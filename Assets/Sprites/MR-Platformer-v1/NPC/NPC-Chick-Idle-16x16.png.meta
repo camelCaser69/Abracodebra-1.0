@@ -1,0 +1,1818 @@
+fileFormatVersion: 2
+guid: 8b37dd9aca364dc4b90d1ed22b8733b7
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8439380473363227068
+    second: NPC-Chick-Idle-16x16_0
+  - first:
+      213: 8392069322806011941
+    second: NPC-Chick-Idle-16x16_1
+  - first:
+      213: 4097232650232281631
+    second: NPC-Chick-Idle-16x16_2
+  - first:
+      213: 9066636875504524519
+    second: NPC-Chick-Idle-16x16_3
+  - first:
+      213: 8342904927666951788
+    second: NPC-Chick-Idle-16x16_4
+  - first:
+      213: -616445348691919024
+    second: NPC-Chick-Idle-16x16_5
+  - first:
+      213: 4602039959607397244
+    second: NPC-Chick-Idle-16x16_6
+  - first:
+      213: -9190968547788551741
+    second: NPC-Chick-Idle-16x16_7
+  - first:
+      213: -568716397133879842
+    second: NPC-Chick-Idle-16x16_8
+  - first:
+      213: 7919846380019009996
+    second: NPC-Chick-Idle-16x16_9
+  - first:
+      213: -7213013170065750333
+    second: NPC-Chick-Idle-16x16_10
+  - first:
+      213: -6051249533303784775
+    second: NPC-Chick-Idle-16x16_11
+  - first:
+      213: -6271453338586801456
+    second: NPC-Chick-Idle-16x16_12
+  - first:
+      213: 3281204817930959553
+    second: NPC-Chick-Idle-16x16_13
+  - first:
+      213: -8180128963177154881
+    second: NPC-Chick-Idle-16x16_14
+  - first:
+      213: -757519926389809089
+    second: NPC-Chick-Idle-16x16_15
+  - first:
+      213: -3560418650803000581
+    second: NPC-Chick-Idle-16x16_16
+  - first:
+      213: 2598983270751243946
+    second: NPC-Chick-Idle-16x16_17
+  - first:
+      213: -8822256161212341795
+    second: NPC-Chick-Idle-16x16_18
+  - first:
+      213: -4412118212515487542
+    second: NPC-Chick-Idle-16x16_19
+  - first:
+      213: -1920638241283167688
+    second: NPC-Chick-Idle-16x16_20
+  - first:
+      213: -1396595369901645689
+    second: NPC-Chick-Idle-16x16_21
+  - first:
+      213: 2344892576501692034
+    second: NPC-Chick-Idle-16x16_22
+  - first:
+      213: -5685165575500876367
+    second: NPC-Chick-Idle-16x16_23
+  - first:
+      213: 3510355818335991637
+    second: NPC-Chick-Idle-16x16_24
+  - first:
+      213: -5917437833162697427
+    second: NPC-Chick-Idle-16x16_25
+  - first:
+      213: -658476787323093032
+    second: NPC-Chick-Idle-16x16_26
+  - first:
+      213: -2344047118954778131
+    second: NPC-Chick-Idle-16x16_27
+  - first:
+      213: 8127301091859268680
+    second: NPC-Chick-Idle-16x16_28
+  - first:
+      213: -4412509647957459047
+    second: NPC-Chick-Idle-16x16_29
+  - first:
+      213: -1483567291800364822
+    second: NPC-Chick-Idle-16x16_30
+  - first:
+      213: 6778639467506739415
+    second: NPC-Chick-Idle-16x16_31
+  - first:
+      213: -3579486140465399417
+    second: NPC-Chick-Idle-16x16_32
+  - first:
+      213: 8109255943387514078
+    second: NPC-Chick-Idle-16x16_33
+  - first:
+      213: 4555113282471758252
+    second: NPC-Chick-Idle-16x16_34
+  - first:
+      213: -5458212777247276895
+    second: NPC-Chick-Idle-16x16_35
+  - first:
+      213: 7296082599143861305
+    second: NPC-Chick-Idle-16x16_36
+  - first:
+      213: -6569629771960833661
+    second: NPC-Chick-Idle-16x16_37
+  - first:
+      213: 2348537157107252749
+    second: NPC-Chick-Idle-16x16_38
+  - first:
+      213: 1459852714021287580
+    second: NPC-Chick-Idle-16x16_39
+  - first:
+      213: -6322658128613849712
+    second: NPC-Chick-Idle-16x16_40
+  - first:
+      213: 8628393972507153446
+    second: NPC-Chick-Idle-16x16_41
+  - first:
+      213: -3006281696251654155
+    second: NPC-Chick-Idle-16x16_42
+  - first:
+      213: -8390669214179972146
+    second: NPC-Chick-Idle-16x16_43
+  - first:
+      213: 4641763894108679294
+    second: NPC-Chick-Idle-16x16_44
+  - first:
+      213: 8314130437514815688
+    second: NPC-Chick-Idle-16x16_45
+  - first:
+      213: -3610945039673188404
+    second: NPC-Chick-Idle-16x16_46
+  - first:
+      213: 4982418031089111688
+    second: NPC-Chick-Idle-16x16_47
+  - first:
+      213: 8033881183511262665
+    second: NPC-Chick-Idle-16x16_48
+  - first:
+      213: 7076309878469305421
+    second: NPC-Chick-Idle-16x16_49
+  - first:
+      213: 9145765565595737038
+    second: NPC-Chick-Idle-16x16_50
+  - first:
+      213: -7444933807955775024
+    second: NPC-Chick-Idle-16x16_51
+  - first:
+      213: 6190424533840428207
+    second: NPC-Chick-Idle-16x16_52
+  - first:
+      213: -5713565759436087522
+    second: NPC-Chick-Idle-16x16_53
+  - first:
+      213: -686114545928080456
+    second: NPC-Chick-Idle-16x16_54
+  - first:
+      213: -6453343579579867299
+    second: NPC-Chick-Idle-16x16_55
+  - first:
+      213: 498002897882197467
+    second: NPC-Chick-Idle-16x16_56
+  - first:
+      213: -2139720473302759237
+    second: NPC-Chick-Idle-16x16_57
+  - first:
+      213: 2683338556366479781
+    second: NPC-Chick-Idle-16x16_58
+  - first:
+      213: -2418158251643601459
+    second: NPC-Chick-Idle-16x16_59
+  - first:
+      213: 6347234528629038491
+    second: NPC-Chick-Idle-16x16_60
+  - first:
+      213: -1211740266548614565
+    second: NPC-Chick-Idle-16x16_61
+  - first:
+      213: 4869449735249130388
+    second: NPC-Chick-Idle-16x16_62
+  - first:
+      213: -3434287225224007723
+    second: NPC-Chick-Idle-16x16_63
+  - first:
+      213: -328425917086439938
+    second: NPC-Chick-Idle-16x16_64
+  - first:
+      213: -7996195309221114180
+    second: NPC-Chick-Idle-16x16_65
+  - first:
+      213: 7234252230270795144
+    second: NPC-Chick-Idle-16x16_66
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_0
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 127
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44e11d85c2c41ea80800000000000000
+      internalID: -8439380473363227068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_1
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 127
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5282e44069e967470800000000000000
+      internalID: 8392069322806011941
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_2
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 127
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f1a3a37236b4cd830800000000000000
+      internalID: 4097232650232281631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_3
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 127
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ec97ef733a23dd70800000000000000
+      internalID: 9066636875504524519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_4
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 127
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c66d17044d3f7c370800000000000000
+      internalID: 8342904927666951788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_5
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 127
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 05fb6cfa832f177f0800000000000000
+      internalID: -616445348691919024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_6
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 127
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7b4d8ae5fabddf30800000000000000
+      internalID: 4602039959607397244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_7
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 127
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c986473dce137080800000000000000
+      internalID: -9190968547788551741
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_8
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 111
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed525e233738b18f0800000000000000
+      internalID: -568716397133879842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_9
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 111
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc942bc4252f8ed60800000000000000
+      internalID: 7919846380019009996
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_10
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 111
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3c6440eecba36eb90800000000000000
+      internalID: -7213013170065750333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_11
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 111
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9bafd204c94a50ca0800000000000000
+      internalID: -6051249533303784775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_12
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 111
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0da98188a6257f8a0800000000000000
+      internalID: -6271453338586801456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_13
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 111
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ca3318b56e298d20800000000000000
+      internalID: 3281204817930959553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_14
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 111
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fb6f0f45c085a7e80800000000000000
+      internalID: -8180128963177154881
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_15
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 111
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f306145f3afbc75f0800000000000000
+      internalID: -757519926389809089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_16
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 95
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bfa263bd91ad69ec0800000000000000
+      internalID: -3560418650803000581
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_17
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 95
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aae8f46c381711420800000000000000
+      internalID: 2598983270751243946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_18
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 95
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dd1ef6183cc019580800000000000000
+      internalID: -8822256161212341795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_19
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 95
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac0abf3bcd105c2c0800000000000000
+      internalID: -4412118212515487542
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_20
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 95
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 83a294e02b58855e0800000000000000
+      internalID: -1920638241283167688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_21
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 95
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 780ae0a19eb4e9ce0800000000000000
+      internalID: -1396595369901645689
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_22
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 95
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28675d2ef5bba8020800000000000000
+      internalID: 2344892576501692034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_23
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 95
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b5bdf6c70c3a11b0800000000000000
+      internalID: -5685165575500876367
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_24
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 79
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5577423a40a47b030800000000000000
+      internalID: 3510355818335991637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_25
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 79
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2551e584a901eda0800000000000000
+      internalID: -5917437833162697427
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_26
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 79
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8df34c6c9de9cd6f0800000000000000
+      internalID: -658476787323093032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_27
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 79
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: de13ce98095487fd0800000000000000
+      internalID: -2344047118954778131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_28
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 79
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8448ae26849f9c070800000000000000
+      internalID: 8127301091859268680
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_29
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 79
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 99ff2898add93c2c0800000000000000
+      internalID: -4412509647957459047
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_30
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 79
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae8d9db886f496be0800000000000000
+      internalID: -1483567291800364822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_31
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 79
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d8ae215ea0921e50800000000000000
+      internalID: 6778639467506739415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_32
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 63
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7893027f15c135ec0800000000000000
+      internalID: -3579486140465399417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_33
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 63
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed4865ad05dd98070800000000000000
+      internalID: 8109255943387514078
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_34
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 63
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca984697563073f30800000000000000
+      internalID: 4555113282471758252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_35
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 63
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1a08dafd5688044b0800000000000000
+      internalID: -5458212777247276895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_36
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 63
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 93ce0e5b774e04560800000000000000
+      internalID: 7296082599143861305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_37
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 63
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 389a170a78cf3d4a0800000000000000
+      internalID: -6569629771960833661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_38
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 63
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0efe2fe91ea79020800000000000000
+      internalID: 2348537157107252749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_39
+      rect:
+        serializedVersion: 2
+        x: 116
+        y: 63
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c96f0ab0f40724410800000000000000
+      internalID: 1459852714021287580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_40
+      rect:
+        serializedVersion: 2
+        x: 4
+        y: 47
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0954cbf4ee76148a0800000000000000
+      internalID: -6322658128613849712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_41
+      rect:
+        serializedVersion: 2
+        x: 20
+        y: 47
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62419615a963eb770800000000000000
+      internalID: 8628393972507153446
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_42
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 47
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5ff4928a9ba8746d0800000000000000
+      internalID: -3006281696251654155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_43
+      rect:
+        serializedVersion: 2
+        x: 52
+        y: 47
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ecb2ffc2eca5e8b80800000000000000
+      internalID: -8390669214179972146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_44
+      rect:
+        serializedVersion: 2
+        x: 68
+        y: 47
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7ce4972babda6040800000000000000
+      internalID: 4641763894108679294
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_45
+      rect:
+        serializedVersion: 2
+        x: 84
+        y: 47
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c865503599b16370800000000000000
+      internalID: 8314130437514815688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_46
+      rect:
+        serializedVersion: 2
+        x: 100
+        y: 47
+        width: 8
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccf12d63e9853edc0800000000000000
+      internalID: -3610945039673188404
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_47
+      rect:
+        serializedVersion: 2
+        x: 114
+        y: 47
+        width: 10
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88251912dca152540800000000000000
+      internalID: 4982418031089111688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_48
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 31
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9c532eefe541e7f60800000000000000
+      internalID: 8033881183511262665
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_49
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 31
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4420c2b75a143260800000000000000
+      internalID: 7076309878469305421
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_50
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 31
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ecb555853594cee70800000000000000
+      internalID: 9145765565595737038
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_51
+      rect:
+        serializedVersion: 2
+        x: 51
+        y: 31
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d1ff7885284ea890800000000000000
+      internalID: -7444933807955775024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_52
+      rect:
+        serializedVersion: 2
+        x: 67
+        y: 31
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: facfb64b05ec8e550800000000000000
+      internalID: 6190424533840428207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_53
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 31
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1f1afba63655b0b0800000000000000
+      internalID: -5713565759436087522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_54
+      rect:
+        serializedVersion: 2
+        x: 99
+        y: 31
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8b37ab6a47e6a76f0800000000000000
+      internalID: -686114545928080456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_55
+      rect:
+        serializedVersion: 2
+        x: 115
+        y: 31
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5f1895a43e1176a0800000000000000
+      internalID: -6453343579579867299
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_56
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 15
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdd22614ff249e600800000000000000
+      internalID: 498002897882197467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_57
+      rect:
+        serializedVersion: 2
+        x: 19
+        y: 15
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb88826f09f2e42e0800000000000000
+      internalID: -2139720473302759237
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_58
+      rect:
+        serializedVersion: 2
+        x: 35
+        y: 15
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a1655833322d3520800000000000000
+      internalID: 2683338556366479781
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_59
+      rect:
+        serializedVersion: 2
+        x: 50
+        y: 15
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dcd7a10d1e9f07ed0800000000000000
+      internalID: -2418158251643601459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_60
+      rect:
+        serializedVersion: 2
+        x: 66
+        y: 15
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b9d1709bc28e51850800000000000000
+      internalID: 6347234528629038491
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_61
+      rect:
+        serializedVersion: 2
+        x: 83
+        y: 15
+        width: 9
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5a255cc5a80f2fe0800000000000000
+      internalID: -1211740266548614565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_62
+      rect:
+        serializedVersion: 2
+        x: 98
+        y: 15
+        width: 10
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 493f4291cb2c39340800000000000000
+      internalID: 4869449735249130388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_63
+      rect:
+        serializedVersion: 2
+        x: 114
+        y: 15
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5df6cdbd6f5f650d0800000000000000
+      internalID: -3434287225224007723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_64
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 0
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef5e7055e52317bf0800000000000000
+      internalID: -328425917086439938
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_65
+      rect:
+        serializedVersion: 2
+        x: 18
+        y: 0
+        width: 10
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cbe0b3f5bbec70190800000000000000
+      internalID: -7996195309221114180
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NPC-Chick-Idle-16x16_66
+      rect:
+        serializedVersion: 2
+        x: 34
+        y: 0
+        width: 10
+        height: 5
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88d3ed0231a356460800000000000000
+      internalID: 7234252230270795144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable: {}
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
