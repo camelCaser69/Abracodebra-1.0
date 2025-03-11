@@ -1,18 +1,15 @@
-﻿using UnityEngine;
+﻿// Assets/Scripts/Nodes/UI/PinView.cs
+using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class PinView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
+public class PinView : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
     public NodePort port;
-    public bool isInput; // True for input pins, false for output pins.
-    private RectTransform rectTransform;
-    private NodeConnectionView currentConnection;
+    public bool isInput; 
     private NodeEditorController nodeEditor;
-
-    private void Awake()
-    {
-        rectTransform = GetComponent<RectTransform>();
-    }
+    
+    // We do NOT store the connection line here; the controller manages it.
+    // We'll just let the controller know which pin the user is dragging from/to.
 
     public void Initialize(NodePort nodePort, bool isInputPin, NodeEditorController editor)
     {
@@ -21,46 +18,26 @@ public class PinView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, ID
         nodeEditor = editor;
     }
 
+    // Called on mouse down.
     public void OnPointerDown(PointerEventData eventData)
     {
-        // Start connection only from output pins.
+        // Typically, we only start a new connection from an output pin.
+        // But if you want to allow “reverse” connection from input to output, remove the check.
         if (!isInput)
-            currentConnection = nodeEditor.StartConnectionFromPin(this);
+        {
+            nodeEditor.StartConnectionDrag(this, eventData);
+        }
     }
 
+    // Called continuously while dragging.
     public void OnDrag(PointerEventData eventData)
     {
-        if (currentConnection != null)
-        {
-            // Update the connection line's end position.
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                nodeEditor.EditorCanvas, eventData.position, eventData.pressEventCamera, out Vector2 localPoint);
-            currentConnection.UpdateEndPoint(localPoint);
-        }
+        nodeEditor.UpdateConnectionDrag(this, eventData);
     }
 
+    // Called once on mouse up.
     public void OnPointerUp(PointerEventData eventData)
     {
-        if (currentConnection != null)
-        {
-            GameObject pointerObj = eventData.pointerCurrentRaycast.gameObject;
-            if (pointerObj != null)
-            {
-                PinView targetPin = pointerObj.GetComponent<PinView>();
-                if (targetPin != null && targetPin.isInput)
-                {
-                    nodeEditor.CompleteConnection(this, targetPin, currentConnection);
-                }
-                else
-                {
-                    nodeEditor.CancelConnection(currentConnection);
-                }
-            }
-            else
-            {
-                nodeEditor.CancelConnection(currentConnection);
-            }
-            currentConnection = null;
-        }
+        nodeEditor.EndConnectionDrag(this, eventData);
     }
 }

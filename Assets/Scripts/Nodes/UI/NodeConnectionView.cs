@@ -1,14 +1,17 @@
-﻿/* Assets/Scripts/Nodes/UI/NodeConnectionView.cs
-   Draws a line (UI-based) between two node ports in the editor. */
-
+﻿// Assets/Scripts/Nodes/UI/NodeConnectionView.cs
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(RectTransform), typeof(Image))]
-public class NodeConnectionView : MonoBehaviour
+public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
 {
-    [SerializeField] private RectTransform startPoint;
-    [SerializeField] private RectTransform endPoint;
+    [SerializeField] private RectTransform startRect;
+    [SerializeField] private RectTransform endRect;
+
+    // Keep track of the source and target pins for easy disconnection.
+    public PinView sourcePin;
+    public PinView targetPin;
 
     private RectTransform lineRect;
     private Image lineImage;
@@ -21,46 +24,63 @@ public class NodeConnectionView : MonoBehaviour
 
     private void Update()
     {
-        if (startPoint != null && endPoint != null)
+        if (startRect && endRect)
+        {
             UpdateLine();
+        }
+    }
+
+    public void SetStartRect(RectTransform start)
+    {
+        startRect = start;
+    }
+
+    public void SetEndRect(RectTransform end)
+    {
+        endRect = end;
+    }
+
+    public void SetEndPosition(Vector2 localPos, RectTransform parentCanvas)
+    {
+        if (!endRect)
+        {
+            GameObject endObj = new GameObject("TempEndRect", typeof(RectTransform));
+            endObj.transform.SetParent(parentCanvas);
+            endRect = endObj.GetComponent<RectTransform>();
+            endRect.sizeDelta = Vector2.zero;
+        }
+        endRect.anchoredPosition = localPos;
     }
 
     private void UpdateLine()
     {
-        Vector3 startPos = startPoint.position;
-        Vector3 endPos = endPoint.position;
+        Vector3 startPos = startRect.position;
+        Vector3 endPos = endRect.position;
         Vector3 direction = endPos - startPos;
         float distance = direction.magnitude;
 
-        // Position at the midpoint.
         lineRect.position = startPos + direction * 0.5f;
         lineRect.sizeDelta = new Vector2(distance, lineRect.sizeDelta.y);
+
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         lineRect.rotation = Quaternion.Euler(0f, 0f, angle);
     }
 
-    public void SetConnectionPoints(RectTransform start, RectTransform end)
+    // ============= Right-Click to Delete the Connection =============
+    public void OnPointerClick(PointerEventData eventData)
     {
-        startPoint = start;
-        endPoint = end;
-    }
-
-    // For dynamic updating by PinView dragging.
-    public void UpdateEndPoint(Vector2 localEndPoint)
-    {
-        if (startPoint != null)
+        // If right-clicked
+        if (eventData.button == PointerEventData.InputButton.Right)
         {
-            // Convert screen space to local space inside the canvas
-            Vector2 worldStart = startPoint.position;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                startPoint.parent as RectTransform, worldStart, null, out Vector2 localStart);
+            // Remove references from source/target
+            if (sourcePin != null && targetPin != null)
+            {
+                sourcePin.port.connectedPortIds.Remove(targetPin.port.portId);
+                // If you store the reverse connection, remove that too
+            }
 
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                startPoint.parent as RectTransform, localEndPoint, null, out Vector2 localEnd);
-
-            // Update line's endpoints
-            SetConnectionPoints(startPoint, startPoint); // Keep source fixed
-            endPoint.anchoredPosition = localEnd;  // Move the end dynamically
+            // Destroy this connection line
+            Destroy(gameObject);
         }
     }
 }
