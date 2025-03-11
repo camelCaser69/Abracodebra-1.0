@@ -10,12 +10,12 @@ public class NodeView : MonoBehaviour
     [SerializeField] private Image backgroundImage;
 
     [Header("Pin Containers")]
-    [SerializeField] private VerticalLayoutGroup inputPinsContainer;
-    [SerializeField] private VerticalLayoutGroup outputPinsContainer;
+    [SerializeField] private Transform inputPinsContainer;   // e.g., a Panel with VerticalLayoutGroup (left side)
+    [SerializeField] private Transform outputPinsContainer;  // (right side)
 
     private NodeData nodeData;
 
-    // We add a 'displayName' parameter to make it simpler
+    // Initialize the node view with data, color, and display name.
     public void Initialize(NodeData data, Color color, string displayName)
     {
         nodeData = data;
@@ -23,51 +23,54 @@ public class NodeView : MonoBehaviour
         if (backgroundImage) backgroundImage.color = color;
     }
 
+    // Generate pin UI elements based on provided port lists.
+    // Assets/Scripts/Nodes/UI/NodeView.cs
     public void GeneratePins(List<NodePort> inputs, List<NodePort> outputs)
     {
-        // Clear existing pins if needed
-        foreach (Transform child in inputPinsContainer.transform)
+        // Find the NodeEditorController in the scene using the new recommended method.
+        NodeEditorController controller = FindFirstObjectByType<NodeEditorController>();  
+
+        foreach (var input in inputs)
         {
-            Destroy(child.gameObject);
-        }
-        foreach (Transform child in outputPinsContainer.transform)
-        {
-            Destroy(child.gameObject);
+            CreatePin(inputPinsContainer, input, true, controller);
         }
 
-        // Generate input pins
-        foreach (var inputPort in inputs)
+        foreach (var output in outputs)
         {
-            CreatePin(inputPinsContainer.transform, inputPort, true);
-        }
-
-        // Generate output pins
-        foreach (var outputPort in outputs)
-        {
-            CreatePin(outputPinsContainer.transform, outputPort, false);
+            CreatePin(outputPinsContainer, output, false, controller);
         }
     }
 
-    private void CreatePin(Transform parent, NodePort port, bool isInput)
+    private void CreatePin(Transform parent, NodePort port, bool isInput, NodeEditorController controller)
     {
-        // For demonstration, let's just create a small button or image
         GameObject pinObj = new GameObject(isInput ? "InputPin" : "OutputPin", typeof(RectTransform));
         pinObj.transform.SetParent(parent);
-        var rect = pinObj.GetComponent<RectTransform>();
-        rect.sizeDelta = new Vector2(20, 20);
+        RectTransform rt = pinObj.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(20, 20);
 
-        // Add an Image to make it visible
-        var img = pinObj.AddComponent<Image>();
-        img.color = isInput ? Color.blue : Color.green;
-        
-        // (Optional) store references somewhere so you can connect them with lines
-        // e.g. pinObj.AddComponent<PinView>().Initialize(port);
+        Image img = pinObj.AddComponent<Image>();
 
-        // If you want to show the portName, you can add a tooltip or small text next to it
+        switch (port.portType)
+        {
+            case PortType.Mana:
+                img.color = Color.cyan;
+                break;
+            case PortType.Condition:
+                img.color = new Color(1f, 0.65f, 0f); // Orange
+                break;
+            default:
+                img.color = Color.blue;
+                break;
+        }
+
+        PinView pinView = pinObj.AddComponent<PinView>();
+        pinView.Initialize(port, isInput, controller);
     }
+
 
     public NodeData GetNodeData()
     {
         return nodeData;
     }
 }
+

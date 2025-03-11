@@ -17,5 +17,5 @@ MonoBehaviour:
   description: Pool of mana
   ports:
   - portName: Mana
-    portType: Mana
+    portType: 1
     isInput: 0

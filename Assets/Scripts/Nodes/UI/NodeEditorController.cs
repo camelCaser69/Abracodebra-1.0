@@ -6,24 +6,27 @@ using System.Collections.Generic;
 public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 {
     [Header("Editor Setup")]
-    [SerializeField] private RectTransform editorCanvas;
-    [SerializeField] private GameObject nodeViewPrefab;
-    [SerializeField] private GameObject connectionViewPrefab;
+    [SerializeField] private RectTransform editorCanvas; // The main area for node views.
+    [SerializeField] private GameObject nodeViewPrefab;  // Prefab for NodeView.
+    [SerializeField] private GameObject connectionViewPrefab; // Prefab for connection lines.
 
     [Header("Node Definitions")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary; 
-    // Instead of "availableNodeTypes", we have a library of NodeDefinitions
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // Holds available NodeDefinition assets.
 
     [Header("Runtime Graph Reference")]
     [SerializeField] private NodeGraph currentGraph;
 
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
 
-    // Right-click context menu
+    // For right-click context menu.
     private bool showContextMenu;
     private Vector2 contextMenuPosition;
 
-    // Load or set a new graph
+    // For active connection dragging.
+    private List<NodeConnectionView> activeConnections = new List<NodeConnectionView>();
+
+    public RectTransform EditorCanvas { get { return editorCanvas; } }
+
     public void LoadGraph(NodeGraph graph)
     {
         currentGraph = graph;
@@ -31,11 +34,8 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
         if (currentGraph == null) return;
 
-        // Recreate each node's NodeView
         foreach (NodeData node in currentGraph.nodes)
-        {
             CreateNodeView(node);
-        }
     }
 
     private NodeView CreateNodeView(NodeData data)
@@ -43,36 +43,29 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         GameObject nodeObj = Instantiate(nodeViewPrefab, editorCanvas);
         NodeView view = nodeObj.GetComponent<NodeView>();
 
-        // We'll set the color and name from the NodeData if we have it
-        // or we could look it up via nodeDefinitionId, but let's keep it simple:
-
-        Color nodeColor = Color.gray; // default
+        // Lookup color and display name from node data.
+        Color nodeColor = Color.gray;
         string displayName = data.nodeDisplayName;
 
         view.Initialize(data, nodeColor, displayName);
 
-        // Move to saved position
         RectTransform rt = nodeObj.GetComponent<RectTransform>();
         rt.anchoredPosition = data.editorPosition;
 
-        // Now we also want to spawn the "pins" on the left/right for inputs/outputs.
         view.GeneratePins(data.inputs, data.outputs);
 
         spawnedNodeViews.Add(view);
         return view;
     }
 
-    // Clears existing NodeViews
     private void ClearExistingViews()
     {
         foreach (NodeView view in spawnedNodeViews)
-        {
             if (view != null) Destroy(view.gameObject);
-        }
         spawnedNodeViews.Clear();
     }
 
-    // Zoom
+    // Zoom functionality.
     public void OnScroll(PointerEventData eventData)
     {
         float scrollDelta = eventData.scrollDelta.y;
@@ -81,13 +74,12 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         editorCanvas.localScale = Vector3.one * newScale;
     }
 
-    // Pan
+    // Pan functionality.
     public void OnDrag(PointerEventData eventData)
     {
         editorCanvas.anchoredPosition += eventData.delta;
     }
 
-    // Detect right-click
     private void Update()
     {
         if (Input.GetMouseButtonDown(1))
@@ -101,9 +93,9 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
     {
         if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions.Count > 0)
         {
-            Vector2 guiPosition = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
-            float height = 20 + (definitionLibrary.definitions.Count * 25);
-            Rect menuRect = new Rect(guiPosition.x, guiPosition.y, 180, height);
+            Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
+            float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
+            Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
 
             GUI.Box(menuRect, "Add Node");
 
@@ -123,16 +115,13 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     private void CreateNodeAtMouse(NodeDefinition definition)
     {
-        // Convert screen space -> local space
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
             editorCanvas, Input.mousePosition, null, out Vector2 localPos);
 
-        // Create new NodeData from the NodeDefinition
         NodeData newNode = new NodeData();
         newNode.nodeDisplayName = definition.displayName;
         newNode.editorPosition = localPos;
 
-        // Create ports from NodeDefinition
         foreach (var portDef in definition.ports)
         {
             NodePort nodePort = new NodePort();
@@ -140,19 +129,42 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             nodePort.portType = portDef.portType;
 
             if (portDef.isInput)
-            {
                 newNode.inputs.Add(nodePort);
-            }
             else
-            {
                 newNode.outputs.Add(nodePort);
-            }
         }
 
-        // Add the new node to the currentGraph
         currentGraph.nodes.Add(newNode);
-
-        // Create a NodeView for it
         CreateNodeView(newNode);
     }
+
+    // Methods for connection handling called by PinView.
+
+    public NodeConnectionView StartConnectionFromPin(PinView sourcePin)
+    {
+        GameObject connObj = Instantiate(connectionViewPrefab, editorCanvas);
+        NodeConnectionView connection = connObj.GetComponent<NodeConnectionView>();
+
+        RectTransform sourceRect = sourcePin.GetComponent<RectTransform>();
+        connection.SetConnectionPoints(sourceRect, sourceRect); // Initially, both endpoints at source.
+        activeConnections.Add(connection);
+        return connection;
+    }
+
+    public void CompleteConnection(PinView sourcePin, PinView targetPin, NodeConnectionView connection)
+    {
+        RectTransform targetRect = targetPin.GetComponent<RectTransform>();
+        connection.SetConnectionPoints(sourcePin.GetComponent<RectTransform>(), targetRect);
+
+        // Update port data: add target pin's ID to source pin's connections.
+        if (sourcePin.port != null && targetPin.port != null)
+            sourcePin.port.connectedPortIds.Add(targetPin.port.portId);
+    }
+
+    public void CancelConnection(NodeConnectionView connection)
+    {
+        activeConnections.Remove(connection);
+        Destroy(connection.gameObject);
+    }
 }
+

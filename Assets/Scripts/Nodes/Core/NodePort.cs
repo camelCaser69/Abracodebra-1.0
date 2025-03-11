@@ -3,15 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class NodePort
 {
     public string portId;
-    public string portName;    // e.g., "In", "Out", "ManaIn"
-    public string portType;    // e.g., "General", "Mana", "Condition"
-
-    // Each port can connect to multiple other ports, stored by their unique IDs.
+    public string portName;
+    public PortType portType;
     public List<string> connectedPortIds;
 
     public NodePort()

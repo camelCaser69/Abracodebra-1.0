@@ -22,9 +22,7 @@ public class NodeConnectionView : MonoBehaviour
     private void Update()
     {
         if (startPoint != null && endPoint != null)
-        {
             UpdateLine();
-        }
     }
 
     private void UpdateLine()
@@ -34,10 +32,9 @@ public class NodeConnectionView : MonoBehaviour
         Vector3 direction = endPos - startPos;
         float distance = direction.magnitude;
 
-        // Move line to midpoint
+        // Position at the midpoint.
         lineRect.position = startPos + direction * 0.5f;
         lineRect.sizeDelta = new Vector2(distance, lineRect.sizeDelta.y);
-
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         lineRect.rotation = Quaternion.Euler(0f, 0f, angle);
     }
@@ -46,5 +43,24 @@ public class NodeConnectionView : MonoBehaviour
     {
         startPoint = start;
         endPoint = end;
+    }
+
+    // For dynamic updating by PinView dragging.
+    public void UpdateEndPoint(Vector2 localEndPoint)
+    {
+        if (startPoint != null)
+        {
+            // Convert screen space to local space inside the canvas
+            Vector2 worldStart = startPoint.position;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                startPoint.parent as RectTransform, worldStart, null, out Vector2 localStart);
+
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                startPoint.parent as RectTransform, localEndPoint, null, out Vector2 localEnd);
+
+            // Update line's endpoints
+            SetConnectionPoints(startPoint, startPoint); // Keep source fixed
+            endPoint.anchoredPosition = localEnd;  // Move the end dynamically
+        }
     }
 }

@@ -7,12 +7,9 @@ using UnityEngine;
 public class NodeData
 {
     public string nodeId;
-    public string nodeDefinitionId;   // e.g. GUID or name referencing the NodeDefinition
-    public string nodeDisplayName;    // "Mana Source", "Damage", etc.
+    public string nodeDisplayName; // e.g., "Mana Source"
+    public Vector2 editorPosition; // Position in the editor
 
-    public Vector2 editorPosition;
-
-    // The actual ports used at runtime
     public List<NodePort> inputs;
     public List<NodePort> outputs;
 
