@@ -1,15 +1,18 @@
 ﻿// Assets/Scripts/Nodes/Core/NodeData.cs
-// Core data class for a single node in the graph (no MonoBehaviour).
-
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 [Serializable]
 public class NodeData
 {
     public string nodeId;
-    public string nodeType;    // e.g. "Mana", "Damage", "Cooldown"
-    
+    public string nodeDefinitionId;   // e.g. GUID or name referencing the NodeDefinition
+    public string nodeDisplayName;    // "Mana Source", "Damage", etc.
+
+    public Vector2 editorPosition;
+
+    // The actual ports used at runtime
     public List<NodePort> inputs;
     public List<NodePort> outputs;
 

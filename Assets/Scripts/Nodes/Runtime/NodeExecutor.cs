@@ -1,5 +1,5 @@
-﻿// Assets/Scripts/Nodes/Runtime/NodeExecutor.cs
-// MonoBehaviour that runs or interprets a NodeGraph at runtime (e.g., for spell logic).
+﻿/* Assets/Scripts/Nodes/Runtime/NodeExecutor.cs
+   MonoBehaviour that runs or interprets a NodeGraph at runtime (e.g., spells). */
 
 using UnityEngine;
 
@@ -7,21 +7,19 @@ public class NodeExecutor : MonoBehaviour
 {
     [SerializeField] private NodeGraph currentGraph;
 
-    // Example: This method demonstrates how you might "execute" the graph logic.
-    // Expand or modify according to your gameplay needs.
+    // Example method for "executing" the graph logic. Expand or modify for your spells.
     public void ExecuteGraph()
     {
         if (currentGraph == null) return;
-
-        // Example approach: a topological sort or BFS could go here.
-        // For each node in currentGraph.nodes, check nodeType and do something.
 
         foreach (var node in currentGraph.nodes)
         {
             // Pseudocode:
             // if (node.nodeType == "Damage") { ... }
-            // if (node.nodeType == "Cooldown") { ... }
-            // and so on
+            // else if (node.nodeType == "Mana") { ... }
+            // etc.
+
+            // This is where you'd connect the node system to actual wizard/spell behaviors.
         }
     }
 

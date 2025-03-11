@@ -531,6 +531,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2010610566}
   - component: {fileID: 2010610567}
+  - component: {fileID: 2010610568}
   m_Layer: 0
   m_Name: NodeSystemRoot
   m_TagString: Untagged
@@ -567,6 +568,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentGraph:
     nodes: []
+--- !u!114 &2010610568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2010610565}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab36eeccd5bb44e2a67c4397aed1a849, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  editorController: {fileID: 2056154128}
 --- !u!1 &2056154126
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,6 +632,7 @@ MonoBehaviour:
   editorCanvas: {fileID: 420027128}
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   connectionViewPrefab: {fileID: 4296726482643796613, guid: cf00005e840b120419ee5051987924d2, type: 3}
+  definitionLibrary: {fileID: 11400000, guid: 11ac7fb888cbf394e81a9c81231495bd, type: 2}
   currentGraph:
     nodes: []
 --- !u!1660057539 &9223372036854775807

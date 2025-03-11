@@ -1,5 +1,5 @@
-﻿// Assets/Scripts/Nodes/Core/NodePort.cs
-// Represents a single port on a NodeData (input or output).
+﻿/* Assets/Scripts/Nodes/Core/NodePort.cs
+   Represents a single port on a NodeData (input or output). */
 
 using System;
 using System.Collections.Generic;
@@ -9,8 +9,8 @@ public class NodePort
 {
     public string portId;
     public string portName;    // e.g., "In", "Out", "ManaIn"
-    public string portType;    // e.g., "Mana", "Trigger", "Float"
-    
+    public string portType;    // e.g., "General", "Mana", "Condition"
+
     // Each port can connect to multiple other ports, stored by their unique IDs.
     public List<string> connectedPortIds;
 
