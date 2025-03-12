@@ -25,11 +25,10 @@ MonoBehaviour:
   - portName: Mana
     portType: 1
     isInput: 1
-  - portName: Mana
-    portType: 1
-    isInput: 0
   effects:
   - effectType: 0
     effectValue: 4
+    secondaryValue: 0
   - effectType: 1
     effectValue: 2
+    secondaryValue: 0

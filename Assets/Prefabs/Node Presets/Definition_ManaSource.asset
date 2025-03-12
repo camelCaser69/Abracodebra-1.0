@@ -16,9 +16,6 @@ MonoBehaviour:
   backgroundColor: {r: 0, g: 0, b: 0, a: 0.8}
   description: Pool of mana
   ports:
-  - portName: General
-    portType: 0
-    isInput: 0
   - portName: Mana
     portType: 1
     isInput: 0

@@ -35,7 +35,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             currentGraph = new NodeGraph();
 
         // Find a NodeExecutor
-        executor = FindObjectOfType<NodeExecutor>();
+        executor = FindFirstObjectByType<NodeExecutor>();
         if (executor == null)
         {
             Debug.LogWarning("[NodeEditorController] No NodeExecutor found in scene.");

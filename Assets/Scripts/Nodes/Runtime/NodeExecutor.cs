@@ -6,17 +6,15 @@ using TMPro;
 
 public class NodeExecutor : MonoBehaviour
 {
-    public float waitTimeBetweenNodes = 0.5f;
-    public TMP_Text debugOutput; // Optional on-screen log display
-
     [SerializeField] private NodeGraph currentGraph;
 
-    private float totalDamage = 0f;
-    private float currentMana = 0f; // Unique mana pool from a ManaStorage node
-    private float maxMana = 0f;
+    [Header("Debug Settings")]
+    public float waitTimeBetweenNodes = 0.5f; // Pause for step-by-step debug
+    public TMP_Text debugOutput; // optional on-screen text
 
     private void Update()
     {
+        // Press SPACE to run the chain
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ExecuteGraph();
@@ -34,9 +32,10 @@ public class NodeExecutor : MonoBehaviour
     {
         if (currentGraph == null || currentGraph.nodes.Count == 0)
         {
-            Debug.LogWarning("No graph or no nodes to execute!");
+            Debug.LogWarning("[NodeExecutor] No graph or no nodes to execute!");
             return;
         }
+
         StopAllCoroutines();
         StartCoroutine(RunChainCoroutine());
     }
@@ -44,115 +43,119 @@ public class NodeExecutor : MonoBehaviour
     private IEnumerator RunChainCoroutine()
     {
         ClearDebugOutput();
-        totalDamage = 0f;
 
-        // 1) Find the output node (assumes at least one exists)
+        // 1) Find an Output node
         var outputNodes = currentGraph.nodes
             .Where(n => n.effects.Any(e => e.effectType == NodeEffectType.Output))
             .ToList();
 
         if (outputNodes.Count == 0)
         {
-            LogDebug("No Output node found. Aborting run.");
+            LogDebug("[NodeExecutor] No Output node found. Aborting run.");
             yield break;
         }
 
-        // For simplicity, use the first output node.
+        // For simplicity, pick the first output node
         NodeData outputNode = outputNodes[0];
 
-        // 2) Gather all nodes in the chain that lead to this output node.
-        List<NodeData> chainNodes = GetNodesLeadingTo(outputNode);
-        if (chainNodes.Count == 0)
+        // 2) Gather all nodes leading to this output (including itself)
+        var chain = new List<NodeData>();
+        RecursiveGatherUpstream(outputNode, chain);
+
+        if (chain.Count == 0)
         {
-            LogDebug("No chain leading to output node. Aborting run.");
+            LogDebug("[NodeExecutor] No chain leading to output node. Aborting run.");
             yield break;
         }
 
-        // Reverse chain so that chainNodes[0] is the starting node.
-        chainNodes.Reverse();
+        // chain is reversed (output -> up). Let's re-reverse it (start -> ... -> output).
+        chain.Reverse();
 
-        // 3) Identify the ManaStorage node in the chain (if any).
-        // We'll assume the starting node is a ManaStorage node.
-        NodeData manaSource = chainNodes.FirstOrDefault(n => n.manaStorageCapacity > 0f);
-        if (manaSource == null)
-        {
-            LogDebug("No Mana Storage node found in chain. Aborting run.");
-            yield break;
-        }
-        maxMana = manaSource.manaStorageCapacity;
-        currentMana = manaSource.currentManaStorage;
+        LogDebug($"[NodeExecutor] Found {chain.Count} nodes in chain from start to output.");
 
-        LogDebug($"[NodeExecutor] Starting chain with Mana: {currentMana}/{maxMana}");
+        // 3) We'll keep track of a "localMana" that can be updated if we encounter a node with ManaStorage
+        float localMana = 0f;
+        float localCapacity = 0f;
+        float totalDamage = 0f;
 
-        // 4) Execute the chain in order.
-        foreach (var node in chainNodes)
+        // 4) Execute chain in forward order
+        foreach (var node in chain)
         {
             yield return new WaitForSeconds(waitTimeBetweenNodes);
 
-            // Sum ManaCost effects for this node.
+            // If this node has a ManaStorage effect, it overrides localMana
+            if (node.manaStorageCapacity > 0f)
+            {
+                localCapacity = node.manaStorageCapacity;
+                localMana = node.currentManaStorage;
+                LogDebug($"[NodeExecutor] Node '{node.nodeDisplayName}' sets localMana to {localMana}/{localCapacity}");
+            }
+
+            // ManaCost
             float manaCost = node.effects
                 .Where(e => e.effectType == NodeEffectType.ManaCost)
                 .Sum(e => e.effectValue);
 
-            if (currentMana < manaCost)
+            bool canPay = (localMana >= manaCost);
+            if (manaCost > 0f && !canPay)
             {
-                LogDebug($"Node '{node.nodeDisplayName}' cannot run. Needs {manaCost} mana, only {currentMana} available.");
-                continue;
+                LogDebug($"[NodeExecutor] Not enough mana for '{node.nodeDisplayName}'. Required {manaCost}, have {localMana}. Skipping node's damage but continuing chain...");
+                // We do not stop the chain, just skip applying this node's damage
             }
-            currentMana -= manaCost;
-
-            // Sum Damage effects for this node.
-            float damage = node.effects
-                .Where(e => e.effectType == NodeEffectType.Damage)
-                .Sum(e => e.effectValue);
-            totalDamage += damage;
-
-            LogDebug($"Node '{node.nodeDisplayName}' executed: ManaCost={manaCost}, Damage={damage}, RemainingMana={currentMana}");
-            
-            // Optionally, update the node's displayed mana storage if this node is a ManaStorage node.
-            if (node.manaStorageCapacity > 0f)
+            else
             {
-                // Here, you could update the NodeView for this node (not shown).
-                LogDebug($"[ManaStorage] '{node.nodeDisplayName}' now has {currentMana}/{maxMana} mana.");
+                // Subtract cost
+                localMana -= manaCost;
+
+                // Damage
+                float dmg = node.effects
+                    .Where(e => e.effectType == NodeEffectType.Damage)
+                    .Sum(e => e.effectValue);
+                totalDamage += dmg;
+
+                LogDebug($"[NodeExecutor] Node '{node.nodeDisplayName}' executed: cost={manaCost}, damage={dmg}, leftoverMana={localMana}/{localCapacity}");
             }
 
-            // If this node has the Output effect, consider it the end of the chain.
-            if (node.effects.Any(e => e.effectType == NodeEffectType.Output))
+            // If node has Output effect, we log final result
+            bool isOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
+            if (isOutput)
             {
-                LogDebug($"[Output] Output node reached: FinalDamage={totalDamage}, FinalMana={currentMana}");
-                // Here you can trigger the visual spell cast.
+                LogDebug($"[NodeExecutor] Output node '{node.nodeDisplayName}' reached. FinalDamage={totalDamage}, finalMana={localMana}");
+                // Potentially spawn a spell effect here
             }
         }
 
-        LogDebug($"[NodeExecutor] Chain execution finished. TotalDamage={totalDamage}, RemainingMana={currentMana}");
+        LogDebug("[NodeExecutor] Done executing chain.");
     }
 
     /// <summary>
-    /// Recursively gathers all nodes that lead to the given output node.
-    /// Returns a list in reverse order (output -> start).
+    /// Recursively gathers all nodes that feed into 'currentNode' (via "General" ports).
+    /// Each node is added once to 'chain'.
     /// </summary>
-    private List<NodeData> GetNodesLeadingTo(NodeData endNode)
+    private void RecursiveGatherUpstream(NodeData currentNode, List<NodeData> chain)
     {
-        List<NodeData> chain = new List<NodeData>();
-        RecursiveGather(endNode, chain);
-        return chain;
-    }
+        if (!chain.Contains(currentNode))
+            chain.Add(currentNode);
 
-    private void RecursiveGather(NodeData node, List<NodeData> chain)
-    {
-        if (!chain.Contains(node))
-            chain.Add(node);
-
-        foreach (var inp in node.inputs)
+        // For each input port of currentNode
+        foreach (var inputPort in currentNode.inputs)
         {
-            foreach (var connectedPortId in inp.connectedPortIds)
+            // If port type != General, skip
+            // (Use your enum-based check here)
+            if (inputPort.portType != PortType.General)
+                continue;
+
+            // Each connectedPortId is from an output port of some other node
+            foreach (var connectedId in inputPort.connectedPortIds)
             {
-                NodeData sourceNode = currentGraph.nodes.FirstOrDefault(
-                    n => n.outputs.Any(o => o.portId == connectedPortId)
-                );
+                // Find which node has an output with this ID
+                var sourceNode = currentGraph.nodes.FirstOrDefault(n =>
+                    n.outputs.Any(o => o.portId == connectedId && o.portType == PortType.General));
+
                 if (sourceNode != null && !chain.Contains(sourceNode))
                 {
-                    RecursiveGather(sourceNode, chain);
+                    // Recurse upstream
+                    RecursiveGatherUpstream(sourceNode, chain);
                 }
             }
         }
@@ -160,14 +163,15 @@ public class NodeExecutor : MonoBehaviour
 
     private void ClearDebugOutput()
     {
-        if (debugOutput)
-            debugOutput.text = "";
+        if (debugOutput) debugOutput.text = "";
     }
 
     private void LogDebug(string msg)
     {
         Debug.Log(msg);
         if (debugOutput)
+        {
             debugOutput.text += msg + "\n";
+        }
     }
 }
