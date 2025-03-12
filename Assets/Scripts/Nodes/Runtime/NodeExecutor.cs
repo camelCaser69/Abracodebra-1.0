@@ -9,49 +9,37 @@ public class NodeExecutor : MonoBehaviour
     [SerializeField] private NodeGraph currentGraph;
 
     [Header("Debug Settings")]
-    public float waitTimeBetweenNodes = 0.5f; // Pause for step-by-step debug
-    public TMP_Text debugOutput; // Optional on-screen text
+    public float waitTimeBetweenNodes = 0.5f;
+    public TMP_Text debugOutput;
 
     private void Update()
     {
-        // 1) Real-time mana recharge for all nodes with ManaStorage + ManaRechargeRate
-        RechargeManaOverTime();
+        RechargeNodesOverTime();
 
-        // 2) Press SPACE => run chain execution
         if (Input.GetKeyDown(KeyCode.Space))
-        {
             ExecuteGraph();
-        }
     }
 
-    private void RechargeManaOverTime()
+    // For each node with ManaStorage + optional ManaRechargeRate
+    private void RechargeNodesOverTime()
     {
         if (currentGraph == null) return;
 
-        // For each node in the graph, if it has a ManaStorage effect and optionally a ManaRechargeRate effect,
-        // we add recharge * Time.deltaTime to the node's current mana, clamped by capacity.
         foreach (var node in currentGraph.nodes)
         {
-            var storageEff = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
-            if (storageEff != null)
+            var storage = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
+            if (storage != null)
             {
-                float capacity = storageEff.effectValue;       // max capacity
-                float current = storageEff.secondaryValue;    // current mana
-                float rechargeRate = 0f;
+                float cap = storage.effectValue;
+                float cur = storage.secondaryValue;
 
-                // If the same node has a separate effect for ManaRechargeRate, add it
-                var rechargeEff = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaRechargeRate);
-                if (rechargeEff != null)
-                {
-                    rechargeRate = rechargeEff.effectValue; // user-defined rate
-                }
+                var rateEff = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaRechargeRate);
+                float rate = (rateEff != null) ? rateEff.effectValue : 0f;
 
-                // Increase current by rechargeRate * dt, clamp to capacity
-                current += rechargeRate * Time.deltaTime;
-                current = Mathf.Clamp(current, 0f, capacity);
+                cur += rate * Time.deltaTime;
+                if (cur > cap) cur = cap;
 
-                // Write back into secondaryValue so the NodeView shows the updated current
-                storageEff.secondaryValue = current;
+                storage.secondaryValue = cur;
             }
         }
     }
@@ -70,121 +58,139 @@ public class NodeExecutor : MonoBehaviour
             Debug.LogWarning("[NodeExecutor] No graph or no nodes to execute!");
             return;
         }
+
         StopAllCoroutines();
         StartCoroutine(RunChainCoroutine());
     }
 
     private IEnumerator RunChainCoroutine()
+{
+    ClearDebugOutput();
+
+    // Build inbound counts from the adjacency dictionary.
+    Dictionary<string, int> inboundCount = BuildInboundCount();
+    List<NodeData> startNodes = currentGraph.nodes.Where(n => inboundCount[n.nodeId] == 0).ToList();
+    if (startNodes.Count == 0)
     {
-        ClearDebugOutput();
+        LogDebug("[NodeExecutor] No start nodes found. Aborting run.");
+        yield break;
+    }
 
-        // BFS or any chain-building approach here:
-        // For example, gather all start nodes (in-degree=0), then BFS to produce a "chain"
-        // (We've simplified it for demonstration. Adjust as needed for multi-output.)
-        Dictionary<string, int> inboundCount = BuildInboundCount();
-        List<NodeData> startNodes = currentGraph.nodes
-            .Where(n => inboundCount[n.nodeId] == 0)
-            .ToList();
+    // Perform BFS to build a chain.
+    Queue<NodeData> queue = new Queue<NodeData>();
+    HashSet<string> visited = new HashSet<string>();
+    foreach (var s in startNodes)
+        queue.Enqueue(s);
 
-        if (startNodes.Count == 0)
+    List<NodeData> chain = new List<NodeData>();
+    while (queue.Count > 0)
+    {
+        NodeData curr = queue.Dequeue();
+        if (visited.Contains(curr.nodeId))
+            continue;
+        visited.Add(curr.nodeId);
+        chain.Add(curr);
+
+        if (currentGraph.adjacency != null && currentGraph.adjacency.ContainsKey(curr.nodeId))
         {
-            LogDebug("[NodeExecutor] No start nodes found. Aborting run.");
-            yield break;
-        }
-
-        // BFS from all starts
-        Queue<NodeData> queue = new Queue<NodeData>();
-        HashSet<string> visited = new HashSet<string>();
-        foreach (var s in startNodes) queue.Enqueue(s);
-
-        List<NodeData> chain = new List<NodeData>();
-
-        while (queue.Count > 0)
-        {
-            var curr = queue.Dequeue();
-            if (visited.Contains(curr.nodeId)) continue;
-            visited.Add(curr.nodeId);
-            chain.Add(curr);
-
-            if (currentGraph.adjacency != null && currentGraph.adjacency.ContainsKey(curr.nodeId))
+            foreach (var childId in currentGraph.adjacency[curr.nodeId])
             {
-                foreach (var childId in currentGraph.adjacency[curr.nodeId])
+                inboundCount[childId]--;
+                if (inboundCount[childId] <= 0)
                 {
-                    if (inboundCount[childId] > 0)
-                    {
-                        inboundCount[childId]--;
-                        if (inboundCount[childId] == 0)
-                        {
-                            var childNode = currentGraph.nodes.FirstOrDefault(n => n.nodeId == childId);
-                            if (childNode != null) queue.Enqueue(childNode);
-                        }
-                    }
+                    NodeData child = currentGraph.nodes.FirstOrDefault(n => n.nodeId == childId);
+                    if (child != null)
+                        queue.Enqueue(child);
                 }
             }
         }
+    }
 
-        // Log the chain: Node1 -> Node2 -> ...
-        string chainLog = string.Join(" -> ", chain.Select(n => n.nodeDisplayName));
-        LogDebug("[NodeExecutor] Chain: " + chainLog);
+    string chainLog = string.Join(" -> ", chain.Select(n => n.nodeDisplayName));
+    LogDebug("[NodeExecutor] Chain: " + chainLog);
 
-        // BFS Execution
-        float totalDamage = 0f;
-        float totalManaCost = 0f;
-        List<string> skippedNodes = new List<string>();
+    float totalDamage = 0f;
+    float totalManaCost = 0f;
+    List<string> skippedNodes = new List<string>();
 
-        foreach (var node in chain)
+    foreach (var node in chain)
+    {
+        yield return new WaitForSeconds(waitTimeBetweenNodes);
+
+        // Sum ManaCost effects for this node.
+        float cost = node.effects.Where(e => e.effectType == NodeEffectType.ManaCost).Sum(e => e.effectValue);
+
+        if (cost <= 0f)
         {
-            yield return new WaitForSeconds(waitTimeBetweenNodes);
-
-            // Gather ManaStorage effect if present (we do NOT reset or override it)
-            var storageEff = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
-            float capacity = (storageEff != null) ? storageEff.effectValue : 0f;
-            float current = (storageEff != null) ? storageEff.secondaryValue : 0f;
-
-            // Gather ManaCost
-            float cost = node.effects
-                .Where(e => e.effectType == NodeEffectType.ManaCost)
-                .Sum(e => e.effectValue);
-
-            if (cost > 0 && current < cost)
+            // If no cost, simply add any damage.
+            float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
+            totalDamage += dmg;
+            LogDebug($"[NodeExecutor] Executed '{node.nodeDisplayName}' with no cost, damage={Mathf.Floor(dmg)}");
+        }
+        else
+        {
+            // For nodes with cost, look up the mana source from manaConnections.
+            if (!currentGraph.manaConnections.ContainsKey(node.nodeId))
             {
-                LogDebug($"[NodeExecutor] Skipping node '{node.nodeDisplayName}' (insufficient mana: {current}/{cost}).");
+                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - no mana source connected.");
                 skippedNodes.Add(node.nodeDisplayName);
+                continue;
+            }
+
+            string sourceId = currentGraph.manaConnections[node.nodeId];
+            NodeData sourceNode = currentGraph.nodes.FirstOrDefault(n => n.nodeId == sourceId);
+            if (sourceNode == null)
+            {
+                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - upstream mana node not found.");
+                skippedNodes.Add(node.nodeDisplayName);
+                continue;
+            }
+
+            var storageEff = sourceNode.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
+            if (storageEff == null)
+            {
+                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - source node '{sourceNode.nodeDisplayName}' has no ManaStorage.");
+                skippedNodes.Add(node.nodeDisplayName);
+                continue;
+            }
+
+            float cap = storageEff.effectValue;
+            float cur = storageEff.secondaryValue;
+
+            if (cur < cost)
+            {
+                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' (insufficient mana in '{sourceNode.nodeDisplayName}': {Mathf.Floor(cur)}/{cost}).");
+                skippedNodes.Add(node.nodeDisplayName);
+                continue;
             }
             else
             {
-                current -= cost;
+                cur -= cost;
+                storageEff.secondaryValue = cur; // update the source's current mana
                 totalManaCost += cost;
 
-                float damage = node.effects
-                    .Where(e => e.effectType == NodeEffectType.Damage)
-                    .Sum(e => e.effectValue);
-                totalDamage += damage;
+                float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
+                totalDamage += dmg;
 
-                LogDebug($"[NodeExecutor] Executed '{node.nodeDisplayName}': cost={cost}, damage={damage}, leftoverMana={current}/{capacity}");
-            }
-
-            // Write back updated mana
-            if (storageEff != null)
-            {
-                storageEff.secondaryValue = Mathf.Clamp(current, 0f, capacity);
-            }
-
-            // If this node is an output node, log final
-            bool isOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
-            if (isOutput)
-            {
-                LogDebug($"[NodeExecutor] Output node '{node.nodeDisplayName}' reached.");
-                LogDebug($"[NodeExecutor] Total mana cost: {totalManaCost}");
-                LogDebug($"[NodeExecutor] Skipped nodes: {(skippedNodes.Count > 0 ? string.Join(", ", skippedNodes) : "None")}");
-                LogDebug($"[NodeExecutor] Final damage: {totalDamage}, final mana: {current}/{capacity}");
+                float fCost = Mathf.Floor(cost);
+                float fDmg = Mathf.Floor(dmg);
+                float fCur = Mathf.Floor(cur);
+                float fCap = Mathf.Floor(cap);
+                LogDebug($"[NodeExecutor] '{node.nodeDisplayName}' executed: cost={fCost}, damage={fDmg}, sourceNode='{sourceNode.nodeDisplayName}' leftoverMana={fCur}/{fCap}");
             }
         }
 
-        LogDebug("[NodeExecutor] BFS execution complete.");
+        // If node has Output effect, log final results.
+        bool isOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
+        if (isOutput)
+        {
+            LogDebug($"[NodeExecutor] Output node '{node.nodeDisplayName}' reached. Total mana cost={Mathf.Floor(totalManaCost)}, total damage={Mathf.Floor(totalDamage)}, skipped nodes={(skippedNodes.Count > 0 ? string.Join(", ", skippedNodes) : "None")}");
+        }
     }
 
-    // Build inbound edges based on adjacency
+    LogDebug("[NodeExecutor] BFS execution complete.");
+}
+
     private Dictionary<string, int> BuildInboundCount()
     {
         Dictionary<string, int> inboundCount = new Dictionary<string, int>();
@@ -214,8 +220,6 @@ public class NodeExecutor : MonoBehaviour
     {
         Debug.Log(msg);
         if (debugOutput)
-        {
             debugOutput.text += msg + "\n";
-        }
     }
 }

@@ -23,13 +23,16 @@ public class NodeView : MonoBehaviour
 
     private void Update()
     {
-        // If the node has a ManaStorage effect, display current vs. capacity
+        // If the node has a ManaStorage effect, display
         var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
         if (manaEff != null && manaStorageText != null)
         {
-            manaStorageText.text = $"Mana: {manaEff.secondaryValue}/{manaEff.effectValue}";
+            float cap = Mathf.Floor(manaEff.effectValue);
+            float cur = Mathf.Floor(manaEff.secondaryValue);
+            manaStorageText.text = $"Mana: {cur}/{cap}";
         }
     }
+
 
     
     public void Initialize(NodeData data, Color color, string displayName)

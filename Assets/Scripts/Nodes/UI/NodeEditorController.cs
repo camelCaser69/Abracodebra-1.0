@@ -259,17 +259,27 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
             activeConnectionLine.targetPin = targetPin;
 
+            // Link the pin IDs
             sourcePin.port.connectedPortIds.Add(targetPin.port.portId);
 
-            // Update adjacency: get node IDs for source and target
+            // Find node IDs
             string sourceId = GetNodeIdFromPin(sourcePin);
             string targetId = GetNodeIdFromPin(targetPin);
-            if (currentGraph.adjacency == null)
-                currentGraph.adjacency = new Dictionary<string, List<string>>();
-            if (!currentGraph.adjacency.ContainsKey(sourceId))
-                currentGraph.adjacency[sourceId] = new List<string>();
-            if (!currentGraph.adjacency[sourceId].Contains(targetId))
-                currentGraph.adjacency[sourceId].Add(targetId);
+
+            // For "General" port => update generalAdjacency
+            if (sourcePin.port.portType == PortType.General && targetPin.port.portType == PortType.General)
+            {
+                if (!currentGraph.adjacency.ContainsKey(sourceId))
+                    currentGraph.adjacency[sourceId] = new List<string>();
+                if (!currentGraph.adjacency[sourceId].Contains(targetId))
+                    currentGraph.adjacency[sourceId].Add(targetId);
+            }
+            // For "Mana" port => update manaConnections
+            else if (sourcePin.port.portType == PortType.Mana && targetPin.port.portType == PortType.Mana)
+            {
+                // We assume 1:1 connection. If targetId already in dictionary => overwritten
+                currentGraph.manaConnections[targetId] = sourceId;
+            }
 
             activeConnectionLine = null;
             sourcePin = null;
@@ -279,6 +289,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             CancelActiveConnectionLine();
         }
     }
+
 
 
 
