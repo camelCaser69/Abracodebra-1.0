@@ -76,11 +76,25 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
             if (sourcePin != null && targetPin != null)
             {
                 sourcePin.port.connectedPortIds.Remove(targetPin.port.portId);
-                // If you store the reverse connection, remove that too
+            
+                // Get the NodeEditorController instance
+                NodeEditorController controller = UnityEngine.Object.FindFirstObjectByType<NodeEditorController>();
+                if (controller != null)
+                {
+                    string sourceId = controller.GetNodeIdFromPin(sourcePin);
+                    string targetId = controller.GetNodeIdFromPin(targetPin);
+                
+                    // Access the public CurrentGraph property
+                    if (controller.CurrentGraph.adjacency.ContainsKey(sourceId))
+                    {
+                        controller.CurrentGraph.adjacency[sourceId].Remove(targetId);
+                    }
+                }
             }
 
             // Destroy this connection line
             Destroy(gameObject);
         }
     }
+
 }

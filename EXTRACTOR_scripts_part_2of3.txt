@@ -1,0 +1,867 @@
+This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
+
+================================================================================
+UNITY PROJECT SCRIPT EXPORT - 2025-03-12 11:15:59
+PART 2 OF 3
+================================================================================
+
+--------------------------------------------------------------------------------
+Assets
+├── DefaultVolumeProfile.asset
+├── InputSystem_Actions.inputactions
+├── Prefabs
+│   ├── Node Presets
+│   │   ├── Definition_DamageNode.asset
+│   │   ├── Definition_ManaSource.asset
+│   │   ├── Definition_Output.asset
+│   │   └── NodeDefinitionLibrary.asset
+│   └── UI
+│       ├── NodeConnectionView.prefab
+│       └── NodeView.prefab
+├── Scenes
+│   ├── MainScene.unity
+│   └── SampleScene.unity
+├── Scripts
+│   ├── Battle
+│   ├── Core
+│   ├── Nodes
+│   │   ├── Core
+│   │   │   ├── NodeData.cs
+│   │   │   ├── NodeDefinition.cs
+│   │   │   ├── NodeDefinitionLibrary.cs
+│   │   │   ├── NodeEffectData.cs
+│   │   │   ├── NodeEffectType.cs
+│   │   │   ├── NodePort.cs
+│   │   │   └── PortDefinition.cs
+│   │   ├── Runtime
+│   │   │   ├── NodeExecutor.cs
+│   │   │   └── NodeGraph.cs
+│   │   ├── Testing
+│   │   └── UI
+│   │       ├── NodeConnectionView.cs
+│   │       ├── NodeEditorController.cs
+│   │       ├── NodeTestInitializer.cs
+│   │       ├── NodeView.cs
+│   │       └── PinView.cs
+│   ├── UI
+│   └── Wizards
+├── Settings
+│   ├── Lit2DSceneTemplate.scenetemplate
+│   ├── Renderer2D.asset
+│   ├── Scenes
+│   │   └── URP2DSceneTemplate.unity
+│   └── UniversalRP.asset
+├── Sprites
+│   └── MR-Platformer-v1
+│       ├── Backgrounds
+│       │   ├── merged-full-background.png
+│       │   ├── parallax-background-mountains.png
+│       │   ├── parallax-background-sky.png
+│       │   ├── parallax-forest-trees-01.png
+│       │   └── parallax-forest-trees-02.png
+│       ├── Enemies
+│       │   ├── Enemy-Bat-Fly-32x32.png
+│       │   ├── Enemy-Boss-Golem-Idle-48x48.png
+│       │   ├── Enemy-Dark-Guard-Idle-39x49.png
+│       │   ├── Enemy-Forest-Goblin-Hog-Idle-32x32.png
+│       │   ├── Enemy-Forest-Goblin-Idle-32x32.png
+│       │   ├── Enemy-Frog-Attack-24x24.png
+│       │   ├── Enemy-Frog-Idle-24x24.png
+│       │   ├── Enemy-Frog-Tongue-Attack-72x24.png
+│       │   ├── Enemy-Mushroom-Walk-24x24.png
+│       │   ├── Enemy-Necromancer-Idle-32x32.png
+│       │   ├── Enemy-Plant-Mutant-Idle-Attack-46x32.png
+│       │   ├── Enemy-Skull-Slime-Idle-32x24.png
+│       │   ├── Enemy-Snail-Attack-24x24.png
+│       │   └── Enemy-Snail-Walk-24x24.png
+│       ├── Misc
+│       │   ├── Bridge-Support.png
+│       │   ├── Bridge-handle-01.png
+│       │   ├── Bridge-handle-02.png
+│       │   ├── Bridge.png
+│       │   ├── Bush-Background.png
+│       │   ├── Bush-Green-Foreground.png
+│       │   ├── Bush-Purple-Foreground.png
+│       │   ├── Cave-Background-Hole-01.png
+│       │   ├── Cave-Background-Rocks-01.png
+│       │   ├── Cave-Background-Rocks-02.png
+│       │   ├── Cave-Background.png
+│       │   ├── Cave-Entrance.png
+│       │   ├── Grass-Green-Foreground.png
+│       │   ├── Grass-Purple-Foreground.png
+│       │   ├── House-01.png
+│       │   ├── House-02.png
+│       │   ├── House-Background-01.png
+│       │   ├── House-Background-02
+│       │   ├── Lamp-Off.png
+│       │   ├── Lamp-On.png
+│       │   └── Mushrooms.png
+│       ├── NPC
+│       │   ├── NPC-Alchemist-Idle-24x24.png
+│       │   ├── NPC-Blacksmith-Idle-48x48.png
+│       │   ├── NPC-Builder-01-Working-24x24.png
+│       │   ├── NPC-Builder-02-Working-24x24.png
+│       │   ├── NPC-Chick-Idle-16x16.png
+│       │   ├── NPC-Miner-Idle-24x24.png
+│       │   ├── NPC-Old-Shaman-Idle-24x24.png
+│       │   ├── NPC-Puppy-Idle-24x24.png
+│       │   ├── NPC-Village-Guard-Idle-32x32.png
+│       │   ├── NPC-Village-Lady-01-Talk-24x24.png
+│       │   └── NPC-Village-Lady-02-Idle-24x24.png
+│       ├── Objects
+│       │   ├── Obj-Arrow-Idle-12x12.png
+│       │   ├── Obj-Arrow-Stuck-12x12.png
+│       │   ├── Obj-Axe-Wood.png
+│       │   ├── Obj-Barrel.png
+│       │   ├── Obj-Big-Wood-Platform-01.png
+│       │   ├── Obj-Big-Wood-Platform-02.png
+│       │   ├── Obj-Blue-Mineral.png
+│       │   ├── Obj-Boxes.png
+│       │   ├── Obj-Cage.png
+│       │   ├── Obj-Checkpoint-Off.png
+│       │   ├── Obj-Checkpoint-On.png
+│       │   ├── Obj-Chest-Closed-24x24.png
+│       │   ├── Obj-Chest-Opening-24x24.png
+│       │   ├── Obj-Crystal-Idle-32x32.png
+│       │   ├── Obj-Crystal-Open-32x32.png
+│       │   ├── Obj-Dreamcatcher-01.png
+│       │   ├── Obj-Dreamcatcher-02.png
+│       │   ├── Obj-Dreamcatcher-03.png
+│       │   ├── Obj-Fence.png
+│       │   ├── Obj-Flag-Hanging-01.png
+│       │   ├── Obj-Gate-Hold.png
+│       │   ├── Obj-Gate-Pillar.png
+│       │   ├── Obj-Green-Mineral.png
+│       │   ├── Obj-Hanging-Flag-01.png
+│       │   ├── Obj-Hanging-Flag-02.png
+│       │   ├── Obj-Hanging-Flag-Medium.png
+│       │   ├── Obj-Idol.png
+│       │   ├── Obj-Key.png
+│       │   ├── Obj-Lamp-On.png
+│       │   ├── Obj-Light-01.png
+│       │   ├── Obj-Mine-Carriage.png
+│       │   ├── Obj-Moving-Platform-Idle-48x28.png
+│       │   ├── Obj-Orange-Mineral.png
+│       │   ├── Obj-Pickaxe.png
+│       │   ├── Obj-Roof-Hanging.png
+│       │   ├── Obj-Short-Roof.png
+│       │   ├── Obj-Stairs.png
+│       │   ├── Obj-Statue.png
+│       │   ├── Obj-Village-Gate-Top.png
+│       │   ├── Obj-Wood-Pillar-01.png
+│       │   ├── Obj-Wood-Platform-01.png
+│       │   ├── Obj-Wood-Platform-02.png
+│       │   ├── Obj-Wood-Platform-Tall-02.png
+│       │   ├── Obj-Wood-Platform-Tall.png
+│       │   ├── Obj-Wood-Platform-Top.png
+│       │   └── Obj-Wood.png
+│       ├── Player
+│       │   ├── Player-Attack-24x24.png
+│       │   ├── Player-Fall-24x24.png
+│       │   ├── Player-Idle-24x24.png
+│       │   ├── Player-Jump-24x24.png
+│       │   └── Player-Run-24x24.png
+│       ├── Tiles
+│       │   ├── Cave-Under-Tile.png
+│       │   ├── Tile-01.png
+│       │   ├── Tile-02.png
+│       │   ├── Tile-03.png
+│       │   ├── Tile-04.png
+│       │   ├── Tile-05.png
+│       │   ├── Tile-06.png
+│       │   ├── Tile-07.png
+│       │   ├── Tile-08.png
+│       │   ├── Tile-09.png
+│       │   ├── Tile-10.png
+│       │   ├── Tile-11.png
+│       │   ├── Tile-12.png
+│       │   ├── Tile-13.png
+│       │   ├── Tile-14.png
+│       │   ├── Tile-15.png
+│       │   ├── Tile-16.png
+│       │   ├── Tile-17.png
+│       │   ├── Tile-18.png
+│       │   ├── Tile-19.png
+│       │   ├── Tile-20.png
+│       │   ├── Tile-21.png
+│       │   ├── Tile-22.png
+│       │   ├── Tile-23.png
+│       │   ├── Tile-24.png
+│       │   ├── Tile-25.png
+│       │   ├── Tile-26.png
+│       │   ├── Tile-27.png
+│       │   ├── Tile-28.png
+│       │   ├── Tile-29.png
+│       │   ├── Tile-30.png
+│       │   ├── Tile-31.png
+│       │   ├── Tile-32.png
+│       │   ├── Tile-33.png
+│       │   ├── Tile-34.png
+│       │   ├── Tile-35.png
+│       │   ├── Tile-36.png
+│       │   ├── Tile-37.png
+│       │   ├── Tree-Trunk-01.png
+│       │   └── Tree-Trunk-02.png
+│       └── UI
+│           ├── Quest-Mark-Idle-16x16.png
+│           ├── UI-Boss-Icon.png
+│           ├── UI-Lives.png
+│           ├── UI-Menu-Button-Active.png
+│           ├── UI-Menu-Button-Default.png
+│           └── UI-Menu-Popup-Background.png
+├── Test
+├── TextMesh Pro
+│   ├── Examples & Extras
+│   │   ├── Fonts
+│   │   │   ├── Anton OFL.txt
+│   │   │   ├── Anton.ttf
+│   │   │   ├── Bangers - OFL.txt
+│   │   │   ├── Bangers.ttf
+│   │   │   ├── Electronic Highway Sign.TTF
+│   │   │   ├── Oswald-Bold - OFL.txt
+│   │   │   ├── Oswald-Bold.ttf
+│   │   │   ├── Roboto-Bold - AFL.txt
+│   │   │   ├── Roboto-Bold - License.txt
+│   │   │   ├── Roboto-Bold.ttf
+│   │   │   ├── Unity - OFL.txt
+│   │   │   └── Unity.ttf
+│   │   ├── Materials
+│   │   │   ├── Crate - Surface Shader Scene.mat
+│   │   │   ├── Crate - URP.mat
+│   │   │   ├── Ground - Logo Scene.mat
+│   │   │   ├── Ground - Surface Shader Scene.mat
+│   │   │   ├── Ground - URP.mat
+│   │   │   └── Small Crate_diffuse.mat
+│   │   ├── Prefabs
+│   │   │   ├── Text Popup.prefab
+│   │   │   ├── TextMeshPro - Prefab 1.prefab
+│   │   │   └── TextMeshPro - Prefab 2.prefab
+│   │   ├── Resources
+│   │   │   ├── Color Gradient Presets
+│   │   │   │   ├── Blue to Purple - Vertical.asset
+│   │   │   │   ├── Dark to Light Green - Vertical.asset
+│   │   │   │   ├── Light to Dark Green - Vertical.asset
+│   │   │   │   └── Yellow to Orange - Vertical.asset
+│   │   │   ├── Fonts & Materials
+│   │   │   │   ├── Anton SDF - Drop Shadow.mat
+│   │   │   │   ├── Anton SDF - Outline.mat
+│   │   │   │   ├── Anton SDF - Sunny Days.mat
+│   │   │   │   ├── Anton SDF.asset
+│   │   │   │   ├── Bangers SDF - Drop Shadow - 2 Pass.mat
+│   │   │   │   ├── Bangers SDF - Drop Shadow.mat
+│   │   │   │   ├── Bangers SDF - Outline.mat
+│   │   │   │   ├── Bangers SDF Glow.mat
+│   │   │   │   ├── Bangers SDF Logo - URP.mat
+│   │   │   │   ├── Bangers SDF Logo.mat
+│   │   │   │   ├── Bangers SDF.asset
+│   │   │   │   ├── Electronic Highway Sign SDF.asset
+│   │   │   │   ├── LiberationSans SDF - Metalic Green.mat
+│   │   │   │   ├── LiberationSans SDF - Overlay.mat
+│   │   │   │   ├── LiberationSans SDF - Soft Mask.mat
+│   │   │   │   ├── Oswald Bold SDF.asset
+│   │   │   │   ├── Roboto-Bold SDF - Drop Shadow.mat
+│   │   │   │   ├── Roboto-Bold SDF - HDRP Unlit.mat
+│   │   │   │   ├── Roboto-Bold SDF - Surface.mat
+│   │   │   │   ├── Roboto-Bold SDF - URP.mat
+│   │   │   │   ├── Roboto-Bold SDF.asset
+│   │   │   │   ├── Unity SDF - HDRP LIT - Bloom.mat
+│   │   │   │   ├── Unity SDF - HDRP LIT - Outline.mat
+│   │   │   │   └── Unity SDF.asset
+│   │   │   └── Sprite Assets
+│   │   │       ├── Default Sprite Asset.asset
+│   │   │       └── DropCap Numbers.asset
+│   │   ├── Scenes
+│   │   │   ├── 01-  Single Line TextMesh Pro.unity
+│   │   │   ├── 02 - Multi-line TextMesh Pro.unity
+│   │   │   ├── 03 - Line Justification.unity
+│   │   │   ├── 04 - Word Wrapping.unity
+│   │   │   ├── 05 - Style Tags.unity
+│   │   │   ├── 06 - Extra Rich Text Examples.unity
+│   │   │   ├── 07 - Superscript & Subscript Example.unity
+│   │   │   ├── 08 - Improved Text Alignment.unity
+│   │   │   ├── 09 - Margin Tag Example.unity
+│   │   │   ├── 10 - Bullets & Numbered List Example.unity
+│   │   │   ├── 11 - The Style Tag.unity
+│   │   │   ├── 12 - Link Example.unity
+│   │   │   ├── 12a - Text Interactions.unity
+│   │   │   ├── 13 - Soft Hyphenation.unity
+│   │   │   ├── 14 - Multi Font & Sprites.unity
+│   │   │   ├── 15 - Inline Graphics & Sprites.unity
+│   │   │   ├── 16 - Linked text overflow mode example.unity
+│   │   │   ├── 17 - Old Computer Terminal.unity
+│   │   │   ├── 18 - ScrollRect & Masking & Layout.unity
+│   │   │   ├── 19 - Masking Texture & Soft Mask.unity
+│   │   │   ├── 20 - Input Field with Scrollbar.unity
+│   │   │   ├── 21 - Script Example.unity
+│   │   │   ├── 22 - Basic Scripting Example.unity
+│   │   │   ├── 23 - Animating Vertex Attributes.unity
+│   │   │   ├── 24 - Surface Shader Example URP.unity
+│   │   │   ├── 24 - Surface Shader Example.unity
+│   │   │   ├── 25 - Sunny Days Example.unity
+│   │   │   ├── 26 - Dropdown Placeholder Example.unity
+│   │   │   ├── 27 - Double Pass Shader Example.unity
+│   │   │   ├── 28 - HDRP Shader Example
+│   │   │   │   └── Sky and Fog Volume Profile.asset
+│   │   │   ├── 28 - HDRP Shader Example.unity
+│   │   │   └── Benchmark (Floating Text).unity
+│   │   ├── Scripts
+│   │   │   ├── Benchmark01.cs
+│   │   │   ├── Benchmark01_UGUI.cs
+│   │   │   ├── Benchmark02.cs
+│   │   │   ├── Benchmark03.cs
+│   │   │   ├── Benchmark04.cs
+│   │   │   ├── CameraController.cs
+│   │   │   ├── ChatController.cs
+│   │   │   ├── DropdownSample.cs
+│   │   │   ├── EnvMapAnimator.cs
+│   │   │   ├── ObjectSpin.cs
+│   │   │   ├── ShaderPropAnimator.cs
+│   │   │   ├── SimpleScript.cs
+│   │   │   ├── SkewTextExample.cs
+│   │   │   ├── TMP_DigitValidator.cs
+│   │   │   ├── TMP_ExampleScript_01.cs
+│   │   │   ├── TMP_FrameRateCounter.cs
+│   │   │   ├── TMP_PhoneNumberValidator.cs
+│   │   │   ├── TMP_TextEventCheck.cs
+│   │   │   ├── TMP_TextEventHandler.cs
+│   │   │   ├── TMP_TextInfoDebugTool.cs
+│   │   │   ├── TMP_TextSelector_A.cs
+│   │   │   ├── TMP_TextSelector_B.cs
+│   │   │   ├── TMP_UiFrameRateCounter.cs
+│   │   │   ├── TMPro_InstructionOverlay.cs
+│   │   │   ├── TeleType.cs
+│   │   │   ├── TextConsoleSimulator.cs
+│   │   │   ├── TextMeshProFloatingText.cs
+│   │   │   ├── TextMeshSpawner.cs
+│   │   │   ├── VertexColorCycler.cs
+│   │   │   ├── VertexJitter.cs
+│   │   │   ├── VertexShakeA.cs
+│   │   │   ├── VertexShakeB.cs
+│   │   │   ├── VertexZoom.cs
+│   │   │   └── WarpTextExample.cs
+│   │   ├── Sprites
+│   │   │   ├── Default Sprites.png
+│   │   │   └── DropCap Numbers.psd
+│   │   └── Textures
+│   │       ├── Brushed Metal 3.jpg
+│   │       ├── Floor Cement.jpg
+│   │       ├── Floor Tiles 1 - diffuse.jpg
+│   │       ├── Fruit Jelly (B&W).jpg
+│   │       ├── Gradient Diagonal (Color).jpg
+│   │       ├── Gradient Horizontal (Color).jpg
+│   │       ├── Gradient Vertical (Color).jpg
+│   │       ├── Mask Zig-n-Zag.psd
+│   │       ├── Small Crate_diffuse.jpg
+│   │       ├── Small Crate_normal.jpg
+│   │       ├── Sunny Days - Seamless.jpg
+│   │       ├── Text Overflow - Linked Text Image 1.png
+│   │       ├── Text Overflow - Linked Text UI Screenshot.png
+│   │       ├── Wipe Pattern - Circle.psd
+│   │       ├── Wipe Pattern - Diagonal.psd
+│   │       ├── Wipe Pattern - Radial Double.psd
+│   │       └── Wipe Pattern - Radial Quad.psd
+│   ├── Fonts
+│   │   ├── LiberationSans - OFL.txt
+│   │   └── LiberationSans.ttf
+│   ├── Resources
+│   │   ├── Fonts & Materials
+│   │   │   ├── LiberationSans SDF - Drop Shadow.mat
+│   │   │   ├── LiberationSans SDF - Fallback.asset
+│   │   │   ├── LiberationSans SDF - Outline.mat
+│   │   │   └── LiberationSans SDF.asset
+│   │   ├── LineBreaking Following Characters.txt
+│   │   ├── LineBreaking Leading Characters.txt
+│   │   ├── Sprite Assets
+│   │   │   └── EmojiOne.asset
+│   │   ├── Style Sheets
+│   │   │   └── Default Style Sheet.asset
+│   │   └── TMP Settings.asset
+│   ├── Shaders
+│   │   ├── SDFFunctions.hlsl
+│   │   ├── TMP_Bitmap-Custom-Atlas.shader
+│   │   ├── TMP_Bitmap-Mobile.shader
+│   │   ├── TMP_Bitmap.shader
+│   │   ├── TMP_SDF Overlay.shader
+│   │   ├── TMP_SDF SSD.shader
+│   │   ├── TMP_SDF-HDRP LIT.shadergraph
+│   │   ├── TMP_SDF-HDRP UNLIT.shadergraph
+│   │   ├── TMP_SDF-Mobile Masking.shader
+│   │   ├── TMP_SDF-Mobile Overlay.shader
+│   │   ├── TMP_SDF-Mobile SSD.shader
+│   │   ├── TMP_SDF-Mobile-2-Pass.shader
+│   │   ├── TMP_SDF-Mobile.shader
+│   │   ├── TMP_SDF-Surface-Mobile.shader
+│   │   ├── TMP_SDF-Surface.shader
+│   │   ├── TMP_SDF-URP Lit.shadergraph
+│   │   ├── TMP_SDF-URP Unlit.shadergraph
+│   │   ├── TMP_SDF.shader
+│   │   ├── TMP_Sprite.shader
+│   │   ├── TMPro.cginc
+│   │   ├── TMPro_Mobile.cginc
+│   │   ├── TMPro_Properties.cginc
+│   │   └── TMPro_Surface.cginc
+│   └── Sprites
+│       ├── EmojiOne Attribution.txt
+│       ├── EmojiOne.json
+│       └── EmojiOne.png
+└── UniversalRenderPipelineGlobalSettings.asset
+--------------------------------------------------------------------------------
+
+SCRIPT CONTENTS
+================================================================================
+
+SCRIPT CONTENTS
+================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeEditorController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// Assets/Scripts/Nodes/UI/NodeEditorController.cs
+using UnityEngine;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
+
+public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
+{
+    [Header("Editor Setup")]
+    [SerializeField] private RectTransform editorCanvas;
+    [SerializeField] private GameObject nodeViewPrefab;
+    [SerializeField] private GameObject connectionViewPrefab;
+
+    [Header("Node Definitions")]
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
+
+    [Header("Runtime Graph Reference")]
+    [SerializeField] private NodeGraph currentGraph;
+
+    private List<NodeView> spawnedNodeViews = new List<NodeView>();
+    
+    // For dragging connections
+    private NodeConnectionView activeConnectionLine;
+    private PinView sourcePin;
+
+    private bool showContextMenu;
+    private Vector2 contextMenuPosition;
+
+    // 1) We find a NodeExecutor in the scene to unify references
+    private NodeExecutor executor;
+
+    private void Start()
+    {
+        // If no graph, create a new one
+        if (currentGraph == null)
+            currentGraph = new NodeGraph();
+
+        // Find a NodeExecutor
+        executor = FindFirstObjectByType<NodeExecutor>();
+        if (executor == null)
+        {
+            Debug.LogWarning("[NodeEditorController] No NodeExecutor found in scene.");
+        }
+        else
+        {
+            // Assign the same graph
+            executor.SetGraph(currentGraph);
+        }
+    }
+
+    private void Update()
+    {
+        // Right-click for context menu
+        if (Input.GetMouseButtonDown(1))
+        {
+            showContextMenu = true;
+            contextMenuPosition = Input.mousePosition;
+        }
+    }
+
+    private void Awake()
+    {
+        // Ensure there's a NodeGraph to work with.
+        if (currentGraph == null)
+        {
+            currentGraph = new NodeGraph();
+        }
+    }
+
+    private void OnGUI()
+    {
+        if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions.Count > 0)
+        {
+            Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
+            float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
+            Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
+
+            GUI.Box(menuRect, "Add Node");
+
+            float yOffset = 20f;
+            foreach (NodeDefinition def in definitionLibrary.definitions)
+            {
+                Rect itemRect = new Rect(menuRect.x, menuRect.y + yOffset, 180, 25);
+                if (GUI.Button(itemRect, def.displayName))
+                {
+                    CreateNodeAtMouse(def);
+                    showContextMenu = false;
+                }
+                yOffset += 25f;
+            }
+        }
+    }
+
+    public void LoadGraph(NodeGraph graph)
+    {
+        currentGraph = graph;
+        ClearExistingViews();
+        if (currentGraph == null) return;
+
+        foreach (NodeData node in currentGraph.nodes)
+        {
+            CreateNodeView(node);
+        }
+    }
+
+    private void ClearExistingViews()
+    {
+        foreach (var view in spawnedNodeViews)
+        {
+            if (view != null) Destroy(view.gameObject);
+        }
+        spawnedNodeViews.Clear();
+    }
+
+    private NodeView CreateNodeView(NodeData data)
+    {
+        GameObject nodeObj = Instantiate(nodeViewPrefab, editorCanvas);
+        NodeView view = nodeObj.GetComponent<NodeView>();
+
+        // Simple color & name
+        Color nodeColor = Color.gray;
+        string displayName = data.nodeDisplayName;
+        
+        view.Initialize(data, nodeColor, displayName);
+
+        RectTransform rt = nodeObj.GetComponent<RectTransform>();
+        rt.anchoredPosition = data.editorPosition;
+
+        view.GeneratePins(data.inputs, data.outputs);
+
+        spawnedNodeViews.Add(view);
+        return view;
+    }
+
+    // Assets/Scripts/Nodes/UI/NodeEditorController.cs
+    private void CreateNodeAtMouse(NodeDefinition definition)
+    {
+        Vector2 localPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            editorCanvas, Input.mousePosition, null, out localPos);
+
+        NodeData newNode = new NodeData();
+        newNode.nodeDisplayName = definition.displayName;
+        newNode.editorPosition = localPos;
+
+        // Copy effects: if it's a ManaStorage effect, copy to dedicated fields; else, add normally.
+        foreach (var defEffect in definition.effects)
+        {
+            if (defEffect.effectType == NodeEffectType.ManaStorage)
+            {
+                newNode.manaStorageCapacity = defEffect.effectValue;
+                newNode.currentManaStorage = defEffect.secondaryValue; // Starting mana
+            }
+            else
+            {
+                NodeEffectData effectCopy = new NodeEffectData
+                {
+                    effectType = defEffect.effectType,
+                    effectValue = defEffect.effectValue,
+                    secondaryValue = defEffect.secondaryValue
+                };
+                newNode.effects.Add(effectCopy);
+            }
+        }
+
+        // Copy ports from definition.
+        foreach (var portDef in definition.ports)
+        {
+            NodePort nodePort = new NodePort
+            {
+                portName = portDef.portName,
+                portType = portDef.portType
+            };
+        
+            if (portDef.isInput)
+                newNode.inputs.Add(nodePort);
+            else
+                newNode.outputs.Add(nodePort);
+        }
+
+        currentGraph.nodes.Add(newNode);
+        CreateNodeView(newNode);
+
+        // Optionally re-assign the graph to the executor.
+        if (executor != null)
+            executor.SetGraph(currentGraph);
+    }
+
+
+
+    // ======================= Connection Drag Logic =======================
+
+    public void StartConnectionDrag(PinView source, PointerEventData eventData)
+    {
+        Debug.Log("[NodeEditor] StartConnectionDrag called!");
+
+        sourcePin = source;
+
+        // Instantiate the connection line
+        GameObject connObj = Instantiate(connectionViewPrefab, editorCanvas);
+        if (connObj == null)
+        {
+            Debug.LogError("[NodeEditor] Connection prefab failed to instantiate!");
+            return;
+        }
+
+        activeConnectionLine = connObj.GetComponent<NodeConnectionView>();
+        if (activeConnectionLine == null)
+        {
+            Debug.LogError("[NodeEditor] NodeConnectionView component not found on prefab!");
+            return;
+        }
+
+        // Assign start position
+        RectTransform sourceRect = source.GetComponent<RectTransform>();
+        activeConnectionLine.SetStartRect(sourceRect);
+
+        Vector2 localMousePos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(editorCanvas, eventData.position, eventData.pressEventCamera, out localMousePos);
+        activeConnectionLine.SetEndPosition(localMousePos, editorCanvas);
+
+        Debug.Log("[NodeEditor] Connection line initialized.");
+    }
+
+
+    public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
+    {
+        if (activeConnectionLine == null)
+            return;
+
+        Vector2 localMousePos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(editorCanvas, eventData.position, eventData.pressEventCamera, out localMousePos);
+        activeConnectionLine.SetEndPosition(localMousePos, editorCanvas);
+    }
+
+    public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)
+    {
+        if (activeConnectionLine == null)
+            return;
+
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventData, results);
+        PinView targetPin = null;
+
+        foreach (var r in results)
+        {
+            targetPin = r.gameObject.GetComponent<PinView>();
+            if (targetPin != null && targetPin.isInput)
+                break;
+            else
+                targetPin = null;
+        }
+
+        if (targetPin != null)
+        {
+            RectTransform targetRect = targetPin.GetComponent<RectTransform>(); // Declare targetRect here.
+            activeConnectionLine.SetEndRect(targetRect);
+
+            // Assign the line's target pin for deletion handling.
+            activeConnectionLine.targetPin = targetPin;
+
+            sourcePin.port.connectedPortIds.Add(targetPin.port.portId);
+
+            activeConnectionLine = null;
+            sourcePin = null;
+        }
+        else
+        {
+            CancelActiveConnectionLine();
+        }
+    }
+
+
+    private void CancelActiveConnectionLine()
+    {
+        if (activeConnectionLine)
+        {
+            Destroy(activeConnectionLine.gameObject);
+            activeConnectionLine = null;
+            sourcePin = null;
+        }
+    }
+
+    // ======================= Zoom and Pan Logic =======================
+
+    public void OnScroll(PointerEventData eventData)
+    {
+        float scrollDelta = eventData.scrollDelta.y;
+        float newScale = editorCanvas.localScale.x + scrollDelta * 0.05f;
+        newScale = Mathf.Clamp(newScale, 0.5f, 2f);
+        editorCanvas.localScale = Vector3.one * newScale;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        editorCanvas.anchoredPosition += eventData.delta;
+    }
+    
+    private void OnNodesFinishedCreating()
+    {
+        // If your current graph is done, pass it to NodeExecutor
+        executor.SetGraph(currentGraph);
+    }
+
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeTestInitializer.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// Assets/Scripts/Nodes/Testing/NodeTestInitializer.cs
+using UnityEngine;
+// If NodeEditorController is in a specific namespace, include it, e.g.:
+// using YourProject.Nodes.UI;
+
+public class NodeTestInitializer : MonoBehaviour
+{
+    [SerializeField] private NodeEditorController editorController;
+
+    private NodeGraph testGraph;
+
+    void Start()
+    {
+        testGraph = new NodeGraph();
+        // Load the empty graph into the editor
+        editorController.LoadGraph(testGraph);
+    }
+    
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeView.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// Assets/Scripts/Nodes/UI/NodeView.cs
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System.Collections.Generic;
+
+public class NodeView : MonoBehaviour
+{
+    [SerializeField] private TMP_Text nodeTitleText;
+    [SerializeField] private Image backgroundImage;
+
+    [Header("Pin Containers")]
+    [SerializeField] private Transform inputPinsContainer;
+    [SerializeField] private Transform outputPinsContainer;
+
+    [Header("Node Info Display")]
+    [SerializeField] private TMP_Text effectsText;  // Where we list the node's effects
+
+    private NodeData nodeData;
+
+    public void Initialize(NodeData data, Color color, string displayName)
+    {
+        nodeData = data;
+        if (nodeTitleText) nodeTitleText.text = displayName;
+        if (backgroundImage) backgroundImage.color = color;
+
+        // Show effect data
+        if (effectsText)
+        {
+            if (nodeData.effects.Count == 0)
+            {
+                effectsText.text = "No Effects";
+            }
+            else
+            {
+                string str = "Effects:\n";
+                foreach (var eff in nodeData.effects)
+                {
+                    // e.g. "ManaCost (5)", "Damage (10)"
+                    str += $"- {eff.effectType} ({eff.effectValue})\n";
+                }
+                effectsText.text = str;
+            }
+        }
+    }
+
+    public void GeneratePins(List<NodePort> inputs, List<NodePort> outputs)
+    {
+        // Clear existing pins
+        foreach (Transform child in inputPinsContainer)
+            Destroy(child.gameObject);
+        foreach (Transform child in outputPinsContainer)
+            Destroy(child.gameObject);
+
+        // Create input pins
+        foreach (var input in inputs)
+        {
+            CreatePin(inputPinsContainer, input, true);
+        }
+        // Create output pins
+        foreach (var output in outputs)
+        {
+            CreatePin(outputPinsContainer, output, false);
+        }
+    }
+
+    private void CreatePin(Transform parent, NodePort port, bool isInput)
+    {
+        // Create a new UI GameObject for the pin.
+        GameObject pinObj = new GameObject(isInput ? "InputPin" : "OutputPin", typeof(RectTransform));
+        pinObj.transform.SetParent(parent, false);  // false to keep local scaling
+
+        // Set a fixed size for the pin.
+        RectTransform rt = pinObj.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(20, 20);
+
+        // Add an Image component to make it visible.
+        Image img = pinObj.AddComponent<Image>();
+        // Color mapping based on port type.
+        switch (port.portType)
+        {
+            case PortType.Mana:
+                img.color = Color.cyan;
+                break;
+            case PortType.Condition:
+                img.color = new Color(1f, 0.65f, 0f); // Orange
+                break;
+            default:
+                img.color = Color.blue;
+                break;
+        }
+
+        // Add the PinView component to enable connection behavior.
+        PinView pinView = pinObj.AddComponent<PinView>();
+        // Use FindFirstObjectByType if available, otherwise FindObjectOfType.
+        NodeEditorController controller = UnityEngine.Object.FindFirstObjectByType<NodeEditorController>();
+        pinView.Initialize(port, isInput, controller);
+    }
+
+
+    public NodeData GetNodeData() => nodeData;
+}
+
+
+
+
+
+
+--------------------------------------------------------------------------------
+This is part 2 out of 3 of script collection. 1 more parts remain.
+--------------------------------------------------------------------------------

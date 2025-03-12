@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// NodeData.cs
 [Serializable]
 public class NodeData
 {
@@ -13,9 +14,8 @@ public class NodeData
     public List<NodePort> outputs;
     public List<NodeEffectData> effects;
 
-    // NEW: Unique mana storage fields for nodes that provide mana.
-    public float manaStorageCapacity = 0f;   // Capacity value (if this node is a mana storage node)
-    public float currentManaStorage = 0f;      // Current mana stored
+    // REMOVED: public float manaStorageCapacity;
+    // REMOVED: public float currentManaStorage;
 
     public NodeData()
     {

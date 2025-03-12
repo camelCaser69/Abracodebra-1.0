@@ -381,7 +381,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.3018868, g: 0.3018868, b: 0.3018868, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -566,13 +566,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2811072df39f4781a57f0c5f929d0445, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxMana: 10
-  currentMana: 10
-  manaRegenRate: 1
-  waitTimeBetweenNodes: 0.5
-  manaDisplay: {fileID: 0}
   currentGraph:
     nodes: []
+  waitTimeBetweenNodes: 0.5
+  debugOutput: {fileID: 0}
 --- !u!114 &2010610568
 MonoBehaviour:
   m_ObjectHideFlags: 0

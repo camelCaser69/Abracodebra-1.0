@@ -142,24 +142,17 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         newNode.nodeDisplayName = definition.displayName;
         newNode.editorPosition = localPos;
 
-        // Copy effects: if it's a ManaStorage effect, copy to dedicated fields; else, add normally.
+        // Copy all effects directly into newNode.effects
         foreach (var defEffect in definition.effects)
         {
-            if (defEffect.effectType == NodeEffectType.ManaStorage)
+            // No separate handling for ManaStorage. We always copy to effects
+            NodeEffectData effectCopy = new NodeEffectData
             {
-                newNode.manaStorageCapacity = defEffect.effectValue;
-                newNode.currentManaStorage = defEffect.secondaryValue; // Starting mana
-            }
-            else
-            {
-                NodeEffectData effectCopy = new NodeEffectData
-                {
-                    effectType = defEffect.effectType,
-                    effectValue = defEffect.effectValue,
-                    secondaryValue = defEffect.secondaryValue
-                };
-                newNode.effects.Add(effectCopy);
-            }
+                effectType = defEffect.effectType,
+                effectValue = defEffect.effectValue,
+                secondaryValue = defEffect.secondaryValue
+            };
+            newNode.effects.Add(effectCopy);
         }
 
         // Copy ports from definition.
@@ -180,9 +173,8 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         currentGraph.nodes.Add(newNode);
         CreateNodeView(newNode);
 
-        // Optionally re-assign the graph to the executor.
-        if (executor != null)
-            executor.SetGraph(currentGraph);
+        // If we have an executor, reassign graph
+        executor?.SetGraph(currentGraph);
     }
 
 
@@ -232,6 +224,16 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         activeConnectionLine.SetEndPosition(localMousePos, editorCanvas);
     }
 
+    public string GetNodeIdFromPin(PinView pin)
+    {
+        // The NodeData is in the NodeView which is an ancestor in hierarchy
+        NodeView nodeView = pin.GetComponentInParent<NodeView>();
+        return nodeView.GetNodeData().nodeId;
+    }
+    
+    // Public property to access the currentGraph.
+    public NodeGraph CurrentGraph => currentGraph;
+    
     public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)
     {
         if (activeConnectionLine == null)
@@ -252,13 +254,22 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
         if (targetPin != null)
         {
-            RectTransform targetRect = targetPin.GetComponent<RectTransform>(); // Declare targetRect here.
+            RectTransform targetRect = targetPin.GetComponent<RectTransform>();
             activeConnectionLine.SetEndRect(targetRect);
 
-            // Assign the line's target pin for deletion handling.
             activeConnectionLine.targetPin = targetPin;
 
             sourcePin.port.connectedPortIds.Add(targetPin.port.portId);
+
+            // Update adjacency: get node IDs for source and target
+            string sourceId = GetNodeIdFromPin(sourcePin);
+            string targetId = GetNodeIdFromPin(targetPin);
+            if (currentGraph.adjacency == null)
+                currentGraph.adjacency = new Dictionary<string, List<string>>();
+            if (!currentGraph.adjacency.ContainsKey(sourceId))
+                currentGraph.adjacency[sourceId] = new List<string>();
+            if (!currentGraph.adjacency[sourceId].Contains(targetId))
+                currentGraph.adjacency[sourceId].Add(targetId);
 
             activeConnectionLine = null;
             sourcePin = null;
@@ -268,6 +279,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             CancelActiveConnectionLine();
         }
     }
+
 
 
     private void CancelActiveConnectionLine()
@@ -300,5 +312,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         // If your current graph is done, pass it to NodeExecutor
         executor.SetGraph(currentGraph);
     }
+    
+    
 
 }

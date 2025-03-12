@@ -5,6 +5,6 @@ using System;
 public class NodeEffectData
 {
     public NodeEffectType effectType;  
-    public float effectValue;          // Primary value (for ManaStorage: capacity)
-    public float secondaryValue;       // Secondary value (for ManaStorage: starting mana)
+    public float effectValue;       // For ManaStorage => capacity
+    public float secondaryValue;    // For ManaStorage => current / starting
 }

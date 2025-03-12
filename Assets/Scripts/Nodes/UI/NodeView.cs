@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using System.Linq;
+
 
 public class NodeView : MonoBehaviour
 {
@@ -14,17 +16,29 @@ public class NodeView : MonoBehaviour
     [SerializeField] private Transform outputPinsContainer;
 
     [Header("Node Info Display")]
+    [SerializeField] private TMP_Text manaStorageText; // For real-time mana display
     [SerializeField] private TMP_Text effectsText;  // Where we list the node's effects
 
     private NodeData nodeData;
 
+    private void Update()
+    {
+        // If the node has a ManaStorage effect, display current vs. capacity
+        var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
+        if (manaEff != null && manaStorageText != null)
+        {
+            manaStorageText.text = $"Mana: {manaEff.secondaryValue}/{manaEff.effectValue}";
+        }
+    }
+
+    
     public void Initialize(NodeData data, Color color, string displayName)
     {
         nodeData = data;
         if (nodeTitleText) nodeTitleText.text = displayName;
         if (backgroundImage) backgroundImage.color = color;
 
-        // Show effect data
+        // Display effects (as before)
         if (effectsText)
         {
             if (nodeData.effects.Count == 0)
@@ -36,11 +50,17 @@ public class NodeView : MonoBehaviour
                 string str = "Effects:\n";
                 foreach (var eff in nodeData.effects)
                 {
-                    // e.g. "ManaCost (5)", "Damage (10)"
                     str += $"- {eff.effectType} ({eff.effectValue})\n";
                 }
                 effectsText.text = str;
             }
+        }
+
+        // If node has a ManaStorage effect, display it
+        var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
+        if (manaEff != null && manaStorageText != null)
+        {
+            manaStorageText.text = $"Mana: {manaEff.secondaryValue}/{manaEff.effectValue}";
         }
     }
 
