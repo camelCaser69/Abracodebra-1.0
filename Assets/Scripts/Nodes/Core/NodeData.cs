@@ -1,5 +1,4 @@
-﻿// Assets/Scripts/Nodes/Core/NodeData.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,8 +11,11 @@ public class NodeData
 
     public List<NodePort> inputs;
     public List<NodePort> outputs;
+    public List<NodeEffectData> effects;
 
-    public List<NodeEffectData> effects;  // Copied from NodeDefinition
+    // NEW: Unique mana storage fields for nodes that provide mana.
+    public float manaStorageCapacity = 0f;   // Capacity value (if this node is a mana storage node)
+    public float currentManaStorage = 0f;      // Current mana stored
 
     public NodeData()
     {

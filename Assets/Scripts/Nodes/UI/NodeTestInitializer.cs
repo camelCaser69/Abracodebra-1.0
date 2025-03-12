@@ -15,4 +15,5 @@ public class NodeTestInitializer : MonoBehaviour
         // Load the empty graph into the editor
         editorController.LoadGraph(testGraph);
     }
+    
 }

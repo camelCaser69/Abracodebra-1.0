@@ -566,6 +566,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2811072df39f4781a57f0c5f929d0445, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxMana: 10
+  currentMana: 10
+  manaRegenRate: 1
+  waitTimeBetweenNodes: 0.5
+  manaDisplay: {fileID: 0}
   currentGraph:
     nodes: []
 --- !u!114 &2010610568

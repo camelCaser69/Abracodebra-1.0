@@ -2,6 +2,8 @@
 public enum NodeEffectType
 {
     ManaCost,
-    Damage
-    // Add more as needed (Heal, Slow, etc.)
+    Damage,
+    ManaStorage,      // effectValue = capacity, secondaryValue = starting mana
+    ManaRechargeRate,
+    Output
 }

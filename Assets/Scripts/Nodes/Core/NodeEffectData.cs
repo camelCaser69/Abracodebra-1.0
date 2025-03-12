@@ -4,6 +4,7 @@ using System;
 [Serializable]
 public class NodeEffectData
 {
-    public NodeEffectType effectType;  // e.g. ManaCost, Damage
-    public float effectValue;          // e.g. 5 for ManaCost, 10 for Damage
+    public NodeEffectType effectType;  
+    public float effectValue;          // Primary value (for ManaStorage: capacity)
+    public float secondaryValue;       // Secondary value (for ManaStorage: starting mana)
 }
