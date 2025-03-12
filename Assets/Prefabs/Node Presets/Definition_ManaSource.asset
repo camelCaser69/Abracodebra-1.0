@@ -19,3 +19,8 @@ MonoBehaviour:
   - portName: Mana
     portType: 1
     isInput: 0
+  baseManaCost: 0
+  baseDamage: 0
+  effects:
+  - effectName: 
+    effectValue: 0

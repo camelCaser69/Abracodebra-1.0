@@ -13,14 +13,13 @@ public class NodeData
     public List<NodePort> inputs;
     public List<NodePort> outputs;
 
-    // New properties
-    public float manaCost = 0f;    // Default 0
-    public float damageAdd = 0f;   // Default 0
+    public List<NodeEffectData> effects;  // Copied from NodeDefinition
 
     public NodeData()
     {
         nodeId = Guid.NewGuid().ToString();
         inputs = new List<NodePort>();
         outputs = new List<NodePort>();
+        effects = new List<NodeEffectData>();
     }
 }

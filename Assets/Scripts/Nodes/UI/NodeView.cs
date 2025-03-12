@@ -10,46 +10,73 @@ public class NodeView : MonoBehaviour
     [SerializeField] private Image backgroundImage;
 
     [Header("Pin Containers")]
-    [SerializeField] private Transform inputPinsContainer;   // e.g., a Panel with VerticalLayoutGroup (left side)
-    [SerializeField] private Transform outputPinsContainer;  // (right side)
+    [SerializeField] private Transform inputPinsContainer;
+    [SerializeField] private Transform outputPinsContainer;
+
+    [Header("Node Info Display")]
+    [SerializeField] private TMP_Text effectsText;  // Where we list the node's effects
 
     private NodeData nodeData;
 
-    // Initialize the node view with data, color, and display name.
     public void Initialize(NodeData data, Color color, string displayName)
     {
         nodeData = data;
         if (nodeTitleText) nodeTitleText.text = displayName;
         if (backgroundImage) backgroundImage.color = color;
+
+        // Show effect data
+        if (effectsText)
+        {
+            if (nodeData.effects.Count == 0)
+            {
+                effectsText.text = "No Effects";
+            }
+            else
+            {
+                string str = "Effects:\n";
+                foreach (var eff in nodeData.effects)
+                {
+                    // e.g. "ManaCost (5)", "Damage (10)"
+                    str += $"- {eff.effectType} ({eff.effectValue})\n";
+                }
+                effectsText.text = str;
+            }
+        }
     }
 
-    // Generate pin UI elements based on provided port lists.
-    // Assets/Scripts/Nodes/UI/NodeView.cs
     public void GeneratePins(List<NodePort> inputs, List<NodePort> outputs)
     {
-        // Find the NodeEditorController in the scene using the new recommended method.
-        NodeEditorController controller = FindFirstObjectByType<NodeEditorController>();  
+        // Clear existing pins
+        foreach (Transform child in inputPinsContainer)
+            Destroy(child.gameObject);
+        foreach (Transform child in outputPinsContainer)
+            Destroy(child.gameObject);
 
+        // Create input pins
         foreach (var input in inputs)
         {
-            CreatePin(inputPinsContainer, input, true, controller);
+            CreatePin(inputPinsContainer, input, true);
         }
-
+        // Create output pins
         foreach (var output in outputs)
         {
-            CreatePin(outputPinsContainer, output, false, controller);
+            CreatePin(outputPinsContainer, output, false);
         }
     }
 
-    private void CreatePin(Transform parent, NodePort port, bool isInput, NodeEditorController controller)
+    private void CreatePin(Transform parent, NodePort port, bool isInput)
     {
+        // Create a new UI GameObject for the pin.
         GameObject pinObj = new GameObject(isInput ? "InputPin" : "OutputPin", typeof(RectTransform));
-        pinObj.transform.SetParent(parent);
+        pinObj.transform.SetParent(parent, false);  // false to keep local scaling
+
+        // Set a fixed size for the pin.
         RectTransform rt = pinObj.GetComponent<RectTransform>();
         rt.sizeDelta = new Vector2(20, 20);
 
+        // Add an Image component to make it visible.
         Image img = pinObj.AddComponent<Image>();
-
+        // Color mapping based on port type.
         switch (port.portType)
         {
             case PortType.Mana:
@@ -63,14 +90,13 @@ public class NodeView : MonoBehaviour
                 break;
         }
 
+        // Add the PinView component to enable connection behavior.
         PinView pinView = pinObj.AddComponent<PinView>();
+        // Use FindFirstObjectByType if available, otherwise FindObjectOfType.
+        NodeEditorController controller = UnityEngine.Object.FindFirstObjectByType<NodeEditorController>();
         pinView.Initialize(port, isInput, controller);
     }
 
 
-    public NodeData GetNodeData()
-    {
-        return nodeData;
-    }
+    public NodeData GetNodeData() => nodeData;
 }
-

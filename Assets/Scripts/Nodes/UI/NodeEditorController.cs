@@ -117,6 +117,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         return view;
     }
 
+    // Assets/Scripts/Nodes/UI/NodeEditorController.cs
     private void CreateNodeAtMouse(NodeDefinition definition)
     {
         Vector2 localPos;
@@ -126,6 +127,18 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         newNode.nodeDisplayName = definition.displayName;
         newNode.editorPosition = localPos;
 
+        // Copy all effects from NodeDefinition
+        foreach (var defEffect in definition.effects)
+        {
+            NodeEffectData effectCopy = new NodeEffectData
+            {
+                effectType = defEffect.effectType,
+                effectValue = defEffect.effectValue
+            };
+            newNode.effects.Add(effectCopy);
+        }
+
+        // Copy ports
         foreach (var portDef in definition.ports)
         {
             NodePort nodePort = new NodePort();
@@ -142,25 +155,41 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         CreateNodeView(newNode);
     }
 
+
     // ======================= Connection Drag Logic =======================
 
     public void StartConnectionDrag(PinView source, PointerEventData eventData)
     {
+        Debug.Log("[NodeEditor] StartConnectionDrag called!");
+
         sourcePin = source;
 
+        // Instantiate the connection line
         GameObject connObj = Instantiate(connectionViewPrefab, editorCanvas);
+        if (connObj == null)
+        {
+            Debug.LogError("[NodeEditor] Connection prefab failed to instantiate!");
+            return;
+        }
+
         activeConnectionLine = connObj.GetComponent<NodeConnectionView>();
+        if (activeConnectionLine == null)
+        {
+            Debug.LogError("[NodeEditor] NodeConnectionView component not found on prefab!");
+            return;
+        }
 
-        // Link the line's sourcePin
-        activeConnectionLine.sourcePin = sourcePin;
-
+        // Assign start position
         RectTransform sourceRect = source.GetComponent<RectTransform>();
         activeConnectionLine.SetStartRect(sourceRect);
 
         Vector2 localMousePos;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(editorCanvas, eventData.position, eventData.pressEventCamera, out localMousePos);
         activeConnectionLine.SetEndPosition(localMousePos, editorCanvas);
+
+        Debug.Log("[NodeEditor] Connection line initialized.");
     }
+
 
     public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
     {

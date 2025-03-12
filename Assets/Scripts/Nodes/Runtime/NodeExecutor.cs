@@ -2,17 +2,18 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using System.Linq;   // for .Where, .Sum
 
 public class NodeExecutor : MonoBehaviour
 {
     [Header("Mana Settings")]
     public float maxMana = 10f;
     public float currentMana = 10f;
-    public float manaRegenRate = 1f; // Mana per second
+    public float manaRegenRate = 1f;
 
     [Header("Execution Settings")]
-    public float waitTimeBetweenNodes = 0.5f; // Pause between nodes
-    public TMP_Text manaDisplay; // Assign in Inspector to show "[Current]/[Max]"
+    public float waitTimeBetweenNodes = 0.5f;
+    public TMP_Text manaDisplay;
 
     [SerializeField] private NodeGraph currentGraph;
 
@@ -20,17 +21,20 @@ public class NodeExecutor : MonoBehaviour
 
     private void Update()
     {
-        // Regenerate mana each frame
+        // Regenerate mana
         currentMana = Mathf.Min(currentMana + (manaRegenRate * Time.deltaTime), maxMana);
-
-        // Update mana display if assigned
-        if (manaDisplay != null)
+        if (manaDisplay)
         {
             manaDisplay.text = $"{(int)currentMana} / {maxMana}";
         }
+
+        // Press Space => run
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            ExecuteGraph();
+        }
     }
 
-    // Called to start node execution
     public void ExecuteGraph()
     {
         if (currentGraph == null || currentGraph.nodes.Count == 0)
@@ -44,42 +48,46 @@ public class NodeExecutor : MonoBehaviour
 
     private IEnumerator ProcessGraphCoroutine()
     {
-        // Simple approach: iterate through each node in the graph linearly
         for (int i = 0; i < currentGraph.nodes.Count; i++)
         {
             NodeData node = currentGraph.nodes[i];
 
-            // Wait so we can visually see the step-by-step flow
+            // Wait for debug visualization
             yield return new WaitForSeconds(waitTimeBetweenNodes);
 
-            // Check mana
-            float cost = node.manaCost;
-            if (currentMana < cost)
+            // Sum all ManaCost effects
+            float totalManaCost = node.effects
+                .Where(e => e.effectType == NodeEffectType.ManaCost)
+                .Sum(e => e.effectValue);
+
+            // Check if we can afford
+            if (currentMana < totalManaCost)
             {
-                Debug.Log($"[NodeExecutor] Not enough mana to process node '{node.nodeDisplayName}'. Needed {cost}, have {currentMana}.");
-                continue; // Skip or break, depends on your game logic
+                Debug.Log($"[NodeExecutor] Not enough mana for node '{node.nodeDisplayName}'. Need {totalManaCost}, have {currentMana}.");
+                continue;
             }
 
-            // Subtract mana cost
-            currentMana -= cost;
+            // Subtract
+            currentMana -= totalManaCost;
 
-            // Add damage
-            accumulatedDamage += node.damageAdd;
+            // Sum damage
+            float totalDamage = node.effects
+                .Where(e => e.effectType == NodeEffectType.Damage)
+                .Sum(e => e.effectValue);
 
-            // Debug info
-            Debug.Log($"[NodeExecutor] Processed node '{node.nodeDisplayName}' at index {i}, cost={cost}, totalDamage={accumulatedDamage}, remainingMana={currentMana}");
+            accumulatedDamage += totalDamage;
+
+            // Log each effect
+            foreach (var eff in node.effects)
+            {
+                Debug.Log($"[NodeExecutor] Node '{node.nodeDisplayName}' applying {eff.effectType}({eff.effectValue}).");
+            }
+            Debug.Log($"[NodeExecutor] After node '{node.nodeDisplayName}', totalDamage={accumulatedDamage}, remainingMana={currentMana}");
         }
 
-        Debug.Log($"[NodeExecutor] Finished processing graph. Final damage={accumulatedDamage}.");
+        Debug.Log($"[NodeExecutor] Finished processing. Final damage={accumulatedDamage}.");
     }
 
-    public void SetGraph(NodeGraph graph)
-    {
-        currentGraph = graph;
-    }
-
-    public NodeGraph GetGraph()
-    {
-        return currentGraph;
-    }
+    public void SetGraph(NodeGraph graph) => currentGraph = graph;
+    public NodeGraph GetGraph() => currentGraph;
 }
