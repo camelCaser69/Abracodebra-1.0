@@ -1,100 +1,70 @@
-﻿// Assets/Scripts/Nodes/UI/NodeConnectionView.cs
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-[RequireComponent(typeof(RectTransform), typeof(Image))]
+[RequireComponent(typeof(RectTransform))]
 public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private RectTransform startRect;
     [SerializeField] private RectTransform endRect;
 
-    // Keep track of the source and target pins for easy disconnection.
     public PinView sourcePin;
     public PinView targetPin;
 
-    private RectTransform lineRect;
-    private Image lineImage;
+    private UICubicBezier bezier;
+    private RectTransform ownRect;
+
+    private bool isPreviewing = false;
 
     private void Awake()
     {
-        lineRect = GetComponent<RectTransform>();
-        lineImage = GetComponent<Image>();
+        ownRect = GetComponent<RectTransform>();
+        bezier  = GetComponent<UICubicBezier>();
     }
 
     private void Update()
     {
-        if (startRect && endRect)
+        if (bezier == null || startRect == null) return;
+
+        Vector2 localStart;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, startRect.position, null, out localStart);
+
+        Vector2 localEnd;
+        if (!isPreviewing && endRect != null)
         {
-            UpdateLine();
+            // final connection
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, endRect.position, null, out localEnd);
         }
-    }
-
-    public void SetStartRect(RectTransform start)
-    {
-        startRect = start;
-    }
-
-    public void SetEndRect(RectTransform end)
-    {
-        endRect = end;
-    }
-
-    public void SetEndPosition(Vector2 localPos, RectTransform parentCanvas)
-    {
-        if (!endRect)
+        else
         {
-            GameObject endObj = new GameObject("TempEndRect", typeof(RectTransform));
-            endObj.transform.SetParent(parentCanvas);
-            endRect = endObj.GetComponent<RectTransform>();
-            endRect.sizeDelta = Vector2.zero;
+            // preview => use the mouse position
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, Input.mousePosition, null, out localEnd);
         }
-        endRect.anchoredPosition = localPos;
+
+        bezier.UpdateCurve(localStart, localEnd);
     }
 
-    private void UpdateLine()
+    public void StartPreview(RectTransform source)
     {
-        Vector3 startPos = startRect.position;
-        Vector3 endPos = endRect.position;
-        Vector3 direction = endPos - startPos;
-        float distance = direction.magnitude;
-
-        lineRect.position = startPos + direction * 0.5f;
-        lineRect.sizeDelta = new Vector2(distance, lineRect.sizeDelta.y);
-
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        lineRect.rotation = Quaternion.Euler(0f, 0f, angle);
+        startRect    = source;
+        endRect      = null;
+        isPreviewing = true;
     }
 
-    // ============= Right-Click to Delete the Connection =============
+    public void FinalizeConnection(RectTransform end)
+    {
+        endRect      = end;
+        isPreviewing = false;
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
-        // If right-clicked
+        // Only called if user right-clicks near the line (due to custom raycast)
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            // Remove references from source/target
-            if (sourcePin != null && targetPin != null)
-            {
-                sourcePin.port.connectedPortIds.Remove(targetPin.port.portId);
-            
-                // Get the NodeEditorController instance
-                NodeEditorController controller = UnityEngine.Object.FindFirstObjectByType<NodeEditorController>();
-                if (controller != null)
-                {
-                    string sourceId = controller.GetNodeIdFromPin(sourcePin);
-                    string targetId = controller.GetNodeIdFromPin(targetPin);
-                
-                    // Access the public CurrentGraph property
-                    if (controller.CurrentGraph.adjacency.ContainsKey(sourceId))
-                    {
-                        controller.CurrentGraph.adjacency[sourceId].Remove(targetId);
-                    }
-                }
-            }
+            // remove adjacency logic, etc.
 
-            // Destroy this connection line
+            Debug.Log("[NodeConnectionView] Deleting line");
             Destroy(gameObject);
         }
     }
-
 }

@@ -9,6 +9,10 @@ public class NodeData
     public string nodeId;
     public string nodeDisplayName;
     public Vector2 editorPosition;
+    
+    // In NodeData.cs, add:
+    public Color backgroundColor = Color.gray;
+
 
     public List<NodePort> inputs;
     public List<NodePort> outputs;

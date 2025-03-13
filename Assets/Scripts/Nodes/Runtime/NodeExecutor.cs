@@ -114,79 +114,88 @@ public class NodeExecutor : MonoBehaviour
     List<string> skippedNodes = new List<string>();
 
     foreach (var node in chain)
+{
+    yield return new WaitForSeconds(waitTimeBetweenNodes);
+
+    // Calculate the mana cost for this node.
+    float cost = node.effects
+        .Where(e => e.effectType == NodeEffectType.ManaCost)
+        .Sum(e => e.effectValue);
+
+    if (cost <= 0f)
     {
-        yield return new WaitForSeconds(waitTimeBetweenNodes);
-
-        // Sum ManaCost effects for this node.
-        float cost = node.effects.Where(e => e.effectType == NodeEffectType.ManaCost).Sum(e => e.effectValue);
-
-        if (cost <= 0f)
+        // If there is no cost, simply add damage.
+        float dmg = node.effects
+            .Where(e => e.effectType == NodeEffectType.Damage)
+            .Sum(e => e.effectValue);
+        totalDamage += dmg;
+        LogDebug($"[NodeExecutor] Executed '{node.nodeDisplayName}' with no cost, damage={Mathf.Floor(dmg)}");
+    }
+    else
+    {
+        // For nodes with a cost, require an explicit mana connection.
+        if (!currentGraph.manaConnections.ContainsKey(node.nodeId))
         {
-            // If no cost, simply add any damage.
-            float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
-            totalDamage += dmg;
-            LogDebug($"[NodeExecutor] Executed '{node.nodeDisplayName}' with no cost, damage={Mathf.Floor(dmg)}");
+            LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - no mana source connected.");
+            skippedNodes.Add(node.nodeDisplayName);
+            continue;
+        }
+
+        string sourceId = currentGraph.manaConnections[node.nodeId];
+        NodeData sourceNode = currentGraph.nodes.FirstOrDefault(n => n.nodeId == sourceId);
+        if (sourceNode == null)
+        {
+            LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - upstream mana node not found.");
+            skippedNodes.Add(node.nodeDisplayName);
+            continue;
+        }
+
+        var storageEff = sourceNode.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
+        if (storageEff == null)
+        {
+            LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - source node '{sourceNode.nodeDisplayName}' has no ManaStorage.");
+            skippedNodes.Add(node.nodeDisplayName);
+            continue;
+        }
+
+        float cap = storageEff.effectValue;
+        float cur = storageEff.secondaryValue;
+
+        if (cur < cost)
+        {
+            LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' (insufficient mana in '{sourceNode.nodeDisplayName}': {Mathf.Floor(cur)}/{cost}).");
+            skippedNodes.Add(node.nodeDisplayName);
+            continue;
         }
         else
         {
-            // For nodes with cost, look up the mana source from manaConnections.
-            if (!currentGraph.manaConnections.ContainsKey(node.nodeId))
-            {
-                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - no mana source connected.");
-                skippedNodes.Add(node.nodeDisplayName);
-                continue;
-            }
+            cur -= cost;
+            storageEff.secondaryValue = cur; // Deduct mana from the connected source node.
+            totalManaCost += cost;
 
-            string sourceId = currentGraph.manaConnections[node.nodeId];
-            NodeData sourceNode = currentGraph.nodes.FirstOrDefault(n => n.nodeId == sourceId);
-            if (sourceNode == null)
-            {
-                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - upstream mana node not found.");
-                skippedNodes.Add(node.nodeDisplayName);
-                continue;
-            }
+            float dmg = node.effects
+                .Where(e => e.effectType == NodeEffectType.Damage)
+                .Sum(e => e.effectValue);
+            totalDamage += dmg;
 
-            var storageEff = sourceNode.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
-            if (storageEff == null)
-            {
-                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - source node '{sourceNode.nodeDisplayName}' has no ManaStorage.");
-                skippedNodes.Add(node.nodeDisplayName);
-                continue;
-            }
-
-            float cap = storageEff.effectValue;
-            float cur = storageEff.secondaryValue;
-
-            if (cur < cost)
-            {
-                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' (insufficient mana in '{sourceNode.nodeDisplayName}': {Mathf.Floor(cur)}/{cost}).");
-                skippedNodes.Add(node.nodeDisplayName);
-                continue;
-            }
-            else
-            {
-                cur -= cost;
-                storageEff.secondaryValue = cur; // update the source's current mana
-                totalManaCost += cost;
-
-                float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
-                totalDamage += dmg;
-
-                float fCost = Mathf.Floor(cost);
-                float fDmg = Mathf.Floor(dmg);
-                float fCur = Mathf.Floor(cur);
-                float fCap = Mathf.Floor(cap);
-                LogDebug($"[NodeExecutor] '{node.nodeDisplayName}' executed: cost={fCost}, damage={fDmg}, sourceNode='{sourceNode.nodeDisplayName}' leftoverMana={fCur}/{fCap}");
-            }
-        }
-
-        // If node has Output effect, log final results.
-        bool isOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
-        if (isOutput)
-        {
-            LogDebug($"[NodeExecutor] Output node '{node.nodeDisplayName}' reached. Total mana cost={Mathf.Floor(totalManaCost)}, total damage={Mathf.Floor(totalDamage)}, skipped nodes={(skippedNodes.Count > 0 ? string.Join(", ", skippedNodes) : "None")}");
+            LogDebug($"[NodeExecutor] '{node.nodeDisplayName}' executed: cost={Mathf.Floor(cost)}, damage={Mathf.Floor(dmg)}, source='{sourceNode.nodeDisplayName}', leftoverMana={Mathf.Floor(cur)}/{Mathf.Floor(cap)}");
         }
     }
+
+    // If this node has an Output effect, log final results.
+    bool isOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
+    if (isOutput)
+    {
+        LogDebug($"[NodeExecutor] Output node '{node.nodeDisplayName}' reached.");
+        LogDebug($"[NodeExecutor] Total mana cost: {Mathf.Floor(totalManaCost)}");
+        string skipStr = (skippedNodes.Count > 0) ? string.Join(", ", skippedNodes) : "None";
+        LogDebug($"[NodeExecutor] Skipped nodes: {skipStr}");
+        LogDebug($"[NodeExecutor] Final damage: {Mathf.Floor(totalDamage)}");
+    }
+
+
+}
+
 
     LogDebug("[NodeExecutor] BFS execution complete.");
 }
