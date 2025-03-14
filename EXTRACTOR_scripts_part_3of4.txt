@@ -1,8 +1,8 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-12 11:15:59
-PART 2 OF 3
+UNITY PROJECT SCRIPT EXPORT - 2025-03-14 01:11:46
+PART 3 OF 4
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -39,10 +39,13 @@ Assets
 │   │   ├── Testing
 │   │   └── UI
 │   │       ├── NodeConnectionView.cs
+│   │       ├── NodeDraggable.cs
 │   │       ├── NodeEditorController.cs
+│   │       ├── NodeSelectable.cs
 │   │       ├── NodeTestInitializer.cs
 │   │       ├── NodeView.cs
-│   │       └── PinView.cs
+│   │       ├── PinView.cs
+│   │       └── UICubicBezier.cs
 │   ├── UI
 │   └── Wizards
 ├── Settings
@@ -416,52 +419,76 @@ SCRIPT CONTENTS
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeEditorController.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/UI/NodeEditorController.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
 
 public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 {
-    [Header("Editor Setup")]
-    [SerializeField] private RectTransform editorCanvas;
+    [Header("Node Editor References")]
+    [Tooltip("Spawned node prefabs go here.")]
     [SerializeField] private GameObject nodeViewPrefab;
+
+    [Tooltip("Spawned connection lines (NodeConnectionView) go here.")]
     [SerializeField] private GameObject connectionViewPrefab;
 
-    [Header("Node Definitions")]
+    [Tooltip("If you have a NodeDefinitionLibrary, assign it here for right-click creation.")]
     [SerializeField] private NodeDefinitionLibrary definitionLibrary;
 
-    [Header("Runtime Graph Reference")]
+    [Tooltip("The NodeGraph that stores all nodes & adjacency.")]
     [SerializeField] private NodeGraph currentGraph;
 
-    private List<NodeView> spawnedNodeViews = new List<NodeView>();
-    
-    // For dragging connections
-    private NodeConnectionView activeConnectionLine;
+    [Tooltip("Optional link to NodeExecutor so we can pass updated graphs to it.")]
+    [SerializeField] private NodeExecutor executor;
+
+    // For connection dragging
+    private NodeConnectionView draggingLine;
     private PinView sourcePin;
 
-    private bool showContextMenu;
+    // Context menu
+    private bool showContextMenu = false;
     private Vector2 contextMenuPosition;
 
-    // 1) We find a NodeExecutor in the scene to unify references
-    private NodeExecutor executor;
+    private List<NodeView> spawnedNodeViews = new List<NodeView>();
+
+    private void Awake()
+    {
+        // Ensure there's a transparent Image on this panel so it receives pointer events.
+        var thisRect = GetComponent<RectTransform>();
+        if (thisRect == null)
+        {
+            Debug.LogError("[NodeEditorController] The GameObject must have a RectTransform!");
+            return;
+        }
+
+        // If no Image is present, add one so we can receive scroll & drag events.
+        var image = GetComponent<Image>();
+        if (image == null)
+        {
+            image = gameObject.AddComponent<Image>();
+            image.color = new Color(1,1,1,0);   // fully transparent
+            image.raycastTarget = true;
+        }
+    }
 
     private void Start()
     {
-        // If no graph, create a new one
+        // If no graph assigned, create an empty one
         if (currentGraph == null)
+        {
             currentGraph = new NodeGraph();
+        }
 
-        // Find a NodeExecutor
-        executor = FindFirstObjectByType<NodeExecutor>();
+        // If no executor assigned, try to find one
         if (executor == null)
         {
-            Debug.LogWarning("[NodeEditorController] No NodeExecutor found in scene.");
-        }
-        else
-        {
-            // Assign the same graph
-            executor.SetGraph(currentGraph);
+            executor = GameObject.FindFirstObjectByType<NodeExecutor>();
+            if (executor != null)
+                executor.SetGraph(currentGraph);
+            else
+                Debug.LogWarning("[NodeEditorController] No NodeExecutor found in the scene.");
         }
     }
 
@@ -472,15 +499,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         {
             showContextMenu = true;
             contextMenuPosition = Input.mousePosition;
-        }
-    }
-
-    private void Awake()
-    {
-        // Ensure there's a NodeGraph to work with.
-        if (currentGraph == null)
-        {
-            currentGraph = new NodeGraph();
         }
     }
 
@@ -508,37 +526,58 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         }
     }
 
-    public void LoadGraph(NodeGraph graph)
+    private void CreateNodeAtMouse(NodeDefinition definition)
     {
-        currentGraph = graph;
-        ClearExistingViews();
-        if (currentGraph == null) return;
+        // Convert screen to local position
+        Vector2 localPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            (RectTransform)transform, Input.mousePosition, null, out localPos);
 
-        foreach (NodeData node in currentGraph.nodes)
-        {
-            CreateNodeView(node);
-        }
-    }
+        NodeData newNode = new NodeData();
+        newNode.nodeDisplayName = definition.displayName;
+        newNode.editorPosition = localPos;
+        newNode.backgroundColor = definition.backgroundColor;
 
-    private void ClearExistingViews()
-    {
-        foreach (var view in spawnedNodeViews)
+        // Copy effects
+        foreach (var defEffect in definition.effects)
         {
-            if (view != null) Destroy(view.gameObject);
+            NodeEffectData eff = new NodeEffectData
+            {
+                effectType = defEffect.effectType,
+                effectValue = defEffect.effectValue,
+                secondaryValue = defEffect.secondaryValue
+            };
+            newNode.effects.Add(eff);
         }
-        spawnedNodeViews.Clear();
+
+        // Copy ports
+        foreach (var portDef in definition.ports)
+        {
+            NodePort nPort = new NodePort
+            {
+                portName = portDef.portName,
+                portType = portDef.portType
+            };
+            if (portDef.isInput)
+                newNode.inputs.Add(nPort);
+            else
+                newNode.outputs.Add(nPort);
+        }
+
+        currentGraph.nodes.Add(newNode);
+        CreateNodeView(newNode);
+
+        // Update executor
+        if (executor != null)
+            executor.SetGraph(currentGraph);
     }
 
     private NodeView CreateNodeView(NodeData data)
     {
-        GameObject nodeObj = Instantiate(nodeViewPrefab, editorCanvas);
+        GameObject nodeObj = Instantiate(nodeViewPrefab, transform); // parent is NodeEditorPanel
         NodeView view = nodeObj.GetComponent<NodeView>();
 
-        // Simple color & name
-        Color nodeColor = Color.gray;
-        string displayName = data.nodeDisplayName;
-        
-        view.Initialize(data, nodeColor, displayName);
+        view.Initialize(data, data.backgroundColor, data.nodeDisplayName);
 
         RectTransform rt = nodeObj.GetComponent<RectTransform>();
         rt.anchoredPosition = data.editorPosition;
@@ -549,116 +588,34 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         return view;
     }
 
-    // Assets/Scripts/Nodes/UI/NodeEditorController.cs
-    private void CreateNodeAtMouse(NodeDefinition definition)
-    {
-        Vector2 localPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            editorCanvas, Input.mousePosition, null, out localPos);
-
-        NodeData newNode = new NodeData();
-        newNode.nodeDisplayName = definition.displayName;
-        newNode.editorPosition = localPos;
-
-        // Copy effects: if it's a ManaStorage effect, copy to dedicated fields; else, add normally.
-        foreach (var defEffect in definition.effects)
-        {
-            if (defEffect.effectType == NodeEffectType.ManaStorage)
-            {
-                newNode.manaStorageCapacity = defEffect.effectValue;
-                newNode.currentManaStorage = defEffect.secondaryValue; // Starting mana
-            }
-            else
-            {
-                NodeEffectData effectCopy = new NodeEffectData
-                {
-                    effectType = defEffect.effectType,
-                    effectValue = defEffect.effectValue,
-                    secondaryValue = defEffect.secondaryValue
-                };
-                newNode.effects.Add(effectCopy);
-            }
-        }
-
-        // Copy ports from definition.
-        foreach (var portDef in definition.ports)
-        {
-            NodePort nodePort = new NodePort
-            {
-                portName = portDef.portName,
-                portType = portDef.portType
-            };
-        
-            if (portDef.isInput)
-                newNode.inputs.Add(nodePort);
-            else
-                newNode.outputs.Add(nodePort);
-        }
-
-        currentGraph.nodes.Add(newNode);
-        CreateNodeView(newNode);
-
-        // Optionally re-assign the graph to the executor.
-        if (executor != null)
-            executor.SetGraph(currentGraph);
-    }
-
-
-
-    // ======================= Connection Drag Logic =======================
+    // Connection Dragging
 
     public void StartConnectionDrag(PinView source, PointerEventData eventData)
     {
-        Debug.Log("[NodeEditor] StartConnectionDrag called!");
-
+        Debug.Log("[NodeEditor] StartConnectionDrag");
         sourcePin = source;
 
-        // Instantiate the connection line
-        GameObject connObj = Instantiate(connectionViewPrefab, editorCanvas);
-        if (connObj == null)
-        {
-            Debug.LogError("[NodeEditor] Connection prefab failed to instantiate!");
-            return;
-        }
+        GameObject lineObj = Instantiate(connectionViewPrefab, transform);
+        draggingLine = lineObj.GetComponent<NodeConnectionView>();
 
-        activeConnectionLine = connObj.GetComponent<NodeConnectionView>();
-        if (activeConnectionLine == null)
-        {
-            Debug.LogError("[NodeEditor] NodeConnectionView component not found on prefab!");
-            return;
-        }
-
-        // Assign start position
         RectTransform sourceRect = source.GetComponent<RectTransform>();
-        activeConnectionLine.SetStartRect(sourceRect);
-
-        Vector2 localMousePos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(editorCanvas, eventData.position, eventData.pressEventCamera, out localMousePos);
-        activeConnectionLine.SetEndPosition(localMousePos, editorCanvas);
-
-        Debug.Log("[NodeEditor] Connection line initialized.");
+        draggingLine.sourcePin = source;
+        draggingLine.StartPreview(sourceRect);
     }
-
 
     public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
     {
-        if (activeConnectionLine == null)
-            return;
-
-        Vector2 localMousePos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(editorCanvas, eventData.position, eventData.pressEventCamera, out localMousePos);
-        activeConnectionLine.SetEndPosition(localMousePos, editorCanvas);
+        // NodeConnectionView handles the preview
     }
 
     public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)
     {
-        if (activeConnectionLine == null)
+        if (draggingLine == null)
             return;
 
         List<RaycastResult> results = new List<RaycastResult>();
         EventSystem.current.RaycastAll(eventData, results);
         PinView targetPin = null;
-
         foreach (var r in results)
         {
             targetPin = r.gameObject.GetComponent<PinView>();
@@ -670,57 +627,134 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
         if (targetPin != null)
         {
-            RectTransform targetRect = targetPin.GetComponent<RectTransform>(); // Declare targetRect here.
-            activeConnectionLine.SetEndRect(targetRect);
+            RectTransform targetRect = targetPin.GetComponent<RectTransform>();
+            draggingLine.targetPin = targetPin;
+            draggingLine.FinalizeConnection(targetRect);
 
-            // Assign the line's target pin for deletion handling.
-            activeConnectionLine.targetPin = targetPin;
+            // If both pins are Mana => record in manaConnections
+            if (sourcePin.port.portType == PortType.Mana && targetPin.port.portType == PortType.Mana)
+            {
+                string sourceId = GetNodeIdFromPin(sourcePin);
+                string targetId = GetNodeIdFromPin(targetPin);
+                if (currentGraph.manaConnections == null)
+                    currentGraph.manaConnections = new Dictionary<string, string>();
+                currentGraph.manaConnections[targetId] = sourceId;
+            }
+            // If both pins are General => record adjacency
+            else if (sourcePin.port.portType == PortType.General && targetPin.port.portType == PortType.General)
+            {
+                string sourceId = GetNodeIdFromPin(sourcePin);
+                string targetId = GetNodeIdFromPin(targetPin);
+                if (currentGraph.adjacency == null)
+                    currentGraph.adjacency = new Dictionary<string, List<string>>();
+                if (!currentGraph.adjacency.ContainsKey(sourceId))
+                    currentGraph.adjacency[sourceId] = new List<string>();
+                if (!currentGraph.adjacency[sourceId].Contains(targetId))
+                    currentGraph.adjacency[sourceId].Add(targetId);
+            }
 
-            sourcePin.port.connectedPortIds.Add(targetPin.port.portId);
-
-            activeConnectionLine = null;
-            sourcePin = null;
+            Debug.Log("[NodeEditor] Connection finalized");
         }
         else
         {
-            CancelActiveConnectionLine();
+            Debug.Log("[NodeEditor] Connection canceled");
+            Destroy(draggingLine.gameObject);
         }
+
+        draggingLine = null;
+        sourcePin = null;
     }
 
-
-    private void CancelActiveConnectionLine()
-    {
-        if (activeConnectionLine)
-        {
-            Destroy(activeConnectionLine.gameObject);
-            activeConnectionLine = null;
-            sourcePin = null;
-        }
-    }
-
-    // ======================= Zoom and Pan Logic =======================
-
+    // Zoom (mouse wheel) & Pan (drag the panel)
     public void OnScroll(PointerEventData eventData)
     {
+        Debug.Log($"[NodeEditor] OnScroll => {eventData.scrollDelta}");
         float scrollDelta = eventData.scrollDelta.y;
-        float newScale = editorCanvas.localScale.x + scrollDelta * 0.05f;
-        newScale = Mathf.Clamp(newScale, 0.5f, 2f);
-        editorCanvas.localScale = Vector3.one * newScale;
+        float newScale = transform.localScale.x + scrollDelta * 0.05f;
+        newScale = Mathf.Clamp(newScale, 0.4f, 2f);
+        transform.localScale = Vector3.one * newScale;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        editorCanvas.anchoredPosition += eventData.delta;
-    }
-    
-    private void OnNodesFinishedCreating()
-    {
-        // If your current graph is done, pass it to NodeExecutor
-        executor.SetGraph(currentGraph);
+        Debug.Log($"[NodeEditor] OnDrag => {eventData.delta}");
+        RectTransform rt = (RectTransform)transform;
+        rt.anchoredPosition += eventData.delta;
     }
 
+    // LoadGraph for NodeTestInitializer or other usage
+    public void LoadGraph(NodeGraph graph)
+    {
+        currentGraph = graph;
+        ClearExistingViews();
+        if (currentGraph == null) return;
+
+        foreach (var node in currentGraph.nodes)
+        {
+            CreateNodeView(node);
+        }
+
+        if (executor != null)
+            executor.SetGraph(currentGraph);
+    }
+
+    public string GetNodeIdFromPin(PinView pin)
+    {
+        NodeView view = pin.GetComponentInParent<NodeView>();
+        return view.GetNodeData().nodeId;
+    }
+
+    public NodeGraph CurrentGraph => currentGraph;
+
+    private void ClearExistingViews()
+    {
+        foreach (var view in spawnedNodeViews)
+        {
+            if (view != null)
+                Destroy(view.gameObject);
+        }
+        spawnedNodeViews.Clear();
+    }
 }
 
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeSelectable.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
+public class NodeSelectable : MonoBehaviour, IPointerClickHandler
+{
+    private static GameObject currentSelected;
+
+    // Reference to an Outline component added to the NodeView prefab.
+    [SerializeField] private Outline outline;
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Select(gameObject);
+    }
+
+    public static void Select(GameObject node)
+    {
+        if (currentSelected != null && currentSelected != node)
+        {
+            // Remove highlight from previously selected node.
+            var prevOutline = currentSelected.GetComponent<Outline>();
+            if (prevOutline != null)
+                prevOutline.enabled = false;
+        }
+        currentSelected = node;
+        var outlineComp = node.GetComponent<Outline>();
+        if (outlineComp != null)
+            outlineComp.enabled = true;
+    }
+}
 
 
 
@@ -751,117 +785,7 @@ public class NodeTestInitializer : MonoBehaviour
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\NodeView.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/UI/NodeView.cs
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using System.Collections.Generic;
-
-public class NodeView : MonoBehaviour
-{
-    [SerializeField] private TMP_Text nodeTitleText;
-    [SerializeField] private Image backgroundImage;
-
-    [Header("Pin Containers")]
-    [SerializeField] private Transform inputPinsContainer;
-    [SerializeField] private Transform outputPinsContainer;
-
-    [Header("Node Info Display")]
-    [SerializeField] private TMP_Text effectsText;  // Where we list the node's effects
-
-    private NodeData nodeData;
-
-    public void Initialize(NodeData data, Color color, string displayName)
-    {
-        nodeData = data;
-        if (nodeTitleText) nodeTitleText.text = displayName;
-        if (backgroundImage) backgroundImage.color = color;
-
-        // Show effect data
-        if (effectsText)
-        {
-            if (nodeData.effects.Count == 0)
-            {
-                effectsText.text = "No Effects";
-            }
-            else
-            {
-                string str = "Effects:\n";
-                foreach (var eff in nodeData.effects)
-                {
-                    // e.g. "ManaCost (5)", "Damage (10)"
-                    str += $"- {eff.effectType} ({eff.effectValue})\n";
-                }
-                effectsText.text = str;
-            }
-        }
-    }
-
-    public void GeneratePins(List<NodePort> inputs, List<NodePort> outputs)
-    {
-        // Clear existing pins
-        foreach (Transform child in inputPinsContainer)
-            Destroy(child.gameObject);
-        foreach (Transform child in outputPinsContainer)
-            Destroy(child.gameObject);
-
-        // Create input pins
-        foreach (var input in inputs)
-        {
-            CreatePin(inputPinsContainer, input, true);
-        }
-        // Create output pins
-        foreach (var output in outputs)
-        {
-            CreatePin(outputPinsContainer, output, false);
-        }
-    }
-
-    private void CreatePin(Transform parent, NodePort port, bool isInput)
-    {
-        // Create a new UI GameObject for the pin.
-        GameObject pinObj = new GameObject(isInput ? "InputPin" : "OutputPin", typeof(RectTransform));
-        pinObj.transform.SetParent(parent, false);  // false to keep local scaling
-
-        // Set a fixed size for the pin.
-        RectTransform rt = pinObj.GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(20, 20);
-
-        // Add an Image component to make it visible.
-        Image img = pinObj.AddComponent<Image>();
-        // Color mapping based on port type.
-        switch (port.portType)
-        {
-            case PortType.Mana:
-                img.color = Color.cyan;
-                break;
-            case PortType.Condition:
-                img.color = new Color(1f, 0.65f, 0f); // Orange
-                break;
-            default:
-                img.color = Color.blue;
-                break;
-        }
-
-        // Add the PinView component to enable connection behavior.
-        PinView pinView = pinObj.AddComponent<PinView>();
-        // Use FindFirstObjectByType if available, otherwise FindObjectOfType.
-        NodeEditorController controller = UnityEngine.Object.FindFirstObjectByType<NodeEditorController>();
-        pinView.Initialize(port, isInput, controller);
-    }
-
-
-    public NodeData GetNodeData() => nodeData;
-}
-
-
-
-
-
 
 --------------------------------------------------------------------------------
-This is part 2 out of 3 of script collection. 1 more parts remain.
+This is part 3 out of 4 of script collection. 1 more parts remain.
 --------------------------------------------------------------------------------

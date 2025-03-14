@@ -1,8 +1,8 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-12 11:15:59
-PART 3 OF 3
+UNITY PROJECT SCRIPT EXPORT - 2025-03-14 01:11:46
+PART 4 OF 4
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -39,10 +39,13 @@ Assets
 │   │   ├── Testing
 │   │   └── UI
 │   │       ├── NodeConnectionView.cs
+│   │       ├── NodeDraggable.cs
 │   │       ├── NodeEditorController.cs
+│   │       ├── NodeSelectable.cs
 │   │       ├── NodeTestInitializer.cs
 │   │       ├── NodeView.cs
-│   │       └── PinView.cs
+│   │       ├── PinView.cs
+│   │       └── UICubicBezier.cs
 │   ├── UI
 │   └── Wizards
 ├── Settings
@@ -414,6 +417,139 @@ SCRIPT CONTENTS
 ================================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeView.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// Assets/Scripts/Nodes/UI/NodeView.cs
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System.Collections.Generic;
+using System.Linq;
+
+
+public class NodeView : MonoBehaviour
+{
+    [SerializeField] private TMP_Text nodeTitleText;
+    [SerializeField] private Image backgroundImage;
+
+    [Header("Pin Containers")]
+    [SerializeField] private Transform inputPinsContainer;
+    [SerializeField] private Transform outputPinsContainer;
+
+    [Header("Node Info Display")]
+    [SerializeField] private TMP_Text manaStorageText; // For real-time mana display
+    [SerializeField] private TMP_Text effectsText;  // Where we list the node's effects
+
+    private NodeData nodeData;
+
+    private void Update()
+    {
+        // If the node has a ManaStorage effect, display
+        var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
+        if (manaEff != null && manaStorageText != null)
+        {
+            float cap = Mathf.Floor(manaEff.effectValue);
+            float cur = Mathf.Floor(manaEff.secondaryValue);
+            manaStorageText.text = $"Mana: {cur}/{cap}";
+        }
+    }
+
+
+    
+    public void Initialize(NodeData data, Color color, string displayName)
+    {
+        nodeData = data;
+        if (nodeTitleText) nodeTitleText.text = displayName;
+        if (backgroundImage) backgroundImage.color = color;
+
+        // Display effects (as before)
+        if (effectsText)
+        {
+            if (nodeData.effects.Count == 0)
+            {
+                effectsText.text = "No Effects";
+            }
+            else
+            {
+                string str = "Effects:\n";
+                foreach (var eff in nodeData.effects)
+                {
+                    str += $"- {eff.effectType} ({eff.effectValue})\n";
+                }
+                effectsText.text = str;
+            }
+        }
+
+        // If node has a ManaStorage effect, display it
+        var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
+        if (manaEff != null && manaStorageText != null)
+        {
+            manaStorageText.text = $"Mana: {manaEff.secondaryValue}/{manaEff.effectValue}";
+        }
+    }
+
+    public void GeneratePins(List<NodePort> inputs, List<NodePort> outputs)
+    {
+        // Clear existing pins
+        foreach (Transform child in inputPinsContainer)
+            Destroy(child.gameObject);
+        foreach (Transform child in outputPinsContainer)
+            Destroy(child.gameObject);
+
+        // Create input pins
+        foreach (var input in inputs)
+        {
+            CreatePin(inputPinsContainer, input, true);
+        }
+        // Create output pins
+        foreach (var output in outputs)
+        {
+            CreatePin(outputPinsContainer, output, false);
+        }
+    }
+
+    private void CreatePin(Transform parent, NodePort port, bool isInput)
+    {
+        // Create a new UI GameObject for the pin.
+        GameObject pinObj = new GameObject(isInput ? "InputPin" : "OutputPin", typeof(RectTransform));
+        pinObj.transform.SetParent(parent, false);  // false to keep local scaling
+
+        // Set a fixed size for the pin.
+        RectTransform rt = pinObj.GetComponent<RectTransform>();
+        rt.sizeDelta = new Vector2(20, 20);
+
+        // Add an Image component to make it visible.
+        Image img = pinObj.AddComponent<Image>();
+        // Color mapping based on port type.
+        switch (port.portType)
+        {
+            case PortType.Mana:
+                img.color = Color.cyan;
+                break;
+            case PortType.Condition:
+                img.color = new Color(1f, 0.65f, 0f); // Orange
+                break;
+            default:
+                img.color = Color.blue;
+                break;
+        }
+
+        // Add the PinView component to enable connection behavior.
+        PinView pinView = pinObj.AddComponent<PinView>();
+        // Use FindFirstObjectByType if available, otherwise FindObjectOfType.
+        NodeEditorController controller = UnityEngine.Object.FindFirstObjectByType<NodeEditorController>();
+        pinView.Initialize(port, isInput, controller);
+    }
+
+
+    public NodeData GetNodeData() => nodeData;
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\PinView.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿// Assets/Scripts/Nodes/UI/PinView.cs
@@ -468,7 +604,153 @@ public class PinView : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointe
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\UICubicBezier.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+
+/// <summary>
+/// Draws a cubic Bézier "S-curve" in a Screen Space - Overlay UI. Also performs a custom
+/// hit-test so that pointer events only register if the pointer is near the curve.
+/// </summary>
+[RequireComponent(typeof(CanvasRenderer))]
+public class UICubicBezier : Graphic
+{
+    [Range(2,100)] public int segments = 30;
+    public float lineThickness = 4f;
+
+    [Header("Positions in local space")]
+    public Vector2 startPos;
+    public Vector2 endPos;
+
+    private List<Vector2> sampledPoints = new List<Vector2>();
+
+    protected override void OnPopulateMesh(VertexHelper vh)
+    {
+        vh.Clear();
+        sampledPoints.Clear();
+
+        if ((startPos - endPos).sqrMagnitude < 1f)
+            return;
+
+        // "S-curve" approach: horizontal tangents
+        float dx = (endPos.x - startPos.x) * 0.5f;
+        Vector2 ctrl1 = startPos + new Vector2(dx, 0f);
+        Vector2 ctrl2 = endPos - new Vector2(dx, 0f);
+
+        // Sample the curve
+        for (int i = 0; i <= segments; i++)
+        {
+            float t = i / (float) segments;
+            Vector2 p = CubicBezier(startPos, ctrl1, ctrl2, endPos, t);
+            sampledPoints.Add(p);
+        }
+
+        // Create a mesh
+        for (int i=0; i<sampledPoints.Count -1; i++)
+        {
+            Vector2 p0 = sampledPoints[i];
+            Vector2 p1 = sampledPoints[i+1];
+
+            Vector2 dir = (p1 - p0).normalized;
+            Vector2 normal = new Vector2(-dir.y, dir.x) * (lineThickness*0.5f);
+
+            Vector2 v0 = p0 + normal;
+            Vector2 v1 = p0 - normal;
+            Vector2 v2 = p1 - normal;
+            Vector2 v3 = p1 + normal;
+
+            AddQuad(v0, v1, v2, v3, vh);
+        }
+    }
+
+    private Vector2 CubicBezier(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float t)
+    {
+        float u = 1f - t;
+        float tt = t*t;
+        float uu = u*u;
+        float uuu = uu*u;
+        float ttt = tt*t;
+
+        Vector2 p = uuu * p0;
+        p += 3f * uu * t * p1;
+        p += 3f * u * tt * p2;
+        p += ttt * p3;
+        return p;
+    }
+
+    private void AddQuad(Vector2 v0, Vector2 v1, Vector2 v2, Vector2 v3, VertexHelper vh)
+    {
+        int idx = vh.currentVertCount;
+        vh.AddVert(v0, color, Vector2.zero);
+        vh.AddVert(v1, color, Vector2.zero);
+        vh.AddVert(v2, color, Vector2.zero);
+        vh.AddVert(v3, color, Vector2.zero);
+
+        vh.AddTriangle(idx, idx+1, idx+2);
+        vh.AddTriangle(idx, idx+2, idx+3);
+    }
+
+    /// <summary>
+    /// Update the curve’s start/end in local coordinates.
+    /// </summary>
+    public void UpdateCurve(Vector2 startLocal, Vector2 endLocal)
+    {
+        startPos = startLocal;
+        endPos   = endLocal;
+        SetVerticesDirty();
+    }
+
+    /// <summary>
+    /// Custom Raycast so we only register clicks if pointer is near the line.
+    /// </summary>
+    public override bool Raycast(Vector2 sp, Camera eventCamera)
+    {
+        // Convert screen point to local coords
+        Vector2 localPos;
+        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, sp, eventCamera, out localPos))
+            return false;
+
+        // If we have no sampled points, reject
+        if (sampledPoints.Count < 2) return false;
+
+        float maxDist = lineThickness*0.5f + 2f; // small margin
+        float minDistance = float.MaxValue;
+
+        // find min distance from localPos to any segment
+        for (int i=0; i<sampledPoints.Count-1; i++)
+        {
+            Vector2 segStart = sampledPoints[i];
+            Vector2 segEnd   = sampledPoints[i+1];
+            float dist = DistanceToSegment(localPos, segStart, segEnd);
+            if (dist < minDistance) 
+                minDistance = dist;
+            if (minDistance < maxDist) 
+                return true; // early exit
+        }
+        return false;
+    }
+
+    // helper for point-line distance
+    private float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b)
+    {
+        Vector2 ap = p - a;
+        Vector2 ab = b - a;
+        float magAB = ab.sqrMagnitude;
+        float dot = Vector2.Dot(ap, ab)/magAB;
+        dot = Mathf.Clamp01(dot);
+        Vector2 proj = a + ab*dot;
+        return (p - proj).magnitude;
+    }
+}
+
+
+
+
+
 
 --------------------------------------------------------------------------------
-This is the final part (3 of 3).
+This is the final part (4 of 4).
 --------------------------------------------------------------------------------

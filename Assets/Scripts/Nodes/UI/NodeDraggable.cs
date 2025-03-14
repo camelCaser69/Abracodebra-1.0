@@ -1,37 +1,47 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class NodeDraggable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+/// <summary>
+/// Drags a node in its parent's local space, correctly handling parent scaling & panning.
+/// Attach this to each node (NodeView prefab).
+/// </summary>
+[RequireComponent(typeof(RectTransform))]
+public class NodeDraggable : MonoBehaviour, IPointerDownHandler, IDragHandler
 {
-    private RectTransform rectTransform;
-    private Canvas canvas; // The parent canvas for proper coordinate conversion.
-    private Vector2 offset;
+    private RectTransform nodeRect;      // The node's own RectTransform
+    private RectTransform parentRect;    // The parent panel's RectTransform
+    private Vector2 pointerOffset;       // Offset between pointer & node's anchoredPosition
 
     private void Awake()
     {
-        rectTransform = GetComponent<RectTransform>();
-        canvas = GetComponentInParent<Canvas>();
+        nodeRect = GetComponent<RectTransform>();
+        parentRect = nodeRect.parent as RectTransform;
+        if (parentRect == null)
+        {
+            Debug.LogError("[NodeDraggable] No parent RectTransform found! Dragging won't work.");
+        }
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        // Record the offset between pointer and node position.
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, eventData.position, eventData.pressEventCamera, out offset);
-        // Optionally, inform a global selection manager:
-        NodeSelectable.Select(this.gameObject);
+        // Convert the pointer's screen position to the parent's local coordinates.
+        Vector2 localPointerPos;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                parentRect, eventData.position, eventData.pressEventCamera, out localPointerPos))
+        {
+            // The offset is (nodePosition - pointerPosition) in parent's local space.
+            pointerOffset = nodeRect.anchoredPosition - localPointerPos;
+        }
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        Vector2 localPoint;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, eventData.position, eventData.pressEventCamera, out localPoint))
+        Vector2 localPointerPos;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                parentRect, eventData.position, eventData.pressEventCamera, out localPointerPos))
         {
-            rectTransform.anchoredPosition = localPoint - offset;
+            // On drag, update the node's anchoredPosition so it follows the pointer + offset.
+            nodeRect.anchoredPosition = localPointerPos + pointerOffset;
         }
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        // Nothing needed here for now.
     }
 }

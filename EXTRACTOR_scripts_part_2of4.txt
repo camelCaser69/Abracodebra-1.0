@@ -1,8 +1,8 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-12 11:15:59
-PART 1 OF 3
+UNITY PROJECT SCRIPT EXPORT - 2025-03-14 01:11:46
+PART 2 OF 4
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -39,10 +39,13 @@ Assets
 │   │   ├── Testing
 │   │   └── UI
 │   │       ├── NodeConnectionView.cs
+│   │       ├── NodeDraggable.cs
 │   │       ├── NodeEditorController.cs
+│   │       ├── NodeSelectable.cs
 │   │       ├── NodeTestInitializer.cs
 │   │       ├── NodeView.cs
-│   │       └── PinView.cs
+│   │       ├── PinView.cs
+│   │       └── UICubicBezier.cs
 │   ├── UI
 │   └── Wizards
 ├── Settings
@@ -414,459 +417,74 @@ SCRIPT CONTENTS
 ================================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\NodeData.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-[Serializable]
-public class NodeData
-{
-    public string nodeId;
-    public string nodeDisplayName;
-    public Vector2 editorPosition;
-
-    public List<NodePort> inputs;
-    public List<NodePort> outputs;
-    public List<NodeEffectData> effects;
-
-    // NEW: Unique mana storage fields for nodes that provide mana.
-    public float manaStorageCapacity = 0f;   // Capacity value (if this node is a mana storage node)
-    public float currentManaStorage = 0f;      // Current mana stored
-
-    public NodeData()
-    {
-        nodeId = Guid.NewGuid().ToString();
-        inputs = new List<NodePort>();
-        outputs = new List<NodePort>();
-        effects = new List<NodeEffectData>();
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\NodeDefinition.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// NodeDefinition.cs (unchanged except for your new effects in the list)
-using UnityEngine;
-using System.Collections.Generic;
-
-[CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
-public class NodeDefinition : ScriptableObject
-{
-    public string displayName;
-    public Color backgroundColor = Color.gray;
-    [TextArea] public string description;
-
-    public List<PortDefinition> ports;
-    public List<NodeEffectData> effects = new List<NodeEffectData>();
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\NodeDefinitionLibrary.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/Core/NodeDefinitionLibrary.cs
-using UnityEngine;
-using System.Collections.Generic;
-
-[CreateAssetMenu(fileName = "NodeDefinitionLibrary", menuName = "Nodes/NodeDefinitionLibrary")]
-public class NodeDefinitionLibrary : ScriptableObject
-{
-    public List<NodeDefinition> definitions;
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\NodeEffectData.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/Core/NodeEffectData.cs
-using System;
-
-[Serializable]
-public class NodeEffectData
-{
-    public NodeEffectType effectType;  
-    public float effectValue;          // Primary value (for ManaStorage: capacity)
-    public float secondaryValue;       // Secondary value (for ManaStorage: starting mana)
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\NodeEffectType.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/Core/NodeEffectType.cs
-public enum NodeEffectType
-{
-    ManaCost,
-    Damage,
-    ManaStorage,      // effectValue = capacity, secondaryValue = starting mana
-    ManaRechargeRate,
-    Output
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\NodePort.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿/* Assets/Scripts/Nodes/Core/NodePort.cs
-   Represents a single port on a NodeData (input or output). */
-
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-[Serializable]
-public class NodePort
-{
-    public string portId;
-    public string portName;
-    public PortType portType;
-    public List<string> connectedPortIds;
-
-    public NodePort()
-    {
-        portId = Guid.NewGuid().ToString();
-        connectedPortIds = new List<string>();
-    }
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\PortDefinition.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/Core/PortDefinition.cs
-using System;
-using UnityEngine;
-
-public enum PortType
-{
-    General,
-    Mana,
-    Condition
-}
-
-[Serializable]
-public class PortDefinition
-{
-    public string portName;
-    public PortType portType;
-    public bool isInput;
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Runtime\NodeExecutor.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using TMPro;
-
-public class NodeExecutor : MonoBehaviour
-{
-    [SerializeField] private NodeGraph currentGraph;
-
-    [Header("Debug Settings")]
-    public float waitTimeBetweenNodes = 0.5f; // Pause for step-by-step debug
-    public TMP_Text debugOutput; // optional on-screen text
-
-    private void Update()
-    {
-        // Press SPACE to run the chain
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ExecuteGraph();
-        }
-    }
-
-    public void SetGraph(NodeGraph graph)
-    {
-        currentGraph = graph;
-    }
-
-    public NodeGraph GetGraph() => currentGraph;
-
-    public void ExecuteGraph()
-    {
-        if (currentGraph == null || currentGraph.nodes.Count == 0)
-        {
-            Debug.LogWarning("[NodeExecutor] No graph or no nodes to execute!");
-            return;
-        }
-
-        StopAllCoroutines();
-        StartCoroutine(RunChainCoroutine());
-    }
-
-    private IEnumerator RunChainCoroutine()
-    {
-        ClearDebugOutput();
-
-        // 1) Find an Output node
-        var outputNodes = currentGraph.nodes
-            .Where(n => n.effects.Any(e => e.effectType == NodeEffectType.Output))
-            .ToList();
-
-        if (outputNodes.Count == 0)
-        {
-            LogDebug("[NodeExecutor] No Output node found. Aborting run.");
-            yield break;
-        }
-
-        // For simplicity, pick the first output node
-        NodeData outputNode = outputNodes[0];
-
-        // 2) Gather all nodes leading to this output (including itself)
-        var chain = new List<NodeData>();
-        RecursiveGatherUpstream(outputNode, chain);
-
-        if (chain.Count == 0)
-        {
-            LogDebug("[NodeExecutor] No chain leading to output node. Aborting run.");
-            yield break;
-        }
-
-        // chain is reversed (output -> up). Let's re-reverse it (start -> ... -> output).
-        chain.Reverse();
-
-        LogDebug($"[NodeExecutor] Found {chain.Count} nodes in chain from start to output.");
-
-        // 3) We'll keep track of a "localMana" that can be updated if we encounter a node with ManaStorage
-        float localMana = 0f;
-        float localCapacity = 0f;
-        float totalDamage = 0f;
-
-        // 4) Execute chain in forward order
-        foreach (var node in chain)
-        {
-            yield return new WaitForSeconds(waitTimeBetweenNodes);
-
-            // If this node has a ManaStorage effect, it overrides localMana
-            if (node.manaStorageCapacity > 0f)
-            {
-                localCapacity = node.manaStorageCapacity;
-                localMana = node.currentManaStorage;
-                LogDebug($"[NodeExecutor] Node '{node.nodeDisplayName}' sets localMana to {localMana}/{localCapacity}");
-            }
-
-            // ManaCost
-            float manaCost = node.effects
-                .Where(e => e.effectType == NodeEffectType.ManaCost)
-                .Sum(e => e.effectValue);
-
-            bool canPay = (localMana >= manaCost);
-            if (manaCost > 0f && !canPay)
-            {
-                LogDebug($"[NodeExecutor] Not enough mana for '{node.nodeDisplayName}'. Required {manaCost}, have {localMana}. Skipping node's damage but continuing chain...");
-                // We do not stop the chain, just skip applying this node's damage
-            }
-            else
-            {
-                // Subtract cost
-                localMana -= manaCost;
-
-                // Damage
-                float dmg = node.effects
-                    .Where(e => e.effectType == NodeEffectType.Damage)
-                    .Sum(e => e.effectValue);
-                totalDamage += dmg;
-
-                LogDebug($"[NodeExecutor] Node '{node.nodeDisplayName}' executed: cost={manaCost}, damage={dmg}, leftoverMana={localMana}/{localCapacity}");
-            }
-
-            // If node has Output effect, we log final result
-            bool isOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
-            if (isOutput)
-            {
-                LogDebug($"[NodeExecutor] Output node '{node.nodeDisplayName}' reached. FinalDamage={totalDamage}, finalMana={localMana}");
-                // Potentially spawn a spell effect here
-            }
-        }
-
-        LogDebug("[NodeExecutor] Done executing chain.");
-    }
-
-    /// <summary>
-    /// Recursively gathers all nodes that feed into 'currentNode' (via "General" ports).
-    /// Each node is added once to 'chain'.
-    /// </summary>
-    private void RecursiveGatherUpstream(NodeData currentNode, List<NodeData> chain)
-    {
-        if (!chain.Contains(currentNode))
-            chain.Add(currentNode);
-
-        // For each input port of currentNode
-        foreach (var inputPort in currentNode.inputs)
-        {
-            // If port type != General, skip
-            // (Use your enum-based check here)
-            if (inputPort.portType != PortType.General)
-                continue;
-
-            // Each connectedPortId is from an output port of some other node
-            foreach (var connectedId in inputPort.connectedPortIds)
-            {
-                // Find which node has an output with this ID
-                var sourceNode = currentGraph.nodes.FirstOrDefault(n =>
-                    n.outputs.Any(o => o.portId == connectedId && o.portType == PortType.General));
-
-                if (sourceNode != null && !chain.Contains(sourceNode))
-                {
-                    // Recurse upstream
-                    RecursiveGatherUpstream(sourceNode, chain);
-                }
-            }
-        }
-    }
-
-    private void ClearDebugOutput()
-    {
-        if (debugOutput) debugOutput.text = "";
-    }
-
-    private void LogDebug(string msg)
-    {
-        Debug.Log(msg);
-        if (debugOutput)
-        {
-            debugOutput.text += msg + "\n";
-        }
-    }
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Runtime\NodeGraph.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿/* Assets/Scripts/Nodes/Runtime/NodeGraph.cs
-   Holds a list of NodeData to form a single node graph. */
-
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-[Serializable]
-public class NodeGraph
-{
-    public List<NodeData> nodes;
-
-    public NodeGraph()
-    {
-        nodes = new List<NodeData>();
-    }
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeConnectionView.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/UI/NodeConnectionView.cs
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
-[RequireComponent(typeof(RectTransform), typeof(Image))]
+[RequireComponent(typeof(RectTransform))]
 public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
 {
     [SerializeField] private RectTransform startRect;
     [SerializeField] private RectTransform endRect;
 
-    // Keep track of the source and target pins for easy disconnection.
     public PinView sourcePin;
     public PinView targetPin;
 
-    private RectTransform lineRect;
-    private Image lineImage;
+    private UICubicBezier bezier;
+    private RectTransform ownRect;
+
+    private bool isPreviewing = false;
 
     private void Awake()
     {
-        lineRect = GetComponent<RectTransform>();
-        lineImage = GetComponent<Image>();
+        ownRect = GetComponent<RectTransform>();
+        bezier  = GetComponent<UICubicBezier>();
     }
 
     private void Update()
     {
-        if (startRect && endRect)
+        if (bezier == null || startRect == null) return;
+
+        Vector2 localStart;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, startRect.position, null, out localStart);
+
+        Vector2 localEnd;
+        if (!isPreviewing && endRect != null)
         {
-            UpdateLine();
+            // final connection
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, endRect.position, null, out localEnd);
         }
-    }
-
-    public void SetStartRect(RectTransform start)
-    {
-        startRect = start;
-    }
-
-    public void SetEndRect(RectTransform end)
-    {
-        endRect = end;
-    }
-
-    public void SetEndPosition(Vector2 localPos, RectTransform parentCanvas)
-    {
-        if (!endRect)
+        else
         {
-            GameObject endObj = new GameObject("TempEndRect", typeof(RectTransform));
-            endObj.transform.SetParent(parentCanvas);
-            endRect = endObj.GetComponent<RectTransform>();
-            endRect.sizeDelta = Vector2.zero;
+            // preview => use the mouse position
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, Input.mousePosition, null, out localEnd);
         }
-        endRect.anchoredPosition = localPos;
+
+        bezier.UpdateCurve(localStart, localEnd);
     }
 
-    private void UpdateLine()
+    public void StartPreview(RectTransform source)
     {
-        Vector3 startPos = startRect.position;
-        Vector3 endPos = endRect.position;
-        Vector3 direction = endPos - startPos;
-        float distance = direction.magnitude;
-
-        lineRect.position = startPos + direction * 0.5f;
-        lineRect.sizeDelta = new Vector2(distance, lineRect.sizeDelta.y);
-
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        lineRect.rotation = Quaternion.Euler(0f, 0f, angle);
+        startRect    = source;
+        endRect      = null;
+        isPreviewing = true;
     }
 
-    // ============= Right-Click to Delete the Connection =============
+    public void FinalizeConnection(RectTransform end)
+    {
+        endRect      = end;
+        isPreviewing = false;
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
-        // If right-clicked
+        // Only called if user right-clicks near the line (due to custom raycast)
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            // Remove references from source/target
-            if (sourcePin != null && targetPin != null)
-            {
-                sourcePin.port.connectedPortIds.Remove(targetPin.port.portId);
-                // If you store the reverse connection, remove that too
-            }
+            // remove adjacency logic, etc.
 
-            // Destroy this connection line
+            Debug.Log("[NodeConnectionView] Deleting line");
             Destroy(gameObject);
         }
     }
@@ -875,8 +493,61 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeDraggable.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+
+/// <summary>
+/// Drags a node in its parent's local space, correctly handling parent scaling & panning.
+/// Attach this to each node (NodeView prefab).
+/// </summary>
+[RequireComponent(typeof(RectTransform))]
+public class NodeDraggable : MonoBehaviour, IPointerDownHandler, IDragHandler
+{
+    private RectTransform nodeRect;      // The node's own RectTransform
+    private RectTransform parentRect;    // The parent panel's RectTransform
+    private Vector2 pointerOffset;       // Offset between pointer & node's anchoredPosition
+
+    private void Awake()
+    {
+        nodeRect = GetComponent<RectTransform>();
+        parentRect = nodeRect.parent as RectTransform;
+        if (parentRect == null)
+        {
+            Debug.LogError("[NodeDraggable] No parent RectTransform found! Dragging won't work.");
+        }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        // Convert the pointer's screen position to the parent's local coordinates.
+        Vector2 localPointerPos;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                parentRect, eventData.position, eventData.pressEventCamera, out localPointerPos))
+        {
+            // The offset is (nodePosition - pointerPosition) in parent's local space.
+            pointerOffset = nodeRect.anchoredPosition - localPointerPos;
+        }
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        Vector2 localPointerPos;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                parentRect, eventData.position, eventData.pressEventCamera, out localPointerPos))
+        {
+            // On drag, update the node's anchoredPosition so it follows the pointer + offset.
+            nodeRect.anchoredPosition = localPointerPos + pointerOffset;
+        }
+    }
+}
+
+
+
 
 
 --------------------------------------------------------------------------------
-This is part 1 out of 3 of script collection. 2 more parts remain.
+This is part 2 out of 4 of script collection. 2 more parts remain.
 --------------------------------------------------------------------------------
