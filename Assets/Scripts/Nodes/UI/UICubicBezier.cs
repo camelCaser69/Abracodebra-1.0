@@ -2,14 +2,10 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-/// <summary>
-/// Draws a cubic Bézier "S-curve" in a Screen Space - Overlay UI. Also performs a custom
-/// hit-test so that pointer events only register if the pointer is near the curve.
-/// </summary>
 [RequireComponent(typeof(CanvasRenderer))]
-public class UICubicBezier : Graphic
+public class UICubicBezier : MaskableGraphic
 {
-    [Range(2,100)] public int segments = 30;
+    [Range(2, 100)] public int segments = 30;
     public float lineThickness = 4f;
 
     [Header("Positions in local space")]
@@ -17,6 +13,13 @@ public class UICubicBezier : Graphic
     public Vector2 endPos;
 
     private List<Vector2> sampledPoints = new List<Vector2>();
+
+    protected override void Awake()
+    {
+        base.Awake();
+        // With MaskableGraphic, the property "maskable" is available.
+        this.maskable = true;
+    }
 
     protected override void OnPopulateMesh(VertexHelper vh)
     {
@@ -34,19 +37,19 @@ public class UICubicBezier : Graphic
         // Sample the curve
         for (int i = 0; i <= segments; i++)
         {
-            float t = i / (float) segments;
+            float t = i / (float)segments;
             Vector2 p = CubicBezier(startPos, ctrl1, ctrl2, endPos, t);
             sampledPoints.Add(p);
         }
 
-        // Create a mesh
-        for (int i=0; i<sampledPoints.Count -1; i++)
+        // Create a mesh for the curve using quads.
+        for (int i = 0; i < sampledPoints.Count - 1; i++)
         {
             Vector2 p0 = sampledPoints[i];
-            Vector2 p1 = sampledPoints[i+1];
+            Vector2 p1 = sampledPoints[i + 1];
 
             Vector2 dir = (p1 - p0).normalized;
-            Vector2 normal = new Vector2(-dir.y, dir.x) * (lineThickness*0.5f);
+            Vector2 normal = new Vector2(-dir.y, dir.x) * (lineThickness * 0.5f);
 
             Vector2 v0 = p0 + normal;
             Vector2 v1 = p0 - normal;
@@ -60,10 +63,10 @@ public class UICubicBezier : Graphic
     private Vector2 CubicBezier(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float t)
     {
         float u = 1f - t;
-        float tt = t*t;
-        float uu = u*u;
-        float uuu = uu*u;
-        float ttt = tt*t;
+        float tt = t * t;
+        float uu = u * u;
+        float uuu = uu * u;
+        float ttt = tt * t;
 
         Vector2 p = uuu * p0;
         p += 3f * uu * t * p1;
@@ -80,59 +83,56 @@ public class UICubicBezier : Graphic
         vh.AddVert(v2, color, Vector2.zero);
         vh.AddVert(v3, color, Vector2.zero);
 
-        vh.AddTriangle(idx, idx+1, idx+2);
-        vh.AddTriangle(idx, idx+2, idx+3);
+        vh.AddTriangle(idx, idx + 1, idx + 2);
+        vh.AddTriangle(idx, idx + 2, idx + 3);
     }
 
     /// <summary>
-    /// Update the curve’s start/end in local coordinates.
+    /// Updates the curve’s start and end positions in local coordinates and forces a redraw.
     /// </summary>
     public void UpdateCurve(Vector2 startLocal, Vector2 endLocal)
     {
         startPos = startLocal;
-        endPos   = endLocal;
+        endPos = endLocal;
         SetVerticesDirty();
     }
 
     /// <summary>
-    /// Custom Raycast so we only register clicks if pointer is near the line.
+    /// Custom Raycast so that pointer events only register if the pointer is near the line.
     /// </summary>
     public override bool Raycast(Vector2 sp, Camera eventCamera)
     {
-        // Convert screen point to local coords
         Vector2 localPos;
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, sp, eventCamera, out localPos))
             return false;
 
-        // If we have no sampled points, reject
-        if (sampledPoints.Count < 2) return false;
+        if (sampledPoints.Count < 2)
+            return false;
 
-        float maxDist = lineThickness*0.5f + 2f; // small margin
+        float maxDist = lineThickness * 0.5f + 2f;
         float minDistance = float.MaxValue;
 
-        // find min distance from localPos to any segment
-        for (int i=0; i<sampledPoints.Count-1; i++)
+        for (int i = 0; i < sampledPoints.Count - 1; i++)
         {
             Vector2 segStart = sampledPoints[i];
-            Vector2 segEnd   = sampledPoints[i+1];
+            Vector2 segEnd = sampledPoints[i + 1];
             float dist = DistanceToSegment(localPos, segStart, segEnd);
-            if (dist < minDistance) 
+            if (dist < minDistance)
                 minDistance = dist;
-            if (minDistance < maxDist) 
-                return true; // early exit
+            if (minDistance < maxDist)
+                return true;
         }
         return false;
     }
 
-    // helper for point-line distance
     private float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b)
     {
         Vector2 ap = p - a;
         Vector2 ab = b - a;
-        float magAB = ab.sqrMagnitude;
-        float dot = Vector2.Dot(ap, ab)/magAB;
+        float abSqr = ab.sqrMagnitude;
+        float dot = Vector2.Dot(ap, ab) / abSqr;
         dot = Mathf.Clamp01(dot);
-        Vector2 proj = a + ab*dot;
+        Vector2 proj = a + ab * dot;
         return (p - proj).magnitude;
     }
 }

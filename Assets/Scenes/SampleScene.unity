@@ -1064,7 +1064,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cdec8f77fd614fe2b08767bbff45d291, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  windowRect: {fileID: 420027128}
+  windowRect: {fileID: 2056154127}
   contentRect: {fileID: 237109771}
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   connectionViewPrefab: {fileID: 4296726482643796613, guid: cf00005e840b120419ee5051987924d2, type: 3}
@@ -1072,7 +1072,7 @@ MonoBehaviour:
   currentGraph:
     nodes: []
   executor: {fileID: 2010610567}
-  contentMargin: 20
+  contentMargin: 0
 --- !u!114 &2056154129
 MonoBehaviour:
   m_ObjectHideFlags: 0

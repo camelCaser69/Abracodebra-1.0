@@ -6,55 +6,53 @@ using System.Linq;
 
 public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 {
-    [Header("Editor Window Setup")]
-    [Tooltip("This is the fixed window (NodeEditorWindow) that has a RectMask2D and CanvasGroup.")]
-    [SerializeField] private RectTransform windowRect; // Should be this GameObject's RectTransform
-
-    [Header("Content Container")]
-    [Tooltip("This is the child RectTransform that holds nodes and connection lines.")]
-    [SerializeField] private RectTransform contentRect; // All nodes and lines are spawned here
+    [Header("Window & Content Setup")]
+    [Tooltip("The fixed window (NodeEditorWindow) with RectMask2D, which toggles visibility.")]
+    [SerializeField] private RectTransform windowRect; // This is NodeEditorWindow (the parent panel)
+    
+    [Tooltip("The inner content panel where nodes and connections are spawned.")]
+    [SerializeField] private RectTransform contentRect; // This should be a child of windowRect
 
     [Header("Prefabs")]
     [SerializeField] private GameObject nodeViewPrefab; // Prefab for NodeView
     [SerializeField] private GameObject connectionViewPrefab; // Prefab for NodeConnectionView (with UICubicBezier)
 
     [Header("Node Definitions")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // For right-click creation
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // Contains NodeDefinition assets
 
     [Header("Runtime Graph Reference")]
-    [SerializeField] private NodeGraph currentGraph; // Stores nodes, adjacency, manaConnections
+    [SerializeField] private NodeGraph currentGraph; // Must have adjacency & manaConnections dictionaries
 
     [Header("Optional")]
-    [SerializeField] private NodeExecutor executor; // Optional: updates graph in NodeExecutor
+    [SerializeField] private NodeExecutor executor; // Optional: updates graph for execution
 
     [Header("Panning/Zoom Settings")]
-    [SerializeField] private float contentMargin = 20f; // Margin inside the window
+    [SerializeField] private float contentMargin = 20f; // Minimum margin between content and window borders
 
     // For connection dragging:
     private NodeConnectionView draggingLine;
     private PinView sourcePin;
 
-    // Context menu variables:
+    // Context menu variables for adding nodes:
     private bool showContextMenu = false;
     private Vector2 contextMenuPosition;
 
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
 
-    // CanvasGroup for toggling visibility
-    private CanvasGroup canvasGroup;
+    private CanvasGroup canvasGroup; // For toggling window visibility
 
     private void Awake()
     {
-        // Use the windowRect from this GameObject.
+        // Use this GameObject's RectTransform as windowRect if not assigned.
         if (windowRect == null)
             windowRect = GetComponent<RectTransform>();
 
-        // Ensure this GameObject (window) has a CanvasGroup.
+        // Ensure this window has a CanvasGroup for visibility toggling.
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
-        // Ensure this window has an Image for pointer events.
+        // Ensure the window has a transparent Image so it receives pointer events.
         Image img = GetComponent<Image>();
         if (img == null)
         {
@@ -77,11 +75,14 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             else
                 Debug.LogWarning("[NodeEditorController] No NodeExecutor found in scene.");
         }
+
+        // Initially ensure content panel is large enough.
+        EnsureContentPanelSize();
     }
 
     private void Update()
     {
-        // Toggle window visibility with TAB.
+        // Toggle visibility with TAB key.
         if (Input.GetKeyDown(KeyCode.Tab))
             ToggleVisibility();
 
@@ -134,12 +135,11 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
     }
 
     /// <summary>
-    /// Creates a new node from a definition at the current mouse position.
+    /// Creates a new node from a NodeDefinition at the current mouse position (converted into contentRect space).
     /// </summary>
     private void CreateNodeAtMouse(NodeDefinition definition)
     {
         Vector2 localPos;
-        // Convert screen position to local point within the contentRect (child container).
         RectTransformUtility.ScreenPointToLocalPointInRectangle(contentRect, Input.mousePosition, null, out localPos);
 
         NodeData newNode = new NodeData();
@@ -147,7 +147,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         newNode.editorPosition = localPos;
         newNode.backgroundColor = definition.backgroundColor;
 
-        // Copy effects.
         foreach (var defEffect in definition.effects)
         {
             NodeEffectData effectCopy = new NodeEffectData
@@ -159,7 +158,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             newNode.effects.Add(effectCopy);
         }
 
-        // Copy ports.
         foreach (var portDef in definition.ports)
         {
             NodePort nodePort = new NodePort
@@ -176,13 +174,14 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
         currentGraph.nodes.Add(newNode);
         CreateNodeView(newNode);
+        EnsureContentPanelSize();
 
         if (executor != null)
             executor.SetGraph(currentGraph);
     }
 
     /// <summary>
-    /// Instantiates a NodeView and initializes it.
+    /// Instantiates a NodeView from nodeViewPrefab and initializes it.
     /// </summary>
     private NodeView CreateNodeView(NodeData data)
     {
@@ -196,7 +195,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
         view.GeneratePins(data.inputs, data.outputs);
 
-        // Auto-add OutputNodeEffect if needed.
+        // Auto-add OutputNodeEffect if node has an Output effect.
         if (data.effects.Any(e => e.effectType == NodeEffectType.Output))
         {
             if (nodeObj.GetComponent<OutputNodeEffect>() == null)
@@ -224,7 +223,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
     {
-        // The preview line in NodeConnectionView updates itself using Input.mousePosition.
+        // NodeConnectionView handles its preview update via Input.mousePosition.
     }
 
     public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)
@@ -283,7 +282,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
     }
 
     // --- Zooming & Panning ---
-    // Zoom and pan apply to contentRect.
+    // Zoom and pan are applied to contentRect so that the window (NodeEditorWindow) stays fixed.
     public void OnScroll(PointerEventData eventData)
     {
         Debug.Log($"[NodeEditor] OnScroll: {eventData.scrollDelta}");
@@ -292,47 +291,48 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         newScale = Mathf.Clamp(newScale, 0.5f, 2f);
         contentRect.localScale = Vector3.one * newScale;
 
-        ClampContentPosition();
+        // Ensure content panel remains large enough.
+        EnsureContentPanelSize();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        Debug.Log($"[NodeEditor] OnDrag: {eventData.delta}");
+    //    Debug.Log($"[NodeEditor] OnDrag: {eventData.delta}");
         contentRect.anchoredPosition += eventData.delta;
-
-        ClampContentPosition();
+        EnsureContentPanelSize();
     }
 
-    // Clamps the contentRect's anchoredPosition so that it stays within the window (with a margin).
-    private void ClampContentPosition()
+    // Dynamically ensures contentRect is always larger than windowRect by a defined margin.
+    private void EnsureContentPanelSize()
     {
+        if (windowRect == null || contentRect == null)
+            return;
+
         Vector2 windowSize = windowRect.rect.size;
-        Vector2 contentSize = contentRect.rect.size * contentRect.localScale.x; // assuming uniform scale
-        Vector2 currentPos = contentRect.anchoredPosition;
+        Vector2 minSize = windowSize + new Vector2(contentMargin * 2, contentMargin * 2);
 
-        // If content is smaller than window, center it.
-        float clampedX = currentPos.x;
-        float clampedY = currentPos.y;
-
-        if (contentSize.x < windowSize.x)
-            clampedX = 0;
-        else
+        // Optionally, also enlarge content based on nodes' positions:
+        if (spawnedNodeViews.Count > 0)
         {
-            float maxX = (contentSize.x - windowSize.x) / 2 - contentMargin;
-            float minX = -maxX;
-            clampedX = Mathf.Clamp(currentPos.x, minX, maxX);
+            Vector2 minPos = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 maxPos = new Vector2(float.MinValue, float.MinValue);
+            foreach (var view in spawnedNodeViews)
+            {
+                RectTransform rt = view.GetComponent<RectTransform>();
+                Vector2 pos = rt.anchoredPosition;
+                Vector2 size = rt.rect.size;
+                minPos = Vector2.Min(minPos, pos - size * 0.5f);
+                maxPos = Vector2.Max(maxPos, pos + size * 0.5f);
+            }
+            Vector2 nodesBounds = maxPos - minPos;
+            minSize = Vector2.Max(minSize, nodesBounds + new Vector2(contentMargin * 2, contentMargin * 2));
         }
 
-        if (contentSize.y < windowSize.y)
-            clampedY = 0;
-        else
-        {
-            float maxY = (contentSize.y - windowSize.y) / 2 - contentMargin;
-            float minY = -maxY;
-            clampedY = Mathf.Clamp(currentPos.y, minY, maxY);
-        }
-
-        contentRect.anchoredPosition = new Vector2(clampedX, clampedY);
+        // Set contentRect sizeDelta if needed.
+        Vector2 currentSize = contentRect.sizeDelta;
+        float newWidth = Mathf.Max(currentSize.x, minSize.x);
+        float newHeight = Mathf.Max(currentSize.y, minSize.y);
+        contentRect.sizeDelta = new Vector2(newWidth, newHeight);
     }
 
     // --- Load Graph ---
