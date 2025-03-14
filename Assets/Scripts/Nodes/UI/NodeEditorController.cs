@@ -6,52 +6,61 @@ using System.Linq;
 
 public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 {
-    [Header("Node Editor References")]
-    [SerializeField] private RectTransform editorCanvas; // The container for nodes
-    [SerializeField] private GameObject nodeViewPrefab;  // Prefab for NodeView
+    [Header("Editor Window Setup")]
+    [Tooltip("This is the fixed window (NodeEditorWindow) that has a RectMask2D and CanvasGroup.")]
+    [SerializeField] private RectTransform windowRect; // Should be this GameObject's RectTransform
+
+    [Header("Content Container")]
+    [Tooltip("This is the child RectTransform that holds nodes and connection lines.")]
+    [SerializeField] private RectTransform contentRect; // All nodes and lines are spawned here
+
+    [Header("Prefabs")]
+    [SerializeField] private GameObject nodeViewPrefab; // Prefab for NodeView
     [SerializeField] private GameObject connectionViewPrefab; // Prefab for NodeConnectionView (with UICubicBezier)
 
     [Header("Node Definitions")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // Contains NodeDefinition assets
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // For right-click creation
 
     [Header("Runtime Graph Reference")]
-    [SerializeField] private NodeGraph currentGraph; // Must have adjacency & manaConnections dictionaries
+    [SerializeField] private NodeGraph currentGraph; // Stores nodes, adjacency, manaConnections
 
     [Header("Optional")]
-    [SerializeField] private NodeExecutor executor; // Optional reference to NodeExecutor
+    [SerializeField] private NodeExecutor executor; // Optional: updates graph in NodeExecutor
+
+    [Header("Panning/Zoom Settings")]
+    [SerializeField] private float contentMargin = 20f; // Margin inside the window
 
     // For connection dragging:
     private NodeConnectionView draggingLine;
     private PinView sourcePin;
 
-    // Context menu variables for adding nodes:
+    // Context menu variables:
     private bool showContextMenu = false;
     private Vector2 contextMenuPosition;
 
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
 
+    // CanvasGroup for toggling visibility
     private CanvasGroup canvasGroup;
-    private RectTransform rootTransform;
 
     private void Awake()
     {
-        rootTransform = GetComponent<RectTransform>();
-        if (rootTransform == null)
-        {
-            Debug.LogError("[NodeEditorController] This GameObject must have a RectTransform!");
-            return;
-        }
+        // Use the windowRect from this GameObject.
+        if (windowRect == null)
+            windowRect = GetComponent<RectTransform>();
+
+        // Ensure this GameObject (window) has a CanvasGroup.
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
-        // Ensure this panel has a transparent Image to receive pointer events.
-        Image bg = GetComponent<Image>();
-        if (bg == null)
+        // Ensure this window has an Image for pointer events.
+        Image img = GetComponent<Image>();
+        if (img == null)
         {
-            bg = gameObject.AddComponent<Image>();
-            bg.color = new Color(1, 1, 1, 0);
-            bg.raycastTarget = true;
+            img = gameObject.AddComponent<Image>();
+            img.color = new Color(1, 1, 1, 0);
+            img.raycastTarget = true;
         }
     }
 
@@ -72,11 +81,11 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     private void Update()
     {
-        // Toggle node editor visibility on TAB key.
+        // Toggle window visibility with TAB.
         if (Input.GetKeyDown(KeyCode.Tab))
             ToggleVisibility();
 
-        // Right-click for context menu.
+        // Open context menu on right-click.
         if (Input.GetMouseButtonDown(1))
         {
             showContextMenu = true;
@@ -124,16 +133,21 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         }
     }
 
+    /// <summary>
+    /// Creates a new node from a definition at the current mouse position.
+    /// </summary>
     private void CreateNodeAtMouse(NodeDefinition definition)
     {
         Vector2 localPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(editorCanvas, Input.mousePosition, null, out localPos);
+        // Convert screen position to local point within the contentRect (child container).
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(contentRect, Input.mousePosition, null, out localPos);
 
         NodeData newNode = new NodeData();
         newNode.nodeDisplayName = definition.displayName;
         newNode.editorPosition = localPos;
         newNode.backgroundColor = definition.backgroundColor;
 
+        // Copy effects.
         foreach (var defEffect in definition.effects)
         {
             NodeEffectData effectCopy = new NodeEffectData
@@ -145,6 +159,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             newNode.effects.Add(effectCopy);
         }
 
+        // Copy ports.
         foreach (var portDef in definition.ports)
         {
             NodePort nodePort = new NodePort
@@ -166,9 +181,12 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             executor.SetGraph(currentGraph);
     }
 
+    /// <summary>
+    /// Instantiates a NodeView and initializes it.
+    /// </summary>
     private NodeView CreateNodeView(NodeData data)
     {
-        GameObject nodeObj = Instantiate(nodeViewPrefab, editorCanvas);
+        GameObject nodeObj = Instantiate(nodeViewPrefab, contentRect);
         NodeView view = nodeObj.GetComponent<NodeView>();
 
         view.Initialize(data, data.backgroundColor, data.nodeDisplayName);
@@ -178,16 +196,12 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
         view.GeneratePins(data.inputs, data.outputs);
 
-        // --- NEW: If this node contains an Output effect and doesn't already have an OutputNodeEffect,
-        // add the OutputNodeEffect component automatically.
+        // Auto-add OutputNodeEffect if needed.
         if (data.effects.Any(e => e.effectType == NodeEffectType.Output))
         {
             if (nodeObj.GetComponent<OutputNodeEffect>() == null)
-            {
                 nodeObj.AddComponent<OutputNodeEffect>();
-            }
         }
-        // --- END NEW
 
         spawnedNodeViews.Add(view);
         return view;
@@ -200,7 +214,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         Debug.Log("[NodeEditor] StartConnectionDrag called!");
         sourcePin = source;
 
-        GameObject lineObj = Instantiate(connectionViewPrefab, editorCanvas);
+        GameObject lineObj = Instantiate(connectionViewPrefab, contentRect);
         draggingLine = lineObj.GetComponent<NodeConnectionView>();
 
         RectTransform sourceRect = source.GetComponent<RectTransform>();
@@ -210,7 +224,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
     {
-        // NodeConnectionView handles its own preview via Input.mousePosition.
+        // The preview line in NodeConnectionView updates itself using Input.mousePosition.
     }
 
     public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)
@@ -269,20 +283,56 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
     }
 
     // --- Zooming & Panning ---
-
+    // Zoom and pan apply to contentRect.
     public void OnScroll(PointerEventData eventData)
     {
         Debug.Log($"[NodeEditor] OnScroll: {eventData.scrollDelta}");
         float scrollDelta = eventData.scrollDelta.y;
-        float newScale = rootTransform.localScale.x + scrollDelta * 0.05f;
+        float newScale = contentRect.localScale.x + scrollDelta * 0.05f;
         newScale = Mathf.Clamp(newScale, 0.5f, 2f);
-        rootTransform.localScale = Vector3.one * newScale;
+        contentRect.localScale = Vector3.one * newScale;
+
+        ClampContentPosition();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         Debug.Log($"[NodeEditor] OnDrag: {eventData.delta}");
-        rootTransform.anchoredPosition += eventData.delta;
+        contentRect.anchoredPosition += eventData.delta;
+
+        ClampContentPosition();
+    }
+
+    // Clamps the contentRect's anchoredPosition so that it stays within the window (with a margin).
+    private void ClampContentPosition()
+    {
+        Vector2 windowSize = windowRect.rect.size;
+        Vector2 contentSize = contentRect.rect.size * contentRect.localScale.x; // assuming uniform scale
+        Vector2 currentPos = contentRect.anchoredPosition;
+
+        // If content is smaller than window, center it.
+        float clampedX = currentPos.x;
+        float clampedY = currentPos.y;
+
+        if (contentSize.x < windowSize.x)
+            clampedX = 0;
+        else
+        {
+            float maxX = (contentSize.x - windowSize.x) / 2 - contentMargin;
+            float minX = -maxX;
+            clampedX = Mathf.Clamp(currentPos.x, minX, maxX);
+        }
+
+        if (contentSize.y < windowSize.y)
+            clampedY = 0;
+        else
+        {
+            float maxY = (contentSize.y - windowSize.y) / 2 - contentMargin;
+            float minY = -maxY;
+            clampedY = Mathf.Clamp(currentPos.y, minY, maxY);
+        }
+
+        contentRect.anchoredPosition = new Vector2(clampedX, clampedY);
     }
 
     // --- Load Graph ---
