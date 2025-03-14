@@ -4,10 +4,16 @@ using UnityEngine.EventSystems;
 
 public class NodeSelectable : MonoBehaviour, IPointerClickHandler
 {
-    private static GameObject currentSelected;
+    // Public static property to hold the currently selected node.
+    public static GameObject CurrentSelected { get; set; }
 
-    // Reference to an Outline component added to the NodeView prefab.
     [SerializeField] private Outline outline;
+
+    private void Awake()
+    {
+        if (outline != null)
+            outline.enabled = false;
+    }
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -16,14 +22,14 @@ public class NodeSelectable : MonoBehaviour, IPointerClickHandler
 
     public static void Select(GameObject node)
     {
-        if (currentSelected != null && currentSelected != node)
+        if (CurrentSelected != null && CurrentSelected != node)
         {
-            // Remove highlight from previously selected node.
-            var prevOutline = currentSelected.GetComponent<Outline>();
+            // Disable outline on previously selected node.
+            var prevOutline = CurrentSelected.GetComponent<Outline>();
             if (prevOutline != null)
                 prevOutline.enabled = false;
         }
-        currentSelected = node;
+        CurrentSelected = node;
         var outlineComp = node.GetComponent<Outline>();
         if (outlineComp != null)
             outlineComp.enabled = true;

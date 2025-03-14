@@ -14,6 +14,7 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
     private RectTransform ownRect;
 
     private bool isPreviewing = false;
+    private bool isFinalized = false;
 
     private void Awake()
     {
@@ -23,7 +24,15 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
 
     private void Update()
     {
-        if (bezier == null || startRect == null) return;
+        // If finalized and either pin is missing, destroy self.
+        if (isFinalized && (sourcePin == null || targetPin == null))
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        if (bezier == null || startRect == null)
+            return;
 
         Vector2 localStart;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, startRect.position, null, out localStart);
@@ -31,12 +40,10 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
         Vector2 localEnd;
         if (!isPreviewing && endRect != null)
         {
-            // final connection
             RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, endRect.position, null, out localEnd);
         }
         else
         {
-            // preview => use the mouse position
             RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, Input.mousePosition, null, out localEnd);
         }
 
@@ -45,24 +52,23 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
 
     public void StartPreview(RectTransform source)
     {
-        startRect    = source;
-        endRect      = null;
+        startRect = source;
+        endRect = null;
         isPreviewing = true;
     }
 
     public void FinalizeConnection(RectTransform end)
     {
-        endRect      = end;
+        endRect = end;
         isPreviewing = false;
+        isFinalized = true;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // Only called if user right-clicks near the line (due to custom raycast)
+        // Only delete if right-clicked near the curve (custom Raycast in UICubicBezier).
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            // remove adjacency logic, etc.
-
             Debug.Log("[NodeConnectionView] Deleting line");
             Destroy(gameObject);
         }
