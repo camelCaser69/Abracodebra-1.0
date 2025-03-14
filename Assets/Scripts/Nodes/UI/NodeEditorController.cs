@@ -7,77 +7,96 @@ using System.Linq;
 public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 {
     [Header("Node Editor References")]
-    [Tooltip("Spawned node prefabs go here.")]
-    [SerializeField] private GameObject nodeViewPrefab;
+    [SerializeField] private RectTransform editorCanvas; // The container for nodes
+    [SerializeField] private GameObject nodeViewPrefab;  // Prefab for NodeView
+    [SerializeField] private GameObject connectionViewPrefab; // Prefab for NodeConnectionView (with UICubicBezier)
 
-    [Tooltip("Spawned connection lines (NodeConnectionView) go here.")]
-    [SerializeField] private GameObject connectionViewPrefab;
+    [Header("Node Definitions")]
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // Contains NodeDefinition assets
 
-    [Tooltip("If you have a NodeDefinitionLibrary, assign it here for right-click creation.")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
+    [Header("Runtime Graph Reference")]
+    [SerializeField] private NodeGraph currentGraph; // Must have adjacency & manaConnections dictionaries
 
-    [Tooltip("The NodeGraph that stores all nodes & adjacency.")]
-    [SerializeField] private NodeGraph currentGraph;
+    [Header("Optional")]
+    [SerializeField] private NodeExecutor executor; // Optional reference to NodeExecutor
 
-    [Tooltip("Optional link to NodeExecutor so we can pass updated graphs to it.")]
-    [SerializeField] private NodeExecutor executor;
-
-    // For connection dragging
+    // For connection dragging:
     private NodeConnectionView draggingLine;
     private PinView sourcePin;
 
-    // Context menu
+    // Context menu variables for adding nodes:
     private bool showContextMenu = false;
     private Vector2 contextMenuPosition;
 
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
 
+    private CanvasGroup canvasGroup;
+    private RectTransform rootTransform;
+
     private void Awake()
     {
-        // Ensure there's a transparent Image on this panel so it receives pointer events.
-        var thisRect = GetComponent<RectTransform>();
-        if (thisRect == null)
+        rootTransform = GetComponent<RectTransform>();
+        if (rootTransform == null)
         {
-            Debug.LogError("[NodeEditorController] The GameObject must have a RectTransform!");
+            Debug.LogError("[NodeEditorController] This GameObject must have a RectTransform!");
             return;
         }
+        canvasGroup = GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
-        // If no Image is present, add one so we can receive scroll & drag events.
-        var image = GetComponent<Image>();
-        if (image == null)
+        // Ensure this panel has a transparent Image to receive pointer events.
+        Image bg = GetComponent<Image>();
+        if (bg == null)
         {
-            image = gameObject.AddComponent<Image>();
-            image.color = new Color(1,1,1,0);   // fully transparent
-            image.raycastTarget = true;
+            bg = gameObject.AddComponent<Image>();
+            bg.color = new Color(1, 1, 1, 0);
+            bg.raycastTarget = true;
         }
     }
 
     private void Start()
     {
-        // If no graph assigned, create an empty one
         if (currentGraph == null)
-        {
             currentGraph = new NodeGraph();
-        }
 
-        // If no executor assigned, try to find one
         if (executor == null)
         {
             executor = GameObject.FindFirstObjectByType<NodeExecutor>();
             if (executor != null)
                 executor.SetGraph(currentGraph);
             else
-                Debug.LogWarning("[NodeEditorController] No NodeExecutor found in the scene.");
+                Debug.LogWarning("[NodeEditorController] No NodeExecutor found in scene.");
         }
     }
 
     private void Update()
     {
-        // Right-click for context menu
+        // Toggle node editor visibility on TAB key.
+        if (Input.GetKeyDown(KeyCode.Tab))
+            ToggleVisibility();
+
+        // Right-click for context menu.
         if (Input.GetMouseButtonDown(1))
         {
             showContextMenu = true;
             contextMenuPosition = Input.mousePosition;
+        }
+    }
+
+    private void ToggleVisibility()
+    {
+        if (canvasGroup.alpha > 0)
+        {
+            canvasGroup.alpha = 0;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
+        else
+        {
+            canvasGroup.alpha = 1;
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
         }
     }
 
@@ -107,53 +126,49 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     private void CreateNodeAtMouse(NodeDefinition definition)
     {
-        // Convert screen to local position
         Vector2 localPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            (RectTransform)transform, Input.mousePosition, null, out localPos);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(editorCanvas, Input.mousePosition, null, out localPos);
 
         NodeData newNode = new NodeData();
         newNode.nodeDisplayName = definition.displayName;
         newNode.editorPosition = localPos;
         newNode.backgroundColor = definition.backgroundColor;
 
-        // Copy effects
         foreach (var defEffect in definition.effects)
         {
-            NodeEffectData eff = new NodeEffectData
+            NodeEffectData effectCopy = new NodeEffectData
             {
                 effectType = defEffect.effectType,
                 effectValue = defEffect.effectValue,
                 secondaryValue = defEffect.secondaryValue
             };
-            newNode.effects.Add(eff);
+            newNode.effects.Add(effectCopy);
         }
 
-        // Copy ports
         foreach (var portDef in definition.ports)
         {
-            NodePort nPort = new NodePort
+            NodePort nodePort = new NodePort
             {
                 portName = portDef.portName,
                 portType = portDef.portType
             };
+
             if (portDef.isInput)
-                newNode.inputs.Add(nPort);
+                newNode.inputs.Add(nodePort);
             else
-                newNode.outputs.Add(nPort);
+                newNode.outputs.Add(nodePort);
         }
 
         currentGraph.nodes.Add(newNode);
         CreateNodeView(newNode);
 
-        // Update executor
         if (executor != null)
             executor.SetGraph(currentGraph);
     }
 
     private NodeView CreateNodeView(NodeData data)
     {
-        GameObject nodeObj = Instantiate(nodeViewPrefab, transform); // parent is NodeEditorPanel
+        GameObject nodeObj = Instantiate(nodeViewPrefab, editorCanvas);
         NodeView view = nodeObj.GetComponent<NodeView>();
 
         view.Initialize(data, data.backgroundColor, data.nodeDisplayName);
@@ -163,18 +178,29 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
         view.GeneratePins(data.inputs, data.outputs);
 
+        // --- NEW: If this node contains an Output effect and doesn't already have an OutputNodeEffect,
+        // add the OutputNodeEffect component automatically.
+        if (data.effects.Any(e => e.effectType == NodeEffectType.Output))
+        {
+            if (nodeObj.GetComponent<OutputNodeEffect>() == null)
+            {
+                nodeObj.AddComponent<OutputNodeEffect>();
+            }
+        }
+        // --- END NEW
+
         spawnedNodeViews.Add(view);
         return view;
     }
 
-    // Connection Dragging
+    // --- Connection Dragging Methods ---
 
     public void StartConnectionDrag(PinView source, PointerEventData eventData)
     {
-        Debug.Log("[NodeEditor] StartConnectionDrag");
+        Debug.Log("[NodeEditor] StartConnectionDrag called!");
         sourcePin = source;
 
-        GameObject lineObj = Instantiate(connectionViewPrefab, transform);
+        GameObject lineObj = Instantiate(connectionViewPrefab, editorCanvas);
         draggingLine = lineObj.GetComponent<NodeConnectionView>();
 
         RectTransform sourceRect = source.GetComponent<RectTransform>();
@@ -184,7 +210,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
     {
-        // NodeConnectionView handles the preview
+        // NodeConnectionView handles its own preview via Input.mousePosition.
     }
 
     public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)
@@ -210,7 +236,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             draggingLine.targetPin = targetPin;
             draggingLine.FinalizeConnection(targetRect);
 
-            // If both pins are Mana => record in manaConnections
             if (sourcePin.port.portType == PortType.Mana && targetPin.port.portType == PortType.Mana)
             {
                 string sourceId = GetNodeIdFromPin(sourcePin);
@@ -219,7 +244,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
                     currentGraph.manaConnections = new Dictionary<string, string>();
                 currentGraph.manaConnections[targetId] = sourceId;
             }
-            // If both pins are General => record adjacency
             else if (sourcePin.port.portType == PortType.General && targetPin.port.portType == PortType.General)
             {
                 string sourceId = GetNodeIdFromPin(sourcePin);
@@ -232,11 +256,11 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
                     currentGraph.adjacency[sourceId].Add(targetId);
             }
 
-            Debug.Log("[NodeEditor] Connection finalized");
+            Debug.Log("[NodeEditor] Connection finalized.");
         }
         else
         {
-            Debug.Log("[NodeEditor] Connection canceled");
+            Debug.Log("[NodeEditor] Connection canceled.");
             Destroy(draggingLine.gameObject);
         }
 
@@ -244,24 +268,25 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         sourcePin = null;
     }
 
-    // Zoom (mouse wheel) & Pan (drag the panel)
+    // --- Zooming & Panning ---
+
     public void OnScroll(PointerEventData eventData)
     {
-        Debug.Log($"[NodeEditor] OnScroll => {eventData.scrollDelta}");
+        Debug.Log($"[NodeEditor] OnScroll: {eventData.scrollDelta}");
         float scrollDelta = eventData.scrollDelta.y;
-        float newScale = transform.localScale.x + scrollDelta * 0.05f;
-        newScale = Mathf.Clamp(newScale, 0.4f, 2f);
-        transform.localScale = Vector3.one * newScale;
+        float newScale = rootTransform.localScale.x + scrollDelta * 0.05f;
+        newScale = Mathf.Clamp(newScale, 0.5f, 2f);
+        rootTransform.localScale = Vector3.one * newScale;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        Debug.Log($"[NodeEditor] OnDrag => {eventData.delta}");
-        RectTransform rt = (RectTransform)transform;
-        rt.anchoredPosition += eventData.delta;
+        Debug.Log($"[NodeEditor] OnDrag: {eventData.delta}");
+        rootTransform.anchoredPosition += eventData.delta;
     }
 
-    // LoadGraph for NodeTestInitializer or other usage
+    // --- Load Graph ---
+
     public void LoadGraph(NodeGraph graph)
     {
         currentGraph = graph;
@@ -276,6 +301,8 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         if (executor != null)
             executor.SetGraph(currentGraph);
     }
+
+    // --- Helper Methods ---
 
     public string GetNodeIdFromPin(PinView pin)
     {
