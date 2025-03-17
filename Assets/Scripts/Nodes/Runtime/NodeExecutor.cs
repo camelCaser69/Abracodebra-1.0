@@ -24,7 +24,6 @@ public class NodeExecutor : MonoBehaviour
             ExecuteGraph();
     }
 
-    // Recharge each node's local mana if it has a ManaStorage effect.
     private void RechargeNodesOverTime()
     {
         if (currentGraph == null) return;
@@ -63,7 +62,6 @@ public class NodeExecutor : MonoBehaviour
             return;
         }
 
-        // Reset accumulators.
         totalDamage = 0f;
         totalManaCost = 0f;
         skippedNodes.Clear();
@@ -76,6 +74,7 @@ public class NodeExecutor : MonoBehaviour
     {
         ClearDebugOutput();
 
+        // Build inbound count for BFS.
         Dictionary<string, int> inboundCount = BuildInboundCount();
         List<NodeData> startNodes = currentGraph.nodes.Where(n => inboundCount[n.nodeId] == 0).ToList();
         if (startNodes.Count == 0)
@@ -84,7 +83,6 @@ public class NodeExecutor : MonoBehaviour
             yield break;
         }
 
-        // Build a chain using BFS.
         Queue<NodeData> queue = new Queue<NodeData>();
         HashSet<string> visited = new HashSet<string>();
         foreach (var s in startNodes)
@@ -117,30 +115,38 @@ public class NodeExecutor : MonoBehaviour
         string chainLog = string.Join(" -> ", chain.Select(n => n.nodeDisplayName));
         LogDebug("[NodeExecutor] Chain: " + chainLog);
 
+        // Accumulators for additional effects:
+        float accumulatedAimSpreadModifier = 0f; // formerly accuracy modifier
+        float accumulatedBurningDamage = 0f;
+        float accumulatedBurningDuration = 0f;
+        bool accumulatedPiercing = false;
+
         foreach (var node in chain)
         {
             yield return new WaitForSeconds(waitTimeBetweenNodes);
 
+            bool executed = false;
             float cost = node.effects.Where(e => e.effectType == NodeEffectType.ManaCost)
                                      .Sum(e => e.effectValue);
+
+            if (cost > 0f && (!currentGraph.manaConnections.ContainsKey(node.nodeId) ||
+                              string.IsNullOrEmpty(currentGraph.manaConnections[node.nodeId])))
+            {
+                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - no valid mana source connected.");
+                skippedNodes.Add(node.nodeDisplayName);
+                continue;
+            }
 
             if (cost <= 0f)
             {
                 float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage)
                                         .Sum(e => e.effectValue);
                 totalDamage += dmg;
+                executed = true;
                 LogDebug($"[NodeExecutor] Executed '{node.nodeDisplayName}' with no cost, damage={Mathf.Floor(dmg)}");
             }
             else
             {
-                // Require an explicit mana connection.
-                if (!currentGraph.manaConnections.ContainsKey(node.nodeId))
-                {
-                    LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - no mana source connected.");
-                    skippedNodes.Add(node.nodeDisplayName);
-                    continue;
-                }
-
                 string sourceId = currentGraph.manaConnections[node.nodeId];
                 NodeData sourceNode = currentGraph.nodes.FirstOrDefault(n => n.nodeId == sourceId);
                 if (sourceNode == null)
@@ -173,11 +179,29 @@ public class NodeExecutor : MonoBehaviour
                     storageEff.secondaryValue = cur;
                     totalManaCost += cost;
 
-                    float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage)
-                                            .Sum(e => e.effectValue);
+                    float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
                     totalDamage += dmg;
-
+                    executed = true;
                     LogDebug($"[NodeExecutor] '{node.nodeDisplayName}' executed: cost={Mathf.Floor(cost)}, damage={Mathf.Floor(dmg)}, source='{sourceNode.nodeDisplayName}', leftoverMana={Mathf.Floor(cur)}/{Mathf.Floor(cap)}");
+                }
+            }
+
+            // Only accumulate extra effects if this node executed.
+            if (executed)
+            {
+                foreach (var effect in node.effects)
+                {
+                    if (effect.effectType == NodeEffectType.AimSpread)
+                        accumulatedAimSpreadModifier += effect.effectValue;
+                    else if (effect.effectType == NodeEffectType.Burning)
+                    {
+                        accumulatedBurningDamage += effect.effectValue;
+                        accumulatedBurningDuration += effect.secondaryValue;
+                    }
+                    else if (effect.effectType == NodeEffectType.Piercing)
+                    {
+                        accumulatedPiercing = true;
+                    }
                 }
             }
 
@@ -190,15 +214,18 @@ public class NodeExecutor : MonoBehaviour
                 LogDebug($"[NodeExecutor] Skipped nodes: {skipStr}");
                 LogDebug($"[NodeExecutor] Final damage: {Mathf.Floor(totalDamage)}");
 
-                // Instead of directly calling PlayerWizard, let the output node handle it.
                 NodeView outputView = FindNodeViewById(node.nodeId);
                 if (outputView != null)
                 {
                     OutputNodeEffect outputEffect = outputView.GetComponent<OutputNodeEffect>();
                     if (outputEffect != null)
-                        outputEffect.Activate(totalDamage);
+                    {
+                        outputEffect.Activate(totalDamage, accumulatedAimSpreadModifier, accumulatedBurningDamage, accumulatedBurningDuration, accumulatedPiercing);
+                    }
                     else
+                    {
                         Debug.LogWarning("[NodeExecutor] Output node effect not found on NodeView.");
+                    }
                 }
             }
         }
@@ -206,7 +233,6 @@ public class NodeExecutor : MonoBehaviour
         LogDebug("[NodeExecutor] BFS execution complete.");
     }
 
-    // Instead of using a stored list, we find all NodeViews in the scene.
     private NodeView FindNodeViewById(string nodeId)
     {
         NodeView[] views = GameObject.FindObjectsOfType<NodeView>();

@@ -66,10 +66,12 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // Only delete if right-clicked near the curve (custom Raycast in UICubicBezier).
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            Debug.Log("[NodeConnectionView] Deleting line");
+            Debug.Log("[NodeConnectionView] Deleting connection");
+            // Clear references to help garbage collection.
+            sourcePin = null;
+            targetPin = null;
             Destroy(gameObject);
         }
     }

@@ -1,9 +1,11 @@
-﻿// Assets/Scripts/Nodes/Core/NodeEffectType.cs
-public enum NodeEffectType
+﻿public enum NodeEffectType
 {
     ManaCost,
     Damage,
-    ManaStorage,      // effectValue = capacity, secondaryValue = starting mana
+    ManaStorage,
     ManaRechargeRate,
-    Output
+    Output,
+    AimSpread,   // renamed from Accuracy
+    Burning,
+    Piercing
 }

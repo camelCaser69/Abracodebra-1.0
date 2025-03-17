@@ -7,27 +7,27 @@ using System.Linq;
 public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 {
     [Header("Window & Content Setup")]
-    [Tooltip("The fixed window (NodeEditorWindow) with RectMask2D, which toggles visibility.")]
-    [SerializeField] private RectTransform windowRect; // This is NodeEditorWindow (the parent panel)
-    
+    [Tooltip("The fixed window (NodeEditorWindow) with RectMask2D & CanvasGroup.")]
+    [SerializeField] private RectTransform windowRect; // Parent window panel
+
     [Tooltip("The inner content panel where nodes and connections are spawned.")]
-    [SerializeField] private RectTransform contentRect; // This should be a child of windowRect
+    [SerializeField] private RectTransform contentRect; // Child container for nodes
 
     [Header("Prefabs")]
     [SerializeField] private GameObject nodeViewPrefab; // Prefab for NodeView
-    [SerializeField] private GameObject connectionViewPrefab; // Prefab for NodeConnectionView (with UICubicBezier)
+    [SerializeField] private GameObject connectionViewPrefab; // Prefab for connection (with UICubicBezier)
 
     [Header("Node Definitions")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // Contains NodeDefinition assets
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // For context menu
 
     [Header("Runtime Graph Reference")]
-    [SerializeField] private NodeGraph currentGraph; // Stores nodes, adjacency, manaConnections
+    [SerializeField] private NodeGraph currentGraph; // Contains nodes, adjacency, manaConnections
 
     [Header("Optional")]
-    [SerializeField] private NodeExecutor executor; // Optional: updates graph in NodeExecutor
+    [SerializeField] private NodeExecutor executor; // Optional: updates graph
 
     [Header("Panning/Zoom Settings")]
-    [SerializeField] private float contentMargin = 20f; // Margin inside the window
+    [SerializeField] private float contentMargin = 20f; // Minimum margin for content panel
 
     // For connection dragging:
     private NodeConnectionView draggingLine;
@@ -39,7 +39,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
 
-    // CanvasGroup for toggling window visibility
     private CanvasGroup canvasGroup;
 
     private void Awake()
@@ -51,7 +50,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
-        // Ensure this window has a transparent Image so it receives pointer events.
         Image bg = GetComponent<Image>();
         if (bg == null)
         {
@@ -74,22 +72,25 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             else
                 Debug.LogWarning("[NodeEditorController] No NodeExecutor found in scene.");
         }
+
+        EnsureContentPanelSize();
     }
 
     private void Update()
     {
-        // Toggle visibility with TAB.
+        // Hide context menu on left-click.
+        if (Input.GetMouseButtonDown(0))
+            showContextMenu = false;
+
         if (Input.GetKeyDown(KeyCode.Tab))
             ToggleVisibility();
 
-        // Handle deletion with DELETE key.
         if (Input.GetKeyDown(KeyCode.Delete))
         {
             if (NodeSelectable.CurrentSelected != null)
                 DeleteSelectedNode();
         }
 
-        // Right-click for context menu.
         if (Input.GetMouseButtonDown(1))
         {
             showContextMenu = true;
@@ -192,7 +193,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
         view.GeneratePins(data.inputs, data.outputs);
 
-        // Auto-add OutputNodeEffect if needed.
         if (data.effects.Any(e => e.effectType == NodeEffectType.Output))
         {
             if (nodeObj.GetComponent<OutputNodeEffect>() == null)
@@ -207,14 +207,13 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
     private void DeleteSelectedNode()
     {
         NodeView selectedView = NodeSelectable.CurrentSelected.GetComponent<NodeView>();
-        if (selectedView == null) return;
+        if (selectedView == null)
+            return;
 
         string nodeId = selectedView.GetNodeData().nodeId;
 
-        // Remove node from graph.
         currentGraph.nodes.RemoveAll(n => n.nodeId == nodeId);
 
-        // Remove references from adjacency.
         if (currentGraph.adjacency != null)
         {
             currentGraph.adjacency.Remove(nodeId);
@@ -224,7 +223,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             }
         }
 
-        // Remove references from manaConnections.
         if (currentGraph.manaConnections != null)
         {
             List<string> keysToRemove = new List<string>();
@@ -234,12 +232,10 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
                     keysToRemove.Add(kvp.Key);
             }
             foreach (var key in keysToRemove)
-            {
                 currentGraph.manaConnections.Remove(key);
-            }
         }
 
-        // Destroy any connection lines referencing this node.
+        // Remove any connection lines referencing this node.
         NodeConnectionView[] allLines = GameObject.FindObjectsOfType<NodeConnectionView>();
         foreach (var line in allLines)
         {
@@ -263,13 +259,11 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             }
         }
 
-        // Destroy the selected node.
         Destroy(NodeSelectable.CurrentSelected);
         NodeSelectable.CurrentSelected = null;
     }
 
     // --- Connection Dragging Methods ---
-
     public void StartConnectionDrag(PinView source, PointerEventData eventData)
     {
         Debug.Log("[NodeEditor] StartConnectionDrag called!");
@@ -285,7 +279,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
     {
-        // NodeConnectionView updates its preview automatically.
+        // Preview is updated within the connection line's own Update()
     }
 
     public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)
@@ -344,7 +338,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
     }
 
     // --- Zooming & Panning ---
-    // Zoom and pan are applied to contentRect so that the window stays fixed.
     public void OnScroll(PointerEventData eventData)
     {
         Debug.Log($"[NodeEditor] OnScroll: {eventData.scrollDelta}");
@@ -362,7 +355,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         EnsureContentPanelSize();
     }
 
-    // Dynamically ensure contentRect is always larger than windowRect by a defined margin.
     private void EnsureContentPanelSize()
     {
         if (windowRect == null || contentRect == null)
@@ -394,7 +386,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
     }
 
     // --- Load Graph ---
-
     public void LoadGraph(NodeGraph graph)
     {
         currentGraph = graph;
@@ -411,7 +402,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
     }
 
     // --- Helper Methods ---
-
     public string GetNodeIdFromPin(PinView pin)
     {
         NodeView view = pin.GetComponentInParent<NodeView>();

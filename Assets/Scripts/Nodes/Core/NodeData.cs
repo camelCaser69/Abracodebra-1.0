@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// NodeData.cs
 [Serializable]
 public class NodeData
 {
@@ -10,16 +9,12 @@ public class NodeData
     public string nodeDisplayName;
     public Vector2 editorPosition;
     
-    // In NodeData.cs, add:
     public Color backgroundColor = Color.gray;
-
+    public string description = ""; // Added for NodeView to access.
 
     public List<NodePort> inputs;
     public List<NodePort> outputs;
     public List<NodeEffectData> effects;
-
-    // REMOVED: public float manaStorageCapacity;
-    // REMOVED: public float currentManaStorage;
 
     public NodeData()
     {
