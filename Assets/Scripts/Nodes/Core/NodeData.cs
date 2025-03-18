@@ -10,7 +10,7 @@ public class NodeData
     public Vector2 editorPosition;
     
     public Color backgroundColor = Color.gray;
-    public string description = ""; // Added for NodeView to access.
+    public string description = ""; // Ensure this field exists.
 
     public List<NodePort> inputs;
     public List<NodePort> outputs;

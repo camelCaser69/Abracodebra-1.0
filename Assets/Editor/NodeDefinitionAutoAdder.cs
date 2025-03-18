@@ -14,7 +14,6 @@ public class NodeDefinitionAutoAdder : AssetPostprocessor
             if (nodeDef != null)
             {
                 string folderPath = Path.GetDirectoryName(assetPath);
-                // Find an existing NodeDefinitionLibrary in the same folder.
                 string[] libraryFiles = Directory.GetFiles(folderPath, "*.asset", SearchOption.TopDirectoryOnly)
                     .Where(f => f.Contains("NodeDefinitionLibrary")).ToArray();
                 if (libraryFiles.Length > 0)

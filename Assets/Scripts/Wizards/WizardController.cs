@@ -34,7 +34,7 @@ public class WizardController : MonoBehaviour
     public TMP_Text hpText;
 
     private float originalSpawnY = 0f;
-    private List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
+    public List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
 
     private void Awake()
     {

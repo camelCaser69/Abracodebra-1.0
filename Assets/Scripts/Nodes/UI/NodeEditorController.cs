@@ -78,18 +78,29 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     private void Update()
     {
-        // Toggle visibility with TAB key.
+        // Hide context menu on left-click if outside its bounds.
+        if (Input.GetMouseButtonDown(0))
+        {
+            // If context menu is showing, check if the click is outside the menu.
+            if (showContextMenu)
+            {
+                Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
+                float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
+                Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
+                if (!menuRect.Contains(Event.current.mousePosition))
+                    showContextMenu = false;
+            }
+        }
+
         if (Input.GetKeyDown(KeyCode.Tab))
             ToggleVisibility();
 
-        // Delete selected node on DELETE key.
         if (Input.GetKeyDown(KeyCode.Delete))
         {
             if (NodeSelectable.CurrentSelected != null)
                 DeleteSelectedNode();
         }
 
-        // Right-click to open context menu.
         if (Input.GetMouseButtonDown(1))
         {
             showContextMenu = true;
@@ -121,7 +132,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
             Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
 
-            // If a left-click occurs outside the context menu, hide the menu.
+            // If a left-click occurs outside the menu, hide it.
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
                 if (!menuRect.Contains(Event.current.mousePosition))
@@ -155,6 +166,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         newNode.nodeDisplayName = definition.displayName;
         newNode.editorPosition = localPos;
         newNode.backgroundColor = definition.backgroundColor;
+        newNode.description = definition.description; // Copy description from preset
 
         foreach (var defEffect in definition.effects)
         {
@@ -219,7 +231,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             return;
 
         string nodeId = selectedView.GetNodeData().nodeId;
-
         currentGraph.nodes.RemoveAll(n => n.nodeId == nodeId);
 
         if (currentGraph.adjacency != null)
@@ -243,7 +254,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
                 currentGraph.manaConnections.Remove(key);
         }
 
-        // Remove any connection lines referencing this node.
         NodeConnectionView[] allLines = GameObject.FindObjectsOfType<NodeConnectionView>();
         foreach (var line in allLines)
         {
@@ -287,7 +297,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
     {
-        // Preview is updated within the connection line's own Update()
+        // Preview updated within NodeConnectionView.
     }
 
     public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)

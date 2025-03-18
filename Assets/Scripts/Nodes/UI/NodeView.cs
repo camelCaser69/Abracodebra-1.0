@@ -14,7 +14,7 @@ public class NodeView : MonoBehaviour
     [SerializeField] private Transform outputPinsContainer;
 
     [Header("Node Info Display")]
-    [SerializeField] private TMP_Text effectsText;  // This will display both effects and the description
+    [SerializeField] private TMP_Text effectsText;  // Will display effects and description
 
     private NodeData nodeData;
 
@@ -26,7 +26,7 @@ public class NodeView : MonoBehaviour
         if (backgroundImage)
             backgroundImage.color = color;
 
-        // Build the effects text.
+        // Build the text for effects.
         string effectsStr = "";
         if (nodeData.effects.Count == 0)
             effectsStr = "No Effects";
@@ -38,7 +38,7 @@ public class NodeView : MonoBehaviour
                 effectsStr += $"- {eff.effectType} ({eff.effectValue})\n";
             }
         }
-        // Append description if present, with an empty line before.
+        // Append description (with an empty line) if available.
         if (!string.IsNullOrEmpty(nodeData.description))
             effectsStr += "\n" + nodeData.description;
 

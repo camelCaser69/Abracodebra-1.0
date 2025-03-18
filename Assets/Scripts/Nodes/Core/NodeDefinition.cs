@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Linq; // Added for Skip()
+using System.Linq;
 
 [CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
 public class NodeDefinition : ScriptableObject
 {
     public string displayName;
     public Color backgroundColor = Color.gray;
-    [TextArea] public string description; // This is used to auto-fill NodeData.description later.
+    [TextArea] public string description;
     public List<PortDefinition> ports;
     public List<NodeEffectData> effects = new List<NodeEffectData>();
 
@@ -18,14 +18,25 @@ public class NodeDefinition : ScriptableObject
         {
             string path = UnityEditor.AssetDatabase.GetAssetPath(this);
             string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
-            // Expected format: Node_XXX_[Suffix]
             string[] parts = fileName.Split('_');
             if (parts.Length >= 3)
             {
-                // Use everything after the numeric part as the display name.
                 displayName = string.Join("_", parts.Skip(2).ToArray());
             }
         }
     }
 #endif
+
+    private void OnEnable()
+    {
+        // Auto-add default General ports if none exist.
+        if (ports == null || ports.Count == 0)
+        {
+            ports = new List<PortDefinition>();
+            PortDefinition inputPort = new PortDefinition { portName = "Input", portType = PortType.General, isInput = true };
+            PortDefinition outputPort = new PortDefinition { portName = "Output", portType = PortType.General, isInput = false };
+            ports.Add(inputPort);
+            ports.Add(outputPort);
+        }
+    }
 }

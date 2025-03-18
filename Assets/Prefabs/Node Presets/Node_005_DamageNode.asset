@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayName: Damage Node
   backgroundColor: {r: 0, g: 0, b: 0, a: 0.8}
-  description: Test
+  description: Adds Damage to the projectile
   ports:
   - portName: General
     portType: 0

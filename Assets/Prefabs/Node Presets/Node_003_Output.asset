@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayName: Output
   backgroundColor: {r: 0, g: 0, b: 0, a: 0.8}
-  description: 
+  description: Each node chain has to end with this Output node
   ports:
   - portName: General
     portType: 0

@@ -8,7 +8,8 @@ public class NodeDefinitionAutoRenamer : AssetModificationProcessor
         if (path.EndsWith(".asset"))
         {
             string fileName = Path.GetFileNameWithoutExtension(path);
-            if (fileName.Contains("NodeDefinition"))
+            // If the file name is still the default "NodeDefinition"
+            if (fileName == "NodeDefinition")
             {
                 string folderPath = Path.GetDirectoryName(path);
                 string[] files = Directory.GetFiles(folderPath, "Node_*", SearchOption.TopDirectoryOnly);
@@ -16,7 +17,7 @@ public class NodeDefinitionAutoRenamer : AssetModificationProcessor
                 foreach (var file in files)
                 {
                     string fName = Path.GetFileNameWithoutExtension(file);
-                    if (fName.StartsWith("Node_"))
+                    if (fName.StartsWith("Node_") && fName.Length >= 8)
                     {
                         string numberPart = fName.Substring(5, 3);
                         if (int.TryParse(numberPart, out int num))
@@ -27,9 +28,7 @@ public class NodeDefinitionAutoRenamer : AssetModificationProcessor
                     }
                 }
                 string newName = $"Node_{nextNumber:D3}_";
-                string newPath = Path.Combine(folderPath, newName + ".asset");
-                newPath = newPath.Replace("\\", "/");
-                return newPath;
+                return Path.Combine(Path.GetDirectoryName(path), newName + ".asset").Replace("\\", "/");
             }
         }
         return path;

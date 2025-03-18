@@ -1,8 +1,11 @@
 ﻿public abstract class StatusEffect
 {
-    public float duration;
+    public float duration; // Total duration.
     public float damagePerSecond;
     protected float elapsed = 0f;
+
+    // Public property to expose elapsed time.
+    public float Elapsed { get { return elapsed; } }
 
     public StatusEffect(float d, float dps)
     {
