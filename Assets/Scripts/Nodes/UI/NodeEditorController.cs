@@ -81,16 +81,23 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         // Hide context menu on left-click if outside its bounds.
         if (Input.GetMouseButtonDown(0))
         {
-            // If context menu is showing, check if the click is outside the menu.
-            if (showContextMenu)
+            if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions != null)
             {
                 Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
                 float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
                 Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
-                if (!menuRect.Contains(Event.current.mousePosition))
+
+                // Convert Input.mousePosition to the same coordinate space as 'menuRect'.
+                // 'menuRect' is in GUI coords => top-left(0,0), so let's do:
+                Vector2 mousePos = Input.mousePosition;
+                mousePos.y = Screen.height - mousePos.y; 
+                // Now 'mousePos' matches the coordinate space of 'menuRect'.
+
+                if (!menuRect.Contains(mousePos))
                     showContextMenu = false;
             }
         }
+
 
         if (Input.GetKeyDown(KeyCode.Tab))
             ToggleVisibility();
