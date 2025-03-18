@@ -226,7 +226,8 @@ public class NodeExecutor : MonoBehaviour
 
     private NodeView FindNodeViewById(string nodeId)
     {
-        NodeView[] views = GameObject.FindObjectsOfType<NodeView>();
+        // Use FindObjectsByType
+        NodeView[] views = Object.FindObjectsByType<NodeView>(FindObjectsSortMode.None);
         foreach (var view in views)
         {
             if (view.GetNodeData().nodeId == nodeId)

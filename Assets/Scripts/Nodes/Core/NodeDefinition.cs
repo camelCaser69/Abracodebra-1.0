@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-[CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
+// [CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
 public class NodeDefinition : ScriptableObject
 {
     public string displayName;

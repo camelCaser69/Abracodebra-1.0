@@ -14,36 +14,53 @@ public class NodeView : MonoBehaviour
     [SerializeField] private Transform outputPinsContainer;
 
     [Header("Node Info Display")]
-    [SerializeField] private TMP_Text effectsText;  // Will display effects and description
+    [SerializeField] private TMP_Text manaStorageText;
+    [SerializeField] private TMP_Text effectsText;
+    [SerializeField] private TMP_Text descriptionText; // Separate text field for description
 
     private NodeData nodeData;
+
+    private void Update()
+    {
+        var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
+        if (manaEff != null && manaStorageText != null)
+        {
+            float cap = Mathf.Floor(manaEff.effectValue);
+            float cur = Mathf.Floor(manaEff.secondaryValue);
+            manaStorageText.text = $"Mana: {cur}/{cap}";
+        }
+    }
 
     public void Initialize(NodeData data, Color color, string displayName)
     {
         nodeData = data;
-        if (nodeTitleText)
+        if (nodeTitleText) 
             nodeTitleText.text = displayName;
-        if (backgroundImage)
+        if (backgroundImage) 
             backgroundImage.color = color;
 
-        // Build the text for effects.
-        string effectsStr = "";
-        if (nodeData.effects.Count == 0)
-            effectsStr = "No Effects";
-        else
+        // Build effects text.
+        if (effectsText)
         {
-            effectsStr = "Effects:\n";
-            foreach (var eff in nodeData.effects)
+            if (nodeData.effects.Count == 0)
+                effectsText.text = "No Effects";
+            else
             {
-                effectsStr += $"- {eff.effectType} ({eff.effectValue})\n";
+                string str = "Effects:\n";
+                foreach (var eff in nodeData.effects)
+                    str += $"- {eff.effectType} ({eff.effectValue})\n";
+                effectsText.text = str;
             }
         }
-        // Append description (with an empty line) if available.
-        if (!string.IsNullOrEmpty(nodeData.description))
-            effectsStr += "\n" + nodeData.description;
 
-        if (effectsText)
-            effectsText.text = effectsStr;
+        // Display description in cursive using <i> tags.
+        if (descriptionText)
+            descriptionText.text = $"{nodeData.description}";
+
+        // If node has a ManaStorage effect, update manaStorageText.
+        var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
+        if (manaEff != null && manaStorageText != null)
+            manaStorageText.text = $"Mana: {manaEff.secondaryValue}/{manaEff.effectValue}";
     }
 
     public void GeneratePins(List<NodePort> inputs, List<NodePort> outputs)
@@ -54,23 +71,17 @@ public class NodeView : MonoBehaviour
             Destroy(child.gameObject);
 
         foreach (var input in inputs)
-        {
             CreatePin(inputPinsContainer, input, true);
-        }
         foreach (var output in outputs)
-        {
             CreatePin(outputPinsContainer, output, false);
-        }
     }
 
     private void CreatePin(Transform parent, NodePort port, bool isInput)
     {
         GameObject pinObj = new GameObject(isInput ? "InputPin" : "OutputPin", typeof(RectTransform));
         pinObj.transform.SetParent(parent, false);
-
         RectTransform rt = pinObj.GetComponent<RectTransform>();
         rt.sizeDelta = new Vector2(20, 20);
-
         Image img = pinObj.AddComponent<Image>();
         switch (port.portType)
         {
@@ -84,7 +95,6 @@ public class NodeView : MonoBehaviour
                 img.color = Color.blue;
                 break;
         }
-
         PinView pinView = pinObj.AddComponent<PinView>();
         NodeEditorController controller = UnityEngine.Object.FindFirstObjectByType<NodeEditorController>();
         pinView.Initialize(port, isInput, controller);

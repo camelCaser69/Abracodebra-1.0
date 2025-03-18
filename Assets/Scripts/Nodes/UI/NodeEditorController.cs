@@ -254,7 +254,8 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
                 currentGraph.manaConnections.Remove(key);
         }
 
-        NodeConnectionView[] allLines = GameObject.FindObjectsOfType<NodeConnectionView>();
+        // Use FindObjectsByType instead of FindObjectsOfType
+        NodeConnectionView[] allLines = Object.FindObjectsByType<NodeConnectionView>(FindObjectsSortMode.None);
         foreach (var line in allLines)
         {
             if (line.sourcePin != null)
