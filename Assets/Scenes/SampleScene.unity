@@ -678,6 +678,10 @@ PrefabInstance:
       propertyPath: firingDirection
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2286930423113279058, guid: 70bcf90c8bf00e54e93ef8ff37c059ac, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 3865789443703534087, guid: 70bcf90c8bf00e54e93ef8ff37c059ac, type: 3}
       propertyPath: m_Name
       value: WizardPrefab_Player
@@ -1009,6 +1013,10 @@ PrefabInstance:
     - target: {fileID: 446017123173006964, guid: 70bcf90c8bf00e54e93ef8ff37c059ac, type: 3}
       propertyPath: firingDirection
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2286930423113279058, guid: 70bcf90c8bf00e54e93ef8ff37c059ac, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.2
       objectReference: {fileID: 0}
     - target: {fileID: 3865789443703534087, guid: 70bcf90c8bf00e54e93ef8ff37c059ac, type: 3}
       propertyPath: m_Name

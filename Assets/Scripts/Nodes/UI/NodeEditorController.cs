@@ -78,19 +78,18 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     private void Update()
     {
-        // Hide context menu on left-click.
-        if (Input.GetMouseButtonDown(0))
-            showContextMenu = false;
-
+        // Toggle visibility with TAB key.
         if (Input.GetKeyDown(KeyCode.Tab))
             ToggleVisibility();
 
+        // Delete selected node on DELETE key.
         if (Input.GetKeyDown(KeyCode.Delete))
         {
             if (NodeSelectable.CurrentSelected != null)
                 DeleteSelectedNode();
         }
 
+        // Right-click to open context menu.
         if (Input.GetMouseButtonDown(1))
         {
             showContextMenu = true;
@@ -121,6 +120,15 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
             float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
             Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
+
+            // If a left-click occurs outside the context menu, hide the menu.
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+            {
+                if (!menuRect.Contains(Event.current.mousePosition))
+                {
+                    showContextMenu = false;
+                }
+            }
 
             GUI.Box(menuRect, "Add Node");
 

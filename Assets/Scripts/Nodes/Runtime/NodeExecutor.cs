@@ -35,13 +35,10 @@ public class NodeExecutor : MonoBehaviour
             {
                 float cap = storage.effectValue;
                 float cur = storage.secondaryValue;
-
                 var rateEff = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaRechargeRate);
                 float rate = (rateEff != null) ? rateEff.effectValue : 0f;
-
                 cur += rate * Time.deltaTime;
                 if (cur > cap) cur = cap;
-
                 storage.secondaryValue = cur;
             }
         }
@@ -73,8 +70,6 @@ public class NodeExecutor : MonoBehaviour
     private IEnumerator RunChainCoroutine()
     {
         ClearDebugOutput();
-
-        // Build inbound count for BFS.
         Dictionary<string, int> inboundCount = BuildInboundCount();
         List<NodeData> startNodes = currentGraph.nodes.Where(n => inboundCount[n.nodeId] == 0).ToList();
         if (startNodes.Count == 0)
@@ -115,19 +110,17 @@ public class NodeExecutor : MonoBehaviour
         string chainLog = string.Join(" -> ", chain.Select(n => n.nodeDisplayName));
         LogDebug("[NodeExecutor] Chain: " + chainLog);
 
-        // Accumulators for additional effects:
-        float accumulatedAimSpreadModifier = 0f; // formerly accuracy modifier
+        float accumulatedAimSpreadModifier = 0f;
         float accumulatedBurningDamage = 0f;
         float accumulatedBurningDuration = 0f;
         bool accumulatedPiercing = false;
+        bool accumulatedFriendlyFire = false;
 
         foreach (var node in chain)
         {
             yield return new WaitForSeconds(waitTimeBetweenNodes);
-
             bool executed = false;
-            float cost = node.effects.Where(e => e.effectType == NodeEffectType.ManaCost)
-                                     .Sum(e => e.effectValue);
+            float cost = node.effects.Where(e => e.effectType == NodeEffectType.ManaCost).Sum(e => e.effectValue);
 
             if (cost > 0f && (!currentGraph.manaConnections.ContainsKey(node.nodeId) ||
                               string.IsNullOrEmpty(currentGraph.manaConnections[node.nodeId])))
@@ -139,8 +132,7 @@ public class NodeExecutor : MonoBehaviour
 
             if (cost <= 0f)
             {
-                float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage)
-                                        .Sum(e => e.effectValue);
+                float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
                 totalDamage += dmg;
                 executed = true;
                 LogDebug($"[NodeExecutor] Executed '{node.nodeDisplayName}' with no cost, damage={Mathf.Floor(dmg)}");
@@ -186,22 +178,21 @@ public class NodeExecutor : MonoBehaviour
                 }
             }
 
-            // Only accumulate extra effects if this node executed.
             if (executed)
             {
-                foreach (var effect in node.effects)
+                foreach (var eff in node.effects)
                 {
-                    if (effect.effectType == NodeEffectType.AimSpread)
-                        accumulatedAimSpreadModifier += effect.effectValue;
-                    else if (effect.effectType == NodeEffectType.Burning)
+                    if (eff.effectType == NodeEffectType.AimSpread)
+                        accumulatedAimSpreadModifier += eff.effectValue;
+                    else if (eff.effectType == NodeEffectType.Burning)
                     {
-                        accumulatedBurningDamage += effect.effectValue;
-                        accumulatedBurningDuration += effect.secondaryValue;
+                        accumulatedBurningDamage += eff.effectValue;
+                        accumulatedBurningDuration += eff.secondaryValue;
                     }
-                    else if (effect.effectType == NodeEffectType.Piercing)
-                    {
+                    else if (eff.effectType == NodeEffectType.Piercing)
                         accumulatedPiercing = true;
-                    }
+                    else if (eff.effectType == NodeEffectType.FriendlyFire)
+                        accumulatedFriendlyFire = true;
                 }
             }
 
@@ -220,7 +211,7 @@ public class NodeExecutor : MonoBehaviour
                     OutputNodeEffect outputEffect = outputView.GetComponent<OutputNodeEffect>();
                     if (outputEffect != null)
                     {
-                        outputEffect.Activate(totalDamage, accumulatedAimSpreadModifier, accumulatedBurningDamage, accumulatedBurningDuration, accumulatedPiercing);
+                        outputEffect.Activate(totalDamage, accumulatedAimSpreadModifier, accumulatedBurningDamage, accumulatedBurningDuration, accumulatedPiercing, accumulatedFriendlyFire);
                     }
                     else
                     {

@@ -5,12 +5,16 @@ public class SpellProjectile : MonoBehaviour
     [Header("Projectile Stats")]
     public float damage;
     public float speed;
-    [Tooltip("If true, the projectile is destroyed upon hitting a wizard.")]
+    [Tooltip("If true, the projectile will be destroyed upon hitting a wizard.")]
     public bool destroyOnHit = true;
 
     [Header("Burning Effect (optional)")]
     public float burningDamage;   // DPS
-    public float burningDuration; // seconds
+    public float burningDuration; // Duration in seconds
+
+    [Header("Friendly Fire")]
+    public bool friendlyFire = false;
+    public bool casterIsEnemy = false;
 
     public void Initialize(float dmg, float spd)
     {
@@ -28,16 +32,14 @@ public class SpellProjectile : MonoBehaviour
         WizardController wizard = collision.GetComponent<WizardController>();
         if (wizard != null)
         {
-            // If the wizard is an enemy, apply damage.
-            if (wizard.isEnemy)
-            {
-                wizard.TakeDamage(damage);
+            // If friendly fire is disabled and the hit wizard is on the same team, ignore.
+            if (!friendlyFire && wizard.isEnemy == casterIsEnemy)
+                return;
 
-                // Apply burning effect if present.
-                if (burningDamage > 0 && burningDuration > 0)
-                {
-                    wizard.ApplyStatusEffect(new BurningStatusEffect(burningDuration, burningDamage));
-                }
+            wizard.TakeDamage(damage);
+            if (burningDamage > 0 && burningDuration > 0)
+            {
+                wizard.ApplyStatusEffect(new BurningStatusEffect(burningDuration, burningDamage));
             }
             if (destroyOnHit)
                 Destroy(gameObject);

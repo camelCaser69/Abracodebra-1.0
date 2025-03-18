@@ -5,7 +5,8 @@
     ManaStorage,
     ManaRechargeRate,
     Output,
-    AimSpread,   // renamed from Accuracy
+    AimSpread,    // formerly Accuracy
     Burning,
-    Piercing
+    Piercing,
+    FriendlyFire
 }

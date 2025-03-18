@@ -1,6 +1,6 @@
 ﻿public abstract class StatusEffect
 {
-    public float duration; // Total duration
+    public float duration;
     public float damagePerSecond;
     protected float elapsed = 0f;
 

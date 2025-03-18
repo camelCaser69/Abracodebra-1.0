@@ -10,10 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d27f72fdfc3f4962b8c5577d1ed14561, type: 3}
-  m_Name: Node_007_
+  m_Name: Node_001_AimSpread
   m_EditorClassIdentifier: 
-  displayName: 
+  displayName: AimSpread
   backgroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   description: 
-  ports: []
-  effects: []
+  ports:
+  - portName: General
+    portType: 0
+    isInput: 1
+  - portName: General
+    portType: 0
+    isInput: 0
+  - portName: Mana
+    portType: 1
+    isInput: 1
+  effects:
+  - effectType: 0
+    effectValue: 4
+    secondaryValue: 0
+  - effectType: 5
+    effectValue: -10
+    secondaryValue: 0
