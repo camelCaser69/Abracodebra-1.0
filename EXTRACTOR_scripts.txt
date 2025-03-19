@@ -1,28 +1,53 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-14 01:11:46
+UNITY PROJECT SCRIPT EXPORT - 2025-03-19 21:11:28
 ================================================================================
 
 DIRECTORY STRUCTURE
 --------------------------------------------------------------------------------
 Assets
 ├── DefaultVolumeProfile.asset
+├── Editor
+│   ├── NodeDefinitionAutoAdder.cs
+│   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionLibraryEditor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   ├── NodeEffectDataDrawer.cs
+│   └── WizardControllerStatusEditor.cs
 ├── InputSystem_Actions.inputactions
+├── Materials
+│   └── BezierCurveAA_Material.mat
+├── Post Processing
+│   └── BezierCurvesAntialiasing.renderTexture
 ├── Prefabs
+│   ├── General
+│   │   ├── Projectile_Basic_Pixel.prefab
+│   │   └── WizardPrefab.prefab
 │   ├── Node Presets
-│   │   ├── Definition_DamageNode.asset
-│   │   ├── Definition_ManaSource.asset
-│   │   ├── Definition_Output.asset
-│   │   └── NodeDefinitionLibrary.asset
-│   └── UI
-│       ├── NodeConnectionView.prefab
-│       └── NodeView.prefab
+│   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_001_AimSpread.asset
+│   │   ├── Node_002_Piercing.asset
+│   │   ├── Node_003_Output.asset
+│   │   ├── Node_004_ManaSource.asset
+│   │   ├── Node_005_DamageNode.asset
+│   │   ├── Node_006_Burn.asset
+│   │   └── Node_007_FriendlyFire.asset
+│   ├── UI
+│   │   ├── NodeConnectionView.prefab
+│   │   └── NodeView.prefab
+│   └── Wizard Presets
+│       ├── Wizard_Basic.asset
+│       └── Wizard_Dummy.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   └── SampleScene.unity
 ├── Scripts
 │   ├── Battle
+│   │   ├── SpellProjectile.cs
+│   │   └── Status Effects
+│   │       ├── BurningStatusEffect.cs
+│   │       └── StatusEffect.cs
 │   ├── Core
 │   ├── Nodes
 │   │   ├── Core
@@ -32,12 +57,13 @@ Assets
 │   │   │   ├── NodeEffectData.cs
 │   │   │   ├── NodeEffectType.cs
 │   │   │   ├── NodePort.cs
+│   │   │   ├── OutputNodeEffect.cs
 │   │   │   └── PortDefinition.cs
 │   │   ├── Runtime
 │   │   │   ├── NodeExecutor.cs
 │   │   │   └── NodeGraph.cs
-│   │   ├── Testing
 │   │   └── UI
+│   │       ├── ColorExtensions.cs
 │   │       ├── NodeConnectionView.cs
 │   │       ├── NodeDraggable.cs
 │   │       ├── NodeEditorController.cs
@@ -48,170 +74,341 @@ Assets
 │   │       └── UICubicBezier.cs
 │   ├── UI
 │   └── Wizards
+│       ├── WizardController.cs
+│       └── WizardPreset.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
 │   ├── Scenes
 │   │   └── URP2DSceneTemplate.unity
 │   └── UniversalRP.asset
+├── Shaders
+│   └── BezierCurveAA.shader
 ├── Sprites
-│   └── MR-Platformer-v1
-│       ├── Backgrounds
-│       │   ├── merged-full-background.png
-│       │   ├── parallax-background-mountains.png
-│       │   ├── parallax-background-sky.png
-│       │   ├── parallax-forest-trees-01.png
-│       │   └── parallax-forest-trees-02.png
-│       ├── Enemies
-│       │   ├── Enemy-Bat-Fly-32x32.png
-│       │   ├── Enemy-Boss-Golem-Idle-48x48.png
-│       │   ├── Enemy-Dark-Guard-Idle-39x49.png
-│       │   ├── Enemy-Forest-Goblin-Hog-Idle-32x32.png
-│       │   ├── Enemy-Forest-Goblin-Idle-32x32.png
-│       │   ├── Enemy-Frog-Attack-24x24.png
-│       │   ├── Enemy-Frog-Idle-24x24.png
-│       │   ├── Enemy-Frog-Tongue-Attack-72x24.png
-│       │   ├── Enemy-Mushroom-Walk-24x24.png
-│       │   ├── Enemy-Necromancer-Idle-32x32.png
-│       │   ├── Enemy-Plant-Mutant-Idle-Attack-46x32.png
-│       │   ├── Enemy-Skull-Slime-Idle-32x24.png
-│       │   ├── Enemy-Snail-Attack-24x24.png
-│       │   └── Enemy-Snail-Walk-24x24.png
-│       ├── Misc
-│       │   ├── Bridge-Support.png
-│       │   ├── Bridge-handle-01.png
-│       │   ├── Bridge-handle-02.png
-│       │   ├── Bridge.png
-│       │   ├── Bush-Background.png
-│       │   ├── Bush-Green-Foreground.png
-│       │   ├── Bush-Purple-Foreground.png
-│       │   ├── Cave-Background-Hole-01.png
-│       │   ├── Cave-Background-Rocks-01.png
-│       │   ├── Cave-Background-Rocks-02.png
-│       │   ├── Cave-Background.png
-│       │   ├── Cave-Entrance.png
-│       │   ├── Grass-Green-Foreground.png
-│       │   ├── Grass-Purple-Foreground.png
-│       │   ├── House-01.png
-│       │   ├── House-02.png
-│       │   ├── House-Background-01.png
-│       │   ├── House-Background-02
-│       │   ├── Lamp-Off.png
-│       │   ├── Lamp-On.png
-│       │   └── Mushrooms.png
-│       ├── NPC
-│       │   ├── NPC-Alchemist-Idle-24x24.png
-│       │   ├── NPC-Blacksmith-Idle-48x48.png
-│       │   ├── NPC-Builder-01-Working-24x24.png
-│       │   ├── NPC-Builder-02-Working-24x24.png
-│       │   ├── NPC-Chick-Idle-16x16.png
-│       │   ├── NPC-Miner-Idle-24x24.png
-│       │   ├── NPC-Old-Shaman-Idle-24x24.png
-│       │   ├── NPC-Puppy-Idle-24x24.png
-│       │   ├── NPC-Village-Guard-Idle-32x32.png
-│       │   ├── NPC-Village-Lady-01-Talk-24x24.png
-│       │   └── NPC-Village-Lady-02-Idle-24x24.png
-│       ├── Objects
-│       │   ├── Obj-Arrow-Idle-12x12.png
-│       │   ├── Obj-Arrow-Stuck-12x12.png
-│       │   ├── Obj-Axe-Wood.png
-│       │   ├── Obj-Barrel.png
-│       │   ├── Obj-Big-Wood-Platform-01.png
-│       │   ├── Obj-Big-Wood-Platform-02.png
-│       │   ├── Obj-Blue-Mineral.png
-│       │   ├── Obj-Boxes.png
-│       │   ├── Obj-Cage.png
-│       │   ├── Obj-Checkpoint-Off.png
-│       │   ├── Obj-Checkpoint-On.png
-│       │   ├── Obj-Chest-Closed-24x24.png
-│       │   ├── Obj-Chest-Opening-24x24.png
-│       │   ├── Obj-Crystal-Idle-32x32.png
-│       │   ├── Obj-Crystal-Open-32x32.png
-│       │   ├── Obj-Dreamcatcher-01.png
-│       │   ├── Obj-Dreamcatcher-02.png
-│       │   ├── Obj-Dreamcatcher-03.png
-│       │   ├── Obj-Fence.png
-│       │   ├── Obj-Flag-Hanging-01.png
-│       │   ├── Obj-Gate-Hold.png
-│       │   ├── Obj-Gate-Pillar.png
-│       │   ├── Obj-Green-Mineral.png
-│       │   ├── Obj-Hanging-Flag-01.png
-│       │   ├── Obj-Hanging-Flag-02.png
-│       │   ├── Obj-Hanging-Flag-Medium.png
-│       │   ├── Obj-Idol.png
-│       │   ├── Obj-Key.png
-│       │   ├── Obj-Lamp-On.png
-│       │   ├── Obj-Light-01.png
-│       │   ├── Obj-Mine-Carriage.png
-│       │   ├── Obj-Moving-Platform-Idle-48x28.png
-│       │   ├── Obj-Orange-Mineral.png
-│       │   ├── Obj-Pickaxe.png
-│       │   ├── Obj-Roof-Hanging.png
-│       │   ├── Obj-Short-Roof.png
-│       │   ├── Obj-Stairs.png
-│       │   ├── Obj-Statue.png
-│       │   ├── Obj-Village-Gate-Top.png
-│       │   ├── Obj-Wood-Pillar-01.png
-│       │   ├── Obj-Wood-Platform-01.png
-│       │   ├── Obj-Wood-Platform-02.png
-│       │   ├── Obj-Wood-Platform-Tall-02.png
-│       │   ├── Obj-Wood-Platform-Tall.png
-│       │   ├── Obj-Wood-Platform-Top.png
-│       │   └── Obj-Wood.png
-│       ├── Player
-│       │   ├── Player-Attack-24x24.png
-│       │   ├── Player-Fall-24x24.png
-│       │   ├── Player-Idle-24x24.png
-│       │   ├── Player-Jump-24x24.png
-│       │   └── Player-Run-24x24.png
-│       ├── Tiles
-│       │   ├── Cave-Under-Tile.png
-│       │   ├── Tile-01.png
-│       │   ├── Tile-02.png
-│       │   ├── Tile-03.png
-│       │   ├── Tile-04.png
-│       │   ├── Tile-05.png
-│       │   ├── Tile-06.png
-│       │   ├── Tile-07.png
-│       │   ├── Tile-08.png
-│       │   ├── Tile-09.png
-│       │   ├── Tile-10.png
-│       │   ├── Tile-11.png
-│       │   ├── Tile-12.png
-│       │   ├── Tile-13.png
-│       │   ├── Tile-14.png
-│       │   ├── Tile-15.png
-│       │   ├── Tile-16.png
-│       │   ├── Tile-17.png
-│       │   ├── Tile-18.png
-│       │   ├── Tile-19.png
-│       │   ├── Tile-20.png
-│       │   ├── Tile-21.png
-│       │   ├── Tile-22.png
-│       │   ├── Tile-23.png
-│       │   ├── Tile-24.png
-│       │   ├── Tile-25.png
-│       │   ├── Tile-26.png
-│       │   ├── Tile-27.png
-│       │   ├── Tile-28.png
-│       │   ├── Tile-29.png
-│       │   ├── Tile-30.png
-│       │   ├── Tile-31.png
-│       │   ├── Tile-32.png
-│       │   ├── Tile-33.png
-│       │   ├── Tile-34.png
-│       │   ├── Tile-35.png
-│       │   ├── Tile-36.png
-│       │   ├── Tile-37.png
-│       │   ├── Tree-Trunk-01.png
-│       │   └── Tree-Trunk-02.png
-│       └── UI
-│           ├── Quest-Mark-Idle-16x16.png
-│           ├── UI-Boss-Icon.png
-│           ├── UI-Lives.png
-│           ├── UI-Menu-Button-Active.png
-│           ├── UI-Menu-Button-Default.png
-│           └── UI-Menu-Popup-Background.png
+│   ├── Clouds
+│   │   ├── Clouds 1
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   └── 4.png
+│   │   ├── Clouds 2
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   └── 4.png
+│   │   ├── Clouds 3
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   └── 4.png
+│   │   ├── Clouds 4
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   └── 4.png
+│   │   ├── Clouds 5
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   ├── 4.png
+│   │   │   └── 5.png
+│   │   ├── Clouds 6
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   ├── 4.png
+│   │   │   ├── 5.png
+│   │   │   └── 6.png
+│   │   ├── Clouds 7
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   └── 4.png
+│   │   └── Clouds 8
+│   │       ├── 1.png
+│   │       ├── 2.png
+│   │       ├── 3.png
+│   │       ├── 4.png
+│   │       ├── 5.png
+│   │       └── 6.png
+│   ├── Free Pixel Effects Pack
+│   │   ├── 10_weaponhit_spritesheet.png
+│   │   ├── 11_fire_spritesheet.png
+│   │   ├── 12_nebula_spritesheet.png
+│   │   ├── 13_vortex_spritesheet.png
+│   │   ├── 14_phantom_spritesheet.png
+│   │   ├── 15_loading_spritesheet.png
+│   │   ├── 16_sunburn_spritesheet.png
+│   │   ├── 17_felspell_spritesheet.png
+│   │   ├── 18_midnight_spritesheet.png
+│   │   ├── 19_freezing_spritesheet.png
+│   │   ├── 1_magicspell_spritesheet.png
+│   │   ├── 20_magicbubbles_spritesheet.png
+│   │   ├── 2_magic8_spritesheet.png
+│   │   ├── 3_bluefire_spritesheet.png
+│   │   ├── 4_casting_spritesheet.png
+│   │   ├── 5_magickahit_spritesheet.png
+│   │   ├── 6_flamelash_spritesheet.png
+│   │   ├── 7_firespin_spritesheet.png
+│   │   ├── 8_protectioncircle_spritesheet.png
+│   │   ├── 9_brightfire_spritesheet.png
+│   │   ├── README.txt
+│   │   └── cover.png
+│   ├── MR-Platformer-v1
+│   │   ├── Backgrounds
+│   │   │   ├── merged-full-background.png
+│   │   │   ├── parallax-background-mountains.png
+│   │   │   ├── parallax-background-sky.png
+│   │   │   ├── parallax-forest-trees-01.png
+│   │   │   └── parallax-forest-trees-02.png
+│   │   ├── Enemies
+│   │   │   ├── Enemy-Bat-Fly-32x32.png
+│   │   │   ├── Enemy-Boss-Golem-Idle-48x48.png
+│   │   │   ├── Enemy-Dark-Guard-Idle-39x49.png
+│   │   │   ├── Enemy-Forest-Goblin-Hog-Idle-32x32.png
+│   │   │   ├── Enemy-Forest-Goblin-Idle-32x32.png
+│   │   │   ├── Enemy-Frog-Attack-24x24.png
+│   │   │   ├── Enemy-Frog-Idle-24x24.png
+│   │   │   ├── Enemy-Frog-Tongue-Attack-72x24.png
+│   │   │   ├── Enemy-Mushroom-Walk-24x24.png
+│   │   │   ├── Enemy-Necromancer-Idle-32x32.png
+│   │   │   ├── Enemy-Plant-Mutant-Idle-Attack-46x32.png
+│   │   │   ├── Enemy-Skull-Slime-Idle-32x24.png
+│   │   │   ├── Enemy-Snail-Attack-24x24.png
+│   │   │   └── Enemy-Snail-Walk-24x24.png
+│   │   ├── Misc
+│   │   │   ├── Bridge-Support.png
+│   │   │   ├── Bridge-handle-01.png
+│   │   │   ├── Bridge-handle-02.png
+│   │   │   ├── Bridge.png
+│   │   │   ├── Bush-Background.png
+│   │   │   ├── Bush-Green-Foreground.png
+│   │   │   ├── Bush-Purple-Foreground.png
+│   │   │   ├── Cave-Background-Hole-01.png
+│   │   │   ├── Cave-Background-Rocks-01.png
+│   │   │   ├── Cave-Background-Rocks-02.png
+│   │   │   ├── Cave-Background.png
+│   │   │   ├── Cave-Entrance.png
+│   │   │   ├── Grass-Green-Foreground.png
+│   │   │   ├── Grass-Purple-Foreground.png
+│   │   │   ├── House-01.png
+│   │   │   ├── House-02.png
+│   │   │   ├── House-Background-01.png
+│   │   │   ├── House-Background-02
+│   │   │   ├── Lamp-Off.png
+│   │   │   ├── Lamp-On.png
+│   │   │   └── Mushrooms.png
+│   │   ├── NPC
+│   │   │   ├── NPC-Alchemist-Idle-24x24.png
+│   │   │   ├── NPC-Blacksmith-Idle-48x48.png
+│   │   │   ├── NPC-Builder-01-Working-24x24.png
+│   │   │   ├── NPC-Builder-02-Working-24x24.png
+│   │   │   ├── NPC-Chick-Idle-16x16.png
+│   │   │   ├── NPC-Miner-Idle-24x24.png
+│   │   │   ├── NPC-Old-Shaman-Idle-24x24.png
+│   │   │   ├── NPC-Puppy-Idle-24x24.png
+│   │   │   ├── NPC-Village-Guard-Idle-32x32.png
+│   │   │   ├── NPC-Village-Lady-01-Talk-24x24.png
+│   │   │   └── NPC-Village-Lady-02-Idle-24x24.png
+│   │   ├── Objects
+│   │   │   ├── Obj-Arrow-Idle-12x12.png
+│   │   │   ├── Obj-Arrow-Stuck-12x12.png
+│   │   │   ├── Obj-Axe-Wood.png
+│   │   │   ├── Obj-Barrel.png
+│   │   │   ├── Obj-Big-Wood-Platform-01.png
+│   │   │   ├── Obj-Big-Wood-Platform-02.png
+│   │   │   ├── Obj-Blue-Mineral.png
+│   │   │   ├── Obj-Boxes.png
+│   │   │   ├── Obj-Cage.png
+│   │   │   ├── Obj-Checkpoint-Off.png
+│   │   │   ├── Obj-Checkpoint-On.png
+│   │   │   ├── Obj-Chest-Closed-24x24.png
+│   │   │   ├── Obj-Chest-Opening-24x24.png
+│   │   │   ├── Obj-Crystal-Idle-32x32.png
+│   │   │   ├── Obj-Crystal-Open-32x32.png
+│   │   │   ├── Obj-Dreamcatcher-01.png
+│   │   │   ├── Obj-Dreamcatcher-02.png
+│   │   │   ├── Obj-Dreamcatcher-03.png
+│   │   │   ├── Obj-Fence.png
+│   │   │   ├── Obj-Flag-Hanging-01.png
+│   │   │   ├── Obj-Gate-Hold.png
+│   │   │   ├── Obj-Gate-Pillar.png
+│   │   │   ├── Obj-Green-Mineral.png
+│   │   │   ├── Obj-Hanging-Flag-01.png
+│   │   │   ├── Obj-Hanging-Flag-02.png
+│   │   │   ├── Obj-Hanging-Flag-Medium.png
+│   │   │   ├── Obj-Idol.png
+│   │   │   ├── Obj-Key.png
+│   │   │   ├── Obj-Lamp-On.png
+│   │   │   ├── Obj-Light-01.png
+│   │   │   ├── Obj-Mine-Carriage.png
+│   │   │   ├── Obj-Moving-Platform-Idle-48x28.png
+│   │   │   ├── Obj-Orange-Mineral.png
+│   │   │   ├── Obj-Pickaxe.png
+│   │   │   ├── Obj-Roof-Hanging.png
+│   │   │   ├── Obj-Short-Roof.png
+│   │   │   ├── Obj-Stairs.png
+│   │   │   ├── Obj-Statue.png
+│   │   │   ├── Obj-Village-Gate-Top.png
+│   │   │   ├── Obj-Wood-Pillar-01.png
+│   │   │   ├── Obj-Wood-Platform-01.png
+│   │   │   ├── Obj-Wood-Platform-02.png
+│   │   │   ├── Obj-Wood-Platform-Tall-02.png
+│   │   │   ├── Obj-Wood-Platform-Tall.png
+│   │   │   ├── Obj-Wood-Platform-Top.png
+│   │   │   └── Obj-Wood.png
+│   │   ├── Player
+│   │   │   ├── Player-Attack-24x24.png
+│   │   │   ├── Player-Fall-24x24.png
+│   │   │   ├── Player-Idle-24x24.png
+│   │   │   ├── Player-Jump-24x24.png
+│   │   │   └── Player-Run-24x24.png
+│   │   ├── Tiles
+│   │   │   ├── Cave-Under-Tile.png
+│   │   │   ├── Tile-01.png
+│   │   │   ├── Tile-02.png
+│   │   │   ├── Tile-03.png
+│   │   │   ├── Tile-04.png
+│   │   │   ├── Tile-05.png
+│   │   │   ├── Tile-06.png
+│   │   │   ├── Tile-07.png
+│   │   │   ├── Tile-08.png
+│   │   │   ├── Tile-09.png
+│   │   │   ├── Tile-10.png
+│   │   │   ├── Tile-11.png
+│   │   │   ├── Tile-12.png
+│   │   │   ├── Tile-13.png
+│   │   │   ├── Tile-14.png
+│   │   │   ├── Tile-15.png
+│   │   │   ├── Tile-16.png
+│   │   │   ├── Tile-17.png
+│   │   │   ├── Tile-18.png
+│   │   │   ├── Tile-19.png
+│   │   │   ├── Tile-20.png
+│   │   │   ├── Tile-21.png
+│   │   │   ├── Tile-22.png
+│   │   │   ├── Tile-23.png
+│   │   │   ├── Tile-24.png
+│   │   │   ├── Tile-25.png
+│   │   │   ├── Tile-26.png
+│   │   │   ├── Tile-27.png
+│   │   │   ├── Tile-28.png
+│   │   │   ├── Tile-29.png
+│   │   │   ├── Tile-30.png
+│   │   │   ├── Tile-31.png
+│   │   │   ├── Tile-32.png
+│   │   │   ├── Tile-33.png
+│   │   │   ├── Tile-34.png
+│   │   │   ├── Tile-35.png
+│   │   │   ├── Tile-36.png
+│   │   │   ├── Tile-37.png
+│   │   │   ├── Tree-Trunk-01.png
+│   │   │   └── Tree-Trunk-02.png
+│   │   └── UI
+│   │       ├── Quest-Mark-Idle-16x16.png
+│   │       ├── UI-Boss-Icon.png
+│   │       ├── UI-Lives.png
+│   │       ├── UI-Menu-Button-Active.png
+│   │       ├── UI-Menu-Button-Default.png
+│   │       └── UI-Menu-Popup-Background.png
+│   ├── PixelWhite.png
+│   ├── Shikashi's Fantasy Icons Pack v2
+│   │   ├── #1 - Transparent Icons.png
+│   │   ├── #2 - Transparent Icons & Drop Shadow.png
+│   │   ├── BG 10.png
+│   │   ├── BG 11.png
+│   │   ├── BG 3a.png
+│   │   ├── BG 3b.png
+│   │   ├── BG 3c.png
+│   │   ├── BG 4a.png
+│   │   ├── BG 4b.png
+│   │   ├── BG 5.png
+│   │   ├── BG 6.png
+│   │   ├── BG 7.png
+│   │   ├── BG 8.png
+│   │   ├── BG 9.png
+│   │   ├── Background 1a.png
+│   │   ├── Background 1b.png
+│   │   ├── Background 2.png
+│   │   └── Shikashi's Fantasy Icons Pack.txt
+│   ├── Tiny RPG Character Asset Pack v1.03 -Free Soldier&Orc
+│   │   ├── Arrow(Projectile)
+│   │   │   ├── Arrow01(100x100).png
+│   │   │   └── Arrow01(32x32).png
+│   │   ├── Aseprite file
+│   │   │   ├── Orc.aseprite
+│   │   │   └── Soldier.aseprite
+│   │   └── Characters(100x100)
+│   │       ├── Orc
+│   │       │   ├── Orc
+│   │       │   │   ├── Orc-Attack01.png
+│   │       │   │   ├── Orc-Attack02.png
+│   │       │   │   ├── Orc-Death.png
+│   │       │   │   ├── Orc-Hurt.png
+│   │       │   │   ├── Orc-Idle-Anim.anim
+│   │       │   │   ├── Orc-Idle.png
+│   │       │   │   ├── Orc-Idle_0.controller
+│   │       │   │   ├── Orc-Walk.png
+│   │       │   │   ├── Orc.png
+│   │       │   │   └── Shadow sprites
+│   │       │   │       ├── Orc-shadow.png
+│   │       │   │       ├── Orc-shadow_attack02.png
+│   │       │   │       └── Orc-shadow_death.png
+│   │       │   ├── Orc with shadows
+│   │       │   │   ├── Orc-Attack01.png
+│   │       │   │   ├── Orc-Attack02.png
+│   │       │   │   ├── Orc-Death.png
+│   │       │   │   ├── Orc-Hurt.png
+│   │       │   │   ├── Orc-Idle.png
+│   │       │   │   ├── Orc-Walk.png
+│   │       │   │   └── Orc.png
+│   │       │   └── Orc(Split Effects)
+│   │       │       ├── Orc-attack01_Effect.png
+│   │       │       ├── Orc-attack02_Effect.png
+│   │       │       └── Orc.png
+│   │       └── Soldier
+│   │           ├── Arrow(projectile)
+│   │           │   ├── Arrow01(100x100).png
+│   │           │   └── Arrow01(32x32).png
+│   │           ├── Soldier
+│   │           │   ├── Shadow sprites
+│   │           │   │   ├── Soldier-Shadow.png
+│   │           │   │   └── Soldier-Shadow_death.png
+│   │           │   ├── Soldier-Attack01.png
+│   │           │   ├── Soldier-Attack02.png
+│   │           │   ├── Soldier-Attack03.png
+│   │           │   ├── Soldier-Death.png
+│   │           │   ├── Soldier-Hurt.png
+│   │           │   ├── Soldier-Idle.png
+│   │           │   ├── Soldier-Shadow_attack2.png
+│   │           │   ├── Soldier-Walk.png
+│   │           │   └── Soldier.png
+│   │           ├── Soldier with shadows
+│   │           │   ├── Soldier-Attack01.png
+│   │           │   ├── Soldier-Attack02.png
+│   │           │   ├── Soldier-Attack03.png
+│   │           │   ├── Soldier-Death.png
+│   │           │   ├── Soldier-Hurt.png
+│   │           │   ├── Soldier-Idle-Anim.anim
+│   │           │   ├── Soldier-Idle.png
+│   │           │   ├── Soldier-Idle_0.controller
+│   │           │   ├── Soldier-Walk.png
+│   │           │   ├── Soldier.png
+│   │           │   └── WizardPrefab.controller
+│   │           └── Soldier(Split Effects)
+│   │               ├── Soldier-Attack01_Effect.png
+│   │               ├── Soldier-Attack02_Effect.png
+│   │               ├── Soldier-Attack03_Effect.png
+│   │               └── Soldier.png
+│   └── Wizard Pack
+│       ├── Attack1.png
+│       ├── Attack2.png
+│       ├── Death.png
+│       ├── Fall.png
+│       ├── Hit.png
+│       ├── Idle.png
+│       ├── Jump.png
+│       └── Run.png
 ├── Test
 ├── TextMesh Pro
 │   ├── Examples & Extras
@@ -414,13 +611,103 @@ SCRIPT CONTENTS
 ================================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\SpellProjectile.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class SpellProjectile : MonoBehaviour
+{
+    [Header("Projectile Stats")]
+    public float damage;
+    public float speed;
+    [Tooltip("If true, the projectile will be destroyed upon hitting a wizard.")]
+    public bool destroyOnHit = true;
+
+    [Header("Burning Effect (optional)")]
+    public float burningDamage;   // DPS
+    public float burningDuration; // Duration in seconds
+
+    [Header("Friendly Fire")]
+    public bool friendlyFire = false;
+    public bool casterIsEnemy = false;
+
+    public void Initialize(float dmg, float spd)
+    {
+        damage = dmg;
+        speed = spd;
+    }
+
+    private void Update()
+    {
+        transform.Translate(Vector2.up * speed * Time.deltaTime);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        WizardController wizard = collision.GetComponent<WizardController>();
+        if (wizard != null)
+        {
+            // If friendly fire is disabled and the hit wizard is on the same team, ignore.
+            if (!friendlyFire && wizard.isEnemy == casterIsEnemy)
+                return;
+
+            wizard.TakeDamage(damage);
+            if (burningDamage > 0 && burningDuration > 0)
+            {
+                wizard.ApplyStatusEffect(new BurningStatusEffect(burningDuration, burningDamage));
+            }
+            if (destroyOnHit)
+                Destroy(gameObject);
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Status Effects\BurningStatusEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public class BurningStatusEffect : StatusEffect
+{
+    public BurningStatusEffect(float d, float dps) : base(d, dps) { }
+
+    public override void UpdateEffect(WizardController wizard, float deltaTime)
+    {
+        elapsed += deltaTime;
+        wizard.TakeDamage(damagePerSecond * deltaTime);
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Status Effects\StatusEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public abstract class StatusEffect
+{
+    public float duration; // Total duration.
+    public float damagePerSecond;
+    protected float elapsed = 0f;
+
+    // Public property to expose elapsed time.
+    public float Elapsed { get { return elapsed; } }
+
+    public StatusEffect(float d, float dps)
+    {
+        duration = d;
+        damagePerSecond = dps;
+    }
+
+    public abstract void UpdateEffect(WizardController wizard, float deltaTime);
+    public bool IsExpired() => elapsed >= duration;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeData.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// NodeData.cs
 [Serializable]
 public class NodeData
 {
@@ -428,16 +715,12 @@ public class NodeData
     public string nodeDisplayName;
     public Vector2 editorPosition;
     
-    // In NodeData.cs, add:
     public Color backgroundColor = Color.gray;
-
+    public string description = ""; // Ensure this field exists.
 
     public List<NodePort> inputs;
     public List<NodePort> outputs;
     public List<NodeEffectData> effects;
-
-    // REMOVED: public float manaStorageCapacity;
-    // REMOVED: public float currentManaStorage;
 
     public NodeData()
     {
@@ -449,23 +732,50 @@ public class NodeData
 }
 
 
-
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeDefinition.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// NodeDefinition.cs (unchanged except for your new effects in the list)
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
-[CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
+// [CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
 public class NodeDefinition : ScriptableObject
 {
     public string displayName;
     public Color backgroundColor = Color.gray;
     [TextArea] public string description;
-
     public List<PortDefinition> ports;
     public List<NodeEffectData> effects = new List<NodeEffectData>();
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (string.IsNullOrEmpty(displayName))
+        {
+            string path = UnityEditor.AssetDatabase.GetAssetPath(this);
+            string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
+            string[] parts = fileName.Split('_');
+            if (parts.Length >= 3)
+            {
+                displayName = string.Join("_", parts.Skip(2).ToArray());
+            }
+        }
+    }
+#endif
+
+    private void OnEnable()
+    {
+        // Auto-add default General ports if none exist.
+        if (ports == null || ports.Count == 0)
+        {
+            ports = new List<PortDefinition>();
+            PortDefinition inputPort = new PortDefinition { portName = "Input", portType = PortType.General, isInput = true };
+            PortDefinition outputPort = new PortDefinition { portName = "Output", portType = PortType.General, isInput = false };
+            ports.Add(inputPort);
+            ports.Add(outputPort);
+        }
+    }
 }
 
 
@@ -502,14 +812,17 @@ public class NodeEffectData
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeEffectType.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/Core/NodeEffectType.cs
-public enum NodeEffectType
+﻿public enum NodeEffectType
 {
     ManaCost,
     Damage,
-    ManaStorage,      // effectValue = capacity, secondaryValue = starting mana
+    ManaStorage,
     ManaRechargeRate,
-    Output
+    Output,
+    AimSpread,    // formerly Accuracy
+    Burning,
+    Piercing,
+    FriendlyFire
 }
 
 
@@ -538,6 +851,34 @@ public class NodePort
     }
 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Core\OutputNodeEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using System.Linq;
+
+public class OutputNodeEffect : MonoBehaviour
+{
+    public void Activate(float finalDamage, float aimSpreadModifier, float burningDamage, float burningDuration, bool piercing, bool friendlyFire)
+    {
+        // Use FindObjectsByType
+        WizardController[] allWizards = Object.FindObjectsByType<WizardController>(FindObjectsSortMode.None);
+        WizardController wizard = allWizards.FirstOrDefault(w => !w.isEnemy);
+
+        if (wizard != null)
+        {
+            float finalAimSpread = Mathf.Clamp(wizard.baseAimSpread + aimSpreadModifier, 0f, 180f);
+            wizard.CastSpell(finalDamage, finalAimSpread, burningDamage, burningDuration, piercing, friendlyFire);
+            Debug.Log($"[OutputNodeEffect] Spell cast with damage: {finalDamage}, final aim spread: {finalAimSpread}, burning: {burningDamage} DPS for {burningDuration}s, piercing: {piercing}, friendlyFire: {friendlyFire}");
+        }
+        else
+        {
+            Debug.LogWarning("[OutputNodeEffect] No player WizardController found!");
+        }
+    }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -581,6 +922,10 @@ public class NodeExecutor : MonoBehaviour
     public float waitTimeBetweenNodes = 0.5f;
     public TMP_Text debugOutput;
 
+    private float totalDamage = 0f;
+    private float totalManaCost = 0f;
+    private List<string> skippedNodes = new List<string>();
+
     private void Update()
     {
         RechargeNodesOverTime();
@@ -589,7 +934,6 @@ public class NodeExecutor : MonoBehaviour
             ExecuteGraph();
     }
 
-    // For each node with ManaStorage + optional ManaRechargeRate
     private void RechargeNodesOverTime()
     {
         if (currentGraph == null) return;
@@ -601,13 +945,10 @@ public class NodeExecutor : MonoBehaviour
             {
                 float cap = storage.effectValue;
                 float cur = storage.secondaryValue;
-
                 var rateEff = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaRechargeRate);
                 float rate = (rateEff != null) ? rateEff.effectValue : 0f;
-
                 cur += rate * Time.deltaTime;
                 if (cur > cap) cur = cap;
-
                 storage.secondaryValue = cur;
             }
         }
@@ -628,146 +969,182 @@ public class NodeExecutor : MonoBehaviour
             return;
         }
 
+        totalDamage = 0f;
+        totalManaCost = 0f;
+        skippedNodes.Clear();
+
         StopAllCoroutines();
         StartCoroutine(RunChainCoroutine());
     }
 
     private IEnumerator RunChainCoroutine()
-{
-    ClearDebugOutput();
-
-    // Build inbound counts from the adjacency dictionary.
-    Dictionary<string, int> inboundCount = BuildInboundCount();
-    List<NodeData> startNodes = currentGraph.nodes.Where(n => inboundCount[n.nodeId] == 0).ToList();
-    if (startNodes.Count == 0)
     {
-        LogDebug("[NodeExecutor] No start nodes found. Aborting run.");
-        yield break;
-    }
-
-    // Perform BFS to build a chain.
-    Queue<NodeData> queue = new Queue<NodeData>();
-    HashSet<string> visited = new HashSet<string>();
-    foreach (var s in startNodes)
-        queue.Enqueue(s);
-
-    List<NodeData> chain = new List<NodeData>();
-    while (queue.Count > 0)
-    {
-        NodeData curr = queue.Dequeue();
-        if (visited.Contains(curr.nodeId))
-            continue;
-        visited.Add(curr.nodeId);
-        chain.Add(curr);
-
-        if (currentGraph.adjacency != null && currentGraph.adjacency.ContainsKey(curr.nodeId))
+        ClearDebugOutput();
+        Dictionary<string, int> inboundCount = BuildInboundCount();
+        List<NodeData> startNodes = currentGraph.nodes.Where(n => inboundCount[n.nodeId] == 0).ToList();
+        if (startNodes.Count == 0)
         {
-            foreach (var childId in currentGraph.adjacency[curr.nodeId])
+            LogDebug("[NodeExecutor] No start nodes found. Aborting run.");
+            yield break;
+        }
+
+        Queue<NodeData> queue = new Queue<NodeData>();
+        HashSet<string> visited = new HashSet<string>();
+        foreach (var s in startNodes)
+            queue.Enqueue(s);
+
+        List<NodeData> chain = new List<NodeData>();
+        while (queue.Count > 0)
+        {
+            NodeData curr = queue.Dequeue();
+            if (visited.Contains(curr.nodeId))
+                continue;
+            visited.Add(curr.nodeId);
+            chain.Add(curr);
+
+            if (currentGraph.adjacency != null && currentGraph.adjacency.ContainsKey(curr.nodeId))
             {
-                inboundCount[childId]--;
-                if (inboundCount[childId] <= 0)
+                foreach (var childId in currentGraph.adjacency[curr.nodeId])
                 {
-                    NodeData child = currentGraph.nodes.FirstOrDefault(n => n.nodeId == childId);
-                    if (child != null)
-                        queue.Enqueue(child);
+                    inboundCount[childId]--;
+                    if (inboundCount[childId] <= 0)
+                    {
+                        NodeData child = currentGraph.nodes.FirstOrDefault(n => n.nodeId == childId);
+                        if (child != null)
+                            queue.Enqueue(child);
+                    }
                 }
             }
         }
+
+        string chainLog = string.Join(" -> ", chain.Select(n => n.nodeDisplayName));
+        LogDebug("[NodeExecutor] Chain: " + chainLog);
+
+        float accumulatedAimSpreadModifier = 0f;
+        float accumulatedBurningDamage = 0f;
+        float accumulatedBurningDuration = 0f;
+        bool accumulatedPiercing = false;
+        bool accumulatedFriendlyFire = false;
+
+        foreach (var node in chain)
+        {
+            yield return new WaitForSeconds(waitTimeBetweenNodes);
+            bool executed = false;
+            float cost = node.effects.Where(e => e.effectType == NodeEffectType.ManaCost).Sum(e => e.effectValue);
+
+            if (cost > 0f && (!currentGraph.manaConnections.ContainsKey(node.nodeId) ||
+                              string.IsNullOrEmpty(currentGraph.manaConnections[node.nodeId])))
+            {
+                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - no valid mana source connected.");
+                skippedNodes.Add(node.nodeDisplayName);
+                continue;
+            }
+
+            if (cost <= 0f)
+            {
+                float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
+                totalDamage += dmg;
+                executed = true;
+                LogDebug($"[NodeExecutor] Executed '{node.nodeDisplayName}' with no cost, damage={Mathf.Floor(dmg)}");
+            }
+            else
+            {
+                string sourceId = currentGraph.manaConnections[node.nodeId];
+                NodeData sourceNode = currentGraph.nodes.FirstOrDefault(n => n.nodeId == sourceId);
+                if (sourceNode == null)
+                {
+                    LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - upstream mana node not found.");
+                    skippedNodes.Add(node.nodeDisplayName);
+                    continue;
+                }
+
+                var storageEff = sourceNode.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
+                if (storageEff == null)
+                {
+                    LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - source node '{sourceNode.nodeDisplayName}' has no ManaStorage.");
+                    skippedNodes.Add(node.nodeDisplayName);
+                    continue;
+                }
+
+                float cap = storageEff.effectValue;
+                float cur = storageEff.secondaryValue;
+
+                if (cur < cost)
+                {
+                    LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' (insufficient mana in '{sourceNode.nodeDisplayName}': {Mathf.Floor(cur)}/{cost}).");
+                    skippedNodes.Add(node.nodeDisplayName);
+                    continue;
+                }
+                else
+                {
+                    cur -= cost;
+                    storageEff.secondaryValue = cur;
+                    totalManaCost += cost;
+
+                    float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
+                    totalDamage += dmg;
+                    executed = true;
+                    LogDebug($"[NodeExecutor] '{node.nodeDisplayName}' executed: cost={Mathf.Floor(cost)}, damage={Mathf.Floor(dmg)}, source='{sourceNode.nodeDisplayName}', leftoverMana={Mathf.Floor(cur)}/{Mathf.Floor(cap)}");
+                }
+            }
+
+            if (executed)
+            {
+                foreach (var eff in node.effects)
+                {
+                    if (eff.effectType == NodeEffectType.AimSpread)
+                        accumulatedAimSpreadModifier += eff.effectValue;
+                    else if (eff.effectType == NodeEffectType.Burning)
+                    {
+                        accumulatedBurningDamage += eff.effectValue;
+                        accumulatedBurningDuration += eff.secondaryValue;
+                    }
+                    else if (eff.effectType == NodeEffectType.Piercing)
+                        accumulatedPiercing = true;
+                    else if (eff.effectType == NodeEffectType.FriendlyFire)
+                        accumulatedFriendlyFire = true;
+                }
+            }
+
+            bool isOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
+            if (isOutput)
+            {
+                LogDebug($"[NodeExecutor] Output node '{node.nodeDisplayName}' reached.");
+                LogDebug($"[NodeExecutor] Total mana cost: {Mathf.Floor(totalManaCost)}");
+                string skipStr = (skippedNodes.Count > 0) ? string.Join(", ", skippedNodes) : "None";
+                LogDebug($"[NodeExecutor] Skipped nodes: {skipStr}");
+                LogDebug($"[NodeExecutor] Final damage: {Mathf.Floor(totalDamage)}");
+
+                NodeView outputView = FindNodeViewById(node.nodeId);
+                if (outputView != null)
+                {
+                    OutputNodeEffect outputEffect = outputView.GetComponent<OutputNodeEffect>();
+                    if (outputEffect != null)
+                    {
+                        outputEffect.Activate(totalDamage, accumulatedAimSpreadModifier, accumulatedBurningDamage, accumulatedBurningDuration, accumulatedPiercing, accumulatedFriendlyFire);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[NodeExecutor] Output node effect not found on NodeView.");
+                    }
+                }
+            }
+        }
+
+        LogDebug("[NodeExecutor] BFS execution complete.");
     }
 
-    string chainLog = string.Join(" -> ", chain.Select(n => n.nodeDisplayName));
-    LogDebug("[NodeExecutor] Chain: " + chainLog);
-
-    float totalDamage = 0f;
-    float totalManaCost = 0f;
-    List<string> skippedNodes = new List<string>();
-
-    foreach (var node in chain)
-{
-    yield return new WaitForSeconds(waitTimeBetweenNodes);
-
-    // Calculate the mana cost for this node.
-    float cost = node.effects
-        .Where(e => e.effectType == NodeEffectType.ManaCost)
-        .Sum(e => e.effectValue);
-
-    if (cost <= 0f)
+    private NodeView FindNodeViewById(string nodeId)
     {
-        // If there is no cost, simply add damage.
-        float dmg = node.effects
-            .Where(e => e.effectType == NodeEffectType.Damage)
-            .Sum(e => e.effectValue);
-        totalDamage += dmg;
-        LogDebug($"[NodeExecutor] Executed '{node.nodeDisplayName}' with no cost, damage={Mathf.Floor(dmg)}");
+        // Use FindObjectsByType
+        NodeView[] views = Object.FindObjectsByType<NodeView>(FindObjectsSortMode.None);
+        foreach (var view in views)
+        {
+            if (view.GetNodeData().nodeId == nodeId)
+                return view;
+        }
+        return null;
     }
-    else
-    {
-        // For nodes with a cost, require an explicit mana connection.
-        if (!currentGraph.manaConnections.ContainsKey(node.nodeId))
-        {
-            LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - no mana source connected.");
-            skippedNodes.Add(node.nodeDisplayName);
-            continue;
-        }
-
-        string sourceId = currentGraph.manaConnections[node.nodeId];
-        NodeData sourceNode = currentGraph.nodes.FirstOrDefault(n => n.nodeId == sourceId);
-        if (sourceNode == null)
-        {
-            LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - upstream mana node not found.");
-            skippedNodes.Add(node.nodeDisplayName);
-            continue;
-        }
-
-        var storageEff = sourceNode.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
-        if (storageEff == null)
-        {
-            LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - source node '{sourceNode.nodeDisplayName}' has no ManaStorage.");
-            skippedNodes.Add(node.nodeDisplayName);
-            continue;
-        }
-
-        float cap = storageEff.effectValue;
-        float cur = storageEff.secondaryValue;
-
-        if (cur < cost)
-        {
-            LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' (insufficient mana in '{sourceNode.nodeDisplayName}': {Mathf.Floor(cur)}/{cost}).");
-            skippedNodes.Add(node.nodeDisplayName);
-            continue;
-        }
-        else
-        {
-            cur -= cost;
-            storageEff.secondaryValue = cur; // Deduct mana from the connected source node.
-            totalManaCost += cost;
-
-            float dmg = node.effects
-                .Where(e => e.effectType == NodeEffectType.Damage)
-                .Sum(e => e.effectValue);
-            totalDamage += dmg;
-
-            LogDebug($"[NodeExecutor] '{node.nodeDisplayName}' executed: cost={Mathf.Floor(cost)}, damage={Mathf.Floor(dmg)}, source='{sourceNode.nodeDisplayName}', leftoverMana={Mathf.Floor(cur)}/{Mathf.Floor(cap)}");
-        }
-    }
-
-    // If this node has an Output effect, log final results.
-    bool isOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
-    if (isOutput)
-    {
-        LogDebug($"[NodeExecutor] Output node '{node.nodeDisplayName}' reached.");
-        LogDebug($"[NodeExecutor] Total mana cost: {Mathf.Floor(totalManaCost)}");
-        string skipStr = (skippedNodes.Count > 0) ? string.Join(", ", skippedNodes) : "None";
-        LogDebug($"[NodeExecutor] Skipped nodes: {skipStr}");
-        LogDebug($"[NodeExecutor] Final damage: {Mathf.Floor(totalDamage)}");
-    }
-
-
-}
-
-
-    LogDebug("[NodeExecutor] BFS execution complete.");
-}
 
     private Dictionary<string, int> BuildInboundCount()
     {
@@ -828,6 +1205,20 @@ public class NodeGraph
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\ColorExtensions.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public static class ColorExtensions
+{
+    public static Color WithAlpha(this Color c, float alpha)
+    {
+        return new Color(c.r, c.g, c.b, alpha);
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeConnectionView.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
@@ -846,6 +1237,7 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
     private RectTransform ownRect;
 
     private bool isPreviewing = false;
+    private bool isFinalized = false;
 
     private void Awake()
     {
@@ -855,7 +1247,15 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
 
     private void Update()
     {
-        if (bezier == null || startRect == null) return;
+        // If finalized and either pin is missing, destroy self.
+        if (isFinalized && (sourcePin == null || targetPin == null))
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        if (bezier == null || startRect == null)
+            return;
 
         Vector2 localStart;
         RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, startRect.position, null, out localStart);
@@ -863,12 +1263,10 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
         Vector2 localEnd;
         if (!isPreviewing && endRect != null)
         {
-            // final connection
             RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, endRect.position, null, out localEnd);
         }
         else
         {
-            // preview => use the mouse position
             RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, Input.mousePosition, null, out localEnd);
         }
 
@@ -877,29 +1275,31 @@ public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
 
     public void StartPreview(RectTransform source)
     {
-        startRect    = source;
-        endRect      = null;
+        startRect = source;
+        endRect = null;
         isPreviewing = true;
     }
 
     public void FinalizeConnection(RectTransform end)
     {
-        endRect      = end;
+        endRect = end;
         isPreviewing = false;
+        isFinalized = true;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // Only called if user right-clicks near the line (due to custom raycast)
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            // remove adjacency logic, etc.
-
-            Debug.Log("[NodeConnectionView] Deleting line");
+            Debug.Log("[NodeConnectionView] Deleting connection");
+            // Clear references to help garbage collection.
+            sourcePin = null;
+            targetPin = null;
             Destroy(gameObject);
         }
     }
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -965,78 +1365,128 @@ using System.Linq;
 
 public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 {
-    [Header("Node Editor References")]
-    [Tooltip("Spawned node prefabs go here.")]
-    [SerializeField] private GameObject nodeViewPrefab;
+    [Header("Window & Content Setup")]
+    [Tooltip("The fixed window (NodeEditorWindow) with RectMask2D & CanvasGroup.")]
+    [SerializeField] private RectTransform windowRect; // Parent window panel
 
-    [Tooltip("Spawned connection lines (NodeConnectionView) go here.")]
-    [SerializeField] private GameObject connectionViewPrefab;
+    [Tooltip("The inner content panel where nodes and connections are spawned.")]
+    [SerializeField] private RectTransform contentRect; // Child container for nodes
 
-    [Tooltip("If you have a NodeDefinitionLibrary, assign it here for right-click creation.")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
+    [Header("Prefabs")]
+    [SerializeField] private GameObject nodeViewPrefab; // Prefab for NodeView
+    [SerializeField] private GameObject connectionViewPrefab; // Prefab for connection (with UICubicBezier)
 
-    [Tooltip("The NodeGraph that stores all nodes & adjacency.")]
-    [SerializeField] private NodeGraph currentGraph;
+    [Header("Node Definitions")]
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // For context menu
 
-    [Tooltip("Optional link to NodeExecutor so we can pass updated graphs to it.")]
-    [SerializeField] private NodeExecutor executor;
+    [Header("Runtime Graph Reference")]
+    [SerializeField] private NodeGraph currentGraph; // Contains nodes, adjacency, manaConnections
 
-    // For connection dragging
+    [Header("Optional")]
+    [SerializeField] private NodeExecutor executor; // Optional: updates graph
+
+    [Header("Panning/Zoom Settings")]
+    [SerializeField] private float contentMargin = 20f; // Minimum margin for content panel
+
+    // For connection dragging:
     private NodeConnectionView draggingLine;
     private PinView sourcePin;
 
-    // Context menu
+    // Context menu variables:
     private bool showContextMenu = false;
     private Vector2 contextMenuPosition;
 
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
 
+    private CanvasGroup canvasGroup;
+
     private void Awake()
     {
-        // Ensure there's a transparent Image on this panel so it receives pointer events.
-        var thisRect = GetComponent<RectTransform>();
-        if (thisRect == null)
-        {
-            Debug.LogError("[NodeEditorController] The GameObject must have a RectTransform!");
-            return;
-        }
+        if (windowRect == null)
+            windowRect = GetComponent<RectTransform>();
 
-        // If no Image is present, add one so we can receive scroll & drag events.
-        var image = GetComponent<Image>();
-        if (image == null)
+        canvasGroup = GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = gameObject.AddComponent<CanvasGroup>();
+
+        Image bg = GetComponent<Image>();
+        if (bg == null)
         {
-            image = gameObject.AddComponent<Image>();
-            image.color = new Color(1,1,1,0);   // fully transparent
-            image.raycastTarget = true;
+            bg = gameObject.AddComponent<Image>();
+            bg.color = new Color(1, 1, 1, 0);
+            bg.raycastTarget = true;
         }
     }
 
     private void Start()
     {
-        // If no graph assigned, create an empty one
         if (currentGraph == null)
-        {
             currentGraph = new NodeGraph();
-        }
 
-        // If no executor assigned, try to find one
         if (executor == null)
         {
             executor = GameObject.FindFirstObjectByType<NodeExecutor>();
             if (executor != null)
                 executor.SetGraph(currentGraph);
             else
-                Debug.LogWarning("[NodeEditorController] No NodeExecutor found in the scene.");
+                Debug.LogWarning("[NodeEditorController] No NodeExecutor found in scene.");
         }
+
+        EnsureContentPanelSize();
     }
 
     private void Update()
     {
-        // Right-click for context menu
+        // Hide context menu on left-click if outside its bounds.
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions != null)
+            {
+                Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
+                float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
+                Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
+
+                // Convert Input.mousePosition to the same coordinate space as 'menuRect'.
+                // 'menuRect' is in GUI coords => top-left(0,0), so let's do:
+                Vector2 mousePos = Input.mousePosition;
+                mousePos.y = Screen.height - mousePos.y; 
+                // Now 'mousePos' matches the coordinate space of 'menuRect'.
+
+                if (!menuRect.Contains(mousePos))
+                    showContextMenu = false;
+            }
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+            ToggleVisibility();
+
+        if (Input.GetKeyDown(KeyCode.Delete))
+        {
+            if (NodeSelectable.CurrentSelected != null)
+                DeleteSelectedNode();
+        }
+
         if (Input.GetMouseButtonDown(1))
         {
             showContextMenu = true;
             contextMenuPosition = Input.mousePosition;
+        }
+    }
+
+    private void ToggleVisibility()
+    {
+        if (canvasGroup.alpha > 0)
+        {
+            canvasGroup.alpha = 0;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
+        else
+        {
+            canvasGroup.alpha = 1;
+            canvasGroup.interactable = true;
+            canvasGroup.blocksRaycasts = true;
         }
     }
 
@@ -1047,6 +1497,15 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
             float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
             Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
+
+            // If a left-click occurs outside the menu, hide it.
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+            {
+                if (!menuRect.Contains(Event.current.mousePosition))
+                {
+                    showContextMenu = false;
+                }
+            }
 
             GUI.Box(menuRect, "Add Node");
 
@@ -1066,53 +1525,51 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     private void CreateNodeAtMouse(NodeDefinition definition)
     {
-        // Convert screen to local position
         Vector2 localPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            (RectTransform)transform, Input.mousePosition, null, out localPos);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(contentRect, Input.mousePosition, null, out localPos);
 
         NodeData newNode = new NodeData();
         newNode.nodeDisplayName = definition.displayName;
         newNode.editorPosition = localPos;
         newNode.backgroundColor = definition.backgroundColor;
+        newNode.description = definition.description; // Copy description from preset
 
-        // Copy effects
         foreach (var defEffect in definition.effects)
         {
-            NodeEffectData eff = new NodeEffectData
+            NodeEffectData effectCopy = new NodeEffectData
             {
                 effectType = defEffect.effectType,
                 effectValue = defEffect.effectValue,
                 secondaryValue = defEffect.secondaryValue
             };
-            newNode.effects.Add(eff);
+            newNode.effects.Add(effectCopy);
         }
 
-        // Copy ports
         foreach (var portDef in definition.ports)
         {
-            NodePort nPort = new NodePort
+            NodePort nodePort = new NodePort
             {
                 portName = portDef.portName,
                 portType = portDef.portType
             };
+
             if (portDef.isInput)
-                newNode.inputs.Add(nPort);
+                newNode.inputs.Add(nodePort);
             else
-                newNode.outputs.Add(nPort);
+                newNode.outputs.Add(nodePort);
         }
 
         currentGraph.nodes.Add(newNode);
         CreateNodeView(newNode);
+        EnsureContentPanelSize();
 
-        // Update executor
         if (executor != null)
             executor.SetGraph(currentGraph);
     }
 
     private NodeView CreateNodeView(NodeData data)
     {
-        GameObject nodeObj = Instantiate(nodeViewPrefab, transform); // parent is NodeEditorPanel
+        GameObject nodeObj = Instantiate(nodeViewPrefab, contentRect);
         NodeView view = nodeObj.GetComponent<NodeView>();
 
         view.Initialize(data, data.backgroundColor, data.nodeDisplayName);
@@ -1122,18 +1579,82 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
         view.GeneratePins(data.inputs, data.outputs);
 
+        if (data.effects.Any(e => e.effectType == NodeEffectType.Output))
+        {
+            if (nodeObj.GetComponent<OutputNodeEffect>() == null)
+                nodeObj.AddComponent<OutputNodeEffect>();
+        }
+
         spawnedNodeViews.Add(view);
         return view;
     }
 
-    // Connection Dragging
+    // --- Deletion Logic ---
+    private void DeleteSelectedNode()
+    {
+        NodeView selectedView = NodeSelectable.CurrentSelected.GetComponent<NodeView>();
+        if (selectedView == null)
+            return;
 
+        string nodeId = selectedView.GetNodeData().nodeId;
+        currentGraph.nodes.RemoveAll(n => n.nodeId == nodeId);
+
+        if (currentGraph.adjacency != null)
+        {
+            currentGraph.adjacency.Remove(nodeId);
+            foreach (var kvp in currentGraph.adjacency)
+            {
+                kvp.Value.RemoveAll(childId => childId == nodeId);
+            }
+        }
+
+        if (currentGraph.manaConnections != null)
+        {
+            List<string> keysToRemove = new List<string>();
+            foreach (var kvp in currentGraph.manaConnections)
+            {
+                if (kvp.Key == nodeId || kvp.Value == nodeId)
+                    keysToRemove.Add(kvp.Key);
+            }
+            foreach (var key in keysToRemove)
+                currentGraph.manaConnections.Remove(key);
+        }
+
+        // Use FindObjectsByType instead of FindObjectsOfType
+        NodeConnectionView[] allLines = Object.FindObjectsByType<NodeConnectionView>(FindObjectsSortMode.None);
+        foreach (var line in allLines)
+        {
+            if (line.sourcePin != null)
+            {
+                NodeView srcView = line.sourcePin.GetComponentInParent<NodeView>();
+                if (srcView == null || srcView.GetNodeData().nodeId == nodeId)
+                {
+                    Destroy(line.gameObject);
+                    continue;
+                }
+            }
+            if (line.targetPin != null)
+            {
+                NodeView tgtView = line.targetPin.GetComponentInParent<NodeView>();
+                if (tgtView == null || tgtView.GetNodeData().nodeId == nodeId)
+                {
+                    Destroy(line.gameObject);
+                    continue;
+                }
+            }
+        }
+
+        Destroy(NodeSelectable.CurrentSelected);
+        NodeSelectable.CurrentSelected = null;
+    }
+
+    // --- Connection Dragging Methods ---
     public void StartConnectionDrag(PinView source, PointerEventData eventData)
     {
-        Debug.Log("[NodeEditor] StartConnectionDrag");
+        Debug.Log("[NodeEditor] StartConnectionDrag called!");
         sourcePin = source;
 
-        GameObject lineObj = Instantiate(connectionViewPrefab, transform);
+        GameObject lineObj = Instantiate(connectionViewPrefab, contentRect);
         draggingLine = lineObj.GetComponent<NodeConnectionView>();
 
         RectTransform sourceRect = source.GetComponent<RectTransform>();
@@ -1143,7 +1664,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
     {
-        // NodeConnectionView handles the preview
+        // Preview updated within NodeConnectionView.
     }
 
     public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)
@@ -1169,7 +1690,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             draggingLine.targetPin = targetPin;
             draggingLine.FinalizeConnection(targetRect);
 
-            // If both pins are Mana => record in manaConnections
             if (sourcePin.port.portType == PortType.Mana && targetPin.port.portType == PortType.Mana)
             {
                 string sourceId = GetNodeIdFromPin(sourcePin);
@@ -1178,7 +1698,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
                     currentGraph.manaConnections = new Dictionary<string, string>();
                 currentGraph.manaConnections[targetId] = sourceId;
             }
-            // If both pins are General => record adjacency
             else if (sourcePin.port.portType == PortType.General && targetPin.port.portType == PortType.General)
             {
                 string sourceId = GetNodeIdFromPin(sourcePin);
@@ -1191,11 +1710,11 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
                     currentGraph.adjacency[sourceId].Add(targetId);
             }
 
-            Debug.Log("[NodeEditor] Connection finalized");
+            Debug.Log("[NodeEditor] Connection finalized.");
         }
         else
         {
-            Debug.Log("[NodeEditor] Connection canceled");
+            Debug.Log("[NodeEditor] Connection canceled.");
             Destroy(draggingLine.gameObject);
         }
 
@@ -1203,24 +1722,55 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         sourcePin = null;
     }
 
-    // Zoom (mouse wheel) & Pan (drag the panel)
+    // --- Zooming & Panning ---
     public void OnScroll(PointerEventData eventData)
     {
-        Debug.Log($"[NodeEditor] OnScroll => {eventData.scrollDelta}");
+        Debug.Log($"[NodeEditor] OnScroll: {eventData.scrollDelta}");
         float scrollDelta = eventData.scrollDelta.y;
-        float newScale = transform.localScale.x + scrollDelta * 0.05f;
-        newScale = Mathf.Clamp(newScale, 0.4f, 2f);
-        transform.localScale = Vector3.one * newScale;
+        float newScale = contentRect.localScale.x + scrollDelta * 0.05f;
+        newScale = Mathf.Clamp(newScale, 0.5f, 2f);
+        contentRect.localScale = Vector3.one * newScale;
+        EnsureContentPanelSize();
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        Debug.Log($"[NodeEditor] OnDrag => {eventData.delta}");
-        RectTransform rt = (RectTransform)transform;
-        rt.anchoredPosition += eventData.delta;
+        Debug.Log($"[NodeEditor] OnDrag: {eventData.delta}");
+        contentRect.anchoredPosition += eventData.delta;
+        EnsureContentPanelSize();
     }
 
-    // LoadGraph for NodeTestInitializer or other usage
+    private void EnsureContentPanelSize()
+    {
+        if (windowRect == null || contentRect == null)
+            return;
+
+        Vector2 windowSize = windowRect.rect.size;
+        Vector2 minSize = windowSize + new Vector2(contentMargin * 2, contentMargin * 2);
+
+        if (spawnedNodeViews.Count > 0)
+        {
+            Vector2 minPos = new Vector2(float.MaxValue, float.MaxValue);
+            Vector2 maxPos = new Vector2(float.MinValue, float.MinValue);
+            foreach (var view in spawnedNodeViews)
+            {
+                RectTransform rt = view.GetComponent<RectTransform>();
+                Vector2 pos = rt.anchoredPosition;
+                Vector2 size = rt.rect.size;
+                minPos = Vector2.Min(minPos, pos - size * 0.5f);
+                maxPos = Vector2.Max(maxPos, pos + size * 0.5f);
+            }
+            Vector2 nodesBounds = maxPos - minPos;
+            minSize = Vector2.Max(minSize, nodesBounds + new Vector2(contentMargin * 2, contentMargin * 2));
+        }
+
+        Vector2 currentSize = contentRect.sizeDelta;
+        float newWidth = Mathf.Max(currentSize.x, minSize.x);
+        float newHeight = Mathf.Max(currentSize.y, minSize.y);
+        contentRect.sizeDelta = new Vector2(newWidth, newHeight);
+    }
+
+    // --- Load Graph ---
     public void LoadGraph(NodeGraph graph)
     {
         currentGraph = graph;
@@ -1236,6 +1786,7 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             executor.SetGraph(currentGraph);
     }
 
+    // --- Helper Methods ---
     public string GetNodeIdFromPin(PinView pin)
     {
         NodeView view = pin.GetComponentInParent<NodeView>();
@@ -1266,10 +1817,16 @@ using UnityEngine.EventSystems;
 
 public class NodeSelectable : MonoBehaviour, IPointerClickHandler
 {
-    private static GameObject currentSelected;
+    // Public static property to hold the currently selected node.
+    public static GameObject CurrentSelected { get; set; }
 
-    // Reference to an Outline component added to the NodeView prefab.
     [SerializeField] private Outline outline;
+
+    private void Awake()
+    {
+        if (outline != null)
+            outline.enabled = false;
+    }
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -1278,14 +1835,14 @@ public class NodeSelectable : MonoBehaviour, IPointerClickHandler
 
     public static void Select(GameObject node)
     {
-        if (currentSelected != null && currentSelected != node)
+        if (CurrentSelected != null && CurrentSelected != node)
         {
-            // Remove highlight from previously selected node.
-            var prevOutline = currentSelected.GetComponent<Outline>();
+            // Disable outline on previously selected node.
+            var prevOutline = CurrentSelected.GetComponent<Outline>();
             if (prevOutline != null)
                 prevOutline.enabled = false;
         }
-        currentSelected = node;
+        CurrentSelected = node;
         var outlineComp = node.GetComponent<Outline>();
         if (outlineComp != null)
             outlineComp.enabled = true;
@@ -1320,13 +1877,11 @@ public class NodeTestInitializer : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeView.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/UI/NodeView.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using System.Linq;
-
 
 public class NodeView : MonoBehaviour
 {
@@ -1338,14 +1893,14 @@ public class NodeView : MonoBehaviour
     [SerializeField] private Transform outputPinsContainer;
 
     [Header("Node Info Display")]
-    [SerializeField] private TMP_Text manaStorageText; // For real-time mana display
-    [SerializeField] private TMP_Text effectsText;  // Where we list the node's effects
+    [SerializeField] private TMP_Text manaStorageText;
+    [SerializeField] private TMP_Text effectsText;
+    [SerializeField] private TMP_Text descriptionText; // Separate text field for description
 
     private NodeData nodeData;
 
     private void Update()
     {
-        // If the node has a ManaStorage effect, display
         var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
         if (manaEff != null && manaStorageText != null)
         {
@@ -1355,93 +1910,74 @@ public class NodeView : MonoBehaviour
         }
     }
 
-
-    
     public void Initialize(NodeData data, Color color, string displayName)
     {
         nodeData = data;
-        if (nodeTitleText) nodeTitleText.text = displayName;
-        if (backgroundImage) backgroundImage.color = color;
+        if (nodeTitleText) 
+            nodeTitleText.text = displayName;
+        if (backgroundImage) 
+            backgroundImage.color = color;
 
-        // Display effects (as before)
+        // Build effects text.
         if (effectsText)
         {
             if (nodeData.effects.Count == 0)
-            {
                 effectsText.text = "No Effects";
-            }
             else
             {
                 string str = "Effects:\n";
                 foreach (var eff in nodeData.effects)
-                {
                     str += $"- {eff.effectType} ({eff.effectValue})\n";
-                }
                 effectsText.text = str;
             }
         }
 
-        // If node has a ManaStorage effect, display it
+        // Display description in cursive using <i> tags.
+        if (descriptionText)
+            descriptionText.text = $"{nodeData.description}";
+
+        // If node has a ManaStorage effect, update manaStorageText.
         var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
         if (manaEff != null && manaStorageText != null)
-        {
             manaStorageText.text = $"Mana: {manaEff.secondaryValue}/{manaEff.effectValue}";
-        }
     }
 
     public void GeneratePins(List<NodePort> inputs, List<NodePort> outputs)
     {
-        // Clear existing pins
         foreach (Transform child in inputPinsContainer)
             Destroy(child.gameObject);
         foreach (Transform child in outputPinsContainer)
             Destroy(child.gameObject);
 
-        // Create input pins
         foreach (var input in inputs)
-        {
             CreatePin(inputPinsContainer, input, true);
-        }
-        // Create output pins
         foreach (var output in outputs)
-        {
             CreatePin(outputPinsContainer, output, false);
-        }
     }
 
     private void CreatePin(Transform parent, NodePort port, bool isInput)
     {
-        // Create a new UI GameObject for the pin.
         GameObject pinObj = new GameObject(isInput ? "InputPin" : "OutputPin", typeof(RectTransform));
-        pinObj.transform.SetParent(parent, false);  // false to keep local scaling
-
-        // Set a fixed size for the pin.
+        pinObj.transform.SetParent(parent, false);
         RectTransform rt = pinObj.GetComponent<RectTransform>();
         rt.sizeDelta = new Vector2(20, 20);
-
-        // Add an Image component to make it visible.
         Image img = pinObj.AddComponent<Image>();
-        // Color mapping based on port type.
         switch (port.portType)
         {
             case PortType.Mana:
                 img.color = Color.cyan;
                 break;
             case PortType.Condition:
-                img.color = new Color(1f, 0.65f, 0f); // Orange
+                img.color = new Color(1f, 0.65f, 0f);
                 break;
             default:
                 img.color = Color.blue;
                 break;
         }
-
-        // Add the PinView component to enable connection behavior.
         PinView pinView = pinObj.AddComponent<PinView>();
-        // Use FindFirstObjectByType if available, otherwise FindObjectOfType.
         NodeEditorController controller = UnityEngine.Object.FindFirstObjectByType<NodeEditorController>();
         pinView.Initialize(port, isInput, controller);
     }
-
 
     public NodeData GetNodeData() => nodeData;
 }
@@ -1508,14 +2044,10 @@ public class PinView : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointe
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-/// <summary>
-/// Draws a cubic Bézier "S-curve" in a Screen Space - Overlay UI. Also performs a custom
-/// hit-test so that pointer events only register if the pointer is near the curve.
-/// </summary>
 [RequireComponent(typeof(CanvasRenderer))]
-public class UICubicBezier : Graphic
+public class UICubicBezier : MaskableGraphic
 {
-    [Range(2,100)] public int segments = 30;
+    [Range(2, 100)] public int segments = 30;
     public float lineThickness = 4f;
 
     [Header("Positions in local space")]
@@ -1524,52 +2056,100 @@ public class UICubicBezier : Graphic
 
     private List<Vector2> sampledPoints = new List<Vector2>();
 
-    protected override void OnPopulateMesh(VertexHelper vh)
+    protected override void Awake()
     {
-        vh.Clear();
-        sampledPoints.Clear();
-
-        if ((startPos - endPos).sqrMagnitude < 1f)
-            return;
-
-        // "S-curve" approach: horizontal tangents
-        float dx = (endPos.x - startPos.x) * 0.5f;
-        Vector2 ctrl1 = startPos + new Vector2(dx, 0f);
-        Vector2 ctrl2 = endPos - new Vector2(dx, 0f);
-
-        // Sample the curve
-        for (int i = 0; i <= segments; i++)
-        {
-            float t = i / (float) segments;
-            Vector2 p = CubicBezier(startPos, ctrl1, ctrl2, endPos, t);
-            sampledPoints.Add(p);
-        }
-
-        // Create a mesh
-        for (int i=0; i<sampledPoints.Count -1; i++)
-        {
-            Vector2 p0 = sampledPoints[i];
-            Vector2 p1 = sampledPoints[i+1];
-
-            Vector2 dir = (p1 - p0).normalized;
-            Vector2 normal = new Vector2(-dir.y, dir.x) * (lineThickness*0.5f);
-
-            Vector2 v0 = p0 + normal;
-            Vector2 v1 = p0 - normal;
-            Vector2 v2 = p1 - normal;
-            Vector2 v3 = p1 + normal;
-
-            AddQuad(v0, v1, v2, v3, vh);
-        }
+        base.Awake();
+        // With MaskableGraphic, the property "maskable" is available.
+        this.maskable = true;
     }
+
+    protected override void OnPopulateMesh(VertexHelper vh)
+{
+    vh.Clear();
+    sampledPoints.Clear();
+
+    if ((startPos - endPos).sqrMagnitude < 1f)
+        return;
+
+    // Create control points (S-curve style)
+    float dx = (endPos.x - startPos.x) * 0.5f;
+    Vector2 ctrl1 = startPos + new Vector2(dx, 0f);
+    Vector2 ctrl2 = endPos - new Vector2(dx, 0f);
+
+    // Sample the curve
+    for (int i = 0; i <= segments; i++)
+    {
+        float t = i / (float)segments;
+        Vector2 p = CubicBezier(startPos, ctrl1, ctrl2, endPos, t);
+        sampledPoints.Add(p);
+    }
+
+    // We define an "outer ring" (alpha=0) and an "inner ring" (alpha=1)
+    // so we can fade out the edges.
+    float outerThickness = lineThickness * 0.5f;
+    float innerThickness = outerThickness - 1f; // 1px fade region
+
+    for (int i = 0; i < sampledPoints.Count - 1; i++)
+    {
+        Vector2 p0 = sampledPoints[i];
+        Vector2 p1 = sampledPoints[i + 1];
+
+        Vector2 dir = (p1 - p0).normalized;
+        Vector2 normal = new Vector2(-dir.y, dir.x);
+
+        // Outer ring (alpha=0)
+        Vector2 v0 = p0 + normal * outerThickness;
+        Vector2 v1 = p0 - normal * outerThickness;
+        Vector2 v2 = p1 - normal * outerThickness;
+        Vector2 v3 = p1 + normal * outerThickness;
+
+        // Inner ring (alpha=1)
+        Vector2 v0i = p0 + normal * innerThickness;
+        Vector2 v1i = p0 - normal * innerThickness;
+        Vector2 v2i = p1 - normal * innerThickness;
+        Vector2 v3i = p1 + normal * innerThickness;
+
+        int idx = vh.currentVertCount;
+
+        // Add 8 vertices (outer ring + inner ring)
+        vh.AddVert(v0, new Color(color.r, color.g, color.b, 0), Vector2.zero);
+        vh.AddVert(v1, new Color(color.r, color.g, color.b, 0), Vector2.zero);
+        vh.AddVert(v2, new Color(color.r, color.g, color.b, 0), Vector2.zero);
+        vh.AddVert(v3, new Color(color.r, color.g, color.b, 0), Vector2.zero);
+
+        vh.AddVert(v0i, new Color(color.r, color.g, color.b, 1), Vector2.zero);
+        vh.AddVert(v1i, new Color(color.r, color.g, color.b, 1), Vector2.zero);
+        vh.AddVert(v2i, new Color(color.r, color.g, color.b, 1), Vector2.zero);
+        vh.AddVert(v3i, new Color(color.r, color.g, color.b, 1), Vector2.zero);
+
+        // Bridge the outer ring (alpha=0) to the inner ring (alpha=1)
+        vh.AddTriangle(idx,   idx+4, idx+5);
+        vh.AddTriangle(idx,   idx+5, idx+1);
+
+        vh.AddTriangle(idx+1, idx+5, idx+6);
+        vh.AddTriangle(idx+1, idx+6, idx+2);
+
+        vh.AddTriangle(idx+2, idx+6, idx+7);
+        vh.AddTriangle(idx+2, idx+7, idx+3);
+
+        vh.AddTriangle(idx+3, idx+7, idx+4);
+        vh.AddTriangle(idx+3, idx+4, idx);
+
+        // **Fill the center** (the inner ring) so we don't just get an outline
+        vh.AddTriangle(idx+4, idx+5, idx+6);
+        vh.AddTriangle(idx+4, idx+6, idx+7);
+    }
+}
+
+
 
     private Vector2 CubicBezier(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float t)
     {
         float u = 1f - t;
-        float tt = t*t;
-        float uu = u*u;
-        float uuu = uu*u;
-        float ttt = tt*t;
+        float tt = t * t;
+        float uu = u * u;
+        float uuu = uu * u;
+        float ttt = tt * t;
 
         Vector2 p = uuu * p0;
         p += 3f * uu * t * p1;
@@ -1581,66 +2161,233 @@ public class UICubicBezier : Graphic
     private void AddQuad(Vector2 v0, Vector2 v1, Vector2 v2, Vector2 v3, VertexHelper vh)
     {
         int idx = vh.currentVertCount;
-        vh.AddVert(v0, color, Vector2.zero);
-        vh.AddVert(v1, color, Vector2.zero);
-        vh.AddVert(v2, color, Vector2.zero);
-        vh.AddVert(v3, color, Vector2.zero);
 
-        vh.AddTriangle(idx, idx+1, idx+2);
-        vh.AddTriangle(idx, idx+2, idx+3);
+        // Vertices on the "edge" get alpha = 0, center vertices get alpha = 1
+        Color edgeColor = new Color(color.r, color.g, color.b, 0);
+        Color centerColor = new Color(color.r, color.g, color.b, 1);
+
+        vh.AddVert(v0, edgeColor, Vector2.zero);
+        vh.AddVert(v1, edgeColor, Vector2.zero);
+        vh.AddVert(v2, edgeColor, Vector2.zero);
+        vh.AddVert(v3, edgeColor, Vector2.zero);
+
+        // Two triangles
+        vh.AddTriangle(idx, idx + 1, idx + 2);
+        vh.AddTriangle(idx, idx + 2, idx + 3);
     }
 
+
     /// <summary>
-    /// Update the curve’s start/end in local coordinates.
+    /// Updates the curve’s start and end positions in local coordinates and forces a redraw.
     /// </summary>
     public void UpdateCurve(Vector2 startLocal, Vector2 endLocal)
     {
         startPos = startLocal;
-        endPos   = endLocal;
+        endPos = endLocal;
         SetVerticesDirty();
     }
 
     /// <summary>
-    /// Custom Raycast so we only register clicks if pointer is near the line.
+    /// Custom Raycast so that pointer events only register if the pointer is near the line.
     /// </summary>
     public override bool Raycast(Vector2 sp, Camera eventCamera)
     {
-        // Convert screen point to local coords
         Vector2 localPos;
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, sp, eventCamera, out localPos))
             return false;
 
-        // If we have no sampled points, reject
-        if (sampledPoints.Count < 2) return false;
+        if (sampledPoints.Count < 2)
+            return false;
 
-        float maxDist = lineThickness*0.5f + 2f; // small margin
+        float maxDist = lineThickness * 0.5f + 2f;
         float minDistance = float.MaxValue;
 
-        // find min distance from localPos to any segment
-        for (int i=0; i<sampledPoints.Count-1; i++)
+        for (int i = 0; i < sampledPoints.Count - 1; i++)
         {
             Vector2 segStart = sampledPoints[i];
-            Vector2 segEnd   = sampledPoints[i+1];
+            Vector2 segEnd = sampledPoints[i + 1];
             float dist = DistanceToSegment(localPos, segStart, segEnd);
-            if (dist < minDistance) 
+            if (dist < minDistance)
                 minDistance = dist;
-            if (minDistance < maxDist) 
-                return true; // early exit
+            if (minDistance < maxDist)
+                return true;
         }
         return false;
     }
 
-    // helper for point-line distance
     private float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b)
     {
         Vector2 ap = p - a;
         Vector2 ab = b - a;
-        float magAB = ab.sqrMagnitude;
-        float dot = Vector2.Dot(ap, ab)/magAB;
+        float abSqr = ab.sqrMagnitude;
+        float dot = Vector2.Dot(ap, ab) / abSqr;
         dot = Mathf.Clamp01(dot);
-        Vector2 proj = a + ab*dot;
+        Vector2 proj = a + ab * dot;
         return (p - proj).magnitude;
     }
 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Wizards\WizardController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using TMPro;
+using System.Collections.Generic;
+
+public enum FiringDirection
+{
+    Up,
+    Down
+}
+
+public class WizardController : MonoBehaviour
+{
+    [Header("Wizard Configuration")]
+    public bool isEnemy = false;
+
+    [Header("Wizard Stats")]
+    public float maxHP = 100f;
+    public float currentHP;
+    [Tooltip("Base aim spread in degrees; higher values mean a wider spread.")]
+    public float baseAimSpread = 5f;
+
+    [Header("Firing Settings")]
+    [Tooltip("Determines if the wizard fires upward (default) or downward.")]
+    public FiringDirection firingDirection = FiringDirection.Up;
+    [Tooltip("The transform where spells are spawned. Its original Y value is used as reference.")]
+    public Transform spellSpawnPoint;
+    [Tooltip("Projectile prefab to be cast.")]
+    public GameObject spellProjectilePrefab;
+    public float projectileSpeed = 10f;
+    [Tooltip("Enable friendly fire (projectile can damage friendlies)")]
+    public bool friendlyFireEnabled = false;
+
+    [Header("UI")]
+    public TMP_Text hpText;
+
+    private float originalSpawnY = 0f;
+    public List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
+
+    private void Awake()
+    {
+        currentHP = maxHP;
+        UpdateHPUI();
+
+#if UNITY_EDITOR
+        // Store the original Y value if not already stored.
+        if (spellSpawnPoint != null && originalSpawnY == 0f)
+            originalSpawnY = spellSpawnPoint.localPosition.y;
+#endif
+    }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        // When the firing direction changes, update spellSpawnPoint's Y coordinate.
+        if (spellSpawnPoint != null)
+        {
+            // Ensure we have stored the original Y value.
+            if (originalSpawnY == 0f)
+                originalSpawnY = spellSpawnPoint.localPosition.y;
+
+            Vector2 pos = spellSpawnPoint.localPosition;
+            if (firingDirection == FiringDirection.Down)
+                pos.y = -Mathf.Abs(originalSpawnY);
+            else
+                pos.y = Mathf.Abs(originalSpawnY);
+            spellSpawnPoint.localPosition = pos;
+        }
+    }
+#endif
+
+    public void TakeDamage(float damage)
+    {
+        currentHP -= damage;
+        if (currentHP < 0)
+            currentHP = 0;
+        UpdateHPUI();
+        if (currentHP <= 0)
+        {
+            Debug.Log($"{gameObject.name} has been defeated.");
+            // Add additional death logic if needed.
+        }
+    }
+
+    private void UpdateHPUI()
+    {
+        if (hpText != null)
+            hpText.text = $"HP: {Mathf.Floor(currentHP)}/{maxHP}";
+    }
+
+    /// <summary>
+    /// Casts a spell. The projectile is spawned at spellSpawnPoint.
+    /// The projectile's rotation is based on firingDirection and a random deviation within ±finalAimSpread.
+    /// Also passes burning and friendly-fire parameters.
+    /// </summary>
+    public void CastSpell(float finalDamage, float finalAimSpread, float burningDamage, float burningDuration, bool piercing, bool friendlyFire)
+    {
+        if (isEnemy)
+            return; // Enemies do not cast spells via node chain.
+
+        if (spellProjectilePrefab == null || spellSpawnPoint == null)
+        {
+            Debug.LogWarning("Spell projectile prefab or spawn point not set.");
+            return;
+        }
+
+        // Base rotation: for Up, identity; for Down, flip 180°.
+        Quaternion baseRotation = (firingDirection == FiringDirection.Up) ? Quaternion.identity : Quaternion.Euler(0, 0, 180);
+        float deviation = Random.Range(-finalAimSpread, finalAimSpread);
+        Quaternion finalRotation = baseRotation * Quaternion.Euler(0, 0, deviation);
+
+        GameObject projObj = Instantiate(spellProjectilePrefab, spellSpawnPoint.position, finalRotation);
+        SpellProjectile projectile = projObj.GetComponent<SpellProjectile>();
+        if (projectile != null)
+        {
+            projectile.Initialize(finalDamage, projectileSpeed);
+            projectile.burningDamage = burningDamage;
+            projectile.burningDuration = burningDuration;
+            projectile.destroyOnHit = !piercing; // If piercing is true, do not destroy.
+            projectile.friendlyFire = friendlyFire;
+            projectile.casterIsEnemy = isEnemy;
+        }
+    }
+
+    private void Update()
+    {
+        float delta = Time.deltaTime;
+        for (int i = activeStatusEffects.Count - 1; i >= 0; i--)
+        {
+            activeStatusEffects[i].UpdateEffect(this, delta);
+            if (activeStatusEffects[i].IsExpired())
+                activeStatusEffects.RemoveAt(i);
+        }
+    }
+
+    public void ApplyStatusEffect(StatusEffect effect)
+    {
+        activeStatusEffects.Add(effect);
+    }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Wizards\WizardPreset.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+
+[CreateAssetMenu(fileName = "WizardPreset", menuName = "Wizards/WizardPreset")]
+public class WizardPreset : ScriptableObject
+{
+    public string presetName;
+    public float maxHP = 100f;
+    public float accuracy = 5f;      // In degrees: how much the projectile can deviate.
+    public float critChance = 0f;    // Future use.
+    public FiringDirection baseFiringDirection = FiringDirection.Up;
+    // Add additional stats as needed.
+}
 
