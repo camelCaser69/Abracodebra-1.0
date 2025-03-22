@@ -67,15 +67,15 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 9fc1ef308eedf0e468d3f7e1958dbc2b, type: 2}
+  m_sharedMaterial: {fileID: 4594303012967394465, guid: 9fc1ef308eedf0e468d3f7e1958dbc2b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4280210432
+  m_fontColor: {r: 0, g: 0.8301887, b: 0.11802769, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -185,12 +185,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 933627a6a3934b31a6bcb072b4c75dc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  preset: {fileID: 0}
   isEnemy: 0
+  maxHP: 100
   currentHP: 0
+  baseAimSpread: 5
+  firingDirection: 0
   spellSpawnPoint: {fileID: 2286930423113279058}
   spellProjectilePrefab: {fileID: 6783261795052518866, guid: 75839977a9e2c664a8404ef7a23d97ba, type: 3}
   projectileSpeed: 10
+  friendlyFireEnabled: 0
   hpText: {fileID: 1461922507262685618}
 --- !u!212 &-6191398404550704219
 SpriteRenderer:

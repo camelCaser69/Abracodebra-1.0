@@ -1,19 +1,35 @@
-﻿// Assets/Scripts/Nodes/Testing/NodeTestInitializer.cs
-using UnityEngine;
-// If NodeEditorController is in a specific namespace, include it, e.g.:
-// using YourProject.Nodes.UI;
+﻿using UnityEngine;
 
 public class NodeTestInitializer : MonoBehaviour
 {
     [SerializeField] private NodeEditorController editorController;
+    [SerializeField] private NodeExecutor nodeExecutor;
 
     private NodeGraph testGraph;
 
-    void Start()
+    private void Start()
     {
+        // 1) Create a new NodeGraph (or load an existing one, if you prefer).
         testGraph = new NodeGraph();
-        // Load the empty graph into the editor
-        editorController.LoadGraph(testGraph);
+
+        // 2) Make the editor load that graph, so new nodes appear in the UI.
+        if (editorController != null)
+        {
+            editorController.LoadGraph(testGraph);
+        }
+        else
+        {
+            Debug.LogWarning("[NodeTestInitializer] editorController is missing.");
+        }
+
+        // 3) Pass the SAME graph to the executor.
+        if (nodeExecutor != null)
+        {
+            nodeExecutor.SetGraph(testGraph);
+        }
+        else
+        {
+            Debug.LogWarning("[NodeTestInitializer] nodeExecutor is missing.");
+        }
     }
-    
 }

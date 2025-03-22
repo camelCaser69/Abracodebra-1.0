@@ -7,20 +7,18 @@ public class NodeData
 {
     public string nodeId;
     public string nodeDisplayName;
-    public Vector2 editorPosition;
-    
+    public Vector2 editorPosition; // For UI positioning
+    public HexCoords coords;       // Hex-based position
     public Color backgroundColor = Color.gray;
-    public string description = ""; // Ensure this field exists.
-
-    public List<NodePort> inputs;
-    public List<NodePort> outputs;
+    public string description = "";
+    public List<NodePort> ports;   // Up to 6 ports (max 1 per side)
     public List<NodeEffectData> effects;
 
     public NodeData()
     {
         nodeId = Guid.NewGuid().ToString();
-        inputs = new List<NodePort>();
-        outputs = new List<NodePort>();
+        ports = new List<NodePort>();
         effects = new List<NodeEffectData>();
+        coords = new HexCoords(0, 0);
     }
 }

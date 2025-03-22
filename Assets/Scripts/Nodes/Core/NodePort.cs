@@ -1,21 +1,23 @@
-﻿/* Assets/Scripts/Nodes/Core/NodePort.cs
-   Represents a single port on a NodeData (input or output). */
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
+
+public enum PortType { General, Mana, Condition }
+
+public enum HexSideFlat { Top, One, Two, Three, Four, Five }
 
 [Serializable]
 public class NodePort
 {
-    public string portId;
-    public string portName;
+    public bool isInput;
     public PortType portType;
-    public List<string> connectedPortIds;
+    public HexSideFlat side;
 
-    public NodePort()
+    public NodePort(bool isInput, PortType portType, HexSideFlat side)
     {
-        portId = Guid.NewGuid().ToString();
-        connectedPortIds = new List<string>();
+        this.isInput = isInput;
+        this.portType = portType;
+        this.side = side;
     }
+
+    public NodePort() { }
 }

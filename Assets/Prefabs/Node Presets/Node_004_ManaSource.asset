@@ -13,12 +13,12 @@ MonoBehaviour:
   m_Name: Node_004_ManaSource
   m_EditorClassIdentifier: 
   displayName: Mana Storage
-  backgroundColor: {r: 0, g: 0, b: 0, a: 0.8}
+  backgroundColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 0.9490196}
   description: Pool of mana
   ports:
-  - portName: Mana
+  - isInput: 0
     portType: 1
-    isInput: 0
+    side: 0
   effects:
   - effectType: 2
     effectValue: 20

@@ -7,46 +7,26 @@ using TMPro;
 public class NodeExecutor : MonoBehaviour
 {
     [SerializeField] private NodeGraph currentGraph;
-
     [Header("Debug Settings")]
     public float waitTimeBetweenNodes = 0.5f;
-    public TMP_Text debugOutput;
+    public TMP_Text debugOutput; // optional UI text
 
-    private float totalDamage = 0f;
-    private float totalManaCost = 0f;
-    private List<string> skippedNodes = new List<string>();
+    private Dictionary<HexCoords, NodeData> coordsMap;
+    private HashSet<string> visited;
 
     private void Update()
     {
-        RechargeNodesOverTime();
-
+        // Press SPACE => BFS
         if (Input.GetKeyDown(KeyCode.Space))
-            ExecuteGraph();
-    }
-
-    private void RechargeNodesOverTime()
-    {
-        if (currentGraph == null) return;
-
-        foreach (var node in currentGraph.nodes)
         {
-            var storage = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
-            if (storage != null)
-            {
-                float cap = storage.effectValue;
-                float cur = storage.secondaryValue;
-                var rateEff = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaRechargeRate);
-                float rate = (rateEff != null) ? rateEff.effectValue : 0f;
-                cur += rate * Time.deltaTime;
-                if (cur > cap) cur = cap;
-                storage.secondaryValue = cur;
-            }
+            ExecuteGraph();
         }
     }
 
     public void SetGraph(NodeGraph graph)
     {
         currentGraph = graph;
+        Debug.Log("[NodeExecutor] Graph set via SetGraph(). Node count=" + (graph != null ? graph.nodes.Count : 0));
     }
 
     public NodeGraph GetGraph() => currentGraph;
@@ -55,210 +35,149 @@ public class NodeExecutor : MonoBehaviour
     {
         if (currentGraph == null || currentGraph.nodes.Count == 0)
         {
-            Debug.LogWarning("[NodeExecutor] No graph or no nodes to execute!");
+            LogDebug("[NodeExecutor] No graph or no nodes to execute!");
             return;
         }
-
-        totalDamage = 0f;
-        totalManaCost = 0f;
-        skippedNodes.Clear();
-
         StopAllCoroutines();
-        StartCoroutine(RunChainCoroutine());
-    }
+        ClearDebug();
+        BuildCoordsMap();
+        visited = new HashSet<string>();
 
-    private IEnumerator RunChainCoroutine()
-    {
-        ClearDebugOutput();
-        Dictionary<string, int> inboundCount = BuildInboundCount();
-        List<NodeData> startNodes = currentGraph.nodes.Where(n => inboundCount[n.nodeId] == 0).ToList();
+        List<NodeData> startNodes = FindStartNodes();
         if (startNodes.Count == 0)
         {
-            LogDebug("[NodeExecutor] No start nodes found. Aborting run.");
-            yield break;
+            LogDebug("[NodeExecutor] No start nodes found. Aborting BFS.");
+            return;
         }
+        foreach (var startNode in startNodes)
+        {
+            StartCoroutine(RunChainBFS(startNode));
+        }
+    }
 
-        Queue<NodeData> queue = new Queue<NodeData>();
-        HashSet<string> visited = new HashSet<string>();
-        foreach (var s in startNodes)
-            queue.Enqueue(s);
+    private void BuildCoordsMap()
+    {
+        coordsMap = new Dictionary<HexCoords, NodeData>();
+        foreach (var node in currentGraph.nodes)
+        {
+            coordsMap[node.coords] = node;
+        }
+    }
 
-        List<NodeData> chain = new List<NodeData>();
+    private List<NodeData> FindStartNodes()
+    {
+        List<NodeData> result = new List<NodeData>();
+        foreach (var node in currentGraph.nodes)
+        {
+            if (!HasInbound(node))
+                result.Add(node);
+        }
+        return result;
+    }
+
+    private bool HasInbound(NodeData node)
+    {
+        foreach (var port in node.ports)
+        {
+            if (!port.isInput)
+                continue;
+            int sideIndex = SideIndex(port.side);
+            int oppSide = OppositeSideIndex(sideIndex);
+            HexCoords neighborCoords = HexCoords.GetNeighbor(node.coords, oppSide);
+            if (!coordsMap.ContainsKey(neighborCoords))
+                continue;
+            var neighborNode = coordsMap[neighborCoords];
+            var neighborPort = neighborNode.ports
+                .FirstOrDefault(p => !p.isInput && SideIndex(p.side) == oppSide);
+            if (neighborPort != null)
+                return true;
+        }
+        return false;
+    }
+
+    private IEnumerator RunChainBFS(NodeData startNode)
+    {
+        Queue<HexCoords> queue = new Queue<HexCoords>();
+        queue.Enqueue(startNode.coords);
+
         while (queue.Count > 0)
         {
-            NodeData curr = queue.Dequeue();
-            if (visited.Contains(curr.nodeId))
+            HexCoords coords = queue.Dequeue();
+            if (!coordsMap.ContainsKey(coords))
                 continue;
-            visited.Add(curr.nodeId);
-            chain.Add(curr);
+            NodeData node = coordsMap[coords];
+            if (visited.Contains(node.nodeId))
+                continue;
+            visited.Add(node.nodeId);
 
-            if (currentGraph.adjacency != null && currentGraph.adjacency.ContainsKey(curr.nodeId))
+            yield return new WaitForSeconds(waitTimeBetweenNodes);
+            ProcessNode(node);
+
+            // For each output side...
+            foreach (var port in node.ports)
             {
-                foreach (var childId in currentGraph.adjacency[curr.nodeId])
+                if (port.isInput) continue; // skip input
+                int sIndex = SideIndex(port.side);
+                HexCoords neighborCoords = HexCoords.GetNeighbor(coords, sIndex);
+                if (!coordsMap.ContainsKey(neighborCoords))
+                    continue;
+                NodeData neighborNode = coordsMap[neighborCoords];
+                int oppIndex = OppositeSideIndex(sIndex);
+                bool hasInputMatch = neighborNode.ports.Any(p => p.isInput && SideIndex(p.side) == oppIndex);
+                if (hasInputMatch && !visited.Contains(neighborNode.nodeId))
                 {
-                    inboundCount[childId]--;
-                    if (inboundCount[childId] <= 0)
-                    {
-                        NodeData child = currentGraph.nodes.FirstOrDefault(n => n.nodeId == childId);
-                        if (child != null)
-                            queue.Enqueue(child);
-                    }
+                    queue.Enqueue(neighborCoords);
                 }
             }
         }
+        LogDebug("[NodeExecutor] BFS from start node completed.");
+    }
 
-        string chainLog = string.Join(" -> ", chain.Select(n => n.nodeDisplayName));
-        LogDebug("[NodeExecutor] Chain: " + chainLog);
+    private void ProcessNode(NodeData node)
+    {
+        LogDebug($"[NodeExecutor] Processing node '{node.nodeDisplayName}' at coords ({node.coords.q}, {node.coords.r}).");
 
-        float accumulatedAimSpreadModifier = 0f;
-        float accumulatedBurningDamage = 0f;
-        float accumulatedBurningDuration = 0f;
-        bool accumulatedPiercing = false;
-        bool accumulatedFriendlyFire = false;
-
-        foreach (var node in chain)
+        // If node has an 'Output' effect, find its NodeView => call OutputNodeEffect.
+        bool hasOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
+        if (hasOutput)
         {
-            yield return new WaitForSeconds(waitTimeBetweenNodes);
-            bool executed = false;
-            float cost = node.effects.Where(e => e.effectType == NodeEffectType.ManaCost).Sum(e => e.effectValue);
-
-            if (cost > 0f && (!currentGraph.manaConnections.ContainsKey(node.nodeId) ||
-                              string.IsNullOrEmpty(currentGraph.manaConnections[node.nodeId])))
+            // Locate the NodeView in the scene with matching nodeId.
+            NodeView view = FindNodeViewById(node.nodeId);
+            if (view != null)
             {
-                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - no valid mana source connected.");
-                skippedNodes.Add(node.nodeDisplayName);
-                continue;
-            }
-
-            if (cost <= 0f)
-            {
-                float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
-                totalDamage += dmg;
-                executed = true;
-                LogDebug($"[NodeExecutor] Executed '{node.nodeDisplayName}' with no cost, damage={Mathf.Floor(dmg)}");
-            }
-            else
-            {
-                string sourceId = currentGraph.manaConnections[node.nodeId];
-                NodeData sourceNode = currentGraph.nodes.FirstOrDefault(n => n.nodeId == sourceId);
-                if (sourceNode == null)
+                // Attempt to get OutputNodeEffect on that NodeView
+                OutputNodeEffect outputComp = view.GetComponent<OutputNodeEffect>();
+                if (outputComp != null)
                 {
-                    LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - upstream mana node not found.");
-                    skippedNodes.Add(node.nodeDisplayName);
-                    continue;
-                }
-
-                var storageEff = sourceNode.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
-                if (storageEff == null)
-                {
-                    LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - source node '{sourceNode.nodeDisplayName}' has no ManaStorage.");
-                    skippedNodes.Add(node.nodeDisplayName);
-                    continue;
-                }
-
-                float cap = storageEff.effectValue;
-                float cur = storageEff.secondaryValue;
-
-                if (cur < cost)
-                {
-                    LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' (insufficient mana in '{sourceNode.nodeDisplayName}': {Mathf.Floor(cur)}/{cost}).");
-                    skippedNodes.Add(node.nodeDisplayName);
-                    continue;
+                    outputComp.Activate(); // Fire the projectile logic
                 }
                 else
                 {
-                    cur -= cost;
-                    storageEff.secondaryValue = cur;
-                    totalManaCost += cost;
-
-                    float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
-                    totalDamage += dmg;
-                    executed = true;
-                    LogDebug($"[NodeExecutor] '{node.nodeDisplayName}' executed: cost={Mathf.Floor(cost)}, damage={Mathf.Floor(dmg)}, source='{sourceNode.nodeDisplayName}', leftoverMana={Mathf.Floor(cur)}/{Mathf.Floor(cap)}");
+                    LogDebug("[NodeExecutor] Warning: Node has Output effect but no OutputNodeEffect component found.");
                 }
             }
-
-            if (executed)
+            else
             {
-                foreach (var eff in node.effects)
-                {
-                    if (eff.effectType == NodeEffectType.AimSpread)
-                        accumulatedAimSpreadModifier += eff.effectValue;
-                    else if (eff.effectType == NodeEffectType.Burning)
-                    {
-                        accumulatedBurningDamage += eff.effectValue;
-                        accumulatedBurningDuration += eff.secondaryValue;
-                    }
-                    else if (eff.effectType == NodeEffectType.Piercing)
-                        accumulatedPiercing = true;
-                    else if (eff.effectType == NodeEffectType.FriendlyFire)
-                        accumulatedFriendlyFire = true;
-                }
-            }
-
-            bool isOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
-            if (isOutput)
-            {
-                LogDebug($"[NodeExecutor] Output node '{node.nodeDisplayName}' reached.");
-                LogDebug($"[NodeExecutor] Total mana cost: {Mathf.Floor(totalManaCost)}");
-                string skipStr = (skippedNodes.Count > 0) ? string.Join(", ", skippedNodes) : "None";
-                LogDebug($"[NodeExecutor] Skipped nodes: {skipStr}");
-                LogDebug($"[NodeExecutor] Final damage: {Mathf.Floor(totalDamage)}");
-
-                NodeView outputView = FindNodeViewById(node.nodeId);
-                if (outputView != null)
-                {
-                    OutputNodeEffect outputEffect = outputView.GetComponent<OutputNodeEffect>();
-                    if (outputEffect != null)
-                    {
-                        outputEffect.Activate(totalDamage, accumulatedAimSpreadModifier, accumulatedBurningDamage, accumulatedBurningDuration, accumulatedPiercing, accumulatedFriendlyFire);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("[NodeExecutor] Output node effect not found on NodeView.");
-                    }
-                }
+                LogDebug("[NodeExecutor] Warning: No NodeView found for Output node. Can't spawn projectile.");
             }
         }
-
-        LogDebug("[NodeExecutor] BFS execution complete.");
     }
-
+    
+    // Helper method to find the NodeView with the same nodeId in the scene.
     private NodeView FindNodeViewById(string nodeId)
     {
-        // Use FindObjectsByType
-        NodeView[] views = Object.FindObjectsByType<NodeView>(FindObjectsSortMode.None);
-        foreach (var view in views)
+        NodeView[] allViews = FindObjectsOfType<NodeView>();
+        foreach (var v in allViews)
         {
-            if (view.GetNodeData().nodeId == nodeId)
-                return view;
+            if (v.GetNodeData().nodeId == nodeId)
+                return v;
         }
         return null;
     }
-
-    private Dictionary<string, int> BuildInboundCount()
+    
+    private void ClearDebug()
     {
-        Dictionary<string, int> inboundCount = new Dictionary<string, int>();
-        foreach (var node in currentGraph.nodes)
-            inboundCount[node.nodeId] = 0;
-
-        if (currentGraph.adjacency != null)
-        {
-            foreach (var kvp in currentGraph.adjacency)
-            {
-                foreach (var childId in kvp.Value)
-                {
-                    inboundCount[childId]++;
-                }
-            }
-        }
-        return inboundCount;
-    }
-
-    private void ClearDebugOutput()
-    {
-        if (debugOutput)
-            debugOutput.text = "";
+        if (debugOutput) debugOutput.text = "";
     }
 
     private void LogDebug(string msg)
@@ -266,5 +185,17 @@ public class NodeExecutor : MonoBehaviour
         Debug.Log(msg);
         if (debugOutput)
             debugOutput.text += msg + "\n";
+    }
+
+    private int SideIndex(HexSideFlat side)
+    {
+        // Top=0, One=1, Two=2, Three=3, Four=4, Five=5
+        return (int)side;
+    }
+
+    private int OppositeSideIndex(int sideIndex)
+    {
+        // sideIndex + 3 mod 6
+        return (sideIndex + 3) % 6;
     }
 }

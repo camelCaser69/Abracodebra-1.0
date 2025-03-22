@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-// [CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
+[CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
 public class NodeDefinition : ScriptableObject
 {
     public string displayName;
@@ -20,23 +20,19 @@ public class NodeDefinition : ScriptableObject
             string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
             string[] parts = fileName.Split('_');
             if (parts.Length >= 3)
-            {
                 displayName = string.Join("_", parts.Skip(2).ToArray());
-            }
         }
     }
 #endif
 
     private void OnEnable()
     {
-        // Auto-add default General ports if none exist.
         if (ports == null || ports.Count == 0)
         {
             ports = new List<PortDefinition>();
-            PortDefinition inputPort = new PortDefinition { portName = "Input", portType = PortType.General, isInput = true };
-            PortDefinition outputPort = new PortDefinition { portName = "Output", portType = PortType.General, isInput = false };
-            ports.Add(inputPort);
-            ports.Add(outputPort);
+            // Default: one input on Top and one output on Three (opposite for flat-top)
+            ports.Add(new PortDefinition { isInput = true, portType = PortType.General, side = HexSideFlat.Top });
+            ports.Add(new PortDefinition { isInput = false, portType = PortType.General, side = HexSideFlat.Three });
         }
     }
 }

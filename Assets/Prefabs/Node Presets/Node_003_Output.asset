@@ -13,13 +13,13 @@ MonoBehaviour:
   m_Name: Node_003_Output
   m_EditorClassIdentifier: 
   displayName: Output
-  backgroundColor: {r: 0, g: 0, b: 0, a: 0.8}
+  backgroundColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 0.9490196}
   description: Each node chain has to end with this Output node
   ports:
-  - portName: General
+  - isInput: 1
     portType: 0
-    isInput: 1
+    side: 4
   effects:
   - effectType: 4
-    effectValue: 0
+    effectValue: 20
     secondaryValue: 0

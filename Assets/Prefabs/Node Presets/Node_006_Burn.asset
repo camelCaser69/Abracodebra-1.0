@@ -13,21 +13,21 @@ MonoBehaviour:
   m_Name: Node_006_Burn
   m_EditorClassIdentifier: 
   displayName: Burn
-  backgroundColor: {r: 0.4716981, g: 0.024474904, b: 0.024474904, a: 1}
+  backgroundColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 0.9490196}
   description: 
   ports:
-  - portName: 
+  - isInput: 1
     portType: 0
-    isInput: 1
-  - portName: 
+    side: 2
+  - isInput: 0
     portType: 0
-    isInput: 0
-  - portName: 
+    side: 3
+  - isInput: 1
     portType: 1
-    isInput: 1
+    side: 6
   effects:
   - effectType: 0
-    effectValue: 2
+    effectValue: 20
     secondaryValue: 0
   - effectType: 6
     effectValue: 1

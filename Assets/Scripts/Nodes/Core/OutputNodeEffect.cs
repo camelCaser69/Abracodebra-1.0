@@ -1,23 +1,36 @@
 ﻿using UnityEngine;
 using System.Linq;
 
+/// <summary>
+/// Attach this to the NodeView prefab if the node has Output effect,
+/// or have BFS call it directly. 
+/// It calls WizardController to spawn a projectile/spell.
+/// </summary>
 public class OutputNodeEffect : MonoBehaviour
 {
-    public void Activate(float finalDamage, float aimSpreadModifier, float burningDamage, float burningDuration, bool piercing, bool friendlyFire)
+    /// <summary>
+    /// This method is invoked by NodeExecutor when BFS processes an 'Output' node.
+    /// You can pass any parameters (damage, aim, etc.) or just do a test projectile.
+    /// </summary>
+    public void Activate()
     {
-        // Use FindObjectsByType
-        WizardController[] allWizards = Object.FindObjectsByType<WizardController>(FindObjectsSortMode.None);
-        WizardController wizard = allWizards.FirstOrDefault(w => !w.isEnemy);
+        Debug.Log("[OutputNodeEffect] Activate() called. Spawning projectile or calling wizard cast.");
 
-        if (wizard != null)
+        // For example, find the local (player) wizard and cast a test projectile:
+        WizardController playerWiz = FindObjectsOfType<WizardController>()
+            .FirstOrDefault(w => !w.isEnemy);
+
+        if (playerWiz)
         {
-            float finalAimSpread = Mathf.Clamp(wizard.baseAimSpread + aimSpreadModifier, 0f, 180f);
-            wizard.CastSpell(finalDamage, finalAimSpread, burningDamage, burningDuration, piercing, friendlyFire);
-            Debug.Log($"[OutputNodeEffect] Spell cast with damage: {finalDamage}, final aim spread: {finalAimSpread}, burning: {burningDamage} DPS for {burningDuration}s, piercing: {piercing}, friendlyFire: {friendlyFire}");
+            // Just an example. The real logic might pass finalDamage, aimSpread, etc.
+            playerWiz.CastSpell(finalDamage: 10f, finalAimSpread: 5f,
+                burningDamage: 0f, burningDuration: 0f,
+                piercing: false, friendlyFire: false);
+            Debug.Log("[OutputNodeEffect] Called player's CastSpell with sample values.");
         }
         else
         {
-            Debug.LogWarning("[OutputNodeEffect] No player WizardController found!");
+            Debug.LogWarning("[OutputNodeEffect] No friendly wizard found in scene.");
         }
     }
 }

@@ -13,21 +13,21 @@ MonoBehaviour:
   m_Name: Node_002_Piercing
   m_EditorClassIdentifier: 
   displayName: Piercing
-  backgroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  backgroundColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 0.9490196}
   description: 
   ports:
-  - portName: 
+  - isInput: 1
     portType: 1
-    isInput: 1
-  - portName: 
+    side: 1
+  - isInput: 1
     portType: 0
-    isInput: 1
-  - portName: 
+    side: 3
+  - isInput: 0
     portType: 0
-    isInput: 0
+    side: 4
   effects:
   - effectType: 0
-    effectValue: 0
+    effectValue: 20
     secondaryValue: 0
   - effectType: 7
     effectValue: 0

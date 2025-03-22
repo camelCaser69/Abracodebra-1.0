@@ -13,21 +13,21 @@ MonoBehaviour:
   m_Name: Node_001_AimSpread
   m_EditorClassIdentifier: 
   displayName: AimSpread
-  backgroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  backgroundColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 0.9490196}
   description: 
   ports:
-  - portName: General
+  - isInput: 1
     portType: 0
-    isInput: 1
-  - portName: General
+    side: 1
+  - isInput: 0
     portType: 0
-    isInput: 0
-  - portName: Mana
+    side: 3
+  - isInput: 1
     portType: 1
-    isInput: 1
+    side: 4
   effects:
   - effectType: 0
-    effectValue: 4
+    effectValue: 20
     secondaryValue: 0
   - effectType: 5
     effectValue: -4
