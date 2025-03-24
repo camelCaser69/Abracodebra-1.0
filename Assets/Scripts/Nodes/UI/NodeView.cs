@@ -72,7 +72,7 @@ public class NodeView : MonoBehaviour
                 effectsText.text = "No Effects";
             else
             {
-                string str = "Effects:\n";
+                string str = "";              //"Effects:\n";
                 foreach (var eff in nodeData.effects)
                     str += $"- {eff.effectType} ({eff.effectValue})\n";
                 effectsText.text = str;

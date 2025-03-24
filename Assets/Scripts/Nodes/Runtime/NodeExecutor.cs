@@ -17,6 +17,10 @@ public class NodeExecutor : MonoBehaviour
     private Dictionary<HexCoords, NodeData> coordsMap;
     private HashSet<string> visited;
 
+    // For accumulating energy info from the BFS chain:
+    private float accumulatedEnergyStorage  = 0f;
+    private float accumulatedPhotosynthesis = 0f;
+
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Space))
@@ -42,6 +46,10 @@ public class NodeExecutor : MonoBehaviour
         ClearDebug();
         BuildCoordsMap();
         visited = new HashSet<string>();
+
+        // Reset accumulators in case we want a fresh sum each time.
+        accumulatedEnergyStorage  = 0f;
+        accumulatedPhotosynthesis = 0f;
 
         List<NodeData> startNodes = FindStartNodes();
         if (startNodes.Count == 0)
@@ -75,13 +83,14 @@ public class NodeExecutor : MonoBehaviour
     {
         foreach (var port in node.ports)
         {
-            if (!port.isInput)
-                continue;
+            if (!port.isInput) continue;
+
             int sideIndex = (int)port.side;
-            int oppSide = (sideIndex + 3) % 6;
-            var neighborCoords = HexCoords.GetNeighbor(node.coords, oppSide);
-            if (!coordsMap.ContainsKey(neighborCoords))
+            int oppSide   = (sideIndex + 3) % 6;
+            HexCoords neighborCoords = HexCoords.GetNeighbor(node.coords, oppSide);
+            if (!coordsMap.ContainsKey(neighborCoords)) 
                 continue;
+
             var neighborNode = coordsMap[neighborCoords];
             bool hasOutputMatch = neighborNode.ports.Any(p => !p.isInput && (int)p.side == oppSide);
             if (hasOutputMatch)
@@ -100,22 +109,26 @@ public class NodeExecutor : MonoBehaviour
             HexCoords coords = queue.Dequeue();
             if (!coordsMap.ContainsKey(coords)) 
                 continue;
+
             NodeData node = coordsMap[coords];
-            if (visited.Contains(node.nodeId))
+            if (visited.Contains(node.nodeId)) 
                 continue;
+
             visited.Add(node.nodeId);
 
             yield return new WaitForSeconds(waitTimeBetweenNodes);
             ProcessNode(node);
 
+            // Follow output sides
             foreach (var port in node.ports)
             {
                 if (!port.isInput)
                 {
                     int sIndex = (int)port.side;
-                    var neighborCoords = HexCoords.GetNeighbor(coords, sIndex);
-                    if (!coordsMap.ContainsKey(neighborCoords))
+                    HexCoords neighborCoords = HexCoords.GetNeighbor(coords, sIndex);
+                    if (!coordsMap.ContainsKey(neighborCoords)) 
                         continue;
+
                     var neighborNode = coordsMap[neighborCoords];
                     int oppIndex = (sIndex + 3) % 6;
                     bool hasInputMatch = neighborNode.ports.Any(p => p.isInput && (int)p.side == oppIndex);
@@ -131,6 +144,21 @@ public class NodeExecutor : MonoBehaviour
     {
         LogDebug($"[NodeExecutor] Processing node '{node.nodeDisplayName}' at coords ({node.coords.q}, {node.coords.r}).");
 
+        // Accumulate Energy Storage and Photosynthesis from ANY node effect 
+        // in the BFS chain.
+        foreach (var eff in node.effects)
+        {
+            if (eff.effectType == NodeEffectType.EnergyStorage)
+            {
+                accumulatedEnergyStorage += eff.effectValue;
+            }
+            else if (eff.effectType == NodeEffectType.EnergyPhotosynthesis)
+            {
+                accumulatedPhotosynthesis += eff.effectValue;
+            }
+        }
+
+        // If it's a Seed node, spawn the plant now using the BFS accumulators.
         var seedEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.Seed);
         if (seedEffect != null)
         {
@@ -155,21 +183,35 @@ public class NodeExecutor : MonoBehaviour
         Vector2 spawnPos = gardener.GetPlantingPosition();
         GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
         PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
+
         if (growth != null)
         {
-            growth.stemMinLength    = Mathf.RoundToInt(seedEffect.effectValue);
-            growth.stemMaxLength    = Mathf.RoundToInt(seedEffect.secondaryValue);
-            growth.growthSpeed      = seedEffect.extra1;
-            growth.leafGap          = Mathf.RoundToInt(seedEffect.extra2);
+            // standard seed data
+            growth.stemMinLength = Mathf.RoundToInt(seedEffect.effectValue);
+            growth.stemMaxLength = Mathf.RoundToInt(seedEffect.secondaryValue);
+            growth.growthSpeed   = seedEffect.extra1;
+            growth.leafGap       = Mathf.RoundToInt(seedEffect.extra2);
             growth.leafPattern      = seedEffect.leafPattern; 
             growth.growthRandomness = seedEffect.growthRandomness;
-            LogDebug($"[NodeExecutor] Spawned plant => min={growth.stemMinLength}, max={growth.stemMaxLength}, spd={growth.growthSpeed}, leafGap={growth.leafGap}, pattern={growth.leafPattern}, rand={growth.growthRandomness}");
+
+            // new "energy" data from BFS sums
+            growth.maxEnergy       = accumulatedEnergyStorage;   // sum of all energy storages
+            growth.basePhotosynthesis = accumulatedPhotosynthesis; // sum of all photosynthesis rates
+
+            LogDebug($"[NodeExecutor] Spawned plant => " +
+                     $"Seed(min={growth.stemMinLength},max={growth.stemMaxLength},spd={growth.growthSpeed},gap={growth.leafGap},pat={growth.leafPattern},rand={growth.growthRandomness}), " +
+                     $"Energy(max={growth.maxEnergy}), Photosynthesis(base={growth.basePhotosynthesis})");
         }
+        else
+        {
+            LogDebug("[NodeExecutor] PlantGrowth missing on plantPrefab.");
+        }
+
+        // If you want each new seed to get its own accumulators, 
+        // reset them after spawning:
+        accumulatedEnergyStorage  = 0f;
+        accumulatedPhotosynthesis = 0f;
     }
-
-
-
-
 
     private void ClearDebug()
     {

@@ -1,0 +1,663 @@
+fileFormatVersion: 2
+guid: af36ec564c429184da248c6663a65cf5
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -379249250460920189
+    second: MiniNun_0
+  - first:
+      213: -3917647363209039490
+    second: MiniNun_1
+  - first:
+      213: 1747144050221349384
+    second: MiniNun_2
+  - first:
+      213: 2620070179293456002
+    second: MiniNun_3
+  - first:
+      213: 3748746118230657564
+    second: MiniNun_4
+  - first:
+      213: -7485738683850595965
+    second: MiniNun_5
+  - first:
+      213: 7674937601490535552
+    second: MiniNun_6
+  - first:
+      213: -2948941878727363272
+    second: MiniNun_7
+  - first:
+      213: 3902023006751040736
+    second: MiniNun_8
+  - first:
+      213: 7773953320318388504
+    second: MiniNun_9
+  - first:
+      213: 9175446305547091051
+    second: MiniNun_10
+  - first:
+      213: 1506240757878599082
+    second: MiniNun_11
+  - first:
+      213: 2009468874379644536
+    second: MiniNun_12
+  - first:
+      213: -2007215788748903829
+    second: MiniNun_13
+  - first:
+      213: -4390479601635437159
+    second: MiniNun_14
+  - first:
+      213: 7343806752777066944
+    second: MiniNun_15
+  - first:
+      213: -8156397957081406058
+    second: MiniNun_16
+  - first:
+      213: -4422282888733584269
+    second: MiniNun_17
+  - first:
+      213: 8250195532974145357
+    second: MiniNun_18
+  - first:
+      213: 5124181407342733350
+    second: MiniNun_19
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MiniNun_0
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 160
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 38691f8e0d2acbaf0800000000000000
+      internalID: -379249250460920189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_1
+      rect:
+        serializedVersion: 2
+        x: 43
+        y: 160
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e71fda0da78b1a9c0800000000000000
+      internalID: -3917647363209039490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_2
+      rect:
+        serializedVersion: 2
+        x: 75
+        y: 160
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80a71e4c14a1f3810800000000000000
+      internalID: 1747144050221349384
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_3
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 160
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 286616342fb5c5420800000000000000
+      internalID: 2620070179293456002
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_4
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 128
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1a434a9bb8360430800000000000000
+      internalID: 3748746118230657564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_5
+      rect:
+        serializedVersion: 2
+        x: 44
+        y: 128
+        width: 11
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3816fa304505d1890800000000000000
+      internalID: -7485738683850595965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_6
+      rect:
+        serializedVersion: 2
+        x: 76
+        y: 128
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 084c122c51bd28a60800000000000000
+      internalID: 7674937601490535552
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_7
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 97
+        width: 9
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 835be274cf04317d0800000000000000
+      internalID: -2948941878727363272
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_8
+      rect:
+        serializedVersion: 2
+        x: 43
+        y: 96
+        width: 9
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e42cc63045c62630800000000000000
+      internalID: 3902023006751040736
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_9
+      rect:
+        serializedVersion: 2
+        x: 75
+        y: 96
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 819cb0e4b51a2eb60800000000000000
+      internalID: 7773953320318388504
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_10
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 97
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6cfdc12dcbb55f70800000000000000
+      internalID: 9175446305547091051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_11
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 96
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aada1972dfd37e410800000000000000
+      internalID: 1506240757878599082
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_12
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 96
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 87e4a9c6b4113eb10800000000000000
+      internalID: 2009468874379644536
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_13
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 65
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6ae014ffdfe424e0800000000000000
+      internalID: -2007215788748903829
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_14
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 65
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 995dbe66012e113c0800000000000000
+      internalID: -4390479601635437159
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_15
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 64
+        width: 12
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0c9546e15517ae560800000000000000
+      internalID: 7343806752777066944
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_16
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 32
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 695e071c547aece80800000000000000
+      internalID: -8156397957081406058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_17
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 32
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3741fb89425e0a2c0800000000000000
+      internalID: -4422282888733584269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_18
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 0
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d4f307630259e7270800000000000000
+      internalID: 8250195532974145357
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNun_19
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 0
+        width: 74
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 628235547dfbc1740800000000000000
+      internalID: 5124181407342733350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MiniNun_0: -379249250460920189
+      MiniNun_1: -3917647363209039490
+      MiniNun_10: 9175446305547091051
+      MiniNun_11: 1506240757878599082
+      MiniNun_12: 2009468874379644536
+      MiniNun_13: -2007215788748903829
+      MiniNun_14: -4390479601635437159
+      MiniNun_15: 7343806752777066944
+      MiniNun_16: -8156397957081406058
+      MiniNun_17: -4422282888733584269
+      MiniNun_18: 8250195532974145357
+      MiniNun_19: 5124181407342733350
+      MiniNun_2: 1747144050221349384
+      MiniNun_3: 2620070179293456002
+      MiniNun_4: 3748746118230657564
+      MiniNun_5: -7485738683850595965
+      MiniNun_6: 7674937601490535552
+      MiniNun_7: -2948941878727363272
+      MiniNun_8: 3902023006751040736
+      MiniNun_9: 7773953320318388504
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

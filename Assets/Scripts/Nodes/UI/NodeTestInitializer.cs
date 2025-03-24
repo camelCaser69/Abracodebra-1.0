@@ -23,43 +23,57 @@ public class NodeTestInitializer : MonoBehaviour
             Debug.LogWarning("[NodeTestInitializer] Missing NodeEditorController reference.");
         }
 
-        // Auto-spawn nodes from the library.
+        // ============================
+        // AUTO-SPAWN NODES FROM LIBRARY
+        // ============================
         if (definitionLibrary != null && definitionLibrary.autoSpawnNodes != null)
         {
             foreach (var nodeDef in definitionLibrary.autoSpawnNodes)
             {
-                // Here we simply call CreateNodeAtMouse, but you might want to specify positions.
-                // For demonstration, we use a fixed position offset (e.g., based on index).
+                // We use a simple offset logic: each node is placed 100 units to the right/down from the previous.
                 Vector2 spawnPos = new Vector2(100 * testGraph.nodes.Count, 100 * testGraph.nodes.Count);
+
+                // -----------------
+                // CREATE THE NODE
+                // -----------------
                 NodeData newNode = new NodeData();
                 newNode.nodeDisplayName = nodeDef.displayName;
                 newNode.backgroundColor = nodeDef.backgroundColor;
                 newNode.description = nodeDef.description;
+
+                // Copy NodeDefinition effects => newNode.effects
                 foreach (var defEffect in nodeDef.effects)
                 {
                     NodeEffectData effectCopy = new NodeEffectData
                     {
-                        effectType = defEffect.effectType,
-                        effectValue = defEffect.effectValue,
-                        secondaryValue = defEffect.secondaryValue,
-                        extra1 = defEffect.extra1,
-                        extra2 = defEffect.extra2
+                        effectType       = defEffect.effectType,
+                        effectValue      = defEffect.effectValue,
+                        secondaryValue   = defEffect.secondaryValue,
+                        extra1           = defEffect.extra1,
+                        extra2           = defEffect.extra2,
+                        leafPattern      = defEffect.leafPattern,       // FIX: now copying leafPattern
+                        growthRandomness = defEffect.growthRandomness   // FIX: now copying growthRandomness
                     };
                     newNode.effects.Add(effectCopy);
                 }
+
+                // Copy NodeDefinition ports => newNode.ports
                 foreach (var portDef in nodeDef.ports)
                 {
                     NodePort nodePort = new NodePort
                     {
-                        isInput = portDef.isInput,
+                        isInput  = portDef.isInput,
                         portType = portDef.portType,
-                        side = portDef.side
+                        side     = portDef.side
                     };
                     newNode.ports.Add(nodePort);
                 }
 
-                // Snap position based on current contentRect.
-                float hexSizeValue = (HexGridManager.Instance != null) ? HexGridManager.Instance.hexSize : 50f;
+                // Snap position based on current contentRect from the editor.
+                float hexSizeValue = (HexGridManager.Instance != null) 
+                    ? HexGridManager.Instance.hexSize 
+                    : 50f;
+
                 // Adjust spawnPos relative to content center.
                 Vector2 adjustedSpawn = spawnPos - editorController.ContentRect.rect.center;
                 HexCoords hc = HexCoords.WorldToHex(adjustedSpawn, hexSizeValue);
@@ -67,7 +81,10 @@ public class NodeTestInitializer : MonoBehaviour
                 Vector2 snappedPos = hc.HexToWorld(hexSizeValue) + editorController.ContentRect.rect.center;
                 newNode.editorPosition = snappedPos;
 
+                // Add the newly created node to the graph.
                 testGraph.nodes.Add(newNode);
+
+                // Create the NodeView in the editor UI.
                 editorController.CreateNodeView(newNode);
             }
         }

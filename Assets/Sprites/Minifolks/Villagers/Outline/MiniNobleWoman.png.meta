@@ -1,0 +1,637 @@
+fileFormatVersion: 2
+guid: 046267b46ce5ffe4c96f3041083955bc
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -397669154456918113
+    second: MiniNobleWoman_0
+  - first:
+      213: -6839170261005686664
+    second: MiniNobleWoman_1
+  - first:
+      213: 5281531734587367493
+    second: MiniNobleWoman_2
+  - first:
+      213: 1395391224441280758
+    second: MiniNobleWoman_3
+  - first:
+      213: -8632548644236342675
+    second: MiniNobleWoman_4
+  - first:
+      213: 8391214139698770639
+    second: MiniNobleWoman_5
+  - first:
+      213: 297264286890547415
+    second: MiniNobleWoman_6
+  - first:
+      213: -3425622903223516436
+    second: MiniNobleWoman_7
+  - first:
+      213: -547283075064570490
+    second: MiniNobleWoman_8
+  - first:
+      213: 7127924040555223801
+    second: MiniNobleWoman_9
+  - first:
+      213: -252027392866638225
+    second: MiniNobleWoman_10
+  - first:
+      213: 155162393970232894
+    second: MiniNobleWoman_11
+  - first:
+      213: 4432147843778774051
+    second: MiniNobleWoman_12
+  - first:
+      213: 3255137862366240288
+    second: MiniNobleWoman_13
+  - first:
+      213: 4811231303335437936
+    second: MiniNobleWoman_14
+  - first:
+      213: 5499297512309482609
+    second: MiniNobleWoman_15
+  - first:
+      213: -2471988811749774330
+    second: MiniNobleWoman_16
+  - first:
+      213: 3360743502946437151
+    second: MiniNobleWoman_17
+  - first:
+      213: 1142061079406661
+    second: MiniNobleWoman_18
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MiniNobleWoman_0
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 128
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f97277ec2023b7af0800000000000000
+      internalID: -397669154456918113
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_1
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 128
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 878275212e26611a0800000000000000
+      internalID: -6839170261005686664
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_2
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 128
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 540680e3125cb4940800000000000000
+      internalID: 5281531734587367493
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_3
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 128
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f8158fecec6d5310800000000000000
+      internalID: 1395391224441280758
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_4
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 96
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6a430aceb6033880800000000000000
+      internalID: -8632548644236342675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_5
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 96
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc2fafe2dc4937470800000000000000
+      internalID: 8391214139698770639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_6
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 96
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d855804b48102400800000000000000
+      internalID: 297264286890547415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_7
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 96
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce28be68e1eb570d0800000000000000
+      internalID: -3425622903223516436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_8
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 96
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68d513f51f8a768f0800000000000000
+      internalID: -547283075064570490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_9
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 96
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9fad24746297be260800000000000000
+      internalID: 7127924040555223801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_10
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 64
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f662486eb6e908cf0800000000000000
+      internalID: -252027392866638225
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_11
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 64
+        width: 15
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e3e481f006f372200800000000000000
+      internalID: 155162393970232894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_12
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 64
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 324827c3bf6228d30800000000000000
+      internalID: 4432147843778774051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_13
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 32
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02e934da3a29c2d20800000000000000
+      internalID: 3255137862366240288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_14
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 32
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0766c8f116de4c240800000000000000
+      internalID: 4811231303335437936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_15
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 32
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 174656f63fd615c40800000000000000
+      internalID: 5499297512309482609
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_16
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 0
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 60c2aead54bb1bdd0800000000000000
+      internalID: -2471988811749774330
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_17
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 0
+        width: 13
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f180352f862c3ae20800000000000000
+      internalID: 3360743502946437151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleWoman_18
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 0
+        width: 48
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 54823f0d2be040000800000000000000
+      internalID: 1142061079406661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MiniNobleWoman_0: -397669154456918113
+      MiniNobleWoman_1: -6839170261005686664
+      MiniNobleWoman_10: -252027392866638225
+      MiniNobleWoman_11: 155162393970232894
+      MiniNobleWoman_12: 4432147843778774051
+      MiniNobleWoman_13: 3255137862366240288
+      MiniNobleWoman_14: 4811231303335437936
+      MiniNobleWoman_15: 5499297512309482609
+      MiniNobleWoman_16: -2471988811749774330
+      MiniNobleWoman_17: 3360743502946437151
+      MiniNobleWoman_18: 1142061079406661
+      MiniNobleWoman_2: 5281531734587367493
+      MiniNobleWoman_3: 1395391224441280758
+      MiniNobleWoman_4: -8632548644236342675
+      MiniNobleWoman_5: 8391214139698770639
+      MiniNobleWoman_6: 297264286890547415
+      MiniNobleWoman_7: -3425622903223516436
+      MiniNobleWoman_8: -547283075064570490
+      MiniNobleWoman_9: 7127924040555223801
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

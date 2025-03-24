@@ -1,0 +1,1313 @@
+fileFormatVersion: 2
+guid: 99992e14c331a6d4c87093cf5e866528
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -8562148360649723391
+    second: MiniThief_0
+  - first:
+      213: 8237634978289377805
+    second: MiniThief_1
+  - first:
+      213: 2512864797859006026
+    second: MiniThief_2
+  - first:
+      213: 5277482109482450214
+    second: MiniThief_3
+  - first:
+      213: -3628463619237402052
+    second: MiniThief_4
+  - first:
+      213: 1867716192549436091
+    second: MiniThief_5
+  - first:
+      213: 8803721623549417499
+    second: MiniThief_6
+  - first:
+      213: 9075575426113729467
+    second: MiniThief_7
+  - first:
+      213: 1868784739195183554
+    second: MiniThief_8
+  - first:
+      213: 3497063846113349457
+    second: MiniThief_9
+  - first:
+      213: 8179844241676785822
+    second: MiniThief_10
+  - first:
+      213: 5602349863370908208
+    second: MiniThief_11
+  - first:
+      213: 3105451358379665249
+    second: MiniThief_12
+  - first:
+      213: -3963542309137679970
+    second: MiniThief_13
+  - first:
+      213: 7370958753353910921
+    second: MiniThief_14
+  - first:
+      213: 7736729961826654841
+    second: MiniThief_15
+  - first:
+      213: -8906722998622321556
+    second: MiniThief_16
+  - first:
+      213: 5083818323716114507
+    second: MiniThief_17
+  - first:
+      213: 6765876042057002971
+    second: MiniThief_18
+  - first:
+      213: -7929635545692480476
+    second: MiniThief_19
+  - first:
+      213: -1941320500888154418
+    second: MiniThief_20
+  - first:
+      213: -5393698279073425875
+    second: MiniThief_21
+  - first:
+      213: -8561908109198495014
+    second: MiniThief_22
+  - first:
+      213: -3072320229324714796
+    second: MiniThief_23
+  - first:
+      213: 5814815559592778149
+    second: MiniThief_24
+  - first:
+      213: 8380459945492435424
+    second: MiniThief_25
+  - first:
+      213: -5546351787577811737
+    second: MiniThief_26
+  - first:
+      213: 9040382980568475131
+    second: MiniThief_27
+  - first:
+      213: 994872274068854946
+    second: MiniThief_28
+  - first:
+      213: -1941911345456614610
+    second: MiniThief_29
+  - first:
+      213: -8273204524621481195
+    second: MiniThief_30
+  - first:
+      213: 3929654210652571863
+    second: MiniThief_31
+  - first:
+      213: 6955478613402827269
+    second: MiniThief_32
+  - first:
+      213: 3263584483261466110
+    second: MiniThief_33
+  - first:
+      213: 8386800729113341519
+    second: MiniThief_34
+  - first:
+      213: -6363636019016945526
+    second: MiniThief_35
+  - first:
+      213: 6191882102423555027
+    second: MiniThief_36
+  - first:
+      213: -3995571877197724172
+    second: MiniThief_37
+  - first:
+      213: -5020039194802629974
+    second: MiniThief_38
+  - first:
+      213: 9161350322038305243
+    second: MiniThief_39
+  - first:
+      213: 3406643863452640172
+    second: MiniThief_40
+  - first:
+      213: 3345789169350503370
+    second: MiniThief_41
+  - first:
+      213: 3213468721486747976
+    second: MiniThief_42
+  - first:
+      213: 6819258179115913323
+    second: MiniThief_43
+  - first:
+      213: 2493440845299382011
+    second: MiniThief_44
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MiniThief_0
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 224
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 102b7412e632d2980800000000000000
+      internalID: -8562148360649723391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_1
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 224
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d02654e2e55f15270800000000000000
+      internalID: 8237634978289377805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_2
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 224
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a4648fc483d7fd220800000000000000
+      internalID: 2512864797859006026
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_3
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 224
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62d3e2c64026d3940800000000000000
+      internalID: 5277482109482450214
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_4
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 192
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c3a2dee009b15adc0800000000000000
+      internalID: -3628463619237402052
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_5
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 192
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bba77264bf57be910800000000000000
+      internalID: 1867716192549436091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_6
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 192
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b1896192c2a1d2a70800000000000000
+      internalID: 8803721623549417499
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_7
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 192
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb3f5cdf3cbe2fd70800000000000000
+      internalID: 9075575426113729467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_8
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 192
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2c1666da1d14fe910800000000000000
+      internalID: 1868784739195183554
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_9
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 192
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 15f82703a01188030800000000000000
+      internalID: 3497063846113349457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_10
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 192
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e985b27cff4a48170800000000000000
+      internalID: 8179844241676785822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_11
+      rect:
+        serializedVersion: 2
+        x: 234
+        y: 192
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0326ea9a48b8fbd40800000000000000
+      internalID: 5602349863370908208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_12
+      rect:
+        serializedVersion: 2
+        x: 267
+        y: 192
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 167697b9e87c81b20800000000000000
+      internalID: 3105451358379665249
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_13
+      rect:
+        serializedVersion: 2
+        x: 298
+        y: 192
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e99fd93054baef8c0800000000000000
+      internalID: -3963542309137679970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_14
+      rect:
+        serializedVersion: 2
+        x: 330
+        y: 192
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 98a47b3eee7ea4660800000000000000
+      internalID: 7370958753353910921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_15
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 192
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 97a9cc9c8e26e5b60800000000000000
+      internalID: 7736729961826654841
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_16
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 160
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c6480526f96f46480800000000000000
+      internalID: -8906722998622321556
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_17
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 160
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4888b784d95d8640800000000000000
+      internalID: 5083818323716114507
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_18
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 160
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bdf2221c96835ed50800000000000000
+      internalID: 6765876042057002971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_19
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 160
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42c50b4fb7644f190800000000000000
+      internalID: -7929635545692480476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_20
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 160
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ecec06d3a4b0f05e0800000000000000
+      internalID: -1941320500888154418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_21
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 160
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2651320efbb525b0800000000000000
+      internalID: -5393698279073425875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_22
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 128
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad2ffa700fdfd2980800000000000000
+      internalID: -8561908109198495014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_23
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 128
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4dc8ade770dec55d0800000000000000
+      internalID: -3072320229324714796
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_24
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 128
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a911f771ff52b050800000000000000
+      internalID: 5814815559592778149
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_25
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 96
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e157793bef5d4470800000000000000
+      internalID: 8380459945492435424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_26
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 96
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ec521e5f666703b0800000000000000
+      internalID: -5546351787577811737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_27
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 96
+        width: 19
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf5654e3c64e57d70800000000000000
+      internalID: 9040382980568475131
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_28
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 96
+        width: 17
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2a852ccef0f7ecd00800000000000000
+      internalID: 994872274068854946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_29
+      rect:
+        serializedVersion: 2
+        x: 139
+        y: 96
+        width: 17
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e23f1c48be1fc05e0800000000000000
+      internalID: -1941911345456614610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_30
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 96
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 51b38c3715caf2d80800000000000000
+      internalID: -8273204524621481195
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_31
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 96
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d880143fafe88630800000000000000
+      internalID: 3929654210652571863
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_32
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 64
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50ab3ba72f2d68060800000000000000
+      internalID: 6955478613402827269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_33
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 64
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef5c64bdbc49a4d20800000000000000
+      internalID: 3263584483261466110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_34
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 64
+        width: 17
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4ea9c4f3d6e36470800000000000000
+      internalID: 8386800729113341519
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_35
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 64
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a803d96b1c2dfa7a0800000000000000
+      internalID: -6363636019016945526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_36
+      rect:
+        serializedVersion: 2
+        x: 139
+        y: 64
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3db0e0657fbfde550800000000000000
+      internalID: 6191882102423555027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_37
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 64
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f5c6111c80ec88c0800000000000000
+      internalID: -3995571877197724172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_38
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 32
+        width: 18
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa2504b13fc355ab0800000000000000
+      internalID: -5020039194802629974
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_39
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 32
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd1f0083497a32f70800000000000000
+      internalID: 9161350322038305243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_40
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 0
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca3eb5d6b84d64f20800000000000000
+      internalID: 3406643863452640172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_41
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 0
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acb6c74d581ae6e20800000000000000
+      internalID: 3345789169350503370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_42
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 0
+        width: 17
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 849db09c6c8889c20800000000000000
+      internalID: 3213468721486747976
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_43
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 0
+        width: 17
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6091e51f2fd2ae50800000000000000
+      internalID: 6819258179115913323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniThief_44
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 0
+        width: 17
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf6f48cec3b7a9220800000000000000
+      internalID: 2493440845299382011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MiniThief_0: -8562148360649723391
+      MiniThief_1: 8237634978289377805
+      MiniThief_10: 8179844241676785822
+      MiniThief_11: 5602349863370908208
+      MiniThief_12: 3105451358379665249
+      MiniThief_13: -3963542309137679970
+      MiniThief_14: 7370958753353910921
+      MiniThief_15: 7736729961826654841
+      MiniThief_16: -8906722998622321556
+      MiniThief_17: 5083818323716114507
+      MiniThief_18: 6765876042057002971
+      MiniThief_19: -7929635545692480476
+      MiniThief_2: 2512864797859006026
+      MiniThief_20: -1941320500888154418
+      MiniThief_21: -5393698279073425875
+      MiniThief_22: -8561908109198495014
+      MiniThief_23: -3072320229324714796
+      MiniThief_24: 5814815559592778149
+      MiniThief_25: 8380459945492435424
+      MiniThief_26: -5546351787577811737
+      MiniThief_27: 9040382980568475131
+      MiniThief_28: 994872274068854946
+      MiniThief_29: -1941911345456614610
+      MiniThief_3: 5277482109482450214
+      MiniThief_30: -8273204524621481195
+      MiniThief_31: 3929654210652571863
+      MiniThief_32: 6955478613402827269
+      MiniThief_33: 3263584483261466110
+      MiniThief_34: 8386800729113341519
+      MiniThief_35: -6363636019016945526
+      MiniThief_36: 6191882102423555027
+      MiniThief_37: -3995571877197724172
+      MiniThief_38: -5020039194802629974
+      MiniThief_39: 9161350322038305243
+      MiniThief_4: -3628463619237402052
+      MiniThief_40: 3406643863452640172
+      MiniThief_41: 3345789169350503370
+      MiniThief_42: 3213468721486747976
+      MiniThief_43: 6819258179115913323
+      MiniThief_44: 2493440845299382011
+      MiniThief_5: 1867716192549436091
+      MiniThief_6: 8803721623549417499
+      MiniThief_7: 9075575426113729467
+      MiniThief_8: 1868784739195183554
+      MiniThief_9: 3497063846113349457
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,6 +1,7 @@
 {
     "max_chars_per_file": 30000,
-    "scripts_directory": "Assets/Scripts",
+    "scripts_directories": ["Assets/Scripts", "Assets/Editor"],
+    "treeBlacklist_directories": ["TextMesh Pro", "Sprites"],
     "main_output_filename": "EXTRACTOR_scripts",
     "part_output_filename": "EXTRACTOR_scripts_part",
     "exclude_extensions": [
@@ -11,7 +12,7 @@
     ],
     "clean_previous_files": true,
     "backup_previous_files": false,
-    "custom_header_text": "This document contains extracted Unity C# scripts from my project. Do not reply\u2014just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.",
+    "custom_header_text": "This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.",
     "backup_directory": "_SCRIPT_EXTRACTOR_backups",
     "include_timestamp_in_filename": false,
     "part_end_text": "This is part {current_part} out of {total_parts} of script collection. {remaining_parts} more parts remain.",

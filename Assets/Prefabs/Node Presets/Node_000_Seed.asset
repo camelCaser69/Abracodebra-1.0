@@ -20,10 +20,38 @@ MonoBehaviour:
     portType: 0
     side: 1
   effects:
-  - effectType: 9
+  - effectType: 11
     effectValue: 6
     secondaryValue: 9
     extra1: 1
     extra2: 1
     leafPattern: 1
-    growthRandomness: 1
+    growthRandomness: 0.15
+  - effectType: 5
+    effectValue: 0.2
+    secondaryValue: 9
+    extra1: 1
+    extra2: 1
+    leafPattern: 1
+    growthRandomness: 0.15
+  - effectType: 5
+    effectValue: 0.1
+    secondaryValue: 9
+    extra1: 1
+    extra2: 1
+    leafPattern: 1
+    growthRandomness: 0.15
+  - effectType: 4
+    effectValue: 20
+    secondaryValue: 9
+    extra1: 1
+    extra2: 1
+    leafPattern: 1
+    growthRandomness: 0.15
+  - effectType: 4
+    effectValue: 20
+    secondaryValue: 9
+    extra1: 1
+    extra2: 1
+    leafPattern: 1
+    growthRandomness: 0.15

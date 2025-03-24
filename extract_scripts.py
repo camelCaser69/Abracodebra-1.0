@@ -10,7 +10,8 @@ import glob
 # Default settings
 DEFAULT_SETTINGS = {
     "max_chars_per_file": 30000,
-    "scripts_directory": "Assets/Scripts",
+    "scripts_directories": ["Assets/Scripts"],  # Changed to list for multiple directories
+    "treeBlacklist_directories": [],  # New setting to blacklist directories from tree
     "main_output_filename": "EXTRACTOR_scripts",
     "part_output_filename": "EXTRACTOR_scripts_part",
     "exclude_extensions": [".meta"],
@@ -69,6 +70,15 @@ def generate_tree(startpath, settings, prefix=''):
             if item.endswith(ext):
                 skip = True
                 break
+        
+        # Skip blacklisted directories
+        path = os.path.join(startpath, item)
+        rel_path = os.path.relpath(path, os.path.join(os.getcwd(), "Assets"))
+        if os.path.isdir(path):
+            for blacklisted in settings.get("treeBlacklist_directories", []):
+                if rel_path == blacklisted or rel_path.startswith(blacklisted + os.sep):
+                    skip = True
+                    break
         
         if not skip:
             filtered_contents.append(item)
@@ -318,7 +328,6 @@ def extract_scripts(project_path):
     settings = load_settings()
     
     assets_path = os.path.join(project_path, "Assets")
-    scripts_path = os.path.join(project_path, settings["scripts_directory"])
     timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     max_chars = settings["max_chars_per_file"]
     
@@ -331,7 +340,7 @@ def extract_scripts(project_path):
     if settings.get("clean_previous_files", False):
         clean_previous_files(project_path, settings, timestamp)
     
-    # Verify that paths exist
+    # Verify that assets path exists
     if not os.path.exists(assets_path):
         print(f"Error: Assets folder not found at {assets_path}")
         return
@@ -351,21 +360,35 @@ def extract_scripts(project_path):
     all_content.append("=" * 80)
     all_content.append("")
     
-    # Check if Scripts folder exists
-    if not os.path.exists(scripts_path):
-        all_content.append("Note: Scripts folder not found. No scripts extracted.")
-    else:
-        # Find and extract all C# scripts
-        script_files = []
+    # Find and extract all C# scripts from all script directories
+    script_directories = settings.get("scripts_directories", ["Assets/Scripts"])
+    
+    # Collect all script files
+    script_files = []
+    missing_dirs = []
+    
+    for scripts_dir in script_directories:
+        scripts_path = os.path.join(project_path, scripts_dir)
+        
+        if not os.path.exists(scripts_path):
+            missing_dirs.append(scripts_dir)
+            continue
+            
         for root, _, files in os.walk(scripts_path):
             for file in files:
                 for ext in settings["include_extensions"]:
                     if file.endswith(ext):
                         script_files.append(os.path.join(root, file))
                         break
-        
+    
+    if missing_dirs:
+        all_content.append(f"Note: The following script directories were not found: {', '.join(missing_dirs)}")
+    
+    if not script_files:
+        all_content.append("Note: No script files found in any of the specified directories.")
+    else:
         # Sort script files by relative path for better organization
-        script_files.sort(key=lambda x: os.path.relpath(x, scripts_path))
+        script_files.sort(key=lambda x: os.path.relpath(x, project_path))
         
         # Extract and format each script
         for script_path in script_files:
@@ -384,9 +407,6 @@ def extract_scripts(project_path):
                 
             all_content.append("")
             all_content.append("")
-        
-        if not script_files:
-            all_content.append("Note: No script files found in the Scripts folder.")
     
     # Generate filenames with or without timestamp
     if include_timestamp:

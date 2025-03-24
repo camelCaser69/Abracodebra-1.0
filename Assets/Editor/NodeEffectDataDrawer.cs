@@ -111,12 +111,12 @@ public class NodeEffectDataDrawer : PropertyDrawer
                 // Leaf Pattern => 0=Parallel, 1=Alternating
                 var line5 = NextLineRect();
                 leafPatternProp.intValue = EditorGUI.IntSlider(line5,
-                    new GUIContent("Leaf Pattern (0=parallel,1=alt)", ""), leafPatternProp.intValue, 0, 1);
+                    new GUIContent("Leaf Pattern", "(0=parallel,1=alt)"), leafPatternProp.intValue, 0, 1);
 
                 // Growth Randomness => [0..2]
                 var line6 = NextLineRect();
                 growthRandomnessProp.floatValue = EditorGUI.Slider(line6,
-                    new GUIContent("Growth Randomness", ""), growthRandomnessProp.floatValue, 0f, 2f);
+                    new GUIContent("Growth Randomness", "0=straight, 0.5=random, 0.5=always diagonal"), growthRandomnessProp.floatValue, 0f, 1f);
                 break;
             }
             default:

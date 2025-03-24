@@ -1,0 +1,1105 @@
+fileFormatVersion: 2
+guid: db0cd8441cfd92945a0e09afe92a9d65
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1678069435006654288
+    second: MiniMiner_0
+  - first:
+      213: -1106304226818118710
+    second: MiniMiner_1
+  - first:
+      213: 6896682100588991710
+    second: MiniMiner_2
+  - first:
+      213: -7471119545488166273
+    second: MiniMiner_3
+  - first:
+      213: -8523917008254636229
+    second: MiniMiner_4
+  - first:
+      213: -5067960412559845778
+    second: MiniMiner_5
+  - first:
+      213: 4677811541557204712
+    second: MiniMiner_6
+  - first:
+      213: -6090859053213834154
+    second: MiniMiner_7
+  - first:
+      213: -6106452900040361282
+    second: MiniMiner_8
+  - first:
+      213: 2942471901544882865
+    second: MiniMiner_9
+  - first:
+      213: 2197144203751791428
+    second: MiniMiner_10
+  - first:
+      213: 6588492295180949678
+    second: MiniMiner_11
+  - first:
+      213: -1336552904508235115
+    second: MiniMiner_12
+  - first:
+      213: -1031768655417285188
+    second: MiniMiner_13
+  - first:
+      213: 33823906094711468
+    second: MiniMiner_14
+  - first:
+      213: -201775622303268473
+    second: MiniMiner_15
+  - first:
+      213: -5734221367272940229
+    second: MiniMiner_16
+  - first:
+      213: 3845003218926407280
+    second: MiniMiner_17
+  - first:
+      213: -3357762560958188125
+    second: MiniMiner_18
+  - first:
+      213: 7398169101359330596
+    second: MiniMiner_19
+  - first:
+      213: -1291741178397477029
+    second: MiniMiner_20
+  - first:
+      213: 4689802046181751041
+    second: MiniMiner_21
+  - first:
+      213: -4449334604012867044
+    second: MiniMiner_22
+  - first:
+      213: 7624710627771013797
+    second: MiniMiner_23
+  - first:
+      213: -6382024054903591534
+    second: MiniMiner_24
+  - first:
+      213: -3345384105229966608
+    second: MiniMiner_25
+  - first:
+      213: 7810271840593514333
+    second: MiniMiner_26
+  - first:
+      213: -2821108715052025370
+    second: MiniMiner_27
+  - first:
+      213: 621621071900639970
+    second: MiniMiner_28
+  - first:
+      213: 2991204991595478225
+    second: MiniMiner_29
+  - first:
+      213: -2700326090504721114
+    second: MiniMiner_30
+  - first:
+      213: -7374651181111639442
+    second: MiniMiner_31
+  - first:
+      213: 1601069257459461721
+    second: MiniMiner_32
+  - first:
+      213: 6593452514077895410
+    second: MiniMiner_33
+  - first:
+      213: 1768014359865694305
+    second: MiniMiner_34
+  - first:
+      213: -5242934516945475688
+    second: MiniMiner_35
+  - first:
+      213: 4616073565756662652
+    second: MiniMiner_36
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MiniMiner_0
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 224
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0b8ecf95dbc46b8e0800000000000000
+      internalID: -1678069435006654288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_1
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 224
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acb2efaca2e95a0f0800000000000000
+      internalID: -1106304226818118710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_2
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 224
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ed4d66e84dfe5bf50800000000000000
+      internalID: 6896682100588991710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_3
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 224
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7233b86b50415890800000000000000
+      internalID: -7471119545488166273
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_4
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 192
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3f621484a6f4b980800000000000000
+      internalID: -8523917008254636229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_5
+      rect:
+        serializedVersion: 2
+        x: 43
+        y: 192
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e66d0a12bdcfaa9b0800000000000000
+      internalID: -5067960412559845778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_6
+      rect:
+        serializedVersion: 2
+        x: 75
+        y: 192
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8e65dbc10dceae040800000000000000
+      internalID: 4677811541557204712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_7
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 192
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 654a73c36fbe87ba0800000000000000
+      internalID: -6090859053213834154
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_8
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 192
+        width: 21
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ebab077d075814ba0800000000000000
+      internalID: -6106452900040361282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_9
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 192
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b2a625ca92c5d820800000000000000
+      internalID: 2942471901544882865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_10
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 160
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44b1fe82303dd7e10800000000000000
+      internalID: 2197144203751791428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_11
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 160
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea898abc5d60f6b50800000000000000
+      internalID: 6588492295180949678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_12
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 160
+        width: 19
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5922547f63c937de0800000000000000
+      internalID: -1336552904508235115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_13
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 160
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb5687bdfdb6ea1f0800000000000000
+      internalID: -1031768655417285188
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_14
+      rect:
+        serializedVersion: 2
+        x: 138
+        y: 160
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca201b3d9aa287000800000000000000
+      internalID: 33823906094711468
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_15
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 129
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 781c74cf326233df0800000000000000
+      internalID: -201775622303268473
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_16
+      rect:
+        serializedVersion: 2
+        x: 43
+        y: 128
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3ddd343c04fb60b0800000000000000
+      internalID: -5734221367272940229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_17
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 128
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 07e87505e023c5530800000000000000
+      internalID: 3845003218926407280
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_18
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 129
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3a53bf1bdb4d661d0800000000000000
+      internalID: -3357762560958188125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_19
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 128
+        width: 17
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4253bcab9939ba660800000000000000
+      internalID: 7398169101359330596
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_20
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 128
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b57bfdffd30d21ee0800000000000000
+      internalID: -1291741178397477029
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_21
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 97
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 10930950d16851140800000000000000
+      internalID: 4689802046181751041
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_22
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 97
+        width: 17
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c12b5f050c9c042c0800000000000000
+      internalID: -4449334604012867044
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_23
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 96
+        width: 17
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5aadf632be960d960800000000000000
+      internalID: 7624710627771013797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_24
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 64
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 29d297b7fee7e67a0800000000000000
+      internalID: -6382024054903591534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_25
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 64
+        width: 12
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0f2a78281eec291d0800000000000000
+      internalID: -3345384105229966608
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_26
+      rect:
+        serializedVersion: 2
+        x: 74
+        y: 64
+        width: 20
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5f00d1cbd8a36c60800000000000000
+      internalID: 7810271840593514333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_27
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 64
+        width: 20
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6e9b09e029869d8d0800000000000000
+      internalID: -2821108715052025370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_28
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 64
+        width: 19
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e20987421170a800800000000000000
+      internalID: 621621071900639970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_29
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 32
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1dc7c6e7715e28920800000000000000
+      internalID: 2991204991595478225
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_30
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 32
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 62d2fb54ab3868ad0800000000000000
+      internalID: -2700326090504721114
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_31
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 0
+        width: 22
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e620d67c2d9f7a990800000000000000
+      internalID: -7374651181111639442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_32
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 1
+        width: 14
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 95e6bafb104283610800000000000000
+      internalID: 1601069257459461721
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_33
+      rect:
+        serializedVersion: 2
+        x: 54
+        y: 0
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2fae401c026a08b50800000000000000
+      internalID: 6593452514077895410
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_34
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 0
+        width: 15
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 168959561bf398810800000000000000
+      internalID: 1768014359865694305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_35
+      rect:
+        serializedVersion: 2
+        x: 86
+        y: 0
+        width: 9
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 897a4d8c5da5d37b0800000000000000
+      internalID: -5242934516945475688
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMiner_36
+      rect:
+        serializedVersion: 2
+        x: 103
+        y: 0
+        width: 24
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c732ff773769f0040800000000000000
+      internalID: 4616073565756662652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MiniMiner_0: -1678069435006654288
+      MiniMiner_1: -1106304226818118710
+      MiniMiner_10: 2197144203751791428
+      MiniMiner_11: 6588492295180949678
+      MiniMiner_12: -1336552904508235115
+      MiniMiner_13: -1031768655417285188
+      MiniMiner_14: 33823906094711468
+      MiniMiner_15: -201775622303268473
+      MiniMiner_16: -5734221367272940229
+      MiniMiner_17: 3845003218926407280
+      MiniMiner_18: -3357762560958188125
+      MiniMiner_19: 7398169101359330596
+      MiniMiner_2: 6896682100588991710
+      MiniMiner_20: -1291741178397477029
+      MiniMiner_21: 4689802046181751041
+      MiniMiner_22: -4449334604012867044
+      MiniMiner_23: 7624710627771013797
+      MiniMiner_24: -6382024054903591534
+      MiniMiner_25: -3345384105229966608
+      MiniMiner_26: 7810271840593514333
+      MiniMiner_27: -2821108715052025370
+      MiniMiner_28: 621621071900639970
+      MiniMiner_29: 2991204991595478225
+      MiniMiner_3: -7471119545488166273
+      MiniMiner_30: -2700326090504721114
+      MiniMiner_31: -7374651181111639442
+      MiniMiner_32: 1601069257459461721
+      MiniMiner_33: 6593452514077895410
+      MiniMiner_34: 1768014359865694305
+      MiniMiner_35: -5242934516945475688
+      MiniMiner_36: 4616073565756662652
+      MiniMiner_4: -8523917008254636229
+      MiniMiner_5: -5067960412559845778
+      MiniMiner_6: 4677811541557204712
+      MiniMiner_7: -6090859053213834154
+      MiniMiner_8: -6106452900040361282
+      MiniMiner_9: 2942471901544882865
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

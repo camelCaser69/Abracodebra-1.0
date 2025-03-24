@@ -1,0 +1,1053 @@
+fileFormatVersion: 2
+guid: 6dd5a2586f517014e9a2d081fdb58891
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4196239000010113515
+    second: MiniMerchant_0
+  - first:
+      213: 8314813314877677765
+    second: MiniMerchant_1
+  - first:
+      213: -6463173515625529458
+    second: MiniMerchant_2
+  - first:
+      213: -5533754864678425507
+    second: MiniMerchant_3
+  - first:
+      213: 3741546308274651435
+    second: MiniMerchant_4
+  - first:
+      213: 5904225794113610125
+    second: MiniMerchant_5
+  - first:
+      213: 5391426466025919202
+    second: MiniMerchant_6
+  - first:
+      213: -1553252132575916022
+    second: MiniMerchant_7
+  - first:
+      213: -8749162994266138888
+    second: MiniMerchant_8
+  - first:
+      213: 4457425173889173173
+    second: MiniMerchant_9
+  - first:
+      213: -1594262055072905426
+    second: MiniMerchant_10
+  - first:
+      213: -6772632617881933391
+    second: MiniMerchant_11
+  - first:
+      213: 49351488666786993
+    second: MiniMerchant_12
+  - first:
+      213: 4098878199091414441
+    second: MiniMerchant_13
+  - first:
+      213: -283612883405657897
+    second: MiniMerchant_14
+  - first:
+      213: -8435888662244036338
+    second: MiniMerchant_15
+  - first:
+      213: 8180555346275030282
+    second: MiniMerchant_16
+  - first:
+      213: 6675294133939046069
+    second: MiniMerchant_17
+  - first:
+      213: -2459974980048176611
+    second: MiniMerchant_18
+  - first:
+      213: -9132764973343152115
+    second: MiniMerchant_19
+  - first:
+      213: 1540540918739199319
+    second: MiniMerchant_20
+  - first:
+      213: 1206462418172131641
+    second: MiniMerchant_21
+  - first:
+      213: -3030798096555085112
+    second: MiniMerchant_22
+  - first:
+      213: -9090206424400718794
+    second: MiniMerchant_23
+  - first:
+      213: 4037313924825888411
+    second: MiniMerchant_24
+  - first:
+      213: 3601015134065161540
+    second: MiniMerchant_25
+  - first:
+      213: -1584327895570516467
+    second: MiniMerchant_26
+  - first:
+      213: 8778409158786117555
+    second: MiniMerchant_27
+  - first:
+      213: 1058888827754400807
+    second: MiniMerchant_28
+  - first:
+      213: -787792664521117962
+    second: MiniMerchant_29
+  - first:
+      213: -5240474570311348121
+    second: MiniMerchant_30
+  - first:
+      213: 4837332925850349988
+    second: MiniMerchant_31
+  - first:
+      213: 4329139395012350155
+    second: MiniMerchant_32
+  - first:
+      213: -5793879027153590454
+    second: MiniMerchant_33
+  - first:
+      213: 2272317588668199245
+    second: MiniMerchant_34
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MiniMerchant_0
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 192
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: be14e3c43290c3a30800000000000000
+      internalID: 4196239000010113515
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_1
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 192
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5c0e8f6f7a6246370800000000000000
+      internalID: 8314813314877677765
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_2
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 192
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e8f7d6f4ee13e46a0800000000000000
+      internalID: -6463173515625529458
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_3
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 192
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d5ca0c805472433b0800000000000000
+      internalID: -5533754864678425507
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_4
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 160
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b2182673b84ace330800000000000000
+      internalID: 3741546308274651435
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_5
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 160
+        width: 18
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8127dbe31600f150800000000000000
+      internalID: 5904225794113610125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_6
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 160
+        width: 18
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2e25d1c4ec132da40800000000000000
+      internalID: 5391426466025919202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_7
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 160
+        width: 18
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a00d1373a6db17ae0800000000000000
+      internalID: -1553252132575916022
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_8
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 160
+        width: 18
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f616cc9c9ab49680800000000000000
+      internalID: -8749162994266138888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_9
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 160
+        width: 18
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b64c864494fbdd30800000000000000
+      internalID: 4457425173889173173
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_10
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 160
+        width: 18
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e27ce709b1b00e9e0800000000000000
+      internalID: -1594262055072905426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_11
+      rect:
+        serializedVersion: 2
+        x: 233
+        y: 160
+        width: 18
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b96ce85486c202a0800000000000000
+      internalID: -6772632617881933391
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_12
+      rect:
+        serializedVersion: 2
+        x: 265
+        y: 160
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1bcde1fdae45fa000800000000000000
+      internalID: 49351488666786993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_13
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 128
+        width: 19
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a5cf6a510422e830800000000000000
+      internalID: 4098878199091414441
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_14
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 128
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d8a1eec597601cf0800000000000000
+      internalID: -283612883405657897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_15
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 128
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e01f23af4f3bdea80800000000000000
+      internalID: -8435888662244036338
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_16
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 128
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a055528bebb278170800000000000000
+      internalID: 8180555346275030282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_17
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 128
+        width: 19
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b68fa8c5a863ac50800000000000000
+      internalID: 6675294133939046069
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_18
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 128
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1a31e50ac96cddd0800000000000000
+      internalID: -2459974980048176611
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_19
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 128
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d0860cae4a6e14180800000000000000
+      internalID: -9132764973343152115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_20
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 96
+        width: 13
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 755676fadc9116510800000000000000
+      internalID: 1540540918739199319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_21
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 96
+        width: 12
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 939320e5d273eb010800000000000000
+      internalID: 1206462418172131641
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_22
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 96
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c277e4603170f5d0800000000000000
+      internalID: -3030798096555085112
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_23
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 96
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6341f924b6919d180800000000000000
+      internalID: -9090206424400718794
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_24
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 96
+        width: 16
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b963cffbf9b670830800000000000000
+      internalID: 4037313924825888411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_25
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 96
+        width: 14
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 44572c87f2069f130800000000000000
+      internalID: 3601015134065161540
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_26
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 64
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d06f6c05c26530ae0800000000000000
+      internalID: -1584327895570516467
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_27
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 64
+        width: 16
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3bf6b72be9c23d970800000000000000
+      internalID: 8778409158786117555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_28
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 64
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72c4ee257cde1be00800000000000000
+      internalID: 1058888827754400807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_29
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 32
+        width: 17
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6fe6f8adeb23115f0800000000000000
+      internalID: -787792664521117962
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_30
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 32
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 760df1eb4281647b0800000000000000
+      internalID: -5240474570311348121
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_31
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 0
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4a17c91baa8a12340800000000000000
+      internalID: 4837332925850349988
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_32
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 0
+        width: 14
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc05cdec751341c30800000000000000
+      internalID: 4329139395012350155
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_33
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 0
+        width: 17
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a47acead8b1089fa0800000000000000
+      internalID: -5793879027153590454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniMerchant_34
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 0
+        width: 17
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d41b071cec4e88f10800000000000000
+      internalID: 2272317588668199245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MiniMerchant_0: 4196239000010113515
+      MiniMerchant_1: 8314813314877677765
+      MiniMerchant_10: -1594262055072905426
+      MiniMerchant_11: -6772632617881933391
+      MiniMerchant_12: 49351488666786993
+      MiniMerchant_13: 4098878199091414441
+      MiniMerchant_14: -283612883405657897
+      MiniMerchant_15: -8435888662244036338
+      MiniMerchant_16: 8180555346275030282
+      MiniMerchant_17: 6675294133939046069
+      MiniMerchant_18: -2459974980048176611
+      MiniMerchant_19: -9132764973343152115
+      MiniMerchant_2: -6463173515625529458
+      MiniMerchant_20: 1540540918739199319
+      MiniMerchant_21: 1206462418172131641
+      MiniMerchant_22: -3030798096555085112
+      MiniMerchant_23: -9090206424400718794
+      MiniMerchant_24: 4037313924825888411
+      MiniMerchant_25: 3601015134065161540
+      MiniMerchant_26: -1584327895570516467
+      MiniMerchant_27: 8778409158786117555
+      MiniMerchant_28: 1058888827754400807
+      MiniMerchant_29: -787792664521117962
+      MiniMerchant_3: -5533754864678425507
+      MiniMerchant_30: -5240474570311348121
+      MiniMerchant_31: 4837332925850349988
+      MiniMerchant_32: 4329139395012350155
+      MiniMerchant_33: -5793879027153590454
+      MiniMerchant_34: 2272317588668199245
+      MiniMerchant_4: 3741546308274651435
+      MiniMerchant_5: 5904225794113610125
+      MiniMerchant_6: 5391426466025919202
+      MiniMerchant_7: -1553252132575916022
+      MiniMerchant_8: -8749162994266138888
+      MiniMerchant_9: 4457425173889173173
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

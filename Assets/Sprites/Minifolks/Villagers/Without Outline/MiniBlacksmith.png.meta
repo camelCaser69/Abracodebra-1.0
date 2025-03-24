@@ -1,0 +1,1183 @@
+fileFormatVersion: 2
+guid: a42061f0cc8d5d242880cb06ff5600db
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4640112307870392815
+    second: MiniBlacksmith_0
+  - first:
+      213: 5207777188190581422
+    second: MiniBlacksmith_1
+  - first:
+      213: -385092730865189614
+    second: MiniBlacksmith_2
+  - first:
+      213: 6634763679777895869
+    second: MiniBlacksmith_3
+  - first:
+      213: 8771292871711256398
+    second: MiniBlacksmith_4
+  - first:
+      213: 6129909250474767315
+    second: MiniBlacksmith_5
+  - first:
+      213: -1134843304396533894
+    second: MiniBlacksmith_6
+  - first:
+      213: -4682515863480034466
+    second: MiniBlacksmith_7
+  - first:
+      213: 4616514731578072550
+    second: MiniBlacksmith_8
+  - first:
+      213: 3493834585676780261
+    second: MiniBlacksmith_9
+  - first:
+      213: 6321587736405753752
+    second: MiniBlacksmith_10
+  - first:
+      213: -2581373298600966570
+    second: MiniBlacksmith_11
+  - first:
+      213: 1340981307223939296
+    second: MiniBlacksmith_12
+  - first:
+      213: 1697375298615012896
+    second: MiniBlacksmith_13
+  - first:
+      213: 8145281077556507456
+    second: MiniBlacksmith_14
+  - first:
+      213: -1154011944086153061
+    second: MiniBlacksmith_15
+  - first:
+      213: -2061266949694821585
+    second: MiniBlacksmith_16
+  - first:
+      213: 5013868884204665897
+    second: MiniBlacksmith_17
+  - first:
+      213: -678140573182117144
+    second: MiniBlacksmith_18
+  - first:
+      213: -147742567337905738
+    second: MiniBlacksmith_19
+  - first:
+      213: -5097800108359906289
+    second: MiniBlacksmith_20
+  - first:
+      213: 7554942125335438895
+    second: MiniBlacksmith_21
+  - first:
+      213: 8996471404019973346
+    second: MiniBlacksmith_22
+  - first:
+      213: -6980057304105053199
+    second: MiniBlacksmith_23
+  - first:
+      213: 1436806892305140607
+    second: MiniBlacksmith_24
+  - first:
+      213: -1218989783547780875
+    second: MiniBlacksmith_25
+  - first:
+      213: 2079912704653893045
+    second: MiniBlacksmith_26
+  - first:
+      213: -1960147301013987477
+    second: MiniBlacksmith_27
+  - first:
+      213: -5941138613388187461
+    second: MiniBlacksmith_28
+  - first:
+      213: 5169659184183106957
+    second: MiniBlacksmith_29
+  - first:
+      213: -4600909251351566528
+    second: MiniBlacksmith_30
+  - first:
+      213: -4776911256138601241
+    second: MiniBlacksmith_31
+  - first:
+      213: -7563795765610893571
+    second: MiniBlacksmith_32
+  - first:
+      213: -6193692164989562835
+    second: MiniBlacksmith_33
+  - first:
+      213: -1104020511414556917
+    second: MiniBlacksmith_34
+  - first:
+      213: -1993057865421797523
+    second: MiniBlacksmith_35
+  - first:
+      213: -765933126599243652
+    second: MiniBlacksmith_36
+  - first:
+      213: -7063533997058019717
+    second: MiniBlacksmith_37
+  - first:
+      213: 7788338556187676924
+    second: MiniBlacksmith_38
+  - first:
+      213: 3451469584602087133
+    second: MiniBlacksmith_39
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MiniBlacksmith_0
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 224
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 11e977bb0720b9fb0800000000000000
+      internalID: -4640112307870392815
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_1
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 224
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ea27b7bb2cdb54840800000000000000
+      internalID: 5207777188190581422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_2
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 224
+        width: 13
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21df13b9330e7aaf0800000000000000
+      internalID: -385092730865189614
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_3
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 224
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: db533dd0a6a631c50800000000000000
+      internalID: 6634763679777895869
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_4
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 192
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e4fe34ff464e9b970800000000000000
+      internalID: 8771292871711256398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_5
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 192
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d3fde35cffc11550800000000000000
+      internalID: 6129909250474767315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_6
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 192
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a7fc6bdf60a3040f0800000000000000
+      internalID: -1134843304396533894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_7
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 192
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5b142691ac540fb0800000000000000
+      internalID: -4682515863480034466
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_8
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 192
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6ed911460b7211040800000000000000
+      internalID: 4616514731578072550
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_9
+      rect:
+        serializedVersion: 2
+        x: 170
+        y: 192
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e21d376b089c7030800000000000000
+      internalID: 3493834585676780261
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_10
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 192
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 89f3ee49d8acab750800000000000000
+      internalID: 6321587736405753752
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_11
+      rect:
+        serializedVersion: 2
+        x: 234
+        y: 192
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 656063069ae1d2cd0800000000000000
+      internalID: -2581373298600966570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_12
+      rect:
+        serializedVersion: 2
+        x: 265
+        y: 192
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0e89583e46f1c9210800000000000000
+      internalID: 1340981307223939296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_13
+      rect:
+        serializedVersion: 2
+        x: 297
+        y: 192
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 02e687c47d94e8710800000000000000
+      internalID: 1697375298615012896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_14
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 160
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 04377770cf9d90170800000000000000
+      internalID: 8145281077556507456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_15
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 160
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b98df2640402cffe0800000000000000
+      internalID: -1154011944086153061
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_16
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 160
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f2bef2c51a8e463e0800000000000000
+      internalID: -2061266949694821585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_17
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 160
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92c37618f27d49540800000000000000
+      internalID: 5013868884204665897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_18
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 128
+        width: 11
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ea33bbddb2c696f0800000000000000
+      internalID: -678140573182117144
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_19
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 128
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b1be93faec13fdf0800000000000000
+      internalID: -147742567337905738
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_20
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 128
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f0c824d8fc9f049b0800000000000000
+      internalID: -5097800108359906289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_21
+      rect:
+        serializedVersion: 2
+        x: 103
+        y: 128
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f26e04fc5db88d860800000000000000
+      internalID: 7554942125335438895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_22
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 128
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2ecf19c9313e9dc70800000000000000
+      internalID: 8996471404019973346
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_23
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 128
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f392f42ddad12f90800000000000000
+      internalID: -6980057304105053199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_24
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 97
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f7b4eaa814090f310800000000000000
+      internalID: 1436806892305140607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_25
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 97
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5f0edc61047451fe0800000000000000
+      internalID: -1218989783547780875
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_26
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 96
+        width: 15
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5bd97b4c5955ddc10800000000000000
+      internalID: 2079912704653893045
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_27
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 64
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6fde9f3a682cc4e0800000000000000
+      internalID: -1960147301013987477
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_28
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 64
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb8e3ab98e5dc8da0800000000000000
+      internalID: -5941138613388187461
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_29
+      rect:
+        serializedVersion: 2
+        x: 75
+        y: 64
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d8dd11353a15eb740800000000000000
+      internalID: 5169659184183106957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_30
+      rect:
+        serializedVersion: 2
+        x: 107
+        y: 64
+        width: 13
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 047a16d99694620c0800000000000000
+      internalID: -4600909251351566528
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_31
+      rect:
+        serializedVersion: 2
+        x: 139
+        y: 64
+        width: 12
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7ec2b4e858005bdb0800000000000000
+      internalID: -4776911256138601241
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_32
+      rect:
+        serializedVersion: 2
+        x: 171
+        y: 64
+        width: 10
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dfea82d63dff70790800000000000000
+      internalID: -7563795765610893571
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_33
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 32
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d205da1aac59b0aa0800000000000000
+      internalID: -6193692164989562835
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_34
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 32
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b07e368b13bbda0f0800000000000000
+      internalID: -1104020511414556917
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_35
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 0
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d674cba5e6c3754e0800000000000000
+      internalID: -1993057865421797523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_36
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 0
+        width: 16
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c78095321ebde55f0800000000000000
+      internalID: -765933126599243652
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_37
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 0
+        width: 18
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7e267ef04949fd90800000000000000
+      internalID: -7063533997058019717
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_38
+      rect:
+        serializedVersion: 2
+        x: 104
+        y: 0
+        width: 18
+        height: 9
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cf09b0807acb51c60800000000000000
+      internalID: 7788338556187676924
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBlacksmith_39
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 0
+        width: 18
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ddeb54fec4516ef20800000000000000
+      internalID: 3451469584602087133
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MiniBlacksmith_0: -4640112307870392815
+      MiniBlacksmith_1: 5207777188190581422
+      MiniBlacksmith_10: 6321587736405753752
+      MiniBlacksmith_11: -2581373298600966570
+      MiniBlacksmith_12: 1340981307223939296
+      MiniBlacksmith_13: 1697375298615012896
+      MiniBlacksmith_14: 8145281077556507456
+      MiniBlacksmith_15: -1154011944086153061
+      MiniBlacksmith_16: -2061266949694821585
+      MiniBlacksmith_17: 5013868884204665897
+      MiniBlacksmith_18: -678140573182117144
+      MiniBlacksmith_19: -147742567337905738
+      MiniBlacksmith_2: -385092730865189614
+      MiniBlacksmith_20: -5097800108359906289
+      MiniBlacksmith_21: 7554942125335438895
+      MiniBlacksmith_22: 8996471404019973346
+      MiniBlacksmith_23: -6980057304105053199
+      MiniBlacksmith_24: 1436806892305140607
+      MiniBlacksmith_25: -1218989783547780875
+      MiniBlacksmith_26: 2079912704653893045
+      MiniBlacksmith_27: -1960147301013987477
+      MiniBlacksmith_28: -5941138613388187461
+      MiniBlacksmith_29: 5169659184183106957
+      MiniBlacksmith_3: 6634763679777895869
+      MiniBlacksmith_30: -4600909251351566528
+      MiniBlacksmith_31: -4776911256138601241
+      MiniBlacksmith_32: -7563795765610893571
+      MiniBlacksmith_33: -6193692164989562835
+      MiniBlacksmith_34: -1104020511414556917
+      MiniBlacksmith_35: -1993057865421797523
+      MiniBlacksmith_36: -765933126599243652
+      MiniBlacksmith_37: -7063533997058019717
+      MiniBlacksmith_38: 7788338556187676924
+      MiniBlacksmith_39: 3451469584602087133
+      MiniBlacksmith_4: 8771292871711256398
+      MiniBlacksmith_5: 6129909250474767315
+      MiniBlacksmith_6: -1134843304396533894
+      MiniBlacksmith_7: -4682515863480034466
+      MiniBlacksmith_8: 4616514731578072550
+      MiniBlacksmith_9: 3493834585676780261
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

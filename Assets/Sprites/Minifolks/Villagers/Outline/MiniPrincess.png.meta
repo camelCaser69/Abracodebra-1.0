@@ -1,0 +1,689 @@
+fileFormatVersion: 2
+guid: 9f0e1f9fc0a05cd41af3c72a10fee92a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4145385630474837228
+    second: MiniPrincess_0
+  - first:
+      213: 7052537322361726253
+    second: MiniPrincess_1
+  - first:
+      213: 600362870740375574
+    second: MiniPrincess_2
+  - first:
+      213: 8421063791971589415
+    second: MiniPrincess_3
+  - first:
+      213: 368318592237580347
+    second: MiniPrincess_4
+  - first:
+      213: -995022992228821768
+    second: MiniPrincess_5
+  - first:
+      213: 7993514044276948413
+    second: MiniPrincess_6
+  - first:
+      213: -6952722390150936667
+    second: MiniPrincess_7
+  - first:
+      213: 4879199374349932647
+    second: MiniPrincess_8
+  - first:
+      213: 8617313918080419484
+    second: MiniPrincess_9
+  - first:
+      213: 5546596325009282507
+    second: MiniPrincess_10
+  - first:
+      213: -2828875019683956456
+    second: MiniPrincess_11
+  - first:
+      213: 8111558413171187712
+    second: MiniPrincess_12
+  - first:
+      213: 3385326665418467706
+    second: MiniPrincess_13
+  - first:
+      213: 3857366259868768034
+    second: MiniPrincess_14
+  - first:
+      213: 8122786380022959640
+    second: MiniPrincess_15
+  - first:
+      213: 225613372021729095
+    second: MiniPrincess_16
+  - first:
+      213: 4504702147518487027
+    second: MiniPrincess_17
+  - first:
+      213: -3159909299350208564
+    second: MiniPrincess_18
+  - first:
+      213: -1488739488514913950
+    second: MiniPrincess_19
+  - first:
+      213: 1000950257184306719
+    second: MiniPrincess_20
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MiniPrincess_0
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 128
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 413e9867bb1a876c0800000000000000
+      internalID: -4145385630474837228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_1
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 128
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d252e882455afd160800000000000000
+      internalID: 7052537322361726253
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_2
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 128
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 61850de99dae45800800000000000000
+      internalID: 600362870740375574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_3
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 128
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 72dde5fe6e0add470800000000000000
+      internalID: 8421063791971589415
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_4
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 96
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b303e76eec78c1500800000000000000
+      internalID: 368318592237580347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_5
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 96
+        width: 12
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8f4dad44cd7f032f0800000000000000
+      internalID: -995022992228821768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_6
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 96
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbd393cfbaaaeee60800000000000000
+      internalID: 7993514044276948413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_7
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 96
+        width: 12
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5a70621c2d7f28f90800000000000000
+      internalID: -6952722390150936667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_8
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 96
+        width: 14
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7689f68daf566b340800000000000000
+      internalID: 4879199374349932647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_9
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 96
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c96863d1a59d69770800000000000000
+      internalID: 8617313918080419484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_10
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 64
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bc55aa078f779fc40800000000000000
+      internalID: 5546596325009282507
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_11
+      rect:
+        serializedVersion: 2
+        x: 41
+        y: 64
+        width: 14
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 819f2c95821ddb8d0800000000000000
+      internalID: -2828875019683956456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_12
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 64
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00066ef566b029070800000000000000
+      internalID: 8111558413171187712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_13
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 32
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a79ecec7aa81bfe20800000000000000
+      internalID: 3385326665418467706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_14
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 32
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2271e081d2e188530800000000000000
+      internalID: 3857366259868768034
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_15
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 32
+        width: 13
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 81e46af1d2fe9b070800000000000000
+      internalID: 8122786380022959640
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_16
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 0
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 747eeef9a2a812300800000000000000
+      internalID: 225613372021729095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_17
+      rect:
+        serializedVersion: 2
+        x: 42
+        y: 0
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3f957c97cbae38e30800000000000000
+      internalID: 4504702147518487027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_18
+      rect:
+        serializedVersion: 2
+        x: 73
+        y: 0
+        width: 19
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ccff6c1fb3fb524d0800000000000000
+      internalID: -3159909299350208564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_19
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 0
+        width: 19
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 269c8f7a25fe65be0800000000000000
+      internalID: -1488739488514913950
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniPrincess_20
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 0
+        width: 20
+        height: 10
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f167e45a4f614ed00800000000000000
+      internalID: 1000950257184306719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MiniPrincess_0: -4145385630474837228
+      MiniPrincess_1: 7052537322361726253
+      MiniPrincess_10: 5546596325009282507
+      MiniPrincess_11: -2828875019683956456
+      MiniPrincess_12: 8111558413171187712
+      MiniPrincess_13: 3385326665418467706
+      MiniPrincess_14: 3857366259868768034
+      MiniPrincess_15: 8122786380022959640
+      MiniPrincess_16: 225613372021729095
+      MiniPrincess_17: 4504702147518487027
+      MiniPrincess_18: -3159909299350208564
+      MiniPrincess_19: -1488739488514913950
+      MiniPrincess_2: 600362870740375574
+      MiniPrincess_20: 1000950257184306719
+      MiniPrincess_3: 8421063791971589415
+      MiniPrincess_4: 368318592237580347
+      MiniPrincess_5: -995022992228821768
+      MiniPrincess_6: 7993514044276948413
+      MiniPrincess_7: -6952722390150936667
+      MiniPrincess_8: 4879199374349932647
+      MiniPrincess_9: 8617313918080419484
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

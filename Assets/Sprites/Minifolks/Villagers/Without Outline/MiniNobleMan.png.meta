@@ -1,0 +1,637 @@
+fileFormatVersion: 2
+guid: 63d8978371de2a846a2ea3e18b57bb0b
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1471327572736957275
+    second: MiniNobleMan_0
+  - first:
+      213: -493995988456213594
+    second: MiniNobleMan_1
+  - first:
+      213: -3860155507577422089
+    second: MiniNobleMan_2
+  - first:
+      213: 8102980300940503012
+    second: MiniNobleMan_3
+  - first:
+      213: 287879780892779027
+    second: MiniNobleMan_4
+  - first:
+      213: 1713405332583098350
+    second: MiniNobleMan_5
+  - first:
+      213: -2192521887911157061
+    second: MiniNobleMan_6
+  - first:
+      213: -3077360085231996457
+    second: MiniNobleMan_7
+  - first:
+      213: -5127018253701112460
+    second: MiniNobleMan_8
+  - first:
+      213: 5754424647602621909
+    second: MiniNobleMan_9
+  - first:
+      213: -2706106492245448025
+    second: MiniNobleMan_10
+  - first:
+      213: 1833258450741683399
+    second: MiniNobleMan_11
+  - first:
+      213: -5561936192484494660
+    second: MiniNobleMan_12
+  - first:
+      213: 4223260579185007805
+    second: MiniNobleMan_13
+  - first:
+      213: -4767236166147813523
+    second: MiniNobleMan_14
+  - first:
+      213: -5273276580158822997
+    second: MiniNobleMan_15
+  - first:
+      213: -207937530391932947
+    second: MiniNobleMan_16
+  - first:
+      213: -3036254056688153769
+    second: MiniNobleMan_17
+  - first:
+      213: 769927228299722885
+    second: MiniNobleMan_18
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MiniNobleMan_0
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 128
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5b5939c1a43b6410800000000000000
+      internalID: 1471327572736957275
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_1
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 128
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6a3799b0449f429f0800000000000000
+      internalID: -493995988456213594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_2
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 128
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7fe74119409fd6ac0800000000000000
+      internalID: -3860155507577422089
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_3
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 128
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4e7eb8bf6a1937070800000000000000
+      internalID: 8102980300940503012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_4
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 96
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 312a12ea221cef300800000000000000
+      internalID: 287879780892779027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_5
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 96
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee720ec621d37c710800000000000000
+      internalID: 1713405332583098350
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_6
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 97
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bb269cc95f89291e0800000000000000
+      internalID: -2192521887911157061
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_7
+      rect:
+        serializedVersion: 2
+        x: 103
+        y: 96
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7d1f7c99e450b45d0800000000000000
+      internalID: -3077360085231996457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_8
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 96
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 47d9337ff0c29d8b0800000000000000
+      internalID: -5127018253701112460
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_9
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 97
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5dd4b1f8ab2dbdf40800000000000000
+      internalID: 5754424647602621909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_10
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 65
+        width: 13
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7aae45d9b7af17ad0800000000000000
+      internalID: -2706106492245448025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_11
+      rect:
+        serializedVersion: 2
+        x: 40
+        y: 65
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7c4e0f119da017910800000000000000
+      internalID: 1833258450741683399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_12
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 64
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cb2b297508800d2b0800000000000000
+      internalID: -5561936192484494660
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_13
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 32
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: dbc9b38fe190c9a30800000000000000
+      internalID: 4223260579185007805
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_14
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 32
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6f4d5cf6ff57ddb0800000000000000
+      internalID: -4767236166147813523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_15
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 32
+        width: 15
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba52f3da3ee81d6b0800000000000000
+      internalID: -5273276580158822997
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_16
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 0
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: def4485fae14d1df0800000000000000
+      internalID: -207937530391932947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_17
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 1
+        width: 14
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75b834fa50f0dd5d0800000000000000
+      internalID: -3036254056688153769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniNobleMan_18
+      rect:
+        serializedVersion: 2
+        x: 72
+        y: 0
+        width: 46
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 580c4b12cb45faa00800000000000000
+      internalID: 769927228299722885
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MiniNobleMan_0: 1471327572736957275
+      MiniNobleMan_1: -493995988456213594
+      MiniNobleMan_10: -2706106492245448025
+      MiniNobleMan_11: 1833258450741683399
+      MiniNobleMan_12: -5561936192484494660
+      MiniNobleMan_13: 4223260579185007805
+      MiniNobleMan_14: -4767236166147813523
+      MiniNobleMan_15: -5273276580158822997
+      MiniNobleMan_16: -207937530391932947
+      MiniNobleMan_17: -3036254056688153769
+      MiniNobleMan_18: 769927228299722885
+      MiniNobleMan_2: -3860155507577422089
+      MiniNobleMan_3: 8102980300940503012
+      MiniNobleMan_4: 287879780892779027
+      MiniNobleMan_5: 1713405332583098350
+      MiniNobleMan_6: -2192521887911157061
+      MiniNobleMan_7: -3077360085231996457
+      MiniNobleMan_8: -5127018253701112460
+      MiniNobleMan_9: 5754424647602621909
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

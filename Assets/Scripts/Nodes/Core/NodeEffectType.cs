@@ -4,6 +4,8 @@
     Damage,
     ManaStorage,
     ManaRechargeRate,
+    EnergyStorage,
+    EnergyPhotosynthesis,
     Output,
     AimSpread,    // formerly Accuracy
     Burning,

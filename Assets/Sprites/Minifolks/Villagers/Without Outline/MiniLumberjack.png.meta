@@ -1,0 +1,1131 @@
+fileFormatVersion: 2
+guid: f11c663cf7cfe1447b9f56459987e481
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -6981436394488493474
+    second: MiniLumberjack_0
+  - first:
+      213: 7966150676907374182
+    second: MiniLumberjack_1
+  - first:
+      213: 3714355572618067691
+    second: MiniLumberjack_2
+  - first:
+      213: 950126197785546524
+    second: MiniLumberjack_3
+  - first:
+      213: 5503736071188223323
+    second: MiniLumberjack_4
+  - first:
+      213: -3919133409105627521
+    second: MiniLumberjack_5
+  - first:
+      213: -731775047375351111
+    second: MiniLumberjack_6
+  - first:
+      213: -2988559229120764719
+    second: MiniLumberjack_7
+  - first:
+      213: 579421553063455816
+    second: MiniLumberjack_8
+  - first:
+      213: 2549278444678236583
+    second: MiniLumberjack_9
+  - first:
+      213: 8610185626210173995
+    second: MiniLumberjack_10
+  - first:
+      213: 4653980971668202282
+    second: MiniLumberjack_11
+  - first:
+      213: 3116287913324771524
+    second: MiniLumberjack_12
+  - first:
+      213: 7211168928371862820
+    second: MiniLumberjack_13
+  - first:
+      213: 2697135270816264500
+    second: MiniLumberjack_14
+  - first:
+      213: -7838499098152916472
+    second: MiniLumberjack_15
+  - first:
+      213: -7019837293805397161
+    second: MiniLumberjack_16
+  - first:
+      213: -6873036189813121371
+    second: MiniLumberjack_17
+  - first:
+      213: 8560637393292255362
+    second: MiniLumberjack_18
+  - first:
+      213: -7224764864536890618
+    second: MiniLumberjack_19
+  - first:
+      213: -5937792858194109775
+    second: MiniLumberjack_20
+  - first:
+      213: -2825460699344667899
+    second: MiniLumberjack_21
+  - first:
+      213: -7739807031648913768
+    second: MiniLumberjack_22
+  - first:
+      213: 5808784073740529329
+    second: MiniLumberjack_23
+  - first:
+      213: 6739070383659795751
+    second: MiniLumberjack_24
+  - first:
+      213: -6017829725657676767
+    second: MiniLumberjack_25
+  - first:
+      213: 4043896305690353320
+    second: MiniLumberjack_26
+  - first:
+      213: -6079348681616682661
+    second: MiniLumberjack_27
+  - first:
+      213: 582927176547547546
+    second: MiniLumberjack_28
+  - first:
+      213: -3119928897610738706
+    second: MiniLumberjack_29
+  - first:
+      213: 4000598578238784185
+    second: MiniLumberjack_30
+  - first:
+      213: 6700566538296433202
+    second: MiniLumberjack_31
+  - first:
+      213: -2679992404401917921
+    second: MiniLumberjack_32
+  - first:
+      213: 2570492849448082063
+    second: MiniLumberjack_33
+  - first:
+      213: -4201142451782663183
+    second: MiniLumberjack_34
+  - first:
+      213: 6161618900853706986
+    second: MiniLumberjack_35
+  - first:
+      213: 8494399491549954388
+    second: MiniLumberjack_36
+  - first:
+      213: -498816519072041265
+    second: MiniLumberjack_37
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: MiniLumberjack_0
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 224
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5a8784a694fc1f90800000000000000
+      internalID: -6981436394488493474
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_1
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 224
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6663d4c85d37d8e60800000000000000
+      internalID: 7966150676907374182
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_2
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 224
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bee746bb6ba0c8330800000000000000
+      internalID: 3714355572618067691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_3
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 224
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c1fccce2eb68f2d00800000000000000
+      internalID: 950126197785546524
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_4
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 192
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b559da4fbc2316c40800000000000000
+      internalID: 5503736071188223323
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_5
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 192
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f76b4eacde07c99c0800000000000000
+      internalID: -3919133409105627521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_6
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 192
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b292b5b87638d5f0800000000000000
+      internalID: -731775047375351111
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_7
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 192
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d4aa0617318686d0800000000000000
+      internalID: -2988559229120764719
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_8
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 192
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84c6d8525d48a0800800000000000000
+      internalID: 579421553063455816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_9
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 192
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a94b902d3bd06320800000000000000
+      internalID: 2549278444678236583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_10
+      rect:
+        serializedVersion: 2
+        x: 198
+        y: 192
+        width: 18
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b248e6455368d7770800000000000000
+      internalID: 8610185626210173995
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_11
+      rect:
+        serializedVersion: 2
+        x: 5
+        y: 160
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a23e5bf2903469040800000000000000
+      internalID: 4653980971668202282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_12
+      rect:
+        serializedVersion: 2
+        x: 36
+        y: 160
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4c8f09ba8574f3b20800000000000000
+      internalID: 3116287913324771524
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_13
+      rect:
+        serializedVersion: 2
+        x: 76
+        y: 160
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 42d60f61fe7331460800000000000000
+      internalID: 7211168928371862820
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_14
+      rect:
+        serializedVersion: 2
+        x: 108
+        y: 160
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4313e202d362e6520800000000000000
+      internalID: 2697135270816264500
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_15
+      rect:
+        serializedVersion: 2
+        x: 140
+        y: 160
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80a2062b99e083390800000000000000
+      internalID: -7838499098152916472
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_16
+      rect:
+        serializedVersion: 2
+        x: 169
+        y: 160
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 75b90b98c27849e90800000000000000
+      internalID: -7019837293805397161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_17
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 129
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5aed8c110021e90a0800000000000000
+      internalID: -6873036189813121371
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_18
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 128
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2806c1e5a5e7dc670800000000000000
+      internalID: 8560637393292255362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_19
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 128
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6033e8752aa7cbb90800000000000000
+      internalID: -7224764864536890618
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_20
+      rect:
+        serializedVersion: 2
+        x: 102
+        y: 129
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1ba1d71fad8b89da0800000000000000
+      internalID: -5937792858194109775
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_21
+      rect:
+        serializedVersion: 2
+        x: 134
+        y: 128
+        width: 16
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 50bfbb0c672f9c8d0800000000000000
+      internalID: -2825460699344667899
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_22
+      rect:
+        serializedVersion: 2
+        x: 166
+        y: 128
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 896fe70138ea69490800000000000000
+      internalID: -7739807031648913768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_23
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 97
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1be204cb652fc9050800000000000000
+      internalID: 5808784073740529329
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_24
+      rect:
+        serializedVersion: 2
+        x: 38
+        y: 97
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 725c56e0fccf58d50800000000000000
+      internalID: 6739070383659795751
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_25
+      rect:
+        serializedVersion: 2
+        x: 70
+        y: 96
+        width: 16
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12443639fbf5c7ca0800000000000000
+      internalID: -6017829725657676767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_26
+      rect:
+        serializedVersion: 2
+        x: 6
+        y: 64
+        width: 15
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8ae1039b34ece1830800000000000000
+      internalID: 4043896305690353320
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_27
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 64
+        width: 14
+        height: 15
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b519f767590d1aba0800000000000000
+      internalID: -6079348681616682661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_28
+      rect:
+        serializedVersion: 2
+        x: 76
+        y: 64
+        width: 17
+        height: 17
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a99b908bd29f61800800000000000000
+      internalID: 582927176547547546
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_29
+      rect:
+        serializedVersion: 2
+        x: 108
+        y: 64
+        width: 19
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ee39f6d9239c3b4d0800000000000000
+      internalID: -3119928897610738706
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_30
+      rect:
+        serializedVersion: 2
+        x: 140
+        y: 64
+        width: 19
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b20bd8f53bf48730800000000000000
+      internalID: 4000598578238784185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_31
+      rect:
+        serializedVersion: 2
+        x: 172
+        y: 64
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 23a1705f3c13dfc50800000000000000
+      internalID: 6700566538296433202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_32
+      rect:
+        serializedVersion: 2
+        x: 201
+        y: 64
+        width: 14
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f10f0ee7b11cecad0800000000000000
+      internalID: -2679992404401917921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_33
+      rect:
+        serializedVersion: 2
+        x: 3
+        y: 32
+        width: 17
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8ad805a0a93ca320800000000000000
+      internalID: 2570492849448082063
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_34
+      rect:
+        serializedVersion: 2
+        x: 37
+        y: 32
+        width: 16
+        height: 14
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1f34eaed23b82b5c0800000000000000
+      internalID: -4201142451782663183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_35
+      rect:
+        serializedVersion: 2
+        x: 7
+        y: 0
+        width: 15
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae0d7b2aeb7728550800000000000000
+      internalID: 6161618900853706986
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_36
+      rect:
+        serializedVersion: 2
+        x: 39
+        y: 0
+        width: 15
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4510812155b22e570800000000000000
+      internalID: 8494399491549954388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniLumberjack_37
+      rect:
+        serializedVersion: 2
+        x: 71
+        y: 0
+        width: 47
+        height: 7
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fc63d9cc409d319f0800000000000000
+      internalID: -498816519072041265
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      MiniLumberjack_0: -6981436394488493474
+      MiniLumberjack_1: 7966150676907374182
+      MiniLumberjack_10: 8610185626210173995
+      MiniLumberjack_11: 4653980971668202282
+      MiniLumberjack_12: 3116287913324771524
+      MiniLumberjack_13: 7211168928371862820
+      MiniLumberjack_14: 2697135270816264500
+      MiniLumberjack_15: -7838499098152916472
+      MiniLumberjack_16: -7019837293805397161
+      MiniLumberjack_17: -6873036189813121371
+      MiniLumberjack_18: 8560637393292255362
+      MiniLumberjack_19: -7224764864536890618
+      MiniLumberjack_2: 3714355572618067691
+      MiniLumberjack_20: -5937792858194109775
+      MiniLumberjack_21: -2825460699344667899
+      MiniLumberjack_22: -7739807031648913768
+      MiniLumberjack_23: 5808784073740529329
+      MiniLumberjack_24: 6739070383659795751
+      MiniLumberjack_25: -6017829725657676767
+      MiniLumberjack_26: 4043896305690353320
+      MiniLumberjack_27: -6079348681616682661
+      MiniLumberjack_28: 582927176547547546
+      MiniLumberjack_29: -3119928897610738706
+      MiniLumberjack_3: 950126197785546524
+      MiniLumberjack_30: 4000598578238784185
+      MiniLumberjack_31: 6700566538296433202
+      MiniLumberjack_32: -2679992404401917921
+      MiniLumberjack_33: 2570492849448082063
+      MiniLumberjack_34: -4201142451782663183
+      MiniLumberjack_35: 6161618900853706986
+      MiniLumberjack_36: 8494399491549954388
+      MiniLumberjack_37: -498816519072041265
+      MiniLumberjack_4: 5503736071188223323
+      MiniLumberjack_5: -3919133409105627521
+      MiniLumberjack_6: -731775047375351111
+      MiniLumberjack_7: -2988559229120764719
+      MiniLumberjack_8: 579421553063455816
+      MiniLumberjack_9: 2549278444678236583
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
