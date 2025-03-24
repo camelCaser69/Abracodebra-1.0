@@ -1,0 +1,1228 @@
+This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
+
+================================================================================
+UNITY PROJECT SCRIPT EXPORT - 2025-03-24 13:12:56
+PART 16 OF 26
+================================================================================
+
+--------------------------------------------------------------------------------
+Assets
+├── DefaultVolumeProfile.asset
+├── Editor
+│   ├── HexGridRendererEditor.cs
+│   ├── NodeDefinitionAutoAdder.cs
+│   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionLibraryEditor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   ├── NodeEffectDataDrawer.cs
+│   └── WizardControllerStatusEditor.cs
+├── InputSystem_Actions.inputactions
+├── Materials
+│   └── BezierCurveAA_Material.mat
+├── Post Processing
+├── Prefabs
+│   ├── General
+│   │   ├── GardenerPrefab.prefab
+│   │   ├── PixelLeaf.prefab
+│   │   ├── PixelSeed.prefab
+│   │   ├── PixelStem.prefab
+│   │   ├── PlantPrefab.prefab
+│   │   ├── Projectile_Basic_Pixel.prefab
+│   │   └── WizardPrefab.prefab
+│   ├── Node Presets
+│   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
+│   │   ├── Node_001_AimSpread.asset
+│   │   ├── Node_002_Piercing.asset
+│   │   ├── Node_003_Output.asset
+│   │   ├── Node_004_ManaSource.asset
+│   │   ├── Node_005_DamageNode.asset
+│   │   ├── Node_006_Burn.asset
+│   │   └── Node_007_FriendlyFire.asset
+│   ├── UI
+│   │   └── NodeView.prefab
+│   └── Wizard Presets
+│       ├── Wizard_Basic.asset
+│       └── Wizard_Dummy.asset
+├── Scenes
+│   ├── MainScene.unity
+│   └── SampleScene.unity
+├── Scripts
+│   ├── Battle
+│   │   ├── Plant
+│   │   │   └── PlantGrowth.cs
+│   │   ├── SpellProjectile.cs
+│   │   └── Status Effects
+│   │       ├── BurningStatusEffect.cs
+│   │       └── StatusEffect.cs
+│   ├── Core
+│   ├── Nodes
+│   │   ├── Core
+│   │   │   ├── HexCoords.cs
+│   │   │   ├── HexGridManager.cs
+│   │   │   ├── HexGridRenderer.cs
+│   │   │   ├── NodeData.cs
+│   │   │   ├── NodeDefinition.cs
+│   │   │   ├── NodeDefinitionLibrary.cs
+│   │   │   ├── NodeEffectData.cs
+│   │   │   ├── NodeEffectType.cs
+│   │   │   ├── NodePort.cs
+│   │   │   ├── OutputNodeEffect.cs
+│   │   │   └── PortDefinition.cs
+│   │   ├── Runtime
+│   │   │   ├── NodeExecutor.cs
+│   │   │   └── NodeGraph.cs
+│   │   └── UI
+│   │       ├── ColorExtensions.cs
+│   │       ├── NodeEditorController.cs
+│   │       ├── NodeHexDraggable.cs
+│   │       ├── NodeSelectable.cs
+│   │       ├── NodeTestInitializer.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
+│   ├── UI
+│   └── Wizards
+│       ├── WizardController.cs
+│       └── WizardPreset.cs
+├── Settings
+│   ├── Lit2DSceneTemplate.scenetemplate
+│   ├── Renderer2D.asset
+│   ├── Scenes
+│   │   └── URP2DSceneTemplate.unity
+│   └── UniversalRP.asset
+├── Shaders
+│   └── BezierCurveAA.shader
+├── Sprites
+│   ├── Clouds
+│   │   ├── Clouds 1
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   └── 4.png
+│   │   ├── Clouds 2
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   └── 4.png
+│   │   ├── Clouds 3
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   └── 4.png
+│   │   ├── Clouds 4
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   └── 4.png
+│   │   ├── Clouds 5
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   ├── 4.png
+│   │   │   └── 5.png
+│   │   ├── Clouds 6
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   ├── 4.png
+│   │   │   ├── 5.png
+│   │   │   └── 6.png
+│   │   ├── Clouds 7
+│   │   │   ├── 1.png
+│   │   │   ├── 2.png
+│   │   │   ├── 3.png
+│   │   │   └── 4.png
+│   │   └── Clouds 8
+│   │       ├── 1.png
+│   │       ├── 2.png
+│   │       ├── 3.png
+│   │       ├── 4.png
+│   │       ├── 5.png
+│   │       └── 6.png
+│   ├── CustomDownloaded
+│   │   ├── arrowSimple.png
+│   │   ├── arrowSimpleWhite.png
+│   │   ├── arrowSimpleWhite.png~
+│   │   ├── arrowSimpleWhiteShadowIn.png
+│   │   └── arrowSimpleWhiteShadowOut.png
+│   ├── Free Pixel Effects Pack
+│   │   ├── 10_weaponhit_spritesheet.png
+│   │   ├── 11_fire_spritesheet.png
+│   │   ├── 12_nebula_spritesheet.png
+│   │   ├── 13_vortex_spritesheet.png
+│   │   ├── 14_phantom_spritesheet.png
+│   │   ├── 15_loading_spritesheet.png
+│   │   ├── 16_sunburn_spritesheet.png
+│   │   ├── 17_felspell_spritesheet.png
+│   │   ├── 18_midnight_spritesheet.png
+│   │   ├── 19_freezing_spritesheet.png
+│   │   ├── 1_magicspell_spritesheet.png
+│   │   ├── 20_magicbubbles_spritesheet.png
+│   │   ├── 2_magic8_spritesheet.png
+│   │   ├── 3_bluefire_spritesheet.png
+│   │   ├── 4_casting_spritesheet.png
+│   │   ├── 5_magickahit_spritesheet.png
+│   │   ├── 6_flamelash_spritesheet.png
+│   │   ├── 7_firespin_spritesheet.png
+│   │   ├── 8_protectioncircle_spritesheet.png
+│   │   ├── 9_brightfire_spritesheet.png
+│   │   ├── README.txt
+│   │   └── cover.png
+│   ├── Hexagons Nodes
+│   │   ├── hex1.png
+│   │   ├── hex2.png
+│   │   ├── hex3.png
+│   │   ├── hex4.png
+│   │   ├── hex5.png
+│   │   ├── hex6.png
+│   │   ├── hex7.png
+│   │   └── hex8.png
+│   ├── MR-Platformer-v1
+│   │   ├── Backgrounds
+│   │   │   ├── merged-full-background.png
+│   │   │   ├── parallax-background-mountains.png
+│   │   │   ├── parallax-background-sky.png
+│   │   │   ├── parallax-forest-trees-01.png
+│   │   │   └── parallax-forest-trees-02.png
+│   │   ├── Enemies
+│   │   │   ├── Enemy-Bat-Fly-32x32.png
+│   │   │   ├── Enemy-Boss-Golem-Idle-48x48.png
+│   │   │   ├── Enemy-Dark-Guard-Idle-39x49.png
+│   │   │   ├── Enemy-Forest-Goblin-Hog-Idle-32x32.png
+│   │   │   ├── Enemy-Forest-Goblin-Idle-32x32.png
+│   │   │   ├── Enemy-Frog-Attack-24x24.png
+│   │   │   ├── Enemy-Frog-Idle-24x24.png
+│   │   │   ├── Enemy-Frog-Tongue-Attack-72x24.png
+│   │   │   ├── Enemy-Mushroom-Walk-24x24.png
+│   │   │   ├── Enemy-Necromancer-Idle-32x32.png
+│   │   │   ├── Enemy-Plant-Mutant-Idle-Attack-46x32.png
+│   │   │   ├── Enemy-Skull-Slime-Idle-32x24.png
+│   │   │   ├── Enemy-Snail-Attack-24x24.png
+│   │   │   └── Enemy-Snail-Walk-24x24.png
+│   │   ├── Misc
+│   │   │   ├── Bridge-Support.png
+│   │   │   ├── Bridge-handle-01.png
+│   │   │   ├── Bridge-handle-02.png
+│   │   │   ├── Bridge.png
+│   │   │   ├── Bush-Background.png
+│   │   │   ├── Bush-Green-Foreground.png
+│   │   │   ├── Bush-Purple-Foreground.png
+│   │   │   ├── Cave-Background-Hole-01.png
+│   │   │   ├── Cave-Background-Rocks-01.png
+│   │   │   ├── Cave-Background-Rocks-02.png
+│   │   │   ├── Cave-Background.png
+│   │   │   ├── Cave-Entrance.png
+│   │   │   ├── Grass-Green-Foreground.png
+│   │   │   ├── Grass-Purple-Foreground.png
+│   │   │   ├── House-01.png
+│   │   │   ├── House-02.png
+│   │   │   ├── House-Background-01.png
+│   │   │   ├── House-Background-02
+│   │   │   ├── Lamp-Off.png
+│   │   │   ├── Lamp-On.png
+│   │   │   └── Mushrooms.png
+│   │   ├── NPC
+│   │   │   ├── NPC-Alchemist-Idle-24x24.png
+│   │   │   ├── NPC-Blacksmith-Idle-48x48.png
+│   │   │   ├── NPC-Builder-01-Working-24x24.png
+│   │   │   ├── NPC-Builder-02-Working-24x24.png
+│   │   │   ├── NPC-Chick-Idle-16x16.png
+│   │   │   ├── NPC-Miner-Idle-24x24.png
+│   │   │   ├── NPC-Old-Shaman-Idle-24x24.png
+│   │   │   ├── NPC-Puppy-Idle-24x24.png
+│   │   │   ├── NPC-Village-Guard-Idle-32x32.png
+│   │   │   ├── NPC-Village-Lady-01-Talk-24x24.png
+│   │   │   └── NPC-Village-Lady-02-Idle-24x24.png
+│   │   ├── Objects
+│   │   │   ├── Obj-Arrow-Idle-12x12.png
+│   │   │   ├── Obj-Arrow-Stuck-12x12.png
+│   │   │   ├── Obj-Axe-Wood.png
+│   │   │   ├── Obj-Barrel.png
+│   │   │   ├── Obj-Big-Wood-Platform-01.png
+│   │   │   ├── Obj-Big-Wood-Platform-02.png
+│   │   │   ├── Obj-Blue-Mineral.png
+│   │   │   ├── Obj-Boxes.png
+│   │   │   ├── Obj-Cage.png
+│   │   │   ├── Obj-Checkpoint-Off.png
+│   │   │   ├── Obj-Checkpoint-On.png
+│   │   │   ├── Obj-Chest-Closed-24x24.png
+│   │   │   ├── Obj-Chest-Opening-24x24.png
+│   │   │   ├── Obj-Crystal-Idle-32x32.png
+│   │   │   ├── Obj-Crystal-Open-32x32.png
+│   │   │   ├── Obj-Dreamcatcher-01.png
+│   │   │   ├── Obj-Dreamcatcher-02.png
+│   │   │   ├── Obj-Dreamcatcher-03.png
+│   │   │   ├── Obj-Fence.png
+│   │   │   ├── Obj-Flag-Hanging-01.png
+│   │   │   ├── Obj-Gate-Hold.png
+│   │   │   ├── Obj-Gate-Pillar.png
+│   │   │   ├── Obj-Green-Mineral.png
+│   │   │   ├── Obj-Hanging-Flag-01.png
+│   │   │   ├── Obj-Hanging-Flag-02.png
+│   │   │   ├── Obj-Hanging-Flag-Medium.png
+│   │   │   ├── Obj-Idol.png
+│   │   │   ├── Obj-Key.png
+│   │   │   ├── Obj-Lamp-On.png
+│   │   │   ├── Obj-Light-01.png
+│   │   │   ├── Obj-Mine-Carriage.png
+│   │   │   ├── Obj-Moving-Platform-Idle-48x28.png
+│   │   │   ├── Obj-Orange-Mineral.png
+│   │   │   ├── Obj-Pickaxe.png
+│   │   │   ├── Obj-Roof-Hanging.png
+│   │   │   ├── Obj-Short-Roof.png
+│   │   │   ├── Obj-Stairs.png
+│   │   │   ├── Obj-Statue.png
+│   │   │   ├── Obj-Village-Gate-Top.png
+│   │   │   ├── Obj-Wood-Pillar-01.png
+│   │   │   ├── Obj-Wood-Platform-01.png
+│   │   │   ├── Obj-Wood-Platform-02.png
+│   │   │   ├── Obj-Wood-Platform-Tall-02.png
+│   │   │   ├── Obj-Wood-Platform-Tall.png
+│   │   │   ├── Obj-Wood-Platform-Top.png
+│   │   │   └── Obj-Wood.png
+│   │   ├── Player
+│   │   │   ├── Player-Attack-24x24.png
+│   │   │   ├── Player-Fall-24x24.png
+│   │   │   ├── Player-Idle-24x24.png
+│   │   │   ├── Player-Jump-24x24.png
+│   │   │   └── Player-Run-24x24.png
+│   │   ├── Tiles
+│   │   │   ├── Cave-Under-Tile.png
+│   │   │   ├── Tile-01.png
+│   │   │   ├── Tile-02.png
+│   │   │   ├── Tile-03.png
+│   │   │   ├── Tile-04.png
+│   │   │   ├── Tile-05.png
+│   │   │   ├── Tile-06.png
+│   │   │   ├── Tile-07.png
+│   │   │   ├── Tile-08.png
+│   │   │   ├── Tile-09.png
+│   │   │   ├── Tile-10.png
+│   │   │   ├── Tile-11.png
+│   │   │   ├── Tile-12.png
+│   │   │   ├── Tile-13.png
+│   │   │   ├── Tile-14.png
+│   │   │   ├── Tile-15.png
+│   │   │   ├── Tile-16.png
+│   │   │   ├── Tile-17.png
+│   │   │   ├── Tile-18.png
+│   │   │   ├── Tile-19.png
+│   │   │   ├── Tile-20.png
+│   │   │   ├── Tile-21.png
+│   │   │   ├── Tile-22.png
+│   │   │   ├── Tile-23.png
+│   │   │   ├── Tile-24.png
+│   │   │   ├── Tile-25.png
+│   │   │   ├── Tile-26.png
+│   │   │   ├── Tile-27.png
+│   │   │   ├── Tile-28.png
+│   │   │   ├── Tile-29.png
+│   │   │   ├── Tile-30.png
+│   │   │   ├── Tile-31.png
+│   │   │   ├── Tile-32.png
+│   │   │   ├── Tile-33.png
+│   │   │   ├── Tile-34.png
+│   │   │   ├── Tile-35.png
+│   │   │   ├── Tile-36.png
+│   │   │   ├── Tile-37.png
+│   │   │   ├── Tree-Trunk-01.png
+│   │   │   └── Tree-Trunk-02.png
+│   │   └── UI
+│   │       ├── Quest-Mark-Idle-16x16.png
+│   │       ├── UI-Boss-Icon.png
+│   │       ├── UI-Lives.png
+│   │       ├── UI-Menu-Button-Active.png
+│   │       ├── UI-Menu-Button-Default.png
+│   │       └── UI-Menu-Popup-Background.png
+│   ├── PixelWhite.png
+│   ├── Shikashi's Fantasy Icons Pack v2
+│   │   ├── #1 - Transparent Icons.png
+│   │   ├── #2 - Transparent Icons & Drop Shadow.png
+│   │   ├── BG 10.png
+│   │   ├── BG 11.png
+│   │   ├── BG 3a.png
+│   │   ├── BG 3b.png
+│   │   ├── BG 3c.png
+│   │   ├── BG 4a.png
+│   │   ├── BG 4b.png
+│   │   ├── BG 5.png
+│   │   ├── BG 6.png
+│   │   ├── BG 7.png
+│   │   ├── BG 8.png
+│   │   ├── BG 9.png
+│   │   ├── Background 1a.png
+│   │   ├── Background 1b.png
+│   │   ├── Background 2.png
+│   │   └── Shikashi's Fantasy Icons Pack.txt
+│   ├── Tiny RPG Character Asset Pack v1.03 -Free Soldier&Orc
+│   │   ├── Arrow(Projectile)
+│   │   │   ├── Arrow01(100x100).png
+│   │   │   └── Arrow01(32x32).png
+│   │   ├── Aseprite file
+│   │   │   ├── Orc.aseprite
+│   │   │   └── Soldier.aseprite
+│   │   └── Characters(100x100)
+│   │       ├── Orc
+│   │       │   ├── Orc
+│   │       │   │   ├── Orc-Attack01.png
+│   │       │   │   ├── Orc-Attack02.png
+│   │       │   │   ├── Orc-Death.png
+│   │       │   │   ├── Orc-Hurt.png
+│   │       │   │   ├── Orc-Idle-Anim.anim
+│   │       │   │   ├── Orc-Idle.png
+│   │       │   │   ├── Orc-Idle_0.controller
+│   │       │   │   ├── Orc-Walk.png
+│   │       │   │   ├── Orc.png
+│   │       │   │   └── Shadow sprites
+│   │       │   │       ├── Orc-shadow.png
+│   │       │   │       ├── Orc-shadow_attack02.png
+│   │       │   │       └── Orc-shadow_death.png
+│   │       │   ├── Orc with shadows
+│   │       │   │   ├── Orc-Attack01.png
+│   │       │   │   ├── Orc-Attack02.png
+│   │       │   │   ├── Orc-Death.png
+│   │       │   │   ├── Orc-Hurt.png
+│   │       │   │   ├── Orc-Idle.png
+│   │       │   │   ├── Orc-Walk.png
+│   │       │   │   └── Orc.png
+│   │       │   └── Orc(Split Effects)
+│   │       │       ├── Orc-attack01_Effect.png
+│   │       │       ├── Orc-attack02_Effect.png
+│   │       │       └── Orc.png
+│   │       └── Soldier
+│   │           ├── Arrow(projectile)
+│   │           │   ├── Arrow01(100x100).png
+│   │           │   └── Arrow01(32x32).png
+│   │           ├── Soldier
+│   │           │   ├── Shadow sprites
+│   │           │   │   ├── Soldier-Shadow.png
+│   │           │   │   └── Soldier-Shadow_death.png
+│   │           │   ├── Soldier-Attack01.png
+│   │           │   ├── Soldier-Attack02.png
+│   │           │   ├── Soldier-Attack03.png
+│   │           │   ├── Soldier-Death.png
+│   │           │   ├── Soldier-Hurt.png
+│   │           │   ├── Soldier-Idle.png
+│   │           │   ├── Soldier-Shadow_attack2.png
+│   │           │   ├── Soldier-Walk.png
+│   │           │   └── Soldier.png
+│   │           ├── Soldier with shadows
+│   │           │   ├── Soldier-Attack01.png
+│   │           │   ├── Soldier-Attack02.png
+│   │           │   ├── Soldier-Attack03.png
+│   │           │   ├── Soldier-Death.png
+│   │           │   ├── Soldier-Hurt.png
+│   │           │   ├── Soldier-Idle-Anim.anim
+│   │           │   ├── Soldier-Idle.png
+│   │           │   ├── Soldier-Idle_0.controller
+│   │           │   ├── Soldier-Walk.png
+│   │           │   ├── Soldier.png
+│   │           │   └── WizardPrefab.controller
+│   │           └── Soldier(Split Effects)
+│   │               ├── Soldier-Attack01_Effect.png
+│   │               ├── Soldier-Attack02_Effect.png
+│   │               ├── Soldier-Attack03_Effect.png
+│   │               └── Soldier.png
+│   └── Wizard Pack
+│       ├── Attack1.png
+│       ├── Attack2.png
+│       ├── Death.png
+│       ├── Fall.png
+│       ├── Hit.png
+│       ├── Idle.png
+│       ├── Jump.png
+│       └── Run.png
+├── Test
+├── TextMesh Pro
+│   ├── Examples & Extras
+│   │   ├── Fonts
+│   │   │   ├── Anton OFL.txt
+│   │   │   ├── Anton SDF.asset
+│   │   │   ├── Anton.ttf
+│   │   │   ├── Bangers - OFL.txt
+│   │   │   ├── Bangers SDF.asset
+│   │   │   ├── Bangers.ttf
+│   │   │   ├── Electronic Highway Sign SDF.asset
+│   │   │   ├── Electronic Highway Sign.TTF
+│   │   │   ├── Oswald-Bold - OFL.txt
+│   │   │   ├── Oswald-Bold.ttf
+│   │   │   ├── Roboto-Bold - AFL.txt
+│   │   │   ├── Roboto-Bold - License.txt
+│   │   │   ├── Roboto-Bold SDF.asset
+│   │   │   ├── Roboto-Bold.ttf
+│   │   │   ├── Unity - OFL.txt
+│   │   │   └── Unity.ttf
+│   │   ├── Materials
+│   │   │   ├── Crate - Surface Shader Scene.mat
+│   │   │   ├── Crate - URP.mat
+│   │   │   ├── Ground - Logo Scene.mat
+│   │   │   ├── Ground - Surface Shader Scene.mat
+│   │   │   ├── Ground - URP.mat
+│   │   │   └── Small Crate_diffuse.mat
+│   │   ├── Prefabs
+│   │   │   ├── Text Popup.prefab
+│   │   │   ├── TextMeshPro - Prefab 1.prefab
+│   │   │   └── TextMeshPro - Prefab 2.prefab
+│   │   ├── Resources
+│   │   │   ├── Color Gradient Presets
+│   │   │   │   ├── Blue to Purple - Vertical.asset
+│   │   │   │   ├── Dark to Light Green - Vertical.asset
+│   │   │   │   ├── Light to Dark Green - Vertical.asset
+│   │   │   │   └── Yellow to Orange - Vertical.asset
+│   │   │   ├── Fonts & Materials
+│   │   │   │   ├── Anton SDF - Drop Shadow.mat
+│   │   │   │   ├── Anton SDF - Outline.mat
+│   │   │   │   ├── Anton SDF - Sunny Days.mat
+│   │   │   │   ├── Anton SDF.asset
+│   │   │   │   ├── Bangers SDF - Drop Shadow - 2 Pass.mat
+│   │   │   │   ├── Bangers SDF - Drop Shadow.mat
+│   │   │   │   ├── Bangers SDF - Outline.mat
+│   │   │   │   ├── Bangers SDF Glow.mat
+│   │   │   │   ├── Bangers SDF Logo - URP.mat
+│   │   │   │   ├── Bangers SDF Logo.mat
+│   │   │   │   ├── Bangers SDF.asset
+│   │   │   │   ├── Electronic Highway Sign SDF.asset
+│   │   │   │   ├── LiberationSans SDF - Metalic Green.mat
+│   │   │   │   ├── LiberationSans SDF - Overlay.mat
+│   │   │   │   ├── LiberationSans SDF - Soft Mask.mat
+│   │   │   │   ├── Oswald Bold SDF.asset
+│   │   │   │   ├── Roboto-Bold SDF - Drop Shadow.mat
+│   │   │   │   ├── Roboto-Bold SDF - HDRP Unlit.mat
+│   │   │   │   ├── Roboto-Bold SDF - Surface.mat
+│   │   │   │   ├── Roboto-Bold SDF - URP.mat
+│   │   │   │   ├── Roboto-Bold SDF.asset
+│   │   │   │   ├── Unity SDF - HDRP LIT - Bloom.mat
+│   │   │   │   ├── Unity SDF - HDRP LIT - Outline.mat
+│   │   │   │   └── Unity SDF.asset
+│   │   │   └── Sprite Assets
+│   │   │       ├── Default Sprite Asset.asset
+│   │   │       └── DropCap Numbers.asset
+│   │   ├── Scenes
+│   │   │   ├── 01-  Single Line TextMesh Pro.unity
+│   │   │   ├── 02 - Multi-line TextMesh Pro.unity
+│   │   │   ├── 03 - Line Justification.unity
+│   │   │   ├── 04 - Word Wrapping.unity
+│   │   │   ├── 05 - Style Tags.unity
+│   │   │   ├── 06 - Extra Rich Text Examples.unity
+│   │   │   ├── 07 - Superscript & Subscript Example.unity
+│   │   │   ├── 08 - Improved Text Alignment.unity
+│   │   │   ├── 09 - Margin Tag Example.unity
+│   │   │   ├── 10 - Bullets & Numbered List Example.unity
+│   │   │   ├── 11 - The Style Tag.unity
+│   │   │   ├── 12 - Link Example.unity
+│   │   │   ├── 12a - Text Interactions.unity
+│   │   │   ├── 13 - Soft Hyphenation.unity
+│   │   │   ├── 14 - Multi Font & Sprites.unity
+│   │   │   ├── 15 - Inline Graphics & Sprites.unity
+│   │   │   ├── 16 - Linked text overflow mode example.unity
+│   │   │   ├── 17 - Old Computer Terminal.unity
+│   │   │   ├── 18 - ScrollRect & Masking & Layout.unity
+│   │   │   ├── 19 - Masking Texture & Soft Mask.unity
+│   │   │   ├── 20 - Input Field with Scrollbar.unity
+│   │   │   ├── 21 - Script Example.unity
+│   │   │   ├── 22 - Basic Scripting Example.unity
+│   │   │   ├── 23 - Animating Vertex Attributes.unity
+│   │   │   ├── 24 - Surface Shader Example URP.unity
+│   │   │   ├── 24 - Surface Shader Example.unity
+│   │   │   ├── 25 - Sunny Days Example.unity
+│   │   │   ├── 26 - Dropdown Placeholder Example.unity
+│   │   │   ├── 27 - Double Pass Shader Example.unity
+│   │   │   ├── 28 - HDRP Shader Example
+│   │   │   │   └── Sky and Fog Volume Profile.asset
+│   │   │   ├── 28 - HDRP Shader Example.unity
+│   │   │   └── Benchmark (Floating Text).unity
+│   │   ├── Scripts
+│   │   │   ├── Benchmark01.cs
+│   │   │   ├── Benchmark01_UGUI.cs
+│   │   │   ├── Benchmark02.cs
+│   │   │   ├── Benchmark03.cs
+│   │   │   ├── Benchmark04.cs
+│   │   │   ├── CameraController.cs
+│   │   │   ├── ChatController.cs
+│   │   │   ├── DropdownSample.cs
+│   │   │   ├── EnvMapAnimator.cs
+│   │   │   ├── ObjectSpin.cs
+│   │   │   ├── ShaderPropAnimator.cs
+│   │   │   ├── SimpleScript.cs
+│   │   │   ├── SkewTextExample.cs
+│   │   │   ├── TMP_DigitValidator.cs
+│   │   │   ├── TMP_ExampleScript_01.cs
+│   │   │   ├── TMP_FrameRateCounter.cs
+│   │   │   ├── TMP_PhoneNumberValidator.cs
+│   │   │   ├── TMP_TextEventCheck.cs
+│   │   │   ├── TMP_TextEventHandler.cs
+│   │   │   ├── TMP_TextInfoDebugTool.cs
+│   │   │   ├── TMP_TextSelector_A.cs
+│   │   │   ├── TMP_TextSelector_B.cs
+│   │   │   ├── TMP_UiFrameRateCounter.cs
+│   │   │   ├── TMPro_InstructionOverlay.cs
+│   │   │   ├── TeleType.cs
+│   │   │   ├── TextConsoleSimulator.cs
+│   │   │   ├── TextMeshProFloatingText.cs
+│   │   │   ├── TextMeshSpawner.cs
+│   │   │   ├── VertexColorCycler.cs
+│   │   │   ├── VertexJitter.cs
+│   │   │   ├── VertexShakeA.cs
+│   │   │   ├── VertexShakeB.cs
+│   │   │   ├── VertexZoom.cs
+│   │   │   └── WarpTextExample.cs
+│   │   ├── Sprites
+│   │   │   ├── Default Sprites.png
+│   │   │   └── DropCap Numbers.psd
+│   │   └── Textures
+│   │       ├── Brushed Metal 3.jpg
+│   │       ├── Floor Cement.jpg
+│   │       ├── Floor Tiles 1 - diffuse.jpg
+│   │       ├── Fruit Jelly (B&W).jpg
+│   │       ├── Gradient Diagonal (Color).jpg
+│   │       ├── Gradient Horizontal (Color).jpg
+│   │       ├── Gradient Vertical (Color).jpg
+│   │       ├── Mask Zig-n-Zag.psd
+│   │       ├── Small Crate_diffuse.jpg
+│   │       ├── Small Crate_normal.jpg
+│   │       ├── Sunny Days - Seamless.jpg
+│   │       ├── Text Overflow - Linked Text Image 1.png
+│   │       ├── Text Overflow - Linked Text UI Screenshot.png
+│   │       ├── Wipe Pattern - Circle.psd
+│   │       ├── Wipe Pattern - Diagonal.psd
+│   │       ├── Wipe Pattern - Radial Double.psd
+│   │       └── Wipe Pattern - Radial Quad.psd
+│   ├── Fonts
+│   │   ├── Extracted Fonts
+│   │   │   ├── ArchitectsDaughter-Regular SDF.asset
+│   │   │   ├── ArchitectsDaughter-Regular.ttf
+│   │   │   ├── AtkinsonHyperlegible-Bold SDF.asset
+│   │   │   ├── AtkinsonHyperlegible-Bold.ttf
+│   │   │   ├── AtkinsonHyperlegible-BoldItalic SDF.asset
+│   │   │   ├── AtkinsonHyperlegible-BoldItalic.ttf
+│   │   │   ├── AtkinsonHyperlegible-Italic SDF.asset
+│   │   │   ├── AtkinsonHyperlegible-Italic.ttf
+│   │   │   ├── AtkinsonHyperlegible-Regular SDF.asset
+│   │   │   ├── AtkinsonHyperlegible-Regular.ttf
+│   │   │   ├── Bungee-Regular SDF.asset
+│   │   │   ├── Bungee-Regular.ttf
+│   │   │   ├── Caveat-Bold SDF.asset
+│   │   │   ├── Caveat-Bold.ttf
+│   │   │   ├── Caveat-Medium SDF.asset
+│   │   │   ├── Caveat-Medium.ttf
+│   │   │   ├── Caveat-Regular SDF.asset
+│   │   │   ├── Caveat-Regular.ttf
+│   │   │   ├── Caveat-SemiBold SDF.asset
+│   │   │   ├── Caveat-SemiBold.ttf
+│   │   │   ├── Caveat-VariableFont_wght SDF.asset
+│   │   │   ├── Caveat-VariableFont_wght.ttf
+│   │   │   ├── ChakraPetch-Bold SDF.asset
+│   │   │   ├── ChakraPetch-Bold.ttf
+│   │   │   ├── ChakraPetch-BoldItalic SDF.asset
+│   │   │   ├── ChakraPetch-BoldItalic.ttf
+│   │   │   ├── ChakraPetch-Italic SDF.asset
+│   │   │   ├── ChakraPetch-Italic.ttf
+│   │   │   ├── ChakraPetch-Light SDF.asset
+│   │   │   ├── ChakraPetch-Light.ttf
+│   │   │   ├── ChakraPetch-LightItalic SDF.asset
+│   │   │   ├── ChakraPetch-LightItalic.ttf
+│   │   │   ├── ChakraPetch-Medium SDF.asset
+│   │   │   ├── ChakraPetch-Medium.ttf
+│   │   │   ├── ChakraPetch-MediumItalic SDF.asset
+│   │   │   ├── ChakraPetch-MediumItalic.ttf
+│   │   │   ├── ChakraPetch-Regular SDF.asset
+│   │   │   ├── ChakraPetch-Regular.ttf
+│   │   │   ├── ChakraPetch-SemiBold SDF.asset
+│   │   │   ├── ChakraPetch-SemiBold.ttf
+│   │   │   ├── ChakraPetch-SemiBoldItalic SDF.asset
+│   │   │   ├── ChakraPetch-SemiBoldItalic.ttf
+│   │   │   ├── Comfortaa-Bold SDF.asset
+│   │   │   ├── Comfortaa-Bold.ttf
+│   │   │   ├── Comfortaa-Light SDF.asset
+│   │   │   ├── Comfortaa-Light.ttf
+│   │   │   ├── Comfortaa-Medium SDF.asset
+│   │   │   ├── Comfortaa-Medium.ttf
+│   │   │   ├── Comfortaa-Regular SDF.asset
+│   │   │   ├── Comfortaa-Regular.ttf
+│   │   │   ├── Comfortaa-SemiBold SDF.asset
+│   │   │   ├── Comfortaa-SemiBold.ttf
+│   │   │   ├── Comfortaa-VariableFont_wght SDF.asset
+│   │   │   ├── Comfortaa-VariableFont_wght.ttf
+│   │   │   ├── Exo2-Black SDF.asset
+│   │   │   ├── Exo2-Black.ttf
+│   │   │   ├── Exo2-BlackItalic SDF.asset
+│   │   │   ├── Exo2-BlackItalic.ttf
+│   │   │   ├── Exo2-Bold SDF.asset
+│   │   │   ├── Exo2-Bold.ttf
+│   │   │   ├── Exo2-BoldItalic SDF.asset
+│   │   │   ├── Exo2-BoldItalic.ttf
+│   │   │   ├── Exo2-ExtraBold SDF.asset
+│   │   │   ├── Exo2-ExtraBold.ttf
+│   │   │   ├── Exo2-ExtraBoldItalic SDF.asset
+│   │   │   ├── Exo2-ExtraBoldItalic.ttf
+│   │   │   ├── Exo2-ExtraLight SDF.asset
+│   │   │   ├── Exo2-ExtraLight.ttf
+│   │   │   ├── Exo2-ExtraLightItalic SDF.asset
+│   │   │   ├── Exo2-ExtraLightItalic.ttf
+│   │   │   ├── Exo2-Italic SDF.asset
+│   │   │   ├── Exo2-Italic-VariableFont_wght SDF.asset
+│   │   │   ├── Exo2-Italic-VariableFont_wght.ttf
+│   │   │   ├── Exo2-Italic.ttf
+│   │   │   ├── Exo2-Light SDF.asset
+│   │   │   ├── Exo2-Light.ttf
+│   │   │   ├── Exo2-LightItalic SDF.asset
+│   │   │   ├── Exo2-LightItalic.ttf
+│   │   │   ├── Exo2-Medium SDF.asset
+│   │   │   ├── Exo2-Medium.ttf
+│   │   │   ├── Exo2-MediumItalic SDF.asset
+│   │   │   ├── Exo2-MediumItalic.ttf
+│   │   │   ├── Exo2-Regular SDF.asset
+│   │   │   ├── Exo2-Regular.ttf
+│   │   │   ├── Exo2-SemiBold SDF.asset
+│   │   │   ├── Exo2-SemiBold.ttf
+│   │   │   ├── Exo2-SemiBoldItalic SDF.asset
+│   │   │   ├── Exo2-SemiBoldItalic.ttf
+│   │   │   ├── Exo2-Thin SDF.asset
+│   │   │   ├── Exo2-Thin.ttf
+│   │   │   ├── Exo2-ThinItalic SDF.asset
+│   │   │   ├── Exo2-ThinItalic.ttf
+│   │   │   ├── Exo2-VariableFont_wght SDF.asset
+│   │   │   ├── Exo2-VariableFont_wght.ttf
+│   │   │   ├── GloriaHallelujah-Regular SDF.asset
+│   │   │   ├── GloriaHallelujah-Regular.ttf
+│   │   │   ├── Handjet-Black SDF.asset
+│   │   │   ├── Handjet-Black.ttf
+│   │   │   ├── Handjet-Bold SDF.asset
+│   │   │   ├── Handjet-Bold.ttf
+│   │   │   ├── Handjet-ExtraBold SDF.asset
+│   │   │   ├── Handjet-ExtraBold.ttf
+│   │   │   ├── Handjet-ExtraLight SDF.asset
+│   │   │   ├── Handjet-ExtraLight.ttf
+│   │   │   ├── Handjet-Light SDF.asset
+│   │   │   ├── Handjet-Light.ttf
+│   │   │   ├── Handjet-Medium SDF.asset
+│   │   │   ├── Handjet-Medium.ttf
+│   │   │   ├── Handjet-Regular SDF.asset
+│   │   │   ├── Handjet-Regular.ttf
+│   │   │   ├── Handjet-SemiBold SDF.asset
+│   │   │   ├── Handjet-SemiBold.ttf
+│   │   │   ├── Handjet-Thin SDF.asset
+│   │   │   ├── Handjet-Thin.ttf
+│   │   │   ├── Handjet-VariableFont_ELGR,ELSH,wght SDF.asset
+│   │   │   ├── Handjet-VariableFont_ELGR,ELSH,wght.ttf
+│   │   │   ├── Handlee-Regular SDF.asset
+│   │   │   ├── Handlee-Regular.ttf
+│   │   │   ├── Inter-Italic-VariableFont_opsz,wght SDF.asset
+│   │   │   ├── Inter-Italic-VariableFont_opsz,wght.ttf
+│   │   │   ├── Inter-VariableFont_opsz,wght SDF.asset
+│   │   │   ├── Inter-VariableFont_opsz,wght.ttf
+│   │   │   ├── Inter_18pt-Black SDF.asset
+│   │   │   ├── Inter_18pt-Black.ttf
+│   │   │   ├── Inter_18pt-BlackItalic SDF.asset
+│   │   │   ├── Inter_18pt-BlackItalic.ttf
+│   │   │   ├── Inter_18pt-Bold SDF.asset
+│   │   │   ├── Inter_18pt-Bold.ttf
+│   │   │   ├── Inter_18pt-BoldItalic SDF.asset
+│   │   │   ├── Inter_18pt-BoldItalic.ttf
+│   │   │   ├── Inter_18pt-ExtraBold SDF.asset
+│   │   │   ├── Inter_18pt-ExtraBold.ttf
+│   │   │   ├── Inter_18pt-ExtraBoldItalic SDF.asset
+│   │   │   ├── Inter_18pt-ExtraBoldItalic.ttf
+│   │   │   ├── Inter_18pt-ExtraLight SDF.asset
+│   │   │   ├── Inter_18pt-ExtraLight.ttf
+│   │   │   ├── Inter_18pt-ExtraLightItalic SDF.asset
+│   │   │   ├── Inter_18pt-ExtraLightItalic.ttf
+│   │   │   ├── Inter_18pt-Italic SDF.asset
+│   │   │   ├── Inter_18pt-Italic.ttf
+│   │   │   ├── Inter_18pt-Light SDF.asset
+│   │   │   ├── Inter_18pt-Light.ttf
+│   │   │   ├── Inter_18pt-LightItalic SDF.asset
+│   │   │   ├── Inter_18pt-LightItalic.ttf
+│   │   │   ├── Inter_18pt-Medium SDF.asset
+│   │   │   ├── Inter_18pt-Medium.ttf
+│   │   │   ├── Inter_18pt-MediumItalic SDF.asset
+│   │   │   ├── Inter_18pt-MediumItalic.ttf
+│   │   │   ├── Inter_18pt-Regular SDF.asset
+│   │   │   ├── Inter_18pt-Regular.ttf
+│   │   │   ├── Inter_18pt-SemiBold SDF.asset
+│   │   │   ├── Inter_18pt-SemiBold.ttf
+│   │   │   ├── Inter_18pt-SemiBoldItalic SDF.asset
+│   │   │   ├── Inter_18pt-SemiBoldItalic.ttf
+│   │   │   ├── Inter_18pt-Thin SDF.asset
+│   │   │   ├── Inter_18pt-Thin.ttf
+│   │   │   ├── Inter_18pt-ThinItalic SDF.asset
+│   │   │   ├── Inter_18pt-ThinItalic.ttf
+│   │   │   ├── Inter_24pt-Black SDF.asset
+│   │   │   ├── Inter_24pt-Black.ttf
+│   │   │   ├── Inter_24pt-BlackItalic SDF.asset
+│   │   │   ├── Inter_24pt-BlackItalic.ttf
+│   │   │   ├── Inter_24pt-Bold SDF.asset
+│   │   │   ├── Inter_24pt-Bold.ttf
+│   │   │   ├── Inter_24pt-BoldItalic SDF.asset
+│   │   │   ├── Inter_24pt-BoldItalic.ttf
+│   │   │   ├── Inter_24pt-ExtraBold SDF.asset
+│   │   │   ├── Inter_24pt-ExtraBold.ttf
+│   │   │   ├── Inter_24pt-ExtraBoldItalic SDF.asset
+│   │   │   ├── Inter_24pt-ExtraBoldItalic.ttf
+│   │   │   ├── Inter_24pt-ExtraLight SDF.asset
+│   │   │   ├── Inter_24pt-ExtraLight.ttf
+│   │   │   ├── Inter_24pt-ExtraLightItalic SDF.asset
+│   │   │   ├── Inter_24pt-ExtraLightItalic.ttf
+│   │   │   ├── Inter_24pt-Italic SDF.asset
+│   │   │   ├── Inter_24pt-Italic.ttf
+│   │   │   ├── Inter_24pt-Light SDF.asset
+│   │   │   ├── Inter_24pt-Light.ttf
+│   │   │   ├── Inter_24pt-LightItalic SDF.asset
+│   │   │   ├── Inter_24pt-LightItalic.ttf
+│   │   │   ├── Inter_24pt-Medium SDF.asset
+│   │   │   ├── Inter_24pt-Medium.ttf
+│   │   │   ├── Inter_24pt-MediumItalic SDF.asset
+│   │   │   ├── Inter_24pt-MediumItalic.ttf
+│   │   │   ├── Inter_24pt-Regular SDF.asset
+│   │   │   ├── Inter_24pt-Regular.ttf
+│   │   │   ├── Inter_24pt-SemiBold SDF.asset
+│   │   │   ├── Inter_24pt-SemiBold.ttf
+│   │   │   ├── Inter_24pt-SemiBoldItalic SDF.asset
+│   │   │   ├── Inter_24pt-SemiBoldItalic.ttf
+│   │   │   ├── Inter_24pt-Thin SDF.asset
+│   │   │   ├── Inter_24pt-Thin.ttf
+│   │   │   ├── Inter_24pt-ThinItalic SDF.asset
+│   │   │   ├── Inter_24pt-ThinItalic.ttf
+│   │   │   ├── Inter_28pt-Black SDF.asset
+│   │   │   ├── Inter_28pt-Black.ttf
+│   │   │   ├── Inter_28pt-BlackItalic SDF.asset
+│   │   │   ├── Inter_28pt-BlackItalic.ttf
+│   │   │   ├── Inter_28pt-Bold SDF.asset
+│   │   │   ├── Inter_28pt-Bold.ttf
+│   │   │   ├── Inter_28pt-BoldItalic SDF.asset
+│   │   │   ├── Inter_28pt-BoldItalic.ttf
+│   │   │   ├── Inter_28pt-ExtraBold SDF.asset
+│   │   │   ├── Inter_28pt-ExtraBold.ttf
+│   │   │   ├── Inter_28pt-ExtraBoldItalic SDF.asset
+│   │   │   ├── Inter_28pt-ExtraBoldItalic.ttf
+│   │   │   ├── Inter_28pt-ExtraLight SDF.asset
+│   │   │   ├── Inter_28pt-ExtraLight.ttf
+│   │   │   ├── Inter_28pt-ExtraLightItalic SDF.asset
+│   │   │   ├── Inter_28pt-ExtraLightItalic.ttf
+│   │   │   ├── Inter_28pt-Italic SDF.asset
+│   │   │   ├── Inter_28pt-Italic.ttf
+│   │   │   ├── Inter_28pt-Light SDF.asset
+│   │   │   ├── Inter_28pt-Light.ttf
+│   │   │   ├── Inter_28pt-LightItalic SDF.asset
+│   │   │   ├── Inter_28pt-LightItalic.ttf
+│   │   │   ├── Inter_28pt-Medium SDF.asset
+│   │   │   ├── Inter_28pt-Medium.ttf
+│   │   │   ├── Inter_28pt-MediumItalic SDF.asset
+│   │   │   ├── Inter_28pt-MediumItalic.ttf
+│   │   │   ├── Inter_28pt-Regular SDF.asset
+│   │   │   ├── Inter_28pt-Regular.ttf
+│   │   │   ├── Inter_28pt-SemiBold SDF.asset
+│   │   │   ├── Inter_28pt-SemiBold.ttf
+│   │   │   ├── Inter_28pt-SemiBoldItalic SDF.asset
+│   │   │   ├── Inter_28pt-SemiBoldItalic.ttf
+│   │   │   ├── Inter_28pt-Thin SDF.asset
+│   │   │   ├── Inter_28pt-Thin.ttf
+│   │   │   ├── Inter_28pt-ThinItalic SDF.asset
+│   │   │   ├── Inter_28pt-ThinItalic.ttf
+│   │   │   ├── OdibeeSans-Regular SDF.asset
+│   │   │   ├── OdibeeSans-Regular.ttf
+│   │   │   ├── PatrickHand-Regular SDF.asset
+│   │   │   ├── PatrickHand-Regular.ttf
+│   │   │   ├── ReenieBeanie-Regular SDF.asset
+│   │   │   ├── ReenieBeanie-Regular.ttf
+│   │   │   ├── Righteous-Regular SDF.asset
+│   │   │   ├── Righteous-Regular.ttf
+│   │   │   ├── ShadowsIntoLight-Regular SDF.asset
+│   │   │   ├── ShadowsIntoLight-Regular.ttf
+│   │   │   ├── ShareTech-Regular SDF.asset
+│   │   │   ├── ShareTech-Regular.ttf
+│   │   │   ├── ShareTechMono-Regular SDF.asset
+│   │   │   ├── ShareTechMono-Regular.ttf
+│   │   │   ├── ShortStack-Regular SDF.asset
+│   │   │   ├── ShortStack-Regular.ttf
+│   │   │   ├── SourceCodePro-Black SDF.asset
+│   │   │   ├── SourceCodePro-Black.ttf
+│   │   │   ├── SourceCodePro-BlackItalic SDF.asset
+│   │   │   ├── SourceCodePro-BlackItalic.ttf
+│   │   │   ├── SourceCodePro-Bold SDF.asset
+│   │   │   ├── SourceCodePro-Bold.ttf
+│   │   │   ├── SourceCodePro-BoldItalic SDF.asset
+│   │   │   ├── SourceCodePro-BoldItalic.ttf
+│   │   │   ├── SourceCodePro-ExtraBold SDF.asset
+│   │   │   ├── SourceCodePro-ExtraBold.ttf
+│   │   │   ├── SourceCodePro-ExtraBoldItalic SDF.asset
+│   │   │   ├── SourceCodePro-ExtraBoldItalic.ttf
+│   │   │   ├── SourceCodePro-ExtraLight SDF.asset
+│   │   │   ├── SourceCodePro-ExtraLight.ttf
+│   │   │   ├── SourceCodePro-ExtraLightItalic SDF.asset
+│   │   │   ├── SourceCodePro-ExtraLightItalic.ttf
+│   │   │   ├── SourceCodePro-Italic SDF.asset
+│   │   │   ├── SourceCodePro-Italic-VariableFont_wght SDF.asset
+│   │   │   ├── SourceCodePro-Italic-VariableFont_wght.ttf
+│   │   │   ├── SourceCodePro-Italic.ttf
+│   │   │   ├── SourceCodePro-Light SDF.asset
+│   │   │   ├── SourceCodePro-Light.ttf
+│   │   │   ├── SourceCodePro-LightItalic SDF.asset
+│   │   │   ├── SourceCodePro-LightItalic.ttf
+│   │   │   ├── SourceCodePro-Medium SDF.asset
+│   │   │   ├── SourceCodePro-Medium.ttf
+│   │   │   ├── SourceCodePro-MediumItalic SDF.asset
+│   │   │   ├── SourceCodePro-MediumItalic.ttf
+│   │   │   ├── SourceCodePro-Regular SDF.asset
+│   │   │   ├── SourceCodePro-Regular.ttf
+│   │   │   ├── SourceCodePro-SemiBold SDF.asset
+│   │   │   ├── SourceCodePro-SemiBold.ttf
+│   │   │   ├── SourceCodePro-SemiBoldItalic SDF.asset
+│   │   │   ├── SourceCodePro-SemiBoldItalic.ttf
+│   │   │   ├── SourceCodePro-VariableFont_wght SDF.asset
+│   │   │   ├── SourceCodePro-VariableFont_wght.ttf
+│   │   │   ├── SourceSans3-Black SDF.asset
+│   │   │   ├── SourceSans3-Black.ttf
+│   │   │   ├── SourceSans3-BlackItalic SDF.asset
+│   │   │   ├── SourceSans3-BlackItalic.ttf
+│   │   │   ├── SourceSans3-Bold SDF.asset
+│   │   │   ├── SourceSans3-Bold.ttf
+│   │   │   ├── SourceSans3-BoldItalic SDF.asset
+│   │   │   ├── SourceSans3-BoldItalic.ttf
+│   │   │   ├── SourceSans3-ExtraBold SDF.asset
+│   │   │   ├── SourceSans3-ExtraBold.ttf
+│   │   │   ├── SourceSans3-ExtraBoldItalic SDF.asset
+│   │   │   ├── SourceSans3-ExtraBoldItalic.ttf
+│   │   │   ├── SourceSans3-ExtraLight SDF.asset
+│   │   │   ├── SourceSans3-ExtraLight.ttf
+│   │   │   ├── SourceSans3-ExtraLightItalic SDF.asset
+│   │   │   ├── SourceSans3-ExtraLightItalic.ttf
+│   │   │   ├── SourceSans3-Italic SDF.asset
+│   │   │   ├── SourceSans3-Italic-VariableFont_wght SDF.asset
+│   │   │   ├── SourceSans3-Italic-VariableFont_wght.ttf
+│   │   │   ├── SourceSans3-Italic.ttf
+│   │   │   ├── SourceSans3-Light SDF.asset
+│   │   │   ├── SourceSans3-Light.ttf
+│   │   │   ├── SourceSans3-LightItalic SDF.asset
+│   │   │   ├── SourceSans3-LightItalic.ttf
+│   │   │   ├── SourceSans3-Medium SDF.asset
+│   │   │   ├── SourceSans3-Medium.ttf
+│   │   │   ├── SourceSans3-MediumItalic SDF.asset
+│   │   │   ├── SourceSans3-MediumItalic.ttf
+│   │   │   ├── SourceSans3-Regular SDF.asset
+│   │   │   ├── SourceSans3-Regular.ttf
+│   │   │   ├── SourceSans3-SemiBold SDF.asset
+│   │   │   ├── SourceSans3-SemiBold.ttf
+│   │   │   ├── SourceSans3-SemiBoldItalic SDF.asset
+│   │   │   ├── SourceSans3-SemiBoldItalic.ttf
+│   │   │   ├── SourceSans3-VariableFont_wght SDF.asset
+│   │   │   ├── SourceSans3-VariableFont_wght.ttf
+│   │   │   ├── SpaceMono-Bold SDF.asset
+│   │   │   ├── SpaceMono-Bold.ttf
+│   │   │   ├── SpaceMono-BoldItalic SDF.asset
+│   │   │   ├── SpaceMono-BoldItalic.ttf
+│   │   │   ├── SpaceMono-Italic SDF.asset
+│   │   │   ├── SpaceMono-Italic.ttf
+│   │   │   ├── SpaceMono-Regular SDF.asset
+│   │   │   ├── SpaceMono-Regular.ttf
+│   │   │   ├── Ubuntu-Bold SDF.asset
+│   │   │   ├── Ubuntu-Bold.ttf
+│   │   │   ├── Ubuntu-BoldItalic SDF.asset
+│   │   │   ├── Ubuntu-BoldItalic.ttf
+│   │   │   ├── Ubuntu-Italic SDF.asset
+│   │   │   ├── Ubuntu-Italic.ttf
+│   │   │   ├── Ubuntu-Light SDF.asset
+│   │   │   ├── Ubuntu-Light.ttf
+│   │   │   ├── Ubuntu-LightItalic SDF.asset
+│   │   │   ├── Ubuntu-LightItalic.ttf
+│   │   │   ├── Ubuntu-Medium SDF.asset
+│   │   │   ├── Ubuntu-Medium.ttf
+│   │   │   ├── Ubuntu-MediumItalic SDF.asset
+│   │   │   ├── Ubuntu-MediumItalic.ttf
+│   │   │   ├── Ubuntu-Regular SDF.asset
+│   │   │   ├── Ubuntu-Regular.ttf
+│   │   │   ├── UbuntuCondensed-Regular SDF.asset
+│   │   │   ├── UbuntuCondensed-Regular.ttf
+│   │   │   ├── UbuntuMono-Bold SDF.asset
+│   │   │   ├── UbuntuMono-Bold.ttf
+│   │   │   ├── UbuntuMono-BoldItalic SDF.asset
+│   │   │   ├── UbuntuMono-BoldItalic.ttf
+│   │   │   ├── UbuntuMono-Italic SDF.asset
+│   │   │   ├── UbuntuMono-Italic.ttf
+│   │   │   ├── UbuntuMono-Regular SDF.asset
+│   │   │   ├── UbuntuMono-Regular.ttf
+│   │   │   ├── UnicaOne-Regular SDF.asset
+│   │   │   ├── UnicaOne-Regular.ttf
+│   │   │   ├── VT323-Regular SDF.asset
+│   │   │   └── VT323-Regular.ttf
+│   │   ├── Kenney Blocks SDF.asset
+│   │   ├── Kenney Future Narrow SDF.asset
+│   │   ├── Kenney Future SDF.asset
+│   │   ├── Kenney High SDF.asset
+│   │   ├── Kenney High Square SDF.asset
+│   │   ├── Kenney Mini SDF.asset
+│   │   ├── Kenney Mini Square Mono SDF.asset
+│   │   ├── Kenney Mini Square SDF.asset
+│   │   ├── Kenney Pixel SDF.asset
+│   │   ├── Kenney Pixel Square SDF.asset
+│   │   ├── Kenney Rocket SDF.asset
+│   │   ├── Kenney Rocket Square SDF.asset
+│   │   ├── Kenney fonts
+│   │   │   ├── Kenney Blocks SDF.asset
+│   │   │   ├── Kenney Blocks.ttf
+│   │   │   ├── Kenney Future Narrow.ttf
+│   │   │   ├── Kenney Future SDF.asset
+│   │   │   ├── Kenney Future.ttf
+│   │   │   ├── Kenney High Square.ttf
+│   │   │   ├── Kenney High.ttf
+│   │   │   ├── Kenney Mini Square Mono.ttf
+│   │   │   ├── Kenney Mini Square.ttf
+│   │   │   ├── Kenney Mini.ttf
+│   │   │   ├── Kenney Pixel Square.ttf
+│   │   │   ├── Kenney Pixel.ttf
+│   │   │   ├── Kenney Rocket Square.ttf
+│   │   │   ├── Kenney Rocket.ttf
+│   │   │   └── Kenney fonts
+│   │   ├── LiberationSans - OFL.txt
+│   │   └── LiberationSans.ttf
+│   ├── Resources
+│   │   ├── Fonts & Materials
+│   │   │   ├── LiberationSans SDF - Drop Shadow.mat
+│   │   │   ├── LiberationSans SDF - Fallback.asset
+│   │   │   ├── LiberationSans SDF - Outline.mat
+│   │   │   └── LiberationSans SDF.asset
+│   │   ├── LineBreaking Following Characters.txt
+│   │   ├── LineBreaking Leading Characters.txt
+│   │   ├── Sprite Assets
+│   │   │   └── EmojiOne.asset
+│   │   ├── Style Sheets
+│   │   │   └── Default Style Sheet.asset
+│   │   └── TMP Settings.asset
+│   ├── Shaders
+│   │   ├── SDFFunctions.hlsl
+│   │   ├── TMP_Bitmap-Custom-Atlas.shader
+│   │   ├── TMP_Bitmap-Mobile.shader
+│   │   ├── TMP_Bitmap.shader
+│   │   ├── TMP_SDF Overlay.shader
+│   │   ├── TMP_SDF SSD.shader
+│   │   ├── TMP_SDF-HDRP LIT.shadergraph
+│   │   ├── TMP_SDF-HDRP UNLIT.shadergraph
+│   │   ├── TMP_SDF-Mobile Masking.shader
+│   │   ├── TMP_SDF-Mobile Overlay.shader
+│   │   ├── TMP_SDF-Mobile SSD.shader
+│   │   ├── TMP_SDF-Mobile-2-Pass.shader
+│   │   ├── TMP_SDF-Mobile.shader
+│   │   ├── TMP_SDF-Surface-Mobile.shader
+│   │   ├── TMP_SDF-Surface.shader
+│   │   ├── TMP_SDF-URP Lit.shadergraph
+│   │   ├── TMP_SDF-URP Unlit.shadergraph
+│   │   ├── TMP_SDF.shader
+│   │   ├── TMP_Sprite.shader
+│   │   ├── TMPro.cginc
+│   │   ├── TMPro_Mobile.cginc
+│   │   ├── TMPro_Properties.cginc
+│   │   └── TMPro_Surface.cginc
+│   └── Sprites
+│       ├── EmojiOne Attribution.txt
+│       ├── EmojiOne.json
+│       └── EmojiOne.png
+└── UniversalRenderPipelineGlobalSettings.asset
+--------------------------------------------------------------------------------
+
+SCRIPT CONTENTS
+================================================================================
+
+SCRIPT CONTENTS
+================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Runtime\NodeExecutor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using TMPro;
+
+public class NodeExecutor : MonoBehaviour
+{
+    [SerializeField] private NodeGraph currentGraph;
+    [Header("Debug Settings")]
+    public float waitTimeBetweenNodes = 0.5f;
+    public TMP_Text debugOutput;
+
+    [Header("Plant Prefab (assigned in inspector)")]
+    public GameObject plantPrefab;  // Assign your PlantPrefab here
+
+    private Dictionary<HexCoords, NodeData> coordsMap;
+    private HashSet<string> visited;
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+            ExecuteGraph();
+    }
+
+    public void SetGraph(NodeGraph graph)
+    {
+        currentGraph = graph;
+        Debug.Log("[NodeExecutor] Graph set. Node count=" + (graph != null ? graph.nodes.Count : 0));
+    }
+
+    public NodeGraph GetGraph() => currentGraph;
+
+    public void ExecuteGraph()
+    {
+        if (currentGraph == null || currentGraph.nodes.Count == 0)
+        {
+            LogDebug("[NodeExecutor] No graph or no nodes to execute!");
+            return;
+        }
+        StopAllCoroutines();
+        ClearDebug();
+        BuildCoordsMap();
+        visited = new HashSet<string>();
+
+        List<NodeData> startNodes = FindStartNodes();
+        if (startNodes.Count == 0)
+        {
+            LogDebug("[NodeExecutor] No start nodes found. Aborting BFS.");
+            return;
+        }
+        foreach (var startNode in startNodes)
+            StartCoroutine(RunChainBFS(startNode));
+    }
+
+    private void BuildCoordsMap()
+    {
+        coordsMap = new Dictionary<HexCoords, NodeData>();
+        foreach (var node in currentGraph.nodes)
+            coordsMap[node.coords] = node;
+    }
+
+    private List<NodeData> FindStartNodes()
+    {
+        List<NodeData> result = new List<NodeData>();
+        foreach (var node in currentGraph.nodes)
+        {
+            if (!HasInbound(node))
+                result.Add(node);
+        }
+        return result;
+    }
+
+    private bool HasInbound(NodeData node)
+    {
+        foreach (var port in node.ports)
+        {
+            if (!port.isInput)
+                continue;
+            int sideIndex = (int)port.side;
+            int oppSide = (sideIndex + 3) % 6;
+            var neighborCoords = HexCoords.GetNeighbor(node.coords, oppSide);
+            if (!coordsMap.ContainsKey(neighborCoords))
+                continue;
+            var neighborNode = coordsMap[neighborCoords];
+            bool hasOutputMatch = neighborNode.ports.Any(p => !p.isInput && (int)p.side == oppSide);
+            if (hasOutputMatch)
+                return true;
+        }
+        return false;
+    }
+
+    private IEnumerator RunChainBFS(NodeData startNode)
+    {
+        Queue<HexCoords> queue = new Queue<HexCoords>();
+        queue.Enqueue(startNode.coords);
+
+        while (queue.Count > 0)
+        {
+            HexCoords coords = queue.Dequeue();
+            if (!coordsMap.ContainsKey(coords)) 
+                continue;
+            NodeData node = coordsMap[coords];
+            if (visited.Contains(node.nodeId))
+                continue;
+            visited.Add(node.nodeId);
+
+            yield return new WaitForSeconds(waitTimeBetweenNodes);
+            ProcessNode(node);
+
+            foreach (var port in node.ports)
+            {
+                if (!port.isInput)
+                {
+                    int sIndex = (int)port.side;
+                    var neighborCoords = HexCoords.GetNeighbor(coords, sIndex);
+                    if (!coordsMap.ContainsKey(neighborCoords))
+                        continue;
+                    var neighborNode = coordsMap[neighborCoords];
+                    int oppIndex = (sIndex + 3) % 6;
+                    bool hasInputMatch = neighborNode.ports.Any(p => p.isInput && (int)p.side == oppIndex);
+                    if (hasInputMatch && !visited.Contains(neighborNode.nodeId))
+                        queue.Enqueue(neighborCoords);
+                }
+            }
+        }
+        LogDebug("[NodeExecutor] BFS from start node completed.");
+    }
+
+    private void ProcessNode(NodeData node)
+    {
+        LogDebug($"[NodeExecutor] Processing node '{node.nodeDisplayName}' at coords ({node.coords.q}, {node.coords.r}).");
+
+        var seedEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.Seed);
+        if (seedEffect != null)
+        {
+            SpawnPlant(seedEffect);
+        }
+    }
+
+    private void SpawnPlant(NodeEffectData seedEffect)
+    {
+        if (plantPrefab == null)
+        {
+            LogDebug("[NodeExecutor] plantPrefab is not assigned in the inspector!");
+            return;
+        }
+        var gardener = FindObjectOfType<GardenerController>();
+        if (gardener == null)
+        {
+            LogDebug("[NodeExecutor] No GardenerController found. Can't spawn plant.");
+            return;
+        }
+
+        Vector2 spawnPos = gardener.GetPlantingPosition();
+        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
+        PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
+        if (growth != null)
+        {
+            growth.stemMinLength    = Mathf.RoundToInt(seedEffect.effectValue);
+            growth.stemMaxLength    = Mathf.RoundToInt(seedEffect.secondaryValue);
+            growth.growthSpeed      = seedEffect.extra1;
+            growth.leafGap          = Mathf.RoundToInt(seedEffect.extra2);
+
+            // New fields:
+            growth.leafPattern      = seedEffect.leafPattern; 
+            growth.growthRandomness = seedEffect.growthRandomness;
+
+            LogDebug($"[NodeExecutor] Spawned plant => min={growth.stemMinLength}, max={growth.stemMaxLength}, spd={growth.growthSpeed}, leafGap={growth.leafGap}, pattern={growth.leafPattern}, rand={growth.growthRandomness}");
+        }
+    }
+
+
+
+
+    private void ClearDebug()
+    {
+        if (debugOutput)
+            debugOutput.text = "";
+    }
+
+    private void LogDebug(string msg)
+    {
+        Debug.Log(msg);
+        if (debugOutput)
+            debugOutput.text += msg + "\n";
+    }
+}
+
+
+
+
+
+
+--------------------------------------------------------------------------------
+This is part 16 out of 26 of script collection. 10 more parts remain.
+--------------------------------------------------------------------------------

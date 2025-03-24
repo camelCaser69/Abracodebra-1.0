@@ -1,14 +1,15 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-19 21:11:29
-PART 5 OF 8
+UNITY PROJECT SCRIPT EXPORT - 2025-03-24 13:12:56
+PART 7 OF 26
 ================================================================================
 
 --------------------------------------------------------------------------------
 Assets
 ├── DefaultVolumeProfile.asset
 ├── Editor
+│   ├── HexGridRendererEditor.cs
 │   ├── NodeDefinitionAutoAdder.cs
 │   ├── NodeDefinitionCreator.cs
 │   ├── NodeDefinitionLibraryEditor.cs
@@ -19,13 +20,18 @@ Assets
 ├── Materials
 │   └── BezierCurveAA_Material.mat
 ├── Post Processing
-│   └── BezierCurvesAntialiasing.renderTexture
 ├── Prefabs
 │   ├── General
+│   │   ├── GardenerPrefab.prefab
+│   │   ├── PixelLeaf.prefab
+│   │   ├── PixelSeed.prefab
+│   │   ├── PixelStem.prefab
+│   │   ├── PlantPrefab.prefab
 │   │   ├── Projectile_Basic_Pixel.prefab
 │   │   └── WizardPrefab.prefab
 │   ├── Node Presets
 │   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
 │   │   ├── Node_001_AimSpread.asset
 │   │   ├── Node_002_Piercing.asset
 │   │   ├── Node_003_Output.asset
@@ -34,7 +40,6 @@ Assets
 │   │   ├── Node_006_Burn.asset
 │   │   └── Node_007_FriendlyFire.asset
 │   ├── UI
-│   │   ├── NodeConnectionView.prefab
 │   │   └── NodeView.prefab
 │   └── Wizard Presets
 │       ├── Wizard_Basic.asset
@@ -44,6 +49,8 @@ Assets
 │   └── SampleScene.unity
 ├── Scripts
 │   ├── Battle
+│   │   ├── Plant
+│   │   │   └── PlantGrowth.cs
 │   │   ├── SpellProjectile.cs
 │   │   └── Status Effects
 │   │       ├── BurningStatusEffect.cs
@@ -51,6 +58,9 @@ Assets
 │   ├── Core
 │   ├── Nodes
 │   │   ├── Core
+│   │   │   ├── HexCoords.cs
+│   │   │   ├── HexGridManager.cs
+│   │   │   ├── HexGridRenderer.cs
 │   │   │   ├── NodeData.cs
 │   │   │   ├── NodeDefinition.cs
 │   │   │   ├── NodeDefinitionLibrary.cs
@@ -64,14 +74,13 @@ Assets
 │   │   │   └── NodeGraph.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
-│   │       ├── NodeConnectionView.cs
-│   │       ├── NodeDraggable.cs
 │   │       ├── NodeEditorController.cs
+│   │       ├── NodeHexDraggable.cs
 │   │       ├── NodeSelectable.cs
 │   │       ├── NodeTestInitializer.cs
-│   │       ├── NodeView.cs
-│   │       ├── PinView.cs
-│   │       └── UICubicBezier.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
 │   ├── UI
 │   └── Wizards
 │       ├── WizardController.cs
@@ -131,6 +140,12 @@ Assets
 │   │       ├── 4.png
 │   │       ├── 5.png
 │   │       └── 6.png
+│   ├── CustomDownloaded
+│   │   ├── arrowSimple.png
+│   │   ├── arrowSimpleWhite.png
+│   │   ├── arrowSimpleWhite.png~
+│   │   ├── arrowSimpleWhiteShadowIn.png
+│   │   └── arrowSimpleWhiteShadowOut.png
 │   ├── Free Pixel Effects Pack
 │   │   ├── 10_weaponhit_spritesheet.png
 │   │   ├── 11_fire_spritesheet.png
@@ -154,6 +169,15 @@ Assets
 │   │   ├── 9_brightfire_spritesheet.png
 │   │   ├── README.txt
 │   │   └── cover.png
+│   ├── Hexagons Nodes
+│   │   ├── hex1.png
+│   │   ├── hex2.png
+│   │   ├── hex3.png
+│   │   ├── hex4.png
+│   │   ├── hex5.png
+│   │   ├── hex6.png
+│   │   ├── hex7.png
+│   │   └── hex8.png
 │   ├── MR-Platformer-v1
 │   │   ├── Backgrounds
 │   │   │   ├── merged-full-background.png
@@ -414,14 +438,18 @@ Assets
 │   ├── Examples & Extras
 │   │   ├── Fonts
 │   │   │   ├── Anton OFL.txt
+│   │   │   ├── Anton SDF.asset
 │   │   │   ├── Anton.ttf
 │   │   │   ├── Bangers - OFL.txt
+│   │   │   ├── Bangers SDF.asset
 │   │   │   ├── Bangers.ttf
+│   │   │   ├── Electronic Highway Sign SDF.asset
 │   │   │   ├── Electronic Highway Sign.TTF
 │   │   │   ├── Oswald-Bold - OFL.txt
 │   │   │   ├── Oswald-Bold.ttf
 │   │   │   ├── Roboto-Bold - AFL.txt
 │   │   │   ├── Roboto-Bold - License.txt
+│   │   │   ├── Roboto-Bold SDF.asset
 │   │   │   ├── Roboto-Bold.ttf
 │   │   │   ├── Unity - OFL.txt
 │   │   │   └── Unity.ttf
@@ -561,6 +589,391 @@ Assets
 │   │       ├── Wipe Pattern - Radial Double.psd
 │   │       └── Wipe Pattern - Radial Quad.psd
 │   ├── Fonts
+│   │   ├── Extracted Fonts
+│   │   │   ├── ArchitectsDaughter-Regular SDF.asset
+│   │   │   ├── ArchitectsDaughter-Regular.ttf
+│   │   │   ├── AtkinsonHyperlegible-Bold SDF.asset
+│   │   │   ├── AtkinsonHyperlegible-Bold.ttf
+│   │   │   ├── AtkinsonHyperlegible-BoldItalic SDF.asset
+│   │   │   ├── AtkinsonHyperlegible-BoldItalic.ttf
+│   │   │   ├── AtkinsonHyperlegible-Italic SDF.asset
+│   │   │   ├── AtkinsonHyperlegible-Italic.ttf
+│   │   │   ├── AtkinsonHyperlegible-Regular SDF.asset
+│   │   │   ├── AtkinsonHyperlegible-Regular.ttf
+│   │   │   ├── Bungee-Regular SDF.asset
+│   │   │   ├── Bungee-Regular.ttf
+│   │   │   ├── Caveat-Bold SDF.asset
+│   │   │   ├── Caveat-Bold.ttf
+│   │   │   ├── Caveat-Medium SDF.asset
+│   │   │   ├── Caveat-Medium.ttf
+│   │   │   ├── Caveat-Regular SDF.asset
+│   │   │   ├── Caveat-Regular.ttf
+│   │   │   ├── Caveat-SemiBold SDF.asset
+│   │   │   ├── Caveat-SemiBold.ttf
+│   │   │   ├── Caveat-VariableFont_wght SDF.asset
+│   │   │   ├── Caveat-VariableFont_wght.ttf
+│   │   │   ├── ChakraPetch-Bold SDF.asset
+│   │   │   ├── ChakraPetch-Bold.ttf
+│   │   │   ├── ChakraPetch-BoldItalic SDF.asset
+│   │   │   ├── ChakraPetch-BoldItalic.ttf
+│   │   │   ├── ChakraPetch-Italic SDF.asset
+│   │   │   ├── ChakraPetch-Italic.ttf
+│   │   │   ├── ChakraPetch-Light SDF.asset
+│   │   │   ├── ChakraPetch-Light.ttf
+│   │   │   ├── ChakraPetch-LightItalic SDF.asset
+│   │   │   ├── ChakraPetch-LightItalic.ttf
+│   │   │   ├── ChakraPetch-Medium SDF.asset
+│   │   │   ├── ChakraPetch-Medium.ttf
+│   │   │   ├── ChakraPetch-MediumItalic SDF.asset
+│   │   │   ├── ChakraPetch-MediumItalic.ttf
+│   │   │   ├── ChakraPetch-Regular SDF.asset
+│   │   │   ├── ChakraPetch-Regular.ttf
+│   │   │   ├── ChakraPetch-SemiBold SDF.asset
+│   │   │   ├── ChakraPetch-SemiBold.ttf
+│   │   │   ├── ChakraPetch-SemiBoldItalic SDF.asset
+│   │   │   ├── ChakraPetch-SemiBoldItalic.ttf
+│   │   │   ├── Comfortaa-Bold SDF.asset
+│   │   │   ├── Comfortaa-Bold.ttf
+│   │   │   ├── Comfortaa-Light SDF.asset
+│   │   │   ├── Comfortaa-Light.ttf
+│   │   │   ├── Comfortaa-Medium SDF.asset
+│   │   │   ├── Comfortaa-Medium.ttf
+│   │   │   ├── Comfortaa-Regular SDF.asset
+│   │   │   ├── Comfortaa-Regular.ttf
+│   │   │   ├── Comfortaa-SemiBold SDF.asset
+│   │   │   ├── Comfortaa-SemiBold.ttf
+│   │   │   ├── Comfortaa-VariableFont_wght SDF.asset
+│   │   │   ├── Comfortaa-VariableFont_wght.ttf
+│   │   │   ├── Exo2-Black SDF.asset
+│   │   │   ├── Exo2-Black.ttf
+│   │   │   ├── Exo2-BlackItalic SDF.asset
+│   │   │   ├── Exo2-BlackItalic.ttf
+│   │   │   ├── Exo2-Bold SDF.asset
+│   │   │   ├── Exo2-Bold.ttf
+│   │   │   ├── Exo2-BoldItalic SDF.asset
+│   │   │   ├── Exo2-BoldItalic.ttf
+│   │   │   ├── Exo2-ExtraBold SDF.asset
+│   │   │   ├── Exo2-ExtraBold.ttf
+│   │   │   ├── Exo2-ExtraBoldItalic SDF.asset
+│   │   │   ├── Exo2-ExtraBoldItalic.ttf
+│   │   │   ├── Exo2-ExtraLight SDF.asset
+│   │   │   ├── Exo2-ExtraLight.ttf
+│   │   │   ├── Exo2-ExtraLightItalic SDF.asset
+│   │   │   ├── Exo2-ExtraLightItalic.ttf
+│   │   │   ├── Exo2-Italic SDF.asset
+│   │   │   ├── Exo2-Italic-VariableFont_wght SDF.asset
+│   │   │   ├── Exo2-Italic-VariableFont_wght.ttf
+│   │   │   ├── Exo2-Italic.ttf
+│   │   │   ├── Exo2-Light SDF.asset
+│   │   │   ├── Exo2-Light.ttf
+│   │   │   ├── Exo2-LightItalic SDF.asset
+│   │   │   ├── Exo2-LightItalic.ttf
+│   │   │   ├── Exo2-Medium SDF.asset
+│   │   │   ├── Exo2-Medium.ttf
+│   │   │   ├── Exo2-MediumItalic SDF.asset
+│   │   │   ├── Exo2-MediumItalic.ttf
+│   │   │   ├── Exo2-Regular SDF.asset
+│   │   │   ├── Exo2-Regular.ttf
+│   │   │   ├── Exo2-SemiBold SDF.asset
+│   │   │   ├── Exo2-SemiBold.ttf
+│   │   │   ├── Exo2-SemiBoldItalic SDF.asset
+│   │   │   ├── Exo2-SemiBoldItalic.ttf
+│   │   │   ├── Exo2-Thin SDF.asset
+│   │   │   ├── Exo2-Thin.ttf
+│   │   │   ├── Exo2-ThinItalic SDF.asset
+│   │   │   ├── Exo2-ThinItalic.ttf
+│   │   │   ├── Exo2-VariableFont_wght SDF.asset
+│   │   │   ├── Exo2-VariableFont_wght.ttf
+│   │   │   ├── GloriaHallelujah-Regular SDF.asset
+│   │   │   ├── GloriaHallelujah-Regular.ttf
+│   │   │   ├── Handjet-Black SDF.asset
+│   │   │   ├── Handjet-Black.ttf
+│   │   │   ├── Handjet-Bold SDF.asset
+│   │   │   ├── Handjet-Bold.ttf
+│   │   │   ├── Handjet-ExtraBold SDF.asset
+│   │   │   ├── Handjet-ExtraBold.ttf
+│   │   │   ├── Handjet-ExtraLight SDF.asset
+│   │   │   ├── Handjet-ExtraLight.ttf
+│   │   │   ├── Handjet-Light SDF.asset
+│   │   │   ├── Handjet-Light.ttf
+│   │   │   ├── Handjet-Medium SDF.asset
+│   │   │   ├── Handjet-Medium.ttf
+│   │   │   ├── Handjet-Regular SDF.asset
+│   │   │   ├── Handjet-Regular.ttf
+│   │   │   ├── Handjet-SemiBold SDF.asset
+│   │   │   ├── Handjet-SemiBold.ttf
+│   │   │   ├── Handjet-Thin SDF.asset
+│   │   │   ├── Handjet-Thin.ttf
+│   │   │   ├── Handjet-VariableFont_ELGR,ELSH,wght SDF.asset
+│   │   │   ├── Handjet-VariableFont_ELGR,ELSH,wght.ttf
+│   │   │   ├── Handlee-Regular SDF.asset
+│   │   │   ├── Handlee-Regular.ttf
+│   │   │   ├── Inter-Italic-VariableFont_opsz,wght SDF.asset
+│   │   │   ├── Inter-Italic-VariableFont_opsz,wght.ttf
+│   │   │   ├── Inter-VariableFont_opsz,wght SDF.asset
+│   │   │   ├── Inter-VariableFont_opsz,wght.ttf
+│   │   │   ├── Inter_18pt-Black SDF.asset
+│   │   │   ├── Inter_18pt-Black.ttf
+│   │   │   ├── Inter_18pt-BlackItalic SDF.asset
+│   │   │   ├── Inter_18pt-BlackItalic.ttf
+│   │   │   ├── Inter_18pt-Bold SDF.asset
+│   │   │   ├── Inter_18pt-Bold.ttf
+│   │   │   ├── Inter_18pt-BoldItalic SDF.asset
+│   │   │   ├── Inter_18pt-BoldItalic.ttf
+│   │   │   ├── Inter_18pt-ExtraBold SDF.asset
+│   │   │   ├── Inter_18pt-ExtraBold.ttf
+│   │   │   ├── Inter_18pt-ExtraBoldItalic SDF.asset
+│   │   │   ├── Inter_18pt-ExtraBoldItalic.ttf
+│   │   │   ├── Inter_18pt-ExtraLight SDF.asset
+│   │   │   ├── Inter_18pt-ExtraLight.ttf
+│   │   │   ├── Inter_18pt-ExtraLightItalic SDF.asset
+│   │   │   ├── Inter_18pt-ExtraLightItalic.ttf
+│   │   │   ├── Inter_18pt-Italic SDF.asset
+│   │   │   ├── Inter_18pt-Italic.ttf
+│   │   │   ├── Inter_18pt-Light SDF.asset
+│   │   │   ├── Inter_18pt-Light.ttf
+│   │   │   ├── Inter_18pt-LightItalic SDF.asset
+│   │   │   ├── Inter_18pt-LightItalic.ttf
+│   │   │   ├── Inter_18pt-Medium SDF.asset
+│   │   │   ├── Inter_18pt-Medium.ttf
+│   │   │   ├── Inter_18pt-MediumItalic SDF.asset
+│   │   │   ├── Inter_18pt-MediumItalic.ttf
+│   │   │   ├── Inter_18pt-Regular SDF.asset
+│   │   │   ├── Inter_18pt-Regular.ttf
+│   │   │   ├── Inter_18pt-SemiBold SDF.asset
+│   │   │   ├── Inter_18pt-SemiBold.ttf
+│   │   │   ├── Inter_18pt-SemiBoldItalic SDF.asset
+│   │   │   ├── Inter_18pt-SemiBoldItalic.ttf
+│   │   │   ├── Inter_18pt-Thin SDF.asset
+│   │   │   ├── Inter_18pt-Thin.ttf
+│   │   │   ├── Inter_18pt-ThinItalic SDF.asset
+│   │   │   ├── Inter_18pt-ThinItalic.ttf
+│   │   │   ├── Inter_24pt-Black SDF.asset
+│   │   │   ├── Inter_24pt-Black.ttf
+│   │   │   ├── Inter_24pt-BlackItalic SDF.asset
+│   │   │   ├── Inter_24pt-BlackItalic.ttf
+│   │   │   ├── Inter_24pt-Bold SDF.asset
+│   │   │   ├── Inter_24pt-Bold.ttf
+│   │   │   ├── Inter_24pt-BoldItalic SDF.asset
+│   │   │   ├── Inter_24pt-BoldItalic.ttf
+│   │   │   ├── Inter_24pt-ExtraBold SDF.asset
+│   │   │   ├── Inter_24pt-ExtraBold.ttf
+│   │   │   ├── Inter_24pt-ExtraBoldItalic SDF.asset
+│   │   │   ├── Inter_24pt-ExtraBoldItalic.ttf
+│   │   │   ├── Inter_24pt-ExtraLight SDF.asset
+│   │   │   ├── Inter_24pt-ExtraLight.ttf
+│   │   │   ├── Inter_24pt-ExtraLightItalic SDF.asset
+│   │   │   ├── Inter_24pt-ExtraLightItalic.ttf
+│   │   │   ├── Inter_24pt-Italic SDF.asset
+│   │   │   ├── Inter_24pt-Italic.ttf
+│   │   │   ├── Inter_24pt-Light SDF.asset
+│   │   │   ├── Inter_24pt-Light.ttf
+│   │   │   ├── Inter_24pt-LightItalic SDF.asset
+│   │   │   ├── Inter_24pt-LightItalic.ttf
+│   │   │   ├── Inter_24pt-Medium SDF.asset
+│   │   │   ├── Inter_24pt-Medium.ttf
+│   │   │   ├── Inter_24pt-MediumItalic SDF.asset
+│   │   │   ├── Inter_24pt-MediumItalic.ttf
+│   │   │   ├── Inter_24pt-Regular SDF.asset
+│   │   │   ├── Inter_24pt-Regular.ttf
+│   │   │   ├── Inter_24pt-SemiBold SDF.asset
+│   │   │   ├── Inter_24pt-SemiBold.ttf
+│   │   │   ├── Inter_24pt-SemiBoldItalic SDF.asset
+│   │   │   ├── Inter_24pt-SemiBoldItalic.ttf
+│   │   │   ├── Inter_24pt-Thin SDF.asset
+│   │   │   ├── Inter_24pt-Thin.ttf
+│   │   │   ├── Inter_24pt-ThinItalic SDF.asset
+│   │   │   ├── Inter_24pt-ThinItalic.ttf
+│   │   │   ├── Inter_28pt-Black SDF.asset
+│   │   │   ├── Inter_28pt-Black.ttf
+│   │   │   ├── Inter_28pt-BlackItalic SDF.asset
+│   │   │   ├── Inter_28pt-BlackItalic.ttf
+│   │   │   ├── Inter_28pt-Bold SDF.asset
+│   │   │   ├── Inter_28pt-Bold.ttf
+│   │   │   ├── Inter_28pt-BoldItalic SDF.asset
+│   │   │   ├── Inter_28pt-BoldItalic.ttf
+│   │   │   ├── Inter_28pt-ExtraBold SDF.asset
+│   │   │   ├── Inter_28pt-ExtraBold.ttf
+│   │   │   ├── Inter_28pt-ExtraBoldItalic SDF.asset
+│   │   │   ├── Inter_28pt-ExtraBoldItalic.ttf
+│   │   │   ├── Inter_28pt-ExtraLight SDF.asset
+│   │   │   ├── Inter_28pt-ExtraLight.ttf
+│   │   │   ├── Inter_28pt-ExtraLightItalic SDF.asset
+│   │   │   ├── Inter_28pt-ExtraLightItalic.ttf
+│   │   │   ├── Inter_28pt-Italic SDF.asset
+│   │   │   ├── Inter_28pt-Italic.ttf
+│   │   │   ├── Inter_28pt-Light SDF.asset
+│   │   │   ├── Inter_28pt-Light.ttf
+│   │   │   ├── Inter_28pt-LightItalic SDF.asset
+│   │   │   ├── Inter_28pt-LightItalic.ttf
+│   │   │   ├── Inter_28pt-Medium SDF.asset
+│   │   │   ├── Inter_28pt-Medium.ttf
+│   │   │   ├── Inter_28pt-MediumItalic SDF.asset
+│   │   │   ├── Inter_28pt-MediumItalic.ttf
+│   │   │   ├── Inter_28pt-Regular SDF.asset
+│   │   │   ├── Inter_28pt-Regular.ttf
+│   │   │   ├── Inter_28pt-SemiBold SDF.asset
+│   │   │   ├── Inter_28pt-SemiBold.ttf
+│   │   │   ├── Inter_28pt-SemiBoldItalic SDF.asset
+│   │   │   ├── Inter_28pt-SemiBoldItalic.ttf
+│   │   │   ├── Inter_28pt-Thin SDF.asset
+│   │   │   ├── Inter_28pt-Thin.ttf
+│   │   │   ├── Inter_28pt-ThinItalic SDF.asset
+│   │   │   ├── Inter_28pt-ThinItalic.ttf
+│   │   │   ├── OdibeeSans-Regular SDF.asset
+│   │   │   ├── OdibeeSans-Regular.ttf
+│   │   │   ├── PatrickHand-Regular SDF.asset
+│   │   │   ├── PatrickHand-Regular.ttf
+│   │   │   ├── ReenieBeanie-Regular SDF.asset
+│   │   │   ├── ReenieBeanie-Regular.ttf
+│   │   │   ├── Righteous-Regular SDF.asset
+│   │   │   ├── Righteous-Regular.ttf
+│   │   │   ├── ShadowsIntoLight-Regular SDF.asset
+│   │   │   ├── ShadowsIntoLight-Regular.ttf
+│   │   │   ├── ShareTech-Regular SDF.asset
+│   │   │   ├── ShareTech-Regular.ttf
+│   │   │   ├── ShareTechMono-Regular SDF.asset
+│   │   │   ├── ShareTechMono-Regular.ttf
+│   │   │   ├── ShortStack-Regular SDF.asset
+│   │   │   ├── ShortStack-Regular.ttf
+│   │   │   ├── SourceCodePro-Black SDF.asset
+│   │   │   ├── SourceCodePro-Black.ttf
+│   │   │   ├── SourceCodePro-BlackItalic SDF.asset
+│   │   │   ├── SourceCodePro-BlackItalic.ttf
+│   │   │   ├── SourceCodePro-Bold SDF.asset
+│   │   │   ├── SourceCodePro-Bold.ttf
+│   │   │   ├── SourceCodePro-BoldItalic SDF.asset
+│   │   │   ├── SourceCodePro-BoldItalic.ttf
+│   │   │   ├── SourceCodePro-ExtraBold SDF.asset
+│   │   │   ├── SourceCodePro-ExtraBold.ttf
+│   │   │   ├── SourceCodePro-ExtraBoldItalic SDF.asset
+│   │   │   ├── SourceCodePro-ExtraBoldItalic.ttf
+│   │   │   ├── SourceCodePro-ExtraLight SDF.asset
+│   │   │   ├── SourceCodePro-ExtraLight.ttf
+│   │   │   ├── SourceCodePro-ExtraLightItalic SDF.asset
+│   │   │   ├── SourceCodePro-ExtraLightItalic.ttf
+│   │   │   ├── SourceCodePro-Italic SDF.asset
+│   │   │   ├── SourceCodePro-Italic-VariableFont_wght SDF.asset
+│   │   │   ├── SourceCodePro-Italic-VariableFont_wght.ttf
+│   │   │   ├── SourceCodePro-Italic.ttf
+│   │   │   ├── SourceCodePro-Light SDF.asset
+│   │   │   ├── SourceCodePro-Light.ttf
+│   │   │   ├── SourceCodePro-LightItalic SDF.asset
+│   │   │   ├── SourceCodePro-LightItalic.ttf
+│   │   │   ├── SourceCodePro-Medium SDF.asset
+│   │   │   ├── SourceCodePro-Medium.ttf
+│   │   │   ├── SourceCodePro-MediumItalic SDF.asset
+│   │   │   ├── SourceCodePro-MediumItalic.ttf
+│   │   │   ├── SourceCodePro-Regular SDF.asset
+│   │   │   ├── SourceCodePro-Regular.ttf
+│   │   │   ├── SourceCodePro-SemiBold SDF.asset
+│   │   │   ├── SourceCodePro-SemiBold.ttf
+│   │   │   ├── SourceCodePro-SemiBoldItalic SDF.asset
+│   │   │   ├── SourceCodePro-SemiBoldItalic.ttf
+│   │   │   ├── SourceCodePro-VariableFont_wght SDF.asset
+│   │   │   ├── SourceCodePro-VariableFont_wght.ttf
+│   │   │   ├── SourceSans3-Black SDF.asset
+│   │   │   ├── SourceSans3-Black.ttf
+│   │   │   ├── SourceSans3-BlackItalic SDF.asset
+│   │   │   ├── SourceSans3-BlackItalic.ttf
+│   │   │   ├── SourceSans3-Bold SDF.asset
+│   │   │   ├── SourceSans3-Bold.ttf
+│   │   │   ├── SourceSans3-BoldItalic SDF.asset
+│   │   │   ├── SourceSans3-BoldItalic.ttf
+│   │   │   ├── SourceSans3-ExtraBold SDF.asset
+│   │   │   ├── SourceSans3-ExtraBold.ttf
+│   │   │   ├── SourceSans3-ExtraBoldItalic SDF.asset
+│   │   │   ├── SourceSans3-ExtraBoldItalic.ttf
+│   │   │   ├── SourceSans3-ExtraLight SDF.asset
+│   │   │   ├── SourceSans3-ExtraLight.ttf
+│   │   │   ├── SourceSans3-ExtraLightItalic SDF.asset
+│   │   │   ├── SourceSans3-ExtraLightItalic.ttf
+│   │   │   ├── SourceSans3-Italic SDF.asset
+│   │   │   ├── SourceSans3-Italic-VariableFont_wght SDF.asset
+│   │   │   ├── SourceSans3-Italic-VariableFont_wght.ttf
+│   │   │   ├── SourceSans3-Italic.ttf
+│   │   │   ├── SourceSans3-Light SDF.asset
+│   │   │   ├── SourceSans3-Light.ttf
+│   │   │   ├── SourceSans3-LightItalic SDF.asset
+│   │   │   ├── SourceSans3-LightItalic.ttf
+│   │   │   ├── SourceSans3-Medium SDF.asset
+│   │   │   ├── SourceSans3-Medium.ttf
+│   │   │   ├── SourceSans3-MediumItalic SDF.asset
+│   │   │   ├── SourceSans3-MediumItalic.ttf
+│   │   │   ├── SourceSans3-Regular SDF.asset
+│   │   │   ├── SourceSans3-Regular.ttf
+│   │   │   ├── SourceSans3-SemiBold SDF.asset
+│   │   │   ├── SourceSans3-SemiBold.ttf
+│   │   │   ├── SourceSans3-SemiBoldItalic SDF.asset
+│   │   │   ├── SourceSans3-SemiBoldItalic.ttf
+│   │   │   ├── SourceSans3-VariableFont_wght SDF.asset
+│   │   │   ├── SourceSans3-VariableFont_wght.ttf
+│   │   │   ├── SpaceMono-Bold SDF.asset
+│   │   │   ├── SpaceMono-Bold.ttf
+│   │   │   ├── SpaceMono-BoldItalic SDF.asset
+│   │   │   ├── SpaceMono-BoldItalic.ttf
+│   │   │   ├── SpaceMono-Italic SDF.asset
+│   │   │   ├── SpaceMono-Italic.ttf
+│   │   │   ├── SpaceMono-Regular SDF.asset
+│   │   │   ├── SpaceMono-Regular.ttf
+│   │   │   ├── Ubuntu-Bold SDF.asset
+│   │   │   ├── Ubuntu-Bold.ttf
+│   │   │   ├── Ubuntu-BoldItalic SDF.asset
+│   │   │   ├── Ubuntu-BoldItalic.ttf
+│   │   │   ├── Ubuntu-Italic SDF.asset
+│   │   │   ├── Ubuntu-Italic.ttf
+│   │   │   ├── Ubuntu-Light SDF.asset
+│   │   │   ├── Ubuntu-Light.ttf
+│   │   │   ├── Ubuntu-LightItalic SDF.asset
+│   │   │   ├── Ubuntu-LightItalic.ttf
+│   │   │   ├── Ubuntu-Medium SDF.asset
+│   │   │   ├── Ubuntu-Medium.ttf
+│   │   │   ├── Ubuntu-MediumItalic SDF.asset
+│   │   │   ├── Ubuntu-MediumItalic.ttf
+│   │   │   ├── Ubuntu-Regular SDF.asset
+│   │   │   ├── Ubuntu-Regular.ttf
+│   │   │   ├── UbuntuCondensed-Regular SDF.asset
+│   │   │   ├── UbuntuCondensed-Regular.ttf
+│   │   │   ├── UbuntuMono-Bold SDF.asset
+│   │   │   ├── UbuntuMono-Bold.ttf
+│   │   │   ├── UbuntuMono-BoldItalic SDF.asset
+│   │   │   ├── UbuntuMono-BoldItalic.ttf
+│   │   │   ├── UbuntuMono-Italic SDF.asset
+│   │   │   ├── UbuntuMono-Italic.ttf
+│   │   │   ├── UbuntuMono-Regular SDF.asset
+│   │   │   ├── UbuntuMono-Regular.ttf
+│   │   │   ├── UnicaOne-Regular SDF.asset
+│   │   │   ├── UnicaOne-Regular.ttf
+│   │   │   ├── VT323-Regular SDF.asset
+│   │   │   └── VT323-Regular.ttf
+│   │   ├── Kenney Blocks SDF.asset
+│   │   ├── Kenney Future Narrow SDF.asset
+│   │   ├── Kenney Future SDF.asset
+│   │   ├── Kenney High SDF.asset
+│   │   ├── Kenney High Square SDF.asset
+│   │   ├── Kenney Mini SDF.asset
+│   │   ├── Kenney Mini Square Mono SDF.asset
+│   │   ├── Kenney Mini Square SDF.asset
+│   │   ├── Kenney Pixel SDF.asset
+│   │   ├── Kenney Pixel Square SDF.asset
+│   │   ├── Kenney Rocket SDF.asset
+│   │   ├── Kenney Rocket Square SDF.asset
+│   │   ├── Kenney fonts
+│   │   │   ├── Kenney Blocks SDF.asset
+│   │   │   ├── Kenney Blocks.ttf
+│   │   │   ├── Kenney Future Narrow.ttf
+│   │   │   ├── Kenney Future SDF.asset
+│   │   │   ├── Kenney Future.ttf
+│   │   │   ├── Kenney High Square.ttf
+│   │   │   ├── Kenney High.ttf
+│   │   │   ├── Kenney Mini Square Mono.ttf
+│   │   │   ├── Kenney Mini Square.ttf
+│   │   │   ├── Kenney Mini.ttf
+│   │   │   ├── Kenney Pixel Square.ttf
+│   │   │   ├── Kenney Pixel.ttf
+│   │   │   ├── Kenney Rocket Square.ttf
+│   │   │   ├── Kenney Rocket.ttf
+│   │   │   └── Kenney fonts
 │   │   ├── LiberationSans - OFL.txt
 │   │   └── LiberationSans.ttf
 │   ├── Resources
@@ -614,454 +1027,79 @@ SCRIPT CONTENTS
 ================================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\NodeEditorController.cs
+// FILE: Assets\Scripts\Nodes\Core\HexGridRenderer.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using System.Linq;
 
-public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
+[RequireComponent(typeof(CanvasRenderer))]
+public class HexGridRenderer : MaskableGraphic
 {
-    [Header("Window & Content Setup")]
-    [Tooltip("The fixed window (NodeEditorWindow) with RectMask2D & CanvasGroup.")]
-    [SerializeField] private RectTransform windowRect; // Parent window panel
+    public bool showGrid = true;
+    public Color gridColor = Color.white;
+    public float lineThickness = 1f;
 
-    [Tooltip("The inner content panel where nodes and connections are spawned.")]
-    [SerializeField] private RectTransform contentRect; // Child container for nodes
-
-    [Header("Prefabs")]
-    [SerializeField] private GameObject nodeViewPrefab; // Prefab for NodeView
-    [SerializeField] private GameObject connectionViewPrefab; // Prefab for connection (with UICubicBezier)
-
-    [Header("Node Definitions")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // For context menu
-
-    [Header("Runtime Graph Reference")]
-    [SerializeField] private NodeGraph currentGraph; // Contains nodes, adjacency, manaConnections
-
-    [Header("Optional")]
-    [SerializeField] private NodeExecutor executor; // Optional: updates graph
-
-    [Header("Panning/Zoom Settings")]
-    [SerializeField] private float contentMargin = 20f; // Minimum margin for content panel
-
-    // For connection dragging:
-    private NodeConnectionView draggingLine;
-    private PinView sourcePin;
-
-    // Context menu variables:
-    private bool showContextMenu = false;
-    private Vector2 contextMenuPosition;
-
-    private List<NodeView> spawnedNodeViews = new List<NodeView>();
-
-    private CanvasGroup canvasGroup;
-
-    private void Awake()
-    {
-        if (windowRect == null)
-            windowRect = GetComponent<RectTransform>();
-
-        canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
-
-        Image bg = GetComponent<Image>();
-        if (bg == null)
-        {
-            bg = gameObject.AddComponent<Image>();
-            bg.color = new Color(1, 1, 1, 0);
-            bg.raycastTarget = true;
-        }
+    private float HexSize {
+        get { return (HexGridManager.Instance != null) ? HexGridManager.Instance.hexSize : 50f; }
     }
 
-    private void Start()
+    protected override void OnPopulateMesh(VertexHelper vh)
     {
-        if (currentGraph == null)
-            currentGraph = new NodeGraph();
-
-        if (executor == null)
-        {
-            executor = GameObject.FindFirstObjectByType<NodeExecutor>();
-            if (executor != null)
-                executor.SetGraph(currentGraph);
-            else
-                Debug.LogWarning("[NodeEditorController] No NodeExecutor found in scene.");
-        }
-
-        EnsureContentPanelSize();
-    }
-
-    private void Update()
-    {
-        // Hide context menu on left-click if outside its bounds.
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions != null)
-            {
-                Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
-                float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
-                Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
-
-                // Convert Input.mousePosition to the same coordinate space as 'menuRect'.
-                // 'menuRect' is in GUI coords => top-left(0,0), so let's do:
-                Vector2 mousePos = Input.mousePosition;
-                mousePos.y = Screen.height - mousePos.y; 
-                // Now 'mousePos' matches the coordinate space of 'menuRect'.
-
-                if (!menuRect.Contains(mousePos))
-                    showContextMenu = false;
-            }
-        }
-
-
-        if (Input.GetKeyDown(KeyCode.Tab))
-            ToggleVisibility();
-
-        if (Input.GetKeyDown(KeyCode.Delete))
-        {
-            if (NodeSelectable.CurrentSelected != null)
-                DeleteSelectedNode();
-        }
-
-        if (Input.GetMouseButtonDown(1))
-        {
-            showContextMenu = true;
-            contextMenuPosition = Input.mousePosition;
-        }
-    }
-
-    private void ToggleVisibility()
-    {
-        if (canvasGroup.alpha > 0)
-        {
-            canvasGroup.alpha = 0;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-        }
-        else
-        {
-            canvasGroup.alpha = 1;
-            canvasGroup.interactable = true;
-            canvasGroup.blocksRaycasts = true;
-        }
-    }
-
-    private void OnGUI()
-    {
-        if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions.Count > 0)
-        {
-            Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
-            float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
-            Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
-
-            // If a left-click occurs outside the menu, hide it.
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
-            {
-                if (!menuRect.Contains(Event.current.mousePosition))
-                {
-                    showContextMenu = false;
-                }
-            }
-
-            GUI.Box(menuRect, "Add Node");
-
-            float yOffset = 20f;
-            foreach (NodeDefinition def in definitionLibrary.definitions)
-            {
-                Rect itemRect = new Rect(menuRect.x, menuRect.y + yOffset, 180, 25);
-                if (GUI.Button(itemRect, def.displayName))
-                {
-                    CreateNodeAtMouse(def);
-                    showContextMenu = false;
-                }
-                yOffset += 25f;
-            }
-        }
-    }
-
-    private void CreateNodeAtMouse(NodeDefinition definition)
-    {
-        Vector2 localPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(contentRect, Input.mousePosition, null, out localPos);
-
-        NodeData newNode = new NodeData();
-        newNode.nodeDisplayName = definition.displayName;
-        newNode.editorPosition = localPos;
-        newNode.backgroundColor = definition.backgroundColor;
-        newNode.description = definition.description; // Copy description from preset
-
-        foreach (var defEffect in definition.effects)
-        {
-            NodeEffectData effectCopy = new NodeEffectData
-            {
-                effectType = defEffect.effectType,
-                effectValue = defEffect.effectValue,
-                secondaryValue = defEffect.secondaryValue
-            };
-            newNode.effects.Add(effectCopy);
-        }
-
-        foreach (var portDef in definition.ports)
-        {
-            NodePort nodePort = new NodePort
-            {
-                portName = portDef.portName,
-                portType = portDef.portType
-            };
-
-            if (portDef.isInput)
-                newNode.inputs.Add(nodePort);
-            else
-                newNode.outputs.Add(nodePort);
-        }
-
-        currentGraph.nodes.Add(newNode);
-        CreateNodeView(newNode);
-        EnsureContentPanelSize();
-
-        if (executor != null)
-            executor.SetGraph(currentGraph);
-    }
-
-    private NodeView CreateNodeView(NodeData data)
-    {
-        GameObject nodeObj = Instantiate(nodeViewPrefab, contentRect);
-        NodeView view = nodeObj.GetComponent<NodeView>();
-
-        view.Initialize(data, data.backgroundColor, data.nodeDisplayName);
-
-        RectTransform rt = nodeObj.GetComponent<RectTransform>();
-        rt.anchoredPosition = data.editorPosition;
-
-        view.GeneratePins(data.inputs, data.outputs);
-
-        if (data.effects.Any(e => e.effectType == NodeEffectType.Output))
-        {
-            if (nodeObj.GetComponent<OutputNodeEffect>() == null)
-                nodeObj.AddComponent<OutputNodeEffect>();
-        }
-
-        spawnedNodeViews.Add(view);
-        return view;
-    }
-
-    // --- Deletion Logic ---
-    private void DeleteSelectedNode()
-    {
-        NodeView selectedView = NodeSelectable.CurrentSelected.GetComponent<NodeView>();
-        if (selectedView == null)
+        vh.Clear();
+        if (!showGrid)
             return;
 
-        string nodeId = selectedView.GetNodeData().nodeId;
-        currentGraph.nodes.RemoveAll(n => n.nodeId == nodeId);
+        Rect rect = rectTransform.rect;
+        Vector2 origin = rect.center;
 
-        if (currentGraph.adjacency != null)
-        {
-            currentGraph.adjacency.Remove(nodeId);
-            foreach (var kvp in currentGraph.adjacency)
-            {
-                kvp.Value.RemoveAll(childId => childId == nodeId);
-            }
-        }
+        int cols = Mathf.CeilToInt(rect.width / (HexSize * Mathf.Sqrt(3))) + 2;
+        int rows = Mathf.CeilToInt(rect.height / (HexSize * 1.5f)) + 2;
 
-        if (currentGraph.manaConnections != null)
-        {
-            List<string> keysToRemove = new List<string>();
-            foreach (var kvp in currentGraph.manaConnections)
-            {
-                if (kvp.Key == nodeId || kvp.Value == nodeId)
-                    keysToRemove.Add(kvp.Key);
-            }
-            foreach (var key in keysToRemove)
-                currentGraph.manaConnections.Remove(key);
-        }
+        List<Vector2> linePoints = new List<Vector2>();
 
-        // Use FindObjectsByType instead of FindObjectsOfType
-        NodeConnectionView[] allLines = Object.FindObjectsByType<NodeConnectionView>(FindObjectsSortMode.None);
-        foreach (var line in allLines)
+        for (int q = -cols; q <= cols; q++)
         {
-            if (line.sourcePin != null)
+            for (int r = -rows; r <= rows; r++)
             {
-                NodeView srcView = line.sourcePin.GetComponentInParent<NodeView>();
-                if (srcView == null || srcView.GetNodeData().nodeId == nodeId)
+                HexCoords hex = new HexCoords(q, r);
+                Vector2 hexCenter = hex.HexToWorld(HexSize) + origin;
+                List<Vector2> corners = new List<Vector2>();
+                // For flat top, use corners at angles 0, 60, 120, 180, 240, 300.
+                for (int i = 0; i < 6; i++)
                 {
-                    Destroy(line.gameObject);
-                    continue;
+                    float angle = i * 60f;
+                    float rad = angle * Mathf.Deg2Rad;
+                    Vector2 offset = new Vector2(HexSize * Mathf.Cos(rad), HexSize * Mathf.Sin(rad));
+                    corners.Add(hexCenter + offset);
                 }
-            }
-            if (line.targetPin != null)
-            {
-                NodeView tgtView = line.targetPin.GetComponentInParent<NodeView>();
-                if (tgtView == null || tgtView.GetNodeData().nodeId == nodeId)
+                for (int i = 0; i < 6; i++)
                 {
-                    Destroy(line.gameObject);
-                    continue;
+                    int next = (i + 1) % 6;
+                    linePoints.Add(corners[i]);
+                    linePoints.Add(corners[next]);
                 }
             }
         }
-
-        Destroy(NodeSelectable.CurrentSelected);
-        NodeSelectable.CurrentSelected = null;
-    }
-
-    // --- Connection Dragging Methods ---
-    public void StartConnectionDrag(PinView source, PointerEventData eventData)
-    {
-        Debug.Log("[NodeEditor] StartConnectionDrag called!");
-        sourcePin = source;
-
-        GameObject lineObj = Instantiate(connectionViewPrefab, contentRect);
-        draggingLine = lineObj.GetComponent<NodeConnectionView>();
-
-        RectTransform sourceRect = source.GetComponent<RectTransform>();
-        draggingLine.sourcePin = source;
-        draggingLine.StartPreview(sourceRect);
-    }
-
-    public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
-    {
-        // Preview updated within NodeConnectionView.
-    }
-
-    public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)
-    {
-        if (draggingLine == null)
-            return;
-
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, results);
-        PinView targetPin = null;
-        foreach (var r in results)
+        for (int i = 0; i < linePoints.Count; i += 2)
         {
-            targetPin = r.gameObject.GetComponent<PinView>();
-            if (targetPin != null && targetPin.isInput)
-                break;
-            else
-                targetPin = null;
+            AddLineQuad(vh, linePoints[i], linePoints[i + 1], lineThickness, gridColor);
         }
-
-        if (targetPin != null)
-        {
-            RectTransform targetRect = targetPin.GetComponent<RectTransform>();
-            draggingLine.targetPin = targetPin;
-            draggingLine.FinalizeConnection(targetRect);
-
-            if (sourcePin.port.portType == PortType.Mana && targetPin.port.portType == PortType.Mana)
-            {
-                string sourceId = GetNodeIdFromPin(sourcePin);
-                string targetId = GetNodeIdFromPin(targetPin);
-                if (currentGraph.manaConnections == null)
-                    currentGraph.manaConnections = new Dictionary<string, string>();
-                currentGraph.manaConnections[targetId] = sourceId;
-            }
-            else if (sourcePin.port.portType == PortType.General && targetPin.port.portType == PortType.General)
-            {
-                string sourceId = GetNodeIdFromPin(sourcePin);
-                string targetId = GetNodeIdFromPin(targetPin);
-                if (currentGraph.adjacency == null)
-                    currentGraph.adjacency = new Dictionary<string, List<string>>();
-                if (!currentGraph.adjacency.ContainsKey(sourceId))
-                    currentGraph.adjacency[sourceId] = new List<string>();
-                if (!currentGraph.adjacency[sourceId].Contains(targetId))
-                    currentGraph.adjacency[sourceId].Add(targetId);
-            }
-
-            Debug.Log("[NodeEditor] Connection finalized.");
-        }
-        else
-        {
-            Debug.Log("[NodeEditor] Connection canceled.");
-            Destroy(draggingLine.gameObject);
-        }
-
-        draggingLine = null;
-        sourcePin = null;
     }
 
-    // --- Zooming & Panning ---
-    public void OnScroll(PointerEventData eventData)
+    private void AddLineQuad(VertexHelper vh, Vector2 start, Vector2 end, float thickness, Color col)
     {
-        Debug.Log($"[NodeEditor] OnScroll: {eventData.scrollDelta}");
-        float scrollDelta = eventData.scrollDelta.y;
-        float newScale = contentRect.localScale.x + scrollDelta * 0.05f;
-        newScale = Mathf.Clamp(newScale, 0.5f, 2f);
-        contentRect.localScale = Vector3.one * newScale;
-        EnsureContentPanelSize();
-    }
+        Vector2 direction = (end - start).normalized;
+        Vector2 normal = new Vector2(-direction.y, direction.x);
+        Vector2 offset = normal * (thickness * 0.5f);
 
-    public void OnDrag(PointerEventData eventData)
-    {
-        Debug.Log($"[NodeEditor] OnDrag: {eventData.delta}");
-        contentRect.anchoredPosition += eventData.delta;
-        EnsureContentPanelSize();
-    }
-
-    private void EnsureContentPanelSize()
-    {
-        if (windowRect == null || contentRect == null)
-            return;
-
-        Vector2 windowSize = windowRect.rect.size;
-        Vector2 minSize = windowSize + new Vector2(contentMargin * 2, contentMargin * 2);
-
-        if (spawnedNodeViews.Count > 0)
-        {
-            Vector2 minPos = new Vector2(float.MaxValue, float.MaxValue);
-            Vector2 maxPos = new Vector2(float.MinValue, float.MinValue);
-            foreach (var view in spawnedNodeViews)
-            {
-                RectTransform rt = view.GetComponent<RectTransform>();
-                Vector2 pos = rt.anchoredPosition;
-                Vector2 size = rt.rect.size;
-                minPos = Vector2.Min(minPos, pos - size * 0.5f);
-                maxPos = Vector2.Max(maxPos, pos + size * 0.5f);
-            }
-            Vector2 nodesBounds = maxPos - minPos;
-            minSize = Vector2.Max(minSize, nodesBounds + new Vector2(contentMargin * 2, contentMargin * 2));
-        }
-
-        Vector2 currentSize = contentRect.sizeDelta;
-        float newWidth = Mathf.Max(currentSize.x, minSize.x);
-        float newHeight = Mathf.Max(currentSize.y, minSize.y);
-        contentRect.sizeDelta = new Vector2(newWidth, newHeight);
-    }
-
-    // --- Load Graph ---
-    public void LoadGraph(NodeGraph graph)
-    {
-        currentGraph = graph;
-        ClearExistingViews();
-        if (currentGraph == null) return;
-
-        foreach (var node in currentGraph.nodes)
-        {
-            CreateNodeView(node);
-        }
-
-        if (executor != null)
-            executor.SetGraph(currentGraph);
-    }
-
-    // --- Helper Methods ---
-    public string GetNodeIdFromPin(PinView pin)
-    {
-        NodeView view = pin.GetComponentInParent<NodeView>();
-        return view.GetNodeData().nodeId;
-    }
-
-    public NodeGraph CurrentGraph => currentGraph;
-
-    private void ClearExistingViews()
-    {
-        foreach (var view in spawnedNodeViews)
-        {
-            if (view != null)
-                Destroy(view.gameObject);
-        }
-        spawnedNodeViews.Clear();
+        int idx = vh.currentVertCount;
+        vh.AddVert(start + offset, col, Vector2.zero);
+        vh.AddVert(start - offset, col, Vector2.zero);
+        vh.AddVert(end - offset, col, Vector2.zero);
+        vh.AddVert(end + offset, col, Vector2.zero);
+        vh.AddTriangle(idx, idx + 1, idx + 2);
+        vh.AddTriangle(idx, idx + 2, idx + 3);
     }
 }
 
@@ -1071,5 +1109,5 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
 
 --------------------------------------------------------------------------------
-This is part 5 out of 8 of script collection. 3 more parts remain.
+This is part 7 out of 26 of script collection. 19 more parts remain.
 --------------------------------------------------------------------------------

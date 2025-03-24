@@ -6,99 +6,127 @@ public class NodeEffectDataDrawer : PropertyDrawer
 {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
-        // Get sub-properties.
-        SerializedProperty typeProp = property.FindPropertyRelative("effectType");
-        SerializedProperty valueProp = property.FindPropertyRelative("effectValue");
-        SerializedProperty secondaryProp = property.FindPropertyRelative("secondaryValue");
+        SerializedProperty typeProp        = property.FindPropertyRelative("effectType");
+        SerializedProperty valueProp       = property.FindPropertyRelative("effectValue");
+        SerializedProperty secondaryProp   = property.FindPropertyRelative("secondaryValue");
+        SerializedProperty extra1Prop      = property.FindPropertyRelative("extra1");
+        SerializedProperty extra2Prop      = property.FindPropertyRelative("extra2");
 
-        // Draw the effect type popup.
+        // New ones.
+        SerializedProperty leafPatternProp      = property.FindPropertyRelative("leafPattern");
+        SerializedProperty growthRandomnessProp = property.FindPropertyRelative("growthRandomness");
+
+        // Draw effectType
         Rect typeRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
         EditorGUI.PropertyField(typeRect, typeProp, new GUIContent("Effect Type"));
-
         NodeEffectType effectType = (NodeEffectType)typeProp.enumValueIndex;
         float yOffset = typeRect.yMax + EditorGUIUtility.standardVerticalSpacing;
 
-        // Helper method without default parameter.
-        Rect NextLineRect(float height)
+        Rect NextLineRect()
         {
-            Rect r = new Rect(position.x, yOffset, position.width, height);
-            yOffset += height + EditorGUIUtility.standardVerticalSpacing;
+            Rect r = new Rect(position.x, yOffset, position.width, EditorGUIUtility.singleLineHeight);
+            yOffset += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             return r;
         }
 
-        // Prepare GUIContent for labels with tooltips.
-        GUIContent content = new GUIContent();
+        // Draw fields based on effectType
         switch (effectType)
         {
             case NodeEffectType.ManaCost:
-                content.text = "Mana Cost";
-                content.tooltip = "Amount of mana required to process this node.";
-                {
-                    Rect line = NextLineRect(EditorGUIUtility.singleLineHeight);
-                    valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
-                }
+            {
+                GUIContent content = new GUIContent("Mana Cost", "Amount of mana required to process this node.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
                 break;
+            }
             case NodeEffectType.Damage:
-                content.text = "Damage";
-                content.tooltip = "Damage value contributed by this node.";
-                {
-                    Rect line = NextLineRect(EditorGUIUtility.singleLineHeight);
-                    valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
-                }
+            {
+                GUIContent content = new GUIContent("Damage", "Damage value contributed by this node.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
                 break;
+            }
             case NodeEffectType.Output:
-                content.text = "Output";
-                content.tooltip = "This node outputs the final chain result (no parameters).";
-                {
-                    Rect line = NextLineRect(EditorGUIUtility.singleLineHeight);
-                    EditorGUI.LabelField(line, content);
-                }
+            {
+                GUIContent content = new GUIContent("Output", "This node outputs the final chain result (no parameters).");
+                Rect line = NextLineRect();
+                EditorGUI.LabelField(line, content);
                 break;
+            }
             case NodeEffectType.Burning:
-                {
-                    content.text = "Fire DPS";
-                    content.tooltip = "Damage per second of burning.";
-                    Rect line1 = NextLineRect(EditorGUIUtility.singleLineHeight);
-                    valueProp.floatValue = EditorGUI.FloatField(line1, content, valueProp.floatValue);
-                    
-                    content.text = "Duration";
-                    content.tooltip = "Duration (seconds) of burning effect.";
-                    Rect line2 = NextLineRect(EditorGUIUtility.singleLineHeight);
-                    secondaryProp.floatValue = EditorGUI.FloatField(line2, content, secondaryProp.floatValue);
-                }
+            {
+                // Fire DPS in value, Duration in secondaryValue
+                GUIContent contentDps = new GUIContent("Fire DPS", "Damage per second of burning.");
+                Rect line1 = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line1, contentDps, valueProp.floatValue);
+
+                GUIContent contentDur = new GUIContent("Duration", "Duration (seconds) of burning effect.");
+                Rect line2 = NextLineRect();
+                secondaryProp.floatValue = EditorGUI.FloatField(line2, contentDur, secondaryProp.floatValue);
                 break;
+            }
             case NodeEffectType.AimSpread:
-                content.text = "Aim Spread Modifier";
-                content.tooltip = "Modifier to add to the wizard's base aim spread.";
-                {
-                    Rect line = NextLineRect(EditorGUIUtility.singleLineHeight);
-                    valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
-                }
+            {
+                GUIContent content = new GUIContent("Aim Spread Modifier", "Modifier to add to the wizard's base aim spread.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
                 break;
+            }
             case NodeEffectType.Piercing:
-                content.text = "Piercing";
-                content.tooltip = "Set to 1 for piercing (projectile will hit multiple enemies), 0 otherwise.";
-                {
-                    Rect line = NextLineRect(EditorGUIUtility.singleLineHeight);
-                    valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
-                }
+            {
+                GUIContent content = new GUIContent("Piercing", "Set to 1 for piercing, 0 otherwise.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
                 break;
+            }
             case NodeEffectType.FriendlyFire:
-                content.text = "Friendly Fire";
-                content.tooltip = "Set to 1 to enable friendly fire (damage allies), 0 to disable.";
-                {
-                    Rect line = NextLineRect(EditorGUIUtility.singleLineHeight);
-                    valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
-                }
+            {
+                GUIContent content = new GUIContent("Friendly Fire", "Set to 1 for friendly fire, 0 for none.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
                 break;
+            }
+            case NodeEffectType.Seed:
+            {
+                // Min stem length
+                var line1 = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line1,
+                    new GUIContent("Min Stem Length", ""), valueProp.floatValue);
+
+                // Max stem length
+                var line2 = NextLineRect();
+                secondaryProp.floatValue = EditorGUI.FloatField(line2,
+                    new GUIContent("Max Stem Length", ""), secondaryProp.floatValue);
+
+                // Growth speed
+                var line3 = NextLineRect();
+                extra1Prop.floatValue = EditorGUI.FloatField(line3,
+                    new GUIContent("Growth Speed (sec)", ""), extra1Prop.floatValue);
+
+                // Leaf gap
+                var line4 = NextLineRect();
+                extra2Prop.floatValue = EditorGUI.FloatField(line4,
+                    new GUIContent("Leaf Gap", ""), extra2Prop.floatValue);
+
+                // Leaf Pattern => 0=Parallel, 1=Alternating
+                var line5 = NextLineRect();
+                leafPatternProp.intValue = EditorGUI.IntSlider(line5,
+                    new GUIContent("Leaf Pattern (0=parallel,1=alt)", ""), leafPatternProp.intValue, 0, 1);
+
+                // Growth Randomness => [0..2]
+                var line6 = NextLineRect();
+                growthRandomnessProp.floatValue = EditorGUI.Slider(line6,
+                    new GUIContent("Growth Randomness", ""), growthRandomnessProp.floatValue, 0f, 2f);
+                break;
+            }
             default:
-                content.text = "Value";
-                content.tooltip = "";
-                {
-                    Rect line = NextLineRect(EditorGUIUtility.singleLineHeight);
-                    valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
-                }
+            {
+                // Fallback for unrecognized effect
+                GUIContent content = new GUIContent("Value", "");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
                 break;
+            }
         }
     }
 
@@ -107,26 +135,43 @@ public class NodeEffectDataDrawer : PropertyDrawer
         SerializedProperty typeProp = property.FindPropertyRelative("effectType");
         NodeEffectType effectType = (NodeEffectType)typeProp.enumValueIndex;
 
-        float height = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        float lineHeight = EditorGUIUtility.singleLineHeight;
+        float spacing = EditorGUIUtility.standardVerticalSpacing;
+
+        // Start with 1 line for the effectType + spacing
+        float totalHeight = lineHeight + spacing;
+
         switch (effectType)
         {
-            case NodeEffectType.Output:
-                height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                break;
-            case NodeEffectType.Burning:
-                height += (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * 2;
-                break;
             case NodeEffectType.ManaCost:
             case NodeEffectType.Damage:
             case NodeEffectType.AimSpread:
             case NodeEffectType.Piercing:
             case NodeEffectType.FriendlyFire:
-                height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                // +1 line
+                totalHeight += (lineHeight + spacing);
                 break;
+
+            case NodeEffectType.Output:
+                // +1 line
+                totalHeight += (lineHeight + spacing);
+                break;
+
+            case NodeEffectType.Burning:
+                // +2 lines
+                totalHeight += (lineHeight + spacing) * 2;
+                break;
+
+            case NodeEffectType.Seed:
+                // min length + max length + growth speed + leaf gap + leaf pattern + randomness => 6 lines
+                totalHeight += (lineHeight + spacing) * 6;
+                break;
+
             default:
-                height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+                // fallback +1 line
+                totalHeight += (lineHeight + spacing);
                 break;
         }
-        return height;
+        return totalHeight;
     }
 }

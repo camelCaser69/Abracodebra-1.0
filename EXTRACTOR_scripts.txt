@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-19 21:11:28
+UNITY PROJECT SCRIPT EXPORT - 2025-03-24 13:12:56
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -9,6 +9,7 @@ DIRECTORY STRUCTURE
 Assets
 ├── DefaultVolumeProfile.asset
 ├── Editor
+│   ├── HexGridRendererEditor.cs
 │   ├── NodeDefinitionAutoAdder.cs
 │   ├── NodeDefinitionCreator.cs
 │   ├── NodeDefinitionLibraryEditor.cs
@@ -18,12 +19,19 @@ Assets
 ├── InputSystem_Actions.inputactions
 ├── Materials
 │   └── BezierCurveAA_Material.mat
+├── Post Processing
 ├── Prefabs
 │   ├── General
+│   │   ├── GardenerPrefab.prefab
+│   │   ├── PixelLeaf.prefab
+│   │   ├── PixelSeed.prefab
+│   │   ├── PixelStem.prefab
+│   │   ├── PlantPrefab.prefab
 │   │   ├── Projectile_Basic_Pixel.prefab
 │   │   └── WizardPrefab.prefab
 │   ├── Node Presets
 │   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
 │   │   ├── Node_001_AimSpread.asset
 │   │   ├── Node_002_Piercing.asset
 │   │   ├── Node_003_Output.asset
@@ -32,7 +40,6 @@ Assets
 │   │   ├── Node_006_Burn.asset
 │   │   └── Node_007_FriendlyFire.asset
 │   ├── UI
-│   │   ├── NodeConnectionView.prefab
 │   │   └── NodeView.prefab
 │   └── Wizard Presets
 │       ├── Wizard_Basic.asset
@@ -42,6 +49,8 @@ Assets
 │   └── SampleScene.unity
 ├── Scripts
 │   ├── Battle
+│   │   ├── Plant
+│   │   │   └── PlantGrowth.cs
 │   │   ├── SpellProjectile.cs
 │   │   └── Status Effects
 │   │       ├── BurningStatusEffect.cs
@@ -49,6 +58,9 @@ Assets
 │   ├── Core
 │   ├── Nodes
 │   │   ├── Core
+│   │   │   ├── HexCoords.cs
+│   │   │   ├── HexGridManager.cs
+│   │   │   ├── HexGridRenderer.cs
 │   │   │   ├── NodeData.cs
 │   │   │   ├── NodeDefinition.cs
 │   │   │   ├── NodeDefinitionLibrary.cs
@@ -62,14 +74,13 @@ Assets
 │   │   │   └── NodeGraph.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
-│   │       ├── NodeConnectionView.cs
-│   │       ├── NodeDraggable.cs
 │   │       ├── NodeEditorController.cs
+│   │       ├── NodeHexDraggable.cs
 │   │       ├── NodeSelectable.cs
 │   │       ├── NodeTestInitializer.cs
-│   │       ├── NodeView.cs
-│   │       ├── PinView.cs
-│   │       └── UICubicBezier.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
 │   ├── UI
 │   └── Wizards
 │       ├── WizardController.cs
@@ -80,14 +91,195 @@ Assets
 │   ├── Scenes
 │   │   └── URP2DSceneTemplate.unity
 │   └── UniversalRP.asset
-├── Shaders
-│   └── BezierCurveAA.shader
-├── Sprites
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
 
 SCRIPT CONTENTS
 ================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\PlantGrowth.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public enum PlantCellType
+{
+    Seed,
+    Stem,
+    Leaf,
+    Flower,
+    Fruit
+}
+
+public class PlantGrowth : MonoBehaviour
+{
+    [Header("Gene Parameters (set via Seed node effect)")]
+    public int stemMinLength = 3;            // Minimum stem length (in cells)
+    public int stemMaxLength = 6;            // Maximum stem length (in cells)
+    public float growthSpeed = 1f;           // Time (seconds) per growth step
+    [Tooltip("Leaf Gap: 0 = leaves on every stem cell; 1 = leaves on every 2nd stem cell; 2 = every 3rd, etc.")]
+    public int leafGap = 1;                  // 0: leaves on every cell; 1: every 2nd cell, etc.
+    public int leafPattern = 0;       // 0=parallel, 1=alternating
+    public float growthRandomness = 0f; // 0..2
+    
+    [Header("Cell Prefabs")]
+    public GameObject seedCellPrefab;
+    public GameObject stemCellPrefab;
+    public GameObject leafCellPrefab;
+
+    [Header("Cell Grid Settings")]
+    [Tooltip("Distance in game units between adjacent cells.")]
+    public float cellSpacing = 8f; 
+
+    // Local dictionary to track cell types at grid coordinates (local to plant)
+    private Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
+
+    private bool growing = true;
+    private int currentStemCount = 0;
+    private int targetStemLength = 0;
+    
+    private bool leftSideNext = true; // for alternating pattern
+
+
+    private void Start()
+    {
+        // Decide on target stem length between min and max.
+        targetStemLength = Random.Range(stemMinLength, stemMaxLength + 1);
+        Debug.Log($"[PlantGrowth] Target stem length: {targetStemLength}");
+
+        // Place the seed cell at local grid coordinate (0,0)
+        cells[new Vector2Int(0, 0)] = PlantCellType.Seed;
+        SpawnCellVisual(PlantCellType.Seed, new Vector2Int(0, 0));
+
+        StartCoroutine(GrowRoutine());
+    }
+
+    private IEnumerator GrowRoutine()
+    {
+        Vector2Int currentPos = new Vector2Int(0,0); // we start at the seed
+        while (growing)
+        {
+            yield return new WaitForSeconds(growthSpeed);
+
+            if (currentStemCount < targetStemLength)
+            {
+                currentStemCount++;
+
+                Vector2Int dir = GetStemDirection();
+                currentPos += dir; 
+                // Mark cell as Stem
+                cells[currentPos] = PlantCellType.Stem;
+                SpawnCellVisual(PlantCellType.Stem, currentPos);
+
+                // Leaf logic
+                if ((currentStemCount % (leafGap + 1)) == 0)
+                {
+                    if (leafPattern == 0) // parallel
+                    {
+                        // if we consider left or right based on dir, you'd do something more complex
+                        // For simplicity, assume left= Vector2Int(-1,0), right=Vector2Int(+1,0)
+                        SpawnLeafIfEmpty(currentPos + new Vector2Int(-1,0));
+                        SpawnLeafIfEmpty(currentPos + new Vector2Int(+1,0));
+                    }
+                    else // alternating
+                    {
+                        if (leftSideNext)
+                        {
+                            SpawnLeafIfEmpty(currentPos + new Vector2Int(-1,0));
+                        }
+                        else
+                        {
+                            SpawnLeafIfEmpty(currentPos + new Vector2Int(+1,0));
+                        }
+                        leftSideNext = !leftSideNext;
+                    }
+                }
+            }
+            else
+            {
+                growing = false;
+            }
+        }
+    }
+    
+    private void SpawnLeafIfEmpty(Vector2Int coords)
+    {
+        if (!cells.ContainsKey(coords))
+        {
+            cells[coords] = PlantCellType.Leaf;
+            SpawnCellVisual(PlantCellType.Leaf, coords);
+        }
+    }
+    
+    private Vector2Int GetStemDirection()
+    {
+        // (0,1) => up, (-1,1) => diag left, (1,1) => diag right
+        Vector2Int[] possibleDirs = {
+            new Vector2Int(0,1),
+            new Vector2Int(-1,1),
+            new Vector2Int(1,1)
+        };
+
+        // random approach:
+        // If growthRandomness=0 => always up
+        // If growthRandomness=1 => pick among all 3 with equal prob
+        // If growthRandomness=2 => pick only among diag left & diag right
+
+        float rand = Random.value; // [0..1)
+        if (growthRandomness <= 0.01f)
+        {
+            // always up
+            return possibleDirs[0];
+        }
+        else if (growthRandomness < 2f)
+        {
+            // pick among up, diag left, diag right with equal prob => 1/3 each
+            int idx = Random.Range(0, 3);
+            return possibleDirs[idx];
+        }
+        else
+        {
+            // pick only diag left or diag right => 2/3
+            // or if you prefer 50-50, do:
+            return (Random.value < 0.5f) ? possibleDirs[1] : possibleDirs[2];
+        }
+    }
+
+
+
+    private void SpawnCellVisual(PlantCellType cellType, Vector2Int coords)
+    {
+        // Convert local grid coordinates to world position:
+        // (transform.position is the plant's origin; each cell is spaced by cellSpacing)
+        Vector2 worldPos = (Vector2)transform.position + (Vector2)coords * cellSpacing;
+        GameObject prefabToUse = null;
+        switch (cellType)
+        {
+            case PlantCellType.Seed:
+                prefabToUse = seedCellPrefab;
+                break;
+            case PlantCellType.Stem:
+                prefabToUse = stemCellPrefab;
+                break;
+            case PlantCellType.Leaf:
+                prefabToUse = leafCellPrefab;
+                break;
+            // Add cases for Flower, Fruit as needed.
+        }
+        if (prefabToUse != null)
+        {
+            Instantiate(prefabToUse, worldPos, Quaternion.identity, transform);
+        }
+        else
+        {
+            Debug.LogWarning($"[PlantGrowth] No prefab assigned for cell type {cellType}");
+        }
+    }
+}
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Battle\SpellProjectile.cs
@@ -181,6 +373,200 @@ public class SpellProjectile : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Core\HexCoords.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[System.Serializable]
+public struct HexCoords
+{
+    public int q; // axial coordinate (column)
+    public int r; // axial coordinate (row)
+
+    public HexCoords(int q, int r)
+    {
+        this.q = q;
+        this.r = r;
+    }
+
+    // Flat top conversion from axial to world coordinates.
+    // Using the formula:
+    // x = hexSize * (3/2 * q)
+    // y = hexSize * ( (sqrt(3)/2 * q) + (sqrt(3) * r) )
+    public Vector2 HexToWorld(float hexSize)
+    {
+        float x = hexSize * (3f / 2f * q);
+        float y = hexSize * ((Mathf.Sqrt(3f) / 2f * q) + (Mathf.Sqrt(3f) * r));
+        return new Vector2(x, y);
+    }
+
+    // Converts a world (UI) position to axial coordinates.
+    // Inverse formulas:
+    // q = (2/3 * x)/hexSize
+    // r = ((-1/3 * x) + (sqrt(3)/3 * y)) / hexSize
+    public static HexCoords WorldToHex(Vector2 pos, float hexSize)
+    {
+        float qf = (2f / 3f * pos.x) / hexSize;
+        float rf = ((-1f / 3f * pos.x) + (Mathf.Sqrt(3f) / 3f * pos.y)) / hexSize;
+        return RoundAxial(qf, rf);
+    }
+
+    public static HexCoords RoundAxial(float qf, float rf)
+    {
+        float sf = -qf - rf;
+        int qi = Mathf.RoundToInt(qf);
+        int ri = Mathf.RoundToInt(rf);
+        int si = Mathf.RoundToInt(sf);
+
+        float qDiff = Mathf.Abs(qi - qf);
+        float rDiff = Mathf.Abs(ri - rf);
+        float sDiff = Mathf.Abs(si - sf);
+
+        if (qDiff > rDiff && qDiff > sDiff)
+            qi = -ri - si;
+        else if (rDiff > sDiff)
+            ri = -qi - si;
+        return new HexCoords(qi, ri);
+    }
+
+    // Fixed neighbor offsets (axial) for flat top grid.
+    private static readonly HexCoords[] AxialNeighbors = new HexCoords[] {
+        new HexCoords(+1, 0),   // Side1
+        new HexCoords(0, -1),   // Side2
+        new HexCoords(-1, -1),  // Side3
+        new HexCoords(-1, 0),   // Side4
+        new HexCoords(0, +1),   // Side5
+        new HexCoords(+1, +1)   // Side6
+    };
+
+    // Returns the neighbor hex coordinate for a given side index (0 to 5)
+    public static HexCoords GetNeighbor(HexCoords origin, int sideIndex)
+    {
+        return new HexCoords(origin.q + AxialNeighbors[sideIndex].q,
+                             origin.r + AxialNeighbors[sideIndex].r);
+    }
+
+    public static int OppositeSideIndex(int sideIndex)
+    {
+        return (sideIndex + 3) % 6;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (!(obj is HexCoords))
+            return false;
+        HexCoords other = (HexCoords)obj;
+        return this.q == other.q && this.r == other.r;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked { return (q * 397) ^ r; }
+    }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Core\HexGridManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class HexGridManager : MonoBehaviour
+{
+    public float hexSize = 50f;
+    public float pinRadiusMultiplier = 1.0f; // Pin radius = hexSize * multiplier
+
+    // Flat top hexagon grid only – no orientation toggle needed.
+    public static HexGridManager Instance { get; private set; }
+    
+    private void Awake()
+    {
+        Instance = this;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Core\HexGridRenderer.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+
+[RequireComponent(typeof(CanvasRenderer))]
+public class HexGridRenderer : MaskableGraphic
+{
+    public bool showGrid = true;
+    public Color gridColor = Color.white;
+    public float lineThickness = 1f;
+
+    private float HexSize {
+        get { return (HexGridManager.Instance != null) ? HexGridManager.Instance.hexSize : 50f; }
+    }
+
+    protected override void OnPopulateMesh(VertexHelper vh)
+    {
+        vh.Clear();
+        if (!showGrid)
+            return;
+
+        Rect rect = rectTransform.rect;
+        Vector2 origin = rect.center;
+
+        int cols = Mathf.CeilToInt(rect.width / (HexSize * Mathf.Sqrt(3))) + 2;
+        int rows = Mathf.CeilToInt(rect.height / (HexSize * 1.5f)) + 2;
+
+        List<Vector2> linePoints = new List<Vector2>();
+
+        for (int q = -cols; q <= cols; q++)
+        {
+            for (int r = -rows; r <= rows; r++)
+            {
+                HexCoords hex = new HexCoords(q, r);
+                Vector2 hexCenter = hex.HexToWorld(HexSize) + origin;
+                List<Vector2> corners = new List<Vector2>();
+                // For flat top, use corners at angles 0, 60, 120, 180, 240, 300.
+                for (int i = 0; i < 6; i++)
+                {
+                    float angle = i * 60f;
+                    float rad = angle * Mathf.Deg2Rad;
+                    Vector2 offset = new Vector2(HexSize * Mathf.Cos(rad), HexSize * Mathf.Sin(rad));
+                    corners.Add(hexCenter + offset);
+                }
+                for (int i = 0; i < 6; i++)
+                {
+                    int next = (i + 1) % 6;
+                    linePoints.Add(corners[i]);
+                    linePoints.Add(corners[next]);
+                }
+            }
+        }
+        for (int i = 0; i < linePoints.Count; i += 2)
+        {
+            AddLineQuad(vh, linePoints[i], linePoints[i + 1], lineThickness, gridColor);
+        }
+    }
+
+    private void AddLineQuad(VertexHelper vh, Vector2 start, Vector2 end, float thickness, Color col)
+    {
+        Vector2 direction = (end - start).normalized;
+        Vector2 normal = new Vector2(-direction.y, direction.x);
+        Vector2 offset = normal * (thickness * 0.5f);
+
+        int idx = vh.currentVertCount;
+        vh.AddVert(start + offset, col, Vector2.zero);
+        vh.AddVert(start - offset, col, Vector2.zero);
+        vh.AddVert(end - offset, col, Vector2.zero);
+        vh.AddVert(end + offset, col, Vector2.zero);
+        vh.AddTriangle(idx, idx + 1, idx + 2);
+        vh.AddTriangle(idx, idx + 2, idx + 3);
+    }
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeData.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using System;
@@ -192,21 +578,19 @@ public class NodeData
 {
     public string nodeId;
     public string nodeDisplayName;
-    public Vector2 editorPosition;
-    
+    public Vector2 editorPosition; // For UI positioning
+    public HexCoords coords;       // Hex-based position
     public Color backgroundColor = Color.gray;
-    public string description = ""; // Ensure this field exists.
-
-    public List<NodePort> inputs;
-    public List<NodePort> outputs;
+    public string description = "";
+    public List<NodePort> ports;   // Up to 6 ports (max 1 per side)
     public List<NodeEffectData> effects;
 
     public NodeData()
     {
         nodeId = Guid.NewGuid().ToString();
-        inputs = new List<NodePort>();
-        outputs = new List<NodePort>();
+        ports = new List<NodePort>();
         effects = new List<NodeEffectData>();
+        coords = new HexCoords(0, 0);
     }
 }
 
@@ -218,7 +602,7 @@ public class NodeData
 using System.Collections.Generic;
 using System.Linq;
 
-// [CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
+[CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
 public class NodeDefinition : ScriptableObject
 {
     public string displayName;
@@ -236,23 +620,19 @@ public class NodeDefinition : ScriptableObject
             string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
             string[] parts = fileName.Split('_');
             if (parts.Length >= 3)
-            {
                 displayName = string.Join("_", parts.Skip(2).ToArray());
-            }
         }
     }
 #endif
 
     private void OnEnable()
     {
-        // Auto-add default General ports if none exist.
         if (ports == null || ports.Count == 0)
         {
             ports = new List<PortDefinition>();
-            PortDefinition inputPort = new PortDefinition { portName = "Input", portType = PortType.General, isInput = true };
-            PortDefinition outputPort = new PortDefinition { portName = "Output", portType = PortType.General, isInput = false };
-            ports.Add(inputPort);
-            ports.Add(outputPort);
+            // Default: one input on Top and one output on Three (opposite for flat-top)
+            ports.Add(new PortDefinition { isInput = true, portType = PortType.General, side = HexSideFlat.Top });
+            ports.Add(new PortDefinition { isInput = false, portType = PortType.General, side = HexSideFlat.Three });
         }
     }
 }
@@ -261,31 +641,42 @@ public class NodeDefinition : ScriptableObject
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeDefinitionLibrary.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/Core/NodeDefinitionLibrary.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "NodeDefinitionLibrary", menuName = "Nodes/NodeDefinitionLibrary")]
 public class NodeDefinitionLibrary : ScriptableObject
 {
     public List<NodeDefinition> definitions;
+    // New: List of nodes to auto-spawn at game start.
+    public List<NodeDefinition> autoSpawnNodes;
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeEffectData.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/Core/NodeEffectData.cs
-using System;
+﻿using System;
 
 [Serializable]
 public class NodeEffectData
 {
-    public NodeEffectType effectType;  
-    public float effectValue;       // For ManaStorage => capacity
-    public float secondaryValue;    // For ManaStorage => current / starting
-}
+    public NodeEffectType effectType;
 
+    // For Seed:
+    // effectValue     = stemMinLength
+    // secondaryValue  = stemMaxLength
+    // extra1          = growthSpeed
+    // extra2          = leafGap
+    public float effectValue;
+    public float secondaryValue;
+    public float extra1;
+    public float extra2;
+
+    // Two brand-new fields:
+    public int leafPattern = 0;       // 0=Parallel, 1=Alternating
+    public float growthRandomness = 0f; // Range [0..2]
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -301,35 +692,37 @@ public class NodeEffectData
     AimSpread,    // formerly Accuracy
     Burning,
     Piercing,
-    FriendlyFire
+    FriendlyFire,
+    Seed  // New effect type for planting a seed.
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodePort.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿/* Assets/Scripts/Nodes/Core/NodePort.cs
-   Represents a single port on a NodeData (input or output). */
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
+
+public enum PortType { General, Mana, Condition }
+
+public enum HexSideFlat { Top, One, Two, Three, Four, Five }
 
 [Serializable]
 public class NodePort
 {
-    public string portId;
-    public string portName;
+    public bool isInput;
     public PortType portType;
-    public List<string> connectedPortIds;
+    public HexSideFlat side;
 
-    public NodePort()
+    public NodePort(bool isInput, PortType portType, HexSideFlat side)
     {
-        portId = Guid.NewGuid().ToString();
-        connectedPortIds = new List<string>();
+        this.isInput = isInput;
+        this.portType = portType;
+        this.side = side;
     }
-}
 
+    public NodePort() { }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -338,23 +731,36 @@ public class NodePort
 ﻿using UnityEngine;
 using System.Linq;
 
+/// <summary>
+/// Attach this to the NodeView prefab if the node has Output effect,
+/// or have BFS call it directly. 
+/// It calls WizardController to spawn a projectile/spell.
+/// </summary>
 public class OutputNodeEffect : MonoBehaviour
 {
-    public void Activate(float finalDamage, float aimSpreadModifier, float burningDamage, float burningDuration, bool piercing, bool friendlyFire)
+    /// <summary>
+    /// This method is invoked by NodeExecutor when BFS processes an 'Output' node.
+    /// You can pass any parameters (damage, aim, etc.) or just do a test projectile.
+    /// </summary>
+    public void Activate()
     {
-        // Use FindObjectsByType
-        WizardController[] allWizards = Object.FindObjectsByType<WizardController>(FindObjectsSortMode.None);
-        WizardController wizard = allWizards.FirstOrDefault(w => !w.isEnemy);
+        Debug.Log("[OutputNodeEffect] Activate() called. Spawning projectile or calling wizard cast.");
 
-        if (wizard != null)
+        // For example, find the local (player) wizard and cast a test projectile:
+        WizardController playerWiz = FindObjectsOfType<WizardController>()
+            .FirstOrDefault(w => !w.isEnemy);
+
+        if (playerWiz)
         {
-            float finalAimSpread = Mathf.Clamp(wizard.baseAimSpread + aimSpreadModifier, 0f, 180f);
-            wizard.CastSpell(finalDamage, finalAimSpread, burningDamage, burningDuration, piercing, friendlyFire);
-            Debug.Log($"[OutputNodeEffect] Spell cast with damage: {finalDamage}, final aim spread: {finalAimSpread}, burning: {burningDamage} DPS for {burningDuration}s, piercing: {piercing}, friendlyFire: {friendlyFire}");
+            // Just an example. The real logic might pass finalDamage, aimSpread, etc.
+            playerWiz.CastSpell(finalDamage: 10f, finalAimSpread: 5f,
+                burningDamage: 0f, burningDuration: 0f,
+                piercing: false, friendlyFire: false);
+            Debug.Log("[OutputNodeEffect] Called player's CastSpell with sample values.");
         }
         else
         {
-            Debug.LogWarning("[OutputNodeEffect] No player WizardController found!");
+            Debug.LogWarning("[OutputNodeEffect] No friendly wizard found in scene.");
         }
     }
 }
@@ -363,25 +769,16 @@ public class OutputNodeEffect : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\PortDefinition.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/Core/PortDefinition.cs
-using System;
+﻿using System;
 using UnityEngine;
-
-public enum PortType
-{
-    General,
-    Mana,
-    Condition
-}
 
 [Serializable]
 public class PortDefinition
 {
-    public string portName;
-    public PortType portType;
     public bool isInput;
+    public PortType portType;
+    public HexSideFlat side;
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -396,46 +793,26 @@ using TMPro;
 public class NodeExecutor : MonoBehaviour
 {
     [SerializeField] private NodeGraph currentGraph;
-
     [Header("Debug Settings")]
     public float waitTimeBetweenNodes = 0.5f;
     public TMP_Text debugOutput;
 
-    private float totalDamage = 0f;
-    private float totalManaCost = 0f;
-    private List<string> skippedNodes = new List<string>();
+    [Header("Plant Prefab (assigned in inspector)")]
+    public GameObject plantPrefab;  // Assign your PlantPrefab here
+
+    private Dictionary<HexCoords, NodeData> coordsMap;
+    private HashSet<string> visited;
 
     private void Update()
     {
-        RechargeNodesOverTime();
-
         if (Input.GetKeyDown(KeyCode.Space))
             ExecuteGraph();
-    }
-
-    private void RechargeNodesOverTime()
-    {
-        if (currentGraph == null) return;
-
-        foreach (var node in currentGraph.nodes)
-        {
-            var storage = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
-            if (storage != null)
-            {
-                float cap = storage.effectValue;
-                float cur = storage.secondaryValue;
-                var rateEff = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaRechargeRate);
-                float rate = (rateEff != null) ? rateEff.effectValue : 0f;
-                cur += rate * Time.deltaTime;
-                if (cur > cap) cur = cap;
-                storage.secondaryValue = cur;
-            }
-        }
     }
 
     public void SetGraph(NodeGraph graph)
     {
         currentGraph = graph;
+        Debug.Log("[NodeExecutor] Graph set. Node count=" + (graph != null ? graph.nodes.Count : 0));
     }
 
     public NodeGraph GetGraph() => currentGraph;
@@ -444,207 +821,145 @@ public class NodeExecutor : MonoBehaviour
     {
         if (currentGraph == null || currentGraph.nodes.Count == 0)
         {
-            Debug.LogWarning("[NodeExecutor] No graph or no nodes to execute!");
+            LogDebug("[NodeExecutor] No graph or no nodes to execute!");
+            return;
+        }
+        StopAllCoroutines();
+        ClearDebug();
+        BuildCoordsMap();
+        visited = new HashSet<string>();
+
+        List<NodeData> startNodes = FindStartNodes();
+        if (startNodes.Count == 0)
+        {
+            LogDebug("[NodeExecutor] No start nodes found. Aborting BFS.");
+            return;
+        }
+        foreach (var startNode in startNodes)
+            StartCoroutine(RunChainBFS(startNode));
+    }
+
+    private void BuildCoordsMap()
+    {
+        coordsMap = new Dictionary<HexCoords, NodeData>();
+        foreach (var node in currentGraph.nodes)
+            coordsMap[node.coords] = node;
+    }
+
+    private List<NodeData> FindStartNodes()
+    {
+        List<NodeData> result = new List<NodeData>();
+        foreach (var node in currentGraph.nodes)
+        {
+            if (!HasInbound(node))
+                result.Add(node);
+        }
+        return result;
+    }
+
+    private bool HasInbound(NodeData node)
+    {
+        foreach (var port in node.ports)
+        {
+            if (!port.isInput)
+                continue;
+            int sideIndex = (int)port.side;
+            int oppSide = (sideIndex + 3) % 6;
+            var neighborCoords = HexCoords.GetNeighbor(node.coords, oppSide);
+            if (!coordsMap.ContainsKey(neighborCoords))
+                continue;
+            var neighborNode = coordsMap[neighborCoords];
+            bool hasOutputMatch = neighborNode.ports.Any(p => !p.isInput && (int)p.side == oppSide);
+            if (hasOutputMatch)
+                return true;
+        }
+        return false;
+    }
+
+    private IEnumerator RunChainBFS(NodeData startNode)
+    {
+        Queue<HexCoords> queue = new Queue<HexCoords>();
+        queue.Enqueue(startNode.coords);
+
+        while (queue.Count > 0)
+        {
+            HexCoords coords = queue.Dequeue();
+            if (!coordsMap.ContainsKey(coords)) 
+                continue;
+            NodeData node = coordsMap[coords];
+            if (visited.Contains(node.nodeId))
+                continue;
+            visited.Add(node.nodeId);
+
+            yield return new WaitForSeconds(waitTimeBetweenNodes);
+            ProcessNode(node);
+
+            foreach (var port in node.ports)
+            {
+                if (!port.isInput)
+                {
+                    int sIndex = (int)port.side;
+                    var neighborCoords = HexCoords.GetNeighbor(coords, sIndex);
+                    if (!coordsMap.ContainsKey(neighborCoords))
+                        continue;
+                    var neighborNode = coordsMap[neighborCoords];
+                    int oppIndex = (sIndex + 3) % 6;
+                    bool hasInputMatch = neighborNode.ports.Any(p => p.isInput && (int)p.side == oppIndex);
+                    if (hasInputMatch && !visited.Contains(neighborNode.nodeId))
+                        queue.Enqueue(neighborCoords);
+                }
+            }
+        }
+        LogDebug("[NodeExecutor] BFS from start node completed.");
+    }
+
+    private void ProcessNode(NodeData node)
+    {
+        LogDebug($"[NodeExecutor] Processing node '{node.nodeDisplayName}' at coords ({node.coords.q}, {node.coords.r}).");
+
+        var seedEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.Seed);
+        if (seedEffect != null)
+        {
+            SpawnPlant(seedEffect);
+        }
+    }
+
+    private void SpawnPlant(NodeEffectData seedEffect)
+    {
+        if (plantPrefab == null)
+        {
+            LogDebug("[NodeExecutor] plantPrefab is not assigned in the inspector!");
+            return;
+        }
+        var gardener = FindObjectOfType<GardenerController>();
+        if (gardener == null)
+        {
+            LogDebug("[NodeExecutor] No GardenerController found. Can't spawn plant.");
             return;
         }
 
-        totalDamage = 0f;
-        totalManaCost = 0f;
-        skippedNodes.Clear();
+        Vector2 spawnPos = gardener.GetPlantingPosition();
+        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
+        PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
+        if (growth != null)
+        {
+            growth.stemMinLength    = Mathf.RoundToInt(seedEffect.effectValue);
+            growth.stemMaxLength    = Mathf.RoundToInt(seedEffect.secondaryValue);
+            growth.growthSpeed      = seedEffect.extra1;
+            growth.leafGap          = Mathf.RoundToInt(seedEffect.extra2);
 
-        StopAllCoroutines();
-        StartCoroutine(RunChainCoroutine());
+            // New fields:
+            growth.leafPattern      = seedEffect.leafPattern; 
+            growth.growthRandomness = seedEffect.growthRandomness;
+
+            LogDebug($"[NodeExecutor] Spawned plant => min={growth.stemMinLength}, max={growth.stemMaxLength}, spd={growth.growthSpeed}, leafGap={growth.leafGap}, pattern={growth.leafPattern}, rand={growth.growthRandomness}");
+        }
     }
 
-    private IEnumerator RunChainCoroutine()
-    {
-        ClearDebugOutput();
-        Dictionary<string, int> inboundCount = BuildInboundCount();
-        List<NodeData> startNodes = currentGraph.nodes.Where(n => inboundCount[n.nodeId] == 0).ToList();
-        if (startNodes.Count == 0)
-        {
-            LogDebug("[NodeExecutor] No start nodes found. Aborting run.");
-            yield break;
-        }
 
-        Queue<NodeData> queue = new Queue<NodeData>();
-        HashSet<string> visited = new HashSet<string>();
-        foreach (var s in startNodes)
-            queue.Enqueue(s);
 
-        List<NodeData> chain = new List<NodeData>();
-        while (queue.Count > 0)
-        {
-            NodeData curr = queue.Dequeue();
-            if (visited.Contains(curr.nodeId))
-                continue;
-            visited.Add(curr.nodeId);
-            chain.Add(curr);
 
-            if (currentGraph.adjacency != null && currentGraph.adjacency.ContainsKey(curr.nodeId))
-            {
-                foreach (var childId in currentGraph.adjacency[curr.nodeId])
-                {
-                    inboundCount[childId]--;
-                    if (inboundCount[childId] <= 0)
-                    {
-                        NodeData child = currentGraph.nodes.FirstOrDefault(n => n.nodeId == childId);
-                        if (child != null)
-                            queue.Enqueue(child);
-                    }
-                }
-            }
-        }
-
-        string chainLog = string.Join(" -> ", chain.Select(n => n.nodeDisplayName));
-        LogDebug("[NodeExecutor] Chain: " + chainLog);
-
-        float accumulatedAimSpreadModifier = 0f;
-        float accumulatedBurningDamage = 0f;
-        float accumulatedBurningDuration = 0f;
-        bool accumulatedPiercing = false;
-        bool accumulatedFriendlyFire = false;
-
-        foreach (var node in chain)
-        {
-            yield return new WaitForSeconds(waitTimeBetweenNodes);
-            bool executed = false;
-            float cost = node.effects.Where(e => e.effectType == NodeEffectType.ManaCost).Sum(e => e.effectValue);
-
-            if (cost > 0f && (!currentGraph.manaConnections.ContainsKey(node.nodeId) ||
-                              string.IsNullOrEmpty(currentGraph.manaConnections[node.nodeId])))
-            {
-                LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - no valid mana source connected.");
-                skippedNodes.Add(node.nodeDisplayName);
-                continue;
-            }
-
-            if (cost <= 0f)
-            {
-                float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
-                totalDamage += dmg;
-                executed = true;
-                LogDebug($"[NodeExecutor] Executed '{node.nodeDisplayName}' with no cost, damage={Mathf.Floor(dmg)}");
-            }
-            else
-            {
-                string sourceId = currentGraph.manaConnections[node.nodeId];
-                NodeData sourceNode = currentGraph.nodes.FirstOrDefault(n => n.nodeId == sourceId);
-                if (sourceNode == null)
-                {
-                    LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - upstream mana node not found.");
-                    skippedNodes.Add(node.nodeDisplayName);
-                    continue;
-                }
-
-                var storageEff = sourceNode.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
-                if (storageEff == null)
-                {
-                    LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' - source node '{sourceNode.nodeDisplayName}' has no ManaStorage.");
-                    skippedNodes.Add(node.nodeDisplayName);
-                    continue;
-                }
-
-                float cap = storageEff.effectValue;
-                float cur = storageEff.secondaryValue;
-
-                if (cur < cost)
-                {
-                    LogDebug($"[NodeExecutor] Skipping '{node.nodeDisplayName}' (insufficient mana in '{sourceNode.nodeDisplayName}': {Mathf.Floor(cur)}/{cost}).");
-                    skippedNodes.Add(node.nodeDisplayName);
-                    continue;
-                }
-                else
-                {
-                    cur -= cost;
-                    storageEff.secondaryValue = cur;
-                    totalManaCost += cost;
-
-                    float dmg = node.effects.Where(e => e.effectType == NodeEffectType.Damage).Sum(e => e.effectValue);
-                    totalDamage += dmg;
-                    executed = true;
-                    LogDebug($"[NodeExecutor] '{node.nodeDisplayName}' executed: cost={Mathf.Floor(cost)}, damage={Mathf.Floor(dmg)}, source='{sourceNode.nodeDisplayName}', leftoverMana={Mathf.Floor(cur)}/{Mathf.Floor(cap)}");
-                }
-            }
-
-            if (executed)
-            {
-                foreach (var eff in node.effects)
-                {
-                    if (eff.effectType == NodeEffectType.AimSpread)
-                        accumulatedAimSpreadModifier += eff.effectValue;
-                    else if (eff.effectType == NodeEffectType.Burning)
-                    {
-                        accumulatedBurningDamage += eff.effectValue;
-                        accumulatedBurningDuration += eff.secondaryValue;
-                    }
-                    else if (eff.effectType == NodeEffectType.Piercing)
-                        accumulatedPiercing = true;
-                    else if (eff.effectType == NodeEffectType.FriendlyFire)
-                        accumulatedFriendlyFire = true;
-                }
-            }
-
-            bool isOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
-            if (isOutput)
-            {
-                LogDebug($"[NodeExecutor] Output node '{node.nodeDisplayName}' reached.");
-                LogDebug($"[NodeExecutor] Total mana cost: {Mathf.Floor(totalManaCost)}");
-                string skipStr = (skippedNodes.Count > 0) ? string.Join(", ", skippedNodes) : "None";
-                LogDebug($"[NodeExecutor] Skipped nodes: {skipStr}");
-                LogDebug($"[NodeExecutor] Final damage: {Mathf.Floor(totalDamage)}");
-
-                NodeView outputView = FindNodeViewById(node.nodeId);
-                if (outputView != null)
-                {
-                    OutputNodeEffect outputEffect = outputView.GetComponent<OutputNodeEffect>();
-                    if (outputEffect != null)
-                    {
-                        outputEffect.Activate(totalDamage, accumulatedAimSpreadModifier, accumulatedBurningDamage, accumulatedBurningDuration, accumulatedPiercing, accumulatedFriendlyFire);
-                    }
-                    else
-                    {
-                        Debug.LogWarning("[NodeExecutor] Output node effect not found on NodeView.");
-                    }
-                }
-            }
-        }
-
-        LogDebug("[NodeExecutor] BFS execution complete.");
-    }
-
-    private NodeView FindNodeViewById(string nodeId)
-    {
-        // Use FindObjectsByType
-        NodeView[] views = Object.FindObjectsByType<NodeView>(FindObjectsSortMode.None);
-        foreach (var view in views)
-        {
-            if (view.GetNodeData().nodeId == nodeId)
-                return view;
-        }
-        return null;
-    }
-
-    private Dictionary<string, int> BuildInboundCount()
-    {
-        Dictionary<string, int> inboundCount = new Dictionary<string, int>();
-        foreach (var node in currentGraph.nodes)
-            inboundCount[node.nodeId] = 0;
-
-        if (currentGraph.adjacency != null)
-        {
-            foreach (var kvp in currentGraph.adjacency)
-            {
-                foreach (var childId in kvp.Value)
-                {
-                    inboundCount[childId]++;
-                }
-            }
-        }
-        return inboundCount;
-    }
-
-    private void ClearDebugOutput()
+    private void ClearDebug()
     {
         if (debugOutput)
             debugOutput.text = "";
@@ -671,14 +986,10 @@ using UnityEngine;
 public class NodeGraph
 {
     public List<NodeData> nodes;
-    [NonSerialized] public Dictionary<string, List<string>> adjacency;
-    [NonSerialized] public Dictionary<string, string> manaConnections;
 
     public NodeGraph()
     {
         nodes = new List<NodeData>();
-        adjacency = new Dictionary<string, List<string>>();
-        manaConnections = new Dictionary<string, string>();
     }
 }
 
@@ -698,142 +1009,6 @@ public static class ColorExtensions
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\NodeConnectionView.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-
-[RequireComponent(typeof(RectTransform))]
-public class NodeConnectionView : MonoBehaviour, IPointerClickHandler
-{
-    [SerializeField] private RectTransform startRect;
-    [SerializeField] private RectTransform endRect;
-
-    public PinView sourcePin;
-    public PinView targetPin;
-
-    private UICubicBezier bezier;
-    private RectTransform ownRect;
-
-    private bool isPreviewing = false;
-    private bool isFinalized = false;
-
-    private void Awake()
-    {
-        ownRect = GetComponent<RectTransform>();
-        bezier  = GetComponent<UICubicBezier>();
-    }
-
-    private void Update()
-    {
-        // If finalized and either pin is missing, destroy self.
-        if (isFinalized && (sourcePin == null || targetPin == null))
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        if (bezier == null || startRect == null)
-            return;
-
-        Vector2 localStart;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, startRect.position, null, out localStart);
-
-        Vector2 localEnd;
-        if (!isPreviewing && endRect != null)
-        {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, endRect.position, null, out localEnd);
-        }
-        else
-        {
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(ownRect, Input.mousePosition, null, out localEnd);
-        }
-
-        bezier.UpdateCurve(localStart, localEnd);
-    }
-
-    public void StartPreview(RectTransform source)
-    {
-        startRect = source;
-        endRect = null;
-        isPreviewing = true;
-    }
-
-    public void FinalizeConnection(RectTransform end)
-    {
-        endRect = end;
-        isPreviewing = false;
-        isFinalized = true;
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (eventData.button == PointerEventData.InputButton.Right)
-        {
-            Debug.Log("[NodeConnectionView] Deleting connection");
-            // Clear references to help garbage collection.
-            sourcePin = null;
-            targetPin = null;
-            Destroy(gameObject);
-        }
-    }
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\NodeDraggable.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-
-/// <summary>
-/// Drags a node in its parent's local space, correctly handling parent scaling & panning.
-/// Attach this to each node (NodeView prefab).
-/// </summary>
-[RequireComponent(typeof(RectTransform))]
-public class NodeDraggable : MonoBehaviour, IPointerDownHandler, IDragHandler
-{
-    private RectTransform nodeRect;      // The node's own RectTransform
-    private RectTransform parentRect;    // The parent panel's RectTransform
-    private Vector2 pointerOffset;       // Offset between pointer & node's anchoredPosition
-
-    private void Awake()
-    {
-        nodeRect = GetComponent<RectTransform>();
-        parentRect = nodeRect.parent as RectTransform;
-        if (parentRect == null)
-        {
-            Debug.LogError("[NodeDraggable] No parent RectTransform found! Dragging won't work.");
-        }
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        // Convert the pointer's screen position to the parent's local coordinates.
-        Vector2 localPointerPos;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                parentRect, eventData.position, eventData.pressEventCamera, out localPointerPos))
-        {
-            // The offset is (nodePosition - pointerPosition) in parent's local space.
-            pointerOffset = nodeRect.anchoredPosition - localPointerPos;
-        }
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        Vector2 localPointerPos;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                parentRect, eventData.position, eventData.pressEventCamera, out localPointerPos))
-        {
-            // On drag, update the node's anchoredPosition so it follows the pointer + offset.
-            nodeRect.anchoredPosition = localPointerPos + pointerOffset;
-        }
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeEditorController.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
@@ -845,39 +1020,28 @@ using System.Linq;
 public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 {
     [Header("Window & Content Setup")]
-    [Tooltip("The fixed window (NodeEditorWindow) with RectMask2D & CanvasGroup.")]
-    [SerializeField] private RectTransform windowRect; // Parent window panel
-
-    [Tooltip("The inner content panel where nodes and connections are spawned.")]
-    [SerializeField] private RectTransform contentRect; // Child container for nodes
+    [SerializeField] private RectTransform windowRect; // Panel with RectMask2D
+    [SerializeField] private RectTransform contentRect; // Panel that holds nodes
 
     [Header("Prefabs")]
-    [SerializeField] private GameObject nodeViewPrefab; // Prefab for NodeView
-    [SerializeField] private GameObject connectionViewPrefab; // Prefab for connection (with UICubicBezier)
+    [SerializeField] private GameObject nodeViewPrefab; // Must have NodeView component
 
     [Header("Node Definitions")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // For context menu
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
 
     [Header("Runtime Graph Reference")]
-    [SerializeField] private NodeGraph currentGraph; // Contains nodes, adjacency, manaConnections
+    [SerializeField] private NodeGraph currentGraph;
 
-    [Header("Optional")]
-    [SerializeField] private NodeExecutor executor; // Optional: updates graph
+    [Header("Zoom and Panning")]
+    [SerializeField] private float startingZoomMultiplier = 1f; // Default zoom at start
+    [SerializeField] private float contentMargin = 20f;         // Margin around nodes
 
-    [Header("Panning/Zoom Settings")]
-    [SerializeField] private float contentMargin = 20f; // Minimum margin for content panel
-
-    // For connection dragging:
-    private NodeConnectionView draggingLine;
-    private PinView sourcePin;
-
-    // Context menu variables:
     private bool showContextMenu = false;
     private Vector2 contextMenuPosition;
-
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
-
     private CanvasGroup canvasGroup;
+    public RectTransform ContentRect => contentRect;
+
 
     private void Awake()
     {
@@ -902,21 +1066,14 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         if (currentGraph == null)
             currentGraph = new NodeGraph();
 
-        if (executor == null)
-        {
-            executor = GameObject.FindFirstObjectByType<NodeExecutor>();
-            if (executor != null)
-                executor.SetGraph(currentGraph);
-            else
-                Debug.LogWarning("[NodeEditorController] No NodeExecutor found in scene.");
-        }
-
+        // Set initial zoom.
+        contentRect.localScale = Vector3.one * startingZoomMultiplier;
         EnsureContentPanelSize();
     }
 
     private void Update()
     {
-        // Hide context menu on left-click if outside its bounds.
+        // Hide context menu on left-click if outside.
         if (Input.GetMouseButtonDown(0))
         {
             if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions != null)
@@ -925,27 +1082,19 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
                 float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
                 Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
 
-                // Convert Input.mousePosition to the same coordinate space as 'menuRect'.
-                // 'menuRect' is in GUI coords => top-left(0,0), so let's do:
                 Vector2 mousePos = Input.mousePosition;
-                mousePos.y = Screen.height - mousePos.y; 
-                // Now 'mousePos' matches the coordinate space of 'menuRect'.
-
+                mousePos.y = Screen.height - mousePos.y;
                 if (!menuRect.Contains(mousePos))
                     showContextMenu = false;
             }
         }
-
-
         if (Input.GetKeyDown(KeyCode.Tab))
             ToggleVisibility();
-
         if (Input.GetKeyDown(KeyCode.Delete))
         {
             if (NodeSelectable.CurrentSelected != null)
                 DeleteSelectedNode();
         }
-
         if (Input.GetMouseButtonDown(1))
         {
             showContextMenu = true;
@@ -977,17 +1126,13 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
             Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
 
-            // If a left-click occurs outside the menu, hide it.
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
                 if (!menuRect.Contains(Event.current.mousePosition))
-                {
                     showContextMenu = false;
-                }
             }
 
             GUI.Box(menuRect, "Add Node");
-
             float yOffset = 20f;
             foreach (NodeDefinition def in definitionLibrary.definitions)
             {
@@ -1002,62 +1147,91 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         }
     }
 
-    private void CreateNodeAtMouse(NodeDefinition definition)
+    
+        private void CreateNodeAtMouse(NodeDefinition definition)
+{
+    // 1. Convert screen coords → local coords in contentRect
+    Vector2 localPos;
+    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        contentRect, Input.mousePosition, null, out localPos);
+
+    // 2. Convert local coords → hex coords (flat-top style)
+    float hexSizeValue = (HexGridManager.Instance != null) 
+        ? HexGridManager.Instance.hexSize 
+        : 50f;
+
+    // If your HexCoords.WorldToHex expects localPos to be the same coordinate space 
+    // as used in your HexCoords logic, we can feed localPos directly:
+    HexCoords hc = HexCoords.WorldToHex(localPos, hexSizeValue);
+
+    // 3. Convert hex coords → local snapped coords
+    Vector2 snappedLocal = hc.HexToWorld(hexSizeValue);
+
+    // 4. Create the new node data
+    NodeData newNode = new NodeData
     {
-        Vector2 localPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(contentRect, Input.mousePosition, null, out localPos);
+        nodeDisplayName = definition.displayName,
+        backgroundColor = definition.backgroundColor,
+        description = definition.description,
+        coords = hc,
+        editorPosition = snappedLocal // This is the local position inside contentRect
+    };
 
-        NodeData newNode = new NodeData();
-        newNode.nodeDisplayName = definition.displayName;
-        newNode.editorPosition = localPos;
-        newNode.backgroundColor = definition.backgroundColor;
-        newNode.description = definition.description; // Copy description from preset
-
-        foreach (var defEffect in definition.effects)
+    // Copy the definition’s effects & ports
+    foreach (var defEffect in definition.effects)
+    {
+        NodeEffectData effectCopy = new NodeEffectData
         {
-            NodeEffectData effectCopy = new NodeEffectData
-            {
-                effectType = defEffect.effectType,
-                effectValue = defEffect.effectValue,
-                secondaryValue = defEffect.secondaryValue
-            };
-            newNode.effects.Add(effectCopy);
-        }
-
-        foreach (var portDef in definition.ports)
+            effectType     = defEffect.effectType,
+            effectValue    = defEffect.effectValue,
+            secondaryValue = defEffect.secondaryValue,
+            extra1         = defEffect.extra1,
+            extra2         = defEffect.extra2,
+            leafPattern = defEffect.leafPattern,         // New: copy leafPattern
+            growthRandomness = defEffect.growthRandomness    // New: copy growthRandomness
+        };
+        newNode.effects.Add(effectCopy);
+    }
+    foreach (var portDef in definition.ports)
+    {
+        NodePort nodePort = new NodePort
         {
-            NodePort nodePort = new NodePort
-            {
-                portName = portDef.portName,
-                portType = portDef.portType
-            };
-
-            if (portDef.isInput)
-                newNode.inputs.Add(nodePort);
-            else
-                newNode.outputs.Add(nodePort);
-        }
-
-        currentGraph.nodes.Add(newNode);
-        CreateNodeView(newNode);
-        EnsureContentPanelSize();
-
-        if (executor != null)
-            executor.SetGraph(currentGraph);
+            isInput  = portDef.isInput,
+            portType = portDef.portType,
+            side     = portDef.side
+        };
+        newNode.ports.Add(nodePort);
     }
 
-    private NodeView CreateNodeView(NodeData data)
+    // 5. Add node to graph and spawn the node view
+    currentGraph.nodes.Add(newNode);
+    CreateNodeView(newNode);
+    EnsureContentPanelSize();
+}
+
+
+
+
+    public NodeView CreateNodeView(NodeData data)
     {
+        if (nodeViewPrefab == null)
+        {
+            Debug.LogError("[NodeEditorController] nodeViewPrefab is not assigned!");
+            return null;
+        }
         GameObject nodeObj = Instantiate(nodeViewPrefab, contentRect);
         NodeView view = nodeObj.GetComponent<NodeView>();
-
+        if (view == null)
+        {
+            Debug.LogError("[NodeEditorController] The instantiated node prefab does not have a NodeView component!");
+            return null;
+        }
         view.Initialize(data, data.backgroundColor, data.nodeDisplayName);
-
         RectTransform rt = nodeObj.GetComponent<RectTransform>();
         rt.anchoredPosition = data.editorPosition;
+        view.GeneratePins(data.ports);
 
-        view.GeneratePins(data.inputs, data.outputs);
-
+        // If node has an Output effect, attach the OutputNodeEffect script
         if (data.effects.Any(e => e.effectType == NodeEffectType.Output))
         {
             if (nodeObj.GetComponent<OutputNodeEffect>() == null)
@@ -1068,143 +1242,20 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         return view;
     }
 
-    // --- Deletion Logic ---
+
     private void DeleteSelectedNode()
     {
         NodeView selectedView = NodeSelectable.CurrentSelected.GetComponent<NodeView>();
         if (selectedView == null)
             return;
-
         string nodeId = selectedView.GetNodeData().nodeId;
         currentGraph.nodes.RemoveAll(n => n.nodeId == nodeId);
-
-        if (currentGraph.adjacency != null)
-        {
-            currentGraph.adjacency.Remove(nodeId);
-            foreach (var kvp in currentGraph.adjacency)
-            {
-                kvp.Value.RemoveAll(childId => childId == nodeId);
-            }
-        }
-
-        if (currentGraph.manaConnections != null)
-        {
-            List<string> keysToRemove = new List<string>();
-            foreach (var kvp in currentGraph.manaConnections)
-            {
-                if (kvp.Key == nodeId || kvp.Value == nodeId)
-                    keysToRemove.Add(kvp.Key);
-            }
-            foreach (var key in keysToRemove)
-                currentGraph.manaConnections.Remove(key);
-        }
-
-        // Use FindObjectsByType instead of FindObjectsOfType
-        NodeConnectionView[] allLines = Object.FindObjectsByType<NodeConnectionView>(FindObjectsSortMode.None);
-        foreach (var line in allLines)
-        {
-            if (line.sourcePin != null)
-            {
-                NodeView srcView = line.sourcePin.GetComponentInParent<NodeView>();
-                if (srcView == null || srcView.GetNodeData().nodeId == nodeId)
-                {
-                    Destroy(line.gameObject);
-                    continue;
-                }
-            }
-            if (line.targetPin != null)
-            {
-                NodeView tgtView = line.targetPin.GetComponentInParent<NodeView>();
-                if (tgtView == null || tgtView.GetNodeData().nodeId == nodeId)
-                {
-                    Destroy(line.gameObject);
-                    continue;
-                }
-            }
-        }
-
         Destroy(NodeSelectable.CurrentSelected);
         NodeSelectable.CurrentSelected = null;
     }
 
-    // --- Connection Dragging Methods ---
-    public void StartConnectionDrag(PinView source, PointerEventData eventData)
-    {
-        Debug.Log("[NodeEditor] StartConnectionDrag called!");
-        sourcePin = source;
-
-        GameObject lineObj = Instantiate(connectionViewPrefab, contentRect);
-        draggingLine = lineObj.GetComponent<NodeConnectionView>();
-
-        RectTransform sourceRect = source.GetComponent<RectTransform>();
-        draggingLine.sourcePin = source;
-        draggingLine.StartPreview(sourceRect);
-    }
-
-    public void UpdateConnectionDrag(PinView draggingPin, PointerEventData eventData)
-    {
-        // Preview updated within NodeConnectionView.
-    }
-
-    public void EndConnectionDrag(PinView draggingPin, PointerEventData eventData)
-    {
-        if (draggingLine == null)
-            return;
-
-        List<RaycastResult> results = new List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, results);
-        PinView targetPin = null;
-        foreach (var r in results)
-        {
-            targetPin = r.gameObject.GetComponent<PinView>();
-            if (targetPin != null && targetPin.isInput)
-                break;
-            else
-                targetPin = null;
-        }
-
-        if (targetPin != null)
-        {
-            RectTransform targetRect = targetPin.GetComponent<RectTransform>();
-            draggingLine.targetPin = targetPin;
-            draggingLine.FinalizeConnection(targetRect);
-
-            if (sourcePin.port.portType == PortType.Mana && targetPin.port.portType == PortType.Mana)
-            {
-                string sourceId = GetNodeIdFromPin(sourcePin);
-                string targetId = GetNodeIdFromPin(targetPin);
-                if (currentGraph.manaConnections == null)
-                    currentGraph.manaConnections = new Dictionary<string, string>();
-                currentGraph.manaConnections[targetId] = sourceId;
-            }
-            else if (sourcePin.port.portType == PortType.General && targetPin.port.portType == PortType.General)
-            {
-                string sourceId = GetNodeIdFromPin(sourcePin);
-                string targetId = GetNodeIdFromPin(targetPin);
-                if (currentGraph.adjacency == null)
-                    currentGraph.adjacency = new Dictionary<string, List<string>>();
-                if (!currentGraph.adjacency.ContainsKey(sourceId))
-                    currentGraph.adjacency[sourceId] = new List<string>();
-                if (!currentGraph.adjacency[sourceId].Contains(targetId))
-                    currentGraph.adjacency[sourceId].Add(targetId);
-            }
-
-            Debug.Log("[NodeEditor] Connection finalized.");
-        }
-        else
-        {
-            Debug.Log("[NodeEditor] Connection canceled.");
-            Destroy(draggingLine.gameObject);
-        }
-
-        draggingLine = null;
-        sourcePin = null;
-    }
-
-    // --- Zooming & Panning ---
     public void OnScroll(PointerEventData eventData)
     {
-        Debug.Log($"[NodeEditor] OnScroll: {eventData.scrollDelta}");
         float scrollDelta = eventData.scrollDelta.y;
         float newScale = contentRect.localScale.x + scrollDelta * 0.05f;
         newScale = Mathf.Clamp(newScale, 0.5f, 2f);
@@ -1214,7 +1265,6 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     public void OnDrag(PointerEventData eventData)
     {
-        Debug.Log($"[NodeEditor] OnDrag: {eventData.delta}");
         contentRect.anchoredPosition += eventData.delta;
         EnsureContentPanelSize();
     }
@@ -1223,6 +1273,9 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
     {
         if (windowRect == null || contentRect == null)
             return;
+
+        // Remove null entries from spawnedNodeViews
+        spawnedNodeViews = spawnedNodeViews.Where(v => v != null).ToList();
 
         Vector2 windowSize = windowRect.rect.size;
         Vector2 minSize = windowSize + new Vector2(contentMargin * 2, contentMargin * 2);
@@ -1233,44 +1286,25 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
             Vector2 maxPos = new Vector2(float.MinValue, float.MinValue);
             foreach (var view in spawnedNodeViews)
             {
+                if (view == null)
+                    continue;
+
                 RectTransform rt = view.GetComponent<RectTransform>();
                 Vector2 pos = rt.anchoredPosition;
                 Vector2 size = rt.rect.size;
                 minPos = Vector2.Min(minPos, pos - size * 0.5f);
                 maxPos = Vector2.Max(maxPos, pos + size * 0.5f);
             }
-            Vector2 nodesBounds = maxPos - minPos;
-            minSize = Vector2.Max(minSize, nodesBounds + new Vector2(contentMargin * 2, contentMargin * 2));
+            Vector2 bounds = maxPos - minPos;
+            minSize = Vector2.Max(minSize, bounds + new Vector2(contentMargin * 2, contentMargin * 2));
         }
 
-        Vector2 currentSize = contentRect.sizeDelta;
-        float newWidth = Mathf.Max(currentSize.x, minSize.x);
-        float newHeight = Mathf.Max(currentSize.y, minSize.y);
-        contentRect.sizeDelta = new Vector2(newWidth, newHeight);
+        Vector2 currSize = contentRect.sizeDelta;
+        float newW = Mathf.Max(currSize.x, minSize.x);
+        float newH = Mathf.Max(currSize.y, minSize.y);
+        contentRect.sizeDelta = new Vector2(newW, newH);
     }
 
-    // --- Load Graph ---
-    public void LoadGraph(NodeGraph graph)
-    {
-        currentGraph = graph;
-        ClearExistingViews();
-        if (currentGraph == null) return;
-
-        foreach (var node in currentGraph.nodes)
-        {
-            CreateNodeView(node);
-        }
-
-        if (executor != null)
-            executor.SetGraph(currentGraph);
-    }
-
-    // --- Helper Methods ---
-    public string GetNodeIdFromPin(PinView pin)
-    {
-        NodeView view = pin.GetComponentInParent<NodeView>();
-        return view.GetNodeData().nodeId;
-    }
 
     public NodeGraph CurrentGraph => currentGraph;
 
@@ -1283,8 +1317,76 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         }
         spawnedNodeViews.Clear();
     }
+
+    public void LoadGraph(NodeGraph graph)
+    {
+        currentGraph = graph;
+        ClearExistingViews();
+        if (currentGraph == null) return;
+        foreach (var nd in currentGraph.nodes)
+            CreateNodeView(nd);
+    }
 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeHexDraggable.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+
+public class NodeHexDraggable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+{
+    private RectTransform nodeRect;
+    private RectTransform parentRect;
+    private Vector2 pointerOffset;
+    private NodeView nodeView;
+    private float hexSize;
+
+    private void Awake()
+    {
+        nodeRect = GetComponent<RectTransform>();
+        parentRect = nodeRect.parent as RectTransform;
+        nodeView = GetComponent<NodeView>();
+        hexSize = (HexGridManager.Instance != null) ? HexGridManager.Instance.hexSize : 50f;
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        Vector2 localPoint;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, eventData.pressEventCamera, out localPoint))
+        {
+            pointerOffset = nodeRect.anchoredPosition - localPoint;
+        }
+        eventData.Use();
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        Vector2 localPoint;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, eventData.pressEventCamera, out localPoint))
+        {
+            nodeRect.anchoredPosition = localPoint + pointerOffset;
+        }
+        eventData.Use();
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        Vector2 currentPos = nodeRect.anchoredPosition;
+        float hexSizeValue = hexSize;
+        HexCoords coords = HexCoords.WorldToHex(currentPos, hexSizeValue);
+        Vector2 snappedPos = coords.HexToWorld(hexSizeValue);
+        nodeRect.anchoredPosition = snappedPos;
+        if (nodeView != null)
+        {
+            nodeView.GetNodeData().coords = coords;
+            nodeView.GetNodeData().editorPosition = snappedPos;
+        }
+        eventData.Use();
+    }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1332,25 +1434,96 @@ public class NodeSelectable : MonoBehaviour, IPointerClickHandler
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeTestInitializer.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/Testing/NodeTestInitializer.cs
-using UnityEngine;
-// If NodeEditorController is in a specific namespace, include it, e.g.:
-// using YourProject.Nodes.UI;
+﻿using UnityEngine;
 
 public class NodeTestInitializer : MonoBehaviour
 {
     [SerializeField] private NodeEditorController editorController;
+    [SerializeField] private NodeExecutor nodeExecutor;
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // Ensure this is assigned.
 
     private NodeGraph testGraph;
 
-    void Start()
+    private void Start()
     {
+        // Create a new graph.
         testGraph = new NodeGraph();
-        // Load the empty graph into the editor
-        editorController.LoadGraph(testGraph);
+
+        // Load the graph into the editor.
+        if (editorController != null)
+        {
+            editorController.LoadGraph(testGraph);
+        }
+        else
+        {
+            Debug.LogWarning("[NodeTestInitializer] Missing NodeEditorController reference.");
+        }
+
+        // Auto-spawn nodes from the library.
+        if (definitionLibrary != null && definitionLibrary.autoSpawnNodes != null)
+        {
+            foreach (var nodeDef in definitionLibrary.autoSpawnNodes)
+            {
+                // Here we simply call CreateNodeAtMouse, but you might want to specify positions.
+                // For demonstration, we use a fixed position offset (e.g., based on index).
+                Vector2 spawnPos = new Vector2(100 * testGraph.nodes.Count, 100 * testGraph.nodes.Count);
+                NodeData newNode = new NodeData();
+                newNode.nodeDisplayName = nodeDef.displayName;
+                newNode.backgroundColor = nodeDef.backgroundColor;
+                newNode.description = nodeDef.description;
+                foreach (var defEffect in nodeDef.effects)
+                {
+                    NodeEffectData effectCopy = new NodeEffectData
+                    {
+                        effectType = defEffect.effectType,
+                        effectValue = defEffect.effectValue,
+                        secondaryValue = defEffect.secondaryValue,
+                        extra1 = defEffect.extra1,
+                        extra2 = defEffect.extra2
+                    };
+                    newNode.effects.Add(effectCopy);
+                }
+                foreach (var portDef in nodeDef.ports)
+                {
+                    NodePort nodePort = new NodePort
+                    {
+                        isInput = portDef.isInput,
+                        portType = portDef.portType,
+                        side = portDef.side
+                    };
+                    newNode.ports.Add(nodePort);
+                }
+
+                // Snap position based on current contentRect.
+                float hexSizeValue = (HexGridManager.Instance != null) ? HexGridManager.Instance.hexSize : 50f;
+                // Adjust spawnPos relative to content center.
+                Vector2 adjustedSpawn = spawnPos - editorController.ContentRect.rect.center;
+                HexCoords hc = HexCoords.WorldToHex(adjustedSpawn, hexSizeValue);
+                newNode.coords = hc;
+                Vector2 snappedPos = hc.HexToWorld(hexSizeValue) + editorController.ContentRect.rect.center;
+                newNode.editorPosition = snappedPos;
+
+                testGraph.nodes.Add(newNode);
+                editorController.CreateNodeView(newNode);
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[NodeTestInitializer] No autoSpawnNodes defined in NodeDefinitionLibrary.");
+        }
+
+        // Pass the same graph to the executor.
+        if (nodeExecutor != null)
+        {
+            nodeExecutor.SetGraph(testGraph);
+        }
+        else
+        {
+            Debug.LogWarning("[NodeTestInitializer] Missing NodeExecutor reference.");
+        }
     }
-    
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1364,19 +1537,46 @@ using System.Linq;
 
 public class NodeView : MonoBehaviour
 {
+    [Header("Text Components")]
     [SerializeField] private TMP_Text nodeTitleText;
     [SerializeField] private Image backgroundImage;
-
-    [Header("Pin Containers")]
-    [SerializeField] private Transform inputPinsContainer;
-    [SerializeField] private Transform outputPinsContainer;
 
     [Header("Node Info Display")]
     [SerializeField] private TMP_Text manaStorageText;
     [SerializeField] private TMP_Text effectsText;
-    [SerializeField] private TMP_Text descriptionText; // Separate text field for description
+    [SerializeField] private TMP_Text descriptionText;
+
+    [Header("Pins Settings")]
+    [SerializeField] private float pinRadius = 60f; // Distance from node center to pin (auto-updated from HexGridManager if available)
+    [SerializeField] private Transform pinContainer; // Parent container for spawned pins
+
+    [Header("Pin Customization")]
+    public Sprite manaPinSprite;
+    public Color manaPinColor = Color.cyan;
+    public Sprite conditionPinSprite;
+    public Color conditionPinColor = new Color(1f, 0.65f, 0f);
+    public Sprite generalPinSprite;
+    public Color generalPinColor = Color.blue;
+    [Tooltip("Uniform additional rotation (in degrees) applied to port sprites.")]
+    public float portSpriteRotationOffset = 0f;
+
+    [Header("Pin Scale Settings")]
+    [Tooltip("General multiplier applied to all port sprites.")]
+    public float portSpriteScaleMultiplier = 1.0f;
+    [Tooltip("Multiplier for input port sprites.")]
+    public float inputPortScaleMultiplier = 1.0f;
+    [Tooltip("Multiplier for output port sprites.")]
+    public float outputPortScaleMultiplier = 1.0f;
 
     private NodeData nodeData;
+
+    private void Awake()
+    {
+        if (pinContainer == null)
+            pinContainer = this.transform;
+        if (HexGridManager.Instance != null)
+            pinRadius = HexGridManager.Instance.hexSize * HexGridManager.Instance.pinRadiusMultiplier;
+    }
 
     private void Update()
     {
@@ -1392,13 +1592,12 @@ public class NodeView : MonoBehaviour
     public void Initialize(NodeData data, Color color, string displayName)
     {
         nodeData = data;
-        if (nodeTitleText) 
+        if (nodeTitleText)
             nodeTitleText.text = displayName;
-        if (backgroundImage) 
+        if (backgroundImage)
             backgroundImage.color = color;
 
-        // Build effects text.
-        if (effectsText)
+        if (effectsText != null)
         {
             if (nodeData.effects.Count == 0)
                 effectsText.text = "No Effects";
@@ -1411,51 +1610,67 @@ public class NodeView : MonoBehaviour
             }
         }
 
-        // Display description in cursive using <i> tags.
-        if (descriptionText)
-            descriptionText.text = $"{nodeData.description}";
+        if (descriptionText != null)
+            descriptionText.text = nodeData.description;
 
-        // If node has a ManaStorage effect, update manaStorageText.
         var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
         if (manaEff != null && manaStorageText != null)
             manaStorageText.text = $"Mana: {manaEff.secondaryValue}/{manaEff.effectValue}";
     }
 
-    public void GeneratePins(List<NodePort> inputs, List<NodePort> outputs)
+    // Generate pins for each port in the node.
+    public void GeneratePins(List<NodePort> ports)
     {
-        foreach (Transform child in inputPinsContainer)
+        foreach (Transform child in pinContainer)
             Destroy(child.gameObject);
-        foreach (Transform child in outputPinsContainer)
-            Destroy(child.gameObject);
-
-        foreach (var input in inputs)
-            CreatePin(inputPinsContainer, input, true);
-        foreach (var output in outputs)
-            CreatePin(outputPinsContainer, output, false);
+        foreach (var port in ports)
+            CreatePin(port);
     }
 
-    private void CreatePin(Transform parent, NodePort port, bool isInput)
+    private void CreatePin(NodePort port)
     {
-        GameObject pinObj = new GameObject(isInput ? "InputPin" : "OutputPin", typeof(RectTransform));
-        pinObj.transform.SetParent(parent, false);
+        GameObject pinObj = new GameObject(port.isInput ? "InputPin" : "OutputPin", typeof(RectTransform));
+        pinObj.transform.SetParent(pinContainer, false);
         RectTransform rt = pinObj.GetComponent<RectTransform>();
-        rt.sizeDelta = new Vector2(20, 20);
+
+        // Calculate scale multiplier based on port type.
+        float scaleMultiplier = portSpriteScaleMultiplier * (port.isInput ? inputPortScaleMultiplier : outputPortScaleMultiplier);
+        rt.sizeDelta = new Vector2(20, 20) * scaleMultiplier;
+
+        // For flat-top hexagons, pins should be centered on each side.
+        // Mapping: Top = 90°, One = 30°, Two = -30°, Three = -90°, Four = -150°, Five = -210°.
+        int sideIndex = (int)port.side; // Top=0, One=1, ..., Five=5.
+        float posAngle = 90f - sideIndex * 60f; // This yields: Top:90, One:30, Two:-30, Three:-90, Four:-150, Five:-210.
+        float posRad = posAngle * Mathf.Deg2Rad;
+        float x = pinRadius * Mathf.Cos(posRad);
+        float y = pinRadius * Mathf.Sin(posRad);
+        rt.anchoredPosition = new Vector2(x, y);
+
+        // Set sprite rotation: for outputs, arrow points out; for inputs, arrow points in (add 180°).
+        float spriteAngle = posAngle;
+        if (port.isInput)
+            spriteAngle += 180f;
+        spriteAngle += portSpriteRotationOffset;
+        rt.localRotation = Quaternion.Euler(0, 0, spriteAngle);
+
         Image img = pinObj.AddComponent<Image>();
         switch (port.portType)
         {
             case PortType.Mana:
-                img.color = Color.cyan;
+                img.sprite = manaPinSprite;
+                img.color = manaPinColor;
                 break;
             case PortType.Condition:
-                img.color = new Color(1f, 0.65f, 0f);
+                img.sprite = conditionPinSprite;
+                img.color = conditionPinColor;
                 break;
             default:
-                img.color = Color.blue;
+                img.sprite = generalPinSprite;
+                img.color = generalPinColor;
                 break;
         }
-        PinView pinView = pinObj.AddComponent<PinView>();
-        NodeEditorController controller = UnityEngine.Object.FindFirstObjectByType<NodeEditorController>();
-        pinView.Initialize(port, isInput, controller);
+        img.type = Image.Type.Simple;
+        img.preserveAspect = true;
     }
 
     public NodeData GetNodeData() => nodeData;
@@ -1464,248 +1679,38 @@ public class NodeView : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\PinView.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// Assets/Scripts/Nodes/UI/PinView.cs
-using UnityEngine;
-using UnityEngine.EventSystems;
-
-public class PinView : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
-{
-    public NodePort port;
-    public bool isInput;
-    private NodeEditorController nodeEditor;
-
-    public void Initialize(NodePort nodePort, bool isInputPin, NodeEditorController editor)
-    {
-        port = nodePort;
-        isInput = isInputPin;
-        nodeEditor = editor;
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        Debug.Log($"[PinView] Clicked on {(isInput ? "Input" : "Output")} port of node: {port.portName}");
-
-        if (!isInput && nodeEditor != null)
-        {
-            Debug.Log("[PinView] Starting connection drag...");
-            nodeEditor.StartConnectionDrag(this, eventData);
-        }
-        else
-        {
-            Debug.LogWarning("[PinView] Attempted to start a connection from an input pin.");
-        }
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (nodeEditor != null)
-        {
-            nodeEditor.UpdateConnectionDrag(this, eventData);
-        }
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        if (nodeEditor != null)
-        {
-            nodeEditor.EndConnectionDrag(this, eventData);
-        }
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\UICubicBezier.cs
+// FILE: Assets\Scripts\Player\GardenerController.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections.Generic;
 
-[RequireComponent(typeof(CanvasRenderer))]
-public class UICubicBezier : MaskableGraphic
+public class GardenerController : MonoBehaviour
 {
-    [Range(2, 100)] public int segments = 30;
-    public float lineThickness = 4f;
+    public float moveSpeed = 5f;
+    private Rigidbody2D rb;
+    private Vector2 movement;
 
-    [Header("Positions in local space")]
-    public Vector2 startPos;
-    public Vector2 endPos;
-
-    private List<Vector2> sampledPoints = new List<Vector2>();
-
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
-        // With MaskableGraphic, the property "maskable" is available.
-        this.maskable = true;
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    protected override void OnPopulateMesh(VertexHelper vh)
-{
-    vh.Clear();
-    sampledPoints.Clear();
-
-    if ((startPos - endPos).sqrMagnitude < 1f)
-        return;
-
-    // Create control points (S-curve style)
-    float dx = (endPos.x - startPos.x) * 0.5f;
-    Vector2 ctrl1 = startPos + new Vector2(dx, 0f);
-    Vector2 ctrl2 = endPos - new Vector2(dx, 0f);
-
-    // Sample the curve
-    for (int i = 0; i <= segments; i++)
+    private void Update()
     {
-        float t = i / (float)segments;
-        Vector2 p = CubicBezier(startPos, ctrl1, ctrl2, endPos, t);
-        sampledPoints.Add(p);
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
     }
 
-    // We define an "outer ring" (alpha=0) and an "inner ring" (alpha=1)
-    // so we can fade out the edges.
-    float outerThickness = lineThickness * 0.5f;
-    float innerThickness = outerThickness - 1f; // 1px fade region
-
-    for (int i = 0; i < sampledPoints.Count - 1; i++)
+    private void FixedUpdate()
     {
-        Vector2 p0 = sampledPoints[i];
-        Vector2 p1 = sampledPoints[i + 1];
-
-        Vector2 dir = (p1 - p0).normalized;
-        Vector2 normal = new Vector2(-dir.y, dir.x);
-
-        // Outer ring (alpha=0)
-        Vector2 v0 = p0 + normal * outerThickness;
-        Vector2 v1 = p0 - normal * outerThickness;
-        Vector2 v2 = p1 - normal * outerThickness;
-        Vector2 v3 = p1 + normal * outerThickness;
-
-        // Inner ring (alpha=1)
-        Vector2 v0i = p0 + normal * innerThickness;
-        Vector2 v1i = p0 - normal * innerThickness;
-        Vector2 v2i = p1 - normal * innerThickness;
-        Vector2 v3i = p1 + normal * innerThickness;
-
-        int idx = vh.currentVertCount;
-
-        // Add 8 vertices (outer ring + inner ring)
-        vh.AddVert(v0, new Color(color.r, color.g, color.b, 0), Vector2.zero);
-        vh.AddVert(v1, new Color(color.r, color.g, color.b, 0), Vector2.zero);
-        vh.AddVert(v2, new Color(color.r, color.g, color.b, 0), Vector2.zero);
-        vh.AddVert(v3, new Color(color.r, color.g, color.b, 0), Vector2.zero);
-
-        vh.AddVert(v0i, new Color(color.r, color.g, color.b, 1), Vector2.zero);
-        vh.AddVert(v1i, new Color(color.r, color.g, color.b, 1), Vector2.zero);
-        vh.AddVert(v2i, new Color(color.r, color.g, color.b, 1), Vector2.zero);
-        vh.AddVert(v3i, new Color(color.r, color.g, color.b, 1), Vector2.zero);
-
-        // Bridge the outer ring (alpha=0) to the inner ring (alpha=1)
-        vh.AddTriangle(idx,   idx+4, idx+5);
-        vh.AddTriangle(idx,   idx+5, idx+1);
-
-        vh.AddTriangle(idx+1, idx+5, idx+6);
-        vh.AddTriangle(idx+1, idx+6, idx+2);
-
-        vh.AddTriangle(idx+2, idx+6, idx+7);
-        vh.AddTriangle(idx+2, idx+7, idx+3);
-
-        vh.AddTriangle(idx+3, idx+7, idx+4);
-        vh.AddTriangle(idx+3, idx+4, idx);
-
-        // **Fill the center** (the inner ring) so we don't just get an outline
-        vh.AddTriangle(idx+4, idx+5, idx+6);
-        vh.AddTriangle(idx+4, idx+6, idx+7);
+        rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+    }
+    
+    // Returns the current position used for planting seeds.
+    public Vector2 GetPlantingPosition()
+    {
+        return transform.position;
     }
 }
-
-
-
-    private Vector2 CubicBezier(Vector2 p0, Vector2 p1, Vector2 p2, Vector2 p3, float t)
-    {
-        float u = 1f - t;
-        float tt = t * t;
-        float uu = u * u;
-        float uuu = uu * u;
-        float ttt = tt * t;
-
-        Vector2 p = uuu * p0;
-        p += 3f * uu * t * p1;
-        p += 3f * u * tt * p2;
-        p += ttt * p3;
-        return p;
-    }
-
-    private void AddQuad(Vector2 v0, Vector2 v1, Vector2 v2, Vector2 v3, VertexHelper vh)
-    {
-        int idx = vh.currentVertCount;
-
-        // Vertices on the "edge" get alpha = 0, center vertices get alpha = 1
-        Color edgeColor = new Color(color.r, color.g, color.b, 0);
-        Color centerColor = new Color(color.r, color.g, color.b, 1);
-
-        vh.AddVert(v0, edgeColor, Vector2.zero);
-        vh.AddVert(v1, edgeColor, Vector2.zero);
-        vh.AddVert(v2, edgeColor, Vector2.zero);
-        vh.AddVert(v3, edgeColor, Vector2.zero);
-
-        // Two triangles
-        vh.AddTriangle(idx, idx + 1, idx + 2);
-        vh.AddTriangle(idx, idx + 2, idx + 3);
-    }
-
-
-    /// <summary>
-    /// Updates the curve’s start and end positions in local coordinates and forces a redraw.
-    /// </summary>
-    public void UpdateCurve(Vector2 startLocal, Vector2 endLocal)
-    {
-        startPos = startLocal;
-        endPos = endLocal;
-        SetVerticesDirty();
-    }
-
-    /// <summary>
-    /// Custom Raycast so that pointer events only register if the pointer is near the line.
-    /// </summary>
-    public override bool Raycast(Vector2 sp, Camera eventCamera)
-    {
-        Vector2 localPos;
-        if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rectTransform, sp, eventCamera, out localPos))
-            return false;
-
-        if (sampledPoints.Count < 2)
-            return false;
-
-        float maxDist = lineThickness * 0.5f + 2f;
-        float minDistance = float.MaxValue;
-
-        for (int i = 0; i < sampledPoints.Count - 1; i++)
-        {
-            Vector2 segStart = sampledPoints[i];
-            Vector2 segEnd = sampledPoints[i + 1];
-            float dist = DistanceToSegment(localPos, segStart, segEnd);
-            if (dist < minDistance)
-                minDistance = dist;
-            if (minDistance < maxDist)
-                return true;
-        }
-        return false;
-    }
-
-    private float DistanceToSegment(Vector2 p, Vector2 a, Vector2 b)
-    {
-        Vector2 ap = p - a;
-        Vector2 ab = b - a;
-        float abSqr = ab.sqrMagnitude;
-        float dot = Vector2.Dot(ap, ab) / abSqr;
-        dot = Mathf.Clamp01(dot);
-        Vector2 proj = a + ab * dot;
-        return (p - proj).magnitude;
-    }
-}
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1869,4 +1874,485 @@ public class WizardPreset : ScriptableObject
     public FiringDirection baseFiringDirection = FiringDirection.Up;
     // Add additional stats as needed.
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\HexGridRendererEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+
+using UnityEngine;
+using UnityEditor;
+
+[CustomEditor(typeof(HexGridRenderer))]
+public class HexGridRendererEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        if (GUILayout.Button("UPDATE"))
+        {
+            HexGridRenderer grid = (HexGridRenderer)target;
+            grid.SetVerticesDirty();
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeDefinitionAutoAdder.cs
+////////////////////////////////////////////////////////////////////////////////
+
+using UnityEngine;
+using UnityEditor;
+using System.IO;
+using System.Linq;
+
+public class NodeDefinitionAutoAdder : AssetPostprocessor
+{
+    static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets,
+        string[] movedAssets, string[] movedFromAssetPaths)
+    {
+        foreach (string assetPath in importedAssets)
+        {
+            NodeDefinition nodeDef = AssetDatabase.LoadAssetAtPath<NodeDefinition>(assetPath);
+            if (nodeDef != null)
+            {
+                string folderPath = Path.GetDirectoryName(assetPath);
+                string[] libraryFiles = Directory.GetFiles(folderPath, "*.asset", SearchOption.TopDirectoryOnly)
+                    .Where(f => f.Contains("NodeDefinitionLibrary")).ToArray();
+                if (libraryFiles.Length > 0)
+                {
+                    NodeDefinitionLibrary library = AssetDatabase.LoadAssetAtPath<NodeDefinitionLibrary>(libraryFiles[0]);
+                    if (library != null && !library.definitions.Contains(nodeDef))
+                    {
+                        library.definitions.Add(nodeDef);
+                        EditorUtility.SetDirty(library);
+                        AssetDatabase.SaveAssets();
+                    }
+                }
+            }
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeDefinitionCreator.cs
+////////////////////////////////////////////////////////////////////////////////
+
+using UnityEngine;
+using UnityEditor;
+using System.IO;
+
+public static class NodeDefinitionCreator
+{
+    private const string MenuPath = "Assets/Create/Nodes/Node Definition (Auto-Named)";
+
+    [MenuItem(MenuPath, false, 50)]
+    public static void CreateNodeDefinition()
+    {
+        // Figure out which folder the user is in, or use Assets/
+        string folder = GetSelectedPathOrFallback();
+
+        // Determine the next numeric index for "Node_XXX_"
+        int nextNumber = GetNextNodeNumber(folder);
+
+        // e.g., "Node_007_"
+        string newName = $"Node_{nextNumber:D3}_";
+        string newPath = Path.Combine(folder, newName + ".asset").Replace("\\", "/");
+
+        // Create the NodeDefinition
+        NodeDefinition nodeDef = ScriptableObject.CreateInstance<NodeDefinition>();
+        AssetDatabase.CreateAsset(nodeDef, newPath);
+        
+        // Save and refresh, but DO NOT select or focus the ProjectWindow.
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created NodeDefinition at: {newPath}");
+        // Notice we don't call Selection.activeObject = nodeDef
+        // or EditorUtility.FocusProjectWindow()
+        // or ProjectWindowUtil.ShowCreatedAsset(nodeDef)
+        // thus we avoid changing the user's folder.
+    }
+
+    // (Optional) Validate the menu item so it’s disabled if the game is running
+    [MenuItem(MenuPath, true)]
+    private static bool ValidateCreateNodeDefinition()
+    {
+        return !Application.isPlaying;
+    }
+
+    private static string GetSelectedPathOrFallback()
+    {
+        // Attempt to get the folder the user has selected in the Project window
+        string path = "Assets";
+        foreach (Object obj in Selection.GetFiltered(typeof(Object), SelectionMode.Assets))
+        {
+            path = AssetDatabase.GetAssetPath(obj);
+            if (!string.IsNullOrEmpty(path))
+            {
+                // If it's a file, get its parent folder
+                if (File.Exists(path))
+                {
+                    path = Path.GetDirectoryName(path);
+                }
+                break;
+            }
+        }
+        return path;
+    }
+
+    private static int GetNextNodeNumber(string folderPath)
+    {
+        int nextNumber = 1;
+        // Look for existing Node_XXX_ files
+        string[] files = Directory.GetFiles(folderPath, "Node_*", SearchOption.TopDirectoryOnly);
+        foreach (var file in files)
+        {
+            string fName = Path.GetFileNameWithoutExtension(file);
+            if (fName.StartsWith("Node_") && fName.Length >= 8)
+            {
+                // extract the 3-digit number from Node_000_
+                string numberPart = fName.Substring(5, 3);
+                if (int.TryParse(numberPart, out int num) && num >= nextNumber)
+                {
+                    nextNumber = num + 1;
+                }
+            }
+        }
+        return nextNumber;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeDefinitionLibraryEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+
+using UnityEngine;
+using UnityEditor;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+[CustomEditor(typeof(NodeDefinitionLibrary))]
+public class NodeDefinitionLibraryEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        if (GUILayout.Button("UPDATE"))
+        {
+            UpdateLibrary();
+        }
+    }
+
+    private void UpdateLibrary()
+    {
+        NodeDefinitionLibrary library = (NodeDefinitionLibrary)target;
+
+        // Get the folder of the current library asset.
+        string libraryPath = AssetDatabase.GetAssetPath(library);
+        string folderPath = Path.GetDirectoryName(libraryPath);
+
+        // Find all .asset files in the folder.
+        string[] assetFiles = Directory.GetFiles(folderPath, "*.asset", SearchOption.TopDirectoryOnly);
+
+        // Load NodeDefinition assets from that folder.
+        List<NodeDefinition> defs = new List<NodeDefinition>();
+        foreach (string file in assetFiles)
+        {
+            // Ignore the library asset itself.
+            if (file == libraryPath)
+                continue;
+
+            NodeDefinition def = AssetDatabase.LoadAssetAtPath<NodeDefinition>(file);
+            if (def != null)
+                defs.Add(def);
+        }
+
+        // Sort definitions by the numeric portion in the file name (assumes "Node_XXX_...").
+        defs = defs.OrderBy(d => {
+            string name = d.name;
+            if (name.StartsWith("Node_") && name.Length >= 8)
+            {
+                string numStr = name.Substring(5, 3);
+                if (int.TryParse(numStr, out int num))
+                    return num;
+            }
+            return int.MaxValue; // if no number is found, sort last.
+        }).ToList();
+
+        library.definitions = defs;
+        EditorUtility.SetDirty(library);
+        AssetDatabase.SaveAssets();
+        Debug.Log("NodeDefinitionLibrary updated. Total definitions: " + library.definitions.Count);
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeDefinitionPostprocessor.cs
+////////////////////////////////////////////////////////////////////////////////
+using UnityEngine;
+using UnityEditor;
+using System.IO;
+using System.Linq;
+
+public class NodeDefinitionPostprocessor : AssetPostprocessor
+{
+    static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, 
+        string[] movedAssets, string[] movedFromAssetPaths)
+    {
+        foreach (string assetPath in importedAssets)
+        {
+            NodeDefinition nodeDef = AssetDatabase.LoadAssetAtPath<NodeDefinition>(assetPath);
+            if (nodeDef != null)
+            {
+                string fileName = Path.GetFileNameWithoutExtension(assetPath);
+                // Check if file name already starts with "Node_"
+                if (!fileName.StartsWith("Node_"))
+                {
+                    string folderPath = Path.GetDirectoryName(assetPath);
+                    // Get all files in folder that start with "Node_"
+                    var files = Directory.GetFiles(folderPath, "Node_*", SearchOption.TopDirectoryOnly);
+                    int nextNumber = 1;
+                    foreach (var file in files)
+                    {
+                        string fName = Path.GetFileNameWithoutExtension(file);
+                        string[] parts = fName.Split('_');
+                        if (parts.Length >= 2 && int.TryParse(parts[1], out int num))
+                        {
+                            if (num >= nextNumber)
+                                nextNumber = num + 1;
+                        }
+                    }
+                    string newName = $"Node_{nextNumber:D3}_";
+                    AssetDatabase.RenameAsset(assetPath, newName);
+                    AssetDatabase.SaveAssets();
+                }
+            }
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeEffectDataDrawer.cs
+////////////////////////////////////////////////////////////////////////////////
+using UnityEngine;
+using UnityEditor;
+
+[CustomPropertyDrawer(typeof(NodeEffectData))]
+public class NodeEffectDataDrawer : PropertyDrawer
+{
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        SerializedProperty typeProp        = property.FindPropertyRelative("effectType");
+        SerializedProperty valueProp       = property.FindPropertyRelative("effectValue");
+        SerializedProperty secondaryProp   = property.FindPropertyRelative("secondaryValue");
+        SerializedProperty extra1Prop      = property.FindPropertyRelative("extra1");
+        SerializedProperty extra2Prop      = property.FindPropertyRelative("extra2");
+
+        // New ones.
+        SerializedProperty leafPatternProp      = property.FindPropertyRelative("leafPattern");
+        SerializedProperty growthRandomnessProp = property.FindPropertyRelative("growthRandomness");
+
+        // Draw effectType
+        Rect typeRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+        EditorGUI.PropertyField(typeRect, typeProp, new GUIContent("Effect Type"));
+        NodeEffectType effectType = (NodeEffectType)typeProp.enumValueIndex;
+        float yOffset = typeRect.yMax + EditorGUIUtility.standardVerticalSpacing;
+
+        Rect NextLineRect()
+        {
+            Rect r = new Rect(position.x, yOffset, position.width, EditorGUIUtility.singleLineHeight);
+            yOffset += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            return r;
+        }
+
+        // Draw fields based on effectType
+        switch (effectType)
+        {
+            case NodeEffectType.ManaCost:
+            {
+                GUIContent content = new GUIContent("Mana Cost", "Amount of mana required to process this node.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.Damage:
+            {
+                GUIContent content = new GUIContent("Damage", "Damage value contributed by this node.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.Output:
+            {
+                GUIContent content = new GUIContent("Output", "This node outputs the final chain result (no parameters).");
+                Rect line = NextLineRect();
+                EditorGUI.LabelField(line, content);
+                break;
+            }
+            case NodeEffectType.Burning:
+            {
+                // Fire DPS in value, Duration in secondaryValue
+                GUIContent contentDps = new GUIContent("Fire DPS", "Damage per second of burning.");
+                Rect line1 = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line1, contentDps, valueProp.floatValue);
+
+                GUIContent contentDur = new GUIContent("Duration", "Duration (seconds) of burning effect.");
+                Rect line2 = NextLineRect();
+                secondaryProp.floatValue = EditorGUI.FloatField(line2, contentDur, secondaryProp.floatValue);
+                break;
+            }
+            case NodeEffectType.AimSpread:
+            {
+                GUIContent content = new GUIContent("Aim Spread Modifier", "Modifier to add to the wizard's base aim spread.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.Piercing:
+            {
+                GUIContent content = new GUIContent("Piercing", "Set to 1 for piercing, 0 otherwise.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.FriendlyFire:
+            {
+                GUIContent content = new GUIContent("Friendly Fire", "Set to 1 for friendly fire, 0 for none.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.Seed:
+            {
+                // Min stem length
+                var line1 = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line1,
+                    new GUIContent("Min Stem Length", ""), valueProp.floatValue);
+
+                // Max stem length
+                var line2 = NextLineRect();
+                secondaryProp.floatValue = EditorGUI.FloatField(line2,
+                    new GUIContent("Max Stem Length", ""), secondaryProp.floatValue);
+
+                // Growth speed
+                var line3 = NextLineRect();
+                extra1Prop.floatValue = EditorGUI.FloatField(line3,
+                    new GUIContent("Growth Speed (sec)", ""), extra1Prop.floatValue);
+
+                // Leaf gap
+                var line4 = NextLineRect();
+                extra2Prop.floatValue = EditorGUI.FloatField(line4,
+                    new GUIContent("Leaf Gap", ""), extra2Prop.floatValue);
+
+                // Leaf Pattern => 0=Parallel, 1=Alternating
+                var line5 = NextLineRect();
+                leafPatternProp.intValue = EditorGUI.IntSlider(line5,
+                    new GUIContent("Leaf Pattern (0=parallel,1=alt)", ""), leafPatternProp.intValue, 0, 1);
+
+                // Growth Randomness => [0..2]
+                var line6 = NextLineRect();
+                growthRandomnessProp.floatValue = EditorGUI.Slider(line6,
+                    new GUIContent("Growth Randomness", ""), growthRandomnessProp.floatValue, 0f, 2f);
+                break;
+            }
+            default:
+            {
+                // Fallback for unrecognized effect
+                GUIContent content = new GUIContent("Value", "");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+        }
+    }
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        SerializedProperty typeProp = property.FindPropertyRelative("effectType");
+        NodeEffectType effectType = (NodeEffectType)typeProp.enumValueIndex;
+
+        float lineHeight = EditorGUIUtility.singleLineHeight;
+        float spacing = EditorGUIUtility.standardVerticalSpacing;
+
+        // Start with 1 line for the effectType + spacing
+        float totalHeight = lineHeight + spacing;
+
+        switch (effectType)
+        {
+            case NodeEffectType.ManaCost:
+            case NodeEffectType.Damage:
+            case NodeEffectType.AimSpread:
+            case NodeEffectType.Piercing:
+            case NodeEffectType.FriendlyFire:
+                // +1 line
+                totalHeight += (lineHeight + spacing);
+                break;
+
+            case NodeEffectType.Output:
+                // +1 line
+                totalHeight += (lineHeight + spacing);
+                break;
+
+            case NodeEffectType.Burning:
+                // +2 lines
+                totalHeight += (lineHeight + spacing) * 2;
+                break;
+
+            case NodeEffectType.Seed:
+                // min length + max length + growth speed + leaf gap + leaf pattern + randomness => 6 lines
+                totalHeight += (lineHeight + spacing) * 6;
+                break;
+
+            default:
+                // fallback +1 line
+                totalHeight += (lineHeight + spacing);
+                break;
+        }
+        return totalHeight;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\WizardControllerStatusEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+using UnityEngine;
+using UnityEditor;
+
+[CustomEditor(typeof(WizardController))]
+public class WizardControllerStatusEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        WizardController wizard = (WizardController)target;
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Active Status Effects", EditorStyles.boldLabel);
+        if (wizard.activeStatusEffects != null && wizard.activeStatusEffects.Count > 0)
+        {
+            foreach (var effect in wizard.activeStatusEffects)
+            {
+                EditorGUILayout.LabelField($"{effect.GetType().Name}: {effect.damagePerSecond} DPS, {effect.duration - effect.Elapsed:F1}s remaining");
+            }
+        }
+        else
+        {
+            EditorGUILayout.LabelField("None");
+        }
+    }
+}
+
 

@@ -9,24 +9,24 @@ public class NodeExecutor : MonoBehaviour
     [SerializeField] private NodeGraph currentGraph;
     [Header("Debug Settings")]
     public float waitTimeBetweenNodes = 0.5f;
-    public TMP_Text debugOutput; // optional UI text
+    public TMP_Text debugOutput;
+
+    [Header("Plant Prefab (assigned in inspector)")]
+    public GameObject plantPrefab;  // Assign your PlantPrefab here
 
     private Dictionary<HexCoords, NodeData> coordsMap;
     private HashSet<string> visited;
 
     private void Update()
     {
-        // Press SPACE => BFS
         if (Input.GetKeyDown(KeyCode.Space))
-        {
             ExecuteGraph();
-        }
     }
 
     public void SetGraph(NodeGraph graph)
     {
         currentGraph = graph;
-        Debug.Log("[NodeExecutor] Graph set via SetGraph(). Node count=" + (graph != null ? graph.nodes.Count : 0));
+        Debug.Log("[NodeExecutor] Graph set. Node count=" + (graph != null ? graph.nodes.Count : 0));
     }
 
     public NodeGraph GetGraph() => currentGraph;
@@ -50,18 +50,14 @@ public class NodeExecutor : MonoBehaviour
             return;
         }
         foreach (var startNode in startNodes)
-        {
             StartCoroutine(RunChainBFS(startNode));
-        }
     }
 
     private void BuildCoordsMap()
     {
         coordsMap = new Dictionary<HexCoords, NodeData>();
         foreach (var node in currentGraph.nodes)
-        {
             coordsMap[node.coords] = node;
-        }
     }
 
     private List<NodeData> FindStartNodes()
@@ -81,15 +77,14 @@ public class NodeExecutor : MonoBehaviour
         {
             if (!port.isInput)
                 continue;
-            int sideIndex = SideIndex(port.side);
-            int oppSide = OppositeSideIndex(sideIndex);
-            HexCoords neighborCoords = HexCoords.GetNeighbor(node.coords, oppSide);
+            int sideIndex = (int)port.side;
+            int oppSide = (sideIndex + 3) % 6;
+            var neighborCoords = HexCoords.GetNeighbor(node.coords, oppSide);
             if (!coordsMap.ContainsKey(neighborCoords))
                 continue;
             var neighborNode = coordsMap[neighborCoords];
-            var neighborPort = neighborNode.ports
-                .FirstOrDefault(p => !p.isInput && SideIndex(p.side) == oppSide);
-            if (neighborPort != null)
+            bool hasOutputMatch = neighborNode.ports.Any(p => !p.isInput && (int)p.side == oppSide);
+            if (hasOutputMatch)
                 return true;
         }
         return false;
@@ -103,7 +98,7 @@ public class NodeExecutor : MonoBehaviour
         while (queue.Count > 0)
         {
             HexCoords coords = queue.Dequeue();
-            if (!coordsMap.ContainsKey(coords))
+            if (!coordsMap.ContainsKey(coords)) 
                 continue;
             NodeData node = coordsMap[coords];
             if (visited.Contains(node.nodeId))
@@ -113,20 +108,19 @@ public class NodeExecutor : MonoBehaviour
             yield return new WaitForSeconds(waitTimeBetweenNodes);
             ProcessNode(node);
 
-            // For each output side...
             foreach (var port in node.ports)
             {
-                if (port.isInput) continue; // skip input
-                int sIndex = SideIndex(port.side);
-                HexCoords neighborCoords = HexCoords.GetNeighbor(coords, sIndex);
-                if (!coordsMap.ContainsKey(neighborCoords))
-                    continue;
-                NodeData neighborNode = coordsMap[neighborCoords];
-                int oppIndex = OppositeSideIndex(sIndex);
-                bool hasInputMatch = neighborNode.ports.Any(p => p.isInput && SideIndex(p.side) == oppIndex);
-                if (hasInputMatch && !visited.Contains(neighborNode.nodeId))
+                if (!port.isInput)
                 {
-                    queue.Enqueue(neighborCoords);
+                    int sIndex = (int)port.side;
+                    var neighborCoords = HexCoords.GetNeighbor(coords, sIndex);
+                    if (!coordsMap.ContainsKey(neighborCoords))
+                        continue;
+                    var neighborNode = coordsMap[neighborCoords];
+                    int oppIndex = (sIndex + 3) % 6;
+                    bool hasInputMatch = neighborNode.ports.Any(p => p.isInput && (int)p.side == oppIndex);
+                    if (hasInputMatch && !visited.Contains(neighborNode.nodeId))
+                        queue.Enqueue(neighborCoords);
                 }
             }
         }
@@ -137,47 +131,50 @@ public class NodeExecutor : MonoBehaviour
     {
         LogDebug($"[NodeExecutor] Processing node '{node.nodeDisplayName}' at coords ({node.coords.q}, {node.coords.r}).");
 
-        // If node has an 'Output' effect, find its NodeView => call OutputNodeEffect.
-        bool hasOutput = node.effects.Any(e => e.effectType == NodeEffectType.Output);
-        if (hasOutput)
+        var seedEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.Seed);
+        if (seedEffect != null)
         {
-            // Locate the NodeView in the scene with matching nodeId.
-            NodeView view = FindNodeViewById(node.nodeId);
-            if (view != null)
-            {
-                // Attempt to get OutputNodeEffect on that NodeView
-                OutputNodeEffect outputComp = view.GetComponent<OutputNodeEffect>();
-                if (outputComp != null)
-                {
-                    outputComp.Activate(); // Fire the projectile logic
-                }
-                else
-                {
-                    LogDebug("[NodeExecutor] Warning: Node has Output effect but no OutputNodeEffect component found.");
-                }
-            }
-            else
-            {
-                LogDebug("[NodeExecutor] Warning: No NodeView found for Output node. Can't spawn projectile.");
-            }
+            SpawnPlant(seedEffect);
         }
     }
-    
-    // Helper method to find the NodeView with the same nodeId in the scene.
-    private NodeView FindNodeViewById(string nodeId)
+
+    private void SpawnPlant(NodeEffectData seedEffect)
     {
-        NodeView[] allViews = FindObjectsOfType<NodeView>();
-        foreach (var v in allViews)
+        if (plantPrefab == null)
         {
-            if (v.GetNodeData().nodeId == nodeId)
-                return v;
+            LogDebug("[NodeExecutor] plantPrefab is not assigned in the inspector!");
+            return;
         }
-        return null;
+        var gardener = FindObjectOfType<GardenerController>();
+        if (gardener == null)
+        {
+            LogDebug("[NodeExecutor] No GardenerController found. Can't spawn plant.");
+            return;
+        }
+
+        Vector2 spawnPos = gardener.GetPlantingPosition();
+        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
+        PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
+        if (growth != null)
+        {
+            growth.stemMinLength    = Mathf.RoundToInt(seedEffect.effectValue);
+            growth.stemMaxLength    = Mathf.RoundToInt(seedEffect.secondaryValue);
+            growth.growthSpeed      = seedEffect.extra1;
+            growth.leafGap          = Mathf.RoundToInt(seedEffect.extra2);
+            growth.leafPattern      = seedEffect.leafPattern; 
+            growth.growthRandomness = seedEffect.growthRandomness;
+            LogDebug($"[NodeExecutor] Spawned plant => min={growth.stemMinLength}, max={growth.stemMaxLength}, spd={growth.growthSpeed}, leafGap={growth.leafGap}, pattern={growth.leafPattern}, rand={growth.growthRandomness}");
+        }
     }
-    
+
+
+
+
+
     private void ClearDebug()
     {
-        if (debugOutput) debugOutput.text = "";
+        if (debugOutput)
+            debugOutput.text = "";
     }
 
     private void LogDebug(string msg)
@@ -185,17 +182,5 @@ public class NodeExecutor : MonoBehaviour
         Debug.Log(msg);
         if (debugOutput)
             debugOutput.text += msg + "\n";
-    }
-
-    private int SideIndex(HexSideFlat side)
-    {
-        // Top=0, One=1, Two=2, Three=3, Four=4, Five=5
-        return (int)side;
-    }
-
-    private int OppositeSideIndex(int sideIndex)
-    {
-        // sideIndex + 3 mod 6
-        return (sideIndex + 3) % 6;
     }
 }

@@ -27,6 +27,8 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
     private Vector2 contextMenuPosition;
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
     private CanvasGroup canvasGroup;
+    public RectTransform ContentRect => contentRect;
+
 
     private void Awake()
     {
@@ -132,51 +134,73 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         }
     }
 
-    private void CreateNodeAtMouse(NodeDefinition definition)
+    
+        private void CreateNodeAtMouse(NodeDefinition definition)
+{
+    // 1. Convert screen coords → local coords in contentRect
+    Vector2 localPos;
+    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        contentRect, Input.mousePosition, null, out localPos);
+
+    // 2. Convert local coords → hex coords (flat-top style)
+    float hexSizeValue = (HexGridManager.Instance != null) 
+        ? HexGridManager.Instance.hexSize 
+        : 50f;
+
+    // If your HexCoords.WorldToHex expects localPos to be the same coordinate space 
+    // as used in your HexCoords logic, we can feed localPos directly:
+    HexCoords hc = HexCoords.WorldToHex(localPos, hexSizeValue);
+
+    // 3. Convert hex coords → local snapped coords
+    Vector2 snappedLocal = hc.HexToWorld(hexSizeValue);
+
+    // 4. Create the new node data
+    NodeData newNode = new NodeData
     {
-        Vector2 localPos;
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(contentRect, Input.mousePosition, null, out localPos);
+        nodeDisplayName = definition.displayName,
+        backgroundColor = definition.backgroundColor,
+        description = definition.description,
+        coords = hc,
+        editorPosition = snappedLocal // This is the local position inside contentRect
+    };
 
-        NodeData newNode = new NodeData();
-        newNode.nodeDisplayName = definition.displayName;
-        newNode.editorPosition = localPos;
-        newNode.backgroundColor = definition.backgroundColor;
-        newNode.description = definition.description;
-
-        foreach (var defEffect in definition.effects)
+    // Copy the definition’s effects & ports
+    foreach (var defEffect in definition.effects)
+    {
+        NodeEffectData effectCopy = new NodeEffectData
         {
-            NodeEffectData effectCopy = new NodeEffectData
-            {
-                effectType = defEffect.effectType,
-                effectValue = defEffect.effectValue,
-                secondaryValue = defEffect.secondaryValue
-            };
-            newNode.effects.Add(effectCopy);
-        }
-        foreach (var portDef in definition.ports)
-        {
-            NodePort nodePort = new NodePort
-            {
-                isInput = portDef.isInput,
-                portType = portDef.portType,
-                side = portDef.side
-            };
-            newNode.ports.Add(nodePort);
-        }
-
-        // Use hex size from HexGridManager.
-        float hexSizeValue = (HexGridManager.Instance != null) ? HexGridManager.Instance.hexSize : 50f;
-        HexCoords hc = HexCoords.WorldToHex(localPos, hexSizeValue);
-        newNode.coords = hc;
-        Vector2 snappedPos = hc.HexToWorld(hexSizeValue);
-        newNode.editorPosition = snappedPos;
-
-        currentGraph.nodes.Add(newNode);
-        CreateNodeView(newNode);
-        EnsureContentPanelSize();
+            effectType = defEffect.effectType,
+            effectValue = defEffect.effectValue,
+            secondaryValue = defEffect.secondaryValue,
+            extra1 = defEffect.extra1,
+            extra2 = defEffect.extra2,
+            leafPattern = defEffect.leafPattern,         // NEW: copy leafPattern
+            growthRandomness = defEffect.growthRandomness    // NEW: copy growthRandomness
+        };
+        newNode.effects.Add(effectCopy);
     }
 
-    private NodeView CreateNodeView(NodeData data)
+    foreach (var portDef in definition.ports)
+    {
+        NodePort nodePort = new NodePort
+        {
+            isInput  = portDef.isInput,
+            portType = portDef.portType,
+            side     = portDef.side
+        };
+        newNode.ports.Add(nodePort);
+    }
+
+    // 5. Add node to graph and spawn the node view
+    currentGraph.nodes.Add(newNode);
+    CreateNodeView(newNode);
+    EnsureContentPanelSize();
+}
+
+
+
+
+    public NodeView CreateNodeView(NodeData data)
     {
         if (nodeViewPrefab == null)
         {

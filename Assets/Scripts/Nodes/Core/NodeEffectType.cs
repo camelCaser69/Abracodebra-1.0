@@ -8,5 +8,6 @@
     AimSpread,    // formerly Accuracy
     Burning,
     Piercing,
-    FriendlyFire
+    FriendlyFire,
+    Seed  // New effect type for planting a seed.
 }
