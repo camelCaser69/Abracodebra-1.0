@@ -59,6 +59,22 @@ public class PlantGrowth : MonoBehaviour
         cells[new Vector2Int(0, 0)] = PlantCellType.Seed;
         SpawnCellVisual(PlantCellType.Seed, new Vector2Int(0, 0));
 
+        // Set up sorting inheritance
+        SortableEntity[] cellEntities = GetComponentsInChildren<SortableEntity>();
+        foreach (var cellEntity in cellEntities)
+        {
+            // Skip the seed cell, which will determine sorting
+            if (cellEntity.transform == transform)
+                continue;
+
+            // Use reflection to set useParentYCoordinate
+            var field = typeof(SortableEntity).GetField("useParentYCoordinate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (field != null)
+            {
+                field.SetValue(cellEntity, true);
+            }
+        }
+
         StartCoroutine(GrowRoutine());
     }
 
@@ -185,7 +201,23 @@ public class PlantGrowth : MonoBehaviour
         }
         if (prefabToUse != null)
         {
-            Instantiate(prefabToUse, worldPos, Quaternion.identity, transform);
+            GameObject cellInstance = Instantiate(prefabToUse, worldPos, Quaternion.identity, transform);
+        
+            // Add SortableEntity if not already present
+            SortableEntity sortableEntity = cellInstance.GetComponent<SortableEntity>();
+            if (sortableEntity == null)
+                sortableEntity = cellInstance.AddComponent<SortableEntity>();
+        
+            // For non-seed cells, enable "Y from parent"
+            if (cellType != PlantCellType.Seed)
+            {
+                // Use reflection to set the useParentYCoordinate field
+                var field = typeof(SortableEntity).GetField("useParentYCoordinate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (field != null)
+                {
+                    field.SetValue(sortableEntity, true);
+                }
+            }
         }
         else
         {

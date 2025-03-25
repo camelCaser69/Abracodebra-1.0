@@ -183,10 +183,10 @@ TextureImporter:
       name: MiniVillagerWoman_0
       rect:
         serializedVersion: 2
-        x: 10
+        x: 0
         y: 128
-        width: 12
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -205,10 +205,10 @@ TextureImporter:
       name: MiniVillagerWoman_1
       rect:
         serializedVersion: 2
-        x: 41
+        x: 32
         y: 128
-        width: 14
-        height: 15
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -227,10 +227,10 @@ TextureImporter:
       name: MiniVillagerWoman_2
       rect:
         serializedVersion: 2
-        x: 74
+        x: 64
         y: 128
-        width: 12
-        height: 15
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -249,10 +249,10 @@ TextureImporter:
       name: MiniVillagerWoman_3
       rect:
         serializedVersion: 2
-        x: 106
+        x: 96
         y: 128
-        width: 12
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -271,10 +271,10 @@ TextureImporter:
       name: MiniVillagerWoman_4
       rect:
         serializedVersion: 2
-        x: 10
+        x: 0
         y: 96
-        width: 12
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -293,10 +293,10 @@ TextureImporter:
       name: MiniVillagerWoman_5
       rect:
         serializedVersion: 2
-        x: 42
+        x: 32
         y: 96
-        width: 12
-        height: 17
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -315,10 +315,10 @@ TextureImporter:
       name: MiniVillagerWoman_6
       rect:
         serializedVersion: 2
-        x: 73
+        x: 64
         y: 96
-        width: 13
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -337,10 +337,10 @@ TextureImporter:
       name: MiniVillagerWoman_7
       rect:
         serializedVersion: 2
-        x: 106
+        x: 96
         y: 96
-        width: 12
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -359,10 +359,10 @@ TextureImporter:
       name: MiniVillagerWoman_8
       rect:
         serializedVersion: 2
-        x: 137
+        x: 128
         y: 96
-        width: 14
-        height: 17
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -381,10 +381,10 @@ TextureImporter:
       name: MiniVillagerWoman_9
       rect:
         serializedVersion: 2
-        x: 169
+        x: 160
         y: 96
-        width: 14
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -403,10 +403,10 @@ TextureImporter:
       name: MiniVillagerWoman_10
       rect:
         serializedVersion: 2
-        x: 9
+        x: 0
         y: 64
-        width: 14
-        height: 17
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -425,10 +425,10 @@ TextureImporter:
       name: MiniVillagerWoman_11
       rect:
         serializedVersion: 2
-        x: 41
+        x: 32
         y: 64
-        width: 14
-        height: 17
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -447,10 +447,10 @@ TextureImporter:
       name: MiniVillagerWoman_12
       rect:
         serializedVersion: 2
-        x: 73
+        x: 64
         y: 64
-        width: 14
-        height: 14
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -469,10 +469,10 @@ TextureImporter:
       name: MiniVillagerWoman_13
       rect:
         serializedVersion: 2
-        x: 9
+        x: 0
         y: 32
-        width: 12
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -491,10 +491,10 @@ TextureImporter:
       name: MiniVillagerWoman_14
       rect:
         serializedVersion: 2
-        x: 39
+        x: 32
         y: 32
-        width: 14
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -513,10 +513,10 @@ TextureImporter:
       name: MiniVillagerWoman_15
       rect:
         serializedVersion: 2
-        x: 72
+        x: 64
         y: 32
-        width: 13
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -535,10 +535,10 @@ TextureImporter:
       name: MiniVillagerWoman_16
       rect:
         serializedVersion: 2
-        x: 9
+        x: 0
         y: 0
-        width: 14
-        height: 15
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -557,10 +557,10 @@ TextureImporter:
       name: MiniVillagerWoman_17
       rect:
         serializedVersion: 2
-        x: 41
+        x: 32
         y: 0
-        width: 13
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -579,10 +579,10 @@ TextureImporter:
       name: MiniVillagerWoman_18
       rect:
         serializedVersion: 2
-        x: 71
+        x: 64
         y: 0
-        width: 46
-        height: 7
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -597,11 +597,33 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: MiniVillagerWoman_19
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a48736297b8c37044b87dd028b1d4704
+      internalID: 1904307513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: c9a0c47cc47a2ce4283414eaef6a4401
     internalID: 0
     vertices: []
     indices: 
@@ -622,6 +644,7 @@ TextureImporter:
       MiniVillagerWoman_16: -4083110843973425810
       MiniVillagerWoman_17: -1971948550002854820
       MiniVillagerWoman_18: -8204682756350420618
+      MiniVillagerWoman_19: 1904307513
       MiniVillagerWoman_2: 4302748597493127448
       MiniVillagerWoman_3: -4004078155843907131
       MiniVillagerWoman_4: -2603696699876743337

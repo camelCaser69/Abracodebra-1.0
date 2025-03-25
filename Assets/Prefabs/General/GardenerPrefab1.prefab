@@ -145,14 +145,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5575549963909954597}
-  - component: {fileID: 446017123173006964}
   - component: {fileID: -1214040801718707697}
+  - component: {fileID: 1316135351782374134}
   - component: {fileID: -6191398404550704219}
   - component: {fileID: 195879902307507124}
   - component: {fileID: 4692275394440683169}
   - component: {fileID: -6875346460999449028}
   m_Layer: 0
-  m_Name: GardenerPrefab
+  m_Name: GardenerPrefab1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -168,35 +168,13 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 3, y: 3, z: 3}
+  m_LocalScale: {x: 6, y: 6, z: 6}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 2286930423113279058}
   - {fileID: 4126343535530882793}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &446017123173006964
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3865789443703534087}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 933627a6a3934b31a6bcb072b4c75dc9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  isEnemy: 0
-  maxHP: 100
-  currentHP: 0
-  baseAimSpread: 5
-  firingDirection: 0
-  spellSpawnPoint: {fileID: 2286930423113279058}
-  spellProjectilePrefab: {fileID: 6783261795052518866, guid: 75839977a9e2c664a8404ef7a23d97ba, type: 3}
-  projectileSpeed: 10
-  friendlyFireEnabled: 0
-  hpText: {fileID: 1461922507262685618}
 --- !u!114 &-1214040801718707697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -210,6 +188,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
+  seedPlantingOffset: {x: 0, y: -1}
+--- !u!114 &1316135351782374134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3865789443703534087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcb97044d7ed4dbbb8d3f852f45a3fc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sortingLayerYOffset: -0.8
+  useParentYCoordinate: 0
+  debugSorting: 0
 --- !u!212 &-6191398404550704219
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -254,7 +248,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -7978735674136817684, guid: 0a62fbcba460ff94ab3dd2f9ee5b362b, type: 3}
+  m_Sprite: {fileID: -692003313702210500, guid: ffad9a1defc7ae34facef98a2fac7e4d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -275,7 +269,7 @@ Animator:
   m_GameObject: {fileID: 3865789443703534087}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 992cadaad0af6314db4b55cd598ff2f1, type: 2}
+  m_Controller: {fileID: 9100000, guid: 9a76d02eb2f35194fbae38b7be98bd32, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

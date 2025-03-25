@@ -351,13 +351,21 @@ PrefabInstance:
       propertyPath: moveSpeed
       value: 4
       objectReference: {fileID: 0}
-    - target: {fileID: 446017123173006964, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
-      propertyPath: m_Enabled
-      value: 0
+    - target: {fileID: -1214040801718707697, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: seedPlantingOffset.y
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: 450235667417177311, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1316135351782374134, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: debugSorting
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1316135351782374134, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: sortingLayerYOffset
+      value: -0.8
       objectReference: {fileID: 0}
     - target: {fileID: 3865789443703534087, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_Name
@@ -689,7 +697,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000
+  m_ApplyToSortingLayers: 000000009503b18ba546f8ef4772f18d
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -1144,11 +1152,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -1913556409
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: -4868938126694065537, guid: 2393821c0f8bfd94e8c7f78e1bfeb383, type: 3}
-  m_Color: {r: 0.96915835, g: 1, b: 0.6273585, a: 0}
+  m_Color: {r: 0.96915835, g: 1, b: 0.6273585, a: 0.4}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1166,13 +1174,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1251780409}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.8019, y: 0.8019, z: 0.8019}
-  m_ConstrainProportionsScale: 0
+  m_LocalRotation: {x: 0, y: 0, z: 0.7089555, w: 0.7052532}
+  m_LocalPosition: {x: 0, y: 0.39, z: 0}
+  m_LocalScale: {x: 1.35, y: 1.35, z: 1.35}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1966203508}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90.3}
 --- !u!1 &1349976370
 GameObject:
   m_ObjectHideFlags: 0
@@ -1277,8 +1285,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: -268941659
+  m_SortingLayer: -1
   m_SortingOrder: -2
   m_Sprite: {fileID: 21300000, guid: e7d755974b147ba4ebc48c8e4fba6a5e, type: 3}
   m_Color: {r: 0.5254902, g: 0.65882355, b: 0.7254902, a: 1}
@@ -1462,8 +1470,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sunIntensity: 1
   fadeSprite: {fileID: 1251780410}
-  minAlpha: 0.05
-  maxAlpha: 0.3
+  minAlpha: 0.1
+  maxAlpha: 0.8
 --- !u!4 &1966203508
 Transform:
   m_ObjectHideFlags: 0
