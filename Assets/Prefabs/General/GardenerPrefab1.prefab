@@ -189,6 +189,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   seedPlantingOffset: {x: 0, y: -1}
+  flipSpriteWhenMovingLeft: 1
+  flipHorizontalDirection: 0
+  useAnimations: 1
+  runningParameterName: isRunning
+  plantingParameterName: isPlanting
 --- !u!114 &1316135351782374134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -269,7 +274,7 @@ Animator:
   m_GameObject: {fileID: 3865789443703534087}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 9a76d02eb2f35194fbae38b7be98bd32, type: 2}
+  m_Controller: {fileID: 9100000, guid: 3e5884227fe0e30468ce03326a4fdce6, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

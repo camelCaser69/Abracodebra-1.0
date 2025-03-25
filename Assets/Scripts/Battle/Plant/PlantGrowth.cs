@@ -67,12 +67,8 @@ public class PlantGrowth : MonoBehaviour
             if (cellEntity.transform == transform)
                 continue;
 
-            // Use reflection to set useParentYCoordinate
-            var field = typeof(SortableEntity).GetField("useParentYCoordinate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (field != null)
-            {
-                field.SetValue(cellEntity, true);
-            }
+            // Use the public method to set parent Y coordinate usage
+            cellEntity.SetUseParentYCoordinate(true);
         }
 
         StartCoroutine(GrowRoutine());
@@ -211,12 +207,7 @@ public class PlantGrowth : MonoBehaviour
             // For non-seed cells, enable "Y from parent"
             if (cellType != PlantCellType.Seed)
             {
-                // Use reflection to set the useParentYCoordinate field
-                var field = typeof(SortableEntity).GetField("useParentYCoordinate", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                if (field != null)
-                {
-                    field.SetValue(sortableEntity, true);
-                }
+                sortableEntity.SetUseParentYCoordinate(true);
             }
         }
         else

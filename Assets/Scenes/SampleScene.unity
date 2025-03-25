@@ -1372,7 +1372,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   showGrid: 1
-  gridColor: {r: 0.06666667, g: 0.06666667, b: 0.06666667, a: 0.14901961}
+  gridColor: {r: 1, g: 1, b: 1, a: 0.007843138}
   lineThickness: 4
 --- !u!222 &1484960129
 CanvasRenderer:
