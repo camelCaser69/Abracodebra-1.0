@@ -29,20 +29,6 @@ public class SpellProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        WizardController wizard = collision.GetComponent<WizardController>();
-        if (wizard != null)
-        {
-            // If friendly fire is disabled and the hit wizard is on the same team, ignore.
-            if (!friendlyFire && wizard.isEnemy == casterIsEnemy)
-                return;
-
-            wizard.TakeDamage(damage);
-            if (burningDamage > 0 && burningDuration > 0)
-            {
-                wizard.ApplyStatusEffect(new BurningStatusEffect(burningDuration, burningDamage));
-            }
-            if (destroyOnHit)
-                Destroy(gameObject);
-        }
+        
     }
 }

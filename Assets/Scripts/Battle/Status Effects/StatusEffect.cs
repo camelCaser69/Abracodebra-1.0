@@ -13,6 +13,5 @@
         damagePerSecond = dps;
     }
 
-    public abstract void UpdateEffect(WizardController wizard, float deltaTime);
     public bool IsExpired() => elapsed >= duration;
 }
