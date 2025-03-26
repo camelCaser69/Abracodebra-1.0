@@ -21,7 +21,8 @@ public class PlantGrowth : MonoBehaviour
     public float growthSpeed = 1f;           // Seconds per growth step
     [Tooltip("Leaf Gap: 0 = leaves on every stem cell; 1 = leaves on every 2nd stem cell; etc.")]
     public int leafGap = 1;
-    public int leafPattern = 0;              // 0 = Parallel, 1 = Alternating
+    [Tooltip("Leaf pattern type: 0=Parallel, 1=Offset-Parallel, 2=Alternating (L/R/R/L), 3=Double-Spiral, 4=One-Sided")]
+    public int leafPattern = 0;
     public float growthRandomness = 0f;      // [0..1]: 0=always up; 1=always diagonal
 
     [Header("Energy System")]
@@ -49,7 +50,6 @@ public class PlantGrowth : MonoBehaviour
     private bool growing = true;
     private int currentStemCount = 0;
     private int targetStemLength = 0;
-    private bool leftSideNext = true;
 
     private void Start()
     {
@@ -92,68 +92,133 @@ public class PlantGrowth : MonoBehaviour
     }
 
     private IEnumerator GrowRoutine()
+{
+    Vector2Int currentPos = new Vector2Int(0, 0);
+    int spiralDirection = 1;  // Used for spiral pattern: 1=right, -1=left
+    int patternCounter = 0;   // Used to track position in complex patterns
+    
+    while (growing)
     {
-        Vector2Int currentPos = new Vector2Int(0, 0);
-        while (growing)
+        yield return new WaitForSeconds(growthSpeed);
+
+        if (currentStemCount < targetStemLength)
         {
-            yield return new WaitForSeconds(growthSpeed);
-
-            if (currentStemCount < targetStemLength)
+            currentStemCount++;
+            Vector2Int dir;
+            if (currentStemCount == 1)
             {
-                currentStemCount++;
-                Vector2Int dir;
-                if (currentStemCount == 1)
-                {
-                    // Always grow directly up for the first stem cell.
-                    dir = new Vector2Int(0, 1);
-                }
-                else
-                {
-                    dir = GetStemDirection();
-                }
-                currentPos += dir;
-                cells[currentPos] = PlantCellType.Stem;
-                SpawnCellVisual(PlantCellType.Stem, currentPos);
-                Debug.Log($"[PlantGrowth] Stem grown at {currentPos}");
-
-                if ((currentStemCount % (leafGap + 1)) == 0)
-                {
-                    Vector2Int baseLeftPos = currentPos + new Vector2Int(-1, 0);
-                    Vector2Int baseRightPos = currentPos + new Vector2Int(1, 0);
-
-                    if (leafPattern == 0) // Parallel: spawn both leaves.
-                    {
-                        SpawnLeafIfEmpty(baseLeftPos);
-                        SpawnLeafIfEmpty(baseRightPos);
-                        Debug.Log($"[PlantGrowth] Parallel leaves at {baseLeftPos} and {baseRightPos}");
-                    }
-                    else // Alternating: spawn both but with one side offset.
-                    {
-                        if (leftSideNext)
-                        {
-                            Vector2Int leftAlt = baseLeftPos + new Vector2Int(0, 1);
-                            SpawnLeafIfEmpty(leftAlt);
-                            SpawnLeafIfEmpty(baseRightPos);
-                            Debug.Log($"[PlantGrowth] Alternating leaves at {leftAlt} (offset) and {baseRightPos}");
-                        }
-                        else
-                        {
-                            Vector2Int rightAlt = baseRightPos + new Vector2Int(0, 1);
-                            SpawnLeafIfEmpty(baseLeftPos);
-                            SpawnLeafIfEmpty(rightAlt);
-                            Debug.Log($"[PlantGrowth] Alternating leaves at {baseLeftPos} and {rightAlt} (offset)");
-                        }
-                        leftSideNext = !leftSideNext;
-                    }
-                }
+                // Always grow directly up for the first stem cell.
+                dir = new Vector2Int(0, 1);
             }
             else
             {
-                growing = false;
-                Debug.Log("[PlantGrowth] Growth complete.");
+                dir = GetStemDirection();
+            }
+            currentPos += dir;
+            cells[currentPos] = PlantCellType.Stem;
+            SpawnCellVisual(PlantCellType.Stem, currentPos);
+            Debug.Log($"[PlantGrowth] Stem grown at {currentPos}");
+
+            if ((currentStemCount % (leafGap + 1)) == 0)
+            {
+                Vector2Int baseLeftPos = currentPos + new Vector2Int(-1, 0);
+                Vector2Int baseRightPos = currentPos + new Vector2Int(1, 0);
+                patternCounter++;
+
+                // Process according to leaf pattern
+                switch (leafPattern)
+                {
+                    case 0: // Parallel: spawn both leaves at same height
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(baseRightPos);
+                        Debug.Log($"[PlantGrowth] Parallel leaves at {baseLeftPos} and {baseRightPos}");
+                        break;
+                        
+                    case 1: // Offset-Parallel: both sides have leaves, but one side is higher
+                        // Fixed side offset - right side is always raised
+                        Vector2Int raisedRightPos = baseRightPos + new Vector2Int(0, 1);
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(raisedRightPos);
+                        Debug.Log($"[PlantGrowth] Offset-Parallel leaves at {baseLeftPos} and {raisedRightPos} (offset)");
+                        break;
+                        
+                    case 2: // Alternating-2 (L/R/R/L/L/R/R/L): proper rotation pattern
+                        // This creates the L/R/R/L/L/R/R/L pattern
+                        // patternCounter % 4 gives us:
+                        // 1 -> Left side offset (L)
+                        // 2 -> Right side normal (R)
+                        // 3 -> Right side offset (R)
+                        // 0 -> Left side normal (L)
+                        
+                        Vector2Int leftPos, rightPos;
+                        
+                        // Determine positions based on pattern position
+                        switch (patternCounter % 4) {
+                            case 1: // Left side offset, right side normal
+                                leftPos = baseLeftPos + new Vector2Int(0, 1);
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} (offset) and {rightPos}");
+                                break;
+                            case 2: // Left side normal, right side normal
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos}");
+                                break;
+                            case 3: // Left side normal, right side offset
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos + new Vector2Int(0, 1);
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos} (offset)");
+                                break;
+                            case 0: // Left side normal, right side normal (cycle complete)
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos}");
+                                break;
+                            default:
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                break;
+                        }
+                        
+                        SpawnLeafIfEmpty(leftPos);
+                        SpawnLeafIfEmpty(rightPos);
+                        break;
+                        
+                    case 3: // Double-Spiral: two leaves per node, spiral pattern
+                        // Create two leaves that spiral around the stem, with vertical offset
+                        Vector2Int leftSpiral = baseLeftPos + new Vector2Int(0, spiralDirection > 0 ? 1 : 0);
+                        Vector2Int rightSpiral = baseRightPos + new Vector2Int(0, spiralDirection > 0 ? 0 : 1);
+                        
+                        SpawnLeafIfEmpty(leftSpiral);
+                        SpawnLeafIfEmpty(rightSpiral);
+                        
+                        Debug.Log($"[PlantGrowth] Double-Spiral leaves at {leftSpiral} and {rightSpiral}");
+                        
+                        // Toggle spiral direction for next node
+                        spiralDirection *= -1;
+                        break;
+                        
+                    case 4: // One-Sided: leaves only grow on one side
+                        // For balance, create two leaves on the same side
+                        SpawnLeafIfEmpty(baseRightPos);
+                        SpawnLeafIfEmpty(baseRightPos + new Vector2Int(0, 1));
+                        Debug.Log($"[PlantGrowth] One-sided leaves at {baseRightPos} and {baseRightPos + new Vector2Int(0, 1)}");
+                        break;
+                        
+                    default: // Fallback to parallel
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(baseRightPos);
+                        break;
+                }
             }
         }
+        else
+        {
+            growing = false;
+            Debug.Log("[PlantGrowth] Growth complete.");
+        }
     }
+}
 
     private Vector2Int GetStemDirection()
     {

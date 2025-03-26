@@ -158,48 +158,83 @@ public class NodeExecutor : MonoBehaviour
             }
         }
 
-        // If it's a Seed node, spawn the plant now using the BFS accumulators.
-        var seedEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.Seed);
-        if (seedEffect != null)
+        // If it's a SeedSpawn node, spawn the plant now using the BFS accumulators and collect plant parameters
+        var seedSpawnEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.SeedSpawn);
+        if (seedSpawnEffect != null)
         {
-            SpawnPlant(seedEffect);
+            SpawnPlant(node);
         }
     }
 
-    private void SpawnPlant(NodeEffectData seedEffect)
+    private void SpawnPlant(NodeData node)
     {
         if (plantPrefab == null)
         {
             LogDebug("[NodeExecutor] plantPrefab is not assigned in the inspector!");
             return;
         }
-        var gardener = FindObjectOfType<GardenerController>();
+        var gardener = Object.FindAnyObjectByType<GardenerController>();
         if (gardener == null)
         {
             LogDebug("[NodeExecutor] No GardenerController found. Can't spawn plant.");
             return;
         }
 
+        // Collect all the plant effect parameters
+        float stemMinLength = 3;  // Default value
+        float stemMaxLength = 6;  // Default value
+        float growthSpeed = 1f;   // Default value
+        float leafGap = 1f;       // Default value
+        float leafPattern = 0f;   // Default value
+        float growthRandomness = 0f; // Default value
+
+        // Find all plant-related effects in this node and the entire visited chain
+        foreach (var effect in node.effects)
+        {
+            switch (effect.effectType)
+            {
+                case NodeEffectType.StemLength:
+                    stemMinLength = effect.effectValue;
+                    stemMaxLength = effect.secondaryValue;
+                    break;
+                case NodeEffectType.GrowthSpeed:
+                    growthSpeed = effect.effectValue;
+                    break;
+                case NodeEffectType.LeafGap:
+                    leafGap = effect.effectValue;
+                    break;
+                case NodeEffectType.LeafPattern:
+                    leafPattern = effect.effectValue;
+                    break;
+                case NodeEffectType.StemRandomness:
+                    growthRandomness = effect.effectValue;
+                    break;
+            }
+        }
+
+        // Spawn the plant with all the collected parameters
         Vector2 spawnPos = gardener.GetPlantingPosition();
         GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
         PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
 
         if (growth != null)
         {
-            // standard seed data
-            growth.stemMinLength = Mathf.RoundToInt(seedEffect.effectValue);
-            growth.stemMaxLength = Mathf.RoundToInt(seedEffect.secondaryValue);
-            growth.growthSpeed   = seedEffect.extra1;
-            growth.leafGap       = Mathf.RoundToInt(seedEffect.extra2);
-            growth.leafPattern      = seedEffect.leafPattern; 
-            growth.growthRandomness = seedEffect.growthRandomness;
+            // Apply all the collected plant parameters
+            growth.stemMinLength = Mathf.RoundToInt(stemMinLength);
+            growth.stemMaxLength = Mathf.RoundToInt(stemMaxLength);
+            growth.growthSpeed = growthSpeed;
+            growth.leafGap = Mathf.RoundToInt(leafGap);
+            growth.leafPattern = Mathf.RoundToInt(leafPattern);
+            growth.growthRandomness = growthRandomness;
 
-            // new "energy" data from BFS sums
-            growth.maxEnergy       = accumulatedEnergyStorage;   // sum of all energy storages
-            growth.basePhotosynthesis = accumulatedPhotosynthesis; // sum of all photosynthesis rates
+            // Energy data from BFS sums
+            growth.maxEnergy = accumulatedEnergyStorage;
+            growth.basePhotosynthesis = accumulatedPhotosynthesis;
 
             LogDebug($"[NodeExecutor] Spawned plant => " +
-                     $"Seed(min={growth.stemMinLength},max={growth.stemMaxLength},spd={growth.growthSpeed},gap={growth.leafGap},pat={growth.leafPattern},rand={growth.growthRandomness}), " +
+                     $"StemLength(min={growth.stemMinLength},max={growth.stemMaxLength}), " +
+                     $"GrowthSpeed={growth.growthSpeed}, LeafGap={growth.leafGap}, " +
+                     $"LeafPattern={growth.leafPattern}, GrowthRandomness={growth.growthRandomness}, " +
                      $"Energy(max={growth.maxEnergy}), Photosynthesis(base={growth.basePhotosynthesis})");
         }
         else
@@ -209,7 +244,7 @@ public class NodeExecutor : MonoBehaviour
 
         // If you want each new seed to get its own accumulators, 
         // reset them after spawning:
-        accumulatedEnergyStorage  = 0f;
+        accumulatedEnergyStorage = 0f;
         accumulatedPhotosynthesis = 0f;
     }
 

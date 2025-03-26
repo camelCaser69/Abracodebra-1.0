@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Node_000_Seed
   m_EditorClassIdentifier: 
   displayName: Seed
-  backgroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0.9019608}
   description: 
   ports:
   - isInput: 0
@@ -21,7 +21,42 @@ MonoBehaviour:
     side: 1
   effects:
   - effectType: 11
-    effectValue: 6
+    effectValue: 20
+    secondaryValue: 9
+    extra1: 1
+    extra2: 1
+    leafPattern: 1
+    growthRandomness: 0.15
+  - effectType: 12
+    effectValue: 5
+    secondaryValue: 14
+    extra1: 1
+    extra2: 1
+    leafPattern: 1
+    growthRandomness: 0.15
+  - effectType: 13
+    effectValue: 1
+    secondaryValue: 9
+    extra1: 1
+    extra2: 1
+    leafPattern: 1
+    growthRandomness: 0.15
+  - effectType: 14
+    effectValue: 1
+    secondaryValue: 9
+    extra1: 1
+    extra2: 1
+    leafPattern: 1
+    growthRandomness: 0.15
+  - effectType: 15
+    effectValue: 2
+    secondaryValue: 9
+    extra1: 1
+    extra2: 1
+    leafPattern: 1
+    growthRandomness: 0.15
+  - effectType: 16
+    effectValue: 0
     secondaryValue: 9
     extra1: 1
     extra2: 1
@@ -29,20 +64,6 @@ MonoBehaviour:
     growthRandomness: 0.15
   - effectType: 5
     effectValue: 0.2
-    secondaryValue: 9
-    extra1: 1
-    extra2: 1
-    leafPattern: 1
-    growthRandomness: 0.15
-  - effectType: 5
-    effectValue: 0.1
-    secondaryValue: 9
-    extra1: 1
-    extra2: 1
-    leafPattern: 1
-    growthRandomness: 0.15
-  - effectType: 4
-    effectValue: 20
     secondaryValue: 9
     extra1: 1
     extra2: 1

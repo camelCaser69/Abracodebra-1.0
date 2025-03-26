@@ -18,11 +18,15 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     [Header("Runtime Graph Reference")]
     [SerializeField] private NodeGraph currentGraph;
-
+    
+    [Header("Startup Settings")]
+    [Tooltip("Should the node editor be visible when the game starts?")]
+    
     [Header("Zoom and Panning")]
     [SerializeField] private float startingZoomMultiplier = 1f; // Default zoom at start
     [SerializeField] private float contentMargin = 20f;         // Margin around nodes
 
+    public bool startVisible = true;
     private bool showContextMenu = false;
     private Vector2 contextMenuPosition;
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
@@ -56,6 +60,14 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         // Set initial zoom.
         contentRect.localScale = Vector3.one * startingZoomMultiplier;
         EnsureContentPanelSize();
+    
+        // Set initial visibility based on the flag
+        if (!startVisible)
+        {
+            canvasGroup.alpha = 0;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
     }
 
     private void Update()

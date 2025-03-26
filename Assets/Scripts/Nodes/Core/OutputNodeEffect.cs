@@ -17,7 +17,7 @@ public class OutputNodeEffect : MonoBehaviour
         Debug.Log("[OutputNodeEffect] Activate() called. Spawning projectile or calling wizard cast.");
 
         // For example, find the local (player) wizard and cast a test projectile:
-        WizardController playerWiz = FindObjectsOfType<WizardController>()
+        WizardController playerWiz = Object.FindObjectsByType<WizardController>(FindObjectsSortMode.None)
             .FirstOrDefault(w => !w.isEnemy);
 
         if (playerWiz)

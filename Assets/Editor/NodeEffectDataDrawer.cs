@@ -12,10 +12,6 @@ public class NodeEffectDataDrawer : PropertyDrawer
         SerializedProperty extra1Prop      = property.FindPropertyRelative("extra1");
         SerializedProperty extra2Prop      = property.FindPropertyRelative("extra2");
 
-        // New ones.
-        SerializedProperty leafPatternProp      = property.FindPropertyRelative("leafPattern");
-        SerializedProperty growthRandomnessProp = property.FindPropertyRelative("growthRandomness");
-
         // Draw effectType
         Rect typeRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
         EditorGUI.PropertyField(typeRect, typeProp, new GUIContent("Effect Type"));
@@ -86,37 +82,64 @@ public class NodeEffectDataDrawer : PropertyDrawer
                 valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
                 break;
             }
-            case NodeEffectType.Seed:
+            case NodeEffectType.SeedSpawn:
+            {
+                GUIContent content = new GUIContent("Seed Spawner", "Base effect required to spawn a plant. Add other plant effects to customize.");
+                Rect line = NextLineRect();
+                EditorGUI.LabelField(line, content);
+                break;
+            }
+            case NodeEffectType.StemLength:
             {
                 // Min stem length
                 var line1 = NextLineRect();
                 valueProp.floatValue = EditorGUI.FloatField(line1,
-                    new GUIContent("Min Stem Length", ""), valueProp.floatValue);
+                    new GUIContent("Min Stem Length", "Minimum length of the stem in cells"), valueProp.floatValue);
 
                 // Max stem length
                 var line2 = NextLineRect();
                 secondaryProp.floatValue = EditorGUI.FloatField(line2,
-                    new GUIContent("Max Stem Length", ""), secondaryProp.floatValue);
-
+                    new GUIContent("Max Stem Length", "Maximum length of the stem in cells"), secondaryProp.floatValue);
+                break;
+            }
+            case NodeEffectType.GrowthSpeed:
+            {
                 // Growth speed
-                var line3 = NextLineRect();
-                extra1Prop.floatValue = EditorGUI.FloatField(line3,
-                    new GUIContent("Growth Speed (sec)", ""), extra1Prop.floatValue);
-
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line,
+                    new GUIContent("Growth Speed (sec)", "Seconds per growth step"), valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.LeafGap:
+            {
                 // Leaf gap
-                var line4 = NextLineRect();
-                extra2Prop.floatValue = EditorGUI.FloatField(line4,
-                    new GUIContent("Leaf Gap", ""), extra2Prop.floatValue);
-
-                // Leaf Pattern => 0=Parallel, 1=Alternating
-                var line5 = NextLineRect();
-                leafPatternProp.intValue = EditorGUI.IntSlider(line5,
-                    new GUIContent("Leaf Pattern", "(0=parallel,1=alt)"), leafPatternProp.intValue, 0, 1);
-
-                // Growth Randomness => [0..2]
-                var line6 = NextLineRect();
-                growthRandomnessProp.floatValue = EditorGUI.Slider(line6,
-                    new GUIContent("Growth Randomness", "0=straight, 0.5=random, 0.5=always diagonal"), growthRandomnessProp.floatValue, 0f, 1f);
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line,
+                    new GUIContent("Leaf Gap", "0=leaves on every cell, 1=every 2nd cell, etc."), valueProp.floatValue);
+                break;
+            }
+            // Update the LeafPattern case in the NodeEffectDataDrawer.cs OnGUI method
+            case NodeEffectType.LeafPattern:
+            {
+                // Leaf Pattern as regular float field with improved tooltip
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, 
+                    new GUIContent("Leaf Pattern", 
+                        "Choose a leaf pattern by number:\n" +
+                        "0 = Parallel (leaves on both sides at same height)\n" +
+                        "1 = Offset-Parallel (right side leaves always higher)\n" +
+                        "2 = Alternating (L/R/R/L/L/R/R/L rotation pattern)\n" +
+                        "3 = Double-Spiral (leaves spiral up the stem)\n" +
+                        "4 = One-Sided (two leaves on right side only)"), 
+                    valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.StemRandomness:
+            {
+                // Growth Randomness => [0..1]
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.Slider(line,
+                    new GUIContent("Growth Randomness", "0=straight up, 1=always diagonal"), valueProp.floatValue, 0f, 1f);
                 break;
             }
             default:
@@ -148,11 +171,16 @@ public class NodeEffectDataDrawer : PropertyDrawer
             case NodeEffectType.AimSpread:
             case NodeEffectType.Piercing:
             case NodeEffectType.FriendlyFire:
-                // +1 line
+            case NodeEffectType.GrowthSpeed:
+            case NodeEffectType.LeafGap:
+            case NodeEffectType.LeafPattern:
+            case NodeEffectType.StemRandomness:
+                // +1 line each
                 totalHeight += (lineHeight + spacing);
                 break;
 
             case NodeEffectType.Output:
+            case NodeEffectType.SeedSpawn:
                 // +1 line
                 totalHeight += (lineHeight + spacing);
                 break;
@@ -162,9 +190,9 @@ public class NodeEffectDataDrawer : PropertyDrawer
                 totalHeight += (lineHeight + spacing) * 2;
                 break;
 
-            case NodeEffectType.Seed:
-                // min length + max length + growth speed + leaf gap + leaf pattern + randomness => 6 lines
-                totalHeight += (lineHeight + spacing) * 6;
+            case NodeEffectType.StemLength:
+                // +2 lines (min and max)
+                totalHeight += (lineHeight + spacing) * 2;
                 break;
 
             default:

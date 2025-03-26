@@ -1437,8 +1437,9 @@ MonoBehaviour:
   definitionLibrary: {fileID: 11400000, guid: 11ac7fb888cbf394e81a9c81231495bd, type: 2}
   currentGraph:
     nodes: []
-  startingZoomMultiplier: 1
+  startingZoomMultiplier: 2
   contentMargin: 0
+  startVisible: 0
 --- !u!1 &1966203506
 GameObject:
   m_ObjectHideFlags: 0

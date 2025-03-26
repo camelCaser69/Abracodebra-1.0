@@ -46,14 +46,14 @@ public class NodeTestInitializer : MonoBehaviour
                 {
                     NodeEffectData effectCopy = new NodeEffectData
                     {
-                        effectType       = defEffect.effectType,
-                        effectValue      = defEffect.effectValue,
-                        secondaryValue   = defEffect.secondaryValue,
-                        extra1           = defEffect.extra1,
-                        extra2           = defEffect.extra2,
-                        leafPattern      = defEffect.leafPattern,       // FIX: now copying leafPattern
-                        growthRandomness = defEffect.growthRandomness   // FIX: now copying growthRandomness
+                        effectType = defEffect.effectType,
+                        effectValue = defEffect.effectValue,
+                        secondaryValue = defEffect.secondaryValue,
+                        extra1 = defEffect.extra1,
+                        extra2 = defEffect.extra2
                     };
+                    
+                    // Add the effect to the node
                     newNode.effects.Add(effectCopy);
                 }
 

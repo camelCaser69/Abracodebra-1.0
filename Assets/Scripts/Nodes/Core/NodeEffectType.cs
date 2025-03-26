@@ -11,5 +11,11 @@
     Burning,
     Piercing,
     FriendlyFire,
-    Seed  // New effect type for planting a seed.
+    // Replaced Seed with more granular effects
+    SeedSpawn,        // Base effect to spawn a plant
+    StemLength,       // Min/Max stem length
+    GrowthSpeed,      // Controls growth speed
+    LeafGap,          // Spacing between leaves
+    LeafPattern,      // Parallel or alternating pattern
+    StemRandomness    // Randomness of stem growth
 }
