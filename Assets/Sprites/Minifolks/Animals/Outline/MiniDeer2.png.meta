@@ -121,7 +121,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -159,7 +159,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -213,10 +213,10 @@ TextureImporter:
       name: MiniDeer2_0
       rect:
         serializedVersion: 2
-        x: 8
+        x: 0
         y: 192
-        width: 17
-        height: 19
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -235,10 +235,10 @@ TextureImporter:
       name: MiniDeer2_1
       rect:
         serializedVersion: 2
-        x: 39
+        x: 32
         y: 192
-        width: 18
-        height: 19
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -257,10 +257,10 @@ TextureImporter:
       name: MiniDeer2_2
       rect:
         serializedVersion: 2
-        x: 72
+        x: 64
         y: 192
-        width: 17
-        height: 18
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -279,10 +279,10 @@ TextureImporter:
       name: MiniDeer2_3
       rect:
         serializedVersion: 2
-        x: 104
+        x: 96
         y: 192
-        width: 17
-        height: 19
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -301,10 +301,10 @@ TextureImporter:
       name: MiniDeer2_4
       rect:
         serializedVersion: 2
-        x: 8
+        x: 0
         y: 160
-        width: 17
-        height: 21
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -323,10 +323,10 @@ TextureImporter:
       name: MiniDeer2_5
       rect:
         serializedVersion: 2
-        x: 36
-        y: 162
-        width: 21
-        height: 18
+        x: 32
+        y: 160
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -345,10 +345,10 @@ TextureImporter:
       name: MiniDeer2_6
       rect:
         serializedVersion: 2
-        x: 71
+        x: 64
         y: 160
-        width: 18
-        height: 19
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -367,10 +367,10 @@ TextureImporter:
       name: MiniDeer2_7
       rect:
         serializedVersion: 2
-        x: 103
+        x: 96
         y: 160
-        width: 18
-        height: 18
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -389,10 +389,10 @@ TextureImporter:
       name: MiniDeer2_8
       rect:
         serializedVersion: 2
-        x: 8
+        x: 0
         y: 128
-        width: 17
-        height: 22
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -411,10 +411,10 @@ TextureImporter:
       name: MiniDeer2_9
       rect:
         serializedVersion: 2
-        x: 39
+        x: 32
         y: 128
-        width: 18
-        height: 20
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -433,10 +433,10 @@ TextureImporter:
       name: MiniDeer2_10
       rect:
         serializedVersion: 2
-        x: 71
+        x: 64
         y: 128
-        width: 18
-        height: 17
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -455,10 +455,10 @@ TextureImporter:
       name: MiniDeer2_11
       rect:
         serializedVersion: 2
-        x: 8
+        x: 0
         y: 96
-        width: 17
-        height: 21
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -477,10 +477,10 @@ TextureImporter:
       name: MiniDeer2_12
       rect:
         serializedVersion: 2
-        x: 40
+        x: 32
         y: 96
-        width: 20
-        height: 22
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -499,10 +499,10 @@ TextureImporter:
       name: MiniDeer2_13
       rect:
         serializedVersion: 2
-        x: 72
+        x: 64
         y: 96
-        width: 20
-        height: 22
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -521,10 +521,10 @@ TextureImporter:
       name: MiniDeer2_14
       rect:
         serializedVersion: 2
-        x: 104
+        x: 96
         y: 96
-        width: 17
-        height: 21
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -543,10 +543,10 @@ TextureImporter:
       name: MiniDeer2_15
       rect:
         serializedVersion: 2
-        x: 136
+        x: 128
         y: 96
-        width: 17
-        height: 17
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -565,10 +565,10 @@ TextureImporter:
       name: MiniDeer2_16
       rect:
         serializedVersion: 2
-        x: 7
+        x: 0
         y: 64
-        width: 17
-        height: 18
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -587,10 +587,10 @@ TextureImporter:
       name: MiniDeer2_17
       rect:
         serializedVersion: 2
-        x: 38
+        x: 32
         y: 64
-        width: 19
-        height: 14
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -609,10 +609,10 @@ TextureImporter:
       name: MiniDeer2_18
       rect:
         serializedVersion: 2
-        x: 71
+        x: 64
         y: 64
-        width: 22
-        height: 18
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -631,10 +631,10 @@ TextureImporter:
       name: MiniDeer2_19
       rect:
         serializedVersion: 2
-        x: 104
+        x: 96
         y: 64
-        width: 18
-        height: 21
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -653,10 +653,10 @@ TextureImporter:
       name: MiniDeer2_20
       rect:
         serializedVersion: 2
-        x: 136
+        x: 128
         y: 64
-        width: 17
-        height: 21
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -675,10 +675,10 @@ TextureImporter:
       name: MiniDeer2_21
       rect:
         serializedVersion: 2
-        x: 168
+        x: 160
         y: 64
-        width: 16
-        height: 21
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -697,10 +697,10 @@ TextureImporter:
       name: MiniDeer2_22
       rect:
         serializedVersion: 2
-        x: 200
+        x: 192
         y: 64
-        width: 17
-        height: 17
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -719,10 +719,10 @@ TextureImporter:
       name: MiniDeer2_23
       rect:
         serializedVersion: 2
-        x: 5
+        x: 0
         y: 32
-        width: 18
-        height: 17
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -741,10 +741,10 @@ TextureImporter:
       name: MiniDeer2_24
       rect:
         serializedVersion: 2
-        x: 39
+        x: 32
         y: 32
-        width: 17
-        height: 19
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -763,10 +763,10 @@ TextureImporter:
       name: MiniDeer2_25
       rect:
         serializedVersion: 2
-        x: 8
-        y: 0
-        width: 18
-        height: 19
+        x: 96
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -785,10 +785,10 @@ TextureImporter:
       name: MiniDeer2_26
       rect:
         serializedVersion: 2
-        x: 40
-        y: 0
-        width: 20
-        height: 18
+        x: 128
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -807,10 +807,10 @@ TextureImporter:
       name: MiniDeer2_27
       rect:
         serializedVersion: 2
-        x: 71
-        y: 0
-        width: 25
-        height: 11
+        x: 160
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -829,10 +829,10 @@ TextureImporter:
       name: MiniDeer2_28
       rect:
         serializedVersion: 2
-        x: 103
-        y: 0
-        width: 25
-        height: 11
+        x: 192
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -847,11 +847,99 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: MiniDeer2_29
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d07528a91e48d28468ebd8149365d8d8
+      internalID: 1872431855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniDeer2_30
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33a5371e87cf3b74790e0cf1b0249516
+      internalID: 280451631
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniDeer2_31
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6b1924f41e2d3d04d913e8d16593baa6
+      internalID: -295747936
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniDeer2_32
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f691633350e7764caf3ddd8ccba9e15
+      internalID: -17489946
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 28b336edf2872af4b9d7de9768aa9084
     internalID: 0
     vertices: []
     indices: 
@@ -860,7 +948,40 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MiniDeer2_0: -7567519506061594918
+      MiniDeer2_1: 2457611332227647452
+      MiniDeer2_10: -7945785203976037144
+      MiniDeer2_11: -691622791154824385
+      MiniDeer2_12: 6110100344933338569
+      MiniDeer2_13: 6949049320556630257
+      MiniDeer2_14: 4385706747121007969
+      MiniDeer2_15: -2457768411910349450
+      MiniDeer2_16: -1755137356461761442
+      MiniDeer2_17: 3863999968059269400
+      MiniDeer2_18: 5495394011200417987
+      MiniDeer2_19: -805894885923520951
+      MiniDeer2_2: 2374727604155830926
+      MiniDeer2_20: 7221750855604817233
+      MiniDeer2_21: -4288322659961745641
+      MiniDeer2_22: -678201350874520821
+      MiniDeer2_23: 6335992454432428286
+      MiniDeer2_24: 6200811291770527290
+      MiniDeer2_25: -6347885440238932507
+      MiniDeer2_26: -6901092385189781910
+      MiniDeer2_27: -7888270352941964189
+      MiniDeer2_28: -5489048838487951769
+      MiniDeer2_29: 1872431855
+      MiniDeer2_3: -4321842938816164896
+      MiniDeer2_30: 280451631
+      MiniDeer2_31: -295747936
+      MiniDeer2_32: -17489946
+      MiniDeer2_4: -7266937306732563311
+      MiniDeer2_5: -5432908467803487994
+      MiniDeer2_6: -7107013933565579511
+      MiniDeer2_7: -8650825603535708697
+      MiniDeer2_8: 4484749101373575240
+      MiniDeer2_9: 7497904359953720568
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

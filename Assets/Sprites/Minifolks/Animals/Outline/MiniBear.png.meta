@@ -154,7 +154,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -192,7 +192,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -246,10 +246,10 @@ TextureImporter:
       name: MiniBear_0
       rect:
         serializedVersion: 2
-        x: 4
+        x: 0
         y: 224
-        width: 24
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -268,10 +268,10 @@ TextureImporter:
       name: MiniBear_1
       rect:
         serializedVersion: 2
-        x: 36
+        x: 32
         y: 224
-        width: 24
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -290,10 +290,10 @@ TextureImporter:
       name: MiniBear_2
       rect:
         serializedVersion: 2
-        x: 68
+        x: 64
         y: 224
-        width: 24
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -312,10 +312,10 @@ TextureImporter:
       name: MiniBear_3
       rect:
         serializedVersion: 2
-        x: 100
+        x: 96
         y: 224
-        width: 24
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -334,10 +334,10 @@ TextureImporter:
       name: MiniBear_4
       rect:
         serializedVersion: 2
-        x: 4
+        x: 0
         y: 192
-        width: 24
-        height: 15
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -356,10 +356,10 @@ TextureImporter:
       name: MiniBear_5
       rect:
         serializedVersion: 2
-        x: 33
+        x: 32
         y: 192
-        width: 27
-        height: 14
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -379,9 +379,9 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 194
-        width: 30
-        height: 12
+        y: 192
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -400,10 +400,10 @@ TextureImporter:
       name: MiniBear_7
       rect:
         serializedVersion: 2
-        x: 98
+        x: 96
         y: 192
-        width: 26
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -422,10 +422,10 @@ TextureImporter:
       name: MiniBear_8
       rect:
         serializedVersion: 2
-        x: 132
+        x: 128
         y: 192
-        width: 24
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -444,10 +444,10 @@ TextureImporter:
       name: MiniBear_9
       rect:
         serializedVersion: 2
-        x: 164
+        x: 160
         y: 192
-        width: 24
-        height: 15
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -466,10 +466,10 @@ TextureImporter:
       name: MiniBear_10
       rect:
         serializedVersion: 2
-        x: 4
+        x: 0
         y: 160
-        width: 24
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -488,10 +488,10 @@ TextureImporter:
       name: MiniBear_11
       rect:
         serializedVersion: 2
-        x: 34
+        x: 32
         y: 160
-        width: 26
-        height: 15
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -510,10 +510,10 @@ TextureImporter:
       name: MiniBear_12
       rect:
         serializedVersion: 2
-        x: 68
+        x: 64
         y: 160
-        width: 24
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -532,10 +532,10 @@ TextureImporter:
       name: MiniBear_13
       rect:
         serializedVersion: 2
-        x: 4
+        x: 0
         y: 128
-        width: 20
-        height: 14
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -554,10 +554,10 @@ TextureImporter:
       name: MiniBear_14
       rect:
         serializedVersion: 2
-        x: 36
+        x: 32
         y: 128
-        width: 20
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -576,10 +576,10 @@ TextureImporter:
       name: MiniBear_15
       rect:
         serializedVersion: 2
-        x: 69
+        x: 64
         y: 128
-        width: 24
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -598,10 +598,10 @@ TextureImporter:
       name: MiniBear_16
       rect:
         serializedVersion: 2
-        x: 101
+        x: 96
         y: 128
-        width: 25
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -620,10 +620,10 @@ TextureImporter:
       name: MiniBear_17
       rect:
         serializedVersion: 2
-        x: 133
+        x: 128
         y: 128
-        width: 22
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -642,10 +642,10 @@ TextureImporter:
       name: MiniBear_18
       rect:
         serializedVersion: 2
-        x: 164
+        x: 160
         y: 128
-        width: 24
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -664,10 +664,10 @@ TextureImporter:
       name: MiniBear_19
       rect:
         serializedVersion: 2
-        x: 3
+        x: 0
         y: 96
-        width: 23
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -686,10 +686,10 @@ TextureImporter:
       name: MiniBear_20
       rect:
         serializedVersion: 2
-        x: 37
+        x: 32
         y: 96
-        width: 24
-        height: 14
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -708,10 +708,10 @@ TextureImporter:
       name: MiniBear_21
       rect:
         serializedVersion: 2
-        x: 69
+        x: 64
         y: 96
-        width: 27
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -730,10 +730,10 @@ TextureImporter:
       name: MiniBear_22
       rect:
         serializedVersion: 2
-        x: 101
+        x: 96
         y: 96
-        width: 28
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -752,10 +752,10 @@ TextureImporter:
       name: MiniBear_23
       rect:
         serializedVersion: 2
-        x: 133
+        x: 128
         y: 96
-        width: 24
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -774,10 +774,10 @@ TextureImporter:
       name: MiniBear_24
       rect:
         serializedVersion: 2
-        x: 4
+        x: 0
         y: 64
-        width: 24
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -796,10 +796,10 @@ TextureImporter:
       name: MiniBear_25
       rect:
         serializedVersion: 2
-        x: 36
+        x: 32
         y: 64
-        width: 23
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -818,10 +818,10 @@ TextureImporter:
       name: MiniBear_26
       rect:
         serializedVersion: 2
-        x: 68
+        x: 64
         y: 64
-        width: 17
-        height: 21
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -840,10 +840,10 @@ TextureImporter:
       name: MiniBear_27
       rect:
         serializedVersion: 2
-        x: 99
+        x: 96
         y: 64
-        width: 16
-        height: 22
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -862,10 +862,10 @@ TextureImporter:
       name: MiniBear_28
       rect:
         serializedVersion: 2
-        x: 131
+        x: 128
         y: 64
-        width: 16
-        height: 22
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -884,10 +884,10 @@ TextureImporter:
       name: MiniBear_29
       rect:
         serializedVersion: 2
-        x: 163
+        x: 160
         y: 64
-        width: 16
-        height: 22
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -906,10 +906,10 @@ TextureImporter:
       name: MiniBear_30
       rect:
         serializedVersion: 2
-        x: 195
+        x: 192
         y: 64
-        width: 16
-        height: 22
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -928,10 +928,10 @@ TextureImporter:
       name: MiniBear_31
       rect:
         serializedVersion: 2
-        x: 227
+        x: 224
         y: 64
-        width: 16
-        height: 22
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -950,10 +950,10 @@ TextureImporter:
       name: MiniBear_32
       rect:
         serializedVersion: 2
-        x: 260
+        x: 256
         y: 64
-        width: 23
-        height: 16
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -972,10 +972,10 @@ TextureImporter:
       name: MiniBear_33
       rect:
         serializedVersion: 2
-        x: 292
+        x: 288
         y: 64
-        width: 24
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -994,10 +994,10 @@ TextureImporter:
       name: MiniBear_34
       rect:
         serializedVersion: 2
-        x: 2
+        x: 0
         y: 32
-        width: 23
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1016,10 +1016,10 @@ TextureImporter:
       name: MiniBear_35
       rect:
         serializedVersion: 2
-        x: 35
+        x: 32
         y: 32
-        width: 24
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1038,10 +1038,10 @@ TextureImporter:
       name: MiniBear_36
       rect:
         serializedVersion: 2
-        x: 5
-        y: 0
-        width: 24
-        height: 13
+        x: 64
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1060,10 +1060,10 @@ TextureImporter:
       name: MiniBear_37
       rect:
         serializedVersion: 2
-        x: 38
-        y: 0
-        width: 25
-        height: 12
+        x: 96
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1082,10 +1082,10 @@ TextureImporter:
       name: MiniBear_38
       rect:
         serializedVersion: 2
-        x: 68
+        x: 0
         y: 0
-        width: 29
-        height: 8
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1104,10 +1104,10 @@ TextureImporter:
       name: MiniBear_39
       rect:
         serializedVersion: 2
-        x: 101
+        x: 32
         y: 0
-        width: 27
-        height: 9
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -1122,11 +1122,55 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: MiniBear_40
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eb28a902847856f4bb2f53a93407aa22
+      internalID: -790953462
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniBear_41
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a056c67193c241748becea2991984f30
+      internalID: 1991203842
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: da2a3168b007f2a4ab970fba03af0be0
     internalID: 0
     vertices: []
     indices: 
@@ -1135,7 +1179,49 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MiniBear_0: -3180414583539082415
+      MiniBear_1: -7709178835008333879
+      MiniBear_10: -6340898498420949937
+      MiniBear_11: 3480432895788475145
+      MiniBear_12: -5470831758064067698
+      MiniBear_13: -584858750305194922
+      MiniBear_14: -4571960576383398362
+      MiniBear_15: -8790200143403477518
+      MiniBear_16: 1953136796782178926
+      MiniBear_17: 1588161173331588922
+      MiniBear_18: 8577510574224684060
+      MiniBear_19: -4141263094121828052
+      MiniBear_2: 4935225088582502738
+      MiniBear_20: 6345316679734156074
+      MiniBear_21: -8528916382996830815
+      MiniBear_22: -7405922404195455560
+      MiniBear_23: 2209914687278961771
+      MiniBear_24: 435579170892901410
+      MiniBear_25: 998470276740744079
+      MiniBear_26: -5657523761692438313
+      MiniBear_27: -1373316823930240706
+      MiniBear_28: -7451370315902259642
+      MiniBear_29: -1820154042793284617
+      MiniBear_3: -7167525312435917624
+      MiniBear_30: -7216989644001220332
+      MiniBear_31: -6591271094673874484
+      MiniBear_32: -7027229346796007951
+      MiniBear_33: -4942694107889773621
+      MiniBear_34: 5462156562045571442
+      MiniBear_35: -1611306630459194121
+      MiniBear_36: -2833312936823449233
+      MiniBear_37: -4118328603078290380
+      MiniBear_38: 7734943224149244285
+      MiniBear_39: 5625749463966857656
+      MiniBear_4: -2525822303413609604
+      MiniBear_40: -790953462
+      MiniBear_41: 1991203842
+      MiniBear_5: 5172519014536631715
+      MiniBear_6: -9207360035905002825
+      MiniBear_7: -2379428253008048106
+      MiniBear_8: 2427151663176515220
+      MiniBear_9: 3939183701221955614
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -100,7 +100,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -138,7 +138,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -192,10 +192,10 @@ TextureImporter:
       name: MiniBoar_0
       rect:
         serializedVersion: 2
-        x: 6
+        x: 0
         y: 160
-        width: 20
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -214,10 +214,10 @@ TextureImporter:
       name: MiniBoar_1
       rect:
         serializedVersion: 2
-        x: 39
+        x: 32
         y: 160
-        width: 19
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -236,10 +236,10 @@ TextureImporter:
       name: MiniBoar_2
       rect:
         serializedVersion: 2
-        x: 70
+        x: 64
         y: 160
-        width: 20
-        height: 11
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -258,10 +258,10 @@ TextureImporter:
       name: MiniBoar_3
       rect:
         serializedVersion: 2
-        x: 102
+        x: 96
         y: 160
-        width: 20
-        height: 11
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -280,10 +280,10 @@ TextureImporter:
       name: MiniBoar_4
       rect:
         serializedVersion: 2
-        x: 6
+        x: 0
         y: 128
-        width: 20
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -302,10 +302,10 @@ TextureImporter:
       name: MiniBoar_5
       rect:
         serializedVersion: 2
-        x: 38
+        x: 32
         y: 128
-        width: 20
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -324,10 +324,10 @@ TextureImporter:
       name: MiniBoar_6
       rect:
         serializedVersion: 2
-        x: 71
+        x: 64
         y: 128
-        width: 19
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -346,10 +346,10 @@ TextureImporter:
       name: MiniBoar_7
       rect:
         serializedVersion: 2
-        x: 102
+        x: 96
         y: 128
-        width: 20
-        height: 11
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -368,10 +368,10 @@ TextureImporter:
       name: MiniBoar_8
       rect:
         serializedVersion: 2
-        x: 6
+        x: 0
         y: 96
-        width: 20
-        height: 14
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -390,10 +390,10 @@ TextureImporter:
       name: MiniBoar_9
       rect:
         serializedVersion: 2
-        x: 39
+        x: 32
         y: 96
-        width: 19
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -412,10 +412,10 @@ TextureImporter:
       name: MiniBoar_10
       rect:
         serializedVersion: 2
-        x: 70
+        x: 64
         y: 96
-        width: 20
-        height: 10
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -434,10 +434,10 @@ TextureImporter:
       name: MiniBoar_11
       rect:
         serializedVersion: 2
-        x: 5
+        x: 0
         y: 64
-        width: 19
-        height: 11
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -456,10 +456,10 @@ TextureImporter:
       name: MiniBoar_12
       rect:
         serializedVersion: 2
-        x: 39
+        x: 32
         y: 64
-        width: 22
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -478,10 +478,10 @@ TextureImporter:
       name: MiniBoar_13
       rect:
         serializedVersion: 2
-        x: 72
+        x: 64
         y: 64
-        width: 21
-        height: 14
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -500,10 +500,10 @@ TextureImporter:
       name: MiniBoar_14
       rect:
         serializedVersion: 2
-        x: 103
+        x: 96
         y: 64
-        width: 22
-        height: 14
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -522,10 +522,10 @@ TextureImporter:
       name: MiniBoar_15
       rect:
         serializedVersion: 2
-        x: 134
+        x: 128
         y: 64
-        width: 21
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -544,10 +544,10 @@ TextureImporter:
       name: MiniBoar_16
       rect:
         serializedVersion: 2
-        x: 5
+        x: 0
         y: 32
-        width: 18
-        height: 11
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -566,10 +566,10 @@ TextureImporter:
       name: MiniBoar_17
       rect:
         serializedVersion: 2
-        x: 37
+        x: 32
         y: 32
-        width: 19
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -588,10 +588,10 @@ TextureImporter:
       name: MiniBoar_18
       rect:
         serializedVersion: 2
-        x: 7
-        y: 0
-        width: 20
-        height: 12
+        x: 96
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -610,10 +610,10 @@ TextureImporter:
       name: MiniBoar_19
       rect:
         serializedVersion: 2
-        x: 40
+        x: 0
         y: 0
-        width: 20
-        height: 11
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -632,10 +632,10 @@ TextureImporter:
       name: MiniBoar_20
       rect:
         serializedVersion: 2
-        x: 71
+        x: 32
         y: 0
-        width: 25
-        height: 8
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -654,10 +654,10 @@ TextureImporter:
       name: MiniBoar_21
       rect:
         serializedVersion: 2
-        x: 104
+        x: 64
         y: 0
-        width: 23
-        height: 8
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -672,11 +672,33 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: MiniBoar_22
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cc44d07a82ba81a40a45737e7dc0ef95
+      internalID: -912819293
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: e7c3082b8e55a3c4dbaea0f6ba4d640b
     internalID: 0
     vertices: []
     indices: 
@@ -685,7 +707,30 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MiniBoar_0: -7672354863234207010
+      MiniBoar_1: 3481569618965902905
+      MiniBoar_10: 8202800113622734110
+      MiniBoar_11: 6537579238732839967
+      MiniBoar_12: -5944359786020868542
+      MiniBoar_13: -3610267396622823303
+      MiniBoar_14: -5400500386182608394
+      MiniBoar_15: -8044176204105586288
+      MiniBoar_16: -2868795883446100871
+      MiniBoar_17: 3726124962400913850
+      MiniBoar_18: 727771401640785436
+      MiniBoar_19: -4101316412423572533
+      MiniBoar_2: -5742449975016222909
+      MiniBoar_20: 286548503628062830
+      MiniBoar_21: 7131773927902854608
+      MiniBoar_22: -912819293
+      MiniBoar_3: -955450440787631540
+      MiniBoar_4: -4299158127702293525
+      MiniBoar_5: -7449739053691664506
+      MiniBoar_6: 8342606506207337448
+      MiniBoar_7: -8468128079830325608
+      MiniBoar_8: 1759345105594861501
+      MiniBoar_9: 6543427238879986710
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

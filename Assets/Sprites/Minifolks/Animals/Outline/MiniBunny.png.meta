@@ -73,7 +73,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -111,7 +111,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -165,10 +165,10 @@ TextureImporter:
       name: MiniBunny_0
       rect:
         serializedVersion: 2
-        x: 9
+        x: 0
         y: 96
-        width: 14
-        height: 10
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -187,10 +187,10 @@ TextureImporter:
       name: MiniBunny_1
       rect:
         serializedVersion: 2
-        x: 41
+        x: 32
         y: 96
-        width: 14
-        height: 10
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -209,10 +209,10 @@ TextureImporter:
       name: MiniBunny_2
       rect:
         serializedVersion: 2
-        x: 73
+        x: 64
         y: 96
-        width: 14
-        height: 9
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -231,10 +231,10 @@ TextureImporter:
       name: MiniBunny_3
       rect:
         serializedVersion: 2
-        x: 105
+        x: 96
         y: 96
-        width: 14
-        height: 10
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -253,10 +253,10 @@ TextureImporter:
       name: MiniBunny_4
       rect:
         serializedVersion: 2
-        x: 9
+        x: 0
         y: 64
-        width: 14
-        height: 11
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -275,10 +275,10 @@ TextureImporter:
       name: MiniBunny_5
       rect:
         serializedVersion: 2
-        x: 41
+        x: 32
         y: 64
-        width: 14
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -297,10 +297,10 @@ TextureImporter:
       name: MiniBunny_6
       rect:
         serializedVersion: 2
-        x: 72
-        y: 65
-        width: 15
-        height: 10
+        x: 64
+        y: 64
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -319,10 +319,10 @@ TextureImporter:
       name: MiniBunny_7
       rect:
         serializedVersion: 2
-        x: 105
+        x: 96
         y: 64
-        width: 14
-        height: 10
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -341,10 +341,10 @@ TextureImporter:
       name: MiniBunny_8
       rect:
         serializedVersion: 2
-        x: 8
+        x: 0
         y: 32
-        width: 13
-        height: 10
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -363,10 +363,10 @@ TextureImporter:
       name: MiniBunny_9
       rect:
         serializedVersion: 2
-        x: 41
+        x: 32
         y: 32
-        width: 13
-        height: 10
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -385,10 +385,10 @@ TextureImporter:
       name: MiniBunny_10
       rect:
         serializedVersion: 2
-        x: 10
-        y: 0
-        width: 14
-        height: 11
+        x: 96
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -407,10 +407,10 @@ TextureImporter:
       name: MiniBunny_11
       rect:
         serializedVersion: 2
-        x: 43
+        x: 0
         y: 0
-        width: 15
-        height: 8
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -429,10 +429,10 @@ TextureImporter:
       name: MiniBunny_12
       rect:
         serializedVersion: 2
-        x: 75
+        x: 32
         y: 0
-        width: 15
-        height: 7
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -447,11 +447,33 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: MiniBunny_13
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0fdab2c236a97f4eb7af8e132111999
+      internalID: -755359154
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 6621665233eca5445a046edaaf8920f7
     internalID: 0
     vertices: []
     indices: 
@@ -460,7 +482,21 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MiniBunny_0: -8409896356631971127
+      MiniBunny_1: 6340854045952114295
+      MiniBunny_10: 1832738086374257141
+      MiniBunny_11: 7423623430616792180
+      MiniBunny_12: -5823696152991409327
+      MiniBunny_13: -755359154
+      MiniBunny_2: -5890350062026976563
+      MiniBunny_3: 2378790814981357269
+      MiniBunny_4: 8393320737649327471
+      MiniBunny_5: -6370912538983481630
+      MiniBunny_6: 4336470574735252164
+      MiniBunny_7: -1794002976782826625
+      MiniBunny_8: 7298635056369984049
+      MiniBunny_9: 5312301222329523875
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

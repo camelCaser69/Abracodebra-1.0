@@ -106,7 +106,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -144,7 +144,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 2
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -198,10 +198,10 @@ TextureImporter:
       name: MiniFox_0
       rect:
         serializedVersion: 2
-        x: 7
+        x: 0
         y: 160
-        width: 18
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -220,10 +220,10 @@ TextureImporter:
       name: MiniFox_1
       rect:
         serializedVersion: 2
-        x: 37
+        x: 32
         y: 160
-        width: 20
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -242,10 +242,10 @@ TextureImporter:
       name: MiniFox_2
       rect:
         serializedVersion: 2
-        x: 70
+        x: 64
         y: 160
-        width: 19
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -264,10 +264,10 @@ TextureImporter:
       name: MiniFox_3
       rect:
         serializedVersion: 2
-        x: 103
+        x: 96
         y: 160
-        width: 18
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -286,10 +286,10 @@ TextureImporter:
       name: MiniFox_4
       rect:
         serializedVersion: 2
-        x: 5
-        y: 128
-        width: 20
-        height: 14
+        x: 128
+        y: 160
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -308,10 +308,10 @@ TextureImporter:
       name: MiniFox_5
       rect:
         serializedVersion: 2
-        x: 36
-        y: 129
-        width: 21
-        height: 13
+        x: 0
+        y: 128
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -330,10 +330,10 @@ TextureImporter:
       name: MiniFox_6
       rect:
         serializedVersion: 2
-        x: 69
+        x: 32
         y: 128
-        width: 20
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -352,10 +352,10 @@ TextureImporter:
       name: MiniFox_7
       rect:
         serializedVersion: 2
-        x: 102
+        x: 64
         y: 128
-        width: 19
-        height: 12
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -374,10 +374,10 @@ TextureImporter:
       name: MiniFox_8
       rect:
         serializedVersion: 2
-        x: 5
-        y: 96
-        width: 20
-        height: 15
+        x: 96
+        y: 128
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -396,10 +396,10 @@ TextureImporter:
       name: MiniFox_9
       rect:
         serializedVersion: 2
-        x: 37
-        y: 96
-        width: 20
-        height: 14
+        x: 128
+        y: 128
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -418,10 +418,10 @@ TextureImporter:
       name: MiniFox_10
       rect:
         serializedVersion: 2
-        x: 69
+        x: 0
         y: 96
-        width: 20
-        height: 11
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -440,10 +440,10 @@ TextureImporter:
       name: MiniFox_11
       rect:
         serializedVersion: 2
-        x: 6
-        y: 64
-        width: 18
-        height: 13
+        x: 32
+        y: 96
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -462,10 +462,10 @@ TextureImporter:
       name: MiniFox_12
       rect:
         serializedVersion: 2
-        x: 37
-        y: 64
-        width: 18
-        height: 11
+        x: 64
+        y: 96
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -484,10 +484,10 @@ TextureImporter:
       name: MiniFox_13
       rect:
         serializedVersion: 2
-        x: 70
-        y: 64
-        width: 21
-        height: 13
+        x: 96
+        y: 96
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -506,10 +506,10 @@ TextureImporter:
       name: MiniFox_14
       rect:
         serializedVersion: 2
-        x: 103
-        y: 64
-        width: 20
-        height: 13
+        x: 128
+        y: 96
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -528,10 +528,10 @@ TextureImporter:
       name: MiniFox_15
       rect:
         serializedVersion: 2
-        x: 121
-        y: 67
-        width: 6
-        height: 9
+        x: 0
+        y: 64
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -550,10 +550,10 @@ TextureImporter:
       name: MiniFox_16
       rect:
         serializedVersion: 2
-        x: 136
+        x: 32
         y: 64
-        width: 24
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -572,10 +572,10 @@ TextureImporter:
       name: MiniFox_17
       rect:
         serializedVersion: 2
-        x: 168
+        x: 64
         y: 64
-        width: 19
-        height: 13
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -594,10 +594,10 @@ TextureImporter:
       name: MiniFox_18
       rect:
         serializedVersion: 2
-        x: 4
-        y: 32
-        width: 20
-        height: 13
+        x: 96
+        y: 64
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -616,10 +616,10 @@ TextureImporter:
       name: MiniFox_19
       rect:
         serializedVersion: 2
-        x: 38
-        y: 32
-        width: 19
-        height: 11
+        x: 128
+        y: 64
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -638,10 +638,10 @@ TextureImporter:
       name: MiniFox_20
       rect:
         serializedVersion: 2
-        x: 6
-        y: 0
-        width: 20
-        height: 13
+        x: 160
+        y: 64
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -660,10 +660,10 @@ TextureImporter:
       name: MiniFox_21
       rect:
         serializedVersion: 2
-        x: 39
-        y: 0
-        width: 21
-        height: 10
+        x: 0
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -682,10 +682,10 @@ TextureImporter:
       name: MiniFox_22
       rect:
         serializedVersion: 2
-        x: 72
-        y: 0
-        width: 22
-        height: 8
+        x: 32
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -704,10 +704,10 @@ TextureImporter:
       name: MiniFox_23
       rect:
         serializedVersion: 2
-        x: 103
-        y: 0
-        width: 23
-        height: 7
+        x: 64
+        y: 32
+        width: 32
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -722,11 +722,165 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: MiniFox_24
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1373824c18ba2e440a3630a2bac90592
+      internalID: 1416151895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniFox_25
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 06d30112d384d9249849ac3a255de44e
+      internalID: -51641310
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniFox_26
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9551992359628074c867959e4d8e6da8
+      internalID: 1795548152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniFox_27
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 21a834a873f1637448218ba0963b92fe
+      internalID: 175041520
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniFox_28
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 081a98b6a983a2444b4b34590838c4d7
+      internalID: -945731538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniFox_29
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b309dbf12d06acb499b415ca3db3945b
+      internalID: 1848486211
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: MiniFox_30
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7647accebd249894e996c540ea647d23
+      internalID: -1208291896
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: fa41e68ecd035f44793b450f6109c9fe
     internalID: 0
     vertices: []
     indices: 
@@ -735,7 +889,38 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      MiniFox_0: 7623300613404548461
+      MiniFox_1: -8789393864153554043
+      MiniFox_10: -6163836534053454643
+      MiniFox_11: 6085903496312592877
+      MiniFox_12: -7614972397356156423
+      MiniFox_13: 401904078112628206
+      MiniFox_14: 2039237447929110003
+      MiniFox_15: 8586038524228481210
+      MiniFox_16: 187318973173659711
+      MiniFox_17: 3127436183925744887
+      MiniFox_18: 3548961012202574203
+      MiniFox_19: -203706587689249598
+      MiniFox_2: -7300987024422333479
+      MiniFox_20: 8706754219153841207
+      MiniFox_21: -5228021086106961641
+      MiniFox_22: 5024691380427325975
+      MiniFox_23: 38208471515682116
+      MiniFox_24: 1416151895
+      MiniFox_25: -51641310
+      MiniFox_26: 1795548152
+      MiniFox_27: 175041520
+      MiniFox_28: -945731538
+      MiniFox_29: 1848486211
+      MiniFox_3: 7560568738027897082
+      MiniFox_30: -1208291896
+      MiniFox_4: 1673437344201228141
+      MiniFox_5: 7323644670389585681
+      MiniFox_6: -8114439344399679727
+      MiniFox_7: 1293509883166666206
+      MiniFox_8: -3998831353902109160
+      MiniFox_9: -1100748744157176202
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
