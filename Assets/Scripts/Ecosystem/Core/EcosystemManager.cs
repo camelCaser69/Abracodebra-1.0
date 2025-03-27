@@ -26,16 +26,19 @@ namespace Ecosystem
         [Header("Population Settings")]
         public int maxHerbivores = 15;
         public int maxCarnivores = 5;
+        public int maxOmnivores = 8;
         public int maxPlants = 20;
         
         [Header("Spawner Settings")]
         public GameObject[] herbivorePrefabs;
         public GameObject[] carnivorePrefabs;
+        public GameObject[] omnivorePrefabs;
         public GameObject[] plantPrefabs;
         
         [Header("Spawning Probabilities")]
         [Range(0f, 1f)] public float herbivoreSpawnChance = 0.3f;
         [Range(0f, 1f)] public float carnivoreSpawnChance = 0.1f;
+        [Range(0f, 1f)] public float omnivoreSpawnChance = 0.15f;
         [Range(0f, 1f)] public float plantSpawnChance = 0.2f;
         
         [Header("UI Elements")]
@@ -46,6 +49,7 @@ namespace Ecosystem
         private float dayTimer = 0f;
         private int herbivoreCount = 0;
         private int carnivoreCount = 0;
+        private int omnivoreCount = 0;
         private int plantCount = 0;
         private float nextSpawnCheckTime = 0f;
         
@@ -177,6 +181,12 @@ namespace Ecosystem
             {
                 SpawnRandomCarnivore();
             }
+            
+            // Add after the carnivore spawning check
+            if (omnivoreCount < maxOmnivores && Random.value < omnivoreSpawnChance)
+            {
+                SpawnRandomOmnivore();
+            }
         }
         
         private void CountExistingEntities()
@@ -188,6 +198,7 @@ namespace Ecosystem
             // Count by type
             herbivoreCount = 0;
             carnivoreCount = 0;
+            omnivoreCount = 0;
             
             foreach (var animal in allAnimals)
             {
@@ -196,6 +207,8 @@ namespace Ecosystem
                 if (animal.animalType == AnimalType.Herbivore)
                     herbivoreCount++;
                 else if (animal.animalType == AnimalType.Carnivore)
+                    carnivoreCount++;
+                else if (animal.animalType == AnimalType.Omnivore)
                     carnivoreCount++;
             }
             
@@ -271,6 +284,32 @@ namespace Ecosystem
             }
             
             return carnivoreObj;
+        }
+        
+        public GameObject SpawnRandomOmnivore()
+        {
+            if (omnivorePrefabs == null || omnivorePrefabs.Length == 0)
+            {
+                Debug.LogWarning("No omnivore prefabs assigned to EcosystemManager");
+                return null;
+            }
+    
+            // Pick a random omnivore prefab
+            GameObject prefab = omnivorePrefabs[Random.Range(0, omnivorePrefabs.Length)];
+    
+            // Spawn at random position within world bounds
+            Vector3 spawnPos = GetRandomSpawnPosition();
+            GameObject omnivoreObj = Instantiate(prefab, spawnPos, Quaternion.identity);
+    
+            // Get animal component
+            Animal animal = omnivoreObj.GetComponent<Animal>();
+            if (animal != null)
+            {
+                allAnimals.Add(animal);
+                RandomizeAnimalPersonality(animal);
+            }
+    
+            return omnivoreObj;
         }
         
         public GameObject SpawnRandomPlant()

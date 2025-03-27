@@ -165,7 +165,7 @@ MonoBehaviour:
   - {fileID: 8982947048272063882, guid: 9838d74874e76024ca01e8e531645f18, type: 3}
   herbivoreSpawnChance: 0.3
   carnivoreSpawnChance: 0.1
-  plantSpawnChance: 0.2
+  plantSpawnChance: 0
   dayCounterText: {fileID: 603935727}
   populationText: {fileID: 1300960458}
 --- !u!4 &6033974
