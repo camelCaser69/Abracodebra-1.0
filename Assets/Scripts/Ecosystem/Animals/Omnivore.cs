@@ -16,18 +16,14 @@ namespace Ecosystem
         [Header("Diet Preferences")]
         [Range(0f, 1f)] public float meatPreference = 0.5f;     // Preference for meat over plants/seeds
         [Range(0f, 1f)] public float insectPreference = 0.7f;   // Preference for insects over other food
-        public float seedNutritionValue = 10f;                  // Nutrition from eating seeds
-        public float insectNutritionValue = 15f;                // Nutrition from eating insects
-        public float preyNutritionValue = 25f;                  // Nutrition from eating small prey
         
-        [Header("Targeting Preferences")]
-        public string[] preyTags = { "Insect", "SmallPrey" };  
-        public string[] seedTags = { "Seed", "Fruit" };
-        public string[] predatorTags = { "LargePredator" };
+        [Header("Targeting")]
+        public float attackCooldown = 1.5f;         // Seconds between attacks
         
         // Private state variables
-        private GameObject nearestPrey;
-        private GameObject nearestSeed;
+        private GameObject nearestHerbivore;
+        private GameObject nearestPlant;
+        private GameObject nearestInsect;
         private GameObject nearestPredator;
         private Vector3 moveTarget;
         private float moveTimer = 0f;
@@ -36,6 +32,8 @@ namespace Ecosystem
         private GameObject perchTarget;
         private bool hasNest = false;
         private Vector3 nestLocation;
+        private float lastAttackTime = -10f;
+        private int seedDispersalCount = 0;
         
         protected override void Awake()
         {
@@ -91,17 +89,7 @@ namespace Ecosystem
         protected override void CheckStateTransitions()
         {
             // Check for predators first - highest priority
-            nearestPredator = FindNearestOfTags(predatorTags);
-            if (nearestPredator != null && 
-                Vector3.Distance(transform.position, nearestPredator.transform.position) < senseRadius)
-            {
-                if (currentState != BehaviorState.Fleeing)
-                {
-                    ChangeState(BehaviorState.Fleeing);
-                    AddMemory($"Fled from predator {nearestPredator.name}");
-                    return;
-                }
-            }
+            CheckForPredators();
             
             // Look for food based on hunger and preferences
             if (IsHungry())
@@ -109,29 +97,54 @@ namespace Ecosystem
                 // Determine food preferences based on hunger level and innate preferences
                 float meatUrgency = meatPreference * (currentHunger / maxHunger);
                 float insectUrgency = insectPreference * (currentHunger / maxHunger);
-                float seedUrgency = (1f - meatPreference) * (currentHunger / maxHunger);
+                float plantUrgency = (1f - meatPreference) * (currentHunger / maxHunger);
                 
                 // Find potential food sources
-                nearestPrey = FindNearestOfTags(preyTags);
-                nearestSeed = FindNearestOfTags(seedTags);
+                nearestInsect = FindNearestInsect();
+                nearestPlant = FindNearestPlantFood();
+                nearestHerbivore = FindNearestSmallHerbivore();
                 
                 // Choose target based on preferences and availability
-                if (nearestPrey != null && (meatUrgency > seedUrgency || nearestSeed == null))
+                GameObject foodTarget = null;
+                
+                // Check for insects first if preference is high
+                if (nearestInsect != null && insectUrgency > meatUrgency && insectUrgency > plantUrgency)
                 {
-                    if (currentState != BehaviorState.Hunting)
-                    {
-                        currentTarget = nearestPrey;
-                        ChangeState(BehaviorState.Hunting);
-                        return;
-                    }
+                    foodTarget = nearestInsect;
                 }
-                else if (nearestSeed != null)
+                // Check for herbivores next if meat preference is high and we're very hungry
+                else if (nearestHerbivore != null && meatUrgency > plantUrgency && IsStarving())
                 {
-                    if (currentState != BehaviorState.Seeking)
+                    foodTarget = nearestHerbivore;
+                }
+                // Fall back to plants
+                else if (nearestPlant != null)
+                {
+                    foodTarget = nearestPlant;
+                }
+                
+                // Transition to hunting or seeking based on the food
+                if (foodTarget != null)
+                {
+                    currentTarget = foodTarget;
+                    
+                    // If targeting animal, go to hunting state
+                    if (foodTarget == nearestHerbivore || foodTarget == nearestInsect)
                     {
-                        currentTarget = nearestSeed;
-                        ChangeState(BehaviorState.Seeking);
-                        return;
+                        if (currentState != BehaviorState.Hunting)
+                        {
+                            ChangeState(BehaviorState.Hunting);
+                            return;
+                        }
+                    }
+                    // If targeting plant, go to seeking state
+                    else
+                    {
+                        if (currentState != BehaviorState.Seeking)
+                        {
+                            ChangeState(BehaviorState.Seeking);
+                            return;
+                        }
                     }
                 }
                 else if (currentState != BehaviorState.Seeking && currentState != BehaviorState.Hunting)
@@ -181,7 +194,7 @@ namespace Ecosystem
                     break;
                     
                 case BehaviorState.Seeking:
-                    // Found seeds, transition to feeding
+                    // Found target, transition to feeding
                     if (currentTarget != null && 
                         Vector3.Distance(transform.position, currentTarget.transform.position) < 1f)
                     {
@@ -247,6 +260,45 @@ namespace Ecosystem
                         return;
                     }
                     break;
+            }
+        }
+
+        private void CheckForPredators()
+        {
+            // Find predators using colliders
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, senseRadius);
+            
+            float closestDistance = senseRadius;
+            nearestPredator = null;
+            
+            foreach (Collider2D collider in colliders)
+            {
+                // Skip self
+                if (collider.gameObject == gameObject)
+                    continue;
+                    
+                Animal potentialPredator = collider.GetComponent<Animal>();
+                if (potentialPredator != null && potentialPredator.animalType == AnimalType.Carnivore)
+                {
+                    float distance = Vector2.Distance(transform.position, collider.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        nearestPredator = collider.gameObject;
+                        closestDistance = distance;
+                    }
+                }
+            }
+            
+            // If predator detected and currently not fleeing, start fleeing
+            if (nearestPredator != null && closestDistance < senseRadius * 0.7f && 
+                currentState != BehaviorState.Fleeing)
+            {
+                // Chance to flee based on fearfulness
+                if (Random.value < Fearfulness)
+                {
+                    ChangeState(BehaviorState.Fleeing);
+                    AddMemory($"Fled from predator {nearestPredator.name}");
+                }
             }
         }
         
@@ -357,17 +409,23 @@ namespace Ecosystem
                 MoveToward(randomMoveTarget, speed);
                 
                 // Look for food while moving
-                nearestPrey = FindNearestOfTags(preyTags);
-                nearestSeed = FindNearestOfTags(seedTags);
+                nearestInsect = FindNearestInsect();
+                nearestPlant = FindNearestPlantFood();
+                nearestHerbivore = FindNearestSmallHerbivore();
                 
-                if (nearestPrey != null && meatPreference > 0.5f)
+                if (nearestInsect != null && insectPreference > 0.5f)
                 {
-                    currentTarget = nearestPrey;
+                    currentTarget = nearestInsect;
                     ChangeState(BehaviorState.Hunting);
                 }
-                else if (nearestSeed != null)
+                else if (nearestHerbivore != null && meatPreference > 0.7f && IsStarving())
                 {
-                    currentTarget = nearestSeed;
+                    currentTarget = nearestHerbivore;
+                    ChangeState(BehaviorState.Hunting);
+                }
+                else if (nearestPlant != null)
+                {
+                    currentTarget = nearestPlant;
                 }
             }
         }
@@ -378,33 +436,43 @@ namespace Ecosystem
             {
                 float distanceToTarget = Vector3.Distance(transform.position, currentTarget.transform.position);
                 
-                if (distanceToTarget < 1f)
+                if (distanceToTarget < 1f && Time.time > lastAttackTime + attackCooldown)
                 {
                     // Attack the prey
-                    // Get prey animal component if it exists
+                    lastAttackTime = Time.time;
+                    
+                    // For insects, immediate consumption
                     Animal targetAnimal = currentTarget.GetComponent<Animal>();
-                    if (targetAnimal != null && targetAnimal.animalType == AnimalType.Herbivore)
+                    if (targetAnimal != null && targetAnimal.animalType == AnimalType.Insect)
                     {
-                        // Only attack if it's smaller (we'll use a simple check based on if it's a smaller herbivore)
-                        targetAnimal.TakeDamage(attackDamage);
+                        // Get nutrition from the insect
+                        float nutrition = GetNutritionFromTarget(currentTarget);
+                        Eat(nutrition);
                         
-                        // If prey is dead, start feeding
-                        if (targetAnimal.currentHealth <= 0)
-                        {
-                            AddMemory($"Successfully caught prey: {targetAnimal.animalName}");
-                            ChangeState(BehaviorState.Feeding);
-                            return;
-                        }
-                    }
-                    else if (currentTarget.CompareTag("Insect"))
-                    {
-                        // For insects, immediate consumption
-                        Eat(insectNutritionValue);
                         AddMemory("Caught and ate an insect");
                         Destroy(currentTarget); // Remove the insect
                         currentTarget = null;
                         ChangeState(BehaviorState.Idle);
                         return;
+                    }
+                    
+                    // For small herbivores, attack
+                    if (targetAnimal != null && targetAnimal.animalType == AnimalType.Herbivore)
+                    {
+                        // Only attack if it's smaller (lower max health)
+                        if (targetAnimal.maxHealth < maxHealth * 0.7f)
+                        {
+                            // Deal damage based on omnivore's capabilities
+                            targetAnimal.TakeDamage(attackDamage);
+                            
+                            // If prey is dead, start feeding
+                            if (targetAnimal.currentHealth <= 0)
+                            {
+                                AddMemory($"Successfully caught prey: {targetAnimal.animalName}");
+                                ChangeState(BehaviorState.Feeding);
+                                return;
+                            }
+                        }
                     }
                 }
                 else
@@ -440,46 +508,51 @@ namespace Ecosystem
         {
             if (currentTarget != null)
             {
-                // Different feeding behavior based on food type
-                if (currentTarget.CompareTag("Seed") || currentTarget.CompareTag("Fruit"))
+                // Check what type of target we're feeding on
+                PlantPart plantPart = currentTarget.GetComponent<PlantPart>();
+                if (plantPart != null)
                 {
-                    // Eat seeds/fruit
-                    Eat(seedNutritionValue * Time.deltaTime);
+                    // Start the eating process
+                    plantPart.StartEating(this);
                     
-                    // Damage the plant part if applicable
-                    PlantPart plantPart = currentTarget.GetComponent<PlantPart>();
-                    if (plantPart != null)
+                    // Get nutrition from the plant part
+                    float nutritionGained = plantPart.GetNutritionalValue() * Time.deltaTime;
+                    Eat(nutritionGained);
+                    
+                    // Handle seed dispersal if eating fruit
+                    if (plantPart.partType == PlantPartType.Fruit && Random.value < 0.05f)
                     {
-                        plantPart.TakeDamage(5f * Time.deltaTime);
+                        AddMemory("Dispersed seeds from fruit");
+                        seedDispersalCount++;
                         
-                        // Potentially disperse seeds
-                        if (plantPart.partType == PlantPartType.Fruit && Random.value < 0.1f)
-                        {
-                            AddMemory("Dispersed seeds from fruit");
-                            // Seed dispersal logic would go here
-                        }
+                        // Logic for seed dispersal would go here
+                        // For example, add a delayed spawn of a seed some distance away
                     }
                 }
-                else if (currentTarget.CompareTag("SmallPrey"))
+                else
                 {
-                    // Eating meat
-                    Eat(preyNutritionValue * Time.deltaTime);
-                    
-                    // Destroy the prey gradually
+                    // Eating animal prey
                     Animal prey = currentTarget.GetComponent<Animal>();
                     if (prey != null)
                     {
-                        prey.TakeDamage(10f * Time.deltaTime);
+                        // Consume prey gradually
+                        float nutritionGained = GetNutritionFromTarget(currentTarget) * Time.deltaTime / 3f;
+                        Eat(nutritionGained);
+                        
+                        // Gradually "consume" the prey
+                        if (stateTime > 3f)
+                        {
+                            // Prey fully consumed
+                            Destroy(currentTarget);
+                            currentTarget = null;
+                            ChangeState(BehaviorState.Idle);
+                        }
                     }
-                }
-                else if (currentTarget.CompareTag("Insect"))
-                {
-                    // Insects are eaten immediately in hunting state
-                    // This is a fallback
-                    Eat(insectNutritionValue);
-                    Destroy(currentTarget);
-                    currentTarget = null;
-                    ChangeState(BehaviorState.Idle);
+                    else
+                    {
+                        // Target is not valid prey
+                        ChangeState(BehaviorState.Seeking);
+                    }
                 }
             }
             else
@@ -642,22 +715,28 @@ namespace Ecosystem
             }
         }
         
-        // Utility to find nearest object from multiple tags
-        private GameObject FindNearestOfTags(string[] tags)
+        // Find the nearest insect
+        protected GameObject FindNearestInsect()
         {
-            GameObject nearest = null;
-            float nearestDistance = senseRadius;
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, senseRadius);
             
-            foreach (string tag in tags)
+            float closestDistance = senseRadius;
+            GameObject nearest = null;
+            
+            foreach (Collider2D collider in colliders)
             {
-                GameObject obj = FindNearestOfTag(tag, senseRadius);
-                if (obj != null)
+                // Skip self
+                if (collider.gameObject == gameObject)
+                    continue;
+                    
+                Animal insect = collider.GetComponent<Animal>();
+                if (insect != null && insect.animalType == AnimalType.Insect)
                 {
-                    float distance = Vector3.Distance(transform.position, obj.transform.position);
-                    if (distance < nearestDistance)
+                    float distance = Vector2.Distance(transform.position, collider.transform.position);
+                    if (distance < closestDistance)
                     {
-                        nearest = obj;
-                        nearestDistance = distance;
+                        nearest = collider.gameObject;
+                        closestDistance = distance;
                     }
                 }
             }
@@ -665,41 +744,84 @@ namespace Ecosystem
             return nearest;
         }
         
+        // Find a small herbivore that can be prey
+        private GameObject FindNearestSmallHerbivore()
+        {
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, senseRadius);
+            
+            float closestDistance = senseRadius;
+            GameObject nearest = null;
+            
+            foreach (Collider2D collider in colliders)
+            {
+                // Skip self
+                if (collider.gameObject == gameObject)
+                    continue;
+                    
+                Animal animal = collider.GetComponent<Animal>();
+                if (animal != null && animal.animalType == AnimalType.Herbivore && animal.maxHealth < maxHealth * 0.7f)
+                {
+                    float distance = Vector2.Distance(transform.position, collider.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        nearest = collider.gameObject;
+                        closestDistance = distance;
+                    }
+                }
+            }
+            
+            return nearest;
+        }
+        
+        // Get nutrition value from a target
+        private float GetNutritionFromTarget(GameObject target)
+        {
+            if (target == null) return 10f; // Default fallback
+            
+            // Check for PlantPart
+            PlantPart plantPart = target.GetComponent<PlantPart>();
+            if (plantPart != null)
+            {
+                return plantPart.GetTotalNutrition();
+            }
+            
+            // Check for Animal (prey)
+            Animal prey = target.GetComponent<Animal>();
+            if (prey != null)
+            {
+                return prey.maxHealth * 0.5f; // Health-based nutrition
+            }
+            
+            // Default fallback
+            return 10f;
+        }
+        
         // Override for omnivore-specific archetypes
         public override void DetermineArchetype()
         {
-            // Track food preferences for archetype determination
-            int seedMeals = 0;
-            int insectMeals = 0;
-            int preyMeals = 0;
+            // Determine based on diet and behaviors
             
-            foreach (string memory in memories)
-            {
-                if (memory.Contains("fruit") || memory.Contains("seed"))
-                    seedMeals++;
-                else if (memory.Contains("insect"))
-                    insectMeals++;
-                else if (memory.Contains("prey") || memory.Contains("caught"))
-                    preyMeals++;
-            }
-            
-            // Determine archetype based on behavior
-            if (seedMeals > preyMeals && seedMeals > insectMeals)
+            // Seed disperser - eats mostly plants and disperses seeds
+            if (seedDispersalCount > 5)
             {
                 archetype = "Seed Disperser";
             }
-            else if (preyMeals > seedMeals && preyMeals > insectMeals)
-            {
-                archetype = "Hunter Bird";
-            }
-            else if (insectMeals > seedMeals && insectMeals > preyMeals)
+            // Insectivore - focuses on insect prey
+            else if (insectPreference > 0.7f)
             {
                 archetype = "Insectivore";
             }
+            // Hunter bird - actively hunts small prey
+            else if (meatPreference > 0.7f && aggression > 0.6f)
+            {
+                archetype = "Hunter Bird";
+            }
+            // Flock member - social bird
             else if (sociability > 0.7f)
             {
                 archetype = "Flock Member";
             }
+            // Nest builder - territorial and defensive
             else if (intelligence > 0.7f && persistence > 0.6f)
             {
                 archetype = "Nest Builder";

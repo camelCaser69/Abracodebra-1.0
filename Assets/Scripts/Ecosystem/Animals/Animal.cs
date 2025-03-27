@@ -137,7 +137,7 @@ namespace Ecosystem
             }
         }
         
-        // Consume food to reduce hunger
+        // Consume food to reduce hunger - calling directly with nutrition amount
         public virtual void Eat(float nutritionAmount)
         {
             currentHunger -= nutritionAmount;
@@ -145,6 +145,37 @@ namespace Ecosystem
             
             // Add a memory of this eating experience
             AddMemory($"Ate food with nutrition value {nutritionAmount}");
+        }
+        
+        // Consume food to reduce hunger - from a food object
+        public virtual void Eat(GameObject foodObject)
+        {
+            float nutritionValue = 10f; // Default fallback value
+            string foodName = foodObject.name;
+            
+            // Try to get nutrition from food
+            PlantPart plantPart = foodObject.GetComponent<PlantPart>();
+            if (plantPart != null)
+            {
+                nutritionValue = plantPart.nutritionalValue * plantPart.calories;
+                foodName = $"{plantPart.partType}";
+            }
+            
+            // If food is another animal
+            Animal preyAnimal = foodObject.GetComponent<Animal>();
+            if (preyAnimal != null)
+            {
+                // Base nutrition on prey's size/health
+                nutritionValue = preyAnimal.maxHealth * 0.3f;
+                foodName = $"{preyAnimal.animalName} ({preyAnimal.animalType})";
+            }
+            
+            // Reduce hunger
+            currentHunger -= nutritionValue;
+            currentHunger = Mathf.Clamp(currentHunger, 0f, maxHunger);
+            
+            // Add memory
+            AddMemory($"Ate {foodName} (nutrition: {nutritionValue:F1})");
         }
         
         // Die and potentially drop resources
@@ -232,28 +263,6 @@ namespace Ecosystem
             return $"{prefixes[Random.Range(0, prefixes.Length)]} {suffixes[Random.Range(0, suffixes.Length)]}";
         }
         
-        // Simple AI to find the nearest object of a specific type
-        protected GameObject FindNearestOfTag(string tag, float maxDistance = 100f)
-        {
-            GameObject nearest = null;
-            float nearestDistance = maxDistance;
-            
-            // Get all objects with the specified tag
-            GameObject[] objects = GameObject.FindGameObjectsWithTag(tag);
-            
-            foreach (GameObject obj in objects)
-            {
-                float distance = Vector3.Distance(transform.position, obj.transform.position);
-                if (distance < nearestDistance)
-                {
-                    nearest = obj;
-                    nearestDistance = distance;
-                }
-            }
-            
-            return nearest;
-        }
-        
         // Utility method to determine the archetype based on personality traits
         public virtual void DetermineArchetype()
         {
@@ -282,6 +291,129 @@ namespace Ecosystem
             {
                 archetype = "Unspecified";
             }
+        }
+        
+        // Check if this animal can be a prey for the given predator type
+        public virtual bool IsValidPreyFor(AnimalType predatorType)
+        {
+            switch (predatorType)
+            {
+                case AnimalType.Carnivore:
+                    return this.animalType == AnimalType.Herbivore || 
+                          (this.animalType == AnimalType.Omnivore && currentHealth < maxHealth * 0.5f) ||
+                          (this.animalType == AnimalType.Insect); // Carnivores can eat insects too
+                
+                case AnimalType.Omnivore:
+                    return this.animalType == AnimalType.Herbivore && this.maxHealth < 80 || // Small herbivores only
+                           this.animalType == AnimalType.Insect; // Omnivores eat insects
+                    
+                default:
+                    return false;
+            }
+        }
+        
+        // Find nearest food source based on animal type
+        protected GameObject FindNearestFood()
+        {
+            switch (animalType)
+            {
+                case AnimalType.Herbivore:
+                    return FindNearestPlantFood();
+                
+                case AnimalType.Carnivore:
+                    return FindNearestPrey();
+                
+                case AnimalType.Omnivore:
+                    // Try plant food first, then prey if starving
+                    GameObject plantFood = FindNearestPlantFood();
+                    
+                    if (plantFood != null)
+                        return plantFood;
+                        
+                    if (IsStarving())
+                        return FindNearestPrey();
+                        
+                    return null;
+                
+                case AnimalType.Insect:
+                    return FindNearestPlantFood();
+                
+                default:
+                    return null;
+            }
+        }
+        
+        // Find nearest plant food for herbivores and omnivores
+        protected virtual GameObject FindNearestPlantFood()
+        {
+            // Search for plant parts in order of preference
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, senseRadius);
+            
+            float closestDistance = senseRadius;
+            GameObject nearest = null;
+            
+            foreach (Collider2D collider in colliders)
+            {
+                // Skip self
+                if (collider.gameObject == gameObject)
+                    continue;
+                
+                // Check if it's a plant part
+                PlantPart plantPart = collider.GetComponent<PlantPart>();
+                if (plantPart != null)
+                {
+                    float distance = Vector2.Distance(transform.position, collider.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        // Check if this animal can eat this part type
+                        if (CanEatPlantPart(plantPart.partType))
+                        {
+                            nearest = collider.gameObject;
+                            closestDistance = distance;
+                        }
+                    }
+                }
+            }
+            
+            return nearest;
+        }
+        
+        // Find nearest prey for carnivores and hungry omnivores
+        protected virtual GameObject FindNearestPrey()
+        {
+            // Search for valid prey animals
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, senseRadius);
+            
+            float closestDistance = senseRadius;
+            GameObject nearest = null;
+            
+            foreach (Collider2D collider in colliders)
+            {
+                // Skip self
+                if (collider.gameObject == gameObject)
+                    continue;
+                
+                // Check if it's an animal
+                Animal potentialPrey = collider.GetComponent<Animal>();
+                if (potentialPrey != null && potentialPrey.IsValidPreyFor(this.animalType))
+                {
+                    float distance = Vector2.Distance(transform.position, collider.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        nearest = collider.gameObject;
+                        closestDistance = distance;
+                    }
+                }
+            }
+            
+            return nearest;
+        }
+        
+        // Check if this animal can eat a specific plant part
+        protected virtual bool CanEatPlantPart(PlantPartType partType)
+        {
+            // Base implementation - override in derived classes for specific preferences
+            return true; // By default, can eat any plant part
         }
     }
 }

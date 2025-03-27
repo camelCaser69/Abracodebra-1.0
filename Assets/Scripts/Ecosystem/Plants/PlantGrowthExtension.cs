@@ -150,7 +150,7 @@ namespace Ecosystem
             // Set properties based on genes and part type
             part.toxicity = toxicityGene;
             part.toughness = toughnessGene;
-            part.nutrition = nutritionGene;
+            part.nutritionalValue = nutritionGene;
             part.visibility = plantVisibility;
             
             // Adjust based on part type
@@ -174,7 +174,7 @@ namespace Ecosystem
                     
                 case PlantPartType.Fruit:
                     // Fruit is nutritious and visible
-                    part.nutrition += 0.3f;
+                    part.nutritionalValue += 0.3f;
                     part.visibility += 0.3f;
                     part.toxicity *= 0.2f; // Much less toxic
                     break;

@@ -8,18 +8,13 @@ namespace Ecosystem
         [Header("Carnivore Settings")]
         public float attackDamage = 20f;            // Damage dealt per attack
         public float attackCooldown = 2f;           // Seconds between attacks
-        public float preyNutritionValue = 30f;      // Nutrition from successful hunt
         public float stalkSpeed = 2f;               // Reduced speed when stalking prey
         public float chaseSpeed = 5f;               // Increased speed when actively chasing
         public float territoryRadius = 20f;         // Area this carnivore considers its territory
         
-        [Header("Targeting Preferences")]
-        public string[] preyTags = { "Herbivore", "Prey" };
-        public string[] competitorTags = { "Carnivore" };
-        
         // Private state variables
-        private GameObject nearestPrey;
-        private GameObject nearestCompetitor;
+        private GameObject potentialPrey;
+        private GameObject potentialCompetitor;
         private Vector3 territoryCenter;
         private float lastAttackTime = -10f;
         private float moveTimer = 0f;
@@ -68,38 +63,12 @@ namespace Ecosystem
         protected override void CheckStateTransitions()
         {
             // First check for territory intrusion by competitors (if territorial)
-            if (Territoriality > 0.7f)
-            {
-                nearestCompetitor = FindNearestOfTags(competitorTags);
-                if (nearestCompetitor != null && 
-                    Vector3.Distance(transform.position, nearestCompetitor.transform.position) < territoryRadius &&
-                    nearestCompetitor != gameObject) // Don't count self
-                {
-                    if (currentState != BehaviorState.Hunting || stateTime > 5f)
-                    {
-                        AddMemory($"Defending territory from {nearestCompetitor.name}");
-                        currentTarget = nearestCompetitor;
-                        ChangeState(BehaviorState.Hunting);
-                        return;
-                    }
-                }
-            }
+            CheckForCompetitors();
             
             // Check for prey if hungry
-            if (IsHungry())
+            if (IsHungry() && currentState != BehaviorState.Hunting && currentState != BehaviorState.Feeding)
             {
-                nearestPrey = FindNearestOfTags(preyTags);
-                if (nearestPrey != null && 
-                    Vector3.Distance(transform.position, nearestPrey.transform.position) < senseRadius)
-                {
-                    if (currentState != BehaviorState.Hunting)
-                    {
-                        AddMemory($"Spotted prey: {nearestPrey.name}");
-                        currentTarget = nearestPrey;
-                        ChangeState(BehaviorState.Hunting);
-                        return;
-                    }
-                }
+                CheckForPrey();
             }
             
             // State-specific transitions
@@ -107,7 +76,7 @@ namespace Ecosystem
             {
                 case BehaviorState.Idle:
                     // If hungry but no visible prey, start seeking
-                    if (IsHungry() && nearestPrey == null)
+                    if (IsHungry() && potentialPrey == null)
                     {
                         ChangeState(BehaviorState.Seeking);
                         return;
@@ -137,7 +106,7 @@ namespace Ecosystem
                 
                 case BehaviorState.Seeking:
                     // Give up seeking if been seeking a while without finding prey
-                    if (stateTime > 20f * persistence && nearestPrey == null)
+                    if (stateTime > 20f * persistence && potentialPrey == null)
                     {
                         // If very hungry, keep seeking, otherwise go idle
                         if (!IsStarving())
@@ -169,7 +138,7 @@ namespace Ecosystem
                 
                 case BehaviorState.Feeding:
                     // Finished feeding or no longer hungry
-                    if (stateTime > 5f || !IsHungry())
+                    if (stateTime > 5f || !IsHungry() || currentTarget == null)
                     {
                         ChangeState(BehaviorState.Resting);
                         return;
@@ -184,6 +153,59 @@ namespace Ecosystem
                         return;
                     }
                     break;
+            }
+        }
+        
+        private void CheckForCompetitors()
+        {
+            if (Territoriality <= 0.7f)
+                return;
+                
+            // Find other carnivores
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, territoryRadius);
+            
+            float closestDistance = territoryRadius;
+            potentialCompetitor = null;
+            
+            foreach (Collider2D collider in colliders)
+            {
+                // Skip self
+                if (collider.gameObject == gameObject)
+                    continue;
+                    
+                Animal animal = collider.GetComponent<Animal>();
+                if (animal != null && animal.animalType == AnimalType.Carnivore)
+                {
+                    float distance = Vector2.Distance(transform.position, collider.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        potentialCompetitor = collider.gameObject;
+                        closestDistance = distance;
+                    }
+                }
+            }
+            
+            // Act on competitor if found
+            if (potentialCompetitor != null && 
+                currentState != BehaviorState.Hunting && 
+                currentState != BehaviorState.Feeding)
+            {
+                AddMemory($"Defending territory from {potentialCompetitor.name}");
+                currentTarget = potentialCompetitor;
+                ChangeState(BehaviorState.Hunting);
+            }
+        }
+        
+        private void CheckForPrey()
+        {
+            // Find valid prey
+            potentialPrey = FindNearestPrey();
+            
+            if (potentialPrey != null)
+            {
+                AddMemory($"Spotted prey: {potentialPrey.name}");
+                currentTarget = potentialPrey;
+                ChangeState(BehaviorState.Hunting);
             }
         }
         
@@ -217,12 +239,12 @@ namespace Ecosystem
             moveTimer += Time.deltaTime;
             
             // Look for prey or patrol territory
-            nearestPrey = FindNearestOfTags(preyTags);
+            potentialPrey = FindNearestPrey();
             
-            if (nearestPrey != null)
+            if (potentialPrey != null)
             {
                 // Move toward the prey, but more slowly (stalking)
-                currentTarget = nearestPrey;
+                currentTarget = potentialPrey;
                 ChangeState(BehaviorState.Hunting);
             }
             else
@@ -312,12 +334,34 @@ namespace Ecosystem
         
         private void ProcessFeedingState()
         {
-            // Feeding reduces hunger
-            float feedAmount = preyNutritionValue * Time.deltaTime;
-            Eat(feedAmount);
-            
-            // Stay in place while feeding
-            // Could add feeding animation here
+            // Eating a prey animal
+            if (currentTarget != null)
+            {
+                // Get calories from prey based on its health
+                Animal prey = currentTarget.GetComponent<Animal>();
+                if (prey != null)
+                {
+                    // Reduce hunger based on prey size
+                    float nutritionPerSecond = (prey.maxHealth * 0.3f) / 5f; // 5 seconds to eat
+                    Eat(nutritionPerSecond * Time.deltaTime);
+                    
+                    // Add memory as we eat
+                    if (stateTime < 0.5f) // Only add memory once
+                    {
+                        AddMemory($"Feeding on {prey.animalName}");
+                    }
+                }
+                else
+                {
+                    // No valid prey to eat anymore
+                    ChangeState(BehaviorState.Idle);
+                }
+            }
+            else
+            {
+                // No target to eat
+                ChangeState(BehaviorState.Idle);
+            }
         }
         
         private void ProcessRestingState()
@@ -348,29 +392,6 @@ namespace Ecosystem
                 animator.SetFloat("Horizontal", direction.x);
                 animator.SetFloat("Vertical", direction.y);
             }
-        }
-        
-        // Utility to find nearest object from multiple tags
-        private GameObject FindNearestOfTags(string[] tags)
-        {
-            GameObject nearest = null;
-            float nearestDistance = senseRadius;
-            
-            foreach (string tag in tags)
-            {
-                GameObject obj = FindNearestOfTag(tag, senseRadius);
-                if (obj != null)
-                {
-                    float distance = Vector3.Distance(transform.position, obj.transform.position);
-                    if (distance < nearestDistance)
-                    {
-                        nearest = obj;
-                        nearestDistance = distance;
-                    }
-                }
-            }
-            
-            return nearest;
         }
         
         // Override for carnivore-specific archetypes

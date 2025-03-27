@@ -6,16 +6,15 @@ namespace Ecosystem
     public class Herbivore : Animal
     {
         [Header("Herbivore Settings")]
-        public float feedingRate = 10f;             // How quickly it consumes plants
-        public float plantNutritionValue = 15f;     // How much hunger is reduced by eating
+        public float fleeDistance = 5f;             // How far it runs when threatened
         public bool preferYoungLeaves = true;       // Whether to target young growth
         public bool canEatFruit = true;             // Whether it can consume fruit
-        public float fleeDistance = 5f;             // How far it runs when threatened
         
-        [Header("Targeting Preferences")]
-        public LayerMask plantLayerMask;
-        public string[] preferredPlantTags = { "Leaf", "Plant" };
-        public string[] predatorTags = { "Predator", "Carnivore" };
+        [Header("Feeding Preferences")]
+        [Range(0f, 1f)] public float leafPreference = 0.8f;
+        [Range(0f, 1f)] public float fruitPreference = 0.6f;
+        [Range(0f, 1f)] public float flowerPreference = 0.4f;
+        [Range(0f, 1f)] public float stemPreference = 0.3f;
         
         // Private state variables
         private GameObject nearestPredator;
@@ -65,17 +64,7 @@ namespace Ecosystem
         protected override void CheckStateTransitions()
         {
             // Check for predators first - highest priority
-            nearestPredator = FindNearestOfTags(predatorTags);
-            if (nearestPredator != null && 
-                Vector3.Distance(transform.position, nearestPredator.transform.position) < senseRadius)
-            {
-                if (currentState != BehaviorState.Fleeing)
-                {
-                    ChangeState(BehaviorState.Fleeing);
-                    AddMemory($"Fled from predator {nearestPredator.name}");
-                    return;
-                }
-            }
+            CheckForPredators();
             
             // Check current state and potential transitions
             switch (currentState)
@@ -115,9 +104,11 @@ namespace Ecosystem
                     
                 case BehaviorState.Seeking:
                     // Found food
+                    nearestPlant = FindNearestPlantFood();
                     if (nearestPlant != null && 
                         Vector3.Distance(transform.position, nearestPlant.transform.position) < 1f)
                     {
+                        currentTarget = nearestPlant;
                         ChangeState(BehaviorState.Feeding);
                         return;
                     }
@@ -130,12 +121,20 @@ namespace Ecosystem
                         return;
                     }
                     break;
-                    
+                
                 case BehaviorState.Feeding:
                     // If no longer hungry or no plant to eat
-                    if (!IsHungry() || nearestPlant == null)
+                    if (!IsHungry() || currentTarget == null)
                     {
                         ChangeState(BehaviorState.Idle);
+                        return;
+                    }
+                    
+                    // If moved too far from food
+                    if (currentTarget != null && 
+                        Vector3.Distance(transform.position, currentTarget.transform.position) > 1.5f)
+                    {
+                        ChangeState(BehaviorState.Seeking);
                         return;
                     }
                     break;
@@ -159,6 +158,47 @@ namespace Ecosystem
                         return;
                     }
                     break;
+            }
+        }
+        
+        private void CheckForPredators()
+        {
+            // Find predators using colliders rather than tags
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, senseRadius);
+            
+            float closestDistance = senseRadius;
+            nearestPredator = null;
+            
+            foreach (Collider2D collider in colliders)
+            {
+                // Skip self
+                if (collider.gameObject == gameObject)
+                    continue;
+                    
+                Animal potentialPredator = collider.GetComponent<Animal>();
+                if (potentialPredator != null && 
+                    (potentialPredator.animalType == AnimalType.Carnivore || 
+                     potentialPredator.animalType == AnimalType.Omnivore))
+                {
+                    float distance = Vector2.Distance(transform.position, collider.transform.position);
+                    if (distance < closestDistance)
+                    {
+                        nearestPredator = collider.gameObject;
+                        closestDistance = distance;
+                    }
+                }
+            }
+            
+            // If predator detected and currently not fleeing, start fleeing
+            if (nearestPredator != null && closestDistance < senseRadius * 0.7f && 
+                currentState != BehaviorState.Fleeing)
+            {
+                // Chance to flee based on fearfulness
+                if (Random.value < Fearfulness)
+                {
+                    ChangeState(BehaviorState.Fleeing);
+                    AddMemory($"Fled from predator {nearestPredator.name}");
+                }
             }
         }
         
@@ -189,12 +229,18 @@ namespace Ecosystem
         private void ProcessSeekingState()
         {
             // Look for nearest food source
-            nearestPlant = FindNearestOfTags(preferredPlantTags);
+            nearestPlant = FindNearestPlantFood();
             
             if (nearestPlant != null)
             {
                 // Move toward the plant
                 MoveToward(nearestPlant.transform.position, moveSpeed);
+                
+                // Set as current target when close enough
+                if (Vector3.Distance(transform.position, nearestPlant.transform.position) < 1.2f)
+                {
+                    currentTarget = nearestPlant;
+                }
             }
             else
             {
@@ -217,34 +263,30 @@ namespace Ecosystem
         
         private void ProcessFeedingState()
         {
-            if (nearestPlant != null)
+            if (currentTarget != null)
             {
-                // Damage the plant and feed
-                PlantPart plantPart = nearestPlant.GetComponent<PlantPart>();
+                // Get plant part
+                PlantPart plantPart = currentTarget.GetComponent<PlantPart>();
                 if (plantPart != null)
                 {
-                    // Damage the plant part
-                    plantPart.TakeDamage(feedingRate * Time.deltaTime);
+                    // Start/continue eating process
+                    plantPart.StartEating(this);
                     
-                    // Reduce hunger based on feeding rate
-                    float nutritionGained = feedingRate * Time.deltaTime;
-                    Eat(nutritionGained);
-                    
-                    // Special case for fruit which might have different effects
-                    if (plantPart.partType == PlantPartType.Fruit)
+                    // Add memory about what's being eaten
+                    if (stateTime < 0.5f) // Only once at the start
                     {
-                        // Fruits might provide additional benefits
-                        AddMemory("Ate a delicious fruit");
+                        AddMemory($"Started eating a {plantPart.partType}");
                     }
-                    else
-                    {
-                        AddMemory($"Ate plant part: {plantPart.partType}");
-                    }
+                }
+                else
+                {
+                    // Not a valid plant part anymore
+                    ChangeState(BehaviorState.Seeking);
                 }
             }
             else
             {
-                // Plant disappeared somehow, go back to seeking
+                // Target disappeared
                 ChangeState(BehaviorState.Seeking);
             }
         }
@@ -298,30 +340,35 @@ namespace Ecosystem
             }
         }
         
-        // Utility to find nearest object from multiple tags
-        private GameObject FindNearestOfTags(string[] tags)
+        // Override to specify plant part preferences
+        protected override bool CanEatPlantPart(PlantPartType partType)
         {
-            GameObject nearest = null;
-            float nearestDistance = senseRadius;
-            
-            foreach (string tag in tags)
+            switch (partType)
             {
-                GameObject obj = FindNearestOfTag(tag, senseRadius);
-                if (obj != null)
-                {
-                    float distance = Vector3.Distance(transform.position, obj.transform.position);
-                    if (distance < nearestDistance)
-                    {
-                        nearest = obj;
-                        nearestDistance = distance;
-                    }
-                }
+                case PlantPartType.Leaf:
+                    return Random.value < leafPreference;
+                    
+                case PlantPartType.Fruit:
+                    return canEatFruit && Random.value < fruitPreference;
+                    
+                case PlantPartType.Flower:
+                    return Random.value < flowerPreference;
+                    
+                case PlantPartType.Stem:
+                    return Random.value < stemPreference;
+                    
+                case PlantPartType.Seed:
+                    return Random.value < 0.2f; // Rarely eat seeds directly
+                    
+                case PlantPartType.Root:
+                    return IsStarving() && Random.value < 0.1f; // Very rarely eat roots
+                    
+                default:
+                    return false;
             }
-            
-            return nearest;
         }
         
-        // Override the archetype determination for herbivore-specific archetypes
+        // Override for herbivore-specific archetypes
         public override void DetermineArchetype()
         {
             if (curiosity > 0.7f && fearfulness > 0.6f)

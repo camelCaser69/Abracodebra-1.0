@@ -18,32 +18,35 @@ namespace Ecosystem
     {
         [Header("Plant Part Settings")]
         public PlantPartType partType;
-        public float maxHealth = 100f;
-        public float currentHealth;
         
         [Header("Plant Properties")]
-        [Range(0f, 1f)] public float toxicity = 0f;     // Reduces damage and can harm herbivores
-        [Range(0f, 1f)] public float toughness = 0f;    // Physical resistance to damage
-        [Range(0f, 1f)] public float nutrition = 0.5f;  // How nutritious this part is (more attracts herbivores)
+        [Range(0f, 1f)] public float toxicity = 0f;     // Can harm herbivores if high
+        [Range(0f, 1f)] public float toughness = 0f;    // Increases eating time
         [Range(0f, 1f)] public float visibility = 0.5f; // How easily spotted by herbivores
+        
+        [Header("Nutritional Properties")]
+        [Range(0f, 1f)] public float nutritionalValue = 0.5f;  // Base nutritional content
+        public float calories = 15f;  // How much hunger is reduced when fully eaten
+        
+        [Header("Eating Mechanics")]
+        public float eatingTime = 3f;  // Base time it takes to fully eat this part
+        private float currentEatingTime = 0f;
+        private bool isBeingEaten = false;
+        private Animal eatingAnimal = null;
         
         [Header("Visual Feedback")]
         public SpriteRenderer spriteRenderer;
-        public Gradient healthGradient;                 // Color varies with health
-        public float damageFeedbackDuration = 0.3f;     // How long damage flash lasts
+        public Gradient eatingGradient;  // Color changes as plant is eaten
+        public bool shrinkWhileEating = true;
         
         [Header("Events")]
         public UnityEvent<float> OnDamaged;             // Triggered when damaged
         public UnityEvent OnDestroyed;                  // Triggered when destroyed
         
         // References
-        private PlantGrowth plantGrowth;
         private SortableEntity sortableEntity;
-        
-        // Internal state
-        private float damageDisplayTimer = 0f;
+        private Vector3 originalScale;
         private Color originalColor;
-        private bool isDying = false;
         
         private void Awake()
         {
@@ -52,140 +55,177 @@ namespace Ecosystem
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
             
-            // Find parent plant
-            plantGrowth = GetComponentInParent<PlantGrowth>();
-            
-            // Initialize health
-            currentHealth = maxHealth;
-            
-            // Store original color
+            // Store original properties
             if (spriteRenderer != null)
                 originalColor = spriteRenderer.color;
-        }
-        
-        private void Start()
-        {
-            // You could add initialization based on plant gene expressions here
-            if (plantGrowth != null)
-            {
-                // Example of how genes might influence this part's properties
-                // This would be expanded in the gene expression system
-                switch (partType)
-                {
-                    case PlantPartType.Leaf:
-                        // Leaf properties might be affected by plant growth genes
-                        break;
-                    case PlantPartType.Stem:
-                        // Stem properties might have different influences
-                        toughness += 0.2f; // Stems are naturally tougher
-                        break;
-                    // Other part types...
-                }
-            }
             
-            // Set the proper tag for this plant part for animal targeting
-            gameObject.tag = partType.ToString();
+            originalScale = transform.localScale;
+            
+            // Adjust eating time based on toughness
+            eatingTime *= (1f + toughness * 2f); // Tougher parts take longer to eat
         }
         
         private void Update()
         {
-            // Visual feedback when damaged
-            if (damageDisplayTimer > 0)
+            if (isBeingEaten)
             {
-                damageDisplayTimer -= Time.deltaTime;
-                
-                if (spriteRenderer != null)
+                // Check if animal is still nearby and in feeding state
+                if (eatingAnimal == null || 
+                    Vector3.Distance(transform.position, eatingAnimal.transform.position) > 1.5f ||
+                    eatingAnimal.CurrentState != BehaviorState.Feeding)
                 {
-                    if (damageDisplayTimer > 0)
-                    {
-                        // Flash white when damaged
-                        spriteRenderer.color = Color.Lerp(Color.white, originalColor, 
-                            1f - (damageDisplayTimer / damageFeedbackDuration));
-                    }
-                    else
-                    {
-                        // Reset to health-based color
-                        UpdateVisualHealth();
-                    }
+                    // Animal moved away, was destroyed, or stopped feeding
+                    StopEating();
+                    return;
+                }
+                
+                // Progress eating time
+                currentEatingTime += Time.deltaTime;
+                
+                // Visual feedback
+                UpdateVisualFeedback();
+                
+                // Provide nutrition to animal as it eats
+                float nutritionPerSecond = (nutritionalValue * calories) / eatingTime;
+                eatingAnimal.Eat(nutritionPerSecond * Time.deltaTime);
+                
+                // Apply toxicity damage if applicable
+                if (toxicity > 0.3f)
+                {
+                    float toxicityDamage = toxicity * 2f * Time.deltaTime;
+                    eatingAnimal.TakeDamage(toxicityDamage);
+                }
+                
+                // Check if fully eaten
+                if (currentEatingTime >= eatingTime)
+                {
+                    // Part is fully eaten
+                    OnDestroyed?.Invoke();
+                    Destroy(gameObject);
                 }
             }
         }
         
+        // Start being eaten by an animal
+        public void StartEating(Animal animal)
+        {
+            if (!isBeingEaten)
+            {
+                isBeingEaten = true;
+                eatingAnimal = animal;
+                currentEatingTime = 0f;
+                
+                // Trigger damage event
+                OnDamaged?.Invoke(1f);
+            }
+        }
+        
+        // Stop being eaten
+        public void StopEating()
+        {
+            if (isBeingEaten)
+            {
+                isBeingEaten = false;
+                eatingAnimal = null;
+                
+                // Partially restore appearance
+                if (shrinkWhileEating)
+                {
+                    float recoveryFactor = 0.5f; // How much to recover when eating stops
+                    float eatingProgress = currentEatingTime / eatingTime;
+                    float recovery = eatingProgress * recoveryFactor;
+                    
+                    transform.localScale = Vector3.Lerp(
+                        Vector3.one * 0.3f,  // Smallest size
+                        originalScale,       // Original size
+                        recovery             // Recovery amount
+                    );
+                }
+                
+                if (spriteRenderer != null && eatingGradient != null)
+                {
+                    spriteRenderer.color = originalColor;
+                }
+            }
+        }
+        
+        // Update visual appearance based on eating progress
+        private void UpdateVisualFeedback()
+        {
+            float eatProgress = currentEatingTime / eatingTime;
+            
+            // Scale down
+            if (shrinkWhileEating)
+            {
+                transform.localScale = Vector3.Lerp(
+                    originalScale,         // Start size
+                    originalScale * 0.3f,  // End size (30% of original)
+                    eatProgress
+                );
+            }
+            
+            // Change color
+            if (spriteRenderer != null && eatingGradient != null)
+            {
+                spriteRenderer.color = eatingGradient.Evaluate(eatProgress);
+            }
+        }
+        
+        // Legacy TakeDamage method for compatibility
         public void TakeDamage(float damage)
         {
-            // Reduce damage based on toughness and toxicity
-            float reducedDamage = damage * (1f - toughness * 0.5f);
-            
-            currentHealth -= reducedDamage;
-            
-            // Visual feedback
-            damageDisplayTimer = damageFeedbackDuration;
-            
-            // Update appearance based on health
-            UpdateVisualHealth();
-            
-            // Trigger damage event
-            OnDamaged?.Invoke(reducedDamage);
-            
-            // Check if destroyed
-            if (currentHealth <= 0 && !isDying)
+            // Ignore damage amount and use eating system instead
+            if (!isBeingEaten)
             {
-                isDying = true;
-                OnDestroyed?.Invoke();
-                DestroyPart();
+                Animal nearbyAnimal = FindNearbyAnimal();
+                if (nearbyAnimal != null)
+                {
+                    StartEating(nearbyAnimal);
+                }
+                else
+                {
+                    // No animal nearby, just trigger damage event
+                    OnDamaged?.Invoke(damage);
+                }
             }
         }
         
-        private void UpdateVisualHealth()
+        // Find the nearest animal that could be eating this plant
+        private Animal FindNearbyAnimal()
         {
-            if (spriteRenderer != null && healthGradient != null)
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, 1.5f);
+            foreach (Collider2D collider in colliders)
             {
-                float healthPercent = Mathf.Clamp01(currentHealth / maxHealth);
-                spriteRenderer.color = healthGradient.Evaluate(healthPercent);
+                Animal animal = collider.GetComponent<Animal>();
+                if (animal != null && animal.CurrentState == BehaviorState.Feeding)
+                {
+                    return animal;
+                }
             }
+            return null;
         }
         
-        private void DestroyPart()
+        // Get total nutritional value
+        public float GetTotalNutrition()
         {
-            // Different behavior based on part type
-            switch (partType)
+            return nutritionalValue * calories;
+        }
+        
+        // Get modified eating time based on animal's attributes
+        public float GetModifiedEatingTime(Animal animal)
+        {
+            // Base time, adjusted for toughness and modified by animal traits
+            if (animal != null)
             {
-                case PlantPartType.Leaf:
-                    // Losing a leaf reduces energy production
-                    if (plantGrowth != null)
-                    {
-                        // Reduce photosynthesis efficiency
-                    }
-                    break;
+                // Aggressive animals eat faster
+                float aggressionModifier = 1f - (animal.aggression * 0.3f);
+                // Persistent animals take their time more
+                float persistenceModifier = 1f + (animal.persistence * 0.2f);
                 
-                case PlantPartType.Stem:
-                    // Stem damage might cause parts above to die as well
-                    if (plantGrowth != null)
-                    {
-                        // Find and damage dependent parts
-                    }
-                    break;
-                
-                case PlantPartType.Fruit:
-                    // Fruit might drop seeds when destroyed
-                    // Implement seed spawning logic
-                    break;
+                return eatingTime * aggressionModifier * persistenceModifier;
             }
             
-            // Destroy the game object
-            Destroy(gameObject);
-        }
-        
-        // Method for animals to check toxicity before eating
-        public float GetToxicity()
-        {
-            return toxicity;
-        }
-        
-        // Method for animals to check nutritional value
-        public float GetNutritionalValue()
-        {
-            return nutrition * maxHealth * 0.01f; // Scale with size/health
+            return eatingTime;
         }
     }
 }
