@@ -87,12 +87,20 @@ MonoBehaviour:
   mouthTransform: {fileID: 9001696667229699929}
   bubbleSpawnTransform: {fileID: 1385400547619210892}
   thoughtCooldownTime: 5
-  wanderPauseIntensity: 0.245
-  maxWanderPauseDuration: 4
-  minBounds: {x: -10, y: -5}
-  maxBounds: {x: 10, y: 5}
   eatDuration: 2
   eatDistance: 0.05
+  wanderPauseIntensity: 0.505
+  wanderMinMoveDuration: 0.5
+  wanderMaxMoveDuration: 5
+  wanderMinPauseDuration: 0.5
+  wanderMaxPauseDuration: 2
+  minPoopDelay: 0.5
+  maxPoopDelay: 3
+  poopDuration: 1.5
+  poopPrefabs:
+  - {fileID: 4068151152815915600, guid: 6e8483a0861990945b53d358aeb98b0e, type: 3}
+  - {fileID: 4068151152815915600, guid: 978e17d09199949439c4ddb97ee2c6c8, type: 3}
+  poopColorVariation: 0.1
 --- !u!114 &1716373188419040610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,7 +113,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcb97044d7ed4dbbb8d3f852f45a3fc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sortingLayerYOffset: 0
+  sortingLayerYOffset: -0.81
   useParentYCoordinate: 0
   debugSorting: 0
 --- !u!212 &7676723920541196182

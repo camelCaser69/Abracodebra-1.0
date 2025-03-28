@@ -17,15 +17,16 @@ public class FaunaManager : MonoBehaviour
     public Vector2 animalMinBounds = new Vector2(-10f, -5f);
     public Vector2 animalMaxBounds = new Vector2(10f, 5f);
 
-    private float spawnTimer = 0f;
-
     private void Start()
     {
+        // Initialize each spawn entry's timer to its effective cooldown.
         foreach (var spawnData in animalsToSpawn)
         {
-            spawnData.spawnTimer = 0f;
+            if (spawnData.spawnRateMultiplier > 0f)
+                spawnData.spawnTimer = globalSpawnCooldown / spawnData.spawnRateMultiplier;
+            else
+                spawnData.spawnTimer = Mathf.Infinity; // won't spawn if 0
         }
-        SpawnInitialAnimals();
     }
 
     private void Update()
@@ -37,6 +38,29 @@ public class FaunaManager : MonoBehaviour
                 if (spawnData.spawnRateMultiplier <= 0f)
                     continue;
 
+                // Check current count for this species.
+                int currentCount = 0;
+                if (ecosystemParent != null && spawnData.animalDefinition != null && !string.IsNullOrEmpty(spawnData.animalDefinition.animalName))
+                {
+                    Transform speciesParent = ecosystemParent.Find(spawnData.animalDefinition.animalName);
+                    if (speciesParent != null)
+                        currentCount = speciesParent.childCount;
+                }
+                else
+                {
+                    AnimalController[] allAnimals = FindObjectsOfType<AnimalController>();
+                    currentCount = 0;
+                    foreach (var a in allAnimals)
+                    {
+                        if (a != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName))
+                            currentCount++;
+                    }
+                }
+                // If maximum is set (>0) and current count is reached, skip spawn.
+                if (spawnData.maximumSpawned > 0 && currentCount >= spawnData.maximumSpawned)
+                    continue;
+
+                // Decrement spawn timer and spawn if ready.
                 spawnData.spawnTimer -= Time.deltaTime;
                 if (spawnData.spawnTimer <= 0f)
                 {
@@ -45,18 +69,6 @@ public class FaunaManager : MonoBehaviour
                     SpawnAnimal(spawnData.animalDefinition, spawnCenter + randomOffset);
                     spawnData.spawnTimer = effectiveCooldown;
                 }
-            }
-        }
-    }
-
-    private void SpawnInitialAnimals()
-    {
-        foreach (var spawnData in animalsToSpawn)
-        {
-            if (spawnData.animalDefinition != null && spawnData.spawnRateMultiplier > 0f)
-            {
-                Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
-                SpawnAnimal(spawnData.animalDefinition, spawnCenter + randomOffset);
             }
         }
     }
@@ -71,6 +83,7 @@ public class FaunaManager : MonoBehaviour
 
         GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
 
+        // Parent the animal under ecosystemParent with species grouping.
         if (ecosystemParent != null)
         {
             Transform speciesParent = ecosystemParent;
@@ -87,6 +100,7 @@ public class FaunaManager : MonoBehaviour
             animalObj.transform.SetParent(speciesParent);
         }
 
+        // Get the existing AnimalController on the prefab.
         AnimalController controller = animalObj.GetComponent<AnimalController>();
         if (!controller)
         {
@@ -94,8 +108,6 @@ public class FaunaManager : MonoBehaviour
             controller = animalObj.AddComponent<AnimalController>();
         }
         controller.Initialize(definition);
-
-        // Set the global movement bounds from FaunaManager
         controller.SetMovementBounds(animalMinBounds, animalMaxBounds);
         return animalObj;
     }

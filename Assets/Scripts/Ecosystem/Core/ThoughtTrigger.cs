@@ -6,5 +6,6 @@ public enum ThoughtTrigger
     Eating,
     HealthLow,
     Fleeing,
+    Pooping,
     // Add more triggers as needed
 }

@@ -83,9 +83,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   thoughtLibrary: {fileID: 11400000, guid: 8abd92eb95108124a8478425e6e2cfb5, type: 2}
   thoughtBubblePrefab: {fileID: 7019603340007582860, guid: e00dc2bef6e577f4788d3a0262749be1, type: 3}
-  minBounds: {x: -10, y: -5}
-  maxBounds: {x: 10, y: 5}
+  mouthTransform: {fileID: 0}
+  bubbleSpawnTransform: {fileID: 0}
+  thoughtCooldownTime: 5
   eatDuration: 2
+  eatDistance: 0.5
+  wanderPauseIntensity: 0.5
+  wanderMinMoveDuration: 1
+  wanderMaxMoveDuration: 3
+  wanderMinPauseDuration: 0.5
+  wanderMaxPauseDuration: 2
+  minPoopDelay: 5
+  maxPoopDelay: 10
+  poopDuration: 1
+  poopPrefabs: []
+  poopColorVariation: 0.1
 --- !u!114 &8136233811546609221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98,7 +110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcb97044d7ed4dbbb8d3f852f45a3fc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sortingLayerYOffset: 0
+  sortingLayerYOffset: -0.4
   useParentYCoordinate: 0
   debugSorting: 0
 --- !u!212 &1083078178134342893
