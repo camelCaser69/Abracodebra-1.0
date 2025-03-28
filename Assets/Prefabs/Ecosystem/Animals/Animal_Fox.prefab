@@ -9,8 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7894036405003825629}
-  - component: {fileID: 1687354854332841276}
-  - component: {fileID: 5260947277961276552}
+  - component: {fileID: -1509153476100906367}
   - component: {fileID: 3952623951119004336}
   - component: {fileID: 8495473327626816803}
   - component: {fileID: 7380513529172313148}
@@ -39,7 +38,7 @@ Transform:
   - {fileID: 886537374395288869}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1687354854332841276
+--- !u!114 &-1509153476100906367
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -48,59 +47,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 2769923873088274107}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cbe0b600a4ae490cbb8a8b24c17f94e0, type: 3}
+  m_Script: {fileID: 11500000, guid: 85a75fc8b3b544a484c5c4f0642416f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animalName: 
-  animalType: 1
-  moveSpeed: 3
-  maxHealth: 100
-  currentHealth: 0
-  senseRadius: 10
-  hungerRate: 5
-  maxHunger: 100
-  currentHunger: 0
-  aggression: 0.5
-  curiosity: 0.5
-  sociability: 0.5
-  intelligence: 0.5
-  persistence: 0.5
-  fearfulness: 0
-  territoriality: 0
-  adaptability: 0
-  age: 0
-  memories: []
-  archetype: Unspecified
-  attackDamage: 20
-  attackCooldown: 2
-  preyNutritionValue: 30
-  stalkSpeed: 2
-  chaseSpeed: 5
-  territoryRadius: 20
-  preyTags:
-  - Herbivore
-  - Prey
-  competitorTags:
-  - Carnivore
---- !u!114 &5260947277961276552
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2769923873088274107}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 884c82b31a02457b8256a41927b6e0ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  thoughtLibrary: {fileID: 11400000, guid: 8abd92eb95108124a8478425e6e2cfb5, type: 2}
   thoughtBubblePrefab: {fileID: 7019603340007582860, guid: e00dc2bef6e577f4788d3a0262749be1, type: 3}
-  bubbleSpawnPoint: {fileID: 886537374395288869}
-  minTimeBetweenThoughts: 10
-  thoughtFrequency: 0.5
-  trackRelationships: 1
-  relationshipRange: 10
-  relationshipMemory: 0.5
+  minBounds: {x: -10, y: -5}
+  maxBounds: {x: 10, y: 5}
+  eatDuration: 2
 --- !u!114 &3952623951119004336
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,12 +1,15 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-25 00:47:25
-PART 3 OF 4
+UNITY PROJECT SCRIPT EXPORT - 2025-03-27 17:48:50
+PART 4 OF 5
 ================================================================================
 
 --------------------------------------------------------------------------------
 Assets
+├── Animation
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
 ├── DefaultVolumeProfile.asset
 ├── Editor
 │   ├── HexGridRendererEditor.cs
@@ -14,36 +17,47 @@ Assets
 │   ├── NodeDefinitionCreator.cs
 │   ├── NodeDefinitionLibraryEditor.cs
 │   ├── NodeDefinitionPostprocessor.cs
-│   ├── NodeEffectDataDrawer.cs
-│   └── WizardControllerStatusEditor.cs
+│   └── NodeEffectDataDrawer.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
 ├── InputSystem_Actions.inputactions
 ├── Materials
 │   └── BezierCurveAA_Material.mat
 ├── Post Processing
 ├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   └── Animal_Fox.prefab
+│   │   ├── Indicator_Opportunity.prefab
+│   │   ├── Indicator_Resource.prefab
+│   │   ├── Indicator_Threat.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   └── PlantPrefab.prefab
+│   │   └── ThoughtBubble.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
-│   │   ├── PixelLeaf.prefab
-│   │   ├── PixelSeed.prefab
-│   │   ├── PixelStem.prefab
-│   │   ├── PlantPrefab.prefab
-│   │   ├── Projectile_Basic_Pixel.prefab
-│   │   └── WizardPrefab.prefab
-│   ├── Node Presets
-│   │   ├── NodeDefinitionLibrary.asset
-│   │   ├── Node_000_Seed.asset
-│   │   ├── Node_001_AimSpread.asset
-│   │   ├── Node_002_Piercing.asset
-│   │   ├── Node_003_Output.asset
-│   │   ├── Node_004_ManaSource.asset
-│   │   ├── Node_005_DamageNode.asset
-│   │   ├── Node_006_Burn.asset
-│   │   └── Node_007_FriendlyFire.asset
-│   ├── UI
-│   │   └── NodeView.prefab
-│   └── Wizard Presets
-│       ├── Wizard_Basic.asset
-│       └── Wizard_Dummy.asset
+│   │   ├── NodeView.prefab
+│   │   └── Projectile_Basic_Pixel.prefab
+│   └── Node Presets
+│       ├── NodeDefinitionLibrary.asset
+│       ├── Node_000_Seed.asset
+│       ├── Node_001_AimSpread.asset
+│       ├── Node_002_Piercing.asset
+│       ├── Node_003_Output.asset
+│       ├── Node_004_ManaSource.asset
+│       ├── Node_005_DamageNode.asset
+│       ├── Node_006_Burn.asset
+│       └── Node_007_FriendlyFire.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   └── SampleScene.unity
@@ -57,6 +71,11 @@ Assets
 │   │       ├── BurningStatusEffect.cs
 │   │       └── StatusEffect.cs
 │   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   ├── Core
+│   │   └── Plants
 │   ├── Nodes
 │   │   ├── Core
 │   │   │   ├── HexCoords.cs
@@ -83,9 +102,7 @@ Assets
 │   ├── Player
 │   │   └── GardenerController.cs
 │   ├── UI
-│   └── Wizards
-│       ├── WizardController.cs
-│       └── WizardPreset.cs
+│   └── Visuals
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -127,11 +144,15 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     [Header("Runtime Graph Reference")]
     [SerializeField] private NodeGraph currentGraph;
-
+    
+    [Header("Startup Settings")]
+    [Tooltip("Should the node editor be visible when the game starts?")]
+    
     [Header("Zoom and Panning")]
     [SerializeField] private float startingZoomMultiplier = 1f; // Default zoom at start
     [SerializeField] private float contentMargin = 20f;         // Margin around nodes
 
+    public bool startVisible = true;
     private bool showContextMenu = false;
     private Vector2 contextMenuPosition;
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
@@ -165,6 +186,14 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         // Set initial zoom.
         contentRect.localScale = Vector3.one * startingZoomMultiplier;
         EnsureContentPanelSize();
+    
+        // Set initial visibility based on the flag
+        if (!startVisible)
+        {
+            canvasGroup.alpha = 0;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
     }
 
     private void Update()
@@ -585,14 +614,14 @@ public class NodeTestInitializer : MonoBehaviour
                 {
                     NodeEffectData effectCopy = new NodeEffectData
                     {
-                        effectType       = defEffect.effectType,
-                        effectValue      = defEffect.effectValue,
-                        secondaryValue   = defEffect.secondaryValue,
-                        extra1           = defEffect.extra1,
-                        extra2           = defEffect.extra2,
-                        leafPattern      = defEffect.leafPattern,       // FIX: now copying leafPattern
-                        growthRandomness = defEffect.growthRandomness   // FIX: now copying growthRandomness
+                        effectType = defEffect.effectType,
+                        effectValue = defEffect.effectValue,
+                        secondaryValue = defEffect.secondaryValue,
+                        extra1 = defEffect.extra1,
+                        extra2 = defEffect.extra2
                     };
+                    
+                    // Add the effect to the node
                     newNode.effects.Add(effectCopy);
                 }
 
@@ -643,7 +672,6 @@ public class NodeTestInitializer : MonoBehaviour
         }
     }
 }
-
 
 
 
@@ -802,44 +830,7 @@ public class NodeView : MonoBehaviour
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Player\GardenerController.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public class GardenerController : MonoBehaviour
-{
-    public float moveSpeed = 5f;
-    private Rigidbody2D rb;
-    private Vector2 movement;
-
-    private void Awake()
-    {
-        rb = GetComponent<Rigidbody2D>();
-    }
-
-    private void Update()
-    {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
-    }
-
-    private void FixedUpdate()
-    {
-        rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
-    }
-    
-    // Returns the current position used for planting seeds.
-    public Vector2 GetPlantingPosition()
-    {
-        return transform.position;
-    }
-}
-
-
-
-
 
 --------------------------------------------------------------------------------
-This is part 3 out of 4 of script collection. 1 more parts remain.
+This is part 4 out of 5 of script collection. 1 more parts remain.
 --------------------------------------------------------------------------------

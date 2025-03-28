@@ -1,12 +1,15 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-25 00:47:25
+UNITY PROJECT SCRIPT EXPORT - 2025-03-27 17:48:50
 ================================================================================
 
 DIRECTORY STRUCTURE
 --------------------------------------------------------------------------------
 Assets
+├── Animation
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
 ├── DefaultVolumeProfile.asset
 ├── Editor
 │   ├── HexGridRendererEditor.cs
@@ -14,36 +17,47 @@ Assets
 │   ├── NodeDefinitionCreator.cs
 │   ├── NodeDefinitionLibraryEditor.cs
 │   ├── NodeDefinitionPostprocessor.cs
-│   ├── NodeEffectDataDrawer.cs
-│   └── WizardControllerStatusEditor.cs
+│   └── NodeEffectDataDrawer.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
 ├── InputSystem_Actions.inputactions
 ├── Materials
 │   └── BezierCurveAA_Material.mat
 ├── Post Processing
 ├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   └── Animal_Fox.prefab
+│   │   ├── Indicator_Opportunity.prefab
+│   │   ├── Indicator_Resource.prefab
+│   │   ├── Indicator_Threat.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   └── PlantPrefab.prefab
+│   │   └── ThoughtBubble.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
-│   │   ├── PixelLeaf.prefab
-│   │   ├── PixelSeed.prefab
-│   │   ├── PixelStem.prefab
-│   │   ├── PlantPrefab.prefab
-│   │   ├── Projectile_Basic_Pixel.prefab
-│   │   └── WizardPrefab.prefab
-│   ├── Node Presets
-│   │   ├── NodeDefinitionLibrary.asset
-│   │   ├── Node_000_Seed.asset
-│   │   ├── Node_001_AimSpread.asset
-│   │   ├── Node_002_Piercing.asset
-│   │   ├── Node_003_Output.asset
-│   │   ├── Node_004_ManaSource.asset
-│   │   ├── Node_005_DamageNode.asset
-│   │   ├── Node_006_Burn.asset
-│   │   └── Node_007_FriendlyFire.asset
-│   ├── UI
-│   │   └── NodeView.prefab
-│   └── Wizard Presets
-│       ├── Wizard_Basic.asset
-│       └── Wizard_Dummy.asset
+│   │   ├── NodeView.prefab
+│   │   └── Projectile_Basic_Pixel.prefab
+│   └── Node Presets
+│       ├── NodeDefinitionLibrary.asset
+│       ├── Node_000_Seed.asset
+│       ├── Node_001_AimSpread.asset
+│       ├── Node_002_Piercing.asset
+│       ├── Node_003_Output.asset
+│       ├── Node_004_ManaSource.asset
+│       ├── Node_005_DamageNode.asset
+│       ├── Node_006_Burn.asset
+│       └── Node_007_FriendlyFire.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   └── SampleScene.unity
@@ -57,6 +71,11 @@ Assets
 │   │       ├── BurningStatusEffect.cs
 │   │       └── StatusEffect.cs
 │   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   ├── Core
+│   │   └── Plants
 │   ├── Nodes
 │   │   ├── Core
 │   │   │   ├── HexCoords.cs
@@ -83,9 +102,7 @@ Assets
 │   ├── Player
 │   │   └── GardenerController.cs
 │   ├── UI
-│   └── Wizards
-│       ├── WizardController.cs
-│       └── WizardPreset.cs
+│   └── Visuals
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -379,10 +396,6 @@ public class NodeEffectDataDrawer : PropertyDrawer
         SerializedProperty extra1Prop      = property.FindPropertyRelative("extra1");
         SerializedProperty extra2Prop      = property.FindPropertyRelative("extra2");
 
-        // New ones.
-        SerializedProperty leafPatternProp      = property.FindPropertyRelative("leafPattern");
-        SerializedProperty growthRandomnessProp = property.FindPropertyRelative("growthRandomness");
-
         // Draw effectType
         Rect typeRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
         EditorGUI.PropertyField(typeRect, typeProp, new GUIContent("Effect Type"));
@@ -453,37 +466,64 @@ public class NodeEffectDataDrawer : PropertyDrawer
                 valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
                 break;
             }
-            case NodeEffectType.Seed:
+            case NodeEffectType.SeedSpawn:
+            {
+                GUIContent content = new GUIContent("Seed Spawner", "Base effect required to spawn a plant. Add other plant effects to customize.");
+                Rect line = NextLineRect();
+                EditorGUI.LabelField(line, content);
+                break;
+            }
+            case NodeEffectType.StemLength:
             {
                 // Min stem length
                 var line1 = NextLineRect();
                 valueProp.floatValue = EditorGUI.FloatField(line1,
-                    new GUIContent("Min Stem Length", ""), valueProp.floatValue);
+                    new GUIContent("Min Stem Length", "Minimum length of the stem in cells"), valueProp.floatValue);
 
                 // Max stem length
                 var line2 = NextLineRect();
                 secondaryProp.floatValue = EditorGUI.FloatField(line2,
-                    new GUIContent("Max Stem Length", ""), secondaryProp.floatValue);
-
+                    new GUIContent("Max Stem Length", "Maximum length of the stem in cells"), secondaryProp.floatValue);
+                break;
+            }
+            case NodeEffectType.GrowthSpeed:
+            {
                 // Growth speed
-                var line3 = NextLineRect();
-                extra1Prop.floatValue = EditorGUI.FloatField(line3,
-                    new GUIContent("Growth Speed (sec)", ""), extra1Prop.floatValue);
-
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line,
+                    new GUIContent("Growth Speed (sec)", "Seconds per growth step"), valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.LeafGap:
+            {
                 // Leaf gap
-                var line4 = NextLineRect();
-                extra2Prop.floatValue = EditorGUI.FloatField(line4,
-                    new GUIContent("Leaf Gap", ""), extra2Prop.floatValue);
-
-                // Leaf Pattern => 0=Parallel, 1=Alternating
-                var line5 = NextLineRect();
-                leafPatternProp.intValue = EditorGUI.IntSlider(line5,
-                    new GUIContent("Leaf Pattern", "(0=parallel,1=alt)"), leafPatternProp.intValue, 0, 1);
-
-                // Growth Randomness => [0..2]
-                var line6 = NextLineRect();
-                growthRandomnessProp.floatValue = EditorGUI.Slider(line6,
-                    new GUIContent("Growth Randomness", "0=straight, 0.5=random, 0.5=always diagonal"), growthRandomnessProp.floatValue, 0f, 1f);
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line,
+                    new GUIContent("Leaf Gap", "0=leaves on every cell, 1=every 2nd cell, etc."), valueProp.floatValue);
+                break;
+            }
+            // Update the LeafPattern case in the NodeEffectDataDrawer.cs OnGUI method
+            case NodeEffectType.LeafPattern:
+            {
+                // Leaf Pattern as regular float field with improved tooltip
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, 
+                    new GUIContent("Leaf Pattern", 
+                        "Choose a leaf pattern by number:\n" +
+                        "0 = Parallel (leaves on both sides at same height)\n" +
+                        "1 = Offset-Parallel (right side leaves always higher)\n" +
+                        "2 = Alternating (L/R/R/L/L/R/R/L rotation pattern)\n" +
+                        "3 = Double-Spiral (leaves spiral up the stem)\n" +
+                        "4 = One-Sided (two leaves on right side only)"), 
+                    valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.StemRandomness:
+            {
+                // Growth Randomness => [0..1]
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.Slider(line,
+                    new GUIContent("Growth Randomness", "0=straight up, 1=always diagonal"), valueProp.floatValue, 0f, 1f);
                 break;
             }
             default:
@@ -515,11 +555,16 @@ public class NodeEffectDataDrawer : PropertyDrawer
             case NodeEffectType.AimSpread:
             case NodeEffectType.Piercing:
             case NodeEffectType.FriendlyFire:
-                // +1 line
+            case NodeEffectType.GrowthSpeed:
+            case NodeEffectType.LeafGap:
+            case NodeEffectType.LeafPattern:
+            case NodeEffectType.StemRandomness:
+                // +1 line each
                 totalHeight += (lineHeight + spacing);
                 break;
 
             case NodeEffectType.Output:
+            case NodeEffectType.SeedSpawn:
                 // +1 line
                 totalHeight += (lineHeight + spacing);
                 break;
@@ -529,9 +574,9 @@ public class NodeEffectDataDrawer : PropertyDrawer
                 totalHeight += (lineHeight + spacing) * 2;
                 break;
 
-            case NodeEffectType.Seed:
-                // min length + max length + growth speed + leaf gap + leaf pattern + randomness => 6 lines
-                totalHeight += (lineHeight + spacing) * 6;
+            case NodeEffectType.StemLength:
+                // +2 lines (min and max)
+                totalHeight += (lineHeight + spacing) * 2;
                 break;
 
             default:
@@ -540,38 +585,6 @@ public class NodeEffectDataDrawer : PropertyDrawer
                 break;
         }
         return totalHeight;
-    }
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Editor\WizardControllerStatusEditor.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEditor;
-
-[CustomEditor(typeof(WizardController))]
-public class WizardControllerStatusEditor : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-
-        WizardController wizard = (WizardController)target;
-        EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Active Status Effects", EditorStyles.boldLabel);
-        if (wizard.activeStatusEffects != null && wizard.activeStatusEffects.Count > 0)
-        {
-            foreach (var effect in wizard.activeStatusEffects)
-            {
-                EditorGUILayout.LabelField($"{effect.GetType().Name}: {effect.damagePerSecond} DPS, {effect.duration - effect.Elapsed:F1}s remaining");
-            }
-        }
-        else
-        {
-            EditorGUILayout.LabelField("None");
-        }
     }
 }
 
@@ -602,7 +615,8 @@ public class PlantGrowth : MonoBehaviour
     public float growthSpeed = 1f;           // Seconds per growth step
     [Tooltip("Leaf Gap: 0 = leaves on every stem cell; 1 = leaves on every 2nd stem cell; etc.")]
     public int leafGap = 1;
-    public int leafPattern = 0;              // 0 = Parallel, 1 = Alternating
+    [Tooltip("Leaf pattern type: 0=Parallel, 1=Offset-Parallel, 2=Alternating (L/R/R/L), 3=Double-Spiral, 4=One-Sided")]
+    public int leafPattern = 0;
     public float growthRandomness = 0f;      // [0..1]: 0=always up; 1=always diagonal
 
     [Header("Energy System")]
@@ -630,7 +644,6 @@ public class PlantGrowth : MonoBehaviour
     private bool growing = true;
     private int currentStemCount = 0;
     private int targetStemLength = 0;
-    private bool leftSideNext = true;
 
     private void Start()
     {
@@ -639,6 +652,18 @@ public class PlantGrowth : MonoBehaviour
 
         cells[new Vector2Int(0, 0)] = PlantCellType.Seed;
         SpawnCellVisual(PlantCellType.Seed, new Vector2Int(0, 0));
+
+        // Set up sorting inheritance
+        SortableEntity[] cellEntities = GetComponentsInChildren<SortableEntity>();
+        foreach (var cellEntity in cellEntities)
+        {
+            // Skip the seed cell, which will determine sorting
+            if (cellEntity.transform == transform)
+                continue;
+
+            // Use the public method to set parent Y coordinate usage
+            cellEntity.SetUseParentYCoordinate(true);
+        }
 
         StartCoroutine(GrowRoutine());
     }
@@ -661,68 +686,133 @@ public class PlantGrowth : MonoBehaviour
     }
 
     private IEnumerator GrowRoutine()
+{
+    Vector2Int currentPos = new Vector2Int(0, 0);
+    int spiralDirection = 1;  // Used for spiral pattern: 1=right, -1=left
+    int patternCounter = 0;   // Used to track position in complex patterns
+    
+    while (growing)
     {
-        Vector2Int currentPos = new Vector2Int(0, 0);
-        while (growing)
+        yield return new WaitForSeconds(growthSpeed);
+
+        if (currentStemCount < targetStemLength)
         {
-            yield return new WaitForSeconds(growthSpeed);
-
-            if (currentStemCount < targetStemLength)
+            currentStemCount++;
+            Vector2Int dir;
+            if (currentStemCount == 1)
             {
-                currentStemCount++;
-                Vector2Int dir;
-                if (currentStemCount == 1)
-                {
-                    // Always grow directly up for the first stem cell.
-                    dir = new Vector2Int(0, 1);
-                }
-                else
-                {
-                    dir = GetStemDirection();
-                }
-                currentPos += dir;
-                cells[currentPos] = PlantCellType.Stem;
-                SpawnCellVisual(PlantCellType.Stem, currentPos);
-                Debug.Log($"[PlantGrowth] Stem grown at {currentPos}");
-
-                if ((currentStemCount % (leafGap + 1)) == 0)
-                {
-                    Vector2Int baseLeftPos = currentPos + new Vector2Int(-1, 0);
-                    Vector2Int baseRightPos = currentPos + new Vector2Int(1, 0);
-
-                    if (leafPattern == 0) // Parallel: spawn both leaves.
-                    {
-                        SpawnLeafIfEmpty(baseLeftPos);
-                        SpawnLeafIfEmpty(baseRightPos);
-                        Debug.Log($"[PlantGrowth] Parallel leaves at {baseLeftPos} and {baseRightPos}");
-                    }
-                    else // Alternating: spawn both but with one side offset.
-                    {
-                        if (leftSideNext)
-                        {
-                            Vector2Int leftAlt = baseLeftPos + new Vector2Int(0, 1);
-                            SpawnLeafIfEmpty(leftAlt);
-                            SpawnLeafIfEmpty(baseRightPos);
-                            Debug.Log($"[PlantGrowth] Alternating leaves at {leftAlt} (offset) and {baseRightPos}");
-                        }
-                        else
-                        {
-                            Vector2Int rightAlt = baseRightPos + new Vector2Int(0, 1);
-                            SpawnLeafIfEmpty(baseLeftPos);
-                            SpawnLeafIfEmpty(rightAlt);
-                            Debug.Log($"[PlantGrowth] Alternating leaves at {baseLeftPos} and {rightAlt} (offset)");
-                        }
-                        leftSideNext = !leftSideNext;
-                    }
-                }
+                // Always grow directly up for the first stem cell.
+                dir = new Vector2Int(0, 1);
             }
             else
             {
-                growing = false;
-                Debug.Log("[PlantGrowth] Growth complete.");
+                dir = GetStemDirection();
+            }
+            currentPos += dir;
+            cells[currentPos] = PlantCellType.Stem;
+            SpawnCellVisual(PlantCellType.Stem, currentPos);
+            Debug.Log($"[PlantGrowth] Stem grown at {currentPos}");
+
+            if ((currentStemCount % (leafGap + 1)) == 0)
+            {
+                Vector2Int baseLeftPos = currentPos + new Vector2Int(-1, 0);
+                Vector2Int baseRightPos = currentPos + new Vector2Int(1, 0);
+                patternCounter++;
+
+                // Process according to leaf pattern
+                switch (leafPattern)
+                {
+                    case 0: // Parallel: spawn both leaves at same height
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(baseRightPos);
+                        Debug.Log($"[PlantGrowth] Parallel leaves at {baseLeftPos} and {baseRightPos}");
+                        break;
+                        
+                    case 1: // Offset-Parallel: both sides have leaves, but one side is higher
+                        // Fixed side offset - right side is always raised
+                        Vector2Int raisedRightPos = baseRightPos + new Vector2Int(0, 1);
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(raisedRightPos);
+                        Debug.Log($"[PlantGrowth] Offset-Parallel leaves at {baseLeftPos} and {raisedRightPos} (offset)");
+                        break;
+                        
+                    case 2: // Alternating-2 (L/R/R/L/L/R/R/L): proper rotation pattern
+                        // This creates the L/R/R/L/L/R/R/L pattern
+                        // patternCounter % 4 gives us:
+                        // 1 -> Left side offset (L)
+                        // 2 -> Right side normal (R)
+                        // 3 -> Right side offset (R)
+                        // 0 -> Left side normal (L)
+                        
+                        Vector2Int leftPos, rightPos;
+                        
+                        // Determine positions based on pattern position
+                        switch (patternCounter % 4) {
+                            case 1: // Left side offset, right side normal
+                                leftPos = baseLeftPos + new Vector2Int(0, 1);
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} (offset) and {rightPos}");
+                                break;
+                            case 2: // Left side normal, right side normal
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos}");
+                                break;
+                            case 3: // Left side normal, right side offset
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos + new Vector2Int(0, 1);
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos} (offset)");
+                                break;
+                            case 0: // Left side normal, right side normal (cycle complete)
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos}");
+                                break;
+                            default:
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                break;
+                        }
+                        
+                        SpawnLeafIfEmpty(leftPos);
+                        SpawnLeafIfEmpty(rightPos);
+                        break;
+                        
+                    case 3: // Double-Spiral: two leaves per node, spiral pattern
+                        // Create two leaves that spiral around the stem, with vertical offset
+                        Vector2Int leftSpiral = baseLeftPos + new Vector2Int(0, spiralDirection > 0 ? 1 : 0);
+                        Vector2Int rightSpiral = baseRightPos + new Vector2Int(0, spiralDirection > 0 ? 0 : 1);
+                        
+                        SpawnLeafIfEmpty(leftSpiral);
+                        SpawnLeafIfEmpty(rightSpiral);
+                        
+                        Debug.Log($"[PlantGrowth] Double-Spiral leaves at {leftSpiral} and {rightSpiral}");
+                        
+                        // Toggle spiral direction for next node
+                        spiralDirection *= -1;
+                        break;
+                        
+                    case 4: // One-Sided: leaves only grow on one side
+                        // For balance, create two leaves on the same side
+                        SpawnLeafIfEmpty(baseRightPos);
+                        SpawnLeafIfEmpty(baseRightPos + new Vector2Int(0, 1));
+                        Debug.Log($"[PlantGrowth] One-sided leaves at {baseRightPos} and {baseRightPos + new Vector2Int(0, 1)}");
+                        break;
+                        
+                    default: // Fallback to parallel
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(baseRightPos);
+                        break;
+                }
             }
         }
+        else
+        {
+            growing = false;
+            Debug.Log("[PlantGrowth] Growth complete.");
+        }
     }
+}
 
     private Vector2Int GetStemDirection()
     {
@@ -766,7 +856,18 @@ public class PlantGrowth : MonoBehaviour
         }
         if (prefabToUse != null)
         {
-            Instantiate(prefabToUse, worldPos, Quaternion.identity, transform);
+            GameObject cellInstance = Instantiate(prefabToUse, worldPos, Quaternion.identity, transform);
+        
+            // Add SortableEntity if not already present
+            SortableEntity sortableEntity = cellInstance.GetComponent<SortableEntity>();
+            if (sortableEntity == null)
+                sortableEntity = cellInstance.AddComponent<SortableEntity>();
+        
+            // For non-seed cells, enable "Y from parent"
+            if (cellType != PlantCellType.Seed)
+            {
+                sortableEntity.SetUseParentYCoordinate(true);
+            }
         }
         else
         {
@@ -774,7 +875,6 @@ public class PlantGrowth : MonoBehaviour
         }
     }
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -857,21 +957,7 @@ public class SpellProjectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        WizardController wizard = collision.GetComponent<WizardController>();
-        if (wizard != null)
-        {
-            // If friendly fire is disabled and the hit wizard is on the same team, ignore.
-            if (!friendlyFire && wizard.isEnemy == casterIsEnemy)
-                return;
-
-            wizard.TakeDamage(damage);
-            if (burningDamage > 0 && burningDuration > 0)
-            {
-                wizard.ApplyStatusEffect(new BurningStatusEffect(burningDuration, burningDamage));
-            }
-            if (destroyOnHit)
-                Destroy(gameObject);
-        }
+        
     }
 }
 
@@ -883,11 +969,7 @@ public class SpellProjectile : MonoBehaviour
 {
     public BurningStatusEffect(float d, float dps) : base(d, dps) { }
 
-    public override void UpdateEffect(WizardController wizard, float deltaTime)
-    {
-        elapsed += deltaTime;
-        wizard.TakeDamage(damagePerSecond * deltaTime);
-    }
+    
 }
 
 
@@ -909,8 +991,98 @@ public class SpellProjectile : MonoBehaviour
         damagePerSecond = dps;
     }
 
-    public abstract void UpdateEffect(WizardController wizard, float deltaTime);
     public bool IsExpired() => elapsed >= duration;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Core\SortableEntity.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class SortableEntity : MonoBehaviour
+{
+    [Header("Sorting Configuration")]
+    [Tooltip("Offset added to Y position for sorting calculation")]
+    [SerializeField] private float sortingLayerYOffset = 0f;
+
+    [Tooltip("Use parent's Y coordinate for sorting")]
+    [SerializeField] private bool useParentYCoordinate = false;
+
+    [Tooltip("Debug logging for sorting")]
+    public bool debugSorting = false;
+
+    private SpriteRenderer spriteRenderer;
+
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        
+        // If no SpriteRenderer, try to find one in children
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        // Ensure sprite renderer exists
+        if (spriteRenderer == null)
+        {
+            Debug.LogWarning($"[SortableEntity] No SpriteRenderer found on {gameObject.name}");
+        }
+    }
+
+    private void Start()
+    {
+        UpdateSortingOrder();
+    }
+
+    private void LateUpdate()
+    {
+        UpdateSortingOrder();
+    }
+
+    public void UpdateSortingOrder()
+    {
+        if (spriteRenderer == null) return;
+
+        // Determine Y position for sorting
+        float yPositionForSorting = useParentYCoordinate && transform.parent != null 
+            ? transform.parent.position.y 
+            : transform.position.y;
+
+        int sortOrder = CalculateSortOrder(yPositionForSorting);
+        spriteRenderer.sortingOrder = sortOrder;
+
+        if (debugSorting)
+        {
+            Debug.Log($"[SortableEntity] {gameObject.name} - Y: {yPositionForSorting}, Offset: {sortingLayerYOffset}, Sort Order: {sortOrder}");
+        }
+    }
+
+    private int CalculateSortOrder(float yPosition)
+    {
+        // Subtract offset to effectively move the sorting position
+        return Mathf.RoundToInt(-(yPosition + sortingLayerYOffset) * 1000f);
+    }
+
+    // Public method to get current sorting order
+    public int GetCurrentSortOrder()
+    {
+        if (spriteRenderer == null) return 0;
+        return spriteRenderer.sortingOrder;
+    }
+
+    // Public method to set sorting order directly if needed
+    public void SetSortingOrder(int order)
+    {
+        if (spriteRenderer != null)
+            spriteRenderer.sortingOrder = order;
+    }
+
+    // Public method to set the parent Y coordinate usage flag
+    // This eliminates the need for reflection in other scripts
+    public void SetUseParentYCoordinate(bool value)
+    {
+        useParentYCoordinate = value;
+    }
 }
 
 
@@ -1237,7 +1409,13 @@ public class NodeEffectData
     Burning,
     Piercing,
     FriendlyFire,
-    Seed  // New effect type for planting a seed.
+    // Replaced Seed with more granular effects
+    SeedSpawn,        // Base effect to spawn a plant
+    StemLength,       // Min/Max stem length
+    GrowthSpeed,      // Controls growth speed
+    LeafGap,          // Spacing between leaves
+    LeafPattern,      // Parallel or alternating pattern
+    StemRandomness    // Randomness of stem growth
 }
 
 
@@ -1290,22 +1468,10 @@ public class OutputNodeEffect : MonoBehaviour
     {
         Debug.Log("[OutputNodeEffect] Activate() called. Spawning projectile or calling wizard cast.");
 
-        // For example, find the local (player) wizard and cast a test projectile:
-        WizardController playerWiz = FindObjectsOfType<WizardController>()
-            .FirstOrDefault(w => !w.isEnemy);
+        
 
-        if (playerWiz)
-        {
-            // Just an example. The real logic might pass finalDamage, aimSpread, etc.
-            playerWiz.CastSpell(finalDamage: 10f, finalAimSpread: 5f,
-                burningDamage: 0f, burningDuration: 0f,
-                piercing: false, friendlyFire: false);
-            Debug.Log("[OutputNodeEffect] Called player's CastSpell with sample values.");
-        }
-        else
-        {
-            Debug.LogWarning("[OutputNodeEffect] No friendly wizard found in scene.");
-        }
+        
+        
     }
 }
 
@@ -1488,48 +1654,83 @@ public class NodeExecutor : MonoBehaviour
             }
         }
 
-        // If it's a Seed node, spawn the plant now using the BFS accumulators.
-        var seedEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.Seed);
-        if (seedEffect != null)
+        // If it's a SeedSpawn node, spawn the plant now using the BFS accumulators and collect plant parameters
+        var seedSpawnEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.SeedSpawn);
+        if (seedSpawnEffect != null)
         {
-            SpawnPlant(seedEffect);
+            SpawnPlant(node);
         }
     }
 
-    private void SpawnPlant(NodeEffectData seedEffect)
+    private void SpawnPlant(NodeData node)
     {
         if (plantPrefab == null)
         {
             LogDebug("[NodeExecutor] plantPrefab is not assigned in the inspector!");
             return;
         }
-        var gardener = FindObjectOfType<GardenerController>();
+        var gardener = Object.FindAnyObjectByType<GardenerController>();
         if (gardener == null)
         {
             LogDebug("[NodeExecutor] No GardenerController found. Can't spawn plant.");
             return;
         }
 
+        // Collect all the plant effect parameters
+        float stemMinLength = 3;  // Default value
+        float stemMaxLength = 6;  // Default value
+        float growthSpeed = 1f;   // Default value
+        float leafGap = 1f;       // Default value
+        float leafPattern = 0f;   // Default value
+        float growthRandomness = 0f; // Default value
+
+        // Find all plant-related effects in this node and the entire visited chain
+        foreach (var effect in node.effects)
+        {
+            switch (effect.effectType)
+            {
+                case NodeEffectType.StemLength:
+                    stemMinLength = effect.effectValue;
+                    stemMaxLength = effect.secondaryValue;
+                    break;
+                case NodeEffectType.GrowthSpeed:
+                    growthSpeed = effect.effectValue;
+                    break;
+                case NodeEffectType.LeafGap:
+                    leafGap = effect.effectValue;
+                    break;
+                case NodeEffectType.LeafPattern:
+                    leafPattern = effect.effectValue;
+                    break;
+                case NodeEffectType.StemRandomness:
+                    growthRandomness = effect.effectValue;
+                    break;
+            }
+        }
+
+        // Spawn the plant with all the collected parameters
         Vector2 spawnPos = gardener.GetPlantingPosition();
         GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
         PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
 
         if (growth != null)
         {
-            // standard seed data
-            growth.stemMinLength = Mathf.RoundToInt(seedEffect.effectValue);
-            growth.stemMaxLength = Mathf.RoundToInt(seedEffect.secondaryValue);
-            growth.growthSpeed   = seedEffect.extra1;
-            growth.leafGap       = Mathf.RoundToInt(seedEffect.extra2);
-            growth.leafPattern      = seedEffect.leafPattern; 
-            growth.growthRandomness = seedEffect.growthRandomness;
+            // Apply all the collected plant parameters
+            growth.stemMinLength = Mathf.RoundToInt(stemMinLength);
+            growth.stemMaxLength = Mathf.RoundToInt(stemMaxLength);
+            growth.growthSpeed = growthSpeed;
+            growth.leafGap = Mathf.RoundToInt(leafGap);
+            growth.leafPattern = Mathf.RoundToInt(leafPattern);
+            growth.growthRandomness = growthRandomness;
 
-            // new "energy" data from BFS sums
-            growth.maxEnergy       = accumulatedEnergyStorage;   // sum of all energy storages
-            growth.basePhotosynthesis = accumulatedPhotosynthesis; // sum of all photosynthesis rates
+            // Energy data from BFS sums
+            growth.maxEnergy = accumulatedEnergyStorage;
+            growth.basePhotosynthesis = accumulatedPhotosynthesis;
 
             LogDebug($"[NodeExecutor] Spawned plant => " +
-                     $"Seed(min={growth.stemMinLength},max={growth.stemMaxLength},spd={growth.growthSpeed},gap={growth.leafGap},pat={growth.leafPattern},rand={growth.growthRandomness}), " +
+                     $"StemLength(min={growth.stemMinLength},max={growth.stemMaxLength}), " +
+                     $"GrowthSpeed={growth.growthSpeed}, LeafGap={growth.leafGap}, " +
+                     $"LeafPattern={growth.leafPattern}, GrowthRandomness={growth.growthRandomness}, " +
                      $"Energy(max={growth.maxEnergy}), Photosynthesis(base={growth.basePhotosynthesis})");
         }
         else
@@ -1539,7 +1740,7 @@ public class NodeExecutor : MonoBehaviour
 
         // If you want each new seed to get its own accumulators, 
         // reset them after spawning:
-        accumulatedEnergyStorage  = 0f;
+        accumulatedEnergyStorage = 0f;
         accumulatedPhotosynthesis = 0f;
     }
 
@@ -1556,7 +1757,6 @@ public class NodeExecutor : MonoBehaviour
             debugOutput.text += msg + "\n";
     }
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1615,11 +1815,15 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
 
     [Header("Runtime Graph Reference")]
     [SerializeField] private NodeGraph currentGraph;
-
+    
+    [Header("Startup Settings")]
+    [Tooltip("Should the node editor be visible when the game starts?")]
+    
     [Header("Zoom and Panning")]
     [SerializeField] private float startingZoomMultiplier = 1f; // Default zoom at start
     [SerializeField] private float contentMargin = 20f;         // Margin around nodes
 
+    public bool startVisible = true;
     private bool showContextMenu = false;
     private Vector2 contextMenuPosition;
     private List<NodeView> spawnedNodeViews = new List<NodeView>();
@@ -1653,6 +1857,14 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         // Set initial zoom.
         contentRect.localScale = Vector3.one * startingZoomMultiplier;
         EnsureContentPanelSize();
+    
+        // Set initial visibility based on the flag
+        if (!startVisible)
+        {
+            canvasGroup.alpha = 0;
+            canvasGroup.interactable = false;
+            canvasGroup.blocksRaycasts = false;
+        }
     }
 
     private void Update()
@@ -2067,14 +2279,14 @@ public class NodeTestInitializer : MonoBehaviour
                 {
                     NodeEffectData effectCopy = new NodeEffectData
                     {
-                        effectType       = defEffect.effectType,
-                        effectValue      = defEffect.effectValue,
-                        secondaryValue   = defEffect.secondaryValue,
-                        extra1           = defEffect.extra1,
-                        extra2           = defEffect.extra2,
-                        leafPattern      = defEffect.leafPattern,       // FIX: now copying leafPattern
-                        growthRandomness = defEffect.growthRandomness   // FIX: now copying growthRandomness
+                        effectType = defEffect.effectType,
+                        effectValue = defEffect.effectValue,
+                        secondaryValue = defEffect.secondaryValue,
+                        extra1 = defEffect.extra1,
+                        extra2 = defEffect.extra2
                     };
+                    
+                    // Add the effect to the node
                     newNode.effects.Add(effectCopy);
                 }
 
@@ -2125,7 +2337,6 @@ public class NodeTestInitializer : MonoBehaviour
         }
     }
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2287,193 +2498,203 @@ public class NodeView : MonoBehaviour
 
 public class GardenerController : MonoBehaviour
 {
+    [Header("Movement Settings")]
     public float moveSpeed = 5f;
+    
+    [Header("Planting Settings")]
+    public Vector2 seedPlantingOffset = new Vector2(0f, -0.5f); // Configurable offset for seed planting
+
+    [Header("Visual Settings")]
+    [Tooltip("If true, the sprite will be flipped when moving left")]
+    public bool flipSpriteWhenMovingLeft = true;
+    [Tooltip("If true, the character will face the opposite direction when flipped")]
+    public bool flipHorizontalDirection = true;
+
+    [Header("Animation Settings")]
+    [Tooltip("Set to false to disable animations")]
+    public bool useAnimations = true;
+    public string runningParameterName = "isRunning";
+    public string plantingParameterName = "isPlanting";
+    [Tooltip("Should match your planting animation length exactly")]
+    public float plantingDuration = 0.25f; // UPDATED to match your 0.25s animation
+
+
+    
+    // Private references
     private Rigidbody2D rb;
     private Vector2 movement;
+    private SortableEntity sortableEntity;
+    private SpriteRenderer spriteRenderer;
+    private Animator animator;
+    // Private variables
+    private bool isPlanting = false;
+    private float plantingTimer = 0f;
+    private bool wasMovingBeforePlanting = false;
 
     private void Awake()
     {
+        // Get required components
         rb = GetComponent<Rigidbody2D>();
+        sortableEntity = GetComponent<SortableEntity>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
+        
+        // Add SortableEntity if not already present
+        if (sortableEntity == null)
+            sortableEntity = gameObject.AddComponent<SortableEntity>();
+            
+        // Warn if sprite renderer is missing
+        if (spriteRenderer == null)
+            Debug.LogWarning("GardenerController: SpriteRenderer component not found. Sprite flipping won't work.");
+            
+        // Warn if animator is missing but animations are enabled
+        if (animator == null && useAnimations)
+            Debug.LogWarning("GardenerController: Animator component not found but useAnimations is true.");
     }
 
     private void Update()
     {
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
+        // Handle movement input and planting action
+        if (!isPlanting)
+        {
+            movement.x = Input.GetAxisRaw("Horizontal");
+            movement.y = Input.GetAxisRaw("Vertical");
+        
+            // Check if we're moving (store for later)
+            bool isMoving = movement.sqrMagnitude > 0.01f;
+        
+            // Handle planting action
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                // Store movement state before planting
+                wasMovingBeforePlanting = isMoving;
+                StartPlantingAnimation();
+            }
+        }
+        else
+        {
+            // When planting, we don't accept movement input
+            movement = Vector2.zero;
+        
+            // Handle planting timer
+            plantingTimer -= Time.deltaTime;
+            if (plantingTimer <= 0)
+            {
+                EndPlantingAnimation();
+            }
+        }
+    
+        // Update animations after all state changes are processed
+        UpdateAnimations();
+    
+        // Handle sprite flipping based on movement direction
+        UpdateSpriteDirection();
     }
 
     private void FixedUpdate()
     {
-        rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+        // Only move if not planting
+        if (!isPlanting)
+        {
+            rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+        }
     }
     
-    // Returns the current position used for planting seeds.
+    // Update character animations based on state
+    private void UpdateAnimations()
+    {
+        if (!useAnimations || animator == null) return;
+    
+        // Set running animation parameter
+        bool isMoving = movement.sqrMagnitude > 0.01f;
+        animator.SetBool(runningParameterName, isMoving);
+    }
+    
+    // Update sprite direction based on movement
+    private void UpdateSpriteDirection()
+    {
+        if (spriteRenderer == null || !flipSpriteWhenMovingLeft) return;
+        
+        if (movement.x != 0)
+        {
+            // Only flip if moving horizontally
+            bool shouldFlip = (movement.x < 0);
+            
+            // Apply flipping logic based on settings
+            if (flipHorizontalDirection)
+            {
+                spriteRenderer.flipX = shouldFlip;
+            }
+            else
+            {
+                // Alternative approach: flip the entire transform
+                // This is useful if the sprite is already facing left initially
+                Vector3 scale = transform.localScale;
+                scale.x = shouldFlip ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
+                transform.localScale = scale;
+            }
+        }
+    }
+    
+    // Start planting animation and process
+    public void StartPlantingAnimation()
+    {
+        if (!useAnimations || isPlanting) return;
+    
+        isPlanting = true;
+        plantingTimer = plantingDuration;
+    
+        // Set animation parameters
+        if (animator != null)
+        {
+            // Set planting to true and ensure running is false
+            animator.SetBool(plantingParameterName, true);
+            animator.SetBool(runningParameterName, false);
+        }
+    }
+    
+    // End planting animation and resume normal control
+    
+    private void EndPlantingAnimation()
+    {
+        // Reset planting state
+        isPlanting = false;
+    
+        // Reset animation parameters
+        if (animator != null)
+        {
+            animator.SetBool(plantingParameterName, false);
+        
+            // Important: don't immediately set isRunning based on current movement
+            // because movement is zero during planting. Instead:
+            if (wasMovingBeforePlanting && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
+            {
+                // Only resume running if we were running before AND still have directional input
+                animator.SetBool(runningParameterName, true);
+            }
+        }
+    
+        // Now update movement based on current input
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
+    }
+    
+    // Returns the position used for planting seeds, now with configurable offset
     public Vector2 GetPlantingPosition()
     {
-        return transform.position;
+        return (Vector2)transform.position + seedPlantingOffset;
     }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Wizards\WizardController.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using TMPro;
-using System.Collections.Generic;
-
-public enum FiringDirection
-{
-    Up,
-    Down
-}
-
-public class WizardController : MonoBehaviour
-{
-    [Header("Wizard Configuration")]
-    public bool isEnemy = false;
-
-    [Header("Wizard Stats")]
-    public float maxHP = 100f;
-    public float currentHP;
-    [Tooltip("Base aim spread in degrees; higher values mean a wider spread.")]
-    public float baseAimSpread = 5f;
-
-    [Header("Firing Settings")]
-    [Tooltip("Determines if the wizard fires upward (default) or downward.")]
-    public FiringDirection firingDirection = FiringDirection.Up;
-    [Tooltip("The transform where spells are spawned. Its original Y value is used as reference.")]
-    public Transform spellSpawnPoint;
-    [Tooltip("Projectile prefab to be cast.")]
-    public GameObject spellProjectilePrefab;
-    public float projectileSpeed = 10f;
-    [Tooltip("Enable friendly fire (projectile can damage friendlies)")]
-    public bool friendlyFireEnabled = false;
-
-    [Header("UI")]
-    public TMP_Text hpText;
-
-    private float originalSpawnY = 0f;
-    public List<StatusEffect> activeStatusEffects = new List<StatusEffect>();
-
-    private void Awake()
+    
+    // Public method to set planting animation duration
+    public void SetPlantingDuration(float duration)
     {
-        currentHP = maxHP;
-        UpdateHPUI();
-
-#if UNITY_EDITOR
-        // Store the original Y value if not already stored.
-        if (spellSpawnPoint != null && originalSpawnY == 0f)
-            originalSpawnY = spellSpawnPoint.localPosition.y;
-#endif
+        plantingDuration = Mathf.Max(0.1f, duration); // Ensure minimum duration
     }
-
-#if UNITY_EDITOR
-    private void OnValidate()
+    
+    // Public method to trigger planting animation from other scripts
+    public void Plant()
     {
-        // When the firing direction changes, update spellSpawnPoint's Y coordinate.
-        if (spellSpawnPoint != null)
-        {
-            // Ensure we have stored the original Y value.
-            if (originalSpawnY == 0f)
-                originalSpawnY = spellSpawnPoint.localPosition.y;
-
-            Vector2 pos = spellSpawnPoint.localPosition;
-            if (firingDirection == FiringDirection.Down)
-                pos.y = -Mathf.Abs(originalSpawnY);
-            else
-                pos.y = Mathf.Abs(originalSpawnY);
-            spellSpawnPoint.localPosition = pos;
-        }
+        StartPlantingAnimation();
     }
-#endif
-
-    public void TakeDamage(float damage)
-    {
-        currentHP -= damage;
-        if (currentHP < 0)
-            currentHP = 0;
-        UpdateHPUI();
-        if (currentHP <= 0)
-        {
-            Debug.Log($"{gameObject.name} has been defeated.");
-            // Add additional death logic if needed.
-        }
-    }
-
-    private void UpdateHPUI()
-    {
-        if (hpText != null)
-            hpText.text = $"HP: {Mathf.Floor(currentHP)}/{maxHP}";
-    }
-
-    /// <summary>
-    /// Casts a spell. The projectile is spawned at spellSpawnPoint.
-    /// The projectile's rotation is based on firingDirection and a random deviation within ±finalAimSpread.
-    /// Also passes burning and friendly-fire parameters.
-    /// </summary>
-    public void CastSpell(float finalDamage, float finalAimSpread, float burningDamage, float burningDuration, bool piercing, bool friendlyFire)
-    {
-        if (isEnemy)
-            return; // Enemies do not cast spells via node chain.
-
-        if (spellProjectilePrefab == null || spellSpawnPoint == null)
-        {
-            Debug.LogWarning("Spell projectile prefab or spawn point not set.");
-            return;
-        }
-
-        // Base rotation: for Up, identity; for Down, flip 180°.
-        Quaternion baseRotation = (firingDirection == FiringDirection.Up) ? Quaternion.identity : Quaternion.Euler(0, 0, 180);
-        float deviation = Random.Range(-finalAimSpread, finalAimSpread);
-        Quaternion finalRotation = baseRotation * Quaternion.Euler(0, 0, deviation);
-
-        GameObject projObj = Instantiate(spellProjectilePrefab, spellSpawnPoint.position, finalRotation);
-        SpellProjectile projectile = projObj.GetComponent<SpellProjectile>();
-        if (projectile != null)
-        {
-            projectile.Initialize(finalDamage, projectileSpeed);
-            projectile.burningDamage = burningDamage;
-            projectile.burningDuration = burningDuration;
-            projectile.destroyOnHit = !piercing; // If piercing is true, do not destroy.
-            projectile.friendlyFire = friendlyFire;
-            projectile.casterIsEnemy = isEnemy;
-        }
-    }
-
-    private void Update()
-    {
-        float delta = Time.deltaTime;
-        for (int i = activeStatusEffects.Count - 1; i >= 0; i--)
-        {
-            activeStatusEffects[i].UpdateEffect(this, delta);
-            if (activeStatusEffects[i].IsExpired())
-                activeStatusEffects.RemoveAt(i);
-        }
-    }
-
-    public void ApplyStatusEffect(StatusEffect effect)
-    {
-        activeStatusEffects.Add(effect);
-    }
-}
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Wizards\WizardPreset.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-
-[CreateAssetMenu(fileName = "WizardPreset", menuName = "Wizards/WizardPreset")]
-public class WizardPreset : ScriptableObject
-{
-    public string presetName;
-    public float maxHP = 100f;
-    public float accuracy = 5f;      // In degrees: how much the projectile can deviate.
-    public float critChance = 0f;    // Future use.
-    public FiringDirection baseFiringDirection = FiringDirection.Up;
-    // Add additional stats as needed.
 }
 

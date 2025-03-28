@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1385400547619210892}
   m_Layer: 0
-  m_Name: SpawnPoint_Bubble
+  m_Name: Transform_ThoughtBubble
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1163734924835668216}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.42, z: 0}
+  m_LocalPosition: {x: 0, y: -0.013, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -40,8 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2467199068900137623}
-  - component: {fileID: 1951457715195270254}
-  - component: {fileID: 3215128133140900390}
+  - component: {fileID: 5388609490824270281}
   - component: {fileID: 1716373188419040610}
   - component: {fileID: 7676723920541196182}
   - component: {fileID: 797355728484655466}
@@ -68,9 +67,10 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1385400547619210892}
+  - {fileID: 9001696667229699929}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1951457715195270254
+--- !u!114 &5388609490824270281
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -79,62 +79,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 1618699628824306755}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b55e8c487b3f4214a0214088b8a34d71, type: 3}
+  m_Script: {fileID: 11500000, guid: 85a75fc8b3b544a484c5c4f0642416f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animalName: Bunny
-  animalType: 0
-  moveSpeed: 3
-  maxHealth: 100
-  currentHealth: 0
-  senseRadius: 10
-  hungerRate: 5
-  maxHunger: 100
-  currentHunger: 0
-  aggression: 0.5
-  curiosity: 0.5
-  sociability: 0.5
-  intelligence: 0.5
-  persistence: 0.5
-  fearfulness: 0
-  territoriality: 0
-  adaptability: 0
-  age: 0
-  memories: []
-  archetype: Unspecified
-  feedingRate: 10
-  plantNutritionValue: 15
-  preferYoungLeaves: 1
-  canEatFruit: 1
-  fleeDistance: 5
-  plantLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  preferredPlantTags:
-  - Leaf
-  - Plant
-  predatorTags:
-  - Predator
-  - Carnivore
---- !u!114 &3215128133140900390
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1618699628824306755}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 884c82b31a02457b8256a41927b6e0ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  thoughtLibrary: {fileID: 11400000, guid: 8abd92eb95108124a8478425e6e2cfb5, type: 2}
   thoughtBubblePrefab: {fileID: 7019603340007582860, guid: e00dc2bef6e577f4788d3a0262749be1, type: 3}
-  bubbleSpawnPoint: {fileID: 1385400547619210892}
-  minTimeBetweenThoughts: 10
-  thoughtFrequency: 0.5
-  trackRelationships: 1
-  relationshipRange: 10
-  relationshipMemory: 0.5
+  mouthTransform: {fileID: 9001696667229699929}
+  bubbleSpawnTransform: {fileID: 1385400547619210892}
+  thoughtCooldownTime: 5
+  wanderMoveDuration: 2
+  wanderPauseDuration: 1
+  minBounds: {x: -10, y: -5}
+  maxBounds: {x: 10, y: 5}
+  eatDuration: 2
+  eatDistance: 0.05
 --- !u!114 &1716373188419040610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -291,3 +249,34 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -0.12}
   m_Size: {x: 0.12, y: 0.06}
   m_Direction: 1
+--- !u!1 &3981490660437409664
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9001696667229699929}
+  m_Layer: 0
+  m_Name: Transform_Mouth
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9001696667229699929
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3981490660437409664}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.037, y: -0.127, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2467199068900137623}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

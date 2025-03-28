@@ -279,7 +279,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1090940917712720748}
   - component: {fileID: -7276291906513066215}
-  - component: {fileID: 2651459961907843522}
   m_Layer: 0
   m_Name: PlantPrefab
   m_TagString: Untagged
@@ -330,26 +329,3 @@ MonoBehaviour:
   leafCellPrefab: {fileID: 3989903528299243114, guid: bfbf2c64527183d4c95dcf83f92ee26b, type: 3}
   cellSpacing: 0.08
   energyText: {fileID: 5767746695747064716}
---- !u!114 &2651459961907843522
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8982947048272063882}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d92651625464849bb76916981aa6c50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  toxicityGene: 0
-  toughnessGene: 0
-  nutritionGene: 0.5
-  growthSpeedGene: 0.5
-  rootDepthGene: 0.5
-  droughtResistance: 0.5
-  coldResistance: 0.5
-  plantVisibility: 0.5
-  attractiveness: 0.5
-  thoughtBubblePrefab: {fileID: 7019603340007582860, guid: e00dc2bef6e577f4788d3a0262749be1, type: 3}
-  thoughtBubbleSpawnPoint: {fileID: 1274493678575850901}

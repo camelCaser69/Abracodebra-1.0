@@ -40,8 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3861641885198686507}
-  - component: {fileID: 8685069789531380983}
-  - component: {fileID: 5300898439900273619}
+  - component: {fileID: 4445507047832314595}
   - component: {fileID: 8136233811546609221}
   - component: {fileID: 1083078178134342893}
   - component: {fileID: 7661782395673529679}
@@ -70,7 +69,7 @@ Transform:
   - {fileID: 798291063594967594}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8685069789531380983
+--- !u!114 &4445507047832314595
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -79,67 +78,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 6503867083147801814}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b02837ec14be4a05a7c138585030c94f, type: 3}
+  m_Script: {fileID: 11500000, guid: 85a75fc8b3b544a484c5c4f0642416f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animalName: 
-  animalType: 2
-  moveSpeed: 3
-  maxHealth: 100
-  currentHealth: 0
-  senseRadius: 10
-  hungerRate: 5
-  maxHunger: 100
-  currentHunger: 0
-  aggression: 0.5
-  curiosity: 0.5
-  sociability: 0.5
-  intelligence: 0.5
-  persistence: 0.5
-  fearfulness: 0
-  territoriality: 0
-  adaptability: 0
-  age: 0
-  memories: []
-  archetype: Unspecified
-  attackDamage: 10
-  flightHeight: 2
-  divingSpeed: 7
-  soaringSpeed: 4
-  landedSpeed: 2
-  isFlying: 1
-  meatPreference: 0.5
-  insectPreference: 0.7
-  seedNutritionValue: 10
-  insectNutritionValue: 15
-  preyNutritionValue: 25
-  preyTags:
-  - Insect
-  - SmallPrey
-  seedTags:
-  - Seed
-  - Fruit
-  predatorTags:
-  - LargePredator
---- !u!114 &5300898439900273619
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6503867083147801814}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 884c82b31a02457b8256a41927b6e0ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  thoughtLibrary: {fileID: 11400000, guid: 8abd92eb95108124a8478425e6e2cfb5, type: 2}
   thoughtBubblePrefab: {fileID: 7019603340007582860, guid: e00dc2bef6e577f4788d3a0262749be1, type: 3}
-  bubbleSpawnPoint: {fileID: 798291063594967594}
-  minTimeBetweenThoughts: 10
-  thoughtFrequency: 0.5
-  trackRelationships: 1
-  relationshipRange: 10
-  relationshipMemory: 0.5
+  minBounds: {x: -10, y: -5}
+  maxBounds: {x: 10, y: 5}
+  eatDuration: 2
 --- !u!114 &8136233811546609221
 MonoBehaviour:
   m_ObjectHideFlags: 0

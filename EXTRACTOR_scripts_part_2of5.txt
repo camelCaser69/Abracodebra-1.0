@@ -1,0 +1,867 @@
+This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
+
+================================================================================
+UNITY PROJECT SCRIPT EXPORT - 2025-03-27 17:48:50
+PART 2 OF 5
+================================================================================
+
+--------------------------------------------------------------------------------
+Assets
+├── Animation
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
+├── DefaultVolumeProfile.asset
+├── Editor
+│   ├── HexGridRendererEditor.cs
+│   ├── NodeDefinitionAutoAdder.cs
+│   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionLibraryEditor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   └── NodeEffectDataDrawer.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
+├── InputSystem_Actions.inputactions
+├── Materials
+│   └── BezierCurveAA_Material.mat
+├── Post Processing
+├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   └── Animal_Fox.prefab
+│   │   ├── Indicator_Opportunity.prefab
+│   │   ├── Indicator_Resource.prefab
+│   │   ├── Indicator_Threat.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   └── PlantPrefab.prefab
+│   │   └── ThoughtBubble.prefab
+│   ├── General
+│   │   ├── GardenerPrefab.prefab
+│   │   ├── NodeView.prefab
+│   │   └── Projectile_Basic_Pixel.prefab
+│   └── Node Presets
+│       ├── NodeDefinitionLibrary.asset
+│       ├── Node_000_Seed.asset
+│       ├── Node_001_AimSpread.asset
+│       ├── Node_002_Piercing.asset
+│       ├── Node_003_Output.asset
+│       ├── Node_004_ManaSource.asset
+│       ├── Node_005_DamageNode.asset
+│       ├── Node_006_Burn.asset
+│       └── Node_007_FriendlyFire.asset
+├── Scenes
+│   ├── MainScene.unity
+│   └── SampleScene.unity
+├── Scripts
+│   ├── Battle
+│   │   ├── Plant
+│   │   │   ├── PlantGrowth.cs
+│   │   │   └── WeatherManager.cs
+│   │   ├── SpellProjectile.cs
+│   │   └── Status Effects
+│   │       ├── BurningStatusEffect.cs
+│   │       └── StatusEffect.cs
+│   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   ├── Core
+│   │   └── Plants
+│   ├── Nodes
+│   │   ├── Core
+│   │   │   ├── HexCoords.cs
+│   │   │   ├── HexGridManager.cs
+│   │   │   ├── HexGridRenderer.cs
+│   │   │   ├── NodeData.cs
+│   │   │   ├── NodeDefinition.cs
+│   │   │   ├── NodeDefinitionLibrary.cs
+│   │   │   ├── NodeEffectData.cs
+│   │   │   ├── NodeEffectType.cs
+│   │   │   ├── NodePort.cs
+│   │   │   ├── OutputNodeEffect.cs
+│   │   │   └── PortDefinition.cs
+│   │   ├── Runtime
+│   │   │   ├── NodeExecutor.cs
+│   │   │   └── NodeGraph.cs
+│   │   └── UI
+│   │       ├── ColorExtensions.cs
+│   │       ├── NodeEditorController.cs
+│   │       ├── NodeHexDraggable.cs
+│   │       ├── NodeSelectable.cs
+│   │       ├── NodeTestInitializer.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
+│   ├── UI
+│   └── Visuals
+├── Settings
+│   ├── Lit2DSceneTemplate.scenetemplate
+│   ├── Renderer2D.asset
+│   ├── Scenes
+│   │   └── URP2DSceneTemplate.unity
+│   └── UniversalRP.asset
+├── Shaders
+│   └── BezierCurveAA.shader
+├── Test
+└── UniversalRenderPipelineGlobalSettings.asset
+--------------------------------------------------------------------------------
+
+SCRIPT CONTENTS
+================================================================================
+
+SCRIPT CONTENTS
+================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\PlantGrowth.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using TMPro;
+
+public enum PlantCellType
+{
+    Seed,
+    Stem,
+    Leaf,
+    Flower,
+    Fruit
+}
+
+public class PlantGrowth : MonoBehaviour
+{
+    [Header("Seed Gene Parameters (set via Seed node effect)")]
+    public int stemMinLength = 3;            // Minimum stem length (cells)
+    public int stemMaxLength = 6;            // Maximum stem length (cells)
+    public float growthSpeed = 1f;           // Seconds per growth step
+    [Tooltip("Leaf Gap: 0 = leaves on every stem cell; 1 = leaves on every 2nd stem cell; etc.")]
+    public int leafGap = 1;
+    [Tooltip("Leaf pattern type: 0=Parallel, 1=Offset-Parallel, 2=Alternating (L/R/R/L), 3=Double-Spiral, 4=One-Sided")]
+    public int leafPattern = 0;
+    public float growthRandomness = 0f;      // [0..1]: 0=always up; 1=always diagonal
+
+    [Header("Energy System")]
+    [Tooltip("Max energy available from all Energy Storage nodes in BFS.")]
+    public float maxEnergy = 0f;
+    [Tooltip("Current energy accumulated.")]
+    public float currentEnergy = 0f;
+    [Tooltip("Base photosynthesis rate from Energy Photosynthesis nodes in BFS.")]
+    public float basePhotosynthesis = 0f;
+
+    [Header("Cell Prefabs")]
+    public GameObject seedCellPrefab;
+    public GameObject stemCellPrefab;
+    public GameObject leafCellPrefab;
+
+    [Header("Cell Grid Settings")]
+    [Tooltip("Distance (in game units) between adjacent cells.")]
+    public float cellSpacing = 8f; 
+
+    [Header("UI")]
+    [Tooltip("TextMeshProUGUI displaying current energy and max energy below the plant.")]
+    public TMP_Text energyText;
+
+    private Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
+    private bool growing = true;
+    private int currentStemCount = 0;
+    private int targetStemLength = 0;
+
+    private void Start()
+    {
+        targetStemLength = Random.Range(stemMinLength, stemMaxLength + 1);
+        Debug.Log($"[PlantGrowth] Target stem length: {targetStemLength}");
+
+        cells[new Vector2Int(0, 0)] = PlantCellType.Seed;
+        SpawnCellVisual(PlantCellType.Seed, new Vector2Int(0, 0));
+
+        // Set up sorting inheritance
+        SortableEntity[] cellEntities = GetComponentsInChildren<SortableEntity>();
+        foreach (var cellEntity in cellEntities)
+        {
+            // Skip the seed cell, which will determine sorting
+            if (cellEntity.transform == transform)
+                continue;
+
+            // Use the public method to set parent Y coordinate usage
+            cellEntity.SetUseParentYCoordinate(true);
+        }
+
+        StartCoroutine(GrowRoutine());
+    }
+
+    private void Update()
+    {
+        // Use sunIntensity from WeatherManager.
+        float sunlight = (WeatherManager.Instance != null) ? WeatherManager.Instance.sunIntensity : 1f;
+        float leafCount = cells.Values.Count(cell => cell == PlantCellType.Leaf);
+        float deltaPhotosynthesis = basePhotosynthesis * leafCount * sunlight * Time.deltaTime;
+        currentEnergy += deltaPhotosynthesis;
+        if (currentEnergy > maxEnergy)
+            currentEnergy = maxEnergy;
+
+        if (energyText != null)
+        {
+            energyText.text = $"Energy: {Mathf.Floor(currentEnergy)}/{Mathf.Floor(maxEnergy)}";
+            // Positioning remains as set in the prefab.
+        }
+    }
+
+    private IEnumerator GrowRoutine()
+{
+    Vector2Int currentPos = new Vector2Int(0, 0);
+    int spiralDirection = 1;  // Used for spiral pattern: 1=right, -1=left
+    int patternCounter = 0;   // Used to track position in complex patterns
+    
+    while (growing)
+    {
+        yield return new WaitForSeconds(growthSpeed);
+
+        if (currentStemCount < targetStemLength)
+        {
+            currentStemCount++;
+            Vector2Int dir;
+            if (currentStemCount == 1)
+            {
+                // Always grow directly up for the first stem cell.
+                dir = new Vector2Int(0, 1);
+            }
+            else
+            {
+                dir = GetStemDirection();
+            }
+            currentPos += dir;
+            cells[currentPos] = PlantCellType.Stem;
+            SpawnCellVisual(PlantCellType.Stem, currentPos);
+            Debug.Log($"[PlantGrowth] Stem grown at {currentPos}");
+
+            if ((currentStemCount % (leafGap + 1)) == 0)
+            {
+                Vector2Int baseLeftPos = currentPos + new Vector2Int(-1, 0);
+                Vector2Int baseRightPos = currentPos + new Vector2Int(1, 0);
+                patternCounter++;
+
+                // Process according to leaf pattern
+                switch (leafPattern)
+                {
+                    case 0: // Parallel: spawn both leaves at same height
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(baseRightPos);
+                        Debug.Log($"[PlantGrowth] Parallel leaves at {baseLeftPos} and {baseRightPos}");
+                        break;
+                        
+                    case 1: // Offset-Parallel: both sides have leaves, but one side is higher
+                        // Fixed side offset - right side is always raised
+                        Vector2Int raisedRightPos = baseRightPos + new Vector2Int(0, 1);
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(raisedRightPos);
+                        Debug.Log($"[PlantGrowth] Offset-Parallel leaves at {baseLeftPos} and {raisedRightPos} (offset)");
+                        break;
+                        
+                    case 2: // Alternating-2 (L/R/R/L/L/R/R/L): proper rotation pattern
+                        // This creates the L/R/R/L/L/R/R/L pattern
+                        // patternCounter % 4 gives us:
+                        // 1 -> Left side offset (L)
+                        // 2 -> Right side normal (R)
+                        // 3 -> Right side offset (R)
+                        // 0 -> Left side normal (L)
+                        
+                        Vector2Int leftPos, rightPos;
+                        
+                        // Determine positions based on pattern position
+                        switch (patternCounter % 4) {
+                            case 1: // Left side offset, right side normal
+                                leftPos = baseLeftPos + new Vector2Int(0, 1);
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} (offset) and {rightPos}");
+                                break;
+                            case 2: // Left side normal, right side normal
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos}");
+                                break;
+                            case 3: // Left side normal, right side offset
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos + new Vector2Int(0, 1);
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos} (offset)");
+                                break;
+                            case 0: // Left side normal, right side normal (cycle complete)
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos}");
+                                break;
+                            default:
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                break;
+                        }
+                        
+                        SpawnLeafIfEmpty(leftPos);
+                        SpawnLeafIfEmpty(rightPos);
+                        break;
+                        
+                    case 3: // Double-Spiral: two leaves per node, spiral pattern
+                        // Create two leaves that spiral around the stem, with vertical offset
+                        Vector2Int leftSpiral = baseLeftPos + new Vector2Int(0, spiralDirection > 0 ? 1 : 0);
+                        Vector2Int rightSpiral = baseRightPos + new Vector2Int(0, spiralDirection > 0 ? 0 : 1);
+                        
+                        SpawnLeafIfEmpty(leftSpiral);
+                        SpawnLeafIfEmpty(rightSpiral);
+                        
+                        Debug.Log($"[PlantGrowth] Double-Spiral leaves at {leftSpiral} and {rightSpiral}");
+                        
+                        // Toggle spiral direction for next node
+                        spiralDirection *= -1;
+                        break;
+                        
+                    case 4: // One-Sided: leaves only grow on one side
+                        // For balance, create two leaves on the same side
+                        SpawnLeafIfEmpty(baseRightPos);
+                        SpawnLeafIfEmpty(baseRightPos + new Vector2Int(0, 1));
+                        Debug.Log($"[PlantGrowth] One-sided leaves at {baseRightPos} and {baseRightPos + new Vector2Int(0, 1)}");
+                        break;
+                        
+                    default: // Fallback to parallel
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(baseRightPos);
+                        break;
+                }
+            }
+        }
+        else
+        {
+            growing = false;
+            Debug.Log("[PlantGrowth] Growth complete.");
+        }
+    }
+}
+
+    private Vector2Int GetStemDirection()
+    {
+        Vector2Int up = new Vector2Int(0, 1);
+        Vector2Int leftDiag = new Vector2Int(-1, 1);
+        Vector2Int rightDiag = new Vector2Int(1, 1);
+
+        float r = Mathf.Clamp01(growthRandomness);
+        float roll = Random.value;
+        float threshold = 1f - r;  
+        if (roll < threshold)
+            return up;
+        else
+            return (Random.value < 0.5f) ? leftDiag : rightDiag;
+    }
+
+    private void SpawnLeafIfEmpty(Vector2Int coords)
+    {
+        if (!cells.ContainsKey(coords))
+        {
+            cells[coords] = PlantCellType.Leaf;
+            SpawnCellVisual(PlantCellType.Leaf, coords);
+        }
+    }
+
+    private void SpawnCellVisual(PlantCellType cellType, Vector2Int coords)
+    {
+        Vector2 worldPos = (Vector2)transform.position + (Vector2)coords * cellSpacing;
+        GameObject prefabToUse = null;
+        switch (cellType)
+        {
+            case PlantCellType.Seed:
+                prefabToUse = seedCellPrefab;
+                break;
+            case PlantCellType.Stem:
+                prefabToUse = stemCellPrefab;
+                break;
+            case PlantCellType.Leaf:
+                prefabToUse = leafCellPrefab;
+                break;
+        }
+        if (prefabToUse != null)
+        {
+            GameObject cellInstance = Instantiate(prefabToUse, worldPos, Quaternion.identity, transform);
+        
+            // Add SortableEntity if not already present
+            SortableEntity sortableEntity = cellInstance.GetComponent<SortableEntity>();
+            if (sortableEntity == null)
+                sortableEntity = cellInstance.AddComponent<SortableEntity>();
+        
+            // For non-seed cells, enable "Y from parent"
+            if (cellType != PlantCellType.Seed)
+            {
+                sortableEntity.SetUseParentYCoordinate(true);
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[PlantGrowth] No prefab assigned for cell type {cellType}");
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\WeatherManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class WeatherManager : MonoBehaviour
+{
+    public static WeatherManager Instance { get; private set; }
+
+    [Header("Sunlight Settings")]
+    [Tooltip("Global sunlight intensity in [0..1]. This affects plant photosynthesis.")]
+    [Range(0f, 1f)]
+    public float sunIntensity = 1f;
+
+    [Header("Sunlight Visualization")]
+    [Tooltip("Sprite whose opacity changes with sunIntensity.")]
+    public SpriteRenderer fadeSprite;
+    [Tooltip("Minimum alpha when sunIntensity = 0.")]
+    public float minAlpha = 0f;
+    [Tooltip("Maximum alpha when sunIntensity = 1.")]
+    public float maxAlpha = 1f;
+
+    private void Awake()
+    {
+        // Set up singleton instance.
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
+    private void Update()
+    {
+        if (fadeSprite != null)
+        {
+            float alpha = Mathf.Lerp(minAlpha, maxAlpha, sunIntensity);
+            Color c = fadeSprite.color;
+            c.a = alpha;
+            fadeSprite.color = c;
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\SpellProjectile.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class SpellProjectile : MonoBehaviour
+{
+    [Header("Projectile Stats")]
+    public float damage;
+    public float speed;
+    [Tooltip("If true, the projectile will be destroyed upon hitting a wizard.")]
+    public bool destroyOnHit = true;
+
+    [Header("Burning Effect (optional)")]
+    public float burningDamage;   // DPS
+    public float burningDuration; // Duration in seconds
+
+    [Header("Friendly Fire")]
+    public bool friendlyFire = false;
+    public bool casterIsEnemy = false;
+
+    public void Initialize(float dmg, float spd)
+    {
+        damage = dmg;
+        speed = spd;
+    }
+
+    private void Update()
+    {
+        transform.Translate(Vector2.up * speed * Time.deltaTime);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Status Effects\BurningStatusEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public class BurningStatusEffect : StatusEffect
+{
+    public BurningStatusEffect(float d, float dps) : base(d, dps) { }
+
+    
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Status Effects\StatusEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public abstract class StatusEffect
+{
+    public float duration; // Total duration.
+    public float damagePerSecond;
+    protected float elapsed = 0f;
+
+    // Public property to expose elapsed time.
+    public float Elapsed { get { return elapsed; } }
+
+    public StatusEffect(float d, float dps)
+    {
+        duration = d;
+        damagePerSecond = dps;
+    }
+
+    public bool IsExpired() => elapsed >= duration;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Core\SortableEntity.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class SortableEntity : MonoBehaviour
+{
+    [Header("Sorting Configuration")]
+    [Tooltip("Offset added to Y position for sorting calculation")]
+    [SerializeField] private float sortingLayerYOffset = 0f;
+
+    [Tooltip("Use parent's Y coordinate for sorting")]
+    [SerializeField] private bool useParentYCoordinate = false;
+
+    [Tooltip("Debug logging for sorting")]
+    public bool debugSorting = false;
+
+    private SpriteRenderer spriteRenderer;
+
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        
+        // If no SpriteRenderer, try to find one in children
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        // Ensure sprite renderer exists
+        if (spriteRenderer == null)
+        {
+            Debug.LogWarning($"[SortableEntity] No SpriteRenderer found on {gameObject.name}");
+        }
+    }
+
+    private void Start()
+    {
+        UpdateSortingOrder();
+    }
+
+    private void LateUpdate()
+    {
+        UpdateSortingOrder();
+    }
+
+    public void UpdateSortingOrder()
+    {
+        if (spriteRenderer == null) return;
+
+        // Determine Y position for sorting
+        float yPositionForSorting = useParentYCoordinate && transform.parent != null 
+            ? transform.parent.position.y 
+            : transform.position.y;
+
+        int sortOrder = CalculateSortOrder(yPositionForSorting);
+        spriteRenderer.sortingOrder = sortOrder;
+
+        if (debugSorting)
+        {
+            Debug.Log($"[SortableEntity] {gameObject.name} - Y: {yPositionForSorting}, Offset: {sortingLayerYOffset}, Sort Order: {sortOrder}");
+        }
+    }
+
+    private int CalculateSortOrder(float yPosition)
+    {
+        // Subtract offset to effectively move the sorting position
+        return Mathf.RoundToInt(-(yPosition + sortingLayerYOffset) * 1000f);
+    }
+
+    // Public method to get current sorting order
+    public int GetCurrentSortOrder()
+    {
+        if (spriteRenderer == null) return 0;
+        return spriteRenderer.sortingOrder;
+    }
+
+    // Public method to set sorting order directly if needed
+    public void SetSortingOrder(int order)
+    {
+        if (spriteRenderer != null)
+            spriteRenderer.sortingOrder = order;
+    }
+
+    // Public method to set the parent Y coordinate usage flag
+    // This eliminates the need for reflection in other scripts
+    public void SetUseParentYCoordinate(bool value)
+    {
+        useParentYCoordinate = value;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Core\HexCoords.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[System.Serializable]
+public struct HexCoords
+{
+    public int q; // axial coordinate (column)
+    public int r; // axial coordinate (row)
+
+    public HexCoords(int q, int r)
+    {
+        this.q = q;
+        this.r = r;
+    }
+
+    // Flat top conversion from axial to world coordinates.
+    // Using the formula:
+    // x = hexSize * (3/2 * q)
+    // y = hexSize * ( (sqrt(3)/2 * q) + (sqrt(3) * r) )
+    public Vector2 HexToWorld(float hexSize)
+    {
+        float x = hexSize * (3f / 2f * q);
+        float y = hexSize * ((Mathf.Sqrt(3f) / 2f * q) + (Mathf.Sqrt(3f) * r));
+        return new Vector2(x, y);
+    }
+
+    // Converts a world (UI) position to axial coordinates.
+    // Inverse formulas:
+    // q = (2/3 * x)/hexSize
+    // r = ((-1/3 * x) + (sqrt(3)/3 * y)) / hexSize
+    public static HexCoords WorldToHex(Vector2 pos, float hexSize)
+    {
+        float qf = (2f / 3f * pos.x) / hexSize;
+        float rf = ((-1f / 3f * pos.x) + (Mathf.Sqrt(3f) / 3f * pos.y)) / hexSize;
+        return RoundAxial(qf, rf);
+    }
+
+    public static HexCoords RoundAxial(float qf, float rf)
+    {
+        float sf = -qf - rf;
+        int qi = Mathf.RoundToInt(qf);
+        int ri = Mathf.RoundToInt(rf);
+        int si = Mathf.RoundToInt(sf);
+
+        float qDiff = Mathf.Abs(qi - qf);
+        float rDiff = Mathf.Abs(ri - rf);
+        float sDiff = Mathf.Abs(si - sf);
+
+        if (qDiff > rDiff && qDiff > sDiff)
+            qi = -ri - si;
+        else if (rDiff > sDiff)
+            ri = -qi - si;
+        return new HexCoords(qi, ri);
+    }
+
+    // Fixed neighbor offsets (axial) for flat top grid.
+    private static readonly HexCoords[] AxialNeighbors = new HexCoords[] {
+        new HexCoords(+1, 0),   // Side1
+        new HexCoords(0, -1),   // Side2
+        new HexCoords(-1, -1),  // Side3
+        new HexCoords(-1, 0),   // Side4
+        new HexCoords(0, +1),   // Side5
+        new HexCoords(+1, +1)   // Side6
+    };
+
+    // Returns the neighbor hex coordinate for a given side index (0 to 5)
+    public static HexCoords GetNeighbor(HexCoords origin, int sideIndex)
+    {
+        return new HexCoords(origin.q + AxialNeighbors[sideIndex].q,
+                             origin.r + AxialNeighbors[sideIndex].r);
+    }
+
+    public static int OppositeSideIndex(int sideIndex)
+    {
+        return (sideIndex + 3) % 6;
+    }
+
+    public override bool Equals(object obj)
+    {
+        if (!(obj is HexCoords))
+            return false;
+        HexCoords other = (HexCoords)obj;
+        return this.q == other.q && this.r == other.r;
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked { return (q * 397) ^ r; }
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Core\HexGridManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class HexGridManager : MonoBehaviour
+{
+    public float hexSize = 50f;
+    public float pinRadiusMultiplier = 1.0f; // Pin radius = hexSize * multiplier
+
+    // Flat top hexagon grid only – no orientation toggle needed.
+    public static HexGridManager Instance { get; private set; }
+    
+    private void Awake()
+    {
+        Instance = this;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Core\HexGridRenderer.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+
+[RequireComponent(typeof(CanvasRenderer))]
+public class HexGridRenderer : MaskableGraphic
+{
+    public bool showGrid = true;
+    public Color gridColor = Color.white;
+    public float lineThickness = 1f;
+
+    private float HexSize {
+        get { return (HexGridManager.Instance != null) ? HexGridManager.Instance.hexSize : 50f; }
+    }
+
+    protected override void OnPopulateMesh(VertexHelper vh)
+    {
+        vh.Clear();
+        if (!showGrid)
+            return;
+
+        Rect rect = rectTransform.rect;
+        Vector2 origin = rect.center;
+
+        int cols = Mathf.CeilToInt(rect.width / (HexSize * Mathf.Sqrt(3))) + 2;
+        int rows = Mathf.CeilToInt(rect.height / (HexSize * 1.5f)) + 2;
+
+        List<Vector2> linePoints = new List<Vector2>();
+
+        for (int q = -cols; q <= cols; q++)
+        {
+            for (int r = -rows; r <= rows; r++)
+            {
+                HexCoords hex = new HexCoords(q, r);
+                Vector2 hexCenter = hex.HexToWorld(HexSize) + origin;
+                List<Vector2> corners = new List<Vector2>();
+                // For flat top, use corners at angles 0, 60, 120, 180, 240, 300.
+                for (int i = 0; i < 6; i++)
+                {
+                    float angle = i * 60f;
+                    float rad = angle * Mathf.Deg2Rad;
+                    Vector2 offset = new Vector2(HexSize * Mathf.Cos(rad), HexSize * Mathf.Sin(rad));
+                    corners.Add(hexCenter + offset);
+                }
+                for (int i = 0; i < 6; i++)
+                {
+                    int next = (i + 1) % 6;
+                    linePoints.Add(corners[i]);
+                    linePoints.Add(corners[next]);
+                }
+            }
+        }
+        for (int i = 0; i < linePoints.Count; i += 2)
+        {
+            AddLineQuad(vh, linePoints[i], linePoints[i + 1], lineThickness, gridColor);
+        }
+    }
+
+    private void AddLineQuad(VertexHelper vh, Vector2 start, Vector2 end, float thickness, Color col)
+    {
+        Vector2 direction = (end - start).normalized;
+        Vector2 normal = new Vector2(-direction.y, direction.x);
+        Vector2 offset = normal * (thickness * 0.5f);
+
+        int idx = vh.currentVertCount;
+        vh.AddVert(start + offset, col, Vector2.zero);
+        vh.AddVert(start - offset, col, Vector2.zero);
+        vh.AddVert(end - offset, col, Vector2.zero);
+        vh.AddVert(end + offset, col, Vector2.zero);
+        vh.AddTriangle(idx, idx + 1, idx + 2);
+        vh.AddTriangle(idx, idx + 2, idx + 3);
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Core\NodeData.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+[Serializable]
+public class NodeData
+{
+    public string nodeId;
+    public string nodeDisplayName;
+    public Vector2 editorPosition; // For UI positioning
+    public HexCoords coords;       // Hex-based position
+    public Color backgroundColor = Color.gray;
+    public string description = "";
+    public List<NodePort> ports;   // Up to 6 ports (max 1 per side)
+    public List<NodeEffectData> effects;
+
+    public NodeData()
+    {
+        nodeId = Guid.NewGuid().ToString();
+        ports = new List<NodePort>();
+        effects = new List<NodeEffectData>();
+        coords = new HexCoords(0, 0);
+    }
+}
+
+
+
+
+
+--------------------------------------------------------------------------------
+This is part 2 out of 5 of script collection. 3 more parts remain.
+--------------------------------------------------------------------------------

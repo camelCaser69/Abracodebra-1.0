@@ -1,12 +1,15 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-25 00:47:25
-PART 2 OF 4
+UNITY PROJECT SCRIPT EXPORT - 2025-03-27 17:48:50
+PART 3 OF 5
 ================================================================================
 
 --------------------------------------------------------------------------------
 Assets
+├── Animation
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
 ├── DefaultVolumeProfile.asset
 ├── Editor
 │   ├── HexGridRendererEditor.cs
@@ -14,36 +17,47 @@ Assets
 │   ├── NodeDefinitionCreator.cs
 │   ├── NodeDefinitionLibraryEditor.cs
 │   ├── NodeDefinitionPostprocessor.cs
-│   ├── NodeEffectDataDrawer.cs
-│   └── WizardControllerStatusEditor.cs
+│   └── NodeEffectDataDrawer.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
 ├── InputSystem_Actions.inputactions
 ├── Materials
 │   └── BezierCurveAA_Material.mat
 ├── Post Processing
 ├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   └── Animal_Fox.prefab
+│   │   ├── Indicator_Opportunity.prefab
+│   │   ├── Indicator_Resource.prefab
+│   │   ├── Indicator_Threat.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   └── PlantPrefab.prefab
+│   │   └── ThoughtBubble.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
-│   │   ├── PixelLeaf.prefab
-│   │   ├── PixelSeed.prefab
-│   │   ├── PixelStem.prefab
-│   │   ├── PlantPrefab.prefab
-│   │   ├── Projectile_Basic_Pixel.prefab
-│   │   └── WizardPrefab.prefab
-│   ├── Node Presets
-│   │   ├── NodeDefinitionLibrary.asset
-│   │   ├── Node_000_Seed.asset
-│   │   ├── Node_001_AimSpread.asset
-│   │   ├── Node_002_Piercing.asset
-│   │   ├── Node_003_Output.asset
-│   │   ├── Node_004_ManaSource.asset
-│   │   ├── Node_005_DamageNode.asset
-│   │   ├── Node_006_Burn.asset
-│   │   └── Node_007_FriendlyFire.asset
-│   ├── UI
-│   │   └── NodeView.prefab
-│   └── Wizard Presets
-│       ├── Wizard_Basic.asset
-│       └── Wizard_Dummy.asset
+│   │   ├── NodeView.prefab
+│   │   └── Projectile_Basic_Pixel.prefab
+│   └── Node Presets
+│       ├── NodeDefinitionLibrary.asset
+│       ├── Node_000_Seed.asset
+│       ├── Node_001_AimSpread.asset
+│       ├── Node_002_Piercing.asset
+│       ├── Node_003_Output.asset
+│       ├── Node_004_ManaSource.asset
+│       ├── Node_005_DamageNode.asset
+│       ├── Node_006_Burn.asset
+│       └── Node_007_FriendlyFire.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   └── SampleScene.unity
@@ -57,6 +71,11 @@ Assets
 │   │       ├── BurningStatusEffect.cs
 │   │       └── StatusEffect.cs
 │   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   ├── Core
+│   │   └── Plants
 │   ├── Nodes
 │   │   ├── Core
 │   │   │   ├── HexCoords.cs
@@ -83,9 +102,7 @@ Assets
 │   ├── Player
 │   │   └── GardenerController.cs
 │   ├── UI
-│   └── Wizards
-│       ├── WizardController.cs
-│       └── WizardPreset.cs
+│   └── Visuals
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -103,382 +120,6 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Battle\Plant\WeatherManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public class WeatherManager : MonoBehaviour
-{
-    public static WeatherManager Instance { get; private set; }
-
-    [Header("Sunlight Settings")]
-    [Tooltip("Global sunlight intensity in [0..1]. This affects plant photosynthesis.")]
-    [Range(0f, 1f)]
-    public float sunIntensity = 1f;
-
-    [Header("Sunlight Visualization")]
-    [Tooltip("Sprite whose opacity changes with sunIntensity.")]
-    public SpriteRenderer fadeSprite;
-    [Tooltip("Minimum alpha when sunIntensity = 0.")]
-    public float minAlpha = 0f;
-    [Tooltip("Maximum alpha when sunIntensity = 1.")]
-    public float maxAlpha = 1f;
-
-    private void Awake()
-    {
-        // Set up singleton instance.
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
-
-    private void Update()
-    {
-        if (fadeSprite != null)
-        {
-            float alpha = Mathf.Lerp(minAlpha, maxAlpha, sunIntensity);
-            Color c = fadeSprite.color;
-            c.a = alpha;
-            fadeSprite.color = c;
-        }
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Battle\SpellProjectile.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public class SpellProjectile : MonoBehaviour
-{
-    [Header("Projectile Stats")]
-    public float damage;
-    public float speed;
-    [Tooltip("If true, the projectile will be destroyed upon hitting a wizard.")]
-    public bool destroyOnHit = true;
-
-    [Header("Burning Effect (optional)")]
-    public float burningDamage;   // DPS
-    public float burningDuration; // Duration in seconds
-
-    [Header("Friendly Fire")]
-    public bool friendlyFire = false;
-    public bool casterIsEnemy = false;
-
-    public void Initialize(float dmg, float spd)
-    {
-        damage = dmg;
-        speed = spd;
-    }
-
-    private void Update()
-    {
-        transform.Translate(Vector2.up * speed * Time.deltaTime);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        WizardController wizard = collision.GetComponent<WizardController>();
-        if (wizard != null)
-        {
-            // If friendly fire is disabled and the hit wizard is on the same team, ignore.
-            if (!friendlyFire && wizard.isEnemy == casterIsEnemy)
-                return;
-
-            wizard.TakeDamage(damage);
-            if (burningDamage > 0 && burningDuration > 0)
-            {
-                wizard.ApplyStatusEffect(new BurningStatusEffect(burningDuration, burningDamage));
-            }
-            if (destroyOnHit)
-                Destroy(gameObject);
-        }
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Battle\Status Effects\BurningStatusEffect.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿public class BurningStatusEffect : StatusEffect
-{
-    public BurningStatusEffect(float d, float dps) : base(d, dps) { }
-
-    public override void UpdateEffect(WizardController wizard, float deltaTime)
-    {
-        elapsed += deltaTime;
-        wizard.TakeDamage(damagePerSecond * deltaTime);
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Battle\Status Effects\StatusEffect.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿public abstract class StatusEffect
-{
-    public float duration; // Total duration.
-    public float damagePerSecond;
-    protected float elapsed = 0f;
-
-    // Public property to expose elapsed time.
-    public float Elapsed { get { return elapsed; } }
-
-    public StatusEffect(float d, float dps)
-    {
-        duration = d;
-        damagePerSecond = dps;
-    }
-
-    public abstract void UpdateEffect(WizardController wizard, float deltaTime);
-    public bool IsExpired() => elapsed >= duration;
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\HexCoords.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-[System.Serializable]
-public struct HexCoords
-{
-    public int q; // axial coordinate (column)
-    public int r; // axial coordinate (row)
-
-    public HexCoords(int q, int r)
-    {
-        this.q = q;
-        this.r = r;
-    }
-
-    // Flat top conversion from axial to world coordinates.
-    // Using the formula:
-    // x = hexSize * (3/2 * q)
-    // y = hexSize * ( (sqrt(3)/2 * q) + (sqrt(3) * r) )
-    public Vector2 HexToWorld(float hexSize)
-    {
-        float x = hexSize * (3f / 2f * q);
-        float y = hexSize * ((Mathf.Sqrt(3f) / 2f * q) + (Mathf.Sqrt(3f) * r));
-        return new Vector2(x, y);
-    }
-
-    // Converts a world (UI) position to axial coordinates.
-    // Inverse formulas:
-    // q = (2/3 * x)/hexSize
-    // r = ((-1/3 * x) + (sqrt(3)/3 * y)) / hexSize
-    public static HexCoords WorldToHex(Vector2 pos, float hexSize)
-    {
-        float qf = (2f / 3f * pos.x) / hexSize;
-        float rf = ((-1f / 3f * pos.x) + (Mathf.Sqrt(3f) / 3f * pos.y)) / hexSize;
-        return RoundAxial(qf, rf);
-    }
-
-    public static HexCoords RoundAxial(float qf, float rf)
-    {
-        float sf = -qf - rf;
-        int qi = Mathf.RoundToInt(qf);
-        int ri = Mathf.RoundToInt(rf);
-        int si = Mathf.RoundToInt(sf);
-
-        float qDiff = Mathf.Abs(qi - qf);
-        float rDiff = Mathf.Abs(ri - rf);
-        float sDiff = Mathf.Abs(si - sf);
-
-        if (qDiff > rDiff && qDiff > sDiff)
-            qi = -ri - si;
-        else if (rDiff > sDiff)
-            ri = -qi - si;
-        return new HexCoords(qi, ri);
-    }
-
-    // Fixed neighbor offsets (axial) for flat top grid.
-    private static readonly HexCoords[] AxialNeighbors = new HexCoords[] {
-        new HexCoords(+1, 0),   // Side1
-        new HexCoords(0, -1),   // Side2
-        new HexCoords(-1, -1),  // Side3
-        new HexCoords(-1, 0),   // Side4
-        new HexCoords(0, +1),   // Side5
-        new HexCoords(+1, +1)   // Side6
-    };
-
-    // Returns the neighbor hex coordinate for a given side index (0 to 5)
-    public static HexCoords GetNeighbor(HexCoords origin, int sideIndex)
-    {
-        return new HexCoords(origin.q + AxialNeighbors[sideIndex].q,
-                             origin.r + AxialNeighbors[sideIndex].r);
-    }
-
-    public static int OppositeSideIndex(int sideIndex)
-    {
-        return (sideIndex + 3) % 6;
-    }
-
-    public override bool Equals(object obj)
-    {
-        if (!(obj is HexCoords))
-            return false;
-        HexCoords other = (HexCoords)obj;
-        return this.q == other.q && this.r == other.r;
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked { return (q * 397) ^ r; }
-    }
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\HexGridManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public class HexGridManager : MonoBehaviour
-{
-    public float hexSize = 50f;
-    public float pinRadiusMultiplier = 1.0f; // Pin radius = hexSize * multiplier
-
-    // Flat top hexagon grid only – no orientation toggle needed.
-    public static HexGridManager Instance { get; private set; }
-    
-    private void Awake()
-    {
-        Instance = this;
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\HexGridRenderer.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections.Generic;
-
-[RequireComponent(typeof(CanvasRenderer))]
-public class HexGridRenderer : MaskableGraphic
-{
-    public bool showGrid = true;
-    public Color gridColor = Color.white;
-    public float lineThickness = 1f;
-
-    private float HexSize {
-        get { return (HexGridManager.Instance != null) ? HexGridManager.Instance.hexSize : 50f; }
-    }
-
-    protected override void OnPopulateMesh(VertexHelper vh)
-    {
-        vh.Clear();
-        if (!showGrid)
-            return;
-
-        Rect rect = rectTransform.rect;
-        Vector2 origin = rect.center;
-
-        int cols = Mathf.CeilToInt(rect.width / (HexSize * Mathf.Sqrt(3))) + 2;
-        int rows = Mathf.CeilToInt(rect.height / (HexSize * 1.5f)) + 2;
-
-        List<Vector2> linePoints = new List<Vector2>();
-
-        for (int q = -cols; q <= cols; q++)
-        {
-            for (int r = -rows; r <= rows; r++)
-            {
-                HexCoords hex = new HexCoords(q, r);
-                Vector2 hexCenter = hex.HexToWorld(HexSize) + origin;
-                List<Vector2> corners = new List<Vector2>();
-                // For flat top, use corners at angles 0, 60, 120, 180, 240, 300.
-                for (int i = 0; i < 6; i++)
-                {
-                    float angle = i * 60f;
-                    float rad = angle * Mathf.Deg2Rad;
-                    Vector2 offset = new Vector2(HexSize * Mathf.Cos(rad), HexSize * Mathf.Sin(rad));
-                    corners.Add(hexCenter + offset);
-                }
-                for (int i = 0; i < 6; i++)
-                {
-                    int next = (i + 1) % 6;
-                    linePoints.Add(corners[i]);
-                    linePoints.Add(corners[next]);
-                }
-            }
-        }
-        for (int i = 0; i < linePoints.Count; i += 2)
-        {
-            AddLineQuad(vh, linePoints[i], linePoints[i + 1], lineThickness, gridColor);
-        }
-    }
-
-    private void AddLineQuad(VertexHelper vh, Vector2 start, Vector2 end, float thickness, Color col)
-    {
-        Vector2 direction = (end - start).normalized;
-        Vector2 normal = new Vector2(-direction.y, direction.x);
-        Vector2 offset = normal * (thickness * 0.5f);
-
-        int idx = vh.currentVertCount;
-        vh.AddVert(start + offset, col, Vector2.zero);
-        vh.AddVert(start - offset, col, Vector2.zero);
-        vh.AddVert(end - offset, col, Vector2.zero);
-        vh.AddVert(end + offset, col, Vector2.zero);
-        vh.AddTriangle(idx, idx + 1, idx + 2);
-        vh.AddTriangle(idx, idx + 2, idx + 3);
-    }
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\NodeData.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-[Serializable]
-public class NodeData
-{
-    public string nodeId;
-    public string nodeDisplayName;
-    public Vector2 editorPosition; // For UI positioning
-    public HexCoords coords;       // Hex-based position
-    public Color backgroundColor = Color.gray;
-    public string description = "";
-    public List<NodePort> ports;   // Up to 6 ports (max 1 per side)
-    public List<NodeEffectData> effects;
-
-    public NodeData()
-    {
-        nodeId = Guid.NewGuid().ToString();
-        ports = new List<NodePort>();
-        effects = new List<NodeEffectData>();
-        coords = new HexCoords(0, 0);
-    }
-}
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeDefinition.cs
@@ -586,7 +227,13 @@ public class NodeEffectData
     Burning,
     Piercing,
     FriendlyFire,
-    Seed  // New effect type for planting a seed.
+    // Replaced Seed with more granular effects
+    SeedSpawn,        // Base effect to spawn a plant
+    StemLength,       // Min/Max stem length
+    GrowthSpeed,      // Controls growth speed
+    LeafGap,          // Spacing between leaves
+    LeafPattern,      // Parallel or alternating pattern
+    StemRandomness    // Randomness of stem growth
 }
 
 
@@ -643,22 +290,10 @@ public class OutputNodeEffect : MonoBehaviour
     {
         Debug.Log("[OutputNodeEffect] Activate() called. Spawning projectile or calling wizard cast.");
 
-        // For example, find the local (player) wizard and cast a test projectile:
-        WizardController playerWiz = FindObjectsOfType<WizardController>()
-            .FirstOrDefault(w => !w.isEnemy);
+        
 
-        if (playerWiz)
-        {
-            // Just an example. The real logic might pass finalDamage, aimSpread, etc.
-            playerWiz.CastSpell(finalDamage: 10f, finalAimSpread: 5f,
-                burningDamage: 0f, burningDuration: 0f,
-                piercing: false, friendlyFire: false);
-            Debug.Log("[OutputNodeEffect] Called player's CastSpell with sample values.");
-        }
-        else
-        {
-            Debug.LogWarning("[OutputNodeEffect] No friendly wizard found in scene.");
-        }
+        
+        
     }
 }
 
@@ -845,48 +480,83 @@ public class NodeExecutor : MonoBehaviour
             }
         }
 
-        // If it's a Seed node, spawn the plant now using the BFS accumulators.
-        var seedEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.Seed);
-        if (seedEffect != null)
+        // If it's a SeedSpawn node, spawn the plant now using the BFS accumulators and collect plant parameters
+        var seedSpawnEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.SeedSpawn);
+        if (seedSpawnEffect != null)
         {
-            SpawnPlant(seedEffect);
+            SpawnPlant(node);
         }
     }
 
-    private void SpawnPlant(NodeEffectData seedEffect)
+    private void SpawnPlant(NodeData node)
     {
         if (plantPrefab == null)
         {
             LogDebug("[NodeExecutor] plantPrefab is not assigned in the inspector!");
             return;
         }
-        var gardener = FindObjectOfType<GardenerController>();
+        var gardener = Object.FindAnyObjectByType<GardenerController>();
         if (gardener == null)
         {
             LogDebug("[NodeExecutor] No GardenerController found. Can't spawn plant.");
             return;
         }
 
+        // Collect all the plant effect parameters
+        float stemMinLength = 3;  // Default value
+        float stemMaxLength = 6;  // Default value
+        float growthSpeed = 1f;   // Default value
+        float leafGap = 1f;       // Default value
+        float leafPattern = 0f;   // Default value
+        float growthRandomness = 0f; // Default value
+
+        // Find all plant-related effects in this node and the entire visited chain
+        foreach (var effect in node.effects)
+        {
+            switch (effect.effectType)
+            {
+                case NodeEffectType.StemLength:
+                    stemMinLength = effect.effectValue;
+                    stemMaxLength = effect.secondaryValue;
+                    break;
+                case NodeEffectType.GrowthSpeed:
+                    growthSpeed = effect.effectValue;
+                    break;
+                case NodeEffectType.LeafGap:
+                    leafGap = effect.effectValue;
+                    break;
+                case NodeEffectType.LeafPattern:
+                    leafPattern = effect.effectValue;
+                    break;
+                case NodeEffectType.StemRandomness:
+                    growthRandomness = effect.effectValue;
+                    break;
+            }
+        }
+
+        // Spawn the plant with all the collected parameters
         Vector2 spawnPos = gardener.GetPlantingPosition();
         GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
         PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
 
         if (growth != null)
         {
-            // standard seed data
-            growth.stemMinLength = Mathf.RoundToInt(seedEffect.effectValue);
-            growth.stemMaxLength = Mathf.RoundToInt(seedEffect.secondaryValue);
-            growth.growthSpeed   = seedEffect.extra1;
-            growth.leafGap       = Mathf.RoundToInt(seedEffect.extra2);
-            growth.leafPattern      = seedEffect.leafPattern; 
-            growth.growthRandomness = seedEffect.growthRandomness;
+            // Apply all the collected plant parameters
+            growth.stemMinLength = Mathf.RoundToInt(stemMinLength);
+            growth.stemMaxLength = Mathf.RoundToInt(stemMaxLength);
+            growth.growthSpeed = growthSpeed;
+            growth.leafGap = Mathf.RoundToInt(leafGap);
+            growth.leafPattern = Mathf.RoundToInt(leafPattern);
+            growth.growthRandomness = growthRandomness;
 
-            // new "energy" data from BFS sums
-            growth.maxEnergy       = accumulatedEnergyStorage;   // sum of all energy storages
-            growth.basePhotosynthesis = accumulatedPhotosynthesis; // sum of all photosynthesis rates
+            // Energy data from BFS sums
+            growth.maxEnergy = accumulatedEnergyStorage;
+            growth.basePhotosynthesis = accumulatedPhotosynthesis;
 
             LogDebug($"[NodeExecutor] Spawned plant => " +
-                     $"Seed(min={growth.stemMinLength},max={growth.stemMaxLength},spd={growth.growthSpeed},gap={growth.leafGap},pat={growth.leafPattern},rand={growth.growthRandomness}), " +
+                     $"StemLength(min={growth.stemMinLength},max={growth.stemMaxLength}), " +
+                     $"GrowthSpeed={growth.growthSpeed}, LeafGap={growth.leafGap}, " +
+                     $"LeafPattern={growth.leafPattern}, GrowthRandomness={growth.growthRandomness}, " +
                      $"Energy(max={growth.maxEnergy}), Photosynthesis(base={growth.basePhotosynthesis})");
         }
         else
@@ -896,7 +566,7 @@ public class NodeExecutor : MonoBehaviour
 
         // If you want each new seed to get its own accumulators, 
         // reset them after spawning:
-        accumulatedEnergyStorage  = 0f;
+        accumulatedEnergyStorage = 0f;
         accumulatedPhotosynthesis = 0f;
     }
 
@@ -913,7 +583,6 @@ public class NodeExecutor : MonoBehaviour
             debugOutput.text += msg + "\n";
     }
 }
-
 
 
 
@@ -957,5 +626,5 @@ public static class ColorExtensions
 
 
 --------------------------------------------------------------------------------
-This is part 2 out of 4 of script collection. 2 more parts remain.
+This is part 3 out of 5 of script collection. 2 more parts remain.
 --------------------------------------------------------------------------------

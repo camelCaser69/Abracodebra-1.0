@@ -27,7 +27,7 @@ RectTransform:
   m_GameObject: {fileID: 4015338797434394026}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.06, y: 0.06, z: 0.06}
+  m_LocalScale: {x: 0.01, y: 0.01, z: 0.01}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1980598367924042953}
@@ -146,7 +146,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1980598367924042953}
   - component: {fileID: 7397743361173121137}
-  - component: {fileID: 2757150415178338116}
+  - component: {fileID: 422200593468989936}
   m_Layer: 0
   m_Name: ThoughtBubble
   m_TagString: Untagged
@@ -198,7 +198,7 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &2757150415178338116
+--- !u!114 &422200593468989936
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -207,43 +207,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 7019603340007582860}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 164ecbbf1bed49739141eddc2c049bdf, type: 3}
+  m_Script: {fileID: 11500000, guid: 22f4cbacd854452fba2fefb1be582f00, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  textComponent: {fileID: 7842189058560335207}
-  displayTime: 4
-  fadeTime: 0.5
-  bubbleRect: {fileID: 6232840578579998303}
-  minWidth: 80
-  maxWidth: 200
-  paddingPerCharacter: 0.5
-  offset: {x: 0, y: 1.5, z: 0}
-  bobAmount: 0.1
-  bobSpeed: 1
-  appearCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  messageText: {fileID: 7842189058560335207}
+  lifetime: 2
 --- !u!1 &7465151999062645074
 GameObject:
   m_ObjectHideFlags: 0
