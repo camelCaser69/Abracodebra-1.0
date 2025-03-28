@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Collections.Generic;
 
-
 [RequireComponent(typeof(Rigidbody2D))]
 public class AnimalController : MonoBehaviour
 {
@@ -65,19 +64,14 @@ public class AnimalController : MonoBehaviour
     public float maxPoopDelay = 10f;
     [Tooltip("Duration (in seconds) the animal spends pooping (not moving).")]
     public float poopDuration = 1f;
-
-// Replace the single poopPrefab with a list:
     [Tooltip("List of poop prefabs for random selection.")]
     public List<GameObject> poopPrefabs;
-
-// Variation to apply to the poop sprite's color channels (0 = no variation).
     [Tooltip("Maximum amount to vary each color channel (0-1) for the poop sprite.")]
     public float poopColorVariation = 0.1f;
 
-
-    // New pooping state variables
+    // Internal pooping state variables
     private bool isPooping = false;
-    private float poopTimer = 0f;      // For pooping phase duration
+    private float poopTimer = 0f;      // For the pooping phase duration
     private float poopDelayTimer = 0f; // Delay before pooping after eating
     private bool hasPooped = false;    // True if the animal has already pooped after the last eating cycle
 
@@ -87,13 +81,10 @@ public class AnimalController : MonoBehaviour
         currentHealth = definition.maxHealth;
         currentHunger = 0f;
         speciesName = definition.animalName; // e.g., "Bunny"
-    
-        // Start as if already pooped:
+        // Start with no pending poop (already pooped)
         hasPooped = true;
-        // Set poopDelayTimer so the animal won't poop until after its next eating cycle.
         poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
     }
-
 
     private void Awake()
     {
@@ -117,7 +108,7 @@ public class AnimalController : MonoBehaviour
         // Increase hunger over time
         currentHunger += definition.hungerDecayRate * Time.deltaTime;
 
-        // Process pooping only if not eating and haven't pooped this cycle
+        // Process pooping only if not eating and hasn't already pooped in this cycle
         if (!isEating && !hasPooped)
         {
             poopDelayTimer -= Time.deltaTime;
@@ -153,7 +144,7 @@ public class AnimalController : MonoBehaviour
             return;
         }
 
-        // Decide behavior based on hunger
+        // Behavior based on hunger:
         if (currentHunger >= definition.hungerThreshold)
         {
             Debug.Log($"{speciesName} is hungry! (Hunger: {currentHunger:0.00}/{definition.hungerThreshold})");
@@ -164,7 +155,6 @@ public class AnimalController : MonoBehaviour
             }
             if (currentTargetLeaf == null)
                 currentTargetLeaf = FindNearestLeaf();
-
             if (currentTargetLeaf != null)
                 MoveTowardLeaf(currentTargetLeaf);
             else
@@ -225,7 +215,8 @@ public class AnimalController : MonoBehaviour
 
     private void MoveTowardLeaf(GameObject leafObj)
     {
-        if (isEating) return; // Prevent re-triggering if already eating
+        if (isEating)
+            return; // Avoid re-triggering if already eating
         if (!leafObj)
         {
             currentTargetLeaf = null;
@@ -322,21 +313,15 @@ public class AnimalController : MonoBehaviour
     {
         if (poopPrefabs != null && poopPrefabs.Count > 0)
         {
-            // Randomly choose one poop prefab using the integer overload.
-            int index = Random.Range(0, (int)poopPrefabs.Count);
+            int index = Random.Range(0, poopPrefabs.Count);
             GameObject selectedPrefab = poopPrefabs[index];
-
-            // Use the mouthTransform as the spawn point if available, else fallback to self.
             Transform spawnPoint = mouthTransform ? mouthTransform : transform;
             GameObject poopObj = Instantiate(selectedPrefab, spawnPoint.position, Quaternion.identity);
-
-            // Randomly flip the poop horizontally.
+            // Random flip and color variation as before.
             SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
             if (sr != null)
             {
                 sr.flipX = (Random.value > 0.5f);
-
-                // Adjust color randomly within the specified variation range.
                 Color originalColor = sr.color;
                 float variation = poopColorVariation;
                 float newR = Mathf.Clamp01(originalColor.r + Random.Range(-variation, variation));
@@ -344,14 +329,20 @@ public class AnimalController : MonoBehaviour
                 float newB = Mathf.Clamp01(originalColor.b + Random.Range(-variation, variation));
                 sr.color = new Color(newR, newG, newB, originalColor.a);
             }
+            // Attach PoopController if not present.
+            PoopController pc = poopObj.GetComponent<PoopController>();
+            if (pc == null)
+            {
+                pc = poopObj.AddComponent<PoopController>();
+            }
+            // Initialize PoopController using its Inspector settings (no lifetime passed).
+            pc.Initialize();
         }
         else
         {
             Debug.LogWarning($"[{speciesName}] No poopPrefabs assigned!");
         }
     }
-
-
 
     // Sprite flipping based on horizontal movement direction.
     private void FlipSpriteBasedOnDirection(Vector2 direction)
@@ -363,7 +354,7 @@ public class AnimalController : MonoBehaviour
         else if (direction.x > 0.01f)
             spriteRenderer.flipX = false;
     }
-    
+
     // Public setter for movement bounds (called from FaunaManager)
     public void SetMovementBounds(Vector2 min, Vector2 max)
     {
@@ -377,3 +368,4 @@ public class AnimalController : MonoBehaviour
         return speciesName == other;
     }
 }
+

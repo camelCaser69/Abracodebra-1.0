@@ -97,10 +97,11 @@ MonoBehaviour:
   minPoopDelay: 0.5
   maxPoopDelay: 3
   poopDuration: 1.5
+  poopLifetime: 10
   poopPrefabs:
   - {fileID: 4068151152815915600, guid: 6e8483a0861990945b53d358aeb98b0e, type: 3}
   - {fileID: 4068151152815915600, guid: 978e17d09199949439c4ddb97ee2c6c8, type: 3}
-  poopColorVariation: 0.1
+  poopColorVariation: 0.12
 --- !u!114 &1716373188419040610
 MonoBehaviour:
   m_ObjectHideFlags: 0
