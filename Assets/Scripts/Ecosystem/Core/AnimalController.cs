@@ -12,8 +12,8 @@ public class AnimalController : MonoBehaviour
     public GameObject thoughtBubblePrefab;           // Assign your ThoughtBubble prefab
 
     [Header("Transforms for Visual Alignment")]
-    public Transform mouthTransform;                 // For future eating VFX (set in prefab)
-    public Transform bubbleSpawnTransform;           // For thought bubble spawn location
+    public Transform mouthTransform;                 // For aligning mouth (future VFX)
+    public Transform bubbleSpawnTransform;           // Where thought bubbles spawn
 
     [Header("Thought Bubble Settings")]
     public float thoughtCooldownTime = 5f;             // Minimum time between thought bubbles
@@ -26,24 +26,25 @@ public class AnimalController : MonoBehaviour
     private float currentHunger;
 
     private Rigidbody2D rb;
-    private SpriteRenderer spriteRenderer;           // Used for sprite flipping
+    private SpriteRenderer spriteRenderer;           // For sprite flipping
     private Vector2 moveDirection;
 
-    // Wander behavior settings
-    private float wanderTimer = 0f;
-    public float wanderMoveDuration = 2f;            // How long animal moves in one wander phase
-    public float wanderPauseDuration = 1f;           // How long animal pauses between moves
-    private bool isWanderingPaused = false;
-    private float wanderStateTimer = 0f;             // Timer for current wander state
+    [Header("Animal Behavior Settings")]
+    [Tooltip("Intensity multiplier (0 to 1) controlling how frequently the animal pauses while wandering.")]
+    [Range(0f, 1f)]
+    public float wanderPauseIntensity = 0.5f;
+    [Tooltip("Maximum duration (in seconds) for a wander pause.")]
+    public float maxWanderPauseDuration = 2f;
+    // Instead of fixed wander durations, we generate them randomly.
 
     [Header("Movement Bounds (World Space)")]
-    public Vector2 minBounds = new Vector2(-10f, -5f);
-    public Vector2 maxBounds = new Vector2(10f, 5f);
+    public Vector2 minBounds;
+    public Vector2 maxBounds;
 
     [Header("Eating Settings")]
-    public float eatDuration = 2f;                   // How long the animal stays still while eating
-    [Tooltip("How close the animal must be to a leaf to eat it.")]
-    public float eatDistance = 0.5f;                 // Adjustable in the Inspector
+    public float eatDuration = 2f;                    // Time spent eating
+    [Tooltip("How close (in world units) the animal must be to a leaf to eat it.")]
+    public float eatDistance = 0.5f;
     private bool isEating = false;
     private float eatTimer = 0f;
     private GameObject currentTargetLeaf;
@@ -53,7 +54,7 @@ public class AnimalController : MonoBehaviour
         definition = def;
         currentHealth = definition.maxHealth;
         currentHunger = 0f;
-        speciesName = definition.animalName; // e.g. "Bunny"
+        speciesName = definition.animalName; // e.g., "Bunny"
     }
 
     private void Awake()
@@ -72,7 +73,7 @@ public class AnimalController : MonoBehaviour
             return;
         }
 
-        // Decrement thought bubble cooldown timer
+        // Decrement thought bubble cooldown
         thoughtCooldownTimer -= Time.deltaTime;
 
         // Increase hunger over time
@@ -90,7 +91,7 @@ public class AnimalController : MonoBehaviour
             return;
         }
 
-        // Determine behavior based on hunger
+        // Decide behavior based on hunger
         if (currentHunger >= definition.hungerThreshold)
         {
             Debug.Log($"{speciesName} is hungry! (Hunger: {currentHunger:0.00}/{definition.hungerThreshold})");
@@ -99,6 +100,7 @@ public class AnimalController : MonoBehaviour
                 ShowThought(ThoughtTrigger.Hungry);
                 thoughtCooldownTimer = thoughtCooldownTime;
             }
+
             if (currentTargetLeaf == null)
                 currentTargetLeaf = FindNearestLeaf();
 
@@ -119,8 +121,7 @@ public class AnimalController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (isEating || rb == null) 
-            return;
+        if (isEating || rb == null) return;
 
         Vector2 newPos = rb.position + moveDirection * definition.movementSpeed * Time.fixedDeltaTime;
         newPos.x = Mathf.Clamp(newPos.x, minBounds.x, maxBounds.x);
@@ -128,37 +129,49 @@ public class AnimalController : MonoBehaviour
         rb.MovePosition(newPos);
     }
 
-    // Improved wander: alternating move and pause phases
+    // Improved wander: alternating between moving and pausing, with random durations affected by intensity.
     private void Wander()
     {
-        wanderStateTimer -= Time.deltaTime;
-        if (wanderStateTimer <= 0f)
+        // Random chance to pause each frame
+        if (Random.value < wanderPauseIntensity * Time.deltaTime)
         {
-            // Toggle state
-            isWanderingPaused = !isWanderingPaused;
-            if (isWanderingPaused)
-            {
-                // Pause movement; set timer to pause duration
-                wanderStateTimer = wanderPauseDuration;
-                moveDirection = Vector2.zero;
-            }
-            else
-            {
-                // Resume moving: pick a new random direction and set move duration
-                float angle = Random.Range(0f, 360f);
-                moveDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-                wanderStateTimer = wanderMoveDuration;
-            }
+            // Pause: set moveDirection to zero for a random duration up to maxWanderPauseDuration
+            moveDirection = Vector2.zero;
+            float pauseDuration = Random.Range(0.5f, maxWanderPauseDuration);
+            Invoke("ResumeWandering", pauseDuration);
         }
+        // If not pausing, choose a random direction occasionally
+        else if (moveDirection == Vector2.zero)
+        {
+            float angle = Random.Range(0f, 360f);
+            moveDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+        }
+    }
+
+    private void ResumeWandering()
+    {
+        // If no current move direction, pick a random one
+        if (moveDirection == Vector2.zero)
+        {
+            float angle = Random.Range(0f, 360f);
+            moveDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+        }
+    }
+    
+    public void SetMovementBounds(Vector2 min, Vector2 max)
+    {
+        minBounds = min;
+        maxBounds = max;
     }
 
     private void MoveTowardLeaf(GameObject leafObj)
     {
-        if (!leafObj)
+        if (leafObj == null)
         {
             currentTargetLeaf = null;
             return;
         }
+
         Vector2 leafPos = leafObj.transform.position;
         Vector2 myPos = transform.position;
         float distance = Vector2.Distance(myPos, leafPos);
@@ -183,15 +196,13 @@ public class AnimalController : MonoBehaviour
             currentTargetLeaf = null;
         }
         currentHunger -= definition.eatAmount;
-        if (currentHunger < 0f)
-            currentHunger = 0f;
+        if (currentHunger < 0f) currentHunger = 0f;
     }
 
     private GameObject FindNearestLeaf()
     {
         GameObject[] leaves = GameObject.FindGameObjectsWithTag("Leaf");
-        if (leaves.Length == 0)
-            return null;
+        if (leaves.Length == 0) return null;
 
         Vector2 myPos = transform.position;
         GameObject nearest = null;
@@ -209,7 +220,7 @@ public class AnimalController : MonoBehaviour
         return nearest;
     }
 
-    // Thought bubble logic: now spawns as a child of bubbleSpawnTransform
+    // Thought bubble logic: spawns a bubble as a child of bubbleSpawnTransform.
     private void ShowThought(ThoughtTrigger trigger)
     {
         if (!thoughtLibrary || !thoughtBubblePrefab)
@@ -240,10 +251,10 @@ public class AnimalController : MonoBehaviour
         string randomLine = chosenEntry.lines[Random.Range(0, chosenEntry.lines.Count)];
         Debug.Log($"[{speciesName}] Spawning thought bubble: {randomLine}");
 
-        // Spawn bubble as a child of bubbleSpawnTransform (or fallback to self)
+        // Spawn bubble as a child of bubbleSpawnTransform (if set) or this transform
         Transform spawnParent = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
         GameObject bubbleObj = Instantiate(thoughtBubblePrefab, spawnParent.position, Quaternion.identity, spawnParent);
-        bubbleObj.transform.localPosition = Vector3.zero; // Align it with parent
+        bubbleObj.transform.localPosition = Vector3.zero;
 
         ThoughtBubbleController bubble = bubbleObj.GetComponent<ThoughtBubbleController>();
         if (bubble != null)
@@ -256,7 +267,7 @@ public class AnimalController : MonoBehaviour
         }
     }
 
-    // Sprite flipping based on horizontal movement
+    // Flip sprite based on horizontal movement direction
     private void FlipSpriteBasedOnDirection(Vector2 direction)
     {
         if (!spriteRenderer) return;

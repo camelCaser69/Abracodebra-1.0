@@ -87,8 +87,8 @@ MonoBehaviour:
   mouthTransform: {fileID: 9001696667229699929}
   bubbleSpawnTransform: {fileID: 1385400547619210892}
   thoughtCooldownTime: 5
-  wanderMoveDuration: 2
-  wanderPauseDuration: 1
+  wanderPauseIntensity: 0.245
+  maxWanderPauseDuration: 4
   minBounds: {x: -10, y: -5}
   maxBounds: {x: 10, y: 5}
   eatDuration: 2

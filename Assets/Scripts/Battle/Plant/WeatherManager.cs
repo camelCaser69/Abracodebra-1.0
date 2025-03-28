@@ -9,9 +9,9 @@ public class WeatherManager : MonoBehaviour
     [Range(0f, 1f)]
     public float sunIntensity = 1f;
 
-    [Header("Day/Night Cycle")]
+    [Header("Day/Night Cycle Settings")]
     [Tooltip("Speed multiplier for day/night cycle")]
-    public float dayNightSpeed = 0.1f; // Adjust this for faster/slower cycles
+    public float dayNightSpeed = 0.1f; // Adjust for faster/slower cycles
     public float minSunIntensity = 0.2f; // Intensity at night
 
     [Header("Sunlight Visualization")]
@@ -31,10 +31,8 @@ public class WeatherManager : MonoBehaviour
 
     private void Update()
     {
-        // Create a cyclic pattern using sine function.
-        // Time.time * dayNightSpeed produces a repeating cycle.
+        // Create a cyclic pattern using sine function
         float cycle = (Mathf.Sin(Time.time * dayNightSpeed * Mathf.PI * 2f) + 1f) / 2f;
-        // Map cycle to [minSunIntensity, 1]
         sunIntensity = Mathf.Lerp(minSunIntensity, 1f, cycle);
 
         if (fadeSprite != null)

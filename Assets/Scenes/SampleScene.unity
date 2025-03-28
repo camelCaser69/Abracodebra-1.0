@@ -1112,8 +1112,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 779e51f1034747bc8f48d26d29c78308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bunnyDefinition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}
-  bunnySpawnPosition: {x: 2, y: 2}
+  animalsToSpawn:
+  - animalDefinition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}
+    spawnRateMultiplier: 1
+    spawnTimer: 0
+  globalSpawnCooldown: 6
+  spawnRadius: 2
+  continuousSpawn: 1
+  spawnCenter: {x: 0, y: 0}
+  ecosystemParent: {fileID: 553168402}
+  animalMinBounds: {x: -8.5, y: -4.5}
+  animalMaxBounds: {x: 8.5, y: 4.5}
 --- !u!50 &1384832983
 Rigidbody2D:
   serializedVersion: 5
