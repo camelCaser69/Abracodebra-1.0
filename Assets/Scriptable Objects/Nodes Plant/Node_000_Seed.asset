@@ -27,6 +27,7 @@ MonoBehaviour:
     extra2: 1
     leafPattern: 1
     growthRandomness: 0.15
+    isBaseAttribute: 1
   - effectType: 12
     effectValue: 5
     secondaryValue: 14
@@ -34,6 +35,7 @@ MonoBehaviour:
     extra2: 1
     leafPattern: 1
     growthRandomness: 0.15
+    isBaseAttribute: 1
   - effectType: 13
     effectValue: 1
     secondaryValue: 9
@@ -41,6 +43,7 @@ MonoBehaviour:
     extra2: 1
     leafPattern: 1
     growthRandomness: 0.15
+    isBaseAttribute: 1
   - effectType: 14
     effectValue: 1
     secondaryValue: 9
@@ -48,6 +51,7 @@ MonoBehaviour:
     extra2: 1
     leafPattern: 1
     growthRandomness: 0.15
+    isBaseAttribute: 1
   - effectType: 15
     effectValue: 1
     secondaryValue: 9
@@ -55,6 +59,7 @@ MonoBehaviour:
     extra2: 1
     leafPattern: 1
     growthRandomness: 0.15
+    isBaseAttribute: 1
   - effectType: 16
     effectValue: 0
     secondaryValue: 9
@@ -62,6 +67,7 @@ MonoBehaviour:
     extra2: 1
     leafPattern: 1
     growthRandomness: 0.15
+    isBaseAttribute: 1
   - effectType: 5
     effectValue: 0.2
     secondaryValue: 9
@@ -69,17 +75,12 @@ MonoBehaviour:
     extra2: 1
     leafPattern: 1
     growthRandomness: 0.15
+    isBaseAttribute: 1
   - effectType: 4
-    effectValue: 20
+    effectValue: 40
     secondaryValue: 9
     extra1: 1
     extra2: 1
     leafPattern: 1
     growthRandomness: 0.15
-  - effectType: 4
-    effectValue: 20
-    secondaryValue: 9
-    extra1: 1
-    extra2: 1
-    leafPattern: 1
-    growthRandomness: 0.15
+    isBaseAttribute: 1

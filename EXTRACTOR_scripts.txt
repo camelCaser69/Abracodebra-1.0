@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-28 23:16:18
+UNITY PROJECT SCRIPT EXPORT - 2025-03-29 18:44:30
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -36,6 +36,8 @@ Assets
 │   │   │   ├── Animal_Bunny.prefab
 │   │   │   └── Animal_Fox.prefab
 │   │   ├── Plants
+│   │   │   ├── PixelFlower.prefab
+│   │   │   ├── PixelFruit.prefab
 │   │   │   ├── PixelLeaf.prefab
 │   │   │   ├── PixelSeed.prefab
 │   │   │   ├── PixelStem.prefab
@@ -669,6 +671,9 @@ public class PlantGrowth : MonoBehaviour
     private bool growing = true;
     private int currentStemCount = 0;
     private int targetStemLength = 0;
+    
+    private bool? offsetRightForPattern1 = null;
+
 
     private void Start()
     {
@@ -705,8 +710,7 @@ public class PlantGrowth : MonoBehaviour
 
         if (energyText != null)
         {
-            energyText.text = $"Energy: {Mathf.Floor(currentEnergy)}/{Mathf.Floor(maxEnergy)}";
-            // Positioning remains as set in the prefab.
+            energyText.text = $"{Mathf.Floor(currentEnergy)}/{Mathf.Floor(maxEnergy)}";
         }
     }
 
@@ -753,13 +757,33 @@ public class PlantGrowth : MonoBehaviour
                         Debug.Log($"[PlantGrowth] Parallel leaves at {baseLeftPos} and {baseRightPos}");
                         break;
                         
-                    case 1: // Offset-Parallel: both sides have leaves, but one side is higher
-                        // Fixed side offset - right side is always raised
-                        Vector2Int raisedRightPos = baseRightPos + new Vector2Int(0, 1);
-                        SpawnLeafIfEmpty(baseLeftPos);
-                        SpawnLeafIfEmpty(raisedRightPos);
-                        Debug.Log($"[PlantGrowth] Offset-Parallel leaves at {baseLeftPos} and {raisedRightPos} (offset)");
+                    case 1: // Offset-Parallel: both sides have leaves, but one side is raised
+                    {
+                        // Choose the starting side only once per plant
+                        if (offsetRightForPattern1 == null)
+                        {
+                            offsetRightForPattern1 = (Random.value < 0.5f);
+                        }
+                        if (offsetRightForPattern1.Value)
+                        {
+                            // Right side is raised.
+                            Vector2Int raisedRightPos = baseRightPos + new Vector2Int(0, 1);
+                            SpawnLeafIfEmpty(baseLeftPos);
+                            SpawnLeafIfEmpty(raisedRightPos);
+                            Debug.Log($"[PlantGrowth] Offset-Parallel (right offset) leaves at {baseLeftPos} and {raisedRightPos}");
+                        }
+                        else
+                        {
+                            // Left side is raised.
+                            Vector2Int raisedLeftPos = baseLeftPos + new Vector2Int(0, 1);
+                            SpawnLeafIfEmpty(raisedLeftPos);
+                            SpawnLeafIfEmpty(baseRightPos);
+                            Debug.Log($"[PlantGrowth] Offset-Parallel (left offset) leaves at {raisedLeftPos} and {baseRightPos}");
+                        }
                         break;
+                    }
+
+
                         
                     case 2: // Alternating-2 (L/R/R/L/L/R/R/L): proper rotation pattern
                         // This creates the L/R/R/L/L/R/R/L pattern
@@ -2518,46 +2542,105 @@ public class NodeExecutor : MonoBehaviour
     }
 
     private void SpawnPlant(NodeData node)
+{
+    if (plantPrefab == null)
     {
-        if (plantPrefab == null)
-        {
-            Debug.Log("[NodeExecutor] plantPrefab is not assigned in the inspector!");
-            return;
-        }
-        var gardener = FindObjectOfType<GardenerController>();
-        if (gardener == null)
-        {
-            Debug.Log("[NodeExecutor] No GardenerController found. Can't spawn plant.");
-            return;
-        }
-    
-        // Collect plant parameters (omitted for brevity)
-        Vector2 spawnPos = gardener.GetPlantingPosition();
-        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
-    
-        // Parent the plant using EcosystemManager
-        if (EcosystemManager.Instance != null && EcosystemManager.Instance.plantParent != null)
-        {
-            if (EcosystemManager.Instance.sortPlantsBySpecies)
-            {
-                // For plants, assume a "Plant" species folder (or use node metadata if available)
-                Transform speciesParent = EcosystemManager.Instance.plantParent.Find("Plant");
-                if (speciesParent == null)
-                {
-                    GameObject subParent = new GameObject("Plant");
-                    subParent.transform.SetParent(EcosystemManager.Instance.plantParent);
-                    speciesParent = subParent.transform;
-                }
-                plantObj.transform.SetParent(speciesParent);
-            }
-            else
-            {
-                plantObj.transform.SetParent(EcosystemManager.Instance.plantParent);
-            }
-        }
-    
-        // Initialize plant parameters via PlantGrowth component (omitted for brevity)
+        LogDebug("[NodeExecutor] plantPrefab is not assigned in the inspector!");
+        return;
     }
+    var gardener = FindObjectOfType<GardenerController>();
+    if (gardener == null)
+    {
+        LogDebug("[NodeExecutor] No GardenerController found. Can't spawn plant.");
+        return;
+    }
+
+    // Step A: Collect all relevant effect data from node
+    float minStem = 3f;
+    float maxStem = 6f;
+    float speed = 1f;            // Growth speed
+    float gap = 1f;              // Leaf gap
+    float pattern = 0f;          // Leaf pattern
+    float randomness = 0f;       // Stem randomness
+
+    // We parse each effect to see if it matches the known effect types
+    foreach (var eff in node.effects)
+    {
+        switch (eff.effectType)
+        {
+            case NodeEffectType.StemLength:
+                minStem = eff.effectValue;
+                maxStem = eff.secondaryValue;
+                break;
+            case NodeEffectType.GrowthSpeed:
+                speed = eff.effectValue;
+                break;
+            case NodeEffectType.LeafGap:
+                gap = eff.effectValue;
+                break;
+            case NodeEffectType.LeafPattern:
+                pattern = eff.effectValue;
+                break;
+            case NodeEffectType.StemRandomness:
+                randomness = eff.effectValue;
+                break;
+            default:
+                // Possibly ignore or handle other effect types here
+                break;
+        }
+    }
+
+    // Step B: Actually spawn the plant
+    Vector2 spawnPos = gardener.GetPlantingPosition();
+    GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
+
+    // Step C: Parent the plant using EcosystemManager
+    if (EcosystemManager.Instance != null && EcosystemManager.Instance.plantParent != null)
+    {
+        if (EcosystemManager.Instance.sortPlantsBySpecies)
+        {
+            // For plants, assume a "Plant" subfolder
+            Transform speciesParent = EcosystemManager.Instance.plantParent.Find("Plant");
+            if (speciesParent == null)
+            {
+                GameObject subParent = new GameObject("Plant");
+                subParent.transform.SetParent(EcosystemManager.Instance.plantParent);
+                speciesParent = subParent.transform;
+            }
+            plantObj.transform.SetParent(speciesParent);
+        }
+        else
+        {
+            plantObj.transform.SetParent(EcosystemManager.Instance.plantParent);
+        }
+    }
+
+    // Step D: Apply the BFS accumulations and effect data to PlantGrowth
+    PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
+    if (growth != null)
+    {
+        // Convert to int if needed
+        growth.stemMinLength = Mathf.RoundToInt(minStem);
+        growth.stemMaxLength = Mathf.RoundToInt(maxStem);
+        growth.growthSpeed   = speed;
+        growth.leafGap       = Mathf.RoundToInt(gap);
+        growth.leafPattern   = Mathf.RoundToInt(pattern);
+        
+        // Our BFS accumulations: pass them in
+        growth.growthRandomness = randomness;
+        growth.maxEnergy        = accumulatedEnergyStorage;   // BFS sum from ProcessNode
+        growth.basePhotosynthesis = accumulatedPhotosynthesis; // BFS sum from ProcessNode
+    }
+    else
+    {
+        LogDebug("[NodeExecutor] PlantGrowth missing on plantPrefab.");
+    }
+
+    // Step E: Reset BFS sums or continue to accumulate for multi-seed spawns
+    // accumulatedEnergyStorage = 0f;
+    // accumulatedPhotosynthesis = 0f;
+}
+
 
 
     private void ClearDebug()
@@ -3526,21 +3609,27 @@ public class NightColorPostProcess : MonoBehaviour
 {
     [Header("References")]
     public WeatherManager weatherManager;        // Assign your existing WeatherManager
-    public Volume globalVolume;                  // The Volume with Color Adjustments override
-    
-    private ColorAdjustments colorAdjustments;   // We'll read/write color filter and post exposure
-    
+    public Volume globalVolume;                  // The Volume with the Color Adjustments override
+
+    private ColorAdjustments colorAdjustments;   // We'll read/write color filter, post exposure, and saturation
+
     [Header("Color Settings")]
     [Tooltip("The color filter at full day (sunIntensity = 1).")]
     public Color dayColorFilter = Color.white;
     [Tooltip("The color filter at full night (sunIntensity ~ 0).")]
     public Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
-    
+
     [Tooltip("Daytime Post-Exposure (e.g. 0). Higher = brighter.")]
     public float dayPostExposure = 0f;
     [Tooltip("Nighttime Post-Exposure (e.g. -0.5). Lower = darker.")]
     public float nightPostExposure = -0.5f;
-    
+
+    [Header("Saturation Settings")]
+    [Tooltip("Saturation at full day (0 means no change).")]
+    public float daySaturation = 0f;
+    [Tooltip("Saturation at full night (e.g. -50 for more desaturation at night).")]
+    public float nightSaturation = -50f;
+
     private void Start()
     {
         if (!globalVolume)
@@ -3565,21 +3654,23 @@ public class NightColorPostProcess : MonoBehaviour
         if (!weatherManager || colorAdjustments == null)
             return;
         
-        // sunIntensity goes 0..1 (0=night, 1=full day).
-        // We invert that to get t = 1 - sunIntensity if we want 
-        // more "night effect" at low intensities.
-        
-        float sun = Mathf.Clamp01(weatherManager.sunIntensity);  // ensure 0..1
+        // Get the sun intensity (0 = night, 1 = day)
+        float sun = Mathf.Clamp01(weatherManager.sunIntensity);
         float t = 1f - sun;  // t=0 at day, t=1 at night
         
-        // Lerp color filter
+        // Lerp the color filter
         Color finalFilter = Color.Lerp(dayColorFilter, nightColorFilter, t);
         colorAdjustments.colorFilter.value = finalFilter;
         
         // Lerp post exposure
         float finalExposure = Mathf.Lerp(dayPostExposure, nightPostExposure, t);
         colorAdjustments.postExposure.value = finalExposure;
+        
+        // Lerp saturation
+        float finalSaturation = Mathf.Lerp(daySaturation, nightSaturation, t);
+        colorAdjustments.saturation.value = finalSaturation;
     }
 }
+
 
 
