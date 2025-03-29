@@ -6,21 +6,27 @@ public class NightColorPostProcess : MonoBehaviour
 {
     [Header("References")]
     public WeatherManager weatherManager;        // Assign your existing WeatherManager
-    public Volume globalVolume;                  // The Volume with Color Adjustments override
-    
-    private ColorAdjustments colorAdjustments;   // We'll read/write color filter and post exposure
-    
+    public Volume globalVolume;                  // The Volume with the Color Adjustments override
+
+    private ColorAdjustments colorAdjustments;   // We'll read/write color filter, post exposure, and saturation
+
     [Header("Color Settings")]
     [Tooltip("The color filter at full day (sunIntensity = 1).")]
     public Color dayColorFilter = Color.white;
     [Tooltip("The color filter at full night (sunIntensity ~ 0).")]
     public Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
-    
+
     [Tooltip("Daytime Post-Exposure (e.g. 0). Higher = brighter.")]
     public float dayPostExposure = 0f;
     [Tooltip("Nighttime Post-Exposure (e.g. -0.5). Lower = darker.")]
     public float nightPostExposure = -0.5f;
-    
+
+    [Header("Saturation Settings")]
+    [Tooltip("Saturation at full day (0 means no change).")]
+    public float daySaturation = 0f;
+    [Tooltip("Saturation at full night (e.g. -50 for more desaturation at night).")]
+    public float nightSaturation = -50f;
+
     private void Start()
     {
         if (!globalVolume)
@@ -45,19 +51,21 @@ public class NightColorPostProcess : MonoBehaviour
         if (!weatherManager || colorAdjustments == null)
             return;
         
-        // sunIntensity goes 0..1 (0=night, 1=full day).
-        // We invert that to get t = 1 - sunIntensity if we want 
-        // more "night effect" at low intensities.
-        
-        float sun = Mathf.Clamp01(weatherManager.sunIntensity);  // ensure 0..1
+        // Get the sun intensity (0 = night, 1 = day)
+        float sun = Mathf.Clamp01(weatherManager.sunIntensity);
         float t = 1f - sun;  // t=0 at day, t=1 at night
         
-        // Lerp color filter
+        // Lerp the color filter
         Color finalFilter = Color.Lerp(dayColorFilter, nightColorFilter, t);
         colorAdjustments.colorFilter.value = finalFilter;
         
         // Lerp post exposure
         float finalExposure = Mathf.Lerp(dayPostExposure, nightPostExposure, t);
         colorAdjustments.postExposure.value = finalExposure;
+        
+        // Lerp saturation
+        float finalSaturation = Mathf.Lerp(daySaturation, nightSaturation, t);
+        colorAdjustments.saturation.value = finalSaturation;
     }
 }
+

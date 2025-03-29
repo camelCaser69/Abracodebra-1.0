@@ -167,46 +167,105 @@ public class NodeExecutor : MonoBehaviour
     }
 
     private void SpawnPlant(NodeData node)
+{
+    if (plantPrefab == null)
     {
-        if (plantPrefab == null)
-        {
-            Debug.Log("[NodeExecutor] plantPrefab is not assigned in the inspector!");
-            return;
-        }
-        var gardener = FindObjectOfType<GardenerController>();
-        if (gardener == null)
-        {
-            Debug.Log("[NodeExecutor] No GardenerController found. Can't spawn plant.");
-            return;
-        }
-    
-        // Collect plant parameters (omitted for brevity)
-        Vector2 spawnPos = gardener.GetPlantingPosition();
-        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
-    
-        // Parent the plant using EcosystemManager
-        if (EcosystemManager.Instance != null && EcosystemManager.Instance.plantParent != null)
-        {
-            if (EcosystemManager.Instance.sortPlantsBySpecies)
-            {
-                // For plants, assume a "Plant" species folder (or use node metadata if available)
-                Transform speciesParent = EcosystemManager.Instance.plantParent.Find("Plant");
-                if (speciesParent == null)
-                {
-                    GameObject subParent = new GameObject("Plant");
-                    subParent.transform.SetParent(EcosystemManager.Instance.plantParent);
-                    speciesParent = subParent.transform;
-                }
-                plantObj.transform.SetParent(speciesParent);
-            }
-            else
-            {
-                plantObj.transform.SetParent(EcosystemManager.Instance.plantParent);
-            }
-        }
-    
-        // Initialize plant parameters via PlantGrowth component (omitted for brevity)
+        LogDebug("[NodeExecutor] plantPrefab is not assigned in the inspector!");
+        return;
     }
+    var gardener = FindObjectOfType<GardenerController>();
+    if (gardener == null)
+    {
+        LogDebug("[NodeExecutor] No GardenerController found. Can't spawn plant.");
+        return;
+    }
+
+    // Step A: Collect all relevant effect data from node
+    float minStem = 3f;
+    float maxStem = 6f;
+    float speed = 1f;            // Growth speed
+    float gap = 1f;              // Leaf gap
+    float pattern = 0f;          // Leaf pattern
+    float randomness = 0f;       // Stem randomness
+
+    // We parse each effect to see if it matches the known effect types
+    foreach (var eff in node.effects)
+    {
+        switch (eff.effectType)
+        {
+            case NodeEffectType.StemLength:
+                minStem = eff.effectValue;
+                maxStem = eff.secondaryValue;
+                break;
+            case NodeEffectType.GrowthSpeed:
+                speed = eff.effectValue;
+                break;
+            case NodeEffectType.LeafGap:
+                gap = eff.effectValue;
+                break;
+            case NodeEffectType.LeafPattern:
+                pattern = eff.effectValue;
+                break;
+            case NodeEffectType.StemRandomness:
+                randomness = eff.effectValue;
+                break;
+            default:
+                // Possibly ignore or handle other effect types here
+                break;
+        }
+    }
+
+    // Step B: Actually spawn the plant
+    Vector2 spawnPos = gardener.GetPlantingPosition();
+    GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
+
+    // Step C: Parent the plant using EcosystemManager
+    if (EcosystemManager.Instance != null && EcosystemManager.Instance.plantParent != null)
+    {
+        if (EcosystemManager.Instance.sortPlantsBySpecies)
+        {
+            // For plants, assume a "Plant" subfolder
+            Transform speciesParent = EcosystemManager.Instance.plantParent.Find("Plant");
+            if (speciesParent == null)
+            {
+                GameObject subParent = new GameObject("Plant");
+                subParent.transform.SetParent(EcosystemManager.Instance.plantParent);
+                speciesParent = subParent.transform;
+            }
+            plantObj.transform.SetParent(speciesParent);
+        }
+        else
+        {
+            plantObj.transform.SetParent(EcosystemManager.Instance.plantParent);
+        }
+    }
+
+    // Step D: Apply the BFS accumulations and effect data to PlantGrowth
+    PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
+    if (growth != null)
+    {
+        // Convert to int if needed
+        growth.stemMinLength = Mathf.RoundToInt(minStem);
+        growth.stemMaxLength = Mathf.RoundToInt(maxStem);
+        growth.growthSpeed   = speed;
+        growth.leafGap       = Mathf.RoundToInt(gap);
+        growth.leafPattern   = Mathf.RoundToInt(pattern);
+        
+        // Our BFS accumulations: pass them in
+        growth.growthRandomness = randomness;
+        growth.maxEnergy        = accumulatedEnergyStorage;   // BFS sum from ProcessNode
+        growth.basePhotosynthesis = accumulatedPhotosynthesis; // BFS sum from ProcessNode
+    }
+    else
+    {
+        LogDebug("[NodeExecutor] PlantGrowth missing on plantPrefab.");
+    }
+
+    // Step E: Reset BFS sums or continue to accumulate for multi-seed spawns
+    // accumulatedEnergyStorage = 0f;
+    // accumulatedPhotosynthesis = 0f;
+}
+
 
 
     private void ClearDebug()

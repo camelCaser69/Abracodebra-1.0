@@ -49,7 +49,7 @@ MonoBehaviour:
     leafPattern: 1
     growthRandomness: 0.15
   - effectType: 15
-    effectValue: 2
+    effectValue: 1
     secondaryValue: 9
     extra1: 1
     extra2: 1
@@ -64,6 +64,13 @@ MonoBehaviour:
     growthRandomness: 0.15
   - effectType: 5
     effectValue: 0.2
+    secondaryValue: 9
+    extra1: 1
+    extra2: 1
+    leafPattern: 1
+    growthRandomness: 0.15
+  - effectType: 4
+    effectValue: 20
     secondaryValue: 9
     extra1: 1
     extra2: 1

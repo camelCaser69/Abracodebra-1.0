@@ -1,8 +1,8 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-27 17:48:50
-PART 4 OF 5
+UNITY PROJECT SCRIPT EXPORT - 2025-03-28 23:16:18
+PART 3 OF 3
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -35,20 +35,36 @@ Assets
 │   │   │   ├── Animal_Bird.prefab
 │   │   │   ├── Animal_Bunny.prefab
 │   │   │   └── Animal_Fox.prefab
-│   │   ├── Indicator_Opportunity.prefab
-│   │   ├── Indicator_Resource.prefab
-│   │   ├── Indicator_Threat.prefab
 │   │   ├── Plants
 │   │   │   ├── PixelLeaf.prefab
 │   │   │   ├── PixelSeed.prefab
 │   │   │   ├── PixelStem.prefab
 │   │   │   └── PlantPrefab.prefab
-│   │   └── ThoughtBubble.prefab
-│   ├── General
-│   │   ├── GardenerPrefab.prefab
-│   │   ├── NodeView.prefab
-│   │   └── Projectile_Basic_Pixel.prefab
-│   └── Node Presets
+│   │   ├── Props
+│   │   │   ├── Poop_Big.prefab
+│   │   │   ├── Poop_Medium_01.prefab
+│   │   │   └── Poop_Medium_02.prefab
+│   │   └── UI
+│   │       ├── Indicator_Opportunity.prefab
+│   │       ├── Indicator_Resource.prefab
+│   │       ├── Indicator_Threat.prefab
+│   │       └── ThoughtBubble.prefab
+│   └── General
+│       ├── GardenerPrefab.prefab
+│       ├── NodeView.prefab
+│       └── Projectile_Basic_Pixel.prefab
+├── Scenes
+│   ├── MainScene.unity
+│   ├── SampleScene
+│   │   └── GlobalPostProcessVolume Profile.asset
+│   └── SampleScene.unity
+├── Scriptable Objects
+│   ├── Animals
+│   │   ├── AnimalLibrary.asset
+│   │   └── Animal_000_Bunny.asset
+│   ├── Life Thoughts
+│   │   └── AnimalThoughtLibrary.asset
+│   └── Nodes Plant
 │       ├── NodeDefinitionLibrary.asset
 │       ├── Node_000_Seed.asset
 │       ├── Node_001_AimSpread.asset
@@ -58,9 +74,6 @@ Assets
 │       ├── Node_005_DamageNode.asset
 │       ├── Node_006_Burn.asset
 │       └── Node_007_FriendlyFire.asset
-├── Scenes
-│   ├── MainScene.unity
-│   └── SampleScene.unity
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -74,7 +87,17 @@ Assets
 │   │   └── SortableEntity.cs
 │   ├── Ecosystem
 │   │   ├── Animals
+│   │   │   ├── AnimalDefinition.cs
+│   │   │   └── AnimalLibrary.cs
 │   │   ├── Core
+│   │   │   ├── AnimalController.cs
+│   │   │   ├── AnimalSpawnData.cs
+│   │   │   ├── AnimalThoughtLibrary.cs
+│   │   │   ├── EcosystemManager.cs
+│   │   │   ├── FaunaManager.cs
+│   │   │   ├── PoopController.cs
+│   │   │   ├── ThoughtBubbleController.cs
+│   │   │   └── ThoughtTrigger.cs
 │   │   └── Plants
 │   ├── Nodes
 │   │   ├── Core
@@ -103,6 +126,7 @@ Assets
 │   │   └── GardenerController.cs
 │   ├── UI
 │   └── Visuals
+│       └── NightColorPostProcess.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -112,6 +136,7 @@ Assets
 ├── Shaders
 │   └── BezierCurveAA.shader
 ├── Test
+├── TextureImporter.preset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
 
@@ -120,6 +145,43 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Runtime\NodeGraph.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+[Serializable]
+public class NodeGraph
+{
+    public List<NodeData> nodes;
+
+    public NodeGraph()
+    {
+        nodes = new List<NodeData>();
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\ColorExtensions.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public static class ColorExtensions
+{
+    public static Color WithAlpha(this Color c, float alpha)
+    {
+        return new Color(c.r, c.g, c.b, alpha);
+    }
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeEditorController.cs
@@ -830,7 +892,288 @@ public class NodeView : MonoBehaviour
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Player\GardenerController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class GardenerController : MonoBehaviour
+{
+    [Header("Movement Settings")]
+    public float moveSpeed = 5f;
+    
+    [Header("Planting Settings")]
+    public Vector2 seedPlantingOffset = new Vector2(0f, -0.5f); // Configurable offset for seed planting
+
+    [Header("Visual Settings")]
+    [Tooltip("If true, the sprite will be flipped when moving left")]
+    public bool flipSpriteWhenMovingLeft = true;
+    [Tooltip("If true, the character will face the opposite direction when flipped")]
+    public bool flipHorizontalDirection = true;
+
+    [Header("Animation Settings")]
+    [Tooltip("Set to false to disable animations")]
+    public bool useAnimations = true;
+    public string runningParameterName = "isRunning";
+    public string plantingParameterName = "isPlanting";
+    [Tooltip("Should match your planting animation length exactly")]
+    public float plantingDuration = 0.25f; // UPDATED to match your 0.25s animation
+
+
+    
+    // Private references
+    private Rigidbody2D rb;
+    private Vector2 movement;
+    private SortableEntity sortableEntity;
+    private SpriteRenderer spriteRenderer;
+    private Animator animator;
+    // Private variables
+    private bool isPlanting = false;
+    private float plantingTimer = 0f;
+    private bool wasMovingBeforePlanting = false;
+
+    private void Awake()
+    {
+        // Get required components
+        rb = GetComponent<Rigidbody2D>();
+        sortableEntity = GetComponent<SortableEntity>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
+        
+        // Add SortableEntity if not already present
+        if (sortableEntity == null)
+            sortableEntity = gameObject.AddComponent<SortableEntity>();
+            
+        // Warn if sprite renderer is missing
+        if (spriteRenderer == null)
+            Debug.LogWarning("GardenerController: SpriteRenderer component not found. Sprite flipping won't work.");
+            
+        // Warn if animator is missing but animations are enabled
+        if (animator == null && useAnimations)
+            Debug.LogWarning("GardenerController: Animator component not found but useAnimations is true.");
+    }
+
+    private void Update()
+    {
+        // Handle movement input and planting action
+        if (!isPlanting)
+        {
+            movement.x = Input.GetAxisRaw("Horizontal");
+            movement.y = Input.GetAxisRaw("Vertical");
+        
+            // Check if we're moving (store for later)
+            bool isMoving = movement.sqrMagnitude > 0.01f;
+        
+            // Handle planting action
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                // Store movement state before planting
+                wasMovingBeforePlanting = isMoving;
+                StartPlantingAnimation();
+            }
+        }
+        else
+        {
+            // When planting, we don't accept movement input
+            movement = Vector2.zero;
+        
+            // Handle planting timer
+            plantingTimer -= Time.deltaTime;
+            if (plantingTimer <= 0)
+            {
+                EndPlantingAnimation();
+            }
+        }
+    
+        // Update animations after all state changes are processed
+        UpdateAnimations();
+    
+        // Handle sprite flipping based on movement direction
+        UpdateSpriteDirection();
+    }
+
+    private void FixedUpdate()
+    {
+        // Only move if not planting
+        if (!isPlanting)
+        {
+            rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+        }
+    }
+    
+    // Update character animations based on state
+    private void UpdateAnimations()
+    {
+        if (!useAnimations || animator == null) return;
+    
+        // Set running animation parameter
+        bool isMoving = movement.sqrMagnitude > 0.01f;
+        animator.SetBool(runningParameterName, isMoving);
+    }
+    
+    // Update sprite direction based on movement
+    private void UpdateSpriteDirection()
+    {
+        if (spriteRenderer == null || !flipSpriteWhenMovingLeft) return;
+        
+        if (movement.x != 0)
+        {
+            // Only flip if moving horizontally
+            bool shouldFlip = (movement.x < 0);
+            
+            // Apply flipping logic based on settings
+            if (flipHorizontalDirection)
+            {
+                spriteRenderer.flipX = shouldFlip;
+            }
+            else
+            {
+                // Alternative approach: flip the entire transform
+                // This is useful if the sprite is already facing left initially
+                Vector3 scale = transform.localScale;
+                scale.x = shouldFlip ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
+                transform.localScale = scale;
+            }
+        }
+    }
+    
+    // Start planting animation and process
+    public void StartPlantingAnimation()
+    {
+        if (!useAnimations || isPlanting) return;
+    
+        isPlanting = true;
+        plantingTimer = plantingDuration;
+    
+        // Set animation parameters
+        if (animator != null)
+        {
+            // Set planting to true and ensure running is false
+            animator.SetBool(plantingParameterName, true);
+            animator.SetBool(runningParameterName, false);
+        }
+    }
+    
+    // End planting animation and resume normal control
+    
+    private void EndPlantingAnimation()
+    {
+        // Reset planting state
+        isPlanting = false;
+    
+        // Reset animation parameters
+        if (animator != null)
+        {
+            animator.SetBool(plantingParameterName, false);
+        
+            // Important: don't immediately set isRunning based on current movement
+            // because movement is zero during planting. Instead:
+            if (wasMovingBeforePlanting && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
+            {
+                // Only resume running if we were running before AND still have directional input
+                animator.SetBool(runningParameterName, true);
+            }
+        }
+    
+        // Now update movement based on current input
+        movement.x = Input.GetAxisRaw("Horizontal");
+        movement.y = Input.GetAxisRaw("Vertical");
+    }
+    
+    // Returns the position used for planting seeds, now with configurable offset
+    public Vector2 GetPlantingPosition()
+    {
+        return (Vector2)transform.position + seedPlantingOffset;
+    }
+    
+    // Public method to set planting animation duration
+    public void SetPlantingDuration(float duration)
+    {
+        plantingDuration = Mathf.Max(0.1f, duration); // Ensure minimum duration
+    }
+    
+    // Public method to trigger planting animation from other scripts
+    public void Plant()
+    {
+        StartPlantingAnimation();
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\NightColorPostProcess.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+
+public class NightColorPostProcess : MonoBehaviour
+{
+    [Header("References")]
+    public WeatherManager weatherManager;        // Assign your existing WeatherManager
+    public Volume globalVolume;                  // The Volume with Color Adjustments override
+    
+    private ColorAdjustments colorAdjustments;   // We'll read/write color filter and post exposure
+    
+    [Header("Color Settings")]
+    [Tooltip("The color filter at full day (sunIntensity = 1).")]
+    public Color dayColorFilter = Color.white;
+    [Tooltip("The color filter at full night (sunIntensity ~ 0).")]
+    public Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
+    
+    [Tooltip("Daytime Post-Exposure (e.g. 0). Higher = brighter.")]
+    public float dayPostExposure = 0f;
+    [Tooltip("Nighttime Post-Exposure (e.g. -0.5). Lower = darker.")]
+    public float nightPostExposure = -0.5f;
+    
+    private void Start()
+    {
+        if (!globalVolume)
+        {
+            Debug.LogWarning("[NightColorPostProcess] No globalVolume assigned!");
+            return;
+        }
+
+        // Try to get the ColorAdjustments override from the volume's profile
+        if (globalVolume.profile.TryGet<ColorAdjustments>(out var colorAdj))
+        {
+            colorAdjustments = colorAdj;
+        }
+        else
+        {
+            Debug.LogWarning("[NightColorPostProcess] No ColorAdjustments override found in the Volume profile!");
+        }
+    }
+
+    private void Update()
+    {
+        if (!weatherManager || colorAdjustments == null)
+            return;
+        
+        // sunIntensity goes 0..1 (0=night, 1=full day).
+        // We invert that to get t = 1 - sunIntensity if we want 
+        // more "night effect" at low intensities.
+        
+        float sun = Mathf.Clamp01(weatherManager.sunIntensity);  // ensure 0..1
+        float t = 1f - sun;  // t=0 at day, t=1 at night
+        
+        // Lerp color filter
+        Color finalFilter = Color.Lerp(dayColorFilter, nightColorFilter, t);
+        colorAdjustments.colorFilter.value = finalFilter;
+        
+        // Lerp post exposure
+        float finalExposure = Mathf.Lerp(dayPostExposure, nightPostExposure, t);
+        colorAdjustments.postExposure.value = finalExposure;
+    }
+}
+
+
+
+
+
 
 --------------------------------------------------------------------------------
-This is part 4 out of 5 of script collection. 1 more parts remain.
+This is the final part (3 of 3).
 --------------------------------------------------------------------------------

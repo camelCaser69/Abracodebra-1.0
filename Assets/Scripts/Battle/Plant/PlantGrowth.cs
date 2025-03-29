@@ -50,6 +50,9 @@ public class PlantGrowth : MonoBehaviour
     private bool growing = true;
     private int currentStemCount = 0;
     private int targetStemLength = 0;
+    
+    private bool? offsetRightForPattern1 = null;
+
 
     private void Start()
     {
@@ -86,8 +89,7 @@ public class PlantGrowth : MonoBehaviour
 
         if (energyText != null)
         {
-            energyText.text = $"Energy: {Mathf.Floor(currentEnergy)}/{Mathf.Floor(maxEnergy)}";
-            // Positioning remains as set in the prefab.
+            energyText.text = $"{Mathf.Floor(currentEnergy)}/{Mathf.Floor(maxEnergy)}";
         }
     }
 
@@ -134,13 +136,33 @@ public class PlantGrowth : MonoBehaviour
                         Debug.Log($"[PlantGrowth] Parallel leaves at {baseLeftPos} and {baseRightPos}");
                         break;
                         
-                    case 1: // Offset-Parallel: both sides have leaves, but one side is higher
-                        // Fixed side offset - right side is always raised
-                        Vector2Int raisedRightPos = baseRightPos + new Vector2Int(0, 1);
-                        SpawnLeafIfEmpty(baseLeftPos);
-                        SpawnLeafIfEmpty(raisedRightPos);
-                        Debug.Log($"[PlantGrowth] Offset-Parallel leaves at {baseLeftPos} and {raisedRightPos} (offset)");
+                    case 1: // Offset-Parallel: both sides have leaves, but one side is raised
+                    {
+                        // Choose the starting side only once per plant
+                        if (offsetRightForPattern1 == null)
+                        {
+                            offsetRightForPattern1 = (Random.value < 0.5f);
+                        }
+                        if (offsetRightForPattern1.Value)
+                        {
+                            // Right side is raised.
+                            Vector2Int raisedRightPos = baseRightPos + new Vector2Int(0, 1);
+                            SpawnLeafIfEmpty(baseLeftPos);
+                            SpawnLeafIfEmpty(raisedRightPos);
+                            Debug.Log($"[PlantGrowth] Offset-Parallel (right offset) leaves at {baseLeftPos} and {raisedRightPos}");
+                        }
+                        else
+                        {
+                            // Left side is raised.
+                            Vector2Int raisedLeftPos = baseLeftPos + new Vector2Int(0, 1);
+                            SpawnLeafIfEmpty(raisedLeftPos);
+                            SpawnLeafIfEmpty(baseRightPos);
+                            Debug.Log($"[PlantGrowth] Offset-Parallel (left offset) leaves at {raisedLeftPos} and {baseRightPos}");
+                        }
                         break;
+                    }
+
+
                         
                     case 2: // Alternating-2 (L/R/R/L/L/R/R/L): proper rotation pattern
                         // This creates the L/R/R/L/L/R/R/L pattern

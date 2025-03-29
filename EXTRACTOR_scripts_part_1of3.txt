@@ -1,0 +1,1291 @@
+This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
+
+================================================================================
+UNITY PROJECT SCRIPT EXPORT - 2025-03-28 23:16:18
+PART 1 OF 3
+================================================================================
+
+--------------------------------------------------------------------------------
+Assets
+├── Animation
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
+├── DefaultVolumeProfile.asset
+├── Editor
+│   ├── HexGridRendererEditor.cs
+│   ├── NodeDefinitionAutoAdder.cs
+│   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionLibraryEditor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   └── NodeEffectDataDrawer.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
+├── InputSystem_Actions.inputactions
+├── Materials
+│   └── BezierCurveAA_Material.mat
+├── Post Processing
+├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   └── Animal_Fox.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   └── PlantPrefab.prefab
+│   │   ├── Props
+│   │   │   ├── Poop_Big.prefab
+│   │   │   ├── Poop_Medium_01.prefab
+│   │   │   └── Poop_Medium_02.prefab
+│   │   └── UI
+│   │       ├── Indicator_Opportunity.prefab
+│   │       ├── Indicator_Resource.prefab
+│   │       ├── Indicator_Threat.prefab
+│   │       └── ThoughtBubble.prefab
+│   └── General
+│       ├── GardenerPrefab.prefab
+│       ├── NodeView.prefab
+│       └── Projectile_Basic_Pixel.prefab
+├── Scenes
+│   ├── MainScene.unity
+│   ├── SampleScene
+│   │   └── GlobalPostProcessVolume Profile.asset
+│   └── SampleScene.unity
+├── Scriptable Objects
+│   ├── Animals
+│   │   ├── AnimalLibrary.asset
+│   │   └── Animal_000_Bunny.asset
+│   ├── Life Thoughts
+│   │   └── AnimalThoughtLibrary.asset
+│   └── Nodes Plant
+│       ├── NodeDefinitionLibrary.asset
+│       ├── Node_000_Seed.asset
+│       ├── Node_001_AimSpread.asset
+│       ├── Node_002_Piercing.asset
+│       ├── Node_003_Output.asset
+│       ├── Node_004_ManaSource.asset
+│       ├── Node_005_DamageNode.asset
+│       ├── Node_006_Burn.asset
+│       └── Node_007_FriendlyFire.asset
+├── Scripts
+│   ├── Battle
+│   │   ├── Plant
+│   │   │   ├── PlantGrowth.cs
+│   │   │   └── WeatherManager.cs
+│   │   ├── SpellProjectile.cs
+│   │   └── Status Effects
+│   │       ├── BurningStatusEffect.cs
+│   │       └── StatusEffect.cs
+│   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── AnimalDefinition.cs
+│   │   │   └── AnimalLibrary.cs
+│   │   ├── Core
+│   │   │   ├── AnimalController.cs
+│   │   │   ├── AnimalSpawnData.cs
+│   │   │   ├── AnimalThoughtLibrary.cs
+│   │   │   ├── EcosystemManager.cs
+│   │   │   ├── FaunaManager.cs
+│   │   │   ├── PoopController.cs
+│   │   │   ├── ThoughtBubbleController.cs
+│   │   │   └── ThoughtTrigger.cs
+│   │   └── Plants
+│   ├── Nodes
+│   │   ├── Core
+│   │   │   ├── HexCoords.cs
+│   │   │   ├── HexGridManager.cs
+│   │   │   ├── HexGridRenderer.cs
+│   │   │   ├── NodeData.cs
+│   │   │   ├── NodeDefinition.cs
+│   │   │   ├── NodeDefinitionLibrary.cs
+│   │   │   ├── NodeEffectData.cs
+│   │   │   ├── NodeEffectType.cs
+│   │   │   ├── NodePort.cs
+│   │   │   ├── OutputNodeEffect.cs
+│   │   │   └── PortDefinition.cs
+│   │   ├── Runtime
+│   │   │   ├── NodeExecutor.cs
+│   │   │   └── NodeGraph.cs
+│   │   └── UI
+│   │       ├── ColorExtensions.cs
+│   │       ├── NodeEditorController.cs
+│   │       ├── NodeHexDraggable.cs
+│   │       ├── NodeSelectable.cs
+│   │       ├── NodeTestInitializer.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
+│   ├── UI
+│   └── Visuals
+│       └── NightColorPostProcess.cs
+├── Settings
+│   ├── Lit2DSceneTemplate.scenetemplate
+│   ├── Renderer2D.asset
+│   ├── Scenes
+│   │   └── URP2DSceneTemplate.unity
+│   └── UniversalRP.asset
+├── Shaders
+│   └── BezierCurveAA.shader
+├── Test
+├── TextureImporter.preset
+└── UniversalRenderPipelineGlobalSettings.asset
+--------------------------------------------------------------------------------
+
+SCRIPT CONTENTS
+================================================================================
+
+SCRIPT CONTENTS
+================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\HexGridRendererEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEditor;
+
+[CustomEditor(typeof(HexGridRenderer))]
+public class HexGridRendererEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        if (GUILayout.Button("UPDATE"))
+        {
+            HexGridRenderer grid = (HexGridRenderer)target;
+            grid.SetVerticesDirty();
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeDefinitionAutoAdder.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEditor;
+using System.IO;
+using System.Linq;
+
+public class NodeDefinitionAutoAdder : AssetPostprocessor
+{
+    static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets,
+        string[] movedAssets, string[] movedFromAssetPaths)
+    {
+        foreach (string assetPath in importedAssets)
+        {
+            NodeDefinition nodeDef = AssetDatabase.LoadAssetAtPath<NodeDefinition>(assetPath);
+            if (nodeDef != null)
+            {
+                string folderPath = Path.GetDirectoryName(assetPath);
+                string[] libraryFiles = Directory.GetFiles(folderPath, "*.asset", SearchOption.TopDirectoryOnly)
+                    .Where(f => f.Contains("NodeDefinitionLibrary")).ToArray();
+                if (libraryFiles.Length > 0)
+                {
+                    NodeDefinitionLibrary library = AssetDatabase.LoadAssetAtPath<NodeDefinitionLibrary>(libraryFiles[0]);
+                    if (library != null && !library.definitions.Contains(nodeDef))
+                    {
+                        library.definitions.Add(nodeDef);
+                        EditorUtility.SetDirty(library);
+                        AssetDatabase.SaveAssets();
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeDefinitionCreator.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEditor;
+using System.IO;
+
+public static class NodeDefinitionCreator
+{
+    private const string MenuPath = "Assets/Create/Nodes/Node Definition (Auto-Named)";
+
+    [MenuItem(MenuPath, false, 50)]
+    public static void CreateNodeDefinition()
+    {
+        // Figure out which folder the user is in, or use Assets/
+        string folder = GetSelectedPathOrFallback();
+
+        // Determine the next numeric index for "Node_XXX_"
+        int nextNumber = GetNextNodeNumber(folder);
+
+        // e.g., "Node_007_"
+        string newName = $"Node_{nextNumber:D3}_";
+        string newPath = Path.Combine(folder, newName + ".asset").Replace("\\", "/");
+
+        // Create the NodeDefinition
+        NodeDefinition nodeDef = ScriptableObject.CreateInstance<NodeDefinition>();
+        AssetDatabase.CreateAsset(nodeDef, newPath);
+        
+        // Save and refresh, but DO NOT select or focus the ProjectWindow.
+        AssetDatabase.SaveAssets();
+        AssetDatabase.Refresh();
+
+        Debug.Log($"Created NodeDefinition at: {newPath}");
+        // Notice we don't call Selection.activeObject = nodeDef
+        // or EditorUtility.FocusProjectWindow()
+        // or ProjectWindowUtil.ShowCreatedAsset(nodeDef)
+        // thus we avoid changing the user's folder.
+    }
+
+    // (Optional) Validate the menu item so it’s disabled if the game is running
+    [MenuItem(MenuPath, true)]
+    private static bool ValidateCreateNodeDefinition()
+    {
+        return !Application.isPlaying;
+    }
+
+    private static string GetSelectedPathOrFallback()
+    {
+        // Attempt to get the folder the user has selected in the Project window
+        string path = "Assets";
+        foreach (Object obj in Selection.GetFiltered(typeof(Object), SelectionMode.Assets))
+        {
+            path = AssetDatabase.GetAssetPath(obj);
+            if (!string.IsNullOrEmpty(path))
+            {
+                // If it's a file, get its parent folder
+                if (File.Exists(path))
+                {
+                    path = Path.GetDirectoryName(path);
+                }
+                break;
+            }
+        }
+        return path;
+    }
+
+    private static int GetNextNodeNumber(string folderPath)
+    {
+        int nextNumber = 1;
+        // Look for existing Node_XXX_ files
+        string[] files = Directory.GetFiles(folderPath, "Node_*", SearchOption.TopDirectoryOnly);
+        foreach (var file in files)
+        {
+            string fName = Path.GetFileNameWithoutExtension(file);
+            if (fName.StartsWith("Node_") && fName.Length >= 8)
+            {
+                // extract the 3-digit number from Node_000_
+                string numberPart = fName.Substring(5, 3);
+                if (int.TryParse(numberPart, out int num) && num >= nextNumber)
+                {
+                    nextNumber = num + 1;
+                }
+            }
+        }
+        return nextNumber;
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeDefinitionLibraryEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEditor;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+[CustomEditor(typeof(NodeDefinitionLibrary))]
+public class NodeDefinitionLibraryEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        if (GUILayout.Button("UPDATE"))
+        {
+            UpdateLibrary();
+        }
+    }
+
+    private void UpdateLibrary()
+    {
+        NodeDefinitionLibrary library = (NodeDefinitionLibrary)target;
+
+        // Get the folder of the current library asset.
+        string libraryPath = AssetDatabase.GetAssetPath(library);
+        string folderPath = Path.GetDirectoryName(libraryPath);
+
+        // Find all .asset files in the folder.
+        string[] assetFiles = Directory.GetFiles(folderPath, "*.asset", SearchOption.TopDirectoryOnly);
+
+        // Load NodeDefinition assets from that folder.
+        List<NodeDefinition> defs = new List<NodeDefinition>();
+        foreach (string file in assetFiles)
+        {
+            // Ignore the library asset itself.
+            if (file == libraryPath)
+                continue;
+
+            NodeDefinition def = AssetDatabase.LoadAssetAtPath<NodeDefinition>(file);
+            if (def != null)
+                defs.Add(def);
+        }
+
+        // Sort definitions by the numeric portion in the file name (assumes "Node_XXX_...").
+        defs = defs.OrderBy(d => {
+            string name = d.name;
+            if (name.StartsWith("Node_") && name.Length >= 8)
+            {
+                string numStr = name.Substring(5, 3);
+                if (int.TryParse(numStr, out int num))
+                    return num;
+            }
+            return int.MaxValue; // if no number is found, sort last.
+        }).ToList();
+
+        library.definitions = defs;
+        EditorUtility.SetDirty(library);
+        AssetDatabase.SaveAssets();
+        Debug.Log("NodeDefinitionLibrary updated. Total definitions: " + library.definitions.Count);
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeDefinitionPostprocessor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEditor;
+using System.IO;
+using System.Linq;
+
+public class NodeDefinitionPostprocessor : AssetPostprocessor
+{
+    static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, 
+        string[] movedAssets, string[] movedFromAssetPaths)
+    {
+        foreach (string assetPath in importedAssets)
+        {
+            NodeDefinition nodeDef = AssetDatabase.LoadAssetAtPath<NodeDefinition>(assetPath);
+            if (nodeDef != null)
+            {
+                string fileName = Path.GetFileNameWithoutExtension(assetPath);
+                // Check if file name already starts with "Node_"
+                if (!fileName.StartsWith("Node_"))
+                {
+                    string folderPath = Path.GetDirectoryName(assetPath);
+                    // Get all files in folder that start with "Node_"
+                    var files = Directory.GetFiles(folderPath, "Node_*", SearchOption.TopDirectoryOnly);
+                    int nextNumber = 1;
+                    foreach (var file in files)
+                    {
+                        string fName = Path.GetFileNameWithoutExtension(file);
+                        string[] parts = fName.Split('_');
+                        if (parts.Length >= 2 && int.TryParse(parts[1], out int num))
+                        {
+                            if (num >= nextNumber)
+                                nextNumber = num + 1;
+                        }
+                    }
+                    string newName = $"Node_{nextNumber:D3}_";
+                    AssetDatabase.RenameAsset(assetPath, newName);
+                    AssetDatabase.SaveAssets();
+                }
+            }
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeEffectDataDrawer.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEditor;
+
+[CustomPropertyDrawer(typeof(NodeEffectData))]
+public class NodeEffectDataDrawer : PropertyDrawer
+{
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
+        SerializedProperty typeProp        = property.FindPropertyRelative("effectType");
+        SerializedProperty valueProp       = property.FindPropertyRelative("effectValue");
+        SerializedProperty secondaryProp   = property.FindPropertyRelative("secondaryValue");
+        SerializedProperty extra1Prop      = property.FindPropertyRelative("extra1");
+        SerializedProperty extra2Prop      = property.FindPropertyRelative("extra2");
+
+        // Draw effectType
+        Rect typeRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+        EditorGUI.PropertyField(typeRect, typeProp, new GUIContent("Effect Type"));
+        NodeEffectType effectType = (NodeEffectType)typeProp.enumValueIndex;
+        float yOffset = typeRect.yMax + EditorGUIUtility.standardVerticalSpacing;
+
+        Rect NextLineRect()
+        {
+            Rect r = new Rect(position.x, yOffset, position.width, EditorGUIUtility.singleLineHeight);
+            yOffset += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            return r;
+        }
+
+        // Draw fields based on effectType
+        switch (effectType)
+        {
+            case NodeEffectType.ManaCost:
+            {
+                GUIContent content = new GUIContent("Mana Cost", "Amount of mana required to process this node.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.Damage:
+            {
+                GUIContent content = new GUIContent("Damage", "Damage value contributed by this node.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.Output:
+            {
+                GUIContent content = new GUIContent("Output", "This node outputs the final chain result (no parameters).");
+                Rect line = NextLineRect();
+                EditorGUI.LabelField(line, content);
+                break;
+            }
+            case NodeEffectType.Burning:
+            {
+                // Fire DPS in value, Duration in secondaryValue
+                GUIContent contentDps = new GUIContent("Fire DPS", "Damage per second of burning.");
+                Rect line1 = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line1, contentDps, valueProp.floatValue);
+
+                GUIContent contentDur = new GUIContent("Duration", "Duration (seconds) of burning effect.");
+                Rect line2 = NextLineRect();
+                secondaryProp.floatValue = EditorGUI.FloatField(line2, contentDur, secondaryProp.floatValue);
+                break;
+            }
+            case NodeEffectType.AimSpread:
+            {
+                GUIContent content = new GUIContent("Aim Spread Modifier", "Modifier to add to the wizard's base aim spread.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.Piercing:
+            {
+                GUIContent content = new GUIContent("Piercing", "Set to 1 for piercing, 0 otherwise.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.FriendlyFire:
+            {
+                GUIContent content = new GUIContent("Friendly Fire", "Set to 1 for friendly fire, 0 for none.");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.SeedSpawn:
+            {
+                GUIContent content = new GUIContent("Seed Spawner", "Base effect required to spawn a plant. Add other plant effects to customize.");
+                Rect line = NextLineRect();
+                EditorGUI.LabelField(line, content);
+                break;
+            }
+            case NodeEffectType.StemLength:
+            {
+                // Min stem length
+                var line1 = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line1,
+                    new GUIContent("Min Stem Length", "Minimum length of the stem in cells"), valueProp.floatValue);
+
+                // Max stem length
+                var line2 = NextLineRect();
+                secondaryProp.floatValue = EditorGUI.FloatField(line2,
+                    new GUIContent("Max Stem Length", "Maximum length of the stem in cells"), secondaryProp.floatValue);
+                break;
+            }
+            case NodeEffectType.GrowthSpeed:
+            {
+                // Growth speed
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line,
+                    new GUIContent("Growth Speed (sec)", "Seconds per growth step"), valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.LeafGap:
+            {
+                // Leaf gap
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line,
+                    new GUIContent("Leaf Gap", "0=leaves on every cell, 1=every 2nd cell, etc."), valueProp.floatValue);
+                break;
+            }
+            // Update the LeafPattern case in the NodeEffectDataDrawer.cs OnGUI method
+            case NodeEffectType.LeafPattern:
+            {
+                // Leaf Pattern as regular float field with improved tooltip
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, 
+                    new GUIContent("Leaf Pattern", 
+                        "Choose a leaf pattern by number:\n" +
+                        "0 = Parallel (leaves on both sides at same height)\n" +
+                        "1 = Offset-Parallel (right side leaves always higher)\n" +
+                        "2 = Alternating (L/R/R/L/L/R/R/L rotation pattern)\n" +
+                        "3 = Double-Spiral (leaves spiral up the stem)\n" +
+                        "4 = One-Sided (two leaves on right side only)"), 
+                    valueProp.floatValue);
+                break;
+            }
+            case NodeEffectType.StemRandomness:
+            {
+                // Growth Randomness => [0..1]
+                var line = NextLineRect();
+                valueProp.floatValue = EditorGUI.Slider(line,
+                    new GUIContent("Growth Randomness", "0=straight up, 1=always diagonal"), valueProp.floatValue, 0f, 1f);
+                break;
+            }
+            default:
+            {
+                // Fallback for unrecognized effect
+                GUIContent content = new GUIContent("Value", "");
+                Rect line = NextLineRect();
+                valueProp.floatValue = EditorGUI.FloatField(line, content, valueProp.floatValue);
+                break;
+            }
+        }
+    }
+
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        SerializedProperty typeProp = property.FindPropertyRelative("effectType");
+        NodeEffectType effectType = (NodeEffectType)typeProp.enumValueIndex;
+
+        float lineHeight = EditorGUIUtility.singleLineHeight;
+        float spacing = EditorGUIUtility.standardVerticalSpacing;
+
+        // Start with 1 line for the effectType + spacing
+        float totalHeight = lineHeight + spacing;
+
+        switch (effectType)
+        {
+            case NodeEffectType.ManaCost:
+            case NodeEffectType.Damage:
+            case NodeEffectType.AimSpread:
+            case NodeEffectType.Piercing:
+            case NodeEffectType.FriendlyFire:
+            case NodeEffectType.GrowthSpeed:
+            case NodeEffectType.LeafGap:
+            case NodeEffectType.LeafPattern:
+            case NodeEffectType.StemRandomness:
+                // +1 line each
+                totalHeight += (lineHeight + spacing);
+                break;
+
+            case NodeEffectType.Output:
+            case NodeEffectType.SeedSpawn:
+                // +1 line
+                totalHeight += (lineHeight + spacing);
+                break;
+
+            case NodeEffectType.Burning:
+                // +2 lines
+                totalHeight += (lineHeight + spacing) * 2;
+                break;
+
+            case NodeEffectType.StemLength:
+                // +2 lines (min and max)
+                totalHeight += (lineHeight + spacing) * 2;
+                break;
+
+            default:
+                // fallback +1 line
+                totalHeight += (lineHeight + spacing);
+                break;
+        }
+        return totalHeight;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\PlantGrowth.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using TMPro;
+
+public enum PlantCellType
+{
+    Seed,
+    Stem,
+    Leaf,
+    Flower,
+    Fruit
+}
+
+public class PlantGrowth : MonoBehaviour
+{
+    [Header("Seed Gene Parameters (set via Seed node effect)")]
+    public int stemMinLength = 3;            // Minimum stem length (cells)
+    public int stemMaxLength = 6;            // Maximum stem length (cells)
+    public float growthSpeed = 1f;           // Seconds per growth step
+    [Tooltip("Leaf Gap: 0 = leaves on every stem cell; 1 = leaves on every 2nd stem cell; etc.")]
+    public int leafGap = 1;
+    [Tooltip("Leaf pattern type: 0=Parallel, 1=Offset-Parallel, 2=Alternating (L/R/R/L), 3=Double-Spiral, 4=One-Sided")]
+    public int leafPattern = 0;
+    public float growthRandomness = 0f;      // [0..1]: 0=always up; 1=always diagonal
+
+    [Header("Energy System")]
+    [Tooltip("Max energy available from all Energy Storage nodes in BFS.")]
+    public float maxEnergy = 0f;
+    [Tooltip("Current energy accumulated.")]
+    public float currentEnergy = 0f;
+    [Tooltip("Base photosynthesis rate from Energy Photosynthesis nodes in BFS.")]
+    public float basePhotosynthesis = 0f;
+
+    [Header("Cell Prefabs")]
+    public GameObject seedCellPrefab;
+    public GameObject stemCellPrefab;
+    public GameObject leafCellPrefab;
+
+    [Header("Cell Grid Settings")]
+    [Tooltip("Distance (in game units) between adjacent cells.")]
+    public float cellSpacing = 8f; 
+
+    [Header("UI")]
+    [Tooltip("TextMeshProUGUI displaying current energy and max energy below the plant.")]
+    public TMP_Text energyText;
+
+    private Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
+    private bool growing = true;
+    private int currentStemCount = 0;
+    private int targetStemLength = 0;
+
+    private void Start()
+    {
+        targetStemLength = Random.Range(stemMinLength, stemMaxLength + 1);
+        Debug.Log($"[PlantGrowth] Target stem length: {targetStemLength}");
+
+        cells[new Vector2Int(0, 0)] = PlantCellType.Seed;
+        SpawnCellVisual(PlantCellType.Seed, new Vector2Int(0, 0));
+
+        // Set up sorting inheritance
+        SortableEntity[] cellEntities = GetComponentsInChildren<SortableEntity>();
+        foreach (var cellEntity in cellEntities)
+        {
+            // Skip the seed cell, which will determine sorting
+            if (cellEntity.transform == transform)
+                continue;
+
+            // Use the public method to set parent Y coordinate usage
+            cellEntity.SetUseParentYCoordinate(true);
+        }
+
+        StartCoroutine(GrowRoutine());
+    }
+
+    private void Update()
+    {
+        // Use sunIntensity from WeatherManager.
+        float sunlight = (WeatherManager.Instance != null) ? WeatherManager.Instance.sunIntensity : 1f;
+        float leafCount = cells.Values.Count(cell => cell == PlantCellType.Leaf);
+        float deltaPhotosynthesis = basePhotosynthesis * leafCount * sunlight * Time.deltaTime;
+        currentEnergy += deltaPhotosynthesis;
+        if (currentEnergy > maxEnergy)
+            currentEnergy = maxEnergy;
+
+        if (energyText != null)
+        {
+            energyText.text = $"Energy: {Mathf.Floor(currentEnergy)}/{Mathf.Floor(maxEnergy)}";
+            // Positioning remains as set in the prefab.
+        }
+    }
+
+    private IEnumerator GrowRoutine()
+{
+    Vector2Int currentPos = new Vector2Int(0, 0);
+    int spiralDirection = 1;  // Used for spiral pattern: 1=right, -1=left
+    int patternCounter = 0;   // Used to track position in complex patterns
+    
+    while (growing)
+    {
+        yield return new WaitForSeconds(growthSpeed);
+
+        if (currentStemCount < targetStemLength)
+        {
+            currentStemCount++;
+            Vector2Int dir;
+            if (currentStemCount == 1)
+            {
+                // Always grow directly up for the first stem cell.
+                dir = new Vector2Int(0, 1);
+            }
+            else
+            {
+                dir = GetStemDirection();
+            }
+            currentPos += dir;
+            cells[currentPos] = PlantCellType.Stem;
+            SpawnCellVisual(PlantCellType.Stem, currentPos);
+            Debug.Log($"[PlantGrowth] Stem grown at {currentPos}");
+
+            if ((currentStemCount % (leafGap + 1)) == 0)
+            {
+                Vector2Int baseLeftPos = currentPos + new Vector2Int(-1, 0);
+                Vector2Int baseRightPos = currentPos + new Vector2Int(1, 0);
+                patternCounter++;
+
+                // Process according to leaf pattern
+                switch (leafPattern)
+                {
+                    case 0: // Parallel: spawn both leaves at same height
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(baseRightPos);
+                        Debug.Log($"[PlantGrowth] Parallel leaves at {baseLeftPos} and {baseRightPos}");
+                        break;
+                        
+                    case 1: // Offset-Parallel: both sides have leaves, but one side is higher
+                        // Fixed side offset - right side is always raised
+                        Vector2Int raisedRightPos = baseRightPos + new Vector2Int(0, 1);
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(raisedRightPos);
+                        Debug.Log($"[PlantGrowth] Offset-Parallel leaves at {baseLeftPos} and {raisedRightPos} (offset)");
+                        break;
+                        
+                    case 2: // Alternating-2 (L/R/R/L/L/R/R/L): proper rotation pattern
+                        // This creates the L/R/R/L/L/R/R/L pattern
+                        // patternCounter % 4 gives us:
+                        // 1 -> Left side offset (L)
+                        // 2 -> Right side normal (R)
+                        // 3 -> Right side offset (R)
+                        // 0 -> Left side normal (L)
+                        
+                        Vector2Int leftPos, rightPos;
+                        
+                        // Determine positions based on pattern position
+                        switch (patternCounter % 4) {
+                            case 1: // Left side offset, right side normal
+                                leftPos = baseLeftPos + new Vector2Int(0, 1);
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} (offset) and {rightPos}");
+                                break;
+                            case 2: // Left side normal, right side normal
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos}");
+                                break;
+                            case 3: // Left side normal, right side offset
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos + new Vector2Int(0, 1);
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos} (offset)");
+                                break;
+                            case 0: // Left side normal, right side normal (cycle complete)
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos}");
+                                break;
+                            default:
+                                leftPos = baseLeftPos;
+                                rightPos = baseRightPos;
+                                break;
+                        }
+                        
+                        SpawnLeafIfEmpty(leftPos);
+                        SpawnLeafIfEmpty(rightPos);
+                        break;
+                        
+                    case 3: // Double-Spiral: two leaves per node, spiral pattern
+                        // Create two leaves that spiral around the stem, with vertical offset
+                        Vector2Int leftSpiral = baseLeftPos + new Vector2Int(0, spiralDirection > 0 ? 1 : 0);
+                        Vector2Int rightSpiral = baseRightPos + new Vector2Int(0, spiralDirection > 0 ? 0 : 1);
+                        
+                        SpawnLeafIfEmpty(leftSpiral);
+                        SpawnLeafIfEmpty(rightSpiral);
+                        
+                        Debug.Log($"[PlantGrowth] Double-Spiral leaves at {leftSpiral} and {rightSpiral}");
+                        
+                        // Toggle spiral direction for next node
+                        spiralDirection *= -1;
+                        break;
+                        
+                    case 4: // One-Sided: leaves only grow on one side
+                        // For balance, create two leaves on the same side
+                        SpawnLeafIfEmpty(baseRightPos);
+                        SpawnLeafIfEmpty(baseRightPos + new Vector2Int(0, 1));
+                        Debug.Log($"[PlantGrowth] One-sided leaves at {baseRightPos} and {baseRightPos + new Vector2Int(0, 1)}");
+                        break;
+                        
+                    default: // Fallback to parallel
+                        SpawnLeafIfEmpty(baseLeftPos);
+                        SpawnLeafIfEmpty(baseRightPos);
+                        break;
+                }
+            }
+        }
+        else
+        {
+            growing = false;
+            Debug.Log("[PlantGrowth] Growth complete.");
+        }
+    }
+}
+
+    private Vector2Int GetStemDirection()
+    {
+        Vector2Int up = new Vector2Int(0, 1);
+        Vector2Int leftDiag = new Vector2Int(-1, 1);
+        Vector2Int rightDiag = new Vector2Int(1, 1);
+
+        float r = Mathf.Clamp01(growthRandomness);
+        float roll = Random.value;
+        float threshold = 1f - r;  
+        if (roll < threshold)
+            return up;
+        else
+            return (Random.value < 0.5f) ? leftDiag : rightDiag;
+    }
+
+    private void SpawnLeafIfEmpty(Vector2Int coords)
+    {
+        if (!cells.ContainsKey(coords))
+        {
+            cells[coords] = PlantCellType.Leaf;
+            SpawnCellVisual(PlantCellType.Leaf, coords);
+        }
+    }
+
+    private void SpawnCellVisual(PlantCellType cellType, Vector2Int coords)
+    {
+        Vector2 worldPos = (Vector2)transform.position + (Vector2)coords * cellSpacing;
+        GameObject prefabToUse = null;
+        switch (cellType)
+        {
+            case PlantCellType.Seed:
+                prefabToUse = seedCellPrefab;
+                break;
+            case PlantCellType.Stem:
+                prefabToUse = stemCellPrefab;
+                break;
+            case PlantCellType.Leaf:
+                prefabToUse = leafCellPrefab;
+                break;
+        }
+        if (prefabToUse != null)
+        {
+            GameObject cellInstance = Instantiate(prefabToUse, worldPos, Quaternion.identity, transform);
+        
+            // Add SortableEntity if not already present
+            SortableEntity sortableEntity = cellInstance.GetComponent<SortableEntity>();
+            if (sortableEntity == null)
+                sortableEntity = cellInstance.AddComponent<SortableEntity>();
+        
+            // For non-seed cells, enable "Y from parent"
+            if (cellType != PlantCellType.Seed)
+            {
+                sortableEntity.SetUseParentYCoordinate(true);
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[PlantGrowth] No prefab assigned for cell type {cellType}");
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\WeatherManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class WeatherManager : MonoBehaviour
+{
+    public static WeatherManager Instance { get; private set; }
+
+    [Header("Day/Night Cycle Settings")]
+    public bool dayNightCycleEnabled = true;
+    
+    [Tooltip("Duration of full day (seconds)")]
+    public float dayDuration = 20f;
+    [Tooltip("Duration of full night (seconds)")]
+    public float nightDuration = 20f;
+    [Tooltip("Duration of transitions (seconds)")]
+    public float transitionDuration = 5f;
+
+    [Tooltip("Curve that controls the sunIntensity during transitions (X=0 start, X=1 end).")]
+    public AnimationCurve transitionCurve = AnimationCurve.Linear(0, 0, 1, 1);
+
+    [Header("Sunlight Settings")]
+    [Range(0f, 1f)]
+    public float sunIntensity = 1f;  // 0=night, 1=day
+
+    [Header("Fixed Sunlight When Cycle Off")]
+    [Tooltip("If dayNightCycleEnabled is false, we use this fixed intensity.")]
+    [Range(0f, 1f)]
+    public float fixedSunIntensity = 1f;
+
+    [Header("Sunlight Visualization")]
+    public SpriteRenderer fadeSprite;
+    public float minAlpha = 0f;
+    public float maxAlpha = 1f;
+
+    // Internals
+    private enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
+    private CyclePhase currentPhase = CyclePhase.Day;
+    private float phaseTimer = 0f; // counts down in each phase
+    private float totalPhaseTime = 0f; // length of current phase
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
+    private void Start()
+    {
+        // Initialize to Day phase
+        EnterPhase(CyclePhase.Day);
+    }
+
+    private void Update()
+    {
+        if (!dayNightCycleEnabled)
+        {
+            // If the cycle is disabled, just use the fixed sun intensity
+            sunIntensity = fixedSunIntensity;
+            UpdateFadeSprite();
+            return;
+        }
+
+        // else dayNightCycle is enabled
+        phaseTimer -= Time.deltaTime;
+        if (phaseTimer <= 0f)
+        {
+            // move to next phase
+            switch (currentPhase)
+            {
+                case CyclePhase.Day:
+                    EnterPhase(CyclePhase.TransitionToNight);
+                    break;
+                case CyclePhase.TransitionToNight:
+                    EnterPhase(CyclePhase.Night);
+                    break;
+                case CyclePhase.Night:
+                    EnterPhase(CyclePhase.TransitionToDay);
+                    break;
+                case CyclePhase.TransitionToDay:
+                    EnterPhase(CyclePhase.Day);
+                    break;
+            }
+        }
+        else
+        {
+            // while in the current phase, update sunIntensity accordingly
+            float progress = 1f - (phaseTimer / totalPhaseTime);
+            switch (currentPhase)
+            {
+                case CyclePhase.Day:
+                    // Full day, sunIntensity = 1
+                    sunIntensity = 1f;
+                    break;
+                case CyclePhase.TransitionToNight:
+                    // 0..1 => day(1) to night(0) using transitionCurve
+                    float tToNight = transitionCurve.Evaluate(progress);
+                    sunIntensity = Mathf.Lerp(1f, 0f, tToNight);
+                    break;
+                case CyclePhase.Night:
+                    // Full night, sunIntensity = 0
+                    sunIntensity = 0f;
+                    break;
+                case CyclePhase.TransitionToDay:
+                    // 0..1 => night(0) to day(1) using transitionCurve
+                    float tToDay = transitionCurve.Evaluate(progress);
+                    sunIntensity = Mathf.Lerp(0f, 1f, tToDay);
+                    break;
+            }
+        }
+
+        UpdateFadeSprite();
+    }
+
+    private void EnterPhase(CyclePhase nextPhase)
+    {
+        currentPhase = nextPhase;
+        switch (nextPhase)
+        {
+            case CyclePhase.Day:
+                totalPhaseTime = dayDuration;
+                break;
+            case CyclePhase.Night:
+                totalPhaseTime = nightDuration;
+                break;
+            case CyclePhase.TransitionToNight:
+            case CyclePhase.TransitionToDay:
+                totalPhaseTime = transitionDuration;
+                break;
+        }
+        phaseTimer = totalPhaseTime;
+    }
+
+    private void UpdateFadeSprite()
+    {
+        if (fadeSprite != null)
+        {
+            float alpha = Mathf.Lerp(minAlpha, maxAlpha, sunIntensity);
+            Color c = fadeSprite.color;
+            c.a = alpha;
+            fadeSprite.color = c;
+        }
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\SpellProjectile.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class SpellProjectile : MonoBehaviour
+{
+    [Header("Projectile Stats")]
+    public float damage;
+    public float speed;
+    [Tooltip("If true, the projectile will be destroyed upon hitting a wizard.")]
+    public bool destroyOnHit = true;
+
+    [Header("Burning Effect (optional)")]
+    public float burningDamage;   // DPS
+    public float burningDuration; // Duration in seconds
+
+    [Header("Friendly Fire")]
+    public bool friendlyFire = false;
+    public bool casterIsEnemy = false;
+
+    public void Initialize(float dmg, float spd)
+    {
+        damage = dmg;
+        speed = spd;
+    }
+
+    private void Update()
+    {
+        transform.Translate(Vector2.up * speed * Time.deltaTime);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Status Effects\BurningStatusEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public class BurningStatusEffect : StatusEffect
+{
+    public BurningStatusEffect(float d, float dps) : base(d, dps) { }
+
+    
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Status Effects\StatusEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public abstract class StatusEffect
+{
+    public float duration; // Total duration.
+    public float damagePerSecond;
+    protected float elapsed = 0f;
+
+    // Public property to expose elapsed time.
+    public float Elapsed { get { return elapsed; } }
+
+    public StatusEffect(float d, float dps)
+    {
+        duration = d;
+        damagePerSecond = dps;
+    }
+
+    public bool IsExpired() => elapsed >= duration;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Core\SortableEntity.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class SortableEntity : MonoBehaviour
+{
+    [Header("Sorting Configuration")]
+    [Tooltip("Offset added to Y position for sorting calculation")]
+    [SerializeField] private float sortingLayerYOffset = 0f;
+
+    [Tooltip("Use parent's Y coordinate for sorting")]
+    [SerializeField] private bool useParentYCoordinate = false;
+
+    [Tooltip("Debug logging for sorting")]
+    public bool debugSorting = false;
+
+    private SpriteRenderer spriteRenderer;
+
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        
+        // If no SpriteRenderer, try to find one in children
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        // Ensure sprite renderer exists
+        if (spriteRenderer == null)
+        {
+            Debug.LogWarning($"[SortableEntity] No SpriteRenderer found on {gameObject.name}");
+        }
+    }
+
+    private void Start()
+    {
+        UpdateSortingOrder();
+    }
+
+    private void LateUpdate()
+    {
+        UpdateSortingOrder();
+    }
+
+    public void UpdateSortingOrder()
+    {
+        if (spriteRenderer == null) return;
+
+        // Determine Y position for sorting
+        float yPositionForSorting = useParentYCoordinate && transform.parent != null 
+            ? transform.parent.position.y 
+            : transform.position.y;
+
+        int sortOrder = CalculateSortOrder(yPositionForSorting);
+        spriteRenderer.sortingOrder = sortOrder;
+
+        if (debugSorting)
+        {
+            Debug.Log($"[SortableEntity] {gameObject.name} - Y: {yPositionForSorting}, Offset: {sortingLayerYOffset}, Sort Order: {sortOrder}");
+        }
+    }
+
+    private int CalculateSortOrder(float yPosition)
+    {
+        // Subtract offset to effectively move the sorting position
+        return Mathf.RoundToInt(-(yPosition + sortingLayerYOffset) * 1000f);
+    }
+
+    // Public method to get current sorting order
+    public int GetCurrentSortOrder()
+    {
+        if (spriteRenderer == null) return 0;
+        return spriteRenderer.sortingOrder;
+    }
+
+    // Public method to set sorting order directly if needed
+    public void SetSortingOrder(int order)
+    {
+        if (spriteRenderer != null)
+            spriteRenderer.sortingOrder = order;
+    }
+
+    // Public method to set the parent Y coordinate usage flag
+    // This eliminates the need for reflection in other scripts
+    public void SetUseParentYCoordinate(bool value)
+    {
+        useParentYCoordinate = value;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Animals\AnimalDefinition.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[CreateAssetMenu(fileName = "AnimalDefinition", menuName = "Ecosystem/Animal Definition")]
+public class AnimalDefinition : ScriptableObject
+{
+    [Header("Basic Stats")]
+    public string animalName;
+    public float maxHealth = 10f;
+    public float hungerDecayRate = 0.5f;  // How quickly the animal gets hungry (units/sec)
+    public float movementSpeed = 2f;
+
+    [Header("Eating & Satiation")]
+    public float hungerThreshold = 5f;    // If hunger > threshold, tries to eat
+    public float eatAmount = 5f;         // How much hunger is reduced when it eats a leaf
+    public float leafDamage = 1f;        // How much health (or 'life') is removed from a leaf
+
+    [Header("Prefab/Visuals")]
+    public GameObject prefab;  // The character prefab to instantiate
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Animals\AnimalLibrary.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using System.Collections.Generic;
+
+[CreateAssetMenu(fileName = "AnimalLibrary", menuName = "Ecosystem/Animal Library")]
+public class AnimalLibrary : ScriptableObject
+{
+    public List<AnimalDefinition> animals;
+}
+
+
+
+
+
+--------------------------------------------------------------------------------
+This is part 1 out of 3 of script collection. 2 more parts remain.
+--------------------------------------------------------------------------------
