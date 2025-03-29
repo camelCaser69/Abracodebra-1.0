@@ -5,10 +5,5 @@ using UnityEngine;
 [Serializable]
 public class NodeGraph
 {
-    public List<NodeData> nodes;
-
-    public NodeGraph()
-    {
-        nodes = new List<NodeData>();
-    }
+    public List<NodeData> nodes = new List<NodeData>();
 }

@@ -147,7 +147,7 @@ public class AnimalController : MonoBehaviour
         // Behavior based on hunger:
         if (currentHunger >= definition.hungerThreshold)
         {
-            Debug.Log($"{speciesName} is hungry! (Hunger: {currentHunger:0.00}/{definition.hungerThreshold})");
+            //Debug.Log($"{speciesName} is hungry! (Hunger: {currentHunger:0.00}/{definition.hungerThreshold})");
             if (thoughtCooldownTimer <= 0f)
             {
                 ShowThought(ThoughtTrigger.Hungry);

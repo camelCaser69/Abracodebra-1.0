@@ -1,19 +1,9 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class NodeSelectable : MonoBehaviour, IPointerClickHandler
 {
-    // Public static property to hold the currently selected node.
     public static GameObject CurrentSelected { get; set; }
-
-    [SerializeField] private Outline outline;
-
-    private void Awake()
-    {
-        if (outline != null)
-            outline.enabled = false;
-    }
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -24,14 +14,9 @@ public class NodeSelectable : MonoBehaviour, IPointerClickHandler
     {
         if (CurrentSelected != null && CurrentSelected != node)
         {
-            // Disable outline on previously selected node.
-            var prevOutline = CurrentSelected.GetComponent<Outline>();
-            if (prevOutline != null)
-                prevOutline.enabled = false;
+            // (Optional) Remove highlight from previously selected node.
         }
         CurrentSelected = node;
-        var outlineComp = node.GetComponent<Outline>();
-        if (outlineComp != null)
-            outlineComp.enabled = true;
+        // (Optional) Add highlight effect here.
     }
 }

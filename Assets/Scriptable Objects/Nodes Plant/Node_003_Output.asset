@@ -15,13 +15,10 @@ MonoBehaviour:
   displayName: Output
   backgroundColor: {r: 0, g: 0, b: 0, a: 0.9019608}
   description: Each node chain has to end with this Output node
-  ports:
-  - isInput: 1
-    portType: 0
-    side: 4
+  thumbnail: {fileID: 0}
   effects:
   - effectType: 4
-    effectValue: 20
+    effectValue: 0
     secondaryValue: 0
     extra1: 0
     extra2: 0

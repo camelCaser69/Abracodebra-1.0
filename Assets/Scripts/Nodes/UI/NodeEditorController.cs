@@ -1,113 +1,93 @@
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections.Generic;
-using System.Linq;
+using TMPro;
 
-public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
+public class NodeEditorController : MonoBehaviour, IPointerClickHandler
 {
-    [Header("Window & Content Setup")]
-    [SerializeField] private RectTransform windowRect; // Panel with RectMask2D
-    [SerializeField] private RectTransform contentRect; // Panel that holds nodes
+    [Header("UI References")]
+    // Instead of Horizontal Layout Group, the panel now has a GridLayoutGroup.
+    public RectTransform slotPanel;        
+    public GameObject nodeSlotPrefab;      
 
-    [Header("Prefabs")]
-    [SerializeField] private GameObject nodeViewPrefab; // Must have NodeView component
+    [Header("Dropdown (using TMP_Dropdown)")]
+    public TMP_Dropdown nodeDropdown;  // Ensure this TMP_Dropdown is set inactive by default.
 
-    [Header("Node Definitions")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
-
-    [Header("Runtime Graph Reference")]
-    [SerializeField] private NodeGraph currentGraph;
+    [Header("Node Data")]
+    public NodeDefinitionLibrary definitionLibrary;  
+    public NodeGraph currentGraph;
     
-    [Header("Startup Settings")]
-    [Tooltip("Should the node editor be visible when the game starts?")]
-    
-    [Header("Zoom and Panning")]
-    [SerializeField] private float startingZoomMultiplier = 1f; // Default zoom at start
-    [SerializeField] private float contentMargin = 20f;         // Margin around nodes
+    [Header("Execution")]
+    public NodeExecutor nodeExecutor;  // Assign in the inspector.
 
-    public bool startVisible = true;
-    private bool showContextMenu = false;
-    private Vector2 contextMenuPosition;
-    private List<NodeView> spawnedNodeViews = new List<NodeView>();
+    private List<NodeView> nodeViews = new List<NodeView>();
     private CanvasGroup canvasGroup;
-    public RectTransform ContentRect => contentRect;
-
 
     private void Awake()
     {
-        if (windowRect == null)
-            windowRect = GetComponent<RectTransform>();
-
+        if (currentGraph == null)
+            currentGraph = new NodeGraph();
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
 
-        Image bg = GetComponent<Image>();
-        if (bg == null)
-        {
-            bg = gameObject.AddComponent<Image>();
-            bg.color = new Color(1, 1, 1, 0);
-            bg.raycastTarget = true;
-        }
+        if (nodeDropdown != null)
+            nodeDropdown.gameObject.SetActive(false);
     }
 
     private void Start()
     {
-        if (currentGraph == null)
-            currentGraph = new NodeGraph();
+        // Hide the node editor initially.
+        canvasGroup.alpha = 0;
+        canvasGroup.interactable = false;
+        canvasGroup.blocksRaycasts = false;
 
-        // Set initial zoom.
-        contentRect.localScale = Vector3.one * startingZoomMultiplier;
-        EnsureContentPanelSize();
-    
-        // Set initial visibility based on the flag
-        if (!startVisible)
-        {
-            canvasGroup.alpha = 0;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-        }
+        // >>> ADD THIS <<<
+        // Make sure NodeExecutor uses the same NodeGraph.
+        if (nodeExecutor != null)
+            nodeExecutor.SetGraph(currentGraph);
     }
-
+    
     private void Update()
     {
-        // Hide context menu on left-click if outside.
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions != null)
-            {
-                Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
-                float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
-                Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
-
-                Vector2 mousePos = Input.mousePosition;
-                mousePos.y = Screen.height - mousePos.y;
-                if (!menuRect.Contains(mousePos))
-                    showContextMenu = false;
-            }
-        }
         if (Input.GetKeyDown(KeyCode.Tab))
             ToggleVisibility();
+
+        // Only hide the dropdown on a left-click if the pointer is NOT over the dropdown.
+        if (Input.GetMouseButtonDown(0) && nodeDropdown.gameObject.activeSelf)
+        {
+            if (!IsPointerOverDropdown())
+            {
+                HideDropdown();
+            }
+        }
+
+        // Delete node when DELETE key is pressed on a selected node.
         if (Input.GetKeyDown(KeyCode.Delete))
         {
             if (NodeSelectable.CurrentSelected != null)
                 DeleteSelectedNode();
         }
-        if (Input.GetMouseButtonDown(1))
+    }
+
+    // IPointerClickHandler: On right-click on the panel, show the dropdown.
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
         {
-            showContextMenu = true;
-            contextMenuPosition = Input.mousePosition;
+            ShowDropdown(eventData.position);
         }
     }
 
-    private void ToggleVisibility()
+    public void ToggleVisibility()
     {
         if (canvasGroup.alpha > 0)
         {
             canvasGroup.alpha = 0;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
+            HideDropdown();
         }
         else
         {
@@ -117,213 +97,122 @@ public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
         }
     }
 
-    private void OnGUI()
+    private void ShowDropdown(Vector2 screenPos)
     {
-        if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions.Count > 0)
-        {
-            Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
-            float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
-            Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
+        if (nodeDropdown == null || definitionLibrary == null) return;
 
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
+        List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+        options.Add(new TMP_Dropdown.OptionData("Select Node")); // Default option.
+        foreach (var def in definitionLibrary.definitions)
+        {
+            options.Add(new TMP_Dropdown.OptionData(def.displayName));
+        }
+        nodeDropdown.ClearOptions();
+        nodeDropdown.AddOptions(options);
+        nodeDropdown.value = 0;
+        nodeDropdown.RefreshShownValue();
+
+        RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
+        dropdownRect.position = screenPos;
+
+        nodeDropdown.gameObject.SetActive(true);
+        nodeDropdown.onValueChanged.RemoveAllListeners();
+        nodeDropdown.onValueChanged.AddListener(OnDropdownValueChanged);
+    }
+
+    private void HideDropdown()
+    {
+        if (nodeDropdown != null)
+            nodeDropdown.gameObject.SetActive(false);
+    }
+
+    // Helper to check if the pointer is over the dropdown or its children.
+    private bool IsPointerOverDropdown()
+    {
+        PointerEventData eventDataCurrentPosition = new PointerEventData(EventSystem.current);
+        eventDataCurrentPosition.position = Input.mousePosition;
+        List<RaycastResult> results = new List<RaycastResult>();
+        EventSystem.current.RaycastAll(eventDataCurrentPosition, results);
+        foreach (var result in results)
+        {
+            if (result.gameObject == nodeDropdown.gameObject || result.gameObject.transform.IsChildOf(nodeDropdown.transform))
+                return true;
+        }
+        return false;
+    }
+
+    private void OnDropdownValueChanged(int value)
+    {
+        if (value == 0) return;
+        int index = value - 1;
+        if (index >= 0 && index < definitionLibrary.definitions.Count)
+        {
+            AddNode(definitionLibrary.definitions[index]);
+        }
+        HideDropdown();
+    }
+
+    public void AddNode(NodeDefinition def)
+    {
+        NodeData newNode = new NodeData();
+        newNode.nodeDisplayName = def.displayName;
+        newNode.effects = new List<NodeEffectData>();
+        foreach (var effect in def.effects)
+        {
+            NodeEffectData newEffect = new NodeEffectData
             {
-                if (!menuRect.Contains(Event.current.mousePosition))
-                    showContextMenu = false;
-            }
+                effectType = effect.effectType,
+                primaryValue = effect.primaryValue,
+                secondaryValue = effect.secondaryValue
+            };
+            newNode.effects.Add(newEffect);
+        }
+        newNode.orderIndex = currentGraph.nodes.Count;
+        currentGraph.nodes.Add(newNode);
 
-            GUI.Box(menuRect, "Add Node");
-            float yOffset = 20f;
-            foreach (NodeDefinition def in definitionLibrary.definitions)
+        GameObject nodeObj = Instantiate(nodeSlotPrefab, slotPanel);
+        NodeView nodeView = nodeObj.GetComponent<NodeView>();
+        if (nodeView != null)
+        {
+            nodeView.Initialize(newNode, def.thumbnail, def.backgroundColor, def.description, def.effects);
+            nodeViews.Add(nodeView);
+        }
+
+        // >>> ADD THIS <<<
+        // Ensure NodeExecutor sees the updated graph with the new node.
+        if (nodeExecutor != null)
+            nodeExecutor.SetGraph(currentGraph);
+    }
+
+    public void DeleteSelectedNode()
+    {
+        NodeView selectedView = NodeSelectable.CurrentSelected?.GetComponent<NodeView>();
+        if (selectedView != null)
+        {
+            string nodeId = selectedView.GetNodeData().nodeId;
+            currentGraph.nodes.RemoveAll(n => n.nodeId == nodeId);
+            nodeViews.Remove(selectedView);
+            Destroy(selectedView.gameObject);
+            NodeSelectable.CurrentSelected = null;
+        }
+    }
+
+    // Called by NodeDraggable on drag end to reorder nodes based on their horizontal positions.
+    public void ReorderNodes()
+    {
+        List<RectTransform> children = new List<RectTransform>();
+        foreach (RectTransform child in slotPanel)
+            children.Add(child);
+        children.Sort((a, b) => a.anchoredPosition.x.CompareTo(b.anchoredPosition.x));
+
+        for (int i = 0; i < children.Count; i++)
+        {
+            children[i].SetSiblingIndex(i);
+            NodeView nv = children[i].GetComponent<NodeView>();
+            if (nv != null)
             {
-                Rect itemRect = new Rect(menuRect.x, menuRect.y + yOffset, 180, 25);
-                if (GUI.Button(itemRect, def.displayName))
-                {
-                    CreateNodeAtMouse(def);
-                    showContextMenu = false;
-                }
-                yOffset += 25f;
+                nv.GetNodeData().orderIndex = i;
             }
         }
-    }
-
-    
-        private void CreateNodeAtMouse(NodeDefinition definition)
-{
-    // 1. Convert screen coords → local coords in contentRect
-    Vector2 localPos;
-    RectTransformUtility.ScreenPointToLocalPointInRectangle(
-        contentRect, Input.mousePosition, null, out localPos);
-
-    // 2. Convert local coords → hex coords (flat-top style)
-    float hexSizeValue = (HexGridManager.Instance != null) 
-        ? HexGridManager.Instance.hexSize 
-        : 50f;
-
-    // If your HexCoords.WorldToHex expects localPos to be the same coordinate space 
-    // as used in your HexCoords logic, we can feed localPos directly:
-    HexCoords hc = HexCoords.WorldToHex(localPos, hexSizeValue);
-
-    // 3. Convert hex coords → local snapped coords
-    Vector2 snappedLocal = hc.HexToWorld(hexSizeValue);
-
-    // 4. Create the new node data
-    NodeData newNode = new NodeData
-    {
-        nodeDisplayName = definition.displayName,
-        backgroundColor = definition.backgroundColor,
-        description = definition.description,
-        coords = hc,
-        editorPosition = snappedLocal // This is the local position inside contentRect
-    };
-
-    // Copy the definition’s effects & ports
-    foreach (var defEffect in definition.effects)
-    {
-        NodeEffectData effectCopy = new NodeEffectData
-        {
-            effectType = defEffect.effectType,
-            effectValue = defEffect.effectValue,
-            secondaryValue = defEffect.secondaryValue,
-            extra1 = defEffect.extra1,
-            extra2 = defEffect.extra2,
-            leafPattern = defEffect.leafPattern,         // NEW: copy leafPattern
-            growthRandomness = defEffect.growthRandomness    // NEW: copy growthRandomness
-        };
-        newNode.effects.Add(effectCopy);
-    }
-
-    foreach (var portDef in definition.ports)
-    {
-        NodePort nodePort = new NodePort
-        {
-            isInput  = portDef.isInput,
-            portType = portDef.portType,
-            side     = portDef.side
-        };
-        newNode.ports.Add(nodePort);
-    }
-
-    // 5. Add node to graph and spawn the node view
-    currentGraph.nodes.Add(newNode);
-    CreateNodeView(newNode);
-    EnsureContentPanelSize();
-}
-
-
-
-
-    public NodeView CreateNodeView(NodeData data)
-    {
-        if (nodeViewPrefab == null)
-        {
-            Debug.LogError("[NodeEditorController] nodeViewPrefab is not assigned!");
-            return null;
-        }
-        GameObject nodeObj = Instantiate(nodeViewPrefab, contentRect);
-        NodeView view = nodeObj.GetComponent<NodeView>();
-        if (view == null)
-        {
-            Debug.LogError("[NodeEditorController] The instantiated node prefab does not have a NodeView component!");
-            return null;
-        }
-        view.Initialize(data, data.backgroundColor, data.nodeDisplayName);
-        RectTransform rt = nodeObj.GetComponent<RectTransform>();
-        rt.anchoredPosition = data.editorPosition;
-        view.GeneratePins(data.ports);
-
-        // If node has an Output effect, attach the OutputNodeEffect script
-        if (data.effects.Any(e => e.effectType == NodeEffectType.Output))
-        {
-            if (nodeObj.GetComponent<OutputNodeEffect>() == null)
-                nodeObj.AddComponent<OutputNodeEffect>();
-        }
-
-        spawnedNodeViews.Add(view);
-        return view;
-    }
-
-
-    private void DeleteSelectedNode()
-    {
-        NodeView selectedView = NodeSelectable.CurrentSelected.GetComponent<NodeView>();
-        if (selectedView == null)
-            return;
-        string nodeId = selectedView.GetNodeData().nodeId;
-        currentGraph.nodes.RemoveAll(n => n.nodeId == nodeId);
-        Destroy(NodeSelectable.CurrentSelected);
-        NodeSelectable.CurrentSelected = null;
-    }
-
-    public void OnScroll(PointerEventData eventData)
-    {
-        float scrollDelta = eventData.scrollDelta.y;
-        float newScale = contentRect.localScale.x + scrollDelta * 0.05f;
-        newScale = Mathf.Clamp(newScale, 0.5f, 2f);
-        contentRect.localScale = Vector3.one * newScale;
-        EnsureContentPanelSize();
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        contentRect.anchoredPosition += eventData.delta;
-        EnsureContentPanelSize();
-    }
-
-    private void EnsureContentPanelSize()
-    {
-        if (windowRect == null || contentRect == null)
-            return;
-
-        // Remove null entries from spawnedNodeViews
-        spawnedNodeViews = spawnedNodeViews.Where(v => v != null).ToList();
-
-        Vector2 windowSize = windowRect.rect.size;
-        Vector2 minSize = windowSize + new Vector2(contentMargin * 2, contentMargin * 2);
-
-        if (spawnedNodeViews.Count > 0)
-        {
-            Vector2 minPos = new Vector2(float.MaxValue, float.MaxValue);
-            Vector2 maxPos = new Vector2(float.MinValue, float.MinValue);
-            foreach (var view in spawnedNodeViews)
-            {
-                if (view == null)
-                    continue;
-
-                RectTransform rt = view.GetComponent<RectTransform>();
-                Vector2 pos = rt.anchoredPosition;
-                Vector2 size = rt.rect.size;
-                minPos = Vector2.Min(minPos, pos - size * 0.5f);
-                maxPos = Vector2.Max(maxPos, pos + size * 0.5f);
-            }
-            Vector2 bounds = maxPos - minPos;
-            minSize = Vector2.Max(minSize, bounds + new Vector2(contentMargin * 2, contentMargin * 2));
-        }
-
-        Vector2 currSize = contentRect.sizeDelta;
-        float newW = Mathf.Max(currSize.x, minSize.x);
-        float newH = Mathf.Max(currSize.y, minSize.y);
-        contentRect.sizeDelta = new Vector2(newW, newH);
-    }
-
-
-    public NodeGraph CurrentGraph => currentGraph;
-
-    private void ClearExistingViews()
-    {
-        foreach (var view in spawnedNodeViews)
-        {
-            if (view != null)
-                Destroy(view.gameObject);
-        }
-        spawnedNodeViews.Clear();
-    }
-
-    public void LoadGraph(NodeGraph graph)
-    {
-        currentGraph = graph;
-        ClearExistingViews();
-        if (currentGraph == null) return;
-        foreach (var nd in currentGraph.nodes)
-            CreateNodeView(nd);
     }
 }
