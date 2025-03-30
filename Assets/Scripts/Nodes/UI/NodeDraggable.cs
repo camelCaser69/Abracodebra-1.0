@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI; // Might need for CanvasGroup or Image
+using UnityEngine.UI;
 
-// Requires RectTransform and CanvasGroup (added automatically if needed)
 [RequireComponent(typeof(RectTransform))]
 public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -10,11 +9,12 @@ public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     private CanvasGroup _canvasGroup;
     private Vector2 _originalAnchoredPosition;
     private Transform _originalParent;
-    private NodeCell _originalCell; // Store the cell it started in
+    private NodeCell _originalCell;
     private NodeEditorGridController _gridController;
-    private Canvas _rootCanvas; // To ensure dragging happens on top
+    private Canvas _rootCanvas;
 
-    // Public property to access the original cell
+    // No _isDragging flag needed if managed carefully by events
+
     public NodeCell OriginalCell => _originalCell;
 
     void Awake()
@@ -25,120 +25,143 @@ public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         {
             _canvasGroup = gameObject.AddComponent<CanvasGroup>();
         }
-         // We expect Initialize to be called by NodeCell after instantiation
+        // CRITICAL: Default state MUST allow interactions (clicks, hovers)
+        _canvasGroup.blocksRaycasts = true;
+        _canvasGroup.alpha = 1f; // Ensure fully visible
     }
 
-    /// <summary>
-    /// Initializes the draggable component with necessary references.
-    /// Should be called by NodeCell when the NodeView is created or assigned.
-    /// </summary>
     public void Initialize(NodeEditorGridController controller, NodeCell startingCell)
     {
         _gridController = controller;
         _originalCell = startingCell;
-        _originalParent = transform.parent; // Initial parent is the cell
-        _originalAnchoredPosition = _rectTransform.anchoredPosition; // Should be (0,0) if placed correctly
-
-        // Find the root canvas for proper drag behavior
         _rootCanvas = GetComponentInParent<Canvas>()?.rootCanvas;
-        if (_rootCanvas == null)
-        {
-             Debug.LogError("[NodeDraggable] Could not find root Canvas!");
+        if (_rootCanvas == null) Debug.LogError("[NodeDraggable] Could not find root Canvas!");
+
+        // Ensure initial state after initialization
+        if (_canvasGroup != null) {
+             _canvasGroup.blocksRaycasts = true;
+             _canvasGroup.alpha = 1f;
         }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (_gridController == null || _rootCanvas == null) return; // Not initialized
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+        if (_gridController == null || _rootCanvas == null) return;
 
-        // Store current state
         _originalParent = transform.parent;
-        _originalCell = _originalParent?.GetComponent<NodeCell>(); // Re-confirm original cell
+        _originalCell = _originalParent?.GetComponent<NodeCell>();
         _originalAnchoredPosition = _rectTransform.anchoredPosition;
 
-        // Make it draggable visually
-        _canvasGroup.alpha = 0.6f; // Make semi-transparent
-        _canvasGroup.blocksRaycasts = false; // Allow raycasts to pass through to cells
+        // Become transparent and STOP blocking raycasts so underlying cells can be detected
+        _canvasGroup.alpha = 0.6f;
+        _canvasGroup.blocksRaycasts = false;
 
-        // Reparent to root canvas temporarily to ensure it renders on top
-        transform.SetParent(_rootCanvas.transform, true); // Keep world position
-        transform.SetAsLastSibling(); // Render on top
+        // Reparent for top rendering
+        transform.SetParent(_rootCanvas.transform, true);
+        transform.SetAsLastSibling();
+         // Debug.Log($"[NodeDraggable OnBeginDrag] Started drag. blocksRaycasts: {_canvasGroup.blocksRaycasts}", gameObject);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        // Only process drag if it's the left button and dragging is conceptually active (raycasts blocked)
+        if (eventData.button != PointerEventData.InputButton.Left || _canvasGroup == null || _canvasGroup.blocksRaycasts) return;
         if (_gridController == null || _rootCanvas == null) return;
 
-        // Move the object with the mouse pointer
-        // Convert delta screen space movement to the local space of the root canvas
-         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-             _rootCanvas.transform as RectTransform,
-             eventData.position,
-             _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera,
-             out Vector2 currentLocalPoint);
-
+        // Move logic (unchanged)
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _rootCanvas.transform as RectTransform,
-            eventData.position - eventData.delta, // Previous position
-            _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera,
-            out Vector2 previousLocalPoint);
-
+             _rootCanvas.transform as RectTransform, eventData.position,
+             _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 currentLocalPoint);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _rootCanvas.transform as RectTransform, eventData.position - eventData.delta,
+            _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 previousLocalPoint);
         Vector2 localDelta = currentLocalPoint - previousLocalPoint;
-        _rectTransform.localPosition += (Vector3)localDelta; // Apply movement in canvas local space
-
-        // Alternative simpler movement (might have slight offset depending on canvas setup):
-        // _rectTransform.anchoredPosition += eventData.delta / _rootCanvas.scaleFactor;
+        _rectTransform.localPosition += (Vector3)localDelta;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (_gridController == null) return;
+         // Debug.Log($"[NodeDraggable OnEndDrag] Drag ended. Button: {eventData.button}", gameObject);
 
-        // Restore visual state
-        _canvasGroup.alpha = 1f;
-        _canvasGroup.blocksRaycasts = true;
+        // Ensure visuals and raycast blocking are reset REGARDLESS of button, BEFORE handling drop
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true; // CRITICAL: Re-enable raycasts immediately
+             // Debug.Log($"--> Reset alpha and blocksRaycasts to: {_canvasGroup.blocksRaycasts}");
+        }
 
-        // Let the controller handle the drop logic
-        bool droppedSuccessfully = _gridController.HandleNodeDrop(this, _originalCell, eventData.position);
-
-        // If the drop was *not* handled successfully by the controller (e.g., dropped outside),
-        // the controller's HandleNodeDrop should call ResetPosition or SnapToCell on the draggable.
-        // If HandleNodeDrop returns true, it means the controller has already placed this draggable
-        // in its new cell via SnapToCell.
-        // If HandleNodeDrop returns false, it means it called ResetPosition.
-
-        // No explicit ResetPosition call needed here anymore, as the controller manages it.
+        // Only handle the drop logic if the drag was initiated by the left button
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            if (_gridController != null) {
+                _gridController.HandleNodeDrop(this, _originalCell, eventData.position);
+            } else {
+                 // No controller, attempt reset
+                 ResetPosition();
+            }
+        }
+        else
+        {
+             // If drag ended via another button (unlikely but possible), ensure reset
+             ResetPosition();
+        }
     }
 
-    /// <summary>
-    /// Snaps the node view back to its original parent cell and position.
-    /// Called by the controller if a drop is invalid.
-    /// </summary>
     public void ResetPosition()
     {
-        transform.SetParent(_originalParent, false); // Set parent back
-        _rectTransform.anchoredPosition = _originalAnchoredPosition; // Reset local position
-         // Update internal reference in case it's needed again
-        _originalCell = _originalParent?.GetComponent<NodeCell>();
+        // Debug.Log($"[NodeDraggable ResetPosition] Resetting {gameObject.name}", gameObject);
+        // Reset parent and position
+        transform.SetParent(_originalParent, false);
+        _rectTransform.anchoredPosition = _originalAnchoredPosition;
+        _originalCell = _originalParent?.GetComponent<NodeCell>(); // Update cell ref
+
+        // Ensure visuals and raycasts are correct after reset
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+        }
+
+        // Update parent cell reference on the NodeView
+        NodeView view = GetComponent<NodeView>();
+        view?.UpdateParentCellReference();
     }
 
-    /// <summary>
-    /// Snaps the node view to a target cell, updating its parent and resetting position.
-    /// Called by the controller after a successful drop or swap.
-    /// </summary>
     public void SnapToCell(NodeCell targetCell)
     {
-        if (targetCell == null)
-        {
-            ResetPosition(); // Fallback if target cell is somehow null
-            return;
-        }
-        transform.SetParent(targetCell.transform, false); // Set new parent
-        _rectTransform.anchoredPosition = Vector2.zero; // Center in the new cell
+        // Debug.Log($"[NodeDraggable SnapToCell] Snapping {gameObject.name} to Cell {targetCell?.CellIndex}", gameObject);
+        if (targetCell == null) { ResetPosition(); return; }
 
-         // Update internal references for future drags
-         _originalParent = targetCell.transform;
-         _originalCell = targetCell;
-         _originalAnchoredPosition = Vector2.zero;
+        // Set Parent and Position
+        transform.SetParent(targetCell.transform, false);
+        _rectTransform.anchoredPosition = Vector2.zero;
+
+        // Update Internal Draggable References
+        _originalParent = targetCell.transform;
+        _originalCell = targetCell;
+        _originalAnchoredPosition = Vector2.zero;
+
+        // Ensure visuals and raycasts are correct after snap
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+        }
+
+        // Update the NodeView's parent reference
+        NodeView view = GetComponent<NodeView>();
+        view?.UpdateParentCellReference();
+    }
+
+    // OnDisable might not be strictly needed now but can be kept as safety
+    void OnDisable()
+    {
+        // If it was disabled mid-drag (blocksRaycasts == false), reset state
+        if (_canvasGroup != null && !_canvasGroup.blocksRaycasts)
+        {
+             Debug.LogWarning($"[NodeDraggable] Disabled while dragging {gameObject.name}. Resetting CanvasGroup.", gameObject);
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+            // Resetting position might be desired but complex here, ensure visuals are ok.
+        }
     }
 }
