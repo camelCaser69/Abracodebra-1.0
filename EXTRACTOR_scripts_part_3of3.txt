@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-29 18:58:15
+UNITY PROJECT SCRIPT EXPORT - 2025-03-30 04:39:01
 PART 3 OF 3
 ================================================================================
 
@@ -12,12 +12,10 @@ Assets
 │   └── MiniVillagerMan_AnimatorBackup.controller
 ├── DefaultVolumeProfile.asset
 ├── Editor
-│   ├── HexGridRendererEditor.cs
 │   ├── NodeDefinitionAutoAdder.cs
 │   ├── NodeDefinitionCreator.cs
 │   ├── NodeDefinitionLibraryEditor.cs
-│   ├── NodeDefinitionPostprocessor.cs
-│   └── NodeEffectDataDrawer.cs
+│   └── NodeDefinitionPostprocessor.cs
 ├── HueFolders
 │   ├── Editor
 │   │   ├── HueFolders.Editor.asmdef
@@ -47,9 +45,15 @@ Assets
 │   │   │   ├── Poop_Medium_01.prefab
 │   │   │   └── Poop_Medium_02.prefab
 │   │   └── UI
+│   │       ├── EmptySlot16.prefab
+│   │       ├── EmptySlot32.prefab
 │   │       ├── Indicator_Opportunity.prefab
 │   │       ├── Indicator_Resource.prefab
 │   │       ├── Indicator_Threat.prefab
+│   │       ├── NodeCellEmpty16.prefab
+│   │       ├── NodePics
+│   │       │   ├── Seed_01.prefab
+│   │       │   └── Seed_02.prefab
 │   │       └── ThoughtBubble.prefab
 │   └── General
 │       ├── GardenerPrefab.prefab
@@ -69,13 +73,9 @@ Assets
 │   └── Nodes Plant
 │       ├── NodeDefinitionLibrary.asset
 │       ├── Node_000_Seed.asset
-│       ├── Node_001_AimSpread.asset
-│       ├── Node_002_Piercing.asset
 │       ├── Node_003_Output.asset
 │       ├── Node_004_ManaSource.asset
-│       ├── Node_005_DamageNode.asset
-│       ├── Node_006_Burn.asset
-│       └── Node_007_FriendlyFire.asset
+│       └── Node_005_DamageNode.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -103,26 +103,21 @@ Assets
 │   │   └── Plants
 │   ├── Nodes
 │   │   ├── Core
-│   │   │   ├── HexCoords.cs
-│   │   │   ├── HexGridManager.cs
-│   │   │   ├── HexGridRenderer.cs
 │   │   │   ├── NodeData.cs
 │   │   │   ├── NodeDefinition.cs
 │   │   │   ├── NodeDefinitionLibrary.cs
 │   │   │   ├── NodeEffectData.cs
 │   │   │   ├── NodeEffectType.cs
-│   │   │   ├── NodePort.cs
-│   │   │   ├── OutputNodeEffect.cs
-│   │   │   └── PortDefinition.cs
+│   │   │   └── OutputNodeEffect.cs
 │   │   ├── Runtime
 │   │   │   ├── NodeExecutor.cs
 │   │   │   └── NodeGraph.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
-│   │       ├── NodeEditorController.cs
-│   │       ├── NodeHexDraggable.cs
+│   │       ├── NodeCell.cs
+│   │       ├── NodeDraggable.cs
+│   │       ├── NodeEditorGridController.cs
 │   │       ├── NodeSelectable.cs
-│   │       ├── NodeTestInitializer.cs
 │   │       └── NodeView.cs
 │   ├── Player
 │   │   └── GardenerController.cs
@@ -149,1035 +144,79 @@ SCRIPT CONTENTS
 ================================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Runtime\NodeExecutor.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using TMPro;
-
-public class NodeExecutor : MonoBehaviour
-{
-    [SerializeField] private NodeGraph currentGraph;
-    [Header("Debug Settings")]
-    public float waitTimeBetweenNodes = 0.5f;
-    public TMP_Text debugOutput;
-
-    [Header("Plant Prefab (assigned in inspector)")]
-    public GameObject plantPrefab;  // Assign your PlantPrefab here
-
-    private Dictionary<HexCoords, NodeData> coordsMap;
-    private HashSet<string> visited;
-
-    // For accumulating energy info from the BFS chain:
-    private float accumulatedEnergyStorage  = 0f;
-    private float accumulatedPhotosynthesis = 0f;
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-            ExecuteGraph();
-    }
-
-    public void SetGraph(NodeGraph graph)
-    {
-        currentGraph = graph;
-        Debug.Log("[NodeExecutor] Graph set. Node count=" + (graph != null ? graph.nodes.Count : 0));
-    }
-
-    public NodeGraph GetGraph() => currentGraph;
-
-    public void ExecuteGraph()
-    {
-        if (currentGraph == null || currentGraph.nodes.Count == 0)
-        {
-            LogDebug("[NodeExecutor] No graph or no nodes to execute!");
-            return;
-        }
-        StopAllCoroutines();
-        ClearDebug();
-        BuildCoordsMap();
-        visited = new HashSet<string>();
-
-        // Reset accumulators in case we want a fresh sum each time.
-        accumulatedEnergyStorage  = 0f;
-        accumulatedPhotosynthesis = 0f;
-
-        List<NodeData> startNodes = FindStartNodes();
-        if (startNodes.Count == 0)
-        {
-            LogDebug("[NodeExecutor] No start nodes found. Aborting BFS.");
-            return;
-        }
-        foreach (var startNode in startNodes)
-            StartCoroutine(RunChainBFS(startNode));
-    }
-
-    private void BuildCoordsMap()
-    {
-        coordsMap = new Dictionary<HexCoords, NodeData>();
-        foreach (var node in currentGraph.nodes)
-            coordsMap[node.coords] = node;
-    }
-
-    private List<NodeData> FindStartNodes()
-    {
-        List<NodeData> result = new List<NodeData>();
-        foreach (var node in currentGraph.nodes)
-        {
-            if (!HasInbound(node))
-                result.Add(node);
-        }
-        return result;
-    }
-
-    private bool HasInbound(NodeData node)
-    {
-        foreach (var port in node.ports)
-        {
-            if (!port.isInput) continue;
-
-            int sideIndex = (int)port.side;
-            int oppSide   = (sideIndex + 3) % 6;
-            HexCoords neighborCoords = HexCoords.GetNeighbor(node.coords, oppSide);
-            if (!coordsMap.ContainsKey(neighborCoords)) 
-                continue;
-
-            var neighborNode = coordsMap[neighborCoords];
-            bool hasOutputMatch = neighborNode.ports.Any(p => !p.isInput && (int)p.side == oppSide);
-            if (hasOutputMatch)
-                return true;
-        }
-        return false;
-    }
-
-    private IEnumerator RunChainBFS(NodeData startNode)
-    {
-        Queue<HexCoords> queue = new Queue<HexCoords>();
-        queue.Enqueue(startNode.coords);
-
-        while (queue.Count > 0)
-        {
-            HexCoords coords = queue.Dequeue();
-            if (!coordsMap.ContainsKey(coords)) 
-                continue;
-
-            NodeData node = coordsMap[coords];
-            if (visited.Contains(node.nodeId)) 
-                continue;
-
-            visited.Add(node.nodeId);
-
-            yield return new WaitForSeconds(waitTimeBetweenNodes);
-            ProcessNode(node);
-
-            // Follow output sides
-            foreach (var port in node.ports)
-            {
-                if (!port.isInput)
-                {
-                    int sIndex = (int)port.side;
-                    HexCoords neighborCoords = HexCoords.GetNeighbor(coords, sIndex);
-                    if (!coordsMap.ContainsKey(neighborCoords)) 
-                        continue;
-
-                    var neighborNode = coordsMap[neighborCoords];
-                    int oppIndex = (sIndex + 3) % 6;
-                    bool hasInputMatch = neighborNode.ports.Any(p => p.isInput && (int)p.side == oppIndex);
-                    if (hasInputMatch && !visited.Contains(neighborNode.nodeId))
-                        queue.Enqueue(neighborCoords);
-                }
-            }
-        }
-        LogDebug("[NodeExecutor] BFS from start node completed.");
-    }
-
-    private void ProcessNode(NodeData node)
-    {
-        LogDebug($"[NodeExecutor] Processing node '{node.nodeDisplayName}' at coords ({node.coords.q}, {node.coords.r}).");
-
-        // Accumulate Energy Storage and Photosynthesis from ANY node effect 
-        // in the BFS chain.
-        foreach (var eff in node.effects)
-        {
-            if (eff.effectType == NodeEffectType.EnergyStorage)
-            {
-                accumulatedEnergyStorage += eff.effectValue;
-            }
-            else if (eff.effectType == NodeEffectType.EnergyPhotosynthesis)
-            {
-                accumulatedPhotosynthesis += eff.effectValue;
-            }
-        }
-
-        // If it's a SeedSpawn node, spawn the plant now using the BFS accumulators and collect plant parameters
-        var seedSpawnEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.SeedSpawn);
-        if (seedSpawnEffect != null)
-        {
-            SpawnPlant(node);
-        }
-    }
-
-    private void SpawnPlant(NodeData node)
-{
-    if (plantPrefab == null)
-    {
-        LogDebug("[NodeExecutor] plantPrefab is not assigned in the inspector!");
-        return;
-    }
-    var gardener = FindObjectOfType<GardenerController>();
-    if (gardener == null)
-    {
-        LogDebug("[NodeExecutor] No GardenerController found. Can't spawn plant.");
-        return;
-    }
-
-    // Step A: Collect all relevant effect data from node
-    float minStem = 3f;
-    float maxStem = 6f;
-    float speed = 1f;            // Growth speed
-    float gap = 1f;              // Leaf gap
-    float pattern = 0f;          // Leaf pattern
-    float randomness = 0f;       // Stem randomness
-
-    // We parse each effect to see if it matches the known effect types
-    foreach (var eff in node.effects)
-    {
-        switch (eff.effectType)
-        {
-            case NodeEffectType.StemLength:
-                minStem = eff.effectValue;
-                maxStem = eff.secondaryValue;
-                break;
-            case NodeEffectType.GrowthSpeed:
-                speed = eff.effectValue;
-                break;
-            case NodeEffectType.LeafGap:
-                gap = eff.effectValue;
-                break;
-            case NodeEffectType.LeafPattern:
-                pattern = eff.effectValue;
-                break;
-            case NodeEffectType.StemRandomness:
-                randomness = eff.effectValue;
-                break;
-            default:
-                // Possibly ignore or handle other effect types here
-                break;
-        }
-    }
-
-    // Step B: Actually spawn the plant
-    Vector2 spawnPos = gardener.GetPlantingPosition();
-    GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
-
-    // Step C: Parent the plant using EcosystemManager
-    if (EcosystemManager.Instance != null && EcosystemManager.Instance.plantParent != null)
-    {
-        if (EcosystemManager.Instance.sortPlantsBySpecies)
-        {
-            // For plants, assume a "Plant" subfolder
-            Transform speciesParent = EcosystemManager.Instance.plantParent.Find("Plant");
-            if (speciesParent == null)
-            {
-                GameObject subParent = new GameObject("Plant");
-                subParent.transform.SetParent(EcosystemManager.Instance.plantParent);
-                speciesParent = subParent.transform;
-            }
-            plantObj.transform.SetParent(speciesParent);
-        }
-        else
-        {
-            plantObj.transform.SetParent(EcosystemManager.Instance.plantParent);
-        }
-    }
-
-    // Step D: Apply the BFS accumulations and effect data to PlantGrowth
-    PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
-    if (growth != null)
-    {
-        // Convert to int if needed
-        growth.stemMinLength = Mathf.RoundToInt(minStem);
-        growth.stemMaxLength = Mathf.RoundToInt(maxStem);
-        growth.growthSpeed   = speed;
-        growth.leafGap       = Mathf.RoundToInt(gap);
-        growth.leafPattern   = Mathf.RoundToInt(pattern);
-        
-        // Our BFS accumulations: pass them in
-        growth.growthRandomness = randomness;
-        growth.maxEnergy        = accumulatedEnergyStorage;   // BFS sum from ProcessNode
-        growth.basePhotosynthesis = accumulatedPhotosynthesis; // BFS sum from ProcessNode
-    }
-    else
-    {
-        LogDebug("[NodeExecutor] PlantGrowth missing on plantPrefab.");
-    }
-
-    // Step E: Reset BFS sums or continue to accumulate for multi-seed spawns
-    // accumulatedEnergyStorage = 0f;
-    // accumulatedPhotosynthesis = 0f;
-}
-
-
-
-    private void ClearDebug()
-    {
-        if (debugOutput)
-            debugOutput.text = "";
-    }
-
-    private void LogDebug(string msg)
-    {
-        Debug.Log(msg);
-        if (debugOutput)
-            debugOutput.text += msg + "\n";
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Runtime\NodeGraph.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
-
-[Serializable]
-public class NodeGraph
-{
-    public List<NodeData> nodes;
-
-    public NodeGraph()
-    {
-        nodes = new List<NodeData>();
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\ColorExtensions.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public static class ColorExtensions
-{
-    public static Color WithAlpha(this Color c, float alpha)
-    {
-        return new Color(c.r, c.g, c.b, alpha);
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\NodeEditorController.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-using System.Collections.Generic;
-using System.Linq;
-
-public class NodeEditorController : MonoBehaviour, IScrollHandler, IDragHandler
-{
-    [Header("Window & Content Setup")]
-    [SerializeField] private RectTransform windowRect; // Panel with RectMask2D
-    [SerializeField] private RectTransform contentRect; // Panel that holds nodes
-
-    [Header("Prefabs")]
-    [SerializeField] private GameObject nodeViewPrefab; // Must have NodeView component
-
-    [Header("Node Definitions")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
-
-    [Header("Runtime Graph Reference")]
-    [SerializeField] private NodeGraph currentGraph;
-    
-    [Header("Startup Settings")]
-    [Tooltip("Should the node editor be visible when the game starts?")]
-    
-    [Header("Zoom and Panning")]
-    [SerializeField] private float startingZoomMultiplier = 1f; // Default zoom at start
-    [SerializeField] private float contentMargin = 20f;         // Margin around nodes
-
-    public bool startVisible = true;
-    private bool showContextMenu = false;
-    private Vector2 contextMenuPosition;
-    private List<NodeView> spawnedNodeViews = new List<NodeView>();
-    private CanvasGroup canvasGroup;
-    public RectTransform ContentRect => contentRect;
-
-
-    private void Awake()
-    {
-        if (windowRect == null)
-            windowRect = GetComponent<RectTransform>();
-
-        canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
-
-        Image bg = GetComponent<Image>();
-        if (bg == null)
-        {
-            bg = gameObject.AddComponent<Image>();
-            bg.color = new Color(1, 1, 1, 0);
-            bg.raycastTarget = true;
-        }
-    }
-
-    private void Start()
-    {
-        if (currentGraph == null)
-            currentGraph = new NodeGraph();
-
-        // Set initial zoom.
-        contentRect.localScale = Vector3.one * startingZoomMultiplier;
-        EnsureContentPanelSize();
-    
-        // Set initial visibility based on the flag
-        if (!startVisible)
-        {
-            canvasGroup.alpha = 0;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-        }
-    }
-
-    private void Update()
-    {
-        // Hide context menu on left-click if outside.
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions != null)
-            {
-                Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
-                float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
-                Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
-
-                Vector2 mousePos = Input.mousePosition;
-                mousePos.y = Screen.height - mousePos.y;
-                if (!menuRect.Contains(mousePos))
-                    showContextMenu = false;
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.Tab))
-            ToggleVisibility();
-        if (Input.GetKeyDown(KeyCode.Delete))
-        {
-            if (NodeSelectable.CurrentSelected != null)
-                DeleteSelectedNode();
-        }
-        if (Input.GetMouseButtonDown(1))
-        {
-            showContextMenu = true;
-            contextMenuPosition = Input.mousePosition;
-        }
-    }
-
-    private void ToggleVisibility()
-    {
-        if (canvasGroup.alpha > 0)
-        {
-            canvasGroup.alpha = 0;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-        }
-        else
-        {
-            canvasGroup.alpha = 1;
-            canvasGroup.interactable = true;
-            canvasGroup.blocksRaycasts = true;
-        }
-    }
-
-    private void OnGUI()
-    {
-        if (showContextMenu && definitionLibrary != null && definitionLibrary.definitions.Count > 0)
-        {
-            Vector2 guiPos = new Vector2(contextMenuPosition.x, Screen.height - contextMenuPosition.y);
-            float menuHeight = 20 + (definitionLibrary.definitions.Count * 25);
-            Rect menuRect = new Rect(guiPos.x, guiPos.y, 180, menuHeight);
-
-            if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
-            {
-                if (!menuRect.Contains(Event.current.mousePosition))
-                    showContextMenu = false;
-            }
-
-            GUI.Box(menuRect, "Add Node");
-            float yOffset = 20f;
-            foreach (NodeDefinition def in definitionLibrary.definitions)
-            {
-                Rect itemRect = new Rect(menuRect.x, menuRect.y + yOffset, 180, 25);
-                if (GUI.Button(itemRect, def.displayName))
-                {
-                    CreateNodeAtMouse(def);
-                    showContextMenu = false;
-                }
-                yOffset += 25f;
-            }
-        }
-    }
-
-    
-        private void CreateNodeAtMouse(NodeDefinition definition)
-{
-    // 1. Convert screen coords → local coords in contentRect
-    Vector2 localPos;
-    RectTransformUtility.ScreenPointToLocalPointInRectangle(
-        contentRect, Input.mousePosition, null, out localPos);
-
-    // 2. Convert local coords → hex coords (flat-top style)
-    float hexSizeValue = (HexGridManager.Instance != null) 
-        ? HexGridManager.Instance.hexSize 
-        : 50f;
-
-    // If your HexCoords.WorldToHex expects localPos to be the same coordinate space 
-    // as used in your HexCoords logic, we can feed localPos directly:
-    HexCoords hc = HexCoords.WorldToHex(localPos, hexSizeValue);
-
-    // 3. Convert hex coords → local snapped coords
-    Vector2 snappedLocal = hc.HexToWorld(hexSizeValue);
-
-    // 4. Create the new node data
-    NodeData newNode = new NodeData
-    {
-        nodeDisplayName = definition.displayName,
-        backgroundColor = definition.backgroundColor,
-        description = definition.description,
-        coords = hc,
-        editorPosition = snappedLocal // This is the local position inside contentRect
-    };
-
-    // Copy the definition’s effects & ports
-    foreach (var defEffect in definition.effects)
-    {
-        NodeEffectData effectCopy = new NodeEffectData
-        {
-            effectType = defEffect.effectType,
-            effectValue = defEffect.effectValue,
-            secondaryValue = defEffect.secondaryValue,
-            extra1 = defEffect.extra1,
-            extra2 = defEffect.extra2,
-            leafPattern = defEffect.leafPattern,         // NEW: copy leafPattern
-            growthRandomness = defEffect.growthRandomness    // NEW: copy growthRandomness
-        };
-        newNode.effects.Add(effectCopy);
-    }
-
-    foreach (var portDef in definition.ports)
-    {
-        NodePort nodePort = new NodePort
-        {
-            isInput  = portDef.isInput,
-            portType = portDef.portType,
-            side     = portDef.side
-        };
-        newNode.ports.Add(nodePort);
-    }
-
-    // 5. Add node to graph and spawn the node view
-    currentGraph.nodes.Add(newNode);
-    CreateNodeView(newNode);
-    EnsureContentPanelSize();
-}
-
-
-
-
-    public NodeView CreateNodeView(NodeData data)
-    {
-        if (nodeViewPrefab == null)
-        {
-            Debug.LogError("[NodeEditorController] nodeViewPrefab is not assigned!");
-            return null;
-        }
-        GameObject nodeObj = Instantiate(nodeViewPrefab, contentRect);
-        NodeView view = nodeObj.GetComponent<NodeView>();
-        if (view == null)
-        {
-            Debug.LogError("[NodeEditorController] The instantiated node prefab does not have a NodeView component!");
-            return null;
-        }
-        view.Initialize(data, data.backgroundColor, data.nodeDisplayName);
-        RectTransform rt = nodeObj.GetComponent<RectTransform>();
-        rt.anchoredPosition = data.editorPosition;
-        view.GeneratePins(data.ports);
-
-        // If node has an Output effect, attach the OutputNodeEffect script
-        if (data.effects.Any(e => e.effectType == NodeEffectType.Output))
-        {
-            if (nodeObj.GetComponent<OutputNodeEffect>() == null)
-                nodeObj.AddComponent<OutputNodeEffect>();
-        }
-
-        spawnedNodeViews.Add(view);
-        return view;
-    }
-
-
-    private void DeleteSelectedNode()
-    {
-        NodeView selectedView = NodeSelectable.CurrentSelected.GetComponent<NodeView>();
-        if (selectedView == null)
-            return;
-        string nodeId = selectedView.GetNodeData().nodeId;
-        currentGraph.nodes.RemoveAll(n => n.nodeId == nodeId);
-        Destroy(NodeSelectable.CurrentSelected);
-        NodeSelectable.CurrentSelected = null;
-    }
-
-    public void OnScroll(PointerEventData eventData)
-    {
-        float scrollDelta = eventData.scrollDelta.y;
-        float newScale = contentRect.localScale.x + scrollDelta * 0.05f;
-        newScale = Mathf.Clamp(newScale, 0.5f, 2f);
-        contentRect.localScale = Vector3.one * newScale;
-        EnsureContentPanelSize();
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        contentRect.anchoredPosition += eventData.delta;
-        EnsureContentPanelSize();
-    }
-
-    private void EnsureContentPanelSize()
-    {
-        if (windowRect == null || contentRect == null)
-            return;
-
-        // Remove null entries from spawnedNodeViews
-        spawnedNodeViews = spawnedNodeViews.Where(v => v != null).ToList();
-
-        Vector2 windowSize = windowRect.rect.size;
-        Vector2 minSize = windowSize + new Vector2(contentMargin * 2, contentMargin * 2);
-
-        if (spawnedNodeViews.Count > 0)
-        {
-            Vector2 minPos = new Vector2(float.MaxValue, float.MaxValue);
-            Vector2 maxPos = new Vector2(float.MinValue, float.MinValue);
-            foreach (var view in spawnedNodeViews)
-            {
-                if (view == null)
-                    continue;
-
-                RectTransform rt = view.GetComponent<RectTransform>();
-                Vector2 pos = rt.anchoredPosition;
-                Vector2 size = rt.rect.size;
-                minPos = Vector2.Min(minPos, pos - size * 0.5f);
-                maxPos = Vector2.Max(maxPos, pos + size * 0.5f);
-            }
-            Vector2 bounds = maxPos - minPos;
-            minSize = Vector2.Max(minSize, bounds + new Vector2(contentMargin * 2, contentMargin * 2));
-        }
-
-        Vector2 currSize = contentRect.sizeDelta;
-        float newW = Mathf.Max(currSize.x, minSize.x);
-        float newH = Mathf.Max(currSize.y, minSize.y);
-        contentRect.sizeDelta = new Vector2(newW, newH);
-    }
-
-
-    public NodeGraph CurrentGraph => currentGraph;
-
-    private void ClearExistingViews()
-    {
-        foreach (var view in spawnedNodeViews)
-        {
-            if (view != null)
-                Destroy(view.gameObject);
-        }
-        spawnedNodeViews.Clear();
-    }
-
-    public void LoadGraph(NodeGraph graph)
-    {
-        currentGraph = graph;
-        ClearExistingViews();
-        if (currentGraph == null) return;
-        foreach (var nd in currentGraph.nodes)
-            CreateNodeView(nd);
-    }
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\NodeHexDraggable.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-
-public class NodeHexDraggable : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
-{
-    private RectTransform nodeRect;
-    private RectTransform parentRect;
-    private Vector2 pointerOffset;
-    private NodeView nodeView;
-    private float hexSize;
-
-    private void Awake()
-    {
-        nodeRect = GetComponent<RectTransform>();
-        parentRect = nodeRect.parent as RectTransform;
-        nodeView = GetComponent<NodeView>();
-        hexSize = (HexGridManager.Instance != null) ? HexGridManager.Instance.hexSize : 50f;
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        Vector2 localPoint;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, eventData.pressEventCamera, out localPoint))
-        {
-            pointerOffset = nodeRect.anchoredPosition - localPoint;
-        }
-        eventData.Use();
-    }
-
-    public void OnDrag(PointerEventData eventData)
-    {
-        Vector2 localPoint;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, eventData.pressEventCamera, out localPoint))
-        {
-            nodeRect.anchoredPosition = localPoint + pointerOffset;
-        }
-        eventData.Use();
-    }
-
-    public void OnPointerUp(PointerEventData eventData)
-    {
-        Vector2 currentPos = nodeRect.anchoredPosition;
-        float hexSizeValue = hexSize;
-        HexCoords coords = HexCoords.WorldToHex(currentPos, hexSizeValue);
-        Vector2 snappedPos = coords.HexToWorld(hexSizeValue);
-        nodeRect.anchoredPosition = snappedPos;
-        if (nodeView != null)
-        {
-            nodeView.GetNodeData().coords = coords;
-            nodeView.GetNodeData().editorPosition = snappedPos;
-        }
-        eventData.Use();
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\NodeSelectable.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-
-public class NodeSelectable : MonoBehaviour, IPointerClickHandler
-{
-    // Public static property to hold the currently selected node.
-    public static GameObject CurrentSelected { get; set; }
-
-    [SerializeField] private Outline outline;
-
-    private void Awake()
-    {
-        if (outline != null)
-            outline.enabled = false;
-    }
-
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        Select(gameObject);
-    }
-
-    public static void Select(GameObject node)
-    {
-        if (CurrentSelected != null && CurrentSelected != node)
-        {
-            // Disable outline on previously selected node.
-            var prevOutline = CurrentSelected.GetComponent<Outline>();
-            if (prevOutline != null)
-                prevOutline.enabled = false;
-        }
-        CurrentSelected = node;
-        var outlineComp = node.GetComponent<Outline>();
-        if (outlineComp != null)
-            outlineComp.enabled = true;
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\NodeTestInitializer.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public class NodeTestInitializer : MonoBehaviour
-{
-    [SerializeField] private NodeEditorController editorController;
-    [SerializeField] private NodeExecutor nodeExecutor;
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // Ensure this is assigned.
-
-    private NodeGraph testGraph;
-
-    private void Start()
-    {
-        // Create a new graph.
-        testGraph = new NodeGraph();
-
-        // Load the graph into the editor.
-        if (editorController != null)
-        {
-            editorController.LoadGraph(testGraph);
-        }
-        else
-        {
-            Debug.LogWarning("[NodeTestInitializer] Missing NodeEditorController reference.");
-        }
-
-        // ============================
-        // AUTO-SPAWN NODES FROM LIBRARY
-        // ============================
-        if (definitionLibrary != null && definitionLibrary.autoSpawnNodes != null)
-        {
-            foreach (var nodeDef in definitionLibrary.autoSpawnNodes)
-            {
-                // We use a simple offset logic: each node is placed 100 units to the right/down from the previous.
-                Vector2 spawnPos = new Vector2(100 * testGraph.nodes.Count, 100 * testGraph.nodes.Count);
-
-                // -----------------
-                // CREATE THE NODE
-                // -----------------
-                NodeData newNode = new NodeData();
-                newNode.nodeDisplayName = nodeDef.displayName;
-                newNode.backgroundColor = nodeDef.backgroundColor;
-                newNode.description = nodeDef.description;
-
-                // Copy NodeDefinition effects => newNode.effects
-                foreach (var defEffect in nodeDef.effects)
-                {
-                    NodeEffectData effectCopy = new NodeEffectData
-                    {
-                        effectType = defEffect.effectType,
-                        effectValue = defEffect.effectValue,
-                        secondaryValue = defEffect.secondaryValue,
-                        extra1 = defEffect.extra1,
-                        extra2 = defEffect.extra2
-                    };
-                    
-                    // Add the effect to the node
-                    newNode.effects.Add(effectCopy);
-                }
-
-                // Copy NodeDefinition ports => newNode.ports
-                foreach (var portDef in nodeDef.ports)
-                {
-                    NodePort nodePort = new NodePort
-                    {
-                        isInput  = portDef.isInput,
-                        portType = portDef.portType,
-                        side     = portDef.side
-                    };
-                    newNode.ports.Add(nodePort);
-                }
-
-                // Snap position based on current contentRect from the editor.
-                float hexSizeValue = (HexGridManager.Instance != null) 
-                    ? HexGridManager.Instance.hexSize 
-                    : 50f;
-
-                // Adjust spawnPos relative to content center.
-                Vector2 adjustedSpawn = spawnPos - editorController.ContentRect.rect.center;
-                HexCoords hc = HexCoords.WorldToHex(adjustedSpawn, hexSizeValue);
-                newNode.coords = hc;
-                Vector2 snappedPos = hc.HexToWorld(hexSizeValue) + editorController.ContentRect.rect.center;
-                newNode.editorPosition = snappedPos;
-
-                // Add the newly created node to the graph.
-                testGraph.nodes.Add(newNode);
-
-                // Create the NodeView in the editor UI.
-                editorController.CreateNodeView(newNode);
-            }
-        }
-        else
-        {
-            Debug.LogWarning("[NodeTestInitializer] No autoSpawnNodes defined in NodeDefinitionLibrary.");
-        }
-
-        // Pass the same graph to the executor.
-        if (nodeExecutor != null)
-        {
-            nodeExecutor.SetGraph(testGraph);
-        }
-        else
-        {
-            Debug.LogWarning("[NodeTestInitializer] Missing NodeExecutor reference.");
-        }
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeView.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.EventSystems;
 using System.Collections.Generic;
-using System.Linq;
 
-public class NodeView : MonoBehaviour
+public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    [Header("Text Components")]
-    [SerializeField] private TMP_Text nodeTitleText;
-    [SerializeField] private Image backgroundImage;
+    [Header("UI Elements")]
+    public Image thumbnailImage;
+    public Image backgroundImage;
+    public GameObject tooltipPanel;
+    public TMP_Text tooltipText;
 
-    [Header("Node Info Display")]
-    [SerializeField] private TMP_Text manaStorageText;
-    [SerializeField] private TMP_Text effectsText;
-    [SerializeField] private TMP_Text descriptionText;
-
-    [Header("Pins Settings")]
-    [SerializeField] private float pinRadius = 60f; // Distance from node center to pin (auto-updated from HexGridManager if available)
-    [SerializeField] private Transform pinContainer; // Parent container for spawned pins
-
-    [Header("Pin Customization")]
-    public Sprite manaPinSprite;
-    public Color manaPinColor = Color.cyan;
-    public Sprite conditionPinSprite;
-    public Color conditionPinColor = new Color(1f, 0.65f, 0f);
-    public Sprite generalPinSprite;
-    public Color generalPinColor = Color.blue;
-    [Tooltip("Uniform additional rotation (in degrees) applied to port sprites.")]
-    public float portSpriteRotationOffset = 0f;
-
-    [Header("Pin Scale Settings")]
-    [Tooltip("General multiplier applied to all port sprites.")]
-    public float portSpriteScaleMultiplier = 1.0f;
-    [Tooltip("Multiplier for input port sprites.")]
-    public float inputPortScaleMultiplier = 1.0f;
-    [Tooltip("Multiplier for output port sprites.")]
-    public float outputPortScaleMultiplier = 1.0f;
+    [Header("Node Name Display")]
+    public TMP_Text nodeNameText;
+    [Tooltip("If false, the node name text will be hidden.")]
+    public bool displayNodeName = true;
 
     private NodeData nodeData;
+    private string nodeDescription;
+    private List<NodeEffectData> nodeEffects;
 
-    private void Awake()
-    {
-        if (pinContainer == null)
-            pinContainer = this.transform;
-        if (HexGridManager.Instance != null)
-            pinRadius = HexGridManager.Instance.hexSize * HexGridManager.Instance.pinRadiusMultiplier;
-    }
-
-    private void Update()
-    {
-        var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
-        if (manaEff != null && manaStorageText != null)
-        {
-            float cap = Mathf.Floor(manaEff.effectValue);
-            float cur = Mathf.Floor(manaEff.secondaryValue);
-            manaStorageText.text = $"Mana: {cur}/{cap}";
-        }
-    }
-
-    public void Initialize(NodeData data, Color color, string displayName)
+    public void Initialize(NodeData data, Sprite thumbnail, Color bgColor, string description, List<NodeEffectData> effects)
     {
         nodeData = data;
-        if (nodeTitleText)
-            nodeTitleText.text = displayName;
-        if (backgroundImage)
-            backgroundImage.color = color;
+        nodeDescription = description;
+        nodeEffects = effects;
 
-        if (effectsText != null)
+        if (thumbnailImage != null)
+            thumbnailImage.sprite = thumbnail;
+        if (backgroundImage != null)
+            backgroundImage.color = bgColor;
+        if (tooltipPanel != null)
+            tooltipPanel.SetActive(false);
+        if (nodeNameText != null)
         {
-            if (nodeData.effects.Count == 0)
-                effectsText.text = "No Effects";
-            else
-            {
-                string str = "";              //"Effects:\n";
-                foreach (var eff in nodeData.effects)
-                    str += $"- {eff.effectType} ({eff.effectValue})\n";
-                effectsText.text = str;
-            }
+            nodeNameText.text = data.nodeDisplayName;
+            nodeNameText.gameObject.SetActive(displayNodeName);
         }
-
-        if (descriptionText != null)
-            descriptionText.text = nodeData.description;
-
-        var manaEff = nodeData.effects.FirstOrDefault(e => e.effectType == NodeEffectType.ManaStorage);
-        if (manaEff != null && manaStorageText != null)
-            manaStorageText.text = $"Mana: {manaEff.secondaryValue}/{manaEff.effectValue}";
-    }
-
-    // Generate pins for each port in the node.
-    public void GeneratePins(List<NodePort> ports)
-    {
-        foreach (Transform child in pinContainer)
-            Destroy(child.gameObject);
-        foreach (var port in ports)
-            CreatePin(port);
-    }
-
-    private void CreatePin(NodePort port)
-    {
-        GameObject pinObj = new GameObject(port.isInput ? "InputPin" : "OutputPin", typeof(RectTransform));
-        pinObj.transform.SetParent(pinContainer, false);
-        RectTransform rt = pinObj.GetComponent<RectTransform>();
-
-        // Calculate scale multiplier based on port type.
-        float scaleMultiplier = portSpriteScaleMultiplier * (port.isInput ? inputPortScaleMultiplier : outputPortScaleMultiplier);
-        rt.sizeDelta = new Vector2(20, 20) * scaleMultiplier;
-
-        // For flat-top hexagons, pins should be centered on each side.
-        // Mapping: Top = 90°, One = 30°, Two = -30°, Three = -90°, Four = -150°, Five = -210°.
-        int sideIndex = (int)port.side; // Top=0, One=1, ..., Five=5.
-        float posAngle = 90f - sideIndex * 60f; // This yields: Top:90, One:30, Two:-30, Three:-90, Four:-150, Five:-210.
-        float posRad = posAngle * Mathf.Deg2Rad;
-        float x = pinRadius * Mathf.Cos(posRad);
-        float y = pinRadius * Mathf.Sin(posRad);
-        rt.anchoredPosition = new Vector2(x, y);
-
-        // Set sprite rotation: for outputs, arrow points out; for inputs, arrow points in (add 180°).
-        float spriteAngle = posAngle;
-        if (port.isInput)
-            spriteAngle += 180f;
-        spriteAngle += portSpriteRotationOffset;
-        rt.localRotation = Quaternion.Euler(0, 0, spriteAngle);
-
-        Image img = pinObj.AddComponent<Image>();
-        switch (port.portType)
-        {
-            case PortType.Mana:
-                img.sprite = manaPinSprite;
-                img.color = manaPinColor;
-                break;
-            case PortType.Condition:
-                img.sprite = conditionPinSprite;
-                img.color = conditionPinColor;
-                break;
-            default:
-                img.sprite = generalPinSprite;
-                img.color = generalPinColor;
-                break;
-        }
-        img.type = Image.Type.Simple;
-        img.preserveAspect = true;
     }
 
     public NodeData GetNodeData() => nodeData;
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (tooltipPanel != null && tooltipText != null)
+        {
+            tooltipPanel.SetActive(true);
+            string tip = $"{nodeData.nodeDisplayName}\n{nodeDescription}\nEffects:\n";
+            foreach (var eff in nodeEffects)
+            {
+                tip += $"- {eff.effectType}: {eff.primaryValue}";
+                if (eff.secondaryValue != 0)
+                    tip += $" / {eff.secondaryValue}";
+                tip += "\n";
+            }
+            tooltipText.text = tip;
+        }
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (tooltipPanel != null)
+            tooltipPanel.SetActive(false);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // Implement selection logic here if needed.
+    }
 }
 
 

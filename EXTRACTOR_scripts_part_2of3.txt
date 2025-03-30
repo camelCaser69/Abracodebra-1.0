@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-29 18:58:15
+UNITY PROJECT SCRIPT EXPORT - 2025-03-30 04:39:01
 PART 2 OF 3
 ================================================================================
 
@@ -12,12 +12,10 @@ Assets
 │   └── MiniVillagerMan_AnimatorBackup.controller
 ├── DefaultVolumeProfile.asset
 ├── Editor
-│   ├── HexGridRendererEditor.cs
 │   ├── NodeDefinitionAutoAdder.cs
 │   ├── NodeDefinitionCreator.cs
 │   ├── NodeDefinitionLibraryEditor.cs
-│   ├── NodeDefinitionPostprocessor.cs
-│   └── NodeEffectDataDrawer.cs
+│   └── NodeDefinitionPostprocessor.cs
 ├── HueFolders
 │   ├── Editor
 │   │   ├── HueFolders.Editor.asmdef
@@ -47,9 +45,15 @@ Assets
 │   │   │   ├── Poop_Medium_01.prefab
 │   │   │   └── Poop_Medium_02.prefab
 │   │   └── UI
+│   │       ├── EmptySlot16.prefab
+│   │       ├── EmptySlot32.prefab
 │   │       ├── Indicator_Opportunity.prefab
 │   │       ├── Indicator_Resource.prefab
 │   │       ├── Indicator_Threat.prefab
+│   │       ├── NodeCellEmpty16.prefab
+│   │       ├── NodePics
+│   │       │   ├── Seed_01.prefab
+│   │       │   └── Seed_02.prefab
 │   │       └── ThoughtBubble.prefab
 │   └── General
 │       ├── GardenerPrefab.prefab
@@ -69,13 +73,9 @@ Assets
 │   └── Nodes Plant
 │       ├── NodeDefinitionLibrary.asset
 │       ├── Node_000_Seed.asset
-│       ├── Node_001_AimSpread.asset
-│       ├── Node_002_Piercing.asset
 │       ├── Node_003_Output.asset
 │       ├── Node_004_ManaSource.asset
-│       ├── Node_005_DamageNode.asset
-│       ├── Node_006_Burn.asset
-│       └── Node_007_FriendlyFire.asset
+│       └── Node_005_DamageNode.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -103,26 +103,21 @@ Assets
 │   │   └── Plants
 │   ├── Nodes
 │   │   ├── Core
-│   │   │   ├── HexCoords.cs
-│   │   │   ├── HexGridManager.cs
-│   │   │   ├── HexGridRenderer.cs
 │   │   │   ├── NodeData.cs
 │   │   │   ├── NodeDefinition.cs
 │   │   │   ├── NodeDefinitionLibrary.cs
 │   │   │   ├── NodeEffectData.cs
 │   │   │   ├── NodeEffectType.cs
-│   │   │   ├── NodePort.cs
-│   │   │   ├── OutputNodeEffect.cs
-│   │   │   └── PortDefinition.cs
+│   │   │   └── OutputNodeEffect.cs
 │   │   ├── Runtime
 │   │   │   ├── NodeExecutor.cs
 │   │   │   └── NodeGraph.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
-│   │       ├── NodeEditorController.cs
-│   │       ├── NodeHexDraggable.cs
+│   │       ├── NodeCell.cs
+│   │       ├── NodeDraggable.cs
+│   │       ├── NodeEditorGridController.cs
 │   │       ├── NodeSelectable.cs
-│   │       ├── NodeTestInitializer.cs
 │   │       └── NodeView.cs
 │   ├── Player
 │   │   └── GardenerController.cs
@@ -300,7 +295,7 @@ public class AnimalController : MonoBehaviour
         // Behavior based on hunger:
         if (currentHunger >= definition.hungerThreshold)
         {
-            Debug.Log($"{speciesName} is hungry! (Hunger: {currentHunger:0.00}/{definition.hungerThreshold})");
+            //Debug.Log($"{speciesName} is hungry! (Hunger: {currentHunger:0.00}/{definition.hungerThreshold})");
             if (thoughtCooldownTimer <= 0f)
             {
                 ShowThought(ThoughtTrigger.Hungry);
@@ -852,206 +847,6 @@ public enum ThoughtTrigger
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\HexCoords.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-[System.Serializable]
-public struct HexCoords
-{
-    public int q; // axial coordinate (column)
-    public int r; // axial coordinate (row)
-
-    public HexCoords(int q, int r)
-    {
-        this.q = q;
-        this.r = r;
-    }
-
-    // Flat top conversion from axial to world coordinates.
-    // Using the formula:
-    // x = hexSize * (3/2 * q)
-    // y = hexSize * ( (sqrt(3)/2 * q) + (sqrt(3) * r) )
-    public Vector2 HexToWorld(float hexSize)
-    {
-        float x = hexSize * (3f / 2f * q);
-        float y = hexSize * ((Mathf.Sqrt(3f) / 2f * q) + (Mathf.Sqrt(3f) * r));
-        return new Vector2(x, y);
-    }
-
-    // Converts a world (UI) position to axial coordinates.
-    // Inverse formulas:
-    // q = (2/3 * x)/hexSize
-    // r = ((-1/3 * x) + (sqrt(3)/3 * y)) / hexSize
-    public static HexCoords WorldToHex(Vector2 pos, float hexSize)
-    {
-        float qf = (2f / 3f * pos.x) / hexSize;
-        float rf = ((-1f / 3f * pos.x) + (Mathf.Sqrt(3f) / 3f * pos.y)) / hexSize;
-        return RoundAxial(qf, rf);
-    }
-
-    public static HexCoords RoundAxial(float qf, float rf)
-    {
-        float sf = -qf - rf;
-        int qi = Mathf.RoundToInt(qf);
-        int ri = Mathf.RoundToInt(rf);
-        int si = Mathf.RoundToInt(sf);
-
-        float qDiff = Mathf.Abs(qi - qf);
-        float rDiff = Mathf.Abs(ri - rf);
-        float sDiff = Mathf.Abs(si - sf);
-
-        if (qDiff > rDiff && qDiff > sDiff)
-            qi = -ri - si;
-        else if (rDiff > sDiff)
-            ri = -qi - si;
-        return new HexCoords(qi, ri);
-    }
-
-    // Fixed neighbor offsets (axial) for flat top grid.
-    private static readonly HexCoords[] AxialNeighbors = new HexCoords[] {
-        new HexCoords(+1, 0),   // Side1
-        new HexCoords(0, -1),   // Side2
-        new HexCoords(-1, -1),  // Side3
-        new HexCoords(-1, 0),   // Side4
-        new HexCoords(0, +1),   // Side5
-        new HexCoords(+1, +1)   // Side6
-    };
-
-    // Returns the neighbor hex coordinate for a given side index (0 to 5)
-    public static HexCoords GetNeighbor(HexCoords origin, int sideIndex)
-    {
-        return new HexCoords(origin.q + AxialNeighbors[sideIndex].q,
-                             origin.r + AxialNeighbors[sideIndex].r);
-    }
-
-    public static int OppositeSideIndex(int sideIndex)
-    {
-        return (sideIndex + 3) % 6;
-    }
-
-    public override bool Equals(object obj)
-    {
-        if (!(obj is HexCoords))
-            return false;
-        HexCoords other = (HexCoords)obj;
-        return this.q == other.q && this.r == other.r;
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked { return (q * 397) ^ r; }
-    }
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\HexGridManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public class HexGridManager : MonoBehaviour
-{
-    public float hexSize = 50f;
-    public float pinRadiusMultiplier = 1.0f; // Pin radius = hexSize * multiplier
-
-    // Flat top hexagon grid only – no orientation toggle needed.
-    public static HexGridManager Instance { get; private set; }
-    
-    private void Awake()
-    {
-        Instance = this;
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\HexGridRenderer.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.UI;
-using System.Collections.Generic;
-
-[RequireComponent(typeof(CanvasRenderer))]
-public class HexGridRenderer : MaskableGraphic
-{
-    public bool showGrid = true;
-    public Color gridColor = Color.white;
-    public float lineThickness = 1f;
-
-    private float HexSize {
-        get { return (HexGridManager.Instance != null) ? HexGridManager.Instance.hexSize : 50f; }
-    }
-
-    protected override void OnPopulateMesh(VertexHelper vh)
-    {
-        vh.Clear();
-        if (!showGrid)
-            return;
-
-        Rect rect = rectTransform.rect;
-        Vector2 origin = rect.center;
-
-        int cols = Mathf.CeilToInt(rect.width / (HexSize * Mathf.Sqrt(3))) + 2;
-        int rows = Mathf.CeilToInt(rect.height / (HexSize * 1.5f)) + 2;
-
-        List<Vector2> linePoints = new List<Vector2>();
-
-        for (int q = -cols; q <= cols; q++)
-        {
-            for (int r = -rows; r <= rows; r++)
-            {
-                HexCoords hex = new HexCoords(q, r);
-                Vector2 hexCenter = hex.HexToWorld(HexSize) + origin;
-                List<Vector2> corners = new List<Vector2>();
-                // For flat top, use corners at angles 0, 60, 120, 180, 240, 300.
-                for (int i = 0; i < 6; i++)
-                {
-                    float angle = i * 60f;
-                    float rad = angle * Mathf.Deg2Rad;
-                    Vector2 offset = new Vector2(HexSize * Mathf.Cos(rad), HexSize * Mathf.Sin(rad));
-                    corners.Add(hexCenter + offset);
-                }
-                for (int i = 0; i < 6; i++)
-                {
-                    int next = (i + 1) % 6;
-                    linePoints.Add(corners[i]);
-                    linePoints.Add(corners[next]);
-                }
-            }
-        }
-        for (int i = 0; i < linePoints.Count; i += 2)
-        {
-            AddLineQuad(vh, linePoints[i], linePoints[i + 1], lineThickness, gridColor);
-        }
-    }
-
-    private void AddLineQuad(VertexHelper vh, Vector2 start, Vector2 end, float thickness, Color col)
-    {
-        Vector2 direction = (end - start).normalized;
-        Vector2 normal = new Vector2(-direction.y, direction.x);
-        Vector2 offset = normal * (thickness * 0.5f);
-
-        int idx = vh.currentVertCount;
-        vh.AddVert(start + offset, col, Vector2.zero);
-        vh.AddVert(start - offset, col, Vector2.zero);
-        vh.AddVert(end - offset, col, Vector2.zero);
-        vh.AddVert(end + offset, col, Vector2.zero);
-        vh.AddTriangle(idx, idx + 1, idx + 2);
-        vh.AddTriangle(idx, idx + 2, idx + 3);
-    }
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeData.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using System;
@@ -1063,19 +858,14 @@ public class NodeData
 {
     public string nodeId;
     public string nodeDisplayName;
-    public Vector2 editorPosition; // For UI positioning
-    public HexCoords coords;       // Hex-based position
-    public Color backgroundColor = Color.gray;
-    public string description = "";
-    public List<NodePort> ports;   // Up to 6 ports (max 1 per side)
-    public List<NodeEffectData> effects;
+    public List<NodeEffectData> effects = new List<NodeEffectData>();
+
+    // (Optional) To store the order if you need explicit ordering.
+    public int orderIndex;
 
     public NodeData()
     {
         nodeId = Guid.NewGuid().ToString();
-        ports = new List<NodePort>();
-        effects = new List<NodeEffectData>();
-        coords = new HexCoords(0, 0);
     }
 }
 
@@ -1087,41 +877,39 @@ public class NodeData
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 
 [CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
 public class NodeDefinition : ScriptableObject
 {
     public string displayName;
     public Color backgroundColor = Color.gray;
-    [TextArea] public string description;
-    public List<PortDefinition> ports;
-    public List<NodeEffectData> effects = new List<NodeEffectData>();
+    [TextArea]
+    public string description;
+    public Sprite thumbnail;
 
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        if (string.IsNullOrEmpty(displayName))
-        {
-            string path = UnityEditor.AssetDatabase.GetAssetPath(this);
-            string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
-            string[] parts = fileName.Split('_');
-            if (parts.Length >= 3)
-                displayName = string.Join("_", parts.Skip(2).ToArray());
-        }
-    }
-#endif
+    // Add this field for the NodeView prefab.
+    public GameObject nodeViewPrefab;
 
-    private void OnEnable()
+    // List of effects
+    public List<NodeEffectData> effects;
+
+    // Method to clone the effects list for NodeData.
+    public List<NodeEffectData> CloneEffects()
     {
-        if (ports == null || ports.Count == 0)
+        List<NodeEffectData> copy = new List<NodeEffectData>();
+        foreach (var eff in effects)
         {
-            ports = new List<PortDefinition>();
-            // Default: one input on Top and one output on Three (opposite for flat-top)
-            ports.Add(new PortDefinition { isInput = true, portType = PortType.General, side = HexSideFlat.Top });
-            ports.Add(new PortDefinition { isInput = false, portType = PortType.General, side = HexSideFlat.Three });
+            NodeEffectData newEff = new NodeEffectData()
+            {
+                effectType = eff.effectType,
+                primaryValue = eff.primaryValue,
+                secondaryValue = eff.secondaryValue
+            };
+            copy.Add(newEff);
         }
+        return copy;
     }
+
 }
 
 
@@ -1137,8 +925,6 @@ using System.Collections.Generic;
 public class NodeDefinitionLibrary : ScriptableObject
 {
     public List<NodeDefinition> definitions;
-    // New: List of nodes to auto-spawn at game start.
-    public List<NodeDefinition> autoSpawnNodes;
 }
 
 
@@ -1153,20 +939,8 @@ public class NodeDefinitionLibrary : ScriptableObject
 public class NodeEffectData
 {
     public NodeEffectType effectType;
-
-    // For Seed:
-    // effectValue     = stemMinLength
-    // secondaryValue  = stemMaxLength
-    // extra1          = growthSpeed
-    // extra2          = leafGap
-    public float effectValue;
+    public float primaryValue;
     public float secondaryValue;
-    public float extra1;
-    public float extra2;
-
-    // Two brand-new fields:
-    public int leafPattern = 0;       // 0=Parallel, 1=Alternating
-    public float growthRandomness = 0f; // Range [0..2]
 }
 
 
@@ -1179,52 +953,16 @@ public class NodeEffectData
 {
     ManaCost,
     Damage,
-    ManaStorage,
-    ManaRechargeRate,
     EnergyStorage,
     EnergyPhotosynthesis,
     Output,
-    AimSpread,    // formerly Accuracy
-    Burning,
-    Piercing,
-    FriendlyFire,
-    // Replaced Seed with more granular effects
-    SeedSpawn,        // Base effect to spawn a plant
-    StemLength,       // Min/Max stem length
-    GrowthSpeed,      // Controls growth speed
-    LeafGap,          // Spacing between leaves
-    LeafPattern,      // Parallel or alternating pattern
-    StemRandomness    // Randomness of stem growth
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\NodePort.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System;
-using UnityEngine;
-
-public enum PortType { General, Mana, Condition }
-
-public enum HexSideFlat { Top, One, Two, Three, Four, Five }
-
-[Serializable]
-public class NodePort
-{
-    public bool isInput;
-    public PortType portType;
-    public HexSideFlat side;
-
-    public NodePort(bool isInput, PortType portType, HexSideFlat side)
-    {
-        this.isInput = isInput;
-        this.portType = portType;
-        this.side = side;
-    }
-
-    public NodePort() { }
+    SeedSpawn,
+    StemLength,
+    GrowthSpeed,
+    LeafGap,
+    LeafPattern,
+    StemRandomness
+    // Add or adjust types as needed.
 }
 
 
@@ -1262,17 +1000,498 @@ public class OutputNodeEffect : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Core\PortDefinition.cs
+// FILE: Assets\Scripts\Nodes\Runtime\NodeExecutor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using System.Linq;
+
+public class NodeExecutor : MonoBehaviour
+{
+    [Header("Execution Settings")]
+    public NodeGraph currentGraph;
+    public TMP_Text debugOutput;
+
+    [Header("Plant Spawning")]
+    public GameObject plantPrefab;
+    public GardenerController gardener;
+
+    private void Update()
+    {
+        // Press spacebar to execute the node chain.
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            ExecuteGraph();
+        }
+    }
+
+    public void SetGraph(NodeGraph graph)
+    {
+        currentGraph = graph;
+    }
+
+    public void ExecuteGraph()
+    {
+        if (currentGraph == null || currentGraph.nodes.Count == 0)
+        {
+            DebugLog("No nodes to execute!");
+            return;
+        }
+
+        // Process nodes left-to-right based on orderIndex.
+        var sortedNodes = currentGraph.nodes.OrderBy(n => n.orderIndex).ToList();
+
+        float accumulatedEnergyStorage = 0f;
+        float accumulatedPhotosynthesis = 0f;
+        bool seedFound = false;
+
+        foreach (var node in sortedNodes)
+        {
+            DebugLog($"Processing node: {node.nodeDisplayName}");
+            foreach (var eff in node.effects)
+            {
+                if (eff.effectType == NodeEffectType.EnergyStorage)
+                    accumulatedEnergyStorage += eff.primaryValue;
+                else if (eff.effectType == NodeEffectType.EnergyPhotosynthesis)
+                    accumulatedPhotosynthesis += eff.primaryValue;
+                else if (eff.effectType == NodeEffectType.SeedSpawn)
+                    seedFound = true;
+            }
+        }
+
+        if (seedFound)
+        {
+            SpawnPlant(accumulatedEnergyStorage, accumulatedPhotosynthesis);
+        }
+        else
+        {
+            DebugLog("No SeedSpawn in chain. Plant not spawned.");
+        }
+
+        DebugLog("Execution complete.");
+    }
+
+    private void SpawnPlant(float energyStorage, float photosynthesis)
+    {
+        if (plantPrefab == null)
+        {
+            DebugLog("Plant prefab not assigned!");
+            return;
+        }
+        if (gardener == null)
+        {
+            DebugLog("No GardenerController found!");
+            return;
+        }
+        Vector2 spawnPos = gardener.GetPlantingPosition();
+        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
+        PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
+        if (growth != null)
+        {
+            growth.maxEnergy = energyStorage;
+            growth.basePhotosynthesis = photosynthesis;
+        }
+        DebugLog("Plant spawned.");
+    }
+
+    private void DebugLog(string msg)
+    {
+        Debug.Log(msg);
+        if (debugOutput != null)
+            debugOutput.text += msg + "\n";
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Runtime\NodeGraph.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class PortDefinition
+public class NodeGraph
 {
-    public bool isInput;
-    public PortType portType;
-    public HexSideFlat side;
+    public List<NodeData> nodes = new List<NodeData>();
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\ColorExtensions.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public static class ColorExtensions
+{
+    public static Color WithAlpha(this Color c, float alpha)
+    {
+        return new Color(c.r, c.g, c.b, alpha);
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeCell.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+
+public class NodeCell : MonoBehaviour, IPointerClickHandler
+{
+    public int cellIndex;
+    private NodeEditorGridController controller;
+    private NodeData nodeData;   // Null if cell is empty.
+    private NodeView nodeView;   // Reference to NodeView child, if any.
+
+    public void Init(int index, NodeEditorGridController gridController)
+    {
+        cellIndex = index;
+        controller = gridController;
+    }
+
+    public bool HasNode()
+    {
+        return nodeData != null;
+    }
+
+    public NodeData GetNodeData()
+    {
+        return nodeData;
+    }
+
+    // Returns the NodeView component (if any)
+    public NodeView GetNodeView()
+    {
+        return nodeView;
+    }
+
+    // Called when the user selects a node definition from the dropdown.
+    public void SetNodeDefinition(NodeDefinition def)
+    {
+        // Create new NodeData using the definition.
+        nodeData = new NodeData()
+        {
+            nodeId = System.Guid.NewGuid().ToString(),
+            nodeDisplayName = def.displayName,
+            effects = def.CloneEffects() // Using the method defined in NodeDefinition.
+        };
+
+        // Remove any existing NodeView.
+        if (nodeView != null)
+        {
+            Destroy(nodeView.gameObject);
+            nodeView = null;
+        }
+
+        // Determine which NodeView prefab to use:
+        GameObject prefabToUse = def.nodeViewPrefab != null ? def.nodeViewPrefab : controller.defaultNodeViewPrefab;
+        if (prefabToUse == null)
+        {
+            Debug.LogError("No NodeView prefab assigned in NodeDefinition or default in NodeEditorGridController.");
+            return;
+        }
+
+        // Instantiate the NodeView prefab as a child of this cell.
+        GameObject nodeViewObj = Instantiate(prefabToUse, transform);
+        nodeView = nodeViewObj.GetComponent<NodeView>();
+        if (nodeView != null)
+        {
+            nodeView.Initialize(nodeData, def.thumbnail, def.backgroundColor, def.description, nodeData.effects);
+        }
+        
+        
+
+    }
+
+    // On right-click, if empty, notify the controller to show the dropdown.
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            if (!HasNode())
+            {
+                controller.OnEmptyCellRightClicked(this, eventData);
+            }
+            else
+            {
+                // Optionally, add logic for right-click on an occupied cell.
+            }
+        }
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeDraggable.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+
+public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+{
+    private RectTransform rectTransform;
+    private CanvasGroup canvasGroup;
+    private Vector2 originalPosition;
+    private Transform originalParent;
+    private NodeEditorGridController gridController;
+
+    private void Awake()
+    {
+        rectTransform = GetComponent<RectTransform>();
+        canvasGroup = GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        gridController = GetComponentInParent<NodeEditorGridController>();
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        originalPosition = rectTransform.anchoredPosition;
+        originalParent = transform.parent;
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.alpha = 0.6f;
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        rectTransform.anchoredPosition += eventData.delta;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.alpha = 1f;
+        if (gridController != null)
+        {
+            bool dropped = gridController.HandleNodeDrop(this, eventData.position);
+            if (!dropped)
+            {
+                rectTransform.anchoredPosition = originalPosition;
+                transform.SetParent(originalParent);
+            }
+        }
+        else
+        {
+            rectTransform.anchoredPosition = originalPosition;
+            transform.SetParent(originalParent);
+        }
+    }
+
+    public void SetParent(Transform newParent)
+    {
+        transform.SetParent(newParent, false);
+        rectTransform.anchoredPosition = Vector2.zero;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeEditorGridController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using TMPro;
+using System.Linq;
+
+public class NodeEditorGridController : MonoBehaviour
+{
+    [Header("Grid Settings")]
+    [Tooltip("Maximum number of cells (gene capacity)")]
+    public int maxCells = 8;
+    [Tooltip("Spacing between cells (pixels)")]
+    public float cellSpacing = 10f;
+    [Tooltip("Size (width/height in pixels) for each cell")]
+    public float cellSize = 64f;
+    [Tooltip("Parent RectTransform where cells will be instantiated")]
+    public RectTransform cellsParent;
+
+    [Header("Prefabs & Library")]
+    [Tooltip("Prefab for an empty cell")]
+    public NodeCell cellPrefab;
+    [Tooltip("Default NodeView prefab (used if a NodeDefinition has none assigned)")]
+    public GameObject defaultNodeViewPrefab;
+    [Tooltip("Library of node definitions")]
+    public NodeDefinitionLibrary definitionLibrary;
+
+    [Header("TMP Dropdown")]
+    [Tooltip("TMP_Dropdown used for node selection (should be inactive by default)")]
+    public TMP_Dropdown nodeDropdown;
+
+    [Header("Execution")]
+    [Tooltip("Reference to the NodeExecutor to update its graph")]
+    public NodeExecutor nodeExecutor;
+
+    // List of instantiated cell references
+    private List<NodeCell> nodeCells = new List<NodeCell>();
+
+    private void Start()
+    {
+        if (nodeDropdown != null)
+            nodeDropdown.gameObject.SetActive(false);
+
+        CreateCells();
+
+        if (nodeExecutor != null)
+            nodeExecutor.SetGraph(new NodeGraph());
+
+        RefreshGraph();
+    }
+
+    // Create exactly maxCells cells, arranged in one centered row.
+    private void CreateCells()
+    {
+        // Clear previous children if any.
+        foreach (Transform child in cellsParent)
+        {
+            Destroy(child.gameObject);
+        }
+        nodeCells.Clear();
+
+        // Total width = (maxCells * cellSize) + ((maxCells - 1) * cellSpacing)
+        float totalWidth = maxCells * cellSize + (maxCells - 1) * cellSpacing;
+        // Starting x position (centered): -totalWidth/2 + cellSize/2
+        float startX = -totalWidth / 2f + cellSize / 2f;
+
+        for (int i = 0; i < maxCells; i++)
+        {
+            NodeCell cell = Instantiate(cellPrefab, cellsParent);
+            RectTransform rt = cell.GetComponent<RectTransform>();
+            rt.sizeDelta = new Vector2(cellSize, cellSize);
+            float xPos = startX + i * (cellSize + cellSpacing);
+            rt.anchoredPosition = new Vector2(xPos, 0f);
+            cell.Init(i, this);
+            nodeCells.Add(cell);
+        }
+    }
+
+    // Called by a NodeCell when right-clicked (and empty)
+    public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
+    {
+        if (nodeDropdown == null || definitionLibrary == null) return;
+
+        // Build dropdown options using TMP_Dropdown.OptionData.
+        List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+        options.Add(new TMP_Dropdown.OptionData("Select Node")); // default option
+        foreach (var def in definitionLibrary.definitions)
+        {
+            options.Add(new TMP_Dropdown.OptionData(def.displayName));
+        }
+        nodeDropdown.ClearOptions();
+        nodeDropdown.AddOptions(options);
+        nodeDropdown.value = 0;
+        nodeDropdown.RefreshShownValue();
+
+        // Position dropdown at pointer.
+        RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
+        dropdownRect.position = eventData.position;
+
+        nodeDropdown.gameObject.SetActive(true);
+        nodeDropdown.onValueChanged.RemoveAllListeners();
+        nodeDropdown.onValueChanged.AddListener((val) => OnDropdownValueChanged(val, cell));
+    }
+
+    private void OnDropdownValueChanged(int value, NodeCell cell)
+    {
+        nodeDropdown.gameObject.SetActive(false);
+        if (value == 0) return; // "Select Node" option
+        int index = value - 1;
+        if (index >= 0 && index < definitionLibrary.definitions.Count)
+        {
+            NodeDefinition def = definitionLibrary.definitions[index];
+            cell.SetNodeDefinition(def);
+            RefreshGraph();
+        }
+    }
+
+    // Rebuild the NodeGraph from all non-empty cells, in order from left to right.
+    public void RefreshGraph()
+    {
+        if (nodeExecutor == null || nodeExecutor.currentGraph == null) return;
+        nodeExecutor.currentGraph.nodes.Clear();
+        foreach (var cell in nodeCells.OrderBy(c => c.cellIndex))
+        {
+            if (cell.HasNode())
+            {
+                nodeExecutor.currentGraph.nodes.Add(cell.GetNodeData());
+            }
+        }
+    }
+
+    // Called by NodeDraggable when a node is dropped; checks if the drop is on a cell.
+    public bool HandleNodeDrop(NodeDraggable draggedNode, Vector2 screenPosition)
+    {
+        foreach (var cell in nodeCells)
+        {
+            RectTransform cellRect = cell.GetComponent<RectTransform>();
+            if (RectTransformUtility.RectangleContainsScreenPoint(cellRect, screenPosition))
+            {
+                // If the cell already has a node, swap them.
+                if (cell.HasNode())
+                {
+                    NodeView existingView = cell.GetNodeView();
+                    if (existingView != null)
+                    {
+                        // Get original cell of dragged node.
+                        NodeCell originCell = draggedNode.GetComponentInParent<NodeCell>();
+                        if (originCell != null)
+                        {
+                            existingView.transform.SetParent(originCell.transform, false);
+                            existingView.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                        }
+                    }
+                }
+                // Place the dragged node in this cell.
+                draggedNode.SetParent(cell.transform);
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeSelectable.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+
+public class NodeSelectable : MonoBehaviour, IPointerClickHandler
+{
+    public static GameObject CurrentSelected { get; set; }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Select(gameObject);
+    }
+
+    public static void Select(GameObject node)
+    {
+        if (CurrentSelected != null && CurrentSelected != node)
+        {
+            // (Optional) Remove highlight from previously selected node.
+        }
+        CurrentSelected = node;
+        // (Optional) Add highlight effect here.
+    }
 }
 
 
