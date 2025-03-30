@@ -8,22 +8,20 @@ public class NodeExecutor : MonoBehaviour
     [Header("Execution Settings")]
     public NodeGraph currentGraph;
     public TMP_Text debugOutput;
-    
+
     [Header("Plant Spawning")]
     public GameObject plantPrefab;
     public GardenerController gardener;
 
-    // >>> ADD THIS <<<
     private void Update()
     {
-        // Press Space to run the node chain
+        // Press spacebar to execute the node chain.
         if (Input.GetKeyDown(KeyCode.Space))
         {
             ExecuteGraph();
         }
     }
 
-    // >>> ADD THIS <<<
     public void SetGraph(NodeGraph graph)
     {
         currentGraph = graph;
@@ -37,7 +35,7 @@ public class NodeExecutor : MonoBehaviour
             return;
         }
 
-        // Sort nodes by orderIndex (left-to-right)
+        // Process nodes left-to-right based on orderIndex.
         var sortedNodes = currentGraph.nodes.OrderBy(n => n.orderIndex).ToList();
 
         float accumulatedEnergyStorage = 0f;
@@ -64,9 +62,9 @@ public class NodeExecutor : MonoBehaviour
         }
         else
         {
-            DebugLog("No seed found in chain. Plant not spawned.");
+            DebugLog("No SeedSpawn in chain. Plant not spawned.");
         }
-        
+
         DebugLog("Execution complete.");
     }
 

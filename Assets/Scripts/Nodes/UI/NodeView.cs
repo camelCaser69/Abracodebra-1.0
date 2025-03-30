@@ -9,12 +9,13 @@ public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     [Header("UI Elements")]
     public Image thumbnailImage;
     public Image backgroundImage;
-    public GameObject tooltipPanel;  
+    public GameObject tooltipPanel;
     public TMP_Text tooltipText;
 
-    // >>> ADD THIS <<<
     [Header("Node Name Display")]
-    public TMP_Text nodeNameText; // Assign in your prefab
+    public TMP_Text nodeNameText;
+    [Tooltip("If false, the node name text will be hidden.")]
+    public bool displayNodeName = true;
 
     private NodeData nodeData;
     private string nodeDescription;
@@ -28,36 +29,33 @@ public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
         if (thumbnailImage != null)
             thumbnailImage.sprite = thumbnail;
-
         if (backgroundImage != null)
             backgroundImage.color = bgColor;
-
         if (tooltipPanel != null)
             tooltipPanel.SetActive(false);
-
-        // >>> ADD THIS <<<
-        // Show the node's name from nodeData.nodeDisplayName
         if (nodeNameText != null)
+        {
             nodeNameText.text = data.nodeDisplayName;
+            nodeNameText.gameObject.SetActive(displayNodeName);
+        }
     }
 
     public NodeData GetNodeData() => nodeData;
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // Show tooltip
         if (tooltipPanel != null && tooltipText != null)
         {
             tooltipPanel.SetActive(true);
-            string tooltipStr = $"{nodeDescription}\n";
+            string tip = $"{nodeData.nodeDisplayName}\n{nodeDescription}\nEffects:\n";
             foreach (var eff in nodeEffects)
             {
-                tooltipStr += $"- {eff.effectType}: {eff.primaryValue}";
+                tip += $"- {eff.effectType}: {eff.primaryValue}";
                 if (eff.secondaryValue != 0)
-                    tooltipStr += $" / {eff.secondaryValue}";
-                tooltipStr += "\n";
+                    tip += $" / {eff.secondaryValue}";
+                tip += "\n";
             }
-            tooltipText.text = tooltipStr;
+            tooltipText.text = tip;
         }
     }
 
@@ -69,6 +67,6 @@ public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        NodeSelectable.Select(gameObject);
+        // Implement selection logic here if needed.
     }
 }

@@ -8,20 +8,29 @@ public class NodeDefinition : ScriptableObject
     public Color backgroundColor = Color.gray;
     [TextArea]
     public string description;
-    public Sprite thumbnail; // Thumbnail for UI
+    public Sprite thumbnail;
 
-    // Effects remain unchanged (you can add/remove variables as needed)
-    public List<NodeEffectData> effects = new List<NodeEffectData>();
+    // Add this field for the NodeView prefab.
+    public GameObject nodeViewPrefab;
 
-#if UNITY_EDITOR
-    private void OnValidate()
+    // List of effects
+    public List<NodeEffectData> effects;
+
+    // Method to clone the effects list for NodeData.
+    public List<NodeEffectData> CloneEffects()
     {
-        if (string.IsNullOrEmpty(displayName))
+        List<NodeEffectData> copy = new List<NodeEffectData>();
+        foreach (var eff in effects)
         {
-            string path = UnityEditor.AssetDatabase.GetAssetPath(this);
-            string fileName = System.IO.Path.GetFileNameWithoutExtension(path);
-            displayName = fileName;
+            NodeEffectData newEff = new NodeEffectData()
+            {
+                effectType = eff.effectType,
+                primaryValue = eff.primaryValue,
+                secondaryValue = eff.secondaryValue
+            };
+            copy.Add(newEff);
         }
+        return copy;
     }
-#endif
+
 }

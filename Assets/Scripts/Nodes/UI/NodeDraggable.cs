@@ -1,47 +1,59 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private RectTransform rectTransform;
-    private Canvas canvas;
+    private CanvasGroup canvasGroup;
     private Vector2 originalPosition;
-    private LayoutElement layoutElement;
+    private Transform originalParent;
+    private NodeEditorGridController gridController;
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
-        canvas = GetComponentInParent<Canvas>();
-        layoutElement = GetComponent<LayoutElement>();
+        canvasGroup = GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+            canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        gridController = GetComponentInParent<NodeEditorGridController>();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalPosition = rectTransform.anchoredPosition;
-        if (layoutElement != null)
-            layoutElement.ignoreLayout = true;
-        GetComponent<CanvasGroup>().blocksRaycasts = false;
+        originalParent = transform.parent;
+        canvasGroup.blocksRaycasts = false;
+        canvasGroup.alpha = 0.6f;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (rectTransform != null && canvas != null)
-        {
-            Vector2 pos;
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvas.transform as RectTransform, eventData.position, canvas.worldCamera, out pos);
-            rectTransform.anchoredPosition = pos;
-        }
+        rectTransform.anchoredPosition += eventData.delta;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        GetComponent<CanvasGroup>().blocksRaycasts = true;
-        if (layoutElement != null)
-            layoutElement.ignoreLayout = false;
-        // After drag, reparenting is not needed since we remain in the grid.
-        NodeEditorController controller = GetComponentInParent<NodeEditorController>();
-        if (controller != null)
-            controller.ReorderNodes();
+        canvasGroup.blocksRaycasts = true;
+        canvasGroup.alpha = 1f;
+        if (gridController != null)
+        {
+            bool dropped = gridController.HandleNodeDrop(this, eventData.position);
+            if (!dropped)
+            {
+                rectTransform.anchoredPosition = originalPosition;
+                transform.SetParent(originalParent);
+            }
+        }
+        else
+        {
+            rectTransform.anchoredPosition = originalPosition;
+            transform.SetParent(originalParent);
+        }
+    }
+
+    public void SetParent(Transform newParent)
+    {
+        transform.SetParent(newParent, false);
+        rectTransform.anchoredPosition = Vector2.zero;
     }
 }
