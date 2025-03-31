@@ -78,45 +78,65 @@ public class NodeEditorGridController : MonoBehaviour
     }
 
     private void CreateCells()
+{
+    // Clear previous children if any
+    foreach (Transform child in transform)
     {
-        foreach (Transform child in transform)
+        if (child.gameObject != this.gameObject && child.GetComponent<NodeEditorGridController>() == null)
         {
-             if (child.gameObject != this.gameObject && child.GetComponent<NodeEditorGridController>() == null)
-             {
-                 Destroy(child.gameObject);
-             }
-        }
-        nodeCells.Clear();
-        NodeCell.ClearSelection(); // Ensure no selection persists if recreated
-
-        float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
-        float startX = -(totalWidth / 2f) + (cellSize.x / 2f);
-
-        for (int i = 0; i < emptyCellsCount; i++)
-        {
-            GameObject cellGO = new GameObject($"Cell_{i}");
-            RectTransform rt = cellGO.AddComponent<RectTransform>();
-            cellGO.transform.SetParent(transform, false);
-
-            rt.sizeDelta = cellSize;
-            rt.anchorMin = new Vector2(0.5f, 0.5f);
-            rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            float xPos = startX + i * (cellSize.x + cellMargin);
-            rt.anchoredPosition = new Vector2(xPos, 0f);
-
-            Image cellImage = cellGO.AddComponent<Image>();
-            cellImage.sprite = emptyCellSprite;
-            cellImage.color = emptyCellColor; // Use the defined empty cell color
-            cellImage.raycastTarget = true; // MUST be true for clicks
-            rt.localScale = emptyCellScale;
-
-            NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
-            cellLogic.Init(i, this, cellImage);
-
-            nodeCells.Add(cellLogic);
+            Destroy(child.gameObject);
         }
     }
+    nodeCells.Clear();
+    NodeCell.ClearSelection();
+
+    // --- Calculate based on Bottom-Left Pivot ---
+    // Total width calculation remains the same
+    float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
+
+    // Calculate the starting X position for the *bottom-left corner* of the first cell,
+    // assuming the *parent* NodeEditorGridController RectTransform has its pivot at (0.5, 0.5) (Center)
+    // Start at the center, move left by half the total width to get the left edge
+    float startX = -(totalWidth / 2f);
+
+    // We also need to consider the vertical position if needed, assume centered vertically for now (Y=0 relative to parent center)
+    float startY = -(cellSize.y / 2f); // Start Y for bottom edge relative to parent center
+
+    for (int i = 0; i < emptyCellsCount; i++)
+    {
+        GameObject cellGO = new GameObject($"Cell_{i}");
+        RectTransform rt = cellGO.AddComponent<RectTransform>();
+        cellGO.transform.SetParent(transform, false);
+
+        // --- Setup RectTransform with (0, 0) Pivot ---
+        rt.sizeDelta = cellSize;
+        // Set Anchor to center of parent (common setup)
+        rt.anchorMin = new Vector2(0.5f, 0.5f);
+        rt.anchorMax = new Vector2(0.5f, 0.5f);
+        // *** SET PIVOT TO BOTTOM-LEFT ***
+        rt.pivot = new Vector2(0f, 0f);
+
+        // Calculate the position of the bottom-left corner relative to the parent's center anchor
+        float xPos = startX + i * (cellSize.x + cellMargin);
+        float yPos = startY; // Keep Y position constant for the bottom edge
+        rt.anchoredPosition = new Vector2(xPos, yPos);
+
+        // Debug.Log($"Creating Cell_{i}: Pivot={rt.pivot}, AnchoredPos={rt.anchoredPosition}, Size={rt.sizeDelta}");
+
+        // --- Add Image Component ---
+        Image cellImage = cellGO.AddComponent<Image>();
+        cellImage.sprite = emptyCellSprite;
+        cellImage.color = emptyCellColor;
+        cellImage.raycastTarget = true; // Keep this true
+        // rt.localScale = emptyCellScale; // Keep commented out for now
+
+        // --- Add NodeCell Logic Component ---
+        NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
+        cellLogic.Init(i, this, cellImage);
+
+        nodeCells.Add(cellLogic);
+    }
+}
 
     void Update()
     {
@@ -133,59 +153,84 @@ public class NodeEditorGridController : MonoBehaviour
     }
 
     public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
-    {
-        if (nodeDropdown == null) { Debug.LogError("[NodeEditorGridController] Dropdown is null!"); return; }
-        if (definitionLibrary == null || definitionLibrary.definitions == null) { Debug.LogError("[NodeEditorGridController] Definition Library is null or empty!"); return; }
-        if (nodeDropdown.template == null) { Debug.LogError("[NodeEditorGridController] Dropdown 'Template' is not assigned or is missing!", nodeDropdown.gameObject); return; }
-
-        List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
-        options.Add(new TMP_Dropdown.OptionData("Select Node..."));
-
-        var sortedDefinitions = definitionLibrary.definitions
-                                    .Where(def => def != null)
-                                    .OrderBy(def => def.displayName)
-                                    .ToList();
-
-        foreach (var def in sortedDefinitions)
-        {
-            TMP_Dropdown.OptionData option = new TMP_Dropdown.OptionData();
-            option.text = def.displayName;
-            option.image = def.thumbnail;
-            options.Add(option);
-        }
-
-        nodeDropdown.ClearOptions();
-        nodeDropdown.AddOptions(options);
-
-        nodeDropdown.onValueChanged.RemoveAllListeners();
-        nodeDropdown.onValueChanged.AddListener((selectedIndex) => {
-            OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions);
-        });
-
-        RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            dropdownRect.parent as RectTransform, eventData.position,
-            _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera,
-            out Vector2 localPos);
-        dropdownRect.localPosition = localPos;
-
-        nodeDropdown.gameObject.SetActive(true);
-
-        try {
-            nodeDropdown.Show();
-        } catch (System.NullReferenceException nre) {
-             Debug.LogError($"[NodeEditorGridController] NRE calling nodeDropdown.Show()! Check Dropdown setup ('{nodeDropdown.gameObject.name}').\nError: {nre.Message}\n{nre.StackTrace}", nodeDropdown.gameObject);
-             nodeDropdown.gameObject.SetActive(false);
-             return;
-        }
-
-        nodeDropdown.value = 0;
-        nodeDropdown.RefreshShownValue();
+{
+    // **Error Prevention:** Double-check dropdown and library existence
+    if (nodeDropdown == null) {
+        Debug.LogError("[NodeEditorGridController] Dropdown is null!");
+        return;
     }
+     if (definitionLibrary == null || definitionLibrary.definitions == null) {
+         Debug.LogError("[NodeEditorGridController] Definition Library is null or empty!");
+         return;
+     }
+    // **Error Prevention:** Check if dropdown template exists (Can't check if inactive, but good practice if active)
+    // if (nodeDropdown.gameObject.activeInHierarchy && nodeDropdown.template == null) {
+    //      Debug.LogError("[NodeEditorGridController] Dropdown 'Template' is not assigned or is missing! Check the Dropdown GameObject in the Inspector.", nodeDropdown.gameObject);
+    //      return;
+    // }
+
+    // --- Build Options (Code Unchanged) ---
+    List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+    options.Add(new TMP_Dropdown.OptionData("Select Node..."));
+    var sortedDefinitions = definitionLibrary.definitions
+                                .Where(def => def != null)
+                                .OrderBy(def => def.displayName)
+                                .ToList();
+    foreach (var def in sortedDefinitions)
+    {
+        TMP_Dropdown.OptionData option = new TMP_Dropdown.OptionData();
+        option.text = def.displayName;
+        option.image = def.thumbnail;
+        options.Add(option);
+    }
+    nodeDropdown.ClearOptions();
+    nodeDropdown.AddOptions(options);
+
+    // --- Setup Listener (Code Unchanged) ---
+    nodeDropdown.onValueChanged.RemoveAllListeners();
+    nodeDropdown.onValueChanged.AddListener((selectedIndex) => {
+        OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions);
+    });
+
+    // --- Position Dropdown (Code Unchanged) ---
+    RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
+    RectTransformUtility.ScreenPointToLocalPointInRectangle(
+        dropdownRect.parent as RectTransform, eventData.position,
+        _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera,
+        out Vector2 localPos);
+    dropdownRect.localPosition = localPos;
+
+
+    // --- Activate and Show ---
+    // 1. Ensure the GameObject is active BEFORE trying to Show()
+    if (!nodeDropdown.gameObject.activeSelf) // Check if inactive
+    {
+         // Debug.Log("Activating Dropdown GameObject.");
+        nodeDropdown.gameObject.SetActive(true);
+    }
+
+    // 2. Now call Show()
+    try {
+        // Debug.Log("Calling Dropdown.Show()");
+        nodeDropdown.Show(); // Force the dropdown list to open
+    } catch (System.NullReferenceException nre) {
+         Debug.LogError($"[NodeEditorGridController] NRE calling nodeDropdown.Show()! Check Dropdown setup ('{nodeDropdown.gameObject.name}'). Is its 'Template' assigned?\nError: {nre.Message}\n{nre.StackTrace}", nodeDropdown.gameObject);
+         // Optionally hide it again if Show() failed
+         // nodeDropdown.gameObject.SetActive(false);
+         return;
+    }
+    // --- End of Show() call ---
+
+    // 3. Reset value AFTER showing (so it shows the placeholder)
+    nodeDropdown.value = 0;
+    nodeDropdown.RefreshShownValue();
+}
 
     private void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefs)
     {
-        nodeDropdown.gameObject.SetActive(false);
+        // Hide dropdown immediately after a value is chosen or list is closed
+        if (nodeDropdown != null) nodeDropdown.gameObject.SetActive(false);
+
         if (selectedIndex > 0)
         {
             int definitionIndex = selectedIndex - 1;
@@ -193,7 +238,7 @@ public class NodeEditorGridController : MonoBehaviour
             {
                 NodeDefinition selectedDef = sortedDefs[definitionIndex];
                 targetCell.AssignNode(selectedDef);
-                NodeCell.SelectCell(targetCell); // Select the cell (which highlights the node inside)
+                NodeCell.SelectCell(targetCell);
                 RefreshGraph();
             }
         }
@@ -277,15 +322,28 @@ public class NodeEditorGridController : MonoBehaviour
 
     private NodeCell FindCellAtScreenPosition(Vector2 screenPosition)
     {
+        NodeCell foundCell = null; // Keep track of found cell
         foreach (var cell in nodeCells)
         {
             RectTransform cellRect = cell.GetComponent<RectTransform>();
-            if (RectTransformUtility.RectangleContainsScreenPoint(cellRect, screenPosition, _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera))
+            bool contains = RectTransformUtility.RectangleContainsScreenPoint(
+                cellRect,
+                screenPosition,
+                _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera
+            );
+
+            if (contains)
             {
-                return cell;
+                // --- Add Log ---
+                Debug.Log($"[FindCellAtScreenPosition] Screen Point {screenPosition} FOUND in Cell_{cell.CellIndex}. Pivot={cellRect.pivot}, Rect={cellRect.rect}");
+                foundCell = cell;
+                break; // Stop checking once found
             }
         }
-        return null;
+        // Optional: Log if no cell was found
+        // if(foundCell == null) Debug.Log($"[FindCellAtScreenPosition] Screen Point {screenPosition} NOT FOUND in any cell.");
+
+        return foundCell;
     }
 
      #if UNITY_EDITOR

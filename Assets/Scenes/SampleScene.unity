@@ -520,11 +520,11 @@ MonoBehaviour:
   weatherManager: {fileID: 1966203507}
   globalVolume: {fileID: 218454255}
   dayColorFilter: {r: 1, g: 1, b: 1, a: 1}
-  nightColorFilter: {r: 0.7294118, g: 0.78431374, b: 1, a: 1}
+  nightColorFilter: {r: 0.6367924, g: 0.7104867, b: 1, a: 1}
   dayPostExposure: 0
-  nightPostExposure: -1
+  nightPostExposure: -1.5
   daySaturation: 0
-  nightSaturation: -10
+  nightSaturation: -15
 --- !u!1 &239351517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1578,7 +1578,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &844052609
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2377,14 +2377,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emptyCellsCount: 8
-  cellSize: {x: 192, y: 192}
-  cellMargin: -90
-  emptyCellSprite: {fileID: 21300000, guid: 8644a9becf246d5459cafd30bb019f41, type: 3}
+  cellSize: {x: 96, y: 96}
+  cellMargin: 0
+  emptyCellSprite: {fileID: 21300000, guid: e297f30aab1496f4d89df7a80efcac6a, type: 3}
   emptyCellColor: {r: 0.14150941, g: 0.14150941, b: 0.14150941, a: 1}
   emptyCellScale: {x: 1, y: 1, z: 1}
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   nodeImageScale: {x: 1, y: 1, z: 1}
-  selectedNodeBackgroundColor: {r: 0.30042705, g: 0.8679245, b: 0.27429688, a: 0.14509805}
+  selectedNodeBackgroundColor: {r: 0.78039217, g: 0.8509804, b: 0.15686275, a: 0.9019608}
   definitionLibrary: {fileID: 11400000, guid: 11ac7fb888cbf394e81a9c81231495bd, type: 2}
   nodeDropdown: {fileID: 844052610}
   nodeExecutor: {fileID: 2010610567}
@@ -2559,8 +2559,8 @@ MonoBehaviour:
   sunIntensity: 1
   fixedSunIntensity: 1
   fadeSprite: {fileID: 1251780410}
-  minAlpha: 0.1
-  maxAlpha: 0.4
+  minAlpha: 0.2
+  maxAlpha: 0.5
 --- !u!4 &1966203508
 Transform:
   m_ObjectHideFlags: 0

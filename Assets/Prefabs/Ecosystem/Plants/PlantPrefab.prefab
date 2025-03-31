@@ -324,12 +324,8 @@ MonoBehaviour:
   maxEnergy: 0
   currentEnergy: 0
   basePhotosynthesis: 0
-  geneExecutionCooldown: 5
-  plantEffects: []
   seedCellPrefab: {fileID: 3989903528299243114, guid: 21f0696b40e6a56479873b186b3d5d93, type: 3}
   stemCellPrefab: {fileID: 3989903528299243114, guid: 43ce9b6d7b5c22d4c988dbdd224c3d5c, type: 3}
   leafCellPrefab: {fileID: 3989903528299243114, guid: bfbf2c64527183d4c95dcf83f92ee26b, type: 3}
-  flowerCellPrefab: {fileID: 3989903528299243114, guid: 60c2cb48f10b1d9488c27264470693b0, type: 3}
-  fruitCellPrefab: {fileID: 3989903528299243114, guid: 0d04f86b0bfb77e4494b03c839ea7c5d, type: 3}
-  cellSpacing: 0.08
+  cellSpacing: 0.06
   energyText: {fileID: 5767746695747064716}
