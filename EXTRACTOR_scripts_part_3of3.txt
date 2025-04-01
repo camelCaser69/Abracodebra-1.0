@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-30 04:39:01
+UNITY PROJECT SCRIPT EXPORT - 2025-04-01 04:16:33
 PART 3 OF 3
 ================================================================================
 
@@ -14,6 +14,7 @@ Assets
 ├── Editor
 │   ├── NodeDefinitionAutoAdder.cs
 │   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionEditor.cs
 │   ├── NodeDefinitionLibraryEditor.cs
 │   └── NodeDefinitionPostprocessor.cs
 ├── HueFolders
@@ -54,10 +55,10 @@ Assets
 │   │       ├── NodePics
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
+│   │       ├── NodeView.prefab
 │   │       └── ThoughtBubble.prefab
 │   └── General
 │       ├── GardenerPrefab.prefab
-│       ├── NodeView.prefab
 │       └── Projectile_Basic_Pixel.prefab
 ├── Scenes
 │   ├── MainScene.unity
@@ -73,9 +74,7 @@ Assets
 │   └── Nodes Plant
 │       ├── NodeDefinitionLibrary.asset
 │       ├── Node_000_Seed.asset
-│       ├── Node_003_Output.asset
-│       ├── Node_004_ManaSource.asset
-│       └── Node_005_DamageNode.asset
+│       └── Node_000_Seed_Solo.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -114,6 +113,7 @@ Assets
 │   │   │   └── NodeGraph.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
+│   │       ├── DeselectOnClickOutside.cs
 │   │       ├── NodeCell.cs
 │   │       ├── NodeDraggable.cs
 │   │       ├── NodeEditorGridController.cs
@@ -144,6 +144,508 @@ SCRIPT CONTENTS
 ================================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeDraggable.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+[RequireComponent(typeof(RectTransform))]
+public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+{
+    private RectTransform _rectTransform;
+    private CanvasGroup _canvasGroup;
+    private Vector2 _originalAnchoredPosition;
+    private Transform _originalParent;
+    private NodeCell _originalCell;
+    private NodeEditorGridController _gridController;
+    private Canvas _rootCanvas;
+
+    // No _isDragging flag needed if managed carefully by events
+
+    public NodeCell OriginalCell => _originalCell;
+
+    void Awake()
+    {
+        _rectTransform = GetComponent<RectTransform>();
+        _canvasGroup = GetComponent<CanvasGroup>();
+        if (_canvasGroup == null)
+        {
+            _canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
+        // CRITICAL: Default state MUST allow interactions (clicks, hovers)
+        _canvasGroup.blocksRaycasts = true;
+        _canvasGroup.alpha = 1f; // Ensure fully visible
+    }
+
+    public void Initialize(NodeEditorGridController controller, NodeCell startingCell)
+    {
+        _gridController = controller;
+        _originalCell = startingCell;
+        _rootCanvas = GetComponentInParent<Canvas>()?.rootCanvas;
+        if (_rootCanvas == null) Debug.LogError("[NodeDraggable] Could not find root Canvas!");
+
+        // Ensure initial state after initialization
+        if (_canvasGroup != null) {
+             _canvasGroup.blocksRaycasts = true;
+             _canvasGroup.alpha = 1f;
+        }
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+        if (_gridController == null || _rootCanvas == null) return;
+
+        _originalParent = transform.parent;
+        _originalCell = _originalParent?.GetComponent<NodeCell>();
+        _originalAnchoredPosition = _rectTransform.anchoredPosition;
+
+        // Become transparent and STOP blocking raycasts so underlying cells can be detected
+        _canvasGroup.alpha = 0.6f;
+        _canvasGroup.blocksRaycasts = false;
+
+        // Reparent for top rendering
+        transform.SetParent(_rootCanvas.transform, true);
+        transform.SetAsLastSibling();
+         // Debug.Log($"[NodeDraggable OnBeginDrag] Started drag. blocksRaycasts: {_canvasGroup.blocksRaycasts}", gameObject);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        // Only process drag if it's the left button and dragging is conceptually active (raycasts blocked)
+        if (eventData.button != PointerEventData.InputButton.Left || _canvasGroup == null || _canvasGroup.blocksRaycasts) return;
+        if (_gridController == null || _rootCanvas == null) return;
+
+        // Move logic (unchanged)
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+             _rootCanvas.transform as RectTransform, eventData.position,
+             _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 currentLocalPoint);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _rootCanvas.transform as RectTransform, eventData.position - eventData.delta,
+            _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 previousLocalPoint);
+        Vector2 localDelta = currentLocalPoint - previousLocalPoint;
+        _rectTransform.localPosition += (Vector3)localDelta;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+         // Debug.Log($"[NodeDraggable OnEndDrag] Drag ended. Button: {eventData.button}", gameObject);
+
+        // Ensure visuals and raycast blocking are reset REGARDLESS of button, BEFORE handling drop
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true; // CRITICAL: Re-enable raycasts immediately
+             // Debug.Log($"--> Reset alpha and blocksRaycasts to: {_canvasGroup.blocksRaycasts}");
+        }
+
+        // Only handle the drop logic if the drag was initiated by the left button
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            if (_gridController != null) {
+                _gridController.HandleNodeDrop(this, _originalCell, eventData.position);
+            } else {
+                 // No controller, attempt reset
+                 ResetPosition();
+            }
+        }
+        else
+        {
+             // If drag ended via another button (unlikely but possible), ensure reset
+             ResetPosition();
+        }
+    }
+
+    public void ResetPosition()
+    {
+        // Debug.Log($"[NodeDraggable ResetPosition] Resetting {gameObject.name}", gameObject);
+        // Reset parent and position
+        transform.SetParent(_originalParent, false);
+        _rectTransform.anchoredPosition = _originalAnchoredPosition;
+        _originalCell = _originalParent?.GetComponent<NodeCell>(); // Update cell ref
+
+        // Ensure visuals and raycasts are correct after reset
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+        }
+
+        // Update parent cell reference on the NodeView
+        NodeView view = GetComponent<NodeView>();
+        view?.UpdateParentCellReference();
+    }
+
+    public void SnapToCell(NodeCell targetCell)
+    {
+        // Debug.Log($"[NodeDraggable SnapToCell] Snapping {gameObject.name} to Cell {targetCell?.CellIndex}", gameObject);
+        if (targetCell == null) { ResetPosition(); return; }
+
+        // Set Parent and Position
+        transform.SetParent(targetCell.transform, false);
+        _rectTransform.anchoredPosition = Vector2.zero;
+
+        // Update Internal Draggable References
+        _originalParent = targetCell.transform;
+        _originalCell = targetCell;
+        _originalAnchoredPosition = Vector2.zero;
+
+        // Ensure visuals and raycasts are correct after snap
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+        }
+
+        // Update the NodeView's parent reference
+        NodeView view = GetComponent<NodeView>();
+        view?.UpdateParentCellReference();
+    }
+
+    // OnDisable might not be strictly needed now but can be kept as safety
+    void OnDisable()
+    {
+        // If it was disabled mid-drag (blocksRaycasts == false), reset state
+        if (_canvasGroup != null && !_canvasGroup.blocksRaycasts)
+        {
+             Debug.LogWarning($"[NodeDraggable] Disabled while dragging {gameObject.name}. Resetting CanvasGroup.", gameObject);
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+            // Resetting position might be desired but complex here, ensure visuals are ok.
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeEditorGridController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using TMPro;
+using System.Linq;
+
+[RequireComponent(typeof(RectTransform))]
+public class NodeEditorGridController : MonoBehaviour
+{
+    public static NodeEditorGridController Instance { get; private set; }
+
+    [Header("Grid Layout & Appearance")]
+    [SerializeField][Min(1)] private int emptyCellsCount = 8;
+    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
+    [SerializeField] private float cellMargin = 10f;
+
+    [Header("Empty Cell Visuals")]
+    [SerializeField] private Sprite emptyCellSprite;
+    [SerializeField] private Color emptyCellColor = Color.white;
+    [SerializeField] private Vector3 emptyCellScale = Vector3.one;
+
+    [Header("Node Visuals")]
+    [SerializeField] private GameObject nodeViewPrefab;
+    [SerializeField] private Vector3 nodeImageScale = Vector3.one;
+    [SerializeField] private Color selectedNodeBackgroundColor = new Color(0.9f, 0.9f, 0.7f, 1f);
+
+    [Header("Node Definitions & Interaction")]
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
+    [SerializeField] private TMP_Dropdown nodeDropdown;
+
+    // REMOVED: The direct reference to NodeExecutor is no longer needed here.
+    // The NodeExecutor script will find this controller via Instance or assignment.
+    // [Header("Execution")]
+    // [SerializeField] private NodeExecutor nodeExecutor;
+
+    [Header("UI Toggle")]
+    [SerializeField] private GameObject gridUIParent;
+
+
+    private List<NodeCell> nodeCells = new List<NodeCell>();
+    private RectTransform _rectTransform;
+    private Canvas _rootCanvas;
+    private NodeGraph _uiGraphRepresentation = new NodeGraph(); // Internal storage
+
+
+    public GameObject NodeViewPrefab => nodeViewPrefab;
+    public Vector3 NodeImageScale => nodeImageScale;
+    public NodeDefinitionLibrary DefinitionLibrary => definitionLibrary;
+    public Color SelectedNodeBackgroundColor => selectedNodeBackgroundColor;
+    public Color EmptyCellColor => emptyCellColor;
+    public NodeGraph GetCurrentUIGraph() => _uiGraphRepresentation; // Public getter for NodeExecutor
+
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+
+        _rectTransform = GetComponent<RectTransform>();
+        _rootCanvas = GetComponentInParent<Canvas>();
+        if (_rootCanvas == null) Debug.LogError("...");
+        if (gridUIParent == null) Debug.LogWarning("...");
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
+
+    void Start()
+    {
+        if (nodeDropdown != null) nodeDropdown.gameObject.SetActive(false);
+        else Debug.LogWarning("...");
+        if (definitionLibrary == null) Debug.LogError("...");
+
+        CreateCells();
+        RefreshGraph();
+    }
+
+    private void CreateCells()
+    {
+        foreach (Transform child in transform) { if (child.gameObject != this.gameObject && child.GetComponent<NodeEditorGridController>() == null) Destroy(child.gameObject); }
+        nodeCells.Clear();
+        NodeCell.ClearSelection();
+
+        float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
+        float startX = -(totalWidth / 2f);
+        float startY = -(cellSize.y / 2f);
+
+        for (int i = 0; i < emptyCellsCount; i++)
+        {
+            GameObject cellGO = new GameObject($"Cell_{i}");
+            RectTransform rt = cellGO.AddComponent<RectTransform>();
+            cellGO.transform.SetParent(transform, false);
+            rt.sizeDelta = cellSize;
+            rt.anchorMin = new Vector2(0.5f, 0.5f); rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0f, 0f); // Using bottom-left pivot
+            float xPos = startX + i * (cellSize.x + cellMargin);
+            float yPos = startY;
+            rt.anchoredPosition = new Vector2(xPos, yPos);
+
+            Image cellImage = cellGO.AddComponent<Image>();
+            cellImage.sprite = emptyCellSprite;
+            cellImage.color = emptyCellColor;
+            cellImage.raycastTarget = true;
+            // rt.localScale = emptyCellScale; // Keep commented out
+
+            NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
+            cellLogic.Init(i, this, cellImage);
+            nodeCells.Add(cellLogic);
+        }
+    }
+
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab)) ToggleGridUI();
+        if (Input.GetKeyDown(KeyCode.Delete)) { if (NodeCell.CurrentlySelectedCell != null) { NodeCell selected = NodeCell.CurrentlySelectedCell; selected.RemoveNode(); RefreshGraph(); } }
+        if (Input.GetKeyDown(KeyCode.Escape)) { if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown(); }
+    }
+
+    public void ToggleGridUI()
+    {
+        if (gridUIParent != null) { bool currentState = gridUIParent.activeSelf; gridUIParent.SetActive(!currentState); if (!gridUIParent.activeSelf && nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown(); if (!gridUIParent.activeSelf) NodeCell.ClearSelection(); }
+        else Debug.LogWarning("...");
+    }
+
+    public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
+    {
+        if (nodeDropdown == null) { Debug.LogError("..."); return; }
+        if (definitionLibrary == null || definitionLibrary.definitions == null) { Debug.LogError("..."); return; }
+
+        StopCoroutine("ShowDropdownCoroutine");
+        StartCoroutine(ShowDropdownCoroutine(cell, eventData));
+    }
+
+    private IEnumerator ShowDropdownCoroutine(NodeCell cell, PointerEventData eventData)
+    {
+        // Build Options
+        List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+        options.Add(new TMP_Dropdown.OptionData("Select Node..."));
+        var sortedDefinitions = definitionLibrary.definitions.Where(def => def != null).OrderBy(def => def.displayName).ToList();
+        foreach (var def in sortedDefinitions) { TMP_Dropdown.OptionData option = new TMP_Dropdown.OptionData(); option.text = def.displayName; option.image = def.thumbnail; options.Add(option); }
+        nodeDropdown.ClearOptions(); nodeDropdown.AddOptions(options);
+
+        // Setup Listener
+        nodeDropdown.onValueChanged.RemoveAllListeners();
+        nodeDropdown.onValueChanged.AddListener((selectedIndex) => { OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions); });
+
+        // Position
+        RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(dropdownRect.parent as RectTransform, eventData.position, _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 localPos);
+        dropdownRect.localPosition = localPos;
+
+        // Activate
+        if (!nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(true);
+
+        // Wait
+        yield return null;
+
+        // Show
+        try {
+            if (nodeDropdown.template == null) { Debug.LogError("..."); HideDropdown(); yield break; }
+            nodeDropdown.Show();
+        } catch (System.NullReferenceException nre) { Debug.LogError($"... NRE Show() ... {nre.Message}", nodeDropdown.gameObject); HideDropdown(); yield break; }
+
+        nodeDropdown.value = 0; nodeDropdown.RefreshShownValue();
+    }
+
+
+    private void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefs)
+    {
+        HideDropdown();
+
+        if (selectedIndex > 0) {
+            int definitionIndex = selectedIndex - 1;
+            if (definitionIndex >= 0 && definitionIndex < sortedDefs.Count) {
+                NodeDefinition selectedDef = sortedDefs[definitionIndex];
+                targetCell.AssignNode(selectedDef);
+                NodeCell.SelectCell(targetCell);
+                RefreshGraph(); // Refresh UI graph representation
+            }
+        }
+    }
+
+    public void HideDropdown()
+    {
+        if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(false);
+    }
+
+
+    public void RefreshGraph()
+    {
+        if (_uiGraphRepresentation == null) _uiGraphRepresentation = new NodeGraph();
+        _uiGraphRepresentation.nodes.Clear();
+        foreach (var cell in nodeCells.OrderBy(c => c.CellIndex))
+        {
+            NodeData data = cell.GetNodeData();
+            if (data != null)
+            {
+                data.orderIndex = cell.CellIndex;
+                _uiGraphRepresentation.nodes.Add(data);
+            }
+        }
+    }
+
+
+    public bool HandleNodeDrop(NodeDraggable draggedDraggable, NodeCell originalCell, Vector2 screenPosition)
+    {
+        NodeCell targetCell = FindCellAtScreenPosition(screenPosition);
+        bool changed = false;
+
+        if (targetCell != null && originalCell != null)
+        {
+            NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
+            NodeData draggedData = draggedView?.GetNodeData();
+
+            if (draggedView == null || draggedData == null) { draggedDraggable.ResetPosition(); return false; }
+            if (targetCell == originalCell) { draggedDraggable.ResetPosition(); NodeCell.SelectCell(targetCell); return true; }
+
+            NodeView existingViewInTarget = targetCell.GetNodeView();
+            NodeData existingDataInTarget = targetCell.GetNodeData();
+
+            NodeCell.ClearSelection();
+            originalCell.ClearNodeReference();
+
+            if (existingViewInTarget != null && existingDataInTarget != null)
+            {
+                NodeDraggable existingDraggable = existingViewInTarget.GetComponent<NodeDraggable>();
+                originalCell.AssignNodeView(existingViewInTarget, existingDataInTarget);
+                if (existingDraggable != null) existingDraggable.SnapToCell(originalCell);
+            }
+
+            targetCell.AssignNodeView(draggedView, draggedData);
+            draggedDraggable.SnapToCell(targetCell);
+
+            NodeCell.SelectCell(targetCell);
+            changed = true;
+        }
+        else
+        {
+            draggedDraggable.ResetPosition();
+            if (originalCell != null && originalCell.HasNode()) { NodeCell.SelectCell(originalCell); }
+            else { NodeCell.ClearSelection(); }
+        }
+
+        if (changed) RefreshGraph(); // Refresh UI graph representation
+
+        return changed;
+    }
+
+
+    private NodeCell FindCellAtScreenPosition(Vector2 screenPosition)
+    {
+        NodeCell foundCell = null;
+        foreach (var cell in nodeCells)
+        {
+            RectTransform cellRect = cell.GetComponent<RectTransform>();
+            bool contains = RectTransformUtility.RectangleContainsScreenPoint(cellRect, screenPosition, _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera );
+            if (contains) { foundCell = cell; break; }
+        }
+        return foundCell;
+    }
+
+
+     #if UNITY_EDITOR
+     void OnDrawGizmos()
+     {
+         if (!Application.isPlaying && TryGetComponent<RectTransform>(out var rt))
+         {
+             Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
+             Vector3 center = rt.position;
+             float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
+             float startX_for_gizmo;
+             if(rt.pivot == Vector2.zero) startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f);
+             else startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f);
+
+             for (int i = 0; i < emptyCellsCount; i++)
+             {
+                 float xOffset = startX_for_gizmo + i * (cellSize.x + cellMargin);
+                 Vector3 cellCenterWorld = center + (Vector3)(rt.rotation * new Vector3(xOffset * rt.lossyScale.x, 0, 0) );
+                 Vector3 gizmoSize = new Vector3(cellSize.x * rt.lossyScale.x, cellSize.y * rt.lossyScale.y, 0.1f);
+                 Matrix4x4 rotationMatrix = Matrix4x4.TRS(cellCenterWorld, rt.rotation, Vector3.one);
+                 Gizmos.matrix = rotationMatrix;
+                 Gizmos.DrawWireCube(Vector3.zero, gizmoSize);
+                 Gizmos.matrix = Matrix4x4.identity;
+             }
+         }
+     }
+     #endif
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeSelectable.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+
+public class NodeSelectable : MonoBehaviour, IPointerClickHandler
+{
+    public static GameObject CurrentSelected { get; set; }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        Select(gameObject);
+    }
+
+    public static void Select(GameObject node)
+    {
+        if (CurrentSelected != null && CurrentSelected != node)
+        {
+            // (Optional) Remove highlight from previously selected node.
+        }
+        CurrentSelected = node;
+        // (Optional) Add highlight effect here.
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeView.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
@@ -151,74 +653,101 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System.Text;
 
-public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+[RequireComponent(typeof(RectTransform))]
+public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
-    [Header("UI Elements")]
-    public Image thumbnailImage;
-    public Image backgroundImage;
-    public GameObject tooltipPanel;
-    public TMP_Text tooltipText;
+    // --- Fields remain the same ---
+    [Header("UI Elements (Assign in Prefab)")]
+    [SerializeField] private Image thumbnailImage;
+    [SerializeField] private Image backgroundImage;
+    [SerializeField] private GameObject tooltipPanel;
+    [SerializeField] private TMP_Text tooltipText;
+    [SerializeField] private TMP_Text nodeNameText;
+    [Header("Configuration")]
+    [SerializeField] private bool displayNodeName = false;
 
-    [Header("Node Name Display")]
-    public TMP_Text nodeNameText;
-    [Tooltip("If false, the node name text will be hidden.")]
-    public bool displayNodeName = true;
+    private NodeData _nodeData;
+    private NodeDefinition _nodeDefinition;
+    private NodeEditorGridController _controller;
+    private NodeCell _parentCell;
+    private Color _originalBackgroundColor;
 
-    private NodeData nodeData;
-    private string nodeDescription;
-    private List<NodeEffectData> nodeEffects;
-
-    public void Initialize(NodeData data, Sprite thumbnail, Color bgColor, string description, List<NodeEffectData> effects)
-    {
-        nodeData = data;
-        nodeDescription = description;
-        nodeEffects = effects;
-
-        if (thumbnailImage != null)
-            thumbnailImage.sprite = thumbnail;
-        if (backgroundImage != null)
-            backgroundImage.color = bgColor;
-        if (tooltipPanel != null)
-            tooltipPanel.SetActive(false);
-        if (nodeNameText != null)
-        {
-            nodeNameText.text = data.nodeDisplayName;
-            nodeNameText.gameObject.SetActive(displayNodeName);
-        }
+    // --- Initialize, UpdateParentCellReference, Getters, Highlight, Unhighlight remain the same ---
+     public void Initialize(NodeData data, NodeDefinition definition, NodeEditorGridController controller)
+    { /* ... as before ... */
+         _nodeData = data; _nodeDefinition = definition; _controller = controller;
+         UpdateParentCellReference();
+         if (_nodeData == null || _nodeDefinition == null || _controller == null || _parentCell == null) { gameObject.SetActive(false); return; }
+         if (thumbnailImage != null) { thumbnailImage.sprite = _nodeDefinition.thumbnail; thumbnailImage.color = _nodeDefinition.thumbnailTintColor; thumbnailImage.rectTransform.localScale = _controller.NodeImageScale; thumbnailImage.enabled = (thumbnailImage.sprite != null); if (!thumbnailImage.raycastTarget) thumbnailImage.raycastTarget = true; }
+         if (backgroundImage != null) { _originalBackgroundColor = _nodeDefinition.backgroundColor; backgroundImage.color = _originalBackgroundColor; backgroundImage.enabled = true; if (!backgroundImage.raycastTarget) backgroundImage.raycastTarget = true; }
+         if (tooltipPanel != null) tooltipPanel.SetActive(false);
+         if (nodeNameText != null) { nodeNameText.text = _nodeData.nodeDisplayName; nodeNameText.gameObject.SetActive(displayNodeName); }
     }
+     public void UpdateParentCellReference() { _parentCell = GetComponentInParent<NodeCell>(); /* ... null check ... */ }
+     public NodeData GetNodeData() => _nodeData;
+     public NodeDefinition GetNodeDefinition() => _nodeDefinition;
+     public NodeCell GetParentCell() => _parentCell;
+     public void Highlight() { if (backgroundImage != null && _controller != null) backgroundImage.color = _controller.SelectedNodeBackgroundColor; }
+     public void Unhighlight() { if (backgroundImage != null) backgroundImage.color = _originalBackgroundColor; }
 
-    public NodeData GetNodeData() => nodeData;
 
+    // --- Tooltip Handling with Logging ---
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (tooltipPanel != null && tooltipText != null)
+        // --- Add Log ---
+        Debug.Log($"[NodeView OnPointerEnter] Fired on {gameObject.name}. Tooltip Panel assigned: {tooltipPanel != null}", gameObject);
+
+        // Ensure the CanvasGroup allows raycasts IF it exists
+        CanvasGroup cg = GetComponent<CanvasGroup>();
+        if (cg != null && cg.blocksRaycasts == false)
         {
-            tooltipPanel.SetActive(true);
-            string tip = $"{nodeData.nodeDisplayName}\n{nodeDescription}\nEffects:\n";
-            foreach (var eff in nodeEffects)
-            {
-                tip += $"- {eff.effectType}: {eff.primaryValue}";
-                if (eff.secondaryValue != 0)
-                    tip += $" / {eff.secondaryValue}";
-                tip += "\n";
-            }
-            tooltipText.text = tip;
+             Debug.LogWarning($"--> PointerEnter detected but CanvasGroup is blocking raycasts! Drag state might be stuck?", gameObject);
+             // Optionally force it: cg.blocksRaycasts = true;
         }
+
+
+        if (tooltipPanel != null && tooltipText != null && _nodeDefinition != null && _nodeData != null)
+        {
+            // --- Add Log ---
+            // Debug.Log("--> Activating Tooltip Panel");
+            tooltipPanel.SetActive(true);
+            tooltipText.text = BuildTooltipString();
+        }
+         else if (tooltipPanel == null) {
+             // Debug.LogWarning("--> Tooltip Panel is not assigned in Inspector.", gameObject);
+         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        // --- Add Log ---
+        // Debug.Log($"[NodeView OnPointerExit] Fired on {gameObject.name}", gameObject);
+
         if (tooltipPanel != null)
+        {
+             // Debug.Log("--> Deactivating Tooltip Panel");
             tooltipPanel.SetActive(false);
+        }
     }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        // Implement selection logic here if needed.
+    // --- Pointer Down remains the same ---
+    public void OnPointerDown(PointerEventData eventData) { /* ... as before ... */
+         // Debug.Log($"[NodeView OnPointerDown] Fired on: {gameObject.name} in Cell: {_parentCell?.CellIndex} | Button: {eventData.button}", gameObject);
+        if (eventData.button == PointerEventData.InputButton.Left) {
+            if (_parentCell != null) {
+                 // Debug.Log($"--> Left Click Confirmed. Requesting SelectCell for {_parentCell.CellIndex}");
+                NodeCell.SelectCell(_parentCell);
+            } else { UpdateParentCellReference(); if (_parentCell != null) NodeCell.SelectCell(_parentCell); else Debug.LogError("[NodeView] ParentCell null on PointerDown!", gameObject); }
+        }
     }
+
+    // --- BuildTooltipString remains the same ---
+    private string BuildTooltipString() { /* ... as before ... */
+         StringBuilder sb = new StringBuilder(); sb.Append("<b>").Append(_nodeData.nodeDisplayName).Append("</b>\n"); if (!string.IsNullOrEmpty(_nodeDefinition.description)) sb.Append(_nodeDefinition.description).Append("\n"); if (_nodeData.effects != null && _nodeData.effects.Count > 0) { sb.Append("<i>Effects:</i>\n"); foreach (var eff in _nodeData.effects) { sb.Append("- ").Append(eff.effectType.ToString()).Append(": "); sb.Append(eff.primaryValue.ToString("G3")); if (eff.secondaryValue != 0) sb.Append(" / ").Append(eff.secondaryValue.ToString("G3")); sb.Append("\n"); } } return sb.ToString().TrimEnd();
+     }
 }
-
 
 
 

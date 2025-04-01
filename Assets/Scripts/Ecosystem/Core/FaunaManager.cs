@@ -29,7 +29,7 @@ public class FaunaManager : MonoBehaviour
         }
     }
 
-    private void Update()
+        private void Update()
     {
         if (continuousSpawn)
         {
@@ -42,17 +42,30 @@ public class FaunaManager : MonoBehaviour
                 int currentCount = 0;
                 if (ecosystemParent != null && spawnData.animalDefinition != null && !string.IsNullOrEmpty(spawnData.animalDefinition.animalName))
                 {
+                    // Try finding the dedicated parent first (more efficient if structure is maintained)
                     Transform speciesParent = ecosystemParent.Find(spawnData.animalDefinition.animalName);
                     if (speciesParent != null)
                         currentCount = speciesParent.childCount;
+                    else {
+                        // Fallback if species parent doesn't exist yet, count all matching animals
+                        // Use FindObjectsByType for modern Unity versions - faster as we don't need sorting
+                        AnimalController[] allAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+                        currentCount = 0; // Reset count before iterating through found animals
+                        foreach (var a in allAnimals)
+                        {
+                            if (a != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName))
+                                currentCount++;
+                        }
+                    }
                 }
-                else
+                else // Fallback if no ecosystem parent or definition name
                 {
-                    AnimalController[] allAnimals = FindObjectsOfType<AnimalController>();
+                     // Use FindObjectsByType for modern Unity versions - faster as we don't need sorting
+                    AnimalController[] allAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None); // <--- THIS LINE IS UPDATED
                     currentCount = 0;
                     foreach (var a in allAnimals)
                     {
-                        if (a != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName))
+                        if (a != null && spawnData.animalDefinition != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName)) // Added null check for spawnData.animalDefinition
                             currentCount++;
                     }
                 }
@@ -67,7 +80,8 @@ public class FaunaManager : MonoBehaviour
                     float effectiveCooldown = globalSpawnCooldown / spawnData.spawnRateMultiplier;
                     Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
                     SpawnAnimal(spawnData.animalDefinition, spawnCenter + randomOffset);
-                    spawnData.spawnTimer = effectiveCooldown;
+                    // Reset timer only AFTER successful spawn attempt potentially
+                    spawnData.spawnTimer = effectiveCooldown > 0 ? effectiveCooldown : float.PositiveInfinity; // Prevent division by zero/negative cooldowns
                 }
             }
         }

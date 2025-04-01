@@ -781,6 +781,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GardenerPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 3865789443703534087, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2387,7 +2391,7 @@ MonoBehaviour:
   selectedNodeBackgroundColor: {r: 0.78039217, g: 0.8509804, b: 0.15686275, a: 0.9019608}
   definitionLibrary: {fileID: 11400000, guid: 11ac7fb888cbf394e81a9c81231495bd, type: 2}
   nodeDropdown: {fileID: 844052610}
-  nodeExecutor: {fileID: 2010610567}
+  gridUIParent: {fileID: 1615779378}
 --- !u!1 &1692015254
 GameObject:
   m_ObjectHideFlags: 0
@@ -2623,11 +2627,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2811072df39f4781a57f0c5f929d0445, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentGraph:
-    nodes: []
-  debugOutput: {fileID: 42977317}
+  nodeEditorGrid: {fileID: 1615779386}
   plantPrefab: {fileID: 8982947048272063882, guid: 9838d74874e76024ca01e8e531645f18, type: 3}
   gardener: {fileID: 1143150342}
+  debugOutput: {fileID: 42977317}
 --- !u!1 &2128026155
 GameObject:
   m_ObjectHideFlags: 0

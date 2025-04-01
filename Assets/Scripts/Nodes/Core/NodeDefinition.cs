@@ -28,12 +28,12 @@ public class NodeDefinition : ScriptableObject
 
         foreach (var eff in effects)
         {
-            // Perform a shallow copy, assuming NodeEffectData is simple enough
             NodeEffectData newEff = new NodeEffectData()
             {
                 effectType = eff.effectType,
                 primaryValue = eff.primaryValue,
-                secondaryValue = eff.secondaryValue
+                secondaryValue = eff.secondaryValue,
+                isPassive = eff.isPassive  // Add this line to copy the flag
             };
             copy.Add(newEff);
         }

@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-03-30 04:39:01
+UNITY PROJECT SCRIPT EXPORT - 2025-04-01 04:16:33
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -14,6 +14,7 @@ Assets
 ├── Editor
 │   ├── NodeDefinitionAutoAdder.cs
 │   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionEditor.cs
 │   ├── NodeDefinitionLibraryEditor.cs
 │   └── NodeDefinitionPostprocessor.cs
 ├── HueFolders
@@ -54,10 +55,10 @@ Assets
 │   │       ├── NodePics
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
+│   │       ├── NodeView.prefab
 │   │       └── ThoughtBubble.prefab
 │   └── General
 │       ├── GardenerPrefab.prefab
-│       ├── NodeView.prefab
 │       └── Projectile_Basic_Pixel.prefab
 ├── Scenes
 │   ├── MainScene.unity
@@ -73,9 +74,7 @@ Assets
 │   └── Nodes Plant
 │       ├── NodeDefinitionLibrary.asset
 │       ├── Node_000_Seed.asset
-│       ├── Node_003_Output.asset
-│       ├── Node_004_ManaSource.asset
-│       └── Node_005_DamageNode.asset
+│       └── Node_000_Seed_Solo.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -114,6 +113,7 @@ Assets
 │   │   │   └── NodeGraph.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
+│   │       ├── DeselectOnClickOutside.cs
 │   │       ├── NodeCell.cs
 │   │       ├── NodeDraggable.cs
 │   │       ├── NodeEditorGridController.cs
@@ -268,6 +268,61 @@ public static class NodeDefinitionCreator
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Editor\NodeDefinitionEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEditor;
+using UnityEngine;
+
+[CustomEditor(typeof(NodeDefinition))]
+public class NodeDefinitionEditor : Editor
+{
+    // Serialized properties for all the fields in NodeDefinition
+    SerializedProperty displayName;
+    SerializedProperty description;
+    SerializedProperty thumbnail;
+    SerializedProperty thumbnailTintColor;
+    SerializedProperty backgroundColor;
+    SerializedProperty nodeViewPrefab;
+    SerializedProperty effects;
+
+    private void OnEnable()
+    {
+        displayName = serializedObject.FindProperty("displayName");
+        description = serializedObject.FindProperty("description");
+        thumbnail = serializedObject.FindProperty("thumbnail");
+        thumbnailTintColor = serializedObject.FindProperty("thumbnailTintColor");
+        backgroundColor = serializedObject.FindProperty("backgroundColor");
+        nodeViewPrefab = serializedObject.FindProperty("nodeViewPrefab");
+        effects = serializedObject.FindProperty("effects");
+    }
+
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
+
+        // "Display" section
+        EditorGUILayout.LabelField("Display", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(displayName);
+        EditorGUILayout.PropertyField(description);
+        EditorGUILayout.PropertyField(thumbnail);
+        EditorGUILayout.PropertyField(thumbnailTintColor);
+        EditorGUILayout.PropertyField(backgroundColor);
+
+        EditorGUILayout.Space();
+
+        // "Prefab & Effects" section
+        EditorGUILayout.LabelField("Prefab & Effects", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(nodeViewPrefab);
+
+        // Draw the effects field with a minimum height
+        EditorGUILayout.PropertyField(effects, new GUIContent("Effects"), true, GUILayout.MinHeight(1300f));
+
+        serializedObject.ApplyModifiedProperties();
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Editor\NodeDefinitionLibraryEditor.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
@@ -386,261 +441,464 @@ public class NodeDefinitionPostprocessor : AssetPostprocessor
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using TMPro;
+using TMPro; // If using TextMeshPro for UI later
 
+// --- MOVED ENUM DEFINITION OUTSIDE THE CLASS ---
 public enum PlantCellType
 {
     Seed,
     Stem,
     Leaf,
-    Flower,
-    Fruit
+    Flower, // Added for potential future use
+    Fruit   // Added for potential future use
+}
+// ---------------------------------------------
+
+// Define Plant States
+public enum PlantState
+{
+    Initializing,
+    Growing,
+    Mature_Idle, // Waiting for cooldown
+    Mature_Executing // Running the node chain effects
 }
 
 public class PlantGrowth : MonoBehaviour
 {
-    [Header("Seed Gene Parameters (set via Seed node effect)")]
-    public int stemMinLength = 3;            // Minimum stem length (cells)
-    public int stemMaxLength = 6;            // Maximum stem length (cells)
-    public float growthSpeed = 1f;           // Seconds per growth step
-    [Tooltip("Leaf Gap: 0 = leaves on every stem cell; 1 = leaves on every 2nd stem cell; etc.")]
-    public int leafGap = 1;
-    [Tooltip("Leaf pattern type: 0=Parallel, 1=Offset-Parallel, 2=Alternating (L/R/R/L), 3=Double-Spiral, 4=One-Sided")]
-    public int leafPattern = 0;
-    public float growthRandomness = 0f;      // [0..1]: 0=always up; 1=always diagonal
+    [Header("Node Graph Data")]
+    // This graph will be assigned externally (e.g., by the spawner)
+    private NodeGraph nodeGraph;
 
-    [Header("Energy System")]
-    [Tooltip("Max energy available from all Energy Storage nodes in BFS.")]
-    public float maxEnergy = 0f;
-    [Tooltip("Current energy accumulated.")]
+    [Header("Calculated Runtime Stats")]
+    // Growth Stats
+    private int finalStemMinLength = 3;
+    private int finalStemMaxLength = 6;
+    private float finalGrowthSpeed = 1f;
+    private int finalLeafGap = 1;
+    private int finalLeafPattern = 0;
+    private float finalGrowthRandomness = 0f;
+    // Energy Stats
+    private float finalMaxEnergy = 10f; // Default value if no nodes provide it
+    private float finalPhotosynthesisRate = 1f; // Default value
+    // Mature Cycle Timing Stats
+    private float cycleCooldown = 5.0f; // Default cooldown
+    private float nodeCastDelay = 0.1f; // Default cast delay
+
+    [Header("Current State")]
+    public PlantState currentState = PlantState.Initializing;
     public float currentEnergy = 0f;
-    [Tooltip("Base photosynthesis rate from Energy Photosynthesis nodes in BFS.")]
-    public float basePhotosynthesis = 0f;
+    private float cycleTimer = 0f; // Timer for cooldown
 
-    [Header("Cell Prefabs")]
-    public GameObject seedCellPrefab;
-    public GameObject stemCellPrefab;
-    public GameObject leafCellPrefab;
+    [Header("Growth Visuals & Logic")]
+    [SerializeField] private GameObject seedCellPrefab;
+    [SerializeField] private GameObject stemCellPrefab;
+    [SerializeField] private GameObject leafCellPrefab;
+    [SerializeField] private float cellSpacing = 8f;
+    [SerializeField] private TMP_Text energyText; // Optional UI display
 
-    [Header("Cell Grid Settings")]
-    [Tooltip("Distance (in game units) between adjacent cells.")]
-    public float cellSpacing = 8f; 
-
-    [Header("UI")]
-    [Tooltip("TextMeshProUGUI displaying current energy and max energy below the plant.")]
-    public TMP_Text energyText;
-
+    // Use the globally accessible PlantCellType
     private Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
-    private bool growing = true;
     private int currentStemCount = 0;
     private int targetStemLength = 0;
-    
-    private bool? offsetRightForPattern1 = null;
+    private bool? offsetRightForPattern1 = null; // For pattern logic
 
+    // --- Initialization (Called externally AFTER graph is set) ---
 
-    private void Start()
+    public void InitializeAndGrow(NodeGraph graph)
     {
-        targetStemLength = Random.Range(stemMinLength, stemMaxLength + 1);
-        Debug.Log($"[PlantGrowth] Target stem length: {targetStemLength}");
-
-        cells[new Vector2Int(0, 0)] = PlantCellType.Seed;
-        SpawnCellVisual(PlantCellType.Seed, new Vector2Int(0, 0));
-
-        // Set up sorting inheritance
-        SortableEntity[] cellEntities = GetComponentsInChildren<SortableEntity>();
-        foreach (var cellEntity in cellEntities)
+        if (graph == null || graph.nodes == null)
         {
-            // Skip the seed cell, which will determine sorting
-            if (cellEntity.transform == transform)
-                continue;
-
-            // Use the public method to set parent Y coordinate usage
-            cellEntity.SetUseParentYCoordinate(true);
+            Debug.LogError("[PlantGrowth] Cannot initialize with a null NodeGraph!", gameObject);
+            Destroy(gameObject); // Destroy self if no graph provided
+            return;
         }
+        // Store the provided graph (it should be a copy)
+        this.nodeGraph = graph;
+        currentState = PlantState.Initializing;
 
-        StartCoroutine(GrowRoutine());
-    }
+        CalculateAndApplyStats();
 
-    private void Update()
-    {
-        // Use sunIntensity from WeatherManager.
-        float sunlight = (WeatherManager.Instance != null) ? WeatherManager.Instance.sunIntensity : 1f;
-        float leafCount = cells.Values.Count(cell => cell == PlantCellType.Leaf);
-        float deltaPhotosynthesis = basePhotosynthesis * leafCount * sunlight * Time.deltaTime;
-        currentEnergy += deltaPhotosynthesis;
-        if (currentEnergy > maxEnergy)
-            currentEnergy = maxEnergy;
+        // Optional: Update any linked UI Stats Panel here
+        // FindObjectOfType<PlantStatsUI>()?.UpdateStats(calculatedStats); // Example
 
-        if (energyText != null)
+        // Start the growth process if stats are valid
+        if (targetStemLength > 0)
         {
-            energyText.text = $"{Mathf.Floor(currentEnergy)}/{Mathf.Floor(maxEnergy)}";
+             StartGrowthVisuals();
+        }
+        else
+        {
+            Debug.LogWarning("[PlantGrowth] Target stem length calculated as 0 or less. Plant will not grow.", gameObject);
+            // Transition directly to mature state? Or destroy? For now, just idle.
+            currentState = PlantState.Mature_Idle;
+            cycleTimer = cycleCooldown; // Start first cooldown
         }
     }
 
-    private IEnumerator GrowRoutine()
-{
-    Vector2Int currentPos = new Vector2Int(0, 0);
-    int spiralDirection = 1;  // Used for spiral pattern: 1=right, -1=left
-    int patternCounter = 0;   // Used to track position in complex patterns
-    
-    while (growing)
+    // --- Stat Calculation (Called once during Initialization) ---
+
+    private void CalculateAndApplyStats()
     {
-        yield return new WaitForSeconds(growthSpeed);
+        if (nodeGraph == null) return;
 
-        if (currentStemCount < targetStemLength)
+        // --- Default Values ---
+        float accumulatedEnergyStorage = 0f;
+        float accumulatedPhotosynthesis = 0f;
+        int baseStemMin = 3; // Base default if no nodes modify
+        int baseStemMax = 6; // Base default
+        float baseGrowthSpeed = 1f;
+        int baseLeafGap = 1;
+        int baseLeafPattern = 0;
+        float baseGrowthRandomness = 0f;
+        float baseCooldown = 5.0f;
+        float baseCastDelay = 0.1f;
+        // Modifiers (can be +/-)
+        int stemLengthModifier = 0;
+        float growthSpeedModifier = 0f;
+        int leafGapModifier = 0;
+        float growthRandomnessModifier = 0f;
+        float cooldownModifier = 0f;
+        float castDelayModifier = 0f;
+
+        bool seedFound = false; // Still useful to check if chain is valid
+
+        // --- Iterate through all nodes and effects ONCE ---
+        foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex))
         {
-            currentStemCount++;
-            Vector2Int dir;
-            if (currentStemCount == 1)
-            {
-                // Always grow directly up for the first stem cell.
-                dir = new Vector2Int(0, 1);
-            }
-            else
-            {
-                dir = GetStemDirection();
-            }
-            currentPos += dir;
-            cells[currentPos] = PlantCellType.Stem;
-            SpawnCellVisual(PlantCellType.Stem, currentPos);
-            Debug.Log($"[PlantGrowth] Stem grown at {currentPos}");
+            if (node.effects == null) continue;
 
-            if ((currentStemCount % (leafGap + 1)) == 0)
+            foreach (NodeEffectData effect in node.effects)
             {
-                Vector2Int baseLeftPos = currentPos + new Vector2Int(-1, 0);
-                Vector2Int baseRightPos = currentPos + new Vector2Int(1, 0);
-                patternCounter++;
+                // Use the renamed flag 'isPassive'
+                if (!effect.isPassive) continue; // Skip ACTIVE effects for stat calculation
 
-                // Process according to leaf pattern
-                switch (leafPattern)
+                // --- Apply Passive Effects ---
+                switch (effect.effectType)
                 {
-                    case 0: // Parallel: spawn both leaves at same height
-                        SpawnLeafIfEmpty(baseLeftPos);
-                        SpawnLeafIfEmpty(baseRightPos);
-                        Debug.Log($"[PlantGrowth] Parallel leaves at {baseLeftPos} and {baseRightPos}");
+                    case NodeEffectType.SeedSpawn:
+                        seedFound = true;
                         break;
-                        
-                    case 1: // Offset-Parallel: both sides have leaves, but one side is raised
-                    {
-                        // Choose the starting side only once per plant
-                        if (offsetRightForPattern1 == null)
-                        {
-                            offsetRightForPattern1 = (Random.value < 0.5f);
-                        }
-                        if (offsetRightForPattern1.Value)
-                        {
-                            // Right side is raised.
-                            Vector2Int raisedRightPos = baseRightPos + new Vector2Int(0, 1);
-                            SpawnLeafIfEmpty(baseLeftPos);
-                            SpawnLeafIfEmpty(raisedRightPos);
-                            Debug.Log($"[PlantGrowth] Offset-Parallel (right offset) leaves at {baseLeftPos} and {raisedRightPos}");
-                        }
-                        else
-                        {
-                            // Left side is raised.
-                            Vector2Int raisedLeftPos = baseLeftPos + new Vector2Int(0, 1);
-                            SpawnLeafIfEmpty(raisedLeftPos);
-                            SpawnLeafIfEmpty(baseRightPos);
-                            Debug.Log($"[PlantGrowth] Offset-Parallel (left offset) leaves at {raisedLeftPos} and {baseRightPos}");
-                        }
+                    case NodeEffectType.EnergyStorage:
+                        accumulatedEnergyStorage += effect.primaryValue;
                         break;
-                    }
-
-
-                        
-                    case 2: // Alternating-2 (L/R/R/L/L/R/R/L): proper rotation pattern
-                        // This creates the L/R/R/L/L/R/R/L pattern
-                        // patternCounter % 4 gives us:
-                        // 1 -> Left side offset (L)
-                        // 2 -> Right side normal (R)
-                        // 3 -> Right side offset (R)
-                        // 0 -> Left side normal (L)
-                        
-                        Vector2Int leftPos, rightPos;
-                        
-                        // Determine positions based on pattern position
-                        switch (patternCounter % 4) {
-                            case 1: // Left side offset, right side normal
-                                leftPos = baseLeftPos + new Vector2Int(0, 1);
-                                rightPos = baseRightPos;
-                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} (offset) and {rightPos}");
-                                break;
-                            case 2: // Left side normal, right side normal
-                                leftPos = baseLeftPos;
-                                rightPos = baseRightPos;
-                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos}");
-                                break;
-                            case 3: // Left side normal, right side offset
-                                leftPos = baseLeftPos;
-                                rightPos = baseRightPos + new Vector2Int(0, 1);
-                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos} (offset)");
-                                break;
-                            case 0: // Left side normal, right side normal (cycle complete)
-                                leftPos = baseLeftPos;
-                                rightPos = baseRightPos;
-                                Debug.Log($"[PlantGrowth] Alternating leaves at {leftPos} and {rightPos}");
-                                break;
-                            default:
-                                leftPos = baseLeftPos;
-                                rightPos = baseRightPos;
-                                break;
-                        }
-                        
-                        SpawnLeafIfEmpty(leftPos);
-                        SpawnLeafIfEmpty(rightPos);
+                    case NodeEffectType.EnergyPhotosynthesis:
+                        accumulatedPhotosynthesis += effect.primaryValue;
                         break;
-                        
-                    case 3: // Double-Spiral: two leaves per node, spiral pattern
-                        // Create two leaves that spiral around the stem, with vertical offset
-                        Vector2Int leftSpiral = baseLeftPos + new Vector2Int(0, spiralDirection > 0 ? 1 : 0);
-                        Vector2Int rightSpiral = baseRightPos + new Vector2Int(0, spiralDirection > 0 ? 0 : 1);
-                        
-                        SpawnLeafIfEmpty(leftSpiral);
-                        SpawnLeafIfEmpty(rightSpiral);
-                        
-                        Debug.Log($"[PlantGrowth] Double-Spiral leaves at {leftSpiral} and {rightSpiral}");
-                        
-                        // Toggle spiral direction for next node
-                        spiralDirection *= -1;
+                    case NodeEffectType.StemLength:
+                        stemLengthModifier += Mathf.RoundToInt(effect.primaryValue);
                         break;
-                        
-                    case 4: // One-Sided: leaves only grow on one side
-                        // For balance, create two leaves on the same side
-                        SpawnLeafIfEmpty(baseRightPos);
-                        SpawnLeafIfEmpty(baseRightPos + new Vector2Int(0, 1));
-                        Debug.Log($"[PlantGrowth] One-sided leaves at {baseRightPos} and {baseRightPos + new Vector2Int(0, 1)}");
+                    case NodeEffectType.GrowthSpeed:
+                        growthSpeedModifier += effect.primaryValue;
                         break;
-                        
-                    default: // Fallback to parallel
-                        SpawnLeafIfEmpty(baseLeftPos);
-                        SpawnLeafIfEmpty(baseRightPos);
+                    case NodeEffectType.LeafGap:
+                        leafGapModifier += Mathf.RoundToInt(effect.primaryValue);
                         break;
+                    case NodeEffectType.LeafPattern:
+                        baseLeafPattern = Mathf.RoundToInt(effect.primaryValue);
+                        break;
+                    case NodeEffectType.StemRandomness:
+                        growthRandomnessModifier += effect.primaryValue;
+                        break;
+                    case NodeEffectType.Cooldown:
+                        cooldownModifier += effect.primaryValue;
+                        break;
+                    case NodeEffectType.CastDelay:
+                        castDelayModifier += effect.primaryValue;
+                        break;
+                        // Add other passive effects here...
                 }
             }
         }
-        else
+
+        // --- Finalize Calculated Stats ---
+        finalMaxEnergy = Mathf.Max(1f, accumulatedEnergyStorage); // Ensure minimum energy storage
+        finalPhotosynthesisRate = Mathf.Max(0f, accumulatedPhotosynthesis); // Can be zero
+
+        finalStemMinLength = Mathf.Max(1, baseStemMin + stemLengthModifier); // Ensure min length is at least 1
+        finalStemMaxLength = Mathf.Max(finalStemMinLength, baseStemMax + stemLengthModifier); // Ensure max >= min
+
+        finalGrowthSpeed = Mathf.Max(0.1f, baseGrowthSpeed + growthSpeedModifier); // Prevent too fast/zero speed
+        finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier); // Min gap is 0
+        finalLeafPattern = Mathf.Clamp(baseLeafPattern, 0, 4); // Assuming 0-4 are valid patterns
+        finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier); // Clamp between 0 and 1
+
+        cycleCooldown = Mathf.Max(0.1f, baseCooldown + cooldownModifier); // Minimum cooldown
+        nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier); // Minimum cast delay
+
+        // Set the target length for the GrowRoutine
+        targetStemLength = Random.Range(finalStemMinLength, finalStemMaxLength + 1);
+
+        // --- Log Calculated Stats (Optional) ---
+        // Debug.Log($"[PlantGrowth] Calculated Stats for {gameObject.name}:\n" +
+        //           $"  Target Stem Length: {targetStemLength} (Range: {finalStemMinLength}-{finalStemMaxLength})\n" +
+        //           $"  Growth Speed: {finalGrowthSpeed}\n" +
+        //           $"  Leaf Gap: {finalLeafGap}, Pattern: {finalLeafPattern}\n" +
+        //           $"  Randomness: {finalGrowthRandomness}\n" +
+        //           $"  Max Energy: {finalMaxEnergy}, Photo Rate: {finalPhotosynthesisRate}\n" +
+        //           $"  Cycle Cooldown: {cycleCooldown}, Cast Delay: {nodeCastDelay}");
+
+        if (!seedFound)
         {
-            growing = false;
-            Debug.Log("[PlantGrowth] Growth complete.");
+             Debug.LogWarning("[PlantGrowth] Node chain lacks a passive SeedSpawn effect. Plant will not grow.", gameObject);
+             targetStemLength = 0; // Prevent growth if no seed marker
         }
     }
-}
 
+    // --- Start Visual Growth ---
+    private void StartGrowthVisuals()
+    {
+        // Clear previous visuals if any
+        foreach (Transform child in transform) { Destroy(child.gameObject); }
+        cells.Clear();
+        currentStemCount = 0;
+        offsetRightForPattern1 = null; // Reset pattern state
+
+        // Spawn Seed
+        cells[Vector2Int.zero] = PlantCellType.Seed;
+        SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
+
+        // Setup sorting
+        SortableEntity[] cellEntities = GetComponentsInChildren<SortableEntity>();
+        foreach (var cellEntity in cellEntities) {
+            if (cellEntity.transform != transform) cellEntity.SetUseParentYCoordinate(true);
+        }
+
+        // Start growing coroutine
+        currentState = PlantState.Growing;
+        StartCoroutine(GrowRoutine());
+    }
+
+
+    // --- Update Loop ---
+    private void Update()
+    {
+        switch (currentState)
+        {
+            case PlantState.Initializing:
+                // Waiting for InitializeAndGrow call
+                break;
+
+            case PlantState.Growing:
+                UpdateEnergyAndUI(); // Still accumulate energy while growing
+                break;
+
+            case PlantState.Mature_Idle:
+                UpdateEnergyAndUI();
+                cycleTimer -= Time.deltaTime;
+                if (cycleTimer <= 0f)
+                {
+                    // TODO: Add energy cost check if required to start cycle
+                    // if (currentEnergy >= cycleStartCost) {
+                         currentState = PlantState.Mature_Executing;
+                         StartCoroutine(ExecuteMatureCycle());
+                    // } else { cycleTimer = cycleCooldown; } // Not enough energy, reset timer
+                }
+                break;
+
+            case PlantState.Mature_Executing:
+                // Coroutine is handling execution, might still update energy
+                UpdateEnergyAndUI();
+                break;
+        }
+    }
+
+    private void UpdateEnergyAndUI()
+    {
+        // Accumulate energy from photosynthesis
+        float sunlight = (WeatherManager.Instance != null) ? WeatherManager.Instance.sunIntensity : 1f;
+        float leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
+        float deltaPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight * Time.deltaTime;
+        currentEnergy = Mathf.Clamp(currentEnergy + deltaPhotosynthesis, 0f, finalMaxEnergy);
+
+        // Update UI
+        if (energyText != null)
+        {
+            energyText.text = $"{Mathf.Floor(currentEnergy)}/{Mathf.Floor(finalMaxEnergy)}";
+        }
+    }
+
+    // --- Mature Phase Execution Cycle ---
+
+    private IEnumerator ExecuteMatureCycle()
+    {
+        // Debug.Log($"[{gameObject.name}] Starting Mature Execution Cycle");
+        if (nodeGraph == null || nodeGraph.nodes == null)
+        {
+             Debug.LogError($"[{gameObject.name}] NodeGraph is missing during mature cycle execution!", gameObject);
+             currentState = PlantState.Mature_Idle; // Go back to idle to prevent lockup
+             cycleTimer = cycleCooldown; // Reset cooldown
+             yield break; // Exit if no graph
+        }
+
+        // TODO: Deduct energy cost to start cycle if applicable
+        // currentEnergy -= cycleStartCost;
+
+        float damageMultiplier = 1.0f; // Example context, reset each cycle
+        // Add other context variables needed by effects (e.g., target position, status flags)
+
+        var sortedNodes = nodeGraph.nodes.OrderBy(n => n.orderIndex).ToList();
+
+        foreach (NodeData node in sortedNodes)
+        {
+             if (node.effects == null) continue;
+
+             // Check if this node has ANY active phase effects
+             // Use the renamed flag 'isPassive'
+             bool hasActiveEffect = node.effects.Any(eff => !eff.isPassive);
+
+             if (hasActiveEffect)
+             {
+                 // Apply cast delay BEFORE executing the active node
+                 if (nodeCastDelay > 0)
+                 {
+                     yield return new WaitForSeconds(nodeCastDelay);
+                 }
+
+                 // Execute all ACTIVE effects within this node
+                 foreach (NodeEffectData effect in node.effects)
+                 {
+                     // Use the renamed flag 'isPassive'
+                     if (effect.isPassive) continue; // Skip PASSIVE effects
+
+                     // --- Execute Active Effects ---
+                     // Debug.Log($"--> Executing Active Effect: {effect.effectType} from Node: {node.nodeDisplayName}");
+                     switch (effect.effectType)
+                     {
+                         case NodeEffectType.Output:
+                             // Find potential OutputNodeEffect component on a prefab or handle directly
+                             OutputNodeEffect outputEffect = GetComponentInChildren<OutputNodeEffect>(); // Simple search, might need refinement
+                             if(outputEffect != null) {
+                                outputEffect.Activate(damageMultiplier); // Pass context
+                             } else {
+                                Debug.LogWarning($"[PlantGrowth] Output effect found on node '{node.nodeDisplayName}' but no OutputNodeEffect component found on plant '{gameObject.name}' or its children.", gameObject);
+                             }
+                             break;
+                         case NodeEffectType.Damage:
+                             // Usually modifies context for subsequent Output nodes
+                             // damageMultiplier += effect.primaryValue;
+                             break;
+                          // Add cases for other active effects (Heal, Status, etc.)
+                     }
+                     // TODO: Add Mana/Energy cost deduction per active effect/node if applicable
+                     // currentEnergy -= effectManaCost;
+                     // if (currentEnergy < 0) { yield break; } // Stop cycle if out of energy
+                 }
+             }
+             // Else: Node only had passive effects, skip cast delay and execution
+        }
+
+        // --- Cycle Complete ---
+        // Debug.Log($"[{gameObject.name}] Mature Execution Cycle Complete.");
+        cycleTimer = cycleCooldown; // Reset cooldown timer
+        currentState = PlantState.Mature_Idle; // Go back to idle state
+    }
+
+
+    // --- Growth Coroutine (Uses calculated stats) ---
+
+    private IEnumerator GrowRoutine()
+    {
+        Vector2Int currentPos = Vector2Int.zero;
+        int spiralDirection = 1;
+        int patternCounter = 0;
+
+        while (currentState == PlantState.Growing) // Loop while growing
+        {
+            // Use calculated growth speed
+            yield return new WaitForSeconds(finalGrowthSpeed);
+
+            if (currentStemCount < targetStemLength)
+            {
+                currentStemCount++;
+                Vector2Int dir = (currentStemCount == 1) ? Vector2Int.up : GetStemDirection(); // GetStemDirection uses finalGrowthRandomness
+                currentPos += dir;
+
+                // Check if position is already occupied (by leaf from complex pattern?)
+                if (!cells.ContainsKey(currentPos)) {
+                    cells[currentPos] = PlantCellType.Stem;
+                    SpawnCellVisual(PlantCellType.Stem, currentPos);
+                } else {
+                     // Debug.LogWarning($"[PlantGrowth] Tried to grow Stem into occupied space {currentPos}. Skipping cell.", gameObject);
+                     // Optional: Handle overlap logic
+                }
+
+
+                // Use calculated leaf gap and pattern
+                if ((finalLeafGap >= 0) && // Ensure gap is valid before modulo
+                    (currentStemCount % (finalLeafGap + 1)) == 0)
+                {
+                    Vector2Int baseLeftPos = currentPos + Vector2Int.left;
+                    Vector2Int baseRightPos = currentPos + Vector2Int.right;
+                    patternCounter++;
+
+                    // Process according to calculated leaf pattern
+                    ExecuteLeafPatternLogic(currentPos, baseLeftPos, baseRightPos, patternCounter, ref spiralDirection);
+                }
+            }
+            else // Growth target reached
+            {
+                // Debug.Log($"[{gameObject.name}] Growth complete. Reached target stem length: {targetStemLength}. Transitioning to Mature_Idle.", gameObject);
+                currentState = PlantState.Mature_Idle;
+                cycleTimer = cycleCooldown; // Start the first cooldown timer
+                // Exit the coroutine
+                yield break;
+            }
+        }
+         // Fallback exit if state changes unexpectedly
+         // Debug.Log($"[{gameObject.name}] Exiting GrowRoutine due to state change.");
+    }
+
+    // Helper for leaf pattern logic (uses finalLeafPattern)
+    private void ExecuteLeafPatternLogic(Vector2Int currentPos, Vector2Int baseLeftPos, Vector2Int baseRightPos, int patternCounter, ref int spiralDirection)
+    {
+        // This logic remains the same as before, using finalLeafPattern
+        switch (finalLeafPattern)
+        {
+            case 0: // Parallel
+                SpawnLeafIfEmpty(baseLeftPos); SpawnLeafIfEmpty(baseRightPos); break;
+            case 1: // Offset-Parallel
+                if (offsetRightForPattern1 == null) offsetRightForPattern1 = (Random.value < 0.5f);
+                Vector2Int raisedLeft = baseLeftPos + Vector2Int.up;
+                Vector2Int raisedRight = baseRightPos + Vector2Int.up;
+                if (offsetRightForPattern1.Value) { SpawnLeafIfEmpty(baseLeftPos); SpawnLeafIfEmpty(raisedRight); }
+                else { SpawnLeafIfEmpty(raisedLeft); SpawnLeafIfEmpty(baseRightPos); }
+                break;
+            case 2: // Alternating
+                 Vector2Int leftPos, rightPos;
+                 switch (patternCounter % 4) {
+                     case 1: leftPos = baseLeftPos + Vector2Int.up; rightPos = baseRightPos; break;
+                     case 2: leftPos = baseLeftPos; rightPos = baseRightPos; break;
+                     case 3: leftPos = baseLeftPos; rightPos = baseRightPos + Vector2Int.up; break;
+                     case 0: default: leftPos = baseLeftPos; rightPos = baseRightPos; break;
+                 }
+                 SpawnLeafIfEmpty(leftPos); SpawnLeafIfEmpty(rightPos);
+                 break;
+            case 3: // Double-Spiral
+                 Vector2Int leftSpiral = baseLeftPos + new Vector2Int(0, spiralDirection > 0 ? 1 : 0);
+                 Vector2Int rightSpiral = baseRightPos + new Vector2Int(0, spiralDirection > 0 ? 0 : 1);
+                 SpawnLeafIfEmpty(leftSpiral); SpawnLeafIfEmpty(rightSpiral);
+                 spiralDirection *= -1; // Toggle spiral
+                 break;
+            case 4: // One-Sided (Right side example)
+                 SpawnLeafIfEmpty(baseRightPos); SpawnLeafIfEmpty(baseRightPos + Vector2Int.up); break;
+            default: // Fallback
+                 SpawnLeafIfEmpty(baseLeftPos); SpawnLeafIfEmpty(baseRightPos); break;
+        }
+    }
+
+    // Helper for stem direction (uses finalGrowthRandomness)
     private Vector2Int GetStemDirection()
     {
-        Vector2Int up = new Vector2Int(0, 1);
+        Vector2Int up = Vector2Int.up;
         Vector2Int leftDiag = new Vector2Int(-1, 1);
         Vector2Int rightDiag = new Vector2Int(1, 1);
 
-        float r = Mathf.Clamp01(growthRandomness);
-        float roll = Random.value;
-        float threshold = 1f - r;  
-        if (roll < threshold)
-            return up;
-        else
-            return (Random.value < 0.5f) ? leftDiag : rightDiag;
+        float r = finalGrowthRandomness; // Use calculated value
+        if (Random.value < (1f - r)) return up;
+        else return (Random.value < 0.5f) ? leftDiag : rightDiag;
     }
 
+    // Helper to spawn leaves (prevent overlap)
     private void SpawnLeafIfEmpty(Vector2Int coords)
     {
         if (!cells.ContainsKey(coords))
@@ -648,43 +906,27 @@ public class PlantGrowth : MonoBehaviour
             cells[coords] = PlantCellType.Leaf;
             SpawnCellVisual(PlantCellType.Leaf, coords);
         }
+        // else: Space occupied, don't spawn leaf
     }
 
+    // Helper to spawn visuals (Uses globally defined PlantCellType)
     private void SpawnCellVisual(PlantCellType cellType, Vector2Int coords)
     {
         Vector2 worldPos = (Vector2)transform.position + (Vector2)coords * cellSpacing;
         GameObject prefabToUse = null;
-        switch (cellType)
-        {
-            case PlantCellType.Seed:
-                prefabToUse = seedCellPrefab;
-                break;
-            case PlantCellType.Stem:
-                prefabToUse = stemCellPrefab;
-                break;
-            case PlantCellType.Leaf:
-                prefabToUse = leafCellPrefab;
-                break;
+        switch (cellType) {
+            case PlantCellType.Seed: prefabToUse = seedCellPrefab; break;
+            case PlantCellType.Stem: prefabToUse = stemCellPrefab; break;
+            case PlantCellType.Leaf: prefabToUse = leafCellPrefab; break;
         }
-        if (prefabToUse != null)
-        {
+        if (prefabToUse != null) {
             GameObject cellInstance = Instantiate(prefabToUse, worldPos, Quaternion.identity, transform);
-        
-            // Add SortableEntity if not already present
-            SortableEntity sortableEntity = cellInstance.GetComponent<SortableEntity>();
-            if (sortableEntity == null)
-                sortableEntity = cellInstance.AddComponent<SortableEntity>();
-        
-            // For non-seed cells, enable "Y from parent"
-            if (cellType != PlantCellType.Seed)
-            {
+            SortableEntity sortableEntity = cellInstance.GetComponent<SortableEntity>() ?? cellInstance.AddComponent<SortableEntity>();
+            // Apply sorting only to non-seed parts if needed
+            if (cellType != PlantCellType.Seed) {
                 sortableEntity.SetUseParentYCoordinate(true);
             }
-        }
-        else
-        {
-            Debug.LogWarning($"[PlantGrowth] No prefab assigned for cell type {cellType}");
-        }
+        } else Debug.LogWarning($"[PlantGrowth] No prefab assigned for cell type {cellType}");
     }
 }
 
@@ -1526,7 +1768,7 @@ public class FaunaManager : MonoBehaviour
         }
     }
 
-    private void Update()
+        private void Update()
     {
         if (continuousSpawn)
         {
@@ -1539,17 +1781,30 @@ public class FaunaManager : MonoBehaviour
                 int currentCount = 0;
                 if (ecosystemParent != null && spawnData.animalDefinition != null && !string.IsNullOrEmpty(spawnData.animalDefinition.animalName))
                 {
+                    // Try finding the dedicated parent first (more efficient if structure is maintained)
                     Transform speciesParent = ecosystemParent.Find(spawnData.animalDefinition.animalName);
                     if (speciesParent != null)
                         currentCount = speciesParent.childCount;
+                    else {
+                        // Fallback if species parent doesn't exist yet, count all matching animals
+                        // Use FindObjectsByType for modern Unity versions - faster as we don't need sorting
+                        AnimalController[] allAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+                        currentCount = 0; // Reset count before iterating through found animals
+                        foreach (var a in allAnimals)
+                        {
+                            if (a != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName))
+                                currentCount++;
+                        }
+                    }
                 }
-                else
+                else // Fallback if no ecosystem parent or definition name
                 {
-                    AnimalController[] allAnimals = FindObjectsOfType<AnimalController>();
+                     // Use FindObjectsByType for modern Unity versions - faster as we don't need sorting
+                    AnimalController[] allAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None); // <--- THIS LINE IS UPDATED
                     currentCount = 0;
                     foreach (var a in allAnimals)
                     {
-                        if (a != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName))
+                        if (a != null && spawnData.animalDefinition != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName)) // Added null check for spawnData.animalDefinition
                             currentCount++;
                     }
                 }
@@ -1564,7 +1819,8 @@ public class FaunaManager : MonoBehaviour
                     float effectiveCooldown = globalSpawnCooldown / spawnData.spawnRateMultiplier;
                     Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
                     SpawnAnimal(spawnData.animalDefinition, spawnCenter + randomOffset);
-                    spawnData.spawnTimer = effectiveCooldown;
+                    // Reset timer only AFTER successful spawn attempt potentially
+                    spawnData.spawnTimer = effectiveCooldown > 0 ? effectiveCooldown : float.PositiveInfinity; // Prevent division by zero/negative cooldowns
                 }
             }
         }
@@ -1761,24 +2017,31 @@ using System.Collections.Generic;
 [CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
 public class NodeDefinition : ScriptableObject
 {
+    [Header("Display")]
     public string displayName;
-    public Color backgroundColor = Color.gray;
     [TextArea]
     public string description;
     public Sprite thumbnail;
+    [Tooltip("Tint color applied to the thumbnail image.")]
+    public Color thumbnailTintColor = Color.white; // ADDED: Thumbnail tint
+    [Tooltip("Background color for the Node View representation.")]
+    public Color backgroundColor = Color.gray;
 
-    // Add this field for the NodeView prefab.
+    [Header("Prefab & Effects")]
+    [Tooltip("Optional: Specific NodeView prefab for this node type. If null, the default from NodeEditorGridController is used.")]
     public GameObject nodeViewPrefab;
-
-    // List of effects
+    [Tooltip("List of effects this node applies.")]
     public List<NodeEffectData> effects;
 
     // Method to clone the effects list for NodeData.
     public List<NodeEffectData> CloneEffects()
     {
         List<NodeEffectData> copy = new List<NodeEffectData>();
+        if (effects == null) return copy; // Handle null list
+
         foreach (var eff in effects)
         {
+            // Perform a shallow copy, assuming NodeEffectData is simple enough
             NodeEffectData newEff = new NodeEffectData()
             {
                 effectType = eff.effectType,
@@ -1789,7 +2052,6 @@ public class NodeDefinition : ScriptableObject
         }
         return copy;
     }
-
 }
 
 
@@ -1810,6 +2072,7 @@ public class NodeDefinitionLibrary : ScriptableObject
 // FILE: Assets\Scripts\Nodes\Core\NodeEffectData.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using System;
+using UnityEngine;
 
 [Serializable]
 public class NodeEffectData
@@ -1817,6 +2080,10 @@ public class NodeEffectData
     public NodeEffectType effectType;
     public float primaryValue;
     public float secondaryValue;
+
+    // Renamed from isGrowthPhaseOnly and default changed to false
+    [Tooltip("If TRUE, this effect only contributes once to calculate initial plant stats (Passive Growth Effect). If FALSE, this effect executes during the periodic Mature Phase cycles (Active Effect).")]
+    public bool isPassive = false; // Defaulting to false, meaning effects are Active unless specified otherwise
 }
 
 
@@ -1825,18 +2092,23 @@ public class NodeEffectData
 ////////////////////////////////////////////////////////////////////////////////
 ﻿public enum NodeEffectType
 {
-    ManaCost,
-    Damage,
-    EnergyStorage,
-    EnergyPhotosynthesis,
-    Output,
-    SeedSpawn,
-    StemLength,
-    GrowthSpeed,
-    LeafGap,
-    LeafPattern,
-    StemRandomness
-    // Add or adjust types as needed.
+    // Config / Growth Phase Effects (isGrowthPhaseOnly = true)
+    ManaCost,           // Base cost calculation (might apply later too?)
+    EnergyStorage,      // Determines max energy
+    EnergyPhotosynthesis, // Determines base energy generation rate
+    SeedSpawn,          // Marker effect to allow spawning
+    StemLength,         // Modifies min/max stem length
+    GrowthSpeed,        // Modifies time between growth steps
+    LeafGap,            // Modifies spacing between leaves
+    LeafPattern,        // Sets leaf pattern type
+    StemRandomness,     // Modifies stem growth direction variance
+    Cooldown,           // Base time between Mature Phase cycles
+    CastDelay,          // Base time between Nodes in a Mature Phase cycle
+
+    // Active / Mature Phase Effects (isGrowthPhaseOnly = false)
+    Output,             // Triggers spell/projectile spawning
+    Damage,             // Adds damage potential to outputs
+    // Add potentially more active effects: Heal, ApplyStatus, AreaEffect, etc.
 }
 
 
@@ -1844,27 +2116,46 @@ public class NodeEffectData
 // FILE: Assets\Scripts\Nodes\Core\OutputNodeEffect.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
-using System.Linq;
 
-/// <summary>
-/// Attach this to the NodeView prefab if the node has Output effect,
-/// or have BFS call it directly. 
-/// It calls WizardController to spawn a projectile/spell.
-/// </summary>
+// Example - This component might be on the Plant Prefab or dynamically added/found
 public class OutputNodeEffect : MonoBehaviour
 {
+    [Header("References")]
+    [Tooltip("Prefab for the projectile to spawn.")]
+    public GameObject projectilePrefab; // Assign your projectile prefab
+
+    [Header("Settings")]
+    public Vector2 spawnOffset = Vector2.up; // Offset relative to plant transform
+
     /// <summary>
-    /// This method is invoked by NodeExecutor when BFS processes an 'Output' node.
-    /// You can pass any parameters (damage, aim, etc.) or just do a test projectile.
+    /// Activated by PlantGrowth during the Mature Execution Cycle.
     /// </summary>
-    public void Activate()
+    /// <param name="damageMultiplier">Contextual damage modifier calculated from the node chain.</param>
+    public void Activate(float damageMultiplier) // Example parameter
     {
-        Debug.Log("[OutputNodeEffect] Activate() called. Spawning projectile or calling wizard cast.");
+        if (projectilePrefab == null) {
+            Debug.LogError("[OutputNodeEffect] Projectile Prefab not assigned!", gameObject);
+            return;
+        }
 
-        
+        Debug.Log($"[OutputNodeEffect] Activate called. Damage Multiplier: {damageMultiplier}. Spawning projectile.");
 
-        
-        
+        // --- Calculate Spawn Position ---
+        Vector2 spawnPos = (Vector2)transform.position + spawnOffset;
+
+        // --- Instantiate Projectile ---
+        GameObject projGO = Instantiate(projectilePrefab, spawnPos, transform.rotation); // Use plant's rotation or aim logic
+
+        // --- Initialize Projectile (if needed) ---
+        SpellProjectile spellProj = projGO.GetComponent<SpellProjectile>();
+        if(spellProj != null)
+        {
+            // TODO: Calculate final damage/speed etc. based on node effects and damageMultiplier
+            float finalDamage = 10f * damageMultiplier; // Example calculation
+            float speed = 5f; // Get speed from effects?
+            spellProj.Initialize(finalDamage, speed);
+            // Set other properties like friendly fire based on plant context?
+        }
     }
 }
 
@@ -1879,100 +2170,80 @@ using System.Linq;
 
 public class NodeExecutor : MonoBehaviour
 {
-    [Header("Execution Settings")]
-    public NodeGraph currentGraph;
-    public TMP_Text debugOutput;
+    [Header("UI Graph Source")]
+    [SerializeField] private NodeEditorGridController nodeEditorGrid;
 
     [Header("Plant Spawning")]
-    public GameObject plantPrefab;
-    public GardenerController gardener;
+    [SerializeField] private GameObject plantPrefab;
+    [SerializeField] private GardenerController gardener;
+
+    [Header("Debugging")]
+    [SerializeField] private TMP_Text debugOutput;
 
     private void Update()
     {
-        // Press spacebar to execute the node chain.
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ExecuteGraph();
-        }
+        if (Input.GetKeyDown(KeyCode.Space)) SpawnPlantFromUIGraph();
     }
 
-    public void SetGraph(NodeGraph graph)
+    public void SpawnPlantFromUIGraph()
     {
-        currentGraph = graph;
-    }
+        if (nodeEditorGrid == null) { DebugLogError("Node Editor Grid Controller not assigned!"); return; }
+        if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return; }
+        if (gardener == null) { DebugLogError("Gardener Controller not assigned!"); return; }
 
-    public void ExecuteGraph()
-    {
-        if (currentGraph == null || currentGraph.nodes.Count == 0)
-        {
-            DebugLog("No nodes to execute!");
-            return;
-        }
+        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
 
-        // Process nodes left-to-right based on orderIndex.
-        var sortedNodes = currentGraph.nodes.OrderBy(n => n.orderIndex).ToList();
+        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0) { DebugLog("No nodes in UI graph."); return; }
 
-        float accumulatedEnergyStorage = 0f;
-        float accumulatedPhotosynthesis = 0f;
-        bool seedFound = false;
+        // Use the renamed flag 'isPassive'
+        bool seedFound = graphToSpawn.nodes.Any(node => node.effects != null && node.effects.Any(eff => eff.effectType == NodeEffectType.SeedSpawn && eff.isPassive)); // SeedSpawn should be passive
+        if (!seedFound) { DebugLog("Node chain lacks a passive SeedSpawn effect."); return; }
 
-        foreach (var node in sortedNodes)
-        {
-            DebugLog($"Processing node: {node.nodeDisplayName}");
-            foreach (var eff in node.effects)
-            {
-                if (eff.effectType == NodeEffectType.EnergyStorage)
-                    accumulatedEnergyStorage += eff.primaryValue;
-                else if (eff.effectType == NodeEffectType.EnergyPhotosynthesis)
-                    accumulatedPhotosynthesis += eff.primaryValue;
-                else if (eff.effectType == NodeEffectType.SeedSpawn)
-                    seedFound = true;
-            }
-        }
-
-        if (seedFound)
-        {
-            SpawnPlant(accumulatedEnergyStorage, accumulatedPhotosynthesis);
-        }
-        else
-        {
-            DebugLog("No SeedSpawn in chain. Plant not spawned.");
-        }
-
-        DebugLog("Execution complete.");
-    }
-
-    private void SpawnPlant(float energyStorage, float photosynthesis)
-    {
-        if (plantPrefab == null)
-        {
-            DebugLog("Plant prefab not assigned!");
-            return;
-        }
-        if (gardener == null)
-        {
-            DebugLog("No GardenerController found!");
-            return;
-        }
+        DebugLog($"Spawning plant from UI graph with {graphToSpawn.nodes.Count} nodes...");
         Vector2 spawnPos = gardener.GetPlantingPosition();
         GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
-        PlantGrowth growth = plantObj.GetComponent<PlantGrowth>();
-        if (growth != null)
+
+        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+        if (growthComponent != null)
         {
-            growth.maxEnergy = energyStorage;
-            growth.basePhotosynthesis = photosynthesis;
+            NodeGraph graphCopy = new NodeGraph();
+            graphCopy.nodes = new List<NodeData>();
+            foreach(NodeData originalNodeData in graphToSpawn.nodes)
+            {
+                 NodeData newNodeData = new NodeData {
+                    nodeId = originalNodeData.nodeId,
+                    nodeDisplayName = originalNodeData.nodeDisplayName,
+                    orderIndex = originalNodeData.orderIndex,
+                    effects = CloneEffectsList(originalNodeData.effects) // Deep copy effects
+                };
+                graphCopy.nodes.Add(newNodeData);
+            }
+            growthComponent.InitializeAndGrow(graphCopy);
+            DebugLog("Plant spawned and initialized.");
         }
-        DebugLog("Plant spawned.");
+        else { DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth!"); Destroy(plantObj); }
     }
 
-    private void DebugLog(string msg)
+    private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
     {
-        Debug.Log(msg);
-        if (debugOutput != null)
-            debugOutput.text += msg + "\n";
+        if (originalList == null) return new List<NodeEffectData>();
+        List<NodeEffectData> newList = new List<NodeEffectData>(originalList.Count);
+        foreach(var eff in originalList)
+        {
+             NodeEffectData newEff = new NodeEffectData {
+                 effectType = eff.effectType,
+                 primaryValue = eff.primaryValue,
+                 secondaryValue = eff.secondaryValue,
+                 isPassive = eff.isPassive // Use the renamed flag
+             };
+             newList.Add(newEff);
+        }
+        return newList;
     }
-}
 
+    private void DebugLog(string msg) { Debug.Log($"[NodeExecutor] {msg}"); if (debugOutput != null) debugOutput.text += msg + "\n"; }
+    private void DebugLogError(string msg) { Debug.LogError($"[NodeExecutor] {msg}"); if (debugOutput != null) debugOutput.text += $"ERROR: {msg}\n"; }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2004,95 +2275,189 @@ public static class ColorExtensions
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\NodeCell.cs
+// FILE: Assets\Scripts\Nodes\UI\DeselectOnClickOutside.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.EventSystems; // Required for IPointerClickHandler
 
-public class NodeCell : MonoBehaviour, IPointerClickHandler
+// Add this script to an invisible, fullscreen background UI Image
+// Make sure it's the first child of the Canvas to render behind everything else
+public class DeselectOnClickOutside : MonoBehaviour, IPointerClickHandler
 {
-    public int cellIndex;
-    private NodeEditorGridController controller;
-    private NodeData nodeData;   // Null if cell is empty.
-    private NodeView nodeView;   // Reference to NodeView child, if any.
-
-    public void Init(int index, NodeEditorGridController gridController)
-    {
-        cellIndex = index;
-        controller = gridController;
-    }
-
-    public bool HasNode()
-    {
-        return nodeData != null;
-    }
-
-    public NodeData GetNodeData()
-    {
-        return nodeData;
-    }
-
-    // Returns the NodeView component (if any)
-    public NodeView GetNodeView()
-    {
-        return nodeView;
-    }
-
-    // Called when the user selects a node definition from the dropdown.
-    public void SetNodeDefinition(NodeDefinition def)
-    {
-        // Create new NodeData using the definition.
-        nodeData = new NodeData()
-        {
-            nodeId = System.Guid.NewGuid().ToString(),
-            nodeDisplayName = def.displayName,
-            effects = def.CloneEffects() // Using the method defined in NodeDefinition.
-        };
-
-        // Remove any existing NodeView.
-        if (nodeView != null)
-        {
-            Destroy(nodeView.gameObject);
-            nodeView = null;
-        }
-
-        // Determine which NodeView prefab to use:
-        GameObject prefabToUse = def.nodeViewPrefab != null ? def.nodeViewPrefab : controller.defaultNodeViewPrefab;
-        if (prefabToUse == null)
-        {
-            Debug.LogError("No NodeView prefab assigned in NodeDefinition or default in NodeEditorGridController.");
-            return;
-        }
-
-        // Instantiate the NodeView prefab as a child of this cell.
-        GameObject nodeViewObj = Instantiate(prefabToUse, transform);
-        nodeView = nodeViewObj.GetComponent<NodeView>();
-        if (nodeView != null)
-        {
-            nodeView.Initialize(nodeData, def.thumbnail, def.backgroundColor, def.description, nodeData.effects);
-        }
-        
-        
-
-    }
-
-    // On right-click, if empty, notify the controller to show the dropdown.
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Right)
+        // Check if the click was with the left mouse button
+        if (eventData.button == PointerEventData.InputButton.Left)
         {
-            if (!HasNode())
-            {
-                controller.OnEmptyCellRightClicked(this, eventData);
-            }
-            else
-            {
-                // Optionally, add logic for right-click on an occupied cell.
-            }
+            // If the background is clicked, clear the current node selection
+            // Debug.Log("Background Clicked. Clearing Node Selection.");
+            NodeCell.ClearSelection();
         }
     }
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeCell.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+[RequireComponent(typeof(RectTransform))]
+// Remove IPointerClickHandler interface from here
+// Keep IDropHandler for dropping onto the cell background
+public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler // Keep IPointerClickHandler for RIGHT click on empty
+{
+    public static NodeCell CurrentlySelectedCell { get; private set; }
+    public int CellIndex { get; private set; }
+
+    private NodeEditorGridController _controller;
+    private NodeData _nodeData;
+    private NodeView _nodeView;
+    private Image _backgroundImage;
+
+    // --- Init remains the same ---
+    public void Init(int index, NodeEditorGridController gridController, Image bgImage)
+    {
+        CellIndex = index;
+        _controller = gridController;
+        _backgroundImage = bgImage;
+
+        if (_backgroundImage != null && _controller != null)
+        {
+            _backgroundImage.color = _controller.EmptyCellColor;
+            _backgroundImage.enabled = true;
+        }
+    }
+
+    // --- HasNode, Getters remain the same ---
+    public bool HasNode() => _nodeData != null && _nodeView != null;
+    public NodeData GetNodeData() => _nodeData;
+    public NodeView GetNodeView() => _nodeView;
+
+    // --- AssignNode, AssignNodeView remain the same ---
+     public void AssignNode(NodeDefinition def)
+    {
+        if (def == null || _controller == null) return;
+        RemoveNode();
+
+        _nodeData = new NodeData() { /* ... data setup ... */
+            nodeId = System.Guid.NewGuid().ToString(),
+            nodeDisplayName = def.displayName,
+            effects = def.CloneEffects(),
+            orderIndex = this.CellIndex
+        };
+
+        GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : _controller.NodeViewPrefab;
+        if (prefabToInstantiate == null) { /* ... error handling ... */ Debug.LogError($"..."); _nodeData = null; return; }
+
+        GameObject nodeViewGO = Instantiate(prefabToInstantiate, transform);
+        _nodeView = nodeViewGO.GetComponent<NodeView>();
+        if (_nodeView == null) { /* ... error handling ... */ Debug.LogError($"..."); Destroy(nodeViewGO); _nodeData = null; return; }
+
+        _nodeView.Initialize(_nodeData, def, _controller); // Init NodeView
+
+        NodeDraggable draggable = _nodeView.GetComponent<NodeDraggable>();
+        if (draggable == null) draggable = _nodeView.gameObject.AddComponent<NodeDraggable>();
+        draggable.Initialize(_controller, this); // Init Draggable
+
+        if(_backgroundImage != null) _backgroundImage.enabled = true;
+    }
+     public void AssignNodeView(NodeView view, NodeData data)
+    {
+         RemoveNode();
+         _nodeView = view;
+         _nodeData = data;
+         if (_nodeView != null) {
+             _nodeView.transform.SetParent(transform, false);
+             if (_nodeData != null) _nodeData.orderIndex = this.CellIndex;
+             // Parent ref will be updated by NodeDraggable.SnapToCell which calls NodeView.UpdateParent...
+         }
+         if(_backgroundImage != null) _backgroundImage.enabled = true;
+    }
+
+
+    // --- RemoveNode, ClearNodeReference remain the same ---
+    public void RemoveNode()
+    {
+        bool wasSelected = (CurrentlySelectedCell == this);
+        if (_nodeView != null) {
+            if (wasSelected) {
+                 _nodeView.Unhighlight();
+                 CurrentlySelectedCell = null;
+            }
+            Destroy(_nodeView.gameObject);
+        }
+        _nodeView = null; _nodeData = null;
+        if (wasSelected && CurrentlySelectedCell == this) CurrentlySelectedCell = null;
+        if(_backgroundImage != null) _backgroundImage.enabled = true;
+    }
+     public void ClearNodeReference()
+    {
+        _nodeView = null; _nodeData = null;
+        if(_backgroundImage != null) _backgroundImage.enabled = true;
+    }
+
+    // --- Selection Handling (SelectCell, ClearSelection) remains the same ---
+     public static void SelectCell(NodeCell cellToSelect)
+    {
+        if (cellToSelect == null || !cellToSelect.HasNode()) { ClearSelection(); return; }
+        if (CurrentlySelectedCell == cellToSelect) return;
+        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
+            CurrentlySelectedCell.GetNodeView().Unhighlight();
+        }
+        CurrentlySelectedCell = cellToSelect;
+        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
+            CurrentlySelectedCell.GetNodeView().Highlight();
+        }
+    }
+     public static void ClearSelection()
+    {
+        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
+            CurrentlySelectedCell.GetNodeView().Unhighlight();
+        }
+        CurrentlySelectedCell = null;
+    }
+
+    // --- Event Handlers UPDATED ---
+
+    /// <summary>
+    /// Handles clicks on the CELL BACKGROUND image.
+    /// Left Click: Does nothing (NodeView handles selection).
+    /// Right Click: Opens add node menu ONLY if the cell is currently empty.
+    /// </summary>
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // This click is on the NodeCell's background image
+
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            // Right Click: Only allow opening the dropdown if the cell is currently EMPTY.
+            if (!HasNode())
+            {
+                // Debug.Log($"NodeCell Background Clicked (Right) on Empty Cell {CellIndex}. Opening dropdown.");
+                ClearSelection(); // Clear selection before showing add menu
+                _controller?.OnEmptyCellRightClicked(this, eventData);
+            }
+            // If right-clicking the background of an occupied cell, do nothing.
+        }
+        // Left click on the background does nothing regarding selection now.
+    }
+
+
+    // --- OnDrop remains the same ---
+    public void OnDrop(PointerEventData eventData)
+    {
+        GameObject draggedObject = eventData.pointerDrag;
+        if (draggedObject != null) {
+            NodeDraggable draggedNode = draggedObject.GetComponent<NodeDraggable>();
+            if (draggedNode != null && _controller != null) {
+                 _controller.HandleNodeDrop(draggedNode, draggedNode.OriginalCell, eventData.position);
+            }
+        }
+    }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2100,61 +2465,169 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
+[RequireComponent(typeof(RectTransform))]
 public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    private RectTransform rectTransform;
-    private CanvasGroup canvasGroup;
-    private Vector2 originalPosition;
-    private Transform originalParent;
-    private NodeEditorGridController gridController;
+    private RectTransform _rectTransform;
+    private CanvasGroup _canvasGroup;
+    private Vector2 _originalAnchoredPosition;
+    private Transform _originalParent;
+    private NodeCell _originalCell;
+    private NodeEditorGridController _gridController;
+    private Canvas _rootCanvas;
 
-    private void Awake()
+    // No _isDragging flag needed if managed carefully by events
+
+    public NodeCell OriginalCell => _originalCell;
+
+    void Awake()
     {
-        rectTransform = GetComponent<RectTransform>();
-        canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        gridController = GetComponentInParent<NodeEditorGridController>();
+        _rectTransform = GetComponent<RectTransform>();
+        _canvasGroup = GetComponent<CanvasGroup>();
+        if (_canvasGroup == null)
+        {
+            _canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
+        // CRITICAL: Default state MUST allow interactions (clicks, hovers)
+        _canvasGroup.blocksRaycasts = true;
+        _canvasGroup.alpha = 1f; // Ensure fully visible
+    }
+
+    public void Initialize(NodeEditorGridController controller, NodeCell startingCell)
+    {
+        _gridController = controller;
+        _originalCell = startingCell;
+        _rootCanvas = GetComponentInParent<Canvas>()?.rootCanvas;
+        if (_rootCanvas == null) Debug.LogError("[NodeDraggable] Could not find root Canvas!");
+
+        // Ensure initial state after initialization
+        if (_canvasGroup != null) {
+             _canvasGroup.blocksRaycasts = true;
+             _canvasGroup.alpha = 1f;
+        }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        originalPosition = rectTransform.anchoredPosition;
-        originalParent = transform.parent;
-        canvasGroup.blocksRaycasts = false;
-        canvasGroup.alpha = 0.6f;
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+        if (_gridController == null || _rootCanvas == null) return;
+
+        _originalParent = transform.parent;
+        _originalCell = _originalParent?.GetComponent<NodeCell>();
+        _originalAnchoredPosition = _rectTransform.anchoredPosition;
+
+        // Become transparent and STOP blocking raycasts so underlying cells can be detected
+        _canvasGroup.alpha = 0.6f;
+        _canvasGroup.blocksRaycasts = false;
+
+        // Reparent for top rendering
+        transform.SetParent(_rootCanvas.transform, true);
+        transform.SetAsLastSibling();
+         // Debug.Log($"[NodeDraggable OnBeginDrag] Started drag. blocksRaycasts: {_canvasGroup.blocksRaycasts}", gameObject);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        rectTransform.anchoredPosition += eventData.delta;
+        // Only process drag if it's the left button and dragging is conceptually active (raycasts blocked)
+        if (eventData.button != PointerEventData.InputButton.Left || _canvasGroup == null || _canvasGroup.blocksRaycasts) return;
+        if (_gridController == null || _rootCanvas == null) return;
+
+        // Move logic (unchanged)
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+             _rootCanvas.transform as RectTransform, eventData.position,
+             _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 currentLocalPoint);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _rootCanvas.transform as RectTransform, eventData.position - eventData.delta,
+            _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 previousLocalPoint);
+        Vector2 localDelta = currentLocalPoint - previousLocalPoint;
+        _rectTransform.localPosition += (Vector3)localDelta;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        canvasGroup.blocksRaycasts = true;
-        canvasGroup.alpha = 1f;
-        if (gridController != null)
+         // Debug.Log($"[NodeDraggable OnEndDrag] Drag ended. Button: {eventData.button}", gameObject);
+
+        // Ensure visuals and raycast blocking are reset REGARDLESS of button, BEFORE handling drop
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true; // CRITICAL: Re-enable raycasts immediately
+             // Debug.Log($"--> Reset alpha and blocksRaycasts to: {_canvasGroup.blocksRaycasts}");
+        }
+
+        // Only handle the drop logic if the drag was initiated by the left button
+        if (eventData.button == PointerEventData.InputButton.Left)
         {
-            bool dropped = gridController.HandleNodeDrop(this, eventData.position);
-            if (!dropped)
-            {
-                rectTransform.anchoredPosition = originalPosition;
-                transform.SetParent(originalParent);
+            if (_gridController != null) {
+                _gridController.HandleNodeDrop(this, _originalCell, eventData.position);
+            } else {
+                 // No controller, attempt reset
+                 ResetPosition();
             }
         }
         else
         {
-            rectTransform.anchoredPosition = originalPosition;
-            transform.SetParent(originalParent);
+             // If drag ended via another button (unlikely but possible), ensure reset
+             ResetPosition();
         }
     }
 
-    public void SetParent(Transform newParent)
+    public void ResetPosition()
     {
-        transform.SetParent(newParent, false);
-        rectTransform.anchoredPosition = Vector2.zero;
+        // Debug.Log($"[NodeDraggable ResetPosition] Resetting {gameObject.name}", gameObject);
+        // Reset parent and position
+        transform.SetParent(_originalParent, false);
+        _rectTransform.anchoredPosition = _originalAnchoredPosition;
+        _originalCell = _originalParent?.GetComponent<NodeCell>(); // Update cell ref
+
+        // Ensure visuals and raycasts are correct after reset
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+        }
+
+        // Update parent cell reference on the NodeView
+        NodeView view = GetComponent<NodeView>();
+        view?.UpdateParentCellReference();
+    }
+
+    public void SnapToCell(NodeCell targetCell)
+    {
+        // Debug.Log($"[NodeDraggable SnapToCell] Snapping {gameObject.name} to Cell {targetCell?.CellIndex}", gameObject);
+        if (targetCell == null) { ResetPosition(); return; }
+
+        // Set Parent and Position
+        transform.SetParent(targetCell.transform, false);
+        _rectTransform.anchoredPosition = Vector2.zero;
+
+        // Update Internal Draggable References
+        _originalParent = targetCell.transform;
+        _originalCell = targetCell;
+        _originalAnchoredPosition = Vector2.zero;
+
+        // Ensure visuals and raycasts are correct after snap
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+        }
+
+        // Update the NodeView's parent reference
+        NodeView view = GetComponent<NodeView>();
+        view?.UpdateParentCellReference();
+    }
+
+    // OnDisable might not be strictly needed now but can be kept as safety
+    void OnDisable()
+    {
+        // If it was disabled mid-drag (blocksRaycasts == false), reset state
+        if (_canvasGroup != null && !_canvasGroup.blocksRaycasts)
+        {
+             Debug.LogWarning($"[NodeDraggable] Disabled while dragging {gameObject.name}. Resetting CanvasGroup.", gameObject);
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+            // Resetting position might be desired but complex here, ensure visuals are ok.
+        }
     }
 }
 
@@ -2162,168 +2635,298 @@ public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeEditorGridController.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using TMPro;
 using System.Linq;
 
+[RequireComponent(typeof(RectTransform))]
 public class NodeEditorGridController : MonoBehaviour
 {
-    [Header("Grid Settings")]
-    [Tooltip("Maximum number of cells (gene capacity)")]
-    public int maxCells = 8;
-    [Tooltip("Spacing between cells (pixels)")]
-    public float cellSpacing = 10f;
-    [Tooltip("Size (width/height in pixels) for each cell")]
-    public float cellSize = 64f;
-    [Tooltip("Parent RectTransform where cells will be instantiated")]
-    public RectTransform cellsParent;
+    public static NodeEditorGridController Instance { get; private set; }
 
-    [Header("Prefabs & Library")]
-    [Tooltip("Prefab for an empty cell")]
-    public NodeCell cellPrefab;
-    [Tooltip("Default NodeView prefab (used if a NodeDefinition has none assigned)")]
-    public GameObject defaultNodeViewPrefab;
-    [Tooltip("Library of node definitions")]
-    public NodeDefinitionLibrary definitionLibrary;
+    [Header("Grid Layout & Appearance")]
+    [SerializeField][Min(1)] private int emptyCellsCount = 8;
+    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
+    [SerializeField] private float cellMargin = 10f;
 
-    [Header("TMP Dropdown")]
-    [Tooltip("TMP_Dropdown used for node selection (should be inactive by default)")]
-    public TMP_Dropdown nodeDropdown;
+    [Header("Empty Cell Visuals")]
+    [SerializeField] private Sprite emptyCellSprite;
+    [SerializeField] private Color emptyCellColor = Color.white;
+    [SerializeField] private Vector3 emptyCellScale = Vector3.one;
 
-    [Header("Execution")]
-    [Tooltip("Reference to the NodeExecutor to update its graph")]
-    public NodeExecutor nodeExecutor;
+    [Header("Node Visuals")]
+    [SerializeField] private GameObject nodeViewPrefab;
+    [SerializeField] private Vector3 nodeImageScale = Vector3.one;
+    [SerializeField] private Color selectedNodeBackgroundColor = new Color(0.9f, 0.9f, 0.7f, 1f);
 
-    // List of instantiated cell references
+    [Header("Node Definitions & Interaction")]
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
+    [SerializeField] private TMP_Dropdown nodeDropdown;
+
+    // REMOVED: The direct reference to NodeExecutor is no longer needed here.
+    // The NodeExecutor script will find this controller via Instance or assignment.
+    // [Header("Execution")]
+    // [SerializeField] private NodeExecutor nodeExecutor;
+
+    [Header("UI Toggle")]
+    [SerializeField] private GameObject gridUIParent;
+
+
     private List<NodeCell> nodeCells = new List<NodeCell>();
+    private RectTransform _rectTransform;
+    private Canvas _rootCanvas;
+    private NodeGraph _uiGraphRepresentation = new NodeGraph(); // Internal storage
 
-    private void Start()
+
+    public GameObject NodeViewPrefab => nodeViewPrefab;
+    public Vector3 NodeImageScale => nodeImageScale;
+    public NodeDefinitionLibrary DefinitionLibrary => definitionLibrary;
+    public Color SelectedNodeBackgroundColor => selectedNodeBackgroundColor;
+    public Color EmptyCellColor => emptyCellColor;
+    public NodeGraph GetCurrentUIGraph() => _uiGraphRepresentation; // Public getter for NodeExecutor
+
+
+    void Awake()
     {
-        if (nodeDropdown != null)
-            nodeDropdown.gameObject.SetActive(false);
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+
+        _rectTransform = GetComponent<RectTransform>();
+        _rootCanvas = GetComponentInParent<Canvas>();
+        if (_rootCanvas == null) Debug.LogError("...");
+        if (gridUIParent == null) Debug.LogWarning("...");
+    }
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
+
+    void Start()
+    {
+        if (nodeDropdown != null) nodeDropdown.gameObject.SetActive(false);
+        else Debug.LogWarning("...");
+        if (definitionLibrary == null) Debug.LogError("...");
 
         CreateCells();
-
-        if (nodeExecutor != null)
-            nodeExecutor.SetGraph(new NodeGraph());
-
         RefreshGraph();
     }
 
-    // Create exactly maxCells cells, arranged in one centered row.
     private void CreateCells()
     {
-        // Clear previous children if any.
-        foreach (Transform child in cellsParent)
-        {
-            Destroy(child.gameObject);
-        }
+        foreach (Transform child in transform) { if (child.gameObject != this.gameObject && child.GetComponent<NodeEditorGridController>() == null) Destroy(child.gameObject); }
         nodeCells.Clear();
+        NodeCell.ClearSelection();
 
-        // Total width = (maxCells * cellSize) + ((maxCells - 1) * cellSpacing)
-        float totalWidth = maxCells * cellSize + (maxCells - 1) * cellSpacing;
-        // Starting x position (centered): -totalWidth/2 + cellSize/2
-        float startX = -totalWidth / 2f + cellSize / 2f;
+        float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
+        float startX = -(totalWidth / 2f);
+        float startY = -(cellSize.y / 2f);
 
-        for (int i = 0; i < maxCells; i++)
+        for (int i = 0; i < emptyCellsCount; i++)
         {
-            NodeCell cell = Instantiate(cellPrefab, cellsParent);
-            RectTransform rt = cell.GetComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(cellSize, cellSize);
-            float xPos = startX + i * (cellSize + cellSpacing);
-            rt.anchoredPosition = new Vector2(xPos, 0f);
-            cell.Init(i, this);
-            nodeCells.Add(cell);
+            GameObject cellGO = new GameObject($"Cell_{i}");
+            RectTransform rt = cellGO.AddComponent<RectTransform>();
+            cellGO.transform.SetParent(transform, false);
+            rt.sizeDelta = cellSize;
+            rt.anchorMin = new Vector2(0.5f, 0.5f); rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0f, 0f); // Using bottom-left pivot
+            float xPos = startX + i * (cellSize.x + cellMargin);
+            float yPos = startY;
+            rt.anchoredPosition = new Vector2(xPos, yPos);
+
+            Image cellImage = cellGO.AddComponent<Image>();
+            cellImage.sprite = emptyCellSprite;
+            cellImage.color = emptyCellColor;
+            cellImage.raycastTarget = true;
+            // rt.localScale = emptyCellScale; // Keep commented out
+
+            NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
+            cellLogic.Init(i, this, cellImage);
+            nodeCells.Add(cellLogic);
         }
     }
 
-    // Called by a NodeCell when right-clicked (and empty)
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Tab)) ToggleGridUI();
+        if (Input.GetKeyDown(KeyCode.Delete)) { if (NodeCell.CurrentlySelectedCell != null) { NodeCell selected = NodeCell.CurrentlySelectedCell; selected.RemoveNode(); RefreshGraph(); } }
+        if (Input.GetKeyDown(KeyCode.Escape)) { if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown(); }
+    }
+
+    public void ToggleGridUI()
+    {
+        if (gridUIParent != null) { bool currentState = gridUIParent.activeSelf; gridUIParent.SetActive(!currentState); if (!gridUIParent.activeSelf && nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown(); if (!gridUIParent.activeSelf) NodeCell.ClearSelection(); }
+        else Debug.LogWarning("...");
+    }
+
     public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
     {
-        if (nodeDropdown == null || definitionLibrary == null) return;
+        if (nodeDropdown == null) { Debug.LogError("..."); return; }
+        if (definitionLibrary == null || definitionLibrary.definitions == null) { Debug.LogError("..."); return; }
 
-        // Build dropdown options using TMP_Dropdown.OptionData.
+        StopCoroutine("ShowDropdownCoroutine");
+        StartCoroutine(ShowDropdownCoroutine(cell, eventData));
+    }
+
+    private IEnumerator ShowDropdownCoroutine(NodeCell cell, PointerEventData eventData)
+    {
+        // Build Options
         List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
-        options.Add(new TMP_Dropdown.OptionData("Select Node")); // default option
-        foreach (var def in definitionLibrary.definitions)
-        {
-            options.Add(new TMP_Dropdown.OptionData(def.displayName));
-        }
-        nodeDropdown.ClearOptions();
-        nodeDropdown.AddOptions(options);
-        nodeDropdown.value = 0;
-        nodeDropdown.RefreshShownValue();
+        options.Add(new TMP_Dropdown.OptionData("Select Node..."));
+        var sortedDefinitions = definitionLibrary.definitions.Where(def => def != null).OrderBy(def => def.displayName).ToList();
+        foreach (var def in sortedDefinitions) { TMP_Dropdown.OptionData option = new TMP_Dropdown.OptionData(); option.text = def.displayName; option.image = def.thumbnail; options.Add(option); }
+        nodeDropdown.ClearOptions(); nodeDropdown.AddOptions(options);
 
-        // Position dropdown at pointer.
-        RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
-        dropdownRect.position = eventData.position;
-
-        nodeDropdown.gameObject.SetActive(true);
+        // Setup Listener
         nodeDropdown.onValueChanged.RemoveAllListeners();
-        nodeDropdown.onValueChanged.AddListener((val) => OnDropdownValueChanged(val, cell));
+        nodeDropdown.onValueChanged.AddListener((selectedIndex) => { OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions); });
+
+        // Position
+        RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(dropdownRect.parent as RectTransform, eventData.position, _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 localPos);
+        dropdownRect.localPosition = localPos;
+
+        // Activate
+        if (!nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(true);
+
+        // Wait
+        yield return null;
+
+        // Show
+        try {
+            if (nodeDropdown.template == null) { Debug.LogError("..."); HideDropdown(); yield break; }
+            nodeDropdown.Show();
+        } catch (System.NullReferenceException nre) { Debug.LogError($"... NRE Show() ... {nre.Message}", nodeDropdown.gameObject); HideDropdown(); yield break; }
+
+        nodeDropdown.value = 0; nodeDropdown.RefreshShownValue();
     }
 
-    private void OnDropdownValueChanged(int value, NodeCell cell)
-    {
-        nodeDropdown.gameObject.SetActive(false);
-        if (value == 0) return; // "Select Node" option
-        int index = value - 1;
-        if (index >= 0 && index < definitionLibrary.definitions.Count)
-        {
-            NodeDefinition def = definitionLibrary.definitions[index];
-            cell.SetNodeDefinition(def);
-            RefreshGraph();
-        }
-    }
 
-    // Rebuild the NodeGraph from all non-empty cells, in order from left to right.
-    public void RefreshGraph()
+    private void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefs)
     {
-        if (nodeExecutor == null || nodeExecutor.currentGraph == null) return;
-        nodeExecutor.currentGraph.nodes.Clear();
-        foreach (var cell in nodeCells.OrderBy(c => c.cellIndex))
-        {
-            if (cell.HasNode())
-            {
-                nodeExecutor.currentGraph.nodes.Add(cell.GetNodeData());
+        HideDropdown();
+
+        if (selectedIndex > 0) {
+            int definitionIndex = selectedIndex - 1;
+            if (definitionIndex >= 0 && definitionIndex < sortedDefs.Count) {
+                NodeDefinition selectedDef = sortedDefs[definitionIndex];
+                targetCell.AssignNode(selectedDef);
+                NodeCell.SelectCell(targetCell);
+                RefreshGraph(); // Refresh UI graph representation
             }
         }
     }
 
-    // Called by NodeDraggable when a node is dropped; checks if the drop is on a cell.
-    public bool HandleNodeDrop(NodeDraggable draggedNode, Vector2 screenPosition)
+    public void HideDropdown()
     {
+        if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(false);
+    }
+
+
+    public void RefreshGraph()
+    {
+        if (_uiGraphRepresentation == null) _uiGraphRepresentation = new NodeGraph();
+        _uiGraphRepresentation.nodes.Clear();
+        foreach (var cell in nodeCells.OrderBy(c => c.CellIndex))
+        {
+            NodeData data = cell.GetNodeData();
+            if (data != null)
+            {
+                data.orderIndex = cell.CellIndex;
+                _uiGraphRepresentation.nodes.Add(data);
+            }
+        }
+    }
+
+
+    public bool HandleNodeDrop(NodeDraggable draggedDraggable, NodeCell originalCell, Vector2 screenPosition)
+    {
+        NodeCell targetCell = FindCellAtScreenPosition(screenPosition);
+        bool changed = false;
+
+        if (targetCell != null && originalCell != null)
+        {
+            NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
+            NodeData draggedData = draggedView?.GetNodeData();
+
+            if (draggedView == null || draggedData == null) { draggedDraggable.ResetPosition(); return false; }
+            if (targetCell == originalCell) { draggedDraggable.ResetPosition(); NodeCell.SelectCell(targetCell); return true; }
+
+            NodeView existingViewInTarget = targetCell.GetNodeView();
+            NodeData existingDataInTarget = targetCell.GetNodeData();
+
+            NodeCell.ClearSelection();
+            originalCell.ClearNodeReference();
+
+            if (existingViewInTarget != null && existingDataInTarget != null)
+            {
+                NodeDraggable existingDraggable = existingViewInTarget.GetComponent<NodeDraggable>();
+                originalCell.AssignNodeView(existingViewInTarget, existingDataInTarget);
+                if (existingDraggable != null) existingDraggable.SnapToCell(originalCell);
+            }
+
+            targetCell.AssignNodeView(draggedView, draggedData);
+            draggedDraggable.SnapToCell(targetCell);
+
+            NodeCell.SelectCell(targetCell);
+            changed = true;
+        }
+        else
+        {
+            draggedDraggable.ResetPosition();
+            if (originalCell != null && originalCell.HasNode()) { NodeCell.SelectCell(originalCell); }
+            else { NodeCell.ClearSelection(); }
+        }
+
+        if (changed) RefreshGraph(); // Refresh UI graph representation
+
+        return changed;
+    }
+
+
+    private NodeCell FindCellAtScreenPosition(Vector2 screenPosition)
+    {
+        NodeCell foundCell = null;
         foreach (var cell in nodeCells)
         {
             RectTransform cellRect = cell.GetComponent<RectTransform>();
-            if (RectTransformUtility.RectangleContainsScreenPoint(cellRect, screenPosition))
-            {
-                // If the cell already has a node, swap them.
-                if (cell.HasNode())
-                {
-                    NodeView existingView = cell.GetNodeView();
-                    if (existingView != null)
-                    {
-                        // Get original cell of dragged node.
-                        NodeCell originCell = draggedNode.GetComponentInParent<NodeCell>();
-                        if (originCell != null)
-                        {
-                            existingView.transform.SetParent(originCell.transform, false);
-                            existingView.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                        }
-                    }
-                }
-                // Place the dragged node in this cell.
-                draggedNode.SetParent(cell.transform);
-                return true;
-            }
+            bool contains = RectTransformUtility.RectangleContainsScreenPoint(cellRect, screenPosition, _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera );
+            if (contains) { foundCell = cell; break; }
         }
-        return false;
+        return foundCell;
     }
-}
 
+
+     #if UNITY_EDITOR
+     void OnDrawGizmos()
+     {
+         if (!Application.isPlaying && TryGetComponent<RectTransform>(out var rt))
+         {
+             Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
+             Vector3 center = rt.position;
+             float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
+             float startX_for_gizmo;
+             if(rt.pivot == Vector2.zero) startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f);
+             else startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f);
+
+             for (int i = 0; i < emptyCellsCount; i++)
+             {
+                 float xOffset = startX_for_gizmo + i * (cellSize.x + cellMargin);
+                 Vector3 cellCenterWorld = center + (Vector3)(rt.rotation * new Vector3(xOffset * rt.lossyScale.x, 0, 0) );
+                 Vector3 gizmoSize = new Vector3(cellSize.x * rt.lossyScale.x, cellSize.y * rt.lossyScale.y, 0.1f);
+                 Matrix4x4 rotationMatrix = Matrix4x4.TRS(cellCenterWorld, rt.rotation, Vector3.one);
+                 Gizmos.matrix = rotationMatrix;
+                 Gizmos.DrawWireCube(Vector3.zero, gizmoSize);
+                 Gizmos.matrix = Matrix4x4.identity;
+             }
+         }
+     }
+     #endif
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2361,74 +2964,101 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System.Text;
 
-public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
+[RequireComponent(typeof(RectTransform))]
+public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
-    [Header("UI Elements")]
-    public Image thumbnailImage;
-    public Image backgroundImage;
-    public GameObject tooltipPanel;
-    public TMP_Text tooltipText;
+    // --- Fields remain the same ---
+    [Header("UI Elements (Assign in Prefab)")]
+    [SerializeField] private Image thumbnailImage;
+    [SerializeField] private Image backgroundImage;
+    [SerializeField] private GameObject tooltipPanel;
+    [SerializeField] private TMP_Text tooltipText;
+    [SerializeField] private TMP_Text nodeNameText;
+    [Header("Configuration")]
+    [SerializeField] private bool displayNodeName = false;
 
-    [Header("Node Name Display")]
-    public TMP_Text nodeNameText;
-    [Tooltip("If false, the node name text will be hidden.")]
-    public bool displayNodeName = true;
+    private NodeData _nodeData;
+    private NodeDefinition _nodeDefinition;
+    private NodeEditorGridController _controller;
+    private NodeCell _parentCell;
+    private Color _originalBackgroundColor;
 
-    private NodeData nodeData;
-    private string nodeDescription;
-    private List<NodeEffectData> nodeEffects;
-
-    public void Initialize(NodeData data, Sprite thumbnail, Color bgColor, string description, List<NodeEffectData> effects)
-    {
-        nodeData = data;
-        nodeDescription = description;
-        nodeEffects = effects;
-
-        if (thumbnailImage != null)
-            thumbnailImage.sprite = thumbnail;
-        if (backgroundImage != null)
-            backgroundImage.color = bgColor;
-        if (tooltipPanel != null)
-            tooltipPanel.SetActive(false);
-        if (nodeNameText != null)
-        {
-            nodeNameText.text = data.nodeDisplayName;
-            nodeNameText.gameObject.SetActive(displayNodeName);
-        }
+    // --- Initialize, UpdateParentCellReference, Getters, Highlight, Unhighlight remain the same ---
+     public void Initialize(NodeData data, NodeDefinition definition, NodeEditorGridController controller)
+    { /* ... as before ... */
+         _nodeData = data; _nodeDefinition = definition; _controller = controller;
+         UpdateParentCellReference();
+         if (_nodeData == null || _nodeDefinition == null || _controller == null || _parentCell == null) { gameObject.SetActive(false); return; }
+         if (thumbnailImage != null) { thumbnailImage.sprite = _nodeDefinition.thumbnail; thumbnailImage.color = _nodeDefinition.thumbnailTintColor; thumbnailImage.rectTransform.localScale = _controller.NodeImageScale; thumbnailImage.enabled = (thumbnailImage.sprite != null); if (!thumbnailImage.raycastTarget) thumbnailImage.raycastTarget = true; }
+         if (backgroundImage != null) { _originalBackgroundColor = _nodeDefinition.backgroundColor; backgroundImage.color = _originalBackgroundColor; backgroundImage.enabled = true; if (!backgroundImage.raycastTarget) backgroundImage.raycastTarget = true; }
+         if (tooltipPanel != null) tooltipPanel.SetActive(false);
+         if (nodeNameText != null) { nodeNameText.text = _nodeData.nodeDisplayName; nodeNameText.gameObject.SetActive(displayNodeName); }
     }
+     public void UpdateParentCellReference() { _parentCell = GetComponentInParent<NodeCell>(); /* ... null check ... */ }
+     public NodeData GetNodeData() => _nodeData;
+     public NodeDefinition GetNodeDefinition() => _nodeDefinition;
+     public NodeCell GetParentCell() => _parentCell;
+     public void Highlight() { if (backgroundImage != null && _controller != null) backgroundImage.color = _controller.SelectedNodeBackgroundColor; }
+     public void Unhighlight() { if (backgroundImage != null) backgroundImage.color = _originalBackgroundColor; }
 
-    public NodeData GetNodeData() => nodeData;
 
+    // --- Tooltip Handling with Logging ---
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (tooltipPanel != null && tooltipText != null)
+        // --- Add Log ---
+        Debug.Log($"[NodeView OnPointerEnter] Fired on {gameObject.name}. Tooltip Panel assigned: {tooltipPanel != null}", gameObject);
+
+        // Ensure the CanvasGroup allows raycasts IF it exists
+        CanvasGroup cg = GetComponent<CanvasGroup>();
+        if (cg != null && cg.blocksRaycasts == false)
         {
-            tooltipPanel.SetActive(true);
-            string tip = $"{nodeData.nodeDisplayName}\n{nodeDescription}\nEffects:\n";
-            foreach (var eff in nodeEffects)
-            {
-                tip += $"- {eff.effectType}: {eff.primaryValue}";
-                if (eff.secondaryValue != 0)
-                    tip += $" / {eff.secondaryValue}";
-                tip += "\n";
-            }
-            tooltipText.text = tip;
+             Debug.LogWarning($"--> PointerEnter detected but CanvasGroup is blocking raycasts! Drag state might be stuck?", gameObject);
+             // Optionally force it: cg.blocksRaycasts = true;
         }
+
+
+        if (tooltipPanel != null && tooltipText != null && _nodeDefinition != null && _nodeData != null)
+        {
+            // --- Add Log ---
+            // Debug.Log("--> Activating Tooltip Panel");
+            tooltipPanel.SetActive(true);
+            tooltipText.text = BuildTooltipString();
+        }
+         else if (tooltipPanel == null) {
+             // Debug.LogWarning("--> Tooltip Panel is not assigned in Inspector.", gameObject);
+         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        // --- Add Log ---
+        // Debug.Log($"[NodeView OnPointerExit] Fired on {gameObject.name}", gameObject);
+
         if (tooltipPanel != null)
+        {
+             // Debug.Log("--> Deactivating Tooltip Panel");
             tooltipPanel.SetActive(false);
+        }
     }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        // Implement selection logic here if needed.
+    // --- Pointer Down remains the same ---
+    public void OnPointerDown(PointerEventData eventData) { /* ... as before ... */
+         // Debug.Log($"[NodeView OnPointerDown] Fired on: {gameObject.name} in Cell: {_parentCell?.CellIndex} | Button: {eventData.button}", gameObject);
+        if (eventData.button == PointerEventData.InputButton.Left) {
+            if (_parentCell != null) {
+                 // Debug.Log($"--> Left Click Confirmed. Requesting SelectCell for {_parentCell.CellIndex}");
+                NodeCell.SelectCell(_parentCell);
+            } else { UpdateParentCellReference(); if (_parentCell != null) NodeCell.SelectCell(_parentCell); else Debug.LogError("[NodeView] ParentCell null on PointerDown!", gameObject); }
+        }
     }
+
+    // --- BuildTooltipString remains the same ---
+    private string BuildTooltipString() { /* ... as before ... */
+         StringBuilder sb = new StringBuilder(); sb.Append("<b>").Append(_nodeData.nodeDisplayName).Append("</b>\n"); if (!string.IsNullOrEmpty(_nodeDefinition.description)) sb.Append(_nodeDefinition.description).Append("\n"); if (_nodeData.effects != null && _nodeData.effects.Count > 0) { sb.Append("<i>Effects:</i>\n"); foreach (var eff in _nodeData.effects) { sb.Append("- ").Append(eff.effectType.ToString()).Append(": "); sb.Append(eff.primaryValue.ToString("G3")); if (eff.secondaryValue != 0) sb.Append(" / ").Append(eff.secondaryValue.ToString("G3")); sb.Append("\n"); } } return sb.ToString().TrimEnd();
+     }
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////

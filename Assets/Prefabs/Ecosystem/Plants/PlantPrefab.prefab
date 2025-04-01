@@ -315,15 +315,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17881b9c2dd347be8e99e77f51ab82ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stemMinLength: 3
-  stemMaxLength: 6
-  growthSpeed: 1
-  leafGap: 1
-  leafPattern: 0
-  growthRandomness: 0
-  maxEnergy: 0
+  showGrowthPercentage: 1
+  allowPhotosynthesisDuringGrowth: 0
+  useSmoothPercentageCounter: 1
+  percentageIncrement: 1
+  currentState: 0
   currentEnergy: 0
-  basePhotosynthesis: 0
   seedCellPrefab: {fileID: 3989903528299243114, guid: 21f0696b40e6a56479873b186b3d5d93, type: 3}
   stemCellPrefab: {fileID: 3989903528299243114, guid: 43ce9b6d7b5c22d4c988dbdd224c3d5c, type: 3}
   leafCellPrefab: {fileID: 3989903528299243114, guid: bfbf2c64527183d4c95dcf83f92ee26b, type: 3}
