@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-01 04:16:33
+UNITY PROJECT SCRIPT EXPORT - 2025-04-01 15:37:58
 PART 1 OF 3
 ================================================================================
 
@@ -73,8 +73,7 @@ Assets
 │   │   └── AnimalThoughtLibrary.asset
 │   └── Nodes Plant
 │       ├── NodeDefinitionLibrary.asset
-│       ├── Node_000_Seed.asset
-│       └── Node_000_Seed_Solo.asset
+│       └── Node_000_Seed.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -454,33 +453,42 @@ public class NodeDefinitionPostprocessor : AssetPostprocessor
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using TMPro; // If using TextMeshPro for UI later
+using TMPro;
 
-// --- MOVED ENUM DEFINITION OUTSIDE THE CLASS ---
 public enum PlantCellType
 {
     Seed,
     Stem,
     Leaf,
-    Flower, // Added for potential future use
-    Fruit   // Added for potential future use
+    Flower,
+    Fruit
 }
-// ---------------------------------------------
 
-// Define Plant States
 public enum PlantState
 {
     Initializing,
     Growing,
-    Mature_Idle, // Waiting for cooldown
-    Mature_Executing // Running the node chain effects
+    Mature_Idle,
+    Mature_Executing
 }
 
 public class PlantGrowth : MonoBehaviour
 {
     [Header("Node Graph Data")]
-    // This graph will be assigned externally (e.g., by the spawner)
     private NodeGraph nodeGraph;
+
+    [Header("UI Display Options")]
+    [Tooltip("If enabled, shows growth percentage during growth phase instead of energy")]
+    [SerializeField] private bool showGrowthPercentage = true;
+    
+    [Tooltip("If enabled, plant will accumulate energy during growth phase")]
+    [SerializeField] private bool allowPhotosynthesisDuringGrowth = false;
+    
+    [Tooltip("If enabled, shows a smooth percentage counter independent of actual growth")]
+    [SerializeField] private bool useSmoothPercentageCounter = true;
+    
+    [Tooltip("How much to increment the percentage counter each step (%)")]
+    [SerializeField] [Range(1, 10)] private int percentageIncrement = 2;
 
     [Header("Calculated Runtime Stats")]
     // Growth Stats
@@ -491,50 +499,113 @@ public class PlantGrowth : MonoBehaviour
     private int finalLeafPattern = 0;
     private float finalGrowthRandomness = 0f;
     // Energy Stats
-    private float finalMaxEnergy = 10f; // Default value if no nodes provide it
-    private float finalPhotosynthesisRate = 1f; // Default value
+    private float finalMaxEnergy = 10f;
+    private float finalPhotosynthesisRate = 1f;
     // Mature Cycle Timing Stats
-    private float cycleCooldown = 5.0f; // Default cooldown
-    private float nodeCastDelay = 0.1f; // Default cast delay
+    private float cycleCooldown = 5.0f;
+    private float nodeCastDelay = 0.1f;
 
     [Header("Current State")]
     public PlantState currentState = PlantState.Initializing;
     public float currentEnergy = 0f;
-    private float cycleTimer = 0f; // Timer for cooldown
+    private float cycleTimer = 0f;
+    
+    // For smooth percentage counter
+    private float displayedGrowthPercentage = 0f;
+    private Coroutine percentageCounterCoroutine;
+    private float totalGrowthDuration;
 
     [Header("Growth Visuals & Logic")]
     [SerializeField] private GameObject seedCellPrefab;
     [SerializeField] private GameObject stemCellPrefab;
     [SerializeField] private GameObject leafCellPrefab;
     [SerializeField] private float cellSpacing = 8f;
-    [SerializeField] private TMP_Text energyText; // Optional UI display
+    [SerializeField] private TMP_Text energyText;
 
-    // Use the globally accessible PlantCellType
     private Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
     private int currentStemCount = 0;
     private int targetStemLength = 0;
-    private bool? offsetRightForPattern1 = null; // For pattern logic
+    private bool? offsetRightForPattern1 = null;
 
-    // --- Initialization (Called externally AFTER graph is set) ---
+    private void Awake()
+    {
+        EnsureUIReferences();
+    }
+
+    private void EnsureUIReferences()
+    {
+        if (energyText != null) return;
+
+        // Try to find by name first
+        Transform textTrans = transform.Find("Txt_Energy");
+        
+        // Try common parent paths if not found directly
+        if (textTrans == null) textTrans = transform.Find("Canvas/Txt_Energy");
+        if (textTrans == null) textTrans = transform.Find("UI/Txt_Energy");
+        
+        // If found by name, get the component
+        if (textTrans != null)
+        {
+            energyText = textTrans.GetComponent<TMP_Text>();
+            if (energyText != null)
+            {
+                Debug.Log($"[PlantGrowth] Found Energy Text by name: {textTrans.name}", gameObject);
+                return;
+            }
+        }
+        
+        // If not found by name, try to find by type
+        TMP_Text[] allTexts = GetComponentsInChildren<TMP_Text>(true);
+        if (allTexts.Length > 0)
+        {
+            // Try to find one that might be for energy
+            foreach (var text in allTexts)
+            {
+                string lowerName = text.name.ToLower();
+                if (lowerName.Contains("energy") || lowerName.Contains("txt_e"))
+                {
+                    energyText = text;
+                    Debug.Log($"[PlantGrowth] Found Energy Text by component search: {text.name}", gameObject);
+                    return;
+                }
+            }
+            
+            // If no good match, just use the first one
+            energyText = allTexts[0];
+            Debug.Log($"[PlantGrowth] Using first TMP_Text found: {energyText.name}", gameObject);
+        }
+        else
+        {
+            Debug.LogWarning($"[PlantGrowth] No TMP_Text components found on {gameObject.name}. Energy display will not work.", gameObject);
+        }
+    }
 
     public void InitializeAndGrow(NodeGraph graph)
     {
+        EnsureUIReferences();
+        
         if (graph == null || graph.nodes == null)
         {
             Debug.LogError("[PlantGrowth] Cannot initialize with a null NodeGraph!", gameObject);
-            Destroy(gameObject); // Destroy self if no graph provided
+            Destroy(gameObject);
             return;
         }
-        // Store the provided graph (it should be a copy)
         this.nodeGraph = graph;
         currentState = PlantState.Initializing;
+        currentEnergy = 0f; // Reset energy at initialization
+        
+        // Reset percentage counter
+        displayedGrowthPercentage = 0f;
+        
+        // Stop any existing percentage counter
+        if (percentageCounterCoroutine != null)
+        {
+            StopCoroutine(percentageCounterCoroutine);
+            percentageCounterCoroutine = null;
+        }
 
         CalculateAndApplyStats();
 
-        // Optional: Update any linked UI Stats Panel here
-        // FindObjectOfType<PlantStatsUI>()?.UpdateStats(calculatedStats); // Example
-
-        // Start the growth process if stats are valid
         if (targetStemLength > 0)
         {
              StartGrowthVisuals();
@@ -542,13 +613,13 @@ public class PlantGrowth : MonoBehaviour
         else
         {
             Debug.LogWarning("[PlantGrowth] Target stem length calculated as 0 or less. Plant will not grow.", gameObject);
-            // Transition directly to mature state? Or destroy? For now, just idle.
             currentState = PlantState.Mature_Idle;
-            cycleTimer = cycleCooldown; // Start first cooldown
+            cycleTimer = cycleCooldown;
         }
+        
+        // Initialize UI based on the current state
+        UpdateUI();
     }
-
-    // --- Stat Calculation (Called once during Initialization) ---
 
     private void CalculateAndApplyStats()
     {
@@ -557,15 +628,15 @@ public class PlantGrowth : MonoBehaviour
         // --- Default Values ---
         float accumulatedEnergyStorage = 0f;
         float accumulatedPhotosynthesis = 0f;
-        int baseStemMin = 3; // Base default if no nodes modify
-        int baseStemMax = 6; // Base default
+        int baseStemMin = 3;
+        int baseStemMax = 6;
         float baseGrowthSpeed = 1f;
         int baseLeafGap = 1;
         int baseLeafPattern = 0;
         float baseGrowthRandomness = 0f;
         float baseCooldown = 5.0f;
         float baseCastDelay = 0.1f;
-        // Modifiers (can be +/-)
+        // Modifiers
         int stemLengthModifier = 0;
         float growthSpeedModifier = 0f;
         int leafGapModifier = 0;
@@ -573,19 +644,16 @@ public class PlantGrowth : MonoBehaviour
         float cooldownModifier = 0f;
         float castDelayModifier = 0f;
 
-        bool seedFound = false; // Still useful to check if chain is valid
+        bool seedFound = false;
 
-        // --- Iterate through all nodes and effects ONCE ---
         foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex))
         {
             if (node.effects == null) continue;
 
             foreach (NodeEffectData effect in node.effects)
             {
-                // Use the renamed flag 'isPassive'
-                if (!effect.isPassive) continue; // Skip ACTIVE effects for stat calculation
+                if (!effect.isPassive) continue;
 
-                // --- Apply Passive Effects ---
                 switch (effect.effectType)
                 {
                     case NodeEffectType.SeedSpawn:
@@ -618,71 +686,102 @@ public class PlantGrowth : MonoBehaviour
                     case NodeEffectType.CastDelay:
                         castDelayModifier += effect.primaryValue;
                         break;
-                        // Add other passive effects here...
                 }
             }
         }
 
-        // --- Finalize Calculated Stats ---
-        finalMaxEnergy = Mathf.Max(1f, accumulatedEnergyStorage); // Ensure minimum energy storage
-        finalPhotosynthesisRate = Mathf.Max(0f, accumulatedPhotosynthesis); // Can be zero
+        finalMaxEnergy = Mathf.Max(1f, accumulatedEnergyStorage);
+        finalPhotosynthesisRate = Mathf.Max(0f, accumulatedPhotosynthesis);
 
-        finalStemMinLength = Mathf.Max(1, baseStemMin + stemLengthModifier); // Ensure min length is at least 1
-        finalStemMaxLength = Mathf.Max(finalStemMinLength, baseStemMax + stemLengthModifier); // Ensure max >= min
+        finalStemMinLength = Mathf.Max(1, baseStemMin + stemLengthModifier);
+        finalStemMaxLength = Mathf.Max(finalStemMinLength, baseStemMax + stemLengthModifier);
 
-        finalGrowthSpeed = Mathf.Max(0.1f, baseGrowthSpeed + growthSpeedModifier); // Prevent too fast/zero speed
-        finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier); // Min gap is 0
-        finalLeafPattern = Mathf.Clamp(baseLeafPattern, 0, 4); // Assuming 0-4 are valid patterns
-        finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier); // Clamp between 0 and 1
+        finalGrowthSpeed = Mathf.Max(0.1f, baseGrowthSpeed + growthSpeedModifier);
+        finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
+        finalLeafPattern = Mathf.Clamp(baseLeafPattern, 0, 4);
+        finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
 
-        cycleCooldown = Mathf.Max(0.1f, baseCooldown + cooldownModifier); // Minimum cooldown
-        nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier); // Minimum cast delay
+        cycleCooldown = Mathf.Max(0.1f, baseCooldown + cooldownModifier);
+        nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
 
-        // Set the target length for the GrowRoutine
         targetStemLength = Random.Range(finalStemMinLength, finalStemMaxLength + 1);
 
-        // --- Log Calculated Stats (Optional) ---
-        // Debug.Log($"[PlantGrowth] Calculated Stats for {gameObject.name}:\n" +
-        //           $"  Target Stem Length: {targetStemLength} (Range: {finalStemMinLength}-{finalStemMaxLength})\n" +
-        //           $"  Growth Speed: {finalGrowthSpeed}\n" +
-        //           $"  Leaf Gap: {finalLeafGap}, Pattern: {finalLeafPattern}\n" +
-        //           $"  Randomness: {finalGrowthRandomness}\n" +
-        //           $"  Max Energy: {finalMaxEnergy}, Photo Rate: {finalPhotosynthesisRate}\n" +
-        //           $"  Cycle Cooldown: {cycleCooldown}, Cast Delay: {nodeCastDelay}");
+        // Calculate total growth duration
+        totalGrowthDuration = finalGrowthSpeed * targetStemLength;
 
         if (!seedFound)
         {
              Debug.LogWarning("[PlantGrowth] Node chain lacks a passive SeedSpawn effect. Plant will not grow.", gameObject);
-             targetStemLength = 0; // Prevent growth if no seed marker
+             targetStemLength = 0;
         }
     }
 
-    // --- Start Visual Growth ---
     private void StartGrowthVisuals()
     {
-        // Clear previous visuals if any
-        foreach (Transform child in transform) { Destroy(child.gameObject); }
+        foreach (Transform child in transform) { 
+            if (child.GetComponent<Canvas>() != null || child.GetComponent<TMP_Text>() != null) continue;
+            if (energyText != null && energyText.transform == child) continue;
+            
+            Destroy(child.gameObject); 
+        }
         cells.Clear();
         currentStemCount = 0;
-        offsetRightForPattern1 = null; // Reset pattern state
+        offsetRightForPattern1 = null;
 
-        // Spawn Seed
         cells[Vector2Int.zero] = PlantCellType.Seed;
         SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
 
-        // Setup sorting
         SortableEntity[] cellEntities = GetComponentsInChildren<SortableEntity>();
         foreach (var cellEntity in cellEntities) {
             if (cellEntity.transform != transform) cellEntity.SetUseParentYCoordinate(true);
         }
 
-        // Start growing coroutine
         currentState = PlantState.Growing;
+        
+        // Start the smooth percentage counter if enabled
+        if (useSmoothPercentageCounter && showGrowthPercentage)
+        {
+            percentageCounterCoroutine = StartCoroutine(PercentageCounterRoutine());
+        }
+        
+        // Start the actual growth routine
         StartCoroutine(GrowRoutine());
     }
 
+    private IEnumerator PercentageCounterRoutine()
+    {
+        displayedGrowthPercentage = 0;
+        UpdateUI();
+        
+        // Calculate time per percentage increment
+        int totalSteps = 100 / percentageIncrement;
+        float timePerStep = totalGrowthDuration / totalSteps;
+        
+        for (int step = 1; step <= totalSteps; step++)
+        {
+            // Wait the calculated time
+            yield return new WaitForSeconds(timePerStep);
+            
+            // Check if we're still in growing state
+            if (currentState != PlantState.Growing)
+                break;
+            
+            // Update the percentage
+            displayedGrowthPercentage = step * percentageIncrement;
+            displayedGrowthPercentage = Mathf.Min(displayedGrowthPercentage, 100f); // Cap at 100%
+            
+            // Update the UI
+            UpdateUI();
+        }
+        
+        // Ensure we end at exactly 100%
+        if (currentState == PlantState.Growing)
+        {
+            displayedGrowthPercentage = 100f;
+            UpdateUI();
+        }
+    }
 
-    // --- Update Loop ---
     private void Update()
     {
         switch (currentState)
@@ -692,62 +791,105 @@ public class PlantGrowth : MonoBehaviour
                 break;
 
             case PlantState.Growing:
-                UpdateEnergyAndUI(); // Still accumulate energy while growing
+                // Optionally accumulate energy during growth based on the flag
+                if (allowPhotosynthesisDuringGrowth)
+                {
+                    AccumulateEnergy();
+                    
+                    // Only update UI if percentage is not shown (since percentage updates are handled by the counter)
+                    if (!showGrowthPercentage)
+                    {
+                        UpdateUI();
+                    }
+                }
                 break;
 
             case PlantState.Mature_Idle:
-                UpdateEnergyAndUI();
+                // Always accumulate energy when mature
+                AccumulateEnergy();
+                UpdateUI();
+                
                 cycleTimer -= Time.deltaTime;
                 if (cycleTimer <= 0f)
                 {
-                    // TODO: Add energy cost check if required to start cycle
-                    // if (currentEnergy >= cycleStartCost) {
-                         currentState = PlantState.Mature_Executing;
-                         StartCoroutine(ExecuteMatureCycle());
-                    // } else { cycleTimer = cycleCooldown; } // Not enough energy, reset timer
+                    currentState = PlantState.Mature_Executing;
+                    StartCoroutine(ExecuteMatureCycle());
                 }
                 break;
 
             case PlantState.Mature_Executing:
-                // Coroutine is handling execution, might still update energy
-                UpdateEnergyAndUI();
+                // Always accumulate energy during execution too
+                AccumulateEnergy();
+                UpdateUI();
                 break;
         }
     }
 
-    private void UpdateEnergyAndUI()
+    // Separated energy accumulation from UI updates
+    private void AccumulateEnergy()
     {
-        // Accumulate energy from photosynthesis
         float sunlight = (WeatherManager.Instance != null) ? WeatherManager.Instance.sunIntensity : 1f;
         float leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
         float deltaPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight * Time.deltaTime;
         currentEnergy = Mathf.Clamp(currentEnergy + deltaPhotosynthesis, 0f, finalMaxEnergy);
+    }
 
-        // Update UI
-        if (energyText != null)
+    private void UpdateUI()
+    {
+        if (energyText == null) EnsureUIReferences();
+        if (energyText == null) return;
+        
+        switch (currentState)
         {
-            energyText.text = $"{Mathf.Floor(currentEnergy)}/{Mathf.Floor(finalMaxEnergy)}";
+            case PlantState.Growing:
+                if (showGrowthPercentage)
+                {
+                    // During growth phase, show the fixed-step counter if enabled, otherwise show real percentage
+                    if (useSmoothPercentageCounter)
+                    {
+                        // Use the smooth counter value
+                        int displayPercentage = Mathf.RoundToInt(displayedGrowthPercentage);
+                        energyText.text = $"{displayPercentage}%";
+                    }
+                    else
+                    {
+                        // Calculate actual percentage
+                        int percentage = targetStemLength <= 0 ? 0 : 
+                            Mathf.RoundToInt((float)currentStemCount / targetStemLength * 100f);
+                        energyText.text = $"{percentage}%";
+                    }
+                }
+                else
+                {
+                    // Show energy instead of percentage if that's the preference
+                    energyText.text = $"{Mathf.Floor(currentEnergy)}/{Mathf.Floor(finalMaxEnergy)}";
+                }
+                break;
+                
+            case PlantState.Mature_Idle:
+            case PlantState.Mature_Executing:
+                // After growth is complete, always show energy level
+                energyText.text = $"{Mathf.Floor(currentEnergy)}/{Mathf.Floor(finalMaxEnergy)}";
+                break;
+                
+            default:
+                // Initializing or other states
+                energyText.text = "...";
+                break;
         }
     }
 
-    // --- Mature Phase Execution Cycle ---
-
     private IEnumerator ExecuteMatureCycle()
     {
-        // Debug.Log($"[{gameObject.name}] Starting Mature Execution Cycle");
         if (nodeGraph == null || nodeGraph.nodes == null)
         {
              Debug.LogError($"[{gameObject.name}] NodeGraph is missing during mature cycle execution!", gameObject);
-             currentState = PlantState.Mature_Idle; // Go back to idle to prevent lockup
-             cycleTimer = cycleCooldown; // Reset cooldown
-             yield break; // Exit if no graph
+             currentState = PlantState.Mature_Idle;
+             cycleTimer = cycleCooldown;
+             yield break;
         }
 
-        // TODO: Deduct energy cost to start cycle if applicable
-        // currentEnergy -= cycleStartCost;
-
-        float damageMultiplier = 1.0f; // Example context, reset each cycle
-        // Add other context variables needed by effects (e.g., target position, status flags)
+        float damageMultiplier = 1.0f;
 
         var sortedNodes = nodeGraph.nodes.OrderBy(n => n.orderIndex).ToList();
 
@@ -755,59 +897,40 @@ public class PlantGrowth : MonoBehaviour
         {
              if (node.effects == null) continue;
 
-             // Check if this node has ANY active phase effects
-             // Use the renamed flag 'isPassive'
              bool hasActiveEffect = node.effects.Any(eff => !eff.isPassive);
 
              if (hasActiveEffect)
              {
-                 // Apply cast delay BEFORE executing the active node
                  if (nodeCastDelay > 0)
                  {
                      yield return new WaitForSeconds(nodeCastDelay);
                  }
 
-                 // Execute all ACTIVE effects within this node
                  foreach (NodeEffectData effect in node.effects)
                  {
-                     // Use the renamed flag 'isPassive'
-                     if (effect.isPassive) continue; // Skip PASSIVE effects
+                     if (effect.isPassive) continue;
 
-                     // --- Execute Active Effects ---
-                     // Debug.Log($"--> Executing Active Effect: {effect.effectType} from Node: {node.nodeDisplayName}");
                      switch (effect.effectType)
                      {
                          case NodeEffectType.Output:
-                             // Find potential OutputNodeEffect component on a prefab or handle directly
-                             OutputNodeEffect outputEffect = GetComponentInChildren<OutputNodeEffect>(); // Simple search, might need refinement
+                             OutputNodeEffect outputEffect = GetComponentInChildren<OutputNodeEffect>();
                              if(outputEffect != null) {
-                                outputEffect.Activate(damageMultiplier); // Pass context
+                                outputEffect.Activate(damageMultiplier);
                              } else {
                                 Debug.LogWarning($"[PlantGrowth] Output effect found on node '{node.nodeDisplayName}' but no OutputNodeEffect component found on plant '{gameObject.name}' or its children.", gameObject);
                              }
                              break;
                          case NodeEffectType.Damage:
-                             // Usually modifies context for subsequent Output nodes
-                             // damageMultiplier += effect.primaryValue;
+                             damageMultiplier += effect.primaryValue;
                              break;
-                          // Add cases for other active effects (Heal, Status, etc.)
                      }
-                     // TODO: Add Mana/Energy cost deduction per active effect/node if applicable
-                     // currentEnergy -= effectManaCost;
-                     // if (currentEnergy < 0) { yield break; } // Stop cycle if out of energy
                  }
              }
-             // Else: Node only had passive effects, skip cast delay and execution
         }
 
-        // --- Cycle Complete ---
-        // Debug.Log($"[{gameObject.name}] Mature Execution Cycle Complete.");
-        cycleTimer = cycleCooldown; // Reset cooldown timer
-        currentState = PlantState.Mature_Idle; // Go back to idle state
+        cycleTimer = cycleCooldown;
+        currentState = PlantState.Mature_Idle;
     }
-
-
-    // --- Growth Coroutine (Uses calculated stats) ---
 
     private IEnumerator GrowRoutine()
     {
@@ -815,56 +938,70 @@ public class PlantGrowth : MonoBehaviour
         int spiralDirection = 1;
         int patternCounter = 0;
 
-        while (currentState == PlantState.Growing) // Loop while growing
+        while (currentState == PlantState.Growing)
         {
-            // Use calculated growth speed
             yield return new WaitForSeconds(finalGrowthSpeed);
 
             if (currentStemCount < targetStemLength)
             {
                 currentStemCount++;
-                Vector2Int dir = (currentStemCount == 1) ? Vector2Int.up : GetStemDirection(); // GetStemDirection uses finalGrowthRandomness
+                Vector2Int dir = (currentStemCount == 1) ? Vector2Int.up : GetStemDirection();
                 currentPos += dir;
 
-                // Check if position is already occupied (by leaf from complex pattern?)
                 if (!cells.ContainsKey(currentPos)) {
                     cells[currentPos] = PlantCellType.Stem;
                     SpawnCellVisual(PlantCellType.Stem, currentPos);
-                } else {
-                     // Debug.LogWarning($"[PlantGrowth] Tried to grow Stem into occupied space {currentPos}. Skipping cell.", gameObject);
-                     // Optional: Handle overlap logic
                 }
 
-
-                // Use calculated leaf gap and pattern
-                if ((finalLeafGap >= 0) && // Ensure gap is valid before modulo
-                    (currentStemCount % (finalLeafGap + 1)) == 0)
+                if ((finalLeafGap >= 0) && (currentStemCount % (finalLeafGap + 1)) == 0)
                 {
                     Vector2Int baseLeftPos = currentPos + Vector2Int.left;
                     Vector2Int baseRightPos = currentPos + Vector2Int.right;
                     patternCounter++;
 
-                    // Process according to calculated leaf pattern
                     ExecuteLeafPatternLogic(currentPos, baseLeftPos, baseRightPos, patternCounter, ref spiralDirection);
                 }
+                
+                // Only update UI if we're showing actual percentage or energy
+                if (showGrowthPercentage && !useSmoothPercentageCounter)
+                {
+                    UpdateUI();
+                }
+                else if (!showGrowthPercentage)
+                {
+                    UpdateUI();
+                }
             }
-            else // Growth target reached
+            else
             {
-                // Debug.Log($"[{gameObject.name}] Growth complete. Reached target stem length: {targetStemLength}. Transitioning to Mature_Idle.", gameObject);
+                Debug.Log($"[{gameObject.name}] Growth complete. Transitioning to Mature_Idle state.");
+                
+                // Stop the percentage counter coroutine if it's running
+                if (percentageCounterCoroutine != null)
+                {
+                    StopCoroutine(percentageCounterCoroutine);
+                    percentageCounterCoroutine = null;
+                }
+                
+                // Make sure percentage shows 100% at the end
+                if (showGrowthPercentage)
+                {
+                    displayedGrowthPercentage = 100f;
+                    UpdateUI();
+                }
+                
                 currentState = PlantState.Mature_Idle;
-                cycleTimer = cycleCooldown; // Start the first cooldown timer
-                // Exit the coroutine
+                cycleTimer = cycleCooldown;
+                
+                // Final UI update to show energy instead of growth percentage
+                UpdateUI();
                 yield break;
             }
         }
-         // Fallback exit if state changes unexpectedly
-         // Debug.Log($"[{gameObject.name}] Exiting GrowRoutine due to state change.");
     }
 
-    // Helper for leaf pattern logic (uses finalLeafPattern)
     private void ExecuteLeafPatternLogic(Vector2Int currentPos, Vector2Int baseLeftPos, Vector2Int baseRightPos, int patternCounter, ref int spiralDirection)
     {
-        // This logic remains the same as before, using finalLeafPattern
         switch (finalLeafPattern)
         {
             case 0: // Parallel
@@ -899,19 +1036,17 @@ public class PlantGrowth : MonoBehaviour
         }
     }
 
-    // Helper for stem direction (uses finalGrowthRandomness)
     private Vector2Int GetStemDirection()
     {
         Vector2Int up = Vector2Int.up;
         Vector2Int leftDiag = new Vector2Int(-1, 1);
         Vector2Int rightDiag = new Vector2Int(1, 1);
 
-        float r = finalGrowthRandomness; // Use calculated value
+        float r = finalGrowthRandomness;
         if (Random.value < (1f - r)) return up;
         else return (Random.value < 0.5f) ? leftDiag : rightDiag;
     }
 
-    // Helper to spawn leaves (prevent overlap)
     private void SpawnLeafIfEmpty(Vector2Int coords)
     {
         if (!cells.ContainsKey(coords))
@@ -919,10 +1054,8 @@ public class PlantGrowth : MonoBehaviour
             cells[coords] = PlantCellType.Leaf;
             SpawnCellVisual(PlantCellType.Leaf, coords);
         }
-        // else: Space occupied, don't spawn leaf
     }
 
-    // Helper to spawn visuals (Uses globally defined PlantCellType)
     private void SpawnCellVisual(PlantCellType cellType, Vector2Int coords)
     {
         Vector2 worldPos = (Vector2)transform.position + (Vector2)coords * cellSpacing;
@@ -935,11 +1068,20 @@ public class PlantGrowth : MonoBehaviour
         if (prefabToUse != null) {
             GameObject cellInstance = Instantiate(prefabToUse, worldPos, Quaternion.identity, transform);
             SortableEntity sortableEntity = cellInstance.GetComponent<SortableEntity>() ?? cellInstance.AddComponent<SortableEntity>();
-            // Apply sorting only to non-seed parts if needed
             if (cellType != PlantCellType.Seed) {
                 sortableEntity.SetUseParentYCoordinate(true);
             }
         } else Debug.LogWarning($"[PlantGrowth] No prefab assigned for cell type {cellType}");
+    }
+    
+    private void OnDestroy()
+    {
+        // Ensure coroutines are stopped when object is destroyed
+        if (percentageCounterCoroutine != null)
+        {
+            StopCoroutine(percentageCounterCoroutine);
+            percentageCounterCoroutine = null;
+        }
     }
 }
 
@@ -1266,47 +1408,6 @@ public class SortableEntity : MonoBehaviour
     {
         useParentYCoordinate = value;
     }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Animals\AnimalDefinition.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-[CreateAssetMenu(fileName = "AnimalDefinition", menuName = "Ecosystem/Animal Definition")]
-public class AnimalDefinition : ScriptableObject
-{
-    [Header("Basic Stats")]
-    public string animalName;
-    public float maxHealth = 10f;
-    public float hungerDecayRate = 0.5f;  // How quickly the animal gets hungry (units/sec)
-    public float movementSpeed = 2f;
-
-    [Header("Eating & Satiation")]
-    public float hungerThreshold = 5f;    // If hunger > threshold, tries to eat
-    public float eatAmount = 5f;         // How much hunger is reduced when it eats a leaf
-    public float leafDamage = 1f;        // How much health (or 'life') is removed from a leaf
-
-    [Header("Prefab/Visuals")]
-    public GameObject prefab;  // The character prefab to instantiate
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Animals\AnimalLibrary.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using System.Collections.Generic;
-
-[CreateAssetMenu(fileName = "AnimalLibrary", menuName = "Ecosystem/Animal Library")]
-public class AnimalLibrary : ScriptableObject
-{
-    public List<AnimalDefinition> animals;
 }
 
 

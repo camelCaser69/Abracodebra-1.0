@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-01 04:16:33
+UNITY PROJECT SCRIPT EXPORT - 2025-04-01 15:37:58
 PART 2 OF 3
 ================================================================================
 
@@ -73,8 +73,7 @@ Assets
 │   │   └── AnimalThoughtLibrary.asset
 │   └── Nodes Plant
 │       ├── NodeDefinitionLibrary.asset
-│       ├── Node_000_Seed.asset
-│       └── Node_000_Seed_Solo.asset
+│       └── Node_000_Seed.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -142,6 +141,47 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Animals\AnimalDefinition.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[CreateAssetMenu(fileName = "AnimalDefinition", menuName = "Ecosystem/Animal Definition")]
+public class AnimalDefinition : ScriptableObject
+{
+    [Header("Basic Stats")]
+    public string animalName;
+    public float maxHealth = 10f;
+    public float hungerDecayRate = 0.5f;  // How quickly the animal gets hungry (units/sec)
+    public float movementSpeed = 2f;
+
+    [Header("Eating & Satiation")]
+    public float hungerThreshold = 5f;    // If hunger > threshold, tries to eat
+    public float eatAmount = 5f;         // How much hunger is reduced when it eats a leaf
+    public float leafDamage = 1f;        // How much health (or 'life') is removed from a leaf
+
+    [Header("Prefab/Visuals")]
+    public GameObject prefab;  // The character prefab to instantiate
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Animals\AnimalLibrary.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using System.Collections.Generic;
+
+[CreateAssetMenu(fileName = "AnimalLibrary", menuName = "Ecosystem/Animal Library")]
+public class AnimalLibrary : ScriptableObject
+{
+    public List<AnimalDefinition> animals;
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\AnimalController.cs
@@ -919,12 +959,12 @@ public class NodeDefinition : ScriptableObject
 
         foreach (var eff in effects)
         {
-            // Perform a shallow copy, assuming NodeEffectData is simple enough
             NodeEffectData newEff = new NodeEffectData()
             {
                 effectType = eff.effectType,
                 primaryValue = eff.primaryValue,
-                secondaryValue = eff.secondaryValue
+                secondaryValue = eff.secondaryValue,
+                isPassive = eff.isPassive  // Add this line to copy the flag
             };
             copy.Add(newEff);
         }
@@ -1074,43 +1114,52 @@ public class NodeExecutor : MonoBehaviour
     }
 
     public void SpawnPlantFromUIGraph()
+{
+    if (nodeEditorGrid == null) { DebugLogError("Node Editor Grid Controller not assigned!"); return; }
+    if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return; }
+    if (gardener == null) { DebugLogError("Gardener Controller not assigned!"); return; }
+
+    NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
+
+    if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0) { DebugLog("No nodes in UI graph."); return; }
+
+    // Use the renamed flag 'isPassive'
+    bool seedFound = graphToSpawn.nodes.Any(node => node.effects != null && node.effects.Any(eff => eff.effectType == NodeEffectType.SeedSpawn && eff.isPassive)); 
+    if (!seedFound) { DebugLog("Node chain lacks a passive SeedSpawn effect."); return; }
+
+    DebugLog($"Spawning plant from UI graph with {graphToSpawn.nodes.Count} nodes...");
+    Vector2 spawnPos = gardener.GetPlantingPosition();
+    
+    // Get parent for plants from EcosystemManager
+    Transform plantParent = null;
+    if (EcosystemManager.Instance != null && EcosystemManager.Instance.plantParent != null)
     {
-        if (nodeEditorGrid == null) { DebugLogError("Node Editor Grid Controller not assigned!"); return; }
-        if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return; }
-        if (gardener == null) { DebugLogError("Gardener Controller not assigned!"); return; }
-
-        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
-
-        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0) { DebugLog("No nodes in UI graph."); return; }
-
-        // Use the renamed flag 'isPassive'
-        bool seedFound = graphToSpawn.nodes.Any(node => node.effects != null && node.effects.Any(eff => eff.effectType == NodeEffectType.SeedSpawn && eff.isPassive)); // SeedSpawn should be passive
-        if (!seedFound) { DebugLog("Node chain lacks a passive SeedSpawn effect."); return; }
-
-        DebugLog($"Spawning plant from UI graph with {graphToSpawn.nodes.Count} nodes...");
-        Vector2 spawnPos = gardener.GetPlantingPosition();
-        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity);
-
-        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
-        if (growthComponent != null)
-        {
-            NodeGraph graphCopy = new NodeGraph();
-            graphCopy.nodes = new List<NodeData>();
-            foreach(NodeData originalNodeData in graphToSpawn.nodes)
-            {
-                 NodeData newNodeData = new NodeData {
-                    nodeId = originalNodeData.nodeId,
-                    nodeDisplayName = originalNodeData.nodeDisplayName,
-                    orderIndex = originalNodeData.orderIndex,
-                    effects = CloneEffectsList(originalNodeData.effects) // Deep copy effects
-                };
-                graphCopy.nodes.Add(newNodeData);
-            }
-            growthComponent.InitializeAndGrow(graphCopy);
-            DebugLog("Plant spawned and initialized.");
-        }
-        else { DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth!"); Destroy(plantObj); }
+        plantParent = EcosystemManager.Instance.plantParent;
     }
+    
+    // Instantiate with proper parent
+    GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity, plantParent);
+
+    PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+    if (growthComponent != null)
+    {
+        NodeGraph graphCopy = new NodeGraph();
+        graphCopy.nodes = new List<NodeData>();
+        foreach(NodeData originalNodeData in graphToSpawn.nodes)
+        {
+             NodeData newNodeData = new NodeData {
+                nodeId = originalNodeData.nodeId,
+                nodeDisplayName = originalNodeData.nodeDisplayName,
+                orderIndex = originalNodeData.orderIndex,
+                effects = CloneEffectsList(originalNodeData.effects) // Deep copy effects
+            };
+            graphCopy.nodes.Add(newNodeData);
+        }
+        growthComponent.InitializeAndGrow(graphCopy);
+        DebugLog("Plant spawned and initialized.");
+    }
+    else { DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth!"); Destroy(plantObj); }
+}
 
     private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
     {
@@ -1186,171 +1235,6 @@ public class DeselectOnClickOutside : MonoBehaviour, IPointerClickHandler
             // If the background is clicked, clear the current node selection
             // Debug.Log("Background Clicked. Clearing Node Selection.");
             NodeCell.ClearSelection();
-        }
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\UI\NodeCell.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
-
-[RequireComponent(typeof(RectTransform))]
-// Remove IPointerClickHandler interface from here
-// Keep IDropHandler for dropping onto the cell background
-public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler // Keep IPointerClickHandler for RIGHT click on empty
-{
-    public static NodeCell CurrentlySelectedCell { get; private set; }
-    public int CellIndex { get; private set; }
-
-    private NodeEditorGridController _controller;
-    private NodeData _nodeData;
-    private NodeView _nodeView;
-    private Image _backgroundImage;
-
-    // --- Init remains the same ---
-    public void Init(int index, NodeEditorGridController gridController, Image bgImage)
-    {
-        CellIndex = index;
-        _controller = gridController;
-        _backgroundImage = bgImage;
-
-        if (_backgroundImage != null && _controller != null)
-        {
-            _backgroundImage.color = _controller.EmptyCellColor;
-            _backgroundImage.enabled = true;
-        }
-    }
-
-    // --- HasNode, Getters remain the same ---
-    public bool HasNode() => _nodeData != null && _nodeView != null;
-    public NodeData GetNodeData() => _nodeData;
-    public NodeView GetNodeView() => _nodeView;
-
-    // --- AssignNode, AssignNodeView remain the same ---
-     public void AssignNode(NodeDefinition def)
-    {
-        if (def == null || _controller == null) return;
-        RemoveNode();
-
-        _nodeData = new NodeData() { /* ... data setup ... */
-            nodeId = System.Guid.NewGuid().ToString(),
-            nodeDisplayName = def.displayName,
-            effects = def.CloneEffects(),
-            orderIndex = this.CellIndex
-        };
-
-        GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : _controller.NodeViewPrefab;
-        if (prefabToInstantiate == null) { /* ... error handling ... */ Debug.LogError($"..."); _nodeData = null; return; }
-
-        GameObject nodeViewGO = Instantiate(prefabToInstantiate, transform);
-        _nodeView = nodeViewGO.GetComponent<NodeView>();
-        if (_nodeView == null) { /* ... error handling ... */ Debug.LogError($"..."); Destroy(nodeViewGO); _nodeData = null; return; }
-
-        _nodeView.Initialize(_nodeData, def, _controller); // Init NodeView
-
-        NodeDraggable draggable = _nodeView.GetComponent<NodeDraggable>();
-        if (draggable == null) draggable = _nodeView.gameObject.AddComponent<NodeDraggable>();
-        draggable.Initialize(_controller, this); // Init Draggable
-
-        if(_backgroundImage != null) _backgroundImage.enabled = true;
-    }
-     public void AssignNodeView(NodeView view, NodeData data)
-    {
-         RemoveNode();
-         _nodeView = view;
-         _nodeData = data;
-         if (_nodeView != null) {
-             _nodeView.transform.SetParent(transform, false);
-             if (_nodeData != null) _nodeData.orderIndex = this.CellIndex;
-             // Parent ref will be updated by NodeDraggable.SnapToCell which calls NodeView.UpdateParent...
-         }
-         if(_backgroundImage != null) _backgroundImage.enabled = true;
-    }
-
-
-    // --- RemoveNode, ClearNodeReference remain the same ---
-    public void RemoveNode()
-    {
-        bool wasSelected = (CurrentlySelectedCell == this);
-        if (_nodeView != null) {
-            if (wasSelected) {
-                 _nodeView.Unhighlight();
-                 CurrentlySelectedCell = null;
-            }
-            Destroy(_nodeView.gameObject);
-        }
-        _nodeView = null; _nodeData = null;
-        if (wasSelected && CurrentlySelectedCell == this) CurrentlySelectedCell = null;
-        if(_backgroundImage != null) _backgroundImage.enabled = true;
-    }
-     public void ClearNodeReference()
-    {
-        _nodeView = null; _nodeData = null;
-        if(_backgroundImage != null) _backgroundImage.enabled = true;
-    }
-
-    // --- Selection Handling (SelectCell, ClearSelection) remains the same ---
-     public static void SelectCell(NodeCell cellToSelect)
-    {
-        if (cellToSelect == null || !cellToSelect.HasNode()) { ClearSelection(); return; }
-        if (CurrentlySelectedCell == cellToSelect) return;
-        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
-            CurrentlySelectedCell.GetNodeView().Unhighlight();
-        }
-        CurrentlySelectedCell = cellToSelect;
-        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
-            CurrentlySelectedCell.GetNodeView().Highlight();
-        }
-    }
-     public static void ClearSelection()
-    {
-        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
-            CurrentlySelectedCell.GetNodeView().Unhighlight();
-        }
-        CurrentlySelectedCell = null;
-    }
-
-    // --- Event Handlers UPDATED ---
-
-    /// <summary>
-    /// Handles clicks on the CELL BACKGROUND image.
-    /// Left Click: Does nothing (NodeView handles selection).
-    /// Right Click: Opens add node menu ONLY if the cell is currently empty.
-    /// </summary>
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        // This click is on the NodeCell's background image
-
-        if (eventData.button == PointerEventData.InputButton.Right)
-        {
-            // Right Click: Only allow opening the dropdown if the cell is currently EMPTY.
-            if (!HasNode())
-            {
-                // Debug.Log($"NodeCell Background Clicked (Right) on Empty Cell {CellIndex}. Opening dropdown.");
-                ClearSelection(); // Clear selection before showing add menu
-                _controller?.OnEmptyCellRightClicked(this, eventData);
-            }
-            // If right-clicking the background of an occupied cell, do nothing.
-        }
-        // Left click on the background does nothing regarding selection now.
-    }
-
-
-    // --- OnDrop remains the same ---
-    public void OnDrop(PointerEventData eventData)
-    {
-        GameObject draggedObject = eventData.pointerDrag;
-        if (draggedObject != null) {
-            NodeDraggable draggedNode = draggedObject.GetComponent<NodeDraggable>();
-            if (draggedNode != null && _controller != null) {
-                 _controller.HandleNodeDrop(draggedNode, draggedNode.OriginalCell, eventData.position);
-            }
         }
     }
 }

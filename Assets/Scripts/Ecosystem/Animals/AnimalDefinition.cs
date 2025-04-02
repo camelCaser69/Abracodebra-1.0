@@ -1,19 +1,23 @@
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "AnimalDefinition", menuName = "Ecosystem/Animal Definition")]
+[CreateAssetMenu(fileName = "Animal_", menuName = "Ecosystem/Animal Definition (Simplified)")]
 public class AnimalDefinition : ScriptableObject
 {
-    [Header("Basic Stats")]
-    public string animalName;
-    public float maxHealth = 10f;
-    public float hungerDecayRate = 0.5f;  // How quickly the animal gets hungry (units/sec)
+    [Header("Identification")]
+    [Tooltip("The species name (e.g., 'Bunny', 'Fox').")]
+    public string animalName = "DefaultAnimal";
+
+    [Header("Core Stats")]
+    public float maxHealth = 10f; // Keep health for potential future damage/predators
     public float movementSpeed = 2f;
 
-    [Header("Eating & Satiation")]
-    public float hungerThreshold = 5f;    // If hunger > threshold, tries to eat
-    public float eatAmount = 5f;         // How much hunger is reduced when it eats a leaf
-    public float leafDamage = 1f;        // How much health (or 'life') is removed from a leaf
+    [Header("Diet")]
+    [Tooltip("Reference to the AnimalDiet ScriptableObject defining eating habits.")]
+    public AnimalDiet diet; // Needs to reference the simplified AnimalDiet SO
 
-    [Header("Prefab/Visuals")]
-    public GameObject prefab;  // The character prefab to instantiate
+    [Header("Visuals")]
+    [Tooltip("The prefab to instantiate for this animal.")]
+    public GameObject prefab;
+
+    // Removed meatFoodType
 }

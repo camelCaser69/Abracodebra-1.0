@@ -4,14 +4,20 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 
+// FILE: Assets\Scripts\Battle\Plant\PlantGrowth.cs (Contains the enum)
+// NOTE: Make sure this enum definition is accessible where needed,
+// potentially move it to its own file if used by many scripts.
+
 public enum PlantCellType
 {
     Seed,
     Stem,
     Leaf,
-    Flower,
-    Fruit
+    Flower, // Kept for potential future use
+    Fruit   // <<< ADDED (Represents berries)
 }
+
+// The rest of PlantGrowth.cs follows...
 
 public enum PlantState
 {

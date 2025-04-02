@@ -67,6 +67,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1385400547619210892}
+  - {fileID: 8180810422158951206}
   - {fileID: 9001696667229699929}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -84,12 +85,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   thoughtLibrary: {fileID: 11400000, guid: 8abd92eb95108124a8478425e6e2cfb5, type: 2}
   thoughtBubblePrefab: {fileID: 7019603340007582860, guid: e00dc2bef6e577f4788d3a0262749be1, type: 3}
-  mouthTransform: {fileID: 9001696667229699929}
   bubbleSpawnTransform: {fileID: 1385400547619210892}
   thoughtCooldownTime: 5
-  eatDuration: 2
+  searchRadius: 10
   eatDistance: 0.05
-  wanderPauseIntensity: 0.505
+  eatDuration: 2
+  wanderPauseChance: 0.3
   wanderMinMoveDuration: 0.5
   wanderMaxMoveDuration: 5
   wanderMinPauseDuration: 0.5
@@ -97,10 +98,10 @@ MonoBehaviour:
   minPoopDelay: 0.5
   maxPoopDelay: 3
   poopDuration: 1.5
-  poopLifetime: 10
   poopPrefabs:
   - {fileID: 4068151152815915600, guid: 6e8483a0861990945b53d358aeb98b0e, type: 3}
   - {fileID: 4068151152815915600, guid: 978e17d09199949439c4ddb97ee2c6c8, type: 3}
+  poopSpawnPoint: {fileID: 8180810422158951206}
   poopColorVariation: 0.12
 --- !u!114 &1716373188419040610
 MonoBehaviour:
@@ -284,6 +285,37 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0.037, y: -0.127, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2467199068900137623}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5707582882680047608
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8180810422158951206}
+  m_Layer: 0
+  m_Name: Transform_Pooping
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8180810422158951206
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5707582882680047608}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.03, y: -0.13, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

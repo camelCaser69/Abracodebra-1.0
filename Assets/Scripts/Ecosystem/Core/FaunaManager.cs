@@ -116,13 +116,17 @@ public class FaunaManager : MonoBehaviour
 
         // Get the existing AnimalController on the prefab.
         AnimalController controller = animalObj.GetComponent<AnimalController>();
-        if (!controller)
+        if (controller != null)
         {
-            Debug.LogWarning("[FaunaManager] Prefab missing AnimalController. Adding one dynamically.");
-            controller = animalObj.AddComponent<AnimalController>();
+            controller.Initialize(definition, animalMinBounds, animalMaxBounds); // Pass bounds
         }
-        controller.Initialize(definition);
-        controller.SetMovementBounds(animalMinBounds, animalMaxBounds);
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] Animal prefab '{definition.prefab.name}' is missing the AnimalController script!", animalObj);
+            Destroy(animalObj); // Destroy if controller is missing
+            return null;
+        }
+// ... rest of parenting logic ...
         return animalObj;
     }
 }
