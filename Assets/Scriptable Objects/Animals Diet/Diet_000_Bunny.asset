@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acceptableFoods:
   - foodType: {fileID: 11400000, guid: a4b9d34a97cd8d543b757c7493c54451, type: 2}
+    satiationAmount: 5
+    preferencePriority: 0.9
+  - foodType: {fileID: 11400000, guid: 9d32f5cdba61e5644b0f7adcc745fb89, type: 2}
     satiationAmount: 10
     preferencePriority: 1
   maxHunger: 20

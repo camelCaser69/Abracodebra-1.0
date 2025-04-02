@@ -2,18 +2,13 @@
 using System;
 using UnityEngine;
 
-/// <summary>
-/// Defines the different types of effects a Node can have.
-/// Effects are categorized as Passive (contribute to initial stats during growth)
-/// or Active (execute periodically during the Mature phase).
-/// </summary>
 public enum NodeEffectType
 {
     // --- Passive / Growth Phase Effects (isPassive = true) ---
     // These typically run once at the start to define the plant's structure and base stats.
 
-    [Tooltip("Base cost calculation (Not currently implemented in PlantGrowth execution).")]
-    ManaCost,
+    // [Tooltip("Base cost calculation (Not currently implemented in PlantGrowth execution).")]
+    // ManaCost, // REMOVED
     [Tooltip("Determines the maximum energy the plant can store.")]
     EnergyStorage,
     [Tooltip("Determines the base rate of energy generation through photosynthesis per leaf.")]
@@ -39,11 +34,13 @@ public enum NodeEffectType
     // --- Active / Mature Phase Effects (isPassive = false) ---
     // These execute periodically after the plant has finished growing.
 
+    [Tooltip("Energy cost deducted from the plant when this node's active effects are executed during the mature cycle.")]
+    EnergyCost, // <<< RENAMED/ADDED
     [Tooltip("Triggers the spawning of a projectile or other output effect (requires OutputNodeEffect component).")]
     Output,
     [Tooltip("Modifies the damage potential of subsequent 'Output' effects in the same cycle.")]
     Damage,
     [Tooltip("Causes the plant to attempt to spawn a berry in an available adjacent slot during the mature cycle.")]
-    GrowBerry, // <<< ADDED
+    GrowBerry,
     // Add potentially more active effects: Heal, ApplyStatus, AreaEffect, etc.
 }

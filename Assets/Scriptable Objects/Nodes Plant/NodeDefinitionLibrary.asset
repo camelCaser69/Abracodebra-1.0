@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   definitions:
   - {fileID: 11400000, guid: c2658bfcc287ffb41a5358a5a8d5dbcb, type: 2}
+  - {fileID: 11400000, guid: 155e1e1e7c78be942b9e766f383efc47, type: 2}
   initialNodes:
   - nodeDefinition: {fileID: 11400000, guid: c2658bfcc287ffb41a5358a5a8d5dbcb, type: 2}
     cellIndex: 0

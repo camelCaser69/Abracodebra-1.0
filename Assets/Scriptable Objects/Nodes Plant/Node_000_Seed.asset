@@ -19,43 +19,43 @@ MonoBehaviour:
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   effects:
-  - effectType: 3
+  - effectType: 2
     primaryValue: 0
     secondaryValue: 0
     isPassive: 1
-  - effectType: 9
-    primaryValue: 5
+  - effectType: 8
+    primaryValue: 6
     secondaryValue: 0
     isPassive: 1
-  - effectType: 10
+  - effectType: 9
+    primaryValue: 0.2
+    secondaryValue: 0
+    isPassive: 1
+  - effectType: 4
+    primaryValue: 0.25
+    secondaryValue: 0
+    isPassive: 1
+  - effectType: 3
+    primaryValue: 6
+    secondaryValue: 11
+    isPassive: 1
+  - effectType: 7
     primaryValue: 0.5
     secondaryValue: 0
     isPassive: 1
   - effectType: 5
-    primaryValue: 0.5
-    secondaryValue: 0
-    isPassive: 1
-  - effectType: 4
-    primaryValue: 5
-    secondaryValue: 9
-    isPassive: 1
-  - effectType: 8
-    primaryValue: 0.3
+    primaryValue: 1
     secondaryValue: 0
     isPassive: 1
   - effectType: 6
     primaryValue: 0
     secondaryValue: 0
     isPassive: 1
-  - effectType: 7
-    primaryValue: 0
-    secondaryValue: 0
-    isPassive: 1
-  - effectType: 2
-    primaryValue: 0.1
+  - effectType: 0
+    primaryValue: 30
     secondaryValue: 0
     isPassive: 1
   - effectType: 1
-    primaryValue: 10
+    primaryValue: 0.1
     secondaryValue: 0
     isPassive: 1

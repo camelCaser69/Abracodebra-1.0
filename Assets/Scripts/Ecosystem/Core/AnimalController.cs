@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.Linq; // Keep for potential future use, but not strictly needed for current FindBestFood
+using System.Linq;
+using TMPro; // <<< ADDED THIS using statement for TextMeshPro
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SortableEntity))]
@@ -19,6 +20,10 @@ public class AnimalController : MonoBehaviour
     public List<GameObject> poopPrefabs;
     public Animator animator; // Assign if using animations
 
+    [Header("UI References (Optional - Auto-Detected)")]
+    [Tooltip("Reference to the TextMeshPro component for displaying HP. Found automatically if not assigned.")]
+    [SerializeField] private TextMeshProUGUI hpText; // <<< ADDED HP TEXT REFERENCE
+
     [Header("Behavior Tuning")]
     public float searchRadius = 5f;
     public float eatDistance = 0.5f;
@@ -35,7 +40,7 @@ public class AnimalController : MonoBehaviour
     public float thoughtCooldownTime = 5f;
 
 
-    // Internal State
+    // --- Internal State ---
     private float currentHealth;
     private float currentHunger;
     private GameObject currentTargetFood = null;
@@ -50,17 +55,18 @@ public class AnimalController : MonoBehaviour
     private bool hasPooped = true;
     private float thoughtCooldownTimer = 0f;
 
-    // Component References
+    // --- Component References ---
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
 
-    // Movement Bounds
+    // --- Movement Bounds ---
     private Vector2 minBounds;
     private Vector2 maxBounds;
 
-    // Public Accessors
+    // --- Public Accessors ---
     public float CurrentHealth => currentHealth;
     public string SpeciesName => definition ? definition.animalName : "Uninitialized";
+
 
     /// <summary>
     /// Initializes the Animal Controller. Called by FaunaManager.
@@ -86,12 +92,15 @@ public class AnimalController : MonoBehaviour
         // Animator is assigned via inspector if used
 
         // Set Initial State
-        currentHealth = definition.maxHealth;
+        currentHealth = definition.maxHealth; // Use maxHealth from definition
         currentHunger = 0f; // Start not hungry
         hasPooped = true;
         poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
         minBounds = minB;
         maxBounds = maxB;
+
+        EnsureHpTextReference(); // <<< CALL METHOD TO FIND HP TEXT
+        UpdateHpText(); // <<< CALL METHOD TO SET INITIAL HP TEXT
 
         if (spriteRenderer == null) {
              Debug.LogWarning($"[{gameObject.name}] No SpriteRenderer found in children.", gameObject);
@@ -102,7 +111,7 @@ public class AnimalController : MonoBehaviour
     {
         if (!enabled) return; // Do nothing if not initialized correctly
 
-        UpdateHunger();
+        UpdateHunger(); // This now calls UpdateHpText if starvation happens
         HandlePooping();
         UpdateThoughts();
 
@@ -126,6 +135,7 @@ public class AnimalController : MonoBehaviour
         if (rb != null && !isEating && !isPooping && moveDirection != Vector2.zero)
         {
             Vector2 currentPos = rb.position;
+            // Use normalized direction to ensure consistent speed
             Vector2 desiredMove = moveDirection.normalized * definition.movementSpeed * Time.fixedDeltaTime;
             Vector2 newPos = currentPos + desiredMove;
 
@@ -137,13 +147,29 @@ public class AnimalController : MonoBehaviour
         }
     }
 
+    // --- State Update Methods ---
+
     void UpdateHunger()
     {
         currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime;
-        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger); // Clamp
+        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
 
-        // Removed starvation logic for simplicity
-        // if (currentHunger >= animalDiet.maxHunger) { /* ApplyStarvationDamage(); */ }
+        // Removed starvation logic for simplicity, but keep structure
+        // if (currentHunger >= animalDiet.maxHunger) {
+        //     ApplyStarvationDamage(); // Check for starvation
+        // }
+    }
+
+    // Placeholder for potential future starvation damage
+    void ApplyStarvationDamage()
+    {
+        // This method would be called if starvation logic is re-added
+        // currentHealth -= animalDiet.starvationDamageRate * Time.deltaTime;
+        UpdateHpText(); // <<< UPDATE HP TEXT AFTER TAKING DAMAGE (important if starvation added back)
+        // if (currentHealth <= 0)
+        // {
+        //     Die(CauseOfDeath.Starvation); // Use existing Die method
+        // }
     }
 
     void HandlePooping()
@@ -162,14 +188,8 @@ public class AnimalController : MonoBehaviour
          if (thoughtCooldownTimer > 0) { thoughtCooldownTimer -= Time.deltaTime; }
      }
 
-    void HandleEating()
-    {
-        eatTimer -= Time.deltaTime;
-        if (eatTimer <= 0f) {
-            isEating = false;
-            FinishEatingAction(); // Renamed for clarity
-        }
-    }
+
+    // --- Action Execution Methods ---
 
     void DecideNextAction()
     {
@@ -227,6 +247,15 @@ public class AnimalController : MonoBehaviour
         if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
     }
 
+    void HandleEating()
+    {
+        eatTimer -= Time.deltaTime;
+        if (eatTimer <= 0f) {
+            isEating = false;
+            FinishEatingAction(); // Renamed for clarity
+        }
+    }
+
     // Called when the eat timer finishes
     void FinishEatingAction()
     {
@@ -242,7 +271,7 @@ public class AnimalController : MonoBehaviour
             currentHunger -= satiationGain;
             currentHunger = Mathf.Max(0f, currentHunger);
 
-            // 3. Destroy the Food GameObject *** THIS IS THE KEY CHANGE ***
+            // 3. Destroy the Food GameObject
             Destroy(currentTargetFood);
 
             // 4. Reset Poop Timer
@@ -254,7 +283,7 @@ public class AnimalController : MonoBehaviour
         }
          else {
              // Target was invalid (missing FoodItem/FoodType), clear it
-             Debug.LogWarning($"[{gameObject.name}] Tried to finish eating invalid target '{currentTargetFood?.name}'. Clearing target.", currentTargetFood);
+             // Debug.LogWarning($"[{gameObject.name}] Tried to finish eating invalid target '{currentTargetFood?.name}'. Clearing target.", currentTargetFood);
              currentTargetFood = null;
          }
     }
@@ -327,6 +356,9 @@ public class AnimalController : MonoBehaviour
         }
     }
 
+
+    // --- Movement & Visuals ---
+
     void FlipSpriteBasedOnDirection()
     {
         if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f) {
@@ -344,6 +376,8 @@ public class AnimalController : MonoBehaviour
         // animator.SetBool("IsPooping", isPooping); // Add if needed
     }
 
+    // --- Thought Bubbles ---
+
     bool CanShowThought() {
         return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f;
     }
@@ -351,7 +385,9 @@ public class AnimalController : MonoBehaviour
     void ShowThought(ThoughtTrigger trigger)
     {
         // Simplified - assumes CanShowThought() was checked
-        var entry = thoughtLibrary.allThoughts.FirstOrDefault(t => t.speciesName == SpeciesName && t.trigger == trigger);
+        if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return; // Added null check
+
+        var entry = thoughtLibrary.allThoughts.FirstOrDefault(t => t != null && t.speciesName == SpeciesName && t.trigger == trigger); // Added null check for entry
         if (entry != null && entry.lines != null && entry.lines.Count > 0) {
             string line = entry.lines[Random.Range(0, entry.lines.Count)];
             Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
@@ -367,9 +403,46 @@ public class AnimalController : MonoBehaviour
         }
     }
 
-     // Removed Die() and starvation logic for simplicity
+     // --- Death Handling --- (Simplified, no starvation damage)
+     public enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
 
-     public bool SpeciesNameEquals(string otherSpeciesName) {
+     private void Die(CauseOfDeath cause) // Keep structure in case starvation is added back
+     {
+          Debug.Log($"[{SpeciesName} on {gameObject.name}] Died due to {cause}.", gameObject);
+          // Add meat spawning logic here later if needed
+          Destroy(gameObject);
+     }
+
+    // --- Helper Methods ---
+    public bool SpeciesNameEquals(string otherSpeciesName) {
          return definition != null && definition.animalName == otherSpeciesName;
      }
+
+    /// <summary>
+    /// Ensures the hpText reference is set, finding it if necessary.
+    /// </summary>
+    private void EnsureHpTextReference() // <<< NEW METHOD
+    {
+        // If not assigned in inspector, try to find it in children
+        if (hpText == null)
+        {
+            hpText = GetComponentInChildren<TextMeshProUGUI>(true); // Include inactive
+
+            if (hpText == null) {
+                 // This warning is okay, HP text is optional
+                 // Debug.LogWarning($"[{gameObject.name}] Could not automatically find TextMeshProUGUI for HP display.", gameObject);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Updates the HP text display.
+    /// </summary>
+    private void UpdateHpText() // <<< NEW METHOD
+    {
+        if (hpText == null || definition == null) return; // Exit if no text component or definition
+
+        // Format the text (using FloorToInt for cleaner display, adjust if floats needed)
+        hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)} / {Mathf.FloorToInt(definition.maxHealth)}";
+    }
 }

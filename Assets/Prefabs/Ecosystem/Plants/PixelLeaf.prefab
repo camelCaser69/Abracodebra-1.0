@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: -3390053949051521573}
   - component: {fileID: 8657622778908597513}
   - component: {fileID: 5462988128650741342}
+  - component: {fileID: 5386156553378416530}
   m_Layer: 0
   m_Name: PixelLeaf
   m_TagString: Leaf
@@ -164,7 +165,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   foodType: {fileID: 11400000, guid: a4b9d34a97cd8d543b757c7493c54451, type: 2}
-  healthRemaining: 1
-  damagePerBite: 0.25
-  destroyWhenConsumed: 1
-  sourceObject: {fileID: 8982947048272063882, guid: 9838d74874e76024ca01e8e531645f18, type: 3}
+--- !u!114 &5386156553378416530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3989903528299243114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f16ff30e6b346dc87a0ea7bd86dce7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ParentPlantGrowth: {fileID: 0}
+  GridCoord: {x: 0, y: 0}
+  CellType: 0

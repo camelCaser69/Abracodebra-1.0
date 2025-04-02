@@ -12,8 +12,10 @@ GameObject:
   - component: {fileID: 5667509348516466673}
   - component: {fileID: -3390053949051521573}
   - component: {fileID: 8657622778908597513}
+  - component: {fileID: -520673554240267092}
+  - component: {fileID: 6230958248040856969}
   m_Layer: 0
-  m_Name: PixelFruit
+  m_Name: PixelBerry
   m_TagString: Leaf
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -150,3 +152,31 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.01, y: 0.01}
   m_EdgeRadius: 0
+--- !u!114 &-520673554240267092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3989903528299243114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91ccfd2737264819bd23ae7c235d1405, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  foodType: {fileID: 11400000, guid: 9d32f5cdba61e5644b0f7adcc745fb89, type: 2}
+--- !u!114 &6230958248040856969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3989903528299243114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f16ff30e6b346dc87a0ea7bd86dce7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ParentPlantGrowth: {fileID: 0}
+  GridCoord: {x: 0, y: 0}
+  CellType: 0
