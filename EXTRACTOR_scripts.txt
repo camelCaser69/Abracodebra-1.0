@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-01 15:37:58
+UNITY PROJECT SCRIPT EXPORT - 2025-04-03 08:34:17
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -35,8 +35,8 @@ Assets
 │   │   │   ├── Animal_Bunny.prefab
 │   │   │   └── Animal_Fox.prefab
 │   │   ├── Plants
+│   │   │   ├── PixelBerry.prefab
 │   │   │   ├── PixelFlower.prefab
-│   │   │   ├── PixelFruit.prefab
 │   │   │   ├── PixelLeaf.prefab
 │   │   │   ├── PixelSeed.prefab
 │   │   │   ├── PixelStem.prefab
@@ -69,14 +69,21 @@ Assets
 │   ├── Animals
 │   │   ├── AnimalLibrary.asset
 │   │   └── Animal_000_Bunny.asset
+│   ├── Animals Diet
+│   │   └── Diet_000_Bunny.asset
+│   ├── Food
+│   │   ├── FoodType_000_Berry.asset
+│   │   └── FoodType_000_Leaf.asset
 │   ├── Life Thoughts
 │   │   └── AnimalThoughtLibrary.asset
 │   └── Nodes Plant
 │       ├── NodeDefinitionLibrary.asset
-│       └── Node_000_Seed.asset
+│       ├── Node_000_Seed.asset
+│       └── Node_001_Berry.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
+│   │   │   ├── PlantCell.cs
 │   │   │   ├── PlantGrowth.cs
 │   │   │   └── WeatherManager.cs
 │   │   ├── SpellProjectile.cs
@@ -98,6 +105,10 @@ Assets
 │   │   │   ├── PoopController.cs
 │   │   │   ├── ThoughtBubbleController.cs
 │   │   │   └── ThoughtTrigger.cs
+│   │   ├── Food
+│   │   │   ├── AnimalDiet.cs
+│   │   │   ├── FoodItem.cs
+│   │   │   └── FoodType.cs
 │   │   └── Plants
 │   ├── Nodes
 │   │   ├── Core
@@ -434,6 +445,31 @@ public class NodeDefinitionPostprocessor : AssetPostprocessor
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\PlantCell.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Battle/Plant/PlantCell.cs (or similar path)
+using UnityEngine;
+
+public class PlantCell : MonoBehaviour
+{
+    // Set these references when the cell is spawned by PlantGrowth
+    [HideInInspector] public PlantGrowth ParentPlantGrowth;
+    [HideInInspector] public Vector2Int GridCoord;
+    [HideInInspector] public PlantCellType CellType; // Store type info here
+
+    // Called automatically by Unity when this GameObject is destroyed
+    private void OnDestroy()
+    {
+        // Notify the parent plant that this cell is gone, if the parent still exists
+        if (ParentPlantGrowth != null)
+        {
+            ParentPlantGrowth.ReportCellDestroyed(GridCoord);
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Battle\Plant\PlantGrowth.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using System.Collections;
@@ -442,204 +478,199 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 
-public enum PlantCellType
-{
-    Seed,
-    Stem,
-    Leaf,
-    Flower,
-    Fruit
-}
-
-public enum PlantState
-{
-    Initializing,
-    Growing,
-    Mature_Idle,
-    Mature_Executing
-}
+public enum PlantCellType { Seed, Stem, Leaf, Flower, Fruit }
+public enum PlantState { Initializing, Growing, Mature_Idle, Mature_Executing }
 
 public class PlantGrowth : MonoBehaviour
 {
-    [Header("Node Graph Data")]
-    private NodeGraph nodeGraph;
-
-    [Header("UI Display Options")]
-    [Tooltip("If enabled, shows growth percentage during growth phase instead of energy")]
-    [SerializeField] private bool showGrowthPercentage = true;
-    
-    [Tooltip("If enabled, plant will accumulate energy during growth phase")]
-    [SerializeField] private bool allowPhotosynthesisDuringGrowth = false;
-    
-    [Tooltip("If enabled, shows a smooth percentage counter independent of actual growth")]
-    [SerializeField] private bool useSmoothPercentageCounter = true;
-    
-    [Tooltip("How much to increment the percentage counter each step (%)")]
-    [SerializeField] [Range(1, 10)] private int percentageIncrement = 2;
-
-    [Header("Calculated Runtime Stats")]
-    // Growth Stats
-    private int finalStemMinLength = 3;
-    private int finalStemMaxLength = 6;
-    private float finalGrowthSpeed = 1f;
-    private int finalLeafGap = 1;
-    private int finalLeafPattern = 0;
-    private float finalGrowthRandomness = 0f;
-    // Energy Stats
-    private float finalMaxEnergy = 10f;
-    private float finalPhotosynthesisRate = 1f;
-    // Mature Cycle Timing Stats
-    private float cycleCooldown = 5.0f;
-    private float nodeCastDelay = 0.1f;
-
-    [Header("Current State")]
-    public PlantState currentState = PlantState.Initializing;
-    public float currentEnergy = 0f;
-    private float cycleTimer = 0f;
-    
-    // For smooth percentage counter
-    private float displayedGrowthPercentage = 0f;
-    private Coroutine percentageCounterCoroutine;
-    private float totalGrowthDuration;
-
-    [Header("Growth Visuals & Logic")]
+    // --- Serialized Fields ---
+    [Header("UI & Visuals")]
+    [SerializeField] private TMP_Text energyText;
     [SerializeField] private GameObject seedCellPrefab;
     [SerializeField] private GameObject stemCellPrefab;
     [SerializeField] private GameObject leafCellPrefab;
+    [SerializeField] private GameObject berryCellPrefab;
     [SerializeField] private float cellSpacing = 8f;
-    [SerializeField] private TMP_Text energyText;
 
+    [Header("Growth & UI Timing")]
+    [SerializeField] private bool showGrowthPercentage = true;
+    [SerializeField] private bool allowPhotosynthesisDuringGrowth = false;
+    [SerializeField] private bool useSmoothPercentageCounter = true;
+    [SerializeField] [Range(1, 10)] private int percentageIncrement = 2;
+
+    // --- Internal State & Data ---
+    private NodeGraph nodeGraph;
+    public PlantState currentState = PlantState.Initializing;
+    public float currentEnergy = 0f;
     private Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
+    private Coroutine percentageCounterCoroutine;
+
+    // --- Calculated Stats ---
+    private int targetStemLength;
+    private float finalGrowthSpeed;
+    private int finalLeafGap;
+    private int finalLeafPattern;
+    private float finalGrowthRandomness;
+    private float finalMaxEnergy;
+    private float finalPhotosynthesisRate;
+    private float cycleCooldown;
+    private float nodeCastDelay;
+
+    // --- Runtime Variables ---
     private int currentStemCount = 0;
-    private int targetStemLength = 0;
+    private float cycleTimer = 0f;
+    private float displayedGrowthPercentage = 0f;
+    private float totalGrowthDuration;
     private bool? offsetRightForPattern1 = null;
 
-    private void Awake()
-    {
-        EnsureUIReferences();
-    }
+    // --- Unity Methods ---
+    private void Awake() => EnsureUIReferences();
+    private void Update() => StateMachineUpdate();
+    private void OnDestroy() => StopAllCoroutines(); // Ensure cleanup
 
-    private void EnsureUIReferences()
-    {
-        if (energyText != null) return;
-
-        // Try to find by name first
-        Transform textTrans = transform.Find("Txt_Energy");
-        
-        // Try common parent paths if not found directly
-        if (textTrans == null) textTrans = transform.Find("Canvas/Txt_Energy");
-        if (textTrans == null) textTrans = transform.Find("UI/Txt_Energy");
-        
-        // If found by name, get the component
-        if (textTrans != null)
-        {
-            energyText = textTrans.GetComponent<TMP_Text>();
-            if (energyText != null)
-            {
-                Debug.Log($"[PlantGrowth] Found Energy Text by name: {textTrans.name}", gameObject);
-                return;
-            }
-        }
-        
-        // If not found by name, try to find by type
-        TMP_Text[] allTexts = GetComponentsInChildren<TMP_Text>(true);
-        if (allTexts.Length > 0)
-        {
-            // Try to find one that might be for energy
-            foreach (var text in allTexts)
-            {
-                string lowerName = text.name.ToLower();
-                if (lowerName.Contains("energy") || lowerName.Contains("txt_e"))
-                {
-                    energyText = text;
-                    Debug.Log($"[PlantGrowth] Found Energy Text by component search: {text.name}", gameObject);
-                    return;
-                }
-            }
-            
-            // If no good match, just use the first one
-            energyText = allTexts[0];
-            Debug.Log($"[PlantGrowth] Using first TMP_Text found: {energyText.name}", gameObject);
-        }
-        else
-        {
-            Debug.LogWarning($"[PlantGrowth] No TMP_Text components found on {gameObject.name}. Energy display will not work.", gameObject);
-        }
-    }
-
+    // --- Public Initialization ---
     public void InitializeAndGrow(NodeGraph graph)
     {
-        EnsureUIReferences();
-        
-        if (graph == null || graph.nodes == null)
-        {
-            Debug.LogError("[PlantGrowth] Cannot initialize with a null NodeGraph!", gameObject);
-            Destroy(gameObject);
-            return;
+        if (graph == null || graph.nodes == null) {
+            Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject); Destroy(gameObject); return;
         }
-        this.nodeGraph = graph;
+        nodeGraph = graph;
         currentState = PlantState.Initializing;
-        currentEnergy = 0f; // Reset energy at initialization
-        
-        // Reset percentage counter
+        currentEnergy = 0f;
         displayedGrowthPercentage = 0f;
-        
-        // Stop any existing percentage counter
-        if (percentageCounterCoroutine != null)
-        {
-            StopCoroutine(percentageCounterCoroutine);
-            percentageCounterCoroutine = null;
-        }
+        if (percentageCounterCoroutine != null) { StopCoroutine(percentageCounterCoroutine); percentageCounterCoroutine = null; }
 
         CalculateAndApplyStats();
 
-        if (targetStemLength > 0)
-        {
-             StartGrowthVisuals();
-        }
-        else
-        {
-            Debug.LogWarning("[PlantGrowth] Target stem length calculated as 0 or less. Plant will not grow.", gameObject);
+        if (targetStemLength > 0) {
+            StartGrowthVisuals();
+        } else { // Skip visual growth
+             Debug.LogWarning($"[{gameObject.name}] Target stem length is {targetStemLength}. Skipping visual growth.", gameObject);
             currentState = PlantState.Mature_Idle;
             cycleTimer = cycleCooldown;
+            if (!cells.ContainsKey(Vector2Int.zero)) { SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero); }
         }
-        
-        // Initialize UI based on the current state
         UpdateUI();
     }
 
+    // --- State Machine & Updates ---
+    private void StateMachineUpdate()
+    {
+        switch (currentState)
+        {
+            case PlantState.Growing:
+                if (allowPhotosynthesisDuringGrowth) AccumulateEnergy();
+                if (!showGrowthPercentage || !useSmoothPercentageCounter) UpdateUI();
+                break;
+            case PlantState.Mature_Idle:
+                AccumulateEnergy();
+                UpdateUI();
+                cycleTimer -= Time.deltaTime;
+                if (cycleTimer <= 0f && currentEnergy >= 1f) // Basic energy check
+                {
+                    currentState = PlantState.Mature_Executing;
+                    StartCoroutine(ExecuteMatureCycle());
+                }
+                break;
+            case PlantState.Mature_Executing:
+                AccumulateEnergy();
+                UpdateUI();
+                break;
+        }
+    }
+
+    private void AccumulateEnergy()
+    {
+        float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
+        // *** Uses the 'cells' dictionary which is now kept up-to-date via ReportCellDestroyed ***
+        int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
+        float delta = finalPhotosynthesisRate * leafCount * sunlight * Time.deltaTime;
+        currentEnergy = Mathf.Clamp(currentEnergy + delta, 0f, finalMaxEnergy);
+    }
+
+    private void UpdateUI()
+    {
+        if (energyText == null) return;
+        switch (currentState) {
+            case PlantState.Growing when showGrowthPercentage:
+                int perc = useSmoothPercentageCounter ? Mathf.RoundToInt(displayedGrowthPercentage) :
+                           (targetStemLength <= 0 ? 100 : Mathf.RoundToInt((float)currentStemCount / targetStemLength * 100f));
+                energyText.text = $"{Mathf.Clamp(perc, 0, 100)}%";
+                break;
+            case PlantState.Growing: // Not showing percentage, show energy
+            case PlantState.Mature_Idle:
+            case PlantState.Mature_Executing:
+                energyText.text = $"{Mathf.FloorToInt(currentEnergy)}/{Mathf.FloorToInt(finalMaxEnergy)}";
+                break;
+            default: energyText.text = "..."; break;
+        }
+    }
+
+    // --- Cell Management ---
+
+    /// <summary>
+    /// Called by PlantCell component when its GameObject is destroyed.
+    /// Removes the cell from the internal dictionary.
+    /// </summary>
+    public void ReportCellDestroyed(Vector2Int coord)
+    {
+        if (cells.ContainsKey(coord))
+        {
+            cells.Remove(coord);
+            // Debug.Log($"Cell at {coord} reported destroyed and removed from dictionary.");
+        }
+    }
+
+    // --- Stat Calculation ---
+        /// <summary>
+        /// <summary>
+    /// Calculates final plant stats (growth speed, max energy, etc.)
+    /// based on the SUM of passive effects from the assigned NodeGraph.
+    /// </summary>
     private void CalculateAndApplyStats()
     {
-        if (nodeGraph == null) return;
+        if (nodeGraph == null)
+        {
+            Debug.LogError($"[{gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
+            return;
+        }
 
-        // --- Default Values ---
-        float accumulatedEnergyStorage = 0f;
-        float accumulatedPhotosynthesis = 0f;
-        int baseStemMin = 3;
-        int baseStemMax = 6;
-        float baseGrowthSpeed = 1f;
-        int baseLeafGap = 1;
+        // --- Define BASE values (Defaults if NO relevant Node Effect modifies them) ---
+        // *** CRITICAL: Set bases to 0 or identity values if effects should fully define the stat ***
+        float baseEnergyStorage = 0f;           // <<< FIX 1: Set base to 0. Effects will define the total.
+        float basePhotosynthesisRate = 0f;      // <<< FIX 2: Set base rate to 0. Effects define total rate per leaf.
+        int baseStemMin = 0;                    // Base range if no modifier
+        int baseStemMax = 0;
+        float baseGrowthSpeed = 0f;             // <<< FIX 3: Base time (seconds) per step. Effects ADD to this time.
+        int baseLeafGap = 0;                    // <<< FIX 4: Base gap. 0 = leaves every stem. Effects ADD to this gap.
         int baseLeafPattern = 0;
         float baseGrowthRandomness = 0f;
-        float baseCooldown = 5.0f;
-        float baseCastDelay = 0.1f;
-        // Modifiers
+        float baseCooldown = 0f;
+        float baseCastDelay = 0f;
+
+        // --- Accumulators for Modifiers from Node Effects ---
+        float accumulatedEnergyStorage = 0f;
+        float accumulatedPhotosynthesis = 0f;
         int stemLengthModifier = 0;
-        float growthSpeedModifier = 0f;
+        float growthSpeedTimeModifier = 0f;     // How much time to ADD to baseGrowthSpeed
         int leafGapModifier = 0;
+        int currentLeafPattern = baseLeafPattern;
         float growthRandomnessModifier = 0f;
         float cooldownModifier = 0f;
         float castDelayModifier = 0f;
-
         bool seedFound = false;
 
+        // --- Iterate through nodes and their PASSIVE effects ---
+        // Debug.Log($"[{gameObject.name}] Calculating Stats..."); // Optional: Start log
         foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex))
         {
             if (node.effects == null) continue;
-
+            // string nodeEffectsLog = $"Node '{node.nodeDisplayName}': "; // Optional: Log effects per node
             foreach (NodeEffectData effect in node.effects)
             {
-                if (!effect.isPassive) continue;
+                if (!effect.isPassive) continue; // Only process PASSIVE effects here
+
+                // nodeEffectsLog += $" {effect.effectType}({effect.primaryValue})"; // Optional: Log effects per node
 
                 switch (effect.effectType)
                 {
@@ -647,22 +678,27 @@ public class PlantGrowth : MonoBehaviour
                         seedFound = true;
                         break;
                     case NodeEffectType.EnergyStorage:
+                        // Debug.Log($"  -> Found EnergyStorage: +{effect.primaryValue}"); // Optional: Log specific effect
                         accumulatedEnergyStorage += effect.primaryValue;
                         break;
                     case NodeEffectType.EnergyPhotosynthesis:
+                        // Debug.Log($"  -> Found EnergyPhotosynthesis: +{effect.primaryValue}"); // Optional
                         accumulatedPhotosynthesis += effect.primaryValue;
                         break;
                     case NodeEffectType.StemLength:
                         stemLengthModifier += Mathf.RoundToInt(effect.primaryValue);
                         break;
                     case NodeEffectType.GrowthSpeed:
-                        growthSpeedModifier += effect.primaryValue;
+                        // Positive value = Slower (Adds Time), Negative = Faster (Subtracts Time)
+                        // Debug.Log($"  -> Found GrowthSpeed Mod: {effect.primaryValue} (Time Adj)"); // Optional
+                        growthSpeedTimeModifier += effect.primaryValue;
                         break;
                     case NodeEffectType.LeafGap:
+                        // Debug.Log($"  -> Found LeafGap Mod: +{Mathf.RoundToInt(effect.primaryValue)}"); // Optional
                         leafGapModifier += Mathf.RoundToInt(effect.primaryValue);
                         break;
                     case NodeEffectType.LeafPattern:
-                        baseLeafPattern = Mathf.RoundToInt(effect.primaryValue);
+                        currentLeafPattern = Mathf.RoundToInt(effect.primaryValue);
                         break;
                     case NodeEffectType.StemRandomness:
                         growthRandomnessModifier += effect.primaryValue;
@@ -675,400 +711,312 @@ public class PlantGrowth : MonoBehaviour
                         break;
                 }
             }
+             // Debug.Log(nodeEffectsLog); // Optional: Log effects per node
         }
 
-        finalMaxEnergy = Mathf.Max(1f, accumulatedEnergyStorage);
-        finalPhotosynthesisRate = Mathf.Max(0f, accumulatedPhotosynthesis);
+        // --- Final Stat Calculation & Clamping ---
 
-        finalStemMinLength = Mathf.Max(1, baseStemMin + stemLengthModifier);
-        finalStemMaxLength = Mathf.Max(finalStemMinLength, baseStemMax + stemLengthModifier);
+        // 1. Max Energy: Base (now 0) + Accumulated. Min value of 1.
+        finalMaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
+        // This should now directly reflect the sum of EnergyStorage effects (or 1 if sum is < 1).
 
-        finalGrowthSpeed = Mathf.Max(0.1f, baseGrowthSpeed + growthSpeedModifier);
+        // 2. Photosynthesis Rate: Base (now 0) + Accumulated. Min 0. Rate PER LEAF.
+        finalPhotosynthesisRate = Mathf.Max(0f, basePhotosynthesisRate + accumulatedPhotosynthesis);
+        // This reflects the sum of EnergyPhotosynthesis effects.
+
+        // 3. Stem Length
+        int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier);
+        int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
+
+        // 4. Growth Speed (Time per step): Base Time + Time Modifier. Min 0.1s.
+        finalGrowthSpeed = Mathf.Max(0.1f, baseGrowthSpeed + growthSpeedTimeModifier);
+        // If base=1s, effect=+0.5 -> 1.5s/step (Slower). If effect=-0.5 -> 0.5s/step (Faster).
+
+        // 5. Leaf Gap: Base Gap (now 0) + Modifier. Min 0.
         finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
-        finalLeafPattern = Mathf.Clamp(baseLeafPattern, 0, 4);
-        finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
+        // Gap=0 -> Leaves every stem (Modulo Check: % (0+1) == 0 -> always true)
+        // Gap=1 -> Leaves every 2nd stem (Modulo Check: % (1+1) == 0 -> true for 2,4,6...)
+        // Gap=2 -> Leaves every 3rd stem (Modulo Check: % (2+1) == 0 -> true for 3,6,9...)
 
+        // 6. Other Stats
+        finalLeafPattern = Mathf.Clamp(currentLeafPattern, 0, 4); // Assuming patterns 0-4
+        finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
         cycleCooldown = Mathf.Max(0.1f, baseCooldown + cooldownModifier);
         nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
 
-        targetStemLength = Random.Range(finalStemMinLength, finalStemMaxLength + 1);
+        // --- Instance Specific ---
+        targetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
+        totalGrowthDuration = targetStemLength * finalGrowthSpeed;
 
-        // Calculate total growth duration
-        totalGrowthDuration = finalGrowthSpeed * targetStemLength;
-
-        if (!seedFound)
-        {
-             Debug.LogWarning("[PlantGrowth] Node chain lacks a passive SeedSpawn effect. Plant will not grow.", gameObject);
-             targetStemLength = 0;
+        if (!seedFound) {
+             Debug.LogWarning($"[{gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth aborted.", gameObject);
         }
+
+        // --- FINAL DEBUG LOG --- (Highly recommended until stats are confirmed correct)
+         Debug.Log($"[{gameObject.name}] === STATS CALCULATED ===\n" +
+                   $"  Max Energy: {finalMaxEnergy} (Base:{baseEnergyStorage} + Acc:{accumulatedEnergyStorage})\n" +
+                   $"  Photo Rate (Per Leaf): {finalPhotosynthesisRate} (Base:{basePhotosynthesisRate} + Acc:{accumulatedPhotosynthesis})\n" +
+                   $"  Growth Speed (Time/Step): {finalGrowthSpeed} (Base:{baseGrowthSpeed} + Mod:{growthSpeedTimeModifier})\n" +
+                   $"  Leaf Gap: {finalLeafGap} (Base:{baseLeafGap} + Mod:{leafGapModifier})\n" +
+                   $"  Target Length: {targetStemLength} (Range: {finalStemMin}-{finalStemMax})\n" +
+                   $"  Pattern: {finalLeafPattern} | Randomness: {finalGrowthRandomness:P0}\n" +
+                   $"  Cooldown: {cycleCooldown} | Cast Delay: {nodeCastDelay}\n" +
+                   $"  Seed Found: {seedFound}");
+        // --- END FINAL DEBUG LOG ---
     }
 
+    // --- Visual Growth & Spawning ---
     private void StartGrowthVisuals()
     {
-        foreach (Transform child in transform) { 
-            if (child.GetComponent<Canvas>() != null || child.GetComponent<TMP_Text>() != null) continue;
-            if (energyText != null && energyText.transform == child) continue;
-            
-            Destroy(child.gameObject); 
+        // Clear existing cells (excluding UI)
+        foreach (Transform child in transform) {
+            if (child != transform && child.GetComponent<Canvas>() == null && (energyText == null || child != energyText.transform)) {
+                Destroy(child.gameObject);
+            }
         }
         cells.Clear();
         currentStemCount = 0;
         offsetRightForPattern1 = null;
 
-        cells[Vector2Int.zero] = PlantCellType.Seed;
-        SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
-
-        SortableEntity[] cellEntities = GetComponentsInChildren<SortableEntity>();
-        foreach (var cellEntity in cellEntities) {
-            if (cellEntity.transform != transform) cellEntity.SetUseParentYCoordinate(true);
-        }
+        SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero); // Spawn seed
 
         currentState = PlantState.Growing;
-        
-        // Start the smooth percentage counter if enabled
-        if (useSmoothPercentageCounter && showGrowthPercentage)
-        {
+        if (useSmoothPercentageCounter && showGrowthPercentage) {
             percentageCounterCoroutine = StartCoroutine(PercentageCounterRoutine());
         }
-        
-        // Start the actual growth routine
         StartCoroutine(GrowRoutine());
     }
 
     private IEnumerator PercentageCounterRoutine()
     {
-        displayedGrowthPercentage = 0;
-        UpdateUI();
-        
-        // Calculate time per percentage increment
-        int totalSteps = 100 / percentageIncrement;
-        float timePerStep = totalGrowthDuration / totalSteps;
-        
-        for (int step = 1; step <= totalSteps; step++)
-        {
-            // Wait the calculated time
+        // Smoothly updates displayed percentage UI during growth
+        displayedGrowthPercentage = 0; UpdateUI();
+        if (totalGrowthDuration <= 0 || percentageIncrement <= 0) yield break;
+        int steps = Mathf.Max(1, 100 / percentageIncrement);
+        float timePerStep = totalGrowthDuration / steps;
+        for (int i = 1; i <= steps; i++) {
             yield return new WaitForSeconds(timePerStep);
-            
-            // Check if we're still in growing state
-            if (currentState != PlantState.Growing)
-                break;
-            
-            // Update the percentage
-            displayedGrowthPercentage = step * percentageIncrement;
-            displayedGrowthPercentage = Mathf.Min(displayedGrowthPercentage, 100f); // Cap at 100%
-            
-            // Update the UI
+            if (currentState != PlantState.Growing) break;
+            displayedGrowthPercentage = Mathf.Min(i * percentageIncrement, 100f);
             UpdateUI();
         }
-        
-        // Ensure we end at exactly 100%
-        if (currentState == PlantState.Growing)
-        {
-            displayedGrowthPercentage = 100f;
-            UpdateUI();
+        if (currentState == PlantState.Growing || currentState == PlantState.Mature_Idle) {
+            displayedGrowthPercentage = 100f; UpdateUI(); // Ensure 100% at end
         }
-    }
-
-    private void Update()
-    {
-        switch (currentState)
-        {
-            case PlantState.Initializing:
-                // Waiting for InitializeAndGrow call
-                break;
-
-            case PlantState.Growing:
-                // Optionally accumulate energy during growth based on the flag
-                if (allowPhotosynthesisDuringGrowth)
-                {
-                    AccumulateEnergy();
-                    
-                    // Only update UI if percentage is not shown (since percentage updates are handled by the counter)
-                    if (!showGrowthPercentage)
-                    {
-                        UpdateUI();
-                    }
-                }
-                break;
-
-            case PlantState.Mature_Idle:
-                // Always accumulate energy when mature
-                AccumulateEnergy();
-                UpdateUI();
-                
-                cycleTimer -= Time.deltaTime;
-                if (cycleTimer <= 0f)
-                {
-                    currentState = PlantState.Mature_Executing;
-                    StartCoroutine(ExecuteMatureCycle());
-                }
-                break;
-
-            case PlantState.Mature_Executing:
-                // Always accumulate energy during execution too
-                AccumulateEnergy();
-                UpdateUI();
-                break;
-        }
-    }
-
-    // Separated energy accumulation from UI updates
-    private void AccumulateEnergy()
-    {
-        float sunlight = (WeatherManager.Instance != null) ? WeatherManager.Instance.sunIntensity : 1f;
-        float leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
-        float deltaPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight * Time.deltaTime;
-        currentEnergy = Mathf.Clamp(currentEnergy + deltaPhotosynthesis, 0f, finalMaxEnergy);
-    }
-
-    private void UpdateUI()
-    {
-        if (energyText == null) EnsureUIReferences();
-        if (energyText == null) return;
-        
-        switch (currentState)
-        {
-            case PlantState.Growing:
-                if (showGrowthPercentage)
-                {
-                    // During growth phase, show the fixed-step counter if enabled, otherwise show real percentage
-                    if (useSmoothPercentageCounter)
-                    {
-                        // Use the smooth counter value
-                        int displayPercentage = Mathf.RoundToInt(displayedGrowthPercentage);
-                        energyText.text = $"{displayPercentage}%";
-                    }
-                    else
-                    {
-                        // Calculate actual percentage
-                        int percentage = targetStemLength <= 0 ? 0 : 
-                            Mathf.RoundToInt((float)currentStemCount / targetStemLength * 100f);
-                        energyText.text = $"{percentage}%";
-                    }
-                }
-                else
-                {
-                    // Show energy instead of percentage if that's the preference
-                    energyText.text = $"{Mathf.Floor(currentEnergy)}/{Mathf.Floor(finalMaxEnergy)}";
-                }
-                break;
-                
-            case PlantState.Mature_Idle:
-            case PlantState.Mature_Executing:
-                // After growth is complete, always show energy level
-                energyText.text = $"{Mathf.Floor(currentEnergy)}/{Mathf.Floor(finalMaxEnergy)}";
-                break;
-                
-            default:
-                // Initializing or other states
-                energyText.text = "...";
-                break;
-        }
-    }
-
-    private IEnumerator ExecuteMatureCycle()
-    {
-        if (nodeGraph == null || nodeGraph.nodes == null)
-        {
-             Debug.LogError($"[{gameObject.name}] NodeGraph is missing during mature cycle execution!", gameObject);
-             currentState = PlantState.Mature_Idle;
-             cycleTimer = cycleCooldown;
-             yield break;
-        }
-
-        float damageMultiplier = 1.0f;
-
-        var sortedNodes = nodeGraph.nodes.OrderBy(n => n.orderIndex).ToList();
-
-        foreach (NodeData node in sortedNodes)
-        {
-             if (node.effects == null) continue;
-
-             bool hasActiveEffect = node.effects.Any(eff => !eff.isPassive);
-
-             if (hasActiveEffect)
-             {
-                 if (nodeCastDelay > 0)
-                 {
-                     yield return new WaitForSeconds(nodeCastDelay);
-                 }
-
-                 foreach (NodeEffectData effect in node.effects)
-                 {
-                     if (effect.isPassive) continue;
-
-                     switch (effect.effectType)
-                     {
-                         case NodeEffectType.Output:
-                             OutputNodeEffect outputEffect = GetComponentInChildren<OutputNodeEffect>();
-                             if(outputEffect != null) {
-                                outputEffect.Activate(damageMultiplier);
-                             } else {
-                                Debug.LogWarning($"[PlantGrowth] Output effect found on node '{node.nodeDisplayName}' but no OutputNodeEffect component found on plant '{gameObject.name}' or its children.", gameObject);
-                             }
-                             break;
-                         case NodeEffectType.Damage:
-                             damageMultiplier += effect.primaryValue;
-                             break;
-                     }
-                 }
-             }
-        }
-
-        cycleTimer = cycleCooldown;
-        currentState = PlantState.Mature_Idle;
+        percentageCounterCoroutine = null;
     }
 
     private IEnumerator GrowRoutine()
     {
         Vector2Int currentPos = Vector2Int.zero;
-        int spiralDirection = 1;
-        int patternCounter = 0;
+        int spiralDir = 1, patternCount = 0;
 
         while (currentState == PlantState.Growing)
         {
+            // Check if target length reached *before* the wait to fix UI lag
+            if (currentStemCount >= targetStemLength)
+            {
+                // --- GROWTH COMPLETE ---
+                 // Debug.Log($"[{gameObject.name}] Growth complete ({currentStemCount}/{targetStemLength}).");
+                if (percentageCounterCoroutine != null) {
+                    StopCoroutine(percentageCounterCoroutine); percentageCounterCoroutine = null;
+                    if (showGrowthPercentage) { displayedGrowthPercentage = 100f; UpdateUI(); } // Ensure 100% shows briefly if needed
+                }
+                currentState = PlantState.Mature_Idle; // Change state HERE
+                cycleTimer = cycleCooldown;
+                UpdateUI(); // Update UI to show energy *immediately*
+                yield break; // Exit coroutine
+            }
+
+            // Wait for the growth interval
             yield return new WaitForSeconds(finalGrowthSpeed);
 
-            if (currentStemCount < targetStemLength)
-            {
-                currentStemCount++;
-                Vector2Int dir = (currentStemCount == 1) ? Vector2Int.up : GetStemDirection();
-                currentPos += dir;
+            // --- PERFORM GROWTH STEP --- (Only if not completed above)
+            currentStemCount++;
+            Vector2Int growthDir = (currentStemCount == 1) ? Vector2Int.up : GetStemDirection();
+            currentPos += growthDir;
 
-                if (!cells.ContainsKey(currentPos)) {
-                    cells[currentPos] = PlantCellType.Stem;
-                    SpawnCellVisual(PlantCellType.Stem, currentPos);
-                }
+            SpawnCellVisual(PlantCellType.Stem, currentPos); // Spawns Stem and adds to dictionary
 
-                if ((finalLeafGap >= 0) && (currentStemCount % (finalLeafGap + 1)) == 0)
-                {
-                    Vector2Int baseLeftPos = currentPos + Vector2Int.left;
-                    Vector2Int baseRightPos = currentPos + Vector2Int.right;
-                    patternCounter++;
-
-                    ExecuteLeafPatternLogic(currentPos, baseLeftPos, baseRightPos, patternCounter, ref spiralDirection);
-                }
-                
-                // Only update UI if we're showing actual percentage or energy
-                if (showGrowthPercentage && !useSmoothPercentageCounter)
-                {
-                    UpdateUI();
-                }
-                else if (!showGrowthPercentage)
-                {
-                    UpdateUI();
-                }
+            // Leaf spawning logic
+            if ((finalLeafGap >= 0) && (currentStemCount % (finalLeafGap + 1)) == 0) {
+                patternCount++;
+                ExecuteLeafPatternLogic(currentPos, currentPos + Vector2Int.left, currentPos + Vector2Int.right, patternCount, ref spiralDir);
             }
-            else
-            {
-                Debug.Log($"[{gameObject.name}] Growth complete. Transitioning to Mature_Idle state.");
-                
-                // Stop the percentage counter coroutine if it's running
-                if (percentageCounterCoroutine != null)
-                {
-                    StopCoroutine(percentageCounterCoroutine);
-                    percentageCounterCoroutine = null;
-                }
-                
-                // Make sure percentage shows 100% at the end
-                if (showGrowthPercentage)
-                {
-                    displayedGrowthPercentage = 100f;
-                    UpdateUI();
-                }
-                
-                currentState = PlantState.Mature_Idle;
-                cycleTimer = cycleCooldown;
-                
-                // Final UI update to show energy instead of growth percentage
-                UpdateUI();
-                yield break;
-            }
-        }
+
+            // Update non-smooth UI if needed
+            if (showGrowthPercentage && !useSmoothPercentageCounter) UpdateUI();
+            else if (!showGrowthPercentage) UpdateUI();
+
+        } // End while loop
     }
 
-    private void ExecuteLeafPatternLogic(Vector2Int currentPos, Vector2Int baseLeftPos, Vector2Int baseRightPos, int patternCounter, ref int spiralDirection)
+
+    private void ExecuteLeafPatternLogic(Vector2Int stemPos, Vector2Int leftBase, Vector2Int rightBase, int counter, ref int spiralDir)
     {
-        switch (finalLeafPattern)
-        {
-            case 0: // Parallel
-                SpawnLeafIfEmpty(baseLeftPos); SpawnLeafIfEmpty(baseRightPos); break;
+        // Spawns leaves based on finalLeafPattern
+        switch (finalLeafPattern) {
+            case 0: SpawnLeafIfEmpty(leftBase); SpawnLeafIfEmpty(rightBase); break; // Parallel
             case 1: // Offset-Parallel
-                if (offsetRightForPattern1 == null) offsetRightForPattern1 = (Random.value < 0.5f);
-                Vector2Int raisedLeft = baseLeftPos + Vector2Int.up;
-                Vector2Int raisedRight = baseRightPos + Vector2Int.up;
-                if (offsetRightForPattern1.Value) { SpawnLeafIfEmpty(baseLeftPos); SpawnLeafIfEmpty(raisedRight); }
-                else { SpawnLeafIfEmpty(raisedLeft); SpawnLeafIfEmpty(baseRightPos); }
+                if (offsetRightForPattern1 == null) offsetRightForPattern1 = Random.value < 0.5f;
+                if (offsetRightForPattern1.Value) { SpawnLeafIfEmpty(leftBase); SpawnLeafIfEmpty(rightBase + Vector2Int.up); }
+                else { SpawnLeafIfEmpty(leftBase + Vector2Int.up); SpawnLeafIfEmpty(rightBase); }
                 break;
-            case 2: // Alternating
-                 Vector2Int leftPos, rightPos;
-                 switch (patternCounter % 4) {
-                     case 1: leftPos = baseLeftPos + Vector2Int.up; rightPos = baseRightPos; break;
-                     case 2: leftPos = baseLeftPos; rightPos = baseRightPos; break;
-                     case 3: leftPos = baseLeftPos; rightPos = baseRightPos + Vector2Int.up; break;
-                     case 0: default: leftPos = baseLeftPos; rightPos = baseRightPos; break;
-                 }
-                 SpawnLeafIfEmpty(leftPos); SpawnLeafIfEmpty(rightPos);
-                 break;
+            case 2: // Alternating Height
+                 switch (counter % 4) { default: case 0: case 2: SpawnLeafIfEmpty(leftBase); SpawnLeafIfEmpty(rightBase); break; case 1: SpawnLeafIfEmpty(leftBase + Vector2Int.up); SpawnLeafIfEmpty(rightBase); break; case 3: SpawnLeafIfEmpty(leftBase); SpawnLeafIfEmpty(rightBase + Vector2Int.up); break; } break;
             case 3: // Double-Spiral
-                 Vector2Int leftSpiral = baseLeftPos + new Vector2Int(0, spiralDirection > 0 ? 1 : 0);
-                 Vector2Int rightSpiral = baseRightPos + new Vector2Int(0, spiralDirection > 0 ? 0 : 1);
-                 SpawnLeafIfEmpty(leftSpiral); SpawnLeafIfEmpty(rightSpiral);
-                 spiralDirection *= -1; // Toggle spiral
-                 break;
-            case 4: // One-Sided (Right side example)
-                 SpawnLeafIfEmpty(baseRightPos); SpawnLeafIfEmpty(baseRightPos + Vector2Int.up); break;
-            default: // Fallback
-                 SpawnLeafIfEmpty(baseLeftPos); SpawnLeafIfEmpty(baseRightPos); break;
+                 SpawnLeafIfEmpty(leftBase + new Vector2Int(0, spiralDir > 0 ? 1 : 0)); SpawnLeafIfEmpty(rightBase + new Vector2Int(0, spiralDir > 0 ? 0 : 1)); spiralDir *= -1; break;
+            case 4: SpawnLeafIfEmpty(rightBase); SpawnLeafIfEmpty(rightBase + Vector2Int.up); break; // One-Sided Right Example
         }
     }
 
     private Vector2Int GetStemDirection()
     {
-        Vector2Int up = Vector2Int.up;
-        Vector2Int leftDiag = new Vector2Int(-1, 1);
-        Vector2Int rightDiag = new Vector2Int(1, 1);
-
-        float r = finalGrowthRandomness;
-        if (Random.value < (1f - r)) return up;
-        else return (Random.value < 0.5f) ? leftDiag : rightDiag;
+        // Returns Up, UpLeft, or UpRight based on randomness
+        if (Random.value < finalGrowthRandomness) return (Random.value < 0.5f) ? Vector2Int.left + Vector2Int.up : Vector2Int.right + Vector2Int.up;
+        return Vector2Int.up;
     }
 
     private void SpawnLeafIfEmpty(Vector2Int coords)
     {
-        if (!cells.ContainsKey(coords))
-        {
-            cells[coords] = PlantCellType.Leaf;
-            SpawnCellVisual(PlantCellType.Leaf, coords);
+        if (!cells.ContainsKey(coords)) SpawnCellVisual(PlantCellType.Leaf, coords);
+    }
+
+    /// <summary>
+    /// Instantiates cell prefab, adds to dictionary, configures PlantCell component.
+    /// </summary>
+    private void SpawnCellVisual(PlantCellType cellType, Vector2Int coords)
+    {
+        // Check if already exists (e.g., stem collision)
+        if (cells.ContainsKey(coords) && cells[coords] != cellType) {
+             Debug.LogWarning($"Spawn collision at {coords}. Overwriting {cells[coords]} with {cellType}.", gameObject);
+            // Optionally destroy old visual first
+        } else if (cells.ContainsKey(coords)) {
+            // Already exists with same type, do nothing (e.g. leaf overlap check)
+            return;
+        }
+
+        GameObject prefab = null;
+        switch (cellType) {
+            case PlantCellType.Seed: prefab = seedCellPrefab; break;
+            case PlantCellType.Stem: prefab = stemCellPrefab; break;
+            case PlantCellType.Leaf: prefab = leafCellPrefab; break;
+            case PlantCellType.Fruit: prefab = berryCellPrefab; break;
+        }
+
+        if (prefab != null) {
+            Vector2 worldPos = (Vector2)transform.position + (Vector2)coords * cellSpacing;
+            GameObject instance = Instantiate(prefab, worldPos, Quaternion.identity, transform);
+
+            // --- Setup PlantCell Component ---
+            PlantCell cellComp = instance.GetComponent<PlantCell>();
+            if (cellComp == null) {
+                 Debug.LogError($"Prefab '{prefab.name}' for {cellType} is MISSING the PlantCell component!", instance);
+            } else {
+                cellComp.ParentPlantGrowth = this; // Link back to parent
+                cellComp.GridCoord = coords;       // Store its grid position
+                cellComp.CellType = cellType;      // Store its type
+            }
+            // --- End Setup PlantCell ---
+
+            cells[coords] = cellType; // Add/Update dictionary entry *after* potential warning
+
+            SortableEntity sorter = instance.GetComponent<SortableEntity>() ?? instance.AddComponent<SortableEntity>();
+            if (cellType != PlantCellType.Seed) sorter.SetUseParentYCoordinate(true);
+
+            // Optional FoodItem validation
+            if (cellType == PlantCellType.Fruit && (instance.GetComponent<FoodItem>() == null || instance.GetComponent<FoodItem>().foodType == null)) {
+                 Debug.LogError($"Spawned Berry Prefab '{prefab.name}' at {coords} has MISSING/unassigned FoodItem!", instance);
+            }
+        } else {
+             Debug.LogWarning($"[{gameObject.name}] No prefab assigned for {cellType}.", gameObject);
         }
     }
 
-    private void SpawnCellVisual(PlantCellType cellType, Vector2Int coords)
+
+    // --- Mature Cycle ---
+    private IEnumerator ExecuteMatureCycle()
     {
-        Vector2 worldPos = (Vector2)transform.position + (Vector2)coords * cellSpacing;
-        GameObject prefabToUse = null;
-        switch (cellType) {
-            case PlantCellType.Seed: prefabToUse = seedCellPrefab; break;
-            case PlantCellType.Stem: prefabToUse = stemCellPrefab; break;
-            case PlantCellType.Leaf: prefabToUse = leafCellPrefab; break;
+        if (nodeGraph?.nodes == null) {
+            Debug.LogError($"[{gameObject.name}] NodeGraph missing!", gameObject);
+            currentState = PlantState.Mature_Idle; cycleTimer = cycleCooldown; yield break;
         }
-        if (prefabToUse != null) {
-            GameObject cellInstance = Instantiate(prefabToUse, worldPos, Quaternion.identity, transform);
-            SortableEntity sortableEntity = cellInstance.GetComponent<SortableEntity>() ?? cellInstance.AddComponent<SortableEntity>();
-            if (cellType != PlantCellType.Seed) {
-                sortableEntity.SetUseParentYCoordinate(true);
+
+        float damageMultiplier = 1.0f;
+
+        foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
+            if (node.effects == null || node.effects.Count == 0) continue;
+
+            // Calculate cost and find other active effects
+            bool hasAnyActiveEffect = false;
+            float nodeEnergyCost = 0f;
+            List<NodeEffectData> otherActiveEffects = new List<NodeEffectData>();
+            foreach (var effect in node.effects) {
+                if (!effect.isPassive) {
+                    hasAnyActiveEffect = true;
+                    if (effect.effectType == NodeEffectType.EnergyCost) nodeEnergyCost += Mathf.Max(0f, effect.primaryValue);
+                    else otherActiveEffects.Add(effect);
+                }
             }
-        } else Debug.LogWarning($"[PlantGrowth] No prefab assigned for cell type {cellType}");
+
+            if (hasAnyActiveEffect) {
+                // Apply delay
+                if (nodeCastDelay > 0.01f) yield return new WaitForSeconds(nodeCastDelay);
+
+                // Check Energy
+                if (currentEnergy >= nodeEnergyCost) {
+                    // Consume energy
+                    currentEnergy = Mathf.Max(0f, currentEnergy - nodeEnergyCost);
+
+                    // Execute other effects
+                    foreach (var activeEffect in otherActiveEffects) {
+                        switch (activeEffect.effectType) {
+                            case NodeEffectType.Output: GetComponentInChildren<OutputNodeEffect>()?.Activate(damageMultiplier); break;
+                            case NodeEffectType.Damage: damageMultiplier = Mathf.Max(0.1f, damageMultiplier + activeEffect.primaryValue); break;
+                            case NodeEffectType.GrowBerry: TrySpawnBerry(); break;
+                                // Add other active cases
+                        }
+                    }
+                     // Debug.Log($"Node '{node.nodeDisplayName}' activated (Cost: {nodeEnergyCost})");
+                } else {
+                     // Debug.Log($"Node '{node.nodeDisplayName}' skipped (Cost: {nodeEnergyCost}, Available: {currentEnergy})");
+                     // Add fizzle feedback?
+                }
+            }
+        } // End foreach node
+
+        cycleTimer = cycleCooldown;
+        currentState = PlantState.Mature_Idle;
     }
-    
-    private void OnDestroy()
+
+    private void TrySpawnBerry()
     {
-        // Ensure coroutines are stopped when object is destroyed
-        if (percentageCounterCoroutine != null)
-        {
-            StopCoroutine(percentageCounterCoroutine);
-            percentageCounterCoroutine = null;
+        if (berryCellPrefab == null) { Debug.LogWarning($"[{gameObject.name}] Berry Prefab not assigned.", gameObject); return; }
+
+        // Find empty spots below leaves or above stems
+        var potentialCoords = cells
+            .SelectMany(cell => {
+                List<Vector2Int> candidates = new List<Vector2Int>();
+                if (cell.Value == PlantCellType.Leaf) candidates.Add(cell.Key + Vector2Int.down);
+                else if (cell.Value == PlantCellType.Stem) candidates.Add(cell.Key + Vector2Int.up);
+                return candidates;
+            })
+            .Where(coord => !cells.ContainsKey(coord)) // Filter out occupied coords
+            .Distinct()
+            .ToList();
+
+        if (potentialCoords.Count > 0) {
+            SpawnCellVisual(PlantCellType.Fruit, potentialCoords[Random.Range(0, potentialCoords.Count)]);
         }
+    }
+
+    // --- UI Reference Helper ---
+    private void EnsureUIReferences()
+    {
+        if (energyText) return;
+        // Simplified search logic from previous versions
+        energyText = GetComponentInChildren<TMP_Text>(true); // Find first active or inactive
+        if (!energyText) Debug.LogWarning($"[{gameObject.name}] Energy Text (TMP_Text) not found in children.", gameObject);
     }
 }
 
@@ -1393,22 +1341,26 @@ public class SortableEntity : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "AnimalDefinition", menuName = "Ecosystem/Animal Definition")]
+[CreateAssetMenu(fileName = "Animal_", menuName = "Ecosystem/Animal Definition (Simplified)")]
 public class AnimalDefinition : ScriptableObject
 {
-    [Header("Basic Stats")]
-    public string animalName;
-    public float maxHealth = 10f;
-    public float hungerDecayRate = 0.5f;  // How quickly the animal gets hungry (units/sec)
+    [Header("Identification")]
+    [Tooltip("The species name (e.g., 'Bunny', 'Fox').")]
+    public string animalName = "DefaultAnimal";
+
+    [Header("Core Stats")]
+    public float maxHealth = 10f; // Keep health for potential future damage/predators
     public float movementSpeed = 2f;
 
-    [Header("Eating & Satiation")]
-    public float hungerThreshold = 5f;    // If hunger > threshold, tries to eat
-    public float eatAmount = 5f;         // How much hunger is reduced when it eats a leaf
-    public float leafDamage = 1f;        // How much health (or 'life') is removed from a leaf
+    [Header("Diet")]
+    [Tooltip("Reference to the AnimalDiet ScriptableObject defining eating habits.")]
+    public AnimalDiet diet; // Needs to reference the simplified AnimalDiet SO
 
-    [Header("Prefab/Visuals")]
-    public GameObject prefab;  // The character prefab to instantiate
+    [Header("Visuals")]
+    [Tooltip("The prefab to instantiate for this animal.")]
+    public GameObject prefab;
+
+    // Removed meatFoodType
 }
 
 
@@ -1429,377 +1381,453 @@ public class AnimalLibrary : ScriptableObject
 // FILE: Assets\Scripts\Ecosystem\Core\AnimalController.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro; // <<< ADDED THIS using statement for TextMeshPro
 
 [RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(SortableEntity))]
 public class AnimalController : MonoBehaviour
 {
-    // Assigned via FaunaManager on instantiation
+    // References set by FaunaManager or Initialize
     private AnimalDefinition definition;
+    private AnimalDiet animalDiet;
 
-    [Header("Thought/Dialogue Setup")]
-    public AnimalThoughtLibrary thoughtLibrary;      // Assign GlobalAnimalThoughtLibrary asset
-    public GameObject thoughtBubblePrefab;           // Assign your ThoughtBubble prefab
+    // Inspector Assigned References (Optional Features)
+    [Header("Optional Features")]
+    public AnimalThoughtLibrary thoughtLibrary;
+    public GameObject thoughtBubblePrefab;
+    public Transform bubbleSpawnTransform;
+    public Transform poopSpawnPoint;
+    public List<GameObject> poopPrefabs;
+    public Animator animator; // Assign if using animations
 
-    [Header("Transforms for Visual Alignment")]
-    public Transform mouthTransform;                 // For aligning mouth (for future pooping VFX)
-    public Transform bubbleSpawnTransform;           // Where thought bubbles spawn
+    [Header("UI References (Optional - Auto-Detected)")]
+    [Tooltip("Reference to the TextMeshPro component for displaying HP. Found automatically if not assigned.")]
+    [SerializeField] private TextMeshProUGUI hpText; // <<< ADDED HP TEXT REFERENCE
 
-    [Header("Thought Bubble Settings")]
-    public float thoughtCooldownTime = 5f;             // Minimum time between thought bubbles
-    private float thoughtCooldownTimer = 0f;
+    [Header("Behavior Tuning")]
+    public float searchRadius = 5f;
+    public float eatDistance = 0.5f;
+    public float eatDuration = 1.5f;
+    [Range(0f, 1f)] public float wanderPauseChance = 0.3f;
+    public float wanderMinMoveDuration = 1f;
+    public float wanderMaxMoveDuration = 3f;
+    public float wanderMinPauseDuration = 0.5f;
+    public float wanderMaxPauseDuration = 2f;
+    public float minPoopDelay = 5f;
+    public float maxPoopDelay = 10f;
+    public float poopDuration = 1f;
+    public float poopColorVariation = 0.1f;
+    public float thoughtCooldownTime = 5f;
 
-    private string speciesName;                      // Derived from definition.animalName
 
-    // Basic runtime stats
+    // --- Internal State ---
     private float currentHealth;
     private float currentHunger;
-
-    private Rigidbody2D rb;
-    private SpriteRenderer spriteRenderer;           // For sprite flipping
-    private Vector2 moveDirection;
-
-    // Global movement bounds (set via FaunaManager; hidden in Inspector)
-    [HideInInspector] private Vector2 minBounds;
-    [HideInInspector] private Vector2 maxBounds;
-
-    [Header("Eating Settings")]
-    public float eatDuration = 2f;                    // Time spent eating
-    [Tooltip("How close the animal must be to a leaf to eat it.")]
-    public float eatDistance = 0.5f;
+    private GameObject currentTargetFood = null;
+    private Vector2 moveDirection = Vector2.zero;
     private bool isEating = false;
     private float eatTimer = 0f;
-    private GameObject currentTargetLeaf;
-
-    [Header("Wander Behavior Settings")]
-    [Tooltip("Intensity multiplier (0 to 1) controlling the chance to pause while wandering.")]
-    [Range(0f, 1f)]
-    public float wanderPauseIntensity = 0.5f;
-    [Tooltip("Minimum duration for a moving phase while wandering.")]
-    public float wanderMinMoveDuration = 1f;
-    [Tooltip("Maximum duration for a moving phase while wandering.")]
-    public float wanderMaxMoveDuration = 3f;
-    [Tooltip("Minimum duration for a pause while wandering.")]
-    public float wanderMinPauseDuration = 0.5f;
-    [Tooltip("Maximum duration for a pause while wandering.")]
-    public float wanderMaxPauseDuration = 2f;
     private bool isWanderPaused = false;
     private float wanderStateTimer = 0f;
-
-    [Header("Pooping Settings")]
-    [Tooltip("Minimum delay after eating before the animal poops.")]
-    public float minPoopDelay = 5f;
-    [Tooltip("Maximum delay after eating before the animal poops.")]
-    public float maxPoopDelay = 10f;
-    [Tooltip("Duration (in seconds) the animal spends pooping (not moving).")]
-    public float poopDuration = 1f;
-    [Tooltip("List of poop prefabs for random selection.")]
-    public List<GameObject> poopPrefabs;
-    [Tooltip("Maximum amount to vary each color channel (0-1) for the poop sprite.")]
-    public float poopColorVariation = 0.1f;
-
-    // Internal pooping state variables
     private bool isPooping = false;
-    private float poopTimer = 0f;      // For the pooping phase duration
-    private float poopDelayTimer = 0f; // Delay before pooping after eating
-    private bool hasPooped = false;    // True if the animal has already pooped after the last eating cycle
+    private float poopTimer = 0f;
+    private float poopDelayTimer = 0f;
+    private bool hasPooped = true;
+    private float thoughtCooldownTimer = 0f;
 
-    public void Initialize(AnimalDefinition def)
+    // --- Component References ---
+    private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
+
+    // --- Movement Bounds ---
+    private Vector2 minBounds;
+    private Vector2 maxBounds;
+
+    // --- Public Accessors ---
+    public float CurrentHealth => currentHealth;
+    public string SpeciesName => definition ? definition.animalName : "Uninitialized";
+
+
+    /// <summary>
+    /// Initializes the Animal Controller. Called by FaunaManager.
+    /// </summary>
+    public void Initialize(AnimalDefinition def, Vector2 minB, Vector2 maxB)
     {
         definition = def;
-        currentHealth = definition.maxHealth;
-        currentHunger = 0f;
-        speciesName = definition.animalName; // e.g., "Bunny"
-        // Start with no pending poop (already pooped)
+        if (definition == null) {
+            Debug.LogError($"[{gameObject.name}] Null definition provided!", gameObject);
+            Destroy(gameObject); return;
+        }
+
+        animalDiet = def.diet;
+        if (animalDiet == null) {
+            Debug.LogError($"[{gameObject.name}] AnimalDefinition '{def.name}' missing required Diet!", gameObject);
+            enabled = false; // Disable controller
+            return;
+        }
+
+        // Get Components
+        rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>(); // Allows sprite to be child
+        // Animator is assigned via inspector if used
+
+        // Set Initial State
+        currentHealth = definition.maxHealth; // Use maxHealth from definition
+        currentHunger = 0f; // Start not hungry
         hasPooped = true;
         poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
+        minBounds = minB;
+        maxBounds = maxB;
+
+        EnsureHpTextReference(); // <<< CALL METHOD TO FIND HP TEXT
+        UpdateHpText(); // <<< CALL METHOD TO SET INITIAL HP TEXT
+
+        if (spriteRenderer == null) {
+             Debug.LogWarning($"[{gameObject.name}] No SpriteRenderer found in children.", gameObject);
+        }
     }
 
-    private void Awake()
+    void Update()
     {
-        rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        if (!spriteRenderer)
-            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-    }
+        if (!enabled) return; // Do nothing if not initialized correctly
 
-    private void Update()
-    {
-        if (definition == null)
-        {
-            Debug.LogWarning("[AnimalController] 'definition' is null. Did you call Initialize()?");
-            return;
+        UpdateHunger(); // This now calls UpdateHpText if starvation happens
+        HandlePooping();
+        UpdateThoughts();
+
+        if (isEating) {
+            HandleEating();
+            moveDirection = Vector2.zero;
+        } else if (isPooping) {
+            // Pooping state/timer handled in HandlePooping
+            moveDirection = Vector2.zero;
+        } else {
+            DecideNextAction(); // Decide whether to wander or seek food
         }
 
-        // Decrement thought bubble cooldown timer
-        thoughtCooldownTimer -= Time.deltaTime;
+        FlipSpriteBasedOnDirection();
+        UpdateAnimationState();
+    }
 
-        // Increase hunger over time
-        currentHunger += definition.hungerDecayRate * Time.deltaTime;
-
-        // Process pooping only if not eating and hasn't already pooped in this cycle
-        if (!isEating && !hasPooped)
+    void FixedUpdate()
+    {
+        // Apply movement if applicable
+        if (rb != null && !isEating && !isPooping && moveDirection != Vector2.zero)
         {
+            Vector2 currentPos = rb.position;
+            // Use normalized direction to ensure consistent speed
+            Vector2 desiredMove = moveDirection.normalized * definition.movementSpeed * Time.fixedDeltaTime;
+            Vector2 newPos = currentPos + desiredMove;
+
+            // Clamp position
+            newPos.x = Mathf.Clamp(newPos.x, minBounds.x, maxBounds.x);
+            newPos.y = Mathf.Clamp(newPos.y, minBounds.y, maxBounds.y);
+
+            rb.MovePosition(newPos);
+        }
+    }
+
+    // --- State Update Methods ---
+
+    void UpdateHunger()
+    {
+        currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime;
+        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
+
+        // Removed starvation logic for simplicity, but keep structure
+        // if (currentHunger >= animalDiet.maxHunger) {
+        //     ApplyStarvationDamage(); // Check for starvation
+        // }
+    }
+
+    // Placeholder for potential future starvation damage
+    void ApplyStarvationDamage()
+    {
+        // This method would be called if starvation logic is re-added
+        // currentHealth -= animalDiet.starvationDamageRate * Time.deltaTime;
+        UpdateHpText(); // <<< UPDATE HP TEXT AFTER TAKING DAMAGE (important if starvation added back)
+        // if (currentHealth <= 0)
+        // {
+        //     Die(CauseOfDeath.Starvation); // Use existing Die method
+        // }
+    }
+
+    void HandlePooping()
+    {
+        if (!isEating && !hasPooped) {
             poopDelayTimer -= Time.deltaTime;
-            if (!isPooping && poopDelayTimer <= 0f)
-            {
-                // Start pooping phase
-                isPooping = true;
-                poopTimer = poopDuration;
-                ShowThought(ThoughtTrigger.Pooping);
-                moveDirection = Vector2.zero; // Stop moving during pooping
-            }
-            if (isPooping)
-            {
+            if (!isPooping && poopDelayTimer <= 0f) { StartPooping(); }
+            if (isPooping) {
                 poopTimer -= Time.deltaTime;
-                if (poopTimer <= 0f)
-                {
-                    SpawnPoop();
-                    isPooping = false;
-                    hasPooped = true; // Mark that we've pooped this cycle
-                }
+                if (poopTimer <= 0f) { FinishPooping(); }
             }
         }
+    }
 
-        // If in eating state, update timer and exit early
-        if (isEating)
-        {
-            eatTimer -= Time.deltaTime;
-            if (eatTimer <= 0f)
-            {
-                isEating = false;
-                FinishEatingLeaf();
-            }
-            return;
-        }
+     void UpdateThoughts() {
+         if (thoughtCooldownTimer > 0) { thoughtCooldownTimer -= Time.deltaTime; }
+     }
 
-        // Behavior based on hunger:
-        if (currentHunger >= definition.hungerThreshold)
-        {
-            //Debug.Log($"{speciesName} is hungry! (Hunger: {currentHunger:0.00}/{definition.hungerThreshold})");
-            if (thoughtCooldownTimer <= 0f)
-            {
-                ShowThought(ThoughtTrigger.Hungry);
-                thoughtCooldownTimer = thoughtCooldownTime;
-            }
-            if (currentTargetLeaf == null)
-                currentTargetLeaf = FindNearestLeaf();
-            if (currentTargetLeaf != null)
-                MoveTowardLeaf(currentTargetLeaf);
-            else
-                Wander();
-        }
-        else
-        {
+
+    // --- Action Execution Methods ---
+
+    void DecideNextAction()
+    {
+        if (currentHunger >= animalDiet.hungerThreshold) {
+            SeekFood();
+        } else {
             Wander();
-            currentTargetLeaf = null;
+            currentTargetFood = null; // Lose target if not hungry
+        }
+    }
+
+    void SeekFood()
+    {
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
+
+        // Check if target is still valid (exists and has FoodItem)
+        bool targetValid = currentTargetFood != null && currentTargetFood.activeInHierarchy && currentTargetFood.GetComponent<FoodItem>() != null;
+
+        if (!targetValid) {
+            currentTargetFood = FindNearestFood();
         }
 
-        FlipSpriteBasedOnDirection(moveDirection);
+        if (currentTargetFood != null) {
+            MoveTowardFood(currentTargetFood);
+        } else {
+            Wander(); // Can't find food
+        }
     }
 
-    private void FixedUpdate()
+    GameObject FindNearestFood()
     {
-        if (isEating || rb == null)
-            return;
-        Vector2 newPos = rb.position + moveDirection * definition.movementSpeed * Time.fixedDeltaTime;
-        newPos.x = Mathf.Clamp(newPos.x, minBounds.x, maxBounds.x);
-        newPos.y = Mathf.Clamp(newPos.y, minBounds.y, maxBounds.y);
-        rb.MovePosition(newPos);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, searchRadius);
+        return animalDiet.FindBestFood(colliders, transform.position); // Use Diet's logic
     }
 
-    // Wander behavior: alternate between moving and pausing with random durations.
-    private void Wander()
+    void MoveTowardFood(GameObject foodObj)
     {
-        if (wanderStateTimer <= 0f)
+        if (foodObj == null) return;
+        float distance = Vector2.Distance(transform.position, foodObj.transform.position);
+
+        if (distance <= eatDistance) {
+            StartEating();
+        } else {
+            moveDirection = (foodObj.transform.position - transform.position).normalized;
+            isWanderPaused = false; // Ensure not paused while seeking food
+            wanderStateTimer = 0f;
+        }
+    }
+
+    void StartEating()
+    {
+        isEating = true;
+        eatTimer = eatDuration;
+        moveDirection = Vector2.zero;
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
+    }
+
+    void HandleEating()
+    {
+        eatTimer -= Time.deltaTime;
+        if (eatTimer <= 0f) {
+            isEating = false;
+            FinishEatingAction(); // Renamed for clarity
+        }
+    }
+
+    // Called when the eat timer finishes
+    void FinishEatingAction()
+    {
+        if (currentTargetFood == null) return; // Target disappeared mid-eat
+
+        FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>();
+        if (foodItem != null && foodItem.foodType != null)
         {
-            if (isWanderPaused)
-            {
+            // 1. Get Satiation
+            float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType);
+
+            // 2. Apply Satiation
+            currentHunger -= satiationGain;
+            currentHunger = Mathf.Max(0f, currentHunger);
+
+            // 3. Destroy the Food GameObject
+            Destroy(currentTargetFood);
+
+            // 4. Reset Poop Timer
+            hasPooped = false;
+            poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
+
+            // 5. Clear Target Reference
+            currentTargetFood = null;
+        }
+         else {
+             // Target was invalid (missing FoodItem/FoodType), clear it
+             // Debug.LogWarning($"[{gameObject.name}] Tried to finish eating invalid target '{currentTargetFood?.name}'. Clearing target.", currentTargetFood);
+             currentTargetFood = null;
+         }
+    }
+
+    void StartPooping()
+    {
+        isPooping = true;
+        poopTimer = poopDuration;
+        moveDirection = Vector2.zero;
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
+    }
+
+    void FinishPooping()
+    {
+        SpawnPoop();
+        isPooping = false;
+        hasPooped = true;
+    }
+
+    void SpawnPoop()
+    {
+        if (poopPrefabs == null || poopPrefabs.Count == 0) return;
+
+        int index = Random.Range(0, poopPrefabs.Count);
+        GameObject prefab = poopPrefabs[index];
+        if (prefab == null) return;
+
+        Transform spawnT = poopSpawnPoint ? poopSpawnPoint : transform;
+        GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity);
+
+        // Apply visual variations
+        SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
+        if (sr != null) {
+            sr.flipX = Random.value > 0.5f;
+            Color c = sr.color;
+            float v = poopColorVariation;
+            sr.color = new Color(
+                Mathf.Clamp01(c.r + Random.Range(-v, v)),
+                Mathf.Clamp01(c.g + Random.Range(-v, v)),
+                Mathf.Clamp01(c.b + Random.Range(-v, v)),
+                c.a);
+        }
+
+        // Ensure PoopController exists and initialize
+        PoopController pc = poopObj.GetComponent<PoopController>() ?? poopObj.AddComponent<PoopController>();
+        pc.Initialize();
+    }
+
+    void Wander()
+    {
+        if (wanderStateTimer <= 0f) {
+            if (isWanderPaused) {
+                // Finish pause, start moving
                 isWanderPaused = false;
-                float angle = Random.Range(0f, 360f);
-                moveDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+                moveDirection = Random.insideUnitCircle.normalized;
                 wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
-            }
-            else
-            {
-                if (Random.value < wanderPauseIntensity)
-                {
+            } else {
+                // Finish moving, decide to pause or change direction
+                if (Random.value < wanderPauseChance) {
                     isWanderPaused = true;
                     moveDirection = Vector2.zero;
                     wanderStateTimer = Random.Range(wanderMinPauseDuration, wanderMaxPauseDuration);
-                }
-                else
-                {
-                    float angle = Random.Range(0f, 360f);
-                    moveDirection = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+                } else {
+                    moveDirection = Random.insideUnitCircle.normalized;
                     wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
                 }
             }
-        }
-        else
-        {
+        } else {
             wanderStateTimer -= Time.deltaTime;
         }
     }
 
-    private void MoveTowardLeaf(GameObject leafObj)
+
+    // --- Movement & Visuals ---
+
+    void FlipSpriteBasedOnDirection()
     {
-        if (isEating)
-            return; // Avoid re-triggering if already eating
-        if (!leafObj)
-        {
-            currentTargetLeaf = null;
-            return;
-        }
-        Vector2 leafPos = leafObj.transform.position;
-        Vector2 myPos = transform.position;
-        float distance = Vector2.Distance(myPos, leafPos);
-        if (distance <= eatDistance)
-        {
-            isEating = true;
-            eatTimer = eatDuration;
-            ShowThought(ThoughtTrigger.Eating);
-        }
-        else
-        {
-            moveDirection = (leafPos - myPos).normalized;
+        if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f) {
+            spriteRenderer.flipX = moveDirection.x < 0;
         }
     }
 
-    private void FinishEatingLeaf()
+    void UpdateAnimationState()
     {
-        if (currentTargetLeaf)
-        {
-            Destroy(currentTargetLeaf);
-            currentTargetLeaf = null;
-        }
-        currentHunger -= definition.eatAmount;
-        if (currentHunger < 0f)
-            currentHunger = 0f;
-        // Reset pooping state for this eating cycle.
-        hasPooped = false;
-        poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
+        if (animator == null) return;
+        bool isMoving = !isEating && !isPooping && moveDirection.sqrMagnitude > 0.01f;
+        // Use parameter names matching your Animator controller
+        animator.SetBool("IsMoving", isMoving);
+        animator.SetBool("IsEating", isEating);
+        // animator.SetBool("IsPooping", isPooping); // Add if needed
     }
 
-    private GameObject FindNearestLeaf()
+    // --- Thought Bubbles ---
+
+    bool CanShowThought() {
+        return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f;
+    }
+
+    void ShowThought(ThoughtTrigger trigger)
     {
-        GameObject[] leaves = GameObject.FindGameObjectsWithTag("Leaf");
-        if (leaves.Length == 0)
-            return null;
-        Vector2 myPos = transform.position;
-        GameObject nearest = null;
-        float nearestDist = float.MaxValue;
-        foreach (var leaf in leaves)
-        {
-            float dist = Vector2.Distance(myPos, leaf.transform.position);
-            if (dist < nearestDist)
-            {
-                nearestDist = dist;
-                nearest = leaf;
+        // Simplified - assumes CanShowThought() was checked
+        if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return; // Added null check
+
+        var entry = thoughtLibrary.allThoughts.FirstOrDefault(t => t != null && t.speciesName == SpeciesName && t.trigger == trigger); // Added null check for entry
+        if (entry != null && entry.lines != null && entry.lines.Count > 0) {
+            string line = entry.lines[Random.Range(0, entry.lines.Count)];
+            Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
+            GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT);
+            bubbleGO.transform.localPosition = Vector3.zero;
+            ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>();
+            if (bubble) {
+                bubble.Initialize(line, spawnT, 2f); // 2s default life
+                thoughtCooldownTimer = thoughtCooldownTime;
+            } else {
+                Destroy(bubbleGO);
             }
         }
-        return nearest;
     }
 
-    // Thought bubble logic: spawn a bubble as a child of bubbleSpawnTransform.
-    private void ShowThought(ThoughtTrigger trigger)
-    {
-        if (!thoughtLibrary || !thoughtBubblePrefab)
-        {
-            Debug.LogWarning($"[{speciesName}] Missing thought library or bubble prefab!");
-            return;
-        }
-        if (string.IsNullOrEmpty(speciesName))
-            return;
-        var matchingEntries = thoughtLibrary.allThoughts
-            .Where(t => t.speciesName == speciesName && t.trigger == trigger)
-            .ToList();
-        if (matchingEntries.Count == 0)
-        {
-            Debug.Log($"[{speciesName}] No thought lines for trigger {trigger}.");
-            return;
-        }
-        var chosenEntry = matchingEntries[Random.Range(0, matchingEntries.Count)];
-        if (chosenEntry.lines == null || chosenEntry.lines.Count == 0)
-        {
-            Debug.Log($"[{speciesName}] Thought entry for trigger {trigger} has no lines.");
-            return;
-        }
-        string randomLine = chosenEntry.lines[Random.Range(0, chosenEntry.lines.Count)];
-        Debug.Log($"[{speciesName}] Spawning thought bubble: {randomLine}");
-        Transform spawnParent = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
-        GameObject bubbleObj = Instantiate(thoughtBubblePrefab, spawnParent.position, Quaternion.identity, spawnParent);
-        bubbleObj.transform.localPosition = Vector3.zero;
-        ThoughtBubbleController bubble = bubbleObj.GetComponent<ThoughtBubbleController>();
-        if (bubble != null)
-            bubble.Initialize(randomLine, spawnParent, 2f);
-        else
-            Debug.LogWarning($"[{speciesName}] ThoughtBubblePrefab is missing ThoughtBubbleController!");
-    }
+     // --- Death Handling --- (Simplified, no starvation damage)
+     public enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
 
-    // Spawn a poop object at the mouthTransform (or fallback to self)
-    private void SpawnPoop()
+     private void Die(CauseOfDeath cause) // Keep structure in case starvation is added back
+     {
+          Debug.Log($"[{SpeciesName} on {gameObject.name}] Died due to {cause}.", gameObject);
+          // Add meat spawning logic here later if needed
+          Destroy(gameObject);
+     }
+
+    // --- Helper Methods ---
+    public bool SpeciesNameEquals(string otherSpeciesName) {
+         return definition != null && definition.animalName == otherSpeciesName;
+     }
+
+    /// <summary>
+    /// Ensures the hpText reference is set, finding it if necessary.
+    /// </summary>
+    private void EnsureHpTextReference() // <<< NEW METHOD
     {
-        if (poopPrefabs != null && poopPrefabs.Count > 0)
+        // If not assigned in inspector, try to find it in children
+        if (hpText == null)
         {
-            int index = Random.Range(0, poopPrefabs.Count);
-            GameObject selectedPrefab = poopPrefabs[index];
-            Transform spawnPoint = mouthTransform ? mouthTransform : transform;
-            GameObject poopObj = Instantiate(selectedPrefab, spawnPoint.position, Quaternion.identity);
-            // Random flip and color variation as before.
-            SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
-            if (sr != null)
-            {
-                sr.flipX = (Random.value > 0.5f);
-                Color originalColor = sr.color;
-                float variation = poopColorVariation;
-                float newR = Mathf.Clamp01(originalColor.r + Random.Range(-variation, variation));
-                float newG = Mathf.Clamp01(originalColor.g + Random.Range(-variation, variation));
-                float newB = Mathf.Clamp01(originalColor.b + Random.Range(-variation, variation));
-                sr.color = new Color(newR, newG, newB, originalColor.a);
+            hpText = GetComponentInChildren<TextMeshProUGUI>(true); // Include inactive
+
+            if (hpText == null) {
+                 // This warning is okay, HP text is optional
+                 // Debug.LogWarning($"[{gameObject.name}] Could not automatically find TextMeshProUGUI for HP display.", gameObject);
             }
-            // Attach PoopController if not present.
-            PoopController pc = poopObj.GetComponent<PoopController>();
-            if (pc == null)
-            {
-                pc = poopObj.AddComponent<PoopController>();
-            }
-            // Initialize PoopController using its Inspector settings (no lifetime passed).
-            pc.Initialize();
-        }
-        else
-        {
-            Debug.LogWarning($"[{speciesName}] No poopPrefabs assigned!");
         }
     }
 
-    // Sprite flipping based on horizontal movement direction.
-    private void FlipSpriteBasedOnDirection(Vector2 direction)
+    /// <summary>
+    /// Updates the HP text display.
+    /// </summary>
+    private void UpdateHpText() // <<< NEW METHOD
     {
-        if (!spriteRenderer)
-            return;
-        if (direction.x < -0.01f)
-            spriteRenderer.flipX = true;
-        else if (direction.x > 0.01f)
-            spriteRenderer.flipX = false;
-    }
+        if (hpText == null || definition == null) return; // Exit if no text component or definition
 
-    // Public setter for movement bounds (called from FaunaManager)
-    public void SetMovementBounds(Vector2 min, Vector2 max)
-    {
-        minBounds = min;
-        maxBounds = max;
-    }
-
-    // Public method to compare species name (used by FaunaManager)
-    public bool SpeciesNameEquals(string other)
-    {
-        return speciesName == other;
+        // Format the text (using FloorToInt for cleaner display, adjust if floats needed)
+        hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)} / {Mathf.FloorToInt(definition.maxHealth)}";
     }
 }
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1997,13 +2025,17 @@ public class FaunaManager : MonoBehaviour
 
         // Get the existing AnimalController on the prefab.
         AnimalController controller = animalObj.GetComponent<AnimalController>();
-        if (!controller)
+        if (controller != null)
         {
-            Debug.LogWarning("[FaunaManager] Prefab missing AnimalController. Adding one dynamically.");
-            controller = animalObj.AddComponent<AnimalController>();
+            controller.Initialize(definition, animalMinBounds, animalMaxBounds); // Pass bounds
         }
-        controller.Initialize(definition);
-        controller.SetMovementBounds(animalMinBounds, animalMaxBounds);
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] Animal prefab '{definition.prefab.name}' is missing the AnimalController script!", animalObj);
+            Destroy(animalObj); // Destroy if controller is missing
+            return null;
+        }
+// ... rest of parenting logic ...
         return animalObj;
     }
 }
@@ -2127,6 +2159,163 @@ public enum ThoughtTrigger
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Food\AnimalDiet.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+
+// Simplified Preference: Links FoodType to satiation amount and behavior priority
+[System.Serializable]
+public class DietPreferenceSimplified
+{
+    [Tooltip("The specific FoodType this preference applies to.")]
+    public FoodType foodType;
+
+    [Tooltip("How much satiation (hunger reduction) is gained when this food is eaten.")]
+    public float satiationAmount = 5f;
+
+    [Tooltip("Priority for seeking this food (higher value = higher priority). Used for choosing between nearby valid foods.")]
+    [Range(0.1f, 5f)]
+    public float preferencePriority = 1f;
+}
+
+
+// Simplified Diet: Defines hunger stats and list of preferences
+[CreateAssetMenu(fileName = "Diet_", menuName = "Ecosystem/Animal Diet (Simplified)")]
+public class AnimalDiet : ScriptableObject
+{
+    [Header("Diet Preferences")]
+    [Tooltip("List of foods this animal can eat and how much they satisfy hunger.")]
+    public List<DietPreferenceSimplified> acceptableFoods = new List<DietPreferenceSimplified>();
+
+    [Header("Hunger Mechanics")]
+    [Tooltip("Maximum hunger level.")]
+    public float maxHunger = 20f;
+    [Tooltip("Rate at which hunger increases per second.")]
+    public float hungerIncreaseRate = 0.5f;
+    [Tooltip("Hunger level above which the animal will actively seek food.")]
+    public float hungerThreshold = 10f;
+
+    // Removed starvation for simplicity, can be added back later if needed
+    // [Header("Starvation")]
+    // public float starvationDamageRate = 0.5f;
+
+    /// <summary>
+    /// Checks if a specific FoodType is included in this diet's acceptable foods.
+    /// </summary>
+    public bool CanEat(FoodType food)
+    {
+        if (food == null) return false;
+        return acceptableFoods.Any(pref => pref.foodType == food);
+    }
+
+    /// <summary>
+    /// Gets the DietPreferenceSimplified entry for a specific FoodType.
+    /// </summary>
+    public DietPreferenceSimplified GetPreference(FoodType food)
+    {
+         if (food == null) return null;
+         return acceptableFoods.FirstOrDefault(p => p.foodType == food);
+    }
+
+    /// <summary>
+    /// Gets the satiation amount provided by a specific FoodType for this diet.
+    /// </summary>
+    public float GetSatiationValue(FoodType food)
+    {
+        var pref = GetPreference(food);
+        return pref != null ? pref.satiationAmount : 0f;
+    }
+
+    /// <summary>
+    /// Finds the best food target from nearby colliders based on preference and distance.
+    /// </summary>
+    public GameObject FindBestFood(Collider2D[] nearbyColliders, Vector3 animalPosition)
+    {
+        GameObject bestTarget = null;
+        float highestScore = -1f; // Start below any possible score
+
+        foreach (var collider in nearbyColliders)
+        {
+            if (collider == null) continue;
+
+            FoodItem foodItem = collider.GetComponent<FoodItem>();
+
+            // Must have FoodItem and its FoodType must be edible by this diet
+            if (foodItem != null && foodItem.foodType != null && CanEat(foodItem.foodType))
+            {
+                DietPreferenceSimplified pref = GetPreference(foodItem.foodType);
+                if (pref == null) continue; // Should be caught by CanEat, but safe check
+
+                float distance = Vector3.Distance(animalPosition, collider.transform.position);
+                // Simple score: Higher preference is better, closer is better.
+                // Avoid division by zero or very small distances inflating score excessively.
+                float score = pref.preferencePriority / (1f + distance); // Inverse distance weighting
+
+                if (score > highestScore)
+                {
+                    highestScore = score;
+                    bestTarget = collider.gameObject;
+                }
+            }
+        }
+        return bestTarget;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Food\FoodItem.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[RequireComponent(typeof(Collider2D))] // Still need collider for detection
+public class FoodItem : MonoBehaviour
+{
+    [Header("Food Identification")]
+    [Tooltip("Reference to the ScriptableObject defining what type of food this is.")]
+    public FoodType foodType;
+
+    private void Start()
+    {
+        // Simple validation
+        if (foodType == null)
+        {
+            Debug.LogWarning($"FoodItem on GameObject '{gameObject.name}' is missing its FoodType reference!", gameObject);
+            // Optionally disable the collider so it can't be detected as food
+            // Collider2D col = GetComponent<Collider2D>();
+            // if (col != null) col.enabled = false;
+            enabled = false; // Disable script if not configured
+        }
+        // No health, no consume logic needed here anymore.
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Food\FoodType.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[CreateAssetMenu(fileName = "FoodType_", menuName = "Ecosystem/Food Type (Simplified)")]
+public class FoodType : ScriptableObject
+{
+    [Header("Identification")]
+    [Tooltip("Identifying name for this food type (e.g., 'Leaf', 'Fruit').")]
+    public string foodName = "Default Food";
+    [Tooltip("Icon used in UI or debugging.")]
+    public Sprite icon;
+
+    // Keep category for potential filtering later, but not actively used by core logic yet
+    public enum FoodCategory { Plant_Leaf, Plant_Fruit, Plant_Stem, Plant_Seed, Other }
+    [Header("Categorization")]
+    [Tooltip("General category this food falls into.")]
+    public FoodCategory category = FoodCategory.Other;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeData.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using System;
@@ -2139,13 +2328,17 @@ public class NodeData
     public string nodeId;
     public string nodeDisplayName;
     public List<NodeEffectData> effects = new List<NodeEffectData>();
-
-    // (Optional) To store the order if you need explicit ordering.
     public int orderIndex;
+
+    // Runtime flags
+    [HideInInspector] // Don't show in NodeDefinition inspector, set at runtime
+    public bool canBeDeleted = true; // <<< NEW FLAG (Defaults to true)
 
     public NodeData()
     {
         nodeId = Guid.NewGuid().ToString();
+        // Ensure default deletability on creation
+        canBeDeleted = true;
     }
 }
 
@@ -2202,11 +2395,37 @@ public class NodeDefinition : ScriptableObject
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System; // Needed for [Serializable]
+
+// Define the configuration for a single initial node
+[Serializable] // Make it visible and editable in the Inspector
+public struct InitialNodeConfig
+{
+    [Tooltip("The Node Definition to spawn.")]
+    public NodeDefinition nodeDefinition;
+
+    [Tooltip("The zero-based index of the cell where this node should spawn (0 is the leftmost cell).")]
+    [Min(0)]
+    public int cellIndex;
+
+    [Tooltip("Can the player drag this initial node to other cells?")]
+    public bool canMove;
+
+    [Tooltip("Can the player delete this initial node using the Delete key?")]
+    public bool canDelete;
+}
+
 
 [CreateAssetMenu(fileName = "NodeDefinitionLibrary", menuName = "Nodes/NodeDefinitionLibrary")]
 public class NodeDefinitionLibrary : ScriptableObject
 {
-    public List<NodeDefinition> definitions;
+    [Header("Available Node Definitions")]
+    [Tooltip("List of all Node Definitions available in the dropdown menu.")]
+    public List<NodeDefinition> definitions; // Your existing list
+
+    [Header("Initial Node Layout")]
+    [Tooltip("Nodes to automatically spawn in specific slots when the grid initializes.")]
+    public List<InitialNodeConfig> initialNodes; // <<< NEW LIST ADDED
 }
 
 
@@ -2232,24 +2451,50 @@ public class NodeEffectData
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeEffectType.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿public enum NodeEffectType
-{
-    // Config / Growth Phase Effects (isGrowthPhaseOnly = true)
-    ManaCost,           // Base cost calculation (might apply later too?)
-    EnergyStorage,      // Determines max energy
-    EnergyPhotosynthesis, // Determines base energy generation rate
-    SeedSpawn,          // Marker effect to allow spawning
-    StemLength,         // Modifies min/max stem length
-    GrowthSpeed,        // Modifies time between growth steps
-    LeafGap,            // Modifies spacing between leaves
-    LeafPattern,        // Sets leaf pattern type
-    StemRandomness,     // Modifies stem growth direction variance
-    Cooldown,           // Base time between Mature Phase cycles
-    CastDelay,          // Base time between Nodes in a Mature Phase cycle
+﻿// FILE: Assets\Scripts\Nodes\Core\NodeEffectType.cs
+using System;
+using UnityEngine;
 
-    // Active / Mature Phase Effects (isGrowthPhaseOnly = false)
-    Output,             // Triggers spell/projectile spawning
-    Damage,             // Adds damage potential to outputs
+public enum NodeEffectType
+{
+    // --- Passive / Growth Phase Effects (isPassive = true) ---
+    // These typically run once at the start to define the plant's structure and base stats.
+
+    // [Tooltip("Base cost calculation (Not currently implemented in PlantGrowth execution).")]
+    // ManaCost, // REMOVED
+    [Tooltip("Determines the maximum energy the plant can store.")]
+    EnergyStorage,
+    [Tooltip("Determines the base rate of energy generation through photosynthesis per leaf.")]
+    EnergyPhotosynthesis,
+    [Tooltip("A required marker effect for a node chain to be spawnable as a plant.")]
+    SeedSpawn,
+    [Tooltip("Modifies the minimum and maximum potential length of the main stem.")]
+    StemLength,
+    [Tooltip("Modifies the time interval between each step of stem/leaf growth.")]
+    GrowthSpeed,
+    [Tooltip("Modifies the number of stem segments between leaf spawns.")]
+    LeafGap,
+    [Tooltip("Sets the pattern in which leaves are spawned (e.g., Parallel, Alternating).")]
+    LeafPattern,
+    [Tooltip("Modifies the chance for the stem to grow diagonally instead of straight up.")]
+    StemRandomness,
+    [Tooltip("Modifies the base time duration between Mature Phase execution cycles.")]
+    Cooldown,
+    [Tooltip("Modifies the base time delay between executing the effects of sequential nodes within a Mature Phase cycle.")]
+    CastDelay,
+
+
+    // --- Active / Mature Phase Effects (isPassive = false) ---
+    // These execute periodically after the plant has finished growing.
+
+    [Tooltip("Energy cost deducted from the plant when this node's active effects are executed during the mature cycle.")]
+    EnergyCost, // <<< RENAMED/ADDED
+    [Tooltip("Triggers the spawning of a projectile or other output effect (requires OutputNodeEffect component).")]
+    Output,
+    [Tooltip("Modifies the damage potential of subsequent 'Output' effects in the same cycle.")]
+    Damage,
+    [Tooltip("Causes the plant to attempt to spawn a berry in an available adjacent slot during the mature cycle.")]
+    GrowBerry,
     // Add potentially more active effects: Heal, ApplyStatus, AreaEffect, etc.
 }
 
@@ -2815,13 +3060,8 @@ public class NodeEditorGridController : MonoBehaviour
     [SerializeField] private Color selectedNodeBackgroundColor = new Color(0.9f, 0.9f, 0.7f, 1f);
 
     [Header("Node Definitions & Interaction")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // Keep this reference
     [SerializeField] private TMP_Dropdown nodeDropdown;
-
-    // REMOVED: The direct reference to NodeExecutor is no longer needed here.
-    // The NodeExecutor script will find this controller via Instance or assignment.
-    // [Header("Execution")]
-    // [SerializeField] private NodeExecutor nodeExecutor;
 
     [Header("UI Toggle")]
     [SerializeField] private GameObject gridUIParent;
@@ -2830,7 +3070,7 @@ public class NodeEditorGridController : MonoBehaviour
     private List<NodeCell> nodeCells = new List<NodeCell>();
     private RectTransform _rectTransform;
     private Canvas _rootCanvas;
-    private NodeGraph _uiGraphRepresentation = new NodeGraph(); // Internal storage
+    private NodeGraph _uiGraphRepresentation = new NodeGraph();
 
 
     public GameObject NodeViewPrefab => nodeViewPrefab;
@@ -2838,7 +3078,7 @@ public class NodeEditorGridController : MonoBehaviour
     public NodeDefinitionLibrary DefinitionLibrary => definitionLibrary;
     public Color SelectedNodeBackgroundColor => selectedNodeBackgroundColor;
     public Color EmptyCellColor => emptyCellColor;
-    public NodeGraph GetCurrentUIGraph() => _uiGraphRepresentation; // Public getter for NodeExecutor
+    public NodeGraph GetCurrentUIGraph() => _uiGraphRepresentation;
 
 
     void Awake()
@@ -2848,8 +3088,8 @@ public class NodeEditorGridController : MonoBehaviour
 
         _rectTransform = GetComponent<RectTransform>();
         _rootCanvas = GetComponentInParent<Canvas>();
-        if (_rootCanvas == null) Debug.LogError("...");
-        if (gridUIParent == null) Debug.LogWarning("...");
+        if (_rootCanvas == null) Debug.LogError("[NodeEditorGridController] Root Canvas not found!", gameObject);
+        if (gridUIParent == null) Debug.LogWarning("[NodeEditorGridController] Grid UI Parent not assigned. UI Toggling might not work.", gameObject);
     }
 
     void OnDestroy()
@@ -2860,31 +3100,46 @@ public class NodeEditorGridController : MonoBehaviour
     void Start()
     {
         if (nodeDropdown != null) nodeDropdown.gameObject.SetActive(false);
-        else Debug.LogWarning("...");
-        if (definitionLibrary == null) Debug.LogError("...");
+        else Debug.LogWarning("[NodeEditorGridController] Node Dropdown not assigned.", gameObject);
+        if (definitionLibrary == null) Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned!", gameObject);
 
         CreateCells();
-        RefreshGraph();
+        SpawnInitialNodes(); // <<< CALL NEW METHOD
+        RefreshGraph(); // Refresh after potentially spawning initial nodes
     }
 
     private void CreateCells()
     {
-        foreach (Transform child in transform) { if (child.gameObject != this.gameObject && child.GetComponent<NodeEditorGridController>() == null) Destroy(child.gameObject); }
+        // Clear existing cells if any (e.g., during hot reload in editor)
+        foreach (Transform child in transform) {
+            // Avoid destroying self or essential components if they are children by mistake
+            if (child.GetComponent<NodeCell>() != null) {
+                Destroy(child.gameObject);
+            }
+        }
         nodeCells.Clear();
-        NodeCell.ClearSelection();
+        NodeCell.ClearSelection(); // Ensure no selection persists
 
         float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
-        float startX = -(totalWidth / 2f);
-        float startY = -(cellSize.y / 2f);
+        // Calculate start based on pivot (assuming center pivot 0.5, 0.5)
+        float startX = -(totalWidth / 2f) + (cellSize.x / 2f);
+        // If using bottom-left pivot (0,0): float startX = 0;
+        // Adjust Y based on pivot too
+        float startY = 0; // Assuming center Y pivot
 
         for (int i = 0; i < emptyCellsCount; i++)
         {
             GameObject cellGO = new GameObject($"Cell_{i}");
             RectTransform rt = cellGO.AddComponent<RectTransform>();
             cellGO.transform.SetParent(transform, false);
-            rt.sizeDelta = cellSize;
-            rt.anchorMin = new Vector2(0.5f, 0.5f); rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.pivot = new Vector2(0f, 0f); // Using bottom-left pivot
+
+            // Set anchors and pivot (e.g., center)
+            rt.anchorMin = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = cellSize; // Set size
+
+            // Calculate position
             float xPos = startX + i * (cellSize.x + cellMargin);
             float yPos = startY;
             rt.anchoredPosition = new Vector2(xPos, yPos);
@@ -2892,8 +3147,8 @@ public class NodeEditorGridController : MonoBehaviour
             Image cellImage = cellGO.AddComponent<Image>();
             cellImage.sprite = emptyCellSprite;
             cellImage.color = emptyCellColor;
-            cellImage.raycastTarget = true;
-            // rt.localScale = emptyCellScale; // Keep commented out
+            cellImage.raycastTarget = true; // Important for drop detection
+            // rt.localScale = emptyCellScale; // Apply scale if needed
 
             NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
             cellLogic.Init(i, this, cellImage);
@@ -2901,179 +3156,385 @@ public class NodeEditorGridController : MonoBehaviour
         }
     }
 
-    void Update()
+    /// <summary>
+    /// Spawns nodes defined in the NodeDefinitionLibrary's initialNodes list.
+    /// </summary>
+    private void SpawnInitialNodes() // <<< NEW METHOD
     {
-        if (Input.GetKeyDown(KeyCode.Tab)) ToggleGridUI();
-        if (Input.GetKeyDown(KeyCode.Delete)) { if (NodeCell.CurrentlySelectedCell != null) { NodeCell selected = NodeCell.CurrentlySelectedCell; selected.RemoveNode(); RefreshGraph(); } }
-        if (Input.GetKeyDown(KeyCode.Escape)) { if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown(); }
-    }
+        if (definitionLibrary == null || definitionLibrary.initialNodes == null)
+        {
+            // Debug.Log("No initial nodes defined in the library.");
+            return;
+        }
 
-    public void ToggleGridUI()
-    {
-        if (gridUIParent != null) { bool currentState = gridUIParent.activeSelf; gridUIParent.SetActive(!currentState); if (!gridUIParent.activeSelf && nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown(); if (!gridUIParent.activeSelf) NodeCell.ClearSelection(); }
-        else Debug.LogWarning("...");
-    }
+        foreach (var config in definitionLibrary.initialNodes)
+        {
+            // Validate Node Definition
+            if (config.nodeDefinition == null)
+            {
+                Debug.LogWarning($"Initial node config has null NodeDefinition. Skipping.");
+                continue;
+            }
 
-    public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
-    {
-        if (nodeDropdown == null) { Debug.LogError("..."); return; }
-        if (definitionLibrary == null || definitionLibrary.definitions == null) { Debug.LogError("..."); return; }
+            // Validate Cell Index
+            if (config.cellIndex < 0 || config.cellIndex >= nodeCells.Count)
+            {
+                Debug.LogWarning($"Initial node config for '{config.nodeDefinition.name}' has invalid cell index ({config.cellIndex}). Max index is {nodeCells.Count - 1}. Skipping.");
+                continue;
+            }
 
-        StopCoroutine("ShowDropdownCoroutine");
-        StartCoroutine(ShowDropdownCoroutine(cell, eventData));
-    }
+            // Get Target Cell
+            NodeCell targetCell = nodeCells[config.cellIndex];
+            if (targetCell.HasNode())
+            {
+                Debug.LogWarning($"Initial node config for '{config.nodeDefinition.name}' targets cell {config.cellIndex}, but it's already occupied. Skipping.");
+                continue;
+            }
 
-    private IEnumerator ShowDropdownCoroutine(NodeCell cell, PointerEventData eventData)
-    {
-        // Build Options
-        List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
-        options.Add(new TMP_Dropdown.OptionData("Select Node..."));
-        var sortedDefinitions = definitionLibrary.definitions.Where(def => def != null).OrderBy(def => def.displayName).ToList();
-        foreach (var def in sortedDefinitions) { TMP_Dropdown.OptionData option = new TMP_Dropdown.OptionData(); option.text = def.displayName; option.image = def.thumbnail; options.Add(option); }
-        nodeDropdown.ClearOptions(); nodeDropdown.AddOptions(options);
+            // Spawn the Node
+            // Debug.Log($"Spawning initial node '{config.nodeDefinition.name}' in cell {config.cellIndex}. Move:{config.canMove}, Delete:{config.canDelete}");
+            targetCell.AssignNode(config.nodeDefinition);
 
-        // Setup Listener
-        nodeDropdown.onValueChanged.RemoveAllListeners();
-        nodeDropdown.onValueChanged.AddListener((selectedIndex) => { OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions); });
-
-        // Position
-        RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(dropdownRect.parent as RectTransform, eventData.position, _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 localPos);
-        dropdownRect.localPosition = localPos;
-
-        // Activate
-        if (!nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(true);
-
-        // Wait
-        yield return null;
-
-        // Show
-        try {
-            if (nodeDropdown.template == null) { Debug.LogError("..."); HideDropdown(); yield break; }
-            nodeDropdown.Show();
-        } catch (System.NullReferenceException nre) { Debug.LogError($"... NRE Show() ... {nre.Message}", nodeDropdown.gameObject); HideDropdown(); yield break; }
-
-        nodeDropdown.value = 0; nodeDropdown.RefreshShownValue();
-    }
+            // Apply Move/Delete settings
+            NodeView spawnedView = targetCell.GetNodeView();
+            if (spawnedView != null)
+            {
+                // Control Movability
+                NodeDraggable draggable = spawnedView.GetComponent<NodeDraggable>();
+                if (draggable != null)
+                {
+                    draggable.enabled = config.canMove;
+                } else if (config.canMove) {
+                     Debug.LogWarning($"Initial node '{config.nodeDefinition.name}' in cell {config.cellIndex} is set to 'canMove=true' but its prefab is missing the NodeDraggable component.", spawnedView.gameObject);
+                }
 
 
-    private void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefs)
-    {
-        HideDropdown();
-
-        if (selectedIndex > 0) {
-            int definitionIndex = selectedIndex - 1;
-            if (definitionIndex >= 0 && definitionIndex < sortedDefs.Count) {
-                NodeDefinition selectedDef = sortedDefs[definitionIndex];
-                targetCell.AssignNode(selectedDef);
-                NodeCell.SelectCell(targetCell);
-                RefreshGraph(); // Refresh UI graph representation
+                // Control Deletability
+                NodeData spawnedData = targetCell.GetNodeData();
+                if (spawnedData != null)
+                {
+                    spawnedData.canBeDeleted = config.canDelete;
+                }
             }
         }
     }
 
-    public void HideDropdown()
+
+    void Update()
     {
-        if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(false);
+        // UI Toggle
+        if (Input.GetKeyDown(KeyCode.Tab)) ToggleGridUI();
+
+        // --- Delete Node Handling (Modified) ---
+        if (Input.GetKeyDown(KeyCode.Delete))
+        {
+            if (NodeCell.CurrentlySelectedCell != null)
+            {
+                NodeCell selected = NodeCell.CurrentlySelectedCell;
+                NodeData data = selected.GetNodeData(); // Get the node data instance
+
+                // Check if the node exists AND if its 'canBeDeleted' flag is true
+                if (data != null && data.canBeDeleted) // <<< CHECK ADDED
+                {
+                    // Debug.Log($"Deleting node '{data.nodeDisplayName}' from cell {selected.CellIndex}.");
+                    selected.RemoveNode(); // RemoveNode handles deselection
+                    RefreshGraph(); // Update internal graph representation
+                }
+                else if (data != null && !data.canBeDeleted)
+                {
+                    // Optional: Give visual/audio feedback that deletion is blocked
+                     Debug.Log($"Node '{data.nodeDisplayName}' cannot be deleted.");
+                    // Example: Play a short "error" sound or flash the node briefly
+                }
+                // If data is null (empty cell selected), do nothing
+            }
+        }
+
+        // Dropdown Escape Handling
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf)
+            {
+                HideDropdown();
+            }
+             // Also deselect node if Escape is pressed and dropdown isn't active?
+             else if (NodeCell.CurrentlySelectedCell != null) {
+                 NodeCell.ClearSelection();
+             }
+        }
     }
 
+    // --- ToggleGridUI --- (Keep existing method)
+    public void ToggleGridUI()
+    {
+        if (gridUIParent != null) {
+            bool currentState = gridUIParent.activeSelf;
+            gridUIParent.SetActive(!currentState);
+            if (!gridUIParent.activeSelf) { // If hiding UI
+                 if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown();
+                 NodeCell.ClearSelection(); // Deselect nodes when UI hides
+            }
+        }
+        else Debug.LogWarning("[NodeEditorGridController] Grid UI Parent not assigned.");
+    }
 
+    // --- OnEmptyCellRightClicked --- (Keep existing method)
+    public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
+    {
+        if (nodeDropdown == null) { Debug.LogError("[NodeEditorGridController] Node Dropdown not assigned."); return; }
+        if (definitionLibrary == null || definitionLibrary.definitions == null) { Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned or has no definitions."); return; }
+
+        // Stop potentially existing dropdown coroutine to prevent conflicts
+        StopCoroutine("ShowDropdownCoroutine");
+        StartCoroutine(ShowDropdownCoroutine(cell, eventData));
+    }
+
+    // --- ShowDropdownCoroutine --- (Keep existing method)
+     private IEnumerator ShowDropdownCoroutine(NodeCell cell, PointerEventData eventData)
+     {
+         // Build Options
+         List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+         options.Add(new TMP_Dropdown.OptionData("Select Node...")); // Placeholder option
+         // Sort definitions alphabetically for the dropdown
+         var sortedDefinitions = definitionLibrary.definitions
+                                     .Where(def => def != null) // Filter out null entries
+                                     .OrderBy(def => def.displayName)
+                                     .ToList();
+         foreach (var def in sortedDefinitions) {
+             TMP_Dropdown.OptionData option = new TMP_Dropdown.OptionData();
+             option.text = def.displayName;
+             option.image = def.thumbnail; // Use thumbnail as icon
+             options.Add(option);
+         }
+         nodeDropdown.ClearOptions();
+         nodeDropdown.AddOptions(options);
+
+         // Setup Listener (Use lambda to capture cell and sorted list)
+         nodeDropdown.onValueChanged.RemoveAllListeners(); // Clear previous listeners
+         nodeDropdown.onValueChanged.AddListener((selectedIndex) => {
+             OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions); // Pass necessary context
+         });
+
+         // Position the Dropdown near the click position
+         RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
+         RectTransformUtility.ScreenPointToLocalPointInRectangle(
+             dropdownRect.parent as RectTransform, // Parent RectTransform
+             eventData.position,                   // Screen click position
+             _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, // Camera for non-overlay canvas
+             out Vector2 localPos);
+         dropdownRect.localPosition = localPos;
+
+         // Activate Dropdown GameObject if not already active
+         if (!nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(true);
+
+         // Wait one frame to allow UI layout to update before showing
+         yield return null;
+
+         // Show the dropdown options list
+         try {
+             // Ensure template is assigned before showing
+             if (nodeDropdown.template == null) {
+                 Debug.LogError("Dropdown template is not assigned in the Inspector!", nodeDropdown.gameObject);
+                 HideDropdown();
+                 yield break;
+             }
+             nodeDropdown.Show();
+         } catch (System.NullReferenceException nre) {
+             // Catch potential NRE if something internal goes wrong
+              Debug.LogError($"Error showing dropdown: {nre.Message}", nodeDropdown.gameObject);
+             HideDropdown();
+             yield break;
+         }
+
+         // Set initial value and refresh display
+         nodeDropdown.value = 0; // Select the "Select Node..." placeholder
+         nodeDropdown.RefreshShownValue();
+     }
+
+    // --- OnDropdownValueChanged --- (Keep existing method)
+     private void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefs)
+     {
+         HideDropdown(); // Hide dropdown immediately after selection
+
+         // Index 0 is the placeholder "Select Node..."
+         if (selectedIndex > 0) {
+             // Adjust index to match the sortedDefs list (since dropdown index 1 corresponds to list index 0)
+             int definitionIndex = selectedIndex - 1;
+             if (definitionIndex >= 0 && definitionIndex < sortedDefs.Count) {
+                 NodeDefinition selectedDef = sortedDefs[definitionIndex];
+                 if (selectedDef != null) {
+                      // Debug.Log($"Assigning node '{selectedDef.name}' to cell {targetCell.CellIndex}");
+                     targetCell.AssignNode(selectedDef); // Assign the chosen node
+                     NodeCell.SelectCell(targetCell);   // Select the newly placed node
+                     RefreshGraph();                    // Update the internal graph representation
+                 }
+             } else {
+                  Debug.LogError($"Dropdown selection index ({selectedIndex}) resulted in an out-of-bounds index ({definitionIndex}) for the definition list.");
+             }
+         }
+         // If selectedIndex is 0, do nothing (user clicked the placeholder)
+     }
+
+    // --- HideDropdown --- (Keep existing method)
+    public void HideDropdown()
+    {
+        if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf)
+        {
+            nodeDropdown.Hide(); // Hide the options list
+            nodeDropdown.gameObject.SetActive(false); // Deactivate the main dropdown object
+        }
+    }
+
+    // --- RefreshGraph --- (Keep existing method)
     public void RefreshGraph()
     {
         if (_uiGraphRepresentation == null) _uiGraphRepresentation = new NodeGraph();
         _uiGraphRepresentation.nodes.Clear();
+        // Ensure cells are ordered correctly by index when building the graph
         foreach (var cell in nodeCells.OrderBy(c => c.CellIndex))
         {
             NodeData data = cell.GetNodeData();
             if (data != null)
             {
+                // Update orderIndex just in case it changed (though it shouldn't if not moved)
                 data.orderIndex = cell.CellIndex;
                 _uiGraphRepresentation.nodes.Add(data);
             }
         }
+        // Optional: Add debug log to see the refreshed graph node count
+        // Debug.Log($"UI Graph Refreshed. Node Count: {_uiGraphRepresentation.nodes.Count}");
     }
 
+    // --- HandleNodeDrop --- (Keep existing method)
+     public bool HandleNodeDrop(NodeDraggable draggedDraggable, NodeCell originalCell, Vector2 screenPosition)
+     {
+         NodeCell targetCell = FindCellAtScreenPosition(screenPosition);
+         bool changed = false;
 
-    public bool HandleNodeDrop(NodeDraggable draggedDraggable, NodeCell originalCell, Vector2 screenPosition)
-    {
-        NodeCell targetCell = FindCellAtScreenPosition(screenPosition);
-        bool changed = false;
+         if (targetCell != null && originalCell != null)
+         {
+             // Get data from the node being dragged
+             NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
+             NodeData draggedData = draggedView?.GetNodeData();
 
-        if (targetCell != null && originalCell != null)
-        {
-            NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
-            NodeData draggedData = draggedView?.GetNodeData();
+             // Ensure we have valid data to move
+             if (draggedView == null || draggedData == null) {
+                 Debug.LogError("Dragged object missing NodeView or NodeData!", draggedDraggable.gameObject);
+                 draggedDraggable.ResetPosition(); // Reset if invalid
+                 return false;
+             }
 
-            if (draggedView == null || draggedData == null) { draggedDraggable.ResetPosition(); return false; }
-            if (targetCell == originalCell) { draggedDraggable.ResetPosition(); NodeCell.SelectCell(targetCell); return true; }
+             // Case 1: Dropped back onto the original cell
+             if (targetCell == originalCell) {
+                 draggedDraggable.ResetPosition(); // Snap back cleanly
+                 NodeCell.SelectCell(targetCell); // Reselect it
+                 return false; // No change in layout
+             }
 
-            NodeView existingViewInTarget = targetCell.GetNodeView();
-            NodeData existingDataInTarget = targetCell.GetNodeData();
+             // --- Proceed with swap/move ---
+             NodeView existingViewInTarget = targetCell.GetNodeView();
+             NodeData existingDataInTarget = targetCell.GetNodeData();
 
-            NodeCell.ClearSelection();
-            originalCell.ClearNodeReference();
+             // Clear selection during swap
+             NodeCell.ClearSelection();
 
-            if (existingViewInTarget != null && existingDataInTarget != null)
-            {
-                NodeDraggable existingDraggable = existingViewInTarget.GetComponent<NodeDraggable>();
-                originalCell.AssignNodeView(existingViewInTarget, existingDataInTarget);
-                if (existingDraggable != null) existingDraggable.SnapToCell(originalCell);
-            }
+             // 1. Clear the original cell's reference to the node being moved
+             originalCell.ClearNodeReference();
 
-            targetCell.AssignNodeView(draggedView, draggedData);
-            draggedDraggable.SnapToCell(targetCell);
+             // 2. If the target cell had a node, move it to the original cell
+             if (existingViewInTarget != null && existingDataInTarget != null) {
+                 NodeDraggable existingDraggable = existingViewInTarget.GetComponent<NodeDraggable>();
+                 // Assign the existing node to the original cell
+                 originalCell.AssignNodeView(existingViewInTarget, existingDataInTarget);
+                 // Snap its visual representation
+                 if (existingDraggable != null) existingDraggable.SnapToCell(originalCell);
+             }
 
-            NodeCell.SelectCell(targetCell);
-            changed = true;
-        }
-        else
-        {
-            draggedDraggable.ResetPosition();
-            if (originalCell != null && originalCell.HasNode()) { NodeCell.SelectCell(originalCell); }
-            else { NodeCell.ClearSelection(); }
-        }
+             // 3. Assign the dragged node to the target cell
+             targetCell.AssignNodeView(draggedView, draggedData);
+             draggedDraggable.SnapToCell(targetCell); // Snap its visual representation
 
-        if (changed) RefreshGraph(); // Refresh UI graph representation
+             // 4. Select the cell where the node was dropped
+             NodeCell.SelectCell(targetCell);
+             changed = true;
+         }
+         else // Dropped outside grid or invalid original cell
+         {
+             // Reset the dragged node to its original position
+             draggedDraggable.ResetPosition();
+             // Reselect the original cell if it still has the node (it should after ResetPosition)
+             if (originalCell != null && originalCell.HasNode()) {
+                 NodeCell.SelectCell(originalCell);
+             } else {
+                 NodeCell.ClearSelection(); // Should not happen often here
+             }
+         }
 
-        return changed;
-    }
+         // If the layout changed, refresh the internal graph representation
+         if (changed) RefreshGraph();
 
+         return changed;
+     }
 
-    private NodeCell FindCellAtScreenPosition(Vector2 screenPosition)
-    {
-        NodeCell foundCell = null;
-        foreach (var cell in nodeCells)
-        {
-            RectTransform cellRect = cell.GetComponent<RectTransform>();
-            bool contains = RectTransformUtility.RectangleContainsScreenPoint(cellRect, screenPosition, _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera );
-            if (contains) { foundCell = cell; break; }
-        }
-        return foundCell;
-    }
+    // --- FindCellAtScreenPosition --- (Keep existing method)
+     private NodeCell FindCellAtScreenPosition(Vector2 screenPosition)
+     {
+         NodeCell foundCell = null;
+         // Check all cells
+         foreach (var cell in nodeCells)
+         {
+             RectTransform cellRect = cell.GetComponent<RectTransform>();
+             // Use RectTransformUtility for accurate checks across different canvas modes
+             bool contains = RectTransformUtility.RectangleContainsScreenPoint(
+                 cellRect,
+                 screenPosition,
+                 _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera
+             );
+             if (contains) {
+                 foundCell = cell;
+                 break; // Found the cell under the cursor
+             }
+         }
+         return foundCell;
+     }
 
-
+    // --- OnDrawGizmos --- (Keep existing method)
      #if UNITY_EDITOR
      void OnDrawGizmos()
      {
+         // Draw gizmos only in the editor and when not playing
          if (!Application.isPlaying && TryGetComponent<RectTransform>(out var rt))
          {
-             Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
-             Vector3 center = rt.position;
+             Gizmos.color = new Color(0f, 1f, 0f, 0.5f); // Semi-transparent green
+
              float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
-             float startX_for_gizmo;
-             if(rt.pivot == Vector2.zero) startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f);
-             else startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f);
+             // Adjust start position based on pivot (assuming 0.5, 0.5)
+             float startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f);
+             float startY_for_gizmo = 0; // Assuming center Y pivot
+
+             // Store original matrix
+             Matrix4x4 originalMatrix = Gizmos.matrix;
 
              for (int i = 0; i < emptyCellsCount; i++)
              {
+                 // Calculate center position of the cell in local space relative to pivot
                  float xOffset = startX_for_gizmo + i * (cellSize.x + cellMargin);
-                 Vector3 cellCenterWorld = center + (Vector3)(rt.rotation * new Vector3(xOffset * rt.lossyScale.x, 0, 0) );
+                 Vector3 localCellCenter = new Vector3(xOffset, startY_for_gizmo, 0);
+
+                 // Transform local center to world space, considering rotation and scale
+                 Vector3 worldCellCenter = rt.TransformPoint(localCellCenter);
+
+                 // Calculate gizmo size based on RectTransform's lossy scale
                  Vector3 gizmoSize = new Vector3(cellSize.x * rt.lossyScale.x, cellSize.y * rt.lossyScale.y, 0.1f);
-                 Matrix4x4 rotationMatrix = Matrix4x4.TRS(cellCenterWorld, rt.rotation, Vector3.one);
-                 Gizmos.matrix = rotationMatrix;
+
+                 // Set Gizmos matrix to handle rotation
+                 Gizmos.matrix = Matrix4x4.TRS(worldCellCenter, rt.rotation, Vector3.one);
+
+                 // Draw wire cube centered at the transformed position (local origin within the matrix)
                  Gizmos.DrawWireCube(Vector3.zero, gizmoSize);
-                 Gizmos.matrix = Matrix4x4.identity;
              }
+             // Restore original Gizmos matrix
+             Gizmos.matrix = originalMatrix;
          }
      }
      #endif
