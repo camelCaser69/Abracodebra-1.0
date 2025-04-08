@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-07 21:13:16
+UNITY PROJECT SCRIPT EXPORT - 2025-04-08 21:25:21
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -165,9 +165,10 @@ Assets
 │       │   ├── PLains_97.asset
 │       │   ├── PLains_98.asset
 │       │   └── PLains_99.asset
-│       ├── Palette_GroundTiles.prefab
+│       ├── Palettes
+│       │   └── PaletteDual_Ground.prefab
 │       └── Rule Tiles
-│           └── TilingMaterial_Grass.asset
+│           └── DualGridRuleTile.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -241,9 +242,7 @@ Assets
 │   │   └── GardenerController.cs
 │   ├── Tiles
 │   │   ├── Data
-│   │   │   └── TilingMaterialDefinition.cs
 │   │   └── Editor
-│   │       └── TilingMaterialGeneratorEditor.cs
 │   ├── UI
 │   └── Visuals
 │       └── NightColorPostProcess.cs
@@ -255,11 +254,7 @@ Assets
 │   └── UniversalRP.asset
 ├── Shaders
 │   └── BezierCurveAA.shader
-├── Test
 ├── TextureImporter.preset
-├── Tiles
-│   └── GeneratedRuleTiles
-│       └── Grass_WangRuleTile.asset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
 
@@ -3993,318 +3988,6 @@ public class GardenerController : MonoBehaviour
     public void Plant()
     {
         StartPlantingAnimation();
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\TilingMaterialDefinition.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.Tilemaps; // Needed for Tile.ColliderType
-
-// Defines the necessary data for a 16-tile Wang-style material
-[CreateAssetMenu(fileName = "TilingMaterial_", menuName = "2D/Tiles/Tiling Material Definition")]
-public class TilingMaterialDefinition : ScriptableObject
-{
-    [Header("Material Identity")]
-    [Tooltip("Descriptive name for this material (e.g., Grass, Dirt, Water). Used for naming generated assets.")]
-    public string materialName = "NewMaterial";
-
-    [Header("Sprites (16 Required)")]
-    [Tooltip("Assign the 16 sprites corresponding to the binary Wang Tile indices (0-15). Order is crucial! Index 0 = no neighbours, Index 15 = all neighbours.")]
-    public Sprite[] sprites = new Sprite[16]; // Must have exactly 16 elements
-
-    [Header("Generated Tile Settings")]
-    [Tooltip("Default collider type for the generated RuleTile.")]
-    public Tile.ColliderType defaultCollider = Tile.ColliderType.None;
-    [Tooltip("Optional: Default GameObject prefab to instantiate with the tile.")]
-    public GameObject defaultGameObject;
-    [Tooltip("Color tint to apply to the generated RuleTile. White = no tint.")]
-    public Color tintColor = Color.white; // <<< ADDED TINT COLOR
-
-    // --- Validation ---
-    private void OnValidate()
-    {
-        // Ensure the sprites array always has exactly 16 elements in the inspector
-        if (sprites == null || sprites.Length != 16)
-        {
-            Debug.LogWarning($"'{materialName}' Material Definition: Sprites array must contain exactly 16 sprites. Resizing array.", this);
-            System.Array.Resize(ref sprites, 16);
-        }
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Editor\TilingMaterialGeneratorEditor.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEditor;          // Required for Editor, SerializedObject, etc.
-using UnityEngine.Tilemaps; // Required for RuleTile, Tile
-using System.Collections.Generic;
-using System.IO;            // Required for path manipulation
-using System.Text;          // Required for StringBuilder
-using System.Linq;          // Required for OfType() and OrderBy()
-
-[CustomEditor(typeof(TilingMaterialDefinition))]
-public class TilingMaterialGeneratorEditor : Editor
-{
-    // Target script properties
-    private SerializedProperty materialNameProp;
-    private SerializedProperty spritesProp;
-    private SerializedProperty defaultColliderProp;
-    private SerializedProperty defaultGameObjectProp;
-    private SerializedProperty tintColorProp;
-
-    // Editor-only fields
-    private Texture2D sourceSpriteSheet;
-    private TilePalette targetPalette; // Type requires UnityEditor.Tilemaps namespace
-    private bool addToPalette = true;
-
-    private const string outputFolderPath = "Assets/Tiles/GeneratedRuleTiles"; // Adjust as needed
-
-    private void OnEnable()
-    {
-        materialNameProp = serializedObject.FindProperty("materialName");
-        spritesProp = serializedObject.FindProperty("sprites");
-        defaultColliderProp = serializedObject.FindProperty("defaultCollider");
-        defaultGameObjectProp = serializedObject.FindProperty("defaultGameObject");
-        tintColorProp = serializedObject.FindProperty("tintColor");
-    }
-
-    public override void OnInspectorGUI()
-    {
-        TilingMaterialDefinition definition = (TilingMaterialDefinition)target;
-        serializedObject.Update();
-
-        EditorGUILayout.PropertyField(materialNameProp);
-        EditorGUILayout.Space();
-
-        // --- Auto-Fill Section ---
-        EditorGUILayout.LabelField("Auto-Fill Sprites (Optional)", EditorStyles.boldLabel);
-        sourceSpriteSheet = (Texture2D)EditorGUILayout.ObjectField(
-            new GUIContent("Source Spritesheet", "Drag a sliced spritesheet Texture (16 sprites, named correctly) here."),
-            sourceSpriteSheet, typeof(Texture2D), false);
-
-        if (GUILayout.Button("Auto-Fill Sprites From Source Sheet")) {
-            if (sourceSpriteSheet != null) AutoFillSpritesFromSheet(definition, sourceSpriteSheet);
-            else EditorUtility.DisplayDialog("No Source Sheet", "Please assign a Source Spritesheet first.", "OK");
-        }
-        EditorGUILayout.HelpBox("Requires Texture sliced into 16 sprites named like 'Name_0' to 'Name_15'.", MessageType.Info);
-        EditorGUILayout.Space();
-
-        // --- Manual Sprite Assignment Section ---
-        EditorGUILayout.LabelField("Manual Sprite Assignment (Indices 0-15)", EditorStyles.boldLabel);
-        EditorGUILayout.HelpBox("Index based on NESW neighbours (N=8, E=4, S=2, W=1). Sum values for matching sides.", MessageType.Info);
-        if (spritesProp.arraySize != 16) spritesProp.arraySize = 16;
-        for (int i = 0; i < 16; i++) {
-            string tooltip = GetTooltipForWangIndex(i);
-            EditorGUILayout.PropertyField(spritesProp.GetArrayElementAtIndex(i), new GUIContent($"Sprite {i}", tooltip));
-        }
-        EditorGUILayout.Space();
-
-        // --- Generated Tile Settings Section ---
-        EditorGUILayout.LabelField("Generated Tile Settings", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(defaultColliderProp);
-        EditorGUILayout.PropertyField(defaultGameObjectProp);
-        EditorGUILayout.PropertyField(tintColorProp);
-        EditorGUILayout.Space();
-
-        // --- Palette Automation Section ---
-        EditorGUILayout.LabelField("Tile Palette Automation", EditorStyles.boldLabel);
-        addToPalette = EditorGUILayout.Toggle(new GUIContent("Add to Palette on Generate", "Automatically add the generated RuleTile to the selected Tile Palette asset below."), addToPalette);
-        EditorGUI.BeginDisabledGroup(!addToPalette);
-        // ObjectField requires the correct type, which comes from the namespace
-        targetPalette = (TilePalette)EditorGUILayout.ObjectField(
-            new GUIContent("Target Palette", "Drag the Tile Palette asset you want to add the generated tile to."),
-            targetPalette,
-            typeof(TilePalette), // Type defined in UnityEditor.Tilemaps
-            false
-        );
-        EditorGUI.EndDisabledGroup();
-        EditorGUILayout.Space();
-
-
-        // --- Generation Button ---
-        GUI.backgroundColor = Color.cyan;
-        if (GUILayout.Button("Generate/Update RuleTile", GUILayout.Height(35))) {
-            if (ValidateSprites(definition)) {
-                if (addToPalette && targetPalette == null) {
-                    EditorUtility.DisplayDialog("Palette Missing", "Please assign a Target Palette asset or uncheck 'Add to Palette'.", "OK");
-                } else if (EditorUtility.DisplayDialog("Confirm RuleTile Generation", $"Create/Update RuleTile for '{definition.materialName}'?", "Generate", "Cancel")) {
-                    GenerateRuleTileAsset(definition);
-                }
-            } else {
-                EditorUtility.DisplayDialog("Sprite Error", "Assign all 16 sprite slots first.", "OK");
-            }
-        }
-        GUI.backgroundColor = Color.white;
-
-        serializedObject.ApplyModifiedProperties();
-    }
-
-    // --- Auto-Fill Logic ---
-    private void AutoFillSpritesFromSheet(TilingMaterialDefinition definition, Texture2D sheet)
-    {
-        string path = AssetDatabase.GetAssetPath(sheet);
-        if (string.IsNullOrEmpty(path)) return;
-
-        Object[] loadedAssets = AssetDatabase.LoadAllAssetRepresentationsAtPath(path);
-        List<Sprite> loadedSprites = loadedAssets.OfType<Sprite>()
-            .Select(sprite => new { Sprite = sprite, SortKey = GetSortKeyFromName(sprite.name) })
-            .OrderBy(item => item.SortKey)
-            .Select(item => item.Sprite)
-            .ToList();
-
-        if (loadedSprites.Count != 16) {
-            EditorUtility.DisplayDialog("Sprite Count Error", $"Found {loadedSprites.Count}/16 sprites in '{sheet.name}'. Check slicing and naming (e.g., Name_0 to Name_15).", "OK");
-            return;
-        }
-
-        serializedObject.Update();
-        bool changed = false;
-        for (int i = 0; i < 16; i++) {
-            SerializedProperty prop = spritesProp.GetArrayElementAtIndex(i);
-            if (prop.objectReferenceValue != loadedSprites[i]) {
-                prop.objectReferenceValue = loadedSprites[i];
-                changed = true;
-            }
-        }
-
-        if (changed) {
-            serializedObject.ApplyModifiedProperties();
-            EditorUtility.SetDirty(definition);
-            EditorUtility.DisplayDialog("Success", "Auto-filled 16 sprites.", "OK");
-        } else {
-            EditorUtility.DisplayDialog("No Changes", "Sprites already assigned.", "OK");
-        }
-    }
-
-    // --- Helper function to extract numeric sort key from sprite name ---
-    private int GetSortKeyFromName(string spriteName)
-    {
-        int lastUnderscore = spriteName.LastIndexOf('_');
-        if (lastUnderscore != -1 && lastUnderscore < spriteName.Length - 1) {
-            if (int.TryParse(spriteName.Substring(lastUnderscore + 1), out int number)) {
-                return number;
-            }
-        }
-        Debug.LogWarning($"Could not parse number from sprite name '{spriteName}'. Using fallback sort.");
-        return int.MaxValue;
-    }
-
-    // --- Sprite Validation ---
-    private bool ValidateSprites(TilingMaterialDefinition definition)
-    {
-        if (definition.sprites == null || definition.sprites.Length != 16) return false;
-        return !definition.sprites.Any(sprite => sprite == null);
-    }
-
-    // --- Tooltip Generation Helper ---
-    private string GetTooltipForWangIndex(int index)
-    {
-        if (index < 0 || index > 15) return "Invalid Index";
-        StringBuilder sb = new StringBuilder();
-        sb.Append($"Index {index} ({System.Convert.ToString(index, 2).PadLeft(4, '0')}): Matches ");
-        List<string> dirs = new List<string>();
-        if ((index & 8) != 0) dirs.Add("N"); if ((index & 4) != 0) dirs.Add("E");
-        if ((index & 2) != 0) dirs.Add("S"); if ((index & 1) != 0) dirs.Add("W");
-        if (dirs.Count == 0) sb.Append("None"); else sb.Append(string.Join("+", dirs));
-        return sb.ToString();
-    }
-
-    // --- RuleTile Generation Logic ---
-    private void GenerateRuleTileAsset(TilingMaterialDefinition definition)
-    {
-        if (!Directory.Exists(outputFolderPath)) { Directory.CreateDirectory(outputFolderPath); AssetDatabase.Refresh(); }
-
-        string assetName = $"{definition.materialName}_WangRuleTile.asset";
-        string assetPath = Path.Combine(outputFolderPath, assetName).Replace("\\", "/");
-        RuleTile ruleTile = AssetDatabase.LoadAssetAtPath<RuleTile>(assetPath);
-        bool createdNew = false;
-        if (ruleTile == null) { ruleTile = ScriptableObject.CreateInstance<RuleTile>(); AssetDatabase.CreateAsset(ruleTile, assetPath); createdNew = true; }
-
-        SerializedObject tileSO = new SerializedObject(ruleTile);
-        SerializedProperty defaultSpriteProp_Tile = tileSO.FindProperty("m_DefaultSprite");
-        SerializedProperty defaultGoProp_Tile = tileSO.FindProperty("m_DefaultGameObject");
-        SerializedProperty defaultColliderProp_Tile = tileSO.FindProperty("m_DefaultColliderType");
-        SerializedProperty rulesProp = tileSO.FindProperty("m_TilingRules");
-        SerializedProperty colorProp = tileSO.FindProperty("m_Color");
-
-        defaultSpriteProp_Tile.objectReferenceValue = definition.sprites[15];
-        defaultGoProp_Tile.objectReferenceValue = definition.defaultGameObject;
-        defaultColliderProp_Tile.enumValueIndex = (int)definition.defaultCollider;
-        colorProp.colorValue = definition.tintColor;
-
-        rulesProp.ClearArray();
-        Tile.ColliderType defaultCollider = (Tile.ColliderType)defaultColliderProp_Tile.enumValueIndex;
-        for (int i = 0; i < 16; i++) {
-            if (definition.sprites[i] == null) continue;
-            AddRule(tileSO.targetObject, rulesProp, definition.sprites[i], GetNeighborsFromWangIndex(i), defaultCollider);
-        }
-
-        tileSO.ApplyModifiedProperties();
-        EditorUtility.SetDirty(ruleTile);
-        if (createdNew) Debug.Log($"Created RuleTile: {assetPath}"); else Debug.Log($"Updated RuleTile: {assetPath}");
-
-        // --- Add to Palette Logic ---
-        if (addToPalette && targetPalette != null)
-        {
-            // GridPaintingState and related methods require UnityEditor.Tilemaps namespace
-            try
-            {
-                GridPaintingState.palette = targetPalette;
-                GridPaintingState.UnlockPalette();
-                GridPaintingState.SetTile(null, ruleTile); // Adds or updates tile
-                EditorUtility.SetDirty(targetPalette);
-                GridPaintingState.SavePalette();
-                GridPaintingState.LockPalette(true);
-                Debug.Log($"Added/Updated '{ruleTile.name}' in palette '{targetPalette.name}'.");
-            }
-            catch (System.Exception e) {
-                Debug.LogError($"Failed to add tile to palette '{targetPalette.name}': {e.Message}");
-                if (GridPaintingState.palette == targetPalette) GridPaintingState.LockPalette(true);
-            }
-            finally {
-                 GridPaintingState.palette = null; // Reset active palette
-            }
-        }
-        // --- End Add to Palette ---
-
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-        EditorGUIUtility.PingObject(ruleTile);
-    }
-
-    // --- Helper to convert index to neighbor array (NESW = 8421) ---
-    private int[] GetNeighborsFromWangIndex(int index)
-    {
-        const int T = RuleTile.TilingRule.Neighbor.This, N = RuleTile.TilingRule.Neighbor.NotThis;
-        bool n=(index&8)!=0, e=(index&4)!=0, s=(index&2)!=0, w=(index&1)!=0;
-        int nN=n?T:N, nE=e?T:N, nS=s?T:N, nW=w?T:N;
-        int nTL=(n&&w)?T:N, nTR=(n&&e)?T:N, nBL=(s&&w)?T:N, nBR=(s&&e)?T:N;
-        return new int[]{nTL, nN, nTR, nW, nE, nBL, nS, nBR};
-    }
-
-    // --- Helper to add a rule using SerializedProperty API ---
-    private void AddRule(Object targetObject, SerializedProperty rulesListProp, Sprite sprite, int[] neighbors, Tile.ColliderType defaultColliderType)
-    {
-        rulesListProp.InsertArrayElementAtIndex(rulesListProp.arraySize);
-        SerializedProperty newRuleProp = rulesListProp.GetArrayElementAtIndex(rulesListProp.arraySize - 1);
-        SerializedProperty neighborsProp = newRuleProp.FindPropertyRelative("m_Neighbors");
-        SerializedProperty spritesProp = newRuleProp.FindPropertyRelative("m_Sprites");
-        SerializedProperty outputProp = newRuleProp.FindPropertyRelative("m_Output");
-        SerializedProperty colliderProp = newRuleProp.FindPropertyRelative("m_ColliderType");
-        SerializedProperty transformProp = newRuleProp.FindPropertyRelative("m_RuleTransform");
-
-        if (neighborsProp.arraySize != 8) neighborsProp.arraySize = 8;
-        for (int i = 0; i < 8; i++) { neighborsProp.GetArrayElementAtIndex(i).intValue = neighbors[i]; }
-        if (spritesProp.arraySize != 1) spritesProp.arraySize = 1;
-        spritesProp.GetArrayElementAtIndex(0).objectReferenceValue = sprite;
-        outputProp.enumValueIndex = (int)RuleTile.TilingRule.OutputSprite.Single;
-        colliderProp.enumValueIndex = (int)defaultColliderType;
-        transformProp.enumValueIndex = (int)RuleTile.TilingRule.Transform.Fixed;
     }
 }
 

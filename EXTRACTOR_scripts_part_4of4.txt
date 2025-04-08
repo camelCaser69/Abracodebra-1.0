@@ -1,8 +1,8 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-07 21:13:16
-PART 4 OF 5
+UNITY PROJECT SCRIPT EXPORT - 2025-04-08 21:25:21
+PART 4 OF 4
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -165,9 +165,10 @@ Assets
 │       │   ├── PLains_97.asset
 │       │   ├── PLains_98.asset
 │       │   └── PLains_99.asset
-│       ├── Palette_GroundTiles.prefab
+│       ├── Palettes
+│       │   └── PaletteDual_Ground.prefab
 │       └── Rule Tiles
-│           └── TilingMaterial_Grass.asset
+│           └── DualGridRuleTile.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -241,9 +242,7 @@ Assets
 │   │   └── GardenerController.cs
 │   ├── Tiles
 │   │   ├── Data
-│   │   │   └── TilingMaterialDefinition.cs
 │   │   └── Editor
-│   │       └── TilingMaterialGeneratorEditor.cs
 │   ├── UI
 │   └── Visuals
 │       └── NightColorPostProcess.cs
@@ -255,11 +254,7 @@ Assets
 │   └── UniversalRP.asset
 ├── Shaders
 │   └── BezierCurveAA.shader
-├── Test
 ├── TextureImporter.preset
-├── Tiles
-│   └── GeneratedRuleTiles
-│       └── Grass_WangRuleTile.asset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
 
@@ -1131,40 +1126,76 @@ public class GardenerController : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\TilingMaterialDefinition.cs
+// FILE: Assets\Scripts\Visuals\NightColorPostProcess.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
-using UnityEngine.Tilemaps; // Needed for Tile.ColliderType
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
-// Defines the necessary data for a 16-tile Wang-style material
-[CreateAssetMenu(fileName = "TilingMaterial_", menuName = "2D/Tiles/Tiling Material Definition")]
-public class TilingMaterialDefinition : ScriptableObject
+public class NightColorPostProcess : MonoBehaviour
 {
-    [Header("Material Identity")]
-    [Tooltip("Descriptive name for this material (e.g., Grass, Dirt, Water). Used for naming generated assets.")]
-    public string materialName = "NewMaterial";
+    [Header("References")]
+    public WeatherManager weatherManager;        // Assign your existing WeatherManager
+    public Volume globalVolume;                  // The Volume with the Color Adjustments override
 
-    [Header("Sprites (16 Required)")]
-    [Tooltip("Assign the 16 sprites corresponding to the binary Wang Tile indices (0-15). Order is crucial! Index 0 = no neighbours, Index 15 = all neighbours.")]
-    public Sprite[] sprites = new Sprite[16]; // Must have exactly 16 elements
+    private ColorAdjustments colorAdjustments;   // We'll read/write color filter, post exposure, and saturation
 
-    [Header("Generated Tile Settings")]
-    [Tooltip("Default collider type for the generated RuleTile.")]
-    public Tile.ColliderType defaultCollider = Tile.ColliderType.None;
-    [Tooltip("Optional: Default GameObject prefab to instantiate with the tile.")]
-    public GameObject defaultGameObject;
-    [Tooltip("Color tint to apply to the generated RuleTile. White = no tint.")]
-    public Color tintColor = Color.white; // <<< ADDED TINT COLOR
+    [Header("Color Settings")]
+    [Tooltip("The color filter at full day (sunIntensity = 1).")]
+    public Color dayColorFilter = Color.white;
+    [Tooltip("The color filter at full night (sunIntensity ~ 0).")]
+    public Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
 
-    // --- Validation ---
-    private void OnValidate()
+    [Tooltip("Daytime Post-Exposure (e.g. 0). Higher = brighter.")]
+    public float dayPostExposure = 0f;
+    [Tooltip("Nighttime Post-Exposure (e.g. -0.5). Lower = darker.")]
+    public float nightPostExposure = -0.5f;
+
+    [Header("Saturation Settings")]
+    [Tooltip("Saturation at full day (0 means no change).")]
+    public float daySaturation = 0f;
+    [Tooltip("Saturation at full night (e.g. -50 for more desaturation at night).")]
+    public float nightSaturation = -50f;
+
+    private void Start()
     {
-        // Ensure the sprites array always has exactly 16 elements in the inspector
-        if (sprites == null || sprites.Length != 16)
+        if (!globalVolume)
         {
-            Debug.LogWarning($"'{materialName}' Material Definition: Sprites array must contain exactly 16 sprites. Resizing array.", this);
-            System.Array.Resize(ref sprites, 16);
+            Debug.LogWarning("[NightColorPostProcess] No globalVolume assigned!");
+            return;
         }
+
+        // Try to get the ColorAdjustments override from the volume's profile
+        if (globalVolume.profile.TryGet<ColorAdjustments>(out var colorAdj))
+        {
+            colorAdjustments = colorAdj;
+        }
+        else
+        {
+            Debug.LogWarning("[NightColorPostProcess] No ColorAdjustments override found in the Volume profile!");
+        }
+    }
+
+    private void Update()
+    {
+        if (!weatherManager || colorAdjustments == null)
+            return;
+        
+        // Get the sun intensity (0 = night, 1 = day)
+        float sun = Mathf.Clamp01(weatherManager.sunIntensity);
+        float t = 1f - sun;  // t=0 at day, t=1 at night
+        
+        // Lerp the color filter
+        Color finalFilter = Color.Lerp(dayColorFilter, nightColorFilter, t);
+        colorAdjustments.colorFilter.value = finalFilter;
+        
+        // Lerp post exposure
+        float finalExposure = Mathf.Lerp(dayPostExposure, nightPostExposure, t);
+        colorAdjustments.postExposure.value = finalExposure;
+        
+        // Lerp saturation
+        float finalSaturation = Mathf.Lerp(daySaturation, nightSaturation, t);
+        colorAdjustments.saturation.value = finalSaturation;
     }
 }
 
@@ -1172,6 +1203,8 @@ public class TilingMaterialDefinition : ScriptableObject
 
 
 
+
+
 --------------------------------------------------------------------------------
-This is part 4 out of 5 of script collection. 1 more parts remain.
+This is the final part (4 of 4).
 --------------------------------------------------------------------------------

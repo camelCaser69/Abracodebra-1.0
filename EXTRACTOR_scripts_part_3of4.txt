@@ -1,8 +1,8 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-07 21:13:16
-PART 3 OF 5
+UNITY PROJECT SCRIPT EXPORT - 2025-04-08 21:25:21
+PART 3 OF 4
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -165,9 +165,10 @@ Assets
 │       │   ├── PLains_97.asset
 │       │   ├── PLains_98.asset
 │       │   └── PLains_99.asset
-│       ├── Palette_GroundTiles.prefab
+│       ├── Palettes
+│       │   └── PaletteDual_Ground.prefab
 │       └── Rule Tiles
-│           └── TilingMaterial_Grass.asset
+│           └── DualGridRuleTile.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -241,9 +242,7 @@ Assets
 │   │   └── GardenerController.cs
 │   ├── Tiles
 │   │   ├── Data
-│   │   │   └── TilingMaterialDefinition.cs
 │   │   └── Editor
-│   │       └── TilingMaterialGeneratorEditor.cs
 │   ├── UI
 │   └── Visuals
 │       └── NightColorPostProcess.cs
@@ -255,11 +254,7 @@ Assets
 │   └── UniversalRP.asset
 ├── Shaders
 │   └── BezierCurveAA.shader
-├── Test
 ├── TextureImporter.preset
-├── Tiles
-│   └── GeneratedRuleTiles
-│       └── Grass_WangRuleTile.asset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
 
@@ -1171,5 +1166,5 @@ public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
 
 --------------------------------------------------------------------------------
-This is part 3 out of 5 of script collection. 2 more parts remain.
+This is part 3 out of 4 of script collection. 1 more parts remain.
 --------------------------------------------------------------------------------
