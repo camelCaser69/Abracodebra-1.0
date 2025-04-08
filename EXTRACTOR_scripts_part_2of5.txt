@@ -1,0 +1,1442 @@
+This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
+
+================================================================================
+UNITY PROJECT SCRIPT EXPORT - 2025-04-07 21:13:16
+PART 2 OF 5
+================================================================================
+
+--------------------------------------------------------------------------------
+Assets
+├── Animation
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
+├── DefaultVolumeProfile.asset
+├── Editor
+│   ├── NodeDefinitionAutoAdder.cs
+│   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionEditor.cs
+│   ├── NodeDefinitionLibraryEditor.cs
+│   └── NodeDefinitionPostprocessor.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
+├── InputSystem_Actions.inputactions
+├── Materials
+│   └── BezierCurveAA_Material.mat
+├── Post Processing
+├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   └── Animal_Fox.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelBerry.prefab
+│   │   │   ├── PixelFlower.prefab
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   └── PlantPrefab.prefab
+│   │   ├── Props
+│   │   │   ├── Poop_Big.prefab
+│   │   │   ├── Poop_Medium_01.prefab
+│   │   │   └── Poop_Medium_02.prefab
+│   │   └── UI
+│   │       ├── EmptySlot16.prefab
+│   │       ├── EmptySlot32.prefab
+│   │       ├── Indicator_Opportunity.prefab
+│   │       ├── Indicator_Resource.prefab
+│   │       ├── Indicator_Threat.prefab
+│   │       ├── NodeCellEmpty16.prefab
+│   │       ├── NodePics
+│   │       │   ├── Seed_01.prefab
+│   │       │   └── Seed_02.prefab
+│   │       ├── NodeView.prefab
+│   │       └── ThoughtBubble.prefab
+│   ├── General
+│   │   ├── GardenerPrefab.prefab
+│   │   └── Projectile_Basic_Pixel.prefab
+│   └── Tiles
+│       ├── Common
+│       │   ├── PLains_0_Corner_LT.asset
+│       │   ├── PLains_10.asset
+│       │   ├── PLains_100.asset
+│       │   ├── PLains_101.asset
+│       │   ├── PLains_102.asset
+│       │   ├── PLains_11.asset
+│       │   ├── PLains_12.asset
+│       │   ├── PLains_13.asset
+│       │   ├── PLains_14.asset
+│       │   ├── PLains_15.asset
+│       │   ├── PLains_16.asset
+│       │   ├── PLains_17.asset
+│       │   ├── PLains_18.asset
+│       │   ├── PLains_19.asset
+│       │   ├── PLains_1_T.asset
+│       │   ├── PLains_20.asset
+│       │   ├── PLains_21.asset
+│       │   ├── PLains_22.asset
+│       │   ├── PLains_23.asset
+│       │   ├── PLains_24.asset
+│       │   ├── PLains_25.asset
+│       │   ├── PLains_26.asset
+│       │   ├── PLains_27.asset
+│       │   ├── PLains_28.asset
+│       │   ├── PLains_29.asset
+│       │   ├── PLains_2_Corner_RT.asset
+│       │   ├── PLains_30.asset
+│       │   ├── PLains_31.asset
+│       │   ├── PLains_32.asset
+│       │   ├── PLains_33.asset
+│       │   ├── PLains_34.asset
+│       │   ├── PLains_35.asset
+│       │   ├── PLains_36.asset
+│       │   ├── PLains_37.asset
+│       │   ├── PLains_38.asset
+│       │   ├── PLains_39.asset
+│       │   ├── PLains_3_Single_B.asset
+│       │   ├── PLains_40.asset
+│       │   ├── PLains_41.asset
+│       │   ├── PLains_42.asset
+│       │   ├── PLains_43.asset
+│       │   ├── PLains_44.asset
+│       │   ├── PLains_45.asset
+│       │   ├── PLains_46.asset
+│       │   ├── PLains_47.asset
+│       │   ├── PLains_48.asset
+│       │   ├── PLains_49.asset
+│       │   ├── PLains_4_Single_B.TR.asset
+│       │   ├── PLains_5.asset
+│       │   ├── PLains_50.asset
+│       │   ├── PLains_51.asset
+│       │   ├── PLains_52_Grass_Center.asset
+│       │   ├── PLains_53_Grass_Center.asset
+│       │   ├── PLains_54_Grass_Center.asset
+│       │   ├── PLains_55.asset
+│       │   ├── PLains_56_Grass_Center.asset
+│       │   ├── PLains_57.asset
+│       │   ├── PLains_58.asset
+│       │   ├── PLains_59.asset
+│       │   ├── PLains_6.asset
+│       │   ├── PLains_60.asset
+│       │   ├── PLains_61_Grass_Center.asset
+│       │   ├── PLains_62_Grass_Center.asset
+│       │   ├── PLains_63.asset
+│       │   ├── PLains_64_Grass_Center.asset
+│       │   ├── PLains_65.asset
+│       │   ├── PLains_66.asset
+│       │   ├── PLains_67.asset
+│       │   ├── PLains_68.asset
+│       │   ├── PLains_69.asset
+│       │   ├── PLains_7.asset
+│       │   ├── PLains_70.asset
+│       │   ├── PLains_71.asset
+│       │   ├── PLains_72.asset
+│       │   ├── PLains_73.asset
+│       │   ├── PLains_74.asset
+│       │   ├── PLains_75.asset
+│       │   ├── PLains_76.asset
+│       │   ├── PLains_77.asset
+│       │   ├── PLains_78.asset
+│       │   ├── PLains_79.asset
+│       │   ├── PLains_8.asset
+│       │   ├── PLains_80.asset
+│       │   ├── PLains_81.asset
+│       │   ├── PLains_82.asset
+│       │   ├── PLains_83.asset
+│       │   ├── PLains_84.asset
+│       │   ├── PLains_85.asset
+│       │   ├── PLains_86.asset
+│       │   ├── PLains_87.asset
+│       │   ├── PLains_88.asset
+│       │   ├── PLains_89.asset
+│       │   ├── PLains_9.asset
+│       │   ├── PLains_90.asset
+│       │   ├── PLains_91.asset
+│       │   ├── PLains_92.asset
+│       │   ├── PLains_93.asset
+│       │   ├── PLains_94.asset
+│       │   ├── PLains_95.asset
+│       │   ├── PLains_96.asset
+│       │   ├── PLains_97.asset
+│       │   ├── PLains_98.asset
+│       │   └── PLains_99.asset
+│       ├── Palette_GroundTiles.prefab
+│       └── Rule Tiles
+│           └── TilingMaterial_Grass.asset
+├── Scenes
+│   ├── MainScene.unity
+│   ├── SampleScene
+│   │   └── GlobalPostProcessVolume Profile.asset
+│   └── SampleScene.unity
+├── Scriptable Objects
+│   ├── Animals
+│   │   ├── AnimalLibrary.asset
+│   │   └── Animal_000_Bunny.asset
+│   ├── Animals Diet
+│   │   └── Diet_000_Bunny.asset
+│   ├── Food
+│   │   ├── FoodType_000_Berry.asset
+│   │   └── FoodType_000_Leaf.asset
+│   ├── Life Thoughts
+│   │   └── AnimalThoughtLibrary.asset
+│   └── Nodes Plant
+│       ├── NodeDefinitionLibrary.asset
+│       ├── Node_000_Seed.asset
+│       └── Node_001_Berry.asset
+├── Scripts
+│   ├── Battle
+│   │   ├── Plant
+│   │   │   ├── PlantCell.cs
+│   │   │   ├── PlantGrowth.cs
+│   │   │   └── WeatherManager.cs
+│   │   ├── SpellProjectile.cs
+│   │   └── Status Effects
+│   │       ├── BurningStatusEffect.cs
+│   │       └── StatusEffect.cs
+│   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── AnimalDefinition.cs
+│   │   │   └── AnimalLibrary.cs
+│   │   ├── Core
+│   │   │   ├── AnimalController.cs
+│   │   │   ├── AnimalSpawnData.cs
+│   │   │   ├── AnimalThoughtLibrary.cs
+│   │   │   ├── EcosystemManager.cs
+│   │   │   ├── FaunaManager.cs
+│   │   │   ├── PoopController.cs
+│   │   │   ├── ThoughtBubbleController.cs
+│   │   │   └── ThoughtTrigger.cs
+│   │   ├── Food
+│   │   │   ├── AnimalDiet.cs
+│   │   │   ├── FoodItem.cs
+│   │   │   └── FoodType.cs
+│   │   └── Plants
+│   ├── Nodes
+│   │   ├── Core
+│   │   │   ├── NodeData.cs
+│   │   │   ├── NodeDefinition.cs
+│   │   │   ├── NodeDefinitionLibrary.cs
+│   │   │   ├── NodeEffectData.cs
+│   │   │   ├── NodeEffectType.cs
+│   │   │   └── OutputNodeEffect.cs
+│   │   ├── Runtime
+│   │   │   ├── NodeExecutor.cs
+│   │   │   └── NodeGraph.cs
+│   │   └── UI
+│   │       ├── ColorExtensions.cs
+│   │       ├── DeselectOnClickOutside.cs
+│   │       ├── NodeCell.cs
+│   │       ├── NodeDraggable.cs
+│   │       ├── NodeEditorGridController.cs
+│   │       ├── NodeSelectable.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
+│   ├── Tiles
+│   │   ├── Data
+│   │   │   └── TilingMaterialDefinition.cs
+│   │   └── Editor
+│   │       └── TilingMaterialGeneratorEditor.cs
+│   ├── UI
+│   └── Visuals
+│       └── NightColorPostProcess.cs
+├── Settings
+│   ├── Lit2DSceneTemplate.scenetemplate
+│   ├── Renderer2D.asset
+│   ├── Scenes
+│   │   └── URP2DSceneTemplate.unity
+│   └── UniversalRP.asset
+├── Shaders
+│   └── BezierCurveAA.shader
+├── Test
+├── TextureImporter.preset
+├── Tiles
+│   └── GeneratedRuleTiles
+│       └── Grass_WangRuleTile.asset
+└── UniversalRenderPipelineGlobalSettings.asset
+--------------------------------------------------------------------------------
+
+SCRIPT CONTENTS
+================================================================================
+
+SCRIPT CONTENTS
+================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\WeatherManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class WeatherManager : MonoBehaviour
+{
+    public static WeatherManager Instance { get; private set; }
+
+    [Header("Day/Night Cycle Settings")]
+    public bool dayNightCycleEnabled = true;
+    
+    [Tooltip("Duration of full day (seconds)")]
+    public float dayDuration = 20f;
+    [Tooltip("Duration of full night (seconds)")]
+    public float nightDuration = 20f;
+    [Tooltip("Duration of transitions (seconds)")]
+    public float transitionDuration = 5f;
+
+    [Tooltip("Curve that controls the sunIntensity during transitions (X=0 start, X=1 end).")]
+    public AnimationCurve transitionCurve = AnimationCurve.Linear(0, 0, 1, 1);
+
+    [Header("Sunlight Settings")]
+    [Range(0f, 1f)]
+    public float sunIntensity = 1f;  // 0=night, 1=day
+
+    [Header("Fixed Sunlight When Cycle Off")]
+    [Tooltip("If dayNightCycleEnabled is false, we use this fixed intensity.")]
+    [Range(0f, 1f)]
+    public float fixedSunIntensity = 1f;
+
+    [Header("Sunlight Visualization")]
+    public SpriteRenderer fadeSprite;
+    public float minAlpha = 0f;
+    public float maxAlpha = 1f;
+
+    // Internals
+    private enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
+    private CyclePhase currentPhase = CyclePhase.Day;
+    private float phaseTimer = 0f; // counts down in each phase
+    private float totalPhaseTime = 0f; // length of current phase
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
+    private void Start()
+    {
+        // Initialize to Day phase
+        EnterPhase(CyclePhase.Day);
+    }
+
+    private void Update()
+    {
+        if (!dayNightCycleEnabled)
+        {
+            // If the cycle is disabled, just use the fixed sun intensity
+            sunIntensity = fixedSunIntensity;
+            UpdateFadeSprite();
+            return;
+        }
+
+        // else dayNightCycle is enabled
+        phaseTimer -= Time.deltaTime;
+        if (phaseTimer <= 0f)
+        {
+            // move to next phase
+            switch (currentPhase)
+            {
+                case CyclePhase.Day:
+                    EnterPhase(CyclePhase.TransitionToNight);
+                    break;
+                case CyclePhase.TransitionToNight:
+                    EnterPhase(CyclePhase.Night);
+                    break;
+                case CyclePhase.Night:
+                    EnterPhase(CyclePhase.TransitionToDay);
+                    break;
+                case CyclePhase.TransitionToDay:
+                    EnterPhase(CyclePhase.Day);
+                    break;
+            }
+        }
+        else
+        {
+            // while in the current phase, update sunIntensity accordingly
+            float progress = 1f - (phaseTimer / totalPhaseTime);
+            switch (currentPhase)
+            {
+                case CyclePhase.Day:
+                    // Full day, sunIntensity = 1
+                    sunIntensity = 1f;
+                    break;
+                case CyclePhase.TransitionToNight:
+                    // 0..1 => day(1) to night(0) using transitionCurve
+                    float tToNight = transitionCurve.Evaluate(progress);
+                    sunIntensity = Mathf.Lerp(1f, 0f, tToNight);
+                    break;
+                case CyclePhase.Night:
+                    // Full night, sunIntensity = 0
+                    sunIntensity = 0f;
+                    break;
+                case CyclePhase.TransitionToDay:
+                    // 0..1 => night(0) to day(1) using transitionCurve
+                    float tToDay = transitionCurve.Evaluate(progress);
+                    sunIntensity = Mathf.Lerp(0f, 1f, tToDay);
+                    break;
+            }
+        }
+
+        UpdateFadeSprite();
+    }
+
+    private void EnterPhase(CyclePhase nextPhase)
+    {
+        currentPhase = nextPhase;
+        switch (nextPhase)
+        {
+            case CyclePhase.Day:
+                totalPhaseTime = dayDuration;
+                break;
+            case CyclePhase.Night:
+                totalPhaseTime = nightDuration;
+                break;
+            case CyclePhase.TransitionToNight:
+            case CyclePhase.TransitionToDay:
+                totalPhaseTime = transitionDuration;
+                break;
+        }
+        phaseTimer = totalPhaseTime;
+    }
+
+    private void UpdateFadeSprite()
+    {
+        if (fadeSprite != null)
+        {
+            float alpha = Mathf.Lerp(minAlpha, maxAlpha, sunIntensity);
+            Color c = fadeSprite.color;
+            c.a = alpha;
+            fadeSprite.color = c;
+        }
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\SpellProjectile.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class SpellProjectile : MonoBehaviour
+{
+    [Header("Projectile Stats")]
+    public float damage;
+    public float speed;
+    [Tooltip("If true, the projectile will be destroyed upon hitting a wizard.")]
+    public bool destroyOnHit = true;
+
+    [Header("Burning Effect (optional)")]
+    public float burningDamage;   // DPS
+    public float burningDuration; // Duration in seconds
+
+    [Header("Friendly Fire")]
+    public bool friendlyFire = false;
+    public bool casterIsEnemy = false;
+
+    public void Initialize(float dmg, float spd)
+    {
+        damage = dmg;
+        speed = spd;
+    }
+
+    private void Update()
+    {
+        transform.Translate(Vector2.up * speed * Time.deltaTime);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Status Effects\BurningStatusEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public class BurningStatusEffect : StatusEffect
+{
+    public BurningStatusEffect(float d, float dps) : base(d, dps) { }
+
+    
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Status Effects\StatusEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public abstract class StatusEffect
+{
+    public float duration; // Total duration.
+    public float damagePerSecond;
+    protected float elapsed = 0f;
+
+    // Public property to expose elapsed time.
+    public float Elapsed { get { return elapsed; } }
+
+    public StatusEffect(float d, float dps)
+    {
+        duration = d;
+        damagePerSecond = dps;
+    }
+
+    public bool IsExpired() => elapsed >= duration;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Core\SortableEntity.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class SortableEntity : MonoBehaviour
+{
+    [Header("Sorting Configuration")]
+    [Tooltip("Offset added to Y position for sorting calculation")]
+    [SerializeField] private float sortingLayerYOffset = 0f;
+
+    [Tooltip("Use parent's Y coordinate for sorting")]
+    [SerializeField] private bool useParentYCoordinate = false;
+
+    [Tooltip("Debug logging for sorting")]
+    public bool debugSorting = false;
+
+    private SpriteRenderer spriteRenderer;
+
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        
+        // If no SpriteRenderer, try to find one in children
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        // Ensure sprite renderer exists
+        if (spriteRenderer == null)
+        {
+            Debug.LogWarning($"[SortableEntity] No SpriteRenderer found on {gameObject.name}");
+        }
+    }
+
+    private void Start()
+    {
+        UpdateSortingOrder();
+    }
+
+    private void LateUpdate()
+    {
+        UpdateSortingOrder();
+    }
+
+    public void UpdateSortingOrder()
+    {
+        if (spriteRenderer == null) return;
+
+        // Determine Y position for sorting
+        float yPositionForSorting = useParentYCoordinate && transform.parent != null 
+            ? transform.parent.position.y 
+            : transform.position.y;
+
+        int sortOrder = CalculateSortOrder(yPositionForSorting);
+        spriteRenderer.sortingOrder = sortOrder;
+
+        if (debugSorting)
+        {
+            Debug.Log($"[SortableEntity] {gameObject.name} - Y: {yPositionForSorting}, Offset: {sortingLayerYOffset}, Sort Order: {sortOrder}");
+        }
+    }
+
+    private int CalculateSortOrder(float yPosition)
+    {
+        // Subtract offset to effectively move the sorting position
+        return Mathf.RoundToInt(-(yPosition + sortingLayerYOffset) * 1000f);
+    }
+
+    // Public method to get current sorting order
+    public int GetCurrentSortOrder()
+    {
+        if (spriteRenderer == null) return 0;
+        return spriteRenderer.sortingOrder;
+    }
+
+    // Public method to set sorting order directly if needed
+    public void SetSortingOrder(int order)
+    {
+        if (spriteRenderer != null)
+            spriteRenderer.sortingOrder = order;
+    }
+
+    // Public method to set the parent Y coordinate usage flag
+    // This eliminates the need for reflection in other scripts
+    public void SetUseParentYCoordinate(bool value)
+    {
+        useParentYCoordinate = value;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Animals\AnimalDefinition.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[CreateAssetMenu(fileName = "Animal_", menuName = "Ecosystem/Animal Definition (Simplified)")]
+public class AnimalDefinition : ScriptableObject
+{
+    [Header("Identification")]
+    [Tooltip("The species name (e.g., 'Bunny', 'Fox').")]
+    public string animalName = "DefaultAnimal";
+
+    [Header("Core Stats")]
+    public float maxHealth = 10f; // Keep health for potential future damage/predators
+    public float movementSpeed = 2f;
+
+    [Header("Diet")]
+    [Tooltip("Reference to the AnimalDiet ScriptableObject defining eating habits.")]
+    public AnimalDiet diet; // Needs to reference the simplified AnimalDiet SO
+
+    [Header("Visuals")]
+    [Tooltip("The prefab to instantiate for this animal.")]
+    public GameObject prefab;
+
+    // Removed meatFoodType
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Animals\AnimalLibrary.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using System.Collections.Generic;
+
+[CreateAssetMenu(fileName = "AnimalLibrary", menuName = "Ecosystem/Animal Library")]
+public class AnimalLibrary : ScriptableObject
+{
+    public List<AnimalDefinition> animals;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\AnimalController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using TMPro; // <<< ADDED THIS using statement for TextMeshPro
+
+[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(SortableEntity))]
+public class AnimalController : MonoBehaviour
+{
+    // References set by FaunaManager or Initialize
+    private AnimalDefinition definition;
+    private AnimalDiet animalDiet;
+
+    // Inspector Assigned References (Optional Features)
+    [Header("Optional Features")]
+    public AnimalThoughtLibrary thoughtLibrary;
+    public GameObject thoughtBubblePrefab;
+    public Transform bubbleSpawnTransform;
+    public Transform poopSpawnPoint;
+    public List<GameObject> poopPrefabs;
+    public Animator animator; // Assign if using animations
+
+    [Header("UI References (Optional - Auto-Detected)")]
+    [Tooltip("Reference to the TextMeshPro component for displaying HP. Found automatically if not assigned.")]
+    [SerializeField] private TextMeshProUGUI hpText; // <<< ADDED HP TEXT REFERENCE
+
+    [Header("Behavior Tuning")]
+    public float searchRadius = 5f;
+    public float eatDistance = 0.5f;
+    public float eatDuration = 1.5f;
+    [Range(0f, 1f)] public float wanderPauseChance = 0.3f;
+    public float wanderMinMoveDuration = 1f;
+    public float wanderMaxMoveDuration = 3f;
+    public float wanderMinPauseDuration = 0.5f;
+    public float wanderMaxPauseDuration = 2f;
+    public float minPoopDelay = 5f;
+    public float maxPoopDelay = 10f;
+    public float poopDuration = 1f;
+    public float poopColorVariation = 0.1f;
+    public float thoughtCooldownTime = 5f;
+
+
+    // --- Internal State ---
+    private float currentHealth;
+    private float currentHunger;
+    private GameObject currentTargetFood = null;
+    private Vector2 moveDirection = Vector2.zero;
+    private bool isEating = false;
+    private float eatTimer = 0f;
+    private bool isWanderPaused = false;
+    private float wanderStateTimer = 0f;
+    private bool isPooping = false;
+    private float poopTimer = 0f;
+    private float poopDelayTimer = 0f;
+    private bool hasPooped = true;
+    private float thoughtCooldownTimer = 0f;
+
+    // --- Component References ---
+    private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
+
+    // --- Movement Bounds ---
+    private Vector2 minBounds;
+    private Vector2 maxBounds;
+
+    // --- Public Accessors ---
+    public float CurrentHealth => currentHealth;
+    public string SpeciesName => definition ? definition.animalName : "Uninitialized";
+
+
+    /// <summary>
+    /// Initializes the Animal Controller. Called by FaunaManager.
+    /// </summary>
+    public void Initialize(AnimalDefinition def, Vector2 minB, Vector2 maxB)
+    {
+        definition = def;
+        if (definition == null) {
+            Debug.LogError($"[{gameObject.name}] Null definition provided!", gameObject);
+            Destroy(gameObject); return;
+        }
+
+        animalDiet = def.diet;
+        if (animalDiet == null) {
+            Debug.LogError($"[{gameObject.name}] AnimalDefinition '{def.name}' missing required Diet!", gameObject);
+            enabled = false; // Disable controller
+            return;
+        }
+
+        // Get Components
+        rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>(); // Allows sprite to be child
+        // Animator is assigned via inspector if used
+
+        // Set Initial State
+        currentHealth = definition.maxHealth; // Use maxHealth from definition
+        currentHunger = 0f; // Start not hungry
+        hasPooped = true;
+        poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
+        minBounds = minB;
+        maxBounds = maxB;
+
+        EnsureHpTextReference(); // <<< CALL METHOD TO FIND HP TEXT
+        UpdateHpText(); // <<< CALL METHOD TO SET INITIAL HP TEXT
+
+        if (spriteRenderer == null) {
+             Debug.LogWarning($"[{gameObject.name}] No SpriteRenderer found in children.", gameObject);
+        }
+    }
+
+    void Update()
+    {
+        if (!enabled) return; // Do nothing if not initialized correctly
+
+        UpdateHunger(); // This now calls UpdateHpText if starvation happens
+        HandlePooping();
+        UpdateThoughts();
+
+        if (isEating) {
+            HandleEating();
+            moveDirection = Vector2.zero;
+        } else if (isPooping) {
+            // Pooping state/timer handled in HandlePooping
+            moveDirection = Vector2.zero;
+        } else {
+            DecideNextAction(); // Decide whether to wander or seek food
+        }
+
+        FlipSpriteBasedOnDirection();
+        UpdateAnimationState();
+    }
+
+    void FixedUpdate()
+    {
+        // Apply movement if applicable
+        if (rb != null && !isEating && !isPooping && moveDirection != Vector2.zero)
+        {
+            Vector2 currentPos = rb.position;
+            // Use normalized direction to ensure consistent speed
+            Vector2 desiredMove = moveDirection.normalized * definition.movementSpeed * Time.fixedDeltaTime;
+            Vector2 newPos = currentPos + desiredMove;
+
+            // Clamp position
+            newPos.x = Mathf.Clamp(newPos.x, minBounds.x, maxBounds.x);
+            newPos.y = Mathf.Clamp(newPos.y, minBounds.y, maxBounds.y);
+
+            rb.MovePosition(newPos);
+        }
+    }
+
+    // --- State Update Methods ---
+
+    void UpdateHunger()
+    {
+        currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime;
+        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
+
+        // Removed starvation logic for simplicity, but keep structure
+        // if (currentHunger >= animalDiet.maxHunger) {
+        //     ApplyStarvationDamage(); // Check for starvation
+        // }
+    }
+
+    // Placeholder for potential future starvation damage
+    void ApplyStarvationDamage()
+    {
+        // This method would be called if starvation logic is re-added
+        // currentHealth -= animalDiet.starvationDamageRate * Time.deltaTime;
+        UpdateHpText(); // <<< UPDATE HP TEXT AFTER TAKING DAMAGE (important if starvation added back)
+        // if (currentHealth <= 0)
+        // {
+        //     Die(CauseOfDeath.Starvation); // Use existing Die method
+        // }
+    }
+
+    void HandlePooping()
+    {
+        if (!isEating && !hasPooped) {
+            poopDelayTimer -= Time.deltaTime;
+            if (!isPooping && poopDelayTimer <= 0f) { StartPooping(); }
+            if (isPooping) {
+                poopTimer -= Time.deltaTime;
+                if (poopTimer <= 0f) { FinishPooping(); }
+            }
+        }
+    }
+
+     void UpdateThoughts() {
+         if (thoughtCooldownTimer > 0) { thoughtCooldownTimer -= Time.deltaTime; }
+     }
+
+
+    // --- Action Execution Methods ---
+
+    void DecideNextAction()
+    {
+        if (currentHunger >= animalDiet.hungerThreshold) {
+            SeekFood();
+        } else {
+            Wander();
+            currentTargetFood = null; // Lose target if not hungry
+        }
+    }
+
+    void SeekFood()
+    {
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
+
+        // Check if target is still valid (exists and has FoodItem)
+        bool targetValid = currentTargetFood != null && currentTargetFood.activeInHierarchy && currentTargetFood.GetComponent<FoodItem>() != null;
+
+        if (!targetValid) {
+            currentTargetFood = FindNearestFood();
+        }
+
+        if (currentTargetFood != null) {
+            MoveTowardFood(currentTargetFood);
+        } else {
+            Wander(); // Can't find food
+        }
+    }
+
+    GameObject FindNearestFood()
+    {
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, searchRadius);
+        return animalDiet.FindBestFood(colliders, transform.position); // Use Diet's logic
+    }
+
+    void MoveTowardFood(GameObject foodObj)
+    {
+        if (foodObj == null) return;
+        float distance = Vector2.Distance(transform.position, foodObj.transform.position);
+
+        if (distance <= eatDistance) {
+            StartEating();
+        } else {
+            moveDirection = (foodObj.transform.position - transform.position).normalized;
+            isWanderPaused = false; // Ensure not paused while seeking food
+            wanderStateTimer = 0f;
+        }
+    }
+
+    void StartEating()
+    {
+        isEating = true;
+        eatTimer = eatDuration;
+        moveDirection = Vector2.zero;
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
+    }
+
+    void HandleEating()
+    {
+        eatTimer -= Time.deltaTime;
+        if (eatTimer <= 0f) {
+            isEating = false;
+            FinishEatingAction(); // Renamed for clarity
+        }
+    }
+
+    // Called when the eat timer finishes
+    void FinishEatingAction()
+    {
+        if (currentTargetFood == null) return; // Target disappeared mid-eat
+
+        FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>();
+        if (foodItem != null && foodItem.foodType != null)
+        {
+            // 1. Get Satiation
+            float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType);
+
+            // 2. Apply Satiation
+            currentHunger -= satiationGain;
+            currentHunger = Mathf.Max(0f, currentHunger);
+
+            // 3. Destroy the Food GameObject
+            Destroy(currentTargetFood);
+
+            // 4. Reset Poop Timer
+            hasPooped = false;
+            poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
+
+            // 5. Clear Target Reference
+            currentTargetFood = null;
+        }
+         else {
+             // Target was invalid (missing FoodItem/FoodType), clear it
+             // Debug.LogWarning($"[{gameObject.name}] Tried to finish eating invalid target '{currentTargetFood?.name}'. Clearing target.", currentTargetFood);
+             currentTargetFood = null;
+         }
+    }
+
+    void StartPooping()
+    {
+        isPooping = true;
+        poopTimer = poopDuration;
+        moveDirection = Vector2.zero;
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
+    }
+
+    void FinishPooping()
+    {
+        SpawnPoop();
+        isPooping = false;
+        hasPooped = true;
+    }
+
+    void SpawnPoop()
+    {
+        if (poopPrefabs == null || poopPrefabs.Count == 0) return;
+
+        int index = Random.Range(0, poopPrefabs.Count);
+        GameObject prefab = poopPrefabs[index];
+        if (prefab == null) return;
+
+        Transform spawnT = poopSpawnPoint ? poopSpawnPoint : transform;
+        GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity);
+
+        // Apply visual variations
+        SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
+        if (sr != null) {
+            sr.flipX = Random.value > 0.5f;
+            Color c = sr.color;
+            float v = poopColorVariation;
+            sr.color = new Color(
+                Mathf.Clamp01(c.r + Random.Range(-v, v)),
+                Mathf.Clamp01(c.g + Random.Range(-v, v)),
+                Mathf.Clamp01(c.b + Random.Range(-v, v)),
+                c.a);
+        }
+
+        // Ensure PoopController exists and initialize
+        PoopController pc = poopObj.GetComponent<PoopController>() ?? poopObj.AddComponent<PoopController>();
+        pc.Initialize();
+    }
+
+    void Wander()
+    {
+        if (wanderStateTimer <= 0f) {
+            if (isWanderPaused) {
+                // Finish pause, start moving
+                isWanderPaused = false;
+                moveDirection = Random.insideUnitCircle.normalized;
+                wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
+            } else {
+                // Finish moving, decide to pause or change direction
+                if (Random.value < wanderPauseChance) {
+                    isWanderPaused = true;
+                    moveDirection = Vector2.zero;
+                    wanderStateTimer = Random.Range(wanderMinPauseDuration, wanderMaxPauseDuration);
+                } else {
+                    moveDirection = Random.insideUnitCircle.normalized;
+                    wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
+                }
+            }
+        } else {
+            wanderStateTimer -= Time.deltaTime;
+        }
+    }
+
+
+    // --- Movement & Visuals ---
+
+    void FlipSpriteBasedOnDirection()
+    {
+        if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f) {
+            spriteRenderer.flipX = moveDirection.x < 0;
+        }
+    }
+
+    void UpdateAnimationState()
+    {
+        if (animator == null) return;
+        bool isMoving = !isEating && !isPooping && moveDirection.sqrMagnitude > 0.01f;
+        // Use parameter names matching your Animator controller
+        animator.SetBool("IsMoving", isMoving);
+        animator.SetBool("IsEating", isEating);
+        // animator.SetBool("IsPooping", isPooping); // Add if needed
+    }
+
+    // --- Thought Bubbles ---
+
+    bool CanShowThought() {
+        return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f;
+    }
+
+    void ShowThought(ThoughtTrigger trigger)
+    {
+        // Simplified - assumes CanShowThought() was checked
+        if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return; // Added null check
+
+        var entry = thoughtLibrary.allThoughts.FirstOrDefault(t => t != null && t.speciesName == SpeciesName && t.trigger == trigger); // Added null check for entry
+        if (entry != null && entry.lines != null && entry.lines.Count > 0) {
+            string line = entry.lines[Random.Range(0, entry.lines.Count)];
+            Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
+            GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT);
+            bubbleGO.transform.localPosition = Vector3.zero;
+            ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>();
+            if (bubble) {
+                bubble.Initialize(line, spawnT, 2f); // 2s default life
+                thoughtCooldownTimer = thoughtCooldownTime;
+            } else {
+                Destroy(bubbleGO);
+            }
+        }
+    }
+
+     // --- Death Handling --- (Simplified, no starvation damage)
+     public enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
+
+     private void Die(CauseOfDeath cause) // Keep structure in case starvation is added back
+     {
+          Debug.Log($"[{SpeciesName} on {gameObject.name}] Died due to {cause}.", gameObject);
+          // Add meat spawning logic here later if needed
+          Destroy(gameObject);
+     }
+
+    // --- Helper Methods ---
+    public bool SpeciesNameEquals(string otherSpeciesName) {
+         return definition != null && definition.animalName == otherSpeciesName;
+     }
+
+    /// <summary>
+    /// Ensures the hpText reference is set, finding it if necessary.
+    /// </summary>
+    private void EnsureHpTextReference() // <<< NEW METHOD
+    {
+        // If not assigned in inspector, try to find it in children
+        if (hpText == null)
+        {
+            hpText = GetComponentInChildren<TextMeshProUGUI>(true); // Include inactive
+
+            if (hpText == null) {
+                 // This warning is okay, HP text is optional
+                 // Debug.LogWarning($"[{gameObject.name}] Could not automatically find TextMeshProUGUI for HP display.", gameObject);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Updates the HP text display.
+    /// </summary>
+    private void UpdateHpText() // <<< NEW METHOD
+    {
+        if (hpText == null || definition == null) return; // Exit if no text component or definition
+
+        // Format the text (using FloorToInt for cleaner display, adjust if floats needed)
+        hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)} / {Mathf.FloorToInt(definition.maxHealth)}";
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\AnimalSpawnData.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[System.Serializable]
+public class AnimalSpawnData {
+    public AnimalDefinition animalDefinition;
+    [Range(0f, 1f)]
+    [Tooltip("Spawn rate multiplier (0 = no spawn; lower values = less frequent spawns).")]
+    public float spawnRateMultiplier = 1f;
+    [Tooltip("Maximum number of this animal type allowed to be spawned (0 = no limit).")]
+    public int maximumSpawned = 0;
+    
+    [HideInInspector]
+    public float spawnTimer = 0f;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\AnimalThoughtLibrary.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "AnimalThoughtLibrary", menuName = "Ecosystem/Animal Thought Library")]
+public class AnimalThoughtLibrary : ScriptableObject
+{
+    public List<AnimalThoughtLine> allThoughts;
+}
+
+[System.Serializable]
+public class AnimalThoughtLine
+{
+    [Header("Which Animal?")]
+    public string speciesName; // e.g. "Bunny", "Fox", "Bird"
+
+    [Header("Trigger Condition")]
+    public ThoughtTrigger trigger;
+
+    [Header("Possible Lines to Randomly Choose From")]
+    public List<string> lines;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\EcosystemManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class EcosystemManager : MonoBehaviour
+{
+    public static EcosystemManager Instance { get; private set; }
+
+    [Header("Parent Transforms")]
+    public Transform animalParent;   // e.g., an empty GameObject "SpawnedEcosystem/Animals"
+    public Transform plantParent;    // e.g., an empty GameObject "SpawnedEcosystem/Plants"
+
+    [Header("Sorting Options")]
+    public bool sortAnimalsBySpecies = true;
+    public bool sortPlantsBySpecies = true;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\FaunaManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using System.Collections.Generic;
+
+public class FaunaManager : MonoBehaviour
+{
+    [Header("Animal Spawn Settings")]
+    public List<AnimalSpawnData> animalsToSpawn;
+    public float globalSpawnCooldown = 5f;
+    public float spawnRadius = 3f;
+    public bool continuousSpawn = true;
+    public Vector2 spawnCenter = Vector2.zero;
+
+    [Header("Ecosystem Parent Settings")]
+    public Transform ecosystemParent; // e.g., "SpawnedEcosystem/Animals"
+
+    [Header("Global Movement Bounds for Animals")]
+    public Vector2 animalMinBounds = new Vector2(-10f, -5f);
+    public Vector2 animalMaxBounds = new Vector2(10f, 5f);
+
+    private void Start()
+    {
+        // Initialize each spawn entry's timer to its effective cooldown.
+        foreach (var spawnData in animalsToSpawn)
+        {
+            if (spawnData.spawnRateMultiplier > 0f)
+                spawnData.spawnTimer = globalSpawnCooldown / spawnData.spawnRateMultiplier;
+            else
+                spawnData.spawnTimer = Mathf.Infinity; // won't spawn if 0
+        }
+    }
+
+        private void Update()
+    {
+        if (continuousSpawn)
+        {
+            foreach (var spawnData in animalsToSpawn)
+            {
+                if (spawnData.spawnRateMultiplier <= 0f)
+                    continue;
+
+                // Check current count for this species.
+                int currentCount = 0;
+                if (ecosystemParent != null && spawnData.animalDefinition != null && !string.IsNullOrEmpty(spawnData.animalDefinition.animalName))
+                {
+                    // Try finding the dedicated parent first (more efficient if structure is maintained)
+                    Transform speciesParent = ecosystemParent.Find(spawnData.animalDefinition.animalName);
+                    if (speciesParent != null)
+                        currentCount = speciesParent.childCount;
+                    else {
+                        // Fallback if species parent doesn't exist yet, count all matching animals
+                        // Use FindObjectsByType for modern Unity versions - faster as we don't need sorting
+                        AnimalController[] allAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+                        currentCount = 0; // Reset count before iterating through found animals
+                        foreach (var a in allAnimals)
+                        {
+                            if (a != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName))
+                                currentCount++;
+                        }
+                    }
+                }
+                else // Fallback if no ecosystem parent or definition name
+                {
+                     // Use FindObjectsByType for modern Unity versions - faster as we don't need sorting
+                    AnimalController[] allAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None); // <--- THIS LINE IS UPDATED
+                    currentCount = 0;
+                    foreach (var a in allAnimals)
+                    {
+                        if (a != null && spawnData.animalDefinition != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName)) // Added null check for spawnData.animalDefinition
+                            currentCount++;
+                    }
+                }
+                // If maximum is set (>0) and current count is reached, skip spawn.
+                if (spawnData.maximumSpawned > 0 && currentCount >= spawnData.maximumSpawned)
+                    continue;
+
+                // Decrement spawn timer and spawn if ready.
+                spawnData.spawnTimer -= Time.deltaTime;
+                if (spawnData.spawnTimer <= 0f)
+                {
+                    float effectiveCooldown = globalSpawnCooldown / spawnData.spawnRateMultiplier;
+                    Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
+                    SpawnAnimal(spawnData.animalDefinition, spawnCenter + randomOffset);
+                    // Reset timer only AFTER successful spawn attempt potentially
+                    spawnData.spawnTimer = effectiveCooldown > 0 ? effectiveCooldown : float.PositiveInfinity; // Prevent division by zero/negative cooldowns
+                }
+            }
+        }
+    }
+
+    public GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position)
+    {
+        if (definition == null || definition.prefab == null)
+        {
+            Debug.LogWarning("[FaunaManager] Invalid animal definition or missing prefab!");
+            return null;
+        }
+
+        GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
+
+        // Parent the animal under ecosystemParent with species grouping.
+        if (ecosystemParent != null)
+        {
+            Transform speciesParent = ecosystemParent;
+            if (!string.IsNullOrEmpty(definition.animalName))
+            {
+                speciesParent = ecosystemParent.Find(definition.animalName);
+                if (speciesParent == null)
+                {
+                    GameObject subParent = new GameObject(definition.animalName);
+                    subParent.transform.SetParent(ecosystemParent);
+                    speciesParent = subParent.transform;
+                }
+            }
+            animalObj.transform.SetParent(speciesParent);
+        }
+
+        // Get the existing AnimalController on the prefab.
+        AnimalController controller = animalObj.GetComponent<AnimalController>();
+        if (controller != null)
+        {
+            controller.Initialize(definition, animalMinBounds, animalMaxBounds); // Pass bounds
+        }
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] Animal prefab '{definition.prefab.name}' is missing the AnimalController script!", animalObj);
+            Destroy(animalObj); // Destroy if controller is missing
+            return null;
+        }
+// ... rest of parenting logic ...
+        return animalObj;
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\PoopController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using TMPro;
+
+public class PoopController : MonoBehaviour
+{
+    [Tooltip("Total lifetime of this poop (in seconds) before disappearing.")]
+    public float lifetime = 10f;
+    [Tooltip("Duration at the end of the lifetime during which the poop fades out.")]
+    public float fadeDuration = 2f;
+    [Tooltip("Fadeout curve to control the alpha during fade-out. X axis goes from 0 (start of fade) to 1 (end of fade).")]
+    public AnimationCurve fadeCurve = AnimationCurve.Linear(0f, 1f, 1f, 0f);
+
+    private SpriteRenderer sr;
+    private float timer = 0f;
+    private Color initialColor;
+
+    private void Awake()
+    {
+        sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            initialColor = sr.color;
+        }
+    }
+
+    private void Update()
+    {
+        timer += Time.deltaTime;
+        if (timer >= lifetime)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        // If within fadeDuration at the end, apply fade-out using the fadeCurve.
+        float remaining = lifetime - timer;
+        if (remaining < fadeDuration && sr != null)
+        {
+            // Normalize fade time (0 = start, 1 = end)
+            float t = 1f - (remaining / fadeDuration);
+            float alphaMultiplier = fadeCurve.Evaluate(t);
+            Color newColor = initialColor;
+            newColor.a = alphaMultiplier;
+            sr.color = newColor;
+        }
+    }
+
+    // Initialize with default parameters if none are provided.
+    public void Initialize(float lifetimeValue = -1f, float fadeDurationValue = -1f)
+    {
+        if (lifetimeValue > 0f)
+            lifetime = lifetimeValue;
+        if (fadeDurationValue > 0f)
+            fadeDuration = fadeDurationValue;
+        timer = 0f;
+        if (sr != null)
+            initialColor = sr.color;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\ThoughtBubbleController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using TMPro;
+
+public class ThoughtBubbleController : MonoBehaviour
+{
+    public TMP_Text messageText;
+    public float lifetime = 2f;
+
+    private Transform followTarget;
+
+    public void Initialize(string message, Transform target, float duration = 2f)
+    {
+        if (messageText != null)
+            messageText.text = message;
+        followTarget = target;
+        lifetime = duration;
+    }
+
+    private void Update()
+    {
+        lifetime -= Time.deltaTime;
+        if (lifetime <= 0f)
+            Destroy(gameObject);
+
+        // Follow the target if needed (optional if already a child)
+        if (followTarget != null)
+        {
+            transform.position = followTarget.position;
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\ThoughtTrigger.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public enum ThoughtTrigger
+{
+    Hungry,
+    Eating,
+    HealthLow,
+    Fleeing,
+    Pooping,
+    // Add more triggers as needed
+}
+
+
+
+
+
+--------------------------------------------------------------------------------
+This is part 2 out of 5 of script collection. 3 more parts remain.
+--------------------------------------------------------------------------------
