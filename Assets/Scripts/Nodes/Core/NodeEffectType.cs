@@ -43,4 +43,8 @@ public enum NodeEffectType
     [Tooltip("Causes the plant to attempt to spawn a berry in an available adjacent slot during the mature cycle.")]
     GrowBerry,
     // Add potentially more active effects: Heal, ApplyStatus, AreaEffect, etc.
+    
+    
+    [Tooltip("Modifies the scent emitted by the next spawned carrier (Berry, Projectile). PrimaryValue=Radius Add, SecondaryValue=Strength Add.")]
+    ScentModifier,
 }

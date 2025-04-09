@@ -106,6 +106,8 @@ MonoBehaviour:
   poopDuration: 1.5
   poopColorVariation: 0.12
   thoughtCooldownTime: 5
+  attractiveScentDefinitions: []
+  repellentScentDefinitions: []
 --- !u!114 &1716373188419040610
 MonoBehaviour:
   m_ObjectHideFlags: 0

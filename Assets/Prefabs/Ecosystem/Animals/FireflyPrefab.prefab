@@ -64,11 +64,12 @@ MonoBehaviour:
   spawnFlickerIntensityRange: {x: 0.5, y: 4}
   spawnFlickerSpeed: 15
   scentCheckInterval: 1
-  scentDetectionRadius: 2
-  attractionStrength: 2
-  orbitDistance: 0.5
-  attractionWobble: 0.3
-  attractiveScentTypes: 0100000002000000
+  scentDetectionRadius: 10
+  attractionStrength: 1
+  orbitDistance: 1
+  attractionWobble: 0.8
+  attractiveScentDefinitions:
+  - {fileID: 11400000, guid: caaf706f86468d545951ef96005f0761, type: 2}
 --- !u!212 &2668219994839306107
 SpriteRenderer:
   m_ObjectHideFlags: 0

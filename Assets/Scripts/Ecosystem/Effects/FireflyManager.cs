@@ -1,5 +1,9 @@
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyManager.cs
+using UnityEngine;
 using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class FireflyManager : MonoBehaviour
 {
@@ -8,13 +12,12 @@ public class FireflyManager : MonoBehaviour
     [Header("Core Dependencies")]
     [SerializeField] private WeatherManager weatherManager;
     [SerializeField] private GameObject fireflyPrefab;
-    [SerializeField] private Transform fireflyParent; // Optional: Parent for spawned fireflies
+    [SerializeField] private Transform fireflyParent;
 
+    // (Keep Spawning Settings, Spawn Area, Movement Bounds, Photosynthesis Bonus)
     [Header("Spawning Settings")]
     [SerializeField] private int maxFireflies = 50;
-    [Tooltip("Time in seconds between spawn attempts at night.")]
     [SerializeField] private float spawnInterval = 0.5f;
-    [Tooltip("Sun intensity below which fireflies start spawning (0=full night, 1=full day).")]
     [SerializeField] [Range(0f, 1f)] private float nightThreshold = 0.25f;
 
     [Header("Spawn Area")]
@@ -24,154 +27,213 @@ public class FireflyManager : MonoBehaviour
     [Header("Movement Bounds (for Fireflies)")]
     [SerializeField] private Vector2 movementMinBounds = new Vector2(-12f, -7f);
     [SerializeField] private Vector2 movementMaxBounds = new Vector2(12f, 7f);
-    
-    // Add these fields in the Header sections
+
     [Header("Photosynthesis Bonus Settings")]
-    [Tooltip("Radius around a Plant within which Fireflies contribute to photosynthesis.")]
     public float photosynthesisRadius = 3f;
-    [Tooltip("Photosynthesis rate bonus provided per nearby Firefly.")]
     public float photosynthesisIntensityPerFly = 0.05f;
-    [Tooltip("Maximum photosynthesis rate bonus achievable from Fireflies.")]
     public float maxPhotosynthesisBonus = 0.5f;
 
-    // Internal State
+
+    [Header("Debugging")]
+    [Tooltip("Show attraction lines in Game View during runtime.")]
+    [SerializeField] private bool showAttractionLinesRuntime = false;
+    [SerializeField] private Color attractionLineColorGizmo = Color.magenta; // Renamed for Gizmo
+    [SerializeField] private bool logGizmoCalls = false;
+    [Space] // Add space for visual separation
+    [Tooltip("Prefab used to draw attraction lines at runtime.")]
+    [SerializeField] private GameObject lineVisualizerPrefab; // <<< ADDED
+    [Tooltip("Parent transform for instantiated line visualizers.")]
+    [SerializeField] private Transform lineContainer; // <<< ADDED
+
+    // --- Public Accessor ---
+    public bool ShowAttractionLinesRuntime => showAttractionLinesRuntime;
+
+    // --- Internal State ---
     private List<FireflyController> activeFireflies = new List<FireflyController>();
     private float spawnTimer;
     private bool isNight = false;
 
+    // Dictionary to track line visualizers per firefly
+    private Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
+
     void Awake()
     {
-        // Singleton Pattern
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
+        // Validate Core Dependencies
+        if (weatherManager == null) { Debug.LogError($"[{nameof(FireflyManager)}] WeatherManager missing!", this); enabled = false; return; }
+        if (fireflyPrefab == null) { Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing!", this); enabled = false; return; }
+        if (fireflyPrefab.GetComponent<FireflyController>() == null) { Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing Controller script!", this); enabled = false; return; }
+        if (fireflyParent == null) { fireflyParent = transform; }
 
-        // Validate Dependencies
-        if (weatherManager == null)
-        {
-            Debug.LogError($"[{nameof(FireflyManager)}] WeatherManager not assigned!", this);
-            enabled = false;
-            return;
-        }
-        if (fireflyPrefab == null)
-        {
-            Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab not assigned!", this);
-            enabled = false;
-            return;
-        }
-        if (fireflyPrefab.GetComponent<FireflyController>() == null)
-        {
-             Debug.LogError($"[{nameof(FireflyManager)}] Assigned Firefly Prefab is missing the FireflyController script!", fireflyPrefab);
-             enabled = false;
-             return;
-        }
-        if (fireflyParent == null)
-        {
-            Debug.LogWarning($"[{nameof(FireflyManager)}] Firefly Parent not assigned. Fireflies will spawn at root level.", this);
-            fireflyParent = transform; // Default to this manager's transform
-        }
+        // Validate Debug Dependencies
+        if (lineVisualizerPrefab == null) { Debug.LogError($"[{nameof(FireflyManager)}] Line Visualizer Prefab is not assigned!", this); }
+        if (lineContainer == null) { Debug.LogError($"[{nameof(FireflyManager)}] Line Container transform is not assigned!", this); }
     }
 
     void Update()
     {
-        // Check Day/Night State
         isNight = weatherManager.sunIntensity <= nightThreshold;
 
-        if (isNight)
-        {
-            // Spawn Timer Logic
+        if (isNight) {
             spawnTimer -= Time.deltaTime;
-            if (spawnTimer <= 0f)
-            {
-                TrySpawnFirefly();
-                spawnTimer = spawnInterval; // Reset timer
-            }
-        }
-        else
-        {
-            // Optional: Could despawn fireflies instantly when day comes,
-            // or let them naturally time out via their own lifetime.
-            // For now, we let them time out.
-            spawnTimer = spawnInterval; // Reset timer when not night
-        }
+            if (spawnTimer <= 0f) { TrySpawnFirefly(); spawnTimer = spawnInterval; }
+        } else { spawnTimer = spawnInterval; }
+
+        // Update runtime visualizers in Update
+        UpdateRuntimeLineVisualizers();
     }
 
     void TrySpawnFirefly()
     {
-        if (activeFireflies.Count >= maxFireflies)
-        {
-            return; // Limit reached
-        }
+        if (activeFireflies.Count >= maxFireflies) return;
 
-        // Calculate random spawn position
         float spawnX = spawnCenter.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
         float spawnY = spawnCenter.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
         Vector2 spawnPos = new Vector2(spawnX, spawnY);
 
-        // Instantiate and Initialize
         GameObject fireflyGO = Instantiate(fireflyPrefab, spawnPos, Quaternion.identity, fireflyParent);
         FireflyController controller = fireflyGO.GetComponent<FireflyController>();
 
-        if (controller != null)
-        {
+        if (controller != null) {
             controller.Initialize(this, movementMinBounds, movementMaxBounds);
             activeFireflies.Add(controller);
-        }
-        else
+            // Don't create line visualizer here, do it in Update when needed
+        } else { /* LogError, Destroy */ }
+    }
+
+    public void ReportFireflyDespawned(FireflyController firefly)
+    {
+        activeFireflies.Remove(firefly);
+
+        // Clean up associated line visualizer
+        if (activeLineVisualizers.TryGetValue(firefly, out LineRenderer line))
         {
-            // This check should ideally be caught in Awake, but safety first
-            Debug.LogError($"[{nameof(FireflyManager)}] Spawned Firefly Prefab is missing the FireflyController script!", fireflyGO);
-            Destroy(fireflyGO); // Clean up invalid spawn
+            if (line != null) Destroy(line.gameObject); // Destroy the visualizer GO
+            activeLineVisualizers.Remove(firefly);
         }
     }
-    
-    public int GetNearbyFireflyCount(Vector3 position, float radius)
-    {
-        int count = 0;
-        float radiusSq = radius * radius; // Use squared distance for efficiency
 
-        // Iterate backwards for safe removal if needed (though not used here)
-        for (int i = activeFireflies.Count - 1; i >= 0; i--)
+    // --- Runtime Visualizer Update ---
+    void UpdateRuntimeLineVisualizers()
+    {
+        if (!Application.isPlaying) return; // Only run in play mode
+
+        // Check if lines should be shown globally
+        bool showLines = showAttractionLinesRuntime && lineVisualizerPrefab != null && lineContainer != null;
+
+        // --- Update existing lines and create new ones ---
+        // Use a temporary list to avoid modifying dictionary while iterating
+        List<FireflyController> firefliesToRemoveLine = new List<FireflyController>();
+
+        foreach (var kvp in activeLineVisualizers)
         {
-            // Check if firefly is null or destroyed (safety check)
-            if (activeFireflies[i] == null)
+            FireflyController firefly = kvp.Key;
+            LineRenderer line = kvp.Value;
+
+            if (firefly == null || line == null) // Firefly or line destroyed unexpectedly
             {
-                activeFireflies.RemoveAt(i);
+                firefliesToRemoveLine.Add(firefly); // Mark for removal
+                if(line != null) Destroy(line.gameObject); // Destroy orphan line
                 continue;
             }
 
-            // Calculate squared distance
-            if ((activeFireflies[i].transform.position - position).sqrMagnitude <= radiusSq)
+            Transform target = firefly.AttractionTarget;
+
+            if (showLines && target != null) // Should be visible and has target
             {
-                count++;
+                line.enabled = true;
+                line.SetPosition(0, firefly.transform.position);
+                line.SetPosition(1, target.position);
             }
+            else // Should be hidden or lost target
+            {
+                line.enabled = false;
+            }
+        }
+
+        // Remove entries whose fireflies are gone
+        foreach (var firefly in firefliesToRemoveLine)
+        {
+            activeLineVisualizers.Remove(firefly);
+        }
+
+
+        // --- Add lines for fireflies that don't have one yet ---
+        if (showLines)
+        {
+            foreach (FireflyController firefly in activeFireflies)
+            {
+                if (firefly == null || activeLineVisualizers.ContainsKey(firefly)) continue; // Skip nulls or those already processed
+
+                Transform target = firefly.AttractionTarget;
+                if (target != null) // Only create if it has a target AND should be shown
+                {
+                    GameObject lineGO = Instantiate(lineVisualizerPrefab, lineContainer); // Instantiate under container
+                    LineRenderer newLine = lineGO.GetComponent<LineRenderer>();
+                    if (newLine != null)
+                    {
+                        // Configure initial points (will be updated next frame anyway)
+                        newLine.SetPosition(0, firefly.transform.position);
+                        newLine.SetPosition(1, target.position);
+                        newLine.enabled = true;
+                        activeLineVisualizers.Add(firefly, newLine); // Add to tracking dictionary
+                    }
+                    else
+                    {
+                         Debug.LogError($"Line Visualizer Prefab '{lineVisualizerPrefab.name}' is missing LineRenderer component!", lineVisualizerPrefab);
+                         Destroy(lineGO); // Destroy invalid instance
+                    }
+                }
+            }
+        }
+        // --- Hide/Destroy lines if global flag turned off ---
+        else if (!showLines && activeLineVisualizers.Count > 0)
+        {
+             // Destroy all active line visualizers if the flag is off
+             foreach (var kvp in activeLineVisualizers)
+             {
+                 if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+             }
+             activeLineVisualizers.Clear();
+        }
+    }
+
+
+    // (Keep GetNearbyFireflyCount)
+     public int GetNearbyFireflyCount(Vector3 position, float radius)
+    {
+        int count = 0; float radiusSq = radius * radius;
+        for (int i = activeFireflies.Count - 1; i >= 0; i--)
+        {
+            if (activeFireflies[i] == null) { activeFireflies.RemoveAt(i); continue; }
+            if ((activeFireflies[i].transform.position - position).sqrMagnitude <= radiusSq) { count++; }
         }
         return count;
     }
-    
-    // Called by FireflyController when its lifetime expires
-    public void ReportFireflyDespawned(FireflyController firefly)
-    {
-        if (activeFireflies.Contains(firefly))
-        {
-            activeFireflies.Remove(firefly);
-        }
-    }
 
-    // --- Gizmos for Visualization ---
+    // --- Gizmos (Editor Visualization - Unchanged) ---
+    #if UNITY_EDITOR
     void OnDrawGizmosSelected()
     {
-        // Draw Spawn Area
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
-
-        // Draw Movement Bounds
-        Gizmos.color = Color.yellow;
+        Gizmos.color = Color.green; Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
+        Gizmos.color = Color.blue;
         Vector3 boundsCenter = (movementMinBounds + movementMaxBounds) / 2f;
         Vector3 boundsSize = movementMaxBounds - movementMinBounds;
         Gizmos.DrawWireCube(boundsCenter, boundsSize);
+
+        // Gizmo drawing for attraction lines
+        if (showAttractionLinesRuntime && Application.isPlaying) {
+             if (logGizmoCalls) { /*...*/ }
+             bool didDrawLine = false;
+             Gizmos.color = attractionLineColorGizmo; // Use Gizmo color
+             foreach (FireflyController firefly in activeFireflies) {
+                if (firefly == null) continue;
+                Transform target = firefly.AttractionTarget;
+                if (target != null) { Gizmos.DrawLine(firefly.transform.position, target.position); didDrawLine = true; }
+             }
+             if (logGizmoCalls && !didDrawLine && activeFireflies.Count > 0) { /*...*/ }
+        }
     }
+    #endif
 }

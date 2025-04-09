@@ -38,6 +38,11 @@ public class AnimalController : MonoBehaviour
     public float poopDuration = 1f;
     public float poopColorVariation = 0.1f;
     public float thoughtCooldownTime = 5f;
+    
+    [Tooltip("Which Scent Definitions attract this animal (e.g., towards food, mates).")]
+    [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>(); // <<< ADDED
+    [Tooltip("Which Scent Definitions repel this animal (e.g., from predators, danger).")]
+    [SerializeField] private List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
 
     // --- Internal State ---

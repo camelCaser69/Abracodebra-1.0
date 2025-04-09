@@ -1294,6 +1294,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animalParent: {fileID: 2128026156}
   plantParent: {fileID: 176308126}
+  scentLibrary: {fileID: 11400000, guid: 219e445698b0cca4fa3016737ef843fd, type: 2}
   sortAnimalsBySpecies: 1
   sortPlantsBySpecies: 1
 --- !u!1 &619394800
@@ -3517,6 +3518,7 @@ Transform:
   - {fileID: 218454254}
   - {fileID: 1966203508}
   - {fileID: 1384832980}
+  - {fileID: 839501940}
   - {fileID: 976596915}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3607,6 +3609,37 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!1 &813162423
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 813162424}
+  m_Layer: 0
+  m_Name: Firefly_AttractionLineContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &813162424
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 813162423}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1079289979}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &823999946
 GameObject:
   m_ObjectHideFlags: 0
@@ -3715,6 +3748,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 823999946}
   m_CullTransparentMesh: 1
+--- !u!1 &839501939
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 839501940}
+  - component: {fileID: 839501941}
+  m_Layer: 0
+  m_Name: Manager_Flora
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &839501940
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 839501939}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 697039534}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &839501941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 839501939}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa0397c3838c4c9aa01e9859a5f1e1ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  showScentRadiiRuntime: 1
+  scentRadiusColorRuntime: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  logGizmoCalls: 0
+  circleVisualizerPrefab: {fileID: 4489783331620860270, guid: d6976fed002367344b9cc1365d0a1201, type: 3}
+  circleContainer: {fileID: 1232000946}
 --- !u!1 &844052608
 GameObject:
   m_ObjectHideFlags: 0
@@ -3915,6 +3997,11 @@ MonoBehaviour:
   photosynthesisRadius: 2
   photosynthesisIntensityPerFly: 0.2
   maxPhotosynthesisBonus: 0.5
+  showAttractionLinesRuntime: 1
+  attractionLineColorGizmo: {r: 1, g: 1, b: 1, a: 1}
+  logGizmoCalls: 0
+  lineVisualizerPrefab: {fileID: 4489783331620860270, guid: 90a334b6403ffa946a0f007b37a0456d, type: 3}
+  lineContainer: {fileID: 813162424}
 --- !u!114 &1016619598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3949,6 +4036,39 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 2
+--- !u!1 &1079289978
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1079289979}
+  m_Layer: 0
+  m_Name: Spawned_Debugging
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1079289979
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1079289978}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 813162424}
+  - {fileID: 1232000946}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1085690770
 GameObject:
   m_ObjectHideFlags: 0
@@ -6822,6 +6942,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1227954964}
   m_CullTransparentMesh: 1
+--- !u!1 &1232000945
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1232000946}
+  m_Layer: 0
+  m_Name: Scent_CircleContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1232000946
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1232000945}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1079289979}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1251780409
 GameObject:
   m_ObjectHideFlags: 0
@@ -7207,7 +7358,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animalsToSpawn:
   - animalDefinition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}
-    spawnRateMultiplier: 1
+    spawnRateMultiplier: 0
     maximumSpawned: 1
     spawnTimer: 0
   globalSpawnCooldown: 3
@@ -8070,3 +8221,4 @@ SceneRoots:
   - {fileID: 463514351}
   - {fileID: 697039534}
   - {fileID: 553168402}
+  - {fileID: 1079289979}
