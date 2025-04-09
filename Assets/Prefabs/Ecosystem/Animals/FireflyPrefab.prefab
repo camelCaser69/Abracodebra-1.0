@@ -49,14 +49,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pointLight: {fileID: 4638215477615662194}
   spriteRenderer: {fileID: 2668219994839306107}
-  speedRange: {x: 0.5, y: 1.5}
-  directionChangeInterval: 2
+  speedRange: {x: 0.3, y: 1.2}
+  directionChangeInterval: 1
   pauseChance: 0.2
-  pauseDurationRange: {x: 0.5, y: 1.5}
+  pauseDurationRange: {x: 0.2, y: 0.8}
   lifetimeRange: {x: 5, y: 15}
+  fadeInDuration: 0.75
+  fadeOutDuration: 1.5
   enableFlicker: 1
   intensityRange: {x: 1.5, y: 3}
   flickerSpeed: 5
+  enableSpawnFlicker: 1
+  spawnFlickerDuration: 0.5
+  spawnFlickerIntensityRange: {x: 0.5, y: 4}
+  spawnFlickerSpeed: 15
+  scentCheckInterval: 1
+  scentDetectionRadius: 2
+  attractionStrength: 2
+  orbitDistance: 0.5
+  attractionWobble: 0.3
+  attractiveScentTypes: 0100000002000000
 --- !u!212 &2668219994839306107
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -134,7 +146,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4042090984494424328}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 073797afb82c5a1438f328866b10b3f0, type: 3}
   m_Name: 
@@ -144,7 +156,7 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 0.9622972, b: 0, a: 1}
-  m_Intensity: 1
+  m_Intensity: 0.2
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: a546f8ef00000000

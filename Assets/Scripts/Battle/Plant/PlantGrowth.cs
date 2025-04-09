@@ -48,11 +48,23 @@ public class PlantGrowth : MonoBehaviour
     private float displayedGrowthPercentage = 0f;
     private float totalGrowthDuration;
     private bool? offsetRightForPattern1 = null;
+    
+    private FireflyManager fireflyManagerInstance;
 
     // --- Unity Methods ---
-    private void Awake() => EnsureUIReferences();
     private void Update() => StateMachineUpdate();
     private void OnDestroy() => StopAllCoroutines(); // Ensure cleanup
+    
+    private void Awake()
+    {
+        EnsureUIReferences();
+        fireflyManagerInstance = FireflyManager.Instance; // Get the singleton instance
+        if (fireflyManagerInstance == null)
+        {
+            // Optional: Log warning if manager doesn't exist, photosynthesis bonus won't work
+            // Debug.LogWarning($"[{gameObject.name}] FireflyManager instance not found. Firefly photosynthesis bonus disabled.");
+        }
+    }
 
     // --- Public Initialization ---
     public void InitializeAndGrow(NodeGraph graph)
@@ -108,9 +120,22 @@ public class PlantGrowth : MonoBehaviour
     private void AccumulateEnergy()
     {
         float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
-        // *** Uses the 'cells' dictionary which is now kept up-to-date via ReportCellDestroyed ***
         int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
-        float delta = finalPhotosynthesisRate * leafCount * sunlight * Time.deltaTime;
+
+        // --- Calculate Firefly Photosynthesis Bonus ---
+        float fireflyBonusRate = 0f;
+        if (fireflyManagerInstance != null) // Check if manager exists
+        {
+            int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(transform.position, fireflyManagerInstance.photosynthesisRadius);
+            fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly,
+                fireflyManagerInstance.maxPhotosynthesisBonus);
+        }
+
+        // --- Combine Photosynthesis Sources ---
+        float standardPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight;
+        float totalRate = standardPhotosynthesis + fireflyBonusRate; // Add the bonus
+
+        float delta = totalRate * Time.deltaTime;
         currentEnergy = Mathf.Clamp(currentEnergy + delta, 0f, finalMaxEnergy);
     }
 

@@ -39,8 +39,7 @@ Shader "Universal Render Pipeline/2D/Sprite Emissive Unlit"
 
             // Use URP's core library functions
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            // Use URP's 2D library functions for Sprite handling
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/2D/Sprite.hlsl"
+            // NO LONGER INCLUDING: Packages/com.unity.render-pipelines.universal/ShaderLibrary/2D/Sprite.hlsl
 
 
             // Define Material Properties (match Properties block)
@@ -50,6 +49,21 @@ Shader "Universal Render Pipeline/2D/Sprite Emissive Unlit"
                 float _PixelSnap;
             CBUFFER_END
 
+            // Define standard URP Per-Renderer / Sprite properties
+            TEXTURE2D(_MainTex); SAMPLER(sampler_MainTex);
+            float4 _MainTex_ST; // Needed for TRANSFORM_TEX macro
+
+            TEXTURE2D(_AlphaTex); SAMPLER(sampler_AlphaTex);
+
+            // Input structure for the vertex shader (standard attributes)
+            struct Attributes
+            {
+                float4 positionOS   : POSITION;
+                float4 color        : COLOR;
+                float2 texcoord     : TEXCOORD0;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
 
             // Input structure for the fragment shader
             struct Varyings
@@ -57,14 +71,12 @@ Shader "Universal Render Pipeline/2D/Sprite Emissive Unlit"
                 float4 positionHCS    : SV_POSITION;
                 float2 uv             : TEXCOORD0;
                 half4 color           : COLOR; // Includes vertex color + renderer color
-#if defined(_FLIP_ON)
-                half2 scale           : TEXCOORD1; // Store flip scale
-#endif
+                // Removed scale for flip - handle flip directly if needed, simplifies dependencies
                  UNITY_VERTEX_OUTPUT_STEREO // For Stereo Rendering
             };
 
 
-            // Vertex Shader (mostly standard URP Sprite Vertex)
+            // Vertex Shader (simplified, relying on Core.hlsl and standard functions)
             Varyings SpriteVertex(Attributes input)
             {
                 Varyings output = (Varyings)0;
@@ -72,18 +84,17 @@ Shader "Universal Render Pipeline/2D/Sprite Emissive Unlit"
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 
+                // Use standard URP vertex transformation
                 output.positionHCS = TransformObjectToHClip(input.positionOS.xyz);
-                output.uv = input.texcoord;
-                output.color = input.color * _Color * _RendererColor; // Combine vertex, material tint, and renderer color
+                // Use standard texture coordinate transformation
+                output.uv = TRANSFORM_TEX(input.texcoord, _MainTex);
+                // Combine vertex color and material Tint (_Color)
+                // Note: _RendererColor is often handled internally or via different mechanism in modern URP sprites
+                output.color = input.color * _Color;
 
                 // Handle Pixel Snap option
-                #if defined(PIXELSNAP_ON)
+                #ifdef PIXELSNAP_ON // Check if keyword is defined by material
                 output.positionHCS = UnityPixelSnap(output.positionHCS);
-                #endif
-
-                // Handle Flip property (from SpriteRenderer component)
-                #if defined(_FLIP_ON)
-                output.scale = _Flip.xy;
                 #endif
 
                 return output;
@@ -95,16 +106,8 @@ Shader "Universal Render Pipeline/2D/Sprite Emissive Unlit"
             {
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
-                // Apply Sprite Flip if necessary
-                #if defined(_FLIP_ON)
-                // Flip UVs only if scale component is negative
-                // Use step() for potentially better performance than branch/if
-                input.uv.x = lerp(input.uv.x, 1.0 - input.uv.x, step(input.scale.x, 0));
-                input.uv.y = lerp(input.uv.y, 1.0 - input.uv.y, step(input.scale.y, 0));
-                #endif
-
                 // Sample the main texture
-                half4 mainTexSample = SampleSpriteTexture(input.uv);
+                half4 mainTexSample = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
 
                 // Combine texture color with vertex/tint color
                 half4 finalColor = mainTexSample * input.color;
@@ -114,15 +117,16 @@ Shader "Universal Render Pipeline/2D/Sprite Emissive Unlit"
                 finalColor.rgb += _EmissionColor.rgb; // Additive emission
 
                 // Handle external alpha if enabled (usually for UI masks)
-                #if defined(_USE_EXTERNAL_ALPHA)
-                // Sample external alpha texture
-                half alpha = SampleSpriteAlpha(input.uv);
-                // Multiply final alpha by external alpha
-                finalColor.a *= alpha;
+                #if defined(_USE_EXTERNAL_ALPHA) // Check for keyword if Feature is enabled
+                 half alpha = SAMPLE_TEXTURE2D(_AlphaTex, sampler_AlphaTex, input.uv).a;
+                 finalColor.a *= alpha;
                 #endif
 
                 // Apply alpha clipping/threshold if needed (standard Sprite-Lit does this, optional here)
                 // clip(finalColor.a - _AlphaClip);
+
+                // Add simple sprite flip handling based on vertex color alpha if needed (common technique)
+                // Or rely on SpriteRenderer component's Flip setting (often handled before shader)
 
                 return finalColor;
             }

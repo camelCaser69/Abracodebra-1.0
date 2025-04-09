@@ -1277,6 +1277,7 @@ Transform:
   m_Children:
   - {fileID: 2128026156}
   - {fileID: 176308126}
+  - {fileID: 1613962853}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &553168403
@@ -3886,8 +3887,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1613962853}
+  m_Children: []
   m_Father: {fileID: 697039534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &976596916
@@ -3905,13 +3905,16 @@ MonoBehaviour:
   weatherManager: {fileID: 1966203507}
   fireflyPrefab: {fileID: 4042090984494424328, guid: 88309470b9e69f94c9faea1346030ab1, type: 3}
   fireflyParent: {fileID: 1613962853}
-  maxFireflies: 10
+  maxFireflies: 15
   spawnInterval: 0.5
   nightThreshold: 0.25
   spawnCenter: {x: 0, y: 0}
   spawnAreaSize: {x: 20, y: 10}
   movementMinBounds: {x: -8.5, y: -4.5}
   movementMaxBounds: {x: 8.5, y: 4.5}
+  photosynthesisRadius: 2
+  photosynthesisIntensityPerFly: 0.2
+  maxPhotosynthesisBonus: 0.5
 --- !u!114 &1016619598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7511,7 +7514,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1613962853}
   m_Layer: 0
-  m_Name: ActiveFireflies
+  m_Name: Fireflies
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7530,7 +7533,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 976596915}
+  m_Father: {fileID: 553168402}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1615779378
 GameObject:

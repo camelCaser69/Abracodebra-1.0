@@ -24,6 +24,15 @@ public class FireflyManager : MonoBehaviour
     [Header("Movement Bounds (for Fireflies)")]
     [SerializeField] private Vector2 movementMinBounds = new Vector2(-12f, -7f);
     [SerializeField] private Vector2 movementMaxBounds = new Vector2(12f, 7f);
+    
+    // Add these fields in the Header sections
+    [Header("Photosynthesis Bonus Settings")]
+    [Tooltip("Radius around a Plant within which Fireflies contribute to photosynthesis.")]
+    public float photosynthesisRadius = 3f;
+    [Tooltip("Photosynthesis rate bonus provided per nearby Firefly.")]
+    public float photosynthesisIntensityPerFly = 0.05f;
+    [Tooltip("Maximum photosynthesis rate bonus achievable from Fireflies.")]
+    public float maxPhotosynthesisBonus = 0.5f;
 
     // Internal State
     private List<FireflyController> activeFireflies = new List<FireflyController>();
@@ -118,7 +127,31 @@ public class FireflyManager : MonoBehaviour
             Destroy(fireflyGO); // Clean up invalid spawn
         }
     }
+    
+    public int GetNearbyFireflyCount(Vector3 position, float radius)
+    {
+        int count = 0;
+        float radiusSq = radius * radius; // Use squared distance for efficiency
 
+        // Iterate backwards for safe removal if needed (though not used here)
+        for (int i = activeFireflies.Count - 1; i >= 0; i--)
+        {
+            // Check if firefly is null or destroyed (safety check)
+            if (activeFireflies[i] == null)
+            {
+                activeFireflies.RemoveAt(i);
+                continue;
+            }
+
+            // Calculate squared distance
+            if ((activeFireflies[i].transform.position - position).sqrMagnitude <= radiusSq)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+    
     // Called by FireflyController when its lifetime expires
     public void ReportFireflyDespawned(FireflyController firefly)
     {
