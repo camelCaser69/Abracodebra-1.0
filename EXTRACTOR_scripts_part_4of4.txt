@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-08 21:25:21
+UNITY PROJECT SCRIPT EXPORT - 2025-04-11 01:27:09
 PART 4 OF 4
 ================================================================================
 
@@ -16,7 +16,8 @@ Assets
 │   ├── NodeDefinitionCreator.cs
 │   ├── NodeDefinitionEditor.cs
 │   ├── NodeDefinitionLibraryEditor.cs
-│   └── NodeDefinitionPostprocessor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   └── NodeEffectDrawer.cs
 ├── HueFolders
 │   ├── Editor
 │   │   ├── HueFolders.Editor.asmdef
@@ -26,14 +27,16 @@ Assets
 │   └── package.json
 ├── InputSystem_Actions.inputactions
 ├── Materials
-│   └── BezierCurveAA_Material.mat
+│   ├── BezierCurveAA_Material.mat
+│   └── Firefly_Glow_Material.mat
 ├── Post Processing
 ├── Prefabs
 │   ├── Ecosystem
 │   │   ├── Animals
 │   │   │   ├── Animal_Bird.prefab
 │   │   │   ├── Animal_Bunny.prefab
-│   │   │   └── Animal_Fox.prefab
+│   │   │   ├── Animal_Fox.prefab
+│   │   │   └── FireflyPrefab.prefab
 │   │   ├── Plants
 │   │   │   ├── PixelBerry.prefab
 │   │   │   ├── PixelFlower.prefab
@@ -48,6 +51,7 @@ Assets
 │   │   └── UI
 │   │       ├── EmptySlot16.prefab
 │   │       ├── EmptySlot32.prefab
+│   │       ├── HoverTileMarker.prefab
 │   │       ├── Indicator_Opportunity.prefab
 │   │       ├── Indicator_Resource.prefab
 │   │       ├── Indicator_Threat.prefab
@@ -56,119 +60,20 @@ Assets
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
-│   │       └── ThoughtBubble.prefab
+│   │       ├── ThoughtBubble.prefab
+│   │       ├── Visualizer_Circle_Prefab.prefab
+│   │       └── Visualizer_Line_Prefab.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
 │   │   └── Projectile_Basic_Pixel.prefab
 │   └── Tiles
 │       ├── Common
-│       │   ├── PLains_0_Corner_LT.asset
-│       │   ├── PLains_10.asset
-│       │   ├── PLains_100.asset
-│       │   ├── PLains_101.asset
-│       │   ├── PLains_102.asset
-│       │   ├── PLains_11.asset
-│       │   ├── PLains_12.asset
-│       │   ├── PLains_13.asset
-│       │   ├── PLains_14.asset
-│       │   ├── PLains_15.asset
-│       │   ├── PLains_16.asset
-│       │   ├── PLains_17.asset
-│       │   ├── PLains_18.asset
-│       │   ├── PLains_19.asset
-│       │   ├── PLains_1_T.asset
-│       │   ├── PLains_20.asset
-│       │   ├── PLains_21.asset
-│       │   ├── PLains_22.asset
-│       │   ├── PLains_23.asset
-│       │   ├── PLains_24.asset
-│       │   ├── PLains_25.asset
-│       │   ├── PLains_26.asset
-│       │   ├── PLains_27.asset
-│       │   ├── PLains_28.asset
-│       │   ├── PLains_29.asset
-│       │   ├── PLains_2_Corner_RT.asset
-│       │   ├── PLains_30.asset
-│       │   ├── PLains_31.asset
-│       │   ├── PLains_32.asset
-│       │   ├── PLains_33.asset
-│       │   ├── PLains_34.asset
-│       │   ├── PLains_35.asset
-│       │   ├── PLains_36.asset
-│       │   ├── PLains_37.asset
-│       │   ├── PLains_38.asset
-│       │   ├── PLains_39.asset
-│       │   ├── PLains_3_Single_B.asset
-│       │   ├── PLains_40.asset
-│       │   ├── PLains_41.asset
-│       │   ├── PLains_42.asset
-│       │   ├── PLains_43.asset
-│       │   ├── PLains_44.asset
-│       │   ├── PLains_45.asset
-│       │   ├── PLains_46.asset
-│       │   ├── PLains_47.asset
-│       │   ├── PLains_48.asset
-│       │   ├── PLains_49.asset
-│       │   ├── PLains_4_Single_B.TR.asset
-│       │   ├── PLains_5.asset
-│       │   ├── PLains_50.asset
-│       │   ├── PLains_51.asset
-│       │   ├── PLains_52_Grass_Center.asset
-│       │   ├── PLains_53_Grass_Center.asset
-│       │   ├── PLains_54_Grass_Center.asset
-│       │   ├── PLains_55.asset
-│       │   ├── PLains_56_Grass_Center.asset
-│       │   ├── PLains_57.asset
-│       │   ├── PLains_58.asset
-│       │   ├── PLains_59.asset
-│       │   ├── PLains_6.asset
-│       │   ├── PLains_60.asset
-│       │   ├── PLains_61_Grass_Center.asset
-│       │   ├── PLains_62_Grass_Center.asset
-│       │   ├── PLains_63.asset
-│       │   ├── PLains_64_Grass_Center.asset
-│       │   ├── PLains_65.asset
-│       │   ├── PLains_66.asset
-│       │   ├── PLains_67.asset
-│       │   ├── PLains_68.asset
-│       │   ├── PLains_69.asset
-│       │   ├── PLains_7.asset
-│       │   ├── PLains_70.asset
-│       │   ├── PLains_71.asset
-│       │   ├── PLains_72.asset
-│       │   ├── PLains_73.asset
-│       │   ├── PLains_74.asset
-│       │   ├── PLains_75.asset
-│       │   ├── PLains_76.asset
-│       │   ├── PLains_77.asset
-│       │   ├── PLains_78.asset
-│       │   ├── PLains_79.asset
-│       │   ├── PLains_8.asset
-│       │   ├── PLains_80.asset
-│       │   ├── PLains_81.asset
-│       │   ├── PLains_82.asset
-│       │   ├── PLains_83.asset
-│       │   ├── PLains_84.asset
-│       │   ├── PLains_85.asset
-│       │   ├── PLains_86.asset
-│       │   ├── PLains_87.asset
-│       │   ├── PLains_88.asset
-│       │   ├── PLains_89.asset
-│       │   ├── PLains_9.asset
-│       │   ├── PLains_90.asset
-│       │   ├── PLains_91.asset
-│       │   ├── PLains_92.asset
-│       │   ├── PLains_93.asset
-│       │   ├── PLains_94.asset
-│       │   ├── PLains_95.asset
-│       │   ├── PLains_96.asset
-│       │   ├── PLains_97.asset
-│       │   ├── PLains_98.asset
-│       │   └── PLains_99.asset
+│       │   └── PLains_0_Corner_LT.asset
 │       ├── Palettes
 │       │   └── PaletteDual_Ground.prefab
 │       └── Rule Tiles
-│           └── DualGridRuleTile.asset
+│           ├── DualGridRuleTile_Dirt.asset
+│           └── DualGridRuleTile_Grass.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -185,10 +90,16 @@ Assets
 │   │   └── FoodType_000_Leaf.asset
 │   ├── Life Thoughts
 │   │   └── AnimalThoughtLibrary.asset
-│   └── Nodes Plant
-│       ├── NodeDefinitionLibrary.asset
-│       ├── Node_000_Seed.asset
-│       └── Node_001_Berry.asset
+│   ├── Nodes Plant
+│   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
+│   │   ├── Node_001_Berry.asset
+│   │   └── Node_002_FireflyPheromone.asset
+│   ├── Scents
+│   │   ├── ScentLibrary.asset
+│   │   └── Scent_000_FireflyPheromone.asset
+│   ├── Tiles
+│   └── Tools
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -211,14 +122,22 @@ Assets
 │   │   │   ├── AnimalThoughtLibrary.cs
 │   │   │   ├── EcosystemManager.cs
 │   │   │   ├── FaunaManager.cs
+│   │   │   ├── FloraManager.cs
 │   │   │   ├── PoopController.cs
+│   │   │   ├── ScentSource.cs
 │   │   │   ├── ThoughtBubbleController.cs
 │   │   │   └── ThoughtTrigger.cs
+│   │   ├── Effects
+│   │   │   ├── FireflyController.cs
+│   │   │   └── FireflyManager.cs
 │   │   ├── Food
 │   │   │   ├── AnimalDiet.cs
 │   │   │   ├── FoodItem.cs
 │   │   │   └── FoodType.cs
-│   │   └── Plants
+│   │   ├── Plants
+│   │   └── Scents
+│   │       ├── ScentDefinition.cs
+│   │       └── ScentLibrary.cs
 │   ├── Nodes
 │   │   ├── Core
 │   │   │   ├── NodeData.cs
@@ -242,10 +161,15 @@ Assets
 │   │   └── GardenerController.cs
 │   ├── Tiles
 │   │   ├── Data
-│   │   └── Editor
+│   │   │   ├── PlayerTileInteractor.cs
+│   │   │   └── TileInteractionManager.cs
+│   │   └── Tools
+│   │       ├── ToolSwitcher.cs
+│   │       └── ToolType.cs
 │   ├── UI
 │   └── Visuals
-│       └── NightColorPostProcess.cs
+│       ├── NightColorPostProcess.cs
+│       └── RuntimeCircleDrawer.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -253,7 +177,8 @@ Assets
 │   │   └── URP2DSceneTemplate.unity
 │   └── UniversalRP.asset
 ├── Shaders
-│   └── BezierCurveAA.shader
+│   ├── BezierCurveAA.shader
+│   └── SpriteEmissiveUnlit.shader
 ├── TextureImporter.preset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
@@ -276,7 +201,7 @@ using TMPro;
 using System.Linq;
 
 [RequireComponent(typeof(RectTransform))]
-public class NodeEditorGridController : MonoBehaviour
+public class NodeEditorGridController : MonoBehaviour // Keep this script on the persistent "UIManager" or similar object
 {
     public static NodeEditorGridController Instance { get; private set; }
 
@@ -288,23 +213,26 @@ public class NodeEditorGridController : MonoBehaviour
     [Header("Empty Cell Visuals")]
     [SerializeField] private Sprite emptyCellSprite;
     [SerializeField] private Color emptyCellColor = Color.white;
-    [SerializeField] private Vector3 emptyCellScale = Vector3.one;
+    [SerializeField] private Vector3 emptyCellScale = Vector3.one; // Still potentially useful for cell GO scale
 
     [Header("Node Visuals")]
     [SerializeField] private GameObject nodeViewPrefab;
-    [SerializeField] private Vector3 nodeImageScale = Vector3.one;
+    [SerializeField] private Vector3 nodeImageScale = Vector3.one; // For the image *inside* the node view
     [SerializeField] private Color selectedNodeBackgroundColor = new Color(0.9f, 0.9f, 0.7f, 1f);
 
     [Header("Node Definitions & Interaction")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary; // Keep this reference
+    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
     [SerializeField] private TMP_Dropdown nodeDropdown;
 
-    [Header("UI Toggle")]
-    [SerializeField] private GameObject gridUIParent;
+    [Header("UI References")]
+    [Tooltip("The UI GameObject (Panel) that gets toggled visible/hidden.")]
+    [SerializeField] private GameObject gridUIParent; // The Panel to show/hide
+    [Tooltip("The Transform within the UI Panel where cell GameObjects should be created.")]
+    [SerializeField] private Transform cellContainer; // The container for cell GOs (e.g., 'GridContainer')
 
 
     private List<NodeCell> nodeCells = new List<NodeCell>();
-    private RectTransform _rectTransform;
+    // Removed _rectTransform as it's less relevant now the script isn't on the grid panel itself
     private Canvas _rootCanvas;
     private NodeGraph _uiGraphRepresentation = new NodeGraph();
 
@@ -322,10 +250,15 @@ public class NodeEditorGridController : MonoBehaviour
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        _rectTransform = GetComponent<RectTransform>();
-        _rootCanvas = GetComponentInParent<Canvas>();
+        // Get components relative to this script's GameObject
+        _rootCanvas = GetComponentInParent<Canvas>(); // Find the root canvas
         if (_rootCanvas == null) Debug.LogError("[NodeEditorGridController] Root Canvas not found!", gameObject);
-        if (gridUIParent == null) Debug.LogWarning("[NodeEditorGridController] Grid UI Parent not assigned. UI Toggling might not work.", gameObject);
+
+        // Validate essential references
+        if (gridUIParent == null) Debug.LogError("[NodeEditorGridController] Grid UI Parent (the panel to toggle) not assigned.", gameObject);
+        if (cellContainer == null) Debug.LogError("[NodeEditorGridController] Cell Container (parent for cells) not assigned.", gameObject);
+        if (nodeDropdown == null) Debug.LogWarning("[NodeEditorGridController] Node Dropdown not assigned.", gameObject);
+        if (definitionLibrary == null) Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned!", gameObject);
     }
 
     void OnDestroy()
@@ -336,90 +269,124 @@ public class NodeEditorGridController : MonoBehaviour
     void Start()
     {
         if (nodeDropdown != null) nodeDropdown.gameObject.SetActive(false);
-        else Debug.LogWarning("[NodeEditorGridController] Node Dropdown not assigned.", gameObject);
-        if (definitionLibrary == null) Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned!", gameObject);
 
-        CreateCells();
-        SpawnInitialNodes(); // <<< CALL NEW METHOD
-        RefreshGraph(); // Refresh after potentially spawning initial nodes
+        // Check if references are set before proceeding
+        if (cellContainer != null && definitionLibrary != null)
+        {
+            CreateCells();
+            SpawnInitialNodes(); // Call after cells are created
+            RefreshGraph(); // Refresh after potentially spawning initial nodes
+        }
+        else
+        {
+            Debug.LogError("[NodeEditorGridController] Cannot initialize grid - Cell Container or Definition Library is missing.", gameObject);
+        }
     }
 
     private void CreateCells()
     {
-        // Clear existing cells if any (e.g., during hot reload in editor)
-        foreach (Transform child in transform) {
-            // Avoid destroying self or essential components if they are children by mistake
-            if (child.GetComponent<NodeCell>() != null) {
+        // Ensure cellContainer is assigned
+        if (cellContainer == null)
+        {
+            Debug.LogError("[NodeEditorGridController] Cannot create cells - Cell Container is not assigned.", gameObject);
+            return;
+        }
+
+        // Clear existing cells from the container
+        foreach (Transform child in cellContainer) // Iterate through the actual container
+        {
+            if (child.GetComponent<NodeCell>() != null)
+            {
                 Destroy(child.gameObject);
             }
         }
         nodeCells.Clear();
-        NodeCell.ClearSelection(); // Ensure no selection persists
+        NodeCell.ClearSelection();
 
+        // Layout calculations (assuming cellContainer uses appropriate layout components or manual positioning)
+        // If using GridLayoutGroup on cellContainer, positioning is automatic.
+        // If positioning manually based on cellContainer's RectTransform:
+        RectTransform containerRect = cellContainer.GetComponent<RectTransform>();
+        if (containerRect == null)
+        {
+             Debug.LogError("[NodeEditorGridController] Cell Container needs a RectTransform for manual layout calculations.", cellContainer.gameObject);
+             return; // Cannot proceed with manual layout
+        }
+
+        // Example Manual Layout (adjust based on containerRect's pivot/anchors):
+        // Assuming center pivot (0.5, 0.5) for the container
         float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
-        // Calculate start based on pivot (assuming center pivot 0.5, 0.5)
         float startX = -(totalWidth / 2f) + (cellSize.x / 2f);
-        // If using bottom-left pivot (0,0): float startX = 0;
-        // Adjust Y based on pivot too
-        float startY = 0; // Assuming center Y pivot
+        float startY = 0; // Assuming horizontal layout centered vertically
 
         for (int i = 0; i < emptyCellsCount; i++)
         {
             GameObject cellGO = new GameObject($"Cell_{i}");
             RectTransform rt = cellGO.AddComponent<RectTransform>();
-            cellGO.transform.SetParent(transform, false);
 
-            // Set anchors and pivot (e.g., center)
+            // *** Parent to the designated cellContainer ***
+            cellGO.transform.SetParent(cellContainer, false);
+
+            // --- Manual Positioning --- (Comment out if using GridLayoutGroup)
+            // Set anchors and pivot (e.g., center) for the cell itself
             rt.anchorMin = new Vector2(0.5f, 0.5f);
             rt.anchorMax = new Vector2(0.5f, 0.5f);
             rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta = cellSize; // Set size
+            rt.sizeDelta = cellSize;
 
-            // Calculate position
+            // Calculate position relative to container
             float xPos = startX + i * (cellSize.x + cellMargin);
             float yPos = startY;
             rt.anchoredPosition = new Vector2(xPos, yPos);
+            // --- End Manual Positioning ---
+
+            // Apply scale if needed
+            rt.localScale = emptyCellScale;
 
             Image cellImage = cellGO.AddComponent<Image>();
             cellImage.sprite = emptyCellSprite;
             cellImage.color = emptyCellColor;
-            cellImage.raycastTarget = true; // Important for drop detection
-            // rt.localScale = emptyCellScale; // Apply scale if needed
+            cellImage.raycastTarget = true;
 
             NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
             cellLogic.Init(i, this, cellImage);
             nodeCells.Add(cellLogic);
+
+            // If using GridLayoutGroup on cellContainer, you might not need manual positioning.
+            // The GridLayoutGroup component handles size and spacing. Just ensure cellGO has a LayoutElement if needed.
+            // Example (if using GridLayout):
+            // LayoutElement le = cellGO.GetComponent<LayoutElement>() ?? cellGO.AddComponent<LayoutElement>();
+            // le.preferredWidth = cellSize.x;
+            // le.preferredHeight = cellSize.y;
         }
     }
 
-    /// <summary>
-    /// Spawns nodes defined in the NodeDefinitionLibrary's initialNodes list.
-    /// </summary>
-    private void SpawnInitialNodes() // <<< NEW METHOD
+    private void SpawnInitialNodes()
     {
         if (definitionLibrary == null || definitionLibrary.initialNodes == null)
         {
-            // Debug.Log("No initial nodes defined in the library.");
             return;
+        }
+        if (nodeCells.Count == 0)
+        {
+             Debug.LogWarning("[NodeEditorGridController] Cannot spawn initial nodes - cells haven't been created yet (check for earlier errors).");
+             return;
         }
 
         foreach (var config in definitionLibrary.initialNodes)
         {
-            // Validate Node Definition
             if (config.nodeDefinition == null)
             {
                 Debug.LogWarning($"Initial node config has null NodeDefinition. Skipping.");
                 continue;
             }
 
-            // Validate Cell Index
             if (config.cellIndex < 0 || config.cellIndex >= nodeCells.Count)
             {
                 Debug.LogWarning($"Initial node config for '{config.nodeDefinition.name}' has invalid cell index ({config.cellIndex}). Max index is {nodeCells.Count - 1}. Skipping.");
                 continue;
             }
 
-            // Get Target Cell
             NodeCell targetCell = nodeCells[config.cellIndex];
             if (targetCell.HasNode())
             {
@@ -427,15 +394,11 @@ public class NodeEditorGridController : MonoBehaviour
                 continue;
             }
 
-            // Spawn the Node
-            // Debug.Log($"Spawning initial node '{config.nodeDefinition.name}' in cell {config.cellIndex}. Move:{config.canMove}, Delete:{config.canDelete}");
             targetCell.AssignNode(config.nodeDefinition);
 
-            // Apply Move/Delete settings
             NodeView spawnedView = targetCell.GetNodeView();
             if (spawnedView != null)
             {
-                // Control Movability
                 NodeDraggable draggable = spawnedView.GetComponent<NodeDraggable>();
                 if (draggable != null)
                 {
@@ -444,8 +407,6 @@ public class NodeEditorGridController : MonoBehaviour
                      Debug.LogWarning($"Initial node '{config.nodeDefinition.name}' in cell {config.cellIndex} is set to 'canMove=true' but its prefab is missing the NodeDraggable component.", spawnedView.gameObject);
                 }
 
-
-                // Control Deletability
                 NodeData spawnedData = targetCell.GetNodeData();
                 if (spawnedData != null)
                 {
@@ -459,30 +420,28 @@ public class NodeEditorGridController : MonoBehaviour
     void Update()
     {
         // UI Toggle
-        if (Input.GetKeyDown(KeyCode.Tab)) ToggleGridUI();
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+             ToggleGridUI(); // This should now work correctly
+        }
 
-        // --- Delete Node Handling (Modified) ---
+        // Delete Node Handling
         if (Input.GetKeyDown(KeyCode.Delete))
         {
             if (NodeCell.CurrentlySelectedCell != null)
             {
                 NodeCell selected = NodeCell.CurrentlySelectedCell;
-                NodeData data = selected.GetNodeData(); // Get the node data instance
+                NodeData data = selected.GetNodeData();
 
-                // Check if the node exists AND if its 'canBeDeleted' flag is true
-                if (data != null && data.canBeDeleted) // <<< CHECK ADDED
+                if (data != null && data.canBeDeleted)
                 {
-                    // Debug.Log($"Deleting node '{data.nodeDisplayName}' from cell {selected.CellIndex}.");
-                    selected.RemoveNode(); // RemoveNode handles deselection
-                    RefreshGraph(); // Update internal graph representation
+                    selected.RemoveNode();
+                    RefreshGraph();
                 }
                 else if (data != null && !data.canBeDeleted)
                 {
-                    // Optional: Give visual/audio feedback that deletion is blocked
                      Debug.Log($"Node '{data.nodeDisplayName}' cannot be deleted.");
-                    // Example: Play a short "error" sound or flash the node briefly
                 }
-                // If data is null (empty cell selected), do nothing
             }
         }
 
@@ -493,20 +452,21 @@ public class NodeEditorGridController : MonoBehaviour
             {
                 HideDropdown();
             }
-             // Also deselect node if Escape is pressed and dropdown isn't active?
              else if (NodeCell.CurrentlySelectedCell != null) {
                  NodeCell.ClearSelection();
              }
         }
     }
 
-    // --- ToggleGridUI --- (Keep existing method)
     public void ToggleGridUI()
     {
-        if (gridUIParent != null) {
+        if (gridUIParent != null)
+        {
             bool currentState = gridUIParent.activeSelf;
-            gridUIParent.SetActive(!currentState);
-            if (!gridUIParent.activeSelf) { // If hiding UI
+            gridUIParent.SetActive(!currentState); // This toggles the assigned panel
+
+            if (!gridUIParent.activeSelf) // If hiding UI
+            {
                  if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown();
                  NodeCell.ClearSelection(); // Deselect nodes when UI hides
             }
@@ -514,61 +474,50 @@ public class NodeEditorGridController : MonoBehaviour
         else Debug.LogWarning("[NodeEditorGridController] Grid UI Parent not assigned.");
     }
 
-    // --- OnEmptyCellRightClicked --- (Keep existing method)
     public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
     {
         if (nodeDropdown == null) { Debug.LogError("[NodeEditorGridController] Node Dropdown not assigned."); return; }
         if (definitionLibrary == null || definitionLibrary.definitions == null) { Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned or has no definitions."); return; }
 
-        // Stop potentially existing dropdown coroutine to prevent conflicts
         StopCoroutine("ShowDropdownCoroutine");
         StartCoroutine(ShowDropdownCoroutine(cell, eventData));
     }
 
-    // --- ShowDropdownCoroutine --- (Keep existing method)
      private IEnumerator ShowDropdownCoroutine(NodeCell cell, PointerEventData eventData)
      {
-         // Build Options
          List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
-         options.Add(new TMP_Dropdown.OptionData("Select Node...")); // Placeholder option
-         // Sort definitions alphabetically for the dropdown
+         options.Add(new TMP_Dropdown.OptionData("Select Node..."));
          var sortedDefinitions = definitionLibrary.definitions
-                                     .Where(def => def != null) // Filter out null entries
+                                     .Where(def => def != null)
                                      .OrderBy(def => def.displayName)
                                      .ToList();
          foreach (var def in sortedDefinitions) {
              TMP_Dropdown.OptionData option = new TMP_Dropdown.OptionData();
              option.text = def.displayName;
-             option.image = def.thumbnail; // Use thumbnail as icon
+             option.image = def.thumbnail;
              options.Add(option);
          }
          nodeDropdown.ClearOptions();
          nodeDropdown.AddOptions(options);
 
-         // Setup Listener (Use lambda to capture cell and sorted list)
-         nodeDropdown.onValueChanged.RemoveAllListeners(); // Clear previous listeners
+         nodeDropdown.onValueChanged.RemoveAllListeners();
          nodeDropdown.onValueChanged.AddListener((selectedIndex) => {
-             OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions); // Pass necessary context
+             OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions);
          });
 
-         // Position the Dropdown near the click position
          RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
          RectTransformUtility.ScreenPointToLocalPointInRectangle(
-             dropdownRect.parent as RectTransform, // Parent RectTransform
-             eventData.position,                   // Screen click position
-             _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, // Camera for non-overlay canvas
+             dropdownRect.parent as RectTransform,
+             eventData.position,
+             _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera,
              out Vector2 localPos);
          dropdownRect.localPosition = localPos;
 
-         // Activate Dropdown GameObject if not already active
          if (!nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(true);
 
-         // Wait one frame to allow UI layout to update before showing
          yield return null;
 
-         // Show the dropdown options list
          try {
-             // Ensure template is assigned before showing
              if (nodeDropdown.template == null) {
                  Debug.LogError("Dropdown template is not assigned in the Inspector!", nodeDropdown.gameObject);
                  HideDropdown();
@@ -576,52 +525,43 @@ public class NodeEditorGridController : MonoBehaviour
              }
              nodeDropdown.Show();
          } catch (System.NullReferenceException nre) {
-             // Catch potential NRE if something internal goes wrong
               Debug.LogError($"Error showing dropdown: {nre.Message}", nodeDropdown.gameObject);
              HideDropdown();
              yield break;
          }
 
-         // Set initial value and refresh display
-         nodeDropdown.value = 0; // Select the "Select Node..." placeholder
+         nodeDropdown.value = 0;
          nodeDropdown.RefreshShownValue();
      }
 
-    // --- OnDropdownValueChanged --- (Keep existing method)
      private void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefs)
      {
-         HideDropdown(); // Hide dropdown immediately after selection
+         HideDropdown();
 
-         // Index 0 is the placeholder "Select Node..."
          if (selectedIndex > 0) {
-             // Adjust index to match the sortedDefs list (since dropdown index 1 corresponds to list index 0)
              int definitionIndex = selectedIndex - 1;
              if (definitionIndex >= 0 && definitionIndex < sortedDefs.Count) {
                  NodeDefinition selectedDef = sortedDefs[definitionIndex];
                  if (selectedDef != null) {
-                      // Debug.Log($"Assigning node '{selectedDef.name}' to cell {targetCell.CellIndex}");
-                     targetCell.AssignNode(selectedDef); // Assign the chosen node
-                     NodeCell.SelectCell(targetCell);   // Select the newly placed node
-                     RefreshGraph();                    // Update the internal graph representation
+                     targetCell.AssignNode(selectedDef);
+                     NodeCell.SelectCell(targetCell);
+                     RefreshGraph();
                  }
              } else {
                   Debug.LogError($"Dropdown selection index ({selectedIndex}) resulted in an out-of-bounds index ({definitionIndex}) for the definition list.");
              }
          }
-         // If selectedIndex is 0, do nothing (user clicked the placeholder)
      }
 
-    // --- HideDropdown --- (Keep existing method)
     public void HideDropdown()
     {
         if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf)
         {
-            nodeDropdown.Hide(); // Hide the options list
-            nodeDropdown.gameObject.SetActive(false); // Deactivate the main dropdown object
+            nodeDropdown.Hide();
+            nodeDropdown.gameObject.SetActive(false);
         }
     }
 
-    // --- RefreshGraph --- (Keep existing method)
     public void RefreshGraph()
     {
         if (_uiGraphRepresentation == null) _uiGraphRepresentation = new NodeGraph();
@@ -632,16 +572,12 @@ public class NodeEditorGridController : MonoBehaviour
             NodeData data = cell.GetNodeData();
             if (data != null)
             {
-                // Update orderIndex just in case it changed (though it shouldn't if not moved)
                 data.orderIndex = cell.CellIndex;
                 _uiGraphRepresentation.nodes.Add(data);
             }
         }
-        // Optional: Add debug log to see the refreshed graph node count
-        // Debug.Log($"UI Graph Refreshed. Node Count: {_uiGraphRepresentation.nodes.Count}");
     }
 
-    // --- HandleNodeDrop --- (Keep existing method)
      public bool HandleNodeDrop(NodeDraggable draggedDraggable, NodeCell originalCell, Vector2 screenPosition)
      {
          NodeCell targetCell = FindCellAtScreenPosition(screenPosition);
@@ -649,78 +585,69 @@ public class NodeEditorGridController : MonoBehaviour
 
          if (targetCell != null && originalCell != null)
          {
-             // Get data from the node being dragged
              NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
              NodeData draggedData = draggedView?.GetNodeData();
 
-             // Ensure we have valid data to move
              if (draggedView == null || draggedData == null) {
                  Debug.LogError("Dragged object missing NodeView or NodeData!", draggedDraggable.gameObject);
-                 draggedDraggable.ResetPosition(); // Reset if invalid
+                 draggedDraggable.ResetPosition();
                  return false;
              }
 
-             // Case 1: Dropped back onto the original cell
              if (targetCell == originalCell) {
-                 draggedDraggable.ResetPosition(); // Snap back cleanly
-                 NodeCell.SelectCell(targetCell); // Reselect it
-                 return false; // No change in layout
+                 draggedDraggable.ResetPosition();
+                 NodeCell.SelectCell(targetCell);
+                 return false;
              }
 
-             // --- Proceed with swap/move ---
              NodeView existingViewInTarget = targetCell.GetNodeView();
              NodeData existingDataInTarget = targetCell.GetNodeData();
 
-             // Clear selection during swap
              NodeCell.ClearSelection();
 
-             // 1. Clear the original cell's reference to the node being moved
              originalCell.ClearNodeReference();
 
-             // 2. If the target cell had a node, move it to the original cell
              if (existingViewInTarget != null && existingDataInTarget != null) {
                  NodeDraggable existingDraggable = existingViewInTarget.GetComponent<NodeDraggable>();
-                 // Assign the existing node to the original cell
                  originalCell.AssignNodeView(existingViewInTarget, existingDataInTarget);
-                 // Snap its visual representation
                  if (existingDraggable != null) existingDraggable.SnapToCell(originalCell);
              }
 
-             // 3. Assign the dragged node to the target cell
              targetCell.AssignNodeView(draggedView, draggedData);
-             draggedDraggable.SnapToCell(targetCell); // Snap its visual representation
+             draggedDraggable.SnapToCell(targetCell);
 
-             // 4. Select the cell where the node was dropped
              NodeCell.SelectCell(targetCell);
              changed = true;
          }
-         else // Dropped outside grid or invalid original cell
+         else
          {
-             // Reset the dragged node to its original position
              draggedDraggable.ResetPosition();
-             // Reselect the original cell if it still has the node (it should after ResetPosition)
              if (originalCell != null && originalCell.HasNode()) {
                  NodeCell.SelectCell(originalCell);
              } else {
-                 NodeCell.ClearSelection(); // Should not happen often here
+                 NodeCell.ClearSelection();
              }
          }
 
-         // If the layout changed, refresh the internal graph representation
          if (changed) RefreshGraph();
 
          return changed;
      }
 
-    // --- FindCellAtScreenPosition --- (Keep existing method)
      private NodeCell FindCellAtScreenPosition(Vector2 screenPosition)
      {
          NodeCell foundCell = null;
-         // Check all cells
-         foreach (var cell in nodeCells)
+         if (cellContainer == null) return null; // Cannot find cells if container is missing
+
+         // Check all NodeCell components *within the specified container*
+         foreach (Transform cellTransform in cellContainer)
          {
+             NodeCell cell = cellTransform.GetComponent<NodeCell>();
+             if (cell == null) continue; // Skip if child isn't a NodeCell
+
              RectTransform cellRect = cell.GetComponent<RectTransform>();
-             // Use RectTransformUtility for accurate checks across different canvas modes
+             if (cellRect == null) continue; // Skip if cell doesn't have a RectTransform
+
              bool contains = RectTransformUtility.RectangleContainsScreenPoint(
                  cellRect,
                  screenPosition,
@@ -728,50 +655,62 @@ public class NodeEditorGridController : MonoBehaviour
              );
              if (contains) {
                  foundCell = cell;
-                 break; // Found the cell under the cursor
+                 break;
              }
          }
          return foundCell;
      }
 
-    // --- OnDrawGizmos --- (Keep existing method)
      #if UNITY_EDITOR
      void OnDrawGizmos()
      {
          // Draw gizmos only in the editor and when not playing
-         if (!Application.isPlaying && TryGetComponent<RectTransform>(out var rt))
+         // Check if cellContainer is assigned before drawing
+         if (!Application.isPlaying && cellContainer != null && cellContainer.TryGetComponent<RectTransform>(out var containerRect))
          {
              Gizmos.color = new Color(0f, 1f, 0f, 0.5f); // Semi-transparent green
 
+             // Use the same layout logic as CreateCells (example for manual layout)
              float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
-             // Adjust start position based on pivot (assuming 0.5, 0.5)
-             float startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f);
-             float startY_for_gizmo = 0; // Assuming center Y pivot
+             float startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f); // Relative to container center pivot
+             float startY_for_gizmo = 0;
 
              // Store original matrix
              Matrix4x4 originalMatrix = Gizmos.matrix;
 
              for (int i = 0; i < emptyCellsCount; i++)
              {
-                 // Calculate center position of the cell in local space relative to pivot
+                 // Calculate center position of the cell in container's local space
                  float xOffset = startX_for_gizmo + i * (cellSize.x + cellMargin);
                  Vector3 localCellCenter = new Vector3(xOffset, startY_for_gizmo, 0);
 
-                 // Transform local center to world space, considering rotation and scale
-                 Vector3 worldCellCenter = rt.TransformPoint(localCellCenter);
+                 // Transform local center to world space using the CELL CONTAINER's transform
+                 Vector3 worldCellCenter = cellContainer.TransformPoint(localCellCenter);
 
-                 // Calculate gizmo size based on RectTransform's lossy scale
-                 Vector3 gizmoSize = new Vector3(cellSize.x * rt.lossyScale.x, cellSize.y * rt.lossyScale.y, 0.1f);
+                 // Calculate gizmo size based on CELL CONTAINER's lossy scale
+                 Vector3 gizmoSize = new Vector3(cellSize.x * cellContainer.lossyScale.x, cellSize.y * cellContainer.lossyScale.y, 0.1f);
 
-                 // Set Gizmos matrix to handle rotation
-                 Gizmos.matrix = Matrix4x4.TRS(worldCellCenter, rt.rotation, Vector3.one);
+                 // Set Gizmos matrix to handle CELL CONTAINER's rotation
+                 Gizmos.matrix = Matrix4x4.TRS(worldCellCenter, cellContainer.rotation, Vector3.one);
 
-                 // Draw wire cube centered at the transformed position (local origin within the matrix)
+                 // Draw wire cube centered at the transformed position
                  Gizmos.DrawWireCube(Vector3.zero, gizmoSize);
              }
              // Restore original Gizmos matrix
              Gizmos.matrix = originalMatrix;
          }
+         // Optional: Draw a box around the container itself
+         // else if (!Application.isPlaying && cellContainer != null && cellContainer.TryGetComponent<RectTransform>(out containerRect)) {
+         //     Gizmos.color = Color.yellow;
+         //     // Simplified world space box based on container rect
+         //     Vector3[] corners = new Vector3[4];
+         //     containerRect.GetWorldCorners(corners);
+         //     Vector3 center = (corners[0] + corners[2]) * 0.5f;
+         //     Vector3 size = new Vector3(Mathf.Abs(corners[0].x - corners[2].x), Mathf.Abs(corners[0].y - corners[2].y), 0.1f);
+         //     Gizmos.matrix = Matrix4x4.TRS(center, containerRect.rotation, Vector3.one);
+         //     Gizmos.DrawWireCube(Vector3.zero, size);
+         //     Gizmos.matrix = Matrix4x4.identity;
+         // }
      }
      #endif
 }
@@ -1126,80 +1065,613 @@ public class GardenerController : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Data\PlayerTileInteractor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[RequireComponent(typeof(ToolSwitcher))]
+public class PlayerTileInteractor : MonoBehaviour
+{
+    [Header("Hover Settings")]
+    [Tooltip("Maximum distance from the player that the highlight appears.")]
+    public float hoverRadius = 3f;
+
+    [Tooltip("Reference to the camera used for raycasting.")]
+    public Camera mainCamera;
+
+    [Tooltip("Reference to the Grid component of your scene.")]
+    public Grid sceneGrid;
+
+    [Header("Highlight Object")]
+    [Tooltip("Prefab or scene object with a SpriteRenderer used as the hover highlight marker.")]
+    public GameObject hoverHighlightObject;
+
+    // (Internal) Last detected cell from mouse
+    private Vector3Int? lastCellPos = null;
+
+    // Reference to ToolSwitcher (assumed to manage your current tool)
+    private ToolSwitcher toolSwitcher;
+
+    private void Awake()
+    {
+        // --- Auto-assign Camera if not manually set
+        if (mainCamera == null)
+        {
+            mainCamera = Camera.main;
+            if (mainCamera == null)
+                Debug.LogError("PlayerTileInteractor: No camera found. Please assign one in Inspector.");
+        }
+
+        // --- Auto-assign Grid if not manually set
+        if (sceneGrid == null)
+        {
+            sceneGrid = FindObjectOfType<Grid>();
+            if (sceneGrid == null)
+                Debug.LogError("PlayerTileInteractor: No Grid found in the scene. Please assign one in Inspector.");
+        }
+
+        // Grab ToolSwitcher from the same GameObject
+        toolSwitcher = GetComponent<ToolSwitcher>();
+        if (toolSwitcher == null)
+        {
+            Debug.LogError("PlayerTileInteractor: No ToolSwitcher component found on this GameObject.");
+        }
+
+        // Optional: Hide highlight at startup
+        if (hoverHighlightObject != null)
+            hoverHighlightObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+        ProcessHover();
+        ProcessMouseClick();
+    }
+
+    private void ProcessHover()
+    {
+        if (mainCamera == null || sceneGrid == null || hoverHighlightObject == null)
+            return; // Missing references
+
+        // Convert mouse screen position to a world position at z=0
+        Vector3 mousePos = Input.mousePosition;
+        Ray ray = mainCamera.ScreenPointToRay(mousePos);
+        float zOffset = (ray.origin.z != 0f) ? -ray.origin.z / ray.direction.z : 10f;
+        Vector3 worldPos = ray.origin + ray.direction * zOffset;
+
+        // Convert the world position to a grid cell position
+        Vector3Int cellPos = sceneGrid.WorldToCell(worldPos);
+
+        // Check if the hovered cell is within range of the player
+        float distance = Vector2.Distance(transform.position, sceneGrid.CellToWorld(cellPos));
+        if (distance <= hoverRadius)
+        {
+            // Enable and position the hover highlighter
+            hoverHighlightObject.SetActive(true);
+
+            // By default, CellToWorld gives the bottom-left corner of the cell (depending on your grid settings).
+            // If you want precisely the cell’s “center,” add half the cell size
+            Vector3 cellCorner = sceneGrid.CellToWorld(cellPos);
+            Vector3 cellCenterOffset = new Vector3(sceneGrid.cellSize.x / 2f, sceneGrid.cellSize.y / 2f, 0f);
+            hoverHighlightObject.transform.position = cellCorner + cellCenterOffset;
+
+            lastCellPos = cellPos;
+        }
+        else
+        {
+            hoverHighlightObject.SetActive(false);
+            lastCellPos = null;
+        }
+    }
+
+    private void ProcessMouseClick()
+    {
+        // Left-click triggers the tool action
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (!lastCellPos.HasValue)
+                return;
+
+            float distance = Vector2.Distance(transform.position, sceneGrid.CellToWorld(lastCellPos.Value));
+            if (distance > hoverRadius)
+                return; // Just in case
+
+            // Determine current tool from ToolSwitcher
+            ToolType currentTool = toolSwitcher != null ? toolSwitcher.CurrentTool : ToolType.None;
+            if (currentTool == ToolType.None)
+            {
+                Debug.Log("No tool is currently selected; ignoring click.");
+                return;
+            }
+
+            // Call the method in your TileInteractionManager that handles tile actions
+            TileInteractionManager.Instance?.ApplyToolAction(lastCellPos.Value, currentTool);
+        }
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Data\TileInteractionManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Tilemaps;
+using skner.DualGrid;  // from your 3rd-party plugin
+
+public class TileInteractionManager : MonoBehaviour
+{
+    public static TileInteractionManager Instance { get; private set; }
+
+    // Maps e.g. "Grass" -> the DualGridTilemapModule for DataTilemap_Grass
+    private Dictionary<string, DualGridTilemapModule> materialToModule = new Dictionary<string, DualGridTilemapModule>();
+
+    // Map (ToolType, currentMaterial) => newMaterial
+    private Dictionary<(ToolType, string), string> interactionRules 
+        = new Dictionary<(ToolType, string), string>();
+
+    private void Awake()
+    {
+        // Enforce Singleton
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
+        // 1) Gather all DataTilemap_* objects in the scene
+        DualGridTilemapModule[] allTilemaps = FindObjectsOfType<DualGridTilemapModule>();
+        foreach (var module in allTilemaps)
+        {
+            string goName = module.gameObject.name; // e.g. "DataTilemap_Grass"
+            if (goName.StartsWith("DataTilemap_"))
+            {
+                string materialName = goName.Substring("DataTilemap_".Length); 
+                // e.g. "Grass"
+                if (!materialToModule.ContainsKey(materialName))
+                {
+                    materialToModule[materialName] = module;
+                    Debug.Log($"TileInteractionManager: Found tilemap '{materialName}' => {goName}");
+                }
+                else
+                {
+                    Debug.LogWarning($"Duplicate tilemap name for '{materialName}'? {goName}");
+                }
+            }
+        }
+
+        // 2) Define the default rules (Tool, oldMaterial) => newMaterial
+        interactionRules[(ToolType.Hoe, "Grass")] = "Dirt";
+        interactionRules[(ToolType.WateringCan, "Dirt")] = "DirtWet";
+        // You can add more as needed
+
+        Debug.Log("TileInteractionManager initialized.");
+    }
+
+    /// <summary>
+    /// Determines which 'material' (e.g. Grass, Dirt, etc.) is occupying the given cell,
+    /// by checking each Data Tilemap for a tile in that cell.
+    /// </summary>
+    public string GetMaterialAtCell(Vector3Int cellPos)
+    {
+        // Check each known tilemap
+        foreach (var kvp in materialToModule)
+        {
+            Tilemap dataMap = kvp.Value.DataTilemap;
+            if (dataMap.HasTile(cellPos))
+            {
+                // We found a tile in this cell, so that’s presumably the “topmost” material
+                return kvp.Key; // e.g. "Grass"
+            }
+        }
+        return null; // no tile found
+    }
+
+    /// <summary>
+    /// Called to apply e.g. Hoe on Grass => remove tile from Grass, add tile to Dirt.
+    /// </summary>
+    public void ApplyToolAction(Vector3Int cellPos, ToolType tool)
+    {
+        // 1) Identify the current material
+        string presentMaterial = GetMaterialAtCell(cellPos);
+        if (presentMaterial == null)
+        {
+            Debug.Log($"No tile at {cellPos} to interact with.");
+            return;
+        }
+
+        // 2) Look up the result
+        (ToolType, string) lookupKey = (tool, presentMaterial);
+        if (!interactionRules.ContainsKey(lookupKey))
+        {
+            Debug.Log($"No rule for Tool={tool} on Material={presentMaterial}.");
+            return;
+        }
+
+        string targetMaterial = interactionRules[lookupKey];
+
+        // 3) Remove from old tilemap
+        var sourceModule = materialToModule[presentMaterial];
+        sourceModule.DataTilemap.SetTile(cellPos, null);
+
+        // 4) Add to new tilemap (if it exists)
+        if (materialToModule.ContainsKey(targetMaterial))
+        {
+            var destModule = materialToModule[targetMaterial];
+            // Place that module’s tile in the cell
+            destModule.DataTilemap.SetTile(cellPos, destModule.DataTile);
+        }
+        else
+        {
+            Debug.LogWarning($"Material '{targetMaterial}' does not exist as a DataTilemap_{targetMaterial} in the scene.");
+        }
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Tools\ToolSwitcher.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.UI; // only needed if you’re updating an Image for the tool icon
+
+public class ToolSwitcher : MonoBehaviour
+{
+    [Tooltip("Tools in the order we cycle through via Q/E")]
+    public ToolType[] toolsOrder = new ToolType[] { ToolType.Hoe, ToolType.WateringCan };
+
+    [Tooltip("Optional UI image to show the current tool icon")]
+    public Image toolIcon;
+
+    private int currentToolIndex = 0;
+
+    public ToolType CurrentTool { get; private set; } = ToolType.None;
+
+    private void Start()
+    {
+        if (toolsOrder.Length > 0)
+        {
+            currentToolIndex = 0;
+            CurrentTool = toolsOrder[currentToolIndex];
+            UpdateUI();
+        }
+    }
+
+    private void Update()
+    {
+        if (toolsOrder.Length == 0) return;
+
+        // Q = cycle backward
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            currentToolIndex--;
+            if (currentToolIndex < 0)
+                currentToolIndex = toolsOrder.Length - 1;
+
+            CurrentTool = toolsOrder[currentToolIndex];
+            UpdateUI();
+        }
+        // E = cycle forward
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            currentToolIndex++;
+            if (currentToolIndex >= toolsOrder.Length)
+                currentToolIndex = 0;
+
+            CurrentTool = toolsOrder[currentToolIndex];
+            UpdateUI();
+        }
+    }
+
+    void UpdateUI()
+    {
+        // For debugging:
+        Debug.Log($"Switched tool to: {CurrentTool}");
+
+        // If you had an icon system:
+        // if (toolIcon != null)
+        //     toolIcon.sprite = someDictionaryOfSprites[CurrentTool];
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Tools\ToolType.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public enum ToolType
+{
+    None,
+    Hoe,
+    WateringCan,
+    // SeedPouch, etc.
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Visuals\NightColorPostProcess.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
+// Ensure this script is attached to a GameObject in your scene
 public class NightColorPostProcess : MonoBehaviour
 {
-    [Header("References")]
-    public WeatherManager weatherManager;        // Assign your existing WeatherManager
-    public Volume globalVolume;                  // The Volume with the Color Adjustments override
+    [Header("Core References")]
+    [Tooltip("Assign the WeatherManager controlling the day/night cycle.")]
+    public WeatherManager weatherManager;
+    [Tooltip("Assign the Global Post Processing Volume.")]
+    public Volume globalVolume;
 
-    private ColorAdjustments colorAdjustments;   // We'll read/write color filter, post exposure, and saturation
+    // --- Private references to the Volume Overrides ---
+    private ColorAdjustments colorAdjustments;
+    private FilmGrain filmGrain;
+    private Vignette vignette;
+    // private Bloom bloom; // Example if you wanted to add Bloom later
 
-    [Header("Color Settings")]
+    [Header("Color Adjustments")]
     [Tooltip("The color filter at full day (sunIntensity = 1).")]
     public Color dayColorFilter = Color.white;
     [Tooltip("The color filter at full night (sunIntensity ~ 0).")]
     public Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
-
-    [Tooltip("Daytime Post-Exposure (e.g. 0). Higher = brighter.")]
+    [Tooltip("Daytime Post-Exposure (Higher = brighter).")]
     public float dayPostExposure = 0f;
-    [Tooltip("Nighttime Post-Exposure (e.g. -0.5). Lower = darker.")]
+    [Tooltip("Nighttime Post-Exposure (Lower = darker).")]
     public float nightPostExposure = -0.5f;
-
-    [Header("Saturation Settings")]
-    [Tooltip("Saturation at full day (0 means no change).")]
+    [Tooltip("Saturation at full day (0 = no change, <0 desaturates, >0 saturates).")]
     public float daySaturation = 0f;
-    [Tooltip("Saturation at full night (e.g. -50 for more desaturation at night).")]
+    [Tooltip("Saturation at full night (e.g., -50 for more desaturation).")]
     public float nightSaturation = -50f;
+
+    [Header("Film Grain")]
+    [Tooltip("Film grain intensity at full day (0 = none).")]
+    [Range(0f, 1f)] public float dayFilmGrainIntensity = 0.1f;
+    [Tooltip("Film grain intensity at full night (e.g., 0.5 for noticeable grain).")]
+    [Range(0f, 1f)] public float nightFilmGrainIntensity = 0.5f;
+    // Note: You could also control FilmGrain.response if desired
+
+    [Header("Vignette")]
+    [Tooltip("Vignette intensity at full day (0 = none, higher = stronger effect).")]
+    [Range(0f, 1f)] public float dayVignetteIntensity = 0.2f;
+    [Tooltip("Vignette intensity at full night (e.g., 0.5 for darker edges).")]
+    [Range(0f, 1f)] public float nightVignetteIntensity = 0.5f;
+    [Tooltip("Vignette smoothness at full day (higher = softer edge).")]
+    [Range(0.01f, 1f)] public float dayVignetteSmoothness = 0.2f;
+    [Tooltip("Vignette smoothness at full night.")]
+    [Range(0.01f, 1f)] public float nightVignetteSmoothness = 0.3f;
+    // Note: You could also control Vignette.color or Vignette.rounded if desired
+
 
     private void Start()
     {
-        if (!globalVolume)
+        // --- Validate Core References ---
+        if (!weatherManager)
         {
-            Debug.LogWarning("[NightColorPostProcess] No globalVolume assigned!");
+            Debug.LogError($"[{nameof(NightColorPostProcess)}] WeatherManager not assigned!", this);
+            enabled = false; // Disable script if core references are missing
             return;
         }
+        if (!globalVolume)
+        {
+            Debug.LogError($"[{nameof(NightColorPostProcess)}] Global Volume not assigned!", this);
+            enabled = false;
+            return;
+        }
+        if (globalVolume.profile == null)
+        {
+             Debug.LogError($"[{nameof(NightColorPostProcess)}] Global Volume has no profile assigned!", this);
+             enabled = false;
+             return;
+        }
 
-        // Try to get the ColorAdjustments override from the volume's profile
-        if (globalVolume.profile.TryGet<ColorAdjustments>(out var colorAdj))
+        // --- Attempt to Get Volume Overrides ---
+        // It's okay if some aren't found, the Update loop will check for null
+        if (!globalVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments))
         {
-            colorAdjustments = colorAdj;
+            Debug.LogWarning($"[{nameof(NightColorPostProcess)}] ColorAdjustments override not found in Volume profile.", this);
         }
-        else
+        if (!globalVolume.profile.TryGet<FilmGrain>(out filmGrain))
         {
-            Debug.LogWarning("[NightColorPostProcess] No ColorAdjustments override found in the Volume profile!");
+             Debug.LogWarning($"[{nameof(NightColorPostProcess)}] FilmGrain override not found in Volume profile.", this);
         }
+        if (!globalVolume.profile.TryGet<Vignette>(out vignette))
+        {
+             Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Vignette override not found in Volume profile.", this);
+        }
+        // Example for Bloom:
+        // if (!globalVolume.profile.TryGet<Bloom>(out bloom))
+        // {
+        //      Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Bloom override not found in Volume profile.", this);
+        // }
+
+        // --- Ensure Overrides are Active ---
+        // Make sure the overrides you intend to use are actually enabled on the Volume component itself.
+        // You might need to manually check the boxes in the Inspector for ColorAdjustments, FilmGrain, and Vignette.
+        // Alternatively, you could force them active here, but it's usually better to configure in the editor:
+        // if (colorAdjustments != null) colorAdjustments.active = true;
+        // if (filmGrain != null) filmGrain.active = true;
+        // if (vignette != null) vignette.active = true;
     }
 
     private void Update()
     {
-        if (!weatherManager || colorAdjustments == null)
-            return;
-        
-        // Get the sun intensity (0 = night, 1 = day)
+        // No need to check weatherManager, Start() already disables if null
+        // Check if any overrides are available before proceeding
+        if (colorAdjustments == null && filmGrain == null && vignette == null)
+            return; // Nothing to update if no overrides were found
+
+        // Get the sun intensity (0 = night, 1 = day) and calculate interpolation factor t
         float sun = Mathf.Clamp01(weatherManager.sunIntensity);
         float t = 1f - sun;  // t=0 at day, t=1 at night
-        
-        // Lerp the color filter
-        Color finalFilter = Color.Lerp(dayColorFilter, nightColorFilter, t);
-        colorAdjustments.colorFilter.value = finalFilter;
-        
-        // Lerp post exposure
-        float finalExposure = Mathf.Lerp(dayPostExposure, nightPostExposure, t);
-        colorAdjustments.postExposure.value = finalExposure;
-        
-        // Lerp saturation
-        float finalSaturation = Mathf.Lerp(daySaturation, nightSaturation, t);
-        colorAdjustments.saturation.value = finalSaturation;
+
+        // --- Interpolate and Apply Color Adjustments ---
+        if (colorAdjustments != null)
+        {
+            colorAdjustments.colorFilter.value = Color.Lerp(dayColorFilter, nightColorFilter, t);
+            colorAdjustments.postExposure.value = Mathf.Lerp(dayPostExposure, nightPostExposure, t);
+            colorAdjustments.saturation.value = Mathf.Lerp(daySaturation, nightSaturation, t);
+        }
+
+        // --- Interpolate and Apply Film Grain ---
+        if (filmGrain != null)
+        {
+            filmGrain.intensity.value = Mathf.Lerp(dayFilmGrainIntensity, nightFilmGrainIntensity, t);
+            // You can add Lerp for filmGrain.response here if needed
+        }
+
+        // --- Interpolate and Apply Vignette ---
+        if (vignette != null)
+        {
+            vignette.intensity.value = Mathf.Lerp(dayVignetteIntensity, nightVignetteIntensity, t);
+            vignette.smoothness.value = Mathf.Lerp(dayVignetteSmoothness, nightVignetteSmoothness, t);
+             // You can add Lerp for vignette.color or vignette.rounded here if needed
+        }
+
+        // --- Example for Bloom ---
+        // if (bloom != null)
+        // {
+        //     bloom.intensity.value = Mathf.Lerp(dayBloomIntensity, nightBloomIntensity, t);
+        // }
     }
 }
 
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\RuntimeCircleDrawer.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/Debug/RuntimeCircleDrawer.cs
+using UnityEngine;
+
+/// <summary>
+/// Draws a circle outline using a LineRenderer attached to the same GameObject.
+/// Requires a LineRenderer component.
+/// </summary>
+[RequireComponent(typeof(LineRenderer))]
+public class RuntimeCircleDrawer : MonoBehaviour
+{
+    [Range(3, 60)]
+    public int segments = 30; // Number of line segments to approximate the circle
+    public float radius = 1.0f;
+    public float lineWidth = 0.02f;
+    public Color color = Color.yellow;
+    public Material lineMaterial; // Assign the same material used for firefly lines, or a specific one
+
+    private LineRenderer lineRenderer;
+    private bool needsRedraw = true; // Flag to force redraw on first UpdateCircle call or when params change
+    private float currentRadius = -1f; // Store current values to detect changes
+    private Color currentColor = Color.clear;
+
+    void Awake()
+    {
+        lineRenderer = GetComponent<LineRenderer>();
+        if (lineRenderer == null) { // Should not happen with RequireComponent
+            Debug.LogError($"[{gameObject.name}] RuntimeCircleDrawer: Missing required LineRenderer component!");
+            enabled = false; // Disable script if component missing
+            return;
+        }
+        ConfigureLineRendererDefaults();
+        lineRenderer.enabled = false; // Start hidden
+    }
+
+    // Sets initial parameters that don't change often
+    void ConfigureLineRendererDefaults()
+    {
+        lineRenderer.useWorldSpace = false; // Draw relative to this object's transform
+        lineRenderer.loop = true; // Connect the last point to the first
+        lineRenderer.startWidth = lineWidth;
+        lineRenderer.endWidth = lineWidth;
+        lineRenderer.material = lineMaterial;
+
+        // Attempt to match sorting with parent sprite
+        SpriteRenderer parentSprite = GetComponentInParent<SpriteRenderer>();
+        if (parentSprite != null) {
+            lineRenderer.sortingLayerName = parentSprite.sortingLayerName;
+            lineRenderer.sortingOrder = parentSprite.sortingOrder + 1; // Draw slightly in front
+        } else {
+            // Default sorting if no parent sprite found
+            lineRenderer.sortingLayerName = "Default";
+            lineRenderer.sortingOrder = 1;
+        }
+    }
+
+    // Call this method to update the circle's appearance and make it visible
+    public void UpdateCircle(float newRadius, Color newColor)
+    {
+        // Check if parameters have actually changed
+        if (!needsRedraw && Mathf.Approximately(currentRadius, newRadius) && currentColor == newColor)
+        {
+            // Ensure it's enabled if it wasn't already
+             if (!lineRenderer.enabled) lineRenderer.enabled = true;
+            return; // No change needed
+        }
+
+        // Update stored values
+        currentRadius = newRadius;
+        radius = newRadius; // Update public field for potential inspector viewing
+        currentColor = newColor;
+        color = newColor; // Update public field
+
+        // Update LineRenderer appearance settings that might change
+        lineRenderer.startColor = currentColor;
+        lineRenderer.endColor = currentColor;
+        // Update width if you add properties for it too
+        // lineRenderer.startWidth = newWidth;
+        // lineRenderer.endWidth = newWidth;
+
+        DrawCircle(); // Recalculate points
+        lineRenderer.enabled = true; // Ensure it's visible
+        needsRedraw = false; // Mark as drawn
+    }
+
+    // Call this to hide the circle
+    public void HideCircle()
+    {
+        if (lineRenderer != null && lineRenderer.enabled)
+        {
+            lineRenderer.enabled = false;
+            needsRedraw = true; // Needs redraw next time it's shown
+        }
+    }
+
+    void DrawCircle()
+    {
+        if (lineRenderer == null || segments <= 2 || radius <= 0f) {
+            lineRenderer.positionCount = 0; // Clear points if invalid params
+            return;
+        };
+
+        // Only resize array if segment count changes (optimization)
+        if (lineRenderer.positionCount != segments + 1) {
+            lineRenderer.positionCount = segments + 1;
+        }
+
+        float angleStep = 360f / segments;
+        Vector3[] points = new Vector3[segments + 1];
+
+        for (int i = 0; i <= segments; i++)
+        {
+            float currentAngle = Mathf.Deg2Rad * (i * angleStep);
+            float x = Mathf.Cos(currentAngle) * radius;
+            float y = Mathf.Sin(currentAngle) * radius;
+            points[i] = new Vector3(x, y, 0); // Z is 0 for local space relative to transform
+        }
+
+        lineRenderer.SetPositions(points);
+    }
+}
 
 
 

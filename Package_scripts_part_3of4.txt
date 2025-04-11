@@ -1,0 +1,1252 @@
+This document contains extracted Unity C# scripts from my dualgrid 3rd party tilemap package plugin.
+
+================================================================================
+UNITY PROJECT SCRIPT EXPORT - 2025-04-10 23:44:12
+PART 3 OF 4
+================================================================================
+
+--------------------------------------------------------------------------------
+Assets
+├── Animation
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
+├── DefaultVolumeProfile.asset
+├── Editor
+│   ├── NodeDefinitionAutoAdder.cs
+│   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionEditor.cs
+│   ├── NodeDefinitionLibraryEditor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   └── NodeEffectDrawer.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
+├── InputSystem_Actions.inputactions
+├── Materials
+│   ├── BezierCurveAA_Material.mat
+│   └── Firefly_Glow_Material.mat
+├── Post Processing
+├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   ├── Animal_Fox.prefab
+│   │   │   └── FireflyPrefab.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelBerry.prefab
+│   │   │   ├── PixelFlower.prefab
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   └── PlantPrefab.prefab
+│   │   ├── Props
+│   │   │   ├── Poop_Big.prefab
+│   │   │   ├── Poop_Medium_01.prefab
+│   │   │   └── Poop_Medium_02.prefab
+│   │   └── UI
+│   │       ├── EmptySlot16.prefab
+│   │       ├── EmptySlot32.prefab
+│   │       ├── Indicator_Opportunity.prefab
+│   │       ├── Indicator_Resource.prefab
+│   │       ├── Indicator_Threat.prefab
+│   │       ├── NodeCellEmpty16.prefab
+│   │       ├── NodePics
+│   │       │   ├── Seed_01.prefab
+│   │       │   └── Seed_02.prefab
+│   │       ├── NodeView.prefab
+│   │       ├── ThoughtBubble.prefab
+│   │       ├── Visualizer_Circle_Prefab.prefab
+│   │       └── Visualizer_Line_Prefab.prefab
+│   ├── General
+│   │   ├── GardenerPrefab.prefab
+│   │   └── Projectile_Basic_Pixel.prefab
+│   └── Tiles
+│       ├── Common
+│       │   ├── PLains_0_Corner_LT.asset
+│       │   ├── PLains_10.asset
+│       │   ├── PLains_100.asset
+│       │   ├── PLains_101.asset
+│       │   ├── PLains_102.asset
+│       │   ├── PLains_11.asset
+│       │   ├── PLains_12.asset
+│       │   ├── PLains_13.asset
+│       │   ├── PLains_14.asset
+│       │   ├── PLains_15.asset
+│       │   ├── PLains_16.asset
+│       │   ├── PLains_17.asset
+│       │   ├── PLains_18.asset
+│       │   ├── PLains_19.asset
+│       │   ├── PLains_1_T.asset
+│       │   ├── PLains_20.asset
+│       │   ├── PLains_21.asset
+│       │   ├── PLains_22.asset
+│       │   ├── PLains_23.asset
+│       │   ├── PLains_24.asset
+│       │   ├── PLains_25.asset
+│       │   ├── PLains_26.asset
+│       │   ├── PLains_27.asset
+│       │   ├── PLains_28.asset
+│       │   ├── PLains_29.asset
+│       │   ├── PLains_2_Corner_RT.asset
+│       │   ├── PLains_30.asset
+│       │   ├── PLains_31.asset
+│       │   ├── PLains_32.asset
+│       │   ├── PLains_33.asset
+│       │   ├── PLains_34.asset
+│       │   ├── PLains_35.asset
+│       │   ├── PLains_36.asset
+│       │   ├── PLains_37.asset
+│       │   ├── PLains_38.asset
+│       │   ├── PLains_39.asset
+│       │   ├── PLains_3_Single_B.asset
+│       │   ├── PLains_40.asset
+│       │   ├── PLains_41.asset
+│       │   ├── PLains_42.asset
+│       │   ├── PLains_43.asset
+│       │   ├── PLains_44.asset
+│       │   ├── PLains_45.asset
+│       │   ├── PLains_46.asset
+│       │   ├── PLains_47.asset
+│       │   ├── PLains_48.asset
+│       │   ├── PLains_49.asset
+│       │   ├── PLains_4_Single_B.TR.asset
+│       │   ├── PLains_5.asset
+│       │   ├── PLains_50.asset
+│       │   ├── PLains_51.asset
+│       │   ├── PLains_52_Grass_Center.asset
+│       │   ├── PLains_53_Grass_Center.asset
+│       │   ├── PLains_54_Grass_Center.asset
+│       │   ├── PLains_55.asset
+│       │   ├── PLains_56_Grass_Center.asset
+│       │   ├── PLains_57.asset
+│       │   ├── PLains_58.asset
+│       │   ├── PLains_59.asset
+│       │   ├── PLains_6.asset
+│       │   ├── PLains_60.asset
+│       │   ├── PLains_61_Grass_Center.asset
+│       │   ├── PLains_62_Grass_Center.asset
+│       │   ├── PLains_63.asset
+│       │   ├── PLains_64_Grass_Center.asset
+│       │   ├── PLains_65.asset
+│       │   ├── PLains_66.asset
+│       │   ├── PLains_67.asset
+│       │   ├── PLains_68.asset
+│       │   ├── PLains_69.asset
+│       │   ├── PLains_7.asset
+│       │   ├── PLains_70.asset
+│       │   ├── PLains_71.asset
+│       │   ├── PLains_72.asset
+│       │   ├── PLains_73.asset
+│       │   ├── PLains_74.asset
+│       │   ├── PLains_75.asset
+│       │   ├── PLains_76.asset
+│       │   ├── PLains_77.asset
+│       │   ├── PLains_78.asset
+│       │   ├── PLains_79.asset
+│       │   ├── PLains_8.asset
+│       │   ├── PLains_80.asset
+│       │   ├── PLains_81.asset
+│       │   ├── PLains_82.asset
+│       │   ├── PLains_83.asset
+│       │   ├── PLains_84.asset
+│       │   ├── PLains_85.asset
+│       │   ├── PLains_86.asset
+│       │   ├── PLains_87.asset
+│       │   ├── PLains_88.asset
+│       │   ├── PLains_89.asset
+│       │   ├── PLains_9.asset
+│       │   ├── PLains_90.asset
+│       │   ├── PLains_91.asset
+│       │   ├── PLains_92.asset
+│       │   ├── PLains_93.asset
+│       │   ├── PLains_94.asset
+│       │   ├── PLains_95.asset
+│       │   ├── PLains_96.asset
+│       │   ├── PLains_97.asset
+│       │   ├── PLains_98.asset
+│       │   └── PLains_99.asset
+│       ├── Palettes
+│       │   └── PaletteDual_Ground.prefab
+│       └── Rule Tiles
+│           ├── DualGridRuleTile_Dirt.asset
+│           └── DualGridRuleTile_Grass.asset
+├── Scenes
+│   ├── MainScene.unity
+│   ├── SampleScene
+│   │   └── GlobalPostProcessVolume Profile.asset
+│   └── SampleScene.unity
+├── Scriptable Objects
+│   ├── Animals
+│   │   ├── AnimalLibrary.asset
+│   │   └── Animal_000_Bunny.asset
+│   ├── Animals Diet
+│   │   └── Diet_000_Bunny.asset
+│   ├── Food
+│   │   ├── FoodType_000_Berry.asset
+│   │   └── FoodType_000_Leaf.asset
+│   ├── Life Thoughts
+│   │   └── AnimalThoughtLibrary.asset
+│   ├── Nodes Plant
+│   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
+│   │   ├── Node_001_Berry.asset
+│   │   └── Node_002_FireflyPheromone.asset
+│   ├── Scents
+│   │   ├── ScentLibrary.asset
+│   │   └── Scent_000_FireflyPheromone.asset
+│   ├── Tiles
+│   │   ├── TileInteractionLibrary.asset
+│   │   ├── TileTypeDef_000_Grass.asset
+│   │   ├── TileTypeDef_001_Dirt.asset
+│   │   └── TileTypeDef_002_DirtWet.asset
+│   └── Tools
+│       ├── ToolDef_000_Hoe.asset
+│       └── ToolDef_001_WateringCan.asset
+├── Scripts
+│   ├── Battle
+│   │   ├── Plant
+│   │   │   ├── PlantCell.cs
+│   │   │   ├── PlantGrowth.cs
+│   │   │   └── WeatherManager.cs
+│   │   ├── SpellProjectile.cs
+│   │   └── Status Effects
+│   │       ├── BurningStatusEffect.cs
+│   │       └── StatusEffect.cs
+│   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── AnimalDefinition.cs
+│   │   │   └── AnimalLibrary.cs
+│   │   ├── Core
+│   │   │   ├── AnimalController.cs
+│   │   │   ├── AnimalSpawnData.cs
+│   │   │   ├── AnimalThoughtLibrary.cs
+│   │   │   ├── EcosystemManager.cs
+│   │   │   ├── FaunaManager.cs
+│   │   │   ├── FloraManager.cs
+│   │   │   ├── PoopController.cs
+│   │   │   ├── ScentSource.cs
+│   │   │   ├── ThoughtBubbleController.cs
+│   │   │   └── ThoughtTrigger.cs
+│   │   ├── Effects
+│   │   │   ├── FireflyController.cs
+│   │   │   └── FireflyManager.cs
+│   │   ├── Food
+│   │   │   ├── AnimalDiet.cs
+│   │   │   ├── FoodItem.cs
+│   │   │   └── FoodType.cs
+│   │   ├── Plants
+│   │   └── Scents
+│   │       ├── ScentDefinition.cs
+│   │       └── ScentLibrary.cs
+│   ├── Nodes
+│   │   ├── Core
+│   │   │   ├── NodeData.cs
+│   │   │   ├── NodeDefinition.cs
+│   │   │   ├── NodeDefinitionLibrary.cs
+│   │   │   ├── NodeEffectData.cs
+│   │   │   ├── NodeEffectType.cs
+│   │   │   └── OutputNodeEffect.cs
+│   │   ├── Runtime
+│   │   │   ├── NodeExecutor.cs
+│   │   │   └── NodeGraph.cs
+│   │   └── UI
+│   │       ├── ColorExtensions.cs
+│   │       ├── DeselectOnClickOutside.cs
+│   │       ├── NodeCell.cs
+│   │       ├── NodeDraggable.cs
+│   │       ├── NodeEditorGridController.cs
+│   │       ├── NodeSelectable.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
+│   ├── Tiles
+│   │   ├── Data
+│   │   │   ├── TileAction.cs
+│   │   │   ├── TileInteractionLibrary.cs
+│   │   │   ├── TileInteractionManager.cs
+│   │   │   └── TileTypeDefinition.cs
+│   │   └── Tools
+│   │       └── ToolDefinition.cs
+│   ├── UI
+│   └── Visuals
+│       ├── NightColorPostProcess.cs
+│       └── RuntimeCircleDrawer.cs
+├── Settings
+│   ├── Lit2DSceneTemplate.scenetemplate
+│   ├── Renderer2D.asset
+│   ├── Scenes
+│   │   └── URP2DSceneTemplate.unity
+│   └── UniversalRP.asset
+├── Shaders
+│   ├── BezierCurveAA.shader
+│   └── SpriteEmissiveUnlit.shader
+├── TextureImporter.preset
+└── UniversalRenderPipelineGlobalSettings.asset
+--------------------------------------------------------------------------------
+
+SCRIPT CONTENTS
+================================================================================
+
+SCRIPT CONTENTS
+================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Packages\com.skner.dualgrid\Editor\Editors\DualGridTilemapModuleEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using skner.DualGrid.Editor.Extensions;
+using skner.DualGrid.Utils;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Tilemaps;
+
+namespace skner.DualGrid.Editor
+{
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(DualGridTilemapModule))]
+    public class DualGridTilemapModuleEditor : UnityEditor.Editor
+    {
+
+        private static class Styles
+        {
+            public static readonly GUIContent RenderTile = EditorGUIUtility.TrTextContent("Dual Grid Rule Tile", "The Render Tile that will be applied in the Render Tilemap.");
+            public static readonly GUIContent EnableTilemapCollider = EditorGUIUtility.TrTextContent("Enable Tilemap Collider", "If a TilemapCollider2D should be active based on the Dual Grid Rule Tile's default collider type.");
+            public static readonly GUIContent GameObjectOrigin = EditorGUIUtility.TrTextContent("Game Object Origin", "Determines which tilemap the GameObjects defined in the Dual Grid Rule Tile should be in.");
+        }
+
+        private DualGridTilemapModule _targetDualGridTilemapModule;
+
+        private bool _hasMultipleTargets = false;
+        private List<DualGridTilemapModule> _targetDualGridTilemapModules = new();
+
+        private bool _showDataTileBoundaries = false;
+
+        private bool _showRenderTileBoundaries = false;
+        private bool _showRenderTileConnections = false;
+
+        public static Grid CreateNewDualGrid()
+        {
+            var newDualGrid = new GameObject("Dual Grid");
+            return newDualGrid.AddComponent<Grid>();
+        }
+
+        public static DualGridTilemapModule CreateNewDualGridTilemap(Grid grid = null)
+        {
+            if (grid == null) grid = CreateNewDualGrid();
+
+            var newDataTilemap = new GameObject("DataTilemap");
+            newDataTilemap.AddComponent<Tilemap>();
+            var dualGridTilemapModule = newDataTilemap.AddComponent<DualGridTilemapModule>();
+            newDataTilemap.transform.parent = grid.transform;
+
+            InitializeRenderTilemap(dualGridTilemapModule);
+
+            return dualGridTilemapModule;
+        }
+
+        private void OnEnable()
+        {
+            _targetDualGridTilemapModule = (DualGridTilemapModule)target;
+
+            _hasMultipleTargets = targets.Length > 1;
+
+            if (_hasMultipleTargets) _targetDualGridTilemapModules = targets.Cast<DualGridTilemapModule>().ToList();
+            else _targetDualGridTilemapModules = new List<DualGridTilemapModule>() { target as DualGridTilemapModule };
+
+            _targetDualGridTilemapModules.ForEach(dualGridTilemapModule => InitializeRenderTilemap(dualGridTilemapModule));
+        }
+
+        private static void InitializeRenderTilemap(DualGridTilemapModule dualGridTilemapModule)
+        {
+            if (dualGridTilemapModule == null) return;
+
+            if (dualGridTilemapModule.RenderTilemap == null)
+            {
+                CreateRenderTilemapObject(dualGridTilemapModule);
+            }
+
+            DestroyTilemapRendererInDataTilemap(dualGridTilemapModule);
+            UpdateTilemapColliderComponents(dualGridTilemapModule);
+        }
+
+        internal static GameObject CreateRenderTilemapObject(DualGridTilemapModule targetModule)
+        {
+            var renderTilemapObject = new GameObject("RenderTilemap");
+            renderTilemapObject.transform.parent = targetModule.transform;
+            renderTilemapObject.transform.localPosition = new Vector3(-0.5f, -0.5f, 0f); // Offset by half a tile (TODO: Confirm if tiles can have different dynamic sizes, this might not work under those conditions)
+
+            renderTilemapObject.AddComponent<Tilemap>();
+            renderTilemapObject.AddComponent<TilemapRenderer>();
+
+            return renderTilemapObject;
+        }
+
+        private static void DestroyTilemapRendererInDataTilemap(DualGridTilemapModule dualGridTilemapModule)
+        {
+            TilemapRenderer renderer = dualGridTilemapModule.GetComponent<TilemapRenderer>();
+            DestroyComponentIfExists(renderer, "Dual Grid Tilemaps cannot have TilemapRenderers in the same GameObject. TilemapRenderer has been destroyed.");
+        }
+
+        internal static void UpdateTilemapColliderComponents(DualGridTilemapModule dualGridTilemapModule, bool shouldLogWarnings = true)
+        {
+            TilemapCollider2D tilemapColliderFromDataTilemap = dualGridTilemapModule.DataTilemap.GetComponent<TilemapCollider2D>();
+            TilemapCollider2D tilemapColliderFromRenderTilemap = dualGridTilemapModule.RenderTilemap.GetComponent<TilemapCollider2D>();
+
+            string warningMessage;
+            if (dualGridTilemapModule.EnableTilemapCollider == false)
+            {
+                warningMessage = "Dual Grid Tilemaps cannot have Tilemap Colliders 2D if not enabled in Dual Grid Tilemap Module.";
+                DestroyComponentIfExists(tilemapColliderFromDataTilemap, shouldLogWarnings ? warningMessage : null);
+                DestroyComponentIfExists(tilemapColliderFromRenderTilemap, shouldLogWarnings ? warningMessage : null);
+                return;
+            }
+
+            switch (dualGridTilemapModule.DataTile.colliderType)
+            {
+                case Tile.ColliderType.None:
+                    warningMessage = "Dual Grid Tilemaps cannot have Tilemap Colliders 2D if Dual Grid Tile has collider type set to none.";
+                    DestroyComponentIfExists(tilemapColliderFromDataTilemap, shouldLogWarnings ? warningMessage : null);
+                    DestroyComponentIfExists(tilemapColliderFromRenderTilemap, shouldLogWarnings ? warningMessage : null);
+                    break;
+                case Tile.ColliderType.Sprite:
+                    warningMessage = "Dual Grid Tilemaps cannot have Tilemap Colliders 2D in the Data Tilemap if Dual Grid Tile has collider type set to Sprite.";
+                    DestroyComponentIfExists(tilemapColliderFromDataTilemap, shouldLogWarnings ? warningMessage : null);
+                    if (tilemapColliderFromRenderTilemap == null) dualGridTilemapModule.RenderTilemap.gameObject.AddComponent<TilemapCollider2D>();
+                    break;
+                case Tile.ColliderType.Grid:
+                    warningMessage = "Dual Grid Tilemaps cannot have Tilemap Colliders 2D in the Render Tilemap if Dual Grid Tile has collider type set to Grid.";
+                    if (tilemapColliderFromDataTilemap == null) dualGridTilemapModule.DataTilemap.gameObject.AddComponent<TilemapCollider2D>();
+                    DestroyComponentIfExists(tilemapColliderFromRenderTilemap, shouldLogWarnings ? warningMessage : null);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private static void DestroyComponentIfExists(Component component, string warningMessage = null)
+        {
+            if (component != null)
+            {
+                if (warningMessage != null)
+                    Debug.LogWarning(warningMessage);
+
+                DestroyImmediate(component);
+            }
+        }
+
+        public override void OnInspectorGUI()
+        {
+            if (_hasMultipleTargets) Undo.RecordObjects(_targetDualGridTilemapModules.ToArray(), $"Updated {_targetDualGridTilemapModules.Count} Dual Grid Tilemap Modules");
+            else Undo.RecordObject(_targetDualGridTilemapModule, $"Updated '{_targetDualGridTilemapModule.name}' Dual Grid Rule Tile");
+
+            EditorGUI.BeginChangeCheck();
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.showMixedValue = _hasMultipleTargets && _targetDualGridTilemapModules.HasDifferentValues(dualGridTilemapModule => dualGridTilemapModule.RenderTile);
+            var renderTile = EditorGUILayout.ObjectField(Styles.RenderTile, _targetDualGridTilemapModule.RenderTile, typeof(DualGridRuleTile), false) as DualGridRuleTile;
+            if (EditorGUI.EndChangeCheck())
+            {
+                foreach(var dualGridTilemapModule in _targetDualGridTilemapModules)
+                {
+                    dualGridTilemapModule.RenderTile = renderTile;
+                    dualGridTilemapModule.DataTilemap.RefreshAllTiles();
+                    dualGridTilemapModule.RefreshRenderTilemap();
+                }
+            }
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.showMixedValue = _hasMultipleTargets && _targetDualGridTilemapModules.HasDifferentValues(dualGridTilemapModule => dualGridTilemapModule.EnableTilemapCollider);
+            var enableTilemapCollider = EditorGUILayout.Toggle(Styles.EnableTilemapCollider, _targetDualGridTilemapModule.EnableTilemapCollider);
+            if (EditorGUI.EndChangeCheck())
+            {
+                foreach (var dualGridTilemapModule in _targetDualGridTilemapModules)
+                {
+                    dualGridTilemapModule.EnableTilemapCollider = enableTilemapCollider;
+                    UpdateTilemapColliderComponents(dualGridTilemapModule, shouldLogWarnings: false);
+                }
+            }
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.showMixedValue = _hasMultipleTargets && _targetDualGridTilemapModules.HasDifferentValues(dualGridTilemapModule => dualGridTilemapModule.GameObjectOrigin);
+            var gameObjectOrigin = (GameObjectOrigin)EditorGUILayout.EnumPopup(Styles.GameObjectOrigin, _targetDualGridTilemapModule.GameObjectOrigin);
+            if (EditorGUI.EndChangeCheck())
+            {
+                foreach (var dualGridTilemapModule in _targetDualGridTilemapModules)
+                {
+                    dualGridTilemapModule.GameObjectOrigin = gameObjectOrigin;
+                    dualGridTilemapModule.DataTilemap.RefreshAllTiles();
+                    dualGridTilemapModule.RefreshRenderTilemap();
+                }
+            }
+
+            GUILayout.Space(5);
+            GUILayout.Label("Tools", EditorStyles.boldLabel);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                EditorUtility.SetDirty(_targetDualGridTilemapModule);
+            }
+
+            EditorGUI.BeginChangeCheck();
+            GUILayout.Label("Visualization Handles", EditorStyles.boldLabel);
+            _showDataTileBoundaries = EditorGUILayout.Toggle("Data Tile Boundaries", _showDataTileBoundaries);
+            _showRenderTileBoundaries = EditorGUILayout.Toggle("Render Tile Boundaries", _showRenderTileBoundaries);
+            _showRenderTileConnections = EditorGUILayout.Toggle("Render Tile Connections", _showRenderTileConnections);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                SceneView.RepaintAll();
+            }
+        }
+
+        private void OnSceneGUI()
+        {
+            foreach (var dualGridTilemapModule in _targetDualGridTilemapModules)
+            {
+                DrawDataTileHandles(dualGridTilemapModule);
+                DrawRenderTileHandles(dualGridTilemapModule);
+            }
+        }
+
+        private void DrawDataTileHandles(DualGridTilemapModule dualGridTilemapModule)
+        {
+            if (!_showDataTileBoundaries) return;
+
+            foreach (var position in dualGridTilemapModule.DataTilemap.cellBounds.allPositionsWithin)
+            {
+                if (!dualGridTilemapModule.DataTilemap.HasTile(position)) continue;
+
+                Vector3 tileCenter = dualGridTilemapModule.DataTilemap.GetCellCenterWorld(position);
+
+                Handles.color = Color.green;
+                DrawTileBoundaries(dualGridTilemapModule.DataTilemap, tileCenter, thickness: 3);
+            }
+        }
+
+        private void DrawRenderTileHandles(DualGridTilemapModule dualGridTilemapModule)
+        {
+            if (!_showRenderTileBoundaries && !_showRenderTileConnections) return;
+
+            foreach (var renderTilePosition in dualGridTilemapModule.RenderTilemap.cellBounds.allPositionsWithin)
+            {
+                if (!dualGridTilemapModule.RenderTilemap.HasTile(renderTilePosition)) continue;
+
+                Vector3 tileCenter = dualGridTilemapModule.RenderTilemap.GetCellCenterWorld(renderTilePosition);
+
+                Handles.color = Color.yellow;
+                if (_showRenderTileBoundaries) DrawTileBoundaries(dualGridTilemapModule.RenderTilemap, tileCenter, thickness: 1);
+
+                Handles.color = Color.red;
+                if (_showRenderTileConnections) DrawRenderTileConnections(dualGridTilemapModule.DataTilemap, dualGridTilemapModule.RenderTilemap, renderTilePosition, tileCenter);
+            }
+        }
+
+        private static void DrawTileBoundaries(Tilemap tilemap, Vector3 tileCenter, float thickness)
+        {
+            if (tilemap == null) return;
+
+            Handles.DrawSolidDisc(tileCenter, Vector3.forward, radius: 0.05f);
+
+            Vector3 topLeft = tileCenter + new Vector3(-tilemap.cellSize.x / 2, tilemap.cellSize.y / 2, 0);
+            Vector3 topRight = tileCenter + new Vector3(tilemap.cellSize.x / 2, tilemap.cellSize.y / 2, 0);
+            Vector3 bottomLeft = tileCenter + new Vector3(-tilemap.cellSize.x / 2, -tilemap.cellSize.y / 2, 0);
+            Vector3 bottomRight = tileCenter + new Vector3(tilemap.cellSize.x / 2, -tilemap.cellSize.y / 2, 0);
+
+            Handles.DrawLine(topLeft, topRight, thickness);
+            Handles.DrawLine(topRight, bottomRight, thickness);
+            Handles.DrawLine(bottomRight, bottomLeft, thickness);
+            Handles.DrawLine(bottomLeft, topLeft, thickness);
+        }
+
+        private static void DrawRenderTileConnections(Tilemap dataTilemap, Tilemap renderTilemap, Vector3Int renderTilePosition, Vector3 tileCenter)
+        {
+            if (dataTilemap == null || renderTilemap == null) return;
+
+            Vector3Int[] dataTilemapPositions = DualGridUtils.GetDataTilePositions(renderTilePosition);
+
+            foreach (Vector3Int dataTilePosition in dataTilemapPositions)
+            {
+                if (dataTilemap.HasTile(dataTilePosition))
+                {
+                    Vector3Int dataTileOffset = dataTilePosition - renderTilePosition;
+                    Vector3Int neighborOffset = DualGridUtils.ConvertDataTileOffsetToNeighborOffset(dataTileOffset);
+
+                    Vector3 corner = tileCenter + new Vector3(neighborOffset.x * renderTilemap.cellSize.x * 0.3f, neighborOffset.y * renderTilemap.cellSize.y * 0.3f, 0f);
+
+                    DrawArrow(tileCenter, corner);
+                }
+            }
+
+            static void DrawArrow(Vector3 start, Vector3 end, float arrowHeadLength = 0.15f, float arrowHeadAngle = 30f)
+            {
+                // Draw the main line
+                Handles.DrawLine(start, end);
+
+                // Calculate direction of the line
+                Vector3 direction = (end - start).normalized;
+
+                // Calculate the points for the arrowhead
+                Vector3 right = Quaternion.Euler(0, 0, arrowHeadAngle) * -direction;
+                Vector3 left = Quaternion.Euler(0, 0, -arrowHeadAngle) * -direction;
+
+                // Draw the arrowhead lines
+                Handles.DrawLine(end, end + right * arrowHeadLength);
+                Handles.DrawLine(end, end + left * arrowHeadLength);
+            }
+        }
+
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Packages\com.skner.dualgrid\Editor\Editors\RestrictedTilemapEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using skner.DualGrid.Extensions;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Tilemaps;
+
+namespace skner.DualGrid.Editor
+{
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(Tilemap))]
+    public class RestrictedTilemapEditor : UnityEditor.Editor
+    {
+
+        private bool showInfoFoldout = true;
+
+        public override void OnInspectorGUI()
+        {
+            Tilemap tilemap = (Tilemap)target;
+
+            SerializedProperty animationFrameRate = serializedObject.FindProperty("m_AnimationFrameRate");
+            SerializedProperty color = serializedObject.FindProperty("m_Color");
+
+            EditorGUILayout.PropertyField(animationFrameRate, new GUIContent("Animation Frame Rate"));
+            EditorGUILayout.PropertyField(color, new GUIContent("Color"));
+
+            // Check if the Tilemap is part of a DualGridTilemapModule
+            bool isRenderTilemap = tilemap.GetComponentInImmediateParent<DualGridTilemapModule>() != null;
+            if (isRenderTilemap)
+            {
+                GUILayout.Space(2);
+                EditorGUILayout.HelpBox("Editing the position and orientation of a RenderTilemap is restricted.", MessageType.Info);
+                GUILayout.Space(2);
+            }
+
+            using (new EditorGUI.DisabledScope(isRenderTilemap))
+            {
+                EditorGUILayout.Vector3Field("Tile Anchor", tilemap.tileAnchor);
+                EditorGUILayout.EnumPopup("Orientation", tilemap.orientation);
+            }
+
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUILayout.Vector3Field("Offset", tilemap.tileAnchor);
+                EditorGUILayout.Vector3Field("Rotation", tilemap.transform.rotation.eulerAngles);
+                EditorGUILayout.Vector3Field("Scale", tilemap.transform.localScale);
+
+                showInfoFoldout = EditorGUILayout.Foldout(showInfoFoldout, "Info");
+                if (showInfoFoldout)
+                {
+                    DisplayTilemapInfo(tilemap);
+                }
+            }
+
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void DisplayTilemapInfo(Tilemap tilemap)
+        {
+            TileBase[] uniqueTiles = GetUniqueTilesFromTilemap(tilemap);
+            Sprite[] uniqueSprites = GetUniqueSpritesFromTilemap(tilemap);
+
+            // Display unique tiles
+            EditorGUILayout.LabelField("Tiles", EditorStyles.boldLabel);
+            foreach (var tile in uniqueTiles)
+            {
+                EditorGUILayout.ObjectField(tile, typeof(TileBase), false);
+            }
+
+            // Display unique sprites
+            EditorGUILayout.LabelField("Sprites", EditorStyles.boldLabel);
+            foreach (var sprite in uniqueSprites)
+            {
+                EditorGUILayout.ObjectField(sprite, typeof(Sprite), false);
+            }
+        }
+
+        private TileBase[] _usedTilesCache;
+        private TileBase[] GetUniqueTilesFromTilemap(Tilemap tilemap)
+        {
+            int usedTilesCount = tilemap.GetUsedTilesCount();
+            if (_usedTilesCache == null || _usedTilesCache.Length != usedTilesCount)
+            {
+                _usedTilesCache = new TileBase[usedTilesCount];
+            }
+            tilemap.GetUsedTilesNonAlloc(_usedTilesCache);
+
+            return _usedTilesCache;
+        }
+
+        private Sprite[] _usedSpritesCache;
+        private Sprite[] GetUniqueSpritesFromTilemap(Tilemap tilemap)
+        {
+            int usedSpritesCount = tilemap.GetUsedSpritesCount();
+            if (_usedSpritesCache == null || _usedSpritesCache.Length != usedSpritesCount)
+            {
+                _usedSpritesCache = new Sprite[usedSpritesCount];
+            }
+            tilemap.GetUsedSpritesNonAlloc(_usedSpritesCache);
+
+            return _usedSpritesCache;
+        }
+
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Packages\com.skner.dualgrid\Editor\Editors\RestrictedTransformEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using skner.DualGrid.Extensions;
+using UnityEditor;
+using UnityEngine;
+
+namespace skner.DualGrid.Editor
+{
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(Transform))]
+    public class RestrictedTransformEditor : UnityEditor.Editor
+    {
+
+        public override void OnInspectorGUI()
+        {
+            Transform transform = (Transform)target;
+
+            // Check if this transform is from the RenderTilemap of a DualGridTilemapModule
+            if (transform.GetComponentInImmediateParent<DualGridTilemapModule>() != null)
+            {
+                EditorGUILayout.HelpBox($"Editing is disabled on a RenderTilemap. The transform is managed by the {nameof(DualGridTilemapModule)}.", MessageType.Info);
+                GUI.enabled = false;
+                DrawDefaultInspector();
+                GUI.enabled = true;
+            }
+            else
+            {
+                DrawDefaultInspector();
+            }
+        }
+
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Packages\com.skner.dualgrid\Editor\Extensions\CollectionExtensions.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace skner.DualGrid.Editor.Extensions
+{
+    public static class CollectionExtensions
+    {
+
+        /// <summary>
+        /// Checks if the values of a specific field differ among items in the collection.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TField"></typeparam>
+        /// <param name="collection"></param>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public static bool HasDifferentValues<T, TField>(this IEnumerable<T> collection, Func<T, TField> selector)
+        {
+            if (collection == null || !collection.Any())
+                return false;
+
+            var firstValue = selector(collection.First());
+
+            return collection.Skip(1).Any(item => !EqualityComparer<TField>.Default.Equals(selector(item), firstValue));
+        }
+
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Packages\com.skner.dualgrid\Editor\Extensions\DualGridRuleTileExtensions.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+
+namespace skner.DualGrid.Editor.Extensions
+{
+    public static class DualGridRuleTileExtensions
+    {
+
+        /// <summary>
+        /// Applies the provided <paramref name="texture"/> to the <paramref name="dualGridRuleTile"/>.
+        /// <para></para>
+        /// If the texture is split in 16x sprites, an automatic rule tiling prompt will follow.
+        /// <para></para>
+        /// Otherwise, the texture is incompatible and will not be applied, displaying a warning popup.
+        /// </summary>
+        /// <param name="dualGridRuleTile"></param>
+        /// <param name="texture"></param>
+        /// <param name="ignoreAutoSlicePrompt"></param>
+        /// <returns><see langword="true"/> if the texture was applied, <see langword="false"/> otherwise.</returns>
+        public static bool TryApplyTexture2D(this DualGridRuleTile dualGridRuleTile, Texture2D texture, bool ignoreAutoSlicePrompt = false)
+        {
+            List<Sprite> sprites = texture.GetSplitSpritesFromTexture().OrderBy(sprite =>
+            {
+                var exception = new InvalidOperationException($"Cannot perform automatic tiling because sprite name '{sprite.name}' is not standardized. It must end with a '_' and a number. Example: 'tile_9'");
+
+                var spriteNumberString = sprite.name.Split("_").LastOrDefault() ?? throw exception;
+                bool wasParseSuccessful = int.TryParse(spriteNumberString, out int spriteNumber);
+
+                if (wasParseSuccessful) return spriteNumber;
+                else throw exception;
+            }).ToList();
+
+            bool isTextureSlicedIn16Pieces = sprites.Count == 16;
+
+            if (isTextureSlicedIn16Pieces)
+            {
+                bool shouldAutoSlice = ignoreAutoSlicePrompt || EditorUtility.DisplayDialog("16x Sliced Texture Detected",
+                    "The selected texture is sliced in 16 pieces. Perform automatic rule tiling?", "Yes", "No");
+
+                dualGridRuleTile.OriginalTexture = texture;
+                ApplySprites(ref dualGridRuleTile, sprites);
+
+                if (shouldAutoSlice)
+                    AutoDualGridRuleTileProvider.ApplyConfigurationPreset(ref dualGridRuleTile);
+
+                return true;
+            }
+            else
+            {
+                EditorUtility.DisplayDialog($"{dualGridRuleTile.name} - Incompatible Texture Detected", "The selected texture is not sliced in 16 pieces.\nTexture will not be applied.", "Ok");
+                return false;
+            }
+        }
+
+        private static void ApplySprites(ref DualGridRuleTile dualGridRuleTile, List<Sprite> sprites)
+        {
+            dualGridRuleTile.m_DefaultSprite = sprites.FirstOrDefault();
+            dualGridRuleTile.m_TilingRules.Clear();
+
+            foreach (Sprite sprite in sprites)
+            {
+                AddNewTilingRuleFromSprite(ref dualGridRuleTile, sprite);
+            }
+        }
+
+        private static void AddNewTilingRuleFromSprite(ref DualGridRuleTile tile, Sprite sprite)
+        {
+            tile.m_TilingRules.Add(new DualGridRuleTile.TilingRule() { m_Sprites = new Sprite[] { sprite }, m_ColliderType = UnityEngine.Tilemaps.Tile.ColliderType.None });
+        }
+
+        /// <summary>
+        /// Returns a sorted list of <see cref="Sprite"/>s from a provided <paramref name="texture"/>.
+        /// </summary>
+        /// <param name="texture"></param>
+        /// <returns></returns>
+        public static List<Sprite> GetSplitSpritesFromTexture(this Texture2D texture)
+        {
+            string path = AssetDatabase.GetAssetPath(texture);
+            return AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>().ToList();
+        }
+
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Packages\com.skner.dualgrid\Editor\Extensions\DualGridTilemapModuleExtensions.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using skner.DualGrid.Utils;
+using UnityEngine;
+using UnityEngine.Tilemaps;
+
+namespace skner.DualGrid.Editor.Extensions
+{
+    public static class DualGridTilemapModuleExtensions
+    {
+
+        public static void SetEditorPreviewTile(this DualGridTilemapModule dualGridTilemapModule, Vector3Int position, TileBase tile)
+        {
+            dualGridTilemapModule.DataTilemap.SetEditorPreviewTile(position, tile);
+            dualGridTilemapModule.UpdatePreviewRenderTiles(position);
+        }
+
+        public static void ClearEditorPreviewTile(this DualGridTilemapModule dualGridTilemapModule, Vector3Int position)
+        {
+            dualGridTilemapModule.DataTilemap.SetEditorPreviewTile(position, null);
+            dualGridTilemapModule.UpdatePreviewRenderTiles(position);
+        }
+
+        public static void UpdatePreviewRenderTiles(this DualGridTilemapModule dualGridTilemapModule, Vector3Int previewDataTilePosition)
+        {
+            bool hasPreviewDataTile = dualGridTilemapModule.DataTilemap.HasEditorPreviewTile(previewDataTilePosition);
+            bool isPreviewDataTileVisible = dualGridTilemapModule.DataTilemap.GetEditorPreviewTile<DualGridPreviewTile>(previewDataTilePosition) is DualGridPreviewTile previewTile && previewTile.IsFilled;
+
+            foreach (Vector3Int renderTilePosition in DualGridUtils.GetRenderTilePositions(previewDataTilePosition))
+            {
+                if (hasPreviewDataTile && isPreviewDataTileVisible)
+                {
+                    SetPreviewRenderTile(dualGridTilemapModule, renderTilePosition);
+                }
+                else
+                {
+                    UnsetPreviewRenderTile(dualGridTilemapModule, renderTilePosition);
+                }
+            }
+        }
+
+        public static void UpdateAllPreviewRenderTiles(this DualGridTilemapModule dualGridTilemapModule)
+        {
+            foreach (var position in dualGridTilemapModule.DataTilemap.cellBounds.allPositionsWithin)
+            {
+                dualGridTilemapModule.UpdatePreviewRenderTiles(position);
+            }
+        }
+
+        public static void ClearAllPreviewTiles(this DualGridTilemapModule dualGridTilemapModule)
+        {
+            dualGridTilemapModule.DataTilemap.ClearAllEditorPreviewTiles();
+            dualGridTilemapModule.RenderTilemap.ClearAllEditorPreviewTiles();
+        }
+
+        private static void SetPreviewRenderTile(DualGridTilemapModule dualGridTilemapModule, Vector3Int previewRenderTilePosition)
+        {
+            dualGridTilemapModule.RenderTilemap.SetEditorPreviewTile(previewRenderTilePosition, dualGridTilemapModule.RenderTile);
+            dualGridTilemapModule.RenderTilemap.RefreshTile(previewRenderTilePosition);
+        }
+
+        private static void UnsetPreviewRenderTile(DualGridTilemapModule dualGridTilemapModule, Vector3Int previewRenderTilePosition)
+        {
+            dualGridTilemapModule.RenderTilemap.SetEditorPreviewTile(previewRenderTilePosition, null);
+            dualGridTilemapModule.RenderTilemap.RefreshTile(previewRenderTilePosition);
+        }
+
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Packages\com.skner.dualgrid\Editor\Menus\DualGridRuleTileMenu.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using skner.DualGrid.Editor.Extensions;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
+
+namespace skner.DualGrid.Editor
+{
+    public static class DualGridRuleTileMenu
+    {
+
+        [MenuItem("Assets/Create/2D/Tiles/Dual Grid Rule Tile", false, 50)]
+        private static void CreateDualGridRuleTile()
+        {
+            bool isSelectedObjectTexture2d = TryGetSelectedTexture2D(out Texture2D selectedTexture);
+
+            DualGridRuleTile newRuleTile = ScriptableObject.CreateInstance<DualGridRuleTile>();
+
+            if (isSelectedObjectTexture2d)
+            {
+                bool wasTextureApplied = newRuleTile.TryApplyTexture2D(selectedTexture);
+                if (!wasTextureApplied) return;
+            }
+
+            string activeAssetPath = AssetDatabase.GetAssetPath(Selection.activeObject);
+            string assetName = isSelectedObjectTexture2d ? selectedTexture.name + "_DualGridRuleTile.asset" : "DualGridRuleTile.asset";
+            string assetPath = Path.Combine(AssetDatabase.IsValidFolder(activeAssetPath) ? activeAssetPath : Path.GetDirectoryName(activeAssetPath), assetName);
+
+            AssetDatabase.CreateAsset(newRuleTile, AssetDatabase.GenerateUniqueAssetPath(assetPath));
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            Selection.activeObject = newRuleTile;
+        }
+
+        private static bool TryGetSelectedTexture2D(out Texture2D selectedTexture2d)
+        {
+            if (Selection.activeObject is Texture2D texture2d)
+            {
+                selectedTexture2d = texture2d;
+                return true;
+            }
+            else
+            {
+                selectedTexture2d = null;
+                return false;
+            }
+        }
+
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Packages\com.skner.dualgrid\Editor\Menus\DualGridTilemapMenu.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEditor;
+using UnityEngine;
+
+namespace skner.DualGrid.Editor
+{
+    public static class DualGridTilemapMenu
+    {
+
+        [MenuItem("GameObject/2D Object/Tilemap/Dual Grid Tilemap ", false, 0)]
+        private static void CreateDualGridTilemapMenu()
+        {
+            Grid selectedGrid = Selection.activeGameObject?.GetComponent<Grid>();
+
+            var newDualGridTilemapModule = DualGridTilemapModuleEditor.CreateNewDualGridTilemap(selectedGrid);
+
+            Selection.activeGameObject = newDualGridTilemapModule.gameObject;
+        }
+
+    }
+}
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Packages\com.skner.dualgrid\Runtime\Components\DualGridTilemapModule.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using skner.DualGrid.Extensions;
+using skner.DualGrid.Utils;
+using UnityEngine;
+using UnityEngine.Tilemaps;
+
+namespace skner.DualGrid
+{
+    public enum GameObjectOrigin { None, DataTilemap, RenderTilemap }
+
+    [RequireComponent(typeof(Tilemap))]
+    [DisallowMultipleComponent]
+    /// <summary>
+    /// A module to be added that converts a <see cref="Tilemap"/> into a Dual Grid Tilemap.
+    /// </summary>
+    /// <remarks>
+    /// This module only guarantees the continuous update of the render tilemap, for data tilemap changes.
+    /// <para></para>
+    /// Editor logic is kept in the associated editor script.
+    /// </remarks>
+    public class DualGridTilemapModule : MonoBehaviour
+    {
+        [SerializeField]
+        private DualGridRuleTile _renderTile;
+        public DualGridRuleTile RenderTile { get => _renderTile; internal set => _renderTile = value; }
+
+        public DualGridDataTile DataTile => RenderTile.DataTile;
+
+        [SerializeField]
+        private bool _enableTilemapCollider = false;
+        public bool EnableTilemapCollider { get => _enableTilemapCollider; internal set => _enableTilemapCollider = value; }
+
+        [SerializeField]
+        private GameObjectOrigin _gameObjectOrigin = GameObjectOrigin.None;
+        public GameObjectOrigin GameObjectOrigin { get => _gameObjectOrigin; internal set => _gameObjectOrigin = value; }
+
+        private Tilemap _dataTilemap;
+        public Tilemap DataTilemap
+        {
+            get
+            {
+                if (_dataTilemap == null) _dataTilemap = GetComponent<Tilemap>();
+                return _dataTilemap;
+            }
+        }
+
+        private Tilemap _renderTilemap;
+        public Tilemap RenderTilemap
+        {
+            get
+            {
+                if (_renderTilemap == null) _renderTilemap = transform.GetComponentInImmediateChildren<Tilemap>();
+                return _renderTilemap;
+            }
+        }
+
+        private void Awake()
+        {
+            if (_dataTilemap == null) _dataTilemap = GetComponent<Tilemap>();
+            if (_renderTilemap == null) _renderTilemap = transform.GetComponentInImmediateChildren<Tilemap>();
+        }
+
+        private void OnEnable()
+        {
+            Tilemap.tilemapTileChanged += HandleTilemapChange;
+        }
+
+        private void OnDisable()
+        {
+            Tilemap.tilemapTileChanged -= HandleTilemapChange;
+        }
+
+        /// <summary>
+        /// For each updated tile in the <see cref="DataTilemap"/>, update the <see cref="RenderTilemap"/>.
+        /// </summary>
+        /// <param name="tilemap"></param>
+        /// <param name="tileChanges"></param>
+        internal void HandleTilemapChange(Tilemap tilemap, Tilemap.SyncTile[] tileChanges)
+        {
+            if (tilemap == DataTilemap)
+            {
+                if (RenderTile == null)
+                {
+                    Debug.LogError($"Cannot update render tilemap, because tile is not set in dual grid module.", RenderTilemap);
+                    return;
+                }
+
+                foreach (Tilemap.SyncTile tileChange in tileChanges)
+                {
+                    RefreshRenderTiles(tileChange.position);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fully refreshes the <see cref="RenderTilemap"/> by forcing an update from all tiles in the <see cref="DataTilemap"/>.
+        /// </summary>
+        public virtual void RefreshRenderTilemap()
+        {
+            if (RenderTile == null)
+            {
+                Debug.LogError($"Cannot refresh render tilemap, because tile is not set in dual grid module.", RenderTilemap);
+                return;
+            }
+
+            RenderTilemap.ClearAllTiles();
+            foreach (var position in DataTilemap.cellBounds.allPositionsWithin)
+            {
+                if (DataTilemap.HasTile(position))
+                {
+                    DataTilemap.SetTile(position, DataTile);
+                    RefreshRenderTiles(position);
+                }
+            }
+        }
+
+        public virtual void RefreshRenderTiles(Vector3Int dataTilePosition)
+        {
+            bool hasDataTile = DataTilemap.HasTile(dataTilePosition);
+
+            foreach (Vector3Int renderTilePosition in DualGridUtils.GetRenderTilePositions(dataTilePosition))
+            {
+                if (hasDataTile)
+                {
+                    SetRenderTile(renderTilePosition);
+                }
+                else
+                {
+                    UnsetRenderTile(renderTilePosition);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Refreshes the <see cref="DataTile"/> with this <see cref="RenderTile"/>'s configuration.
+        /// </summary>
+        /// <returns>The refreshed data tile.</returns>
+        public virtual DualGridDataTile GenerateDataTile()
+        {
+            var dataTile = ScriptableObject.CreateInstance<DualGridDataTile>();
+
+            dataTile.name = RenderTile.name;
+            dataTile.colliderType = RenderTile.m_DefaultColliderType;
+            dataTile.gameObject = RenderTile.m_DefaultGameObject;
+
+            return dataTile;
+        }
+
+        private void SetRenderTile(Vector3Int renderTilePosition)
+        {
+            if (!RenderTilemap.HasTile(renderTilePosition))
+            {
+                RenderTilemap.SetTile(renderTilePosition, RenderTile);
+            }
+            else
+            {
+                RenderTilemap.RefreshTile(renderTilePosition);
+            }
+        }
+
+        private void UnsetRenderTile(Vector3Int renderTilePosition)
+        {
+            if (!IsInUseByDataTilemap(renderTilePosition) && RenderTilemap.HasTile(renderTilePosition))
+            {
+                RenderTilemap.SetTile(renderTilePosition, null);
+            }
+            else
+            {
+                RenderTilemap.RefreshTile(renderTilePosition);
+            }
+        }
+
+        /// <summary>
+        /// Checks if the render tile at <paramref name="renderTilePosition"/> is in use by any data tile.
+        /// </summary>
+        /// <param name="renderTilePosition"></param>
+        /// <returns></returns>
+        private bool IsInUseByDataTilemap(Vector3Int renderTilePosition)
+        {
+            foreach (Vector3Int dataTilePosition in DualGridUtils.GetDataTilePositions(renderTilePosition))
+            {
+                if (DataTilemap.HasTile(dataTilePosition)) return true;
+            }
+
+            return false;
+        }
+
+    }
+}
+
+
+
+
+
+--------------------------------------------------------------------------------
+This is part 3 out of 4 of script collection. 1 more parts remain.
+--------------------------------------------------------------------------------

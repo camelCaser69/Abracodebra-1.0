@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-08 21:25:21
+UNITY PROJECT SCRIPT EXPORT - 2025-04-11 01:27:09
 PART 3 OF 4
 ================================================================================
 
@@ -16,7 +16,8 @@ Assets
 │   ├── NodeDefinitionCreator.cs
 │   ├── NodeDefinitionEditor.cs
 │   ├── NodeDefinitionLibraryEditor.cs
-│   └── NodeDefinitionPostprocessor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   └── NodeEffectDrawer.cs
 ├── HueFolders
 │   ├── Editor
 │   │   ├── HueFolders.Editor.asmdef
@@ -26,14 +27,16 @@ Assets
 │   └── package.json
 ├── InputSystem_Actions.inputactions
 ├── Materials
-│   └── BezierCurveAA_Material.mat
+│   ├── BezierCurveAA_Material.mat
+│   └── Firefly_Glow_Material.mat
 ├── Post Processing
 ├── Prefabs
 │   ├── Ecosystem
 │   │   ├── Animals
 │   │   │   ├── Animal_Bird.prefab
 │   │   │   ├── Animal_Bunny.prefab
-│   │   │   └── Animal_Fox.prefab
+│   │   │   ├── Animal_Fox.prefab
+│   │   │   └── FireflyPrefab.prefab
 │   │   ├── Plants
 │   │   │   ├── PixelBerry.prefab
 │   │   │   ├── PixelFlower.prefab
@@ -48,6 +51,7 @@ Assets
 │   │   └── UI
 │   │       ├── EmptySlot16.prefab
 │   │       ├── EmptySlot32.prefab
+│   │       ├── HoverTileMarker.prefab
 │   │       ├── Indicator_Opportunity.prefab
 │   │       ├── Indicator_Resource.prefab
 │   │       ├── Indicator_Threat.prefab
@@ -56,119 +60,20 @@ Assets
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
-│   │       └── ThoughtBubble.prefab
+│   │       ├── ThoughtBubble.prefab
+│   │       ├── Visualizer_Circle_Prefab.prefab
+│   │       └── Visualizer_Line_Prefab.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
 │   │   └── Projectile_Basic_Pixel.prefab
 │   └── Tiles
 │       ├── Common
-│       │   ├── PLains_0_Corner_LT.asset
-│       │   ├── PLains_10.asset
-│       │   ├── PLains_100.asset
-│       │   ├── PLains_101.asset
-│       │   ├── PLains_102.asset
-│       │   ├── PLains_11.asset
-│       │   ├── PLains_12.asset
-│       │   ├── PLains_13.asset
-│       │   ├── PLains_14.asset
-│       │   ├── PLains_15.asset
-│       │   ├── PLains_16.asset
-│       │   ├── PLains_17.asset
-│       │   ├── PLains_18.asset
-│       │   ├── PLains_19.asset
-│       │   ├── PLains_1_T.asset
-│       │   ├── PLains_20.asset
-│       │   ├── PLains_21.asset
-│       │   ├── PLains_22.asset
-│       │   ├── PLains_23.asset
-│       │   ├── PLains_24.asset
-│       │   ├── PLains_25.asset
-│       │   ├── PLains_26.asset
-│       │   ├── PLains_27.asset
-│       │   ├── PLains_28.asset
-│       │   ├── PLains_29.asset
-│       │   ├── PLains_2_Corner_RT.asset
-│       │   ├── PLains_30.asset
-│       │   ├── PLains_31.asset
-│       │   ├── PLains_32.asset
-│       │   ├── PLains_33.asset
-│       │   ├── PLains_34.asset
-│       │   ├── PLains_35.asset
-│       │   ├── PLains_36.asset
-│       │   ├── PLains_37.asset
-│       │   ├── PLains_38.asset
-│       │   ├── PLains_39.asset
-│       │   ├── PLains_3_Single_B.asset
-│       │   ├── PLains_40.asset
-│       │   ├── PLains_41.asset
-│       │   ├── PLains_42.asset
-│       │   ├── PLains_43.asset
-│       │   ├── PLains_44.asset
-│       │   ├── PLains_45.asset
-│       │   ├── PLains_46.asset
-│       │   ├── PLains_47.asset
-│       │   ├── PLains_48.asset
-│       │   ├── PLains_49.asset
-│       │   ├── PLains_4_Single_B.TR.asset
-│       │   ├── PLains_5.asset
-│       │   ├── PLains_50.asset
-│       │   ├── PLains_51.asset
-│       │   ├── PLains_52_Grass_Center.asset
-│       │   ├── PLains_53_Grass_Center.asset
-│       │   ├── PLains_54_Grass_Center.asset
-│       │   ├── PLains_55.asset
-│       │   ├── PLains_56_Grass_Center.asset
-│       │   ├── PLains_57.asset
-│       │   ├── PLains_58.asset
-│       │   ├── PLains_59.asset
-│       │   ├── PLains_6.asset
-│       │   ├── PLains_60.asset
-│       │   ├── PLains_61_Grass_Center.asset
-│       │   ├── PLains_62_Grass_Center.asset
-│       │   ├── PLains_63.asset
-│       │   ├── PLains_64_Grass_Center.asset
-│       │   ├── PLains_65.asset
-│       │   ├── PLains_66.asset
-│       │   ├── PLains_67.asset
-│       │   ├── PLains_68.asset
-│       │   ├── PLains_69.asset
-│       │   ├── PLains_7.asset
-│       │   ├── PLains_70.asset
-│       │   ├── PLains_71.asset
-│       │   ├── PLains_72.asset
-│       │   ├── PLains_73.asset
-│       │   ├── PLains_74.asset
-│       │   ├── PLains_75.asset
-│       │   ├── PLains_76.asset
-│       │   ├── PLains_77.asset
-│       │   ├── PLains_78.asset
-│       │   ├── PLains_79.asset
-│       │   ├── PLains_8.asset
-│       │   ├── PLains_80.asset
-│       │   ├── PLains_81.asset
-│       │   ├── PLains_82.asset
-│       │   ├── PLains_83.asset
-│       │   ├── PLains_84.asset
-│       │   ├── PLains_85.asset
-│       │   ├── PLains_86.asset
-│       │   ├── PLains_87.asset
-│       │   ├── PLains_88.asset
-│       │   ├── PLains_89.asset
-│       │   ├── PLains_9.asset
-│       │   ├── PLains_90.asset
-│       │   ├── PLains_91.asset
-│       │   ├── PLains_92.asset
-│       │   ├── PLains_93.asset
-│       │   ├── PLains_94.asset
-│       │   ├── PLains_95.asset
-│       │   ├── PLains_96.asset
-│       │   ├── PLains_97.asset
-│       │   ├── PLains_98.asset
-│       │   └── PLains_99.asset
+│       │   └── PLains_0_Corner_LT.asset
 │       ├── Palettes
 │       │   └── PaletteDual_Ground.prefab
 │       └── Rule Tiles
-│           └── DualGridRuleTile.asset
+│           ├── DualGridRuleTile_Dirt.asset
+│           └── DualGridRuleTile_Grass.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -185,10 +90,16 @@ Assets
 │   │   └── FoodType_000_Leaf.asset
 │   ├── Life Thoughts
 │   │   └── AnimalThoughtLibrary.asset
-│   └── Nodes Plant
-│       ├── NodeDefinitionLibrary.asset
-│       ├── Node_000_Seed.asset
-│       └── Node_001_Berry.asset
+│   ├── Nodes Plant
+│   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
+│   │   ├── Node_001_Berry.asset
+│   │   └── Node_002_FireflyPheromone.asset
+│   ├── Scents
+│   │   ├── ScentLibrary.asset
+│   │   └── Scent_000_FireflyPheromone.asset
+│   ├── Tiles
+│   └── Tools
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -211,14 +122,22 @@ Assets
 │   │   │   ├── AnimalThoughtLibrary.cs
 │   │   │   ├── EcosystemManager.cs
 │   │   │   ├── FaunaManager.cs
+│   │   │   ├── FloraManager.cs
 │   │   │   ├── PoopController.cs
+│   │   │   ├── ScentSource.cs
 │   │   │   ├── ThoughtBubbleController.cs
 │   │   │   └── ThoughtTrigger.cs
+│   │   ├── Effects
+│   │   │   ├── FireflyController.cs
+│   │   │   └── FireflyManager.cs
 │   │   ├── Food
 │   │   │   ├── AnimalDiet.cs
 │   │   │   ├── FoodItem.cs
 │   │   │   └── FoodType.cs
-│   │   └── Plants
+│   │   ├── Plants
+│   │   └── Scents
+│   │       ├── ScentDefinition.cs
+│   │       └── ScentLibrary.cs
 │   ├── Nodes
 │   │   ├── Core
 │   │   │   ├── NodeData.cs
@@ -242,10 +161,15 @@ Assets
 │   │   └── GardenerController.cs
 │   ├── Tiles
 │   │   ├── Data
-│   │   └── Editor
+│   │   │   ├── PlayerTileInteractor.cs
+│   │   │   └── TileInteractionManager.cs
+│   │   └── Tools
+│   │       ├── ToolSwitcher.cs
+│   │       └── ToolType.cs
 │   ├── UI
 │   └── Visuals
-│       └── NightColorPostProcess.cs
+│       ├── NightColorPostProcess.cs
+│       └── RuntimeCircleDrawer.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -253,7 +177,8 @@ Assets
 │   │   └── URP2DSceneTemplate.unity
 │   └── UniversalRP.asset
 ├── Shaders
-│   └── BezierCurveAA.shader
+│   ├── BezierCurveAA.shader
+│   └── SpriteEmissiveUnlit.shader
 ├── TextureImporter.preset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
@@ -263,6 +188,252 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyManager.cs
+using UnityEngine;
+using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+public class FireflyManager : MonoBehaviour
+{
+    public static FireflyManager Instance { get; private set; }
+
+    [Header("Core Dependencies")]
+    [SerializeField] private WeatherManager weatherManager;
+    [SerializeField] private GameObject fireflyPrefab;
+    [SerializeField] private Transform fireflyParent;
+
+    // (Keep Spawning Settings, Spawn Area, Movement Bounds, Photosynthesis Bonus)
+    [Header("Spawning Settings")]
+    [SerializeField] private int maxFireflies = 50;
+    [SerializeField] private float spawnInterval = 0.5f;
+    [SerializeField] [Range(0f, 1f)] private float nightThreshold = 0.25f;
+
+    [Header("Spawn Area")]
+    [SerializeField] private Vector2 spawnCenter = Vector2.zero;
+    [SerializeField] private Vector2 spawnAreaSize = new Vector2(20f, 10f);
+
+    [Header("Movement Bounds (for Fireflies)")]
+    [SerializeField] private Vector2 movementMinBounds = new Vector2(-12f, -7f);
+    [SerializeField] private Vector2 movementMaxBounds = new Vector2(12f, 7f);
+
+    [Header("Photosynthesis Bonus Settings")]
+    public float photosynthesisRadius = 3f;
+    public float photosynthesisIntensityPerFly = 0.05f;
+    public float maxPhotosynthesisBonus = 0.5f;
+
+
+    [Header("Debugging")]
+    [Tooltip("Show attraction lines in Game View during runtime.")]
+    [SerializeField] private bool showAttractionLinesRuntime = false;
+    [SerializeField] private Color attractionLineColorGizmo = Color.magenta; // Renamed for Gizmo
+    [SerializeField] private bool logGizmoCalls = false;
+    [Space] // Add space for visual separation
+    [Tooltip("Prefab used to draw attraction lines at runtime.")]
+    [SerializeField] private GameObject lineVisualizerPrefab; // <<< ADDED
+    [Tooltip("Parent transform for instantiated line visualizers.")]
+    [SerializeField] private Transform lineContainer; // <<< ADDED
+
+    // --- Public Accessor ---
+    public bool ShowAttractionLinesRuntime => showAttractionLinesRuntime;
+
+    // --- Internal State ---
+    private List<FireflyController> activeFireflies = new List<FireflyController>();
+    private float spawnTimer;
+    private bool isNight = false;
+
+    // Dictionary to track line visualizers per firefly
+    private Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+        // Validate Core Dependencies
+        if (weatherManager == null) { Debug.LogError($"[{nameof(FireflyManager)}] WeatherManager missing!", this); enabled = false; return; }
+        if (fireflyPrefab == null) { Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing!", this); enabled = false; return; }
+        if (fireflyPrefab.GetComponent<FireflyController>() == null) { Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing Controller script!", this); enabled = false; return; }
+        if (fireflyParent == null) { fireflyParent = transform; }
+
+        // Validate Debug Dependencies
+        if (lineVisualizerPrefab == null) { Debug.LogError($"[{nameof(FireflyManager)}] Line Visualizer Prefab is not assigned!", this); }
+        if (lineContainer == null) { Debug.LogError($"[{nameof(FireflyManager)}] Line Container transform is not assigned!", this); }
+    }
+
+    void Update()
+    {
+        isNight = weatherManager.sunIntensity <= nightThreshold;
+
+        if (isNight) {
+            spawnTimer -= Time.deltaTime;
+            if (spawnTimer <= 0f) { TrySpawnFirefly(); spawnTimer = spawnInterval; }
+        } else { spawnTimer = spawnInterval; }
+
+        // Update runtime visualizers in Update
+        UpdateRuntimeLineVisualizers();
+    }
+
+    void TrySpawnFirefly()
+    {
+        if (activeFireflies.Count >= maxFireflies) return;
+
+        float spawnX = spawnCenter.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
+        float spawnY = spawnCenter.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
+        Vector2 spawnPos = new Vector2(spawnX, spawnY);
+
+        GameObject fireflyGO = Instantiate(fireflyPrefab, spawnPos, Quaternion.identity, fireflyParent);
+        FireflyController controller = fireflyGO.GetComponent<FireflyController>();
+
+        if (controller != null) {
+            controller.Initialize(this, movementMinBounds, movementMaxBounds);
+            activeFireflies.Add(controller);
+            // Don't create line visualizer here, do it in Update when needed
+        } else { /* LogError, Destroy */ }
+    }
+
+    public void ReportFireflyDespawned(FireflyController firefly)
+    {
+        activeFireflies.Remove(firefly);
+
+        // Clean up associated line visualizer
+        if (activeLineVisualizers.TryGetValue(firefly, out LineRenderer line))
+        {
+            if (line != null) Destroy(line.gameObject); // Destroy the visualizer GO
+            activeLineVisualizers.Remove(firefly);
+        }
+    }
+
+    // --- Runtime Visualizer Update ---
+    void UpdateRuntimeLineVisualizers()
+    {
+        if (!Application.isPlaying) return; // Only run in play mode
+
+        // Check if lines should be shown globally
+        bool showLines = showAttractionLinesRuntime && lineVisualizerPrefab != null && lineContainer != null;
+
+        // --- Update existing lines and create new ones ---
+        // Use a temporary list to avoid modifying dictionary while iterating
+        List<FireflyController> firefliesToRemoveLine = new List<FireflyController>();
+
+        foreach (var kvp in activeLineVisualizers)
+        {
+            FireflyController firefly = kvp.Key;
+            LineRenderer line = kvp.Value;
+
+            if (firefly == null || line == null) // Firefly or line destroyed unexpectedly
+            {
+                firefliesToRemoveLine.Add(firefly); // Mark for removal
+                if(line != null) Destroy(line.gameObject); // Destroy orphan line
+                continue;
+            }
+
+            Transform target = firefly.AttractionTarget;
+
+            if (showLines && target != null) // Should be visible and has target
+            {
+                line.enabled = true;
+                line.SetPosition(0, firefly.transform.position);
+                line.SetPosition(1, target.position);
+            }
+            else // Should be hidden or lost target
+            {
+                line.enabled = false;
+            }
+        }
+
+        // Remove entries whose fireflies are gone
+        foreach (var firefly in firefliesToRemoveLine)
+        {
+            activeLineVisualizers.Remove(firefly);
+        }
+
+
+        // --- Add lines for fireflies that don't have one yet ---
+        if (showLines)
+        {
+            foreach (FireflyController firefly in activeFireflies)
+            {
+                if (firefly == null || activeLineVisualizers.ContainsKey(firefly)) continue; // Skip nulls or those already processed
+
+                Transform target = firefly.AttractionTarget;
+                if (target != null) // Only create if it has a target AND should be shown
+                {
+                    GameObject lineGO = Instantiate(lineVisualizerPrefab, lineContainer); // Instantiate under container
+                    LineRenderer newLine = lineGO.GetComponent<LineRenderer>();
+                    if (newLine != null)
+                    {
+                        // Configure initial points (will be updated next frame anyway)
+                        newLine.SetPosition(0, firefly.transform.position);
+                        newLine.SetPosition(1, target.position);
+                        newLine.enabled = true;
+                        activeLineVisualizers.Add(firefly, newLine); // Add to tracking dictionary
+                    }
+                    else
+                    {
+                         Debug.LogError($"Line Visualizer Prefab '{lineVisualizerPrefab.name}' is missing LineRenderer component!", lineVisualizerPrefab);
+                         Destroy(lineGO); // Destroy invalid instance
+                    }
+                }
+            }
+        }
+        // --- Hide/Destroy lines if global flag turned off ---
+        else if (!showLines && activeLineVisualizers.Count > 0)
+        {
+             // Destroy all active line visualizers if the flag is off
+             foreach (var kvp in activeLineVisualizers)
+             {
+                 if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+             }
+             activeLineVisualizers.Clear();
+        }
+    }
+
+
+    // (Keep GetNearbyFireflyCount)
+     public int GetNearbyFireflyCount(Vector3 position, float radius)
+    {
+        int count = 0; float radiusSq = radius * radius;
+        for (int i = activeFireflies.Count - 1; i >= 0; i--)
+        {
+            if (activeFireflies[i] == null) { activeFireflies.RemoveAt(i); continue; }
+            if ((activeFireflies[i].transform.position - position).sqrMagnitude <= radiusSq) { count++; }
+        }
+        return count;
+    }
+
+    // --- Gizmos (Editor Visualization - Unchanged) ---
+    #if UNITY_EDITOR
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green; Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
+        Gizmos.color = Color.blue;
+        Vector3 boundsCenter = (movementMinBounds + movementMaxBounds) / 2f;
+        Vector3 boundsSize = movementMaxBounds - movementMinBounds;
+        Gizmos.DrawWireCube(boundsCenter, boundsSize);
+
+        // Gizmo drawing for attraction lines
+        if (showAttractionLinesRuntime && Application.isPlaying) {
+             if (logGizmoCalls) { /*...*/ }
+             bool didDrawLine = false;
+             Gizmos.color = attractionLineColorGizmo; // Use Gizmo color
+             foreach (FireflyController firefly in activeFireflies) {
+                if (firefly == null) continue;
+                Transform target = firefly.AttractionTarget;
+                if (target != null) { Gizmos.DrawLine(firefly.transform.position, target.position); didDrawLine = true; }
+             }
+             if (logGizmoCalls && !didDrawLine && activeFireflies.Count > 0) { /*...*/ }
+        }
+    }
+    #endif
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Food\AnimalDiet.cs
@@ -428,6 +599,68 @@ public class FoodType : ScriptableObject
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Scents\ScentDefinition.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Scents/ScentDefinition.cs
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "Scent_", menuName = "Ecosystem/Scent Definition")]
+public class ScentDefinition : ScriptableObject
+{
+    [Header("Identification")]
+    [Tooltip("Unique identifier used internally and potentially for node effects.")]
+    public string scentID = "default_scent"; // Still useful for debugging/lookup
+    [Tooltip("Display name for UI or debugging.")]
+    public string displayName = "Default Scent";
+
+    // [Header("Gameplay Properties")] - Removed scentType enum field
+
+    [Tooltip("Base radius for this scent type if not modified by nodes.")]
+    public float baseRadius = 1f;
+    [Tooltip("Base strength for this scent type if not modified by nodes.")]
+    public float baseStrength = 1f;
+
+    [Header("Visuals (Optional)")]
+    [Tooltip("Particle effect prefab to instantiate when this scent is active.")]
+    public GameObject particleEffectPrefab;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Scents\ScentLibrary.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Scents/ScentLibrary.cs
+using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+
+[CreateAssetMenu(fileName = "ScentLibrary", menuName = "Ecosystem/Scent Library")]
+public class ScentLibrary : ScriptableObject
+{
+    public List<ScentDefinition> scents;
+
+    // Helper method to find a scent by its ID (still potentially useful)
+    public ScentDefinition GetScentByID(string id)
+    {
+        if (string.IsNullOrEmpty(id) || scents == null) return null;
+        return scents.FirstOrDefault(s => s != null && s.scentID == id);
+    }
+
+    // Helper to get the actual list of definitions
+    public List<ScentDefinition> GetAllDefinitions()
+    {
+        // Return a copy or filter out nulls
+        return scents?.Where(s => s != null).ToList() ?? new List<ScentDefinition>();
+    }
+
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeData.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using System;
@@ -460,7 +693,8 @@ public class NodeData
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeDefinition.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Nodes/Core/NodeDefinition.cs
+using UnityEngine;
 using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
@@ -472,32 +706,48 @@ public class NodeDefinition : ScriptableObject
     public string description;
     public Sprite thumbnail;
     [Tooltip("Tint color applied to the thumbnail image.")]
-    public Color thumbnailTintColor = Color.white; // ADDED: Thumbnail tint
+    public Color thumbnailTintColor = Color.white;
     [Tooltip("Background color for the Node View representation.")]
     public Color backgroundColor = Color.gray;
 
     [Header("Prefab & Effects")]
     [Tooltip("Optional: Specific NodeView prefab for this node type. If null, the default from NodeEditorGridController is used.")]
     public GameObject nodeViewPrefab;
-    [Tooltip("List of effects this node applies.")]
-    public List<NodeEffectData> effects;
+    [Tooltip("List of effects this node applies. Configure these effects carefully.")]
+    public List<NodeEffectData> effects; // This is the list configured in the Inspector
 
-    // Method to clone the effects list for NodeData.
+    /// <summary>
+    /// Creates a deep copy of the effects list configured in this NodeDefinition asset.
+    /// This ensures that runtime NodeData instances get their own copies of effects.
+    /// </summary>
+    /// <returns>A new list containing copies of the NodeEffectData.</returns>
     public List<NodeEffectData> CloneEffects()
     {
         List<NodeEffectData> copy = new List<NodeEffectData>();
-        if (effects == null) return copy; // Handle null list
+        if (effects == null) {
+            // Debug.LogWarning($"NodeDefinition '{this.name}' has a null effects list."); // Optional warning
+            return copy; // Handle null list
+        }
 
-        foreach (var eff in effects)
+        foreach (var originalEffect in effects)
         {
-            NodeEffectData newEff = new NodeEffectData()
+            if (originalEffect == null) {
+                 Debug.LogWarning($"NodeDefinition '{this.name}' contains a null effect in its list."); // Optional warning
+                 continue; // Skip null effects
+            }
+
+            // Create a new instance and copy ALL relevant fields
+            NodeEffectData newEffect = new NodeEffectData()
             {
-                effectType = eff.effectType,
-                primaryValue = eff.primaryValue,
-                secondaryValue = eff.secondaryValue,
-                isPassive = eff.isPassive  // Add this line to copy the flag
+                effectType = originalEffect.effectType,
+                primaryValue = originalEffect.primaryValue,
+                secondaryValue = originalEffect.secondaryValue,
+                isPassive = originalEffect.isPassive,
+                // --- FIXED: Copy the ScentDefinition reference ---
+                scentDefinitionReference = originalEffect.scentDefinitionReference
+                // --------------------------------------------------
             };
-            copy.Add(newEff);
+            copy.Add(newEffect);
         }
         return copy;
     }
@@ -550,19 +800,29 @@ public class NodeDefinitionLibrary : ScriptableObject
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeEffectData.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using System;
+﻿// FILE: Assets/Scripts/Nodes/Core/NodeEffectData.cs
+using System;
 using UnityEngine;
 
 [Serializable]
 public class NodeEffectData
 {
     public NodeEffectType effectType;
+
+    [Tooltip("Primary numeric value for the effect (e.g., Amount, Duration, Radius Bonus).")] // Updated tooltip
     public float primaryValue;
+    [Tooltip("Secondary numeric value for the effect (e.g., Speed, Intensity, Strength Bonus).")] // Updated tooltip
     public float secondaryValue;
 
-    // Renamed from isGrowthPhaseOnly and default changed to false
-    [Tooltip("If TRUE, this effect only contributes once to calculate initial plant stats (Passive Growth Effect). If FALSE, this effect executes during the periodic Mature Phase cycles (Active Effect).")]
-    public bool isPassive = false; // Defaulting to false, meaning effects are Active unless specified otherwise
+    [Tooltip("If TRUE, effect runs once during growth. If FALSE, effect executes during mature cycles.")]
+    public bool isPassive = false;
+
+    // --- Scent Specific ---
+    // [Tooltip("Identifier (scentID from ScentDefinition) of the scent to apply. Used only if effectType is ScentModifier.")]
+    // public string scentIdentifier; // <<< REMOVED
+
+    [Tooltip("The Scent Definition to apply/modify. Used only if effectType is ScentModifier.")]
+    public ScentDefinition scentDefinitionReference; // <<< ADDED: Direct reference
 }
 
 
@@ -616,6 +876,10 @@ public enum NodeEffectType
     [Tooltip("Causes the plant to attempt to spawn a berry in an available adjacent slot during the mature cycle.")]
     GrowBerry,
     // Add potentially more active effects: Heal, ApplyStatus, AreaEffect, etc.
+    
+    
+    [Tooltip("Modifies the scent emitted by the next spawned carrier (Berry, Projectile). PrimaryValue=Radius Add, SecondaryValue=Strength Add.")]
+    ScentModifier,
 }
 
 
@@ -624,47 +888,88 @@ public enum NodeEffectType
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\OutputNodeEffect.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Nodes/Core/OutputNodeEffect.cs
+using UnityEngine;
+using System.Collections.Generic; // Required for Dictionary
 
-// Example - This component might be on the Plant Prefab or dynamically added/found
 public class OutputNodeEffect : MonoBehaviour
 {
     [Header("References")]
     [Tooltip("Prefab for the projectile to spawn.")]
-    public GameObject projectilePrefab; // Assign your projectile prefab
+    public GameObject projectilePrefab;
 
     [Header("Settings")]
-    public Vector2 spawnOffset = Vector2.up; // Offset relative to plant transform
+    public Vector2 spawnOffset = Vector2.up;
+
+    // Store reference needed to call ApplyScentDataToObject
+    private PlantGrowth parentPlantGrowth;
+
+    void Awake()
+    {
+        // Get reference to parent PlantGrowth to access ApplyScentDataToObject helper
+        parentPlantGrowth = GetComponentInParent<PlantGrowth>();
+        if (parentPlantGrowth == null)
+        {
+            // This is a critical error if scent application is expected
+            Debug.LogError($"[{nameof(OutputNodeEffect)}] Could not find parent PlantGrowth component! Scent application will fail.", gameObject);
+        }
+    }
 
     /// <summary>
     /// Activated by PlantGrowth during the Mature Execution Cycle.
+    /// Spawns a projectile and applies accumulated effects (damage, scent).
     /// </summary>
     /// <param name="damageMultiplier">Contextual damage modifier calculated from the node chain.</param>
-    public void Activate(float damageMultiplier) // Example parameter
+    /// <param name="scentRadiusBonuses">Accumulated radius bonuses per ScentDefinition.</param> // <<< UPDATED PARAM TYPE
+    /// <param name="scentStrengthBonuses">Accumulated strength bonuses per ScentDefinition.</param> // <<< UPDATED PARAM TYPE
+    public void Activate(float damageMultiplier,
+                         Dictionary<ScentDefinition, float> scentRadiusBonuses, // <<< UPDATED TYPE
+                         Dictionary<ScentDefinition, float> scentStrengthBonuses) // <<< UPDATED TYPE
     {
+        // --- Validations ---
         if (projectilePrefab == null) {
-            Debug.LogError("[OutputNodeEffect] Projectile Prefab not assigned!", gameObject);
+            Debug.LogError($"[{nameof(OutputNodeEffect)}] Projectile Prefab not assigned!", gameObject);
             return;
         }
+        
+         if (parentPlantGrowth == null) { // Check again in case Awake failed silently
+              Debug.LogError($"[{nameof(OutputNodeEffect)}] Cannot activate, parent PlantGrowth reference is missing. Scent application will fail.", gameObject);
+             // Decide if we should still spawn projectile without scent or just return
+             // return; // Option: Abort if scent cannot be applied
+         }
 
-        Debug.Log($"[OutputNodeEffect] Activate called. Damage Multiplier: {damageMultiplier}. Spawning projectile.");
+        // Debug.Log($"[OutputNodeEffect] Activate called. Damage Multiplier: {damageMultiplier}. Spawning projectile.");
 
-        // --- Calculate Spawn Position ---
+        // --- Spawn Projectile ---
         Vector2 spawnPos = (Vector2)transform.position + spawnOffset;
-
-        // --- Instantiate Projectile ---
         GameObject projGO = Instantiate(projectilePrefab, spawnPos, transform.rotation); // Use plant's rotation or aim logic
 
-        // --- Initialize Projectile (if needed) ---
+        // --- Apply Accumulated Scents to Projectile ---
+        // Call the public helper method on the parent PlantGrowth instance
+        if (parentPlantGrowth != null) // Check if reference exists before calling
+        {
+            // Debug.Log($"[{gameObject.name} Activate] Calling ApplyScentDataToObject for {projGO.name}. Passing {scentStrengthsBonuses?.Count ?? 0} scent strength entries."); /////////// here
+            
+             // Call the public helper with the NEW dictionaries
+             parentPlantGrowth.ApplyScentDataToObject(projGO, scentRadiusBonuses, scentStrengthBonuses);
+        }
+        // -----------------------------------------------
+
+        // --- Initialize Projectile Stats ---
         SpellProjectile spellProj = projGO.GetComponent<SpellProjectile>();
         if(spellProj != null)
         {
-            // TODO: Calculate final damage/speed etc. based on node effects and damageMultiplier
-            float finalDamage = 10f * damageMultiplier; // Example calculation
-            float speed = 5f; // Get speed from effects?
-            spellProj.Initialize(finalDamage, speed);
+            // TODO: Get base damage/speed from effects or projectile definition?
+            float baseDamage = 10f; // Example base value
+            float baseSpeed = 5f; // Example base value
+
+            float finalDamage = baseDamage * damageMultiplier; // Apply accumulated multiplier
+            float finalSpeed = baseSpeed; // TODO: Apply speed modifiers if implemented
+
+            spellProj.Initialize(finalDamage, finalSpeed);
             // Set other properties like friendly fire based on plant context?
         }
+        // else { Debug.LogWarning($"[{nameof(OutputNodeEffect)}] Spawned projectile '{projGO.name}' is missing SpellProjectile component.", projGO); }
     }
 }
 
@@ -674,7 +979,8 @@ public class OutputNodeEffect : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Runtime\NodeExecutor.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections.Generic;
+﻿// FILE: Assets/Scripts/Nodes/Runtime/NodeExecutor.cs
+using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Linq;
@@ -693,76 +999,129 @@ public class NodeExecutor : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) SpawnPlantFromUIGraph();
+        // Simple check for Space key press to spawn
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+             SpawnPlantFromUIGraph();
+        }
     }
 
     public void SpawnPlantFromUIGraph()
-{
-    if (nodeEditorGrid == null) { DebugLogError("Node Editor Grid Controller not assigned!"); return; }
-    if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return; }
-    if (gardener == null) { DebugLogError("Gardener Controller not assigned!"); return; }
-
-    NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
-
-    if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0) { DebugLog("No nodes in UI graph."); return; }
-
-    // Use the renamed flag 'isPassive'
-    bool seedFound = graphToSpawn.nodes.Any(node => node.effects != null && node.effects.Any(eff => eff.effectType == NodeEffectType.SeedSpawn && eff.isPassive)); 
-    if (!seedFound) { DebugLog("Node chain lacks a passive SeedSpawn effect."); return; }
-
-    DebugLog($"Spawning plant from UI graph with {graphToSpawn.nodes.Count} nodes...");
-    Vector2 spawnPos = gardener.GetPlantingPosition();
-    
-    // Get parent for plants from EcosystemManager
-    Transform plantParent = null;
-    if (EcosystemManager.Instance != null && EcosystemManager.Instance.plantParent != null)
     {
-        plantParent = EcosystemManager.Instance.plantParent;
-    }
-    
-    // Instantiate with proper parent
-    GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity, plantParent);
+        // --- Validations ---
+        if (nodeEditorGrid == null) { DebugLogError("Node Editor Grid Controller not assigned!"); return; }
+        if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return; }
+        if (gardener == null) { DebugLogError("Gardener Controller not assigned!"); return; }
 
-    PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
-    if (growthComponent != null)
-    {
-        NodeGraph graphCopy = new NodeGraph();
-        graphCopy.nodes = new List<NodeData>();
-        foreach(NodeData originalNodeData in graphToSpawn.nodes)
-        {
-             NodeData newNodeData = new NodeData {
-                nodeId = originalNodeData.nodeId,
-                nodeDisplayName = originalNodeData.nodeDisplayName,
-                orderIndex = originalNodeData.orderIndex,
-                effects = CloneEffectsList(originalNodeData.effects) // Deep copy effects
-            };
-            graphCopy.nodes.Add(newNodeData);
+        // Get the current graph state from the UI grid
+        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
+
+        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0) {
+             DebugLog("No nodes in UI graph to spawn.");
+             return;
         }
-        growthComponent.InitializeAndGrow(graphCopy);
-        DebugLog("Plant spawned and initialized.");
-    }
-    else { DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth!"); Destroy(plantObj); }
-}
 
+        // Validate if the graph is spawnable (e.g., requires a SeedSpawn effect)
+        bool seedFound = graphToSpawn.nodes.Any(node => node != null && node.effects != null && node.effects.Any(eff => eff != null && eff.effectType == NodeEffectType.SeedSpawn && eff.isPassive));
+        if (!seedFound) {
+            DebugLog("Cannot spawn plant: Node chain lacks a passive SeedSpawn effect.");
+            return;
+        }
+
+        DebugLog($"Spawning plant from UI graph with {graphToSpawn.nodes.Count} nodes...");
+
+        // Determine spawn position and parent
+        Vector2 spawnPos = gardener.GetPlantingPosition();
+        Transform plantParent = EcosystemManager.Instance?.plantParent; // Use optional chaining
+
+        // Instantiate the plant prefab
+        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity, plantParent); // Assign parent during instantiate
+
+        // Get the PlantGrowth component
+        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+        if (growthComponent != null)
+        {
+            // --- Create a DEEP COPY of the NodeGraph ---
+            // This is crucial so modifications to the UI graph don't affect running plants,
+            // and vice-versa.
+            NodeGraph graphCopy = new NodeGraph();
+            graphCopy.nodes = new List<NodeData>(graphToSpawn.nodes.Count); // Initialize with capacity
+
+            foreach(NodeData originalNodeData in graphToSpawn.nodes)
+            {
+                // Ensure original node data is not null
+                if (originalNodeData == null) {
+                    DebugLogWarning("Encountered null NodeData in UI graph during copy. Skipping.");
+                    continue;
+                }
+
+                 // Create a new NodeData instance
+                 NodeData newNodeData = new NodeData {
+                    nodeId = originalNodeData.nodeId, // Copy ID (or generate new one?)
+                    nodeDisplayName = originalNodeData.nodeDisplayName,
+                    orderIndex = originalNodeData.orderIndex,
+                    canBeDeleted = originalNodeData.canBeDeleted, // Copy runtime flags if needed
+                    // Create a deep copy of the effects list using the *updated* helper method
+                    effects = CloneEffectsList(originalNodeData.effects)
+                };
+                graphCopy.nodes.Add(newNodeData);
+            }
+
+            // Initialize the plant with the deep copy
+            growthComponent.InitializeAndGrow(graphCopy);
+            DebugLog("Plant spawned and initialized.");
+        }
+        else
+        {
+             // Log error and destroy invalid object if PlantGrowth is missing
+             DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth component! Destroying spawned object.");
+             Destroy(plantObj);
+        }
+    }
+
+    /// <summary>
+    /// Creates a deep copy of a list of NodeEffectData, including the ScentDefinition reference.
+    /// </summary>
     private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
     {
-        if (originalList == null) return new List<NodeEffectData>();
+        if (originalList == null) return new List<NodeEffectData>(); // Handle null input list
+
         List<NodeEffectData> newList = new List<NodeEffectData>(originalList.Count);
-        foreach(var eff in originalList)
+        foreach(var originalEffect in originalList)
         {
-             NodeEffectData newEff = new NodeEffectData {
-                 effectType = eff.effectType,
-                 primaryValue = eff.primaryValue,
-                 secondaryValue = eff.secondaryValue,
-                 isPassive = eff.isPassive // Use the renamed flag
+            // Ensure original effect data is not null
+            if(originalEffect == null) {
+                DebugLogWarning("Encountered null NodeEffectData in list during copy. Skipping.");
+                continue;
+            }
+
+             // Create a new NodeEffectData instance and copy all relevant fields
+             NodeEffectData newEffect = new NodeEffectData {
+                 effectType = originalEffect.effectType,
+                 primaryValue = originalEffect.primaryValue,
+                 secondaryValue = originalEffect.secondaryValue,
+                 isPassive = originalEffect.isPassive,
+                 // <<< FIXED: Explicitly copy the ScentDefinition reference >>>
+                 scentDefinitionReference = originalEffect.scentDefinitionReference
              };
-             newList.Add(newEff);
+             newList.Add(newEffect);
         }
         return newList;
     }
 
-    private void DebugLog(string msg) { Debug.Log($"[NodeExecutor] {msg}"); if (debugOutput != null) debugOutput.text += msg + "\n"; }
-    private void DebugLogError(string msg) { Debug.LogError($"[NodeExecutor] {msg}"); if (debugOutput != null) debugOutput.text += $"ERROR: {msg}\n"; }
+    // Helper methods for logging
+    private void DebugLog(string msg) {
+        Debug.Log($"[NodeExecutor] {msg}");
+        if (debugOutput != null) debugOutput.text += msg + "\n";
+    }
+    private void DebugLogError(string msg) {
+        Debug.LogError($"[NodeExecutor] {msg}");
+        if (debugOutput != null) debugOutput.text += $"ERROR: {msg}\n";
+    }
+     private void DebugLogWarning(string msg) {
+        Debug.LogWarning($"[NodeExecutor] {msg}");
+        if (debugOutput != null) debugOutput.text += $"WARNING: {msg}\n";
+    }
 }
 
 

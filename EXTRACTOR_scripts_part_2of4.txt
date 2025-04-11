@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-08 21:25:21
+UNITY PROJECT SCRIPT EXPORT - 2025-04-11 01:27:09
 PART 2 OF 4
 ================================================================================
 
@@ -16,7 +16,8 @@ Assets
 │   ├── NodeDefinitionCreator.cs
 │   ├── NodeDefinitionEditor.cs
 │   ├── NodeDefinitionLibraryEditor.cs
-│   └── NodeDefinitionPostprocessor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   └── NodeEffectDrawer.cs
 ├── HueFolders
 │   ├── Editor
 │   │   ├── HueFolders.Editor.asmdef
@@ -26,14 +27,16 @@ Assets
 │   └── package.json
 ├── InputSystem_Actions.inputactions
 ├── Materials
-│   └── BezierCurveAA_Material.mat
+│   ├── BezierCurveAA_Material.mat
+│   └── Firefly_Glow_Material.mat
 ├── Post Processing
 ├── Prefabs
 │   ├── Ecosystem
 │   │   ├── Animals
 │   │   │   ├── Animal_Bird.prefab
 │   │   │   ├── Animal_Bunny.prefab
-│   │   │   └── Animal_Fox.prefab
+│   │   │   ├── Animal_Fox.prefab
+│   │   │   └── FireflyPrefab.prefab
 │   │   ├── Plants
 │   │   │   ├── PixelBerry.prefab
 │   │   │   ├── PixelFlower.prefab
@@ -48,6 +51,7 @@ Assets
 │   │   └── UI
 │   │       ├── EmptySlot16.prefab
 │   │       ├── EmptySlot32.prefab
+│   │       ├── HoverTileMarker.prefab
 │   │       ├── Indicator_Opportunity.prefab
 │   │       ├── Indicator_Resource.prefab
 │   │       ├── Indicator_Threat.prefab
@@ -56,119 +60,20 @@ Assets
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
-│   │       └── ThoughtBubble.prefab
+│   │       ├── ThoughtBubble.prefab
+│   │       ├── Visualizer_Circle_Prefab.prefab
+│   │       └── Visualizer_Line_Prefab.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
 │   │   └── Projectile_Basic_Pixel.prefab
 │   └── Tiles
 │       ├── Common
-│       │   ├── PLains_0_Corner_LT.asset
-│       │   ├── PLains_10.asset
-│       │   ├── PLains_100.asset
-│       │   ├── PLains_101.asset
-│       │   ├── PLains_102.asset
-│       │   ├── PLains_11.asset
-│       │   ├── PLains_12.asset
-│       │   ├── PLains_13.asset
-│       │   ├── PLains_14.asset
-│       │   ├── PLains_15.asset
-│       │   ├── PLains_16.asset
-│       │   ├── PLains_17.asset
-│       │   ├── PLains_18.asset
-│       │   ├── PLains_19.asset
-│       │   ├── PLains_1_T.asset
-│       │   ├── PLains_20.asset
-│       │   ├── PLains_21.asset
-│       │   ├── PLains_22.asset
-│       │   ├── PLains_23.asset
-│       │   ├── PLains_24.asset
-│       │   ├── PLains_25.asset
-│       │   ├── PLains_26.asset
-│       │   ├── PLains_27.asset
-│       │   ├── PLains_28.asset
-│       │   ├── PLains_29.asset
-│       │   ├── PLains_2_Corner_RT.asset
-│       │   ├── PLains_30.asset
-│       │   ├── PLains_31.asset
-│       │   ├── PLains_32.asset
-│       │   ├── PLains_33.asset
-│       │   ├── PLains_34.asset
-│       │   ├── PLains_35.asset
-│       │   ├── PLains_36.asset
-│       │   ├── PLains_37.asset
-│       │   ├── PLains_38.asset
-│       │   ├── PLains_39.asset
-│       │   ├── PLains_3_Single_B.asset
-│       │   ├── PLains_40.asset
-│       │   ├── PLains_41.asset
-│       │   ├── PLains_42.asset
-│       │   ├── PLains_43.asset
-│       │   ├── PLains_44.asset
-│       │   ├── PLains_45.asset
-│       │   ├── PLains_46.asset
-│       │   ├── PLains_47.asset
-│       │   ├── PLains_48.asset
-│       │   ├── PLains_49.asset
-│       │   ├── PLains_4_Single_B.TR.asset
-│       │   ├── PLains_5.asset
-│       │   ├── PLains_50.asset
-│       │   ├── PLains_51.asset
-│       │   ├── PLains_52_Grass_Center.asset
-│       │   ├── PLains_53_Grass_Center.asset
-│       │   ├── PLains_54_Grass_Center.asset
-│       │   ├── PLains_55.asset
-│       │   ├── PLains_56_Grass_Center.asset
-│       │   ├── PLains_57.asset
-│       │   ├── PLains_58.asset
-│       │   ├── PLains_59.asset
-│       │   ├── PLains_6.asset
-│       │   ├── PLains_60.asset
-│       │   ├── PLains_61_Grass_Center.asset
-│       │   ├── PLains_62_Grass_Center.asset
-│       │   ├── PLains_63.asset
-│       │   ├── PLains_64_Grass_Center.asset
-│       │   ├── PLains_65.asset
-│       │   ├── PLains_66.asset
-│       │   ├── PLains_67.asset
-│       │   ├── PLains_68.asset
-│       │   ├── PLains_69.asset
-│       │   ├── PLains_7.asset
-│       │   ├── PLains_70.asset
-│       │   ├── PLains_71.asset
-│       │   ├── PLains_72.asset
-│       │   ├── PLains_73.asset
-│       │   ├── PLains_74.asset
-│       │   ├── PLains_75.asset
-│       │   ├── PLains_76.asset
-│       │   ├── PLains_77.asset
-│       │   ├── PLains_78.asset
-│       │   ├── PLains_79.asset
-│       │   ├── PLains_8.asset
-│       │   ├── PLains_80.asset
-│       │   ├── PLains_81.asset
-│       │   ├── PLains_82.asset
-│       │   ├── PLains_83.asset
-│       │   ├── PLains_84.asset
-│       │   ├── PLains_85.asset
-│       │   ├── PLains_86.asset
-│       │   ├── PLains_87.asset
-│       │   ├── PLains_88.asset
-│       │   ├── PLains_89.asset
-│       │   ├── PLains_9.asset
-│       │   ├── PLains_90.asset
-│       │   ├── PLains_91.asset
-│       │   ├── PLains_92.asset
-│       │   ├── PLains_93.asset
-│       │   ├── PLains_94.asset
-│       │   ├── PLains_95.asset
-│       │   ├── PLains_96.asset
-│       │   ├── PLains_97.asset
-│       │   ├── PLains_98.asset
-│       │   └── PLains_99.asset
+│       │   └── PLains_0_Corner_LT.asset
 │       ├── Palettes
 │       │   └── PaletteDual_Ground.prefab
 │       └── Rule Tiles
-│           └── DualGridRuleTile.asset
+│           ├── DualGridRuleTile_Dirt.asset
+│           └── DualGridRuleTile_Grass.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -185,10 +90,16 @@ Assets
 │   │   └── FoodType_000_Leaf.asset
 │   ├── Life Thoughts
 │   │   └── AnimalThoughtLibrary.asset
-│   └── Nodes Plant
-│       ├── NodeDefinitionLibrary.asset
-│       ├── Node_000_Seed.asset
-│       └── Node_001_Berry.asset
+│   ├── Nodes Plant
+│   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
+│   │   ├── Node_001_Berry.asset
+│   │   └── Node_002_FireflyPheromone.asset
+│   ├── Scents
+│   │   ├── ScentLibrary.asset
+│   │   └── Scent_000_FireflyPheromone.asset
+│   ├── Tiles
+│   └── Tools
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -211,14 +122,22 @@ Assets
 │   │   │   ├── AnimalThoughtLibrary.cs
 │   │   │   ├── EcosystemManager.cs
 │   │   │   ├── FaunaManager.cs
+│   │   │   ├── FloraManager.cs
 │   │   │   ├── PoopController.cs
+│   │   │   ├── ScentSource.cs
 │   │   │   ├── ThoughtBubbleController.cs
 │   │   │   └── ThoughtTrigger.cs
+│   │   ├── Effects
+│   │   │   ├── FireflyController.cs
+│   │   │   └── FireflyManager.cs
 │   │   ├── Food
 │   │   │   ├── AnimalDiet.cs
 │   │   │   ├── FoodItem.cs
 │   │   │   └── FoodType.cs
-│   │   └── Plants
+│   │   ├── Plants
+│   │   └── Scents
+│   │       ├── ScentDefinition.cs
+│   │       └── ScentLibrary.cs
 │   ├── Nodes
 │   │   ├── Core
 │   │   │   ├── NodeData.cs
@@ -242,10 +161,15 @@ Assets
 │   │   └── GardenerController.cs
 │   ├── Tiles
 │   │   ├── Data
-│   │   └── Editor
+│   │   │   ├── PlayerTileInteractor.cs
+│   │   │   └── TileInteractionManager.cs
+│   │   └── Tools
+│   │       ├── ToolSwitcher.cs
+│   │       └── ToolType.cs
 │   ├── UI
 │   └── Visuals
-│       └── NightColorPostProcess.cs
+│       ├── NightColorPostProcess.cs
+│       └── RuntimeCircleDrawer.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -253,7 +177,8 @@ Assets
 │   │   └── URP2DSceneTemplate.unity
 │   └── UniversalRP.asset
 ├── Shaders
-│   └── BezierCurveAA.shader
+│   ├── BezierCurveAA.shader
+│   └── SpriteEmissiveUnlit.shader
 ├── TextureImporter.preset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
@@ -263,376 +188,6 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Battle\Plant\WeatherManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public class WeatherManager : MonoBehaviour
-{
-    public static WeatherManager Instance { get; private set; }
-
-    [Header("Day/Night Cycle Settings")]
-    public bool dayNightCycleEnabled = true;
-    
-    [Tooltip("Duration of full day (seconds)")]
-    public float dayDuration = 20f;
-    [Tooltip("Duration of full night (seconds)")]
-    public float nightDuration = 20f;
-    [Tooltip("Duration of transitions (seconds)")]
-    public float transitionDuration = 5f;
-
-    [Tooltip("Curve that controls the sunIntensity during transitions (X=0 start, X=1 end).")]
-    public AnimationCurve transitionCurve = AnimationCurve.Linear(0, 0, 1, 1);
-
-    [Header("Sunlight Settings")]
-    [Range(0f, 1f)]
-    public float sunIntensity = 1f;  // 0=night, 1=day
-
-    [Header("Fixed Sunlight When Cycle Off")]
-    [Tooltip("If dayNightCycleEnabled is false, we use this fixed intensity.")]
-    [Range(0f, 1f)]
-    public float fixedSunIntensity = 1f;
-
-    [Header("Sunlight Visualization")]
-    public SpriteRenderer fadeSprite;
-    public float minAlpha = 0f;
-    public float maxAlpha = 1f;
-
-    // Internals
-    private enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
-    private CyclePhase currentPhase = CyclePhase.Day;
-    private float phaseTimer = 0f; // counts down in each phase
-    private float totalPhaseTime = 0f; // length of current phase
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
-
-    private void Start()
-    {
-        // Initialize to Day phase
-        EnterPhase(CyclePhase.Day);
-    }
-
-    private void Update()
-    {
-        if (!dayNightCycleEnabled)
-        {
-            // If the cycle is disabled, just use the fixed sun intensity
-            sunIntensity = fixedSunIntensity;
-            UpdateFadeSprite();
-            return;
-        }
-
-        // else dayNightCycle is enabled
-        phaseTimer -= Time.deltaTime;
-        if (phaseTimer <= 0f)
-        {
-            // move to next phase
-            switch (currentPhase)
-            {
-                case CyclePhase.Day:
-                    EnterPhase(CyclePhase.TransitionToNight);
-                    break;
-                case CyclePhase.TransitionToNight:
-                    EnterPhase(CyclePhase.Night);
-                    break;
-                case CyclePhase.Night:
-                    EnterPhase(CyclePhase.TransitionToDay);
-                    break;
-                case CyclePhase.TransitionToDay:
-                    EnterPhase(CyclePhase.Day);
-                    break;
-            }
-        }
-        else
-        {
-            // while in the current phase, update sunIntensity accordingly
-            float progress = 1f - (phaseTimer / totalPhaseTime);
-            switch (currentPhase)
-            {
-                case CyclePhase.Day:
-                    // Full day, sunIntensity = 1
-                    sunIntensity = 1f;
-                    break;
-                case CyclePhase.TransitionToNight:
-                    // 0..1 => day(1) to night(0) using transitionCurve
-                    float tToNight = transitionCurve.Evaluate(progress);
-                    sunIntensity = Mathf.Lerp(1f, 0f, tToNight);
-                    break;
-                case CyclePhase.Night:
-                    // Full night, sunIntensity = 0
-                    sunIntensity = 0f;
-                    break;
-                case CyclePhase.TransitionToDay:
-                    // 0..1 => night(0) to day(1) using transitionCurve
-                    float tToDay = transitionCurve.Evaluate(progress);
-                    sunIntensity = Mathf.Lerp(0f, 1f, tToDay);
-                    break;
-            }
-        }
-
-        UpdateFadeSprite();
-    }
-
-    private void EnterPhase(CyclePhase nextPhase)
-    {
-        currentPhase = nextPhase;
-        switch (nextPhase)
-        {
-            case CyclePhase.Day:
-                totalPhaseTime = dayDuration;
-                break;
-            case CyclePhase.Night:
-                totalPhaseTime = nightDuration;
-                break;
-            case CyclePhase.TransitionToNight:
-            case CyclePhase.TransitionToDay:
-                totalPhaseTime = transitionDuration;
-                break;
-        }
-        phaseTimer = totalPhaseTime;
-    }
-
-    private void UpdateFadeSprite()
-    {
-        if (fadeSprite != null)
-        {
-            float alpha = Mathf.Lerp(minAlpha, maxAlpha, sunIntensity);
-            Color c = fadeSprite.color;
-            c.a = alpha;
-            fadeSprite.color = c;
-        }
-    }
-}
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Battle\SpellProjectile.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public class SpellProjectile : MonoBehaviour
-{
-    [Header("Projectile Stats")]
-    public float damage;
-    public float speed;
-    [Tooltip("If true, the projectile will be destroyed upon hitting a wizard.")]
-    public bool destroyOnHit = true;
-
-    [Header("Burning Effect (optional)")]
-    public float burningDamage;   // DPS
-    public float burningDuration; // Duration in seconds
-
-    [Header("Friendly Fire")]
-    public bool friendlyFire = false;
-    public bool casterIsEnemy = false;
-
-    public void Initialize(float dmg, float spd)
-    {
-        damage = dmg;
-        speed = spd;
-    }
-
-    private void Update()
-    {
-        transform.Translate(Vector2.up * speed * Time.deltaTime);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Battle\Status Effects\BurningStatusEffect.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿public class BurningStatusEffect : StatusEffect
-{
-    public BurningStatusEffect(float d, float dps) : base(d, dps) { }
-
-    
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Battle\Status Effects\StatusEffect.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿public abstract class StatusEffect
-{
-    public float duration; // Total duration.
-    public float damagePerSecond;
-    protected float elapsed = 0f;
-
-    // Public property to expose elapsed time.
-    public float Elapsed { get { return elapsed; } }
-
-    public StatusEffect(float d, float dps)
-    {
-        duration = d;
-        damagePerSecond = dps;
-    }
-
-    public bool IsExpired() => elapsed >= duration;
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Core\SortableEntity.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public class SortableEntity : MonoBehaviour
-{
-    [Header("Sorting Configuration")]
-    [Tooltip("Offset added to Y position for sorting calculation")]
-    [SerializeField] private float sortingLayerYOffset = 0f;
-
-    [Tooltip("Use parent's Y coordinate for sorting")]
-    [SerializeField] private bool useParentYCoordinate = false;
-
-    [Tooltip("Debug logging for sorting")]
-    public bool debugSorting = false;
-
-    private SpriteRenderer spriteRenderer;
-
-    private void Awake()
-    {
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        
-        // If no SpriteRenderer, try to find one in children
-        if (spriteRenderer == null)
-            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-
-        // Ensure sprite renderer exists
-        if (spriteRenderer == null)
-        {
-            Debug.LogWarning($"[SortableEntity] No SpriteRenderer found on {gameObject.name}");
-        }
-    }
-
-    private void Start()
-    {
-        UpdateSortingOrder();
-    }
-
-    private void LateUpdate()
-    {
-        UpdateSortingOrder();
-    }
-
-    public void UpdateSortingOrder()
-    {
-        if (spriteRenderer == null) return;
-
-        // Determine Y position for sorting
-        float yPositionForSorting = useParentYCoordinate && transform.parent != null 
-            ? transform.parent.position.y 
-            : transform.position.y;
-
-        int sortOrder = CalculateSortOrder(yPositionForSorting);
-        spriteRenderer.sortingOrder = sortOrder;
-
-        if (debugSorting)
-        {
-            Debug.Log($"[SortableEntity] {gameObject.name} - Y: {yPositionForSorting}, Offset: {sortingLayerYOffset}, Sort Order: {sortOrder}");
-        }
-    }
-
-    private int CalculateSortOrder(float yPosition)
-    {
-        // Subtract offset to effectively move the sorting position
-        return Mathf.RoundToInt(-(yPosition + sortingLayerYOffset) * 1000f);
-    }
-
-    // Public method to get current sorting order
-    public int GetCurrentSortOrder()
-    {
-        if (spriteRenderer == null) return 0;
-        return spriteRenderer.sortingOrder;
-    }
-
-    // Public method to set sorting order directly if needed
-    public void SetSortingOrder(int order)
-    {
-        if (spriteRenderer != null)
-            spriteRenderer.sortingOrder = order;
-    }
-
-    // Public method to set the parent Y coordinate usage flag
-    // This eliminates the need for reflection in other scripts
-    public void SetUseParentYCoordinate(bool value)
-    {
-        useParentYCoordinate = value;
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Animals\AnimalDefinition.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-[CreateAssetMenu(fileName = "Animal_", menuName = "Ecosystem/Animal Definition (Simplified)")]
-public class AnimalDefinition : ScriptableObject
-{
-    [Header("Identification")]
-    [Tooltip("The species name (e.g., 'Bunny', 'Fox').")]
-    public string animalName = "DefaultAnimal";
-
-    [Header("Core Stats")]
-    public float maxHealth = 10f; // Keep health for potential future damage/predators
-    public float movementSpeed = 2f;
-
-    [Header("Diet")]
-    [Tooltip("Reference to the AnimalDiet ScriptableObject defining eating habits.")]
-    public AnimalDiet diet; // Needs to reference the simplified AnimalDiet SO
-
-    [Header("Visuals")]
-    [Tooltip("The prefab to instantiate for this animal.")]
-    public GameObject prefab;
-
-    // Removed meatFoodType
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Animals\AnimalLibrary.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using System.Collections.Generic;
-
-[CreateAssetMenu(fileName = "AnimalLibrary", menuName = "Ecosystem/Animal Library")]
-public class AnimalLibrary : ScriptableObject
-{
-    public List<AnimalDefinition> animals;
-}
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\AnimalController.cs
@@ -677,6 +232,11 @@ public class AnimalController : MonoBehaviour
     public float poopDuration = 1f;
     public float poopColorVariation = 0.1f;
     public float thoughtCooldownTime = 5f;
+    
+    [Tooltip("Which Scent Definitions attract this animal (e.g., towards food, mates).")]
+    [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>(); // <<< ADDED
+    [Tooltip("Which Scent Definitions repel this animal (e.g., from predators, danger).")]
+    [SerializeField] private List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
 
     // --- Internal State ---
@@ -1141,15 +701,20 @@ public class AnimalThoughtLine
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\EcosystemManager.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Ecosystem/Core/EcosystemManager.cs
+using UnityEngine;
 
 public class EcosystemManager : MonoBehaviour
 {
     public static EcosystemManager Instance { get; private set; }
 
     [Header("Parent Transforms")]
-    public Transform animalParent;   // e.g., an empty GameObject "SpawnedEcosystem/Animals"
-    public Transform plantParent;    // e.g., an empty GameObject "SpawnedEcosystem/Plants"
+    public Transform animalParent;
+    public Transform plantParent;
+
+    [Header("Libraries")]
+    [Tooltip("Reference to the Scent Library asset.")]
+    public ScentLibrary scentLibrary; // <<< ADDED
 
     [Header("Sorting Options")]
     public bool sortAnimalsBySpecies = true;
@@ -1163,6 +728,12 @@ public class EcosystemManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        // Validate Library Reference
+        if (scentLibrary == null)
+        {
+            Debug.LogWarning($"[{nameof(EcosystemManager)}] Scent Library not assigned! Scent effects will not work.", this);
+        }
     }
 }
 
@@ -1310,6 +881,177 @@ public class FaunaManager : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\FloraManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Core/FloraManager.cs
+using UnityEngine;
+using System.Collections.Generic; // Added for Dictionary
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+public class FloraManager : MonoBehaviour
+{
+    public static FloraManager Instance { get; private set; }
+
+    [Header("Debugging - Scents")]
+    [Tooltip("Show scent radii circle renderers in Game View during runtime.")]
+    [SerializeField] private bool showScentRadiiRuntime = false;
+    [SerializeField] private Color scentRadiusColorRuntime = Color.yellow;
+    [SerializeField] private bool logGizmoCalls = false;
+    [Space]
+    [Tooltip("Prefab used to draw scent circles at runtime.")]
+    [SerializeField] private GameObject circleVisualizerPrefab; // <<< ADDED
+    [Tooltip("Parent transform for instantiated circle visualizers.")]
+    [SerializeField] private Transform circleContainer; // <<< ADDED
+
+    // --- Public Accessors ---
+    public bool ShowScentRadiiRuntime => showScentRadiiRuntime;
+    public Color ScentRadiusColorRuntime => scentRadiusColorRuntime;
+
+    // --- Internal State ---
+    // Dictionary to track circle visualizers per ScentSource
+    private Dictionary<ScentSource, RuntimeCircleDrawer> activeCircleVisualizers = new Dictionary<ScentSource, RuntimeCircleDrawer>();
+
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+
+        // Validate Debug Dependencies
+        if (circleVisualizerPrefab == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Visualizer Prefab is not assigned!", this); }
+        if (circleContainer == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Container transform is not assigned!", this); }
+    }
+
+     void Update() // Added Update loop
+     {
+         if (!Application.isPlaying) return;
+         UpdateRuntimeCircleVisualizers();
+     }
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+        // Clean up any remaining visualizers when manager is destroyed
+         foreach (var kvp in activeCircleVisualizers)
+         {
+             if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+         }
+         activeCircleVisualizers.Clear();
+    }
+
+
+    // --- Runtime Visualizer Update ---
+    void UpdateRuntimeCircleVisualizers()
+    {
+        bool showCircles = showScentRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
+
+        // Find all active ScentSources (can be slow, consider optimizing if needed)
+        // If performance becomes an issue, ScentSources could register/deregister themselves with the manager.
+        ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
+        HashSet<ScentSource> currentSourcesSet = new HashSet<ScentSource>(currentSources); // For quick lookup
+
+        // --- Update existing circles ---
+        List<ScentSource> sourcesToRemove = new List<ScentSource>();
+        foreach (var kvp in activeCircleVisualizers)
+        {
+            ScentSource source = kvp.Key;
+            RuntimeCircleDrawer drawer = kvp.Value;
+
+            // Check if source still exists and is valid
+            if (source == null || drawer == null || !source.gameObject.activeInHierarchy || !currentSourcesSet.Contains(source))
+            {
+                sourcesToRemove.Add(source); // Mark for removal
+                if (drawer != null) Destroy(drawer.gameObject); // Destroy visualizer
+                continue;
+            }
+
+            // Check if circles should be shown globally and if this source is valid
+            bool shouldShowThis = showCircles && source.enabled && source.definition != null && source.EffectiveRadius > 0.01f;
+
+            if (shouldShowThis)
+            {
+                 // Update drawer position to match source and update circle params
+                 drawer.transform.position = source.transform.position;
+                 drawer.transform.rotation = source.transform.rotation; // Match rotation? Optional.
+                 drawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
+            }
+            else
+            {
+                 drawer.HideCircle(); // Hide if shouldn't be shown
+            }
+        }
+
+        // Remove entries for sources that are gone
+        foreach (var source in sourcesToRemove)
+        {
+            activeCircleVisualizers.Remove(source);
+        }
+
+        // --- Add circles for new sources ---
+        if (showCircles)
+        {
+            foreach (ScentSource source in currentSources)
+            {
+                // Skip if already has a visualizer or is invalid
+                if (source == null || activeCircleVisualizers.ContainsKey(source) || !source.enabled || source.definition == null || source.EffectiveRadius <= 0.01f) continue;
+
+                 // Create new visualizer
+                 GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position, source.transform.rotation, circleContainer);
+                 RuntimeCircleDrawer newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
+
+                 if (newDrawer != null)
+                 {
+                      newDrawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
+                      activeCircleVisualizers.Add(source, newDrawer); // Add to tracking
+                 }
+                 else
+                 {
+                    Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' is missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
+                    Destroy(circleGO);
+                 }
+            }
+        }
+        // --- Hide/Destroy all if global flag turned off ---
+        else if (!showCircles && activeCircleVisualizers.Count > 0)
+        {
+             foreach (var kvp in activeCircleVisualizers)
+             {
+                 if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+             }
+             activeCircleVisualizers.Clear();
+        }
+    }
+
+
+    // --- Gizmo Drawing (Editor Visualization - Unchanged) ---
+    #if UNITY_EDITOR
+    void OnDrawGizmosSelected()
+    {
+        // Use the runtime flag to ALSO control the editor gizmo
+        if (showScentRadiiRuntime) {
+             if (logGizmoCalls) { /*...*/ }
+             Gizmos.color = scentRadiusColorRuntime; // Use runtime color for gizmo too
+             ScentSource[] scentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
+             if (logGizmoCalls) { /*...*/ }
+             int drawnCount = 0;
+             foreach (ScentSource source in scentSources) {
+                if (source == null || !source.enabled || source.definition == null) continue;
+                float radius = source.EffectiveRadius;
+                if (radius > 0.01f) { Gizmos.DrawWireSphere(source.transform.position, radius); drawnCount++; }
+             }
+             if (logGizmoCalls && drawnCount > 0) { /*...*/ }
+             else if (logGizmoCalls && scentSources.Length > 0) { /*...*/ }
+        }
+    }
+    #endif
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\PoopController.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
@@ -1376,6 +1118,80 @@ public class PoopController : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\ScentSource.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Core/ScentSource.cs
+using UnityEngine;
+
+// No longer requires RuntimeCircleDrawer directly
+// REMOVED: [RequireComponent(typeof(RuntimeCircleDrawer))]
+public class ScentSource : MonoBehaviour
+{
+    [Header("Scent Definition")]
+    [Tooltip("The base Scent Definition applied to this object.")]
+    public ScentDefinition definition; // Assigned by PlantGrowth/Node effects
+
+    [Header("Applied Modifiers")]
+    [Tooltip("Bonus radius added by node effects.")]
+    public float radiusModifier = 0f;
+    [Tooltip("Bonus strength added by node effects.")]
+    public float strengthModifier = 0f;
+
+    // REMOVED: Debugging Reference private RuntimeCircleDrawer circleDrawer;
+
+    // --- Calculated Effective Properties ---
+    /// <summary> Gets the effective scent radius (Base Radius + Modifier), clamped >= 0. </summary>
+    public float EffectiveRadius => Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier);
+    /// <summary> Gets the effective scent strength (Base Strength + Modifier), clamped >= 0. </summary>
+    public float EffectiveStrength => Mathf.Max(0f, (definition != null ? definition.baseStrength : 0f) + strengthModifier);
+
+
+    void Awake()
+    {
+        // No longer needs to get or manage the circle drawer component here
+        // REMOVED: circleDrawer = GetComponent<RuntimeCircleDrawer>();
+        // REMOVED: circleDrawer?.HideCircle();
+    }
+
+    // REMOVED: Update() method (FloraManager handles creating/updating/hiding the external visualizer)
+
+
+    // Keep Gizmo for Editor visualization (runs independently of Update and runtime drawers)
+    void OnDrawGizmosSelected()
+    {
+        float effectiveRadius = EffectiveRadius; // Calculate radius for gizmo
+
+        if (definition != null) // Check if a definition is assigned
+        {
+            if (effectiveRadius > 0.01f) // Only draw if radius is meaningful
+            {
+                // Use definition name hash for consistent random color
+                // Note: Random.InitState affects the *next* Random call globally,
+                // which might be undesirable if other Gizmos rely on it.
+                // A more robust way might be a custom color mapping or a simple hash function.
+                // For simplicity, we'll keep Random.InitState for now.
+                int prevState = Random.state.GetHashCode(); // Store previous state
+                Random.InitState(definition.name.GetHashCode());
+                Color gizmoColor = Random.ColorHSV(0f, 1f, 0.7f, 0.9f, 0.8f, 1f);
+                gizmoColor.a = 0.3f; // Set alpha for gizmo
+                Random.InitState(prevState); // Restore previous state
+
+                Gizmos.color = gizmoColor;
+                Gizmos.DrawWireSphere(transform.position, effectiveRadius);
+            }
+        }
+        else // Draw default gray if no definition assigned yet
+        {
+            Gizmos.color = new Color(0.8f, 0.8f, 0.8f, 0.2f);
+            Gizmos.DrawWireSphere(transform.position, 1f); // Default size for editor only
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\ThoughtBubbleController.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
@@ -1426,6 +1242,281 @@ public enum ThoughtTrigger
     Fleeing,
     Pooping,
     // Add more triggers as needed
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Effects\FireflyController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyController.cs
+using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using System.Collections.Generic;
+
+public class FireflyController : MonoBehaviour
+{
+    [Header("References (Optional)")]
+    [Tooltip("Optional Light2D component for local glow.")]
+    [SerializeField] private Light2D pointLight;
+    [Tooltip("SpriteRenderer for flickering emission and alpha fade.")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+
+    [Header("Movement")]
+    [SerializeField] private Vector2 speedRange = new Vector2(0.5f, 1.5f);
+    [SerializeField] private float directionChangeInterval = 2.0f;
+    [SerializeField] [Range(0f, 1f)] private float pauseChance = 0.2f;
+    [SerializeField] private Vector2 pauseDurationRange = new Vector2(0.5f, 1.5f);
+
+    [Header("Lifetime & Fade")]
+    [SerializeField] private Vector2 lifetimeRange = new Vector2(8f, 18f);
+    [SerializeField] private float fadeInDuration = 0.75f;
+    [SerializeField] private float fadeOutDuration = 1.5f;
+
+    [Header("Glow Flicker")]
+    [SerializeField] private bool enableFlicker = true;
+    [Tooltip("Intensity range for Emission / Light2D during normal flicker.")]
+    [SerializeField] private Vector2 intensityRange = new Vector2(1.5f, 3.0f);
+    [SerializeField] private float flickerSpeed = 5.0f;
+
+    [Header("Spawn Flicker Effect")]
+    [SerializeField] private bool enableSpawnFlicker = true;
+    [SerializeField] private float spawnFlickerDuration = 0.5f;
+    [Tooltip("Intensity range for Emission / Light2D during SPAWN flicker.")]
+    [SerializeField] private Vector2 spawnFlickerIntensityRange = new Vector2(0.5f, 4.0f);
+    [SerializeField] private float spawnFlickerSpeed = 15.0f;
+
+    [Header("Scent Attraction")]
+    [Tooltip("How often (in seconds) the firefly checks for nearby scent sources.")]
+    [SerializeField] private float scentCheckInterval = 1.0f;
+    [Tooltip("Maximum distance squared the OverlapCircle will check.")]
+    [SerializeField] private float scentOverlapCheckRadius = 10f;
+    [Tooltip("How strongly the firefly steers towards the scent target.")]
+    [SerializeField] private float attractionStrength = 2.0f;
+    [Tooltip("Preferred distance to orbit the scent source.")]
+    [SerializeField] private float orbitDistance = 0.8f;
+    [Tooltip("How much randomness/wobble in the attracted movement.")]
+    [SerializeField] private float attractionWobble = 0.5f;
+    [Tooltip("Which Scent Definitions attract this firefly.")]
+    [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
+
+    // --- Public Accessor ---
+    public Transform AttractionTarget => attractionTarget;
+
+    // --- Internal State ---
+    private FireflyManager manager;
+    private Vector2 currentVelocity;
+    private float currentSpeed;
+    private float stateTimer;
+    private bool isPaused;
+    private float lifetime;
+    private float age = 0f;
+    private float currentAlpha = 0f; // Overall transparency/fade progress
+    private float flickerOffset;
+    private Material spriteMaterialInstance; // Instanced material for modification
+
+    // Scent State
+    private Transform attractionTarget = null;
+    private float scentCheckTimer;
+    private ScentDefinition currentTargetScentDef = null;
+
+    // Movement Bounds
+    private Vector2 minBounds;
+    private Vector2 maxBounds;
+
+    // Store the original emission color *without* intensity scaling from the material asset
+    private Color baseEmissionColor = Color.black; // Default to black if reading fails
+
+    void Awake()
+    {
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && spriteRenderer.material != null) {
+            // Create instance BEFORE reading base emission
+            spriteMaterialInstance = spriteRenderer.material;
+            // Try to read the base emission color set in the material asset
+            if (spriteMaterialInstance.HasProperty("_EmissionColor")) {
+                 // Important: Get the color value directly. If it's HDR, this value
+                 // might already have some intensity baked in, depending on how it was set.
+                 // Ideally, set the material's emission color to the desired *hue/saturation*
+                 // with an intensity of 1 in the editor, and control brightness purely via script.
+                 baseEmissionColor = spriteMaterialInstance.GetColor("_EmissionColor");
+                 // If the color read already has intensity > 1 baked in, we might need to normalize it.
+                 // For simplicity, let's assume the user sets the base color correctly.
+                 // Example normalization (if needed):
+                 // float currentIntensity = Mathf.Max(baseEmissionColor.r, baseEmissionColor.g, baseEmissionColor.b);
+                 // if (currentIntensity > 1.0f) baseEmissionColor /= currentIntensity;
+            } else {
+                 Debug.LogWarning($"[{gameObject.name}] Material '{spriteMaterialInstance.name}' does not have an '_EmissionColor' property.", gameObject);
+            }
+        } else if (spriteRenderer == null || spriteRenderer.material == null) {
+            Debug.LogWarning($"[{gameObject.name}] FireflyController: Cannot modify material properties (flicker/fade), SpriteRenderer or its material is missing.", gameObject);
+            enableFlicker = false;
+            enableSpawnFlicker = false;
+        }
+
+        flickerOffset = Random.Range(0f, 100f);
+    }
+
+    public void Initialize(FireflyManager owner, Vector2 minB, Vector2 maxB)
+    {
+         manager = owner; minBounds = minB; maxBounds = maxB;
+         lifetime = Random.Range(lifetimeRange.x, lifetimeRange.y);
+         age = 0f; currentAlpha = 0f;
+         attractionTarget = null; currentTargetScentDef = null;
+         scentCheckTimer = Random.Range(0, scentCheckInterval);
+         PickNewWanderState();
+         // Apply initial state (fully transparent, potentially zero intensity)
+         ApplyVisualState(0f); // Pass initial intensity 0
+    }
+
+    void Update()
+    {
+        age += Time.deltaTime;
+
+        HandleLifetimeAndFade(); // Calculates currentAlpha
+        if (currentAlpha <= 0f && age > fadeInDuration) { Die(); return; }
+
+        HandleScentDetection();
+        HandleMovement();
+        HandleGlowAndFlicker(); // Calculates target intensity & calls ApplyVisualState
+    }
+
+    void HandleLifetimeAndFade()
+    {
+        // Calculate target alpha based on age and lifetime
+        if (age < fadeInDuration) {
+            currentAlpha = Mathf.Clamp01(age / fadeInDuration); // Fade In
+        } else if (lifetime - age < fadeOutDuration) {
+            currentAlpha = Mathf.Clamp01((lifetime - age) / fadeOutDuration); // Fade Out
+        } else {
+            currentAlpha = 1.0f; // Fully Visible
+        }
+
+        // Check if lifetime naturally expired
+        if (age >= lifetime && currentAlpha > 0) {
+             currentAlpha = Mathf.Clamp01((lifetime - age + fadeOutDuration) / fadeOutDuration);
+             if(currentAlpha <= 0) Die();
+        }
+    }
+
+    // HandleScentDetection (No changes needed from previous version)
+    void HandleScentDetection()
+    {
+        scentCheckTimer -= Time.deltaTime;
+        if (scentCheckTimer <= 0f) { FindAttractionTarget(); scentCheckTimer = scentCheckInterval; }
+        if (attractionTarget != null) { if (!attractionTarget.gameObject.activeInHierarchy || !attractionTarget.TryGetComponent<ScentSource>(out var currentScent) || currentScent.definition != currentTargetScentDef || (attractionTarget.position - transform.position).sqrMagnitude > (currentScent.EffectiveRadius * currentScent.EffectiveRadius) ) { attractionTarget = null; currentTargetScentDef = null; } }
+    }
+
+    // FindAttractionTarget (No changes needed from previous version)
+     void FindAttractionTarget()
+     {
+         Transform bestTarget = null; ScentDefinition bestScentDef = null; float bestScore = -1f;
+         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scentOverlapCheckRadius);
+         foreach (Collider2D hit in hits) {
+             if (hit.TryGetComponent<ScentSource>(out ScentSource scent) && scent.definition != null) {
+                 if (attractiveScentDefinitions.Contains(scent.definition)) {
+                     float distSq = (hit.transform.position - transform.position).sqrMagnitude; float scentRadiusSq = scent.EffectiveRadius * scent.EffectiveRadius;
+                     if (distSq <= scentRadiusSq) { float score = 1.0f / (distSq + 0.01f); if (score > bestScore) { bestScore = score; bestTarget = hit.transform; bestScentDef = scent.definition; } }
+                 }
+             }
+         }
+         if (bestTarget != attractionTarget) { attractionTarget = bestTarget; currentTargetScentDef = bestScentDef; if (attractionTarget != null) { isPaused = false; } }
+     }
+
+    // HandleMovement (No changes needed from previous version)
+    void HandleMovement()
+    {
+        stateTimer -= Time.deltaTime;
+        if (attractionTarget != null) {
+            Vector2 directionToTarget = (attractionTarget.position - transform.position); float distanceToTarget = directionToTarget.magnitude; if (distanceToTarget > 0.01f) { directionToTarget /= distanceToTarget; }
+            Vector2 orbitOffsetDir = new Vector2(-directionToTarget.y, directionToTarget.x) * Mathf.Sign(currentSpeed + 0.1f); Vector2 desiredDirection = directionToTarget * attractionStrength;
+            if (distanceToTarget <= orbitDistance) { desiredDirection += orbitOffsetDir * (currentSpeed * 0.5f); } desiredDirection += Random.insideUnitCircle * attractionWobble;
+            currentVelocity = Vector2.Lerp(currentVelocity.normalized, desiredDirection.normalized, Time.deltaTime * 5f) * currentSpeed;
+        } else { if (stateTimer <= 0f) { PickNewWanderState(); } }
+        if (!isPaused) {
+             Vector2 currentPos = transform.position; Vector2 newPos = currentPos + currentVelocity * Time.deltaTime; bool clampedX = false; bool clampedY = false;
+             if (newPos.x <= minBounds.x || newPos.x >= maxBounds.x) { clampedX = true; newPos.x = Mathf.Clamp(newPos.x, minBounds.x, maxBounds.x); } if (newPos.y <= minBounds.y || newPos.y >= maxBounds.y) { clampedY = true; newPos.y = Mathf.Clamp(newPos.y, minBounds.y, maxBounds.y); }
+             if (clampedX || clampedY) { Vector2 reflectionNormal = Vector2.zero; if(clampedX) reflectionNormal.x = -Mathf.Sign(currentVelocity.x); if(clampedY) reflectionNormal.y = -Mathf.Sign(currentVelocity.y); currentVelocity = Vector2.Reflect(currentVelocity, reflectionNormal.normalized + Random.insideUnitCircle * 0.1f).normalized * currentSpeed; if (currentVelocity.sqrMagnitude < 0.01f) { currentVelocity = Random.insideUnitCircle.normalized * currentSpeed; } PickNewWanderState(true); }
+            transform.position = newPos;
+        }
+    }
+
+    // PickNewWanderState (No changes needed from previous version)
+    void PickNewWanderState(bool forceMove = false)
+    {
+        if (attractionTarget != null && !forceMove) return;
+        if (!forceMove && Random.value < pauseChance) { isPaused = true; currentVelocity = Vector2.zero; stateTimer = Random.Range(pauseDurationRange.x, pauseDurationRange.y); }
+        else { isPaused = false; currentSpeed = Random.Range(speedRange.x, speedRange.y); if(currentVelocity.sqrMagnitude < 0.01f || forceMove) currentVelocity = Random.insideUnitCircle.normalized * currentSpeed; else currentVelocity = (currentVelocity.normalized + Random.insideUnitCircle * 0.5f).normalized * currentSpeed; stateTimer = directionChangeInterval * Random.Range(0.7f, 1.3f); }
+    }
+
+
+    // --- Modified Glow/Flicker Logic ---
+    void HandleGlowAndFlicker()
+    {
+        // Calculate the target BRIGHTNESS intensity based on flicker state
+        float targetFlickerIntensity;
+
+        if (enableSpawnFlicker && age < spawnFlickerDuration) {
+            targetFlickerIntensity = Mathf.Lerp(spawnFlickerIntensityRange.x, spawnFlickerIntensityRange.y, Random.value);
+        } else if (enableFlicker) {
+            float noise = Mathf.PerlinNoise(Time.time * flickerSpeed, flickerOffset);
+            targetFlickerIntensity = Mathf.Lerp(intensityRange.x, intensityRange.y, noise);
+        } else {
+             targetFlickerIntensity = intensityRange.x; // Use base intensity if flicker disabled
+        }
+
+        // Apply the calculated intensity and the current fade alpha
+        ApplyVisualState(targetFlickerIntensity);
+    }
+
+    /// <summary>
+    /// Applies the visual state based on calculated flicker intensity and fade alpha.
+    /// </summary>
+    /// <param name="flickerIntensity">The target brightness intensity for emission/light.</param>
+    void ApplyVisualState(float flickerIntensity)
+    {
+        // 1. Apply overall transparency (Alpha Fade) to the SpriteRenderer's base color alpha
+        if (spriteMaterialInstance != null)
+        {
+            // Ensure _Color property exists before trying to set it
+            if (spriteMaterialInstance.HasProperty("_Color"))
+            {
+                Color baseColor = spriteMaterialInstance.GetColor("_Color");
+                baseColor.a = currentAlpha; // Apply fade alpha
+                spriteMaterialInstance.SetColor("_Color", baseColor);
+            }
+
+            // 2. Apply Flicker Intensity to Emission Color's brightness
+            if (spriteMaterialInstance.HasProperty("_EmissionColor"))
+            {
+                 // Apply intensity to the base emission color we stored in Awake
+                 // Use LinearToGammaSpace if in Linear color space for more visually correct intensity scaling
+                 Color finalEmissionColor = baseEmissionColor * Mathf.LinearToGammaSpace(flickerIntensity);
+                 // Alternative if baseEmissionColor already has intensity: Multiply directly
+                 // Color finalEmissionColor = baseEmissionColor * flickerIntensity;
+                 spriteMaterialInstance.SetColor("_EmissionColor", finalEmissionColor);
+            }
+        }
+
+        // 3. Apply Flicker Intensity (modulated by alpha fade) to Light2D
+        if (pointLight != null)
+        {
+            // Light intensity should reflect both flicker and fade
+            pointLight.intensity = flickerIntensity * currentAlpha;
+        }
+    }
+
+    // Die (No changes needed)
+    void Die()
+    {
+        if (manager != null) manager.ReportFireflyDespawned(this);
+        currentAlpha = 0f; ApplyVisualState(0f); // Ensure visuals are off
+        Destroy(gameObject);
+    }
+
+    // OnDestroy (No changes needed)
+     void OnDestroy() { if (spriteMaterialInstance != null) Destroy(spriteMaterialInstance); }
 }
 
 
