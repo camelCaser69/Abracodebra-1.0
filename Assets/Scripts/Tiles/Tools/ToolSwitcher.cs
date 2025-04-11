@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 
 public class ToolSwitcher : MonoBehaviour
 {
+    [Tooltip("All available tool definitions, e.g. Hoe, WateringCan, etc.")]
     public ToolDefinition[] toolDefinitions;
-    public Image toolIcon;
 
     private int currentIndex = 0;
+
+    /// <summary>
+    /// The currently selected tool definition.
+    /// </summary>
     public ToolDefinition CurrentTool { get; private set; } = null;
 
     private void Start()
@@ -15,14 +18,13 @@ public class ToolSwitcher : MonoBehaviour
         {
             currentIndex = 0;
             CurrentTool = toolDefinitions[currentIndex];
-            UpdateUI();
+            LogToolChange();
         }
     }
 
     private void Update()
     {
-        if (toolDefinitions.Length == 0)
-            return;
+        if (toolDefinitions.Length == 0) return;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
@@ -30,7 +32,7 @@ public class ToolSwitcher : MonoBehaviour
             if (currentIndex < 0)
                 currentIndex = toolDefinitions.Length - 1;
             CurrentTool = toolDefinitions[currentIndex];
-            UpdateUI();
+            LogToolChange();
         }
         else if (Input.GetKeyDown(KeyCode.E))
         {
@@ -38,16 +40,13 @@ public class ToolSwitcher : MonoBehaviour
             if (currentIndex >= toolDefinitions.Length)
                 currentIndex = 0;
             CurrentTool = toolDefinitions[currentIndex];
-            UpdateUI();
+            LogToolChange();
         }
     }
 
-    void UpdateUI()
+    private void LogToolChange()
     {
-        Debug.Log($"Switched tool to: {CurrentTool?.toolType}");
-        if (toolIcon != null && CurrentTool != null && CurrentTool.icon != null)
-        {
-            toolIcon.sprite = CurrentTool.icon;
-        }
+        string toolName = (CurrentTool != null) ? CurrentTool.displayName : "(none)";
+        Debug.Log($"Switched tool to: {toolName}");
     }
 }
