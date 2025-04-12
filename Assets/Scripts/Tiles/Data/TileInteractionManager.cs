@@ -31,8 +31,8 @@ public class TileInteractionManager : MonoBehaviour
     public GameObject hoverHighlightObject;
 
     [Header("Tilemap Rendering Settings")]
-    [Tooltip("The starting sorting order for the first tilemap in the list")]
-    public int initialSortingOrder = 0;
+    [Tooltip("The base sorting order value (the first tilemap will be this value, subsequent ones will decrease)")]
+    public int baseSortingOrder = 0;
 
     [Header("Debug / UI")]
     public bool debugLogs = false;
@@ -64,9 +64,21 @@ public class TileInteractionManager : MonoBehaviour
         SetupTilemaps();
     }
 
-    // New method to set up tilemap sorting order and apply initial colors
+    void Start()
+    {
+        // Ensure we always initialize the dictionary in Start() for runtime
+        if (moduleByDefinition == null || moduleByDefinition.Count == 0)
+        {
+            SetupTilemaps();
+        }
+    }
+
+    // Method to set up tilemap sorting order and apply initial colors
     private void SetupTilemaps()
     {
+        moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
+        definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
+        
         for (int i = 0; i < tileDefinitionMappings.Count; i++)
         {
             var mapping = tileDefinitionMappings[i];
@@ -83,13 +95,14 @@ public class TileInteractionManager : MonoBehaviour
                 Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
                 if (renderTilemapTransform != null)
                 {
-                    // Set the sorting order based on the index
+                    // Set the sorting order based on the index - INVERTED (negative values)
+                    // First item (index 0) gets baseSortingOrder, then we subtract for each subsequent item
                     TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
                     if (renderer != null)
                     {
-                        renderer.sortingOrder = initialSortingOrder + i;
+                        renderer.sortingOrder = baseSortingOrder - i;
                         if (debugLogs)
-                            Debug.Log($"Setting sorting order for {mapping.tileDef.displayName} to {initialSortingOrder + i}");
+                            Debug.Log($"Setting sorting order for {mapping.tileDef.displayName} to {baseSortingOrder - i}");
                     }
                     
                     // Set the initial color from TileDefinition
@@ -108,6 +121,62 @@ public class TileInteractionManager : MonoBehaviour
             else
             {
                 Debug.LogWarning($"Duplicate tileDef {mapping.tileDef.displayName} in tileDefinitionMappings.");
+            }
+        }
+    }
+
+    // New public method to update sorting order - can be called from custom editor
+    public void UpdateSortingOrder()
+    {
+        for (int i = 0; i < tileDefinitionMappings.Count; i++)
+        {
+            var mapping = tileDefinitionMappings[i];
+            if (mapping.tileDef == null || mapping.tilemapModule == null) 
+                continue;
+                
+            Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+            if (renderTilemapTransform != null)
+            {
+                TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
+                if (renderer != null)
+                {
+                    // Negative values - first in list gets highest order
+                    renderer.sortingOrder = baseSortingOrder - i;
+                    
+                    #if UNITY_EDITOR
+                    UnityEditor.EditorUtility.SetDirty(renderer);
+                    #endif
+                    
+                    if (debugLogs)
+                        Debug.Log($"Updated sorting order for {mapping.tileDef.displayName} to {baseSortingOrder - i}");
+                }
+            }
+        }
+    }
+
+    // New public method to update all colors - can be called from custom editor
+    public void UpdateAllColors()
+    {
+        foreach (var mapping in tileDefinitionMappings)
+        {
+            if (mapping.tileDef == null || mapping.tilemapModule == null) 
+                continue;
+                
+            Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+            if (renderTilemapTransform != null)
+            {
+                Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
+                if (renderTilemap != null)
+                {
+                    renderTilemap.color = mapping.tileDef.tintColor;
+                    
+                    #if UNITY_EDITOR
+                    UnityEditor.EditorUtility.SetDirty(renderTilemap);
+                    #endif
+                    
+                    if (debugLogs)
+                        Debug.Log($"Updated color for {mapping.tileDef.displayName} to {mapping.tileDef.tintColor}");
+                }
             }
         }
     }
@@ -226,6 +295,13 @@ public class TileInteractionManager : MonoBehaviour
             if (renderTilemap != null)
             {
                 renderTilemap.color = tileDef.tintColor;
+                
+#if UNITY_EDITOR
+                if (!Application.isPlaying)
+                {
+                    UnityEditor.EditorUtility.SetDirty(renderTilemap);
+                }
+#endif
             }
         }
 

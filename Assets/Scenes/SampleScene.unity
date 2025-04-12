@@ -2290,7 +2290,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -213423677
   m_SortingLayer: -2
-  m_SortingOrder: -20
+  m_SortingOrder: -1
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -7782,7 +7782,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -213423677
   m_SortingLayer: -2
-  m_SortingOrder: -10
+  m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -10540,17 +10540,17 @@ MonoBehaviour:
   tileDefinitionMappings:
   - tileDef: {fileID: 11400000, guid: b82b8add4da60854b89d053b81886617, type: 2}
     tilemapModule: {fileID: 689674503}
-  - tileDef: {fileID: 11400000, guid: 4f94336bb2aca31489661a9f761144db, type: 2}
-    tilemapModule: {fileID: 1673149537}
   - tileDef: {fileID: 11400000, guid: 2efc2db88b0caff4693943889a86ccac, type: 2}
     tilemapModule: {fileID: 604569929}
+  - tileDef: {fileID: 11400000, guid: 4f94336bb2aca31489661a9f761144db, type: 2}
+    tilemapModule: {fileID: 1673149537}
   interactionLibrary: {fileID: 11400000, guid: f255a1f2fd3fbbb429940cb83c7d9809, type: 2}
   interactionGrid: {fileID: 436520932}
   mainCamera: {fileID: 519420031}
   player: {fileID: 1491144816}
   hoverRadius: 3
   hoverHighlightObject: {fileID: 1547083800}
-  initialSortingOrder: 0
+  baseSortingOrder: 0
   debugLogs: 0
   hoveredTileText: {fileID: 235836642}
   currentToolText: {fileID: 416922638}
@@ -11659,7 +11659,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -213423677
   m_SortingLayer: -2
-  m_SortingOrder: -15
+  m_SortingOrder: -2
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16

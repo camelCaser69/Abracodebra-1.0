@@ -22,4 +22,31 @@ public class TileDefinition : ScriptableObject
     [Header("Overlay Option")]
     [Tooltip("If true, this tile will be placed on top without removing the tile underneath ")]
     public bool keepBottomTile = false;
+
+#if UNITY_EDITOR
+    // This method will be called from the custom editor
+    public void UpdateColor()
+    {
+        // Find the TileInteractionManager in the scene using the non-deprecated method
+        var manager = UnityEngine.Object.FindAnyObjectByType<TileInteractionManager>();
+        if (manager == null) return;
+
+        foreach (var mapping in manager.tileDefinitionMappings)
+        {
+            if (mapping.tileDef == this && mapping.tilemapModule != null)
+            {
+                Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+                if (renderTilemapTransform != null)
+                {
+                    Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
+                    if (renderTilemap != null)
+                    {
+                        renderTilemap.color = tintColor;
+                        UnityEditor.EditorUtility.SetDirty(renderTilemap);
+                    }
+                }
+            }
+        }
+    }
+#endif
 }
