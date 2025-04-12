@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class ToolSwitcher : MonoBehaviour
 {
-    [Tooltip("All available tool definitions, e.g. Hoe, WateringCan, etc.")]
+    [Tooltip("Array of Tool Definition assets (order matters for cycling with Q/E).")]
     public ToolDefinition[] toolDefinitions;
 
-    private int currentIndex = 0;
+    // This field is now used to display the tool icon above the player.
+    [Tooltip("SpriteRenderer that displays the current tool icon above the player.")]
+    public SpriteRenderer toolDisplay;
 
-    /// <summary>
-    /// The currently selected tool definition.
-    /// </summary>
+    private int currentIndex = 0;
     public ToolDefinition CurrentTool { get; private set; } = null;
 
     private void Start()
@@ -18,29 +19,52 @@ public class ToolSwitcher : MonoBehaviour
         {
             currentIndex = 0;
             CurrentTool = toolDefinitions[currentIndex];
+            UpdateToolDisplay();
             LogToolChange();
         }
     }
 
     private void Update()
     {
-        if (toolDefinitions.Length == 0) return;
+        if (toolDefinitions.Length == 0)
+            return;
 
+        // Cycle backwards with Q
         if (Input.GetKeyDown(KeyCode.Q))
         {
             currentIndex--;
             if (currentIndex < 0)
                 currentIndex = toolDefinitions.Length - 1;
             CurrentTool = toolDefinitions[currentIndex];
+            UpdateToolDisplay();
             LogToolChange();
         }
+        // Cycle forwards with E
         else if (Input.GetKeyDown(KeyCode.E))
         {
             currentIndex++;
             if (currentIndex >= toolDefinitions.Length)
                 currentIndex = 0;
             CurrentTool = toolDefinitions[currentIndex];
+            UpdateToolDisplay();
             LogToolChange();
+        }
+    }
+
+    private void UpdateToolDisplay()
+    {
+        if (toolDisplay == null)
+            return;
+
+        if (CurrentTool != null && CurrentTool.icon != null)
+        {
+            toolDisplay.sprite = CurrentTool.icon;
+            toolDisplay.color = CurrentTool.iconTint; // Apply the tint defined in the ToolDefinition
+            toolDisplay.enabled = true;
+        }
+        else
+        {
+            toolDisplay.enabled = false;
         }
     }
 
