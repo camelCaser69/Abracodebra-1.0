@@ -8,6 +8,10 @@ public class TileDefinition : ScriptableObject
     [Tooltip("Display name for this tile type (used in UI and debugging)")]
     public string displayName;    // e.g. "Grass", "Dirt", "Wet Dirt"
     
+    [Header("Visual Properties")]
+    [Tooltip("Optional tint color to apply to the RenderTilemap")]
+    public Color tintColor = Color.white;
+    
     [Header("Auto-Reversion (optional)")]
     [Tooltip("If > 0, after this many seconds, the tile reverts to 'revertToTile'.")]
     public float revertAfterSeconds = 0f;

@@ -30,6 +30,10 @@ public class TileInteractionManager : MonoBehaviour
     public float hoverRadius = 3f;
     public GameObject hoverHighlightObject;
 
+    [Header("Tilemap Rendering Settings")]
+    [Tooltip("The starting sorting order for the first tilemap in the list")]
+    public int initialSortingOrder = 0;
+
     [Header("Debug / UI")]
     public bool debugLogs = false;
     public TextMeshProUGUI hoveredTileText;
@@ -56,21 +60,54 @@ public class TileInteractionManager : MonoBehaviour
         moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
         definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
 
-        foreach (var mapping in tileDefinitionMappings)
+        // Setup tilemaps with correct sorting orders and colors
+        SetupTilemaps();
+    }
+
+    // New method to set up tilemap sorting order and apply initial colors
+    private void SetupTilemaps()
+    {
+        for (int i = 0; i < tileDefinitionMappings.Count; i++)
         {
+            var mapping = tileDefinitionMappings[i];
             if (mapping.tileDef == null || mapping.tilemapModule == null) 
                 continue;
 
+            // Add to dictionaries
             if (!moduleByDefinition.ContainsKey(mapping.tileDef))
             {
                 moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
                 definitionByModule[mapping.tilemapModule] = mapping.tileDef;
+                
+                // Get the RenderTilemap component
+                Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+                if (renderTilemapTransform != null)
+                {
+                    // Set the sorting order based on the index
+                    TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
+                    if (renderer != null)
+                    {
+                        renderer.sortingOrder = initialSortingOrder + i;
+                        if (debugLogs)
+                            Debug.Log($"Setting sorting order for {mapping.tileDef.displayName} to {initialSortingOrder + i}");
+                    }
+                    
+                    // Set the initial color from TileDefinition
+                    Tilemap tilemap = renderTilemapTransform.GetComponent<Tilemap>();
+                    if (tilemap != null)
+                    {
+                        tilemap.color = mapping.tileDef.tintColor;
+                        if (debugLogs)
+                            Debug.Log($"Setting color for {mapping.tileDef.displayName} to {mapping.tileDef.tintColor}");
+                    }
+                }
+                
                 if (debugLogs)
-                    Debug.Log($"[Mapping] {mapping.tileDef.displayName } => {mapping.tilemapModule.gameObject.name}");
+                    Debug.Log($"[Mapping] {mapping.tileDef.displayName} => {mapping.tilemapModule.gameObject.name}");
             }
             else
             {
-                Debug.LogWarning($"Duplicate tileDef {mapping.tileDef.displayName } in tileDefinitionMappings.");
+                Debug.LogWarning($"Duplicate tileDef {mapping.tileDef.displayName} in tileDefinitionMappings.");
             }
         }
     }
@@ -180,6 +217,17 @@ public class TileInteractionManager : MonoBehaviour
         // The actual visual appearance is handled by the DualGridTilemapModule system
         // We just need to mark this cell as "filled"
         module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
+
+        // Set the RenderTilemap color to match the TileDefinition's tintColor
+        Transform renderTilemapTransform = module.transform.Find("RenderTilemap");
+        if (renderTilemapTransform != null)
+        {
+            Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
+            if (renderTilemap != null)
+            {
+                renderTilemap.color = tileDef.tintColor;
+            }
+        }
 
         // If it has a timed reversion, schedule that
         RegisterTimedTile(cellPos, tileDef);

@@ -2005,7 +2005,7 @@ MonoBehaviour:
   m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 000000009503b18ba546f8ef4772f18d
+  m_ApplyToSortingLayers: 000000009503b18ba546f8ef4772f18dc36947f3
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -2288,8 +2288,8 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -268941659
-  m_SortingLayer: -1
+  m_SortingLayerID: -213423677
+  m_SortingLayer: -2
   m_SortingOrder: -20
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -7780,8 +7780,8 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -268941659
-  m_SortingLayer: -1
+  m_SortingLayerID: -213423677
+  m_SortingLayer: -2
   m_SortingOrder: -10
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -10550,6 +10550,7 @@ MonoBehaviour:
   player: {fileID: 1491144816}
   hoverRadius: 3
   hoverHighlightObject: {fileID: 1547083800}
+  initialSortingOrder: 0
   debugLogs: 0
   hoveredTileText: {fileID: 235836642}
   currentToolText: {fileID: 416922638}
@@ -11656,8 +11657,8 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -268941659
-  m_SortingLayer: -1
+  m_SortingLayerID: -213423677
+  m_SortingLayer: -2
   m_SortingOrder: -15
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}

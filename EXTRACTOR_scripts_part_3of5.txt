@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-12 21:01:00
+UNITY PROJECT SCRIPT EXPORT - 2025-04-12 23:50:30
 PART 3 OF 5
 ================================================================================
 
@@ -209,7 +209,9 @@ SCRIPT CONTENTS
 // FILE: Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyManager.cs
+
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -262,6 +264,8 @@ public class FireflyManager : MonoBehaviour
     private List<FireflyController> activeFireflies = new List<FireflyController>();
     private float spawnTimer;
     private bool isNight = false;
+    
+    
 
     // Dictionary to track line visualizers per firefly
     private Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: TileDefinition_000_Grass
   m_EditorClassIdentifier: 
   displayName: Grass
+  tintColor: {r: 0.28235295, g: 0.59607846, b: 0.41568628, a: 1}
   revertAfterSeconds: 0
   revertToTile: {fileID: 0}
   keepBottomTile: 0
