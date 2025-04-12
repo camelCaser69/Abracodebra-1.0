@@ -12,8 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 998948210ce44d75897a01d8fd5e6e5d, type: 3}
   m_Name: TileDefinition_002_DirtWet
   m_EditorClassIdentifier: 
-  tileId: Dirt_Wet
-  tile: {fileID: 11400000, guid: d639fca9cd7515e4995f1cb26de15772, type: 2}
+  displayName: Dirt Wet
   revertAfterSeconds: 12
   revertToTile: {fileID: 11400000, guid: 4f94336bb2aca31489661a9f761144db, type: 2}
-  doNotRemovePrevious: 1
+  keepBottomTile: 1

@@ -66,11 +66,11 @@ public class TileInteractionManager : MonoBehaviour
                 moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
                 definitionByModule[mapping.tilemapModule] = mapping.tileDef;
                 if (debugLogs)
-                    Debug.Log($"[Mapping] {mapping.tileDef.tileId} => {mapping.tilemapModule.gameObject.name}");
+                    Debug.Log($"[Mapping] {mapping.tileDef.displayName } => {mapping.tilemapModule.gameObject.name}");
             }
             else
             {
-                Debug.LogWarning($"Duplicate tileDef {mapping.tileDef.tileId} in tileDefinitionMappings.");
+                Debug.LogWarning($"Duplicate tileDef {mapping.tileDef.displayName } in tileDefinitionMappings.");
             }
         }
     }
@@ -157,16 +157,16 @@ public class TileInteractionManager : MonoBehaviour
     {
         if (!moduleByDefinition.ContainsKey(tileDef))
         {
-            Debug.LogWarning($"PlaceTile: {tileDef.tileId} not found in moduleByDefinition.");
+            Debug.LogWarning($"PlaceTile: {tileDef.displayName} not found in moduleByDefinition.");
             return;
         }
         var module = moduleByDefinition[tileDef];
 
         // If tileDef is an overlay, do NOT remove the old tile
         // Else we remove the old tile first
-        if (!tileDef.doNotRemovePrevious)
+        if (!tileDef.keepBottomTile)
         {
-            // e.g. if we are placing "DirtWet" which is overlay=false, 
+            // e.g. if we are placing "DirtWet" which is keepBottomTile=false, 
             // we do remove the old tile from its tilemap
             // but we must find whichever tile is currently there
             TileDefinition existing = FindWhichTileDefinitionAt(cellPos);
@@ -176,40 +176,10 @@ public class TileInteractionManager : MonoBehaviour
             }
         }
 
-        // Set the cell in the tilemap to have a tile (the actual content doesn't matter)
-        // We'll just set a marker tile of 1 - the actual visual appearance is handled by the DualGridTilemapModule
-        
-        // Check if the DualGridTilemapModule has any existing tile we can use as a template
-        TileBase existingTile = null;
-        
-        // Try to find any existing tile in the tilemap to use as a template
-        foreach (var pos in module.DataTilemap.cellBounds.allPositionsWithin)
-        {
-            Vector3Int cellPosition = new Vector3Int(pos.x, pos.y, pos.z);
-            if (module.DataTilemap.HasTile(cellPosition))
-            {
-                existingTile = module.DataTilemap.GetTile(cellPosition);
-                break;
-            }
-        }
-        
-        // If we found an existing tile, use it; otherwise use a RuleTile or TileBase instance
-        // that you've saved as a reference, or create a fallback option
-        if (existingTile != null)
-        {
-            module.DataTilemap.SetTile(cellPos, existingTile);
-        }
-        else
-        {
-            // Fallback: use a basic tile (this might not work visually with your DualGrid system)
-            // but it's a functional placeholder
-            Debug.LogWarning($"No existing tile found in {module.name} to use as template. " +
-                             $"Visual appearance might be incorrect for {tileDef.tileId}.");
-                             
-            // One option is to set a value of 1 if your DualGrid system supports this
-            // Another option is to create a very basic tile if needed
-            module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
-        }
+        // Set the cell in the tilemap to have a tile
+        // The actual visual appearance is handled by the DualGridTilemapModule system
+        // We just need to mark this cell as "filled"
+        module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
 
         // If it has a timed reversion, schedule that
         RegisterTimedTile(cellPos, tileDef);
@@ -219,7 +189,7 @@ public class TileInteractionManager : MonoBehaviour
     {
         if (!moduleByDefinition.ContainsKey(tileDef))
         {
-            Debug.LogWarning($"RemoveTile: {tileDef.tileId} not in moduleByDefinition.");
+            Debug.LogWarning($"RemoveTile: {tileDef.displayName} not in moduleByDefinition.");
             return;
         }
         var module = moduleByDefinition[tileDef];
@@ -243,14 +213,14 @@ public class TileInteractionManager : MonoBehaviour
         // To ensure we get the top-most visible tile for overlays, we need to check
         // tiles in reverse order (or specifically check overlay tiles first)
         
-        // First, try to find any overlay tiles (doNotRemovePrevious = true)
+        // First, try to find any overlay tiles (keepBottomTile = true)
         foreach (var mapping in tileDefinitionMappings)
         {
             if (mapping.tileDef == null || mapping.tilemapModule == null) 
                 continue;
                 
             // Check specifically for overlay tiles first
-            if (mapping.tileDef.doNotRemovePrevious && 
+            if (mapping.tileDef.keepBottomTile && 
                 mapping.tilemapModule.DataTilemap.HasTile(cellPos))
             {
                 return mapping.tileDef;
@@ -286,7 +256,7 @@ public class TileInteractionManager : MonoBehaviour
 
         if (debugLogs)
         {
-            string tileName = foundTile != null ? foundTile.tileId : "NULL";
+            string tileName = foundTile != null ? foundTile.displayName  : "NULL";
             Debug.Log($"[Hover] cell={cellPos}, tile={tileName}, dist={distance:F2}");
         }
 
@@ -315,7 +285,7 @@ public class TileInteractionManager : MonoBehaviour
         {
             if (currentlyHoveredCell.HasValue)
             {
-                string tileName = hoveredTileDef != null ? hoveredTileDef.tileId : "None";
+                string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
                 hoveredTileText.text = $"Hovering: {tileName}";
             }
             else
@@ -394,7 +364,7 @@ public class TileInteractionManager : MonoBehaviour
         }
 
         if (debugLogs)
-            Debug.Log($"[ApplyToolAction] Tool={toolDef.toolType}, fromTile={hoveredTileDef.tileId} at cell={currentlyHoveredCell.Value}");
+            Debug.Log($"[ApplyToolAction] Tool={toolDef.toolType}, fromTile={hoveredTileDef.displayName} at cell={currentlyHoveredCell.Value}");
 
         // Find matching rule
         TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r =>
@@ -404,15 +374,15 @@ public class TileInteractionManager : MonoBehaviour
 
         if (rule == null)
         {
-            Debug.Log($"No rule for tool {toolDef.toolType} on tile {hoveredTileDef.tileId}.");
+            Debug.Log($"No rule for tool {toolDef.toolType} on tile {hoveredTileDef.displayName}.");
             return;
         }
 
-        // FIX: Check whether the destination tile has doNotRemovePrevious flag before removing source tile
+        // Check whether the destination tile has keepBottomTile flag before removing source tile
         if (rule.toTile != null)
         {
-            // Only remove the original tile if the new tile doesn't have doNotRemovePrevious set
-            if (!rule.toTile.doNotRemovePrevious)
+            // Only remove the original tile if the new tile doesn't have keepBottomTile set
+            if (!rule.toTile.keepBottomTile)
             {
                 RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
             }

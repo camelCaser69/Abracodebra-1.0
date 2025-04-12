@@ -5,11 +5,9 @@ using UnityEngine.Tilemaps;
 public class TileDefinition : ScriptableObject
 {
     [Header("Basic Identification")]
-    public string tileId;        // e.g. "Grass", "Dirt", "DirtWet"
+    [Tooltip("Display name for this tile type (used in UI and debugging)")]
+    public string displayName;    // e.g. "Grass", "Dirt", "Wet Dirt"
     
-    // Remove the direct TileBase reference since it's redundant
-    // The actual tile will come from the DualGridTilemapModule
-
     [Header("Auto-Reversion (optional)")]
     [Tooltip("If > 0, after this many seconds, the tile reverts to 'revertToTile'.")]
     public float revertAfterSeconds = 0f;
@@ -18,6 +16,6 @@ public class TileDefinition : ScriptableObject
     public TileDefinition revertToTile;
 
     [Header("Overlay Option")]
-    [Tooltip("If true, placing this tile does NOT remove the old tile underneath.")]
-    public bool doNotRemovePrevious = false;
+    [Tooltip("If true, this tile will be placed on top without removing the tile underneath.")]
+    public bool keepBottomTile = false;
 }
