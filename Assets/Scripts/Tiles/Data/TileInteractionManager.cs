@@ -296,7 +296,8 @@ public class TileInteractionManager : MonoBehaviour
 
         if (currentToolText != null)
         {
-            ToolSwitcher sw = FindObjectOfType<ToolSwitcher>();
+            // Changed from FindObjectOfType to FindAnyObjectByType for better performance
+            ToolSwitcher sw = Object.FindAnyObjectByType<ToolSwitcher>();
             if (sw != null && sw.CurrentTool != null)
             {
                 currentToolText.text = $"Tool: {sw.CurrentTool.toolType}";

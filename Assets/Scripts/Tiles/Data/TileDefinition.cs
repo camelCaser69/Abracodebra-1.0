@@ -16,6 +16,6 @@ public class TileDefinition : ScriptableObject
     public TileDefinition revertToTile;
 
     [Header("Overlay Option")]
-    [Tooltip("If true, this tile will be placed on top without removing the tile underneath.")]
+    [Tooltip("If true, this tile will be placed on top without removing the tile underneath ")]
     public bool keepBottomTile = false;
 }

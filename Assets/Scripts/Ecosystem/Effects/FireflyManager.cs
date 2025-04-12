@@ -1,5 +1,7 @@
 ﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyManager.cs
+
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using System.Collections.Generic;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -52,6 +54,8 @@ public class FireflyManager : MonoBehaviour
     private List<FireflyController> activeFireflies = new List<FireflyController>();
     private float spawnTimer;
     private bool isNight = false;
+    
+    
 
     // Dictionary to track line visualizers per firefly
     private Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
