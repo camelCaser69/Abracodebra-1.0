@@ -1,13 +1,17 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-11 01:27:09
+UNITY PROJECT SCRIPT EXPORT - 2025-04-12 21:01:00
 ================================================================================
 
 DIRECTORY STRUCTURE
 --------------------------------------------------------------------------------
 Assets
 ├── Animation
+│   ├── GodRay300B_001.controller
+│   ├── GodRay60_001.controller
+│   ├── GodRays300.anim
+│   ├── GodRays300B.anim
 │   ├── MiniVillagerMan_Animator.controller
 │   └── MiniVillagerMan_AnimatorBackup.controller
 ├── DefaultVolumeProfile.asset
@@ -73,6 +77,7 @@ Assets
 │       │   └── PaletteDual_Ground.prefab
 │       └── Rule Tiles
 │           ├── DualGridRuleTile_Dirt.asset
+│           ├── DualGridRuleTile_DirtWet.asset
 │           └── DualGridRuleTile_Grass.asset
 ├── Scenes
 │   ├── MainScene.unity
@@ -99,7 +104,13 @@ Assets
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
 │   ├── Tiles
+│   │   ├── TileDefinition_000_Grass.asset
+│   │   ├── TileDefinition_001_Dirt.asset
+│   │   ├── TileDefinition_002_DirtWet.asset
+│   │   └── TileInteractionLibrary.asset
 │   └── Tools
+│       ├── ToolDefinition_000_GardeningHoe.asset
+│       └── ToolDefinition_001_WateringCan.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -159,11 +170,16 @@ Assets
 │   │       └── NodeView.cs
 │   ├── Player
 │   │   └── GardenerController.cs
+│   ├── Rendering
 │   ├── Tiles
 │   │   ├── Data
 │   │   │   ├── PlayerTileInteractor.cs
-│   │   │   └── TileInteractionManager.cs
+│   │   │   ├── TileDefinition.cs
+│   │   │   ├── TileInteractionLibrary.cs
+│   │   │   ├── TileInteractionManager.cs
+│   │   │   └── TileInteractionRule.cs
 │   │   └── Tools
+│   │       ├── ToolDefinition.cs
 │   │       ├── ToolSwitcher.cs
 │   │       └── ToolType.cs
 │   ├── UI
@@ -4980,310 +4996,572 @@ public class GardenerController : MonoBehaviour
 [RequireComponent(typeof(ToolSwitcher))]
 public class PlayerTileInteractor : MonoBehaviour
 {
-    [Header("Hover Settings")]
-    [Tooltip("Maximum distance from the player that the highlight appears.")]
-    public float hoverRadius = 3f;
-
-    [Tooltip("Reference to the camera used for raycasting.")]
-    public Camera mainCamera;
-
-    [Tooltip("Reference to the Grid component of your scene.")]
-    public Grid sceneGrid;
-
-    [Header("Highlight Object")]
-    [Tooltip("Prefab or scene object with a SpriteRenderer used as the hover highlight marker.")]
-    public GameObject hoverHighlightObject;
-
-    // (Internal) Last detected cell from mouse
-    private Vector3Int? lastCellPos = null;
-
-    // Reference to ToolSwitcher (assumed to manage your current tool)
     private ToolSwitcher toolSwitcher;
 
     private void Awake()
     {
-        // --- Auto-assign Camera if not manually set
-        if (mainCamera == null)
-        {
-            mainCamera = Camera.main;
-            if (mainCamera == null)
-                Debug.LogError("PlayerTileInteractor: No camera found. Please assign one in Inspector.");
-        }
-
-        // --- Auto-assign Grid if not manually set
-        if (sceneGrid == null)
-        {
-            sceneGrid = FindObjectOfType<Grid>();
-            if (sceneGrid == null)
-                Debug.LogError("PlayerTileInteractor: No Grid found in the scene. Please assign one in Inspector.");
-        }
-
-        // Grab ToolSwitcher from the same GameObject
         toolSwitcher = GetComponent<ToolSwitcher>();
         if (toolSwitcher == null)
-        {
-            Debug.LogError("PlayerTileInteractor: No ToolSwitcher component found on this GameObject.");
-        }
-
-        // Optional: Hide highlight at startup
-        if (hoverHighlightObject != null)
-            hoverHighlightObject.SetActive(false);
+            Debug.LogError("PlayerTileInteractor: No ToolSwitcher found on this GameObject!");
     }
 
     private void Update()
     {
-        ProcessHover();
-        ProcessMouseClick();
-    }
-
-    private void ProcessHover()
-    {
-        if (mainCamera == null || sceneGrid == null || hoverHighlightObject == null)
-            return; // Missing references
-
-        // Convert mouse screen position to a world position at z=0
-        Vector3 mousePos = Input.mousePosition;
-        Ray ray = mainCamera.ScreenPointToRay(mousePos);
-        float zOffset = (ray.origin.z != 0f) ? -ray.origin.z / ray.direction.z : 10f;
-        Vector3 worldPos = ray.origin + ray.direction * zOffset;
-
-        // Convert the world position to a grid cell position
-        Vector3Int cellPos = sceneGrid.WorldToCell(worldPos);
-
-        // Check if the hovered cell is within range of the player
-        float distance = Vector2.Distance(transform.position, sceneGrid.CellToWorld(cellPos));
-        if (distance <= hoverRadius)
-        {
-            // Enable and position the hover highlighter
-            hoverHighlightObject.SetActive(true);
-
-            // By default, CellToWorld gives the bottom-left corner of the cell (depending on your grid settings).
-            // If you want precisely the cell’s “center,” add half the cell size
-            Vector3 cellCorner = sceneGrid.CellToWorld(cellPos);
-            Vector3 cellCenterOffset = new Vector3(sceneGrid.cellSize.x / 2f, sceneGrid.cellSize.y / 2f, 0f);
-            hoverHighlightObject.transform.position = cellCorner + cellCenterOffset;
-
-            lastCellPos = cellPos;
-        }
-        else
-        {
-            hoverHighlightObject.SetActive(false);
-            lastCellPos = null;
-        }
-    }
-
-    private void ProcessMouseClick()
-    {
-        // Left-click triggers the tool action
         if (Input.GetMouseButtonDown(0))
         {
-            if (!lastCellPos.HasValue)
-                return;
-
-            float distance = Vector2.Distance(transform.position, sceneGrid.CellToWorld(lastCellPos.Value));
-            if (distance > hoverRadius)
-                return; // Just in case
-
-            // Determine current tool from ToolSwitcher
-            ToolType currentTool = toolSwitcher != null ? toolSwitcher.CurrentTool : ToolType.None;
-            if (currentTool == ToolType.None)
+            if (TileInteractionManager.Instance == null)
             {
-                Debug.Log("No tool is currently selected; ignoring click.");
+                Debug.LogError("No TileInteractionManager in scene!");
                 return;
             }
 
-            // Call the method in your TileInteractionManager that handles tile actions
-            TileInteractionManager.Instance?.ApplyToolAction(lastCellPos.Value, currentTool);
+            ToolDefinition currentTool = toolSwitcher.CurrentTool;
+            if (currentTool == null)
+            {
+                Debug.Log("No tool is currently selected.");
+                return;
+            }
+
+            // Attempt to apply the tool
+            TileInteractionManager.Instance.ApplyToolAction(currentTool);
         }
     }
 }
 
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Data\TileDefinition.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.Tilemaps;
+
+[CreateAssetMenu(fileName = "TileDefinition", menuName = "Tiles/Tile Definition")]
+public class TileDefinition : ScriptableObject
+{
+    [Header("Basic Identification")]
+    public string tileId;        // e.g. "Grass", "Dirt", "DirtWet"
+    public TileBase tile;        // The tile (RuleTile, etc.)
+
+    [Header("Auto-Reversion (optional)")]
+    [Tooltip("If > 0, after this many seconds, the tile reverts to 'revertToTile'.")]
+    public float revertAfterSeconds = 0f;
+
+    [Tooltip("If revertAfterSeconds > 0, tile reverts to this tile definition.")]
+    public TileDefinition revertToTile;
+
+    [Header("Overlay Option")]
+    [Tooltip("If true, placing this tile does NOT remove the old tile underneath.")]
+    public bool doNotRemovePrevious = false;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Data\TileInteractionLibrary.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "TileInteractionLibrary", menuName = "Tiles/Tile Interaction Library")]
+public class TileInteractionLibrary : ScriptableObject
+{
+    [Tooltip("List of rules: (Tool, fromTile) => toTile.")]
+    public List<TileInteractionRule> rules;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Data\TileInteractionManager.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-using skner.DualGrid;  // from your 3rd-party plugin
+using skner.DualGrid;  // Your 3rd-party plugin
+using System.Collections.Generic;
+using System.Linq;
+using TMPro; // if you have UI references for debugging
 
 public class TileInteractionManager : MonoBehaviour
 {
     public static TileInteractionManager Instance { get; private set; }
 
-    // Maps e.g. "Grass" -> the DualGridTilemapModule for DataTilemap_Grass
-    private Dictionary<string, DualGridTilemapModule> materialToModule = new Dictionary<string, DualGridTilemapModule>();
-
-    // Map (ToolType, currentMaterial) => newMaterial
-    private Dictionary<(ToolType, string), string> interactionRules 
-        = new Dictionary<(ToolType, string), string>();
-
-    private void Awake()
+    [System.Serializable]
+    public class TileDefinitionMapping
     {
-        // Enforce Singleton
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        public TileDefinition tileDef;
+        public DualGridTilemapModule tilemapModule;
+    }
+
+    [Header("Tile Definition Mappings")]
+    public List<TileDefinitionMapping> tileDefinitionMappings;
+
+    // (If you have an interaction library for tool-based transformations)
+    [Header("Interaction Library")]
+    public TileInteractionLibrary interactionLibrary;
+
+    [Header("Grid & Scene References")]
+    public Grid interactionGrid;
+    public Camera mainCamera;
+    public Transform player;
+    public float hoverRadius = 3f;
+    public GameObject hoverHighlightObject;
+
+    [Header("Debug / UI")]
+    public bool debugLogs = false;
+    public TextMeshProUGUI hoveredTileText;
+    public TextMeshProUGUI currentToolText;
+
+    // quick lookups
+    private Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
+    private Dictionary<DualGridTilemapModule, TileDefinition> definitionByModule;
+
+    // track which cell is hovered
+    private Vector3Int? currentlyHoveredCell = null;
+    private TileDefinition hoveredTileDef = null;
+
+    // --------- NEW: Timed reversion dictionary -----------
+    // Key = cell position, Value = struct that holds the tileDefinition & time left
+    private Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        // 1) Gather all DataTilemap_* objects in the scene
-        DualGridTilemapModule[] allTilemaps = FindObjectsOfType<DualGridTilemapModule>();
-        foreach (var module in allTilemaps)
+        // build dictionaries
+        moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
+        definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
+
+        foreach (var mapping in tileDefinitionMappings)
         {
-            string goName = module.gameObject.name; // e.g. "DataTilemap_Grass"
-            if (goName.StartsWith("DataTilemap_"))
+            if (mapping.tileDef == null || mapping.tilemapModule == null) 
+                continue;
+
+            if (!moduleByDefinition.ContainsKey(mapping.tileDef))
             {
-                string materialName = goName.Substring("DataTilemap_".Length); 
-                // e.g. "Grass"
-                if (!materialToModule.ContainsKey(materialName))
-                {
-                    materialToModule[materialName] = module;
-                    Debug.Log($"TileInteractionManager: Found tilemap '{materialName}' => {goName}");
-                }
-                else
-                {
-                    Debug.LogWarning($"Duplicate tilemap name for '{materialName}'? {goName}");
-                }
+                moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
+                definitionByModule[mapping.tilemapModule] = mapping.tileDef;
+                if (debugLogs)
+                    Debug.Log($"[Mapping] {mapping.tileDef.tileId} => {mapping.tilemapModule.gameObject.name}");
+            }
+            else
+            {
+                Debug.LogWarning($"Duplicate tileDef {mapping.tileDef.tileId} in tileDefinitionMappings.");
+            }
+        }
+    }
+
+    void Update()
+    {
+        HandleTileHover();
+        UpdateReversion();
+        UpdateDebugUI();
+    }
+
+    // ------------------- Timed Reversion Logic ------------------------
+    // We'll store a small struct for each cell that is on a countdown
+    private struct TimedTileState
+    {
+        public TileDefinition tileDef;
+        public float timeLeft;
+    }
+
+    private void UpdateReversion()
+    {
+        if (timedCells.Count == 0) return;
+
+        // We'll gather cells that are about to revert
+        List<Vector3Int> cellsToRevert = null;
+
+        // We'll copy keys to avoid modifying dictionary while iterating
+        foreach (var kvp in timedCells.ToList())
+        {
+            Vector3Int cellPos = kvp.Key;
+            TimedTileState state = kvp.Value;
+            state.timeLeft -= Time.deltaTime;
+            if (state.timeLeft <= 0f)
+            {
+                // we revert now
+                if (cellsToRevert == null) 
+                    cellsToRevert = new List<Vector3Int>();
+                cellsToRevert.Add(cellPos);
+            }
+            else
+            {
+                // store updated time
+                timedCells[cellPos] = state;
             }
         }
 
-        // 2) Define the default rules (Tool, oldMaterial) => newMaterial
-        interactionRules[(ToolType.Hoe, "Grass")] = "Dirt";
-        interactionRules[(ToolType.WateringCan, "Dirt")] = "DirtWet";
-        // You can add more as needed
-
-        Debug.Log("TileInteractionManager initialized.");
-    }
-
-    /// <summary>
-    /// Determines which 'material' (e.g. Grass, Dirt, etc.) is occupying the given cell,
-    /// by checking each Data Tilemap for a tile in that cell.
-    /// </summary>
-    public string GetMaterialAtCell(Vector3Int cellPos)
-    {
-        // Check each known tilemap
-        foreach (var kvp in materialToModule)
+        if (cellsToRevert != null)
         {
-            Tilemap dataMap = kvp.Value.DataTilemap;
-            if (dataMap.HasTile(cellPos))
+            foreach (var cellPos in cellsToRevert)
             {
-                // We found a tile in this cell, so that’s presumably the “topmost” material
-                return kvp.Key; // e.g. "Grass"
+                if (timedCells.TryGetValue(cellPos, out TimedTileState st))
+                {
+                    timedCells.Remove(cellPos);
+                    // revert to st.tileDef's revertToTile
+                    if (st.tileDef.revertToTile != null)
+                    {
+                        // remove the current tile (unless it was doNotRemovePrevious)
+                        // place the revertToTile
+                        RemoveTile(st.tileDef, cellPos); 
+                        PlaceTile(st.tileDef.revertToTile, cellPos);
+                    }
+                }
             }
         }
-        return null; // no tile found
     }
 
-    /// <summary>
-    /// Called to apply e.g. Hoe on Grass => remove tile from Grass, add tile to Dirt.
-    /// </summary>
-    public void ApplyToolAction(Vector3Int cellPos, ToolType tool)
+    // Our method to forcibly schedule a tile for timed reversion
+    private void RegisterTimedTile(Vector3Int cellPos, TileDefinition tileDef)
     {
-        // 1) Identify the current material
-        string presentMaterial = GetMaterialAtCell(cellPos);
-        if (presentMaterial == null)
+        if (tileDef.revertAfterSeconds > 0f && tileDef.revertToTile != null)
         {
-            Debug.Log($"No tile at {cellPos} to interact with.");
+            TimedTileState newState;
+            newState.tileDef = tileDef;
+            newState.timeLeft = tileDef.revertAfterSeconds;
+            timedCells[cellPos] = newState;
+        }
+    }
+
+    // --------------- Re-Use: Placing & Removing Tiles ---------------
+
+    public void PlaceTile(TileDefinition tileDef, Vector3Int cellPos)
+    {
+        if (!moduleByDefinition.ContainsKey(tileDef))
+        {
+            Debug.LogWarning($"PlaceTile: {tileDef.tileId} not found in moduleByDefinition.");
             return;
         }
+        var module = moduleByDefinition[tileDef];
 
-        // 2) Look up the result
-        (ToolType, string) lookupKey = (tool, presentMaterial);
-        if (!interactionRules.ContainsKey(lookupKey))
+        // If tileDef is an overlay, do NOT remove the old tile
+        // Else we remove the old tile first
+        if (!tileDef.doNotRemovePrevious)
         {
-            Debug.Log($"No rule for Tool={tool} on Material={presentMaterial}.");
-            return;
+            // e.g. if we are placing "DirtWet" which is overlay=false, 
+            // we do remove the old tile from its tilemap
+            // but we must find whichever tile is currently there
+            TileDefinition existing = FindWhichTileDefinitionAt(cellPos);
+            if (existing != null && existing != tileDef)
+            {
+                RemoveTile(existing, cellPos);
+            }
         }
 
-        string targetMaterial = interactionRules[lookupKey];
+        // Now place this tile
+        module.DataTilemap.SetTile(cellPos, tileDef.tile);
 
-        // 3) Remove from old tilemap
-        var sourceModule = materialToModule[presentMaterial];
-        sourceModule.DataTilemap.SetTile(cellPos, null);
+        // If it has a timed reversion, schedule that
+        RegisterTimedTile(cellPos, tileDef);
+    }
 
-        // 4) Add to new tilemap (if it exists)
-        if (materialToModule.ContainsKey(targetMaterial))
+    public void RemoveTile(TileDefinition tileDef, Vector3Int cellPos)
+    {
+        if (!moduleByDefinition.ContainsKey(tileDef))
         {
-            var destModule = materialToModule[targetMaterial];
-            // Place that module’s tile in the cell
-            destModule.DataTilemap.SetTile(cellPos, destModule.DataTile);
+            Debug.LogWarning($"RemoveTile: {tileDef.tileId} not in moduleByDefinition.");
+            return;
+        }
+        var module = moduleByDefinition[tileDef];
+        // remove from that tilemap
+        module.DataTilemap.SetTile(cellPos, null);
+
+        // Also if this cell was in timedCells for that tile, remove it
+        if (timedCells.ContainsKey(cellPos))
+        {
+            // We only remove if the tile in timedCells is tileDef
+            TimedTileState st = timedCells[cellPos];
+            if (st.tileDef == tileDef)
+            {
+                timedCells.Remove(cellPos);
+            }
+        }
+    }
+
+    private TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
+    {
+        foreach (var pair in definitionByModule)
+        {
+            DualGridTilemapModule module = pair.Key;
+            TileDefinition def = pair.Value;
+
+            if (module.DataTilemap.HasTile(cellPos))
+            {
+                // Found a tile => that's the tile definition
+                return def;
+            }
+        }
+        return null;
+    }
+
+    // ------------------- Handle Hover & Debug UI (unchanged) -------------------
+    private void HandleTileHover()
+    {
+        if (mainCamera == null || player == null) return;
+
+        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0f;
+        Vector3Int cellPos = WorldToCell(mouseWorldPos);
+        float distance = Vector2.Distance(player.position, CellCenterWorld(cellPos));
+
+        TileDefinition foundTile = FindWhichTileDefinitionAt(cellPos);
+
+        if (debugLogs)
+        {
+            string tileName = foundTile != null ? foundTile.tileId : "NULL";
+            Debug.Log($"[Hover] cell={cellPos}, tile={tileName}, dist={distance:F2}");
+        }
+
+        if (distance <= hoverRadius)
+        {
+            currentlyHoveredCell = cellPos;
+            hoveredTileDef = foundTile;
+            if (hoverHighlightObject != null)
+            {
+                hoverHighlightObject.SetActive(true);
+                hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
+            }
         }
         else
         {
-            Debug.LogWarning($"Material '{targetMaterial}' does not exist as a DataTilemap_{targetMaterial} in the scene.");
+            currentlyHoveredCell = null;
+            hoveredTileDef = null;
+            if (hoverHighlightObject != null)
+                hoverHighlightObject.SetActive(false);
         }
+    }
+
+    private void UpdateDebugUI()
+    {
+        if (hoveredTileText != null)
+        {
+            if (currentlyHoveredCell.HasValue)
+            {
+                string tileName = hoveredTileDef != null ? hoveredTileDef.tileId : "None";
+                hoveredTileText.text = $"Hovering: {tileName}";
+            }
+            else
+            {
+                hoveredTileText.text = "Hovering: (none)";
+            }
+        }
+
+        if (currentToolText != null)
+        {
+            ToolSwitcher sw = FindObjectOfType<ToolSwitcher>();
+            if (sw != null && sw.CurrentTool != null)
+            {
+                currentToolText.text = $"Tool: {sw.CurrentTool.toolType}";
+            }
+            else
+            {
+                currentToolText.text = "Tool: None";
+            }
+        }
+    }
+
+    private Vector3Int WorldToCell(Vector3 worldPos)
+    {
+        if (interactionGrid != null)
+            return interactionGrid.WorldToCell(worldPos);
+
+        if (tileDefinitionMappings.Count > 0 &&
+            tileDefinitionMappings[0].tilemapModule != null &&
+            tileDefinitionMappings[0].tilemapModule.DataTilemap != null)
+        {
+            Grid g = tileDefinitionMappings[0].tilemapModule.DataTilemap.layoutGrid;
+            return g.WorldToCell(worldPos);
+        }
+        return Vector3Int.zero;
+    }
+
+    private Vector3 CellCenterWorld(Vector3Int cellPos)
+    {
+        if (interactionGrid != null)
+        {
+            Vector3 corner = interactionGrid.CellToWorld(cellPos);
+            return corner + interactionGrid.cellSize * 0.5f;
+        }
+
+        if (tileDefinitionMappings.Count > 0 &&
+            tileDefinitionMappings[0].tilemapModule != null &&
+            tileDefinitionMappings[0].tilemapModule.DataTilemap != null)
+        {
+            Grid g = tileDefinitionMappings[0].tilemapModule.DataTilemap.layoutGrid;
+            Vector3 corner = g.CellToWorld(cellPos);
+            return corner + g.cellSize * 0.5f;
+        }
+        return Vector3.zero;
+    }
+    
+    public void ApplyToolAction(ToolDefinition toolDef)
+    {
+        if (!currentlyHoveredCell.HasValue)
+            return;
+
+        // If we recognized no tile, do nothing
+        if (hoveredTileDef == null)
+        {
+            if (debugLogs) Debug.Log("ApplyToolAction: No recognized tile at hovered cell.");
+            return;
+        }
+
+        // Check distance
+        float distance = Vector2.Distance(player.position, CellCenterWorld(currentlyHoveredCell.Value));
+        if (distance > hoverRadius)
+        {
+            if (debugLogs)
+                Debug.Log($"ApplyToolAction: Cell is {distance:F2} away, above {hoverRadius} radius. Aborting.");
+            return;
+        }
+
+        if (debugLogs)
+            Debug.Log($"[ApplyToolAction] Tool={toolDef.toolType}, fromTile={hoveredTileDef.tileId} at cell={currentlyHoveredCell.Value}");
+
+        // Find matching rule
+        TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r =>
+            r.tool == toolDef &&
+            r.fromTile == hoveredTileDef
+        );
+
+        if (rule == null)
+        {
+            Debug.Log($"No rule for tool {toolDef.toolType} on tile {hoveredTileDef.tileId}.");
+            return;
+        }
+
+        // Remove the old tile, place the new tile
+        RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
+        if (rule.toTile != null)
+            PlaceTile(rule.toTile, currentlyHoveredCell.Value);
     }
 }
 
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Data\TileInteractionRule.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System;
+using UnityEngine;
+
+[Serializable]
+public class TileInteractionRule
+{
+    [Header("Tool Condition")]
+    [Tooltip("Which tool triggers this rule.")]
+    public ToolDefinition tool;
+
+    [Header("Tile Transformation")]
+    [Tooltip("Which tile must be present to apply the rule.")]
+    public TileDefinition fromTile;
+    [Tooltip("Which tile to transform into.")]
+    public TileDefinition toTile;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Tools\ToolDefinition.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[CreateAssetMenu(fileName = "ToolDefinition", menuName = "Tiles/Tool Definition")]
+public class ToolDefinition : ScriptableObject
+{
+    [Tooltip("Which tool type this represents (e.g. Hoe, WateringCan).")]
+    public ToolType toolType;
+
+    [Tooltip("Human-readable name (for debugging/UI).")]
+    public string displayName;
+
+    [Tooltip("Icon sprite for the tool.")]
+    public Sprite icon;
+
+    [Tooltip("Tint color to apply to the icon sprite.")]
+    public Color iconTint = Color.white;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Tools\ToolSwitcher.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
-using UnityEngine.UI; // only needed if you’re updating an Image for the tool icon
+using UnityEngine.UI;
 
 public class ToolSwitcher : MonoBehaviour
 {
-    [Tooltip("Tools in the order we cycle through via Q/E")]
-    public ToolType[] toolsOrder = new ToolType[] { ToolType.Hoe, ToolType.WateringCan };
+    [Tooltip("Array of Tool Definition assets (order matters for cycling with Q/E).")]
+    public ToolDefinition[] toolDefinitions;
 
-    [Tooltip("Optional UI image to show the current tool icon")]
-    public Image toolIcon;
+    // This field is now used to display the tool icon above the player.
+    [Tooltip("SpriteRenderer that displays the current tool icon above the player.")]
+    public SpriteRenderer toolDisplay;
 
-    private int currentToolIndex = 0;
-
-    public ToolType CurrentTool { get; private set; } = ToolType.None;
+    private int currentIndex = 0;
+    public ToolDefinition CurrentTool { get; private set; } = null;
 
     private void Start()
     {
-        if (toolsOrder.Length > 0)
+        if (toolDefinitions.Length > 0)
         {
-            currentToolIndex = 0;
-            CurrentTool = toolsOrder[currentToolIndex];
-            UpdateUI();
+            currentIndex = 0;
+            CurrentTool = toolDefinitions[currentIndex];
+            UpdateToolDisplay();
+            LogToolChange();
         }
     }
 
     private void Update()
     {
-        if (toolsOrder.Length == 0) return;
+        if (toolDefinitions.Length == 0)
+            return;
 
-        // Q = cycle backward
+        // Cycle backwards with Q
         if (Input.GetKeyDown(KeyCode.Q))
         {
-            currentToolIndex--;
-            if (currentToolIndex < 0)
-                currentToolIndex = toolsOrder.Length - 1;
-
-            CurrentTool = toolsOrder[currentToolIndex];
-            UpdateUI();
+            currentIndex--;
+            if (currentIndex < 0)
+                currentIndex = toolDefinitions.Length - 1;
+            CurrentTool = toolDefinitions[currentIndex];
+            UpdateToolDisplay();
+            LogToolChange();
         }
-        // E = cycle forward
+        // Cycle forwards with E
         else if (Input.GetKeyDown(KeyCode.E))
         {
-            currentToolIndex++;
-            if (currentToolIndex >= toolsOrder.Length)
-                currentToolIndex = 0;
-
-            CurrentTool = toolsOrder[currentToolIndex];
-            UpdateUI();
+            currentIndex++;
+            if (currentIndex >= toolDefinitions.Length)
+                currentIndex = 0;
+            CurrentTool = toolDefinitions[currentIndex];
+            UpdateToolDisplay();
+            LogToolChange();
         }
     }
 
-    void UpdateUI()
+    private void UpdateToolDisplay()
     {
-        // For debugging:
-        Debug.Log($"Switched tool to: {CurrentTool}");
+        if (toolDisplay == null)
+            return;
 
-        // If you had an icon system:
-        // if (toolIcon != null)
-        //     toolIcon.sprite = someDictionaryOfSprites[CurrentTool];
+        if (CurrentTool != null && CurrentTool.icon != null)
+        {
+            toolDisplay.sprite = CurrentTool.icon;
+            toolDisplay.color = CurrentTool.iconTint; // Apply the tint defined in the ToolDefinition
+            toolDisplay.enabled = true;
+        }
+        else
+        {
+            toolDisplay.enabled = false;
+        }
+    }
+
+    private void LogToolChange()
+    {
+        string toolName = (CurrentTool != null) ? CurrentTool.displayName : "(none)";
+        Debug.Log($"Switched tool to: {toolName}");
     }
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5293,8 +5571,8 @@ public class ToolSwitcher : MonoBehaviour
 {
     None,
     Hoe,
-    WateringCan,
-    // SeedPouch, etc.
+    WateringCan
+    // etc.
 }
 
 

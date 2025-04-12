@@ -1,13 +1,17 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-11 01:27:09
-PART 3 OF 4
+UNITY PROJECT SCRIPT EXPORT - 2025-04-12 21:01:00
+PART 3 OF 5
 ================================================================================
 
 --------------------------------------------------------------------------------
 Assets
 ├── Animation
+│   ├── GodRay300B_001.controller
+│   ├── GodRay60_001.controller
+│   ├── GodRays300.anim
+│   ├── GodRays300B.anim
 │   ├── MiniVillagerMan_Animator.controller
 │   └── MiniVillagerMan_AnimatorBackup.controller
 ├── DefaultVolumeProfile.asset
@@ -73,6 +77,7 @@ Assets
 │       │   └── PaletteDual_Ground.prefab
 │       └── Rule Tiles
 │           ├── DualGridRuleTile_Dirt.asset
+│           ├── DualGridRuleTile_DirtWet.asset
 │           └── DualGridRuleTile_Grass.asset
 ├── Scenes
 │   ├── MainScene.unity
@@ -99,7 +104,13 @@ Assets
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
 │   ├── Tiles
+│   │   ├── TileDefinition_000_Grass.asset
+│   │   ├── TileDefinition_001_Dirt.asset
+│   │   ├── TileDefinition_002_DirtWet.asset
+│   │   └── TileInteractionLibrary.asset
 │   └── Tools
+│       ├── ToolDefinition_000_GardeningHoe.asset
+│       └── ToolDefinition_001_WateringCan.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -159,11 +170,16 @@ Assets
 │   │       └── NodeView.cs
 │   ├── Player
 │   │   └── GardenerController.cs
+│   ├── Rendering
 │   ├── Tiles
 │   │   ├── Data
 │   │   │   ├── PlayerTileInteractor.cs
-│   │   │   └── TileInteractionManager.cs
+│   │   │   ├── TileDefinition.cs
+│   │   │   ├── TileInteractionLibrary.cs
+│   │   │   ├── TileInteractionManager.cs
+│   │   │   └── TileInteractionRule.cs
 │   │   └── Tools
+│   │       ├── ToolDefinition.cs
 │   │       ├── ToolSwitcher.cs
 │   │       └── ToolType.cs
 │   ├── UI
@@ -1525,5 +1541,5 @@ public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
 
 --------------------------------------------------------------------------------
-This is part 3 out of 4 of script collection. 1 more parts remain.
+This is part 3 out of 5 of script collection. 2 more parts remain.
 --------------------------------------------------------------------------------

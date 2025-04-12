@@ -124,12 +124,14 @@ public class TileInteractionManager : MonoBehaviour
                 if (timedCells.TryGetValue(cellPos, out TimedTileState st))
                 {
                     timedCells.Remove(cellPos);
-                    // revert to st.tileDef's revertToTile
+                    
+                    // Always remove the current tile, regardless of doNotRemovePrevious
+                    // This is needed for timed disappearing functionality
+                    RemoveTile(st.tileDef, cellPos);
+                    
+                    // If there's a revert-to tile, place it
                     if (st.tileDef.revertToTile != null)
                     {
-                        // remove the current tile (unless it was doNotRemovePrevious)
-                        // place the revertToTile
-                        RemoveTile(st.tileDef, cellPos); 
                         PlaceTile(st.tileDef.revertToTile, cellPos);
                     }
                 }
@@ -174,8 +176,40 @@ public class TileInteractionManager : MonoBehaviour
             }
         }
 
-        // Now place this tile
-        module.DataTilemap.SetTile(cellPos, tileDef.tile);
+        // Set the cell in the tilemap to have a tile (the actual content doesn't matter)
+        // We'll just set a marker tile of 1 - the actual visual appearance is handled by the DualGridTilemapModule
+        
+        // Check if the DualGridTilemapModule has any existing tile we can use as a template
+        TileBase existingTile = null;
+        
+        // Try to find any existing tile in the tilemap to use as a template
+        foreach (var pos in module.DataTilemap.cellBounds.allPositionsWithin)
+        {
+            Vector3Int cellPosition = new Vector3Int(pos.x, pos.y, pos.z);
+            if (module.DataTilemap.HasTile(cellPosition))
+            {
+                existingTile = module.DataTilemap.GetTile(cellPosition);
+                break;
+            }
+        }
+        
+        // If we found an existing tile, use it; otherwise use a RuleTile or TileBase instance
+        // that you've saved as a reference, or create a fallback option
+        if (existingTile != null)
+        {
+            module.DataTilemap.SetTile(cellPos, existingTile);
+        }
+        else
+        {
+            // Fallback: use a basic tile (this might not work visually with your DualGrid system)
+            // but it's a functional placeholder
+            Debug.LogWarning($"No existing tile found in {module.name} to use as template. " +
+                             $"Visual appearance might be incorrect for {tileDef.tileId}.");
+                             
+            // One option is to set a value of 1 if your DualGrid system supports this
+            // Another option is to create a very basic tile if needed
+            module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
+        }
 
         // If it has a timed reversion, schedule that
         RegisterTimedTile(cellPos, tileDef);
@@ -206,6 +240,24 @@ public class TileInteractionManager : MonoBehaviour
 
     private TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
     {
+        // To ensure we get the top-most visible tile for overlays, we need to check
+        // tiles in reverse order (or specifically check overlay tiles first)
+        
+        // First, try to find any overlay tiles (doNotRemovePrevious = true)
+        foreach (var mapping in tileDefinitionMappings)
+        {
+            if (mapping.tileDef == null || mapping.tilemapModule == null) 
+                continue;
+                
+            // Check specifically for overlay tiles first
+            if (mapping.tileDef.doNotRemovePrevious && 
+                mapping.tilemapModule.DataTilemap.HasTile(cellPos))
+            {
+                return mapping.tileDef;
+            }
+        }
+        
+        // If no overlay tile found, find any base tile
         foreach (var pair in definitionByModule)
         {
             DualGridTilemapModule module = pair.Key;
@@ -356,9 +408,22 @@ public class TileInteractionManager : MonoBehaviour
             return;
         }
 
-        // Remove the old tile, place the new tile
-        RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
+        // FIX: Check whether the destination tile has doNotRemovePrevious flag before removing source tile
         if (rule.toTile != null)
+        {
+            // Only remove the original tile if the new tile doesn't have doNotRemovePrevious set
+            if (!rule.toTile.doNotRemovePrevious)
+            {
+                RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
+            }
+            
+            // Place the new tile
             PlaceTile(rule.toTile, currentlyHoveredCell.Value);
+        }
+        else
+        {
+            // If there's no destination tile, just remove the current one
+            RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
+        }
     }
 }

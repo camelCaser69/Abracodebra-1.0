@@ -6,7 +6,9 @@ public class TileDefinition : ScriptableObject
 {
     [Header("Basic Identification")]
     public string tileId;        // e.g. "Grass", "Dirt", "DirtWet"
-    public TileBase tile;        // The tile (RuleTile, etc.)
+    
+    // Remove the direct TileBase reference since it's redundant
+    // The actual tile will come from the DualGridTilemapModule
 
     [Header("Auto-Reversion (optional)")]
     [Tooltip("If > 0, after this many seconds, the tile reverts to 'revertToTile'.")]
