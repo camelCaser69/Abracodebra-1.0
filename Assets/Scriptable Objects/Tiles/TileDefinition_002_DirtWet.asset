@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   displayName: Dirt Wet
   tintColor: {r: 0.43529412, g: 0.38039216, b: 0.3019608, a: 1}
+  overlays: []
   revertAfterSeconds: 12
   revertToTile: {fileID: 11400000, guid: 4f94336bb2aca31489661a9f761144db, type: 2}
   keepBottomTile: 1

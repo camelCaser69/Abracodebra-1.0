@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-12 23:50:30
+UNITY PROJECT SCRIPT EXPORT - 2025-04-13 14:51:27
 PART 2 OF 5
 ================================================================================
 
@@ -32,6 +32,8 @@ Assets
 ├── InputSystem_Actions.inputactions
 ├── Materials
 │   ├── BezierCurveAA_Material.mat
+│   ├── Custom_TilemapOverlay_preview.mat
+│   ├── DefaultTilemap.mat
 │   └── Firefly_Glow_Material.mat
 ├── Post Processing
 ├── Prefabs
@@ -178,6 +180,9 @@ Assets
 │   │   │   ├── TileInteractionLibrary.cs
 │   │   │   ├── TileInteractionManager.cs
 │   │   │   └── TileInteractionRule.cs
+│   │   ├── Editor
+│   │   │   ├── TileDefinitionEditor.cs
+│   │   │   └── TileInteractionManagerEditor.cs
 │   │   └── Tools
 │   │       ├── ToolDefinition.cs
 │   │       ├── ToolSwitcher.cs
@@ -194,7 +199,9 @@ Assets
 │   └── UniversalRP.asset
 ├── Shaders
 │   ├── BezierCurveAA.shader
-│   └── SpriteEmissiveUnlit.shader
+│   ├── Custom_TilemapOverlay_preview2.mat
+│   ├── SpriteEmissiveUnlit.shader
+│   └── TilemapOverlay.shader
 ├── TextureImporter.preset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------

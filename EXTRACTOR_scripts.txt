@@ -1,7 +1,7 @@
 This document contains extracted Unity C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-12 23:50:30
+UNITY PROJECT SCRIPT EXPORT - 2025-04-13 14:51:27
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -32,6 +32,8 @@ Assets
 ├── InputSystem_Actions.inputactions
 ├── Materials
 │   ├── BezierCurveAA_Material.mat
+│   ├── Custom_TilemapOverlay_preview.mat
+│   ├── DefaultTilemap.mat
 │   └── Firefly_Glow_Material.mat
 ├── Post Processing
 ├── Prefabs
@@ -178,6 +180,9 @@ Assets
 │   │   │   ├── TileInteractionLibrary.cs
 │   │   │   ├── TileInteractionManager.cs
 │   │   │   └── TileInteractionRule.cs
+│   │   ├── Editor
+│   │   │   ├── TileDefinitionEditor.cs
+│   │   │   └── TileInteractionManagerEditor.cs
 │   │   └── Tools
 │   │       ├── ToolDefinition.cs
 │   │       ├── ToolSwitcher.cs
@@ -194,7 +199,9 @@ Assets
 │   └── UniversalRP.asset
 ├── Shaders
 │   ├── BezierCurveAA.shader
-│   └── SpriteEmissiveUnlit.shader
+│   ├── Custom_TilemapOverlay_preview2.mat
+│   ├── SpriteEmissiveUnlit.shader
+│   └── TilemapOverlay.shader
 ├── TextureImporter.preset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
@@ -5111,6 +5118,38 @@ public class PlayerTileInteractor : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
+using System;
+
+[Serializable]
+public class TextureOverlaySettings
+{
+    [Tooltip("The texture to overlay on this tilemap")]
+    public Texture2D overlayTexture;
+    
+    [Tooltip("Tint color for the overlay texture")]
+    public Color tintColor = Color.white;
+    
+    [Tooltip("Scale of the overlay texture (higher value = bigger texture)")]
+    [Range(0.1f, 20f)]
+    public float scale = 1.0f;
+    
+    [Tooltip("Offset for the overlay texture")]
+    public Vector2 offset = Vector2.zero;
+    
+    [Tooltip("Should the texture repeat as tiles?")]
+    public bool tileTexture = false;
+    
+    [Tooltip("Should this texture be animated?")]
+    public bool useAnimation = false;
+    
+    [Tooltip("Animation speed (tiles per second)")]
+    [Range(0.1f, 10f)]
+    public float animationSpeed = 1.0f;
+    
+    [Tooltip("Number of animation frames along X axis")]
+    [Range(1, 32)]
+    public int animationTiles = 1;
+}
 
 [CreateAssetMenu(fileName = "TileDefinition", menuName = "Tiles/Tile Definition")]
 public class TileDefinition : ScriptableObject
@@ -5118,6 +5157,14 @@ public class TileDefinition : ScriptableObject
     [Header("Basic Identification")]
     [Tooltip("Display name for this tile type (used in UI and debugging)")]
     public string displayName;    // e.g. "Grass", "Dirt", "Wet Dirt"
+    
+    [Header("Visual Properties")]
+    [Tooltip("Optional tint color to apply to the RenderTilemap")]
+    public Color tintColor = Color.white;
+    
+    [Header("Texture Overlays")]
+    [Tooltip("Texture overlays for this tile type")]
+    public TextureOverlaySettings[] overlays;
     
     [Header("Auto-Reversion (optional)")]
     [Tooltip("If > 0, after this many seconds, the tile reverts to 'revertToTile'.")]
@@ -5129,6 +5176,58 @@ public class TileDefinition : ScriptableObject
     [Header("Overlay Option")]
     [Tooltip("If true, this tile will be placed on top without removing the tile underneath ")]
     public bool keepBottomTile = false;
+
+#if UNITY_EDITOR
+    // This method will be called from the custom editor
+    public void UpdateColor()
+    {
+        // Find the TileInteractionManager in the scene using the non-deprecated method
+        var manager = UnityEngine.Object.FindAnyObjectByType<TileInteractionManager>();
+        if (manager == null) return;
+
+        foreach (var mapping in manager.tileDefinitionMappings)
+        {
+            if (mapping.tileDef == this && mapping.tilemapModule != null)
+            {
+                Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+                if (renderTilemapTransform != null)
+                {
+                    Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
+                    if (renderTilemap != null)
+                    {
+                        renderTilemap.color = tintColor;
+                        UnityEditor.EditorUtility.SetDirty(renderTilemap);
+                    }
+                }
+            }
+        }
+    }
+
+    public void UpdateOverlays()
+    {
+        // Find the TileInteractionManager in the scene
+        var manager = UnityEngine.Object.FindAnyObjectByType<TileInteractionManager>();
+        if (manager == null) return;
+
+        foreach (var mapping in manager.tileDefinitionMappings)
+        {
+            if (mapping.tileDef == this && mapping.tilemapModule != null)
+            {
+                Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+                if (renderTilemapTransform != null)
+                {
+                    TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
+                    if (renderer != null)
+                    {
+                        // Apply the overlay material and settings
+                        manager.ApplyOverlayToTilemap(mapping.tileDef, renderer);
+                        UnityEditor.EditorUtility.SetDirty(renderer);
+                    }
+                }
+            }
+        }
+    }
+#endif
 }
 
 
@@ -5151,10 +5250,13 @@ public class TileInteractionLibrary : ScriptableObject
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-using skner.DualGrid;  // Your 3rd-party plugin
+using skner.DualGrid;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro; // if you have UI references for debugging
+using TMPro;
+#if UNITY_EDITOR
+using UnityEditor; // Needed for EditorUtility and AssetDatabase
+#endif
 
 public class TileInteractionManager : MonoBehaviour
 {
@@ -5167,65 +5269,301 @@ public class TileInteractionManager : MonoBehaviour
         public DualGridTilemapModule tilemapModule;
     }
 
-    [Header("Tile Definition Mappings")]
-    public List<TileDefinitionMapping> tileDefinitionMappings;
+    [Header("Tile Definition Mappings")] public List<TileDefinitionMapping> tileDefinitionMappings;
 
-    // (If you have an interaction library for tool-based transformations)
-    [Header("Interaction Library")]
-    public TileInteractionLibrary interactionLibrary;
+    [Header("Interaction Library")] public TileInteractionLibrary interactionLibrary;
 
-    [Header("Grid & Scene References")]
-    public Grid interactionGrid;
+    [Header("Grid & Scene References")] public Grid interactionGrid;
     public Camera mainCamera;
     public Transform player;
     public float hoverRadius = 3f;
     public GameObject hoverHighlightObject;
+
+    [Header("Tilemap Rendering Settings")]
+    [Tooltip("The base sorting order value (the first tilemap will be this value, subsequent ones will decrease)")]
+    public int baseSortingOrder = 0;
+
+    [Header("Overlay Settings")]
+    [Tooltip("Reference to the custom TilemapOverlay shader (Required for overlays)")]
+    public Shader overlayShader;
+
+    // *** RENAMED & SIMPLIFIED ***
+    [Tooltip("Assign a Material asset using the 'Custom/TilemapOverlay' shader. This is used in Edit Mode for all previews. NOTE: Edit mode will show the settings from the *last* tilemap updated.")]
+    public Material editModeSharedMaterial; // Assign ONE material using Custom/TilemapOverlay
 
     [Header("Debug / UI")]
     public bool debugLogs = false;
     public TextMeshProUGUI hoveredTileText;
     public TextMeshProUGUI currentToolText;
 
-    // quick lookups
+    // Private fields
     private Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
     private Dictionary<DualGridTilemapModule, TileDefinition> definitionByModule;
-
-    // track which cell is hovered
     private Vector3Int? currentlyHoveredCell = null;
     private TileDefinition hoveredTileDef = null;
-
-    // --------- NEW: Timed reversion dictionary -----------
-    // Key = cell position, Value = struct that holds the tileDefinition & time left
     private Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
+
 
     void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
 
-        // build dictionaries
+        // Validate required components for overlays
+        if (overlayShader == null)
+        {
+            Debug.LogError($"[{nameof(TileInteractionManager)}] Overlay Shader is not assigned. Overlay effects will not work.", this);
+        }
+        if (editModeSharedMaterial == null)
+        {
+             Debug.LogWarning($"[{nameof(TileInteractionManager)}] Edit Mode Shared Material is not assigned. Edit mode rendering might not work correctly or show overlays.", this);
+        }
+        else if (editModeSharedMaterial.shader != overlayShader)
+        {
+            Debug.LogWarning($"[{nameof(TileInteractionManager)}] The assigned Edit Mode Shared Material does not use the assigned Overlay Shader. Edit mode previews may be incorrect.", this);
+        }
+
         moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
         definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
 
-        foreach (var mapping in tileDefinitionMappings)
+        SetupTilemaps();
+    }
+
+    void Start()
+    {
+        if (moduleByDefinition == null || moduleByDefinition.Count == 0)
         {
-            if (mapping.tileDef == null || mapping.tilemapModule == null) 
-                continue;
+            SetupTilemaps();
+        }
+    }
+
+    void OnDestroy()
+    {
+        // No runtime instances tracked globally anymore
+        if (Instance == this) Instance = null;
+    }
+
+    private void SetupTilemaps()
+    {
+        moduleByDefinition.Clear();
+        definitionByModule.Clear();
+
+        for (int i = 0; i < tileDefinitionMappings.Count; i++)
+        {
+            var mapping = tileDefinitionMappings[i];
+            if (mapping.tileDef == null || mapping.tilemapModule == null) continue;
 
             if (!moduleByDefinition.ContainsKey(mapping.tileDef))
             {
                 moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
                 definitionByModule[mapping.tilemapModule] = mapping.tileDef;
-                if (debugLogs)
-                    Debug.Log($"[Mapping] {mapping.tileDef.displayName } => {mapping.tilemapModule.gameObject.name}");
+
+                Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+                if (renderTilemapTransform != null)
+                {
+                    TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
+                    Tilemap tilemap = renderTilemapTransform.GetComponent<Tilemap>();
+
+                    if (renderer != null)
+                    {
+                        renderer.sortingOrder = baseSortingOrder - i;
+                        if (debugLogs) Debug.Log($"Setup: Sorting order for {mapping.tileDef.displayName} to {baseSortingOrder - i}");
+                    }
+                    if (tilemap != null)
+                    {
+                        tilemap.color = mapping.tileDef.tintColor; // Set Tilemap color
+                        if (debugLogs) Debug.Log($"Setup: Tilemap.color for {mapping.tileDef.displayName} to {mapping.tileDef.tintColor}");
+                    }
+                    if (renderer != null)
+                    {
+                       ApplyOverlayToTilemap(mapping.tileDef, renderer); // Apply initial material state
+                    }
+                }
+                if (debugLogs) Debug.Log($"[Mapping] {mapping.tileDef.displayName} => {mapping.tilemapModule.gameObject.name}");
+            }
+            else Debug.LogWarning($"Duplicate tileDef {mapping.tileDef.displayName}");
+        }
+    }
+
+    // !!! REVISED ApplyOverlayToTilemap !!!
+    public void ApplyOverlayToTilemap(TileDefinition tileDef, TilemapRenderer renderer)
+    {
+        if (tileDef == null || renderer == null || overlayShader == null) // Ensure shader exists
+        {
+            // Attempt to revert to a basic state if possible
+             if (renderer != null && renderer.sharedMaterial != null) renderer.sharedMaterial = null; // Use Unity default sprite material
+            return;
+        }
+
+        Tilemap tilemap = renderer.GetComponent<Tilemap>();
+
+        // --- Common Setup ---
+        bool useOverlayFeature = tileDef.overlays != null &&
+                                 tileDef.overlays.Length > 0 &&
+                                 tileDef.overlays[0].overlayTexture != null;
+        bool useAnimationFeature = useOverlayFeature && tileDef.overlays[0].useAnimation;
+
+        // --- Branch Logic: Play Mode vs Edit Mode ---
+        if (Application.isPlaying)
+        {
+            // --- Play Mode: Use Material Instances ---
+            Material material;
+            bool needsNewInstance = true;
+
+            // Check if already using an instance of *our* shader
+            if (renderer.sharedMaterial != null && renderer.sharedMaterial.shader == overlayShader)
+            {
+                material = renderer.material; // Get or create instance
+                if (material.name.Contains("Instance")) needsNewInstance = false;
+            }
+
+            // If not using our shader instance, create/assign one
+            if (needsNewInstance)
+            {
+                 material = new Material(overlayShader);
+                 material.name = $"OverlayMatInstance_{tileDef.displayName}_{renderer.GetInstanceID()}";
+                 renderer.material = material;
             }
             else
             {
-                Debug.LogWarning($"Duplicate tileDef {mapping.tileDef.displayName } in tileDefinitionMappings.");
+                 material = renderer.material; // Should already be the instance
+            }
+
+            // Set Keywords on the instance
+            material.SetKeyword(new UnityEngine.Rendering.LocalKeyword(overlayShader, "_USEOVERLAY_ON"), useOverlayFeature);
+            material.SetKeyword(new UnityEngine.Rendering.LocalKeyword(overlayShader, "_USEANIMATION_ON"), useAnimationFeature);
+
+            // Set overlay properties if active
+            if (useOverlayFeature) ApplyOverlayProperties(material, tileDef.overlays[0]);
+            else material.SetTexture("_OverlayTex", null); // Clear texture if overlay off
+        }
+        else // --- Edit Mode ---
+        {
+             if (editModeSharedMaterial == null) // Cannot proceed without the shared material
+             {
+                  if (renderer.sharedMaterial != null) renderer.sharedMaterial = null; // Revert to default if possible
+                  return;
+             }
+
+             // Assign the single shared material if not already assigned
+             if (renderer.sharedMaterial != editModeSharedMaterial)
+             {
+                  renderer.sharedMaterial = editModeSharedMaterial;
+             }
+
+             // Set keywords and properties on the single SHARED material.
+             // NOTE: This WILL affect all renderers using this material in Edit Mode.
+             editModeSharedMaterial.SetKeyword(new UnityEngine.Rendering.LocalKeyword(overlayShader, "_USEOVERLAY_ON"), useOverlayFeature);
+             editModeSharedMaterial.SetKeyword(new UnityEngine.Rendering.LocalKeyword(overlayShader, "_USEANIMATION_ON"), useAnimationFeature);
+
+             if (useOverlayFeature) ApplyOverlayProperties(editModeSharedMaterial, tileDef.overlays[0]);
+             else editModeSharedMaterial.SetTexture("_OverlayTex", null); // Clear texture on shared material
+
+             #if UNITY_EDITOR
+             // Mark the shared material and renderer as dirty
+             EditorUtility.SetDirty(editModeSharedMaterial);
+             EditorUtility.SetDirty(renderer);
+             // Also ensure Tilemap.color is set correctly
+             if (tilemap != null)
+             {
+                 tilemap.color = tileDef.tintColor;
+                 EditorUtility.SetDirty(tilemap);
+             }
+             #endif
+        }
+    }
+
+    // Helper to apply overlay properties to a material (No _Color setting)
+    private void ApplyOverlayProperties(Material mat, TextureOverlaySettings overlay)
+    {
+        if (mat == null || overlay == null) return;
+        mat.SetTexture("_OverlayTex", overlay.overlayTexture);
+        mat.SetColor("_OverlayColor", overlay.tintColor);
+        mat.SetFloat("_OverlayScaleValue", overlay.scale);
+        mat.SetVector("_OverlayOffset", new Vector4(overlay.offset.x, overlay.offset.y, 0, 0));
+        if (overlay.useAnimation)
+        {
+            mat.SetFloat("_AnimSpeed", overlay.animationSpeed);
+            mat.SetFloat("_AnimTiles", Mathf.Max(1f, overlay.animationTiles));
+        }
+    }
+
+    // Public method to update sorting order - can be called from custom editor
+    public void UpdateSortingOrder()
+    {
+        for (int i = 0; i < tileDefinitionMappings.Count; i++)
+        {
+            var mapping = tileDefinitionMappings[i];
+            if (mapping.tileDef == null || mapping.tilemapModule == null) continue;
+            Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+            if (renderTilemapTransform != null)
+            {
+                TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
+                if (renderer != null)
+                {
+                    renderer.sortingOrder = baseSortingOrder - i;
+                    #if UNITY_EDITOR
+                    EditorUtility.SetDirty(renderer);
+                    #endif
+                    if (debugLogs) Debug.Log($"Updated sorting order for {mapping.tileDef.displayName} to {baseSortingOrder - i}");
+                }
             }
         }
     }
 
+    // Public method to update all colors - can be called from custom editor
+    // Note: This now only needs to set Tilemap.color
+    public void UpdateAllColors()
+    {
+        foreach (var mapping in tileDefinitionMappings)
+        {
+            if (mapping.tileDef == null || mapping.tilemapModule == null) continue;
+            Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+            if (renderTilemapTransform != null)
+            {
+                Tilemap tilemap = renderTilemapTransform.GetComponent<Tilemap>();
+                if (tilemap != null)
+                {
+                    tilemap.color = mapping.tileDef.tintColor;
+                    #if UNITY_EDITOR
+                    EditorUtility.SetDirty(tilemap);
+                    #endif
+                    if (debugLogs) Debug.Log($"Updated Tilemap.color for {mapping.tileDef.displayName} to {mapping.tileDef.tintColor}");
+                }
+            }
+        }
+    }
+
+    // Public method to update all overlay materials - can be called from custom editor
+    public void UpdateAllOverlays()
+    {
+        if (Application.isPlaying)
+        {
+             Debug.LogWarning("UpdateAllOverlays button is primarily for Edit Mode previews. Changes in Play Mode are handled dynamically.");
+             // Optionally still iterate and apply if needed for some reason
+             // foreach (var mapping in tileDefinitionMappings) { ... ApplyOverlayToTilemap ... }
+             return;
+        }
+
+        Debug.Log("Updating Edit Mode overlay previews. Note: All tilemaps will reflect the settings of the *last* processed TileDefinition due to shared material usage.");
+        foreach (var mapping in tileDefinitionMappings)
+        {
+            if (mapping.tileDef == null || mapping.tilemapModule == null) continue;
+            Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+            if (renderTilemapTransform != null)
+            {
+                TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
+                if (renderer != null) ApplyOverlayToTilemap(mapping.tileDef, renderer);
+            }
+        }
+        Debug.Log("Edit Mode overlay preview update complete.");
+    }
+
+    // Update method
     void Update()
     {
         HandleTileHover();
@@ -5233,41 +5571,28 @@ public class TileInteractionManager : MonoBehaviour
         UpdateDebugUI();
     }
 
-    // ------------------- Timed Reversion Logic ------------------------
-    // We'll store a small struct for each cell that is on a countdown
-    private struct TimedTileState
-    {
-        public TileDefinition tileDef;
-        public float timeLeft;
-    }
 
+    // ------------------- Timed Reversion Logic ------------------------
+    private struct TimedTileState { public TileDefinition tileDef; public float timeLeft; }
     private void UpdateReversion()
     {
         if (timedCells.Count == 0) return;
-
-        // We'll gather cells that are about to revert
         List<Vector3Int> cellsToRevert = null;
-
-        // We'll copy keys to avoid modifying dictionary while iterating
-        foreach (var kvp in timedCells.ToList())
+        foreach (var kvp in timedCells.ToList()) // Use ToList for safe removal during iteration
         {
             Vector3Int cellPos = kvp.Key;
             TimedTileState state = kvp.Value;
             state.timeLeft -= Time.deltaTime;
             if (state.timeLeft <= 0f)
             {
-                // we revert now
-                if (cellsToRevert == null) 
-                    cellsToRevert = new List<Vector3Int>();
+                if (cellsToRevert == null) cellsToRevert = new List<Vector3Int>();
                 cellsToRevert.Add(cellPos);
             }
             else
             {
-                // store updated time
-                timedCells[cellPos] = state;
+                timedCells[cellPos] = state; // Update time left
             }
         }
-
         if (cellsToRevert != null)
         {
             foreach (var cellPos in cellsToRevert)
@@ -5275,280 +5600,266 @@ public class TileInteractionManager : MonoBehaviour
                 if (timedCells.TryGetValue(cellPos, out TimedTileState st))
                 {
                     timedCells.Remove(cellPos);
-                    
-                    // Always remove the current tile, regardless of doNotRemovePrevious
-                    // This is needed for timed disappearing functionality
-                    RemoveTile(st.tileDef, cellPos);
-                    
-                    // If there's a revert-to tile, place it
+                    RemoveTile(st.tileDef, cellPos); // Remove the expiring tile
                     if (st.tileDef.revertToTile != null)
                     {
-                        PlaceTile(st.tileDef.revertToTile, cellPos);
+                        PlaceTile(st.tileDef.revertToTile, cellPos); // Place the new tile
                     }
                 }
             }
         }
     }
-
-    // Our method to forcibly schedule a tile for timed reversion
     private void RegisterTimedTile(Vector3Int cellPos, TileDefinition tileDef)
     {
-        if (tileDef.revertAfterSeconds > 0f && tileDef.revertToTile != null)
+        // Only register if reversion is configured
+        if (tileDef.revertAfterSeconds > 0f /*&& tileDef.revertToTile != null*/) // Allow timed removal without replacement
         {
-            TimedTileState newState;
-            newState.tileDef = tileDef;
-            newState.timeLeft = tileDef.revertAfterSeconds;
+            TimedTileState newState = new TimedTileState
+            {
+                tileDef = tileDef,
+                timeLeft = tileDef.revertAfterSeconds
+            };
             timedCells[cellPos] = newState;
+        }
+        else // Ensure any previous timer for this cell is cleared if replaced by a non-timed tile
+        {
+             timedCells.Remove(cellPos);
         }
     }
 
-    // --------------- Re-Use: Placing & Removing Tiles ---------------
 
+    // --------------- Placing & Removing Tiles ---------------
     public void PlaceTile(TileDefinition tileDef, Vector3Int cellPos)
     {
-        if (!moduleByDefinition.ContainsKey(tileDef))
+        if (!moduleByDefinition.TryGetValue(tileDef, out var module))
         {
-            Debug.LogWarning($"PlaceTile: {tileDef.displayName} not found in moduleByDefinition.");
-            return;
+            Debug.LogWarning($"PlaceTile: {tileDef.displayName} not found in moduleByDefinition."); return;
         }
-        var module = moduleByDefinition[tileDef];
-
-        // If tileDef is an overlay, do NOT remove the old tile
-        // Else we remove the old tile first
         if (!tileDef.keepBottomTile)
         {
-            // e.g. if we are placing "DirtWet" which is keepBottomTile=false, 
-            // we do remove the old tile from its tilemap
-            // but we must find whichever tile is currently there
             TileDefinition existing = FindWhichTileDefinitionAt(cellPos);
             if (existing != null && existing != tileDef)
             {
                 RemoveTile(existing, cellPos);
             }
         }
+        // Create a basic Tile asset instance to mark the cell in the DataTilemap
+        Tile presenceTile = ScriptableObject.CreateInstance<Tile>();
+        module.DataTilemap.SetTile(cellPos, presenceTile);
 
-        // Set the cell in the tilemap to have a tile
-        // The actual visual appearance is handled by the DualGridTilemapModule system
-        // We just need to mark this cell as "filled"
-        module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
-
-        // If it has a timed reversion, schedule that
-        RegisterTimedTile(cellPos, tileDef);
+        // Update visuals on the RenderTilemap
+        Transform renderTilemapTransform = module.transform.Find("RenderTilemap");
+        if (renderTilemapTransform != null)
+        {
+             Tilemap tilemap = renderTilemapTransform.GetComponent<Tilemap>();
+             TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
+             if (tilemap != null) tilemap.color = tileDef.tintColor; // Set Tilemap.color
+             if (renderer != null) ApplyOverlayToTilemap(tileDef, renderer); // Apply material state
+        }
+        RegisterTimedTile(cellPos, tileDef); // Register AFTER placing
     }
-
     public void RemoveTile(TileDefinition tileDef, Vector3Int cellPos)
     {
-        if (!moduleByDefinition.ContainsKey(tileDef))
+        if (!moduleByDefinition.TryGetValue(tileDef, out var module))
         {
-            Debug.LogWarning($"RemoveTile: {tileDef.displayName} not in moduleByDefinition.");
-            return;
+             Debug.LogWarning($"RemoveTile: {tileDef.displayName} not in moduleByDefinition."); return;
         }
-        var module = moduleByDefinition[tileDef];
-        // remove from that tilemap
-        module.DataTilemap.SetTile(cellPos, null);
+        module.DataTilemap.SetTile(cellPos, null); // Remove presence tile
+        timedCells.Remove(cellPos); // If this cell was timed, remove it from the timer list
 
-        // Also if this cell was in timedCells for that tile, remove it
-        if (timedCells.ContainsKey(cellPos))
+        // If removing a tile might affect visuals, update the renderer state
+        // This ensures the correct material (shared or default) is applied if the cell becomes empty
+        Transform renderTilemapTransform = module.transform.Find("RenderTilemap");
+        if (renderTilemapTransform != null)
         {
-            // We only remove if the tile in timedCells is tileDef
-            TimedTileState st = timedCells[cellPos];
-            if (st.tileDef == tileDef)
-            {
-                timedCells.Remove(cellPos);
-            }
+            TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
+             if (renderer != null)
+             {
+                  TileDefinition remainingTile = FindWhichTileDefinitionAt(cellPos); // Check if another tile is still present
+                  if (remainingTile != null)
+                  {
+                      ApplyOverlayToTilemap(remainingTile, renderer); // Update with the remaining tile's settings
+                  }
+                  else // Cell is now truly empty for this layer
+                  {
+                      #if UNITY_EDITOR
+                      if(!Application.isPlaying)
+                      {
+                           // In Edit Mode, explicitly set to the shared material (which will have overlay off if appropriate) or null
+                           if (editModeSharedMaterial != null)
+                           {
+                                renderer.sharedMaterial = editModeSharedMaterial;
+                                // Ensure keywords are off if truly empty
+                                editModeSharedMaterial.SetKeyword(new UnityEngine.Rendering.LocalKeyword(overlayShader, "_USEOVERLAY_ON"), false);
+                                editModeSharedMaterial.SetKeyword(new UnityEngine.Rendering.LocalKeyword(overlayShader, "_USEANIMATION_ON"), false);
+                                EditorUtility.SetDirty(editModeSharedMaterial);
+                           } else {
+                                renderer.sharedMaterial = null; // Fallback to default if no shared material assigned
+                           }
+                           EditorUtility.SetDirty(renderer);
+                      }
+                      #endif
+                       // In Play Mode, instance management should handle this, but could force default:
+                       // else { renderer.material = null; } // Or assign a default runtime material
+                  }
+             }
         }
     }
-
     private TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
     {
-        // To ensure we get the top-most visible tile for overlays, we need to check
-        // tiles in reverse order (or specifically check overlay tiles first)
-        
-        // First, try to find any overlay tiles (keepBottomTile = true)
-        foreach (var mapping in tileDefinitionMappings)
+        // Iterate through mappings in reverse order to find the top-most tile
+        for (int i = tileDefinitionMappings.Count - 1; i >= 0; i--)
         {
-            if (mapping.tileDef == null || mapping.tilemapModule == null) 
-                continue;
-                
-            // Check specifically for overlay tiles first
-            if (mapping.tileDef.keepBottomTile && 
-                mapping.tilemapModule.DataTilemap.HasTile(cellPos))
+            var mapping = tileDefinitionMappings[i];
+            if (mapping.tileDef != null && mapping.tilemapModule != null && mapping.tilemapModule.DataTilemap.HasTile(cellPos))
             {
                 return mapping.tileDef;
-            }
-        }
-        
-        // If no overlay tile found, find any base tile
-        foreach (var pair in definitionByModule)
-        {
-            DualGridTilemapModule module = pair.Key;
-            TileDefinition def = pair.Value;
-
-            if (module.DataTilemap.HasTile(cellPos))
-            {
-                // Found a tile => that's the tile definition
-                return def;
             }
         }
         return null;
     }
 
-    // ------------------- Handle Hover & Debug UI (unchanged) -------------------
+
+    // ------------------- Handle Hover & Debug UI -------------------
     private void HandleTileHover()
     {
         if (mainCamera == null || player == null) return;
-
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = 0f;
         Vector3Int cellPos = WorldToCell(mouseWorldPos);
+        if (cellPos == new Vector3Int(int.MinValue, int.MinValue, int.MinValue)) return; // Avoid error if WorldToCell failed
         float distance = Vector2.Distance(player.position, CellCenterWorld(cellPos));
-
         TileDefinition foundTile = FindWhichTileDefinitionAt(cellPos);
-
-        if (debugLogs)
-        {
-            string tileName = foundTile != null ? foundTile.displayName  : "NULL";
-            Debug.Log($"[Hover] cell={cellPos}, tile={tileName}, dist={distance:F2}");
-        }
-
         if (distance <= hoverRadius)
         {
-            currentlyHoveredCell = cellPos;
-            hoveredTileDef = foundTile;
-            if (hoverHighlightObject != null)
+            if (currentlyHoveredCell != cellPos) // Update only if cell changed
             {
-                hoverHighlightObject.SetActive(true);
-                hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
+                currentlyHoveredCell = cellPos;
+                hoveredTileDef = foundTile;
+                if (hoverHighlightObject != null)
+                {
+                    hoverHighlightObject.SetActive(true);
+                    hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
+                }
             }
         }
-        else
+        else // Mouse is outside hover radius
         {
-            currentlyHoveredCell = null;
-            hoveredTileDef = null;
-            if (hoverHighlightObject != null)
-                hoverHighlightObject.SetActive(false);
+            if (currentlyHoveredCell.HasValue) // Turn off only if it was on
+            {
+                currentlyHoveredCell = null;
+                hoveredTileDef = null;
+                if (hoverHighlightObject != null)
+                    hoverHighlightObject.SetActive(false);
+            }
         }
     }
-
     private void UpdateDebugUI()
     {
         if (hoveredTileText != null)
         {
-            if (currentlyHoveredCell.HasValue)
-            {
-                string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
-                hoveredTileText.text = $"Hovering: {tileName}";
+            string tileName = "None";
+            if (currentlyHoveredCell.HasValue && hoveredTileDef != null) {
+                 tileName = hoveredTileDef.displayName;
+            } else if (currentlyHoveredCell.HasValue) {
+                 tileName = "(Empty)"; // Cell is hovered but no tile definition found
             }
-            else
-            {
-                hoveredTileText.text = "Hovering: (none)";
-            }
+            hoveredTileText.text = $"Hover: {tileName}";
         }
-
         if (currentToolText != null)
         {
-            // Changed from FindObjectOfType to FindAnyObjectByType for better performance
-            ToolSwitcher sw = Object.FindAnyObjectByType<ToolSwitcher>();
-            if (sw != null && sw.CurrentTool != null)
+            ToolSwitcher sw = FindAnyObjectByType<ToolSwitcher>(); // Find object in scene
+            string toolName = "None";
+            if (sw != null && sw.CurrentTool != null) {
+                toolName = sw.CurrentTool.toolType.ToString();
+            }
+            currentToolText.text = $"Tool: {toolName}";
+        }
+    }
+
+
+    // ------------------- Coordinate Conversion -------------------
+    private Vector3Int WorldToCell(Vector3 worldPos)
+    {
+        Grid targetGrid = interactionGrid;
+        if (targetGrid == null)
+        {
+            if (tileDefinitionMappings.Count > 0 && tileDefinitionMappings[0].tilemapModule?.DataTilemap?.layoutGrid != null)
             {
-                currentToolText.text = $"Tool: {sw.CurrentTool.toolType}";
+                targetGrid = tileDefinitionMappings[0].tilemapModule.DataTilemap.layoutGrid;
             }
             else
             {
-                currentToolText.text = "Tool: None";
+                 Debug.LogWarning($"[{nameof(TileInteractionManager)}] No Grid reference found for WorldToCell.", this);
+                 return new Vector3Int(int.MinValue, int.MinValue, int.MinValue); // Return indicator of failure
             }
         }
+        return targetGrid.WorldToCell(worldPos);
     }
-
-    private Vector3Int WorldToCell(Vector3 worldPos)
-    {
-        if (interactionGrid != null)
-            return interactionGrid.WorldToCell(worldPos);
-
-        if (tileDefinitionMappings.Count > 0 &&
-            tileDefinitionMappings[0].tilemapModule != null &&
-            tileDefinitionMappings[0].tilemapModule.DataTilemap != null)
-        {
-            Grid g = tileDefinitionMappings[0].tilemapModule.DataTilemap.layoutGrid;
-            return g.WorldToCell(worldPos);
-        }
-        return Vector3Int.zero;
-    }
-
     private Vector3 CellCenterWorld(Vector3Int cellPos)
     {
-        if (interactionGrid != null)
+        Grid targetGrid = interactionGrid;
+        if (targetGrid == null)
         {
-            Vector3 corner = interactionGrid.CellToWorld(cellPos);
-            return corner + interactionGrid.cellSize * 0.5f;
+            if (tileDefinitionMappings.Count > 0 && tileDefinitionMappings[0].tilemapModule?.DataTilemap?.layoutGrid != null)
+            {
+                targetGrid = tileDefinitionMappings[0].tilemapModule.DataTilemap.layoutGrid;
+            }
+            else
+            {
+                 Debug.LogWarning($"[{nameof(TileInteractionManager)}] No Grid reference found for CellCenterWorld.", this);
+                 return Vector3.zero; // Fallback
+            }
         }
-
-        if (tileDefinitionMappings.Count > 0 &&
-            tileDefinitionMappings[0].tilemapModule != null &&
-            tileDefinitionMappings[0].tilemapModule.DataTilemap != null)
-        {
-            Grid g = tileDefinitionMappings[0].tilemapModule.DataTilemap.layoutGrid;
-            Vector3 corner = g.CellToWorld(cellPos);
-            return corner + g.cellSize * 0.5f;
-        }
-        return Vector3.zero;
+        return targetGrid.GetCellCenterWorld(cellPos);
     }
-    
+
+
+    // ------------------- Tool Action Logic -------------------
     public void ApplyToolAction(ToolDefinition toolDef)
     {
-        if (!currentlyHoveredCell.HasValue)
-            return;
-
-        // If we recognized no tile, do nothing
-        if (hoveredTileDef == null)
+        if (!currentlyHoveredCell.HasValue) return;
+        Vector3Int cell = currentlyHoveredCell.Value;
+        TileDefinition currentTileDef = hoveredTileDef; // Use the currently determined hovered tile definition
+        if (currentTileDef == null)
         {
             if (debugLogs) Debug.Log("ApplyToolAction: No recognized tile at hovered cell.");
-            return;
+            return; // No tile to interact with
         }
-
-        // Check distance
-        float distance = Vector2.Distance(player.position, CellCenterWorld(currentlyHoveredCell.Value));
+        float distance = Vector2.Distance(player.position, CellCenterWorld(cell));
         if (distance > hoverRadius)
         {
-            if (debugLogs)
-                Debug.Log($"ApplyToolAction: Cell is {distance:F2} away, above {hoverRadius} radius. Aborting.");
+            if (debugLogs) Debug.Log($"ApplyToolAction: Cell is {distance:F2} away (max {hoverRadius}). Aborting.");
             return;
         }
-
-        if (debugLogs)
-            Debug.Log($"[ApplyToolAction] Tool={toolDef.toolType}, fromTile={hoveredTileDef.displayName} at cell={currentlyHoveredCell.Value}");
-
-        // Find matching rule
-        TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r =>
+        if (debugLogs) Debug.Log($"[ApplyToolAction] Tool={toolDef.toolType}, FromTile={currentTileDef.displayName}, Cell={cell}");
+        // Find matching rule in the library
+        TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(r =>
             r.tool == toolDef &&
-            r.fromTile == hoveredTileDef
+            r.fromTile == currentTileDef
         );
-
         if (rule == null)
         {
-            Debug.Log($"No rule for tool {toolDef.toolType} on tile {hoveredTileDef.displayName}.");
+            if (debugLogs) Debug.Log($"No rule found for Tool: {toolDef.toolType} on Tile: {currentTileDef.displayName}.");
             return;
         }
-
-        // Check whether the destination tile has keepBottomTile flag before removing source tile
+        // Execute the rule
         if (rule.toTile != null)
         {
-            // Only remove the original tile if the new tile doesn't have keepBottomTile set
-            if (!rule.toTile.keepBottomTile)
-            {
-                RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
-            }
-            
-            // Place the new tile
-            PlaceTile(rule.toTile, currentlyHoveredCell.Value);
+            PlaceTile(rule.toTile, cell); // PlaceTile handles removing the old one if necessary
+            if (debugLogs) Debug.Log($"Applied Rule: Placed {rule.toTile.displayName}.");
         }
         else
         {
-            // If there's no destination tile, just remove the current one
-            RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
+            RemoveTile(currentTileDef, cell); // Rule results in removing the tile
+            if (debugLogs) Debug.Log($"Applied Rule: Removed {currentTileDef.displayName}.");
         }
+        // Immediately update hover state after action
+        hoveredTileDef = FindWhichTileDefinitionAt(cell);
+        UpdateDebugUI();
     }
-}
+
+} // End of TileInteractionManager class
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5570,6 +5881,126 @@ public class TileInteractionRule
     [Tooltip("Which tile to transform into.")]
     public TileDefinition toTile;
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Editor\TileDefinitionEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿#if UNITY_EDITOR
+using UnityEngine;
+using UnityEditor;
+
+[CustomEditor(typeof(TileDefinition))]
+public class TileDefinitionEditor : Editor
+{
+    private SerializedProperty overlaysProperty;
+    private bool showOverlays = true;
+
+    private void OnEnable()
+    {
+        overlaysProperty = serializedObject.FindProperty("overlays");
+    }
+
+    public override void OnInspectorGUI()
+    {
+        serializedObject.Update();
+        
+        DrawDefaultInspector();
+        
+        EditorGUILayout.Space(10);
+        EditorGUILayout.LabelField("Texture Overlay Actions", EditorStyles.boldLabel);
+        
+        TileDefinition tileDefinition = (TileDefinition)target;
+        
+        EditorGUILayout.BeginHorizontal();
+        
+        if (GUILayout.Button("UPDATE COLOR IN SCENE", GUILayout.Height(30)))
+        {
+            tileDefinition.UpdateColor();
+        }
+        
+        if (GUILayout.Button("UPDATE OVERLAYS IN SCENE", GUILayout.Height(30)))
+        {
+            tileDefinition.UpdateOverlays();
+        }
+        
+        EditorGUILayout.EndHorizontal();
+        
+        // Show helpful information
+        if (tileDefinition.overlays != null && tileDefinition.overlays.Length > 0)
+        {
+            EditorGUILayout.HelpBox(
+                "Overlay textures will be applied in order (first overlay at bottom, last at top)." +
+                "\n\nIf you don't see your changes, press the UPDATE OVERLAYS button above.", 
+                MessageType.Info);
+        }
+        
+        serializedObject.ApplyModifiedProperties();
+    }
+}
+#endif
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Editor\TileInteractionManagerEditor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿#if UNITY_EDITOR
+using UnityEngine;
+using UnityEditor;
+
+[CustomEditor(typeof(TileInteractionManager))]
+public class TileInteractionManagerEditor : Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+        
+        TileInteractionManager manager = (TileInteractionManager)target;
+        
+        EditorGUILayout.Space(10);
+        EditorGUILayout.LabelField("Tilemap Management", EditorStyles.boldLabel);
+        
+        EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+        
+        EditorGUILayout.BeginHorizontal();
+        
+        if (GUILayout.Button("UPDATE SORTING ORDER", GUILayout.Height(30)))
+        {
+            manager.UpdateSortingOrder();
+            EditorUtility.SetDirty(manager);
+        }
+        
+        if (GUILayout.Button("UPDATE ALL COLORS", GUILayout.Height(30)))
+        {
+            manager.UpdateAllColors();
+            EditorUtility.SetDirty(manager);
+        }
+        
+        EditorGUILayout.EndHorizontal();
+        
+        // Add a button to update all overlays
+        if (GUILayout.Button("UPDATE ALL OVERLAYS", GUILayout.Height(30)))
+        {
+            manager.UpdateAllOverlays();
+            EditorUtility.SetDirty(manager);
+        }
+        
+        EditorGUILayout.EndVertical();
+        
+        // Show helpful info about sorting order
+        EditorGUILayout.HelpBox("Sorting Order: First item in list gets highest sorting order value (" + 
+                                manager.baseSortingOrder + "). Each subsequent item is " + 
+                                (manager.baseSortingOrder - 1) + ", " + 
+                                (manager.baseSortingOrder - 2) + ", etc.", MessageType.Info);
+        
+        // Show helpful info about overlay shader
+        if (manager.overlayShader == null)
+        {
+            EditorGUILayout.HelpBox("Please assign the TilemapOverlay shader in the 'Overlay Shader' field to enable texture overlays.", MessageType.Warning);
+        }
+    }
+}
+#endif
 
 
 ////////////////////////////////////////////////////////////////////////////////
