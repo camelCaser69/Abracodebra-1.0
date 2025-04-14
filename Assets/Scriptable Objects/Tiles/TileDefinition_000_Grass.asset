@@ -12,17 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 998948210ce44d75897a01d8fd5e6e5d, type: 3}
   m_Name: TileDefinition_000_Grass
   m_EditorClassIdentifier: 
-  displayName: Grass
-  tintColor: {r: 0.28235295, g: 0.59607846, b: 0.41568628, a: 1}
-  overlays:
-  - overlayTexture: {fileID: 2800000, guid: 7b1bd125b7364764985c21c190ea5e99, type: 3}
-    tintColor: {r: 1, g: 1, b: 1, a: 1}
-    scale: 6
-    offset: {x: 0, y: 1}
-    tileTexture: 0
-    useAnimation: 0
-    animationSpeed: 0
-    animationTiles: 0
+  displayName: 
+  tintColor: {r: 0.31305623, g: 0.6320754, b: 0.45585534, a: 1}
   revertAfterSeconds: 0
   revertToTile: {fileID: 0}
   keepBottomTile: 0
