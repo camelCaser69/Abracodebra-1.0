@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Custom_TilemapOverlay_preview2
-  m_Shader: {fileID: 4800000, guid: 05fb86c6afd59fe4484ab189ac51c4d8, type: 3}
+  m_Name: Sprite-Lit-Default_Overlay_Base
+  m_Shader: {fileID: 4800000, guid: 66e989394d79e9243ad4423ed92ccff5, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -23,31 +23,40 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _OverlayTex:
+    - _MaskTex:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OverlayTex:
+        m_Texture: {fileID: 2800000, guid: 7b1bd125b7364764985c21c190ea5e99, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AnimSpeed: 1
-    - _AnimTiles: 1
-    - _ColorMask: 15
-    - _DstBlend: 10
-    - _OverlayScaleValue: 1
-    - _SrcBlend: 5
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _UseAnimation: 0
-    - _UseOverlay: 0
+    - _EnableExternalAlpha: 0
+    - _OverlayBlendDst: 10
+    - _OverlayBlendSrc: 5
+    - _OverlayOffsetX: 0
+    - _OverlayOffsetY: 0.5
+    - _OverlayOpacity: 0.69
+    - _OverlayScaleX: 0.1
+    - _OverlayScaleY: 0.1
+    - _ZWrite: 0
     m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _OverlayColor: {r: 1, g: 1, b: 1, a: 1}
-    - _OverlayOffset: {r: 0, g: 0, b: 0, a: 0}
+    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
