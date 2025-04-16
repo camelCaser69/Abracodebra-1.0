@@ -2,6 +2,7 @@
 {
     None,
     Hoe,
-    WateringCan
+    WateringCan,
+    SeedPouch // New tool type
     // etc.
 }

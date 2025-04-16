@@ -18,11 +18,8 @@ public class NodeExecutor : MonoBehaviour
 
     private void Update()
     {
-        // Simple check for Space key press to spawn
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-             SpawnPlantFromUIGraph();
-        }
+        // NOTE: Direct planting with spacebar was removed in favor of the tool-based planting system
+        // Plants are now created through the PlantPlacementManager when using the SeedPouch tool
     }
 
     public void SpawnPlantFromUIGraph()

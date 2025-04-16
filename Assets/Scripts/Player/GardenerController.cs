@@ -66,14 +66,7 @@ public class GardenerController : MonoBehaviour
         
             // Check if we're moving (store for later)
             bool isMoving = movement.sqrMagnitude > 0.01f;
-        
-            // Handle planting action
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                // Store movement state before planting
-                wasMovingBeforePlanting = isMoving;
-                StartPlantingAnimation();
-            }
+            
         }
         else
         {

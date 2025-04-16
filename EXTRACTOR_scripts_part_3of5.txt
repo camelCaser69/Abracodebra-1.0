@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates. After reading all parts of the scripts, confirm that you are fully updated about state of my project and how it works and make a brief sum up so I know you are really informed well. Moreover, I'm using 3rd party package for my dual-grid wang tile system, integrating it into unity tilemap system - to ensure you understand the functionality of my grid tilemap system, I'm also enclosing guides provided by the package. 
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-15 15:56:52
+UNITY PROJECT SCRIPT EXPORT - 2025-04-16 00:23:31
 PART 3 OF 5
 ================================================================================
 
@@ -32,8 +32,6 @@ Assets
 ├── InputSystem_Actions.inputactions
 ├── Materials
 │   ├── BezierCurveAA_Material.mat
-│   ├── Custom_TilemapOverlay_preview.mat
-│   ├── DefaultTilemap.mat
 │   └── Firefly_Glow_Material.mat
 ├── Post Processing
 ├── Prefabs
@@ -199,9 +197,9 @@ Assets
 │   └── UniversalRP.asset
 ├── Shaders
 │   ├── BezierCurveAA.shader
-│   ├── Custom_TilemapOverlay_preview2.mat
-│   ├── SpriteEmissiveUnlit.shader
-│   └── TilemapOverlay.shader
+│   ├── Sprite-Lit-Default_OverlayCustom.shader
+│   ├── Sprite-Lit-Default_Overlay_Base.mat
+│   └── SpriteEmissiveUnlit.shader
 ├── TextureImporter.preset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------

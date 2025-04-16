@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Tilemaps;
-using skner.DualGrid;  // Your 3rd-party plugin
+using skner.DualGrid;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro; // if you have UI references for debugging
+using TMPro;
 
 public class TileInteractionManager : MonoBehaviour
 {
@@ -468,7 +469,54 @@ public class TileInteractionManager : MonoBehaviour
 
         return Vector3.zero;
     }
+    
+    // Update the method to include animation and delayed planting
+    private void HandleSeedPlanting(Vector3Int cellPosition)
+    {
+        // Check if we have a PlantPlacementManager
+        PlantPlacementManager plantManager = PlantPlacementManager.Instance;
+        if (plantManager == null)
+        {
+            Debug.LogError("Cannot plant: PlantPlacementManager not found in scene!");
+            return;
+        }
 
+        // Get the player's GardenerController to trigger animation
+        GardenerController gardener = player?.GetComponent<GardenerController>();
+        if (gardener == null)
+        {
+            Debug.LogError("Cannot plant: GardenerController not found on player reference!");
+            return;
+        }
+
+        // Get world position of cell center for planting
+        Vector3 worldPosition = CellCenterWorld(cellPosition);
+    
+        // Start the planting animation
+        gardener.Plant();
+    
+        // Start a coroutine to plant the seed after the animation completes
+        StartCoroutine(PlantAfterAnimation(gardener, plantManager, cellPosition, worldPosition));
+    }
+    
+    // New coroutine to handle delayed planting after animation
+    private IEnumerator PlantAfterAnimation(GardenerController gardener, PlantPlacementManager plantManager, 
+        Vector3Int cellPosition, Vector3 worldPosition)
+    {
+        // Wait for the planting animation to complete
+        yield return new WaitForSeconds(gardener.plantingDuration);
+    
+        // Try to plant seed at the cell position
+        bool planted = plantManager.TryPlantSeed(cellPosition, worldPosition);
+    
+        if (debugLogs)
+        {
+            Debug.Log(planted ? 
+                $"Planted seed successfully at cell {cellPosition}" : 
+                $"Failed to plant seed at cell {cellPosition}");
+        }
+    }
+    
     public void ApplyToolAction(ToolDefinition toolDef)
     {
         if (!currentlyHoveredCell.HasValue)
@@ -493,6 +541,14 @@ public class TileInteractionManager : MonoBehaviour
         if (debugLogs)
             Debug.Log(
                 $"[ApplyToolAction] Tool={toolDef.toolType}, fromTile={hoveredTileDef.displayName} at cell={currentlyHoveredCell.Value}");
+
+        // ADDED: Special handling for SeedPouch tool type
+        if (toolDef.toolType == ToolType.SeedPouch)
+        {
+            // Handle seed planting action separately
+            HandleSeedPlanting(currentlyHoveredCell.Value);
+            return;
+        }
 
         // Find matching rule
         TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r =>
