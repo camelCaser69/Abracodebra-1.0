@@ -9,6 +9,9 @@ public class PlantPlacementManager : MonoBehaviour
     [SerializeField] private GameObject plantPrefab;
     [SerializeField] private NodeEditorGridController nodeEditorGrid;
     [SerializeField] private Transform plantParent;
+    [SerializeField] private TileInteractionManager tileInteractionManager; // Add this reference
+    [SerializeField] private PlantGrowthModifierManager growthModifierManager; // Add this reference
+
 
     [Header("Planting Settings")]
     [Tooltip("Maximum radius from cell center for random seed placement (in units)")]
@@ -42,14 +45,20 @@ public class PlantPlacementManager : MonoBehaviour
         {
             plantParent = EcosystemManager.Instance.plantParent;
         }
-        
+    
         if (nodeEditorGrid == null)
         {
             nodeEditorGrid = NodeEditorGridController.Instance;
-            if (nodeEditorGrid == null && showDebugMessages)
-            {
-                Debug.LogWarning("PlantPlacementManager: NodeEditorGridController not found.");
-            }
+        }
+    
+        if (tileInteractionManager == null)
+        {
+            tileInteractionManager = TileInteractionManager.Instance;
+        }
+    
+        if (growthModifierManager == null)
+        {
+            growthModifierManager = PlantGrowthModifierManager.Instance;
         }
     }
 
@@ -161,12 +170,37 @@ public class PlantPlacementManager : MonoBehaviour
         // Calculate randomized planting position based on our settings
         Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
         
+        // Get the tile at this position
+        TileDefinition tileDef = null;
+        if (tileInteractionManager != null)
+        {
+            // Get the tile definition using TileInteractionManager's method (we'll need to make this public)
+            tileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
+        }
+        
         // Spawn the plant at the randomized position
         GameObject plantObj = SpawnPlant(graphToSpawn, plantingPosition);
         if (plantObj != null)
         {
             // Track the plant position
             plantsByGridPosition[gridPosition] = plantObj;
+            
+            // Register the plant with the growth modifier manager
+            if (growthModifierManager != null)
+            {
+                PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
+                if (plantGrowth != null)
+                {
+                    growthModifierManager.RegisterPlantTile(plantGrowth, tileDef);
+                    
+                    if (showDebugMessages)
+                    {
+                        string tileDebugName = tileDef != null ? tileDef.displayName : "Unknown";
+                        Debug.Log($"Plant registered with tile: {tileDebugName}");
+                    }
+                }
+            }
+            
             return true;
         }
         return false;

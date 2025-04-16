@@ -67,7 +67,16 @@ public class PlantGrowth : MonoBehaviour
 
     private void Update() => StateMachineUpdate();
 
-    private void OnDestroy() => StopAllCoroutines(); // Ensure cleanup
+    private void OnDestroy()
+    {
+        StopAllCoroutines(); // Ensure cleanup
+    
+        // Unregister with the PlantGrowthModifierManager if it exists
+        if (PlantGrowthModifierManager.Instance != null)
+        {
+            PlantGrowthModifierManager.Instance.UnregisterPlant(this);
+        }
+    }
 
     // --- Public Initialization ---
     public void InitializeAndGrow(NodeGraph graph)
@@ -159,15 +168,24 @@ public class PlantGrowth : MonoBehaviour
     {
         float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
         int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
+    
+        // Get the tile-based energy multiplier
+        float tileMultiplier = 1.0f;
+        if (PlantGrowthModifierManager.Instance != null)
+        {
+            tileMultiplier = PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(this);
+        }
+    
         float fireflyBonusRate = 0f;
         if (fireflyManagerInstance != null)
         {
             int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(transform.position, fireflyManagerInstance.photosynthesisRadius);
             fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly,
-                                          fireflyManagerInstance.maxPhotosynthesisBonus);
+                fireflyManagerInstance.maxPhotosynthesisBonus);
         }
+    
         float standardPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight;
-        float totalRate = standardPhotosynthesis + fireflyBonusRate;
+        float totalRate = (standardPhotosynthesis + fireflyBonusRate) * tileMultiplier; // Apply tile multiplier
         float delta = totalRate * Time.deltaTime;
         currentEnergy = Mathf.Clamp(currentEnergy + delta, 0f, finalMaxEnergy);
     }
@@ -257,29 +275,99 @@ public class PlantGrowth : MonoBehaviour
 
     private IEnumerator PercentageCounterRoutine()
     {
-        // (No changes needed)
-         displayedGrowthPercentage = 0; UpdateUI(); if (totalGrowthDuration <= 0 || percentageIncrement <= 0) yield break;
-         int steps = Mathf.Max(1, 100 / percentageIncrement); float timePerStep = totalGrowthDuration / steps;
-         for (int i = 1; i <= steps; i++) { yield return new WaitForSeconds(timePerStep); if (currentState != PlantState.Growing) break; displayedGrowthPercentage = Mathf.Min(i * percentageIncrement, 100f); UpdateUI(); }
-         if (currentState == PlantState.Growing || currentState == PlantState.Mature_Idle) { displayedGrowthPercentage = 100f; UpdateUI(); }
-         percentageCounterCoroutine = null;
+        displayedGrowthPercentage = 0; 
+        UpdateUI(); 
+    
+        if (totalGrowthDuration <= 0 || percentageIncrement <= 0) yield break;
+    
+        int steps = Mathf.Max(1, 100 / percentageIncrement); 
+    
+        // Keep track of progress
+        float currentProgress = 0f;
+    
+        while (currentState == PlantState.Growing && currentProgress < 100f)
+        {
+            // Get the tile-based growth speed multiplier - this is the same as in GrowRoutine
+            float tileMultiplier = 1.0f;
+            if (PlantGrowthModifierManager.Instance != null)
+            {
+                tileMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(this);
+            }
+        
+            // Calculate how much time to wait before the next percentage update
+            // We adjust time based on the same tile multiplier
+            float adjustedTimePerStep = (totalGrowthDuration / steps) / tileMultiplier;
+        
+            yield return new WaitForSeconds(adjustedTimePerStep);
+        
+            if (currentState != PlantState.Growing) break;
+        
+            // Increase percentage and update UI
+            currentProgress += percentageIncrement;
+            displayedGrowthPercentage = Mathf.Min(currentProgress, 100f);
+            UpdateUI();
+        }
+    
+        if (currentState == PlantState.Growing || currentState == PlantState.Mature_Idle)
+        { 
+            displayedGrowthPercentage = 100f; 
+            UpdateUI(); 
+        }
+    
+        percentageCounterCoroutine = null;
     }
 
     private IEnumerator GrowRoutine()
     {
-        // (No changes needed)
-         Vector2Int currentPos = Vector2Int.zero; int spiralDir = 1, patternCount = 0;
-         while (currentState == PlantState.Growing) {
-             if (currentStemCount >= targetStemLength) {
-                 if (percentageCounterCoroutine != null) { StopCoroutine(percentageCounterCoroutine); percentageCounterCoroutine = null; if (showGrowthPercentage) { displayedGrowthPercentage = 100f; UpdateUI(); } }
-                 currentState = PlantState.Mature_Idle; cycleTimer = cycleCooldown; UpdateUI(); yield break;
-             }
-             yield return new WaitForSeconds(finalGrowthSpeed);
-             currentStemCount++; Vector2Int growthDir = (currentStemCount == 1) ? Vector2Int.up : GetStemDirection(); currentPos += growthDir;
-             SpawnCellVisual(PlantCellType.Stem, currentPos, null, null);
-             if ((finalLeafGap >= 0) && (currentStemCount % (finalLeafGap + 1)) == 0) { patternCount++; ExecuteLeafPatternLogic(currentPos, currentPos + Vector2Int.left, currentPos + Vector2Int.right, patternCount, ref spiralDir); }
-             if ((showGrowthPercentage && !useSmoothPercentageCounter) || !showGrowthPercentage) UpdateUI();
-         }
+        Vector2Int currentPos = Vector2Int.zero; 
+        int spiralDir = 1, patternCount = 0;
+    
+        while (currentState == PlantState.Growing) 
+        {
+            if (currentStemCount >= targetStemLength) 
+            {
+                if (percentageCounterCoroutine != null) 
+                { 
+                    StopCoroutine(percentageCounterCoroutine); 
+                    percentageCounterCoroutine = null; 
+                    if (showGrowthPercentage) 
+                    { 
+                        displayedGrowthPercentage = 100f; 
+                        UpdateUI(); 
+                    } 
+                }
+                currentState = PlantState.Mature_Idle; 
+                cycleTimer = cycleCooldown; 
+                UpdateUI(); 
+                yield break;
+            }
+        
+            // Get the tile-based growth speed multiplier
+            float tileMultiplier = 1.0f;
+            if (PlantGrowthModifierManager.Instance != null)
+            {
+                tileMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(this);
+            }
+        
+            // Apply tile multiplier to growth speed
+            float adjustedGrowthSpeed = finalGrowthSpeed / tileMultiplier; // Divide because higher value = slower growth
+        
+            yield return new WaitForSeconds(adjustedGrowthSpeed);
+        
+            currentStemCount++; 
+            Vector2Int growthDir = (currentStemCount == 1) ? Vector2Int.up : GetStemDirection(); 
+            currentPos += growthDir;
+            SpawnCellVisual(PlantCellType.Stem, currentPos, null, null);
+        
+            if ((finalLeafGap >= 0) && (currentStemCount % (finalLeafGap + 1)) == 0) 
+            { 
+                patternCount++; 
+                ExecuteLeafPatternLogic(currentPos, currentPos + Vector2Int.left, currentPos + Vector2Int.right, patternCount, ref spiralDir); 
+            }
+        
+            if ((showGrowthPercentage && !useSmoothPercentageCounter) || !showGrowthPercentage) 
+                UpdateUI();
+        }
     }
 
     private void ExecuteLeafPatternLogic(Vector2Int stemPos, Vector2Int leftBase, Vector2Int rightBase, int counter, ref int spiralDir)

@@ -1130,9 +1130,17 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4995761266735135271, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
-      propertyPath: 'toolDefinitions.Array.data[2]'
+      propertyPath: 'toolDefinitions.Array.data[0]'
       value: 
       objectReference: {fileID: 11400000, guid: 2f04b490372f08941860e93aee6b9061, type: 2}
+    - target: {fileID: 4995761266735135271, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: 'toolDefinitions.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 864e5c2cfc433e249b02f2a97cced049, type: 2}
+    - target: {fileID: 4995761266735135271, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: 'toolDefinitions.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: b02225d1ccd9f4d42b09de7941a00382, type: 2}
     - target: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -8097,6 +8105,7 @@ Transform:
   - {fileID: 1384832980}
   - {fileID: 839501940}
   - {fileID: 1190077646}
+  - {fileID: 1197055835}
   - {fileID: 976596915}
   - {fileID: 218454254}
   m_Father: {fileID: 0}
@@ -12550,7 +12559,7 @@ GameObject:
   - component: {fileID: 1190077646}
   - component: {fileID: 1190077647}
   m_Layer: 0
-  m_Name: Manager_Plants
+  m_Name: Manager_Plant_Placement
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12586,9 +12595,65 @@ MonoBehaviour:
   plantPrefab: {fileID: 8982947048272063882, guid: 9838d74874e76024ca01e8e531645f18, type: 3}
   nodeEditorGrid: {fileID: 1615779386}
   plantParent: {fileID: 176308126}
+  tileInteractionManager: {fileID: 1097838751}
+  growthModifierManager: {fileID: 1197055836}
   spawnRadius: 0.12
   spawnRadiusIncrement: 6
   showDebugMessages: 0
+--- !u!1 &1197055834
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1197055835}
+  - component: {fileID: 1197055836}
+  m_Layer: 0
+  m_Name: Manager_Plant_Modifiers
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1197055835
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197055834}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 697039534}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1197055836
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197055834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92840148c9b740a6a5d66b7201ba4609, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultGrowthSpeedMultiplier: 0.1
+  defaultEnergyRechargeMultiplier: 0.1
+  tileUpdateInterval: 1
+  tileModifiers:
+  - tileDefinition: {fileID: 11400000, guid: 2efc2db88b0caff4693943889a86ccac, type: 2}
+    growthSpeedMultiplier: 1
+    energyRechargeMultiplier: 1
+  tileInteractionManager: {fileID: 1097838751}
+  showDebugMessages: 0
+  showTileChangeMessages: 1
 --- !u!1 &1227954964
 GameObject:
   m_ObjectHideFlags: 0

@@ -333,17 +333,17 @@ public class TileInteractionManager : MonoBehaviour
         }
     }
 
-    private TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
+    public TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
     {
         // To ensure we get the top-most visible tile for overlays, we need to check
         // tiles in reverse order (or specifically check overlay tiles first)
-        
+    
         // First, try to find any overlay tiles (keepBottomTile = true)
         foreach (var mapping in tileDefinitionMappings)
         {
             if (mapping.tileDef == null || mapping.tilemapModule == null) 
                 continue;
-                
+            
             // Check specifically for overlay tiles first
             if (mapping.tileDef.keepBottomTile && 
                 mapping.tilemapModule.DataTilemap.HasTile(cellPos))
@@ -351,7 +351,7 @@ public class TileInteractionManager : MonoBehaviour
                 return mapping.tileDef;
             }
         }
-        
+    
         // If no overlay tile found, find any base tile
         foreach (var pair in definitionByModule)
         {
@@ -434,7 +434,7 @@ public class TileInteractionManager : MonoBehaviour
         }
     }
 
-    private Vector3Int WorldToCell(Vector3 worldPos)
+    public Vector3Int WorldToCell(Vector3 worldPos)
     {
         if (interactionGrid != null)
             return interactionGrid.WorldToCell(worldPos);
