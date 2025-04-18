@@ -481,6 +481,19 @@ public class TileInteractionManager : MonoBehaviour
             return;
         }
 
+        // Check if this tile is valid for planting
+        TileDefinition tileDef = FindWhichTileDefinitionAt(cellPosition);
+        if (!plantManager.IsTileValidForPlanting(tileDef))
+        {
+            // Optionally show a visual cue or play a sound to indicate invalid planting surface
+            if (debugLogs)
+            {
+                string tileName = tileDef != null ? tileDef.displayName : "Unknown";
+                Debug.Log($"Cannot plant on {tileName} - invalid tile for planting");
+            }
+            return; // Exit early, don't even trigger the planting animation
+        }
+
         // Get the player's GardenerController to trigger animation
         GardenerController gardener = player?.GetComponent<GardenerController>();
         if (gardener == null)

@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates. After reading all parts of the scripts, confirm that you are fully updated about state of my project and how it works and make a brief sum up so I know you are really informed well. Moreover, I'm using 3rd party package for my dual-grid wang tile system, integrating it into unity tilemap system - to ensure you understand the functionality of my grid tilemap system, I'm also enclosing guides provided by the package. 
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-18 13:32:33
+UNITY PROJECT SCRIPT EXPORT - 2025-04-17 18:58:24
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -6645,18 +6645,19 @@ public class ToolDefinition : ScriptableObject
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Tools\ToolSwitcher.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿﻿using UnityEngine;
+using UnityEngine.UI;
 
 public class ToolSwitcher : MonoBehaviour
 {
-    [Tooltip("All available tool definitions, e.g. Hoe, WateringCan, etc.")]
+    [Tooltip("Array of Tool Definition assets (order matters for cycling with Q/E).")]
     public ToolDefinition[] toolDefinitions;
 
-    private int currentIndex = 0;
+    // This field is now used to display the tool icon above the player.
+    [Tooltip("SpriteRenderer that displays the current tool icon above the player.")]
+    public SpriteRenderer toolDisplay;
 
-    /// <summary>
-    /// The currently selected tool definition.
-    /// </summary>
+    private int currentIndex = 0;
     public ToolDefinition CurrentTool { get; private set; } = null;
 
     private void Start()
@@ -6665,29 +6666,52 @@ public class ToolSwitcher : MonoBehaviour
         {
             currentIndex = 0;
             CurrentTool = toolDefinitions[currentIndex];
+            UpdateToolDisplay();
             LogToolChange();
         }
     }
 
     private void Update()
     {
-        if (toolDefinitions.Length == 0) return;
+        if (toolDefinitions.Length == 0)
+            return;
 
+        // Cycle backwards with Q
         if (Input.GetKeyDown(KeyCode.Q))
         {
             currentIndex--;
             if (currentIndex < 0)
                 currentIndex = toolDefinitions.Length - 1;
             CurrentTool = toolDefinitions[currentIndex];
+            UpdateToolDisplay();
             LogToolChange();
         }
+        // Cycle forwards with E
         else if (Input.GetKeyDown(KeyCode.E))
         {
             currentIndex++;
             if (currentIndex >= toolDefinitions.Length)
                 currentIndex = 0;
             CurrentTool = toolDefinitions[currentIndex];
+            UpdateToolDisplay();
             LogToolChange();
+        }
+    }
+
+    private void UpdateToolDisplay()
+    {
+        if (toolDisplay == null)
+            return;
+
+        if (CurrentTool != null && CurrentTool.icon != null)
+        {
+            toolDisplay.sprite = CurrentTool.icon;
+            toolDisplay.color = CurrentTool.iconTint; // Apply the tint defined in the ToolDefinition
+            toolDisplay.enabled = true;
+        }
+        else
+        {
+            toolDisplay.enabled = false;
         }
     }
 
@@ -6696,7 +6720,6 @@ public class ToolSwitcher : MonoBehaviour
         string toolName = (CurrentTool != null) ? CurrentTool.displayName : "(none)";
         Debug.Log($"Switched tool to: {toolName}");
     }
-    
 }
 
 

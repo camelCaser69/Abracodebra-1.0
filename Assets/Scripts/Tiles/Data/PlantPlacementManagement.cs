@@ -9,9 +9,8 @@ public class PlantPlacementManager : MonoBehaviour
     [SerializeField] private GameObject plantPrefab;
     [SerializeField] private NodeEditorGridController nodeEditorGrid;
     [SerializeField] private Transform plantParent;
-    [SerializeField] private TileInteractionManager tileInteractionManager; // Add this reference
-    [SerializeField] private PlantGrowthModifierManager growthModifierManager; // Add this reference
-
+    [SerializeField] private TileInteractionManager tileInteractionManager;
+    [SerializeField] private PlantGrowthModifierManager growthModifierManager;
 
     [Header("Planting Settings")]
     [Tooltip("Maximum radius from cell center for random seed placement (in units)")]
@@ -20,13 +19,18 @@ public class PlantPlacementManager : MonoBehaviour
     [Tooltip("Increment for position randomization (in pixels, for pixel-perfect placement)")]
     [SerializeField] private float spawnRadiusIncrement = 4f;
 
+    [Header("Tile Restrictions")]
+    [Tooltip("List of tiles that cannot be planted on")]
+    [SerializeField] private List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
+
     [Header("Debug")]
     [SerializeField] private bool showDebugMessages = true;
     
+    // Cache for quick lookup of invalid tiles
+    private HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
+    
     // Dictionary to track plant positions (using grid cell positions as keys)
     private Dictionary<Vector3Int, GameObject> plantsByGridPosition = new Dictionary<Vector3Int, GameObject>();
-    
-
     
     private void Awake()
     {
@@ -36,6 +40,9 @@ public class PlantPlacementManager : MonoBehaviour
             return;
         }
         Instance = this;
+        
+        // Build the set of invalid tiles for faster lookup
+        RebuildInvalidTilesSet();
     }
 
     private void Start()
@@ -45,21 +52,44 @@ public class PlantPlacementManager : MonoBehaviour
         {
             plantParent = EcosystemManager.Instance.plantParent;
         }
-    
+        
         if (nodeEditorGrid == null)
         {
             nodeEditorGrid = NodeEditorGridController.Instance;
         }
-    
+        
         if (tileInteractionManager == null)
         {
             tileInteractionManager = TileInteractionManager.Instance;
         }
-    
+        
         if (growthModifierManager == null)
         {
             growthModifierManager = PlantGrowthModifierManager.Instance;
         }
+    }
+    
+    private void RebuildInvalidTilesSet()
+    {
+        invalidTilesSet.Clear();
+        foreach (var tile in invalidPlantingTiles)
+        {
+            if (tile != null)
+            {
+                invalidTilesSet.Add(tile);
+            }
+        }
+        
+        if (showDebugMessages)
+        {
+            Debug.Log($"PlantPlacementManager: Built invalid tiles set with {invalidTilesSet.Count} entries");
+        }
+    }
+    
+    private void OnValidate()
+    {
+        // Rebuild the set when changed in Inspector
+        RebuildInvalidTilesSet();
     }
 
     // Check if a grid position is occupied by a plant
@@ -77,6 +107,17 @@ public class PlantPlacementManager : MonoBehaviour
             return true;
         }
         return false;
+    }
+    
+    // Check if a tile is valid for planting
+    public bool IsTileValidForPlanting(TileDefinition tileDef)
+    {
+        // If the tile is null, it's not valid
+        if (tileDef == null)
+            return false;
+            
+        // Check if this tile is in our invalid set
+        return !invalidTilesSet.Contains(tileDef);
     }
 
     // Clean up destroyed plants from our dictionary (call periodically if needed)
@@ -117,6 +158,24 @@ public class PlantPlacementManager : MonoBehaviour
                 Debug.Log($"Cannot plant: Position {gridPosition} already has a plant.");
             }
             return false;
+        }
+        
+        // Get the tile at this position
+        TileDefinition tileDef = null;
+        if (tileInteractionManager != null)
+        {
+            tileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
+            
+            // Check if the tile is valid for planting
+            if (!IsTileValidForPlanting(tileDef))
+            {
+                if (showDebugMessages)
+                {
+                    string tileName = tileDef != null ? tileDef.displayName : "Unknown";
+                    Debug.Log($"Cannot plant: Tile {tileName} is not valid for planting.");
+                }
+                return false;
+            }
         }
 
         // Get the current graph from the NodeEditorGridController
@@ -170,14 +229,6 @@ public class PlantPlacementManager : MonoBehaviour
         // Calculate randomized planting position based on our settings
         Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
         
-        // Get the tile at this position
-        TileDefinition tileDef = null;
-        if (tileInteractionManager != null)
-        {
-            // Get the tile definition using TileInteractionManager's method (we'll need to make this public)
-            tileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
-        }
-        
         // Spawn the plant at the randomized position
         GameObject plantObj = SpawnPlant(graphToSpawn, plantingPosition);
         if (plantObj != null)
@@ -205,42 +256,6 @@ public class PlantPlacementManager : MonoBehaviour
         }
         return false;
     }
-    
-    private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
-    {
-        if (spawnRadius <= 0f || spawnRadiusIncrement <= 0f)
-        {
-            return centerPosition; // No randomization if settings are invalid
-        }
-        
-        // Get a random direction
-        float randomAngle = Random.Range(0f, 2f * Mathf.PI);
-        Vector2 direction = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle));
-        
-        // Get a random distance within spawn radius
-        float randomDistance = Random.Range(0f, spawnRadius);
-        
-        // Round to the nearest increment for pixel-perfect placement
-        // Convert units to pixels, round, then convert back to units
-        float pixelsPerUnit = 1f / (spawnRadiusIncrement / 100f); // Adjust this if your game has a different PPU
-        
-        float offsetX = direction.x * randomDistance;
-        float offsetY = direction.y * randomDistance;
-        
-        // Round to nearest pixel increment
-        offsetX = Mathf.Round(offsetX * pixelsPerUnit) / pixelsPerUnit;
-        offsetY = Mathf.Round(offsetY * pixelsPerUnit) / pixelsPerUnit;
-        
-        // Create the final position
-        Vector3 randomizedPosition = centerPosition + new Vector3(offsetX, offsetY, 0f);
-        
-        if (showDebugMessages)
-        {
-            Debug.Log($"Randomized plant position: {randomizedPosition} (offset: {offsetX}, {offsetY})");
-        }
-        
-        return randomizedPosition;
-    }
 
     // Spawn a plant using the given node graph at the specified position
     private GameObject SpawnPlant(NodeGraph graphToSpawn, Vector3 position)
@@ -251,8 +266,13 @@ public class PlantPlacementManager : MonoBehaviour
             return null;
         }
 
+        Debug.Log($"SpawnPlant called with position: {position}");
+    
         // Instantiate the plant prefab
         GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
+    
+        // Verify the position was actually applied
+        Debug.Log($"Plant instantiated at position: {plantObj.transform.position}");
 
         // Get the PlantGrowth component
         PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
@@ -320,5 +340,55 @@ public class PlantPlacementManager : MonoBehaviour
             newList.Add(newEffect);
         }
         return newList;
+    }
+    
+    // Generate a randomized position within the given radius, with simple increments
+    // Generate a randomized position within the given radius
+    private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
+    {
+        // First, let's add comprehensive debugging
+        Debug.Log($"Starting position randomization from center: {centerPosition}, radius: {spawnRadius}, increment: {spawnRadiusIncrement}");
+    
+        // Critical check - if radius is too small, just return the center
+        if (spawnRadius < 0.01f)
+        {
+            Debug.LogWarning("Spawn radius too small (<0.01), using center position");
+            return centerPosition;
+        }
+    
+        // Generate a random angle in radians (0 to 2π)
+        float randomAngle = Random.Range(0f, 2f * Mathf.PI);
+        Debug.Log($"Random angle: {randomAngle} radians ({randomAngle * Mathf.Rad2Deg} degrees)");
+    
+        // Convert angle to direction vector
+        Vector2 direction = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle));
+        Debug.Log($"Direction vector: {direction}");
+    
+        // Get a random distance within spawn radius
+        float randomDistance = Random.Range(0.05f, spawnRadius);
+        Debug.Log($"Random distance: {randomDistance}");
+    
+        // Calculate actual offset
+        float offsetX = direction.x * randomDistance;
+        float offsetY = direction.y * randomDistance;
+        Debug.Log($"Raw offset: ({offsetX}, {offsetY})");
+    
+        // Apply increment if needed
+        if (spawnRadiusIncrement > 0.001f)
+        {
+            float originalX = offsetX;
+            float originalY = offsetY;
+        
+            offsetX = Mathf.Round(offsetX / spawnRadiusIncrement) * spawnRadiusIncrement;
+            offsetY = Mathf.Round(offsetY / spawnRadiusIncrement) * spawnRadiusIncrement;
+        
+            Debug.Log($"Snapped offset: ({offsetX}, {offsetY}) from ({originalX}, {originalY})");
+        }
+    
+        // Create the final position
+        Vector3 randomizedPosition = centerPosition + new Vector3(offsetX, offsetY, 0f);
+        Debug.Log($"FINAL randomized position: {randomizedPosition}");
+    
+        return randomizedPosition;
     }
 }

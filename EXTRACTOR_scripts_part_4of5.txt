@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 C# scripts from my project. Do not reply—just confirm storing this in memory. If the full script collection exceeds the character limit, additional parts will follow. Use this to update your understanding of the project until further updates. After reading all parts of the scripts, confirm that you are fully updated about state of my project and how it works and make a brief sum up so I know you are really informed well. Moreover, I'm using 3rd party package for my dual-grid wang tile system, integrating it into unity tilemap system - to ensure you understand the functionality of my grid tilemap system, I'm also enclosing guides provided by the package. 
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-16 00:23:31
+UNITY PROJECT SCRIPT EXPORT - 2025-04-18 13:32:33
 PART 4 OF 5
 ================================================================================
 
@@ -107,10 +107,12 @@ Assets
 │   │   ├── TileDefinition_000_Grass.asset
 │   │   ├── TileDefinition_001_Dirt.asset
 │   │   ├── TileDefinition_002_DirtWet.asset
+│   │   ├── TileDefinition_003_Water.asset
 │   │   └── TileInteractionLibrary.asset
 │   └── Tools
 │       ├── ToolDefinition_000_GardeningHoe.asset
-│       └── ToolDefinition_001_WateringCan.asset
+│       ├── ToolDefinition_001_WateringCan.asset
+│       └── ToolDefinition_002_SeedPouch.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -173,6 +175,8 @@ Assets
 │   ├── Rendering
 │   ├── Tiles
 │   │   ├── Data
+│   │   │   ├── PlantGrowthModifierManager.cs
+│   │   │   ├── PlantPlacementManagement.cs
 │   │   │   ├── PlayerTileInteractor.cs
 │   │   │   ├── TileDefinition.cs
 │   │   │   ├── TileInteractionLibrary.cs
@@ -946,14 +950,7 @@ public class GardenerController : MonoBehaviour
         
             // Check if we're moving (store for later)
             bool isMoving = movement.sqrMagnitude > 0.01f;
-        
-            // Handle planting action
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                // Store movement state before planting
-                wasMovingBeforePlanting = isMoving;
-                StartPlantingAnimation();
-            }
+            
         }
         else
         {
@@ -1086,6 +1083,677 @@ public class GardenerController : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Data\PlantGrowthModifierManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+public class PlantGrowthModifierManager : MonoBehaviour
+{
+    public static PlantGrowthModifierManager Instance { get; private set; }
+
+    [System.Serializable]
+    public class TileGrowthModifier
+    {
+        [Tooltip("The tile definition this modifier applies to")]
+        public TileDefinition tileDefinition;
+
+        [Tooltip("Multiplier for plant growth speed when on this tile (1.0 = normal)")]
+        [Range(0.1f, 3.0f)]
+        public float growthSpeedMultiplier = 1.0f;
+
+        [Tooltip("Multiplier for energy recharge speed when on this tile (1.0 = normal)")]
+        [Range(0.1f, 3.0f)]
+        public float energyRechargeMultiplier = 1.0f;
+    }
+
+    [Header("Default Settings")]
+    [Tooltip("Default multiplier for tiles that aren't specifically configured")]
+    [Range(0.1f, 3.0f)]
+    public float defaultGrowthSpeedMultiplier = 1.0f;
+
+    [Tooltip("Default multiplier for energy recharge on tiles that aren't specifically configured")]
+    [Range(0.1f, 3.0f)]
+    public float defaultEnergyRechargeMultiplier = 1.0f;
+
+    [Header("Tile Update Settings")]
+    [Tooltip("How often (in seconds) to check if plants are on different tiles")]
+    [Range(0.5f, 5.0f)]
+    public float tileUpdateInterval = 1.0f;
+
+    [Header("Tile Growth Modifiers")]
+    [Tooltip("Define growth and energy recharge multipliers for specific tiles")]
+    public List<TileGrowthModifier> tileModifiers = new List<TileGrowthModifier>();
+
+    [Header("References")]
+    [SerializeField] private TileInteractionManager tileInteractionManager;
+
+    [Header("Debug")]
+    [SerializeField] private bool showDebugMessages = true;
+    [SerializeField] private bool showTileChangeMessages = true;
+
+    // Dictionary for faster lookup of modifiers by tile definition
+    private Dictionary<TileDefinition, TileGrowthModifier> modifierLookup = new Dictionary<TileDefinition, TileGrowthModifier>();
+
+    // Dictionary to track what tile each plant is on
+    private Dictionary<PlantGrowth, TileDefinition> plantTiles = new Dictionary<PlantGrowth, TileDefinition>();
+    
+    // Timer for tile updates
+    private float tileUpdateTimer = 0f;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
+        // Build lookup dictionary for faster access
+        BuildModifierLookup();
+    }
+
+    private void Start()
+    {
+        // Find TileInteractionManager if not assigned
+        if (tileInteractionManager == null)
+        {
+            tileInteractionManager = TileInteractionManager.Instance;
+            if (tileInteractionManager == null && showDebugMessages)
+            {
+                Debug.LogWarning("PlantGrowthModifierManager: TileInteractionManager not found!");
+            }
+        }
+        
+        // Start with a tile update
+        tileUpdateTimer = 0f;
+    }
+
+    private void Update()
+    {
+        // Update timer
+        tileUpdateTimer -= Time.deltaTime;
+        
+        // Check if it's time to update tiles
+        if (tileUpdateTimer <= 0f)
+        {
+            UpdateAllPlantTiles();
+            tileUpdateTimer = tileUpdateInterval;
+        }
+    }
+
+    // Check all plants to see if their tiles have changed
+    private void UpdateAllPlantTiles()
+    {
+        if (tileInteractionManager == null)
+        {
+            return;
+        }
+        
+        // We need to copy the keys to avoid modifying the dictionary during iteration
+        List<PlantGrowth> plantsToCheck = new List<PlantGrowth>(plantTiles.Keys);
+        
+        foreach (PlantGrowth plant in plantsToCheck)
+        {
+            if (plant == null)
+            {
+                // Plant has been destroyed, remove from dictionary
+                plantTiles.Remove(plant);
+                continue;
+            }
+            
+            // Convert plant position to grid position
+            Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
+            
+            // Get current tile definition at this position
+            TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
+            
+            // Get previously stored tile definition
+            TileDefinition previousTileDef = plantTiles[plant];
+            
+            // Check if tile has changed
+            if (currentTileDef != previousTileDef)
+            {
+                // Update stored tile
+                plantTiles[plant] = currentTileDef;
+                
+                if (showTileChangeMessages)
+                {
+                    string previousTileName = previousTileDef != null ? previousTileDef.displayName : "None";
+                    string currentTileName = currentTileDef != null ? currentTileDef.displayName : "None";
+                    Debug.Log($"Plant tile changed: {previousTileName} -> {currentTileName}");
+                }
+            }
+        }
+    }
+
+    private void BuildModifierLookup()
+    {
+        modifierLookup.Clear();
+        foreach (var modifier in tileModifiers)
+        {
+            if (modifier.tileDefinition != null && !modifierLookup.ContainsKey(modifier.tileDefinition))
+            {
+                modifierLookup.Add(modifier.tileDefinition, modifier);
+            }
+        }
+
+        if (showDebugMessages)
+        {
+            Debug.Log($"PlantGrowthModifierManager: Built lookup with {modifierLookup.Count} tile modifiers");
+        }
+    }
+
+    // Call this when a plant is created to register its tile
+    public void RegisterPlantTile(PlantGrowth plant, TileDefinition tileDef)
+    {
+        if (plant == null)
+            return;
+
+        plantTiles[plant] = tileDef;
+
+        if (showDebugMessages)
+        {
+            string tileName = tileDef != null ? tileDef.displayName : "Unknown Tile";
+            Debug.Log($"Registered plant {plant.name} on tile {tileName}");
+        }
+    }
+
+    // Call this when a plant is destroyed to clean up
+    public void UnregisterPlant(PlantGrowth plant)
+    {
+        if (plant == null)
+            return;
+
+        if (plantTiles.ContainsKey(plant))
+        {
+            plantTiles.Remove(plant);
+        }
+    }
+
+    // Get growth speed multiplier for a plant based on its tile
+    public float GetGrowthSpeedMultiplier(PlantGrowth plant)
+    {
+        if (plant == null)
+            return defaultGrowthSpeedMultiplier;
+        
+        // If plant not in dictionary, register it with its current tile
+        if (!plantTiles.ContainsKey(plant))
+        {
+            RegisterNewPlant(plant);
+        }
+        
+        TileDefinition tileDef = plantTiles[plant];
+        if (tileDef == null)
+        {
+            return defaultGrowthSpeedMultiplier;
+        }
+
+        if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
+        {
+            return modifier.growthSpeedMultiplier;
+        }
+
+        return defaultGrowthSpeedMultiplier;
+    }
+
+    // Get energy recharge multiplier for a plant based on its tile
+    public float GetEnergyRechargeMultiplier(PlantGrowth plant)
+    {
+        if (plant == null)
+            return defaultEnergyRechargeMultiplier;
+        
+        // If plant not in dictionary, register it with its current tile
+        if (!plantTiles.ContainsKey(plant))
+        {
+            RegisterNewPlant(plant);
+        }
+        
+        TileDefinition tileDef = plantTiles[plant];
+        if (tileDef == null)
+        {
+            return defaultEnergyRechargeMultiplier;
+        }
+
+        if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
+        {
+            return modifier.energyRechargeMultiplier;
+        }
+
+        return defaultEnergyRechargeMultiplier;
+    }
+    
+    // Helper method to register a new plant with its current tile
+    private void RegisterNewPlant(PlantGrowth plant)
+    {
+        if (plant == null || tileInteractionManager == null)
+            return;
+            
+        Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
+        TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
+        
+        plantTiles[plant] = currentTileDef;
+        
+        if (showDebugMessages)
+        {
+            string tileName = currentTileDef != null ? currentTileDef.displayName : "Unknown Tile";
+            Debug.Log($"Auto-registered plant {plant.name} on tile {tileName}");
+        }
+    }
+
+    // For editor support - rebuild lookup when modifiers change
+    public void OnValidate()
+    {
+        BuildModifierLookup();
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Data\PlantPlacementManagement.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+public class PlantPlacementManager : MonoBehaviour
+{
+    public static PlantPlacementManager Instance { get; private set; }
+
+    [Header("References")]
+    [SerializeField] private GameObject plantPrefab;
+    [SerializeField] private NodeEditorGridController nodeEditorGrid;
+    [SerializeField] private Transform plantParent;
+    [SerializeField] private TileInteractionManager tileInteractionManager;
+    [SerializeField] private PlantGrowthModifierManager growthModifierManager;
+
+    [Header("Planting Settings")]
+    [Tooltip("Maximum radius from cell center for random seed placement (in units)")]
+    [SerializeField] private float spawnRadius = 0.25f;
+    
+    [Tooltip("Increment for position randomization (in pixels, for pixel-perfect placement)")]
+    [SerializeField] private float spawnRadiusIncrement = 4f;
+
+    [Header("Tile Restrictions")]
+    [Tooltip("List of tiles that cannot be planted on")]
+    [SerializeField] private List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
+
+    [Header("Debug")]
+    [SerializeField] private bool showDebugMessages = true;
+    
+    // Cache for quick lookup of invalid tiles
+    private HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
+    
+    // Dictionary to track plant positions (using grid cell positions as keys)
+    private Dictionary<Vector3Int, GameObject> plantsByGridPosition = new Dictionary<Vector3Int, GameObject>();
+    
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        
+        // Build the set of invalid tiles for faster lookup
+        RebuildInvalidTilesSet();
+    }
+
+    private void Start()
+    {
+        // Initialize references if not set in inspector
+        if (plantParent == null && EcosystemManager.Instance != null)
+        {
+            plantParent = EcosystemManager.Instance.plantParent;
+        }
+        
+        if (nodeEditorGrid == null)
+        {
+            nodeEditorGrid = NodeEditorGridController.Instance;
+        }
+        
+        if (tileInteractionManager == null)
+        {
+            tileInteractionManager = TileInteractionManager.Instance;
+        }
+        
+        if (growthModifierManager == null)
+        {
+            growthModifierManager = PlantGrowthModifierManager.Instance;
+        }
+    }
+    
+    private void RebuildInvalidTilesSet()
+    {
+        invalidTilesSet.Clear();
+        foreach (var tile in invalidPlantingTiles)
+        {
+            if (tile != null)
+            {
+                invalidTilesSet.Add(tile);
+            }
+        }
+        
+        if (showDebugMessages)
+        {
+            Debug.Log($"PlantPlacementManager: Built invalid tiles set with {invalidTilesSet.Count} entries");
+        }
+    }
+    
+    private void OnValidate()
+    {
+        // Rebuild the set when changed in Inspector
+        RebuildInvalidTilesSet();
+    }
+
+    // Check if a grid position is occupied by a plant
+    public bool IsPositionOccupied(Vector3Int gridPosition)
+    {
+        // If we have a reference, check if it's still valid (not destroyed)
+        if (plantsByGridPosition.TryGetValue(gridPosition, out GameObject plant))
+        {
+            if (plant == null)
+            {
+                // Plant has been destroyed, remove from dictionary
+                plantsByGridPosition.Remove(gridPosition);
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    // Check if a tile is valid for planting
+    public bool IsTileValidForPlanting(TileDefinition tileDef)
+    {
+        // If the tile is null, it's not valid
+        if (tileDef == null)
+            return false;
+            
+        // Check if this tile is in our invalid set
+        return !invalidTilesSet.Contains(tileDef);
+    }
+
+    // Clean up destroyed plants from our dictionary (call periodically if needed)
+    public void CleanupDestroyedPlants()
+    {
+        List<Vector3Int> keysToRemove = new List<Vector3Int>();
+        
+        foreach (var kvp in plantsByGridPosition)
+        {
+            if (kvp.Value == null)
+            {
+                keysToRemove.Add(kvp.Key);
+            }
+        }
+        
+        foreach (var key in keysToRemove)
+        {
+            plantsByGridPosition.Remove(key);
+        }
+        
+        if (showDebugMessages && keysToRemove.Count > 0)
+        {
+            Debug.Log($"PlantPlacementManager: Removed {keysToRemove.Count} destroyed plant references.");
+        }
+    }
+
+    // Try to plant a seed at the given grid position
+    public bool TryPlantSeed(Vector3Int gridPosition, Vector3 worldPosition)
+    {
+        // Clean up any destroyed plants first
+        CleanupDestroyedPlants();
+        
+        // Return false if position is already occupied
+        if (IsPositionOccupied(gridPosition))
+        {
+            if (showDebugMessages)
+            {
+                Debug.Log($"Cannot plant: Position {gridPosition} already has a plant.");
+            }
+            return false;
+        }
+        
+        // Get the tile at this position
+        TileDefinition tileDef = null;
+        if (tileInteractionManager != null)
+        {
+            tileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
+            
+            // Check if the tile is valid for planting
+            if (!IsTileValidForPlanting(tileDef))
+            {
+                if (showDebugMessages)
+                {
+                    string tileName = tileDef != null ? tileDef.displayName : "Unknown";
+                    Debug.Log($"Cannot plant: Tile {tileName} is not valid for planting.");
+                }
+                return false;
+            }
+        }
+
+        // Get the current graph from the NodeEditorGridController
+        if (nodeEditorGrid == null)
+        {
+            nodeEditorGrid = NodeEditorGridController.Instance;
+            if (nodeEditorGrid == null)
+            {
+                Debug.LogError("Cannot plant: NodeEditorGridController not found.");
+                return false;
+            }
+        }
+
+        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
+        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0)
+        {
+            if (showDebugMessages)
+            {
+                Debug.Log("Cannot plant: No nodes in UI graph to spawn.");
+            }
+            return false;
+        }
+        
+        // Validate graph has a seed node
+        bool seedFound = false;
+        foreach (var node in graphToSpawn.nodes)
+        {
+            if (node != null && node.effects != null)
+            {
+                foreach (var effect in node.effects)
+                {
+                    if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
+                    {
+                        seedFound = true;
+                        break;
+                    }
+                }
+            }
+            if (seedFound) break;
+        }
+
+        if (!seedFound)
+        {
+            if (showDebugMessages)
+            {
+                Debug.Log("Cannot plant: Node graph lacks a SeedSpawn effect.");
+            }
+            return false;
+        }
+
+        // Calculate randomized planting position based on our settings
+        Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
+        
+        // Spawn the plant at the randomized position
+        GameObject plantObj = SpawnPlant(graphToSpawn, plantingPosition);
+        if (plantObj != null)
+        {
+            // Track the plant position
+            plantsByGridPosition[gridPosition] = plantObj;
+            
+            // Register the plant with the growth modifier manager
+            if (growthModifierManager != null)
+            {
+                PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
+                if (plantGrowth != null)
+                {
+                    growthModifierManager.RegisterPlantTile(plantGrowth, tileDef);
+                    
+                    if (showDebugMessages)
+                    {
+                        string tileDebugName = tileDef != null ? tileDef.displayName : "Unknown";
+                        Debug.Log($"Plant registered with tile: {tileDebugName}");
+                    }
+                }
+            }
+            
+            return true;
+        }
+        return false;
+    }
+
+    // Spawn a plant using the given node graph at the specified position
+    private GameObject SpawnPlant(NodeGraph graphToSpawn, Vector3 position)
+    {
+        if (plantPrefab == null)
+        {
+            Debug.LogError("Cannot spawn plant: Plant prefab not assigned.");
+            return null;
+        }
+
+        Debug.Log($"SpawnPlant called with position: {position}");
+    
+        // Instantiate the plant prefab
+        GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
+    
+        // Verify the position was actually applied
+        Debug.Log($"Plant instantiated at position: {plantObj.transform.position}");
+
+        // Get the PlantGrowth component
+        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+        if (growthComponent != null)
+        {
+            // Create a deep copy of the node graph to prevent modifications affecting the original
+            NodeGraph graphCopy = CloneNodeGraph(graphToSpawn);
+
+            // Initialize the plant with the deep copy
+            growthComponent.InitializeAndGrow(graphCopy);
+            return plantObj;
+        }
+        else
+        {
+            Debug.LogError("Plant prefab missing PlantGrowth component! Destroying spawned object.");
+            Destroy(plantObj);
+            return null;
+        }
+    }
+
+    // Create a deep copy of a NodeGraph
+    private NodeGraph CloneNodeGraph(NodeGraph original)
+    {
+        NodeGraph copy = new NodeGraph();
+        copy.nodes = new List<NodeData>();
+
+        foreach (NodeData originalNode in original.nodes)
+        {
+            if (originalNode == null) continue;
+
+            NodeData newNode = new NodeData
+            {
+                nodeId = originalNode.nodeId,
+                nodeDisplayName = originalNode.nodeDisplayName,
+                orderIndex = originalNode.orderIndex,
+                canBeDeleted = originalNode.canBeDeleted
+            };
+
+            // Deep copy effects
+            newNode.effects = CloneEffectsList(originalNode.effects);
+            copy.nodes.Add(newNode);
+        }
+
+        return copy;
+    }
+
+    // Create a deep copy of a list of NodeEffectData
+    private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
+    {
+        if (originalList == null) return new List<NodeEffectData>();
+
+        List<NodeEffectData> newList = new List<NodeEffectData>();
+        foreach (var originalEffect in originalList)
+        {
+            if (originalEffect == null) continue;
+
+            NodeEffectData newEffect = new NodeEffectData
+            {
+                effectType = originalEffect.effectType,
+                primaryValue = originalEffect.primaryValue,
+                secondaryValue = originalEffect.secondaryValue,
+                isPassive = originalEffect.isPassive,
+                scentDefinitionReference = originalEffect.scentDefinitionReference
+            };
+            newList.Add(newEffect);
+        }
+        return newList;
+    }
+    
+    // Generate a randomized position within the given radius, with simple increments
+    // Generate a randomized position within the given radius
+    private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
+    {
+        // First, let's add comprehensive debugging
+        Debug.Log($"Starting position randomization from center: {centerPosition}, radius: {spawnRadius}, increment: {spawnRadiusIncrement}");
+    
+        // Critical check - if radius is too small, just return the center
+        if (spawnRadius < 0.01f)
+        {
+            Debug.LogWarning("Spawn radius too small (<0.01), using center position");
+            return centerPosition;
+        }
+    
+        // Generate a random angle in radians (0 to 2π)
+        float randomAngle = Random.Range(0f, 2f * Mathf.PI);
+        Debug.Log($"Random angle: {randomAngle} radians ({randomAngle * Mathf.Rad2Deg} degrees)");
+    
+        // Convert angle to direction vector
+        Vector2 direction = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle));
+        Debug.Log($"Direction vector: {direction}");
+    
+        // Get a random distance within spawn radius
+        float randomDistance = Random.Range(0.05f, spawnRadius);
+        Debug.Log($"Random distance: {randomDistance}");
+    
+        // Calculate actual offset
+        float offsetX = direction.x * randomDistance;
+        float offsetY = direction.y * randomDistance;
+        Debug.Log($"Raw offset: ({offsetX}, {offsetY})");
+    
+        // Apply increment if needed
+        if (spawnRadiusIncrement > 0.001f)
+        {
+            float originalX = offsetX;
+            float originalY = offsetY;
+        
+            offsetX = Mathf.Round(offsetX / spawnRadiusIncrement) * spawnRadiusIncrement;
+            offsetY = Mathf.Round(offsetY / spawnRadiusIncrement) * spawnRadiusIncrement;
+        
+            Debug.Log($"Snapped offset: ({offsetX}, {offsetY}) from ({originalX}, {originalY})");
+        }
+    
+        // Create the final position
+        Vector3 randomizedPosition = centerPosition + new Vector3(offsetX, offsetY, 0f);
+        Debug.Log($"FINAL randomized position: {randomizedPosition}");
+    
+        return randomizedPosition;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Data\PlayerTileInteractor.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
@@ -1198,659 +1866,6 @@ public class TileInteractionLibrary : ScriptableObject
 {
     [Tooltip("List of rules: (Tool, fromTile) => toTile.")]
     public List<TileInteractionRule> rules;
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\TileInteractionManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.Tilemaps;
-using skner.DualGrid;  // Your 3rd-party plugin
-using System.Collections.Generic;
-using System.Linq;
-using TMPro; // if you have UI references for debugging
-
-public class TileInteractionManager : MonoBehaviour
-{
-    public static TileInteractionManager Instance { get; private set; }
-
-    [System.Serializable]
-    public class TileDefinitionMapping
-    {
-        public TileDefinition tileDef;
-        public DualGridTilemapModule tilemapModule;
-    }
-
-    [Header("Tile Definition Mappings")]
-    public List<TileDefinitionMapping> tileDefinitionMappings;
-
-    // (If you have an interaction library for tool-based transformations)
-    [Header("Interaction Library")]
-    public TileInteractionLibrary interactionLibrary;
-
-    [Header("Grid & Scene References")]
-    public Grid interactionGrid;
-    public Camera mainCamera;
-    public Transform player;
-    public float hoverRadius = 3f;
-    public GameObject hoverHighlightObject;
-
-    [Header("Tilemap Rendering Settings")]
-    [Tooltip("The base sorting order value (the first tilemap will be this value, subsequent ones will decrease)")]
-    public int baseSortingOrder = 0;
-
-    [Header("Debug / UI")]
-    public bool debugLogs = false;
-    public TextMeshProUGUI hoveredTileText;
-    public TextMeshProUGUI currentToolText;
-
-    // quick lookups
-    private Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
-    private Dictionary<DualGridTilemapModule, TileDefinition> definitionByModule;
-
-    // track which cell is hovered
-    private Vector3Int? currentlyHoveredCell = null;
-    private TileDefinition hoveredTileDef = null;
-
-    // --------- NEW: Timed reversion dictionary -----------
-    // Key = cell position, Value = struct that holds the tileDefinition & time left
-    private Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
-
-        // build dictionaries
-        moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
-        definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
-
-        // Setup tilemaps with correct sorting orders and colors
-        SetupTilemaps();
-    }
-
-    void Start()
-    {
-        // Ensure we always initialize the dictionary in Start() for runtime
-        if (moduleByDefinition == null || moduleByDefinition.Count == 0)
-        {
-            SetupTilemaps();
-        }
-    }
-
-    // Method to set up tilemap sorting order and apply initial colors
-    private void SetupTilemaps()
-    {
-        moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
-        definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
-        
-        for (int i = 0; i < tileDefinitionMappings.Count; i++)
-        {
-            var mapping = tileDefinitionMappings[i];
-            if (mapping.tileDef == null || mapping.tilemapModule == null) 
-                continue;
-
-            // Add to dictionaries
-            if (!moduleByDefinition.ContainsKey(mapping.tileDef))
-            {
-                moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
-                definitionByModule[mapping.tilemapModule] = mapping.tileDef;
-                
-                // Get the RenderTilemap component
-                Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-                if (renderTilemapTransform != null)
-                {
-                    // Set the sorting order based on the index - INVERTED (negative values)
-                    // First item (index 0) gets baseSortingOrder, then we subtract for each subsequent item
-                    TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
-                    if (renderer != null)
-                    {
-                        renderer.sortingOrder = baseSortingOrder - i;
-                        if (debugLogs)
-                            Debug.Log($"Setting sorting order for {mapping.tileDef.displayName} to {baseSortingOrder - i}");
-                    }
-                    
-                    // Set the initial color from TileDefinition
-                    Tilemap tilemap = renderTilemapTransform.GetComponent<Tilemap>();
-                    if (tilemap != null)
-                    {
-                        tilemap.color = mapping.tileDef.tintColor;
-                        if (debugLogs)
-                            Debug.Log($"Setting color for {mapping.tileDef.displayName} to {mapping.tileDef.tintColor}");
-                    }
-                }
-                
-                if (debugLogs)
-                    Debug.Log($"[Mapping] {mapping.tileDef.displayName} => {mapping.tilemapModule.gameObject.name}");
-            }
-            else
-            {
-                Debug.LogWarning($"Duplicate tileDef {mapping.tileDef.displayName} in tileDefinitionMappings.");
-            }
-        }
-    }
-
-    // New public method to update sorting order - can be called from custom editor
-    public void UpdateSortingOrder()
-    {
-        for (int i = 0; i < tileDefinitionMappings.Count; i++)
-        {
-            var mapping = tileDefinitionMappings[i];
-            if (mapping.tileDef == null || mapping.tilemapModule == null) 
-                continue;
-                
-            Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-            if (renderTilemapTransform != null)
-            {
-                TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
-                if (renderer != null)
-                {
-                    // Negative values - first in list gets highest order
-                    renderer.sortingOrder = baseSortingOrder - i;
-                    
-                    #if UNITY_EDITOR
-                    UnityEditor.EditorUtility.SetDirty(renderer);
-                    #endif
-                    
-                    if (debugLogs)
-                        Debug.Log($"Updated sorting order for {mapping.tileDef.displayName} to {baseSortingOrder - i}");
-                }
-            }
-        }
-    }
-
-    // New public method to update all colors - can be called from custom editor
-    public void UpdateAllColors()
-    {
-        foreach (var mapping in tileDefinitionMappings)
-        {
-            if (mapping.tileDef == null || mapping.tilemapModule == null) 
-                continue;
-                
-            Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-            if (renderTilemapTransform != null)
-            {
-                Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
-                if (renderTilemap != null)
-                {
-                    renderTilemap.color = mapping.tileDef.tintColor;
-                    
-                    #if UNITY_EDITOR
-                    UnityEditor.EditorUtility.SetDirty(renderTilemap);
-                    #endif
-                    
-                    if (debugLogs)
-                        Debug.Log($"Updated color for {mapping.tileDef.displayName} to {mapping.tileDef.tintColor}");
-                }
-            }
-        }
-    }
-
-    void Update()
-    {
-        HandleTileHover();
-        UpdateReversion();
-        UpdateDebugUI();
-    }
-
-    // ------------------- Timed Reversion Logic ------------------------
-    // We'll store a small struct for each cell that is on a countdown
-    private struct TimedTileState
-    {
-        public TileDefinition tileDef;
-        public float timeLeft;
-    }
-
-    private void UpdateReversion()
-    {
-        if (timedCells.Count == 0) return;
-
-        // We'll gather cells that are about to revert
-        List<Vector3Int> cellsToRevert = null;
-
-        // We'll copy keys to avoid modifying dictionary while iterating
-        foreach (var kvp in timedCells.ToList())
-        {
-            Vector3Int cellPos = kvp.Key;
-            TimedTileState state = kvp.Value;
-            state.timeLeft -= Time.deltaTime;
-            if (state.timeLeft <= 0f)
-            {
-                // we revert now
-                if (cellsToRevert == null) 
-                    cellsToRevert = new List<Vector3Int>();
-                cellsToRevert.Add(cellPos);
-            }
-            else
-            {
-                // store updated time
-                timedCells[cellPos] = state;
-            }
-        }
-
-        if (cellsToRevert != null)
-        {
-            foreach (var cellPos in cellsToRevert)
-            {
-                if (timedCells.TryGetValue(cellPos, out TimedTileState st))
-                {
-                    timedCells.Remove(cellPos);
-                    
-                    // Always remove the current tile, regardless of doNotRemovePrevious
-                    // This is needed for timed disappearing functionality
-                    RemoveTile(st.tileDef, cellPos);
-                    
-                    // If there's a revert-to tile, place it
-                    if (st.tileDef.revertToTile != null)
-                    {
-                        PlaceTile(st.tileDef.revertToTile, cellPos);
-                    }
-                }
-            }
-        }
-    }
-
-    // Our method to forcibly schedule a tile for timed reversion
-    private void RegisterTimedTile(Vector3Int cellPos, TileDefinition tileDef)
-    {
-        if (tileDef.revertAfterSeconds > 0f && tileDef.revertToTile != null)
-        {
-            TimedTileState newState;
-            newState.tileDef = tileDef;
-            newState.timeLeft = tileDef.revertAfterSeconds;
-            timedCells[cellPos] = newState;
-        }
-    }
-
-    // --------------- Re-Use: Placing & Removing Tiles ---------------
-
-    public void PlaceTile(TileDefinition tileDef, Vector3Int cellPos)
-    {
-        if (!moduleByDefinition.ContainsKey(tileDef))
-        {
-            Debug.LogWarning($"PlaceTile: {tileDef.displayName} not found in moduleByDefinition.");
-            return;
-        }
-        var module = moduleByDefinition[tileDef];
-
-        // If tileDef is an overlay, do NOT remove the old tile
-        // Else we remove the old tile first
-        if (!tileDef.keepBottomTile)
-        {
-            // e.g. if we are placing "DirtWet" which is keepBottomTile=false, 
-            // we do remove the old tile from its tilemap
-            // but we must find whichever tile is currently there
-            TileDefinition existing = FindWhichTileDefinitionAt(cellPos);
-            if (existing != null && existing != tileDef)
-            {
-                RemoveTile(existing, cellPos);
-            }
-        }
-
-        // Set the cell in the tilemap to have a tile
-        // The actual visual appearance is handled by the DualGridTilemapModule system
-        // We just need to mark this cell as "filled"
-        module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
-
-        // Set the RenderTilemap color to match the TileDefinition's tintColor
-        Transform renderTilemapTransform = module.transform.Find("RenderTilemap");
-        if (renderTilemapTransform != null)
-        {
-            Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
-            if (renderTilemap != null)
-            {
-                renderTilemap.color = tileDef.tintColor;
-                
-#if UNITY_EDITOR
-                if (!Application.isPlaying)
-                {
-                    UnityEditor.EditorUtility.SetDirty(renderTilemap);
-                }
-#endif
-            }
-        }
-
-        // If it has a timed reversion, schedule that
-        RegisterTimedTile(cellPos, tileDef);
-    }
-
-    public void RemoveTile(TileDefinition tileDef, Vector3Int cellPos)
-    {
-        if (!moduleByDefinition.ContainsKey(tileDef))
-        {
-            Debug.LogWarning($"RemoveTile: {tileDef.displayName} not in moduleByDefinition.");
-            return;
-        }
-        var module = moduleByDefinition[tileDef];
-        // remove from that tilemap
-        module.DataTilemap.SetTile(cellPos, null);
-
-        // Also if this cell was in timedCells for that tile, remove it
-        if (timedCells.ContainsKey(cellPos))
-        {
-            // We only remove if the tile in timedCells is tileDef
-            TimedTileState st = timedCells[cellPos];
-            if (st.tileDef == tileDef)
-            {
-                timedCells.Remove(cellPos);
-            }
-        }
-    }
-
-    private TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
-    {
-        // To ensure we get the top-most visible tile for overlays, we need to check
-        // tiles in reverse order (or specifically check overlay tiles first)
-        
-        // First, try to find any overlay tiles (keepBottomTile = true)
-        foreach (var mapping in tileDefinitionMappings)
-        {
-            if (mapping.tileDef == null || mapping.tilemapModule == null) 
-                continue;
-                
-            // Check specifically for overlay tiles first
-            if (mapping.tileDef.keepBottomTile && 
-                mapping.tilemapModule.DataTilemap.HasTile(cellPos))
-            {
-                return mapping.tileDef;
-            }
-        }
-        
-        // If no overlay tile found, find any base tile
-        foreach (var pair in definitionByModule)
-        {
-            DualGridTilemapModule module = pair.Key;
-            TileDefinition def = pair.Value;
-
-            if (module.DataTilemap.HasTile(cellPos))
-            {
-                // Found a tile => that's the tile definition
-                return def;
-            }
-        }
-        return null;
-    }
-
-    // ------------------- Handle Hover & Debug UI (unchanged) -------------------
-    private void HandleTileHover()
-    {
-        if (mainCamera == null || player == null) return;
-
-        Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorldPos.z = 0f;
-        Vector3Int cellPos = WorldToCell(mouseWorldPos);
-        float distance = Vector2.Distance(player.position, CellCenterWorld(cellPos));
-
-        TileDefinition foundTile = FindWhichTileDefinitionAt(cellPos);
-
-        if (debugLogs)
-        {
-            string tileName = foundTile != null ? foundTile.displayName : "NULL";
-            Debug.Log($"[Hover] cell={cellPos}, tile={tileName}, dist={distance:F2}");
-        }
-
-        if (distance <= hoverRadius)
-        {
-            currentlyHoveredCell = cellPos;
-            hoveredTileDef = foundTile;
-            if (hoverHighlightObject != null)
-            {
-                hoverHighlightObject.SetActive(true);
-                hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
-            }
-        }
-        else
-        {
-            currentlyHoveredCell = null;
-            hoveredTileDef = null;
-            if (hoverHighlightObject != null)
-                hoverHighlightObject.SetActive(false);
-        }
-    }
-
-    private void UpdateDebugUI()
-    {
-        if (hoveredTileText != null)
-        {
-            if (currentlyHoveredCell.HasValue)
-            {
-                string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
-                hoveredTileText.text = $"Hovering: {tileName}";
-            }
-            else
-            {
-                hoveredTileText.text = "Hovering: (none)";
-            }
-        }
-
-        if (currentToolText != null)
-        {
-            // Changed from FindObjectOfType to FindAnyObjectByType for better performance
-            ToolSwitcher sw = Object.FindAnyObjectByType<ToolSwitcher>();
-            if (sw != null && sw.CurrentTool != null)
-            {
-                currentToolText.text = $"Tool: {sw.CurrentTool.toolType}";
-            }
-            else
-            {
-                currentToolText.text = "Tool: None";
-            }
-        }
-    }
-
-    private Vector3Int WorldToCell(Vector3 worldPos)
-    {
-        if (interactionGrid != null)
-            return interactionGrid.WorldToCell(worldPos);
-
-        if (tileDefinitionMappings.Count > 0 &&
-            tileDefinitionMappings[0].tilemapModule != null &&
-            tileDefinitionMappings[0].tilemapModule.DataTilemap != null)
-        {
-            Grid g = tileDefinitionMappings[0].tilemapModule.DataTilemap.layoutGrid;
-            return g.WorldToCell(worldPos);
-        }
-
-        return Vector3Int.zero;
-    }
-
-    private Vector3 CellCenterWorld(Vector3Int cellPos)
-    {
-        if (interactionGrid != null)
-        {
-            Vector3 corner = interactionGrid.CellToWorld(cellPos);
-            return corner + interactionGrid.cellSize * 0.5f;
-        }
-
-        if (tileDefinitionMappings.Count > 0 &&
-            tileDefinitionMappings[0].tilemapModule != null &&
-            tileDefinitionMappings[0].tilemapModule.DataTilemap != null)
-        {
-            Grid g = tileDefinitionMappings[0].tilemapModule.DataTilemap.layoutGrid;
-            Vector3 corner = g.CellToWorld(cellPos);
-            return corner + g.cellSize * 0.5f;
-        }
-
-        return Vector3.zero;
-    }
-
-    public void ApplyToolAction(ToolDefinition toolDef)
-    {
-        if (!currentlyHoveredCell.HasValue)
-            return;
-
-        // If we recognized no tile, do nothing
-        if (hoveredTileDef == null)
-        {
-            if (debugLogs) Debug.Log("ApplyToolAction: No recognized tile at hovered cell.");
-            return;
-        }
-
-        // Check distance
-        float distance = Vector2.Distance(player.position, CellCenterWorld(currentlyHoveredCell.Value));
-        if (distance > hoverRadius)
-        {
-            if (debugLogs)
-                Debug.Log($"ApplyToolAction: Cell is {distance:F2} away, above {hoverRadius} radius. Aborting.");
-            return;
-        }
-
-        if (debugLogs)
-            Debug.Log(
-                $"[ApplyToolAction] Tool={toolDef.toolType}, fromTile={hoveredTileDef.displayName} at cell={currentlyHoveredCell.Value}");
-
-        // Find matching rule
-        TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r =>
-            r.tool == toolDef &&
-            r.fromTile == hoveredTileDef
-        );
-
-        if (rule == null)
-        {
-            Debug.Log($"No rule for tool {toolDef.toolType} on tile {hoveredTileDef.displayName}.");
-            return;
-        }
-
-        // Check whether the destination tile has keepBottomTile flag before removing source tile
-        if (rule.toTile != null)
-        {
-            // Only remove the original tile if the new tile doesn't have keepBottomTile set
-            if (!rule.toTile.keepBottomTile)
-            {
-                RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
-            }
-
-            // Place the new tile
-            PlaceTile(rule.toTile, currentlyHoveredCell.Value);
-        }
-        else
-        {
-            // If there's no destination tile, just remove the current one
-            RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
-        }
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\TileInteractionRule.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System;
-using UnityEngine;
-
-[Serializable]
-public class TileInteractionRule
-{
-    [Header("Tool Condition")]
-    [Tooltip("Which tool triggers this rule.")]
-    public ToolDefinition tool;
-
-    [Header("Tile Transformation")]
-    [Tooltip("Which tile must be present to apply the rule.")]
-    public TileDefinition fromTile;
-    [Tooltip("Which tile to transform into.")]
-    public TileDefinition toTile;
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Editor\TileDefinitionEditor.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿#if UNITY_EDITOR
-using UnityEngine;
-using UnityEditor;
-
-[CustomEditor(typeof(TileDefinition))]
-public class TileDefinitionEditor : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-        
-        TileDefinition tileDefinition = (TileDefinition)target;
-        
-        EditorGUILayout.Space();
-        if (GUILayout.Button("UPDATE COLOR IN SCENE", GUILayout.Height(30)))
-        {
-            tileDefinition.UpdateColor();
-        }
-    }
-}
-#endif
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Editor\TileInteractionManagerEditor.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿#if UNITY_EDITOR
-using UnityEngine;
-using UnityEditor;
-
-[CustomEditor(typeof(TileInteractionManager))]
-public class TileInteractionManagerEditor : Editor
-{
-    public override void OnInspectorGUI()
-    {
-        DrawDefaultInspector();
-        
-        TileInteractionManager manager = (TileInteractionManager)target;
-        
-        EditorGUILayout.Space();
-        EditorGUILayout.BeginHorizontal();
-        
-        if (GUILayout.Button("UPDATE SORTING ORDER", GUILayout.Height(30)))
-        {
-            manager.UpdateSortingOrder();
-            EditorUtility.SetDirty(manager);
-        }
-        
-        if (GUILayout.Button("UPDATE ALL COLORS", GUILayout.Height(30)))
-        {
-            manager.UpdateAllColors();
-            EditorUtility.SetDirty(manager);
-        }
-        
-        EditorGUILayout.EndHorizontal();
-        
-        EditorGUILayout.HelpBox("Order: First item in list gets highest sorting order value (" + 
-                                manager.baseSortingOrder + "). Each subsequent item is " + 
-                                (manager.baseSortingOrder - 1) + ", " + 
-                                (manager.baseSortingOrder - 2) + ", etc.", MessageType.Info);
-    }
-}
-#endif
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Tools\ToolDefinition.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-[CreateAssetMenu(fileName = "ToolDefinition", menuName = "Tiles/Tool Definition")]
-public class ToolDefinition : ScriptableObject
-{
-    [Tooltip("Which tool type this represents (e.g. Hoe, WateringCan).")]
-    public ToolType toolType;
-
-    [Tooltip("Human-readable name (for debugging/UI).")]
-    public string displayName;
-
-    [Tooltip("Icon sprite for the tool.")]
-    public Sprite icon;
-
-    [Tooltip("Tint color to apply to the icon sprite.")]
-    public Color iconTint = Color.white;
 }
 
 
