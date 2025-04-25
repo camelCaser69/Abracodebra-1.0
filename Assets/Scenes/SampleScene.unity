@@ -1109,6 +1109,18 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3725805415584448116, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3725805415584448116, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: m_SortingOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3725805415584448116, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3865789443703534087, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_Name
       value: GardenerPrefab
@@ -12922,6 +12934,7 @@ GameObject:
   - component: {fileID: 1219388323}
   - component: {fileID: 1219388325}
   - component: {fileID: 1219388324}
+  - component: {fileID: 1219388326}
   m_Layer: 0
   m_Name: DataTilemap_Dirt_Water
   m_TagString: Untagged
@@ -12958,7 +12971,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _renderTile: {fileID: 11400000, guid: d639fca9cd7515e4995f1cb26de15772, type: 2}
-  _enableTilemapCollider: 0
+  _enableTilemapCollider: 1
   _gameObjectOrigin: 0
 --- !u!1839735485 &1219388325
 Tilemap:
@@ -13040,6 +13053,44 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!19719996 &1219388326
+TilemapCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1219388322}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: -0.04, y: 0}
+  m_MaximumTileChangeCount: 1000
+  m_ExtrusionFactor: 0
+  m_UseDelaunayMesh: 0
 --- !u!1 &1227954964
 GameObject:
   m_ObjectHideFlags: 0

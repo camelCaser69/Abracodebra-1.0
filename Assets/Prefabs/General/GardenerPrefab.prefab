@@ -189,6 +189,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   seedPlantingOffset: {x: 0, y: -1}
+  toolIconRenderer: {fileID: 3725805415584448116}
+  toolSwitcherInstance: {fileID: 4995761266735135271}
   flipSpriteWhenMovingLeft: 1
   flipHorizontalDirection: 0
   useAnimations: 1
@@ -513,7 +515,7 @@ MonoBehaviour:
   toolDefinitions:
   - {fileID: 11400000, guid: b02225d1ccd9f4d42b09de7941a00382, type: 2}
   - {fileID: 11400000, guid: 864e5c2cfc433e249b02f2a97cced049, type: 2}
-  toolDisplay: {fileID: 3725805415584448116}
+  - {fileID: 11400000, guid: 2f04b490372f08941860e93aee6b9061, type: 2}
 --- !u!1 &8311171663216286754
 GameObject:
   m_ObjectHideFlags: 0

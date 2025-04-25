@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 998948210ce44d75897a01d8fd5e6e5d, type: 3}
   m_Name: TileDefinition_000_Grass
   m_EditorClassIdentifier: 
-  displayName: 
+  displayName: Grass
   tintColor: {r: 0.31305623, g: 0.6320754, b: 0.45585534, a: 1}
   revertAfterSeconds: 0
   revertToTile: {fileID: 0}
