@@ -16,3 +16,5 @@ MonoBehaviour:
   displayName: Watering Can
   icon: {fileID: 21300000, guid: 1d7302bb4e02ba24e8cbe0693f2e97b7, type: 3}
   iconTint: {r: 0.46564615, g: 0.76309574, b: 0.9056604, a: 1}
+  limitedUses: 1
+  initialUses: 4

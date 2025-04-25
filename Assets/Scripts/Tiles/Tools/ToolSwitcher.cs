@@ -9,60 +9,29 @@ public class ToolSwitcher : MonoBehaviour
 
     private int currentIndex = 0;
 
+    // --- Public Properties ---
     public ToolDefinition CurrentTool { get; private set; } = null;
+    /// <summary>
+    /// Gets the remaining uses for the current tool. Returns -1 if the tool has unlimited uses.
+    /// </summary>
+    public int CurrentRemainingUses { get; private set; } = -1; // <<< NEW: Track remaining uses (-1 for unlimited)
+
+    // --- Events ---
     public event Action<ToolDefinition> OnToolChanged;
+    /// <summary>
+    /// Event fired when the remaining uses of the current tool changes. Passes the new remaining count (-1 for unlimited).
+    /// </summary>
+    public event Action<int> OnUsesChanged; // <<< NEW EVENT for UI updates
 
     private void Awake()
     {
-        Debug.Log("[ToolSwitcher Awake] Initializing...");
-        if (toolDefinitions == null || toolDefinitions.Length == 0)
-        {
-            Debug.LogWarning("[ToolSwitcher Awake] Tool Definitions array is null or empty!");
-        }
-        else
-        {
-            Debug.Log($"[ToolSwitcher Awake] Found {toolDefinitions.Length} tool definitions.");
-            // Check for nulls in the array
-            for(int i=0; i < toolDefinitions.Length; i++)
-            {
-                if (toolDefinitions[i] == null)
-                {
-                     Debug.LogWarning($"[ToolSwitcher Awake] Tool definition at index {i} is NULL!");
-                }
-            }
-        }
+        // Debug logs from previous step can be kept or removed
+        // Debug.Log("[ToolSwitcher Awake] Initializing...");
     }
-
 
     private void Start()
     {
-        if (toolDefinitions != null && toolDefinitions.Length > 0)
-        {
-            // Check again for null at index 0 specifically before assigning
-            if (toolDefinitions[0] != null)
-            {
-                currentIndex = 0;
-                CurrentTool = toolDefinitions[currentIndex];
-                LogToolChange("[ToolSwitcher Start - Initial Tool]");
-                Debug.Log("[ToolSwitcher Start] Firing initial OnToolChanged event.");
-                OnToolChanged?.Invoke(CurrentTool);
-            }
-            else
-            {
-                 Debug.LogError("[ToolSwitcher Start] Initial tool definition (index 0) is NULL. Cannot set initial tool.");
-                 CurrentTool = null; // Explicitly set to null
-                 LogToolChange("[ToolSwitcher Start - Initial Tool NULL]");
-                 Debug.Log("[ToolSwitcher Start] Firing initial OnToolChanged event with NULL tool.");
-                 OnToolChanged?.Invoke(CurrentTool); // Still invoke with null
-            }
-        }
-        else
-        {
-            CurrentTool = null;
-            LogToolChange("[ToolSwitcher Start - No Tools]");
-            Debug.Log("[ToolSwitcher Start] No tools defined. Firing initial OnToolChanged event with NULL tool.");
-            OnToolChanged?.Invoke(CurrentTool);
-        }
+        InitializeToolState(true); // Initialize and fire events
     }
 
     private void Update()
@@ -70,7 +39,7 @@ public class ToolSwitcher : MonoBehaviour
         if (toolDefinitions == null || toolDefinitions.Length == 0) return;
 
         bool toolChanged = false;
-        int previousIndex = currentIndex; // Store previous index for comparison
+        int previousIndex = currentIndex;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
@@ -89,22 +58,102 @@ public class ToolSwitcher : MonoBehaviour
 
         if (toolChanged)
         {
-            // Ensure the new index points to a valid definition
-            if (toolDefinitions[currentIndex] != null)
+            // Ensure the new index points to a valid definition before updating state
+            if (currentIndex >= 0 && currentIndex < toolDefinitions.Length && toolDefinitions[currentIndex] != null)
             {
-                CurrentTool = toolDefinitions[currentIndex];
-                LogToolChange("[ToolSwitcher Update]");
-                Debug.Log($"[ToolSwitcher Update] Firing OnToolChanged event for tool: {CurrentTool?.displayName ?? "NULL"}");
-                OnToolChanged?.Invoke(CurrentTool);
+                InitializeToolState(false); // Update state for the new tool and fire events
             }
             else
             {
-                // The selected tool definition is null, revert index and maybe log error
-                Debug.LogError($"[ToolSwitcher Update] Attempted to switch to a NULL tool definition at index {currentIndex}. Reverting to previous tool.");
-                currentIndex = previousIndex; // Revert to the last valid index
-                // Optionally, fire the event again with the *previous* valid tool if needed, or do nothing
-                // OnToolChanged?.Invoke(CurrentTool); // CurrentTool still holds the previous valid one
+                 Debug.LogError($"[ToolSwitcher Update] Attempted to switch to an invalid/NULL tool definition at index {currentIndex}. Reverting.");
+                 currentIndex = previousIndex; // Revert to the last valid index
+                 // No state change, no events needed here
             }
+        }
+    }
+
+    /// <summary>
+    /// Sets the CurrentTool and resets CurrentRemainingUses based on the tool's definition.
+    /// Optionally fires OnToolChanged and OnUsesChanged events.
+    /// </summary>
+    /// <param name="isInitialSetup">If true, forces event firing even if tool doesn't technically change.</param>
+    private void InitializeToolState(bool isInitialSetup)
+    {
+        ToolDefinition previousTool = CurrentTool; // Store previous tool for change check
+        int previousUses = CurrentRemainingUses; // Store previous uses
+
+        if (toolDefinitions == null || toolDefinitions.Length == 0 || currentIndex < 0 || currentIndex >= toolDefinitions.Length || toolDefinitions[currentIndex] == null)
+        {
+            // Handle cases with no tools or invalid selection
+            CurrentTool = null;
+            CurrentRemainingUses = -1; // No tool = unlimited uses conceptually
+        }
+        else
+        {
+            // Valid tool selected
+            CurrentTool = toolDefinitions[currentIndex];
+            if (CurrentTool.limitedUses)
+            {
+                CurrentRemainingUses = CurrentTool.initialUses;
+            }
+            else
+            {
+                CurrentRemainingUses = -1; // Mark as unlimited
+            }
+        }
+
+        LogToolChange("[ToolSwitcher InitializeToolState]"); // Log the state after update
+
+        // Fire events if state actually changed or if it's the initial setup
+        bool toolActuallyChanged = previousTool != CurrentTool;
+        bool usesActuallyChanged = previousUses != CurrentRemainingUses;
+
+        if (isInitialSetup || toolActuallyChanged)
+        {
+             Debug.Log($"[ToolSwitcher InitializeToolState] Firing OnToolChanged for tool: {CurrentTool?.displayName ?? "NULL"}");
+             OnToolChanged?.Invoke(CurrentTool);
+        }
+        if (isInitialSetup || usesActuallyChanged || toolActuallyChanged) // Fire uses changed if tool changed too (to reset UI)
+        {
+             Debug.Log($"[ToolSwitcher InitializeToolState] Firing OnUsesChanged with value: {CurrentRemainingUses}");
+             OnUsesChanged?.Invoke(CurrentRemainingUses);
+        }
+    }
+
+
+    /// <summary>
+    /// Attempts to consume one use of the current tool.
+    /// </summary>
+    /// <returns>True if a use was consumed or if the tool has unlimited uses. False if the tool has limited uses and is out of uses.</returns>
+    public bool TryConsumeUse()
+    {
+        if (CurrentTool == null)
+        {
+            Debug.LogWarning("[ToolSwitcher TryConsumeUse] Cannot consume use: No tool selected.");
+            return false; // Cannot use a non-existent tool
+        }
+
+        if (!CurrentTool.limitedUses || CurrentRemainingUses == -1)
+        {
+            // Tool is unlimited, consumption always succeeds
+            // Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' has unlimited uses."); // Optional log
+            return true;
+        }
+
+        // Tool has limited uses
+        if (CurrentRemainingUses > 0)
+        {
+            CurrentRemainingUses--;
+            Debug.Log($"[ToolSwitcher TryConsumeUse] Consumed use for '{CurrentTool.displayName}'. Remaining: {CurrentRemainingUses}");
+            OnUsesChanged?.Invoke(CurrentRemainingUses); // Notify listeners
+            return true;
+        }
+        else
+        {
+            // Out of uses
+            Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' is out of uses (0 remaining).");
+            // Optionally play an 'empty click' sound here
+            return false;
         }
     }
 
@@ -114,6 +163,16 @@ public class ToolSwitcher : MonoBehaviour
         string toolName = (CurrentTool != null && !string.IsNullOrEmpty(CurrentTool.displayName))
                           ? CurrentTool.displayName
                           : "(none)";
-        Debug.Log($"{prefix} Switched tool to: {toolName} (Index: {currentIndex})");
+        string usesSuffix = "";
+        if (CurrentTool != null && CurrentTool.limitedUses && CurrentRemainingUses >= 0)
+        {
+            usesSuffix = $" ({CurrentRemainingUses}/{CurrentTool.initialUses})";
+        }
+        else if (CurrentTool != null && !CurrentTool.limitedUses)
+        {
+            // usesSuffix = " (Unlimited)"; // Optional: Indicate unlimited
+        }
+
+        Debug.Log($"{prefix} Switched tool to: {toolName}{usesSuffix} (Index: {currentIndex})");
     }
 }
