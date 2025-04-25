@@ -19,3 +19,6 @@ MonoBehaviour:
   - tool: {fileID: 11400000, guid: 864e5c2cfc433e249b02f2a97cced049, type: 2}
     fromTile: {fileID: 11400000, guid: 4f94336bb2aca31489661a9f761144db, type: 2}
     toTile: {fileID: 11400000, guid: 2efc2db88b0caff4693943889a86ccac, type: 2}
+  refillRules:
+  - toolToRefill: {fileID: 11400000, guid: 864e5c2cfc433e249b02f2a97cced049, type: 2}
+    refillSourceTile: {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}

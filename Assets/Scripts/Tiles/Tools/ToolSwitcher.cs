@@ -101,6 +101,8 @@ public class ToolSwitcher : MonoBehaviour
                 CurrentRemainingUses = -1; // Mark as unlimited
             }
         }
+        
+        
 
         LogToolChange("[ToolSwitcher InitializeToolState]"); // Log the state after update
 
@@ -121,6 +123,40 @@ public class ToolSwitcher : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Refills the current tool to its maximum capacity if it's a limited-use tool.
+    /// </summary>
+    public void RefillCurrentTool() // <<< NEW METHOD
+    {
+        if (CurrentTool == null)
+        {
+            Debug.LogWarning("[ToolSwitcher RefillCurrentTool] Cannot refill: No tool selected.");
+            return;
+        }
+
+        if (!CurrentTool.limitedUses)
+        {
+            Debug.LogWarning($"[ToolSwitcher RefillCurrentTool] Cannot refill tool '{CurrentTool.displayName}': It has unlimited uses.");
+            return;
+        }
+
+        // Check if already full to avoid unnecessary event firing
+        if (CurrentRemainingUses == CurrentTool.initialUses)
+        {
+            if(Debug.isDebugBuild) Debug.Log($"[ToolSwitcher RefillCurrentTool] Tool '{CurrentTool.displayName}' is already full ({CurrentRemainingUses} uses).");
+            return;
+        }
+
+        // Set uses back to initial amount
+        int previousUses = CurrentRemainingUses;
+        CurrentRemainingUses = CurrentTool.initialUses;
+
+        Debug.Log($"[ToolSwitcher RefillCurrentTool] Refilled tool '{CurrentTool.displayName}' to {CurrentRemainingUses} uses (was {previousUses}).");
+
+        // Notify listeners that uses changed
+        OnUsesChanged?.Invoke(CurrentRemainingUses);
+    }
+    
     /// <summary>
     /// Attempts to consume one use of the current tool.
     /// </summary>
