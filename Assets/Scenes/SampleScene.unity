@@ -7791,6 +7791,7 @@ Transform:
   - {fileID: 1197055835}
   - {fileID: 976596915}
   - {fileID: 218454254}
+  - {fileID: 1296760033}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &757587766
@@ -13087,6 +13088,70 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
+--- !u!1 &1296760032
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1296760033}
+  - component: {fileID: 1296760034}
+  m_Layer: 0
+  m_Name: Manager_Waves
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1296760033
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296760032}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 697039534}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1296760034
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296760032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abd9c6cbb65d4a3585b22dbc9a958008, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  faunaManager: {fileID: 1384832981}
+  weatherManager: {fileID: 1966203507}
+  mainCamera: {fileID: 519420031}
+  wavesSequence:
+  - {fileID: 11400000, guid: 6d4d58a9961c6e849a27fabd71bd5178, type: 2}
+  - {fileID: 0}
+  waveDurationSeconds: 60
+  delayBetweenWaves: 10
+  waveIncomingDisplayTime: 3
+  waveClearedDisplayTime: 3
+  loopSequence: 0
+  syncWithDayNight: 0
+  startWaveAtSunIntensity: 0.9
+  forceEndWaveAtSunIntensity: 0.1
+  waveStatusText: {fileID: 0}
+  waveIncomingFormat: Wave {0} Incoming!
+  waveClearedFormat: Wave {0} Cleared!
+  startWaveButton: {fileID: 0}
+  currentState: 0
+  currentWaveIndex: -1
 --- !u!1 &1359589579
 GameObject:
   m_ObjectHideFlags: 0
@@ -13252,18 +13317,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 779e51f1034747bc8f48d26d29c78308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wavesSequence:
-  - {fileID: 11400000, guid: 6d4d58a9961c6e849a27fabd71bd5178, type: 2}
-  playerTransform: {fileID: 1491144816}
   spawnCenter: {x: 0, y: 0}
   spawnAreaSize: {x: 20, y: 10}
   ecosystemParent: {fileID: 553168402}
   animalMinBounds: {x: -8.5, y: -4.5}
   animalMaxBounds: {x: 8.5, y: 4.5}
-  startFirstWaveAutomatically: 1
-  loopSequence: 0
-  currentState: 0
-  currentWaveIndex: -1
+  offscreenSpawnMargin: 2
 --- !u!1 &1442999825
 GameObject:
   m_ObjectHideFlags: 0
