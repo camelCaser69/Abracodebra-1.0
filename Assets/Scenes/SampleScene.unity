@@ -7727,24 +7727,6 @@ Tilemap:
       e31: 0
       e32: 0
       e33: 1
-  - m_RefCount: 0
-    m_Data:
-      e00: 0
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 0
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 0
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 0
   m_TileColorArray:
   - m_RefCount: 245
     m_Data: {r: 1, g: 1, b: 1, a: 1}
@@ -12648,24 +12630,6 @@ Tilemap:
       e31: 0
       e32: 0
       e33: 1
-  - m_RefCount: 0
-    m_Data:
-      e00: 0
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 0
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 0
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 0
   m_TileColorArray:
   - m_RefCount: 10
     m_Data: {r: 1, g: 1, b: 1, a: 1}
@@ -13288,18 +13252,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 779e51f1034747bc8f48d26d29c78308, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animalsToSpawn:
-  - animalDefinition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}
-    spawnRateMultiplier: 0
-    maximumSpawned: 1
-    spawnTimer: 0
-  globalSpawnCooldown: 3
-  spawnRadius: 2
-  continuousSpawn: 1
+  wavesSequence:
+  - {fileID: 11400000, guid: 6d4d58a9961c6e849a27fabd71bd5178, type: 2}
+  playerTransform: {fileID: 1491144816}
   spawnCenter: {x: 0, y: 0}
+  spawnAreaSize: {x: 20, y: 10}
   ecosystemParent: {fileID: 553168402}
   animalMinBounds: {x: -8.5, y: -4.5}
   animalMaxBounds: {x: 8.5, y: 4.5}
+  startFirstWaveAutomatically: 1
+  loopSequence: 0
+  currentState: 0
+  currentWaveIndex: -1
 --- !u!1 &1442999825
 GameObject:
   m_ObjectHideFlags: 0
@@ -16532,24 +16496,6 @@ Tilemap:
       e31: 0
       e32: 0
       e33: 1
-  - m_RefCount: 0
-    m_Data:
-      e00: 0
-      e01: 0
-      e02: 0
-      e03: 0
-      e10: 0
-      e11: 0
-      e12: 0
-      e13: 0
-      e20: 0
-      e21: 0
-      e22: 0
-      e23: 0
-      e30: 0
-      e31: 0
-      e32: 0
-      e33: 0
   m_TileColorArray:
   - m_RefCount: 244
     m_Data: {r: 1, g: 1, b: 1, a: 1}

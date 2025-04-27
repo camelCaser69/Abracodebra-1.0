@@ -17,5 +17,15 @@ MonoBehaviour:
   thumbnail: {fileID: 0}
   thumbnailTintColor: {r: 1, g: 1, b: 1, a: 1}
   backgroundColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
-  nodeViewPrefab: {fileID: 0}
-  effects: []
+  nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
+  effects:
+  - effectType: 10
+    primaryValue: 0
+    secondaryValue: 0
+    isPassive: 0
+    scentDefinitionReference: {fileID: 0}
+  - effectType: 10
+    primaryValue: 0
+    secondaryValue: 0
+    isPassive: 0
+    scentDefinitionReference: {fileID: 0}
