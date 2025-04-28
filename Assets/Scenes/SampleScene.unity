@@ -8079,7 +8079,7 @@ GameObject:
   - component: {fileID: 743635298}
   - component: {fileID: 743635297}
   m_Layer: 5
-  m_Name: Txt_WaveStatus
+  m_Name: Txt_Time
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8124,7 +8124,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Wave Status
+  m_text: Time
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9fc1ef308eedf0e468d3f7e1958dbc2b, type: 2}
   m_sharedMaterial: {fileID: 4594303012967394465, guid: 9fc1ef308eedf0e468d3f7e1958dbc2b, type: 2}
@@ -13546,18 +13546,21 @@ MonoBehaviour:
   mainCamera: {fileID: 519420031}
   wavesSequence:
   - {fileID: 11400000, guid: 6d4d58a9961c6e849a27fabd71bd5178, type: 2}
-  - {fileID: 11400000, guid: 6d4d58a9961c6e849a27fabd71bd5178, type: 2}
+  - {fileID: 11400000, guid: a909bf6355795ac449bba998b4b3a520, type: 2}
   waveDurationSeconds: 60
   delayBetweenWaves: 10
   waveIncomingDisplayTime: 3
   waveClearedDisplayTime: 3
   loopSequence: 0
+  deletePreviousWaveAnimals: 1
   syncWithDayNight: 1
-  fastForwardMultiplier: 8
+  fastForwardMultiplier: 1
+  pauseWeatherBetweenWaves: 1
   waveStatusText: {fileID: 666779956}
   waveIncomingFormat: Wave {0} Incoming!
   waveClearedFormat: Wave {0} Cleared!
   startWaveButton: {fileID: 1706351737}
+  timeTrackerText: {fileID: 743635297}
   currentState: 0
   currentWaveIndex: -1
 --- !u!1 &1359589579
