@@ -2,15 +2,15 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-// Enums (WaveSpawnLocationType) remain the same
+// Enum WaveSpawnLocationType remains the same
 public enum WaveSpawnLocationType
 {
-    GlobalSpawnArea, // Use FaunaManager's defined spawn area
-    RandomNearPlayer, // Spawn within a radius of the player
-    Offscreen // Spawn outside camera view + margin
+    GlobalSpawnArea,
+    RandomNearPlayer,
+    Offscreen
 }
 
-// Class (WaveSpawnEntry) remains the same
+// Class WaveSpawnEntry remains the same
 [System.Serializable]
 public class WaveSpawnEntry
 {
@@ -21,7 +21,7 @@ public class WaveSpawnEntry
     [Tooltip("How many of this animal to spawn in this specific entry.")]
     [Min(1)]
     public int spawnCount = 1;
-    [Tooltip("Delay (in seconds) after the wave starts before *this entry* begins spawning.")]
+    [Tooltip("Delay (in seconds) after the wave's gameplay starts (AFTER 'Incoming' message) before *this entry* begins spawning.")] // Clarified tooltip
     [Min(0)]
     public float delayAfterWaveStart = 0f;
     [Tooltip("Time (in seconds) between spawning each individual animal in this entry (0 = spawn all instantly).")]
@@ -34,7 +34,7 @@ public class WaveSpawnEntry
     public float spawnRadius = 5f;
 }
 
-
+// WaveDefinition ScriptableObject is simplified
 [CreateAssetMenu(fileName = "Wave_", menuName = "Ecosystem/Wave Definition")]
 public class WaveDefinition : ScriptableObject
 {
@@ -46,7 +46,7 @@ public class WaveDefinition : ScriptableObject
     [Tooltip("Define the groups of animals that spawn during this wave.")]
     public List<WaveSpawnEntry> spawnEntries = new List<WaveSpawnEntry>();
 
-    // REMOVED: endCondition
-    // REMOVED: durationSeconds
-    // REMOVED: delayBeforeNextWave
+    // REMOVED: endCondition (Always Timer or Day/Night Cycle)
+    // REMOVED: durationSeconds (Handled by WaveManager)
+    // REMOVED: delayBeforeNextWave (Handled by WaveManager)
 }
