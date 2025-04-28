@@ -46,6 +46,7 @@ GameObject:
   - component: {fileID: 7661782395673529679}
   - component: {fileID: 661614256673200309}
   - component: {fileID: 8194957371331342594}
+  - component: {fileID: -4228441381205166631}
   m_Layer: 0
   m_Name: Animal_Bird
   m_TagString: Omnivore
@@ -83,12 +84,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   thoughtLibrary: {fileID: 11400000, guid: 8abd92eb95108124a8478425e6e2cfb5, type: 2}
   thoughtBubblePrefab: {fileID: 7019603340007582860, guid: e00dc2bef6e577f4788d3a0262749be1, type: 3}
-  mouthTransform: {fileID: 0}
   bubbleSpawnTransform: {fileID: 0}
-  thoughtCooldownTime: 5
-  eatDuration: 2
+  poopSpawnPoint: {fileID: 0}
+  poopPrefabs: []
+  animator: {fileID: 0}
+  hpText: {fileID: 0}
+  searchRadius: 5
   eatDistance: 0.5
-  wanderPauseIntensity: 0.5
+  eatDuration: 2
+  wanderPauseChance: 0.3
   wanderMinMoveDuration: 1
   wanderMaxMoveDuration: 3
   wanderMinPauseDuration: 0.5
@@ -96,8 +100,10 @@ MonoBehaviour:
   minPoopDelay: 5
   maxPoopDelay: 10
   poopDuration: 1
-  poopPrefabs: []
   poopColorVariation: 0.1
+  thoughtCooldownTime: 5
+  attractiveScentDefinitions: []
+  repellentScentDefinitions: []
 --- !u!114 &8136233811546609221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,14 +204,14 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6503867083147801814}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -216,8 +222,45 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 0
+  m_Constraints: 4
 --- !u!70 &8194957371331342594
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6503867083147801814}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: -0.04}
+  m_Size: {x: 0.06, y: 0.06}
+  m_Direction: 1
+--- !u!70 &-4228441381205166631
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -7,13 +7,10 @@ using UnityEngine.UI;
 
 public enum WaveManagerState
 {
-    Idle_ReadyToStart,
-    FastForwardingToDay,
-    WaveIncomingDisplay,
-    WaveInProgress,
-    WaveClearedDisplay,
-    BetweenWavesDelay,
-    SequenceComplete
+    PausedBeforeRun,     // Initial state, game logic paused
+    WaitingForSpawnTime, // Run started, waiting for correct time in cycle
+    WaveInProgress,      // Spawning triggered for this cycle, counting down day cycles
+    SequenceComplete     // All waves done
 }
 
 public class WaveManager : MonoBehaviour
@@ -28,417 +25,201 @@ public class WaveManager : MonoBehaviour
     [Header("Wave Sequence")]
     [SerializeField] private List<WaveDefinition> wavesSequence;
 
-    [Header("Wave Timing & Flow")]
-    [Tooltip("Duration (in seconds) each wave lasts IF 'Sync With Day Night' is FALSE.")]
-    [SerializeField][Min(1f)] private float waveDurationSeconds = 60f;
-    [Tooltip("Pause duration (in seconds) after a wave is cleared before the next one can be initiated.")]
-    [SerializeField][Min(0f)] private float delayBetweenWaves = 10f;
-    [Tooltip("How long (in seconds) the 'Wave Incoming' message displays.")]
-    [SerializeField][Min(0.1f)] private float waveIncomingDisplayTime = 3.0f;
-    [Tooltip("How long (in seconds) the 'Wave Cleared' message displays.")]
-    [SerializeField][Min(0.1f)] private float waveClearedDisplayTime = 3.0f;
+    [Header("Wave Timing & Spawning (Global)")]
+    [Tooltip("How many full Day+Night cycles each wave lasts.")]
+    [SerializeField][Range(1, 10)] private int waveDurationInDayCycles = 1;
+    [Tooltip("The phase during which spawning should occur each cycle.")]
+    [SerializeField] private WeatherManager.CyclePhase spawnStartPhase = WeatherManager.CyclePhase.Day;
+    [Tooltip("The percentage progress within the Spawn Start Phase when spawning triggers (0-100).")]
+    [SerializeField][Range(0f, 100f)] private float spawnStartPercentage = 50f;
     [SerializeField] private bool loopSequence = false;
-    [Tooltip("If checked, animals from the previous wave are destroyed when a new wave starts.")] // <<< NEW FIELD
-    [SerializeField] private bool deletePreviousWaveAnimals = true; // <<< NEW FIELD
-
-    [Header("Day/Night Synchronization")]
-    [Tooltip("If true, waves start at Day and end when Night finishes. Ignores 'Wave Duration Seconds'.")]
-    [SerializeField] private bool syncWithDayNight = false;
-    [Tooltip("The speed multiplier applied to the WeatherManager when fast-forwarding to the start of the next day.")]
-    [SerializeField][Range(1f, 100f)] private float fastForwardMultiplier = 10f;
-    [Tooltip("If checked, the WeatherManager's time progression will be paused between waves.")] // <<< NEW FIELD
-    [SerializeField] private bool pauseWeatherBetweenWaves = false; // <<< NEW FIELD
+    [Tooltip("If checked, animals from the previous wave are destroyed when a new wave starts.")]
+    [SerializeField] private bool deletePreviousWaveAnimals = true;
 
     [Header("UI & Feedback")]
     [SerializeField] private TextMeshProUGUI waveStatusText;
-    [SerializeField] private string waveIncomingFormat = "Wave {0} Incoming!";
-    [SerializeField] private string waveClearedFormat = "Wave {0} Cleared!";
-    [SerializeField] private Button startWaveButton;
-    [Tooltip("Assign TextMeshProUGUI to display current Day/Night progress.")] // <<< NEW FIELD
-    [SerializeField] private TextMeshProUGUI timeTrackerText; // <<< NEW FIELD
+    [SerializeField] private Button startRunButton;
+    [SerializeField] private TextMeshProUGUI timeTrackerText;
 
     [Header("State (Read Only)")]
-    [SerializeField] private WaveManagerState currentState = WaveManagerState.Idle_ReadyToStart;
+    [SerializeField] private WaveManagerState currentState = WaveManagerState.PausedBeforeRun;
     [SerializeField] private int currentWaveIndex = -1;
 
     // --- Runtime State ---
-    private float currentTimer = 0f;
     private WaveDefinition activeWaveDefinition = null;
-    private bool isFastForwarding = false;
-    private Coroutine fastForwardCoroutine = null;
+    private int dayCyclesRemainingForWave = 0;
+    private bool hasSpawnedThisCycle = false;
+    private bool isInitialPause = true; // <<< NEW: Flag for initial pause
 
     // --- Public Accessors ---
     public WaveManagerState CurrentState => currentState;
     public int CurrentWaveNumber => currentWaveIndex + 1;
     public int TotalWaves => wavesSequence != null ? wavesSequence.Count : 0;
+    public bool IsRunActive => currentState != WaveManagerState.PausedBeforeRun && currentState != WaveManagerState.SequenceComplete;
 
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        // Validations
-        if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager reference missing!", this);
-        if (weatherManager == null) Debug.LogError("[WaveManager] WeatherManager reference missing!", this); // Now always required
-        if (mainCamera == null) Debug.LogError("[WaveManager] Main Camera reference missing!", this);
-        if (waveStatusText == null) Debug.LogWarning("[WaveManager] Wave Status Text reference missing.", this);
-        if (timeTrackerText == null) Debug.LogWarning("[WaveManager] Time Tracker Text reference missing.", this); // <<< NEW VALIDATION
-        if (wavesSequence == null || wavesSequence.Count == 0) Debug.LogWarning("[WaveManager] Wave Sequence is empty.", this);
-        if (startWaveButton != null) startWaveButton.onClick.AddListener(TryManualStartWave);
+        // Validations (same as before)
+        if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager missing!", this);
+        if (weatherManager == null) Debug.LogError("[WaveManager] WeatherManager missing!", this);
+        if (mainCamera == null) Debug.LogError("[WaveManager] Main Camera missing!", this);
+        if (waveStatusText == null) Debug.LogWarning("[WaveManager] Wave Status Text missing.", this);
+        if (timeTrackerText == null) Debug.LogWarning("[WaveManager] Time Tracker Text missing.", this);
+        if (wavesSequence == null || wavesSequence.Count == 0) Debug.LogWarning("[WaveManager] Wave Sequence empty.", this);
+        if (startRunButton == null) Debug.LogWarning("[WaveManager] Start Run Button missing.", this);
+        else startRunButton.onClick.AddListener(TryStartRun);
+
+        // <<< SET INITIAL PAUSE >>>
+        Debug.Log("[WaveManager Awake] Setting initial Time.timeScale = 0");
+        Time.timeScale = 0f;
+        isInitialPause = true;
+        // -------------------------
     }
 
     void Start()
     {
         if (weatherManager != null) weatherManager.OnPhaseChanged += HandleWeatherPhaseChange;
-        InitializeManager();
+        InitializeManager(); // Sets state, updates button
     }
 
-    void OnDestroy()
+     void OnDestroy()
     {
         if (weatherManager != null) weatherManager.OnPhaseChanged -= HandleWeatherPhaseChange;
-        if (startWaveButton != null) startWaveButton.onClick.RemoveListener(TryManualStartWave);
-        // Ensure weather is unpaused on destroy
-        if (weatherManager != null) weatherManager.IsPaused = false;
+        if (startRunButton != null) startRunButton.onClick.RemoveListener(TryStartRun);
+        // Ensure timescale is reset if manager is destroyed
+        if(isInitialPause || Time.timeScale != 1f) Time.timeScale = 1f;
     }
 
     void InitializeManager()
     {
         currentWaveIndex = -1;
         activeWaveDefinition = null;
-        isFastForwarding = false;
-        StopExistingFastForward();
-        SetState(WaveManagerState.Idle_ReadyToStart);
+        dayCyclesRemainingForWave = 0;
+        hasSpawnedThisCycle = false;
+        // Don't set timescale here anymore, Awake handles initial pause
+        SetState(WaveManagerState.PausedBeforeRun);
     }
 
     void Update()
     {
-        if (faunaManager == null || weatherManager == null || mainCamera == null) return;
+        // Always update UI if possible
+        if (weatherManager != null) UpdateTimeTrackerUI();
 
-        // Update Time Tracker UI regardless of state (as long as weather manager exists)
-        UpdateTimeTrackerUI(); // <<< CALL UI UPDATE
+        // Skip logic if paused initially OR dependencies missing
+        if (isInitialPause || faunaManager == null || weatherManager == null || mainCamera == null)
+        {
+            // Still need to manage button state even if paused initially
+             if (currentState == WaveManagerState.PausedBeforeRun && startRunButton != null)
+             {
+                  startRunButton.gameObject.SetActive(true);
+                  startRunButton.interactable = true;
+             }
+             return;
+        }
 
+        // State Machine Update (only runs after initial pause is over)
         switch (currentState)
         {
-            case WaveManagerState.Idle_ReadyToStart: Update_IdleReady(); break;
-            case WaveManagerState.FastForwardingToDay: Update_FastForwarding(); break;
-            case WaveManagerState.WaveIncomingDisplay: Update_TimerBasedStates(); break;
-            case WaveManagerState.WaveClearedDisplay: Update_TimerBasedStates(); break;
-            case WaveManagerState.BetweenWavesDelay: Update_TimerBasedStates(); break;
-            case WaveManagerState.WaveInProgress: Update_WaveInProgress(); break;
+            case WaveManagerState.WaitingForSpawnTime: Update_WaitingForSpawnTime(); break;
+            case WaveManagerState.WaveInProgress: /* Handled by event */ break;
             case WaveManagerState.SequenceComplete: Update_IdleReady(); break;
+             // PausedBeforeRun is handled above
         }
     }
 
-    // --- Event Handler ---
-    void HandleWeatherPhaseChange(WeatherManager.CyclePhase newPhase)
-    {
-        // End synced wave when night ends
-        if (syncWithDayNight && newPhase == WeatherManager.CyclePhase.TransitionToDay && currentState == WaveManagerState.WaveInProgress)
-        {
-            EndWaveGameplay();
-        }
+    // --- Event Handler (HandleWeatherPhaseChange) --- (Unchanged)
+    void HandleWeatherPhaseChange(WeatherManager.CyclePhase newPhase) { if (currentState == WaveManagerState.PausedBeforeRun || isInitialPause) return; if (newPhase == WeatherManager.CyclePhase.TransitionToDay) { if (currentState == WaveManagerState.WaveInProgress) { dayCyclesRemainingForWave--; hasSpawnedThisCycle = false; if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Day cycle complete. Cycles remaining: {dayCyclesRemainingForWave}"); if (dayCyclesRemainingForWave <= 0) { EndWaveGameplay(); } else { SetState(WaveManagerState.WaitingForSpawnTime); UpdateWaveStatusText(); } } else if (currentState == WaveManagerState.WaitingForSpawnTime) { hasSpawnedThisCycle = false; } } else if (newPhase == spawnStartPhase && currentState == WaveManagerState.WaitingForSpawnTime && !hasSpawnedThisCycle) { Update_WaitingForSpawnTime(); } }
 
-        // Stop fast forward when Day starts
-        if (isFastForwarding && newPhase == WeatherManager.CyclePhase.Day)
-        {
-            // Coroutine handles the transition
-        }
-    }
 
     // --- State Update Methods ---
 
-    void Update_IdleReady()
+    void Update_WaitingForSpawnTime() // (Unchanged)
+    { if (hasSpawnedThisCycle || weatherManager == null) return; WeatherManager.CyclePhase currentPhase = weatherManager.CurrentPhase; float totalPhaseTime = weatherManager.CurrentTotalPhaseTime; float remainingPhaseTime = weatherManager.CurrentPhaseTimer; float progressPercent = (totalPhaseTime > 0) ? (1f - (remainingPhaseTime / totalPhaseTime)) * 100f : 0f; if (currentPhase == spawnStartPhase && progressPercent >= spawnStartPercentage) { StartWaveSpawning(); } }
+
+    void Update_IdleReady() // (Now only manages button for looping)
     {
-        // Manage button state
-        if (startWaveButton != null)
-        {
-            bool canStartNow = !syncWithDayNight || (weatherManager.CurrentPhase == WeatherManager.CyclePhase.Day);
-            // Button interactable if not sequence complete OR looping enabled
-            startWaveButton.interactable = !(currentState == WaveManagerState.SequenceComplete && !loopSequence);
-             // Button visible unless sequence is complete AND not looping
-            startWaveButton.gameObject.SetActive(!(currentState == WaveManagerState.SequenceComplete && !loopSequence));
-        }
+         if (startRunButton != null)
+         {
+            bool showButton = (currentState == WaveManagerState.SequenceComplete && loopSequence);
+            startRunButton.gameObject.SetActive(showButton);
+            startRunButton.interactable = showButton;
+         }
     }
 
-     void Update_FastForwarding()
+    void UpdateTimeTrackerUI() // (Unchanged)
+    { if (timeTrackerText == null || weatherManager == null) return; WeatherManager.CyclePhase phase = weatherManager.CurrentPhase; float total = weatherManager.CurrentTotalPhaseTime; float remaining = weatherManager.CurrentPhaseTimer; float progressPercent = (total > 0) ? (1f - (remaining / total)) * 100f : 0f; string phaseName = phase.ToString().Replace("Transition", ""); timeTrackerText.text = $"{phaseName} [{progressPercent:F0}%]"; if (Time.timeScale == 0f && isInitialPause) timeTrackerText.text += " (Paused)"; } // Show paused during initial pause
+
+    void UpdateWaveStatusText() // (Added PausedBeforeRun case)
     {
-        // Keep button disabled
-        if (startWaveButton != null)
-        {
-             startWaveButton.interactable = false;
-             startWaveButton.gameObject.SetActive(true);
-        }
+         if (waveStatusText == null) return;
+         switch(currentState)
+         {
+             case WaveManagerState.PausedBeforeRun: waveStatusText.text = "Press Start Run"; break;
+             case WaveManagerState.WaitingForSpawnTime: waveStatusText.text = $"Wave {CurrentWaveNumber} - Waiting..."; break;
+             case WaveManagerState.WaveInProgress: waveStatusText.text = $"Wave {CurrentWaveNumber} [{dayCyclesRemainingForWave} cycles left]"; break;
+            case WaveManagerState.SequenceComplete: waveStatusText.text = loopSequence ? "Sequence Done. Start Again?" : "All Waves Cleared!"; break;
+             default: waveStatusText.text = ""; break;
+         }
     }
-
-    void Update_TimerBasedStates()
-    {
-        currentTimer -= Time.deltaTime;
-        if (currentTimer <= 0f)
-        {
-            if (currentState == WaveManagerState.WaveIncomingDisplay) StartWaveGameplay();
-            else if (currentState == WaveManagerState.WaveClearedDisplay) SetState(WaveManagerState.BetweenWavesDelay);
-            else if (currentState == WaveManagerState.BetweenWavesDelay) SetState(WaveManagerState.Idle_ReadyToStart);
-        }
-    }
-
-    void Update_WaveInProgress()
-    {
-        if (!syncWithDayNight)
-        {
-            currentTimer -= Time.deltaTime;
-            if (currentTimer <= 0f) EndWaveGameplay();
-        }
-        // Synced end handled by phase change event
-    }
-
-    /// <summary>
-    /// Updates the optional Time Tracker UI element.
-    /// </summary>
-    void UpdateTimeTrackerUI() // <<< NEW METHOD
-    {
-        if (timeTrackerText == null || weatherManager == null) return;
-
-        WeatherManager.CyclePhase phase = weatherManager.CurrentPhase;
-        float total = weatherManager.CurrentTotalPhaseTime;
-        float remaining = weatherManager.CurrentPhaseTimer;
-        float progressPercent = 0f;
-
-        if (total > 0)
-        {
-            progressPercent = (1f - (remaining / total)) * 100f;
-        }
-
-        // Format the string based on the phase
-        string phaseName = phase.ToString();
-        // Optional: Make phase names more user-friendly
-        if (phase == WeatherManager.CyclePhase.TransitionToDay) phaseName = "Sunrise";
-        else if (phase == WeatherManager.CyclePhase.TransitionToNight) phaseName = "Sunset";
-
-        timeTrackerText.text = $"{phaseName} [{progressPercent:F0}%]";
-
-        // Optionally add paused indicator
-        if (weatherManager.IsPaused)
-        {
-             timeTrackerText.text += " (Paused)";
-        }
-    }
-
 
     // --- State Transition and Action Methods ---
 
-    void SetState(WaveManagerState newState)
+    void SetState(WaveManagerState newState) // (Removed weather pause logic)
     {
         if (currentState == newState) return;
         if(Debug.isDebugBuild) Debug.Log($"[WaveManager] State Change: {currentState} -> {newState}");
         currentState = newState;
 
-        // --- Handle Weather Pause ---
-        if (weatherManager != null)
+        // Update Button State
+        if (startRunButton != null)
         {
-            bool shouldPause = pauseWeatherBetweenWaves &&
-                               (newState == WaveManagerState.Idle_ReadyToStart ||
-                                newState == WaveManagerState.BetweenWavesDelay ||
-                                newState == WaveManagerState.SequenceComplete); // Also pause when sequence complete
-
-            if (shouldPause && !weatherManager.IsPaused)
-            {
-                if(Debug.isDebugBuild) Debug.Log("[WaveManager] Pausing WeatherManager.");
-                weatherManager.IsPaused = true;
-                StopExistingFastForward(); // Ensure FF stops if we pause
-            }
-            else if (!shouldPause && weatherManager.IsPaused)
-            {
-                 if(Debug.isDebugBuild) Debug.Log("[WaveManager] Unpausing WeatherManager.");
-                 weatherManager.IsPaused = false;
-            }
-        }
-        // -------------------------
-
-        // Stop fast forward if leaving FF state or entering pause-compatible state
-        if (isFastForwarding && newState != WaveManagerState.FastForwardingToDay)
-        {
-            StopExistingFastForward();
+            bool showButton = (newState == WaveManagerState.PausedBeforeRun) || (newState == WaveManagerState.SequenceComplete && loopSequence);
+            startRunButton.gameObject.SetActive(showButton);
+            startRunButton.interactable = showButton;
         }
 
-
-        // Entry actions
-        switch (newState)
-        {
-            case WaveManagerState.Idle_ReadyToStart:
-                if (waveStatusText != null) waveStatusText.text = ""; // Clear status text
-                Update_IdleReady(); // Update button
-                break;
-
-            case WaveManagerState.FastForwardingToDay:
-                 if (waveStatusText != null) waveStatusText.text = "Fast Forwarding to Day...";
-                 Update_FastForwarding(); // Update button
-                 break;
-
-            case WaveManagerState.WaveIncomingDisplay:
-                if (waveStatusText != null) waveStatusText.text = string.Format(waveIncomingFormat, CurrentWaveNumber);
-                currentTimer = waveIncomingDisplayTime;
-                if (startWaveButton != null) startWaveButton.gameObject.SetActive(false);
-                break;
-
-            case WaveManagerState.WaveInProgress:
-                if (waveStatusText != null) waveStatusText.text = "";
-                currentTimer = syncWithDayNight ? float.MaxValue : waveDurationSeconds;
-                if (startWaveButton != null) startWaveButton.gameObject.SetActive(false);
-                break;
-
-            case WaveManagerState.WaveClearedDisplay:
-                if (waveStatusText != null) waveStatusText.text = string.Format(waveClearedFormat, CurrentWaveNumber);
-                currentTimer = waveClearedDisplayTime;
-                if (startWaveButton != null) startWaveButton.gameObject.SetActive(false);
-                break;
-
-            case WaveManagerState.BetweenWavesDelay:
-                 if (waveStatusText != null) waveStatusText.text = "";
-                 currentTimer = delayBetweenWaves;
-                 if (startWaveButton != null) startWaveButton.gameObject.SetActive(false);
-                break;
-
-             case WaveManagerState.SequenceComplete:
-                 if (waveStatusText != null) waveStatusText.text = "All Waves Cleared!";
-                 activeWaveDefinition = null;
-                 Update_IdleReady(); // Update button visibility based on loop setting
-                 break;
-        }
+        // Update Status Text
+        UpdateWaveStatusText();
     }
 
-    public void TryManualStartWave()
+    public void TryStartRun() // <<< MODIFIED
     {
-        if (currentState != WaveManagerState.Idle_ReadyToStart || isFastForwarding) { return; }
-
-        // If paused, unpause first - starting a wave always resumes time
-        if(weatherManager != null && weatherManager.IsPaused)
+        // Only allow starting from PausedBeforeRun OR SequenceComplete if looping
+        if (currentState != WaveManagerState.PausedBeforeRun && !(currentState == WaveManagerState.SequenceComplete && loopSequence))
         {
-             if(Debug.isDebugBuild) Debug.Log("[WaveManager] Start Wave button clicked while paused. Unpausing.");
-             weatherManager.IsPaused = false;
-             // Update UI immediately if needed
-             UpdateTimeTrackerUI();
+             if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Cannot start run. State: {currentState}, Looping: {loopSequence}");
+             return;
         }
 
-        if (syncWithDayNight && weatherManager != null && weatherManager.CurrentPhase != WeatherManager.CyclePhase.Day)
+        Debug.Log("[WaveManager] Starting Run...");
+
+        // <<< RESUME TIME >>>
+        if (isInitialPause || Time.timeScale != 1f)
         {
-            if (isFastForwarding) return; // Don't start another if already running
-            StopExistingFastForward(); // Stop just in case (shouldn't be needed)
-            fastForwardCoroutine = StartCoroutine(FastForwardToDayCoroutine());
+            Debug.Log("[WaveManager] Setting Time.timeScale = 1");
+            Time.timeScale = 1f;
+            isInitialPause = false; // Mark initial pause as over
         }
-        else
-        {
-            ProceedToNextWave();
-        }
+        // ----------------
+
+        InitializeRun(); // Prepare first wave state
+        SetState(WaveManagerState.WaitingForSpawnTime); // Transition state
     }
 
-    private void ProceedToNextWave()
-    {
-         int nextIndex = currentWaveIndex + 1;
-        if (nextIndex >= wavesSequence.Count)
-        {
-            if (loopSequence) nextIndex = 0;
-            else { SetState(WaveManagerState.SequenceComplete); return; }
-        }
-        if (wavesSequence[nextIndex] == null)
-        {
-             Debug.LogError($"[WaveManager] Wave definition at index {nextIndex} is NULL!");
-             currentWaveIndex = nextIndex; SetState(WaveManagerState.Idle_ReadyToStart); return;
-        }
+    void InitializeRun() // (Unchanged)
+    { currentWaveIndex = 0; if (wavesSequence == null || wavesSequence.Count == 0 || wavesSequence[currentWaveIndex] == null) { Debug.LogError("[WaveManager] Cannot initialize run: Bad wave sequence!"); SetState(WaveManagerState.SequenceComplete); return; } if(deletePreviousWaveAnimals && currentState == WaveManagerState.SequenceComplete && loopSequence) { ClearAllActiveAnimals(); } activeWaveDefinition = wavesSequence[currentWaveIndex]; dayCyclesRemainingForWave = waveDurationInDayCycles; hasSpawnedThisCycle = false; Debug.Log($"[WaveManager] Run initialized. Starting Wave {CurrentWaveNumber}. Duration: {dayCyclesRemainingForWave} cycles."); }
 
-        // --- Delete previous animals IF flag is set ---
-        if(deletePreviousWaveAnimals && currentWaveIndex >= 0) // Only delete if not the very first wave
-        {
-             ClearAllActiveAnimals();
-        }
-        // ----------------------------------------------
+    void StartWaveSpawning() // (Unchanged)
+    { if (activeWaveDefinition == null || currentState != WaveManagerState.WaitingForSpawnTime) { return; } Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} - Spawning Triggered (Phase: {spawnStartPhase} >= {spawnStartPercentage}%)"); hasSpawnedThisCycle = true; SetState(WaveManagerState.WaveInProgress); if (faunaManager != null) faunaManager.ExecuteSpawnWave(activeWaveDefinition); else Debug.LogError("[WaveManager] Cannot execute spawn wave, FaunaManager missing!"); }
 
-        currentWaveIndex = nextIndex;
-        activeWaveDefinition = wavesSequence[currentWaveIndex];
-        SetState(WaveManagerState.WaveIncomingDisplay);
-    }
+    void EndWaveGameplay() // (Unchanged)
+    { Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} Gameplay Ended (Duration Met)."); if (faunaManager != null) faunaManager.StopAllSpawnCoroutines(); if (deletePreviousWaveAnimals) { ClearAllActiveAnimals(); } activeWaveDefinition = null; currentWaveIndex++; if (currentWaveIndex >= wavesSequence.Count) { if (loopSequence) { Debug.Log("[WaveManager] Looping back."); InitializeRun(); SetState(WaveManagerState.WaitingForSpawnTime); } else { Debug.Log("[WaveManager] Sequence complete."); SetState(WaveManagerState.SequenceComplete); } } else { if (wavesSequence[currentWaveIndex] == null) { Debug.LogError($"[WaveManager] Wave definition {currentWaveIndex} NULL!"); SetState(WaveManagerState.SequenceComplete); return; } activeWaveDefinition = wavesSequence[currentWaveIndex]; dayCyclesRemainingForWave = waveDurationInDayCycles; hasSpawnedThisCycle = false; Debug.Log($"[WaveManager] Preparing Wave {CurrentWaveNumber}. Duration: {dayCyclesRemainingForWave} cycles."); SetState(WaveManagerState.WaitingForSpawnTime); } }
 
-    private IEnumerator FastForwardToDayCoroutine()
-    {
-        isFastForwarding = true;
-        SetState(WaveManagerState.FastForwardingToDay);
+    void ClearAllActiveAnimals() // (Unchanged)
+    { if(Debug.isDebugBuild) Debug.Log("[WaveManager] Clearing all active animals."); AnimalController[] activeAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None); int count = 0; foreach(AnimalController animal in activeAnimals) { if(animal != null) { Destroy(animal.gameObject); count++; } } if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Destroyed {count} animals."); }
 
-        if (weatherManager != null)
-        {
-             // Ensure unpaused during fast forward
-             weatherManager.IsPaused = false;
-             weatherManager.timeScaleMultiplier = fastForwardMultiplier;
-             if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Fast Forward started. Weather time scale: {weatherManager.timeScaleMultiplier:F1}");
-
-            while (weatherManager.CurrentPhase != WeatherManager.CyclePhase.Day && isFastForwarding)
-            { yield return null; }
-
-            if (isFastForwarding) // Check flag again
-            {
-                 StopExistingFastForward(); // Resets speed and flag
-                 Debug.Log("[WaveManager] Fast Forward finished. Day reached.");
-                 ProceedToNextWave();
-            }
-        } else { /* Error handling */ isFastForwarding = false; SetState(WaveManagerState.Idle_ReadyToStart); }
-        fastForwardCoroutine = null;
-    }
-
-    private void StopExistingFastForward()
-    {
-        if (isFastForwarding)
-        {
-            if (Debug.isDebugBuild) Debug.Log("[WaveManager] Stopping Fast Forward.");
-            isFastForwarding = false;
-            if (fastForwardCoroutine != null) { StopCoroutine(fastForwardCoroutine); fastForwardCoroutine = null; }
-            if (weatherManager != null && weatherManager.timeScaleMultiplier != 1f) { weatherManager.timeScaleMultiplier = 1f; }
-            // Re-evaluate pause state after stopping FF
-            if(pauseWeatherBetweenWaves && currentState == WaveManagerState.Idle_ReadyToStart) {
-                if(weatherManager != null) weatherManager.IsPaused = true;
-            }
-        }
-    }
-
-    void StartWaveGameplay()
-    {
-        if (activeWaveDefinition == null) { Debug.LogError("[WaveManager] ActiveWaveDefinition null!"); SetState(WaveManagerState.Idle_ReadyToStart); return; }
-        Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} Gameplay Starting!");
-        // Ensure weather is running
-        if(weatherManager != null) weatherManager.IsPaused = false;
-        SetState(WaveManagerState.WaveInProgress);
-        if (faunaManager != null) faunaManager.ExecuteSpawnWave(activeWaveDefinition);
-        else Debug.LogError("[WaveManager] Cannot execute spawn wave, FaunaManager missing!");
-    }
-
-    void EndWaveGameplay()
-    {
-        Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} Gameplay Ended.");
-        if (faunaManager != null) faunaManager.StopAllSpawnCoroutines();
-        activeWaveDefinition = null;
-        bool isLastWave = currentWaveIndex + 1 >= wavesSequence.Count;
-        // Transition to Cleared Display FIRST, which then transitions to Delay/Complete/Idle
-        SetState(WaveManagerState.WaveClearedDisplay);
-    }
-
-    /// <summary>
-    /// Destroys all GameObjects with an AnimalController component in the scene.
-    /// </summary>
-    void ClearAllActiveAnimals() // <<< NEW METHOD
-    {
-         if(Debug.isDebugBuild) Debug.Log("[WaveManager] Clearing all active animals.");
-         // Use FindObjectsByType for better performance than FindObjectsOfType
-         AnimalController[] activeAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-         int count = 0;
-         foreach(AnimalController animal in activeAnimals)
-         {
-             if(animal != null) // Extra safety check
-             {
-                 Destroy(animal.gameObject);
-                 count++;
-             }
-         }
-         if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Destroyed {count} animals.");
-    }
-
-
-    // --- Get Main Camera ---
-    public Camera GetMainCamera() { return mainCamera; }
+    public Camera GetMainCamera() { return mainCamera; } // (Unchanged)
 }

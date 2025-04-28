@@ -481,7 +481,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Start Wave
+  m_text: Start Run
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 9fc1ef308eedf0e468d3f7e1958dbc2b, type: 2}
   m_sharedMaterial: {fileID: 4594303012967394465, guid: 9fc1ef308eedf0e468d3f7e1958dbc2b, type: 2}
@@ -13547,19 +13547,13 @@ MonoBehaviour:
   wavesSequence:
   - {fileID: 11400000, guid: 6d4d58a9961c6e849a27fabd71bd5178, type: 2}
   - {fileID: 11400000, guid: a909bf6355795ac449bba998b4b3a520, type: 2}
-  waveDurationSeconds: 60
-  delayBetweenWaves: 10
-  waveIncomingDisplayTime: 3
-  waveClearedDisplayTime: 3
+  waveDurationInDayCycles: 1
+  spawnStartPhase: 0
+  spawnStartPercentage: 10
   loopSequence: 0
-  deletePreviousWaveAnimals: 1
-  syncWithDayNight: 1
-  fastForwardMultiplier: 1
-  pauseWeatherBetweenWaves: 1
+  deletePreviousWaveAnimals: 0
   waveStatusText: {fileID: 666779956}
-  waveIncomingFormat: Wave {0} Incoming!
-  waveClearedFormat: Wave {0} Cleared!
-  startWaveButton: {fileID: 1706351737}
+  startRunButton: {fileID: 1706351737}
   timeTrackerText: {fileID: 743635297}
   currentState: 0
   currentWaveIndex: -1
@@ -13731,9 +13725,11 @@ MonoBehaviour:
   spawnCenter: {x: 0, y: 0}
   spawnAreaSize: {x: 20, y: 10}
   ecosystemParent: {fileID: 553168402}
-  animalMinBounds: {x: -8.5, y: -4.5}
-  animalMaxBounds: {x: 8.5, y: 4.5}
+  screenBoundsPadding: 1
   offscreenSpawnMargin: 1
+  showBoundsGizmos: 1
+  boundsOffsetX: 0
+  boundsOffsetY: 1
 --- !u!1 &1442999825
 GameObject:
   m_ObjectHideFlags: 0

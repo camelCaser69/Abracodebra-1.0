@@ -21,9 +21,9 @@ public class WaveSpawnEntry
     [Tooltip("How many of this animal to spawn in this specific entry.")]
     [Min(1)]
     public int spawnCount = 1;
-    [Tooltip("Delay (in seconds) after the wave's gameplay starts (AFTER 'Incoming' message) before *this entry* begins spawning.")] // Clarified tooltip
+    [Tooltip("Delay (in seconds) AFTER the designated wave spawn time (e.g. Day 50%) before *this entry* begins spawning.")] // Clarified Tooltip
     [Min(0)]
-    public float delayAfterWaveStart = 0f;
+    public float delayAfterSpawnTime = 0f; // Renamed from delayAfterWaveStart
     [Tooltip("Time (in seconds) between spawning each individual animal in this entry (0 = spawn all instantly).")]
     [Min(0)]
     public float spawnInterval = 0.5f;
@@ -34,7 +34,7 @@ public class WaveSpawnEntry
     public float spawnRadius = 5f;
 }
 
-// WaveDefinition ScriptableObject is simplified
+// WaveDefinition ScriptableObject is simplified further
 [CreateAssetMenu(fileName = "Wave_", menuName = "Ecosystem/Wave Definition")]
 public class WaveDefinition : ScriptableObject
 {
@@ -46,7 +46,5 @@ public class WaveDefinition : ScriptableObject
     [Tooltip("Define the groups of animals that spawn during this wave.")]
     public List<WaveSpawnEntry> spawnEntries = new List<WaveSpawnEntry>();
 
-    // REMOVED: endCondition (Always Timer or Day/Night Cycle)
-    // REMOVED: durationSeconds (Handled by WaveManager)
-    // REMOVED: delayBeforeNextWave (Handled by WaveManager)
+    // REMOVED all timing, duration, end condition, delay fields.
 }

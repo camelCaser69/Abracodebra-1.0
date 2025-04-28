@@ -16,8 +16,8 @@ MonoBehaviour:
   spawnEntries:
   - description: Bunnies
     animalDefinition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}
-    spawnCount: 2
-    delayAfterWaveStart: 1
+    spawnCount: 10
+    delayAfterSpawnTime: 0
     spawnInterval: 1
     spawnLocationType: 2
     spawnRadius: 0
