@@ -95,7 +95,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   hpText: {fileID: 6910504263885416475}
   searchRadius: 10
-  eatDistance: 0.05
+  eatDistance: 0.1
   eatDuration: 2
   wanderPauseChance: 0.3
   wanderMinMoveDuration: 0.5

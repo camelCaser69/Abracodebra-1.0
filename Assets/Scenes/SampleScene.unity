@@ -751,15 +751,15 @@ MonoBehaviour:
   weatherManager: {fileID: 1966203507}
   globalVolume: {fileID: 218454255}
   dayColorFilter: {r: 1, g: 1, b: 1, a: 1}
-  nightColorFilter: {r: 0.6367924, g: 0.7104867, b: 1, a: 1}
+  nightColorFilter: {r: 0.5896226, g: 0.6688182, b: 1, a: 1}
   dayPostExposure: 0
-  nightPostExposure: -1.5
+  nightPostExposure: -0.5
   daySaturation: 0
   nightSaturation: -15
-  dayFilmGrainIntensity: 0.1
-  nightFilmGrainIntensity: 0.5
+  dayFilmGrainIntensity: 0.05
+  nightFilmGrainIntensity: 0.25
   dayVignetteIntensity: 0.1
-  nightVignetteIntensity: 0.2
+  nightVignetteIntensity: 0.23
   dayVignetteSmoothness: 0.2
   nightVignetteSmoothness: 1
 --- !u!1 &235836638
