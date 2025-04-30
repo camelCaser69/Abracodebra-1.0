@@ -13,8 +13,7 @@ MonoBehaviour:
   m_Name: TileDefinition_001_Dirt
   m_EditorClassIdentifier: 
   displayName: Dirt
-  tintColor: {r: 0.7372549, g: 0.6313726, b: 0.4745098, a: 1}
-  overlays: []
+  tintColor: {r: 0.8301887, g: 0.71183246, b: 0.53648984, a: 1}
   revertAfterSeconds: 0
   revertToTile: {fileID: 0}
   keepBottomTile: 0

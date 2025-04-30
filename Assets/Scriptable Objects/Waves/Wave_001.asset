@@ -16,8 +16,15 @@ MonoBehaviour:
   spawnEntries:
   - description: Bunnies
     animalDefinition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}
-    spawnCount: 3
-    delayAfterWaveStart: 1
+    spawnCount: 6
+    delayAfterSpawnTime: 0
     spawnInterval: 1
+    spawnLocationType: 2
+    spawnRadius: 0
+  - description: Deers
+    animalDefinition: {fileID: 11400000, guid: 099ce8f023809384288f8daf16f43fd2, type: 2}
+    spawnCount: 2
+    delayAfterSpawnTime: 0
+    spawnInterval: 3
     spawnLocationType: 2
     spawnRadius: 0

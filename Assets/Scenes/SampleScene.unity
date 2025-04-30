@@ -508,8 +508,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 32
+  m_fontSizeBase: 32
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -2393,11 +2393,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1578588576}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -66.74}
-  m_SizeDelta: {x: 200, y: 50}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 15.400024, y: 0}
+  m_SizeDelta: {x: 400, y: 50}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &666779956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2445,14 +2445,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -5438,7 +5438,7 @@ Tilemap:
     m_Data: {r: 1, g: 1, b: 1, a: 1}
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
-  m_Color: {r: 0.7372549, g: 0.6313726, b: 0.4745098, a: 1}
+  m_Color: {r: 0.8301887, g: 0.71183246, b: 0.53648984, a: 1}
   m_Origin: {x: -10, y: -6, z: 0}
   m_Size: {x: 23, y: 14, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
@@ -8151,8 +8151,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 30
-  m_fontSizeBase: 30
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -8854,7 +8854,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa0397c3838c4c9aa01e9859a5f1e1ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showScentRadiiRuntime: 0
+  showScentRadiiRuntime: 1
   scentRadiusColorRuntime: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   logGizmoCalls: 0
   circleVisualizerPrefab: {fileID: 4489783331620860270, guid: d6976fed002367344b9cc1365d0a1201, type: 3}
@@ -9083,7 +9083,7 @@ MonoBehaviour:
   weatherManager: {fileID: 1966203507}
   fireflyPrefab: {fileID: 4042090984494424328, guid: 88309470b9e69f94c9faea1346030ab1, type: 3}
   fireflyParent: {fileID: 1613962853}
-  maxFireflies: 20
+  maxFireflies: 14
   spawnInterval: 0.5
   nightThreshold: 0.25
   spawnCenter: {x: 0, y: 0}
@@ -9093,7 +9093,7 @@ MonoBehaviour:
   photosynthesisRadius: 2
   photosynthesisIntensityPerFly: 0.2
   maxPhotosynthesisBonus: 0.5
-  showAttractionLinesRuntime: 0
+  showAttractionLinesRuntime: 1
   attractionLineColorGizmo: {r: 1, g: 1, b: 1, a: 1}
   logGizmoCalls: 0
   lineVisualizerPrefab: {fileID: 4489783331620860270, guid: 90a334b6403ffa946a0f007b37a0456d, type: 3}
@@ -14005,7 +14005,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!95 &1517185763
 Animator:
   serializedVersion: 7
@@ -17178,8 +17178,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -30.8}
-  m_SizeDelta: {x: 160, y: 30}
+  m_AnchoredPosition: {x: 0, y: -40}
+  m_SizeDelta: {x: 180, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1706351737
 MonoBehaviour:
@@ -17202,10 +17202,10 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 0.7372549}
+    m_HighlightedColor: {r: 1, g: 1, b: 1, a: 1}
+    m_PressedColor: {r: 1, g: 1, b: 1, a: 0.9647059}
+    m_SelectedColor: {r: 1, g: 1, b: 1, a: 0.7372549}
     m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
@@ -17238,7 +17238,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.14901961}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.34117648}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

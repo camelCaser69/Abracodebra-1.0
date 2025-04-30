@@ -48,7 +48,7 @@ GameObject:
   - component: {fileID: 1678655499690775546}
   - component: {fileID: 8208813146050923784}
   m_Layer: 0
-  m_Name: Animal_Bunny
+  m_Name: Animal_Deer
   m_TagString: Herbivore
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -94,17 +94,17 @@ MonoBehaviour:
   - {fileID: 4068151152815915600, guid: 978e17d09199949439c4ddb97ee2c6c8, type: 3}
   animator: {fileID: 0}
   hpText: {fileID: 6910504263885416475}
-  searchRadius: 10
-  eatDistance: 0.1
-  eatDuration: 2
+  searchRadius: 12
+  eatDistance: 0.2
+  eatDuration: 3
   wanderPauseChance: 0.3
-  wanderMinMoveDuration: 0.5
-  wanderMaxMoveDuration: 5
-  wanderMinPauseDuration: 0.5
-  wanderMaxPauseDuration: 2
+  wanderMinMoveDuration: 0.8
+  wanderMaxMoveDuration: 7
+  wanderMinPauseDuration: 0.6
+  wanderMaxPauseDuration: 3
   minPoopDelay: 0.5
   maxPoopDelay: 3
-  poopDuration: 1.5
+  poopDuration: 2
   poopColorVariation: 0.12
   thoughtCooldownTime: 5
   attractiveScentDefinitions: []
@@ -168,7 +168,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -8409896356631971127, guid: 84b23fb70041769478ab2f998c66880a, type: 3}
+  m_Sprite: {fileID: -3463902250377425916, guid: 9bf4c52da46e25c419c1c55f199b92df, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -189,7 +189,7 @@ Animator:
   m_GameObject: {fileID: 1618699628824306755}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 3ca8ec2f96a60444789c089cf0e7a20e, type: 2}
+  m_Controller: {fileID: 9100000, guid: 01a1c488f9488324d842fe58bd7687d0, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -262,8 +262,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.13}
-  m_Size: {x: 0.06, y: 0.03}
+  m_Offset: {x: -0.01, y: -0.13}
+  m_Size: {x: 0.08, y: 0.04}
   m_Direction: 1
 --- !u!70 &8208813146050923784
 CapsuleCollider2D:
@@ -299,7 +299,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.12}
+  m_Offset: {x: -0.01, y: -0.12}
   m_Size: {x: 0.12, y: 0.06}
   m_Direction: 1
 --- !u!1 &2461211831445650058
