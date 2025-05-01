@@ -1,8 +1,8 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-24 19:30:48
-PART 1 OF 5
+UNITY PROJECT SCRIPT EXPORT - 2025-05-01 01:40:59
+PART 1 OF 6
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -39,6 +39,7 @@ Assets
 │   │   ├── Animals
 │   │   │   ├── Animal_Bird.prefab
 │   │   │   ├── Animal_Bunny.prefab
+│   │   │   ├── Animal_Deer.prefab
 │   │   │   ├── Animal_Fox.prefab
 │   │   │   └── FireflyPrefab.prefab
 │   │   ├── Plants
@@ -47,7 +48,8 @@ Assets
 │   │   │   ├── PixelLeaf.prefab
 │   │   │   ├── PixelSeed.prefab
 │   │   │   ├── PixelStem.prefab
-│   │   │   └── PlantPrefab.prefab
+│   │   │   ├── PlantPrefab.prefab
+│   │   │   └── PlantShadow.prefab
 │   │   ├── Props
 │   │   │   ├── Poop_Big.prefab
 │   │   │   ├── Poop_Medium_01.prefab
@@ -87,9 +89,11 @@ Assets
 ├── Scriptable Objects
 │   ├── Animals
 │   │   ├── AnimalLibrary.asset
-│   │   └── Animal_000_Bunny.asset
+│   │   ├── Animal_000_Bunny.asset
+│   │   └── Animal_001_Deer.asset
 │   ├── Animals Diet
-│   │   └── Diet_000_Bunny.asset
+│   │   ├── Diet_000_Bunny.asset
+│   │   └── Diet_001_Deer.asset
 │   ├── Food
 │   │   ├── FoodType_000_Berry.asset
 │   │   └── FoodType_000_Leaf.asset
@@ -99,7 +103,8 @@ Assets
 │   │   ├── NodeDefinitionLibrary.asset
 │   │   ├── Node_000_Seed.asset
 │   │   ├── Node_001_Berry.asset
-│   │   └── Node_002_FireflyPheromone.asset
+│   │   ├── Node_002_FireflyPheromone.asset
+│   │   └── Node_003_WaterPreserver.asset
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
@@ -109,10 +114,13 @@ Assets
 │   │   ├── TileDefinition_002_DirtWet.asset
 │   │   ├── TileDefinition_003_Water.asset
 │   │   └── TileInteractionLibrary.asset
-│   └── Tools
-│       ├── ToolDefinition_000_GardeningHoe.asset
-│       ├── ToolDefinition_001_WateringCan.asset
-│       └── ToolDefinition_002_SeedPouch.asset
+│   ├── Tools
+│   │   ├── ToolDefinition_000_GardeningHoe.asset
+│   │   ├── ToolDefinition_001_WateringCan.asset
+│   │   └── ToolDefinition_002_SeedPouch.asset
+│   └── Waves
+│       ├── Wave_000.asset
+│       └── Wave_001.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -139,7 +147,9 @@ Assets
 │   │   │   ├── PoopController.cs
 │   │   │   ├── ScentSource.cs
 │   │   │   ├── ThoughtBubbleController.cs
-│   │   │   └── ThoughtTrigger.cs
+│   │   │   ├── ThoughtTrigger.cs
+│   │   │   ├── WaveDefinition.cs
+│   │   │   └── WaveManager.cs
 │   │   ├── Effects
 │   │   │   ├── FireflyController.cs
 │   │   │   └── FireflyManager.cs
@@ -192,7 +202,9 @@ Assets
 │   ├── UI
 │   └── Visuals
 │       ├── NightColorPostProcess.cs
-│       └── RuntimeCircleDrawer.cs
+│       ├── PlantShadowController.cs
+│       ├── RuntimeCircleDrawer.cs
+│       └── ShadowPartController.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -660,6 +672,12 @@ public class PlantGrowth : MonoBehaviour
     [SerializeField] private GameObject leafCellPrefab;
     [SerializeField] private GameObject berryCellPrefab; // Used for PlantCellType.Fruit
     [SerializeField] private float cellSpacing = 8f;
+    
+    [Header("Shadow Setup")]
+    [SerializeField] [Tooltip("Assign the PlantShadowController component from the child _ShadowRoot GameObject")]
+    private PlantShadowController shadowController;
+    [SerializeField] [Tooltip("Assign your generic ShadowPart prefab (containing only SpriteRenderer + ShadowPartController script)")]
+    private GameObject shadowPartPrefab;
 
     [Header("Growth & UI Timing")]
     [SerializeField] private bool showGrowthPercentage = true;
@@ -674,6 +692,8 @@ public class PlantGrowth : MonoBehaviour
     private Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
     private Coroutine percentageCounterCoroutine;
     private FireflyManager fireflyManagerInstance; // Cache the reference
+    
+    private GameObject rootCellInstance;
 
     // --- Calculated Stats ---
     private int targetStemLength;
@@ -694,15 +714,33 @@ public class PlantGrowth : MonoBehaviour
     private bool? offsetRightForPattern1 = null;
 
     // --- Unity Methods ---
-    private void Awake() // Modified
+    void Awake()
     {
-        EnsureUIReferences();
-        fireflyManagerInstance = FireflyManager.Instance; // Get the singleton instance
-        if (fireflyManagerInstance == null)
+        // Example: Find the controller if not assigned in Inspector (assigning is preferred)
+        if (shadowController == null)
         {
-             // Optional: Log warning if manager doesn't exist, photosynthesis bonus won't work
-             // Debug.LogWarning($"[{gameObject.name}] FireflyManager instance not found. Firefly photosynthesis bonus disabled.");
+            shadowController = GetComponentInChildren<PlantShadowController>(true); // true to include inactive
+            if (shadowController == null)
+            {
+                Debug.LogError("PlantGrowth ERROR: Could not find PlantShadowController in children! Shadow system will not work.", this);
+                enabled = false; // Disable script if setup is broken
+                return;
+            }
+            else {
+                Debug.Log("PlantGrowth found PlantShadowController dynamically.", this);
+            }
         }
+        if (shadowPartPrefab == null)
+        {
+            Debug.LogError("PlantGrowth ERROR: Assign the Shadow Part Prefab in the Inspector! Shadow system will not work.", this);
+            enabled = false; // Disable script if setup is broken
+        }
+    }
+    
+    void Start()
+    {
+        // Example: Spawn the initial seed cell
+        SpawnInitialSeed();
     }
 
     private void Update() => StateMachineUpdate();
@@ -1275,31 +1313,28 @@ public class PlantGrowth : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Battle\Plant\WeatherManager.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Battle/Plant/WeatherManager.cs
+using UnityEngine;
+using System;
 
 public class WeatherManager : MonoBehaviour
 {
     public static WeatherManager Instance { get; private set; }
 
+    public enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
+
     [Header("Day/Night Cycle Settings")]
     public bool dayNightCycleEnabled = true;
-    
-    [Tooltip("Duration of full day (seconds)")]
     public float dayDuration = 20f;
-    [Tooltip("Duration of full night (seconds)")]
     public float nightDuration = 20f;
-    [Tooltip("Duration of transitions (seconds)")]
     public float transitionDuration = 5f;
-
-    [Tooltip("Curve that controls the sunIntensity during transitions (X=0 start, X=1 end).")]
     public AnimationCurve transitionCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
     [Header("Sunlight Settings")]
     [Range(0f, 1f)]
-    public float sunIntensity = 1f;  // 0=night, 1=day
+    public float sunIntensity = 1f;
 
     [Header("Fixed Sunlight When Cycle Off")]
-    [Tooltip("If dayNightCycleEnabled is false, we use this fixed intensity.")]
     [Range(0f, 1f)]
     public float fixedSunIntensity = 1f;
 
@@ -1308,120 +1343,121 @@ public class WeatherManager : MonoBehaviour
     public float minAlpha = 0f;
     public float maxAlpha = 1f;
 
-    // Internals
-    private enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
-    private CyclePhase currentPhase = CyclePhase.Day;
-    private float phaseTimer = 0f; // counts down in each phase
-    private float totalPhaseTime = 0f; // length of current phase
+    [Header("Time Scaling & Pausing")] // <<< UPDATED HEADER
+    [Range(1f, 100f)]
+    public float timeScaleMultiplier = 1f;
+    public bool IsPaused { get; set; } = false; // <<< NEW: Pause flag
 
-    private void Awake()
+    // --- Public Properties & Events ---
+    public CyclePhase CurrentPhase => currentPhase;
+    public event Action<CyclePhase> OnPhaseChanged;
+    public float CurrentPhaseTimer => phaseTimer; // <<< NEW: Expose timer
+    public float CurrentTotalPhaseTime => totalPhaseTime; // <<< NEW: Expose total time
+
+    // --- Internals ---
+    private CyclePhase currentPhase = CyclePhase.Day;
+    private float phaseTimer = 0f;
+    private float totalPhaseTime = 0f;
+
+    void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
-    private void Start()
+    void Start()
     {
-        // Initialize to Day phase
-        EnterPhase(CyclePhase.Day);
+        EnterPhase(CyclePhase.Day, true);
     }
 
-    private void Update()
+    void Update()
     {
+        // --- PAUSE CHECK ---
+        if (IsPaused) // <<< NEW: Check if paused
+        {
+            // If paused, potentially ensure timeScale is 1? Or leave it? Let's reset it.
+            if (timeScaleMultiplier != 1f) timeScaleMultiplier = 1f;
+            return; // Do nothing else if paused
+        }
+        // ---------------------
+
         if (!dayNightCycleEnabled)
         {
-            // If the cycle is disabled, just use the fixed sun intensity
             sunIntensity = fixedSunIntensity;
             UpdateFadeSprite();
+            if (timeScaleMultiplier != 1f) timeScaleMultiplier = 1f;
             return;
         }
 
-        // else dayNightCycle is enabled
-        phaseTimer -= Time.deltaTime;
+        phaseTimer -= Time.deltaTime * timeScaleMultiplier;
+
         if (phaseTimer <= 0f)
         {
-            // move to next phase
+            CyclePhase nextPhase = currentPhase;
             switch (currentPhase)
             {
-                case CyclePhase.Day:
-                    EnterPhase(CyclePhase.TransitionToNight);
-                    break;
-                case CyclePhase.TransitionToNight:
-                    EnterPhase(CyclePhase.Night);
-                    break;
-                case CyclePhase.Night:
-                    EnterPhase(CyclePhase.TransitionToDay);
-                    break;
-                case CyclePhase.TransitionToDay:
-                    EnterPhase(CyclePhase.Day);
-                    break;
+                case CyclePhase.Day: nextPhase = CyclePhase.TransitionToNight; break;
+                case CyclePhase.TransitionToNight: nextPhase = CyclePhase.Night; break;
+                case CyclePhase.Night: nextPhase = CyclePhase.TransitionToDay; break;
+                case CyclePhase.TransitionToDay: nextPhase = CyclePhase.Day; break;
             }
+            EnterPhase(nextPhase);
         }
         else
         {
-            // while in the current phase, update sunIntensity accordingly
-            float progress = 1f - (phaseTimer / totalPhaseTime);
-            switch (currentPhase)
-            {
-                case CyclePhase.Day:
-                    // Full day, sunIntensity = 1
-                    sunIntensity = 1f;
-                    break;
-                case CyclePhase.TransitionToNight:
-                    // 0..1 => day(1) to night(0) using transitionCurve
-                    float tToNight = transitionCurve.Evaluate(progress);
-                    sunIntensity = Mathf.Lerp(1f, 0f, tToNight);
-                    break;
-                case CyclePhase.Night:
-                    // Full night, sunIntensity = 0
-                    sunIntensity = 0f;
-                    break;
-                case CyclePhase.TransitionToDay:
-                    // 0..1 => night(0) to day(1) using transitionCurve
-                    float tToDay = transitionCurve.Evaluate(progress);
-                    sunIntensity = Mathf.Lerp(0f, 1f, tToDay);
-                    break;
-            }
+            UpdateSunIntensity();
         }
 
         UpdateFadeSprite();
     }
 
-    private void EnterPhase(CyclePhase nextPhase)
+    private void EnterPhase(CyclePhase nextPhase, bool forceEvent = false)
     {
+        CyclePhase previousPhase = currentPhase;
         currentPhase = nextPhase;
+
         switch (nextPhase)
         {
-            case CyclePhase.Day:
-                totalPhaseTime = dayDuration;
-                break;
-            case CyclePhase.Night:
-                totalPhaseTime = nightDuration;
-                break;
+            case CyclePhase.Day: totalPhaseTime = dayDuration; break;
+            case CyclePhase.Night: totalPhaseTime = nightDuration; break;
             case CyclePhase.TransitionToNight:
-            case CyclePhase.TransitionToDay:
-                totalPhaseTime = transitionDuration;
-                break;
+            case CyclePhase.TransitionToDay: totalPhaseTime = transitionDuration; break;
         }
+        totalPhaseTime = Mathf.Max(0.01f, totalPhaseTime);
         phaseTimer = totalPhaseTime;
+
+        UpdateSunIntensity();
+
+        if (previousPhase != currentPhase || forceEvent)
+        {
+            if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
+            OnPhaseChanged?.Invoke(currentPhase);
+        }
+    }
+
+    private void UpdateSunIntensity()
+    {
+        if (totalPhaseTime <= 0) return;
+        float progress = 1f - Mathf.Clamp01(phaseTimer / totalPhaseTime);
+        switch (currentPhase)
+        {
+            case CyclePhase.Day: sunIntensity = 1f; break;
+            case CyclePhase.TransitionToNight: sunIntensity = Mathf.Lerp(1f, 0f, transitionCurve.Evaluate(progress)); break;
+            case CyclePhase.Night: sunIntensity = 0f; break;
+            case CyclePhase.TransitionToDay: sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(progress)); break;
+        }
+        sunIntensity = Mathf.Clamp01(sunIntensity);
     }
 
     private void UpdateFadeSprite()
     {
         if (fadeSprite != null)
         {
-            float alpha = Mathf.Lerp(minAlpha, maxAlpha, sunIntensity);
-            Color c = fadeSprite.color;
-            c.a = alpha;
-            fadeSprite.color = c;
+            float alpha = Mathf.Lerp(maxAlpha, minAlpha, sunIntensity);
+            Color c = fadeSprite.color; c.a = alpha; fadeSprite.color = c;
         }
     }
 }
-
 
 
 
@@ -1644,5 +1680,5 @@ public class AnimalLibrary : ScriptableObject
 
 
 --------------------------------------------------------------------------------
-This is part 1 out of 5 of script collection. 4 more parts remain.
+This is part 1 out of 6 of script collection. 5 more parts remain.
 --------------------------------------------------------------------------------

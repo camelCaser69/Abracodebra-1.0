@@ -301,6 +301,7 @@ Transform:
   m_Children:
   - {fileID: 1274493678575850901}
   - {fileID: 2880054064010453107}
+  - {fileID: 103468527644774447}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-7276291906513066215
@@ -315,15 +316,71 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17881b9c2dd347be8e99e77f51ab82ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showGrowthPercentage: 1
-  allowPhotosynthesisDuringGrowth: 0
-  useSmoothPercentageCounter: 1
-  percentageIncrement: 1
-  currentState: 0
-  currentEnergy: 0
+  energyText: {fileID: 5767746695747064716}
   seedCellPrefab: {fileID: 3989903528299243114, guid: 21f0696b40e6a56479873b186b3d5d93, type: 3}
   stemCellPrefab: {fileID: 3989903528299243114, guid: 43ce9b6d7b5c22d4c988dbdd224c3d5c, type: 3}
   leafCellPrefab: {fileID: 3989903528299243114, guid: bfbf2c64527183d4c95dcf83f92ee26b, type: 3}
   berryCellPrefab: {fileID: 3989903528299243114, guid: 0d04f86b0bfb77e4494b03c839ea7c5d, type: 3}
   cellSpacing: 0.06
-  energyText: {fileID: 5767746695747064716}
+  shadowController: {fileID: 7566804035257960334}
+  shadowPartPrefab: {fileID: 4782029035367563709, guid: 0a51edb060595654a8aec35798679f0d, type: 3}
+  showGrowthPercentage: 1
+  allowPhotosynthesisDuringGrowth: 0
+  useSmoothPercentageCounter: 1
+  percentageIncrement: 2
+  currentState: 0
+  currentEnergy: 0
+--- !u!1 &9214799694400921061
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 103468527644774447}
+  - component: {fileID: 7566804035257960334}
+  m_Layer: 0
+  m_Name: ShadowRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &103468527644774447
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9214799694400921061}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1090940917712720748}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7566804035257960334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9214799694400921061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c1edc226a04c2d97ec35b084c76bc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shadowColor: {r: 0, g: 0, b: 0, a: 0.56078434}
+  squashFactor: 1
+  shadowAngleDegrees: 225
+  flipShadow: 0
+  enableDistanceFade: 1
+  fadeStartDistance: 0
+  fadeEndDistance: 1
+  minFadeAlpha: 0
+  shadowSortingLayerName: Default
+  shadowSortingOrder: 20

@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-04-24 19:30:48
+UNITY PROJECT SCRIPT EXPORT - 2025-05-01 01:40:59
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -39,6 +39,7 @@ Assets
 │   │   ├── Animals
 │   │   │   ├── Animal_Bird.prefab
 │   │   │   ├── Animal_Bunny.prefab
+│   │   │   ├── Animal_Deer.prefab
 │   │   │   ├── Animal_Fox.prefab
 │   │   │   └── FireflyPrefab.prefab
 │   │   ├── Plants
@@ -47,7 +48,8 @@ Assets
 │   │   │   ├── PixelLeaf.prefab
 │   │   │   ├── PixelSeed.prefab
 │   │   │   ├── PixelStem.prefab
-│   │   │   └── PlantPrefab.prefab
+│   │   │   ├── PlantPrefab.prefab
+│   │   │   └── PlantShadow.prefab
 │   │   ├── Props
 │   │   │   ├── Poop_Big.prefab
 │   │   │   ├── Poop_Medium_01.prefab
@@ -87,9 +89,11 @@ Assets
 ├── Scriptable Objects
 │   ├── Animals
 │   │   ├── AnimalLibrary.asset
-│   │   └── Animal_000_Bunny.asset
+│   │   ├── Animal_000_Bunny.asset
+│   │   └── Animal_001_Deer.asset
 │   ├── Animals Diet
-│   │   └── Diet_000_Bunny.asset
+│   │   ├── Diet_000_Bunny.asset
+│   │   └── Diet_001_Deer.asset
 │   ├── Food
 │   │   ├── FoodType_000_Berry.asset
 │   │   └── FoodType_000_Leaf.asset
@@ -99,7 +103,8 @@ Assets
 │   │   ├── NodeDefinitionLibrary.asset
 │   │   ├── Node_000_Seed.asset
 │   │   ├── Node_001_Berry.asset
-│   │   └── Node_002_FireflyPheromone.asset
+│   │   ├── Node_002_FireflyPheromone.asset
+│   │   └── Node_003_WaterPreserver.asset
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
@@ -109,10 +114,13 @@ Assets
 │   │   ├── TileDefinition_002_DirtWet.asset
 │   │   ├── TileDefinition_003_Water.asset
 │   │   └── TileInteractionLibrary.asset
-│   └── Tools
-│       ├── ToolDefinition_000_GardeningHoe.asset
-│       ├── ToolDefinition_001_WateringCan.asset
-│       └── ToolDefinition_002_SeedPouch.asset
+│   ├── Tools
+│   │   ├── ToolDefinition_000_GardeningHoe.asset
+│   │   ├── ToolDefinition_001_WateringCan.asset
+│   │   └── ToolDefinition_002_SeedPouch.asset
+│   └── Waves
+│       ├── Wave_000.asset
+│       └── Wave_001.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -139,7 +147,9 @@ Assets
 │   │   │   ├── PoopController.cs
 │   │   │   ├── ScentSource.cs
 │   │   │   ├── ThoughtBubbleController.cs
-│   │   │   └── ThoughtTrigger.cs
+│   │   │   ├── ThoughtTrigger.cs
+│   │   │   ├── WaveDefinition.cs
+│   │   │   └── WaveManager.cs
 │   │   ├── Effects
 │   │   │   ├── FireflyController.cs
 │   │   │   └── FireflyManager.cs
@@ -192,7 +202,9 @@ Assets
 │   ├── UI
 │   └── Visuals
 │       ├── NightColorPostProcess.cs
-│       └── RuntimeCircleDrawer.cs
+│       ├── PlantShadowController.cs
+│       ├── RuntimeCircleDrawer.cs
+│       └── ShadowPartController.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -643,6 +655,12 @@ public class PlantGrowth : MonoBehaviour
     [SerializeField] private GameObject leafCellPrefab;
     [SerializeField] private GameObject berryCellPrefab; // Used for PlantCellType.Fruit
     [SerializeField] private float cellSpacing = 8f;
+    
+    [Header("Shadow Setup")]
+    [SerializeField] [Tooltip("Assign the PlantShadowController component from the child _ShadowRoot GameObject")]
+    private PlantShadowController shadowController;
+    [SerializeField] [Tooltip("Assign your generic ShadowPart prefab (containing only SpriteRenderer + ShadowPartController script)")]
+    private GameObject shadowPartPrefab;
 
     [Header("Growth & UI Timing")]
     [SerializeField] private bool showGrowthPercentage = true;
@@ -657,6 +675,8 @@ public class PlantGrowth : MonoBehaviour
     private Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
     private Coroutine percentageCounterCoroutine;
     private FireflyManager fireflyManagerInstance; // Cache the reference
+    
+    private GameObject rootCellInstance;
 
     // --- Calculated Stats ---
     private int targetStemLength;
@@ -677,15 +697,33 @@ public class PlantGrowth : MonoBehaviour
     private bool? offsetRightForPattern1 = null;
 
     // --- Unity Methods ---
-    private void Awake() // Modified
+    void Awake()
     {
-        EnsureUIReferences();
-        fireflyManagerInstance = FireflyManager.Instance; // Get the singleton instance
-        if (fireflyManagerInstance == null)
+        // Example: Find the controller if not assigned in Inspector (assigning is preferred)
+        if (shadowController == null)
         {
-             // Optional: Log warning if manager doesn't exist, photosynthesis bonus won't work
-             // Debug.LogWarning($"[{gameObject.name}] FireflyManager instance not found. Firefly photosynthesis bonus disabled.");
+            shadowController = GetComponentInChildren<PlantShadowController>(true); // true to include inactive
+            if (shadowController == null)
+            {
+                Debug.LogError("PlantGrowth ERROR: Could not find PlantShadowController in children! Shadow system will not work.", this);
+                enabled = false; // Disable script if setup is broken
+                return;
+            }
+            else {
+                Debug.Log("PlantGrowth found PlantShadowController dynamically.", this);
+            }
         }
+        if (shadowPartPrefab == null)
+        {
+            Debug.LogError("PlantGrowth ERROR: Assign the Shadow Part Prefab in the Inspector! Shadow system will not work.", this);
+            enabled = false; // Disable script if setup is broken
+        }
+    }
+    
+    void Start()
+    {
+        // Example: Spawn the initial seed cell
+        SpawnInitialSeed();
     }
 
     private void Update() => StateMachineUpdate();
@@ -1256,31 +1294,28 @@ public class PlantGrowth : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Battle\Plant\WeatherManager.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Battle/Plant/WeatherManager.cs
+using UnityEngine;
+using System;
 
 public class WeatherManager : MonoBehaviour
 {
     public static WeatherManager Instance { get; private set; }
 
+    public enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
+
     [Header("Day/Night Cycle Settings")]
     public bool dayNightCycleEnabled = true;
-    
-    [Tooltip("Duration of full day (seconds)")]
     public float dayDuration = 20f;
-    [Tooltip("Duration of full night (seconds)")]
     public float nightDuration = 20f;
-    [Tooltip("Duration of transitions (seconds)")]
     public float transitionDuration = 5f;
-
-    [Tooltip("Curve that controls the sunIntensity during transitions (X=0 start, X=1 end).")]
     public AnimationCurve transitionCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
     [Header("Sunlight Settings")]
     [Range(0f, 1f)]
-    public float sunIntensity = 1f;  // 0=night, 1=day
+    public float sunIntensity = 1f;
 
     [Header("Fixed Sunlight When Cycle Off")]
-    [Tooltip("If dayNightCycleEnabled is false, we use this fixed intensity.")]
     [Range(0f, 1f)]
     public float fixedSunIntensity = 1f;
 
@@ -1289,120 +1324,121 @@ public class WeatherManager : MonoBehaviour
     public float minAlpha = 0f;
     public float maxAlpha = 1f;
 
-    // Internals
-    private enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
-    private CyclePhase currentPhase = CyclePhase.Day;
-    private float phaseTimer = 0f; // counts down in each phase
-    private float totalPhaseTime = 0f; // length of current phase
+    [Header("Time Scaling & Pausing")] // <<< UPDATED HEADER
+    [Range(1f, 100f)]
+    public float timeScaleMultiplier = 1f;
+    public bool IsPaused { get; set; } = false; // <<< NEW: Pause flag
 
-    private void Awake()
+    // --- Public Properties & Events ---
+    public CyclePhase CurrentPhase => currentPhase;
+    public event Action<CyclePhase> OnPhaseChanged;
+    public float CurrentPhaseTimer => phaseTimer; // <<< NEW: Expose timer
+    public float CurrentTotalPhaseTime => totalPhaseTime; // <<< NEW: Expose total time
+
+    // --- Internals ---
+    private CyclePhase currentPhase = CyclePhase.Day;
+    private float phaseTimer = 0f;
+    private float totalPhaseTime = 0f;
+
+    void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
-    private void Start()
+    void Start()
     {
-        // Initialize to Day phase
-        EnterPhase(CyclePhase.Day);
+        EnterPhase(CyclePhase.Day, true);
     }
 
-    private void Update()
+    void Update()
     {
+        // --- PAUSE CHECK ---
+        if (IsPaused) // <<< NEW: Check if paused
+        {
+            // If paused, potentially ensure timeScale is 1? Or leave it? Let's reset it.
+            if (timeScaleMultiplier != 1f) timeScaleMultiplier = 1f;
+            return; // Do nothing else if paused
+        }
+        // ---------------------
+
         if (!dayNightCycleEnabled)
         {
-            // If the cycle is disabled, just use the fixed sun intensity
             sunIntensity = fixedSunIntensity;
             UpdateFadeSprite();
+            if (timeScaleMultiplier != 1f) timeScaleMultiplier = 1f;
             return;
         }
 
-        // else dayNightCycle is enabled
-        phaseTimer -= Time.deltaTime;
+        phaseTimer -= Time.deltaTime * timeScaleMultiplier;
+
         if (phaseTimer <= 0f)
         {
-            // move to next phase
+            CyclePhase nextPhase = currentPhase;
             switch (currentPhase)
             {
-                case CyclePhase.Day:
-                    EnterPhase(CyclePhase.TransitionToNight);
-                    break;
-                case CyclePhase.TransitionToNight:
-                    EnterPhase(CyclePhase.Night);
-                    break;
-                case CyclePhase.Night:
-                    EnterPhase(CyclePhase.TransitionToDay);
-                    break;
-                case CyclePhase.TransitionToDay:
-                    EnterPhase(CyclePhase.Day);
-                    break;
+                case CyclePhase.Day: nextPhase = CyclePhase.TransitionToNight; break;
+                case CyclePhase.TransitionToNight: nextPhase = CyclePhase.Night; break;
+                case CyclePhase.Night: nextPhase = CyclePhase.TransitionToDay; break;
+                case CyclePhase.TransitionToDay: nextPhase = CyclePhase.Day; break;
             }
+            EnterPhase(nextPhase);
         }
         else
         {
-            // while in the current phase, update sunIntensity accordingly
-            float progress = 1f - (phaseTimer / totalPhaseTime);
-            switch (currentPhase)
-            {
-                case CyclePhase.Day:
-                    // Full day, sunIntensity = 1
-                    sunIntensity = 1f;
-                    break;
-                case CyclePhase.TransitionToNight:
-                    // 0..1 => day(1) to night(0) using transitionCurve
-                    float tToNight = transitionCurve.Evaluate(progress);
-                    sunIntensity = Mathf.Lerp(1f, 0f, tToNight);
-                    break;
-                case CyclePhase.Night:
-                    // Full night, sunIntensity = 0
-                    sunIntensity = 0f;
-                    break;
-                case CyclePhase.TransitionToDay:
-                    // 0..1 => night(0) to day(1) using transitionCurve
-                    float tToDay = transitionCurve.Evaluate(progress);
-                    sunIntensity = Mathf.Lerp(0f, 1f, tToDay);
-                    break;
-            }
+            UpdateSunIntensity();
         }
 
         UpdateFadeSprite();
     }
 
-    private void EnterPhase(CyclePhase nextPhase)
+    private void EnterPhase(CyclePhase nextPhase, bool forceEvent = false)
     {
+        CyclePhase previousPhase = currentPhase;
         currentPhase = nextPhase;
+
         switch (nextPhase)
         {
-            case CyclePhase.Day:
-                totalPhaseTime = dayDuration;
-                break;
-            case CyclePhase.Night:
-                totalPhaseTime = nightDuration;
-                break;
+            case CyclePhase.Day: totalPhaseTime = dayDuration; break;
+            case CyclePhase.Night: totalPhaseTime = nightDuration; break;
             case CyclePhase.TransitionToNight:
-            case CyclePhase.TransitionToDay:
-                totalPhaseTime = transitionDuration;
-                break;
+            case CyclePhase.TransitionToDay: totalPhaseTime = transitionDuration; break;
         }
+        totalPhaseTime = Mathf.Max(0.01f, totalPhaseTime);
         phaseTimer = totalPhaseTime;
+
+        UpdateSunIntensity();
+
+        if (previousPhase != currentPhase || forceEvent)
+        {
+            if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
+            OnPhaseChanged?.Invoke(currentPhase);
+        }
+    }
+
+    private void UpdateSunIntensity()
+    {
+        if (totalPhaseTime <= 0) return;
+        float progress = 1f - Mathf.Clamp01(phaseTimer / totalPhaseTime);
+        switch (currentPhase)
+        {
+            case CyclePhase.Day: sunIntensity = 1f; break;
+            case CyclePhase.TransitionToNight: sunIntensity = Mathf.Lerp(1f, 0f, transitionCurve.Evaluate(progress)); break;
+            case CyclePhase.Night: sunIntensity = 0f; break;
+            case CyclePhase.TransitionToDay: sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(progress)); break;
+        }
+        sunIntensity = Mathf.Clamp01(sunIntensity);
     }
 
     private void UpdateFadeSprite()
     {
         if (fadeSprite != null)
         {
-            float alpha = Mathf.Lerp(minAlpha, maxAlpha, sunIntensity);
-            Color c = fadeSprite.color;
-            c.a = alpha;
-            fadeSprite.color = c;
+            float alpha = Mathf.Lerp(maxAlpha, minAlpha, sunIntensity);
+            Color c = fadeSprite.color; c.a = alpha; fadeSprite.color = c;
         }
     }
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1612,458 +1648,147 @@ public class AnimalLibrary : ScriptableObject
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\AnimalController.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Ecosystem/Core/AnimalController.cs
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro; // <<< ADDED THIS using statement for TextMeshPro
+using TMPro;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(SortableEntity))]
+[RequireComponent(typeof(Collider2D))]
 public class AnimalController : MonoBehaviour
 {
-    // References set by FaunaManager or Initialize
-    private AnimalDefinition definition;
-    private AnimalDiet animalDiet;
+    // --- Fields --- (No changes)
+    private AnimalDefinition definition; private AnimalDiet animalDiet;
+    [Header("Optional Features")] public AnimalThoughtLibrary thoughtLibrary; public GameObject thoughtBubblePrefab; public Transform bubbleSpawnTransform; public Transform poopSpawnPoint; public List<GameObject> poopPrefabs; public Animator animator;
+    [Header("UI References")] [SerializeField] private TextMeshProUGUI hpText;
+    [Header("Behavior Tuning")] public float searchRadius = 5f; public float eatDistance = 0.5f; public float eatDuration = 1.5f; [Range(0f, 1f)] public float wanderPauseChance = 0.3f; public float wanderMinMoveDuration = 1f; public float wanderMaxMoveDuration = 3f; public float wanderMinPauseDuration = 0.5f; public float wanderMaxPauseDuration = 2f; public float minPoopDelay = 5f; public float maxPoopDelay = 10f; public float poopDuration = 1f; public float poopColorVariation = 0.1f; public float thoughtCooldownTime = 5f; [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>(); [SerializeField] private List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
-    // Inspector Assigned References (Optional Features)
-    [Header("Optional Features")]
-    public AnimalThoughtLibrary thoughtLibrary;
-    public GameObject thoughtBubblePrefab;
-    public Transform bubbleSpawnTransform;
-    public Transform poopSpawnPoint;
-    public List<GameObject> poopPrefabs;
-    public Animator animator; // Assign if using animations
+    // --- Internal State --- (No changes)
+    private float currentHealth; private float currentHunger; private GameObject currentTargetFood = null; private Vector2 moveDirection = Vector2.zero; private bool isEating = false; private float eatTimer = 0f; private bool isWanderPaused = false; private float wanderStateTimer = 0f; private bool isPooping = false; private float poopTimer = 0f; private float poopDelayTimer = 0f; private bool hasPooped = true; private float thoughtCooldownTimer = 0f;
+    private bool isSeekingScreenCenter = false;
+    private Vector2 screenCenterTarget;
 
-    [Header("UI References (Optional - Auto-Detected)")]
-    [Tooltip("Reference to the TextMeshPro component for displaying HP. Found automatically if not assigned.")]
-    [SerializeField] private TextMeshProUGUI hpText; // <<< ADDED HP TEXT REFERENCE
+    // --- Component References --- (No changes)
+    private Rigidbody2D rb; private SpriteRenderer spriteRenderer; private Collider2D animalCollider;
 
-    [Header("Behavior Tuning")]
-    public float searchRadius = 5f;
-    public float eatDistance = 0.5f;
-    public float eatDuration = 1.5f;
-    [Range(0f, 1f)] public float wanderPauseChance = 0.3f;
-    public float wanderMinMoveDuration = 1f;
-    public float wanderMaxMoveDuration = 3f;
-    public float wanderMinPauseDuration = 0.5f;
-    public float wanderMaxPauseDuration = 2f;
-    public float minPoopDelay = 5f;
-    public float maxPoopDelay = 10f;
-    public float poopDuration = 1f;
-    public float poopColorVariation = 0.1f;
-    public float thoughtCooldownTime = 5f;
-    
-    [Tooltip("Which Scent Definitions attract this animal (e.g., towards food, mates).")]
-    [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>(); // <<< ADDED
-    [Tooltip("Which Scent Definitions repel this animal (e.g., from predators, danger).")]
-    [SerializeField] private List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
+    // --- Movement Bounds (Now Shifted Padded Screen Bounds) ---
+    private Vector2 minBounds; private Vector2 maxBounds;
 
+    // --- Public Accessors --- (No changes)
+    public float CurrentHealth => currentHealth; public string SpeciesName => definition ? definition.animalName : "Uninitialized";
 
-    // --- Internal State ---
-    private float currentHealth;
-    private float currentHunger;
-    private GameObject currentTargetFood = null;
-    private Vector2 moveDirection = Vector2.zero;
-    private bool isEating = false;
-    private float eatTimer = 0f;
-    private bool isWanderPaused = false;
-    private float wanderStateTimer = 0f;
-    private bool isPooping = false;
-    private float poopTimer = 0f;
-    private float poopDelayTimer = 0f;
-    private bool hasPooped = true;
-    private float thoughtCooldownTimer = 0f;
-
-    // --- Component References ---
-    private Rigidbody2D rb;
-    private SpriteRenderer spriteRenderer;
-
-    // --- Movement Bounds ---
-    private Vector2 minBounds;
-    private Vector2 maxBounds;
-
-    // --- Public Accessors ---
-    public float CurrentHealth => currentHealth;
-    public string SpeciesName => definition ? definition.animalName : "Uninitialized";
-
-
-    /// <summary>
-    /// Initializes the Animal Controller. Called by FaunaManager.
-    /// </summary>
-    public void Initialize(AnimalDefinition def, Vector2 minB, Vector2 maxB)
+    // --- Initialize --- (MODIFIED center calculation only)
+    public void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false)
     {
-        definition = def;
-        if (definition == null) {
-            Debug.LogError($"[{gameObject.name}] Null definition provided!", gameObject);
-            Destroy(gameObject); return;
+        definition = def; if (definition == null) { Destroy(gameObject); return; }
+        animalDiet = def.diet; if (animalDiet == null) { enabled = false; return; }
+        rb = GetComponent<Rigidbody2D>(); spriteRenderer = GetComponentInChildren<SpriteRenderer>(); animalCollider = GetComponent<Collider2D>();
+        if (animalCollider == null) { Debug.LogError($"[{gameObject.name}] Missing Collider2D!", gameObject); enabled = false; return; }
+
+        currentHealth = definition.maxHealth; currentHunger = 0f; hasPooped = true; poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
+
+        // Store the SHIFTED bounds received from FaunaManager
+        minBounds = shiftedMinBounds;
+        maxBounds = shiftedMaxBounds;
+        // Calculate the target center based on the SHIFTED bounds
+        screenCenterTarget = (minBounds + maxBounds) / 2f;
+
+        isSeekingScreenCenter = spawnedOffscreen;
+        if (isSeekingScreenCenter)
+        {
+            // Debug now shows the shifted bounds and target
+            if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name} Initialize] Offscreen spawn. Seeking SHIFTED center ({screenCenterTarget}). SHIFTED Bounds: min{minBounds}, max{maxBounds}", gameObject);
+            moveDirection = (screenCenterTarget - (Vector2)transform.position).normalized;
+            if (moveDirection == Vector2.zero) moveDirection = Random.insideUnitCircle.normalized;
         }
-
-        animalDiet = def.diet;
-        if (animalDiet == null) {
-            Debug.LogError($"[{gameObject.name}] AnimalDefinition '{def.name}' missing required Diet!", gameObject);
-            enabled = false; // Disable controller
-            return;
-        }
-
-        // Get Components
-        rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>(); // Allows sprite to be child
-        // Animator is assigned via inspector if used
-
-        // Set Initial State
-        currentHealth = definition.maxHealth; // Use maxHealth from definition
-        currentHunger = 0f; // Start not hungry
-        hasPooped = true;
-        poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
-        minBounds = minB;
-        maxBounds = maxB;
-
-        EnsureHpTextReference(); // <<< CALL METHOD TO FIND HP TEXT
-        UpdateHpText(); // <<< CALL METHOD TO SET INITIAL HP TEXT
-
-        if (spriteRenderer == null) {
-             Debug.LogWarning($"[{gameObject.name}] No SpriteRenderer found in children.", gameObject);
-        }
+        EnsureHpTextReference(); UpdateHpText(); if (spriteRenderer == null) { /* Warning */ }
     }
 
+    // --- Update --- (MODIFIED check, uses shifted bounds)
     void Update()
     {
-        if (!enabled) return; // Do nothing if not initialized correctly
+        if (!enabled || rb == null) return;
 
-        UpdateHunger(); // This now calls UpdateHpText if starvation happens
-        HandlePooping();
-        UpdateThoughts();
-
-        if (isEating) {
-            HandleEating();
-            moveDirection = Vector2.zero;
-        } else if (isPooping) {
-            // Pooping state/timer handled in HandlePooping
-            moveDirection = Vector2.zero;
-        } else {
-            DecideNextAction(); // Decide whether to wander or seek food
-        }
-
-        FlipSpriteBasedOnDirection();
-        UpdateAnimationState();
-    }
-
-    void FixedUpdate()
-    {
-        // Apply movement if applicable
-        if (rb != null && !isEating && !isPooping && moveDirection != Vector2.zero)
+        if (isSeekingScreenCenter)
         {
             Vector2 currentPos = rb.position;
-            // Use normalized direction to ensure consistent speed
+            // Check if center is within the SHIFTED padded bounds
+            bool centerWithinBounds =
+                currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
+                currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
+
+            if (centerWithinBounds)
+            {
+                if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name} Update] Center reached SHIFTED bounds! Pos: {currentPos}. MinB: {minBounds}, MaxB: {maxBounds}. Switching to normal AI.", gameObject);
+                isSeekingScreenCenter = false;
+                moveDirection = Vector2.zero;
+            }
+            else
+            {
+                // Seek the SHIFTED center target
+                moveDirection = (screenCenterTarget - currentPos).normalized;
+                 if (moveDirection == Vector2.zero) moveDirection = Random.insideUnitCircle.normalized;
+                FlipSpriteBasedOnDirection(); UpdateAnimationState();
+                return; // Skip normal AI
+            }
+        }
+
+        // Normal AI Logic
+        UpdateHunger(); HandlePooping(); UpdateThoughts();
+        if (isEating) { HandleEating(); moveDirection = Vector2.zero; }
+        else if (isPooping) { moveDirection = Vector2.zero; }
+        else { DecideNextAction(); }
+
+        FlipSpriteBasedOnDirection(); UpdateAnimationState();
+    }
+
+    // --- FixedUpdate --- (Uses shifted bounds for clamping)
+    void FixedUpdate()
+    {
+        if (rb == null) return;
+        if (!isEating && !isPooping && moveDirection != Vector2.zero)
+        {
+            Vector2 currentPos = rb.position;
             Vector2 desiredMove = moveDirection.normalized * definition.movementSpeed * Time.fixedDeltaTime;
-            Vector2 newPos = currentPos + desiredMove;
+            Vector2 nextPos = currentPos + desiredMove;
 
-            // Clamp position
-            newPos.x = Mathf.Clamp(newPos.x, minBounds.x, maxBounds.x);
-            newPos.y = Mathf.Clamp(newPos.y, minBounds.y, maxBounds.y);
-
-            rb.MovePosition(newPos);
-        }
-    }
-
-    // --- State Update Methods ---
-
-    void UpdateHunger()
-    {
-        currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime;
-        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
-
-        // Removed starvation logic for simplicity, but keep structure
-        // if (currentHunger >= animalDiet.maxHunger) {
-        //     ApplyStarvationDamage(); // Check for starvation
-        // }
-    }
-
-    // Placeholder for potential future starvation damage
-    void ApplyStarvationDamage()
-    {
-        // This method would be called if starvation logic is re-added
-        // currentHealth -= animalDiet.starvationDamageRate * Time.deltaTime;
-        UpdateHpText(); // <<< UPDATE HP TEXT AFTER TAKING DAMAGE (important if starvation added back)
-        // if (currentHealth <= 0)
-        // {
-        //     Die(CauseOfDeath.Starvation); // Use existing Die method
-        // }
-    }
-
-    void HandlePooping()
-    {
-        if (!isEating && !hasPooped) {
-            poopDelayTimer -= Time.deltaTime;
-            if (!isPooping && poopDelayTimer <= 0f) { StartPooping(); }
-            if (isPooping) {
-                poopTimer -= Time.deltaTime;
-                if (poopTimer <= 0f) { FinishPooping(); }
+            if (!isSeekingScreenCenter) // Clamp only when NOT seeking
+            {
+                 // Clamp the CENTER position using the SHIFTED bounds
+                 nextPos.x = Mathf.Clamp(nextPos.x, minBounds.x, maxBounds.x);
+                 nextPos.y = Mathf.Clamp(nextPos.y, minBounds.y, maxBounds.y);
             }
+            rb.MovePosition(nextPos);
         }
     }
 
-     void UpdateThoughts() {
-         if (thoughtCooldownTimer > 0) { thoughtCooldownTimer -= Time.deltaTime; }
-     }
-
-
-    // --- Action Execution Methods ---
-
-    void DecideNextAction()
-    {
-        if (currentHunger >= animalDiet.hungerThreshold) {
-            SeekFood();
-        } else {
-            Wander();
-            currentTargetFood = null; // Lose target if not hungry
-        }
-    }
-
-    void SeekFood()
-    {
-        if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
-
-        // Check if target is still valid (exists and has FoodItem)
-        bool targetValid = currentTargetFood != null && currentTargetFood.activeInHierarchy && currentTargetFood.GetComponent<FoodItem>() != null;
-
-        if (!targetValid) {
-            currentTargetFood = FindNearestFood();
-        }
-
-        if (currentTargetFood != null) {
-            MoveTowardFood(currentTargetFood);
-        } else {
-            Wander(); // Can't find food
-        }
-    }
-
-    GameObject FindNearestFood()
-    {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, searchRadius);
-        return animalDiet.FindBestFood(colliders, transform.position); // Use Diet's logic
-    }
-
-    void MoveTowardFood(GameObject foodObj)
-    {
-        if (foodObj == null) return;
-        float distance = Vector2.Distance(transform.position, foodObj.transform.position);
-
-        if (distance <= eatDistance) {
-            StartEating();
-        } else {
-            moveDirection = (foodObj.transform.position - transform.position).normalized;
-            isWanderPaused = false; // Ensure not paused while seeking food
-            wanderStateTimer = 0f;
-        }
-    }
-
-    void StartEating()
-    {
-        isEating = true;
-        eatTimer = eatDuration;
-        moveDirection = Vector2.zero;
-        if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
-    }
-
-    void HandleEating()
-    {
-        eatTimer -= Time.deltaTime;
-        if (eatTimer <= 0f) {
-            isEating = false;
-            FinishEatingAction(); // Renamed for clarity
-        }
-    }
-
-    // Called when the eat timer finishes
-    void FinishEatingAction()
-    {
-        if (currentTargetFood == null) return; // Target disappeared mid-eat
-
-        FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>();
-        if (foodItem != null && foodItem.foodType != null)
-        {
-            // 1. Get Satiation
-            float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType);
-
-            // 2. Apply Satiation
-            currentHunger -= satiationGain;
-            currentHunger = Mathf.Max(0f, currentHunger);
-
-            // 3. Destroy the Food GameObject
-            Destroy(currentTargetFood);
-
-            // 4. Reset Poop Timer
-            hasPooped = false;
-            poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
-
-            // 5. Clear Target Reference
-            currentTargetFood = null;
-        }
-         else {
-             // Target was invalid (missing FoodItem/FoodType), clear it
-             // Debug.LogWarning($"[{gameObject.name}] Tried to finish eating invalid target '{currentTargetFood?.name}'. Clearing target.", currentTargetFood);
-             currentTargetFood = null;
-         }
-    }
-
-    void StartPooping()
-    {
-        isPooping = true;
-        poopTimer = poopDuration;
-        moveDirection = Vector2.zero;
-        if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
-    }
-
-    void FinishPooping()
-    {
-        SpawnPoop();
-        isPooping = false;
-        hasPooped = true;
-    }
-
-    void SpawnPoop()
-    {
-        if (poopPrefabs == null || poopPrefabs.Count == 0) return;
-
-        int index = Random.Range(0, poopPrefabs.Count);
-        GameObject prefab = poopPrefabs[index];
-        if (prefab == null) return;
-
-        Transform spawnT = poopSpawnPoint ? poopSpawnPoint : transform;
-        GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity);
-
-        // Apply visual variations
-        SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
-        if (sr != null) {
-            sr.flipX = Random.value > 0.5f;
-            Color c = sr.color;
-            float v = poopColorVariation;
-            sr.color = new Color(
-                Mathf.Clamp01(c.r + Random.Range(-v, v)),
-                Mathf.Clamp01(c.g + Random.Range(-v, v)),
-                Mathf.Clamp01(c.b + Random.Range(-v, v)),
-                c.a);
-        }
-
-        // Ensure PoopController exists and initialize
-        PoopController pc = poopObj.GetComponent<PoopController>() ?? poopObj.AddComponent<PoopController>();
-        pc.Initialize();
-    }
-
-    void Wander()
-    {
-        if (wanderStateTimer <= 0f) {
-            if (isWanderPaused) {
-                // Finish pause, start moving
-                isWanderPaused = false;
-                moveDirection = Random.insideUnitCircle.normalized;
-                wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
-            } else {
-                // Finish moving, decide to pause or change direction
-                if (Random.value < wanderPauseChance) {
-                    isWanderPaused = true;
-                    moveDirection = Vector2.zero;
-                    wanderStateTimer = Random.Range(wanderMinPauseDuration, wanderMaxPauseDuration);
-                } else {
-                    moveDirection = Random.insideUnitCircle.normalized;
-                    wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
-                }
-            }
-        } else {
-            wanderStateTimer -= Time.deltaTime;
-        }
-    }
-
-
-    // --- Movement & Visuals ---
-
-    void FlipSpriteBasedOnDirection()
-    {
-        if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f) {
-            spriteRenderer.flipX = moveDirection.x < 0;
-        }
-    }
-
-    void UpdateAnimationState()
-    {
-        if (animator == null) return;
-        bool isMoving = !isEating && !isPooping && moveDirection.sqrMagnitude > 0.01f;
-        // Use parameter names matching your Animator controller
-        animator.SetBool("IsMoving", isMoving);
-        animator.SetBool("IsEating", isEating);
-        // animator.SetBool("IsPooping", isPooping); // Add if needed
-    }
-
-    // --- Thought Bubbles ---
-
-    bool CanShowThought() {
-        return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f;
-    }
-
-    void ShowThought(ThoughtTrigger trigger)
-    {
-        // Simplified - assumes CanShowThought() was checked
-        if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return; // Added null check
-
-        var entry = thoughtLibrary.allThoughts.FirstOrDefault(t => t != null && t.speciesName == SpeciesName && t.trigger == trigger); // Added null check for entry
-        if (entry != null && entry.lines != null && entry.lines.Count > 0) {
-            string line = entry.lines[Random.Range(0, entry.lines.Count)];
-            Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
-            GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT);
-            bubbleGO.transform.localPosition = Vector3.zero;
-            ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>();
-            if (bubble) {
-                bubble.Initialize(line, spawnT, 2f); // 2s default life
-                thoughtCooldownTimer = thoughtCooldownTime;
-            } else {
-                Destroy(bubbleGO);
-            }
-        }
-    }
-
-     // --- Death Handling --- (Simplified, no starvation damage)
-     public enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
-
-     private void Die(CauseOfDeath cause) // Keep structure in case starvation is added back
-     {
-          Debug.Log($"[{SpeciesName} on {gameObject.name}] Died due to {cause}.", gameObject);
-          // Add meat spawning logic here later if needed
-          Destroy(gameObject);
-     }
-
-    // --- Helper Methods ---
-    public bool SpeciesNameEquals(string otherSpeciesName) {
-         return definition != null && definition.animalName == otherSpeciesName;
-     }
-
-    /// <summary>
-    /// Ensures the hpText reference is set, finding it if necessary.
-    /// </summary>
-    private void EnsureHpTextReference() // <<< NEW METHOD
-    {
-        // If not assigned in inspector, try to find it in children
-        if (hpText == null)
-        {
-            hpText = GetComponentInChildren<TextMeshProUGUI>(true); // Include inactive
-
-            if (hpText == null) {
-                 // This warning is okay, HP text is optional
-                 // Debug.LogWarning($"[{gameObject.name}] Could not automatically find TextMeshProUGUI for HP display.", gameObject);
-            }
-        }
-    }
-
-    /// <summary>
-    /// Updates the HP text display.
-    /// </summary>
-    private void UpdateHpText() // <<< NEW METHOD
-    {
-        if (hpText == null || definition == null) return; // Exit if no text component or definition
-
-        // Format the text (using FloorToInt for cleaner display, adjust if floats needed)
-        hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)} / {Mathf.FloorToInt(definition.maxHealth)}";
-    }
+    // --- Other methods (Unchanged) ---
+    void UpdateHunger() { /* ... */ currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime; currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger); }
+    void ApplyStarvationDamage() { /* ... */ UpdateHpText(); }
+    void HandlePooping() { /* ... */ if (!isEating && !hasPooped) { poopDelayTimer -= Time.deltaTime; if (!isPooping && poopDelayTimer <= 0f) { StartPooping(); } if (isPooping) { poopTimer -= Time.deltaTime; if (poopTimer <= 0f) { FinishPooping(); } } } }
+    void UpdateThoughts() { /* ... */ if (thoughtCooldownTimer > 0) { thoughtCooldownTimer -= Time.deltaTime; } }
+    void DecideNextAction() { /* ... */ if (currentHunger >= animalDiet.hungerThreshold) { SeekFood(); } else { Wander(); currentTargetFood = null; } }
+    void SeekFood() { /* ... */ if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry); bool targetValid = currentTargetFood != null && currentTargetFood.activeInHierarchy && currentTargetFood.GetComponent<FoodItem>() != null; if (!targetValid) { currentTargetFood = FindNearestFood(); } if (currentTargetFood != null) { MoveTowardFood(currentTargetFood); } else { Wander(); } }
+    GameObject FindNearestFood() { /* ... */ Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, searchRadius); return animalDiet.FindBestFood(colliders, transform.position); }
+    void MoveTowardFood(GameObject foodObj) { /* ... */ if (foodObj == null) return; float distance = Vector2.Distance(transform.position, foodObj.transform.position); if (distance <= eatDistance) { StartEating(); } else { moveDirection = (foodObj.transform.position - transform.position).normalized; isWanderPaused = false; wanderStateTimer = 0f; } }
+    void StartEating() { /* ... */ isEating = true; eatTimer = eatDuration; moveDirection = Vector2.zero; if (CanShowThought()) ShowThought(ThoughtTrigger.Eating); }
+    void HandleEating() { /* ... */ eatTimer -= Time.deltaTime; if (eatTimer <= 0f) { isEating = false; FinishEatingAction(); } }
+    void FinishEatingAction() { /* ... */ if (currentTargetFood == null) return; FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>(); if (foodItem != null && foodItem.foodType != null) { float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType); currentHunger -= satiationGain; currentHunger = Mathf.Max(0f, currentHunger); Destroy(currentTargetFood); hasPooped = false; poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay); currentTargetFood = null; } else { currentTargetFood = null; } }
+    void StartPooping() { /* ... */ isPooping = true; poopTimer = poopDuration; moveDirection = Vector2.zero; if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping); }
+    void FinishPooping() { /* ... */ SpawnPoop(); isPooping = false; hasPooped = true; }
+    void SpawnPoop() { /* ... */ if (poopPrefabs == null || poopPrefabs.Count == 0) return; int index = Random.Range(0, poopPrefabs.Count); GameObject prefab = poopPrefabs[index]; if (prefab == null) return; Transform spawnT = poopSpawnPoint ? poopSpawnPoint : transform; GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity); SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>(); if (sr != null) { sr.flipX = Random.value > 0.5f; Color c = sr.color; float v = poopColorVariation; sr.color = new Color(Mathf.Clamp01(c.r + Random.Range(-v, v)), Mathf.Clamp01(c.g + Random.Range(-v, v)), Mathf.Clamp01(c.b + Random.Range(-v, v)), c.a); } PoopController pc = poopObj.GetComponent<PoopController>() ?? poopObj.AddComponent<PoopController>(); pc.Initialize(); }
+    void Wander() { /* ... */ if (wanderStateTimer <= 0f) { if (isWanderPaused) { isWanderPaused = false; moveDirection = Random.insideUnitCircle.normalized; wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration); } else { if (Random.value < wanderPauseChance) { isWanderPaused = true; moveDirection = Vector2.zero; wanderStateTimer = Random.Range(wanderMinPauseDuration, wanderMaxPauseDuration); } else { moveDirection = Random.insideUnitCircle.normalized; wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration); } } } else { wanderStateTimer -= Time.deltaTime; } }
+    void FlipSpriteBasedOnDirection() { /* ... */ if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f) { spriteRenderer.flipX = moveDirection.x < 0; } }
+    void UpdateAnimationState() { /* ... */ if (animator == null) return; bool isMoving = !isEating && !isPooping && moveDirection.sqrMagnitude > 0.01f; animator.SetBool("IsMoving", isMoving); animator.SetBool("IsEating", isEating); }
+    bool CanShowThought() { /* ... */ return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f; }
+    void ShowThought(ThoughtTrigger trigger) { /* ... */ if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return; var entry = thoughtLibrary.allThoughts.FirstOrDefault(t => t != null && t.speciesName == SpeciesName && t.trigger == trigger); if (entry != null && entry.lines != null && entry.lines.Count > 0) { string line = entry.lines[Random.Range(0, entry.lines.Count)]; Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform; GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT); bubbleGO.transform.localPosition = Vector3.zero; ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>(); if (bubble) { bubble.Initialize(line, spawnT, 2f); thoughtCooldownTimer = thoughtCooldownTime; } else { Destroy(bubbleGO); } } }
+    public enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
+    private void Die(CauseOfDeath cause) { /* ... */ Debug.Log($"[{SpeciesName} died: {cause}]", gameObject); Destroy(gameObject); }
+    public bool SpeciesNameEquals(string other) { /* ... */ return definition != null && definition.animalName == other; }
+    private void EnsureHpTextReference() { /* ... */ if (hpText == null) { hpText = GetComponentInChildren<TextMeshProUGUI>(true); } }
+    private void UpdateHpText() { /* ... */ if (hpText == null || definition == null) return; hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)}/{Mathf.FloorToInt(definition.maxHealth)}"; }
 }
 
 
@@ -2155,139 +1880,166 @@ public class EcosystemManager : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\FaunaManager.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Ecosystem/Core/FaunaManager.cs
+using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class FaunaManager : MonoBehaviour
 {
-    [Header("Animal Spawn Settings")]
-    public List<AnimalSpawnData> animalsToSpawn;
-    public float globalSpawnCooldown = 5f;
-    public float spawnRadius = 3f;
-    public bool continuousSpawn = true;
-    public Vector2 spawnCenter = Vector2.zero;
+    [Header("Spawning Area (Global)")]
+    [SerializeField] private Vector2 spawnCenter = Vector2.zero;
+    [SerializeField] private Vector2 spawnAreaSize = new Vector2(20f, 10f);
 
-    [Header("Ecosystem Parent Settings")]
-    public Transform ecosystemParent; // e.g., "SpawnedEcosystem/Animals"
+    [Header("General Settings")]
+    [SerializeField] private Transform ecosystemParent;
+    [Tooltip("How far INSIDE the screen edge the effective animal movement bounds are.")]
+    [SerializeField][Min(0f)] private float screenBoundsPadding = 0.5f;
+    [Tooltip("How far OUTSIDE the screen edge the 'Offscreen' spawn area starts.")]
+    [SerializeField][Min(0f)] private float offscreenSpawnMargin = 2.0f;
 
-    [Header("Global Movement Bounds for Animals")]
-    public Vector2 animalMinBounds = new Vector2(-10f, -5f);
-    public Vector2 animalMaxBounds = new Vector2(10f, 5f);
+    [Header("Debugging")]
+    [Tooltip("Show gizmos visualizing the Margin (Red) and Padding (Green) bounds.")]
+    [SerializeField] private bool showBoundsGizmos = false;
 
-    private void Start()
+    [Header("Functional Bounds Offset")] // <<< UPDATED HEADER NAME
+    [Tooltip("Functional horizontal shift for gameplay bounds and spawning relative to camera view.")] // <<< UPDATED TOOLTIP
+    [SerializeField][Range(-10f, 10f)] private float boundsOffsetX = 0f; // <<< RENAMED FIELD
+    [Tooltip("Functional vertical shift for gameplay bounds and spawning relative to camera view.")] // <<< UPDATED TOOLTIP
+    [SerializeField][Range(-10f, 10f)] private float boundsOffsetY = 0f; // <<< RENAMED FIELD
+
+    // --- Runtime State ---
+    private List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
+    private Camera mainCamera;
+
+    // --- Start, InitializeManager, Update, ExecuteSpawnWave, StopAllSpawnCoroutines, SpawnWaveEntryCoroutine (Unchanged) ---
+    void Start() { InitializeManager(); }
+    void InitializeManager() { activeSpawnCoroutines.Clear(); if (WaveManager.Instance != null) { mainCamera = WaveManager.Instance.GetMainCamera(); } if (mainCamera == null) { mainCamera = Camera.main; if (mainCamera == null) Debug.LogError("[FaunaManager] Cannot find Main Camera!", this); } if (ecosystemParent == null) { ecosystemParent = transform; Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned to self.", this); } }
+    void Update() { /* ... */ }
+    public void ExecuteSpawnWave(WaveDefinition waveDef) { if (waveDef == null) { Debug.LogError("[FaunaManager] ExecuteSpawnWave null WaveDefinition!", this); return; } if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; } Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'"); foreach (WaveSpawnEntry entry in waveDef.spawnEntries) { if (entry.animalDefinition == null) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', null AnimalDefinition."); continue; } if (entry.spawnCount <= 0) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', Spawn Count <= 0."); continue; } WaveSpawnEntry currentEntry = entry; Coroutine spawnCoroutine = StartCoroutine(SpawnWaveEntryCoroutine(currentEntry)); activeSpawnCoroutines.Add(spawnCoroutine); } Debug.Log($"[FaunaManager] Started {activeSpawnCoroutines.Count} coroutine(s) for '{waveDef.waveName}'."); }
+    public void StopAllSpawnCoroutines() { if (activeSpawnCoroutines.Count > 0) { Debug.Log("[FaunaManager] Stopping all spawn coroutines."); foreach (Coroutine co in activeSpawnCoroutines) { if (co != null) StopCoroutine(co); } activeSpawnCoroutines.Clear(); } }
+     private IEnumerator SpawnWaveEntryCoroutine(WaveSpawnEntry entry) { if (entry.delayAfterSpawnTime > 0) { yield return new WaitForSeconds(entry.delayAfterSpawnTime); } for (int i = 0; i < entry.spawnCount; i++) { if (WaveManager.Instance != null && !WaveManager.Instance.IsRunActive) { Debug.Log($"[FaunaManager] Halting spawn '{entry.description}', run no longer active."); break; } Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius); bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen; GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen); if (entry.spawnInterval > 0 && i < entry.spawnCount - 1) { yield return new WaitForSeconds(entry.spawnInterval); } } if (activeSpawnCoroutines.Count > 0) activeSpawnCoroutines.RemoveAt(0); } // Simplistic removal
+
+    /// <summary>
+    /// Calculates a spawn position based on the specified type, applying functional offset.
+    /// </summary>
+    private Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius) // <<< MODIFIED
     {
-        // Initialize each spawn entry's timer to its effective cooldown.
-        foreach (var spawnData in animalsToSpawn)
+        if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera!"); return spawnCenter; }
+
+        // --- Calculate the FUNCTIONAL offset ---
+        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+        // --- Apply offset to camera position for ALL calculations below ---
+        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+
+        Vector2 spawnPos = Vector2.zero;
+        float camHeight = mainCamera.orthographicSize * 2f;
+        float camWidth = camHeight * mainCamera.aspect;
+
+        switch (locationType)
         {
-            if (spawnData.spawnRateMultiplier > 0f)
-                spawnData.spawnTimer = globalSpawnCooldown / spawnData.spawnRateMultiplier;
-            else
-                spawnData.spawnTimer = Mathf.Infinity; // won't spawn if 0
+            case WaveSpawnLocationType.Offscreen:
+                // Use effectiveCamPos for calculations
+                float marginMinX = effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin;
+                float marginMaxX = effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin;
+                float marginMinY = effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin;
+                float marginMaxY = effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin;
+                float extraOffset = 0.1f; // To spawn strictly outside the line
+                int edge = Random.Range(0, 4);
+                if (edge == 0) { spawnPos.x = marginMinX - extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
+                else if (edge == 1) { spawnPos.x = marginMaxX + extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
+                else if (edge == 2) { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMinY - extraOffset; }
+                else { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMaxY + extraOffset; }
+                break;
+
+            case WaveSpawnLocationType.RandomNearPlayer:
+                 Transform playerT = FindPlayerTransform();
+                 if (playerT != null) {
+                    // Spawn relative to player, still respecting the overall bounds offset implicitly
+                    spawnPos = (Vector2)playerT.position + Random.insideUnitCircle * radius;
+                 } else {
+                     Debug.LogWarning("[FaunaManager] Player not found for RandomNearPlayer. Falling back to Global.");
+                     goto case WaveSpawnLocationType.GlobalSpawnArea; // Fallthrough
+                 }
+                 break;
+
+            case WaveSpawnLocationType.GlobalSpawnArea:
+            default:
+                // Use effectiveCamPos OR a fixed world space center? Let's stick to camera relative for now.
+                // If you want truly fixed global spawn, use spawnCenter directly.
+                // This uses the *shifted* camera center as the basis for the global area.
+                spawnPos.x = effectiveCamPos.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
+                spawnPos.y = effectiveCamPos.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
+                break;
         }
+        return spawnPos;
     }
 
-        private void Update()
+    private Transform FindPlayerTransform() { /* Unchanged */ Transform pT = null; if (WaveManager.Instance != null) { var pI = FindObjectOfType<PlayerTileInteractor>(); if (pI != null) pT = pI.transform; } if (pT == null) { GameObject pO = GameObject.FindGameObjectWithTag("Player"); if (pO != null) pT = pO.transform; } return pT; }
+
+    /// <summary>
+    /// Instantiates and initializes an animal, passing SHIFTED screen bounds.
+    /// </summary>
+    private GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn) // <<< MODIFIED
     {
-        if (continuousSpawn)
-        {
-            foreach (var spawnData in animalsToSpawn)
-            {
-                if (spawnData.spawnRateMultiplier <= 0f)
-                    continue;
+        if (definition == null || definition.prefab == null) { /* Error Log */ return null; }
+        if (mainCamera == null) { /* Error Log */ return null; }
 
-                // Check current count for this species.
-                int currentCount = 0;
-                if (ecosystemParent != null && spawnData.animalDefinition != null && !string.IsNullOrEmpty(spawnData.animalDefinition.animalName))
-                {
-                    // Try finding the dedicated parent first (more efficient if structure is maintained)
-                    Transform speciesParent = ecosystemParent.Find(spawnData.animalDefinition.animalName);
-                    if (speciesParent != null)
-                        currentCount = speciesParent.childCount;
-                    else {
-                        // Fallback if species parent doesn't exist yet, count all matching animals
-                        // Use FindObjectsByType for modern Unity versions - faster as we don't need sorting
-                        AnimalController[] allAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-                        currentCount = 0; // Reset count before iterating through found animals
-                        foreach (var a in allAnimals)
-                        {
-                            if (a != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName))
-                                currentCount++;
-                        }
-                    }
-                }
-                else // Fallback if no ecosystem parent or definition name
-                {
-                     // Use FindObjectsByType for modern Unity versions - faster as we don't need sorting
-                    AnimalController[] allAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None); // <--- THIS LINE IS UPDATED
-                    currentCount = 0;
-                    foreach (var a in allAnimals)
-                    {
-                        if (a != null && spawnData.animalDefinition != null && a.SpeciesNameEquals(spawnData.animalDefinition.animalName)) // Added null check for spawnData.animalDefinition
-                            currentCount++;
-                    }
-                }
-                // If maximum is set (>0) and current count is reached, skip spawn.
-                if (spawnData.maximumSpawned > 0 && currentCount >= spawnData.maximumSpawned)
-                    continue;
+        // --- Calculate SHIFTED Padded Screen Bounds ---
+        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
 
-                // Decrement spawn timer and spawn if ready.
-                spawnData.spawnTimer -= Time.deltaTime;
-                if (spawnData.spawnTimer <= 0f)
-                {
-                    float effectiveCooldown = globalSpawnCooldown / spawnData.spawnRateMultiplier;
-                    Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
-                    SpawnAnimal(spawnData.animalDefinition, spawnCenter + randomOffset);
-                    // Reset timer only AFTER successful spawn attempt potentially
-                    spawnData.spawnTimer = effectiveCooldown > 0 ? effectiveCooldown : float.PositiveInfinity; // Prevent division by zero/negative cooldowns
-                }
-            }
-        }
-    }
+        Vector2 minPaddedBounds, maxPaddedBounds;
+        float camHeight = mainCamera.orthographicSize * 2f;
+        float camWidth = camHeight * mainCamera.aspect;
 
-    public GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position)
-    {
-        if (definition == null || definition.prefab == null)
-        {
-            Debug.LogWarning("[FaunaManager] Invalid animal definition or missing prefab!");
-            return null;
-        }
+        minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
+        maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
+        minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
+        maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
+        // ---------------------------------------------
 
         GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
 
-        // Parent the animal under ecosystemParent with species grouping.
-        if (ecosystemParent != null)
-        {
-            Transform speciesParent = ecosystemParent;
-            if (!string.IsNullOrEmpty(definition.animalName))
-            {
-                speciesParent = ecosystemParent.Find(definition.animalName);
-                if (speciesParent == null)
-                {
-                    GameObject subParent = new GameObject(definition.animalName);
-                    subParent.transform.SetParent(ecosystemParent);
-                    speciesParent = subParent.transform;
-                }
-            }
-            animalObj.transform.SetParent(speciesParent);
-        }
+        // Parenting (unchanged)
+        if (ecosystemParent != null) { Transform sP = ecosystemParent; if (!string.IsNullOrEmpty(definition.animalName)) { sP = ecosystemParent.Find(definition.animalName); if (sP == null) { GameObject subP = new GameObject(definition.animalName); subP.transform.SetParent(ecosystemParent); sP = subP.transform; } } animalObj.transform.SetParent(sP); }
 
-        // Get the existing AnimalController on the prefab.
+        // Initialize Controller, passing the SHIFTED bounds
         AnimalController controller = animalObj.GetComponent<AnimalController>();
-        if (controller != null)
-        {
-            controller.Initialize(definition, animalMinBounds, animalMaxBounds); // Pass bounds
-        }
-        else
-        {
-            Debug.LogError($"[{gameObject.name}] Animal prefab '{definition.prefab.name}' is missing the AnimalController script!", animalObj);
-            Destroy(animalObj); // Destroy if controller is missing
-            return null;
-        }
-// ... rest of parenting logic ...
+        if (controller != null) {
+            controller.Initialize(definition, minPaddedBounds, maxPaddedBounds, isOffscreenSpawn); // Pass shifted bounds
+        } else { /* Error Log & Destroy */ Destroy(animalObj); return null; }
         return animalObj;
     }
-}
 
+    /// <summary>
+    /// Draws debug rectangles applying the functional offset.
+    /// </summary>
+    void OnDrawGizmos() // <<< MODIFIED to use offset
+    {
+        if (!showBoundsGizmos || mainCamera == null) return;
+
+        // --- Apply functional offset for Gizmo drawing ---
+        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+        // --------------------------------------------------
+
+        float camHeight = mainCamera.orthographicSize * 2f;
+        float camWidth = camHeight * mainCamera.aspect;
+
+        // Calculate corners using effectiveCamPos
+        Vector2 paddedMin = new Vector2(effectiveCamPos.x - camWidth / 2f + screenBoundsPadding, effectiveCamPos.y - camHeight / 2f + screenBoundsPadding);
+        Vector2 paddedMax = new Vector2(effectiveCamPos.x + camWidth / 2f - screenBoundsPadding, effectiveCamPos.y + camHeight / 2f - screenBoundsPadding);
+        DrawWireRectangleGizmo(paddedMin, paddedMax, Color.green);
+
+        Vector2 marginMin = new Vector2(effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin, effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin);
+        Vector2 marginMax = new Vector2(effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin, effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin);
+        DrawWireRectangleGizmo(marginMin, marginMax, Color.red);
+    }
+
+    void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { /* Unchanged */ Gizmos.color = color; Gizmos.DrawLine(new Vector3(min.x, min.y, 0), new Vector3(max.x, min.y, 0)); Gizmos.DrawLine(new Vector3(max.x, min.y, 0), new Vector3(max.x, max.y, 0)); Gizmos.DrawLine(new Vector3(max.x, max.y, 0), new Vector3(min.x, max.y, 0)); Gizmos.DrawLine(new Vector3(min.x, max.y, 0), new Vector3(min.x, min.y, 0)); }
+
+} // End of class
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2644,6 +2396,291 @@ public enum ThoughtTrigger
     Fleeing,
     Pooping,
     // Add more triggers as needed
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\WaveDefinition.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Core/WaveDefinition.cs
+using UnityEngine;
+using System.Collections.Generic;
+
+// Enum WaveSpawnLocationType remains the same
+public enum WaveSpawnLocationType
+{
+    GlobalSpawnArea,
+    RandomNearPlayer,
+    Offscreen
+}
+
+// Class WaveSpawnEntry remains the same
+[System.Serializable]
+public class WaveSpawnEntry
+{
+    [Tooltip("Optional description for this specific spawn group within the wave.")]
+    public string description = "Spawn Group";
+    [Tooltip("The type of animal to spawn.")]
+    public AnimalDefinition animalDefinition;
+    [Tooltip("How many of this animal to spawn in this specific entry.")]
+    [Min(1)]
+    public int spawnCount = 1;
+    [Tooltip("Delay (in seconds) AFTER the designated wave spawn time (e.g. Day 50%) before *this entry* begins spawning.")] // Clarified Tooltip
+    [Min(0)]
+    public float delayAfterSpawnTime = 0f; // Renamed from delayAfterWaveStart
+    [Tooltip("Time (in seconds) between spawning each individual animal in this entry (0 = spawn all instantly).")]
+    [Min(0)]
+    public float spawnInterval = 0.5f;
+    [Tooltip("Where these animals should spawn.")]
+    public WaveSpawnLocationType spawnLocationType = WaveSpawnLocationType.GlobalSpawnArea;
+    [Tooltip("Radius used for spawning (e.g., if Spawn Location Type is RandomNearPlayer).")]
+    [Min(0)]
+    public float spawnRadius = 5f;
+}
+
+// WaveDefinition ScriptableObject is simplified further
+[CreateAssetMenu(fileName = "Wave_", menuName = "Ecosystem/Wave Definition")]
+public class WaveDefinition : ScriptableObject
+{
+    [Header("Wave Identification")]
+    [Tooltip("Editor-only name for this wave.")]
+    public string waveName = "New Wave";
+
+    [Header("Wave Content")]
+    [Tooltip("Define the groups of animals that spawn during this wave.")]
+    public List<WaveSpawnEntry> spawnEntries = new List<WaveSpawnEntry>();
+
+    // REMOVED all timing, duration, end condition, delay fields.
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\WaveManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Managers/WaveManager.cs
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine.UI;
+
+public enum WaveManagerState
+{
+    PausedBeforeRun,     // Initial state, game logic paused
+    WaitingForSpawnTime, // Run started, waiting for correct time in cycle
+    WaveInProgress,      // Spawning triggered for this cycle, counting down day cycles
+    SequenceComplete     // All waves done
+}
+
+public class WaveManager : MonoBehaviour
+{
+    public static WaveManager Instance { get; private set; }
+
+    [Header("Core Dependencies")]
+    [SerializeField] private FaunaManager faunaManager;
+    [SerializeField] private WeatherManager weatherManager;
+    [SerializeField] private Camera mainCamera;
+
+    [Header("Wave Sequence")]
+    [SerializeField] private List<WaveDefinition> wavesSequence;
+
+    [Header("Wave Timing & Spawning (Global)")]
+    [Tooltip("How many full Day+Night cycles each wave lasts.")]
+    [SerializeField][Range(1, 10)] private int waveDurationInDayCycles = 1;
+    [Tooltip("The phase during which spawning should occur each cycle.")]
+    [SerializeField] private WeatherManager.CyclePhase spawnStartPhase = WeatherManager.CyclePhase.Day;
+    [Tooltip("The percentage progress within the Spawn Start Phase when spawning triggers (0-100).")]
+    [SerializeField][Range(0f, 100f)] private float spawnStartPercentage = 50f;
+    [SerializeField] private bool loopSequence = false;
+    [Tooltip("If checked, animals from the previous wave are destroyed when a new wave starts.")]
+    [SerializeField] private bool deletePreviousWaveAnimals = true;
+
+    [Header("UI & Feedback")]
+    [SerializeField] private TextMeshProUGUI waveStatusText;
+    [SerializeField] private Button startRunButton;
+    [SerializeField] private TextMeshProUGUI timeTrackerText;
+
+    [Header("State (Read Only)")]
+    [SerializeField] private WaveManagerState currentState = WaveManagerState.PausedBeforeRun;
+    [SerializeField] private int currentWaveIndex = -1;
+
+    // --- Runtime State ---
+    private WaveDefinition activeWaveDefinition = null;
+    private int dayCyclesRemainingForWave = 0;
+    private bool hasSpawnedThisCycle = false;
+    private bool isInitialPause = true; // <<< NEW: Flag for initial pause
+
+    // --- Public Accessors ---
+    public WaveManagerState CurrentState => currentState;
+    public int CurrentWaveNumber => currentWaveIndex + 1;
+    public int TotalWaves => wavesSequence != null ? wavesSequence.Count : 0;
+    public bool IsRunActive => currentState != WaveManagerState.PausedBeforeRun && currentState != WaveManagerState.SequenceComplete;
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+
+        // Validations (same as before)
+        if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager missing!", this);
+        if (weatherManager == null) Debug.LogError("[WaveManager] WeatherManager missing!", this);
+        if (mainCamera == null) Debug.LogError("[WaveManager] Main Camera missing!", this);
+        if (waveStatusText == null) Debug.LogWarning("[WaveManager] Wave Status Text missing.", this);
+        if (timeTrackerText == null) Debug.LogWarning("[WaveManager] Time Tracker Text missing.", this);
+        if (wavesSequence == null || wavesSequence.Count == 0) Debug.LogWarning("[WaveManager] Wave Sequence empty.", this);
+        if (startRunButton == null) Debug.LogWarning("[WaveManager] Start Run Button missing.", this);
+        else startRunButton.onClick.AddListener(TryStartRun);
+
+        // <<< SET INITIAL PAUSE >>>
+        Debug.Log("[WaveManager Awake] Setting initial Time.timeScale = 0");
+        Time.timeScale = 0f;
+        isInitialPause = true;
+        // -------------------------
+    }
+
+    void Start()
+    {
+        if (weatherManager != null) weatherManager.OnPhaseChanged += HandleWeatherPhaseChange;
+        InitializeManager(); // Sets state, updates button
+    }
+
+     void OnDestroy()
+    {
+        if (weatherManager != null) weatherManager.OnPhaseChanged -= HandleWeatherPhaseChange;
+        if (startRunButton != null) startRunButton.onClick.RemoveListener(TryStartRun);
+        // Ensure timescale is reset if manager is destroyed
+        if(isInitialPause || Time.timeScale != 1f) Time.timeScale = 1f;
+    }
+
+    void InitializeManager()
+    {
+        currentWaveIndex = -1;
+        activeWaveDefinition = null;
+        dayCyclesRemainingForWave = 0;
+        hasSpawnedThisCycle = false;
+        // Don't set timescale here anymore, Awake handles initial pause
+        SetState(WaveManagerState.PausedBeforeRun);
+    }
+
+    void Update()
+    {
+        // Always update UI if possible
+        if (weatherManager != null) UpdateTimeTrackerUI();
+
+        // Skip logic if paused initially OR dependencies missing
+        if (isInitialPause || faunaManager == null || weatherManager == null || mainCamera == null)
+        {
+            // Still need to manage button state even if paused initially
+             if (currentState == WaveManagerState.PausedBeforeRun && startRunButton != null)
+             {
+                  startRunButton.gameObject.SetActive(true);
+                  startRunButton.interactable = true;
+             }
+             return;
+        }
+
+        // State Machine Update (only runs after initial pause is over)
+        switch (currentState)
+        {
+            case WaveManagerState.WaitingForSpawnTime: Update_WaitingForSpawnTime(); break;
+            case WaveManagerState.WaveInProgress: /* Handled by event */ break;
+            case WaveManagerState.SequenceComplete: Update_IdleReady(); break;
+             // PausedBeforeRun is handled above
+        }
+    }
+
+    // --- Event Handler (HandleWeatherPhaseChange) --- (Unchanged)
+    void HandleWeatherPhaseChange(WeatherManager.CyclePhase newPhase) { if (currentState == WaveManagerState.PausedBeforeRun || isInitialPause) return; if (newPhase == WeatherManager.CyclePhase.TransitionToDay) { if (currentState == WaveManagerState.WaveInProgress) { dayCyclesRemainingForWave--; hasSpawnedThisCycle = false; if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Day cycle complete. Cycles remaining: {dayCyclesRemainingForWave}"); if (dayCyclesRemainingForWave <= 0) { EndWaveGameplay(); } else { SetState(WaveManagerState.WaitingForSpawnTime); UpdateWaveStatusText(); } } else if (currentState == WaveManagerState.WaitingForSpawnTime) { hasSpawnedThisCycle = false; } } else if (newPhase == spawnStartPhase && currentState == WaveManagerState.WaitingForSpawnTime && !hasSpawnedThisCycle) { Update_WaitingForSpawnTime(); } }
+
+
+    // --- State Update Methods ---
+
+    void Update_WaitingForSpawnTime() // (Unchanged)
+    { if (hasSpawnedThisCycle || weatherManager == null) return; WeatherManager.CyclePhase currentPhase = weatherManager.CurrentPhase; float totalPhaseTime = weatherManager.CurrentTotalPhaseTime; float remainingPhaseTime = weatherManager.CurrentPhaseTimer; float progressPercent = (totalPhaseTime > 0) ? (1f - (remainingPhaseTime / totalPhaseTime)) * 100f : 0f; if (currentPhase == spawnStartPhase && progressPercent >= spawnStartPercentage) { StartWaveSpawning(); } }
+
+    void Update_IdleReady() // (Now only manages button for looping)
+    {
+         if (startRunButton != null)
+         {
+            bool showButton = (currentState == WaveManagerState.SequenceComplete && loopSequence);
+            startRunButton.gameObject.SetActive(showButton);
+            startRunButton.interactable = showButton;
+         }
+    }
+
+    void UpdateTimeTrackerUI() // (Unchanged)
+    { if (timeTrackerText == null || weatherManager == null) return; WeatherManager.CyclePhase phase = weatherManager.CurrentPhase; float total = weatherManager.CurrentTotalPhaseTime; float remaining = weatherManager.CurrentPhaseTimer; float progressPercent = (total > 0) ? (1f - (remaining / total)) * 100f : 0f; string phaseName = phase.ToString().Replace("Transition", ""); timeTrackerText.text = $"{phaseName} [{progressPercent:F0}%]"; if (Time.timeScale == 0f && isInitialPause) timeTrackerText.text += " (Paused)"; } // Show paused during initial pause
+
+    void UpdateWaveStatusText() // (Added PausedBeforeRun case)
+    {
+         if (waveStatusText == null) return;
+         switch(currentState)
+         {
+             case WaveManagerState.PausedBeforeRun: waveStatusText.text = "Press Start Run"; break;
+             case WaveManagerState.WaitingForSpawnTime: waveStatusText.text = $"Wave {CurrentWaveNumber} - Waiting..."; break;
+             case WaveManagerState.WaveInProgress: waveStatusText.text = $"Wave {CurrentWaveNumber} [{dayCyclesRemainingForWave} cycles left]"; break;
+            case WaveManagerState.SequenceComplete: waveStatusText.text = loopSequence ? "Sequence Done. Start Again?" : "All Waves Cleared!"; break;
+             default: waveStatusText.text = ""; break;
+         }
+    }
+
+    // --- State Transition and Action Methods ---
+
+    void SetState(WaveManagerState newState) // (Removed weather pause logic)
+    {
+        if (currentState == newState) return;
+        if(Debug.isDebugBuild) Debug.Log($"[WaveManager] State Change: {currentState} -> {newState}");
+        currentState = newState;
+
+        // Update Button State
+        if (startRunButton != null)
+        {
+            bool showButton = (newState == WaveManagerState.PausedBeforeRun) || (newState == WaveManagerState.SequenceComplete && loopSequence);
+            startRunButton.gameObject.SetActive(showButton);
+            startRunButton.interactable = showButton;
+        }
+
+        // Update Status Text
+        UpdateWaveStatusText();
+    }
+
+    public void TryStartRun() // <<< MODIFIED
+    {
+        // Only allow starting from PausedBeforeRun OR SequenceComplete if looping
+        if (currentState != WaveManagerState.PausedBeforeRun && !(currentState == WaveManagerState.SequenceComplete && loopSequence))
+        {
+             if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Cannot start run. State: {currentState}, Looping: {loopSequence}");
+             return;
+        }
+
+        Debug.Log("[WaveManager] Starting Run...");
+
+        // <<< RESUME TIME >>>
+        if (isInitialPause || Time.timeScale != 1f)
+        {
+            Debug.Log("[WaveManager] Setting Time.timeScale = 1");
+            Time.timeScale = 1f;
+            isInitialPause = false; // Mark initial pause as over
+        }
+        // ----------------
+
+        InitializeRun(); // Prepare first wave state
+        SetState(WaveManagerState.WaitingForSpawnTime); // Transition state
+    }
+
+    void InitializeRun() // (Unchanged)
+    { currentWaveIndex = 0; if (wavesSequence == null || wavesSequence.Count == 0 || wavesSequence[currentWaveIndex] == null) { Debug.LogError("[WaveManager] Cannot initialize run: Bad wave sequence!"); SetState(WaveManagerState.SequenceComplete); return; } if(deletePreviousWaveAnimals && currentState == WaveManagerState.SequenceComplete && loopSequence) { ClearAllActiveAnimals(); } activeWaveDefinition = wavesSequence[currentWaveIndex]; dayCyclesRemainingForWave = waveDurationInDayCycles; hasSpawnedThisCycle = false; Debug.Log($"[WaveManager] Run initialized. Starting Wave {CurrentWaveNumber}. Duration: {dayCyclesRemainingForWave} cycles."); }
+
+    void StartWaveSpawning() // (Unchanged)
+    { if (activeWaveDefinition == null || currentState != WaveManagerState.WaitingForSpawnTime) { return; } Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} - Spawning Triggered (Phase: {spawnStartPhase} >= {spawnStartPercentage}%)"); hasSpawnedThisCycle = true; SetState(WaveManagerState.WaveInProgress); if (faunaManager != null) faunaManager.ExecuteSpawnWave(activeWaveDefinition); else Debug.LogError("[WaveManager] Cannot execute spawn wave, FaunaManager missing!"); }
+
+    void EndWaveGameplay() // (Unchanged)
+    { Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} Gameplay Ended (Duration Met)."); if (faunaManager != null) faunaManager.StopAllSpawnCoroutines(); if (deletePreviousWaveAnimals) { ClearAllActiveAnimals(); } activeWaveDefinition = null; currentWaveIndex++; if (currentWaveIndex >= wavesSequence.Count) { if (loopSequence) { Debug.Log("[WaveManager] Looping back."); InitializeRun(); SetState(WaveManagerState.WaitingForSpawnTime); } else { Debug.Log("[WaveManager] Sequence complete."); SetState(WaveManagerState.SequenceComplete); } } else { if (wavesSequence[currentWaveIndex] == null) { Debug.LogError($"[WaveManager] Wave definition {currentWaveIndex} NULL!"); SetState(WaveManagerState.SequenceComplete); return; } activeWaveDefinition = wavesSequence[currentWaveIndex]; dayCyclesRemainingForWave = waveDurationInDayCycles; hasSpawnedThisCycle = false; Debug.Log($"[WaveManager] Preparing Wave {CurrentWaveNumber}. Duration: {dayCyclesRemainingForWave} cycles."); SetState(WaveManagerState.WaitingForSpawnTime); } }
+
+    void ClearAllActiveAnimals() // (Unchanged)
+    { if(Debug.isDebugBuild) Debug.Log("[WaveManager] Clearing all active animals."); AnimalController[] activeAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None); int count = 0; foreach(AnimalController animal in activeAnimals) { if(animal != null) { Destroy(animal.gameObject); count++; } } if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Destroyed {count} animals."); }
+
+    public Camera GetMainCamera() { return mainCamera; } // (Unchanged)
 }
 
 
@@ -4953,38 +4990,43 @@ public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Player\GardenerController.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Player/GardenerController.cs
+using UnityEngine;
+using System;
 
+// No longer requires ToolSwitcher on the same GameObject
 public class GardenerController : MonoBehaviour
 {
+    // --- Fields ---
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
-    
     [Header("Planting Settings")]
-    public Vector2 seedPlantingOffset = new Vector2(0f, -0.5f); // Configurable offset for seed planting
+    public Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
+
+    [Header("Tool References")] // <<< NEW HEADER
+    [Tooltip("Assign the SpriteRenderer used to display the current tool's icon.")]
+    [SerializeField] private SpriteRenderer toolIconRenderer;
+    [Tooltip("Assign the GameObject or Component containing the ToolSwitcher script.")] // <<< NEW TOOLTIP
+    [SerializeField] private ToolSwitcher toolSwitcherInstance; // <<< CHANGED: Reference field
 
     [Header("Visual Settings")]
-    [Tooltip("If true, the sprite will be flipped when moving left")]
     public bool flipSpriteWhenMovingLeft = true;
-    [Tooltip("If true, the character will face the opposite direction when flipped")]
     public bool flipHorizontalDirection = true;
 
     [Header("Animation Settings")]
-    [Tooltip("Set to false to disable animations")]
     public bool useAnimations = true;
     public string runningParameterName = "isRunning";
     public string plantingParameterName = "isPlanting";
-    [Tooltip("Should match your planting animation length exactly")]
-    public float plantingDuration = 0.25f; // UPDATED to match your 0.25s animation
+    public float plantingDuration = 0.25f;
 
-
-    
     // Private references
     private Rigidbody2D rb;
     private Vector2 movement;
     private SortableEntity sortableEntity;
     private SpriteRenderer spriteRenderer;
     private Animator animator;
+    // ToolSwitcher reference is now toolSwitcherInstance (assigned via inspector)
+
     // Private variables
     private bool isPlanting = false;
     private float plantingTimer = 0f;
@@ -4992,161 +5034,131 @@ public class GardenerController : MonoBehaviour
 
     private void Awake()
     {
-        // Get required components
+        // --- Get Components (excluding ToolSwitcher) ---
         rb = GetComponent<Rigidbody2D>();
         sortableEntity = GetComponent<SortableEntity>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
-        
-        // Add SortableEntity if not already present
-        if (sortableEntity == null)
-            sortableEntity = gameObject.AddComponent<SortableEntity>();
-            
-        // Warn if sprite renderer is missing
-        if (spriteRenderer == null)
-            Debug.LogWarning("GardenerController: SpriteRenderer component not found. Sprite flipping won't work.");
-            
-        // Warn if animator is missing but animations are enabled
-        if (animator == null && useAnimations)
-            Debug.LogWarning("GardenerController: Animator component not found but useAnimations is true.");
+
+        if (sortableEntity == null) sortableEntity = gameObject.AddComponent<SortableEntity>();
+
+        // --- VALIDATIONS (Focus on assigned references) ---
+        if (spriteRenderer == null) Debug.LogWarning("[GardenerController Awake] Main SpriteRenderer component not found.", gameObject);
+        if (animator == null && useAnimations) Debug.LogWarning("[GardenerController Awake] Animator component not found but useAnimations is true.", gameObject);
+
+        // Validate the explicitly assigned ToolSwitcher reference
+        if (toolSwitcherInstance == null)
+        {
+            // This is now an error because it MUST be assigned in the inspector
+            Debug.LogError("[GardenerController Awake] Tool Switcher Instance is not assigned in the Inspector! Tool switching and icon display will not function.", gameObject);
+        }
+
+        if (toolIconRenderer == null)
+            Debug.LogError("[GardenerController Awake] Tool Icon Renderer is not assigned in the Inspector! Tool icons will not display.", gameObject);
+        else
+        {
+            Debug.Log("[GardenerController Awake] Tool Icon Renderer found. Initializing as hidden.", gameObject);
+            toolIconRenderer.enabled = false;
+        }
     }
 
+    private void Start()
+    {
+        // Subscribe ONLY if toolSwitcherInstance was assigned in the inspector
+        if (toolSwitcherInstance != null)
+        {
+            Debug.Log("[GardenerController Start] ToolSwitcherInstance assigned. Subscribing to ToolSwitcher.OnToolChanged.", gameObject);
+            toolSwitcherInstance.OnToolChanged += HandleToolChanged;
+
+            // Manually trigger the handler once at the start
+            Debug.Log("[GardenerController Start] Manually calling HandleToolChanged for initial tool.", gameObject);
+            HandleToolChanged(toolSwitcherInstance.CurrentTool);
+        }
+        else
+        {
+             // Error logged in Awake, no need for more logs here.
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Unsubscribe ONLY if toolSwitcherInstance was assigned and we subscribed
+        if (toolSwitcherInstance != null)
+        {
+            Debug.Log("[GardenerController OnDestroy] Unsubscribing from ToolSwitcher.OnToolChanged.", gameObject);
+            toolSwitcherInstance.OnToolChanged -= HandleToolChanged;
+        }
+    }
+
+    // --- Update, FixedUpdate, UpdateAnimations, UpdateSpriteDirection, Start/EndPlantingAnimation, GetPlantingPosition, SetPlantingDuration, Plant methods remain the same ---
     private void Update()
     {
-        // Handle movement input and planting action
         if (!isPlanting)
         {
             movement.x = Input.GetAxisRaw("Horizontal");
             movement.y = Input.GetAxisRaw("Vertical");
-        
-            // Check if we're moving (store for later)
             bool isMoving = movement.sqrMagnitude > 0.01f;
-            
+            if (isMoving) wasMovingBeforePlanting = true;
         }
         else
         {
-            // When planting, we don't accept movement input
             movement = Vector2.zero;
-        
-            // Handle planting timer
             plantingTimer -= Time.deltaTime;
-            if (plantingTimer <= 0)
-            {
-                EndPlantingAnimation();
-            }
+            if (plantingTimer <= 0) EndPlantingAnimation();
         }
-    
-        // Update animations after all state changes are processed
         UpdateAnimations();
-    
-        // Handle sprite flipping based on movement direction
         UpdateSpriteDirection();
     }
+    private void FixedUpdate() { if (!isPlanting) { rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime); } }
+    private void UpdateAnimations() { if (!useAnimations || animator == null) return; bool isMoving = movement.sqrMagnitude > 0.01f; animator.SetBool(runningParameterName, isMoving); }
+    private void UpdateSpriteDirection() { if (spriteRenderer == null || !flipSpriteWhenMovingLeft) return; if (movement.x != 0) { bool shouldFlip = (movement.x < 0); if (flipHorizontalDirection) { spriteRenderer.flipX = shouldFlip; } else { Vector3 scale = transform.localScale; scale.x = shouldFlip ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x); transform.localScale = scale; } } }
+    public void StartPlantingAnimation() { if (!useAnimations || isPlanting) return; isPlanting = true; plantingTimer = plantingDuration; wasMovingBeforePlanting = movement.sqrMagnitude > 0.01f; if (animator != null) { animator.SetBool(plantingParameterName, true); animator.SetBool(runningParameterName, false); } }
+    private void EndPlantingAnimation() { isPlanting = false; if (animator != null) { animator.SetBool(plantingParameterName, false); movement.x = Input.GetAxisRaw("Horizontal"); movement.y = Input.GetAxisRaw("Vertical"); bool shouldResumeRunning = movement.sqrMagnitude > 0.01f; animator.SetBool(runningParameterName, shouldResumeRunning); } }
+    public Vector2 GetPlantingPosition() { return (Vector2)transform.position + seedPlantingOffset; }
+    public void SetPlantingDuration(float duration) { plantingDuration = Mathf.Max(0.1f, duration); }
+    public void Plant() { StartPlantingAnimation(); }
+    // ---------------------------------
 
-    private void FixedUpdate()
+    // --- HandleToolChanged remains the same (uses toolSwitcherInstance implicitly via Start/OnDestroy) ---
+    private void HandleToolChanged(ToolDefinition newTool)
     {
-        // Only move if not planting
-        if (!isPlanting)
+        string toolName = newTool != null ? newTool.displayName : "NULL";
+        Debug.Log($"[HandleToolChanged] Received tool: {toolName}", gameObject);
+
+        if (toolIconRenderer == null)
         {
-            rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime);
+            Debug.LogError("[HandleToolChanged] toolIconRenderer is NULL. Cannot update icon.", gameObject);
+            return;
         }
-    }
-    
-    // Update character animations based on state
-    private void UpdateAnimations()
-    {
-        if (!useAnimations || animator == null) return;
-    
-        // Set running animation parameter
-        bool isMoving = movement.sqrMagnitude > 0.01f;
-        animator.SetBool(runningParameterName, isMoving);
-    }
-    
-    // Update sprite direction based on movement
-    private void UpdateSpriteDirection()
-    {
-        if (spriteRenderer == null || !flipSpriteWhenMovingLeft) return;
-        
-        if (movement.x != 0)
+
+        if (newTool != null)
         {
-            // Only flip if moving horizontally
-            bool shouldFlip = (movement.x < 0);
-            
-            // Apply flipping logic based on settings
-            if (flipHorizontalDirection)
+            string iconName = newTool.icon != null ? newTool.icon.name : "NULL";
+            Debug.Log($"[HandleToolChanged] Tool '{toolName}' has icon: {iconName}", gameObject);
+
+            if (newTool.icon != null)
             {
-                spriteRenderer.flipX = shouldFlip;
+                Debug.Log($"[HandleToolChanged] Assigning sprite '{newTool.icon.name}' and color '{newTool.iconTint}' to toolIconRenderer.", gameObject);
+                toolIconRenderer.sprite = newTool.icon;
+                toolIconRenderer.color = newTool.iconTint;
+                Debug.Log($"[HandleToolChanged] Enabling toolIconRenderer. Current state before: {toolIconRenderer.enabled}", gameObject);
+                toolIconRenderer.enabled = true;
+                Debug.Log($"[HandleToolChanged] toolIconRenderer.enabled is now: {toolIconRenderer.enabled}", gameObject);
+                Debug.Log($"[HandleToolChanged] toolIconRenderer.sprite is now: {toolIconRenderer.sprite?.name ?? "NULL"}", gameObject);
             }
             else
             {
-                // Alternative approach: flip the entire transform
-                // This is useful if the sprite is already facing left initially
-                Vector3 scale = transform.localScale;
-                scale.x = shouldFlip ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
-                transform.localScale = scale;
+                Debug.LogWarning($"[HandleToolChanged] Tool '{toolName}' has a NULL icon. Hiding renderer.", gameObject);
+                toolIconRenderer.enabled = false;
+                toolIconRenderer.sprite = null;
             }
         }
-    }
-    
-    // Start planting animation and process
-    public void StartPlantingAnimation()
-    {
-        if (!useAnimations || isPlanting) return;
-    
-        isPlanting = true;
-        plantingTimer = plantingDuration;
-    
-        // Set animation parameters
-        if (animator != null)
+        else
         {
-            // Set planting to true and ensure running is false
-            animator.SetBool(plantingParameterName, true);
-            animator.SetBool(runningParameterName, false);
+            Debug.Log("[HandleToolChanged] newTool is NULL. Hiding renderer.", gameObject);
+            toolIconRenderer.enabled = false;
+            toolIconRenderer.sprite = null;
         }
-    }
-    
-    // End planting animation and resume normal control
-    
-    private void EndPlantingAnimation()
-    {
-        // Reset planting state
-        isPlanting = false;
-    
-        // Reset animation parameters
-        if (animator != null)
-        {
-            animator.SetBool(plantingParameterName, false);
-        
-            // Important: don't immediately set isRunning based on current movement
-            // because movement is zero during planting. Instead:
-            if (wasMovingBeforePlanting && (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0))
-            {
-                // Only resume running if we were running before AND still have directional input
-                animator.SetBool(runningParameterName, true);
-            }
-        }
-    
-        // Now update movement based on current input
-        movement.x = Input.GetAxisRaw("Horizontal");
-        movement.y = Input.GetAxisRaw("Vertical");
-    }
-    
-    // Returns the position used for planting seeds, now with configurable offset
-    public Vector2 GetPlantingPosition()
-    {
-        return (Vector2)transform.position + seedPlantingOffset;
-    }
-    
-    // Public method to set planting animation duration
-    public void SetPlantingDuration(float duration)
-    {
-        plantingDuration = Mathf.Max(0.1f, duration); // Ensure minimum duration
-    }
-    
-    // Public method to trigger planting animation from other scripts
-    public void Plant()
-    {
-        StartPlantingAnimation();
     }
 }
 
@@ -5919,185 +5931,204 @@ public class TileDefinition : ScriptableObject
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Data\TileInteractionLibrary.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections.Generic;
+﻿// FILE: Assets/Scripts/Tiles/Data/TileInteractionLibrary.cs
+using System.Collections.Generic;
 using UnityEngine;
+using System; // Needed for [Serializable]
+
+// --- NEW: Define the structure for a refill rule ---
+[Serializable] // Make it visible in the Inspector
+public class ToolRefillRule
+{
+    [Tooltip("The tool that can be refilled.")]
+    public ToolDefinition toolToRefill;
+
+    [Tooltip("The tile that must be interacted with to trigger the refill.")]
+    public TileDefinition refillSourceTile;
+}
+// ----------------------------------------------------
 
 [CreateAssetMenu(fileName = "TileInteractionLibrary", menuName = "Tiles/Tile Interaction Library")]
 public class TileInteractionLibrary : ScriptableObject
 {
+    [Header("Standard Tile Transformations")]
     [Tooltip("List of rules: (Tool, fromTile) => toTile.")]
-    public List<TileInteractionRule> rules;
+    public List<TileInteractionRule> rules; // Existing transformation rules
+
+    [Header("Tool Refill Rules")] // <<< NEW HEADER
+    [Tooltip("List of rules defining how tools are refilled.")]
+    public List<ToolRefillRule> refillRules; // <<< NEW LIST FOR REFILLS
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Data\TileInteractionManager.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections;
+﻿// FILE: Assets/Scripts/Tiles/Data/TileInteractionManager.cs
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using skner.DualGrid;
+using skner.DualGrid; // Assuming this is the correct namespace for your DualGrid package
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+#if UNITY_EDITOR
+using UnityEditor; // Correct placement for editor-specific using directive
+#endif
 
 public class TileInteractionManager : MonoBehaviour
 {
     public static TileInteractionManager Instance { get; private set; }
-
-    [System.Serializable]
-    public class TileDefinitionMapping
-    {
-        public TileDefinition tileDef;
-        public DualGridTilemapModule tilemapModule;
-    }
-
-    [Header("Tile Definition Mappings")]
-    public List<TileDefinitionMapping> tileDefinitionMappings;
-
-    // (If you have an interaction library for tool-based transformations)
-    [Header("Interaction Library")]
-    public TileInteractionLibrary interactionLibrary;
-
-    [Header("Grid & Scene References")]
-    public Grid interactionGrid;
-    public Camera mainCamera;
-    public Transform player;
-    public float hoverRadius = 3f;
-    public GameObject hoverHighlightObject;
-
-    [Header("Tilemap Rendering Settings")]
-    [Tooltip("The base sorting order value (the first tilemap will be this value, subsequent ones will decrease)")]
-    public int baseSortingOrder = 0;
-
-    [Header("Debug / UI")]
-    public bool debugLogs = false;
-    public TextMeshProUGUI hoveredTileText;
-    public TextMeshProUGUI currentToolText;
-
-    // quick lookups
+    [System.Serializable] public class TileDefinitionMapping { public TileDefinition tileDef; public DualGridTilemapModule tilemapModule; }
+    [Header("Tile Definition Mappings")] public List<TileDefinitionMapping> tileDefinitionMappings;
+    [Header("Interaction Library")] public TileInteractionLibrary interactionLibrary; // Now contains both rule types
+    [Header("Grid & Scene References")] public Grid interactionGrid; public Camera mainCamera; public Transform player; public float hoverRadius = 3f; public GameObject hoverHighlightObject;
+    [Header("Tilemap Rendering Settings")] public int baseSortingOrder = 0;
+    [Header("Debug / UI")] public bool debugLogs = false; public TextMeshProUGUI hoveredTileText; public TextMeshProUGUI currentToolText;
     private Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
     private Dictionary<DualGridTilemapModule, TileDefinition> definitionByModule;
-
-    // track which cell is hovered
     private Vector3Int? currentlyHoveredCell = null;
     private TileDefinition hoveredTileDef = null;
-
-    // --------- NEW: Timed reversion dictionary -----------
-    // Key = cell position, Value = struct that holds the tileDefinition & time left
+    private struct TimedTileState { public TileDefinition tileDef; public float timeLeft; }
     private Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
+    private ToolSwitcher playerToolSwitcher;
 
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        // build dictionaries
+        // Initialize dictionaries here
         moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
         definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
 
-        // Setup tilemaps with correct sorting orders and colors
-        SetupTilemaps();
+        SetupTilemaps(); // Setup tilemaps after dictionaries are created
     }
 
     void Start()
     {
-        // Ensure we always initialize the dictionary in Start() for runtime
-        if (moduleByDefinition == null || moduleByDefinition.Count == 0)
+        // Ensure dictionaries are populated if something went wrong in Awake or for runtime recompiles
+        if (moduleByDefinition == null || moduleByDefinition.Count == 0 || definitionByModule == null || definitionByModule.Count == 0)
         {
+            Debug.LogWarning("[TileInteractionManager Start] Dictionaries were empty or null, re-running SetupTilemaps.");
             SetupTilemaps();
+        }
+
+        // Find the Player's ToolSwitcher
+        if (player != null)
+        {
+            // Use GetComponentInChildren to find it even if it's nested
+            playerToolSwitcher = player.GetComponentInChildren<ToolSwitcher>(true); // Include inactive just in case
+            if (playerToolSwitcher == null)
+            {
+                Debug.LogError("[TileInteractionManager Start] Could not find ToolSwitcher component on Player or its children!", player);
+            }
+            else
+            {
+                 if(debugLogs) Debug.Log("[TileInteractionManager Start] Found Player ToolSwitcher.", playerToolSwitcher.gameObject);
+            }
+        }
+        else
+        {
+            Debug.LogError("[TileInteractionManager Start] Player Transform reference is not assigned in the Inspector!", this);
         }
     }
 
-    // Method to set up tilemap sorting order and apply initial colors
     private void SetupTilemaps()
     {
-        moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
-        definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
-        
+        // Clear dictionaries before rebuilding
+        moduleByDefinition.Clear();
+        definitionByModule.Clear();
+
+        if (tileDefinitionMappings == null)
+        {
+            Debug.LogError("[TileInteractionManager SetupTilemaps] Tile Definition Mappings list is null!", this);
+            return;
+        }
+
         for (int i = 0; i < tileDefinitionMappings.Count; i++)
         {
             var mapping = tileDefinitionMappings[i];
-            if (mapping.tileDef == null || mapping.tilemapModule == null) 
-                continue;
+            if (mapping == null || mapping.tileDef == null || mapping.tilemapModule == null)
+            {
+                 Debug.LogWarning($"[TileInteractionManager SetupTilemaps] Skipping null or incomplete mapping at index {i}.");
+                 continue;
+            }
 
             // Add to dictionaries
             if (!moduleByDefinition.ContainsKey(mapping.tileDef))
             {
                 moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
+                // *** CORRECTED ASSIGNMENT HERE ***
                 definitionByModule[mapping.tilemapModule] = mapping.tileDef;
-                
-                // Get the RenderTilemap component
+
+                // Find the RenderTilemap child
                 Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
                 if (renderTilemapTransform != null)
                 {
-                    // Set the sorting order based on the index - INVERTED (negative values)
-                    // First item (index 0) gets baseSortingOrder, then we subtract for each subsequent item
+                    // Set Sorting Order
                     TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
                     if (renderer != null)
                     {
                         renderer.sortingOrder = baseSortingOrder - i;
-                        if (debugLogs)
-                            Debug.Log($"Setting sorting order for {mapping.tileDef.displayName} to {baseSortingOrder - i}");
+                        if (debugLogs) Debug.Log($"Setting sorting order for {mapping.tileDef.displayName} to {renderer.sortingOrder}");
                     }
-                    
-                    // Set the initial color from TileDefinition
+                    else { Debug.LogWarning($"RenderTilemap for {mapping.tileDef.displayName} missing TilemapRenderer.", renderTilemapTransform); }
+
+                    // Set Initial Color
                     Tilemap tilemap = renderTilemapTransform.GetComponent<Tilemap>();
                     if (tilemap != null)
                     {
                         tilemap.color = mapping.tileDef.tintColor;
-                        if (debugLogs)
-                            Debug.Log($"Setting color for {mapping.tileDef.displayName} to {mapping.tileDef.tintColor}");
+                        if (debugLogs) Debug.Log($"Setting color for {mapping.tileDef.displayName} to {tilemap.color}");
                     }
+                     else { Debug.LogWarning($"RenderTilemap for {mapping.tileDef.displayName} missing Tilemap component.", renderTilemapTransform); }
                 }
-                
-                if (debugLogs)
-                    Debug.Log($"[Mapping] {mapping.tileDef.displayName} => {mapping.tilemapModule.gameObject.name}");
+                 else { Debug.LogWarning($"Could not find 'RenderTilemap' child for module of {mapping.tileDef.displayName}.", mapping.tilemapModule.gameObject); }
+
+                if (debugLogs) Debug.Log($"[Mapping] Added: {mapping.tileDef.displayName} => {mapping.tilemapModule.gameObject.name}");
             }
             else
             {
-                Debug.LogWarning($"Duplicate tileDef {mapping.tileDef.displayName} in tileDefinitionMappings.");
+                Debug.LogWarning($"[TileInteractionManager SetupTilemaps] Duplicate TileDefinition '{mapping.tileDef.displayName}' found in mappings. Ignoring subsequent entries.", mapping.tileDef);
             }
         }
+         if (debugLogs) Debug.Log($"[TileInteractionManager SetupTilemaps] Setup complete. {moduleByDefinition.Count} definitions mapped.");
     }
 
-    // New public method to update sorting order - can be called from custom editor
+    // Method for editor button: Update Sorting Order
     public void UpdateSortingOrder()
     {
+        if (tileDefinitionMappings == null) return;
         for (int i = 0; i < tileDefinitionMappings.Count; i++)
         {
             var mapping = tileDefinitionMappings[i];
-            if (mapping.tileDef == null || mapping.tilemapModule == null) 
-                continue;
-                
+            if (mapping == null || mapping.tileDef == null || mapping.tilemapModule == null) continue;
+
             Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
             if (renderTilemapTransform != null)
             {
                 TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
                 if (renderer != null)
                 {
-                    // Negative values - first in list gets highest order
                     renderer.sortingOrder = baseSortingOrder - i;
-                    
-                    #if UNITY_EDITOR
-                    UnityEditor.EditorUtility.SetDirty(renderer);
-                    #endif
-                    
-                    if (debugLogs)
-                        Debug.Log($"Updated sorting order for {mapping.tileDef.displayName} to {baseSortingOrder - i}");
+#if UNITY_EDITOR
+                    if (!Application.isPlaying) EditorUtility.SetDirty(renderer);
+#endif
+                    if (debugLogs) Debug.Log($"Updated sorting order for {mapping.tileDef.displayName} to {renderer.sortingOrder}");
                 }
             }
         }
     }
 
-    // New public method to update all colors - can be called from custom editor
+    // Method for editor button: Update All Colors
     public void UpdateAllColors()
     {
+        if (tileDefinitionMappings == null) return;
         foreach (var mapping in tileDefinitionMappings)
         {
-            if (mapping.tileDef == null || mapping.tilemapModule == null) 
-                continue;
-                
+            if (mapping == null || mapping.tileDef == null || mapping.tilemapModule == null) continue;
+
             Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
             if (renderTilemapTransform != null)
             {
@@ -6105,13 +6136,10 @@ public class TileInteractionManager : MonoBehaviour
                 if (renderTilemap != null)
                 {
                     renderTilemap.color = mapping.tileDef.tintColor;
-                    
-                    #if UNITY_EDITOR
-                    UnityEditor.EditorUtility.SetDirty(renderTilemap);
-                    #endif
-                    
-                    if (debugLogs)
-                        Debug.Log($"Updated color for {mapping.tileDef.displayName} to {mapping.tileDef.tintColor}");
+#if UNITY_EDITOR
+                    if (!Application.isPlaying) EditorUtility.SetDirty(renderTilemap);
+#endif
+                    if (debugLogs) Debug.Log($"Updated color for {mapping.tileDef.displayName} to {renderTilemap.color}");
                 }
             }
         }
@@ -6121,41 +6149,37 @@ public class TileInteractionManager : MonoBehaviour
     {
         HandleTileHover();
         UpdateReversion();
-        UpdateDebugUI();
-    }
-
-    // ------------------- Timed Reversion Logic ------------------------
-    // We'll store a small struct for each cell that is on a countdown
-    private struct TimedTileState
-    {
-        public TileDefinition tileDef;
-        public float timeLeft;
+        UpdateDebugUI(); // Update UI every frame
     }
 
     private void UpdateReversion()
     {
         if (timedCells.Count == 0) return;
 
-        // We'll gather cells that are about to revert
-        List<Vector3Int> cellsToRevert = null;
+        List<Vector3Int> cellsToRevert = null; // Initialize null
 
-        // We'll copy keys to avoid modifying dictionary while iterating
+        // Iterate over a temporary copy to allow modification
         foreach (var kvp in timedCells.ToList())
         {
             Vector3Int cellPos = kvp.Key;
             TimedTileState state = kvp.Value;
+
+            // Check if the state's tile definition is still valid (safety check)
+            if (state.tileDef == null) {
+                timedCells.Remove(cellPos); // Clean up invalid entry
+                continue;
+            }
+
             state.timeLeft -= Time.deltaTime;
+
             if (state.timeLeft <= 0f)
             {
-                // we revert now
-                if (cellsToRevert == null) 
-                    cellsToRevert = new List<Vector3Int>();
+                if (cellsToRevert == null) cellsToRevert = new List<Vector3Int>();
                 cellsToRevert.Add(cellPos);
             }
             else
             {
-                // store updated time
-                timedCells[cellPos] = state;
+                timedCells[cellPos] = state; // Update time left
             }
         }
 
@@ -6163,67 +6187,81 @@ public class TileInteractionManager : MonoBehaviour
         {
             foreach (var cellPos in cellsToRevert)
             {
-                if (timedCells.TryGetValue(cellPos, out TimedTileState st))
+                // Check if the entry still exists before processing
+                if (timedCells.TryGetValue(cellPos, out TimedTileState stateToRevert))
                 {
-                    timedCells.Remove(cellPos);
-                    
-                    // Always remove the current tile, regardless of doNotRemovePrevious
-                    // This is needed for timed disappearing functionality
-                    RemoveTile(st.tileDef, cellPos);
-                    
-                    // If there's a revert-to tile, place it
-                    if (st.tileDef.revertToTile != null)
+                    timedCells.Remove(cellPos); // Remove before acting
+
+                    // Always remove the reverting tile itself
+                    RemoveTile(stateToRevert.tileDef, cellPos);
+
+                    // Place the revert-to tile *if specified*
+                    if (stateToRevert.tileDef.revertToTile != null)
                     {
-                        PlaceTile(st.tileDef.revertToTile, cellPos);
+                        if (debugLogs) Debug.Log($"Reverting tile at {cellPos} from {stateToRevert.tileDef.displayName} to {stateToRevert.tileDef.revertToTile.displayName}");
+                        PlaceTile(stateToRevert.tileDef.revertToTile, cellPos);
+                    } else {
+                        if (debugLogs) Debug.Log($"Tile {stateToRevert.tileDef.displayName} at {cellPos} expired and removed (no revert target).");
                     }
                 }
             }
         }
     }
 
-    // Our method to forcibly schedule a tile for timed reversion
     private void RegisterTimedTile(Vector3Int cellPos, TileDefinition tileDef)
     {
-        if (tileDef.revertAfterSeconds > 0f && tileDef.revertToTile != null)
+        // Only register if revert time is positive
+        // RevertToTile check is now handled during reversion itself
+        if (tileDef != null && tileDef.revertAfterSeconds > 0f)
         {
-            TimedTileState newState;
-            newState.tileDef = tileDef;
-            newState.timeLeft = tileDef.revertAfterSeconds;
+            TimedTileState newState = new TimedTileState
+            {
+                tileDef = tileDef,
+                timeLeft = tileDef.revertAfterSeconds
+            };
             timedCells[cellPos] = newState;
+            if (debugLogs) Debug.Log($"Registered timed reversion for {tileDef.displayName} at {cellPos} ({tileDef.revertAfterSeconds}s).");
         }
+         // Clear any existing timer if revertAfterSeconds is 0 or less
+         else if (timedCells.ContainsKey(cellPos))
+         {
+              timedCells.Remove(cellPos);
+              if (debugLogs) Debug.Log($"Cleared timed reversion for {cellPos} because revert time is not positive.");
+         }
     }
-
-    // --------------- Re-Use: Placing & Removing Tiles ---------------
 
     public void PlaceTile(TileDefinition tileDef, Vector3Int cellPos)
     {
-        if (!moduleByDefinition.ContainsKey(tileDef))
+        if (tileDef == null) { Debug.LogWarning($"PlaceTile: Attempted to place a NULL TileDefinition at {cellPos}."); return; }
+
+        if (moduleByDefinition == null || !moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) || module == null)
         {
-            Debug.LogWarning($"PlaceTile: {tileDef.displayName} not found in moduleByDefinition.");
+            Debug.LogWarning($"PlaceTile: No mapped module found for TileDefinition '{tileDef.displayName}'. Cannot place tile.");
             return;
         }
-        var module = moduleByDefinition[tileDef];
 
-        // If tileDef is an overlay, do NOT remove the old tile
-        // Else we remove the old tile first
+        // Handle removing existing tiles based on the new tile's 'keepBottomTile' flag
         if (!tileDef.keepBottomTile)
         {
-            // e.g. if we are placing "DirtWet" which is keepBottomTile=false, 
-            // we do remove the old tile from its tilemap
-            // but we must find whichever tile is currently there
-            TileDefinition existing = FindWhichTileDefinitionAt(cellPos);
-            if (existing != null && existing != tileDef)
+            TileDefinition existingDef = FindWhichTileDefinitionAt(cellPos);
+            if (existingDef != null && existingDef != tileDef)
             {
-                RemoveTile(existing, cellPos);
+                 if (debugLogs) Debug.Log($"Placing '{tileDef.displayName}' (KeepBottom=false), removing existing '{existingDef.displayName}' at {cellPos}.");
+                 RemoveTile(existingDef, cellPos);
             }
+        } else {
+             if (debugLogs) Debug.Log($"Placing '{tileDef.displayName}' (KeepBottom=true) over whatever is at {cellPos}.");
         }
 
-        // Set the cell in the tilemap to have a tile
-        // The actual visual appearance is handled by the DualGridTilemapModule system
-        // We just need to mark this cell as "filled"
-        module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
+        // Set the tile on the correct module's DataTilemap
+        if (module.DataTilemap != null)
+        {
+            // Using a basic Tile asset is fine for the data layer
+            TileBase dataTile = ScriptableObject.CreateInstance<Tile>();
+            module.DataTilemap.SetTile(cellPos, dataTile);
+        } else { Debug.LogWarning($"Module for '{tileDef.displayName}' has no DataTilemap assigned.", module.gameObject); }
 
-        // Set the RenderTilemap color to match the TileDefinition's tintColor
+        // Update RenderTilemap color immediately
         Transform renderTilemapTransform = module.transform.Find("RenderTilemap");
         if (renderTilemapTransform != null)
         {
@@ -6231,136 +6269,158 @@ public class TileInteractionManager : MonoBehaviour
             if (renderTilemap != null)
             {
                 renderTilemap.color = tileDef.tintColor;
-                
 #if UNITY_EDITOR
-                if (!Application.isPlaying)
-                {
-                    UnityEditor.EditorUtility.SetDirty(renderTilemap);
-                }
+                if (!Application.isPlaying) EditorUtility.SetDirty(renderTilemap);
 #endif
             }
         }
 
-        // If it has a timed reversion, schedule that
+        // Register for timed reversion if applicable
         RegisterTimedTile(cellPos, tileDef);
     }
 
     public void RemoveTile(TileDefinition tileDef, Vector3Int cellPos)
     {
-        if (!moduleByDefinition.ContainsKey(tileDef))
+        if (tileDef == null) { Debug.LogWarning($"RemoveTile: Attempted to remove a NULL TileDefinition at {cellPos}."); return; }
+
+        if (moduleByDefinition == null || !moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) || module == null)
         {
-            Debug.LogWarning($"RemoveTile: {tileDef.displayName} not in moduleByDefinition.");
+            if (debugLogs) Debug.LogWarning($"RemoveTile: No mapped module found for TileDefinition '{tileDef.displayName}'. Cannot remove tile.");
             return;
         }
-        var module = moduleByDefinition[tileDef];
-        // remove from that tilemap
-        module.DataTilemap.SetTile(cellPos, null);
 
-        // Also if this cell was in timedCells for that tile, remove it
-        if (timedCells.ContainsKey(cellPos))
+        // Remove from the module's DataTilemap
+        if (module.DataTilemap != null)
         {
-            // We only remove if the tile in timedCells is tileDef
-            TimedTileState st = timedCells[cellPos];
-            if (st.tileDef == tileDef)
-            {
-                timedCells.Remove(cellPos);
-            }
+             // Check if the tile actually exists before removing
+             if (module.DataTilemap.HasTile(cellPos)) {
+                 module.DataTilemap.SetTile(cellPos, null);
+                 if (debugLogs) Debug.Log($"Removed '{tileDef.displayName}' from DataTilemap at {cellPos}.");
+             } else {
+                 if (debugLogs) Debug.Log($"RemoveTile: Tile '{tileDef.displayName}' not found on DataTilemap at {cellPos}, skipping removal.");
+             }
+        } else { Debug.LogWarning($"Module for '{tileDef.displayName}' has no DataTilemap assigned.", module.gameObject); }
+
+        // Also remove from timed reversion tracking if it matches
+        if (timedCells.TryGetValue(cellPos, out TimedTileState timedState) && timedState.tileDef == tileDef)
+        {
+            timedCells.Remove(cellPos);
+            if (debugLogs) Debug.Log($"Cleared timed reversion for {tileDef.displayName} at {cellPos} during removal.");
         }
     }
 
     public TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
     {
-        // To ensure we get the top-most visible tile for overlays, we need to check
-        // tiles in reverse order (or specifically check overlay tiles first)
-    
-        // First, try to find any overlay tiles (keepBottomTile = true)
+        if (definitionByModule == null || tileDefinitionMappings == null) {
+             Debug.LogError("[FindWhichTileDefinitionAt] Dictionaries not initialized!");
+             return null;
+        }
+
+        TileDefinition foundDef = null;
+
+        // Prioritize checking overlay tiles first (those with keepBottomTile = true)
+        // Iterate mappings list directly to check the flag easily
         foreach (var mapping in tileDefinitionMappings)
         {
-            if (mapping.tileDef == null || mapping.tilemapModule == null) 
-                continue;
-            
-            // Check specifically for overlay tiles first
-            if (mapping.tileDef.keepBottomTile && 
-                mapping.tilemapModule.DataTilemap.HasTile(cellPos))
-            {
-                return mapping.tileDef;
-            }
+             if (mapping?.tileDef != null && mapping.tilemapModule?.DataTilemap != null && mapping.tileDef.keepBottomTile)
+             {
+                 if (mapping.tilemapModule.DataTilemap.HasTile(cellPos))
+                 {
+                     foundDef = mapping.tileDef;
+                     break; // Found the top overlay tile
+                 }
+             }
         }
-    
-        // If no overlay tile found, find any base tile
-        foreach (var pair in definitionByModule)
-        {
-            DualGridTilemapModule module = pair.Key;
-            TileDefinition def = pair.Value;
 
-            if (module.DataTilemap.HasTile(cellPos))
-            {
-                // Found a tile => that's the tile definition
-                return def;
-            }
+        // If no overlay found, check non-overlay tiles
+        if (foundDef == null)
+        {
+             // Use the definitionByModule dictionary which maps modules back to definitions
+             foreach (var kvp in definitionByModule)
+             {
+                 DualGridTilemapModule module = kvp.Key;
+                 TileDefinition def = kvp.Value;
+
+                 // Ensure it's not an overlay tile (we already checked those) and the module/tilemap are valid
+                 if (module?.DataTilemap != null && def != null && !def.keepBottomTile)
+                 {
+                     if (module.DataTilemap.HasTile(cellPos))
+                     {
+                         foundDef = def;
+                         break; // Found the base tile
+                     }
+                 }
+             }
         }
-        return null;
+
+        // if (debugLogs && foundDef != null) Debug.Log($"[FindWhichTileDefinitionAt] Found '{foundDef.displayName}' at {cellPos}");
+        // else if (debugLogs && foundDef == null) Debug.Log($"[FindWhichTileDefinitionAt] Found no tile at {cellPos}");
+
+        return foundDef;
     }
 
-    // ------------------- Handle Hover & Debug UI (unchanged) -------------------
     private void HandleTileHover()
     {
         if (mainCamera == null || player == null) return;
 
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorldPos.z = 0f;
+        mouseWorldPos.z = 0f; // Ensure Z is 0 for 2D comparison
         Vector3Int cellPos = WorldToCell(mouseWorldPos);
-        float distance = Vector2.Distance(player.position, CellCenterWorld(cellPos));
+
+        // Check distance only if player reference exists
+        float distance = (player != null) ? Vector2.Distance(player.position, CellCenterWorld(cellPos)) : float.MaxValue;
 
         TileDefinition foundTile = FindWhichTileDefinitionAt(cellPos);
 
-        if (debugLogs)
-        {
-            string tileName = foundTile != null ? foundTile.displayName : "NULL";
-            Debug.Log($"[Hover] cell={cellPos}, tile={tileName}, dist={distance:F2}");
-        }
-
+        // Only update hover state if within radius
         if (distance <= hoverRadius)
         {
+            bool changedCell = !currentlyHoveredCell.HasValue || currentlyHoveredCell.Value != cellPos;
             currentlyHoveredCell = cellPos;
             hoveredTileDef = foundTile;
+
             if (hoverHighlightObject != null)
             {
                 hoverHighlightObject.SetActive(true);
                 hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
             }
+            //if (debugLogs && changedCell) Debug.Log($"[Hover Enter] Cell={cellPos}, Tile={foundTile?.displayName ?? "None"}, Dist={distance:F2}");
         }
         else
         {
+            bool changedCell = currentlyHoveredCell.HasValue;
             currentlyHoveredCell = null;
             hoveredTileDef = null;
             if (hoverHighlightObject != null)
+            {
                 hoverHighlightObject.SetActive(false);
+            }
+            //if (debugLogs && changedCell) Debug.Log($"[Hover Exit] Cell outside radius ({distance:F2} > {hoverRadius})");
         }
     }
 
     private void UpdateDebugUI()
     {
+        // Hovered Tile Text
         if (hoveredTileText != null)
         {
-            if (currentlyHoveredCell.HasValue)
-            {
-                string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
-                hoveredTileText.text = $"Hovering: {tileName}";
-            }
-            else
-            {
-                hoveredTileText.text = "Hovering: (none)";
-            }
+            string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
+            hoveredTileText.text = $"Hover: {tileName}";
         }
 
+        // Current Tool Text (includes uses)
         if (currentToolText != null)
         {
-            // Changed from FindObjectOfType to FindAnyObjectByType for better performance
-            ToolSwitcher sw = Object.FindAnyObjectByType<ToolSwitcher>();
-            if (sw != null && sw.CurrentTool != null)
+            if (playerToolSwitcher != null && playerToolSwitcher.CurrentTool != null)
             {
-                currentToolText.text = $"Tool: {sw.CurrentTool.toolType}";
+                ToolDefinition tool = playerToolSwitcher.CurrentTool;
+                string toolString = $"Tool: {tool.displayName}";
+                if (tool.limitedUses)
+                {
+                    int uses = playerToolSwitcher.CurrentRemainingUses;
+                    toolString += $" ({uses})"; // Show remaining uses
+                }
+                currentToolText.text = toolString;
             }
             else
             {
@@ -6371,160 +6431,168 @@ public class TileInteractionManager : MonoBehaviour
 
     public Vector3Int WorldToCell(Vector3 worldPos)
     {
-        if (interactionGrid != null)
-            return interactionGrid.WorldToCell(worldPos);
+        if (interactionGrid != null) return interactionGrid.WorldToCell(worldPos);
 
-        if (tileDefinitionMappings.Count > 0 &&
-            tileDefinitionMappings[0].tilemapModule != null &&
-            tileDefinitionMappings[0].tilemapModule.DataTilemap != null)
-        {
-            Grid g = tileDefinitionMappings[0].tilemapModule.DataTilemap.layoutGrid;
-            return g.WorldToCell(worldPos);
+        // Fallback: Try to get grid from the first valid mapping
+        if (tileDefinitionMappings != null && tileDefinitionMappings.Count > 0) {
+             foreach(var mapping in tileDefinitionMappings) {
+                 if (mapping?.tilemapModule?.DataTilemap?.layoutGrid != null) {
+                     return mapping.tilemapModule.DataTilemap.layoutGrid.WorldToCell(worldPos);
+                 }
+             }
         }
 
+        Debug.LogWarning("[WorldToCell] No valid interactionGrid or mapped Tilemap found to determine cell position.");
         return Vector3Int.zero;
     }
 
     private Vector3 CellCenterWorld(Vector3Int cellPos)
     {
-        if (interactionGrid != null)
-        {
-            Vector3 corner = interactionGrid.CellToWorld(cellPos);
-            return corner + interactionGrid.cellSize * 0.5f;
+         if (interactionGrid != null) return interactionGrid.GetCellCenterWorld(cellPos);
+
+         // Fallback: Try to get grid from the first valid mapping
+         if (tileDefinitionMappings != null && tileDefinitionMappings.Count > 0) {
+             foreach(var mapping in tileDefinitionMappings) {
+                 if (mapping?.tilemapModule?.DataTilemap?.layoutGrid != null) {
+                     return mapping.tilemapModule.DataTilemap.layoutGrid.GetCellCenterWorld(cellPos);
+                 }
+             }
         }
 
-        if (tileDefinitionMappings.Count > 0 &&
-            tileDefinitionMappings[0].tilemapModule != null &&
-            tileDefinitionMappings[0].tilemapModule.DataTilemap != null)
-        {
-            Grid g = tileDefinitionMappings[0].tilemapModule.DataTilemap.layoutGrid;
-            Vector3 corner = g.CellToWorld(cellPos);
-            return corner + g.cellSize * 0.5f;
-        }
-
-        return Vector3.zero;
+        Debug.LogWarning("[CellCenterWorld] No valid interactionGrid or mapped Tilemap found to determine cell center.");
+        return Vector3.zero; // Or grid.CellToWorld(cellPos) + grid.cellSize * 0.5f if grid guaranteed?
     }
-    
-    // Update the method to include animation and delayed planting
+
     private void HandleSeedPlanting(Vector3Int cellPosition)
     {
-        // Check if we have a PlantPlacementManager
         PlantPlacementManager plantManager = PlantPlacementManager.Instance;
-        if (plantManager == null)
-        {
-            Debug.LogError("Cannot plant: PlantPlacementManager not found in scene!");
-            return;
-        }
+        if (plantManager == null) { Debug.LogError("Cannot plant: PlantPlacementManager not found!"); return; }
 
-        // Check if this tile is valid for planting
         TileDefinition tileDef = FindWhichTileDefinitionAt(cellPosition);
         if (!plantManager.IsTileValidForPlanting(tileDef))
         {
-            // Optionally show a visual cue or play a sound to indicate invalid planting surface
-            if (debugLogs)
-            {
-                string tileName = tileDef != null ? tileDef.displayName : "Unknown";
-                Debug.Log($"Cannot plant on {tileName} - invalid tile for planting");
-            }
-            return; // Exit early, don't even trigger the planting animation
-        }
-
-        // Get the player's GardenerController to trigger animation
-        GardenerController gardener = player?.GetComponent<GardenerController>();
-        if (gardener == null)
-        {
-            Debug.LogError("Cannot plant: GardenerController not found on player reference!");
+            if (debugLogs) Debug.Log($"Cannot plant on {tileDef?.displayName ?? "Unknown"} - invalid tile.");
+            // Maybe add player feedback here (sound/visual)
             return;
         }
 
-        // Get world position of cell center for planting
-        Vector3 worldPosition = CellCenterWorld(cellPosition);
-    
-        // Start the planting animation
-        gardener.Plant();
-    
-        // Start a coroutine to plant the seed after the animation completes
+        GardenerController gardener = player?.GetComponent<GardenerController>();
+        if (gardener == null) { Debug.LogError("Cannot plant: GardenerController not found on player!"); return; }
+
+        Vector3 worldPosition = CellCenterWorld(cellPosition); // Plant near cell center
+
+        gardener.Plant(); // Trigger animation
         StartCoroutine(PlantAfterAnimation(gardener, plantManager, cellPosition, worldPosition));
     }
-    
-    // New coroutine to handle delayed planting after animation
-    private IEnumerator PlantAfterAnimation(GardenerController gardener, PlantPlacementManager plantManager, 
-        Vector3Int cellPosition, Vector3 worldPosition)
+
+    private IEnumerator PlantAfterAnimation(GardenerController gardener, PlantPlacementManager plantManager, Vector3Int cellPosition, Vector3 worldPosition)
     {
-        // Wait for the planting animation to complete
-        yield return new WaitForSeconds(gardener.plantingDuration);
-    
-        // Try to plant seed at the cell position
-        bool planted = plantManager.TryPlantSeed(cellPosition, worldPosition);
-    
-        if (debugLogs)
+        // Ensure gardener and duration are valid
+        float waitTime = (gardener != null) ? gardener.plantingDuration : 0.1f;
+        yield return new WaitForSeconds(waitTime);
+
+        if (plantManager != null) // Check again in case it was destroyed
         {
-            Debug.Log(planted ? 
-                $"Planted seed successfully at cell {cellPosition}" : 
-                $"Failed to plant seed at cell {cellPosition}");
+            bool planted = plantManager.TryPlantSeed(cellPosition, worldPosition);
+            if (debugLogs) Debug.Log(planted ? $"Planted seed successfully at {cellPosition}" : $"Failed to plant seed at {cellPosition}");
         }
     }
-    
+
+    // --- ApplyToolAction is MODIFIED ---
     public void ApplyToolAction(ToolDefinition toolDef)
     {
-        if (!currentlyHoveredCell.HasValue)
-            return;
-
-        // If we recognized no tile, do nothing
-        if (hoveredTileDef == null)
-        {
-            if (debugLogs) Debug.Log("ApplyToolAction: No recognized tile at hovered cell.");
-            return;
-        }
-
-        // Check distance
+        // --- Initial Checks (unchanged) ---
+        if (toolDef == null) { Debug.LogWarning("ApplyToolAction called with a NULL toolDef."); return; }
+        if (!currentlyHoveredCell.HasValue) return;
+        if (hoveredTileDef == null) { if (debugLogs) Debug.Log("ApplyToolAction: No recognized tile at hovered cell."); return; }
+        if (playerToolSwitcher == null) { Debug.LogError("ApplyToolAction: ToolSwitcher reference is missing! Cannot apply tool."); return; }
         float distance = Vector2.Distance(player.position, CellCenterWorld(currentlyHoveredCell.Value));
-        if (distance > hoverRadius)
+        if (distance > hoverRadius) { if (debugLogs) Debug.Log($"ApplyToolAction: Cell too far ({distance:F2} > {hoverRadius})."); return; }
+        if (playerToolSwitcher.CurrentTool != toolDef) { Debug.LogWarning($"ApplyToolAction: Tool passed ({toolDef.displayName}) does not match current tool ({playerToolSwitcher.CurrentTool?.displayName}). Aborting."); return; }
+        // ---------------------------------
+
+        // --- Consume Use Attempt ---
+        // We *attempt* to consume first. If it fails (out of uses), we stop.
+        // If it succeeds, we proceed to check for refill or transformation.
+        bool consumed = playerToolSwitcher.TryConsumeUse();
+        // --- Note: We don't stop here even if consumed is false, because a refill action might still be possible even if uses are 0 (e.g. refill an empty can) ---
+        // --- UPDATE: Actually, let's only proceed if consumed is TRUE OR if a refill rule applies ---
+
+        if (debugLogs) Debug.Log($"[ApplyToolAction] Using Tool='{toolDef.toolType}', On Tile='{hoveredTileDef.displayName}', At Cell={currentlyHoveredCell.Value}. Consumed Use: {consumed}");
+
+
+        // --- Check for REFILL Action FIRST ---
+        bool wasRefillAction = false;
+        if (interactionLibrary != null && interactionLibrary.refillRules != null)
         {
-            if (debugLogs)
-                Debug.Log($"ApplyToolAction: Cell is {distance:F2} away, above {hoverRadius} radius. Aborting.");
+            foreach (var refillRule in interactionLibrary.refillRules)
+            {
+                // Check if rule matches the current tool and hovered tile
+                if (refillRule != null && refillRule.toolToRefill == toolDef && refillRule.refillSourceTile == hoveredTileDef)
+                {
+                    // Match found! Attempt to refill.
+                    if (debugLogs) Debug.Log($"Refill rule matched: Tool '{toolDef.displayName}' on Tile '{hoveredTileDef.displayName}'.");
+                    playerToolSwitcher.RefillCurrentTool(); // Call the refill method
+                    wasRefillAction = true;
+                    break; // Stop checking refill rules once one matches
+                }
+            }
+        }
+        // If it was a refill action, we are done. Don't proceed to tile transformation.
+        if (wasRefillAction)
+        {
+            // Note: The use was already consumed before the refill check.
+            // If you want to *not* consume a use when refilling, you'd need
+            // to add a RefundUse() method to ToolSwitcher and call it here,
+            // or move the TryConsumeUse() call *after* the refill check.
+            // Current logic: Click on water consumes 1 use, then refills to max.
             return;
         }
+        // --------------------------------------
 
-        if (debugLogs)
-            Debug.Log(
-                $"[ApplyToolAction] Tool={toolDef.toolType}, fromTile={hoveredTileDef.displayName} at cell={currentlyHoveredCell.Value}");
 
-        // ADDED: Special handling for SeedPouch tool type
+        // --- Proceed ONLY if use was successfully consumed AND it wasn't a refill ---
+        if (!consumed)
+        {
+            if (debugLogs) Debug.Log($"ApplyToolAction: Tool '{toolDef.displayName}' could not be used (out of uses) and no refill rule applied.");
+            return; // Stop if out of uses and not refilling
+        }
+
+
+        // --- Handle Standard Tile Transformation ---
+
+        // Special case: SeedPouch (check again after use consumption)
         if (toolDef.toolType == ToolType.SeedPouch)
         {
-            // Handle seed planting action separately
             HandleSeedPlanting(currentlyHoveredCell.Value);
-            return;
+            return; // Seed planting handles its own logic
         }
 
-        // Find matching rule
-        TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r =>
-            r.tool == toolDef &&
-            r.fromTile == hoveredTileDef
-        );
+        // Find standard matching rule
+        if (interactionLibrary == null || interactionLibrary.rules == null) { Debug.LogWarning("Interaction Library or its standard rules list is null!"); return; }
+        TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == hoveredTileDef);
 
         if (rule == null)
         {
-            Debug.Log($"No rule for tool {toolDef.toolType} on tile {hoveredTileDef.displayName}.");
+            if (debugLogs) Debug.Log($"No standard interaction rule found for tool '{toolDef.toolType}' on tile '{hoveredTileDef.displayName}'.");
+            // Since a use was consumed but no action taken, maybe refund here?
+            // playerToolSwitcher.RefundUse(); // Requires implementation
             return;
         }
 
-        // Check whether the destination tile has keepBottomTile flag before removing source tile
-        if (rule.toTile != null)
+        // Apply the standard rule
+        if (rule.toTile != null) // If there's a tile to change TO
         {
-            // Only remove the original tile if the new tile doesn't have keepBottomTile set
+            if (debugLogs) Debug.Log($"Applying standard rule: '{hoveredTileDef.displayName}' -> '{rule.toTile.displayName}'");
             if (!rule.toTile.keepBottomTile)
             {
                 RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
             }
-
-            // Place the new tile
             PlaceTile(rule.toTile, currentlyHoveredCell.Value);
         }
-        else
+        else // If the rule specifies removing the tile (toTile is null)
         {
-            // If there's no destination tile, just remove the current one
+            if (debugLogs) Debug.Log($"Applying standard rule: Remove '{hoveredTileDef.displayName}'");
             RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
         }
     }
@@ -6623,29 +6691,39 @@ public class TileInteractionManagerEditor : Editor
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Tools\ToolDefinition.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Tiles/Tools/ToolDefinition.cs
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "ToolDefinition", menuName = "Tiles/Tool Definition")]
 public class ToolDefinition : ScriptableObject
 {
+    [Header("Identification")]
     [Tooltip("Which tool type this represents (e.g. Hoe, WateringCan).")]
     public ToolType toolType;
-
     [Tooltip("Human-readable name (for debugging/UI).")]
     public string displayName;
 
+    [Header("Visuals")]
     [Tooltip("Icon sprite for the tool.")]
     public Sprite icon;
-
     [Tooltip("Tint color to apply to the icon sprite.")]
     public Color iconTint = Color.white;
+
+    [Header("Usage Limits")] // <<< NEW HEADER
+    [Tooltip("If true, this tool has a limited number of uses.")]
+    public bool limitedUses = false; // <<< NEW FIELD (Defaults to unlimited)
+    [Tooltip("The number of uses the tool starts with (only relevant if Limited Uses is true).")]
+    [Min(0)] // Ensure it's not negative
+    public int initialUses = 10; // <<< NEW FIELD
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Tools\ToolSwitcher.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Tiles/Tools/ToolSwitcher.cs
+using UnityEngine;
+using System;
 
 public class ToolSwitcher : MonoBehaviour
 {
@@ -6654,49 +6732,208 @@ public class ToolSwitcher : MonoBehaviour
 
     private int currentIndex = 0;
 
-    /// <summary>
-    /// The currently selected tool definition.
-    /// </summary>
+    // --- Public Properties ---
     public ToolDefinition CurrentTool { get; private set; } = null;
+    /// <summary>
+    /// Gets the remaining uses for the current tool. Returns -1 if the tool has unlimited uses.
+    /// </summary>
+    public int CurrentRemainingUses { get; private set; } = -1; // <<< NEW: Track remaining uses (-1 for unlimited)
+
+    // --- Events ---
+    public event Action<ToolDefinition> OnToolChanged;
+    /// <summary>
+    /// Event fired when the remaining uses of the current tool changes. Passes the new remaining count (-1 for unlimited).
+    /// </summary>
+    public event Action<int> OnUsesChanged; // <<< NEW EVENT for UI updates
+
+    private void Awake()
+    {
+        // Debug logs from previous step can be kept or removed
+        // Debug.Log("[ToolSwitcher Awake] Initializing...");
+    }
 
     private void Start()
     {
-        if (toolDefinitions.Length > 0)
-        {
-            currentIndex = 0;
-            CurrentTool = toolDefinitions[currentIndex];
-            LogToolChange();
-        }
+        InitializeToolState(true); // Initialize and fire events
     }
 
     private void Update()
     {
-        if (toolDefinitions.Length == 0) return;
+        if (toolDefinitions == null || toolDefinitions.Length == 0) return;
+
+        bool toolChanged = false;
+        int previousIndex = currentIndex;
 
         if (Input.GetKeyDown(KeyCode.Q))
         {
             currentIndex--;
             if (currentIndex < 0)
                 currentIndex = toolDefinitions.Length - 1;
-            CurrentTool = toolDefinitions[currentIndex];
-            LogToolChange();
+            toolChanged = true;
         }
         else if (Input.GetKeyDown(KeyCode.E))
         {
             currentIndex++;
             if (currentIndex >= toolDefinitions.Length)
                 currentIndex = 0;
-            CurrentTool = toolDefinitions[currentIndex];
-            LogToolChange();
+            toolChanged = true;
+        }
+
+        if (toolChanged)
+        {
+            // Ensure the new index points to a valid definition before updating state
+            if (currentIndex >= 0 && currentIndex < toolDefinitions.Length && toolDefinitions[currentIndex] != null)
+            {
+                InitializeToolState(false); // Update state for the new tool and fire events
+            }
+            else
+            {
+                 Debug.LogError($"[ToolSwitcher Update] Attempted to switch to an invalid/NULL tool definition at index {currentIndex}. Reverting.");
+                 currentIndex = previousIndex; // Revert to the last valid index
+                 // No state change, no events needed here
+            }
         }
     }
 
-    private void LogToolChange()
+    /// <summary>
+    /// Sets the CurrentTool and resets CurrentRemainingUses based on the tool's definition.
+    /// Optionally fires OnToolChanged and OnUsesChanged events.
+    /// </summary>
+    /// <param name="isInitialSetup">If true, forces event firing even if tool doesn't technically change.</param>
+    private void InitializeToolState(bool isInitialSetup)
     {
-        string toolName = (CurrentTool != null) ? CurrentTool.displayName : "(none)";
-        Debug.Log($"Switched tool to: {toolName}");
+        ToolDefinition previousTool = CurrentTool; // Store previous tool for change check
+        int previousUses = CurrentRemainingUses; // Store previous uses
+
+        if (toolDefinitions == null || toolDefinitions.Length == 0 || currentIndex < 0 || currentIndex >= toolDefinitions.Length || toolDefinitions[currentIndex] == null)
+        {
+            // Handle cases with no tools or invalid selection
+            CurrentTool = null;
+            CurrentRemainingUses = -1; // No tool = unlimited uses conceptually
+        }
+        else
+        {
+            // Valid tool selected
+            CurrentTool = toolDefinitions[currentIndex];
+            if (CurrentTool.limitedUses)
+            {
+                CurrentRemainingUses = CurrentTool.initialUses;
+            }
+            else
+            {
+                CurrentRemainingUses = -1; // Mark as unlimited
+            }
+        }
+        
+        
+
+        LogToolChange("[ToolSwitcher InitializeToolState]"); // Log the state after update
+
+        // Fire events if state actually changed or if it's the initial setup
+        bool toolActuallyChanged = previousTool != CurrentTool;
+        bool usesActuallyChanged = previousUses != CurrentRemainingUses;
+
+        if (isInitialSetup || toolActuallyChanged)
+        {
+             Debug.Log($"[ToolSwitcher InitializeToolState] Firing OnToolChanged for tool: {CurrentTool?.displayName ?? "NULL"}");
+             OnToolChanged?.Invoke(CurrentTool);
+        }
+        if (isInitialSetup || usesActuallyChanged || toolActuallyChanged) // Fire uses changed if tool changed too (to reset UI)
+        {
+             Debug.Log($"[ToolSwitcher InitializeToolState] Firing OnUsesChanged with value: {CurrentRemainingUses}");
+             OnUsesChanged?.Invoke(CurrentRemainingUses);
+        }
+    }
+
+
+    /// <summary>
+    /// Refills the current tool to its maximum capacity if it's a limited-use tool.
+    /// </summary>
+    public void RefillCurrentTool() // <<< NEW METHOD
+    {
+        if (CurrentTool == null)
+        {
+            Debug.LogWarning("[ToolSwitcher RefillCurrentTool] Cannot refill: No tool selected.");
+            return;
+        }
+
+        if (!CurrentTool.limitedUses)
+        {
+            Debug.LogWarning($"[ToolSwitcher RefillCurrentTool] Cannot refill tool '{CurrentTool.displayName}': It has unlimited uses.");
+            return;
+        }
+
+        // Check if already full to avoid unnecessary event firing
+        if (CurrentRemainingUses == CurrentTool.initialUses)
+        {
+            if(Debug.isDebugBuild) Debug.Log($"[ToolSwitcher RefillCurrentTool] Tool '{CurrentTool.displayName}' is already full ({CurrentRemainingUses} uses).");
+            return;
+        }
+
+        // Set uses back to initial amount
+        int previousUses = CurrentRemainingUses;
+        CurrentRemainingUses = CurrentTool.initialUses;
+
+        Debug.Log($"[ToolSwitcher RefillCurrentTool] Refilled tool '{CurrentTool.displayName}' to {CurrentRemainingUses} uses (was {previousUses}).");
+
+        // Notify listeners that uses changed
+        OnUsesChanged?.Invoke(CurrentRemainingUses);
     }
     
+    /// <summary>
+    /// Attempts to consume one use of the current tool.
+    /// </summary>
+    /// <returns>True if a use was consumed or if the tool has unlimited uses. False if the tool has limited uses and is out of uses.</returns>
+    public bool TryConsumeUse()
+    {
+        if (CurrentTool == null)
+        {
+            Debug.LogWarning("[ToolSwitcher TryConsumeUse] Cannot consume use: No tool selected.");
+            return false; // Cannot use a non-existent tool
+        }
+
+        if (!CurrentTool.limitedUses || CurrentRemainingUses == -1)
+        {
+            // Tool is unlimited, consumption always succeeds
+            // Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' has unlimited uses."); // Optional log
+            return true;
+        }
+
+        // Tool has limited uses
+        if (CurrentRemainingUses > 0)
+        {
+            CurrentRemainingUses--;
+            Debug.Log($"[ToolSwitcher TryConsumeUse] Consumed use for '{CurrentTool.displayName}'. Remaining: {CurrentRemainingUses}");
+            OnUsesChanged?.Invoke(CurrentRemainingUses); // Notify listeners
+            return true;
+        }
+        else
+        {
+            // Out of uses
+            Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' is out of uses (0 remaining).");
+            // Optionally play an 'empty click' sound here
+            return false;
+        }
+    }
+
+    // Added prefix parameter for context
+    private void LogToolChange(string prefix = "[ToolSwitcher]")
+    {
+        string toolName = (CurrentTool != null && !string.IsNullOrEmpty(CurrentTool.displayName))
+                          ? CurrentTool.displayName
+                          : "(none)";
+        string usesSuffix = "";
+        if (CurrentTool != null && CurrentTool.limitedUses && CurrentRemainingUses >= 0)
+        {
+            usesSuffix = $" ({CurrentRemainingUses}/{CurrentTool.initialUses})";
+        }
+        else if (CurrentTool != null && !CurrentTool.limitedUses)
+        {
+            // usesSuffix = " (Unlimited)"; // Optional: Indicate unlimited
+        }
+
+        Debug.Log($"{prefix} Switched tool to: {toolName}{usesSuffix} (Index: {currentIndex})");
+    }
 }
 
 
@@ -6863,6 +7100,130 @@ public class NightColorPostProcess : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\PlantShadowController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using System.Collections.Generic;
+
+public class PlantShadowController : MonoBehaviour
+{
+    [Header("Global Shadow Settings")]
+    [SerializeField] private Color shadowColor = new Color(0f, 0f, 0f, 0.5f);
+    [SerializeField] [Tooltip("Direction light comes FROM (e.g., (1, -1) for light from top-right)")]
+    private Vector2 lightSourceDirection = new Vector2(0.7f, -1f);
+    [SerializeField] private float shadowDistance = 0.3f; // Base distance multiplier
+    [SerializeField] [Range(0.1f, 2f)] private float squashFactor = 0.6f; // Vertical squash (1 = none, <1 = flatter, >1 = taller)
+    [SerializeField] [Range(-45f, 45f)] private float skewAngleDegrees = 15f; // Fake skew via Z rotation
+
+    [Header("Sorting")]
+    [SerializeField] [Tooltip("Name of the Sorting Layer for shadows (e.g., 'Shadows')")]
+    private string shadowSortingLayerName = "Default"; // Default to 'Default' layer
+    [SerializeField] [Tooltip("Sorting Order within the layer (lower values are rendered first)")]
+    private int shadowSortingOrder = -1; // Typically below the plant
+
+    // --- Internal ID ---
+    private int shadowSortingLayerID;
+
+    // Public accessors for ShadowPartController
+    public Color ShadowColor => shadowColor;
+    public int ShadowSortingLayer => shadowSortingLayerID; // Use the internal ID
+    public int ShadowSortingOrder => shadowSortingOrder;
+
+
+    private Vector3 baseLocalScale;
+    private Quaternion baseLocalRotation;
+    private Vector3 baseLocalPosition;
+
+    private Dictionary<SpriteRenderer, ShadowPartController> shadowPartMap = new Dictionary<SpriteRenderer, ShadowPartController>();
+
+
+    void Awake()
+    {
+        // Convert layer name to ID
+        shadowSortingLayerID = SortingLayer.NameToID(shadowSortingLayerName);
+        if (shadowSortingLayerID == 0 && shadowSortingLayerName != "Default") // NameToID returns 0 for invalid names (and Default)
+        {
+            Debug.LogWarning($"Sorting Layer '{shadowSortingLayerName}' not found. Shadow will use 'Default'.", this);
+            shadowSortingLayerID = SortingLayer.NameToID("Default"); // Fallback explicitly
+        }
+
+
+        baseLocalScale = transform.localScale;
+        baseLocalRotation = transform.localRotation;
+        baseLocalPosition = transform.localPosition; // Store initial position relative to plant root
+    }
+
+    void LateUpdate()
+    {
+        // 1. Calculate Global Offset based on light direction
+        Vector3 shadowOffset = -(Vector3)lightSourceDirection.normalized * shadowDistance;
+
+        // Apply the offset to the ShadowRoot's position relative to the plant root
+        transform.localPosition = baseLocalPosition + shadowOffset;
+
+        // 2. Apply Squash (relative to base scale)
+        // Simplification: apply squash globally on Y for now.
+        transform.localScale = new Vector3(baseLocalScale.x, baseLocalScale.y * squashFactor, baseLocalScale.z);
+
+        // 3. Apply Skew (Fake Z-Rotation)
+        // Rotate the shadow root based on the skew angle
+        transform.localRotation = baseLocalRotation * Quaternion.Euler(0, 0, skewAngleDegrees);
+
+        // Optional: Update color globally if needed (e.g., time of day)
+        // UpdateShadowPartColors(); // You'd need to cache child ShadowPartControllers for this
+    }
+
+    // --- Methods for PlantGrowth Integration ---
+
+    // Call this from PlantGrowth when a plant part is instantiated
+    public void RegisterPlantPart(SpriteRenderer plantPartRenderer, GameObject shadowPartPrefab)
+    {
+        if (plantPartRenderer == null || shadowPartPrefab == null) return;
+        if (shadowPartMap.ContainsKey(plantPartRenderer)) return; // Already registered
+
+        // Instantiate the shadow part prefab as a child of this ShadowRoot
+        GameObject shadowInstance = Instantiate(shadowPartPrefab, transform); // Instantiate under this shadow root
+        ShadowPartController shadowController = shadowInstance.GetComponent<ShadowPartController>();
+
+        if (shadowController != null)
+        {
+            shadowController.Initialize(plantPartRenderer, this);
+            shadowPartMap.Add(plantPartRenderer, shadowController);
+            // Debug.Log($"Registered shadow for {plantPartRenderer.gameObject.name}");
+        }
+        else
+        {
+            Debug.LogError($"Shadow Part Prefab '{shadowPartPrefab.name}' is missing ShadowPartController script.", shadowPartPrefab);
+            Destroy(shadowInstance);
+        }
+    }
+
+    // Call this from PlantGrowth when a plant part is about to be destroyed
+    public void UnregisterPlantPart(SpriteRenderer plantPartRenderer)
+    {
+        if (plantPartRenderer != null && shadowPartMap.TryGetValue(plantPartRenderer, out ShadowPartController shadowController))
+        {
+            if (shadowController != null) // Check if it wasn't already destroyed
+            {
+                 shadowController.OnPlantPartDestroyed(); // Tell the part to destroy itself
+                 // Debug.Log($"Unregistered shadow for {plantPartRenderer.gameObject.name}");
+            }
+            shadowPartMap.Remove(plantPartRenderer);
+        }
+        // else { Debug.LogWarning($"Attempted to unregister shadow for {plantPartRenderer?.gameObject.name}, but not found in map."); }
+    }
+
+     // Clean up dictionary when the main plant is destroyed
+    void OnDestroy()
+    {
+         // The child shadow GameObjects will be destroyed automatically since they are parented.
+         // Just clear the map to prevent potential memory issues if the map reference somehow persists.
+        shadowPartMap.Clear();
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Visuals\RuntimeCircleDrawer.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿// FILE: Assets/Scripts/Visuals/Debug/RuntimeCircleDrawer.cs
@@ -6983,6 +7344,131 @@ public class RuntimeCircleDrawer : MonoBehaviour
         }
 
         lineRenderer.SetPositions(points);
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\ShadowPartController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+
+[RequireComponent(typeof(SpriteRenderer))]
+public class ShadowPartController : MonoBehaviour
+{
+    private SpriteRenderer shadowRenderer;
+    private SpriteRenderer plantPartRenderer; // Reference to the actual plant part's renderer
+    private Transform plantPartTransform;   // Reference to the actual plant part's transform
+
+    private Transform shadowRootTransform; // The parent transform that handles global skew/squash
+    private PlantShadowController mainShadowController; // To get global settings
+
+    private Vector3 initialLocalPosition; // Store position relative to plant part at setup
+
+    void Awake()
+    {
+        shadowRenderer = GetComponent<SpriteRenderer>();
+        shadowRenderer.drawMode = SpriteDrawMode.Simple; // Ensure scaling works as expected
+        shadowRenderer.enabled = false; // Start disabled until initialized
+    }
+
+    // Call this immediately after instantiating the shadow part
+    public void Initialize(SpriteRenderer targetPlantPartRenderer, PlantShadowController controller)
+    {
+        if (targetPlantPartRenderer == null || controller == null)
+        {
+            Debug.LogError("ShadowPartController initialization failed: Missing references.", this);
+            Destroy(gameObject); // Can't function without these
+            return;
+        }
+
+        plantPartRenderer = targetPlantPartRenderer;
+        plantPartTransform = targetPlantPartRenderer.transform;
+        mainShadowController = controller;
+        shadowRootTransform = controller.transform; // The controller sits on the shadow root
+
+        // Set initial properties from controller
+        shadowRenderer.sortingLayerID = mainShadowController.ShadowSortingLayer;
+        shadowRenderer.sortingOrder = mainShadowController.ShadowSortingOrder;
+        shadowRenderer.color = mainShadowController.ShadowColor; // Use the global color
+
+        // --- Calculate position relative to the plant part ---
+        // We want the shadow part's origin (relative to the shadow root)
+        // to match the plant part's origin (relative to the plant root),
+        // before the shadow root applies its own offset/skew/squash.
+        transform.position = plantPartTransform.position;
+        transform.rotation = plantPartTransform.rotation;
+        // Store this initial local position relative to the root
+        initialLocalPosition = transform.localPosition;
+
+
+        // We don't set the sprite here, LateUpdate handles it
+        shadowRenderer.enabled = plantPartRenderer.enabled && plantPartRenderer.sprite != null;
+
+        // Ensure it's parented correctly under the shadow root
+        transform.SetParent(shadowRootTransform, true); // Parent while maintaining world position/rotation
+
+        // Re-calculate local position *after* parenting
+        initialLocalPosition = transform.localPosition;
+    }
+
+    void LateUpdate()
+    {
+        if (plantPartRenderer == null || !plantPartRenderer.enabled || plantPartRenderer.sprite == null || shadowRenderer == null)
+        {
+            shadowRenderer.enabled = false; // Hide shadow if plant part is hidden/gone
+            return;
+        }
+
+        shadowRenderer.enabled = true;
+
+        // 1. Sync Sprite
+        shadowRenderer.sprite = plantPartRenderer.sprite;
+
+        // 2. Sync Position & Rotation (Relative to Shadow Root)
+        // Match the plant part's world position/rotation initially
+        transform.position = plantPartTransform.position;
+        transform.rotation = plantPartTransform.rotation;
+        // Now update the local position based on the initial offset we calculated
+        // This ensures it moves WITH the plant part, but stays correctly positioned
+        // relative to the shadow root for skew/squash to apply.
+         // transform.localPosition = initialLocalPosition; // NO - this fights the world pos update
+         // Instead, recalculate the desired local position based on the plant part's *current* local pos relative to *its* parent
+         // Vector3 plantPartLocalPos = plantPartTransform.localPosition;
+         // transform.localPosition = plantPartLocalPos; // Simplest: just match local position relative to respective roots
+
+        // --- More Robust Position Sync ---
+        // Calculate the plant part's position relative to the *plant's root*
+        Vector3 plantPartPosRelativeToPlantRoot = plantPartTransform.parent.InverseTransformPoint(plantPartTransform.position);
+        // Set this shadow part's local position relative to the *shadow root* to match
+        transform.localPosition = plantPartPosRelativeToPlantRoot;
+        // Match local rotation as well
+        transform.localRotation = plantPartTransform.localRotation;
+
+
+        // 3. Sync Flip
+        shadowRenderer.flipX = plantPartRenderer.flipX;
+        shadowRenderer.flipY = plantPartRenderer.flipY;
+
+        // 4. Sync Scale (relative to parent)
+        transform.localScale = plantPartTransform.localScale;
+
+        // Color & Sorting are set during Initialize and potentially updated by PlantShadowController if needed
+        // shadowRenderer.color = mainShadowController.ShadowColor; // Only if color can change dynamically
+    }
+
+    // Called when the corresponding plant part is destroyed
+    public void OnPlantPartDestroyed()
+    {
+         if (this != null && gameObject != null)
+         {
+              // Use DestroyImmediate if called from editor script, Destroy otherwise
+             if (Application.isPlaying) { Destroy(gameObject); } else { DestroyImmediate(gameObject); }
+         }
     }
 }
 
