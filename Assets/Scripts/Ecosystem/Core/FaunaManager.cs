@@ -93,8 +93,22 @@ public class FaunaManager : MonoBehaviour
         return spawnPos;
     }
 
-    private Transform FindPlayerTransform() { /* Unchanged */ Transform pT = null; if (WaveManager.Instance != null) { var pI = FindObjectOfType<PlayerTileInteractor>(); if (pI != null) pT = pI.transform; } if (pT == null) { GameObject pO = GameObject.FindGameObjectWithTag("Player"); if (pO != null) pT = pO.transform; } return pT; }
-
+    private Transform FindPlayerTransform()
+    {
+        Transform pT = null;
+        if (WaveManager.Instance != null)
+        {
+            var pI = FindAnyObjectByType<PlayerTileInteractor>();
+            if (pI != null) pT = pI.transform;
+        }
+        if (pT == null)
+        {
+            GameObject pO = GameObject.FindGameObjectWithTag("Player");
+            if (pO != null) pT = pO.transform;
+        }
+        return pT;
+    }
+    
     /// <summary>
     /// Instantiates and initializes an animal, passing SHIFTED screen bounds.
     /// </summary>

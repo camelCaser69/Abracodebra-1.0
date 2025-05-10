@@ -13,10 +13,6 @@ public class PlantOutlineController : MonoBehaviour
     [SerializeField] private bool excludeBaseCell = true;
     [SerializeField] private GameObject outlinePartPrefab;
     
-    [Header("Performance Options")]
-    [SerializeField] private bool batchOutlineUpdates = true;
-    [SerializeField] [Range(0.05f, 0.5f)] private float updateInterval = 0.1f;
-
     [Header("Sorting")]
     [SerializeField] private string outlineSortingLayerName = "Default";
     [SerializeField] private int outlineSortingOrder = -1;
@@ -35,8 +31,6 @@ public class PlantOutlineController : MonoBehaviour
     private Dictionary<Vector2Int, OutlinePartController> outlinePartMap = new Dictionary<Vector2Int, OutlinePartController>();
     private HashSet<Vector2Int> plantCellCoords = new HashSet<Vector2Int>();
     
-    private float lastUpdateTime = 0f;
-
     // Neighbor offsets - 8 directions around a cell
     private static readonly Vector2Int[] neighborOffsets = new Vector2Int[]
     {
