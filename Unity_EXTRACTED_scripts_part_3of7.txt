@@ -1,0 +1,1491 @@
+This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
+
+================================================================================
+UNITY PROJECT SCRIPT EXPORT - 2025-05-10 01:49:48
+PART 3 OF 7
+================================================================================
+
+--------------------------------------------------------------------------------
+Assets
+├── Animation
+│   ├── GodRay300B_001.controller
+│   ├── GodRay60_001.controller
+│   ├── GodRays300.anim
+│   ├── GodRays300B.anim
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
+├── DefaultVolumeProfile.asset
+├── Editor
+│   ├── NodeDefinitionAutoAdder.cs
+│   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionEditor.cs
+│   ├── NodeDefinitionLibraryEditor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   └── NodeEffectDrawer.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
+├── InputSystem_Actions.inputactions
+├── Materials
+│   ├── BezierCurveAA_Material.mat
+│   └── Firefly_Glow_Material.mat
+├── Post Processing
+├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   ├── Animal_Deer.prefab
+│   │   │   ├── Animal_Fox.prefab
+│   │   │   └── FireflyPrefab.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelBerry.prefab
+│   │   │   ├── PixelFlower.prefab
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   ├── PlantOutline.prefab
+│   │   │   ├── PlantPrefab.prefab
+│   │   │   └── PlantShadow.prefab
+│   │   ├── Props
+│   │   │   ├── Poop_Big.prefab
+│   │   │   ├── Poop_Medium_01.prefab
+│   │   │   └── Poop_Medium_02.prefab
+│   │   └── UI
+│   │       ├── EmptySlot16.prefab
+│   │       ├── EmptySlot32.prefab
+│   │       ├── HoverTileMarker.prefab
+│   │       ├── Indicator_Opportunity.prefab
+│   │       ├── Indicator_Resource.prefab
+│   │       ├── Indicator_Threat.prefab
+│   │       ├── NodeCellEmpty16.prefab
+│   │       ├── NodePics
+│   │       │   ├── Seed_01.prefab
+│   │       │   └── Seed_02.prefab
+│   │       ├── NodeView.prefab
+│   │       ├── ThoughtBubble.prefab
+│   │       ├── Visualizer_Circle_Prefab.prefab
+│   │       └── Visualizer_Line_Prefab.prefab
+│   ├── General
+│   │   ├── GardenerPrefab.prefab
+│   │   └── Projectile_Basic_Pixel.prefab
+│   └── Tiles
+│       ├── Common
+│       │   └── PLains_0_Corner_LT.asset
+│       ├── Palettes
+│       │   └── PaletteDual_Ground.prefab
+│       └── Rule Tiles
+│           ├── DualGridRuleTile_Dirt.asset
+│           ├── DualGridRuleTile_DirtWet.asset
+│           └── DualGridRuleTile_Grass.asset
+├── Scenes
+│   ├── MainScene.unity
+│   ├── SampleScene
+│   │   └── GlobalPostProcessVolume Profile.asset
+│   └── SampleScene.unity
+├── Scriptable Objects
+│   ├── Animals
+│   │   ├── AnimalLibrary.asset
+│   │   ├── Animal_000_Bunny.asset
+│   │   └── Animal_001_Deer.asset
+│   ├── Animals Diet
+│   │   ├── Diet_000_Bunny.asset
+│   │   └── Diet_001_Deer.asset
+│   ├── Food
+│   │   ├── FoodType_000_Berry.asset
+│   │   └── FoodType_000_Leaf.asset
+│   ├── Life Thoughts
+│   │   └── AnimalThoughtLibrary.asset
+│   ├── Nodes Plant
+│   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
+│   │   ├── Node_001_Berry.asset
+│   │   ├── Node_002_FireflyPheromone.asset
+│   │   └── Node_003_WaterPreserver.asset
+│   ├── Scents
+│   │   ├── ScentLibrary.asset
+│   │   └── Scent_000_FireflyPheromone.asset
+│   ├── Tiles
+│   │   ├── TileDefinition_000_Grass.asset
+│   │   ├── TileDefinition_001_Dirt.asset
+│   │   ├── TileDefinition_002_DirtWet.asset
+│   │   ├── TileDefinition_003_Water.asset
+│   │   └── TileInteractionLibrary.asset
+│   ├── Tools
+│   │   ├── ToolDefinition_000_GardeningHoe.asset
+│   │   ├── ToolDefinition_001_WateringCan.asset
+│   │   └── ToolDefinition_002_SeedPouch.asset
+│   └── Waves
+│       ├── Wave_000.asset
+│       └── Wave_001.asset
+├── Scripts
+│   ├── Battle
+│   │   ├── Plant
+│   │   │   ├── PlantCell.cs
+│   │   │   ├── PlantGrowth.Cell.cs
+│   │   │   ├── PlantGrowth.Growth.cs
+│   │   │   ├── PlantGrowth.NodeExecution.cs
+│   │   │   ├── PlantGrowth.cs
+│   │   │   └── WeatherManager.cs
+│   │   ├── SpellProjectile.cs
+│   │   └── Status Effects
+│   │       ├── BurningStatusEffect.cs
+│   │       └── StatusEffect.cs
+│   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── AnimalDefinition.cs
+│   │   │   └── AnimalLibrary.cs
+│   │   ├── Core
+│   │   │   ├── AnimalController.cs
+│   │   │   ├── AnimalSpawnData.cs
+│   │   │   ├── AnimalThoughtLibrary.cs
+│   │   │   ├── EcosystemManager.cs
+│   │   │   ├── FaunaManager.cs
+│   │   │   ├── FloraManager.cs
+│   │   │   ├── PoopController.cs
+│   │   │   ├── ScentSource.cs
+│   │   │   ├── ThoughtBubbleController.cs
+│   │   │   ├── ThoughtTrigger.cs
+│   │   │   ├── WaveDefinition.cs
+│   │   │   └── WaveManager.cs
+│   │   ├── Effects
+│   │   │   ├── FireflyController.cs
+│   │   │   └── FireflyManager.cs
+│   │   ├── Food
+│   │   │   ├── AnimalDiet.cs
+│   │   │   ├── FoodItem.cs
+│   │   │   └── FoodType.cs
+│   │   ├── Plants
+│   │   └── Scents
+│   │       ├── ScentDefinition.cs
+│   │       └── ScentLibrary.cs
+│   ├── Nodes
+│   │   ├── Core
+│   │   │   ├── NodeData.cs
+│   │   │   ├── NodeDefinition.cs
+│   │   │   ├── NodeDefinitionLibrary.cs
+│   │   │   ├── NodeEffectData.cs
+│   │   │   ├── NodeEffectType.cs
+│   │   │   └── OutputNodeEffect.cs
+│   │   ├── Runtime
+│   │   │   ├── NodeExecutor.cs
+│   │   │   └── NodeGraph.cs
+│   │   └── UI
+│   │       ├── ColorExtensions.cs
+│   │       ├── DeselectOnClickOutside.cs
+│   │       ├── NodeCell.cs
+│   │       ├── NodeDraggable.cs
+│   │       ├── NodeEditorGridController.cs
+│   │       ├── NodeSelectable.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
+│   ├── Rendering
+│   ├── Tiles
+│   │   ├── Data
+│   │   │   ├── PlantGrowthModifierManager.cs
+│   │   │   ├── PlantPlacementManagement.cs
+│   │   │   ├── PlayerTileInteractor.cs
+│   │   │   ├── TileDefinition.cs
+│   │   │   ├── TileInteractionLibrary.cs
+│   │   │   ├── TileInteractionManager.cs
+│   │   │   └── TileInteractionRule.cs
+│   │   ├── Editor
+│   │   │   ├── TileDefinitionEditor.cs
+│   │   │   └── TileInteractionManagerEditor.cs
+│   │   └── Tools
+│   │       ├── ToolDefinition.cs
+│   │       ├── ToolSwitcher.cs
+│   │       └── ToolType.cs
+│   ├── UI
+│   └── Visuals
+│       ├── NightColorPostProcess.cs
+│       ├── OutlinePartController.cs
+│       ├── PlantOutlineController.cs
+│       ├── PlantShadowController.cs
+│       ├── RuntimeCircleDrawer.cs
+│       └── ShadowPartController.cs
+├── Settings
+│   ├── Lit2DSceneTemplate.scenetemplate
+│   ├── Renderer2D.asset
+│   ├── Scenes
+│   │   └── URP2DSceneTemplate.unity
+│   └── UniversalRP.asset
+├── Shaders
+│   ├── BezierCurveAA.shader
+│   ├── Sprite-Lit-Default_OverlayCustom.shader
+│   ├── Sprite-Lit-Default_Overlay_Base.mat
+│   └── SpriteEmissiveUnlit.shader
+├── TextureImporter.preset
+└── UniversalRenderPipelineGlobalSettings.asset
+--------------------------------------------------------------------------------
+
+SCRIPT CONTENTS
+================================================================================
+
+SCRIPT CONTENTS
+================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\FloraManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Core/FloraManager.cs
+using UnityEngine;
+using System.Collections.Generic; // Added for Dictionary
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+public class FloraManager : MonoBehaviour
+{
+    public static FloraManager Instance { get; private set; }
+
+    [Header("Debugging - Scents")]
+    [Tooltip("Show scent radii circle renderers in Game View during runtime.")]
+    [SerializeField] private bool showScentRadiiRuntime = false;
+    [SerializeField] private Color scentRadiusColorRuntime = Color.yellow;
+    [SerializeField] private bool logGizmoCalls = false;
+    [Space]
+    [Tooltip("Prefab used to draw scent circles at runtime.")]
+    [SerializeField] private GameObject circleVisualizerPrefab; // <<< ADDED
+    [Tooltip("Parent transform for instantiated circle visualizers.")]
+    [SerializeField] private Transform circleContainer; // <<< ADDED
+
+    // --- Public Accessors ---
+    public bool ShowScentRadiiRuntime => showScentRadiiRuntime;
+    public Color ScentRadiusColorRuntime => scentRadiusColorRuntime;
+
+    // --- Internal State ---
+    // Dictionary to track circle visualizers per ScentSource
+    private Dictionary<ScentSource, RuntimeCircleDrawer> activeCircleVisualizers = new Dictionary<ScentSource, RuntimeCircleDrawer>();
+
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+
+        // Validate Debug Dependencies
+        if (circleVisualizerPrefab == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Visualizer Prefab is not assigned!", this); }
+        if (circleContainer == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Container transform is not assigned!", this); }
+    }
+
+     void Update() // Added Update loop
+     {
+         if (!Application.isPlaying) return;
+         UpdateRuntimeCircleVisualizers();
+     }
+
+    void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+        // Clean up any remaining visualizers when manager is destroyed
+         foreach (var kvp in activeCircleVisualizers)
+         {
+             if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+         }
+         activeCircleVisualizers.Clear();
+    }
+
+
+    // --- Runtime Visualizer Update ---
+    void UpdateRuntimeCircleVisualizers()
+    {
+        bool showCircles = showScentRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
+
+        // Find all active ScentSources (can be slow, consider optimizing if needed)
+        // If performance becomes an issue, ScentSources could register/deregister themselves with the manager.
+        ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
+        HashSet<ScentSource> currentSourcesSet = new HashSet<ScentSource>(currentSources); // For quick lookup
+
+        // --- Update existing circles ---
+        List<ScentSource> sourcesToRemove = new List<ScentSource>();
+        foreach (var kvp in activeCircleVisualizers)
+        {
+            ScentSource source = kvp.Key;
+            RuntimeCircleDrawer drawer = kvp.Value;
+
+            // Check if source still exists and is valid
+            if (source == null || drawer == null || !source.gameObject.activeInHierarchy || !currentSourcesSet.Contains(source))
+            {
+                sourcesToRemove.Add(source); // Mark for removal
+                if (drawer != null) Destroy(drawer.gameObject); // Destroy visualizer
+                continue;
+            }
+
+            // Check if circles should be shown globally and if this source is valid
+            bool shouldShowThis = showCircles && source.enabled && source.definition != null && source.EffectiveRadius > 0.01f;
+
+            if (shouldShowThis)
+            {
+                 // Update drawer position to match source and update circle params
+                 drawer.transform.position = source.transform.position;
+                 drawer.transform.rotation = source.transform.rotation; // Match rotation? Optional.
+                 drawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
+            }
+            else
+            {
+                 drawer.HideCircle(); // Hide if shouldn't be shown
+            }
+        }
+
+        // Remove entries for sources that are gone
+        foreach (var source in sourcesToRemove)
+        {
+            activeCircleVisualizers.Remove(source);
+        }
+
+        // --- Add circles for new sources ---
+        if (showCircles)
+        {
+            foreach (ScentSource source in currentSources)
+            {
+                // Skip if already has a visualizer or is invalid
+                if (source == null || activeCircleVisualizers.ContainsKey(source) || !source.enabled || source.definition == null || source.EffectiveRadius <= 0.01f) continue;
+
+                 // Create new visualizer
+                 GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position, source.transform.rotation, circleContainer);
+                 RuntimeCircleDrawer newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
+
+                 if (newDrawer != null)
+                 {
+                      newDrawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
+                      activeCircleVisualizers.Add(source, newDrawer); // Add to tracking
+                 }
+                 else
+                 {
+                    Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' is missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
+                    Destroy(circleGO);
+                 }
+            }
+        }
+        // --- Hide/Destroy all if global flag turned off ---
+        else if (!showCircles && activeCircleVisualizers.Count > 0)
+        {
+             foreach (var kvp in activeCircleVisualizers)
+             {
+                 if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+             }
+             activeCircleVisualizers.Clear();
+        }
+    }
+
+
+    // --- Gizmo Drawing (Editor Visualization - Unchanged) ---
+    #if UNITY_EDITOR
+    void OnDrawGizmosSelected()
+    {
+        // Use the runtime flag to ALSO control the editor gizmo
+        if (showScentRadiiRuntime) {
+             if (logGizmoCalls) { /*...*/ }
+             Gizmos.color = scentRadiusColorRuntime; // Use runtime color for gizmo too
+             ScentSource[] scentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
+             if (logGizmoCalls) { /*...*/ }
+             int drawnCount = 0;
+             foreach (ScentSource source in scentSources) {
+                if (source == null || !source.enabled || source.definition == null) continue;
+                float radius = source.EffectiveRadius;
+                if (radius > 0.01f) { Gizmos.DrawWireSphere(source.transform.position, radius); drawnCount++; }
+             }
+             if (logGizmoCalls && drawnCount > 0) { /*...*/ }
+             else if (logGizmoCalls && scentSources.Length > 0) { /*...*/ }
+        }
+    }
+    #endif
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\PoopController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using TMPro;
+
+public class PoopController : MonoBehaviour
+{
+    [Tooltip("Total lifetime of this poop (in seconds) before disappearing.")]
+    public float lifetime = 10f;
+    [Tooltip("Duration at the end of the lifetime during which the poop fades out.")]
+    public float fadeDuration = 2f;
+    [Tooltip("Fadeout curve to control the alpha during fade-out. X axis goes from 0 (start of fade) to 1 (end of fade).")]
+    public AnimationCurve fadeCurve = AnimationCurve.Linear(0f, 1f, 1f, 0f);
+
+    private SpriteRenderer sr;
+    private float timer = 0f;
+    private Color initialColor;
+
+    private void Awake()
+    {
+        sr = GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            initialColor = sr.color;
+        }
+    }
+
+    private void Update()
+    {
+        timer += Time.deltaTime;
+        if (timer >= lifetime)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        // If within fadeDuration at the end, apply fade-out using the fadeCurve.
+        float remaining = lifetime - timer;
+        if (remaining < fadeDuration && sr != null)
+        {
+            // Normalize fade time (0 = start, 1 = end)
+            float t = 1f - (remaining / fadeDuration);
+            float alphaMultiplier = fadeCurve.Evaluate(t);
+            Color newColor = initialColor;
+            newColor.a = alphaMultiplier;
+            sr.color = newColor;
+        }
+    }
+
+    // Initialize with default parameters if none are provided.
+    public void Initialize(float lifetimeValue = -1f, float fadeDurationValue = -1f)
+    {
+        if (lifetimeValue > 0f)
+            lifetime = lifetimeValue;
+        if (fadeDurationValue > 0f)
+            fadeDuration = fadeDurationValue;
+        timer = 0f;
+        if (sr != null)
+            initialColor = sr.color;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\ScentSource.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Core/ScentSource.cs
+using UnityEngine;
+
+// No longer requires RuntimeCircleDrawer directly
+// REMOVED: [RequireComponent(typeof(RuntimeCircleDrawer))]
+public class ScentSource : MonoBehaviour
+{
+    [Header("Scent Definition")]
+    [Tooltip("The base Scent Definition applied to this object.")]
+    public ScentDefinition definition; // Assigned by PlantGrowth/Node effects
+
+    [Header("Applied Modifiers")]
+    [Tooltip("Bonus radius added by node effects.")]
+    public float radiusModifier = 0f;
+    [Tooltip("Bonus strength added by node effects.")]
+    public float strengthModifier = 0f;
+
+    // REMOVED: Debugging Reference private RuntimeCircleDrawer circleDrawer;
+
+    // --- Calculated Effective Properties ---
+    /// <summary> Gets the effective scent radius (Base Radius + Modifier), clamped >= 0. </summary>
+    public float EffectiveRadius => Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier);
+    /// <summary> Gets the effective scent strength (Base Strength + Modifier), clamped >= 0. </summary>
+    public float EffectiveStrength => Mathf.Max(0f, (definition != null ? definition.baseStrength : 0f) + strengthModifier);
+
+
+    void Awake()
+    {
+        // No longer needs to get or manage the circle drawer component here
+        // REMOVED: circleDrawer = GetComponent<RuntimeCircleDrawer>();
+        // REMOVED: circleDrawer?.HideCircle();
+    }
+
+    // REMOVED: Update() method (FloraManager handles creating/updating/hiding the external visualizer)
+
+
+    // Keep Gizmo for Editor visualization (runs independently of Update and runtime drawers)
+    void OnDrawGizmosSelected()
+    {
+        float effectiveRadius = EffectiveRadius; // Calculate radius for gizmo
+
+        if (definition != null) // Check if a definition is assigned
+        {
+            if (effectiveRadius > 0.01f) // Only draw if radius is meaningful
+            {
+                // Use definition name hash for consistent random color
+                // Note: Random.InitState affects the *next* Random call globally,
+                // which might be undesirable if other Gizmos rely on it.
+                // A more robust way might be a custom color mapping or a simple hash function.
+                // For simplicity, we'll keep Random.InitState for now.
+                int prevState = Random.state.GetHashCode(); // Store previous state
+                Random.InitState(definition.name.GetHashCode());
+                Color gizmoColor = Random.ColorHSV(0f, 1f, 0.7f, 0.9f, 0.8f, 1f);
+                gizmoColor.a = 0.3f; // Set alpha for gizmo
+                Random.InitState(prevState); // Restore previous state
+
+                Gizmos.color = gizmoColor;
+                Gizmos.DrawWireSphere(transform.position, effectiveRadius);
+            }
+        }
+        else // Draw default gray if no definition assigned yet
+        {
+            Gizmos.color = new Color(0.8f, 0.8f, 0.8f, 0.2f);
+            Gizmos.DrawWireSphere(transform.position, 1f); // Default size for editor only
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\ThoughtBubbleController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using TMPro;
+
+public class ThoughtBubbleController : MonoBehaviour
+{
+    public TMP_Text messageText;
+    public float lifetime = 2f;
+
+    private Transform followTarget;
+
+    public void Initialize(string message, Transform target, float duration = 2f)
+    {
+        if (messageText != null)
+            messageText.text = message;
+        followTarget = target;
+        lifetime = duration;
+    }
+
+    private void Update()
+    {
+        lifetime -= Time.deltaTime;
+        if (lifetime <= 0f)
+            Destroy(gameObject);
+
+        // Follow the target if needed (optional if already a child)
+        if (followTarget != null)
+        {
+            transform.position = followTarget.position;
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\ThoughtTrigger.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public enum ThoughtTrigger
+{
+    Hungry,
+    Eating,
+    HealthLow,
+    Fleeing,
+    Pooping,
+    // Add more triggers as needed
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\WaveDefinition.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Core/WaveDefinition.cs
+using UnityEngine;
+using System.Collections.Generic;
+
+// Enum WaveSpawnLocationType remains the same
+public enum WaveSpawnLocationType
+{
+    GlobalSpawnArea,
+    RandomNearPlayer,
+    Offscreen
+}
+
+// Class WaveSpawnEntry remains the same
+[System.Serializable]
+public class WaveSpawnEntry
+{
+    [Tooltip("Optional description for this specific spawn group within the wave.")]
+    public string description = "Spawn Group";
+    [Tooltip("The type of animal to spawn.")]
+    public AnimalDefinition animalDefinition;
+    [Tooltip("How many of this animal to spawn in this specific entry.")]
+    [Min(1)]
+    public int spawnCount = 1;
+    [Tooltip("Delay (in seconds) AFTER the designated wave spawn time (e.g. Day 50%) before *this entry* begins spawning.")] // Clarified Tooltip
+    [Min(0)]
+    public float delayAfterSpawnTime = 0f; // Renamed from delayAfterWaveStart
+    [Tooltip("Time (in seconds) between spawning each individual animal in this entry (0 = spawn all instantly).")]
+    [Min(0)]
+    public float spawnInterval = 0.5f;
+    [Tooltip("Where these animals should spawn.")]
+    public WaveSpawnLocationType spawnLocationType = WaveSpawnLocationType.GlobalSpawnArea;
+    [Tooltip("Radius used for spawning (e.g., if Spawn Location Type is RandomNearPlayer).")]
+    [Min(0)]
+    public float spawnRadius = 5f;
+}
+
+// WaveDefinition ScriptableObject is simplified further
+[CreateAssetMenu(fileName = "Wave_", menuName = "Ecosystem/Wave Definition")]
+public class WaveDefinition : ScriptableObject
+{
+    [Header("Wave Identification")]
+    [Tooltip("Editor-only name for this wave.")]
+    public string waveName = "New Wave";
+
+    [Header("Wave Content")]
+    [Tooltip("Define the groups of animals that spawn during this wave.")]
+    public List<WaveSpawnEntry> spawnEntries = new List<WaveSpawnEntry>();
+
+    // REMOVED all timing, duration, end condition, delay fields.
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\WaveManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Managers/WaveManager.cs
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine.UI;
+
+public enum WaveManagerState
+{
+    PausedBeforeRun,     // Initial state, game logic paused
+    WaitingForSpawnTime, // Run started, waiting for correct time in cycle
+    WaveInProgress,      // Spawning triggered for this cycle, counting down day cycles
+    SequenceComplete     // All waves done
+}
+
+public class WaveManager : MonoBehaviour
+{
+    public static WaveManager Instance { get; private set; }
+
+    [Header("Core Dependencies")]
+    [SerializeField] private FaunaManager faunaManager;
+    [SerializeField] private WeatherManager weatherManager;
+    [SerializeField] private Camera mainCamera;
+
+    [Header("Wave Sequence")]
+    [SerializeField] private List<WaveDefinition> wavesSequence;
+
+    [Header("Wave Timing & Spawning (Global)")]
+    [Tooltip("How many full Day+Night cycles each wave lasts.")]
+    [SerializeField][Range(1, 10)] private int waveDurationInDayCycles = 1;
+    [Tooltip("The phase during which spawning should occur each cycle.")]
+    [SerializeField] private WeatherManager.CyclePhase spawnStartPhase = WeatherManager.CyclePhase.Day;
+    [Tooltip("The percentage progress within the Spawn Start Phase when spawning triggers (0-100).")]
+    [SerializeField][Range(0f, 100f)] private float spawnStartPercentage = 50f;
+    [SerializeField] private bool loopSequence = false;
+    [Tooltip("If checked, animals from the previous wave are destroyed when a new wave starts.")]
+    [SerializeField] private bool deletePreviousWaveAnimals = true;
+
+    [Header("UI & Feedback")]
+    [SerializeField] private TextMeshProUGUI waveStatusText;
+    [SerializeField] private Button startRunButton;
+    [SerializeField] private TextMeshProUGUI timeTrackerText;
+
+    [Header("State (Read Only)")]
+    [SerializeField] private WaveManagerState currentState = WaveManagerState.PausedBeforeRun;
+    [SerializeField] private int currentWaveIndex = -1;
+
+    // --- Runtime State ---
+    private WaveDefinition activeWaveDefinition = null;
+    private int dayCyclesRemainingForWave = 0;
+    private bool hasSpawnedThisCycle = false;
+    private bool isInitialPause = true; // <<< NEW: Flag for initial pause
+
+    // --- Public Accessors ---
+    public WaveManagerState CurrentState => currentState;
+    public int CurrentWaveNumber => currentWaveIndex + 1;
+    public int TotalWaves => wavesSequence != null ? wavesSequence.Count : 0;
+    public bool IsRunActive => currentState != WaveManagerState.PausedBeforeRun && currentState != WaveManagerState.SequenceComplete;
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+
+        // Validations (same as before)
+        if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager missing!", this);
+        if (weatherManager == null) Debug.LogError("[WaveManager] WeatherManager missing!", this);
+        if (mainCamera == null) Debug.LogError("[WaveManager] Main Camera missing!", this);
+        if (waveStatusText == null) Debug.LogWarning("[WaveManager] Wave Status Text missing.", this);
+        if (timeTrackerText == null) Debug.LogWarning("[WaveManager] Time Tracker Text missing.", this);
+        if (wavesSequence == null || wavesSequence.Count == 0) Debug.LogWarning("[WaveManager] Wave Sequence empty.", this);
+        if (startRunButton == null) Debug.LogWarning("[WaveManager] Start Run Button missing.", this);
+        else startRunButton.onClick.AddListener(TryStartRun);
+
+        // <<< SET INITIAL PAUSE >>>
+        Debug.Log("[WaveManager Awake] Setting initial Time.timeScale = 0");
+        Time.timeScale = 0f;
+        isInitialPause = true;
+        // -------------------------
+    }
+
+    void Start()
+    {
+        if (weatherManager != null) weatherManager.OnPhaseChanged += HandleWeatherPhaseChange;
+        InitializeManager(); // Sets state, updates button
+    }
+
+     void OnDestroy()
+    {
+        if (weatherManager != null) weatherManager.OnPhaseChanged -= HandleWeatherPhaseChange;
+        if (startRunButton != null) startRunButton.onClick.RemoveListener(TryStartRun);
+        // Ensure timescale is reset if manager is destroyed
+        if(isInitialPause || Time.timeScale != 1f) Time.timeScale = 1f;
+    }
+
+    void InitializeManager()
+    {
+        currentWaveIndex = -1;
+        activeWaveDefinition = null;
+        dayCyclesRemainingForWave = 0;
+        hasSpawnedThisCycle = false;
+        // Don't set timescale here anymore, Awake handles initial pause
+        SetState(WaveManagerState.PausedBeforeRun);
+    }
+
+    void Update()
+    {
+        // Always update UI if possible
+        if (weatherManager != null) UpdateTimeTrackerUI();
+
+        // Skip logic if paused initially OR dependencies missing
+        if (isInitialPause || faunaManager == null || weatherManager == null || mainCamera == null)
+        {
+            // Still need to manage button state even if paused initially
+             if (currentState == WaveManagerState.PausedBeforeRun && startRunButton != null)
+             {
+                  startRunButton.gameObject.SetActive(true);
+                  startRunButton.interactable = true;
+             }
+             return;
+        }
+
+        // State Machine Update (only runs after initial pause is over)
+        switch (currentState)
+        {
+            case WaveManagerState.WaitingForSpawnTime: Update_WaitingForSpawnTime(); break;
+            case WaveManagerState.WaveInProgress: /* Handled by event */ break;
+            case WaveManagerState.SequenceComplete: Update_IdleReady(); break;
+             // PausedBeforeRun is handled above
+        }
+    }
+
+    // --- Event Handler (HandleWeatherPhaseChange) --- (Unchanged)
+    void HandleWeatherPhaseChange(WeatherManager.CyclePhase newPhase) { if (currentState == WaveManagerState.PausedBeforeRun || isInitialPause) return; if (newPhase == WeatherManager.CyclePhase.TransitionToDay) { if (currentState == WaveManagerState.WaveInProgress) { dayCyclesRemainingForWave--; hasSpawnedThisCycle = false; if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Day cycle complete. Cycles remaining: {dayCyclesRemainingForWave}"); if (dayCyclesRemainingForWave <= 0) { EndWaveGameplay(); } else { SetState(WaveManagerState.WaitingForSpawnTime); UpdateWaveStatusText(); } } else if (currentState == WaveManagerState.WaitingForSpawnTime) { hasSpawnedThisCycle = false; } } else if (newPhase == spawnStartPhase && currentState == WaveManagerState.WaitingForSpawnTime && !hasSpawnedThisCycle) { Update_WaitingForSpawnTime(); } }
+
+
+    // --- State Update Methods ---
+
+    void Update_WaitingForSpawnTime() // (Unchanged)
+    { if (hasSpawnedThisCycle || weatherManager == null) return; WeatherManager.CyclePhase currentPhase = weatherManager.CurrentPhase; float totalPhaseTime = weatherManager.CurrentTotalPhaseTime; float remainingPhaseTime = weatherManager.CurrentPhaseTimer; float progressPercent = (totalPhaseTime > 0) ? (1f - (remainingPhaseTime / totalPhaseTime)) * 100f : 0f; if (currentPhase == spawnStartPhase && progressPercent >= spawnStartPercentage) { StartWaveSpawning(); } }
+
+    void Update_IdleReady() // (Now only manages button for looping)
+    {
+         if (startRunButton != null)
+         {
+            bool showButton = (currentState == WaveManagerState.SequenceComplete && loopSequence);
+            startRunButton.gameObject.SetActive(showButton);
+            startRunButton.interactable = showButton;
+         }
+    }
+
+    void UpdateTimeTrackerUI() // (Unchanged)
+    { if (timeTrackerText == null || weatherManager == null) return; WeatherManager.CyclePhase phase = weatherManager.CurrentPhase; float total = weatherManager.CurrentTotalPhaseTime; float remaining = weatherManager.CurrentPhaseTimer; float progressPercent = (total > 0) ? (1f - (remaining / total)) * 100f : 0f; string phaseName = phase.ToString().Replace("Transition", ""); timeTrackerText.text = $"{phaseName} [{progressPercent:F0}%]"; if (Time.timeScale == 0f && isInitialPause) timeTrackerText.text += " (Paused)"; } // Show paused during initial pause
+
+    void UpdateWaveStatusText() // (Added PausedBeforeRun case)
+    {
+         if (waveStatusText == null) return;
+         switch(currentState)
+         {
+             case WaveManagerState.PausedBeforeRun: waveStatusText.text = "Press Start Run"; break;
+             case WaveManagerState.WaitingForSpawnTime: waveStatusText.text = $"Wave {CurrentWaveNumber} - Waiting..."; break;
+             case WaveManagerState.WaveInProgress: waveStatusText.text = $"Wave {CurrentWaveNumber} [{dayCyclesRemainingForWave} cycles left]"; break;
+            case WaveManagerState.SequenceComplete: waveStatusText.text = loopSequence ? "Sequence Done. Start Again?" : "All Waves Cleared!"; break;
+             default: waveStatusText.text = ""; break;
+         }
+    }
+
+    // --- State Transition and Action Methods ---
+
+    void SetState(WaveManagerState newState) // (Removed weather pause logic)
+    {
+        if (currentState == newState) return;
+        if(Debug.isDebugBuild) Debug.Log($"[WaveManager] State Change: {currentState} -> {newState}");
+        currentState = newState;
+
+        // Update Button State
+        if (startRunButton != null)
+        {
+            bool showButton = (newState == WaveManagerState.PausedBeforeRun) || (newState == WaveManagerState.SequenceComplete && loopSequence);
+            startRunButton.gameObject.SetActive(showButton);
+            startRunButton.interactable = showButton;
+        }
+
+        // Update Status Text
+        UpdateWaveStatusText();
+    }
+
+    public void TryStartRun() // <<< MODIFIED
+    {
+        // Only allow starting from PausedBeforeRun OR SequenceComplete if looping
+        if (currentState != WaveManagerState.PausedBeforeRun && !(currentState == WaveManagerState.SequenceComplete && loopSequence))
+        {
+             if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Cannot start run. State: {currentState}, Looping: {loopSequence}");
+             return;
+        }
+
+        Debug.Log("[WaveManager] Starting Run...");
+
+        // <<< RESUME TIME >>>
+        if (isInitialPause || Time.timeScale != 1f)
+        {
+            Debug.Log("[WaveManager] Setting Time.timeScale = 1");
+            Time.timeScale = 1f;
+            isInitialPause = false; // Mark initial pause as over
+        }
+        // ----------------
+
+        InitializeRun(); // Prepare first wave state
+        SetState(WaveManagerState.WaitingForSpawnTime); // Transition state
+    }
+
+    void InitializeRun() // (Unchanged)
+    { currentWaveIndex = 0; if (wavesSequence == null || wavesSequence.Count == 0 || wavesSequence[currentWaveIndex] == null) { Debug.LogError("[WaveManager] Cannot initialize run: Bad wave sequence!"); SetState(WaveManagerState.SequenceComplete); return; } if(deletePreviousWaveAnimals && currentState == WaveManagerState.SequenceComplete && loopSequence) { ClearAllActiveAnimals(); } activeWaveDefinition = wavesSequence[currentWaveIndex]; dayCyclesRemainingForWave = waveDurationInDayCycles; hasSpawnedThisCycle = false; Debug.Log($"[WaveManager] Run initialized. Starting Wave {CurrentWaveNumber}. Duration: {dayCyclesRemainingForWave} cycles."); }
+
+    void StartWaveSpawning() // (Unchanged)
+    { if (activeWaveDefinition == null || currentState != WaveManagerState.WaitingForSpawnTime) { return; } Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} - Spawning Triggered (Phase: {spawnStartPhase} >= {spawnStartPercentage}%)"); hasSpawnedThisCycle = true; SetState(WaveManagerState.WaveInProgress); if (faunaManager != null) faunaManager.ExecuteSpawnWave(activeWaveDefinition); else Debug.LogError("[WaveManager] Cannot execute spawn wave, FaunaManager missing!"); }
+
+    void EndWaveGameplay() // (Unchanged)
+    { Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} Gameplay Ended (Duration Met)."); if (faunaManager != null) faunaManager.StopAllSpawnCoroutines(); if (deletePreviousWaveAnimals) { ClearAllActiveAnimals(); } activeWaveDefinition = null; currentWaveIndex++; if (currentWaveIndex >= wavesSequence.Count) { if (loopSequence) { Debug.Log("[WaveManager] Looping back."); InitializeRun(); SetState(WaveManagerState.WaitingForSpawnTime); } else { Debug.Log("[WaveManager] Sequence complete."); SetState(WaveManagerState.SequenceComplete); } } else { if (wavesSequence[currentWaveIndex] == null) { Debug.LogError($"[WaveManager] Wave definition {currentWaveIndex} NULL!"); SetState(WaveManagerState.SequenceComplete); return; } activeWaveDefinition = wavesSequence[currentWaveIndex]; dayCyclesRemainingForWave = waveDurationInDayCycles; hasSpawnedThisCycle = false; Debug.Log($"[WaveManager] Preparing Wave {CurrentWaveNumber}. Duration: {dayCyclesRemainingForWave} cycles."); SetState(WaveManagerState.WaitingForSpawnTime); } }
+
+    void ClearAllActiveAnimals() // (Unchanged)
+    { if(Debug.isDebugBuild) Debug.Log("[WaveManager] Clearing all active animals."); AnimalController[] activeAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None); int count = 0; foreach(AnimalController animal in activeAnimals) { if(animal != null) { Destroy(animal.gameObject); count++; } } if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Destroyed {count} animals."); }
+
+    public Camera GetMainCamera() { return mainCamera; } // (Unchanged)
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Effects\FireflyController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using System.Collections.Generic;
+
+public class FireflyController : MonoBehaviour
+{
+    [Header("References (Optional)")]
+    [Tooltip("Optional Light2D component for local glow.")]
+    [SerializeField] private Light2D pointLight;
+    [Tooltip("SpriteRenderer for flickering emission and alpha fade.")]
+    [SerializeField] private SpriteRenderer spriteRenderer;
+
+    [Header("Movement")]
+    [Tooltip("Min/Max movement speed")]
+    [SerializeField] private Vector2 speedRange = new Vector2(0.5f, 1.5f);
+    [Tooltip("How often (in seconds) the firefly changes direction while wandering")]
+    [SerializeField] private float directionChangeInterval = 2.0f;
+    [Tooltip("Chance (0-1) that the firefly will pause when changing direction")]
+    [SerializeField] [Range(0f, 1f)] private float pauseChance = 0.2f;
+    [Tooltip("Min/Max duration (in seconds) for pauses")]
+    [SerializeField] private Vector2 pauseDurationRange = new Vector2(0.5f, 1.5f);
+
+    [Header("Lifetime & Fade")]
+    [Tooltip("Min/Max lifetime (in seconds) before the firefly despawns")]
+    [SerializeField] private Vector2 lifetimeRange = new Vector2(8f, 18f);
+    [Tooltip("Duration (in seconds) of the fade-in effect when spawning")]
+    [SerializeField] private float fadeInDuration = 0.75f;
+    [Tooltip("Duration (in seconds) of the fade-out effect before despawning")]
+    [SerializeField] private float fadeOutDuration = 1.5f;
+
+    [Header("Normal Glow Flicker")]
+    [Tooltip("If true, the firefly will have a subtle flickering effect during its lifetime")]
+    [SerializeField] private bool enableFlicker = true;
+    [Tooltip("Min/Max intensity values for normal flickering")]
+    [SerializeField] private Vector2 intensityRange = new Vector2(1.5f, 3.0f);
+    [Tooltip("Speed of normal flickering (cycles per second) - higher values create more rapid changes")]
+    [SerializeField] private float flickerSpeed = 5.0f;
+
+    [Header("Spawn Flicker Effect")]
+    [Tooltip("If true, the firefly will have a special flickering effect when first spawned")]
+    [SerializeField] private bool enableSpawnEffect = true;
+    [Tooltip("Duration (in seconds) of the special spawn effect")]
+    [SerializeField] private float spawnEffectDuration = 0.5f;
+    [Tooltip("Base brightness to gradually increase to during spawn effect")]
+    [SerializeField] private float spawnBaseIntensity = 2.0f;
+    [Tooltip("Probability (0-1) of short blackout flickers during spawn effect")]
+    [SerializeField] [Range(0f, 1f)] private float spawnBlackoutChance = 0.3f;
+    [Tooltip("Min/Max duration (in seconds) of blackout flickers during spawn")]
+    [SerializeField] private Vector2 blackoutDurationRange = new Vector2(0.01f, 0.08f);
+    [Tooltip("Min/Max spacing (in seconds) between blackout flickers")]
+    [SerializeField] private Vector2 blackoutSpacingRange = new Vector2(0.05f, 0.2f);
+
+    [Header("Scent Attraction")]
+    [Tooltip("How often (in seconds) the firefly checks for nearby scent sources.")]
+    [SerializeField] private float scentCheckInterval = 1.0f;
+    [Tooltip("Maximum distance squared the OverlapCircle will check.")]
+    [SerializeField] private float scentOverlapCheckRadius = 10f;
+    [Tooltip("How strongly the firefly steers towards the scent target.")]
+    [SerializeField] private float attractionStrength = 2.0f;
+    [Tooltip("Preferred distance to orbit the scent source.")]
+    [SerializeField] private float orbitDistance = 0.8f;
+    [Tooltip("How much randomness/wobble in the attracted movement.")]
+    [SerializeField] private float attractionWobble = 0.5f;
+    [Tooltip("Which Scent Definitions attract this firefly.")]
+    [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
+
+    // --- Public Accessor ---
+    public Transform AttractionTarget => attractionTarget;
+
+    // --- Internal State ---
+    private FireflyManager manager;
+    private Vector2 currentVelocity;
+    private float currentSpeed;
+    private float stateTimer;
+    private bool isPaused;
+    private float lifetime;
+    private float age = 0f;
+    private float currentAlpha = 0f; // Overall transparency/fade progress
+    private float flickerOffset;
+    private Material spriteMaterialInstance; // Instanced material for modification
+
+    // Scent State
+    private Transform attractionTarget = null;
+    private float scentCheckTimer;
+    private ScentDefinition currentTargetScentDef = null;
+
+    // Movement Bounds
+    private Vector2 minBounds;
+    private Vector2 maxBounds;
+
+    // Store the original emission color *without* intensity scaling from the material asset
+    private Color baseEmissionColor = Color.black; // Default to black if reading fails
+    
+    // New fields for tracking the improved spawn effect
+    private float nextBlackoutTime = 0f;
+    private float blackoutEndTime = 0f;
+    private bool isInBlackout = false;
+
+    void Awake()
+    {
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null && spriteRenderer.material != null) {
+            // Create instance BEFORE reading base emission
+            spriteMaterialInstance = spriteRenderer.material;
+            // Try to read the base emission color set in the material asset
+            if (spriteMaterialInstance.HasProperty("_EmissionColor")) {
+                 // Important: Get the color value directly. If it's HDR, this value
+                 // might already have some intensity baked in, depending on how it was set.
+                 // Ideally, set the material's emission color to the desired *hue/saturation*
+                 // with an intensity of 1 in the editor, and control brightness purely via script.
+                 baseEmissionColor = spriteMaterialInstance.GetColor("_EmissionColor");
+                 // If the color read already has intensity > 1 baked in, we might need to normalize it.
+                 // For simplicity, let's assume the user sets the base color correctly.
+                 // Example normalization (if needed):
+                 // float currentIntensity = Mathf.Max(baseEmissionColor.r, baseEmissionColor.g, baseEmissionColor.b);
+                 // if (currentIntensity > 1.0f) baseEmissionColor /= currentIntensity;
+            } else {
+                 Debug.LogWarning($"[{gameObject.name}] Material '{spriteMaterialInstance.name}' does not have an '_EmissionColor' property.", gameObject);
+            }
+        } else if (spriteRenderer == null || spriteRenderer.material == null) {
+            Debug.LogWarning($"[{gameObject.name}] FireflyController: Cannot modify material properties (flicker/fade), SpriteRenderer or its material is missing.", gameObject);
+            enableFlicker = false;
+            enableSpawnEffect = false;
+        }
+
+        flickerOffset = Random.Range(0f, 100f);
+    }
+
+    public void Initialize(FireflyManager owner, Vector2 minB, Vector2 maxB)
+    {
+        manager = owner; 
+        minBounds = minB; 
+        maxBounds = maxB;
+        
+        lifetime = Random.Range(lifetimeRange.x, lifetimeRange.y);
+        age = 0f; 
+        currentAlpha = 0f;
+        
+        attractionTarget = null; 
+        currentTargetScentDef = null;
+        scentCheckTimer = Random.Range(0, scentCheckInterval);
+        
+        // Initialize blackout effect timing based on spawnBlackoutChance
+        isInBlackout = false;
+        
+        // Only schedule blackouts if the chance is above zero
+        if (Random.value < spawnBlackoutChance) {
+            float initialDelay = Random.Range(0.01f, 0.1f); // Small random delay before first blackout
+            nextBlackoutTime = Time.time + initialDelay;
+        } else {
+            // Set to a time after spawn effect is over if we don't want blackouts for this instance
+            nextBlackoutTime = Time.time + spawnEffectDuration + 1f;
+        }
+        blackoutEndTime = 0f;
+        
+        PickNewWanderState();
+        // Apply initial state (fully transparent, potentially zero intensity)
+        ApplyVisualState(0f);
+    }
+
+    void Update()
+    {
+        age += Time.deltaTime;
+
+        HandleLifetimeAndFade(); // Calculates currentAlpha
+        if (currentAlpha <= 0f && age > fadeInDuration) { Die(); return; }
+
+        HandleScentDetection();
+        HandleMovement();
+        HandleGlowAndFlicker(); // Calculates target intensity & calls ApplyVisualState
+    }
+
+    void HandleLifetimeAndFade()
+    {
+        // Calculate target alpha based on age and lifetime
+        if (age < fadeInDuration) {
+            currentAlpha = Mathf.Clamp01(age / fadeInDuration); // Fade In
+        } else if (lifetime - age < fadeOutDuration) {
+            currentAlpha = Mathf.Clamp01((lifetime - age) / fadeOutDuration); // Fade Out
+        } else {
+            currentAlpha = 1.0f; // Fully Visible
+        }
+
+        // Check if lifetime naturally expired
+        if (age >= lifetime && currentAlpha > 0) {
+             currentAlpha = Mathf.Clamp01((lifetime - age + fadeOutDuration) / fadeOutDuration);
+             if(currentAlpha <= 0) Die();
+        }
+    }
+
+    void HandleScentDetection()
+    {
+        scentCheckTimer -= Time.deltaTime;
+        if (scentCheckTimer <= 0f) { FindAttractionTarget(); scentCheckTimer = scentCheckInterval; }
+        if (attractionTarget != null) { if (!attractionTarget.gameObject.activeInHierarchy || !attractionTarget.TryGetComponent<ScentSource>(out var currentScent) || currentScent.definition != currentTargetScentDef || (attractionTarget.position - transform.position).sqrMagnitude > (currentScent.EffectiveRadius * currentScent.EffectiveRadius) ) { attractionTarget = null; currentTargetScentDef = null; } }
+    }
+
+    void FindAttractionTarget()
+    {
+        Transform bestTarget = null; ScentDefinition bestScentDef = null; float bestScore = -1f;
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scentOverlapCheckRadius);
+        foreach (Collider2D hit in hits) {
+            if (hit.TryGetComponent<ScentSource>(out ScentSource scent) && scent.definition != null) {
+                if (attractiveScentDefinitions.Contains(scent.definition)) {
+                    float distSq = (hit.transform.position - transform.position).sqrMagnitude; float scentRadiusSq = scent.EffectiveRadius * scent.EffectiveRadius;
+                    if (distSq <= scentRadiusSq) { float score = 1.0f / (distSq + 0.01f); if (score > bestScore) { bestScore = score; bestTarget = hit.transform; bestScentDef = scent.definition; } }
+                }
+            }
+        }
+        if (bestTarget != attractionTarget) { attractionTarget = bestTarget; currentTargetScentDef = bestScentDef; if (attractionTarget != null) { isPaused = false; } }
+    }
+
+    void HandleMovement()
+    {
+        stateTimer -= Time.deltaTime;
+        if (attractionTarget != null) {
+            Vector2 directionToTarget = (attractionTarget.position - transform.position); float distanceToTarget = directionToTarget.magnitude; if (distanceToTarget > 0.01f) { directionToTarget /= distanceToTarget; }
+            Vector2 orbitOffsetDir = new Vector2(-directionToTarget.y, directionToTarget.x) * Mathf.Sign(currentSpeed + 0.1f); Vector2 desiredDirection = directionToTarget * attractionStrength;
+            if (distanceToTarget <= orbitDistance) { desiredDirection += orbitOffsetDir * (currentSpeed * 0.5f); } desiredDirection += Random.insideUnitCircle * attractionWobble;
+            currentVelocity = Vector2.Lerp(currentVelocity.normalized, desiredDirection.normalized, Time.deltaTime * 5f) * currentSpeed;
+        } else { if (stateTimer <= 0f) { PickNewWanderState(); } }
+        if (!isPaused) {
+             Vector2 currentPos = transform.position; Vector2 newPos = currentPos + currentVelocity * Time.deltaTime; bool clampedX = false; bool clampedY = false;
+             if (newPos.x <= minBounds.x || newPos.x >= maxBounds.x) { clampedX = true; newPos.x = Mathf.Clamp(newPos.x, minBounds.x, maxBounds.x); } if (newPos.y <= minBounds.y || newPos.y >= maxBounds.y) { clampedY = true; newPos.y = Mathf.Clamp(newPos.y, minBounds.y, maxBounds.y); }
+             if (clampedX || clampedY) { Vector2 reflectionNormal = Vector2.zero; if(clampedX) reflectionNormal.x = -Mathf.Sign(currentVelocity.x); if(clampedY) reflectionNormal.y = -Mathf.Sign(currentVelocity.y); currentVelocity = Vector2.Reflect(currentVelocity, reflectionNormal.normalized + Random.insideUnitCircle * 0.1f).normalized * currentSpeed; if (currentVelocity.sqrMagnitude < 0.01f) { currentVelocity = Random.insideUnitCircle.normalized * currentSpeed; } PickNewWanderState(true); }
+            transform.position = newPos;
+        }
+    }
+
+    void PickNewWanderState(bool forceMove = false)
+    {
+        if (attractionTarget != null && !forceMove) return;
+        if (!forceMove && Random.value < pauseChance) { isPaused = true; currentVelocity = Vector2.zero; stateTimer = Random.Range(pauseDurationRange.x, pauseDurationRange.y); }
+        else { isPaused = false; currentSpeed = Random.Range(speedRange.x, speedRange.y); if(currentVelocity.sqrMagnitude < 0.01f || forceMove) currentVelocity = Random.insideUnitCircle.normalized * currentSpeed; else currentVelocity = (currentVelocity.normalized + Random.insideUnitCircle * 0.5f).normalized * currentSpeed; stateTimer = directionChangeInterval * Random.Range(0.7f, 1.3f); }
+    }
+
+    void HandleGlowAndFlicker()
+    {
+        float targetFlickerIntensity;
+
+        // New spawn flickering effect that simulates a fluorescent tube turning on
+        if (enableSpawnEffect && age < spawnEffectDuration) 
+        {
+            // Base linear brightening from 0 to spawnBaseIntensity based on progress
+            float progress = age / spawnEffectDuration;
+            float baseIntensity = Mathf.Lerp(0f, spawnBaseIntensity, progress);
+            
+            // Blackout flickering logic - Check if we need to schedule a new blackout
+            if (Time.time >= nextBlackoutTime && !isInBlackout) 
+            {
+                // Start a new blackout with probability based on spawnBlackoutChance
+                if (Random.value < spawnBlackoutChance) {
+                    isInBlackout = true;
+                    float blackoutDuration = Random.Range(blackoutDurationRange.x, blackoutDurationRange.y);
+                    blackoutEndTime = Time.time + blackoutDuration;
+                    
+                    // Schedule the next potential blackout check
+                    float spacingTime = Random.Range(blackoutSpacingRange.x, blackoutSpacingRange.y);
+                    nextBlackoutTime = blackoutEndTime + spacingTime;
+                } else {
+                    // No blackout this time, but schedule next check
+                    float spacingTime = Random.Range(blackoutSpacingRange.x, blackoutSpacingRange.y);
+                    nextBlackoutTime = Time.time + spacingTime;
+                }
+            }
+            
+            // Update blackout state
+            if (isInBlackout && Time.time > blackoutEndTime) 
+            {
+                isInBlackout = false;
+            }
+            
+            // Apply blackout if active
+            targetFlickerIntensity = isInBlackout ? 0f : baseIntensity;
+        }
+        else if (enableFlicker) 
+        {
+            // Normal runtime flickering (unchanged)
+            float noise = Mathf.PerlinNoise(Time.time * flickerSpeed, flickerOffset);
+            targetFlickerIntensity = Mathf.Lerp(intensityRange.x, intensityRange.y, noise);
+        }
+        else 
+        {
+            // Steady state if flickering disabled
+            targetFlickerIntensity = intensityRange.x;
+        }
+
+        // Apply the calculated intensity and the current fade alpha
+        ApplyVisualState(targetFlickerIntensity);
+    }
+
+    /// <summary>
+    /// Applies the visual state based on calculated flicker intensity and fade alpha.
+    /// </summary>
+    /// <param name="flickerIntensity">The target brightness intensity for emission/light.</param>
+    void ApplyVisualState(float flickerIntensity)
+    {
+        // 1. Apply overall transparency (Alpha Fade) to the SpriteRenderer's base color alpha
+        if (spriteMaterialInstance != null)
+        {
+            // Ensure _Color property exists before trying to set it
+            if (spriteMaterialInstance.HasProperty("_Color"))
+            {
+                Color baseColor = spriteMaterialInstance.GetColor("_Color");
+                baseColor.a = currentAlpha; // Apply fade alpha
+                spriteMaterialInstance.SetColor("_Color", baseColor);
+            }
+
+            // 2. Apply Flicker Intensity to Emission Color's brightness
+            if (spriteMaterialInstance.HasProperty("_EmissionColor"))
+            {
+                 // Apply intensity to the base emission color we stored in Awake
+                 // Use LinearToGammaSpace if in Linear color space for more visually correct intensity scalinG
+                 Color finalEmissionColor = baseEmissionColor * Mathf.LinearToGammaSpace(flickerIntensity);
+                 // Alternative if baseEmissionColor already has intensity: Multiply directly
+                 // Color finalEmissionColor = baseEmissionColor * flickerIntensity;
+                 spriteMaterialInstance.SetColor("_EmissionColor", finalEmissionColor);
+            }
+        }
+
+        // 3. Apply Flicker Intensity (modulated by alpha fade) to Light2D
+        if (pointLight != null)
+        {
+            // Light intensity should reflect both flicker and fade
+            pointLight.intensity = flickerIntensity * currentAlpha;
+        }
+    }
+
+    void Die()
+    {
+        if (manager != null) manager.ReportFireflyDespawned(this);
+        currentAlpha = 0f; ApplyVisualState(0f); // Ensure visuals are off
+        Destroy(gameObject);
+    }
+
+    void OnDestroy() 
+    { 
+        if (spriteMaterialInstance != null) Destroy(spriteMaterialInstance); 
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyManager.cs
+
+using UnityEngine;
+using UnityEngine.Rendering.Universal;
+using System.Collections.Generic;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+public class FireflyManager : MonoBehaviour
+{
+    public static FireflyManager Instance { get; private set; }
+
+    [Header("Core Dependencies")]
+    [SerializeField] private WeatherManager weatherManager;
+    [SerializeField] private GameObject fireflyPrefab;
+    [SerializeField] private Transform fireflyParent;
+
+    // (Keep Spawning Settings, Spawn Area, Movement Bounds, Photosynthesis Bonus)
+    [Header("Spawning Settings")]
+    [SerializeField] private int maxFireflies = 50;
+    [SerializeField] private float spawnInterval = 0.5f;
+    [SerializeField] [Range(0f, 1f)] private float nightThreshold = 0.25f;
+
+    [Header("Spawn Area")]
+    [SerializeField] private Vector2 spawnCenter = Vector2.zero;
+    [SerializeField] private Vector2 spawnAreaSize = new Vector2(20f, 10f);
+
+    [Header("Movement Bounds (for Fireflies)")]
+    [SerializeField] private Vector2 movementMinBounds = new Vector2(-12f, -7f);
+    [SerializeField] private Vector2 movementMaxBounds = new Vector2(12f, 7f);
+
+    [Header("Photosynthesis Bonus Settings")]
+    public float photosynthesisRadius = 3f;
+    public float photosynthesisIntensityPerFly = 0.05f;
+    public float maxPhotosynthesisBonus = 0.5f;
+
+
+    [Header("Debugging")]
+    [Tooltip("Show attraction lines in Game View during runtime.")]
+    [SerializeField] private bool showAttractionLinesRuntime = false;
+    [SerializeField] private Color attractionLineColorGizmo = Color.magenta; // Renamed for Gizmo
+    [SerializeField] private bool logGizmoCalls = false;
+    [Space] // Add space for visual separation
+    [Tooltip("Prefab used to draw attraction lines at runtime.")]
+    [SerializeField] private GameObject lineVisualizerPrefab; // <<< ADDED
+    [Tooltip("Parent transform for instantiated line visualizers.")]
+    [SerializeField] private Transform lineContainer; // <<< ADDED
+
+    // --- Public Accessor ---
+    public bool ShowAttractionLinesRuntime => showAttractionLinesRuntime;
+
+    // --- Internal State ---
+    private List<FireflyController> activeFireflies = new List<FireflyController>();
+    private float spawnTimer;
+    private bool isNight = false;
+    
+    
+
+    // Dictionary to track line visualizers per firefly
+    private Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+        // Validate Core Dependencies
+        if (weatherManager == null) { Debug.LogError($"[{nameof(FireflyManager)}] WeatherManager missing!", this); enabled = false; return; }
+        if (fireflyPrefab == null) { Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing!", this); enabled = false; return; }
+        if (fireflyPrefab.GetComponent<FireflyController>() == null) { Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing Controller script!", this); enabled = false; return; }
+        if (fireflyParent == null) { fireflyParent = transform; }
+
+        // Validate Debug Dependencies
+        if (lineVisualizerPrefab == null) { Debug.LogError($"[{nameof(FireflyManager)}] Line Visualizer Prefab is not assigned!", this); }
+        if (lineContainer == null) { Debug.LogError($"[{nameof(FireflyManager)}] Line Container transform is not assigned!", this); }
+    }
+
+    void Update()
+    {
+        isNight = weatherManager.sunIntensity <= nightThreshold;
+
+        if (isNight) {
+            spawnTimer -= Time.deltaTime;
+            if (spawnTimer <= 0f) { TrySpawnFirefly(); spawnTimer = spawnInterval; }
+        } else { spawnTimer = spawnInterval; }
+
+        // Update runtime visualizers in Update
+        UpdateRuntimeLineVisualizers();
+    }
+
+    void TrySpawnFirefly()
+    {
+        if (activeFireflies.Count >= maxFireflies) return;
+
+        float spawnX = spawnCenter.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
+        float spawnY = spawnCenter.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
+        Vector2 spawnPos = new Vector2(spawnX, spawnY);
+
+        GameObject fireflyGO = Instantiate(fireflyPrefab, spawnPos, Quaternion.identity, fireflyParent);
+        FireflyController controller = fireflyGO.GetComponent<FireflyController>();
+
+        if (controller != null) {
+            controller.Initialize(this, movementMinBounds, movementMaxBounds);
+            activeFireflies.Add(controller);
+            // Don't create line visualizer here, do it in Update when needed
+        } else { /* LogError, Destroy */ }
+    }
+
+    public void ReportFireflyDespawned(FireflyController firefly)
+    {
+        activeFireflies.Remove(firefly);
+
+        // Clean up associated line visualizer
+        if (activeLineVisualizers.TryGetValue(firefly, out LineRenderer line))
+        {
+            if (line != null) Destroy(line.gameObject); // Destroy the visualizer GO
+            activeLineVisualizers.Remove(firefly);
+        }
+    }
+
+    // --- Runtime Visualizer Update ---
+    void UpdateRuntimeLineVisualizers()
+    {
+        if (!Application.isPlaying) return; // Only run in play mode
+
+        // Check if lines should be shown globally
+        bool showLines = showAttractionLinesRuntime && lineVisualizerPrefab != null && lineContainer != null;
+
+        // --- Update existing lines and create new ones ---
+        // Use a temporary list to avoid modifying dictionary while iterating
+        List<FireflyController> firefliesToRemoveLine = new List<FireflyController>();
+
+        foreach (var kvp in activeLineVisualizers)
+        {
+            FireflyController firefly = kvp.Key;
+            LineRenderer line = kvp.Value;
+
+            if (firefly == null || line == null) // Firefly or line destroyed unexpectedly
+            {
+                firefliesToRemoveLine.Add(firefly); // Mark for removal
+                if(line != null) Destroy(line.gameObject); // Destroy orphan line
+                continue;
+            }
+
+            Transform target = firefly.AttractionTarget;
+
+            if (showLines && target != null) // Should be visible and has target
+            {
+                line.enabled = true;
+                line.SetPosition(0, firefly.transform.position);
+                line.SetPosition(1, target.position);
+            }
+            else // Should be hidden or lost target
+            {
+                line.enabled = false;
+            }
+        }
+
+        // Remove entries whose fireflies are gone
+        foreach (var firefly in firefliesToRemoveLine)
+        {
+            activeLineVisualizers.Remove(firefly);
+        }
+
+
+        // --- Add lines for fireflies that don't have one yet ---
+        if (showLines)
+        {
+            foreach (FireflyController firefly in activeFireflies)
+            {
+                if (firefly == null || activeLineVisualizers.ContainsKey(firefly)) continue; // Skip nulls or those already processed
+
+                Transform target = firefly.AttractionTarget;
+                if (target != null) // Only create if it has a target AND should be shown
+                {
+                    GameObject lineGO = Instantiate(lineVisualizerPrefab, lineContainer); // Instantiate under container
+                    LineRenderer newLine = lineGO.GetComponent<LineRenderer>();
+                    if (newLine != null)
+                    {
+                        // Configure initial points (will be updated next frame anyway)
+                        newLine.SetPosition(0, firefly.transform.position);
+                        newLine.SetPosition(1, target.position);
+                        newLine.enabled = true;
+                        activeLineVisualizers.Add(firefly, newLine); // Add to tracking dictionary
+                    }
+                    else
+                    {
+                         Debug.LogError($"Line Visualizer Prefab '{lineVisualizerPrefab.name}' is missing LineRenderer component!", lineVisualizerPrefab);
+                         Destroy(lineGO); // Destroy invalid instance
+                    }
+                }
+            }
+        }
+        // --- Hide/Destroy lines if global flag turned off ---
+        else if (!showLines && activeLineVisualizers.Count > 0)
+        {
+             // Destroy all active line visualizers if the flag is off
+             foreach (var kvp in activeLineVisualizers)
+             {
+                 if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+             }
+             activeLineVisualizers.Clear();
+        }
+    }
+
+
+    // (Keep GetNearbyFireflyCount)
+     public int GetNearbyFireflyCount(Vector3 position, float radius)
+    {
+        int count = 0; float radiusSq = radius * radius;
+        for (int i = activeFireflies.Count - 1; i >= 0; i--)
+        {
+            if (activeFireflies[i] == null) { activeFireflies.RemoveAt(i); continue; }
+            if ((activeFireflies[i].transform.position - position).sqrMagnitude <= radiusSq) { count++; }
+        }
+        return count;
+    }
+
+    // --- Gizmos (Editor Visualization - Unchanged) ---
+    #if UNITY_EDITOR
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.green; Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
+        Gizmos.color = Color.blue;
+        Vector3 boundsCenter = (movementMinBounds + movementMaxBounds) / 2f;
+        Vector3 boundsSize = movementMaxBounds - movementMinBounds;
+        Gizmos.DrawWireCube(boundsCenter, boundsSize);
+
+        // Gizmo drawing for attraction lines
+        if (showAttractionLinesRuntime && Application.isPlaying) {
+             if (logGizmoCalls) { /*...*/ }
+             bool didDrawLine = false;
+             Gizmos.color = attractionLineColorGizmo; // Use Gizmo color
+             foreach (FireflyController firefly in activeFireflies) {
+                if (firefly == null) continue;
+                Transform target = firefly.AttractionTarget;
+                if (target != null) { Gizmos.DrawLine(firefly.transform.position, target.position); didDrawLine = true; }
+             }
+             if (logGizmoCalls && !didDrawLine && activeFireflies.Count > 0) { /*...*/ }
+        }
+    }
+    #endif
+}
+
+
+
+
+
+--------------------------------------------------------------------------------
+This is part 3 out of 7 of script collection. 4 more parts remain.
+--------------------------------------------------------------------------------

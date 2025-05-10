@@ -1,0 +1,1031 @@
+This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
+
+================================================================================
+UNITY PROJECT SCRIPT EXPORT - 2025-05-10 01:49:48
+PART 7 OF 7
+================================================================================
+
+--------------------------------------------------------------------------------
+Assets
+├── Animation
+│   ├── GodRay300B_001.controller
+│   ├── GodRay60_001.controller
+│   ├── GodRays300.anim
+│   ├── GodRays300B.anim
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
+├── DefaultVolumeProfile.asset
+├── Editor
+│   ├── NodeDefinitionAutoAdder.cs
+│   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionEditor.cs
+│   ├── NodeDefinitionLibraryEditor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   └── NodeEffectDrawer.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
+├── InputSystem_Actions.inputactions
+├── Materials
+│   ├── BezierCurveAA_Material.mat
+│   └── Firefly_Glow_Material.mat
+├── Post Processing
+├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   ├── Animal_Deer.prefab
+│   │   │   ├── Animal_Fox.prefab
+│   │   │   └── FireflyPrefab.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelBerry.prefab
+│   │   │   ├── PixelFlower.prefab
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   ├── PlantOutline.prefab
+│   │   │   ├── PlantPrefab.prefab
+│   │   │   └── PlantShadow.prefab
+│   │   ├── Props
+│   │   │   ├── Poop_Big.prefab
+│   │   │   ├── Poop_Medium_01.prefab
+│   │   │   └── Poop_Medium_02.prefab
+│   │   └── UI
+│   │       ├── EmptySlot16.prefab
+│   │       ├── EmptySlot32.prefab
+│   │       ├── HoverTileMarker.prefab
+│   │       ├── Indicator_Opportunity.prefab
+│   │       ├── Indicator_Resource.prefab
+│   │       ├── Indicator_Threat.prefab
+│   │       ├── NodeCellEmpty16.prefab
+│   │       ├── NodePics
+│   │       │   ├── Seed_01.prefab
+│   │       │   └── Seed_02.prefab
+│   │       ├── NodeView.prefab
+│   │       ├── ThoughtBubble.prefab
+│   │       ├── Visualizer_Circle_Prefab.prefab
+│   │       └── Visualizer_Line_Prefab.prefab
+│   ├── General
+│   │   ├── GardenerPrefab.prefab
+│   │   └── Projectile_Basic_Pixel.prefab
+│   └── Tiles
+│       ├── Common
+│       │   └── PLains_0_Corner_LT.asset
+│       ├── Palettes
+│       │   └── PaletteDual_Ground.prefab
+│       └── Rule Tiles
+│           ├── DualGridRuleTile_Dirt.asset
+│           ├── DualGridRuleTile_DirtWet.asset
+│           └── DualGridRuleTile_Grass.asset
+├── Scenes
+│   ├── MainScene.unity
+│   ├── SampleScene
+│   │   └── GlobalPostProcessVolume Profile.asset
+│   └── SampleScene.unity
+├── Scriptable Objects
+│   ├── Animals
+│   │   ├── AnimalLibrary.asset
+│   │   ├── Animal_000_Bunny.asset
+│   │   └── Animal_001_Deer.asset
+│   ├── Animals Diet
+│   │   ├── Diet_000_Bunny.asset
+│   │   └── Diet_001_Deer.asset
+│   ├── Food
+│   │   ├── FoodType_000_Berry.asset
+│   │   └── FoodType_000_Leaf.asset
+│   ├── Life Thoughts
+│   │   └── AnimalThoughtLibrary.asset
+│   ├── Nodes Plant
+│   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
+│   │   ├── Node_001_Berry.asset
+│   │   ├── Node_002_FireflyPheromone.asset
+│   │   └── Node_003_WaterPreserver.asset
+│   ├── Scents
+│   │   ├── ScentLibrary.asset
+│   │   └── Scent_000_FireflyPheromone.asset
+│   ├── Tiles
+│   │   ├── TileDefinition_000_Grass.asset
+│   │   ├── TileDefinition_001_Dirt.asset
+│   │   ├── TileDefinition_002_DirtWet.asset
+│   │   ├── TileDefinition_003_Water.asset
+│   │   └── TileInteractionLibrary.asset
+│   ├── Tools
+│   │   ├── ToolDefinition_000_GardeningHoe.asset
+│   │   ├── ToolDefinition_001_WateringCan.asset
+│   │   └── ToolDefinition_002_SeedPouch.asset
+│   └── Waves
+│       ├── Wave_000.asset
+│       └── Wave_001.asset
+├── Scripts
+│   ├── Battle
+│   │   ├── Plant
+│   │   │   ├── PlantCell.cs
+│   │   │   ├── PlantGrowth.Cell.cs
+│   │   │   ├── PlantGrowth.Growth.cs
+│   │   │   ├── PlantGrowth.NodeExecution.cs
+│   │   │   ├── PlantGrowth.cs
+│   │   │   └── WeatherManager.cs
+│   │   ├── SpellProjectile.cs
+│   │   └── Status Effects
+│   │       ├── BurningStatusEffect.cs
+│   │       └── StatusEffect.cs
+│   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── AnimalDefinition.cs
+│   │   │   └── AnimalLibrary.cs
+│   │   ├── Core
+│   │   │   ├── AnimalController.cs
+│   │   │   ├── AnimalSpawnData.cs
+│   │   │   ├── AnimalThoughtLibrary.cs
+│   │   │   ├── EcosystemManager.cs
+│   │   │   ├── FaunaManager.cs
+│   │   │   ├── FloraManager.cs
+│   │   │   ├── PoopController.cs
+│   │   │   ├── ScentSource.cs
+│   │   │   ├── ThoughtBubbleController.cs
+│   │   │   ├── ThoughtTrigger.cs
+│   │   │   ├── WaveDefinition.cs
+│   │   │   └── WaveManager.cs
+│   │   ├── Effects
+│   │   │   ├── FireflyController.cs
+│   │   │   └── FireflyManager.cs
+│   │   ├── Food
+│   │   │   ├── AnimalDiet.cs
+│   │   │   ├── FoodItem.cs
+│   │   │   └── FoodType.cs
+│   │   ├── Plants
+│   │   └── Scents
+│   │       ├── ScentDefinition.cs
+│   │       └── ScentLibrary.cs
+│   ├── Nodes
+│   │   ├── Core
+│   │   │   ├── NodeData.cs
+│   │   │   ├── NodeDefinition.cs
+│   │   │   ├── NodeDefinitionLibrary.cs
+│   │   │   ├── NodeEffectData.cs
+│   │   │   ├── NodeEffectType.cs
+│   │   │   └── OutputNodeEffect.cs
+│   │   ├── Runtime
+│   │   │   ├── NodeExecutor.cs
+│   │   │   └── NodeGraph.cs
+│   │   └── UI
+│   │       ├── ColorExtensions.cs
+│   │       ├── DeselectOnClickOutside.cs
+│   │       ├── NodeCell.cs
+│   │       ├── NodeDraggable.cs
+│   │       ├── NodeEditorGridController.cs
+│   │       ├── NodeSelectable.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
+│   ├── Rendering
+│   ├── Tiles
+│   │   ├── Data
+│   │   │   ├── PlantGrowthModifierManager.cs
+│   │   │   ├── PlantPlacementManagement.cs
+│   │   │   ├── PlayerTileInteractor.cs
+│   │   │   ├── TileDefinition.cs
+│   │   │   ├── TileInteractionLibrary.cs
+│   │   │   ├── TileInteractionManager.cs
+│   │   │   └── TileInteractionRule.cs
+│   │   ├── Editor
+│   │   │   ├── TileDefinitionEditor.cs
+│   │   │   └── TileInteractionManagerEditor.cs
+│   │   └── Tools
+│   │       ├── ToolDefinition.cs
+│   │       ├── ToolSwitcher.cs
+│   │       └── ToolType.cs
+│   ├── UI
+│   └── Visuals
+│       ├── NightColorPostProcess.cs
+│       ├── OutlinePartController.cs
+│       ├── PlantOutlineController.cs
+│       ├── PlantShadowController.cs
+│       ├── RuntimeCircleDrawer.cs
+│       └── ShadowPartController.cs
+├── Settings
+│   ├── Lit2DSceneTemplate.scenetemplate
+│   ├── Renderer2D.asset
+│   ├── Scenes
+│   │   └── URP2DSceneTemplate.unity
+│   └── UniversalRP.asset
+├── Shaders
+│   ├── BezierCurveAA.shader
+│   ├── Sprite-Lit-Default_OverlayCustom.shader
+│   ├── Sprite-Lit-Default_Overlay_Base.mat
+│   └── SpriteEmissiveUnlit.shader
+├── TextureImporter.preset
+└── UniversalRenderPipelineGlobalSettings.asset
+--------------------------------------------------------------------------------
+
+SCRIPT CONTENTS
+================================================================================
+
+SCRIPT CONTENTS
+================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\PlantOutlineController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/PlantOutlineController.cs
+using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+
+[RequireComponent(typeof(RectTransform))]
+public class PlantOutlineController : MonoBehaviour
+{
+    // --- Fields ---
+    [Header("Outline Settings")]
+    [SerializeField] private Color outlineColor = Color.black;
+    [SerializeField] private bool excludeOuterCorners = false;
+    [SerializeField] private bool excludeBaseCell = true;
+    [SerializeField] private GameObject outlinePartPrefab;
+    
+    [Header("Performance Options")]
+    [SerializeField] private bool batchOutlineUpdates = true;
+    [SerializeField] [Range(0.05f, 0.5f)] private float updateInterval = 0.1f;
+
+    [Header("Sorting")]
+    [SerializeField] private string outlineSortingLayerName = "Default";
+    [SerializeField] private int outlineSortingOrder = -1;
+
+    [Header("Debugging")]
+    [SerializeField] private bool debugLogging = false;
+
+    // Public accessors
+    public Color OutlineColor => outlineColor;
+    public int OutlineSortingLayer => outlineSortingLayerID;
+    public int OutlineSortingOrder => outlineSortingOrder;
+
+    // Internal State
+    private int outlineSortingLayerID;
+    private PlantGrowth parentPlantGrowth;
+    private Dictionary<Vector2Int, OutlinePartController> outlinePartMap = new Dictionary<Vector2Int, OutlinePartController>();
+    private HashSet<Vector2Int> plantCellCoords = new HashSet<Vector2Int>();
+    
+    private float lastUpdateTime = 0f;
+
+    // Neighbor offsets - 8 directions around a cell
+    private static readonly Vector2Int[] neighborOffsets = new Vector2Int[]
+    {
+        new Vector2Int(-1, -1), // Down-Left
+        new Vector2Int(0, -1),  // Down
+        new Vector2Int(1, -1),  // Down-Right
+        new Vector2Int(-1, 0),  // Left
+        new Vector2Int(1, 0),   // Right
+        new Vector2Int(-1, 1),  // Up-Left
+        new Vector2Int(0, 1),   // Up
+        new Vector2Int(1, 1),   // Up-Right
+    };
+
+    // Just the cardinal directions (for certain operations)
+    private static readonly Vector2Int[] cardinalOffsets = new Vector2Int[]
+    {
+        new Vector2Int(0, -1),  // Down
+        new Vector2Int(-1, 0),  // Left
+        new Vector2Int(1, 0),   // Right
+        new Vector2Int(0, 1),   // Up
+    };
+
+    void Awake()
+    {
+        parentPlantGrowth = GetComponentInParent<PlantGrowth>();
+        if (parentPlantGrowth == null)
+        {
+            Debug.LogError($"[{gameObject.name} Awake] Missing PlantGrowth parent!", gameObject);
+            enabled = false;
+            return;
+        }
+        
+        if (outlinePartPrefab == null)
+        {
+            Debug.LogError($"[{gameObject.name} Awake] Outline Part Prefab not assigned!", gameObject);
+            enabled = false;
+            return;
+        }
+        
+        // Get the proper sorting layer ID from the name
+        outlineSortingLayerID = SortingLayer.NameToID(outlineSortingLayerName);
+        if (outlineSortingLayerID == 0 && outlineSortingLayerName != "Default")
+        {
+            Debug.LogWarning($"[{gameObject.name} Awake] Sorting Layer '{outlineSortingLayerName}' not found, using 'Default'.");
+            outlineSortingLayerID = SortingLayer.NameToID("Default");
+        }
+        
+        // Zero out local transform values to avoid unexpected visual glitches
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+        transform.localScale = Vector3.one;
+        
+        if (debugLogging)
+            Debug.Log($"[{gameObject.name} Awake] Initialized outline controller for {parentPlantGrowth.gameObject.name}");
+    }
+
+    // --- Methods Called by PlantGrowth ---
+
+    // OnPlantCellAdded - Called when a new plant cell is added
+    public void OnPlantCellAdded(Vector2Int plantCoord, GameObject plantCellGO)
+    {
+        if (plantCellGO == null)
+        {
+            if (debugLogging)
+                Debug.LogWarning($"[{gameObject.name}] OnPlantCellAdded: Null GameObject at {plantCoord}");
+            return;
+        }
+        
+        // Add to our plant cells set
+        plantCellCoords.Add(plantCoord);
+        
+        // Remove any existing outline at the plant location (should be clear already, but safety)
+        RemoveOutlinePartIfExists(plantCoord);
+        
+        // Get the SpriteRenderer from the plant cell
+        SpriteRenderer plantRenderer = plantCellGO.GetComponentInChildren<SpriteRenderer>();
+        if (plantRenderer == null)
+        {
+            Debug.LogWarning($"Plant cell added at {plantCoord} missing SpriteRenderer.", plantCellGO);
+            return;
+        }
+        
+        // Check all neighboring coordinates around this plant cell
+        foreach (Vector2Int offset in neighborOffsets)
+        {
+            Vector2Int neighborCoord = plantCoord + offset;
+            
+            // Only create outline parts where:
+            // 1. There's no plant cell
+            // 2. There's no outline part already
+            // 3. It passes any exclusion rules
+            if (!plantCellCoords.Contains(neighborCoord) && 
+                !outlinePartMap.ContainsKey(neighborCoord))
+            {
+                if (ShouldExcludeOutlineAt(neighborCoord))
+                    continue;
+                    
+                CreateOutlinePart(neighborCoord, plantRenderer);
+            }
+        }
+        
+        if (debugLogging)
+            Debug.Log($"[{gameObject.name}] Added cell at {plantCoord}, now tracking {plantCellCoords.Count} cells and {outlinePartMap.Count} outline parts");
+    }
+
+    // OnPlantCellRemoved - Called when a plant cell is removed
+    public void OnPlantCellRemoved(Vector2Int plantCoord)
+    {
+        if (!plantCellCoords.Contains(plantCoord))
+        {
+            if (debugLogging)
+                Debug.LogWarning($"[{gameObject.name}] OnPlantCellRemoved: Coordinate {plantCoord} not found in plant cells!");
+            return;
+        }
+        
+        // Remove the coordinate from our internal tracking
+        plantCellCoords.Remove(plantCoord);
+        
+        if (debugLogging)
+            Debug.Log($"[{gameObject.name}] Removed cell at {plantCoord}, now have {plantCellCoords.Count} cells");
+        
+        // 1. Check if outline should appear *at the removed location*
+        if (!outlinePartMap.ContainsKey(plantCoord))
+        {
+            if (HasPlantNeighbor(plantCoord))
+            {
+                SpriteRenderer sourceRenderer = FindValidNeighborRenderer(plantCoord);
+                if (sourceRenderer != null && !ShouldExcludeOutlineAt(plantCoord))
+                {
+                    CreateOutlinePart(plantCoord, sourceRenderer);
+                    if (debugLogging)
+                        Debug.Log($"[{gameObject.name}] Created new outline at removed cell position {plantCoord}");
+                }
+            }
+        }
+        
+        // 2. Re-evaluate all neighboring coordinates
+        foreach (Vector2Int offset in neighborOffsets)
+        {
+            Vector2Int neighborCoord = plantCoord + offset;
+            
+            // Check if an outline exists at this neighbor
+            if (outlinePartMap.TryGetValue(neighborCoord, out OutlinePartController outlinePart))
+            {
+                // Safety check for destroyed outline part
+                if (outlinePart == null)
+                {
+                    outlinePartMap.Remove(neighborCoord);
+                    if (debugLogging)
+                        Debug.Log($"[{gameObject.name}] Removed null outline at {neighborCoord} from dictionary");
+                    continue;
+                }
+                
+                // Check if this neighbor still needs an outline
+                bool neighborStillHasPlantNeighbor = HasPlantNeighbor(neighborCoord);
+                
+                if (!neighborStillHasPlantNeighbor)
+                {
+                    // No longer has any plant neighbors, remove it
+                    RemoveOutlinePartIfExists(neighborCoord);
+                    if (debugLogging)
+                        Debug.Log($"[{gameObject.name}] Removed orphaned outline at {neighborCoord}");
+                }
+                else if (!outlinePart.IsSourceRendererValid())
+                {
+                    // Outline's source was likely the removed cell, update it
+                    SpriteRenderer newSource = FindValidNeighborRenderer(neighborCoord);
+                    if (newSource != null)
+                    {
+                        outlinePart.UpdateSourceRenderer(newSource);
+                        outlinePart.SyncSpriteAndTransform();
+                        if (debugLogging)
+                            Debug.Log($"[{gameObject.name}] Updated source for outline at {neighborCoord}");
+                    }
+                    else
+                    {
+                        // This case is unlikely but could happen in complex removals
+                        if (debugLogging)
+                            Debug.LogWarning($"[{gameObject.name}] Outline at {neighborCoord} lost source but HasPlantNeighbor=true. Removing.");
+                        RemoveOutlinePartIfExists(neighborCoord);
+                    }
+                }
+            }
+            // If no outline at this neighbor, but there should be one (e.g., it was excluded before)
+            else if (!plantCellCoords.Contains(neighborCoord) && HasPlantNeighbor(neighborCoord))
+            {
+                if (!ShouldExcludeOutlineAt(neighborCoord))
+                {
+                    SpriteRenderer sourceRenderer = FindValidNeighborRenderer(neighborCoord);
+                    if (sourceRenderer != null)
+                    {
+                        CreateOutlinePart(neighborCoord, sourceRenderer);
+                        if (debugLogging)
+                            Debug.Log($"[{gameObject.name}] Created new outline at neighbor {neighborCoord} after cell removal");
+                    }
+                }
+            }
+        }
+    }
+
+    // --- Internal Helper Methods ---
+
+    // CreateOutlinePart - Creates an outline part at the specified coordinates
+    private void CreateOutlinePart(Vector2Int coord, SpriteRenderer sourceRenderer)
+    {
+        if (outlinePartPrefab == null)
+        {
+            Debug.LogError($"[{gameObject.name}] CreateOutlinePart: outlinePartPrefab is null!");
+            return;
+        }
+        
+        if (sourceRenderer == null)
+        {
+            Debug.LogWarning($"[{gameObject.name}] CreateOutlinePart: sourceRenderer is null for coord {coord}");
+            return;
+        }
+        
+        // Check if already exists (safety)
+        if (outlinePartMap.ContainsKey(coord))
+        {
+            if (debugLogging)
+                Debug.LogWarning($"[{gameObject.name}] CreateOutlinePart: Outline already exists at {coord}");
+            return;
+        }
+        
+        // Instantiate the outline part
+        GameObject outlineInstance = Instantiate(outlinePartPrefab, transform);
+        if (outlineInstance == null)
+        {
+            Debug.LogError($"[{gameObject.name}] CreateOutlinePart: Failed to instantiate outline prefab!");
+            return;
+        }
+        
+        // Set position using PlantGrowth's cell spacing
+        float spacing = parentPlantGrowth.GetCellSpacing();
+        outlineInstance.transform.localPosition = (Vector2)coord * spacing;
+        
+        // Get the controller and initialize it
+        OutlinePartController outlineController = outlineInstance.GetComponent<OutlinePartController>();
+        if (outlineController != null)
+        {
+            outlineController.Initialize(sourceRenderer, coord, this);
+            outlineController.SetVisibility(true);
+            outlinePartMap.Add(coord, outlineController);
+            
+            if (debugLogging)
+                Debug.Log($"[{gameObject.name}] Created outline part at {coord} using source {sourceRenderer.gameObject.name}");
+        }
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] Outline Part Prefab missing OutlinePartController script!", outlinePartPrefab);
+            Destroy(outlineInstance);
+        }
+    }
+
+    // RemoveOutlinePartIfExists - Removes an outline part if it exists at the specified coordinates
+    private void RemoveOutlinePartIfExists(Vector2Int coord)
+    {
+        if (outlinePartMap.TryGetValue(coord, out OutlinePartController outlinePart))
+        {
+            if (outlinePart != null)
+            {
+                outlinePart.DestroyOutlinePart();
+                if (debugLogging)
+                    Debug.Log($"[{gameObject.name}] Destroyed outline part at {coord}");
+            }
+            outlinePartMap.Remove(coord);
+        }
+    }
+
+    // HasPlantNeighbor - Checks if the specified coordinates have any plant neighbors
+    private bool HasPlantNeighbor(Vector2Int coord)
+    {
+        foreach (Vector2Int offset in neighborOffsets)
+        {
+            if (plantCellCoords.Contains(coord + offset))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // FindValidNeighborRenderer - Finds a valid SpriteRenderer from a neighboring plant cell
+    private SpriteRenderer FindValidNeighborRenderer(Vector2Int coord)
+    {
+        foreach (Vector2Int offset in neighborOffsets)
+        {
+            Vector2Int neighborCoord = coord + offset;
+            
+            // Check if there's a plant cell at this coordinate
+            if (plantCellCoords.Contains(neighborCoord))
+            {
+                // Get the GameObject from PlantGrowth
+                GameObject plantGO = parentPlantGrowth.GetCellGameObjectAt(neighborCoord);
+                if (plantGO != null)
+                {
+                    SpriteRenderer renderer = plantGO.GetComponentInChildren<SpriteRenderer>();
+                    if (renderer != null)
+                    {
+                        if (debugLogging)
+                            Debug.Log($"[{gameObject.name}] Found valid renderer at {neighborCoord} for outline at {coord}");
+                        return renderer;
+                    }
+                }
+            }
+        }
+        
+        if (debugLogging)
+            Debug.LogWarning($"[{gameObject.name}] Could not find any valid neighbor renderer for {coord}");
+        return null;
+    }
+
+    // ShouldExcludeOutlineAt - Checks if an outline should be excluded at the specified coordinates
+    private bool ShouldExcludeOutlineAt(Vector2Int coord)
+    {
+        // Exclude base cell (e.g., under the seed) if enabled
+        if (excludeBaseCell && coord == Vector2Int.down && plantCellCoords.Contains(Vector2Int.zero))
+        {
+            return true;
+        }
+        
+        // Exclude outer corners if enabled
+        if (excludeOuterCorners && IsOuterCornerCandidate(coord))
+        {
+            return true;
+        }
+        
+        return false;
+    }
+
+    // IsOuterCornerCandidate - Checks if the coordinate is a potential outer corner
+    private bool IsOuterCornerCandidate(Vector2Int coord)
+    {
+        // If it's a plant cell, it's not an outer corner
+        if (plantCellCoords.Contains(coord))
+            return false;
+            
+        // Count the number of plant neighbors
+        int plantNeighborCount = 0;
+        foreach (Vector2Int offset in neighborOffsets)
+        {
+            if (plantCellCoords.Contains(coord + offset)) {
+                plantNeighborCount++;
+            }
+        }
+        
+        // In typical 2D grid outline detection, an outer corner has 3 neighbors
+        return plantNeighborCount == 3;
+    }
+
+    void OnDestroy()
+    {
+        // Clean up resources when destroyed
+        foreach (var kvp in outlinePartMap)
+        {
+            if (kvp.Value != null)
+            {
+                kvp.Value.DestroyOutlinePart();
+            }
+        }
+        outlinePartMap.Clear();
+        plantCellCoords.Clear();
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\PlantShadowController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/PlantShadowController.cs
+using UnityEngine;
+using System.Collections.Generic;
+
+public class PlantShadowController : MonoBehaviour
+{
+    [Header("Global Shadow Settings")]
+    [SerializeField] private Color shadowColor = new Color(0f, 0f, 0f, 0.5f);
+    [SerializeField] [Range(0.1f, 2f)] [Tooltip("Vertical squash factor (1 = none, <1 = flatter, >1 = taller)")]
+    private float squashFactor = 0.6f;
+    [SerializeField] [Range(0f, 360f)] [Tooltip("Rotation angle of the shadow around the plant's base (0 = right, 90 = up, 180 = left, 270 = down)")]
+    private float shadowAngleDegrees = 270f; // Default to directly downwards
+    [SerializeField] [Tooltip("Flip the shadow horizontally?")]
+    private bool flipShadow = false;
+    // Removed: lightSourceDirection
+    // Removed: shadowDistance
+    // Removed: skewAngleDegrees (replaced by shadowAngleDegrees for direction)
+    
+    [Header("Distance Fade")]
+    [Tooltip("Enable fading parts based on distance from the root.")]
+    [SerializeField] private bool enableDistanceFade = true;
+    [Tooltip("Distance from the root where the shadow part starts fading.")]
+    [SerializeField] private float fadeStartDistance = 1.5f;
+    [Tooltip("Distance from the root where the shadow part is fully faded (alpha 0).")]
+    [SerializeField] private float fadeEndDistance = 3.0f;
+    [Tooltip("Minimum alpha value even when fully faded (e.g., 0.1 for slight visibility).")]
+    [SerializeField] [Range(0f, 1f)] private float minFadeAlpha = 0.0f;
+
+    [Header("Sorting")]
+    [SerializeField] [Tooltip("Name of the Sorting Layer for shadows (e.g., 'Shadows')")]
+    private string shadowSortingLayerName = "Default";
+    [SerializeField] [Tooltip("Sorting Order within the layer (lower values are rendered first)")]
+    private int shadowSortingOrder = -1;
+
+    // --- Internal ID ---
+    private int shadowSortingLayerID;
+
+    // Public accessors for ShadowPartController
+    public Color ShadowColor => shadowColor;
+    public int ShadowSortingLayer => shadowSortingLayerID;
+    public int ShadowSortingOrder => shadowSortingOrder;
+
+    // <<< NEW ACCESSORS for Fade >>>
+    public bool EnableDistanceFade => enableDistanceFade;
+    public float FadeStartDistance => fadeStartDistance;
+    public float FadeEndDistance => fadeEndDistance;
+    public float MinFadeAlpha => minFadeAlpha;
+    
+    // Cached base transform values
+    private Vector3 baseLocalScale;
+    private Quaternion baseLocalRotation;
+    private Vector3 baseLocalPosition;
+
+    // Dictionary to manage shadow parts (unchanged)
+    private Dictionary<SpriteRenderer, ShadowPartController> shadowPartMap = new Dictionary<SpriteRenderer, ShadowPartController>();
+
+    void Awake()
+    {
+        // Convert layer name to ID (unchanged)
+        shadowSortingLayerID = SortingLayer.NameToID(shadowSortingLayerName);
+        if (shadowSortingLayerID == 0 && shadowSortingLayerName != "Default")
+        {
+            Debug.LogWarning($"Sorting Layer '{shadowSortingLayerName}' not found. Shadow will use 'Default'.", this);
+            shadowSortingLayerID = SortingLayer.NameToID("Default");
+        }
+
+        // Cache initial transform state (unchanged)
+        baseLocalScale = transform.localScale;
+        baseLocalRotation = transform.localRotation;
+        // --- IMPORTANT: Ensure _ShadowRoot starts at local position (0,0,0) relative to the Plant root ---
+        baseLocalPosition = transform.localPosition;
+        if (baseLocalPosition != Vector3.zero) {
+             Debug.LogWarning($"'{gameObject.name}' initial localPosition is not zero ({baseLocalPosition}). Shadow origin might be slightly offset from plant root.", gameObject);
+        }
+    }
+
+    void LateUpdate()
+    {
+        // 1. Set Position: Keep the shadow root at the plant's origin (relative to parent)
+        // We don't apply any offset anymore.
+        transform.localPosition = baseLocalPosition; // Should typically be Vector3.zero
+
+        // 2. Set Rotation based on the angle slider
+        // Apply the rotation relative to the initial orientation
+        Quaternion angleRotation = Quaternion.Euler(0, 0, shadowAngleDegrees);
+        transform.localRotation = baseLocalRotation * angleRotation;
+
+        // 3. Calculate and Apply Scale (Squash + Flip)
+        Vector3 finalScale = baseLocalScale; // Start with original scale
+        // Apply squash factor (typically affects the Y-axis before rotation)
+        // To apply squash along the *rotated* Y-axis is more complex.
+        // Let's keep the simpler approach: squash the local Y scale.
+        finalScale.y *= squashFactor;
+
+        // Apply horizontal flip if checked (affects the X-axis)
+        if (flipShadow)
+        {
+            finalScale.x *= -1f;
+        }
+        // Apply the calculated scale
+        transform.localScale = finalScale;
+
+    }
+
+    // --- Methods for PlantGrowth Integration (Unchanged) ---
+
+    public void RegisterPlantPart(SpriteRenderer plantPartRenderer, GameObject shadowPartPrefab)
+    {
+        if (plantPartRenderer == null || shadowPartPrefab == null) return;
+        if (shadowPartMap.ContainsKey(plantPartRenderer)) return;
+        GameObject shadowInstance = Instantiate(shadowPartPrefab, transform);
+        ShadowPartController shadowController = shadowInstance.GetComponent<ShadowPartController>();
+        if (shadowController != null) { shadowController.Initialize(plantPartRenderer, this); shadowPartMap.Add(plantPartRenderer, shadowController); }
+        else { Debug.LogError($"Shadow Part Prefab '{shadowPartPrefab.name}' missing ShadowPartController.", shadowPartPrefab); Destroy(shadowInstance); }
+    }
+
+    public void UnregisterPlantPart(SpriteRenderer plantPartRenderer)
+    {
+        if (plantPartRenderer != null && shadowPartMap.TryGetValue(plantPartRenderer, out ShadowPartController shadowController)) {
+            if (shadowController != null) { shadowController.OnPlantPartDestroyed(); }
+            shadowPartMap.Remove(plantPartRenderer);
+        }
+    }
+
+    void OnDestroy()
+    {
+        shadowPartMap.Clear(); // Prevent memory leaks
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\RuntimeCircleDrawer.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/Debug/RuntimeCircleDrawer.cs
+using UnityEngine;
+
+/// <summary>
+/// Draws a circle outline using a LineRenderer attached to the same GameObject.
+/// Requires a LineRenderer component.
+/// </summary>
+[RequireComponent(typeof(LineRenderer))]
+public class RuntimeCircleDrawer : MonoBehaviour
+{
+    [Range(3, 60)]
+    public int segments = 30; // Number of line segments to approximate the circle
+    public float radius = 1.0f;
+    public float lineWidth = 0.02f;
+    public Color color = Color.yellow;
+    public Material lineMaterial; // Assign the same material used for firefly lines, or a specific one
+
+    private LineRenderer lineRenderer;
+    private bool needsRedraw = true; // Flag to force redraw on first UpdateCircle call or when params change
+    private float currentRadius = -1f; // Store current values to detect changes
+    private Color currentColor = Color.clear;
+
+    void Awake()
+    {
+        lineRenderer = GetComponent<LineRenderer>();
+        if (lineRenderer == null) { // Should not happen with RequireComponent
+            Debug.LogError($"[{gameObject.name}] RuntimeCircleDrawer: Missing required LineRenderer component!");
+            enabled = false; // Disable script if component missing
+            return;
+        }
+        ConfigureLineRendererDefaults();
+        lineRenderer.enabled = false; // Start hidden
+    }
+
+    // Sets initial parameters that don't change often
+    void ConfigureLineRendererDefaults()
+    {
+        lineRenderer.useWorldSpace = false; // Draw relative to this object's transform
+        lineRenderer.loop = true; // Connect the last point to the first
+        lineRenderer.startWidth = lineWidth;
+        lineRenderer.endWidth = lineWidth;
+        lineRenderer.material = lineMaterial;
+
+        // Attempt to match sorting with parent sprite
+        SpriteRenderer parentSprite = GetComponentInParent<SpriteRenderer>();
+        if (parentSprite != null) {
+            lineRenderer.sortingLayerName = parentSprite.sortingLayerName;
+            lineRenderer.sortingOrder = parentSprite.sortingOrder + 1; // Draw slightly in front
+        } else {
+            // Default sorting if no parent sprite found
+            lineRenderer.sortingLayerName = "Default";
+            lineRenderer.sortingOrder = 1;
+        }
+    }
+
+    // Call this method to update the circle's appearance and make it visible
+    public void UpdateCircle(float newRadius, Color newColor)
+    {
+        // Check if parameters have actually changed
+        if (!needsRedraw && Mathf.Approximately(currentRadius, newRadius) && currentColor == newColor)
+        {
+            // Ensure it's enabled if it wasn't already
+             if (!lineRenderer.enabled) lineRenderer.enabled = true;
+            return; // No change needed
+        }
+
+        // Update stored values
+        currentRadius = newRadius;
+        radius = newRadius; // Update public field for potential inspector viewing
+        currentColor = newColor;
+        color = newColor; // Update public field
+
+        // Update LineRenderer appearance settings that might change
+        lineRenderer.startColor = currentColor;
+        lineRenderer.endColor = currentColor;
+        // Update width if you add properties for it too
+        // lineRenderer.startWidth = newWidth;
+        // lineRenderer.endWidth = newWidth;
+
+        DrawCircle(); // Recalculate points
+        lineRenderer.enabled = true; // Ensure it's visible
+        needsRedraw = false; // Mark as drawn
+    }
+
+    // Call this to hide the circle
+    public void HideCircle()
+    {
+        if (lineRenderer != null && lineRenderer.enabled)
+        {
+            lineRenderer.enabled = false;
+            needsRedraw = true; // Needs redraw next time it's shown
+        }
+    }
+
+    void DrawCircle()
+    {
+        if (lineRenderer == null || segments <= 2 || radius <= 0f) {
+            lineRenderer.positionCount = 0; // Clear points if invalid params
+            return;
+        };
+
+        // Only resize array if segment count changes (optimization)
+        if (lineRenderer.positionCount != segments + 1) {
+            lineRenderer.positionCount = segments + 1;
+        }
+
+        float angleStep = 360f / segments;
+        Vector3[] points = new Vector3[segments + 1];
+
+        for (int i = 0; i <= segments; i++)
+        {
+            float currentAngle = Mathf.Deg2Rad * (i * angleStep);
+            float x = Mathf.Cos(currentAngle) * radius;
+            float y = Mathf.Sin(currentAngle) * radius;
+            points[i] = new Vector3(x, y, 0); // Z is 0 for local space relative to transform
+        }
+
+        lineRenderer.SetPositions(points);
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\ShadowPartController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/ShadowPartController.cs
+using UnityEngine;
+// using UnityEngine.Rendering; // Not needed for this simple fade
+
+[RequireComponent(typeof(SpriteRenderer))]
+public class ShadowPartController : MonoBehaviour
+{
+    private SpriteRenderer shadowRenderer;
+    private SpriteRenderer plantPartRenderer;
+    private Transform plantPartTransform;
+    private Transform shadowRootTransform;
+    private PlantShadowController mainShadowController;
+    // Removed: initialLocalPosition - not needed for distance calc
+
+    void Awake()
+    {
+        shadowRenderer = GetComponent<SpriteRenderer>();
+        shadowRenderer.drawMode = SpriteDrawMode.Simple;
+        shadowRenderer.enabled = false;
+    }
+
+    public void Initialize(SpriteRenderer targetPlantPartRenderer, PlantShadowController controller)
+    {
+        if (targetPlantPartRenderer == null || controller == null) { Destroy(gameObject); return; }
+        plantPartRenderer = targetPlantPartRenderer;
+        plantPartTransform = targetPlantPartRenderer.transform;
+        mainShadowController = controller;
+        shadowRootTransform = controller.transform;
+
+        shadowRenderer.sortingLayerID = mainShadowController.ShadowSortingLayer;
+        shadowRenderer.sortingOrder = mainShadowController.ShadowSortingOrder;
+        // Color is now set in LateUpdate to include fade alpha
+
+        transform.SetParent(shadowRootTransform, true); // Parent first
+
+        shadowRenderer.enabled = plantPartRenderer.enabled && plantPartRenderer.sprite != null;
+        // Initialize color with potentially full alpha
+        UpdateColorAndFade();
+    }
+
+    void LateUpdate()
+    {
+        if (plantPartRenderer == null || !plantPartRenderer.enabled || plantPartRenderer.sprite == null || shadowRenderer == null || mainShadowController == null)
+        {
+            if (shadowRenderer != null) shadowRenderer.enabled = false;
+            return;
+        }
+
+        shadowRenderer.enabled = true;
+
+        // 1. Sync Sprite
+        shadowRenderer.sprite = plantPartRenderer.sprite;
+
+        // 2. Sync Position & Rotation (Relative to Shadow Root) - Unchanged
+        Vector3 plantPartPosRelativeToPlantRoot = plantPartTransform.parent.InverseTransformPoint(plantPartTransform.position);
+        transform.localPosition = plantPartPosRelativeToPlantRoot;
+        transform.localRotation = plantPartTransform.localRotation;
+
+        // 3. Sync Flip - Unchanged
+        shadowRenderer.flipX = plantPartRenderer.flipX;
+        shadowRenderer.flipY = plantPartRenderer.flipY;
+
+        // 4. Sync Scale (relative to parent) - Unchanged
+        transform.localScale = plantPartTransform.localScale;
+
+        // 5. Update Color & Apply Distance Fade
+        UpdateColorAndFade();
+    }
+
+    // <<< NEW METHOD >>>
+    private void UpdateColorAndFade()
+    {
+        if(mainShadowController == null || shadowRenderer == null) return;
+
+        Color baseShadowColor = mainShadowController.ShadowColor;
+        float finalAlpha = baseShadowColor.a; // Start with the controller's base alpha
+
+        // Apply distance fade if enabled
+        if (mainShadowController.EnableDistanceFade)
+        {
+            float distance = Vector3.Distance(transform.position, shadowRootTransform.position); // Distance from shadow part to shadow root
+
+            float fadeStart = mainShadowController.FadeStartDistance;
+            float fadeEnd = mainShadowController.FadeEndDistance;
+            float minAlpha = mainShadowController.MinFadeAlpha;
+
+            if (distance >= fadeEnd)
+            {
+                finalAlpha *= minAlpha; // Apply min alpha
+            }
+            else if (distance > fadeStart)
+            {
+                // Calculate interpolation factor (0 at start, 1 at end)
+                float t = Mathf.InverseLerp(fadeStart, fadeEnd, distance);
+                // Lerp between 1 (full alpha multiplier) and minAlpha
+                float distanceAlphaMultiplier = Mathf.Lerp(1f, minAlpha, t);
+                finalAlpha *= distanceAlphaMultiplier; // Modulate base alpha
+            }
+            // Else (distance <= fadeStart), finalAlpha remains baseShadowColor.a
+        }
+
+        // Set the final color with calculated alpha
+        shadowRenderer.color = new Color(baseShadowColor.r, baseShadowColor.g, baseShadowColor.b, finalAlpha);
+    }
+    // <<< END NEW METHOD >>>
+
+
+    public void OnPlantPartDestroyed() // Unchanged
+    {
+         if (this != null && gameObject != null) { if (Application.isPlaying) { Destroy(gameObject); } else { DestroyImmediate(gameObject); } }
+    }
+}
+
+
+
+
+
+--------------------------------------------------------------------------------
+This is the final part (7 of 7).
+--------------------------------------------------------------------------------

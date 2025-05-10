@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-01 01:40:59
+UNITY PROJECT SCRIPT EXPORT - 2025-05-10 01:49:48
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -48,6 +48,7 @@ Assets
 │   │   │   ├── PixelLeaf.prefab
 │   │   │   ├── PixelSeed.prefab
 │   │   │   ├── PixelStem.prefab
+│   │   │   ├── PlantOutline.prefab
 │   │   │   ├── PlantPrefab.prefab
 │   │   │   └── PlantShadow.prefab
 │   │   ├── Props
@@ -125,6 +126,9 @@ Assets
 │   ├── Battle
 │   │   ├── Plant
 │   │   │   ├── PlantCell.cs
+│   │   │   ├── PlantGrowth.Cell.cs
+│   │   │   ├── PlantGrowth.Growth.cs
+│   │   │   ├── PlantGrowth.NodeExecution.cs
 │   │   │   ├── PlantGrowth.cs
 │   │   │   └── WeatherManager.cs
 │   │   ├── SpellProjectile.cs
@@ -202,6 +206,8 @@ Assets
 │   ├── UI
 │   └── Visuals
 │       ├── NightColorPostProcess.cs
+│       ├── OutlinePartController.cs
+│       ├── PlantOutlineController.cs
 │       ├── PlantShadowController.cs
 │       ├── RuntimeCircleDrawer.cs
 │       └── ShadowPartController.cs
@@ -608,26 +614,817 @@ public class NodeEffectDrawer : PropertyDrawer
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Battle\Plant\PlantCell.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantCell.cs (or similar path)
+﻿// FILE: Assets/Scripts/Battle/Plant/PlantCell.cs
 using UnityEngine;
+
+// Define the enum here if it's closely tied to PlantCell,
+// or move it to a separate file (e.g., PlantEnums.cs) for better organization.
+public enum PlantCellType { Seed, Stem, Leaf, Flower, Fruit } // <<< ADDED ENUM DEFINITION
 
 public class PlantCell : MonoBehaviour
 {
     // Set these references when the cell is spawned by PlantGrowth
     [HideInInspector] public PlantGrowth ParentPlantGrowth;
     [HideInInspector] public Vector2Int GridCoord;
-    [HideInInspector] public PlantCellType CellType; // Store type info here
+    [HideInInspector] public PlantCellType CellType; // Uses the enum defined above
 
     // Called automatically by Unity when this GameObject is destroyed
     private void OnDestroy()
     {
         // Notify the parent plant that this cell is gone, if the parent still exists
+        // Ensure shadow is unregistered *before* destruction, handled in PlantGrowth.RemovePlantCell
         if (ParentPlantGrowth != null)
         {
+            // Use the public method on PlantGrowth to handle removal logic cleanly
+            // This ensures the dictionary and shadow are handled correctly
+            // ParentPlantGrowth.HandleCellDestruction(this); // Or pass GridCoord if preferred
+            // Let's stick to the original notification for now, cleanup is in PlantGrowth.RemovePlantCell
             ParentPlantGrowth.ReportCellDestroyed(GridCoord);
         }
     }
 }
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\PlantGrowth.Cell.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.Cell.cs
+using System.Collections.Generic;
+using System.Linq; // Added this namespace for OrderBy()
+using UnityEngine;
+
+public partial class PlantGrowth : MonoBehaviour
+{
+    // ------------------------------------------------
+    // --- CELL MANAGEMENT METHODS ---
+    // ------------------------------------------------
+
+    public void ReportCellDestroyed(Vector2Int coord)
+    {
+        if (cells.ContainsKey(coord)) {
+            cells.Remove(coord);
+            // Assume RemovePlantCell(GameObject) will be called externally for proper cleanup
+            // We still need to clean the GO list if destruction happened unexpectedly
+            activeCellGameObjects.RemoveAll(go => go == null || (go.GetComponent<PlantCell>()?.GridCoord == coord));
+
+             // Trigger outline update after internal state change
+             if (enableOutline && outlineController != null) {
+                 outlineController.OnPlantCellRemoved(coord);
+             }
+        }
+    }
+
+    // RemovePlantCell (Handles shadow AND outline unregistration)
+    public void RemovePlantCell(GameObject cellToRemove)
+    {
+        if (cellToRemove == null) return;
+
+        PlantCell cellComp = cellToRemove.GetComponent<PlantCell>();
+        if (cellComp == null) { Destroy(cellToRemove); return; } // Destroy if no component
+
+        Vector2Int coord = cellComp.GridCoord;
+
+        // --- Unregister Visuals FIRST ---
+        // Shadow
+        SpriteRenderer partRenderer = cellToRemove.GetComponentInChildren<SpriteRenderer>(); // More robust check
+        if (shadowController != null && partRenderer != null) {
+            shadowController.UnregisterPlantPart(partRenderer);
+        }
+
+        // Outline (this now triggers the update based on internal state)
+        // No direct call to outlineController needed here, ReportCellDestroyed handles it.
+
+        // --- Remove from internal tracking ---
+        if (cells.ContainsKey(coord)) {
+            cells.Remove(coord);
+        }
+        activeCellGameObjects.Remove(cellToRemove);
+
+        // --- Destroy the GameObject ---
+        Destroy(cellToRemove);
+
+        // --- Trigger Outline Update AFTER internal state reflects the removal ---
+        // Moved notification to ReportCellDestroyed which should be called by PlantCell OnDestroy
+        // If called directly, ensure ReportCellDestroyed is also called or call the outline update here:
+        // if (enableOutline && outlineController != null) {
+        //     outlineController.OnPlantCellRemoved(coord);
+        // }
+    }
+
+
+    // ClearAllVisuals (Combined cleanup helper for Shadows and Outlines)
+    private void ClearAllVisuals()
+    {
+        // Create a copy because RemovePlantCell modifies the list
+        List<GameObject> cellsToClear = new List<GameObject>(activeCellGameObjects);
+        foreach (GameObject cellGO in cellsToClear) {
+            if (cellGO != null) {
+                // Directly destroy, OnDestroy in PlantCell calls ReportCellDestroyed -> Outline Update
+                Destroy(cellGO);
+            }
+        }
+        // Ensure lists/dicts are clear after iteration
+        activeCellGameObjects.Clear();
+        cells.Clear();
+
+        // Also clear any outlines that might be orphaned
+        if (outlineController != null) {
+             // This assumes OutlineController has a method to clear all its parts
+             // outlineController.ClearAllOutlineParts();
+             // Or simply destroy/recreate the outline controller if simpler
+        }
+
+        rootCellInstance = null;
+    }
+
+
+    // SpawnCellVisual - Creates a cell visual GameObject
+    private GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords,
+                                 Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = null,
+                                 Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = null)
+    {
+        if (cells.ContainsKey(coords)) {
+             Debug.LogWarning($"[{gameObject.name}] Trying to spawn {cellType} at occupied coord {coords}.");
+            return null;
+        }
+
+        GameObject prefab = null;
+        switch (cellType) {
+            case PlantCellType.Seed: prefab = seedCellPrefab; break;
+            case PlantCellType.Stem: prefab = stemCellPrefab; break;
+            case PlantCellType.Leaf: prefab = leafCellPrefab; break;
+            case PlantCellType.Fruit: prefab = berryCellPrefab; break;
+        }
+
+        if (prefab == null) {
+            Debug.LogError($"[{gameObject.name}] Prefab for PlantCellType.{cellType} is null!");
+            return null;
+        }
+
+        // Create visual cell
+        Vector2 worldPos = (Vector2)transform.position + ((Vector2)coords * cellSpacing);
+        GameObject instance = Instantiate(prefab, worldPos, Quaternion.identity, transform);
+        instance.name = $"{gameObject.name}_{cellType}_{coords.x}_{coords.y}";
+
+        // Set up PlantCell component
+        PlantCell cellComp = instance.GetComponent<PlantCell>() ?? instance.AddComponent<PlantCell>();
+        cellComp.ParentPlantGrowth = this;
+        cellComp.GridCoord = coords;
+        cellComp.CellType = cellType;
+
+        // Add to tracking
+        cells[coords] = cellType;
+        activeCellGameObjects.Add(instance);
+
+        // Set up SortableEntity
+        SortableEntity sorter = instance.GetComponent<SortableEntity>() ?? instance.AddComponent<SortableEntity>();
+        if (cellType == PlantCellType.Seed) {
+            sorter.SetUseParentYCoordinate(false);
+        } else {
+            sorter.SetUseParentYCoordinate(true);
+        }
+
+        // Apply scent data if it's a fruit
+        if (cellType == PlantCellType.Fruit) {
+            ApplyScentDataToObject(instance, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+        }
+
+        // Register visual effects
+        RegisterShadowForCell(instance, cellType.ToString());
+        // Outline registration now happens via OnPlantCellAdded call
+        if (enableOutline && outlineController != null)
+        {
+             outlineController.OnPlantCellAdded(coords, instance);
+        }
+
+        return instance;
+    }
+
+    // --- Helper Methods for Shadow & Outline Integration ---
+    private void RegisterShadowForCell(GameObject cellInstance, string cellTypeName)
+    {
+        if (shadowController == null || shadowPartPrefab == null || cellInstance == null) return;
+
+        SpriteRenderer partRenderer = cellInstance.GetComponentInChildren<SpriteRenderer>(); // More robust
+        if (partRenderer != null) {
+            shadowController.RegisterPlantPart(partRenderer, shadowPartPrefab);
+        } else {
+            Debug.LogWarning($"Plant '{gameObject.name}': {cellTypeName} missing SpriteRenderer. No shadow.", cellInstance);
+        }
+    }
+
+    // REMOVED: RegisterOutlineForCell (Logic moved to SpawnCellVisual calling outlineController.OnPlantCellAdded)
+
+    // --- Stat Calculation ---
+    private void CalculateAndApplyStats()
+    {
+        // (Function body remains the same as before)
+        if (nodeGraph == null) {
+            Debug.LogError($"[{gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
+            return;
+        }
+
+        float baseEnergyStorage = 10f;
+        float basePhotosynthesisRate = 0.5f;
+        int baseStemMin = 3;
+        int baseStemMax = 5;
+        float baseGrowthSpeedInterval = 0.5f; // Base time per step
+        int baseLeafGap = 1;
+        int baseLeafPattern = 0;
+        float baseGrowthRandomness = 0.1f;
+        float baseCooldown = 5f;
+        float baseCastDelay = 0.1f;
+
+        float accumulatedEnergyStorage = 0f;
+        float accumulatedPhotosynthesis = 0f;
+        int stemLengthModifier = 0;
+        float growthSpeedTimeModifier = 0f;
+        int leafGapModifier = 0;
+        int currentLeafPattern = baseLeafPattern;
+        float growthRandomnessModifier = 0f;
+        float cooldownModifier = 0f;
+        float castDelayModifier = 0f;
+        bool seedFound = false;
+
+        foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
+            if (node?.effects == null) continue;
+            foreach (NodeEffectData effect in node.effects) {
+                if (effect == null || !effect.isPassive) continue;
+                switch (effect.effectType) {
+                    case NodeEffectType.SeedSpawn:
+                        seedFound = true;
+                        break;
+                    case NodeEffectType.EnergyStorage:
+                        accumulatedEnergyStorage += effect.primaryValue;
+                        break;
+                    case NodeEffectType.EnergyPhotosynthesis:
+                        accumulatedPhotosynthesis += effect.primaryValue;
+                        break;
+                    case NodeEffectType.StemLength:
+                        stemLengthModifier += Mathf.RoundToInt(effect.primaryValue);
+                        break;
+                    case NodeEffectType.GrowthSpeed:
+                        // Modify the *time interval* per step
+                        growthSpeedTimeModifier += effect.primaryValue;
+                        break;
+                    case NodeEffectType.LeafGap:
+                        leafGapModifier += Mathf.RoundToInt(effect.primaryValue);
+                        break;
+                    case NodeEffectType.LeafPattern:
+                        currentLeafPattern = Mathf.Clamp(Mathf.RoundToInt(effect.primaryValue), 0, 4); // Assuming max 4 patterns defined
+                        break;
+                    case NodeEffectType.StemRandomness:
+                        growthRandomnessModifier += effect.primaryValue;
+                        break;
+                    case NodeEffectType.Cooldown:
+                        cooldownModifier += effect.primaryValue;
+                        break;
+                    case NodeEffectType.CastDelay:
+                        castDelayModifier += effect.primaryValue;
+                        break;
+                        // Add other passive effects here if needed
+                }
+            }
+        }
+
+        finalMaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
+        finalPhotosynthesisRate = Mathf.Max(0f, basePhotosynthesisRate + accumulatedPhotosynthesis);
+        int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier);
+        int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
+        finalGrowthSpeed = Mathf.Max(0.01f, baseGrowthSpeedInterval + growthSpeedTimeModifier); // This is now TIME PER STEP
+        finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
+        finalLeafPattern = currentLeafPattern;
+        finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
+        cycleCooldown = Mathf.Max(0.1f, baseCooldown + cooldownModifier);
+        nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
+
+        targetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
+        // REMOVED: totalGrowthDuration calculation (less relevant)
+
+        if (!seedFound) {
+            Debug.LogWarning($"[{gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth aborted.", gameObject);
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\PlantGrowth.Growth.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.Growth.cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using System.Linq; // Keep for OrderBy
+
+public partial class PlantGrowth : MonoBehaviour
+{
+    // ------------------------------------------------
+    // --- TIME-BASED GROWTH SYSTEM ---                // <<< NEW SYSTEM
+    // ------------------------------------------------
+
+    // Helper class to store pre-calculated growth steps (same as before)
+    private class GrowthStep
+    {
+        public PlantCellType CellType;
+        public Vector2Int Position;
+        public int StemIndex; // Track which stem this belongs to (for percentage)
+    }
+
+    // --- GrowthCoroutine_TimeBased ---              // <<< NEW COROUTINE
+    private IEnumerator GrowthCoroutine_TimeBased()
+    {
+        if (targetStemLength <= 0)
+        {
+            currentState = PlantState.GrowthComplete;
+            growthCoroutine = null;
+            yield break;
+        }
+
+        List<GrowthStep> growthPlan = PreCalculateGrowthPlan(); // Assumes this method exists
+        int totalStepsInPlan = growthPlan.Count;
+        if (totalStepsInPlan == 0)
+        {
+            currentState = PlantState.GrowthComplete;
+            growthCoroutine = null;
+            yield break;
+        }
+
+        // --- Initialize Time Variables ---
+        currentGrowthElapsedTime = 0f; // Reset elapsed time for this growth cycle
+        int stepsCompleted = 0;
+        float baseTimePerStep = finalGrowthSpeed;
+        if (baseTimePerStep <= 0.001f) baseTimePerStep = 0.01f;
+
+        // --- Calculate Initial Estimated Total Time (for continuous mode) ---
+        float initialTileMultiplier = 1.0f;
+        if (PlantGrowthModifierManager.Instance != null)
+        {
+            initialTileMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(this);
+            initialTileMultiplier = Mathf.Clamp(initialTileMultiplier, 0.1f, 10.0f);
+        }
+        float initialEffectiveTimePerStep = baseTimePerStep / initialTileMultiplier;
+        if (initialEffectiveTimePerStep < 0.001f) initialEffectiveTimePerStep = 0.001f;
+        estimatedTotalGrowthTime = totalStepsInPlan * initialEffectiveTimePerStep;
+        // Ensure estimated time is at least a small positive value
+        if (estimatedTotalGrowthTime < 0.01f) estimatedTotalGrowthTime = 0.01f;
+        // --------------------------------------------------------------------
+
+        // Debug.Log($"[{gameObject.name}] Starting growth. Est. Time: {estimatedTotalGrowthTime:F2}s");
+
+        // --- Growth Loop ---
+        while (stepsCompleted < totalStepsInPlan && currentState == PlantState.Growing)
+        {
+            // 1. Accumulate & Store Elapsed Time
+            float frameDeltaTime = Time.deltaTime;
+            currentGrowthElapsedTime += frameDeltaTime; // Update member variable
+
+            // 2. Get Current Tile Modifier
+            float currentTileMultiplier = 1.0f;
+            if (PlantGrowthModifierManager.Instance != null)
+            {
+                currentTileMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(this);
+                currentTileMultiplier = Mathf.Clamp(currentTileMultiplier, 0.1f, 10.0f);
+            }
+
+            // 3. Calculate Target Steps based on *current* effective time per step
+            float currentEffectiveTimePerStep = baseTimePerStep / currentTileMultiplier;
+            if (currentEffectiveTimePerStep < 0.001f) currentEffectiveTimePerStep = 0.001f;
+
+            // Use the MEMBER variable currentGrowthElapsedTime for calculation
+            int targetSteps = Mathf.FloorToInt(currentGrowthElapsedTime / currentEffectiveTimePerStep);
+
+            // 4. Process Pending Steps
+            int stepsToProcessThisFrame = targetSteps - stepsCompleted;
+
+            if (stepsToProcessThisFrame > 0)
+            {
+                for (int i = 0; i < stepsToProcessThisFrame; i++)
+                {
+                    int currentPlanIndex = stepsCompleted + i;
+                    if (currentPlanIndex >= totalStepsInPlan) break;
+
+                    GrowthStep step = growthPlan[currentPlanIndex];
+                    GameObject spawnedCell = SpawnCellVisual(step.CellType, step.Position, null, null); // Assumes method exists
+
+                    // --- Update percentage ONLY in DISCRETE mode here ---
+                    if (step.CellType == PlantCellType.Stem)
+                    {
+                        currentStemCount = step.StemIndex;
+                        if (!continuousIncrement) // Only update UI from here if discrete
+                        {
+                             UpdateGrowthPercentageUI();
+                        }
+                    }
+                    // -----------------------------------------------------
+                }
+                stepsCompleted += stepsToProcessThisFrame;
+            }
+
+            // 5. Yield
+            yield return null;
+        }
+
+        currentState = PlantState.GrowthComplete;
+        growthCoroutine = null;
+    }
+
+
+    // --- PreCalculateGrowthPlan ---                     // <<< NEW HELPER
+    /// <summary>
+    /// Generates the full sequence of stem and leaf placements based on calculated stats.
+    /// </summary>
+    /// <returns>A list of GrowthStep objects defining the growth sequence.</returns>
+    private List<GrowthStep> PreCalculateGrowthPlan()
+    {
+        List<GrowthStep> plan = new List<GrowthStep>();
+        Vector2Int currentPos = Vector2Int.zero; // Start relative to the seed
+        int spiralDir = 1; // Used for spiral pattern
+        int patternCount = 0; // Used for alternating patterns
+
+        // Simulate the growth stem by stem
+        for (int stemIndex = 1; stemIndex <= targetStemLength; stemIndex++)
+        {
+            // Determine growth direction for this stem
+            Vector2Int growthDir = GetStemDirection(); // Use the randomness calculated in stats
+            Vector2Int nextStemPos = currentPos + growthDir;
+
+            // Add stem step to the plan
+            plan.Add(new GrowthStep {
+                CellType = PlantCellType.Stem,
+                Position = nextStemPos,
+                StemIndex = stemIndex
+            });
+
+            currentPos = nextStemPos; // Update position for leaf calculation
+
+            // Check if leaves should be added for this stem segment
+            if ((finalLeafGap >= 0) && (stemIndex % (finalLeafGap + 1)) == 0)
+            {
+                patternCount++;
+
+                // Base positions for leaves relative to the *new* stem position
+                Vector2Int leftBase = currentPos + Vector2Int.left;
+                Vector2Int rightBase = currentPos + Vector2Int.right;
+
+                // Calculate leaf positions based on the chosen pattern
+                List<Vector2Int> leafPositions = CalculateLeafPositions(
+                    currentPos, // Current stem position
+                    leftBase,   // Potential left leaf position
+                    rightBase,  // Potential right leaf position
+                    patternCount, // Counter for alternating patterns
+                    ref spiralDir // Ref for spiral direction state
+                );
+
+                // Add leaf steps to the plan
+                foreach (Vector2Int leafPos in leafPositions)
+                {
+                    plan.Add(new GrowthStep {
+                        CellType = PlantCellType.Leaf,
+                        Position = leafPos,
+                        StemIndex = stemIndex // Associate leaf with the stem it grew from
+                    });
+                }
+            }
+        }
+        return plan;
+    }
+
+
+    // --- GetStemDirection - Determines the next stem growth direction ---
+    // (Logic remains the same, uses finalGrowthRandomness)
+    private Vector2Int GetStemDirection()
+    {
+        // Use pre-calculated randomness factor
+        if (Random.value < finalGrowthRandomness) // Check against the final calculated value
+        {
+            // Randomly choose left-up or right-up diagonal
+            return (Random.value < 0.5f) ? (Vector2Int.up + Vector2Int.left) : (Vector2Int.up + Vector2Int.right);
+        }
+        // Default to straight up
+        return Vector2Int.up;
+    }
+
+    // --- CalculateLeafPositions - Calculates leaf positions based on pattern ---
+    // (Logic remains the same, uses finalLeafPattern)
+    private List<Vector2Int> CalculateLeafPositions(
+        Vector2Int stemPos, Vector2Int leftBase, Vector2Int rightBase, int counter, ref int spiralDir)
+    {
+        List<Vector2Int> leafPositions = new List<Vector2Int>();
+
+        switch (finalLeafPattern) // Use the final calculated pattern
+        {
+            case 0: // Parallel leaves
+                leafPositions.Add(leftBase);
+                leafPositions.Add(rightBase);
+                break;
+
+            case 1: // Alternating Offset leaves
+                 // Initialize random offset ONCE per plant growth instance
+                if (offsetRightForPattern1 == null)
+                    offsetRightForPattern1 = Random.value < 0.5f;
+
+                if (offsetRightForPattern1.Value) { // Offset right leaf up
+                    leafPositions.Add(leftBase);
+                    leafPositions.Add(rightBase + Vector2Int.up);
+                } else { // Offset left leaf up
+                    leafPositions.Add(leftBase + Vector2Int.up);
+                    leafPositions.Add(rightBase);
+                }
+                break;
+
+            case 2: // Alternating Parallel/Offset combination
+                switch (counter % 4) {
+                    case 0: // Treat 0 like 2 for parallel
+                    case 2: // Parallel
+                        leafPositions.Add(leftBase);
+                        leafPositions.Add(rightBase);
+                        break;
+                    case 1: // Offset left up
+                        leafPositions.Add(leftBase + Vector2Int.up);
+                        leafPositions.Add(rightBase);
+                        break;
+                    case 3: // Offset right up
+                        leafPositions.Add(leftBase);
+                        leafPositions.Add(rightBase + Vector2Int.up);
+                        break;
+                }
+                break;
+
+            case 3: // Spiral leaves
+                // Place one leaf normally, offset the other based on spiral direction
+                if (spiralDir > 0) { // e.g., Right leaf is higher
+                    leafPositions.Add(leftBase);
+                    leafPositions.Add(rightBase + Vector2Int.up);
+                } else { // e.g., Left leaf is higher
+                    leafPositions.Add(leftBase + Vector2Int.up);
+                    leafPositions.Add(rightBase);
+                }
+                spiralDir *= -1; // Flip direction for next time
+                break;
+
+            case 4: // Example: Symmetric double leaves on both sides
+                leafPositions.Add(leftBase);
+                leafPositions.Add(leftBase + Vector2Int.up);
+                leafPositions.Add(rightBase);
+                leafPositions.Add(rightBase + Vector2Int.up);
+                break;
+
+             default: // Fallback to parallel
+                 leafPositions.Add(leftBase);
+                 leafPositions.Add(rightBase);
+                 break;
+        }
+
+        return leafPositions;
+    }
+
+} // End PARTIAL Class
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\PlantGrowth.NodeExecution.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.NodeExecution.cs
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+public partial class PlantGrowth : MonoBehaviour
+{
+    // ------------------------------------------------
+    // --- NODE EXECUTION METHODS ---
+    // ------------------------------------------------
+
+    private IEnumerator ExecuteMatureCycle()
+    {
+        if (nodeGraph?.nodes == null || nodeGraph.nodes.Count == 0) {
+             Debug.LogError($"[{gameObject.name}] NodeGraph missing or empty!", gameObject);
+             currentState = PlantState.Mature_Idle;
+             cycleTimer = cycleCooldown; // Reset timer even on error
+             yield break;
+        }
+
+        // --- Accumulation Phase ---
+        float damageMultiplier = 1.0f;
+        Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
+        Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
+        float totalEnergyCostForCycle = 0f;
+
+        // Process all nodes to accumulate effects
+        foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex))
+        {
+            if (node?.effects == null || node.effects.Count == 0) continue;
+
+            foreach (var effect in node.effects)
+            {
+                 if (effect == null || effect.isPassive) continue; // Skip passive effects
+
+                 // Accumulate specific non-passive effects
+                 switch (effect.effectType)
+                 {
+                    case NodeEffectType.EnergyCost:
+                         totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
+                         break;
+                    case NodeEffectType.Damage:
+                         damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue);
+                         break;
+                    case NodeEffectType.ScentModifier:
+                        if (effect.scentDefinitionReference != null)
+                        {
+                             ScentDefinition key = effect.scentDefinitionReference;
+                             // Use TryGetValue for cleaner addition
+                             accumulatedScentRadiusBonus.TryGetValue(key, out float currentRad);
+                             accumulatedScentRadiusBonus[key] = currentRad + effect.primaryValue;
+
+                             accumulatedScentStrengthBonus.TryGetValue(key, out float currentStr);
+                             accumulatedScentStrengthBonus[key] = currentStr + effect.secondaryValue;
+                        }
+                        else {
+                             Debug.LogWarning($"Node '{node.nodeDisplayName ?? "Unnamed"}' has ScentModifier effect but ScentDefinition reference is NULL.");
+                        }
+                        break;
+                    // Other accumulation effects could go here
+                 }
+            }
+        }
+
+        // --- Execution Phase ---
+        // Check Energy Cost *before* executing actions
+        if (currentEnergy < totalEnergyCostForCycle) {
+             if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name}] Not enough energy ({currentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
+             currentState = PlantState.Mature_Idle;
+             cycleTimer = cycleCooldown; // Reset timer
+             yield break; // Exit if not enough energy
+        }
+
+        // Spend energy
+        currentEnergy = Mathf.Max(0f, currentEnergy - totalEnergyCostForCycle);
+        UpdateUI(); // Update UI after spending energy
+
+        // Execute node effects in order
+        foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex))
+        {
+            if (node?.effects == null || node.effects.Count == 0) continue;
+
+            // Check if this node contains any *active* effects that require a delay
+            bool hasActionEffectInNode = node.effects.Any(eff => eff != null && !eff.isPassive &&
+                                            eff.effectType != NodeEffectType.EnergyCost && // Don't delay for cost
+                                            eff.effectType != NodeEffectType.Damage &&   // Don't delay for damage mod
+                                            eff.effectType != NodeEffectType.ScentModifier); // Don't delay for scent mod
+
+            // Apply delay BEFORE processing effects of this node if applicable
+            if (hasActionEffectInNode && nodeCastDelay > 0.01f) {
+                 yield return new WaitForSeconds(nodeCastDelay);
+            }
+
+            // Execute individual active effects
+            foreach (var effect in node.effects)
+            {
+                 // Skip passive and accumulation-only effects during execution
+                 if (effect == null || effect.isPassive ||
+                     effect.effectType == NodeEffectType.EnergyCost ||
+                     effect.effectType == NodeEffectType.Damage ||
+                     effect.effectType == NodeEffectType.ScentModifier) continue;
+
+                 // Execute the actual active effect
+                 switch (effect.effectType) {
+                     case NodeEffectType.Output:
+                        // Find component on THIS plant root or its children
+                        OutputNodeEffect outputComp = GetComponentInChildren<OutputNodeEffect>();
+                        if (outputComp != null) {
+                             outputComp.Activate(damageMultiplier, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+                        } else {
+                             Debug.LogWarning($"[{gameObject.name}] Node requested Output effect, but no OutputNodeEffect component found.", this);
+                        }
+                         break;
+                     case NodeEffectType.GrowBerry:
+                         TrySpawnBerry(accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+                         break;
+                     // Add other ACTIVE effect cases here (e.g., Heal, StatusEffect)
+                 }
+            }
+        }
+
+        // --- Cycle Complete ---
+        // Reset timer and state after executing all nodes
+        cycleTimer = cycleCooldown;
+        currentState = PlantState.Mature_Idle;
+    }
+
+    // --- TrySpawnBerry - Tries to create a berry on the plant ---
+    private void TrySpawnBerry(Dictionary<ScentDefinition, float> scentRadiiBonus, Dictionary<ScentDefinition, float> scentStrengthsBonus)
+    {
+        if (berryCellPrefab == null) {
+            Debug.LogWarning($"[{gameObject.name}] Berry Prefab not assigned. Cannot spawn berry.", gameObject);
+            return;
+        }
+
+        // Find potential coordinates adjacent to existing stems/leaves where berries can grow
+        // Consider only coords adjacent to stems for typical berry growth
+        var potentialCoords = cells
+            .Where(cellKvp => cellKvp.Value == PlantCellType.Stem || cellKvp.Value == PlantCellType.Seed) // Only grow off Stem/Seed
+            .SelectMany(cellKvp => {
+                Vector2Int coord = cellKvp.Key;
+                // Define potential relative offsets for berries (e.g., above, left, right)
+                Vector2Int[] berryOffsets = { Vector2Int.up, Vector2Int.left, Vector2Int.right };
+                List<Vector2Int> candidates = new List<Vector2Int>();
+                foreach(var offset in berryOffsets) {
+                    candidates.Add(coord + offset);
+                }
+                return candidates;
+            })
+            .Where(coord => !cells.ContainsKey(coord)) // Ensure the target coordinate is empty
+            .Distinct() // Avoid duplicates if multiple stems border the same empty cell
+            .ToList();
+
+        if (potentialCoords.Count > 0) {
+            // Choose a random empty valid spot
+            Vector2Int chosenCoord = potentialCoords[Random.Range(0, potentialCoords.Count)];
+            // Spawn the berry visual, passing accumulated scent data
+            GameObject berryGO = SpawnCellVisual(PlantCellType.Fruit, chosenCoord, scentRadiiBonus, scentStrengthsBonus);
+             if (berryGO == null) {
+                  Debug.LogError($"[{gameObject.name}] Failed to spawn berry visual at {chosenCoord}, SpawnCellVisual returned null.");
+             }
+        } else {
+             if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name}] No valid empty adjacent locations found to spawn a berry.");
+        }
+    }
+
+
+    // --- ApplyScentDataToObject - Applies scent to an object like a berry or projectile ---
+    public void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses)
+    {
+        // (Function body remains the same as before)
+        if (targetObject == null) {
+            Debug.LogError("ApplyScentDataToObject: targetObject is null.");
+            return;
+        }
+
+        if (EcosystemManager.Instance == null) {
+            Debug.LogError("ApplyScentDataToObject: EcosystemManager instance not found.");
+            return;
+        }
+
+        if (EcosystemManager.Instance.scentLibrary == null) {
+            Debug.LogWarning("ApplyScentDataToObject: Scent Library not assigned in EcosystemManager.");
+            return;
+        }
+
+        // Find the ScentDefinition with the highest accumulated strength bonus
+        ScentDefinition strongestScentDef = null;
+        float maxStrengthBonus = -1f; // Use -1 to correctly handle 0 bonus values
+
+        if (scentStrengthBonuses != null && scentStrengthBonuses.Count > 0) {
+            foreach (var kvp in scentStrengthBonuses) {
+                if (kvp.Key != null && kvp.Value > maxStrengthBonus) {
+                    maxStrengthBonus = kvp.Value;
+                    strongestScentDef = kvp.Key;
+                }
+            }
+        } else {
+             // if (Debug.isDebugBuild) Debug.Log($"[{gameObject.name} ApplyScentToObject] No scent strength bonuses provided.");
+        }
+
+        // Apply the strongest scent found (if any)
+        if (strongestScentDef != null) {
+             // if (Debug.isDebugBuild) Debug.Log($"[{gameObject.name} ApplyScentToObject] Applying strongest scent '{strongestScentDef.displayName}' to {targetObject.name} (Str Bonus: {maxStrengthBonus})");
+
+            ScentSource scentSource = targetObject.GetComponent<ScentSource>();
+            if (scentSource == null) {
+                scentSource = targetObject.AddComponent<ScentSource>();
+            }
+
+            // Configure the ScentSource component
+            scentSource.definition = strongestScentDef;
+
+            // Retrieve the corresponding bonuses (defaulting to 0 if not found)
+            scentRadiusBonuses.TryGetValue(strongestScentDef, out float radiusBonus);
+            scentSource.radiusModifier = radiusBonus;
+            scentSource.strengthModifier = maxStrengthBonus; // Apply the max strength found
+
+            // Instantiate particle effect if defined and not already present
+            if (strongestScentDef.particleEffectPrefab != null) {
+                bool particleExists = false;
+                // Check immediate children for an existing particle system to avoid duplicates
+                foreach(Transform child in targetObject.transform){
+                    if(child.TryGetComponent<ParticleSystem>(out _)){
+                        particleExists = true;
+                        break;
+                    }
+                }
+                if (!particleExists) {
+                     // Instantiate under the target object
+                    Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform.position, Quaternion.identity, targetObject.transform);
+                }
+            }
+        } else {
+            // if (Debug.isDebugBuild) Debug.Log($"[{gameObject.name} ApplyScentToObject] No strongest scent found to apply to {targetObject.name}.");
+        }
+    }
+
+} // End PARTIAL Class
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -641,46 +1438,66 @@ using UnityEngine;
 using TMPro;
 
 // --- Enums ---
-public enum PlantCellType { Seed, Stem, Leaf, Flower, Fruit }
-public enum PlantState { Initializing, Growing, Mature_Idle, Mature_Executing }
+public enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
 
-
-public class PlantGrowth : MonoBehaviour
+public partial class PlantGrowth : MonoBehaviour
 {
-    // --- Serialized Fields ---
+    // ------------------------------------------------
+    // --- SERIALIZED FIELDS ---
+    // ------------------------------------------------
+
     [Header("UI & Visuals")]
     [SerializeField] private TMP_Text energyText;
     [SerializeField] private GameObject seedCellPrefab;
     [SerializeField] private GameObject stemCellPrefab;
     [SerializeField] private GameObject leafCellPrefab;
     [SerializeField] private GameObject berryCellPrefab; // Used for PlantCellType.Fruit
-    [SerializeField] private float cellSpacing = 8f;
-    
+    [SerializeField] private float cellSpacing = 0.08f;
+
     [Header("Shadow Setup")]
     [SerializeField] [Tooltip("Assign the PlantShadowController component from the child _ShadowRoot GameObject")]
     private PlantShadowController shadowController;
-    [SerializeField] [Tooltip("Assign your generic ShadowPart prefab (containing only SpriteRenderer + ShadowPartController script)")]
+    [SerializeField] [Tooltip("Assign your 'PlantShadow' prefab (GO + SpriteRenderer + ShadowPartController script)")]
     private GameObject shadowPartPrefab;
+
+    [Header("Outline Setup")]
+    [SerializeField] [Tooltip("Enable or disable plant outline visualization")]
+    private bool enableOutline = true;
+    [SerializeField] [Tooltip("Assign the PlantOutlineController component from the child _OutlineRoot GameObject")]
+    private PlantOutlineController outlineController;
+    [SerializeField] [Tooltip("Assign your outline part prefab (GO + SpriteRenderer + OutlinePartController script)")]
+    private GameObject outlinePartPrefab;
 
     [Header("Growth & UI Timing")]
     [SerializeField] private bool showGrowthPercentage = true;
     [SerializeField] private bool allowPhotosynthesisDuringGrowth = false;
-    [SerializeField] private bool useSmoothPercentageCounter = true;
-    [SerializeField] [Range(1, 10)] private int percentageIncrement = 2;
+    [SerializeField] [Tooltip("Percentage UI updates only on these increments (e.g., 5 shows 0, 5, 10...).")]
+    [Range(1, 25)] private int percentageIncrement = 5;
+    // --- NEW FIELD ---
+    [SerializeField] [Tooltip("If true, percentage display approximates smooth progress based on time. If false, it reflects discrete stem cell additions.")]
+    private bool continuousIncrement = false;
+    // -----------------
 
-    // --- Internal State & Data ---
+    // ------------------------------------------------
+    // --- INTERNAL STATE & DATA ---
+    // ------------------------------------------------
+
     private NodeGraph nodeGraph;
     public PlantState currentState = PlantState.Initializing;
     public float currentEnergy = 0f;
     private Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
-    private Coroutine percentageCounterCoroutine;
-    private FireflyManager fireflyManagerInstance; // Cache the reference
-    
+    private List<GameObject> activeCellGameObjects = new List<GameObject>();
+    private FireflyManager fireflyManagerInstance;
     private GameObject rootCellInstance;
+    private Coroutine growthCoroutine;
+    private bool isGrowthCompletionHandled = false;
 
-    // --- Calculated Stats ---
+    // ------------------------------------------------
+    // --- CALCULATED STATS ---
+    // ------------------------------------------------
+
     private int targetStemLength;
-    private float finalGrowthSpeed;
+    private float finalGrowthSpeed; // Represents time interval per step
     private int finalLeafGap;
     private int finalLeafPattern;
     private float finalGrowthRandomness;
@@ -689,606 +1506,255 @@ public class PlantGrowth : MonoBehaviour
     private float cycleCooldown;
     private float nodeCastDelay;
 
-    // --- Runtime Variables ---
+    // ------------------------------------------------
+    // --- RUNTIME VARIABLES ---
+    // ------------------------------------------------
+
     private int currentStemCount = 0;
     private float cycleTimer = 0f;
-    private float displayedGrowthPercentage = 0f;
-    private float totalGrowthDuration;
+    private int displayedGrowthPercentage = -1;
     private bool? offsetRightForPattern1 = null;
+    // --- NEW FIELDS for Continuous Mode ---
+    private float currentGrowthElapsedTime = 0f;
+    private float estimatedTotalGrowthTime = 1f; // Default to 1 to avoid division by zero
 
-    // --- Unity Methods ---
+    // ------------------------------------------------
+    // --- UNITY LIFECYCLE METHODS ---
+    // ------------------------------------------------
+
     void Awake()
     {
-        // Example: Find the controller if not assigned in Inspector (assigning is preferred)
-        if (shadowController == null)
-        {
-            shadowController = GetComponentInChildren<PlantShadowController>(true); // true to include inactive
-            if (shadowController == null)
-            {
-                Debug.LogError("PlantGrowth ERROR: Could not find PlantShadowController in children! Shadow system will not work.", this);
-                enabled = false; // Disable script if setup is broken
-                return;
-            }
-            else {
-                Debug.Log("PlantGrowth found PlantShadowController dynamically.", this);
-            }
-        }
-        if (shadowPartPrefab == null)
-        {
-            Debug.LogError("PlantGrowth ERROR: Assign the Shadow Part Prefab in the Inspector! Shadow system will not work.", this);
-            enabled = false; // Disable script if setup is broken
-        }
+        // --- Critical Setup Check ---
+        bool setupValid = true;
+        if (shadowController == null) { shadowController = GetComponentInChildren<PlantShadowController>(true); if (shadowController == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantShadowController ref missing!", this); setupValid = false; } else { Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantShadowController dynamically.", this); } }
+        if (shadowPartPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Shadow Part Prefab missing!", this); setupValid = false; }
+        if (enableOutline) { if (outlineController == null) { outlineController = GetComponentInChildren<PlantOutlineController>(true); if (outlineController == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantOutlineController ref missing but outline is enabled!", this); setupValid = false; } else { Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantOutlineController dynamically.", this); } } if (outlinePartPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Outline Part Prefab missing but outline is enabled!", this); setupValid = false; } }
+        if (seedCellPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Seed Cell Prefab missing!", this); setupValid = false; } if (energyText == null) Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Energy Text (TMP_Text) missing.", this);
+        if (!setupValid) { enabled = false; return; }
+        if (!enableOutline && outlineController != null) { outlineController.gameObject.SetActive(false); }
+        fireflyManagerInstance = FireflyManager.Instance;
+        EnsureUIReferences();
     }
-    
+
     void Start()
     {
-        // Example: Spawn the initial seed cell
-        SpawnInitialSeed();
-    }
-
-    private void Update() => StateMachineUpdate();
-
-    private void OnDestroy()
-    {
-        StopAllCoroutines(); // Ensure cleanup
-    
-        // Unregister with the PlantGrowthModifierManager if it exists
-        if (PlantGrowthModifierManager.Instance != null)
-        {
-            PlantGrowthModifierManager.Instance.UnregisterPlant(this);
-        }
-    }
-
-    // --- Public Initialization ---
-    public void InitializeAndGrow(NodeGraph graph)
-    {
-        if (graph == null || graph.nodes == null) {
-            Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject); Destroy(gameObject); return;
-        }
-
-        // <<< ADDED DETAILED GRAPH INSPECTION LOG >>>
-        Debug.Log($"InitializeAndGrow received graph with {graph.nodes.Count} nodes.");
-        for(int i = 0; i < graph.nodes.Count; i++)
-        {
-            var node = graph.nodes[i];
-             if(node == null) {
-                Debug.LogWarning($" - Node at index {i} is NULL.");
-                continue;
-             }
-            Debug.Log($" - Node '{node.nodeDisplayName ?? "NO NAME"}' (Index: {node.orderIndex}) has {node.effects?.Count ?? 0} effects:");
-            if (node.effects != null)
-            {
-                for(int j = 0; j < node.effects.Count; j++)
-                {
-                    var effect = node.effects[j];
-                     if(effect == null) {
-                        Debug.LogWarning($"   - Effect at index {j} is NULL.");
-                        continue;
-                     }
-                     // Log details of each effect
-                     Debug.Log($"   - Type: {effect.effectType}, Passive: {effect.isPassive}, ScentRef: {(effect.scentDefinitionReference != null ? effect.scentDefinitionReference.name : "NULL")}, RadiusBonus(Val1): {effect.primaryValue}, StrengthBonus(Val2): {effect.secondaryValue}");
-                }
-            }
-        }
-        // <<< END DETAILED GRAPH INSPECTION LOG >>>
-
-
-        nodeGraph = graph; // Store the graph reference
-        currentState = PlantState.Initializing;
-        currentEnergy = 0f;
-        displayedGrowthPercentage = 0f;
-        if (percentageCounterCoroutine != null) { StopCoroutine(percentageCounterCoroutine); percentageCounterCoroutine = null; }
-
-        CalculateAndApplyStats(); // Calculate based on the stored nodeGraph
-
-        if (targetStemLength > 0) {
-            StartGrowthVisuals();
-        } else {
-             Debug.LogWarning($"[{gameObject.name}] Target stem length is {targetStemLength}. Skipping visual growth.", gameObject);
-            currentState = PlantState.Mature_Idle;
-            cycleTimer = cycleCooldown;
-            if (!cells.ContainsKey(Vector2Int.zero)) {
-                 SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
-             }
-        }
         UpdateUI();
     }
 
-
-    // --- State Machine & Updates ---
-    private void StateMachineUpdate()
+    private void Update()
     {
+        // Handle frame-dependent UI updates and state transitions
         switch (currentState)
         {
             case PlantState.Growing:
-                if (allowPhotosynthesisDuringGrowth) AccumulateEnergy();
-                if (!showGrowthPercentage || !useSmoothPercentageCounter) UpdateUI();
+                if (allowPhotosynthesisDuringGrowth)
+                    AccumulateEnergy();
+
+                // --- Update percentage UI every frame ONLY if in continuous mode ---
+                if (showGrowthPercentage && continuousIncrement)
+                {
+                    UpdateGrowthPercentageUI();
+                }
+                // (Discrete mode updates are handled within the coroutine)
                 break;
+
+            case PlantState.GrowthComplete:
+                if (!isGrowthCompletionHandled)
+                {
+                    isGrowthCompletionHandled = true;
+                    if (showGrowthPercentage && targetStemLength > 0)
+                    {
+                        UpdateGrowthPercentageUI(true); // Force 100% display
+                    }
+                    currentState = PlantState.Mature_Idle;
+                    cycleTimer = cycleCooldown;
+                    UpdateUI(); // Update energy text if needed
+                }
+                break;
+
             case PlantState.Mature_Idle:
                 AccumulateEnergy();
                 UpdateUI();
                 cycleTimer -= Time.deltaTime;
-                // Ensure energy is checked against the cost dynamically if needed,
-                // or just use a minimal threshold to start the cycle attempt.
-                // Checking against total cost happens INSIDE ExecuteMatureCycle now.
-                if (cycleTimer <= 0f && currentEnergy >= 1f) // Low threshold to attempt cycle
+                if (cycleTimer <= 0f && currentEnergy >= 1f)
                 {
                     currentState = PlantState.Mature_Executing;
-                    StartCoroutine(ExecuteMatureCycle());
+                    StartCoroutine(ExecuteMatureCycle()); // Assumes ExecuteMatureCycle is in another partial file
                 }
                 break;
+
             case PlantState.Mature_Executing:
                 AccumulateEnergy();
                 UpdateUI();
                 break;
+
+            case PlantState.Initializing:
+                break;
         }
     }
 
-    // AccumulateEnergy (No changes needed from previous version)
+    private void OnDestroy()
+    {
+        StopAllCoroutines(); growthCoroutine = null;
+        if (PlantGrowthModifierManager.Instance != null) { PlantGrowthModifierManager.Instance.UnregisterPlant(this); }
+        ClearAllVisuals(); // Assumes ClearAllVisuals is in another partial file
+    }
+
+    // ------------------------------------------------
+    // --- PUBLIC INITIALIZATION ---
+    // ------------------------------------------------
+
+    public void InitializeAndGrow(NodeGraph graph)
+    {
+        if (graph == null || graph.nodes == null) { Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject); Destroy(gameObject); return; }
+        if (growthCoroutine != null) { StopCoroutine(growthCoroutine); growthCoroutine = null; }
+        ClearAllVisuals();
+        rootCellInstance = null; currentStemCount = 0; offsetRightForPattern1 = null; isGrowthCompletionHandled = false; displayedGrowthPercentage = -1;
+        currentGrowthElapsedTime = 0f; // <-- RESET
+        estimatedTotalGrowthTime = 1f; // <-- RESET to default
+        nodeGraph = graph; currentState = PlantState.Initializing; currentEnergy = 0f;
+        CalculateAndApplyStats();
+        GameObject spawnedSeed = SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
+        if (spawnedSeed != null) {
+            rootCellInstance = spawnedSeed;
+            if (PlantGrowthModifierManager.Instance != null && TileInteractionManager.Instance != null) { Vector3Int gridPos = TileInteractionManager.Instance.WorldToCell(transform.position); TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(gridPos); PlantGrowthModifierManager.Instance.RegisterPlantTile(this, currentTile); }
+            if (targetStemLength > 0) {
+                currentState = PlantState.Growing;
+                UpdateGrowthPercentageUI(); // Initial UI update (0%)
+                growthCoroutine = StartCoroutine(GrowthCoroutine_TimeBased());
+            } else {
+                Debug.LogWarning($"[{gameObject.name}] Target stem length is {targetStemLength}. Skipping visual growth phase.", gameObject);
+                currentState = PlantState.GrowthComplete; isGrowthCompletionHandled = false; UpdateUI();
+            }
+        } else { Debug.LogError($"[{gameObject.name}] Failed to spawn initial seed! Aborting growth.", gameObject); currentState = PlantState.Mature_Idle; Destroy(gameObject, 0.1f); }
+        UpdateUI();
+    }
+
+    // ------------------------------------------------
+    // --- ENERGY & UI ---
+    // ------------------------------------------------
+
     private void AccumulateEnergy()
     {
-        float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
-        int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
-    
-        // Get the tile-based energy multiplier
-        float tileMultiplier = 1.0f;
-        if (PlantGrowthModifierManager.Instance != null)
+        if (finalPhotosynthesisRate <= 0 || finalMaxEnergy <= 0) return; float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f; int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf); float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ? PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(this) : 1.0f; float fireflyBonusRate = 0f; if (fireflyManagerInstance != null) { int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(transform.position, fireflyManagerInstance.photosynthesisRadius); fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly, fireflyManagerInstance.maxPhotosynthesisBonus); } float standardPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight; float totalRate = (standardPhotosynthesis + fireflyBonusRate) * tileMultiplier; float delta = totalRate * Time.deltaTime; currentEnergy = Mathf.Clamp(currentEnergy + delta, 0f, finalMaxEnergy);
+    }
+
+    // --- UpdateGrowthPercentageUI (REVISED with Continuous Mode Logic Check) ---
+    /// <summary>
+    /// Calculates the target display percentage based on chosen mode (discrete/continuous)
+    /// and updates the UI text ONLY if the snapped value has changed.
+    /// </summary>
+    /// <param name="forceComplete">If true, forces the display to 100%.</param>
+    private void UpdateGrowthPercentageUI(bool forceComplete = false)
+    {
+        if (!showGrowthPercentage || energyText == null) return;
+
+        float rawPercentageFloat = 0f; // The calculated percentage before snapping
+
+        if (forceComplete)
         {
-            tileMultiplier = PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(this);
+            rawPercentageFloat = 100f;
         }
-    
-        float fireflyBonusRate = 0f;
-        if (fireflyManagerInstance != null)
+        // --- Check Continuous Flag Here ---
+        else if (continuousIncrement) // --- CONTINUOUS MODE ---
         {
-            int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(transform.position, fireflyManagerInstance.photosynthesisRadius);
-            fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly,
-                fireflyManagerInstance.maxPhotosynthesisBonus);
+            // Calculate based on time progress relative to estimated total time
+            if (estimatedTotalGrowthTime > 0.01f) // Avoid division by zero/tiny numbers
+            {
+                // Use the current elapsed time tracked by the coroutine member variable
+                rawPercentageFloat = Mathf.Clamp01(currentGrowthElapsedTime / estimatedTotalGrowthTime) * 100f;
+                 // Debug.Log($"Continuous Raw %: {rawPercentageFloat:F2} (Time: {currentGrowthElapsedTime:F2} / {estimatedTotalGrowthTime:F2})");
+            }
+            else
+            {
+                // If estimated time is effectively zero, show 0% while growing, 100% if done
+                rawPercentageFloat = (currentState == PlantState.Growing) ? 0f : 100f;
+                 // Debug.Log($"Continuous Raw %: {rawPercentageFloat} (Estimated time near zero)");
+            }
         }
-    
-        float standardPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight;
-        float totalRate = (standardPhotosynthesis + fireflyBonusRate) * tileMultiplier; // Apply tile multiplier
-        float delta = totalRate * Time.deltaTime;
-        currentEnergy = Mathf.Clamp(currentEnergy + delta, 0f, finalMaxEnergy);
+        else // --- DISCRETE MODE ---
+        {
+            // Calculate based on current stem count vs target
+            if (targetStemLength <= 0)
+            {
+                rawPercentageFloat = 0f; // No stems to grow
+                 // Debug.Log("Discrete Raw %: 0 (No target stems)");
+            }
+            else
+            {
+                rawPercentageFloat = Mathf.Clamp(((float)currentStemCount / targetStemLength) * 100f, 0f, 100f);
+                 // Debug.Log($"Discrete Raw %: {rawPercentageFloat:F2} (Stems: {currentStemCount} / {targetStemLength})");
+            }
+        }
+
+        // --- Snap the calculated percentage (Applies to BOTH modes) ---
+        int targetDisplayValue; // The final value to show (snapped)
+        if (percentageIncrement <= 1)
+        {
+            targetDisplayValue = Mathf.FloorToInt(rawPercentageFloat);
+        }
+        else
+        {
+            // Floor to the nearest lower multiple of the increment
+            targetDisplayValue = (Mathf.FloorToInt(rawPercentageFloat) / percentageIncrement) * percentageIncrement;
+        }
+        targetDisplayValue = Mathf.Min(targetDisplayValue, 100); // Clamp final value
+
+
+        // --- Update TextMeshPro only if the snapped value changed ---
+        if (targetDisplayValue != displayedGrowthPercentage)
+        {
+            // Debug.Log($"Updating Display %: {displayedGrowthPercentage} -> {targetDisplayValue}");
+            displayedGrowthPercentage = targetDisplayValue;
+            energyText.text = $"{displayedGrowthPercentage}%";
+        }
     }
 
 
+    // --- UpdateUI (Consolidated) ---
     private void UpdateUI()
     {
-        // (No changes needed)
         if (energyText == null) return;
-        switch (currentState) {
-            case PlantState.Growing when showGrowthPercentage:
-                int perc = useSmoothPercentageCounter ? Mathf.RoundToInt(displayedGrowthPercentage) :
-                           (targetStemLength <= 0 ? 100 : Mathf.RoundToInt((float)currentStemCount / targetStemLength * 100f));
-                energyText.text = $"{Mathf.Clamp(perc, 0, 100)}%";
-                break;
-            case PlantState.Growing: // Not showing percentage, show energy
-            case PlantState.Mature_Idle:
-            case PlantState.Mature_Executing:
-                energyText.text = $"{Mathf.FloorToInt(currentEnergy)}/{Mathf.FloorToInt(finalMaxEnergy)}";
-                break;
-            default: energyText.text = "..."; break;
-        }
-    }
 
-    // --- Cell Management ---
-    /// <summary>
-    /// Called by PlantCell component when its GameObject is destroyed.
-    /// Removes the cell from the internal dictionary.
-    /// </summary>
-    public void ReportCellDestroyed(Vector2Int coord)
-    {
-         if (cells.ContainsKey(coord))
-         {
-             cells.Remove(coord);
-         }
-    }
-
-    // --- Stat Calculation ---
-    private void CalculateAndApplyStats()
-    {
-        // (No changes needed - Scent is not passive)
-        if (nodeGraph == null) { Debug.LogError($"[{gameObject.name}] CalculateAndApplyStats called with null NodeGraph!"); return; }
-        float baseEnergyStorage = 0f; float basePhotosynthesisRate = 0f; int baseStemMin = 0; int baseStemMax = 0; float baseGrowthSpeed = 0f;
-        int baseLeafGap = 0; int baseLeafPattern = 0; float baseGrowthRandomness = 0f; float baseCooldown = 0f; float baseCastDelay = 0f;
-        float accumulatedEnergyStorage = 0f; float accumulatedPhotosynthesis = 0f; int stemLengthModifier = 0; float growthSpeedTimeModifier = 0f;
-        int leafGapModifier = 0; int currentLeafPattern = baseLeafPattern; float growthRandomnessModifier = 0f; float cooldownModifier = 0f;
-        float castDelayModifier = 0f; bool seedFound = false;
-        foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-            if (node.effects == null) continue;
-            foreach (NodeEffectData effect in node.effects) {
-                if (!effect.isPassive) continue;
-                switch (effect.effectType) {
-                    case NodeEffectType.SeedSpawn: seedFound = true; break;
-                    case NodeEffectType.EnergyStorage: accumulatedEnergyStorage += effect.primaryValue; break;
-                    case NodeEffectType.EnergyPhotosynthesis: accumulatedPhotosynthesis += effect.primaryValue; break;
-                    case NodeEffectType.StemLength: stemLengthModifier += Mathf.RoundToInt(effect.primaryValue); break;
-                    case NodeEffectType.GrowthSpeed: growthSpeedTimeModifier += effect.primaryValue; break;
-                    case NodeEffectType.LeafGap: leafGapModifier += Mathf.RoundToInt(effect.primaryValue); break;
-                    case NodeEffectType.LeafPattern: currentLeafPattern = Mathf.RoundToInt(effect.primaryValue); break;
-                    case NodeEffectType.StemRandomness: growthRandomnessModifier += effect.primaryValue; break;
-                    case NodeEffectType.Cooldown: cooldownModifier += effect.primaryValue; break;
-                    case NodeEffectType.CastDelay: castDelayModifier += effect.primaryValue; break;
-                }
-            }
-        }
-        finalMaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
-        finalPhotosynthesisRate = Mathf.Max(0f, basePhotosynthesisRate + accumulatedPhotosynthesis);
-        int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier); int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
-        finalGrowthSpeed = Mathf.Max(0.1f, baseGrowthSpeed + growthSpeedTimeModifier); finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
-        finalLeafPattern = Mathf.Clamp(currentLeafPattern, 0, 4); finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
-        cycleCooldown = Mathf.Max(0.1f, baseCooldown + cooldownModifier); nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
-        targetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0; totalGrowthDuration = targetStemLength * finalGrowthSpeed;
-        if (!seedFound) { Debug.LogWarning($"[{gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth aborted.", gameObject); }
-    }
-
-    // --- Visual Growth & Spawning ---
-    private void StartGrowthVisuals()
-    {
-        // (No changes needed)
-         foreach (Transform child in transform) { if (child.GetComponent<PlantCell>() != null) { Destroy(child.gameObject); } }
-         cells.Clear(); currentStemCount = 0; offsetRightForPattern1 = null;
-         SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
-         currentState = PlantState.Growing;
-         if (useSmoothPercentageCounter && showGrowthPercentage) { percentageCounterCoroutine = StartCoroutine(PercentageCounterRoutine()); }
-         StartCoroutine(GrowRoutine());
-    }
-
-    private IEnumerator PercentageCounterRoutine()
-    {
-        displayedGrowthPercentage = 0; 
-        UpdateUI(); 
-    
-        if (totalGrowthDuration <= 0 || percentageIncrement <= 0) yield break;
-    
-        int steps = Mathf.Max(1, 100 / percentageIncrement); 
-    
-        // Keep track of progress
-        float currentProgress = 0f;
-    
-        while (currentState == PlantState.Growing && currentProgress < 100f)
+        // If showing percentage AND in a state where it's relevant (Growing or just completed)
+        // Let UpdateGrowthPercentageUI handle it (called from Update or completion logic)
+        if (showGrowthPercentage && (currentState == PlantState.Growing || currentState == PlantState.GrowthComplete))
         {
-            // Get the tile-based growth speed multiplier - this is the same as in GrowRoutine
-            float tileMultiplier = 1.0f;
-            if (PlantGrowthModifierManager.Instance != null)
-            {
-                tileMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(this);
-            }
-        
-            // Calculate how much time to wait before the next percentage update
-            // We adjust time based on the same tile multiplier
-            float adjustedTimePerStep = (totalGrowthDuration / steps) / tileMultiplier;
-        
-            yield return new WaitForSeconds(adjustedTimePerStep);
-        
-            if (currentState != PlantState.Growing) break;
-        
-            // Increase percentage and update UI
-            currentProgress += percentageIncrement;
-            displayedGrowthPercentage = Mathf.Min(currentProgress, 100f);
-            UpdateUI();
+           // If not using continuous increment, the discrete update happens in the coroutine.
+           // If using continuous, it happens in Update(). If complete, it happens in Update().
+           // No need to directly modify text here for percentage display.
         }
-    
-        if (currentState == PlantState.Growing || currentState == PlantState.Mature_Idle)
-        { 
-            displayedGrowthPercentage = 100f; 
-            UpdateUI(); 
-        }
-    
-        percentageCounterCoroutine = null;
-    }
-
-    private IEnumerator GrowRoutine()
-    {
-        Vector2Int currentPos = Vector2Int.zero; 
-        int spiralDir = 1, patternCount = 0;
-    
-        while (currentState == PlantState.Growing) 
+        else // Otherwise (Idle, Executing, or not showing percentage), show Energy
         {
-            if (currentStemCount >= targetStemLength) 
-            {
-                if (percentageCounterCoroutine != null) 
-                { 
-                    StopCoroutine(percentageCounterCoroutine); 
-                    percentageCounterCoroutine = null; 
-                    if (showGrowthPercentage) 
-                    { 
-                        displayedGrowthPercentage = 100f; 
-                        UpdateUI(); 
-                    } 
-                }
-                currentState = PlantState.Mature_Idle; 
-                cycleTimer = cycleCooldown; 
-                UpdateUI(); 
-                yield break;
-            }
-        
-            // Get the tile-based growth speed multiplier
-            float tileMultiplier = 1.0f;
-            if (PlantGrowthModifierManager.Instance != null)
-            {
-                tileMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(this);
-            }
-        
-            // Apply tile multiplier to growth speed
-            float adjustedGrowthSpeed = finalGrowthSpeed / tileMultiplier; // Divide because higher value = slower growth
-        
-            yield return new WaitForSeconds(adjustedGrowthSpeed);
-        
-            currentStemCount++; 
-            Vector2Int growthDir = (currentStemCount == 1) ? Vector2Int.up : GetStemDirection(); 
-            currentPos += growthDir;
-            SpawnCellVisual(PlantCellType.Stem, currentPos, null, null);
-        
-            if ((finalLeafGap >= 0) && (currentStemCount % (finalLeafGap + 1)) == 0) 
-            { 
-                patternCount++; 
-                ExecuteLeafPatternLogic(currentPos, currentPos + Vector2Int.left, currentPos + Vector2Int.right, patternCount, ref spiralDir); 
-            }
-        
-            if ((showGrowthPercentage && !useSmoothPercentageCounter) || !showGrowthPercentage) 
-                UpdateUI();
+            energyText.text = $"{Mathf.FloorToInt(currentEnergy)}/{Mathf.FloorToInt(finalMaxEnergy)}";
         }
     }
 
-    private void ExecuteLeafPatternLogic(Vector2Int stemPos, Vector2Int leftBase, Vector2Int rightBase, int counter, ref int spiralDir)
-    {
-        // (No changes needed)
-         switch (finalLeafPattern) {
-             case 0: SpawnLeafIfEmpty(leftBase); SpawnLeafIfEmpty(rightBase); break;
-             case 1: if (offsetRightForPattern1 == null) offsetRightForPattern1 = Random.value < 0.5f; if (offsetRightForPattern1.Value) { SpawnLeafIfEmpty(leftBase); SpawnLeafIfEmpty(rightBase + Vector2Int.up); } else { SpawnLeafIfEmpty(leftBase + Vector2Int.up); SpawnLeafIfEmpty(rightBase); } break;
-             case 2: switch (counter % 4) { default: case 0: case 2: SpawnLeafIfEmpty(leftBase); SpawnLeafIfEmpty(rightBase); break; case 1: SpawnLeafIfEmpty(leftBase + Vector2Int.up); SpawnLeafIfEmpty(rightBase); break; case 3: SpawnLeafIfEmpty(leftBase); SpawnLeafIfEmpty(rightBase + Vector2Int.up); break; } break;
-             case 3: SpawnLeafIfEmpty(leftBase + new Vector2Int(0, spiralDir > 0 ? 1 : 0)); SpawnLeafIfEmpty(rightBase + new Vector2Int(0, spiralDir > 0 ? 0 : 1)); spiralDir *= -1; break;
-             case 4: SpawnLeafIfEmpty(rightBase); SpawnLeafIfEmpty(rightBase + Vector2Int.up); break;
-         }
-    }
+    // ------------------------------------------------
+    // --- UI REFERENCE HELPER ---
+    // ------------------------------------------------
 
-    private Vector2Int GetStemDirection()
-    {
-        // (No changes needed)
-        if (Random.value < finalGrowthRandomness) return (Random.value < 0.5f) ? Vector2Int.left + Vector2Int.up : Vector2Int.right + Vector2Int.up;
-        return Vector2Int.up;
-    }
-
-    private void SpawnLeafIfEmpty(Vector2Int coords)
-    {
-        // (No changes needed)
-        if (!cells.ContainsKey(coords)) SpawnCellVisual(PlantCellType.Leaf, coords, null, null);
-    }
-
-    // SpawnCellVisual (No changes needed from previous 'complete' version)
-    private void SpawnCellVisual(PlantCellType cellType, Vector2Int coords,
-                                 Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = null,
-                                 Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = null)
-    {
-        // (No changes needed)
-        if (cells.ContainsKey(coords)) { if(cells[coords] != cellType) { Debug.LogWarning($"Spawn collision at {coords}. Overwriting {cells[coords]} with {cellType}.", gameObject); } else { return; } }
-        GameObject prefab = null; switch (cellType) { case PlantCellType.Seed: prefab = seedCellPrefab; break; case PlantCellType.Stem: prefab = stemCellPrefab; break; case PlantCellType.Leaf: prefab = leafCellPrefab; break; case PlantCellType.Fruit: prefab = berryCellPrefab; break; }
-        if (prefab != null) {
-            Vector2 worldPos = (Vector2)transform.position + (Vector2)coords * cellSpacing; GameObject instance = Instantiate(prefab, worldPos, Quaternion.identity, transform);
-            PlantCell cellComp = instance.GetComponent<PlantCell>(); if (cellComp == null) { Debug.LogError($"Prefab '{prefab.name}' for {cellType} missing PlantCell! Adding one.", instance); cellComp = instance.AddComponent<PlantCell>(); }
-            cellComp.ParentPlantGrowth = this; cellComp.GridCoord = coords; cellComp.CellType = cellType;
-            cells[coords] = cellType;
-            SortableEntity sorter = instance.GetComponent<SortableEntity>() ?? instance.AddComponent<SortableEntity>(); if (cellType != PlantCellType.Seed) sorter.SetUseParentYCoordinate(true);
-            if (cellType == PlantCellType.Fruit && accumulatedScentRadiusBonus != null && accumulatedScentStrengthBonus != null) { ApplyScentDataToObject(instance, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus); }
-            if (cellType == PlantCellType.Fruit && (instance.GetComponent<FoodItem>() == null || instance.GetComponent<FoodItem>().foodType == null)) { Debug.LogError($"Spawned Berry Prefab '{prefab.name}' at {coords} missing/unassigned FoodItem!", instance); }
-        } else { Debug.LogWarning($"[{gameObject.name}] No prefab assigned for {cellType}.", gameObject); }
-    }
-
-
-    // --- Mature Cycle Execution (with Debug Logs) ---
-    private IEnumerator ExecuteMatureCycle()
-    {
-        if (nodeGraph?.nodes == null || nodeGraph.nodes.Count == 0) {
-             Debug.LogError($"[{gameObject.name}] NodeGraph missing or empty!", gameObject);
-             currentState = PlantState.Mature_Idle; cycleTimer = cycleCooldown; yield break;
-        }
-
-        // --- Accumulation Phase ---
-        float damageMultiplier = 1.0f;
-        Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
-        Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
-        float totalEnergyCostForCycle = 0f;
-
-        Debug.Log($"[{gameObject.name} Cycle] Starting Accumulation Phase for {nodeGraph.nodes.Count} nodes."); // Log start
-
-        foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex))
-        {
-            if (node.effects == null || node.effects.Count == 0) continue;
-
-            // Debug.Log($" - Checking Node '{node.nodeDisplayName}'"); // Optional per-node log
-
-            foreach (var effect in node.effects)
-            {
-                 // Skip passive effects during the mature cycle accumulation
-                 if(effect.isPassive) {
-                     // if(effect.effectType == NodeEffectType.ScentModifier) Debug.Log($"   - Skipping ScentModifier because it's marked PASSIVE."); // Log if passive
-                     continue;
-                 }
-
-                 // Debug.Log($"   - Processing Effect Type: {effect.effectType}"); // Optional per-effect log
-
-                 switch (effect.effectType)
-                 {
-                    case NodeEffectType.EnergyCost:
-                         totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
-                         break;
-                    case NodeEffectType.Damage:
-                         damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue);
-                         break;
-                    case NodeEffectType.ScentModifier:
-                        // Check if the reference is valid
-                        if (effect.scentDefinitionReference != null)
-                        {
-                             ScentDefinition key = effect.scentDefinitionReference;
-                             // <<< ADDED SPECIFIC SCENTMODIFIER LOG >>>
-                             Debug.Log($"   - FOUND ScentModifier for '{key.name}'. Passive={effect.isPassive}, RadiusBonus={effect.primaryValue}, StrengthBonus={effect.secondaryValue}");
-
-                             // Add radius bonus
-                            if (!accumulatedScentRadiusBonus.ContainsKey(key)) accumulatedScentRadiusBonus[key] = 0f;
-                            accumulatedScentRadiusBonus[key] += effect.primaryValue;
-
-                            // Add strength bonus
-                            if (!accumulatedScentStrengthBonus.ContainsKey(key)) accumulatedScentStrengthBonus[key] = 0f;
-                            accumulatedScentStrengthBonus[key] += effect.secondaryValue;
-                        }
-                        else {
-                             // <<< ADDED NULL REFERENCE LOG >>>
-                             Debug.LogWarning($"   - Node '{node.nodeDisplayName ?? "Unnamed"}' has ScentModifier effect but ScentDefinition reference is NULL.");
-                        }
-                        break;
-                    // Other non-action, non-passive effects accumulate here if needed
-                 }
-            }
-        }
-
-        // Log results of accumulation
-        Debug.Log($"[{gameObject.name} Cycle] Accumulation Complete. " +
-                  $"Total Cost: {totalEnergyCostForCycle}, DamageMult: {damageMultiplier}, " +
-                  $"Scent Radius Bonuses: {accumulatedScentRadiusBonus.Count}, " +
-                  $"Scent Strength Bonuses: {accumulatedScentStrengthBonus.Count}");
-        // Optional detailed log
-        // foreach(var kvp in accumulatedScentStrengthBonus) { Debug.Log($"    -> {kvp.Key.name}: StrBonus={kvp.Value}"); }
-
-
-        // --- Execution Phase ---
-        if (currentEnergy < totalEnergyCostForCycle) {
-             Debug.Log($"[{gameObject.name} Cycle] Execution skipped. Cost {totalEnergyCostForCycle} > Available {currentEnergy}");
-             currentState = PlantState.Mature_Idle; cycleTimer = cycleCooldown; yield break;
-        }
-        currentEnergy = Mathf.Max(0f, currentEnergy - totalEnergyCostForCycle);
-        UpdateUI();
-        Debug.Log($"[{gameObject.name} Cycle] Starting Execution Phase. Remaining Energy: {currentEnergy}");
-
-        foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex))
-        {
-            if (node.effects == null || node.effects.Count == 0) continue;
-
-            bool hasActionEffectInNode = node.effects.Any(eff => !eff.isPassive &&
-                                            eff.effectType != NodeEffectType.EnergyCost &&
-                                            eff.effectType != NodeEffectType.Damage &&
-                                            eff.effectType != NodeEffectType.ScentModifier);
-            if (hasActionEffectInNode && nodeCastDelay > 0.01f) {
-                 yield return new WaitForSeconds(nodeCastDelay);
-            }
-
-            foreach (var effect in node.effects)
-            {
-                 // Skip non-action effects here
-                 if(effect.isPassive || effect.effectType == NodeEffectType.EnergyCost || effect.effectType == NodeEffectType.Damage || effect.effectType == NodeEffectType.ScentModifier) continue;
-
-                 // Debug.Log($"   - Executing Action: {effect.effectType} from Node '{node.nodeDisplayName}'"); // Optional per-action log
-
-                 switch (effect.effectType) {
-                     case NodeEffectType.Output:
-                        OutputNodeEffect outputComp = GetComponentInChildren<OutputNodeEffect>();
-                        if (outputComp != null) {
-                             outputComp.Activate(damageMultiplier, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
-                        } else { Debug.LogWarning($"[{gameObject.name}] Node requested Output effect, but no OutputNodeEffect component found.", this); }
-                         break;
-                     case NodeEffectType.GrowBerry:
-                         TrySpawnBerry(accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
-                         break;
-                     // Other actions...
-                 }
-            }
-        }
-
-        cycleTimer = cycleCooldown;
-        currentState = PlantState.Mature_Idle;
-        Debug.Log($"[{gameObject.name} Cycle] Execution Phase Complete.");
-    }
-
-
-    // TrySpawnBerry (with Debug Log)
-    private void TrySpawnBerry(Dictionary<ScentDefinition, float> scentRadiiBonus, Dictionary<ScentDefinition, float> scentStrengthsBonus)
-    {
-        if (berryCellPrefab == null) { Debug.LogWarning($"[{gameObject.name}] Berry Prefab not assigned.", gameObject); return; }
-        // <<< ADDED LOG from previous step >>>
-        Debug.Log($"[{gameObject.name} Cycle] TrySpawnBerry called. Passing {scentStrengthsBonus?.Count ?? 0} scent strength entries.");
-
-        var potentialCoords = cells
-            .SelectMany(cell => {
-                List<Vector2Int> candidates = new List<Vector2Int>();
-                if (cell.Value == PlantCellType.Leaf) candidates.Add(cell.Key + Vector2Int.down);
-                else if (cell.Value == PlantCellType.Stem) candidates.Add(cell.Key + Vector2Int.up);
-                return candidates;
-            })
-            .Where(coord => !cells.ContainsKey(coord))
-            .Distinct()
-            .ToList();
-
-        if (potentialCoords.Count > 0) {
-            SpawnCellVisual(PlantCellType.Fruit, potentialCoords[Random.Range(0, potentialCoords.Count)], scentRadiiBonus, scentStrengthsBonus);
-        }
-    }
-
-    // ApplyScentDataToObject (with Debug Logs)
-    public void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses)
-    {
-        // <<< ADDED LOG from previous step >>>
-        Debug.Log($"ApplyScentDataToObject called for {targetObject.name}. StrengthBonus Dict has {scentStrengthBonuses?.Count ?? 0} entries.");
-
-        if (targetObject == null) { Debug.LogError("ApplyScentDataToObject: targetObject is null."); return; }
-        if (EcosystemManager.Instance == null) { Debug.LogError("ApplyScentDataToObject: EcosystemManager instance not found."); return; }
-        if (EcosystemManager.Instance.scentLibrary == null) { Debug.LogWarning("ApplyScentDataToObject: Scent Library not assigned in EcosystemManager."); return; }
-
-
-        ScentDefinition strongestScentDef = null;
-        float maxStrengthBonus = -1f;
-
-        if (scentStrengthBonuses != null && scentStrengthBonuses.Count > 0) {
-            foreach (var kvp in scentStrengthBonuses) {
-                if (kvp.Key != null && kvp.Value > maxStrengthBonus) {
-                    maxStrengthBonus = kvp.Value;
-                    strongestScentDef = kvp.Key;
-                }
-            }
-        }
-
-        if (strongestScentDef != null) {
-            // <<< ADDED LOG from previous step >>>
-            Debug.Log($" - Strongest scent found: {strongestScentDef.name}. Getting/Adding ScentSource component...");
-            ScentSource scentSource = targetObject.GetComponent<ScentSource>();
-            if (scentSource == null) {
-                Debug.Log("   - ScentSource missing, adding component.");
-                scentSource = targetObject.AddComponent<ScentSource>();
-            } else {
-                 Debug.Log("   - ScentSource already exists, configuring.");
-                 if (scentSource.definition != null && scentSource.definition != strongestScentDef) {
-                     Debug.LogWarning($"   - Overwriting existing scent '{scentSource.definition.name}' with '{strongestScentDef.name}' on {targetObject.name}");
-                 }
-            }
-
-            scentSource.definition = strongestScentDef;
-            scentRadiusBonuses.TryGetValue(strongestScentDef, out float radiusBonus);
-            scentStrengthBonuses.TryGetValue(strongestScentDef, out float strengthBonus); // Strength bonus is maxStrengthBonus
-            scentSource.radiusModifier = radiusBonus;
-            scentSource.strengthModifier = strengthBonus;
-
-            // <<< ADDED LOG from previous step >>>
-            Debug.Log($"   - Configured ScentSource: Def={scentSource.definition?.name}, RadMod={scentSource.radiusModifier}, StrMod={scentSource.strengthModifier}, EffectiveRadius={scentSource.EffectiveRadius}");
-
-            if (strongestScentDef.particleEffectPrefab != null) {
-                bool particleExists = false; foreach(Transform child in targetObject.transform){ if(child.TryGetComponent<ParticleSystem>(out _)){ particleExists = true; break; } }
-                if (!particleExists) { Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform.position, Quaternion.identity, targetObject.transform); }
-            }
-        } else {
-             // <<< ADDED LOG from previous step >>>
-             Debug.Log(" - No strongest scent found (maxStrengthBonus was <= -1 or dictionary empty/null). No ScentSource added/configured.");
-        }
-    }
-
-
-    // --- UI Reference Helper ---
     private void EnsureUIReferences()
     {
-        // (No changes needed)
-        if (energyText) return;
-        energyText = GetComponentInChildren<TMP_Text>(true);
-        if (!energyText) Debug.LogWarning($"[{gameObject.name}] Energy Text (TMP_Text) not found in children.", gameObject);
+        if (energyText) return; energyText = GetComponentInChildren<TMP_Text>(true); if (!energyText) { Debug.LogWarning($"[{gameObject.name}] Energy Text (TMP_Text) UI reference not assigned in Inspector and not found in children.", gameObject); }
     }
-}
+
+    // ------------------------------------------------
+    // --- PUBLIC ACCESSORS FOR OUTLINES ---
+    // ------------------------------------------------
+
+    public bool DoesCellExistAt(Vector2Int coord) { return cells.ContainsKey(coord); }
+    public float GetCellSpacing() { return this.cellSpacing; }
+    public GameObject GetCellGameObjectAt(Vector2Int coord) { return activeCellGameObjects.FirstOrDefault(go => go != null && go.GetComponent<PlantCell>()?.GridCoord == coord); }
+    public bool IsOutlineEnabled() { return enableOutline; }
+
+    // --- PARTIAL CLASS METHODS (Assumed in other files) ---
+    // Define these methods in the corresponding partial class files:
+    // In PlantGrowth.Cell.cs: ReportCellDestroyed, RemovePlantCell, ClearAllVisuals, SpawnCellVisual, CalculateAndApplyStats, RegisterShadowForCell
+    // In PlantGrowth.Growth.cs: GrowthStep class, GrowthCoroutine_TimeBased, PreCalculateGrowthPlan, GetStemDirection, CalculateLeafPositions
+    // In PlantGrowth.NodeExecution.cs: ExecuteMatureCycle, TrySpawnBerry, ApplyScentDataToObject
+
+} // End PARTIAL Class definition
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -7100,125 +7566,725 @@ public class NightColorPostProcess : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\OutlinePartController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/OutlinePartController.cs
+using UnityEngine;
+
+[RequireComponent(typeof(SpriteRenderer))]
+public class OutlinePartController : MonoBehaviour
+{
+    private SpriteRenderer outlineRenderer;
+    private SpriteRenderer sourcePlantPartRenderer; // The plant part this outline mimics
+
+    [HideInInspector] public Vector2Int gridCoord; // The coordinate *this outline* lives at
+
+    void Awake()
+    {
+        outlineRenderer = GetComponent<SpriteRenderer>();
+        if (outlineRenderer != null)
+        {
+            outlineRenderer.drawMode = SpriteDrawMode.Simple;
+            outlineRenderer.enabled = false;
+        }
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] OutlinePartController is missing SpriteRenderer component!", this);
+        }
+    }
+
+    public void Initialize(SpriteRenderer sourceRenderer, Vector2Int myCoord, PlantOutlineController controller)
+    {
+        if (sourceRenderer == null || controller == null) 
+        { 
+            Debug.LogError($"[{gameObject.name}] Initialization failed! Source renderer or controller is null!", this);
+            Destroy(gameObject); 
+            return; 
+        }
+        
+        sourcePlantPartRenderer = sourceRenderer; // Store initial source
+        gridCoord = myCoord;
+        
+        if (outlineRenderer == null)
+        {
+            outlineRenderer = GetComponent<SpriteRenderer>();
+            if (outlineRenderer == null)
+            {
+                Debug.LogError($"[{gameObject.name}] Initialize: Cannot find SpriteRenderer component!", this);
+                Destroy(gameObject);
+                return;
+            }
+        }
+        
+        // Set layer & color properties
+        outlineRenderer.sortingLayerID = controller.OutlineSortingLayer;
+        outlineRenderer.sortingOrder = controller.OutlineSortingOrder;
+        outlineRenderer.color = controller.OutlineColor;
+        
+        // Set parent & position
+        transform.SetParent(controller.transform, true); // Parent to controller's transform
+        
+        // Set initial position based on grid coordinate (controller handles spacing)
+        float spacing = controller.GetComponentInParent<PlantGrowth>()?.GetCellSpacing() ?? 0.08f; // Get spacing
+        transform.localPosition = (Vector2)myCoord * spacing;
+
+        // Set visibility based on source renderer's state
+        outlineRenderer.enabled = IsSourceRendererValid() && 
+                                  sourcePlantPartRenderer.enabled && 
+                                  sourcePlantPartRenderer.sprite != null;
+        
+        SyncSpriteAndTransform(); // Initial sync
+    }
+
+    void LateUpdate()
+    {
+        // Skip update if not visible
+        if (outlineRenderer == null || !outlineRenderer.enabled) return;
+
+        // Check if source is still valid
+        if (!IsSourceRendererValid())
+        {
+            SetVisibility(false);
+            return;
+        }
+        
+        // Check if source is still enabled and has a sprite
+        if (!sourcePlantPartRenderer.enabled || sourcePlantPartRenderer.sprite == null)
+        {
+            SetVisibility(false);
+            return;
+        }
+
+        // If we are enabled and source is valid, sync visuals
+        SyncSpriteAndTransform();
+    }
+
+    // Public method to check if the source renderer still exists
+    public bool IsSourceRendererValid()
+    {
+        // Unity overloads null check for destroyed objects
+        if (sourcePlantPartRenderer == null)
+            return false;
+            
+        // Additional check: is the gameObject actually active/valid
+        if (!sourcePlantPartRenderer.gameObject.activeInHierarchy)
+            return false;
+            
+        return true;
+    }
+
+    // Public method to update the source renderer if the original was destroyed
+    public void UpdateSourceRenderer(SpriteRenderer newSource)
+    {
+        if (newSource != null)
+        {
+            sourcePlantPartRenderer = newSource;
+            
+            // Ensure visibility state is correct after source update
+            SetVisibility(
+                outlineRenderer != null && 
+                sourcePlantPartRenderer.enabled && 
+                sourcePlantPartRenderer.sprite != null
+            );
+            
+            // Immediately sync sprite/transform after updating source
+            SyncSpriteAndTransform();
+            
+            // Debug.Log($"Updated outline at {gridCoord} with new source renderer: {newSource.gameObject.name}");
+        } 
+        else 
+        {
+            Debug.LogWarning($"Attempted to update source renderer for outline at {gridCoord} with null.", gameObject);
+            // If no valid new source, hide this outline
+            SetVisibility(false);
+        }
+    }
+
+    // Sync sprite and transform data
+    public void SyncSpriteAndTransform()
+    {
+        // Safety checks
+        if (!IsSourceRendererValid() || outlineRenderer == null) 
+            return;
+
+        // Sync sprite
+        if (outlineRenderer.sprite != sourcePlantPartRenderer.sprite)
+        {
+            outlineRenderer.sprite = sourcePlantPartRenderer.sprite;
+        }
+        
+        // Sync other visual properties
+        transform.localScale = sourcePlantPartRenderer.transform.localScale;
+        outlineRenderer.flipX = sourcePlantPartRenderer.flipX;
+        outlineRenderer.flipY = sourcePlantPartRenderer.flipY;
+        
+        // Note: Position is set in Initialize and doesn't need to track source renderer's parent offset
+    }
+
+    public void SetVisibility(bool isVisible)
+    {
+        if (outlineRenderer != null && outlineRenderer.enabled != isVisible)
+        {
+            outlineRenderer.enabled = isVisible;
+        }
+    }
+
+    public void DestroyOutlinePart()
+    {
+        if (this != null && gameObject != null)
+        {
+            if (Application.isPlaying)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                DestroyImmediate(gameObject);
+            }
+        }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\PlantOutlineController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/PlantOutlineController.cs
+using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+
+[RequireComponent(typeof(RectTransform))]
+public class PlantOutlineController : MonoBehaviour
+{
+    // --- Fields ---
+    [Header("Outline Settings")]
+    [SerializeField] private Color outlineColor = Color.black;
+    [SerializeField] private bool excludeOuterCorners = false;
+    [SerializeField] private bool excludeBaseCell = true;
+    [SerializeField] private GameObject outlinePartPrefab;
+    
+    [Header("Performance Options")]
+    [SerializeField] private bool batchOutlineUpdates = true;
+    [SerializeField] [Range(0.05f, 0.5f)] private float updateInterval = 0.1f;
+
+    [Header("Sorting")]
+    [SerializeField] private string outlineSortingLayerName = "Default";
+    [SerializeField] private int outlineSortingOrder = -1;
+
+    [Header("Debugging")]
+    [SerializeField] private bool debugLogging = false;
+
+    // Public accessors
+    public Color OutlineColor => outlineColor;
+    public int OutlineSortingLayer => outlineSortingLayerID;
+    public int OutlineSortingOrder => outlineSortingOrder;
+
+    // Internal State
+    private int outlineSortingLayerID;
+    private PlantGrowth parentPlantGrowth;
+    private Dictionary<Vector2Int, OutlinePartController> outlinePartMap = new Dictionary<Vector2Int, OutlinePartController>();
+    private HashSet<Vector2Int> plantCellCoords = new HashSet<Vector2Int>();
+    
+    private float lastUpdateTime = 0f;
+
+    // Neighbor offsets - 8 directions around a cell
+    private static readonly Vector2Int[] neighborOffsets = new Vector2Int[]
+    {
+        new Vector2Int(-1, -1), // Down-Left
+        new Vector2Int(0, -1),  // Down
+        new Vector2Int(1, -1),  // Down-Right
+        new Vector2Int(-1, 0),  // Left
+        new Vector2Int(1, 0),   // Right
+        new Vector2Int(-1, 1),  // Up-Left
+        new Vector2Int(0, 1),   // Up
+        new Vector2Int(1, 1),   // Up-Right
+    };
+
+    // Just the cardinal directions (for certain operations)
+    private static readonly Vector2Int[] cardinalOffsets = new Vector2Int[]
+    {
+        new Vector2Int(0, -1),  // Down
+        new Vector2Int(-1, 0),  // Left
+        new Vector2Int(1, 0),   // Right
+        new Vector2Int(0, 1),   // Up
+    };
+
+    void Awake()
+    {
+        parentPlantGrowth = GetComponentInParent<PlantGrowth>();
+        if (parentPlantGrowth == null)
+        {
+            Debug.LogError($"[{gameObject.name} Awake] Missing PlantGrowth parent!", gameObject);
+            enabled = false;
+            return;
+        }
+        
+        if (outlinePartPrefab == null)
+        {
+            Debug.LogError($"[{gameObject.name} Awake] Outline Part Prefab not assigned!", gameObject);
+            enabled = false;
+            return;
+        }
+        
+        // Get the proper sorting layer ID from the name
+        outlineSortingLayerID = SortingLayer.NameToID(outlineSortingLayerName);
+        if (outlineSortingLayerID == 0 && outlineSortingLayerName != "Default")
+        {
+            Debug.LogWarning($"[{gameObject.name} Awake] Sorting Layer '{outlineSortingLayerName}' not found, using 'Default'.");
+            outlineSortingLayerID = SortingLayer.NameToID("Default");
+        }
+        
+        // Zero out local transform values to avoid unexpected visual glitches
+        transform.localPosition = Vector3.zero;
+        transform.localRotation = Quaternion.identity;
+        transform.localScale = Vector3.one;
+        
+        if (debugLogging)
+            Debug.Log($"[{gameObject.name} Awake] Initialized outline controller for {parentPlantGrowth.gameObject.name}");
+    }
+
+    // --- Methods Called by PlantGrowth ---
+
+    // OnPlantCellAdded - Called when a new plant cell is added
+    public void OnPlantCellAdded(Vector2Int plantCoord, GameObject plantCellGO)
+    {
+        if (plantCellGO == null)
+        {
+            if (debugLogging)
+                Debug.LogWarning($"[{gameObject.name}] OnPlantCellAdded: Null GameObject at {plantCoord}");
+            return;
+        }
+        
+        // Add to our plant cells set
+        plantCellCoords.Add(plantCoord);
+        
+        // Remove any existing outline at the plant location (should be clear already, but safety)
+        RemoveOutlinePartIfExists(plantCoord);
+        
+        // Get the SpriteRenderer from the plant cell
+        SpriteRenderer plantRenderer = plantCellGO.GetComponentInChildren<SpriteRenderer>();
+        if (plantRenderer == null)
+        {
+            Debug.LogWarning($"Plant cell added at {plantCoord} missing SpriteRenderer.", plantCellGO);
+            return;
+        }
+        
+        // Check all neighboring coordinates around this plant cell
+        foreach (Vector2Int offset in neighborOffsets)
+        {
+            Vector2Int neighborCoord = plantCoord + offset;
+            
+            // Only create outline parts where:
+            // 1. There's no plant cell
+            // 2. There's no outline part already
+            // 3. It passes any exclusion rules
+            if (!plantCellCoords.Contains(neighborCoord) && 
+                !outlinePartMap.ContainsKey(neighborCoord))
+            {
+                if (ShouldExcludeOutlineAt(neighborCoord))
+                    continue;
+                    
+                CreateOutlinePart(neighborCoord, plantRenderer);
+            }
+        }
+        
+        if (debugLogging)
+            Debug.Log($"[{gameObject.name}] Added cell at {plantCoord}, now tracking {plantCellCoords.Count} cells and {outlinePartMap.Count} outline parts");
+    }
+
+    // OnPlantCellRemoved - Called when a plant cell is removed
+    public void OnPlantCellRemoved(Vector2Int plantCoord)
+    {
+        if (!plantCellCoords.Contains(plantCoord))
+        {
+            if (debugLogging)
+                Debug.LogWarning($"[{gameObject.name}] OnPlantCellRemoved: Coordinate {plantCoord} not found in plant cells!");
+            return;
+        }
+        
+        // Remove the coordinate from our internal tracking
+        plantCellCoords.Remove(plantCoord);
+        
+        if (debugLogging)
+            Debug.Log($"[{gameObject.name}] Removed cell at {plantCoord}, now have {plantCellCoords.Count} cells");
+        
+        // 1. Check if outline should appear *at the removed location*
+        if (!outlinePartMap.ContainsKey(plantCoord))
+        {
+            if (HasPlantNeighbor(plantCoord))
+            {
+                SpriteRenderer sourceRenderer = FindValidNeighborRenderer(plantCoord);
+                if (sourceRenderer != null && !ShouldExcludeOutlineAt(plantCoord))
+                {
+                    CreateOutlinePart(plantCoord, sourceRenderer);
+                    if (debugLogging)
+                        Debug.Log($"[{gameObject.name}] Created new outline at removed cell position {plantCoord}");
+                }
+            }
+        }
+        
+        // 2. Re-evaluate all neighboring coordinates
+        foreach (Vector2Int offset in neighborOffsets)
+        {
+            Vector2Int neighborCoord = plantCoord + offset;
+            
+            // Check if an outline exists at this neighbor
+            if (outlinePartMap.TryGetValue(neighborCoord, out OutlinePartController outlinePart))
+            {
+                // Safety check for destroyed outline part
+                if (outlinePart == null)
+                {
+                    outlinePartMap.Remove(neighborCoord);
+                    if (debugLogging)
+                        Debug.Log($"[{gameObject.name}] Removed null outline at {neighborCoord} from dictionary");
+                    continue;
+                }
+                
+                // Check if this neighbor still needs an outline
+                bool neighborStillHasPlantNeighbor = HasPlantNeighbor(neighborCoord);
+                
+                if (!neighborStillHasPlantNeighbor)
+                {
+                    // No longer has any plant neighbors, remove it
+                    RemoveOutlinePartIfExists(neighborCoord);
+                    if (debugLogging)
+                        Debug.Log($"[{gameObject.name}] Removed orphaned outline at {neighborCoord}");
+                }
+                else if (!outlinePart.IsSourceRendererValid())
+                {
+                    // Outline's source was likely the removed cell, update it
+                    SpriteRenderer newSource = FindValidNeighborRenderer(neighborCoord);
+                    if (newSource != null)
+                    {
+                        outlinePart.UpdateSourceRenderer(newSource);
+                        outlinePart.SyncSpriteAndTransform();
+                        if (debugLogging)
+                            Debug.Log($"[{gameObject.name}] Updated source for outline at {neighborCoord}");
+                    }
+                    else
+                    {
+                        // This case is unlikely but could happen in complex removals
+                        if (debugLogging)
+                            Debug.LogWarning($"[{gameObject.name}] Outline at {neighborCoord} lost source but HasPlantNeighbor=true. Removing.");
+                        RemoveOutlinePartIfExists(neighborCoord);
+                    }
+                }
+            }
+            // If no outline at this neighbor, but there should be one (e.g., it was excluded before)
+            else if (!plantCellCoords.Contains(neighborCoord) && HasPlantNeighbor(neighborCoord))
+            {
+                if (!ShouldExcludeOutlineAt(neighborCoord))
+                {
+                    SpriteRenderer sourceRenderer = FindValidNeighborRenderer(neighborCoord);
+                    if (sourceRenderer != null)
+                    {
+                        CreateOutlinePart(neighborCoord, sourceRenderer);
+                        if (debugLogging)
+                            Debug.Log($"[{gameObject.name}] Created new outline at neighbor {neighborCoord} after cell removal");
+                    }
+                }
+            }
+        }
+    }
+
+    // --- Internal Helper Methods ---
+
+    // CreateOutlinePart - Creates an outline part at the specified coordinates
+    private void CreateOutlinePart(Vector2Int coord, SpriteRenderer sourceRenderer)
+    {
+        if (outlinePartPrefab == null)
+        {
+            Debug.LogError($"[{gameObject.name}] CreateOutlinePart: outlinePartPrefab is null!");
+            return;
+        }
+        
+        if (sourceRenderer == null)
+        {
+            Debug.LogWarning($"[{gameObject.name}] CreateOutlinePart: sourceRenderer is null for coord {coord}");
+            return;
+        }
+        
+        // Check if already exists (safety)
+        if (outlinePartMap.ContainsKey(coord))
+        {
+            if (debugLogging)
+                Debug.LogWarning($"[{gameObject.name}] CreateOutlinePart: Outline already exists at {coord}");
+            return;
+        }
+        
+        // Instantiate the outline part
+        GameObject outlineInstance = Instantiate(outlinePartPrefab, transform);
+        if (outlineInstance == null)
+        {
+            Debug.LogError($"[{gameObject.name}] CreateOutlinePart: Failed to instantiate outline prefab!");
+            return;
+        }
+        
+        // Set position using PlantGrowth's cell spacing
+        float spacing = parentPlantGrowth.GetCellSpacing();
+        outlineInstance.transform.localPosition = (Vector2)coord * spacing;
+        
+        // Get the controller and initialize it
+        OutlinePartController outlineController = outlineInstance.GetComponent<OutlinePartController>();
+        if (outlineController != null)
+        {
+            outlineController.Initialize(sourceRenderer, coord, this);
+            outlineController.SetVisibility(true);
+            outlinePartMap.Add(coord, outlineController);
+            
+            if (debugLogging)
+                Debug.Log($"[{gameObject.name}] Created outline part at {coord} using source {sourceRenderer.gameObject.name}");
+        }
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] Outline Part Prefab missing OutlinePartController script!", outlinePartPrefab);
+            Destroy(outlineInstance);
+        }
+    }
+
+    // RemoveOutlinePartIfExists - Removes an outline part if it exists at the specified coordinates
+    private void RemoveOutlinePartIfExists(Vector2Int coord)
+    {
+        if (outlinePartMap.TryGetValue(coord, out OutlinePartController outlinePart))
+        {
+            if (outlinePart != null)
+            {
+                outlinePart.DestroyOutlinePart();
+                if (debugLogging)
+                    Debug.Log($"[{gameObject.name}] Destroyed outline part at {coord}");
+            }
+            outlinePartMap.Remove(coord);
+        }
+    }
+
+    // HasPlantNeighbor - Checks if the specified coordinates have any plant neighbors
+    private bool HasPlantNeighbor(Vector2Int coord)
+    {
+        foreach (Vector2Int offset in neighborOffsets)
+        {
+            if (plantCellCoords.Contains(coord + offset))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // FindValidNeighborRenderer - Finds a valid SpriteRenderer from a neighboring plant cell
+    private SpriteRenderer FindValidNeighborRenderer(Vector2Int coord)
+    {
+        foreach (Vector2Int offset in neighborOffsets)
+        {
+            Vector2Int neighborCoord = coord + offset;
+            
+            // Check if there's a plant cell at this coordinate
+            if (plantCellCoords.Contains(neighborCoord))
+            {
+                // Get the GameObject from PlantGrowth
+                GameObject plantGO = parentPlantGrowth.GetCellGameObjectAt(neighborCoord);
+                if (plantGO != null)
+                {
+                    SpriteRenderer renderer = plantGO.GetComponentInChildren<SpriteRenderer>();
+                    if (renderer != null)
+                    {
+                        if (debugLogging)
+                            Debug.Log($"[{gameObject.name}] Found valid renderer at {neighborCoord} for outline at {coord}");
+                        return renderer;
+                    }
+                }
+            }
+        }
+        
+        if (debugLogging)
+            Debug.LogWarning($"[{gameObject.name}] Could not find any valid neighbor renderer for {coord}");
+        return null;
+    }
+
+    // ShouldExcludeOutlineAt - Checks if an outline should be excluded at the specified coordinates
+    private bool ShouldExcludeOutlineAt(Vector2Int coord)
+    {
+        // Exclude base cell (e.g., under the seed) if enabled
+        if (excludeBaseCell && coord == Vector2Int.down && plantCellCoords.Contains(Vector2Int.zero))
+        {
+            return true;
+        }
+        
+        // Exclude outer corners if enabled
+        if (excludeOuterCorners && IsOuterCornerCandidate(coord))
+        {
+            return true;
+        }
+        
+        return false;
+    }
+
+    // IsOuterCornerCandidate - Checks if the coordinate is a potential outer corner
+    private bool IsOuterCornerCandidate(Vector2Int coord)
+    {
+        // If it's a plant cell, it's not an outer corner
+        if (plantCellCoords.Contains(coord))
+            return false;
+            
+        // Count the number of plant neighbors
+        int plantNeighborCount = 0;
+        foreach (Vector2Int offset in neighborOffsets)
+        {
+            if (plantCellCoords.Contains(coord + offset)) {
+                plantNeighborCount++;
+            }
+        }
+        
+        // In typical 2D grid outline detection, an outer corner has 3 neighbors
+        return plantNeighborCount == 3;
+    }
+
+    void OnDestroy()
+    {
+        // Clean up resources when destroyed
+        foreach (var kvp in outlinePartMap)
+        {
+            if (kvp.Value != null)
+            {
+                kvp.Value.DestroyOutlinePart();
+            }
+        }
+        outlinePartMap.Clear();
+        plantCellCoords.Clear();
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Visuals\PlantShadowController.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Visuals/PlantShadowController.cs
+using UnityEngine;
 using System.Collections.Generic;
 
 public class PlantShadowController : MonoBehaviour
 {
     [Header("Global Shadow Settings")]
     [SerializeField] private Color shadowColor = new Color(0f, 0f, 0f, 0.5f);
-    [SerializeField] [Tooltip("Direction light comes FROM (e.g., (1, -1) for light from top-right)")]
-    private Vector2 lightSourceDirection = new Vector2(0.7f, -1f);
-    [SerializeField] private float shadowDistance = 0.3f; // Base distance multiplier
-    [SerializeField] [Range(0.1f, 2f)] private float squashFactor = 0.6f; // Vertical squash (1 = none, <1 = flatter, >1 = taller)
-    [SerializeField] [Range(-45f, 45f)] private float skewAngleDegrees = 15f; // Fake skew via Z rotation
+    [SerializeField] [Range(0.1f, 2f)] [Tooltip("Vertical squash factor (1 = none, <1 = flatter, >1 = taller)")]
+    private float squashFactor = 0.6f;
+    [SerializeField] [Range(0f, 360f)] [Tooltip("Rotation angle of the shadow around the plant's base (0 = right, 90 = up, 180 = left, 270 = down)")]
+    private float shadowAngleDegrees = 270f; // Default to directly downwards
+    [SerializeField] [Tooltip("Flip the shadow horizontally?")]
+    private bool flipShadow = false;
+    // Removed: lightSourceDirection
+    // Removed: shadowDistance
+    // Removed: skewAngleDegrees (replaced by shadowAngleDegrees for direction)
+    
+    [Header("Distance Fade")]
+    [Tooltip("Enable fading parts based on distance from the root.")]
+    [SerializeField] private bool enableDistanceFade = true;
+    [Tooltip("Distance from the root where the shadow part starts fading.")]
+    [SerializeField] private float fadeStartDistance = 1.5f;
+    [Tooltip("Distance from the root where the shadow part is fully faded (alpha 0).")]
+    [SerializeField] private float fadeEndDistance = 3.0f;
+    [Tooltip("Minimum alpha value even when fully faded (e.g., 0.1 for slight visibility).")]
+    [SerializeField] [Range(0f, 1f)] private float minFadeAlpha = 0.0f;
 
     [Header("Sorting")]
     [SerializeField] [Tooltip("Name of the Sorting Layer for shadows (e.g., 'Shadows')")]
-    private string shadowSortingLayerName = "Default"; // Default to 'Default' layer
+    private string shadowSortingLayerName = "Default";
     [SerializeField] [Tooltip("Sorting Order within the layer (lower values are rendered first)")]
-    private int shadowSortingOrder = -1; // Typically below the plant
+    private int shadowSortingOrder = -1;
 
     // --- Internal ID ---
     private int shadowSortingLayerID;
 
     // Public accessors for ShadowPartController
     public Color ShadowColor => shadowColor;
-    public int ShadowSortingLayer => shadowSortingLayerID; // Use the internal ID
+    public int ShadowSortingLayer => shadowSortingLayerID;
     public int ShadowSortingOrder => shadowSortingOrder;
 
-
+    // <<< NEW ACCESSORS for Fade >>>
+    public bool EnableDistanceFade => enableDistanceFade;
+    public float FadeStartDistance => fadeStartDistance;
+    public float FadeEndDistance => fadeEndDistance;
+    public float MinFadeAlpha => minFadeAlpha;
+    
+    // Cached base transform values
     private Vector3 baseLocalScale;
     private Quaternion baseLocalRotation;
     private Vector3 baseLocalPosition;
 
+    // Dictionary to manage shadow parts (unchanged)
     private Dictionary<SpriteRenderer, ShadowPartController> shadowPartMap = new Dictionary<SpriteRenderer, ShadowPartController>();
-
 
     void Awake()
     {
-        // Convert layer name to ID
+        // Convert layer name to ID (unchanged)
         shadowSortingLayerID = SortingLayer.NameToID(shadowSortingLayerName);
-        if (shadowSortingLayerID == 0 && shadowSortingLayerName != "Default") // NameToID returns 0 for invalid names (and Default)
+        if (shadowSortingLayerID == 0 && shadowSortingLayerName != "Default")
         {
             Debug.LogWarning($"Sorting Layer '{shadowSortingLayerName}' not found. Shadow will use 'Default'.", this);
-            shadowSortingLayerID = SortingLayer.NameToID("Default"); // Fallback explicitly
+            shadowSortingLayerID = SortingLayer.NameToID("Default");
         }
 
-
+        // Cache initial transform state (unchanged)
         baseLocalScale = transform.localScale;
         baseLocalRotation = transform.localRotation;
-        baseLocalPosition = transform.localPosition; // Store initial position relative to plant root
+        // --- IMPORTANT: Ensure _ShadowRoot starts at local position (0,0,0) relative to the Plant root ---
+        baseLocalPosition = transform.localPosition;
+        if (baseLocalPosition != Vector3.zero) {
+             Debug.LogWarning($"'{gameObject.name}' initial localPosition is not zero ({baseLocalPosition}). Shadow origin might be slightly offset from plant root.", gameObject);
+        }
     }
 
     void LateUpdate()
     {
-        // 1. Calculate Global Offset based on light direction
-        Vector3 shadowOffset = -(Vector3)lightSourceDirection.normalized * shadowDistance;
+        // 1. Set Position: Keep the shadow root at the plant's origin (relative to parent)
+        // We don't apply any offset anymore.
+        transform.localPosition = baseLocalPosition; // Should typically be Vector3.zero
 
-        // Apply the offset to the ShadowRoot's position relative to the plant root
-        transform.localPosition = baseLocalPosition + shadowOffset;
+        // 2. Set Rotation based on the angle slider
+        // Apply the rotation relative to the initial orientation
+        Quaternion angleRotation = Quaternion.Euler(0, 0, shadowAngleDegrees);
+        transform.localRotation = baseLocalRotation * angleRotation;
 
-        // 2. Apply Squash (relative to base scale)
-        // Simplification: apply squash globally on Y for now.
-        transform.localScale = new Vector3(baseLocalScale.x, baseLocalScale.y * squashFactor, baseLocalScale.z);
+        // 3. Calculate and Apply Scale (Squash + Flip)
+        Vector3 finalScale = baseLocalScale; // Start with original scale
+        // Apply squash factor (typically affects the Y-axis before rotation)
+        // To apply squash along the *rotated* Y-axis is more complex.
+        // Let's keep the simpler approach: squash the local Y scale.
+        finalScale.y *= squashFactor;
 
-        // 3. Apply Skew (Fake Z-Rotation)
-        // Rotate the shadow root based on the skew angle
-        transform.localRotation = baseLocalRotation * Quaternion.Euler(0, 0, skewAngleDegrees);
+        // Apply horizontal flip if checked (affects the X-axis)
+        if (flipShadow)
+        {
+            finalScale.x *= -1f;
+        }
+        // Apply the calculated scale
+        transform.localScale = finalScale;
 
-        // Optional: Update color globally if needed (e.g., time of day)
-        // UpdateShadowPartColors(); // You'd need to cache child ShadowPartControllers for this
     }
 
-    // --- Methods for PlantGrowth Integration ---
+    // --- Methods for PlantGrowth Integration (Unchanged) ---
 
-    // Call this from PlantGrowth when a plant part is instantiated
     public void RegisterPlantPart(SpriteRenderer plantPartRenderer, GameObject shadowPartPrefab)
     {
         if (plantPartRenderer == null || shadowPartPrefab == null) return;
-        if (shadowPartMap.ContainsKey(plantPartRenderer)) return; // Already registered
-
-        // Instantiate the shadow part prefab as a child of this ShadowRoot
-        GameObject shadowInstance = Instantiate(shadowPartPrefab, transform); // Instantiate under this shadow root
+        if (shadowPartMap.ContainsKey(plantPartRenderer)) return;
+        GameObject shadowInstance = Instantiate(shadowPartPrefab, transform);
         ShadowPartController shadowController = shadowInstance.GetComponent<ShadowPartController>();
-
-        if (shadowController != null)
-        {
-            shadowController.Initialize(plantPartRenderer, this);
-            shadowPartMap.Add(plantPartRenderer, shadowController);
-            // Debug.Log($"Registered shadow for {plantPartRenderer.gameObject.name}");
-        }
-        else
-        {
-            Debug.LogError($"Shadow Part Prefab '{shadowPartPrefab.name}' is missing ShadowPartController script.", shadowPartPrefab);
-            Destroy(shadowInstance);
-        }
+        if (shadowController != null) { shadowController.Initialize(plantPartRenderer, this); shadowPartMap.Add(plantPartRenderer, shadowController); }
+        else { Debug.LogError($"Shadow Part Prefab '{shadowPartPrefab.name}' missing ShadowPartController.", shadowPartPrefab); Destroy(shadowInstance); }
     }
 
-    // Call this from PlantGrowth when a plant part is about to be destroyed
     public void UnregisterPlantPart(SpriteRenderer plantPartRenderer)
     {
-        if (plantPartRenderer != null && shadowPartMap.TryGetValue(plantPartRenderer, out ShadowPartController shadowController))
-        {
-            if (shadowController != null) // Check if it wasn't already destroyed
-            {
-                 shadowController.OnPlantPartDestroyed(); // Tell the part to destroy itself
-                 // Debug.Log($"Unregistered shadow for {plantPartRenderer.gameObject.name}");
-            }
+        if (plantPartRenderer != null && shadowPartMap.TryGetValue(plantPartRenderer, out ShadowPartController shadowController)) {
+            if (shadowController != null) { shadowController.OnPlantPartDestroyed(); }
             shadowPartMap.Remove(plantPartRenderer);
         }
-        // else { Debug.LogWarning($"Attempted to unregister shadow for {plantPartRenderer?.gameObject.name}, but not found in map."); }
     }
 
-     // Clean up dictionary when the main plant is destroyed
     void OnDestroy()
     {
-         // The child shadow GameObjects will be destroyed automatically since they are parented.
-         // Just clear the map to prevent potential memory issues if the map reference somehow persists.
-        shadowPartMap.Clear();
+        shadowPartMap.Clear(); // Prevent memory leaks
     }
 }
 
@@ -7351,76 +8417,51 @@ public class RuntimeCircleDrawer : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Visuals\ShadowPartController.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
+﻿// FILE: Assets/Scripts/Visuals/ShadowPartController.cs
+using UnityEngine;
+// using UnityEngine.Rendering; // Not needed for this simple fade
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class ShadowPartController : MonoBehaviour
 {
     private SpriteRenderer shadowRenderer;
-    private SpriteRenderer plantPartRenderer; // Reference to the actual plant part's renderer
-    private Transform plantPartTransform;   // Reference to the actual plant part's transform
-
-    private Transform shadowRootTransform; // The parent transform that handles global skew/squash
-    private PlantShadowController mainShadowController; // To get global settings
-
-    private Vector3 initialLocalPosition; // Store position relative to plant part at setup
+    private SpriteRenderer plantPartRenderer;
+    private Transform plantPartTransform;
+    private Transform shadowRootTransform;
+    private PlantShadowController mainShadowController;
+    // Removed: initialLocalPosition - not needed for distance calc
 
     void Awake()
     {
         shadowRenderer = GetComponent<SpriteRenderer>();
-        shadowRenderer.drawMode = SpriteDrawMode.Simple; // Ensure scaling works as expected
-        shadowRenderer.enabled = false; // Start disabled until initialized
+        shadowRenderer.drawMode = SpriteDrawMode.Simple;
+        shadowRenderer.enabled = false;
     }
 
-    // Call this immediately after instantiating the shadow part
     public void Initialize(SpriteRenderer targetPlantPartRenderer, PlantShadowController controller)
     {
-        if (targetPlantPartRenderer == null || controller == null)
-        {
-            Debug.LogError("ShadowPartController initialization failed: Missing references.", this);
-            Destroy(gameObject); // Can't function without these
-            return;
-        }
-
+        if (targetPlantPartRenderer == null || controller == null) { Destroy(gameObject); return; }
         plantPartRenderer = targetPlantPartRenderer;
         plantPartTransform = targetPlantPartRenderer.transform;
         mainShadowController = controller;
-        shadowRootTransform = controller.transform; // The controller sits on the shadow root
+        shadowRootTransform = controller.transform;
 
-        // Set initial properties from controller
         shadowRenderer.sortingLayerID = mainShadowController.ShadowSortingLayer;
         shadowRenderer.sortingOrder = mainShadowController.ShadowSortingOrder;
-        shadowRenderer.color = mainShadowController.ShadowColor; // Use the global color
+        // Color is now set in LateUpdate to include fade alpha
 
-        // --- Calculate position relative to the plant part ---
-        // We want the shadow part's origin (relative to the shadow root)
-        // to match the plant part's origin (relative to the plant root),
-        // before the shadow root applies its own offset/skew/squash.
-        transform.position = plantPartTransform.position;
-        transform.rotation = plantPartTransform.rotation;
-        // Store this initial local position relative to the root
-        initialLocalPosition = transform.localPosition;
+        transform.SetParent(shadowRootTransform, true); // Parent first
 
-
-        // We don't set the sprite here, LateUpdate handles it
         shadowRenderer.enabled = plantPartRenderer.enabled && plantPartRenderer.sprite != null;
-
-        // Ensure it's parented correctly under the shadow root
-        transform.SetParent(shadowRootTransform, true); // Parent while maintaining world position/rotation
-
-        // Re-calculate local position *after* parenting
-        initialLocalPosition = transform.localPosition;
+        // Initialize color with potentially full alpha
+        UpdateColorAndFade();
     }
 
     void LateUpdate()
     {
-        if (plantPartRenderer == null || !plantPartRenderer.enabled || plantPartRenderer.sprite == null || shadowRenderer == null)
+        if (plantPartRenderer == null || !plantPartRenderer.enabled || plantPartRenderer.sprite == null || shadowRenderer == null || mainShadowController == null)
         {
-            shadowRenderer.enabled = false; // Hide shadow if plant part is hidden/gone
+            if (shadowRenderer != null) shadowRenderer.enabled = false;
             return;
         }
 
@@ -7429,46 +8470,63 @@ public class ShadowPartController : MonoBehaviour
         // 1. Sync Sprite
         shadowRenderer.sprite = plantPartRenderer.sprite;
 
-        // 2. Sync Position & Rotation (Relative to Shadow Root)
-        // Match the plant part's world position/rotation initially
-        transform.position = plantPartTransform.position;
-        transform.rotation = plantPartTransform.rotation;
-        // Now update the local position based on the initial offset we calculated
-        // This ensures it moves WITH the plant part, but stays correctly positioned
-        // relative to the shadow root for skew/squash to apply.
-         // transform.localPosition = initialLocalPosition; // NO - this fights the world pos update
-         // Instead, recalculate the desired local position based on the plant part's *current* local pos relative to *its* parent
-         // Vector3 plantPartLocalPos = plantPartTransform.localPosition;
-         // transform.localPosition = plantPartLocalPos; // Simplest: just match local position relative to respective roots
-
-        // --- More Robust Position Sync ---
-        // Calculate the plant part's position relative to the *plant's root*
+        // 2. Sync Position & Rotation (Relative to Shadow Root) - Unchanged
         Vector3 plantPartPosRelativeToPlantRoot = plantPartTransform.parent.InverseTransformPoint(plantPartTransform.position);
-        // Set this shadow part's local position relative to the *shadow root* to match
         transform.localPosition = plantPartPosRelativeToPlantRoot;
-        // Match local rotation as well
         transform.localRotation = plantPartTransform.localRotation;
 
-
-        // 3. Sync Flip
+        // 3. Sync Flip - Unchanged
         shadowRenderer.flipX = plantPartRenderer.flipX;
         shadowRenderer.flipY = plantPartRenderer.flipY;
 
-        // 4. Sync Scale (relative to parent)
+        // 4. Sync Scale (relative to parent) - Unchanged
         transform.localScale = plantPartTransform.localScale;
 
-        // Color & Sorting are set during Initialize and potentially updated by PlantShadowController if needed
-        // shadowRenderer.color = mainShadowController.ShadowColor; // Only if color can change dynamically
+        // 5. Update Color & Apply Distance Fade
+        UpdateColorAndFade();
     }
 
-    // Called when the corresponding plant part is destroyed
-    public void OnPlantPartDestroyed()
+    // <<< NEW METHOD >>>
+    private void UpdateColorAndFade()
     {
-         if (this != null && gameObject != null)
-         {
-              // Use DestroyImmediate if called from editor script, Destroy otherwise
-             if (Application.isPlaying) { Destroy(gameObject); } else { DestroyImmediate(gameObject); }
-         }
+        if(mainShadowController == null || shadowRenderer == null) return;
+
+        Color baseShadowColor = mainShadowController.ShadowColor;
+        float finalAlpha = baseShadowColor.a; // Start with the controller's base alpha
+
+        // Apply distance fade if enabled
+        if (mainShadowController.EnableDistanceFade)
+        {
+            float distance = Vector3.Distance(transform.position, shadowRootTransform.position); // Distance from shadow part to shadow root
+
+            float fadeStart = mainShadowController.FadeStartDistance;
+            float fadeEnd = mainShadowController.FadeEndDistance;
+            float minAlpha = mainShadowController.MinFadeAlpha;
+
+            if (distance >= fadeEnd)
+            {
+                finalAlpha *= minAlpha; // Apply min alpha
+            }
+            else if (distance > fadeStart)
+            {
+                // Calculate interpolation factor (0 at start, 1 at end)
+                float t = Mathf.InverseLerp(fadeStart, fadeEnd, distance);
+                // Lerp between 1 (full alpha multiplier) and minAlpha
+                float distanceAlphaMultiplier = Mathf.Lerp(1f, minAlpha, t);
+                finalAlpha *= distanceAlphaMultiplier; // Modulate base alpha
+            }
+            // Else (distance <= fadeStart), finalAlpha remains baseShadowColor.a
+        }
+
+        // Set the final color with calculated alpha
+        shadowRenderer.color = new Color(baseShadowColor.r, baseShadowColor.g, baseShadowColor.b, finalAlpha);
+    }
+    // <<< END NEW METHOD >>>
+
+
+    public void OnPlantPartDestroyed() // Unchanged
+    {
+         if (this != null && gameObject != null) { if (Application.isPlaying) { Destroy(gameObject); } else { DestroyImmediate(gameObject); } }
     }
 }
 

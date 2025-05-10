@@ -1,8 +1,8 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-01 01:40:59
-PART 2 OF 6
+UNITY PROJECT SCRIPT EXPORT - 2025-05-10 01:49:48
+PART 2 OF 7
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -48,6 +48,7 @@ Assets
 │   │   │   ├── PixelLeaf.prefab
 │   │   │   ├── PixelSeed.prefab
 │   │   │   ├── PixelStem.prefab
+│   │   │   ├── PlantOutline.prefab
 │   │   │   ├── PlantPrefab.prefab
 │   │   │   └── PlantShadow.prefab
 │   │   ├── Props
@@ -125,6 +126,9 @@ Assets
 │   ├── Battle
 │   │   ├── Plant
 │   │   │   ├── PlantCell.cs
+│   │   │   ├── PlantGrowth.Cell.cs
+│   │   │   ├── PlantGrowth.Growth.cs
+│   │   │   ├── PlantGrowth.NodeExecution.cs
 │   │   │   ├── PlantGrowth.cs
 │   │   │   └── WeatherManager.cs
 │   │   ├── SpellProjectile.cs
@@ -202,6 +206,8 @@ Assets
 │   ├── UI
 │   └── Visuals
 │       ├── NightColorPostProcess.cs
+│       ├── OutlinePartController.cs
+│       ├── PlantOutlineController.cs
 │       ├── PlantShadowController.cs
 │       ├── RuntimeCircleDrawer.cs
 │       └── ShadowPartController.cs
@@ -225,6 +231,706 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\PlantGrowth.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.cs
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using TMPro;
+
+// --- Enums ---
+public enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
+
+public partial class PlantGrowth : MonoBehaviour
+{
+    // ------------------------------------------------
+    // --- SERIALIZED FIELDS ---
+    // ------------------------------------------------
+
+    [Header("UI & Visuals")]
+    [SerializeField] private TMP_Text energyText;
+    [SerializeField] private GameObject seedCellPrefab;
+    [SerializeField] private GameObject stemCellPrefab;
+    [SerializeField] private GameObject leafCellPrefab;
+    [SerializeField] private GameObject berryCellPrefab; // Used for PlantCellType.Fruit
+    [SerializeField] private float cellSpacing = 0.08f;
+
+    [Header("Shadow Setup")]
+    [SerializeField] [Tooltip("Assign the PlantShadowController component from the child _ShadowRoot GameObject")]
+    private PlantShadowController shadowController;
+    [SerializeField] [Tooltip("Assign your 'PlantShadow' prefab (GO + SpriteRenderer + ShadowPartController script)")]
+    private GameObject shadowPartPrefab;
+
+    [Header("Outline Setup")]
+    [SerializeField] [Tooltip("Enable or disable plant outline visualization")]
+    private bool enableOutline = true;
+    [SerializeField] [Tooltip("Assign the PlantOutlineController component from the child _OutlineRoot GameObject")]
+    private PlantOutlineController outlineController;
+    [SerializeField] [Tooltip("Assign your outline part prefab (GO + SpriteRenderer + OutlinePartController script)")]
+    private GameObject outlinePartPrefab;
+
+    [Header("Growth & UI Timing")]
+    [SerializeField] private bool showGrowthPercentage = true;
+    [SerializeField] private bool allowPhotosynthesisDuringGrowth = false;
+    [SerializeField] [Tooltip("Percentage UI updates only on these increments (e.g., 5 shows 0, 5, 10...).")]
+    [Range(1, 25)] private int percentageIncrement = 5;
+    // --- NEW FIELD ---
+    [SerializeField] [Tooltip("If true, percentage display approximates smooth progress based on time. If false, it reflects discrete stem cell additions.")]
+    private bool continuousIncrement = false;
+    // -----------------
+
+    // ------------------------------------------------
+    // --- INTERNAL STATE & DATA ---
+    // ------------------------------------------------
+
+    private NodeGraph nodeGraph;
+    public PlantState currentState = PlantState.Initializing;
+    public float currentEnergy = 0f;
+    private Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
+    private List<GameObject> activeCellGameObjects = new List<GameObject>();
+    private FireflyManager fireflyManagerInstance;
+    private GameObject rootCellInstance;
+    private Coroutine growthCoroutine;
+    private bool isGrowthCompletionHandled = false;
+
+    // ------------------------------------------------
+    // --- CALCULATED STATS ---
+    // ------------------------------------------------
+
+    private int targetStemLength;
+    private float finalGrowthSpeed; // Represents time interval per step
+    private int finalLeafGap;
+    private int finalLeafPattern;
+    private float finalGrowthRandomness;
+    private float finalMaxEnergy;
+    private float finalPhotosynthesisRate;
+    private float cycleCooldown;
+    private float nodeCastDelay;
+
+    // ------------------------------------------------
+    // --- RUNTIME VARIABLES ---
+    // ------------------------------------------------
+
+    private int currentStemCount = 0;
+    private float cycleTimer = 0f;
+    private int displayedGrowthPercentage = -1;
+    private bool? offsetRightForPattern1 = null;
+    // --- NEW FIELDS for Continuous Mode ---
+    private float currentGrowthElapsedTime = 0f;
+    private float estimatedTotalGrowthTime = 1f; // Default to 1 to avoid division by zero
+
+    // ------------------------------------------------
+    // --- UNITY LIFECYCLE METHODS ---
+    // ------------------------------------------------
+
+    void Awake()
+    {
+        // --- Critical Setup Check ---
+        bool setupValid = true;
+        if (shadowController == null) { shadowController = GetComponentInChildren<PlantShadowController>(true); if (shadowController == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantShadowController ref missing!", this); setupValid = false; } else { Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantShadowController dynamically.", this); } }
+        if (shadowPartPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Shadow Part Prefab missing!", this); setupValid = false; }
+        if (enableOutline) { if (outlineController == null) { outlineController = GetComponentInChildren<PlantOutlineController>(true); if (outlineController == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantOutlineController ref missing but outline is enabled!", this); setupValid = false; } else { Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantOutlineController dynamically.", this); } } if (outlinePartPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Outline Part Prefab missing but outline is enabled!", this); setupValid = false; } }
+        if (seedCellPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Seed Cell Prefab missing!", this); setupValid = false; } if (energyText == null) Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Energy Text (TMP_Text) missing.", this);
+        if (!setupValid) { enabled = false; return; }
+        if (!enableOutline && outlineController != null) { outlineController.gameObject.SetActive(false); }
+        fireflyManagerInstance = FireflyManager.Instance;
+        EnsureUIReferences();
+    }
+
+    void Start()
+    {
+        UpdateUI();
+    }
+
+    private void Update()
+    {
+        // Handle frame-dependent UI updates and state transitions
+        switch (currentState)
+        {
+            case PlantState.Growing:
+                if (allowPhotosynthesisDuringGrowth)
+                    AccumulateEnergy();
+
+                // --- Update percentage UI every frame ONLY if in continuous mode ---
+                if (showGrowthPercentage && continuousIncrement)
+                {
+                    UpdateGrowthPercentageUI();
+                }
+                // (Discrete mode updates are handled within the coroutine)
+                break;
+
+            case PlantState.GrowthComplete:
+                if (!isGrowthCompletionHandled)
+                {
+                    isGrowthCompletionHandled = true;
+                    if (showGrowthPercentage && targetStemLength > 0)
+                    {
+                        UpdateGrowthPercentageUI(true); // Force 100% display
+                    }
+                    currentState = PlantState.Mature_Idle;
+                    cycleTimer = cycleCooldown;
+                    UpdateUI(); // Update energy text if needed
+                }
+                break;
+
+            case PlantState.Mature_Idle:
+                AccumulateEnergy();
+                UpdateUI();
+                cycleTimer -= Time.deltaTime;
+                if (cycleTimer <= 0f && currentEnergy >= 1f)
+                {
+                    currentState = PlantState.Mature_Executing;
+                    StartCoroutine(ExecuteMatureCycle()); // Assumes ExecuteMatureCycle is in another partial file
+                }
+                break;
+
+            case PlantState.Mature_Executing:
+                AccumulateEnergy();
+                UpdateUI();
+                break;
+
+            case PlantState.Initializing:
+                break;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        StopAllCoroutines(); growthCoroutine = null;
+        if (PlantGrowthModifierManager.Instance != null) { PlantGrowthModifierManager.Instance.UnregisterPlant(this); }
+        ClearAllVisuals(); // Assumes ClearAllVisuals is in another partial file
+    }
+
+    // ------------------------------------------------
+    // --- PUBLIC INITIALIZATION ---
+    // ------------------------------------------------
+
+    public void InitializeAndGrow(NodeGraph graph)
+    {
+        if (graph == null || graph.nodes == null) { Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject); Destroy(gameObject); return; }
+        if (growthCoroutine != null) { StopCoroutine(growthCoroutine); growthCoroutine = null; }
+        ClearAllVisuals();
+        rootCellInstance = null; currentStemCount = 0; offsetRightForPattern1 = null; isGrowthCompletionHandled = false; displayedGrowthPercentage = -1;
+        currentGrowthElapsedTime = 0f; // <-- RESET
+        estimatedTotalGrowthTime = 1f; // <-- RESET to default
+        nodeGraph = graph; currentState = PlantState.Initializing; currentEnergy = 0f;
+        CalculateAndApplyStats();
+        GameObject spawnedSeed = SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
+        if (spawnedSeed != null) {
+            rootCellInstance = spawnedSeed;
+            if (PlantGrowthModifierManager.Instance != null && TileInteractionManager.Instance != null) { Vector3Int gridPos = TileInteractionManager.Instance.WorldToCell(transform.position); TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(gridPos); PlantGrowthModifierManager.Instance.RegisterPlantTile(this, currentTile); }
+            if (targetStemLength > 0) {
+                currentState = PlantState.Growing;
+                UpdateGrowthPercentageUI(); // Initial UI update (0%)
+                growthCoroutine = StartCoroutine(GrowthCoroutine_TimeBased());
+            } else {
+                Debug.LogWarning($"[{gameObject.name}] Target stem length is {targetStemLength}. Skipping visual growth phase.", gameObject);
+                currentState = PlantState.GrowthComplete; isGrowthCompletionHandled = false; UpdateUI();
+            }
+        } else { Debug.LogError($"[{gameObject.name}] Failed to spawn initial seed! Aborting growth.", gameObject); currentState = PlantState.Mature_Idle; Destroy(gameObject, 0.1f); }
+        UpdateUI();
+    }
+
+    // ------------------------------------------------
+    // --- ENERGY & UI ---
+    // ------------------------------------------------
+
+    private void AccumulateEnergy()
+    {
+        if (finalPhotosynthesisRate <= 0 || finalMaxEnergy <= 0) return; float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f; int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf); float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ? PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(this) : 1.0f; float fireflyBonusRate = 0f; if (fireflyManagerInstance != null) { int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(transform.position, fireflyManagerInstance.photosynthesisRadius); fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly, fireflyManagerInstance.maxPhotosynthesisBonus); } float standardPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight; float totalRate = (standardPhotosynthesis + fireflyBonusRate) * tileMultiplier; float delta = totalRate * Time.deltaTime; currentEnergy = Mathf.Clamp(currentEnergy + delta, 0f, finalMaxEnergy);
+    }
+
+    // --- UpdateGrowthPercentageUI (REVISED with Continuous Mode Logic Check) ---
+    /// <summary>
+    /// Calculates the target display percentage based on chosen mode (discrete/continuous)
+    /// and updates the UI text ONLY if the snapped value has changed.
+    /// </summary>
+    /// <param name="forceComplete">If true, forces the display to 100%.</param>
+    private void UpdateGrowthPercentageUI(bool forceComplete = false)
+    {
+        if (!showGrowthPercentage || energyText == null) return;
+
+        float rawPercentageFloat = 0f; // The calculated percentage before snapping
+
+        if (forceComplete)
+        {
+            rawPercentageFloat = 100f;
+        }
+        // --- Check Continuous Flag Here ---
+        else if (continuousIncrement) // --- CONTINUOUS MODE ---
+        {
+            // Calculate based on time progress relative to estimated total time
+            if (estimatedTotalGrowthTime > 0.01f) // Avoid division by zero/tiny numbers
+            {
+                // Use the current elapsed time tracked by the coroutine member variable
+                rawPercentageFloat = Mathf.Clamp01(currentGrowthElapsedTime / estimatedTotalGrowthTime) * 100f;
+                 // Debug.Log($"Continuous Raw %: {rawPercentageFloat:F2} (Time: {currentGrowthElapsedTime:F2} / {estimatedTotalGrowthTime:F2})");
+            }
+            else
+            {
+                // If estimated time is effectively zero, show 0% while growing, 100% if done
+                rawPercentageFloat = (currentState == PlantState.Growing) ? 0f : 100f;
+                 // Debug.Log($"Continuous Raw %: {rawPercentageFloat} (Estimated time near zero)");
+            }
+        }
+        else // --- DISCRETE MODE ---
+        {
+            // Calculate based on current stem count vs target
+            if (targetStemLength <= 0)
+            {
+                rawPercentageFloat = 0f; // No stems to grow
+                 // Debug.Log("Discrete Raw %: 0 (No target stems)");
+            }
+            else
+            {
+                rawPercentageFloat = Mathf.Clamp(((float)currentStemCount / targetStemLength) * 100f, 0f, 100f);
+                 // Debug.Log($"Discrete Raw %: {rawPercentageFloat:F2} (Stems: {currentStemCount} / {targetStemLength})");
+            }
+        }
+
+        // --- Snap the calculated percentage (Applies to BOTH modes) ---
+        int targetDisplayValue; // The final value to show (snapped)
+        if (percentageIncrement <= 1)
+        {
+            targetDisplayValue = Mathf.FloorToInt(rawPercentageFloat);
+        }
+        else
+        {
+            // Floor to the nearest lower multiple of the increment
+            targetDisplayValue = (Mathf.FloorToInt(rawPercentageFloat) / percentageIncrement) * percentageIncrement;
+        }
+        targetDisplayValue = Mathf.Min(targetDisplayValue, 100); // Clamp final value
+
+
+        // --- Update TextMeshPro only if the snapped value changed ---
+        if (targetDisplayValue != displayedGrowthPercentage)
+        {
+            // Debug.Log($"Updating Display %: {displayedGrowthPercentage} -> {targetDisplayValue}");
+            displayedGrowthPercentage = targetDisplayValue;
+            energyText.text = $"{displayedGrowthPercentage}%";
+        }
+    }
+
+
+    // --- UpdateUI (Consolidated) ---
+    private void UpdateUI()
+    {
+        if (energyText == null) return;
+
+        // If showing percentage AND in a state where it's relevant (Growing or just completed)
+        // Let UpdateGrowthPercentageUI handle it (called from Update or completion logic)
+        if (showGrowthPercentage && (currentState == PlantState.Growing || currentState == PlantState.GrowthComplete))
+        {
+           // If not using continuous increment, the discrete update happens in the coroutine.
+           // If using continuous, it happens in Update(). If complete, it happens in Update().
+           // No need to directly modify text here for percentage display.
+        }
+        else // Otherwise (Idle, Executing, or not showing percentage), show Energy
+        {
+            energyText.text = $"{Mathf.FloorToInt(currentEnergy)}/{Mathf.FloorToInt(finalMaxEnergy)}";
+        }
+    }
+
+    // ------------------------------------------------
+    // --- UI REFERENCE HELPER ---
+    // ------------------------------------------------
+
+    private void EnsureUIReferences()
+    {
+        if (energyText) return; energyText = GetComponentInChildren<TMP_Text>(true); if (!energyText) { Debug.LogWarning($"[{gameObject.name}] Energy Text (TMP_Text) UI reference not assigned in Inspector and not found in children.", gameObject); }
+    }
+
+    // ------------------------------------------------
+    // --- PUBLIC ACCESSORS FOR OUTLINES ---
+    // ------------------------------------------------
+
+    public bool DoesCellExistAt(Vector2Int coord) { return cells.ContainsKey(coord); }
+    public float GetCellSpacing() { return this.cellSpacing; }
+    public GameObject GetCellGameObjectAt(Vector2Int coord) { return activeCellGameObjects.FirstOrDefault(go => go != null && go.GetComponent<PlantCell>()?.GridCoord == coord); }
+    public bool IsOutlineEnabled() { return enableOutline; }
+
+    // --- PARTIAL CLASS METHODS (Assumed in other files) ---
+    // Define these methods in the corresponding partial class files:
+    // In PlantGrowth.Cell.cs: ReportCellDestroyed, RemovePlantCell, ClearAllVisuals, SpawnCellVisual, CalculateAndApplyStats, RegisterShadowForCell
+    // In PlantGrowth.Growth.cs: GrowthStep class, GrowthCoroutine_TimeBased, PreCalculateGrowthPlan, GetStemDirection, CalculateLeafPositions
+    // In PlantGrowth.NodeExecution.cs: ExecuteMatureCycle, TrySpawnBerry, ApplyScentDataToObject
+
+} // End PARTIAL Class definition
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\WeatherManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Battle/Plant/WeatherManager.cs
+using UnityEngine;
+using System;
+
+public class WeatherManager : MonoBehaviour
+{
+    public static WeatherManager Instance { get; private set; }
+
+    public enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
+
+    [Header("Day/Night Cycle Settings")]
+    public bool dayNightCycleEnabled = true;
+    public float dayDuration = 20f;
+    public float nightDuration = 20f;
+    public float transitionDuration = 5f;
+    public AnimationCurve transitionCurve = AnimationCurve.Linear(0, 0, 1, 1);
+
+    [Header("Sunlight Settings")]
+    [Range(0f, 1f)]
+    public float sunIntensity = 1f;
+
+    [Header("Fixed Sunlight When Cycle Off")]
+    [Range(0f, 1f)]
+    public float fixedSunIntensity = 1f;
+
+    [Header("Sunlight Visualization")]
+    public SpriteRenderer fadeSprite;
+    public float minAlpha = 0f;
+    public float maxAlpha = 1f;
+
+    [Header("Time Scaling & Pausing")] // <<< UPDATED HEADER
+    [Range(1f, 100f)]
+    public float timeScaleMultiplier = 1f;
+    public bool IsPaused { get; set; } = false; // <<< NEW: Pause flag
+
+    // --- Public Properties & Events ---
+    public CyclePhase CurrentPhase => currentPhase;
+    public event Action<CyclePhase> OnPhaseChanged;
+    public float CurrentPhaseTimer => phaseTimer; // <<< NEW: Expose timer
+    public float CurrentTotalPhaseTime => totalPhaseTime; // <<< NEW: Expose total time
+
+    // --- Internals ---
+    private CyclePhase currentPhase = CyclePhase.Day;
+    private float phaseTimer = 0f;
+    private float totalPhaseTime = 0f;
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        Instance = this;
+    }
+
+    void Start()
+    {
+        EnterPhase(CyclePhase.Day, true);
+    }
+
+    void Update()
+    {
+        // --- PAUSE CHECK ---
+        if (IsPaused) // <<< NEW: Check if paused
+        {
+            // If paused, potentially ensure timeScale is 1? Or leave it? Let's reset it.
+            if (timeScaleMultiplier != 1f) timeScaleMultiplier = 1f;
+            return; // Do nothing else if paused
+        }
+        // ---------------------
+
+        if (!dayNightCycleEnabled)
+        {
+            sunIntensity = fixedSunIntensity;
+            UpdateFadeSprite();
+            if (timeScaleMultiplier != 1f) timeScaleMultiplier = 1f;
+            return;
+        }
+
+        phaseTimer -= Time.deltaTime * timeScaleMultiplier;
+
+        if (phaseTimer <= 0f)
+        {
+            CyclePhase nextPhase = currentPhase;
+            switch (currentPhase)
+            {
+                case CyclePhase.Day: nextPhase = CyclePhase.TransitionToNight; break;
+                case CyclePhase.TransitionToNight: nextPhase = CyclePhase.Night; break;
+                case CyclePhase.Night: nextPhase = CyclePhase.TransitionToDay; break;
+                case CyclePhase.TransitionToDay: nextPhase = CyclePhase.Day; break;
+            }
+            EnterPhase(nextPhase);
+        }
+        else
+        {
+            UpdateSunIntensity();
+        }
+
+        UpdateFadeSprite();
+    }
+
+    private void EnterPhase(CyclePhase nextPhase, bool forceEvent = false)
+    {
+        CyclePhase previousPhase = currentPhase;
+        currentPhase = nextPhase;
+
+        switch (nextPhase)
+        {
+            case CyclePhase.Day: totalPhaseTime = dayDuration; break;
+            case CyclePhase.Night: totalPhaseTime = nightDuration; break;
+            case CyclePhase.TransitionToNight:
+            case CyclePhase.TransitionToDay: totalPhaseTime = transitionDuration; break;
+        }
+        totalPhaseTime = Mathf.Max(0.01f, totalPhaseTime);
+        phaseTimer = totalPhaseTime;
+
+        UpdateSunIntensity();
+
+        if (previousPhase != currentPhase || forceEvent)
+        {
+            if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
+            OnPhaseChanged?.Invoke(currentPhase);
+        }
+    }
+
+    private void UpdateSunIntensity()
+    {
+        if (totalPhaseTime <= 0) return;
+        float progress = 1f - Mathf.Clamp01(phaseTimer / totalPhaseTime);
+        switch (currentPhase)
+        {
+            case CyclePhase.Day: sunIntensity = 1f; break;
+            case CyclePhase.TransitionToNight: sunIntensity = Mathf.Lerp(1f, 0f, transitionCurve.Evaluate(progress)); break;
+            case CyclePhase.Night: sunIntensity = 0f; break;
+            case CyclePhase.TransitionToDay: sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(progress)); break;
+        }
+        sunIntensity = Mathf.Clamp01(sunIntensity);
+    }
+
+    private void UpdateFadeSprite()
+    {
+        if (fadeSprite != null)
+        {
+            float alpha = Mathf.Lerp(maxAlpha, minAlpha, sunIntensity);
+            Color c = fadeSprite.color; c.a = alpha; fadeSprite.color = c;
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\SpellProjectile.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class SpellProjectile : MonoBehaviour
+{
+    [Header("Projectile Stats")]
+    public float damage;
+    public float speed;
+    [Tooltip("If true, the projectile will be destroyed upon hitting a wizard.")]
+    public bool destroyOnHit = true;
+
+    [Header("Burning Effect (optional)")]
+    public float burningDamage;   // DPS
+    public float burningDuration; // Duration in seconds
+
+    [Header("Friendly Fire")]
+    public bool friendlyFire = false;
+    public bool casterIsEnemy = false;
+
+    public void Initialize(float dmg, float spd)
+    {
+        damage = dmg;
+        speed = spd;
+    }
+
+    private void Update()
+    {
+        transform.Translate(Vector2.up * speed * Time.deltaTime);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Status Effects\BurningStatusEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public class BurningStatusEffect : StatusEffect
+{
+    public BurningStatusEffect(float d, float dps) : base(d, dps) { }
+
+    
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Status Effects\StatusEffect.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public abstract class StatusEffect
+{
+    public float duration; // Total duration.
+    public float damagePerSecond;
+    protected float elapsed = 0f;
+
+    // Public property to expose elapsed time.
+    public float Elapsed { get { return elapsed; } }
+
+    public StatusEffect(float d, float dps)
+    {
+        duration = d;
+        damagePerSecond = dps;
+    }
+
+    public bool IsExpired() => elapsed >= duration;
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Core\SortableEntity.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public class SortableEntity : MonoBehaviour
+{
+    [Header("Sorting Configuration")]
+    [Tooltip("Offset added to Y position for sorting calculation")]
+    [SerializeField] private float sortingLayerYOffset = 0f;
+
+    [Tooltip("Use parent's Y coordinate for sorting")]
+    [SerializeField] private bool useParentYCoordinate = false;
+
+    [Tooltip("Debug logging for sorting")]
+    public bool debugSorting = false;
+
+    private SpriteRenderer spriteRenderer;
+
+    private void Awake()
+    {
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        
+        // If no SpriteRenderer, try to find one in children
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        // Ensure sprite renderer exists
+        if (spriteRenderer == null)
+        {
+            Debug.LogWarning($"[SortableEntity] No SpriteRenderer found on {gameObject.name}");
+        }
+    }
+
+    private void Start()
+    {
+        UpdateSortingOrder();
+    }
+
+    private void LateUpdate()
+    {
+        UpdateSortingOrder();
+    }
+
+    public void UpdateSortingOrder()
+    {
+        if (spriteRenderer == null) return;
+
+        // Determine Y position for sorting
+        float yPositionForSorting = useParentYCoordinate && transform.parent != null 
+            ? transform.parent.position.y 
+            : transform.position.y;
+
+        int sortOrder = CalculateSortOrder(yPositionForSorting);
+        spriteRenderer.sortingOrder = sortOrder;
+
+        if (debugSorting)
+        {
+            Debug.Log($"[SortableEntity] {gameObject.name} - Y: {yPositionForSorting}, Offset: {sortingLayerYOffset}, Sort Order: {sortOrder}");
+        }
+    }
+
+    private int CalculateSortOrder(float yPosition)
+    {
+        // Subtract offset to effectively move the sorting position
+        return Mathf.RoundToInt(-(yPosition + sortingLayerYOffset) * 1000f);
+    }
+
+    // Public method to get current sorting order
+    public int GetCurrentSortOrder()
+    {
+        if (spriteRenderer == null) return 0;
+        return spriteRenderer.sortingOrder;
+    }
+
+    // Public method to set sorting order directly if needed
+    public void SetSortingOrder(int order)
+    {
+        if (spriteRenderer != null)
+            spriteRenderer.sortingOrder = order;
+    }
+
+    // Public method to set the parent Y coordinate usage flag
+    // This eliminates the need for reflection in other scripts
+    public void SetUseParentYCoordinate(bool value)
+    {
+        useParentYCoordinate = value;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Animals\AnimalDefinition.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[CreateAssetMenu(fileName = "Animal_", menuName = "Ecosystem/Animal Definition (Simplified)")]
+public class AnimalDefinition : ScriptableObject
+{
+    [Header("Identification")]
+    [Tooltip("The species name (e.g., 'Bunny', 'Fox').")]
+    public string animalName = "DefaultAnimal";
+
+    [Header("Core Stats")]
+    public float maxHealth = 10f; // Keep health for potential future damage/predators
+    public float movementSpeed = 2f;
+
+    [Header("Diet")]
+    [Tooltip("Reference to the AnimalDiet ScriptableObject defining eating habits.")]
+    public AnimalDiet diet; // Needs to reference the simplified AnimalDiet SO
+
+    [Header("Visuals")]
+    [Tooltip("The prefab to instantiate for this animal.")]
+    public GameObject prefab;
+
+    // Removed meatFoodType
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Animals\AnimalLibrary.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using System.Collections.Generic;
+
+[CreateAssetMenu(fileName = "AnimalLibrary", menuName = "Ecosystem/Animal Library")]
+public class AnimalLibrary : ScriptableObject
+{
+    public List<AnimalDefinition> animals;
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\AnimalController.cs
@@ -633,663 +1339,7 @@ public class FaunaManager : MonoBehaviour
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Core\FloraManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Ecosystem/Core/FloraManager.cs
-using UnityEngine;
-using System.Collections.Generic; // Added for Dictionary
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-public class FloraManager : MonoBehaviour
-{
-    public static FloraManager Instance { get; private set; }
-
-    [Header("Debugging - Scents")]
-    [Tooltip("Show scent radii circle renderers in Game View during runtime.")]
-    [SerializeField] private bool showScentRadiiRuntime = false;
-    [SerializeField] private Color scentRadiusColorRuntime = Color.yellow;
-    [SerializeField] private bool logGizmoCalls = false;
-    [Space]
-    [Tooltip("Prefab used to draw scent circles at runtime.")]
-    [SerializeField] private GameObject circleVisualizerPrefab; // <<< ADDED
-    [Tooltip("Parent transform for instantiated circle visualizers.")]
-    [SerializeField] private Transform circleContainer; // <<< ADDED
-
-    // --- Public Accessors ---
-    public bool ShowScentRadiiRuntime => showScentRadiiRuntime;
-    public Color ScentRadiusColorRuntime => scentRadiusColorRuntime;
-
-    // --- Internal State ---
-    // Dictionary to track circle visualizers per ScentSource
-    private Dictionary<ScentSource, RuntimeCircleDrawer> activeCircleVisualizers = new Dictionary<ScentSource, RuntimeCircleDrawer>();
-
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
-
-        // Validate Debug Dependencies
-        if (circleVisualizerPrefab == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Visualizer Prefab is not assigned!", this); }
-        if (circleContainer == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Container transform is not assigned!", this); }
-    }
-
-     void Update() // Added Update loop
-     {
-         if (!Application.isPlaying) return;
-         UpdateRuntimeCircleVisualizers();
-     }
-
-    void OnDestroy()
-    {
-        if (Instance == this) Instance = null;
-        // Clean up any remaining visualizers when manager is destroyed
-         foreach (var kvp in activeCircleVisualizers)
-         {
-             if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-         }
-         activeCircleVisualizers.Clear();
-    }
-
-
-    // --- Runtime Visualizer Update ---
-    void UpdateRuntimeCircleVisualizers()
-    {
-        bool showCircles = showScentRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
-
-        // Find all active ScentSources (can be slow, consider optimizing if needed)
-        // If performance becomes an issue, ScentSources could register/deregister themselves with the manager.
-        ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
-        HashSet<ScentSource> currentSourcesSet = new HashSet<ScentSource>(currentSources); // For quick lookup
-
-        // --- Update existing circles ---
-        List<ScentSource> sourcesToRemove = new List<ScentSource>();
-        foreach (var kvp in activeCircleVisualizers)
-        {
-            ScentSource source = kvp.Key;
-            RuntimeCircleDrawer drawer = kvp.Value;
-
-            // Check if source still exists and is valid
-            if (source == null || drawer == null || !source.gameObject.activeInHierarchy || !currentSourcesSet.Contains(source))
-            {
-                sourcesToRemove.Add(source); // Mark for removal
-                if (drawer != null) Destroy(drawer.gameObject); // Destroy visualizer
-                continue;
-            }
-
-            // Check if circles should be shown globally and if this source is valid
-            bool shouldShowThis = showCircles && source.enabled && source.definition != null && source.EffectiveRadius > 0.01f;
-
-            if (shouldShowThis)
-            {
-                 // Update drawer position to match source and update circle params
-                 drawer.transform.position = source.transform.position;
-                 drawer.transform.rotation = source.transform.rotation; // Match rotation? Optional.
-                 drawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
-            }
-            else
-            {
-                 drawer.HideCircle(); // Hide if shouldn't be shown
-            }
-        }
-
-        // Remove entries for sources that are gone
-        foreach (var source in sourcesToRemove)
-        {
-            activeCircleVisualizers.Remove(source);
-        }
-
-        // --- Add circles for new sources ---
-        if (showCircles)
-        {
-            foreach (ScentSource source in currentSources)
-            {
-                // Skip if already has a visualizer or is invalid
-                if (source == null || activeCircleVisualizers.ContainsKey(source) || !source.enabled || source.definition == null || source.EffectiveRadius <= 0.01f) continue;
-
-                 // Create new visualizer
-                 GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position, source.transform.rotation, circleContainer);
-                 RuntimeCircleDrawer newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
-
-                 if (newDrawer != null)
-                 {
-                      newDrawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
-                      activeCircleVisualizers.Add(source, newDrawer); // Add to tracking
-                 }
-                 else
-                 {
-                    Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' is missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
-                    Destroy(circleGO);
-                 }
-            }
-        }
-        // --- Hide/Destroy all if global flag turned off ---
-        else if (!showCircles && activeCircleVisualizers.Count > 0)
-        {
-             foreach (var kvp in activeCircleVisualizers)
-             {
-                 if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-             }
-             activeCircleVisualizers.Clear();
-        }
-    }
-
-
-    // --- Gizmo Drawing (Editor Visualization - Unchanged) ---
-    #if UNITY_EDITOR
-    void OnDrawGizmosSelected()
-    {
-        // Use the runtime flag to ALSO control the editor gizmo
-        if (showScentRadiiRuntime) {
-             if (logGizmoCalls) { /*...*/ }
-             Gizmos.color = scentRadiusColorRuntime; // Use runtime color for gizmo too
-             ScentSource[] scentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
-             if (logGizmoCalls) { /*...*/ }
-             int drawnCount = 0;
-             foreach (ScentSource source in scentSources) {
-                if (source == null || !source.enabled || source.definition == null) continue;
-                float radius = source.EffectiveRadius;
-                if (radius > 0.01f) { Gizmos.DrawWireSphere(source.transform.position, radius); drawnCount++; }
-             }
-             if (logGizmoCalls && drawnCount > 0) { /*...*/ }
-             else if (logGizmoCalls && scentSources.Length > 0) { /*...*/ }
-        }
-    }
-    #endif
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Core\PoopController.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using TMPro;
-
-public class PoopController : MonoBehaviour
-{
-    [Tooltip("Total lifetime of this poop (in seconds) before disappearing.")]
-    public float lifetime = 10f;
-    [Tooltip("Duration at the end of the lifetime during which the poop fades out.")]
-    public float fadeDuration = 2f;
-    [Tooltip("Fadeout curve to control the alpha during fade-out. X axis goes from 0 (start of fade) to 1 (end of fade).")]
-    public AnimationCurve fadeCurve = AnimationCurve.Linear(0f, 1f, 1f, 0f);
-
-    private SpriteRenderer sr;
-    private float timer = 0f;
-    private Color initialColor;
-
-    private void Awake()
-    {
-        sr = GetComponent<SpriteRenderer>();
-        if (sr != null)
-        {
-            initialColor = sr.color;
-        }
-    }
-
-    private void Update()
-    {
-        timer += Time.deltaTime;
-        if (timer >= lifetime)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        // If within fadeDuration at the end, apply fade-out using the fadeCurve.
-        float remaining = lifetime - timer;
-        if (remaining < fadeDuration && sr != null)
-        {
-            // Normalize fade time (0 = start, 1 = end)
-            float t = 1f - (remaining / fadeDuration);
-            float alphaMultiplier = fadeCurve.Evaluate(t);
-            Color newColor = initialColor;
-            newColor.a = alphaMultiplier;
-            sr.color = newColor;
-        }
-    }
-
-    // Initialize with default parameters if none are provided.
-    public void Initialize(float lifetimeValue = -1f, float fadeDurationValue = -1f)
-    {
-        if (lifetimeValue > 0f)
-            lifetime = lifetimeValue;
-        if (fadeDurationValue > 0f)
-            fadeDuration = fadeDurationValue;
-        timer = 0f;
-        if (sr != null)
-            initialColor = sr.color;
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Core\ScentSource.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Ecosystem/Core/ScentSource.cs
-using UnityEngine;
-
-// No longer requires RuntimeCircleDrawer directly
-// REMOVED: [RequireComponent(typeof(RuntimeCircleDrawer))]
-public class ScentSource : MonoBehaviour
-{
-    [Header("Scent Definition")]
-    [Tooltip("The base Scent Definition applied to this object.")]
-    public ScentDefinition definition; // Assigned by PlantGrowth/Node effects
-
-    [Header("Applied Modifiers")]
-    [Tooltip("Bonus radius added by node effects.")]
-    public float radiusModifier = 0f;
-    [Tooltip("Bonus strength added by node effects.")]
-    public float strengthModifier = 0f;
-
-    // REMOVED: Debugging Reference private RuntimeCircleDrawer circleDrawer;
-
-    // --- Calculated Effective Properties ---
-    /// <summary> Gets the effective scent radius (Base Radius + Modifier), clamped >= 0. </summary>
-    public float EffectiveRadius => Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier);
-    /// <summary> Gets the effective scent strength (Base Strength + Modifier), clamped >= 0. </summary>
-    public float EffectiveStrength => Mathf.Max(0f, (definition != null ? definition.baseStrength : 0f) + strengthModifier);
-
-
-    void Awake()
-    {
-        // No longer needs to get or manage the circle drawer component here
-        // REMOVED: circleDrawer = GetComponent<RuntimeCircleDrawer>();
-        // REMOVED: circleDrawer?.HideCircle();
-    }
-
-    // REMOVED: Update() method (FloraManager handles creating/updating/hiding the external visualizer)
-
-
-    // Keep Gizmo for Editor visualization (runs independently of Update and runtime drawers)
-    void OnDrawGizmosSelected()
-    {
-        float effectiveRadius = EffectiveRadius; // Calculate radius for gizmo
-
-        if (definition != null) // Check if a definition is assigned
-        {
-            if (effectiveRadius > 0.01f) // Only draw if radius is meaningful
-            {
-                // Use definition name hash for consistent random color
-                // Note: Random.InitState affects the *next* Random call globally,
-                // which might be undesirable if other Gizmos rely on it.
-                // A more robust way might be a custom color mapping or a simple hash function.
-                // For simplicity, we'll keep Random.InitState for now.
-                int prevState = Random.state.GetHashCode(); // Store previous state
-                Random.InitState(definition.name.GetHashCode());
-                Color gizmoColor = Random.ColorHSV(0f, 1f, 0.7f, 0.9f, 0.8f, 1f);
-                gizmoColor.a = 0.3f; // Set alpha for gizmo
-                Random.InitState(prevState); // Restore previous state
-
-                Gizmos.color = gizmoColor;
-                Gizmos.DrawWireSphere(transform.position, effectiveRadius);
-            }
-        }
-        else // Draw default gray if no definition assigned yet
-        {
-            Gizmos.color = new Color(0.8f, 0.8f, 0.8f, 0.2f);
-            Gizmos.DrawWireSphere(transform.position, 1f); // Default size for editor only
-        }
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Core\ThoughtBubbleController.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using TMPro;
-
-public class ThoughtBubbleController : MonoBehaviour
-{
-    public TMP_Text messageText;
-    public float lifetime = 2f;
-
-    private Transform followTarget;
-
-    public void Initialize(string message, Transform target, float duration = 2f)
-    {
-        if (messageText != null)
-            messageText.text = message;
-        followTarget = target;
-        lifetime = duration;
-    }
-
-    private void Update()
-    {
-        lifetime -= Time.deltaTime;
-        if (lifetime <= 0f)
-            Destroy(gameObject);
-
-        // Follow the target if needed (optional if already a child)
-        if (followTarget != null)
-        {
-            transform.position = followTarget.position;
-        }
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Core\ThoughtTrigger.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-public enum ThoughtTrigger
-{
-    Hungry,
-    Eating,
-    HealthLow,
-    Fleeing,
-    Pooping,
-    // Add more triggers as needed
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Core\WaveDefinition.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Ecosystem/Core/WaveDefinition.cs
-using UnityEngine;
-using System.Collections.Generic;
-
-// Enum WaveSpawnLocationType remains the same
-public enum WaveSpawnLocationType
-{
-    GlobalSpawnArea,
-    RandomNearPlayer,
-    Offscreen
-}
-
-// Class WaveSpawnEntry remains the same
-[System.Serializable]
-public class WaveSpawnEntry
-{
-    [Tooltip("Optional description for this specific spawn group within the wave.")]
-    public string description = "Spawn Group";
-    [Tooltip("The type of animal to spawn.")]
-    public AnimalDefinition animalDefinition;
-    [Tooltip("How many of this animal to spawn in this specific entry.")]
-    [Min(1)]
-    public int spawnCount = 1;
-    [Tooltip("Delay (in seconds) AFTER the designated wave spawn time (e.g. Day 50%) before *this entry* begins spawning.")] // Clarified Tooltip
-    [Min(0)]
-    public float delayAfterSpawnTime = 0f; // Renamed from delayAfterWaveStart
-    [Tooltip("Time (in seconds) between spawning each individual animal in this entry (0 = spawn all instantly).")]
-    [Min(0)]
-    public float spawnInterval = 0.5f;
-    [Tooltip("Where these animals should spawn.")]
-    public WaveSpawnLocationType spawnLocationType = WaveSpawnLocationType.GlobalSpawnArea;
-    [Tooltip("Radius used for spawning (e.g., if Spawn Location Type is RandomNearPlayer).")]
-    [Min(0)]
-    public float spawnRadius = 5f;
-}
-
-// WaveDefinition ScriptableObject is simplified further
-[CreateAssetMenu(fileName = "Wave_", menuName = "Ecosystem/Wave Definition")]
-public class WaveDefinition : ScriptableObject
-{
-    [Header("Wave Identification")]
-    [Tooltip("Editor-only name for this wave.")]
-    public string waveName = "New Wave";
-
-    [Header("Wave Content")]
-    [Tooltip("Define the groups of animals that spawn during this wave.")]
-    public List<WaveSpawnEntry> spawnEntries = new List<WaveSpawnEntry>();
-
-    // REMOVED all timing, duration, end condition, delay fields.
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Core\WaveManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Managers/WaveManager.cs
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using UnityEngine.UI;
-
-public enum WaveManagerState
-{
-    PausedBeforeRun,     // Initial state, game logic paused
-    WaitingForSpawnTime, // Run started, waiting for correct time in cycle
-    WaveInProgress,      // Spawning triggered for this cycle, counting down day cycles
-    SequenceComplete     // All waves done
-}
-
-public class WaveManager : MonoBehaviour
-{
-    public static WaveManager Instance { get; private set; }
-
-    [Header("Core Dependencies")]
-    [SerializeField] private FaunaManager faunaManager;
-    [SerializeField] private WeatherManager weatherManager;
-    [SerializeField] private Camera mainCamera;
-
-    [Header("Wave Sequence")]
-    [SerializeField] private List<WaveDefinition> wavesSequence;
-
-    [Header("Wave Timing & Spawning (Global)")]
-    [Tooltip("How many full Day+Night cycles each wave lasts.")]
-    [SerializeField][Range(1, 10)] private int waveDurationInDayCycles = 1;
-    [Tooltip("The phase during which spawning should occur each cycle.")]
-    [SerializeField] private WeatherManager.CyclePhase spawnStartPhase = WeatherManager.CyclePhase.Day;
-    [Tooltip("The percentage progress within the Spawn Start Phase when spawning triggers (0-100).")]
-    [SerializeField][Range(0f, 100f)] private float spawnStartPercentage = 50f;
-    [SerializeField] private bool loopSequence = false;
-    [Tooltip("If checked, animals from the previous wave are destroyed when a new wave starts.")]
-    [SerializeField] private bool deletePreviousWaveAnimals = true;
-
-    [Header("UI & Feedback")]
-    [SerializeField] private TextMeshProUGUI waveStatusText;
-    [SerializeField] private Button startRunButton;
-    [SerializeField] private TextMeshProUGUI timeTrackerText;
-
-    [Header("State (Read Only)")]
-    [SerializeField] private WaveManagerState currentState = WaveManagerState.PausedBeforeRun;
-    [SerializeField] private int currentWaveIndex = -1;
-
-    // --- Runtime State ---
-    private WaveDefinition activeWaveDefinition = null;
-    private int dayCyclesRemainingForWave = 0;
-    private bool hasSpawnedThisCycle = false;
-    private bool isInitialPause = true; // <<< NEW: Flag for initial pause
-
-    // --- Public Accessors ---
-    public WaveManagerState CurrentState => currentState;
-    public int CurrentWaveNumber => currentWaveIndex + 1;
-    public int TotalWaves => wavesSequence != null ? wavesSequence.Count : 0;
-    public bool IsRunActive => currentState != WaveManagerState.PausedBeforeRun && currentState != WaveManagerState.SequenceComplete;
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
-
-        // Validations (same as before)
-        if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager missing!", this);
-        if (weatherManager == null) Debug.LogError("[WaveManager] WeatherManager missing!", this);
-        if (mainCamera == null) Debug.LogError("[WaveManager] Main Camera missing!", this);
-        if (waveStatusText == null) Debug.LogWarning("[WaveManager] Wave Status Text missing.", this);
-        if (timeTrackerText == null) Debug.LogWarning("[WaveManager] Time Tracker Text missing.", this);
-        if (wavesSequence == null || wavesSequence.Count == 0) Debug.LogWarning("[WaveManager] Wave Sequence empty.", this);
-        if (startRunButton == null) Debug.LogWarning("[WaveManager] Start Run Button missing.", this);
-        else startRunButton.onClick.AddListener(TryStartRun);
-
-        // <<< SET INITIAL PAUSE >>>
-        Debug.Log("[WaveManager Awake] Setting initial Time.timeScale = 0");
-        Time.timeScale = 0f;
-        isInitialPause = true;
-        // -------------------------
-    }
-
-    void Start()
-    {
-        if (weatherManager != null) weatherManager.OnPhaseChanged += HandleWeatherPhaseChange;
-        InitializeManager(); // Sets state, updates button
-    }
-
-     void OnDestroy()
-    {
-        if (weatherManager != null) weatherManager.OnPhaseChanged -= HandleWeatherPhaseChange;
-        if (startRunButton != null) startRunButton.onClick.RemoveListener(TryStartRun);
-        // Ensure timescale is reset if manager is destroyed
-        if(isInitialPause || Time.timeScale != 1f) Time.timeScale = 1f;
-    }
-
-    void InitializeManager()
-    {
-        currentWaveIndex = -1;
-        activeWaveDefinition = null;
-        dayCyclesRemainingForWave = 0;
-        hasSpawnedThisCycle = false;
-        // Don't set timescale here anymore, Awake handles initial pause
-        SetState(WaveManagerState.PausedBeforeRun);
-    }
-
-    void Update()
-    {
-        // Always update UI if possible
-        if (weatherManager != null) UpdateTimeTrackerUI();
-
-        // Skip logic if paused initially OR dependencies missing
-        if (isInitialPause || faunaManager == null || weatherManager == null || mainCamera == null)
-        {
-            // Still need to manage button state even if paused initially
-             if (currentState == WaveManagerState.PausedBeforeRun && startRunButton != null)
-             {
-                  startRunButton.gameObject.SetActive(true);
-                  startRunButton.interactable = true;
-             }
-             return;
-        }
-
-        // State Machine Update (only runs after initial pause is over)
-        switch (currentState)
-        {
-            case WaveManagerState.WaitingForSpawnTime: Update_WaitingForSpawnTime(); break;
-            case WaveManagerState.WaveInProgress: /* Handled by event */ break;
-            case WaveManagerState.SequenceComplete: Update_IdleReady(); break;
-             // PausedBeforeRun is handled above
-        }
-    }
-
-    // --- Event Handler (HandleWeatherPhaseChange) --- (Unchanged)
-    void HandleWeatherPhaseChange(WeatherManager.CyclePhase newPhase) { if (currentState == WaveManagerState.PausedBeforeRun || isInitialPause) return; if (newPhase == WeatherManager.CyclePhase.TransitionToDay) { if (currentState == WaveManagerState.WaveInProgress) { dayCyclesRemainingForWave--; hasSpawnedThisCycle = false; if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Day cycle complete. Cycles remaining: {dayCyclesRemainingForWave}"); if (dayCyclesRemainingForWave <= 0) { EndWaveGameplay(); } else { SetState(WaveManagerState.WaitingForSpawnTime); UpdateWaveStatusText(); } } else if (currentState == WaveManagerState.WaitingForSpawnTime) { hasSpawnedThisCycle = false; } } else if (newPhase == spawnStartPhase && currentState == WaveManagerState.WaitingForSpawnTime && !hasSpawnedThisCycle) { Update_WaitingForSpawnTime(); } }
-
-
-    // --- State Update Methods ---
-
-    void Update_WaitingForSpawnTime() // (Unchanged)
-    { if (hasSpawnedThisCycle || weatherManager == null) return; WeatherManager.CyclePhase currentPhase = weatherManager.CurrentPhase; float totalPhaseTime = weatherManager.CurrentTotalPhaseTime; float remainingPhaseTime = weatherManager.CurrentPhaseTimer; float progressPercent = (totalPhaseTime > 0) ? (1f - (remainingPhaseTime / totalPhaseTime)) * 100f : 0f; if (currentPhase == spawnStartPhase && progressPercent >= spawnStartPercentage) { StartWaveSpawning(); } }
-
-    void Update_IdleReady() // (Now only manages button for looping)
-    {
-         if (startRunButton != null)
-         {
-            bool showButton = (currentState == WaveManagerState.SequenceComplete && loopSequence);
-            startRunButton.gameObject.SetActive(showButton);
-            startRunButton.interactable = showButton;
-         }
-    }
-
-    void UpdateTimeTrackerUI() // (Unchanged)
-    { if (timeTrackerText == null || weatherManager == null) return; WeatherManager.CyclePhase phase = weatherManager.CurrentPhase; float total = weatherManager.CurrentTotalPhaseTime; float remaining = weatherManager.CurrentPhaseTimer; float progressPercent = (total > 0) ? (1f - (remaining / total)) * 100f : 0f; string phaseName = phase.ToString().Replace("Transition", ""); timeTrackerText.text = $"{phaseName} [{progressPercent:F0}%]"; if (Time.timeScale == 0f && isInitialPause) timeTrackerText.text += " (Paused)"; } // Show paused during initial pause
-
-    void UpdateWaveStatusText() // (Added PausedBeforeRun case)
-    {
-         if (waveStatusText == null) return;
-         switch(currentState)
-         {
-             case WaveManagerState.PausedBeforeRun: waveStatusText.text = "Press Start Run"; break;
-             case WaveManagerState.WaitingForSpawnTime: waveStatusText.text = $"Wave {CurrentWaveNumber} - Waiting..."; break;
-             case WaveManagerState.WaveInProgress: waveStatusText.text = $"Wave {CurrentWaveNumber} [{dayCyclesRemainingForWave} cycles left]"; break;
-            case WaveManagerState.SequenceComplete: waveStatusText.text = loopSequence ? "Sequence Done. Start Again?" : "All Waves Cleared!"; break;
-             default: waveStatusText.text = ""; break;
-         }
-    }
-
-    // --- State Transition and Action Methods ---
-
-    void SetState(WaveManagerState newState) // (Removed weather pause logic)
-    {
-        if (currentState == newState) return;
-        if(Debug.isDebugBuild) Debug.Log($"[WaveManager] State Change: {currentState} -> {newState}");
-        currentState = newState;
-
-        // Update Button State
-        if (startRunButton != null)
-        {
-            bool showButton = (newState == WaveManagerState.PausedBeforeRun) || (newState == WaveManagerState.SequenceComplete && loopSequence);
-            startRunButton.gameObject.SetActive(showButton);
-            startRunButton.interactable = showButton;
-        }
-
-        // Update Status Text
-        UpdateWaveStatusText();
-    }
-
-    public void TryStartRun() // <<< MODIFIED
-    {
-        // Only allow starting from PausedBeforeRun OR SequenceComplete if looping
-        if (currentState != WaveManagerState.PausedBeforeRun && !(currentState == WaveManagerState.SequenceComplete && loopSequence))
-        {
-             if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Cannot start run. State: {currentState}, Looping: {loopSequence}");
-             return;
-        }
-
-        Debug.Log("[WaveManager] Starting Run...");
-
-        // <<< RESUME TIME >>>
-        if (isInitialPause || Time.timeScale != 1f)
-        {
-            Debug.Log("[WaveManager] Setting Time.timeScale = 1");
-            Time.timeScale = 1f;
-            isInitialPause = false; // Mark initial pause as over
-        }
-        // ----------------
-
-        InitializeRun(); // Prepare first wave state
-        SetState(WaveManagerState.WaitingForSpawnTime); // Transition state
-    }
-
-    void InitializeRun() // (Unchanged)
-    { currentWaveIndex = 0; if (wavesSequence == null || wavesSequence.Count == 0 || wavesSequence[currentWaveIndex] == null) { Debug.LogError("[WaveManager] Cannot initialize run: Bad wave sequence!"); SetState(WaveManagerState.SequenceComplete); return; } if(deletePreviousWaveAnimals && currentState == WaveManagerState.SequenceComplete && loopSequence) { ClearAllActiveAnimals(); } activeWaveDefinition = wavesSequence[currentWaveIndex]; dayCyclesRemainingForWave = waveDurationInDayCycles; hasSpawnedThisCycle = false; Debug.Log($"[WaveManager] Run initialized. Starting Wave {CurrentWaveNumber}. Duration: {dayCyclesRemainingForWave} cycles."); }
-
-    void StartWaveSpawning() // (Unchanged)
-    { if (activeWaveDefinition == null || currentState != WaveManagerState.WaitingForSpawnTime) { return; } Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} - Spawning Triggered (Phase: {spawnStartPhase} >= {spawnStartPercentage}%)"); hasSpawnedThisCycle = true; SetState(WaveManagerState.WaveInProgress); if (faunaManager != null) faunaManager.ExecuteSpawnWave(activeWaveDefinition); else Debug.LogError("[WaveManager] Cannot execute spawn wave, FaunaManager missing!"); }
-
-    void EndWaveGameplay() // (Unchanged)
-    { Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} Gameplay Ended (Duration Met)."); if (faunaManager != null) faunaManager.StopAllSpawnCoroutines(); if (deletePreviousWaveAnimals) { ClearAllActiveAnimals(); } activeWaveDefinition = null; currentWaveIndex++; if (currentWaveIndex >= wavesSequence.Count) { if (loopSequence) { Debug.Log("[WaveManager] Looping back."); InitializeRun(); SetState(WaveManagerState.WaitingForSpawnTime); } else { Debug.Log("[WaveManager] Sequence complete."); SetState(WaveManagerState.SequenceComplete); } } else { if (wavesSequence[currentWaveIndex] == null) { Debug.LogError($"[WaveManager] Wave definition {currentWaveIndex} NULL!"); SetState(WaveManagerState.SequenceComplete); return; } activeWaveDefinition = wavesSequence[currentWaveIndex]; dayCyclesRemainingForWave = waveDurationInDayCycles; hasSpawnedThisCycle = false; Debug.Log($"[WaveManager] Preparing Wave {CurrentWaveNumber}. Duration: {dayCyclesRemainingForWave} cycles."); SetState(WaveManagerState.WaitingForSpawnTime); } }
-
-    void ClearAllActiveAnimals() // (Unchanged)
-    { if(Debug.isDebugBuild) Debug.Log("[WaveManager] Clearing all active animals."); AnimalController[] activeAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None); int count = 0; foreach(AnimalController animal in activeAnimals) { if(animal != null) { Destroy(animal.gameObject); count++; } } if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Destroyed {count} animals."); }
-
-    public Camera GetMainCamera() { return mainCamera; } // (Unchanged)
-}
-
-
-
-
 
 --------------------------------------------------------------------------------
-This is part 2 out of 6 of script collection. 4 more parts remain.
+This is part 2 out of 7 of script collection. 5 more parts remain.
 --------------------------------------------------------------------------------
