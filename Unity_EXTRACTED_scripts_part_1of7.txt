@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-17 03:36:09
+UNITY PROJECT SCRIPT EXPORT - 2025-05-19 01:01:18
 PART 1 OF 7
 ================================================================================
 
@@ -943,11 +943,11 @@ public partial class PlantGrowth : MonoBehaviour
         
         // Initialize poop fertilizer values to zero
         poopDetectionRadius = 0f;
-        poopAbsorptionRate = 0f;
+        poopEnergyBonus = 0f; // Renamed from poopAbsorptionRate
 
         foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
             if (node?.effects == null) continue;
-            foreach (NodeEffectData effect in node.effects) {
+            foreach (var effect in node.effects) {
                 if (effect == null || !effect.isPassive) continue;
                 switch (effect.effectType) {
                     case NodeEffectType.SeedSpawn:
@@ -983,7 +983,7 @@ public partial class PlantGrowth : MonoBehaviour
                         break;
                     case NodeEffectType.PoopFertilizer:
                         poopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
-                        poopAbsorptionRate = Mathf.Max(0f, effect.secondaryValue);
+                        poopEnergyBonus = Mathf.Max(0f, effect.secondaryValue); // Renamed from poopAbsorptionRate
                         break;
                         // Add other passive effects here if needed
                 }
@@ -1413,6 +1413,12 @@ public partial class PlantGrowth : MonoBehaviour
                     // Other accumulation effects could go here
                  }
             }
+        }
+        
+        // --- NEW: Check for poop to absorb in this cycle ---
+        if (poopDetectionRadius > 0f)
+        {
+            CheckForPoopAndAbsorb();
         }
 
         // --- Execution Phase ---

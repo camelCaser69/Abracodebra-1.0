@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-17 03:36:09
+UNITY PROJECT SCRIPT EXPORT - 2025-05-19 01:01:18
 PART 4 OF 7
 ================================================================================
 
@@ -1276,7 +1276,7 @@ public enum NodeEffectType
     Cooldown,
     [Tooltip("Modifies the base time delay between executing the effects of sequential nodes within a Mature Phase cycle.")]
     CastDelay,
-    [Tooltip("Allows the plant to absorb poop within a radius and regrow eaten leaves. PrimaryValue=Detection Radius, SecondaryValue=Absorption Rate.")]
+    [Tooltip("Allows the plant to absorb poop within a radius and regrow eaten leaves or gain energy. PrimaryValue=Detection Radius, SecondaryValue=Energy Added.")]
     PoopFertilizer,
 
 

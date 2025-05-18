@@ -12,7 +12,15 @@ public class AnimalController : MonoBehaviour
     // --- Fields --- (No changes)
     private AnimalDefinition definition; private AnimalDiet animalDiet;
     [Header("Optional Features")] public AnimalThoughtLibrary thoughtLibrary; public GameObject thoughtBubblePrefab; public Transform bubbleSpawnTransform; public Transform poopSpawnPoint; public List<GameObject> poopPrefabs; public Animator animator;
-    [Header("UI References")] [SerializeField] private TextMeshProUGUI hpText;
+    
+    [Header("UI References")]
+    [SerializeField] private TextMeshProUGUI hpText;
+    [SerializeField] private TextMeshProUGUI hungerText; // NEW: Hunger text reference
+
+    [Header("UI Settings")] // NEW HEADER
+    [Tooltip("Which key to hold to display HP and Hunger texts")]
+    [SerializeField] private KeyCode showStatsKey = KeyCode.LeftAlt; // NEW: Configurable key for showing stats
+    
     [Header("Behavior Tuning")] public float searchRadius = 5f; public float eatDistance = 0.5f; public float eatDuration = 1.5f; [Range(0f, 1f)] public float wanderPauseChance = 0.3f; public float wanderMinMoveDuration = 1f; public float wanderMaxMoveDuration = 3f; public float wanderMinPauseDuration = 0.5f; public float wanderMaxPauseDuration = 2f; public float minPoopDelay = 5f; public float maxPoopDelay = 10f; public float poopDuration = 1f; public float poopColorVariation = 0.1f; public float thoughtCooldownTime = 5f; [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>(); [SerializeField] private List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
     // --- NEW: Food reassessment timer fields ---
@@ -60,13 +68,54 @@ public class AnimalController : MonoBehaviour
             moveDirection = (screenCenterTarget - (Vector2)transform.position).normalized;
             if (moveDirection == Vector2.zero) moveDirection = Random.insideUnitCircle.normalized;
         }
-        EnsureHpTextReference(); UpdateHpText(); if (spriteRenderer == null) { /* Warning */ }
+    
+        EnsureUITextReferences(); // RENAMED from EnsureHpTextReference
+    
+        // Hide text elements initially
+        SetStatsTextVisibility(false);
+    
+        UpdateHpText(); 
+        UpdateHungerText(); // NEW: Initialize hunger text
+    
+        if (spriteRenderer == null) { /* Warning */ }
+    }
+    
+    private void EnsureUITextReferences() 
+    { 
+        if (hpText == null) 
+        {
+            hpText = GetComponentInChildren<TextMeshProUGUI>(true);
+            // If we found a TMP_Text but it should be for HP, don't assign it to both
+            if (hpText != null && hpText.gameObject.name.Contains("Hunger"))
+            {
+                hungerText = hpText;
+                hpText = null;
+            }
+        }
+    
+        if (hungerText == null)
+        {
+            // Try to find any TextMeshProUGUI component that's not the HP text
+            TextMeshProUGUI[] allTexts = GetComponentsInChildren<TextMeshProUGUI>(true);
+            foreach (var text in allTexts)
+            {
+                if (text != hpText)
+                {
+                    hungerText = text;
+                    break;
+                }
+            }
+        }
     }
 
     // --- Update --- (MODIFIED check, uses shifted bounds)
     void Update()
     {
         if (!enabled || rb == null) return;
+
+        // Check for ALT key (or configured key) press to show/hide stats
+        bool showStats = Input.GetKey(showStatsKey);
+        SetStatsTextVisibility(showStats);
 
         if (isSeekingScreenCenter)
         {
@@ -86,7 +135,7 @@ public class AnimalController : MonoBehaviour
             {
                 // Seek the SHIFTED center target
                 moveDirection = (screenCenterTarget - currentPos).normalized;
-                 if (moveDirection == Vector2.zero) moveDirection = Random.insideUnitCircle.normalized;
+                if (moveDirection == Vector2.zero) moveDirection = Random.insideUnitCircle.normalized;
                 FlipSpriteBasedOnDirection(); UpdateAnimationState();
                 return; // Skip normal AI
             }
@@ -99,6 +148,19 @@ public class AnimalController : MonoBehaviour
         else { DecideNextAction(); }
 
         FlipSpriteBasedOnDirection(); UpdateAnimationState();
+    }
+    
+    private void SetStatsTextVisibility(bool visible)
+    {
+        if (hpText != null)
+        {
+            hpText.gameObject.SetActive(visible);
+        }
+    
+        if (hungerText != null)
+        {
+            hungerText.gameObject.SetActive(visible);
+        }
     }
 
     // --- FixedUpdate --- (Uses shifted bounds for clamping)
@@ -124,7 +186,9 @@ public class AnimalController : MonoBehaviour
     void UpdateHunger() 
     { 
         currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime; 
-        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger); 
+        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
+        // Update hunger text when hunger changes
+        UpdateHungerText();
     }
     
     void ApplyStarvationDamage() 
@@ -279,6 +343,7 @@ public class AnimalController : MonoBehaviour
         } 
     }
     
+    
     void FinishEatingAction() 
     { 
         if (currentTargetFood == null) return; 
@@ -291,7 +356,9 @@ public class AnimalController : MonoBehaviour
             Destroy(currentTargetFood); 
             hasPooped = false; 
             poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay); 
-            currentTargetFood = null; 
+            currentTargetFood = null;
+            // Update hunger text
+            UpdateHungerText();
         } 
         else 
         { 
@@ -434,5 +501,11 @@ public class AnimalController : MonoBehaviour
     { 
         if (hpText == null || definition == null) return; 
         hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)}/{Mathf.FloorToInt(definition.maxHealth)}"; 
+    }
+    
+    private void UpdateHungerText()
+    {
+        if (hungerText == null || animalDiet == null) return;
+        hungerText.text = $"Hunger: {Mathf.FloorToInt(currentHunger)}/{Mathf.FloorToInt(animalDiet.maxHunger)}";
     }
 }

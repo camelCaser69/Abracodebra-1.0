@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-17 03:36:09
+UNITY PROJECT SCRIPT EXPORT - 2025-05-19 01:01:17
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -924,11 +924,11 @@ public partial class PlantGrowth : MonoBehaviour
         
         // Initialize poop fertilizer values to zero
         poopDetectionRadius = 0f;
-        poopAbsorptionRate = 0f;
+        poopEnergyBonus = 0f; // Renamed from poopAbsorptionRate
 
         foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
             if (node?.effects == null) continue;
-            foreach (NodeEffectData effect in node.effects) {
+            foreach (var effect in node.effects) {
                 if (effect == null || !effect.isPassive) continue;
                 switch (effect.effectType) {
                     case NodeEffectType.SeedSpawn:
@@ -964,7 +964,7 @@ public partial class PlantGrowth : MonoBehaviour
                         break;
                     case NodeEffectType.PoopFertilizer:
                         poopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
-                        poopAbsorptionRate = Mathf.Max(0f, effect.secondaryValue);
+                        poopEnergyBonus = Mathf.Max(0f, effect.secondaryValue); // Renamed from poopAbsorptionRate
                         break;
                         // Add other passive effects here if needed
                 }
@@ -1391,6 +1391,12 @@ public partial class PlantGrowth : MonoBehaviour
                  }
             }
         }
+        
+        // --- NEW: Check for poop to absorb in this cycle ---
+        if (poopDetectionRadius > 0f)
+        {
+            CheckForPoopAndAbsorb();
+        }
 
         // --- Execution Phase ---
         // Check Energy Cost *before* executing actions
@@ -1638,10 +1644,8 @@ public partial class PlantGrowth : MonoBehaviour
     // --- POOP FERTILIZER DATA ---
     // ------------------------------------------------
     private float poopDetectionRadius = 0f;
-    private float poopAbsorptionRate = 0f;
-    private float poopAbsorptionTimer = 0f;
+    private float poopEnergyBonus = 0f; // Renamed from poopAbsorptionRate
     private List<LeafData> leafDataList = new List<LeafData>();
-    private const float POOP_CHECK_INTERVAL = 1.0f; // Check for poop once per second
 
     // ------------------------------------------------
     // --- CALCULATED STATS ---
@@ -1745,17 +1749,6 @@ public partial class PlantGrowth : MonoBehaviour
 
             case PlantState.Initializing:
                 break;
-        }
-        
-        // Add poop absorption check if radius > 0
-        if (poopDetectionRadius > 0f && currentState != PlantState.Growing)
-        {
-            poopAbsorptionTimer -= Time.deltaTime;
-            if (poopAbsorptionTimer <= 0f)
-            {
-                CheckForPoopAndAbsorb();
-                poopAbsorptionTimer = POOP_CHECK_INTERVAL;
-            }
         }
     }
 
@@ -1922,139 +1915,131 @@ public partial class PlantGrowth : MonoBehaviour
     // --- POOP FERTILIZER METHODS ---
     // ------------------------------------------------
     
-    // FILE: Assets/Scripts/Battle/Plant/PlantGrowth.cs (Debug Logging Fix)
-
-// Add this method at the beginning of CheckForPoopAndAbsorb to provide more debug information:
-
-private void CheckForPoopAndAbsorb()
-{
-    // Skip if no missing leaves to regrow
-    bool hasMissingLeaves = leafDataList.Any(leaf => !leaf.IsActive);
-    
-    if (Debug.isDebugBuild && poopDetectionRadius > 0f)
+    private void CheckForPoopAndAbsorb()
     {
-        string leafStatus = hasMissingLeaves ? 
-            $"Has {leafDataList.Count(l => !l.IsActive)} missing leaves" : 
-            "No missing leaves";
-        Debug.Log($"[{gameObject.name}] PoopFertilizer: {leafStatus}, Radius: {poopDetectionRadius}, Rate: {poopAbsorptionRate}");
-    }
-    
-    if (!hasMissingLeaves) return;
-    
-    // Look for poop in range
-    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, poopDetectionRadius);
-    
-    if (Debug.isDebugBuild && poopDetectionRadius > 0f)
-    {
-        Debug.Log($"[{gameObject.name}] PoopFertilizer: Found {colliders.Length} colliders in radius {poopDetectionRadius}");
-        int poopCount = 0;
-        foreach (Collider2D col in colliders)
-        {
-            if (col.GetComponent<PoopController>() != null)
-                poopCount++;
-        }
-        Debug.Log($"[{gameObject.name}] PoopFertilizer: {poopCount} of those colliders have PoopController");
-    }
-    
-    // Calculate how many poop items we can process this cycle
-    // poopAbsorptionRate represents poop items per second
-    int maxAbsorptionsPerCheck = Mathf.FloorToInt(poopAbsorptionRate * POOP_CHECK_INTERVAL);
-    
-    // Ensure at least one poop can be absorbed if rate > 0
-    if (poopAbsorptionRate > 0 && maxAbsorptionsPerCheck < 1)
-        maxAbsorptionsPerCheck = 1;
-    
-    // Track how many we've absorbed this cycle
-    int absorptionsThisCycle = 0;
-    
-    foreach (Collider2D collider in colliders)
-    {
-        // Stop if we've reached our absorption limit for this cycle
-        if (absorptionsThisCycle >= maxAbsorptionsPerCheck)
-            break;
+        // Skip if no missing leaves to regrow and no energy bonus
+        bool hasMissingLeaves = leafDataList.Any(leaf => !leaf.IsActive);
+        bool canAddEnergy = poopEnergyBonus > 0f;
         
-        PoopController poop = collider.GetComponent<PoopController>();
-        if (poop != null)
+        if (Debug.isDebugBuild && poopDetectionRadius > 0f)
         {
-            // Absorb the poop
-            if (Debug.isDebugBuild)
-                Debug.Log($"[{gameObject.name}] Absorbing poop for fertilizer effect.");
-            
-            // Try to regrow a leaf
-            if (TryRegrowLeaf())
+            string leafStatus = hasMissingLeaves ? 
+                $"Has {leafDataList.Count(l => !l.IsActive)} missing leaves" : 
+                "No missing leaves";
+            Debug.Log($"[{gameObject.name}] PoopFertilizer: {leafStatus}, Radius: {poopDetectionRadius}, Energy bonus: {poopEnergyBonus}");
+        }
+        
+        if (!hasMissingLeaves && !canAddEnergy) return;
+        
+        // Look for poop in range
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, poopDetectionRadius);
+        
+        if (Debug.isDebugBuild && poopDetectionRadius > 0f)
+        {
+            Debug.Log($"[{gameObject.name}] PoopFertilizer: Found {colliders.Length} colliders in radius {poopDetectionRadius}");
+            int poopCount = 0;
+            foreach (Collider2D col in colliders)
             {
-                // Destroy the poop
-                Destroy(poop.gameObject);
+                if (col.GetComponent<PoopController>() != null)
+                    poopCount++;
+            }
+            Debug.Log($"[{gameObject.name}] PoopFertilizer: {poopCount} of those colliders have PoopController");
+        }
+        
+        // Process poop that we find
+        foreach (Collider2D collider in colliders)
+        {
+            PoopController poop = collider.GetComponent<PoopController>();
+            if (poop != null)
+            {
+                bool absorbed = false;
                 
-                // Increment counter
-                absorptionsThisCycle++;
+                // First try to regrow a leaf if there are missing leaves
+                if (hasMissingLeaves)
+                {
+                    absorbed = TryRegrowLeaf();
+                }
+                
+                // If we couldn't regrow a leaf (or didn't need to) but have energy bonus, add energy
+                if ((!absorbed || !hasMissingLeaves) && canAddEnergy)
+                {
+                    currentEnergy = Mathf.Min(finalMaxEnergy, currentEnergy + poopEnergyBonus);
+                    absorbed = true;
+                    
+                    if (Debug.isDebugBuild)
+                        Debug.Log($"[{gameObject.name}] Added {poopEnergyBonus} energy from poop fertilizer. Current energy: {currentEnergy}");
+                }
+                
+                // Destroy the poop if it was successfully used
+                if (absorbed)
+                {
+                    Destroy(poop.gameObject);
+                    break; // Process only one poop per cycle
+                }
             }
         }
     }
-}
 
     private bool TryRegrowLeaf()
-{
-    // Look for a missing leaf to regrow
-    int missingLeafIndex = -1;
-    
-    // Debug counts
-    if (Debug.isDebugBuild)
     {
-        int totalLeaves = leafDataList.Count;
-        int missingLeaves = leafDataList.Count(leaf => !leaf.IsActive);
-        Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Total leaves: {totalLeaves}, Missing leaves: {missingLeaves}");
-    }
-    
-    for (int i = 0; i < leafDataList.Count; i++)
-    {
-        if (!leafDataList[i].IsActive)
+        // Look for a missing leaf to regrow
+        int missingLeafIndex = -1;
+        
+        // Debug counts
+        if (Debug.isDebugBuild)
         {
-            missingLeafIndex = i;
-            break;
+            int totalLeaves = leafDataList.Count;
+            int missingLeaves = leafDataList.Count(leaf => !leaf.IsActive);
+            Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Total leaves: {totalLeaves}, Missing leaves: {missingLeaves}");
         }
-    }
-    
-    if (missingLeafIndex == -1)
-    {
+        
+        for (int i = 0; i < leafDataList.Count; i++)
+        {
+            if (!leafDataList[i].IsActive)
+            {
+                missingLeafIndex = i;
+                break;
+            }
+        }
+        
+        if (missingLeafIndex == -1)
+        {
+            if (Debug.isDebugBuild)
+                Debug.Log($"[{gameObject.name}] TryRegrowLeaf: No missing leaves found to regrow.");
+            return false; // No missing leaves found
+        }
+        
+        // Get the leaf coordinate and mark it as active
+        Vector2Int leafCoord = leafDataList[missingLeafIndex].GridCoord;
+        
+        // IMPORTANT: Check if the coordinate is already occupied by another cell
+        if (cells.ContainsKey(leafCoord))
+        {
+            if (Debug.isDebugBuild)
+                Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Cannot regrow leaf at {leafCoord} because cell is already occupied.");
+            return false;
+        }
+        
+        // Create the new leaf visual
+        GameObject newLeaf = SpawnCellVisual(PlantCellType.Leaf, leafCoord);
+        
+        if (newLeaf != null)
+        {
+            // Update the leaf data to mark it as active ONLY if spawn succeeded
+            leafDataList[missingLeafIndex] = new LeafData(leafCoord, true);
+            
+            if (Debug.isDebugBuild)
+                Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Successfully regrew leaf at {leafCoord} using poop fertilizer!");
+            return true;
+        }
+        
+        // If we get here, the leaf couldn't be created
         if (Debug.isDebugBuild)
-            Debug.Log($"[{gameObject.name}] TryRegrowLeaf: No missing leaves found to regrow.");
-        return false; // No missing leaves found
-    }
-    
-    // Get the leaf coordinate and mark it as active
-    Vector2Int leafCoord = leafDataList[missingLeafIndex].GridCoord;
-    
-    // IMPORTANT: Check if the coordinate is already occupied by another cell
-    if (cells.ContainsKey(leafCoord))
-    {
-        if (Debug.isDebugBuild)
-            Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Cannot regrow leaf at {leafCoord} because cell is already occupied.");
+            Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Failed to spawn new leaf at {leafCoord}");
+        
+        // Leave the leaf marked as inactive in the tracking list
         return false;
     }
-    
-    // Mark the leaf as active in our tracking list AFTER we successfully spawn it
-    
-    // Create the new leaf visual
-    GameObject newLeaf = SpawnCellVisual(PlantCellType.Leaf, leafCoord);
-    
-    if (newLeaf != null)
-    {
-        // Update the leaf data to mark it as active ONLY if spawn succeeded
-        leafDataList[missingLeafIndex] = new LeafData(leafCoord, true);
-        
-        if (Debug.isDebugBuild)
-            Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Successfully regrew leaf at {leafCoord} using poop fertilizer!");
-        return true;
-    }
-    
-    // If we get here, the leaf couldn't be created
-    if (Debug.isDebugBuild)
-        Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Failed to spawn new leaf at {leafCoord}");
-    
-    // Leave the leaf marked as inactive in the tracking list
-    return false;
-}
 
     // -----------------------------------------------
     // --- PUBLIC ACCESSORS FOR OUTLINES ---
@@ -4971,7 +4956,7 @@ public enum NodeEffectType
     Cooldown,
     [Tooltip("Modifies the base time delay between executing the effects of sequential nodes within a Mature Phase cycle.")]
     CastDelay,
-    [Tooltip("Allows the plant to absorb poop within a radius and regrow eaten leaves. PrimaryValue=Detection Radius, SecondaryValue=Absorption Rate.")]
+    [Tooltip("Allows the plant to absorb poop within a radius and regrow eaten leaves or gain energy. PrimaryValue=Detection Radius, SecondaryValue=Energy Added.")]
     PoopFertilizer,
 
 

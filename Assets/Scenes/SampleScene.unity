@@ -8826,12 +8826,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa0397c3838c4c9aa01e9859a5f1e1ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showScentRadiiRuntime: 1
+  showScentRadiiRuntime: 0
   scentRadiusColorRuntime: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   logGizmoCalls: 0
   circleVisualizerPrefab: {fileID: 4489783331620860270, guid: d6976fed002367344b9cc1365d0a1201, type: 3}
   circleContainer: {fileID: 1232000946}
-  showPoopAbsorptionRadiiRuntime: 1
+  showPoopAbsorptionRadiiRuntime: 0
   poopAbsorptionRadiusColorRuntime: {r: 0.2264151, g: 0.15966536, b: 0.09291563, a: 1}
 --- !u!1 &844052608
 GameObject:
