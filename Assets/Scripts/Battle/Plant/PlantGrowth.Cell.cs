@@ -11,16 +11,41 @@ public partial class PlantGrowth : MonoBehaviour
 
     public void ReportCellDestroyed(Vector2Int coord)
     {
-        if (cells.ContainsKey(coord)) {
+        if (cells.ContainsKey(coord))
+        {
+            // Check what type of cell is being destroyed
+            PlantCellType cellType = cells[coord];
+        
+            // If it's a leaf, mark it as inactive for potential regrowth
+            if (cellType == PlantCellType.Leaf)
+            {
+                // Find and update the leaf data
+                for (int i = 0; i < leafDataList.Count; i++)
+                {
+                    if (leafDataList[i].GridCoord == coord)
+                    {
+                        LeafData updatedData = leafDataList[i];
+                        updatedData.IsActive = false; // Mark as eaten/missing
+                        leafDataList[i] = updatedData;
+                    
+                        if (Debug.isDebugBuild)
+                            Debug.Log($"[{gameObject.name}] Leaf at {coord} marked as missing for potential regrowth via ReportCellDestroyed.");
+                    
+                        break;
+                    }
+                }
+            }
+        
             cells.Remove(coord);
             // Assume RemovePlantCell(GameObject) will be called externally for proper cleanup
             // We still need to clean the GO list if destruction happened unexpectedly
             activeCellGameObjects.RemoveAll(go => go == null || (go.GetComponent<PlantCell>()?.GridCoord == coord));
 
-             // Trigger outline update after internal state change
-             if (enableOutline && outlineController != null) {
-                 outlineController.OnPlantCellRemoved(coord);
-             }
+            // Trigger outline update after internal state change
+            if (enableOutline && outlineController != null)
+            {
+                outlineController.OnPlantCellRemoved(coord);
+            }
         }
     }
 
@@ -33,6 +58,26 @@ public partial class PlantGrowth : MonoBehaviour
         if (cellComp == null) { Destroy(cellToRemove); return; } // Destroy if no component
 
         Vector2Int coord = cellComp.GridCoord;
+        
+        // NEW: Check if this is a leaf and mark it as inactive in our leaf data list
+        if (cellComp.CellType == PlantCellType.Leaf)
+        {
+            // Find matching leaf data and mark as inactive (missing)
+            for (int i = 0; i < leafDataList.Count; i++)
+            {
+                if (leafDataList[i].GridCoord == coord)
+                {
+                    LeafData updatedData = leafDataList[i];
+                    updatedData.IsActive = false; // Mark as eaten/missing
+                    leafDataList[i] = updatedData;
+                    
+                    if (Debug.isDebugBuild)
+                        Debug.Log($"[{gameObject.name}] Leaf at {coord} marked as missing for potential regrowth.");
+                    
+                    break;
+                }
+            }
+        }
 
         // --- Unregister Visuals FIRST ---
         // Shadow
@@ -195,10 +240,14 @@ public partial class PlantGrowth : MonoBehaviour
         float cooldownModifier = 0f;
         float castDelayModifier = 0f;
         bool seedFound = false;
+        
+        // Initialize poop fertilizer values to zero
+        poopDetectionRadius = 0f;
+        poopEnergyBonus = 0f; // Renamed from poopAbsorptionRate
 
         foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
             if (node?.effects == null) continue;
-            foreach (NodeEffectData effect in node.effects) {
+            foreach (var effect in node.effects) {
                 if (effect == null || !effect.isPassive) continue;
                 switch (effect.effectType) {
                     case NodeEffectType.SeedSpawn:
@@ -231,6 +280,10 @@ public partial class PlantGrowth : MonoBehaviour
                         break;
                     case NodeEffectType.CastDelay:
                         castDelayModifier += effect.primaryValue;
+                        break;
+                    case NodeEffectType.PoopFertilizer:
+                        poopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
+                        poopEnergyBonus = Mathf.Max(0f, effect.secondaryValue); // Renamed from poopAbsorptionRate
                         break;
                         // Add other passive effects here if needed
                 }

@@ -20,13 +20,23 @@ public class FloraManager : MonoBehaviour
     [Tooltip("Parent transform for instantiated circle visualizers.")]
     [SerializeField] private Transform circleContainer; // <<< ADDED
 
+    [Header("Debugging - Poop Absorption")] // <<< NEW HEADER
+    [Tooltip("Show poop absorption radii circle renderers in Game View during runtime.")]
+    [SerializeField] private bool showPoopAbsorptionRadiiRuntime = false;
+    [Tooltip("Color of the poop absorption radius visualization.")]
+    [SerializeField] private Color poopAbsorptionRadiusColorRuntime = new Color(0.6f, 0.4f, 0.2f, 0.5f); // Brown-ish color
+
     // --- Public Accessors ---
     public bool ShowScentRadiiRuntime => showScentRadiiRuntime;
     public Color ScentRadiusColorRuntime => scentRadiusColorRuntime;
+    // <<< NEW ACCESSORS for poop absorption radius visualization >>>
+    public bool ShowPoopAbsorptionRadiiRuntime => showPoopAbsorptionRadiiRuntime;
+    public Color PoopAbsorptionRadiusColorRuntime => poopAbsorptionRadiusColorRuntime;
 
-    // --- Internal State ---
     // Dictionary to track circle visualizers per ScentSource
     private Dictionary<ScentSource, RuntimeCircleDrawer> activeCircleVisualizers = new Dictionary<ScentSource, RuntimeCircleDrawer>();
+    // NEW: Dictionary to track poop absorption circle visualizers per PlantGrowth
+    private Dictionary<PlantGrowth, RuntimeCircleDrawer> activePoopAbsorptionCircleVisualizers = new Dictionary<PlantGrowth, RuntimeCircleDrawer>();
 
 
     void Awake()
@@ -43,42 +53,149 @@ public class FloraManager : MonoBehaviour
      {
          if (!Application.isPlaying) return;
          UpdateRuntimeCircleVisualizers();
+         // NEW: Update poop absorption radius visualizers
+         UpdatePoopAbsorptionCircleVisualizers();
      }
 
     void OnDestroy()
     {
         if (Instance == this) Instance = null;
         // Clean up any remaining visualizers when manager is destroyed
-         foreach (var kvp in activeCircleVisualizers)
-         {
-             if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-         }
-         activeCircleVisualizers.Clear();
+        foreach (var kvp in activeCircleVisualizers)
+        {
+            if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+        }
+        activeCircleVisualizers.Clear();
+        
+        // NEW: Clean up poop absorption visualizers
+        foreach (var kvp in activePoopAbsorptionCircleVisualizers)
+        {
+            if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+        }
+        activePoopAbsorptionCircleVisualizers.Clear();
     }
-
+    
+    // NEW: Method to update poop absorption radius visualizers
+    void UpdatePoopAbsorptionCircleVisualizers()
+    {
+        if (!Application.isPlaying) return;
+        
+        // Check if visualization is enabled
+        bool showCircles = showPoopAbsorptionRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
+        
+        if (!showCircles)
+        {
+            // If visualization is disabled, clean up any existing visualizers
+            foreach (var kvp in activePoopAbsorptionCircleVisualizers)
+            {
+                if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+            }
+            activePoopAbsorptionCircleVisualizers.Clear();
+            return;
+        }
+        
+        // Find all plants with the poop fertilizer effect
+        PlantGrowth[] plants = FindObjectsByType<PlantGrowth>(FindObjectsSortMode.None);
+        HashSet<PlantGrowth> currentPlantsSet = new HashSet<PlantGrowth>(plants);
+        
+        // Track plants to remove (no longer exist or don't have the effect)
+        List<PlantGrowth> plantsToRemove = new List<PlantGrowth>();
+        
+        // First, update existing visualizers
+        foreach (var kvp in activePoopAbsorptionCircleVisualizers)
+        {
+            PlantGrowth plant = kvp.Key;
+            RuntimeCircleDrawer drawer = kvp.Value;
+            
+            if (plant == null || drawer == null || !plant.gameObject.activeInHierarchy ||
+                !currentPlantsSet.Contains(plant))
+            {
+                plantsToRemove.Add(plant);
+                if (drawer != null) Destroy(drawer.gameObject);
+                continue;
+            }
+            
+            // Check if the plant still has a valid poop detection radius
+            float poopRadius = GetPlantPoopDetectionRadius(plant);
+            bool shouldShowThis = showCircles && poopRadius > 0.01f;
+            
+            if (shouldShowThis)
+            {
+                // Update drawer position and radius
+                drawer.transform.position = plant.transform.position;
+                drawer.UpdateCircle(poopRadius, poopAbsorptionRadiusColorRuntime);
+            }
+            else
+            {
+                drawer.HideCircle();
+                plantsToRemove.Add(plant); // If radius is too small or zero, remove the visualizer
+            }
+        }
+        
+        // Remove plants that no longer need visualization
+        foreach (var plant in plantsToRemove)
+        {
+            if (activePoopAbsorptionCircleVisualizers.TryGetValue(plant, out RuntimeCircleDrawer drawer))
+            {
+                if (drawer != null) Destroy(drawer.gameObject);
+                activePoopAbsorptionCircleVisualizers.Remove(plant);
+            }
+        }
+        
+        // Create new visualizers for plants with poop fertilizer effect
+        foreach (PlantGrowth plant in plants)
+        {
+            if (plant == null || activePoopAbsorptionCircleVisualizers.ContainsKey(plant)) continue;
+            
+            float poopRadius = GetPlantPoopDetectionRadius(plant);
+            if (poopRadius <= 0.01f) continue; // Skip if radius is too small
+            
+            // Create new visualizer
+            GameObject circleGO = Instantiate(circleVisualizerPrefab, plant.transform.position, 
+                                             Quaternion.identity, circleContainer);
+            RuntimeCircleDrawer newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
+            
+            if (newDrawer != null)
+            {
+                newDrawer.UpdateCircle(poopRadius, poopAbsorptionRadiusColorRuntime);
+                activePoopAbsorptionCircleVisualizers.Add(plant, newDrawer);
+            }
+            else
+            {
+                Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
+                Destroy(circleGO);
+            }
+        }
+    }
+    
+    // NEW: Helper method to get poop detection radius from a plant
+    private float GetPlantPoopDetectionRadius(PlantGrowth plant)
+    {
+        if (plant == null) return 0f;
+        return plant.GetPoopDetectionRadius();
+    }
 
     // --- Runtime Visualizer Update ---
     void UpdateRuntimeCircleVisualizers()
     {
+        if (!Application.isPlaying) return; // Only run in play mode
+
+        // Check if lines should be shown globally
         bool showCircles = showScentRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
 
-        // Find all active ScentSources (can be slow, consider optimizing if needed)
-        // If performance becomes an issue, ScentSources could register/deregister themselves with the manager.
-        ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
-        HashSet<ScentSource> currentSourcesSet = new HashSet<ScentSource>(currentSources); // For quick lookup
-
-        // --- Update existing circles ---
+        // --- Update existing circles and create new ones ---
+        // Use a temporary list to avoid modifying dictionary while iterating
         List<ScentSource> sourcesToRemove = new List<ScentSource>();
+
         foreach (var kvp in activeCircleVisualizers)
         {
             ScentSource source = kvp.Key;
-            RuntimeCircleDrawer drawer = kvp.Value;
+            RuntimeCircleDrawer line = kvp.Value;
 
-            // Check if source still exists and is valid
-            if (source == null || drawer == null || !source.gameObject.activeInHierarchy || !currentSourcesSet.Contains(source))
+            if (source == null || line == null || !source.gameObject.activeInHierarchy) // Source or drawer destroyed unexpectedly
             {
                 sourcesToRemove.Add(source); // Mark for removal
-                if (drawer != null) Destroy(drawer.gameObject); // Destroy visualizer
+                if(line != null) Destroy(line.gameObject); // Destroy orphan drawer
                 continue;
             }
 
@@ -88,32 +205,39 @@ public class FloraManager : MonoBehaviour
             if (shouldShowThis)
             {
                  // Update drawer position to match source and update circle params
-                 drawer.transform.position = source.transform.position;
-                 drawer.transform.rotation = source.transform.rotation; // Match rotation? Optional.
-                 drawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
+                 line.transform.position = source.transform.position;
+                 line.transform.rotation = source.transform.rotation; // Match rotation? Optional.
+                 line.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
             }
             else
             {
-                 drawer.HideCircle(); // Hide if shouldn't be shown
+                 line.HideCircle(); // Hide if shouldn't be shown
             }
         }
 
         // Remove entries for sources that are gone
         foreach (var source in sourcesToRemove)
         {
+            if (activeCircleVisualizers.TryGetValue(source, out RuntimeCircleDrawer drawer) && drawer != null)
+                Destroy(drawer.gameObject);
             activeCircleVisualizers.Remove(source);
         }
 
         // --- Add circles for new sources ---
         if (showCircles)
         {
+            // Find all active ScentSources
+            ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
+            
             foreach (ScentSource source in currentSources)
             {
                 // Skip if already has a visualizer or is invalid
-                if (source == null || activeCircleVisualizers.ContainsKey(source) || !source.enabled || source.definition == null || source.EffectiveRadius <= 0.01f) continue;
+                if (source == null || activeCircleVisualizers.ContainsKey(source) || !source.enabled || 
+                    source.definition == null || source.EffectiveRadius <= 0.01f) continue;
 
                  // Create new visualizer
-                 GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position, source.transform.rotation, circleContainer);
+                 GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position, 
+                                                 source.transform.rotation, circleContainer);
                  RuntimeCircleDrawer newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
 
                  if (newDrawer != null)
@@ -158,6 +282,26 @@ public class FloraManager : MonoBehaviour
              }
              if (logGizmoCalls && drawnCount > 0) { /*...*/ }
              else if (logGizmoCalls && scentSources.Length > 0) { /*...*/ }
+        }
+        
+        // NEW: Draw poop absorption radius in editor
+        if (showPoopAbsorptionRadiiRuntime) {
+             Gizmos.color = poopAbsorptionRadiusColorRuntime;
+             PlantGrowth[] plants = FindObjectsByType<PlantGrowth>(FindObjectsSortMode.None);
+             int drawnCount = 0;
+             
+             foreach (PlantGrowth plant in plants) {
+                if (plant == null) continue;
+                float radius = GetPlantPoopDetectionRadius(plant);
+                if (radius > 0.01f) {
+                    Gizmos.DrawWireSphere(plant.transform.position, radius);
+                    drawnCount++;
+                }
+             }
+             
+             if (logGizmoCalls && drawnCount > 0) {
+                 Debug.Log($"[FloraManager] Drew {drawnCount} poop absorption radius gizmos");
+             }
         }
     }
     #endif

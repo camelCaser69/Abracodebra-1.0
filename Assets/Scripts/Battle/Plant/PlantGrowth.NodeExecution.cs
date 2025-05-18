@@ -62,6 +62,12 @@ public partial class PlantGrowth : MonoBehaviour
                  }
             }
         }
+        
+        // --- NEW: Check for poop to absorb in this cycle ---
+        if (poopDetectionRadius > 0f)
+        {
+            CheckForPoopAndAbsorb();
+        }
 
         // --- Execution Phase ---
         // Check Energy Cost *before* executing actions

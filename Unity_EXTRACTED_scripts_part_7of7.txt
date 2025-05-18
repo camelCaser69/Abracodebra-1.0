@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-10 01:49:48
+UNITY PROJECT SCRIPT EXPORT - 2025-05-17 03:36:09
 PART 7 OF 7
 ================================================================================
 
@@ -81,7 +81,8 @@ Assets
 │       └── Rule Tiles
 │           ├── DualGridRuleTile_Dirt.asset
 │           ├── DualGridRuleTile_DirtWet.asset
-│           └── DualGridRuleTile_Grass.asset
+│           ├── DualGridRuleTile_Grass.asset
+│           └── DualGridRuleTile_Water.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -105,7 +106,7 @@ Assets
 │   │   ├── Node_000_Seed.asset
 │   │   ├── Node_001_Berry.asset
 │   │   ├── Node_002_FireflyPheromone.asset
-│   │   └── Node_003_WaterPreserver.asset
+│   │   └── Node_003_PoopFertilizer.asset
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
@@ -125,6 +126,7 @@ Assets
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
+│   │   │   ├── LeafData.cs
 │   │   │   ├── PlantCell.cs
 │   │   │   ├── PlantGrowth.Cell.cs
 │   │   │   ├── PlantGrowth.Growth.cs
@@ -233,6 +235,340 @@ SCRIPT CONTENTS
 ================================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\NightColorPostProcess.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+
+// Ensure this script is attached to a GameObject in your scene
+public class NightColorPostProcess : MonoBehaviour
+{
+    [Header("Core References")]
+    [Tooltip("Assign the WeatherManager controlling the day/night cycle.")]
+    public WeatherManager weatherManager;
+    [Tooltip("Assign the Global Post Processing Volume.")]
+    public Volume globalVolume;
+
+    // --- Private references to the Volume Overrides ---
+    private ColorAdjustments colorAdjustments;
+    private FilmGrain filmGrain;
+    private Vignette vignette;
+    // private Bloom bloom; // Example if you wanted to add Bloom later
+
+    [Header("Color Adjustments")]
+    [Tooltip("The color filter at full day (sunIntensity = 1).")]
+    public Color dayColorFilter = Color.white;
+    [Tooltip("The color filter at full night (sunIntensity ~ 0).")]
+    public Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
+    [Tooltip("Daytime Post-Exposure (Higher = brighter).")]
+    public float dayPostExposure = 0f;
+    [Tooltip("Nighttime Post-Exposure (Lower = darker).")]
+    public float nightPostExposure = -0.5f;
+    [Tooltip("Saturation at full day (0 = no change, <0 desaturates, >0 saturates).")]
+    public float daySaturation = 0f;
+    [Tooltip("Saturation at full night (e.g., -50 for more desaturation).")]
+    public float nightSaturation = -50f;
+
+    [Header("Film Grain")]
+    [Tooltip("Film grain intensity at full day (0 = none).")]
+    [Range(0f, 1f)] public float dayFilmGrainIntensity = 0.1f;
+    [Tooltip("Film grain intensity at full night (e.g., 0.5 for noticeable grain).")]
+    [Range(0f, 1f)] public float nightFilmGrainIntensity = 0.5f;
+    // Note: You could also control FilmGrain.response if desired
+
+    [Header("Vignette")]
+    [Tooltip("Vignette intensity at full day (0 = none, higher = stronger effect).")]
+    [Range(0f, 1f)] public float dayVignetteIntensity = 0.2f;
+    [Tooltip("Vignette intensity at full night (e.g., 0.5 for darker edges).")]
+    [Range(0f, 1f)] public float nightVignetteIntensity = 0.5f;
+    [Tooltip("Vignette smoothness at full day (higher = softer edge).")]
+    [Range(0.01f, 1f)] public float dayVignetteSmoothness = 0.2f;
+    [Tooltip("Vignette smoothness at full night.")]
+    [Range(0.01f, 1f)] public float nightVignetteSmoothness = 0.3f;
+    // Note: You could also control Vignette.color or Vignette.rounded if desired
+
+
+    private void Start()
+    {
+        // --- Validate Core References ---
+        if (!weatherManager)
+        {
+            Debug.LogError($"[{nameof(NightColorPostProcess)}] WeatherManager not assigned!", this);
+            enabled = false; // Disable script if core references are missing
+            return;
+        }
+        if (!globalVolume)
+        {
+            Debug.LogError($"[{nameof(NightColorPostProcess)}] Global Volume not assigned!", this);
+            enabled = false;
+            return;
+        }
+        if (globalVolume.profile == null)
+        {
+             Debug.LogError($"[{nameof(NightColorPostProcess)}] Global Volume has no profile assigned!", this);
+             enabled = false;
+             return;
+        }
+
+        // --- Attempt to Get Volume Overrides ---
+        // It's okay if some aren't found, the Update loop will check for null
+        if (!globalVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments))
+        {
+            Debug.LogWarning($"[{nameof(NightColorPostProcess)}] ColorAdjustments override not found in Volume profile.", this);
+        }
+        if (!globalVolume.profile.TryGet<FilmGrain>(out filmGrain))
+        {
+             Debug.LogWarning($"[{nameof(NightColorPostProcess)}] FilmGrain override not found in Volume profile.", this);
+        }
+        if (!globalVolume.profile.TryGet<Vignette>(out vignette))
+        {
+             Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Vignette override not found in Volume profile.", this);
+        }
+        // Example for Bloom:
+        // if (!globalVolume.profile.TryGet<Bloom>(out bloom))
+        // {
+        //      Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Bloom override not found in Volume profile.", this);
+        // }
+
+        // --- Ensure Overrides are Active ---
+        // Make sure the overrides you intend to use are actually enabled on the Volume component itself.
+        // You might need to manually check the boxes in the Inspector for ColorAdjustments, FilmGrain, and Vignette.
+        // Alternatively, you could force them active here, but it's usually better to configure in the editor:
+        // if (colorAdjustments != null) colorAdjustments.active = true;
+        // if (filmGrain != null) filmGrain.active = true;
+        // if (vignette != null) vignette.active = true;
+    }
+
+    private void Update()
+    {
+        // No need to check weatherManager, Start() already disables if null
+        // Check if any overrides are available before proceeding
+        if (colorAdjustments == null && filmGrain == null && vignette == null)
+            return; // Nothing to update if no overrides were found
+
+        // Get the sun intensity (0 = night, 1 = day) and calculate interpolation factor t
+        float sun = Mathf.Clamp01(weatherManager.sunIntensity);
+        float t = 1f - sun;  // t=0 at day, t=1 at night
+
+        // --- Interpolate and Apply Color Adjustments ---
+        if (colorAdjustments != null)
+        {
+            colorAdjustments.colorFilter.value = Color.Lerp(dayColorFilter, nightColorFilter, t);
+            colorAdjustments.postExposure.value = Mathf.Lerp(dayPostExposure, nightPostExposure, t);
+            colorAdjustments.saturation.value = Mathf.Lerp(daySaturation, nightSaturation, t);
+        }
+
+        // --- Interpolate and Apply Film Grain ---
+        if (filmGrain != null)
+        {
+            filmGrain.intensity.value = Mathf.Lerp(dayFilmGrainIntensity, nightFilmGrainIntensity, t);
+            // You can add Lerp for filmGrain.response here if needed
+        }
+
+        // --- Interpolate and Apply Vignette ---
+        if (vignette != null)
+        {
+            vignette.intensity.value = Mathf.Lerp(dayVignetteIntensity, nightVignetteIntensity, t);
+            vignette.smoothness.value = Mathf.Lerp(dayVignetteSmoothness, nightVignetteSmoothness, t);
+             // You can add Lerp for vignette.color or vignette.rounded here if needed
+        }
+
+        // --- Example for Bloom ---
+        // if (bloom != null)
+        // {
+        //     bloom.intensity.value = Mathf.Lerp(dayBloomIntensity, nightBloomIntensity, t);
+        // }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\OutlinePartController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/OutlinePartController.cs
+using UnityEngine;
+
+[RequireComponent(typeof(SpriteRenderer))]
+public class OutlinePartController : MonoBehaviour
+{
+    private SpriteRenderer outlineRenderer;
+    private SpriteRenderer sourcePlantPartRenderer; // The plant part this outline mimics
+
+    [HideInInspector] public Vector2Int gridCoord; // The coordinate *this outline* lives at
+
+    void Awake()
+    {
+        outlineRenderer = GetComponent<SpriteRenderer>();
+        if (outlineRenderer != null)
+        {
+            outlineRenderer.drawMode = SpriteDrawMode.Simple;
+            outlineRenderer.enabled = false;
+        }
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] OutlinePartController is missing SpriteRenderer component!", this);
+        }
+    }
+
+    public void Initialize(SpriteRenderer sourceRenderer, Vector2Int myCoord, PlantOutlineController controller)
+    {
+        if (sourceRenderer == null || controller == null) 
+        { 
+            Debug.LogError($"[{gameObject.name}] Initialization failed! Source renderer or controller is null!", this);
+            Destroy(gameObject); 
+            return; 
+        }
+        
+        sourcePlantPartRenderer = sourceRenderer; // Store initial source
+        gridCoord = myCoord;
+        
+        if (outlineRenderer == null)
+        {
+            outlineRenderer = GetComponent<SpriteRenderer>();
+            if (outlineRenderer == null)
+            {
+                Debug.LogError($"[{gameObject.name}] Initialize: Cannot find SpriteRenderer component!", this);
+                Destroy(gameObject);
+                return;
+            }
+        }
+        
+        // Set layer & color properties
+        outlineRenderer.sortingLayerID = controller.OutlineSortingLayer;
+        outlineRenderer.sortingOrder = controller.OutlineSortingOrder;
+        outlineRenderer.color = controller.OutlineColor;
+        
+        // Set parent & position
+        transform.SetParent(controller.transform, true); // Parent to controller's transform
+        
+        // Set initial position based on grid coordinate (controller handles spacing)
+        float spacing = controller.GetComponentInParent<PlantGrowth>()?.GetCellSpacing() ?? 0.08f; // Get spacing
+        transform.localPosition = (Vector2)myCoord * spacing;
+
+        // Set visibility based on source renderer's state
+        outlineRenderer.enabled = IsSourceRendererValid() && 
+                                  sourcePlantPartRenderer.enabled && 
+                                  sourcePlantPartRenderer.sprite != null;
+        
+        SyncSpriteAndTransform(); // Initial sync
+    }
+
+    void LateUpdate()
+    {
+        // Skip update if not visible
+        if (outlineRenderer == null || !outlineRenderer.enabled) return;
+
+        // Check if source is still valid
+        if (!IsSourceRendererValid())
+        {
+            SetVisibility(false);
+            return;
+        }
+        
+        // Check if source is still enabled and has a sprite
+        if (!sourcePlantPartRenderer.enabled || sourcePlantPartRenderer.sprite == null)
+        {
+            SetVisibility(false);
+            return;
+        }
+
+        // If we are enabled and source is valid, sync visuals
+        SyncSpriteAndTransform();
+    }
+
+    // Public method to check if the source renderer still exists
+    public bool IsSourceRendererValid()
+    {
+        // Unity overloads null check for destroyed objects
+        if (sourcePlantPartRenderer == null)
+            return false;
+            
+        // Additional check: is the gameObject actually active/valid
+        if (!sourcePlantPartRenderer.gameObject.activeInHierarchy)
+            return false;
+            
+        return true;
+    }
+
+    // Public method to update the source renderer if the original was destroyed
+    public void UpdateSourceRenderer(SpriteRenderer newSource)
+    {
+        if (newSource != null)
+        {
+            sourcePlantPartRenderer = newSource;
+            
+            // Ensure visibility state is correct after source update
+            SetVisibility(
+                outlineRenderer != null && 
+                sourcePlantPartRenderer.enabled && 
+                sourcePlantPartRenderer.sprite != null
+            );
+            
+            // Immediately sync sprite/transform after updating source
+            SyncSpriteAndTransform();
+            
+            // Debug.Log($"Updated outline at {gridCoord} with new source renderer: {newSource.gameObject.name}");
+        } 
+        else 
+        {
+            Debug.LogWarning($"Attempted to update source renderer for outline at {gridCoord} with null.", gameObject);
+            // If no valid new source, hide this outline
+            SetVisibility(false);
+        }
+    }
+
+    // Sync sprite and transform data
+    public void SyncSpriteAndTransform()
+    {
+        // Safety checks
+        if (!IsSourceRendererValid() || outlineRenderer == null) 
+            return;
+
+        // Sync sprite
+        if (outlineRenderer.sprite != sourcePlantPartRenderer.sprite)
+        {
+            outlineRenderer.sprite = sourcePlantPartRenderer.sprite;
+        }
+        
+        // Sync other visual properties
+        transform.localScale = sourcePlantPartRenderer.transform.localScale;
+        outlineRenderer.flipX = sourcePlantPartRenderer.flipX;
+        outlineRenderer.flipY = sourcePlantPartRenderer.flipY;
+        
+        // Note: Position is set in Initialize and doesn't need to track source renderer's parent offset
+    }
+
+    public void SetVisibility(bool isVisible)
+    {
+        if (outlineRenderer != null && outlineRenderer.enabled != isVisible)
+        {
+            outlineRenderer.enabled = isVisible;
+        }
+    }
+
+    public void DestroyOutlinePart()
+    {
+        if (this != null && gameObject != null)
+        {
+            if (Application.isPlaying)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                DestroyImmediate(gameObject);
+            }
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Visuals\PlantOutlineController.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿// FILE: Assets/Scripts/Visuals/PlantOutlineController.cs
@@ -250,10 +586,6 @@ public class PlantOutlineController : MonoBehaviour
     [SerializeField] private bool excludeBaseCell = true;
     [SerializeField] private GameObject outlinePartPrefab;
     
-    [Header("Performance Options")]
-    [SerializeField] private bool batchOutlineUpdates = true;
-    [SerializeField] [Range(0.05f, 0.5f)] private float updateInterval = 0.1f;
-
     [Header("Sorting")]
     [SerializeField] private string outlineSortingLayerName = "Default";
     [SerializeField] private int outlineSortingOrder = -1;
@@ -272,8 +604,6 @@ public class PlantOutlineController : MonoBehaviour
     private Dictionary<Vector2Int, OutlinePartController> outlinePartMap = new Dictionary<Vector2Int, OutlinePartController>();
     private HashSet<Vector2Int> plantCellCoords = new HashSet<Vector2Int>();
     
-    private float lastUpdateTime = 0f;
-
     // Neighbor offsets - 8 directions around a cell
     private static readonly Vector2Int[] neighborOffsets = new Vector2Int[]
     {
@@ -782,7 +1112,8 @@ public class PlantShadowController : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Visuals\RuntimeCircleDrawer.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Visuals/Debug/RuntimeCircleDrawer.cs
+﻿// FILE: Assets/Scripts/Visuals/RuntimeCircleDrawer.cs
+
 using UnityEngine;
 
 /// <summary>
@@ -823,7 +1154,14 @@ public class RuntimeCircleDrawer : MonoBehaviour
         lineRenderer.loop = true; // Connect the last point to the first
         lineRenderer.startWidth = lineWidth;
         lineRenderer.endWidth = lineWidth;
-        lineRenderer.material = lineMaterial;
+        
+        // Only set material if one was provided and lineRenderer doesn't have one
+        if (lineMaterial != null && lineRenderer.material == null)
+        {
+            lineRenderer.material = lineMaterial;
+        }
+        
+        // Don't set color here - UpdateCircle will handle that
 
         // Attempt to match sorting with parent sprite
         SpriteRenderer parentSprite = GetComponentInParent<SpriteRenderer>();
@@ -841,10 +1179,13 @@ public class RuntimeCircleDrawer : MonoBehaviour
     public void UpdateCircle(float newRadius, Color newColor)
     {
         // Check if parameters have actually changed
-        if (!needsRedraw && Mathf.Approximately(currentRadius, newRadius) && currentColor == newColor)
+        bool radiusChanged = !Mathf.Approximately(currentRadius, newRadius);
+        bool colorChanged = currentColor != newColor;
+        
+        if (!needsRedraw && !radiusChanged && !colorChanged)
         {
             // Ensure it's enabled if it wasn't already
-             if (!lineRenderer.enabled) lineRenderer.enabled = true;
+            if (!lineRenderer.enabled) lineRenderer.enabled = true;
             return; // No change needed
         }
 
@@ -854,9 +1195,16 @@ public class RuntimeCircleDrawer : MonoBehaviour
         currentColor = newColor;
         color = newColor; // Update public field
 
-        // Update LineRenderer appearance settings that might change
+        // IMPORTANT: Update LineRenderer colors
         lineRenderer.startColor = currentColor;
         lineRenderer.endColor = currentColor;
+        
+        // Log color change for debugging
+        if (colorChanged && Debug.isDebugBuild)
+        {
+            Debug.Log($"[RuntimeCircleDrawer] Updated color to: {newColor}", gameObject);
+        }
+        
         // Update width if you add properties for it too
         // lineRenderer.startWidth = newWidth;
         // lineRenderer.endWidth = newWidth;

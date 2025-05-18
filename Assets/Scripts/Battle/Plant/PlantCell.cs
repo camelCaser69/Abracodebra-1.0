@@ -1,4 +1,5 @@
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantCell.cs
+﻿// FILE: Assets/Scripts/Battle/Plant/PlantCell.cs (Fix Leaf Tracking)
+
 using UnityEngine;
 
 // Define the enum here if it's closely tied to PlantCell,
@@ -16,13 +17,18 @@ public class PlantCell : MonoBehaviour
     private void OnDestroy()
     {
         // Notify the parent plant that this cell is gone, if the parent still exists
-        // Ensure shadow is unregistered *before* destruction, handled in PlantGrowth.RemovePlantCell
         if (ParentPlantGrowth != null)
         {
-            // Use the public method on PlantGrowth to handle removal logic cleanly
-            // This ensures the dictionary and shadow are handled correctly
-            // ParentPlantGrowth.HandleCellDestruction(this); // Or pass GridCoord if preferred
-            // Let's stick to the original notification for now, cleanup is in PlantGrowth.RemovePlantCell
+            // If it's a leaf being destroyed, ensure it's marked as inactive for potential regrowth
+            if (CellType == PlantCellType.Leaf)
+            {
+                // Call the plant growth to let it know this is a leaf being destroyed
+                // This helps ensure we mark it as inactive for regrowth
+                if (Debug.isDebugBuild)
+                    Debug.Log($"[PlantCell OnDestroy] Leaf at {GridCoord} is being destroyed - notifying parent plant", gameObject);
+            }
+            
+            // Notify parent to update tracking and handle removal
             ParentPlantGrowth.ReportCellDestroyed(GridCoord);
         }
     }

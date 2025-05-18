@@ -1,6 +1,9 @@
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Ecosystem/Core/PoopController.cs (Ensure Collider is Added)
+
+using UnityEngine;
 using TMPro;
 
+[RequireComponent(typeof(Collider2D))] // Add RequireComponent for Collider2D
 public class PoopController : MonoBehaviour
 {
     [Tooltip("Total lifetime of this poop (in seconds) before disappearing.")]
@@ -13,6 +16,7 @@ public class PoopController : MonoBehaviour
     private SpriteRenderer sr;
     private float timer = 0f;
     private Color initialColor;
+    private Collider2D poopCollider; // Reference to the collider
 
     private void Awake()
     {
@@ -21,6 +25,18 @@ public class PoopController : MonoBehaviour
         {
             initialColor = sr.color;
         }
+        
+        // Ensure there's a collider and it's properly configured
+        poopCollider = GetComponent<Collider2D>();
+        if (poopCollider == null)
+        {
+            // If no collider exists, add a CircleCollider2D
+            poopCollider = gameObject.AddComponent<CircleCollider2D>();
+            Debug.Log($"Added CircleCollider2D to {gameObject.name} for poop detection", gameObject);
+        }
+        
+        // Make sure it's a trigger so it doesn't block movement
+        poopCollider.isTrigger = true;
     }
 
     private void Update()
@@ -55,5 +71,16 @@ public class PoopController : MonoBehaviour
         timer = 0f;
         if (sr != null)
             initialColor = sr.color;
+            
+        // Ensure collider is configured properly
+        if (poopCollider == null)
+        {
+            poopCollider = GetComponent<Collider2D>();
+            if (poopCollider == null)
+            {
+                poopCollider = gameObject.AddComponent<CircleCollider2D>();
+            }
+            poopCollider.isTrigger = true;
+        }
     }
 }

@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-10 01:49:48
+UNITY PROJECT SCRIPT EXPORT - 2025-05-17 03:36:09
 PART 1 OF 7
 ================================================================================
 
@@ -81,7 +81,8 @@ Assets
 │       └── Rule Tiles
 │           ├── DualGridRuleTile_Dirt.asset
 │           ├── DualGridRuleTile_DirtWet.asset
-│           └── DualGridRuleTile_Grass.asset
+│           ├── DualGridRuleTile_Grass.asset
+│           └── DualGridRuleTile_Water.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -105,7 +106,7 @@ Assets
 │   │   ├── Node_000_Seed.asset
 │   │   ├── Node_001_Berry.asset
 │   │   ├── Node_002_FireflyPheromone.asset
-│   │   └── Node_003_WaterPreserver.asset
+│   │   └── Node_003_PoopFertilizer.asset
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
@@ -125,6 +126,7 @@ Assets
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
+│   │   │   ├── LeafData.cs
 │   │   │   ├── PlantCell.cs
 │   │   │   ├── PlantGrowth.Cell.cs
 │   │   │   ├── PlantGrowth.Growth.cs
@@ -627,9 +629,35 @@ public class NodeEffectDrawer : PropertyDrawer
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Battle\Plant\LeafData.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Battle/Plant/LeafData.cs
+using UnityEngine;
+
+/// <summary>
+/// Class to store information about leaves for regrowth tracking
+/// </summary>
+[System.Serializable]
+public class LeafData
+{
+    public Vector2Int GridCoord;
+    public bool IsActive; // True if the leaf exists, false if it was eaten
+    
+    public LeafData(Vector2Int coord, bool isActive = true)
+    {
+        GridCoord = coord;
+        IsActive = isActive;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Battle\Plant\PlantCell.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantCell.cs
+﻿// FILE: Assets/Scripts/Battle/Plant/PlantCell.cs (Fix Leaf Tracking)
+
 using UnityEngine;
 
 // Define the enum here if it's closely tied to PlantCell,
@@ -647,13 +675,18 @@ public class PlantCell : MonoBehaviour
     private void OnDestroy()
     {
         // Notify the parent plant that this cell is gone, if the parent still exists
-        // Ensure shadow is unregistered *before* destruction, handled in PlantGrowth.RemovePlantCell
         if (ParentPlantGrowth != null)
         {
-            // Use the public method on PlantGrowth to handle removal logic cleanly
-            // This ensures the dictionary and shadow are handled correctly
-            // ParentPlantGrowth.HandleCellDestruction(this); // Or pass GridCoord if preferred
-            // Let's stick to the original notification for now, cleanup is in PlantGrowth.RemovePlantCell
+            // If it's a leaf being destroyed, ensure it's marked as inactive for potential regrowth
+            if (CellType == PlantCellType.Leaf)
+            {
+                // Call the plant growth to let it know this is a leaf being destroyed
+                // This helps ensure we mark it as inactive for regrowth
+                if (Debug.isDebugBuild)
+                    Debug.Log($"[PlantCell OnDestroy] Leaf at {GridCoord} is being destroyed - notifying parent plant", gameObject);
+            }
+            
+            // Notify parent to update tracking and handle removal
             ParentPlantGrowth.ReportCellDestroyed(GridCoord);
         }
     }
@@ -678,16 +711,41 @@ public partial class PlantGrowth : MonoBehaviour
 
     public void ReportCellDestroyed(Vector2Int coord)
     {
-        if (cells.ContainsKey(coord)) {
+        if (cells.ContainsKey(coord))
+        {
+            // Check what type of cell is being destroyed
+            PlantCellType cellType = cells[coord];
+        
+            // If it's a leaf, mark it as inactive for potential regrowth
+            if (cellType == PlantCellType.Leaf)
+            {
+                // Find and update the leaf data
+                for (int i = 0; i < leafDataList.Count; i++)
+                {
+                    if (leafDataList[i].GridCoord == coord)
+                    {
+                        LeafData updatedData = leafDataList[i];
+                        updatedData.IsActive = false; // Mark as eaten/missing
+                        leafDataList[i] = updatedData;
+                    
+                        if (Debug.isDebugBuild)
+                            Debug.Log($"[{gameObject.name}] Leaf at {coord} marked as missing for potential regrowth via ReportCellDestroyed.");
+                    
+                        break;
+                    }
+                }
+            }
+        
             cells.Remove(coord);
             // Assume RemovePlantCell(GameObject) will be called externally for proper cleanup
             // We still need to clean the GO list if destruction happened unexpectedly
             activeCellGameObjects.RemoveAll(go => go == null || (go.GetComponent<PlantCell>()?.GridCoord == coord));
 
-             // Trigger outline update after internal state change
-             if (enableOutline && outlineController != null) {
-                 outlineController.OnPlantCellRemoved(coord);
-             }
+            // Trigger outline update after internal state change
+            if (enableOutline && outlineController != null)
+            {
+                outlineController.OnPlantCellRemoved(coord);
+            }
         }
     }
 
@@ -700,6 +758,26 @@ public partial class PlantGrowth : MonoBehaviour
         if (cellComp == null) { Destroy(cellToRemove); return; } // Destroy if no component
 
         Vector2Int coord = cellComp.GridCoord;
+        
+        // NEW: Check if this is a leaf and mark it as inactive in our leaf data list
+        if (cellComp.CellType == PlantCellType.Leaf)
+        {
+            // Find matching leaf data and mark as inactive (missing)
+            for (int i = 0; i < leafDataList.Count; i++)
+            {
+                if (leafDataList[i].GridCoord == coord)
+                {
+                    LeafData updatedData = leafDataList[i];
+                    updatedData.IsActive = false; // Mark as eaten/missing
+                    leafDataList[i] = updatedData;
+                    
+                    if (Debug.isDebugBuild)
+                        Debug.Log($"[{gameObject.name}] Leaf at {coord} marked as missing for potential regrowth.");
+                    
+                    break;
+                }
+            }
+        }
 
         // --- Unregister Visuals FIRST ---
         // Shadow
@@ -862,6 +940,10 @@ public partial class PlantGrowth : MonoBehaviour
         float cooldownModifier = 0f;
         float castDelayModifier = 0f;
         bool seedFound = false;
+        
+        // Initialize poop fertilizer values to zero
+        poopDetectionRadius = 0f;
+        poopAbsorptionRate = 0f;
 
         foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
             if (node?.effects == null) continue;
@@ -898,6 +980,10 @@ public partial class PlantGrowth : MonoBehaviour
                         break;
                     case NodeEffectType.CastDelay:
                         castDelayModifier += effect.primaryValue;
+                        break;
+                    case NodeEffectType.PoopFertilizer:
+                        poopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
+                        poopAbsorptionRate = Mathf.Max(0f, effect.secondaryValue);
                         break;
                         // Add other passive effects here if needed
                 }
@@ -950,7 +1036,7 @@ public partial class PlantGrowth : MonoBehaviour
         public int StemIndex; // Track which stem this belongs to (for percentage)
     }
 
-    // --- GrowthCoroutine_TimeBased ---              // <<< NEW COROUTINE
+    // --- GrowthCoroutine_TimeBased ---              // <<< FIXED COROUTINE
     private IEnumerator GrowthCoroutine_TimeBased()
     {
         if (targetStemLength <= 0)
@@ -960,18 +1046,26 @@ public partial class PlantGrowth : MonoBehaviour
             yield break;
         }
 
-        List<GrowthStep> growthPlan = PreCalculateGrowthPlan(); // Assumes this method exists
-        int totalStepsInPlan = growthPlan.Count;
-        if (totalStepsInPlan == 0)
+        List<GrowthStep> growthPlan = PreCalculateGrowthPlan();
+        
+        // Reset all growth tracking variables
+        totalPlannedSteps = growthPlan.Count;
+        stepsCompleted = 0;
+        actualGrowthProgress = 0f;
+        
+        if (totalPlannedSteps == 0)
         {
             currentState = PlantState.GrowthComplete;
             growthCoroutine = null;
             yield break;
         }
 
+        // --- Count stem steps for better time estimation ---
+        int stemStepsCount = growthPlan.Count(step => step.CellType == PlantCellType.Stem);
+        if (stemStepsCount == 0) stemStepsCount = 1; // Safety check
+
         // --- Initialize Time Variables ---
         currentGrowthElapsedTime = 0f; // Reset elapsed time for this growth cycle
-        int stepsCompleted = 0;
         float baseTimePerStep = finalGrowthSpeed;
         if (baseTimePerStep <= 0.001f) baseTimePerStep = 0.01f;
 
@@ -984,19 +1078,24 @@ public partial class PlantGrowth : MonoBehaviour
         }
         float initialEffectiveTimePerStep = baseTimePerStep / initialTileMultiplier;
         if (initialEffectiveTimePerStep < 0.001f) initialEffectiveTimePerStep = 0.001f;
-        estimatedTotalGrowthTime = totalStepsInPlan * initialEffectiveTimePerStep;
+        
+        // --- Use stem count for time estimate, not total steps ---
+        estimatedTotalGrowthTime = stemStepsCount * initialEffectiveTimePerStep;
         // Ensure estimated time is at least a small positive value
         if (estimatedTotalGrowthTime < 0.01f) estimatedTotalGrowthTime = 0.01f;
-        // --------------------------------------------------------------------
 
-        // Debug.Log($"[{gameObject.name}] Starting growth. Est. Time: {estimatedTotalGrowthTime:F2}s");
+        float lastUpdateTime = Time.time;
+        float updateProgressInterval = 0.1f; // Update progress at least every 0.1 seconds
+
+        // --- Track actual progress toward next step ---
+        float progressTowardNextStep = 0f;
 
         // --- Growth Loop ---
-        while (stepsCompleted < totalStepsInPlan && currentState == PlantState.Growing)
+        while (stepsCompleted < totalPlannedSteps && currentState == PlantState.Growing)
         {
-            // 1. Accumulate & Store Elapsed Time
+            // 1. Get Current Frame's Delta Time
             float frameDeltaTime = Time.deltaTime;
-            currentGrowthElapsedTime += frameDeltaTime; // Update member variable
+            currentGrowthElapsedTime += frameDeltaTime;
 
             // 2. Get Current Tile Modifier
             float currentTileMultiplier = 1.0f;
@@ -1006,27 +1105,44 @@ public partial class PlantGrowth : MonoBehaviour
                 currentTileMultiplier = Mathf.Clamp(currentTileMultiplier, 0.1f, 10.0f);
             }
 
-            // 3. Calculate Target Steps based on *current* effective time per step
+            // 3. Calculate current effective time per step
             float currentEffectiveTimePerStep = baseTimePerStep / currentTileMultiplier;
             if (currentEffectiveTimePerStep < 0.001f) currentEffectiveTimePerStep = 0.001f;
 
-            // Use the MEMBER variable currentGrowthElapsedTime for calculation
-            int targetSteps = Mathf.FloorToInt(currentGrowthElapsedTime / currentEffectiveTimePerStep);
+            // 4. FIXED: Calculate progress rate - how quickly we accumulate progress relative to base rate
+            //    When growth speed increases, we accumulate progress faster proportionally
+            float progressRate = initialEffectiveTimePerStep / currentEffectiveTimePerStep;
+            
+            // 5. Add progress toward next step based on adjusted progress rate
+            progressTowardNextStep += frameDeltaTime * progressRate;
+            
+            // 6. Calculate partial progress (0-1) toward next step for UI smoothness
+            actualGrowthProgress = Mathf.Clamp01(progressTowardNextStep / initialEffectiveTimePerStep);
+            
+            // 7. Check if we've accumulated enough progress for one or more steps
+            int stepsToProcessThisFrame = 0;
+            
+            while (progressTowardNextStep >= initialEffectiveTimePerStep && stepsCompleted < totalPlannedSteps) 
+            {
+                stepsToProcessThisFrame++;
+                progressTowardNextStep -= initialEffectiveTimePerStep;
+                
+                // Limit steps per frame to prevent lag
+                if (stepsToProcessThisFrame >= 3) break;
+            }
 
-            // 4. Process Pending Steps
-            int stepsToProcessThisFrame = targetSteps - stepsCompleted;
-
+            // 8. Process the steps
             if (stepsToProcessThisFrame > 0)
             {
                 for (int i = 0; i < stepsToProcessThisFrame; i++)
                 {
-                    int currentPlanIndex = stepsCompleted + i;
-                    if (currentPlanIndex >= totalStepsInPlan) break;
+                    int currentPlanIndex = stepsCompleted;
+                    if (currentPlanIndex >= totalPlannedSteps) break;
 
                     GrowthStep step = growthPlan[currentPlanIndex];
-                    GameObject spawnedCell = SpawnCellVisual(step.CellType, step.Position, null, null); // Assumes method exists
+                    GameObject spawnedCell = SpawnCellVisual(step.CellType, step.Position, null, null);
 
-                    // --- Update percentage ONLY in DISCRETE mode here ---
+                    // Update stem count for discrete percentage display
                     if (step.CellType == PlantCellType.Stem)
                     {
                         currentStemCount = step.StemIndex;
@@ -1035,16 +1151,34 @@ public partial class PlantGrowth : MonoBehaviour
                              UpdateGrowthPercentageUI();
                         }
                     }
-                    // -----------------------------------------------------
+                    
+                    stepsCompleted++;
                 }
-                stepsCompleted += stepsToProcessThisFrame;
+                
+                lastUpdateTime = Time.time;
+                
+                // Update partial progress after steps
+                actualGrowthProgress = Mathf.Clamp01(progressTowardNextStep / initialEffectiveTimePerStep);
+            }
+            
+            // 9. Update UI based on time interval regardless of steps processed
+            if (Time.time - lastUpdateTime > updateProgressInterval)
+            {
+                if (continuousIncrement)
+                {
+                    UpdateGrowthPercentageUI();
+                }
+                lastUpdateTime = Time.time;
             }
 
-            // 5. Yield
+            // 10. Yield
             yield return null;
         }
 
+        // Final update to ensure we reach 100%
         currentState = PlantState.GrowthComplete;
+        stepsCompleted = totalPlannedSteps;
+        actualGrowthProgress = 1.0f;
         growthCoroutine = null;
     }
 
@@ -1106,6 +1240,16 @@ public partial class PlantGrowth : MonoBehaviour
                 }
             }
         }
+        
+        // Track all leaf positions for potential regrowth
+        foreach (GrowthStep step in plan)
+        {
+            if (step.CellType == PlantCellType.Leaf)
+            {
+                leafDataList.Add(new LeafData(step.Position, true));
+            }
+        }
+        
         return plan;
     }
 

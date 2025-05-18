@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-10 01:49:48
+UNITY PROJECT SCRIPT EXPORT - 2025-05-17 03:36:09
 PART 5 OF 7
 ================================================================================
 
@@ -81,7 +81,8 @@ Assets
 │       └── Rule Tiles
 │           ├── DualGridRuleTile_Dirt.asset
 │           ├── DualGridRuleTile_DirtWet.asset
-│           └── DualGridRuleTile_Grass.asset
+│           ├── DualGridRuleTile_Grass.asset
+│           └── DualGridRuleTile_Water.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -105,7 +106,7 @@ Assets
 │   │   ├── Node_000_Seed.asset
 │   │   ├── Node_001_Berry.asset
 │   │   ├── Node_002_FireflyPheromone.asset
-│   │   └── Node_003_WaterPreserver.asset
+│   │   └── Node_003_PoopFertilizer.asset
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
@@ -125,6 +126,7 @@ Assets
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
+│   │   │   ├── LeafData.cs
 │   │   │   ├── PlantCell.cs
 │   │   │   ├── PlantGrowth.Cell.cs
 │   │   │   ├── PlantGrowth.Growth.cs
@@ -231,6 +233,345 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeCell.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+[RequireComponent(typeof(RectTransform))]
+// Remove IPointerClickHandler interface from here
+// Keep IDropHandler for dropping onto the cell background
+public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler // Keep IPointerClickHandler for RIGHT click on empty
+{
+    public static NodeCell CurrentlySelectedCell { get; private set; }
+    public int CellIndex { get; private set; }
+
+    private NodeEditorGridController _controller;
+    private NodeData _nodeData;
+    private NodeView _nodeView;
+    private Image _backgroundImage;
+
+    // --- Init remains the same ---
+    public void Init(int index, NodeEditorGridController gridController, Image bgImage)
+    {
+        CellIndex = index;
+        _controller = gridController;
+        _backgroundImage = bgImage;
+
+        if (_backgroundImage != null && _controller != null)
+        {
+            _backgroundImage.color = _controller.EmptyCellColor;
+            _backgroundImage.enabled = true;
+        }
+    }
+
+    // --- HasNode, Getters remain the same ---
+    public bool HasNode() => _nodeData != null && _nodeView != null;
+    public NodeData GetNodeData() => _nodeData;
+    public NodeView GetNodeView() => _nodeView;
+
+    // --- AssignNode, AssignNodeView remain the same ---
+     public void AssignNode(NodeDefinition def)
+    {
+        if (def == null || _controller == null) return;
+        RemoveNode();
+
+        _nodeData = new NodeData() { /* ... data setup ... */
+            nodeId = System.Guid.NewGuid().ToString(),
+            nodeDisplayName = def.displayName,
+            effects = def.CloneEffects(),
+            orderIndex = this.CellIndex
+        };
+
+        GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : _controller.NodeViewPrefab;
+        if (prefabToInstantiate == null) { /* ... error handling ... */ Debug.LogError($"..."); _nodeData = null; return; }
+
+        GameObject nodeViewGO = Instantiate(prefabToInstantiate, transform);
+        _nodeView = nodeViewGO.GetComponent<NodeView>();
+        if (_nodeView == null) { /* ... error handling ... */ Debug.LogError($"..."); Destroy(nodeViewGO); _nodeData = null; return; }
+
+        _nodeView.Initialize(_nodeData, def, _controller); // Init NodeView
+
+        NodeDraggable draggable = _nodeView.GetComponent<NodeDraggable>();
+        if (draggable == null) draggable = _nodeView.gameObject.AddComponent<NodeDraggable>();
+        draggable.Initialize(_controller, this); // Init Draggable
+
+        if(_backgroundImage != null) _backgroundImage.enabled = true;
+    }
+     public void AssignNodeView(NodeView view, NodeData data)
+    {
+         RemoveNode();
+         _nodeView = view;
+         _nodeData = data;
+         if (_nodeView != null) {
+             _nodeView.transform.SetParent(transform, false);
+             if (_nodeData != null) _nodeData.orderIndex = this.CellIndex;
+             // Parent ref will be updated by NodeDraggable.SnapToCell which calls NodeView.UpdateParent...
+         }
+         if(_backgroundImage != null) _backgroundImage.enabled = true;
+    }
+
+
+    // --- RemoveNode, ClearNodeReference remain the same ---
+    public void RemoveNode()
+    {
+        bool wasSelected = (CurrentlySelectedCell == this);
+        if (_nodeView != null) {
+            if (wasSelected) {
+                 _nodeView.Unhighlight();
+                 CurrentlySelectedCell = null;
+            }
+            Destroy(_nodeView.gameObject);
+        }
+        _nodeView = null; _nodeData = null;
+        if (wasSelected && CurrentlySelectedCell == this) CurrentlySelectedCell = null;
+        if(_backgroundImage != null) _backgroundImage.enabled = true;
+    }
+     public void ClearNodeReference()
+    {
+        _nodeView = null; _nodeData = null;
+        if(_backgroundImage != null) _backgroundImage.enabled = true;
+    }
+
+    // --- Selection Handling (SelectCell, ClearSelection) remains the same ---
+     public static void SelectCell(NodeCell cellToSelect)
+    {
+        if (cellToSelect == null || !cellToSelect.HasNode()) { ClearSelection(); return; }
+        if (CurrentlySelectedCell == cellToSelect) return;
+        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
+            CurrentlySelectedCell.GetNodeView().Unhighlight();
+        }
+        CurrentlySelectedCell = cellToSelect;
+        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
+            CurrentlySelectedCell.GetNodeView().Highlight();
+        }
+    }
+     public static void ClearSelection()
+    {
+        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
+            CurrentlySelectedCell.GetNodeView().Unhighlight();
+        }
+        CurrentlySelectedCell = null;
+    }
+
+    // --- Event Handlers UPDATED ---
+
+    /// <summary>
+    /// Handles clicks on the CELL BACKGROUND image.
+    /// Left Click: Does nothing (NodeView handles selection).
+    /// Right Click: Opens add node menu ONLY if the cell is currently empty.
+    /// </summary>
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // This click is on the NodeCell's background image
+
+        if (eventData.button == PointerEventData.InputButton.Right)
+        {
+            // Right Click: Only allow opening the dropdown if the cell is currently EMPTY.
+            if (!HasNode())
+            {
+                // Debug.Log($"NodeCell Background Clicked (Right) on Empty Cell {CellIndex}. Opening dropdown.");
+                ClearSelection(); // Clear selection before showing add menu
+                _controller?.OnEmptyCellRightClicked(this, eventData);
+            }
+            // If right-clicking the background of an occupied cell, do nothing.
+        }
+        // Left click on the background does nothing regarding selection now.
+    }
+
+
+    // --- OnDrop remains the same ---
+    public void OnDrop(PointerEventData eventData)
+    {
+        GameObject draggedObject = eventData.pointerDrag;
+        if (draggedObject != null) {
+            NodeDraggable draggedNode = draggedObject.GetComponent<NodeDraggable>();
+            if (draggedNode != null && _controller != null) {
+                 _controller.HandleNodeDrop(draggedNode, draggedNode.OriginalCell, eventData.position);
+            }
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\NodeDraggable.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
+[RequireComponent(typeof(RectTransform))]
+public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+{
+    private RectTransform _rectTransform;
+    private CanvasGroup _canvasGroup;
+    private Vector2 _originalAnchoredPosition;
+    private Transform _originalParent;
+    private NodeCell _originalCell;
+    private NodeEditorGridController _gridController;
+    private Canvas _rootCanvas;
+
+    // No _isDragging flag needed if managed carefully by events
+
+    public NodeCell OriginalCell => _originalCell;
+
+    void Awake()
+    {
+        _rectTransform = GetComponent<RectTransform>();
+        _canvasGroup = GetComponent<CanvasGroup>();
+        if (_canvasGroup == null)
+        {
+            _canvasGroup = gameObject.AddComponent<CanvasGroup>();
+        }
+        // CRITICAL: Default state MUST allow interactions (clicks, hovers)
+        _canvasGroup.blocksRaycasts = true;
+        _canvasGroup.alpha = 1f; // Ensure fully visible
+    }
+
+    public void Initialize(NodeEditorGridController controller, NodeCell startingCell)
+    {
+        _gridController = controller;
+        _originalCell = startingCell;
+        _rootCanvas = GetComponentInParent<Canvas>()?.rootCanvas;
+        if (_rootCanvas == null) Debug.LogError("[NodeDraggable] Could not find root Canvas!");
+
+        // Ensure initial state after initialization
+        if (_canvasGroup != null) {
+             _canvasGroup.blocksRaycasts = true;
+             _canvasGroup.alpha = 1f;
+        }
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+        if (_gridController == null || _rootCanvas == null) return;
+
+        _originalParent = transform.parent;
+        _originalCell = _originalParent?.GetComponent<NodeCell>();
+        _originalAnchoredPosition = _rectTransform.anchoredPosition;
+
+        // Become transparent and STOP blocking raycasts so underlying cells can be detected
+        _canvasGroup.alpha = 0.6f;
+        _canvasGroup.blocksRaycasts = false;
+
+        // Reparent for top rendering
+        transform.SetParent(_rootCanvas.transform, true);
+        transform.SetAsLastSibling();
+         // Debug.Log($"[NodeDraggable OnBeginDrag] Started drag. blocksRaycasts: {_canvasGroup.blocksRaycasts}", gameObject);
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        // Only process drag if it's the left button and dragging is conceptually active (raycasts blocked)
+        if (eventData.button != PointerEventData.InputButton.Left || _canvasGroup == null || _canvasGroup.blocksRaycasts) return;
+        if (_gridController == null || _rootCanvas == null) return;
+
+        // Move logic (unchanged)
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+             _rootCanvas.transform as RectTransform, eventData.position,
+             _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 currentLocalPoint);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _rootCanvas.transform as RectTransform, eventData.position - eventData.delta,
+            _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 previousLocalPoint);
+        Vector2 localDelta = currentLocalPoint - previousLocalPoint;
+        _rectTransform.localPosition += (Vector3)localDelta;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+         // Debug.Log($"[NodeDraggable OnEndDrag] Drag ended. Button: {eventData.button}", gameObject);
+
+        // Ensure visuals and raycast blocking are reset REGARDLESS of button, BEFORE handling drop
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true; // CRITICAL: Re-enable raycasts immediately
+             // Debug.Log($"--> Reset alpha and blocksRaycasts to: {_canvasGroup.blocksRaycasts}");
+        }
+
+        // Only handle the drop logic if the drag was initiated by the left button
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            if (_gridController != null) {
+                _gridController.HandleNodeDrop(this, _originalCell, eventData.position);
+            } else {
+                 // No controller, attempt reset
+                 ResetPosition();
+            }
+        }
+        else
+        {
+             // If drag ended via another button (unlikely but possible), ensure reset
+             ResetPosition();
+        }
+    }
+
+    public void ResetPosition()
+    {
+        // Debug.Log($"[NodeDraggable ResetPosition] Resetting {gameObject.name}", gameObject);
+        // Reset parent and position
+        transform.SetParent(_originalParent, false);
+        _rectTransform.anchoredPosition = _originalAnchoredPosition;
+        _originalCell = _originalParent?.GetComponent<NodeCell>(); // Update cell ref
+
+        // Ensure visuals and raycasts are correct after reset
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+        }
+
+        // Update parent cell reference on the NodeView
+        NodeView view = GetComponent<NodeView>();
+        view?.UpdateParentCellReference();
+    }
+
+    public void SnapToCell(NodeCell targetCell)
+    {
+        // Debug.Log($"[NodeDraggable SnapToCell] Snapping {gameObject.name} to Cell {targetCell?.CellIndex}", gameObject);
+        if (targetCell == null) { ResetPosition(); return; }
+
+        // Set Parent and Position
+        transform.SetParent(targetCell.transform, false);
+        _rectTransform.anchoredPosition = Vector2.zero;
+
+        // Update Internal Draggable References
+        _originalParent = targetCell.transform;
+        _originalCell = targetCell;
+        _originalAnchoredPosition = Vector2.zero;
+
+        // Ensure visuals and raycasts are correct after snap
+        if (_canvasGroup != null) {
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+        }
+
+        // Update the NodeView's parent reference
+        NodeView view = GetComponent<NodeView>();
+        view?.UpdateParentCellReference();
+    }
+
+    // OnDisable might not be strictly needed now but can be kept as safety
+    void OnDisable()
+    {
+        // If it was disabled mid-drag (blocksRaycasts == false), reset state
+        if (_canvasGroup != null && !_canvasGroup.blocksRaycasts)
+        {
+             Debug.LogWarning($"[NodeDraggable] Disabled while dragging {gameObject.name}. Resetting CanvasGroup.", gameObject);
+            _canvasGroup.alpha = 1f;
+            _canvasGroup.blocksRaycasts = true;
+            // Resetting position might be desired but complex here, ensure visuals are ok.
+        }
+    }
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeEditorGridController.cs
@@ -1339,450 +1680,6 @@ public class PlantGrowthModifierManager : MonoBehaviour
     public void OnValidate()
     {
         BuildModifierLookup();
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\PlantPlacementManagement.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections.Generic;
-using UnityEngine;
-
-public class PlantPlacementManager : MonoBehaviour
-{
-    public static PlantPlacementManager Instance { get; private set; }
-
-    [Header("References")]
-    [SerializeField] private GameObject plantPrefab;
-    [SerializeField] private NodeEditorGridController nodeEditorGrid;
-    [SerializeField] private Transform plantParent;
-    [SerializeField] private TileInteractionManager tileInteractionManager;
-    [SerializeField] private PlantGrowthModifierManager growthModifierManager;
-
-    [Header("Planting Settings")]
-    [Tooltip("Maximum radius from cell center for random seed placement (in units)")]
-    [SerializeField] private float spawnRadius = 0.25f;
-    
-    [Tooltip("Increment for position randomization (in pixels, for pixel-perfect placement)")]
-    [SerializeField] private float spawnRadiusIncrement = 4f;
-
-    [Header("Tile Restrictions")]
-    [Tooltip("List of tiles that cannot be planted on")]
-    [SerializeField] private List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
-
-    [Header("Debug")]
-    [SerializeField] private bool showDebugMessages = true;
-    
-    // Cache for quick lookup of invalid tiles
-    private HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
-    
-    // Dictionary to track plant positions (using grid cell positions as keys)
-    private Dictionary<Vector3Int, GameObject> plantsByGridPosition = new Dictionary<Vector3Int, GameObject>();
-    
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        
-        // Build the set of invalid tiles for faster lookup
-        RebuildInvalidTilesSet();
-    }
-
-    private void Start()
-    {
-        // Initialize references if not set in inspector
-        if (plantParent == null && EcosystemManager.Instance != null)
-        {
-            plantParent = EcosystemManager.Instance.plantParent;
-        }
-        
-        if (nodeEditorGrid == null)
-        {
-            nodeEditorGrid = NodeEditorGridController.Instance;
-        }
-        
-        if (tileInteractionManager == null)
-        {
-            tileInteractionManager = TileInteractionManager.Instance;
-        }
-        
-        if (growthModifierManager == null)
-        {
-            growthModifierManager = PlantGrowthModifierManager.Instance;
-        }
-    }
-    
-    private void RebuildInvalidTilesSet()
-    {
-        invalidTilesSet.Clear();
-        foreach (var tile in invalidPlantingTiles)
-        {
-            if (tile != null)
-            {
-                invalidTilesSet.Add(tile);
-            }
-        }
-        
-        if (showDebugMessages)
-        {
-            Debug.Log($"PlantPlacementManager: Built invalid tiles set with {invalidTilesSet.Count} entries");
-        }
-    }
-    
-    private void OnValidate()
-    {
-        // Rebuild the set when changed in Inspector
-        RebuildInvalidTilesSet();
-    }
-
-    // Check if a grid position is occupied by a plant
-    public bool IsPositionOccupied(Vector3Int gridPosition)
-    {
-        // If we have a reference, check if it's still valid (not destroyed)
-        if (plantsByGridPosition.TryGetValue(gridPosition, out GameObject plant))
-        {
-            if (plant == null)
-            {
-                // Plant has been destroyed, remove from dictionary
-                plantsByGridPosition.Remove(gridPosition);
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-    
-    // Check if a tile is valid for planting
-    public bool IsTileValidForPlanting(TileDefinition tileDef)
-    {
-        // If the tile is null, it's not valid
-        if (tileDef == null)
-            return false;
-            
-        // Check if this tile is in our invalid set
-        return !invalidTilesSet.Contains(tileDef);
-    }
-
-    // Clean up destroyed plants from our dictionary (call periodically if needed)
-    public void CleanupDestroyedPlants()
-    {
-        List<Vector3Int> keysToRemove = new List<Vector3Int>();
-        
-        foreach (var kvp in plantsByGridPosition)
-        {
-            if (kvp.Value == null)
-            {
-                keysToRemove.Add(kvp.Key);
-            }
-        }
-        
-        foreach (var key in keysToRemove)
-        {
-            plantsByGridPosition.Remove(key);
-        }
-        
-        if (showDebugMessages && keysToRemove.Count > 0)
-        {
-            Debug.Log($"PlantPlacementManager: Removed {keysToRemove.Count} destroyed plant references.");
-        }
-    }
-
-    // Try to plant a seed at the given grid position
-    public bool TryPlantSeed(Vector3Int gridPosition, Vector3 worldPosition)
-    {
-        // Clean up any destroyed plants first
-        CleanupDestroyedPlants();
-        
-        // Return false if position is already occupied
-        if (IsPositionOccupied(gridPosition))
-        {
-            if (showDebugMessages)
-            {
-                Debug.Log($"Cannot plant: Position {gridPosition} already has a plant.");
-            }
-            return false;
-        }
-        
-        // Get the tile at this position
-        TileDefinition tileDef = null;
-        if (tileInteractionManager != null)
-        {
-            tileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
-            
-            // Check if the tile is valid for planting
-            if (!IsTileValidForPlanting(tileDef))
-            {
-                if (showDebugMessages)
-                {
-                    string tileName = tileDef != null ? tileDef.displayName : "Unknown";
-                    Debug.Log($"Cannot plant: Tile {tileName} is not valid for planting.");
-                }
-                return false;
-            }
-        }
-
-        // Get the current graph from the NodeEditorGridController
-        if (nodeEditorGrid == null)
-        {
-            nodeEditorGrid = NodeEditorGridController.Instance;
-            if (nodeEditorGrid == null)
-            {
-                Debug.LogError("Cannot plant: NodeEditorGridController not found.");
-                return false;
-            }
-        }
-
-        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
-        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0)
-        {
-            if (showDebugMessages)
-            {
-                Debug.Log("Cannot plant: No nodes in UI graph to spawn.");
-            }
-            return false;
-        }
-        
-        // Validate graph has a seed node
-        bool seedFound = false;
-        foreach (var node in graphToSpawn.nodes)
-        {
-            if (node != null && node.effects != null)
-            {
-                foreach (var effect in node.effects)
-                {
-                    if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
-                    {
-                        seedFound = true;
-                        break;
-                    }
-                }
-            }
-            if (seedFound) break;
-        }
-
-        if (!seedFound)
-        {
-            if (showDebugMessages)
-            {
-                Debug.Log("Cannot plant: Node graph lacks a SeedSpawn effect.");
-            }
-            return false;
-        }
-
-        // Calculate randomized planting position based on our settings
-        Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
-        
-        // Spawn the plant at the randomized position
-        GameObject plantObj = SpawnPlant(graphToSpawn, plantingPosition);
-        if (plantObj != null)
-        {
-            // Track the plant position
-            plantsByGridPosition[gridPosition] = plantObj;
-            
-            // Register the plant with the growth modifier manager
-            if (growthModifierManager != null)
-            {
-                PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
-                if (plantGrowth != null)
-                {
-                    growthModifierManager.RegisterPlantTile(plantGrowth, tileDef);
-                    
-                    if (showDebugMessages)
-                    {
-                        string tileDebugName = tileDef != null ? tileDef.displayName : "Unknown";
-                        Debug.Log($"Plant registered with tile: {tileDebugName}");
-                    }
-                }
-            }
-            
-            return true;
-        }
-        return false;
-    }
-
-    // Spawn a plant using the given node graph at the specified position
-    private GameObject SpawnPlant(NodeGraph graphToSpawn, Vector3 position)
-    {
-        if (plantPrefab == null)
-        {
-            Debug.LogError("Cannot spawn plant: Plant prefab not assigned.");
-            return null;
-        }
-
-        Debug.Log($"SpawnPlant called with position: {position}");
-    
-        // Instantiate the plant prefab
-        GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
-    
-        // Verify the position was actually applied
-        Debug.Log($"Plant instantiated at position: {plantObj.transform.position}");
-
-        // Get the PlantGrowth component
-        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
-        if (growthComponent != null)
-        {
-            // Create a deep copy of the node graph to prevent modifications affecting the original
-            NodeGraph graphCopy = CloneNodeGraph(graphToSpawn);
-
-            // Initialize the plant with the deep copy
-            growthComponent.InitializeAndGrow(graphCopy);
-            return plantObj;
-        }
-        else
-        {
-            Debug.LogError("Plant prefab missing PlantGrowth component! Destroying spawned object.");
-            Destroy(plantObj);
-            return null;
-        }
-    }
-
-    // Create a deep copy of a NodeGraph
-    private NodeGraph CloneNodeGraph(NodeGraph original)
-    {
-        NodeGraph copy = new NodeGraph();
-        copy.nodes = new List<NodeData>();
-
-        foreach (NodeData originalNode in original.nodes)
-        {
-            if (originalNode == null) continue;
-
-            NodeData newNode = new NodeData
-            {
-                nodeId = originalNode.nodeId,
-                nodeDisplayName = originalNode.nodeDisplayName,
-                orderIndex = originalNode.orderIndex,
-                canBeDeleted = originalNode.canBeDeleted
-            };
-
-            // Deep copy effects
-            newNode.effects = CloneEffectsList(originalNode.effects);
-            copy.nodes.Add(newNode);
-        }
-
-        return copy;
-    }
-
-    // Create a deep copy of a list of NodeEffectData
-    private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
-    {
-        if (originalList == null) return new List<NodeEffectData>();
-
-        List<NodeEffectData> newList = new List<NodeEffectData>();
-        foreach (var originalEffect in originalList)
-        {
-            if (originalEffect == null) continue;
-
-            NodeEffectData newEffect = new NodeEffectData
-            {
-                effectType = originalEffect.effectType,
-                primaryValue = originalEffect.primaryValue,
-                secondaryValue = originalEffect.secondaryValue,
-                isPassive = originalEffect.isPassive,
-                scentDefinitionReference = originalEffect.scentDefinitionReference
-            };
-            newList.Add(newEffect);
-        }
-        return newList;
-    }
-    
-    // Generate a randomized position within the given radius, with simple increments
-    // Generate a randomized position within the given radius
-    private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
-    {
-        // First, let's add comprehensive debugging
-        Debug.Log($"Starting position randomization from center: {centerPosition}, radius: {spawnRadius}, increment: {spawnRadiusIncrement}");
-    
-        // Critical check - if radius is too small, just return the center
-        if (spawnRadius < 0.01f)
-        {
-            Debug.LogWarning("Spawn radius too small (<0.01), using center position");
-            return centerPosition;
-        }
-    
-        // Generate a random angle in radians (0 to 2π)
-        float randomAngle = Random.Range(0f, 2f * Mathf.PI);
-        Debug.Log($"Random angle: {randomAngle} radians ({randomAngle * Mathf.Rad2Deg} degrees)");
-    
-        // Convert angle to direction vector
-        Vector2 direction = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle));
-        Debug.Log($"Direction vector: {direction}");
-    
-        // Get a random distance within spawn radius
-        float randomDistance = Random.Range(0.05f, spawnRadius);
-        Debug.Log($"Random distance: {randomDistance}");
-    
-        // Calculate actual offset
-        float offsetX = direction.x * randomDistance;
-        float offsetY = direction.y * randomDistance;
-        Debug.Log($"Raw offset: ({offsetX}, {offsetY})");
-    
-        // Apply increment if needed
-        if (spawnRadiusIncrement > 0.001f)
-        {
-            float originalX = offsetX;
-            float originalY = offsetY;
-        
-            offsetX = Mathf.Round(offsetX / spawnRadiusIncrement) * spawnRadiusIncrement;
-            offsetY = Mathf.Round(offsetY / spawnRadiusIncrement) * spawnRadiusIncrement;
-        
-            Debug.Log($"Snapped offset: ({offsetX}, {offsetY}) from ({originalX}, {originalY})");
-        }
-    
-        // Create the final position
-        Vector3 randomizedPosition = centerPosition + new Vector3(offsetX, offsetY, 0f);
-        Debug.Log($"FINAL randomized position: {randomizedPosition}");
-    
-        return randomizedPosition;
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\PlayerTileInteractor.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-[RequireComponent(typeof(ToolSwitcher))]
-public class PlayerTileInteractor : MonoBehaviour
-{
-    private ToolSwitcher toolSwitcher;
-
-    private void Awake()
-    {
-        toolSwitcher = GetComponent<ToolSwitcher>();
-        if (toolSwitcher == null)
-            Debug.LogError("PlayerTileInteractor: No ToolSwitcher found on this GameObject!");
-    }
-
-    private void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (TileInteractionManager.Instance == null)
-            {
-                Debug.LogError("No TileInteractionManager in scene!");
-                return;
-            }
-
-            ToolDefinition currentTool = toolSwitcher.CurrentTool;
-            if (currentTool == null)
-            {
-                Debug.Log("No tool is currently selected.");
-                return;
-            }
-
-            // Attempt to apply the tool
-            TileInteractionManager.Instance.ApplyToolAction(currentTool);
-        }
     }
 }
 

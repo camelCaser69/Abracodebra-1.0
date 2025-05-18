@@ -1,4 +1,4 @@
-﻿// FILE: Assets\Scripts\Nodes\Core\NodeEffectType.cs
+﻿// FILE: Assets/Scripts/Nodes/Core/NodeEffectType.cs
 using System;
 using UnityEngine;
 
@@ -29,6 +29,8 @@ public enum NodeEffectType
     Cooldown,
     [Tooltip("Modifies the base time delay between executing the effects of sequential nodes within a Mature Phase cycle.")]
     CastDelay,
+    [Tooltip("Allows the plant to absorb poop within a radius and regrow eaten leaves or gain energy. PrimaryValue=Detection Radius, SecondaryValue=Energy Added.")]
+    PoopFertilizer,
 
 
     // --- Active / Mature Phase Effects (isPassive = false) ---

@@ -39,7 +39,7 @@ public class FireflyManager : MonoBehaviour
     [Header("Debugging")]
     [Tooltip("Show attraction lines in Game View during runtime.")]
     [SerializeField] private bool showAttractionLinesRuntime = false;
-    [SerializeField] private Color attractionLineColorGizmo = Color.magenta; // Renamed for Gizmo
+    [SerializeField] private Color attractionLineColorRuntime = Color.magenta; // Renamed for Gizmo
     [SerializeField] private bool logGizmoCalls = false;
     [Space] // Add space for visual separation
     [Tooltip("Prefab used to draw attraction lines at runtime.")]
@@ -149,6 +149,16 @@ public class FireflyManager : MonoBehaviour
                 line.enabled = true;
                 line.SetPosition(0, firefly.transform.position);
                 line.SetPosition(1, target.position);
+                
+                // IMPORTANT: Ensure the color is set properly
+                if (line.startColor != attractionLineColorRuntime || line.endColor != attractionLineColorRuntime)
+                {
+                    line.startColor = attractionLineColorRuntime;
+                    line.endColor = attractionLineColorRuntime;
+                    
+                    if (Debug.isDebugBuild)
+                        Debug.Log($"[FireflyManager] Set line color to {attractionLineColorRuntime}", line.gameObject);
+                }
             }
             else // Should be hidden or lost target
             {
@@ -180,8 +190,16 @@ public class FireflyManager : MonoBehaviour
                         // Configure initial points (will be updated next frame anyway)
                         newLine.SetPosition(0, firefly.transform.position);
                         newLine.SetPosition(1, target.position);
+                        
+                        // IMPORTANT: Set the line color correctly
+                        newLine.startColor = attractionLineColorRuntime;
+                        newLine.endColor = attractionLineColorRuntime;
+                        
                         newLine.enabled = true;
                         activeLineVisualizers.Add(firefly, newLine); // Add to tracking dictionary
+                        
+                        if (Debug.isDebugBuild)
+                            Debug.Log($"[FireflyManager] Created new line with color {attractionLineColorRuntime}", newLine.gameObject);
                     }
                     else
                     {
@@ -230,7 +248,7 @@ public class FireflyManager : MonoBehaviour
         if (showAttractionLinesRuntime && Application.isPlaying) {
              if (logGizmoCalls) { /*...*/ }
              bool didDrawLine = false;
-             Gizmos.color = attractionLineColorGizmo; // Use Gizmo color
+             Gizmos.color = attractionLineColorRuntime; // Use Gizmo color
              foreach (FireflyController firefly in activeFireflies) {
                 if (firefly == null) continue;
                 Transform target = firefly.AttractionTarget;

@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-10 01:49:48
+UNITY PROJECT SCRIPT EXPORT - 2025-05-17 03:36:09
 PART 2 OF 7
 ================================================================================
 
@@ -81,7 +81,8 @@ Assets
 │       └── Rule Tiles
 │           ├── DualGridRuleTile_Dirt.asset
 │           ├── DualGridRuleTile_DirtWet.asset
-│           └── DualGridRuleTile_Grass.asset
+│           ├── DualGridRuleTile_Grass.asset
+│           └── DualGridRuleTile_Water.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -105,7 +106,7 @@ Assets
 │   │   ├── Node_000_Seed.asset
 │   │   ├── Node_001_Berry.asset
 │   │   ├── Node_002_FireflyPheromone.asset
-│   │   └── Node_003_WaterPreserver.asset
+│   │   └── Node_003_PoopFertilizer.asset
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
@@ -125,6 +126,7 @@ Assets
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
+│   │   │   ├── LeafData.cs
 │   │   │   ├── PlantCell.cs
 │   │   │   ├── PlantGrowth.Cell.cs
 │   │   │   ├── PlantGrowth.Growth.cs
@@ -236,10 +238,10 @@ SCRIPT CONTENTS
 // FILE: Assets\Scripts\Battle\Plant\PlantGrowth.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.cs
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using TMPro;
 
 // --- Enums ---
@@ -298,6 +300,15 @@ public partial class PlantGrowth : MonoBehaviour
     private bool isGrowthCompletionHandled = false;
 
     // ------------------------------------------------
+    // --- POOP FERTILIZER DATA ---
+    // ------------------------------------------------
+    private float poopDetectionRadius = 0f;
+    private float poopAbsorptionRate = 0f;
+    private float poopAbsorptionTimer = 0f;
+    private List<LeafData> leafDataList = new List<LeafData>();
+    private const float POOP_CHECK_INTERVAL = 1.0f; // Check for poop once per second
+
+    // ------------------------------------------------
     // --- CALCULATED STATS ---
     // ------------------------------------------------
 
@@ -322,6 +333,10 @@ public partial class PlantGrowth : MonoBehaviour
     // --- NEW FIELDS for Continuous Mode ---
     private float currentGrowthElapsedTime = 0f;
     private float estimatedTotalGrowthTime = 1f; // Default to 1 to avoid division by zero
+    // --- NEW FIELDS for better growth tracking ---
+    private float actualGrowthProgress = 0f; // The normalized progress value (0-1) representing true growth completion
+    private int stepsCompleted = 0; // Track how many steps have been completed
+    private int totalPlannedSteps = 0; // Total number of steps in the growth plan
 
     // ------------------------------------------------
     // --- UNITY LIFECYCLE METHODS ---
@@ -396,6 +411,17 @@ public partial class PlantGrowth : MonoBehaviour
             case PlantState.Initializing:
                 break;
         }
+        
+        // Add poop absorption check if radius > 0
+        if (poopDetectionRadius > 0f && currentState != PlantState.Growing)
+        {
+            poopAbsorptionTimer -= Time.deltaTime;
+            if (poopAbsorptionTimer <= 0f)
+            {
+                CheckForPoopAndAbsorb();
+                poopAbsorptionTimer = POOP_CHECK_INTERVAL;
+            }
+        }
     }
 
     private void OnDestroy()
@@ -417,7 +443,12 @@ public partial class PlantGrowth : MonoBehaviour
         rootCellInstance = null; currentStemCount = 0; offsetRightForPattern1 = null; isGrowthCompletionHandled = false; displayedGrowthPercentage = -1;
         currentGrowthElapsedTime = 0f; // <-- RESET
         estimatedTotalGrowthTime = 1f; // <-- RESET to default
+        stepsCompleted = 0; // <-- RESET new variable
+        totalPlannedSteps = 0; // <-- RESET new variable
+        actualGrowthProgress = 0f; // <-- RESET new variable
         nodeGraph = graph; currentState = PlantState.Initializing; currentEnergy = 0f;
+        // Clear any old leaf data
+        leafDataList.Clear();
         CalculateAndApplyStats();
         GameObject spawnedSeed = SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
         if (spawnedSeed != null) {
@@ -444,7 +475,7 @@ public partial class PlantGrowth : MonoBehaviour
         if (finalPhotosynthesisRate <= 0 || finalMaxEnergy <= 0) return; float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f; int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf); float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ? PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(this) : 1.0f; float fireflyBonusRate = 0f; if (fireflyManagerInstance != null) { int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(transform.position, fireflyManagerInstance.photosynthesisRadius); fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly, fireflyManagerInstance.maxPhotosynthesisBonus); } float standardPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight; float totalRate = (standardPhotosynthesis + fireflyBonusRate) * tileMultiplier; float delta = totalRate * Time.deltaTime; currentEnergy = Mathf.Clamp(currentEnergy + delta, 0f, finalMaxEnergy);
     }
 
-    // --- UpdateGrowthPercentageUI (REVISED with Continuous Mode Logic Check) ---
+    // --- FIXED: UpdateGrowthPercentageUI with Continuous Mode Logic ---
     /// <summary>
     /// Calculates the target display percentage based on chosen mode (discrete/continuous)
     /// and updates the UI text ONLY if the snapped value has changed.
@@ -456,25 +487,31 @@ public partial class PlantGrowth : MonoBehaviour
 
         float rawPercentageFloat = 0f; // The calculated percentage before snapping
 
-        if (forceComplete)
+        if (forceComplete || currentState == PlantState.GrowthComplete)
         {
             rawPercentageFloat = 100f;
         }
         // --- Check Continuous Flag Here ---
         else if (continuousIncrement) // --- CONTINUOUS MODE ---
         {
-            // Calculate based on time progress relative to estimated total time
-            if (estimatedTotalGrowthTime > 0.01f) // Avoid division by zero/tiny numbers
+            // NEW: Use actual growth progress instead of elapsed time
+            if (totalPlannedSteps > 0) 
             {
-                // Use the current elapsed time tracked by the coroutine member variable
-                rawPercentageFloat = Mathf.Clamp01(currentGrowthElapsedTime / estimatedTotalGrowthTime) * 100f;
-                 // Debug.Log($"Continuous Raw %: {rawPercentageFloat:F2} (Time: {currentGrowthElapsedTime:F2} / {estimatedTotalGrowthTime:F2})");
+                // Calculate percentage based on steps completed
+                rawPercentageFloat = ((float)stepsCompleted / totalPlannedSteps) * 100f;
+                
+                // Add partial progress toward next step based on actual growth progress
+                if (actualGrowthProgress > 0f && stepsCompleted < totalPlannedSteps)
+                {
+                    float stepSize = 100f / totalPlannedSteps;
+                    float partialStepProgress = actualGrowthProgress * stepSize;
+                    rawPercentageFloat = (stepsCompleted * stepSize) + partialStepProgress;
+                }
             }
             else
             {
-                // If estimated time is effectively zero, show 0% while growing, 100% if done
+                // Fallback if no planned steps (shouldn't happen)
                 rawPercentageFloat = (currentState == PlantState.Growing) ? 0f : 100f;
-                 // Debug.Log($"Continuous Raw %: {rawPercentageFloat} (Estimated time near zero)");
             }
         }
         else // --- DISCRETE MODE ---
@@ -483,12 +520,10 @@ public partial class PlantGrowth : MonoBehaviour
             if (targetStemLength <= 0)
             {
                 rawPercentageFloat = 0f; // No stems to grow
-                 // Debug.Log("Discrete Raw %: 0 (No target stems)");
             }
             else
             {
                 rawPercentageFloat = Mathf.Clamp(((float)currentStemCount / targetStemLength) * 100f, 0f, 100f);
-                 // Debug.Log($"Discrete Raw %: {rawPercentageFloat:F2} (Stems: {currentStemCount} / {targetStemLength})");
             }
         }
 
@@ -500,16 +535,20 @@ public partial class PlantGrowth : MonoBehaviour
         }
         else
         {
-            // Floor to the nearest lower multiple of the increment
-            targetDisplayValue = (Mathf.FloorToInt(rawPercentageFloat) / percentageIncrement) * percentageIncrement;
+            // Use proper rounding to closest increment rather than floor
+            targetDisplayValue = Mathf.RoundToInt(rawPercentageFloat / percentageIncrement) * percentageIncrement;
         }
         targetDisplayValue = Mathf.Min(targetDisplayValue, 100); // Clamp final value
-
+        
+        // Ensure we don't show 100% until growth is complete, unless forced
+        if (targetDisplayValue == 100 && currentState == PlantState.Growing && !forceComplete)
+        {
+            targetDisplayValue = 95; // Cap at 95% until actually complete
+        }
 
         // --- Update TextMeshPro only if the snapped value changed ---
         if (targetDisplayValue != displayedGrowthPercentage)
         {
-            // Debug.Log($"Updating Display %: {displayedGrowthPercentage} -> {targetDisplayValue}");
             displayedGrowthPercentage = targetDisplayValue;
             energyText.text = $"{displayedGrowthPercentage}%";
         }
@@ -545,13 +584,154 @@ public partial class PlantGrowth : MonoBehaviour
     }
 
     // ------------------------------------------------
-    // --- PUBLIC ACCESSORS FOR OUTLINES ---
+    // --- POOP FERTILIZER METHODS ---
     // ------------------------------------------------
+    
+    // FILE: Assets/Scripts/Battle/Plant/PlantGrowth.cs (Debug Logging Fix)
+
+// Add this method at the beginning of CheckForPoopAndAbsorb to provide more debug information:
+
+private void CheckForPoopAndAbsorb()
+{
+    // Skip if no missing leaves to regrow
+    bool hasMissingLeaves = leafDataList.Any(leaf => !leaf.IsActive);
+    
+    if (Debug.isDebugBuild && poopDetectionRadius > 0f)
+    {
+        string leafStatus = hasMissingLeaves ? 
+            $"Has {leafDataList.Count(l => !l.IsActive)} missing leaves" : 
+            "No missing leaves";
+        Debug.Log($"[{gameObject.name}] PoopFertilizer: {leafStatus}, Radius: {poopDetectionRadius}, Rate: {poopAbsorptionRate}");
+    }
+    
+    if (!hasMissingLeaves) return;
+    
+    // Look for poop in range
+    Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, poopDetectionRadius);
+    
+    if (Debug.isDebugBuild && poopDetectionRadius > 0f)
+    {
+        Debug.Log($"[{gameObject.name}] PoopFertilizer: Found {colliders.Length} colliders in radius {poopDetectionRadius}");
+        int poopCount = 0;
+        foreach (Collider2D col in colliders)
+        {
+            if (col.GetComponent<PoopController>() != null)
+                poopCount++;
+        }
+        Debug.Log($"[{gameObject.name}] PoopFertilizer: {poopCount} of those colliders have PoopController");
+    }
+    
+    // Calculate how many poop items we can process this cycle
+    // poopAbsorptionRate represents poop items per second
+    int maxAbsorptionsPerCheck = Mathf.FloorToInt(poopAbsorptionRate * POOP_CHECK_INTERVAL);
+    
+    // Ensure at least one poop can be absorbed if rate > 0
+    if (poopAbsorptionRate > 0 && maxAbsorptionsPerCheck < 1)
+        maxAbsorptionsPerCheck = 1;
+    
+    // Track how many we've absorbed this cycle
+    int absorptionsThisCycle = 0;
+    
+    foreach (Collider2D collider in colliders)
+    {
+        // Stop if we've reached our absorption limit for this cycle
+        if (absorptionsThisCycle >= maxAbsorptionsPerCheck)
+            break;
+        
+        PoopController poop = collider.GetComponent<PoopController>();
+        if (poop != null)
+        {
+            // Absorb the poop
+            if (Debug.isDebugBuild)
+                Debug.Log($"[{gameObject.name}] Absorbing poop for fertilizer effect.");
+            
+            // Try to regrow a leaf
+            if (TryRegrowLeaf())
+            {
+                // Destroy the poop
+                Destroy(poop.gameObject);
+                
+                // Increment counter
+                absorptionsThisCycle++;
+            }
+        }
+    }
+}
+
+    private bool TryRegrowLeaf()
+{
+    // Look for a missing leaf to regrow
+    int missingLeafIndex = -1;
+    
+    // Debug counts
+    if (Debug.isDebugBuild)
+    {
+        int totalLeaves = leafDataList.Count;
+        int missingLeaves = leafDataList.Count(leaf => !leaf.IsActive);
+        Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Total leaves: {totalLeaves}, Missing leaves: {missingLeaves}");
+    }
+    
+    for (int i = 0; i < leafDataList.Count; i++)
+    {
+        if (!leafDataList[i].IsActive)
+        {
+            missingLeafIndex = i;
+            break;
+        }
+    }
+    
+    if (missingLeafIndex == -1)
+    {
+        if (Debug.isDebugBuild)
+            Debug.Log($"[{gameObject.name}] TryRegrowLeaf: No missing leaves found to regrow.");
+        return false; // No missing leaves found
+    }
+    
+    // Get the leaf coordinate and mark it as active
+    Vector2Int leafCoord = leafDataList[missingLeafIndex].GridCoord;
+    
+    // IMPORTANT: Check if the coordinate is already occupied by another cell
+    if (cells.ContainsKey(leafCoord))
+    {
+        if (Debug.isDebugBuild)
+            Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Cannot regrow leaf at {leafCoord} because cell is already occupied.");
+        return false;
+    }
+    
+    // Mark the leaf as active in our tracking list AFTER we successfully spawn it
+    
+    // Create the new leaf visual
+    GameObject newLeaf = SpawnCellVisual(PlantCellType.Leaf, leafCoord);
+    
+    if (newLeaf != null)
+    {
+        // Update the leaf data to mark it as active ONLY if spawn succeeded
+        leafDataList[missingLeafIndex] = new LeafData(leafCoord, true);
+        
+        if (Debug.isDebugBuild)
+            Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Successfully regrew leaf at {leafCoord} using poop fertilizer!");
+        return true;
+    }
+    
+    // If we get here, the leaf couldn't be created
+    if (Debug.isDebugBuild)
+        Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Failed to spawn new leaf at {leafCoord}");
+    
+    // Leave the leaf marked as inactive in the tracking list
+    return false;
+}
+
+    // -----------------------------------------------
+    // --- PUBLIC ACCESSORS FOR OUTLINES ---
+    // -----------------------------------------------
 
     public bool DoesCellExistAt(Vector2Int coord) { return cells.ContainsKey(coord); }
     public float GetCellSpacing() { return this.cellSpacing; }
     public GameObject GetCellGameObjectAt(Vector2Int coord) { return activeCellGameObjects.FirstOrDefault(go => go != null && go.GetComponent<PlantCell>()?.GridCoord == coord); }
     public bool IsOutlineEnabled() { return enableOutline; }
+    
+    // Accessor for poop fertilizer visualization
+    public float GetPoopDetectionRadius() { return poopDetectionRadius; }
 
     // --- PARTIAL CLASS METHODS (Assumed in other files) ---
     // Define these methods in the corresponding partial class files:
@@ -952,6 +1132,12 @@ public class AnimalController : MonoBehaviour
     [Header("UI References")] [SerializeField] private TextMeshProUGUI hpText;
     [Header("Behavior Tuning")] public float searchRadius = 5f; public float eatDistance = 0.5f; public float eatDuration = 1.5f; [Range(0f, 1f)] public float wanderPauseChance = 0.3f; public float wanderMinMoveDuration = 1f; public float wanderMaxMoveDuration = 3f; public float wanderMinPauseDuration = 0.5f; public float wanderMaxPauseDuration = 2f; public float minPoopDelay = 5f; public float maxPoopDelay = 10f; public float poopDuration = 1f; public float poopColorVariation = 0.1f; public float thoughtCooldownTime = 5f; [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>(); [SerializeField] private List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
+    // --- NEW: Food reassessment timer fields ---
+    [Header("Food Seeking Improvements")]
+    [Tooltip("How often (in seconds) to reassess nearby food even when current target is valid")]
+    public float foodReassessmentInterval = 0.5f;
+    private float foodReassessmentTimer = 0f;
+
     // --- Internal State --- (No changes)
     private float currentHealth; private float currentHunger; private GameObject currentTargetFood = null; private Vector2 moveDirection = Vector2.zero; private bool isEating = false; private float eatTimer = 0f; private bool isWanderPaused = false; private float wanderStateTimer = 0f; private bool isPooping = false; private float poopTimer = 0f; private float poopDelayTimer = 0f; private bool hasPooped = true; private float thoughtCooldownTimer = 0f;
     private bool isSeekingScreenCenter = false;
@@ -975,6 +1161,7 @@ public class AnimalController : MonoBehaviour
         if (animalCollider == null) { Debug.LogError($"[{gameObject.name}] Missing Collider2D!", gameObject); enabled = false; return; }
 
         currentHealth = definition.maxHealth; currentHunger = 0f; hasPooped = true; poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
+        foodReassessmentTimer = Random.Range(0f, foodReassessmentInterval); // Randomize initial timer
 
         // Store the SHIFTED bounds received from FaunaManager
         minBounds = shiftedMinBounds;
@@ -1051,31 +1238,320 @@ public class AnimalController : MonoBehaviour
         }
     }
 
-    // --- Other methods (Unchanged) ---
-    void UpdateHunger() { /* ... */ currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime; currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger); }
-    void ApplyStarvationDamage() { /* ... */ UpdateHpText(); }
-    void HandlePooping() { /* ... */ if (!isEating && !hasPooped) { poopDelayTimer -= Time.deltaTime; if (!isPooping && poopDelayTimer <= 0f) { StartPooping(); } if (isPooping) { poopTimer -= Time.deltaTime; if (poopTimer <= 0f) { FinishPooping(); } } } }
-    void UpdateThoughts() { /* ... */ if (thoughtCooldownTimer > 0) { thoughtCooldownTimer -= Time.deltaTime; } }
-    void DecideNextAction() { /* ... */ if (currentHunger >= animalDiet.hungerThreshold) { SeekFood(); } else { Wander(); currentTargetFood = null; } }
-    void SeekFood() { /* ... */ if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry); bool targetValid = currentTargetFood != null && currentTargetFood.activeInHierarchy && currentTargetFood.GetComponent<FoodItem>() != null; if (!targetValid) { currentTargetFood = FindNearestFood(); } if (currentTargetFood != null) { MoveTowardFood(currentTargetFood); } else { Wander(); } }
-    GameObject FindNearestFood() { /* ... */ Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, searchRadius); return animalDiet.FindBestFood(colliders, transform.position); }
-    void MoveTowardFood(GameObject foodObj) { /* ... */ if (foodObj == null) return; float distance = Vector2.Distance(transform.position, foodObj.transform.position); if (distance <= eatDistance) { StartEating(); } else { moveDirection = (foodObj.transform.position - transform.position).normalized; isWanderPaused = false; wanderStateTimer = 0f; } }
-    void StartEating() { /* ... */ isEating = true; eatTimer = eatDuration; moveDirection = Vector2.zero; if (CanShowThought()) ShowThought(ThoughtTrigger.Eating); }
-    void HandleEating() { /* ... */ eatTimer -= Time.deltaTime; if (eatTimer <= 0f) { isEating = false; FinishEatingAction(); } }
-    void FinishEatingAction() { /* ... */ if (currentTargetFood == null) return; FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>(); if (foodItem != null && foodItem.foodType != null) { float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType); currentHunger -= satiationGain; currentHunger = Mathf.Max(0f, currentHunger); Destroy(currentTargetFood); hasPooped = false; poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay); currentTargetFood = null; } else { currentTargetFood = null; } }
-    void StartPooping() { /* ... */ isPooping = true; poopTimer = poopDuration; moveDirection = Vector2.zero; if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping); }
-    void FinishPooping() { /* ... */ SpawnPoop(); isPooping = false; hasPooped = true; }
-    void SpawnPoop() { /* ... */ if (poopPrefabs == null || poopPrefabs.Count == 0) return; int index = Random.Range(0, poopPrefabs.Count); GameObject prefab = poopPrefabs[index]; if (prefab == null) return; Transform spawnT = poopSpawnPoint ? poopSpawnPoint : transform; GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity); SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>(); if (sr != null) { sr.flipX = Random.value > 0.5f; Color c = sr.color; float v = poopColorVariation; sr.color = new Color(Mathf.Clamp01(c.r + Random.Range(-v, v)), Mathf.Clamp01(c.g + Random.Range(-v, v)), Mathf.Clamp01(c.b + Random.Range(-v, v)), c.a); } PoopController pc = poopObj.GetComponent<PoopController>() ?? poopObj.AddComponent<PoopController>(); pc.Initialize(); }
-    void Wander() { /* ... */ if (wanderStateTimer <= 0f) { if (isWanderPaused) { isWanderPaused = false; moveDirection = Random.insideUnitCircle.normalized; wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration); } else { if (Random.value < wanderPauseChance) { isWanderPaused = true; moveDirection = Vector2.zero; wanderStateTimer = Random.Range(wanderMinPauseDuration, wanderMaxPauseDuration); } else { moveDirection = Random.insideUnitCircle.normalized; wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration); } } } else { wanderStateTimer -= Time.deltaTime; } }
-    void FlipSpriteBasedOnDirection() { /* ... */ if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f) { spriteRenderer.flipX = moveDirection.x < 0; } }
-    void UpdateAnimationState() { /* ... */ if (animator == null) return; bool isMoving = !isEating && !isPooping && moveDirection.sqrMagnitude > 0.01f; animator.SetBool("IsMoving", isMoving); animator.SetBool("IsEating", isEating); }
-    bool CanShowThought() { /* ... */ return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f; }
-    void ShowThought(ThoughtTrigger trigger) { /* ... */ if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return; var entry = thoughtLibrary.allThoughts.FirstOrDefault(t => t != null && t.speciesName == SpeciesName && t.trigger == trigger); if (entry != null && entry.lines != null && entry.lines.Count > 0) { string line = entry.lines[Random.Range(0, entry.lines.Count)]; Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform; GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT); bubbleGO.transform.localPosition = Vector3.zero; ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>(); if (bubble) { bubble.Initialize(line, spawnT, 2f); thoughtCooldownTimer = thoughtCooldownTime; } else { Destroy(bubbleGO); } } }
+    void UpdateHunger() 
+    { 
+        currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime; 
+        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger); 
+    }
+    
+    void ApplyStarvationDamage() 
+    { 
+        /* ... */ 
+        UpdateHpText(); 
+    }
+    
+    void HandlePooping() 
+    { 
+        if (!isEating && !hasPooped) 
+        { 
+            poopDelayTimer -= Time.deltaTime; 
+            if (!isPooping && poopDelayTimer <= 0f) 
+            { 
+                StartPooping(); 
+            } 
+            if (isPooping) 
+            { 
+                poopTimer -= Time.deltaTime; 
+                if (poopTimer <= 0f) 
+                { 
+                    FinishPooping(); 
+                } 
+            } 
+        } 
+    }
+    
+    void UpdateThoughts() 
+    { 
+        if (thoughtCooldownTimer > 0) 
+        { 
+            thoughtCooldownTimer -= Time.deltaTime; 
+        } 
+    }
+    
+    void DecideNextAction() 
+    { 
+        if (currentHunger >= animalDiet.hungerThreshold) 
+        { 
+            SeekFood(); 
+        } 
+        else 
+        { 
+            Wander(); 
+            currentTargetFood = null; 
+        } 
+    }
+    
+    // --- MODIFIED: SeekFood with periodic reassessment ---
+    void SeekFood() 
+    { 
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
+        
+        // Reassess food periodically even if current target is valid
+        foodReassessmentTimer -= Time.deltaTime;
+        bool shouldReassess = foodReassessmentTimer <= 0f;
+        bool targetValid = currentTargetFood != null && currentTargetFood.activeInHierarchy && 
+                          currentTargetFood.GetComponent<FoodItem>() != null;
+        
+        // Reassess when timer expires or if target is invalid
+        if (shouldReassess || !targetValid) 
+        {
+            // Store position of old target for comparison
+            Vector3 oldTargetPosition = targetValid ? currentTargetFood.transform.position : Vector3.zero;
+            
+            // Find potentially better food
+            GameObject potentialBetterFood = FindNearestFood();
+            
+            if (potentialBetterFood != null) 
+            {
+                // Always switch to new target if no current target
+                if (!targetValid) 
+                {
+                    currentTargetFood = potentialBetterFood;
+                    if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name} SeekFood] Found new food target (no previous): {potentialBetterFood.name}");
+                }
+                // Switch to new target if it's better than current
+                else if (potentialBetterFood != currentTargetFood) 
+                {
+                    // Get preferences for comparison
+                    FoodItem currentFoodItem = currentTargetFood.GetComponent<FoodItem>();
+                    FoodItem newFoodItem = potentialBetterFood.GetComponent<FoodItem>();
+                    
+                    if (currentFoodItem != null && newFoodItem != null) 
+                    {
+                        float currentPriority = animalDiet.GetPreference(currentFoodItem.foodType)?.preferencePriority ?? 0f;
+                        float newPriority = animalDiet.GetPreference(newFoodItem.foodType)?.preferencePriority ?? 0f;
+                        
+                        // Switch if new food has higher priority
+                        if (newPriority > currentPriority) 
+                        {
+                            if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name} SeekFood] Switching to higher priority food: {newFoodItem.foodType.foodName} (priority: {newPriority}) from {currentFoodItem.foodType.foodName} (priority: {currentPriority})");
+                            currentTargetFood = potentialBetterFood;
+                        }
+                    }
+                }
+            }
+            
+            // Reset timer
+            foodReassessmentTimer = foodReassessmentInterval;
+        }
+        
+        // Proceed with target as before
+        if (currentTargetFood != null) 
+        {
+            MoveTowardFood(currentTargetFood);
+        } 
+        else 
+        {
+            Wander();
+        }
+    }
+
+    GameObject FindNearestFood() 
+    { 
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, searchRadius); 
+        return animalDiet.FindBestFood(colliders, transform.position); 
+    }
+    
+    void MoveTowardFood(GameObject foodObj) 
+    { 
+        if (foodObj == null) return; 
+        float distance = Vector2.Distance(transform.position, foodObj.transform.position); 
+        if (distance <= eatDistance) 
+        { 
+            StartEating(); 
+        } 
+        else 
+        { 
+            moveDirection = (foodObj.transform.position - transform.position).normalized; 
+            isWanderPaused = false; 
+            wanderStateTimer = 0f; 
+        } 
+    }
+    
+    void StartEating() 
+    { 
+        isEating = true; 
+        eatTimer = eatDuration; 
+        moveDirection = Vector2.zero; 
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Eating); 
+    }
+    
+    void HandleEating() 
+    { 
+        eatTimer -= Time.deltaTime; 
+        if (eatTimer <= 0f) 
+        { 
+            isEating = false; 
+            FinishEatingAction(); 
+        } 
+    }
+    
+    void FinishEatingAction() 
+    { 
+        if (currentTargetFood == null) return; 
+        FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>(); 
+        if (foodItem != null && foodItem.foodType != null) 
+        { 
+            float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType); 
+            currentHunger -= satiationGain; 
+            currentHunger = Mathf.Max(0f, currentHunger); 
+            Destroy(currentTargetFood); 
+            hasPooped = false; 
+            poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay); 
+            currentTargetFood = null; 
+        } 
+        else 
+        { 
+            currentTargetFood = null; 
+        } 
+    }
+    
+    void StartPooping() 
+    { 
+        isPooping = true; 
+        poopTimer = poopDuration; 
+        moveDirection = Vector2.zero; 
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping); 
+    }
+    
+    void FinishPooping() 
+    { 
+        SpawnPoop(); 
+        isPooping = false; 
+        hasPooped = true; 
+    }
+    
+    void SpawnPoop() 
+    { 
+        if (poopPrefabs == null || poopPrefabs.Count == 0) return; 
+        int index = Random.Range(0, poopPrefabs.Count); 
+        GameObject prefab = poopPrefabs[index]; 
+        if (prefab == null) return; 
+        Transform spawnT = poopSpawnPoint ? poopSpawnPoint : transform; 
+        GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity); 
+        SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>(); 
+        if (sr != null) 
+        { 
+            sr.flipX = Random.value > 0.5f; 
+            Color c = sr.color; 
+            float v = poopColorVariation; 
+            sr.color = new Color(Mathf.Clamp01(c.r + Random.Range(-v, v)), Mathf.Clamp01(c.g + Random.Range(-v, v)), Mathf.Clamp01(c.b + Random.Range(-v, v)), c.a); 
+        } 
+        PoopController pc = poopObj.GetComponent<PoopController>() ?? poopObj.AddComponent<PoopController>(); 
+        pc.Initialize(); 
+    }
+    
+    void Wander() 
+    { 
+        if (wanderStateTimer <= 0f) 
+        { 
+            if (isWanderPaused) 
+            { 
+                isWanderPaused = false; 
+                moveDirection = Random.insideUnitCircle.normalized; 
+                wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration); 
+            } 
+            else 
+            { 
+                if (Random.value < wanderPauseChance) 
+                { 
+                    isWanderPaused = true; 
+                    moveDirection = Vector2.zero; 
+                    wanderStateTimer = Random.Range(wanderMinPauseDuration, wanderMaxPauseDuration); 
+                } 
+                else 
+                { 
+                    moveDirection = Random.insideUnitCircle.normalized; 
+                    wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration); 
+                } 
+            } 
+        } 
+        else 
+        { 
+            wanderStateTimer -= Time.deltaTime; 
+        } 
+    }
+    
+    void FlipSpriteBasedOnDirection() 
+    { 
+        if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f) 
+        { 
+            spriteRenderer.flipX = moveDirection.x < 0; 
+        } 
+    }
+    
+    void UpdateAnimationState() 
+    { 
+        if (animator == null) return; 
+        bool isMoving = !isEating && !isPooping && moveDirection.sqrMagnitude > 0.01f; 
+        animator.SetBool("IsMoving", isMoving); 
+        animator.SetBool("IsEating", isEating); 
+    }
+    
+    bool CanShowThought() 
+    { 
+        return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f; 
+    }
+    
+    void ShowThought(ThoughtTrigger trigger) 
+    { 
+        if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return; 
+        var entry = thoughtLibrary.allThoughts.FirstOrDefault(t => t != null && t.speciesName == SpeciesName && t.trigger == trigger); 
+        if (entry != null && entry.lines != null && entry.lines.Count > 0) 
+        { 
+            string line = entry.lines[Random.Range(0, entry.lines.Count)]; 
+            Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform; 
+            GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT); 
+            bubbleGO.transform.localPosition = Vector3.zero; 
+            ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>(); 
+            if (bubble) 
+            { 
+                bubble.Initialize(line, spawnT, 2f); 
+                thoughtCooldownTimer = thoughtCooldownTime; 
+            } 
+            else 
+            { 
+                Destroy(bubbleGO); 
+            } 
+        } 
+    }
+    
     public enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
-    private void Die(CauseOfDeath cause) { /* ... */ Debug.Log($"[{SpeciesName} died: {cause}]", gameObject); Destroy(gameObject); }
-    public bool SpeciesNameEquals(string other) { /* ... */ return definition != null && definition.animalName == other; }
-    private void EnsureHpTextReference() { /* ... */ if (hpText == null) { hpText = GetComponentInChildren<TextMeshProUGUI>(true); } }
-    private void UpdateHpText() { /* ... */ if (hpText == null || definition == null) return; hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)}/{Mathf.FloorToInt(definition.maxHealth)}"; }
+    
+    private void Die(CauseOfDeath cause) 
+    { 
+        Debug.Log($"[{SpeciesName} died: {cause}]", gameObject); 
+        Destroy(gameObject); 
+    }
+    
+    public bool SpeciesNameEquals(string other) 
+    { 
+        return definition != null && definition.animalName == other; 
+    }
+    
+    private void EnsureHpTextReference() 
+    { 
+        if (hpText == null) 
+        { 
+            hpText = GetComponentInChildren<TextMeshProUGUI>(true); 
+        } 
+    }
+    
+    private void UpdateHpText() 
+    { 
+        if (hpText == null || definition == null) return; 
+        hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)}/{Mathf.FloorToInt(definition.maxHealth)}"; 
+    }
 }
 
 
@@ -1168,173 +1644,6 @@ public class EcosystemManager : MonoBehaviour
         }
     }
 }
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Core\FaunaManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Ecosystem/Core/FaunaManager.cs
-using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-
-public class FaunaManager : MonoBehaviour
-{
-    [Header("Spawning Area (Global)")]
-    [SerializeField] private Vector2 spawnCenter = Vector2.zero;
-    [SerializeField] private Vector2 spawnAreaSize = new Vector2(20f, 10f);
-
-    [Header("General Settings")]
-    [SerializeField] private Transform ecosystemParent;
-    [Tooltip("How far INSIDE the screen edge the effective animal movement bounds are.")]
-    [SerializeField][Min(0f)] private float screenBoundsPadding = 0.5f;
-    [Tooltip("How far OUTSIDE the screen edge the 'Offscreen' spawn area starts.")]
-    [SerializeField][Min(0f)] private float offscreenSpawnMargin = 2.0f;
-
-    [Header("Debugging")]
-    [Tooltip("Show gizmos visualizing the Margin (Red) and Padding (Green) bounds.")]
-    [SerializeField] private bool showBoundsGizmos = false;
-
-    [Header("Functional Bounds Offset")] // <<< UPDATED HEADER NAME
-    [Tooltip("Functional horizontal shift for gameplay bounds and spawning relative to camera view.")] // <<< UPDATED TOOLTIP
-    [SerializeField][Range(-10f, 10f)] private float boundsOffsetX = 0f; // <<< RENAMED FIELD
-    [Tooltip("Functional vertical shift for gameplay bounds and spawning relative to camera view.")] // <<< UPDATED TOOLTIP
-    [SerializeField][Range(-10f, 10f)] private float boundsOffsetY = 0f; // <<< RENAMED FIELD
-
-    // --- Runtime State ---
-    private List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
-    private Camera mainCamera;
-
-    // --- Start, InitializeManager, Update, ExecuteSpawnWave, StopAllSpawnCoroutines, SpawnWaveEntryCoroutine (Unchanged) ---
-    void Start() { InitializeManager(); }
-    void InitializeManager() { activeSpawnCoroutines.Clear(); if (WaveManager.Instance != null) { mainCamera = WaveManager.Instance.GetMainCamera(); } if (mainCamera == null) { mainCamera = Camera.main; if (mainCamera == null) Debug.LogError("[FaunaManager] Cannot find Main Camera!", this); } if (ecosystemParent == null) { ecosystemParent = transform; Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned to self.", this); } }
-    void Update() { /* ... */ }
-    public void ExecuteSpawnWave(WaveDefinition waveDef) { if (waveDef == null) { Debug.LogError("[FaunaManager] ExecuteSpawnWave null WaveDefinition!", this); return; } if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; } Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'"); foreach (WaveSpawnEntry entry in waveDef.spawnEntries) { if (entry.animalDefinition == null) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', null AnimalDefinition."); continue; } if (entry.spawnCount <= 0) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', Spawn Count <= 0."); continue; } WaveSpawnEntry currentEntry = entry; Coroutine spawnCoroutine = StartCoroutine(SpawnWaveEntryCoroutine(currentEntry)); activeSpawnCoroutines.Add(spawnCoroutine); } Debug.Log($"[FaunaManager] Started {activeSpawnCoroutines.Count} coroutine(s) for '{waveDef.waveName}'."); }
-    public void StopAllSpawnCoroutines() { if (activeSpawnCoroutines.Count > 0) { Debug.Log("[FaunaManager] Stopping all spawn coroutines."); foreach (Coroutine co in activeSpawnCoroutines) { if (co != null) StopCoroutine(co); } activeSpawnCoroutines.Clear(); } }
-     private IEnumerator SpawnWaveEntryCoroutine(WaveSpawnEntry entry) { if (entry.delayAfterSpawnTime > 0) { yield return new WaitForSeconds(entry.delayAfterSpawnTime); } for (int i = 0; i < entry.spawnCount; i++) { if (WaveManager.Instance != null && !WaveManager.Instance.IsRunActive) { Debug.Log($"[FaunaManager] Halting spawn '{entry.description}', run no longer active."); break; } Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius); bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen; GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen); if (entry.spawnInterval > 0 && i < entry.spawnCount - 1) { yield return new WaitForSeconds(entry.spawnInterval); } } if (activeSpawnCoroutines.Count > 0) activeSpawnCoroutines.RemoveAt(0); } // Simplistic removal
-
-    /// <summary>
-    /// Calculates a spawn position based on the specified type, applying functional offset.
-    /// </summary>
-    private Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius) // <<< MODIFIED
-    {
-        if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera!"); return spawnCenter; }
-
-        // --- Calculate the FUNCTIONAL offset ---
-        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-        // --- Apply offset to camera position for ALL calculations below ---
-        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-
-        Vector2 spawnPos = Vector2.zero;
-        float camHeight = mainCamera.orthographicSize * 2f;
-        float camWidth = camHeight * mainCamera.aspect;
-
-        switch (locationType)
-        {
-            case WaveSpawnLocationType.Offscreen:
-                // Use effectiveCamPos for calculations
-                float marginMinX = effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin;
-                float marginMaxX = effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin;
-                float marginMinY = effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin;
-                float marginMaxY = effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin;
-                float extraOffset = 0.1f; // To spawn strictly outside the line
-                int edge = Random.Range(0, 4);
-                if (edge == 0) { spawnPos.x = marginMinX - extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
-                else if (edge == 1) { spawnPos.x = marginMaxX + extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
-                else if (edge == 2) { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMinY - extraOffset; }
-                else { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMaxY + extraOffset; }
-                break;
-
-            case WaveSpawnLocationType.RandomNearPlayer:
-                 Transform playerT = FindPlayerTransform();
-                 if (playerT != null) {
-                    // Spawn relative to player, still respecting the overall bounds offset implicitly
-                    spawnPos = (Vector2)playerT.position + Random.insideUnitCircle * radius;
-                 } else {
-                     Debug.LogWarning("[FaunaManager] Player not found for RandomNearPlayer. Falling back to Global.");
-                     goto case WaveSpawnLocationType.GlobalSpawnArea; // Fallthrough
-                 }
-                 break;
-
-            case WaveSpawnLocationType.GlobalSpawnArea:
-            default:
-                // Use effectiveCamPos OR a fixed world space center? Let's stick to camera relative for now.
-                // If you want truly fixed global spawn, use spawnCenter directly.
-                // This uses the *shifted* camera center as the basis for the global area.
-                spawnPos.x = effectiveCamPos.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
-                spawnPos.y = effectiveCamPos.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
-                break;
-        }
-        return spawnPos;
-    }
-
-    private Transform FindPlayerTransform() { /* Unchanged */ Transform pT = null; if (WaveManager.Instance != null) { var pI = FindObjectOfType<PlayerTileInteractor>(); if (pI != null) pT = pI.transform; } if (pT == null) { GameObject pO = GameObject.FindGameObjectWithTag("Player"); if (pO != null) pT = pO.transform; } return pT; }
-
-    /// <summary>
-    /// Instantiates and initializes an animal, passing SHIFTED screen bounds.
-    /// </summary>
-    private GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn) // <<< MODIFIED
-    {
-        if (definition == null || definition.prefab == null) { /* Error Log */ return null; }
-        if (mainCamera == null) { /* Error Log */ return null; }
-
-        // --- Calculate SHIFTED Padded Screen Bounds ---
-        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-
-        Vector2 minPaddedBounds, maxPaddedBounds;
-        float camHeight = mainCamera.orthographicSize * 2f;
-        float camWidth = camHeight * mainCamera.aspect;
-
-        minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
-        maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
-        minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
-        maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
-        // ---------------------------------------------
-
-        GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
-
-        // Parenting (unchanged)
-        if (ecosystemParent != null) { Transform sP = ecosystemParent; if (!string.IsNullOrEmpty(definition.animalName)) { sP = ecosystemParent.Find(definition.animalName); if (sP == null) { GameObject subP = new GameObject(definition.animalName); subP.transform.SetParent(ecosystemParent); sP = subP.transform; } } animalObj.transform.SetParent(sP); }
-
-        // Initialize Controller, passing the SHIFTED bounds
-        AnimalController controller = animalObj.GetComponent<AnimalController>();
-        if (controller != null) {
-            controller.Initialize(definition, minPaddedBounds, maxPaddedBounds, isOffscreenSpawn); // Pass shifted bounds
-        } else { /* Error Log & Destroy */ Destroy(animalObj); return null; }
-        return animalObj;
-    }
-
-    /// <summary>
-    /// Draws debug rectangles applying the functional offset.
-    /// </summary>
-    void OnDrawGizmos() // <<< MODIFIED to use offset
-    {
-        if (!showBoundsGizmos || mainCamera == null) return;
-
-        // --- Apply functional offset for Gizmo drawing ---
-        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-        // --------------------------------------------------
-
-        float camHeight = mainCamera.orthographicSize * 2f;
-        float camWidth = camHeight * mainCamera.aspect;
-
-        // Calculate corners using effectiveCamPos
-        Vector2 paddedMin = new Vector2(effectiveCamPos.x - camWidth / 2f + screenBoundsPadding, effectiveCamPos.y - camHeight / 2f + screenBoundsPadding);
-        Vector2 paddedMax = new Vector2(effectiveCamPos.x + camWidth / 2f - screenBoundsPadding, effectiveCamPos.y + camHeight / 2f - screenBoundsPadding);
-        DrawWireRectangleGizmo(paddedMin, paddedMax, Color.green);
-
-        Vector2 marginMin = new Vector2(effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin, effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin);
-        Vector2 marginMax = new Vector2(effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin, effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin);
-        DrawWireRectangleGizmo(marginMin, marginMax, Color.red);
-    }
-
-    void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { /* Unchanged */ Gizmos.color = color; Gizmos.DrawLine(new Vector3(min.x, min.y, 0), new Vector3(max.x, min.y, 0)); Gizmos.DrawLine(new Vector3(max.x, min.y, 0), new Vector3(max.x, max.y, 0)); Gizmos.DrawLine(new Vector3(max.x, max.y, 0), new Vector3(min.x, max.y, 0)); Gizmos.DrawLine(new Vector3(min.x, max.y, 0), new Vector3(min.x, min.y, 0)); }
-
-} // End of class
 
 
 

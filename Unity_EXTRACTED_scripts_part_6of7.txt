@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-10 01:49:48
+UNITY PROJECT SCRIPT EXPORT - 2025-05-17 03:36:09
 PART 6 OF 7
 ================================================================================
 
@@ -81,7 +81,8 @@ Assets
 │       └── Rule Tiles
 │           ├── DualGridRuleTile_Dirt.asset
 │           ├── DualGridRuleTile_DirtWet.asset
-│           └── DualGridRuleTile_Grass.asset
+│           ├── DualGridRuleTile_Grass.asset
+│           └── DualGridRuleTile_Water.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -105,7 +106,7 @@ Assets
 │   │   ├── Node_000_Seed.asset
 │   │   ├── Node_001_Berry.asset
 │   │   ├── Node_002_FireflyPheromone.asset
-│   │   └── Node_003_WaterPreserver.asset
+│   │   └── Node_003_PoopFertilizer.asset
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
@@ -125,6 +126,7 @@ Assets
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
+│   │   │   ├── LeafData.cs
 │   │   │   ├── PlantCell.cs
 │   │   │   ├── PlantGrowth.Cell.cs
 │   │   │   ├── PlantGrowth.Growth.cs
@@ -231,6 +233,450 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Data\PlantPlacementManagement.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+public class PlantPlacementManager : MonoBehaviour
+{
+    public static PlantPlacementManager Instance { get; private set; }
+
+    [Header("References")]
+    [SerializeField] private GameObject plantPrefab;
+    [SerializeField] private NodeEditorGridController nodeEditorGrid;
+    [SerializeField] private Transform plantParent;
+    [SerializeField] private TileInteractionManager tileInteractionManager;
+    [SerializeField] private PlantGrowthModifierManager growthModifierManager;
+
+    [Header("Planting Settings")]
+    [Tooltip("Maximum radius from cell center for random seed placement (in units)")]
+    [SerializeField] private float spawnRadius = 0.25f;
+    
+    [Tooltip("Increment for position randomization (in pixels, for pixel-perfect placement)")]
+    [SerializeField] private float spawnRadiusIncrement = 4f;
+
+    [Header("Tile Restrictions")]
+    [Tooltip("List of tiles that cannot be planted on")]
+    [SerializeField] private List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
+
+    [Header("Debug")]
+    [SerializeField] private bool showDebugMessages = true;
+    
+    // Cache for quick lookup of invalid tiles
+    private HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
+    
+    // Dictionary to track plant positions (using grid cell positions as keys)
+    private Dictionary<Vector3Int, GameObject> plantsByGridPosition = new Dictionary<Vector3Int, GameObject>();
+    
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        
+        // Build the set of invalid tiles for faster lookup
+        RebuildInvalidTilesSet();
+    }
+
+    private void Start()
+    {
+        // Initialize references if not set in inspector
+        if (plantParent == null && EcosystemManager.Instance != null)
+        {
+            plantParent = EcosystemManager.Instance.plantParent;
+        }
+        
+        if (nodeEditorGrid == null)
+        {
+            nodeEditorGrid = NodeEditorGridController.Instance;
+        }
+        
+        if (tileInteractionManager == null)
+        {
+            tileInteractionManager = TileInteractionManager.Instance;
+        }
+        
+        if (growthModifierManager == null)
+        {
+            growthModifierManager = PlantGrowthModifierManager.Instance;
+        }
+    }
+    
+    private void RebuildInvalidTilesSet()
+    {
+        invalidTilesSet.Clear();
+        foreach (var tile in invalidPlantingTiles)
+        {
+            if (tile != null)
+            {
+                invalidTilesSet.Add(tile);
+            }
+        }
+        
+        if (showDebugMessages)
+        {
+            Debug.Log($"PlantPlacementManager: Built invalid tiles set with {invalidTilesSet.Count} entries");
+        }
+    }
+    
+    private void OnValidate()
+    {
+        // Rebuild the set when changed in Inspector
+        RebuildInvalidTilesSet();
+    }
+
+    // Check if a grid position is occupied by a plant
+    public bool IsPositionOccupied(Vector3Int gridPosition)
+    {
+        // If we have a reference, check if it's still valid (not destroyed)
+        if (plantsByGridPosition.TryGetValue(gridPosition, out GameObject plant))
+        {
+            if (plant == null)
+            {
+                // Plant has been destroyed, remove from dictionary
+                plantsByGridPosition.Remove(gridPosition);
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    // Check if a tile is valid for planting
+    public bool IsTileValidForPlanting(TileDefinition tileDef)
+    {
+        // If the tile is null, it's not valid
+        if (tileDef == null)
+            return false;
+            
+        // Check if this tile is in our invalid set
+        return !invalidTilesSet.Contains(tileDef);
+    }
+
+    // Clean up destroyed plants from our dictionary (call periodically if needed)
+    public void CleanupDestroyedPlants()
+    {
+        List<Vector3Int> keysToRemove = new List<Vector3Int>();
+        
+        foreach (var kvp in plantsByGridPosition)
+        {
+            if (kvp.Value == null)
+            {
+                keysToRemove.Add(kvp.Key);
+            }
+        }
+        
+        foreach (var key in keysToRemove)
+        {
+            plantsByGridPosition.Remove(key);
+        }
+        
+        if (showDebugMessages && keysToRemove.Count > 0)
+        {
+            Debug.Log($"PlantPlacementManager: Removed {keysToRemove.Count} destroyed plant references.");
+        }
+    }
+
+    // Try to plant a seed at the given grid position
+    public bool TryPlantSeed(Vector3Int gridPosition, Vector3 worldPosition)
+    {
+        // Clean up any destroyed plants first
+        CleanupDestroyedPlants();
+        
+        // Return false if position is already occupied
+        if (IsPositionOccupied(gridPosition))
+        {
+            if (showDebugMessages)
+            {
+                Debug.Log($"Cannot plant: Position {gridPosition} already has a plant.");
+            }
+            return false;
+        }
+        
+        // Get the tile at this position
+        TileDefinition tileDef = null;
+        if (tileInteractionManager != null)
+        {
+            tileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
+            
+            // Check if the tile is valid for planting
+            if (!IsTileValidForPlanting(tileDef))
+            {
+                if (showDebugMessages)
+                {
+                    string tileName = tileDef != null ? tileDef.displayName : "Unknown";
+                    Debug.Log($"Cannot plant: Tile {tileName} is not valid for planting.");
+                }
+                return false;
+            }
+        }
+
+        // Get the current graph from the NodeEditorGridController
+        if (nodeEditorGrid == null)
+        {
+            nodeEditorGrid = NodeEditorGridController.Instance;
+            if (nodeEditorGrid == null)
+            {
+                Debug.LogError("Cannot plant: NodeEditorGridController not found.");
+                return false;
+            }
+        }
+
+        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
+        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0)
+        {
+            if (showDebugMessages)
+            {
+                Debug.Log("Cannot plant: No nodes in UI graph to spawn.");
+            }
+            return false;
+        }
+        
+        // Validate graph has a seed node
+        bool seedFound = false;
+        foreach (var node in graphToSpawn.nodes)
+        {
+            if (node != null && node.effects != null)
+            {
+                foreach (var effect in node.effects)
+                {
+                    if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
+                    {
+                        seedFound = true;
+                        break;
+                    }
+                }
+            }
+            if (seedFound) break;
+        }
+
+        if (!seedFound)
+        {
+            if (showDebugMessages)
+            {
+                Debug.Log("Cannot plant: Node graph lacks a SeedSpawn effect.");
+            }
+            return false;
+        }
+
+        // Calculate randomized planting position based on our settings
+        Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
+        
+        // Spawn the plant at the randomized position
+        GameObject plantObj = SpawnPlant(graphToSpawn, plantingPosition);
+        if (plantObj != null)
+        {
+            // Track the plant position
+            plantsByGridPosition[gridPosition] = plantObj;
+            
+            // Register the plant with the growth modifier manager
+            if (growthModifierManager != null)
+            {
+                PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
+                if (plantGrowth != null)
+                {
+                    growthModifierManager.RegisterPlantTile(plantGrowth, tileDef);
+                    
+                    if (showDebugMessages)
+                    {
+                        string tileDebugName = tileDef != null ? tileDef.displayName : "Unknown";
+                        Debug.Log($"Plant registered with tile: {tileDebugName}");
+                    }
+                }
+            }
+            
+            return true;
+        }
+        return false;
+    }
+
+    // Spawn a plant using the given node graph at the specified position
+    private GameObject SpawnPlant(NodeGraph graphToSpawn, Vector3 position)
+    {
+        if (plantPrefab == null)
+        {
+            Debug.LogError("Cannot spawn plant: Plant prefab not assigned.");
+            return null;
+        }
+
+        Debug.Log($"SpawnPlant called with position: {position}");
+    
+        // Instantiate the plant prefab
+        GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
+    
+        // Verify the position was actually applied
+        Debug.Log($"Plant instantiated at position: {plantObj.transform.position}");
+
+        // Get the PlantGrowth component
+        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+        if (growthComponent != null)
+        {
+            // Create a deep copy of the node graph to prevent modifications affecting the original
+            NodeGraph graphCopy = CloneNodeGraph(graphToSpawn);
+
+            // Initialize the plant with the deep copy
+            growthComponent.InitializeAndGrow(graphCopy);
+            return plantObj;
+        }
+        else
+        {
+            Debug.LogError("Plant prefab missing PlantGrowth component! Destroying spawned object.");
+            Destroy(plantObj);
+            return null;
+        }
+    }
+
+    // Create a deep copy of a NodeGraph
+    private NodeGraph CloneNodeGraph(NodeGraph original)
+    {
+        NodeGraph copy = new NodeGraph();
+        copy.nodes = new List<NodeData>();
+
+        foreach (NodeData originalNode in original.nodes)
+        {
+            if (originalNode == null) continue;
+
+            NodeData newNode = new NodeData
+            {
+                nodeId = originalNode.nodeId,
+                nodeDisplayName = originalNode.nodeDisplayName,
+                orderIndex = originalNode.orderIndex,
+                canBeDeleted = originalNode.canBeDeleted
+            };
+
+            // Deep copy effects
+            newNode.effects = CloneEffectsList(originalNode.effects);
+            copy.nodes.Add(newNode);
+        }
+
+        return copy;
+    }
+
+    // Create a deep copy of a list of NodeEffectData
+    private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
+    {
+        if (originalList == null) return new List<NodeEffectData>();
+
+        List<NodeEffectData> newList = new List<NodeEffectData>();
+        foreach (var originalEffect in originalList)
+        {
+            if (originalEffect == null) continue;
+
+            NodeEffectData newEffect = new NodeEffectData
+            {
+                effectType = originalEffect.effectType,
+                primaryValue = originalEffect.primaryValue,
+                secondaryValue = originalEffect.secondaryValue,
+                isPassive = originalEffect.isPassive,
+                scentDefinitionReference = originalEffect.scentDefinitionReference
+            };
+            newList.Add(newEffect);
+        }
+        return newList;
+    }
+    
+    // Generate a randomized position within the given radius, with simple increments
+    // Generate a randomized position within the given radius
+    private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
+    {
+        // First, let's add comprehensive debugging
+        Debug.Log($"Starting position randomization from center: {centerPosition}, radius: {spawnRadius}, increment: {spawnRadiusIncrement}");
+    
+        // Critical check - if radius is too small, just return the center
+        if (spawnRadius < 0.01f)
+        {
+            Debug.LogWarning("Spawn radius too small (<0.01), using center position");
+            return centerPosition;
+        }
+    
+        // Generate a random angle in radians (0 to 2π)
+        float randomAngle = Random.Range(0f, 2f * Mathf.PI);
+        Debug.Log($"Random angle: {randomAngle} radians ({randomAngle * Mathf.Rad2Deg} degrees)");
+    
+        // Convert angle to direction vector
+        Vector2 direction = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle));
+        Debug.Log($"Direction vector: {direction}");
+    
+        // Get a random distance within spawn radius
+        float randomDistance = Random.Range(0.05f, spawnRadius);
+        Debug.Log($"Random distance: {randomDistance}");
+    
+        // Calculate actual offset
+        float offsetX = direction.x * randomDistance;
+        float offsetY = direction.y * randomDistance;
+        Debug.Log($"Raw offset: ({offsetX}, {offsetY})");
+    
+        // Apply increment if needed
+        if (spawnRadiusIncrement > 0.001f)
+        {
+            float originalX = offsetX;
+            float originalY = offsetY;
+        
+            offsetX = Mathf.Round(offsetX / spawnRadiusIncrement) * spawnRadiusIncrement;
+            offsetY = Mathf.Round(offsetY / spawnRadiusIncrement) * spawnRadiusIncrement;
+        
+            Debug.Log($"Snapped offset: ({offsetX}, {offsetY}) from ({originalX}, {originalY})");
+        }
+    
+        // Create the final position
+        Vector3 randomizedPosition = centerPosition + new Vector3(offsetX, offsetY, 0f);
+        Debug.Log($"FINAL randomized position: {randomizedPosition}");
+    
+        return randomizedPosition;
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Data\PlayerTileInteractor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+[RequireComponent(typeof(ToolSwitcher))]
+public class PlayerTileInteractor : MonoBehaviour
+{
+    private ToolSwitcher toolSwitcher;
+
+    private void Awake()
+    {
+        toolSwitcher = GetComponent<ToolSwitcher>();
+        if (toolSwitcher == null)
+            Debug.LogError("PlayerTileInteractor: No ToolSwitcher found on this GameObject!");
+    }
+
+    private void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            if (TileInteractionManager.Instance == null)
+            {
+                Debug.LogError("No TileInteractionManager in scene!");
+                return;
+            }
+
+            ToolDefinition currentTool = toolSwitcher.CurrentTool;
+            if (currentTool == null)
+            {
+                Debug.Log("No tool is currently selected.");
+                return;
+            }
+
+            // Attempt to apply the tool
+            TileInteractionManager.Instance.ApplyToolAction(currentTool);
+        }
+    }
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Data\TileDefinition.cs
@@ -1324,340 +1770,6 @@ public class ToolSwitcher : MonoBehaviour
     WateringCan,
     SeedPouch // New tool type
     // etc.
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Visuals\NightColorPostProcess.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
-
-// Ensure this script is attached to a GameObject in your scene
-public class NightColorPostProcess : MonoBehaviour
-{
-    [Header("Core References")]
-    [Tooltip("Assign the WeatherManager controlling the day/night cycle.")]
-    public WeatherManager weatherManager;
-    [Tooltip("Assign the Global Post Processing Volume.")]
-    public Volume globalVolume;
-
-    // --- Private references to the Volume Overrides ---
-    private ColorAdjustments colorAdjustments;
-    private FilmGrain filmGrain;
-    private Vignette vignette;
-    // private Bloom bloom; // Example if you wanted to add Bloom later
-
-    [Header("Color Adjustments")]
-    [Tooltip("The color filter at full day (sunIntensity = 1).")]
-    public Color dayColorFilter = Color.white;
-    [Tooltip("The color filter at full night (sunIntensity ~ 0).")]
-    public Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
-    [Tooltip("Daytime Post-Exposure (Higher = brighter).")]
-    public float dayPostExposure = 0f;
-    [Tooltip("Nighttime Post-Exposure (Lower = darker).")]
-    public float nightPostExposure = -0.5f;
-    [Tooltip("Saturation at full day (0 = no change, <0 desaturates, >0 saturates).")]
-    public float daySaturation = 0f;
-    [Tooltip("Saturation at full night (e.g., -50 for more desaturation).")]
-    public float nightSaturation = -50f;
-
-    [Header("Film Grain")]
-    [Tooltip("Film grain intensity at full day (0 = none).")]
-    [Range(0f, 1f)] public float dayFilmGrainIntensity = 0.1f;
-    [Tooltip("Film grain intensity at full night (e.g., 0.5 for noticeable grain).")]
-    [Range(0f, 1f)] public float nightFilmGrainIntensity = 0.5f;
-    // Note: You could also control FilmGrain.response if desired
-
-    [Header("Vignette")]
-    [Tooltip("Vignette intensity at full day (0 = none, higher = stronger effect).")]
-    [Range(0f, 1f)] public float dayVignetteIntensity = 0.2f;
-    [Tooltip("Vignette intensity at full night (e.g., 0.5 for darker edges).")]
-    [Range(0f, 1f)] public float nightVignetteIntensity = 0.5f;
-    [Tooltip("Vignette smoothness at full day (higher = softer edge).")]
-    [Range(0.01f, 1f)] public float dayVignetteSmoothness = 0.2f;
-    [Tooltip("Vignette smoothness at full night.")]
-    [Range(0.01f, 1f)] public float nightVignetteSmoothness = 0.3f;
-    // Note: You could also control Vignette.color or Vignette.rounded if desired
-
-
-    private void Start()
-    {
-        // --- Validate Core References ---
-        if (!weatherManager)
-        {
-            Debug.LogError($"[{nameof(NightColorPostProcess)}] WeatherManager not assigned!", this);
-            enabled = false; // Disable script if core references are missing
-            return;
-        }
-        if (!globalVolume)
-        {
-            Debug.LogError($"[{nameof(NightColorPostProcess)}] Global Volume not assigned!", this);
-            enabled = false;
-            return;
-        }
-        if (globalVolume.profile == null)
-        {
-             Debug.LogError($"[{nameof(NightColorPostProcess)}] Global Volume has no profile assigned!", this);
-             enabled = false;
-             return;
-        }
-
-        // --- Attempt to Get Volume Overrides ---
-        // It's okay if some aren't found, the Update loop will check for null
-        if (!globalVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments))
-        {
-            Debug.LogWarning($"[{nameof(NightColorPostProcess)}] ColorAdjustments override not found in Volume profile.", this);
-        }
-        if (!globalVolume.profile.TryGet<FilmGrain>(out filmGrain))
-        {
-             Debug.LogWarning($"[{nameof(NightColorPostProcess)}] FilmGrain override not found in Volume profile.", this);
-        }
-        if (!globalVolume.profile.TryGet<Vignette>(out vignette))
-        {
-             Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Vignette override not found in Volume profile.", this);
-        }
-        // Example for Bloom:
-        // if (!globalVolume.profile.TryGet<Bloom>(out bloom))
-        // {
-        //      Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Bloom override not found in Volume profile.", this);
-        // }
-
-        // --- Ensure Overrides are Active ---
-        // Make sure the overrides you intend to use are actually enabled on the Volume component itself.
-        // You might need to manually check the boxes in the Inspector for ColorAdjustments, FilmGrain, and Vignette.
-        // Alternatively, you could force them active here, but it's usually better to configure in the editor:
-        // if (colorAdjustments != null) colorAdjustments.active = true;
-        // if (filmGrain != null) filmGrain.active = true;
-        // if (vignette != null) vignette.active = true;
-    }
-
-    private void Update()
-    {
-        // No need to check weatherManager, Start() already disables if null
-        // Check if any overrides are available before proceeding
-        if (colorAdjustments == null && filmGrain == null && vignette == null)
-            return; // Nothing to update if no overrides were found
-
-        // Get the sun intensity (0 = night, 1 = day) and calculate interpolation factor t
-        float sun = Mathf.Clamp01(weatherManager.sunIntensity);
-        float t = 1f - sun;  // t=0 at day, t=1 at night
-
-        // --- Interpolate and Apply Color Adjustments ---
-        if (colorAdjustments != null)
-        {
-            colorAdjustments.colorFilter.value = Color.Lerp(dayColorFilter, nightColorFilter, t);
-            colorAdjustments.postExposure.value = Mathf.Lerp(dayPostExposure, nightPostExposure, t);
-            colorAdjustments.saturation.value = Mathf.Lerp(daySaturation, nightSaturation, t);
-        }
-
-        // --- Interpolate and Apply Film Grain ---
-        if (filmGrain != null)
-        {
-            filmGrain.intensity.value = Mathf.Lerp(dayFilmGrainIntensity, nightFilmGrainIntensity, t);
-            // You can add Lerp for filmGrain.response here if needed
-        }
-
-        // --- Interpolate and Apply Vignette ---
-        if (vignette != null)
-        {
-            vignette.intensity.value = Mathf.Lerp(dayVignetteIntensity, nightVignetteIntensity, t);
-            vignette.smoothness.value = Mathf.Lerp(dayVignetteSmoothness, nightVignetteSmoothness, t);
-             // You can add Lerp for vignette.color or vignette.rounded here if needed
-        }
-
-        // --- Example for Bloom ---
-        // if (bloom != null)
-        // {
-        //     bloom.intensity.value = Mathf.Lerp(dayBloomIntensity, nightBloomIntensity, t);
-        // }
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Visuals\OutlinePartController.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Visuals/OutlinePartController.cs
-using UnityEngine;
-
-[RequireComponent(typeof(SpriteRenderer))]
-public class OutlinePartController : MonoBehaviour
-{
-    private SpriteRenderer outlineRenderer;
-    private SpriteRenderer sourcePlantPartRenderer; // The plant part this outline mimics
-
-    [HideInInspector] public Vector2Int gridCoord; // The coordinate *this outline* lives at
-
-    void Awake()
-    {
-        outlineRenderer = GetComponent<SpriteRenderer>();
-        if (outlineRenderer != null)
-        {
-            outlineRenderer.drawMode = SpriteDrawMode.Simple;
-            outlineRenderer.enabled = false;
-        }
-        else
-        {
-            Debug.LogError($"[{gameObject.name}] OutlinePartController is missing SpriteRenderer component!", this);
-        }
-    }
-
-    public void Initialize(SpriteRenderer sourceRenderer, Vector2Int myCoord, PlantOutlineController controller)
-    {
-        if (sourceRenderer == null || controller == null) 
-        { 
-            Debug.LogError($"[{gameObject.name}] Initialization failed! Source renderer or controller is null!", this);
-            Destroy(gameObject); 
-            return; 
-        }
-        
-        sourcePlantPartRenderer = sourceRenderer; // Store initial source
-        gridCoord = myCoord;
-        
-        if (outlineRenderer == null)
-        {
-            outlineRenderer = GetComponent<SpriteRenderer>();
-            if (outlineRenderer == null)
-            {
-                Debug.LogError($"[{gameObject.name}] Initialize: Cannot find SpriteRenderer component!", this);
-                Destroy(gameObject);
-                return;
-            }
-        }
-        
-        // Set layer & color properties
-        outlineRenderer.sortingLayerID = controller.OutlineSortingLayer;
-        outlineRenderer.sortingOrder = controller.OutlineSortingOrder;
-        outlineRenderer.color = controller.OutlineColor;
-        
-        // Set parent & position
-        transform.SetParent(controller.transform, true); // Parent to controller's transform
-        
-        // Set initial position based on grid coordinate (controller handles spacing)
-        float spacing = controller.GetComponentInParent<PlantGrowth>()?.GetCellSpacing() ?? 0.08f; // Get spacing
-        transform.localPosition = (Vector2)myCoord * spacing;
-
-        // Set visibility based on source renderer's state
-        outlineRenderer.enabled = IsSourceRendererValid() && 
-                                  sourcePlantPartRenderer.enabled && 
-                                  sourcePlantPartRenderer.sprite != null;
-        
-        SyncSpriteAndTransform(); // Initial sync
-    }
-
-    void LateUpdate()
-    {
-        // Skip update if not visible
-        if (outlineRenderer == null || !outlineRenderer.enabled) return;
-
-        // Check if source is still valid
-        if (!IsSourceRendererValid())
-        {
-            SetVisibility(false);
-            return;
-        }
-        
-        // Check if source is still enabled and has a sprite
-        if (!sourcePlantPartRenderer.enabled || sourcePlantPartRenderer.sprite == null)
-        {
-            SetVisibility(false);
-            return;
-        }
-
-        // If we are enabled and source is valid, sync visuals
-        SyncSpriteAndTransform();
-    }
-
-    // Public method to check if the source renderer still exists
-    public bool IsSourceRendererValid()
-    {
-        // Unity overloads null check for destroyed objects
-        if (sourcePlantPartRenderer == null)
-            return false;
-            
-        // Additional check: is the gameObject actually active/valid
-        if (!sourcePlantPartRenderer.gameObject.activeInHierarchy)
-            return false;
-            
-        return true;
-    }
-
-    // Public method to update the source renderer if the original was destroyed
-    public void UpdateSourceRenderer(SpriteRenderer newSource)
-    {
-        if (newSource != null)
-        {
-            sourcePlantPartRenderer = newSource;
-            
-            // Ensure visibility state is correct after source update
-            SetVisibility(
-                outlineRenderer != null && 
-                sourcePlantPartRenderer.enabled && 
-                sourcePlantPartRenderer.sprite != null
-            );
-            
-            // Immediately sync sprite/transform after updating source
-            SyncSpriteAndTransform();
-            
-            // Debug.Log($"Updated outline at {gridCoord} with new source renderer: {newSource.gameObject.name}");
-        } 
-        else 
-        {
-            Debug.LogWarning($"Attempted to update source renderer for outline at {gridCoord} with null.", gameObject);
-            // If no valid new source, hide this outline
-            SetVisibility(false);
-        }
-    }
-
-    // Sync sprite and transform data
-    public void SyncSpriteAndTransform()
-    {
-        // Safety checks
-        if (!IsSourceRendererValid() || outlineRenderer == null) 
-            return;
-
-        // Sync sprite
-        if (outlineRenderer.sprite != sourcePlantPartRenderer.sprite)
-        {
-            outlineRenderer.sprite = sourcePlantPartRenderer.sprite;
-        }
-        
-        // Sync other visual properties
-        transform.localScale = sourcePlantPartRenderer.transform.localScale;
-        outlineRenderer.flipX = sourcePlantPartRenderer.flipX;
-        outlineRenderer.flipY = sourcePlantPartRenderer.flipY;
-        
-        // Note: Position is set in Initialize and doesn't need to track source renderer's parent offset
-    }
-
-    public void SetVisibility(bool isVisible)
-    {
-        if (outlineRenderer != null && outlineRenderer.enabled != isVisible)
-        {
-            outlineRenderer.enabled = isVisible;
-        }
-    }
-
-    public void DestroyOutlinePart()
-    {
-        if (this != null && gameObject != null)
-        {
-            if (Application.isPlaying)
-            {
-                Destroy(gameObject);
-            }
-            else
-            {
-                DestroyImmediate(gameObject);
-            }
-        }
-    }
 }
 
 

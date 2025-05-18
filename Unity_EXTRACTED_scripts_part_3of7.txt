@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-10 01:49:48
+UNITY PROJECT SCRIPT EXPORT - 2025-05-17 03:36:09
 PART 3 OF 7
 ================================================================================
 
@@ -81,7 +81,8 @@ Assets
 │       └── Rule Tiles
 │           ├── DualGridRuleTile_Dirt.asset
 │           ├── DualGridRuleTile_DirtWet.asset
-│           └── DualGridRuleTile_Grass.asset
+│           ├── DualGridRuleTile_Grass.asset
+│           └── DualGridRuleTile_Water.asset
 ├── Scenes
 │   ├── MainScene.unity
 │   ├── SampleScene
@@ -105,7 +106,7 @@ Assets
 │   │   ├── Node_000_Seed.asset
 │   │   ├── Node_001_Berry.asset
 │   │   ├── Node_002_FireflyPheromone.asset
-│   │   └── Node_003_WaterPreserver.asset
+│   │   └── Node_003_PoopFertilizer.asset
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
@@ -125,6 +126,7 @@ Assets
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
+│   │   │   ├── LeafData.cs
 │   │   │   ├── PlantCell.cs
 │   │   │   ├── PlantGrowth.Cell.cs
 │   │   │   ├── PlantGrowth.Growth.cs
@@ -233,6 +235,187 @@ SCRIPT CONTENTS
 ================================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Core\FaunaManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Ecosystem/Core/FaunaManager.cs
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class FaunaManager : MonoBehaviour
+{
+    [Header("Spawning Area (Global)")]
+    [SerializeField] private Vector2 spawnCenter = Vector2.zero;
+    [SerializeField] private Vector2 spawnAreaSize = new Vector2(20f, 10f);
+
+    [Header("General Settings")]
+    [SerializeField] private Transform ecosystemParent;
+    [Tooltip("How far INSIDE the screen edge the effective animal movement bounds are.")]
+    [SerializeField][Min(0f)] private float screenBoundsPadding = 0.5f;
+    [Tooltip("How far OUTSIDE the screen edge the 'Offscreen' spawn area starts.")]
+    [SerializeField][Min(0f)] private float offscreenSpawnMargin = 2.0f;
+
+    [Header("Debugging")]
+    [Tooltip("Show gizmos visualizing the Margin (Red) and Padding (Green) bounds.")]
+    [SerializeField] private bool showBoundsGizmos = false;
+
+    [Header("Functional Bounds Offset")] // <<< UPDATED HEADER NAME
+    [Tooltip("Functional horizontal shift for gameplay bounds and spawning relative to camera view.")] // <<< UPDATED TOOLTIP
+    [SerializeField][Range(-10f, 10f)] private float boundsOffsetX = 0f; // <<< RENAMED FIELD
+    [Tooltip("Functional vertical shift for gameplay bounds and spawning relative to camera view.")] // <<< UPDATED TOOLTIP
+    [SerializeField][Range(-10f, 10f)] private float boundsOffsetY = 0f; // <<< RENAMED FIELD
+
+    // --- Runtime State ---
+    private List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
+    private Camera mainCamera;
+
+    // --- Start, InitializeManager, Update, ExecuteSpawnWave, StopAllSpawnCoroutines, SpawnWaveEntryCoroutine (Unchanged) ---
+    void Start() { InitializeManager(); }
+    void InitializeManager() { activeSpawnCoroutines.Clear(); if (WaveManager.Instance != null) { mainCamera = WaveManager.Instance.GetMainCamera(); } if (mainCamera == null) { mainCamera = Camera.main; if (mainCamera == null) Debug.LogError("[FaunaManager] Cannot find Main Camera!", this); } if (ecosystemParent == null) { ecosystemParent = transform; Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned to self.", this); } }
+    void Update() { /* ... */ }
+    public void ExecuteSpawnWave(WaveDefinition waveDef) { if (waveDef == null) { Debug.LogError("[FaunaManager] ExecuteSpawnWave null WaveDefinition!", this); return; } if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; } Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'"); foreach (WaveSpawnEntry entry in waveDef.spawnEntries) { if (entry.animalDefinition == null) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', null AnimalDefinition."); continue; } if (entry.spawnCount <= 0) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', Spawn Count <= 0."); continue; } WaveSpawnEntry currentEntry = entry; Coroutine spawnCoroutine = StartCoroutine(SpawnWaveEntryCoroutine(currentEntry)); activeSpawnCoroutines.Add(spawnCoroutine); } Debug.Log($"[FaunaManager] Started {activeSpawnCoroutines.Count} coroutine(s) for '{waveDef.waveName}'."); }
+    public void StopAllSpawnCoroutines() { if (activeSpawnCoroutines.Count > 0) { Debug.Log("[FaunaManager] Stopping all spawn coroutines."); foreach (Coroutine co in activeSpawnCoroutines) { if (co != null) StopCoroutine(co); } activeSpawnCoroutines.Clear(); } }
+     private IEnumerator SpawnWaveEntryCoroutine(WaveSpawnEntry entry) { if (entry.delayAfterSpawnTime > 0) { yield return new WaitForSeconds(entry.delayAfterSpawnTime); } for (int i = 0; i < entry.spawnCount; i++) { if (WaveManager.Instance != null && !WaveManager.Instance.IsRunActive) { Debug.Log($"[FaunaManager] Halting spawn '{entry.description}', run no longer active."); break; } Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius); bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen; GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen); if (entry.spawnInterval > 0 && i < entry.spawnCount - 1) { yield return new WaitForSeconds(entry.spawnInterval); } } if (activeSpawnCoroutines.Count > 0) activeSpawnCoroutines.RemoveAt(0); } // Simplistic removal
+
+    /// <summary>
+    /// Calculates a spawn position based on the specified type, applying functional offset.
+    /// </summary>
+    private Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius) // <<< MODIFIED
+    {
+        if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera!"); return spawnCenter; }
+
+        // --- Calculate the FUNCTIONAL offset ---
+        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+        // --- Apply offset to camera position for ALL calculations below ---
+        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+
+        Vector2 spawnPos = Vector2.zero;
+        float camHeight = mainCamera.orthographicSize * 2f;
+        float camWidth = camHeight * mainCamera.aspect;
+
+        switch (locationType)
+        {
+            case WaveSpawnLocationType.Offscreen:
+                // Use effectiveCamPos for calculations
+                float marginMinX = effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin;
+                float marginMaxX = effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin;
+                float marginMinY = effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin;
+                float marginMaxY = effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin;
+                float extraOffset = 0.1f; // To spawn strictly outside the line
+                int edge = Random.Range(0, 4);
+                if (edge == 0) { spawnPos.x = marginMinX - extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
+                else if (edge == 1) { spawnPos.x = marginMaxX + extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
+                else if (edge == 2) { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMinY - extraOffset; }
+                else { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMaxY + extraOffset; }
+                break;
+
+            case WaveSpawnLocationType.RandomNearPlayer:
+                 Transform playerT = FindPlayerTransform();
+                 if (playerT != null) {
+                    // Spawn relative to player, still respecting the overall bounds offset implicitly
+                    spawnPos = (Vector2)playerT.position + Random.insideUnitCircle * radius;
+                 } else {
+                     Debug.LogWarning("[FaunaManager] Player not found for RandomNearPlayer. Falling back to Global.");
+                     goto case WaveSpawnLocationType.GlobalSpawnArea; // Fallthrough
+                 }
+                 break;
+
+            case WaveSpawnLocationType.GlobalSpawnArea:
+            default:
+                // Use effectiveCamPos OR a fixed world space center? Let's stick to camera relative for now.
+                // If you want truly fixed global spawn, use spawnCenter directly.
+                // This uses the *shifted* camera center as the basis for the global area.
+                spawnPos.x = effectiveCamPos.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
+                spawnPos.y = effectiveCamPos.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
+                break;
+        }
+        return spawnPos;
+    }
+
+    private Transform FindPlayerTransform()
+    {
+        Transform pT = null;
+        if (WaveManager.Instance != null)
+        {
+            var pI = FindAnyObjectByType<PlayerTileInteractor>();
+            if (pI != null) pT = pI.transform;
+        }
+        if (pT == null)
+        {
+            GameObject pO = GameObject.FindGameObjectWithTag("Player");
+            if (pO != null) pT = pO.transform;
+        }
+        return pT;
+    }
+    
+    /// <summary>
+    /// Instantiates and initializes an animal, passing SHIFTED screen bounds.
+    /// </summary>
+    private GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn) // <<< MODIFIED
+    {
+        if (definition == null || definition.prefab == null) { /* Error Log */ return null; }
+        if (mainCamera == null) { /* Error Log */ return null; }
+
+        // --- Calculate SHIFTED Padded Screen Bounds ---
+        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+
+        Vector2 minPaddedBounds, maxPaddedBounds;
+        float camHeight = mainCamera.orthographicSize * 2f;
+        float camWidth = camHeight * mainCamera.aspect;
+
+        minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
+        maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
+        minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
+        maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
+        // ---------------------------------------------
+
+        GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
+
+        // Parenting (unchanged)
+        if (ecosystemParent != null) { Transform sP = ecosystemParent; if (!string.IsNullOrEmpty(definition.animalName)) { sP = ecosystemParent.Find(definition.animalName); if (sP == null) { GameObject subP = new GameObject(definition.animalName); subP.transform.SetParent(ecosystemParent); sP = subP.transform; } } animalObj.transform.SetParent(sP); }
+
+        // Initialize Controller, passing the SHIFTED bounds
+        AnimalController controller = animalObj.GetComponent<AnimalController>();
+        if (controller != null) {
+            controller.Initialize(definition, minPaddedBounds, maxPaddedBounds, isOffscreenSpawn); // Pass shifted bounds
+        } else { /* Error Log & Destroy */ Destroy(animalObj); return null; }
+        return animalObj;
+    }
+
+    /// <summary>
+    /// Draws debug rectangles applying the functional offset.
+    /// </summary>
+    void OnDrawGizmos() // <<< MODIFIED to use offset
+    {
+        if (!showBoundsGizmos || mainCamera == null) return;
+
+        // --- Apply functional offset for Gizmo drawing ---
+        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+        // --------------------------------------------------
+
+        float camHeight = mainCamera.orthographicSize * 2f;
+        float camWidth = camHeight * mainCamera.aspect;
+
+        // Calculate corners using effectiveCamPos
+        Vector2 paddedMin = new Vector2(effectiveCamPos.x - camWidth / 2f + screenBoundsPadding, effectiveCamPos.y - camHeight / 2f + screenBoundsPadding);
+        Vector2 paddedMax = new Vector2(effectiveCamPos.x + camWidth / 2f - screenBoundsPadding, effectiveCamPos.y + camHeight / 2f - screenBoundsPadding);
+        DrawWireRectangleGizmo(paddedMin, paddedMax, Color.green);
+
+        Vector2 marginMin = new Vector2(effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin, effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin);
+        Vector2 marginMax = new Vector2(effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin, effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin);
+        DrawWireRectangleGizmo(marginMin, marginMax, Color.red);
+    }
+
+    void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { /* Unchanged */ Gizmos.color = color; Gizmos.DrawLine(new Vector3(min.x, min.y, 0), new Vector3(max.x, min.y, 0)); Gizmos.DrawLine(new Vector3(max.x, min.y, 0), new Vector3(max.x, max.y, 0)); Gizmos.DrawLine(new Vector3(max.x, max.y, 0), new Vector3(min.x, max.y, 0)); Gizmos.DrawLine(new Vector3(min.x, max.y, 0), new Vector3(min.x, min.y, 0)); }
+
+} // End of class
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\FloraManager.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿// FILE: Assets/Scripts/Ecosystem/Core/FloraManager.cs
@@ -257,13 +440,23 @@ public class FloraManager : MonoBehaviour
     [Tooltip("Parent transform for instantiated circle visualizers.")]
     [SerializeField] private Transform circleContainer; // <<< ADDED
 
+    [Header("Debugging - Poop Absorption")] // <<< NEW HEADER
+    [Tooltip("Show poop absorption radii circle renderers in Game View during runtime.")]
+    [SerializeField] private bool showPoopAbsorptionRadiiRuntime = false;
+    [Tooltip("Color of the poop absorption radius visualization.")]
+    [SerializeField] private Color poopAbsorptionRadiusColorRuntime = new Color(0.6f, 0.4f, 0.2f, 0.5f); // Brown-ish color
+
     // --- Public Accessors ---
     public bool ShowScentRadiiRuntime => showScentRadiiRuntime;
     public Color ScentRadiusColorRuntime => scentRadiusColorRuntime;
+    // <<< NEW ACCESSORS for poop absorption radius visualization >>>
+    public bool ShowPoopAbsorptionRadiiRuntime => showPoopAbsorptionRadiiRuntime;
+    public Color PoopAbsorptionRadiusColorRuntime => poopAbsorptionRadiusColorRuntime;
 
-    // --- Internal State ---
     // Dictionary to track circle visualizers per ScentSource
     private Dictionary<ScentSource, RuntimeCircleDrawer> activeCircleVisualizers = new Dictionary<ScentSource, RuntimeCircleDrawer>();
+    // NEW: Dictionary to track poop absorption circle visualizers per PlantGrowth
+    private Dictionary<PlantGrowth, RuntimeCircleDrawer> activePoopAbsorptionCircleVisualizers = new Dictionary<PlantGrowth, RuntimeCircleDrawer>();
 
 
     void Awake()
@@ -280,42 +473,149 @@ public class FloraManager : MonoBehaviour
      {
          if (!Application.isPlaying) return;
          UpdateRuntimeCircleVisualizers();
+         // NEW: Update poop absorption radius visualizers
+         UpdatePoopAbsorptionCircleVisualizers();
      }
 
     void OnDestroy()
     {
         if (Instance == this) Instance = null;
         // Clean up any remaining visualizers when manager is destroyed
-         foreach (var kvp in activeCircleVisualizers)
-         {
-             if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-         }
-         activeCircleVisualizers.Clear();
+        foreach (var kvp in activeCircleVisualizers)
+        {
+            if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+        }
+        activeCircleVisualizers.Clear();
+        
+        // NEW: Clean up poop absorption visualizers
+        foreach (var kvp in activePoopAbsorptionCircleVisualizers)
+        {
+            if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+        }
+        activePoopAbsorptionCircleVisualizers.Clear();
     }
-
+    
+    // NEW: Method to update poop absorption radius visualizers
+    void UpdatePoopAbsorptionCircleVisualizers()
+    {
+        if (!Application.isPlaying) return;
+        
+        // Check if visualization is enabled
+        bool showCircles = showPoopAbsorptionRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
+        
+        if (!showCircles)
+        {
+            // If visualization is disabled, clean up any existing visualizers
+            foreach (var kvp in activePoopAbsorptionCircleVisualizers)
+            {
+                if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+            }
+            activePoopAbsorptionCircleVisualizers.Clear();
+            return;
+        }
+        
+        // Find all plants with the poop fertilizer effect
+        PlantGrowth[] plants = FindObjectsByType<PlantGrowth>(FindObjectsSortMode.None);
+        HashSet<PlantGrowth> currentPlantsSet = new HashSet<PlantGrowth>(plants);
+        
+        // Track plants to remove (no longer exist or don't have the effect)
+        List<PlantGrowth> plantsToRemove = new List<PlantGrowth>();
+        
+        // First, update existing visualizers
+        foreach (var kvp in activePoopAbsorptionCircleVisualizers)
+        {
+            PlantGrowth plant = kvp.Key;
+            RuntimeCircleDrawer drawer = kvp.Value;
+            
+            if (plant == null || drawer == null || !plant.gameObject.activeInHierarchy ||
+                !currentPlantsSet.Contains(plant))
+            {
+                plantsToRemove.Add(plant);
+                if (drawer != null) Destroy(drawer.gameObject);
+                continue;
+            }
+            
+            // Check if the plant still has a valid poop detection radius
+            float poopRadius = GetPlantPoopDetectionRadius(plant);
+            bool shouldShowThis = showCircles && poopRadius > 0.01f;
+            
+            if (shouldShowThis)
+            {
+                // Update drawer position and radius
+                drawer.transform.position = plant.transform.position;
+                drawer.UpdateCircle(poopRadius, poopAbsorptionRadiusColorRuntime);
+            }
+            else
+            {
+                drawer.HideCircle();
+                plantsToRemove.Add(plant); // If radius is too small or zero, remove the visualizer
+            }
+        }
+        
+        // Remove plants that no longer need visualization
+        foreach (var plant in plantsToRemove)
+        {
+            if (activePoopAbsorptionCircleVisualizers.TryGetValue(plant, out RuntimeCircleDrawer drawer))
+            {
+                if (drawer != null) Destroy(drawer.gameObject);
+                activePoopAbsorptionCircleVisualizers.Remove(plant);
+            }
+        }
+        
+        // Create new visualizers for plants with poop fertilizer effect
+        foreach (PlantGrowth plant in plants)
+        {
+            if (plant == null || activePoopAbsorptionCircleVisualizers.ContainsKey(plant)) continue;
+            
+            float poopRadius = GetPlantPoopDetectionRadius(plant);
+            if (poopRadius <= 0.01f) continue; // Skip if radius is too small
+            
+            // Create new visualizer
+            GameObject circleGO = Instantiate(circleVisualizerPrefab, plant.transform.position, 
+                                             Quaternion.identity, circleContainer);
+            RuntimeCircleDrawer newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
+            
+            if (newDrawer != null)
+            {
+                newDrawer.UpdateCircle(poopRadius, poopAbsorptionRadiusColorRuntime);
+                activePoopAbsorptionCircleVisualizers.Add(plant, newDrawer);
+            }
+            else
+            {
+                Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
+                Destroy(circleGO);
+            }
+        }
+    }
+    
+    // NEW: Helper method to get poop detection radius from a plant
+    private float GetPlantPoopDetectionRadius(PlantGrowth plant)
+    {
+        if (plant == null) return 0f;
+        return plant.GetPoopDetectionRadius();
+    }
 
     // --- Runtime Visualizer Update ---
     void UpdateRuntimeCircleVisualizers()
     {
+        if (!Application.isPlaying) return; // Only run in play mode
+
+        // Check if lines should be shown globally
         bool showCircles = showScentRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
 
-        // Find all active ScentSources (can be slow, consider optimizing if needed)
-        // If performance becomes an issue, ScentSources could register/deregister themselves with the manager.
-        ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
-        HashSet<ScentSource> currentSourcesSet = new HashSet<ScentSource>(currentSources); // For quick lookup
-
-        // --- Update existing circles ---
+        // --- Update existing circles and create new ones ---
+        // Use a temporary list to avoid modifying dictionary while iterating
         List<ScentSource> sourcesToRemove = new List<ScentSource>();
+
         foreach (var kvp in activeCircleVisualizers)
         {
             ScentSource source = kvp.Key;
-            RuntimeCircleDrawer drawer = kvp.Value;
+            RuntimeCircleDrawer line = kvp.Value;
 
-            // Check if source still exists and is valid
-            if (source == null || drawer == null || !source.gameObject.activeInHierarchy || !currentSourcesSet.Contains(source))
+            if (source == null || line == null || !source.gameObject.activeInHierarchy) // Source or drawer destroyed unexpectedly
             {
                 sourcesToRemove.Add(source); // Mark for removal
-                if (drawer != null) Destroy(drawer.gameObject); // Destroy visualizer
+                if(line != null) Destroy(line.gameObject); // Destroy orphan drawer
                 continue;
             }
 
@@ -325,32 +625,39 @@ public class FloraManager : MonoBehaviour
             if (shouldShowThis)
             {
                  // Update drawer position to match source and update circle params
-                 drawer.transform.position = source.transform.position;
-                 drawer.transform.rotation = source.transform.rotation; // Match rotation? Optional.
-                 drawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
+                 line.transform.position = source.transform.position;
+                 line.transform.rotation = source.transform.rotation; // Match rotation? Optional.
+                 line.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
             }
             else
             {
-                 drawer.HideCircle(); // Hide if shouldn't be shown
+                 line.HideCircle(); // Hide if shouldn't be shown
             }
         }
 
         // Remove entries for sources that are gone
         foreach (var source in sourcesToRemove)
         {
+            if (activeCircleVisualizers.TryGetValue(source, out RuntimeCircleDrawer drawer) && drawer != null)
+                Destroy(drawer.gameObject);
             activeCircleVisualizers.Remove(source);
         }
 
         // --- Add circles for new sources ---
         if (showCircles)
         {
+            // Find all active ScentSources
+            ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
+            
             foreach (ScentSource source in currentSources)
             {
                 // Skip if already has a visualizer or is invalid
-                if (source == null || activeCircleVisualizers.ContainsKey(source) || !source.enabled || source.definition == null || source.EffectiveRadius <= 0.01f) continue;
+                if (source == null || activeCircleVisualizers.ContainsKey(source) || !source.enabled || 
+                    source.definition == null || source.EffectiveRadius <= 0.01f) continue;
 
                  // Create new visualizer
-                 GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position, source.transform.rotation, circleContainer);
+                 GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position, 
+                                                 source.transform.rotation, circleContainer);
                  RuntimeCircleDrawer newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
 
                  if (newDrawer != null)
@@ -396,6 +703,26 @@ public class FloraManager : MonoBehaviour
              if (logGizmoCalls && drawnCount > 0) { /*...*/ }
              else if (logGizmoCalls && scentSources.Length > 0) { /*...*/ }
         }
+        
+        // NEW: Draw poop absorption radius in editor
+        if (showPoopAbsorptionRadiiRuntime) {
+             Gizmos.color = poopAbsorptionRadiusColorRuntime;
+             PlantGrowth[] plants = FindObjectsByType<PlantGrowth>(FindObjectsSortMode.None);
+             int drawnCount = 0;
+             
+             foreach (PlantGrowth plant in plants) {
+                if (plant == null) continue;
+                float radius = GetPlantPoopDetectionRadius(plant);
+                if (radius > 0.01f) {
+                    Gizmos.DrawWireSphere(plant.transform.position, radius);
+                    drawnCount++;
+                }
+             }
+             
+             if (logGizmoCalls && drawnCount > 0) {
+                 Debug.Log($"[FloraManager] Drew {drawnCount} poop absorption radius gizmos");
+             }
+        }
     }
     #endif
 }
@@ -406,9 +733,12 @@ public class FloraManager : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\PoopController.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Ecosystem/Core/PoopController.cs (Ensure Collider is Added)
+
+using UnityEngine;
 using TMPro;
 
+[RequireComponent(typeof(Collider2D))] // Add RequireComponent for Collider2D
 public class PoopController : MonoBehaviour
 {
     [Tooltip("Total lifetime of this poop (in seconds) before disappearing.")]
@@ -421,6 +751,7 @@ public class PoopController : MonoBehaviour
     private SpriteRenderer sr;
     private float timer = 0f;
     private Color initialColor;
+    private Collider2D poopCollider; // Reference to the collider
 
     private void Awake()
     {
@@ -429,6 +760,18 @@ public class PoopController : MonoBehaviour
         {
             initialColor = sr.color;
         }
+        
+        // Ensure there's a collider and it's properly configured
+        poopCollider = GetComponent<Collider2D>();
+        if (poopCollider == null)
+        {
+            // If no collider exists, add a CircleCollider2D
+            poopCollider = gameObject.AddComponent<CircleCollider2D>();
+            Debug.Log($"Added CircleCollider2D to {gameObject.name} for poop detection", gameObject);
+        }
+        
+        // Make sure it's a trigger so it doesn't block movement
+        poopCollider.isTrigger = true;
     }
 
     private void Update()
@@ -463,6 +806,17 @@ public class PoopController : MonoBehaviour
         timer = 0f;
         if (sr != null)
             initialColor = sr.color;
+            
+        // Ensure collider is configured properly
+        if (poopCollider == null)
+        {
+            poopCollider = GetComponent<Collider2D>();
+            if (poopCollider == null)
+            {
+                poopCollider = gameObject.AddComponent<CircleCollider2D>();
+            }
+            poopCollider.isTrigger = true;
+        }
     }
 }
 
@@ -883,603 +1237,6 @@ public class WaveManager : MonoBehaviour
     { if(Debug.isDebugBuild) Debug.Log("[WaveManager] Clearing all active animals."); AnimalController[] activeAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None); int count = 0; foreach(AnimalController animal in activeAnimals) { if(animal != null) { Destroy(animal.gameObject); count++; } } if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Destroyed {count} animals."); }
 
     public Camera GetMainCamera() { return mainCamera; } // (Unchanged)
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Effects\FireflyController.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.Rendering.Universal;
-using System.Collections.Generic;
-
-public class FireflyController : MonoBehaviour
-{
-    [Header("References (Optional)")]
-    [Tooltip("Optional Light2D component for local glow.")]
-    [SerializeField] private Light2D pointLight;
-    [Tooltip("SpriteRenderer for flickering emission and alpha fade.")]
-    [SerializeField] private SpriteRenderer spriteRenderer;
-
-    [Header("Movement")]
-    [Tooltip("Min/Max movement speed")]
-    [SerializeField] private Vector2 speedRange = new Vector2(0.5f, 1.5f);
-    [Tooltip("How often (in seconds) the firefly changes direction while wandering")]
-    [SerializeField] private float directionChangeInterval = 2.0f;
-    [Tooltip("Chance (0-1) that the firefly will pause when changing direction")]
-    [SerializeField] [Range(0f, 1f)] private float pauseChance = 0.2f;
-    [Tooltip("Min/Max duration (in seconds) for pauses")]
-    [SerializeField] private Vector2 pauseDurationRange = new Vector2(0.5f, 1.5f);
-
-    [Header("Lifetime & Fade")]
-    [Tooltip("Min/Max lifetime (in seconds) before the firefly despawns")]
-    [SerializeField] private Vector2 lifetimeRange = new Vector2(8f, 18f);
-    [Tooltip("Duration (in seconds) of the fade-in effect when spawning")]
-    [SerializeField] private float fadeInDuration = 0.75f;
-    [Tooltip("Duration (in seconds) of the fade-out effect before despawning")]
-    [SerializeField] private float fadeOutDuration = 1.5f;
-
-    [Header("Normal Glow Flicker")]
-    [Tooltip("If true, the firefly will have a subtle flickering effect during its lifetime")]
-    [SerializeField] private bool enableFlicker = true;
-    [Tooltip("Min/Max intensity values for normal flickering")]
-    [SerializeField] private Vector2 intensityRange = new Vector2(1.5f, 3.0f);
-    [Tooltip("Speed of normal flickering (cycles per second) - higher values create more rapid changes")]
-    [SerializeField] private float flickerSpeed = 5.0f;
-
-    [Header("Spawn Flicker Effect")]
-    [Tooltip("If true, the firefly will have a special flickering effect when first spawned")]
-    [SerializeField] private bool enableSpawnEffect = true;
-    [Tooltip("Duration (in seconds) of the special spawn effect")]
-    [SerializeField] private float spawnEffectDuration = 0.5f;
-    [Tooltip("Base brightness to gradually increase to during spawn effect")]
-    [SerializeField] private float spawnBaseIntensity = 2.0f;
-    [Tooltip("Probability (0-1) of short blackout flickers during spawn effect")]
-    [SerializeField] [Range(0f, 1f)] private float spawnBlackoutChance = 0.3f;
-    [Tooltip("Min/Max duration (in seconds) of blackout flickers during spawn")]
-    [SerializeField] private Vector2 blackoutDurationRange = new Vector2(0.01f, 0.08f);
-    [Tooltip("Min/Max spacing (in seconds) between blackout flickers")]
-    [SerializeField] private Vector2 blackoutSpacingRange = new Vector2(0.05f, 0.2f);
-
-    [Header("Scent Attraction")]
-    [Tooltip("How often (in seconds) the firefly checks for nearby scent sources.")]
-    [SerializeField] private float scentCheckInterval = 1.0f;
-    [Tooltip("Maximum distance squared the OverlapCircle will check.")]
-    [SerializeField] private float scentOverlapCheckRadius = 10f;
-    [Tooltip("How strongly the firefly steers towards the scent target.")]
-    [SerializeField] private float attractionStrength = 2.0f;
-    [Tooltip("Preferred distance to orbit the scent source.")]
-    [SerializeField] private float orbitDistance = 0.8f;
-    [Tooltip("How much randomness/wobble in the attracted movement.")]
-    [SerializeField] private float attractionWobble = 0.5f;
-    [Tooltip("Which Scent Definitions attract this firefly.")]
-    [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
-
-    // --- Public Accessor ---
-    public Transform AttractionTarget => attractionTarget;
-
-    // --- Internal State ---
-    private FireflyManager manager;
-    private Vector2 currentVelocity;
-    private float currentSpeed;
-    private float stateTimer;
-    private bool isPaused;
-    private float lifetime;
-    private float age = 0f;
-    private float currentAlpha = 0f; // Overall transparency/fade progress
-    private float flickerOffset;
-    private Material spriteMaterialInstance; // Instanced material for modification
-
-    // Scent State
-    private Transform attractionTarget = null;
-    private float scentCheckTimer;
-    private ScentDefinition currentTargetScentDef = null;
-
-    // Movement Bounds
-    private Vector2 minBounds;
-    private Vector2 maxBounds;
-
-    // Store the original emission color *without* intensity scaling from the material asset
-    private Color baseEmissionColor = Color.black; // Default to black if reading fails
-    
-    // New fields for tracking the improved spawn effect
-    private float nextBlackoutTime = 0f;
-    private float blackoutEndTime = 0f;
-    private bool isInBlackout = false;
-
-    void Awake()
-    {
-        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer != null && spriteRenderer.material != null) {
-            // Create instance BEFORE reading base emission
-            spriteMaterialInstance = spriteRenderer.material;
-            // Try to read the base emission color set in the material asset
-            if (spriteMaterialInstance.HasProperty("_EmissionColor")) {
-                 // Important: Get the color value directly. If it's HDR, this value
-                 // might already have some intensity baked in, depending on how it was set.
-                 // Ideally, set the material's emission color to the desired *hue/saturation*
-                 // with an intensity of 1 in the editor, and control brightness purely via script.
-                 baseEmissionColor = spriteMaterialInstance.GetColor("_EmissionColor");
-                 // If the color read already has intensity > 1 baked in, we might need to normalize it.
-                 // For simplicity, let's assume the user sets the base color correctly.
-                 // Example normalization (if needed):
-                 // float currentIntensity = Mathf.Max(baseEmissionColor.r, baseEmissionColor.g, baseEmissionColor.b);
-                 // if (currentIntensity > 1.0f) baseEmissionColor /= currentIntensity;
-            } else {
-                 Debug.LogWarning($"[{gameObject.name}] Material '{spriteMaterialInstance.name}' does not have an '_EmissionColor' property.", gameObject);
-            }
-        } else if (spriteRenderer == null || spriteRenderer.material == null) {
-            Debug.LogWarning($"[{gameObject.name}] FireflyController: Cannot modify material properties (flicker/fade), SpriteRenderer or its material is missing.", gameObject);
-            enableFlicker = false;
-            enableSpawnEffect = false;
-        }
-
-        flickerOffset = Random.Range(0f, 100f);
-    }
-
-    public void Initialize(FireflyManager owner, Vector2 minB, Vector2 maxB)
-    {
-        manager = owner; 
-        minBounds = minB; 
-        maxBounds = maxB;
-        
-        lifetime = Random.Range(lifetimeRange.x, lifetimeRange.y);
-        age = 0f; 
-        currentAlpha = 0f;
-        
-        attractionTarget = null; 
-        currentTargetScentDef = null;
-        scentCheckTimer = Random.Range(0, scentCheckInterval);
-        
-        // Initialize blackout effect timing based on spawnBlackoutChance
-        isInBlackout = false;
-        
-        // Only schedule blackouts if the chance is above zero
-        if (Random.value < spawnBlackoutChance) {
-            float initialDelay = Random.Range(0.01f, 0.1f); // Small random delay before first blackout
-            nextBlackoutTime = Time.time + initialDelay;
-        } else {
-            // Set to a time after spawn effect is over if we don't want blackouts for this instance
-            nextBlackoutTime = Time.time + spawnEffectDuration + 1f;
-        }
-        blackoutEndTime = 0f;
-        
-        PickNewWanderState();
-        // Apply initial state (fully transparent, potentially zero intensity)
-        ApplyVisualState(0f);
-    }
-
-    void Update()
-    {
-        age += Time.deltaTime;
-
-        HandleLifetimeAndFade(); // Calculates currentAlpha
-        if (currentAlpha <= 0f && age > fadeInDuration) { Die(); return; }
-
-        HandleScentDetection();
-        HandleMovement();
-        HandleGlowAndFlicker(); // Calculates target intensity & calls ApplyVisualState
-    }
-
-    void HandleLifetimeAndFade()
-    {
-        // Calculate target alpha based on age and lifetime
-        if (age < fadeInDuration) {
-            currentAlpha = Mathf.Clamp01(age / fadeInDuration); // Fade In
-        } else if (lifetime - age < fadeOutDuration) {
-            currentAlpha = Mathf.Clamp01((lifetime - age) / fadeOutDuration); // Fade Out
-        } else {
-            currentAlpha = 1.0f; // Fully Visible
-        }
-
-        // Check if lifetime naturally expired
-        if (age >= lifetime && currentAlpha > 0) {
-             currentAlpha = Mathf.Clamp01((lifetime - age + fadeOutDuration) / fadeOutDuration);
-             if(currentAlpha <= 0) Die();
-        }
-    }
-
-    void HandleScentDetection()
-    {
-        scentCheckTimer -= Time.deltaTime;
-        if (scentCheckTimer <= 0f) { FindAttractionTarget(); scentCheckTimer = scentCheckInterval; }
-        if (attractionTarget != null) { if (!attractionTarget.gameObject.activeInHierarchy || !attractionTarget.TryGetComponent<ScentSource>(out var currentScent) || currentScent.definition != currentTargetScentDef || (attractionTarget.position - transform.position).sqrMagnitude > (currentScent.EffectiveRadius * currentScent.EffectiveRadius) ) { attractionTarget = null; currentTargetScentDef = null; } }
-    }
-
-    void FindAttractionTarget()
-    {
-        Transform bestTarget = null; ScentDefinition bestScentDef = null; float bestScore = -1f;
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scentOverlapCheckRadius);
-        foreach (Collider2D hit in hits) {
-            if (hit.TryGetComponent<ScentSource>(out ScentSource scent) && scent.definition != null) {
-                if (attractiveScentDefinitions.Contains(scent.definition)) {
-                    float distSq = (hit.transform.position - transform.position).sqrMagnitude; float scentRadiusSq = scent.EffectiveRadius * scent.EffectiveRadius;
-                    if (distSq <= scentRadiusSq) { float score = 1.0f / (distSq + 0.01f); if (score > bestScore) { bestScore = score; bestTarget = hit.transform; bestScentDef = scent.definition; } }
-                }
-            }
-        }
-        if (bestTarget != attractionTarget) { attractionTarget = bestTarget; currentTargetScentDef = bestScentDef; if (attractionTarget != null) { isPaused = false; } }
-    }
-
-    void HandleMovement()
-    {
-        stateTimer -= Time.deltaTime;
-        if (attractionTarget != null) {
-            Vector2 directionToTarget = (attractionTarget.position - transform.position); float distanceToTarget = directionToTarget.magnitude; if (distanceToTarget > 0.01f) { directionToTarget /= distanceToTarget; }
-            Vector2 orbitOffsetDir = new Vector2(-directionToTarget.y, directionToTarget.x) * Mathf.Sign(currentSpeed + 0.1f); Vector2 desiredDirection = directionToTarget * attractionStrength;
-            if (distanceToTarget <= orbitDistance) { desiredDirection += orbitOffsetDir * (currentSpeed * 0.5f); } desiredDirection += Random.insideUnitCircle * attractionWobble;
-            currentVelocity = Vector2.Lerp(currentVelocity.normalized, desiredDirection.normalized, Time.deltaTime * 5f) * currentSpeed;
-        } else { if (stateTimer <= 0f) { PickNewWanderState(); } }
-        if (!isPaused) {
-             Vector2 currentPos = transform.position; Vector2 newPos = currentPos + currentVelocity * Time.deltaTime; bool clampedX = false; bool clampedY = false;
-             if (newPos.x <= minBounds.x || newPos.x >= maxBounds.x) { clampedX = true; newPos.x = Mathf.Clamp(newPos.x, minBounds.x, maxBounds.x); } if (newPos.y <= minBounds.y || newPos.y >= maxBounds.y) { clampedY = true; newPos.y = Mathf.Clamp(newPos.y, minBounds.y, maxBounds.y); }
-             if (clampedX || clampedY) { Vector2 reflectionNormal = Vector2.zero; if(clampedX) reflectionNormal.x = -Mathf.Sign(currentVelocity.x); if(clampedY) reflectionNormal.y = -Mathf.Sign(currentVelocity.y); currentVelocity = Vector2.Reflect(currentVelocity, reflectionNormal.normalized + Random.insideUnitCircle * 0.1f).normalized * currentSpeed; if (currentVelocity.sqrMagnitude < 0.01f) { currentVelocity = Random.insideUnitCircle.normalized * currentSpeed; } PickNewWanderState(true); }
-            transform.position = newPos;
-        }
-    }
-
-    void PickNewWanderState(bool forceMove = false)
-    {
-        if (attractionTarget != null && !forceMove) return;
-        if (!forceMove && Random.value < pauseChance) { isPaused = true; currentVelocity = Vector2.zero; stateTimer = Random.Range(pauseDurationRange.x, pauseDurationRange.y); }
-        else { isPaused = false; currentSpeed = Random.Range(speedRange.x, speedRange.y); if(currentVelocity.sqrMagnitude < 0.01f || forceMove) currentVelocity = Random.insideUnitCircle.normalized * currentSpeed; else currentVelocity = (currentVelocity.normalized + Random.insideUnitCircle * 0.5f).normalized * currentSpeed; stateTimer = directionChangeInterval * Random.Range(0.7f, 1.3f); }
-    }
-
-    void HandleGlowAndFlicker()
-    {
-        float targetFlickerIntensity;
-
-        // New spawn flickering effect that simulates a fluorescent tube turning on
-        if (enableSpawnEffect && age < spawnEffectDuration) 
-        {
-            // Base linear brightening from 0 to spawnBaseIntensity based on progress
-            float progress = age / spawnEffectDuration;
-            float baseIntensity = Mathf.Lerp(0f, spawnBaseIntensity, progress);
-            
-            // Blackout flickering logic - Check if we need to schedule a new blackout
-            if (Time.time >= nextBlackoutTime && !isInBlackout) 
-            {
-                // Start a new blackout with probability based on spawnBlackoutChance
-                if (Random.value < spawnBlackoutChance) {
-                    isInBlackout = true;
-                    float blackoutDuration = Random.Range(blackoutDurationRange.x, blackoutDurationRange.y);
-                    blackoutEndTime = Time.time + blackoutDuration;
-                    
-                    // Schedule the next potential blackout check
-                    float spacingTime = Random.Range(blackoutSpacingRange.x, blackoutSpacingRange.y);
-                    nextBlackoutTime = blackoutEndTime + spacingTime;
-                } else {
-                    // No blackout this time, but schedule next check
-                    float spacingTime = Random.Range(blackoutSpacingRange.x, blackoutSpacingRange.y);
-                    nextBlackoutTime = Time.time + spacingTime;
-                }
-            }
-            
-            // Update blackout state
-            if (isInBlackout && Time.time > blackoutEndTime) 
-            {
-                isInBlackout = false;
-            }
-            
-            // Apply blackout if active
-            targetFlickerIntensity = isInBlackout ? 0f : baseIntensity;
-        }
-        else if (enableFlicker) 
-        {
-            // Normal runtime flickering (unchanged)
-            float noise = Mathf.PerlinNoise(Time.time * flickerSpeed, flickerOffset);
-            targetFlickerIntensity = Mathf.Lerp(intensityRange.x, intensityRange.y, noise);
-        }
-        else 
-        {
-            // Steady state if flickering disabled
-            targetFlickerIntensity = intensityRange.x;
-        }
-
-        // Apply the calculated intensity and the current fade alpha
-        ApplyVisualState(targetFlickerIntensity);
-    }
-
-    /// <summary>
-    /// Applies the visual state based on calculated flicker intensity and fade alpha.
-    /// </summary>
-    /// <param name="flickerIntensity">The target brightness intensity for emission/light.</param>
-    void ApplyVisualState(float flickerIntensity)
-    {
-        // 1. Apply overall transparency (Alpha Fade) to the SpriteRenderer's base color alpha
-        if (spriteMaterialInstance != null)
-        {
-            // Ensure _Color property exists before trying to set it
-            if (spriteMaterialInstance.HasProperty("_Color"))
-            {
-                Color baseColor = spriteMaterialInstance.GetColor("_Color");
-                baseColor.a = currentAlpha; // Apply fade alpha
-                spriteMaterialInstance.SetColor("_Color", baseColor);
-            }
-
-            // 2. Apply Flicker Intensity to Emission Color's brightness
-            if (spriteMaterialInstance.HasProperty("_EmissionColor"))
-            {
-                 // Apply intensity to the base emission color we stored in Awake
-                 // Use LinearToGammaSpace if in Linear color space for more visually correct intensity scalinG
-                 Color finalEmissionColor = baseEmissionColor * Mathf.LinearToGammaSpace(flickerIntensity);
-                 // Alternative if baseEmissionColor already has intensity: Multiply directly
-                 // Color finalEmissionColor = baseEmissionColor * flickerIntensity;
-                 spriteMaterialInstance.SetColor("_EmissionColor", finalEmissionColor);
-            }
-        }
-
-        // 3. Apply Flicker Intensity (modulated by alpha fade) to Light2D
-        if (pointLight != null)
-        {
-            // Light intensity should reflect both flicker and fade
-            pointLight.intensity = flickerIntensity * currentAlpha;
-        }
-    }
-
-    void Die()
-    {
-        if (manager != null) manager.ReportFireflyDespawned(this);
-        currentAlpha = 0f; ApplyVisualState(0f); // Ensure visuals are off
-        Destroy(gameObject);
-    }
-
-    void OnDestroy() 
-    { 
-        if (spriteMaterialInstance != null) Destroy(spriteMaterialInstance); 
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyManager.cs
-
-using UnityEngine;
-using UnityEngine.Rendering.Universal;
-using System.Collections.Generic;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-public class FireflyManager : MonoBehaviour
-{
-    public static FireflyManager Instance { get; private set; }
-
-    [Header("Core Dependencies")]
-    [SerializeField] private WeatherManager weatherManager;
-    [SerializeField] private GameObject fireflyPrefab;
-    [SerializeField] private Transform fireflyParent;
-
-    // (Keep Spawning Settings, Spawn Area, Movement Bounds, Photosynthesis Bonus)
-    [Header("Spawning Settings")]
-    [SerializeField] private int maxFireflies = 50;
-    [SerializeField] private float spawnInterval = 0.5f;
-    [SerializeField] [Range(0f, 1f)] private float nightThreshold = 0.25f;
-
-    [Header("Spawn Area")]
-    [SerializeField] private Vector2 spawnCenter = Vector2.zero;
-    [SerializeField] private Vector2 spawnAreaSize = new Vector2(20f, 10f);
-
-    [Header("Movement Bounds (for Fireflies)")]
-    [SerializeField] private Vector2 movementMinBounds = new Vector2(-12f, -7f);
-    [SerializeField] private Vector2 movementMaxBounds = new Vector2(12f, 7f);
-
-    [Header("Photosynthesis Bonus Settings")]
-    public float photosynthesisRadius = 3f;
-    public float photosynthesisIntensityPerFly = 0.05f;
-    public float maxPhotosynthesisBonus = 0.5f;
-
-
-    [Header("Debugging")]
-    [Tooltip("Show attraction lines in Game View during runtime.")]
-    [SerializeField] private bool showAttractionLinesRuntime = false;
-    [SerializeField] private Color attractionLineColorGizmo = Color.magenta; // Renamed for Gizmo
-    [SerializeField] private bool logGizmoCalls = false;
-    [Space] // Add space for visual separation
-    [Tooltip("Prefab used to draw attraction lines at runtime.")]
-    [SerializeField] private GameObject lineVisualizerPrefab; // <<< ADDED
-    [Tooltip("Parent transform for instantiated line visualizers.")]
-    [SerializeField] private Transform lineContainer; // <<< ADDED
-
-    // --- Public Accessor ---
-    public bool ShowAttractionLinesRuntime => showAttractionLinesRuntime;
-
-    // --- Internal State ---
-    private List<FireflyController> activeFireflies = new List<FireflyController>();
-    private float spawnTimer;
-    private bool isNight = false;
-    
-    
-
-    // Dictionary to track line visualizers per firefly
-    private Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
-        // Validate Core Dependencies
-        if (weatherManager == null) { Debug.LogError($"[{nameof(FireflyManager)}] WeatherManager missing!", this); enabled = false; return; }
-        if (fireflyPrefab == null) { Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing!", this); enabled = false; return; }
-        if (fireflyPrefab.GetComponent<FireflyController>() == null) { Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing Controller script!", this); enabled = false; return; }
-        if (fireflyParent == null) { fireflyParent = transform; }
-
-        // Validate Debug Dependencies
-        if (lineVisualizerPrefab == null) { Debug.LogError($"[{nameof(FireflyManager)}] Line Visualizer Prefab is not assigned!", this); }
-        if (lineContainer == null) { Debug.LogError($"[{nameof(FireflyManager)}] Line Container transform is not assigned!", this); }
-    }
-
-    void Update()
-    {
-        isNight = weatherManager.sunIntensity <= nightThreshold;
-
-        if (isNight) {
-            spawnTimer -= Time.deltaTime;
-            if (spawnTimer <= 0f) { TrySpawnFirefly(); spawnTimer = spawnInterval; }
-        } else { spawnTimer = spawnInterval; }
-
-        // Update runtime visualizers in Update
-        UpdateRuntimeLineVisualizers();
-    }
-
-    void TrySpawnFirefly()
-    {
-        if (activeFireflies.Count >= maxFireflies) return;
-
-        float spawnX = spawnCenter.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
-        float spawnY = spawnCenter.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
-        Vector2 spawnPos = new Vector2(spawnX, spawnY);
-
-        GameObject fireflyGO = Instantiate(fireflyPrefab, spawnPos, Quaternion.identity, fireflyParent);
-        FireflyController controller = fireflyGO.GetComponent<FireflyController>();
-
-        if (controller != null) {
-            controller.Initialize(this, movementMinBounds, movementMaxBounds);
-            activeFireflies.Add(controller);
-            // Don't create line visualizer here, do it in Update when needed
-        } else { /* LogError, Destroy */ }
-    }
-
-    public void ReportFireflyDespawned(FireflyController firefly)
-    {
-        activeFireflies.Remove(firefly);
-
-        // Clean up associated line visualizer
-        if (activeLineVisualizers.TryGetValue(firefly, out LineRenderer line))
-        {
-            if (line != null) Destroy(line.gameObject); // Destroy the visualizer GO
-            activeLineVisualizers.Remove(firefly);
-        }
-    }
-
-    // --- Runtime Visualizer Update ---
-    void UpdateRuntimeLineVisualizers()
-    {
-        if (!Application.isPlaying) return; // Only run in play mode
-
-        // Check if lines should be shown globally
-        bool showLines = showAttractionLinesRuntime && lineVisualizerPrefab != null && lineContainer != null;
-
-        // --- Update existing lines and create new ones ---
-        // Use a temporary list to avoid modifying dictionary while iterating
-        List<FireflyController> firefliesToRemoveLine = new List<FireflyController>();
-
-        foreach (var kvp in activeLineVisualizers)
-        {
-            FireflyController firefly = kvp.Key;
-            LineRenderer line = kvp.Value;
-
-            if (firefly == null || line == null) // Firefly or line destroyed unexpectedly
-            {
-                firefliesToRemoveLine.Add(firefly); // Mark for removal
-                if(line != null) Destroy(line.gameObject); // Destroy orphan line
-                continue;
-            }
-
-            Transform target = firefly.AttractionTarget;
-
-            if (showLines && target != null) // Should be visible and has target
-            {
-                line.enabled = true;
-                line.SetPosition(0, firefly.transform.position);
-                line.SetPosition(1, target.position);
-            }
-            else // Should be hidden or lost target
-            {
-                line.enabled = false;
-            }
-        }
-
-        // Remove entries whose fireflies are gone
-        foreach (var firefly in firefliesToRemoveLine)
-        {
-            activeLineVisualizers.Remove(firefly);
-        }
-
-
-        // --- Add lines for fireflies that don't have one yet ---
-        if (showLines)
-        {
-            foreach (FireflyController firefly in activeFireflies)
-            {
-                if (firefly == null || activeLineVisualizers.ContainsKey(firefly)) continue; // Skip nulls or those already processed
-
-                Transform target = firefly.AttractionTarget;
-                if (target != null) // Only create if it has a target AND should be shown
-                {
-                    GameObject lineGO = Instantiate(lineVisualizerPrefab, lineContainer); // Instantiate under container
-                    LineRenderer newLine = lineGO.GetComponent<LineRenderer>();
-                    if (newLine != null)
-                    {
-                        // Configure initial points (will be updated next frame anyway)
-                        newLine.SetPosition(0, firefly.transform.position);
-                        newLine.SetPosition(1, target.position);
-                        newLine.enabled = true;
-                        activeLineVisualizers.Add(firefly, newLine); // Add to tracking dictionary
-                    }
-                    else
-                    {
-                         Debug.LogError($"Line Visualizer Prefab '{lineVisualizerPrefab.name}' is missing LineRenderer component!", lineVisualizerPrefab);
-                         Destroy(lineGO); // Destroy invalid instance
-                    }
-                }
-            }
-        }
-        // --- Hide/Destroy lines if global flag turned off ---
-        else if (!showLines && activeLineVisualizers.Count > 0)
-        {
-             // Destroy all active line visualizers if the flag is off
-             foreach (var kvp in activeLineVisualizers)
-             {
-                 if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-             }
-             activeLineVisualizers.Clear();
-        }
-    }
-
-
-    // (Keep GetNearbyFireflyCount)
-     public int GetNearbyFireflyCount(Vector3 position, float radius)
-    {
-        int count = 0; float radiusSq = radius * radius;
-        for (int i = activeFireflies.Count - 1; i >= 0; i--)
-        {
-            if (activeFireflies[i] == null) { activeFireflies.RemoveAt(i); continue; }
-            if ((activeFireflies[i].transform.position - position).sqrMagnitude <= radiusSq) { count++; }
-        }
-        return count;
-    }
-
-    // --- Gizmos (Editor Visualization - Unchanged) ---
-    #if UNITY_EDITOR
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.green; Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
-        Gizmos.color = Color.blue;
-        Vector3 boundsCenter = (movementMinBounds + movementMaxBounds) / 2f;
-        Vector3 boundsSize = movementMaxBounds - movementMinBounds;
-        Gizmos.DrawWireCube(boundsCenter, boundsSize);
-
-        // Gizmo drawing for attraction lines
-        if (showAttractionLinesRuntime && Application.isPlaying) {
-             if (logGizmoCalls) { /*...*/ }
-             bool didDrawLine = false;
-             Gizmos.color = attractionLineColorGizmo; // Use Gizmo color
-             foreach (FireflyController firefly in activeFireflies) {
-                if (firefly == null) continue;
-                Transform target = firefly.AttractionTarget;
-                if (target != null) { Gizmos.DrawLine(firefly.transform.position, target.position); didDrawLine = true; }
-             }
-             if (logGizmoCalls && !didDrawLine && activeFireflies.Count > 0) { /*...*/ }
-        }
-    }
-    #endif
 }
 
 

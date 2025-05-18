@@ -1,8 +1,8 @@
 ﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.cs
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using TMPro;
 
 // --- Enums ---
@@ -59,6 +59,13 @@ public partial class PlantGrowth : MonoBehaviour
     private GameObject rootCellInstance;
     private Coroutine growthCoroutine;
     private bool isGrowthCompletionHandled = false;
+
+    // ------------------------------------------------
+    // --- POOP FERTILIZER DATA ---
+    // ------------------------------------------------
+    private float poopDetectionRadius = 0f;
+    private float poopEnergyBonus = 0f; // Renamed from poopAbsorptionRate
+    private List<LeafData> leafDataList = new List<LeafData>();
 
     // ------------------------------------------------
     // --- CALCULATED STATS ---
@@ -188,6 +195,8 @@ public partial class PlantGrowth : MonoBehaviour
         totalPlannedSteps = 0; // <-- RESET new variable
         actualGrowthProgress = 0f; // <-- RESET new variable
         nodeGraph = graph; currentState = PlantState.Initializing; currentEnergy = 0f;
+        // Clear any old leaf data
+        leafDataList.Clear();
         CalculateAndApplyStats();
         GameObject spawnedSeed = SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
         if (spawnedSeed != null) {
@@ -322,6 +331,136 @@ public partial class PlantGrowth : MonoBehaviour
         if (energyText) return; energyText = GetComponentInChildren<TMP_Text>(true); if (!energyText) { Debug.LogWarning($"[{gameObject.name}] Energy Text (TMP_Text) UI reference not assigned in Inspector and not found in children.", gameObject); }
     }
 
+    // ------------------------------------------------
+    // --- POOP FERTILIZER METHODS ---
+    // ------------------------------------------------
+    
+    private void CheckForPoopAndAbsorb()
+    {
+        // Skip if no missing leaves to regrow and no energy bonus
+        bool hasMissingLeaves = leafDataList.Any(leaf => !leaf.IsActive);
+        bool canAddEnergy = poopEnergyBonus > 0f;
+        
+        if (Debug.isDebugBuild && poopDetectionRadius > 0f)
+        {
+            string leafStatus = hasMissingLeaves ? 
+                $"Has {leafDataList.Count(l => !l.IsActive)} missing leaves" : 
+                "No missing leaves";
+            Debug.Log($"[{gameObject.name}] PoopFertilizer: {leafStatus}, Radius: {poopDetectionRadius}, Energy bonus: {poopEnergyBonus}");
+        }
+        
+        if (!hasMissingLeaves && !canAddEnergy) return;
+        
+        // Look for poop in range
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, poopDetectionRadius);
+        
+        if (Debug.isDebugBuild && poopDetectionRadius > 0f)
+        {
+            Debug.Log($"[{gameObject.name}] PoopFertilizer: Found {colliders.Length} colliders in radius {poopDetectionRadius}");
+            int poopCount = 0;
+            foreach (Collider2D col in colliders)
+            {
+                if (col.GetComponent<PoopController>() != null)
+                    poopCount++;
+            }
+            Debug.Log($"[{gameObject.name}] PoopFertilizer: {poopCount} of those colliders have PoopController");
+        }
+        
+        // Process poop that we find
+        foreach (Collider2D collider in colliders)
+        {
+            PoopController poop = collider.GetComponent<PoopController>();
+            if (poop != null)
+            {
+                bool absorbed = false;
+                
+                // First try to regrow a leaf if there are missing leaves
+                if (hasMissingLeaves)
+                {
+                    absorbed = TryRegrowLeaf();
+                }
+                
+                // If we couldn't regrow a leaf (or didn't need to) but have energy bonus, add energy
+                if ((!absorbed || !hasMissingLeaves) && canAddEnergy)
+                {
+                    currentEnergy = Mathf.Min(finalMaxEnergy, currentEnergy + poopEnergyBonus);
+                    absorbed = true;
+                    
+                    if (Debug.isDebugBuild)
+                        Debug.Log($"[{gameObject.name}] Added {poopEnergyBonus} energy from poop fertilizer. Current energy: {currentEnergy}");
+                }
+                
+                // Destroy the poop if it was successfully used
+                if (absorbed)
+                {
+                    Destroy(poop.gameObject);
+                    break; // Process only one poop per cycle
+                }
+            }
+        }
+    }
+
+    private bool TryRegrowLeaf()
+    {
+        // Look for a missing leaf to regrow
+        int missingLeafIndex = -1;
+        
+        // Debug counts
+        if (Debug.isDebugBuild)
+        {
+            int totalLeaves = leafDataList.Count;
+            int missingLeaves = leafDataList.Count(leaf => !leaf.IsActive);
+            Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Total leaves: {totalLeaves}, Missing leaves: {missingLeaves}");
+        }
+        
+        for (int i = 0; i < leafDataList.Count; i++)
+        {
+            if (!leafDataList[i].IsActive)
+            {
+                missingLeafIndex = i;
+                break;
+            }
+        }
+        
+        if (missingLeafIndex == -1)
+        {
+            if (Debug.isDebugBuild)
+                Debug.Log($"[{gameObject.name}] TryRegrowLeaf: No missing leaves found to regrow.");
+            return false; // No missing leaves found
+        }
+        
+        // Get the leaf coordinate and mark it as active
+        Vector2Int leafCoord = leafDataList[missingLeafIndex].GridCoord;
+        
+        // IMPORTANT: Check if the coordinate is already occupied by another cell
+        if (cells.ContainsKey(leafCoord))
+        {
+            if (Debug.isDebugBuild)
+                Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Cannot regrow leaf at {leafCoord} because cell is already occupied.");
+            return false;
+        }
+        
+        // Create the new leaf visual
+        GameObject newLeaf = SpawnCellVisual(PlantCellType.Leaf, leafCoord);
+        
+        if (newLeaf != null)
+        {
+            // Update the leaf data to mark it as active ONLY if spawn succeeded
+            leafDataList[missingLeafIndex] = new LeafData(leafCoord, true);
+            
+            if (Debug.isDebugBuild)
+                Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Successfully regrew leaf at {leafCoord} using poop fertilizer!");
+            return true;
+        }
+        
+        // If we get here, the leaf couldn't be created
+        if (Debug.isDebugBuild)
+            Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Failed to spawn new leaf at {leafCoord}");
+        
+        // Leave the leaf marked as inactive in the tracking list
+        return false;
+    }
+
     // -----------------------------------------------
     // --- PUBLIC ACCESSORS FOR OUTLINES ---
     // -----------------------------------------------
@@ -330,6 +469,9 @@ public partial class PlantGrowth : MonoBehaviour
     public float GetCellSpacing() { return this.cellSpacing; }
     public GameObject GetCellGameObjectAt(Vector2Int coord) { return activeCellGameObjects.FirstOrDefault(go => go != null && go.GetComponent<PlantCell>()?.GridCoord == coord); }
     public bool IsOutlineEnabled() { return enableOutline; }
+    
+    // Accessor for poop fertilizer visualization
+    public float GetPoopDetectionRadius() { return poopDetectionRadius; }
 
     // --- PARTIAL CLASS METHODS (Assumed in other files) ---
     // Define these methods in the corresponding partial class files:

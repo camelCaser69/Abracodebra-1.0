@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d27f72fdfc3f4962b8c5577d1ed14561, type: 3}
-  m_Name: Node_003_WaterPreserver
+  m_Name: Node_003_PoopFertilizer
   m_EditorClassIdentifier: 
   displayName: 
   description: 
@@ -20,12 +20,7 @@ MonoBehaviour:
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   effects:
   - effectType: 10
-    primaryValue: 0
-    secondaryValue: 0
-    isPassive: 0
-    scentDefinitionReference: {fileID: 0}
-  - effectType: 10
-    primaryValue: 0
-    secondaryValue: 0
-    isPassive: 0
+    primaryValue: 2
+    secondaryValue: 4
+    isPassive: 1
     scentDefinitionReference: {fileID: 0}

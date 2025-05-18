@@ -19,7 +19,7 @@ MonoBehaviour:
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   effects:
-  - effectType: 14
+  - effectType: 15
     primaryValue: 1
     secondaryValue: 1
     isPassive: 0

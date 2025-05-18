@@ -1,4 +1,5 @@
-﻿// FILE: Assets/Scripts/Visuals/Debug/RuntimeCircleDrawer.cs
+﻿// FILE: Assets/Scripts/Visuals/RuntimeCircleDrawer.cs
+
 using UnityEngine;
 
 /// <summary>
@@ -39,7 +40,14 @@ public class RuntimeCircleDrawer : MonoBehaviour
         lineRenderer.loop = true; // Connect the last point to the first
         lineRenderer.startWidth = lineWidth;
         lineRenderer.endWidth = lineWidth;
-        lineRenderer.material = lineMaterial;
+        
+        // Only set material if one was provided and lineRenderer doesn't have one
+        if (lineMaterial != null && lineRenderer.material == null)
+        {
+            lineRenderer.material = lineMaterial;
+        }
+        
+        // Don't set color here - UpdateCircle will handle that
 
         // Attempt to match sorting with parent sprite
         SpriteRenderer parentSprite = GetComponentInParent<SpriteRenderer>();
@@ -57,10 +65,13 @@ public class RuntimeCircleDrawer : MonoBehaviour
     public void UpdateCircle(float newRadius, Color newColor)
     {
         // Check if parameters have actually changed
-        if (!needsRedraw && Mathf.Approximately(currentRadius, newRadius) && currentColor == newColor)
+        bool radiusChanged = !Mathf.Approximately(currentRadius, newRadius);
+        bool colorChanged = currentColor != newColor;
+        
+        if (!needsRedraw && !radiusChanged && !colorChanged)
         {
             // Ensure it's enabled if it wasn't already
-             if (!lineRenderer.enabled) lineRenderer.enabled = true;
+            if (!lineRenderer.enabled) lineRenderer.enabled = true;
             return; // No change needed
         }
 
@@ -70,9 +81,16 @@ public class RuntimeCircleDrawer : MonoBehaviour
         currentColor = newColor;
         color = newColor; // Update public field
 
-        // Update LineRenderer appearance settings that might change
+        // IMPORTANT: Update LineRenderer colors
         lineRenderer.startColor = currentColor;
         lineRenderer.endColor = currentColor;
+        
+        // Log color change for debugging
+        if (colorChanged && Debug.isDebugBuild)
+        {
+            Debug.Log($"[RuntimeCircleDrawer] Updated color to: {newColor}", gameObject);
+        }
+        
         // Update width if you add properties for it too
         // lineRenderer.startWidth = newWidth;
         // lineRenderer.endWidth = newWidth;

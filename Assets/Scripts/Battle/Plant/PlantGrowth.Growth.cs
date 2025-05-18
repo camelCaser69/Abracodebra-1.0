@@ -222,6 +222,16 @@ public partial class PlantGrowth : MonoBehaviour
                 }
             }
         }
+        
+        // Track all leaf positions for potential regrowth
+        foreach (GrowthStep step in plan)
+        {
+            if (step.CellType == PlantCellType.Leaf)
+            {
+                leafDataList.Add(new LeafData(step.Position, true));
+            }
+        }
+        
         return plan;
     }
 

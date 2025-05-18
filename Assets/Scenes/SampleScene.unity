@@ -8831,6 +8831,8 @@ MonoBehaviour:
   logGizmoCalls: 0
   circleVisualizerPrefab: {fileID: 4489783331620860270, guid: d6976fed002367344b9cc1365d0a1201, type: 3}
   circleContainer: {fileID: 1232000946}
+  showPoopAbsorptionRadiiRuntime: 1
+  poopAbsorptionRadiusColorRuntime: {r: 0.2264151, g: 0.15966536, b: 0.09291563, a: 1}
 --- !u!1 &844052608
 GameObject:
   m_ObjectHideFlags: 0
@@ -9066,7 +9068,7 @@ MonoBehaviour:
   photosynthesisIntensityPerFly: 0.2
   maxPhotosynthesisBonus: 0.5
   showAttractionLinesRuntime: 1
-  attractionLineColorGizmo: {r: 1, g: 1, b: 1, a: 1}
+  attractionLineColorRuntime: {r: 1, g: 0, b: 1, a: 1}
   logGizmoCalls: 0
   lineVisualizerPrefab: {fileID: 4489783331620860270, guid: 90a334b6403ffa946a0f007b37a0456d, type: 3}
   lineContainer: {fileID: 813162424}
