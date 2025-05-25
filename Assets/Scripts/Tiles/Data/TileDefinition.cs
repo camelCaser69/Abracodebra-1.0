@@ -22,6 +22,10 @@ public class TileDefinition : ScriptableObject
     [Header("Overlay Option")]
     [Tooltip("If true, this tile will be placed on top without removing the tile underneath ")]
     public bool keepBottomTile = false;
+    
+    [Header("Special Properties")]
+    [Tooltip("If true, this tile will use water reflection shader")]
+    public bool isWaterTile = false;
 
 #if UNITY_EDITOR
     // This method will be called from the custom editor

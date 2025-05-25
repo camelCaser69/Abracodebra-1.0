@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-19 01:01:18
+UNITY PROJECT SCRIPT EXPORT - 2025-05-24 21:05:17
 PART 4 OF 7
 ================================================================================
 
@@ -122,7 +122,8 @@ Assets
 │   │   └── ToolDefinition_002_SeedPouch.asset
 │   └── Waves
 │       ├── Wave_000.asset
-│       └── Wave_001.asset
+│       ├── Wave_001.asset
+│       └── Wave_002.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -152,6 +153,7 @@ Assets
 │   │   │   ├── FloraManager.cs
 │   │   │   ├── PoopController.cs
 │   │   │   ├── ScentSource.cs
+│   │   │   ├── SlowdownZone.cs
 │   │   │   ├── ThoughtBubbleController.cs
 │   │   │   ├── ThoughtTrigger.cs
 │   │   │   ├── WaveDefinition.cs

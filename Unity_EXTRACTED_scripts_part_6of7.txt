@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-19 01:01:18
+UNITY PROJECT SCRIPT EXPORT - 2025-05-24 21:05:17
 PART 6 OF 7
 ================================================================================
 
@@ -122,7 +122,8 @@ Assets
 │   │   └── ToolDefinition_002_SeedPouch.asset
 │   └── Waves
 │       ├── Wave_000.asset
-│       └── Wave_001.asset
+│       ├── Wave_001.asset
+│       └── Wave_002.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -152,6 +153,7 @@ Assets
 │   │   │   ├── FloraManager.cs
 │   │   │   ├── PoopController.cs
 │   │   │   ├── ScentSource.cs
+│   │   │   ├── SlowdownZone.cs
 │   │   │   ├── ThoughtBubbleController.cs
 │   │   │   ├── ThoughtTrigger.cs
 │   │   │   ├── WaveDefinition.cs
@@ -233,6 +235,276 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Data\PlantGrowthModifierManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections.Generic;
+using UnityEngine;
+
+public class PlantGrowthModifierManager : MonoBehaviour
+{
+    public static PlantGrowthModifierManager Instance { get; private set; }
+
+    [System.Serializable]
+    public class TileGrowthModifier
+    {
+        [Tooltip("The tile definition this modifier applies to")]
+        public TileDefinition tileDefinition;
+
+        [Tooltip("Multiplier for plant growth speed when on this tile (1.0 = normal)")]
+        [Range(0.1f, 3.0f)]
+        public float growthSpeedMultiplier = 1.0f;
+
+        [Tooltip("Multiplier for energy recharge speed when on this tile (1.0 = normal)")]
+        [Range(0.1f, 3.0f)]
+        public float energyRechargeMultiplier = 1.0f;
+    }
+
+    [Header("Default Settings")]
+    [Tooltip("Default multiplier for tiles that aren't specifically configured")]
+    [Range(0.1f, 3.0f)]
+    public float defaultGrowthSpeedMultiplier = 1.0f;
+
+    [Tooltip("Default multiplier for energy recharge on tiles that aren't specifically configured")]
+    [Range(0.1f, 3.0f)]
+    public float defaultEnergyRechargeMultiplier = 1.0f;
+
+    [Header("Tile Update Settings")]
+    [Tooltip("How often (in seconds) to check if plants are on different tiles")]
+    [Range(0.5f, 5.0f)]
+    public float tileUpdateInterval = 1.0f;
+
+    [Header("Tile Growth Modifiers")]
+    [Tooltip("Define growth and energy recharge multipliers for specific tiles")]
+    public List<TileGrowthModifier> tileModifiers = new List<TileGrowthModifier>();
+
+    [Header("References")]
+    [SerializeField] private TileInteractionManager tileInteractionManager;
+
+    [Header("Debug")]
+    [SerializeField] private bool showDebugMessages = true;
+    [SerializeField] private bool showTileChangeMessages = true;
+
+    // Dictionary for faster lookup of modifiers by tile definition
+    private Dictionary<TileDefinition, TileGrowthModifier> modifierLookup = new Dictionary<TileDefinition, TileGrowthModifier>();
+
+    // Dictionary to track what tile each plant is on
+    private Dictionary<PlantGrowth, TileDefinition> plantTiles = new Dictionary<PlantGrowth, TileDefinition>();
+    
+    // Timer for tile updates
+    private float tileUpdateTimer = 0f;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
+        // Build lookup dictionary for faster access
+        BuildModifierLookup();
+    }
+
+    private void Start()
+    {
+        // Find TileInteractionManager if not assigned
+        if (tileInteractionManager == null)
+        {
+            tileInteractionManager = TileInteractionManager.Instance;
+            if (tileInteractionManager == null && showDebugMessages)
+            {
+                Debug.LogWarning("PlantGrowthModifierManager: TileInteractionManager not found!");
+            }
+        }
+        
+        // Start with a tile update
+        tileUpdateTimer = 0f;
+    }
+
+    private void Update()
+    {
+        // Update timer
+        tileUpdateTimer -= Time.deltaTime;
+        
+        // Check if it's time to update tiles
+        if (tileUpdateTimer <= 0f)
+        {
+            UpdateAllPlantTiles();
+            tileUpdateTimer = tileUpdateInterval;
+        }
+    }
+
+    // Check all plants to see if their tiles have changed
+    private void UpdateAllPlantTiles()
+    {
+        if (tileInteractionManager == null)
+        {
+            return;
+        }
+        
+        // We need to copy the keys to avoid modifying the dictionary during iteration
+        List<PlantGrowth> plantsToCheck = new List<PlantGrowth>(plantTiles.Keys);
+        
+        foreach (PlantGrowth plant in plantsToCheck)
+        {
+            if (plant == null)
+            {
+                // Plant has been destroyed, remove from dictionary
+                plantTiles.Remove(plant);
+                continue;
+            }
+            
+            // Convert plant position to grid position
+            Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
+            
+            // Get current tile definition at this position
+            TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
+            
+            // Get previously stored tile definition
+            TileDefinition previousTileDef = plantTiles[plant];
+            
+            // Check if tile has changed
+            if (currentTileDef != previousTileDef)
+            {
+                // Update stored tile
+                plantTiles[plant] = currentTileDef;
+                
+                if (showTileChangeMessages)
+                {
+                    string previousTileName = previousTileDef != null ? previousTileDef.displayName : "None";
+                    string currentTileName = currentTileDef != null ? currentTileDef.displayName : "None";
+                    Debug.Log($"Plant tile changed: {previousTileName} -> {currentTileName}");
+                }
+            }
+        }
+    }
+
+    private void BuildModifierLookup()
+    {
+        modifierLookup.Clear();
+        foreach (var modifier in tileModifiers)
+        {
+            if (modifier.tileDefinition != null && !modifierLookup.ContainsKey(modifier.tileDefinition))
+            {
+                modifierLookup.Add(modifier.tileDefinition, modifier);
+            }
+        }
+
+        if (showDebugMessages)
+        {
+            Debug.Log($"PlantGrowthModifierManager: Built lookup with {modifierLookup.Count} tile modifiers");
+        }
+    }
+
+    // Call this when a plant is created to register its tile
+    public void RegisterPlantTile(PlantGrowth plant, TileDefinition tileDef)
+    {
+        if (plant == null)
+            return;
+
+        plantTiles[plant] = tileDef;
+
+        if (showDebugMessages)
+        {
+            string tileName = tileDef != null ? tileDef.displayName : "Unknown Tile";
+            Debug.Log($"Registered plant {plant.name} on tile {tileName}");
+        }
+    }
+
+    // Call this when a plant is destroyed to clean up
+    public void UnregisterPlant(PlantGrowth plant)
+    {
+        if (plant == null)
+            return;
+
+        if (plantTiles.ContainsKey(plant))
+        {
+            plantTiles.Remove(plant);
+        }
+    }
+
+    // Get growth speed multiplier for a plant based on its tile
+    public float GetGrowthSpeedMultiplier(PlantGrowth plant)
+    {
+        if (plant == null)
+            return defaultGrowthSpeedMultiplier;
+        
+        // If plant not in dictionary, register it with its current tile
+        if (!plantTiles.ContainsKey(plant))
+        {
+            RegisterNewPlant(plant);
+        }
+        
+        TileDefinition tileDef = plantTiles[plant];
+        if (tileDef == null)
+        {
+            return defaultGrowthSpeedMultiplier;
+        }
+
+        if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
+        {
+            return modifier.growthSpeedMultiplier;
+        }
+
+        return defaultGrowthSpeedMultiplier;
+    }
+
+    // Get energy recharge multiplier for a plant based on its tile
+    public float GetEnergyRechargeMultiplier(PlantGrowth plant)
+    {
+        if (plant == null)
+            return defaultEnergyRechargeMultiplier;
+        
+        // If plant not in dictionary, register it with its current tile
+        if (!plantTiles.ContainsKey(plant))
+        {
+            RegisterNewPlant(plant);
+        }
+        
+        TileDefinition tileDef = plantTiles[plant];
+        if (tileDef == null)
+        {
+            return defaultEnergyRechargeMultiplier;
+        }
+
+        if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
+        {
+            return modifier.energyRechargeMultiplier;
+        }
+
+        return defaultEnergyRechargeMultiplier;
+    }
+    
+    // Helper method to register a new plant with its current tile
+    private void RegisterNewPlant(PlantGrowth plant)
+    {
+        if (plant == null || tileInteractionManager == null)
+            return;
+            
+        Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
+        TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
+        
+        plantTiles[plant] = currentTileDef;
+        
+        if (showDebugMessages)
+        {
+            string tileName = currentTileDef != null ? currentTileDef.displayName : "Unknown Tile";
+            Debug.Log($"Auto-registered plant {plant.name} on tile {tileName}");
+        }
+    }
+
+    // For editor support - rebuild lookup when modifiers change
+    public void OnValidate()
+    {
+        BuildModifierLookup();
+    }
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Data\PlantPlacementManagement.cs
@@ -1534,242 +1806,6 @@ public class ToolDefinition : ScriptableObject
     [Tooltip("The number of uses the tool starts with (only relevant if Limited Uses is true).")]
     [Min(0)] // Ensure it's not negative
     public int initialUses = 10; // <<< NEW FIELD
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Tools\ToolSwitcher.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Tiles/Tools/ToolSwitcher.cs
-using UnityEngine;
-using System;
-
-public class ToolSwitcher : MonoBehaviour
-{
-    [Tooltip("All available tool definitions, e.g. Hoe, WateringCan, etc.")]
-    public ToolDefinition[] toolDefinitions;
-
-    private int currentIndex = 0;
-
-    // --- Public Properties ---
-    public ToolDefinition CurrentTool { get; private set; } = null;
-    /// <summary>
-    /// Gets the remaining uses for the current tool. Returns -1 if the tool has unlimited uses.
-    /// </summary>
-    public int CurrentRemainingUses { get; private set; } = -1; // <<< NEW: Track remaining uses (-1 for unlimited)
-
-    // --- Events ---
-    public event Action<ToolDefinition> OnToolChanged;
-    /// <summary>
-    /// Event fired when the remaining uses of the current tool changes. Passes the new remaining count (-1 for unlimited).
-    /// </summary>
-    public event Action<int> OnUsesChanged; // <<< NEW EVENT for UI updates
-
-    private void Awake()
-    {
-        // Debug logs from previous step can be kept or removed
-        // Debug.Log("[ToolSwitcher Awake] Initializing...");
-    }
-
-    private void Start()
-    {
-        InitializeToolState(true); // Initialize and fire events
-    }
-
-    private void Update()
-    {
-        if (toolDefinitions == null || toolDefinitions.Length == 0) return;
-
-        bool toolChanged = false;
-        int previousIndex = currentIndex;
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            currentIndex--;
-            if (currentIndex < 0)
-                currentIndex = toolDefinitions.Length - 1;
-            toolChanged = true;
-        }
-        else if (Input.GetKeyDown(KeyCode.E))
-        {
-            currentIndex++;
-            if (currentIndex >= toolDefinitions.Length)
-                currentIndex = 0;
-            toolChanged = true;
-        }
-
-        if (toolChanged)
-        {
-            // Ensure the new index points to a valid definition before updating state
-            if (currentIndex >= 0 && currentIndex < toolDefinitions.Length && toolDefinitions[currentIndex] != null)
-            {
-                InitializeToolState(false); // Update state for the new tool and fire events
-            }
-            else
-            {
-                 Debug.LogError($"[ToolSwitcher Update] Attempted to switch to an invalid/NULL tool definition at index {currentIndex}. Reverting.");
-                 currentIndex = previousIndex; // Revert to the last valid index
-                 // No state change, no events needed here
-            }
-        }
-    }
-
-    /// <summary>
-    /// Sets the CurrentTool and resets CurrentRemainingUses based on the tool's definition.
-    /// Optionally fires OnToolChanged and OnUsesChanged events.
-    /// </summary>
-    /// <param name="isInitialSetup">If true, forces event firing even if tool doesn't technically change.</param>
-    private void InitializeToolState(bool isInitialSetup)
-    {
-        ToolDefinition previousTool = CurrentTool; // Store previous tool for change check
-        int previousUses = CurrentRemainingUses; // Store previous uses
-
-        if (toolDefinitions == null || toolDefinitions.Length == 0 || currentIndex < 0 || currentIndex >= toolDefinitions.Length || toolDefinitions[currentIndex] == null)
-        {
-            // Handle cases with no tools or invalid selection
-            CurrentTool = null;
-            CurrentRemainingUses = -1; // No tool = unlimited uses conceptually
-        }
-        else
-        {
-            // Valid tool selected
-            CurrentTool = toolDefinitions[currentIndex];
-            if (CurrentTool.limitedUses)
-            {
-                CurrentRemainingUses = CurrentTool.initialUses;
-            }
-            else
-            {
-                CurrentRemainingUses = -1; // Mark as unlimited
-            }
-        }
-        
-        
-
-        LogToolChange("[ToolSwitcher InitializeToolState]"); // Log the state after update
-
-        // Fire events if state actually changed or if it's the initial setup
-        bool toolActuallyChanged = previousTool != CurrentTool;
-        bool usesActuallyChanged = previousUses != CurrentRemainingUses;
-
-        if (isInitialSetup || toolActuallyChanged)
-        {
-             Debug.Log($"[ToolSwitcher InitializeToolState] Firing OnToolChanged for tool: {CurrentTool?.displayName ?? "NULL"}");
-             OnToolChanged?.Invoke(CurrentTool);
-        }
-        if (isInitialSetup || usesActuallyChanged || toolActuallyChanged) // Fire uses changed if tool changed too (to reset UI)
-        {
-             Debug.Log($"[ToolSwitcher InitializeToolState] Firing OnUsesChanged with value: {CurrentRemainingUses}");
-             OnUsesChanged?.Invoke(CurrentRemainingUses);
-        }
-    }
-
-
-    /// <summary>
-    /// Refills the current tool to its maximum capacity if it's a limited-use tool.
-    /// </summary>
-    public void RefillCurrentTool() // <<< NEW METHOD
-    {
-        if (CurrentTool == null)
-        {
-            Debug.LogWarning("[ToolSwitcher RefillCurrentTool] Cannot refill: No tool selected.");
-            return;
-        }
-
-        if (!CurrentTool.limitedUses)
-        {
-            Debug.LogWarning($"[ToolSwitcher RefillCurrentTool] Cannot refill tool '{CurrentTool.displayName}': It has unlimited uses.");
-            return;
-        }
-
-        // Check if already full to avoid unnecessary event firing
-        if (CurrentRemainingUses == CurrentTool.initialUses)
-        {
-            if(Debug.isDebugBuild) Debug.Log($"[ToolSwitcher RefillCurrentTool] Tool '{CurrentTool.displayName}' is already full ({CurrentRemainingUses} uses).");
-            return;
-        }
-
-        // Set uses back to initial amount
-        int previousUses = CurrentRemainingUses;
-        CurrentRemainingUses = CurrentTool.initialUses;
-
-        Debug.Log($"[ToolSwitcher RefillCurrentTool] Refilled tool '{CurrentTool.displayName}' to {CurrentRemainingUses} uses (was {previousUses}).");
-
-        // Notify listeners that uses changed
-        OnUsesChanged?.Invoke(CurrentRemainingUses);
-    }
-    
-    /// <summary>
-    /// Attempts to consume one use of the current tool.
-    /// </summary>
-    /// <returns>True if a use was consumed or if the tool has unlimited uses. False if the tool has limited uses and is out of uses.</returns>
-    public bool TryConsumeUse()
-    {
-        if (CurrentTool == null)
-        {
-            Debug.LogWarning("[ToolSwitcher TryConsumeUse] Cannot consume use: No tool selected.");
-            return false; // Cannot use a non-existent tool
-        }
-
-        if (!CurrentTool.limitedUses || CurrentRemainingUses == -1)
-        {
-            // Tool is unlimited, consumption always succeeds
-            // Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' has unlimited uses."); // Optional log
-            return true;
-        }
-
-        // Tool has limited uses
-        if (CurrentRemainingUses > 0)
-        {
-            CurrentRemainingUses--;
-            Debug.Log($"[ToolSwitcher TryConsumeUse] Consumed use for '{CurrentTool.displayName}'. Remaining: {CurrentRemainingUses}");
-            OnUsesChanged?.Invoke(CurrentRemainingUses); // Notify listeners
-            return true;
-        }
-        else
-        {
-            // Out of uses
-            Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' is out of uses (0 remaining).");
-            // Optionally play an 'empty click' sound here
-            return false;
-        }
-    }
-
-    // Added prefix parameter for context
-    private void LogToolChange(string prefix = "[ToolSwitcher]")
-    {
-        string toolName = (CurrentTool != null && !string.IsNullOrEmpty(CurrentTool.displayName))
-                          ? CurrentTool.displayName
-                          : "(none)";
-        string usesSuffix = "";
-        if (CurrentTool != null && CurrentTool.limitedUses && CurrentRemainingUses >= 0)
-        {
-            usesSuffix = $" ({CurrentRemainingUses}/{CurrentTool.initialUses})";
-        }
-        else if (CurrentTool != null && !CurrentTool.limitedUses)
-        {
-            // usesSuffix = " (Unlimited)"; // Optional: Indicate unlimited
-        }
-
-        Debug.Log($"{prefix} Switched tool to: {toolName}{usesSuffix} (Index: {currentIndex})");
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Tools\ToolType.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿public enum ToolType
-{
-    None,
-    Hoe,
-    WateringCan,
-    SeedPouch // New tool type
-    // etc.
 }
 
 

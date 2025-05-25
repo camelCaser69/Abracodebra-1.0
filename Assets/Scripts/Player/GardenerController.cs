@@ -1,6 +1,7 @@
 ﻿// FILE: Assets/Scripts/Player/GardenerController.cs
 using UnityEngine;
 using System;
+using System.Collections.Generic;
 
 // No longer requires ToolSwitcher on the same GameObject
 public class GardenerController : MonoBehaviour
@@ -8,6 +9,13 @@ public class GardenerController : MonoBehaviour
     // --- Fields ---
     [Header("Movement Settings")]
     public float moveSpeed = 5f;
+    
+    [Header("Speed Modifiers")]
+    [Tooltip("Current speed including all active modifiers (read-only)")]
+    [SerializeField] private float currentMoveSpeed;
+    private float baseMoveSpeed;
+    private List<float> activeSpeedMultipliers = new List<float>();
+    
     [Header("Planting Settings")]
     public Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
 
@@ -40,24 +48,33 @@ public class GardenerController : MonoBehaviour
     private float plantingTimer = 0f;
     private bool wasMovingBeforePlanting = false;
 
-    private void Awake()
+    void Awake()
     {
-        // --- Get Components (excluding ToolSwitcher) ---
+        // Store original components and references
         rb = GetComponent<Rigidbody2D>();
         sortableEntity = GetComponent<SortableEntity>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
 
-        if (sortableEntity == null) sortableEntity = gameObject.AddComponent<SortableEntity>();
+        // Store base movement speed for multiplier system
+        baseMoveSpeed = moveSpeed;
+        currentMoveSpeed = moveSpeed;
+    
+        // Initialize speed multipliers list
+        activeSpeedMultipliers = new List<float>();
 
-        // --- VALIDATIONS (Focus on assigned references) ---
-        if (spriteRenderer == null) Debug.LogWarning("[GardenerController Awake] Main SpriteRenderer component not found.", gameObject);
-        if (animator == null && useAnimations) Debug.LogWarning("[GardenerController Awake] Animator component not found but useAnimations is true.", gameObject);
+        if (sortableEntity == null)
+            sortableEntity = gameObject.AddComponent<SortableEntity>();
 
-        // Validate the explicitly assigned ToolSwitcher reference
+        // Validations for other components
+        if (spriteRenderer == null)
+            Debug.LogWarning("[GardenerController Awake] Main SpriteRenderer component not found.", gameObject);
+    
+        if (animator == null && useAnimations)
+            Debug.LogWarning("[GardenerController Awake] Animator component not found but useAnimations is true.", gameObject);
+
         if (toolSwitcherInstance == null)
         {
-            // This is now an error because it MUST be assigned in the inspector
             Debug.LogError("[GardenerController Awake] Tool Switcher Instance is not assigned in the Inspector! Tool switching and icon display will not function.", gameObject);
         }
 
@@ -90,6 +107,8 @@ public class GardenerController : MonoBehaviour
 
     private void OnDestroy()
     {
+        // Clear speed multipliers list
+        activeSpeedMultipliers.Clear();
         // Unsubscribe ONLY if toolSwitcherInstance was assigned and we subscribed
         if (toolSwitcherInstance != null)
         {
@@ -117,7 +136,69 @@ public class GardenerController : MonoBehaviour
         UpdateAnimations();
         UpdateSpriteDirection();
     }
-    private void FixedUpdate() { if (!isPlanting) { rb.MovePosition(rb.position + movement.normalized * moveSpeed * Time.fixedDeltaTime); } }
+    
+    public void ApplySpeedMultiplier(float multiplier)
+    {
+        if (!activeSpeedMultipliers.Contains(multiplier))
+        {
+            activeSpeedMultipliers.Add(multiplier);
+            UpdateMovementSpeed();
+        
+            if (Debug.isDebugBuild)
+            {
+                Debug.Log($"[{gameObject.name}] Applied speed multiplier: {multiplier}. New speed: {currentMoveSpeed}");
+            }
+        }
+    }
+    
+    private void UpdateMovementSpeed()
+    {
+        // Start with base speed
+        float newSpeed = baseMoveSpeed;
+    
+        // Apply all active multipliers
+        if (activeSpeedMultipliers.Count > 0)
+        {
+            // Use the most restrictive (lowest) multiplier
+            float lowestMultiplier = 1.0f;
+            foreach (float multiplier in activeSpeedMultipliers)
+            {
+                if (multiplier < lowestMultiplier)
+                {
+                    lowestMultiplier = multiplier;
+                }
+            }
+        
+            newSpeed *= lowestMultiplier;
+        }
+    
+        // Update the current move speed
+        currentMoveSpeed = newSpeed;
+    }
+    
+    public void RemoveSpeedMultiplier(float multiplier)
+    {
+        if (activeSpeedMultipliers.Contains(multiplier))
+        {
+            activeSpeedMultipliers.Remove(multiplier);
+            UpdateMovementSpeed();
+        
+            if (Debug.isDebugBuild)
+            {
+                Debug.Log($"[{gameObject.name}] Removed speed multiplier: {multiplier}. New speed: {currentMoveSpeed}");
+            }
+        }
+    }
+    
+    
+    void FixedUpdate()
+    {
+        if (!isPlanting)
+        {
+            // Use currentMoveSpeed (with modifiers) instead of moveSpeed
+            rb.MovePosition(rb.position + movement.normalized * currentMoveSpeed * Time.fixedDeltaTime);
+        }
+    }
     private void UpdateAnimations() { if (!useAnimations || animator == null) return; bool isMoving = movement.sqrMagnitude > 0.01f; animator.SetBool(runningParameterName, isMoving); }
     private void UpdateSpriteDirection() { if (spriteRenderer == null || !flipSpriteWhenMovingLeft) return; if (movement.x != 0) { bool shouldFlip = (movement.x < 0); if (flipHorizontalDirection) { spriteRenderer.flipX = shouldFlip; } else { Vector3 scale = transform.localScale; scale.x = shouldFlip ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x); transform.localScale = scale; } } }
     public void StartPlantingAnimation() { if (!useAnimations || isPlanting) return; isPlanting = true; plantingTimer = plantingDuration; wasMovingBeforePlanting = movement.sqrMagnitude > 0.01f; if (animator != null) { animator.SetBool(plantingParameterName, true); animator.SetBool(runningParameterName, false); } }

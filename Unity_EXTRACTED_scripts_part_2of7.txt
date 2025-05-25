@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-19 01:01:18
+UNITY PROJECT SCRIPT EXPORT - 2025-05-24 21:05:17
 PART 2 OF 7
 ================================================================================
 
@@ -122,7 +122,8 @@ Assets
 │   │   └── ToolDefinition_002_SeedPouch.asset
 │   └── Waves
 │       ├── Wave_000.asset
-│       └── Wave_001.asset
+│       ├── Wave_001.asset
+│       └── Wave_002.asset
 ├── Scripts
 │   ├── Battle
 │   │   ├── Plant
@@ -152,6 +153,7 @@ Assets
 │   │   │   ├── FloraManager.cs
 │   │   │   ├── PoopController.cs
 │   │   │   ├── ScentSource.cs
+│   │   │   ├── SlowdownZone.cs
 │   │   │   ├── ThoughtBubbleController.cs
 │   │   │   ├── ThoughtTrigger.cs
 │   │   │   ├── WaveDefinition.cs
@@ -1094,8 +1096,7 @@ public class AnimalLibrary : ScriptableObject
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\AnimalController.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Ecosystem/Core/AnimalController.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -1105,11 +1106,43 @@ using TMPro;
 [RequireComponent(typeof(Collider2D))]
 public class AnimalController : MonoBehaviour
 {
-    // --- Fields --- (No changes)
-    private AnimalDefinition definition; private AnimalDiet animalDiet;
-    [Header("Optional Features")] public AnimalThoughtLibrary thoughtLibrary; public GameObject thoughtBubblePrefab; public Transform bubbleSpawnTransform; public Transform poopSpawnPoint; public List<GameObject> poopPrefabs; public Animator animator;
-    [Header("UI References")] [SerializeField] private TextMeshProUGUI hpText;
-    [Header("Behavior Tuning")] public float searchRadius = 5f; public float eatDistance = 0.5f; public float eatDuration = 1.5f; [Range(0f, 1f)] public float wanderPauseChance = 0.3f; public float wanderMinMoveDuration = 1f; public float wanderMaxMoveDuration = 3f; public float wanderMinPauseDuration = 0.5f; public float wanderMaxPauseDuration = 2f; public float minPoopDelay = 5f; public float maxPoopDelay = 10f; public float poopDuration = 1f; public float poopColorVariation = 0.1f; public float thoughtCooldownTime = 5f; [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>(); [SerializeField] private List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
+    // --- Fields ---
+    private AnimalDefinition definition;
+    private AnimalDiet animalDiet;
+    
+    [Header("Optional Features")]
+    public AnimalThoughtLibrary thoughtLibrary;
+    public GameObject thoughtBubblePrefab;
+    public Transform bubbleSpawnTransform;
+    public Transform poopSpawnPoint;
+    public List<GameObject> poopPrefabs;
+    public Animator animator;
+    
+    [Header("UI References")]
+    [SerializeField] private TextMeshProUGUI hpText;
+    [SerializeField] private TextMeshProUGUI hungerText; // NEW: Hunger text reference
+
+    [Header("UI Settings")] // NEW HEADER
+    [Tooltip("Which key to hold to display HP and Hunger texts")]
+    [SerializeField] private KeyCode showStatsKey = KeyCode.LeftAlt; // NEW: Configurable key for showing stats
+    
+    [Header("Behavior Tuning")]
+    public float searchRadius = 5f;
+    public float eatDistance = 0.5f;
+    public float eatDuration = 1.5f;
+    [Range(0f, 1f)]
+    public float wanderPauseChance = 0.3f;
+    public float wanderMinMoveDuration = 1f;
+    public float wanderMaxMoveDuration = 3f;
+    public float wanderMinPauseDuration = 0.5f;
+    public float wanderMaxPauseDuration = 2f;
+    public float minPoopDelay = 5f;
+    public float maxPoopDelay = 10f;
+    public float poopDuration = 1f;
+    public float poopColorVariation = 0.1f;
+    public float thoughtCooldownTime = 5f;
+    [SerializeField] private List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
+    [SerializeField] private List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
     // --- NEW: Food reassessment timer fields ---
     [Header("Food Seeking Improvements")]
@@ -1117,52 +1150,135 @@ public class AnimalController : MonoBehaviour
     public float foodReassessmentInterval = 0.5f;
     private float foodReassessmentTimer = 0f;
 
-    // --- Internal State --- (No changes)
-    private float currentHealth; private float currentHunger; private GameObject currentTargetFood = null; private Vector2 moveDirection = Vector2.zero; private bool isEating = false; private float eatTimer = 0f; private bool isWanderPaused = false; private float wanderStateTimer = 0f; private bool isPooping = false; private float poopTimer = 0f; private float poopDelayTimer = 0f; private bool hasPooped = true; private float thoughtCooldownTimer = 0f;
+    // --- Internal State ---
+    private float currentHealth;
+    private float currentHunger;
+    private GameObject currentTargetFood = null;
+    private Vector2 moveDirection = Vector2.zero;
+    private bool isEating = false;
+    private float eatTimer = 0f;
+    private bool isWanderPaused = false;
+    private float wanderStateTimer = 0f;
+    private bool isPooping = false;
+    private float poopTimer = 0f;
+    private float poopDelayTimer = 0f;
+    private bool hasPooped = true;
+    private float thoughtCooldownTimer = 0f;
     private bool isSeekingScreenCenter = false;
     private Vector2 screenCenterTarget;
 
-    // --- Component References --- (No changes)
-    private Rigidbody2D rb; private SpriteRenderer spriteRenderer; private Collider2D animalCollider;
+    // --- Component References ---
+    private Rigidbody2D rb;
+    private SpriteRenderer spriteRenderer;
+    private Collider2D animalCollider;
 
-    // --- Movement Bounds (Now Shifted Padded Screen Bounds) ---
-    private Vector2 minBounds; private Vector2 maxBounds;
+    // --- Movement Bounds (Shifted Padded Screen Bounds) ---
+    private Vector2 minBounds;
+    private Vector2 maxBounds;
 
-    // --- Public Accessors --- (No changes)
-    public float CurrentHealth => currentHealth; public string SpeciesName => definition ? definition.animalName : "Uninitialized";
+    // --- Public Accessors ---
+    public float CurrentHealth => currentHealth;
+    public string SpeciesName => definition ? definition.animalName : "Uninitialized";
 
-    // --- Initialize --- (MODIFIED center calculation only)
+    // --- NEW: Fields for slowdown system ---
+    private float baseMovementSpeed;
+    private List<float> activeSpeedMultipliers = new List<float>();
+
+    // --- Initialize ---
     public void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false)
     {
-        definition = def; if (definition == null) { Destroy(gameObject); return; }
-        animalDiet = def.diet; if (animalDiet == null) { enabled = false; return; }
-        rb = GetComponent<Rigidbody2D>(); spriteRenderer = GetComponentInChildren<SpriteRenderer>(); animalCollider = GetComponent<Collider2D>();
-        if (animalCollider == null) { Debug.LogError($"[{gameObject.name}] Missing Collider2D!", gameObject); enabled = false; return; }
+        definition = def; 
+        if (definition == null) { Destroy(gameObject); return; }
+        
+        animalDiet = def.diet; 
+        if (animalDiet == null) { enabled = false; return; }
+        
+        rb = GetComponent<Rigidbody2D>(); 
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>(); 
+        animalCollider = GetComponent<Collider2D>();
+        
+        if (animalCollider == null) 
+        { 
+            Debug.LogError($"[{gameObject.name}] Missing Collider2D!", gameObject); 
+            enabled = false; 
+            return; 
+        }
 
-        currentHealth = definition.maxHealth; currentHunger = 0f; hasPooped = true; poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
+        // Store base movement speed - NEW
+        baseMovementSpeed = definition.movementSpeed;
+        activeSpeedMultipliers.Clear(); // NEW
+
+        currentHealth = definition.maxHealth;
+        currentHunger = 0f;
+        hasPooped = true;
+        poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
         foodReassessmentTimer = Random.Range(0f, foodReassessmentInterval); // Randomize initial timer
 
         // Store the SHIFTED bounds received from FaunaManager
         minBounds = shiftedMinBounds;
         maxBounds = shiftedMaxBounds;
+        
         // Calculate the target center based on the SHIFTED bounds
         screenCenterTarget = (minBounds + maxBounds) / 2f;
 
         isSeekingScreenCenter = spawnedOffscreen;
         if (isSeekingScreenCenter)
         {
-            // Debug now shows the shifted bounds and target
-            if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name} Initialize] Offscreen spawn. Seeking SHIFTED center ({screenCenterTarget}). SHIFTED Bounds: min{minBounds}, max{maxBounds}", gameObject);
+            if(Debug.isDebugBuild) 
+                Debug.Log($"[{gameObject.name} Initialize] Offscreen spawn. Seeking SHIFTED center ({screenCenterTarget}). SHIFTED Bounds: min{minBounds}, max{maxBounds}", gameObject);
+            
             moveDirection = (screenCenterTarget - (Vector2)transform.position).normalized;
-            if (moveDirection == Vector2.zero) moveDirection = Random.insideUnitCircle.normalized;
+            if (moveDirection == Vector2.zero) 
+                moveDirection = Random.insideUnitCircle.normalized;
         }
-        EnsureHpTextReference(); UpdateHpText(); if (spriteRenderer == null) { /* Warning */ }
+    
+        EnsureUITextReferences();
+    
+        // Hide text elements initially
+        SetStatsTextVisibility(false);
+    
+        UpdateHpText(); 
+        UpdateHungerText();
+    
+        if (spriteRenderer == null) { /* Warning */ }
+    }
+    
+    private void EnsureUITextReferences() 
+    { 
+        if (hpText == null) 
+        {
+            hpText = GetComponentInChildren<TextMeshProUGUI>(true);
+            // If we found a TMP_Text but it should be for HP, don't assign it to both
+            if (hpText != null && hpText.gameObject.name.Contains("Hunger"))
+            {
+                hungerText = hpText;
+                hpText = null;
+            }
+        }
+    
+        if (hungerText == null)
+        {
+            // Try to find any TextMeshProUGUI component that's not the HP text
+            TextMeshProUGUI[] allTexts = GetComponentsInChildren<TextMeshProUGUI>(true);
+            foreach (var text in allTexts)
+            {
+                if (text != hpText)
+                {
+                    hungerText = text;
+                    break;
+                }
+            }
+        }
     }
 
-    // --- Update --- (MODIFIED check, uses shifted bounds)
+    // --- Update ---
     void Update()
     {
         if (!enabled || rb == null) return;
+
+        // Check for ALT key (or configured key) press to show/hide stats
+        bool showStats = Input.GetKey(showStatsKey);
+        SetStatsTextVisibility(showStats);
 
         if (isSeekingScreenCenter)
         {
@@ -1174,7 +1290,9 @@ public class AnimalController : MonoBehaviour
 
             if (centerWithinBounds)
             {
-                if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name} Update] Center reached SHIFTED bounds! Pos: {currentPos}. MinB: {minBounds}, MaxB: {maxBounds}. Switching to normal AI.", gameObject);
+                if(Debug.isDebugBuild) 
+                    Debug.Log($"[{gameObject.name} Update] Center reached SHIFTED bounds! Pos: {currentPos}. MinB: {minBounds}, MaxB: {maxBounds}. Switching to normal AI.", gameObject);
+                
                 isSeekingScreenCenter = false;
                 moveDirection = Vector2.zero;
             }
@@ -1182,25 +1300,56 @@ public class AnimalController : MonoBehaviour
             {
                 // Seek the SHIFTED center target
                 moveDirection = (screenCenterTarget - currentPos).normalized;
-                 if (moveDirection == Vector2.zero) moveDirection = Random.insideUnitCircle.normalized;
-                FlipSpriteBasedOnDirection(); UpdateAnimationState();
+                if (moveDirection == Vector2.zero) 
+                    moveDirection = Random.insideUnitCircle.normalized;
+                
+                FlipSpriteBasedOnDirection();
+                UpdateAnimationState();
                 return; // Skip normal AI
             }
         }
 
         // Normal AI Logic
-        UpdateHunger(); HandlePooping(); UpdateThoughts();
-        if (isEating) { HandleEating(); moveDirection = Vector2.zero; }
-        else if (isPooping) { moveDirection = Vector2.zero; }
-        else { DecideNextAction(); }
+        UpdateHunger();
+        HandlePooping();
+        UpdateThoughts();
+        
+        if (isEating) 
+        { 
+            HandleEating(); 
+            moveDirection = Vector2.zero; 
+        }
+        else if (isPooping) 
+        { 
+            moveDirection = Vector2.zero; 
+        }
+        else 
+        { 
+            DecideNextAction(); 
+        }
 
-        FlipSpriteBasedOnDirection(); UpdateAnimationState();
+        FlipSpriteBasedOnDirection();
+        UpdateAnimationState();
+    }
+    
+    private void SetStatsTextVisibility(bool visible)
+    {
+        if (hpText != null)
+        {
+            hpText.gameObject.SetActive(visible);
+        }
+    
+        if (hungerText != null)
+        {
+            hungerText.gameObject.SetActive(visible);
+        }
     }
 
-    // --- FixedUpdate --- (Uses shifted bounds for clamping)
+    // --- FixedUpdate ---
     void FixedUpdate()
     {
         if (rb == null) return;
+        
         if (!isEating && !isPooping && moveDirection != Vector2.zero)
         {
             Vector2 currentPos = rb.position;
@@ -1209,9 +1358,9 @@ public class AnimalController : MonoBehaviour
 
             if (!isSeekingScreenCenter) // Clamp only when NOT seeking
             {
-                 // Clamp the CENTER position using the SHIFTED bounds
-                 nextPos.x = Mathf.Clamp(nextPos.x, minBounds.x, maxBounds.x);
-                 nextPos.y = Mathf.Clamp(nextPos.y, minBounds.y, maxBounds.y);
+                // Clamp the CENTER position using the SHIFTED bounds
+                nextPos.x = Mathf.Clamp(nextPos.x, minBounds.x, maxBounds.x);
+                nextPos.y = Mathf.Clamp(nextPos.y, minBounds.y, maxBounds.y);
             }
             rb.MovePosition(nextPos);
         }
@@ -1220,7 +1369,9 @@ public class AnimalController : MonoBehaviour
     void UpdateHunger() 
     { 
         currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime; 
-        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger); 
+        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
+        // Update hunger text when hunger changes
+        UpdateHungerText();
     }
     
     void ApplyStarvationDamage() 
@@ -1270,7 +1421,7 @@ public class AnimalController : MonoBehaviour
         } 
     }
     
-    // --- MODIFIED: SeekFood with periodic reassessment ---
+    // --- Food seeking with periodic reassessment ---
     void SeekFood() 
     { 
         if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
@@ -1296,7 +1447,8 @@ public class AnimalController : MonoBehaviour
                 if (!targetValid) 
                 {
                     currentTargetFood = potentialBetterFood;
-                    if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name} SeekFood] Found new food target (no previous): {potentialBetterFood.name}");
+                    if(Debug.isDebugBuild) 
+                        Debug.Log($"[{gameObject.name} SeekFood] Found new food target (no previous): {potentialBetterFood.name}");
                 }
                 // Switch to new target if it's better than current
                 else if (potentialBetterFood != currentTargetFood) 
@@ -1313,7 +1465,9 @@ public class AnimalController : MonoBehaviour
                         // Switch if new food has higher priority
                         if (newPriority > currentPriority) 
                         {
-                            if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name} SeekFood] Switching to higher priority food: {newFoodItem.foodType.foodName} (priority: {newPriority}) from {currentFoodItem.foodType.foodName} (priority: {currentPriority})");
+                            if(Debug.isDebugBuild) 
+                                Debug.Log($"[{gameObject.name} SeekFood] Switching to higher priority food: {newFoodItem.foodType.foodName} (priority: {newPriority}) from {currentFoodItem.foodType.foodName} (priority: {currentPriority})");
+                            
                             currentTargetFood = potentialBetterFood;
                         }
                     }
@@ -1344,6 +1498,7 @@ public class AnimalController : MonoBehaviour
     void MoveTowardFood(GameObject foodObj) 
     { 
         if (foodObj == null) return; 
+        
         float distance = Vector2.Distance(transform.position, foodObj.transform.position); 
         if (distance <= eatDistance) 
         { 
@@ -1378,6 +1533,7 @@ public class AnimalController : MonoBehaviour
     void FinishEatingAction() 
     { 
         if (currentTargetFood == null) return; 
+        
         FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>(); 
         if (foodItem != null && foodItem.foodType != null) 
         { 
@@ -1387,7 +1543,9 @@ public class AnimalController : MonoBehaviour
             Destroy(currentTargetFood); 
             hasPooped = false; 
             poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay); 
-            currentTargetFood = null; 
+            currentTargetFood = null;
+            // Update hunger text
+            UpdateHungerText();
         } 
         else 
         { 
@@ -1413,19 +1571,28 @@ public class AnimalController : MonoBehaviour
     void SpawnPoop() 
     { 
         if (poopPrefabs == null || poopPrefabs.Count == 0) return; 
+        
         int index = Random.Range(0, poopPrefabs.Count); 
         GameObject prefab = poopPrefabs[index]; 
         if (prefab == null) return; 
+        
         Transform spawnT = poopSpawnPoint ? poopSpawnPoint : transform; 
         GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity); 
+        
         SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>(); 
         if (sr != null) 
         { 
             sr.flipX = Random.value > 0.5f; 
             Color c = sr.color; 
             float v = poopColorVariation; 
-            sr.color = new Color(Mathf.Clamp01(c.r + Random.Range(-v, v)), Mathf.Clamp01(c.g + Random.Range(-v, v)), Mathf.Clamp01(c.b + Random.Range(-v, v)), c.a); 
+            sr.color = new Color(
+                Mathf.Clamp01(c.r + Random.Range(-v, v)),
+                Mathf.Clamp01(c.g + Random.Range(-v, v)),
+                Mathf.Clamp01(c.b + Random.Range(-v, v)),
+                c.a
+            ); 
         } 
+        
         PoopController pc = poopObj.GetComponent<PoopController>() ?? poopObj.AddComponent<PoopController>(); 
         pc.Initialize(); 
     }
@@ -1485,13 +1652,18 @@ public class AnimalController : MonoBehaviour
     void ShowThought(ThoughtTrigger trigger) 
     { 
         if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return; 
-        var entry = thoughtLibrary.allThoughts.FirstOrDefault(t => t != null && t.speciesName == SpeciesName && t.trigger == trigger); 
+        
+        var entry = thoughtLibrary.allThoughts.FirstOrDefault(t => 
+            t != null && t.speciesName == SpeciesName && t.trigger == trigger
+        ); 
+        
         if (entry != null && entry.lines != null && entry.lines.Count > 0) 
         { 
             string line = entry.lines[Random.Range(0, entry.lines.Count)]; 
             Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform; 
             GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT); 
             bubbleGO.transform.localPosition = Vector3.zero; 
+            
             ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>(); 
             if (bubble) 
             { 
@@ -1518,19 +1690,83 @@ public class AnimalController : MonoBehaviour
         return definition != null && definition.animalName == other; 
     }
     
-    private void EnsureHpTextReference() 
-    { 
-        if (hpText == null) 
-        { 
-            hpText = GetComponentInChildren<TextMeshProUGUI>(true); 
-        } 
-    }
-    
     private void UpdateHpText() 
     { 
         if (hpText == null || definition == null) return; 
         hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)}/{Mathf.FloorToInt(definition.maxHealth)}"; 
     }
+    
+    private void UpdateHungerText()
+    {
+        if (hungerText == null || animalDiet == null) return;
+        hungerText.text = $"Hunger: {Mathf.FloorToInt(currentHunger)}/{Mathf.FloorToInt(animalDiet.maxHunger)}";
+    }
+
+    // --- NEW METHODS FOR SLOWDOWN SYSTEM ---
+    
+    // Method to apply speed multiplier from SlowdownZone
+    public void ApplySpeedMultiplier(float multiplier)
+    {
+        if (!activeSpeedMultipliers.Contains(multiplier))
+        {
+            activeSpeedMultipliers.Add(multiplier);
+            UpdateMovementSpeed();
+            
+            if (Debug.isDebugBuild)
+            {
+                Debug.Log($"[{gameObject.name}] Applied speed multiplier: {multiplier}. New speed: {definition.movementSpeed}");
+            }
+        }
+    }
+
+    // Method to remove speed multiplier when leaving SlowdownZone
+    public void RemoveSpeedMultiplier(float multiplier)
+    {
+        if (activeSpeedMultipliers.Contains(multiplier))
+        {
+            activeSpeedMultipliers.Remove(multiplier);
+            UpdateMovementSpeed();
+            
+            if (Debug.isDebugBuild)
+            {
+                Debug.Log($"[{gameObject.name}] Removed speed multiplier: {multiplier}. New speed: {definition.movementSpeed}");
+            }
+        }
+    }
+
+    // Method to recalculate movement speed based on active multipliers
+    private void UpdateMovementSpeed()
+    {
+        // Start with base speed (original speed from definition)
+        float newSpeed = baseMovementSpeed;
+        
+        // Apply all active multipliers
+        if (activeSpeedMultipliers.Count > 0)
+        {
+            // Use the most restrictive (lowest) multiplier
+            float lowestMultiplier = 1.0f;
+            foreach (float multiplier in activeSpeedMultipliers)
+            {
+                if (multiplier < lowestMultiplier)
+                {
+                    lowestMultiplier = multiplier;
+                }
+            }
+            
+            newSpeed *= lowestMultiplier;
+        }
+        
+        // Update the definition's movement speed (which is used in FixedUpdate)
+        definition.movementSpeed = newSpeed;
+        
+        // Optionally update animation speed to match movement
+        if (animator != null)
+        {
+            float speedRatio = newSpeed / baseMovementSpeed;
+            animator.speed = Mathf.Max(0.5f, speedRatio); // Don't go below half speed
+        }
+    }
+
 }
 
 

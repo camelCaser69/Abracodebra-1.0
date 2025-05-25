@@ -15,8 +15,8 @@ MonoBehaviour:
   displayName: Poop Fertilizer
   description: 
   thumbnail: {fileID: 21300000, guid: 3ac79cd7051f70948a53b002b1926a80, type: 3}
-  thumbnailTintColor: {r: 1, g: 1, b: 1, a: 1}
-  backgroundColor: {r: 0, g: 0, b: 0, a: 1}
+  thumbnailTintColor: {r: 0.6415094, g: 0.38158095, b: 0.2208971, a: 1}
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0}
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   effects:
   - effectType: 10
