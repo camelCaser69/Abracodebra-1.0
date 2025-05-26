@@ -1,54 +1,73 @@
 ﻿// FILE: Assets/Scripts/Visuals/WaterReflection.cs
 using UnityEngine;
-using UnityEngine.Tilemaps; // Keep for water masking logic
-using System.Collections.Generic;
-using System.Linq; // For FindObjectsOfType
+using UnityEngine.Tilemaps;
+using System.Collections.Generic; // Keep for potential future extensions, not strictly needed now
 
-/// <summary>
-/// Creates a water reflection effect by duplicating and flipping the sprite.
-/// Attach to any GameObject with a SpriteRenderer to create its reflection.
-/// Can optionally use parent's transform for offset and fade calculations.
-/// </summary>
 public class WaterReflection : MonoBehaviour
 {
+    // --- SECTION: Override Toggles ---
+    [System.Serializable]
+    public class OverrideSettings
+    {
+        [Tooltip("If checked, the local 'Reflection Opacity' value will be used instead of the global manager's default.")]
+        public bool reflectionOpacity = false;
+        [Tooltip("If checked, the local 'Reflection Tint' value will be used instead of the global manager's default.")]
+        public bool reflectionTint = false;
+        [Tooltip("If checked, the local 'Gradient Fade Base Material' will be used. Otherwise, manager's default is used.")]
+        public bool gradientFadeBaseMaterial = false;
+        [Tooltip("If checked, the local 'Sorting Order Offset' value will be used instead of the global manager's default.")]
+        public bool sortingOrderOffset = false;
+        [Tooltip("If checked, the local 'Use Water Masking' value will be used instead of the global manager's default.")]
+        public bool useWaterMasking = false;
+        [Tooltip("If checked, the local 'Water Tilemap Tag' value will be used instead of the global manager's default.")]
+        public bool waterTilemapTag = false;
+        [Tooltip("If checked, the local 'Show Debug Info' value will be used instead of the global manager's default.")]
+        public bool showDebugInfo = false;
+    }
+    [Header("Overrides (Global Defaults from WaterReflectionManager)")]
+    [SerializeField] private OverrideSettings overrides;
+
+
+    // --- SECTION: Local Settings (Used if Overridden) ---
     [Header("Reflection Source")]
     [Tooltip("If true, Y Offset and Distance Fade calculations will be relative to this GameObject's parent. If false (default), relative to this GameObject.")]
-    [SerializeField] private bool useParentAsReference = false;
+    [SerializeField] private bool useParentAsReference = false; // This remains a local setting
 
-    [Header("Reflection Settings")]
+    [Header("Local Reflection Settings (If Overridden)")]
     [Tooltip("Vertical offset of the reflection. Interpretation depends on 'Use Parent As Reference'.")]
-    [SerializeField] private float yOffset = -1f;
+    [SerializeField] private float yOffset = -1f; // This remains a local setting
 
-    [Tooltip("Opacity of the reflection (0 = invisible, 1 = fully opaque)")]
-    [SerializeField] [Range(0f, 1f)] private float reflectionOpacity = 0.5f;
+    [Tooltip("Local opacity of the reflection (0 = invisible, 1 = fully opaque)")]
+    [SerializeField] [Range(0f, 1f)] private float localReflectionOpacity = 0.5f;
 
-    [Tooltip("Additional tint color for the reflection")]
-    [SerializeField] private Color reflectionTint = Color.white;
+    [Tooltip("Local additional tint color for the reflection")]
+    [SerializeField] private Color localReflectionTint = Color.white;
 
-    [Header("Distance Fade (Shader Controlled)")]
-    [Tooltip("Enable fading reflection. Requires 'Gradient Fade Base Material' to be assigned.")]
-    [SerializeField] private bool enableDistanceFade = true;
-    [Tooltip("Vertical distance from the reference Y (self or parent) where fade starts (shader's _FadeStart).")]
-    [SerializeField] private float fadeStartDistance = 0.0f;
-    [Tooltip("Vertical distance from the reference Y (self or parent) where reflection becomes min alpha (shader's _FadeEnd).")]
-    [SerializeField] private float fadeEndDistance = 1.0f;
-    [Tooltip("Minimum alpha when fully faded (shader's _MinAlpha).")]
-    [SerializeField] [Range(0f, 1f)] private float minFadeAlpha = 0.0f;
-    [Tooltip("Assign the 'Custom/WaterReflectionGradient' material, or one using that shader.")]
-    [SerializeField] private Material gradientFadeBaseMaterial;
+    [Header("Local Distance Fade (If Overridden)")]
+    [Tooltip("Enable fading reflection. Requires 'Gradient Fade Base Material' (local or global) to be assigned.")]
+    [SerializeField] private bool enableDistanceFade = true; // This remains local as it depends on material
+    [Tooltip("Vertical distance from the reference Y where fade starts.")]
+    [SerializeField] private float fadeStartDistance = 0.0f; // Local
+    [Tooltip("Vertical distance from the reference Y where reflection becomes min alpha.")]
+    [SerializeField] private float fadeEndDistance = 1.0f; // Local
+    [Tooltip("Minimum alpha when fully faded.")]
+    [SerializeField] [Range(0f, 1f)] private float minFadeAlpha = 0.0f; // Local
+    [Tooltip("Local override for the gradient fade material. If unassigned and override is false, uses manager's default.")]
+    [SerializeField] private Material localGradientFadeBaseMaterial;
 
-    [Header("Sorting")]
-    [Tooltip("Sorting order offset for the reflection (usually negative to render behind)")]
-    [SerializeField] private int sortingOrderOffset = -1;
+    [Header("Local Sorting (If Overridden)")]
+    [Tooltip("Local sorting order offset for the reflection")]
+    [SerializeField] private int localSortingOrderOffset = -1;
 
-    [Header("Water Masking")]
-    [Tooltip("If enabled, reflection will only be visible over water tiles")]
-    [SerializeField] private bool useWaterMasking = true;
-    [Tooltip("Tag used to identify the water tilemap (default: 'Water')")]
-    [SerializeField] private string waterTilemapTag = "Water";
+    [Header("Local Water Masking (If Overridden)")]
+    [Tooltip("Local override for using water masking")]
+    [SerializeField] private bool localUseWaterMasking = true;
+    [Tooltip("Local override for the water tilemap tag")]
+    [SerializeField] private string localWaterTilemapTag = "Water";
 
-    [Header("Debug")]
-    [SerializeField] private bool showDebugInfo = false;
+    [Header("Local Debug (If Overridden)")]
+    [SerializeField] private bool localShowDebugInfo = false;
+
 
     // --- Internal References ---
     private SpriteRenderer originalRenderer;
@@ -56,7 +75,17 @@ public class WaterReflection : MonoBehaviour
     private GameObject reflectionObject;
     private SpriteRenderer reflectionRenderer;
     private Animator reflectionAnimator;
-    private Material reflectionMaterialInstance;
+    private Material reflectionMaterialInstance; // Instanced material for this reflection
+
+    // --- Resolved Settings (from Manager or Local) ---
+    private float _actualReflectionOpacity;
+    private Color _actualReflectionTint;
+    private Material _actualGradientFadeBaseMaterial;
+    private int _actualSortingOrderOffset;
+    private bool _actualUseWaterMasking;
+    private string _actualWaterTilemapTag;
+    private bool _actualShowDebugInfo;
+
 
     // --- Cached Values for Optimization ---
     private Sprite lastSprite;
@@ -69,45 +98,68 @@ public class WaterReflection : MonoBehaviour
 
     void Awake()
     {
+        ResolveSettings(); // Determine actual settings to use
+
         originalRenderer = GetComponent<SpriteRenderer>();
         originalAnimator = GetComponent<Animator>();
 
         if (originalRenderer == null)
         {
-            Debug.LogError($"[WaterReflection] No SpriteRenderer found on {gameObject.name}! Component disabled.", this);
+            if (_actualShowDebugInfo) Debug.LogError($"[WaterReflection] No SpriteRenderer found on {gameObject.name}! Component disabled.", this);
             enabled = false;
             return;
         }
 
         if (useParentAsReference && transform.parent == null)
         {
-            if (showDebugInfo) Debug.LogWarning($"[WaterReflection] 'Use Parent As Reference' is true on {gameObject.name}, but it has no parent. Will use self as reference.", this);
+            if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection] 'Use Parent As Reference' is true on {gameObject.name}, but it has no parent. Will use self as reference.", this);
             useParentAsReference = false;
         }
 
-        // Check for gradientFadeBaseMaterial in Awake, specifically for Play mode behavior
-        if (Application.isPlaying) // Only show this more detailed warning in play mode
+        if (Application.isPlaying)
         {
-            if (enableDistanceFade && gradientFadeBaseMaterial == null)
+            if (enableDistanceFade && _actualGradientFadeBaseMaterial == null)
             {
-                Debug.LogWarning($"[WaterReflection Awake] '{gameObject.name}': 'Enable Distance Fade' is true, but 'Gradient Fade Base Material' is not assigned. Distance fade will not use the custom shader. Please assign a material using 'Custom/WaterReflectionGradient' on the prefab or this instance.", this);
-                // Do not disable enableDistanceFade here, let CreateReflectionObject handle fallback.
+                 if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection Awake] '{gameObject.name}': 'Enable Distance Fade' is true, but no 'Gradient Fade Base Material' (local or global) is assigned/found. Distance fade will not use the custom shader.", this);
             }
         }
 
-
         CreateReflectionObject();
 
-        if (useWaterMasking)
+        if (_actualUseWaterMasking)
         {
             SetupWaterMaskingInteraction();
         }
     }
+    
+    void ResolveSettings()
+    {
+        if (WaterReflectionManager.Instance != null)
+        {
+            _actualReflectionOpacity = overrides.reflectionOpacity ? localReflectionOpacity : WaterReflectionManager.Instance.defaultReflectionOpacity;
+            _actualReflectionTint = overrides.reflectionTint ? localReflectionTint : WaterReflectionManager.Instance.defaultReflectionTint;
+            _actualGradientFadeBaseMaterial = overrides.gradientFadeBaseMaterial ? localGradientFadeBaseMaterial : WaterReflectionManager.Instance.defaultGradientFadeMaterial;
+            _actualSortingOrderOffset = overrides.sortingOrderOffset ? localSortingOrderOffset : WaterReflectionManager.Instance.defaultSortingOrderOffset;
+            _actualUseWaterMasking = overrides.useWaterMasking ? localUseWaterMasking : WaterReflectionManager.Instance.defaultUseWaterMasking;
+            _actualWaterTilemapTag = overrides.waterTilemapTag && !string.IsNullOrEmpty(localWaterTilemapTag) ? localWaterTilemapTag : WaterReflectionManager.Instance.defaultWaterTilemapTag;
+            _actualShowDebugInfo = overrides.showDebugInfo ? localShowDebugInfo : WaterReflectionManager.Instance.globalShowDebugInfo;
+        }
+        else // Fallback if no manager in scene
+        {
+            _actualReflectionOpacity = localReflectionOpacity;
+            _actualReflectionTint = localReflectionTint;
+            _actualGradientFadeBaseMaterial = localGradientFadeBaseMaterial;
+            _actualSortingOrderOffset = localSortingOrderOffset;
+            _actualUseWaterMasking = localUseWaterMasking;
+            _actualWaterTilemapTag = localWaterTilemapTag;
+            _actualShowDebugInfo = localShowDebugInfo;
+            if (Application.isPlaying) Debug.LogWarning("[WaterReflection] WaterReflectionManager not found in scene. Using local settings for all reflections.", this);
+        }
+    }
+
 
     void Start()
     {
-        // Ensure visuals are up-to-date after all Awakes might have run
-        // and especially if material instantiation happened.
         UpdateReflectionVisuals();
         UpdateReflectionTransform();
         CacheCurrentState();
@@ -120,9 +172,7 @@ public class WaterReflection : MonoBehaviour
             if (reflectionObject != null) reflectionObject.SetActive(false);
             return;
         }
-
         UpdateReflectionTransform();
-
         if (HasVisualStateChanged())
         {
             UpdateReflectionVisuals();
@@ -138,24 +188,21 @@ public class WaterReflection : MonoBehaviour
 
         reflectionRenderer = reflectionObject.AddComponent<SpriteRenderer>();
         reflectionRenderer.sortingLayerName = originalRenderer.sortingLayerName;
-        reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + sortingOrderOffset;
+        reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + _actualSortingOrderOffset; // Use resolved
         reflectionRenderer.drawMode = originalRenderer.drawMode;
 
-        if (enableDistanceFade && gradientFadeBaseMaterial != null)
+        if (enableDistanceFade && _actualGradientFadeBaseMaterial != null) // Use resolved
         {
-            // This is where the material is instanced. If gradientFadeBaseMaterial is null
-            // here (despite being set on prefab), then the warning in Awake was correct.
-            reflectionMaterialInstance = new Material(gradientFadeBaseMaterial);
+            reflectionMaterialInstance = new Material(_actualGradientFadeBaseMaterial);
             reflectionRenderer.material = reflectionMaterialInstance;
-            if (showDebugInfo && Application.isPlaying) Debug.Log($"[{gameObject.name}] Instantiated gradient material for reflection.", this);
+            if (_actualShowDebugInfo && Application.isPlaying) Debug.Log($"[{gameObject.name}] Instantiated gradient material for reflection using '{_actualGradientFadeBaseMaterial.name}'.", this);
         }
         else
         {
             reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial;
-            if (enableDistanceFade && gradientFadeBaseMaterial == null && showDebugInfo && Application.isPlaying)
+            if (enableDistanceFade && _actualGradientFadeBaseMaterial == null && _actualShowDebugInfo && Application.isPlaying)
             {
-                // This confirms the Awake warning: material was indeed null when needed for instancing.
-                Debug.Log($"[{gameObject.name}] Using sharedMaterial for reflection as gradientFadeBaseMaterial was null during CreateReflectionObject.", this);
+                 Debug.Log($"[{gameObject.name}] Using sharedMaterial for reflection as no gradientFadeBaseMaterial (local or global) was resolved during CreateReflectionObject.", this);
             }
         }
 
@@ -164,20 +211,17 @@ public class WaterReflection : MonoBehaviour
             reflectionAnimator = reflectionObject.AddComponent<Animator>();
             reflectionAnimator.runtimeAnimatorController = originalAnimator.runtimeAnimatorController;
         }
-
         SortableEntity originalSortable = GetComponent<SortableEntity>();
         if (originalSortable != null)
         {
             reflectionObject.AddComponent<SortableEntity>();
         }
-
-        if (showDebugInfo) Debug.Log($"[WaterReflection] Created reflection for {gameObject.name}", this);
+        if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Created reflection for {gameObject.name}", this);
     }
 
     private void UpdateReflectionTransform()
     {
         if (reflectionObject == null || originalRenderer == null) return;
-
         Transform referenceTransform = (useParentAsReference && transform.parent != null) ? transform.parent : transform;
         Vector3 originalWorldPos = transform.position;
         Vector3 reflectionWorldPos = originalWorldPos;
@@ -200,11 +244,11 @@ public class WaterReflection : MonoBehaviour
         reflectionRenderer.flipY = originalRenderer.flipY;
 
         Color baseOriginalSpriteColor = originalRenderer.color;
-        Color finalReflectionTintedColor = baseOriginalSpriteColor * reflectionTint;
-        float finalCombinedAlpha = baseOriginalSpriteColor.a * reflectionOpacity;
+        Color finalReflectionTintedColor = baseOriginalSpriteColor * _actualReflectionTint; // Use resolved
+        float finalCombinedAlpha = baseOriginalSpriteColor.a * _actualReflectionOpacity; // Use resolved
         reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
 
-        if (enableDistanceFade && reflectionMaterialInstance != null) // Check reflectionMaterialInstance
+        if (enableDistanceFade && reflectionMaterialInstance != null)
         {
             Transform referenceTransform = (useParentAsReference && transform.parent != null) ? transform.parent : transform;
             float waterSurfaceY = referenceTransform.position.y;
@@ -212,13 +256,13 @@ public class WaterReflection : MonoBehaviour
             reflectionMaterialInstance.SetFloat("_FadeEnd", fadeEndDistance);
             reflectionMaterialInstance.SetFloat("_MinAlpha", minFadeAlpha);
             reflectionMaterialInstance.SetFloat("_OriginalY", waterSurfaceY);
-            Color materialBaseColor = reflectionTint;
-            materialBaseColor.a = reflectionOpacity * baseOriginalSpriteColor.a;
+            Color materialBaseColor = _actualReflectionTint; // Use resolved
+            materialBaseColor.a = _actualReflectionOpacity * baseOriginalSpriteColor.a; // Use resolved
             reflectionMaterialInstance.SetColor("_Color", materialBaseColor);
         }
         else if (!enableDistanceFade && reflectionMaterialInstance != null)
         {
-            reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial; // Revert to shared
+            reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial;
             Destroy(reflectionMaterialInstance);
             reflectionMaterialInstance = null;
         }
@@ -246,7 +290,7 @@ public class WaterReflection : MonoBehaviour
                                 break;
                         }
                     } catch (System.Exception e) {
-                        if(showDebugInfo) Debug.LogWarning($"Failed to sync animator param '{param.name}': {e.Message}", reflectionAnimator);
+                        if(_actualShowDebugInfo) Debug.LogWarning($"Failed to sync animator param '{param.name}': {e.Message}", reflectionAnimator);
                     }
                 }
             }
@@ -297,12 +341,12 @@ public class WaterReflection : MonoBehaviour
 
     private void SetupWaterMaskingInteraction()
     {
-        if (!useWaterMasking || reflectionRenderer == null) return;
-        GameObject waterTilemapGO = FindWaterTilemapByTag();
+        if (!_actualUseWaterMasking || reflectionRenderer == null) return; // Use resolved
+        GameObject waterTilemapGO = FindWaterTilemapByTag(); // FindWaterTilemapByTag will use resolved tag
         if (waterTilemapGO == null)
         {
-            if (showDebugInfo) Debug.LogWarning($"[WaterReflection] Water tilemap for masking not found on {gameObject.name} via tag '{waterTilemapTag}'. Masking disabled.", this);
-            useWaterMasking = false;
+            if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection] Water tilemap for masking not found on {gameObject.name} using tag '{_actualWaterTilemapTag}'. Masking disabled.", this);
+            // _actualUseWaterMasking = false; // Don't change resolved setting here, just don't apply mask
             return;
         }
         SpriteMask maskComponent = waterTilemapGO.GetComponent<SpriteMask>();
@@ -310,24 +354,25 @@ public class WaterReflection : MonoBehaviour
         {
             maskComponent = waterTilemapGO.AddComponent<SpriteMask>();
             maskComponent.sprite = null;
-            if (showDebugInfo) Debug.Log($"[WaterReflection] Added SpriteMask to water tilemap '{waterTilemapGO.name}' for object '{gameObject.name}'.", waterTilemapGO);
+            if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Added SpriteMask to water tilemap '{waterTilemapGO.name}' for object '{gameObject.name}'.", waterTilemapGO);
         }
         reflectionRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-        if (showDebugInfo) Debug.Log($"[WaterReflection] Reflection of '{gameObject.name}' will be masked by '{waterTilemapGO.name}'.", this);
+        if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Reflection of '{gameObject.name}' will be masked by '{waterTilemapGO.name}'.", this);
     }
 
     private GameObject FindWaterTilemapByTag()
     {
-        if (string.IsNullOrEmpty(waterTilemapTag)) return FindWaterTilemapFallback();
-        GameObject taggedWater = GameObject.FindGameObjectWithTag(waterTilemapTag);
+        // Uses _actualWaterTilemapTag which is resolved in Awake
+        if (string.IsNullOrEmpty(_actualWaterTilemapTag)) return FindWaterTilemapFallback();
+        GameObject taggedWater = GameObject.FindGameObjectWithTag(_actualWaterTilemapTag);
         if (taggedWater != null && taggedWater.GetComponent<Tilemap>() != null)
         {
-            if (showDebugInfo) Debug.Log($"[WaterReflection] Found water tilemap by tag '{waterTilemapTag}': {taggedWater.name} for {gameObject.name}", this);
+            if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Found water tilemap by tag '{_actualWaterTilemapTag}': {taggedWater.name} for {gameObject.name}", this);
             return taggedWater;
         }
-        if (taggedWater != null && taggedWater.GetComponent<Tilemap>() == null && showDebugInfo)
+        if (taggedWater != null && taggedWater.GetComponent<Tilemap>() == null && _actualShowDebugInfo)
         {
-            Debug.LogWarning($"[WaterReflection] GameObject '{taggedWater.name}' (tag '{waterTilemapTag}') has no Tilemap component!", this);
+            Debug.LogWarning($"[WaterReflection] GameObject '{taggedWater.name}' (tag '{_actualWaterTilemapTag}') has no Tilemap component!", this);
         }
         return FindWaterTilemapFallback();
     }
@@ -346,14 +391,14 @@ public class WaterReflection : MonoBehaviour
                         Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
                         if (renderTilemapTransform != null && renderTilemapTransform.GetComponent<Tilemap>() != null)
                         {
-                            if (showDebugInfo) Debug.Log($"[WaterReflection] Auto-detected water tilemap via TIM: {renderTilemapTransform.name} for {gameObject.name}", this);
+                            if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Auto-detected water tilemap via TIM: {renderTilemapTransform.name} for {gameObject.name}", this);
                             return renderTilemapTransform.gameObject;
                         }
                     }
                 }
             }
         }
-        if (showDebugInfo) Debug.LogWarning($"[WaterReflection] Could not auto-detect water tilemap via TileInteractionManager for {gameObject.name}.", this);
+        if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection] Could not auto-detect water tilemap via TileInteractionManager for {gameObject.name}.", this);
         return null;
     }
 
@@ -373,53 +418,56 @@ public class WaterReflection : MonoBehaviour
 
     void OnValidate()
     {
-        // The OnValidate warning should only appear if:
-        // 1. We are in the editor AND not playing.
-        // 2. enableDistanceFade is true.
-        // 3. gradientFadeBaseMaterial is actually null *on this component*.
+        // In OnValidate, we don't have access to the Manager's instance easily,
+        // so we'll primarily validate local settings.
+        // The ResolveSettings() call in Awake will handle combining with manager settings at runtime.
         if (Application.isEditor && !Application.isPlaying)
         {
-            if (enableDistanceFade && gradientFadeBaseMaterial == null)
+            // Check if local material is needed but missing
+            bool localMaterialNeeded = enableDistanceFade && (!overrides.gradientFadeBaseMaterial || localGradientFadeBaseMaterial == null);
+            bool globalMaterialMightBeUsed = enableDistanceFade && !overrides.gradientFadeBaseMaterial && localGradientFadeBaseMaterial == null;
+
+            if (localMaterialNeeded && !globalMaterialMightBeUsed) // Warn if local override is on but local material missing
             {
-                // This warning is for the user configuring the component in the editor.
-                Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true, but 'Gradient Fade Base Material' is not assigned. Distance fading will require this in Play mode.", this);
+                 Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true and 'Override Gradient Material' is true, but 'Local Gradient Fade Base Material' is not assigned. Assign local material or uncheck override.", this);
+            }
+            else if (globalMaterialMightBeUsed) // Inform that global will be used if local isn't set
+            {
+                 Debug.Log($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true. If 'Local Gradient Fade Base Material' remains unassigned and override is false, the global default from WaterReflectionManager will be used in Play mode.", this);
+            }
+
+
+            // Basic visual update for editor preview if possible
+            if (reflectionRenderer != null && originalRenderer != null)
+            {
+                // Determine settings as best as possible for editor preview (without manager)
+                Color previewTint = overrides.reflectionTint ? localReflectionTint : Color.white; // Default to white if no manager
+                float previewOpacity = overrides.reflectionOpacity ? localReflectionOpacity : 0.5f;
+                int previewSortOffset = overrides.sortingOrderOffset ? localSortingOrderOffset : -1;
+
+                reflectionRenderer.sprite = originalRenderer.sprite;
+                reflectionRenderer.flipX = originalRenderer.flipX;
+                reflectionRenderer.flipY = originalRenderer.flipY;
+                reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + previewSortOffset;
+                Color baseOriginalSpriteColor = originalRenderer.color;
+                Color finalReflectionTintedColor = baseOriginalSpriteColor * previewTint;
+                float finalCombinedAlpha = baseOriginalSpriteColor.a * previewOpacity;
+                reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
+                UpdateReflectionTransform(); // Keep transform updated
             }
         }
+    }
 
-        if (Application.isPlaying) return;
 
-        if (reflectionRenderer != null && originalRenderer != null)
+    // --- Public Methods for Runtime Control (Could be removed if not needed, or kept for dynamic changes) ---
+    public void SetLocalReflectionOpacity(float opacity) // Example of changing a local-only value
+    {
+        localReflectionOpacity = Mathf.Clamp01(opacity);
+        if (overrides.reflectionOpacity) // Only re-resolve and update if this local value is being used
         {
-            reflectionRenderer.sprite = originalRenderer.sprite;
-            reflectionRenderer.flipX = originalRenderer.flipX;
-            reflectionRenderer.flipY = originalRenderer.flipY; // This was originalRenderer.flipY, should be consistent
-            reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + sortingOrderOffset;
-            Color baseOriginalSpriteColor = originalRenderer.color;
-            Color finalReflectionTintedColor = baseOriginalSpriteColor * reflectionTint;
-            float finalCombinedAlpha = baseOriginalSpriteColor.a * reflectionOpacity;
-            reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
-            UpdateReflectionTransform();
+            ResolveSettings();
+            if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals();
         }
     }
-
-    // --- Public Methods for Runtime Control ---
-    public void SetReflectionOpacity(float opacity)
-    {
-        reflectionOpacity = Mathf.Clamp01(opacity);
-        if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals(); // Check originalRenderer too
-    }
-    public void SetYOffset(float offset)
-    {
-        yOffset = offset;
-        if (Application.isPlaying && originalRenderer != null) UpdateReflectionTransform();
-    }
-    public void SetReflectionTint(Color tint)
-    {
-        reflectionTint = tint;
-        if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals();
-    }
-    public void SetReflectionEnabled(bool enabled)
-    {
-        if (reflectionObject != null) reflectionObject.SetActive(enabled);
-    }
+    // Add more setters if you need to programmatically change local override values and have them take effect.
 }

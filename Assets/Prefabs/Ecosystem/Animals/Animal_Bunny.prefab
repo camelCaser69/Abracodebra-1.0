@@ -461,8 +461,8 @@ MonoBehaviour:
   reflectionOpacity: 0.5
   reflectionTint: {r: 1, g: 1, b: 1, a: 1}
   enableDistanceFade: 1
-  fadeStartDistance: 0.4
-  fadeEndDistance: 1.7
+  fadeStartDistance: 0.3
+  fadeEndDistance: 1.5
   minFadeAlpha: 0
   gradientFadeBaseMaterial: {fileID: 2100000, guid: 9c89380ac3c2b264391225c5e0baa010, type: 2}
   sortingOrderOffset: -100
