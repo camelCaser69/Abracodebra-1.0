@@ -1,3 +1,250 @@
+This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
+
+================================================================================
+UNITY PROJECT SCRIPT EXPORT - 2025-05-26 22:28:12
+PART 8 OF 8
+================================================================================
+
+--------------------------------------------------------------------------------
+Assets
+├── Animation
+│   ├── GodRay300B_001.controller
+│   ├── GodRay60_001.controller
+│   ├── GodRays300.anim
+│   ├── GodRays300B.anim
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
+├── DefaultVolumeProfile.asset
+├── Editor
+│   ├── NodeDefinitionAutoAdder.cs
+│   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionEditor.cs
+│   ├── NodeDefinitionLibraryEditor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   └── NodeEffectDrawer.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
+├── InputSystem_Actions.inputactions
+├── Materials
+│   ├── BezierCurveAA_Material.mat
+│   └── Firefly_Glow_Material.mat
+├── Post Processing
+├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   ├── Animal_Deer.prefab
+│   │   │   ├── Animal_Fox.prefab
+│   │   │   └── FireflyPrefab.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelBerry.prefab
+│   │   │   ├── PixelFlower.prefab
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   ├── PlantOutline.prefab
+│   │   │   ├── PlantPrefab.prefab
+│   │   │   └── PlantShadow.prefab
+│   │   ├── Props
+│   │   │   ├── Poop_Big.prefab
+│   │   │   ├── Poop_Medium_01.prefab
+│   │   │   └── Poop_Medium_02.prefab
+│   │   └── UI
+│   │       ├── EmptySlot16.prefab
+│   │       ├── EmptySlot32.prefab
+│   │       ├── HoverTileMarker.prefab
+│   │       ├── Indicator_Opportunity.prefab
+│   │       ├── Indicator_Resource.prefab
+│   │       ├── Indicator_Threat.prefab
+│   │       ├── NodeCellEmpty16.prefab
+│   │       ├── NodePics
+│   │       │   ├── Seed_01.prefab
+│   │       │   └── Seed_02.prefab
+│   │       ├── NodeView.prefab
+│   │       ├── ThoughtBubble.prefab
+│   │       ├── Visualizer_Circle_Prefab.prefab
+│   │       └── Visualizer_Line_Prefab.prefab
+│   ├── General
+│   │   ├── GardenerPrefab.prefab
+│   │   └── Projectile_Basic_Pixel.prefab
+│   └── Tiles
+│       ├── Common
+│       │   └── PLains_0_Corner_LT.asset
+│       ├── Palettes
+│       │   └── PaletteDual_Ground.prefab
+│       └── Rule Tiles
+│           ├── DualGridRuleTile_Dirt.asset
+│           ├── DualGridRuleTile_DirtWet.asset
+│           ├── DualGridRuleTile_Grass.asset
+│           └── DualGridRuleTile_Water.asset
+├── Scenes
+│   ├── MainScene.unity
+│   ├── SampleScene
+│   │   └── GlobalPostProcessVolume Profile.asset
+│   └── SampleScene.unity
+├── Scriptable Objects
+│   ├── Animals
+│   │   ├── AnimalLibrary.asset
+│   │   ├── Animal_000_Bunny.asset
+│   │   └── Animal_001_Deer.asset
+│   ├── Animals Diet
+│   │   ├── Diet_000_Bunny.asset
+│   │   └── Diet_001_Deer.asset
+│   ├── Food
+│   │   ├── FoodType_000_Berry.asset
+│   │   └── FoodType_000_Leaf.asset
+│   ├── Life Thoughts
+│   │   └── AnimalThoughtLibrary.asset
+│   ├── Nodes Plant
+│   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
+│   │   ├── Node_001_Berry.asset
+│   │   ├── Node_002_FireflyPheromone.asset
+│   │   └── Node_003_PoopFertilizer.asset
+│   ├── Scents
+│   │   ├── ScentLibrary.asset
+│   │   └── Scent_000_FireflyPheromone.asset
+│   ├── Tiles
+│   │   ├── TileDefinition_000_Grass.asset
+│   │   ├── TileDefinition_001_Dirt.asset
+│   │   ├── TileDefinition_002_DirtWet.asset
+│   │   ├── TileDefinition_003_Water.asset
+│   │   └── TileInteractionLibrary.asset
+│   ├── Tools
+│   │   ├── ToolDefinition_000_GardeningHoe.asset
+│   │   ├── ToolDefinition_001_WateringCan.asset
+│   │   └── ToolDefinition_002_SeedPouch.asset
+│   └── Waves
+│       ├── Wave_000.asset
+│       ├── Wave_001.asset
+│       └── Wave_002.asset
+├── Scripts
+│   ├── Battle
+│   │   ├── Plant
+│   │   │   ├── LeafData.cs
+│   │   │   ├── PlantCell.cs
+│   │   │   ├── PlantGrowth.Cell.cs
+│   │   │   ├── PlantGrowth.Growth.cs
+│   │   │   ├── PlantGrowth.NodeExecution.cs
+│   │   │   ├── PlantGrowth.cs
+│   │   │   └── WeatherManager.cs
+│   │   ├── SpellProjectile.cs
+│   │   └── Status Effects
+│   │       ├── BurningStatusEffect.cs
+│   │       └── StatusEffect.cs
+│   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── AnimalDefinition.cs
+│   │   │   └── AnimalLibrary.cs
+│   │   ├── Core
+│   │   │   ├── AnimalController.cs
+│   │   │   ├── AnimalSpawnData.cs
+│   │   │   ├── AnimalThoughtLibrary.cs
+│   │   │   ├── EcosystemManager.cs
+│   │   │   ├── FaunaManager.cs
+│   │   │   ├── FloraManager.cs
+│   │   │   ├── PoopController.cs
+│   │   │   ├── ScentSource.cs
+│   │   │   ├── SlowdownZone.cs
+│   │   │   ├── ThoughtBubbleController.cs
+│   │   │   ├── ThoughtTrigger.cs
+│   │   │   ├── WaveDefinition.cs
+│   │   │   └── WaveManager.cs
+│   │   ├── Effects
+│   │   │   ├── FireflyController.cs
+│   │   │   └── FireflyManager.cs
+│   │   ├── Food
+│   │   │   ├── AnimalDiet.cs
+│   │   │   ├── FoodItem.cs
+│   │   │   └── FoodType.cs
+│   │   ├── Plants
+│   │   └── Scents
+│   │       ├── ScentDefinition.cs
+│   │       └── ScentLibrary.cs
+│   ├── Nodes
+│   │   ├── Core
+│   │   │   ├── NodeData.cs
+│   │   │   ├── NodeDefinition.cs
+│   │   │   ├── NodeDefinitionLibrary.cs
+│   │   │   ├── NodeEffectData.cs
+│   │   │   ├── NodeEffectType.cs
+│   │   │   └── OutputNodeEffect.cs
+│   │   ├── Runtime
+│   │   │   ├── NodeExecutor.cs
+│   │   │   └── NodeGraph.cs
+│   │   └── UI
+│   │       ├── ColorExtensions.cs
+│   │       ├── DeselectOnClickOutside.cs
+│   │       ├── NodeCell.cs
+│   │       ├── NodeDraggable.cs
+│   │       ├── NodeEditorGridController.cs
+│   │       ├── NodeSelectable.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
+│   ├── Rendering
+│   ├── Tiles
+│   │   ├── Data
+│   │   │   ├── PlantGrowthModifierManager.cs
+│   │   │   ├── PlantPlacementManagement.cs
+│   │   │   ├── PlayerTileInteractor.cs
+│   │   │   ├── TileDefinition.cs
+│   │   │   ├── TileInteractionLibrary.cs
+│   │   │   ├── TileInteractionManager.cs
+│   │   │   └── TileInteractionRule.cs
+│   │   ├── Editor
+│   │   │   ├── TileDefinitionEditor.cs
+│   │   │   └── TileInteractionManagerEditor.cs
+│   │   └── Tools
+│   │       ├── ToolDefinition.cs
+│   │       ├── ToolSwitcher.cs
+│   │       └── ToolType.cs
+│   ├── UI
+│   └── Visuals
+│       ├── NightColorPostProcess.cs
+│       ├── OutlinePartController.cs
+│       ├── PlantOutlineController.cs
+│       ├── PlantShadowController.cs
+│       ├── RuntimeCircleDrawer.cs
+│       ├── ShadowPartController.cs
+│       └── WaterReflection.cs
+├── Settings
+│   ├── Lit2DSceneTemplate.scenetemplate
+│   ├── Renderer2D.asset
+│   ├── Scenes
+│   │   └── URP2DSceneTemplate.unity
+│   └── UniversalRP.asset
+├── Shaders
+│   ├── BezierCurveAA.shader
+│   ├── Custom_WaterReflectionGradient.mat
+│   ├── Sprite-Lit-Advanced_Overlay_Base.mat
+│   ├── Sprite-Lit-Default_OverlayAdvanced.shader
+│   ├── Sprite-Lit-Default_OverlayCustom.shader
+│   ├── Sprite-Lit-Default_Overlay_Base.mat
+│   ├── SpriteEmissiveUnlit.shader
+│   ├── WaterReflection.shader
+│   └── WaterReflectionSimple.shader
+├── TextureImporter.preset
+└── UniversalRenderPipelineGlobalSettings.asset
+--------------------------------------------------------------------------------
+
+SCRIPT CONTENTS
+================================================================================
+
+SCRIPT CONTENTS
+================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\WaterReflection.cs
+////////////////////////////////////////////////////////////////////////////////
 ﻿// FILE: Assets/Scripts/Visuals/WaterReflection.cs
 using UnityEngine;
 using UnityEngine.Tilemaps; // Keep for water masking logic
@@ -423,3 +670,11 @@ public class WaterReflection : MonoBehaviour
         if (reflectionObject != null) reflectionObject.SetActive(enabled);
     }
 }
+
+
+
+
+
+--------------------------------------------------------------------------------
+This is the final part (8 of 8).
+--------------------------------------------------------------------------------

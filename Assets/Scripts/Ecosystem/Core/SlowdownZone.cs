@@ -62,7 +62,7 @@ public class SlowdownZone : MonoBehaviour
             // It's NOT a BoxCollider2D (e.g., TilemapCollider2D, PolygonCollider2D)
             if (colliderShrinkAmount > SHRINK_EPSILON) // Only warn if shrinking was actually intended
             {
-                Debug.LogWarning($"SlowdownZone on '{gameObject.name}' has a 'Collider Shrink Amount' of {colliderShrinkAmount} but is using a '{col.GetType().Name}'. This collider type does not support automatic shrinking. Shrinking will be ignored.", gameObject);
+               // Debug.LogWarning($"SlowdownZone on '{gameObject.name}' has a 'Collider Shrink Amount' of {colliderShrinkAmount} but is using a '{col.GetType().Name}'. This collider type does not support automatic shrinking. Shrinking will be ignored.", gameObject);
             }
             // If colliderShrinkAmount is 0 (or very close), no warning is issued, which is correct.
         }

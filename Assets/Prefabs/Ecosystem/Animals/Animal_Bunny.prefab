@@ -456,6 +456,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e3b763aac349f9893880f6600308e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  useParentAsReference: 0
   yOffset: -1.75
   reflectionOpacity: 0.5
   reflectionTint: {r: 1, g: 1, b: 1, a: 1}
@@ -463,7 +464,7 @@ MonoBehaviour:
   fadeStartDistance: 0.4
   fadeEndDistance: 1.7
   minFadeAlpha: 0
-  gradientFadeMaterial: {fileID: 2100000, guid: 9c89380ac3c2b264391225c5e0baa010, type: 2}
+  gradientFadeBaseMaterial: {fileID: 2100000, guid: 9c89380ac3c2b264391225c5e0baa010, type: 2}
   sortingOrderOffset: -100
   useWaterMasking: 1
   waterTilemapTag: Water

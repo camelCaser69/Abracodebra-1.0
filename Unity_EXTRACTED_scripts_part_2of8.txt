@@ -1,8 +1,8 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-26 16:14:09
-PART 2 OF 7
+UNITY PROJECT SCRIPT EXPORT - 2025-05-26 22:28:12
+PART 2 OF 8
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -214,7 +214,8 @@ Assets
 │       ├── PlantOutlineController.cs
 │       ├── PlantShadowController.cs
 │       ├── RuntimeCircleDrawer.cs
-│       └── ShadowPartController.cs
+│       ├── ShadowPartController.cs
+│       └── WaterReflection.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -223,12 +224,14 @@ Assets
 │   └── UniversalRP.asset
 ├── Shaders
 │   ├── BezierCurveAA.shader
+│   ├── Custom_WaterReflectionGradient.mat
 │   ├── Sprite-Lit-Advanced_Overlay_Base.mat
 │   ├── Sprite-Lit-Default_OverlayAdvanced.shader
 │   ├── Sprite-Lit-Default_OverlayCustom.shader
 │   ├── Sprite-Lit-Default_Overlay_Base.mat
 │   ├── SpriteEmissiveUnlit.shader
-│   └── WaterReflection.shader
+│   ├── WaterReflection.shader
+│   └── WaterReflectionSimple.shader
 ├── TextureImporter.preset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
@@ -1868,5 +1871,5 @@ public class EcosystemManager : MonoBehaviour
 
 
 --------------------------------------------------------------------------------
-This is part 2 out of 7 of script collection. 5 more parts remain.
+This is part 2 out of 8 of script collection. 6 more parts remain.
 --------------------------------------------------------------------------------

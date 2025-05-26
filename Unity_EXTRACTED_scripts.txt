@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-26 16:14:09
+UNITY PROJECT SCRIPT EXPORT - 2025-05-26 22:28:12
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -214,7 +214,8 @@ Assets
 │       ├── PlantOutlineController.cs
 │       ├── PlantShadowController.cs
 │       ├── RuntimeCircleDrawer.cs
-│       └── ShadowPartController.cs
+│       ├── ShadowPartController.cs
+│       └── WaterReflection.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -223,12 +224,14 @@ Assets
 │   └── UniversalRP.asset
 ├── Shaders
 │   ├── BezierCurveAA.shader
+│   ├── Custom_WaterReflectionGradient.mat
 │   ├── Sprite-Lit-Advanced_Overlay_Base.mat
 │   ├── Sprite-Lit-Default_OverlayAdvanced.shader
 │   ├── Sprite-Lit-Default_OverlayCustom.shader
 │   ├── Sprite-Lit-Default_Overlay_Base.mat
 │   ├── SpriteEmissiveUnlit.shader
-│   └── WaterReflection.shader
+│   ├── WaterReflection.shader
+│   └── WaterReflectionSimple.shader
 ├── TextureImporter.preset
 └── UniversalRenderPipelineGlobalSettings.asset
 --------------------------------------------------------------------------------
@@ -3841,7 +3844,8 @@ public class ScentSource : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\SlowdownZone.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets\Scripts\Ecosystem\Core\SlowdownZone.cs
+using UnityEngine;
 using System.Collections.Generic;
 
 public class SlowdownZone : MonoBehaviour
@@ -3850,27 +3854,26 @@ public class SlowdownZone : MonoBehaviour
     [Tooltip("How much to multiply movement speed by (0.5 = half speed)")]
     [Range(0.1f, 1.0f)]
     public float speedMultiplier = 0.5f;
-    
+
     [Header("Collider Adjustment")]
-    [Tooltip("How much to shrink the collider from its edges (in units)")]
+    [Tooltip("How much to shrink the collider from its edges (in units). Only works with BoxCollider2D.")]
     [Range(0f, 1f)]
-    public float colliderShrinkAmount = 0.2f;
-    
+    public float colliderShrinkAmount = 0.2f; // Defaulted to 0.2f in original, if 0 no warning will show for non-BoxColliders
+
     [Header("Debug")]
     [SerializeField] private bool showDebugMessages = false;
-    
-    // Keep track of entities currently affected
+
     private Dictionary<int, AnimalController> affectedAnimals = new Dictionary<int, AnimalController>();
     private Dictionary<int, GardenerController> affectedPlayers = new Dictionary<int, GardenerController>();
-    
-    // Original collider properties (for shrinking)
+
     private Vector2 originalSize;
     private Vector2 originalOffset;
-    private BoxCollider2D boxCollider;
-    
+    private BoxCollider2D boxCollider; // Cached BoxCollider2D, null if not a BoxCollider2D
+
+    private const float SHRINK_EPSILON = 0.001f; // For comparing colliderShrinkAmount against zero
+
     private void Awake()
     {
-        // Get the collider and ensure it's a trigger
         Collider2D col = GetComponent<Collider2D>();
         if (col == null)
         {
@@ -3878,160 +3881,200 @@ public class SlowdownZone : MonoBehaviour
             enabled = false;
             return;
         }
-        
+
         if (!col.isTrigger)
         {
             col.isTrigger = true;
-            Debug.Log($"SlowdownZone on '{gameObject.name}' automatically enabled isTrigger on its collider.");
+            // Optional: Log that trigger was auto-enabled
+            // if (showDebugMessages) Debug.Log($"SlowdownZone on '{gameObject.name}' automatically enabled isTrigger on its collider.");
         }
-        
-        // Store original size for BoxCollider2D
-        boxCollider = col as BoxCollider2D;
+
+        boxCollider = col as BoxCollider2D; // Attempt to cast to BoxCollider2D
+
         if (boxCollider != null)
         {
+            // It's a BoxCollider2D
             originalSize = boxCollider.size;
             originalOffset = boxCollider.offset;
-            
-            // Apply shrinking
-            if (colliderShrinkAmount > 0)
+
+            if (colliderShrinkAmount > SHRINK_EPSILON)
             {
                 ShrinkCollider();
             }
+            // No warning needed if it's a BoxCollider2D, regardless of shrinkAmount
         }
         else
         {
-            // If it's not a BoxCollider2D, log a warning
-            Debug.LogWarning($"SlowdownZone on '{gameObject.name}' is using a collider type other than BoxCollider2D. " +
-                             "Collider shrinking will not work.", gameObject);
+            // It's NOT a BoxCollider2D (e.g., TilemapCollider2D, PolygonCollider2D)
+            if (colliderShrinkAmount > SHRINK_EPSILON) // Only warn if shrinking was actually intended
+            {
+                Debug.LogWarning($"SlowdownZone on '{gameObject.name}' has a 'Collider Shrink Amount' of {colliderShrinkAmount} but is using a '{col.GetType().Name}'. This collider type does not support automatic shrinking. Shrinking will be ignored.", gameObject);
+            }
+            // If colliderShrinkAmount is 0 (or very close), no warning is issued, which is correct.
         }
     }
-    
+
     private void ShrinkCollider()
     {
-        if (boxCollider == null) return;
-        
-        // Calculate new size by subtracting shrink amount from both dimensions
+        if (boxCollider == null) return; // Should not happen if called correctly, but safety first
+
         Vector2 newSize = new Vector2(
             Mathf.Max(0.1f, originalSize.x - (colliderShrinkAmount * 2f)),
             Mathf.Max(0.1f, originalSize.y - (colliderShrinkAmount * 2f))
         );
-        
-        // Apply the new size
+
         boxCollider.size = newSize;
-        
+        // Note: originalOffset is not changed by this shrinking method.
+
         if (showDebugMessages)
         {
-            Debug.Log($"SlowdownZone: Shrunk collider from {originalSize} to {newSize}");
+            Debug.Log($"SlowdownZone on '{gameObject.name}': Shrunk BoxCollider2D from {originalSize} to {newSize}");
         }
     }
-    
+
+    private void RestoreCollider()
+    {
+        if (boxCollider == null) return;
+
+        boxCollider.size = originalSize;
+        boxCollider.offset = originalOffset; // Ensure offset is also restored
+
+        if (showDebugMessages)
+        {
+            Debug.Log($"SlowdownZone on '{gameObject.name}': Restored BoxCollider2D to original size {originalSize} and offset {originalOffset}");
+        }
+    }
+
     private void OnValidate()
     {
-        // Update collider size when values change in inspector
-        if (Application.isPlaying && boxCollider != null)
+        // This method is called in the editor when a script's properties are changed.
+        // It's also called when the script is first loaded or a value is changed in the Inspector.
+
+        // If we have a cached BoxCollider2D (meaning it was a BoxCollider2D at Awake)
+        if (boxCollider != null)
         {
-            ShrinkCollider();
+            if (colliderShrinkAmount > SHRINK_EPSILON)
+            {
+                // If playing, originalSize should be set. If not playing, Awake might not have run.
+                // To be safe, only shrink if originalSize seems valid (not zero).
+                if (originalSize != Vector2.zero || Application.isPlaying) // Application.isPlaying ensures Awake has run
+                {
+                     ShrinkCollider();
+                }
+                else if (showDebugMessages && !Application.isPlaying)
+                {
+                    // Debug.Log($"SlowdownZone OnValidate (Editor): '{gameObject.name}' BoxCollider2D detected, but originalSize not cached (Awake likely not run yet for this specific validation). Shrinking will apply on Play.");
+                }
+            }
+            else // colliderShrinkAmount is effectively zero
+            {
+                // If originalSize is known, restore it.
+                if (originalSize != Vector2.zero || Application.isPlaying)
+                {
+                    RestoreCollider();
+                }
+                else if (showDebugMessages && !Application.isPlaying)
+                {
+                    // Debug.Log($"SlowdownZone OnValidate (Editor): '{gameObject.name}' BoxCollider2D detected, shrink amount is zero, but originalSize not cached. Restoration will apply on Play if needed.");
+                }
+            }
         }
+        // If boxCollider is null, it means it wasn't a BoxCollider2D at Awake (or Awake hasn't run).
+        // In this case, OnValidate won't attempt to shrink or restore, aligning with Awake's logic.
+        // The warning about non-BoxCollider shrinking (if applicable) is handled by Awake at runtime.
     }
-    
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Check if it's an animal
         AnimalController animal = other.GetComponent<AnimalController>();
         if (animal != null)
         {
-            // Add to affected list
             int id = animal.GetInstanceID();
-            affectedAnimals[id] = animal;
-            
-            // Apply slowdown effect
-            animal.ApplySpeedMultiplier(speedMultiplier);
-            
-            if (showDebugMessages)
-                Debug.Log($"SlowdownZone: '{animal.name}' entered zone, applied multiplier {speedMultiplier}");
-            
-            return; // Skip further checks if it's an animal
+            if (!affectedAnimals.ContainsKey(id)) // Ensure not already added
+            {
+                affectedAnimals.Add(id, animal);
+                animal.ApplySpeedMultiplier(speedMultiplier);
+                if (showDebugMessages)
+                    Debug.Log($"SlowdownZone: '{animal.name}' entered zone, applied multiplier {speedMultiplier}");
+            }
+            return;
         }
-        
-        // Check if it's the player (gardener)
+
         GardenerController player = other.GetComponent<GardenerController>();
         if (player != null)
         {
-            // Add to affected list
             int id = player.GetInstanceID();
-            affectedPlayers[id] = player;
-            
-            // Apply slowdown effect
-            player.ApplySpeedMultiplier(speedMultiplier);
-            
-            if (showDebugMessages)
-                Debug.Log($"SlowdownZone: Player '{player.name}' entered zone, applied multiplier {speedMultiplier}");
+            if (!affectedPlayers.ContainsKey(id)) // Ensure not already added
+            {
+                affectedPlayers.Add(id, player);
+                player.ApplySpeedMultiplier(speedMultiplier);
+                if (showDebugMessages)
+                    Debug.Log($"SlowdownZone: Player '{player.name}' entered zone, applied multiplier {speedMultiplier}");
+            }
         }
     }
-    
+
     private void OnTriggerExit2D(Collider2D other)
     {
-        // Check if it's an animal
         AnimalController animal = other.GetComponent<AnimalController>();
         if (animal != null)
         {
-            // Remove from affected list
             int id = animal.GetInstanceID();
             if (affectedAnimals.ContainsKey(id))
             {
+                animal.RemoveSpeedMultiplier(speedMultiplier); // Call RemoveSpeedMultiplier on the animal
                 affectedAnimals.Remove(id);
-                
-                // Remove slowdown effect
-                animal.RemoveSpeedMultiplier(speedMultiplier);
-                
                 if (showDebugMessages)
                     Debug.Log($"SlowdownZone: '{animal.name}' exited zone, removed multiplier");
             }
-            
-            return; // Skip further checks if it's an animal
+            return;
         }
-        
-        // Check if it's the player (gardener)
+
         GardenerController player = other.GetComponent<GardenerController>();
         if (player != null)
         {
-            // Remove from affected list
             int id = player.GetInstanceID();
             if (affectedPlayers.ContainsKey(id))
             {
+                player.RemoveSpeedMultiplier(speedMultiplier); // Call RemoveSpeedMultiplier on the player
                 affectedPlayers.Remove(id);
-                
-                // Remove slowdown effect
-                player.RemoveSpeedMultiplier(speedMultiplier);
-                
                 if (showDebugMessages)
                     Debug.Log($"SlowdownZone: Player '{player.name}' exited zone, removed multiplier");
             }
         }
     }
-    
-    // Clean up when destroyed
+
     private void OnDestroy()
     {
-        // Remove effects from all affected animals
-        foreach (var animal in affectedAnimals.Values)
+        foreach (var animalEntry in affectedAnimals)
         {
-            if (animal != null)
+            if (animalEntry.Value != null) // Check if animal still exists
             {
-                animal.RemoveSpeedMultiplier(speedMultiplier);
+                animalEntry.Value.RemoveSpeedMultiplier(speedMultiplier);
             }
         }
         affectedAnimals.Clear();
-        
-        // Remove effects from all affected players
-        foreach (var player in affectedPlayers.Values)
+
+        foreach (var playerEntry in affectedPlayers)
         {
-            if (player != null)
+            if (playerEntry.Value != null) // Check if player still exists
             {
-                player.RemoveSpeedMultiplier(speedMultiplier);
+                playerEntry.Value.RemoveSpeedMultiplier(speedMultiplier);
             }
         }
         affectedPlayers.Clear();
+
+        // Restore collider on destroy if it was shrunk
+        if (boxCollider != null && colliderShrinkAmount > SHRINK_EPSILON)
+        {
+             // Check if originalSize is valid before restoring.
+             // This is mostly relevant if OnDestroy is called before Awake fully completes,
+             // or if the object is destroyed from the editor without playing.
+            if (originalSize != Vector2.zero)
+            {
+                RestoreCollider();
+            }
+        }
     }
 }
 
@@ -9867,6 +9910,436 @@ public class ShadowPartController : MonoBehaviour
     public void OnPlantPartDestroyed() // Unchanged
     {
          if (this != null && gameObject != null) { if (Application.isPlaying) { Destroy(gameObject); } else { DestroyImmediate(gameObject); } }
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\WaterReflection.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/WaterReflection.cs
+using UnityEngine;
+using UnityEngine.Tilemaps; // Keep for water masking logic
+using System.Collections.Generic;
+using System.Linq; // For FindObjectsOfType
+
+/// <summary>
+/// Creates a water reflection effect by duplicating and flipping the sprite.
+/// Attach to any GameObject with a SpriteRenderer to create its reflection.
+/// Can optionally use parent's transform for offset and fade calculations.
+/// </summary>
+public class WaterReflection : MonoBehaviour
+{
+    [Header("Reflection Source")]
+    [Tooltip("If true, Y Offset and Distance Fade calculations will be relative to this GameObject's parent. If false (default), relative to this GameObject.")]
+    [SerializeField] private bool useParentAsReference = false;
+
+    [Header("Reflection Settings")]
+    [Tooltip("Vertical offset of the reflection. Interpretation depends on 'Use Parent As Reference'.")]
+    [SerializeField] private float yOffset = -1f;
+
+    [Tooltip("Opacity of the reflection (0 = invisible, 1 = fully opaque)")]
+    [SerializeField] [Range(0f, 1f)] private float reflectionOpacity = 0.5f;
+
+    [Tooltip("Additional tint color for the reflection")]
+    [SerializeField] private Color reflectionTint = Color.white;
+
+    [Header("Distance Fade (Shader Controlled)")]
+    [Tooltip("Enable fading reflection. Requires 'Gradient Fade Base Material' to be assigned.")]
+    [SerializeField] private bool enableDistanceFade = true;
+    [Tooltip("Vertical distance from the reference Y (self or parent) where fade starts (shader's _FadeStart).")]
+    [SerializeField] private float fadeStartDistance = 0.0f;
+    [Tooltip("Vertical distance from the reference Y (self or parent) where reflection becomes min alpha (shader's _FadeEnd).")]
+    [SerializeField] private float fadeEndDistance = 1.0f;
+    [Tooltip("Minimum alpha when fully faded (shader's _MinAlpha).")]
+    [SerializeField] [Range(0f, 1f)] private float minFadeAlpha = 0.0f;
+    [Tooltip("Assign the 'Custom/WaterReflectionGradient' material, or one using that shader.")]
+    [SerializeField] private Material gradientFadeBaseMaterial;
+
+    [Header("Sorting")]
+    [Tooltip("Sorting order offset for the reflection (usually negative to render behind)")]
+    [SerializeField] private int sortingOrderOffset = -1;
+
+    [Header("Water Masking")]
+    [Tooltip("If enabled, reflection will only be visible over water tiles")]
+    [SerializeField] private bool useWaterMasking = true;
+    [Tooltip("Tag used to identify the water tilemap (default: 'Water')")]
+    [SerializeField] private string waterTilemapTag = "Water";
+
+    [Header("Debug")]
+    [SerializeField] private bool showDebugInfo = false;
+
+    // --- Internal References ---
+    private SpriteRenderer originalRenderer;
+    private Animator originalAnimator;
+    private GameObject reflectionObject;
+    private SpriteRenderer reflectionRenderer;
+    private Animator reflectionAnimator;
+    private Material reflectionMaterialInstance;
+
+    // --- Cached Values for Optimization ---
+    private Sprite lastSprite;
+    private Color lastOriginalColor;
+    private bool lastFlipX, lastFlipY;
+    private bool lastEnabled;
+    private Vector3 lastScale;
+    private Vector3 lastPosition;
+    private float lastParentY;
+
+    void Awake()
+    {
+        originalRenderer = GetComponent<SpriteRenderer>();
+        originalAnimator = GetComponent<Animator>();
+
+        if (originalRenderer == null)
+        {
+            Debug.LogError($"[WaterReflection] No SpriteRenderer found on {gameObject.name}! Component disabled.", this);
+            enabled = false;
+            return;
+        }
+
+        if (useParentAsReference && transform.parent == null)
+        {
+            if (showDebugInfo) Debug.LogWarning($"[WaterReflection] 'Use Parent As Reference' is true on {gameObject.name}, but it has no parent. Will use self as reference.", this);
+            useParentAsReference = false;
+        }
+
+        // Check for gradientFadeBaseMaterial in Awake, specifically for Play mode behavior
+        if (Application.isPlaying) // Only show this more detailed warning in play mode
+        {
+            if (enableDistanceFade && gradientFadeBaseMaterial == null)
+            {
+                Debug.LogWarning($"[WaterReflection Awake] '{gameObject.name}': 'Enable Distance Fade' is true, but 'Gradient Fade Base Material' is not assigned. Distance fade will not use the custom shader. Please assign a material using 'Custom/WaterReflectionGradient' on the prefab or this instance.", this);
+                // Do not disable enableDistanceFade here, let CreateReflectionObject handle fallback.
+            }
+        }
+
+
+        CreateReflectionObject();
+
+        if (useWaterMasking)
+        {
+            SetupWaterMaskingInteraction();
+        }
+    }
+
+    void Start()
+    {
+        // Ensure visuals are up-to-date after all Awakes might have run
+        // and especially if material instantiation happened.
+        UpdateReflectionVisuals();
+        UpdateReflectionTransform();
+        CacheCurrentState();
+    }
+
+    void LateUpdate()
+    {
+        if (originalRenderer == null || reflectionObject == null)
+        {
+            if (reflectionObject != null) reflectionObject.SetActive(false);
+            return;
+        }
+
+        UpdateReflectionTransform();
+
+        if (HasVisualStateChanged())
+        {
+            UpdateReflectionVisuals();
+            CacheCurrentState();
+        }
+    }
+
+    private void CreateReflectionObject()
+    {
+        reflectionObject = new GameObject($"{gameObject.name}_Reflection");
+        reflectionObject.transform.SetParent(transform.parent, false);
+        reflectionObject.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+
+        reflectionRenderer = reflectionObject.AddComponent<SpriteRenderer>();
+        reflectionRenderer.sortingLayerName = originalRenderer.sortingLayerName;
+        reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + sortingOrderOffset;
+        reflectionRenderer.drawMode = originalRenderer.drawMode;
+
+        if (enableDistanceFade && gradientFadeBaseMaterial != null)
+        {
+            // This is where the material is instanced. If gradientFadeBaseMaterial is null
+            // here (despite being set on prefab), then the warning in Awake was correct.
+            reflectionMaterialInstance = new Material(gradientFadeBaseMaterial);
+            reflectionRenderer.material = reflectionMaterialInstance;
+            if (showDebugInfo && Application.isPlaying) Debug.Log($"[{gameObject.name}] Instantiated gradient material for reflection.", this);
+        }
+        else
+        {
+            reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial;
+            if (enableDistanceFade && gradientFadeBaseMaterial == null && showDebugInfo && Application.isPlaying)
+            {
+                // This confirms the Awake warning: material was indeed null when needed for instancing.
+                Debug.Log($"[{gameObject.name}] Using sharedMaterial for reflection as gradientFadeBaseMaterial was null during CreateReflectionObject.", this);
+            }
+        }
+
+        if (originalAnimator != null)
+        {
+            reflectionAnimator = reflectionObject.AddComponent<Animator>();
+            reflectionAnimator.runtimeAnimatorController = originalAnimator.runtimeAnimatorController;
+        }
+
+        SortableEntity originalSortable = GetComponent<SortableEntity>();
+        if (originalSortable != null)
+        {
+            reflectionObject.AddComponent<SortableEntity>();
+        }
+
+        if (showDebugInfo) Debug.Log($"[WaterReflection] Created reflection for {gameObject.name}", this);
+    }
+
+    private void UpdateReflectionTransform()
+    {
+        if (reflectionObject == null || originalRenderer == null) return;
+
+        Transform referenceTransform = (useParentAsReference && transform.parent != null) ? transform.parent : transform;
+        Vector3 originalWorldPos = transform.position;
+        Vector3 reflectionWorldPos = originalWorldPos;
+        float referenceYForOffset = referenceTransform.position.y;
+        reflectionWorldPos.y = referenceYForOffset + yOffset - (originalWorldPos.y - referenceYForOffset);
+        reflectionObject.transform.position = reflectionWorldPos;
+        reflectionObject.transform.rotation = transform.rotation;
+        reflectionObject.transform.localScale = transform.localScale;
+        Vector3 currentLocalScale = reflectionObject.transform.localScale;
+        currentLocalScale.y *= -1;
+        reflectionObject.transform.localScale = currentLocalScale;
+    }
+
+    private void UpdateReflectionVisuals()
+    {
+        if (reflectionRenderer == null || originalRenderer == null) return;
+
+        reflectionRenderer.sprite = originalRenderer.sprite;
+        reflectionRenderer.flipX = originalRenderer.flipX;
+        reflectionRenderer.flipY = originalRenderer.flipY;
+
+        Color baseOriginalSpriteColor = originalRenderer.color;
+        Color finalReflectionTintedColor = baseOriginalSpriteColor * reflectionTint;
+        float finalCombinedAlpha = baseOriginalSpriteColor.a * reflectionOpacity;
+        reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
+
+        if (enableDistanceFade && reflectionMaterialInstance != null) // Check reflectionMaterialInstance
+        {
+            Transform referenceTransform = (useParentAsReference && transform.parent != null) ? transform.parent : transform;
+            float waterSurfaceY = referenceTransform.position.y;
+            reflectionMaterialInstance.SetFloat("_FadeStart", fadeStartDistance);
+            reflectionMaterialInstance.SetFloat("_FadeEnd", fadeEndDistance);
+            reflectionMaterialInstance.SetFloat("_MinAlpha", minFadeAlpha);
+            reflectionMaterialInstance.SetFloat("_OriginalY", waterSurfaceY);
+            Color materialBaseColor = reflectionTint;
+            materialBaseColor.a = reflectionOpacity * baseOriginalSpriteColor.a;
+            reflectionMaterialInstance.SetColor("_Color", materialBaseColor);
+        }
+        else if (!enableDistanceFade && reflectionMaterialInstance != null)
+        {
+            reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial; // Revert to shared
+            Destroy(reflectionMaterialInstance);
+            reflectionMaterialInstance = null;
+        }
+
+        reflectionRenderer.enabled = originalRenderer.enabled && originalRenderer.gameObject.activeInHierarchy;
+
+        if (reflectionAnimator != null && originalAnimator != null)
+        {
+            reflectionAnimator.enabled = originalAnimator.enabled;
+            if (originalAnimator.runtimeAnimatorController != null && originalAnimator.parameterCount > 0)
+            {
+                foreach (AnimatorControllerParameter param in originalAnimator.parameters)
+                {
+                    try {
+                        switch (param.type)
+                        {
+                            case AnimatorControllerParameterType.Bool:
+                                reflectionAnimator.SetBool(param.name, originalAnimator.GetBool(param.name));
+                                break;
+                            case AnimatorControllerParameterType.Float:
+                                reflectionAnimator.SetFloat(param.name, originalAnimator.GetFloat(param.name));
+                                break;
+                            case AnimatorControllerParameterType.Int:
+                                reflectionAnimator.SetInteger(param.name, originalAnimator.GetInteger(param.name));
+                                break;
+                        }
+                    } catch (System.Exception e) {
+                        if(showDebugInfo) Debug.LogWarning($"Failed to sync animator param '{param.name}': {e.Message}", reflectionAnimator);
+                    }
+                }
+            }
+        }
+    }
+
+    private bool HasVisualStateChanged()
+    {
+        if (originalRenderer == null) return false;
+        bool parentYChanged = false;
+        if (useParentAsReference && transform.parent != null)
+        {
+            parentYChanged = !Mathf.Approximately(lastParentY, transform.parent.position.y);
+        }
+        return lastSprite != originalRenderer.sprite ||
+               !ColorsApproximatelyEqual(lastOriginalColor, originalRenderer.color) ||
+               lastFlipX != originalRenderer.flipX ||
+               lastFlipY != originalRenderer.flipY ||
+               lastEnabled != (originalRenderer.enabled && originalRenderer.gameObject.activeInHierarchy) ||
+               lastScale != transform.localScale ||
+               lastPosition != transform.position ||
+               parentYChanged;
+    }
+
+    private void CacheCurrentState()
+    {
+        if (originalRenderer == null) return;
+        lastSprite = originalRenderer.sprite;
+        lastOriginalColor = originalRenderer.color;
+        lastFlipX = originalRenderer.flipX;
+        lastFlipY = originalRenderer.flipY;
+        lastEnabled = originalRenderer.enabled && originalRenderer.gameObject.activeInHierarchy;
+        lastScale = transform.localScale;
+        lastPosition = transform.position;
+        if (useParentAsReference && transform.parent != null)
+        {
+            lastParentY = transform.parent.position.y;
+        }
+    }
+
+    private bool ColorsApproximatelyEqual(Color c1, Color c2, float tolerance = 0.001f)
+    {
+        return Mathf.Abs(c1.r - c2.r) < tolerance &&
+               Mathf.Abs(c1.g - c2.g) < tolerance &&
+               Mathf.Abs(c1.b - c2.b) < tolerance &&
+               Mathf.Abs(c1.a - c2.a) < tolerance;
+    }
+
+    private void SetupWaterMaskingInteraction()
+    {
+        if (!useWaterMasking || reflectionRenderer == null) return;
+        GameObject waterTilemapGO = FindWaterTilemapByTag();
+        if (waterTilemapGO == null)
+        {
+            if (showDebugInfo) Debug.LogWarning($"[WaterReflection] Water tilemap for masking not found on {gameObject.name} via tag '{waterTilemapTag}'. Masking disabled.", this);
+            useWaterMasking = false;
+            return;
+        }
+        SpriteMask maskComponent = waterTilemapGO.GetComponent<SpriteMask>();
+        if (maskComponent == null)
+        {
+            maskComponent = waterTilemapGO.AddComponent<SpriteMask>();
+            maskComponent.sprite = null;
+            if (showDebugInfo) Debug.Log($"[WaterReflection] Added SpriteMask to water tilemap '{waterTilemapGO.name}' for object '{gameObject.name}'.", waterTilemapGO);
+        }
+        reflectionRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+        if (showDebugInfo) Debug.Log($"[WaterReflection] Reflection of '{gameObject.name}' will be masked by '{waterTilemapGO.name}'.", this);
+    }
+
+    private GameObject FindWaterTilemapByTag()
+    {
+        if (string.IsNullOrEmpty(waterTilemapTag)) return FindWaterTilemapFallback();
+        GameObject taggedWater = GameObject.FindGameObjectWithTag(waterTilemapTag);
+        if (taggedWater != null && taggedWater.GetComponent<Tilemap>() != null)
+        {
+            if (showDebugInfo) Debug.Log($"[WaterReflection] Found water tilemap by tag '{waterTilemapTag}': {taggedWater.name} for {gameObject.name}", this);
+            return taggedWater;
+        }
+        if (taggedWater != null && taggedWater.GetComponent<Tilemap>() == null && showDebugInfo)
+        {
+            Debug.LogWarning($"[WaterReflection] GameObject '{taggedWater.name}' (tag '{waterTilemapTag}') has no Tilemap component!", this);
+        }
+        return FindWaterTilemapFallback();
+    }
+
+    private GameObject FindWaterTilemapFallback()
+    {
+        if (TileInteractionManager.Instance != null)
+        {
+            var mappings = TileInteractionManager.Instance.tileDefinitionMappings;
+            if (mappings != null)
+            {
+                foreach (var mapping in mappings)
+                {
+                    if (mapping?.tileDef != null && mapping.tilemapModule != null && mapping.tileDef.isWaterTile)
+                    {
+                        Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+                        if (renderTilemapTransform != null && renderTilemapTransform.GetComponent<Tilemap>() != null)
+                        {
+                            if (showDebugInfo) Debug.Log($"[WaterReflection] Auto-detected water tilemap via TIM: {renderTilemapTransform.name} for {gameObject.name}", this);
+                            return renderTilemapTransform.gameObject;
+                        }
+                    }
+                }
+            }
+        }
+        if (showDebugInfo) Debug.LogWarning($"[WaterReflection] Could not auto-detect water tilemap via TileInteractionManager for {gameObject.name}.", this);
+        return null;
+    }
+
+    void OnDestroy()
+    {
+        if (reflectionObject != null)
+        {
+            if (Application.isPlaying) Destroy(reflectionObject);
+            else DestroyImmediate(reflectionObject);
+        }
+        if (reflectionMaterialInstance != null)
+        {
+            if (Application.isPlaying) Destroy(reflectionMaterialInstance);
+            else DestroyImmediate(reflectionMaterialInstance);
+        }
+    }
+
+    void OnValidate()
+    {
+        // The OnValidate warning should only appear if:
+        // 1. We are in the editor AND not playing.
+        // 2. enableDistanceFade is true.
+        // 3. gradientFadeBaseMaterial is actually null *on this component*.
+        if (Application.isEditor && !Application.isPlaying)
+        {
+            if (enableDistanceFade && gradientFadeBaseMaterial == null)
+            {
+                // This warning is for the user configuring the component in the editor.
+                Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true, but 'Gradient Fade Base Material' is not assigned. Distance fading will require this in Play mode.", this);
+            }
+        }
+
+        if (Application.isPlaying) return;
+
+        if (reflectionRenderer != null && originalRenderer != null)
+        {
+            reflectionRenderer.sprite = originalRenderer.sprite;
+            reflectionRenderer.flipX = originalRenderer.flipX;
+            reflectionRenderer.flipY = originalRenderer.flipY; // This was originalRenderer.flipY, should be consistent
+            reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + sortingOrderOffset;
+            Color baseOriginalSpriteColor = originalRenderer.color;
+            Color finalReflectionTintedColor = baseOriginalSpriteColor * reflectionTint;
+            float finalCombinedAlpha = baseOriginalSpriteColor.a * reflectionOpacity;
+            reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
+            UpdateReflectionTransform();
+        }
+    }
+
+    // --- Public Methods for Runtime Control ---
+    public void SetReflectionOpacity(float opacity)
+    {
+        reflectionOpacity = Mathf.Clamp01(opacity);
+        if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals(); // Check originalRenderer too
+    }
+    public void SetYOffset(float offset)
+    {
+        yOffset = offset;
+        if (Application.isPlaying && originalRenderer != null) UpdateReflectionTransform();
+    }
+    public void SetReflectionTint(Color tint)
+    {
+        reflectionTint = tint;
+        if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals();
+    }
+    public void SetReflectionEnabled(bool enabled)
+    {
+        if (reflectionObject != null) reflectionObject.SetActive(enabled);
     }
 }
 

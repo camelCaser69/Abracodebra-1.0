@@ -352,7 +352,7 @@ public class PlantPlacementManager : MonoBehaviour
         // Critical check - if radius is too small, just return the center
         if (spawnRadius < 0.01f)
         {
-            Debug.LogWarning("Spawn radius too small (<0.01), using center position");
+            // Debug.LogWarning("Spawn radius too small (<0.01), using center position");
             return centerPosition;
         }
     
