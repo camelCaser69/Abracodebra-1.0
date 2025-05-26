@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 8657622778908597513}
   - component: {fileID: 5462988128650741342}
   - component: {fileID: 5386156553378416530}
+  - component: {fileID: -3166401540708806128}
   m_Layer: 0
   m_Name: PixelLeaf
   m_TagString: Leaf
@@ -180,3 +181,28 @@ MonoBehaviour:
   ParentPlantGrowth: {fileID: 0}
   GridCoord: {x: 0, y: 0}
   CellType: 0
+--- !u!114 &-3166401540708806128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3989903528299243114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e3b763aac349f9893880f6600308e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useParentAsReference: 1
+  yOffset: -0.3
+  reflectionOpacity: 0.6
+  reflectionTint: {r: 1, g: 1, b: 1, a: 1}
+  enableDistanceFade: 1
+  fadeStartDistance: 0.6
+  fadeEndDistance: 2.2
+  minFadeAlpha: 0
+  gradientFadeBaseMaterial: {fileID: 2100000, guid: 9c89380ac3c2b264391225c5e0baa010, type: 2}
+  sortingOrderOffset: -100
+  useWaterMasking: 1
+  waterTilemapTag: Water
+  showDebugInfo: 0

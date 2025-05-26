@@ -457,8 +457,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   yOffset: -1.75
-  reflectionOpacity: 0.8
-  reflectionTint: {r: 0.4292453, g: 0.75104785, b: 1, a: 1}
+  reflectionOpacity: 0.5
+  reflectionTint: {r: 1, g: 1, b: 1, a: 1}
   enableDistanceFade: 1
   fadeStartDistance: 0.4
   fadeEndDistance: 1.7

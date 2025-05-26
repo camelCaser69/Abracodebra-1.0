@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: -1166173012765983499}
   - component: {fileID: -3199723638171609685}
   - component: {fileID: 4637009881160798084}
+  - component: {fileID: 1384242643062123842}
   m_Layer: 0
   m_Name: PixelSeed
   m_TagString: Seed
@@ -166,3 +167,28 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.01, y: 0.01}
   m_EdgeRadius: 0
+--- !u!114 &1384242643062123842
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3989903528299243114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e3b763aac349f9893880f6600308e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  useParentAsReference: 1
+  yOffset: -0.3
+  reflectionOpacity: 0.6
+  reflectionTint: {r: 1, g: 1, b: 1, a: 1}
+  enableDistanceFade: 1
+  fadeStartDistance: 0.6
+  fadeEndDistance: 2.2
+  minFadeAlpha: 0
+  gradientFadeBaseMaterial: {fileID: 2100000, guid: 9c89380ac3c2b264391225c5e0baa010, type: 2}
+  sortingOrderOffset: -100
+  useWaterMasking: 1
+  waterTilemapTag: Water
+  showDebugInfo: 0
