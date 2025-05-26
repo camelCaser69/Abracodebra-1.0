@@ -185,6 +185,7 @@ GameObject:
   - component: {fileID: 6360368297587786613}
   - component: {fileID: 1678655499690775546}
   - component: {fileID: 8208813146050923784}
+  - component: {fileID: 2553985273532714941}
   m_Layer: 0
   m_Name: Animal_Bunny
   m_TagString: Herbivore
@@ -443,6 +444,30 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: -0.12}
   m_Size: {x: 0.12, y: 0.06}
   m_Direction: 1
+--- !u!114 &2553985273532714941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1618699628824306755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e3b763aac349f9893880f6600308e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  yOffset: -1.75
+  reflectionOpacity: 0.8
+  reflectionTint: {r: 0.4292453, g: 0.75104785, b: 1, a: 1}
+  enableDistanceFade: 1
+  fadeStartDistance: 0.4
+  fadeEndDistance: 1.7
+  minFadeAlpha: 0
+  gradientFadeMaterial: {fileID: 2100000, guid: 9c89380ac3c2b264391225c5e0baa010, type: 2}
+  sortingOrderOffset: -100
+  useWaterMasking: 1
+  waterTilemapTag: Water
+  showDebugInfo: 0
 --- !u!1 &2461211831445650058
 GameObject:
   m_ObjectHideFlags: 0

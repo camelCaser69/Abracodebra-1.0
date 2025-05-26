@@ -219,8 +219,6 @@ MonoBehaviour:
   excludeOuterCorners: 1
   excludeBaseCell: 1
   outlinePartPrefab: {fileID: 4782029035367563709, guid: 743876fcc031111489cdd615ffaefa59, type: 3}
-  batchOutlineUpdates: 1
-  updateInterval: 0.1
   outlineSortingLayerName: Default
   outlineSortingOrder: 2
   debugLogging: 0
@@ -336,6 +334,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1090940917712720748}
   - component: {fileID: -7276291906513066215}
+  - component: {fileID: -8399928101059597356}
   m_Layer: 0
   m_Name: PlantPrefab
   m_TagString: Untagged
@@ -391,6 +390,30 @@ MonoBehaviour:
   continuousIncrement: 1
   currentState: 0
   currentEnergy: 0
+--- !u!114 &-8399928101059597356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8982947048272063882}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e3b763aac349f9893880f6600308e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  yOffset: -1.75
+  reflectionOpacity: 0.8
+  reflectionTint: {r: 0.4292453, g: 0.75104785, b: 1, a: 1}
+  enableDistanceFade: 1
+  fadeStartDistance: 0.4
+  fadeEndDistance: 1.7
+  minFadeAlpha: 0
+  gradientFadeMaterial: {fileID: 2100000, guid: 9c89380ac3c2b264391225c5e0baa010, type: 2}
+  sortingOrderOffset: -100
+  useWaterMasking: 1
+  waterTilemapTag: Water
+  showDebugInfo: 0
 --- !u!1 &9214799694400921061
 GameObject:
   m_ObjectHideFlags: 0

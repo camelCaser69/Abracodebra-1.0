@@ -70,22 +70,22 @@ Material:
     - _FoamScale: 0.5
     - _FoamSpeed: 0.2
     - _FoamThreshold: 0
-    - _OverlayBlendMode: 0
+    - _OverlayBlendMode: 2
     - _OverlayOffsetX: 0
     - _OverlayOffsetY: 0.5
-    - _OverlayOpacity: 0
+    - _OverlayOpacity: 0.5
     - _OverlayScaleX: 0.1
     - _OverlayScaleY: 0.1
     - _OverlayScrollSpeedX: 0
     - _OverlayScrollSpeedY: 0
-    - _ReflectionDistortion: 0.02
+    - _ReflectionDistortion: 0
     - _ReflectionDistortionScale: 1
     - _ReflectionDistortionSpeed: 0.3
     - _ReflectionDistortionStrength: 0.001
-    - _ReflectionIntensity: 0.7
+    - _ReflectionIntensity: 0
     - _ReflectionStrength: 0.185
     - _RefractionStrength: 0
-    - _WaterDepth: 0
+    - _WaterDepth: 0.081
     - _WaterLevelScreenY: 0.504
     - _WaveAmplitude: 0.0185
     - _WaveFrequency: 1.48

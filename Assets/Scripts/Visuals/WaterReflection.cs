@@ -31,6 +31,9 @@ public class WaterReflection : MonoBehaviour
     [Tooltip("Minimum alpha even when fully faded (0 = completely invisible)")]
     [SerializeField] [Range(0f, 1f)] private float minFadeAlpha = 0.0f;
     
+    [Tooltip("Custom material with gradient fade shader (leave empty to auto-create)")]
+    [SerializeField] private Material gradientFadeMaterial;
+    
     [Header("Sorting")]
     [Tooltip("Sorting order offset for the reflection (usually negative to render behind)")]
     [SerializeField] private int sortingOrderOffset = -1;
@@ -52,6 +55,8 @@ public class WaterReflection : MonoBehaviour
     private SpriteRenderer reflectionRenderer;
     private Animator reflectionAnimator;
     private SpriteMask waterMask;
+    private Material originalReflectionMaterial;
+    private Material currentGradientMaterial;
     
     // --- Cached Values ---
     private Sprite lastSprite;
@@ -118,6 +123,15 @@ public class WaterReflection : MonoBehaviour
         reflectionRenderer.drawMode = originalRenderer.drawMode;
         reflectionRenderer.size = originalRenderer.size;
         reflectionRenderer.tileMode = originalRenderer.tileMode;
+        
+        // Store original material for later restoration
+        originalReflectionMaterial = reflectionRenderer.material;
+        
+        // Setup distance fade material if enabled
+        if (enableDistanceFade)
+        {
+            SetupGradientMaterial();
+        }
         
         // Add Animator if original has one
         if (originalAnimator != null)
@@ -278,15 +292,13 @@ public class WaterReflection : MonoBehaviour
         // Apply base opacity
         finalColor.a = originalColor.a * reflectionOpacity;
         
-        // Apply distance fade if enabled
-        if (enableDistanceFade)
-        {
-            float distance = Mathf.Abs(yOffset); // Distance is based on Y offset
-            float fadeAlpha = CalculateDistanceFadeAlpha(distance);
-            finalColor.a *= fadeAlpha;
-        }
-        
         reflectionRenderer.color = finalColor;
+        
+        // Update gradient fade if enabled
+        if (enableDistanceFade && currentGradientMaterial != null)
+        {
+            UpdateGradientMaterial();
+        }
         
         // Sync enabled state
         reflectionRenderer.enabled = originalRenderer.enabled;
@@ -384,6 +396,82 @@ public class WaterReflection : MonoBehaviour
         }
     }
 
+    private void SetupGradientMaterial()
+    {
+        if (reflectionRenderer == null) return;
+
+        // Use provided material or create one with the gradient shader
+        if (gradientFadeMaterial != null)
+        {
+            currentGradientMaterial = new Material(gradientFadeMaterial);
+        }
+        else
+        {
+            // Try to find the gradient shader
+            Shader gradientShader = Shader.Find("Custom/WaterReflectionGradient");
+            if (gradientShader != null)
+            {
+                currentGradientMaterial = new Material(gradientShader);
+            }
+            else
+            {
+                Debug.LogWarning($"[WaterReflection] Custom gradient shader not found. Create 'WaterReflectionGradient.shader' for proper gradient fading. Using simple fade instead.", this);
+                currentGradientMaterial = new Material(originalReflectionMaterial);
+            }
+        }
+
+        reflectionRenderer.material = currentGradientMaterial;
+        UpdateGradientMaterial();
+    }
+
+    private void UpdateGradientMaterial()
+    {
+        if (currentGradientMaterial == null || reflectionRenderer == null) return;
+
+        // Update shader properties for gradient fade
+        if (currentGradientMaterial.HasProperty("_FadeStart"))
+        {
+            currentGradientMaterial.SetFloat("_FadeStart", fadeStartDistance);
+        }
+        
+        if (currentGradientMaterial.HasProperty("_FadeEnd"))
+        {
+            currentGradientMaterial.SetFloat("_FadeEnd", fadeEndDistance);
+        }
+        
+        if (currentGradientMaterial.HasProperty("_MinAlpha"))
+        {
+            currentGradientMaterial.SetFloat("_MinAlpha", minFadeAlpha);
+        }
+        
+        if (currentGradientMaterial.HasProperty("_OriginalY"))
+        {
+            // Pass the original object's world Y position to the shader
+            currentGradientMaterial.SetFloat("_OriginalY", transform.position.y);
+        }
+    }
+
+    private void RestoreOriginalMaterial()
+    {
+        if (reflectionRenderer != null && originalReflectionMaterial != null)
+        {
+            reflectionRenderer.material = originalReflectionMaterial;
+        }
+        
+        if (currentGradientMaterial != null)
+        {
+            if (Application.isPlaying)
+            {
+                Destroy(currentGradientMaterial);
+            }
+            else
+            {
+                DestroyImmediate(currentGradientMaterial);
+            }
+            currentGradientMaterial = null;
+        }
+    }
+
     void OnDestroy()
     {
         // Clean up the reflection object
@@ -398,6 +486,9 @@ public class WaterReflection : MonoBehaviour
                 DestroyImmediate(reflectionObject);
             }
         }
+        
+        // Clean up gradient material
+        RestoreOriginalMaterial();
     }
 
     void OnValidate()
@@ -478,6 +569,16 @@ public class WaterReflection : MonoBehaviour
     public void SetDistanceFade(bool enabled)
     {
         enableDistanceFade = enabled;
+        
+        if (enabled)
+        {
+            SetupGradientMaterial();
+        }
+        else
+        {
+            RestoreOriginalMaterial();
+        }
+        
         UpdateReflection(); // Refresh to apply/remove fade
     }
     
