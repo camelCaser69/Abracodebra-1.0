@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿// FILE: Assets/Scripts/Tiles/Data/PlantPlacementManager.cs (UPDATED for Seed System)
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlantPlacementManager : MonoBehaviour
@@ -7,7 +8,6 @@ public class PlantPlacementManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private GameObject plantPrefab;
-    [SerializeField] private NodeEditorGridController nodeEditorGrid;
     [SerializeField] private Transform plantParent;
     [SerializeField] private TileInteractionManager tileInteractionManager;
     [SerializeField] private PlantGrowthModifierManager growthModifierManager;
@@ -53,11 +53,6 @@ public class PlantPlacementManager : MonoBehaviour
             plantParent = EcosystemManager.Instance.plantParent;
         }
         
-        if (nodeEditorGrid == null)
-        {
-            nodeEditorGrid = NodeEditorGridController.Instance;
-        }
-        
         if (tileInteractionManager == null)
         {
             tileInteractionManager = TileInteractionManager.Instance;
@@ -92,15 +87,14 @@ public class PlantPlacementManager : MonoBehaviour
         RebuildInvalidTilesSet();
     }
 
-    // Check if a grid position is occupied by a plant
+    // --- Position Management (unchanged) ---
+    
     public bool IsPositionOccupied(Vector3Int gridPosition)
     {
-        // If we have a reference, check if it's still valid (not destroyed)
         if (plantsByGridPosition.TryGetValue(gridPosition, out GameObject plant))
         {
             if (plant == null)
             {
-                // Plant has been destroyed, remove from dictionary
                 plantsByGridPosition.Remove(gridPosition);
                 return false;
             }
@@ -109,18 +103,14 @@ public class PlantPlacementManager : MonoBehaviour
         return false;
     }
     
-    // Check if a tile is valid for planting
     public bool IsTileValidForPlanting(TileDefinition tileDef)
     {
-        // If the tile is null, it's not valid
         if (tileDef == null)
             return false;
             
-        // Check if this tile is in our invalid set
         return !invalidTilesSet.Contains(tileDef);
     }
 
-    // Clean up destroyed plants from our dictionary (call periodically if needed)
     public void CleanupDestroyedPlants()
     {
         List<Vector3Int> keysToRemove = new List<Vector3Int>();
@@ -144,29 +134,136 @@ public class PlantPlacementManager : MonoBehaviour
         }
     }
 
-    // Try to plant a seed at the given grid position
+    // --- NEW: Seed-based planting methods ---
+
+    /// <summary>
+    /// NEW: Try to plant using seed selection system
+    /// </summary>
+    public void TryPlantWithSeedSelection(Vector3Int gridPosition, Vector3 worldPosition, 
+        System.Action onCompleted = null)
+    {
+        // Basic validation
+        if (!CanPlantAtPosition(gridPosition))
+        {
+            onCompleted?.Invoke();
+            return;
+        }
+
+        // Use seed selection UI
+        if (SeedSelectionUI.Instance != null && PlayerGeneticsInventory.Instance != null)
+        {
+            var plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
+            
+            if (plantableSeeds.Count == 0)
+            {
+                if (showDebugMessages)
+                    Debug.Log("Cannot plant: No plantable seeds available in inventory.");
+                onCompleted?.Invoke();
+                return;
+            }
+            
+            if (plantableSeeds.Count == 1)
+            {
+                // Auto-select single seed
+                TryPlantSeedInstance(plantableSeeds[0], gridPosition, worldPosition);
+                onCompleted?.Invoke();
+            }
+            else
+            {
+                // Show selection UI
+                SeedSelectionUI.Instance.ShowSeedSelection(selectedSeed => {
+                    TryPlantSeedInstance(selectedSeed, gridPosition, worldPosition);
+                    onCompleted?.Invoke();
+                });
+            }
+        }
+        else
+        {
+            if (showDebugMessages)
+                Debug.LogError("Cannot plant: Seed selection system not available!");
+            onCompleted?.Invoke();
+        }
+    }
+
+    /// <summary>
+    /// NEW: Plant a specific seed instance
+    /// </summary>
+    public bool TryPlantSeedInstance(SeedInstance seedInstance, Vector3Int gridPosition, Vector3 worldPosition)
+    {
+        if (seedInstance == null)
+        {
+            if (showDebugMessages)
+                Debug.LogError("Cannot plant: Seed instance is null!");
+            return false;
+        }
+
+        if (!seedInstance.IsValidForPlanting())
+        {
+            if (showDebugMessages)
+                Debug.Log($"Cannot plant: Seed '{seedInstance.seedName}' is not valid for planting.");
+            return false;
+        }
+
+        // Check if position is still valid
+        if (!CanPlantAtPosition(gridPosition))
+            return false;
+
+        // Calculate planting position
+        Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
+        
+        // Spawn the plant
+        GameObject plantObj = SpawnPlantFromSeed(seedInstance, plantingPosition);
+        if (plantObj != null)
+        {
+            // Track the plant position
+            plantsByGridPosition[gridPosition] = plantObj;
+            
+            // Register with growth modifier manager
+            RegisterPlantWithModifiers(plantObj, gridPosition);
+            
+            // Remove seed from inventory
+            if (PlayerGeneticsInventory.Instance != null)
+            {
+                PlayerGeneticsInventory.Instance.RemoveSeed(seedInstance);
+                if (showDebugMessages)
+                    Debug.Log($"Planted and consumed seed: {seedInstance.seedName}");
+            }
+            
+            return true;
+        }
+        return false;
+    }
+
+    // --- LEGACY: Original NodeGraph-based planting (kept for compatibility) ---
+
     public bool TryPlantSeed(Vector3Int gridPosition, Vector3 worldPosition)
+    {
+        // This is the old method - now redirects to seed selection
+        TryPlantWithSeedSelection(gridPosition, worldPosition);
+        return true; // Always return true as the new system handles validation internally
+    }
+
+    // --- Private Helper Methods ---
+
+    private bool CanPlantAtPosition(Vector3Int gridPosition)
     {
         // Clean up any destroyed plants first
         CleanupDestroyedPlants();
         
-        // Return false if position is already occupied
+        // Check if position is occupied
         if (IsPositionOccupied(gridPosition))
         {
             if (showDebugMessages)
-            {
                 Debug.Log($"Cannot plant: Position {gridPosition} already has a plant.");
-            }
             return false;
         }
         
-        // Get the tile at this position
+        // Check tile validity
         TileDefinition tileDef = null;
         if (tileInteractionManager != null)
         {
             tileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
             
-            // Check if the tile is valid for planting
             if (!IsTileValidForPlanting(tileDef))
             {
                 if (showDebugMessages)
@@ -178,86 +275,56 @@ public class PlantPlacementManager : MonoBehaviour
             }
         }
 
-        // Get the current graph from the NodeEditorGridController
-        if (nodeEditorGrid == null)
-        {
-            nodeEditorGrid = NodeEditorGridController.Instance;
-            if (nodeEditorGrid == null)
-            {
-                Debug.LogError("Cannot plant: NodeEditorGridController not found.");
-                return false;
-            }
-        }
-
-        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
-        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0)
-        {
-            if (showDebugMessages)
-            {
-                Debug.Log("Cannot plant: No nodes in UI graph to spawn.");
-            }
-            return false;
-        }
-        
-        // Validate graph has a seed node
-        bool seedFound = false;
-        foreach (var node in graphToSpawn.nodes)
-        {
-            if (node != null && node.effects != null)
-            {
-                foreach (var effect in node.effects)
-                {
-                    if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
-                    {
-                        seedFound = true;
-                        break;
-                    }
-                }
-            }
-            if (seedFound) break;
-        }
-
-        if (!seedFound)
-        {
-            if (showDebugMessages)
-            {
-                Debug.Log("Cannot plant: Node graph lacks a SeedSpawn effect.");
-            }
-            return false;
-        }
-
-        // Calculate randomized planting position based on our settings
-        Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
-        
-        // Spawn the plant at the randomized position
-        GameObject plantObj = SpawnPlant(graphToSpawn, plantingPosition);
-        if (plantObj != null)
-        {
-            // Track the plant position
-            plantsByGridPosition[gridPosition] = plantObj;
-            
-            // Register the plant with the growth modifier manager
-            if (growthModifierManager != null)
-            {
-                PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
-                if (plantGrowth != null)
-                {
-                    growthModifierManager.RegisterPlantTile(plantGrowth, tileDef);
-                    
-                    if (showDebugMessages)
-                    {
-                        string tileDebugName = tileDef != null ? tileDef.displayName : "Unknown";
-                        Debug.Log($"Plant registered with tile: {tileDebugName}");
-                    }
-                }
-            }
-            
-            return true;
-        }
-        return false;
+        return true;
     }
 
-    // Spawn a plant using the given node graph at the specified position
+    /// <summary>
+    /// NEW: Spawn a plant from a SeedInstance
+    /// </summary>
+    private GameObject SpawnPlantFromSeed(SeedInstance seedInstance, Vector3 position)
+    {
+        if (plantPrefab == null)
+        {
+            Debug.LogError("Cannot spawn plant: Plant prefab not assigned.");
+            return null;
+        }
+
+        if (showDebugMessages)
+            Debug.Log($"SpawnPlantFromSeed called: {seedInstance.seedName} at position: {position}");
+    
+        // Instantiate the plant prefab
+        GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
+        plantObj.name = $"Plant_{seedInstance.seedName}_{System.DateTime.Now:HHmmss}";
+
+        // Get the PlantGrowth component
+        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+        if (growthComponent != null)
+        {
+            // Convert seed to NodeGraph
+            NodeGraph nodeGraph = seedInstance.ToNodeGraph();
+            
+            if (nodeGraph == null)
+            {
+                Debug.LogError($"Failed to convert seed '{seedInstance.seedName}' to NodeGraph!");
+                Destroy(plantObj);
+                return null;
+            }
+
+            // Initialize the plant
+            growthComponent.InitializeAndGrow(nodeGraph);
+            return plantObj;
+        }
+        else
+        {
+            Debug.LogError("Plant prefab missing PlantGrowth component! Destroying spawned object.");
+            Destroy(plantObj);
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// LEGACY: Spawn a plant using the original NodeGraph system
+    /// </summary>
     private GameObject SpawnPlant(NodeGraph graphToSpawn, Vector3 position)
     {
         if (plantPrefab == null)
@@ -266,22 +333,15 @@ public class PlantPlacementManager : MonoBehaviour
             return null;
         }
 
-        Debug.Log($"SpawnPlant called with position: {position}");
+        if (showDebugMessages)
+            Debug.Log($"SpawnPlant called with position: {position}");
     
-        // Instantiate the plant prefab
         GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
-    
-        // Verify the position was actually applied
-        Debug.Log($"Plant instantiated at position: {plantObj.transform.position}");
 
-        // Get the PlantGrowth component
         PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
         if (growthComponent != null)
         {
-            // Create a deep copy of the node graph to prevent modifications affecting the original
             NodeGraph graphCopy = CloneNodeGraph(graphToSpawn);
-
-            // Initialize the plant with the deep copy
             growthComponent.InitializeAndGrow(graphCopy);
             return plantObj;
         }
@@ -293,7 +353,28 @@ public class PlantPlacementManager : MonoBehaviour
         }
     }
 
-    // Create a deep copy of a NodeGraph
+    private void RegisterPlantWithModifiers(GameObject plantObj, Vector3Int gridPosition)
+    {
+        if (growthModifierManager != null && tileInteractionManager != null)
+        {
+            TileDefinition currentTile = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
+            PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
+            
+            if (plantGrowth != null)
+            {
+                growthModifierManager.RegisterPlantTile(plantGrowth, currentTile);
+                
+                if (showDebugMessages)
+                {
+                    string tileDebugName = currentTile != null ? currentTile.displayName : "Unknown";
+                    Debug.Log($"Plant registered with tile: {tileDebugName}");
+                }
+            }
+        }
+    }
+
+    // --- Legacy Helper Methods (kept for compatibility) ---
+
     private NodeGraph CloneNodeGraph(NodeGraph original)
     {
         NodeGraph copy = new NodeGraph();
@@ -311,7 +392,6 @@ public class PlantPlacementManager : MonoBehaviour
                 canBeDeleted = originalNode.canBeDeleted
             };
 
-            // Deep copy effects
             newNode.effects = CloneEffectsList(originalNode.effects);
             copy.nodes.Add(newNode);
         }
@@ -319,7 +399,6 @@ public class PlantPlacementManager : MonoBehaviour
         return copy;
     }
 
-    // Create a deep copy of a list of NodeEffectData
     private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
     {
         if (originalList == null) return new List<NodeEffectData>();
@@ -342,52 +421,33 @@ public class PlantPlacementManager : MonoBehaviour
         return newList;
     }
     
-    // Generate a randomized position within the given radius, with simple increments
-    // Generate a randomized position within the given radius
     private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
     {
-        // First, let's add comprehensive debugging
-        Debug.Log($"Starting position randomization from center: {centerPosition}, radius: {spawnRadius}, increment: {spawnRadiusIncrement}");
+        if (showDebugMessages)
+            Debug.Log($"Starting position randomization from center: {centerPosition}, radius: {spawnRadius}, increment: {spawnRadiusIncrement}");
     
-        // Critical check - if radius is too small, just return the center
         if (spawnRadius < 0.01f)
         {
-            // Debug.LogWarning("Spawn radius too small (<0.01), using center position");
             return centerPosition;
         }
     
-        // Generate a random angle in radians (0 to 2π)
         float randomAngle = Random.Range(0f, 2f * Mathf.PI);
-        Debug.Log($"Random angle: {randomAngle} radians ({randomAngle * Mathf.Rad2Deg} degrees)");
-    
-        // Convert angle to direction vector
         Vector2 direction = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle));
-        Debug.Log($"Direction vector: {direction}");
-    
-        // Get a random distance within spawn radius
         float randomDistance = Random.Range(0.05f, spawnRadius);
-        Debug.Log($"Random distance: {randomDistance}");
-    
-        // Calculate actual offset
+        
         float offsetX = direction.x * randomDistance;
         float offsetY = direction.y * randomDistance;
-        Debug.Log($"Raw offset: ({offsetX}, {offsetY})");
-    
-        // Apply increment if needed
+        
         if (spawnRadiusIncrement > 0.001f)
         {
-            float originalX = offsetX;
-            float originalY = offsetY;
-        
             offsetX = Mathf.Round(offsetX / spawnRadiusIncrement) * spawnRadiusIncrement;
             offsetY = Mathf.Round(offsetY / spawnRadiusIncrement) * spawnRadiusIncrement;
-        
-            Debug.Log($"Snapped offset: ({offsetX}, {offsetY}) from ({originalX}, {originalY})");
         }
-    
-        // Create the final position
+        
         Vector3 randomizedPosition = centerPosition + new Vector3(offsetX, offsetY, 0f);
-        Debug.Log($"FINAL randomized position: {randomizedPosition}");
+        
+        if (showDebugMessages)
+            Debug.Log($"FINAL randomized position: {randomizedPosition}");
     
         return randomizedPosition;
     }

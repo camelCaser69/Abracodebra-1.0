@@ -1,8 +1,8 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-26 22:28:12
-PART 6 OF 8
+UNITY PROJECT SCRIPT EXPORT - 2025-05-28 18:59:47
+PART 8 OF 9
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -67,11 +67,17 @@ Assets
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
+│   │       ├── Panels
+│   │       │   ├── Panel_GeneListItem.prefab
+│   │       │   ├── Panel_GeneSequenceItem.prefab
+│   │       │   ├── Panel_SeedListItem.prefab
+│   │       │   └── Panel_SeedSelectionButton.prefab
 │   │       ├── ThoughtBubble.prefab
 │   │       ├── Visualizer_Circle_Prefab.prefab
 │   │       └── Visualizer_Line_Prefab.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
+│   │   ├── PLANTOTRON_Machine.prefab
 │   │   └── Projectile_Basic_Pixel.prefab
 │   └── Tiles
 │       ├── Common
@@ -110,6 +116,8 @@ Assets
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
+│   ├── Seeds
+│   │   └── SeedDefinition_000_Base.asset
 │   ├── Tiles
 │   │   ├── TileDefinition_000_Grass.asset
 │   │   ├── TileDefinition_001_Dirt.asset
@@ -180,6 +188,17 @@ Assets
 │   │   ├── Runtime
 │   │   │   ├── NodeExecutor.cs
 │   │   │   └── NodeGraph.cs
+│   │   ├── Seeds
+│   │   │   ├── PlantotronGeneItem.cs
+│   │   │   ├── PlantotronGeneSequenceItem.cs
+│   │   │   ├── PlantotronMachine.cs
+│   │   │   ├── PlantotronSeedItem.cs
+│   │   │   ├── PlantotronUI.cs
+│   │   │   ├── PlayerGeneticsInventory.cs
+│   │   │   ├── SeedDefinition.cs
+│   │   │   ├── SeedInstance.cs
+│   │   │   ├── SeedSelectionButton.cs
+│   │   │   └── SeedSelectionUI.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
 │   │       ├── DeselectOnClickOutside.cs
@@ -194,7 +213,7 @@ Assets
 │   ├── Tiles
 │   │   ├── Data
 │   │   │   ├── PlantGrowthModifierManager.cs
-│   │   │   ├── PlantPlacementManagement.cs
+│   │   │   ├── PlantPlacementManager.cs
 │   │   │   ├── PlayerTileInteractor.cs
 │   │   │   ├── TileDefinition.cs
 │   │   │   ├── TileInteractionLibrary.cs
@@ -211,11 +230,13 @@ Assets
 │   └── Visuals
 │       ├── NightColorPostProcess.cs
 │       ├── OutlinePartController.cs
+│       ├── PixelPerfectSetup.cs
 │       ├── PlantOutlineController.cs
 │       ├── PlantShadowController.cs
 │       ├── RuntimeCircleDrawer.cs
 │       ├── ShadowPartController.cs
-│       └── WaterReflection.cs
+│       ├── WaterReflection.cs
+│       └── WaterReflectionManager.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -241,818 +262,6 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\PlantGrowthModifierManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections.Generic;
-using UnityEngine;
-
-public class PlantGrowthModifierManager : MonoBehaviour
-{
-    public static PlantGrowthModifierManager Instance { get; private set; }
-
-    [System.Serializable]
-    public class TileGrowthModifier
-    {
-        [Tooltip("The tile definition this modifier applies to")]
-        public TileDefinition tileDefinition;
-
-        [Tooltip("Multiplier for plant growth speed when on this tile (1.0 = normal)")]
-        [Range(0.1f, 3.0f)]
-        public float growthSpeedMultiplier = 1.0f;
-
-        [Tooltip("Multiplier for energy recharge speed when on this tile (1.0 = normal)")]
-        [Range(0.1f, 3.0f)]
-        public float energyRechargeMultiplier = 1.0f;
-    }
-
-    [Header("Default Settings")]
-    [Tooltip("Default multiplier for tiles that aren't specifically configured")]
-    [Range(0.1f, 3.0f)]
-    public float defaultGrowthSpeedMultiplier = 1.0f;
-
-    [Tooltip("Default multiplier for energy recharge on tiles that aren't specifically configured")]
-    [Range(0.1f, 3.0f)]
-    public float defaultEnergyRechargeMultiplier = 1.0f;
-
-    [Header("Tile Update Settings")]
-    [Tooltip("How often (in seconds) to check if plants are on different tiles")]
-    [Range(0.5f, 5.0f)]
-    public float tileUpdateInterval = 1.0f;
-
-    [Header("Tile Growth Modifiers")]
-    [Tooltip("Define growth and energy recharge multipliers for specific tiles")]
-    public List<TileGrowthModifier> tileModifiers = new List<TileGrowthModifier>();
-
-    [Header("References")]
-    [SerializeField] private TileInteractionManager tileInteractionManager;
-
-    [Header("Debug")]
-    [SerializeField] private bool showDebugMessages = true;
-    [SerializeField] private bool showTileChangeMessages = true;
-
-    // Dictionary for faster lookup of modifiers by tile definition
-    private Dictionary<TileDefinition, TileGrowthModifier> modifierLookup = new Dictionary<TileDefinition, TileGrowthModifier>();
-
-    // Dictionary to track what tile each plant is on
-    private Dictionary<PlantGrowth, TileDefinition> plantTiles = new Dictionary<PlantGrowth, TileDefinition>();
-    
-    // Timer for tile updates
-    private float tileUpdateTimer = 0f;
-
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-
-        // Build lookup dictionary for faster access
-        BuildModifierLookup();
-    }
-
-    private void Start()
-    {
-        // Find TileInteractionManager if not assigned
-        if (tileInteractionManager == null)
-        {
-            tileInteractionManager = TileInteractionManager.Instance;
-            if (tileInteractionManager == null && showDebugMessages)
-            {
-                Debug.LogWarning("PlantGrowthModifierManager: TileInteractionManager not found!");
-            }
-        }
-        
-        // Start with a tile update
-        tileUpdateTimer = 0f;
-    }
-
-    private void Update()
-    {
-        // Update timer
-        tileUpdateTimer -= Time.deltaTime;
-        
-        // Check if it's time to update tiles
-        if (tileUpdateTimer <= 0f)
-        {
-            UpdateAllPlantTiles();
-            tileUpdateTimer = tileUpdateInterval;
-        }
-    }
-
-    // Check all plants to see if their tiles have changed
-    private void UpdateAllPlantTiles()
-    {
-        if (tileInteractionManager == null)
-        {
-            return;
-        }
-        
-        // We need to copy the keys to avoid modifying the dictionary during iteration
-        List<PlantGrowth> plantsToCheck = new List<PlantGrowth>(plantTiles.Keys);
-        
-        foreach (PlantGrowth plant in plantsToCheck)
-        {
-            if (plant == null)
-            {
-                // Plant has been destroyed, remove from dictionary
-                plantTiles.Remove(plant);
-                continue;
-            }
-            
-            // Convert plant position to grid position
-            Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
-            
-            // Get current tile definition at this position
-            TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
-            
-            // Get previously stored tile definition
-            TileDefinition previousTileDef = plantTiles[plant];
-            
-            // Check if tile has changed
-            if (currentTileDef != previousTileDef)
-            {
-                // Update stored tile
-                plantTiles[plant] = currentTileDef;
-                
-                if (showTileChangeMessages)
-                {
-                    string previousTileName = previousTileDef != null ? previousTileDef.displayName : "None";
-                    string currentTileName = currentTileDef != null ? currentTileDef.displayName : "None";
-                    Debug.Log($"Plant tile changed: {previousTileName} -> {currentTileName}");
-                }
-            }
-        }
-    }
-
-    private void BuildModifierLookup()
-    {
-        modifierLookup.Clear();
-        foreach (var modifier in tileModifiers)
-        {
-            if (modifier.tileDefinition != null && !modifierLookup.ContainsKey(modifier.tileDefinition))
-            {
-                modifierLookup.Add(modifier.tileDefinition, modifier);
-            }
-        }
-
-        if (showDebugMessages)
-        {
-            Debug.Log($"PlantGrowthModifierManager: Built lookup with {modifierLookup.Count} tile modifiers");
-        }
-    }
-
-    // Call this when a plant is created to register its tile
-    public void RegisterPlantTile(PlantGrowth plant, TileDefinition tileDef)
-    {
-        if (plant == null)
-            return;
-
-        plantTiles[plant] = tileDef;
-
-        if (showDebugMessages)
-        {
-            string tileName = tileDef != null ? tileDef.displayName : "Unknown Tile";
-            Debug.Log($"Registered plant {plant.name} on tile {tileName}");
-        }
-    }
-
-    // Call this when a plant is destroyed to clean up
-    public void UnregisterPlant(PlantGrowth plant)
-    {
-        if (plant == null)
-            return;
-
-        if (plantTiles.ContainsKey(plant))
-        {
-            plantTiles.Remove(plant);
-        }
-    }
-
-    // Get growth speed multiplier for a plant based on its tile
-    public float GetGrowthSpeedMultiplier(PlantGrowth plant)
-    {
-        if (plant == null)
-            return defaultGrowthSpeedMultiplier;
-        
-        // If plant not in dictionary, register it with its current tile
-        if (!plantTiles.ContainsKey(plant))
-        {
-            RegisterNewPlant(plant);
-        }
-        
-        TileDefinition tileDef = plantTiles[plant];
-        if (tileDef == null)
-        {
-            return defaultGrowthSpeedMultiplier;
-        }
-
-        if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
-        {
-            return modifier.growthSpeedMultiplier;
-        }
-
-        return defaultGrowthSpeedMultiplier;
-    }
-
-    // Get energy recharge multiplier for a plant based on its tile
-    public float GetEnergyRechargeMultiplier(PlantGrowth plant)
-    {
-        if (plant == null)
-            return defaultEnergyRechargeMultiplier;
-        
-        // If plant not in dictionary, register it with its current tile
-        if (!plantTiles.ContainsKey(plant))
-        {
-            RegisterNewPlant(plant);
-        }
-        
-        TileDefinition tileDef = plantTiles[plant];
-        if (tileDef == null)
-        {
-            return defaultEnergyRechargeMultiplier;
-        }
-
-        if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
-        {
-            return modifier.energyRechargeMultiplier;
-        }
-
-        return defaultEnergyRechargeMultiplier;
-    }
-    
-    // Helper method to register a new plant with its current tile
-    private void RegisterNewPlant(PlantGrowth plant)
-    {
-        if (plant == null || tileInteractionManager == null)
-            return;
-            
-        Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
-        TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
-        
-        plantTiles[plant] = currentTileDef;
-        
-        if (showDebugMessages)
-        {
-            string tileName = currentTileDef != null ? currentTileDef.displayName : "Unknown Tile";
-            Debug.Log($"Auto-registered plant {plant.name} on tile {tileName}");
-        }
-    }
-
-    // For editor support - rebuild lookup when modifiers change
-    public void OnValidate()
-    {
-        BuildModifierLookup();
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\PlantPlacementManagement.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections.Generic;
-using UnityEngine;
-
-public class PlantPlacementManager : MonoBehaviour
-{
-    public static PlantPlacementManager Instance { get; private set; }
-
-    [Header("References")]
-    [SerializeField] private GameObject plantPrefab;
-    [SerializeField] private NodeEditorGridController nodeEditorGrid;
-    [SerializeField] private Transform plantParent;
-    [SerializeField] private TileInteractionManager tileInteractionManager;
-    [SerializeField] private PlantGrowthModifierManager growthModifierManager;
-
-    [Header("Planting Settings")]
-    [Tooltip("Maximum radius from cell center for random seed placement (in units)")]
-    [SerializeField] private float spawnRadius = 0.25f;
-    
-    [Tooltip("Increment for position randomization (in pixels, for pixel-perfect placement)")]
-    [SerializeField] private float spawnRadiusIncrement = 4f;
-
-    [Header("Tile Restrictions")]
-    [Tooltip("List of tiles that cannot be planted on")]
-    [SerializeField] private List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
-
-    [Header("Debug")]
-    [SerializeField] private bool showDebugMessages = true;
-    
-    // Cache for quick lookup of invalid tiles
-    private HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
-    
-    // Dictionary to track plant positions (using grid cell positions as keys)
-    private Dictionary<Vector3Int, GameObject> plantsByGridPosition = new Dictionary<Vector3Int, GameObject>();
-    
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        
-        // Build the set of invalid tiles for faster lookup
-        RebuildInvalidTilesSet();
-    }
-
-    private void Start()
-    {
-        // Initialize references if not set in inspector
-        if (plantParent == null && EcosystemManager.Instance != null)
-        {
-            plantParent = EcosystemManager.Instance.plantParent;
-        }
-        
-        if (nodeEditorGrid == null)
-        {
-            nodeEditorGrid = NodeEditorGridController.Instance;
-        }
-        
-        if (tileInteractionManager == null)
-        {
-            tileInteractionManager = TileInteractionManager.Instance;
-        }
-        
-        if (growthModifierManager == null)
-        {
-            growthModifierManager = PlantGrowthModifierManager.Instance;
-        }
-    }
-    
-    private void RebuildInvalidTilesSet()
-    {
-        invalidTilesSet.Clear();
-        foreach (var tile in invalidPlantingTiles)
-        {
-            if (tile != null)
-            {
-                invalidTilesSet.Add(tile);
-            }
-        }
-        
-        if (showDebugMessages)
-        {
-            Debug.Log($"PlantPlacementManager: Built invalid tiles set with {invalidTilesSet.Count} entries");
-        }
-    }
-    
-    private void OnValidate()
-    {
-        // Rebuild the set when changed in Inspector
-        RebuildInvalidTilesSet();
-    }
-
-    // Check if a grid position is occupied by a plant
-    public bool IsPositionOccupied(Vector3Int gridPosition)
-    {
-        // If we have a reference, check if it's still valid (not destroyed)
-        if (plantsByGridPosition.TryGetValue(gridPosition, out GameObject plant))
-        {
-            if (plant == null)
-            {
-                // Plant has been destroyed, remove from dictionary
-                plantsByGridPosition.Remove(gridPosition);
-                return false;
-            }
-            return true;
-        }
-        return false;
-    }
-    
-    // Check if a tile is valid for planting
-    public bool IsTileValidForPlanting(TileDefinition tileDef)
-    {
-        // If the tile is null, it's not valid
-        if (tileDef == null)
-            return false;
-            
-        // Check if this tile is in our invalid set
-        return !invalidTilesSet.Contains(tileDef);
-    }
-
-    // Clean up destroyed plants from our dictionary (call periodically if needed)
-    public void CleanupDestroyedPlants()
-    {
-        List<Vector3Int> keysToRemove = new List<Vector3Int>();
-        
-        foreach (var kvp in plantsByGridPosition)
-        {
-            if (kvp.Value == null)
-            {
-                keysToRemove.Add(kvp.Key);
-            }
-        }
-        
-        foreach (var key in keysToRemove)
-        {
-            plantsByGridPosition.Remove(key);
-        }
-        
-        if (showDebugMessages && keysToRemove.Count > 0)
-        {
-            Debug.Log($"PlantPlacementManager: Removed {keysToRemove.Count} destroyed plant references.");
-        }
-    }
-
-    // Try to plant a seed at the given grid position
-    public bool TryPlantSeed(Vector3Int gridPosition, Vector3 worldPosition)
-    {
-        // Clean up any destroyed plants first
-        CleanupDestroyedPlants();
-        
-        // Return false if position is already occupied
-        if (IsPositionOccupied(gridPosition))
-        {
-            if (showDebugMessages)
-            {
-                Debug.Log($"Cannot plant: Position {gridPosition} already has a plant.");
-            }
-            return false;
-        }
-        
-        // Get the tile at this position
-        TileDefinition tileDef = null;
-        if (tileInteractionManager != null)
-        {
-            tileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
-            
-            // Check if the tile is valid for planting
-            if (!IsTileValidForPlanting(tileDef))
-            {
-                if (showDebugMessages)
-                {
-                    string tileName = tileDef != null ? tileDef.displayName : "Unknown";
-                    Debug.Log($"Cannot plant: Tile {tileName} is not valid for planting.");
-                }
-                return false;
-            }
-        }
-
-        // Get the current graph from the NodeEditorGridController
-        if (nodeEditorGrid == null)
-        {
-            nodeEditorGrid = NodeEditorGridController.Instance;
-            if (nodeEditorGrid == null)
-            {
-                Debug.LogError("Cannot plant: NodeEditorGridController not found.");
-                return false;
-            }
-        }
-
-        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
-        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0)
-        {
-            if (showDebugMessages)
-            {
-                Debug.Log("Cannot plant: No nodes in UI graph to spawn.");
-            }
-            return false;
-        }
-        
-        // Validate graph has a seed node
-        bool seedFound = false;
-        foreach (var node in graphToSpawn.nodes)
-        {
-            if (node != null && node.effects != null)
-            {
-                foreach (var effect in node.effects)
-                {
-                    if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
-                    {
-                        seedFound = true;
-                        break;
-                    }
-                }
-            }
-            if (seedFound) break;
-        }
-
-        if (!seedFound)
-        {
-            if (showDebugMessages)
-            {
-                Debug.Log("Cannot plant: Node graph lacks a SeedSpawn effect.");
-            }
-            return false;
-        }
-
-        // Calculate randomized planting position based on our settings
-        Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
-        
-        // Spawn the plant at the randomized position
-        GameObject plantObj = SpawnPlant(graphToSpawn, plantingPosition);
-        if (plantObj != null)
-        {
-            // Track the plant position
-            plantsByGridPosition[gridPosition] = plantObj;
-            
-            // Register the plant with the growth modifier manager
-            if (growthModifierManager != null)
-            {
-                PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
-                if (plantGrowth != null)
-                {
-                    growthModifierManager.RegisterPlantTile(plantGrowth, tileDef);
-                    
-                    if (showDebugMessages)
-                    {
-                        string tileDebugName = tileDef != null ? tileDef.displayName : "Unknown";
-                        Debug.Log($"Plant registered with tile: {tileDebugName}");
-                    }
-                }
-            }
-            
-            return true;
-        }
-        return false;
-    }
-
-    // Spawn a plant using the given node graph at the specified position
-    private GameObject SpawnPlant(NodeGraph graphToSpawn, Vector3 position)
-    {
-        if (plantPrefab == null)
-        {
-            Debug.LogError("Cannot spawn plant: Plant prefab not assigned.");
-            return null;
-        }
-
-        Debug.Log($"SpawnPlant called with position: {position}");
-    
-        // Instantiate the plant prefab
-        GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
-    
-        // Verify the position was actually applied
-        Debug.Log($"Plant instantiated at position: {plantObj.transform.position}");
-
-        // Get the PlantGrowth component
-        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
-        if (growthComponent != null)
-        {
-            // Create a deep copy of the node graph to prevent modifications affecting the original
-            NodeGraph graphCopy = CloneNodeGraph(graphToSpawn);
-
-            // Initialize the plant with the deep copy
-            growthComponent.InitializeAndGrow(graphCopy);
-            return plantObj;
-        }
-        else
-        {
-            Debug.LogError("Plant prefab missing PlantGrowth component! Destroying spawned object.");
-            Destroy(plantObj);
-            return null;
-        }
-    }
-
-    // Create a deep copy of a NodeGraph
-    private NodeGraph CloneNodeGraph(NodeGraph original)
-    {
-        NodeGraph copy = new NodeGraph();
-        copy.nodes = new List<NodeData>();
-
-        foreach (NodeData originalNode in original.nodes)
-        {
-            if (originalNode == null) continue;
-
-            NodeData newNode = new NodeData
-            {
-                nodeId = originalNode.nodeId,
-                nodeDisplayName = originalNode.nodeDisplayName,
-                orderIndex = originalNode.orderIndex,
-                canBeDeleted = originalNode.canBeDeleted
-            };
-
-            // Deep copy effects
-            newNode.effects = CloneEffectsList(originalNode.effects);
-            copy.nodes.Add(newNode);
-        }
-
-        return copy;
-    }
-
-    // Create a deep copy of a list of NodeEffectData
-    private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
-    {
-        if (originalList == null) return new List<NodeEffectData>();
-
-        List<NodeEffectData> newList = new List<NodeEffectData>();
-        foreach (var originalEffect in originalList)
-        {
-            if (originalEffect == null) continue;
-
-            NodeEffectData newEffect = new NodeEffectData
-            {
-                effectType = originalEffect.effectType,
-                primaryValue = originalEffect.primaryValue,
-                secondaryValue = originalEffect.secondaryValue,
-                isPassive = originalEffect.isPassive,
-                scentDefinitionReference = originalEffect.scentDefinitionReference
-            };
-            newList.Add(newEffect);
-        }
-        return newList;
-    }
-    
-    // Generate a randomized position within the given radius, with simple increments
-    // Generate a randomized position within the given radius
-    private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
-    {
-        // First, let's add comprehensive debugging
-        Debug.Log($"Starting position randomization from center: {centerPosition}, radius: {spawnRadius}, increment: {spawnRadiusIncrement}");
-    
-        // Critical check - if radius is too small, just return the center
-        if (spawnRadius < 0.01f)
-        {
-            Debug.LogWarning("Spawn radius too small (<0.01), using center position");
-            return centerPosition;
-        }
-    
-        // Generate a random angle in radians (0 to 2π)
-        float randomAngle = Random.Range(0f, 2f * Mathf.PI);
-        Debug.Log($"Random angle: {randomAngle} radians ({randomAngle * Mathf.Rad2Deg} degrees)");
-    
-        // Convert angle to direction vector
-        Vector2 direction = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle));
-        Debug.Log($"Direction vector: {direction}");
-    
-        // Get a random distance within spawn radius
-        float randomDistance = Random.Range(0.05f, spawnRadius);
-        Debug.Log($"Random distance: {randomDistance}");
-    
-        // Calculate actual offset
-        float offsetX = direction.x * randomDistance;
-        float offsetY = direction.y * randomDistance;
-        Debug.Log($"Raw offset: ({offsetX}, {offsetY})");
-    
-        // Apply increment if needed
-        if (spawnRadiusIncrement > 0.001f)
-        {
-            float originalX = offsetX;
-            float originalY = offsetY;
-        
-            offsetX = Mathf.Round(offsetX / spawnRadiusIncrement) * spawnRadiusIncrement;
-            offsetY = Mathf.Round(offsetY / spawnRadiusIncrement) * spawnRadiusIncrement;
-        
-            Debug.Log($"Snapped offset: ({offsetX}, {offsetY}) from ({originalX}, {originalY})");
-        }
-    
-        // Create the final position
-        Vector3 randomizedPosition = centerPosition + new Vector3(offsetX, offsetY, 0f);
-        Debug.Log($"FINAL randomized position: {randomizedPosition}");
-    
-        return randomizedPosition;
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\PlayerTileInteractor.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-
-[RequireComponent(typeof(ToolSwitcher))]
-public class PlayerTileInteractor : MonoBehaviour
-{
-    private ToolSwitcher toolSwitcher;
-
-    private void Awake()
-    {
-        toolSwitcher = GetComponent<ToolSwitcher>();
-        if (toolSwitcher == null)
-            Debug.LogError("PlayerTileInteractor: No ToolSwitcher found on this GameObject!");
-    }
-
-    private void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (TileInteractionManager.Instance == null)
-            {
-                Debug.LogError("No TileInteractionManager in scene!");
-                return;
-            }
-
-            ToolDefinition currentTool = toolSwitcher.CurrentTool;
-            if (currentTool == null)
-            {
-                Debug.Log("No tool is currently selected.");
-                return;
-            }
-
-            // Attempt to apply the tool
-            TileInteractionManager.Instance.ApplyToolAction(currentTool);
-        }
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\TileDefinition.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
-using UnityEngine.Tilemaps;
-
-[CreateAssetMenu(fileName = "TileDefinition", menuName = "Tiles/Tile Definition")]
-public class TileDefinition : ScriptableObject
-{
-    [Header("Basic Identification")]
-    [Tooltip("Display name for this tile type (used in UI and debugging)")]
-    public string displayName;    // e.g. "Grass", "Dirt", "Wet Dirt"
-    
-    [Header("Visual Properties")]
-    [Tooltip("Optional tint color to apply to the RenderTilemap")]
-    public Color tintColor = Color.white;
-    
-    [Header("Auto-Reversion (optional)")]
-    [Tooltip("If > 0, after this many seconds, the tile reverts to 'revertToTile'.")]
-    public float revertAfterSeconds = 0f;
-
-    [Tooltip("If revertAfterSeconds > 0, tile reverts to this tile definition.")]
-    public TileDefinition revertToTile;
-
-    [Header("Overlay Option")]
-    [Tooltip("If true, this tile will be placed on top without removing the tile underneath ")]
-    public bool keepBottomTile = false;
-    
-    [Header("Special Properties")]
-    [Tooltip("If true, this tile will use water reflection shader")]
-    public bool isWaterTile = false;
-
-#if UNITY_EDITOR
-    // This method will be called from the custom editor
-    public void UpdateColor()
-    {
-        // Find the TileInteractionManager in the scene using the non-deprecated method
-        var manager = UnityEngine.Object.FindAnyObjectByType<TileInteractionManager>();
-        if (manager == null) return;
-
-        foreach (var mapping in manager.tileDefinitionMappings)
-        {
-            if (mapping.tileDef == this && mapping.tilemapModule != null)
-            {
-                Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-                if (renderTilemapTransform != null)
-                {
-                    Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
-                    if (renderTilemap != null)
-                    {
-                        renderTilemap.color = tintColor;
-                        UnityEditor.EditorUtility.SetDirty(renderTilemap);
-                    }
-                }
-            }
-        }
-    }
-#endif
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\TileInteractionLibrary.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Tiles/Data/TileInteractionLibrary.cs
-using System.Collections.Generic;
-using UnityEngine;
-using System; // Needed for [Serializable]
-
-// --- NEW: Define the structure for a refill rule ---
-[Serializable] // Make it visible in the Inspector
-public class ToolRefillRule
-{
-    [Tooltip("The tool that can be refilled.")]
-    public ToolDefinition toolToRefill;
-
-    [Tooltip("The tile that must be interacted with to trigger the refill.")]
-    public TileDefinition refillSourceTile;
-}
-// ----------------------------------------------------
-
-[CreateAssetMenu(fileName = "TileInteractionLibrary", menuName = "Tiles/Tile Interaction Library")]
-public class TileInteractionLibrary : ScriptableObject
-{
-    [Header("Standard Tile Transformations")]
-    [Tooltip("List of rules: (Tool, fromTile) => toTile.")]
-    public List<TileInteractionRule> rules; // Existing transformation rules
-
-    [Header("Tool Refill Rules")] // <<< NEW HEADER
-    [Tooltip("List of rules defining how tools are refilled.")]
-    public List<ToolRefillRule> refillRules; // <<< NEW LIST FOR REFILLS
-}
-
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Data\TileInteractionManager.cs
@@ -1565,29 +774,28 @@ public class TileInteractionManager : MonoBehaviour
         if (!plantManager.IsTileValidForPlanting(tileDef))
         {
             if (debugLogs) Debug.Log($"Cannot plant on {tileDef?.displayName ?? "Unknown"} - invalid tile.");
-            // Maybe add player feedback here (sound/visual)
             return;
         }
 
         GardenerController gardener = player?.GetComponent<GardenerController>();
         if (gardener == null) { Debug.LogError("Cannot plant: GardenerController not found on player!"); return; }
 
-        Vector3 worldPosition = CellCenterWorld(cellPosition); // Plant near cell center
-
+        Vector3 worldPosition = CellCenterWorld(cellPosition);
+    
         gardener.Plant(); // Trigger animation
-        StartCoroutine(PlantAfterAnimation(gardener, plantManager, cellPosition, worldPosition));
+        StartCoroutine(PlantAfterAnimationWithSeeds(gardener, plantManager, cellPosition, worldPosition));
     }
 
-    private IEnumerator PlantAfterAnimation(GardenerController gardener, PlantPlacementManager plantManager, Vector3Int cellPosition, Vector3 worldPosition)
+    private IEnumerator PlantAfterAnimationWithSeeds(GardenerController gardener, PlantPlacementManager plantManager, Vector3Int cellPosition, Vector3 worldPosition)
     {
-        // Ensure gardener and duration are valid
         float waitTime = (gardener != null) ? gardener.plantingDuration : 0.1f;
         yield return new WaitForSeconds(waitTime);
 
-        if (plantManager != null) // Check again in case it was destroyed
+        if (plantManager != null)
         {
-            bool planted = plantManager.TryPlantSeed(cellPosition, worldPosition);
-            if (debugLogs) Debug.Log(planted ? $"Planted seed successfully at {cellPosition}" : $"Failed to plant seed at {cellPosition}");
+            // Use new seed-based planting system
+            plantManager.TryPlantWithSeedSelection(cellPosition, worldPosition);
+            if (debugLogs) Debug.Log($"Attempted seed planting at {cellPosition}");
         }
     }
 
@@ -1821,7 +1029,632 @@ public class ToolDefinition : ScriptableObject
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Tools\ToolSwitcher.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Tiles/Tools/ToolSwitcher.cs
+using UnityEngine;
+using System;
+
+public class ToolSwitcher : MonoBehaviour
+{
+    [Tooltip("All available tool definitions, e.g. Hoe, WateringCan, etc.")]
+    public ToolDefinition[] toolDefinitions;
+
+    private int currentIndex = 0;
+
+    // --- Public Properties ---
+    public ToolDefinition CurrentTool { get; private set; } = null;
+    /// <summary>
+    /// Gets the remaining uses for the current tool. Returns -1 if the tool has unlimited uses.
+    /// </summary>
+    public int CurrentRemainingUses { get; private set; } = -1; // <<< NEW: Track remaining uses (-1 for unlimited)
+
+    // --- Events ---
+    public event Action<ToolDefinition> OnToolChanged;
+    /// <summary>
+    /// Event fired when the remaining uses of the current tool changes. Passes the new remaining count (-1 for unlimited).
+    /// </summary>
+    public event Action<int> OnUsesChanged; // <<< NEW EVENT for UI updates
+
+    private void Awake()
+    {
+        // Debug logs from previous step can be kept or removed
+        // Debug.Log("[ToolSwitcher Awake] Initializing...");
+    }
+
+    private void Start()
+    {
+        InitializeToolState(true); // Initialize and fire events
+    }
+
+    private void Update()
+    {
+        if (toolDefinitions == null || toolDefinitions.Length == 0) return;
+
+        bool toolChanged = false;
+        int previousIndex = currentIndex;
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            currentIndex--;
+            if (currentIndex < 0)
+                currentIndex = toolDefinitions.Length - 1;
+            toolChanged = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            currentIndex++;
+            if (currentIndex >= toolDefinitions.Length)
+                currentIndex = 0;
+            toolChanged = true;
+        }
+
+        if (toolChanged)
+        {
+            // Ensure the new index points to a valid definition before updating state
+            if (currentIndex >= 0 && currentIndex < toolDefinitions.Length && toolDefinitions[currentIndex] != null)
+            {
+                InitializeToolState(false); // Update state for the new tool and fire events
+            }
+            else
+            {
+                 Debug.LogError($"[ToolSwitcher Update] Attempted to switch to an invalid/NULL tool definition at index {currentIndex}. Reverting.");
+                 currentIndex = previousIndex; // Revert to the last valid index
+                 // No state change, no events needed here
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sets the CurrentTool and resets CurrentRemainingUses based on the tool's definition.
+    /// Optionally fires OnToolChanged and OnUsesChanged events.
+    /// </summary>
+    /// <param name="isInitialSetup">If true, forces event firing even if tool doesn't technically change.</param>
+    private void InitializeToolState(bool isInitialSetup)
+    {
+        ToolDefinition previousTool = CurrentTool; // Store previous tool for change check
+        int previousUses = CurrentRemainingUses; // Store previous uses
+
+        if (toolDefinitions == null || toolDefinitions.Length == 0 || currentIndex < 0 || currentIndex >= toolDefinitions.Length || toolDefinitions[currentIndex] == null)
+        {
+            // Handle cases with no tools or invalid selection
+            CurrentTool = null;
+            CurrentRemainingUses = -1; // No tool = unlimited uses conceptually
+        }
+        else
+        {
+            // Valid tool selected
+            CurrentTool = toolDefinitions[currentIndex];
+            if (CurrentTool.limitedUses)
+            {
+                CurrentRemainingUses = CurrentTool.initialUses;
+            }
+            else
+            {
+                CurrentRemainingUses = -1; // Mark as unlimited
+            }
+        }
+        
+        
+
+        LogToolChange("[ToolSwitcher InitializeToolState]"); // Log the state after update
+
+        // Fire events if state actually changed or if it's the initial setup
+        bool toolActuallyChanged = previousTool != CurrentTool;
+        bool usesActuallyChanged = previousUses != CurrentRemainingUses;
+
+        if (isInitialSetup || toolActuallyChanged)
+        {
+             Debug.Log($"[ToolSwitcher InitializeToolState] Firing OnToolChanged for tool: {CurrentTool?.displayName ?? "NULL"}");
+             OnToolChanged?.Invoke(CurrentTool);
+        }
+        if (isInitialSetup || usesActuallyChanged || toolActuallyChanged) // Fire uses changed if tool changed too (to reset UI)
+        {
+             Debug.Log($"[ToolSwitcher InitializeToolState] Firing OnUsesChanged with value: {CurrentRemainingUses}");
+             OnUsesChanged?.Invoke(CurrentRemainingUses);
+        }
+    }
+
+
+    /// <summary>
+    /// Refills the current tool to its maximum capacity if it's a limited-use tool.
+    /// </summary>
+    public void RefillCurrentTool() // <<< NEW METHOD
+    {
+        if (CurrentTool == null)
+        {
+            Debug.LogWarning("[ToolSwitcher RefillCurrentTool] Cannot refill: No tool selected.");
+            return;
+        }
+
+        if (!CurrentTool.limitedUses)
+        {
+            Debug.LogWarning($"[ToolSwitcher RefillCurrentTool] Cannot refill tool '{CurrentTool.displayName}': It has unlimited uses.");
+            return;
+        }
+
+        // Check if already full to avoid unnecessary event firing
+        if (CurrentRemainingUses == CurrentTool.initialUses)
+        {
+            if(Debug.isDebugBuild) Debug.Log($"[ToolSwitcher RefillCurrentTool] Tool '{CurrentTool.displayName}' is already full ({CurrentRemainingUses} uses).");
+            return;
+        }
+
+        // Set uses back to initial amount
+        int previousUses = CurrentRemainingUses;
+        CurrentRemainingUses = CurrentTool.initialUses;
+
+        Debug.Log($"[ToolSwitcher RefillCurrentTool] Refilled tool '{CurrentTool.displayName}' to {CurrentRemainingUses} uses (was {previousUses}).");
+
+        // Notify listeners that uses changed
+        OnUsesChanged?.Invoke(CurrentRemainingUses);
+    }
+    
+    /// <summary>
+    /// Attempts to consume one use of the current tool.
+    /// </summary>
+    /// <returns>True if a use was consumed or if the tool has unlimited uses. False if the tool has limited uses and is out of uses.</returns>
+    public bool TryConsumeUse()
+    {
+        if (CurrentTool == null)
+        {
+            Debug.LogWarning("[ToolSwitcher TryConsumeUse] Cannot consume use: No tool selected.");
+            return false; // Cannot use a non-existent tool
+        }
+
+        if (!CurrentTool.limitedUses || CurrentRemainingUses == -1)
+        {
+            // Tool is unlimited, consumption always succeeds
+            // Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' has unlimited uses."); // Optional log
+            return true;
+        }
+
+        // Tool has limited uses
+        if (CurrentRemainingUses > 0)
+        {
+            CurrentRemainingUses--;
+            Debug.Log($"[ToolSwitcher TryConsumeUse] Consumed use for '{CurrentTool.displayName}'. Remaining: {CurrentRemainingUses}");
+            OnUsesChanged?.Invoke(CurrentRemainingUses); // Notify listeners
+            return true;
+        }
+        else
+        {
+            // Out of uses
+            Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' is out of uses (0 remaining).");
+            // Optionally play an 'empty click' sound here
+            return false;
+        }
+    }
+
+    // Added prefix parameter for context
+    private void LogToolChange(string prefix = "[ToolSwitcher]")
+    {
+        string toolName = (CurrentTool != null && !string.IsNullOrEmpty(CurrentTool.displayName))
+                          ? CurrentTool.displayName
+                          : "(none)";
+        string usesSuffix = "";
+        if (CurrentTool != null && CurrentTool.limitedUses && CurrentRemainingUses >= 0)
+        {
+            usesSuffix = $" ({CurrentRemainingUses}/{CurrentTool.initialUses})";
+        }
+        else if (CurrentTool != null && !CurrentTool.limitedUses)
+        {
+            // usesSuffix = " (Unlimited)"; // Optional: Indicate unlimited
+        }
+
+        Debug.Log($"{prefix} Switched tool to: {toolName}{usesSuffix} (Index: {currentIndex})");
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Tools\ToolType.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public enum ToolType
+{
+    None,
+    Hoe,
+    WateringCan,
+    SeedPouch // New tool type
+    // etc.
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\NightColorPostProcess.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+
+// Ensure this script is attached to a GameObject in your scene
+public class NightColorPostProcess : MonoBehaviour
+{
+    [Header("Core References")]
+    [Tooltip("Assign the WeatherManager controlling the day/night cycle.")]
+    public WeatherManager weatherManager;
+    [Tooltip("Assign the Global Post Processing Volume.")]
+    public Volume globalVolume;
+
+    // --- Private references to the Volume Overrides ---
+    private ColorAdjustments colorAdjustments;
+    private FilmGrain filmGrain;
+    private Vignette vignette;
+    // private Bloom bloom; // Example if you wanted to add Bloom later
+
+    [Header("Color Adjustments")]
+    [Tooltip("The color filter at full day (sunIntensity = 1).")]
+    public Color dayColorFilter = Color.white;
+    [Tooltip("The color filter at full night (sunIntensity ~ 0).")]
+    public Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
+    [Tooltip("Daytime Post-Exposure (Higher = brighter).")]
+    public float dayPostExposure = 0f;
+    [Tooltip("Nighttime Post-Exposure (Lower = darker).")]
+    public float nightPostExposure = -0.5f;
+    [Tooltip("Saturation at full day (0 = no change, <0 desaturates, >0 saturates).")]
+    public float daySaturation = 0f;
+    [Tooltip("Saturation at full night (e.g., -50 for more desaturation).")]
+    public float nightSaturation = -50f;
+
+    [Header("Film Grain")]
+    [Tooltip("Film grain intensity at full day (0 = none).")]
+    [Range(0f, 1f)] public float dayFilmGrainIntensity = 0.1f;
+    [Tooltip("Film grain intensity at full night (e.g., 0.5 for noticeable grain).")]
+    [Range(0f, 1f)] public float nightFilmGrainIntensity = 0.5f;
+    // Note: You could also control FilmGrain.response if desired
+
+    [Header("Vignette")]
+    [Tooltip("Vignette intensity at full day (0 = none, higher = stronger effect).")]
+    [Range(0f, 1f)] public float dayVignetteIntensity = 0.2f;
+    [Tooltip("Vignette intensity at full night (e.g., 0.5 for darker edges).")]
+    [Range(0f, 1f)] public float nightVignetteIntensity = 0.5f;
+    [Tooltip("Vignette smoothness at full day (higher = softer edge).")]
+    [Range(0.01f, 1f)] public float dayVignetteSmoothness = 0.2f;
+    [Tooltip("Vignette smoothness at full night.")]
+    [Range(0.01f, 1f)] public float nightVignetteSmoothness = 0.3f;
+    // Note: You could also control Vignette.color or Vignette.rounded if desired
+
+
+    private void Start()
+    {
+        // --- Validate Core References ---
+        if (!weatherManager)
+        {
+            Debug.LogError($"[{nameof(NightColorPostProcess)}] WeatherManager not assigned!", this);
+            enabled = false; // Disable script if core references are missing
+            return;
+        }
+        if (!globalVolume)
+        {
+            Debug.LogError($"[{nameof(NightColorPostProcess)}] Global Volume not assigned!", this);
+            enabled = false;
+            return;
+        }
+        if (globalVolume.profile == null)
+        {
+             Debug.LogError($"[{nameof(NightColorPostProcess)}] Global Volume has no profile assigned!", this);
+             enabled = false;
+             return;
+        }
+
+        // --- Attempt to Get Volume Overrides ---
+        // It's okay if some aren't found, the Update loop will check for null
+        if (!globalVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments))
+        {
+            Debug.LogWarning($"[{nameof(NightColorPostProcess)}] ColorAdjustments override not found in Volume profile.", this);
+        }
+        if (!globalVolume.profile.TryGet<FilmGrain>(out filmGrain))
+        {
+             Debug.LogWarning($"[{nameof(NightColorPostProcess)}] FilmGrain override not found in Volume profile.", this);
+        }
+        if (!globalVolume.profile.TryGet<Vignette>(out vignette))
+        {
+             Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Vignette override not found in Volume profile.", this);
+        }
+        // Example for Bloom:
+        // if (!globalVolume.profile.TryGet<Bloom>(out bloom))
+        // {
+        //      Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Bloom override not found in Volume profile.", this);
+        // }
+
+        // --- Ensure Overrides are Active ---
+        // Make sure the overrides you intend to use are actually enabled on the Volume component itself.
+        // You might need to manually check the boxes in the Inspector for ColorAdjustments, FilmGrain, and Vignette.
+        // Alternatively, you could force them active here, but it's usually better to configure in the editor:
+        // if (colorAdjustments != null) colorAdjustments.active = true;
+        // if (filmGrain != null) filmGrain.active = true;
+        // if (vignette != null) vignette.active = true;
+    }
+
+    private void Update()
+    {
+        // No need to check weatherManager, Start() already disables if null
+        // Check if any overrides are available before proceeding
+        if (colorAdjustments == null && filmGrain == null && vignette == null)
+            return; // Nothing to update if no overrides were found
+
+        // Get the sun intensity (0 = night, 1 = day) and calculate interpolation factor t
+        float sun = Mathf.Clamp01(weatherManager.sunIntensity);
+        float t = 1f - sun;  // t=0 at day, t=1 at night
+
+        // --- Interpolate and Apply Color Adjustments ---
+        if (colorAdjustments != null)
+        {
+            colorAdjustments.colorFilter.value = Color.Lerp(dayColorFilter, nightColorFilter, t);
+            colorAdjustments.postExposure.value = Mathf.Lerp(dayPostExposure, nightPostExposure, t);
+            colorAdjustments.saturation.value = Mathf.Lerp(daySaturation, nightSaturation, t);
+        }
+
+        // --- Interpolate and Apply Film Grain ---
+        if (filmGrain != null)
+        {
+            filmGrain.intensity.value = Mathf.Lerp(dayFilmGrainIntensity, nightFilmGrainIntensity, t);
+            // You can add Lerp for filmGrain.response here if needed
+        }
+
+        // --- Interpolate and Apply Vignette ---
+        if (vignette != null)
+        {
+            vignette.intensity.value = Mathf.Lerp(dayVignetteIntensity, nightVignetteIntensity, t);
+            vignette.smoothness.value = Mathf.Lerp(dayVignetteSmoothness, nightVignetteSmoothness, t);
+             // You can add Lerp for vignette.color or vignette.rounded here if needed
+        }
+
+        // --- Example for Bloom ---
+        // if (bloom != null)
+        // {
+        //     bloom.intensity.value = Mathf.Lerp(dayBloomIntensity, nightBloomIntensity, t);
+        // }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\OutlinePartController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/OutlinePartController.cs
+using UnityEngine;
+
+[RequireComponent(typeof(SpriteRenderer))]
+public class OutlinePartController : MonoBehaviour
+{
+    private SpriteRenderer outlineRenderer;
+    private SpriteRenderer sourcePlantPartRenderer; // The plant part this outline mimics
+
+    [HideInInspector] public Vector2Int gridCoord; // The coordinate *this outline* lives at
+
+    void Awake()
+    {
+        outlineRenderer = GetComponent<SpriteRenderer>();
+        if (outlineRenderer != null)
+        {
+            outlineRenderer.drawMode = SpriteDrawMode.Simple;
+            outlineRenderer.enabled = false;
+        }
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] OutlinePartController is missing SpriteRenderer component!", this);
+        }
+    }
+
+    public void Initialize(SpriteRenderer sourceRenderer, Vector2Int myCoord, PlantOutlineController controller)
+    {
+        if (sourceRenderer == null || controller == null) 
+        { 
+            Debug.LogError($"[{gameObject.name}] Initialization failed! Source renderer or controller is null!", this);
+            Destroy(gameObject); 
+            return; 
+        }
+        
+        sourcePlantPartRenderer = sourceRenderer; // Store initial source
+        gridCoord = myCoord;
+        
+        if (outlineRenderer == null)
+        {
+            outlineRenderer = GetComponent<SpriteRenderer>();
+            if (outlineRenderer == null)
+            {
+                Debug.LogError($"[{gameObject.name}] Initialize: Cannot find SpriteRenderer component!", this);
+                Destroy(gameObject);
+                return;
+            }
+        }
+        
+        // Set layer & color properties
+        outlineRenderer.sortingLayerID = controller.OutlineSortingLayer;
+        outlineRenderer.sortingOrder = controller.OutlineSortingOrder;
+        outlineRenderer.color = controller.OutlineColor;
+        
+        // Set parent & position
+        transform.SetParent(controller.transform, true); // Parent to controller's transform
+        
+        // Set initial position based on grid coordinate (controller handles spacing)
+        float spacing = controller.GetComponentInParent<PlantGrowth>()?.GetCellSpacing() ?? 0.08f; // Get spacing
+        transform.localPosition = (Vector2)myCoord * spacing;
+
+        // Set visibility based on source renderer's state
+        outlineRenderer.enabled = IsSourceRendererValid() && 
+                                  sourcePlantPartRenderer.enabled && 
+                                  sourcePlantPartRenderer.sprite != null;
+        
+        SyncSpriteAndTransform(); // Initial sync
+    }
+
+    void LateUpdate()
+    {
+        // Skip update if not visible
+        if (outlineRenderer == null || !outlineRenderer.enabled) return;
+
+        // Check if source is still valid
+        if (!IsSourceRendererValid())
+        {
+            SetVisibility(false);
+            return;
+        }
+        
+        // Check if source is still enabled and has a sprite
+        if (!sourcePlantPartRenderer.enabled || sourcePlantPartRenderer.sprite == null)
+        {
+            SetVisibility(false);
+            return;
+        }
+
+        // If we are enabled and source is valid, sync visuals
+        SyncSpriteAndTransform();
+    }
+
+    // Public method to check if the source renderer still exists
+    public bool IsSourceRendererValid()
+    {
+        // Unity overloads null check for destroyed objects
+        if (sourcePlantPartRenderer == null)
+            return false;
+            
+        // Additional check: is the gameObject actually active/valid
+        if (!sourcePlantPartRenderer.gameObject.activeInHierarchy)
+            return false;
+            
+        return true;
+    }
+
+    // Public method to update the source renderer if the original was destroyed
+    public void UpdateSourceRenderer(SpriteRenderer newSource)
+    {
+        if (newSource != null)
+        {
+            sourcePlantPartRenderer = newSource;
+            
+            // Ensure visibility state is correct after source update
+            SetVisibility(
+                outlineRenderer != null && 
+                sourcePlantPartRenderer.enabled && 
+                sourcePlantPartRenderer.sprite != null
+            );
+            
+            // Immediately sync sprite/transform after updating source
+            SyncSpriteAndTransform();
+            
+            // Debug.Log($"Updated outline at {gridCoord} with new source renderer: {newSource.gameObject.name}");
+        } 
+        else 
+        {
+            Debug.LogWarning($"Attempted to update source renderer for outline at {gridCoord} with null.", gameObject);
+            // If no valid new source, hide this outline
+            SetVisibility(false);
+        }
+    }
+
+    // Sync sprite and transform data
+    public void SyncSpriteAndTransform()
+    {
+        // Safety checks
+        if (!IsSourceRendererValid() || outlineRenderer == null) 
+            return;
+
+        // Sync sprite
+        if (outlineRenderer.sprite != sourcePlantPartRenderer.sprite)
+        {
+            outlineRenderer.sprite = sourcePlantPartRenderer.sprite;
+        }
+        
+        // Sync other visual properties
+        transform.localScale = sourcePlantPartRenderer.transform.localScale;
+        outlineRenderer.flipX = sourcePlantPartRenderer.flipX;
+        outlineRenderer.flipY = sourcePlantPartRenderer.flipY;
+        
+        // Note: Position is set in Initialize and doesn't need to track source renderer's parent offset
+    }
+
+    public void SetVisibility(bool isVisible)
+    {
+        if (outlineRenderer != null && outlineRenderer.enabled != isVisible)
+        {
+            outlineRenderer.enabled = isVisible;
+        }
+    }
+
+    public void DestroyOutlinePart()
+    {
+        if (this != null && gameObject != null)
+        {
+            if (Application.isPlaying)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                DestroyImmediate(gameObject);
+            }
+        }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\PixelPerfectSetup.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Core/PixelPerfectSetup.cs
+using UnityEngine;
+using UnityEngine.U2D;
+
+[RequireComponent(typeof(Camera))]
+[RequireComponent(typeof(PixelPerfectCamera))]
+public class PixelPerfectSetup : MonoBehaviour
+{
+    [Header("Game Resolution")]
+    [SerializeField] private int referenceResolutionX = 320; // Your base game width
+    [SerializeField] private int referenceResolutionY = 180; // Your base game height
+    
+    [Header("Pixel Settings")]
+    [SerializeField] private int pixelsPerUnit = 6; // Since 1 game pixel = 6x6 real pixels
+    
+    private PixelPerfectCamera pixelPerfectCamera;
+    private Camera cam;
+    
+    void Awake()
+    {
+        cam = GetComponent<Camera>();
+        pixelPerfectCamera = GetComponent<PixelPerfectCamera>();
+        
+        SetupPixelPerfectCamera();
+    }
+    
+    void SetupPixelPerfectCamera()
+    {
+        // Configure Pixel Perfect Camera
+        pixelPerfectCamera.assetsPPU = pixelsPerUnit;
+        pixelPerfectCamera.refResolutionX = referenceResolutionX;
+        pixelPerfectCamera.refResolutionY = referenceResolutionY;
+        pixelPerfectCamera.upscaleRT = true;
+        pixelPerfectCamera.pixelSnapping = true;
+        pixelPerfectCamera.cropFrameX = false;
+        pixelPerfectCamera.cropFrameY = false;
+        pixelPerfectCamera.stretchFill = false;
+        
+        Debug.Log($"[PixelPerfectSetup] Configured for {referenceResolutionX}x{referenceResolutionY} at {pixelsPerUnit} PPU");
+    }
+    
+    void Start()
+    {
+        // Verify the setup
+        float expectedCameraSize = (float)referenceResolutionY / (2f * pixelsPerUnit);
+        Debug.Log($"[PixelPerfectSetup] Expected camera orthographic size: {expectedCameraSize}");
+    }
+}
+
+
+
+
 
 --------------------------------------------------------------------------------
-This is part 6 out of 8 of script collection. 2 more parts remain.
+This is part 8 out of 9 of script collection. 1 more parts remain.
 --------------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-26 22:28:12
-PART 5 OF 8
+UNITY PROJECT SCRIPT EXPORT - 2025-05-28 18:59:47
+PART 6 OF 9
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -67,11 +67,17 @@ Assets
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
+│   │       ├── Panels
+│   │       │   ├── Panel_GeneListItem.prefab
+│   │       │   ├── Panel_GeneSequenceItem.prefab
+│   │       │   ├── Panel_SeedListItem.prefab
+│   │       │   └── Panel_SeedSelectionButton.prefab
 │   │       ├── ThoughtBubble.prefab
 │   │       ├── Visualizer_Circle_Prefab.prefab
 │   │       └── Visualizer_Line_Prefab.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
+│   │   ├── PLANTOTRON_Machine.prefab
 │   │   └── Projectile_Basic_Pixel.prefab
 │   └── Tiles
 │       ├── Common
@@ -110,6 +116,8 @@ Assets
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
+│   ├── Seeds
+│   │   └── SeedDefinition_000_Base.asset
 │   ├── Tiles
 │   │   ├── TileDefinition_000_Grass.asset
 │   │   ├── TileDefinition_001_Dirt.asset
@@ -180,6 +188,17 @@ Assets
 │   │   ├── Runtime
 │   │   │   ├── NodeExecutor.cs
 │   │   │   └── NodeGraph.cs
+│   │   ├── Seeds
+│   │   │   ├── PlantotronGeneItem.cs
+│   │   │   ├── PlantotronGeneSequenceItem.cs
+│   │   │   ├── PlantotronMachine.cs
+│   │   │   ├── PlantotronSeedItem.cs
+│   │   │   ├── PlantotronUI.cs
+│   │   │   ├── PlayerGeneticsInventory.cs
+│   │   │   ├── SeedDefinition.cs
+│   │   │   ├── SeedInstance.cs
+│   │   │   ├── SeedSelectionButton.cs
+│   │   │   └── SeedSelectionUI.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
 │   │       ├── DeselectOnClickOutside.cs
@@ -194,7 +213,7 @@ Assets
 │   ├── Tiles
 │   │   ├── Data
 │   │   │   ├── PlantGrowthModifierManager.cs
-│   │   │   ├── PlantPlacementManagement.cs
+│   │   │   ├── PlantPlacementManager.cs
 │   │   │   ├── PlayerTileInteractor.cs
 │   │   │   ├── TileDefinition.cs
 │   │   │   ├── TileInteractionLibrary.cs
@@ -211,11 +230,13 @@ Assets
 │   └── Visuals
 │       ├── NightColorPostProcess.cs
 │       ├── OutlinePartController.cs
+│       ├── PixelPerfectSetup.cs
 │       ├── PlantOutlineController.cs
 │       ├── PlantShadowController.cs
 │       ├── RuntimeCircleDrawer.cs
 │       ├── ShadowPartController.cs
-│       └── WaterReflection.cs
+│       ├── WaterReflection.cs
+│       └── WaterReflectionManager.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -241,6 +262,612 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Seeds\SeedInstance.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Genetics/SeedInstance.cs
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+
+[System.Serializable]
+public class SeedInstance
+{
+    [Header("Seed Identity")]
+    public string seedName;
+    public string seedId; // Unique identifier for this specific seed instance
+    
+    [Header("Genetic Data")]
+    public SeedDefinition baseSeedDefinition;
+    public List<NodeDefinition> currentGenes = new List<NodeDefinition>();
+    
+    [Header("Metadata")]
+    public bool isModified = false;
+    public DateTime creationTime;
+    
+    // Default constructor
+    public SeedInstance()
+    {
+        seedId = Guid.NewGuid().ToString();
+        creationTime = DateTime.Now;
+    }
+    
+    // Constructor from SeedDefinition
+    public SeedInstance(SeedDefinition seedDef)
+    {
+        if (seedDef == null)
+        {
+            Debug.LogError("Cannot create SeedInstance from null SeedDefinition!");
+            return;
+        }
+        
+        seedId = Guid.NewGuid().ToString();
+        creationTime = DateTime.Now;
+        baseSeedDefinition = seedDef;
+        seedName = seedDef.seedName;
+        currentGenes = seedDef.CloneInitialGenes();
+        isModified = false;
+    }
+    
+    /// <summary>
+    /// Copy constructor for creating duplicates
+    /// </summary>
+    public SeedInstance(SeedInstance original)
+    {
+        if (original == null)
+        {
+            Debug.LogError("Cannot create SeedInstance from null original!");
+            return;
+        }
+        
+        seedId = Guid.NewGuid().ToString(); // Always generate new ID
+        creationTime = DateTime.Now;
+        baseSeedDefinition = original.baseSeedDefinition;
+        seedName = original.seedName;
+        isModified = original.isModified;
+        
+        // Deep copy the genes list
+        currentGenes = new List<NodeDefinition>();
+        if (original.currentGenes != null)
+        {
+            foreach (var gene in original.currentGenes)
+            {
+                if (gene != null)
+                {
+                    currentGenes.Add(gene);
+                }
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Checks if current genes match the original seed definition
+    /// </summary>
+    public bool GenesMatchOriginal()
+    {
+        if (baseSeedDefinition == null || baseSeedDefinition.initialGenes == null)
+            return false;
+            
+        if (currentGenes == null)
+            return baseSeedDefinition.initialGenes.Count == 0;
+            
+        if (currentGenes.Count != baseSeedDefinition.initialGenes.Count)
+            return false;
+            
+        for (int i = 0; i < currentGenes.Count; i++)
+        {
+            if (currentGenes[i] != baseSeedDefinition.initialGenes[i])
+                return false;
+        }
+        
+        return true;
+    }
+    
+    /// <summary>
+    /// Updates the modified flag based on current gene state
+    /// </summary>
+    public void UpdateModifiedStatus()
+    {
+        isModified = !GenesMatchOriginal();
+        
+        // Update seed name to reflect modification
+        if (baseSeedDefinition != null)
+        {
+            if (isModified && !seedName.Contains("(Modified)"))
+            {
+                seedName = baseSeedDefinition.seedName + " (Modified)";
+            }
+            else if (!isModified && seedName.Contains("(Modified)"))
+            {
+                seedName = baseSeedDefinition.seedName;
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Adds a gene to the seed at the specified index
+    /// </summary>
+    public void AddGene(NodeDefinition gene, int index = -1)
+    {
+        if (gene == null) return;
+        
+        if (currentGenes == null)
+            currentGenes = new List<NodeDefinition>();
+            
+        if (index < 0 || index >= currentGenes.Count)
+        {
+            currentGenes.Add(gene);
+        }
+        else
+        {
+            currentGenes.Insert(index, gene);
+        }
+        
+        UpdateModifiedStatus();
+    }
+    
+    /// <summary>
+    /// Removes a gene from the seed at the specified index
+    /// </summary>
+    public bool RemoveGeneAt(int index)
+    {
+        if (currentGenes == null || index < 0 || index >= currentGenes.Count)
+            return false;
+            
+        currentGenes.RemoveAt(index);
+        UpdateModifiedStatus();
+        return true;
+    }
+    
+    /// <summary>
+    /// Moves a gene from one position to another
+    /// </summary>
+    public bool MoveGene(int fromIndex, int toIndex)
+    {
+        if (currentGenes == null || fromIndex < 0 || fromIndex >= currentGenes.Count || 
+            toIndex < 0 || toIndex >= currentGenes.Count || fromIndex == toIndex)
+            return false;
+            
+        NodeDefinition gene = currentGenes[fromIndex];
+        currentGenes.RemoveAt(fromIndex);
+        currentGenes.Insert(toIndex, gene);
+        UpdateModifiedStatus();
+        return true;
+    }
+    
+    /// <summary>
+    /// Converts this seed instance to a NodeGraph for planting
+    /// </summary>
+    public NodeGraph ToNodeGraph()
+    {
+        NodeGraph graph = new NodeGraph();
+        
+        if (currentGenes == null || currentGenes.Count == 0)
+        {
+            Debug.LogWarning($"SeedInstance '{seedName}' has no genes to convert to NodeGraph!");
+            return graph;
+        }
+        
+        // Convert each gene to NodeData
+        for (int i = 0; i < currentGenes.Count; i++)
+        {
+            NodeDefinition gene = currentGenes[i];
+            if (gene == null) continue;
+            
+            NodeData nodeData = new NodeData
+            {
+                nodeId = Guid.NewGuid().ToString(),
+                nodeDisplayName = gene.displayName,
+                orderIndex = i, // Top-to-bottom becomes order index
+                effects = gene.CloneEffects(),
+                canBeDeleted = true // Allow deletion in UI if needed
+            };
+            
+            graph.nodes.Add(nodeData);
+        }
+        
+        return graph;
+    }
+    
+    /// <summary>
+    /// Validates that this seed has the minimum requirements to grow
+    /// </summary>
+    public bool IsValidForPlanting()
+    {
+        if (currentGenes == null || currentGenes.Count == 0)
+            return false;
+            
+        // Check for required SeedSpawn effect
+        foreach (var gene in currentGenes)
+        {
+            if (gene != null && gene.effects != null)
+            {
+                foreach (var effect in gene.effects)
+                {
+                    if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
+    }
+    
+    /// <summary>
+    /// Gets a summary description of this seed's genetic composition
+    /// </summary>
+    public string GetGeneticSummary()
+    {
+        if (currentGenes == null || currentGenes.Count == 0)
+            return "No genes present.";
+            
+        List<string> geneNames = new List<string>();
+        foreach (var gene in currentGenes)
+        {
+            if (gene != null && !string.IsNullOrEmpty(gene.displayName))
+            {
+                geneNames.Add(gene.displayName);
+            }
+        }
+        
+        if (geneNames.Count == 0)
+            return "No valid genes present.";
+            
+        return string.Join(" → ", geneNames);
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Seeds\SeedSelectionButton.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System.Linq;
+
+// =====================================================================
+// Seed Selection Button Component
+// =====================================================================
+public class SeedSelectionButton : MonoBehaviour
+{
+    [Header("UI References")]
+    public TMP_Text seedNameText;
+    public TMP_Text seedInfoText;
+    public Image seedIcon;
+    public Button selectButton;
+    public Image backgroundImage;
+    
+    [Header("Visual Settings")]
+    public Color normalColor = Color.white;
+    public Color hoverColor = Color.yellow;
+    public Color modifiedColor = Color.cyan;
+    public Color vanillaColor = Color.green;
+    
+    private SeedInstance seed;
+    private SeedSelectionUI parentUI;
+    
+    public void Initialize(SeedInstance seedInstance, SeedSelectionUI ui)
+    {
+        seed = seedInstance;
+        parentUI = ui;
+        
+        if (seed == null || parentUI == null)
+        {
+            Debug.LogError("[SeedSelectionButton] Invalid initialization parameters!");
+            return;
+        }
+        
+        // Setup UI elements
+        if (seedNameText != null)
+            seedNameText.text = seed.seedName;
+            
+        if (seedInfoText != null)
+        {
+            string status = seed.isModified ? "Modified" : "Vanilla";
+            int geneCount = seed.currentGenes?.Count ?? 0;
+            seedInfoText.text = $"{status} • {geneCount} genes";
+            seedInfoText.color = seed.isModified ? modifiedColor : vanillaColor;
+        }
+        
+        if (seedIcon != null && seed.baseSeedDefinition != null)
+        {
+            seedIcon.sprite = seed.baseSeedDefinition.icon;
+        }
+        
+        // Setup select button
+        if (selectButton != null)
+        {
+            selectButton.onClick.RemoveAllListeners();
+            selectButton.onClick.AddListener(OnSelectButtonClicked);
+        }
+        
+        // Set initial background color
+        if (backgroundImage != null)
+            backgroundImage.color = normalColor;
+    }
+    
+    private void OnSelectButtonClicked()
+    {
+        if (parentUI != null && seed != null)
+            parentUI.OnSeedSelected(seed);
+    }
+    
+    void OnDestroy()
+    {
+        if (selectButton != null)
+            selectButton.onClick.RemoveAllListeners();
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Seeds\SeedSelectionUI.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Genetics/SeedSelectionUI.cs
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+using System.Linq;
+
+public class SeedSelectionUI : MonoBehaviour
+{
+    public static SeedSelectionUI Instance { get; private set; }
+    
+    [Header("UI References")]
+    public GameObject selectionPanel;
+    public Transform seedButtonContainer;
+    public GameObject seedButtonPrefab;
+    public Button cancelButton;
+    public TMP_Text titleText;
+    public TMP_Text instructionText;
+    
+    [Header("Settings")]
+    [SerializeField] private bool showDebugLogs = false;
+    
+    // Current state
+    private System.Action<SeedInstance> onSeedSelectedCallback;
+    private List<GameObject> currentSeedButtons = new List<GameObject>();
+    
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        
+        // Setup cancel button
+        if (cancelButton != null)
+            cancelButton.onClick.AddListener(CancelSelection);
+        
+        // Validate required components
+        if (seedButtonPrefab == null)
+            Debug.LogError("[SeedSelectionUI] Seed Button Prefab not assigned!", this);
+        if (seedButtonContainer == null)
+            Debug.LogError("[SeedSelectionUI] Seed Button Container not assigned!", this);
+        
+        // Start hidden
+        if (selectionPanel != null)
+            selectionPanel.SetActive(false);
+    }
+    
+    void OnDestroy()
+    {
+        if (cancelButton != null)
+            cancelButton.onClick.RemoveAllListeners();
+            
+        if (Instance == this)
+            Instance = null;
+    }
+    
+    /// <summary>
+    /// Shows the seed selection UI with plantable seeds
+    /// </summary>
+    /// <param name="onSeedSelected">Callback when a seed is selected</param>
+    public void ShowSeedSelection(System.Action<SeedInstance> onSeedSelected)
+    {
+        if (PlayerGeneticsInventory.Instance == null)
+        {
+            Debug.LogError("[SeedSelectionUI] PlayerGeneticsInventory not found!");
+            return;
+        }
+        
+        onSeedSelectedCallback = onSeedSelected;
+        
+        // Get plantable seeds
+        List<SeedInstance> plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
+        
+        if (plantableSeeds.Count == 0)
+        {
+            Debug.LogWarning("[SeedSelectionUI] No plantable seeds available!");
+            if (showDebugLogs)
+                Debug.Log("[SeedSelectionUI] Player has no valid seeds to plant");
+            return;
+        }
+        
+        // Update UI text
+        if (titleText != null)
+            titleText.text = "Select Seed to Plant";
+        if (instructionText != null)
+            instructionText.text = $"Choose from {plantableSeeds.Count} available seeds:";
+        
+        // Create seed buttons
+        CreateSeedButtons(plantableSeeds);
+        
+        // Show panel
+        if (selectionPanel != null)
+            selectionPanel.SetActive(true);
+        
+        if (showDebugLogs)
+            Debug.Log($"[SeedSelectionUI] Showing selection with {plantableSeeds.Count} seeds");
+    }
+    
+    /// <summary>
+    /// Hides the seed selection UI
+    /// </summary>
+    public void HideSelection()
+    {
+        if (selectionPanel != null)
+            selectionPanel.SetActive(false);
+            
+        ClearSeedButtons();
+        onSeedSelectedCallback = null;
+        
+        if (showDebugLogs)
+            Debug.Log("[SeedSelectionUI] Hidden selection UI");
+    }
+    
+    private void CreateSeedButtons(List<SeedInstance> seeds)
+    {
+        if (seedButtonContainer == null || seedButtonPrefab == null)
+            return;
+            
+        // Clear existing buttons
+        ClearSeedButtons();
+        
+        // Create button for each seed
+        foreach (SeedInstance seed in seeds)
+        {
+            if (seed == null) continue;
+            
+            GameObject buttonObj = Instantiate(seedButtonPrefab, seedButtonContainer);
+            SeedSelectionButton buttonComponent = buttonObj.GetComponent<SeedSelectionButton>();
+            
+            if (buttonComponent == null)
+                buttonComponent = buttonObj.AddComponent<SeedSelectionButton>();
+                
+            buttonComponent.Initialize(seed, this);
+            currentSeedButtons.Add(buttonObj);
+        }
+    }
+    
+    private void ClearSeedButtons()
+    {
+        foreach (GameObject button in currentSeedButtons)
+        {
+            if (button != null)
+                DestroyImmediate(button);
+        }
+        currentSeedButtons.Clear();
+    }
+    
+    /// <summary>
+    /// Called when a seed button is clicked
+    /// </summary>
+    public void OnSeedSelected(SeedInstance selectedSeed)
+    {
+        if (selectedSeed == null)
+        {
+            Debug.LogWarning("[SeedSelectionUI] Null seed selected!");
+            return;
+        }
+        
+        if (showDebugLogs)
+            Debug.Log($"[SeedSelectionUI] Seed selected: {selectedSeed.seedName}");
+        
+        // Invoke callback
+        onSeedSelectedCallback?.Invoke(selectedSeed);
+        
+        // Hide UI
+        HideSelection();
+    }
+    
+    private void CancelSelection()
+    {
+        if (showDebugLogs)
+            Debug.Log("[SeedSelectionUI] Selection cancelled");
+            
+        HideSelection();
+    }
+    
+    /// <summary>
+    /// Quick method for single seed auto-selection (when only one seed available)
+    /// </summary>
+    public void AttemptAutoSelection(System.Action<SeedInstance> onSeedSelected)
+    {
+        if (PlayerGeneticsInventory.Instance == null)
+            return;
+            
+        List<SeedInstance> plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
+        
+        if (plantableSeeds.Count == 1)
+        {
+            // Auto-select the only available seed
+            if (showDebugLogs)
+                Debug.Log($"[SeedSelectionUI] Auto-selecting only available seed: {plantableSeeds[0].seedName}");
+                
+            onSeedSelected?.Invoke(plantableSeeds[0]);
+        }
+        else if (plantableSeeds.Count > 1)
+        {
+            // Show selection UI
+            ShowSeedSelection(onSeedSelected);
+        }
+        else
+        {
+            // No seeds available
+            Debug.LogWarning("[SeedSelectionUI] No plantable seeds available for auto-selection!");
+        }
+    }
+}
+
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\ColorExtensions.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public static class ColorExtensions
+{
+    public static Color WithAlpha(this Color c, float alpha)
+    {
+        return new Color(c.r, c.g, c.b, alpha);
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\DeselectOnClickOutside.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems; // Required for IPointerClickHandler
+
+// Add this script to an invisible, fullscreen background UI Image
+// Make sure it's the first child of the Canvas to render behind everything else
+public class DeselectOnClickOutside : MonoBehaviour, IPointerClickHandler
+{
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // Check if the click was with the left mouse button
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            // If the background is clicked, clear the current node selection
+            // Debug.Log("Background Clicked. Clearing Node Selection.");
+            NodeCell.ClearSelection();
+        }
+    }
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeCell.cs
@@ -1246,266 +1873,7 @@ public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Player\GardenerController.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Player/GardenerController.cs
-using UnityEngine;
-using System;
-using System.Collections.Generic;
-
-// No longer requires ToolSwitcher on the same GameObject
-public class GardenerController : MonoBehaviour
-{
-    // --- Fields ---
-    [Header("Movement Settings")]
-    public float moveSpeed = 5f;
-    
-    [Header("Speed Modifiers")]
-    [Tooltip("Current speed including all active modifiers (read-only)")]
-    [SerializeField] private float currentMoveSpeed;
-    private float baseMoveSpeed;
-    private List<float> activeSpeedMultipliers = new List<float>();
-    
-    [Header("Planting Settings")]
-    public Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
-
-    [Header("Tool References")] // <<< NEW HEADER
-    [Tooltip("Assign the SpriteRenderer used to display the current tool's icon.")]
-    [SerializeField] private SpriteRenderer toolIconRenderer;
-    [Tooltip("Assign the GameObject or Component containing the ToolSwitcher script.")] // <<< NEW TOOLTIP
-    [SerializeField] private ToolSwitcher toolSwitcherInstance; // <<< CHANGED: Reference field
-
-    [Header("Visual Settings")]
-    public bool flipSpriteWhenMovingLeft = true;
-    public bool flipHorizontalDirection = true;
-
-    [Header("Animation Settings")]
-    public bool useAnimations = true;
-    public string runningParameterName = "isRunning";
-    public string plantingParameterName = "isPlanting";
-    public float plantingDuration = 0.25f;
-
-    // Private references
-    private Rigidbody2D rb;
-    private Vector2 movement;
-    private SortableEntity sortableEntity;
-    private SpriteRenderer spriteRenderer;
-    private Animator animator;
-    // ToolSwitcher reference is now toolSwitcherInstance (assigned via inspector)
-
-    // Private variables
-    private bool isPlanting = false;
-    private float plantingTimer = 0f;
-    private bool wasMovingBeforePlanting = false;
-
-    void Awake()
-    {
-        // Store original components and references
-        rb = GetComponent<Rigidbody2D>();
-        sortableEntity = GetComponent<SortableEntity>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-        animator = GetComponent<Animator>();
-
-        // Store base movement speed for multiplier system
-        baseMoveSpeed = moveSpeed;
-        currentMoveSpeed = moveSpeed;
-    
-        // Initialize speed multipliers list
-        activeSpeedMultipliers = new List<float>();
-
-        if (sortableEntity == null)
-            sortableEntity = gameObject.AddComponent<SortableEntity>();
-
-        // Validations for other components
-        if (spriteRenderer == null)
-            Debug.LogWarning("[GardenerController Awake] Main SpriteRenderer component not found.", gameObject);
-    
-        if (animator == null && useAnimations)
-            Debug.LogWarning("[GardenerController Awake] Animator component not found but useAnimations is true.", gameObject);
-
-        if (toolSwitcherInstance == null)
-        {
-            Debug.LogError("[GardenerController Awake] Tool Switcher Instance is not assigned in the Inspector! Tool switching and icon display will not function.", gameObject);
-        }
-
-        if (toolIconRenderer == null)
-            Debug.LogError("[GardenerController Awake] Tool Icon Renderer is not assigned in the Inspector! Tool icons will not display.", gameObject);
-        else
-        {
-            Debug.Log("[GardenerController Awake] Tool Icon Renderer found. Initializing as hidden.", gameObject);
-            toolIconRenderer.enabled = false;
-        }
-    }
-
-    private void Start()
-    {
-        // Subscribe ONLY if toolSwitcherInstance was assigned in the inspector
-        if (toolSwitcherInstance != null)
-        {
-            Debug.Log("[GardenerController Start] ToolSwitcherInstance assigned. Subscribing to ToolSwitcher.OnToolChanged.", gameObject);
-            toolSwitcherInstance.OnToolChanged += HandleToolChanged;
-
-            // Manually trigger the handler once at the start
-            Debug.Log("[GardenerController Start] Manually calling HandleToolChanged for initial tool.", gameObject);
-            HandleToolChanged(toolSwitcherInstance.CurrentTool);
-        }
-        else
-        {
-             // Error logged in Awake, no need for more logs here.
-        }
-    }
-
-    private void OnDestroy()
-    {
-        // Clear speed multipliers list
-        activeSpeedMultipliers.Clear();
-        // Unsubscribe ONLY if toolSwitcherInstance was assigned and we subscribed
-        if (toolSwitcherInstance != null)
-        {
-            Debug.Log("[GardenerController OnDestroy] Unsubscribing from ToolSwitcher.OnToolChanged.", gameObject);
-            toolSwitcherInstance.OnToolChanged -= HandleToolChanged;
-        }
-    }
-
-    // --- Update, FixedUpdate, UpdateAnimations, UpdateSpriteDirection, Start/EndPlantingAnimation, GetPlantingPosition, SetPlantingDuration, Plant methods remain the same ---
-    private void Update()
-    {
-        if (!isPlanting)
-        {
-            movement.x = Input.GetAxisRaw("Horizontal");
-            movement.y = Input.GetAxisRaw("Vertical");
-            bool isMoving = movement.sqrMagnitude > 0.01f;
-            if (isMoving) wasMovingBeforePlanting = true;
-        }
-        else
-        {
-            movement = Vector2.zero;
-            plantingTimer -= Time.deltaTime;
-            if (plantingTimer <= 0) EndPlantingAnimation();
-        }
-        UpdateAnimations();
-        UpdateSpriteDirection();
-    }
-    
-    public void ApplySpeedMultiplier(float multiplier)
-    {
-        if (!activeSpeedMultipliers.Contains(multiplier))
-        {
-            activeSpeedMultipliers.Add(multiplier);
-            UpdateMovementSpeed();
-        
-            if (Debug.isDebugBuild)
-            {
-                Debug.Log($"[{gameObject.name}] Applied speed multiplier: {multiplier}. New speed: {currentMoveSpeed}");
-            }
-        }
-    }
-    
-    private void UpdateMovementSpeed()
-    {
-        // Start with base speed
-        float newSpeed = baseMoveSpeed;
-    
-        // Apply all active multipliers
-        if (activeSpeedMultipliers.Count > 0)
-        {
-            // Use the most restrictive (lowest) multiplier
-            float lowestMultiplier = 1.0f;
-            foreach (float multiplier in activeSpeedMultipliers)
-            {
-                if (multiplier < lowestMultiplier)
-                {
-                    lowestMultiplier = multiplier;
-                }
-            }
-        
-            newSpeed *= lowestMultiplier;
-        }
-    
-        // Update the current move speed
-        currentMoveSpeed = newSpeed;
-    }
-    
-    public void RemoveSpeedMultiplier(float multiplier)
-    {
-        if (activeSpeedMultipliers.Contains(multiplier))
-        {
-            activeSpeedMultipliers.Remove(multiplier);
-            UpdateMovementSpeed();
-        
-            if (Debug.isDebugBuild)
-            {
-                Debug.Log($"[{gameObject.name}] Removed speed multiplier: {multiplier}. New speed: {currentMoveSpeed}");
-            }
-        }
-    }
-    
-    
-    void FixedUpdate()
-    {
-        if (!isPlanting)
-        {
-            // Use currentMoveSpeed (with modifiers) instead of moveSpeed
-            rb.MovePosition(rb.position + movement.normalized * currentMoveSpeed * Time.fixedDeltaTime);
-        }
-    }
-    private void UpdateAnimations() { if (!useAnimations || animator == null) return; bool isMoving = movement.sqrMagnitude > 0.01f; animator.SetBool(runningParameterName, isMoving); }
-    private void UpdateSpriteDirection() { if (spriteRenderer == null || !flipSpriteWhenMovingLeft) return; if (movement.x != 0) { bool shouldFlip = (movement.x < 0); if (flipHorizontalDirection) { spriteRenderer.flipX = shouldFlip; } else { Vector3 scale = transform.localScale; scale.x = shouldFlip ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x); transform.localScale = scale; } } }
-    public void StartPlantingAnimation() { if (!useAnimations || isPlanting) return; isPlanting = true; plantingTimer = plantingDuration; wasMovingBeforePlanting = movement.sqrMagnitude > 0.01f; if (animator != null) { animator.SetBool(plantingParameterName, true); animator.SetBool(runningParameterName, false); } }
-    private void EndPlantingAnimation() { isPlanting = false; if (animator != null) { animator.SetBool(plantingParameterName, false); movement.x = Input.GetAxisRaw("Horizontal"); movement.y = Input.GetAxisRaw("Vertical"); bool shouldResumeRunning = movement.sqrMagnitude > 0.01f; animator.SetBool(runningParameterName, shouldResumeRunning); } }
-    public Vector2 GetPlantingPosition() { return (Vector2)transform.position + seedPlantingOffset; }
-    public void SetPlantingDuration(float duration) { plantingDuration = Mathf.Max(0.1f, duration); }
-    public void Plant() { StartPlantingAnimation(); }
-    // ---------------------------------
-
-    // --- HandleToolChanged remains the same (uses toolSwitcherInstance implicitly via Start/OnDestroy) ---
-    private void HandleToolChanged(ToolDefinition newTool)
-    {
-        string toolName = newTool != null ? newTool.displayName : "NULL";
-        Debug.Log($"[HandleToolChanged] Received tool: {toolName}", gameObject);
-
-        if (toolIconRenderer == null)
-        {
-            Debug.LogError("[HandleToolChanged] toolIconRenderer is NULL. Cannot update icon.", gameObject);
-            return;
-        }
-
-        if (newTool != null)
-        {
-            string iconName = newTool.icon != null ? newTool.icon.name : "NULL";
-            Debug.Log($"[HandleToolChanged] Tool '{toolName}' has icon: {iconName}", gameObject);
-
-            if (newTool.icon != null)
-            {
-                Debug.Log($"[HandleToolChanged] Assigning sprite '{newTool.icon.name}' and color '{newTool.iconTint}' to toolIconRenderer.", gameObject);
-                toolIconRenderer.sprite = newTool.icon;
-                toolIconRenderer.color = newTool.iconTint;
-                Debug.Log($"[HandleToolChanged] Enabling toolIconRenderer. Current state before: {toolIconRenderer.enabled}", gameObject);
-                toolIconRenderer.enabled = true;
-                Debug.Log($"[HandleToolChanged] toolIconRenderer.enabled is now: {toolIconRenderer.enabled}", gameObject);
-                Debug.Log($"[HandleToolChanged] toolIconRenderer.sprite is now: {toolIconRenderer.sprite?.name ?? "NULL"}", gameObject);
-            }
-            else
-            {
-                Debug.LogWarning($"[HandleToolChanged] Tool '{toolName}' has a NULL icon. Hiding renderer.", gameObject);
-                toolIconRenderer.enabled = false;
-                toolIconRenderer.sprite = null;
-            }
-        }
-        else
-        {
-            Debug.Log("[HandleToolChanged] newTool is NULL. Hiding renderer.", gameObject);
-            toolIconRenderer.enabled = false;
-            toolIconRenderer.sprite = null;
-        }
-    }
-}
-
-
-
-
 
 --------------------------------------------------------------------------------
-This is part 5 out of 8 of script collection. 3 more parts remain.
+This is part 6 out of 9 of script collection. 3 more parts remain.
 --------------------------------------------------------------------------------
