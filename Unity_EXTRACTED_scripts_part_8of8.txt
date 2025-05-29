@@ -1,0 +1,680 @@
+This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
+
+================================================================================
+UNITY PROJECT SCRIPT EXPORT - 2025-05-26 22:28:12
+PART 8 OF 8
+================================================================================
+
+--------------------------------------------------------------------------------
+Assets
+├── Animation
+│   ├── GodRay300B_001.controller
+│   ├── GodRay60_001.controller
+│   ├── GodRays300.anim
+│   ├── GodRays300B.anim
+│   ├── MiniVillagerMan_Animator.controller
+│   └── MiniVillagerMan_AnimatorBackup.controller
+├── DefaultVolumeProfile.asset
+├── Editor
+│   ├── NodeDefinitionAutoAdder.cs
+│   ├── NodeDefinitionCreator.cs
+│   ├── NodeDefinitionEditor.cs
+│   ├── NodeDefinitionLibraryEditor.cs
+│   ├── NodeDefinitionPostprocessor.cs
+│   └── NodeEffectDrawer.cs
+├── HueFolders
+│   ├── Editor
+│   │   ├── HueFolders.Editor.asmdef
+│   │   ├── HueFoldersBrowser.cs
+│   │   └── SettingsProvider.cs
+│   ├── Readme.pdf
+│   └── package.json
+├── InputSystem_Actions.inputactions
+├── Materials
+│   ├── BezierCurveAA_Material.mat
+│   └── Firefly_Glow_Material.mat
+├── Post Processing
+├── Prefabs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── Animal_Bird.prefab
+│   │   │   ├── Animal_Bunny.prefab
+│   │   │   ├── Animal_Deer.prefab
+│   │   │   ├── Animal_Fox.prefab
+│   │   │   └── FireflyPrefab.prefab
+│   │   ├── Plants
+│   │   │   ├── PixelBerry.prefab
+│   │   │   ├── PixelFlower.prefab
+│   │   │   ├── PixelLeaf.prefab
+│   │   │   ├── PixelSeed.prefab
+│   │   │   ├── PixelStem.prefab
+│   │   │   ├── PlantOutline.prefab
+│   │   │   ├── PlantPrefab.prefab
+│   │   │   └── PlantShadow.prefab
+│   │   ├── Props
+│   │   │   ├── Poop_Big.prefab
+│   │   │   ├── Poop_Medium_01.prefab
+│   │   │   └── Poop_Medium_02.prefab
+│   │   └── UI
+│   │       ├── EmptySlot16.prefab
+│   │       ├── EmptySlot32.prefab
+│   │       ├── HoverTileMarker.prefab
+│   │       ├── Indicator_Opportunity.prefab
+│   │       ├── Indicator_Resource.prefab
+│   │       ├── Indicator_Threat.prefab
+│   │       ├── NodeCellEmpty16.prefab
+│   │       ├── NodePics
+│   │       │   ├── Seed_01.prefab
+│   │       │   └── Seed_02.prefab
+│   │       ├── NodeView.prefab
+│   │       ├── ThoughtBubble.prefab
+│   │       ├── Visualizer_Circle_Prefab.prefab
+│   │       └── Visualizer_Line_Prefab.prefab
+│   ├── General
+│   │   ├── GardenerPrefab.prefab
+│   │   └── Projectile_Basic_Pixel.prefab
+│   └── Tiles
+│       ├── Common
+│       │   └── PLains_0_Corner_LT.asset
+│       ├── Palettes
+│       │   └── PaletteDual_Ground.prefab
+│       └── Rule Tiles
+│           ├── DualGridRuleTile_Dirt.asset
+│           ├── DualGridRuleTile_DirtWet.asset
+│           ├── DualGridRuleTile_Grass.asset
+│           └── DualGridRuleTile_Water.asset
+├── Scenes
+│   ├── MainScene.unity
+│   ├── SampleScene
+│   │   └── GlobalPostProcessVolume Profile.asset
+│   └── SampleScene.unity
+├── Scriptable Objects
+│   ├── Animals
+│   │   ├── AnimalLibrary.asset
+│   │   ├── Animal_000_Bunny.asset
+│   │   └── Animal_001_Deer.asset
+│   ├── Animals Diet
+│   │   ├── Diet_000_Bunny.asset
+│   │   └── Diet_001_Deer.asset
+│   ├── Food
+│   │   ├── FoodType_000_Berry.asset
+│   │   └── FoodType_000_Leaf.asset
+│   ├── Life Thoughts
+│   │   └── AnimalThoughtLibrary.asset
+│   ├── Nodes Plant
+│   │   ├── NodeDefinitionLibrary.asset
+│   │   ├── Node_000_Seed.asset
+│   │   ├── Node_001_Berry.asset
+│   │   ├── Node_002_FireflyPheromone.asset
+│   │   └── Node_003_PoopFertilizer.asset
+│   ├── Scents
+│   │   ├── ScentLibrary.asset
+│   │   └── Scent_000_FireflyPheromone.asset
+│   ├── Tiles
+│   │   ├── TileDefinition_000_Grass.asset
+│   │   ├── TileDefinition_001_Dirt.asset
+│   │   ├── TileDefinition_002_DirtWet.asset
+│   │   ├── TileDefinition_003_Water.asset
+│   │   └── TileInteractionLibrary.asset
+│   ├── Tools
+│   │   ├── ToolDefinition_000_GardeningHoe.asset
+│   │   ├── ToolDefinition_001_WateringCan.asset
+│   │   └── ToolDefinition_002_SeedPouch.asset
+│   └── Waves
+│       ├── Wave_000.asset
+│       ├── Wave_001.asset
+│       └── Wave_002.asset
+├── Scripts
+│   ├── Battle
+│   │   ├── Plant
+│   │   │   ├── LeafData.cs
+│   │   │   ├── PlantCell.cs
+│   │   │   ├── PlantGrowth.Cell.cs
+│   │   │   ├── PlantGrowth.Growth.cs
+│   │   │   ├── PlantGrowth.NodeExecution.cs
+│   │   │   ├── PlantGrowth.cs
+│   │   │   └── WeatherManager.cs
+│   │   ├── SpellProjectile.cs
+│   │   └── Status Effects
+│   │       ├── BurningStatusEffect.cs
+│   │       └── StatusEffect.cs
+│   ├── Core
+│   │   └── SortableEntity.cs
+│   ├── Ecosystem
+│   │   ├── Animals
+│   │   │   ├── AnimalDefinition.cs
+│   │   │   └── AnimalLibrary.cs
+│   │   ├── Core
+│   │   │   ├── AnimalController.cs
+│   │   │   ├── AnimalSpawnData.cs
+│   │   │   ├── AnimalThoughtLibrary.cs
+│   │   │   ├── EcosystemManager.cs
+│   │   │   ├── FaunaManager.cs
+│   │   │   ├── FloraManager.cs
+│   │   │   ├── PoopController.cs
+│   │   │   ├── ScentSource.cs
+│   │   │   ├── SlowdownZone.cs
+│   │   │   ├── ThoughtBubbleController.cs
+│   │   │   ├── ThoughtTrigger.cs
+│   │   │   ├── WaveDefinition.cs
+│   │   │   └── WaveManager.cs
+│   │   ├── Effects
+│   │   │   ├── FireflyController.cs
+│   │   │   └── FireflyManager.cs
+│   │   ├── Food
+│   │   │   ├── AnimalDiet.cs
+│   │   │   ├── FoodItem.cs
+│   │   │   └── FoodType.cs
+│   │   ├── Plants
+│   │   └── Scents
+│   │       ├── ScentDefinition.cs
+│   │       └── ScentLibrary.cs
+│   ├── Nodes
+│   │   ├── Core
+│   │   │   ├── NodeData.cs
+│   │   │   ├── NodeDefinition.cs
+│   │   │   ├── NodeDefinitionLibrary.cs
+│   │   │   ├── NodeEffectData.cs
+│   │   │   ├── NodeEffectType.cs
+│   │   │   └── OutputNodeEffect.cs
+│   │   ├── Runtime
+│   │   │   ├── NodeExecutor.cs
+│   │   │   └── NodeGraph.cs
+│   │   └── UI
+│   │       ├── ColorExtensions.cs
+│   │       ├── DeselectOnClickOutside.cs
+│   │       ├── NodeCell.cs
+│   │       ├── NodeDraggable.cs
+│   │       ├── NodeEditorGridController.cs
+│   │       ├── NodeSelectable.cs
+│   │       └── NodeView.cs
+│   ├── Player
+│   │   └── GardenerController.cs
+│   ├── Rendering
+│   ├── Tiles
+│   │   ├── Data
+│   │   │   ├── PlantGrowthModifierManager.cs
+│   │   │   ├── PlantPlacementManagement.cs
+│   │   │   ├── PlayerTileInteractor.cs
+│   │   │   ├── TileDefinition.cs
+│   │   │   ├── TileInteractionLibrary.cs
+│   │   │   ├── TileInteractionManager.cs
+│   │   │   └── TileInteractionRule.cs
+│   │   ├── Editor
+│   │   │   ├── TileDefinitionEditor.cs
+│   │   │   └── TileInteractionManagerEditor.cs
+│   │   └── Tools
+│   │       ├── ToolDefinition.cs
+│   │       ├── ToolSwitcher.cs
+│   │       └── ToolType.cs
+│   ├── UI
+│   └── Visuals
+│       ├── NightColorPostProcess.cs
+│       ├── OutlinePartController.cs
+│       ├── PlantOutlineController.cs
+│       ├── PlantShadowController.cs
+│       ├── RuntimeCircleDrawer.cs
+│       ├── ShadowPartController.cs
+│       └── WaterReflection.cs
+├── Settings
+│   ├── Lit2DSceneTemplate.scenetemplate
+│   ├── Renderer2D.asset
+│   ├── Scenes
+│   │   └── URP2DSceneTemplate.unity
+│   └── UniversalRP.asset
+├── Shaders
+│   ├── BezierCurveAA.shader
+│   ├── Custom_WaterReflectionGradient.mat
+│   ├── Sprite-Lit-Advanced_Overlay_Base.mat
+│   ├── Sprite-Lit-Default_OverlayAdvanced.shader
+│   ├── Sprite-Lit-Default_OverlayCustom.shader
+│   ├── Sprite-Lit-Default_Overlay_Base.mat
+│   ├── SpriteEmissiveUnlit.shader
+│   ├── WaterReflection.shader
+│   └── WaterReflectionSimple.shader
+├── TextureImporter.preset
+└── UniversalRenderPipelineGlobalSettings.asset
+--------------------------------------------------------------------------------
+
+SCRIPT CONTENTS
+================================================================================
+
+SCRIPT CONTENTS
+================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\WaterReflection.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/WaterReflection.cs
+using UnityEngine;
+using UnityEngine.Tilemaps; // Keep for water masking logic
+using System.Collections.Generic;
+using System.Linq; // For FindObjectsOfType
+
+/// <summary>
+/// Creates a water reflection effect by duplicating and flipping the sprite.
+/// Attach to any GameObject with a SpriteRenderer to create its reflection.
+/// Can optionally use parent's transform for offset and fade calculations.
+/// </summary>
+public class WaterReflection : MonoBehaviour
+{
+    [Header("Reflection Source")]
+    [Tooltip("If true, Y Offset and Distance Fade calculations will be relative to this GameObject's parent. If false (default), relative to this GameObject.")]
+    [SerializeField] private bool useParentAsReference = false;
+
+    [Header("Reflection Settings")]
+    [Tooltip("Vertical offset of the reflection. Interpretation depends on 'Use Parent As Reference'.")]
+    [SerializeField] private float yOffset = -1f;
+
+    [Tooltip("Opacity of the reflection (0 = invisible, 1 = fully opaque)")]
+    [SerializeField] [Range(0f, 1f)] private float reflectionOpacity = 0.5f;
+
+    [Tooltip("Additional tint color for the reflection")]
+    [SerializeField] private Color reflectionTint = Color.white;
+
+    [Header("Distance Fade (Shader Controlled)")]
+    [Tooltip("Enable fading reflection. Requires 'Gradient Fade Base Material' to be assigned.")]
+    [SerializeField] private bool enableDistanceFade = true;
+    [Tooltip("Vertical distance from the reference Y (self or parent) where fade starts (shader's _FadeStart).")]
+    [SerializeField] private float fadeStartDistance = 0.0f;
+    [Tooltip("Vertical distance from the reference Y (self or parent) where reflection becomes min alpha (shader's _FadeEnd).")]
+    [SerializeField] private float fadeEndDistance = 1.0f;
+    [Tooltip("Minimum alpha when fully faded (shader's _MinAlpha).")]
+    [SerializeField] [Range(0f, 1f)] private float minFadeAlpha = 0.0f;
+    [Tooltip("Assign the 'Custom/WaterReflectionGradient' material, or one using that shader.")]
+    [SerializeField] private Material gradientFadeBaseMaterial;
+
+    [Header("Sorting")]
+    [Tooltip("Sorting order offset for the reflection (usually negative to render behind)")]
+    [SerializeField] private int sortingOrderOffset = -1;
+
+    [Header("Water Masking")]
+    [Tooltip("If enabled, reflection will only be visible over water tiles")]
+    [SerializeField] private bool useWaterMasking = true;
+    [Tooltip("Tag used to identify the water tilemap (default: 'Water')")]
+    [SerializeField] private string waterTilemapTag = "Water";
+
+    [Header("Debug")]
+    [SerializeField] private bool showDebugInfo = false;
+
+    // --- Internal References ---
+    private SpriteRenderer originalRenderer;
+    private Animator originalAnimator;
+    private GameObject reflectionObject;
+    private SpriteRenderer reflectionRenderer;
+    private Animator reflectionAnimator;
+    private Material reflectionMaterialInstance;
+
+    // --- Cached Values for Optimization ---
+    private Sprite lastSprite;
+    private Color lastOriginalColor;
+    private bool lastFlipX, lastFlipY;
+    private bool lastEnabled;
+    private Vector3 lastScale;
+    private Vector3 lastPosition;
+    private float lastParentY;
+
+    void Awake()
+    {
+        originalRenderer = GetComponent<SpriteRenderer>();
+        originalAnimator = GetComponent<Animator>();
+
+        if (originalRenderer == null)
+        {
+            Debug.LogError($"[WaterReflection] No SpriteRenderer found on {gameObject.name}! Component disabled.", this);
+            enabled = false;
+            return;
+        }
+
+        if (useParentAsReference && transform.parent == null)
+        {
+            if (showDebugInfo) Debug.LogWarning($"[WaterReflection] 'Use Parent As Reference' is true on {gameObject.name}, but it has no parent. Will use self as reference.", this);
+            useParentAsReference = false;
+        }
+
+        // Check for gradientFadeBaseMaterial in Awake, specifically for Play mode behavior
+        if (Application.isPlaying) // Only show this more detailed warning in play mode
+        {
+            if (enableDistanceFade && gradientFadeBaseMaterial == null)
+            {
+                Debug.LogWarning($"[WaterReflection Awake] '{gameObject.name}': 'Enable Distance Fade' is true, but 'Gradient Fade Base Material' is not assigned. Distance fade will not use the custom shader. Please assign a material using 'Custom/WaterReflectionGradient' on the prefab or this instance.", this);
+                // Do not disable enableDistanceFade here, let CreateReflectionObject handle fallback.
+            }
+        }
+
+
+        CreateReflectionObject();
+
+        if (useWaterMasking)
+        {
+            SetupWaterMaskingInteraction();
+        }
+    }
+
+    void Start()
+    {
+        // Ensure visuals are up-to-date after all Awakes might have run
+        // and especially if material instantiation happened.
+        UpdateReflectionVisuals();
+        UpdateReflectionTransform();
+        CacheCurrentState();
+    }
+
+    void LateUpdate()
+    {
+        if (originalRenderer == null || reflectionObject == null)
+        {
+            if (reflectionObject != null) reflectionObject.SetActive(false);
+            return;
+        }
+
+        UpdateReflectionTransform();
+
+        if (HasVisualStateChanged())
+        {
+            UpdateReflectionVisuals();
+            CacheCurrentState();
+        }
+    }
+
+    private void CreateReflectionObject()
+    {
+        reflectionObject = new GameObject($"{gameObject.name}_Reflection");
+        reflectionObject.transform.SetParent(transform.parent, false);
+        reflectionObject.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
+
+        reflectionRenderer = reflectionObject.AddComponent<SpriteRenderer>();
+        reflectionRenderer.sortingLayerName = originalRenderer.sortingLayerName;
+        reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + sortingOrderOffset;
+        reflectionRenderer.drawMode = originalRenderer.drawMode;
+
+        if (enableDistanceFade && gradientFadeBaseMaterial != null)
+        {
+            // This is where the material is instanced. If gradientFadeBaseMaterial is null
+            // here (despite being set on prefab), then the warning in Awake was correct.
+            reflectionMaterialInstance = new Material(gradientFadeBaseMaterial);
+            reflectionRenderer.material = reflectionMaterialInstance;
+            if (showDebugInfo && Application.isPlaying) Debug.Log($"[{gameObject.name}] Instantiated gradient material for reflection.", this);
+        }
+        else
+        {
+            reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial;
+            if (enableDistanceFade && gradientFadeBaseMaterial == null && showDebugInfo && Application.isPlaying)
+            {
+                // This confirms the Awake warning: material was indeed null when needed for instancing.
+                Debug.Log($"[{gameObject.name}] Using sharedMaterial for reflection as gradientFadeBaseMaterial was null during CreateReflectionObject.", this);
+            }
+        }
+
+        if (originalAnimator != null)
+        {
+            reflectionAnimator = reflectionObject.AddComponent<Animator>();
+            reflectionAnimator.runtimeAnimatorController = originalAnimator.runtimeAnimatorController;
+        }
+
+        SortableEntity originalSortable = GetComponent<SortableEntity>();
+        if (originalSortable != null)
+        {
+            reflectionObject.AddComponent<SortableEntity>();
+        }
+
+        if (showDebugInfo) Debug.Log($"[WaterReflection] Created reflection for {gameObject.name}", this);
+    }
+
+    private void UpdateReflectionTransform()
+    {
+        if (reflectionObject == null || originalRenderer == null) return;
+
+        Transform referenceTransform = (useParentAsReference && transform.parent != null) ? transform.parent : transform;
+        Vector3 originalWorldPos = transform.position;
+        Vector3 reflectionWorldPos = originalWorldPos;
+        float referenceYForOffset = referenceTransform.position.y;
+        reflectionWorldPos.y = referenceYForOffset + yOffset - (originalWorldPos.y - referenceYForOffset);
+        reflectionObject.transform.position = reflectionWorldPos;
+        reflectionObject.transform.rotation = transform.rotation;
+        reflectionObject.transform.localScale = transform.localScale;
+        Vector3 currentLocalScale = reflectionObject.transform.localScale;
+        currentLocalScale.y *= -1;
+        reflectionObject.transform.localScale = currentLocalScale;
+    }
+
+    private void UpdateReflectionVisuals()
+    {
+        if (reflectionRenderer == null || originalRenderer == null) return;
+
+        reflectionRenderer.sprite = originalRenderer.sprite;
+        reflectionRenderer.flipX = originalRenderer.flipX;
+        reflectionRenderer.flipY = originalRenderer.flipY;
+
+        Color baseOriginalSpriteColor = originalRenderer.color;
+        Color finalReflectionTintedColor = baseOriginalSpriteColor * reflectionTint;
+        float finalCombinedAlpha = baseOriginalSpriteColor.a * reflectionOpacity;
+        reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
+
+        if (enableDistanceFade && reflectionMaterialInstance != null) // Check reflectionMaterialInstance
+        {
+            Transform referenceTransform = (useParentAsReference && transform.parent != null) ? transform.parent : transform;
+            float waterSurfaceY = referenceTransform.position.y;
+            reflectionMaterialInstance.SetFloat("_FadeStart", fadeStartDistance);
+            reflectionMaterialInstance.SetFloat("_FadeEnd", fadeEndDistance);
+            reflectionMaterialInstance.SetFloat("_MinAlpha", minFadeAlpha);
+            reflectionMaterialInstance.SetFloat("_OriginalY", waterSurfaceY);
+            Color materialBaseColor = reflectionTint;
+            materialBaseColor.a = reflectionOpacity * baseOriginalSpriteColor.a;
+            reflectionMaterialInstance.SetColor("_Color", materialBaseColor);
+        }
+        else if (!enableDistanceFade && reflectionMaterialInstance != null)
+        {
+            reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial; // Revert to shared
+            Destroy(reflectionMaterialInstance);
+            reflectionMaterialInstance = null;
+        }
+
+        reflectionRenderer.enabled = originalRenderer.enabled && originalRenderer.gameObject.activeInHierarchy;
+
+        if (reflectionAnimator != null && originalAnimator != null)
+        {
+            reflectionAnimator.enabled = originalAnimator.enabled;
+            if (originalAnimator.runtimeAnimatorController != null && originalAnimator.parameterCount > 0)
+            {
+                foreach (AnimatorControllerParameter param in originalAnimator.parameters)
+                {
+                    try {
+                        switch (param.type)
+                        {
+                            case AnimatorControllerParameterType.Bool:
+                                reflectionAnimator.SetBool(param.name, originalAnimator.GetBool(param.name));
+                                break;
+                            case AnimatorControllerParameterType.Float:
+                                reflectionAnimator.SetFloat(param.name, originalAnimator.GetFloat(param.name));
+                                break;
+                            case AnimatorControllerParameterType.Int:
+                                reflectionAnimator.SetInteger(param.name, originalAnimator.GetInteger(param.name));
+                                break;
+                        }
+                    } catch (System.Exception e) {
+                        if(showDebugInfo) Debug.LogWarning($"Failed to sync animator param '{param.name}': {e.Message}", reflectionAnimator);
+                    }
+                }
+            }
+        }
+    }
+
+    private bool HasVisualStateChanged()
+    {
+        if (originalRenderer == null) return false;
+        bool parentYChanged = false;
+        if (useParentAsReference && transform.parent != null)
+        {
+            parentYChanged = !Mathf.Approximately(lastParentY, transform.parent.position.y);
+        }
+        return lastSprite != originalRenderer.sprite ||
+               !ColorsApproximatelyEqual(lastOriginalColor, originalRenderer.color) ||
+               lastFlipX != originalRenderer.flipX ||
+               lastFlipY != originalRenderer.flipY ||
+               lastEnabled != (originalRenderer.enabled && originalRenderer.gameObject.activeInHierarchy) ||
+               lastScale != transform.localScale ||
+               lastPosition != transform.position ||
+               parentYChanged;
+    }
+
+    private void CacheCurrentState()
+    {
+        if (originalRenderer == null) return;
+        lastSprite = originalRenderer.sprite;
+        lastOriginalColor = originalRenderer.color;
+        lastFlipX = originalRenderer.flipX;
+        lastFlipY = originalRenderer.flipY;
+        lastEnabled = originalRenderer.enabled && originalRenderer.gameObject.activeInHierarchy;
+        lastScale = transform.localScale;
+        lastPosition = transform.position;
+        if (useParentAsReference && transform.parent != null)
+        {
+            lastParentY = transform.parent.position.y;
+        }
+    }
+
+    private bool ColorsApproximatelyEqual(Color c1, Color c2, float tolerance = 0.001f)
+    {
+        return Mathf.Abs(c1.r - c2.r) < tolerance &&
+               Mathf.Abs(c1.g - c2.g) < tolerance &&
+               Mathf.Abs(c1.b - c2.b) < tolerance &&
+               Mathf.Abs(c1.a - c2.a) < tolerance;
+    }
+
+    private void SetupWaterMaskingInteraction()
+    {
+        if (!useWaterMasking || reflectionRenderer == null) return;
+        GameObject waterTilemapGO = FindWaterTilemapByTag();
+        if (waterTilemapGO == null)
+        {
+            if (showDebugInfo) Debug.LogWarning($"[WaterReflection] Water tilemap for masking not found on {gameObject.name} via tag '{waterTilemapTag}'. Masking disabled.", this);
+            useWaterMasking = false;
+            return;
+        }
+        SpriteMask maskComponent = waterTilemapGO.GetComponent<SpriteMask>();
+        if (maskComponent == null)
+        {
+            maskComponent = waterTilemapGO.AddComponent<SpriteMask>();
+            maskComponent.sprite = null;
+            if (showDebugInfo) Debug.Log($"[WaterReflection] Added SpriteMask to water tilemap '{waterTilemapGO.name}' for object '{gameObject.name}'.", waterTilemapGO);
+        }
+        reflectionRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
+        if (showDebugInfo) Debug.Log($"[WaterReflection] Reflection of '{gameObject.name}' will be masked by '{waterTilemapGO.name}'.", this);
+    }
+
+    private GameObject FindWaterTilemapByTag()
+    {
+        if (string.IsNullOrEmpty(waterTilemapTag)) return FindWaterTilemapFallback();
+        GameObject taggedWater = GameObject.FindGameObjectWithTag(waterTilemapTag);
+        if (taggedWater != null && taggedWater.GetComponent<Tilemap>() != null)
+        {
+            if (showDebugInfo) Debug.Log($"[WaterReflection] Found water tilemap by tag '{waterTilemapTag}': {taggedWater.name} for {gameObject.name}", this);
+            return taggedWater;
+        }
+        if (taggedWater != null && taggedWater.GetComponent<Tilemap>() == null && showDebugInfo)
+        {
+            Debug.LogWarning($"[WaterReflection] GameObject '{taggedWater.name}' (tag '{waterTilemapTag}') has no Tilemap component!", this);
+        }
+        return FindWaterTilemapFallback();
+    }
+
+    private GameObject FindWaterTilemapFallback()
+    {
+        if (TileInteractionManager.Instance != null)
+        {
+            var mappings = TileInteractionManager.Instance.tileDefinitionMappings;
+            if (mappings != null)
+            {
+                foreach (var mapping in mappings)
+                {
+                    if (mapping?.tileDef != null && mapping.tilemapModule != null && mapping.tileDef.isWaterTile)
+                    {
+                        Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+                        if (renderTilemapTransform != null && renderTilemapTransform.GetComponent<Tilemap>() != null)
+                        {
+                            if (showDebugInfo) Debug.Log($"[WaterReflection] Auto-detected water tilemap via TIM: {renderTilemapTransform.name} for {gameObject.name}", this);
+                            return renderTilemapTransform.gameObject;
+                        }
+                    }
+                }
+            }
+        }
+        if (showDebugInfo) Debug.LogWarning($"[WaterReflection] Could not auto-detect water tilemap via TileInteractionManager for {gameObject.name}.", this);
+        return null;
+    }
+
+    void OnDestroy()
+    {
+        if (reflectionObject != null)
+        {
+            if (Application.isPlaying) Destroy(reflectionObject);
+            else DestroyImmediate(reflectionObject);
+        }
+        if (reflectionMaterialInstance != null)
+        {
+            if (Application.isPlaying) Destroy(reflectionMaterialInstance);
+            else DestroyImmediate(reflectionMaterialInstance);
+        }
+    }
+
+    void OnValidate()
+    {
+        // The OnValidate warning should only appear if:
+        // 1. We are in the editor AND not playing.
+        // 2. enableDistanceFade is true.
+        // 3. gradientFadeBaseMaterial is actually null *on this component*.
+        if (Application.isEditor && !Application.isPlaying)
+        {
+            if (enableDistanceFade && gradientFadeBaseMaterial == null)
+            {
+                // This warning is for the user configuring the component in the editor.
+                Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true, but 'Gradient Fade Base Material' is not assigned. Distance fading will require this in Play mode.", this);
+            }
+        }
+
+        if (Application.isPlaying) return;
+
+        if (reflectionRenderer != null && originalRenderer != null)
+        {
+            reflectionRenderer.sprite = originalRenderer.sprite;
+            reflectionRenderer.flipX = originalRenderer.flipX;
+            reflectionRenderer.flipY = originalRenderer.flipY; // This was originalRenderer.flipY, should be consistent
+            reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + sortingOrderOffset;
+            Color baseOriginalSpriteColor = originalRenderer.color;
+            Color finalReflectionTintedColor = baseOriginalSpriteColor * reflectionTint;
+            float finalCombinedAlpha = baseOriginalSpriteColor.a * reflectionOpacity;
+            reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
+            UpdateReflectionTransform();
+        }
+    }
+
+    // --- Public Methods for Runtime Control ---
+    public void SetReflectionOpacity(float opacity)
+    {
+        reflectionOpacity = Mathf.Clamp01(opacity);
+        if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals(); // Check originalRenderer too
+    }
+    public void SetYOffset(float offset)
+    {
+        yOffset = offset;
+        if (Application.isPlaying && originalRenderer != null) UpdateReflectionTransform();
+    }
+    public void SetReflectionTint(Color tint)
+    {
+        reflectionTint = tint;
+        if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals();
+    }
+    public void SetReflectionEnabled(bool enabled)
+    {
+        if (reflectionObject != null) reflectionObject.SetActive(enabled);
+    }
+}
+
+
+
+
+
+--------------------------------------------------------------------------------
+This is the final part (8 of 8).
+--------------------------------------------------------------------------------

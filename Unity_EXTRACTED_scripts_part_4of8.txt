@@ -1,8 +1,8 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-28 18:59:47
-PART 4 OF 9
+UNITY PROJECT SCRIPT EXPORT - 2025-05-26 22:28:12
+PART 4 OF 8
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -67,17 +67,11 @@ Assets
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
-│   │       ├── Panels
-│   │       │   ├── Panel_GeneListItem.prefab
-│   │       │   ├── Panel_GeneSequenceItem.prefab
-│   │       │   ├── Panel_SeedListItem.prefab
-│   │       │   └── Panel_SeedSelectionButton.prefab
 │   │       ├── ThoughtBubble.prefab
 │   │       ├── Visualizer_Circle_Prefab.prefab
 │   │       └── Visualizer_Line_Prefab.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
-│   │   ├── PLANTOTRON_Machine.prefab
 │   │   └── Projectile_Basic_Pixel.prefab
 │   └── Tiles
 │       ├── Common
@@ -116,8 +110,6 @@ Assets
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
-│   ├── Seeds
-│   │   └── SeedDefinition_000_Base.asset
 │   ├── Tiles
 │   │   ├── TileDefinition_000_Grass.asset
 │   │   ├── TileDefinition_001_Dirt.asset
@@ -188,17 +180,6 @@ Assets
 │   │   ├── Runtime
 │   │   │   ├── NodeExecutor.cs
 │   │   │   └── NodeGraph.cs
-│   │   ├── Seeds
-│   │   │   ├── PlantotronGeneItem.cs
-│   │   │   ├── PlantotronGeneSequenceItem.cs
-│   │   │   ├── PlantotronMachine.cs
-│   │   │   ├── PlantotronSeedItem.cs
-│   │   │   ├── PlantotronUI.cs
-│   │   │   ├── PlayerGeneticsInventory.cs
-│   │   │   ├── SeedDefinition.cs
-│   │   │   ├── SeedInstance.cs
-│   │   │   ├── SeedSelectionButton.cs
-│   │   │   └── SeedSelectionUI.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
 │   │       ├── DeselectOnClickOutside.cs
@@ -213,7 +194,7 @@ Assets
 │   ├── Tiles
 │   │   ├── Data
 │   │   │   ├── PlantGrowthModifierManager.cs
-│   │   │   ├── PlantPlacementManager.cs
+│   │   │   ├── PlantPlacementManagement.cs
 │   │   │   ├── PlayerTileInteractor.cs
 │   │   │   ├── TileDefinition.cs
 │   │   │   ├── TileInteractionLibrary.cs
@@ -230,13 +211,11 @@ Assets
 │   └── Visuals
 │       ├── NightColorPostProcess.cs
 │       ├── OutlinePartController.cs
-│       ├── PixelPerfectSetup.cs
 │       ├── PlantOutlineController.cs
 │       ├── PlantShadowController.cs
 │       ├── RuntimeCircleDrawer.cs
 │       ├── ShadowPartController.cs
-│       ├── WaterReflection.cs
-│       └── WaterReflectionManager.cs
+│       └── WaterReflection.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -1421,7 +1400,212 @@ public class OutputNodeEffect : MonoBehaviour
 
 
 
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Runtime\NodeExecutor.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Nodes/Runtime/NodeExecutor.cs
+using System.Collections.Generic;
+using UnityEngine;
+using TMPro;
+using System.Linq;
+
+public class NodeExecutor : MonoBehaviour
+{
+    [Header("UI Graph Source")]
+    [SerializeField] private NodeEditorGridController nodeEditorGrid;
+
+    [Header("Plant Spawning")]
+    [SerializeField] private GameObject plantPrefab;
+    [SerializeField] private GardenerController gardener;
+
+    [Header("Debugging")]
+    [SerializeField] private TMP_Text debugOutput;
+
+    private void Update()
+    {
+        // NOTE: Direct planting with spacebar was removed in favor of the tool-based planting system
+        // Plants are now created through the PlantPlacementManager when using the SeedPouch tool
+    }
+
+    public void SpawnPlantFromUIGraph()
+    {
+        // --- Validations ---
+        if (nodeEditorGrid == null) { DebugLogError("Node Editor Grid Controller not assigned!"); return; }
+        if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return; }
+        if (gardener == null) { DebugLogError("Gardener Controller not assigned!"); return; }
+
+        // Get the current graph state from the UI grid
+        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
+
+        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0) {
+             DebugLog("No nodes in UI graph to spawn.");
+             return;
+        }
+
+        // Validate if the graph is spawnable (e.g., requires a SeedSpawn effect)
+        bool seedFound = graphToSpawn.nodes.Any(node => node != null && node.effects != null && node.effects.Any(eff => eff != null && eff.effectType == NodeEffectType.SeedSpawn && eff.isPassive));
+        if (!seedFound) {
+            DebugLog("Cannot spawn plant: Node chain lacks a passive SeedSpawn effect.");
+            return;
+        }
+
+        DebugLog($"Spawning plant from UI graph with {graphToSpawn.nodes.Count} nodes...");
+
+        // Determine spawn position and parent
+        Vector2 spawnPos = gardener.GetPlantingPosition();
+        Transform plantParent = EcosystemManager.Instance?.plantParent; // Use optional chaining
+
+        // Instantiate the plant prefab
+        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity, plantParent); // Assign parent during instantiate
+
+        // Get the PlantGrowth component
+        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+        if (growthComponent != null)
+        {
+            // --- Create a DEEP COPY of the NodeGraph ---
+            // This is crucial so modifications to the UI graph don't affect running plants,
+            // and vice-versa.
+            NodeGraph graphCopy = new NodeGraph();
+            graphCopy.nodes = new List<NodeData>(graphToSpawn.nodes.Count); // Initialize with capacity
+
+            foreach(NodeData originalNodeData in graphToSpawn.nodes)
+            {
+                // Ensure original node data is not null
+                if (originalNodeData == null) {
+                    DebugLogWarning("Encountered null NodeData in UI graph during copy. Skipping.");
+                    continue;
+                }
+
+                 // Create a new NodeData instance
+                 NodeData newNodeData = new NodeData {
+                    nodeId = originalNodeData.nodeId, // Copy ID (or generate new one?)
+                    nodeDisplayName = originalNodeData.nodeDisplayName,
+                    orderIndex = originalNodeData.orderIndex,
+                    canBeDeleted = originalNodeData.canBeDeleted, // Copy runtime flags if needed
+                    // Create a deep copy of the effects list using the *updated* helper method
+                    effects = CloneEffectsList(originalNodeData.effects)
+                };
+                graphCopy.nodes.Add(newNodeData);
+            }
+
+            // Initialize the plant with the deep copy
+            growthComponent.InitializeAndGrow(graphCopy);
+            DebugLog("Plant spawned and initialized.");
+        }
+        else
+        {
+             // Log error and destroy invalid object if PlantGrowth is missing
+             DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth component! Destroying spawned object.");
+             Destroy(plantObj);
+        }
+    }
+
+    /// <summary>
+    /// Creates a deep copy of a list of NodeEffectData, including the ScentDefinition reference.
+    /// </summary>
+    private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
+    {
+        if (originalList == null) return new List<NodeEffectData>(); // Handle null input list
+
+        List<NodeEffectData> newList = new List<NodeEffectData>(originalList.Count);
+        foreach(var originalEffect in originalList)
+        {
+            // Ensure original effect data is not null
+            if(originalEffect == null) {
+                DebugLogWarning("Encountered null NodeEffectData in list during copy. Skipping.");
+                continue;
+            }
+
+             // Create a new NodeEffectData instance and copy all relevant fields
+             NodeEffectData newEffect = new NodeEffectData {
+                 effectType = originalEffect.effectType,
+                 primaryValue = originalEffect.primaryValue,
+                 secondaryValue = originalEffect.secondaryValue,
+                 isPassive = originalEffect.isPassive,
+                 // <<< FIXED: Explicitly copy the ScentDefinition reference >>>
+                 scentDefinitionReference = originalEffect.scentDefinitionReference
+             };
+             newList.Add(newEffect);
+        }
+        return newList;
+    }
+
+    // Helper methods for logging
+    private void DebugLog(string msg) {
+        Debug.Log($"[NodeExecutor] {msg}");
+        if (debugOutput != null) debugOutput.text += msg + "\n";
+    }
+    private void DebugLogError(string msg) {
+        Debug.LogError($"[NodeExecutor] {msg}");
+        if (debugOutput != null) debugOutput.text += $"ERROR: {msg}\n";
+    }
+     private void DebugLogWarning(string msg) {
+        Debug.LogWarning($"[NodeExecutor] {msg}");
+        if (debugOutput != null) debugOutput.text += $"WARNING: {msg}\n";
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\Runtime\NodeGraph.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+[Serializable]
+public class NodeGraph
+{
+    public List<NodeData> nodes = new List<NodeData>();
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\ColorExtensions.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+
+public static class ColorExtensions
+{
+    public static Color WithAlpha(this Color c, float alpha)
+    {
+        return new Color(c.r, c.g, c.b, alpha);
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\DeselectOnClickOutside.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.EventSystems; // Required for IPointerClickHandler
+
+// Add this script to an invisible, fullscreen background UI Image
+// Make sure it's the first child of the Canvas to render behind everything else
+public class DeselectOnClickOutside : MonoBehaviour, IPointerClickHandler
+{
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // Check if the click was with the left mouse button
+        if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            // If the background is clicked, clear the current node selection
+            // Debug.Log("Background Clicked. Clearing Node Selection.");
+            NodeCell.ClearSelection();
+        }
+    }
+}
+
+
+
+
 
 --------------------------------------------------------------------------------
-This is part 4 out of 9 of script collection. 5 more parts remain.
+This is part 4 out of 8 of script collection. 4 more parts remain.
 --------------------------------------------------------------------------------

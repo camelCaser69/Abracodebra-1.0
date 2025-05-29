@@ -1,8 +1,8 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-28 18:59:47
-PART 9 OF 9
+UNITY PROJECT SCRIPT EXPORT - 2025-05-26 22:28:12
+PART 7 OF 8
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -67,17 +67,11 @@ Assets
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
-│   │       ├── Panels
-│   │       │   ├── Panel_GeneListItem.prefab
-│   │       │   ├── Panel_GeneSequenceItem.prefab
-│   │       │   ├── Panel_SeedListItem.prefab
-│   │       │   └── Panel_SeedSelectionButton.prefab
 │   │       ├── ThoughtBubble.prefab
 │   │       ├── Visualizer_Circle_Prefab.prefab
 │   │       └── Visualizer_Line_Prefab.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
-│   │   ├── PLANTOTRON_Machine.prefab
 │   │   └── Projectile_Basic_Pixel.prefab
 │   └── Tiles
 │       ├── Common
@@ -116,8 +110,6 @@ Assets
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
-│   ├── Seeds
-│   │   └── SeedDefinition_000_Base.asset
 │   ├── Tiles
 │   │   ├── TileDefinition_000_Grass.asset
 │   │   ├── TileDefinition_001_Dirt.asset
@@ -188,17 +180,6 @@ Assets
 │   │   ├── Runtime
 │   │   │   ├── NodeExecutor.cs
 │   │   │   └── NodeGraph.cs
-│   │   ├── Seeds
-│   │   │   ├── PlantotronGeneItem.cs
-│   │   │   ├── PlantotronGeneSequenceItem.cs
-│   │   │   ├── PlantotronMachine.cs
-│   │   │   ├── PlantotronSeedItem.cs
-│   │   │   ├── PlantotronUI.cs
-│   │   │   ├── PlayerGeneticsInventory.cs
-│   │   │   ├── SeedDefinition.cs
-│   │   │   ├── SeedInstance.cs
-│   │   │   ├── SeedSelectionButton.cs
-│   │   │   └── SeedSelectionUI.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
 │   │       ├── DeselectOnClickOutside.cs
@@ -213,7 +194,7 @@ Assets
 │   ├── Tiles
 │   │   ├── Data
 │   │   │   ├── PlantGrowthModifierManager.cs
-│   │   │   ├── PlantPlacementManager.cs
+│   │   │   ├── PlantPlacementManagement.cs
 │   │   │   ├── PlayerTileInteractor.cs
 │   │   │   ├── TileDefinition.cs
 │   │   │   ├── TileInteractionLibrary.cs
@@ -230,13 +211,11 @@ Assets
 │   └── Visuals
 │       ├── NightColorPostProcess.cs
 │       ├── OutlinePartController.cs
-│       ├── PixelPerfectSetup.cs
 │       ├── PlantOutlineController.cs
 │       ├── PlantShadowController.cs
 │       ├── RuntimeCircleDrawer.cs
 │       ├── ShadowPartController.cs
-│       ├── WaterReflection.cs
-│       └── WaterReflectionManager.cs
+│       └── WaterReflection.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -262,6 +241,576 @@ SCRIPT CONTENTS
 
 SCRIPT CONTENTS
 ================================================================================
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Tools\ToolSwitcher.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Tiles/Tools/ToolSwitcher.cs
+using UnityEngine;
+using System;
+
+public class ToolSwitcher : MonoBehaviour
+{
+    [Tooltip("All available tool definitions, e.g. Hoe, WateringCan, etc.")]
+    public ToolDefinition[] toolDefinitions;
+
+    private int currentIndex = 0;
+
+    // --- Public Properties ---
+    public ToolDefinition CurrentTool { get; private set; } = null;
+    /// <summary>
+    /// Gets the remaining uses for the current tool. Returns -1 if the tool has unlimited uses.
+    /// </summary>
+    public int CurrentRemainingUses { get; private set; } = -1; // <<< NEW: Track remaining uses (-1 for unlimited)
+
+    // --- Events ---
+    public event Action<ToolDefinition> OnToolChanged;
+    /// <summary>
+    /// Event fired when the remaining uses of the current tool changes. Passes the new remaining count (-1 for unlimited).
+    /// </summary>
+    public event Action<int> OnUsesChanged; // <<< NEW EVENT for UI updates
+
+    private void Awake()
+    {
+        // Debug logs from previous step can be kept or removed
+        // Debug.Log("[ToolSwitcher Awake] Initializing...");
+    }
+
+    private void Start()
+    {
+        InitializeToolState(true); // Initialize and fire events
+    }
+
+    private void Update()
+    {
+        if (toolDefinitions == null || toolDefinitions.Length == 0) return;
+
+        bool toolChanged = false;
+        int previousIndex = currentIndex;
+
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            currentIndex--;
+            if (currentIndex < 0)
+                currentIndex = toolDefinitions.Length - 1;
+            toolChanged = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.E))
+        {
+            currentIndex++;
+            if (currentIndex >= toolDefinitions.Length)
+                currentIndex = 0;
+            toolChanged = true;
+        }
+
+        if (toolChanged)
+        {
+            // Ensure the new index points to a valid definition before updating state
+            if (currentIndex >= 0 && currentIndex < toolDefinitions.Length && toolDefinitions[currentIndex] != null)
+            {
+                InitializeToolState(false); // Update state for the new tool and fire events
+            }
+            else
+            {
+                 Debug.LogError($"[ToolSwitcher Update] Attempted to switch to an invalid/NULL tool definition at index {currentIndex}. Reverting.");
+                 currentIndex = previousIndex; // Revert to the last valid index
+                 // No state change, no events needed here
+            }
+        }
+    }
+
+    /// <summary>
+    /// Sets the CurrentTool and resets CurrentRemainingUses based on the tool's definition.
+    /// Optionally fires OnToolChanged and OnUsesChanged events.
+    /// </summary>
+    /// <param name="isInitialSetup">If true, forces event firing even if tool doesn't technically change.</param>
+    private void InitializeToolState(bool isInitialSetup)
+    {
+        ToolDefinition previousTool = CurrentTool; // Store previous tool for change check
+        int previousUses = CurrentRemainingUses; // Store previous uses
+
+        if (toolDefinitions == null || toolDefinitions.Length == 0 || currentIndex < 0 || currentIndex >= toolDefinitions.Length || toolDefinitions[currentIndex] == null)
+        {
+            // Handle cases with no tools or invalid selection
+            CurrentTool = null;
+            CurrentRemainingUses = -1; // No tool = unlimited uses conceptually
+        }
+        else
+        {
+            // Valid tool selected
+            CurrentTool = toolDefinitions[currentIndex];
+            if (CurrentTool.limitedUses)
+            {
+                CurrentRemainingUses = CurrentTool.initialUses;
+            }
+            else
+            {
+                CurrentRemainingUses = -1; // Mark as unlimited
+            }
+        }
+        
+        
+
+        LogToolChange("[ToolSwitcher InitializeToolState]"); // Log the state after update
+
+        // Fire events if state actually changed or if it's the initial setup
+        bool toolActuallyChanged = previousTool != CurrentTool;
+        bool usesActuallyChanged = previousUses != CurrentRemainingUses;
+
+        if (isInitialSetup || toolActuallyChanged)
+        {
+             Debug.Log($"[ToolSwitcher InitializeToolState] Firing OnToolChanged for tool: {CurrentTool?.displayName ?? "NULL"}");
+             OnToolChanged?.Invoke(CurrentTool);
+        }
+        if (isInitialSetup || usesActuallyChanged || toolActuallyChanged) // Fire uses changed if tool changed too (to reset UI)
+        {
+             Debug.Log($"[ToolSwitcher InitializeToolState] Firing OnUsesChanged with value: {CurrentRemainingUses}");
+             OnUsesChanged?.Invoke(CurrentRemainingUses);
+        }
+    }
+
+
+    /// <summary>
+    /// Refills the current tool to its maximum capacity if it's a limited-use tool.
+    /// </summary>
+    public void RefillCurrentTool() // <<< NEW METHOD
+    {
+        if (CurrentTool == null)
+        {
+            Debug.LogWarning("[ToolSwitcher RefillCurrentTool] Cannot refill: No tool selected.");
+            return;
+        }
+
+        if (!CurrentTool.limitedUses)
+        {
+            Debug.LogWarning($"[ToolSwitcher RefillCurrentTool] Cannot refill tool '{CurrentTool.displayName}': It has unlimited uses.");
+            return;
+        }
+
+        // Check if already full to avoid unnecessary event firing
+        if (CurrentRemainingUses == CurrentTool.initialUses)
+        {
+            if(Debug.isDebugBuild) Debug.Log($"[ToolSwitcher RefillCurrentTool] Tool '{CurrentTool.displayName}' is already full ({CurrentRemainingUses} uses).");
+            return;
+        }
+
+        // Set uses back to initial amount
+        int previousUses = CurrentRemainingUses;
+        CurrentRemainingUses = CurrentTool.initialUses;
+
+        Debug.Log($"[ToolSwitcher RefillCurrentTool] Refilled tool '{CurrentTool.displayName}' to {CurrentRemainingUses} uses (was {previousUses}).");
+
+        // Notify listeners that uses changed
+        OnUsesChanged?.Invoke(CurrentRemainingUses);
+    }
+    
+    /// <summary>
+    /// Attempts to consume one use of the current tool.
+    /// </summary>
+    /// <returns>True if a use was consumed or if the tool has unlimited uses. False if the tool has limited uses and is out of uses.</returns>
+    public bool TryConsumeUse()
+    {
+        if (CurrentTool == null)
+        {
+            Debug.LogWarning("[ToolSwitcher TryConsumeUse] Cannot consume use: No tool selected.");
+            return false; // Cannot use a non-existent tool
+        }
+
+        if (!CurrentTool.limitedUses || CurrentRemainingUses == -1)
+        {
+            // Tool is unlimited, consumption always succeeds
+            // Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' has unlimited uses."); // Optional log
+            return true;
+        }
+
+        // Tool has limited uses
+        if (CurrentRemainingUses > 0)
+        {
+            CurrentRemainingUses--;
+            Debug.Log($"[ToolSwitcher TryConsumeUse] Consumed use for '{CurrentTool.displayName}'. Remaining: {CurrentRemainingUses}");
+            OnUsesChanged?.Invoke(CurrentRemainingUses); // Notify listeners
+            return true;
+        }
+        else
+        {
+            // Out of uses
+            Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' is out of uses (0 remaining).");
+            // Optionally play an 'empty click' sound here
+            return false;
+        }
+    }
+
+    // Added prefix parameter for context
+    private void LogToolChange(string prefix = "[ToolSwitcher]")
+    {
+        string toolName = (CurrentTool != null && !string.IsNullOrEmpty(CurrentTool.displayName))
+                          ? CurrentTool.displayName
+                          : "(none)";
+        string usesSuffix = "";
+        if (CurrentTool != null && CurrentTool.limitedUses && CurrentRemainingUses >= 0)
+        {
+            usesSuffix = $" ({CurrentRemainingUses}/{CurrentTool.initialUses})";
+        }
+        else if (CurrentTool != null && !CurrentTool.limitedUses)
+        {
+            // usesSuffix = " (Unlimited)"; // Optional: Indicate unlimited
+        }
+
+        Debug.Log($"{prefix} Switched tool to: {toolName}{usesSuffix} (Index: {currentIndex})");
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Tiles\Tools\ToolType.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿public enum ToolType
+{
+    None,
+    Hoe,
+    WateringCan,
+    SeedPouch // New tool type
+    // etc.
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\NightColorPostProcess.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
+
+// Ensure this script is attached to a GameObject in your scene
+public class NightColorPostProcess : MonoBehaviour
+{
+    [Header("Core References")]
+    [Tooltip("Assign the WeatherManager controlling the day/night cycle.")]
+    public WeatherManager weatherManager;
+    [Tooltip("Assign the Global Post Processing Volume.")]
+    public Volume globalVolume;
+
+    // --- Private references to the Volume Overrides ---
+    private ColorAdjustments colorAdjustments;
+    private FilmGrain filmGrain;
+    private Vignette vignette;
+    // private Bloom bloom; // Example if you wanted to add Bloom later
+
+    [Header("Color Adjustments")]
+    [Tooltip("The color filter at full day (sunIntensity = 1).")]
+    public Color dayColorFilter = Color.white;
+    [Tooltip("The color filter at full night (sunIntensity ~ 0).")]
+    public Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
+    [Tooltip("Daytime Post-Exposure (Higher = brighter).")]
+    public float dayPostExposure = 0f;
+    [Tooltip("Nighttime Post-Exposure (Lower = darker).")]
+    public float nightPostExposure = -0.5f;
+    [Tooltip("Saturation at full day (0 = no change, <0 desaturates, >0 saturates).")]
+    public float daySaturation = 0f;
+    [Tooltip("Saturation at full night (e.g., -50 for more desaturation).")]
+    public float nightSaturation = -50f;
+
+    [Header("Film Grain")]
+    [Tooltip("Film grain intensity at full day (0 = none).")]
+    [Range(0f, 1f)] public float dayFilmGrainIntensity = 0.1f;
+    [Tooltip("Film grain intensity at full night (e.g., 0.5 for noticeable grain).")]
+    [Range(0f, 1f)] public float nightFilmGrainIntensity = 0.5f;
+    // Note: You could also control FilmGrain.response if desired
+
+    [Header("Vignette")]
+    [Tooltip("Vignette intensity at full day (0 = none, higher = stronger effect).")]
+    [Range(0f, 1f)] public float dayVignetteIntensity = 0.2f;
+    [Tooltip("Vignette intensity at full night (e.g., 0.5 for darker edges).")]
+    [Range(0f, 1f)] public float nightVignetteIntensity = 0.5f;
+    [Tooltip("Vignette smoothness at full day (higher = softer edge).")]
+    [Range(0.01f, 1f)] public float dayVignetteSmoothness = 0.2f;
+    [Tooltip("Vignette smoothness at full night.")]
+    [Range(0.01f, 1f)] public float nightVignetteSmoothness = 0.3f;
+    // Note: You could also control Vignette.color or Vignette.rounded if desired
+
+
+    private void Start()
+    {
+        // --- Validate Core References ---
+        if (!weatherManager)
+        {
+            Debug.LogError($"[{nameof(NightColorPostProcess)}] WeatherManager not assigned!", this);
+            enabled = false; // Disable script if core references are missing
+            return;
+        }
+        if (!globalVolume)
+        {
+            Debug.LogError($"[{nameof(NightColorPostProcess)}] Global Volume not assigned!", this);
+            enabled = false;
+            return;
+        }
+        if (globalVolume.profile == null)
+        {
+             Debug.LogError($"[{nameof(NightColorPostProcess)}] Global Volume has no profile assigned!", this);
+             enabled = false;
+             return;
+        }
+
+        // --- Attempt to Get Volume Overrides ---
+        // It's okay if some aren't found, the Update loop will check for null
+        if (!globalVolume.profile.TryGet<ColorAdjustments>(out colorAdjustments))
+        {
+            Debug.LogWarning($"[{nameof(NightColorPostProcess)}] ColorAdjustments override not found in Volume profile.", this);
+        }
+        if (!globalVolume.profile.TryGet<FilmGrain>(out filmGrain))
+        {
+             Debug.LogWarning($"[{nameof(NightColorPostProcess)}] FilmGrain override not found in Volume profile.", this);
+        }
+        if (!globalVolume.profile.TryGet<Vignette>(out vignette))
+        {
+             Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Vignette override not found in Volume profile.", this);
+        }
+        // Example for Bloom:
+        // if (!globalVolume.profile.TryGet<Bloom>(out bloom))
+        // {
+        //      Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Bloom override not found in Volume profile.", this);
+        // }
+
+        // --- Ensure Overrides are Active ---
+        // Make sure the overrides you intend to use are actually enabled on the Volume component itself.
+        // You might need to manually check the boxes in the Inspector for ColorAdjustments, FilmGrain, and Vignette.
+        // Alternatively, you could force them active here, but it's usually better to configure in the editor:
+        // if (colorAdjustments != null) colorAdjustments.active = true;
+        // if (filmGrain != null) filmGrain.active = true;
+        // if (vignette != null) vignette.active = true;
+    }
+
+    private void Update()
+    {
+        // No need to check weatherManager, Start() already disables if null
+        // Check if any overrides are available before proceeding
+        if (colorAdjustments == null && filmGrain == null && vignette == null)
+            return; // Nothing to update if no overrides were found
+
+        // Get the sun intensity (0 = night, 1 = day) and calculate interpolation factor t
+        float sun = Mathf.Clamp01(weatherManager.sunIntensity);
+        float t = 1f - sun;  // t=0 at day, t=1 at night
+
+        // --- Interpolate and Apply Color Adjustments ---
+        if (colorAdjustments != null)
+        {
+            colorAdjustments.colorFilter.value = Color.Lerp(dayColorFilter, nightColorFilter, t);
+            colorAdjustments.postExposure.value = Mathf.Lerp(dayPostExposure, nightPostExposure, t);
+            colorAdjustments.saturation.value = Mathf.Lerp(daySaturation, nightSaturation, t);
+        }
+
+        // --- Interpolate and Apply Film Grain ---
+        if (filmGrain != null)
+        {
+            filmGrain.intensity.value = Mathf.Lerp(dayFilmGrainIntensity, nightFilmGrainIntensity, t);
+            // You can add Lerp for filmGrain.response here if needed
+        }
+
+        // --- Interpolate and Apply Vignette ---
+        if (vignette != null)
+        {
+            vignette.intensity.value = Mathf.Lerp(dayVignetteIntensity, nightVignetteIntensity, t);
+            vignette.smoothness.value = Mathf.Lerp(dayVignetteSmoothness, nightVignetteSmoothness, t);
+             // You can add Lerp for vignette.color or vignette.rounded here if needed
+        }
+
+        // --- Example for Bloom ---
+        // if (bloom != null)
+        // {
+        //     bloom.intensity.value = Mathf.Lerp(dayBloomIntensity, nightBloomIntensity, t);
+        // }
+    }
+}
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visuals\OutlinePartController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Visuals/OutlinePartController.cs
+using UnityEngine;
+
+[RequireComponent(typeof(SpriteRenderer))]
+public class OutlinePartController : MonoBehaviour
+{
+    private SpriteRenderer outlineRenderer;
+    private SpriteRenderer sourcePlantPartRenderer; // The plant part this outline mimics
+
+    [HideInInspector] public Vector2Int gridCoord; // The coordinate *this outline* lives at
+
+    void Awake()
+    {
+        outlineRenderer = GetComponent<SpriteRenderer>();
+        if (outlineRenderer != null)
+        {
+            outlineRenderer.drawMode = SpriteDrawMode.Simple;
+            outlineRenderer.enabled = false;
+        }
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] OutlinePartController is missing SpriteRenderer component!", this);
+        }
+    }
+
+    public void Initialize(SpriteRenderer sourceRenderer, Vector2Int myCoord, PlantOutlineController controller)
+    {
+        if (sourceRenderer == null || controller == null) 
+        { 
+            Debug.LogError($"[{gameObject.name}] Initialization failed! Source renderer or controller is null!", this);
+            Destroy(gameObject); 
+            return; 
+        }
+        
+        sourcePlantPartRenderer = sourceRenderer; // Store initial source
+        gridCoord = myCoord;
+        
+        if (outlineRenderer == null)
+        {
+            outlineRenderer = GetComponent<SpriteRenderer>();
+            if (outlineRenderer == null)
+            {
+                Debug.LogError($"[{gameObject.name}] Initialize: Cannot find SpriteRenderer component!", this);
+                Destroy(gameObject);
+                return;
+            }
+        }
+        
+        // Set layer & color properties
+        outlineRenderer.sortingLayerID = controller.OutlineSortingLayer;
+        outlineRenderer.sortingOrder = controller.OutlineSortingOrder;
+        outlineRenderer.color = controller.OutlineColor;
+        
+        // Set parent & position
+        transform.SetParent(controller.transform, true); // Parent to controller's transform
+        
+        // Set initial position based on grid coordinate (controller handles spacing)
+        float spacing = controller.GetComponentInParent<PlantGrowth>()?.GetCellSpacing() ?? 0.08f; // Get spacing
+        transform.localPosition = (Vector2)myCoord * spacing;
+
+        // Set visibility based on source renderer's state
+        outlineRenderer.enabled = IsSourceRendererValid() && 
+                                  sourcePlantPartRenderer.enabled && 
+                                  sourcePlantPartRenderer.sprite != null;
+        
+        SyncSpriteAndTransform(); // Initial sync
+    }
+
+    void LateUpdate()
+    {
+        // Skip update if not visible
+        if (outlineRenderer == null || !outlineRenderer.enabled) return;
+
+        // Check if source is still valid
+        if (!IsSourceRendererValid())
+        {
+            SetVisibility(false);
+            return;
+        }
+        
+        // Check if source is still enabled and has a sprite
+        if (!sourcePlantPartRenderer.enabled || sourcePlantPartRenderer.sprite == null)
+        {
+            SetVisibility(false);
+            return;
+        }
+
+        // If we are enabled and source is valid, sync visuals
+        SyncSpriteAndTransform();
+    }
+
+    // Public method to check if the source renderer still exists
+    public bool IsSourceRendererValid()
+    {
+        // Unity overloads null check for destroyed objects
+        if (sourcePlantPartRenderer == null)
+            return false;
+            
+        // Additional check: is the gameObject actually active/valid
+        if (!sourcePlantPartRenderer.gameObject.activeInHierarchy)
+            return false;
+            
+        return true;
+    }
+
+    // Public method to update the source renderer if the original was destroyed
+    public void UpdateSourceRenderer(SpriteRenderer newSource)
+    {
+        if (newSource != null)
+        {
+            sourcePlantPartRenderer = newSource;
+            
+            // Ensure visibility state is correct after source update
+            SetVisibility(
+                outlineRenderer != null && 
+                sourcePlantPartRenderer.enabled && 
+                sourcePlantPartRenderer.sprite != null
+            );
+            
+            // Immediately sync sprite/transform after updating source
+            SyncSpriteAndTransform();
+            
+            // Debug.Log($"Updated outline at {gridCoord} with new source renderer: {newSource.gameObject.name}");
+        } 
+        else 
+        {
+            Debug.LogWarning($"Attempted to update source renderer for outline at {gridCoord} with null.", gameObject);
+            // If no valid new source, hide this outline
+            SetVisibility(false);
+        }
+    }
+
+    // Sync sprite and transform data
+    public void SyncSpriteAndTransform()
+    {
+        // Safety checks
+        if (!IsSourceRendererValid() || outlineRenderer == null) 
+            return;
+
+        // Sync sprite
+        if (outlineRenderer.sprite != sourcePlantPartRenderer.sprite)
+        {
+            outlineRenderer.sprite = sourcePlantPartRenderer.sprite;
+        }
+        
+        // Sync other visual properties
+        transform.localScale = sourcePlantPartRenderer.transform.localScale;
+        outlineRenderer.flipX = sourcePlantPartRenderer.flipX;
+        outlineRenderer.flipY = sourcePlantPartRenderer.flipY;
+        
+        // Note: Position is set in Initialize and doesn't need to track source renderer's parent offset
+    }
+
+    public void SetVisibility(bool isVisible)
+    {
+        if (outlineRenderer != null && outlineRenderer.enabled != isVisible)
+        {
+            outlineRenderer.enabled = isVisible;
+        }
+    }
+
+    public void DestroyOutlinePart()
+    {
+        if (this != null && gameObject != null)
+        {
+            if (Application.isPlaying)
+            {
+                Destroy(gameObject);
+            }
+            else
+            {
+                DestroyImmediate(gameObject);
+            }
+        }
+    }
+}
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Visuals\PlantOutlineController.cs
@@ -1068,542 +1617,7 @@ public class ShadowPartController : MonoBehaviour
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Visuals\WaterReflection.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Visuals/WaterReflection.cs
-using UnityEngine;
-using UnityEngine.Tilemaps;
-using System.Collections.Generic; // Keep for potential future extensions, not strictly needed now
-
-public class WaterReflection : MonoBehaviour
-{
-    // --- SECTION: Override Toggles ---
-    [System.Serializable]
-    public class OverrideSettings
-    {
-        [Tooltip("If checked, the local 'Reflection Opacity' value will be used instead of the global manager's default.")]
-        public bool reflectionOpacity = false;
-        [Tooltip("If checked, the local 'Reflection Tint' value will be used instead of the global manager's default.")]
-        public bool reflectionTint = false;
-        [Tooltip("If checked, the local 'Gradient Fade Base Material' will be used. Otherwise, manager's default is used.")]
-        public bool gradientFadeBaseMaterial = false;
-        [Tooltip("If checked, the local 'Sorting Order Offset' value will be used instead of the global manager's default.")]
-        public bool sortingOrderOffset = false;
-        [Tooltip("If checked, the local 'Use Water Masking' value will be used instead of the global manager's default.")]
-        public bool useWaterMasking = false;
-        [Tooltip("If checked, the local 'Water Tilemap Tag' value will be used instead of the global manager's default.")]
-        public bool waterTilemapTag = false;
-        [Tooltip("If checked, the local 'Show Debug Info' value will be used instead of the global manager's default.")]
-        public bool showDebugInfo = false;
-    }
-    [Header("Overrides (Global Defaults from WaterReflectionManager)")]
-    [SerializeField] private OverrideSettings overrides;
-
-
-    // --- SECTION: Local Settings (Used if Overridden) ---
-    [Header("Reflection Source")]
-    [Tooltip("If true, Y Offset and Distance Fade calculations will be relative to this GameObject's parent. If false (default), relative to this GameObject.")]
-    [SerializeField] private bool useParentAsReference = false; // This remains a local setting
-
-    [Header("Local Reflection Settings (If Overridden)")]
-    [Tooltip("Vertical offset of the reflection. Interpretation depends on 'Use Parent As Reference'.")]
-    [SerializeField] private float yOffset = -1f; // This remains a local setting
-
-    [Tooltip("Local opacity of the reflection (0 = invisible, 1 = fully opaque)")]
-    [SerializeField] [Range(0f, 1f)] private float localReflectionOpacity = 0.5f;
-
-    [Tooltip("Local additional tint color for the reflection")]
-    [SerializeField] private Color localReflectionTint = Color.white;
-
-    [Header("Local Distance Fade (If Overridden)")]
-    [Tooltip("Enable fading reflection. Requires 'Gradient Fade Base Material' (local or global) to be assigned.")]
-    [SerializeField] private bool enableDistanceFade = true; // This remains local as it depends on material
-    [Tooltip("Vertical distance from the reference Y where fade starts.")]
-    [SerializeField] private float fadeStartDistance = 0.0f; // Local
-    [Tooltip("Vertical distance from the reference Y where reflection becomes min alpha.")]
-    [SerializeField] private float fadeEndDistance = 1.0f; // Local
-    [Tooltip("Minimum alpha when fully faded.")]
-    [SerializeField] [Range(0f, 1f)] private float minFadeAlpha = 0.0f; // Local
-    [Tooltip("Local override for the gradient fade material. If unassigned and override is false, uses manager's default.")]
-    [SerializeField] private Material localGradientFadeBaseMaterial;
-
-    [Header("Local Sorting (If Overridden)")]
-    [Tooltip("Local sorting order offset for the reflection")]
-    [SerializeField] private int localSortingOrderOffset = -1;
-
-    [Header("Local Water Masking (If Overridden)")]
-    [Tooltip("Local override for using water masking")]
-    [SerializeField] private bool localUseWaterMasking = true;
-    [Tooltip("Local override for the water tilemap tag")]
-    [SerializeField] private string localWaterTilemapTag = "Water";
-
-    [Header("Local Debug (If Overridden)")]
-    [SerializeField] private bool localShowDebugInfo = false;
-
-
-    // --- Internal References ---
-    private SpriteRenderer originalRenderer;
-    private Animator originalAnimator;
-    private GameObject reflectionObject;
-    private SpriteRenderer reflectionRenderer;
-    private Animator reflectionAnimator;
-    private Material reflectionMaterialInstance; // Instanced material for this reflection
-
-    // --- Resolved Settings (from Manager or Local) ---
-    private float _actualReflectionOpacity;
-    private Color _actualReflectionTint;
-    private Material _actualGradientFadeBaseMaterial;
-    private int _actualSortingOrderOffset;
-    private bool _actualUseWaterMasking;
-    private string _actualWaterTilemapTag;
-    private bool _actualShowDebugInfo;
-
-
-    // --- Cached Values for Optimization ---
-    private Sprite lastSprite;
-    private Color lastOriginalColor;
-    private bool lastFlipX, lastFlipY;
-    private bool lastEnabled;
-    private Vector3 lastScale;
-    private Vector3 lastPosition;
-    private float lastParentY;
-
-    void Awake()
-    {
-        ResolveSettings(); // Determine actual settings to use
-
-        originalRenderer = GetComponent<SpriteRenderer>();
-        originalAnimator = GetComponent<Animator>();
-
-        if (originalRenderer == null)
-        {
-            if (_actualShowDebugInfo) Debug.LogError($"[WaterReflection] No SpriteRenderer found on {gameObject.name}! Component disabled.", this);
-            enabled = false;
-            return;
-        }
-
-        if (useParentAsReference && transform.parent == null)
-        {
-            if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection] 'Use Parent As Reference' is true on {gameObject.name}, but it has no parent. Will use self as reference.", this);
-            useParentAsReference = false;
-        }
-
-        if (Application.isPlaying)
-        {
-            if (enableDistanceFade && _actualGradientFadeBaseMaterial == null)
-            {
-                 if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection Awake] '{gameObject.name}': 'Enable Distance Fade' is true, but no 'Gradient Fade Base Material' (local or global) is assigned/found. Distance fade will not use the custom shader.", this);
-            }
-        }
-
-        CreateReflectionObject();
-
-        if (_actualUseWaterMasking)
-        {
-            SetupWaterMaskingInteraction();
-        }
-    }
-    
-    void ResolveSettings()
-    {
-        if (WaterReflectionManager.Instance != null)
-        {
-            _actualReflectionOpacity = overrides.reflectionOpacity ? localReflectionOpacity : WaterReflectionManager.Instance.defaultReflectionOpacity;
-            _actualReflectionTint = overrides.reflectionTint ? localReflectionTint : WaterReflectionManager.Instance.defaultReflectionTint;
-            _actualGradientFadeBaseMaterial = overrides.gradientFadeBaseMaterial ? localGradientFadeBaseMaterial : WaterReflectionManager.Instance.defaultGradientFadeMaterial;
-            _actualSortingOrderOffset = overrides.sortingOrderOffset ? localSortingOrderOffset : WaterReflectionManager.Instance.defaultSortingOrderOffset;
-            _actualUseWaterMasking = overrides.useWaterMasking ? localUseWaterMasking : WaterReflectionManager.Instance.defaultUseWaterMasking;
-            _actualWaterTilemapTag = overrides.waterTilemapTag && !string.IsNullOrEmpty(localWaterTilemapTag) ? localWaterTilemapTag : WaterReflectionManager.Instance.defaultWaterTilemapTag;
-            _actualShowDebugInfo = overrides.showDebugInfo ? localShowDebugInfo : WaterReflectionManager.Instance.globalShowDebugInfo;
-        }
-        else // Fallback if no manager in scene
-        {
-            _actualReflectionOpacity = localReflectionOpacity;
-            _actualReflectionTint = localReflectionTint;
-            _actualGradientFadeBaseMaterial = localGradientFadeBaseMaterial;
-            _actualSortingOrderOffset = localSortingOrderOffset;
-            _actualUseWaterMasking = localUseWaterMasking;
-            _actualWaterTilemapTag = localWaterTilemapTag;
-            _actualShowDebugInfo = localShowDebugInfo;
-            if (Application.isPlaying) Debug.LogWarning("[WaterReflection] WaterReflectionManager not found in scene. Using local settings for all reflections.", this);
-        }
-    }
-
-
-    void Start()
-    {
-        UpdateReflectionVisuals();
-        UpdateReflectionTransform();
-        CacheCurrentState();
-    }
-
-    void LateUpdate()
-    {
-        if (originalRenderer == null || reflectionObject == null)
-        {
-            if (reflectionObject != null) reflectionObject.SetActive(false);
-            return;
-        }
-        UpdateReflectionTransform();
-        if (HasVisualStateChanged())
-        {
-            UpdateReflectionVisuals();
-            CacheCurrentState();
-        }
-    }
-
-    private void CreateReflectionObject()
-    {
-        reflectionObject = new GameObject($"{gameObject.name}_Reflection");
-        reflectionObject.transform.SetParent(transform.parent, false);
-        reflectionObject.transform.SetSiblingIndex(transform.GetSiblingIndex() + 1);
-
-        reflectionRenderer = reflectionObject.AddComponent<SpriteRenderer>();
-        reflectionRenderer.sortingLayerName = originalRenderer.sortingLayerName;
-        reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + _actualSortingOrderOffset; // Use resolved
-        reflectionRenderer.drawMode = originalRenderer.drawMode;
-
-        if (enableDistanceFade && _actualGradientFadeBaseMaterial != null) // Use resolved
-        {
-            reflectionMaterialInstance = new Material(_actualGradientFadeBaseMaterial);
-            reflectionRenderer.material = reflectionMaterialInstance;
-            if (_actualShowDebugInfo && Application.isPlaying) Debug.Log($"[{gameObject.name}] Instantiated gradient material for reflection using '{_actualGradientFadeBaseMaterial.name}'.", this);
-        }
-        else
-        {
-            reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial;
-            if (enableDistanceFade && _actualGradientFadeBaseMaterial == null && _actualShowDebugInfo && Application.isPlaying)
-            {
-                 Debug.Log($"[{gameObject.name}] Using sharedMaterial for reflection as no gradientFadeBaseMaterial (local or global) was resolved during CreateReflectionObject.", this);
-            }
-        }
-
-        if (originalAnimator != null)
-        {
-            reflectionAnimator = reflectionObject.AddComponent<Animator>();
-            reflectionAnimator.runtimeAnimatorController = originalAnimator.runtimeAnimatorController;
-        }
-        SortableEntity originalSortable = GetComponent<SortableEntity>();
-        if (originalSortable != null)
-        {
-            reflectionObject.AddComponent<SortableEntity>();
-        }
-        if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Created reflection for {gameObject.name}", this);
-    }
-
-    private void UpdateReflectionTransform()
-    {
-        if (reflectionObject == null || originalRenderer == null) return;
-        Transform referenceTransform = (useParentAsReference && transform.parent != null) ? transform.parent : transform;
-        Vector3 originalWorldPos = transform.position;
-        Vector3 reflectionWorldPos = originalWorldPos;
-        float referenceYForOffset = referenceTransform.position.y;
-        reflectionWorldPos.y = referenceYForOffset + yOffset - (originalWorldPos.y - referenceYForOffset);
-        reflectionObject.transform.position = reflectionWorldPos;
-        reflectionObject.transform.rotation = transform.rotation;
-        reflectionObject.transform.localScale = transform.localScale;
-        Vector3 currentLocalScale = reflectionObject.transform.localScale;
-        currentLocalScale.y *= -1;
-        reflectionObject.transform.localScale = currentLocalScale;
-    }
-
-    private void UpdateReflectionVisuals()
-    {
-        if (reflectionRenderer == null || originalRenderer == null) return;
-
-        reflectionRenderer.sprite = originalRenderer.sprite;
-        reflectionRenderer.flipX = originalRenderer.flipX;
-        reflectionRenderer.flipY = originalRenderer.flipY;
-
-        Color baseOriginalSpriteColor = originalRenderer.color;
-        Color finalReflectionTintedColor = baseOriginalSpriteColor * _actualReflectionTint; // Use resolved
-        float finalCombinedAlpha = baseOriginalSpriteColor.a * _actualReflectionOpacity; // Use resolved
-        reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
-
-        if (enableDistanceFade && reflectionMaterialInstance != null)
-        {
-            Transform referenceTransform = (useParentAsReference && transform.parent != null) ? transform.parent : transform;
-            float waterSurfaceY = referenceTransform.position.y;
-            reflectionMaterialInstance.SetFloat("_FadeStart", fadeStartDistance);
-            reflectionMaterialInstance.SetFloat("_FadeEnd", fadeEndDistance);
-            reflectionMaterialInstance.SetFloat("_MinAlpha", minFadeAlpha);
-            reflectionMaterialInstance.SetFloat("_OriginalY", waterSurfaceY);
-            Color materialBaseColor = _actualReflectionTint; // Use resolved
-            materialBaseColor.a = _actualReflectionOpacity * baseOriginalSpriteColor.a; // Use resolved
-            reflectionMaterialInstance.SetColor("_Color", materialBaseColor);
-        }
-        else if (!enableDistanceFade && reflectionMaterialInstance != null)
-        {
-            reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial;
-            Destroy(reflectionMaterialInstance);
-            reflectionMaterialInstance = null;
-        }
-
-        reflectionRenderer.enabled = originalRenderer.enabled && originalRenderer.gameObject.activeInHierarchy;
-
-        if (reflectionAnimator != null && originalAnimator != null)
-        {
-            reflectionAnimator.enabled = originalAnimator.enabled;
-            if (originalAnimator.runtimeAnimatorController != null && originalAnimator.parameterCount > 0)
-            {
-                foreach (AnimatorControllerParameter param in originalAnimator.parameters)
-                {
-                    try {
-                        switch (param.type)
-                        {
-                            case AnimatorControllerParameterType.Bool:
-                                reflectionAnimator.SetBool(param.name, originalAnimator.GetBool(param.name));
-                                break;
-                            case AnimatorControllerParameterType.Float:
-                                reflectionAnimator.SetFloat(param.name, originalAnimator.GetFloat(param.name));
-                                break;
-                            case AnimatorControllerParameterType.Int:
-                                reflectionAnimator.SetInteger(param.name, originalAnimator.GetInteger(param.name));
-                                break;
-                        }
-                    } catch (System.Exception e) {
-                        if(_actualShowDebugInfo) Debug.LogWarning($"Failed to sync animator param '{param.name}': {e.Message}", reflectionAnimator);
-                    }
-                }
-            }
-        }
-    }
-
-    private bool HasVisualStateChanged()
-    {
-        if (originalRenderer == null) return false;
-        bool parentYChanged = false;
-        if (useParentAsReference && transform.parent != null)
-        {
-            parentYChanged = !Mathf.Approximately(lastParentY, transform.parent.position.y);
-        }
-        return lastSprite != originalRenderer.sprite ||
-               !ColorsApproximatelyEqual(lastOriginalColor, originalRenderer.color) ||
-               lastFlipX != originalRenderer.flipX ||
-               lastFlipY != originalRenderer.flipY ||
-               lastEnabled != (originalRenderer.enabled && originalRenderer.gameObject.activeInHierarchy) ||
-               lastScale != transform.localScale ||
-               lastPosition != transform.position ||
-               parentYChanged;
-    }
-
-    private void CacheCurrentState()
-    {
-        if (originalRenderer == null) return;
-        lastSprite = originalRenderer.sprite;
-        lastOriginalColor = originalRenderer.color;
-        lastFlipX = originalRenderer.flipX;
-        lastFlipY = originalRenderer.flipY;
-        lastEnabled = originalRenderer.enabled && originalRenderer.gameObject.activeInHierarchy;
-        lastScale = transform.localScale;
-        lastPosition = transform.position;
-        if (useParentAsReference && transform.parent != null)
-        {
-            lastParentY = transform.parent.position.y;
-        }
-    }
-
-    private bool ColorsApproximatelyEqual(Color c1, Color c2, float tolerance = 0.001f)
-    {
-        return Mathf.Abs(c1.r - c2.r) < tolerance &&
-               Mathf.Abs(c1.g - c2.g) < tolerance &&
-               Mathf.Abs(c1.b - c2.b) < tolerance &&
-               Mathf.Abs(c1.a - c2.a) < tolerance;
-    }
-
-    private void SetupWaterMaskingInteraction()
-    {
-        if (!_actualUseWaterMasking || reflectionRenderer == null) return; // Use resolved
-        GameObject waterTilemapGO = FindWaterTilemapByTag(); // FindWaterTilemapByTag will use resolved tag
-        if (waterTilemapGO == null)
-        {
-            if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection] Water tilemap for masking not found on {gameObject.name} using tag '{_actualWaterTilemapTag}'. Masking disabled.", this);
-            // _actualUseWaterMasking = false; // Don't change resolved setting here, just don't apply mask
-            return;
-        }
-        SpriteMask maskComponent = waterTilemapGO.GetComponent<SpriteMask>();
-        if (maskComponent == null)
-        {
-            maskComponent = waterTilemapGO.AddComponent<SpriteMask>();
-            maskComponent.sprite = null;
-            if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Added SpriteMask to water tilemap '{waterTilemapGO.name}' for object '{gameObject.name}'.", waterTilemapGO);
-        }
-        reflectionRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-        if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Reflection of '{gameObject.name}' will be masked by '{waterTilemapGO.name}'.", this);
-    }
-
-    private GameObject FindWaterTilemapByTag()
-    {
-        // Uses _actualWaterTilemapTag which is resolved in Awake
-        if (string.IsNullOrEmpty(_actualWaterTilemapTag)) return FindWaterTilemapFallback();
-        GameObject taggedWater = GameObject.FindGameObjectWithTag(_actualWaterTilemapTag);
-        if (taggedWater != null && taggedWater.GetComponent<Tilemap>() != null)
-        {
-            if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Found water tilemap by tag '{_actualWaterTilemapTag}': {taggedWater.name} for {gameObject.name}", this);
-            return taggedWater;
-        }
-        if (taggedWater != null && taggedWater.GetComponent<Tilemap>() == null && _actualShowDebugInfo)
-        {
-            Debug.LogWarning($"[WaterReflection] GameObject '{taggedWater.name}' (tag '{_actualWaterTilemapTag}') has no Tilemap component!", this);
-        }
-        return FindWaterTilemapFallback();
-    }
-
-    private GameObject FindWaterTilemapFallback()
-    {
-        if (TileInteractionManager.Instance != null)
-        {
-            var mappings = TileInteractionManager.Instance.tileDefinitionMappings;
-            if (mappings != null)
-            {
-                foreach (var mapping in mappings)
-                {
-                    if (mapping?.tileDef != null && mapping.tilemapModule != null && mapping.tileDef.isWaterTile)
-                    {
-                        Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-                        if (renderTilemapTransform != null && renderTilemapTransform.GetComponent<Tilemap>() != null)
-                        {
-                            if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Auto-detected water tilemap via TIM: {renderTilemapTransform.name} for {gameObject.name}", this);
-                            return renderTilemapTransform.gameObject;
-                        }
-                    }
-                }
-            }
-        }
-        if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection] Could not auto-detect water tilemap via TileInteractionManager for {gameObject.name}.", this);
-        return null;
-    }
-
-    void OnDestroy()
-    {
-        if (reflectionObject != null)
-        {
-            if (Application.isPlaying) Destroy(reflectionObject);
-            else DestroyImmediate(reflectionObject);
-        }
-        if (reflectionMaterialInstance != null)
-        {
-            if (Application.isPlaying) Destroy(reflectionMaterialInstance);
-            else DestroyImmediate(reflectionMaterialInstance);
-        }
-    }
-
-    void OnValidate()
-    {
-        // In OnValidate, we don't have access to the Manager's instance easily,
-        // so we'll primarily validate local settings.
-        // The ResolveSettings() call in Awake will handle combining with manager settings at runtime.
-        if (Application.isEditor && !Application.isPlaying)
-        {
-            // Check if local material is needed but missing
-            bool localMaterialNeeded = enableDistanceFade && (!overrides.gradientFadeBaseMaterial || localGradientFadeBaseMaterial == null);
-            bool globalMaterialMightBeUsed = enableDistanceFade && !overrides.gradientFadeBaseMaterial && localGradientFadeBaseMaterial == null;
-
-            if (localMaterialNeeded && !globalMaterialMightBeUsed) // Warn if local override is on but local material missing
-            {
-                 Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true and 'Override Gradient Material' is true, but 'Local Gradient Fade Base Material' is not assigned. Assign local material or uncheck override.", this);
-            }
-            else if (globalMaterialMightBeUsed) // Inform that global will be used if local isn't set
-            {
-                 Debug.Log($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true. If 'Local Gradient Fade Base Material' remains unassigned and override is false, the global default from WaterReflectionManager will be used in Play mode.", this);
-            }
-
-
-            // Basic visual update for editor preview if possible
-            if (reflectionRenderer != null && originalRenderer != null)
-            {
-                // Determine settings as best as possible for editor preview (without manager)
-                Color previewTint = overrides.reflectionTint ? localReflectionTint : Color.white; // Default to white if no manager
-                float previewOpacity = overrides.reflectionOpacity ? localReflectionOpacity : 0.5f;
-                int previewSortOffset = overrides.sortingOrderOffset ? localSortingOrderOffset : -1;
-
-                reflectionRenderer.sprite = originalRenderer.sprite;
-                reflectionRenderer.flipX = originalRenderer.flipX;
-                reflectionRenderer.flipY = originalRenderer.flipY;
-                reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + previewSortOffset;
-                Color baseOriginalSpriteColor = originalRenderer.color;
-                Color finalReflectionTintedColor = baseOriginalSpriteColor * previewTint;
-                float finalCombinedAlpha = baseOriginalSpriteColor.a * previewOpacity;
-                reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
-                UpdateReflectionTransform(); // Keep transform updated
-            }
-        }
-    }
-
-
-    // --- Public Methods for Runtime Control (Could be removed if not needed, or kept for dynamic changes) ---
-    public void SetLocalReflectionOpacity(float opacity) // Example of changing a local-only value
-    {
-        localReflectionOpacity = Mathf.Clamp01(opacity);
-        if (overrides.reflectionOpacity) // Only re-resolve and update if this local value is being used
-        {
-            ResolveSettings();
-            if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals();
-        }
-    }
-    // Add more setters if you need to programmatically change local override values and have them take effect.
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Visuals\WaterReflectionManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Visuals/Managers/WaterReflectionManager.cs
-using UnityEngine;
-
-public class WaterReflectionManager : MonoBehaviour
-{
-    public static WaterReflectionManager Instance { get; private set; }
-
-    [Header("Global Default Reflection Settings")]
-    [Tooltip("Default material to use for reflections if 'Enable Distance Fade' is true and no specific material is assigned on the WaterReflection component. Assign your 'Custom/WaterReflectionGradient' material asset here.")]
-    public Material defaultGradientFadeMaterial;
-
-    [Tooltip("Default opacity for all reflections (0 = invisible, 1 = fully opaque). Can be overridden per instance.")]
-    [Range(0f, 1f)] public float defaultReflectionOpacity = 0.5f;
-
-    [Tooltip("Default additional tint color for all reflections. Can be overridden per instance.")]
-    public Color defaultReflectionTint = Color.white;
-
-    [Tooltip("Default sorting order offset for reflections (usually negative). Can be overridden per instance.")]
-    public int defaultSortingOrderOffset = -1;
-
-    [Header("Global Default Water Masking Settings")]
-    [Tooltip("Default setting for whether to use water masking. Can be overridden per instance.")]
-    public bool defaultUseWaterMasking = true;
-
-    [Tooltip("Default tag used to identify the water tilemap. Can be overridden per instance.")]
-    public string defaultWaterTilemapTag = "Water";
-
-    [Header("Global Debug Settings")]
-    [Tooltip("Enable debug logs for all WaterReflection instances that don't override this.")]
-    public bool globalShowDebugInfo = false;
-
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Debug.LogWarning($"[WaterReflectionManager] Duplicate instance found on {gameObject.name}. Destroying self.", gameObject);
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-
-        if (defaultGradientFadeMaterial == null)
-        {
-            Debug.LogWarning("[WaterReflectionManager] Default Gradient Fade Material is not assigned. Distance fade may not work correctly for reflections that don't have their own material specified.", this);
-        }
-    }
-}
-
-
-
-
 
 --------------------------------------------------------------------------------
-This is the final part (9 of 9).
+This is part 7 out of 8 of script collection. 1 more parts remain.
 --------------------------------------------------------------------------------

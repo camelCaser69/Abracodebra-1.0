@@ -1,8 +1,8 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-28 18:59:47
-PART 3 OF 9
+UNITY PROJECT SCRIPT EXPORT - 2025-05-26 22:28:12
+PART 3 OF 8
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -67,17 +67,11 @@ Assets
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
-│   │       ├── Panels
-│   │       │   ├── Panel_GeneListItem.prefab
-│   │       │   ├── Panel_GeneSequenceItem.prefab
-│   │       │   ├── Panel_SeedListItem.prefab
-│   │       │   └── Panel_SeedSelectionButton.prefab
 │   │       ├── ThoughtBubble.prefab
 │   │       ├── Visualizer_Circle_Prefab.prefab
 │   │       └── Visualizer_Line_Prefab.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
-│   │   ├── PLANTOTRON_Machine.prefab
 │   │   └── Projectile_Basic_Pixel.prefab
 │   └── Tiles
 │       ├── Common
@@ -116,8 +110,6 @@ Assets
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
-│   ├── Seeds
-│   │   └── SeedDefinition_000_Base.asset
 │   ├── Tiles
 │   │   ├── TileDefinition_000_Grass.asset
 │   │   ├── TileDefinition_001_Dirt.asset
@@ -188,17 +180,6 @@ Assets
 │   │   ├── Runtime
 │   │   │   ├── NodeExecutor.cs
 │   │   │   └── NodeGraph.cs
-│   │   ├── Seeds
-│   │   │   ├── PlantotronGeneItem.cs
-│   │   │   ├── PlantotronGeneSequenceItem.cs
-│   │   │   ├── PlantotronMachine.cs
-│   │   │   ├── PlantotronSeedItem.cs
-│   │   │   ├── PlantotronUI.cs
-│   │   │   ├── PlayerGeneticsInventory.cs
-│   │   │   ├── SeedDefinition.cs
-│   │   │   ├── SeedInstance.cs
-│   │   │   ├── SeedSelectionButton.cs
-│   │   │   └── SeedSelectionUI.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
 │   │       ├── DeselectOnClickOutside.cs
@@ -213,7 +194,7 @@ Assets
 │   ├── Tiles
 │   │   ├── Data
 │   │   │   ├── PlantGrowthModifierManager.cs
-│   │   │   ├── PlantPlacementManager.cs
+│   │   │   ├── PlantPlacementManagement.cs
 │   │   │   ├── PlayerTileInteractor.cs
 │   │   │   ├── TileDefinition.cs
 │   │   │   ├── TileInteractionLibrary.cs
@@ -230,13 +211,11 @@ Assets
 │   └── Visuals
 │       ├── NightColorPostProcess.cs
 │       ├── OutlinePartController.cs
-│       ├── PixelPerfectSetup.cs
 │       ├── PlantOutlineController.cs
 │       ├── PlantShadowController.cs
 │       ├── RuntimeCircleDrawer.cs
 │       ├── ShadowPartController.cs
-│       ├── WaterReflection.cs
-│       └── WaterReflectionManager.cs
+│       └── WaterReflection.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -993,7 +972,7 @@ public class SlowdownZone : MonoBehaviour
             // It's NOT a BoxCollider2D (e.g., TilemapCollider2D, PolygonCollider2D)
             if (colliderShrinkAmount > SHRINK_EPSILON) // Only warn if shrinking was actually intended
             {
-               // Debug.LogWarning($"SlowdownZone on '{gameObject.name}' has a 'Collider Shrink Amount' of {colliderShrinkAmount} but is using a '{col.GetType().Name}'. This collider type does not support automatic shrinking. Shrinking will be ignored.", gameObject);
+                Debug.LogWarning($"SlowdownZone on '{gameObject.name}' has a 'Collider Shrink Amount' of {colliderShrinkAmount} but is using a '{col.GetType().Name}'. This collider type does not support automatic shrinking. Shrinking will be ignored.", gameObject);
             }
             // If colliderShrinkAmount is 0 (or very close), no warning is issued, which is correct.
         }
@@ -1513,5 +1492,5 @@ public class WaveManager : MonoBehaviour
 
 
 --------------------------------------------------------------------------------
-This is part 3 out of 9 of script collection. 6 more parts remain.
+This is part 3 out of 8 of script collection. 5 more parts remain.
 --------------------------------------------------------------------------------

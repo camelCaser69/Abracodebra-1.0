@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-28 18:59:47
+UNITY PROJECT SCRIPT EXPORT - 2025-05-26 22:28:12
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -67,17 +67,11 @@ Assets
 │   │       │   ├── Seed_01.prefab
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
-│   │       ├── Panels
-│   │       │   ├── Panel_GeneListItem.prefab
-│   │       │   ├── Panel_GeneSequenceItem.prefab
-│   │       │   ├── Panel_SeedListItem.prefab
-│   │       │   └── Panel_SeedSelectionButton.prefab
 │   │       ├── ThoughtBubble.prefab
 │   │       ├── Visualizer_Circle_Prefab.prefab
 │   │       └── Visualizer_Line_Prefab.prefab
 │   ├── General
 │   │   ├── GardenerPrefab.prefab
-│   │   ├── PLANTOTRON_Machine.prefab
 │   │   └── Projectile_Basic_Pixel.prefab
 │   └── Tiles
 │       ├── Common
@@ -116,8 +110,6 @@ Assets
 │   ├── Scents
 │   │   ├── ScentLibrary.asset
 │   │   └── Scent_000_FireflyPheromone.asset
-│   ├── Seeds
-│   │   └── SeedDefinition_000_Base.asset
 │   ├── Tiles
 │   │   ├── TileDefinition_000_Grass.asset
 │   │   ├── TileDefinition_001_Dirt.asset
@@ -188,17 +180,6 @@ Assets
 │   │   ├── Runtime
 │   │   │   ├── NodeExecutor.cs
 │   │   │   └── NodeGraph.cs
-│   │   ├── Seeds
-│   │   │   ├── PlantotronGeneItem.cs
-│   │   │   ├── PlantotronGeneSequenceItem.cs
-│   │   │   ├── PlantotronMachine.cs
-│   │   │   ├── PlantotronSeedItem.cs
-│   │   │   ├── PlantotronUI.cs
-│   │   │   ├── PlayerGeneticsInventory.cs
-│   │   │   ├── SeedDefinition.cs
-│   │   │   ├── SeedInstance.cs
-│   │   │   ├── SeedSelectionButton.cs
-│   │   │   └── SeedSelectionUI.cs
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
 │   │       ├── DeselectOnClickOutside.cs
@@ -213,7 +194,7 @@ Assets
 │   ├── Tiles
 │   │   ├── Data
 │   │   │   ├── PlantGrowthModifierManager.cs
-│   │   │   ├── PlantPlacementManager.cs
+│   │   │   ├── PlantPlacementManagement.cs
 │   │   │   ├── PlayerTileInteractor.cs
 │   │   │   ├── TileDefinition.cs
 │   │   │   ├── TileInteractionLibrary.cs
@@ -230,13 +211,11 @@ Assets
 │   └── Visuals
 │       ├── NightColorPostProcess.cs
 │       ├── OutlinePartController.cs
-│       ├── PixelPerfectSetup.cs
 │       ├── PlantOutlineController.cs
 │       ├── PlantShadowController.cs
 │       ├── RuntimeCircleDrawer.cs
 │       ├── ShadowPartController.cs
-│       ├── WaterReflection.cs
-│       └── WaterReflectionManager.cs
+│       └── WaterReflection.cs
 ├── Settings
 │   ├── Lit2DSceneTemplate.scenetemplate
 │   ├── Renderer2D.asset
@@ -3929,7 +3908,7 @@ public class SlowdownZone : MonoBehaviour
             // It's NOT a BoxCollider2D (e.g., TilemapCollider2D, PolygonCollider2D)
             if (colliderShrinkAmount > SHRINK_EPSILON) // Only warn if shrinking was actually intended
             {
-               // Debug.LogWarning($"SlowdownZone on '{gameObject.name}' has a 'Collider Shrink Amount' of {colliderShrinkAmount} but is using a '{col.GetType().Name}'. This collider type does not support automatic shrinking. Shrinking will be ignored.", gameObject);
+                Debug.LogWarning($"SlowdownZone on '{gameObject.name}' has a 'Collider Shrink Amount' of {colliderShrinkAmount} but is using a '{col.GetType().Name}'. This collider type does not support automatic shrinking. Shrinking will be ignored.", gameObject);
             }
             // If colliderShrinkAmount is 0 (or very close), no warning is issued, which is correct.
         }
@@ -5572,7 +5551,7 @@ public class OutputNodeEffect : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Runtime\NodeExecutor.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Nodes/Runtime/NodeExecutor.cs (UPDATED for Seed System)
+﻿// FILE: Assets/Scripts/Nodes/Runtime/NodeExecutor.cs
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -5580,117 +5559,28 @@ using System.Linq;
 
 public class NodeExecutor : MonoBehaviour
 {
+    [Header("UI Graph Source")]
+    [SerializeField] private NodeEditorGridController nodeEditorGrid;
+
     [Header("Plant Spawning")]
     [SerializeField] private GameObject plantPrefab;
     [SerializeField] private GardenerController gardener;
 
-    [Header("UI References (Legacy Support)")]
-    [SerializeField] private NodeEditorGridController nodeEditorGrid; // Keep for fallback
-
     [Header("Debugging")]
     [SerializeField] private TMP_Text debugOutput;
-    [SerializeField] private bool showDebugLogs = false;
 
     private void Update()
     {
-        // Legacy spacebar planting (now shows seed selection)
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            AttemptPlantingWithSeedSelection();
-        }
+        // NOTE: Direct planting with spacebar was removed in favor of the tool-based planting system
+        // Plants are now created through the PlantPlacementManager when using the SeedPouch tool
     }
 
-    /// <summary>
-    /// NEW: Attempts to plant using seed selection system
-    /// </summary>
-    public void AttemptPlantingWithSeedSelection()
-    {
-        // Validate basic requirements
-        if (!ValidateBasicPlantingRequirements())
-            return;
-
-        // Use seed selection UI
-        if (SeedSelectionUI.Instance != null)
-        {
-            SeedSelectionUI.Instance.AttemptAutoSelection(OnSeedSelectedForPlanting);
-        }
-        else
-        {
-            DebugLogError("Seed Selection UI not found! Cannot plant with seed selection.");
-            // Fallback to legacy system
-            SpawnPlantFromUIGraph();
-        }
-    }
-
-    /// <summary>
-    /// NEW: Called when a seed is selected for planting
-    /// </summary>
-    private void OnSeedSelectedForPlanting(SeedInstance selectedSeed)
-    {
-        if (selectedSeed == null)
-        {
-            DebugLogError("Selected seed is null!");
-            return;
-        }
-
-        bool success = SpawnPlantFromSeedInstance(selectedSeed);
-        
-        if (success)
-        {
-            // Remove the seed from inventory (it was planted)
-            if (PlayerGeneticsInventory.Instance != null)
-            {
-                PlayerGeneticsInventory.Instance.RemoveSeed(selectedSeed);
-                DebugLog($"Planted and consumed seed: {selectedSeed.seedName}");
-            }
-        }
-    }
-
-    /// <summary>
-    /// NEW: Spawns a plant from a SeedInstance
-    /// </summary>
-    public bool SpawnPlantFromSeedInstance(SeedInstance seedInstance)
-    {
-        // Validate seed instance
-        if (seedInstance == null)
-        {
-            DebugLogError("Cannot spawn plant: SeedInstance is null!");
-            return false;
-        }
-
-        if (!seedInstance.IsValidForPlanting())
-        {
-            DebugLogError($"Cannot spawn plant: Seed '{seedInstance.seedName}' is not valid for planting!");
-            return false;
-        }
-
-        // Validate basic requirements
-        if (!ValidateBasicPlantingRequirements())
-            return false;
-
-        DebugLog($"Spawning plant from seed: {seedInstance.seedName}");
-
-        // Convert seed to NodeGraph
-        NodeGraph graphToSpawn = seedInstance.ToNodeGraph();
-        
-        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0)
-        {
-            DebugLogError($"Failed to convert seed '{seedInstance.seedName}' to NodeGraph!");
-            return false;
-        }
-
-        // Spawn the plant
-        return SpawnPlantFromNodeGraph(graphToSpawn, seedInstance.seedName);
-    }
-
-    /// <summary>
-    /// LEGACY: Spawns plant from UI graph (kept for backward compatibility)
-    /// </summary>
     public void SpawnPlantFromUIGraph()
     {
         // --- Validations ---
         if (nodeEditorGrid == null) { DebugLogError("Node Editor Grid Controller not assigned!"); return; }
-        if (!ValidateBasicPlantingRequirements()) return;
+        if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return; }
+        if (gardener == null) { DebugLogError("Gardener Controller not assigned!"); return; }
 
         // Get the current graph state from the UI grid
         NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
@@ -5700,112 +5590,87 @@ public class NodeExecutor : MonoBehaviour
              return;
         }
 
-        // Validate if the graph is spawnable
-        bool seedFound = graphToSpawn.nodes.Any(node => node != null && node.effects != null && 
-            node.effects.Any(eff => eff != null && eff.effectType == NodeEffectType.SeedSpawn && eff.isPassive));
-        
+        // Validate if the graph is spawnable (e.g., requires a SeedSpawn effect)
+        bool seedFound = graphToSpawn.nodes.Any(node => node != null && node.effects != null && node.effects.Any(eff => eff != null && eff.effectType == NodeEffectType.SeedSpawn && eff.isPassive));
         if (!seedFound) {
             DebugLog("Cannot spawn plant: Node chain lacks a passive SeedSpawn effect.");
             return;
         }
 
         DebugLog($"Spawning plant from UI graph with {graphToSpawn.nodes.Count} nodes...");
-        SpawnPlantFromNodeGraph(graphToSpawn, "UI Graph Plant");
-    }
 
-    /// <summary>
-    /// Core plant spawning logic (used by both new and legacy systems)
-    /// </summary>
-    private bool SpawnPlantFromNodeGraph(NodeGraph graphToSpawn, string plantName)
-    {
         // Determine spawn position and parent
         Vector2 spawnPos = gardener.GetPlantingPosition();
-        Transform plantParent = EcosystemManager.Instance?.plantParent;
+        Transform plantParent = EcosystemManager.Instance?.plantParent; // Use optional chaining
 
         // Instantiate the plant prefab
-        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity, plantParent);
-        plantObj.name = $"Plant_{plantName}_{System.DateTime.Now:HHmmss}"; // Add timestamp for uniqueness
+        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity, plantParent); // Assign parent during instantiate
 
         // Get the PlantGrowth component
         PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
         if (growthComponent != null)
         {
-            // Create a DEEP COPY of the NodeGraph
-            NodeGraph graphCopy = CloneNodeGraph(graphToSpawn);
+            // --- Create a DEEP COPY of the NodeGraph ---
+            // This is crucial so modifications to the UI graph don't affect running plants,
+            // and vice-versa.
+            NodeGraph graphCopy = new NodeGraph();
+            graphCopy.nodes = new List<NodeData>(graphToSpawn.nodes.Count); // Initialize with capacity
+
+            foreach(NodeData originalNodeData in graphToSpawn.nodes)
+            {
+                // Ensure original node data is not null
+                if (originalNodeData == null) {
+                    DebugLogWarning("Encountered null NodeData in UI graph during copy. Skipping.");
+                    continue;
+                }
+
+                 // Create a new NodeData instance
+                 NodeData newNodeData = new NodeData {
+                    nodeId = originalNodeData.nodeId, // Copy ID (or generate new one?)
+                    nodeDisplayName = originalNodeData.nodeDisplayName,
+                    orderIndex = originalNodeData.orderIndex,
+                    canBeDeleted = originalNodeData.canBeDeleted, // Copy runtime flags if needed
+                    // Create a deep copy of the effects list using the *updated* helper method
+                    effects = CloneEffectsList(originalNodeData.effects)
+                };
+                graphCopy.nodes.Add(newNodeData);
+            }
 
             // Initialize the plant with the deep copy
             growthComponent.InitializeAndGrow(graphCopy);
-            DebugLog($"Plant '{plantName}' spawned and initialized successfully.");
-            return true;
+            DebugLog("Plant spawned and initialized.");
         }
         else
         {
-            // Log error and destroy invalid object if PlantGrowth is missing
-            DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth component! Destroying spawned object.");
-            Destroy(plantObj);
-            return false;
+             // Log error and destroy invalid object if PlantGrowth is missing
+             DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth component! Destroying spawned object.");
+             Destroy(plantObj);
         }
     }
 
     /// <summary>
-    /// Validates basic requirements for planting
-    /// </summary>
-    private bool ValidateBasicPlantingRequirements()
-    {
-        if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return false; }
-        if (gardener == null) { DebugLogError("Gardener Controller not assigned!"); return false; }
-        return true;
-    }
-
-    /// <summary>
-    /// Creates a deep copy of a NodeGraph
-    /// </summary>
-    private NodeGraph CloneNodeGraph(NodeGraph original)
-    {
-        NodeGraph graphCopy = new NodeGraph();
-        graphCopy.nodes = new List<NodeData>(original.nodes.Count);
-
-        foreach(NodeData originalNodeData in original.nodes)
-        {
-            if (originalNodeData == null) {
-                DebugLogWarning("Encountered null NodeData in graph during copy. Skipping.");
-                continue;
-            }
-
-             // Create a new NodeData instance
-             NodeData newNodeData = new NodeData {
-                nodeId = originalNodeData.nodeId,
-                nodeDisplayName = originalNodeData.nodeDisplayName,
-                orderIndex = originalNodeData.orderIndex,
-                canBeDeleted = originalNodeData.canBeDeleted,
-                effects = CloneEffectsList(originalNodeData.effects)
-            };
-            graphCopy.nodes.Add(newNodeData);
-        }
-
-        return graphCopy;
-    }
-
-    /// <summary>
-    /// Creates a deep copy of a list of NodeEffectData
+    /// Creates a deep copy of a list of NodeEffectData, including the ScentDefinition reference.
     /// </summary>
     private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
     {
-        if (originalList == null) return new List<NodeEffectData>();
+        if (originalList == null) return new List<NodeEffectData>(); // Handle null input list
 
         List<NodeEffectData> newList = new List<NodeEffectData>(originalList.Count);
         foreach(var originalEffect in originalList)
         {
+            // Ensure original effect data is not null
             if(originalEffect == null) {
                 DebugLogWarning("Encountered null NodeEffectData in list during copy. Skipping.");
                 continue;
             }
 
+             // Create a new NodeEffectData instance and copy all relevant fields
              NodeEffectData newEffect = new NodeEffectData {
                  effectType = originalEffect.effectType,
                  primaryValue = originalEffect.primaryValue,
                  secondaryValue = originalEffect.secondaryValue,
                  isPassive = originalEffect.isPassive,
+                 // <<< FIXED: Explicitly copy the ScentDefinition reference >>>
                  scentDefinitionReference = originalEffect.scentDefinitionReference
              };
              newList.Add(newEffect);
@@ -5813,41 +5678,18 @@ public class NodeExecutor : MonoBehaviour
         return newList;
     }
 
-    // --- Helper methods for logging ---
+    // Helper methods for logging
     private void DebugLog(string msg) {
-        if (showDebugLogs) Debug.Log($"[NodeExecutor] {msg}");
+        Debug.Log($"[NodeExecutor] {msg}");
         if (debugOutput != null) debugOutput.text += msg + "\n";
     }
-    
     private void DebugLogError(string msg) {
         Debug.LogError($"[NodeExecutor] {msg}");
         if (debugOutput != null) debugOutput.text += $"ERROR: {msg}\n";
     }
-    
-    private void DebugLogWarning(string msg) {
-        if (showDebugLogs) Debug.LogWarning($"[NodeExecutor] {msg}");
+     private void DebugLogWarning(string msg) {
+        Debug.LogWarning($"[NodeExecutor] {msg}");
         if (debugOutput != null) debugOutput.text += $"WARNING: {msg}\n";
-    }
-
-    // --- Public API Methods ---
-
-    /// <summary>
-    /// Public method for external scripts to plant a specific seed
-    /// </summary>
-    public bool PlantSeed(SeedInstance seed)
-    {
-        return SpawnPlantFromSeedInstance(seed);
-    }
-
-    /// <summary>
-    /// Public method to get available plantable seeds count
-    /// </summary>
-    public int GetPlantableSeedsCount()
-    {
-        if (PlayerGeneticsInventory.Instance == null)
-            return 0;
-            
-        return PlayerGeneticsInventory.Instance.GetPlantableSeeds().Count;
     }
 }
 
@@ -5864,2155 +5706,6 @@ public class NodeGraph
 {
     public List<NodeData> nodes = new List<NodeData>();
 }
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\PlantotronGeneItem.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/PlantotronGeneItem.cs
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using TMPro;
-
-public class PlantotronGeneItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
-{
-    [Header("UI References")]
-    public TMP_Text geneNameText;
-    public TMP_Text geneTypeText;
-    public Image geneIcon;
-    public Button addButton;
-    public Image backgroundImage;
-    
-    [Header("Visual Settings")]
-    public Color normalColor = Color.white;
-    public Color hoverColor = Color.yellow;
-    
-    private NodeDefinition gene;
-    private PlantotronUI parentUI;
-    
-    public void Initialize(NodeDefinition geneDefinition, PlantotronUI ui)
-    {
-        gene = geneDefinition;
-        parentUI = ui;
-        
-        if (gene == null || parentUI == null)
-        {
-            Debug.LogError("[PlantotronGeneItem] Invalid initialization parameters!");
-            return;
-        }
-        
-        // Setup UI elements
-        if (geneNameText != null)
-            geneNameText.text = gene.displayName;
-            
-        if (geneTypeText != null)
-        {
-            // Show primary effect type
-            string effectType = "Unknown";
-            if (gene.effects != null && gene.effects.Count > 0 && gene.effects[0] != null)
-            {
-                effectType = gene.effects[0].effectType.ToString();
-            }
-            geneTypeText.text = effectType;
-        }
-        
-        if (geneIcon != null)
-        {
-            geneIcon.sprite = gene.thumbnail;
-            geneIcon.color = gene.thumbnailTintColor;
-        }
-        
-        // Setup add button
-        if (addButton != null)
-        {
-            addButton.onClick.RemoveAllListeners();
-            addButton.onClick.AddListener(OnAddButtonClicked);
-        }
-        
-        // Set initial background color
-        if (backgroundImage != null)
-            backgroundImage.color = normalColor;
-    }
-    
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (backgroundImage != null)
-            backgroundImage.color = hoverColor;
-            
-        if (parentUI != null && gene != null)
-            parentUI.ShowGeneDetails(gene);
-    }
-    
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (backgroundImage != null)
-            backgroundImage.color = normalColor;
-    }
-    
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (parentUI != null && gene != null)
-            parentUI.OnGeneSelected(gene);
-    }
-    
-    private void OnAddButtonClicked()
-    {
-        if (parentUI != null && gene != null)
-            parentUI.OnGeneAddToSequence(gene);
-    }
-    
-    void OnDestroy()
-    {
-        if (addButton != null)
-            addButton.onClick.RemoveAllListeners();
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\PlantotronGeneSequenceItem.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/PlantotronGeneSequenceItem.cs
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using TMPro;
-
-public class PlantotronGeneSequenceItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, 
-    IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
-{
-    [Header("UI References - SIMPLIFIED")]
-    public TMP_Text geneNameText;
-    public Image backgroundImage;
-    
-    [Header("Visual Settings")]
-    public Color normalColor = new Color(0.9f, 0.9f, 0.9f, 1f);
-    public Color hoverColor = Color.yellow;
-    public Color dragColor = new Color(1f, 0.8f, 0.8f, 1f);
-    
-    [Header("Drag Settings")]
-    public float dragAlpha = 0.8f;
-    
-    private NodeDefinition gene;
-    private int sequenceIndex;
-    private PlantotronUI parentUI;
-    private bool isDragging = false;
-    private Vector3 originalPosition;
-    private Transform originalParent;
-    private CanvasGroup canvasGroup;
-    
-    public void Initialize(NodeDefinition geneDefinition, int index, PlantotronUI ui)
-    {
-        gene = geneDefinition;
-        sequenceIndex = index;
-        parentUI = ui;
-        
-        if (gene == null || parentUI == null)
-        {
-            Debug.LogError("[PlantotronGeneSequenceItem] Invalid initialization parameters!");
-            return;
-        }
-        
-        // Setup canvas group for drag transparency
-        canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        
-        // Setup UI elements - SIMPLIFIED
-        if (geneNameText != null)
-            geneNameText.text = $"{index + 1}. {gene.displayName}";
-        
-        // Set initial background color
-        if (backgroundImage != null)
-            backgroundImage.color = normalColor;
-            
-        // Store original transform info
-        originalPosition = transform.position;
-        originalParent = transform.parent;
-    }
-    
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (!isDragging && backgroundImage != null)
-            backgroundImage.color = hoverColor;
-            
-        if (parentUI != null && gene != null)
-            parentUI.ShowGeneDetails(gene);
-    }
-    
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (!isDragging && backgroundImage != null)
-            backgroundImage.color = normalColor;
-    }
-    
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        isDragging = true;
-        if (backgroundImage != null)
-            backgroundImage.color = dragColor;
-            
-        // Make semi-transparent during drag
-        if (canvasGroup != null)
-            canvasGroup.alpha = dragAlpha;
-            
-        // Make this item appear on top
-        transform.SetAsLastSibling();
-        
-        Debug.Log($"[PlantotronGeneSequenceItem] Started dragging: {gene?.displayName ?? "Unknown"}");
-    }
-    
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (isDragging)
-        {
-            // Follow mouse/finger during drag
-            transform.position = eventData.position;
-        }
-    }
-    
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        isDragging = false;
-        if (backgroundImage != null)
-            backgroundImage.color = normalColor;
-            
-        // Restore transparency
-        if (canvasGroup != null)
-            canvasGroup.alpha = 1f;
-            
-        // Reset position and parent
-        transform.position = originalPosition;
-        transform.SetParent(originalParent);
-        
-        Debug.Log($"[PlantotronGeneSequenceItem] Ended dragging: {gene?.displayName ?? "Unknown"}");
-    }
-    
-    public void OnDrop(PointerEventData eventData)
-    {
-        // Handle drop from other gene sequence items
-        GameObject draggedObject = eventData.pointerDrag;
-        if (draggedObject != null)
-        {
-            PlantotronGeneSequenceItem draggedItem = draggedObject.GetComponent<PlantotronGeneSequenceItem>();
-            if (draggedItem != null && draggedItem != this && parentUI != null)
-            {
-                Debug.Log($"[PlantotronGeneSequenceItem] Drop detected: Moving {draggedItem.gene?.displayName} to position {sequenceIndex}");
-                // Swap positions in the gene sequence
-                parentUI.OnGeneMovedInSequence(draggedItem.sequenceIndex, this.sequenceIndex);
-            }
-        }
-    }
-    
-    // Public method to update the sequence index and display
-    public void UpdateIndex(int newIndex)
-    {
-        sequenceIndex = newIndex;
-        if (geneNameText != null && gene != null)
-            geneNameText.text = $"{newIndex + 1}. {gene.displayName}";
-            
-        // Update original position for drag reset
-        originalPosition = transform.position;
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\PlantotronMachine.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/PlantotronMachine.cs
-using UnityEngine;
-
-[RequireComponent(typeof(Collider2D))]
-public class PlantotronMachine : MonoBehaviour
-{
-    [Header("Interaction Settings")]
-    [Tooltip("Maximum distance for player interaction")]
-    public float interactionRange = 2f;
-    
-    [Tooltip("Key to press for interaction (default: E)")]
-    public KeyCode interactionKey = KeyCode.E;
-    
-    [Header("UI References")]
-    [Tooltip("The Plantotron UI panel to show/hide")]
-    public PlantotronUI uiPanel;
-    
-    [Header("Visual Feedback")]
-    [Tooltip("GameObject to show when player is in range (optional)")]
-    public GameObject interactionPrompt;
-    
-    [Tooltip("Highlight material/effect when player is nearby (optional)")]
-    public Material highlightMaterial;
-    
-    [Header("Audio (Optional)")]
-    [Tooltip("Sound to play when machine is activated")]
-    public AudioClip activationSound;
-    
-    [Header("Debug")]
-    [SerializeField] private bool showDebugLogs = false;
-    
-    // Internal state
-    private bool playerInRange = false;
-    private Transform playerTransform;
-    private SpriteRenderer machineRenderer;
-    private Material originalMaterial;
-    private AudioSource audioSource;
-    
-    // Cache for player detection
-    private const string PLAYER_TAG = "Player";
-    
-    void Awake()
-    {
-        // Get components
-        machineRenderer = GetComponent<SpriteRenderer>();
-        audioSource = GetComponent<AudioSource>();
-        
-        // Ensure collider is set as trigger
-        Collider2D col = GetComponent<Collider2D>();
-        if (col != null && !col.isTrigger)
-        {
-            col.isTrigger = true;
-            if (showDebugLogs)
-                Debug.Log($"[PlantotronMachine] Set collider on {gameObject.name} to trigger mode");
-        }
-        
-        // Store original material
-        if (machineRenderer != null)
-        {
-            originalMaterial = machineRenderer.material;
-        }
-        
-        // Ensure UI panel starts hidden
-        if (uiPanel != null)
-        {
-            uiPanel.gameObject.SetActive(false);
-        }
-        else
-        {
-            Debug.LogError($"[PlantotronMachine] UI Panel not assigned on {gameObject.name}!", this);
-        }
-        
-        // Hide interaction prompt initially
-        if (interactionPrompt != null)
-        {
-            interactionPrompt.SetActive(false);
-        }
-    }
-    
-    void Update()
-    {
-        // Only check for interaction if player is in range
-        if (playerInRange && playerTransform != null)
-        {
-            // Double-check distance (in case player moved quickly)
-            float distance = Vector2.Distance(transform.position, playerTransform.position);
-            if (distance <= interactionRange)
-            {
-                // Check for interaction input
-                if (Input.GetKeyDown(interactionKey))
-                {
-                    ToggleMachine();
-                }
-            }
-            else
-            {
-                // Player moved out of range
-                SetPlayerInRange(false);
-            }
-        }
-    }
-    
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag(PLAYER_TAG))
-        {
-            playerTransform = other.transform;
-            SetPlayerInRange(true);
-            
-            if (showDebugLogs)
-                Debug.Log($"[PlantotronMachine] Player entered interaction range");
-        }
-    }
-    
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (other.CompareTag(PLAYER_TAG))
-        {
-            SetPlayerInRange(false);
-            
-            if (showDebugLogs)
-                Debug.Log($"[PlantotronMachine] Player left interaction range");
-        }
-    }
-    
-    private void SetPlayerInRange(bool inRange)
-    {
-        if (playerInRange == inRange) return;
-        
-        playerInRange = inRange;
-        
-        // Update visual feedback
-        if (interactionPrompt != null)
-        {
-            interactionPrompt.SetActive(inRange);
-        }
-        
-        // Update highlight effect
-        if (machineRenderer != null && highlightMaterial != null)
-        {
-            machineRenderer.material = inRange ? highlightMaterial : originalMaterial;
-        }
-        
-        // If player left range while UI is open, close it
-        if (!inRange && uiPanel != null && uiPanel.gameObject.activeSelf)
-        {
-            CloseMachine();
-        }
-        
-        if (!inRange)
-        {
-            playerTransform = null;
-        }
-    }
-    
-    private void ToggleMachine()
-    {
-        if (uiPanel == null)
-        {
-            Debug.LogError("[PlantotronMachine] Cannot toggle - UI Panel is null!");
-            return;
-        }
-        
-        bool isCurrentlyOpen = uiPanel.gameObject.activeSelf;
-        
-        if (isCurrentlyOpen)
-        {
-            CloseMachine();
-        }
-        else
-        {
-            OpenMachine();
-        }
-    }
-    
-    private void OpenMachine()
-    {
-        if (uiPanel == null) return;
-        
-        // Check if player has genetics inventory
-        if (PlayerGeneticsInventory.Instance == null)
-        {
-            Debug.LogError("[PlantotronMachine] Cannot open - PlayerGeneticsInventory not found!");
-            return;
-        }
-        
-        uiPanel.gameObject.SetActive(true);
-        uiPanel.OpenUI();
-        
-        // Play activation sound
-        if (audioSource != null && activationSound != null)
-        {
-            audioSource.PlayOneShot(activationSound);
-        }
-        
-        // Pause the game or disable player movement if needed
-        // Time.timeScale = 0f; // Uncomment if you want to pause the game
-        
-        if (showDebugLogs)
-            Debug.Log("[PlantotronMachine] Machine opened");
-    }
-    
-    private void CloseMachine()
-    {
-        if (uiPanel == null) return;
-        
-        uiPanel.CloseUI();
-        uiPanel.gameObject.SetActive(false);
-        
-        // Resume the game if it was paused
-        // Time.timeScale = 1f; // Uncomment if you paused the game
-        
-        if (showDebugLogs)
-            Debug.Log("[PlantotronMachine] Machine closed");
-    }
-    
-    // Public method for external scripts to open/close the machine
-    public void SetMachineOpen(bool open)
-    {
-        if (open)
-            OpenMachine();
-        else
-            CloseMachine();
-    }
-    
-    // Public method to check if machine is currently open
-    public bool IsMachineOpen()
-    {
-        return uiPanel != null && uiPanel.gameObject.activeSelf;
-    }
-    
-    void OnDrawGizmosSelected()
-    {
-        // Draw interaction range in editor
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, interactionRange);
-        
-        // Draw a line to player if in range during play mode
-        if (Application.isPlaying && playerTransform != null && playerInRange)
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawLine(transform.position, playerTransform.position);
-        }
-    }
-    
-    void OnDestroy()
-    {
-        // Clean up
-        if (machineRenderer != null && originalMaterial != null)
-        {
-            machineRenderer.material = originalMaterial;
-        }
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\PlantotronSeedItem.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/PlantotronSeedItem.cs
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-using TMPro;
-
-public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
-{
-    [Header("UI References")]
-    public TMP_Text seedNameText;
-    public TMP_Text seedStatusText;
-    public Image seedIcon;
-    public Button editButton;
-    public Button deleteButton;
-    public Image backgroundImage;
-    
-    [Header("Visual Settings")]
-    public Color normalColor = Color.white;
-    public Color hoverColor = Color.yellow;
-    public Color modifiedColor = Color.cyan;
-    public Color vanillaColor = Color.green;
-    
-    private SeedInstance seed;
-    private PlantotronUI parentUI;
-    
-    public void Initialize(SeedInstance seedInstance, PlantotronUI ui)
-    {
-        seed = seedInstance;
-        parentUI = ui;
-        
-        if (seed == null || parentUI == null)
-        {
-            Debug.LogError("[PlantotronSeedItem] Invalid initialization parameters!");
-            return;
-        }
-        
-        // Setup UI elements
-        if (seedNameText != null)
-            seedNameText.text = seed.seedName;
-            
-        if (seedStatusText != null)
-        {
-            string status = seed.isModified ? "Modified" : "Vanilla";
-            int geneCount = seed.currentGenes?.Count ?? 0;
-            seedStatusText.text = $"{status} • {geneCount} genes";
-            seedStatusText.color = seed.isModified ? modifiedColor : vanillaColor;
-        }
-        
-        if (seedIcon != null && seed.baseSeedDefinition != null)
-        {
-            seedIcon.sprite = seed.baseSeedDefinition.icon;
-        }
-        
-        // Setup buttons
-        if (editButton != null)
-        {
-            editButton.onClick.RemoveAllListeners();
-            editButton.onClick.AddListener(OnEditButtonClicked);
-        }
-        
-        if (deleteButton != null)
-        {
-            deleteButton.onClick.RemoveAllListeners();
-            deleteButton.onClick.AddListener(OnDeleteButtonClicked);
-        }
-        
-        // Set initial background color
-        if (backgroundImage != null)
-            backgroundImage.color = normalColor;
-    }
-    
-    public void OnPointerEnter(PointerEventData eventData)
-    {
-        if (backgroundImage != null)
-            backgroundImage.color = hoverColor;
-            
-        if (parentUI != null && seed != null)
-            parentUI.ShowSeedDetails(seed);
-    }
-    
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (backgroundImage != null)
-            backgroundImage.color = normalColor;
-    }
-    
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (parentUI != null && seed != null)
-            parentUI.OnSeedSelected(seed);
-    }
-    
-    private void OnEditButtonClicked()
-    {
-        if (parentUI != null && seed != null)
-            parentUI.OnSeedLoadForEditing(seed);
-    }
-    
-    private void OnDeleteButtonClicked()
-    {
-        if (seed != null && PlayerGeneticsInventory.Instance != null)
-        {
-            PlayerGeneticsInventory.Instance.RemoveSeed(seed);
-        }
-    }
-    
-    void OnDestroy()
-    {
-        if (editButton != null)
-            editButton.onClick.RemoveAllListeners();
-        if (deleteButton != null)
-            deleteButton.onClick.RemoveAllListeners();
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\PlantotronUI.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/PlantotronUI.cs
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using System.Linq;
-
-public class PlantotronUI : MonoBehaviour
-{
-    [Header("Main UI Panels")]
-    public GameObject mainPanel;
-    public GameObject geneDatabasePanel;
-    public GameObject seedDatabasePanel;
-    public GameObject geneEditorPanel;
-    public GameObject detailsPanel;
-    
-    [Header("Gene Database UI")]
-    public Transform geneListContainer;
-    public GameObject geneListItemPrefab;
-    public TMP_InputField geneSearchField;
-    
-    [Header("Seed Database UI")]
-    public Transform seedListContainer;
-    public GameObject seedListItemPrefab;
-    public TMP_InputField seedSearchField;
-    
-    [Header("Gene Editor UI")]
-    public TMP_Text currentSeedNameText;
-    public GameObject seedSlotPanel;
-    public Button seedSlotButton;
-    public TMP_Text seedSlotText;
-    public Transform geneSequenceContainer;
-    public GameObject geneSequenceItemPrefab;
-    public Button saveSeedButton;
-    public Button resetSeedButton;
-    public TMP_InputField seedNameInputField;
-    
-    [Header("Details Panel UI")]
-    public TMP_Text detailsTitleText;
-    public TMP_Text detailsDescriptionText;
-    public ScrollRect detailsScrollRect;
-    
-    [Header("Control Buttons")]
-    public Button closeButton;
-    public Button clearAllButton;
-    
-    [Header("Debug")]
-    [SerializeField] private bool showDebugLogs = false;
-    
-    // Current state
-    private SeedInstance currentEditingSeed;
-    private PlayerGeneticsInventory inventory;
-    private List<GameObject> currentGeneListItems = new List<GameObject>();
-    private List<GameObject> currentSeedListItems = new List<GameObject>();
-    private List<GameObject> currentGeneSequenceItems = new List<GameObject>();
-    
-    // Cached references for performance
-    private RectTransform geneListContainerRect;
-    private RectTransform seedListContainerRect;
-    private RectTransform geneSequenceContainerRect;
-    
-    void Awake()
-    {
-        // Cache rect transforms
-        if (geneListContainer != null)
-            geneListContainerRect = geneListContainer.GetComponent<RectTransform>();
-        if (seedListContainer != null)
-            seedListContainerRect = seedListContainer.GetComponent<RectTransform>();
-        if (geneSequenceContainer != null)
-            geneSequenceContainerRect = geneSequenceContainer.GetComponent<RectTransform>();
-        
-        // Setup button listeners
-        if (closeButton != null)
-            closeButton.onClick.AddListener(CloseUI);
-        if (clearAllButton != null)
-            clearAllButton.onClick.AddListener(ClearCurrentSeed);
-        if (saveSeedButton != null)
-            saveSeedButton.onClick.AddListener(SaveCurrentSeed);
-        if (resetSeedButton != null)
-            resetSeedButton.onClick.AddListener(ResetCurrentSeed);
-        if (seedSlotButton != null)
-            seedSlotButton.onClick.AddListener(OpenSeedSelectionPopup);
-        
-        // Setup search field listeners
-        if (geneSearchField != null)
-            geneSearchField.onValueChanged.AddListener(OnGeneSearchChanged);
-        if (seedSearchField != null)
-            seedSearchField.onValueChanged.AddListener(OnSeedSearchChanged);
-        if (seedNameInputField != null)
-            seedNameInputField.onValueChanged.AddListener(OnSeedNameChanged);
-        
-        // Validate required prefabs
-        if (geneListItemPrefab == null)
-            Debug.LogError("[PlantotronUI] Gene List Item Prefab not assigned!", this);
-        if (seedListItemPrefab == null)
-            Debug.LogError("[PlantotronUI] Seed List Item Prefab not assigned!", this);
-        if (geneSequenceItemPrefab == null)
-            Debug.LogError("[PlantotronUI] Gene Sequence Item Prefab not assigned!", this);
-    }
-    
-    void Start()
-    {
-        // Get inventory reference
-        inventory = PlayerGeneticsInventory.Instance;
-        if (inventory == null)
-        {
-            Debug.LogError("[PlantotronUI] PlayerGeneticsInventory not found!", this);
-            return;
-        }
-        
-        // Subscribe to inventory events
-        inventory.OnInventoryChanged += RefreshAllLists;
-        
-        // Ensure UI starts closed
-        if (mainPanel != null)
-            mainPanel.SetActive(false);
-    }
-    
-    void OnDestroy()
-    {
-        // Unsubscribe from events
-        if (inventory != null)
-            inventory.OnInventoryChanged -= RefreshAllLists;
-        
-        // Clean up button listeners
-        if (closeButton != null)
-            closeButton.onClick.RemoveAllListeners();
-        if (clearAllButton != null)
-            clearAllButton.onClick.RemoveAllListeners();
-        if (saveSeedButton != null)
-            saveSeedButton.onClick.RemoveAllListeners();
-        if (resetSeedButton != null)
-            resetSeedButton.onClick.RemoveAllListeners();
-        if (seedSlotButton != null)
-            seedSlotButton.onClick.RemoveAllListeners();
-    }
-    
-    // --- Main UI Control ---
-    
-    public void OpenUI()
-    {
-        if (mainPanel != null)
-            mainPanel.SetActive(true);
-            
-        RefreshAllLists();
-        ClearDetails();
-        
-        if (showDebugLogs)
-            Debug.Log("[PlantotronUI] UI Opened");
-    }
-    
-    public void CloseUI()
-    {
-        if (mainPanel != null)
-            mainPanel.SetActive(false);
-            
-        // Clear current editing state
-        SetCurrentEditingSeed(null);
-        
-        if (showDebugLogs)
-            Debug.Log("[PlantotronUI] UI Closed");
-    }
-    
-    // --- Gene Database ---
-    
-    private void RefreshGeneDatabase(string searchFilter = "")
-    {
-        if (inventory == null || geneListContainer == null) return;
-        
-        // Clear existing items
-        ClearContainer(geneListContainer, currentGeneListItems);
-        
-        // Filter genes based on search
-        var filteredGenes = inventory.AvailableGenes.Where(gene => 
-            gene != null && (string.IsNullOrEmpty(searchFilter) || 
-            gene.displayName.ToLower().Contains(searchFilter.ToLower()))
-        ).ToList();
-        
-        // Create UI items for each gene
-        foreach (var gene in filteredGenes)
-        {
-            GameObject geneItem = CreateGeneListItem(gene);
-            if (geneItem != null)
-                currentGeneListItems.Add(geneItem);
-        }
-        
-        if (showDebugLogs)
-            Debug.Log($"[PlantotronUI] Refreshed gene database: {filteredGenes.Count} genes");
-    }
-    
-    private GameObject CreateGeneListItem(NodeDefinition gene)
-    {
-        if (geneListItemPrefab == null || geneListContainer == null || gene == null)
-            return null;
-            
-        GameObject item = Instantiate(geneListItemPrefab, geneListContainer);
-        
-        // Setup the gene item component
-        PlantotronGeneItem geneItemComponent = item.GetComponent<PlantotronGeneItem>();
-        if (geneItemComponent == null)
-            geneItemComponent = item.AddComponent<PlantotronGeneItem>();
-            
-        geneItemComponent.Initialize(gene, this);
-        
-        return item;
-    }
-    
-    // --- Seed Database ---
-    
-    private void RefreshSeedDatabase(string searchFilter = "")
-    {
-        if (inventory == null || seedListContainer == null) return;
-        
-        // Clear existing items
-        ClearContainer(seedListContainer, currentSeedListItems);
-        
-        // Filter seeds based on search
-        var filteredSeeds = inventory.AvailableSeeds.Where(seed => 
-            seed != null && (string.IsNullOrEmpty(searchFilter) || 
-            seed.seedName.ToLower().Contains(searchFilter.ToLower()))
-        ).ToList();
-        
-        // Create UI items for each seed
-        foreach (var seed in filteredSeeds)
-        {
-            GameObject seedItem = CreateSeedListItem(seed);
-            if (seedItem != null)
-                currentSeedListItems.Add(seedItem);
-        }
-        
-        if (showDebugLogs)
-            Debug.Log($"[PlantotronUI] Refreshed seed database: {filteredSeeds.Count} seeds");
-    }
-    
-    private GameObject CreateSeedListItem(SeedInstance seed)
-    {
-        if (seedListItemPrefab == null || seedListContainer == null || seed == null)
-            return null;
-            
-        GameObject item = Instantiate(seedListItemPrefab, seedListContainer);
-        
-        // Setup the seed item component
-        PlantotronSeedItem seedItemComponent = item.GetComponent<PlantotronSeedItem>();
-        if (seedItemComponent == null)
-            seedItemComponent = item.AddComponent<PlantotronSeedItem>();
-            
-        seedItemComponent.Initialize(seed, this);
-        
-        return item;
-    }
-    
-    // --- Gene Editor ---
-    
-    public void SetCurrentEditingSeed(SeedInstance seed)
-    {
-        currentEditingSeed = seed;
-        RefreshGeneEditor();
-        
-        if (seed != null && showDebugLogs)
-            Debug.Log($"[PlantotronUI] Now editing seed: {seed.seedName}");
-    }
-    
-    private void RefreshGeneEditor()
-    {
-        // Update seed slot display
-        if (seedSlotText != null)
-        {
-            if (currentEditingSeed != null)
-            {
-                seedSlotText.text = currentEditingSeed.seedName;
-            }
-            else
-            {
-                seedSlotText.text = "Click to select seed...";
-            }
-        }
-        
-        // Update seed name display
-        if (currentSeedNameText != null)
-        {
-            if (currentEditingSeed != null)
-            {
-                currentSeedNameText.text = currentEditingSeed.seedName;
-            }
-            else
-            {
-                currentSeedNameText.text = "No seed selected";
-            }
-        }
-        
-        // Update seed name input field
-        if (seedNameInputField != null)
-        {
-            if (currentEditingSeed != null)
-            {
-                seedNameInputField.text = currentEditingSeed.seedName;
-                seedNameInputField.interactable = true;
-            }
-            else
-            {
-                seedNameInputField.text = "";
-                seedNameInputField.interactable = false;
-            }
-        }
-        
-        // Refresh gene sequence
-        RefreshGeneSequence();
-        
-        // Update button states
-        if (saveSeedButton != null)
-            saveSeedButton.interactable = (currentEditingSeed != null);
-        if (resetSeedButton != null)
-            resetSeedButton.interactable = (currentEditingSeed != null);
-    }
-    
-    private void RefreshGeneSequence()
-    {
-        if (geneSequenceContainer == null) return;
-        
-        // Clear existing items
-        ClearContainer(geneSequenceContainer, currentGeneSequenceItems);
-        
-        if (currentEditingSeed == null || currentEditingSeed.currentGenes == null)
-            return;
-        
-        // Create UI items for each gene in the sequence
-        for (int i = 0; i < currentEditingSeed.currentGenes.Count; i++)
-        {
-            NodeDefinition gene = currentEditingSeed.currentGenes[i];
-            if (gene != null)
-            {
-                GameObject sequenceItem = CreateGeneSequenceItem(gene, i);
-                if (sequenceItem != null)
-                    currentGeneSequenceItems.Add(sequenceItem);
-            }
-        }
-        
-        if (showDebugLogs)
-            Debug.Log($"[PlantotronUI] Refreshed gene sequence: {currentEditingSeed.currentGenes.Count} genes");
-    }
-    
-    private GameObject CreateGeneSequenceItem(NodeDefinition gene, int index)
-    {
-        if (geneSequenceItemPrefab == null || geneSequenceContainer == null || gene == null)
-            return null;
-            
-        GameObject item = Instantiate(geneSequenceItemPrefab, geneSequenceContainer);
-        
-        // Setup the gene sequence item component
-        PlantotronGeneSequenceItem sequenceItemComponent = item.GetComponent<PlantotronGeneSequenceItem>();
-        if (sequenceItemComponent == null)
-            sequenceItemComponent = item.AddComponent<PlantotronGeneSequenceItem>();
-            
-        sequenceItemComponent.Initialize(gene, index, this);
-        
-        return item;
-    }
-    
-    // --- Details Panel ---
-    
-    public void ShowGeneDetails(NodeDefinition gene)
-    {
-        if (gene == null || detailsTitleText == null || detailsDescriptionText == null)
-            return;
-            
-        detailsTitleText.text = gene.displayName;
-        
-        string details = !string.IsNullOrEmpty(gene.description) ? gene.description : "No description available.";
-        
-        // Add effect information
-        if (gene.effects != null && gene.effects.Count > 0)
-        {
-            details += "\n\n<b>Effects:</b>";
-            foreach (var effect in gene.effects)
-            {
-                if (effect != null)
-                {
-                    details += $"\n• {effect.effectType}: {effect.primaryValue}";
-                    if (effect.secondaryValue != 0)
-                        details += $" / {effect.secondaryValue}";
-                    if (effect.isPassive)
-                        details += " (Passive)";
-                }
-            }
-        }
-        
-        detailsDescriptionText.text = details;
-        
-        // Scroll to top
-        if (detailsScrollRect != null)
-            detailsScrollRect.verticalNormalizedPosition = 1f;
-    }
-    
-    public void ShowSeedDetails(SeedInstance seed)
-    {
-        if (seed == null || detailsTitleText == null || detailsDescriptionText == null)
-            return;
-            
-        detailsTitleText.text = seed.seedName;
-        
-        string details = "";
-        
-        // Add basic info
-        if (seed.baseSeedDefinition != null && !string.IsNullOrEmpty(seed.baseSeedDefinition.description))
-        {
-            details += seed.baseSeedDefinition.description + "\n\n";
-        }
-        
-        // Add modification info
-        details += $"<b>Status:</b> {(seed.isModified ? "Modified" : "Vanilla")}\n";
-        details += $"<b>Genes:</b> {(seed.currentGenes?.Count ?? 0)}\n";
-        details += $"<b>Plantable:</b> {(seed.IsValidForPlanting() ? "Yes" : "No")}\n\n";
-        
-        // Add genetic composition
-        if (seed.currentGenes != null && seed.currentGenes.Count > 0)
-        {
-            details += "<b>Genetic Sequence:</b>\n";
-            for (int i = 0; i < seed.currentGenes.Count; i++)
-            {
-                if (seed.currentGenes[i] != null)
-                {
-                    details += $"{i + 1}. {seed.currentGenes[i].displayName}\n";
-                }
-            }
-        }
-        else
-        {
-            details += "<b>No genes present</b>";
-        }
-        
-        detailsDescriptionText.text = details;
-        
-        // Scroll to top
-        if (detailsScrollRect != null)
-            detailsScrollRect.verticalNormalizedPosition = 1f;
-    }
-    
-    public void ClearDetails()
-    {
-        if (detailsTitleText != null)
-            detailsTitleText.text = "Details";
-        if (detailsDescriptionText != null)
-            detailsDescriptionText.text = "Hover over or select an item to see details.";
-    }
-    
-    // --- Event Handlers ---
-    
-    private void OnGeneSearchChanged(string searchText)
-    {
-        RefreshGeneDatabase(searchText);
-    }
-    
-    private void OnSeedSearchChanged(string searchText)
-    {
-        RefreshSeedDatabase(searchText);
-    }
-    
-    private void OnSeedNameChanged(string newName)
-    {
-        if (currentEditingSeed != null && !string.IsNullOrEmpty(newName))
-        {
-            currentEditingSeed.seedName = newName;
-        }
-    }
-    
-    private void OpenSeedSelectionPopup()
-    {
-        // TODO: Implement seed selection popup
-        // For now, just select the first available seed
-        if (inventory != null && inventory.AvailableSeeds.Count > 0)
-        {
-            SetCurrentEditingSeed(inventory.AvailableSeeds[0]);
-        }
-    }
-    
-    private void SaveCurrentSeed()
-    {
-        if (currentEditingSeed == null)
-            return;
-            
-        // Create a new seed instance (duplicate) and add to inventory
-        SeedInstance savedSeed = inventory.DuplicateSeed(currentEditingSeed);
-        
-        if (savedSeed != null && showDebugLogs)
-            Debug.Log($"[PlantotronUI] Saved seed: {savedSeed.seedName}");
-    }
-    
-    private void ResetCurrentSeed()
-    {
-        if (currentEditingSeed == null || currentEditingSeed.baseSeedDefinition == null)
-            return;
-            
-        // Reset to original genes
-        currentEditingSeed.currentGenes = currentEditingSeed.baseSeedDefinition.CloneInitialGenes();
-        currentEditingSeed.UpdateModifiedStatus();
-        RefreshGeneEditor();
-        
-        if (showDebugLogs)
-            Debug.Log($"[PlantotronUI] Reset seed: {currentEditingSeed.seedName}");
-    }
-    
-    private void ClearCurrentSeed()
-    {
-        SetCurrentEditingSeed(null);
-        ClearDetails();
-    }
-    
-    // --- Public Methods for Gene/Seed Items ---
-    
-    public void OnGeneSelected(NodeDefinition gene)
-    {
-        ShowGeneDetails(gene);
-    }
-    
-    public void OnSeedSelected(SeedInstance seed)
-    {
-        ShowSeedDetails(seed);
-    }
-    
-    public void OnGeneAddToSequence(NodeDefinition gene)
-    {
-        if (currentEditingSeed != null && gene != null)
-        {
-            currentEditingSeed.AddGene(gene);
-            RefreshGeneSequence();
-            
-            if (showDebugLogs)
-                Debug.Log($"[PlantotronUI] Added gene {gene.displayName} to seed");
-        }
-    }
-    
-    public void OnSeedLoadForEditing(SeedInstance seed)
-    {
-        if (seed != null)
-        {
-            // Create a working copy
-            SeedInstance workingCopy = new SeedInstance(seed);
-            SetCurrentEditingSeed(workingCopy);
-        }
-    }
-    
-    public void OnGeneRemovedFromSequence(int index)
-    {
-        if (currentEditingSeed != null && currentEditingSeed.RemoveGeneAt(index))
-        {
-            RefreshGeneSequence();
-            
-            if (showDebugLogs)
-                Debug.Log($"[PlantotronUI] Removed gene at index {index}");
-        }
-    }
-    
-    public void OnGeneMovedInSequence(int fromIndex, int toIndex)
-    {
-        if (currentEditingSeed != null && currentEditingSeed.MoveGene(fromIndex, toIndex))
-        {
-            RefreshGeneSequence();
-            
-            if (showDebugLogs)
-                Debug.Log($"[PlantotronUI] Moved gene from {fromIndex} to {toIndex}");
-        }
-    }
-    
-    // --- Utility Methods ---
-    
-    private void RefreshAllLists()
-    {
-        RefreshGeneDatabase(geneSearchField?.text ?? "");
-        RefreshSeedDatabase(seedSearchField?.text ?? "");
-        RefreshGeneEditor();
-    }
-    
-    private void ClearContainer(Transform container, List<GameObject> itemList)
-    {
-        foreach (GameObject item in itemList)
-        {
-            if (item != null)
-                DestroyImmediate(item);
-        }
-        itemList.Clear();
-    }
-    
-    public SeedInstance GetCurrentEditingSeed()
-    {
-        return currentEditingSeed;
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\PlayerGeneticsInventory.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/PlayerGeneticsInventory.cs
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using System;
-
-public class PlayerGeneticsInventory : MonoBehaviour
-{
-    public static PlayerGeneticsInventory Instance { get; private set; }
-    
-    [Header("Starting Inventory")]
-    [Tooltip("Genes (NodeDefinitions) the player starts with")]
-    public List<NodeDefinition> startingGenes = new List<NodeDefinition>();
-    
-    [Tooltip("Seeds (SeedDefinitions) the player starts with")]
-    public List<SeedDefinition> startingSeedDefinitions = new List<SeedDefinition>();
-    
-    [Header("Current Inventory")]
-    [SerializeField] private List<NodeDefinition> availableGenes = new List<NodeDefinition>();
-    [SerializeField] private List<SeedInstance> availableSeeds = new List<SeedInstance>();
-    
-    [Header("Debug")]
-    [SerializeField] private bool showDebugLogs = false;
-    
-    // Events for UI updates
-    public event Action OnInventoryChanged;
-    public event Action<NodeDefinition> OnGeneAdded;
-    public event Action<SeedInstance> OnSeedAdded;
-    public event Action<SeedInstance> OnSeedRemoved;
-    
-    // Public accessors
-    public List<NodeDefinition> AvailableGenes => availableGenes;
-    public List<SeedInstance> AvailableSeeds => availableSeeds;
-    
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-    }
-    
-    void Start()
-    {
-        InitializeStartingInventory();
-    }
-    
-    private void InitializeStartingInventory()
-    {
-        // Add starting genes
-        foreach (var gene in startingGenes)
-        {
-            if (gene != null && !availableGenes.Contains(gene))
-            {
-                availableGenes.Add(gene);
-                if (showDebugLogs)
-                    Debug.Log($"[PlayerGeneticsInventory] Added starting gene: {gene.displayName}");
-            }
-        }
-        
-        // Add starting seeds
-        foreach (var seedDef in startingSeedDefinitions)
-        {
-            if (seedDef != null)
-            {
-                SeedInstance newSeed = new SeedInstance(seedDef);
-                availableSeeds.Add(newSeed);
-                if (showDebugLogs)
-                    Debug.Log($"[PlayerGeneticsInventory] Added starting seed: {newSeed.seedName}");
-            }
-        }
-        
-        if (showDebugLogs)
-            Debug.Log($"[PlayerGeneticsInventory] Initialized with {availableGenes.Count} genes and {availableSeeds.Count} seeds");
-            
-        OnInventoryChanged?.Invoke();
-    }
-    
-    // --- Gene Management ---
-    
-    /// <summary>
-    /// Adds a gene to the player's inventory if not already present
-    /// </summary>
-    public bool AddGene(NodeDefinition gene)
-    {
-        if (gene == null)
-        {
-            Debug.LogWarning("[PlayerGeneticsInventory] Tried to add null gene!");
-            return false;
-        }
-        
-        if (availableGenes.Contains(gene))
-        {
-            if (showDebugLogs)
-                Debug.Log($"[PlayerGeneticsInventory] Gene '{gene.displayName}' already in inventory");
-            return false;
-        }
-        
-        availableGenes.Add(gene);
-        if (showDebugLogs)
-            Debug.Log($"[PlayerGeneticsInventory] Added gene: {gene.displayName}");
-            
-        OnGeneAdded?.Invoke(gene);
-        OnInventoryChanged?.Invoke();
-        return true;
-    }
-    
-    /// <summary>
-    /// Checks if the player has a specific gene
-    /// </summary>
-    public bool HasGene(NodeDefinition gene)
-    {
-        return gene != null && availableGenes.Contains(gene);
-    }
-    
-    /// <summary>
-    /// Gets all genes of a specific effect type
-    /// </summary>
-    public List<NodeDefinition> GetGenesWithEffectType(NodeEffectType effectType)
-    {
-        return availableGenes.Where(gene => 
-            gene != null && gene.effects != null && 
-            gene.effects.Any(effect => effect != null && effect.effectType == effectType)
-        ).ToList();
-    }
-    
-    // --- Seed Management ---
-    
-    /// <summary>
-    /// Adds a seed instance to the player's inventory
-    /// </summary>
-    public bool AddSeed(SeedInstance seed)
-    {
-        if (seed == null)
-        {
-            Debug.LogWarning("[PlayerGeneticsInventory] Tried to add null seed!");
-            return false;
-        }
-        
-        availableSeeds.Add(seed);
-        if (showDebugLogs)
-            Debug.Log($"[PlayerGeneticsInventory] Added seed: {seed.seedName}");
-            
-        OnSeedAdded?.Invoke(seed);
-        OnInventoryChanged?.Invoke();
-        return true;
-    }
-    
-    /// <summary>
-    /// Creates and adds a new seed from a SeedDefinition
-    /// </summary>
-    public SeedInstance AddSeedFromDefinition(SeedDefinition seedDef)
-    {
-        if (seedDef == null)
-        {
-            Debug.LogWarning("[PlayerGeneticsInventory] Tried to add seed from null definition!");
-            return null;
-        }
-        
-        SeedInstance newSeed = new SeedInstance(seedDef);
-        AddSeed(newSeed);
-        return newSeed;
-    }
-    
-    /// <summary>
-    /// Removes a seed from the inventory (e.g., when planted)
-    /// </summary>
-    public bool RemoveSeed(SeedInstance seed)
-    {
-        if (seed == null || !availableSeeds.Contains(seed))
-            return false;
-            
-        availableSeeds.Remove(seed);
-        if (showDebugLogs)
-            Debug.Log($"[PlayerGeneticsInventory] Removed seed: {seed.seedName}");
-            
-        OnSeedRemoved?.Invoke(seed);
-        OnInventoryChanged?.Invoke();
-        return true;
-    }
-    
-    /// <summary>
-    /// Removes a seed by its unique ID
-    /// </summary>
-    public bool RemoveSeedById(string seedId)
-    {
-        SeedInstance seed = availableSeeds.FirstOrDefault(s => s.seedId == seedId);
-        return RemoveSeed(seed);
-    }
-    
-    /// <summary>
-    /// Creates a duplicate of an existing seed
-    /// </summary>
-    public SeedInstance DuplicateSeed(SeedInstance originalSeed)
-    {
-        if (originalSeed == null)
-        {
-            Debug.LogWarning("[PlayerGeneticsInventory] Cannot duplicate null seed!");
-            return null;
-        }
-        
-        SeedInstance duplicatedSeed = new SeedInstance(originalSeed);
-        AddSeed(duplicatedSeed);
-        return duplicatedSeed;
-    }
-    
-    /// <summary>
-    /// Gets seeds that are valid for planting
-    /// </summary>
-    public List<SeedInstance> GetPlantableSeeds()
-    {
-        return availableSeeds.Where(seed => seed != null && seed.IsValidForPlanting()).ToList();
-    }
-    
-    /// <summary>
-    /// Gets seeds based on whether they're modified or vanilla
-    /// </summary>
-    public List<SeedInstance> GetSeedsByType(bool getModified)
-    {
-        return availableSeeds.Where(seed => seed != null && seed.isModified == getModified).ToList();
-    }
-    
-    // --- Utility Methods ---
-    
-    /// <summary>
-    /// Gets inventory statistics for debugging/UI
-    /// </summary>
-    public string GetInventoryStats()
-    {
-        int vanillaSeeds = GetSeedsByType(false).Count;
-        int modifiedSeeds = GetSeedsByType(true).Count;
-        int plantableSeeds = GetPlantableSeeds().Count;
-        
-        return $"Genes: {availableGenes.Count} | Seeds: {availableSeeds.Count} " +
-               $"(Vanilla: {vanillaSeeds}, Modified: {modifiedSeeds}, Plantable: {plantableSeeds})";
-    }
-    
-    /// <summary>
-    /// Validates inventory integrity (for debugging)
-    /// </summary>
-    public void ValidateInventory()
-    {
-        // Remove null entries
-        availableGenes.RemoveAll(gene => gene == null);
-        availableSeeds.RemoveAll(seed => seed == null);
-        
-        // Update modified status for all seeds
-        foreach (var seed in availableSeeds)
-        {
-            seed.UpdateModifiedStatus();
-        }
-        
-        if (showDebugLogs)
-            Debug.Log($"[PlayerGeneticsInventory] Validated inventory: {GetInventoryStats()}");
-    }
-    
-    // --- Save/Load (Basic Implementation) ---
-    // Note: For production, you'd want a more robust save system
-    
-    [System.Serializable]
-    private class InventorySaveData
-    {
-        public List<string> geneAssetNames = new List<string>();
-        public List<SeedInstance> seedInstances = new List<SeedInstance>();
-    }
-    
-    public void SaveInventory()
-    {
-        // Basic implementation - in production you'd use a proper save system
-        if (showDebugLogs)
-            Debug.Log("[PlayerGeneticsInventory] Save functionality not fully implemented yet");
-    }
-    
-    public void LoadInventory()
-    {
-        // Basic implementation - in production you'd use a proper save system
-        if (showDebugLogs)
-            Debug.Log("[PlayerGeneticsInventory] Load functionality not fully implemented yet");
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\SeedDefinition.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/SeedDefinition.cs
-using UnityEngine;
-using System.Collections.Generic;
-
-[CreateAssetMenu(fileName = "Seed_", menuName = "Genetics/Seed Definition")]
-public class SeedDefinition : ScriptableObject
-{
-    [Header("Basic Information")]
-    [Tooltip("Display name for this seed type")]
-    public string seedName = "Unknown Seed";
-    
-    [Tooltip("Description of this seed's characteristics")]
-    [TextArea(3, 5)]
-    public string description = "A mysterious seed with unknown properties.";
-    
-    [Tooltip("Icon for this seed type")]
-    public Sprite icon;
-    
-    [Header("Genetic Composition")]
-    [Tooltip("Starting genes (nodes) that this seed contains")]
-    public List<NodeDefinition> initialGenes = new List<NodeDefinition>();
-    
-    [Header("Seed Properties")]
-    [Tooltip("Is this a vanilla (unmodified) seed type?")]
-    public bool isVanillaSeed = true;
-    
-    [Tooltip("Rarity level for potential future progression systems")]
-    [Range(1, 5)]
-    public int rarityLevel = 1;
-    
-    /// <summary>
-    /// Creates a deep copy of the initial genes list for use in SeedInstance
-    /// </summary>
-    public List<NodeDefinition> CloneInitialGenes()
-    {
-        List<NodeDefinition> clonedGenes = new List<NodeDefinition>();
-        if (initialGenes != null)
-        {
-            foreach (var gene in initialGenes)
-            {
-                if (gene != null)
-                {
-                    clonedGenes.Add(gene);
-                }
-            }
-        }
-        return clonedGenes;
-    }
-    
-    /// <summary>
-    /// Validates that this seed definition has the minimum required genes to grow
-    /// </summary>
-    public bool IsValidSeed()
-    {
-        if (initialGenes == null || initialGenes.Count == 0)
-            return false;
-            
-        // Check for required SeedSpawn effect
-        foreach (var gene in initialGenes)
-        {
-            if (gene != null && gene.effects != null)
-            {
-                foreach (var effect in gene.effects)
-                {
-                    if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        
-        return false;
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\SeedInstance.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/SeedInstance.cs
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-
-[System.Serializable]
-public class SeedInstance
-{
-    [Header("Seed Identity")]
-    public string seedName;
-    public string seedId; // Unique identifier for this specific seed instance
-    
-    [Header("Genetic Data")]
-    public SeedDefinition baseSeedDefinition;
-    public List<NodeDefinition> currentGenes = new List<NodeDefinition>();
-    
-    [Header("Metadata")]
-    public bool isModified = false;
-    public DateTime creationTime;
-    
-    // Default constructor
-    public SeedInstance()
-    {
-        seedId = Guid.NewGuid().ToString();
-        creationTime = DateTime.Now;
-    }
-    
-    // Constructor from SeedDefinition
-    public SeedInstance(SeedDefinition seedDef)
-    {
-        if (seedDef == null)
-        {
-            Debug.LogError("Cannot create SeedInstance from null SeedDefinition!");
-            return;
-        }
-        
-        seedId = Guid.NewGuid().ToString();
-        creationTime = DateTime.Now;
-        baseSeedDefinition = seedDef;
-        seedName = seedDef.seedName;
-        currentGenes = seedDef.CloneInitialGenes();
-        isModified = false;
-    }
-    
-    /// <summary>
-    /// Copy constructor for creating duplicates
-    /// </summary>
-    public SeedInstance(SeedInstance original)
-    {
-        if (original == null)
-        {
-            Debug.LogError("Cannot create SeedInstance from null original!");
-            return;
-        }
-        
-        seedId = Guid.NewGuid().ToString(); // Always generate new ID
-        creationTime = DateTime.Now;
-        baseSeedDefinition = original.baseSeedDefinition;
-        seedName = original.seedName;
-        isModified = original.isModified;
-        
-        // Deep copy the genes list
-        currentGenes = new List<NodeDefinition>();
-        if (original.currentGenes != null)
-        {
-            foreach (var gene in original.currentGenes)
-            {
-                if (gene != null)
-                {
-                    currentGenes.Add(gene);
-                }
-            }
-        }
-    }
-    
-    /// <summary>
-    /// Checks if current genes match the original seed definition
-    /// </summary>
-    public bool GenesMatchOriginal()
-    {
-        if (baseSeedDefinition == null || baseSeedDefinition.initialGenes == null)
-            return false;
-            
-        if (currentGenes == null)
-            return baseSeedDefinition.initialGenes.Count == 0;
-            
-        if (currentGenes.Count != baseSeedDefinition.initialGenes.Count)
-            return false;
-            
-        for (int i = 0; i < currentGenes.Count; i++)
-        {
-            if (currentGenes[i] != baseSeedDefinition.initialGenes[i])
-                return false;
-        }
-        
-        return true;
-    }
-    
-    /// <summary>
-    /// Updates the modified flag based on current gene state
-    /// </summary>
-    public void UpdateModifiedStatus()
-    {
-        isModified = !GenesMatchOriginal();
-        
-        // Update seed name to reflect modification
-        if (baseSeedDefinition != null)
-        {
-            if (isModified && !seedName.Contains("(Modified)"))
-            {
-                seedName = baseSeedDefinition.seedName + " (Modified)";
-            }
-            else if (!isModified && seedName.Contains("(Modified)"))
-            {
-                seedName = baseSeedDefinition.seedName;
-            }
-        }
-    }
-    
-    /// <summary>
-    /// Adds a gene to the seed at the specified index
-    /// </summary>
-    public void AddGene(NodeDefinition gene, int index = -1)
-    {
-        if (gene == null) return;
-        
-        if (currentGenes == null)
-            currentGenes = new List<NodeDefinition>();
-            
-        if (index < 0 || index >= currentGenes.Count)
-        {
-            currentGenes.Add(gene);
-        }
-        else
-        {
-            currentGenes.Insert(index, gene);
-        }
-        
-        UpdateModifiedStatus();
-    }
-    
-    /// <summary>
-    /// Removes a gene from the seed at the specified index
-    /// </summary>
-    public bool RemoveGeneAt(int index)
-    {
-        if (currentGenes == null || index < 0 || index >= currentGenes.Count)
-            return false;
-            
-        currentGenes.RemoveAt(index);
-        UpdateModifiedStatus();
-        return true;
-    }
-    
-    /// <summary>
-    /// Moves a gene from one position to another
-    /// </summary>
-    public bool MoveGene(int fromIndex, int toIndex)
-    {
-        if (currentGenes == null || fromIndex < 0 || fromIndex >= currentGenes.Count || 
-            toIndex < 0 || toIndex >= currentGenes.Count || fromIndex == toIndex)
-            return false;
-            
-        NodeDefinition gene = currentGenes[fromIndex];
-        currentGenes.RemoveAt(fromIndex);
-        currentGenes.Insert(toIndex, gene);
-        UpdateModifiedStatus();
-        return true;
-    }
-    
-    /// <summary>
-    /// Converts this seed instance to a NodeGraph for planting
-    /// </summary>
-    public NodeGraph ToNodeGraph()
-    {
-        NodeGraph graph = new NodeGraph();
-        
-        if (currentGenes == null || currentGenes.Count == 0)
-        {
-            Debug.LogWarning($"SeedInstance '{seedName}' has no genes to convert to NodeGraph!");
-            return graph;
-        }
-        
-        // Convert each gene to NodeData
-        for (int i = 0; i < currentGenes.Count; i++)
-        {
-            NodeDefinition gene = currentGenes[i];
-            if (gene == null) continue;
-            
-            NodeData nodeData = new NodeData
-            {
-                nodeId = Guid.NewGuid().ToString(),
-                nodeDisplayName = gene.displayName,
-                orderIndex = i, // Top-to-bottom becomes order index
-                effects = gene.CloneEffects(),
-                canBeDeleted = true // Allow deletion in UI if needed
-            };
-            
-            graph.nodes.Add(nodeData);
-        }
-        
-        return graph;
-    }
-    
-    /// <summary>
-    /// Validates that this seed has the minimum requirements to grow
-    /// </summary>
-    public bool IsValidForPlanting()
-    {
-        if (currentGenes == null || currentGenes.Count == 0)
-            return false;
-            
-        // Check for required SeedSpawn effect
-        foreach (var gene in currentGenes)
-        {
-            if (gene != null && gene.effects != null)
-            {
-                foreach (var effect in gene.effects)
-                {
-                    if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        
-        return false;
-    }
-    
-    /// <summary>
-    /// Gets a summary description of this seed's genetic composition
-    /// </summary>
-    public string GetGeneticSummary()
-    {
-        if (currentGenes == null || currentGenes.Count == 0)
-            return "No genes present.";
-            
-        List<string> geneNames = new List<string>();
-        foreach (var gene in currentGenes)
-        {
-            if (gene != null && !string.IsNullOrEmpty(gene.displayName))
-            {
-                geneNames.Add(gene.displayName);
-            }
-        }
-        
-        if (geneNames.Count == 0)
-            return "No valid genes present.";
-            
-        return string.Join(" → ", geneNames);
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\SeedSelectionButton.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using System.Linq;
-
-// =====================================================================
-// Seed Selection Button Component
-// =====================================================================
-public class SeedSelectionButton : MonoBehaviour
-{
-    [Header("UI References")]
-    public TMP_Text seedNameText;
-    public TMP_Text seedInfoText;
-    public Image seedIcon;
-    public Button selectButton;
-    public Image backgroundImage;
-    
-    [Header("Visual Settings")]
-    public Color normalColor = Color.white;
-    public Color hoverColor = Color.yellow;
-    public Color modifiedColor = Color.cyan;
-    public Color vanillaColor = Color.green;
-    
-    private SeedInstance seed;
-    private SeedSelectionUI parentUI;
-    
-    public void Initialize(SeedInstance seedInstance, SeedSelectionUI ui)
-    {
-        seed = seedInstance;
-        parentUI = ui;
-        
-        if (seed == null || parentUI == null)
-        {
-            Debug.LogError("[SeedSelectionButton] Invalid initialization parameters!");
-            return;
-        }
-        
-        // Setup UI elements
-        if (seedNameText != null)
-            seedNameText.text = seed.seedName;
-            
-        if (seedInfoText != null)
-        {
-            string status = seed.isModified ? "Modified" : "Vanilla";
-            int geneCount = seed.currentGenes?.Count ?? 0;
-            seedInfoText.text = $"{status} • {geneCount} genes";
-            seedInfoText.color = seed.isModified ? modifiedColor : vanillaColor;
-        }
-        
-        if (seedIcon != null && seed.baseSeedDefinition != null)
-        {
-            seedIcon.sprite = seed.baseSeedDefinition.icon;
-        }
-        
-        // Setup select button
-        if (selectButton != null)
-        {
-            selectButton.onClick.RemoveAllListeners();
-            selectButton.onClick.AddListener(OnSelectButtonClicked);
-        }
-        
-        // Set initial background color
-        if (backgroundImage != null)
-            backgroundImage.color = normalColor;
-    }
-    
-    private void OnSelectButtonClicked()
-    {
-        if (parentUI != null && seed != null)
-            parentUI.OnSeedSelected(seed);
-    }
-    
-    void OnDestroy()
-    {
-        if (selectButton != null)
-            selectButton.onClick.RemoveAllListeners();
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\SeedSelectionUI.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/SeedSelectionUI.cs
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using System.Linq;
-
-public class SeedSelectionUI : MonoBehaviour
-{
-    public static SeedSelectionUI Instance { get; private set; }
-    
-    [Header("UI References")]
-    public GameObject selectionPanel;
-    public Transform seedButtonContainer;
-    public GameObject seedButtonPrefab;
-    public Button cancelButton;
-    public TMP_Text titleText;
-    public TMP_Text instructionText;
-    
-    [Header("Settings")]
-    [SerializeField] private bool showDebugLogs = false;
-    
-    // Current state
-    private System.Action<SeedInstance> onSeedSelectedCallback;
-    private List<GameObject> currentSeedButtons = new List<GameObject>();
-    
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        
-        // Setup cancel button
-        if (cancelButton != null)
-            cancelButton.onClick.AddListener(CancelSelection);
-        
-        // Validate required components
-        if (seedButtonPrefab == null)
-            Debug.LogError("[SeedSelectionUI] Seed Button Prefab not assigned!", this);
-        if (seedButtonContainer == null)
-            Debug.LogError("[SeedSelectionUI] Seed Button Container not assigned!", this);
-        
-        // Start hidden
-        if (selectionPanel != null)
-            selectionPanel.SetActive(false);
-    }
-    
-    void OnDestroy()
-    {
-        if (cancelButton != null)
-            cancelButton.onClick.RemoveAllListeners();
-            
-        if (Instance == this)
-            Instance = null;
-    }
-    
-    /// <summary>
-    /// Shows the seed selection UI with plantable seeds
-    /// </summary>
-    /// <param name="onSeedSelected">Callback when a seed is selected</param>
-    public void ShowSeedSelection(System.Action<SeedInstance> onSeedSelected)
-    {
-        if (PlayerGeneticsInventory.Instance == null)
-        {
-            Debug.LogError("[SeedSelectionUI] PlayerGeneticsInventory not found!");
-            return;
-        }
-        
-        onSeedSelectedCallback = onSeedSelected;
-        
-        // Get plantable seeds
-        List<SeedInstance> plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
-        
-        if (plantableSeeds.Count == 0)
-        {
-            Debug.LogWarning("[SeedSelectionUI] No plantable seeds available!");
-            if (showDebugLogs)
-                Debug.Log("[SeedSelectionUI] Player has no valid seeds to plant");
-            return;
-        }
-        
-        // Update UI text
-        if (titleText != null)
-            titleText.text = "Select Seed to Plant";
-        if (instructionText != null)
-            instructionText.text = $"Choose from {plantableSeeds.Count} available seeds:";
-        
-        // Create seed buttons
-        CreateSeedButtons(plantableSeeds);
-        
-        // Show panel
-        if (selectionPanel != null)
-            selectionPanel.SetActive(true);
-        
-        if (showDebugLogs)
-            Debug.Log($"[SeedSelectionUI] Showing selection with {plantableSeeds.Count} seeds");
-    }
-    
-    /// <summary>
-    /// Hides the seed selection UI
-    /// </summary>
-    public void HideSelection()
-    {
-        if (selectionPanel != null)
-            selectionPanel.SetActive(false);
-            
-        ClearSeedButtons();
-        onSeedSelectedCallback = null;
-        
-        if (showDebugLogs)
-            Debug.Log("[SeedSelectionUI] Hidden selection UI");
-    }
-    
-    private void CreateSeedButtons(List<SeedInstance> seeds)
-    {
-        if (seedButtonContainer == null || seedButtonPrefab == null)
-            return;
-            
-        // Clear existing buttons
-        ClearSeedButtons();
-        
-        // Create button for each seed
-        foreach (SeedInstance seed in seeds)
-        {
-            if (seed == null) continue;
-            
-            GameObject buttonObj = Instantiate(seedButtonPrefab, seedButtonContainer);
-            SeedSelectionButton buttonComponent = buttonObj.GetComponent<SeedSelectionButton>();
-            
-            if (buttonComponent == null)
-                buttonComponent = buttonObj.AddComponent<SeedSelectionButton>();
-                
-            buttonComponent.Initialize(seed, this);
-            currentSeedButtons.Add(buttonObj);
-        }
-    }
-    
-    private void ClearSeedButtons()
-    {
-        foreach (GameObject button in currentSeedButtons)
-        {
-            if (button != null)
-                DestroyImmediate(button);
-        }
-        currentSeedButtons.Clear();
-    }
-    
-    /// <summary>
-    /// Called when a seed button is clicked
-    /// </summary>
-    public void OnSeedSelected(SeedInstance selectedSeed)
-    {
-        if (selectedSeed == null)
-        {
-            Debug.LogWarning("[SeedSelectionUI] Null seed selected!");
-            return;
-        }
-        
-        if (showDebugLogs)
-            Debug.Log($"[SeedSelectionUI] Seed selected: {selectedSeed.seedName}");
-        
-        // Invoke callback
-        onSeedSelectedCallback?.Invoke(selectedSeed);
-        
-        // Hide UI
-        HideSelection();
-    }
-    
-    private void CancelSelection()
-    {
-        if (showDebugLogs)
-            Debug.Log("[SeedSelectionUI] Selection cancelled");
-            
-        HideSelection();
-    }
-    
-    /// <summary>
-    /// Quick method for single seed auto-selection (when only one seed available)
-    /// </summary>
-    public void AttemptAutoSelection(System.Action<SeedInstance> onSeedSelected)
-    {
-        if (PlayerGeneticsInventory.Instance == null)
-            return;
-            
-        List<SeedInstance> plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
-        
-        if (plantableSeeds.Count == 1)
-        {
-            // Auto-select the only available seed
-            if (showDebugLogs)
-                Debug.Log($"[SeedSelectionUI] Auto-selecting only available seed: {plantableSeeds[0].seedName}");
-                
-            onSeedSelected?.Invoke(plantableSeeds[0]);
-        }
-        else if (plantableSeeds.Count > 1)
-        {
-            // Show selection UI
-            ShowSeedSelection(onSeedSelected);
-        }
-        else
-        {
-            // No seeds available
-            Debug.LogWarning("[SeedSelectionUI] No plantable seeds available for auto-selection!");
-        }
-    }
-}
-
-
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -9572,10 +7265,9 @@ public class PlantGrowthModifierManager : MonoBehaviour
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Tiles\Data\PlantPlacementManager.cs
+// FILE: Assets\Scripts\Tiles\Data\PlantPlacementManagement.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Tiles/Data/PlantPlacementManager.cs (UPDATED for Seed System)
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class PlantPlacementManager : MonoBehaviour
@@ -9584,6 +7276,7 @@ public class PlantPlacementManager : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private GameObject plantPrefab;
+    [SerializeField] private NodeEditorGridController nodeEditorGrid;
     [SerializeField] private Transform plantParent;
     [SerializeField] private TileInteractionManager tileInteractionManager;
     [SerializeField] private PlantGrowthModifierManager growthModifierManager;
@@ -9629,6 +7322,11 @@ public class PlantPlacementManager : MonoBehaviour
             plantParent = EcosystemManager.Instance.plantParent;
         }
         
+        if (nodeEditorGrid == null)
+        {
+            nodeEditorGrid = NodeEditorGridController.Instance;
+        }
+        
         if (tileInteractionManager == null)
         {
             tileInteractionManager = TileInteractionManager.Instance;
@@ -9663,14 +7361,15 @@ public class PlantPlacementManager : MonoBehaviour
         RebuildInvalidTilesSet();
     }
 
-    // --- Position Management (unchanged) ---
-    
+    // Check if a grid position is occupied by a plant
     public bool IsPositionOccupied(Vector3Int gridPosition)
     {
+        // If we have a reference, check if it's still valid (not destroyed)
         if (plantsByGridPosition.TryGetValue(gridPosition, out GameObject plant))
         {
             if (plant == null)
             {
+                // Plant has been destroyed, remove from dictionary
                 plantsByGridPosition.Remove(gridPosition);
                 return false;
             }
@@ -9679,14 +7378,18 @@ public class PlantPlacementManager : MonoBehaviour
         return false;
     }
     
+    // Check if a tile is valid for planting
     public bool IsTileValidForPlanting(TileDefinition tileDef)
     {
+        // If the tile is null, it's not valid
         if (tileDef == null)
             return false;
             
+        // Check if this tile is in our invalid set
         return !invalidTilesSet.Contains(tileDef);
     }
 
+    // Clean up destroyed plants from our dictionary (call periodically if needed)
     public void CleanupDestroyedPlants()
     {
         List<Vector3Int> keysToRemove = new List<Vector3Int>();
@@ -9710,136 +7413,29 @@ public class PlantPlacementManager : MonoBehaviour
         }
     }
 
-    // --- NEW: Seed-based planting methods ---
-
-    /// <summary>
-    /// NEW: Try to plant using seed selection system
-    /// </summary>
-    public void TryPlantWithSeedSelection(Vector3Int gridPosition, Vector3 worldPosition, 
-        System.Action onCompleted = null)
-    {
-        // Basic validation
-        if (!CanPlantAtPosition(gridPosition))
-        {
-            onCompleted?.Invoke();
-            return;
-        }
-
-        // Use seed selection UI
-        if (SeedSelectionUI.Instance != null && PlayerGeneticsInventory.Instance != null)
-        {
-            var plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
-            
-            if (plantableSeeds.Count == 0)
-            {
-                if (showDebugMessages)
-                    Debug.Log("Cannot plant: No plantable seeds available in inventory.");
-                onCompleted?.Invoke();
-                return;
-            }
-            
-            if (plantableSeeds.Count == 1)
-            {
-                // Auto-select single seed
-                TryPlantSeedInstance(plantableSeeds[0], gridPosition, worldPosition);
-                onCompleted?.Invoke();
-            }
-            else
-            {
-                // Show selection UI
-                SeedSelectionUI.Instance.ShowSeedSelection(selectedSeed => {
-                    TryPlantSeedInstance(selectedSeed, gridPosition, worldPosition);
-                    onCompleted?.Invoke();
-                });
-            }
-        }
-        else
-        {
-            if (showDebugMessages)
-                Debug.LogError("Cannot plant: Seed selection system not available!");
-            onCompleted?.Invoke();
-        }
-    }
-
-    /// <summary>
-    /// NEW: Plant a specific seed instance
-    /// </summary>
-    public bool TryPlantSeedInstance(SeedInstance seedInstance, Vector3Int gridPosition, Vector3 worldPosition)
-    {
-        if (seedInstance == null)
-        {
-            if (showDebugMessages)
-                Debug.LogError("Cannot plant: Seed instance is null!");
-            return false;
-        }
-
-        if (!seedInstance.IsValidForPlanting())
-        {
-            if (showDebugMessages)
-                Debug.Log($"Cannot plant: Seed '{seedInstance.seedName}' is not valid for planting.");
-            return false;
-        }
-
-        // Check if position is still valid
-        if (!CanPlantAtPosition(gridPosition))
-            return false;
-
-        // Calculate planting position
-        Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
-        
-        // Spawn the plant
-        GameObject plantObj = SpawnPlantFromSeed(seedInstance, plantingPosition);
-        if (plantObj != null)
-        {
-            // Track the plant position
-            plantsByGridPosition[gridPosition] = plantObj;
-            
-            // Register with growth modifier manager
-            RegisterPlantWithModifiers(plantObj, gridPosition);
-            
-            // Remove seed from inventory
-            if (PlayerGeneticsInventory.Instance != null)
-            {
-                PlayerGeneticsInventory.Instance.RemoveSeed(seedInstance);
-                if (showDebugMessages)
-                    Debug.Log($"Planted and consumed seed: {seedInstance.seedName}");
-            }
-            
-            return true;
-        }
-        return false;
-    }
-
-    // --- LEGACY: Original NodeGraph-based planting (kept for compatibility) ---
-
+    // Try to plant a seed at the given grid position
     public bool TryPlantSeed(Vector3Int gridPosition, Vector3 worldPosition)
-    {
-        // This is the old method - now redirects to seed selection
-        TryPlantWithSeedSelection(gridPosition, worldPosition);
-        return true; // Always return true as the new system handles validation internally
-    }
-
-    // --- Private Helper Methods ---
-
-    private bool CanPlantAtPosition(Vector3Int gridPosition)
     {
         // Clean up any destroyed plants first
         CleanupDestroyedPlants();
         
-        // Check if position is occupied
+        // Return false if position is already occupied
         if (IsPositionOccupied(gridPosition))
         {
             if (showDebugMessages)
+            {
                 Debug.Log($"Cannot plant: Position {gridPosition} already has a plant.");
+            }
             return false;
         }
         
-        // Check tile validity
+        // Get the tile at this position
         TileDefinition tileDef = null;
         if (tileInteractionManager != null)
         {
             tileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
             
+            // Check if the tile is valid for planting
             if (!IsTileValidForPlanting(tileDef))
             {
                 if (showDebugMessages)
@@ -9851,56 +7447,86 @@ public class PlantPlacementManager : MonoBehaviour
             }
         }
 
-        return true;
-    }
-
-    /// <summary>
-    /// NEW: Spawn a plant from a SeedInstance
-    /// </summary>
-    private GameObject SpawnPlantFromSeed(SeedInstance seedInstance, Vector3 position)
-    {
-        if (plantPrefab == null)
+        // Get the current graph from the NodeEditorGridController
+        if (nodeEditorGrid == null)
         {
-            Debug.LogError("Cannot spawn plant: Plant prefab not assigned.");
-            return null;
-        }
-
-        if (showDebugMessages)
-            Debug.Log($"SpawnPlantFromSeed called: {seedInstance.seedName} at position: {position}");
-    
-        // Instantiate the plant prefab
-        GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
-        plantObj.name = $"Plant_{seedInstance.seedName}_{System.DateTime.Now:HHmmss}";
-
-        // Get the PlantGrowth component
-        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
-        if (growthComponent != null)
-        {
-            // Convert seed to NodeGraph
-            NodeGraph nodeGraph = seedInstance.ToNodeGraph();
-            
-            if (nodeGraph == null)
+            nodeEditorGrid = NodeEditorGridController.Instance;
+            if (nodeEditorGrid == null)
             {
-                Debug.LogError($"Failed to convert seed '{seedInstance.seedName}' to NodeGraph!");
-                Destroy(plantObj);
-                return null;
+                Debug.LogError("Cannot plant: NodeEditorGridController not found.");
+                return false;
             }
+        }
 
-            // Initialize the plant
-            growthComponent.InitializeAndGrow(nodeGraph);
-            return plantObj;
-        }
-        else
+        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
+        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0)
         {
-            Debug.LogError("Plant prefab missing PlantGrowth component! Destroying spawned object.");
-            Destroy(plantObj);
-            return null;
+            if (showDebugMessages)
+            {
+                Debug.Log("Cannot plant: No nodes in UI graph to spawn.");
+            }
+            return false;
         }
+        
+        // Validate graph has a seed node
+        bool seedFound = false;
+        foreach (var node in graphToSpawn.nodes)
+        {
+            if (node != null && node.effects != null)
+            {
+                foreach (var effect in node.effects)
+                {
+                    if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
+                    {
+                        seedFound = true;
+                        break;
+                    }
+                }
+            }
+            if (seedFound) break;
+        }
+
+        if (!seedFound)
+        {
+            if (showDebugMessages)
+            {
+                Debug.Log("Cannot plant: Node graph lacks a SeedSpawn effect.");
+            }
+            return false;
+        }
+
+        // Calculate randomized planting position based on our settings
+        Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
+        
+        // Spawn the plant at the randomized position
+        GameObject plantObj = SpawnPlant(graphToSpawn, plantingPosition);
+        if (plantObj != null)
+        {
+            // Track the plant position
+            plantsByGridPosition[gridPosition] = plantObj;
+            
+            // Register the plant with the growth modifier manager
+            if (growthModifierManager != null)
+            {
+                PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
+                if (plantGrowth != null)
+                {
+                    growthModifierManager.RegisterPlantTile(plantGrowth, tileDef);
+                    
+                    if (showDebugMessages)
+                    {
+                        string tileDebugName = tileDef != null ? tileDef.displayName : "Unknown";
+                        Debug.Log($"Plant registered with tile: {tileDebugName}");
+                    }
+                }
+            }
+            
+            return true;
+        }
+        return false;
     }
 
-    /// <summary>
-    /// LEGACY: Spawn a plant using the original NodeGraph system
-    /// </summary>
+    // Spawn a plant using the given node graph at the specified position
     private GameObject SpawnPlant(NodeGraph graphToSpawn, Vector3 position)
     {
         if (plantPrefab == null)
@@ -9909,15 +7535,22 @@ public class PlantPlacementManager : MonoBehaviour
             return null;
         }
 
-        if (showDebugMessages)
-            Debug.Log($"SpawnPlant called with position: {position}");
+        Debug.Log($"SpawnPlant called with position: {position}");
     
+        // Instantiate the plant prefab
         GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
+    
+        // Verify the position was actually applied
+        Debug.Log($"Plant instantiated at position: {plantObj.transform.position}");
 
+        // Get the PlantGrowth component
         PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
         if (growthComponent != null)
         {
+            // Create a deep copy of the node graph to prevent modifications affecting the original
             NodeGraph graphCopy = CloneNodeGraph(graphToSpawn);
+
+            // Initialize the plant with the deep copy
             growthComponent.InitializeAndGrow(graphCopy);
             return plantObj;
         }
@@ -9929,28 +7562,7 @@ public class PlantPlacementManager : MonoBehaviour
         }
     }
 
-    private void RegisterPlantWithModifiers(GameObject plantObj, Vector3Int gridPosition)
-    {
-        if (growthModifierManager != null && tileInteractionManager != null)
-        {
-            TileDefinition currentTile = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
-            PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
-            
-            if (plantGrowth != null)
-            {
-                growthModifierManager.RegisterPlantTile(plantGrowth, currentTile);
-                
-                if (showDebugMessages)
-                {
-                    string tileDebugName = currentTile != null ? currentTile.displayName : "Unknown";
-                    Debug.Log($"Plant registered with tile: {tileDebugName}");
-                }
-            }
-        }
-    }
-
-    // --- Legacy Helper Methods (kept for compatibility) ---
-
+    // Create a deep copy of a NodeGraph
     private NodeGraph CloneNodeGraph(NodeGraph original)
     {
         NodeGraph copy = new NodeGraph();
@@ -9968,6 +7580,7 @@ public class PlantPlacementManager : MonoBehaviour
                 canBeDeleted = originalNode.canBeDeleted
             };
 
+            // Deep copy effects
             newNode.effects = CloneEffectsList(originalNode.effects);
             copy.nodes.Add(newNode);
         }
@@ -9975,6 +7588,7 @@ public class PlantPlacementManager : MonoBehaviour
         return copy;
     }
 
+    // Create a deep copy of a list of NodeEffectData
     private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
     {
         if (originalList == null) return new List<NodeEffectData>();
@@ -9997,33 +7611,52 @@ public class PlantPlacementManager : MonoBehaviour
         return newList;
     }
     
+    // Generate a randomized position within the given radius, with simple increments
+    // Generate a randomized position within the given radius
     private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
     {
-        if (showDebugMessages)
-            Debug.Log($"Starting position randomization from center: {centerPosition}, radius: {spawnRadius}, increment: {spawnRadiusIncrement}");
+        // First, let's add comprehensive debugging
+        Debug.Log($"Starting position randomization from center: {centerPosition}, radius: {spawnRadius}, increment: {spawnRadiusIncrement}");
     
+        // Critical check - if radius is too small, just return the center
         if (spawnRadius < 0.01f)
         {
+            Debug.LogWarning("Spawn radius too small (<0.01), using center position");
             return centerPosition;
         }
     
+        // Generate a random angle in radians (0 to 2π)
         float randomAngle = Random.Range(0f, 2f * Mathf.PI);
+        Debug.Log($"Random angle: {randomAngle} radians ({randomAngle * Mathf.Rad2Deg} degrees)");
+    
+        // Convert angle to direction vector
         Vector2 direction = new Vector2(Mathf.Cos(randomAngle), Mathf.Sin(randomAngle));
+        Debug.Log($"Direction vector: {direction}");
+    
+        // Get a random distance within spawn radius
         float randomDistance = Random.Range(0.05f, spawnRadius);
-        
+        Debug.Log($"Random distance: {randomDistance}");
+    
+        // Calculate actual offset
         float offsetX = direction.x * randomDistance;
         float offsetY = direction.y * randomDistance;
-        
+        Debug.Log($"Raw offset: ({offsetX}, {offsetY})");
+    
+        // Apply increment if needed
         if (spawnRadiusIncrement > 0.001f)
         {
+            float originalX = offsetX;
+            float originalY = offsetY;
+        
             offsetX = Mathf.Round(offsetX / spawnRadiusIncrement) * spawnRadiusIncrement;
             offsetY = Mathf.Round(offsetY / spawnRadiusIncrement) * spawnRadiusIncrement;
+        
+            Debug.Log($"Snapped offset: ({offsetX}, {offsetY}) from ({originalX}, {originalY})");
         }
-        
+    
+        // Create the final position
         Vector3 randomizedPosition = centerPosition + new Vector3(offsetX, offsetY, 0f);
-        
-        if (showDebugMessages)
-            Debug.Log($"FINAL randomized position: {randomizedPosition}");
+        Debug.Log($"FINAL randomized position: {randomizedPosition}");
     
         return randomizedPosition;
     }
@@ -10676,28 +8309,29 @@ public class TileInteractionManager : MonoBehaviour
         if (!plantManager.IsTileValidForPlanting(tileDef))
         {
             if (debugLogs) Debug.Log($"Cannot plant on {tileDef?.displayName ?? "Unknown"} - invalid tile.");
+            // Maybe add player feedback here (sound/visual)
             return;
         }
 
         GardenerController gardener = player?.GetComponent<GardenerController>();
         if (gardener == null) { Debug.LogError("Cannot plant: GardenerController not found on player!"); return; }
 
-        Vector3 worldPosition = CellCenterWorld(cellPosition);
-    
+        Vector3 worldPosition = CellCenterWorld(cellPosition); // Plant near cell center
+
         gardener.Plant(); // Trigger animation
-        StartCoroutine(PlantAfterAnimationWithSeeds(gardener, plantManager, cellPosition, worldPosition));
+        StartCoroutine(PlantAfterAnimation(gardener, plantManager, cellPosition, worldPosition));
     }
 
-    private IEnumerator PlantAfterAnimationWithSeeds(GardenerController gardener, PlantPlacementManager plantManager, Vector3Int cellPosition, Vector3 worldPosition)
+    private IEnumerator PlantAfterAnimation(GardenerController gardener, PlantPlacementManager plantManager, Vector3Int cellPosition, Vector3 worldPosition)
     {
+        // Ensure gardener and duration are valid
         float waitTime = (gardener != null) ? gardener.plantingDuration : 0.1f;
         yield return new WaitForSeconds(waitTime);
 
-        if (plantManager != null)
+        if (plantManager != null) // Check again in case it was destroyed
         {
-            // Use new seed-based planting system
-            plantManager.TryPlantWithSeedSelection(cellPosition, worldPosition);
-            if (debugLogs) Debug.Log($"Attempted seed planting at {cellPosition}");
+            bool planted = plantManager.TryPlantSeed(cellPosition, worldPosition);
+            if (debugLogs) Debug.Log(planted ? $"Planted seed successfully at {cellPosition}" : $"Failed to plant seed at {cellPosition}");
         }
     }
 
@@ -11479,59 +9113,6 @@ public class OutlinePartController : MonoBehaviour
                 DestroyImmediate(gameObject);
             }
         }
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Visuals\PixelPerfectSetup.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Core/PixelPerfectSetup.cs
-using UnityEngine;
-using UnityEngine.U2D;
-
-[RequireComponent(typeof(Camera))]
-[RequireComponent(typeof(PixelPerfectCamera))]
-public class PixelPerfectSetup : MonoBehaviour
-{
-    [Header("Game Resolution")]
-    [SerializeField] private int referenceResolutionX = 320; // Your base game width
-    [SerializeField] private int referenceResolutionY = 180; // Your base game height
-    
-    [Header("Pixel Settings")]
-    [SerializeField] private int pixelsPerUnit = 6; // Since 1 game pixel = 6x6 real pixels
-    
-    private PixelPerfectCamera pixelPerfectCamera;
-    private Camera cam;
-    
-    void Awake()
-    {
-        cam = GetComponent<Camera>();
-        pixelPerfectCamera = GetComponent<PixelPerfectCamera>();
-        
-        SetupPixelPerfectCamera();
-    }
-    
-    void SetupPixelPerfectCamera()
-    {
-        // Configure Pixel Perfect Camera
-        pixelPerfectCamera.assetsPPU = pixelsPerUnit;
-        pixelPerfectCamera.refResolutionX = referenceResolutionX;
-        pixelPerfectCamera.refResolutionY = referenceResolutionY;
-        pixelPerfectCamera.upscaleRT = true;
-        pixelPerfectCamera.pixelSnapping = true;
-        pixelPerfectCamera.cropFrameX = false;
-        pixelPerfectCamera.cropFrameY = false;
-        pixelPerfectCamera.stretchFill = false;
-        
-        Debug.Log($"[PixelPerfectSetup] Configured for {referenceResolutionX}x{referenceResolutionY} at {pixelsPerUnit} PPU");
-    }
-    
-    void Start()
-    {
-        // Verify the setup
-        float expectedCameraSize = (float)referenceResolutionY / (2f * pixelsPerUnit);
-        Debug.Log($"[PixelPerfectSetup] Expected camera orthographic size: {expectedCameraSize}");
     }
 }
 
@@ -12338,74 +9919,55 @@ public class ShadowPartController : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 ﻿// FILE: Assets/Scripts/Visuals/WaterReflection.cs
 using UnityEngine;
-using UnityEngine.Tilemaps;
-using System.Collections.Generic; // Keep for potential future extensions, not strictly needed now
+using UnityEngine.Tilemaps; // Keep for water masking logic
+using System.Collections.Generic;
+using System.Linq; // For FindObjectsOfType
 
+/// <summary>
+/// Creates a water reflection effect by duplicating and flipping the sprite.
+/// Attach to any GameObject with a SpriteRenderer to create its reflection.
+/// Can optionally use parent's transform for offset and fade calculations.
+/// </summary>
 public class WaterReflection : MonoBehaviour
 {
-    // --- SECTION: Override Toggles ---
-    [System.Serializable]
-    public class OverrideSettings
-    {
-        [Tooltip("If checked, the local 'Reflection Opacity' value will be used instead of the global manager's default.")]
-        public bool reflectionOpacity = false;
-        [Tooltip("If checked, the local 'Reflection Tint' value will be used instead of the global manager's default.")]
-        public bool reflectionTint = false;
-        [Tooltip("If checked, the local 'Gradient Fade Base Material' will be used. Otherwise, manager's default is used.")]
-        public bool gradientFadeBaseMaterial = false;
-        [Tooltip("If checked, the local 'Sorting Order Offset' value will be used instead of the global manager's default.")]
-        public bool sortingOrderOffset = false;
-        [Tooltip("If checked, the local 'Use Water Masking' value will be used instead of the global manager's default.")]
-        public bool useWaterMasking = false;
-        [Tooltip("If checked, the local 'Water Tilemap Tag' value will be used instead of the global manager's default.")]
-        public bool waterTilemapTag = false;
-        [Tooltip("If checked, the local 'Show Debug Info' value will be used instead of the global manager's default.")]
-        public bool showDebugInfo = false;
-    }
-    [Header("Overrides (Global Defaults from WaterReflectionManager)")]
-    [SerializeField] private OverrideSettings overrides;
-
-
-    // --- SECTION: Local Settings (Used if Overridden) ---
     [Header("Reflection Source")]
     [Tooltip("If true, Y Offset and Distance Fade calculations will be relative to this GameObject's parent. If false (default), relative to this GameObject.")]
-    [SerializeField] private bool useParentAsReference = false; // This remains a local setting
+    [SerializeField] private bool useParentAsReference = false;
 
-    [Header("Local Reflection Settings (If Overridden)")]
+    [Header("Reflection Settings")]
     [Tooltip("Vertical offset of the reflection. Interpretation depends on 'Use Parent As Reference'.")]
-    [SerializeField] private float yOffset = -1f; // This remains a local setting
+    [SerializeField] private float yOffset = -1f;
 
-    [Tooltip("Local opacity of the reflection (0 = invisible, 1 = fully opaque)")]
-    [SerializeField] [Range(0f, 1f)] private float localReflectionOpacity = 0.5f;
+    [Tooltip("Opacity of the reflection (0 = invisible, 1 = fully opaque)")]
+    [SerializeField] [Range(0f, 1f)] private float reflectionOpacity = 0.5f;
 
-    [Tooltip("Local additional tint color for the reflection")]
-    [SerializeField] private Color localReflectionTint = Color.white;
+    [Tooltip("Additional tint color for the reflection")]
+    [SerializeField] private Color reflectionTint = Color.white;
 
-    [Header("Local Distance Fade (If Overridden)")]
-    [Tooltip("Enable fading reflection. Requires 'Gradient Fade Base Material' (local or global) to be assigned.")]
-    [SerializeField] private bool enableDistanceFade = true; // This remains local as it depends on material
-    [Tooltip("Vertical distance from the reference Y where fade starts.")]
-    [SerializeField] private float fadeStartDistance = 0.0f; // Local
-    [Tooltip("Vertical distance from the reference Y where reflection becomes min alpha.")]
-    [SerializeField] private float fadeEndDistance = 1.0f; // Local
-    [Tooltip("Minimum alpha when fully faded.")]
-    [SerializeField] [Range(0f, 1f)] private float minFadeAlpha = 0.0f; // Local
-    [Tooltip("Local override for the gradient fade material. If unassigned and override is false, uses manager's default.")]
-    [SerializeField] private Material localGradientFadeBaseMaterial;
+    [Header("Distance Fade (Shader Controlled)")]
+    [Tooltip("Enable fading reflection. Requires 'Gradient Fade Base Material' to be assigned.")]
+    [SerializeField] private bool enableDistanceFade = true;
+    [Tooltip("Vertical distance from the reference Y (self or parent) where fade starts (shader's _FadeStart).")]
+    [SerializeField] private float fadeStartDistance = 0.0f;
+    [Tooltip("Vertical distance from the reference Y (self or parent) where reflection becomes min alpha (shader's _FadeEnd).")]
+    [SerializeField] private float fadeEndDistance = 1.0f;
+    [Tooltip("Minimum alpha when fully faded (shader's _MinAlpha).")]
+    [SerializeField] [Range(0f, 1f)] private float minFadeAlpha = 0.0f;
+    [Tooltip("Assign the 'Custom/WaterReflectionGradient' material, or one using that shader.")]
+    [SerializeField] private Material gradientFadeBaseMaterial;
 
-    [Header("Local Sorting (If Overridden)")]
-    [Tooltip("Local sorting order offset for the reflection")]
-    [SerializeField] private int localSortingOrderOffset = -1;
+    [Header("Sorting")]
+    [Tooltip("Sorting order offset for the reflection (usually negative to render behind)")]
+    [SerializeField] private int sortingOrderOffset = -1;
 
-    [Header("Local Water Masking (If Overridden)")]
-    [Tooltip("Local override for using water masking")]
-    [SerializeField] private bool localUseWaterMasking = true;
-    [Tooltip("Local override for the water tilemap tag")]
-    [SerializeField] private string localWaterTilemapTag = "Water";
+    [Header("Water Masking")]
+    [Tooltip("If enabled, reflection will only be visible over water tiles")]
+    [SerializeField] private bool useWaterMasking = true;
+    [Tooltip("Tag used to identify the water tilemap (default: 'Water')")]
+    [SerializeField] private string waterTilemapTag = "Water";
 
-    [Header("Local Debug (If Overridden)")]
-    [SerializeField] private bool localShowDebugInfo = false;
-
+    [Header("Debug")]
+    [SerializeField] private bool showDebugInfo = false;
 
     // --- Internal References ---
     private SpriteRenderer originalRenderer;
@@ -12413,17 +9975,7 @@ public class WaterReflection : MonoBehaviour
     private GameObject reflectionObject;
     private SpriteRenderer reflectionRenderer;
     private Animator reflectionAnimator;
-    private Material reflectionMaterialInstance; // Instanced material for this reflection
-
-    // --- Resolved Settings (from Manager or Local) ---
-    private float _actualReflectionOpacity;
-    private Color _actualReflectionTint;
-    private Material _actualGradientFadeBaseMaterial;
-    private int _actualSortingOrderOffset;
-    private bool _actualUseWaterMasking;
-    private string _actualWaterTilemapTag;
-    private bool _actualShowDebugInfo;
-
+    private Material reflectionMaterialInstance;
 
     // --- Cached Values for Optimization ---
     private Sprite lastSprite;
@@ -12436,68 +9988,45 @@ public class WaterReflection : MonoBehaviour
 
     void Awake()
     {
-        ResolveSettings(); // Determine actual settings to use
-
         originalRenderer = GetComponent<SpriteRenderer>();
         originalAnimator = GetComponent<Animator>();
 
         if (originalRenderer == null)
         {
-            if (_actualShowDebugInfo) Debug.LogError($"[WaterReflection] No SpriteRenderer found on {gameObject.name}! Component disabled.", this);
+            Debug.LogError($"[WaterReflection] No SpriteRenderer found on {gameObject.name}! Component disabled.", this);
             enabled = false;
             return;
         }
 
         if (useParentAsReference && transform.parent == null)
         {
-            if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection] 'Use Parent As Reference' is true on {gameObject.name}, but it has no parent. Will use self as reference.", this);
+            if (showDebugInfo) Debug.LogWarning($"[WaterReflection] 'Use Parent As Reference' is true on {gameObject.name}, but it has no parent. Will use self as reference.", this);
             useParentAsReference = false;
         }
 
-        if (Application.isPlaying)
+        // Check for gradientFadeBaseMaterial in Awake, specifically for Play mode behavior
+        if (Application.isPlaying) // Only show this more detailed warning in play mode
         {
-            if (enableDistanceFade && _actualGradientFadeBaseMaterial == null)
+            if (enableDistanceFade && gradientFadeBaseMaterial == null)
             {
-                 if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection Awake] '{gameObject.name}': 'Enable Distance Fade' is true, but no 'Gradient Fade Base Material' (local or global) is assigned/found. Distance fade will not use the custom shader.", this);
+                Debug.LogWarning($"[WaterReflection Awake] '{gameObject.name}': 'Enable Distance Fade' is true, but 'Gradient Fade Base Material' is not assigned. Distance fade will not use the custom shader. Please assign a material using 'Custom/WaterReflectionGradient' on the prefab or this instance.", this);
+                // Do not disable enableDistanceFade here, let CreateReflectionObject handle fallback.
             }
         }
 
+
         CreateReflectionObject();
 
-        if (_actualUseWaterMasking)
+        if (useWaterMasking)
         {
             SetupWaterMaskingInteraction();
         }
     }
-    
-    void ResolveSettings()
-    {
-        if (WaterReflectionManager.Instance != null)
-        {
-            _actualReflectionOpacity = overrides.reflectionOpacity ? localReflectionOpacity : WaterReflectionManager.Instance.defaultReflectionOpacity;
-            _actualReflectionTint = overrides.reflectionTint ? localReflectionTint : WaterReflectionManager.Instance.defaultReflectionTint;
-            _actualGradientFadeBaseMaterial = overrides.gradientFadeBaseMaterial ? localGradientFadeBaseMaterial : WaterReflectionManager.Instance.defaultGradientFadeMaterial;
-            _actualSortingOrderOffset = overrides.sortingOrderOffset ? localSortingOrderOffset : WaterReflectionManager.Instance.defaultSortingOrderOffset;
-            _actualUseWaterMasking = overrides.useWaterMasking ? localUseWaterMasking : WaterReflectionManager.Instance.defaultUseWaterMasking;
-            _actualWaterTilemapTag = overrides.waterTilemapTag && !string.IsNullOrEmpty(localWaterTilemapTag) ? localWaterTilemapTag : WaterReflectionManager.Instance.defaultWaterTilemapTag;
-            _actualShowDebugInfo = overrides.showDebugInfo ? localShowDebugInfo : WaterReflectionManager.Instance.globalShowDebugInfo;
-        }
-        else // Fallback if no manager in scene
-        {
-            _actualReflectionOpacity = localReflectionOpacity;
-            _actualReflectionTint = localReflectionTint;
-            _actualGradientFadeBaseMaterial = localGradientFadeBaseMaterial;
-            _actualSortingOrderOffset = localSortingOrderOffset;
-            _actualUseWaterMasking = localUseWaterMasking;
-            _actualWaterTilemapTag = localWaterTilemapTag;
-            _actualShowDebugInfo = localShowDebugInfo;
-            if (Application.isPlaying) Debug.LogWarning("[WaterReflection] WaterReflectionManager not found in scene. Using local settings for all reflections.", this);
-        }
-    }
-
 
     void Start()
     {
+        // Ensure visuals are up-to-date after all Awakes might have run
+        // and especially if material instantiation happened.
         UpdateReflectionVisuals();
         UpdateReflectionTransform();
         CacheCurrentState();
@@ -12510,7 +10039,9 @@ public class WaterReflection : MonoBehaviour
             if (reflectionObject != null) reflectionObject.SetActive(false);
             return;
         }
+
         UpdateReflectionTransform();
+
         if (HasVisualStateChanged())
         {
             UpdateReflectionVisuals();
@@ -12526,21 +10057,24 @@ public class WaterReflection : MonoBehaviour
 
         reflectionRenderer = reflectionObject.AddComponent<SpriteRenderer>();
         reflectionRenderer.sortingLayerName = originalRenderer.sortingLayerName;
-        reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + _actualSortingOrderOffset; // Use resolved
+        reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + sortingOrderOffset;
         reflectionRenderer.drawMode = originalRenderer.drawMode;
 
-        if (enableDistanceFade && _actualGradientFadeBaseMaterial != null) // Use resolved
+        if (enableDistanceFade && gradientFadeBaseMaterial != null)
         {
-            reflectionMaterialInstance = new Material(_actualGradientFadeBaseMaterial);
+            // This is where the material is instanced. If gradientFadeBaseMaterial is null
+            // here (despite being set on prefab), then the warning in Awake was correct.
+            reflectionMaterialInstance = new Material(gradientFadeBaseMaterial);
             reflectionRenderer.material = reflectionMaterialInstance;
-            if (_actualShowDebugInfo && Application.isPlaying) Debug.Log($"[{gameObject.name}] Instantiated gradient material for reflection using '{_actualGradientFadeBaseMaterial.name}'.", this);
+            if (showDebugInfo && Application.isPlaying) Debug.Log($"[{gameObject.name}] Instantiated gradient material for reflection.", this);
         }
         else
         {
             reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial;
-            if (enableDistanceFade && _actualGradientFadeBaseMaterial == null && _actualShowDebugInfo && Application.isPlaying)
+            if (enableDistanceFade && gradientFadeBaseMaterial == null && showDebugInfo && Application.isPlaying)
             {
-                 Debug.Log($"[{gameObject.name}] Using sharedMaterial for reflection as no gradientFadeBaseMaterial (local or global) was resolved during CreateReflectionObject.", this);
+                // This confirms the Awake warning: material was indeed null when needed for instancing.
+                Debug.Log($"[{gameObject.name}] Using sharedMaterial for reflection as gradientFadeBaseMaterial was null during CreateReflectionObject.", this);
             }
         }
 
@@ -12549,17 +10083,20 @@ public class WaterReflection : MonoBehaviour
             reflectionAnimator = reflectionObject.AddComponent<Animator>();
             reflectionAnimator.runtimeAnimatorController = originalAnimator.runtimeAnimatorController;
         }
+
         SortableEntity originalSortable = GetComponent<SortableEntity>();
         if (originalSortable != null)
         {
             reflectionObject.AddComponent<SortableEntity>();
         }
-        if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Created reflection for {gameObject.name}", this);
+
+        if (showDebugInfo) Debug.Log($"[WaterReflection] Created reflection for {gameObject.name}", this);
     }
 
     private void UpdateReflectionTransform()
     {
         if (reflectionObject == null || originalRenderer == null) return;
+
         Transform referenceTransform = (useParentAsReference && transform.parent != null) ? transform.parent : transform;
         Vector3 originalWorldPos = transform.position;
         Vector3 reflectionWorldPos = originalWorldPos;
@@ -12582,11 +10119,11 @@ public class WaterReflection : MonoBehaviour
         reflectionRenderer.flipY = originalRenderer.flipY;
 
         Color baseOriginalSpriteColor = originalRenderer.color;
-        Color finalReflectionTintedColor = baseOriginalSpriteColor * _actualReflectionTint; // Use resolved
-        float finalCombinedAlpha = baseOriginalSpriteColor.a * _actualReflectionOpacity; // Use resolved
+        Color finalReflectionTintedColor = baseOriginalSpriteColor * reflectionTint;
+        float finalCombinedAlpha = baseOriginalSpriteColor.a * reflectionOpacity;
         reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
 
-        if (enableDistanceFade && reflectionMaterialInstance != null)
+        if (enableDistanceFade && reflectionMaterialInstance != null) // Check reflectionMaterialInstance
         {
             Transform referenceTransform = (useParentAsReference && transform.parent != null) ? transform.parent : transform;
             float waterSurfaceY = referenceTransform.position.y;
@@ -12594,13 +10131,13 @@ public class WaterReflection : MonoBehaviour
             reflectionMaterialInstance.SetFloat("_FadeEnd", fadeEndDistance);
             reflectionMaterialInstance.SetFloat("_MinAlpha", minFadeAlpha);
             reflectionMaterialInstance.SetFloat("_OriginalY", waterSurfaceY);
-            Color materialBaseColor = _actualReflectionTint; // Use resolved
-            materialBaseColor.a = _actualReflectionOpacity * baseOriginalSpriteColor.a; // Use resolved
+            Color materialBaseColor = reflectionTint;
+            materialBaseColor.a = reflectionOpacity * baseOriginalSpriteColor.a;
             reflectionMaterialInstance.SetColor("_Color", materialBaseColor);
         }
         else if (!enableDistanceFade && reflectionMaterialInstance != null)
         {
-            reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial;
+            reflectionRenderer.sharedMaterial = originalRenderer.sharedMaterial; // Revert to shared
             Destroy(reflectionMaterialInstance);
             reflectionMaterialInstance = null;
         }
@@ -12628,7 +10165,7 @@ public class WaterReflection : MonoBehaviour
                                 break;
                         }
                     } catch (System.Exception e) {
-                        if(_actualShowDebugInfo) Debug.LogWarning($"Failed to sync animator param '{param.name}': {e.Message}", reflectionAnimator);
+                        if(showDebugInfo) Debug.LogWarning($"Failed to sync animator param '{param.name}': {e.Message}", reflectionAnimator);
                     }
                 }
             }
@@ -12679,12 +10216,12 @@ public class WaterReflection : MonoBehaviour
 
     private void SetupWaterMaskingInteraction()
     {
-        if (!_actualUseWaterMasking || reflectionRenderer == null) return; // Use resolved
-        GameObject waterTilemapGO = FindWaterTilemapByTag(); // FindWaterTilemapByTag will use resolved tag
+        if (!useWaterMasking || reflectionRenderer == null) return;
+        GameObject waterTilemapGO = FindWaterTilemapByTag();
         if (waterTilemapGO == null)
         {
-            if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection] Water tilemap for masking not found on {gameObject.name} using tag '{_actualWaterTilemapTag}'. Masking disabled.", this);
-            // _actualUseWaterMasking = false; // Don't change resolved setting here, just don't apply mask
+            if (showDebugInfo) Debug.LogWarning($"[WaterReflection] Water tilemap for masking not found on {gameObject.name} via tag '{waterTilemapTag}'. Masking disabled.", this);
+            useWaterMasking = false;
             return;
         }
         SpriteMask maskComponent = waterTilemapGO.GetComponent<SpriteMask>();
@@ -12692,25 +10229,24 @@ public class WaterReflection : MonoBehaviour
         {
             maskComponent = waterTilemapGO.AddComponent<SpriteMask>();
             maskComponent.sprite = null;
-            if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Added SpriteMask to water tilemap '{waterTilemapGO.name}' for object '{gameObject.name}'.", waterTilemapGO);
+            if (showDebugInfo) Debug.Log($"[WaterReflection] Added SpriteMask to water tilemap '{waterTilemapGO.name}' for object '{gameObject.name}'.", waterTilemapGO);
         }
         reflectionRenderer.maskInteraction = SpriteMaskInteraction.VisibleInsideMask;
-        if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Reflection of '{gameObject.name}' will be masked by '{waterTilemapGO.name}'.", this);
+        if (showDebugInfo) Debug.Log($"[WaterReflection] Reflection of '{gameObject.name}' will be masked by '{waterTilemapGO.name}'.", this);
     }
 
     private GameObject FindWaterTilemapByTag()
     {
-        // Uses _actualWaterTilemapTag which is resolved in Awake
-        if (string.IsNullOrEmpty(_actualWaterTilemapTag)) return FindWaterTilemapFallback();
-        GameObject taggedWater = GameObject.FindGameObjectWithTag(_actualWaterTilemapTag);
+        if (string.IsNullOrEmpty(waterTilemapTag)) return FindWaterTilemapFallback();
+        GameObject taggedWater = GameObject.FindGameObjectWithTag(waterTilemapTag);
         if (taggedWater != null && taggedWater.GetComponent<Tilemap>() != null)
         {
-            if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Found water tilemap by tag '{_actualWaterTilemapTag}': {taggedWater.name} for {gameObject.name}", this);
+            if (showDebugInfo) Debug.Log($"[WaterReflection] Found water tilemap by tag '{waterTilemapTag}': {taggedWater.name} for {gameObject.name}", this);
             return taggedWater;
         }
-        if (taggedWater != null && taggedWater.GetComponent<Tilemap>() == null && _actualShowDebugInfo)
+        if (taggedWater != null && taggedWater.GetComponent<Tilemap>() == null && showDebugInfo)
         {
-            Debug.LogWarning($"[WaterReflection] GameObject '{taggedWater.name}' (tag '{_actualWaterTilemapTag}') has no Tilemap component!", this);
+            Debug.LogWarning($"[WaterReflection] GameObject '{taggedWater.name}' (tag '{waterTilemapTag}') has no Tilemap component!", this);
         }
         return FindWaterTilemapFallback();
     }
@@ -12729,14 +10265,14 @@ public class WaterReflection : MonoBehaviour
                         Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
                         if (renderTilemapTransform != null && renderTilemapTransform.GetComponent<Tilemap>() != null)
                         {
-                            if (_actualShowDebugInfo) Debug.Log($"[WaterReflection] Auto-detected water tilemap via TIM: {renderTilemapTransform.name} for {gameObject.name}", this);
+                            if (showDebugInfo) Debug.Log($"[WaterReflection] Auto-detected water tilemap via TIM: {renderTilemapTransform.name} for {gameObject.name}", this);
                             return renderTilemapTransform.gameObject;
                         }
                     }
                 }
             }
         }
-        if (_actualShowDebugInfo) Debug.LogWarning($"[WaterReflection] Could not auto-detect water tilemap via TileInteractionManager for {gameObject.name}.", this);
+        if (showDebugInfo) Debug.LogWarning($"[WaterReflection] Could not auto-detect water tilemap via TileInteractionManager for {gameObject.name}.", this);
         return null;
     }
 
@@ -12756,110 +10292,54 @@ public class WaterReflection : MonoBehaviour
 
     void OnValidate()
     {
-        // In OnValidate, we don't have access to the Manager's instance easily,
-        // so we'll primarily validate local settings.
-        // The ResolveSettings() call in Awake will handle combining with manager settings at runtime.
+        // The OnValidate warning should only appear if:
+        // 1. We are in the editor AND not playing.
+        // 2. enableDistanceFade is true.
+        // 3. gradientFadeBaseMaterial is actually null *on this component*.
         if (Application.isEditor && !Application.isPlaying)
         {
-            // Check if local material is needed but missing
-            bool localMaterialNeeded = enableDistanceFade && (!overrides.gradientFadeBaseMaterial || localGradientFadeBaseMaterial == null);
-            bool globalMaterialMightBeUsed = enableDistanceFade && !overrides.gradientFadeBaseMaterial && localGradientFadeBaseMaterial == null;
-
-            if (localMaterialNeeded && !globalMaterialMightBeUsed) // Warn if local override is on but local material missing
+            if (enableDistanceFade && gradientFadeBaseMaterial == null)
             {
-                 Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true and 'Override Gradient Material' is true, but 'Local Gradient Fade Base Material' is not assigned. Assign local material or uncheck override.", this);
+                // This warning is for the user configuring the component in the editor.
+                Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true, but 'Gradient Fade Base Material' is not assigned. Distance fading will require this in Play mode.", this);
             }
-            else if (globalMaterialMightBeUsed) // Inform that global will be used if local isn't set
-            {
-                 Debug.Log($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true. If 'Local Gradient Fade Base Material' remains unassigned and override is false, the global default from WaterReflectionManager will be used in Play mode.", this);
-            }
+        }
 
+        if (Application.isPlaying) return;
 
-            // Basic visual update for editor preview if possible
-            if (reflectionRenderer != null && originalRenderer != null)
-            {
-                // Determine settings as best as possible for editor preview (without manager)
-                Color previewTint = overrides.reflectionTint ? localReflectionTint : Color.white; // Default to white if no manager
-                float previewOpacity = overrides.reflectionOpacity ? localReflectionOpacity : 0.5f;
-                int previewSortOffset = overrides.sortingOrderOffset ? localSortingOrderOffset : -1;
-
-                reflectionRenderer.sprite = originalRenderer.sprite;
-                reflectionRenderer.flipX = originalRenderer.flipX;
-                reflectionRenderer.flipY = originalRenderer.flipY;
-                reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + previewSortOffset;
-                Color baseOriginalSpriteColor = originalRenderer.color;
-                Color finalReflectionTintedColor = baseOriginalSpriteColor * previewTint;
-                float finalCombinedAlpha = baseOriginalSpriteColor.a * previewOpacity;
-                reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
-                UpdateReflectionTransform(); // Keep transform updated
-            }
+        if (reflectionRenderer != null && originalRenderer != null)
+        {
+            reflectionRenderer.sprite = originalRenderer.sprite;
+            reflectionRenderer.flipX = originalRenderer.flipX;
+            reflectionRenderer.flipY = originalRenderer.flipY; // This was originalRenderer.flipY, should be consistent
+            reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + sortingOrderOffset;
+            Color baseOriginalSpriteColor = originalRenderer.color;
+            Color finalReflectionTintedColor = baseOriginalSpriteColor * reflectionTint;
+            float finalCombinedAlpha = baseOriginalSpriteColor.a * reflectionOpacity;
+            reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
+            UpdateReflectionTransform();
         }
     }
 
-
-    // --- Public Methods for Runtime Control (Could be removed if not needed, or kept for dynamic changes) ---
-    public void SetLocalReflectionOpacity(float opacity) // Example of changing a local-only value
+    // --- Public Methods for Runtime Control ---
+    public void SetReflectionOpacity(float opacity)
     {
-        localReflectionOpacity = Mathf.Clamp01(opacity);
-        if (overrides.reflectionOpacity) // Only re-resolve and update if this local value is being used
-        {
-            ResolveSettings();
-            if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals();
-        }
+        reflectionOpacity = Mathf.Clamp01(opacity);
+        if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals(); // Check originalRenderer too
     }
-    // Add more setters if you need to programmatically change local override values and have them take effect.
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Visuals\WaterReflectionManager.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Visuals/Managers/WaterReflectionManager.cs
-using UnityEngine;
-
-public class WaterReflectionManager : MonoBehaviour
-{
-    public static WaterReflectionManager Instance { get; private set; }
-
-    [Header("Global Default Reflection Settings")]
-    [Tooltip("Default material to use for reflections if 'Enable Distance Fade' is true and no specific material is assigned on the WaterReflection component. Assign your 'Custom/WaterReflectionGradient' material asset here.")]
-    public Material defaultGradientFadeMaterial;
-
-    [Tooltip("Default opacity for all reflections (0 = invisible, 1 = fully opaque). Can be overridden per instance.")]
-    [Range(0f, 1f)] public float defaultReflectionOpacity = 0.5f;
-
-    [Tooltip("Default additional tint color for all reflections. Can be overridden per instance.")]
-    public Color defaultReflectionTint = Color.white;
-
-    [Tooltip("Default sorting order offset for reflections (usually negative). Can be overridden per instance.")]
-    public int defaultSortingOrderOffset = -1;
-
-    [Header("Global Default Water Masking Settings")]
-    [Tooltip("Default setting for whether to use water masking. Can be overridden per instance.")]
-    public bool defaultUseWaterMasking = true;
-
-    [Tooltip("Default tag used to identify the water tilemap. Can be overridden per instance.")]
-    public string defaultWaterTilemapTag = "Water";
-
-    [Header("Global Debug Settings")]
-    [Tooltip("Enable debug logs for all WaterReflection instances that don't override this.")]
-    public bool globalShowDebugInfo = false;
-
-
-    void Awake()
+    public void SetYOffset(float offset)
     {
-        if (Instance != null && Instance != this)
-        {
-            Debug.LogWarning($"[WaterReflectionManager] Duplicate instance found on {gameObject.name}. Destroying self.", gameObject);
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-
-        if (defaultGradientFadeMaterial == null)
-        {
-            Debug.LogWarning("[WaterReflectionManager] Default Gradient Fade Material is not assigned. Distance fade may not work correctly for reflections that don't have their own material specified.", this);
-        }
+        yOffset = offset;
+        if (Application.isPlaying && originalRenderer != null) UpdateReflectionTransform();
+    }
+    public void SetReflectionTint(Color tint)
+    {
+        reflectionTint = tint;
+        if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals();
+    }
+    public void SetReflectionEnabled(bool enabled)
+    {
+        if (reflectionObject != null) reflectionObject.SetActive(enabled);
     }
 }
 
