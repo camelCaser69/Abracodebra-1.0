@@ -1,11 +1,11 @@
-﻿// FILE: Assets/Scripts/Nodes/Seeds/PlantotronGeneSequenceItem.cs (FIXED)
+﻿// FILE: Assets/Scripts/Nodes/Seeds/PlantotronSequenceItem.cs (NEW)
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
 public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, 
-    IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
+    IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler, IPointerClickHandler
 {
     [Header("UI References")]
     public TMP_Text geneNameText;
@@ -21,7 +21,7 @@ public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPoin
     public Color dropTargetColor = new Color(0.8f, 1f, 0.8f, 1f);
     
     [Header("Drag Settings")]
-    public float dragAlpha = 0.6f;
+    public float dragAlpha = 0.8f;
     
     private NodeDefinition gene;
     private int sequenceIndex;
@@ -31,9 +31,6 @@ public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPoin
     private Vector3 originalPosition;
     private Transform originalParent;
     private CanvasGroup canvasGroup;
-    private Canvas rootCanvas;
-    private GameObject dragClone;
-    private PlantotronSequenceItem currentDropTarget;
     
     public void Initialize(NodeDefinition geneDefinition, int index, PlantotronUI ui)
     {
@@ -47,14 +44,10 @@ public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPoin
             return;
         }
         
-        // Setup components
+        // Setup canvas group for drag transparency
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        
-        rootCanvas = GetComponentInParent<Canvas>();
-        if (rootCanvas != null)
-            rootCanvas = rootCanvas.rootCanvas;
         
         // Setup UI elements
         if (geneNameText != null)
@@ -115,133 +108,66 @@ public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPoin
     public void OnBeginDrag(PointerEventData eventData)
     {
         isDragging = true;
-        
-        // Visual feedback
         if (backgroundImage != null)
             backgroundImage.color = dragColor;
+            
+        // Make semi-transparent during drag
         if (canvasGroup != null)
             canvasGroup.alpha = dragAlpha;
-        
-        // Create drag clone
-        CreateDragClone();
-        
-        // Make this item appear on top during drag
+            
+        // Make this item appear on top
         transform.SetAsLastSibling();
-        
-        // FIXED: Enable drop zones for internal sequence dragging
-        if (parentUI != null)
-        {
-            parentUI.EnableDropZones(true);
-            Debug.Log("[PlantotronSequenceItem] Enabled drop zones for internal sequence drag");
-        }
     }
     
     public void OnDrag(PointerEventData eventData)
     {
-        if (!isDragging || dragClone == null) return;
-        
-        // Move drag clone to follow cursor
-        Vector2 localPoint;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            rootCanvas.transform as RectTransform, 
-            eventData.position, 
-            rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : rootCanvas.worldCamera, 
-            out localPoint))
+        if (isDragging)
         {
-            dragClone.transform.localPosition = localPoint;
+            // Follow mouse/finger during drag
+            transform.position = eventData.position;
         }
-        
-        // Check for drop targets
-        CheckDropTargets(eventData);
     }
     
     public void OnEndDrag(PointerEventData eventData)
     {
         isDragging = false;
-        
-        // Reset visual state
         if (backgroundImage != null)
             backgroundImage.color = normalColor;
+            
+        // Restore transparency
         if (canvasGroup != null)
             canvasGroup.alpha = 1f;
-        
-        // Clean up drag clone
-        if (dragClone != null)
-        {
-            Destroy(dragClone);
-            dragClone = null;
-        }
-        
+            
         // Reset position and parent
         transform.position = originalPosition;
         transform.SetParent(originalParent);
-        
-        // FIXED: Disable drop zones after dragging
-        if (parentUI != null)
-        {
-            parentUI.EnableDropZones(false);
-            Debug.Log("[PlantotronSequenceItem] Disabled drop zones after internal sequence drag");
-        }
-        
-        // Handle drop
-        if (currentDropTarget != null && currentDropTarget != this)
-        {
-            // Swap positions in the gene sequence
-            if (parentUI != null)
-                parentUI.TryMoveGeneInSequence(this.sequenceIndex, currentDropTarget.sequenceIndex);
-            
-            currentDropTarget.SetDropTarget(false);
-            currentDropTarget = null;
-        }
     }
     
-    private void CreateDragClone()
+    public void OnDrop(PointerEventData eventData)
     {
-        if (rootCanvas == null) return;
-        
-        // Create a visual clone
-        dragClone = Instantiate(gameObject, rootCanvas.transform);
-        dragClone.name = gameObject.name + "_DragClone";
-        
-        // Remove interactive components from clone
-        Button[] buttons = dragClone.GetComponentsInChildren<Button>();
-        foreach (var btn in buttons)
-            btn.interactable = false;
-        
-        // Make it slightly transparent
-        CanvasGroup cloneGroup = dragClone.GetComponent<CanvasGroup>();
-        if (cloneGroup == null)
-            cloneGroup = dragClone.AddComponent<CanvasGroup>();
-        cloneGroup.alpha = 0.8f;
-        cloneGroup.blocksRaycasts = false;
-        
-        // Position at cursor
-        dragClone.transform.SetAsLastSibling();
-    }
-    
-    private void CheckDropTargets(PointerEventData eventData)
-    {
-        // Clear current drop target highlighting
-        if (currentDropTarget != null)
+        // Handle drop from other sequence items (reordering)
+        GameObject draggedObject = eventData.pointerDrag;
+        if (draggedObject != null && parentUI != null)
         {
-            currentDropTarget.SetDropTarget(false);
-            currentDropTarget = null;
-        }
-        
-        // Check for new drop target
-        var results = new System.Collections.Generic.List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, results);
-        
-        foreach (var result in results)
-        {
-            PlantotronSequenceItem sequenceItem = result.gameObject.GetComponent<PlantotronSequenceItem>();
-            if (sequenceItem != null && sequenceItem != this)
+            PlantotronSequenceItem draggedItem = draggedObject.GetComponent<PlantotronSequenceItem>();
+            if (draggedItem != null && draggedItem != this)
             {
-                currentDropTarget = sequenceItem;
-                sequenceItem.SetDropTarget(true);
-                break;
+                // Swap positions in the gene sequence
+                parentUI.TryMoveGeneInSequence(draggedItem.sequenceIndex, this.sequenceIndex);
+            }
+            else
+            {
+                // Handle drop from gene panel
+                PlantotronGeneItem geneItem = draggedObject.GetComponent<PlantotronGeneItem>();
+                if (geneItem != null)
+                {
+                    // This is handled by the gene item's OnEndDrag
+                }
             }
         }
+        
+        // Reset drop target visual
+        SetDropTarget(false);
     }
     
     public void SetDropTarget(bool isTarget)
@@ -281,8 +207,5 @@ public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPoin
     {
         if (removeButton != null)
             removeButton.onClick.RemoveAllListeners();
-        
-        if (dragClone != null)
-            Destroy(dragClone);
     }
 }

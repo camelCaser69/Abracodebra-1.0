@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-29 10:42:16
+UNITY PROJECT SCRIPT EXPORT - 2025-05-28 18:59:47
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -68,7 +68,6 @@ Assets
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
 │   │       ├── Panels
-│   │       │   ├── Panel_DropZone.prefab
 │   │       │   ├── Panel_GeneListItem.prefab
 │   │       │   ├── Panel_GeneSequenceItem.prefab
 │   │       │   ├── Panel_SeedListItem.prefab
@@ -194,7 +193,6 @@ Assets
 │   │   │   ├── PlantotronGeneSequenceItem.cs
 │   │   │   ├── PlantotronMachine.cs
 │   │   │   ├── PlantotronSeedItem.cs
-│   │   │   ├── PlantotronSequenceDropZone.cs
 │   │   │   ├── PlantotronUI.cs
 │   │   │   ├── PlayerGeneticsInventory.cs
 │   │   │   ├── SeedDefinition.cs
@@ -5871,17 +5869,17 @@ public class NodeGraph
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Seeds\PlantotronGeneItem.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Nodes/Seeds/PlantotronGeneItem.cs (FIXED)
+﻿// FILE: Assets/Scripts/Genetics/PlantotronGeneItem.cs
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-public class PlantotronGeneItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class PlantotronGeneItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     [Header("UI References")]
     public TMP_Text geneNameText;
-    public TMP_Text geneCountText;
+    public TMP_Text geneTypeText;
     public Image geneIcon;
     public Button addButton;
     public Image backgroundImage;
@@ -5889,64 +5887,40 @@ public class PlantotronGeneItem : MonoBehaviour, IPointerEnterHandler, IPointerE
     [Header("Visual Settings")]
     public Color normalColor = Color.white;
     public Color hoverColor = Color.yellow;
-    public Color dragColor = new Color(1f, 0.8f, 0.8f, 1f);
     
-    [Header("Drag Settings")]
-    public float dragAlpha = 0.6f;
-    
-    private PlayerGeneticsInventory.GeneCount geneCount;
+    private NodeDefinition gene;
     private PlantotronUI parentUI;
-    private bool isDragging = false;
-    private Vector3 originalPosition;
-    private Transform originalParent;
-    private CanvasGroup canvasGroup;
-    private Canvas rootCanvas;
-    private RectTransform rectTransform;
     
-    // Drag visual clone
-    private GameObject dragClone;
-    private PlantotronSequenceDropZone currentDropZone;
-    
-    // FIXED: Add public accessor for the gene
-    public NodeDefinition GetGene()
+    public void Initialize(NodeDefinition geneDefinition, PlantotronUI ui)
     {
-        return geneCount?.gene;
-    }
-    
-    public void Initialize(PlayerGeneticsInventory.GeneCount geneCountData, PlantotronUI ui)
-    {
-        geneCount = geneCountData;
+        gene = geneDefinition;
         parentUI = ui;
         
-        if (geneCount?.gene == null || parentUI == null)
+        if (gene == null || parentUI == null)
         {
             Debug.LogError("[PlantotronGeneItem] Invalid initialization parameters!");
             return;
         }
         
-        // Setup components
-        rectTransform = GetComponent<RectTransform>();
-        canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        
-        rootCanvas = GetComponentInParent<Canvas>();
-        if (rootCanvas != null)
-            rootCanvas = rootCanvas.rootCanvas;
-        
         // Setup UI elements
         if (geneNameText != null)
-            geneNameText.text = geneCount.gene.displayName;
+            geneNameText.text = gene.displayName;
             
-        if (geneCountText != null)
+        if (geneTypeText != null)
         {
-            geneCountText.text = $"x{geneCount.count}";
+            // Show primary effect type
+            string effectType = "Unknown";
+            if (gene.effects != null && gene.effects.Count > 0 && gene.effects[0] != null)
+            {
+                effectType = gene.effects[0].effectType.ToString();
+            }
+            geneTypeText.text = effectType;
         }
         
         if (geneIcon != null)
         {
-            geneIcon.sprite = geneCount.gene.thumbnail;
-            geneIcon.color = geneCount.gene.thumbnailTintColor;
+            geneIcon.sprite = gene.thumbnail;
+            geneIcon.color = gene.thumbnailTintColor;
         }
         
         // Setup add button
@@ -5954,192 +5928,44 @@ public class PlantotronGeneItem : MonoBehaviour, IPointerEnterHandler, IPointerE
         {
             addButton.onClick.RemoveAllListeners();
             addButton.onClick.AddListener(OnAddButtonClicked);
-            addButton.interactable = geneCount.count > 0;
         }
         
         // Set initial background color
         if (backgroundImage != null)
             backgroundImage.color = normalColor;
-            
-        // Store original transform info
-        originalPosition = transform.position;
-        originalParent = transform.parent;
     }
     
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!isDragging && backgroundImage != null)
+        if (backgroundImage != null)
             backgroundImage.color = hoverColor;
             
-        if (parentUI != null && geneCount?.gene != null)
-            parentUI.ShowGeneDetails(geneCount.gene);
+        if (parentUI != null && gene != null)
+            parentUI.ShowGeneDetails(gene);
     }
     
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (!isDragging && backgroundImage != null)
+        if (backgroundImage != null)
             backgroundImage.color = normalColor;
     }
     
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (parentUI != null && geneCount?.gene != null)
-            parentUI.OnGeneClicked(geneCount.gene);
+        if (parentUI != null && gene != null)
+            parentUI.OnGeneSelected(gene);
     }
     
     private void OnAddButtonClicked()
     {
-        if (parentUI != null && geneCount?.gene != null && geneCount.count > 0)
-        {
-            parentUI.TryAddGeneToSequence(geneCount.gene);
-        }
-    }
-    
-    public void OnBeginDrag(PointerEventData eventData)
-    {
-        if (geneCount?.count <= 0) return; // Can't drag if no genes available
-    
-        isDragging = true;
-    
-        // Visual feedback
-        if (backgroundImage != null)
-            backgroundImage.color = dragColor;
-        if (canvasGroup != null)
-            canvasGroup.alpha = dragAlpha;
-    
-        // Create drag clone for better visual feedback
-        CreateDragClone();
-    
-        // Enable drop zones through parent UI
-        if (parentUI != null)
-        {
-            parentUI.EnableDropZones(true);
-            Debug.Log("[PlantotronGeneItem] Enabled drop zones for drag");
-        }
-    }
-    
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (!isDragging || dragClone == null) return;
-        
-        // Move drag clone to follow cursor
-        Vector2 localPoint;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            rootCanvas.transform as RectTransform, 
-            eventData.position, 
-            rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : rootCanvas.worldCamera, 
-            out localPoint))
-        {
-            dragClone.transform.localPosition = localPoint;
-        }
-        
-        // Check for drop zones
-        CheckDropZones(eventData);
-    }
-    
-    public void OnEndDrag(PointerEventData eventData)
-    {
-        isDragging = false;
-    
-        // Reset visual state
-        if (backgroundImage != null)
-            backgroundImage.color = normalColor;
-        if (canvasGroup != null)
-            canvasGroup.alpha = 1f;
-    
-        // Clean up drag clone
-        if (dragClone != null)
-        {
-            Destroy(dragClone);
-            dragClone = null;
-        }
-    
-        // Disable drop zones through parent UI
-        if (parentUI != null)
-        {
-            parentUI.EnableDropZones(false);
-            Debug.Log("[PlantotronGeneItem] Disabled drop zones after drag");
-        }
-    
-        // FIXED: Handle drop using Unity's drop system instead of manual detection
-        // The drop will be handled by PlantotronSequenceDropZone.OnDrop
-        if (currentDropZone != null)
-        {
-            currentDropZone.SetHighlight(false);
-            currentDropZone = null;
-        }
-    }
-    
-    private void CreateDragClone()
-    {
-        if (rootCanvas == null) return;
-        
-        // Create a visual clone
-        dragClone = Instantiate(gameObject, rootCanvas.transform);
-        dragClone.name = gameObject.name + "_DragClone";
-        
-        // Remove interactive components from clone
-        Button[] buttons = dragClone.GetComponentsInChildren<Button>();
-        foreach (var btn in buttons)
-            btn.interactable = false;
-        
-        // Make it slightly transparent
-        CanvasGroup cloneGroup = dragClone.GetComponent<CanvasGroup>();
-        if (cloneGroup == null)
-            cloneGroup = dragClone.AddComponent<CanvasGroup>();
-        cloneGroup.alpha = 0.8f;
-        cloneGroup.blocksRaycasts = false;
-        
-        // Position at cursor
-        dragClone.transform.SetAsLastSibling();
-    }
-    
-    private void CheckDropZones(PointerEventData eventData)
-    {
-        // Clear current drop zone highlighting
-        if (currentDropZone != null)
-        {
-            currentDropZone.SetHighlight(false);
-            currentDropZone = null;
-        }
-        
-        // Check for new drop zone
-        var results = new System.Collections.Generic.List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, results);
-        
-        foreach (var result in results)
-        {
-            PlantotronSequenceDropZone dropZone = result.gameObject.GetComponent<PlantotronSequenceDropZone>();
-            if (dropZone != null && dropZone.CanAcceptDrop())
-            {
-                currentDropZone = dropZone;
-                dropZone.SetHighlight(true);
-                break;
-            }
-        }
-    }
-    
-    // Update the display when gene count changes
-    public void UpdateDisplay()
-    {
-        if (geneCountText != null && geneCount != null)
-        {
-            geneCountText.text = $"x{geneCount.count}";
-        }
-        
-        if (addButton != null && geneCount != null)
-        {
-            addButton.interactable = geneCount.count > 0;
-        }
+        if (parentUI != null && gene != null)
+            parentUI.OnGeneAddToSequence(gene);
     }
     
     void OnDestroy()
     {
         if (addButton != null)
             addButton.onClick.RemoveAllListeners();
-        
-        if (dragClone != null)
-            Destroy(dragClone);
     }
 }
 
@@ -6147,42 +5973,34 @@ public class PlantotronGeneItem : MonoBehaviour, IPointerEnterHandler, IPointerE
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Seeds\PlantotronGeneSequenceItem.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Nodes/Seeds/PlantotronGeneSequenceItem.cs (FIXED)
+﻿// FILE: Assets/Scripts/Genetics/PlantotronGeneSequenceItem.cs
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 
-public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, 
-    IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
+public class PlantotronGeneSequenceItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, 
+    IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
-    [Header("UI References")]
+    [Header("UI References - SIMPLIFIED")]
     public TMP_Text geneNameText;
-    public TMP_Text sequenceIndexText;
-    public Image geneIcon;
-    public Button removeButton;
     public Image backgroundImage;
     
     [Header("Visual Settings")]
     public Color normalColor = new Color(0.9f, 0.9f, 0.9f, 1f);
     public Color hoverColor = Color.yellow;
     public Color dragColor = new Color(1f, 0.8f, 0.8f, 1f);
-    public Color dropTargetColor = new Color(0.8f, 1f, 0.8f, 1f);
     
     [Header("Drag Settings")]
-    public float dragAlpha = 0.6f;
+    public float dragAlpha = 0.8f;
     
     private NodeDefinition gene;
     private int sequenceIndex;
     private PlantotronUI parentUI;
     private bool isDragging = false;
-    private bool isDropTarget = false;
     private Vector3 originalPosition;
     private Transform originalParent;
     private CanvasGroup canvasGroup;
-    private Canvas rootCanvas;
-    private GameObject dragClone;
-    private PlantotronSequenceItem currentDropTarget;
     
     public void Initialize(NodeDefinition geneDefinition, int index, PlantotronUI ui)
     {
@@ -6192,38 +6010,18 @@ public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPoin
         
         if (gene == null || parentUI == null)
         {
-            Debug.LogError("[PlantotronSequenceItem] Invalid initialization parameters!");
+            Debug.LogError("[PlantotronGeneSequenceItem] Invalid initialization parameters!");
             return;
         }
         
-        // Setup components
+        // Setup canvas group for drag transparency
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
         
-        rootCanvas = GetComponentInParent<Canvas>();
-        if (rootCanvas != null)
-            rootCanvas = rootCanvas.rootCanvas;
-        
-        // Setup UI elements
+        // Setup UI elements - SIMPLIFIED
         if (geneNameText != null)
-            geneNameText.text = gene.displayName;
-            
-        if (sequenceIndexText != null)
-            sequenceIndexText.text = $"{index + 1}.";
-            
-        if (geneIcon != null)
-        {
-            geneIcon.sprite = gene.thumbnail;
-            geneIcon.color = gene.thumbnailTintColor;
-        }
-        
-        // Setup remove button
-        if (removeButton != null)
-        {
-            removeButton.onClick.RemoveAllListeners();
-            removeButton.onClick.AddListener(OnRemoveButtonClicked);
-        }
+            geneNameText.text = $"{index + 1}. {gene.displayName}";
         
         // Set initial background color
         if (backgroundImage != null)
@@ -6236,7 +6034,7 @@ public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPoin
     
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (!isDragging && !isDropTarget && backgroundImage != null)
+        if (!isDragging && backgroundImage != null)
             backgroundImage.color = hoverColor;
             
         if (parentUI != null && gene != null)
@@ -6245,163 +6043,65 @@ public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPoin
     
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (!isDragging && !isDropTarget && backgroundImage != null)
+        if (!isDragging && backgroundImage != null)
             backgroundImage.color = normalColor;
-    }
-    
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        if (parentUI != null && gene != null)
-            parentUI.ShowGeneDetails(gene);
-    }
-    
-    private void OnRemoveButtonClicked()
-    {
-        if (parentUI != null)
-            parentUI.TryRemoveGeneFromSequence(sequenceIndex);
     }
     
     public void OnBeginDrag(PointerEventData eventData)
     {
         isDragging = true;
-        
-        // Visual feedback
         if (backgroundImage != null)
             backgroundImage.color = dragColor;
+            
+        // Make semi-transparent during drag
         if (canvasGroup != null)
             canvasGroup.alpha = dragAlpha;
-        
-        // Create drag clone
-        CreateDragClone();
-        
-        // Make this item appear on top during drag
+            
+        // Make this item appear on top
         transform.SetAsLastSibling();
         
-        // FIXED: Enable drop zones for internal sequence dragging
-        if (parentUI != null)
-        {
-            parentUI.EnableDropZones(true);
-            Debug.Log("[PlantotronSequenceItem] Enabled drop zones for internal sequence drag");
-        }
+        Debug.Log($"[PlantotronGeneSequenceItem] Started dragging: {gene?.displayName ?? "Unknown"}");
     }
     
     public void OnDrag(PointerEventData eventData)
     {
-        if (!isDragging || dragClone == null) return;
-        
-        // Move drag clone to follow cursor
-        Vector2 localPoint;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            rootCanvas.transform as RectTransform, 
-            eventData.position, 
-            rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : rootCanvas.worldCamera, 
-            out localPoint))
+        if (isDragging)
         {
-            dragClone.transform.localPosition = localPoint;
+            // Follow mouse/finger during drag
+            transform.position = eventData.position;
         }
-        
-        // Check for drop targets
-        CheckDropTargets(eventData);
     }
     
     public void OnEndDrag(PointerEventData eventData)
     {
         isDragging = false;
-        
-        // Reset visual state
         if (backgroundImage != null)
             backgroundImage.color = normalColor;
+            
+        // Restore transparency
         if (canvasGroup != null)
             canvasGroup.alpha = 1f;
-        
-        // Clean up drag clone
-        if (dragClone != null)
-        {
-            Destroy(dragClone);
-            dragClone = null;
-        }
-        
+            
         // Reset position and parent
         transform.position = originalPosition;
         transform.SetParent(originalParent);
         
-        // FIXED: Disable drop zones after dragging
-        if (parentUI != null)
-        {
-            parentUI.EnableDropZones(false);
-            Debug.Log("[PlantotronSequenceItem] Disabled drop zones after internal sequence drag");
-        }
-        
-        // Handle drop
-        if (currentDropTarget != null && currentDropTarget != this)
-        {
-            // Swap positions in the gene sequence
-            if (parentUI != null)
-                parentUI.TryMoveGeneInSequence(this.sequenceIndex, currentDropTarget.sequenceIndex);
-            
-            currentDropTarget.SetDropTarget(false);
-            currentDropTarget = null;
-        }
+        Debug.Log($"[PlantotronGeneSequenceItem] Ended dragging: {gene?.displayName ?? "Unknown"}");
     }
     
-    private void CreateDragClone()
+    public void OnDrop(PointerEventData eventData)
     {
-        if (rootCanvas == null) return;
-        
-        // Create a visual clone
-        dragClone = Instantiate(gameObject, rootCanvas.transform);
-        dragClone.name = gameObject.name + "_DragClone";
-        
-        // Remove interactive components from clone
-        Button[] buttons = dragClone.GetComponentsInChildren<Button>();
-        foreach (var btn in buttons)
-            btn.interactable = false;
-        
-        // Make it slightly transparent
-        CanvasGroup cloneGroup = dragClone.GetComponent<CanvasGroup>();
-        if (cloneGroup == null)
-            cloneGroup = dragClone.AddComponent<CanvasGroup>();
-        cloneGroup.alpha = 0.8f;
-        cloneGroup.blocksRaycasts = false;
-        
-        // Position at cursor
-        dragClone.transform.SetAsLastSibling();
-    }
-    
-    private void CheckDropTargets(PointerEventData eventData)
-    {
-        // Clear current drop target highlighting
-        if (currentDropTarget != null)
+        // Handle drop from other gene sequence items
+        GameObject draggedObject = eventData.pointerDrag;
+        if (draggedObject != null)
         {
-            currentDropTarget.SetDropTarget(false);
-            currentDropTarget = null;
-        }
-        
-        // Check for new drop target
-        var results = new System.Collections.Generic.List<RaycastResult>();
-        EventSystem.current.RaycastAll(eventData, results);
-        
-        foreach (var result in results)
-        {
-            PlantotronSequenceItem sequenceItem = result.gameObject.GetComponent<PlantotronSequenceItem>();
-            if (sequenceItem != null && sequenceItem != this)
+            PlantotronGeneSequenceItem draggedItem = draggedObject.GetComponent<PlantotronGeneSequenceItem>();
+            if (draggedItem != null && draggedItem != this && parentUI != null)
             {
-                currentDropTarget = sequenceItem;
-                sequenceItem.SetDropTarget(true);
-                break;
+                Debug.Log($"[PlantotronGeneSequenceItem] Drop detected: Moving {draggedItem.gene?.displayName} to position {sequenceIndex}");
+                // Swap positions in the gene sequence
+                parentUI.OnGeneMovedInSequence(draggedItem.sequenceIndex, this.sequenceIndex);
             }
-        }
-    }
-    
-    public void SetDropTarget(bool isTarget)
-    {
-        isDropTarget = isTarget;
-        if (backgroundImage != null)
-        {
-            if (isTarget)
-                backgroundImage.color = dropTargetColor;
-            else if (!isDragging)
-                backgroundImage.color = normalColor;
         }
     }
     
@@ -6409,30 +6109,11 @@ public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPoin
     public void UpdateIndex(int newIndex)
     {
         sequenceIndex = newIndex;
-        if (sequenceIndexText != null)
-            sequenceIndexText.text = $"{newIndex + 1}.";
+        if (geneNameText != null && gene != null)
+            geneNameText.text = $"{newIndex + 1}. {gene.displayName}";
             
         // Update original position for drag reset
         originalPosition = transform.position;
-    }
-    
-    public int GetIndex()
-    {
-        return sequenceIndex;
-    }
-    
-    public NodeDefinition GetGene()
-    {
-        return gene;
-    }
-    
-    void OnDestroy()
-    {
-        if (removeButton != null)
-            removeButton.onClick.RemoveAllListeners();
-        
-        if (dragClone != null)
-            Destroy(dragClone);
     }
 }
 
@@ -6440,9 +6121,8 @@ public class PlantotronSequenceItem : MonoBehaviour, IPointerEnterHandler, IPoin
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Seeds\PlantotronMachine.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Nodes/Seeds/PlantotronMachine.cs (FIXED)
+﻿// FILE: Assets/Scripts/Genetics/PlantotronMachine.cs
 using UnityEngine;
-using System.Collections;
 
 [RequireComponent(typeof(Collider2D))]
 public class PlantotronMachine : MonoBehaviour
@@ -6470,7 +6150,7 @@ public class PlantotronMachine : MonoBehaviour
     public AudioClip activationSound;
     
     [Header("Debug")]
-    [SerializeField] private bool showDebugLogs = true; // Changed to true for debugging
+    [SerializeField] private bool showDebugLogs = false;
     
     // Internal state
     private bool playerInRange = false;
@@ -6478,8 +6158,6 @@ public class PlantotronMachine : MonoBehaviour
     private SpriteRenderer machineRenderer;
     private Material originalMaterial;
     private AudioSource audioSource;
-    private bool isUIOpen = false;
-    private Coroutine openUICoroutine;
     
     // Cache for player detection
     private const string PLAYER_TAG = "Player";
@@ -6505,20 +6183,14 @@ public class PlantotronMachine : MonoBehaviour
             originalMaterial = machineRenderer.material;
         }
         
-        // Validate UI panel
-        if (uiPanel == null)
+        // Ensure UI panel starts hidden
+        if (uiPanel != null)
         {
-            Debug.LogError($"[PlantotronMachine] UI Panel not assigned on {gameObject.name}!", this);
+            uiPanel.gameObject.SetActive(false);
         }
         else
         {
-            // CRITICAL FIX: Ensure UI starts properly closed
-            if (uiPanel.gameObject.activeSelf)
-            {
-                uiPanel.gameObject.SetActive(false);
-                if (showDebugLogs)
-                    Debug.Log("[PlantotronMachine] UI Panel was active in Awake, forcing inactive");
-            }
+            Debug.LogError($"[PlantotronMachine] UI Panel not assigned on {gameObject.name}!", this);
         }
         
         // Hide interaction prompt initially
@@ -6593,7 +6265,7 @@ public class PlantotronMachine : MonoBehaviour
         }
         
         // If player left range while UI is open, close it
-        if (!inRange && isUIOpen)
+        if (!inRange && uiPanel != null && uiPanel.gameObject.activeSelf)
         {
             CloseMachine();
         }
@@ -6612,7 +6284,9 @@ public class PlantotronMachine : MonoBehaviour
             return;
         }
         
-        if (isUIOpen)
+        bool isCurrentlyOpen = uiPanel.gameObject.activeSelf;
+        
+        if (isCurrentlyOpen)
         {
             CloseMachine();
         }
@@ -6626,9 +6300,6 @@ public class PlantotronMachine : MonoBehaviour
     {
         if (uiPanel == null) return;
         
-        if (showDebugLogs)
-            Debug.Log("[PlantotronMachine] Opening machine");
-        
         // Check if player has genetics inventory
         if (PlayerGeneticsInventory.Instance == null)
         {
@@ -6636,32 +6307,7 @@ public class PlantotronMachine : MonoBehaviour
             return;
         }
         
-        // Stop any existing open coroutine
-        if (openUICoroutine != null)
-        {
-            StopCoroutine(openUICoroutine);
-        }
-        
-        // Start the opening process
-        openUICoroutine = StartCoroutine(OpenMachineCoroutine());
-    }
-    
-    private IEnumerator OpenMachineCoroutine()
-    {
-        isUIOpen = true;
-        
-        // Activate the UI GameObject first
-        if (!uiPanel.gameObject.activeSelf)
-        {
-            uiPanel.gameObject.SetActive(true);
-            if (showDebugLogs)
-                Debug.Log("[PlantotronMachine] Activated UI GameObject");
-        }
-        
-        // Wait a frame for the GameObject to be properly activated
-        yield return null;
-        
-        // Now call the UI's OpenUI method
+        uiPanel.gameObject.SetActive(true);
         uiPanel.OpenUI();
         
         // Play activation sound
@@ -6670,39 +6316,19 @@ public class PlantotronMachine : MonoBehaviour
             audioSource.PlayOneShot(activationSound);
         }
         
-        // Optional: Pause the game or disable player movement
+        // Pause the game or disable player movement if needed
         // Time.timeScale = 0f; // Uncomment if you want to pause the game
         
         if (showDebugLogs)
-            Debug.Log("[PlantotronMachine] Machine opened successfully");
-            
-        openUICoroutine = null;
+            Debug.Log("[PlantotronMachine] Machine opened");
     }
     
     private void CloseMachine()
     {
         if (uiPanel == null) return;
         
-        if (showDebugLogs)
-            Debug.Log("[PlantotronMachine] Closing machine");
-        
-        // Stop any opening coroutine
-        if (openUICoroutine != null)
-        {
-            StopCoroutine(openUICoroutine);
-            openUICoroutine = null;
-        }
-        
-        isUIOpen = false;
-        
-        // Close the UI first
         uiPanel.CloseUI();
-        
-        // Then deactivate the GameObject
-        if (uiPanel.gameObject.activeSelf)
-        {
-            uiPanel.gameObject.SetActive(false);
-        }
+        uiPanel.gameObject.SetActive(false);
         
         // Resume the game if it was paused
         // Time.timeScale = 1f; // Uncomment if you paused the game
@@ -6714,16 +6340,16 @@ public class PlantotronMachine : MonoBehaviour
     // Public method for external scripts to open/close the machine
     public void SetMachineOpen(bool open)
     {
-        if (open && !isUIOpen)
+        if (open)
             OpenMachine();
-        else if (!open && isUIOpen)
+        else
             CloseMachine();
     }
     
     // Public method to check if machine is currently open
     public bool IsMachineOpen()
     {
-        return isUIOpen;
+        return uiPanel != null && uiPanel.gameObject.activeSelf;
     }
     
     void OnDrawGizmosSelected()
@@ -6747,11 +6373,6 @@ public class PlantotronMachine : MonoBehaviour
         {
             machineRenderer.material = originalMaterial;
         }
-        
-        if (openUICoroutine != null)
-        {
-            StopCoroutine(openUICoroutine);
-        }
     }
 }
 
@@ -6759,7 +6380,7 @@ public class PlantotronMachine : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Seeds\PlantotronSeedItem.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Nodes/Seeds/PlantotronSeedItem.cs (FIXED)
+﻿// FILE: Assets/Scripts/Genetics/PlantotronSeedItem.cs
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -6771,14 +6392,13 @@ public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerE
     public TMP_Text seedNameText;
     public TMP_Text seedStatusText;
     public Image seedIcon;
-    public Button selectButton;
+    public Button editButton;
     public Button deleteButton;
     public Image backgroundImage;
     
     [Header("Visual Settings")]
     public Color normalColor = Color.white;
     public Color hoverColor = Color.yellow;
-    public Color selectedColor = Color.cyan;
     public Color modifiedColor = Color.cyan;
     public Color vanillaColor = Color.green;
     
@@ -6795,8 +6415,6 @@ public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerE
             Debug.LogError("[PlantotronSeedItem] Invalid initialization parameters!");
             return;
         }
-        
-        Debug.Log($"[PlantotronSeedItem] Initializing seed item for: {seed.seedName}");
         
         // Setup UI elements
         if (seedNameText != null)
@@ -6816,15 +6434,10 @@ public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerE
         }
         
         // Setup buttons
-        if (selectButton != null)
+        if (editButton != null)
         {
-            selectButton.onClick.RemoveAllListeners();
-            selectButton.onClick.AddListener(OnSelectButtonClicked);
-            Debug.Log($"[PlantotronSeedItem] Select button configured for {seed.seedName}");
-        }
-        else
-        {
-            Debug.LogWarning($"[PlantotronSeedItem] Select button is null for {seed.seedName}!");
+            editButton.onClick.RemoveAllListeners();
+            editButton.onClick.AddListener(OnEditButtonClicked);
         }
         
         if (deleteButton != null)
@@ -6836,8 +6449,6 @@ public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerE
         // Set initial background color
         if (backgroundImage != null)
             backgroundImage.color = normalColor;
-        
-        Debug.Log($"[PlantotronSeedItem] Successfully initialized: {seed.seedName}");
     }
     
     public void OnPointerEnter(PointerEventData eventData)
@@ -6857,56 +6468,28 @@ public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerE
     
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log($"[PlantotronSeedItem] OnPointerClick fired for {seed?.seedName ?? "null seed"}");
-        
         if (parentUI != null && seed != null)
-        {
-            Debug.Log($"[PlantotronSeedItem] Calling OnSeedSelected for {seed.seedName}");
             parentUI.OnSeedSelected(seed);
-        }
-        else
-        {
-            Debug.LogError($"[PlantotronSeedItem] OnPointerClick failed - parentUI: {parentUI != null}, seed: {seed != null}");
-        }
     }
     
-    private void OnSelectButtonClicked()
+    private void OnEditButtonClicked()
     {
-        Debug.Log($"[PlantotronSeedItem] Select button clicked for {seed?.seedName ?? "null seed"}");
-        
         if (parentUI != null && seed != null)
-        {
-            Debug.Log($"[PlantotronSeedItem] Calling OnSeedSelected from button for {seed.seedName}");
-            parentUI.OnSeedSelected(seed);
-        }
-        else
-        {
-            Debug.LogError($"[PlantotronSeedItem] Button click failed - parentUI: {parentUI != null}, seed: {seed != null}");
-        }
+            parentUI.OnSeedLoadForEditing(seed);
     }
     
     private void OnDeleteButtonClicked()
     {
-        Debug.Log($"[PlantotronSeedItem] Delete button clicked for {seed?.seedName ?? "null seed"}");
-        
         if (seed != null && PlayerGeneticsInventory.Instance != null)
         {
             PlayerGeneticsInventory.Instance.RemoveSeed(seed);
         }
     }
     
-    public void SetSelected(bool isSelected)
-    {
-        if (backgroundImage != null)
-        {
-            backgroundImage.color = isSelected ? selectedColor : normalColor;
-        }
-    }
-    
     void OnDestroy()
     {
-        if (selectButton != null)
-            selectButton.onClick.RemoveAllListeners();
+        if (editButton != null)
+            editButton.onClick.RemoveAllListeners();
         if (deleteButton != null)
             deleteButton.onClick.RemoveAllListeners();
     }
@@ -6914,239 +6497,106 @@ public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerE
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\PlantotronSequenceDropZone.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Nodes/Seeds/PlantotronSequenceDropZone.cs (FIXED)
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
-
-public class PlantotronSequenceDropZone : MonoBehaviour, IDropHandler
-{
-    [Header("Visual Settings")]
-    public Color normalColor = new Color(0.2f, 0.8f, 0.2f, 0.2f); // Slightly visible green
-    public Color highlightColor = new Color(0.2f, 1f, 0.2f, 0.5f); // Bright green when highlighted
-    
-    private Image backgroundImage;
-    private PlantotronUI parentUI;
-    private int insertIndex = -1;
-    private bool isEnabled = false;
-    
-    void Awake()
-    {
-        backgroundImage = GetComponent<Image>();
-        if (backgroundImage == null)
-        {
-            backgroundImage = gameObject.AddComponent<Image>();
-        }
-        
-        // Set initial state - slightly visible so you can see where they are
-        backgroundImage.color = normalColor;
-        backgroundImage.raycastTarget = true;
-        gameObject.SetActive(false); // Start disabled
-    }
-    
-    public void Initialize(PlantotronUI ui, int index)
-    {
-        parentUI = ui;
-        insertIndex = index;
-        
-        if (parentUI != null)
-        {
-            Debug.Log($"[PlantotronSequenceDropZone] Initialized drop zone {index}");
-        }
-    }
-    
-    public void SetEnabled(bool enabled)
-    {
-        isEnabled = enabled;
-        gameObject.SetActive(enabled);
-        
-        if (!enabled)
-            SetHighlight(false);
-            
-        Debug.Log($"[PlantotronSequenceDropZone] Zone {insertIndex} enabled: {enabled}");
-    }
-    
-    public void SetHighlight(bool highlight)
-    {
-        if (backgroundImage != null)
-        {
-            backgroundImage.color = highlight ? highlightColor : normalColor;
-            Debug.Log($"[PlantotronSequenceDropZone] Zone {insertIndex} highlighted: {highlight}");
-        }
-    }
-    
-    public bool CanAcceptDrop()
-    {
-        bool canAccept = isEnabled && parentUI != null && parentUI.GetCurrentSelectedSeed() != null;
-        Debug.Log($"[PlantotronSequenceDropZone] Zone {insertIndex} can accept drop: {canAccept}");
-        return canAccept;
-    }
-    
-    // OLD METHOD - Keep for compatibility but make it handle both cases
-    public void OnGeneDropped(NodeDefinition gene)
-    {
-        if (parentUI != null && CanAcceptDrop() && gene != null)
-        {
-            Debug.Log($"[PlantotronSequenceDropZone] Gene {gene.displayName} dropped on zone {insertIndex}");
-            parentUI.TryAddGeneToSequence(gene, insertIndex);
-        }
-    }
-    
-    // FIXED: New IDropHandler implementation to handle actual drop events
-    public void OnDrop(PointerEventData eventData)
-    {
-        Debug.Log($"[PlantotronSequenceDropZone] OnDrop triggered on zone {insertIndex}");
-        
-        if (!CanAcceptDrop())
-        {
-            Debug.Log($"[PlantotronSequenceDropZone] Zone {insertIndex} cannot accept drop");
-            return;
-        }
-        
-        GameObject draggedObject = eventData.pointerDrag;
-        if (draggedObject == null)
-        {
-            Debug.LogWarning("[PlantotronSequenceDropZone] No dragged object found in drop event");
-            return;
-        }
-        
-        Debug.Log($"[PlantotronSequenceDropZone] Processing drop of {draggedObject.name}");
-        
-        // Handle drops from PlantotronGeneItem (gene inventory -> sequence)
-        PlantotronGeneItem geneItem = draggedObject.GetComponent<PlantotronGeneItem>();
-        if (geneItem != null)
-        {
-            // Get the gene from the gene item - we need to access its internal gene reference
-            // Since PlantotronGeneItem doesn't expose the gene directly, we need to get it through the parent UI
-            var allGeneItems = FindObjectsOfType<PlantotronGeneItem>();
-            foreach (var item in allGeneItems)
-            {
-                if (item.gameObject == draggedObject)
-                {
-                    // We need to find which gene this represents by checking the inventory
-                    if (PlayerGeneticsInventory.Instance != null)
-                    {
-                        // Try all available genes to find which one this item represents
-                        foreach (var geneCount in PlayerGeneticsInventory.Instance.AvailableGenes)
-                        {
-                            if (geneCount.gene != null && geneCount.count > 0)
-                            {
-                                // Try adding this gene - TryAddGeneToSequence will handle validation
-                                bool success = parentUI.TryAddGeneToSequence(geneCount.gene, insertIndex);
-                                if (success)
-                                {
-                                    Debug.Log($"[PlantotronSequenceDropZone] Successfully added gene {geneCount.gene.displayName} at index {insertIndex}");
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                    break;
-                }
-            }
-            Debug.LogWarning("[PlantotronSequenceDropZone] Could not determine which gene was being dragged from inventory");
-            return;
-        }
-        
-        // Handle drops from PlantotronSequenceItem (internal sequence reordering)
-        PlantotronSequenceItem sequenceItem = draggedObject.GetComponent<PlantotronSequenceItem>();
-        if (sequenceItem != null)
-        {
-            NodeDefinition gene = sequenceItem.GetGene();
-            if (gene != null)
-            {
-                Debug.Log($"[PlantotronSequenceDropZone] Moving sequence gene {gene.displayName} to index {insertIndex}");
-                
-                // For internal reordering, we need to move the gene rather than add a new one
-                int fromIndex = sequenceItem.GetIndex();
-                if (fromIndex != insertIndex)
-                {
-                    bool success = parentUI.TryMoveGeneInSequence(fromIndex, insertIndex);
-                    if (success)
-                    {
-                        Debug.Log($"[PlantotronSequenceDropZone] Successfully moved gene from {fromIndex} to {insertIndex}");
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"[PlantotronSequenceDropZone] Failed to move gene from {fromIndex} to {insertIndex}");
-                    }
-                }
-                return;
-            }
-        }
-        
-        Debug.LogWarning($"[PlantotronSequenceDropZone] Unknown drag source: {draggedObject.name}");
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Seeds\PlantotronUI.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Nodes/Seeds/PlantotronUI.cs (UPDATED with Drop Zones)
+﻿// FILE: Assets/Scripts/Genetics/PlantotronUI.cs
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;
-using System.Collections;
 
 public class PlantotronUI : MonoBehaviour
 {
-    [Header("Main UI Panel")]
+    [Header("Main UI Panels")]
     public GameObject mainPanel;
+    public GameObject geneDatabasePanel;
+    public GameObject seedDatabasePanel;
+    public GameObject geneEditorPanel;
+    public GameObject detailsPanel;
     
-    [Header("4-Panel Layout")]
-    public Transform detailsPanel;
-    public Transform genesPanel;
-    public Transform seedsPanel;
-    public Transform sequencePanel;
-    
-    [Header("Scrollview Containers")]
+    [Header("Gene Database UI")]
     public Transform geneListContainer;
+    public GameObject geneListItemPrefab;
+    public TMP_InputField geneSearchField;
+    
+    [Header("Seed Database UI")]
     public Transform seedListContainer;
-    public Transform sequenceContainer;
+    public GameObject seedListItemPrefab;
+    public TMP_InputField seedSearchField;
     
-    [Header("Prefabs")]
-    public GameObject geneItemPrefab;
-    public GameObject seedItemPrefab;
-    public GameObject sequenceItemPrefab;
-    public GameObject dropZonePrefab; // <<< NEW: Drop zone prefab
+    [Header("Gene Editor UI")]
+    public TMP_Text currentSeedNameText;
+    public GameObject seedSlotPanel;
+    public Button seedSlotButton;
+    public TMP_Text seedSlotText;
+    public Transform geneSequenceContainer;
+    public GameObject geneSequenceItemPrefab;
+    public Button saveSeedButton;
+    public Button resetSeedButton;
+    public TMP_InputField seedNameInputField;
     
-    [Header("Details Panel Components")]
+    [Header("Details Panel UI")]
     public TMP_Text detailsTitleText;
     public TMP_Text detailsDescriptionText;
     public ScrollRect detailsScrollRect;
     
     [Header("Control Buttons")]
     public Button closeButton;
+    public Button clearAllButton;
     
     [Header("Debug")]
-    [SerializeField] private bool showDebugLogs = true;
+    [SerializeField] private bool showDebugLogs = false;
     
     // Current state
-    private SeedInstance currentSelectedSeed;
+    private SeedInstance currentEditingSeed;
     private PlayerGeneticsInventory inventory;
+    private List<GameObject> currentGeneListItems = new List<GameObject>();
+    private List<GameObject> currentSeedListItems = new List<GameObject>();
+    private List<GameObject> currentGeneSequenceItems = new List<GameObject>();
     
-    // UI item lists
-    private List<GameObject> currentGeneItems = new List<GameObject>();
-    private List<GameObject> currentSeedItems = new List<GameObject>();
-    private List<GameObject> currentSequenceItems = new List<GameObject>();
-    private List<PlantotronSequenceDropZone> currentDropZones = new List<PlantotronSequenceDropZone>(); // <<< NEW
-    
-    // UI state tracking
-    private bool isUIOpen = false;
+    // Cached references for performance
+    private RectTransform geneListContainerRect;
+    private RectTransform seedListContainerRect;
+    private RectTransform geneSequenceContainerRect;
     
     void Awake()
     {
-        // Setup close button
+        // Cache rect transforms
+        if (geneListContainer != null)
+            geneListContainerRect = geneListContainer.GetComponent<RectTransform>();
+        if (seedListContainer != null)
+            seedListContainerRect = seedListContainer.GetComponent<RectTransform>();
+        if (geneSequenceContainer != null)
+            geneSequenceContainerRect = geneSequenceContainer.GetComponent<RectTransform>();
+        
+        // Setup button listeners
         if (closeButton != null)
             closeButton.onClick.AddListener(CloseUI);
+        if (clearAllButton != null)
+            clearAllButton.onClick.AddListener(ClearCurrentSeed);
+        if (saveSeedButton != null)
+            saveSeedButton.onClick.AddListener(SaveCurrentSeed);
+        if (resetSeedButton != null)
+            resetSeedButton.onClick.AddListener(ResetCurrentSeed);
+        if (seedSlotButton != null)
+            seedSlotButton.onClick.AddListener(OpenSeedSelectionPopup);
         
-        // Validate required components
-        ValidateComponents();
+        // Setup search field listeners
+        if (geneSearchField != null)
+            geneSearchField.onValueChanged.AddListener(OnGeneSearchChanged);
+        if (seedSearchField != null)
+            seedSearchField.onValueChanged.AddListener(OnSeedSearchChanged);
+        if (seedNameInputField != null)
+            seedNameInputField.onValueChanged.AddListener(OnSeedNameChanged);
+        
+        // Validate required prefabs
+        if (geneListItemPrefab == null)
+            Debug.LogError("[PlantotronUI] Gene List Item Prefab not assigned!", this);
+        if (seedListItemPrefab == null)
+            Debug.LogError("[PlantotronUI] Seed List Item Prefab not assigned!", this);
+        if (geneSequenceItemPrefab == null)
+            Debug.LogError("[PlantotronUI] Gene Sequence Item Prefab not assigned!", this);
     }
     
     void Start()
@@ -7158,451 +6608,139 @@ public class PlantotronUI : MonoBehaviour
             Debug.LogError("[PlantotronUI] PlayerGeneticsInventory not found!", this);
             return;
         }
-    
-        // DEBUG: Check inventory contents
-        Debug.Log($"[PlantotronUI] Inventory found with {inventory.AvailableSeeds?.Count ?? 0} seeds");
-        if (inventory.AvailableSeeds != null)
-        {
-            foreach (var seed in inventory.AvailableSeeds)
-            {
-                Debug.Log($"[PlantotronUI] Seed in inventory: {seed?.seedName ?? "null"}, genes: {seed?.currentGenes?.Count ?? 0}");
-            }
-        }
-    
-        // Subscribe to inventory events
-        inventory.OnInventoryChanged += RefreshAllPanels;
-        inventory.OnGeneCountChanged += OnGeneCountChanged;
         
-        // CRITICAL FIX: Ensure UI starts closed properly
+        // Subscribe to inventory events
+        inventory.OnInventoryChanged += RefreshAllLists;
+        
+        // Ensure UI starts closed
         if (mainPanel != null)
-        {
             mainPanel.SetActive(false);
-            isUIOpen = false;
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] UI properly initialized as closed");
-        }
     }
     
     void OnDestroy()
     {
         // Unsubscribe from events
         if (inventory != null)
-        {
-            inventory.OnInventoryChanged -= RefreshAllPanels;
-            inventory.OnGeneCountChanged -= OnGeneCountChanged;
-        }
+            inventory.OnInventoryChanged -= RefreshAllLists;
         
         // Clean up button listeners
         if (closeButton != null)
             closeButton.onClick.RemoveAllListeners();
-    }
-    
-    private void ValidateComponents()
-    {
-        bool isValid = true;
-        
-        if (geneItemPrefab == null) { Debug.LogError("[PlantotronUI] Gene Item Prefab not assigned!", this); isValid = false; }
-        if (seedItemPrefab == null) { Debug.LogError("[PlantotronUI] Seed Item Prefab not assigned!", this); isValid = false; }
-        if (sequenceItemPrefab == null) { Debug.LogError("[PlantotronUI] Sequence Item Prefab not assigned!", this); isValid = false; }
-        if (dropZonePrefab == null) { Debug.LogError("[PlantotronUI] Drop Zone Prefab not assigned!", this); isValid = false; } // <<< NEW
-        if (geneListContainer == null) { Debug.LogError("[PlantotronUI] Gene List Container not assigned!", this); isValid = false; }
-        if (seedListContainer == null) { Debug.LogError("[PlantotronUI] Seed List Container not assigned!", this); isValid = false; }
-        if (sequenceContainer == null) { Debug.LogError("[PlantotronUI] Sequence Container not assigned!", this); isValid = false; }
-        if (mainPanel == null) { Debug.LogError("[PlantotronUI] Main Panel not assigned!", this); isValid = false; }
-        
-        if (!isValid)
-        {
-            Debug.LogError("[PlantotronUI] Missing required components! UI will not function properly.", this);
-            enabled = false;
-        }
+        if (clearAllButton != null)
+            clearAllButton.onClick.RemoveAllListeners();
+        if (saveSeedButton != null)
+            saveSeedButton.onClick.RemoveAllListeners();
+        if (resetSeedButton != null)
+            resetSeedButton.onClick.RemoveAllListeners();
+        if (seedSlotButton != null)
+            seedSlotButton.onClick.RemoveAllListeners();
     }
     
     // --- Main UI Control ---
     
     public void OpenUI()
     {
-        if (showDebugLogs)
-            Debug.Log("[PlantotronUI] OpenUI called");
-        
-        if (isUIOpen)
-        {
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] UI already open, skipping");
-            return;
-        }
-        
-        StartCoroutine(OpenUICoroutine());
-    }
-    
-    private IEnumerator OpenUICoroutine()
-    {
         if (mainPanel != null)
-        {
             mainPanel.SetActive(true);
-            isUIOpen = true;
+            
+        RefreshAllLists();
+        ClearDetails();
         
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] Main panel activated");
-        
-            yield return null;
-        
-            // ENSURE ALL CONTAINERS ARE ENABLED
-            EnsureContainersEnabled();
-        
-            Canvas canvas = mainPanel.GetComponentInParent<Canvas>();
-            if (canvas != null)
-            {
-                canvas.enabled = false;
-                canvas.enabled = true;
-            }
-        
-            yield return null;
-        
-            RefreshAllPanels();
-            ClearDetails();
-        
-            if (geneListContainer != null)
-                LayoutRebuilder.ForceRebuildLayoutImmediate(geneListContainer.GetComponent<RectTransform>());
-            if (seedListContainer != null)
-                LayoutRebuilder.ForceRebuildLayoutImmediate(seedListContainer.GetComponent<RectTransform>());
-            if (sequenceContainer != null)
-                LayoutRebuilder.ForceRebuildLayoutImmediate(sequenceContainer.GetComponent<RectTransform>());
-        
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] UI fully opened and refreshed");
-        }
+        if (showDebugLogs)
+            Debug.Log("[PlantotronUI] UI Opened");
     }
     
     public void CloseUI()
     {
-        if (showDebugLogs)
-            Debug.Log("[PlantotronUI] CloseUI called");
-        
         if (mainPanel != null)
-        {
             mainPanel.SetActive(false);
-            isUIOpen = false;
-        }
             
-        currentSelectedSeed = null;
+        // Clear current editing state
+        SetCurrentEditingSeed(null);
         
         if (showDebugLogs)
             Debug.Log("[PlantotronUI] UI Closed");
     }
     
-    // --- Panel Refresh Methods ---
+    // --- Gene Database ---
     
-    private void RefreshAllPanels()
-    {
-        if (!isUIOpen)
-        {
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] RefreshAllPanels called but UI not open, skipping");
-            return;
-        }
-        
-        if (showDebugLogs)
-            Debug.Log("[PlantotronUI] Refreshing all panels");
-        
-        RefreshGenesPanel();
-        RefreshSeedsPanel();
-        RefreshSequencePanel();
-    }
-    
-    private void RefreshGenesPanel()
+    private void RefreshGeneDatabase(string searchFilter = "")
     {
         if (inventory == null || geneListContainer == null) return;
         
-        ClearContainer(geneListContainer, currentGeneItems);
+        // Clear existing items
+        ClearContainer(geneListContainer, currentGeneListItems);
         
-        foreach (var geneCount in inventory.AvailableGenes)
+        // Filter genes based on search
+        var filteredGenes = inventory.AvailableGenes.Where(gene => 
+            gene != null && (string.IsNullOrEmpty(searchFilter) || 
+            gene.displayName.ToLower().Contains(searchFilter.ToLower()))
+        ).ToList();
+        
+        // Create UI items for each gene
+        foreach (var gene in filteredGenes)
         {
-            if (geneCount.gene != null && geneCount.count > 0)
-            {
-                GameObject geneItem = CreateGeneItem(geneCount);
-                if (geneItem != null)
-                    currentGeneItems.Add(geneItem);
-            }
-        }
-        
-        if (showDebugLogs)
-            Debug.Log($"[PlantotronUI] Refreshed genes panel: {currentGeneItems.Count} gene types");
-    }
-    
-    private void RefreshSeedsPanel()
-    {
-        if (inventory == null || seedListContainer == null) return;
-        
-        ClearContainer(seedListContainer, currentSeedItems);
-        
-        foreach (var seed in inventory.AvailableSeeds)
-        {
-            if (seed != null)
-            {
-                GameObject seedItem = CreateSeedItem(seed);
-                if (seedItem != null)
-                    currentSeedItems.Add(seedItem);
-            }
+            GameObject geneItem = CreateGeneListItem(gene);
+            if (geneItem != null)
+                currentGeneListItems.Add(geneItem);
         }
         
         if (showDebugLogs)
-            Debug.Log($"[PlantotronUI] Refreshed seeds panel: {currentSeedItems.Count} seeds");
+            Debug.Log($"[PlantotronUI] Refreshed gene database: {filteredGenes.Count} genes");
     }
     
-    // Add this new method to ensure containers are enabled
-    private void EnsureContainersEnabled()
+    private GameObject CreateGeneListItem(NodeDefinition gene)
     {
-        // Enable main containers
-        if (geneListContainer != null && !geneListContainer.gameObject.activeSelf)
-        {
-            geneListContainer.gameObject.SetActive(true);
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] Enabled geneListContainer");
-        }
-    
-        if (seedListContainer != null && !seedListContainer.gameObject.activeSelf)
-        {
-            seedListContainer.gameObject.SetActive(true);
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] Enabled seedListContainer");
-        }
-    
-        if (sequenceContainer != null && !sequenceContainer.gameObject.activeSelf)
-        {
-            sequenceContainer.gameObject.SetActive(true);
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] Enabled sequenceContainer");
-        }
-    
-        // Also enable parent panels if they exist
-        if (genesPanel != null && !genesPanel.gameObject.activeSelf)
-        {
-            genesPanel.gameObject.SetActive(true);
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] Enabled genesPanel");
-        }
-    
-        if (seedsPanel != null && !seedsPanel.gameObject.activeSelf)
-        {
-            seedsPanel.gameObject.SetActive(true);
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] Enabled seedsPanel");
-        }
-    
-        if (sequencePanel != null && !sequencePanel.gameObject.activeSelf)
-        {
-            sequencePanel.gameObject.SetActive(true);
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] Enabled sequencePanel");
-        }
-    }
-    
-    private void RefreshSequencePanel()
-{
-    Debug.Log("[PlantotronUI] RefreshSequencePanel called");
-    
-    if (sequenceContainer == null)
-    {
-        Debug.LogError("[PlantotronUI] sequenceContainer is null!");
-        return;
-    }
-    
-    // ENSURE SEQUENCE CONTAINER IS ENABLED
-    if (!sequenceContainer.gameObject.activeSelf)
-    {
-        sequenceContainer.gameObject.SetActive(true);
-        Debug.Log("[PlantotronUI] Enabled sequenceContainer in RefreshSequencePanel");
-    }
-    
-    Debug.Log("[PlantotronUI] Clearing containers and drop zones...");
-    
-    // Clear existing items and drop zones
-    ClearContainer(sequenceContainer, currentSequenceItems);
-    ClearDropZones();
-    
-    if (currentSelectedSeed == null)
-    {
-        Debug.Log("[PlantotronUI] No seed selected, creating minimal drop zones");
-        CreateDropZones(0);
-        return;
-    }
-    
-    if (currentSelectedSeed.currentGenes == null)
-    {
-        Debug.Log("[PlantotronUI] Selected seed has null genes list, creating minimal drop zones");
-        CreateDropZones(0);
-        return;
-    }
-    
-    int geneCount = currentSelectedSeed.currentGenes.Count;
-    Debug.Log($"[PlantotronUI] Selected seed has {geneCount} genes");
-    
-    // Create gene items ONLY (no drop zones yet - they're created on demand during drag)
-    for (int i = 0; i < geneCount; i++)
-    {
-        if (currentSelectedSeed.currentGenes[i] != null)
-        {
-            Debug.Log($"[PlantotronUI] Creating sequence item {i}: {currentSelectedSeed.currentGenes[i].displayName}");
-            
-            GameObject sequenceItem = CreateSequenceItem(currentSelectedSeed.currentGenes[i], i);
-            if (sequenceItem != null)
-            {
-                currentSequenceItems.Add(sequenceItem);
-                Debug.Log($"[PlantotronUI] Created sequence item {i}");
-            }
-            else
-            {
-                Debug.LogError($"[PlantotronUI] Failed to create sequence item {i}");
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"[PlantotronUI] Gene at index {i} is null");
-        }
-    }
-    
-    Debug.Log($"[PlantotronUI] RefreshSequencePanel complete: {currentSequenceItems.Count} genes");
-    
-    // Force layout rebuild
-    LayoutRebuilder.ForceRebuildLayoutImmediate(sequenceContainer.GetComponent<RectTransform>());
-}
-
-    
-    // <<< NEW: Drop Zone Management >>>
-    private void CreateDropZones(int geneCount)
-    {
-        Debug.Log($"[PlantotronUI] CreateDropZones called with geneCount: {geneCount}");
-    
-        if (dropZonePrefab == null)
-        {
-            Debug.LogError("[PlantotronUI] dropZonePrefab is null!");
-            return;
-        }
-    
-        if (sequenceContainer == null)
-        {
-            Debug.LogError("[PlantotronUI] sequenceContainer is null!");
-            return;
-        }
-    
-        // Create one more drop zone than genes (for insertion at end)
-        int dropZoneCount = geneCount + 1;
-        Debug.Log($"[PlantotronUI] Creating {dropZoneCount} drop zones");
-    
-        for (int i = 0; i < dropZoneCount; i++)
-        {
-            Debug.Log($"[PlantotronUI] Creating drop zone {i}");
-        
-            GameObject dropZoneGO = Instantiate(dropZonePrefab, sequenceContainer);
-            if (dropZoneGO == null)
-            {
-                Debug.LogError($"[PlantotronUI] Failed to instantiate drop zone {i}");
-                continue;
-            }
-        
-            PlantotronSequenceDropZone dropZone = dropZoneGO.GetComponent<PlantotronSequenceDropZone>();
-        
-            if (dropZone != null)
-            {
-                dropZone.Initialize(this, i);
-                currentDropZones.Add(dropZone);
-            
-                // Position at even indices (0, 2, 4, etc.)
-                dropZoneGO.transform.SetSiblingIndex(i * 2);
-            
-                Debug.Log($"[PlantotronUI] Successfully created drop zone {i} at sibling index {i * 2}");
-            }
-            else
-            {
-                Debug.LogError("[PlantotronUI] Drop Zone Prefab missing PlantotronSequenceDropZone component!", dropZonePrefab);
-                Destroy(dropZoneGO);
-            }
-        }
-    
-        Debug.Log($"[PlantotronUI] CreateDropZones complete: {currentDropZones.Count} zones created");
-    }
-    
-    private void CreateDropZonesForDrag()
-    {
-        if (dropZonePrefab == null || sequenceContainer == null) return;
-    
-        // Clear any existing drop zones first
-        ClearDropZones();
-    
-        int geneCount = currentSelectedSeed?.currentGenes?.Count ?? 0;
-        int dropZoneCount = geneCount + 1; // One more than genes for insertion at end
-    
-        Debug.Log($"[PlantotronUI] Creating {dropZoneCount} drop zones for drag operation");
-    
-        for (int i = 0; i < dropZoneCount; i++)
-        {
-            GameObject dropZoneGO = Instantiate(dropZonePrefab, sequenceContainer);
-            PlantotronSequenceDropZone dropZone = dropZoneGO.GetComponent<PlantotronSequenceDropZone>();
-        
-            if (dropZone != null)
-            {
-                dropZone.Initialize(this, i);
-                currentDropZones.Add(dropZone);
-            
-                // Position drop zones between gene items
-                // Index 0: before first gene
-                // Index 1: between gene 0 and 1
-                // Index 2: between gene 1 and 2, etc.
-                int siblingIndex = i * 2; // 0, 2, 4, 6...
-                dropZoneGO.transform.SetSiblingIndex(siblingIndex);
-            
-                // Shift existing gene items to odd positions
-                if (i < currentSequenceItems.Count && currentSequenceItems[i] != null)
-                {
-                    currentSequenceItems[i].transform.SetSiblingIndex((i * 2) + 1);
-                }
-            
-                Debug.Log($"[PlantotronUI] Created drop zone {i} at sibling index {siblingIndex}");
-            }
-            else
-            {
-                Debug.LogError("[PlantotronUI] Drop Zone Prefab missing PlantotronSequenceDropZone component!", dropZonePrefab);
-                Destroy(dropZoneGO);
-            }
-        }
-    }
-    
-    private void ClearDropZones()
-    {
-        foreach (var dropZone in currentDropZones)
-        {
-            if (dropZone != null && dropZone.gameObject != null)
-                DestroyImmediate(dropZone.gameObject);
-        }
-        currentDropZones.Clear();
-    }
-    // <<< END Drop Zone Management >>>
-    
-    // --- Item Creation Methods ---
-    
-    private GameObject CreateGeneItem(PlayerGeneticsInventory.GeneCount geneCount)
-    {
-        if (geneItemPrefab == null || geneListContainer == null || geneCount.gene == null)
+        if (geneListItemPrefab == null || geneListContainer == null || gene == null)
             return null;
             
-        GameObject item = Instantiate(geneItemPrefab, geneListContainer);
+        GameObject item = Instantiate(geneListItemPrefab, geneListContainer);
         
+        // Setup the gene item component
         PlantotronGeneItem geneItemComponent = item.GetComponent<PlantotronGeneItem>();
         if (geneItemComponent == null)
             geneItemComponent = item.AddComponent<PlantotronGeneItem>();
             
-        geneItemComponent.Initialize(geneCount, this);
+        geneItemComponent.Initialize(gene, this);
         
         return item;
     }
     
-    private GameObject CreateSeedItem(SeedInstance seed)
+    // --- Seed Database ---
+    
+    private void RefreshSeedDatabase(string searchFilter = "")
     {
-        if (seedItemPrefab == null || seedListContainer == null || seed == null)
+        if (inventory == null || seedListContainer == null) return;
+        
+        // Clear existing items
+        ClearContainer(seedListContainer, currentSeedListItems);
+        
+        // Filter seeds based on search
+        var filteredSeeds = inventory.AvailableSeeds.Where(seed => 
+            seed != null && (string.IsNullOrEmpty(searchFilter) || 
+            seed.seedName.ToLower().Contains(searchFilter.ToLower()))
+        ).ToList();
+        
+        // Create UI items for each seed
+        foreach (var seed in filteredSeeds)
+        {
+            GameObject seedItem = CreateSeedListItem(seed);
+            if (seedItem != null)
+                currentSeedListItems.Add(seedItem);
+        }
+        
+        if (showDebugLogs)
+            Debug.Log($"[PlantotronUI] Refreshed seed database: {filteredSeeds.Count} seeds");
+    }
+    
+    private GameObject CreateSeedListItem(SeedInstance seed)
+    {
+        if (seedListItemPrefab == null || seedListContainer == null || seed == null)
             return null;
             
-        GameObject item = Instantiate(seedItemPrefab, seedListContainer);
+        GameObject item = Instantiate(seedListItemPrefab, seedListContainer);
         
+        // Setup the seed item component
         PlantotronSeedItem seedItemComponent = item.GetComponent<PlantotronSeedItem>();
         if (seedItemComponent == null)
             seedItemComponent = item.AddComponent<PlantotronSeedItem>();
@@ -7612,16 +6750,107 @@ public class PlantotronUI : MonoBehaviour
         return item;
     }
     
-    private GameObject CreateSequenceItem(NodeDefinition gene, int index)
+    // --- Gene Editor ---
+    
+    public void SetCurrentEditingSeed(SeedInstance seed)
     {
-        if (sequenceItemPrefab == null || sequenceContainer == null || gene == null)
+        currentEditingSeed = seed;
+        RefreshGeneEditor();
+        
+        if (seed != null && showDebugLogs)
+            Debug.Log($"[PlantotronUI] Now editing seed: {seed.seedName}");
+    }
+    
+    private void RefreshGeneEditor()
+    {
+        // Update seed slot display
+        if (seedSlotText != null)
+        {
+            if (currentEditingSeed != null)
+            {
+                seedSlotText.text = currentEditingSeed.seedName;
+            }
+            else
+            {
+                seedSlotText.text = "Click to select seed...";
+            }
+        }
+        
+        // Update seed name display
+        if (currentSeedNameText != null)
+        {
+            if (currentEditingSeed != null)
+            {
+                currentSeedNameText.text = currentEditingSeed.seedName;
+            }
+            else
+            {
+                currentSeedNameText.text = "No seed selected";
+            }
+        }
+        
+        // Update seed name input field
+        if (seedNameInputField != null)
+        {
+            if (currentEditingSeed != null)
+            {
+                seedNameInputField.text = currentEditingSeed.seedName;
+                seedNameInputField.interactable = true;
+            }
+            else
+            {
+                seedNameInputField.text = "";
+                seedNameInputField.interactable = false;
+            }
+        }
+        
+        // Refresh gene sequence
+        RefreshGeneSequence();
+        
+        // Update button states
+        if (saveSeedButton != null)
+            saveSeedButton.interactable = (currentEditingSeed != null);
+        if (resetSeedButton != null)
+            resetSeedButton.interactable = (currentEditingSeed != null);
+    }
+    
+    private void RefreshGeneSequence()
+    {
+        if (geneSequenceContainer == null) return;
+        
+        // Clear existing items
+        ClearContainer(geneSequenceContainer, currentGeneSequenceItems);
+        
+        if (currentEditingSeed == null || currentEditingSeed.currentGenes == null)
+            return;
+        
+        // Create UI items for each gene in the sequence
+        for (int i = 0; i < currentEditingSeed.currentGenes.Count; i++)
+        {
+            NodeDefinition gene = currentEditingSeed.currentGenes[i];
+            if (gene != null)
+            {
+                GameObject sequenceItem = CreateGeneSequenceItem(gene, i);
+                if (sequenceItem != null)
+                    currentGeneSequenceItems.Add(sequenceItem);
+            }
+        }
+        
+        if (showDebugLogs)
+            Debug.Log($"[PlantotronUI] Refreshed gene sequence: {currentEditingSeed.currentGenes.Count} genes");
+    }
+    
+    private GameObject CreateGeneSequenceItem(NodeDefinition gene, int index)
+    {
+        if (geneSequenceItemPrefab == null || geneSequenceContainer == null || gene == null)
             return null;
             
-        GameObject item = Instantiate(sequenceItemPrefab, sequenceContainer);
+        GameObject item = Instantiate(geneSequenceItemPrefab, geneSequenceContainer);
         
-        PlantotronSequenceItem sequenceItemComponent = item.GetComponent<PlantotronSequenceItem>();
+        // Setup the gene sequence item component
+        PlantotronGeneSequenceItem sequenceItemComponent = item.GetComponent<PlantotronGeneSequenceItem>();
         if (sequenceItemComponent == null)
-            sequenceItemComponent = item.AddComponent<PlantotronSequenceItem>();
+            sequenceItemComponent = item.AddComponent<PlantotronGeneSequenceItem>();
             
         sequenceItemComponent.Initialize(gene, index, this);
         
@@ -7639,6 +6868,7 @@ public class PlantotronUI : MonoBehaviour
         
         string details = !string.IsNullOrEmpty(gene.description) ? gene.description : "No description available.";
         
+        // Add effect information
         if (gene.effects != null && gene.effects.Count > 0)
         {
             details += "\n\n<b>Effects:</b>";
@@ -7655,11 +6885,9 @@ public class PlantotronUI : MonoBehaviour
             }
         }
         
-        int count = inventory?.GetGeneCount(gene) ?? 0;
-        details += $"\n\n<b>Available:</b> {count}";
-        
         detailsDescriptionText.text = details;
         
+        // Scroll to top
         if (detailsScrollRect != null)
             detailsScrollRect.verticalNormalizedPosition = 1f;
     }
@@ -7673,15 +6901,18 @@ public class PlantotronUI : MonoBehaviour
         
         string details = "";
         
+        // Add basic info
         if (seed.baseSeedDefinition != null && !string.IsNullOrEmpty(seed.baseSeedDefinition.description))
         {
             details += seed.baseSeedDefinition.description + "\n\n";
         }
         
+        // Add modification info
         details += $"<b>Status:</b> {(seed.isModified ? "Modified" : "Vanilla")}\n";
         details += $"<b>Genes:</b> {(seed.currentGenes?.Count ?? 0)}\n";
         details += $"<b>Plantable:</b> {(seed.IsValidForPlanting() ? "Yes" : "No")}\n\n";
         
+        // Add genetic composition
         if (seed.currentGenes != null && seed.currentGenes.Count > 0)
         {
             details += "<b>Genetic Sequence:</b>\n";
@@ -7700,6 +6931,7 @@ public class PlantotronUI : MonoBehaviour
         
         detailsDescriptionText.text = details;
         
+        // Scroll to top
         if (detailsScrollRect != null)
             detailsScrollRect.verticalNormalizedPosition = 1f;
     }
@@ -7709,200 +6941,135 @@ public class PlantotronUI : MonoBehaviour
         if (detailsTitleText != null)
             detailsTitleText.text = "Details";
         if (detailsDescriptionText != null)
-            detailsDescriptionText.text = "Click on a gene or seed to see details.";
+            detailsDescriptionText.text = "Hover over or select an item to see details.";
     }
     
     // --- Event Handlers ---
     
-    private void OnGeneCountChanged(NodeDefinition gene, int newCount)
+    private void OnGeneSearchChanged(string searchText)
     {
-        foreach (GameObject item in currentGeneItems)
+        RefreshGeneDatabase(searchText);
+    }
+    
+    private void OnSeedSearchChanged(string searchText)
+    {
+        RefreshSeedDatabase(searchText);
+    }
+    
+    private void OnSeedNameChanged(string newName)
+    {
+        if (currentEditingSeed != null && !string.IsNullOrEmpty(newName))
         {
-            if (item != null)
-            {
-                PlantotronGeneItem geneItem = item.GetComponent<PlantotronGeneItem>();
-                if (geneItem != null)
-                {
-                    geneItem.UpdateDisplay();
-                }
-            }
-        }
-        
-        if (newCount <= 0)
-        {
-            RefreshGenesPanel();
+            currentEditingSeed.seedName = newName;
         }
     }
     
-    // --- Public Methods for Item Interactions ---
-    
-    public void OnSeedSelected(SeedInstance seed)
+    private void OpenSeedSelectionPopup()
     {
-        Debug.Log($"[PlantotronUI] OnSeedSelected called with seed: {seed?.seedName ?? "null"}");
-    
-        if (seed == null)
+        // TODO: Implement seed selection popup
+        // For now, just select the first available seed
+        if (inventory != null && inventory.AvailableSeeds.Count > 0)
         {
-            Debug.LogError("[PlantotronUI] OnSeedSelected: seed is null!");
+            SetCurrentEditingSeed(inventory.AvailableSeeds[0]);
+        }
+    }
+    
+    private void SaveCurrentSeed()
+    {
+        if (currentEditingSeed == null)
             return;
-        }
-    
-        Debug.Log($"[PlantotronUI] Selecting seed: {seed.seedName}, genes count: {seed.currentGenes?.Count ?? 0}");
-    
-        currentSelectedSeed = seed;
-    
-        // ENSURE CONTAINERS ARE ENABLED BEFORE REFRESHING
-        EnsureContainersEnabled();
-    
-        Debug.Log("[PlantotronUI] About to refresh sequence panel...");
-        RefreshSequencePanel();
-    
-        Debug.Log("[PlantotronUI] About to show seed details...");
-        ShowSeedDetails(seed);
-    
-        Debug.Log($"[PlantotronUI] Seed selection complete for: {seed.seedName}");
+            
+        // Create a new seed instance (duplicate) and add to inventory
+        SeedInstance savedSeed = inventory.DuplicateSeed(currentEditingSeed);
+        
+        if (savedSeed != null && showDebugLogs)
+            Debug.Log($"[PlantotronUI] Saved seed: {savedSeed.seedName}");
     }
     
-    public void OnGeneClicked(NodeDefinition gene)
+    private void ResetCurrentSeed()
+    {
+        if (currentEditingSeed == null || currentEditingSeed.baseSeedDefinition == null)
+            return;
+            
+        // Reset to original genes
+        currentEditingSeed.currentGenes = currentEditingSeed.baseSeedDefinition.CloneInitialGenes();
+        currentEditingSeed.UpdateModifiedStatus();
+        RefreshGeneEditor();
+        
+        if (showDebugLogs)
+            Debug.Log($"[PlantotronUI] Reset seed: {currentEditingSeed.seedName}");
+    }
+    
+    private void ClearCurrentSeed()
+    {
+        SetCurrentEditingSeed(null);
+        ClearDetails();
+    }
+    
+    // --- Public Methods for Gene/Seed Items ---
+    
+    public void OnGeneSelected(NodeDefinition gene)
     {
         ShowGeneDetails(gene);
     }
     
-    
-    
-    // --- UPDATED: Drag & Drop Methods ---
-    
-    public bool TryAddGeneToSequence(NodeDefinition gene, int insertIndex = -1)
+    public void OnSeedSelected(SeedInstance seed)
     {
-        if (currentSelectedSeed == null || gene == null)
+        ShowSeedDetails(seed);
+    }
+    
+    public void OnGeneAddToSequence(NodeDefinition gene)
+    {
+        if (currentEditingSeed != null && gene != null)
         {
+            currentEditingSeed.AddGene(gene);
+            RefreshGeneSequence();
+            
             if (showDebugLogs)
-                Debug.Log("[PlantotronUI] Cannot add gene - no seed selected or gene is null");
-            return false;
+                Debug.Log($"[PlantotronUI] Added gene {gene.displayName} to seed");
         }
-        
-        if (!inventory.TryConsumeGene(gene))
+    }
+    
+    public void OnSeedLoadForEditing(SeedInstance seed)
+    {
+        if (seed != null)
         {
-            if (showDebugLogs)
-                Debug.Log($"[PlantotronUI] Cannot add gene {gene.displayName} - not available in inventory");
-            return false;
+            // Create a working copy
+            SeedInstance workingCopy = new SeedInstance(seed);
+            SetCurrentEditingSeed(workingCopy);
         }
-        
-        // Add to seed's gene sequence at specific index
-        if (insertIndex >= 0 && insertIndex <= currentSelectedSeed.currentGenes.Count)
+    }
+    
+    public void OnGeneRemovedFromSequence(int index)
+    {
+        if (currentEditingSeed != null && currentEditingSeed.RemoveGeneAt(index))
         {
-            currentSelectedSeed.currentGenes.Insert(insertIndex, gene);
+            RefreshGeneSequence();
+            
             if (showDebugLogs)
-                Debug.Log($"[PlantotronUI] Inserted gene {gene.displayName} at index {insertIndex}");
+                Debug.Log($"[PlantotronUI] Removed gene at index {index}");
         }
-        else
+    }
+    
+    public void OnGeneMovedInSequence(int fromIndex, int toIndex)
+    {
+        if (currentEditingSeed != null && currentEditingSeed.MoveGene(fromIndex, toIndex))
         {
-            currentSelectedSeed.currentGenes.Add(gene);
+            RefreshGeneSequence();
+            
             if (showDebugLogs)
-                Debug.Log($"[PlantotronUI] Added gene {gene.displayName} at end of sequence");
+                Debug.Log($"[PlantotronUI] Moved gene from {fromIndex} to {toIndex}");
         }
-        
-        currentSelectedSeed.UpdateModifiedStatus();
-        RefreshSequencePanel();
-        
-        return true;
     }
-    
-    public bool TryRemoveGeneFromSequence(int index)
-    {
-        if (currentSelectedSeed == null || index < 0 || index >= currentSelectedSeed.currentGenes.Count)
-        {
-            if (showDebugLogs)
-                Debug.Log("[PlantotronUI] Cannot remove gene - invalid index or no seed selected");
-            return false;
-        }
-        
-        NodeDefinition gene = currentSelectedSeed.currentGenes[index];
-        if (gene == null) return false;
-        
-        currentSelectedSeed.currentGenes.RemoveAt(index);
-        currentSelectedSeed.UpdateModifiedStatus();
-        
-        inventory.ReturnGeneToInventory(gene);
-        
-        RefreshSequencePanel();
-        
-        if (showDebugLogs)
-            Debug.Log($"[PlantotronUI] Removed gene {gene.displayName} from sequence");
-        
-        return true;
-    }
-    
-    // Replacement method for PlantotronUI.TryMoveGeneInSequence
-public bool TryMoveGeneInSequence(int fromIndex, int toIndex)
-{
-    if (currentSelectedSeed == null || currentSelectedSeed.currentGenes == null)
-    {
-        if (showDebugLogs)
-            Debug.Log("[PlantotronUI] Cannot move gene - no seed selected or genes list is null");
-        return false;
-    }
-        
-    if (fromIndex < 0 || fromIndex >= currentSelectedSeed.currentGenes.Count)
-    {
-        if (showDebugLogs)
-            Debug.Log($"[PlantotronUI] Cannot move gene - invalid fromIndex {fromIndex} (valid range: 0-{currentSelectedSeed.currentGenes.Count - 1})");
-        return false;
-    }
-    
-    // FIXED: Handle toIndex properly for drop zone insertion
-    // When dropping on a drop zone, toIndex might be equal to count (inserting at end)
-    if (toIndex < 0 || toIndex > currentSelectedSeed.currentGenes.Count)
-    {
-        if (showDebugLogs)
-            Debug.Log($"[PlantotronUI] Cannot move gene - invalid toIndex {toIndex} (valid range: 0-{currentSelectedSeed.currentGenes.Count})");
-        return false;
-    }
-    
-    if (fromIndex == toIndex)
-    {
-        if (showDebugLogs)
-            Debug.Log("[PlantotronUI] No move needed - fromIndex equals toIndex");
-        return true; // Not really an error, just no change needed
-    }
-    
-    NodeDefinition gene = currentSelectedSeed.currentGenes[fromIndex];
-    if (gene == null)
-    {
-        if (showDebugLogs)
-            Debug.Log($"[PlantotronUI] Cannot move gene - gene at index {fromIndex} is null");
-        return false;
-    }
-    
-    // FIXED: Properly handle insertion logic
-    // Remove the gene from its current position
-    currentSelectedSeed.currentGenes.RemoveAt(fromIndex);
-    
-    // Adjust insertion index if removing from before the target
-    int adjustedToIndex = toIndex;
-    if (fromIndex < toIndex)
-    {
-        adjustedToIndex = toIndex - 1;
-    }
-    
-    // Ensure the adjusted index is still valid after removal
-    adjustedToIndex = Mathf.Clamp(adjustedToIndex, 0, currentSelectedSeed.currentGenes.Count);
-    
-    // Insert at the adjusted position
-    currentSelectedSeed.currentGenes.Insert(adjustedToIndex, gene);
-    
-    // Mark seed as modified
-    currentSelectedSeed.UpdateModifiedStatus();
-    
-    // Refresh the sequence panel to reflect changes
-    RefreshSequencePanel();
-    
-    if (showDebugLogs)
-        Debug.Log($"[PlantotronUI] Moved gene {gene.displayName} from index {fromIndex} to {adjustedToIndex} (requested: {toIndex})");
-    
-    return true;
-}
     
     // --- Utility Methods ---
+    
+    private void RefreshAllLists()
+    {
+        RefreshGeneDatabase(geneSearchField?.text ?? "");
+        RefreshSeedDatabase(seedSearchField?.text ?? "");
+        RefreshGeneEditor();
+    }
     
     private void ClearContainer(Transform container, List<GameObject> itemList)
     {
@@ -7914,47 +7081,9 @@ public bool TryMoveGeneInSequence(int fromIndex, int toIndex)
         itemList.Clear();
     }
     
-    public SeedInstance GetCurrentSelectedSeed()
+    public SeedInstance GetCurrentEditingSeed()
     {
-        return currentSelectedSeed;
-    }
-    
-    public bool IsUIOpen()
-    {
-        return isUIOpen;
-    }
-    
-    // <<< NEW: Enable/Disable Drop Zones >>>
-    public void EnableDropZones(bool enable)
-    {
-        if (enable)
-        {
-            // Create drop zones if they don't exist
-            if (currentDropZones.Count == 0)
-            {
-                CreateDropZonesForDrag();
-            }
-        
-            // Enable all drop zones
-            foreach (var dropZone in currentDropZones)
-            {
-                if (dropZone != null)
-                    dropZone.SetEnabled(true);
-            }
-        
-            Debug.Log($"[PlantotronUI] Enabled {currentDropZones.Count} drop zones");
-        }
-        else
-        {
-            // Disable all drop zones
-            foreach (var dropZone in currentDropZones)
-            {
-                if (dropZone != null)
-                    dropZone.SetEnabled(false);
-            }
-        
-            Debug.Log("[PlantotronUI] Disabled drop zones");
-        }
+        return currentEditingSeed;
     }
 }
 
@@ -7962,7 +7091,7 @@ public bool TryMoveGeneInSequence(int fromIndex, int toIndex)
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Seeds\PlayerGeneticsInventory.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Nodes/Seeds/PlayerGeneticsInventory.cs (UPDATED)
+﻿// FILE: Assets/Scripts/Genetics/PlayerGeneticsInventory.cs
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -7970,30 +7099,17 @@ using System;
 
 public class PlayerGeneticsInventory : MonoBehaviour
 {
-    [System.Serializable]
-    public class GeneCount
-    {
-        public NodeDefinition gene;
-        public int count;
-        
-        public GeneCount(NodeDefinition gene, int count)
-        {
-            this.gene = gene;
-            this.count = count;
-        }
-    }
-
     public static PlayerGeneticsInventory Instance { get; private set; }
     
     [Header("Starting Inventory")]
-    [Tooltip("Genes the player starts with and their counts")]
-    public List<GeneCount> startingGenes = new List<GeneCount>();
+    [Tooltip("Genes (NodeDefinitions) the player starts with")]
+    public List<NodeDefinition> startingGenes = new List<NodeDefinition>();
     
     [Tooltip("Seeds (SeedDefinitions) the player starts with")]
     public List<SeedDefinition> startingSeedDefinitions = new List<SeedDefinition>();
     
     [Header("Current Inventory")]
-    [SerializeField] private List<GeneCount> availableGenes = new List<GeneCount>();
+    [SerializeField] private List<NodeDefinition> availableGenes = new List<NodeDefinition>();
     [SerializeField] private List<SeedInstance> availableSeeds = new List<SeedInstance>();
     
     [Header("Debug")]
@@ -8001,12 +7117,12 @@ public class PlayerGeneticsInventory : MonoBehaviour
     
     // Events for UI updates
     public event Action OnInventoryChanged;
-    public event Action<NodeDefinition, int> OnGeneCountChanged;
+    public event Action<NodeDefinition> OnGeneAdded;
     public event Action<SeedInstance> OnSeedAdded;
     public event Action<SeedInstance> OnSeedRemoved;
     
     // Public accessors
-    public List<GeneCount> AvailableGenes => availableGenes;
+    public List<NodeDefinition> AvailableGenes => availableGenes;
     public List<SeedInstance> AvailableSeeds => availableSeeds;
     
     void Awake()
@@ -8027,14 +7143,14 @@ public class PlayerGeneticsInventory : MonoBehaviour
     
     private void InitializeStartingInventory()
     {
-        // Add starting genes with their counts
-        foreach (var geneCount in startingGenes)
+        // Add starting genes
+        foreach (var gene in startingGenes)
         {
-            if (geneCount.gene != null && geneCount.count > 0)
+            if (gene != null && !availableGenes.Contains(gene))
             {
-                AddGeneCount(geneCount.gene, geneCount.count);
+                availableGenes.Add(gene);
                 if (showDebugLogs)
-                    Debug.Log($"[PlayerGeneticsInventory] Added starting gene: {geneCount.gene.displayName} x{geneCount.count}");
+                    Debug.Log($"[PlayerGeneticsInventory] Added starting gene: {gene.displayName}");
             }
         }
         
@@ -8051,109 +7167,64 @@ public class PlayerGeneticsInventory : MonoBehaviour
         }
         
         if (showDebugLogs)
-            Debug.Log($"[PlayerGeneticsInventory] Initialized with {availableGenes.Count} gene types and {availableSeeds.Count} seeds");
+            Debug.Log($"[PlayerGeneticsInventory] Initialized with {availableGenes.Count} genes and {availableSeeds.Count} seeds");
             
         OnInventoryChanged?.Invoke();
     }
     
-    // --- Gene Count Management ---
+    // --- Gene Management ---
     
     /// <summary>
-    /// Adds genes to inventory with specified count
+    /// Adds a gene to the player's inventory if not already present
     /// </summary>
-    public bool AddGeneCount(NodeDefinition gene, int count)
+    public bool AddGene(NodeDefinition gene)
     {
-        if (gene == null || count <= 0)
+        if (gene == null)
         {
-            Debug.LogWarning("[PlayerGeneticsInventory] Tried to add invalid gene or count!");
+            Debug.LogWarning("[PlayerGeneticsInventory] Tried to add null gene!");
             return false;
         }
         
-        var existingGene = availableGenes.FirstOrDefault(g => g.gene == gene);
-        if (existingGene != null)
+        if (availableGenes.Contains(gene))
         {
-            existingGene.count += count;
-        }
-        else
-        {
-            availableGenes.Add(new GeneCount(gene, count));
+            if (showDebugLogs)
+                Debug.Log($"[PlayerGeneticsInventory] Gene '{gene.displayName}' already in inventory");
+            return false;
         }
         
+        availableGenes.Add(gene);
         if (showDebugLogs)
-            Debug.Log($"[PlayerGeneticsInventory] Added {count} of gene: {gene.displayName}");
+            Debug.Log($"[PlayerGeneticsInventory] Added gene: {gene.displayName}");
             
-        OnGeneCountChanged?.Invoke(gene, GetGeneCount(gene));
+        OnGeneAdded?.Invoke(gene);
         OnInventoryChanged?.Invoke();
         return true;
     }
     
     /// <summary>
-    /// Tries to consume one count of a gene. Returns true if successful.
-    /// </summary>
-    public bool TryConsumeGene(NodeDefinition gene)
-    {
-        if (gene == null) return false;
-        
-        var geneCount = availableGenes.FirstOrDefault(g => g.gene == gene);
-        if (geneCount == null || geneCount.count <= 0)
-        {
-            if (showDebugLogs)
-                Debug.Log($"[PlayerGeneticsInventory] Cannot consume gene {gene.displayName} - not available or count is 0");
-            return false;
-        }
-        
-        geneCount.count--;
-        
-        if (geneCount.count <= 0)
-        {
-            availableGenes.Remove(geneCount);
-            if (showDebugLogs)
-                Debug.Log($"[PlayerGeneticsInventory] Removed gene {gene.displayName} from inventory (count reached 0)");
-        }
-        else
-        {
-            if (showDebugLogs)
-                Debug.Log($"[PlayerGeneticsInventory] Consumed gene {gene.displayName}, remaining: {geneCount.count}");
-        }
-        
-        OnGeneCountChanged?.Invoke(gene, GetGeneCount(gene));
-        OnInventoryChanged?.Invoke();
-        return true;
-    }
-    
-    /// <summary>
-    /// Returns a gene to inventory (increases count by 1)
-    /// </summary>
-    public void ReturnGeneToInventory(NodeDefinition gene)
-    {
-        if (gene == null) return;
-        
-        AddGeneCount(gene, 1);
-        if (showDebugLogs)
-            Debug.Log($"[PlayerGeneticsInventory] Returned gene {gene.displayName} to inventory");
-    }
-    
-    /// <summary>
-    /// Gets the current count of a specific gene
-    /// </summary>
-    public int GetGeneCount(NodeDefinition gene)
-    {
-        if (gene == null) return 0;
-        
-        var geneCount = availableGenes.FirstOrDefault(g => g.gene == gene);
-        return geneCount?.count ?? 0;
-    }
-    
-    /// <summary>
-    /// Checks if player has at least one of the specified gene
+    /// Checks if the player has a specific gene
     /// </summary>
     public bool HasGene(NodeDefinition gene)
     {
-        return GetGeneCount(gene) > 0;
+        return gene != null && availableGenes.Contains(gene);
     }
     
-    // --- Seed Management (Simplified) ---
+    /// <summary>
+    /// Gets all genes of a specific effect type
+    /// </summary>
+    public List<NodeDefinition> GetGenesWithEffectType(NodeEffectType effectType)
+    {
+        return availableGenes.Where(gene => 
+            gene != null && gene.effects != null && 
+            gene.effects.Any(effect => effect != null && effect.effectType == effectType)
+        ).ToList();
+    }
     
+    // --- Seed Management ---
+    
+    /// <summary>
+    /// Adds a seed instance to the player's inventory
+    /// </summary>
     public bool AddSeed(SeedInstance seed)
     {
         if (seed == null)
@@ -8169,28 +7240,6 @@ public class PlayerGeneticsInventory : MonoBehaviour
         OnSeedAdded?.Invoke(seed);
         OnInventoryChanged?.Invoke();
         return true;
-    }
-    
-    public bool RemoveSeed(SeedInstance seed)
-    {
-        if (seed == null || !availableSeeds.Contains(seed))
-            return false;
-            
-        availableSeeds.Remove(seed);
-        if (showDebugLogs)
-            Debug.Log($"[PlayerGeneticsInventory] Removed seed: {seed.seedName}");
-            
-        OnSeedRemoved?.Invoke(seed);
-        OnInventoryChanged?.Invoke();
-        return true;
-    }
-    
-    /// <summary>
-    /// Gets seeds that are valid for planting
-    /// </summary>
-    public List<SeedInstance> GetPlantableSeeds()
-    {
-        return availableSeeds.Where(seed => seed != null && seed.IsValidForPlanting()).ToList();
     }
     
     /// <summary>
@@ -8210,17 +7259,119 @@ public class PlayerGeneticsInventory : MonoBehaviour
     }
     
     /// <summary>
+    /// Removes a seed from the inventory (e.g., when planted)
+    /// </summary>
+    public bool RemoveSeed(SeedInstance seed)
+    {
+        if (seed == null || !availableSeeds.Contains(seed))
+            return false;
+            
+        availableSeeds.Remove(seed);
+        if (showDebugLogs)
+            Debug.Log($"[PlayerGeneticsInventory] Removed seed: {seed.seedName}");
+            
+        OnSeedRemoved?.Invoke(seed);
+        OnInventoryChanged?.Invoke();
+        return true;
+    }
+    
+    /// <summary>
+    /// Removes a seed by its unique ID
+    /// </summary>
+    public bool RemoveSeedById(string seedId)
+    {
+        SeedInstance seed = availableSeeds.FirstOrDefault(s => s.seedId == seedId);
+        return RemoveSeed(seed);
+    }
+    
+    /// <summary>
+    /// Creates a duplicate of an existing seed
+    /// </summary>
+    public SeedInstance DuplicateSeed(SeedInstance originalSeed)
+    {
+        if (originalSeed == null)
+        {
+            Debug.LogWarning("[PlayerGeneticsInventory] Cannot duplicate null seed!");
+            return null;
+        }
+        
+        SeedInstance duplicatedSeed = new SeedInstance(originalSeed);
+        AddSeed(duplicatedSeed);
+        return duplicatedSeed;
+    }
+    
+    /// <summary>
+    /// Gets seeds that are valid for planting
+    /// </summary>
+    public List<SeedInstance> GetPlantableSeeds()
+    {
+        return availableSeeds.Where(seed => seed != null && seed.IsValidForPlanting()).ToList();
+    }
+    
+    /// <summary>
+    /// Gets seeds based on whether they're modified or vanilla
+    /// </summary>
+    public List<SeedInstance> GetSeedsByType(bool getModified)
+    {
+        return availableSeeds.Where(seed => seed != null && seed.isModified == getModified).ToList();
+    }
+    
+    // --- Utility Methods ---
+    
+    /// <summary>
     /// Gets inventory statistics for debugging/UI
     /// </summary>
     public string GetInventoryStats()
     {
-        int totalGenes = availableGenes.Sum(g => g.count);
-        int vanillaSeeds = availableSeeds.Count(s => !s.isModified);
-        int modifiedSeeds = availableSeeds.Count(s => s.isModified);
+        int vanillaSeeds = GetSeedsByType(false).Count;
+        int modifiedSeeds = GetSeedsByType(true).Count;
         int plantableSeeds = GetPlantableSeeds().Count;
         
-        return $"Gene Types: {availableGenes.Count} (Total: {totalGenes}) | Seeds: {availableSeeds.Count} " +
+        return $"Genes: {availableGenes.Count} | Seeds: {availableSeeds.Count} " +
                $"(Vanilla: {vanillaSeeds}, Modified: {modifiedSeeds}, Plantable: {plantableSeeds})";
+    }
+    
+    /// <summary>
+    /// Validates inventory integrity (for debugging)
+    /// </summary>
+    public void ValidateInventory()
+    {
+        // Remove null entries
+        availableGenes.RemoveAll(gene => gene == null);
+        availableSeeds.RemoveAll(seed => seed == null);
+        
+        // Update modified status for all seeds
+        foreach (var seed in availableSeeds)
+        {
+            seed.UpdateModifiedStatus();
+        }
+        
+        if (showDebugLogs)
+            Debug.Log($"[PlayerGeneticsInventory] Validated inventory: {GetInventoryStats()}");
+    }
+    
+    // --- Save/Load (Basic Implementation) ---
+    // Note: For production, you'd want a more robust save system
+    
+    [System.Serializable]
+    private class InventorySaveData
+    {
+        public List<string> geneAssetNames = new List<string>();
+        public List<SeedInstance> seedInstances = new List<SeedInstance>();
+    }
+    
+    public void SaveInventory()
+    {
+        // Basic implementation - in production you'd use a proper save system
+        if (showDebugLogs)
+            Debug.Log("[PlayerGeneticsInventory] Save functionality not fully implemented yet");
+    }
+    
+    public void LoadInventory()
+    {
+        // Basic implementation - in production you'd use a proper save system
+        if (showDebugLogs)
+            Debug.Log("[PlayerGeneticsInventory] Load functionality not fully implemented yet");
     }
 }
 
@@ -8651,7 +7802,7 @@ public class SeedSelectionButton : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Seeds\SeedSelectionUI.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Nodes/Seeds/SeedSelectionUI.cs (FIXED)
+﻿// FILE: Assets/Scripts/Genetics/SeedSelectionUI.cs
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8671,7 +7822,7 @@ public class SeedSelectionUI : MonoBehaviour
     public TMP_Text instructionText;
     
     [Header("Settings")]
-    [SerializeField] private bool showDebugLogs = true; // Changed to true for debugging
+    [SerializeField] private bool showDebugLogs = false;
     
     // Current state
     private System.Action<SeedInstance> onSeedSelectedCallback;
@@ -8695,27 +7846,10 @@ public class SeedSelectionUI : MonoBehaviour
             Debug.LogError("[SeedSelectionUI] Seed Button Prefab not assigned!", this);
         if (seedButtonContainer == null)
             Debug.LogError("[SeedSelectionUI] Seed Button Container not assigned!", this);
-        if (selectionPanel == null)
-            Debug.LogError("[SeedSelectionUI] Selection Panel not assigned!", this);
         
-        // CRITICAL FIX: Ensure panel starts inactive but the GameObject itself is active
+        // Start hidden
         if (selectionPanel != null)
-        {
             selectionPanel.SetActive(false);
-            if (showDebugLogs)
-                Debug.Log("[SeedSelectionUI] Panel set to inactive in Awake");
-        }
-    }
-    
-    void Start()
-    {
-        // Additional safety check
-        if (selectionPanel != null && selectionPanel.activeSelf)
-        {
-            selectionPanel.SetActive(false);
-            if (showDebugLogs)
-                Debug.Log("[SeedSelectionUI] Panel was active in Start, forcing inactive");
-        }
     }
     
     void OnDestroy()
@@ -8733,9 +7867,6 @@ public class SeedSelectionUI : MonoBehaviour
     /// <param name="onSeedSelected">Callback when a seed is selected</param>
     public void ShowSeedSelection(System.Action<SeedInstance> onSeedSelected)
     {
-        if (showDebugLogs)
-            Debug.Log("[SeedSelectionUI] ShowSeedSelection called");
-        
         if (PlayerGeneticsInventory.Instance == null)
         {
             Debug.LogError("[SeedSelectionUI] PlayerGeneticsInventory not found!");
@@ -8755,9 +7886,6 @@ public class SeedSelectionUI : MonoBehaviour
             return;
         }
         
-        if (showDebugLogs)
-            Debug.Log($"[SeedSelectionUI] Found {plantableSeeds.Count} plantable seeds");
-        
         // Update UI text
         if (titleText != null)
             titleText.text = "Select Seed to Plant";
@@ -8767,39 +7895,12 @@ public class SeedSelectionUI : MonoBehaviour
         // Create seed buttons
         CreateSeedButtons(plantableSeeds);
         
-        // CRITICAL FIX: Force panel active and ensure it's visible
+        // Show panel
         if (selectionPanel != null)
-        {
-            // Make sure parent chain is active
-            Transform current = selectionPanel.transform;
-            while (current != null)
-            {
-                if (!current.gameObject.activeInHierarchy && current.gameObject != selectionPanel)
-                {
-                    if (showDebugLogs)
-                        Debug.LogWarning($"[SeedSelectionUI] Parent {current.name} was inactive, activating");
-                    current.gameObject.SetActive(true);
-                }
-                current = current.parent;
-            }
-            
             selectionPanel.SetActive(true);
-            
-            // Force canvas update
-            Canvas canvas = selectionPanel.GetComponentInParent<Canvas>();
-            if (canvas != null)
-            {
-                canvas.enabled = false;
-                canvas.enabled = true;
-            }
-            
-            if (showDebugLogs)
-                Debug.Log($"[SeedSelectionUI] Panel activated. Active: {selectionPanel.activeSelf}, ActiveInHierarchy: {selectionPanel.activeInHierarchy}");
-        }
-        else
-        {
-            Debug.LogError("[SeedSelectionUI] Selection Panel is null!");
-        }
+        
+        if (showDebugLogs)
+            Debug.Log($"[SeedSelectionUI] Showing selection with {plantableSeeds.Count} seeds");
     }
     
     /// <summary>
@@ -8807,9 +7908,6 @@ public class SeedSelectionUI : MonoBehaviour
     /// </summary>
     public void HideSelection()
     {
-        if (showDebugLogs)
-            Debug.Log("[SeedSelectionUI] HideSelection called");
-            
         if (selectionPanel != null)
             selectionPanel.SetActive(false);
             
@@ -8823,16 +7921,10 @@ public class SeedSelectionUI : MonoBehaviour
     private void CreateSeedButtons(List<SeedInstance> seeds)
     {
         if (seedButtonContainer == null || seedButtonPrefab == null)
-        {
-            Debug.LogError("[SeedSelectionUI] CreateSeedButtons: Missing container or prefab");
             return;
-        }
             
         // Clear existing buttons
         ClearSeedButtons();
-        
-        if (showDebugLogs)
-            Debug.Log($"[SeedSelectionUI] Creating {seeds.Count} seed buttons");
         
         // Create button for each seed
         foreach (SeedInstance seed in seeds)
@@ -8847,13 +7939,7 @@ public class SeedSelectionUI : MonoBehaviour
                 
             buttonComponent.Initialize(seed, this);
             currentSeedButtons.Add(buttonObj);
-            
-            if (showDebugLogs)
-                Debug.Log($"[SeedSelectionUI] Created button for seed: {seed.seedName}");
         }
-        
-        // Force layout update
-        LayoutRebuilder.ForceRebuildLayoutImmediate(seedButtonContainer.GetComponent<RectTransform>());
     }
     
     private void ClearSeedButtons()
@@ -8864,9 +7950,6 @@ public class SeedSelectionUI : MonoBehaviour
                 DestroyImmediate(button);
         }
         currentSeedButtons.Clear();
-        
-        if (showDebugLogs)
-            Debug.Log("[SeedSelectionUI] Cleared all seed buttons");
     }
     
     /// <summary>
@@ -8903,19 +7986,10 @@ public class SeedSelectionUI : MonoBehaviour
     /// </summary>
     public void AttemptAutoSelection(System.Action<SeedInstance> onSeedSelected)
     {
-        if (showDebugLogs)
-            Debug.Log("[SeedSelectionUI] AttemptAutoSelection called");
-            
         if (PlayerGeneticsInventory.Instance == null)
-        {
-            Debug.LogError("[SeedSelectionUI] PlayerGeneticsInventory.Instance is null!");
             return;
-        }
             
         List<SeedInstance> plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
-        
-        if (showDebugLogs)
-            Debug.Log($"[SeedSelectionUI] Found {plantableSeeds.Count} plantable seeds for auto selection");
         
         if (plantableSeeds.Count == 1)
         {
@@ -8928,9 +8002,6 @@ public class SeedSelectionUI : MonoBehaviour
         else if (plantableSeeds.Count > 1)
         {
             // Show selection UI
-            if (showDebugLogs)
-                Debug.Log("[SeedSelectionUI] Multiple seeds available, showing selection UI");
-                
             ShowSeedSelection(onSeedSelected);
         }
         else
@@ -8939,13 +8010,9 @@ public class SeedSelectionUI : MonoBehaviour
             Debug.LogWarning("[SeedSelectionUI] No plantable seeds available for auto-selection!");
         }
     }
-    
-    // Public method to check if UI is currently visible
-    public bool IsVisible()
-    {
-        return selectionPanel != null && selectionPanel.activeSelf;
-    }
 }
+
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -10507,7 +9574,7 @@ public class PlantGrowthModifierManager : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Data\PlantPlacementManager.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Tiles/Data/PlantPlacementManager.cs (FIXED)
+﻿// FILE: Assets/Scripts/Tiles/Data/PlantPlacementManager.cs (UPDATED for Seed System)
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10533,7 +9600,7 @@ public class PlantPlacementManager : MonoBehaviour
     [SerializeField] private List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
 
     [Header("Debug")]
-    [SerializeField] private bool showDebugMessages = true; // Changed to true for debugging
+    [SerializeField] private bool showDebugMessages = true;
     
     // Cache for quick lookup of invalid tiles
     private HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
@@ -10596,7 +9663,7 @@ public class PlantPlacementManager : MonoBehaviour
         RebuildInvalidTilesSet();
     }
 
-    // --- Position Management ---
+    // --- Position Management (unchanged) ---
     
     public bool IsPositionOccupied(Vector3Int gridPosition)
     {
@@ -10643,88 +9710,62 @@ public class PlantPlacementManager : MonoBehaviour
         }
     }
 
-    // --- FIXED: Seed-based planting methods ---
+    // --- NEW: Seed-based planting methods ---
 
     /// <summary>
-    /// FIXED: Try to plant using seed selection system
+    /// NEW: Try to plant using seed selection system
     /// </summary>
     public void TryPlantWithSeedSelection(Vector3Int gridPosition, Vector3 worldPosition, 
         System.Action onCompleted = null)
     {
-        if (showDebugMessages)
-            Debug.Log($"[PlantPlacementManager] TryPlantWithSeedSelection called at {gridPosition}");
-        
         // Basic validation
         if (!CanPlantAtPosition(gridPosition))
         {
-            if (showDebugMessages)
-                Debug.Log("[PlantPlacementManager] Cannot plant at position - validation failed");
             onCompleted?.Invoke();
             return;
         }
 
-        // CRITICAL FIX: Ensure SeedSelectionUI instance exists and is properly initialized
-        if (SeedSelectionUI.Instance == null)
+        // Use seed selection UI
+        if (SeedSelectionUI.Instance != null && PlayerGeneticsInventory.Instance != null)
         {
-            Debug.LogError("[PlantPlacementManager] SeedSelectionUI.Instance is null! Make sure SeedSelectionUI exists in the scene.");
-            onCompleted?.Invoke();
-            return;
-        }
-        
-        if (PlayerGeneticsInventory.Instance == null)
-        {
-            Debug.LogError("[PlantPlacementManager] PlayerGeneticsInventory.Instance is null!");
-            onCompleted?.Invoke();
-            return;
-        }
-
-        var plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
-        
-        if (showDebugMessages)
-            Debug.Log($"[PlantPlacementManager] Found {plantableSeeds.Count} plantable seeds");
-        
-        if (plantableSeeds.Count == 0)
-        {
-            if (showDebugMessages)
-                Debug.Log("Cannot plant: No plantable seeds available in inventory.");
-            onCompleted?.Invoke();
-            return;
-        }
-        
-        if (plantableSeeds.Count == 1)
-        {
-            // Auto-select single seed
-            if (showDebugMessages)
-                Debug.Log($"[PlantPlacementManager] Auto-selecting single seed: {plantableSeeds[0].seedName}");
-            TryPlantSeedInstance(plantableSeeds[0], gridPosition, worldPosition);
-            onCompleted?.Invoke();
+            var plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
+            
+            if (plantableSeeds.Count == 0)
+            {
+                if (showDebugMessages)
+                    Debug.Log("Cannot plant: No plantable seeds available in inventory.");
+                onCompleted?.Invoke();
+                return;
+            }
+            
+            if (plantableSeeds.Count == 1)
+            {
+                // Auto-select single seed
+                TryPlantSeedInstance(plantableSeeds[0], gridPosition, worldPosition);
+                onCompleted?.Invoke();
+            }
+            else
+            {
+                // Show selection UI
+                SeedSelectionUI.Instance.ShowSeedSelection(selectedSeed => {
+                    TryPlantSeedInstance(selectedSeed, gridPosition, worldPosition);
+                    onCompleted?.Invoke();
+                });
+            }
         }
         else
         {
-            // Show selection UI
             if (showDebugMessages)
-                Debug.Log("[PlantPlacementManager] Showing seed selection UI for multiple seeds");
-            
-            SeedSelectionUI.Instance.ShowSeedSelection(selectedSeed => {
-                if (showDebugMessages)
-                    Debug.Log($"[PlantPlacementManager] Seed selected from UI: {selectedSeed?.seedName ?? "null"}");
-                if (selectedSeed != null)
-                {
-                    TryPlantSeedInstance(selectedSeed, gridPosition, worldPosition);
-                }
-                onCompleted?.Invoke();
-            });
+                Debug.LogError("Cannot plant: Seed selection system not available!");
+            onCompleted?.Invoke();
         }
     }
 
     /// <summary>
-    /// FIXED: Plant a specific seed instance
+    /// NEW: Plant a specific seed instance
     /// </summary>
     public bool TryPlantSeedInstance(SeedInstance seedInstance, Vector3Int gridPosition, Vector3 worldPosition)
     {
-        if (showDebugMessages)
-            Debug.Log($"[PlantPlacementManager] TryPlantSeedInstance called for seed: {seedInstance?.seedName ?? "null"}");
-        
         if (seedInstance == null)
         {
             if (showDebugMessages)
@@ -10741,17 +9782,10 @@ public class PlantPlacementManager : MonoBehaviour
 
         // Check if position is still valid
         if (!CanPlantAtPosition(gridPosition))
-        {
-            if (showDebugMessages)
-                Debug.Log($"Cannot plant: Position {gridPosition} is not valid for planting.");
             return false;
-        }
 
         // Calculate planting position
         Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
-        
-        if (showDebugMessages)
-            Debug.Log($"[PlantPlacementManager] Planting at position: {plantingPosition}");
         
         // Spawn the plant
         GameObject plantObj = SpawnPlantFromSeed(seedInstance, plantingPosition);
@@ -10772,11 +9806,6 @@ public class PlantPlacementManager : MonoBehaviour
             }
             
             return true;
-        }
-        else
-        {
-            if (showDebugMessages)
-                Debug.LogError($"Failed to spawn plant from seed: {seedInstance.seedName}");
         }
         return false;
     }
@@ -10826,7 +9855,7 @@ public class PlantPlacementManager : MonoBehaviour
     }
 
     /// <summary>
-    /// FIXED: Spawn a plant from a SeedInstance
+    /// NEW: Spawn a plant from a SeedInstance
     /// </summary>
     private GameObject SpawnPlantFromSeed(SeedInstance seedInstance, Vector3 position)
     {
@@ -10850,22 +9879,46 @@ public class PlantPlacementManager : MonoBehaviour
             // Convert seed to NodeGraph
             NodeGraph nodeGraph = seedInstance.ToNodeGraph();
             
-            if (nodeGraph == null || nodeGraph.nodes == null || nodeGraph.nodes.Count == 0)
+            if (nodeGraph == null)
             {
-                Debug.LogError($"Failed to convert seed '{seedInstance.seedName}' to NodeGraph or NodeGraph is empty!");
+                Debug.LogError($"Failed to convert seed '{seedInstance.seedName}' to NodeGraph!");
                 Destroy(plantObj);
                 return null;
             }
 
-            if (showDebugMessages)
-                Debug.Log($"Converted seed to NodeGraph with {nodeGraph.nodes.Count} nodes");
-
             // Initialize the plant
             growthComponent.InitializeAndGrow(nodeGraph);
-            
-            if (showDebugMessages)
-                Debug.Log($"Plant spawned and initialized successfully: {plantObj.name}");
-            
+            return plantObj;
+        }
+        else
+        {
+            Debug.LogError("Plant prefab missing PlantGrowth component! Destroying spawned object.");
+            Destroy(plantObj);
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// LEGACY: Spawn a plant using the original NodeGraph system
+    /// </summary>
+    private GameObject SpawnPlant(NodeGraph graphToSpawn, Vector3 position)
+    {
+        if (plantPrefab == null)
+        {
+            Debug.LogError("Cannot spawn plant: Plant prefab not assigned.");
+            return null;
+        }
+
+        if (showDebugMessages)
+            Debug.Log($"SpawnPlant called with position: {position}");
+    
+        GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
+
+        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+        if (growthComponent != null)
+        {
+            NodeGraph graphCopy = CloneNodeGraph(graphToSpawn);
+            growthComponent.InitializeAndGrow(graphCopy);
             return plantObj;
         }
         else
@@ -10894,6 +9947,54 @@ public class PlantPlacementManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    // --- Legacy Helper Methods (kept for compatibility) ---
+
+    private NodeGraph CloneNodeGraph(NodeGraph original)
+    {
+        NodeGraph copy = new NodeGraph();
+        copy.nodes = new List<NodeData>();
+
+        foreach (NodeData originalNode in original.nodes)
+        {
+            if (originalNode == null) continue;
+
+            NodeData newNode = new NodeData
+            {
+                nodeId = originalNode.nodeId,
+                nodeDisplayName = originalNode.nodeDisplayName,
+                orderIndex = originalNode.orderIndex,
+                canBeDeleted = originalNode.canBeDeleted
+            };
+
+            newNode.effects = CloneEffectsList(originalNode.effects);
+            copy.nodes.Add(newNode);
+        }
+
+        return copy;
+    }
+
+    private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
+    {
+        if (originalList == null) return new List<NodeEffectData>();
+
+        List<NodeEffectData> newList = new List<NodeEffectData>();
+        foreach (var originalEffect in originalList)
+        {
+            if (originalEffect == null) continue;
+
+            NodeEffectData newEffect = new NodeEffectData
+            {
+                effectType = originalEffect.effectType,
+                primaryValue = originalEffect.primaryValue,
+                secondaryValue = originalEffect.secondaryValue,
+                isPassive = originalEffect.isPassive,
+                scentDefinitionReference = originalEffect.scentDefinitionReference
+            };
+            newList.Add(newEffect);
+        }
+        return newList;
     }
     
     private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
