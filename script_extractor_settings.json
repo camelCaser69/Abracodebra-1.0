@@ -1,5 +1,5 @@
 {
-    "max_chars_per_file": 70000,
+    "max_chars_per_file": 900000,
     "scripts_directories": ["Assets/Scripts", "Assets/Editor"],
     "treeBlacklist_directories": ["TextMesh Pro", "Sprites"],
     "main_output_filename": "Unity_EXTRACTED_scripts",
