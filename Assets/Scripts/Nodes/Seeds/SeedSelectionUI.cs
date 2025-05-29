@@ -1,4 +1,4 @@
-﻿// FILE: Assets/Scripts/Genetics/SeedSelectionUI.cs
+﻿// FILE: Assets/Scripts/Nodes/Seeds/SeedSelectionUI.cs (FIXED)
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,7 +18,7 @@ public class SeedSelectionUI : MonoBehaviour
     public TMP_Text instructionText;
     
     [Header("Settings")]
-    [SerializeField] private bool showDebugLogs = false;
+    [SerializeField] private bool showDebugLogs = true; // Changed to true for debugging
     
     // Current state
     private System.Action<SeedInstance> onSeedSelectedCallback;
@@ -42,10 +42,27 @@ public class SeedSelectionUI : MonoBehaviour
             Debug.LogError("[SeedSelectionUI] Seed Button Prefab not assigned!", this);
         if (seedButtonContainer == null)
             Debug.LogError("[SeedSelectionUI] Seed Button Container not assigned!", this);
+        if (selectionPanel == null)
+            Debug.LogError("[SeedSelectionUI] Selection Panel not assigned!", this);
         
-        // Start hidden
+        // CRITICAL FIX: Ensure panel starts inactive but the GameObject itself is active
         if (selectionPanel != null)
+        {
             selectionPanel.SetActive(false);
+            if (showDebugLogs)
+                Debug.Log("[SeedSelectionUI] Panel set to inactive in Awake");
+        }
+    }
+    
+    void Start()
+    {
+        // Additional safety check
+        if (selectionPanel != null && selectionPanel.activeSelf)
+        {
+            selectionPanel.SetActive(false);
+            if (showDebugLogs)
+                Debug.Log("[SeedSelectionUI] Panel was active in Start, forcing inactive");
+        }
     }
     
     void OnDestroy()
@@ -63,6 +80,9 @@ public class SeedSelectionUI : MonoBehaviour
     /// <param name="onSeedSelected">Callback when a seed is selected</param>
     public void ShowSeedSelection(System.Action<SeedInstance> onSeedSelected)
     {
+        if (showDebugLogs)
+            Debug.Log("[SeedSelectionUI] ShowSeedSelection called");
+        
         if (PlayerGeneticsInventory.Instance == null)
         {
             Debug.LogError("[SeedSelectionUI] PlayerGeneticsInventory not found!");
@@ -82,6 +102,9 @@ public class SeedSelectionUI : MonoBehaviour
             return;
         }
         
+        if (showDebugLogs)
+            Debug.Log($"[SeedSelectionUI] Found {plantableSeeds.Count} plantable seeds");
+        
         // Update UI text
         if (titleText != null)
             titleText.text = "Select Seed to Plant";
@@ -91,12 +114,39 @@ public class SeedSelectionUI : MonoBehaviour
         // Create seed buttons
         CreateSeedButtons(plantableSeeds);
         
-        // Show panel
+        // CRITICAL FIX: Force panel active and ensure it's visible
         if (selectionPanel != null)
+        {
+            // Make sure parent chain is active
+            Transform current = selectionPanel.transform;
+            while (current != null)
+            {
+                if (!current.gameObject.activeInHierarchy && current.gameObject != selectionPanel)
+                {
+                    if (showDebugLogs)
+                        Debug.LogWarning($"[SeedSelectionUI] Parent {current.name} was inactive, activating");
+                    current.gameObject.SetActive(true);
+                }
+                current = current.parent;
+            }
+            
             selectionPanel.SetActive(true);
-        
-        if (showDebugLogs)
-            Debug.Log($"[SeedSelectionUI] Showing selection with {plantableSeeds.Count} seeds");
+            
+            // Force canvas update
+            Canvas canvas = selectionPanel.GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                canvas.enabled = false;
+                canvas.enabled = true;
+            }
+            
+            if (showDebugLogs)
+                Debug.Log($"[SeedSelectionUI] Panel activated. Active: {selectionPanel.activeSelf}, ActiveInHierarchy: {selectionPanel.activeInHierarchy}");
+        }
+        else
+        {
+            Debug.LogError("[SeedSelectionUI] Selection Panel is null!");
+        }
     }
     
     /// <summary>
@@ -104,6 +154,9 @@ public class SeedSelectionUI : MonoBehaviour
     /// </summary>
     public void HideSelection()
     {
+        if (showDebugLogs)
+            Debug.Log("[SeedSelectionUI] HideSelection called");
+            
         if (selectionPanel != null)
             selectionPanel.SetActive(false);
             
@@ -117,10 +170,16 @@ public class SeedSelectionUI : MonoBehaviour
     private void CreateSeedButtons(List<SeedInstance> seeds)
     {
         if (seedButtonContainer == null || seedButtonPrefab == null)
+        {
+            Debug.LogError("[SeedSelectionUI] CreateSeedButtons: Missing container or prefab");
             return;
+        }
             
         // Clear existing buttons
         ClearSeedButtons();
+        
+        if (showDebugLogs)
+            Debug.Log($"[SeedSelectionUI] Creating {seeds.Count} seed buttons");
         
         // Create button for each seed
         foreach (SeedInstance seed in seeds)
@@ -135,7 +194,13 @@ public class SeedSelectionUI : MonoBehaviour
                 
             buttonComponent.Initialize(seed, this);
             currentSeedButtons.Add(buttonObj);
+            
+            if (showDebugLogs)
+                Debug.Log($"[SeedSelectionUI] Created button for seed: {seed.seedName}");
         }
+        
+        // Force layout update
+        LayoutRebuilder.ForceRebuildLayoutImmediate(seedButtonContainer.GetComponent<RectTransform>());
     }
     
     private void ClearSeedButtons()
@@ -146,6 +211,9 @@ public class SeedSelectionUI : MonoBehaviour
                 DestroyImmediate(button);
         }
         currentSeedButtons.Clear();
+        
+        if (showDebugLogs)
+            Debug.Log("[SeedSelectionUI] Cleared all seed buttons");
     }
     
     /// <summary>
@@ -182,10 +250,19 @@ public class SeedSelectionUI : MonoBehaviour
     /// </summary>
     public void AttemptAutoSelection(System.Action<SeedInstance> onSeedSelected)
     {
+        if (showDebugLogs)
+            Debug.Log("[SeedSelectionUI] AttemptAutoSelection called");
+            
         if (PlayerGeneticsInventory.Instance == null)
+        {
+            Debug.LogError("[SeedSelectionUI] PlayerGeneticsInventory.Instance is null!");
             return;
+        }
             
         List<SeedInstance> plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
+        
+        if (showDebugLogs)
+            Debug.Log($"[SeedSelectionUI] Found {plantableSeeds.Count} plantable seeds for auto selection");
         
         if (plantableSeeds.Count == 1)
         {
@@ -198,6 +275,9 @@ public class SeedSelectionUI : MonoBehaviour
         else if (plantableSeeds.Count > 1)
         {
             // Show selection UI
+            if (showDebugLogs)
+                Debug.Log("[SeedSelectionUI] Multiple seeds available, showing selection UI");
+                
             ShowSeedSelection(onSeedSelected);
         }
         else
@@ -206,5 +286,10 @@ public class SeedSelectionUI : MonoBehaviour
             Debug.LogWarning("[SeedSelectionUI] No plantable seeds available for auto-selection!");
         }
     }
+    
+    // Public method to check if UI is currently visible
+    public bool IsVisible()
+    {
+        return selectionPanel != null && selectionPanel.activeSelf;
+    }
 }
-

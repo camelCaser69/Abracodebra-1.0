@@ -3835,6 +3835,7 @@ GameObject:
   m_Component:
   - component: {fileID: 588608147}
   - component: {fileID: 588608148}
+  - component: {fileID: 588608149}
   m_Layer: 5
   m_Name: GeneSequenceContainer
   m_TagString: Untagged
@@ -3887,6 +3888,20 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &588608149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 588608146}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 003c1debafc44dfd8160c58f4b990336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  normalColor: {r: 0.9, g: 0.9, b: 0.9, a: 1}
+  highlightColor: {r: 0.8, g: 1, b: 0.8, a: 1}
 --- !u!1 &601788439
 GameObject:
   m_ObjectHideFlags: 0
@@ -4106,7 +4121,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 616907317}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
@@ -11466,6 +11481,7 @@ MonoBehaviour:
   geneItemPrefab: {fileID: 6553735160218590187, guid: 3b5156b21f5b5ae4a9be89489f34714f, type: 3}
   seedItemPrefab: {fileID: 4383812656932159126, guid: 25f84d2b892d6c2439ea4f1ae33d821b, type: 3}
   sequenceItemPrefab: {fileID: 4383812656932159126, guid: 127170cee932e8745b61d5a6dddd7c7f, type: 3}
+  dropZonePrefab: {fileID: 2459339482194286303, guid: 04cc95f44173d6841adabed9e0ba98d7, type: 3}
   detailsTitleText: {fileID: 1500336507}
   detailsDescriptionText: {fileID: 259162474}
   detailsScrollRect: {fileID: 1367193749}
@@ -17335,11 +17351,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startingGenes:
   - gene: {fileID: 11400000, guid: 155e1e1e7c78be942b9e766f383efc47, type: 2}
-    count: 0
+    count: 3
   - gene: {fileID: 11400000, guid: 4493db067ab561f46934373e4bb2851a, type: 2}
-    count: 0
+    count: 1
   - gene: {fileID: 11400000, guid: a9515042c727d2646bfe7af12231b8eb, type: 2}
-    count: 0
+    count: 2
   startingSeedDefinitions:
   - {fileID: 11400000, guid: b4df32460473dbf4b9750c43f156ecde, type: 2}
   - {fileID: 11400000, guid: b4df32460473dbf4b9750c43f156ecde, type: 2}
@@ -24640,13 +24656,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1893376532}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.392}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.19215687}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -25340,7 +25356,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1987653151}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 

@@ -35,6 +35,8 @@ public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerE
             return;
         }
         
+        Debug.Log($"[PlantotronSeedItem] Initializing seed item for: {seed.seedName}");
+        
         // Setup UI elements
         if (seedNameText != null)
             seedNameText.text = seed.seedName;
@@ -57,6 +59,11 @@ public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerE
         {
             selectButton.onClick.RemoveAllListeners();
             selectButton.onClick.AddListener(OnSelectButtonClicked);
+            Debug.Log($"[PlantotronSeedItem] Select button configured for {seed.seedName}");
+        }
+        else
+        {
+            Debug.LogWarning($"[PlantotronSeedItem] Select button is null for {seed.seedName}!");
         }
         
         if (deleteButton != null)
@@ -68,6 +75,8 @@ public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerE
         // Set initial background color
         if (backgroundImage != null)
             backgroundImage.color = normalColor;
+        
+        Debug.Log($"[PlantotronSeedItem] Successfully initialized: {seed.seedName}");
     }
     
     public void OnPointerEnter(PointerEventData eventData)
@@ -87,18 +96,38 @@ public class PlantotronSeedItem : MonoBehaviour, IPointerEnterHandler, IPointerE
     
     public void OnPointerClick(PointerEventData eventData)
     {
+        Debug.Log($"[PlantotronSeedItem] OnPointerClick fired for {seed?.seedName ?? "null seed"}");
+        
         if (parentUI != null && seed != null)
+        {
+            Debug.Log($"[PlantotronSeedItem] Calling OnSeedSelected for {seed.seedName}");
             parentUI.OnSeedSelected(seed);
+        }
+        else
+        {
+            Debug.LogError($"[PlantotronSeedItem] OnPointerClick failed - parentUI: {parentUI != null}, seed: {seed != null}");
+        }
     }
     
     private void OnSelectButtonClicked()
     {
+        Debug.Log($"[PlantotronSeedItem] Select button clicked for {seed?.seedName ?? "null seed"}");
+        
         if (parentUI != null && seed != null)
+        {
+            Debug.Log($"[PlantotronSeedItem] Calling OnSeedSelected from button for {seed.seedName}");
             parentUI.OnSeedSelected(seed);
+        }
+        else
+        {
+            Debug.LogError($"[PlantotronSeedItem] Button click failed - parentUI: {parentUI != null}, seed: {seed != null}");
+        }
     }
     
     private void OnDeleteButtonClicked()
     {
+        Debug.Log($"[PlantotronSeedItem] Delete button clicked for {seed?.seedName ?? "null seed"}");
+        
         if (seed != null && PlayerGeneticsInventory.Instance != null)
         {
             PlayerGeneticsInventory.Instance.RemoveSeed(seed);

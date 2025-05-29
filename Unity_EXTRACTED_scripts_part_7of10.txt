@@ -1,8 +1,8 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-28 18:59:47
-PART 6 OF 9
+UNITY PROJECT SCRIPT EXPORT - 2025-05-29 10:42:16
+PART 7 OF 10
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -68,6 +68,7 @@ Assets
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
 │   │       ├── Panels
+│   │       │   ├── Panel_DropZone.prefab
 │   │       │   ├── Panel_GeneListItem.prefab
 │   │       │   ├── Panel_GeneSequenceItem.prefab
 │   │       │   ├── Panel_SeedListItem.prefab
@@ -193,6 +194,7 @@ Assets
 │   │   │   ├── PlantotronGeneSequenceItem.cs
 │   │   │   ├── PlantotronMachine.cs
 │   │   │   ├── PlantotronSeedItem.cs
+│   │   │   ├── PlantotronSequenceDropZone.cs
 │   │   │   ├── PlantotronUI.cs
 │   │   │   ├── PlayerGeneticsInventory.cs
 │   │   │   ├── SeedDefinition.cs
@@ -264,356 +266,9 @@ SCRIPT CONTENTS
 ================================================================================
 
 ////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\SeedInstance.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/SeedInstance.cs
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-
-[System.Serializable]
-public class SeedInstance
-{
-    [Header("Seed Identity")]
-    public string seedName;
-    public string seedId; // Unique identifier for this specific seed instance
-    
-    [Header("Genetic Data")]
-    public SeedDefinition baseSeedDefinition;
-    public List<NodeDefinition> currentGenes = new List<NodeDefinition>();
-    
-    [Header("Metadata")]
-    public bool isModified = false;
-    public DateTime creationTime;
-    
-    // Default constructor
-    public SeedInstance()
-    {
-        seedId = Guid.NewGuid().ToString();
-        creationTime = DateTime.Now;
-    }
-    
-    // Constructor from SeedDefinition
-    public SeedInstance(SeedDefinition seedDef)
-    {
-        if (seedDef == null)
-        {
-            Debug.LogError("Cannot create SeedInstance from null SeedDefinition!");
-            return;
-        }
-        
-        seedId = Guid.NewGuid().ToString();
-        creationTime = DateTime.Now;
-        baseSeedDefinition = seedDef;
-        seedName = seedDef.seedName;
-        currentGenes = seedDef.CloneInitialGenes();
-        isModified = false;
-    }
-    
-    /// <summary>
-    /// Copy constructor for creating duplicates
-    /// </summary>
-    public SeedInstance(SeedInstance original)
-    {
-        if (original == null)
-        {
-            Debug.LogError("Cannot create SeedInstance from null original!");
-            return;
-        }
-        
-        seedId = Guid.NewGuid().ToString(); // Always generate new ID
-        creationTime = DateTime.Now;
-        baseSeedDefinition = original.baseSeedDefinition;
-        seedName = original.seedName;
-        isModified = original.isModified;
-        
-        // Deep copy the genes list
-        currentGenes = new List<NodeDefinition>();
-        if (original.currentGenes != null)
-        {
-            foreach (var gene in original.currentGenes)
-            {
-                if (gene != null)
-                {
-                    currentGenes.Add(gene);
-                }
-            }
-        }
-    }
-    
-    /// <summary>
-    /// Checks if current genes match the original seed definition
-    /// </summary>
-    public bool GenesMatchOriginal()
-    {
-        if (baseSeedDefinition == null || baseSeedDefinition.initialGenes == null)
-            return false;
-            
-        if (currentGenes == null)
-            return baseSeedDefinition.initialGenes.Count == 0;
-            
-        if (currentGenes.Count != baseSeedDefinition.initialGenes.Count)
-            return false;
-            
-        for (int i = 0; i < currentGenes.Count; i++)
-        {
-            if (currentGenes[i] != baseSeedDefinition.initialGenes[i])
-                return false;
-        }
-        
-        return true;
-    }
-    
-    /// <summary>
-    /// Updates the modified flag based on current gene state
-    /// </summary>
-    public void UpdateModifiedStatus()
-    {
-        isModified = !GenesMatchOriginal();
-        
-        // Update seed name to reflect modification
-        if (baseSeedDefinition != null)
-        {
-            if (isModified && !seedName.Contains("(Modified)"))
-            {
-                seedName = baseSeedDefinition.seedName + " (Modified)";
-            }
-            else if (!isModified && seedName.Contains("(Modified)"))
-            {
-                seedName = baseSeedDefinition.seedName;
-            }
-        }
-    }
-    
-    /// <summary>
-    /// Adds a gene to the seed at the specified index
-    /// </summary>
-    public void AddGene(NodeDefinition gene, int index = -1)
-    {
-        if (gene == null) return;
-        
-        if (currentGenes == null)
-            currentGenes = new List<NodeDefinition>();
-            
-        if (index < 0 || index >= currentGenes.Count)
-        {
-            currentGenes.Add(gene);
-        }
-        else
-        {
-            currentGenes.Insert(index, gene);
-        }
-        
-        UpdateModifiedStatus();
-    }
-    
-    /// <summary>
-    /// Removes a gene from the seed at the specified index
-    /// </summary>
-    public bool RemoveGeneAt(int index)
-    {
-        if (currentGenes == null || index < 0 || index >= currentGenes.Count)
-            return false;
-            
-        currentGenes.RemoveAt(index);
-        UpdateModifiedStatus();
-        return true;
-    }
-    
-    /// <summary>
-    /// Moves a gene from one position to another
-    /// </summary>
-    public bool MoveGene(int fromIndex, int toIndex)
-    {
-        if (currentGenes == null || fromIndex < 0 || fromIndex >= currentGenes.Count || 
-            toIndex < 0 || toIndex >= currentGenes.Count || fromIndex == toIndex)
-            return false;
-            
-        NodeDefinition gene = currentGenes[fromIndex];
-        currentGenes.RemoveAt(fromIndex);
-        currentGenes.Insert(toIndex, gene);
-        UpdateModifiedStatus();
-        return true;
-    }
-    
-    /// <summary>
-    /// Converts this seed instance to a NodeGraph for planting
-    /// </summary>
-    public NodeGraph ToNodeGraph()
-    {
-        NodeGraph graph = new NodeGraph();
-        
-        if (currentGenes == null || currentGenes.Count == 0)
-        {
-            Debug.LogWarning($"SeedInstance '{seedName}' has no genes to convert to NodeGraph!");
-            return graph;
-        }
-        
-        // Convert each gene to NodeData
-        for (int i = 0; i < currentGenes.Count; i++)
-        {
-            NodeDefinition gene = currentGenes[i];
-            if (gene == null) continue;
-            
-            NodeData nodeData = new NodeData
-            {
-                nodeId = Guid.NewGuid().ToString(),
-                nodeDisplayName = gene.displayName,
-                orderIndex = i, // Top-to-bottom becomes order index
-                effects = gene.CloneEffects(),
-                canBeDeleted = true // Allow deletion in UI if needed
-            };
-            
-            graph.nodes.Add(nodeData);
-        }
-        
-        return graph;
-    }
-    
-    /// <summary>
-    /// Validates that this seed has the minimum requirements to grow
-    /// </summary>
-    public bool IsValidForPlanting()
-    {
-        if (currentGenes == null || currentGenes.Count == 0)
-            return false;
-            
-        // Check for required SeedSpawn effect
-        foreach (var gene in currentGenes)
-        {
-            if (gene != null && gene.effects != null)
-            {
-                foreach (var effect in gene.effects)
-                {
-                    if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        
-        return false;
-    }
-    
-    /// <summary>
-    /// Gets a summary description of this seed's genetic composition
-    /// </summary>
-    public string GetGeneticSummary()
-    {
-        if (currentGenes == null || currentGenes.Count == 0)
-            return "No genes present.";
-            
-        List<string> geneNames = new List<string>();
-        foreach (var gene in currentGenes)
-        {
-            if (gene != null && !string.IsNullOrEmpty(gene.displayName))
-            {
-                geneNames.Add(gene.displayName);
-            }
-        }
-        
-        if (geneNames.Count == 0)
-            return "No valid genes present.";
-            
-        return string.Join(" → ", geneNames);
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Nodes\Seeds\SeedSelectionButton.cs
-////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using System.Linq;
-
-// =====================================================================
-// Seed Selection Button Component
-// =====================================================================
-public class SeedSelectionButton : MonoBehaviour
-{
-    [Header("UI References")]
-    public TMP_Text seedNameText;
-    public TMP_Text seedInfoText;
-    public Image seedIcon;
-    public Button selectButton;
-    public Image backgroundImage;
-    
-    [Header("Visual Settings")]
-    public Color normalColor = Color.white;
-    public Color hoverColor = Color.yellow;
-    public Color modifiedColor = Color.cyan;
-    public Color vanillaColor = Color.green;
-    
-    private SeedInstance seed;
-    private SeedSelectionUI parentUI;
-    
-    public void Initialize(SeedInstance seedInstance, SeedSelectionUI ui)
-    {
-        seed = seedInstance;
-        parentUI = ui;
-        
-        if (seed == null || parentUI == null)
-        {
-            Debug.LogError("[SeedSelectionButton] Invalid initialization parameters!");
-            return;
-        }
-        
-        // Setup UI elements
-        if (seedNameText != null)
-            seedNameText.text = seed.seedName;
-            
-        if (seedInfoText != null)
-        {
-            string status = seed.isModified ? "Modified" : "Vanilla";
-            int geneCount = seed.currentGenes?.Count ?? 0;
-            seedInfoText.text = $"{status} • {geneCount} genes";
-            seedInfoText.color = seed.isModified ? modifiedColor : vanillaColor;
-        }
-        
-        if (seedIcon != null && seed.baseSeedDefinition != null)
-        {
-            seedIcon.sprite = seed.baseSeedDefinition.icon;
-        }
-        
-        // Setup select button
-        if (selectButton != null)
-        {
-            selectButton.onClick.RemoveAllListeners();
-            selectButton.onClick.AddListener(OnSelectButtonClicked);
-        }
-        
-        // Set initial background color
-        if (backgroundImage != null)
-            backgroundImage.color = normalColor;
-    }
-    
-    private void OnSelectButtonClicked()
-    {
-        if (parentUI != null && seed != null)
-            parentUI.OnSeedSelected(seed);
-    }
-    
-    void OnDestroy()
-    {
-        if (selectButton != null)
-            selectButton.onClick.RemoveAllListeners();
-    }
-}
-
-
-
-
-////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Seeds\SeedSelectionUI.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Genetics/SeedSelectionUI.cs
+﻿// FILE: Assets/Scripts/Nodes/Seeds/SeedSelectionUI.cs (FIXED)
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -633,7 +288,7 @@ public class SeedSelectionUI : MonoBehaviour
     public TMP_Text instructionText;
     
     [Header("Settings")]
-    [SerializeField] private bool showDebugLogs = false;
+    [SerializeField] private bool showDebugLogs = true; // Changed to true for debugging
     
     // Current state
     private System.Action<SeedInstance> onSeedSelectedCallback;
@@ -657,10 +312,27 @@ public class SeedSelectionUI : MonoBehaviour
             Debug.LogError("[SeedSelectionUI] Seed Button Prefab not assigned!", this);
         if (seedButtonContainer == null)
             Debug.LogError("[SeedSelectionUI] Seed Button Container not assigned!", this);
+        if (selectionPanel == null)
+            Debug.LogError("[SeedSelectionUI] Selection Panel not assigned!", this);
         
-        // Start hidden
+        // CRITICAL FIX: Ensure panel starts inactive but the GameObject itself is active
         if (selectionPanel != null)
+        {
             selectionPanel.SetActive(false);
+            if (showDebugLogs)
+                Debug.Log("[SeedSelectionUI] Panel set to inactive in Awake");
+        }
+    }
+    
+    void Start()
+    {
+        // Additional safety check
+        if (selectionPanel != null && selectionPanel.activeSelf)
+        {
+            selectionPanel.SetActive(false);
+            if (showDebugLogs)
+                Debug.Log("[SeedSelectionUI] Panel was active in Start, forcing inactive");
+        }
     }
     
     void OnDestroy()
@@ -678,6 +350,9 @@ public class SeedSelectionUI : MonoBehaviour
     /// <param name="onSeedSelected">Callback when a seed is selected</param>
     public void ShowSeedSelection(System.Action<SeedInstance> onSeedSelected)
     {
+        if (showDebugLogs)
+            Debug.Log("[SeedSelectionUI] ShowSeedSelection called");
+        
         if (PlayerGeneticsInventory.Instance == null)
         {
             Debug.LogError("[SeedSelectionUI] PlayerGeneticsInventory not found!");
@@ -697,6 +372,9 @@ public class SeedSelectionUI : MonoBehaviour
             return;
         }
         
+        if (showDebugLogs)
+            Debug.Log($"[SeedSelectionUI] Found {plantableSeeds.Count} plantable seeds");
+        
         // Update UI text
         if (titleText != null)
             titleText.text = "Select Seed to Plant";
@@ -706,12 +384,39 @@ public class SeedSelectionUI : MonoBehaviour
         // Create seed buttons
         CreateSeedButtons(plantableSeeds);
         
-        // Show panel
+        // CRITICAL FIX: Force panel active and ensure it's visible
         if (selectionPanel != null)
+        {
+            // Make sure parent chain is active
+            Transform current = selectionPanel.transform;
+            while (current != null)
+            {
+                if (!current.gameObject.activeInHierarchy && current.gameObject != selectionPanel)
+                {
+                    if (showDebugLogs)
+                        Debug.LogWarning($"[SeedSelectionUI] Parent {current.name} was inactive, activating");
+                    current.gameObject.SetActive(true);
+                }
+                current = current.parent;
+            }
+            
             selectionPanel.SetActive(true);
-        
-        if (showDebugLogs)
-            Debug.Log($"[SeedSelectionUI] Showing selection with {plantableSeeds.Count} seeds");
+            
+            // Force canvas update
+            Canvas canvas = selectionPanel.GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                canvas.enabled = false;
+                canvas.enabled = true;
+            }
+            
+            if (showDebugLogs)
+                Debug.Log($"[SeedSelectionUI] Panel activated. Active: {selectionPanel.activeSelf}, ActiveInHierarchy: {selectionPanel.activeInHierarchy}");
+        }
+        else
+        {
+            Debug.LogError("[SeedSelectionUI] Selection Panel is null!");
+        }
     }
     
     /// <summary>
@@ -719,6 +424,9 @@ public class SeedSelectionUI : MonoBehaviour
     /// </summary>
     public void HideSelection()
     {
+        if (showDebugLogs)
+            Debug.Log("[SeedSelectionUI] HideSelection called");
+            
         if (selectionPanel != null)
             selectionPanel.SetActive(false);
             
@@ -732,10 +440,16 @@ public class SeedSelectionUI : MonoBehaviour
     private void CreateSeedButtons(List<SeedInstance> seeds)
     {
         if (seedButtonContainer == null || seedButtonPrefab == null)
+        {
+            Debug.LogError("[SeedSelectionUI] CreateSeedButtons: Missing container or prefab");
             return;
+        }
             
         // Clear existing buttons
         ClearSeedButtons();
+        
+        if (showDebugLogs)
+            Debug.Log($"[SeedSelectionUI] Creating {seeds.Count} seed buttons");
         
         // Create button for each seed
         foreach (SeedInstance seed in seeds)
@@ -750,7 +464,13 @@ public class SeedSelectionUI : MonoBehaviour
                 
             buttonComponent.Initialize(seed, this);
             currentSeedButtons.Add(buttonObj);
+            
+            if (showDebugLogs)
+                Debug.Log($"[SeedSelectionUI] Created button for seed: {seed.seedName}");
         }
+        
+        // Force layout update
+        LayoutRebuilder.ForceRebuildLayoutImmediate(seedButtonContainer.GetComponent<RectTransform>());
     }
     
     private void ClearSeedButtons()
@@ -761,6 +481,9 @@ public class SeedSelectionUI : MonoBehaviour
                 DestroyImmediate(button);
         }
         currentSeedButtons.Clear();
+        
+        if (showDebugLogs)
+            Debug.Log("[SeedSelectionUI] Cleared all seed buttons");
     }
     
     /// <summary>
@@ -797,10 +520,19 @@ public class SeedSelectionUI : MonoBehaviour
     /// </summary>
     public void AttemptAutoSelection(System.Action<SeedInstance> onSeedSelected)
     {
+        if (showDebugLogs)
+            Debug.Log("[SeedSelectionUI] AttemptAutoSelection called");
+            
         if (PlayerGeneticsInventory.Instance == null)
+        {
+            Debug.LogError("[SeedSelectionUI] PlayerGeneticsInventory.Instance is null!");
             return;
+        }
             
         List<SeedInstance> plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
+        
+        if (showDebugLogs)
+            Debug.Log($"[SeedSelectionUI] Found {plantableSeeds.Count} plantable seeds for auto selection");
         
         if (plantableSeeds.Count == 1)
         {
@@ -813,6 +545,9 @@ public class SeedSelectionUI : MonoBehaviour
         else if (plantableSeeds.Count > 1)
         {
             // Show selection UI
+            if (showDebugLogs)
+                Debug.Log("[SeedSelectionUI] Multiple seeds available, showing selection UI");
+                
             ShowSeedSelection(onSeedSelected);
         }
         else
@@ -821,9 +556,13 @@ public class SeedSelectionUI : MonoBehaviour
             Debug.LogWarning("[SeedSelectionUI] No plantable seeds available for auto-selection!");
         }
     }
+    
+    // Public method to check if UI is currently visible
+    public bool IsVisible()
+    {
+        return selectionPanel != null && selectionPanel.activeSelf;
+    }
 }
-
-
 
 
 
@@ -1875,5 +1614,5 @@ public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
 
 --------------------------------------------------------------------------------
-This is part 6 out of 9 of script collection. 3 more parts remain.
+This is part 7 out of 10 of script collection. 3 more parts remain.
 --------------------------------------------------------------------------------

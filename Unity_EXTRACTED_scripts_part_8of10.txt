@@ -1,8 +1,8 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-28 18:59:47
-PART 7 OF 9
+UNITY PROJECT SCRIPT EXPORT - 2025-05-29 10:42:16
+PART 8 OF 10
 ================================================================================
 
 --------------------------------------------------------------------------------
@@ -68,6 +68,7 @@ Assets
 │   │       │   └── Seed_02.prefab
 │   │       ├── NodeView.prefab
 │   │       ├── Panels
+│   │       │   ├── Panel_DropZone.prefab
 │   │       │   ├── Panel_GeneListItem.prefab
 │   │       │   ├── Panel_GeneSequenceItem.prefab
 │   │       │   ├── Panel_SeedListItem.prefab
@@ -193,6 +194,7 @@ Assets
 │   │   │   ├── PlantotronGeneSequenceItem.cs
 │   │   │   ├── PlantotronMachine.cs
 │   │   │   ├── PlantotronSeedItem.cs
+│   │   │   ├── PlantotronSequenceDropZone.cs
 │   │   │   ├── PlantotronUI.cs
 │   │   │   ├── PlayerGeneticsInventory.cs
 │   │   │   ├── SeedDefinition.cs
@@ -795,7 +797,7 @@ public class PlantGrowthModifierManager : MonoBehaviour
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Tiles\Data\PlantPlacementManager.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Tiles/Data/PlantPlacementManager.cs (UPDATED for Seed System)
+﻿// FILE: Assets/Scripts/Tiles/Data/PlantPlacementManager.cs (FIXED)
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -821,7 +823,7 @@ public class PlantPlacementManager : MonoBehaviour
     [SerializeField] private List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
 
     [Header("Debug")]
-    [SerializeField] private bool showDebugMessages = true;
+    [SerializeField] private bool showDebugMessages = true; // Changed to true for debugging
     
     // Cache for quick lookup of invalid tiles
     private HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
@@ -884,7 +886,7 @@ public class PlantPlacementManager : MonoBehaviour
         RebuildInvalidTilesSet();
     }
 
-    // --- Position Management (unchanged) ---
+    // --- Position Management ---
     
     public bool IsPositionOccupied(Vector3Int gridPosition)
     {
@@ -931,62 +933,88 @@ public class PlantPlacementManager : MonoBehaviour
         }
     }
 
-    // --- NEW: Seed-based planting methods ---
+    // --- FIXED: Seed-based planting methods ---
 
     /// <summary>
-    /// NEW: Try to plant using seed selection system
+    /// FIXED: Try to plant using seed selection system
     /// </summary>
     public void TryPlantWithSeedSelection(Vector3Int gridPosition, Vector3 worldPosition, 
         System.Action onCompleted = null)
     {
+        if (showDebugMessages)
+            Debug.Log($"[PlantPlacementManager] TryPlantWithSeedSelection called at {gridPosition}");
+        
         // Basic validation
         if (!CanPlantAtPosition(gridPosition))
         {
+            if (showDebugMessages)
+                Debug.Log("[PlantPlacementManager] Cannot plant at position - validation failed");
             onCompleted?.Invoke();
             return;
         }
 
-        // Use seed selection UI
-        if (SeedSelectionUI.Instance != null && PlayerGeneticsInventory.Instance != null)
+        // CRITICAL FIX: Ensure SeedSelectionUI instance exists and is properly initialized
+        if (SeedSelectionUI.Instance == null)
         {
-            var plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
-            
-            if (plantableSeeds.Count == 0)
-            {
-                if (showDebugMessages)
-                    Debug.Log("Cannot plant: No plantable seeds available in inventory.");
-                onCompleted?.Invoke();
-                return;
-            }
-            
-            if (plantableSeeds.Count == 1)
-            {
-                // Auto-select single seed
-                TryPlantSeedInstance(plantableSeeds[0], gridPosition, worldPosition);
-                onCompleted?.Invoke();
-            }
-            else
-            {
-                // Show selection UI
-                SeedSelectionUI.Instance.ShowSeedSelection(selectedSeed => {
-                    TryPlantSeedInstance(selectedSeed, gridPosition, worldPosition);
-                    onCompleted?.Invoke();
-                });
-            }
+            Debug.LogError("[PlantPlacementManager] SeedSelectionUI.Instance is null! Make sure SeedSelectionUI exists in the scene.");
+            onCompleted?.Invoke();
+            return;
+        }
+        
+        if (PlayerGeneticsInventory.Instance == null)
+        {
+            Debug.LogError("[PlantPlacementManager] PlayerGeneticsInventory.Instance is null!");
+            onCompleted?.Invoke();
+            return;
+        }
+
+        var plantableSeeds = PlayerGeneticsInventory.Instance.GetPlantableSeeds();
+        
+        if (showDebugMessages)
+            Debug.Log($"[PlantPlacementManager] Found {plantableSeeds.Count} plantable seeds");
+        
+        if (plantableSeeds.Count == 0)
+        {
+            if (showDebugMessages)
+                Debug.Log("Cannot plant: No plantable seeds available in inventory.");
+            onCompleted?.Invoke();
+            return;
+        }
+        
+        if (plantableSeeds.Count == 1)
+        {
+            // Auto-select single seed
+            if (showDebugMessages)
+                Debug.Log($"[PlantPlacementManager] Auto-selecting single seed: {plantableSeeds[0].seedName}");
+            TryPlantSeedInstance(plantableSeeds[0], gridPosition, worldPosition);
+            onCompleted?.Invoke();
         }
         else
         {
+            // Show selection UI
             if (showDebugMessages)
-                Debug.LogError("Cannot plant: Seed selection system not available!");
-            onCompleted?.Invoke();
+                Debug.Log("[PlantPlacementManager] Showing seed selection UI for multiple seeds");
+            
+            SeedSelectionUI.Instance.ShowSeedSelection(selectedSeed => {
+                if (showDebugMessages)
+                    Debug.Log($"[PlantPlacementManager] Seed selected from UI: {selectedSeed?.seedName ?? "null"}");
+                if (selectedSeed != null)
+                {
+                    TryPlantSeedInstance(selectedSeed, gridPosition, worldPosition);
+                }
+                onCompleted?.Invoke();
+            });
         }
     }
 
     /// <summary>
-    /// NEW: Plant a specific seed instance
+    /// FIXED: Plant a specific seed instance
     /// </summary>
     public bool TryPlantSeedInstance(SeedInstance seedInstance, Vector3Int gridPosition, Vector3 worldPosition)
     {
+        if (showDebugMessages)
+            Debug.Log($"[PlantPlacementManager] TryPlantSeedInstance called for seed: {seedInstance?.seedName ?? "null"}");
+        
         if (seedInstance == null)
         {
             if (showDebugMessages)
@@ -1003,10 +1031,17 @@ public class PlantPlacementManager : MonoBehaviour
 
         // Check if position is still valid
         if (!CanPlantAtPosition(gridPosition))
+        {
+            if (showDebugMessages)
+                Debug.Log($"Cannot plant: Position {gridPosition} is not valid for planting.");
             return false;
+        }
 
         // Calculate planting position
         Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
+        
+        if (showDebugMessages)
+            Debug.Log($"[PlantPlacementManager] Planting at position: {plantingPosition}");
         
         // Spawn the plant
         GameObject plantObj = SpawnPlantFromSeed(seedInstance, plantingPosition);
@@ -1027,6 +1062,11 @@ public class PlantPlacementManager : MonoBehaviour
             }
             
             return true;
+        }
+        else
+        {
+            if (showDebugMessages)
+                Debug.LogError($"Failed to spawn plant from seed: {seedInstance.seedName}");
         }
         return false;
     }
@@ -1076,7 +1116,7 @@ public class PlantPlacementManager : MonoBehaviour
     }
 
     /// <summary>
-    /// NEW: Spawn a plant from a SeedInstance
+    /// FIXED: Spawn a plant from a SeedInstance
     /// </summary>
     private GameObject SpawnPlantFromSeed(SeedInstance seedInstance, Vector3 position)
     {
@@ -1100,46 +1140,22 @@ public class PlantPlacementManager : MonoBehaviour
             // Convert seed to NodeGraph
             NodeGraph nodeGraph = seedInstance.ToNodeGraph();
             
-            if (nodeGraph == null)
+            if (nodeGraph == null || nodeGraph.nodes == null || nodeGraph.nodes.Count == 0)
             {
-                Debug.LogError($"Failed to convert seed '{seedInstance.seedName}' to NodeGraph!");
+                Debug.LogError($"Failed to convert seed '{seedInstance.seedName}' to NodeGraph or NodeGraph is empty!");
                 Destroy(plantObj);
                 return null;
             }
 
+            if (showDebugMessages)
+                Debug.Log($"Converted seed to NodeGraph with {nodeGraph.nodes.Count} nodes");
+
             // Initialize the plant
             growthComponent.InitializeAndGrow(nodeGraph);
-            return plantObj;
-        }
-        else
-        {
-            Debug.LogError("Plant prefab missing PlantGrowth component! Destroying spawned object.");
-            Destroy(plantObj);
-            return null;
-        }
-    }
-
-    /// <summary>
-    /// LEGACY: Spawn a plant using the original NodeGraph system
-    /// </summary>
-    private GameObject SpawnPlant(NodeGraph graphToSpawn, Vector3 position)
-    {
-        if (plantPrefab == null)
-        {
-            Debug.LogError("Cannot spawn plant: Plant prefab not assigned.");
-            return null;
-        }
-
-        if (showDebugMessages)
-            Debug.Log($"SpawnPlant called with position: {position}");
-    
-        GameObject plantObj = Instantiate(plantPrefab, position, Quaternion.identity, plantParent);
-
-        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
-        if (growthComponent != null)
-        {
-            NodeGraph graphCopy = CloneNodeGraph(graphToSpawn);
-            growthComponent.InitializeAndGrow(graphCopy);
+            
+            if (showDebugMessages)
+                Debug.Log($"Plant spawned and initialized successfully: {plantObj.name}");
+            
             return plantObj;
         }
         else
@@ -1168,54 +1184,6 @@ public class PlantPlacementManager : MonoBehaviour
                 }
             }
         }
-    }
-
-    // --- Legacy Helper Methods (kept for compatibility) ---
-
-    private NodeGraph CloneNodeGraph(NodeGraph original)
-    {
-        NodeGraph copy = new NodeGraph();
-        copy.nodes = new List<NodeData>();
-
-        foreach (NodeData originalNode in original.nodes)
-        {
-            if (originalNode == null) continue;
-
-            NodeData newNode = new NodeData
-            {
-                nodeId = originalNode.nodeId,
-                nodeDisplayName = originalNode.nodeDisplayName,
-                orderIndex = originalNode.orderIndex,
-                canBeDeleted = originalNode.canBeDeleted
-            };
-
-            newNode.effects = CloneEffectsList(originalNode.effects);
-            copy.nodes.Add(newNode);
-        }
-
-        return copy;
-    }
-
-    private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
-    {
-        if (originalList == null) return new List<NodeEffectData>();
-
-        List<NodeEffectData> newList = new List<NodeEffectData>();
-        foreach (var originalEffect in originalList)
-        {
-            if (originalEffect == null) continue;
-
-            NodeEffectData newEffect = new NodeEffectData
-            {
-                effectType = originalEffect.effectType,
-                primaryValue = originalEffect.primaryValue,
-                secondaryValue = originalEffect.secondaryValue,
-                isPassive = originalEffect.isPassive,
-                scentDefinitionReference = originalEffect.scentDefinitionReference
-            };
-            newList.Add(newEffect);
-        }
-        return newList;
     }
     
     private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
@@ -1396,5 +1364,5 @@ public class TileInteractionLibrary : ScriptableObject
 
 
 --------------------------------------------------------------------------------
-This is part 7 out of 9 of script collection. 2 more parts remain.
+This is part 8 out of 10 of script collection. 2 more parts remain.
 --------------------------------------------------------------------------------

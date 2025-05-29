@@ -1,5 +1,6 @@
-﻿// FILE: Assets/Scripts/Genetics/PlantotronMachine.cs
+﻿// FILE: Assets/Scripts/Nodes/Seeds/PlantotronMachine.cs (FIXED)
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(Collider2D))]
 public class PlantotronMachine : MonoBehaviour
@@ -27,7 +28,7 @@ public class PlantotronMachine : MonoBehaviour
     public AudioClip activationSound;
     
     [Header("Debug")]
-    [SerializeField] private bool showDebugLogs = false;
+    [SerializeField] private bool showDebugLogs = true; // Changed to true for debugging
     
     // Internal state
     private bool playerInRange = false;
@@ -35,6 +36,8 @@ public class PlantotronMachine : MonoBehaviour
     private SpriteRenderer machineRenderer;
     private Material originalMaterial;
     private AudioSource audioSource;
+    private bool isUIOpen = false;
+    private Coroutine openUICoroutine;
     
     // Cache for player detection
     private const string PLAYER_TAG = "Player";
@@ -60,14 +63,20 @@ public class PlantotronMachine : MonoBehaviour
             originalMaterial = machineRenderer.material;
         }
         
-        // Ensure UI panel starts hidden
-        if (uiPanel != null)
+        // Validate UI panel
+        if (uiPanel == null)
         {
-            uiPanel.gameObject.SetActive(false);
+            Debug.LogError($"[PlantotronMachine] UI Panel not assigned on {gameObject.name}!", this);
         }
         else
         {
-            Debug.LogError($"[PlantotronMachine] UI Panel not assigned on {gameObject.name}!", this);
+            // CRITICAL FIX: Ensure UI starts properly closed
+            if (uiPanel.gameObject.activeSelf)
+            {
+                uiPanel.gameObject.SetActive(false);
+                if (showDebugLogs)
+                    Debug.Log("[PlantotronMachine] UI Panel was active in Awake, forcing inactive");
+            }
         }
         
         // Hide interaction prompt initially
@@ -142,7 +151,7 @@ public class PlantotronMachine : MonoBehaviour
         }
         
         // If player left range while UI is open, close it
-        if (!inRange && uiPanel != null && uiPanel.gameObject.activeSelf)
+        if (!inRange && isUIOpen)
         {
             CloseMachine();
         }
@@ -161,9 +170,7 @@ public class PlantotronMachine : MonoBehaviour
             return;
         }
         
-        bool isCurrentlyOpen = uiPanel.gameObject.activeSelf;
-        
-        if (isCurrentlyOpen)
+        if (isUIOpen)
         {
             CloseMachine();
         }
@@ -177,6 +184,9 @@ public class PlantotronMachine : MonoBehaviour
     {
         if (uiPanel == null) return;
         
+        if (showDebugLogs)
+            Debug.Log("[PlantotronMachine] Opening machine");
+        
         // Check if player has genetics inventory
         if (PlayerGeneticsInventory.Instance == null)
         {
@@ -184,7 +194,32 @@ public class PlantotronMachine : MonoBehaviour
             return;
         }
         
-        uiPanel.gameObject.SetActive(true);
+        // Stop any existing open coroutine
+        if (openUICoroutine != null)
+        {
+            StopCoroutine(openUICoroutine);
+        }
+        
+        // Start the opening process
+        openUICoroutine = StartCoroutine(OpenMachineCoroutine());
+    }
+    
+    private IEnumerator OpenMachineCoroutine()
+    {
+        isUIOpen = true;
+        
+        // Activate the UI GameObject first
+        if (!uiPanel.gameObject.activeSelf)
+        {
+            uiPanel.gameObject.SetActive(true);
+            if (showDebugLogs)
+                Debug.Log("[PlantotronMachine] Activated UI GameObject");
+        }
+        
+        // Wait a frame for the GameObject to be properly activated
+        yield return null;
+        
+        // Now call the UI's OpenUI method
         uiPanel.OpenUI();
         
         // Play activation sound
@@ -193,19 +228,39 @@ public class PlantotronMachine : MonoBehaviour
             audioSource.PlayOneShot(activationSound);
         }
         
-        // Pause the game or disable player movement if needed
+        // Optional: Pause the game or disable player movement
         // Time.timeScale = 0f; // Uncomment if you want to pause the game
         
         if (showDebugLogs)
-            Debug.Log("[PlantotronMachine] Machine opened");
+            Debug.Log("[PlantotronMachine] Machine opened successfully");
+            
+        openUICoroutine = null;
     }
     
     private void CloseMachine()
     {
         if (uiPanel == null) return;
         
+        if (showDebugLogs)
+            Debug.Log("[PlantotronMachine] Closing machine");
+        
+        // Stop any opening coroutine
+        if (openUICoroutine != null)
+        {
+            StopCoroutine(openUICoroutine);
+            openUICoroutine = null;
+        }
+        
+        isUIOpen = false;
+        
+        // Close the UI first
         uiPanel.CloseUI();
-        uiPanel.gameObject.SetActive(false);
+        
+        // Then deactivate the GameObject
+        if (uiPanel.gameObject.activeSelf)
+        {
+            uiPanel.gameObject.SetActive(false);
+        }
         
         // Resume the game if it was paused
         // Time.timeScale = 1f; // Uncomment if you paused the game
@@ -217,16 +272,16 @@ public class PlantotronMachine : MonoBehaviour
     // Public method for external scripts to open/close the machine
     public void SetMachineOpen(bool open)
     {
-        if (open)
+        if (open && !isUIOpen)
             OpenMachine();
-        else
+        else if (!open && isUIOpen)
             CloseMachine();
     }
     
     // Public method to check if machine is currently open
     public bool IsMachineOpen()
     {
-        return uiPanel != null && uiPanel.gameObject.activeSelf;
+        return isUIOpen;
     }
     
     void OnDrawGizmosSelected()
@@ -249,6 +304,11 @@ public class PlantotronMachine : MonoBehaviour
         if (machineRenderer != null && originalMaterial != null)
         {
             machineRenderer.material = originalMaterial;
+        }
+        
+        if (openUICoroutine != null)
+        {
+            StopCoroutine(openUICoroutine);
         }
     }
 }
