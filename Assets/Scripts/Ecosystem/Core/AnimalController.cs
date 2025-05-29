@@ -52,6 +52,11 @@ public class AnimalController : MonoBehaviour
     public float foodReassessmentInterval = 0.5f;
     private float foodReassessmentTimer = 0f;
 
+    // --- NEW: Starvation damage settings ---
+    [Header("Starvation Settings")]
+    [Tooltip("Damage per second when hunger is at maximum")]
+    public float starvationDamageRate = 2f;
+
     // --- Internal State ---
     private float currentHealth;
     private float currentHunger;
@@ -272,14 +277,31 @@ public class AnimalController : MonoBehaviour
     { 
         currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime; 
         currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
+        
+        // Check for starvation damage when hunger reaches maximum
+        if (currentHunger >= animalDiet.maxHunger)
+        {
+            ApplyStarvationDamage();
+        }
+        
         // Update hunger text when hunger changes
         UpdateHungerText();
     }
     
     void ApplyStarvationDamage() 
     { 
-        /* ... */ 
-        UpdateHpText(); 
+        // Apply damage over time when starving
+        float damage = starvationDamageRate * Time.deltaTime;
+        currentHealth -= damage;
+        currentHealth = Mathf.Max(0f, currentHealth);
+        
+        UpdateHpText();
+        
+        // Die if health reaches zero
+        if (currentHealth <= 0f)
+        {
+            Die(CauseOfDeath.Starvation);
+        }
     }
     
     void HandlePooping() 
@@ -668,5 +690,4 @@ public class AnimalController : MonoBehaviour
             animator.speed = Mathf.Max(0.5f, speedRatio); // Don't go below half speed
         }
     }
-
 }

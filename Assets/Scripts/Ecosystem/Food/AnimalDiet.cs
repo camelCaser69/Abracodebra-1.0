@@ -77,6 +77,10 @@ public class AnimalDiet : ScriptableObject
         {
             if (collider == null) continue;
 
+            // BUGFIX: Skip objects with PoopController to prevent animals from eating poop
+            PoopController poopController = collider.GetComponent<PoopController>();
+            if (poopController != null) continue;
+
             FoodItem foodItem = collider.GetComponent<FoodItem>();
 
             // Must have FoodItem and its FoodType must be edible by this diet

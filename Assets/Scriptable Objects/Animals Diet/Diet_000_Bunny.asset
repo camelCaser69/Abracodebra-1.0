@@ -20,5 +20,5 @@ MonoBehaviour:
     satiationAmount: 10
     preferencePriority: 1
   maxHunger: 20
-  hungerIncreaseRate: 0.5
+  hungerIncreaseRate: 1
   hungerThreshold: 10
