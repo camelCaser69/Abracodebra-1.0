@@ -98,7 +98,14 @@ public class WaterReflection : MonoBehaviour
 
     void Awake()
     {
-        ResolveSettings(); // Determine actual settings to use
+        // Initialize with local settings first, will be updated in Start if manager exists
+        _actualReflectionOpacity = localReflectionOpacity;
+        _actualReflectionTint = localReflectionTint;
+        _actualGradientFadeBaseMaterial = localGradientFadeBaseMaterial;
+        _actualSortingOrderOffset = localSortingOrderOffset;
+        _actualUseWaterMasking = localUseWaterMasking;
+        _actualWaterTilemapTag = localWaterTilemapTag;
+        _actualShowDebugInfo = localShowDebugInfo;
 
         originalRenderer = GetComponent<SpriteRenderer>();
         originalAnimator = GetComponent<Animator>();
@@ -160,6 +167,7 @@ public class WaterReflection : MonoBehaviour
 
     void Start()
     {
+        ResolveSettings(); // Now resolve settings after all Awake() calls are completed
         UpdateReflectionVisuals();
         UpdateReflectionTransform();
         CacheCurrentState();
