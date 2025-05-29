@@ -3,203 +3,242 @@
 **Last Updated:** 2025-05-29  
 **Project Structure Version:** 1.0
 
-## 📁 Folder Structure
+## 📁 Folder Structure & Key Systems
 
-### Assets/Scripts/
-Core gameplay and system scripts organized by domain:
+### Assets/Scripts/Battle/
+Plant lifecycle, combat, and environmental effects
+- **Plant/**
+  - `PlantGrowth.cs` - Main plant controller with partial classes
+  - `PlantGrowth.Cell.cs` - Cell management and visual spawning
+  - `PlantGrowth.Growth.cs` - Time-based growth coroutines
+  - `PlantGrowth.NodeExecution.cs` - Mature cycle node execution
+  - `PlantCell.cs` - Individual cell behavior and destruction tracking
+  - `LeafData.cs` - Leaf state for regrowth mechanics
+  - `WeatherManager.cs` - Day/night cycle with pause/time scaling
+- **SpellProjectile.cs** - Projectile behavior with scent application
+- **Status Effects/** - Burning and other status effect system
 
-- **Battle/** - Plant growth, weather, and status effects
-  - Plant/ - PlantGrowth system with cell-based architecture
-  - Status Effects/ - Status effect system (e.g., burning)
-  - SpellProjectile.cs - Projectile behavior
+### Assets/Scripts/Ecosystem/
+Living world simulation with interconnected systems
+- **Core/**
+  - `EcosystemManager.cs` - Central coordinator with ScentLibrary reference
+  - `FaunaManager.cs` - Animal spawning with functional offset system
+  - `FloraManager.cs` - Plant visualization (scent radii, poop absorption)
+  - `AnimalController.cs` - Complex AI with diet, thoughts, slowdown zones
+  - `WaveManager.cs` - Wave-based animal spawning with pause controls
+  - `PoopController.cs` - Fertilizer mechanics with collider requirements
+  - `ScentSource.cs` - Scent emission with definition references
+  - `ThoughtBubbleController.cs` - AI thought display system
+  - `SlowdownZone.cs` - Area-based speed modification
 
-- **Ecosystem/** - Plant and animal simulation
-  - Animals/ - Animal definitions and library
-  - Core/ - Managers (Ecosystem, Fauna, Flora) and controllers
-  - Effects/ - Environmental effects (e.g., Firefly system)
-  - Food/ - Food types and animal diet system
-  - Scents/ - Scent system definitions and library
+- **Animals/** - `AnimalDefinition.cs`, `AnimalLibrary.cs`
+- **Food/** - `AnimalDiet.cs`, `FoodItem.cs`, `FoodType.cs`
+- **Scents/** - `ScentDefinition.cs`, `ScentLibrary.cs`
+- **Effects/** - `FireflyController.cs`, `FireflyManager.cs` with attraction lines
 
-- **Nodes/** - Node-based plant genetics system
-  - Core/ - Node definitions, effects, and library
-  - Runtime/ - Node execution and graph system
-  - UI/ - Node editor interface and interactions
+### Assets/Scripts/Nodes/
+Visual node programming system for plant genetics
+- **Core/**
+  - `NodeDefinition.cs` - ScriptableObject with effect cloning
+  - `NodeDefinitionLibrary.cs` - Collection with initial node configs
+  - `NodeData.cs` - Runtime data with deletion flags
+  - `NodeEffectData.cs` - Effect configuration with ScentDefinition refs
+  - `NodeEffectType.cs` - Comprehensive enum of all effect types
+  - `OutputNodeEffect.cs` - Projectile spawning with scent application
 
-- **Player/** - Player controls
-  - GardenerController.cs - Main player controller
+- **Runtime/**
+  - `NodeExecutor.cs` - Plant spawning from UI graphs
+  - `NodeGraph.cs` - Graph data structure
 
-- **Tiles/** - Tile system and ground mechanics
-  - Data/ - Tile definitions, interactions, and placement
-  - Editor/ - Custom editors for tile system
-  - Tools/ - Tool system for ground modification
+- **UI/**
+  - `NodeEditorGridController.cs` - Main UI controller with dropdown system
+  - `NodeCell.cs` - Individual cell logic with selection handling
+  - `NodeView.cs` - Visual representation with tooltips
+  - `NodeDraggable.cs` - Drag-and-drop functionality
+  - Helper classes for selection and interaction
 
-- **Visuals/** - Visual effects and post-processing
-  - Night color post-processing
-  - Plant outlines and shadows
-  - Water reflections
-  - Pixel perfect camera setup
+### Assets/Scripts/Player/
+- `GardenerController.cs` - Player movement, tool integration, speed modifiers
+
+### Assets/Scripts/Tiles/
+Dual-grid tile system with tool interactions
+- **Data/**
+  - `TileInteractionManager.cs` - Central tile system with refill rules
+  - `TileDefinition.cs` - Individual tile properties with auto-reversion
+  - `TileInteractionLibrary.cs` - Rules for tool→tile transformations + refills
+  - `PlantGrowthModifierManager.cs` - Tile-based growth speed/energy modifiers
+  - `PlantPlacementManager.cs` - Seed planting with randomization
+  - `PlayerTileInteractor.cs` - Player input bridge
+
+- **Tools/**
+  - `ToolDefinition.cs` - Tool properties with usage limits
+  - `ToolSwitcher.cs` - Tool management with events and refill system
+  - `ToolType.cs` - Tool enumeration
+
+- **Editor/** - Custom editors for tile system
+
+### Assets/Scripts/Visuals/
+Rendering effects and visual enhancements
+- `PlantOutlineController.cs` - Dynamic plant outlines
+- `PlantShadowController.cs` - Plant shadows with distance fading
+- `OutlinePartController.cs` - Individual outline parts
+- `ShadowPartController.cs` - Individual shadow parts with fade
+- `WaterReflection.cs` - Water surface reflections with masking
+- `WaterReflectionManager.cs` - Global reflection settings
+- `RuntimeCircleDrawer.cs` - Debug circle visualization
+- `NightColorPostProcess.cs` - Dynamic post-processing for day/night
+- `PixelPerfectSetup.cs` - Camera configuration for pixel art
+
+### Assets/Scripts/Core/
+- `SortableEntity.cs` - Automatic sprite sorting for 2D depth
 
 ### Assets/Editor/
-Node system editor tools:
+Automated node system tools
+- `NodeDefinitionAutoAdder.cs` - Auto-adds nodes to libraries
+- `NodeDefinitionCreator.cs` - Creates numbered node assets
+- `NodeDefinitionEditor.cs` - Custom inspector with large effect list
+- `NodeDefinitionLibraryEditor.cs` - Library management with UPDATE button
+- `NodeDefinitionPostprocessor.cs` - Auto-naming for node assets
+- `NodeEffectDrawer.cs` - Custom property drawer for effects
 
-- **NodeDefinitionAutoAdder.cs** - Automated node setup
-- **NodeDefinitionCreator.cs** - Node creation tools
-- **NodeDefinitionEditor.cs** - Node property editor
-- **NodeDefinitionLibraryEditor.cs** - Node library management
-- **NodeDefinitionPostprocessor.cs** - Asset post-processing
-- **NodeEffectDrawer.cs** - Visual effect property drawer
+## 🔄 Data Flow Architecture
 
-Additional editor tools are located within their respective systems (e.g., Tiles/Editor/)
-
-### Assets/Scriptable Objects/
-Data-driven configuration assets:
-
-- **Animals/** - Animal behavior definitions
-- **Animals Diet/** - Diet preferences and rules
-- **Food/** - Food item properties
-- **Life Thoughts/** - AI thought patterns
-- **Nodes Plant/** - Plant genetics node definitions
-- **Scents/** - Scent system configurations
-- **Tiles/** - Tile type definitions
-- **Tools/** - Tool behavior settings
-- **Waves/** - Wave/pattern definitions
-
-## 🔄 Data Flow
-
-### Plant Growth System
-```mermaid
-graph TD
-    A[Node Graph] --> B[PlantGrowth]
-    B --> C[PlantCell]
-    C --> D[LeafData]
-    B --> E[WeatherManager]
-    E --> F[Growth Rate]
-    F --> C
-    C --> G[Visual Updates]
-    G --> H[Outlines]
-    G --> I[Shadows]
+### Plant Growth Pipeline
+```
+NodeGraph (UI) → PlantGrowth.InitializeAndGrow() → CalculateAndApplyStats() → 
+GrowthCoroutine_TimeBased() → SpawnCellVisual() → PlantCell instances → 
+Visual Effects (Shadows, Outlines) → Mature Cycle Execution
 ```
 
-### Ecosystem Simulation
-```mermaid
-graph TD
-    A[EcosystemManager] --> B[FaunaManager]
-    B --> C[AnimalController]
-    C --> D[AnimalDefinition]
-    C --> E[AnimalDiet]
-    F[ScentSource] --> G[ScentLibrary]
-    G --> C
-    C --> H[ThoughtBubble]
-    I[FireflyManager] --> J[FireflyController]
-    K[FloraManager] --> L[FoodItem]
+### Ecosystem Simulation Loop
+```
+WaveManager → FaunaManager → AnimalController → AnimalDiet → FoodItem consumption → 
+PoopController → PlantGrowth fertilizer absorption → Leaf regrowth → ScentSource → 
+Animal attraction/repulsion
 ```
 
-### Tile Interaction
-```mermaid
-graph TD
-    A[GardenerController] --> B[ToolSwitcher]
-    B --> C[ToolDefinition]
-    C --> D[PlayerTileInteractor]
-    D --> E[TileInteractionManager]
-    E --> F[TileDefinition]
-    F --> G[PlantGrowthModifier]
-    G --> H[PlantPlacement]
+### Tile Interaction Flow
 ```
+Input → PlayerTileInteractor → ToolSwitcher → TileInteractionManager → 
+TileDefinition lookup → PlantPlacementManager (for seeds) OR 
+TileInteractionRule application → PlantGrowthModifierManager updates
+```
+
+### Node System Workflow
+```
+NodeDefinitionLibrary → NodeEditorGridController → NodeCell/NodeView → 
+NodeDraggable → NodeExecutor.SpawnPlantFromUIGraph() → PlantGrowth initialization
+```
+
+## 🏗️ Key Architectural Patterns
+
+### Partial Classes
+- `PlantGrowth` split into logical concerns (Cell, Growth, NodeExecution)
+
+### ScriptableObject Data
+- Heavy use of ScriptableObjects for configuration
+- Auto-population systems in Editor scripts
+- Runtime cloning for instance isolation
+
+### Event-Driven Communication
+- ToolSwitcher events for UI updates
+- WeatherManager phase changes
+- Animal thought system
+
+### Manager Singleton Pattern
+- EcosystemManager, TileInteractionManager, PlantGrowthModifierManager
+- Instance-based access with validation
+
+### Component-Based Effects
+- Visual effects as separate components (shadows, outlines)
+- Modular tool system
+- Drag-and-drop UI components
 
 ## 🔌 External Dependencies
 
-### Core Dependencies
-- Unity Universal RP
-- New Input System
+### Unity Packages
+- Universal RP (URP 2D Renderer)
+- New Input System (InputSystem_Actions.inputactions)
 - TextMesh Pro
+- 2D Tilemap Extras
 
-### Custom Packages
-- DualGrid (com.skner.dualgrid)
-- HueFolders
+### Third-Party Packages
+- **DualGrid** (com.skner.dualgrid) - Wang tile implementation
+- **HueFolders** - Asset organization
 
-## 🏗️ Architecture
+## 🎮 Critical System Interactions
 
-### Core Systems
-1. **Node System**
-   - Extensible node framework
-   - Visual node editor
-   - Runtime execution engine
+### Plant-Ecosystem Integration
+- Plants emit ScentSources based on NodeEffects
+- Animals consume FoodItems (plant berries/leaves)
+- Poop fertilizer enables leaf regrowth
+- Weather affects photosynthesis rates
 
-2. **Ecosystem**
-   - Decentralized AI
-   - Event-driven interactions
-   - State management
+### UI-Runtime Bridge
+- NodeEditorGridController builds NodeGraphs
+- NodeExecutor spawns real PlantGrowth instances
+- PlantPlacementManager validates tile compatibility
 
-3. **Tile System**
-   - Dual-grid implementation
-   - Wang tile rules
-   - Ground modification
-
-## 🔄 Recent Changes
-
-### Latest Updates
-- Node system optimization
-- Animal AI improvements
-- Visual effect enhancements
-
-### Structural Changes
-- Modular script organization
-- Enhanced editor tools
-- Performance optimizations
+### Tool-World Integration
+- ToolSwitcher manages state and events
+- TileInteractionManager processes tool actions
+- PlantGrowthModifierManager applies tile effects
+- Refill rules allow tool restoration
 
 ## 📊 Performance Considerations
 
 ### Critical Paths
-1. Node graph execution
-2. Animal AI updates
-3. Tile system modifications
-4. Visual effect rendering
+1. **PlantGrowth.Update()** - Growth percentage UI updates
+2. **AnimalController.Update()** - AI decision making, movement
+3. **TileInteractionManager.Update()** - Hover detection, timed reversions
+4. **Visual Effects LateUpdate()** - Shadow/outline synchronization
 
-### Optimization Targets
-- Batch plant updates
-- Cache AI decisions
-- Pool visual effects
-- Minimize physics calls
+### Optimization Strategies
+- Coroutine-based plant growth (time-distributed)
+- Cached tile lookups with dictionaries
+- Event-driven UI updates
+- Pooled visual effects (circles, lines)
 
-## 🧪 Testing
+### Scaling Concerns
+- Animal AI updates (50+ animals)
+- Plant visual effects (100+ plants)
+- Tile system performance (large maps)
+- Node graph execution complexity
 
-### Test Coverage
-- Editor tools: High
-- Core systems: Medium
-- Visual effects: Low
+## 🧪 Testing Infrastructure
 
-### Test Priorities
-1. Node execution accuracy
-2. AI behavior consistency
-3. Tool interaction reliability
-4. Performance benchmarks
+### Play Mode Tests
+- Critical for PlantGrowth lifecycle
+- Animal AI behavior validation
+- Tool interaction verification
 
-## 📝 Documentation Files
+### Editor Tests
+- Node definition validation
+- Asset reference integrity
+- ScriptableObject cloning
 
-### Core Documentation
-- **projectRoadmap.md** - Project vision and milestones
-- **currentTask.md** - Active development focus
-- **techStack.md** - Technical configuration
-- **codebaseSummary.md** - This file
+### Manual Testing Hooks
+- Debug visualization toggles
+- Performance profiling markers
+- State inspection tools
 
-### Additional References
-- DualgridPackage_user-guide.md
-- DualgridPackage_cheatsheet.md
+## 📝 Development Patterns
 
-## 🔍 Code Style
+### Code Organization
+- Namespace consistency (no explicit namespaces used)
+- Logical file grouping by system
+- Clear separation of concerns
 
-### Conventions
-- PascalCase for types
-- camelCase for fields/properties
-- Regions for logical grouping
-- XML documentation on public APIs
+### Asset Management
+- Auto-numbering for ScriptableObjects
+- Library auto-population
+- Reference validation systems
 
-### Best Practices
-- Single responsibility principle
-- Event-driven communication
-- Data-driven configuration
-- Editor tool automation
+### Error Handling
+- Null reference checking
+- Component validation
+- Graceful degradation
 
 ---
 
-**Next Update:** When making significant architectural changes or adding new systems
+**Next Update:** When adding major systems or refactoring existing architecture

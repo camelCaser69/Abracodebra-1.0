@@ -6,162 +6,249 @@
 ## 🌱 Plant Systems
 
 ### Node Graph System
-A visual programming system for defining plant genetics and growth patterns.
+Visual programming system for defining plant genetics and behaviors.
 
-- **Node Definition**: ScriptableObject that defines a single genetic trait
-- **Node Effect**: Runtime behavior executed during plant growth
-- **Node Library**: Collection of available genetic traits
-- **Node Graph**: Connected network of nodes defining a plant's complete genetics
-- **Node Execution**: Process of evaluating node effects during growth
+- **NodeDefinition**: ScriptableObject defining a genetic trait with effects and visuals
+- **NodeEffectData**: Individual effect configuration with type, values, and scent references  
+- **NodeEffectType**: Enum of all possible effects (passive growth traits, active mature effects)
+- **NodeGraph**: Runtime collection of NodeData representing a complete plant genome
+- **NodeData**: Runtime instance of a node with order index and deletion permissions
+- **NodeDefinitionLibrary**: Collection of available nodes with initial spawn configurations
 
 ### Plant Growth System
-Manages the lifecycle and visual representation of plants.
+Manages plant lifecycle from seed to mature organism.
 
-- **Growth Stage**: Discrete step in plant development
-- **Growth Manager**: Coordinates growth across all plants
-- **Growth Pattern**: Specific arrangement of stems and leaves
-- **Growth Rate**: Speed of development, affected by conditions
-- **Growth State**: Current development status of a plant
+- **PlantGrowth**: Main controller with partial classes (Cell, Growth, NodeExecution)
+- **PlantCell**: Individual cell instances with type (Seed, Stem, Leaf, Fruit) and parent references
+- **GrowthStep**: Pre-calculated growth sequence for time-based development
+- **LeafData**: Tracking structure for leaf regrowth mechanics after consumption
+- **Growth State**: Current phase (Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing)
+- **Cell Spacing**: 0.08f unit grid spacing for precise plant structure
+
+### Plant Effects System
+Visual and behavioral effects attached to plants.
+
+- **PlantShadowController**: Dynamic shadow generation with distance fading
+- **PlantOutlineController**: Dynamic outline generation tracking cell additions/removals
+- **ScentSource**: Scent emission component with definition references and modifiers
+- **OutputNodeEffect**: Projectile spawning component for active plant abilities
 
 ## 🦊 Ecosystem Systems
 
-### Animal AI
-Decentralized artificial intelligence system for creature behavior.
+### Animal AI System
+Decentralized intelligence for creature behavior and decision making.
 
-- **Behavior Tree**: Decision-making structure
-- **Thought Pattern**: Sequence of AI considerations
-- **Diet Preference**: Food type and priority settings
-- **Movement Pattern**: Wandering and navigation logic
-- **State Machine**: Current behavior status
+- **AnimalController**: Main AI controller with diet, movement, thoughts, and speed modifiers
+- **AnimalDefinition**: ScriptableObject defining species traits, visuals, and base stats
+- **AnimalDiet**: Food preference system with satiation values and priority rankings
+- **DietPreferenceSimplified**: Individual food type preference with priority and satiation
+- **AnimalSpawnData**: Wave spawning configuration with rate multipliers and limits
+
+### Thought & Communication System
+AI personality and communication mechanics.
+
+- **AnimalThoughtLibrary**: Collection of species-specific thought patterns
+- **AnimalThoughtLine**: Individual thought with trigger conditions and text options
+- **ThoughtTrigger**: Enum of AI states (Hungry, Eating, HealthLow, Fleeing, Pooping)
+- **ThoughtBubbleController**: Visual thought display with lifetime and positioning
+
+### Food & Consumption System
+Resource management for ecosystem sustainability.
+
+- **FoodType**: ScriptableObject defining food properties and categories
+- **FoodItem**: Component marking objects as consumable with type reference
+- **Consumption Flow**: FoodItem → AnimalDiet lookup → Satiation → Poop production
+- **PoopController**: Fertilizer lifecycle with auto-cleanup and collision detection
 
 ### Scent System
-Propagation and detection of environmental signals.
+Environmental communication through chemical signals.
 
-- **Scent Type**: Category of environmental signal
-- **Scent Radius**: Area of effect for a scent
-- **Scent Strength**: Intensity of the signal
-- **Scent Layer**: Specific type of scent information
-- **Scent Response**: How entities react to scents
+- **ScentDefinition**: ScriptableObject defining scent properties and visual effects
+- **ScentLibrary**: Central collection of all available scent types
+- **ScentSource**: Component emitting scents with radius and strength modifiers
+- **Scent Detection**: Animal AI uses scent sources for attraction/repulsion behaviors
 
-## 🗺️ Tile Systems
+## 🗺️ Tile & Environment Systems
 
-### Dual-Grid System
-Two-layer tile system for ground and object placement.
+### Dual-Grid Tile System
+Two-layer tilemap system for seamless terrain and interactions.
 
-- **Base Grid**: Primary ground tile layer
-- **Object Grid**: Secondary interactive layer
-- **Wang Tiles**: Context-aware tile connections
-- **Tile State**: Current condition of a tile
-- **Tile Modifier**: Effect applied to a tile
+- **DualGridTilemapModule**: Third-party component managing data/render tilemap pairs
+- **TileDefinition**: ScriptableObject defining tile properties, colors, and behaviors
+- **TileDefinitionMapping**: Links TileDefinition to DualGridTilemapModule in manager
+- **Wang Tiles**: Context-aware tile connections for seamless terrain
+- **Auto-Reversion**: Time-based tile state changes with configurable delays
 
-### Ground System
-Manages soil conditions and environmental factors.
+### Tile Interaction System
+Player tool interactions with environment modification.
 
-- **Soil Type**: Base ground material
-- **Moisture Level**: Water content in soil
-- **Fertility**: Growth-supporting capability
-- **Temperature**: Local heat level
-- **Modification**: Changes from tool use
+- **TileInteractionManager**: Central processor for all tile modifications
+- **TileInteractionRule**: Configuration for tool + tile → new tile transformations
+- **TileInteractionLibrary**: Collection of transformation and refill rules
+- **ToolRefillRule**: Configuration for tool restoration at specific tiles
+- **Hover System**: Real-time tile detection with range validation
+
+### Plant Placement System
+Seed planting with environmental validation and randomization.
+
+- **PlantPlacementManager**: Handles plant spawning with tile validation
+- **Placement Validation**: Checks tile compatibility and existing plant conflicts
+- **Position Randomization**: Offset placement within tile bounds for organic feel
+- **Spawn Radius**: Configurable randomization distance with pixel-perfect snapping
+
+### Growth Modifier System
+Environmental effects on plant development and energy.
+
+- **PlantGrowthModifierManager**: Applies tile-based modifiers to plant stats
+- **TileGrowthModifier**: Configuration linking tiles to speed/energy multipliers
+- **Growth Speed Multiplier**: Affects time between growth steps
+- **Energy Recharge Multiplier**: Affects photosynthesis and energy accumulation
+- **Tile Update Tracking**: Monitors plant position changes for modifier updates
 
 ## 🛠️ Tool Systems
 
-### Tool Manager
-Handles player interaction with the environment.
+### Tool Management
+Player interaction tools with usage limits and state management.
 
-- **Tool Type**: Category of interaction
-- **Tool State**: Current condition/charges
-- **Tool Effect**: Impact on environment
-- **Tool Range**: Area of influence
-- **Tool Cooldown**: Usage limitations
+- **ToolDefinition**: ScriptableObject defining tool properties, icons, and usage limits
+- **ToolType**: Enum of available tools (Hoe, WateringCan, SeedPouch)
+- **ToolSwitcher**: Manager for tool selection, usage tracking, and events
+- **Usage Limits**: Configurable limited uses with refill mechanics
+- **Tool Events**: OnToolChanged and OnUsesChanged for UI integration
 
-### Interaction System
-Processes player actions with the world.
+### Tool Interaction Processing
+Handles tool application to environment with validation.
 
-- **Action Type**: Category of interaction
-- **Action Target**: Affected object/area
-- **Action Result**: Outcome of interaction
-- **Action Chain**: Sequence of effects
-- **Action Validation**: Input verification
+- **PlayerTileInteractor**: Input handler requiring ToolSwitcher component
+- **Tool Application**: Hover validation → Use consumption → Effect application
+- **Refill Mechanics**: Water tiles refill WateringCan, other rules configurable
+- **Range Validation**: Distance checks and target tile validation
+
+## 🌤️ Weather & Time Systems
+
+### Weather Management
+Day/night cycle with environmental effects.
+
+- **WeatherManager**: Central time controller with phase transitions
+- **CyclePhase**: Enum (Day, TransitionToNight, Night, TransitionToDay)
+- **Sun Intensity**: 0-1 value affecting photosynthesis and visual effects
+- **Time Scaling**: Configurable speed multiplier with pause functionality
+- **Phase Events**: OnPhaseChanged event for system synchronization
+
+### Environmental Effects
+Systems responding to weather and time changes.
+
+- **Photosynthesis**: Plant energy generation based on sunlight and firefly proximity
+- **Animal Spawning**: Fireflies spawn at night, other animals via wave system
+- **Visual Effects**: Post-processing changes based on sun intensity
+- **Growth Rates**: Weather affects plant development speed
 
 ## 🎨 Visual Systems
 
-### Shader Effects
+### Dynamic Visual Effects
+Real-time visual enhancements for plant representation.
+
+- **Shadow System**: PlantShadowController with configurable angle, squash, and distance fade
+- **Outline System**: PlantOutlineController with cell tracking and exclusion rules
+- **Water Reflection**: WaterReflection with gradient fading and water masking
+- **Runtime Visualization**: Debug circles and lines for scent radii and firefly attraction
+
+### Shader & Material System
 Custom rendering for unique visual styles.
 
-- **Outline Shader**: Object boundary rendering
-- **Water Reflection**: Surface water effects
-- **Emission**: Glowing elements
-- **Overlay**: Additional visual layers
-- **Post-Processing**: Global visual effects
+- **Water Reflection Shader**: Custom gradient fading based on distance from origin
+- **Emissive Materials**: Glowing effects for fireflies and special elements
+- **Post-Processing**: NightColorPostProcess for day/night visual transitions
+- **Pixel Perfect**: PixelPerfectSetup for consistent pixel art rendering
 
-### Animation System
-Handles visual movement and transitions.
+### Sorting & Layering
+Depth management for 2D rendering.
 
-- **Animation State**: Current motion status
-- **Animation Blend**: Transition between states
-- **Animation Event**: Timed triggers
-- **Animation Layer**: Priority and masking
-- **Animation Override**: Custom motion sets
+- **SortableEntity**: Automatic sprite sorting based on Y position
+- **Sorting Layers**: Configured layers for shadows, main objects, outlines, UI
+- **Sorting Order**: Automatic assignment based on tilemap priority and object hierarchy
+- **Parent Y Coordinate**: Option for child objects to use parent position for sorting
 
 ## ⚙️ Core Systems
 
-### Event System
-Manages communication between systems.
+### Ecosystem Management
+Central coordination of all living systems.
 
-- **Event Type**: Category of message
-- **Event Data**: Transmitted information
-- **Event Handler**: Response logic
-- **Event Queue**: Message processing order
-- **Event Filter**: Selective handling
+- **EcosystemManager**: Singleton coordinator with library references
+- **FaunaManager**: Animal spawning with functional offset and bounds management
+- **FloraManager**: Plant visualization with debug toggles for scent/poop radius
+- **Wave System**: WaveManager with pause controls and spawning coordination
 
-### Save System
-Handles persistence of game state.
+### Spawning & Population Control
+Management of entity creation and lifecycle.
 
-- **Save Data**: Stored information
-- **Save Format**: Data structure
-- **Save Validation**: Data integrity checks
-- **Save Version**: Compatibility tracking
-- **Save Migration**: Format updates
+- **WaveDefinition**: ScriptableObject defining spawn patterns and timing
+- **WaveSpawnEntry**: Individual spawn configuration with delays and locations
+- **WaveSpawnLocationType**: Enum (GlobalSpawnArea, RandomNearPlayer, Offscreen)
+- **Population Limits**: Configurable maximum entities per type
 
-## 🎮 Input Systems
+### State Management
+Persistent data and configuration systems.
 
-### Input Manager
-Processes player control signals.
+- **ScriptableObject Architecture**: Heavy use for data-driven configuration
+- **Library Pattern**: Central collections (NodeDefinitionLibrary, ScentLibrary, etc.)
+- **Auto-Population**: Editor scripts automatically update libraries
+- **Reference Validation**: Runtime checks for missing or null references
 
-- **Input Action**: Mapped control
-- **Input State**: Current control status
-- **Input Binding**: Control mapping
-- **Input Context**: Control mode
-- **Input Priority**: Control hierarchy
+## 🎮 Input & UI Systems
 
-### Camera System
-Manages game view and rendering.
+### Input Management
+Player control processing and tool interaction.
 
-- **Camera Mode**: View configuration
-- **Camera Target**: Focus object/area
-- **Camera Bounds**: Movement limits
-- **Camera Effect**: Visual modifications
-- **Camera Layer**: Render masking
+- **Input System**: New Unity Input System with InputSystem_Actions asset
+- **Control Mapping**: WASD movement, Q/E tool switching, Tab node editor
+- **Context Switching**: Different input maps for gameplay vs UI modes
+- **Tool Integration**: Direct input processing through PlayerTileInteractor
+
+### Node Editor UI
+Visual programming interface for plant genetics.
+
+- **NodeEditorGridController**: Main UI controller with grid-based layout
+- **NodeCell**: Individual cell logic with selection and drop handling
+- **NodeView**: Visual representation with tooltips and effect display
+- **NodeDraggable**: Drag-and-drop functionality with canvas group management
+- **Auto-Layout**: Automatic cell positioning and dropdown menu handling
+
+### User Interface Integration
+UI elements responding to game state.
+
+- **Tool UI**: Real-time display of current tool and remaining uses
+- **Growth UI**: Plant growth percentage display with continuous/discrete modes
+- **Debug UI**: Hover tile information and system status displays
+- **Selection System**: Node selection with highlight states and keyboard shortcuts
 
 ## 🔧 Development Tools
 
-### Debug Tools
-Aids in development and testing.
+### Editor Automation
+Custom Unity Editor tools for asset management.
 
-- **State Inspector**: Runtime monitoring
-- **Performance Monitor**: Resource tracking
-- **Visual Debugger**: Graphical debugging
-- **Log System**: Error tracking
-- **Test Framework**: Automated testing
+- **NodeDefinitionAutoAdder**: Automatically adds new nodes to libraries
+- **NodeDefinitionCreator**: Creates auto-numbered node assets
+- **NodeDefinitionPostprocessor**: Auto-renames and organizes node assets
+- **NodeEffectDrawer**: Custom property drawer for effect configuration
+- **Library Management**: UPDATE buttons for refreshing ScriptableObject collections
 
-### Editor Tools
-Custom Unity Editor extensions.
+### Debug & Visualization Tools
+Development aids for system monitoring and debugging.
 
-- **Node Editor**: Genetic design tool
-- **Tile Editor**: Ground design tool
-- **Preview System**: Pre-runtime visualization
-- **Batch Tools**: Mass operations
-- **Asset Processors**: Import automation
+- **Runtime Circle Drawer**: Dynamic circle visualization for radii and ranges
+- **Scent Radius Visualization**: Toggle-able display of scent source ranges
+- **Poop Absorption Visualization**: Debug display for fertilizer detection ranges
+- **Firefly Attraction Lines**: Visual lines showing firefly-scent attraction
+- **Performance Monitoring**: Built-in debug logging and state inspection
+
+### Asset Management
+Organization and validation systems for project assets.
+
+- **HueFolders**: Asset organization with color-coded folder system
+- **Auto-Numbering**: Consistent naming for ScriptableObject assets
+- **Reference Tracking**: Validation systems for asset dependencies
+- **Assembly Definitions**: Logical grouping for faster compilation
 
 ---
 

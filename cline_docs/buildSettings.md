@@ -33,7 +33,8 @@
   "Allow Debugging": true,
   "Wait For Managed Debugger": false,
   "Script Debugging": true,
-  "Profiler": true
+  "Profiler": true,
+  "Deep Profiling": false
 }
 ```
 
@@ -43,7 +44,8 @@
   "Development Build": false,
   "Strip Engine Code": true,
   "Optimize Mesh Data": true,
-  "IL2CPP": true,
+  "IL2CPP": false,
+  "Mono": true,
   "Compression Method": "LZ4"
 }
 ```
@@ -51,11 +53,11 @@
 ## 🎨 Graphics Settings
 
 ### Quality Levels
-1. **Ultra**
-   - Anti-aliasing: Disabled (pixel art)
+1. **Ultra (Default)**
+   - Anti-aliasing: Disabled (pixel art style)
    - Texture Quality: Full
-   - Shadows: Disabled
-   - Post Processing: Full
+   - Shadows: Disabled (2D game)
+   - Post Processing: Full (Night color effects, water reflections)
 
 2. **High**
    - Anti-aliasing: Disabled
@@ -71,9 +73,9 @@
 
 4. **Low**
    - Anti-aliasing: Disabled
-   - Texture Quality: Full
+   - Texture Quality: Half
    - Shadows: Disabled
-   - Post Processing: Minimal
+   - Post Processing: Disabled
 
 ### URP Asset Settings
 ```json
@@ -83,7 +85,9 @@
   "Cast Shadows": false,
   "Soft Shadows": false,
   "Additional Lights": 0,
-  "HDR": true
+  "HDR": true,
+  "MSAA": "Disabled",
+  "Render Pipeline": "UniversalRP"
 }
 ```
 
@@ -91,115 +95,152 @@
 
 ### Bundle Settings
 - **Compression:** LZ4
-- **Include In Build:** false
+- **Include In Build:** Core assets only
 - **Load Type:** On Demand
 - **Bundle Identifier:** Hash
 
 ### Bundle Groups
 1. **Core Assets**
-   - Essential game data
-   - Always included
+   - Essential systems (PlantGrowth, WeatherManager)
+   - Core UI elements
+   - Input System actions
 
-2. **Plant Assets**
-   - Node definitions
-   - Growth patterns
-   - Visual assets
+2. **Node System Assets**
+   - NodeDefinition ScriptableObjects
+   - Node effect configurations
+   - NodeDefinitionLibrary assets
 
-3. **Animal Assets**
-   - Behavior definitions
-   - Animation data
-   - Sound effects
+3. **Ecosystem Assets**
+   - AnimalDefinition ScriptableObjects
+   - ScentDefinition assets
+   - FoodType definitions
+   - ThoughtLibrary configurations
 
-4. **Environment**
-   - Tile sets
-   - Background elements
-   - Weather effects
+4. **Environment Assets**
+   - TileDefinition assets
+   - Dual-grid rule tiles
+   - ToolDefinition configs
+   - WaveDefinition assets
+
+5. **Visual Effects**
+   - Firefly materials
+   - Water reflection shaders
+   - Plant shadow/outline prefabs
+   - Post-processing profiles
 
 ## 🔒 Security Settings
 
 ### Code Protection
-- **IL2CPP Scripting Backend**
-- **Code Stripping: Medium**
-- **Anti-Cheat: Basic**
-- **Managed Stripping: Medium**
+- **Scripting Backend:** Mono (for development)
+- **Code Stripping:** Minimal (preserve reflection)
+- **Anti-Cheat:** None (single-player focused)
+- **Managed Stripping:** Disabled
 
 ### Data Protection
-- **Encrypted Player Prefs**
-- **Obfuscated Save Data**
-- **Protected Assets**
-- **Secure File I/O**
+- **Player Prefs:** Standard Unity
+- **Save Data:** JSON serialization
+- **Asset Protection:** Standard
+- **File I/O:** Standard Unity
 
 ## 🚀 Distribution Settings
 
-### Steam Build
-- **Steam SDK:** Latest
-- **DRM:** Steam
-- **Cloud Saves:** Enabled
-- **Achievements:** Enabled
-- **Workshop:** Planned
-
 ### Standalone Build
 - **DRM:** None
-- **Auto-Updates:** Built-in
-- **Save Location:** AppData
-- **Config:** Local
+- **Auto-Updates:** Not implemented
+- **Save Location:** AppData/LocalLow
+- **Config:** Local settings
+- **Resolution:** Pixel-perfect scaling
+
+### Future Steam Build
+- **Steam SDK:** TBD
+- **DRM:** Steam (if needed)
+- **Cloud Saves:** Planned
+- **Achievements:** Planned
+- **Workshop:** Potential node sharing
 
 ## 📊 Performance Settings
 
 ### Memory
-- **Managed Heap:** 512MB
+- **Managed Heap:** 256MB (2D focused)
 - **Job Thread Count:** Auto
-- **GC Settings:** Incremental
-- **Memory Profile:** Balanced
+- **GC Settings:** Standard
+- **Memory Profile:** 2D Optimized
 
 ### Loading
-- **Preload Assets:** Minimal
-- **Load Scene Async:** true
-- **Background Loading:** true
-- **Asset Warmup:** true
+- **Preload Assets:** Node definitions, core prefabs
+- **Load Scene Async:** false (single scene focus)
+- **Background Loading:** false
+- **Asset Warmup:** ScriptableObjects
 
 ## 🔍 Debug Settings
 
 ### Development
-- **Deep Profiling:** Optional
+- **Deep Profiling:** Optional (performance impact)
 - **Stack Traces:** Full
 - **Exception Handling:** Full
 - **Log Level:** Verbose
+- **Custom Debug:** FloraManager visualization, NodeGraph debugging
 
 ### Testing
-- **Automated Tests:** Enabled
-- **Performance Tests:** Optional
-- **Coverage:** Basic
-- **Validation:** Full
+- **Automated Tests:** PlayMode tests for critical systems
+- **Performance Tests:** PlantGrowth scaling, Animal AI load
+- **Coverage:** Core systems (PlantGrowth, EcosystemManager)
+- **Validation:** NodeGraph integrity, asset references
 
 ## 📱 Input Settings
 
 ### Controls
-- **Input System:** New
+- **Input System:** New Unity Input System
 - **Default Scheme:** Keyboard/Mouse
-- **Fallback:** Classic Input
-- **Touch:** Supported
+- **Primary Actions:**
+  - WASD/Arrow Keys: Player movement
+  - Q/E: Tool switching
+  - Left Click: Tool usage
+  - Tab: Node editor toggle
+  - Delete: Node deletion
+  - Right Click: Context menus
 
 ### Customization
-- **Rebinding:** Supported
-- **Schemes:** Multiple
-- **Action Maps:** Modular
+- **Rebinding:** Supported through InputSystem_Actions
+- **Schemes:** Keyboard/Mouse only (current)
+- **Action Maps:** Player, UI, NodeEditor
 - **Devices:** Auto-detect
 
 ## 🌐 Localization Settings
 
 ### Languages
 - **Default:** English
-- **Supported:** Planned
-- **Asset Bundles:** Per Language
-- **Text Assets:** Tagged
+- **Supported:** English only (initial)
+- **Future Plans:** Spanish, French, German
+- **Text Sources:** ScriptableObject descriptions, UI text
 
 ### Implementation
-- **String Tables:** Scriptable Objects
-- **Asset Loading:** Dynamic
-- **Fonts:** Dynamic
-- **RTL Support:** Planned
+- **String Tables:** ScriptableObject fields
+- **Asset Loading:** Direct reference
+- **Fonts:** Default Unity fonts
+- **RTL Support:** Not needed
+
+## 🎮 Specific Game Settings
+
+### Pixel Perfect Setup
+- **Reference Resolution:** 320x180
+- **Assets PPU:** 16
+- **Pixel Snapping:** Enabled
+- **Crop Frame:** Disabled
+- **Stretch Fill:** Disabled
+
+### Ecosystem Settings
+- **Max Animals:** 50 concurrent
+- **Max Plants:** 100 concurrent
+- **Update Frequency:** 60 FPS
+- **Simulation Range:** Camera bounds + margin
+
+### Node System
+- **Max Nodes Per Graph:** 16 (UI grid limitation)
+- **Effect Validation:** Runtime checking
+- **Graph Serialization:** JSON format
+- **Asset References:** ScriptableObject links
 
 ---
 
-**Next Update:** When build configuration changes or new platforms are added
+**Next Update:** When build configuration changes or optimization needs arise

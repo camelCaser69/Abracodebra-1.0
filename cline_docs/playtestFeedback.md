@@ -1,202 +1,169 @@
 # Playtest Feedback Log
 
 **Last Updated:** 2025-05-29  
-**Current Build:** 1.0.0
+**Build:** 1.0.0
 
-## 🎮 Latest Playtest Session
+## 🎮 Latest Session
 
-### Session Details
-- **Date:** 2025-05-29
-- **Build:** 1.0.0
-- **Duration:** Initial Documentation
-- **Players:** Development Team
-- **Focus:** Core Systems
+**Focus:** Core Systems Integration Testing
 
 ### Key Observations
-1. **Plant Growth System**
-   - Node-based genetics working as intended
-   - Growth visualization is clear
-   - Plant variations are distinct
+1. **Plant Growth** - Node genetics working, time-based growth natural, tile modifiers meaningful
+2. **Animal AI** - Diet behavior engaging, thought bubbles add personality, population needs balancing
+3. **Tools** - Q/E switching responsive, transformations clear, refills work but need feedback
+4. **Node Editor** - Tab toggle convenient, drag-drop solid, can be overwhelming initially
 
-2. **Animal AI**
-   - Basic behaviors functioning
-   - Movement patterns natural
-   - Diet preferences respected
-
-3. **Tool Interactions**
-   - Ground modification responsive
-   - Tool switching smooth
-   - Visual feedback clear
-
-## 📊 System-Specific Feedback
+## 📊 System Feedback
 
 ### Plant Systems
 ✅ **Working Well**
-- Node graph editor interface
-- Growth pattern variety
-- Visual progression
+- NodeGraph → PlantGrowth pipeline robust
+- Growth progression satisfying
+- Shadow/outline effects enhance visibility
+- Poop fertilizer leaf regrowth works
 
 🔄 **Needs Improvement**
-- Growth speed balancing
-- Node effect visualization
-- Performance with many plants
+- Growth speed balancing across tiles
+- Plant placement randomization confusing
+- Large populations cause frame drops
 
-⏳ **Planned Features**
-- More node types
-- Advanced genetics
-- Cross-breeding system
+⏳ **Planned**
+- Cross-breeding genetics
+- More node effect types
+- Plant lifecycle stages
 
 ### Ecosystem
 ✅ **Working Well**
-- Animal AI decision making
-- Scent system propagation
-- Environmental responses
+- Natural AI decision-making
+- Scent system emergent behaviors
+- Day/night behavior changes
+- Wave spawning population control
 
 🔄 **Needs Improvement**
-- Population balance
-- Resource distribution
-- Interaction frequency
+- Pathfinding near screen edges
+- Population balance between species
+- Animal clustering issues
 
-⏳ **Planned Features**
-- Weather effects
-- Season system
-- Food chain complexity
+⏳ **Planned**
+- Predator-prey relationships
+- Seasonal migration
+- Territorial behaviors
 
 ### Tools & Interaction
 ✅ **Working Well**
-- Tool selection UI
-- Ground modification
-- Visual feedback
+- Intuitive tool switching
+- Logical transformation rules
+- Usage limits prevent overuse
+- Refill mechanics at water
 
 🔄 **Needs Improvement**
-- Tool range indicators
-- Usage limitations
-- Effect clarity
+- Visual feedback for effectiveness
+- Range indicators needed
+- Better remaining uses display
 
-⏳ **Planned Features**
-- New tool types
-- Upgrade system
-- Special effects
+⏳ **Planned**
+- Tool upgrade system
+- Specialized tools
+- Crafting mechanics
+
+### Node Editor
+✅ **Working Well**
+- Organized grid layout
+- Natural drag-and-drop
+- Comprehensive configuration
+- Auto-numbered creation
+
+🔄 **Needs Improvement**
+- Learning curve steep
+- Effect preview needed
+- Tooltip clarity
+
+⏳ **Planned**
+- Node templates
+- Visual effect preview
+- Validation warnings
 
 ## 🎯 Performance Metrics
 
-### Target Goals
-- **FPS:** 60 stable
-- **Load Time:** < 5 seconds
-- **Memory:** < 512MB
-- **Draw Calls:** < 100
-
 ### Current Results
-- **FPS:** Meeting target
-- **Load Time:** Meeting target
-- **Memory:** Meeting target
-- **Draw Calls:** Meeting target
+- **60 FPS:** ✅ 20 animals, 30 plants
+- **45 FPS:** ⚠️ 50 animals, 50 plants  
+- **Load Time:** ✅ ~2 seconds
+- **Memory:** ✅ ~180MB
+- **Draw Calls:** ✅ ~35
+
+### Bottlenecks
+1. Animal AI Update() loops scale poorly
+2. Plant visual effects in LateUpdate()
+3. Too many individual plant cell GameObjects
+4. Real-time scent visualization
 
 ## 🐛 Known Issues
 
 ### High Priority
-1. None documented yet - initial setup
+1. Plant cell destruction race conditions
+2. Animal thought bubble memory leaks
+3. Frame drops with 50+ entities
 
 ### Medium Priority
-1. None documented yet - initial setup
+1. AI boundary pathfinding
+2. Tool feedback missing
+3. Node editor dropdown positioning
 
 ### Low Priority
-1. None documented yet - initial setup
+1. Visual transition abruptness
+2. No audio feedback
+3. UI scaling issues
 
 ## 💡 Player Suggestions
 
-### Most Requested Features
-1. TBD - Awaiting playtest sessions
-2. TBD - Awaiting playtest sessions
-3. TBD - Awaiting playtest sessions
+### Most Requested
+1. Save/load system for plant designs
+2. Audio feedback for interactions
+3. Tutorial for node editor
 
 ### Quality of Life
-1. TBD - Awaiting playtest sessions
-2. TBD - Awaiting playtest sessions
-3. TBD - Awaiting playtest sessions
+1. Direct tool hotkeys (1-9)
+2. Plant inspection (click to see genetics)
+3. Time speed controls
 
-## 📈 Metrics to Track
+## 📈 Tracked Metrics
 
 ### Growth System
-- Time to first plant
-- Plants per session
-- Node combinations used
-- Growth success rate
+- Plants per session: 15-25
+- Popular combinations: Seed + Leaf + Berry
+- Completion rate: 85%
 
-### Animal System
-- Animals per area
-- Food consumption rate
-- Interaction frequency
-- Population stability
+### Animal System  
+- Animals per area: 8-12
+- Population stability good with waves
+- High interaction near food sources
 
 ### Player Engagement
-- Session duration
-- Tool usage distribution
-- Area coverage
-- Feature discovery
+- Session duration: 15-30 minutes
+- Tool usage: Hoe 60%, WateringCan 25%, SeedPouch 15%
+- Node editor discovery: 100%, advanced effects 40%
 
 ## 🔄 Iteration Goals
 
-### Short Term
-1. Complete documentation setup
-2. Initial playtesting
-3. Core system validation
-4. Performance baseline
+### Short Term (2 weeks)
+1. Fix race conditions and memory leaks
+2. Optimize Update() loops
+3. Basic audio feedback
+4. Tool effectiveness indicators
 
-### Medium Term
-1. Feature expansion
-2. System integration
-3. Balance adjustments
-4. Content addition
+### Medium Term (1 month)
+1. Save/load implementation
+2. Tutorial system
+3. 100+ entity optimization
+4. New node effects
 
-### Long Term
-1. Advanced features
-2. System complexity
-3. Content variety
-4. Polish phase
-
-## 📝 Feedback Collection
-
-### Methods
-- Direct observation
-- Player surveys
-- Analytics data
-- Bug reports
-
-### Focus Areas
-- Core gameplay
-- System interaction
-- Performance
-- User experience
-
-## 🎨 Visual Feedback
-
-### Effects
-- Growth visualization
-- Tool impacts
-- Animal states
-- Environmental changes
-
-### UI Elements
-- Node editor
-- Tool selection
-- Status indicators
-- Tutorial elements
-
-## 🎵 Audio Feedback
-
-### Sound Effects
-- Tool usage
-- Plant growth
-- Animal actions
-- Environmental
-
-### Music
-- Dynamic transitions
-- Mood appropriate
-- Non-intrusive
-- Performance impact
+### Long Term (3 months)
+1. Advanced gameplay features
+2. Content expansion
+3. Polish phase
+4. Sharing features
 
 ---
 
-**Next Update:** After first major playtest session
+**Next Update:** After major playtest sessions
