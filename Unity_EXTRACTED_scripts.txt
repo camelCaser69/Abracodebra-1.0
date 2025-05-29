@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-29 15:47:53
+UNITY PROJECT SCRIPT EXPORT - 2025-05-29 18:48:18
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -2483,6 +2483,11 @@ public class AnimalController : MonoBehaviour
     public float foodReassessmentInterval = 0.5f;
     private float foodReassessmentTimer = 0f;
 
+    // --- NEW: Starvation damage settings ---
+    [Header("Starvation Settings")]
+    [Tooltip("Damage per second when hunger is at maximum")]
+    public float starvationDamageRate = 2f;
+
     // --- Internal State ---
     private float currentHealth;
     private float currentHunger;
@@ -2703,14 +2708,31 @@ public class AnimalController : MonoBehaviour
     { 
         currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime; 
         currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
+        
+        // Check for starvation damage when hunger reaches maximum
+        if (currentHunger >= animalDiet.maxHunger)
+        {
+            ApplyStarvationDamage();
+        }
+        
         // Update hunger text when hunger changes
         UpdateHungerText();
     }
     
     void ApplyStarvationDamage() 
     { 
-        /* ... */ 
-        UpdateHpText(); 
+        // Apply damage over time when starving
+        float damage = starvationDamageRate * Time.deltaTime;
+        currentHealth -= damage;
+        currentHealth = Mathf.Max(0f, currentHealth);
+        
+        UpdateHpText();
+        
+        // Die if health reaches zero
+        if (currentHealth <= 0f)
+        {
+            Die(CauseOfDeath.Starvation);
+        }
     }
     
     void HandlePooping() 
@@ -3099,8 +3121,8 @@ public class AnimalController : MonoBehaviour
             animator.speed = Mathf.Max(0.5f, speedRatio); // Don't go below half speed
         }
     }
-
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -5111,6 +5133,10 @@ public class AnimalDiet : ScriptableObject
         {
             if (collider == null) continue;
 
+            // BUGFIX: Skip objects with PoopController to prevent animals from eating poop
+            PoopController poopController = collider.GetComponent<PoopController>();
+            if (poopController != null) continue;
+
             FoodItem foodItem = collider.GetComponent<FoodItem>();
 
             // Must have FoodItem and its FoodType must be edible by this diet
@@ -5134,6 +5160,7 @@ public class AnimalDiet : ScriptableObject
         return bestTarget;
     }
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -10072,7 +10099,14 @@ public class WaterReflection : MonoBehaviour
 
     void Awake()
     {
-        ResolveSettings(); // Determine actual settings to use
+        // Initialize with local settings first, will be updated in Start if manager exists
+        _actualReflectionOpacity = localReflectionOpacity;
+        _actualReflectionTint = localReflectionTint;
+        _actualGradientFadeBaseMaterial = localGradientFadeBaseMaterial;
+        _actualSortingOrderOffset = localSortingOrderOffset;
+        _actualUseWaterMasking = localUseWaterMasking;
+        _actualWaterTilemapTag = localWaterTilemapTag;
+        _actualShowDebugInfo = localShowDebugInfo;
 
         originalRenderer = GetComponent<SpriteRenderer>();
         originalAnimator = GetComponent<Animator>();
@@ -10134,6 +10168,7 @@ public class WaterReflection : MonoBehaviour
 
     void Start()
     {
+        ResolveSettings(); // Now resolve settings after all Awake() calls are completed
         UpdateReflectionVisuals();
         UpdateReflectionTransform();
         CacheCurrentState();
@@ -10445,6 +10480,7 @@ public class WaterReflection : MonoBehaviour
     }
     // Add more setters if you need to programmatically change local override values and have them take effect.
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
