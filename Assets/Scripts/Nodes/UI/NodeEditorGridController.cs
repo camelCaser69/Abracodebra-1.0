@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿// FILE: Assets\Scripts\Nodes\UI\NodeEditorGridController.cs
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7,7 +8,7 @@ using TMPro;
 using System.Linq;
 
 [RequireComponent(typeof(RectTransform))]
-public class NodeEditorGridController : MonoBehaviour // Keep this script on the persistent "UIManager" or similar object
+public class NodeEditorGridController : MonoBehaviour
 {
     public static NodeEditorGridController Instance { get; private set; }
 
@@ -19,11 +20,11 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
     [Header("Empty Cell Visuals")]
     [SerializeField] private Sprite emptyCellSprite;
     [SerializeField] private Color emptyCellColor = Color.white;
-    [SerializeField] private Vector3 emptyCellScale = Vector3.one; // Still potentially useful for cell GO scale
+    [SerializeField] private Vector3 emptyCellScale = Vector3.one;
 
     [Header("Node Visuals")]
     [SerializeField] private GameObject nodeViewPrefab;
-    [SerializeField] private Vector3 nodeImageScale = Vector3.one; // For the image *inside* the node view
+    [SerializeField] private Vector3 nodeImageScale = Vector3.one;
     [SerializeField] private Color selectedNodeBackgroundColor = new Color(0.9f, 0.9f, 0.7f, 1f);
 
     [Header("Node Definitions & Interaction")]
@@ -31,14 +32,13 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
     [SerializeField] private TMP_Dropdown nodeDropdown;
 
     [Header("UI References")]
-    [Tooltip("The UI GameObject (Panel) that gets toggled visible/hidden.")]
-    [SerializeField] private GameObject gridUIParent; // The Panel to show/hide
+    [Tooltip("The UI GameObject (Panel) that acts as the main container for the Node Editor. This will be controlled by UIManager.")] // MODIFIED TOOLTIP
+    [SerializeField] public GameObject gridUIParent; // MADE PUBLIC FOR UIManager assignment. This is the panel to show/hide.
     [Tooltip("The Transform within the UI Panel where cell GameObjects should be created.")]
-    [SerializeField] private Transform cellContainer; // The container for cell GOs (e.g., 'GridContainer')
+    [SerializeField] private Transform cellContainer;
 
 
     private List<NodeCell> nodeCells = new List<NodeCell>();
-    // Removed _rectTransform as it's less relevant now the script isn't on the grid panel itself
     private Canvas _rootCanvas;
     private NodeGraph _uiGraphRepresentation = new NodeGraph();
 
@@ -56,12 +56,10 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        // Get components relative to this script's GameObject
-        _rootCanvas = GetComponentInParent<Canvas>(); // Find the root canvas
+        _rootCanvas = GetComponentInParent<Canvas>();
         if (_rootCanvas == null) Debug.LogError("[NodeEditorGridController] Root Canvas not found!", gameObject);
 
-        // Validate essential references
-        if (gridUIParent == null) Debug.LogError("[NodeEditorGridController] Grid UI Parent (the panel to toggle) not assigned.", gameObject);
+        if (gridUIParent == null) Debug.LogError("[NodeEditorGridController] Grid UI Parent (the panel to toggle) not assigned. UIManager will not be able to control its visibility.", gameObject);
         if (cellContainer == null) Debug.LogError("[NodeEditorGridController] Cell Container (parent for cells) not assigned.", gameObject);
         if (nodeDropdown == null) Debug.LogWarning("[NodeEditorGridController] Node Dropdown not assigned.", gameObject);
         if (definitionLibrary == null) Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned!", gameObject);
@@ -76,30 +74,31 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
     {
         if (nodeDropdown != null) nodeDropdown.gameObject.SetActive(false);
 
-        // Check if references are set before proceeding
         if (cellContainer != null && definitionLibrary != null)
         {
             CreateCells();
-            SpawnInitialNodes(); // Call after cells are created
-            RefreshGraph(); // Refresh after potentially spawning initial nodes
+            SpawnInitialNodes();
+            RefreshGraph();
         }
         else
         {
             Debug.LogError("[NodeEditorGridController] Cannot initialize grid - Cell Container or Definition Library is missing.", gameObject);
         }
+
+        // IMPORTANT: Ensure the gridUIParent is initially hidden if UIManager will control it from a hidden state.
+        // Or, UIManager's first HandleRunStateChanged will correctly set its visibility.
+        // For safety, if gridUIParent is directly assigned to planningPanel, UIManager will handle it.
     }
 
     private void CreateCells()
     {
-        // Ensure cellContainer is assigned
         if (cellContainer == null)
         {
             Debug.LogError("[NodeEditorGridController] Cannot create cells - Cell Container is not assigned.", gameObject);
             return;
         }
 
-        // Clear existing cells from the container
-        foreach (Transform child in cellContainer) // Iterate through the actual container
+        foreach (Transform child in cellContainer)
         {
             if (child.GetComponent<NodeCell>() != null)
             {
@@ -109,44 +108,30 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
         nodeCells.Clear();
         NodeCell.ClearSelection();
 
-        // Layout calculations (assuming cellContainer uses appropriate layout components or manual positioning)
-        // If using GridLayoutGroup on cellContainer, positioning is automatic.
-        // If positioning manually based on cellContainer's RectTransform:
         RectTransform containerRect = cellContainer.GetComponent<RectTransform>();
         if (containerRect == null)
         {
              Debug.LogError("[NodeEditorGridController] Cell Container needs a RectTransform for manual layout calculations.", cellContainer.gameObject);
-             return; // Cannot proceed with manual layout
+             return;
         }
 
-        // Example Manual Layout (adjust based on containerRect's pivot/anchors):
-        // Assuming center pivot (0.5, 0.5) for the container
         float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
         float startX = -(totalWidth / 2f) + (cellSize.x / 2f);
-        float startY = 0; // Assuming horizontal layout centered vertically
+        float startY = 0;
 
         for (int i = 0; i < emptyCellsCount; i++)
         {
             GameObject cellGO = new GameObject($"Cell_{i}");
             RectTransform rt = cellGO.AddComponent<RectTransform>();
-
-            // *** Parent to the designated cellContainer ***
             cellGO.transform.SetParent(cellContainer, false);
 
-            // --- Manual Positioning --- (Comment out if using GridLayoutGroup)
-            // Set anchors and pivot (e.g., center) for the cell itself
             rt.anchorMin = new Vector2(0.5f, 0.5f);
             rt.anchorMax = new Vector2(0.5f, 0.5f);
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.sizeDelta = cellSize;
-
-            // Calculate position relative to container
             float xPos = startX + i * (cellSize.x + cellMargin);
             float yPos = startY;
             rt.anchoredPosition = new Vector2(xPos, yPos);
-            // --- End Manual Positioning ---
-
-            // Apply scale if needed
             rt.localScale = emptyCellScale;
 
             Image cellImage = cellGO.AddComponent<Image>();
@@ -157,13 +142,6 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
             NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
             cellLogic.Init(i, this, cellImage);
             nodeCells.Add(cellLogic);
-
-            // If using GridLayoutGroup on cellContainer, you might not need manual positioning.
-            // The GridLayoutGroup component handles size and spacing. Just ensure cellGO has a LayoutElement if needed.
-            // Example (if using GridLayout):
-            // LayoutElement le = cellGO.GetComponent<LayoutElement>() ?? cellGO.AddComponent<LayoutElement>();
-            // le.preferredWidth = cellSize.x;
-            // le.preferredHeight = cellSize.y;
         }
     }
 
@@ -225,16 +203,12 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
 
     void Update()
     {
-        // UI Toggle
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-             ToggleGridUI(); // This should now work correctly
-        }
+        // REMOVED: Tab key logic for ToggleGridUI()
 
         // Delete Node Handling
         if (Input.GetKeyDown(KeyCode.Delete))
         {
-            if (NodeCell.CurrentlySelectedCell != null)
+            if (NodeCell.CurrentlySelectedCell != null && gridUIParent != null && gridUIParent.activeInHierarchy) // ADDED: Check if UI is active
             {
                 NodeCell selected = NodeCell.CurrentlySelectedCell;
                 NodeData data = selected.GetNodeData();
@@ -258,27 +232,51 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
             {
                 HideDropdown();
             }
-             else if (NodeCell.CurrentlySelectedCell != null) {
+             else if (NodeCell.CurrentlySelectedCell != null && gridUIParent != null && gridUIParent.activeInHierarchy) { // ADDED: Check if UI is active
                  NodeCell.ClearSelection();
              }
         }
     }
 
-    public void ToggleGridUI()
+    // MODIFIED: This method might no longer be needed if UIManager directly controls gridUIParent.
+    // If UIManager needs to call this, it can be kept. Otherwise, it can be removed.
+    // For now, let's assume UIManager sets gridUIParent.SetActive() directly.
+    // public void ToggleGridUI()
+    // {
+    //     if (gridUIParent != null)
+    //     {
+    //         bool currentState = gridUIParent.activeSelf;
+    //         gridUIParent.SetActive(!currentState);
+
+    //         if (!gridUIParent.activeSelf)
+    //         {
+    //              if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown();
+    //              NodeCell.ClearSelection();
+    //         }
+    //     }
+    //     else Debug.LogWarning("[NodeEditorGridController] Grid UI Parent not assigned.");
+    // }
+
+    // Public methods to explicitly show/hide, callable by UIManager if needed,
+    // though direct panel activation by UIManager is simpler.
+    public void ShowNodeEditor()
     {
         if (gridUIParent != null)
         {
-            bool currentState = gridUIParent.activeSelf;
-            gridUIParent.SetActive(!currentState); // This toggles the assigned panel
-
-            if (!gridUIParent.activeSelf) // If hiding UI
-            {
-                 if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown();
-                 NodeCell.ClearSelection(); // Deselect nodes when UI hides
-            }
+            gridUIParent.SetActive(true);
         }
-        else Debug.LogWarning("[NodeEditorGridController] Grid UI Parent not assigned.");
     }
+
+    public void HideNodeEditor()
+    {
+        if (gridUIParent != null)
+        {
+            gridUIParent.SetActive(false);
+            if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown();
+            NodeCell.ClearSelection();
+        }
+    }
+
 
     public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
     {
@@ -372,7 +370,6 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
     {
         if (_uiGraphRepresentation == null) _uiGraphRepresentation = new NodeGraph();
         _uiGraphRepresentation.nodes.Clear();
-        // Ensure cells are ordered correctly by index when building the graph
         foreach (var cell in nodeCells.OrderBy(c => c.CellIndex))
         {
             NodeData data = cell.GetNodeData();
@@ -443,16 +440,15 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
      private NodeCell FindCellAtScreenPosition(Vector2 screenPosition)
      {
          NodeCell foundCell = null;
-         if (cellContainer == null) return null; // Cannot find cells if container is missing
+         if (cellContainer == null) return null;
 
-         // Check all NodeCell components *within the specified container*
          foreach (Transform cellTransform in cellContainer)
          {
              NodeCell cell = cellTransform.GetComponent<NodeCell>();
-             if (cell == null) continue; // Skip if child isn't a NodeCell
+             if (cell == null) continue;
 
              RectTransform cellRect = cell.GetComponent<RectTransform>();
-             if (cellRect == null) continue; // Skip if cell doesn't have a RectTransform
+             if (cellRect == null) continue;
 
              bool contains = RectTransformUtility.RectangleContainsScreenPoint(
                  cellRect,
@@ -470,53 +466,24 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
      #if UNITY_EDITOR
      void OnDrawGizmos()
      {
-         // Draw gizmos only in the editor and when not playing
-         // Check if cellContainer is assigned before drawing
          if (!Application.isPlaying && cellContainer != null && cellContainer.TryGetComponent<RectTransform>(out var containerRect))
          {
-             Gizmos.color = new Color(0f, 1f, 0f, 0.5f); // Semi-transparent green
-
-             // Use the same layout logic as CreateCells (example for manual layout)
+             Gizmos.color = new Color(0f, 1f, 0f, 0.5f);
              float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
-             float startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f); // Relative to container center pivot
+             float startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f);
              float startY_for_gizmo = 0;
-
-             // Store original matrix
              Matrix4x4 originalMatrix = Gizmos.matrix;
-
              for (int i = 0; i < emptyCellsCount; i++)
              {
-                 // Calculate center position of the cell in container's local space
                  float xOffset = startX_for_gizmo + i * (cellSize.x + cellMargin);
                  Vector3 localCellCenter = new Vector3(xOffset, startY_for_gizmo, 0);
-
-                 // Transform local center to world space using the CELL CONTAINER's transform
                  Vector3 worldCellCenter = cellContainer.TransformPoint(localCellCenter);
-
-                 // Calculate gizmo size based on CELL CONTAINER's lossy scale
                  Vector3 gizmoSize = new Vector3(cellSize.x * cellContainer.lossyScale.x, cellSize.y * cellContainer.lossyScale.y, 0.1f);
-
-                 // Set Gizmos matrix to handle CELL CONTAINER's rotation
                  Gizmos.matrix = Matrix4x4.TRS(worldCellCenter, cellContainer.rotation, Vector3.one);
-
-                 // Draw wire cube centered at the transformed position
                  Gizmos.DrawWireCube(Vector3.zero, gizmoSize);
              }
-             // Restore original Gizmos matrix
              Gizmos.matrix = originalMatrix;
          }
-         // Optional: Draw a box around the container itself
-         // else if (!Application.isPlaying && cellContainer != null && cellContainer.TryGetComponent<RectTransform>(out containerRect)) {
-         //     Gizmos.color = Color.yellow;
-         //     // Simplified world space box based on container rect
-         //     Vector3[] corners = new Vector3[4];
-         //     containerRect.GetWorldCorners(corners);
-         //     Vector3 center = (corners[0] + corners[2]) * 0.5f;
-         //     Vector3 size = new Vector3(Mathf.Abs(corners[0].x - corners[2].x), Mathf.Abs(corners[0].y - corners[2].y), 0.1f);
-         //     Gizmos.matrix = Matrix4x4.TRS(center, containerRect.rotation, Vector3.one);
-         //     Gizmos.DrawWireCube(Vector3.zero, size);
-         //     Gizmos.matrix = Matrix4x4.identity;
-         // }
      }
      #endif
 }

@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-29 18:48:18
+UNITY PROJECT SCRIPT EXPORT - 2025-05-31 23:24:07
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -2430,6 +2430,7 @@ public class AnimalLibrary : ScriptableObject
 // FILE: Assets\Scripts\Ecosystem\Core\AnimalController.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -2488,6 +2489,15 @@ public class AnimalController : MonoBehaviour
     [Tooltip("Damage per second when hunger is at maximum")]
     public float starvationDamageRate = 2f;
 
+    // --- NEW: Visual feedback settings ---
+    [Header("Visual Effects")]
+    [Tooltip("Duration of red flash when taking damage")]
+    public float damageFlashDuration = 0.2f;
+    [Tooltip("Duration of fade out when dying")]
+    public float deathFadeDuration = 1.5f;
+    [Tooltip("Color to flash when taking damage")]
+    public Color damageFlashColor = Color.red;
+
     // --- Internal State ---
     private float currentHealth;
     private float currentHunger;
@@ -2504,6 +2514,11 @@ public class AnimalController : MonoBehaviour
     private float thoughtCooldownTimer = 0f;
     private bool isSeekingScreenCenter = false;
     private Vector2 screenCenterTarget;
+
+    // --- NEW: Visual effect state ---
+    private bool isDying = false;
+    private Color originalColor;
+    private bool isFlashing = false;
 
     // --- Component References ---
     private Rigidbody2D rb;
@@ -2540,6 +2555,12 @@ public class AnimalController : MonoBehaviour
             Debug.LogError($"[{gameObject.name}] Missing Collider2D!", gameObject); 
             enabled = false; 
             return; 
+        }
+
+        // Store original color for visual effects
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
         }
 
         // Store base movement speed - NEW
@@ -2612,7 +2633,7 @@ public class AnimalController : MonoBehaviour
     // --- Update ---
     void Update()
     {
-        if (!enabled || rb == null) return;
+        if (!enabled || rb == null || isDying) return;
 
         // Check for ALT key (or configured key) press to show/hide stats
         bool showStats = Input.GetKey(showStatsKey);
@@ -2686,7 +2707,7 @@ public class AnimalController : MonoBehaviour
     // --- FixedUpdate ---
     void FixedUpdate()
     {
-        if (rb == null) return;
+        if (rb == null || isDying) return;
         
         if (!isEating && !isPooping && moveDirection != Vector2.zero)
         {
@@ -2726,6 +2747,12 @@ public class AnimalController : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Max(0f, currentHealth);
         
+        // Flash red when taking damage
+        if (!isFlashing)
+        {
+            StartCoroutine(FlashDamage());
+        }
+        
         UpdateHpText();
         
         // Die if health reaches zero
@@ -2733,6 +2760,41 @@ public class AnimalController : MonoBehaviour
         {
             Die(CauseOfDeath.Starvation);
         }
+    }
+    
+    // --- NEW: Visual effect coroutines ---
+    private IEnumerator FlashDamage()
+    {
+        if (spriteRenderer == null) yield break;
+        
+        isFlashing = true;
+        spriteRenderer.color = damageFlashColor;
+        yield return new WaitForSeconds(damageFlashDuration);
+        spriteRenderer.color = originalColor;
+        isFlashing = false;
+    }
+    
+    private IEnumerator FadeOutAndDestroy()
+    {
+        if (spriteRenderer == null)
+        {
+            Destroy(gameObject);
+            yield break;
+        }
+        
+        isDying = true;
+        float elapsedTime = 0f;
+        Color startColor = spriteRenderer.color;
+        
+        while (elapsedTime < deathFadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            float alpha = Mathf.Lerp(startColor.a, 0f, elapsedTime / deathFadeDuration);
+            spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+            yield return null;
+        }
+        
+        Destroy(gameObject);
     }
     
     void HandlePooping() 
@@ -3036,8 +3098,10 @@ public class AnimalController : MonoBehaviour
     
     private void Die(CauseOfDeath cause) 
     { 
-        Debug.Log($"[{SpeciesName} died: {cause}]", gameObject); 
-        Destroy(gameObject); 
+        Debug.Log($"[{SpeciesName} died: {cause}]", gameObject);
+        
+        // Start fade out effect instead of immediate destruction
+        StartCoroutine(FadeOutAndDestroy());
     }
     
     public bool SpeciesNameEquals(string other) 
