@@ -1,85 +1,106 @@
-﻿using UnityEngine;
+﻿// FILE: Assets\Scripts\Nodes\UI\NodeCell.cs
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(RectTransform))]
-// Remove IPointerClickHandler interface from here
-// Keep IDropHandler for dropping onto the cell background
-public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler // Keep IPointerClickHandler for RIGHT click on empty
+public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 {
-    public static NodeCell CurrentlySelectedCell { get; private set; }
+    public static NodeCell CurrentlySelectedCell { get; private set; } // For the main sequence
     public int CellIndex { get; private set; }
+    public bool IsInventoryCell { get; private set; } // NEW: Flag to identify cell type
 
-    private NodeEditorGridController _controller;
+    private NodeEditorGridController _sequenceController; // For sequence cells
+    private InventoryGridController _inventoryController; // For inventory cells
     private NodeData _nodeData;
     private NodeView _nodeView;
     private Image _backgroundImage;
 
-    // --- Init remains the same ---
-    public void Init(int index, NodeEditorGridController gridController, Image bgImage)
+    // MODIFIED Init for flexibility
+    public void Init(int index, NodeEditorGridController sequenceController, InventoryGridController inventoryController, Image bgImage)
     {
         CellIndex = index;
-        _controller = gridController;
+        _sequenceController = sequenceController;
+        _inventoryController = inventoryController;
         _backgroundImage = bgImage;
+        IsInventoryCell = (_inventoryController != null); // Determine if it's an inventory cell
 
-        if (_backgroundImage != null && _controller != null)
+        if (_backgroundImage != null)
         {
-            _backgroundImage.color = _controller.EmptyCellColor;
+            Color emptyColor = IsInventoryCell ?
+                               _inventoryController.EmptyCellColor :
+                               _sequenceController.EmptyCellColor;
+            _backgroundImage.color = emptyColor;
             _backgroundImage.enabled = true;
         }
     }
+    // Overload for original NodeEditorGridController usage (or it can call the new one with null for inventoryController)
+    public void Init(int index, NodeEditorGridController sequenceController, Image bgImage)
+    {
+        Init(index, sequenceController, null, bgImage);
+    }
+    // Overload for InventoryGridController usage
+    public void Init(int index, InventoryGridController inventoryController, Image bgImage)
+    {
+        Init(index, null, inventoryController, bgImage);
+    }
 
-    // --- HasNode, Getters remain the same ---
+
     public bool HasNode() => _nodeData != null && _nodeView != null;
     public NodeData GetNodeData() => _nodeData;
     public NodeView GetNodeView() => _nodeView;
 
-    // --- AssignNode, AssignNodeView remain the same ---
-     public void AssignNode(NodeDefinition def)
+    // AssignNode for sequence cells
+    public void AssignNode(NodeDefinition def)
     {
-        if (def == null || _controller == null) return;
+        if (def == null || _sequenceController == null) return; // Only for sequence
         RemoveNode();
 
-        _nodeData = new NodeData() { /* ... data setup ... */
+        _nodeData = new NodeData() {
             nodeId = System.Guid.NewGuid().ToString(),
             nodeDisplayName = def.displayName,
             effects = def.CloneEffects(),
             orderIndex = this.CellIndex
         };
 
-        GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : _controller.NodeViewPrefab;
-        if (prefabToInstantiate == null) { /* ... error handling ... */ Debug.LogError($"..."); _nodeData = null; return; }
+        GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : _sequenceController.NodeViewPrefab;
+        if (prefabToInstantiate == null) { _nodeData = null; return; }
 
         GameObject nodeViewGO = Instantiate(prefabToInstantiate, transform);
         _nodeView = nodeViewGO.GetComponent<NodeView>();
-        if (_nodeView == null) { /* ... error handling ... */ Debug.LogError($"..."); Destroy(nodeViewGO); _nodeData = null; return; }
+        if (_nodeView == null) { Destroy(nodeViewGO); _nodeData = null; return; }
 
-        _nodeView.Initialize(_nodeData, def, _controller); // Init NodeView
+        _nodeView.Initialize(_nodeData, def, _sequenceController);
 
         NodeDraggable draggable = _nodeView.GetComponent<NodeDraggable>();
         if (draggable == null) draggable = _nodeView.gameObject.AddComponent<NodeDraggable>();
-        draggable.Initialize(_controller, this); // Init Draggable
+        draggable.Initialize(_sequenceController, this); // Sequence draggable inits with sequence controller
 
-        if(_backgroundImage != null) _backgroundImage.enabled = true;
+        if(_backgroundImage != null) _backgroundImage.enabled = true; // Should be false if occupied
     }
-     public void AssignNodeView(NodeView view, NodeData data)
+
+    // AssignNodeView (generic for both inventory and sequence when dragging)
+    public void AssignNodeView(NodeView view, NodeData data)
     {
-         RemoveNode();
+         RemoveNode(); // Clear current content
          _nodeView = view;
-         _nodeData = data;
+         _nodeData = data; // This data could be "real" (sequence) or "dummy" (inventory)
          if (_nodeView != null) {
              _nodeView.transform.SetParent(transform, false);
-             if (_nodeData != null) _nodeData.orderIndex = this.CellIndex;
-             // Parent ref will be updated by NodeDraggable.SnapToCell which calls NodeView.UpdateParent...
+             _nodeView.transform.localPosition = Vector2.zero; // Ensure it's centered
+             if (_nodeData != null && !IsInventoryCell && _sequenceController != null) // Only update orderIndex for sequence
+             {
+                 _nodeData.orderIndex = this.CellIndex;
+             }
+             // Parent cell ref on NodeView and NodeDraggable will be updated by SnapToCell
          }
-         if(_backgroundImage != null) _backgroundImage.enabled = true;
+         if(_backgroundImage != null) _backgroundImage.enabled = true; // Should be false if occupied
     }
 
 
-    // --- RemoveNode, ClearNodeReference remain the same ---
     public void RemoveNode()
     {
-        bool wasSelected = (CurrentlySelectedCell == this);
+        bool wasSelected = (CurrentlySelectedCell == this && !IsInventoryCell);
         if (_nodeView != null) {
             if (wasSelected) {
                  _nodeView.Unhighlight();
@@ -88,19 +109,22 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler // Kee
             Destroy(_nodeView.gameObject);
         }
         _nodeView = null; _nodeData = null;
-        if (wasSelected && CurrentlySelectedCell == this) CurrentlySelectedCell = null;
+        if (wasSelected && CurrentlySelectedCell == this) CurrentlySelectedCell = null; // Redundant?
         if(_backgroundImage != null) _backgroundImage.enabled = true;
     }
-     public void ClearNodeReference()
+    public void ClearNodeReference() // Used when a node is dragged *out* of this cell
     {
         _nodeView = null; _nodeData = null;
         if(_backgroundImage != null) _backgroundImage.enabled = true;
     }
 
-    // --- Selection Handling (SelectCell, ClearSelection) remains the same ---
-     public static void SelectCell(NodeCell cellToSelect)
+
+    public static void SelectCell(NodeCell cellToSelect)
     {
-        if (cellToSelect == null || !cellToSelect.HasNode()) { ClearSelection(); return; }
+        if (cellToSelect == null || !cellToSelect.HasNode() || cellToSelect.IsInventoryCell) // Don't select inventory items
+        {
+            ClearSelection(); return;
+        }
         if (CurrentlySelectedCell == cellToSelect) return;
         if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
             CurrentlySelectedCell.GetNodeView().Unhighlight();
@@ -110,7 +134,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler // Kee
             CurrentlySelectedCell.GetNodeView().Highlight();
         }
     }
-     public static void ClearSelection()
+    public static void ClearSelection()
     {
         if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
             CurrentlySelectedCell.GetNodeView().Unhighlight();
@@ -118,41 +142,55 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler // Kee
         CurrentlySelectedCell = null;
     }
 
-    // --- Event Handlers UPDATED ---
 
-    /// <summary>
-    /// Handles clicks on the CELL BACKGROUND image.
-    /// Left Click: Does nothing (NodeView handles selection).
-    /// Right Click: Opens add node menu ONLY if the cell is currently empty.
-    /// </summary>
     public void OnPointerClick(PointerEventData eventData)
     {
-        // This click is on the NodeCell's background image
-
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            // Right Click: Only allow opening the dropdown if the cell is currently EMPTY.
-            if (!HasNode())
+            if (!HasNode() && !IsInventoryCell && _sequenceController != null) // Only open add for empty SEQUENCE cells
             {
-                // Debug.Log($"NodeCell Background Clicked (Right) on Empty Cell {CellIndex}. Opening dropdown.");
-                ClearSelection(); // Clear selection before showing add menu
-                _controller?.OnEmptyCellRightClicked(this, eventData);
+                ClearSelection();
+                _sequenceController.OnEmptyCellRightClicked(this, eventData);
             }
-            // If right-clicking the background of an occupied cell, do nothing.
+            // Right click on inventory or occupied sequence cells does nothing here.
         }
-        // Left click on the background does nothing regarding selection now.
+        else if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            if (HasNode() && !IsInventoryCell) // Left click selects sequence nodes
+            {
+                SelectCell(this);
+            }
+            else if (!HasNode()) // Left click on any empty cell (inventory or sequence)
+            {
+                ClearSelection();
+            }
+        }
     }
 
-
-    // --- OnDrop remains the same ---
+    // MODIFIED OnDrop to handle inter-grid logic
     public void OnDrop(PointerEventData eventData)
     {
         GameObject draggedObject = eventData.pointerDrag;
-        if (draggedObject != null) {
-            NodeDraggable draggedNode = draggedObject.GetComponent<NodeDraggable>();
-            if (draggedNode != null && _controller != null) {
-                 _controller.HandleNodeDrop(draggedNode, draggedNode.OriginalCell, eventData.position);
-            }
+        if (draggedObject == null) return;
+
+        NodeDraggable draggedNode = draggedObject.GetComponent<NodeDraggable>();
+        if (draggedNode == null) return;
+
+        NodeCell originalCell = draggedNode.OriginalCell;
+        if (originalCell == null) return; // Should not happen
+
+        NodeEditorGridController mainSeqController = NodeEditorGridController.Instance;
+        InventoryGridController invController = InventoryGridController.Instance;
+
+        // Case 1: Dropping onto a SEQUENCE cell (this cell)
+        if (!this.IsInventoryCell && mainSeqController != null)
+        {
+            mainSeqController.HandleDropOnSequenceCell(draggedNode, originalCell, this);
+        }
+        // Case 2: Dropping onto an INVENTORY cell (this cell)
+        else if (this.IsInventoryCell && invController != null)
+        {
+            invController.HandleDropOnInventoryCell(draggedNode, originalCell, this);
         }
     }
 }

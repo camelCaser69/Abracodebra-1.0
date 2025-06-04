@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// FILE: Assets\Scripts\Nodes\UI\NodeDraggable.cs
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -10,158 +11,190 @@ public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
     private Vector2 _originalAnchoredPosition;
     private Transform _originalParent;
     private NodeCell _originalCell;
-    private NodeEditorGridController _gridController;
+    private NodeEditorGridController _gridController; // Null if from inventory
+    private InventoryGridController _inventoryController; // Null if from sequence
     private Canvas _rootCanvas;
 
-    // No _isDragging flag needed if managed carefully by events
-
     public NodeCell OriginalCell => _originalCell;
+    public bool IsFromInventoryGrid => _inventoryController != null; // NEW: Helper property
 
     void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
-        _canvasGroup = GetComponent<CanvasGroup>();
-        if (_canvasGroup == null)
-        {
-            _canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        }
-        // CRITICAL: Default state MUST allow interactions (clicks, hovers)
+        _canvasGroup = GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
         _canvasGroup.blocksRaycasts = true;
-        _canvasGroup.alpha = 1f; // Ensure fully visible
+        _canvasGroup.alpha = 1f;
     }
 
-    public void Initialize(NodeEditorGridController controller, NodeCell startingCell)
+    // MODIFIED: Initialize to handle both grid types
+    public void Initialize(NodeEditorGridController gridCtrl, InventoryGridController invCtrl, NodeCell startingCell)
     {
-        _gridController = controller;
+        _gridController = gridCtrl;
+        _inventoryController = invCtrl;
         _originalCell = startingCell;
-        _rootCanvas = GetComponentInParent<Canvas>()?.rootCanvas;
+        _rootCanvas = GetComponentInParent<Canvas>()?.rootCanvas; // Safe navigation
+        if (_rootCanvas == null) _rootCanvas = FindObjectOfType<Canvas>(); // Fallback
         if (_rootCanvas == null) Debug.LogError("[NodeDraggable] Could not find root Canvas!");
 
-        // Ensure initial state after initialization
         if (_canvasGroup != null) {
              _canvasGroup.blocksRaycasts = true;
              _canvasGroup.alpha = 1f;
         }
     }
+    // Overload for original NodeEditorGridController usage
+    public void Initialize(NodeEditorGridController gridCtrl, NodeCell startingCell)
+    {
+        Initialize(gridCtrl, null, startingCell);
+    }
+    // Overload for InventoryGridController usage
+    public void Initialize(InventoryGridController invCtrl, NodeCell startingCell)
+    {
+        Initialize(null, invCtrl, startingCell);
+    }
+
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left) return;
-        if (_gridController == null || _rootCanvas == null) return;
+        // Check if it's draggable (e.g. initial seed nodes might not be)
+        NodeView view = GetComponent<NodeView>();
+        if (view != null && view.GetNodeData() != null && !view.GetNodeData().canBeDeleted && OriginalCell != null && !OriginalCell.IsInventoryCell)
+        {
+            // Example: Non-deletable sequence nodes might also be non-draggable from their initial spot
+            // For inventory, canBeDeleted is false, but they should be draggable.
+            // This logic might need refinement based on exact canMove/canDelete rules.
+            // For now, assume inventory items are always draggable FROM inventory.
+            // And sequence items are draggable if not explicitly locked.
+            if (!IsFromInventoryGrid) // If from sequence and marked as not deletable (e.g. initial seed)
+            {
+                 // Check canMove on the NodeDefinition's InitialNodeConfig if this is an initial node
+                 // This requires more complex tracking or flags. For now, just prevent drag if from sequence & !canBeDeleted (simple proxy for non-movable initial nodes)
+                if (view.GetNodeData().canBeDeleted == false) // A simple check, refine if needed
+                {
+                    Debug.Log($"Node '{view.GetNodeData().nodeDisplayName}' is not draggable from sequence.");
+                    eventData.pointerDrag = null; // Cancel drag
+                    return;
+                }
+            }
+        }
+
+
+        if (_rootCanvas == null) return;
 
         _originalParent = transform.parent;
-        _originalCell = _originalParent?.GetComponent<NodeCell>();
+        // _originalCell is already set by Initialize and updated by SnapToCell
         _originalAnchoredPosition = _rectTransform.anchoredPosition;
 
-        // Become transparent and STOP blocking raycasts so underlying cells can be detected
         _canvasGroup.alpha = 0.6f;
         _canvasGroup.blocksRaycasts = false;
 
-        // Reparent for top rendering
         transform.SetParent(_rootCanvas.transform, true);
         transform.SetAsLastSibling();
-         // Debug.Log($"[NodeDraggable OnBeginDrag] Started drag. blocksRaycasts: {_canvasGroup.blocksRaycasts}", gameObject);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        // Only process drag if it's the left button and dragging is conceptually active (raycasts blocked)
         if (eventData.button != PointerEventData.InputButton.Left || _canvasGroup == null || _canvasGroup.blocksRaycasts) return;
-        if (_gridController == null || _rootCanvas == null) return;
+        if (_rootCanvas == null) return;
 
-        // Move logic (unchanged)
         RectTransformUtility.ScreenPointToLocalPointInRectangle(
              _rootCanvas.transform as RectTransform, eventData.position,
              _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 currentLocalPoint);
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _rootCanvas.transform as RectTransform, eventData.position - eventData.delta,
-            _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 previousLocalPoint);
-        Vector2 localDelta = currentLocalPoint - previousLocalPoint;
-        _rectTransform.localPosition += (Vector3)localDelta;
+        _rectTransform.localPosition = currentLocalPoint; // Simpler movement for top-level canvas drag
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-         // Debug.Log($"[NodeDraggable OnEndDrag] Drag ended. Button: {eventData.button}", gameObject);
-
-        // Ensure visuals and raycast blocking are reset REGARDLESS of button, BEFORE handling drop
         if (_canvasGroup != null) {
             _canvasGroup.alpha = 1f;
-            _canvasGroup.blocksRaycasts = true; // CRITICAL: Re-enable raycasts immediately
-             // Debug.Log($"--> Reset alpha and blocksRaycasts to: {_canvasGroup.blocksRaycasts}");
+            _canvasGroup.blocksRaycasts = true;
         }
 
-        // Only handle the drop logic if the drag was initiated by the left button
-        if (eventData.button == PointerEventData.InputButton.Left)
+        if (eventData.button != PointerEventData.InputButton.Left)
         {
-            if (_gridController != null) {
-                _gridController.HandleNodeDrop(this, _originalCell, eventData.position);
-            } else {
-                 // No controller, attempt reset
-                 ResetPosition();
+            ResetPosition(); // Reset if not a left-button drag end
+            return;
+        }
+
+        // Determine which controller should handle the drop
+        // The actual drop logic is now in NodeCell.OnDrop, which then calls the appropriate grid controller.
+        // Here, we just need to ensure the NodeDraggable is reset if no valid drop target is found by the EventSystem.
+        // The EventSystem calls OnDrop on the NodeCell *under* the mouse pointer.
+        // If eventData.pointerEnter is null or not a NodeCell, it means it was dropped outside.
+        
+        GameObject dropTarget = eventData.pointerEnter;
+        NodeCell targetCell = dropTarget?.GetComponent<NodeCell>();
+
+        if (targetCell == null) // Dropped outside any cell
+        {
+            if (IsFromInventoryGrid && _inventoryController != null)
+            {
+                // If dragged from inventory and dropped outside, return it to an inventory slot
+                // _inventoryController.ReturnGeneToInventory(GetComponent<NodeView>().GetNodeDefinition(), _originalCell); // This logic is complex, simpler to reset
+                ResetPosition(); // Simplest: reset to original inventory slot
+            }
+            else if (!IsFromInventoryGrid && _gridController != null)
+            {
+                // If dragged from sequence and dropped outside, reset to original sequence slot
+                ResetPosition();
+            }
+            else // Fallback
+            {
+                ResetPosition();
             }
         }
-        else
-        {
-             // If drag ended via another button (unlikely but possible), ensure reset
-             ResetPosition();
-        }
+        // If targetCell is not null, NodeCell.OnDrop will handle it.
+        // NodeDraggable doesn't need to do more here.
     }
 
     public void ResetPosition()
     {
-        // Debug.Log($"[NodeDraggable ResetPosition] Resetting {gameObject.name}", gameObject);
-        // Reset parent and position
+        if (_originalParent == null) {
+            Debug.LogWarning($"[NodeDraggable ResetPosition] {gameObject.name} has no original parent to reset to. Destroying or hiding might be an option if it's orphaned.", gameObject);
+            // Fallback: try to reparent to root canvas and hide, or destroy
+            if(_rootCanvas != null) transform.SetParent(_rootCanvas.transform, false);
+            gameObject.SetActive(false); // Hide it
+            return;
+        }
         transform.SetParent(_originalParent, false);
         _rectTransform.anchoredPosition = _originalAnchoredPosition;
-        _originalCell = _originalParent?.GetComponent<NodeCell>(); // Update cell ref
+        _originalCell = _originalParent.GetComponent<NodeCell>();
 
-        // Ensure visuals and raycasts are correct after reset
         if (_canvasGroup != null) {
             _canvasGroup.alpha = 1f;
             _canvasGroup.blocksRaycasts = true;
         }
-
-        // Update parent cell reference on the NodeView
-        NodeView view = GetComponent<NodeView>();
-        view?.UpdateParentCellReference();
+        GetComponent<NodeView>()?.UpdateParentCellReference();
     }
 
     public void SnapToCell(NodeCell targetCell)
     {
-        // Debug.Log($"[NodeDraggable SnapToCell] Snapping {gameObject.name} to Cell {targetCell?.CellIndex}", gameObject);
         if (targetCell == null) { ResetPosition(); return; }
 
-        // Set Parent and Position
         transform.SetParent(targetCell.transform, false);
         _rectTransform.anchoredPosition = Vector2.zero;
 
-        // Update Internal Draggable References
         _originalParent = targetCell.transform;
-        _originalCell = targetCell;
+        _originalCell = targetCell; // Update original cell to the new one
         _originalAnchoredPosition = Vector2.zero;
 
-        // Ensure visuals and raycasts are correct after snap
         if (_canvasGroup != null) {
             _canvasGroup.alpha = 1f;
             _canvasGroup.blocksRaycasts = true;
         }
+        GetComponent<NodeView>()?.UpdateParentCellReference();
 
-        // Update the NodeView's parent reference
-        NodeView view = GetComponent<NodeView>();
-        view?.UpdateParentCellReference();
+        // Update which controller this draggable "belongs" to based on the target cell
+        _inventoryController = targetCell.IsInventoryCell ? InventoryGridController.Instance : null;
+        _gridController = !targetCell.IsInventoryCell ? NodeEditorGridController.Instance : null;
     }
 
-    // OnDisable might not be strictly needed now but can be kept as safety
     void OnDisable()
     {
-        // If it was disabled mid-drag (blocksRaycasts == false), reset state
         if (_canvasGroup != null && !_canvasGroup.blocksRaycasts)
         {
-             Debug.LogWarning($"[NodeDraggable] Disabled while dragging {gameObject.name}. Resetting CanvasGroup.", gameObject);
             _canvasGroup.alpha = 1f;
             _canvasGroup.blocksRaycasts = true;
-            // Resetting position might be desired but complex here, ensure visuals are ok.
         }
     }
 }

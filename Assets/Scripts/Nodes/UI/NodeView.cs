@@ -25,15 +25,56 @@ public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private Color _originalBackgroundColor;
 
     // --- Initialize, UpdateParentCellReference, Getters, Highlight, Unhighlight remain the same ---
-     public void Initialize(NodeData data, NodeDefinition definition, NodeEditorGridController controller)
-    { /* ... as before ... */
-         _nodeData = data; _nodeDefinition = definition; _controller = controller;
-         UpdateParentCellReference();
-         if (_nodeData == null || _nodeDefinition == null || _controller == null || _parentCell == null) { gameObject.SetActive(false); return; }
-         if (thumbnailImage != null) { thumbnailImage.sprite = _nodeDefinition.thumbnail; thumbnailImage.color = _nodeDefinition.thumbnailTintColor; thumbnailImage.rectTransform.localScale = _controller.NodeImageScale; thumbnailImage.enabled = (thumbnailImage.sprite != null); if (!thumbnailImage.raycastTarget) thumbnailImage.raycastTarget = true; }
-         if (backgroundImage != null) { _originalBackgroundColor = _nodeDefinition.backgroundColor; backgroundImage.color = _originalBackgroundColor; backgroundImage.enabled = true; if (!backgroundImage.raycastTarget) backgroundImage.raycastTarget = true; }
-         if (tooltipPanel != null) tooltipPanel.SetActive(false);
-         if (nodeNameText != null) { nodeNameText.text = _nodeData.nodeDisplayName; nodeNameText.gameObject.SetActive(displayNodeName); }
+    public void Initialize(NodeData data, NodeDefinition definition, NodeEditorGridController sequenceController) // Renamed for clarity
+    {
+        _nodeData = data;
+        _nodeDefinition = definition;
+        _controller = sequenceController; // This is the NodeEditorGridController, can be null for inventory items
+
+        UpdateParentCellReference(); // Parent cell should always exist
+
+        if (_nodeData == null || _nodeDefinition == null)
+        {
+            Debug.LogError($"[NodeView Initialize] NodeData or NodeDefinition is null for {gameObject.name}. Disabling.", gameObject);
+            gameObject.SetActive(false);
+            return;
+        }
+
+        // Thumbnail and Background
+        if (thumbnailImage != null)
+        {
+            thumbnailImage.sprite = _nodeDefinition.thumbnail;
+            thumbnailImage.color = _nodeDefinition.thumbnailTintColor;
+            // Get scale from appropriate controller or a default
+            Vector3 imageScale = Vector3.one;
+            if (_controller != null) // Is a sequence node
+            {
+                imageScale = _controller.NodeImageScale;
+            }
+            else if (InventoryGridController.Instance != null) // Is an inventory node
+            {
+                imageScale = InventoryGridController.Instance.NodeImageScale;
+            }
+            thumbnailImage.rectTransform.localScale = imageScale;
+            thumbnailImage.enabled = (thumbnailImage.sprite != null);
+            if (!thumbnailImage.raycastTarget) thumbnailImage.raycastTarget = true;
+        }
+
+        if (backgroundImage != null)
+        {
+            _originalBackgroundColor = _nodeDefinition.backgroundColor;
+            backgroundImage.color = _originalBackgroundColor;
+            backgroundImage.enabled = true;
+            if (!backgroundImage.raycastTarget) backgroundImage.raycastTarget = true;
+        }
+
+        if (tooltipPanel != null) tooltipPanel.SetActive(false);
+
+        if (nodeNameText != null)
+        {
+            nodeNameText.text = _nodeData.nodeDisplayName;
+            nodeNameText.gameObject.SetActive(displayNodeName);
+        }
     }
      public void UpdateParentCellReference() { _parentCell = GetComponentInParent<NodeCell>(); /* ... null check ... */ }
      public NodeData GetNodeData() => _nodeData;
