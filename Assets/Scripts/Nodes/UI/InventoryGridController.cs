@@ -91,7 +91,6 @@ public class InventoryGridController : MonoBehaviour
 
     private void PopulateInitialGenesFromLibrary()
     {
-        // ... (no changes)
         if (NodeEditorGridController.Instance == null || NodeEditorGridController.Instance.DefinitionLibrary == null) {
             Debug.LogWarning("[InventoryGridController] Cannot populate: NodeEditorGridController or DefinitionLibrary not ready.");
             return;
@@ -99,45 +98,66 @@ public class InventoryGridController : MonoBehaviour
         NodeDefinitionLibrary lib = NodeEditorGridController.Instance.DefinitionLibrary;
         if (lib.definitions != null) {
             var definitionsToAdd = lib.definitions.Where(d => d != null).Take(inventoryRows * inventoryColumns).ToList();
-            foreach (var def in definitionsToAdd) AddGeneToInventoryFromDefinition(def); 
+            foreach (var def in definitionsToAdd)
+            {
+                // <<< CORRECTED LINE: Call the overload with null for targetCellHint >>>
+                AddGeneToInventoryFromDefinition(def, null); 
+            }
             if (definitionsToAdd.Count == 0 && lib.definitions.Count > 0)
-                 Debug.LogWarning("[InventoryGridController] No valid definitions in library for initial population.");
+                Debug.LogWarning("[InventoryGridController] No valid definitions in library for initial population.");
         }
     }
 
-    public bool AddGeneToInventoryFromDefinition(NodeDefinition geneDef)
+    // <<< NEW OVERLOAD: Tries to use targetCellHint if provided and empty >>>
+    public bool AddGeneToInventoryFromDefinition(NodeDefinition geneDef, NodeCell targetCellHint)
     {
-        // ... (ensure NodeData.storedSequence is new for all, especially seeds)
         if (geneDef == null) return false;
-        NodeCell emptyCell = inventoryCells.FirstOrDefault(cell => !cell.HasNode());
-        if (emptyCell != null)
+
+        NodeCell cellToUse = null;
+
+        // If a target cell hint is provided and it's actually an empty inventory cell, use it.
+        if (targetCellHint != null && targetCellHint.IsInventoryCell && !targetCellHint.HasNode())
+        {
+            cellToUse = targetCellHint;
+            if (logInventoryChanges) Debug.Log($"[Inventory AddGene] Using provided targetCellHint: {targetCellHint.CellIndex}");
+        }
+        else
+        {
+            // Fallback: find the first available empty cell
+            cellToUse = inventoryCells.FirstOrDefault(cell => !cell.HasNode());
+            if (logInventoryChanges && targetCellHint != null) Debug.Log($"[Inventory AddGene] TargetCellHint ({targetCellHint.CellIndex}) was not usable (IsInv: {targetCellHint.IsInventoryCell}, HasNode: {targetCellHint.HasNode()}). Using first available: {cellToUse?.CellIndex ?? -1}");
+        }
+        
+        if (cellToUse != null)
         {
             NodeData inventoryNodeData = new NodeData() {
                 nodeId = geneDef.name + "_inventory_" + System.Guid.NewGuid().ToString(),
                 nodeDisplayName = geneDef.displayName,
                 effects = geneDef.CloneEffects(),
-                orderIndex = -1,
+                orderIndex = -1, 
                 canBeDeleted = false,
-                storedSequence = new NodeGraph() // All items (including seeds) in inventory start with a fresh/empty stored sequence.
-                                                // If you want seeds to have default sequences, populate here based on geneDef.
+                storedSequence = new NodeGraph()
             };
 
-            GameObject nodeViewGO = Instantiate(nodeViewPrefab, emptyCell.transform);
+            GameObject nodeViewGO = Instantiate(nodeViewPrefab, cellToUse.transform); // Parent to the chosen cell
             NodeView view = nodeViewGO.GetComponent<NodeView>();
             if (view == null) { Destroy(nodeViewGO); return false; }
             
             view.Initialize(inventoryNodeData, geneDef, null);
 
             NodeDraggable draggable = view.GetComponent<NodeDraggable>() ?? view.gameObject.AddComponent<NodeDraggable>();
-            draggable.Initialize(invCtrl: this, startingCell: emptyCell);
+            draggable.Initialize(invCtrl: this, startingCell: cellToUse); // Initialize with the correct cell
 
-            emptyCell.AssignNodeView(view, inventoryNodeData);
-            if (logInventoryChanges) Debug.Log($"[Inventory] Added '{geneDef.displayName}' to inv cell {emptyCell.CellIndex}. IsSeed: {inventoryNodeData.IsSeed()}");
+            cellToUse.AssignNodeView(view, inventoryNodeData); // Assign to the chosen cell
+            if (logInventoryChanges) Debug.Log($"[Inventory] Added '{geneDef.displayName}' to inv cell {cellToUse.CellIndex}. IsSeed: {inventoryNodeData.IsSeed()}");
             return true;
         }
-        if (logInventoryChanges) Debug.LogWarning($"[Inventory] Could not add '{geneDef.displayName}', inventory full.");
+
+        if (logInventoryChanges) Debug.LogWarning($"[Inventory] Could not add '{geneDef.displayName}', inventory full or no suitable cell found.");
         return false;
     }
+    
+    
 
     // This method takes an *existing* NodeView and its *existing* NodeData (e.g., from seed slot or sequence editor)
     // and places it into an inventory slot.
@@ -211,7 +231,7 @@ public class InventoryGridController : MonoBehaviour
             draggedDraggable.ResetPosition(); return;
         }
 
-        if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Attempting drop. Original Cell - IsInv: {originalCell.IsInventoryCell}, IsSeedSlot: {originalCell.IsSeedSlot}. Target Cell: {targetInventoryCell.CellIndex}");
+        if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Attempting drop. Original Cell - IsInv: {originalCell.IsInventoryCell}, IsSeedSlot: {originalCell.IsSeedSlot}. Target Cell: {targetInventoryCell.CellIndex} (HasNode: {targetInventoryCell.HasNode()})");
 
         // --- Case 1: Node dragged FROM SEED SLOT TO INVENTORY ---
         if (!originalCell.IsInventoryCell && originalCell.IsSeedSlot)
@@ -219,60 +239,68 @@ public class InventoryGridController : MonoBehaviour
             if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Path: SeedSlot -> Inventory. Seed: '{draggedData.nodeDisplayName}'");
 
             NodeCell actualTargetInvCell = targetInventoryCell;
-            // If target inventory cell is occupied AND it's not the same as the original cell (which it won't be if original is seed slot)
-            // try to find an empty one.
+            // If target inventory cell is occupied, try to find an empty one.
             if (actualTargetInvCell.HasNode()) 
             {
-                if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Target Inv Cell {actualTargetInvCell.CellIndex} is occupied. Finding empty slot.");
+                if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Target Inv Cell {actualTargetInvCell.CellIndex} is occupied by {actualTargetInvCell.GetNodeData()?.nodeDisplayName}. Finding empty slot.");
                 actualTargetInvCell = inventoryCells.FirstOrDefault(c => !c.HasNode());
             }
 
-            if (actualTargetInvCell == null) { // No empty inventory slot found
+            if (actualTargetInvCell == null) { 
                 if (logInventoryChanges) Debug.LogWarning($"[Inventory HandleDrop] Inventory Full. Cannot return Seed '{draggedData.nodeDisplayName}'. Resetting drag to original seed slot.");
-                draggedDraggable.ResetPosition(); // Reset to original cell (the seed slot)
+                draggedDraggable.ResetPosition(); 
                 return;
             }
             
             if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Target inventory cell for seed is: {actualTargetInvCell.CellIndex}. Unloading from Node Editor.");
-
-            // Unload from seed slot (this clears the editor UI, doesn't touch seed slot's content yet)
+            
             NodeEditorGridController.Instance.UnloadSeedFromSlot();
             
             if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Clearing original seed slot cell ({originalCell.CellIndex}, IsSeedSlot: {originalCell.IsSeedSlot}).");
-            originalCell.ClearNodeReference(); // Original seed slot cell is now visually empty and its NodeData/View refs are null
+            originalCell.ClearNodeReference(); 
 
             if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Assigning dragged seed '{draggedData.nodeDisplayName}' (View: {draggedView.gameObject.name}) to inventory cell {actualTargetInvCell.CellIndex}.");
-            actualTargetInvCell.AssignNodeView(draggedView, draggedData); // Assigns the existing NodeView and NodeData
+            actualTargetInvCell.AssignNodeView(draggedView, draggedData); 
             
             if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Snapping '{draggedData.nodeDisplayName}' to inventory cell {actualTargetInvCell.CellIndex}.");
-            draggedDraggable.SnapToCell(actualTargetInvCell); // This reparents and positions the draggedView
+            draggedDraggable.SnapToCell(actualTargetInvCell); 
 
             if (logInventoryChanges) Debug.Log($"[Inventory] Returned Seed '{draggedData.nodeDisplayName}' from Seed Slot to inv cell {actualTargetInvCell.CellIndex}. StoredSeqCount: {draggedData.storedSequence?.nodes?.Count ?? 0}");
         }
         // --- Case 2: Node dragged FROM SEQUENCE EDITOR TO INVENTORY ---
         else if (!originalCell.IsInventoryCell && !originalCell.IsSeedSlot)
         {
-            if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Path: SequenceEditor -> Inventory. Gene: '{draggedDef.displayName}'");
-            NodeCell actualTargetInvCell = targetInventoryCell;
-            if (actualTargetInvCell.HasNode()) actualTargetInvCell = inventoryCells.FirstOrDefault(c => !c.HasNode());
+            if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Path: SequenceEditor -> Inventory. Gene: '{draggedDef.displayName}' being dropped on InvCell: {targetInventoryCell.CellIndex}");
             
-            if (actualTargetInvCell == null) {
+            NodeCell actualTargetInvCell = targetInventoryCell; // Try to use the direct drop target first
+
+            // If the direct target inventory cell is occupied, then find the first available empty slot.
+            if (actualTargetInvCell.HasNode()) {
+                if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Target InvCell {actualTargetInvCell.CellIndex} for sequence item is occupied by {actualTargetInvCell.GetNodeData()?.nodeDisplayName}. Finding first available empty slot.");
+                actualTargetInvCell = inventoryCells.FirstOrDefault(c => !c.HasNode());
+            }
+            
+            if (actualTargetInvCell == null) { // No empty slot found at all
                 if (logInventoryChanges) Debug.LogWarning($"[Inventory HandleDrop] Inventory Full. Cannot move '{draggedDef.displayName}' from sequence. Resetting drag.");
-                draggedDraggable.ResetPosition();
+                draggedDraggable.ResetPosition(); // Reset to original sequence cell
                 return;
             }
             
+            // Remove from sequence editor
             NodeEditorGridController.Instance?.GetCellAtIndex(originalCell.CellIndex)?.RemoveNode();
-            NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();
+            NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed(); // Update the (now modified) sequence in the loaded seed
 
-            AddGeneToInventoryFromDefinition(draggedDef); 
-            Destroy(draggedDraggable.gameObject); 
+            // Add a new instance of this gene type back to the determined inventory cell (actualTargetInvCell)
+            // We need a modified AddGeneToInventoryFromDefinition that takes a target cell hint
+            AddGeneToInventoryFromDefinition(draggedDef, actualTargetInvCell); 
+            Destroy(draggedDraggable.gameObject); // Destroy the original dragged view from sequence
 
             if (logInventoryChanges) Debug.Log($"[Inventory] Moved '{draggedDef.displayName}' from seq cell {originalCell.CellIndex} to inv cell {actualTargetInvCell.CellIndex}.");
         }
         // --- Case 3: From INVENTORY to INVENTORY (Swapping or Moving) ---
         else if (originalCell.IsInventoryCell)
         {
+            // ... (this logic remains the same)
             if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Path: Inventory -> Inventory. Item: '{draggedData.nodeDisplayName}'");
             if (targetInventoryCell == originalCell) {
                 if (logInventoryChanges) Debug.Log("[Inventory HandleDrop] Dropped on self in inventory. Resetting.");
