@@ -249,92 +249,81 @@ public class InventoryGridController : MonoBehaviour
     }
 
     public void HandleDropOnInventoryCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetInventoryCell)
+{
+    if (draggedDraggable == null || originalCell == null || targetInventoryCell == null || !targetInventoryCell.IsInventoryCell)
     {
-        if (draggedDraggable == null || originalCell == null || targetInventoryCell == null || !targetInventoryCell.IsInventoryCell)
-        {
-            draggedDraggable?.ResetPosition();
-            return;
-        }
-
-        NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
-        NodeDefinition draggedDef = draggedView?.GetNodeDefinition();
-
-        if (draggedView == null || draggedDef == null)
-        {
-            Debug.LogError("[InventoryGridController] HandleDropOnInventoryCell: Dragged object missing NodeView or Definition!", draggedDraggable.gameObject);
-            draggedDraggable.ResetPosition();
-            return;
-        }
-
-        // --- Scenario 1: Dragged from SEQUENCE to INVENTORY ---
-        if (!originalCell.IsInventoryCell)
-        {
-            // A. First, try to place in inventory. Determine actual target cell (could be targetInventoryCell or first empty).
-            NodeCell actualTargetInvCell = targetInventoryCell;
-            if (actualTargetInvCell.HasNode()) // If the hint target is occupied
-            {
-                actualTargetInvCell = inventoryCells.FirstOrDefault(c => !c.HasNode()); // Find any empty cell
-            }
-
-            if (actualTargetInvCell == null) // Inventory is truly full
-            {
-                if (logInventoryChanges) Debug.LogWarning($"[Inventory] Inventory full. Cannot move '{draggedDef.displayName}' from sequence. Resetting drag.");
-                draggedDraggable.ResetPosition(); // Put it back to its original sequence slot
-                // No change to sequence graph or inventory needed.
-                return;
-            }
-
-            // B. Inventory has space. Remove from sequence FIRST.
-            NodeEditorGridController.Instance?.GetCellAtIndex(originalCell.CellIndex)?.RemoveNode();
-            NodeEditorGridController.Instance?.RefreshGraph();
-
-            // C. Add to inventory. This creates a NEW NodeView instance in the inventory.
-            ReturnGeneToInventory(draggedDef, actualTargetInvCell);
-
-            // D. The original GameObject (draggedDraggable.gameObject) that was part of the sequence is no longer needed.
-            Destroy(draggedDraggable.gameObject);
-             if (logInventoryChanges) Debug.Log($"[Inventory] Moved '{draggedDef.displayName}' from sequence cell {originalCell.CellIndex} to inventory cell {actualTargetInvCell.CellIndex}.");
-        }
-        // --- Scenario 2: Dragged from INVENTORY to INVENTORY (Re-ordering) ---
-        else // originalCell.IsInventoryCell must be true
-        {
-            if (targetInventoryCell == originalCell)
-            {
-                draggedDraggable.ResetPosition(); // Dropped on itself, no change
-                return;
-            }
-
-            // Get the "dummy" NodeData from the item being dragged
-            NodeData draggedInventoryItemData = draggedView.GetNodeData();
-
-            if (targetInventoryCell.HasNode()) // Target inventory cell is OCCUPIED, so SWAP
-            {
-                NodeView viewInTargetCell = targetInventoryCell.GetNodeView();
-                NodeData dataInTargetCell = targetInventoryCell.GetNodeData(); // Dummy data of item in target
-
-                // 1. Clear original cell (where drag started), makes it ready for the item from target
-                originalCell.ClearNodeReference(); // availableGenes count is not changed by reordering
-
-                // 2. Move item from target cell TO original cell
-                originalCell.AssignNodeView(viewInTargetCell, dataInTargetCell);
-                viewInTargetCell.GetComponent<NodeDraggable>()?.SnapToCell(originalCell); // Update draggable's cell
-
-                // 3. Clear target cell (where drag ended), makes it ready for dragged item
-                targetInventoryCell.ClearNodeReference();
-            }
-            else // Target inventory cell is EMPTY
-            {
-                // Just clear the original cell as the item is moving out
-                originalCell.ClearNodeReference();
-            }
-
-            // Place the dragged item (which was originally from inventory) into the target inventory cell
-            targetInventoryCell.AssignNodeView(draggedView, draggedInventoryItemData);
-            draggedDraggable.SnapToCell(targetInventoryCell); // Update draggable's cell
-
-            if (logInventoryChanges) Debug.Log($"[Inventory] Moved inventory item '{draggedDef.displayName}' from cell {originalCell.CellIndex} to cell {targetInventoryCell.CellIndex}.");
-        }
+        draggedDraggable?.ResetPosition();
+        return;
     }
+
+    NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
+    NodeDefinition draggedDef = draggedView?.GetNodeDefinition();
+
+    if (draggedView == null || draggedDef == null)
+    {
+        Debug.LogError("[InventoryGridController] HandleDropOnInventoryCell: Dragged object missing NodeView/Definition!", draggedDraggable.gameObject);
+        draggedDraggable.ResetPosition();
+        return;
+    }
+
+    // --- Case: Dropped back onto its original inventory cell ---
+    if (targetInventoryCell == originalCell && originalCell.IsInventoryCell)
+    {
+        draggedDraggable.SnapToCell(originalCell); // Explicitly snap it back
+        // No selection for inventory items, no graph refresh needed for internal inventory move.
+        return;
+    }
+
+    // --- Scenario 1: Dragged from SEQUENCE to INVENTORY ---
+    if (!originalCell.IsInventoryCell)
+    {
+        NodeCell actualTargetInvCell = targetInventoryCell;
+        if (actualTargetInvCell.HasNode())
+        {
+            actualTargetInvCell = inventoryCells.FirstOrDefault(c => !c.HasNode());
+        }
+
+        if (actualTargetInvCell == null)
+        {
+            if (logInventoryChanges) Debug.LogWarning($"[Inventory] Inventory full. Cannot move '{draggedDef.displayName}' from sequence. Resetting drag.");
+            draggedDraggable.ResetPosition(); // This will put it back into originalCell correctly
+            return;
+        }
+
+        NodeEditorGridController.Instance?.GetCellAtIndex(originalCell.CellIndex)?.RemoveNode();
+        NodeEditorGridController.Instance?.RefreshGraph();
+        
+        ReturnGeneToInventory(draggedDef, actualTargetInvCell); // This creates a new view for inventory
+        Destroy(draggedDraggable.gameObject); // Destroy the old view from sequence
+        if (logInventoryChanges) Debug.Log($"[Inventory] Moved '{draggedDef.displayName}' from sequence cell {originalCell.CellIndex} to inventory cell {actualTargetInvCell.CellIndex}.");
+    }
+    // --- Scenario 2: Dragged from INVENTORY to a DIFFERENT INVENTORY Cell ---
+    else // originalCell.IsInventoryCell && targetInventoryCell != originalCell
+    {
+        NodeData draggedInventoryItemData = draggedView.GetNodeData();
+
+        if (targetInventoryCell.HasNode()) // Target inventory cell is OCCUPIED, so SWAP
+        {
+            NodeView viewInTargetCell = targetInventoryCell.GetNodeView();
+            NodeData dataInTargetCell = targetInventoryCell.GetNodeData();
+            
+            originalCell.ClearNodeReference(); // Source cell becomes empty
+
+            originalCell.AssignNodeView(viewInTargetCell, dataInTargetCell); // Item from target moves to original
+            viewInTargetCell.GetComponent<NodeDraggable>()?.SnapToCell(originalCell);
+
+            targetInventoryCell.ClearNodeReference(); // Target cell becomes empty (momentarily)
+        }
+        else // Target inventory cell is EMPTY
+        {
+            originalCell.ClearNodeReference(); // Source cell becomes empty
+        }
+
+        targetInventoryCell.AssignNodeView(draggedView, draggedInventoryItemData); // Dragged item moves to target
+        draggedDraggable.SnapToCell(targetInventoryCell); // Snap the dragged item
+        if (logInventoryChanges) Debug.Log($"[Inventory] Moved inventory item '{draggedDef.displayName}' from cell {originalCell.CellIndex} to cell {targetInventoryCell.CellIndex}.");
+    }
+}
 
     public NodeCell GetInventoryCellAtIndex(int index)
     {

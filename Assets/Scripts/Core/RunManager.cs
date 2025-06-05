@@ -18,7 +18,7 @@ public class RunManager : MonoBehaviour
     [Tooltip("Time scale multiplier during the Growth & Threat phase.")]
     [SerializeField] private float growthPhaseTimeScale = 6f;
     [Tooltip("Current round number, starts at 1.")]
-    [SerializeField] private int currentRoundNumber = 1; // For tracking progression
+    [SerializeField] private int currentRoundNumber = 1;
 
     [Header("Manager References (Assign in Inspector)")]
     [SerializeField] private WeatherManager weatherManager;
@@ -27,17 +27,30 @@ public class RunManager : MonoBehaviour
     public RunState CurrentState => currentState;
     public int CurrentRoundNumber => currentRoundNumber;
     public event Action<RunState> OnRunStateChanged;
-    public event Action<int> OnRoundChanged; // Event for new round starting
+    public event Action<int> OnRoundChanged;
 
     private void Awake()
     {
         if (Instance != null && Instance != this)
         {
-            Destroy(gameObject);
+            Debug.LogWarning($"[RunManager] Duplicate instance found on {gameObject.name}. Destroying this one.", gameObject);
+            Destroy(gameObject); // Destroy this duplicate instance
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+
+        // This line will work without warning IF this GameObject is a root object in the scene.
+        // If you intend for RunManager to persist across scene loads.
+        // If your game is single-scene, you might not even need DontDestroyOnLoad.
+        if (transform.parent == null) // Only call DontDestroyOnLoad if it's a root GameObject
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Debug.LogWarning($"[RunManager] {gameObject.name} is not a root GameObject. DontDestroyOnLoad will not be called for it directly. If its parent is persistent, that's fine. Otherwise, make RunManager a root object if it needs to persist across scenes.", gameObject);
+        }
+
 
         SetState(RunState.Planning, true);
     }
@@ -53,16 +66,16 @@ public class RunManager : MonoBehaviour
         {
             case RunState.Planning:
                 Time.timeScale = 0f;
-                weatherManager?.PauseCycleAtDay(); // Example: Ensure consistent planning environment
+                weatherManager?.PauseCycleAtDay();
                 break;
             case RunState.GrowthAndThreat:
                 Time.timeScale = growthPhaseTimeScale;
                 weatherManager?.ResumeCycle();
-                waveManager?.StartWaveForRound(currentRoundNumber); // Tell WaveManager to start
+                waveManager?.StartWaveForRound(currentRoundNumber);
                 break;
             case RunState.Recovery:
                 Time.timeScale = 0f;
-                weatherManager?.PauseCycle(); // Example: Pause environment during recovery
+                weatherManager?.PauseCycle();
                 break;
         }
         OnRunStateChanged?.Invoke(currentState);
@@ -86,7 +99,7 @@ public class RunManager : MonoBehaviour
         if (currentState == RunState.GrowthAndThreat)
         {
             Debug.Log("[RunManager] Transitioning: Growth & Threat -> Recovery");
-            waveManager?.StopCurrentWaveSpawning(); // Tell WaveManager to stop spawning more for this wave
+            waveManager?.StopCurrentWaveSpawning();
             SetState(RunState.Recovery);
         }
         else
@@ -101,8 +114,7 @@ public class RunManager : MonoBehaviour
         {
             currentRoundNumber++;
             Debug.Log($"[RunManager] Transitioning: Recovery -> Planning (New Round: {currentRoundNumber})");
-            waveManager?.ResetForNewRound(); // Prepare WaveManager for the next round
-            // TODO: Add any other game element resets needed for a new round
+            waveManager?.ResetForNewRound();
             SetState(RunState.Planning);
             OnRoundChanged?.Invoke(currentRoundNumber);
         }
@@ -114,8 +126,6 @@ public class RunManager : MonoBehaviour
 
     void Update()
     {
-        // Example: Automatically transition from GrowthAndThreat to Recovery
-        // This condition needs to be robust.
         if (currentState == RunState.GrowthAndThreat)
         {
             if (waveManager != null && waveManager.IsCurrentWaveDefeated())
