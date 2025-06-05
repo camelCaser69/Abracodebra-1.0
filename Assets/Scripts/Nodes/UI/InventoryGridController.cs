@@ -22,9 +22,14 @@ public class InventoryGridController : MonoBehaviour
     [Tooltip("Prefab for displaying nodes in the inventory. Can be the same as NodeEditorGridController's NodeViewPrefab.")]
     [SerializeField] private GameObject nodeViewPrefab;
 
-    // --- NEW FIELD FOR INVENTORY ITEM SPRITE SCALE ---
-    [Tooltip("Scale factor for the gene/item image (thumbnail) within inventory NodeViews. Default is 1,1,1 (no change).")]
-    [SerializeField] private Vector3 inventoryNodeImageScale = Vector3.one; // Default to no scaling
+    // --- MODIFIED: Scale is now a single float for uniform scaling ---
+    [Tooltip("Uniform scale factor for the gene/item image (thumbnail) within NodeViews. Default is 1 (no change). Applies to both X and Y axes.")]
+    [SerializeField] private float nodeGlobalImageScale = 1f; // Default to no scaling
+    // --- END MODIFIED ---
+
+    // --- NEW FIELD FOR RAYCAST PADDING ---
+    [Tooltip("Padding to shrink the raycast area of node images (thumbnails and backgrounds) to prevent overlap with adjacent cells when scaled up. Negative values shrink. Default 0.")]
+    [SerializeField] private float nodeImageRaycastPadding = 0f; // Default to no padding (shrinking)
     // --- END NEW FIELD ---
 
     [Header("UI References")]
@@ -41,9 +46,9 @@ public class InventoryGridController : MonoBehaviour
 
     // Public accessors
     public GameObject NodeViewPrefab => nodeViewPrefab;
-    public Vector3 InventoryNodeImageScale => inventoryNodeImageScale; // --- NEW PUBLIC ACCESSOR ---
     public Color EmptyCellColor => emptyCellColor;
-    // Removed: public Vector3 NodeImageScale => nodeImageScale; // This was ambiguous, now specific
+    public float NodeGlobalImageScale => nodeGlobalImageScale; // --- MODIFIED PUBLIC ACCESSOR ---
+    public float NodeImageRaycastPadding => nodeImageRaycastPadding; // --- NEW PUBLIC ACCESSOR ---
 
     void Awake()
     {

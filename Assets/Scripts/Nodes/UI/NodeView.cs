@@ -25,71 +25,76 @@ public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private Color _originalBackgroundColor;
 
     public void Initialize(NodeData data, NodeDefinition definition, NodeEditorGridController sequenceController)
-    {
-        _nodeData = data;
-        _nodeDefinition = definition;
-        _sequenceGridControllerRef = sequenceController; // This will be null if it's an inventory item
+ {
+     _nodeData = data;
+     _nodeDefinition = definition;
+     _sequenceGridControllerRef = sequenceController; // This will be null if it's an inventory item
 
-        UpdateParentCellReference(); // Call early
+     UpdateParentCellReference(); // Call early to know if it's inventory or sequence via _parentCell.IsInventoryCell
 
-        if (_nodeData == null || _nodeDefinition == null)
-        {
-            Debug.LogError($"[NodeView Initialize] NodeData or NodeDefinition is null for {gameObject.name}. Disabling.", gameObject);
-            gameObject.SetActive(false);
-            return;
-        }
+     if (_nodeData == null || _nodeDefinition == null)
+     {
+         Debug.LogError($"[NodeView Initialize] NodeData or NodeDefinition is null for {gameObject.name}. Disabling.", gameObject);
+         gameObject.SetActive(false);
+         return;
+     }
 
-        // Thumbnail Image Setup
-        if (thumbnailImage != null)
-        {
-            thumbnailImage.sprite = _nodeDefinition.thumbnail;
-            thumbnailImage.color = _nodeDefinition.thumbnailTintColor;
+     // --- Get Global Scale and Padding from InventoryGridController (if available) ---
+     float globalScaleFactor = 1f;
+     float raycastPaddingValue = 0f;
 
-            Vector3 imageScale = Vector3.one; // Default to (1,1,1)
-            if (InventoryGridController.Instance != null)
-            {
-                // Prioritize scale from InventoryGridController if it exists, making it global
-                imageScale = InventoryGridController.Instance.InventoryNodeImageScale;
-            }
-            else
-            {
-                // Fallback if InventoryGridController isn't available (e.g., testing scene without it)
-                Debug.LogWarning("[NodeView] InventoryGridController.Instance not found during Initialize. Using default image scale (1,1,1).", gameObject);
-            }
-            thumbnailImage.rectTransform.localScale = imageScale;
+     if (InventoryGridController.Instance != null)
+     {
+         globalScaleFactor = InventoryGridController.Instance.NodeGlobalImageScale;
+         raycastPaddingValue = InventoryGridController.Instance.NodeImageRaycastPadding;
+     }
+     else
+     {
+         // This warning is important if InventoryGridController is expected to be present
+         Debug.LogWarning("[NodeView] InventoryGridController.Instance not found during Initialize. Using default image scale (1) and padding (0). Ensure InventoryGridController is active in the scene.", gameObject);
+     }
+     // --- END Get Global Scale and Padding ---
 
-            thumbnailImage.enabled = (_nodeDefinition.thumbnail != null);
-            if (!thumbnailImage.raycastTarget) thumbnailImage.raycastTarget = true; // Ensure clickable
-        }
-        else
-        {
-            Debug.LogWarning($"[NodeView {gameObject.name}] ThumbnailImage is not assigned in prefab.", gameObject);
-        }
+     // Create the padding vector for UI.Image.raycastPadding
+     // Order is: Left, Bottom, Right, Top
+     Vector4 raycastPaddingVector = new Vector4(raycastPaddingValue, raycastPaddingValue, raycastPaddingValue, raycastPaddingValue);
 
+     if (thumbnailImage != null)
+     {
+         thumbnailImage.sprite = _nodeDefinition.thumbnail;
+         thumbnailImage.color = _nodeDefinition.thumbnailTintColor;
+         // Apply uniform global scale to X and Y, Z remains 1
+         thumbnailImage.rectTransform.localScale = new Vector3(globalScaleFactor, globalScaleFactor, 1f);
+         thumbnailImage.enabled = (_nodeDefinition.thumbnail != null);
+         thumbnailImage.raycastTarget = true; // Thumbnail needs to be targetable to initiate drag
+         thumbnailImage.raycastPadding = raycastPaddingVector; // Apply padding
+     }
+     else
+     {
+         Debug.LogWarning($"[NodeView {gameObject.name}] ThumbnailImage is not assigned in prefab.", gameObject);
+     }
 
-        // Background Image Setup
-        if (backgroundImage != null)
-        {
-            _originalBackgroundColor = _nodeDefinition.backgroundColor;
-            backgroundImage.color = _originalBackgroundColor;
-            backgroundImage.enabled = true;
-            if (!backgroundImage.raycastTarget) backgroundImage.raycastTarget = true; // Ensure clickable
-        }
-        else
-        {
-            Debug.LogWarning($"[NodeView {gameObject.name}] BackgroundImage is not assigned in prefab.", gameObject);
-        }
+     if (backgroundImage != null) // This is the NodeView's own background
+     {
+         _originalBackgroundColor = _nodeDefinition.backgroundColor;
+         backgroundImage.color = _originalBackgroundColor;
+         backgroundImage.enabled = true;
+         backgroundImage.raycastTarget = true; // NodeView background also needs to be targetable for clicks/drag start
+         backgroundImage.raycastPadding = raycastPaddingVector; // Apply padding
+     }
+     else
+     {
+         Debug.LogWarning($"[NodeView {gameObject.name}] BackgroundImage for NodeView itself is not assigned in prefab.", gameObject);
+     }
 
-        // Tooltip Setup
-        if (tooltipPanel != null) tooltipPanel.SetActive(false);
+     if (tooltipPanel != null) tooltipPanel.SetActive(false);
 
-        // Node Name Text Setup
-        if (nodeNameText != null)
-        {
-            nodeNameText.text = _nodeData.nodeDisplayName;
-            nodeNameText.gameObject.SetActive(displayNodeName);
-        }
-    }
+     if (nodeNameText != null)
+     {
+         nodeNameText.text = _nodeData.nodeDisplayName;
+         nodeNameText.gameObject.SetActive(displayNodeName);
+     }
+ }
 
     public void UpdateParentCellReference()
     {
