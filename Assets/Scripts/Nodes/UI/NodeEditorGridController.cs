@@ -11,10 +11,10 @@ public class NodeEditorGridController : MonoBehaviour
 {
     public static NodeEditorGridController Instance { get; private set; }
 
-    [Header("Grid Layout & Appearance")]
+    [Header("Grid Layout & Appearance (Sequence Editor)")]
     [SerializeField][Min(1)] private int emptyCellsCount = 8;
-    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
-    [SerializeField] private float cellMargin = 10f;
+    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f); // Also used for seed slot
+    [SerializeField] private float cellMargin = 10f; // Also used for seed slot if its container has layout
 
     [Header("Empty Cell Visuals")]
     [SerializeField] private Sprite emptyCellSprite;
@@ -23,7 +23,6 @@ public class NodeEditorGridController : MonoBehaviour
 
     [Header("Node Visuals")]
     [SerializeField] private GameObject nodeViewPrefab;
-    // REMOVED: nodeImageScale field - now globally controlled by InventoryGridController
     [SerializeField] private Color selectedNodeBackgroundColor = new Color(0.9f, 0.9f, 0.7f, 1f);
 
     [Header("Node Definitions & Interaction")]
@@ -31,12 +30,17 @@ public class NodeEditorGridController : MonoBehaviour
     [SerializeField] private TMP_Dropdown nodeDropdown;
 
     [Header("UI References")]
-    [Tooltip("The UI GameObject (Panel) that acts as the main container for the Node Editor. This will be controlled by UIManager.")]
+    [Tooltip("The UI GameObject (Panel) that acts as the main container for the Node Editor sequence. This will be controlled by UIManager.")]
     [SerializeField] public GameObject gridUIParent;
     [Tooltip("The Transform within gridUIParent where sequence cell GameObjects should be created.")]
     [SerializeField] private Transform cellContainer;
 
+    [Header("Seed Slot Specifics")]
+    [Tooltip("Assign the Transform that will parent the dynamically created Seed Slot cell. Ensure its layout (e.g., via Horizontal/Vertical Layout Group or manual RectTransform positioning) is correct.")]
+    [SerializeField] private Transform seedSlotContainer;
+
     private List<NodeCell> nodeCells = new List<NodeCell>();
+    private NodeCell _actualSeedSlotCell;
     private Canvas _rootCanvas;
     private NodeGraph _uiGraphRepresentation = new NodeGraph();
 
@@ -44,7 +48,9 @@ public class NodeEditorGridController : MonoBehaviour
     public NodeDefinitionLibrary DefinitionLibrary => definitionLibrary;
     public Color SelectedNodeBackgroundColor => selectedNodeBackgroundColor;
     public Color EmptyCellColor => emptyCellColor;
-    public NodeGraph GetCurrentUIGraph() => _uiGraphRepresentation;
+    public NodeGraph GetCurrentGraphInEditor() => _uiGraphRepresentation;
+    public NodeData GetCurrentSeedInSlot() => _actualSeedSlotCell != null ? _actualSeedSlotCell.GetNodeData() : null;
+    public NodeCell SeedSlotCell => _actualSeedSlotCell;
 
     void Awake()
     {
@@ -55,10 +61,15 @@ public class NodeEditorGridController : MonoBehaviour
         if (_rootCanvas == null) _rootCanvas = FindFirstObjectByType<Canvas>();
         if (_rootCanvas == null) Debug.LogError("[NodeEditorGridController] Root Canvas not found!", gameObject);
 
-        if (gridUIParent == null) Debug.LogError("[NodeEditorGridController] Grid UI Parent not assigned.", gameObject);
-        if (cellContainer == null) Debug.LogError("[NodeEditorGridController] Cell Container not assigned.", gameObject);
+        if (gridUIParent == null) Debug.LogError("[NodeEditorGridController] Grid UI Parent (sequence editor panel) not assigned.", gameObject);
+        if (cellContainer == null) Debug.LogError("[NodeEditorGridController] Cell Container (for sequence) not assigned.", gameObject);
         if (nodeDropdown == null) Debug.LogWarning("[NodeEditorGridController] Node Dropdown not assigned.", gameObject);
         if (definitionLibrary == null) Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned!", gameObject);
+        
+        if (seedSlotContainer == null)
+        {
+            Debug.LogError("[NodeEditorGridController] Seed Slot Container is not assigned in the Inspector! Seed slot will not be created.", gameObject);
+        }
     }
 
     void OnDestroy()
@@ -70,10 +81,15 @@ public class NodeEditorGridController : MonoBehaviour
     {
         if (nodeDropdown != null) nodeDropdown.gameObject.SetActive(false);
 
+        if (seedSlotContainer != null)
+        {
+            CreateSeedSlot();
+        }
+
         if (cellContainer != null && definitionLibrary != null)
         {
-            CreateCells();
-            SpawnInitialNodes();
+            CreateSequenceCells();
+            HideNodeEditorPanel();
             RefreshGraph();
         }
         else
@@ -82,13 +98,46 @@ public class NodeEditorGridController : MonoBehaviour
         }
     }
 
-    private void CreateCells()
+    private void CreateSeedSlot()
+    {
+        if (seedSlotContainer == null) return;
+        foreach (Transform child in seedSlotContainer) Destroy(child.gameObject);
+
+        // Create GameObject with RectTransform
+        GameObject seedCellGO = new GameObject("SeedSlot_Cell", typeof(RectTransform)); // <<< Ensure RectTransform
+        seedCellGO.transform.SetParent(seedSlotContainer, false);
+
+        RectTransform rt = seedCellGO.GetComponent<RectTransform>(); // This will now exist
+        // If the seedSlotContainer has a Layout Group (e.g., Horizontal/Vertical),
+        // the sizeDelta might be controlled by the layout group.
+        // Setting it here might be overridden or might be necessary if no layout group.
+        rt.sizeDelta = cellSize;
+        // For manual positioning if no layout group:
+        // rt.anchorMin = new Vector2(0.5f, 0.5f);
+        // rt.anchorMax = new Vector2(0.5f, 0.5f);
+        // rt.pivot = new Vector2(0.5f, 0.5f);
+        // rt.anchoredPosition = Vector2.zero; // Center in parent, or set specific position
+
+        Image cellImage = seedCellGO.AddComponent<Image>();
+        cellImage.sprite = emptyCellSprite;
+        cellImage.color = emptyCellColor;
+        cellImage.raycastTarget = true;
+
+        NodeCell cellLogic = seedCellGO.AddComponent<NodeCell>();
+        cellLogic.InitAsSeedSlot(this, cellImage);
+        _actualSeedSlotCell = cellLogic;
+
+        Debug.Log("[NodeEditorGridController] Seed Slot cell created and initialized.", _actualSeedSlotCell.gameObject);
+    }
+
+    private void CreateSequenceCells()
     {
         if (cellContainer == null) return;
 
         foreach (Transform child in cellContainer)
         {
-            if (child.GetComponent<NodeCell>() != null) Destroy(child.gameObject);
+            NodeCell nc = child.GetComponent<NodeCell>();
+            if (nc != null && !nc.IsSeedSlot) Destroy(child.gameObject);
         }
         nodeCells.Clear();
         NodeCell.ClearSelection();
@@ -96,80 +145,65 @@ public class NodeEditorGridController : MonoBehaviour
         GridLayoutGroup gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
         if (gridLayout == null)
         {
-            Debug.LogWarning("[NodeEditorGridController] Cell Container for sequence does not have a GridLayoutGroup. Using manual layout. Consider adding GridLayoutGroup for easier management.", cellContainer.gameObject);
+            Debug.LogWarning("[NodeEditorGridController] Sequence Cell Container does not have a GridLayoutGroup. Manual layout may be incorrect.", cellContainer.gameObject);
             RectTransform containerRect = cellContainer.GetComponent<RectTransform>();
             if (containerRect == null) { Debug.LogError("CellContainer needs a RectTransform for manual layout!", cellContainer.gameObject); return; }
             float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
             float startX = -(totalWidth / 2f) + (cellSize.x / 2f);
-            float startY = 0;
             for (int i = 0; i < emptyCellsCount; i++)
             {
-                GameObject cellGO = new GameObject($"SequenceCell_{i}");
-                RectTransform rt = cellGO.AddComponent<RectTransform>();
+                GameObject cellGO = new GameObject($"SequenceCell_{i}", typeof(RectTransform)); // <<< Ensure RectTransform
                 cellGO.transform.SetParent(cellContainer, false);
-                rt.anchorMin = new Vector2(0.5f, 0.5f); rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.pivot = new Vector2(0.5f, 0.5f); rt.sizeDelta = cellSize;
-                rt.anchoredPosition = new Vector2(startX + i * (cellSize.x + cellMargin), startY);
+
+                RectTransform rt = cellGO.GetComponent<RectTransform>();
+                rt.sizeDelta = cellSize;
                 rt.localScale = emptyCellScale;
+                // Manual positioning for sequence cells if no grid layout
+                rt.anchorMin = new Vector2(0.5f, 0.5f); rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.anchoredPosition = new Vector2(startX + i * (cellSize.x + cellMargin), 0);
+                
                 SetupCellComponents(cellGO, i);
             }
         }
-        else // Using GridLayoutGroup
+        else 
         {
             gridLayout.cellSize = cellSize;
             gridLayout.spacing = new Vector2(cellMargin, cellMargin);
-            // Ensure other GridLayoutGroup settings (constraint, constraintCount, padding, childAlignment) are set correctly in Inspector.
+            // For GridLayoutGroup, it's better to let it control the size.
+            // We might not even need to set rt.sizeDelta explicitly if LayoutElement isn't used.
             for (int i = 0; i < emptyCellsCount; i++)
             {
-                GameObject cellGO = new GameObject($"SequenceCell_{i}");
+                // Create GameObject with RectTransform
+                GameObject cellGO = new GameObject($"SequenceCell_{i}", typeof(RectTransform)); // <<< Ensure RectTransform
                 cellGO.transform.SetParent(cellContainer, false);
+                // Let GridLayoutGroup handle size and position.
+                // We can still set scale if needed: cellGO.transform.localScale = emptyCellScale;
                 SetupCellComponents(cellGO, i);
             }
         }
     }
-
-    private void SetupCellComponents(GameObject cellGO, int index)
+    
+    private void SetupCellComponents(GameObject cellGO, int index) // For sequence cells
     {
         Image cellImage = cellGO.AddComponent<Image>();
         cellImage.sprite = emptyCellSprite;
         cellImage.color = emptyCellColor;
         cellImage.raycastTarget = true;
         NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
-        cellLogic.Init(index, this, null, cellImage); // For sequence cells, inventoryController is null
+        cellLogic.Init(index, this, null, cellImage);
         nodeCells.Add(cellLogic);
-    }
-
-    private void SpawnInitialNodes()
-    {
-        if (definitionLibrary == null || definitionLibrary.initialNodes == null) return;
-        if (nodeCells.Count == 0) { Debug.LogWarning("[NodeEditorGridController] Cannot spawn initial nodes - cells not created."); return; }
-
-        foreach (var config in definitionLibrary.initialNodes)
-        {
-            if (config.nodeDefinition == null) { Debug.LogWarning("InitialNodeConfig has null NodeDefinition. Skipping."); continue; }
-            if (config.cellIndex < 0 || config.cellIndex >= nodeCells.Count) { Debug.LogWarning($"InitialNodeConfig for '{config.nodeDefinition.name}' has invalid cellIndex {config.cellIndex}. Skipping."); continue; }
-            NodeCell targetCell = nodeCells[config.cellIndex];
-            if (targetCell.HasNode()) { Debug.LogWarning($"InitialNodeConfig for '{config.nodeDefinition.name}' targets occupied cell {config.cellIndex}. Skipping."); continue; }
-            
-            targetCell.AssignNode(config.nodeDefinition);
-            NodeView spawnedView = targetCell.GetNodeView();
-            if (spawnedView != null)
-            {
-                NodeDraggable draggable = spawnedView.GetComponent<NodeDraggable>();
-                if (draggable != null) draggable.enabled = config.canMove;
-                NodeData spawnedData = targetCell.GetNodeData();
-                if (spawnedData != null) spawnedData.canBeDeleted = config.canDelete;
-            }
-        }
     }
 
     void Update()
     {
-        if (gridUIParent != null && gridUIParent.activeInHierarchy) // Only process input if this UI is active
+        if (gridUIParent != null && gridUIParent.activeInHierarchy)
         {
             if (Input.GetKeyDown(KeyCode.Delete))
             {
-                if (NodeCell.CurrentlySelectedCell != null && !NodeCell.CurrentlySelectedCell.IsInventoryCell) // Ensure it's a sequence cell
+                if (NodeCell.CurrentlySelectedCell != null && 
+                    !NodeCell.CurrentlySelectedCell.IsInventoryCell && 
+                    NodeCell.CurrentlySelectedCell != _actualSeedSlotCell) // <<< Check against _actualSeedSlotCell
                 {
                     NodeCell selected = NodeCell.CurrentlySelectedCell;
                     NodeData data = selected.GetNodeData();
@@ -184,56 +218,120 @@ public class NodeEditorGridController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown();
-                else if (NodeCell.CurrentlySelectedCell != null) NodeCell.ClearSelection(); // Deselect if dropdown not open
+                else if (NodeCell.CurrentlySelectedCell != null) NodeCell.ClearSelection();
             }
         }
     }
+    
+    public void ShowNodeEditorPanel() { if (gridUIParent != null) gridUIParent.SetActive(true); }
+    public void HideNodeEditorPanel() { if (gridUIParent != null) { gridUIParent.SetActive(false); if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown(); NodeCell.ClearSelection(); } }
 
-    public void ShowNodeEditor() { if (gridUIParent != null) gridUIParent.SetActive(true); }
-    public void HideNodeEditor() { if (gridUIParent != null) { gridUIParent.SetActive(false); if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown(); NodeCell.ClearSelection(); } }
+    public void LoadSequenceFromSeed(NodeData seedData)
+    {
+        if (_actualSeedSlotCell == null) { Debug.LogError("Seed slot not initialized. Cannot load sequence."); return; }
+
+        if (seedData == null || !seedData.IsSeed())
+        {
+            Debug.LogError("[NodeEditorGridController] LoadSequenceFromSeed: Invalid or non-seed data.", gameObject);
+            HideNodeEditorPanel();
+            return;
+        }
+
+        ClearSequenceEditorCells(); 
+
+        if (seedData.storedSequence != null && seedData.storedSequence.nodes != null)
+        {
+            foreach (NodeData nodeDataInSeed in seedData.storedSequence.nodes.OrderBy(n => n.orderIndex))
+            {
+                if (nodeDataInSeed == null) continue;
+                if (nodeDataInSeed.orderIndex >= 0 && nodeDataInSeed.orderIndex < nodeCells.Count)
+                {
+                    NodeCell targetCell = nodeCells[nodeDataInSeed.orderIndex];
+                    NodeDefinition def = definitionLibrary.definitions.FirstOrDefault(d => d.displayName == nodeDataInSeed.nodeDisplayName); 
+                    
+                    if (def != null)
+                    {
+                        GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : this.NodeViewPrefab;
+                        if (prefabToInstantiate == null) {
+                            Debug.LogError($"No NodeView prefab for '{def.displayName}'.", gameObject);
+                            continue;
+                        }
+                        GameObject nodeViewGO = Instantiate(prefabToInstantiate, targetCell.transform);
+                        NodeView view = nodeViewGO.GetComponent<NodeView>();
+                        if (view != null)
+                        {
+                            view.Initialize(nodeDataInSeed, def, this);
+                            targetCell.AssignNodeView(view, nodeDataInSeed);
+                            
+                            NodeDraggable draggable = view.GetComponent<NodeDraggable>() ?? view.gameObject.AddComponent<NodeDraggable>();
+                            draggable.Initialize(this, null, targetCell);
+                        }
+                        else { Destroy(nodeViewGO); }
+                    }
+                    else Debug.LogWarning($"Could not find NodeDefinition for '{nodeDataInSeed.nodeDisplayName}' while loading seed.");
+                }
+            }
+        }
+        ShowNodeEditorPanel();
+        RefreshGraph();
+        Debug.Log($"[NodeEditorGridController] Loaded sequence from seed '{seedData.nodeDisplayName}'.");
+    }
+
+    public void UnloadSeedFromSlot()
+    {
+        if (_actualSeedSlotCell == null) { Debug.LogWarning("Seed slot not initialized. Cannot unload."); return; }
+        
+        ClearSequenceEditorCells();
+        HideNodeEditorPanel();
+        _uiGraphRepresentation.nodes.Clear();
+        Debug.Log("[NodeEditorGridController] Unloaded seed and cleared editor.");
+    }
+
+    private void ClearSequenceEditorCells()
+    {
+        foreach (NodeCell cell in nodeCells)
+        {
+            cell.RemoveNode();
+        }
+        NodeCell.ClearSelection();
+    }
 
     public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
     {
-        if (cell.IsInventoryCell) return; // Don't open for inventory cells
+        if (cell.IsInventoryCell || cell == _actualSeedSlotCell) return; // <<< Check against _actualSeedSlotCell
         if (nodeDropdown == null) { Debug.LogError("[NodeEditorGridController] Node Dropdown not assigned."); return; }
         if (definitionLibrary == null || definitionLibrary.definitions == null) { Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned/empty."); return; }
-        StopCoroutine("ShowDropdownCoroutine"); // Ensure only one runs
+        StopCoroutine("ShowDropdownCoroutine");
         StartCoroutine(ShowDropdownCoroutine(cell, eventData));
     }
 
     private IEnumerator ShowDropdownCoroutine(NodeCell cell, PointerEventData eventData)
     {
-        List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
-        options.Add(new TMP_Dropdown.OptionData("Select Node...")); // Placeholder first option
-
+        List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData> { new TMP_Dropdown.OptionData("Select Node...") };
         var sortedDefinitions = definitionLibrary.definitions
-                                    .Where(def => def != null) // Filter out any nulls in the library
+                                    .Where(def => def != null && !def.effects.Any(e => e.effectType == NodeEffectType.SeedSpawn)) 
                                     .OrderBy(def => def.displayName)
                                     .ToList();
-
-        foreach (var def in sortedDefinitions)
-        {
-            options.Add(new TMP_Dropdown.OptionData { text = def.displayName, image = def.thumbnail });
-        }
+        foreach (var def in sortedDefinitions) options.Add(new TMP_Dropdown.OptionData { text = def.displayName, image = def.thumbnail });
         
         nodeDropdown.ClearOptions(); nodeDropdown.AddOptions(options);
-        nodeDropdown.onValueChanged.RemoveAllListeners(); // Important to prevent multiple calls
+        nodeDropdown.onValueChanged.RemoveAllListeners();
         nodeDropdown.onValueChanged.AddListener((selectedIndex) => { OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions); });
 
         RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
         if (_rootCanvas != null && dropdownRect.parent is RectTransform parentRect) {
             RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, _rootCanvas.worldCamera, out Vector2 localPos);
             dropdownRect.localPosition = localPos;
-        } else { Debug.LogWarning("[NodeEditorGridController] Cannot accurately position dropdown: RootCanvas or parent RectTransform issue."); }
+        } else Debug.LogWarning("[NodeEditorGridController] Cannot accurately position dropdown.");
         
         if (!nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(true);
-        yield return null; // Wait for layout potentially
+        yield return null;
         
         try { 
             if (nodeDropdown.template == null) { Debug.LogError("Node Dropdown template is null!", nodeDropdown.gameObject); HideDropdown(); yield break; }
             nodeDropdown.Show(); 
         }
-        catch (System.NullReferenceException nre) { Debug.LogError($"Error showing dropdown (template issue?): {nre.Message}", nodeDropdown.gameObject); HideDropdown(); yield break; }
+        catch (System.NullReferenceException nre) { Debug.LogError($"Error showing dropdown: {nre.Message}", nodeDropdown.gameObject); HideDropdown(); yield break; }
         
         nodeDropdown.value = 0; nodeDropdown.RefreshShownValue();
     }
@@ -241,7 +339,7 @@ public class NodeEditorGridController : MonoBehaviour
     private void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefinitions)
     {
         HideDropdown();
-        if (selectedIndex > 0) { // 0 is "Select Node..."
+        if (selectedIndex > 0) {
             int definitionIndexInSortedList = selectedIndex - 1;
             if (definitionIndexInSortedList >= 0 && definitionIndexInSortedList < sortedDefinitions.Count) {
                 NodeDefinition selectedDef = sortedDefinitions[definitionIndexInSortedList];
@@ -250,7 +348,7 @@ public class NodeEditorGridController : MonoBehaviour
                     NodeCell.SelectCell(targetCell);    
                     RefreshGraph();                     
                 }
-            } else { Debug.LogError($"[NodeEditorGridController] Dropdown selection index ({selectedIndex}) invalid for sorted definition list."); }
+            } else Debug.LogError($"Dropdown selection index {selectedIndex} invalid.");
         }
     }
 
@@ -263,68 +361,135 @@ public class NodeEditorGridController : MonoBehaviour
 
     public void RefreshGraph()
     {
+        if (_actualSeedSlotCell == null) { return; }
+
         if (_uiGraphRepresentation == null) _uiGraphRepresentation = new NodeGraph();
         _uiGraphRepresentation.nodes.Clear();
-        if (nodeCells != null) {
-            foreach (var cell in nodeCells.OrderBy(c => c.CellIndex)) { // Ensure processing in order
+        if (nodeCells != null) { 
+            foreach (var cell in nodeCells.OrderBy(c => c.CellIndex)) {
                 NodeData data = cell.GetNodeData();
                 if (data != null) { data.orderIndex = cell.CellIndex; _uiGraphRepresentation.nodes.Add(data); }
             }
         }
+
+        NodeData currentSeed = GetCurrentSeedInSlot();
+        if (currentSeed != null && currentSeed.IsSeed())
+        {
+            currentSeed.storedSequence.nodes = new List<NodeData>(_uiGraphRepresentation.nodes);
+        }
     }
     
-    public NodeCell GetCellAtIndex(int index)
+    public NodeCell GetCellAtIndex(int index) 
     {
-        if (nodeCells == null) { Debug.LogError("[NodeEditorGridController] nodeCells list is null. Cannot GetCellAtIndex."); return null; }
+        if (nodeCells == null) { Debug.LogError("[NodeEditorGridController] nodeCells list is null."); return null; }
         if (index >= 0 && index < nodeCells.Count) return nodeCells[index];
-        Debug.LogWarning($"[NodeEditorGridController] GetCellAtIndex: Index {index} out of bounds (0-{(nodeCells.Count > 0 ? nodeCells.Count - 1 : -1)}). Returning null.");
+        Debug.LogWarning($"[NodeEditorGridController] GetCellAtIndex: Index {index} out of bounds for sequence cells.");
         return null;
     }
 
+    public void HandleDropOnSeedSlot(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetSeedSlotCell)
+    {
+        if (_actualSeedSlotCell == null || targetSeedSlotCell != _actualSeedSlotCell) {
+             Debug.LogError("HandleDropOnSeedSlot called on an incorrect or uninitialized cell.", targetSeedSlotCell.gameObject);
+             draggedDraggable.ResetPosition();
+             return;
+        }
+
+        NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
+        NodeData draggedData = draggedView?.GetNodeData();
+
+        if (draggedView == null || draggedData == null || !draggedData.IsSeed())
+        {
+            Debug.LogWarning($"[NodeEditorGridController] Item dropped on seed slot is not a valid seed. Resetting drag.", draggedDraggable.gameObject);
+            draggedDraggable.ResetPosition();
+            return;
+        }
+        
+        NodeData existingSeedInSlotData = _actualSeedSlotCell.GetNodeData();
+        if (existingSeedInSlotData != null)
+        {
+            NodeView existingSeedViewInSlot = _actualSeedSlotCell.GetNodeView();
+            _actualSeedSlotCell.ClearNodeReference(); 
+            InventoryGridController.Instance.ReturnGeneToInventory(existingSeedViewInSlot, existingSeedInSlotData);
+            Debug.Log($"Returned '{existingSeedInSlotData.nodeDisplayName}' from seed slot to inventory.");
+        }
+
+        if (originalCell.IsInventoryCell)
+        {
+            InventoryGridController.Instance.RemoveGeneFromInventory(originalCell); 
+        }
+        else
+        {
+            Debug.LogError($"[NodeEditorGridController] A seed '{draggedData.nodeDisplayName}' was dragged from non-inventory cell ({originalCell.gameObject.name}) to seed slot. Original cell cleared.", originalCell.gameObject);
+            originalCell.RemoveNode();
+        }
+
+        _actualSeedSlotCell.AssignNodeView(draggedView, draggedData);
+        draggedDraggable.SnapToCell(_actualSeedSlotCell);
+        
+        LoadSequenceFromSeed(draggedData);
+        Debug.Log($"Seed '{draggedData.nodeDisplayName}' placed in slot. Stored sequence has {draggedData.storedSequence.nodes.Count} nodes.");
+    }
+
+
     public void HandleDropOnSequenceCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetSequenceCell)
     {
-        if (draggedDraggable == null || originalCell == null || targetSequenceCell == null || targetSequenceCell.IsInventoryCell)
+        if (_actualSeedSlotCell == null) { Debug.LogError("Seed slot not initialized. Sequence operations may fail."); }
+
+        if (draggedDraggable == null || originalCell == null || targetSequenceCell == null || targetSequenceCell.IsInventoryCell || targetSequenceCell == _actualSeedSlotCell)
         {
             draggedDraggable?.ResetPosition(); return;
         }
+
         NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
         NodeDefinition draggedDef = draggedView?.GetNodeDefinition();
-        if (draggedView == null || draggedDef == null) {
-            Debug.LogError("[NodeEditorGridController] HandleDropOnSequenceCell: Dragged object missing NodeView/Definition.", draggedDraggable.gameObject);
+        NodeData draggedData = draggedView?.GetNodeData();
+
+        if (draggedView == null || (draggedDef == null && draggedData == null) ) {
+            Debug.LogError("[NodeEditorGridController] HandleDropOnSequenceCell: Dragged object missing View/Def/Data.", draggedDraggable.gameObject);
             draggedDraggable.ResetPosition(); return;
         }
+        if (draggedDef != null && draggedDef.effects.Any(e => e.effectType == NodeEffectType.SeedSpawn)) {
+            Debug.LogWarning("Cannot place Seed definitions into a seed's sequence. Resetting drag.");
+            draggedDraggable.ResetPosition();
+            return;
+        }
 
-        if (targetSequenceCell == originalCell && !originalCell.IsInventoryCell) { // Dropped on self in sequence
+        if (targetSequenceCell == originalCell && !originalCell.IsInventoryCell) {
             draggedDraggable.SnapToCell(originalCell); NodeCell.SelectCell(originalCell); return;
         }
 
-        if (originalCell.IsInventoryCell) { // Inventory TO Sequence
-            InventoryGridController.Instance?.RemoveGeneFromInventory(originalCell); // This destroys the inventory's NodeView
-            
+        if (originalCell.IsInventoryCell) {
+            InventoryGridController.Instance?.RemoveGeneFromInventory(originalCell);
             NodeView existingViewInTargetSeq = targetSequenceCell.GetNodeView();
-            if (existingViewInTargetSeq != null) { // If sequence target is occupied
+            if (existingViewInTargetSeq != null) {
                 NodeDefinition defFromSeqTarget = existingViewInTargetSeq.GetNodeDefinition();
-                targetSequenceCell.ClearNodeReference(); // Clear before returning, doesn't destroy view
-                InventoryGridController.Instance?.ReturnGeneToInventory(defFromSeqTarget, null); // This creates a new view in inventory
-                Destroy(existingViewInTargetSeq.gameObject); // Destroy the old view from sequence
+                NodeData dataFromSeqTarget = targetSequenceCell.GetNodeData();
+                targetSequenceCell.ClearNodeReference(); 
+                InventoryGridController.Instance.ReturnGeneToInventory(existingViewInTargetSeq, dataFromSeqTarget);
             }
-            targetSequenceCell.AssignNode(draggedDef); // Creates a new NodeView for sequence
+            targetSequenceCell.AssignNode(draggedDef);
             targetSequenceCell.GetNodeView()?.GetComponent<NodeDraggable>()?.SnapToCell(targetSequenceCell);
             NodeCell.SelectCell(targetSequenceCell);
         } 
-        else { // Sequence TO Sequence (different cells)
+        else if (originalCell == _actualSeedSlotCell) 
+        {
+            Debug.LogWarning("Cannot drag the main Seed from the Seed Slot directly into its own sequence editor. Resetting drag.");
+            draggedDraggable.ResetPosition();
+            return;
+        }
+        else { // Sequence TO Sequence
             NodeView existingViewInTarget = targetSequenceCell.GetNodeView(); 
             NodeData existingDataInTarget = targetSequenceCell.GetNodeData();
             NodeCell.ClearSelection(); 
-            originalCell.ClearNodeReference(); // Original cell is now empty
+            originalCell.ClearNodeReference();
 
-            if (existingViewInTarget != null) { // If target cell was occupied, move its content to original cell
+            if (existingViewInTarget != null) {
                 NodeDraggable draggableFromTarget = existingViewInTarget.GetComponent<NodeDraggable>();
                 originalCell.AssignNodeView(existingViewInTarget, existingDataInTarget);
                 draggableFromTarget?.SnapToCell(originalCell);
             }
-            // Assign the dragged node (which is `draggedView` and its `draggedView.GetNodeData()`) to the target cell
-            targetSequenceCell.AssignNodeView(draggedView, draggedView.GetNodeData());
+            targetSequenceCell.AssignNodeView(draggedView, draggedData);
             draggedDraggable.SnapToCell(targetSequenceCell); 
             NodeCell.SelectCell(targetSequenceCell);
         }
@@ -335,11 +500,20 @@ public class NodeEditorGridController : MonoBehaviour
     {
         NodeCell foundCell = null;
         if (cellContainer == null || _rootCanvas == null) return null;
-        foreach (Transform cellTransform in cellContainer) {
+        foreach (Transform cellTransform in cellContainer) { 
             NodeCell cell = cellTransform.GetComponent<NodeCell>(); if (cell == null) continue;
             RectTransform cellRect = cell.GetComponent<RectTransform>(); if (cellRect == null) continue;
-            if (RectTransformUtility.RectangleContainsScreenPoint(cellRect, screenPosition, _rootCanvas.worldCamera)) // Use worldCamera for ScreenSpace-Camera or Perspective
+            if (RectTransformUtility.RectangleContainsScreenPoint(cellRect, screenPosition, _rootCanvas.worldCamera))
             { foundCell = cell; break; }
+        }
+        // Also check the seed slot
+        if (foundCell == null && _actualSeedSlotCell != null)
+        {
+            RectTransform seedSlotRect = _actualSeedSlotCell.GetComponent<RectTransform>();
+            if (seedSlotRect != null && RectTransformUtility.RectangleContainsScreenPoint(seedSlotRect, screenPosition, _rootCanvas.worldCamera))
+            {
+                return _actualSeedSlotCell;
+            }
         }
         return foundCell;
     }
@@ -347,35 +521,49 @@ public class NodeEditorGridController : MonoBehaviour
     #if UNITY_EDITOR
     void OnDrawGizmos()
     {
-        if (Application.isPlaying || cellContainer == null || !cellContainer.gameObject.activeInHierarchy ||
-            !cellContainer.TryGetComponent<RectTransform>(out var containerRect)) return;
+        if (Application.isPlaying) return; // Only draw in editor mode when not playing
         
-        Gizmos.color = new Color(0f, 1f, 0f, 0.25f); 
-        Matrix4x4 originalMatrix = Gizmos.matrix;
-        
-        GridLayoutGroup gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
-        if (gridLayout != null && gridLayout.enabled) {
-            Vector3[] corners = new Vector3[4]; 
-            containerRect.GetWorldCorners(corners);
-            Gizmos.matrix = Matrix4x4.identity; // Use world space for drawing lines between world corners
-            Gizmos.DrawLine(corners[0], corners[1]); 
-            Gizmos.DrawLine(corners[1], corners[2]);
-            Gizmos.DrawLine(corners[2], corners[3]); 
-            Gizmos.DrawLine(corners[3], corners[0]);
-        } else { // Manual Layout Gizmos
-            float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
-            float startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f); 
-            float startY_for_gizmo = 0;
-            for (int i = 0; i < emptyCellsCount; i++) {
-                float xOffset = startX_for_gizmo + i * (cellSize.x + cellMargin);
-                Vector3 localCellCenter = new Vector3(xOffset, startY_for_gizmo, 0);
-                Vector3 worldCellCenter = cellContainer.TransformPoint(localCellCenter);
-                Vector3 gizmoSize = new Vector3(cellSize.x * cellContainer.lossyScale.x, cellSize.y * cellContainer.lossyScale.y, 0.1f);
-                Gizmos.matrix = Matrix4x4.TRS(worldCellCenter, cellContainer.rotation, Vector3.one);
-                Gizmos.DrawWireCube(Vector3.zero, gizmoSize);
+        // Gizmo for Sequence Cell Container
+        if (cellContainer != null && cellContainer.gameObject.activeInHierarchy && cellContainer.TryGetComponent<RectTransform>(out var containerRect))
+        {
+            Gizmos.color = new Color(0f, 1f, 0f, 0.25f); 
+            Matrix4x4 originalMatrix = Gizmos.matrix;
+            
+            GridLayoutGroup gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
+            if (gridLayout != null && gridLayout.enabled) {
+                Vector3[] corners = new Vector3[4]; 
+                containerRect.GetWorldCorners(corners);
+                Gizmos.matrix = Matrix4x4.identity;
+                Gizmos.DrawLine(corners[0], corners[1]); Gizmos.DrawLine(corners[1], corners[2]);
+                Gizmos.DrawLine(corners[2], corners[3]); Gizmos.DrawLine(corners[3], corners[0]);
+            } else { // Manual Layout Gizmos for sequence cells
+                float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
+                float startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f); 
+                for (int i = 0; i < emptyCellsCount; i++) {
+                    float xOffset = startX_for_gizmo + i * (cellSize.x + cellMargin);
+                    Vector3 localCellCenter = new Vector3(xOffset, 0, 0);
+                    Vector3 worldCellCenter = cellContainer.TransformPoint(localCellCenter);
+                    Vector3 gizmoSize = new Vector3(cellSize.x * cellContainer.lossyScale.x, cellSize.y * cellContainer.lossyScale.y, 0.1f);
+                    Gizmos.matrix = Matrix4x4.TRS(worldCellCenter, cellContainer.rotation, Vector3.one);
+                    Gizmos.DrawWireCube(Vector3.zero, gizmoSize);
+                }
             }
+            Gizmos.matrix = originalMatrix;
         }
-        Gizmos.matrix = originalMatrix; // Restore original matrix
+
+
+        // Gizmo for Seed Slot Container
+        if (seedSlotContainer != null && seedSlotContainer.gameObject.activeInHierarchy && seedSlotContainer.TryGetComponent<RectTransform>(out var seedContainerRect))
+        {
+            Gizmos.color = new Color(1f, 0f, 1f, 0.35f); // Magenta for seed slot container
+            Vector3[] corners = new Vector3[4];
+            seedContainerRect.GetWorldCorners(corners);
+            Matrix4x4 originalMatrix = Gizmos.matrix; // Store it again just in case
+            Gizmos.matrix = Matrix4x4.identity;
+            Gizmos.DrawLine(corners[0], corners[1]); Gizmos.DrawLine(corners[1], corners[2]);
+            Gizmos.DrawLine(corners[2], corners[3]); Gizmos.DrawLine(corners[3], corners[0]);
+            Gizmos.matrix = originalMatrix;
+        }
     }
     #endif
 }

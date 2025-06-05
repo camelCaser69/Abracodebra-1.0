@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-05-31 23:24:07
+UNITY PROJECT SCRIPT EXPORT - 2025-06-05 03:47:23
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -139,7 +139,9 @@ Assets
 │   │       ├── BurningStatusEffect.cs
 │   │       └── StatusEffect.cs
 │   ├── Core
-│   │   └── SortableEntity.cs
+│   │   ├── RunManager.cs
+│   │   ├── SortableEntity.cs
+│   │   └── UIManager.cs
 │   ├── Ecosystem
 │   │   ├── Animals
 │   │   │   ├── AnimalDefinition.cs
@@ -183,6 +185,7 @@ Assets
 │   │   └── UI
 │   │       ├── ColorExtensions.cs
 │   │       ├── DeselectOnClickOutside.cs
+│   │       ├── InventoryGridController.cs
 │   │       ├── NodeCell.cs
 │   │       ├── NodeDraggable.cs
 │   │       ├── NodeEditorGridController.cs
@@ -2105,21 +2108,20 @@ public class WeatherManager : MonoBehaviour
     public float minAlpha = 0f;
     public float maxAlpha = 1f;
 
-    [Header("Time Scaling & Pausing")] // <<< UPDATED HEADER
+    [Header("Time Scaling & Pausing")]
     [Range(1f, 100f)]
-    public float timeScaleMultiplier = 1f;
-    public bool IsPaused { get; set; } = false; // <<< NEW: Pause flag
+    public float timeScaleMultiplier = 1f; // This scales the internal phaseTimer speed
+    public bool IsPaused { get; private set; } = false; // MODIFIED: Made setter private
 
-    // --- Public Properties & Events ---
     public CyclePhase CurrentPhase => currentPhase;
     public event Action<CyclePhase> OnPhaseChanged;
-    public float CurrentPhaseTimer => phaseTimer; // <<< NEW: Expose timer
-    public float CurrentTotalPhaseTime => totalPhaseTime; // <<< NEW: Expose total time
+    public float CurrentPhaseTimer => phaseTimer;
+    public float CurrentTotalPhaseTime => totalPhaseTime;
 
-    // --- Internals ---
     private CyclePhase currentPhase = CyclePhase.Day;
     private float phaseTimer = 0f;
     private float totalPhaseTime = 0f;
+    private bool forceDaylight = false; // NEW: Flag to hold daylight
 
     void Awake()
     {
@@ -2129,29 +2131,43 @@ public class WeatherManager : MonoBehaviour
 
     void Start()
     {
-        EnterPhase(CyclePhase.Day, true);
+        EnterPhase(CyclePhase.Day, true); // Start at day
     }
 
     void Update()
     {
-        // --- PAUSE CHECK ---
-        if (IsPaused) // <<< NEW: Check if paused
+        // If RunManager has globally paused time, WeatherManager effectively pauses too.
+        // The IsPaused flag here is for internal cycle pausing by RunManager.
+        if (Time.timeScale == 0f && !IsPaused) // If global time is 0 but we aren't internally paused, we should probably respect that.
         {
-            // If paused, potentially ensure timeScale is 1? Or leave it? Let's reset it.
-            if (timeScaleMultiplier != 1f) timeScaleMultiplier = 1f;
-            return; // Do nothing else if paused
+            UpdateFadeSprite(); // Still update visual representation of current sunIntensity
+            return;
         }
-        // ---------------------
 
+
+        if (IsPaused)
+        {
+            // If explicitly paused by RunManager
+            if (forceDaylight)
+            {
+                sunIntensity = 1.0f; // Maintain full daylight if forced
+            }
+            // else, sunIntensity remains as it was when PauseCycle() was called.
+            UpdateFadeSprite();
+            return;
+        }
+
+        // Normal cycle update
         if (!dayNightCycleEnabled)
         {
             sunIntensity = fixedSunIntensity;
             UpdateFadeSprite();
-            if (timeScaleMultiplier != 1f) timeScaleMultiplier = 1f;
+            // if (timeScaleMultiplier != 1f) timeScaleMultiplier = 1f; // This seems redundant if cycle is off
             return;
         }
 
-        phaseTimer -= Time.deltaTime * timeScaleMultiplier;
+        // Apply our internal timeScaleMultiplier to the phase timer
+        phaseTimer -= Time.deltaTime * timeScaleMultiplier; // Time.deltaTime is already affected by Time.timeScale
 
         if (phaseTimer <= 0f)
         {
@@ -2185,10 +2201,10 @@ public class WeatherManager : MonoBehaviour
             case CyclePhase.TransitionToNight:
             case CyclePhase.TransitionToDay: totalPhaseTime = transitionDuration; break;
         }
-        totalPhaseTime = Mathf.Max(0.01f, totalPhaseTime);
+        totalPhaseTime = Mathf.Max(0.01f, totalPhaseTime); // Avoid division by zero
         phaseTimer = totalPhaseTime;
 
-        UpdateSunIntensity();
+        UpdateSunIntensity(); // Calculate intensity for the new phase start
 
         if (previousPhase != currentPhase || forceEvent)
         {
@@ -2199,7 +2215,13 @@ public class WeatherManager : MonoBehaviour
 
     private void UpdateSunIntensity()
     {
-        if (totalPhaseTime <= 0) return;
+        if (forceDaylight && IsPaused) // If forced to day and paused, keep it at 1
+        {
+            sunIntensity = 1.0f;
+            return;
+        }
+        if (totalPhaseTime <= 0) return; // Should be prevented by EnterPhase
+
         float progress = 1f - Mathf.Clamp01(phaseTimer / totalPhaseTime);
         switch (currentPhase)
         {
@@ -2215,9 +2237,54 @@ public class WeatherManager : MonoBehaviour
     {
         if (fadeSprite != null)
         {
-            float alpha = Mathf.Lerp(maxAlpha, minAlpha, sunIntensity);
+            float alpha = Mathf.Lerp(maxAlpha, minAlpha, sunIntensity); // Lerp between minAlpha and maxAlpha
             Color c = fadeSprite.color; c.a = alpha; fadeSprite.color = c;
         }
+    }
+
+    // --- NEW PUBLIC METHODS FOR RunManager CONTROL ---
+
+    /// <summary>
+    /// Pauses the day/night cycle and forces the sun intensity to full day.
+    /// This is typically used during the Planning phase.
+    /// </summary>
+    public void PauseCycleAtDay()
+    {
+        Debug.Log("[WeatherManager] PauseCycleAtDay called.");
+        IsPaused = true;
+        forceDaylight = true;
+        sunIntensity = 1.0f; // Immediately set to full day
+        // Optionally, set currentPhase to Day and reset phaseTimer if needed for consistency,
+        // but just forcing sunIntensity might be enough for visual and gameplay effects.
+        // currentPhase = CyclePhase.Day;
+        // phaseTimer = dayDuration;
+        // totalPhaseTime = dayDuration;
+        UpdateFadeSprite(); // Update visuals immediately
+        OnPhaseChanged?.Invoke(CyclePhase.Day); // Notify that effectively it's day
+    }
+
+    /// <summary>
+    /// Resumes the normal day/night cycle from its current state.
+    /// This is typically used when transitioning to the Growth & Threat phase.
+    /// </summary>
+    public void ResumeCycle()
+    {
+        Debug.Log("[WeatherManager] ResumeCycle called.");
+        IsPaused = false;
+        forceDaylight = false;
+        // No need to change sunIntensity here, it will update naturally in Update()
+    }
+
+    /// <summary>
+    /// Pauses the day/night cycle at its current sun intensity and phase progress.
+    /// This is typically used during the Recovery phase or for other general pauses.
+    /// </summary>
+    public void PauseCycle()
+    {
+        Debug.Log("[WeatherManager] PauseCycle called.");
+        IsPaused = true;
+        forceDaylight = false; // Don't force daylight, just pause current state
+        // SunIntensity and phaseTimer will remain as they are.
     }
 }
 
@@ -2291,6 +2358,149 @@ public class SpellProjectile : MonoBehaviour
     }
 
     public bool IsExpired() => elapsed >= duration;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Core\RunManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Core/RunManager.cs
+using UnityEngine;
+using System;
+
+public enum RunState
+{
+    Planning,
+    GrowthAndThreat,
+    Recovery
+}
+
+public class RunManager : MonoBehaviour
+{
+    public static RunManager Instance { get; private set; }
+
+    [Header("State & Timing")]
+    [SerializeField] private RunState currentState = RunState.Planning;
+    [Tooltip("Time scale multiplier during the Growth & Threat phase.")]
+    [SerializeField] private float growthPhaseTimeScale = 6f;
+    [Tooltip("Current round number, starts at 1.")]
+    [SerializeField] private int currentRoundNumber = 1;
+
+    [Header("Manager References (Assign in Inspector)")]
+    [SerializeField] private WeatherManager weatherManager;
+    [SerializeField] private WaveManager waveManager;
+
+    public RunState CurrentState => currentState;
+    public int CurrentRoundNumber => currentRoundNumber;
+    public event Action<RunState> OnRunStateChanged;
+    public event Action<int> OnRoundChanged;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning($"[RunManager] Duplicate instance found on {gameObject.name}. Destroying this one.", gameObject);
+            Destroy(gameObject); // Destroy this duplicate instance
+            return;
+        }
+        Instance = this;
+
+        // This line will work without warning IF this GameObject is a root object in the scene.
+        // If you intend for RunManager to persist across scene loads.
+        // If your game is single-scene, you might not even need DontDestroyOnLoad.
+        if (transform.parent == null) // Only call DontDestroyOnLoad if it's a root GameObject
+        {
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Debug.LogWarning($"[RunManager] {gameObject.name} is not a root GameObject. DontDestroyOnLoad will not be called for it directly. If its parent is persistent, that's fine. Otherwise, make RunManager a root object if it needs to persist across scenes.", gameObject);
+        }
+
+
+        SetState(RunState.Planning, true);
+    }
+
+    private void SetState(RunState newState, bool force = false)
+    {
+        if (currentState == newState && !force) return;
+
+        currentState = newState;
+        Debug.Log($"[RunManager] State changed to: {currentState}");
+
+        switch (currentState)
+        {
+            case RunState.Planning:
+                Time.timeScale = 0f;
+                weatherManager?.PauseCycleAtDay();
+                break;
+            case RunState.GrowthAndThreat:
+                Time.timeScale = growthPhaseTimeScale;
+                weatherManager?.ResumeCycle();
+                waveManager?.StartWaveForRound(currentRoundNumber);
+                break;
+            case RunState.Recovery:
+                Time.timeScale = 0f;
+                weatherManager?.PauseCycle();
+                break;
+        }
+        OnRunStateChanged?.Invoke(currentState);
+    }
+
+    public void StartGrowthAndThreatPhase()
+    {
+        if (currentState == RunState.Planning)
+        {
+            Debug.Log($"[RunManager] Transitioning: Planning -> Growth & Threat for Round {currentRoundNumber}");
+            SetState(RunState.GrowthAndThreat);
+        }
+        else
+        {
+            Debug.LogWarning($"[RunManager] Cannot start Growth phase from state: {currentState}");
+        }
+    }
+
+    public void StartRecoveryPhase()
+    {
+        if (currentState == RunState.GrowthAndThreat)
+        {
+            Debug.Log("[RunManager] Transitioning: Growth & Threat -> Recovery");
+            waveManager?.StopCurrentWaveSpawning();
+            SetState(RunState.Recovery);
+        }
+        else
+        {
+            Debug.LogWarning($"[RunManager] Cannot start Recovery phase from state: {currentState}");
+        }
+    }
+
+    public void StartNewPlanningPhase()
+    {
+        if (currentState == RunState.Recovery)
+        {
+            currentRoundNumber++;
+            Debug.Log($"[RunManager] Transitioning: Recovery -> Planning (New Round: {currentRoundNumber})");
+            waveManager?.ResetForNewRound();
+            SetState(RunState.Planning);
+            OnRoundChanged?.Invoke(currentRoundNumber);
+        }
+        else
+        {
+            Debug.LogWarning($"[RunManager] Cannot start new Planning phase from state: {currentState}");
+        }
+    }
+
+    void Update()
+    {
+        if (currentState == RunState.GrowthAndThreat)
+        {
+            if (waveManager != null && waveManager.IsCurrentWaveDefeated())
+            {
+                Debug.Log("[RunManager] Current wave defeated. Transitioning to Recovery.");
+                StartRecoveryPhase();
+            }
+        }
+    }
 }
 
 
@@ -2381,6 +2591,141 @@ public class SortableEntity : MonoBehaviour
     public void SetUseParentYCoordinate(bool value)
     {
         useParentYCoordinate = value;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Core\UIManager.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/UI/UIManager.cs
+using UnityEngine;
+using UnityEngine.UI; // Required for Button
+
+public class UIManager : MonoBehaviour
+{
+    public static UIManager Instance { get; private set; }
+
+    [Header("Phase Panels (Assign in Inspector)")]
+    [SerializeField] private GameObject planningPanel;
+    [SerializeField] private GameObject growthAndThreatPanel;
+    [SerializeField] private GameObject recoveryPanel;
+
+    [Header("Buttons (Assign in Inspector)")]
+    [SerializeField] private Button startGrowthPhaseButton;
+    [SerializeField] private Button startRecoveryPhaseButton; // This might be automated later
+    [SerializeField] private Button startNewPlanningPhaseButton;
+
+    [Header("Node Editor Integration")]
+    [Tooltip("Assign the Node Editor's main UI Panel (NodeEditorGridController.gridUIParent) here. This panel will be shown during Planning.")]
+    [SerializeField] private GameObject nodeEditorPanel; // This should be NodeEditorGridController.gridUIParent
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
+
+    private void Start()
+    {
+        if (RunManager.Instance == null)
+        {
+            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not function correctly.");
+            return;
+        }
+
+        RunManager.Instance.OnRunStateChanged += HandleRunStateChanged;
+
+        // Setup button listeners
+        if (startGrowthPhaseButton != null)
+            startGrowthPhaseButton.onClick.AddListener(OnStartGrowthPhaseClicked);
+        else Debug.LogError("[UIManager] Start Growth Phase Button not assigned!");
+
+        if (startRecoveryPhaseButton != null)
+            startRecoveryPhaseButton.onClick.AddListener(OnStartRecoveryPhaseClicked);
+        // else Debug.LogWarning("[UIManager] Start Recovery Phase Button not assigned (may be automated).");
+
+        if (startNewPlanningPhaseButton != null)
+            startNewPlanningPhaseButton.onClick.AddListener(OnStartNewPlanningPhaseClicked);
+        else Debug.LogError("[UIManager] Start New Planning Phase Button not assigned!");
+        
+        // Initial UI setup based on RunManager's starting state
+        HandleRunStateChanged(RunManager.Instance.CurrentState);
+    }
+
+    private void OnDestroy()
+    {
+        if (RunManager.Instance != null)
+        {
+            RunManager.Instance.OnRunStateChanged -= HandleRunStateChanged;
+        }
+
+        // Clean up button listeners
+        if (startGrowthPhaseButton != null) startGrowthPhaseButton.onClick.RemoveAllListeners();
+        if (startRecoveryPhaseButton != null) startRecoveryPhaseButton.onClick.RemoveAllListeners();
+        if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.onClick.RemoveAllListeners();
+    }
+
+    private void HandleRunStateChanged(RunState newState)
+    {
+        // Hide all main phase panels first
+        if (planningPanel != null) planningPanel.SetActive(false);
+        if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(false);
+        if (recoveryPanel != null) recoveryPanel.SetActive(false);
+
+        // Hide Node Editor Panel by default, show only in Planning
+        if (nodeEditorPanel != null) nodeEditorPanel.SetActive(false);
+
+        Debug.Log($"[UIManager] Handling state change to: {newState}");
+
+        switch (newState)
+        {
+            case RunState.Planning:
+                if (planningPanel != null) planningPanel.SetActive(true);
+                if (nodeEditorPanel != null) nodeEditorPanel.SetActive(true); // Show Node Editor
+                // Manage button interactivity
+                if (startGrowthPhaseButton != null) startGrowthPhaseButton.interactable = true;
+                if (startRecoveryPhaseButton != null) startRecoveryPhaseButton.interactable = false;
+                if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.interactable = false;
+                break;
+            case RunState.GrowthAndThreat:
+                if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(true);
+                // Manage button interactivity
+                if (startGrowthPhaseButton != null) startGrowthPhaseButton.interactable = false;
+                if (startRecoveryPhaseButton != null) startRecoveryPhaseButton.interactable = true; // Or false if automated
+                if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.interactable = false;
+                break;
+            case RunState.Recovery:
+                if (recoveryPanel != null) recoveryPanel.SetActive(true);
+                // Manage button interactivity
+                if (startGrowthPhaseButton != null) startGrowthPhaseButton.interactable = false;
+                if (startRecoveryPhaseButton != null) startRecoveryPhaseButton.interactable = false;
+                if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.interactable = true;
+                break;
+        }
+    }
+
+    // --- Button Click Handlers ---
+    private void OnStartGrowthPhaseClicked()
+    {
+        Debug.Log("[UIManager] StartGrowthPhaseButton Clicked");
+        RunManager.Instance?.StartGrowthAndThreatPhase();
+    }
+
+    private void OnStartRecoveryPhaseClicked()
+    {
+        Debug.Log("[UIManager] StartRecoveryPhaseButton Clicked");
+        RunManager.Instance?.StartRecoveryPhase();
+    }
+
+    private void OnStartNewPlanningPhaseClicked()
+    {
+        Debug.Log("[UIManager] StartNewPlanningPhaseButton Clicked");
+        RunManager.Instance?.StartNewPlanningPhase();
     }
 }
 
@@ -3299,34 +3644,131 @@ public class FaunaManager : MonoBehaviour
     [Tooltip("Show gizmos visualizing the Margin (Red) and Padding (Green) bounds.")]
     [SerializeField] private bool showBoundsGizmos = false;
 
-    [Header("Functional Bounds Offset")] // <<< UPDATED HEADER NAME
-    [Tooltip("Functional horizontal shift for gameplay bounds and spawning relative to camera view.")] // <<< UPDATED TOOLTIP
-    [SerializeField][Range(-10f, 10f)] private float boundsOffsetX = 0f; // <<< RENAMED FIELD
-    [Tooltip("Functional vertical shift for gameplay bounds and spawning relative to camera view.")] // <<< UPDATED TOOLTIP
-    [SerializeField][Range(-10f, 10f)] private float boundsOffsetY = 0f; // <<< RENAMED FIELD
+    [Header("Functional Bounds Offset")]
+    [Tooltip("Functional horizontal shift for gameplay bounds and spawning relative to camera view.")]
+    [SerializeField][Range(-10f, 10f)] private float boundsOffsetX = 0f;
+    [Tooltip("Functional vertical shift for gameplay bounds and spawning relative to camera view.")]
+    [SerializeField][Range(-10f, 10f)] private float boundsOffsetY = 0f;
 
-    // --- Runtime State ---
     private List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
-    private Camera mainCamera;
+    private Camera mainCamera; // Ensure this is assigned or found
 
-    // --- Start, InitializeManager, Update, ExecuteSpawnWave, StopAllSpawnCoroutines, SpawnWaveEntryCoroutine (Unchanged) ---
-    void Start() { InitializeManager(); }
-    void InitializeManager() { activeSpawnCoroutines.Clear(); if (WaveManager.Instance != null) { mainCamera = WaveManager.Instance.GetMainCamera(); } if (mainCamera == null) { mainCamera = Camera.main; if (mainCamera == null) Debug.LogError("[FaunaManager] Cannot find Main Camera!", this); } if (ecosystemParent == null) { ecosystemParent = transform; Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned to self.", this); } }
-    void Update() { /* ... */ }
-    public void ExecuteSpawnWave(WaveDefinition waveDef) { if (waveDef == null) { Debug.LogError("[FaunaManager] ExecuteSpawnWave null WaveDefinition!", this); return; } if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; } Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'"); foreach (WaveSpawnEntry entry in waveDef.spawnEntries) { if (entry.animalDefinition == null) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', null AnimalDefinition."); continue; } if (entry.spawnCount <= 0) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', Spawn Count <= 0."); continue; } WaveSpawnEntry currentEntry = entry; Coroutine spawnCoroutine = StartCoroutine(SpawnWaveEntryCoroutine(currentEntry)); activeSpawnCoroutines.Add(spawnCoroutine); } Debug.Log($"[FaunaManager] Started {activeSpawnCoroutines.Count} coroutine(s) for '{waveDef.waveName}'."); }
-    public void StopAllSpawnCoroutines() { if (activeSpawnCoroutines.Count > 0) { Debug.Log("[FaunaManager] Stopping all spawn coroutines."); foreach (Coroutine co in activeSpawnCoroutines) { if (co != null) StopCoroutine(co); } activeSpawnCoroutines.Clear(); } }
-     private IEnumerator SpawnWaveEntryCoroutine(WaveSpawnEntry entry) { if (entry.delayAfterSpawnTime > 0) { yield return new WaitForSeconds(entry.delayAfterSpawnTime); } for (int i = 0; i < entry.spawnCount; i++) { if (WaveManager.Instance != null && !WaveManager.Instance.IsRunActive) { Debug.Log($"[FaunaManager] Halting spawn '{entry.description}', run no longer active."); break; } Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius); bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen; GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen); if (entry.spawnInterval > 0 && i < entry.spawnCount - 1) { yield return new WaitForSeconds(entry.spawnInterval); } } if (activeSpawnCoroutines.Count > 0) activeSpawnCoroutines.RemoveAt(0); } // Simplistic removal
-
-    /// <summary>
-    /// Calculates a spawn position based on the specified type, applying functional offset.
-    /// </summary>
-    private Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius) // <<< MODIFIED
+    void Start()
     {
-        if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera!"); return spawnCenter; }
+        InitializeManager();
+    }
 
-        // --- Calculate the FUNCTIONAL offset ---
+    void InitializeManager()
+    {
+        activeSpawnCoroutines.Clear();
+        // Attempt to get camera from WaveManager first, then fallback
+        if (WaveManager.Instance != null) mainCamera = WaveManager.Instance.GetMainCamera();
+        if (mainCamera == null) mainCamera = Camera.main;
+        if (mainCamera == null) Debug.LogError("[FaunaManager] Cannot find Main Camera!", this);
+
+        if (ecosystemParent == null)
+        {
+            if (EcosystemManager.Instance != null && EcosystemManager.Instance.animalParent != null)
+            {
+                ecosystemParent = EcosystemManager.Instance.animalParent;
+                Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned from EcosystemManager.animalParent.", this);
+            }
+            else
+            {
+                ecosystemParent = transform;
+                Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned to self as fallback.", this);
+            }
+        }
+    }
+
+    public void ExecuteSpawnWave(WaveDefinition waveDef)
+    {
+        if (waveDef == null) { Debug.LogError("[FaunaManager] ExecuteSpawnWave called with null WaveDefinition!", this); return; }
+        if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; }
+
+        Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'");
+        // Stop any previously running spawn coroutines for this FaunaManager instance
+        StopAllSpawnCoroutines(); // Ensures only one waveDef's entries are spawning at a time from this manager
+
+        foreach (WaveSpawnEntry entry in waveDef.spawnEntries)
+        {
+            if (entry.animalDefinition == null) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', null AnimalDefinition for wave '{waveDef.waveName}'."); continue; }
+            if (entry.spawnCount <= 0) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', Spawn Count <= 0 for wave '{waveDef.waveName}'."); continue; }
+
+            // Check RunManager state before starting new coroutines
+            if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
+            {
+                Debug.Log($"[FaunaManager] Halting further spawn entry processing for wave '{waveDef.waveName}', RunManager not in GrowthAndThreat state.");
+                break; // Don't start new coroutines if not in the correct game state
+            }
+
+            WaveSpawnEntry currentEntry = entry; // Closure capture
+            Coroutine spawnCoroutine = StartCoroutine(SpawnWaveEntryCoroutine(currentEntry, waveDef.waveName));
+            activeSpawnCoroutines.Add(spawnCoroutine);
+        }
+        Debug.Log($"[FaunaManager] Started {activeSpawnCoroutines.Count} spawn entry coroutine(s) for '{waveDef.waveName}'.");
+    }
+
+    public void StopAllSpawnCoroutines()
+    {
+        if (activeSpawnCoroutines.Count > 0)
+        {
+            Debug.Log($"[FaunaManager] Stopping all ({activeSpawnCoroutines.Count}) active spawn coroutines.");
+            foreach (Coroutine co in activeSpawnCoroutines)
+            {
+                if (co != null) StopCoroutine(co);
+            }
+            activeSpawnCoroutines.Clear();
+        }
+    }
+
+    private IEnumerator SpawnWaveEntryCoroutine(WaveSpawnEntry entry, string waveNameForDebug)
+    {
+        if (entry.delayAfterSpawnTime > 0)
+        {
+            yield return new WaitForSeconds(entry.delayAfterSpawnTime);
+        }
+
+        for (int i = 0; i < entry.spawnCount; i++)
+        {
+            // Check RunManager state before each spawn
+            if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
+            {
+                Debug.Log($"[FaunaManager] Halting spawn for entry '{entry.description}' in wave '{waveNameForDebug}', RunManager no longer in GrowthAndThreat state.");
+                break; // Exit loop if game state changed
+            }
+
+            // WaveManager.IsRunActive is now less reliable here, use RunManager state.
+            // if (WaveManager.Instance != null && !WaveManager.Instance.IsRunActive)
+            // {
+            //     Debug.Log($"[FaunaManager] Halting spawn '{entry.description}', run no longer active.");
+            //     break;
+            // }
+
+            Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius);
+            bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen;
+            GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen);
+
+            if (entry.spawnInterval > 0 && i < entry.spawnCount - 1) // Don't wait after the last one
+            {
+                yield return new WaitForSeconds(entry.spawnInterval);
+            }
+        }
+        // Coroutine completes, remove itself from the list if it was added
+        // This removal is a bit tricky if coroutines are stopped externally.
+        // A more robust way is to check `activeSpawnCoroutines.Remove(thisCoroutineInstance)`
+        // but `thisCoroutineInstance` is not directly available here.
+        // For simplicity, we'll rely on StopAllSpawnCoroutines to clear the list.
+        // Or, pass the coroutine itself into this method and remove it.
+        // For now, let's clear it more carefully in StopAll and on completion.
+    }
+
+
+    private Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius)
+    {
+        if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera for CalculateSpawnPosition!"); return spawnCenter; }
+
         Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-        // --- Apply offset to camera position for ALL calculations below ---
         Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
 
         Vector2 spawnPos = Vector2.zero;
@@ -3336,12 +3778,11 @@ public class FaunaManager : MonoBehaviour
         switch (locationType)
         {
             case WaveSpawnLocationType.Offscreen:
-                // Use effectiveCamPos for calculations
                 float marginMinX = effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin;
                 float marginMaxX = effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin;
                 float marginMinY = effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin;
                 float marginMaxY = effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin;
-                float extraOffset = 0.1f; // To spawn strictly outside the line
+                float extraOffset = 0.1f;
                 int edge = Random.Range(0, 4);
                 if (edge == 0) { spawnPos.x = marginMinX - extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
                 else if (edge == 1) { spawnPos.x = marginMaxX + extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
@@ -3352,19 +3793,15 @@ public class FaunaManager : MonoBehaviour
             case WaveSpawnLocationType.RandomNearPlayer:
                  Transform playerT = FindPlayerTransform();
                  if (playerT != null) {
-                    // Spawn relative to player, still respecting the overall bounds offset implicitly
                     spawnPos = (Vector2)playerT.position + Random.insideUnitCircle * radius;
                  } else {
                      Debug.LogWarning("[FaunaManager] Player not found for RandomNearPlayer. Falling back to Global.");
-                     goto case WaveSpawnLocationType.GlobalSpawnArea; // Fallthrough
+                     goto case WaveSpawnLocationType.GlobalSpawnArea;
                  }
                  break;
 
             case WaveSpawnLocationType.GlobalSpawnArea:
             default:
-                // Use effectiveCamPos OR a fixed world space center? Let's stick to camera relative for now.
-                // If you want truly fixed global spawn, use spawnCenter directly.
-                // This uses the *shifted* camera center as the basis for the global area.
                 spawnPos.x = effectiveCamPos.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
                 spawnPos.y = effectiveCamPos.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
                 break;
@@ -3374,29 +3811,25 @@ public class FaunaManager : MonoBehaviour
 
     private Transform FindPlayerTransform()
     {
-        Transform pT = null;
-        if (WaveManager.Instance != null)
-        {
-            var pI = FindAnyObjectByType<PlayerTileInteractor>();
-            if (pI != null) pT = pI.transform;
-        }
-        if (pT == null)
-        {
-            GameObject pO = GameObject.FindGameObjectWithTag("Player");
-            if (pO != null) pT = pO.transform;
-        }
-        return pT;
-    }
-    
-    /// <summary>
-    /// Instantiates and initializes an animal, passing SHIFTED screen bounds.
-    /// </summary>
-    private GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn) // <<< MODIFIED
-    {
-        if (definition == null || definition.prefab == null) { /* Error Log */ return null; }
-        if (mainCamera == null) { /* Error Log */ return null; }
+        // This can be simplified if player is consistently tagged or has a singleton reference
+        GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+        if (playerGO != null) return playerGO.transform;
 
-        // --- Calculate SHIFTED Padded Screen Bounds ---
+        // Fallback or more specific searches
+        PlayerTileInteractor pti = FindAnyObjectByType<PlayerTileInteractor>();
+        if (pti != null) return pti.transform;
+
+        GardenerController gc = FindAnyObjectByType<GardenerController>();
+        if (gc != null) return gc.transform;
+
+        return null;
+    }
+
+    private GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn)
+    {
+        if (definition == null || definition.prefab == null) { Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab."); return null; }
+        if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!"); return null; }
+
         Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
         Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
 
@@ -3408,49 +3841,49 @@ public class FaunaManager : MonoBehaviour
         maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
         minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
         maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
-        // ---------------------------------------------
 
         GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
 
-        // Parenting (unchanged)
-        if (ecosystemParent != null) { Transform sP = ecosystemParent; if (!string.IsNullOrEmpty(definition.animalName)) { sP = ecosystemParent.Find(definition.animalName); if (sP == null) { GameObject subP = new GameObject(definition.animalName); subP.transform.SetParent(ecosystemParent); sP = subP.transform; } } animalObj.transform.SetParent(sP); }
+        if (ecosystemParent != null)
+        {
+            Transform speciesParent = ecosystemParent;
+            if (EcosystemManager.Instance != null && EcosystemManager.Instance.sortAnimalsBySpecies && !string.IsNullOrEmpty(definition.animalName))
+            {
+                speciesParent = ecosystemParent.Find(definition.animalName);
+                if (speciesParent == null)
+                {
+                    GameObject subParentGO = new GameObject(definition.animalName);
+                    subParentGO.transform.SetParent(ecosystemParent);
+                    speciesParent = subParentGO.transform;
+                }
+            }
+            animalObj.transform.SetParent(speciesParent);
+        }
 
-        // Initialize Controller, passing the SHIFTED bounds
         AnimalController controller = animalObj.GetComponent<AnimalController>();
         if (controller != null) {
-            controller.Initialize(definition, minPaddedBounds, maxPaddedBounds, isOffscreenSpawn); // Pass shifted bounds
-        } else { /* Error Log & Destroy */ Destroy(animalObj); return null; }
+            controller.Initialize(definition, minPaddedBounds, maxPaddedBounds, isOffscreenSpawn);
+        } else { Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj); Destroy(animalObj); return null; }
         return animalObj;
     }
 
-    /// <summary>
-    /// Draws debug rectangles applying the functional offset.
-    /// </summary>
-    void OnDrawGizmos() // <<< MODIFIED to use offset
+    void OnDrawGizmos()
     {
         if (!showBoundsGizmos || mainCamera == null) return;
-
-        // --- Apply functional offset for Gizmo drawing ---
         Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
         Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-        // --------------------------------------------------
-
         float camHeight = mainCamera.orthographicSize * 2f;
         float camWidth = camHeight * mainCamera.aspect;
-
-        // Calculate corners using effectiveCamPos
         Vector2 paddedMin = new Vector2(effectiveCamPos.x - camWidth / 2f + screenBoundsPadding, effectiveCamPos.y - camHeight / 2f + screenBoundsPadding);
         Vector2 paddedMax = new Vector2(effectiveCamPos.x + camWidth / 2f - screenBoundsPadding, effectiveCamPos.y + camHeight / 2f - screenBoundsPadding);
         DrawWireRectangleGizmo(paddedMin, paddedMax, Color.green);
-
         Vector2 marginMin = new Vector2(effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin, effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin);
-        Vector2 marginMax = new Vector2(effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin, effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin);
+        Vector2 marginMax = new Vector2(effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin, effectiveCamPos.y + camHeight / 2f - offscreenSpawnMargin);
         DrawWireRectangleGizmo(marginMin, marginMax, Color.red);
     }
 
-    void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { /* Unchanged */ Gizmos.color = color; Gizmos.DrawLine(new Vector3(min.x, min.y, 0), new Vector3(max.x, min.y, 0)); Gizmos.DrawLine(new Vector3(max.x, min.y, 0), new Vector3(max.x, max.y, 0)); Gizmos.DrawLine(new Vector3(max.x, max.y, 0), new Vector3(min.x, max.y, 0)); Gizmos.DrawLine(new Vector3(min.x, max.y, 0), new Vector3(min.x, min.y, 0)); }
-
-} // End of class
+    void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { Gizmos.color = color; Gizmos.DrawLine(new Vector3(min.x, min.y, 0), new Vector3(max.x, min.y, 0)); Gizmos.DrawLine(new Vector3(max.x, min.y, 0), new Vector3(max.x, max.y, 0)); Gizmos.DrawLine(new Vector3(max.x, max.y, 0), new Vector3(min.x, max.y, 0)); Gizmos.DrawLine(new Vector3(min.x, max.y, 0), new Vector3(min.x, min.y, 0)); }
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4277,19 +4710,20 @@ public class WaveDefinition : ScriptableObject
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Core\WaveManager.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Managers/WaveManager.cs
+﻿// FILE: Assets/Scripts/Ecosystem/Core/WaveManager.cs
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
-using UnityEngine.UI;
+using TMPro; // Keep for legacy UI if any part is still used
+using UnityEngine.UI; // Keep for legacy UI
 
-public enum WaveManagerState
+// Renamed internal state for clarity, as RunManager now controls overall game state
+public enum InternalWaveState
 {
-    PausedBeforeRun,     // Initial state, game logic paused
-    WaitingForSpawnTime, // Run started, waiting for correct time in cycle
-    WaveInProgress,      // Spawning triggered for this cycle, counting down day cycles
-    SequenceComplete     // All waves done
+    Idle,                // Not currently processing a wave
+    WaitingForSpawnTime, // Wave active, waiting for correct time in WeatherManager cycle to spawn
+    SpawningInProgress,  // FaunaManager has been told to execute spawn entries
+    WaveActive           // Spawns done for this wave def, wave duration timer running (dayCyclesRemaining)
 }
 
 public class WaveManager : MonoBehaviour
@@ -4299,208 +4733,310 @@ public class WaveManager : MonoBehaviour
     [Header("Core Dependencies")]
     [SerializeField] private FaunaManager faunaManager;
     [SerializeField] private WeatherManager weatherManager;
-    [SerializeField] private Camera mainCamera;
+    [SerializeField] private Camera mainCamera; // Keep for FaunaManager if it still needs it
 
-    [Header("Wave Sequence")]
+    [Header("Wave Sequence (Played sequentially per round)")]
     [SerializeField] private List<WaveDefinition> wavesSequence;
 
-    [Header("Wave Timing & Spawning (Global)")]
-    [Tooltip("How many full Day+Night cycles each wave lasts.")]
+    [Header("Wave Timing & Spawning (For a single WaveDefinition)")]
+    [Tooltip("How many full Day+Night cycles each WaveDefinition lasts.")]
     [SerializeField][Range(1, 10)] private int waveDurationInDayCycles = 1;
-    [Tooltip("The phase during which spawning should occur each cycle.")]
+    [Tooltip("The phase during which spawning should occur each cycle for the active WaveDefinition.")]
     [SerializeField] private WeatherManager.CyclePhase spawnStartPhase = WeatherManager.CyclePhase.Day;
     [Tooltip("The percentage progress within the Spawn Start Phase when spawning triggers (0-100).")]
     [SerializeField][Range(0f, 100f)] private float spawnStartPercentage = 50f;
-    [SerializeField] private bool loopSequence = false;
-    [Tooltip("If checked, animals from the previous wave are destroyed when a new wave starts.")]
+    // REMOVED: loopSequence - RunManager handles overall game looping/progression
+    [Tooltip("If checked, animals from the previous wave are destroyed when a new wave (within the same round or new round) starts.")]
     [SerializeField] private bool deletePreviousWaveAnimals = true;
 
-    [Header("UI & Feedback")]
+    [Header("UI & Feedback (Legacy - May be replaced by UIManager)")]
     [SerializeField] private TextMeshProUGUI waveStatusText;
-    [SerializeField] private Button startRunButton;
     [SerializeField] private TextMeshProUGUI timeTrackerText;
+    // REMOVED: startRunButton - UIManager controls this
 
-    [Header("State (Read Only)")]
-    [SerializeField] private WaveManagerState currentState = WaveManagerState.PausedBeforeRun;
-    [SerializeField] private int currentWaveIndex = -1;
+    [Header("State (Read Only - Internal)")]
+    [SerializeField] private InternalWaveState currentInternalState = InternalWaveState.Idle;
+    [SerializeField] private int activeWaveDefinitionIndex = -1; // Index within wavesSequence for the current round's wave
 
-    // --- Runtime State ---
-    private WaveDefinition activeWaveDefinition = null;
-    private int dayCyclesRemainingForWave = 0;
-    private bool hasSpawnedThisCycle = false;
-    private bool isInitialPause = true; // <<< NEW: Flag for initial pause
+    private WaveDefinition currentActiveWaveDef = null;
+    private int dayCyclesRemainingForThisWaveDef = 0;
+    private bool hasSpawnedForThisWeatherCycle = false;
+    private Coroutine activeWaveExecutionCoroutine; // To manage FaunaManager spawning for current WaveDef
 
-    // --- Public Accessors ---
-    public WaveManagerState CurrentState => currentState;
-    public int CurrentWaveNumber => currentWaveIndex + 1;
-    public int TotalWaves => wavesSequence != null ? wavesSequence.Count : 0;
-    public bool IsRunActive => currentState != WaveManagerState.PausedBeforeRun && currentState != WaveManagerState.SequenceComplete;
+    // Public property for RunManager to check
+    public bool IsCurrentWaveDefeated()
+    {
+        // A wave is "defeated" if:
+        // 1. It's in Idle state (meaning it finished or was never started properly for the round)
+        // 2. OR its dayCyclesRemainingForThisWaveDef is <= 0 (duration met)
+        //    AND no animals are left (this part is trickier and might need FaunaManager input)
+        // For now, let's simplify: duration met means "wave part" is done.
+        // RunManager might have additional conditions (like all animals cleared).
+        bool durationMet = currentInternalState == InternalWaveState.WaveActive && dayCyclesRemainingForThisWaveDef <= 0;
+        bool isIdle = currentInternalState == InternalWaveState.Idle;
+
+        // For a more robust check, we'd also ask FaunaManager if any wave-spawned animals are left.
+        // bool noActiveThreats = faunaManager != null ? faunaManager.AreAllSpawnedAnimalsDefeated() : true;
+        // For now, relying on duration or being idle.
+        if (isIdle && activeWaveDefinitionIndex != -1)
+        {
+            // This means a wave was processed and finished, ready for next.
+            return true;
+        }
+        return durationMet;
+    }
+
 
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        // Validations (same as before)
         if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager missing!", this);
         if (weatherManager == null) Debug.LogError("[WaveManager] WeatherManager missing!", this);
-        if (mainCamera == null) Debug.LogError("[WaveManager] Main Camera missing!", this);
-        if (waveStatusText == null) Debug.LogWarning("[WaveManager] Wave Status Text missing.", this);
-        if (timeTrackerText == null) Debug.LogWarning("[WaveManager] Time Tracker Text missing.", this);
-        if (wavesSequence == null || wavesSequence.Count == 0) Debug.LogWarning("[WaveManager] Wave Sequence empty.", this);
-        if (startRunButton == null) Debug.LogWarning("[WaveManager] Start Run Button missing.", this);
-        else startRunButton.onClick.AddListener(TryStartRun);
-
-        // <<< SET INITIAL PAUSE >>>
-        Debug.Log("[WaveManager Awake] Setting initial Time.timeScale = 0");
-        Time.timeScale = 0f;
-        isInitialPause = true;
-        // -------------------------
+        // if (mainCamera == null) Debug.LogError("[WaveManager] Main Camera missing!", this); // Less critical now if FaunaManager has its own
+        if (wavesSequence == null || wavesSequence.Count == 0) Debug.LogWarning("[WaveManager] Wave Sequence empty. No waves will spawn.", this);
     }
 
     void Start()
     {
         if (weatherManager != null) weatherManager.OnPhaseChanged += HandleWeatherPhaseChange;
-        InitializeManager(); // Sets state, updates button
+        SetInternalState(InternalWaveState.Idle); // Start idle, wait for RunManager
     }
 
-     void OnDestroy()
+    void OnDestroy()
     {
         if (weatherManager != null) weatherManager.OnPhaseChanged -= HandleWeatherPhaseChange;
-        if (startRunButton != null) startRunButton.onClick.RemoveListener(TryStartRun);
-        // Ensure timescale is reset if manager is destroyed
-        if(isInitialPause || Time.timeScale != 1f) Time.timeScale = 1f;
+        StopAllCoroutines(); // Ensure any wave execution stops
     }
 
-    void InitializeManager()
+    private void SetInternalState(InternalWaveState newState)
     {
-        currentWaveIndex = -1;
-        activeWaveDefinition = null;
-        dayCyclesRemainingForWave = 0;
-        hasSpawnedThisCycle = false;
-        // Don't set timescale here anymore, Awake handles initial pause
-        SetState(WaveManagerState.PausedBeforeRun);
+        if (currentInternalState == newState) return;
+        if (Debug.isDebugBuild) Debug.Log($"[WaveManager] Internal State Change: {currentInternalState} -> {newState}");
+        currentInternalState = newState;
+        UpdateLegacyWaveStatusText();
     }
 
-    void Update()
+    public void StartWaveForRound(int roundNumber)
     {
-        // Always update UI if possible
-        if (weatherManager != null) UpdateTimeTrackerUI();
-
-        // Skip logic if paused initially OR dependencies missing
-        if (isInitialPause || faunaManager == null || weatherManager == null || mainCamera == null)
+        if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat)
         {
-            // Still need to manage button state even if paused initially
-             if (currentState == WaveManagerState.PausedBeforeRun && startRunButton != null)
-             {
-                  startRunButton.gameObject.SetActive(true);
-                  startRunButton.interactable = true;
-             }
-             return;
+            Debug.LogWarning("[WaveManager] Attempted to StartWaveForRound, but RunManager not in GrowthAndThreat state.");
+            return;
         }
 
-        // State Machine Update (only runs after initial pause is over)
-        switch (currentState)
+        // Determine which wave definition to use for this round.
+        // Simple approach: use roundNumber as an index (1-based round to 0-based index)
+        // This assumes wavesSequence contains definitions for multiple rounds.
+        activeWaveDefinitionIndex = roundNumber - 1;
+
+        if (wavesSequence == null || activeWaveDefinitionIndex < 0 || activeWaveDefinitionIndex >= wavesSequence.Count)
         {
-            case WaveManagerState.WaitingForSpawnTime: Update_WaitingForSpawnTime(); break;
-            case WaveManagerState.WaveInProgress: /* Handled by event */ break;
-            case WaveManagerState.SequenceComplete: Update_IdleReady(); break;
-             // PausedBeforeRun is handled above
+            Debug.LogWarning($"[WaveManager] No WaveDefinition for round {roundNumber} (index {activeWaveDefinitionIndex}). Max index: {(wavesSequence?.Count - 1) ?? -1}. No wave will start.");
+            currentActiveWaveDef = null;
+            SetInternalState(InternalWaveState.Idle); // Effectively, this round has no wave.
+            return;
+        }
+
+        currentActiveWaveDef = wavesSequence[activeWaveDefinitionIndex];
+        if (currentActiveWaveDef == null)
+        {
+            Debug.LogError($"[WaveManager] WaveDefinition at index {activeWaveDefinitionIndex} for round {roundNumber} is NULL.");
+            SetInternalState(InternalWaveState.Idle);
+            return;
+        }
+
+        if (deletePreviousWaveAnimals)
+        {
+            ClearAllActiveAnimals();
+        }
+
+        Debug.Log($"[WaveManager] Starting wave '{currentActiveWaveDef.waveName}' for Round {roundNumber}. Duration: {waveDurationInDayCycles} day cycles.");
+        dayCyclesRemainingForThisWaveDef = waveDurationInDayCycles;
+        hasSpawnedForThisWeatherCycle = false;
+        SetInternalState(InternalWaveState.WaitingForSpawnTime);
+        Update_WaitingForSpawnTimeCheck(); // Initial check in case conditions are already met
+    }
+
+    public void StopCurrentWaveSpawning()
+    {
+        Debug.Log("[WaveManager] StopCurrentWaveSpawning called (e.g., round ending).");
+        if (activeWaveExecutionCoroutine != null)
+        {
+            StopCoroutine(activeWaveExecutionCoroutine);
+            activeWaveExecutionCoroutine = null;
+        }
+        // FaunaManager itself should also stop its individual spawn coroutines if it has any running
+        // from a previous ExecuteSpawnWave call that might not have completed all its entries.
+        faunaManager?.StopAllSpawnCoroutines();
+        SetInternalState(InternalWaveState.Idle); // Wave is considered done for this round.
+    }
+
+    void HandleWeatherPhaseChange(WeatherManager.CyclePhase newPhase)
+    {
+        if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat || currentActiveWaveDef == null) return;
+
+        if (newPhase == WeatherManager.CyclePhase.TransitionToDay) // A new day starts
+        {
+            if (currentInternalState == InternalWaveState.WaveActive || currentInternalState == InternalWaveState.SpawningInProgress || currentInternalState == InternalWaveState.WaitingForSpawnTime)
+            {
+                dayCyclesRemainingForThisWaveDef--;
+                hasSpawnedForThisWeatherCycle = false; // Reset for the new day cycle
+                if (Debug.isDebugBuild) Debug.Log($"[WaveManager] Day cycle ended for wave '{currentActiveWaveDef.waveName}'. Cycles remaining: {dayCyclesRemainingForThisWaveDef}");
+
+                if (dayCyclesRemainingForThisWaveDef <= 0)
+                {
+                    Debug.Log($"[WaveManager] Wave '{currentActiveWaveDef.waveName}' duration met. Marking as complete for this round.");
+                    StopCurrentWaveSpawning(); // This will set state to Idle
+                    // RunManager will detect IsCurrentWaveDefeated()
+                }
+                else
+                {
+                    // Still more days for this wave definition
+                    SetInternalState(InternalWaveState.WaitingForSpawnTime);
+                }
+            }
+        }
+        // If the phase changed TO our spawnStartPhase, re-evaluate spawning
+        else if (newPhase == spawnStartPhase && (currentInternalState == InternalWaveState.WaitingForSpawnTime || currentInternalState == InternalWaveState.WaveActive) )
+        {
+            Update_WaitingForSpawnTimeCheck();
         }
     }
 
-    // --- Event Handler (HandleWeatherPhaseChange) --- (Unchanged)
-    void HandleWeatherPhaseChange(WeatherManager.CyclePhase newPhase) { if (currentState == WaveManagerState.PausedBeforeRun || isInitialPause) return; if (newPhase == WeatherManager.CyclePhase.TransitionToDay) { if (currentState == WaveManagerState.WaveInProgress) { dayCyclesRemainingForWave--; hasSpawnedThisCycle = false; if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Day cycle complete. Cycles remaining: {dayCyclesRemainingForWave}"); if (dayCyclesRemainingForWave <= 0) { EndWaveGameplay(); } else { SetState(WaveManagerState.WaitingForSpawnTime); UpdateWaveStatusText(); } } else if (currentState == WaveManagerState.WaitingForSpawnTime) { hasSpawnedThisCycle = false; } } else if (newPhase == spawnStartPhase && currentState == WaveManagerState.WaitingForSpawnTime && !hasSpawnedThisCycle) { Update_WaitingForSpawnTime(); } }
-
-
-    // --- State Update Methods ---
-
-    void Update_WaitingForSpawnTime() // (Unchanged)
-    { if (hasSpawnedThisCycle || weatherManager == null) return; WeatherManager.CyclePhase currentPhase = weatherManager.CurrentPhase; float totalPhaseTime = weatherManager.CurrentTotalPhaseTime; float remainingPhaseTime = weatherManager.CurrentPhaseTimer; float progressPercent = (totalPhaseTime > 0) ? (1f - (remainingPhaseTime / totalPhaseTime)) * 100f : 0f; if (currentPhase == spawnStartPhase && progressPercent >= spawnStartPercentage) { StartWaveSpawning(); } }
-
-    void Update_IdleReady() // (Now only manages button for looping)
+    void Update_WaitingForSpawnTimeCheck()
     {
-         if (startRunButton != null)
+        if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat || currentActiveWaveDef == null) return;
+        if (currentInternalState != InternalWaveState.WaitingForSpawnTime && currentInternalState != InternalWaveState.WaveActive) return; // Only proceed if waiting or already active (for subsequent day spawns)
+        if (hasSpawnedForThisWeatherCycle) return; // Already spawned in this specific weather cycle
+
+        if (weatherManager == null) return;
+        WeatherManager.CyclePhase currentPhase = weatherManager.CurrentPhase;
+        float totalPhaseTime = weatherManager.CurrentTotalPhaseTime;
+        float remainingPhaseTime = weatherManager.CurrentPhaseTimer;
+        float progressPercent = (totalPhaseTime > 0) ? (1f - (remainingPhaseTime / totalPhaseTime)) * 100f : 0f;
+
+        if (currentPhase == spawnStartPhase && progressPercent >= spawnStartPercentage)
+        {
+            TriggerFaunaSpawning();
+        }
+    }
+
+    private void TriggerFaunaSpawning()
+    {
+        if (currentActiveWaveDef == null) return;
+        if (faunaManager == null) { Debug.LogError("[WaveManager] FaunaManager missing, cannot spawn!"); return; }
+
+        Debug.Log($"[WaveManager] Spawning animals for WaveDefinition: '{currentActiveWaveDef.waveName}' (Phase: {spawnStartPhase} >= {spawnStartPercentage}%)");
+        SetInternalState(InternalWaveState.SpawningInProgress); // Indicate spawning has started
+        hasSpawnedForThisWeatherCycle = true; // Mark as spawned for *this* specific day's spawn window
+
+        // FaunaManager's ExecuteSpawnWave will run its coroutines.
+        // We might not need to hold onto the coroutine here if FaunaManager manages its own lifecycle.
+        // However, if WaveDefinition contains multiple entries with delays,
+        // ExecuteSpawnWave might be a long-running operation.
+        faunaManager.ExecuteSpawnWave(currentActiveWaveDef);
+
+        // After telling FaunaManager to spawn, transition to WaveActive.
+        // This implies the wave is "active" for its duration, even if FaunaManager is still
+        // trickling out spawns from the definition's entries.
+        SetInternalState(InternalWaveState.WaveActive);
+    }
+
+    void ClearAllActiveAnimals()
+    {
+        if(Debug.isDebugBuild) Debug.Log("[WaveManager] Clearing all active animals.");
+        AnimalController[] activeAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+        int count = 0;
+        foreach(AnimalController animal in activeAnimals)
+        {
+            if(animal != null) { Destroy(animal.gameObject); count++; }
+        }
+        if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Destroyed {count} animals.");
+    }
+
+    public void ResetForNewRound()
+    {
+        Debug.Log("[WaveManager] Resetting for new round.");
+        StopCurrentWaveSpawning(); // Stop any ongoing coroutines and clear FaunaManager
+        if (deletePreviousWaveAnimals) // This flag can decide if animals carry over or not
+        {
+            ClearAllActiveAnimals();
+        }
+        currentActiveWaveDef = null;
+        activeWaveDefinitionIndex = -1;
+        dayCyclesRemainingForThisWaveDef = 0;
+        hasSpawnedForThisWeatherCycle = false;
+        SetInternalState(InternalWaveState.Idle);
+    }
+
+    // --- Legacy UI Update Methods (can be phased out if UIManager takes full control) ---
+    void Update() // Keep this for legacy UI or other periodic checks if necessary
+    {
+        if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)
+        {
+            // If we are in WaitingForSpawnTime, constantly check if conditions are met
+            if (currentInternalState == InternalWaveState.WaitingForSpawnTime)
+            {
+                Update_WaitingForSpawnTimeCheck();
+            }
+        }
+        UpdateLegacyTimeTrackerUI();
+        UpdateLegacyWaveStatusText();
+    }
+
+    private void UpdateLegacyTimeTrackerUI()
+    {
+        if (timeTrackerText == null || weatherManager == null) return;
+        // ... (same as before, but consider if this UI is still needed)
+        WeatherManager.CyclePhase phase = weatherManager.CurrentPhase;
+        float total = weatherManager.CurrentTotalPhaseTime;
+        float remaining = weatherManager.CurrentPhaseTimer;
+        float progressPercent = (total > 0) ? (1f - (remaining / total)) * 100f : 0f;
+        string phaseName = phase.ToString().Replace("Transition", "");
+        timeTrackerText.text = $"{phaseName} [{progressPercent:F0}%]";
+         if (RunManager.Instance != null)
          {
-            bool showButton = (currentState == WaveManagerState.SequenceComplete && loopSequence);
-            startRunButton.gameObject.SetActive(showButton);
-            startRunButton.interactable = showButton;
+            if(RunManager.Instance.CurrentState == RunState.Planning) timeTrackerText.text += " (Planning)";
+            else if(RunManager.Instance.CurrentState == RunState.Recovery) timeTrackerText.text += " (Recovery)";
          }
     }
 
-    void UpdateTimeTrackerUI() // (Unchanged)
-    { if (timeTrackerText == null || weatherManager == null) return; WeatherManager.CyclePhase phase = weatherManager.CurrentPhase; float total = weatherManager.CurrentTotalPhaseTime; float remaining = weatherManager.CurrentPhaseTimer; float progressPercent = (total > 0) ? (1f - (remaining / total)) * 100f : 0f; string phaseName = phase.ToString().Replace("Transition", ""); timeTrackerText.text = $"{phaseName} [{progressPercent:F0}%]"; if (Time.timeScale == 0f && isInitialPause) timeTrackerText.text += " (Paused)"; } // Show paused during initial pause
-
-    void UpdateWaveStatusText() // (Added PausedBeforeRun case)
+    private void UpdateLegacyWaveStatusText()
     {
-         if (waveStatusText == null) return;
-         switch(currentState)
-         {
-             case WaveManagerState.PausedBeforeRun: waveStatusText.text = "Press Start Run"; break;
-             case WaveManagerState.WaitingForSpawnTime: waveStatusText.text = $"Wave {CurrentWaveNumber} - Waiting..."; break;
-             case WaveManagerState.WaveInProgress: waveStatusText.text = $"Wave {CurrentWaveNumber} [{dayCyclesRemainingForWave} cycles left]"; break;
-            case WaveManagerState.SequenceComplete: waveStatusText.text = loopSequence ? "Sequence Done. Start Again?" : "All Waves Cleared!"; break;
-             default: waveStatusText.text = ""; break;
-         }
-    }
+        if (waveStatusText == null) return;
+        if (RunManager.Instance == null) return;
 
-    // --- State Transition and Action Methods ---
-
-    void SetState(WaveManagerState newState) // (Removed weather pause logic)
-    {
-        if (currentState == newState) return;
-        if(Debug.isDebugBuild) Debug.Log($"[WaveManager] State Change: {currentState} -> {newState}");
-        currentState = newState;
-
-        // Update Button State
-        if (startRunButton != null)
+        if (RunManager.Instance.CurrentState == RunState.Planning)
         {
-            bool showButton = (newState == WaveManagerState.PausedBeforeRun) || (newState == WaveManagerState.SequenceComplete && loopSequence);
-            startRunButton.gameObject.SetActive(showButton);
-            startRunButton.interactable = showButton;
+            waveStatusText.text = $"Prepare for Round {RunManager.Instance.CurrentRoundNumber}";
         }
-
-        // Update Status Text
-        UpdateWaveStatusText();
-    }
-
-    public void TryStartRun() // <<< MODIFIED
-    {
-        // Only allow starting from PausedBeforeRun OR SequenceComplete if looping
-        if (currentState != WaveManagerState.PausedBeforeRun && !(currentState == WaveManagerState.SequenceComplete && loopSequence))
+        else if (RunManager.Instance.CurrentState == RunState.GrowthAndThreat)
         {
-             if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Cannot start run. State: {currentState}, Looping: {loopSequence}");
-             return;
+            if (currentActiveWaveDef != null)
+            {
+                string waveNamePart = string.IsNullOrEmpty(currentActiveWaveDef.waveName) ? $"Wave {activeWaveDefinitionIndex + 1}" : currentActiveWaveDef.waveName;
+                if (currentInternalState == InternalWaveState.WaitingForSpawnTime)
+                    waveStatusText.text = $"{waveNamePart} - Waiting...";
+                else if (currentInternalState == InternalWaveState.SpawningInProgress)
+                    waveStatusText.text = $"{waveNamePart} - Spawning...";
+                else if (currentInternalState == InternalWaveState.WaveActive)
+                    waveStatusText.text = $"{waveNamePart} [{dayCyclesRemainingForThisWaveDef} cycles left]";
+                else if (currentInternalState == InternalWaveState.Idle && dayCyclesRemainingForThisWaveDef <=0) // Wave finished
+                     waveStatusText.text = $"{waveNamePart} - Cleared";
+            }
+            else if (currentInternalState == InternalWaveState.Idle) // No wave for this round, or sequence finished
+            {
+                waveStatusText.text = "All waves for round complete.";
+            }
         }
-
-        Debug.Log("[WaveManager] Starting Run...");
-
-        // <<< RESUME TIME >>>
-        if (isInitialPause || Time.timeScale != 1f)
+        else if (RunManager.Instance.CurrentState == RunState.Recovery)
         {
-            Debug.Log("[WaveManager] Setting Time.timeScale = 1");
-            Time.timeScale = 1f;
-            isInitialPause = false; // Mark initial pause as over
+            waveStatusText.text = "Round Recovering";
         }
-        // ----------------
-
-        InitializeRun(); // Prepare first wave state
-        SetState(WaveManagerState.WaitingForSpawnTime); // Transition state
     }
-
-    void InitializeRun() // (Unchanged)
-    { currentWaveIndex = 0; if (wavesSequence == null || wavesSequence.Count == 0 || wavesSequence[currentWaveIndex] == null) { Debug.LogError("[WaveManager] Cannot initialize run: Bad wave sequence!"); SetState(WaveManagerState.SequenceComplete); return; } if(deletePreviousWaveAnimals && currentState == WaveManagerState.SequenceComplete && loopSequence) { ClearAllActiveAnimals(); } activeWaveDefinition = wavesSequence[currentWaveIndex]; dayCyclesRemainingForWave = waveDurationInDayCycles; hasSpawnedThisCycle = false; Debug.Log($"[WaveManager] Run initialized. Starting Wave {CurrentWaveNumber}. Duration: {dayCyclesRemainingForWave} cycles."); }
-
-    void StartWaveSpawning() // (Unchanged)
-    { if (activeWaveDefinition == null || currentState != WaveManagerState.WaitingForSpawnTime) { return; } Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} - Spawning Triggered (Phase: {spawnStartPhase} >= {spawnStartPercentage}%)"); hasSpawnedThisCycle = true; SetState(WaveManagerState.WaveInProgress); if (faunaManager != null) faunaManager.ExecuteSpawnWave(activeWaveDefinition); else Debug.LogError("[WaveManager] Cannot execute spawn wave, FaunaManager missing!"); }
-
-    void EndWaveGameplay() // (Unchanged)
-    { Debug.Log($"[WaveManager] Wave {CurrentWaveNumber} Gameplay Ended (Duration Met)."); if (faunaManager != null) faunaManager.StopAllSpawnCoroutines(); if (deletePreviousWaveAnimals) { ClearAllActiveAnimals(); } activeWaveDefinition = null; currentWaveIndex++; if (currentWaveIndex >= wavesSequence.Count) { if (loopSequence) { Debug.Log("[WaveManager] Looping back."); InitializeRun(); SetState(WaveManagerState.WaitingForSpawnTime); } else { Debug.Log("[WaveManager] Sequence complete."); SetState(WaveManagerState.SequenceComplete); } } else { if (wavesSequence[currentWaveIndex] == null) { Debug.LogError($"[WaveManager] Wave definition {currentWaveIndex} NULL!"); SetState(WaveManagerState.SequenceComplete); return; } activeWaveDefinition = wavesSequence[currentWaveIndex]; dayCyclesRemainingForWave = waveDurationInDayCycles; hasSpawnedThisCycle = false; Debug.Log($"[WaveManager] Preparing Wave {CurrentWaveNumber}. Duration: {dayCyclesRemainingForWave} cycles."); SetState(WaveManagerState.WaitingForSpawnTime); } }
-
-    void ClearAllActiveAnimals() // (Unchanged)
-    { if(Debug.isDebugBuild) Debug.Log("[WaveManager] Clearing all active animals."); AnimalController[] activeAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None); int count = 0; foreach(AnimalController animal in activeAnimals) { if(animal != null) { Destroy(animal.gameObject); count++; } } if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Destroyed {count} animals."); }
-
-    public Camera GetMainCamera() { return mainCamera; } // (Unchanged)
+    public Camera GetMainCamera() { return mainCamera; } // If FaunaManager still needs it via WaveManager
 }
 
 
@@ -5839,121 +6375,507 @@ public class DeselectOnClickOutside : MonoBehaviour, IPointerClickHandler
 
 
 ////////////////////////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Nodes\UI\InventoryGridController.cs
+////////////////////////////////////////////////////////////////////////////////
+﻿// FILE: Assets/Scripts/Nodes/UI/InventoryGridController.cs
+using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+using System.Linq;
+
+public class InventoryGridController : MonoBehaviour
+{
+    public static InventoryGridController Instance { get; private set; }
+
+    [Header("Grid Layout & Appearance")]
+    [SerializeField][Min(1)] private int inventoryRows = 2;
+    [SerializeField][Min(1)] private int inventoryColumns = 8;
+    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
+    [SerializeField] private float cellMargin = 10f;
+
+    [Header("Cell Visuals")]
+    [SerializeField] private Sprite emptyCellSprite;
+    [SerializeField] private Color emptyCellColor = Color.white;
+
+    [Header("Node Visuals (Shared or Specific)")]
+    [Tooltip("Prefab for displaying nodes in the inventory. Can be the same as NodeEditorGridController's NodeViewPrefab.")]
+    [SerializeField] private GameObject nodeViewPrefab;
+
+    // --- MODIFIED: Scale is now a single float for uniform scaling ---
+    [Tooltip("Uniform scale factor for the gene/item image (thumbnail) within NodeViews. Default is 1 (no change). Applies to both X and Y axes.")]
+    [SerializeField] private float nodeGlobalImageScale = 1f; // Default to no scaling
+    // --- END MODIFIED ---
+
+    // --- NEW FIELD FOR RAYCAST PADDING ---
+    [Tooltip("Padding to shrink the raycast area of node images (thumbnails and backgrounds) to prevent overlap with adjacent cells when scaled up. Negative values shrink. Default 0.")]
+    [SerializeField] private float nodeImageRaycastPadding = 0f; // Default to no padding (shrinking)
+    // --- END NEW FIELD ---
+
+    [Header("UI References")]
+    [Tooltip("The Transform within the UI Panel where inventory cell GameObjects should be created. Should have a GridLayoutGroup.")]
+    [SerializeField] private Transform cellContainer;
+    [Tooltip("Assign the main UICanvas from your scene.")]
+    [SerializeField] private Canvas _rootCanvas;
+
+    [Header("Debugging")]
+    [SerializeField] private bool logInventoryChanges = true;
+
+    private List<NodeCell> inventoryCells = new List<NodeCell>();
+    private List<NodeDefinition> availableGenes = new List<NodeDefinition>();
+
+    // Public accessors
+    public GameObject NodeViewPrefab => nodeViewPrefab;
+    public Color EmptyCellColor => emptyCellColor;
+    public float NodeGlobalImageScale => nodeGlobalImageScale; // --- MODIFIED PUBLIC ACCESSOR ---
+    public float NodeImageRaycastPadding => nodeImageRaycastPadding; // --- NEW PUBLIC ACCESSOR ---
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
+        if (cellContainer == null) Debug.LogError("[InventoryGridController] Cell Container not assigned!", gameObject);
+        if (nodeViewPrefab == null) Debug.LogError("[InventoryGridController] Node View Prefab not assigned!", gameObject);
+        if (_rootCanvas == null) Debug.LogError("[InventoryGridController] Root Canvas not assigned!", gameObject);
+    }
+
+    void Start()
+    {
+        if (cellContainer != null)
+        {
+            CreateInventoryCells();
+            PopulateInitialTestGenes();
+        }
+    }
+
+    private void CreateInventoryCells()
+    {
+        foreach (Transform child in cellContainer) Destroy(child.gameObject);
+        inventoryCells.Clear();
+
+        GridLayoutGroup gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
+        if (gridLayout == null)
+        {
+            Debug.LogError("[InventoryGridController] Cell Container MUST have a GridLayoutGroup component.", cellContainer.gameObject);
+            return; // Stop if no layout group
+        }
+        
+        gridLayout.cellSize = cellSize;
+        gridLayout.spacing = new Vector2(cellMargin, cellMargin);
+        gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+        gridLayout.constraintCount = inventoryColumns;
+
+        int totalCells = inventoryRows * inventoryColumns;
+        for (int i = 0; i < totalCells; i++)
+        {
+            GameObject cellGO = new GameObject($"InventoryCell_{i}");
+            cellGO.transform.SetParent(cellContainer, false);
+
+            Image cellImage = cellGO.AddComponent<Image>();
+            cellImage.sprite = emptyCellSprite;
+            cellImage.color = emptyCellColor;
+            cellImage.raycastTarget = true;
+
+            NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
+            cellLogic.Init(i, this, cellImage);
+            inventoryCells.Add(cellLogic);
+        }
+    }
+
+    private void PopulateInitialTestGenes()
+    {
+        if (NodeEditorGridController.Instance == null || NodeEditorGridController.Instance.DefinitionLibrary == null)
+        {
+            Debug.LogWarning("[InventoryGridController] Cannot populate initial test genes: NodeEditorGridController or its DefinitionLibrary not ready.");
+            return;
+        }
+        NodeDefinitionLibrary lib = NodeEditorGridController.Instance.DefinitionLibrary;
+        if (lib.definitions != null)
+        {
+            var definitionsToAdd = lib.definitions.Where(d => d != null).Take(inventoryRows * inventoryColumns).ToList();
+            foreach (var def in definitionsToAdd) AddGeneToInventory(def);
+            if (definitionsToAdd.Count == 0 && lib.definitions.Count > 0)
+                 Debug.LogWarning("[InventoryGridController] No valid (non-null) definitions found in library to populate test genes.");
+        }
+    }
+
+    public bool AddGeneToInventory(NodeDefinition geneDef)
+    {
+        if (geneDef == null) return false;
+        NodeCell emptyCell = inventoryCells.FirstOrDefault(cell => !cell.HasNode());
+        if (emptyCell != null)
+        {
+            NodeData inventoryNodeData = new NodeData()
+            {
+                nodeId = geneDef.name + "_inventory_" + System.Guid.NewGuid().ToString(),
+                nodeDisplayName = geneDef.displayName,
+                effects = new List<NodeEffectData>(),
+                orderIndex = -1,
+                canBeDeleted = false
+            };
+
+            GameObject nodeViewGO = Instantiate(nodeViewPrefab, emptyCell.transform);
+            NodeView view = nodeViewGO.GetComponent<NodeView>();
+            if (view == null) { /* ... error handling ... */ Destroy(nodeViewGO); return false; }
+            
+            // Initialize NodeView: controller is null as it's an inventory item.
+            // NodeView's Initialize method will handle fetching the correct image scale.
+            view.Initialize(inventoryNodeData, geneDef, null); 
+
+            NodeDraggable draggable = view.GetComponent<NodeDraggable>() ?? view.gameObject.AddComponent<NodeDraggable>();
+            draggable.Initialize(invCtrl: this, startingCell: emptyCell);
+
+            emptyCell.AssignNodeView(view, inventoryNodeData);
+            availableGenes.Add(geneDef);
+            if (logInventoryChanges) Debug.Log($"[Inventory] Added '{geneDef.displayName}' to inventory cell {emptyCell.CellIndex}");
+            return true;
+        }
+        if (logInventoryChanges) Debug.LogWarning($"[Inventory] Could not add '{geneDef.displayName}', inventory is full.");
+        return false;
+    }
+
+    public void ReturnGeneToInventory(NodeDefinition geneDef, NodeCell targetInventoryCellHint)
+    {
+        if (geneDef == null) return;
+        NodeCell actualTargetCell = targetInventoryCellHint;
+        if (actualTargetCell == null || !actualTargetCell.IsInventoryCell || actualTargetCell.HasNode())
+        {
+            actualTargetCell = inventoryCells.FirstOrDefault(cell => !cell.HasNode());
+            if (actualTargetCell == null) {
+                if (logInventoryChanges) Debug.LogWarning($"[Inventory] Cannot return '{geneDef.displayName}', inventory is full.");
+                return;
+            }
+        }
+        
+        NodeData inventoryNodeData = new NodeData() { /* ... */ };
+        inventoryNodeData.nodeId = geneDef.name + "_inventory_" + System.Guid.NewGuid().ToString();
+        inventoryNodeData.nodeDisplayName = geneDef.displayName;
+        inventoryNodeData.canBeDeleted = false;
+
+        GameObject nodeViewGO = Instantiate(nodeViewPrefab, actualTargetCell.transform);
+        NodeView view = nodeViewGO.GetComponent<NodeView>();
+        if (view == null) { /* ... error handling ... */ Destroy(nodeViewGO); return; }
+
+        view.Initialize(inventoryNodeData, geneDef, null); // Controller is null
+
+        NodeDraggable draggable = view.GetComponent<NodeDraggable>() ?? view.gameObject.AddComponent<NodeDraggable>();
+        draggable.Initialize(invCtrl: this, startingCell: actualTargetCell);
+
+        actualTargetCell.AssignNodeView(view, inventoryNodeData);
+        availableGenes.Add(geneDef);
+        if (logInventoryChanges) Debug.Log($"[Inventory] Returned '{geneDef.displayName}' to inventory cell {actualTargetCell.CellIndex}");
+    }
+
+    public void RemoveGeneFromInventory(NodeCell inventoryCell)
+    {
+        if (inventoryCell == null || !inventoryCell.HasNode() || !inventoryCell.IsInventoryCell) return;
+        NodeDefinition geneDef = inventoryCell.GetNodeView()?.GetNodeDefinition();
+        if (geneDef != null)
+        {
+            availableGenes.Remove(geneDef);
+            if (logInventoryChanges) Debug.Log($"[Inventory] Dragged out '{geneDef.displayName}' from inventory cell {inventoryCell.CellIndex}");
+        }
+        inventoryCell.RemoveNode();
+    }
+
+    public NodeCell FindInventoryCellAtScreenPosition(Vector2 screenPosition)
+    {
+        if (_rootCanvas == null) return null;
+        foreach (NodeCell cell in inventoryCells)
+        {
+            RectTransform cellRect = cell.GetComponent<RectTransform>();
+            if (RectTransformUtility.RectangleContainsScreenPoint(cellRect, screenPosition, _rootCanvas.worldCamera))
+            {
+                return cell;
+            }
+        }
+        return null;
+    }
+
+    public void HandleDropOnInventoryCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetInventoryCell)
+    {
+        if (draggedDraggable == null || originalCell == null || targetInventoryCell == null || !targetInventoryCell.IsInventoryCell)
+        {
+            draggedDraggable?.ResetPosition(); return;
+        }
+        NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
+        NodeDefinition draggedDef = draggedView?.GetNodeDefinition();
+        if (draggedView == null || draggedDef == null)
+        {
+            Debug.LogError("[InventoryGridController] HandleDrop: Dragged object missing View/Definition!", draggedDraggable.gameObject);
+            draggedDraggable.ResetPosition(); return;
+        }
+
+        if (!originalCell.IsInventoryCell) // From SEQUENCE to INVENTORY
+        {
+            NodeCell actualTargetInvCell = targetInventoryCell;
+            if (actualTargetInvCell.HasNode()) actualTargetInvCell = inventoryCells.FirstOrDefault(c => !c.HasNode());
+            if (actualTargetInvCell == null) {
+                if (logInventoryChanges) Debug.LogWarning($"[Inventory] Full. Cannot move '{draggedDef.displayName}' from sequence. Resetting drag.");
+                draggedDraggable.ResetPosition(); return;
+            }
+            NodeEditorGridController.Instance?.GetCellAtIndex(originalCell.CellIndex)?.RemoveNode();
+            NodeEditorGridController.Instance?.RefreshGraph();
+            ReturnGeneToInventory(draggedDef, actualTargetInvCell);
+            Destroy(draggedDraggable.gameObject);
+            if (logInventoryChanges) Debug.Log($"[Inventory] Moved '{draggedDef.displayName}' from seq cell {originalCell.CellIndex} to inv cell {actualTargetInvCell.CellIndex}.");
+        }
+        else // From INVENTORY to INVENTORY
+        {
+            if (targetInventoryCell == originalCell) { draggedDraggable.ResetPosition(); return; }
+            NodeData draggedInventoryItemData = draggedView.GetNodeData();
+            if (targetInventoryCell.HasNode()) {
+                NodeView viewInTargetCell = targetInventoryCell.GetNodeView();
+                NodeData dataInTargetCell = targetInventoryCell.GetNodeData();
+                originalCell.ClearNodeReference();
+                originalCell.AssignNodeView(viewInTargetCell, dataInTargetCell);
+                viewInTargetCell.GetComponent<NodeDraggable>()?.SnapToCell(originalCell);
+                targetInventoryCell.ClearNodeReference();
+            } else {
+                originalCell.ClearNodeReference();
+            }
+            targetInventoryCell.AssignNodeView(draggedView, draggedInventoryItemData);
+            draggedDraggable.SnapToCell(targetInventoryCell);
+            if (logInventoryChanges) Debug.Log($"[Inventory] Moved inv item '{draggedDef.displayName}' from cell {originalCell.CellIndex} to cell {targetInventoryCell.CellIndex}.");
+        }
+    }
+
+    public NodeCell GetInventoryCellAtIndex(int index)
+    {
+        if (index >= 0 && index < inventoryCells.Count) return inventoryCells[index];
+        return null;
+    }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeCell.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Nodes/UI/NodeCell.cs
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(RectTransform))]
-// Remove IPointerClickHandler interface from here
-// Keep IDropHandler for dropping onto the cell background
-public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler // Keep IPointerClickHandler for RIGHT click on empty
+public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 {
     public static NodeCell CurrentlySelectedCell { get; private set; }
     public int CellIndex { get; private set; }
+    public bool IsInventoryCell { get; private set; }
 
-    private NodeEditorGridController _controller;
+    private NodeEditorGridController _sequenceController;
+    private InventoryGridController _inventoryController;
+
     private NodeData _nodeData;
     private NodeView _nodeView;
-    private Image _backgroundImage;
 
-    // --- Init remains the same ---
-    public void Init(int index, NodeEditorGridController gridController, Image bgImage)
+    private Image _backgroundImage; // This is the NodeCell's own background
+
+    public void Init(int index, NodeEditorGridController sequenceController, InventoryGridController inventoryController, Image bgImage)
     {
         CellIndex = index;
-        _controller = gridController;
+        _sequenceController = sequenceController;
+        _inventoryController = inventoryController;
         _backgroundImage = bgImage;
+        IsInventoryCell = (_inventoryController != null);
 
-        if (_backgroundImage != null && _controller != null)
+        if (_backgroundImage != null)
         {
-            _backgroundImage.color = _controller.EmptyCellColor;
+            Color emptyColor = Color.gray; // Default fallback
+            if (IsInventoryCell && _inventoryController != null)
+            {
+                emptyColor = _inventoryController.EmptyCellColor;
+            }
+            else if (!IsInventoryCell && _sequenceController != null)
+            {
+                emptyColor = _sequenceController.EmptyCellColor;
+            }
+            _backgroundImage.color = emptyColor;
             _backgroundImage.enabled = true;
+            _backgroundImage.raycastTarget = true; // Empty cell is a raycast target
+        }
+        else
+        {
+            Debug.LogWarning($"[NodeCell {CellIndex}] Init: Background Image component is not assigned.", gameObject);
         }
     }
 
-    // --- HasNode, Getters remain the same ---
-    public bool HasNode() => _nodeData != null && _nodeView != null;
-    public NodeData GetNodeData() => _nodeData;
-    public NodeView GetNodeView() => _nodeView;
-
-    // --- AssignNode, AssignNodeView remain the same ---
-     public void AssignNode(NodeDefinition def)
+    public void Init(int index, NodeEditorGridController sequenceController, Image bgImage)
     {
-        if (def == null || _controller == null) return;
-        RemoveNode();
+        Init(index, sequenceController, null, bgImage);
+    }
 
-        _nodeData = new NodeData() { /* ... data setup ... */
+    public void Init(int index, InventoryGridController inventoryController, Image bgImage)
+    {
+        Init(index, null, inventoryController, bgImage);
+    }
+
+    public bool HasNode()
+    {
+        return _nodeData != null && _nodeView != null;
+    }
+
+    public NodeData GetNodeData()
+    {
+        return _nodeData;
+    }
+
+    public NodeView GetNodeView()
+    {
+        return _nodeView;
+    }
+
+    // FULLY WRITTEN METHOD
+    public void AssignNode(NodeDefinition def)
+    {
+        if (def == null)
+        {
+            Debug.LogError($"[NodeCell {CellIndex}] AssignNode called with a null NodeDefinition.", gameObject);
+            return;
+        }
+        if (IsInventoryCell)
+        {
+            Debug.LogError($"[NodeCell {CellIndex}] AssignNode (for new sequence nodes) called on an inventory cell. This is likely an error. Use InventoryGridController.AddGeneToInventory instead.", gameObject);
+            return;
+        }
+        if (_sequenceController == null)
+        {
+            Debug.LogError($"[NodeCell {CellIndex}] AssignNode called, but _sequenceController is null. Cannot proceed.", gameObject);
+            return;
+        }
+
+        RemoveNode(); // Clear any existing content first, sets background raycastTarget = true
+
+        // Create new NodeData for the sequence
+        _nodeData = new NodeData() {
             nodeId = System.Guid.NewGuid().ToString(),
             nodeDisplayName = def.displayName,
-            effects = def.CloneEffects(),
-            orderIndex = this.CellIndex
+            effects = def.CloneEffects(), // Crucial to clone for runtime instances
+            orderIndex = this.CellIndex,
+            canBeDeleted = true // Default for nodes added from library; initial nodes might override this
         };
 
-        GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : _controller.NodeViewPrefab;
-        if (prefabToInstantiate == null) { /* ... error handling ... */ Debug.LogError($"..."); _nodeData = null; return; }
+        GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : _sequenceController.NodeViewPrefab;
+        if (prefabToInstantiate == null) {
+            Debug.LogError($"[NodeCell {CellIndex}] No NodeView prefab available (def specific or controller default) for '{def.displayName}'.", gameObject);
+            _nodeData = null; // Abort assignment
+            if (_backgroundImage != null) _backgroundImage.raycastTarget = true; // Ensure it's targetable if assign fails
+            return;
+        }
 
-        GameObject nodeViewGO = Instantiate(prefabToInstantiate, transform);
+        GameObject nodeViewGO = Instantiate(prefabToInstantiate, transform); // Instantiate as child of this cell
         _nodeView = nodeViewGO.GetComponent<NodeView>();
-        if (_nodeView == null) { /* ... error handling ... */ Debug.LogError($"..."); Destroy(nodeViewGO); _nodeData = null; return; }
 
-        _nodeView.Initialize(_nodeData, def, _controller); // Init NodeView
+        if (_nodeView == null) {
+            Debug.LogError($"[NodeCell {CellIndex}] NodeView prefab '{prefabToInstantiate.name}' is missing NodeView component. Destroying instance.", gameObject);
+            Destroy(nodeViewGO);
+            _nodeData = null;
+            if (_backgroundImage != null) _backgroundImage.raycastTarget = true; // Ensure it's targetable if assign fails
+            return;
+        }
 
-        NodeDraggable draggable = _nodeView.GetComponent<NodeDraggable>();
-        if (draggable == null) draggable = _nodeView.gameObject.AddComponent<NodeDraggable>();
-        draggable.Initialize(_controller, this); // Init Draggable
+        _nodeView.Initialize(_nodeData, def, _sequenceController); // Initialize the NodeView
 
-        if(_backgroundImage != null) _backgroundImage.enabled = true;
+        RectTransform viewRectTransform = _nodeView.GetComponent<RectTransform>();
+        if (viewRectTransform != null)
+        {
+            viewRectTransform.anchoredPosition = Vector2.zero; // Center it
+        }
+
+        NodeDraggable draggable = _nodeView.GetComponent<NodeDraggable>() ?? _nodeView.gameObject.AddComponent<NodeDraggable>();
+        draggable.Initialize(_sequenceController, null, this); // Initialize draggable for sequence cell
+
+        if (_backgroundImage != null)
+        {
+            _backgroundImage.raycastTarget = false; // Cell background no longer primary raycast target
+        }
     }
-     public void AssignNodeView(NodeView view, NodeData data)
+
+    // FULLY WRITTEN METHOD
+    public void AssignNodeView(NodeView view, NodeData data)
     {
-         RemoveNode();
+         RemoveNode(); // Clear current content first, sets background raycastTarget = true
+
          _nodeView = view;
          _nodeData = data;
+
          if (_nodeView != null) {
-             _nodeView.transform.SetParent(transform, false);
-             if (_nodeData != null) _nodeData.orderIndex = this.CellIndex;
-             // Parent ref will be updated by NodeDraggable.SnapToCell which calls NodeView.UpdateParent...
+            _nodeView.transform.SetParent(transform, false);
+            RectTransform viewRectTransform = _nodeView.GetComponent<RectTransform>();
+            if (viewRectTransform != null) viewRectTransform.anchoredPosition = Vector2.zero;
+
+            if (_nodeData != null && !IsInventoryCell && _sequenceController != null)
+            {
+                _nodeData.orderIndex = this.CellIndex;
+            }
+
+            if (_backgroundImage != null)
+            {
+                _backgroundImage.raycastTarget = false; // Cell background no longer primary raycast target
+            }
          }
-         if(_backgroundImage != null) _backgroundImage.enabled = true;
+         else // Fallback if view somehow becomes null after assignment (should not happen)
+         {
+            if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
+         }
     }
 
-
-    // --- RemoveNode, ClearNodeReference remain the same ---
+    // FULLY WRITTEN METHOD
     public void RemoveNode()
     {
-        bool wasSelected = (CurrentlySelectedCell == this);
+        bool wasSelected = (CurrentlySelectedCell == this && !IsInventoryCell);
         if (_nodeView != null) {
-            if (wasSelected) {
-                 _nodeView.Unhighlight();
-                 CurrentlySelectedCell = null;
-            }
+            if (wasSelected) _nodeView.Unhighlight();
             Destroy(_nodeView.gameObject);
         }
-        _nodeView = null; _nodeData = null;
-        if (wasSelected && CurrentlySelectedCell == this) CurrentlySelectedCell = null;
-        if(_backgroundImage != null) _backgroundImage.enabled = true;
-    }
-     public void ClearNodeReference()
-    {
-        _nodeView = null; _nodeData = null;
-        if(_backgroundImage != null) _backgroundImage.enabled = true;
+        _nodeView = null;
+        _nodeData = null;
+        if (wasSelected) NodeCell.ClearSelection();
+
+        if (_backgroundImage != null)
+        {
+            _backgroundImage.raycastTarget = true; // Cell is empty, make its background targetable
+        }
     }
 
-    // --- Selection Handling (SelectCell, ClearSelection) remains the same ---
-     public static void SelectCell(NodeCell cellToSelect)
+    // FULLY WRITTEN METHOD
+    public void ClearNodeReference() // Called when a node is dragged OUT
     {
-        if (cellToSelect == null || !cellToSelect.HasNode()) { ClearSelection(); return; }
-        if (CurrentlySelectedCell == cellToSelect) return;
-        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
-            CurrentlySelectedCell.GetNodeView().Unhighlight();
+        _nodeView = null;
+        _nodeData = null;
+        if (_backgroundImage != null)
+        {
+            _backgroundImage.raycastTarget = true; // Cell is empty, make its background targetable
         }
+    }
+
+    // FULLY WRITTEN METHOD
+    public static void SelectCell(NodeCell cellToSelect)
+    {
+        if (cellToSelect == null || !cellToSelect.HasNode() || cellToSelect.IsInventoryCell)
+        {
+            ClearSelection();
+            return;
+        }
+        if (CurrentlySelectedCell == cellToSelect)
+        {
+            return; // Already selected
+        }
+        
+        ClearSelection(); // Unhighlight previous one
+
         CurrentlySelectedCell = cellToSelect;
-        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
+        if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) { // Defensive check
             CurrentlySelectedCell.GetNodeView().Highlight();
         }
     }
-     public static void ClearSelection()
+
+    // FULLY WRITTEN METHOD
+    public static void ClearSelection()
     {
         if (CurrentlySelectedCell != null && CurrentlySelectedCell.GetNodeView() != null) {
             CurrentlySelectedCell.GetNodeView().Unhighlight();
@@ -5961,41 +6883,64 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler // Kee
         CurrentlySelectedCell = null;
     }
 
-    // --- Event Handlers UPDATED ---
-
-    /// <summary>
-    /// Handles clicks on the CELL BACKGROUND image.
-    /// Left Click: Does nothing (NodeView handles selection).
-    /// Right Click: Opens add node menu ONLY if the cell is currently empty.
-    /// </summary>
+    // FULLY WRITTEN METHOD
     public void OnPointerClick(PointerEventData eventData)
     {
-        // This click is on the NodeCell's background image
-
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            // Right Click: Only allow opening the dropdown if the cell is currently EMPTY.
-            if (!HasNode())
+            // If this cell is empty, a sequence cell, and its controller is available
+            if (!HasNode() && !IsInventoryCell && _sequenceController != null)
             {
-                // Debug.Log($"NodeCell Background Clicked (Right) on Empty Cell {CellIndex}. Opening dropdown.");
-                ClearSelection(); // Clear selection before showing add menu
-                _controller?.OnEmptyCellRightClicked(this, eventData);
+                ClearSelection(); // Deselect any other node
+                _sequenceController.OnEmptyCellRightClicked(this, eventData); // Show add-node dropdown
             }
-            // If right-clicking the background of an occupied cell, do nothing.
         }
-        // Left click on the background does nothing regarding selection now.
+        else if (eventData.button == PointerEventData.InputButton.Left)
+        {
+            // If this cell has a node and is a sequence cell
+            if (HasNode() && !IsInventoryCell)
+            {
+                SelectCell(this); // Select this cell's node
+            }
+            // If this cell is empty (any type: inventory or sequence)
+            else if (!HasNode())
+            {
+                ClearSelection(); // Clear current selection
+            }
+            // Left-clicking an occupied inventory cell does nothing in terms of "selection"
+        }
     }
 
-
-    // --- OnDrop remains the same ---
+    // FULLY WRITTEN METHOD
     public void OnDrop(PointerEventData eventData)
     {
         GameObject draggedObject = eventData.pointerDrag;
-        if (draggedObject != null) {
-            NodeDraggable draggedNode = draggedObject.GetComponent<NodeDraggable>();
-            if (draggedNode != null && _controller != null) {
-                 _controller.HandleNodeDrop(draggedNode, draggedNode.OriginalCell, eventData.position);
-            }
+        if (draggedObject == null) return;
+
+        NodeDraggable draggedNode = draggedObject.GetComponent<NodeDraggable>();
+        if (draggedNode == null) return;
+
+        NodeCell originalCell = draggedNode.OriginalCell;
+        if (originalCell == null) {
+            Debug.LogError($"[NodeCell {CellIndex} OnDrop] Dragged node '{draggedNode.name}' is missing its originalCell reference! Attempting to reset draggable.", draggedNode.gameObject);
+            draggedNode.ResetPosition();
+            return;
+        }
+
+        // Delegate drop handling to the appropriate controller based on THIS cell's type (the drop target)
+        if (!this.IsInventoryCell && _sequenceController != null) // Dropped onto a SEQUENCE cell
+        {
+            _sequenceController.HandleDropOnSequenceCell(draggedNode, originalCell, this);
+        }
+        else if (this.IsInventoryCell && _inventoryController != null) // Dropped onto an INVENTORY cell
+        {
+            _inventoryController.HandleDropOnInventoryCell(draggedNode, originalCell, this);
+        }
+        else
+        {
+            // This cell is not properly configured or its controller is missing.
+            Debug.LogWarning($"[NodeCell {CellIndex} OnDrop] (IsInventory: {IsInventoryCell}) is not a valid drop target type or its controller is missing. Resetting dragged item.", gameObject);
+            draggedNode.ResetPosition();
         }
     }
 }
@@ -6004,7 +6949,8 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler // Kee
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeDraggable.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Nodes/UI/NodeDraggable.cs
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -6013,161 +6959,190 @@ public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 {
     private RectTransform _rectTransform;
     private CanvasGroup _canvasGroup;
-    private Vector2 _originalAnchoredPosition;
-    private Transform _originalParent;
+    private Vector2 _originalAnchoredPosition; // Anchored position within its original cell
+    private Transform _originalParent;         // The NodeCell's transform
     private NodeCell _originalCell;
     private NodeEditorGridController _gridController;
+    private InventoryGridController _inventoryController;
     private Canvas _rootCanvas;
-
-    // No _isDragging flag needed if managed carefully by events
+    // REMOVED: private Vector2 _dragOffset; // No longer needed for center-snap behavior
 
     public NodeCell OriginalCell => _originalCell;
+    public bool IsFromInventoryGrid => _inventoryController != null;
 
     void Awake()
     {
         _rectTransform = GetComponent<RectTransform>();
-        _canvasGroup = GetComponent<CanvasGroup>();
-        if (_canvasGroup == null)
-        {
-            _canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        }
-        // CRITICAL: Default state MUST allow interactions (clicks, hovers)
+        _canvasGroup = GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
         _canvasGroup.blocksRaycasts = true;
-        _canvasGroup.alpha = 1f; // Ensure fully visible
+        _canvasGroup.alpha = 1f;
     }
 
-    public void Initialize(NodeEditorGridController controller, NodeCell startingCell)
+    public void Initialize(NodeEditorGridController gridCtrl, InventoryGridController invCtrl, NodeCell startingCell)
     {
-        _gridController = controller;
+        _gridController = gridCtrl;
+        _inventoryController = invCtrl;
         _originalCell = startingCell;
-        _rootCanvas = GetComponentInParent<Canvas>()?.rootCanvas;
-        if (_rootCanvas == null) Debug.LogError("[NodeDraggable] Could not find root Canvas!");
 
-        // Ensure initial state after initialization
-        if (_canvasGroup != null) {
-             _canvasGroup.blocksRaycasts = true;
-             _canvasGroup.alpha = 1f;
+        if (_rootCanvas == null) _rootCanvas = GetComponentInParent<Canvas>()?.rootCanvas;
+        if (_rootCanvas == null) _rootCanvas = FindFirstObjectByType<Canvas>();
+        if (_rootCanvas == null) Debug.LogError("[NodeDraggable] Could not find root Canvas!", gameObject);
+
+        if (_canvasGroup != null)
+        {
+            _canvasGroup.blocksRaycasts = true;
+            _canvasGroup.alpha = 1f;
         }
+    }
+
+    public void Initialize(NodeEditorGridController gridCtrl, NodeCell startingCell)
+    {
+        Initialize(gridCtrl, null, startingCell);
+    }
+
+    public void Initialize(InventoryGridController invCtrl, NodeCell startingCell)
+    {
+        Initialize(null, invCtrl, startingCell);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left) return;
-        if (_gridController == null || _rootCanvas == null) return;
+
+        NodeView view = GetComponent<NodeView>();
+        if (view != null && view.GetNodeData() != null)
+        {
+            if (!IsFromInventoryGrid && view.GetNodeData().canBeDeleted == false && _gridController != null)
+            {
+                Debug.Log($"Node '{view.GetNodeData().nodeDisplayName}' is configured as non-draggable/non-deletable from sequence.", gameObject);
+                eventData.pointerDrag = null;
+                return;
+            }
+        }
+
+        if (_rootCanvas == null)
+        {
+            Debug.LogError("[NodeDraggable] OnBeginDrag: Root Canvas is null! Cannot start drag.", gameObject);
+            eventData.pointerDrag = null;
+            return;
+        }
 
         _originalParent = transform.parent;
-        _originalCell = _originalParent?.GetComponent<NodeCell>();
-        _originalAnchoredPosition = _rectTransform.anchoredPosition;
+        _originalAnchoredPosition = _rectTransform.anchoredPosition; // Should be (0,0) if snapped in cell
 
-        // Become transparent and STOP blocking raycasts so underlying cells can be detected
-        _canvasGroup.alpha = 0.6f;
+        _canvasGroup.alpha = 0.6f; // Ghost effect
         _canvasGroup.blocksRaycasts = false;
 
-        // Reparent for top rendering
         transform.SetParent(_rootCanvas.transform, true);
         transform.SetAsLastSibling();
-         // Debug.Log($"[NodeDraggable OnBeginDrag] Started drag. blocksRaycasts: {_canvasGroup.blocksRaycasts}", gameObject);
+
+        // --- MODIFICATION: Directly position the item's pivot under the mouse ---
+        Vector2 mouseLocalPosInCanvas;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _rootCanvas.transform as RectTransform,
+            eventData.position,
+            _rootCanvas.worldCamera,
+            out mouseLocalPosInCanvas
+        );
+        _rectTransform.localPosition = mouseLocalPosInCanvas; // Item's pivot jumps to mouse
+        // --- END MODIFICATION ---
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        // Only process drag if it's the left button and dragging is conceptually active (raycasts blocked)
         if (eventData.button != PointerEventData.InputButton.Left || _canvasGroup == null || _canvasGroup.blocksRaycasts) return;
-        if (_gridController == null || _rootCanvas == null) return;
+        if (_rootCanvas == null || _rectTransform == null) return;
 
-        // Move logic (unchanged)
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-             _rootCanvas.transform as RectTransform, eventData.position,
-             _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 currentLocalPoint);
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            _rootCanvas.transform as RectTransform, eventData.position - eventData.delta,
-            _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera, out Vector2 previousLocalPoint);
-        Vector2 localDelta = currentLocalPoint - previousLocalPoint;
-        _rectTransform.localPosition += (Vector3)localDelta;
+        // --- MODIFICATION: Keep the item's pivot directly under the mouse ---
+        Vector2 mouseLocalPosInCanvas;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            _rootCanvas.transform as RectTransform,
+            eventData.position,
+            _rootCanvas.worldCamera,
+            out mouseLocalPosInCanvas))
+        {
+            _rectTransform.localPosition = mouseLocalPosInCanvas;
+        }
+        // --- END MODIFICATION ---
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-         // Debug.Log($"[NodeDraggable OnEndDrag] Drag ended. Button: {eventData.button}", gameObject);
-
-        // Ensure visuals and raycast blocking are reset REGARDLESS of button, BEFORE handling drop
-        if (_canvasGroup != null) {
+        if (_canvasGroup != null)
+        {
             _canvasGroup.alpha = 1f;
-            _canvasGroup.blocksRaycasts = true; // CRITICAL: Re-enable raycasts immediately
-             // Debug.Log($"--> Reset alpha and blocksRaycasts to: {_canvasGroup.blocksRaycasts}");
+            _canvasGroup.blocksRaycasts = true;
         }
 
-        // Only handle the drop logic if the drag was initiated by the left button
-        if (eventData.button == PointerEventData.InputButton.Left)
+        if (eventData.button != PointerEventData.InputButton.Left)
         {
-            if (_gridController != null) {
-                _gridController.HandleNodeDrop(this, _originalCell, eventData.position);
-            } else {
-                 // No controller, attempt reset
-                 ResetPosition();
-            }
+            ResetPosition();
+            return;
         }
-        else
+        
+        GameObject dropTargetGO = eventData.pointerEnter;
+        NodeCell targetCell = dropTargetGO?.GetComponent<NodeCell>();
+
+        if (targetCell == null) // Dropped outside a valid cell
         {
-             // If drag ended via another button (unlikely but possible), ensure reset
-             ResetPosition();
+            ResetPosition();
         }
+        // If targetCell is not null, NodeCell.OnDrop will handle the rest.
     }
 
     public void ResetPosition()
     {
-        // Debug.Log($"[NodeDraggable ResetPosition] Resetting {gameObject.name}", gameObject);
-        // Reset parent and position
-        transform.SetParent(_originalParent, false);
-        _rectTransform.anchoredPosition = _originalAnchoredPosition;
-        _originalCell = _originalParent?.GetComponent<NodeCell>(); // Update cell ref
+        if (_originalParent == null || _originalCell == null)
+        {
+            Debug.LogWarning($"[NodeDraggable ResetPosition] {gameObject.name} missing original parent/cell. Disabling.", gameObject);
+            gameObject.SetActive(false);
+            return;
+        }
 
-        // Ensure visuals and raycasts are correct after reset
-        if (_canvasGroup != null) {
+        transform.SetParent(_originalParent, false);
+        _rectTransform.anchoredPosition = _originalAnchoredPosition; // This should be (0,0) for a snapped cell
+
+        if (_canvasGroup != null)
+        {
             _canvasGroup.alpha = 1f;
             _canvasGroup.blocksRaycasts = true;
         }
-
-        // Update parent cell reference on the NodeView
-        NodeView view = GetComponent<NodeView>();
-        view?.UpdateParentCellReference();
     }
 
     public void SnapToCell(NodeCell targetCell)
     {
-        // Debug.Log($"[NodeDraggable SnapToCell] Snapping {gameObject.name} to Cell {targetCell?.CellIndex}", gameObject);
-        if (targetCell == null) { ResetPosition(); return; }
+        if (targetCell == null)
+        {
+            Debug.LogWarning($"[NodeDraggable SnapToCell] TargetCell is null for {gameObject.name}. Attempting Reset.", gameObject);
+            ResetPosition();
+            return;
+        }
 
-        // Set Parent and Position
         transform.SetParent(targetCell.transform, false);
-        _rectTransform.anchoredPosition = Vector2.zero;
+        _rectTransform.anchoredPosition = Vector2.zero; // Snap to center (pivot) of the cell
 
-        // Update Internal Draggable References
         _originalParent = targetCell.transform;
         _originalCell = targetCell;
         _originalAnchoredPosition = Vector2.zero;
 
-        // Ensure visuals and raycasts are correct after snap
-        if (_canvasGroup != null) {
+        if (_canvasGroup != null)
+        {
             _canvasGroup.alpha = 1f;
             _canvasGroup.blocksRaycasts = true;
         }
+        
+        GetComponent<NodeView>()?.UpdateParentCellReference();
 
-        // Update the NodeView's parent reference
-        NodeView view = GetComponent<NodeView>();
-        view?.UpdateParentCellReference();
+        _inventoryController = targetCell.IsInventoryCell ? InventoryGridController.Instance : null;
+        _gridController = !targetCell.IsInventoryCell ? NodeEditorGridController.Instance : null;
     }
 
-    // OnDisable might not be strictly needed now but can be kept as safety
     void OnDisable()
     {
-        // If it was disabled mid-drag (blocksRaycasts == false), reset state
         if (_canvasGroup != null && !_canvasGroup.blocksRaycasts)
         {
-             Debug.LogWarning($"[NodeDraggable] Disabled while dragging {gameObject.name}. Resetting CanvasGroup.", gameObject);
             _canvasGroup.alpha = 1f;
             _canvasGroup.blocksRaycasts = true;
-            // Resetting position might be desired but complex here, ensure visuals are ok.
         }
     }
 }
@@ -6176,7 +7151,8 @@ public class NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeEditorGridController.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using System.Collections;
+﻿// FILE: Assets/Scripts/Nodes/UI/NodeEditorGridController.cs
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -6184,8 +7160,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Linq;
 
-[RequireComponent(typeof(RectTransform))]
-public class NodeEditorGridController : MonoBehaviour // Keep this script on the persistent "UIManager" or similar object
+public class NodeEditorGridController : MonoBehaviour
 {
     public static NodeEditorGridController Instance { get; private set; }
 
@@ -6197,11 +7172,11 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
     [Header("Empty Cell Visuals")]
     [SerializeField] private Sprite emptyCellSprite;
     [SerializeField] private Color emptyCellColor = Color.white;
-    [SerializeField] private Vector3 emptyCellScale = Vector3.one; // Still potentially useful for cell GO scale
+    [SerializeField] private Vector3 emptyCellScale = Vector3.one;
 
     [Header("Node Visuals")]
     [SerializeField] private GameObject nodeViewPrefab;
-    [SerializeField] private Vector3 nodeImageScale = Vector3.one; // For the image *inside* the node view
+    // REMOVED: nodeImageScale field - now globally controlled by InventoryGridController
     [SerializeField] private Color selectedNodeBackgroundColor = new Color(0.9f, 0.9f, 0.7f, 1f);
 
     [Header("Node Definitions & Interaction")]
@@ -6209,38 +7184,32 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
     [SerializeField] private TMP_Dropdown nodeDropdown;
 
     [Header("UI References")]
-    [Tooltip("The UI GameObject (Panel) that gets toggled visible/hidden.")]
-    [SerializeField] private GameObject gridUIParent; // The Panel to show/hide
-    [Tooltip("The Transform within the UI Panel where cell GameObjects should be created.")]
-    [SerializeField] private Transform cellContainer; // The container for cell GOs (e.g., 'GridContainer')
-
+    [Tooltip("The UI GameObject (Panel) that acts as the main container for the Node Editor. This will be controlled by UIManager.")]
+    [SerializeField] public GameObject gridUIParent;
+    [Tooltip("The Transform within gridUIParent where sequence cell GameObjects should be created.")]
+    [SerializeField] private Transform cellContainer;
 
     private List<NodeCell> nodeCells = new List<NodeCell>();
-    // Removed _rectTransform as it's less relevant now the script isn't on the grid panel itself
     private Canvas _rootCanvas;
     private NodeGraph _uiGraphRepresentation = new NodeGraph();
 
-
     public GameObject NodeViewPrefab => nodeViewPrefab;
-    public Vector3 NodeImageScale => nodeImageScale;
     public NodeDefinitionLibrary DefinitionLibrary => definitionLibrary;
     public Color SelectedNodeBackgroundColor => selectedNodeBackgroundColor;
     public Color EmptyCellColor => emptyCellColor;
     public NodeGraph GetCurrentUIGraph() => _uiGraphRepresentation;
-
 
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
 
-        // Get components relative to this script's GameObject
-        _rootCanvas = GetComponentInParent<Canvas>(); // Find the root canvas
+        if (_rootCanvas == null) _rootCanvas = GetComponentInParent<Canvas>()?.rootCanvas;
+        if (_rootCanvas == null) _rootCanvas = FindFirstObjectByType<Canvas>();
         if (_rootCanvas == null) Debug.LogError("[NodeEditorGridController] Root Canvas not found!", gameObject);
 
-        // Validate essential references
-        if (gridUIParent == null) Debug.LogError("[NodeEditorGridController] Grid UI Parent (the panel to toggle) not assigned.", gameObject);
-        if (cellContainer == null) Debug.LogError("[NodeEditorGridController] Cell Container (parent for cells) not assigned.", gameObject);
+        if (gridUIParent == null) Debug.LogError("[NodeEditorGridController] Grid UI Parent not assigned.", gameObject);
+        if (cellContainer == null) Debug.LogError("[NodeEditorGridController] Cell Container not assigned.", gameObject);
         if (nodeDropdown == null) Debug.LogWarning("[NodeEditorGridController] Node Dropdown not assigned.", gameObject);
         if (definitionLibrary == null) Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned!", gameObject);
     }
@@ -6254,449 +7223,314 @@ public class NodeEditorGridController : MonoBehaviour // Keep this script on the
     {
         if (nodeDropdown != null) nodeDropdown.gameObject.SetActive(false);
 
-        // Check if references are set before proceeding
         if (cellContainer != null && definitionLibrary != null)
         {
             CreateCells();
-            SpawnInitialNodes(); // Call after cells are created
-            RefreshGraph(); // Refresh after potentially spawning initial nodes
+            SpawnInitialNodes();
+            RefreshGraph();
         }
         else
         {
-            Debug.LogError("[NodeEditorGridController] Cannot initialize grid - Cell Container or Definition Library is missing.", gameObject);
+            Debug.LogError("[NodeEditorGridController] Cannot initialize sequence grid - Cell Container or Definition Library is missing.", gameObject);
         }
     }
 
     private void CreateCells()
     {
-        // Ensure cellContainer is assigned
-        if (cellContainer == null)
-        {
-            Debug.LogError("[NodeEditorGridController] Cannot create cells - Cell Container is not assigned.", gameObject);
-            return;
-        }
+        if (cellContainer == null) return;
 
-        // Clear existing cells from the container
-        foreach (Transform child in cellContainer) // Iterate through the actual container
+        foreach (Transform child in cellContainer)
         {
-            if (child.GetComponent<NodeCell>() != null)
-            {
-                Destroy(child.gameObject);
-            }
+            if (child.GetComponent<NodeCell>() != null) Destroy(child.gameObject);
         }
         nodeCells.Clear();
         NodeCell.ClearSelection();
 
-        // Layout calculations (assuming cellContainer uses appropriate layout components or manual positioning)
-        // If using GridLayoutGroup on cellContainer, positioning is automatic.
-        // If positioning manually based on cellContainer's RectTransform:
-        RectTransform containerRect = cellContainer.GetComponent<RectTransform>();
-        if (containerRect == null)
+        GridLayoutGroup gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
+        if (gridLayout == null)
         {
-             Debug.LogError("[NodeEditorGridController] Cell Container needs a RectTransform for manual layout calculations.", cellContainer.gameObject);
-             return; // Cannot proceed with manual layout
+            Debug.LogWarning("[NodeEditorGridController] Cell Container for sequence does not have a GridLayoutGroup. Using manual layout. Consider adding GridLayoutGroup for easier management.", cellContainer.gameObject);
+            RectTransform containerRect = cellContainer.GetComponent<RectTransform>();
+            if (containerRect == null) { Debug.LogError("CellContainer needs a RectTransform for manual layout!", cellContainer.gameObject); return; }
+            float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
+            float startX = -(totalWidth / 2f) + (cellSize.x / 2f);
+            float startY = 0;
+            for (int i = 0; i < emptyCellsCount; i++)
+            {
+                GameObject cellGO = new GameObject($"SequenceCell_{i}");
+                RectTransform rt = cellGO.AddComponent<RectTransform>();
+                cellGO.transform.SetParent(cellContainer, false);
+                rt.anchorMin = new Vector2(0.5f, 0.5f); rt.anchorMax = new Vector2(0.5f, 0.5f);
+                rt.pivot = new Vector2(0.5f, 0.5f); rt.sizeDelta = cellSize;
+                rt.anchoredPosition = new Vector2(startX + i * (cellSize.x + cellMargin), startY);
+                rt.localScale = emptyCellScale;
+                SetupCellComponents(cellGO, i);
+            }
         }
-
-        // Example Manual Layout (adjust based on containerRect's pivot/anchors):
-        // Assuming center pivot (0.5, 0.5) for the container
-        float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
-        float startX = -(totalWidth / 2f) + (cellSize.x / 2f);
-        float startY = 0; // Assuming horizontal layout centered vertically
-
-        for (int i = 0; i < emptyCellsCount; i++)
+        else // Using GridLayoutGroup
         {
-            GameObject cellGO = new GameObject($"Cell_{i}");
-            RectTransform rt = cellGO.AddComponent<RectTransform>();
-
-            // *** Parent to the designated cellContainer ***
-            cellGO.transform.SetParent(cellContainer, false);
-
-            // --- Manual Positioning --- (Comment out if using GridLayoutGroup)
-            // Set anchors and pivot (e.g., center) for the cell itself
-            rt.anchorMin = new Vector2(0.5f, 0.5f);
-            rt.anchorMax = new Vector2(0.5f, 0.5f);
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            rt.sizeDelta = cellSize;
-
-            // Calculate position relative to container
-            float xPos = startX + i * (cellSize.x + cellMargin);
-            float yPos = startY;
-            rt.anchoredPosition = new Vector2(xPos, yPos);
-            // --- End Manual Positioning ---
-
-            // Apply scale if needed
-            rt.localScale = emptyCellScale;
-
-            Image cellImage = cellGO.AddComponent<Image>();
-            cellImage.sprite = emptyCellSprite;
-            cellImage.color = emptyCellColor;
-            cellImage.raycastTarget = true;
-
-            NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
-            cellLogic.Init(i, this, cellImage);
-            nodeCells.Add(cellLogic);
-
-            // If using GridLayoutGroup on cellContainer, you might not need manual positioning.
-            // The GridLayoutGroup component handles size and spacing. Just ensure cellGO has a LayoutElement if needed.
-            // Example (if using GridLayout):
-            // LayoutElement le = cellGO.GetComponent<LayoutElement>() ?? cellGO.AddComponent<LayoutElement>();
-            // le.preferredWidth = cellSize.x;
-            // le.preferredHeight = cellSize.y;
+            gridLayout.cellSize = cellSize;
+            gridLayout.spacing = new Vector2(cellMargin, cellMargin);
+            // Ensure other GridLayoutGroup settings (constraint, constraintCount, padding, childAlignment) are set correctly in Inspector.
+            for (int i = 0; i < emptyCellsCount; i++)
+            {
+                GameObject cellGO = new GameObject($"SequenceCell_{i}");
+                cellGO.transform.SetParent(cellContainer, false);
+                SetupCellComponents(cellGO, i);
+            }
         }
+    }
+
+    private void SetupCellComponents(GameObject cellGO, int index)
+    {
+        Image cellImage = cellGO.AddComponent<Image>();
+        cellImage.sprite = emptyCellSprite;
+        cellImage.color = emptyCellColor;
+        cellImage.raycastTarget = true;
+        NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
+        cellLogic.Init(index, this, null, cellImage); // For sequence cells, inventoryController is null
+        nodeCells.Add(cellLogic);
     }
 
     private void SpawnInitialNodes()
     {
-        if (definitionLibrary == null || definitionLibrary.initialNodes == null)
-        {
-            return;
-        }
-        if (nodeCells.Count == 0)
-        {
-             Debug.LogWarning("[NodeEditorGridController] Cannot spawn initial nodes - cells haven't been created yet (check for earlier errors).");
-             return;
-        }
+        if (definitionLibrary == null || definitionLibrary.initialNodes == null) return;
+        if (nodeCells.Count == 0) { Debug.LogWarning("[NodeEditorGridController] Cannot spawn initial nodes - cells not created."); return; }
 
         foreach (var config in definitionLibrary.initialNodes)
         {
-            if (config.nodeDefinition == null)
-            {
-                Debug.LogWarning($"Initial node config has null NodeDefinition. Skipping.");
-                continue;
-            }
-
-            if (config.cellIndex < 0 || config.cellIndex >= nodeCells.Count)
-            {
-                Debug.LogWarning($"Initial node config for '{config.nodeDefinition.name}' has invalid cell index ({config.cellIndex}). Max index is {nodeCells.Count - 1}. Skipping.");
-                continue;
-            }
-
+            if (config.nodeDefinition == null) { Debug.LogWarning("InitialNodeConfig has null NodeDefinition. Skipping."); continue; }
+            if (config.cellIndex < 0 || config.cellIndex >= nodeCells.Count) { Debug.LogWarning($"InitialNodeConfig for '{config.nodeDefinition.name}' has invalid cellIndex {config.cellIndex}. Skipping."); continue; }
             NodeCell targetCell = nodeCells[config.cellIndex];
-            if (targetCell.HasNode())
-            {
-                Debug.LogWarning($"Initial node config for '{config.nodeDefinition.name}' targets cell {config.cellIndex}, but it's already occupied. Skipping.");
-                continue;
-            }
-
+            if (targetCell.HasNode()) { Debug.LogWarning($"InitialNodeConfig for '{config.nodeDefinition.name}' targets occupied cell {config.cellIndex}. Skipping."); continue; }
+            
             targetCell.AssignNode(config.nodeDefinition);
-
             NodeView spawnedView = targetCell.GetNodeView();
             if (spawnedView != null)
             {
                 NodeDraggable draggable = spawnedView.GetComponent<NodeDraggable>();
-                if (draggable != null)
-                {
-                    draggable.enabled = config.canMove;
-                } else if (config.canMove) {
-                     Debug.LogWarning($"Initial node '{config.nodeDefinition.name}' in cell {config.cellIndex} is set to 'canMove=true' but its prefab is missing the NodeDraggable component.", spawnedView.gameObject);
-                }
-
+                if (draggable != null) draggable.enabled = config.canMove;
                 NodeData spawnedData = targetCell.GetNodeData();
-                if (spawnedData != null)
-                {
-                    spawnedData.canBeDeleted = config.canDelete;
-                }
+                if (spawnedData != null) spawnedData.canBeDeleted = config.canDelete;
             }
         }
     }
-
 
     void Update()
     {
-        // UI Toggle
-        if (Input.GetKeyDown(KeyCode.Tab))
+        if (gridUIParent != null && gridUIParent.activeInHierarchy) // Only process input if this UI is active
         {
-             ToggleGridUI(); // This should now work correctly
-        }
-
-        // Delete Node Handling
-        if (Input.GetKeyDown(KeyCode.Delete))
-        {
-            if (NodeCell.CurrentlySelectedCell != null)
+            if (Input.GetKeyDown(KeyCode.Delete))
             {
-                NodeCell selected = NodeCell.CurrentlySelectedCell;
-                NodeData data = selected.GetNodeData();
-
-                if (data != null && data.canBeDeleted)
+                if (NodeCell.CurrentlySelectedCell != null && !NodeCell.CurrentlySelectedCell.IsInventoryCell) // Ensure it's a sequence cell
                 {
-                    selected.RemoveNode();
-                    RefreshGraph();
-                }
-                else if (data != null && !data.canBeDeleted)
-                {
-                     Debug.Log($"Node '{data.nodeDisplayName}' cannot be deleted.");
+                    NodeCell selected = NodeCell.CurrentlySelectedCell;
+                    NodeData data = selected.GetNodeData();
+                    if (data != null && data.canBeDeleted)
+                    {
+                        selected.RemoveNode();
+                        RefreshGraph();
+                    }
+                    else if (data != null && !data.canBeDeleted) Debug.Log($"Node '{data.nodeDisplayName}' in sequence cannot be deleted.");
                 }
             }
-        }
-
-        // Dropdown Escape Handling
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf)
+            if (Input.GetKeyDown(KeyCode.Escape))
             {
-                HideDropdown();
+                if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown();
+                else if (NodeCell.CurrentlySelectedCell != null) NodeCell.ClearSelection(); // Deselect if dropdown not open
             }
-             else if (NodeCell.CurrentlySelectedCell != null) {
-                 NodeCell.ClearSelection();
-             }
         }
     }
 
-    public void ToggleGridUI()
-    {
-        if (gridUIParent != null)
-        {
-            bool currentState = gridUIParent.activeSelf;
-            gridUIParent.SetActive(!currentState); // This toggles the assigned panel
-
-            if (!gridUIParent.activeSelf) // If hiding UI
-            {
-                 if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown();
-                 NodeCell.ClearSelection(); // Deselect nodes when UI hides
-            }
-        }
-        else Debug.LogWarning("[NodeEditorGridController] Grid UI Parent not assigned.");
-    }
+    public void ShowNodeEditor() { if (gridUIParent != null) gridUIParent.SetActive(true); }
+    public void HideNodeEditor() { if (gridUIParent != null) { gridUIParent.SetActive(false); if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) HideDropdown(); NodeCell.ClearSelection(); } }
 
     public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
     {
+        if (cell.IsInventoryCell) return; // Don't open for inventory cells
         if (nodeDropdown == null) { Debug.LogError("[NodeEditorGridController] Node Dropdown not assigned."); return; }
-        if (definitionLibrary == null || definitionLibrary.definitions == null) { Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned or has no definitions."); return; }
-
-        StopCoroutine("ShowDropdownCoroutine");
+        if (definitionLibrary == null || definitionLibrary.definitions == null) { Debug.LogError("[NodeEditorGridController] Node Definition Library not assigned/empty."); return; }
+        StopCoroutine("ShowDropdownCoroutine"); // Ensure only one runs
         StartCoroutine(ShowDropdownCoroutine(cell, eventData));
     }
 
-     private IEnumerator ShowDropdownCoroutine(NodeCell cell, PointerEventData eventData)
-     {
-         List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
-         options.Add(new TMP_Dropdown.OptionData("Select Node..."));
-         var sortedDefinitions = definitionLibrary.definitions
-                                     .Where(def => def != null)
-                                     .OrderBy(def => def.displayName)
-                                     .ToList();
-         foreach (var def in sortedDefinitions) {
-             TMP_Dropdown.OptionData option = new TMP_Dropdown.OptionData();
-             option.text = def.displayName;
-             option.image = def.thumbnail;
-             options.Add(option);
-         }
-         nodeDropdown.ClearOptions();
-         nodeDropdown.AddOptions(options);
-
-         nodeDropdown.onValueChanged.RemoveAllListeners();
-         nodeDropdown.onValueChanged.AddListener((selectedIndex) => {
-             OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions);
-         });
-
-         RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
-         RectTransformUtility.ScreenPointToLocalPointInRectangle(
-             dropdownRect.parent as RectTransform,
-             eventData.position,
-             _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera,
-             out Vector2 localPos);
-         dropdownRect.localPosition = localPos;
-
-         if (!nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(true);
-
-         yield return null;
-
-         try {
-             if (nodeDropdown.template == null) {
-                 Debug.LogError("Dropdown template is not assigned in the Inspector!", nodeDropdown.gameObject);
-                 HideDropdown();
-                 yield break;
-             }
-             nodeDropdown.Show();
-         } catch (System.NullReferenceException nre) {
-              Debug.LogError($"Error showing dropdown: {nre.Message}", nodeDropdown.gameObject);
-             HideDropdown();
-             yield break;
-         }
-
-         nodeDropdown.value = 0;
-         nodeDropdown.RefreshShownValue();
-     }
-
-     private void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefs)
-     {
-         HideDropdown();
-
-         if (selectedIndex > 0) {
-             int definitionIndex = selectedIndex - 1;
-             if (definitionIndex >= 0 && definitionIndex < sortedDefs.Count) {
-                 NodeDefinition selectedDef = sortedDefs[definitionIndex];
-                 if (selectedDef != null) {
-                     targetCell.AssignNode(selectedDef);
-                     NodeCell.SelectCell(targetCell);
-                     RefreshGraph();
-                 }
-             } else {
-                  Debug.LogError($"Dropdown selection index ({selectedIndex}) resulted in an out-of-bounds index ({definitionIndex}) for the definition list.");
-             }
-         }
-     }
-
-    public void HideDropdown()
+    private IEnumerator ShowDropdownCoroutine(NodeCell cell, PointerEventData eventData)
     {
-        if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf)
+        List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData>();
+        options.Add(new TMP_Dropdown.OptionData("Select Node...")); // Placeholder first option
+
+        var sortedDefinitions = definitionLibrary.definitions
+                                    .Where(def => def != null) // Filter out any nulls in the library
+                                    .OrderBy(def => def.displayName)
+                                    .ToList();
+
+        foreach (var def in sortedDefinitions)
         {
-            nodeDropdown.Hide();
-            nodeDropdown.gameObject.SetActive(false);
+            options.Add(new TMP_Dropdown.OptionData { text = def.displayName, image = def.thumbnail });
         }
+        
+        nodeDropdown.ClearOptions(); nodeDropdown.AddOptions(options);
+        nodeDropdown.onValueChanged.RemoveAllListeners(); // Important to prevent multiple calls
+        nodeDropdown.onValueChanged.AddListener((selectedIndex) => { OnDropdownValueChanged(selectedIndex, cell, sortedDefinitions); });
+
+        RectTransform dropdownRect = nodeDropdown.GetComponent<RectTransform>();
+        if (_rootCanvas != null && dropdownRect.parent is RectTransform parentRect) {
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, eventData.position, _rootCanvas.worldCamera, out Vector2 localPos);
+            dropdownRect.localPosition = localPos;
+        } else { Debug.LogWarning("[NodeEditorGridController] Cannot accurately position dropdown: RootCanvas or parent RectTransform issue."); }
+        
+        if (!nodeDropdown.gameObject.activeSelf) nodeDropdown.gameObject.SetActive(true);
+        yield return null; // Wait for layout potentially
+        
+        try { 
+            if (nodeDropdown.template == null) { Debug.LogError("Node Dropdown template is null!", nodeDropdown.gameObject); HideDropdown(); yield break; }
+            nodeDropdown.Show(); 
+        }
+        catch (System.NullReferenceException nre) { Debug.LogError($"Error showing dropdown (template issue?): {nre.Message}", nodeDropdown.gameObject); HideDropdown(); yield break; }
+        
+        nodeDropdown.value = 0; nodeDropdown.RefreshShownValue();
+    }
+
+    private void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefinitions)
+    {
+        HideDropdown();
+        if (selectedIndex > 0) { // 0 is "Select Node..."
+            int definitionIndexInSortedList = selectedIndex - 1;
+            if (definitionIndexInSortedList >= 0 && definitionIndexInSortedList < sortedDefinitions.Count) {
+                NodeDefinition selectedDef = sortedDefinitions[definitionIndexInSortedList];
+                if (selectedDef != null) { 
+                    targetCell.AssignNode(selectedDef); 
+                    NodeCell.SelectCell(targetCell);    
+                    RefreshGraph();                     
+                }
+            } else { Debug.LogError($"[NodeEditorGridController] Dropdown selection index ({selectedIndex}) invalid for sorted definition list."); }
+        }
+    }
+
+    public void HideDropdown() { 
+        if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) { 
+            if (nodeDropdown.IsExpanded) nodeDropdown.Hide(); 
+            nodeDropdown.gameObject.SetActive(false); 
+        } 
     }
 
     public void RefreshGraph()
     {
         if (_uiGraphRepresentation == null) _uiGraphRepresentation = new NodeGraph();
         _uiGraphRepresentation.nodes.Clear();
-        // Ensure cells are ordered correctly by index when building the graph
-        foreach (var cell in nodeCells.OrderBy(c => c.CellIndex))
-        {
-            NodeData data = cell.GetNodeData();
-            if (data != null)
-            {
-                data.orderIndex = cell.CellIndex;
-                _uiGraphRepresentation.nodes.Add(data);
+        if (nodeCells != null) {
+            foreach (var cell in nodeCells.OrderBy(c => c.CellIndex)) { // Ensure processing in order
+                NodeData data = cell.GetNodeData();
+                if (data != null) { data.orderIndex = cell.CellIndex; _uiGraphRepresentation.nodes.Add(data); }
             }
         }
     }
+    
+    public NodeCell GetCellAtIndex(int index)
+    {
+        if (nodeCells == null) { Debug.LogError("[NodeEditorGridController] nodeCells list is null. Cannot GetCellAtIndex."); return null; }
+        if (index >= 0 && index < nodeCells.Count) return nodeCells[index];
+        Debug.LogWarning($"[NodeEditorGridController] GetCellAtIndex: Index {index} out of bounds (0-{(nodeCells.Count > 0 ? nodeCells.Count - 1 : -1)}). Returning null.");
+        return null;
+    }
 
-     public bool HandleNodeDrop(NodeDraggable draggedDraggable, NodeCell originalCell, Vector2 screenPosition)
-     {
-         NodeCell targetCell = FindCellAtScreenPosition(screenPosition);
-         bool changed = false;
+    public void HandleDropOnSequenceCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetSequenceCell)
+    {
+        if (draggedDraggable == null || originalCell == null || targetSequenceCell == null || targetSequenceCell.IsInventoryCell)
+        {
+            draggedDraggable?.ResetPosition(); return;
+        }
+        NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
+        NodeDefinition draggedDef = draggedView?.GetNodeDefinition();
+        if (draggedView == null || draggedDef == null) {
+            Debug.LogError("[NodeEditorGridController] HandleDropOnSequenceCell: Dragged object missing NodeView/Definition.", draggedDraggable.gameObject);
+            draggedDraggable.ResetPosition(); return;
+        }
 
-         if (targetCell != null && originalCell != null)
-         {
-             NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
-             NodeData draggedData = draggedView?.GetNodeData();
+        if (targetSequenceCell == originalCell && !originalCell.IsInventoryCell) { // Dropped on self in sequence
+            draggedDraggable.SnapToCell(originalCell); NodeCell.SelectCell(originalCell); return;
+        }
 
-             if (draggedView == null || draggedData == null) {
-                 Debug.LogError("Dragged object missing NodeView or NodeData!", draggedDraggable.gameObject);
-                 draggedDraggable.ResetPosition();
-                 return false;
-             }
+        if (originalCell.IsInventoryCell) { // Inventory TO Sequence
+            InventoryGridController.Instance?.RemoveGeneFromInventory(originalCell); // This destroys the inventory's NodeView
+            
+            NodeView existingViewInTargetSeq = targetSequenceCell.GetNodeView();
+            if (existingViewInTargetSeq != null) { // If sequence target is occupied
+                NodeDefinition defFromSeqTarget = existingViewInTargetSeq.GetNodeDefinition();
+                targetSequenceCell.ClearNodeReference(); // Clear before returning, doesn't destroy view
+                InventoryGridController.Instance?.ReturnGeneToInventory(defFromSeqTarget, null); // This creates a new view in inventory
+                Destroy(existingViewInTargetSeq.gameObject); // Destroy the old view from sequence
+            }
+            targetSequenceCell.AssignNode(draggedDef); // Creates a new NodeView for sequence
+            targetSequenceCell.GetNodeView()?.GetComponent<NodeDraggable>()?.SnapToCell(targetSequenceCell);
+            NodeCell.SelectCell(targetSequenceCell);
+        } 
+        else { // Sequence TO Sequence (different cells)
+            NodeView existingViewInTarget = targetSequenceCell.GetNodeView(); 
+            NodeData existingDataInTarget = targetSequenceCell.GetNodeData();
+            NodeCell.ClearSelection(); 
+            originalCell.ClearNodeReference(); // Original cell is now empty
 
-             if (targetCell == originalCell) {
-                 draggedDraggable.ResetPosition();
-                 NodeCell.SelectCell(targetCell);
-                 return false;
-             }
+            if (existingViewInTarget != null) { // If target cell was occupied, move its content to original cell
+                NodeDraggable draggableFromTarget = existingViewInTarget.GetComponent<NodeDraggable>();
+                originalCell.AssignNodeView(existingViewInTarget, existingDataInTarget);
+                draggableFromTarget?.SnapToCell(originalCell);
+            }
+            // Assign the dragged node (which is `draggedView` and its `draggedView.GetNodeData()`) to the target cell
+            targetSequenceCell.AssignNodeView(draggedView, draggedView.GetNodeData());
+            draggedDraggable.SnapToCell(targetSequenceCell); 
+            NodeCell.SelectCell(targetSequenceCell);
+        }
+        RefreshGraph();
+    }
 
-             NodeView existingViewInTarget = targetCell.GetNodeView();
-             NodeData existingDataInTarget = targetCell.GetNodeData();
+    private NodeCell FindCellAtScreenPosition(Vector2 screenPosition)
+    {
+        NodeCell foundCell = null;
+        if (cellContainer == null || _rootCanvas == null) return null;
+        foreach (Transform cellTransform in cellContainer) {
+            NodeCell cell = cellTransform.GetComponent<NodeCell>(); if (cell == null) continue;
+            RectTransform cellRect = cell.GetComponent<RectTransform>(); if (cellRect == null) continue;
+            if (RectTransformUtility.RectangleContainsScreenPoint(cellRect, screenPosition, _rootCanvas.worldCamera)) // Use worldCamera for ScreenSpace-Camera or Perspective
+            { foundCell = cell; break; }
+        }
+        return foundCell;
+    }
 
-             NodeCell.ClearSelection();
-
-             originalCell.ClearNodeReference();
-
-             if (existingViewInTarget != null && existingDataInTarget != null) {
-                 NodeDraggable existingDraggable = existingViewInTarget.GetComponent<NodeDraggable>();
-                 originalCell.AssignNodeView(existingViewInTarget, existingDataInTarget);
-                 if (existingDraggable != null) existingDraggable.SnapToCell(originalCell);
-             }
-
-             targetCell.AssignNodeView(draggedView, draggedData);
-             draggedDraggable.SnapToCell(targetCell);
-
-             NodeCell.SelectCell(targetCell);
-             changed = true;
-         }
-         else
-         {
-             draggedDraggable.ResetPosition();
-             if (originalCell != null && originalCell.HasNode()) {
-                 NodeCell.SelectCell(originalCell);
-             } else {
-                 NodeCell.ClearSelection();
-             }
-         }
-
-         if (changed) RefreshGraph();
-
-         return changed;
-     }
-
-     private NodeCell FindCellAtScreenPosition(Vector2 screenPosition)
-     {
-         NodeCell foundCell = null;
-         if (cellContainer == null) return null; // Cannot find cells if container is missing
-
-         // Check all NodeCell components *within the specified container*
-         foreach (Transform cellTransform in cellContainer)
-         {
-             NodeCell cell = cellTransform.GetComponent<NodeCell>();
-             if (cell == null) continue; // Skip if child isn't a NodeCell
-
-             RectTransform cellRect = cell.GetComponent<RectTransform>();
-             if (cellRect == null) continue; // Skip if cell doesn't have a RectTransform
-
-             bool contains = RectTransformUtility.RectangleContainsScreenPoint(
-                 cellRect,
-                 screenPosition,
-                 _rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : _rootCanvas.worldCamera
-             );
-             if (contains) {
-                 foundCell = cell;
-                 break;
-             }
-         }
-         return foundCell;
-     }
-
-     #if UNITY_EDITOR
-     void OnDrawGizmos()
-     {
-         // Draw gizmos only in the editor and when not playing
-         // Check if cellContainer is assigned before drawing
-         if (!Application.isPlaying && cellContainer != null && cellContainer.TryGetComponent<RectTransform>(out var containerRect))
-         {
-             Gizmos.color = new Color(0f, 1f, 0f, 0.5f); // Semi-transparent green
-
-             // Use the same layout logic as CreateCells (example for manual layout)
-             float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
-             float startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f); // Relative to container center pivot
-             float startY_for_gizmo = 0;
-
-             // Store original matrix
-             Matrix4x4 originalMatrix = Gizmos.matrix;
-
-             for (int i = 0; i < emptyCellsCount; i++)
-             {
-                 // Calculate center position of the cell in container's local space
-                 float xOffset = startX_for_gizmo + i * (cellSize.x + cellMargin);
-                 Vector3 localCellCenter = new Vector3(xOffset, startY_for_gizmo, 0);
-
-                 // Transform local center to world space using the CELL CONTAINER's transform
-                 Vector3 worldCellCenter = cellContainer.TransformPoint(localCellCenter);
-
-                 // Calculate gizmo size based on CELL CONTAINER's lossy scale
-                 Vector3 gizmoSize = new Vector3(cellSize.x * cellContainer.lossyScale.x, cellSize.y * cellContainer.lossyScale.y, 0.1f);
-
-                 // Set Gizmos matrix to handle CELL CONTAINER's rotation
-                 Gizmos.matrix = Matrix4x4.TRS(worldCellCenter, cellContainer.rotation, Vector3.one);
-
-                 // Draw wire cube centered at the transformed position
-                 Gizmos.DrawWireCube(Vector3.zero, gizmoSize);
-             }
-             // Restore original Gizmos matrix
-             Gizmos.matrix = originalMatrix;
-         }
-         // Optional: Draw a box around the container itself
-         // else if (!Application.isPlaying && cellContainer != null && cellContainer.TryGetComponent<RectTransform>(out containerRect)) {
-         //     Gizmos.color = Color.yellow;
-         //     // Simplified world space box based on container rect
-         //     Vector3[] corners = new Vector3[4];
-         //     containerRect.GetWorldCorners(corners);
-         //     Vector3 center = (corners[0] + corners[2]) * 0.5f;
-         //     Vector3 size = new Vector3(Mathf.Abs(corners[0].x - corners[2].x), Mathf.Abs(corners[0].y - corners[2].y), 0.1f);
-         //     Gizmos.matrix = Matrix4x4.TRS(center, containerRect.rotation, Vector3.one);
-         //     Gizmos.DrawWireCube(Vector3.zero, size);
-         //     Gizmos.matrix = Matrix4x4.identity;
-         // }
-     }
-     #endif
+    #if UNITY_EDITOR
+    void OnDrawGizmos()
+    {
+        if (Application.isPlaying || cellContainer == null || !cellContainer.gameObject.activeInHierarchy ||
+            !cellContainer.TryGetComponent<RectTransform>(out var containerRect)) return;
+        
+        Gizmos.color = new Color(0f, 1f, 0f, 0.25f); 
+        Matrix4x4 originalMatrix = Gizmos.matrix;
+        
+        GridLayoutGroup gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
+        if (gridLayout != null && gridLayout.enabled) {
+            Vector3[] corners = new Vector3[4]; 
+            containerRect.GetWorldCorners(corners);
+            Gizmos.matrix = Matrix4x4.identity; // Use world space for drawing lines between world corners
+            Gizmos.DrawLine(corners[0], corners[1]); 
+            Gizmos.DrawLine(corners[1], corners[2]);
+            Gizmos.DrawLine(corners[2], corners[3]); 
+            Gizmos.DrawLine(corners[3], corners[0]);
+        } else { // Manual Layout Gizmos
+            float totalWidth = (emptyCellsCount * cellSize.x) + ((emptyCellsCount - 1) * cellMargin);
+            float startX_for_gizmo = -(totalWidth / 2f) + (cellSize.x / 2f); 
+            float startY_for_gizmo = 0;
+            for (int i = 0; i < emptyCellsCount; i++) {
+                float xOffset = startX_for_gizmo + i * (cellSize.x + cellMargin);
+                Vector3 localCellCenter = new Vector3(xOffset, startY_for_gizmo, 0);
+                Vector3 worldCellCenter = cellContainer.TransformPoint(localCellCenter);
+                Vector3 gizmoSize = new Vector3(cellSize.x * cellContainer.lossyScale.x, cellSize.y * cellContainer.lossyScale.y, 0.1f);
+                Gizmos.matrix = Matrix4x4.TRS(worldCellCenter, cellContainer.rotation, Vector3.one);
+                Gizmos.DrawWireCube(Vector3.zero, gizmoSize);
+            }
+        }
+        Gizmos.matrix = originalMatrix; // Restore original matrix
+    }
+    #endif
 }
 
 
@@ -6730,105 +7564,209 @@ public class NodeSelectable : MonoBehaviour, IPointerClickHandler
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\UI\NodeView.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Nodes/UI/NodeView.cs
+using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
-using System.Collections.Generic;
 using System.Text;
 
 [RequireComponent(typeof(RectTransform))]
 public class NodeView : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
 {
-    // --- Fields remain the same ---
     [Header("UI Elements (Assign in Prefab)")]
     [SerializeField] private Image thumbnailImage;
     [SerializeField] private Image backgroundImage;
     [SerializeField] private GameObject tooltipPanel;
     [SerializeField] private TMP_Text tooltipText;
     [SerializeField] private TMP_Text nodeNameText;
+
     [Header("Configuration")]
     [SerializeField] private bool displayNodeName = false;
 
     private NodeData _nodeData;
     private NodeDefinition _nodeDefinition;
-    private NodeEditorGridController _controller;
-    private NodeCell _parentCell;
+    private NodeEditorGridController _sequenceGridControllerRef; // Controller if this view is in the main sequence
+    private NodeCell _parentCell; // The cell this view is currently in
     private Color _originalBackgroundColor;
 
-    // --- Initialize, UpdateParentCellReference, Getters, Highlight, Unhighlight remain the same ---
-     public void Initialize(NodeData data, NodeDefinition definition, NodeEditorGridController controller)
-    { /* ... as before ... */
-         _nodeData = data; _nodeDefinition = definition; _controller = controller;
-         UpdateParentCellReference();
-         if (_nodeData == null || _nodeDefinition == null || _controller == null || _parentCell == null) { gameObject.SetActive(false); return; }
-         if (thumbnailImage != null) { thumbnailImage.sprite = _nodeDefinition.thumbnail; thumbnailImage.color = _nodeDefinition.thumbnailTintColor; thumbnailImage.rectTransform.localScale = _controller.NodeImageScale; thumbnailImage.enabled = (thumbnailImage.sprite != null); if (!thumbnailImage.raycastTarget) thumbnailImage.raycastTarget = true; }
-         if (backgroundImage != null) { _originalBackgroundColor = _nodeDefinition.backgroundColor; backgroundImage.color = _originalBackgroundColor; backgroundImage.enabled = true; if (!backgroundImage.raycastTarget) backgroundImage.raycastTarget = true; }
-         if (tooltipPanel != null) tooltipPanel.SetActive(false);
-         if (nodeNameText != null) { nodeNameText.text = _nodeData.nodeDisplayName; nodeNameText.gameObject.SetActive(displayNodeName); }
+    public void Initialize(NodeData data, NodeDefinition definition, NodeEditorGridController sequenceController)
+ {
+     _nodeData = data;
+     _nodeDefinition = definition;
+     _sequenceGridControllerRef = sequenceController; // This will be null if it's an inventory item
+
+     UpdateParentCellReference(); // Call early to know if it's inventory or sequence via _parentCell.IsInventoryCell
+
+     if (_nodeData == null || _nodeDefinition == null)
+     {
+         Debug.LogError($"[NodeView Initialize] NodeData or NodeDefinition is null for {gameObject.name}. Disabling.", gameObject);
+         gameObject.SetActive(false);
+         return;
+     }
+
+     // --- Get Global Scale and Padding from InventoryGridController (if available) ---
+     float globalScaleFactor = 1f;
+     float raycastPaddingValue = 0f;
+
+     if (InventoryGridController.Instance != null)
+     {
+         globalScaleFactor = InventoryGridController.Instance.NodeGlobalImageScale;
+         raycastPaddingValue = InventoryGridController.Instance.NodeImageRaycastPadding;
+     }
+     else
+     {
+         // This warning is important if InventoryGridController is expected to be present
+         Debug.LogWarning("[NodeView] InventoryGridController.Instance not found during Initialize. Using default image scale (1) and padding (0). Ensure InventoryGridController is active in the scene.", gameObject);
+     }
+     // --- END Get Global Scale and Padding ---
+
+     // Create the padding vector for UI.Image.raycastPadding
+     // Order is: Left, Bottom, Right, Top
+     Vector4 raycastPaddingVector = new Vector4(raycastPaddingValue, raycastPaddingValue, raycastPaddingValue, raycastPaddingValue);
+
+     if (thumbnailImage != null)
+     {
+         thumbnailImage.sprite = _nodeDefinition.thumbnail;
+         thumbnailImage.color = _nodeDefinition.thumbnailTintColor;
+         // Apply uniform global scale to X and Y, Z remains 1
+         thumbnailImage.rectTransform.localScale = new Vector3(globalScaleFactor, globalScaleFactor, 1f);
+         thumbnailImage.enabled = (_nodeDefinition.thumbnail != null);
+         thumbnailImage.raycastTarget = true; // Thumbnail needs to be targetable to initiate drag
+         thumbnailImage.raycastPadding = raycastPaddingVector; // Apply padding
+     }
+     else
+     {
+         Debug.LogWarning($"[NodeView {gameObject.name}] ThumbnailImage is not assigned in prefab.", gameObject);
+     }
+
+     if (backgroundImage != null) // This is the NodeView's own background
+     {
+         _originalBackgroundColor = _nodeDefinition.backgroundColor;
+         backgroundImage.color = _originalBackgroundColor;
+         backgroundImage.enabled = true;
+         backgroundImage.raycastTarget = true; // NodeView background also needs to be targetable for clicks/drag start
+         backgroundImage.raycastPadding = raycastPaddingVector; // Apply padding
+     }
+     else
+     {
+         Debug.LogWarning($"[NodeView {gameObject.name}] BackgroundImage for NodeView itself is not assigned in prefab.", gameObject);
+     }
+
+     if (tooltipPanel != null) tooltipPanel.SetActive(false);
+
+     if (nodeNameText != null)
+     {
+         nodeNameText.text = _nodeData.nodeDisplayName;
+         nodeNameText.gameObject.SetActive(displayNodeName);
+     }
+ }
+
+    public void UpdateParentCellReference()
+    {
+        _parentCell = GetComponentInParent<NodeCell>();
+        // No warning here as it can be null during drag's reparenting
     }
-     public void UpdateParentCellReference() { _parentCell = GetComponentInParent<NodeCell>(); /* ... null check ... */ }
-     public NodeData GetNodeData() => _nodeData;
-     public NodeDefinition GetNodeDefinition() => _nodeDefinition;
-     public NodeCell GetParentCell() => _parentCell;
-     public void Highlight() { if (backgroundImage != null && _controller != null) backgroundImage.color = _controller.SelectedNodeBackgroundColor; }
-     public void Unhighlight() { if (backgroundImage != null) backgroundImage.color = _originalBackgroundColor; }
 
+    public NodeData GetNodeData() => _nodeData;
+    public NodeDefinition GetNodeDefinition() => _nodeDefinition;
+    public NodeCell GetParentCell() => _parentCell;
 
-    // --- Tooltip Handling with Logging ---
+    public void Highlight()
+    {
+        // Only highlight if it's a sequence node and has the necessary references
+        if (backgroundImage != null && _sequenceGridControllerRef != null && _parentCell != null && !_parentCell.IsInventoryCell)
+        {
+            backgroundImage.color = _sequenceGridControllerRef.SelectedNodeBackgroundColor;
+        }
+    }
+
+    public void Unhighlight()
+    {
+        if (backgroundImage != null)
+        {
+            backgroundImage.color = _originalBackgroundColor; // Revert to its definition's color
+        }
+    }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // --- Add Log ---
-        Debug.Log($"[NodeView OnPointerEnter] Fired on {gameObject.name}. Tooltip Panel assigned: {tooltipPanel != null}", gameObject);
-
-        // Ensure the CanvasGroup allows raycasts IF it exists
-        CanvasGroup cg = GetComponent<CanvasGroup>();
-        if (cg != null && cg.blocksRaycasts == false)
-        {
-             Debug.LogWarning($"--> PointerEnter detected but CanvasGroup is blocking raycasts! Drag state might be stuck?", gameObject);
-             // Optionally force it: cg.blocksRaycasts = true;
-        }
-
-
         if (tooltipPanel != null && tooltipText != null && _nodeDefinition != null && _nodeData != null)
         {
-            // --- Add Log ---
-            // Debug.Log("--> Activating Tooltip Panel");
             tooltipPanel.SetActive(true);
             tooltipText.text = BuildTooltipString();
         }
-         else if (tooltipPanel == null) {
-             // Debug.LogWarning("--> Tooltip Panel is not assigned in Inspector.", gameObject);
-         }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        // --- Add Log ---
-        // Debug.Log($"[NodeView OnPointerExit] Fired on {gameObject.name}", gameObject);
-
         if (tooltipPanel != null)
         {
-             // Debug.Log("--> Deactivating Tooltip Panel");
             tooltipPanel.SetActive(false);
         }
     }
 
-    // --- Pointer Down remains the same ---
-    public void OnPointerDown(PointerEventData eventData) { /* ... as before ... */
-         // Debug.Log($"[NodeView OnPointerDown] Fired on: {gameObject.name} in Cell: {_parentCell?.CellIndex} | Button: {eventData.button}", gameObject);
-        if (eventData.button == PointerEventData.InputButton.Left) {
-            if (_parentCell != null) {
-                 // Debug.Log($"--> Left Click Confirmed. Requesting SelectCell for {_parentCell.CellIndex}");
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (_parentCell == null) UpdateParentCellReference(); // Attempt to get parent if null
+
+        if (_parentCell != null && eventData.button == PointerEventData.InputButton.Left)
+        {
+            if (!_parentCell.IsInventoryCell) // Only select actual sequence nodes
+            {
                 NodeCell.SelectCell(_parentCell);
-            } else { UpdateParentCellReference(); if (_parentCell != null) NodeCell.SelectCell(_parentCell); else Debug.LogError("[NodeView] ParentCell null on PointerDown!", gameObject); }
+            }
+            // Left-clicking inventory items will still allow drag to start due to NodeDraggable
         }
     }
 
-    // --- BuildTooltipString remains the same ---
-    private string BuildTooltipString() { /* ... as before ... */
-         StringBuilder sb = new StringBuilder(); sb.Append("<b>").Append(_nodeData.nodeDisplayName).Append("</b>\n"); if (!string.IsNullOrEmpty(_nodeDefinition.description)) sb.Append(_nodeDefinition.description).Append("\n"); if (_nodeData.effects != null && _nodeData.effects.Count > 0) { sb.Append("<i>Effects:</i>\n"); foreach (var eff in _nodeData.effects) { sb.Append("- ").Append(eff.effectType.ToString()).Append(": "); sb.Append(eff.primaryValue.ToString("G3")); if (eff.secondaryValue != 0) sb.Append(" / ").Append(eff.secondaryValue.ToString("G3")); sb.Append("\n"); } } return sb.ToString().TrimEnd();
-     }
+    private string BuildTooltipString()
+    {
+        if (_nodeData == null || _nodeDefinition == null) return "Invalid Node Data";
+
+        StringBuilder sb = new StringBuilder();
+        sb.Append("<b>").Append(_nodeData.nodeDisplayName ?? "Unnamed Node").Append("</b>\n");
+
+        if (!string.IsNullOrEmpty(_nodeDefinition.description))
+        {
+            sb.Append(_nodeDefinition.description).Append("\n");
+        }
+
+        // Determine if effects should be shown (i.e., it's a "real" node in the sequence)
+        bool showEffects = false;
+        if (_parentCell != null && !_parentCell.IsInventoryCell) // If it's in a sequence cell
+        {
+            showEffects = true;
+        }
+        else if (_parentCell == null && _sequenceGridControllerRef != null) // If it's being initialized for sequence but not yet in a cell
+        {
+            showEffects = true;
+        }
+
+
+        if (showEffects && _nodeData.effects != null && _nodeData.effects.Count > 0)
+        {
+            sb.Append("<i>Effects:</i>\n");
+            foreach (var eff in _nodeData.effects)
+            {
+                if (eff == null) continue;
+                sb.Append("- ").Append(eff.effectType.ToString()).Append(": ");
+                sb.Append(eff.primaryValue.ToString("G3"));
+                if (eff.secondaryValue != 0 || 
+                    (eff.effectType == NodeEffectType.ScentModifier && eff.scentDefinitionReference != null) || /* Add other types that use secondaryValue even if 0 */
+                    (eff.effectType == NodeEffectType.PoopFertilizer) ) // PoopFertilizer uses secondary for energy
+                {
+                    sb.Append(" / ").Append(eff.secondaryValue.ToString("G3"));
+                }
+                if (eff.effectType == NodeEffectType.ScentModifier && eff.scentDefinitionReference != null)
+                {
+                    sb.Append(" (").Append(eff.scentDefinitionReference.displayName).Append(")");
+                }
+                sb.Append("\n");
+            }
+        }
+        return sb.ToString().TrimEnd();
+    }
 }
 
 

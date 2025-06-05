@@ -6,126 +6,123 @@ using System.Linq;
 
 public class NodeExecutor : MonoBehaviour
 {
-    [Header("UI Graph Source")]
-    [SerializeField] private NodeEditorGridController nodeEditorGrid;
-
     [Header("Plant Spawning")]
     [SerializeField] private GameObject plantPrefab;
-    [SerializeField] private GardenerController gardener;
+    // Gardener reference might not be needed here if PlantPlacementManager handles position
+    // [SerializeField] private GardenerController gardener; 
 
     [Header("Debugging")]
     [SerializeField] private TMP_Text debugOutput;
 
-    private void Update()
-    {
-        // NOTE: Direct planting with spacebar was removed in favor of the tool-based planting system
-        // Plants are now created through the PlantPlacementManager when using the SeedPouch tool
-    }
-
-    public void SpawnPlantFromUIGraph()
+    // This method is now called by PlantPlacementManager or a similar system
+    // when the player uses the SeedPouch tool.
+    // It assumes NodeEditorGridController.Instance.GetCurrentSeedInSlot() provides the seed.
+    public GameObject SpawnPlantFromSeedInSlot(Vector3 plantingPosition, Transform parentTransform)
     {
         // --- Validations ---
-        if (nodeEditorGrid == null) { DebugLogError("Node Editor Grid Controller not assigned!"); return; }
-        if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return; }
-        if (gardener == null) { DebugLogError("Gardener Controller not assigned!"); return; }
+        if (NodeEditorGridController.Instance == null) { DebugLogError("Node Editor Grid Controller not found!"); return null; }
+        if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return null; }
 
-        // Get the current graph state from the UI grid
-        NodeGraph graphToSpawn = nodeEditorGrid.GetCurrentUIGraph();
+        NodeData seedNodeData = NodeEditorGridController.Instance.GetCurrentSeedInSlot();
 
-        if (graphToSpawn == null || graphToSpawn.nodes == null || graphToSpawn.nodes.Count == 0) {
-             DebugLog("No nodes in UI graph to spawn.");
-             return;
+        if (seedNodeData == null) {
+            DebugLog("No seed in slot to plant.");
+            return null;
+        }
+        if (!seedNodeData.IsSeed()) { // Should be guaranteed if it's in the seed slot, but double-check
+            DebugLogError("Item in seed slot is not a valid seed!");
+            return null;
         }
 
-        // Validate if the graph is spawnable (e.g., requires a SeedSpawn effect)
-        bool seedFound = graphToSpawn.nodes.Any(node => node != null && node.effects != null && node.effects.Any(eff => eff != null && eff.effectType == NodeEffectType.SeedSpawn && eff.isPassive));
-        if (!seedFound) {
-            DebugLog("Cannot spawn plant: Node chain lacks a passive SeedSpawn effect.");
-            return;
+        DebugLog($"Attempting to plant seed '{seedNodeData.nodeDisplayName}' with {seedNodeData.storedSequence.nodes.Count} internal nodes...");
+
+        // --- Construct the final NodeGraph for the plant ---
+        NodeGraph finalGraphForPlant = new NodeGraph();
+        finalGraphForPlant.nodes = new List<NodeData>();
+
+        // 1. Add a CLONE of the seed node itself. Its effects provide base stats.
+        // Ensure its orderIndex is suitable (e.g., 0 or handled by PlantGrowth if it re-orders)
+        NodeData clonedSeedNodeInstance = new NodeData {
+            nodeId = System.Guid.NewGuid().ToString(), // New ID for this plant instance
+            nodeDisplayName = seedNodeData.nodeDisplayName,
+            effects = CloneEffectsList(seedNodeData.effects), // Deep copy effects
+            orderIndex = 0, // Seed node is conceptually the first
+            canBeDeleted = false, // Planted nodes are part of the plant, not UI deletable
+            storedSequence = new NodeGraph() // The planted instance doesn't need to store the sequence again
+        };
+        finalGraphForPlant.nodes.Add(clonedSeedNodeInstance);
+
+        // 2. Add CLONES of nodes from the seed's storedSequence.
+        int currentOrderIndex = 1;
+        foreach (NodeData nodeInSeedSequence in seedNodeData.storedSequence.nodes.OrderBy(n => n.orderIndex))
+        {
+            if (nodeInSeedSequence == null) continue;
+            NodeData clonedSequenceNodeInstance = new NodeData {
+                nodeId = System.Guid.NewGuid().ToString(),
+                nodeDisplayName = nodeInSeedSequence.nodeDisplayName,
+                effects = CloneEffectsList(nodeInSeedSequence.effects),
+                orderIndex = currentOrderIndex++,
+                canBeDeleted = false,
+                storedSequence = new NodeGraph()
+            };
+            finalGraphForPlant.nodes.Add(clonedSequenceNodeInstance);
         }
-
-        DebugLog($"Spawning plant from UI graph with {graphToSpawn.nodes.Count} nodes...");
-
-        // Determine spawn position and parent
-        Vector2 spawnPos = gardener.GetPlantingPosition();
-        Transform plantParent = EcosystemManager.Instance?.plantParent; // Use optional chaining
+        
+        DebugLog($"Constructed final graph for plant with {finalGraphForPlant.nodes.Count} total nodes (1 seed + {finalGraphForPlant.nodes.Count -1} from sequence).");
 
         // Instantiate the plant prefab
-        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity, plantParent); // Assign parent during instantiate
+        GameObject plantObj = Instantiate(plantPrefab, plantingPosition, Quaternion.identity, parentTransform);
 
-        // Get the PlantGrowth component
         PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
         if (growthComponent != null)
         {
-            // --- Create a DEEP COPY of the NodeGraph ---
-            // This is crucial so modifications to the UI graph don't affect running plants,
-            // and vice-versa.
-            NodeGraph graphCopy = new NodeGraph();
-            graphCopy.nodes = new List<NodeData>(graphToSpawn.nodes.Count); // Initialize with capacity
-
-            foreach(NodeData originalNodeData in graphToSpawn.nodes)
+            // Initialize the plant with the constructed final graph
+            // PlantGrowth.InitializeAndGrow should handle its own deep copy if it modifies the graph at runtime.
+            // For safety, we pass a deep copy to PlantGrowth here as well.
+            NodeGraph graphCopyForPlantGrowth = new NodeGraph();
+            graphCopyForPlantGrowth.nodes = new List<NodeData>();
+            foreach (NodeData nodeToCopy in finalGraphForPlant.nodes)
             {
-                // Ensure original node data is not null
-                if (originalNodeData == null) {
-                    DebugLogWarning("Encountered null NodeData in UI graph during copy. Skipping.");
-                    continue;
-                }
-
-                 // Create a new NodeData instance
-                 NodeData newNodeData = new NodeData {
-                    nodeId = originalNodeData.nodeId, // Copy ID (or generate new one?)
-                    nodeDisplayName = originalNodeData.nodeDisplayName,
-                    orderIndex = originalNodeData.orderIndex,
-                    canBeDeleted = originalNodeData.canBeDeleted, // Copy runtime flags if needed
-                    // Create a deep copy of the effects list using the *updated* helper method
-                    effects = CloneEffectsList(originalNodeData.effects)
-                };
-                graphCopy.nodes.Add(newNodeData);
+                 graphCopyForPlantGrowth.nodes.Add(new NodeData {
+                     nodeId = nodeToCopy.nodeId, // Can reuse ID here as it's for this specific plant
+                     nodeDisplayName = nodeToCopy.nodeDisplayName,
+                     effects = CloneEffectsList(nodeToCopy.effects), // Crucial: clone effects again
+                     orderIndex = nodeToCopy.orderIndex,
+                     canBeDeleted = nodeToCopy.canBeDeleted,
+                     storedSequence = new NodeGraph() // No nested sequences for nodes within a plant graph
+                 });
             }
 
-            // Initialize the plant with the deep copy
-            growthComponent.InitializeAndGrow(graphCopy);
-            DebugLog("Plant spawned and initialized.");
+            growthComponent.InitializeAndGrow(graphCopyForPlantGrowth);
+            DebugLog($"Plant '{plantObj.name}' spawned and initialized with seed '{seedNodeData.nodeDisplayName}'.");
+            return plantObj;
         }
         else
         {
-             // Log error and destroy invalid object if PlantGrowth is missing
              DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth component! Destroying spawned object.");
              Destroy(plantObj);
+             return null;
         }
     }
 
-    /// <summary>
-    /// Creates a deep copy of a list of NodeEffectData, including the ScentDefinition reference.
-    /// </summary>
     private List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
     {
-        if (originalList == null) return new List<NodeEffectData>(); // Handle null input list
-
+        if (originalList == null) return new List<NodeEffectData>();
         List<NodeEffectData> newList = new List<NodeEffectData>(originalList.Count);
-        foreach(var originalEffect in originalList)
-        {
-            // Ensure original effect data is not null
-            if(originalEffect == null) {
-                DebugLogWarning("Encountered null NodeEffectData in list during copy. Skipping.");
-                continue;
-            }
-
-             // Create a new NodeEffectData instance and copy all relevant fields
-             NodeEffectData newEffect = new NodeEffectData {
+        foreach(var originalEffect in originalList) {
+            if(originalEffect == null) continue;
+            NodeEffectData newEffect = new NodeEffectData {
                  effectType = originalEffect.effectType,
                  primaryValue = originalEffect.primaryValue,
                  secondaryValue = originalEffect.secondaryValue,
                  isPassive = originalEffect.isPassive,
-                 // <<< FIXED: Explicitly copy the ScentDefinition reference >>>
                  scentDefinitionReference = originalEffect.scentDefinitionReference
-             };
-             newList.Add(newEffect);
+            };
+            newList.Add(newEffect);
         }
         return newList;
     }
 
-    // Helper methods for logging
     private void DebugLog(string msg) {
         Debug.Log($"[NodeExecutor] {msg}");
         if (debugOutput != null) debugOutput.text += msg + "\n";
@@ -133,9 +130,5 @@ public class NodeExecutor : MonoBehaviour
     private void DebugLogError(string msg) {
         Debug.LogError($"[NodeExecutor] {msg}");
         if (debugOutput != null) debugOutput.text += $"ERROR: {msg}\n";
-    }
-     private void DebugLogWarning(string msg) {
-        Debug.LogWarning($"[NodeExecutor] {msg}");
-        if (debugOutput != null) debugOutput.text += $"WARNING: {msg}\n";
     }
 }
