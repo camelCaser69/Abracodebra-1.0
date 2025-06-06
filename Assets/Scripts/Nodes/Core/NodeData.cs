@@ -1,121 +1,152 @@
-﻿// FILE: Assets/Scripts/Nodes/Core/NodeData.cs
+﻿﻿// FILE: Assets/Scripts/Nodes/Core/NodeData.cs
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [Serializable]
-public class NodeData
+public class NodeData : ISerializationCallbackReceiver
 {
+    // ──────────────────────────────────────
+    // Public serialised fields
+    // ──────────────────────────────────────
     public string nodeId;
     public string nodeDisplayName;
     public List<NodeEffectData> effects = new List<NodeEffectData>();
     public int orderIndex;
 
-    [HideInInspector]
-    public bool canBeDeleted = true;
+    [HideInInspector] public bool canBeDeleted = true;
 
-    [Tooltip("If this NodeData represents a Seed, this holds its internal sequence of nodes. Should be null for non-seed nodes or nodes within a sequence.")]
-    [SerializeField] private NodeGraph _storedSequence;
-    
+    // ──────────────────────────────────────
+    // Internal state flags
+    // ──────────────────────────────────────
+    [NonSerialized] private bool _isContainedInSequence = false;
+    public bool IsContainedInSequence => _isContainedInSequence;
+
+    // ──────────────────────────────────────
+    // RUNTIME-ONLY reference -- **NOT** serialised
+    // ──────────────────────────────────────
+    [NonSerialized] private NodeGraph _storedSequence;
+
+    /// <summary>Access to the runtime sequence, with safety guards.</summary>
     public NodeGraph storedSequence
     {
-        get 
+        get
         {
-            // Safety check: if this is not a seed, force null
-            if (!IsSeed())
+            if (_isContainedInSequence || !IsPotentialSeedContainer())
             {
-                _storedSequence = null;
+                if (_storedSequence != null) _storedSequence = null;
             }
             return _storedSequence;
         }
-        set 
+        set
         {
-            // Safety check: only allow setting if this is a seed
-            if (!IsSeed() && value != null)
+            if (_isContainedInSequence || (!IsPotentialSeedContainer() && value != null))
             {
-                Debug.LogError($"Attempted to set storedSequence on non-seed node '{nodeDisplayName}'. Ignoring.");
-                _storedSequence = null;
+                _storedSequence = null;      // Disallow illegal assignments
             }
             else
             {
                 _storedSequence = value;
-                // If we're setting a sequence, ensure all nodes in it are clean
-                if (_storedSequence != null && _storedSequence.nodes != null)
+                // Ensure all inner nodes know they’re inside a sequence
+                if (_storedSequence?.nodes != null)
                 {
-                    foreach (var node in _storedSequence.nodes)
+                    foreach (var node in _storedSequence.nodes.Where(n => n != null))
                     {
-                        if (node != null)
-                        {
-                            node._storedSequence = null; // Direct access to backing field
-                        }
+                        node.SetContainedInSequence(true);
+                        node._storedSequence = null;
                     }
                 }
             }
         }
     }
 
+    // ──────────────────────────────────────
+    // Constructor
+    // ──────────────────────────────────────
     public NodeData()
     {
-        nodeId = Guid.NewGuid().ToString();
-        canBeDeleted = true;
-        _storedSequence = null;
+        nodeId             = Guid.NewGuid().ToString();
+        _storedSequence    = null;
+        _isContainedInSequence = false;
     }
 
-    public bool IsSeed()
+    // ──────────────────────────────────────
+    // Seed helpers
+    // ──────────────────────────────────────
+    public bool IsPotentialSeedContainer() =>
+        effects != null &&
+        effects.Any(e => e != null &&
+                         e.effectType == NodeEffectType.SeedSpawn &&
+                         e.isPassive);
+
+    public bool IsSeed() => IsPotentialSeedContainer() && !_isContainedInSequence;
+
+    public void SetContainedInSequence(bool isContained)
     {
-        if (effects == null) return false;
-        foreach (var effect in effects)
-        {
-            if (effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive)
-            {
-                return true;
-            }
-        }
-        return false;
+        _isContainedInSequence = isContained;
+        if (isContained) _storedSequence = null;
     }
 
     public void EnsureSeedSequenceInitialized()
     {
-        if (IsSeed() && _storedSequence == null)
+        if (IsPotentialSeedContainer() && !_isContainedInSequence && _storedSequence == null)
         {
-            _storedSequence = new NodeGraph();
+            _storedSequence = new NodeGraph { nodes = new List<NodeData>() };
         }
-        else if (!IsSeed())
+        else if (!IsPotentialSeedContainer() || _isContainedInSequence)
         {
             _storedSequence = null;
         }
     }
 
-    public void ClearStoredSequence()
+    public void ClearStoredSequence() => _storedSequence = null;
+
+    // ──────────────────────────────────────
+    // Serialization guards
+    // ──────────────────────────────────────
+    public void CleanForSerialization(int depth = 0, string logPrefix = "CLEAN_SERIALIZE")
     {
-        _storedSequence = null;
-    }
-    
-    public void ForceCleanNestedSequences(int depth = 0)
-    {
-        if (depth > 10)
+        if (depth > 7)
         {
-            Debug.LogError($"[NodeData] ForceCleanNestedSequences depth limit exceeded at node '{nodeDisplayName}'");
-            return;
-        }
-        
-        if (!IsSeed())
-        {
+            Debug.LogError($"{logPrefix} (Depth {depth}) Node '{nodeDisplayName ?? nodeId}': " +
+                           "Serialization clean depth limit. Forcing _storedSequence to null.");
             _storedSequence = null;
             return;
         }
-        
-        if (_storedSequence != null && _storedSequence.nodes != null)
+
+        if (_isContainedInSequence || !IsPotentialSeedContainer())
         {
-            foreach (var innerNode in _storedSequence.nodes)
+            if (_storedSequence != null) _storedSequence = null;
+            return;
+        }
+
+        if (_storedSequence?.nodes != null)
+        {
+            foreach (var inner in _storedSequence.nodes.Where(n => n != null))
             {
-                if (innerNode == null) continue;
-                
-                // Direct access to backing field to force null
-                innerNode._storedSequence = null;
-                
-                // Don't recurse - we've forcibly cleaned it
+                inner.SetContainedInSequence(true);
+                inner.CleanForSerialization(depth + 1, $"{logPrefix} Inner");
             }
         }
+        else if (_storedSequence == null)
+        {
+            _storedSequence = new NodeGraph { nodes = new List<NodeData>() };
+        }
+    }
+
+    // Unity callback -- before snapshot
+    public void OnBeforeSerialize()
+    {
+        CleanForSerialization(0, $"OBS ({nodeDisplayName ?? nodeId})");
+        // No need to null _storedSequence here; [NonSerialized] already keeps it out of the snapshot.
+    }
+
+    // Unity callback -- after load
+    public void OnAfterDeserialize()
+    {
+        _isContainedInSequence = false;  // Always start fresh
+        // _storedSequence is already null (not serialised), but we run the cleaner to update flags
+        CleanForSerialization(0, $"OADS ({nodeDisplayName ?? nodeId})");
     }
 }

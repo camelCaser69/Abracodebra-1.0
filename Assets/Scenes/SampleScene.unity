@@ -2231,6 +2231,18 @@ PrefabInstance:
       propertyPath: 'toolDefinitions.Array.data[1]'
       value: 
       objectReference: {fileID: 11400000, guid: 864e5c2cfc433e249b02f2a97cced049, type: 2}
+    - target: {fileID: 6488995978696107044, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: inventoryBar
+      value: 
+      objectReference: {fileID: 1705734112}
+    - target: {fileID: 6488995978696107044, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: playerTransform
+      value: 
+      objectReference: {fileID: 1491144816}
+    - target: {fileID: 6488995978696107044, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: tileInteractionManager
+      value: 
+      objectReference: {fileID: 1097838751}
     m_RemovedComponents:
     - {fileID: 0}
     - {fileID: 4423669967780435352, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
@@ -3396,7 +3408,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.65096813, b: 0.4198113, a: 0.392}
+  m_Color: {r: 1, g: 0.65096813, b: 0.4198113, a: 0.13333334}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

@@ -1,5 +1,4 @@
 ﻿// FILE: Assets/Scripts/Nodes/UI/NodeCell.cs
-
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,19 +8,19 @@ using UnityEngine.UI;
 public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 {
     public static NodeCell CurrentlySelectedCell { get; private set; }
-    public int CellIndex { get; private set; }
+
+    public int  CellIndex       { get; private set; }
     public bool IsInventoryCell { get; private set; }
-    public bool IsSeedSlot { get; private set; }
+    public bool IsSeedSlot      { get; private set; }
 
     private NodeEditorGridController _sequenceController;
-    private InventoryGridController _inventoryController;
+    private InventoryGridController  _inventoryController;
 
-    private NodeData _nodeData;
-    private NodeView _nodeView;
+    private NodeData   _nodeData;
+    private NodeView   _nodeView;
+    private ToolDefinition _toolDefinition;
 
     private Image _backgroundImage;
-    
-    private ToolDefinition _toolDefinition;
 
     public void Init(int index, NodeEditorGridController sequenceController, InventoryGridController inventoryController, Image bgImage)
     {
@@ -73,7 +72,9 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 
     public bool HasNode()
     {
-        return (_nodeData != null && _nodeView != null) || (_nodeData != null && _toolDefinition != null);
+        // Bar-copy cells: _nodeData != null, _nodeView == null, _toolDefinition == null
+        // Tool cells     : _toolDefinition != null
+        return _nodeData != null || _toolDefinition != null;
     }
 
     public NodeData GetNodeData()

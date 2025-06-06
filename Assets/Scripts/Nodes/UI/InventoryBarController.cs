@@ -135,7 +135,7 @@ public class InventoryBarController : MonoBehaviour
         // Clamp current row to valid range
         currentRow = Mathf.Clamp(currentRow, 0, totalRows - 1);
 
-        Debug.Log($"[InventoryBarController] RefreshFromInventory: TotalSlots={totalInventorySlots}, Columns={inventoryColumns}, TotalRows={totalRows}, CurrentRow={currentRow}");
+        // Debug.Log($"[InventoryBarController] RefreshFromInventory: TotalSlots={totalInventorySlots}, Columns={inventoryColumns}, TotalRows={totalRows}, CurrentRow={currentRow}");
     
         // Clean any circular references in inventory items
         if (inventoryGridController != null)
@@ -148,7 +148,8 @@ public class InventoryBarController : MonoBehaviour
                     var nodeData = cell.GetNodeData();
                     if (nodeData != null)
                     {
-                        nodeData.ForceCleanNestedSequences();
+                        // MODIFIED: Call the new public method
+                        nodeData.CleanForSerialization(0, "InvBarRefresh"); 
                     }
                 }
             }

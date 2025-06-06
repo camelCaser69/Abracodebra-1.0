@@ -23,11 +23,68 @@ public class NodeExecutor : MonoBehaviour
                  primaryValue = originalEffect.primaryValue,
                  secondaryValue = originalEffect.secondaryValue,
                  isPassive = originalEffect.isPassive,
-                 scentDefinitionReference = originalEffect.scentDefinitionReference
+                 scentDefinitionReference = originalEffect.scentDefinitionReference 
             };
             newList.Add(newEffect);
         }
         return newList;
+    }
+
+    public static NodeData CloneNodeData(NodeData original, bool preserveStoredSequence = false)
+    {
+        if (original == null) return null;
+    
+        NodeData clone = new NodeData
+        {
+            nodeId = System.Guid.NewGuid().ToString(), 
+            nodeDisplayName = original.nodeDisplayName,
+            effects = CloneEffectsList(original.effects), 
+            orderIndex = original.orderIndex,
+            canBeDeleted = original.canBeDeleted,
+        };
+        // clone._isContainedInSequence is false by default from constructor
+    
+        if (preserveStoredSequence && 
+            original.IsPotentialSeedContainer() && 
+            !original.IsContainedInSequence /* MODIFIED: Using public getter */ && 
+            original.storedSequence != null)
+        {
+            clone.EnsureSeedSequenceInitialized(); 
+            
+            if (clone.storedSequence.nodes == null) 
+            {
+                clone.storedSequence.nodes = new List<NodeData>();
+            }
+    
+            foreach (var nodeInOriginalSequence in original.storedSequence.nodes)
+            {
+                if (nodeInOriginalSequence == null) continue;
+            
+                NodeData innerClone = new NodeData
+                {
+                    nodeId = System.Guid.NewGuid().ToString(),
+                    nodeDisplayName = nodeInOriginalSequence.nodeDisplayName,
+                    effects = CloneEffectsList(nodeInOriginalSequence.effects),
+                    orderIndex = nodeInOriginalSequence.orderIndex,
+                    canBeDeleted = nodeInOriginalSequence.canBeDeleted,
+                };
+                innerClone.SetContainedInSequence(true); 
+                
+                clone.storedSequence.nodes.Add(innerClone);
+            }
+        }
+        else if (preserveStoredSequence && clone.IsPotentialSeedContainer() && !clone.IsContainedInSequence /* MODIFIED: Using public getter */)
+        {
+            clone.EnsureSeedSequenceInitialized();
+        }
+        else
+        {
+            clone.ClearStoredSequence();
+        }
+    
+        clone.CleanForSerialization(0, "NodeExecutorClonePost"); 
+    
+        return clone;
     }
 
 
@@ -42,50 +99,49 @@ public class NodeExecutor : MonoBehaviour
             DebugLog("No seed in slot to plant.");
             return null;
         }
-        if (!seedNodeDataInSlot.IsSeed()) {
-            DebugLogError("Item in seed slot is not a valid seed!");
+        if (!seedNodeDataInSlot.IsSeed()) { 
+            DebugLogError($"Item '{seedNodeDataInSlot.nodeDisplayName}' in seed slot is not a valid seed container!");
             return null;
         }
         
-        // Ensure the seed from the slot has its sequence object ready (if it's a seed)
         seedNodeDataInSlot.EnsureSeedSequenceInitialized(); 
 
-        NodeGraph sequenceForPlant = NodeEditorGridController.Instance.GetCurrentGraphInEditorForSpawning();
+        NodeGraph sequenceFromEditor = NodeEditorGridController.Instance.GetCurrentGraphInEditorForSpawning();
 
-        DebugLog($"Attempting to plant seed '{seedNodeDataInSlot.nodeDisplayName}' with {sequenceForPlant.nodes.Count} internal nodes from editor...");
+        DebugLog($"Attempting to plant seed '{seedNodeDataInSlot.nodeDisplayName}' with {sequenceFromEditor.nodes.Count} internal nodes from editor...");
 
         NodeGraph finalGraphForPlant = new NodeGraph();
         finalGraphForPlant.nodes = new List<NodeData>();
 
-        NodeData clonedSeedNodeInstance = new NodeData {
-            nodeId = System.Guid.NewGuid().ToString(),
-            nodeDisplayName = seedNodeDataInSlot.nodeDisplayName,
-            effects = CloneEffectsList(seedNodeDataInSlot.effects),
-            orderIndex = 0,
-            canBeDeleted = false,
-            storedSequence = null // The seed node *instance on the plant* doesn't store the sequence again
-        };
-        finalGraphForPlant.nodes.Add(clonedSeedNodeInstance);
+        NodeData clonedSeedNodeForPlant = CloneNodeData(seedNodeDataInSlot, false); 
+        if (clonedSeedNodeForPlant == null) { DebugLogError("Failed to clone seed node for plant."); return null; }
+        
+        clonedSeedNodeForPlant.orderIndex = 0; 
+        clonedSeedNodeForPlant.canBeDeleted = false; 
+        finalGraphForPlant.nodes.Add(clonedSeedNodeForPlant);
 
         int currentOrderIndex = 1;
-        // sequenceForPlant.nodes are already new instances from GetCurrentGraphInEditorForSpawning,
-        // and their storedSequence was set to null there.
-        foreach (NodeData nodeInUISequenceClone in sequenceForPlant.nodes.OrderBy(n => n.orderIndex)) 
+        foreach (NodeData nodeFromEditorSequence in sequenceFromEditor.nodes.OrderBy(n => n.orderIndex)) 
         {
-            if (nodeInUISequenceClone == null) continue;
-            // We can directly add these clones as their storedSequence should already be null
-            nodeInUISequenceClone.nodeId = System.Guid.NewGuid().ToString(); // Give it a new runtime ID
-            nodeInUISequenceClone.orderIndex = currentOrderIndex++;
-            nodeInUISequenceClone.canBeDeleted = false;
-            // storedSequence is already null from GetCurrentGraphInEditorForSpawning
-            finalGraphForPlant.nodes.Add(nodeInUISequenceClone);
+            if (nodeFromEditorSequence == null) continue;
+            
+            NodeData clonedSequenceNodeForPlant = CloneNodeData(nodeFromEditorSequence, false);
+            if(clonedSequenceNodeForPlant == null) { 
+                // MODIFIED: Use Debug.LogWarning (standard Unity logging)
+                Debug.LogWarning($"Failed to clone node '{nodeFromEditorSequence.nodeDisplayName}' from editor sequence."); 
+                continue; 
+            }
+
+            clonedSequenceNodeForPlant.orderIndex = currentOrderIndex++;
+            clonedSequenceNodeForPlant.canBeDeleted = false; 
+            finalGraphForPlant.nodes.Add(clonedSequenceNodeForPlant);
         }
         
         DebugLog($"Constructed final graph for plant with {finalGraphForPlant.nodes.Count} total nodes (1 seed + {finalGraphForPlant.nodes.Count -1} from sequence).");
 
         GameObject plantObj = Instantiate(plantPrefab, plantingPosition, Quaternion.identity, parentTransform);
-
         PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+
         if (growthComponent != null)
         {
             growthComponent.InitializeAndGrow(finalGraphForPlant);
@@ -100,143 +156,69 @@ public class NodeExecutor : MonoBehaviour
         }
     }
     
-    public GameObject SpawnPlantFromInventorySeed(NodeData seedNodeData, Vector3 plantingPosition, Transform parentTransform)
+    public GameObject SpawnPlantFromInventorySeed(NodeData seedData,
+        Vector3  spawnPos,
+        Transform parent)
     {
-        if (seedNodeData == null || !seedNodeData.IsSeed())
+        // Validate -----------------------------------------------------------
+        if (seedData == null || !seedData.IsSeed())
         {
-            DebugLogError("Invalid seed data provided for planting!");
+            DebugLogError("SpawnPlantFromInventorySeed called with invalid seed.");
             return null;
         }
-        
         if (plantPrefab == null)
         {
-            DebugLogError("Plant prefab not assigned!");
+            DebugLogError("Plant prefab not assigned.");
             return null;
         }
 
-        // Ensure the seed from inventory has its sequence object ready (if it's a seed)
-        seedNodeData.EnsureSeedSequenceInitialized();
-        
-        DebugLog($"Spawning plant from inventory seed '{seedNodeData.nodeDisplayName}' with {seedNodeData.storedSequence?.nodes?.Count ?? 0} internal nodes...");
-        
-        if (seedNodeData.storedSequence != null && seedNodeData.storedSequence.nodes != null)
+        // Clone seed + internal sequence ------------------------------------
+        seedData.EnsureSeedSequenceInitialized();
+
+        NodeGraph graph = new NodeGraph { nodes = new List<NodeData>() };
+
+        NodeData seedClone = CloneNodeData(seedData, false);
+        seedClone.orderIndex   = 0;
+        seedClone.canBeDeleted = false;
+        graph.nodes.Add(seedClone);
+
+        int order = 1;
+        if (seedData.storedSequence?.nodes != null)
         {
-            DebugLog($"Seed's stored sequence contains:");
-            foreach (var node in seedNodeData.storedSequence.nodes)
+            foreach (NodeData n in seedData.storedSequence.nodes.OrderBy(n => n.orderIndex))
             {
-                if (node != null)
-                    DebugLog($"  - {node.nodeDisplayName} (order: {node.orderIndex})");
+                NodeData clone = CloneNodeData(n, false);
+                if (clone == null) continue;
+                clone.orderIndex   = order++;
+                clone.canBeDeleted = false;
+                graph.nodes.Add(clone);
             }
         }
-        else
+
+        // Instantiate & initialise ------------------------------------------
+        GameObject plantGO = Instantiate(plantPrefab, spawnPos, Quaternion.identity, parent);
+        PlantGrowth growth = plantGO.GetComponent<PlantGrowth>();
+
+        if (growth == null)
         {
-            DebugLog("Seed has no stored sequence or nodes (or it's null)!");
-        }
-        
-        NodeGraph finalGraphForPlant = new NodeGraph();
-        finalGraphForPlant.nodes = new List<NodeData>();
-        
-        NodeData clonedSeedNodeInstance = new NodeData
-        {
-            nodeId = System.Guid.NewGuid().ToString(),
-            nodeDisplayName = seedNodeData.nodeDisplayName,
-            effects = CloneEffectsList(seedNodeData.effects),
-            orderIndex = 0,
-            canBeDeleted = false,
-            storedSequence = null // Seed instance on plant doesn't re-store sequence
-        };
-        finalGraphForPlant.nodes.Add(clonedSeedNodeInstance);
-        
-        int currentOrderIndex = 1;
-        if (seedNodeData.storedSequence != null && seedNodeData.storedSequence.nodes != null)
-        {
-            foreach (NodeData nodeInSeedSequence in seedNodeData.storedSequence.nodes.OrderBy(n => n.orderIndex))
-            {
-                if (nodeInSeedSequence == null) continue;
-                // Create a fresh clone for the plant's graph
-                NodeData clonedSequenceNodeInstance = new NodeData
-                {
-                    nodeId = System.Guid.NewGuid().ToString(), // New runtime ID
-                    nodeDisplayName = nodeInSeedSequence.nodeDisplayName,
-                    effects = CloneEffectsList(nodeInSeedSequence.effects), // Deep copy effects
-                    orderIndex = currentOrderIndex++,
-                    canBeDeleted = false,
-                    storedSequence = null // Nodes in plant sequence don't have sub-sequences
-                };
-                finalGraphForPlant.nodes.Add(clonedSequenceNodeInstance);
-            }
-        }
-        
-        DebugLog($"Constructed final graph for plant with {finalGraphForPlant.nodes.Count} total nodes (1 seed + {finalGraphForPlant.nodes.Count - 1} from sequence).");
-        
-        GameObject plantObj = Instantiate(plantPrefab, plantingPosition, Quaternion.identity, parentTransform);
-        
-        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
-        if (growthComponent != null)
-        {
-            growthComponent.InitializeAndGrow(finalGraphForPlant);
-            DebugLog($"Plant '{plantObj.name}' spawned and initialized with seed '{seedNodeData.nodeDisplayName}'.");
-            return plantObj;
-        }
-        else
-        {
-            DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth component! Destroying spawned object.");
-            Destroy(plantObj);
+            DebugLogError("Plant prefab missing PlantGrowth component.");
+            Destroy(plantGO);
             return null;
         }
+
+        growth.InitializeAndGrow(graph);
+        return plantGO;
     }
+
 
     private void DebugLog(string msg) {
-        Debug.Log($"[NodeExecutor] {msg}");
+        // Commented out for less console spam during normal operation
+        // if (Application.isPlaying) Debug.Log($"[NodeExecutor] {msg}");
         if (debugOutput != null) debugOutput.text += msg + "\n";
     }
+
     private void DebugLogError(string msg) {
         Debug.LogError($"[NodeExecutor] {msg}");
         if (debugOutput != null) debugOutput.text += $"ERROR: {msg}\n";
-    }
-    
-    public static NodeData CloneNodeData(NodeData original, bool preserveStoredSequence = false)
-    {
-        if (original == null) return null;
-    
-        NodeData clone = new NodeData
-        {
-            nodeId = System.Guid.NewGuid().ToString(), // New ID for the clone
-            nodeDisplayName = original.nodeDisplayName,
-            effects = CloneEffectsList(original.effects),
-            orderIndex = original.orderIndex,
-            canBeDeleted = original.canBeDeleted,
-            storedSequence = null // Start with null
-        };
-    
-        // Only preserve stored sequence if explicitly requested AND it's a seed
-        if (preserveStoredSequence && original.IsSeed() && original.storedSequence != null)
-        {
-            clone.storedSequence = new NodeGraph();
-            clone.storedSequence.nodes = new List<NodeData>();
-        
-            // Clone nodes in the sequence but ensure they don't have their own sequences
-            foreach (var node in original.storedSequence.nodes)
-            {
-                if (node == null) continue;
-            
-                NodeData innerClone = new NodeData
-                {
-                    nodeId = System.Guid.NewGuid().ToString(),
-                    nodeDisplayName = node.nodeDisplayName,
-                    effects = CloneEffectsList(node.effects),
-                    orderIndex = node.orderIndex,
-                    canBeDeleted = node.canBeDeleted,
-                    storedSequence = null // CRITICAL: Inner nodes never have sequences
-                };
-            
-                clone.storedSequence.nodes.Add(innerClone);
-            }
-        }
-    
-        // Final safety check
-        clone.ForceCleanNestedSequences();
-    
-        return clone;
     }
 }

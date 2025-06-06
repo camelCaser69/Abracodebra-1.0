@@ -238,7 +238,7 @@ public class InventoryGridController : MonoBehaviour
     if (targetCellHint != null && targetCellHint.IsInventoryCell && !targetCellHint.HasNode())
     {
         cellToUse = targetCellHint;
-        if (logInventoryChanges) Debug.Log($"[Inventory AddGene] Using provided targetCellHint: {targetCellHint.CellIndex}");
+        // if (logInventoryChanges) Debug.Log($"[Inventory AddGene] Using provided targetCellHint: {targetCellHint.CellIndex}");
     }
     else
     {
@@ -252,21 +252,22 @@ public class InventoryGridController : MonoBehaviour
             nodeDisplayName = geneDef.displayName,
             effects = geneDef.CloneEffects(), // Effects are cloned
             orderIndex = -1, 
-            canBeDeleted = false,
-            storedSequence = null // Start with null
+            canBeDeleted = false, // Typically false for library items
+            // _storedSequence will be null by default
+            // _isContainedInSequence will be false by default
         };
 
         // If the definition is for a seed, initialize its sequence storage.
-        // Otherwise, storedSequence remains null.
-        inventoryNodeData.EnsureSeedSequenceInitialized();
+        inventoryNodeData.EnsureSeedSequenceInitialized(); // This checks IsPotentialSeedContainer & !_isContainedInSequence
         
-        // CRITICAL: Clean any nested sequences that might have been created
-        inventoryNodeData.ForceCleanNestedSequences();
+        // CRITICAL: Clean. This will also ensure children in sequence are marked as contained.
+        inventoryNodeData.CleanForSerialization(0, "InvGridAddGene"); 
         
         GameObject nodeViewGO = Instantiate(nodeViewPrefab, cellToUse.transform);
         NodeView view = nodeViewGO.GetComponent<NodeView>();
         if (view == null) { Destroy(nodeViewGO); return false; }
         
+        // Initialize NodeView. It will handle its own _nodeData state based on IsSeed().
         view.Initialize(inventoryNodeData, geneDef, null); 
 
         NodeDraggable draggable = view.GetComponent<NodeDraggable>() ?? view.gameObject.AddComponent<NodeDraggable>();
