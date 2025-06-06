@@ -121,6 +121,26 @@ public class ToolSwitcher : MonoBehaviour
              OnUsesChanged?.Invoke(CurrentRemainingUses);
         }
     }
+    
+    // Add this method to ToolSwitcher to allow external tool selection
+    public void SelectToolByDefinition(ToolDefinition toolDef)
+    {
+        if (toolDef == null || toolDefinitions == null) return;
+    
+        // Find the index of this tool definition
+        for (int i = 0; i < toolDefinitions.Length; i++)
+        {
+            if (toolDefinitions[i] == toolDef)
+            {
+                currentIndex = i;
+                InitializeToolState(false);
+                Debug.Log($"[ToolSwitcher] Externally selected tool: {toolDef.displayName} at index {i}");
+                return;
+            }
+        }
+    
+        Debug.LogWarning($"[ToolSwitcher] Tool '{toolDef.displayName}' not found in definitions array");
+    }
 
 
     /// <summary>

@@ -22,8 +22,7 @@ public class GardenerController : MonoBehaviour
     [Header("Tool References")] // <<< NEW HEADER
     [Tooltip("Assign the SpriteRenderer used to display the current tool's icon.")]
     [SerializeField] private SpriteRenderer toolIconRenderer;
-    [Tooltip("Assign the GameObject or Component containing the ToolSwitcher script.")] // <<< NEW TOOLTIP
-    [SerializeField] private ToolSwitcher toolSwitcherInstance; // <<< CHANGED: Reference field
+    
 
     [Header("Visual Settings")]
     public bool flipSpriteWhenMovingLeft = true;
@@ -73,11 +72,7 @@ public class GardenerController : MonoBehaviour
         if (animator == null && useAnimations)
             Debug.LogWarning("[GardenerController Awake] Animator component not found but useAnimations is true.", gameObject);
 
-        if (toolSwitcherInstance == null)
-        {
-            Debug.LogError("[GardenerController Awake] Tool Switcher Instance is not assigned in the Inspector! Tool switching and icon display will not function.", gameObject);
-        }
-
+        
         if (toolIconRenderer == null)
             Debug.LogError("[GardenerController Awake] Tool Icon Renderer is not assigned in the Inspector! Tool icons will not display.", gameObject);
         else
@@ -89,31 +84,18 @@ public class GardenerController : MonoBehaviour
 
     private void Start()
     {
-        // Subscribe ONLY if toolSwitcherInstance was assigned in the inspector
-        if (toolSwitcherInstance != null)
+        if (InventoryBarController.Instance != null)
         {
-            Debug.Log("[GardenerController Start] ToolSwitcherInstance assigned. Subscribing to ToolSwitcher.OnToolChanged.", gameObject);
-            toolSwitcherInstance.OnToolChanged += HandleToolChanged;
-
-            // Manually trigger the handler once at the start
-            Debug.Log("[GardenerController Start] Manually calling HandleToolChanged for initial tool.", gameObject);
-            HandleToolChanged(toolSwitcherInstance.CurrentTool);
-        }
-        else
-        {
-             // Error logged in Awake, no need for more logs here.
+            InventoryBarController.Instance.OnSelectionChanged += HandleInventorySelectionChanged;
         }
     }
 
     private void OnDestroy()
     {
-        // Clear speed multipliers list
         activeSpeedMultipliers.Clear();
-        // Unsubscribe ONLY if toolSwitcherInstance was assigned and we subscribed
-        if (toolSwitcherInstance != null)
+        if (InventoryBarController.Instance != null)
         {
-            Debug.Log("[GardenerController OnDestroy] Unsubscribing from ToolSwitcher.OnToolChanged.", gameObject);
-            toolSwitcherInstance.OnToolChanged -= HandleToolChanged;
+            InventoryBarController.Instance.OnSelectionChanged -= HandleInventorySelectionChanged;
         }
     }
 
@@ -135,6 +117,22 @@ public class GardenerController : MonoBehaviour
         }
         UpdateAnimations();
         UpdateSpriteDirection();
+    }
+    
+    private void HandleInventorySelectionChanged(InventoryBarItem selectedItem)
+    {
+        Debug.Log($"[GardenerController] HandleInventorySelectionChanged: {selectedItem?.GetDisplayName() ?? "NULL"}");
+    
+        if (selectedItem != null && selectedItem.Type == InventoryBarItem.ItemType.Tool)
+        {
+            // Just update the visual icon
+            HandleToolChanged(selectedItem.ToolDefinition);
+        }
+        else
+        {
+            // Hide tool icon when not a tool
+            HandleToolChanged(null);
+        }
     }
     
     public void ApplySpeedMultiplier(float multiplier)

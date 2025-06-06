@@ -105,6 +105,91 @@ public class NodeExecutor : MonoBehaviour
              return null;
         }
     }
+    
+    public GameObject SpawnPlantFromInventorySeed(NodeData seedNodeData, Vector3 plantingPosition, Transform parentTransform)
+{
+    if (seedNodeData == null || !seedNodeData.IsSeed())
+    {
+        DebugLogError("Invalid seed data provided for planting!");
+        return null;
+    }
+    
+    if (plantPrefab == null)
+    {
+        DebugLogError("Plant prefab not assigned!");
+        return null;
+    }
+    
+    DebugLog($"Spawning plant from inventory seed '{seedNodeData.nodeDisplayName}' with {seedNodeData.storedSequence?.nodes?.Count ?? 0} internal nodes...");
+    
+    // Debug the seed's stored sequence
+    if (seedNodeData.storedSequence != null && seedNodeData.storedSequence.nodes != null)
+    {
+        DebugLog($"Seed's stored sequence contains:");
+        foreach (var node in seedNodeData.storedSequence.nodes)
+        {
+            if (node != null)
+                DebugLog($"  - {node.nodeDisplayName} (order: {node.orderIndex})");
+        }
+    }
+    else
+    {
+        DebugLog("Seed has no stored sequence or nodes!");
+    }
+    
+    NodeGraph finalGraphForPlant = new NodeGraph();
+    finalGraphForPlant.nodes = new List<NodeData>();
+    
+    // 1. Add a CLONE of the seed node itself
+    NodeData clonedSeedNodeInstance = new NodeData
+    {
+        nodeId = System.Guid.NewGuid().ToString(),
+        nodeDisplayName = seedNodeData.nodeDisplayName,
+        effects = CloneEffectsList(seedNodeData.effects),
+        orderIndex = 0,
+        canBeDeleted = false,
+        storedSequence = new NodeGraph() // The instance on the plant doesn't store a sequence
+    };
+    finalGraphForPlant.nodes.Add(clonedSeedNodeInstance);
+    
+    // 2. Add CLONES of nodes from the seed's stored sequence
+    int currentOrderIndex = 1;
+    if (seedNodeData.storedSequence != null && seedNodeData.storedSequence.nodes != null)
+    {
+        foreach (NodeData nodeInSequence in seedNodeData.storedSequence.nodes.OrderBy(n => n.orderIndex))
+        {
+            if (nodeInSequence == null) continue;
+            NodeData clonedSequenceNodeInstance = new NodeData
+            {
+                nodeId = System.Guid.NewGuid().ToString(),
+                nodeDisplayName = nodeInSequence.nodeDisplayName,
+                effects = CloneEffectsList(nodeInSequence.effects),
+                orderIndex = currentOrderIndex++,
+                canBeDeleted = false,
+                storedSequence = new NodeGraph()
+            };
+            finalGraphForPlant.nodes.Add(clonedSequenceNodeInstance);
+        }
+    }
+    
+    DebugLog($"Constructed final graph for plant with {finalGraphForPlant.nodes.Count} total nodes (1 seed + {finalGraphForPlant.nodes.Count - 1} from sequence).");
+    
+    GameObject plantObj = Instantiate(plantPrefab, plantingPosition, Quaternion.identity, parentTransform);
+    
+    PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+    if (growthComponent != null)
+    {
+        growthComponent.InitializeAndGrow(finalGraphForPlant);
+        DebugLog($"Plant '{plantObj.name}' spawned and initialized with seed '{seedNodeData.nodeDisplayName}'.");
+        return plantObj;
+    }
+    else
+    {
+        DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth component! Destroying spawned object.");
+        Destroy(plantObj);
+        return null;
+    }
+}
 
     // DebugLog and DebugLogError methods remain the same
     private void DebugLog(string msg) {

@@ -9,7 +9,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
     public static NodeCell CurrentlySelectedCell { get; private set; }
     public int CellIndex { get; private set; }
     public bool IsInventoryCell { get; private set; }
-    public bool IsSeedSlot { get; private set; } // <<< NEW FLAG
+    public bool IsSeedSlot { get; private set; }
 
     private NodeEditorGridController _sequenceController;
     private InventoryGridController _inventoryController;
@@ -18,6 +18,8 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
     private NodeView _nodeView;
 
     private Image _backgroundImage;
+    
+    private ToolDefinition _toolDefinition;
 
     // Init for general cells (sequence or inventory)
     public void Init(int index, NodeEditorGridController sequenceController, InventoryGridController inventoryController, Image bgImage)
@@ -51,7 +53,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         Init(index, null, inventoryController, bgImage);
     }
 
-    // <<< NEW: Init specifically for the Seed Slot >>>
+    // Init specifically for the Seed Slot
     public void InitAsSeedSlot(NodeEditorGridController sequenceController, Image bgImage)
     {
         CellIndex = -1; // Or a specific sentinel value for the seed slot
@@ -70,10 +72,9 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         else Debug.LogWarning($"[NodeCell SeedSlot] Init: Background Image component is not assigned.", gameObject);
     }
 
-
     public bool HasNode()
     {
-        return _nodeData != null && _nodeView != null;
+        return (_nodeData != null && _nodeView != null) || (_nodeData != null && _toolDefinition != null);
     }
 
     public NodeData GetNodeData()
@@ -121,7 +122,6 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         // Ensure storedSequence is new for regular nodes added to sequence (it won't be used by them)
         _nodeData.storedSequence = new NodeGraph();
 
-
         GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : _sequenceController.NodeViewPrefab;
         if (prefabToInstantiate == null) {
             Debug.LogError($"[NodeCell {CellIndex}] No NodeView prefab for '{def.displayName}'.", gameObject);
@@ -151,6 +151,34 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 
         if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
     }
+    
+    // Get tool definition
+    public ToolDefinition GetToolDefinition()
+    {
+        return _toolDefinition;
+    }
+    
+    public void AssignToolView(GameObject toolView, NodeData data, ToolDefinition toolDef)
+    {
+        RemoveNode();
+    
+        _nodeView = toolView?.GetComponent<NodeView>(); // Might be null for tools
+        _nodeData = data;
+        _toolDefinition = toolDef;
+    
+        if (toolView != null)
+        {
+            toolView.transform.SetParent(transform, false);
+            RectTransform viewRectTransform = toolView.GetComponent<RectTransform>();
+            if (viewRectTransform != null) viewRectTransform.anchoredPosition = Vector2.zero;
+        
+            if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
+        }
+        else if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
+        
+        // FIXED: Debug logging to track tool assignment
+        Debug.Log($"[NodeCell {CellIndex}] AssignToolView: Tool='{toolDef?.displayName}', HasView={toolView != null}, HasData={data != null}");
+    }
 
     public void AssignNodeView(NodeView view, NodeData data)
     {
@@ -158,6 +186,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 
          _nodeView = view;
          _nodeData = data;
+         _toolDefinition = null; // Clear tool definition when assigning node view
 
          if (_nodeView != null) {
             _nodeView.transform.SetParent(transform, false);
@@ -172,27 +201,59 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
          }
          else if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
+         
+         // FIXED: Debug logging to track node assignment
+         Debug.Log($"[NodeCell {CellIndex}] AssignNodeView: Node='{data?.nodeDisplayName}', HasView={view != null}");
     }
 
     public void RemoveNode()
     {
-        bool wasSelected = (CurrentlySelectedCell == this && !IsInventoryCell && !IsSeedSlot); // Seed slot is not "selectable" in the same way
+        bool wasSelected = (CurrentlySelectedCell == this && !IsInventoryCell && !IsSeedSlot);
         if (_nodeView != null) {
             if (wasSelected) _nodeView.Unhighlight();
             Destroy(_nodeView.gameObject);
         }
         _nodeView = null;
         _nodeData = null;
+        _toolDefinition = null;
         if (wasSelected) NodeCell.ClearSelection();
 
         if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
+        
+        Debug.Log($"[NodeCell {CellIndex}] RemoveNode: Cleared all references");
+    }
+
+    // Assign display-only item (for inventory bar)
+    public void AssignDisplayOnly(GameObject displayObject, NodeData data, ToolDefinition toolDef)
+    {
+        RemoveNode();
+    
+        _nodeView = null; // No NodeView for display-only
+        _nodeData = data;
+        _toolDefinition = toolDef;
+    
+        if (displayObject != null)
+        {
+            displayObject.transform.SetParent(transform, false);
+            RectTransform displayRect = displayObject.GetComponent<RectTransform>();
+            if (displayRect != null) displayRect.anchoredPosition = Vector2.zero;
+        
+            if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
+        }
+        else if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
+        
+        // FIXED: Debug logging for display-only assignment
+        Debug.Log($"[NodeCell {CellIndex}] AssignDisplayOnly: Item='{data?.nodeDisplayName ?? toolDef?.displayName}', IsDisplayOnly=true");
     }
 
     public void ClearNodeReference()
     {
         _nodeView = null;
         _nodeData = null;
+        _toolDefinition = null;
         if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
+        
+        Debug.Log($"[NodeCell {CellIndex}] ClearNodeReference: References cleared but GameObject not destroyed");
     }
 
     public static void SelectCell(NodeCell cellToSelect)
@@ -243,8 +304,8 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         GameObject draggedObject = eventData.pointerDrag;
         if (draggedObject == null) return;
 
-        NodeDraggable draggedDraggable = draggedObject.GetComponent<NodeDraggable>(); // <<< CORRECTED: Use draggedDraggable here
-        if (draggedDraggable == null) return; // <<< CORRECTED: Check draggedDraggable
+        NodeDraggable draggedDraggable = draggedObject.GetComponent<NodeDraggable>();
+        if (draggedDraggable == null) return;
 
         NodeCell originalCell = draggedDraggable.OriginalCell;
         if (originalCell == null) {
@@ -253,11 +314,22 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             return;
         }
 
-        NodeView draggedView = draggedDraggable.GetComponent<NodeView>();
-        NodeData draggedData = draggedView?.GetNodeData();
+        // FIXED: Handle both NodeView and ToolView
+        NodeView draggedNodeView = draggedDraggable.GetComponent<NodeView>();
+        ToolView draggedToolView = draggedDraggable.GetComponent<ToolView>();
+        NodeData draggedData = null;
 
-        if (draggedView == null || draggedData == null) {
-             Debug.LogError($"[NodeCell {CellIndex} OnDrop] Dragged object '{draggedDraggable.name}' missing NodeView/NodeData. Resetting.", draggedDraggable.gameObject);
+        if (draggedNodeView != null)
+        {
+            draggedData = draggedNodeView.GetNodeData();
+        }
+        else if (draggedToolView != null)
+        {
+            draggedData = draggedToolView.GetNodeData();
+        }
+
+        if (draggedData == null) {
+             Debug.LogError($"[NodeCell {CellIndex} OnDrop] Dragged object '{draggedDraggable.name}' missing NodeView/ToolView or NodeData. Resetting.", draggedDraggable.gameObject);
              draggedDraggable.ResetPosition();
              return;
         }

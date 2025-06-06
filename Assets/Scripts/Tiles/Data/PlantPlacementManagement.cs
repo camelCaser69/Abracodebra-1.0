@@ -120,6 +120,82 @@ public class PlantPlacementManager : MonoBehaviour
         if (showDebugMessages) Debug.Log($"Failed to plant seed at {gridPosition} (NodeExecutor returned null).");
         return false;
     }
+    
+    public bool TryPlantSeedFromInventory(InventoryBarItem seedItem)
+{
+    if (seedItem == null || !seedItem.IsSeed())
+    {
+        if (showDebugMessages) Debug.Log("Invalid seed item provided for planting.");
+        return false;
+    }
+    
+    // Get mouse position and convert to grid position
+    Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+    mouseWorldPos.z = 0f;
+    
+    if (showDebugMessages)
+        Debug.Log($"[PlantPlacementManager] Mouse world position: {mouseWorldPos}");
+    
+    Vector3Int gridPosition = tileInteractionManager?.WorldToCell(mouseWorldPos) ?? Vector3Int.zero;
+    
+    // Use TileInteractionManager's method to get world position
+    Vector3 worldPosition = mouseWorldPos;
+    if (tileInteractionManager != null && tileInteractionManager.interactionGrid != null)
+    {
+        worldPosition = tileInteractionManager.interactionGrid.GetCellCenterWorld(gridPosition);
+    }
+    
+    if (showDebugMessages)
+        Debug.Log($"[PlantPlacementManager] Attempting to plant at grid position: {gridPosition}, world position: {worldPosition}");
+    
+    // Check if position is valid for planting
+    CleanupDestroyedPlants();
+    if (IsPositionOccupied(gridPosition))
+    {
+        if (showDebugMessages) Debug.Log($"Cannot plant: Position {gridPosition} occupied.");
+        return false;
+    }
+    
+    TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
+    if (!IsTileValidForPlanting(tileDef))
+    {
+        if (showDebugMessages) Debug.Log($"Cannot plant: Tile {tileDef?.displayName ?? "Unknown"} invalid.");
+        return false;
+    }
+    
+    // Use NodeExecutor to spawn plant from the selected seed
+    if (nodeExecutor == null)
+    {
+        Debug.LogError("Cannot plant: NodeExecutor reference is missing in PlantPlacementManager.");
+        return false;
+    }
+    
+    Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
+    GameObject plantObj = nodeExecutor.SpawnPlantFromInventorySeed(seedItem.NodeData, plantingPosition, plantParent);
+    
+    if (plantObj != null)
+    {
+        plantsByGridPosition[gridPosition] = plantObj;
+        PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
+        if (growthModifierManager != null && plantGrowth != null)
+        {
+            growthModifierManager.RegisterPlantTile(plantGrowth, tileDef);
+            if (showDebugMessages) Debug.Log($"Plant registered with tile: {tileDef?.displayName ?? "Unknown"}");
+        }
+        
+        // Trigger planting animation
+        GardenerController gardener = FindAnyObjectByType<GardenerController>();
+        if (gardener != null)
+        {
+            gardener.Plant();
+        }
+        
+        return true;
+    }
+    
+    if (showDebugMessages) Debug.Log($"Failed to plant seed at {gridPosition} (NodeExecutor returned null).");
+    return false;
+}
 
     // SpawnPlant method is now effectively inside NodeExecutor.SpawnPlantFromSeedInSlot
     // CloneNodeGraph and CloneEffectsList are also in NodeExecutor

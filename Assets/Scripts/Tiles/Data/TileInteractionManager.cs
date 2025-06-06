@@ -25,7 +25,6 @@ public class TileInteractionManager : MonoBehaviour
     private TileDefinition hoveredTileDef = null;
     private struct TimedTileState { public TileDefinition tileDef; public float timeLeft; }
     private Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
-    private ToolSwitcher playerToolSwitcher;
 
     void Awake()
     {
@@ -48,24 +47,7 @@ public class TileInteractionManager : MonoBehaviour
             SetupTilemaps();
         }
 
-        // Find the Player's ToolSwitcher
-        if (player != null)
-        {
-            // Use GetComponentInChildren to find it even if it's nested
-            playerToolSwitcher = player.GetComponentInChildren<ToolSwitcher>(true); // Include inactive just in case
-            if (playerToolSwitcher == null)
-            {
-                Debug.LogError("[TileInteractionManager Start] Could not find ToolSwitcher component on Player or its children!", player);
-            }
-            else
-            {
-                 if(debugLogs) Debug.Log("[TileInteractionManager Start] Found Player ToolSwitcher.", playerToolSwitcher.gameObject);
-            }
-        }
-        else
-        {
-            Debug.LogError("[TileInteractionManager Start] Player Transform reference is not assigned in the Inspector!", this);
-        }
+        
     }
 
     private void SetupTilemaps()
@@ -442,23 +424,28 @@ public class TileInteractionManager : MonoBehaviour
             hoveredTileText.text = $"Hover: {tileName}";
         }
 
-        // Current Tool Text (includes uses)
+        // Current Tool Text - now from inventory bar
         if (currentToolText != null)
         {
-            if (playerToolSwitcher != null && playerToolSwitcher.CurrentTool != null)
+            if (InventoryBarController.Instance != null && InventoryBarController.Instance.SelectedItem != null)
             {
-                ToolDefinition tool = playerToolSwitcher.CurrentTool;
-                string toolString = $"Tool: {tool.displayName}";
-                if (tool.limitedUses)
+                var selectedItem = InventoryBarController.Instance.SelectedItem;
+                if (selectedItem.Type == InventoryBarItem.ItemType.Tool)
                 {
-                    int uses = playerToolSwitcher.CurrentRemainingUses;
-                    toolString += $" ({uses})"; // Show remaining uses
+                    currentToolText.text = $"Tool: {selectedItem.GetDisplayName()}";
                 }
-                currentToolText.text = toolString;
+                else if (selectedItem.Type == InventoryBarItem.ItemType.Node && selectedItem.IsSeed())
+                {
+                    currentToolText.text = $"Seed: {selectedItem.GetDisplayName()}";
+                }
+                else
+                {
+                    currentToolText.text = $"Selected: {selectedItem.GetDisplayName()}";
+                }
             }
             else
             {
-                currentToolText.text = "Tool: None";
+                currentToolText.text = "Nothing Selected";
             }
         }
     }
@@ -534,100 +521,63 @@ public class TileInteractionManager : MonoBehaviour
 
     // --- ApplyToolAction is MODIFIED ---
     public void ApplyToolAction(ToolDefinition toolDef)
+{
+    // --- Initial Checks (modified - removed ToolSwitcher check) ---
+    if (toolDef == null) { Debug.LogWarning("ApplyToolAction called with a NULL toolDef."); return; }
+    if (!currentlyHoveredCell.HasValue) return;
+    if (hoveredTileDef == null) { if (debugLogs) Debug.Log("ApplyToolAction: No recognized tile at hovered cell."); return; }
+    
+    float distance = Vector2.Distance(player.position, CellCenterWorld(currentlyHoveredCell.Value));
+    if (distance > hoverRadius) { if (debugLogs) Debug.Log($"ApplyToolAction: Cell too far ({distance:F2} > {hoverRadius})."); return; }
+    
+    // REMOVED: All playerToolSwitcher checks - we don't need them anymore!
+    
+    if (debugLogs) Debug.Log($"[ApplyToolAction] Using Tool='{toolDef.toolType}', On Tile='{hoveredTileDef.displayName}', At Cell={currentlyHoveredCell.Value}");
+
+    // --- Check for REFILL Action FIRST ---
+    bool wasRefillAction = false;
+    if (interactionLibrary != null && interactionLibrary.refillRules != null)
     {
-        // --- Initial Checks (unchanged) ---
-        if (toolDef == null) { Debug.LogWarning("ApplyToolAction called with a NULL toolDef."); return; }
-        if (!currentlyHoveredCell.HasValue) return;
-        if (hoveredTileDef == null) { if (debugLogs) Debug.Log("ApplyToolAction: No recognized tile at hovered cell."); return; }
-        if (playerToolSwitcher == null) { Debug.LogError("ApplyToolAction: ToolSwitcher reference is missing! Cannot apply tool."); return; }
-        float distance = Vector2.Distance(player.position, CellCenterWorld(currentlyHoveredCell.Value));
-        if (distance > hoverRadius) { if (debugLogs) Debug.Log($"ApplyToolAction: Cell too far ({distance:F2} > {hoverRadius})."); return; }
-        if (playerToolSwitcher.CurrentTool != toolDef) { Debug.LogWarning($"ApplyToolAction: Tool passed ({toolDef.displayName}) does not match current tool ({playerToolSwitcher.CurrentTool?.displayName}). Aborting."); return; }
-        // ---------------------------------
-
-        // --- Consume Use Attempt ---
-        // We *attempt* to consume first. If it fails (out of uses), we stop.
-        // If it succeeds, we proceed to check for refill or transformation.
-        bool consumed = playerToolSwitcher.TryConsumeUse();
-        // --- Note: We don't stop here even if consumed is false, because a refill action might still be possible even if uses are 0 (e.g. refill an empty can) ---
-        // --- UPDATE: Actually, let's only proceed if consumed is TRUE OR if a refill rule applies ---
-
-        if (debugLogs) Debug.Log($"[ApplyToolAction] Using Tool='{toolDef.toolType}', On Tile='{hoveredTileDef.displayName}', At Cell={currentlyHoveredCell.Value}. Consumed Use: {consumed}");
-
-
-        // --- Check for REFILL Action FIRST ---
-        bool wasRefillAction = false;
-        if (interactionLibrary != null && interactionLibrary.refillRules != null)
+        foreach (var refillRule in interactionLibrary.refillRules)
         {
-            foreach (var refillRule in interactionLibrary.refillRules)
+            if (refillRule != null && refillRule.toolToRefill == toolDef && refillRule.refillSourceTile == hoveredTileDef)
             {
-                // Check if rule matches the current tool and hovered tile
-                if (refillRule != null && refillRule.toolToRefill == toolDef && refillRule.refillSourceTile == hoveredTileDef)
-                {
-                    // Match found! Attempt to refill.
-                    if (debugLogs) Debug.Log($"Refill rule matched: Tool '{toolDef.displayName}' on Tile '{hoveredTileDef.displayName}'.");
-                    playerToolSwitcher.RefillCurrentTool(); // Call the refill method
-                    wasRefillAction = true;
-                    break; // Stop checking refill rules once one matches
-                }
+                if (debugLogs) Debug.Log($"Refill rule matched: Tool '{toolDef.displayName}' on Tile '{hoveredTileDef.displayName}'.");
+                
+                // We can't refill without ToolSwitcher, so just log it
+                Debug.Log($"[TileInteractionManager] Tool refill not implemented for inventory-based tools yet.");
+                wasRefillAction = true;
+                break;
             }
-        }
-        // If it was a refill action, we are done. Don't proceed to tile transformation.
-        if (wasRefillAction)
-        {
-            // Note: The use was already consumed before the refill check.
-            // If you want to *not* consume a use when refilling, you'd need
-            // to add a RefundUse() method to ToolSwitcher and call it here,
-            // or move the TryConsumeUse() call *after* the refill check.
-            // Current logic: Click on water consumes 1 use, then refills to max.
-            return;
-        }
-        // --------------------------------------
-
-
-        // --- Proceed ONLY if use was successfully consumed AND it wasn't a refill ---
-        if (!consumed)
-        {
-            if (debugLogs) Debug.Log($"ApplyToolAction: Tool '{toolDef.displayName}' could not be used (out of uses) and no refill rule applied.");
-            return; // Stop if out of uses and not refilling
-        }
-
-
-        // --- Handle Standard Tile Transformation ---
-
-        // Special case: SeedPouch (check again after use consumption)
-        if (toolDef.toolType == ToolType.SeedPouch)
-        {
-            HandleSeedPlanting(currentlyHoveredCell.Value);
-            return; // Seed planting handles its own logic
-        }
-
-        // Find standard matching rule
-        if (interactionLibrary == null || interactionLibrary.rules == null) { Debug.LogWarning("Interaction Library or its standard rules list is null!"); return; }
-        TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == hoveredTileDef);
-
-        if (rule == null)
-        {
-            if (debugLogs) Debug.Log($"No standard interaction rule found for tool '{toolDef.toolType}' on tile '{hoveredTileDef.displayName}'.");
-            // Since a use was consumed but no action taken, maybe refund here?
-            // playerToolSwitcher.RefundUse(); // Requires implementation
-            return;
-        }
-
-        // Apply the standard rule
-        if (rule.toTile != null) // If there's a tile to change TO
-        {
-            if (debugLogs) Debug.Log($"Applying standard rule: '{hoveredTileDef.displayName}' -> '{rule.toTile.displayName}'");
-            if (!rule.toTile.keepBottomTile)
-            {
-                RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
-            }
-            PlaceTile(rule.toTile, currentlyHoveredCell.Value);
-        }
-        else // If the rule specifies removing the tile (toTile is null)
-        {
-            if (debugLogs) Debug.Log($"Applying standard rule: Remove '{hoveredTileDef.displayName}'");
-            RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
         }
     }
+    
+    if (wasRefillAction) return;
+
+    // --- Handle Standard Tile Transformation ---
+    if (interactionLibrary == null || interactionLibrary.rules == null) { Debug.LogWarning("Interaction Library or its standard rules list is null!"); return; }
+    TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == hoveredTileDef);
+
+    if (rule == null)
+    {
+        if (debugLogs) Debug.Log($"No standard interaction rule found for tool '{toolDef.toolType}' on tile '{hoveredTileDef.displayName}'.");
+        return;
+    }
+
+    // Apply the standard rule
+    if (rule.toTile != null)
+    {
+        if (debugLogs) Debug.Log($"Applying standard rule: '{hoveredTileDef.displayName}' -> '{rule.toTile.displayName}'");
+        if (!rule.toTile.keepBottomTile)
+        {
+            RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
+        }
+        PlaceTile(rule.toTile, currentlyHoveredCell.Value);
+    }
+    else
+    {
+        if (debugLogs) Debug.Log($"Applying standard rule: Remove '{hoveredTileDef.displayName}'");
+        RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
+    }
+}
 }

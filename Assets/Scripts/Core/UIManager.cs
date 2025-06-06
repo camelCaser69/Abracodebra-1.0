@@ -1,6 +1,6 @@
-﻿// FILE: Assets/Scripts/UI/UIManager.cs
+﻿// FILE: Assets/Scripts/Core/UIManager.cs
 using UnityEngine;
-using UnityEngine.UI; // Required for Button
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
@@ -13,12 +13,11 @@ public class UIManager : MonoBehaviour
 
     [Header("Buttons (Assign in Inspector)")]
     [SerializeField] private Button startGrowthPhaseButton;
-    [SerializeField] private Button startRecoveryPhaseButton; // This might be automated later
+    [SerializeField] private Button startRecoveryPhaseButton;
     [SerializeField] private Button startNewPlanningPhaseButton;
 
     [Header("Node Editor Integration")]
-    [Tooltip("Assign the Node Editor's main UI Panel (NodeEditorGridController.gridUIParent) here. This panel will be shown during Planning.")]
-    [SerializeField] private GameObject nodeEditorPanel; // This should be NodeEditorGridController.gridUIParent
+    [SerializeField] private GameObject nodeEditorPanel;
 
     private void Awake()
     {
@@ -32,6 +31,13 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
+        // ENSURE PLANNING PANEL IS ACTIVE FIRST FOR INVENTORY INITIALIZATION
+        if (planningPanel != null) 
+        {
+            planningPanel.SetActive(true);
+            if (nodeEditorPanel != null) nodeEditorPanel.SetActive(true);
+        }
+
         if (RunManager.Instance == null)
         {
             Debug.LogError("[UIManager] RunManager.Instance not found! UI will not function correctly.");
@@ -47,13 +53,12 @@ public class UIManager : MonoBehaviour
 
         if (startRecoveryPhaseButton != null)
             startRecoveryPhaseButton.onClick.AddListener(OnStartRecoveryPhaseClicked);
-        // else Debug.LogWarning("[UIManager] Start Recovery Phase Button not assigned (may be automated).");
 
         if (startNewPlanningPhaseButton != null)
             startNewPlanningPhaseButton.onClick.AddListener(OnStartNewPlanningPhaseClicked);
         else Debug.LogError("[UIManager] Start New Planning Phase Button not assigned!");
         
-        // Initial UI setup based on RunManager's starting state
+        // Initial UI setup - this will be called after inventory is initialized
         HandleRunStateChanged(RunManager.Instance.CurrentState);
     }
 
@@ -64,7 +69,6 @@ public class UIManager : MonoBehaviour
             RunManager.Instance.OnRunStateChanged -= HandleRunStateChanged;
         }
 
-        // Clean up button listeners
         if (startGrowthPhaseButton != null) startGrowthPhaseButton.onClick.RemoveAllListeners();
         if (startRecoveryPhaseButton != null) startRecoveryPhaseButton.onClick.RemoveAllListeners();
         if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.onClick.RemoveAllListeners();
@@ -72,44 +76,100 @@ public class UIManager : MonoBehaviour
 
     private void HandleRunStateChanged(RunState newState)
     {
-        // Hide all main phase panels first
-        if (planningPanel != null) planningPanel.SetActive(false);
-        if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(false);
-        if (recoveryPanel != null) recoveryPanel.SetActive(false);
-
-        // Hide Node Editor Panel by default, show only in Planning
-        if (nodeEditorPanel != null) nodeEditorPanel.SetActive(false);
-
         Debug.Log($"[UIManager] Handling state change to: {newState}");
 
         switch (newState)
         {
             case RunState.Planning:
+                // Activate planning panel and inventory grid
                 if (planningPanel != null) planningPanel.SetActive(true);
-                if (nodeEditorPanel != null) nodeEditorPanel.SetActive(true); // Show Node Editor
-                // Manage button interactivity
+                if (nodeEditorPanel != null) nodeEditorPanel.SetActive(true);
+                
+                if (InventoryGridController.Instance != null) 
+                    InventoryGridController.Instance.gameObject.SetActive(true);
+                if (InventoryBarController.Instance != null) 
+                    InventoryBarController.Instance.HideBar();
+                
+                // Hide other panels
+                if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(false);
+                if (recoveryPanel != null) recoveryPanel.SetActive(false);
+                
+                // Button states
                 if (startGrowthPhaseButton != null) startGrowthPhaseButton.interactable = true;
                 if (startRecoveryPhaseButton != null) startRecoveryPhaseButton.interactable = false;
                 if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.interactable = false;
                 break;
+                
             case RunState.GrowthAndThreat:
+                // FIXED: Hide planning panel first, then show growth panel
+                if (planningPanel != null) planningPanel.SetActive(false);
+                if (nodeEditorPanel != null) nodeEditorPanel.SetActive(false);
+                
+                // Activate growth panel and inventory bar
                 if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(true);
-                // Manage button interactivity
+                
+                if (InventoryGridController.Instance != null) 
+                    InventoryGridController.Instance.gameObject.SetActive(false);
+                    
+                // FIXED: Add safety check and delay for inventory bar
+                if (InventoryBarController.Instance != null) 
+                {
+                    // Small delay to ensure inventory is properly initialized before showing bar
+                    StartCoroutine(ShowInventoryBarDelayed());
+                }
+                
+                // Hide recovery panel
+                if (recoveryPanel != null) recoveryPanel.SetActive(false);
+                
+                // Button states
                 if (startGrowthPhaseButton != null) startGrowthPhaseButton.interactable = false;
-                if (startRecoveryPhaseButton != null) startRecoveryPhaseButton.interactable = true; // Or false if automated
+                if (startRecoveryPhaseButton != null) startRecoveryPhaseButton.interactable = true;
                 if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.interactable = false;
                 break;
+                
             case RunState.Recovery:
+                // Activate recovery panel
                 if (recoveryPanel != null) recoveryPanel.SetActive(true);
-                // Manage button interactivity
+                
+                // Hide both inventory systems
+                if (InventoryGridController.Instance != null) 
+                    InventoryGridController.Instance.gameObject.SetActive(false);
+                if (InventoryBarController.Instance != null) 
+                    InventoryBarController.Instance.HideBar();
+                
+                // Hide other panels
+                if (planningPanel != null) planningPanel.SetActive(false);
+                if (nodeEditorPanel != null) nodeEditorPanel.SetActive(false);
+                if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(false);
+                
+                // Button states
                 if (startGrowthPhaseButton != null) startGrowthPhaseButton.interactable = false;
                 if (startRecoveryPhaseButton != null) startRecoveryPhaseButton.interactable = false;
                 if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.interactable = true;
                 break;
         }
     }
+    
+    // FIXED: Add coroutine to safely show inventory bar with delay
+    private System.Collections.IEnumerator ShowInventoryBarDelayed()
+    {
+        // Wait one frame to ensure everything is properly set up
+        yield return null;
+        
+        if (InventoryBarController.Instance != null)
+        {
+            try
+            {
+                InventoryBarController.Instance.ShowBar();
+                Debug.Log("[UIManager] Successfully showed inventory bar after delay");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[UIManager] Error showing inventory bar: {e.Message}\n{e.StackTrace}");
+            }
+        }
+    }
 
-    // --- Button Click Handlers ---
     private void OnStartGrowthPhaseClicked()
     {
         Debug.Log("[UIManager] StartGrowthPhaseButton Clicked");
