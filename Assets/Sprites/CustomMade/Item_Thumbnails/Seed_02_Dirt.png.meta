@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 25378d62702bafa4fb5f92d21146b629
+guid: 1db862c5c07e3d04f989efcb5a55e5b4
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4434407758412806583
-    second: Seed_01_0
+      213: -3654572570614238138
+    second: Seed_02_Dirt_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Seed_01_0
+      name: Seed_02_Dirt_0
       rect:
         serializedVersion: 2
-        x: 12
-        y: 11
-        width: 9
-        height: 9
+        x: 1
+        y: 1
+        width: 14
+        height: 11
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 7b97e6d9c5e2a8d30800000000000000
-      internalID: 4434407758412806583
+      spriteID: 644f6aa1c99584dc0800000000000000
+      internalID: -3654572570614238138
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Seed_01_0: 4434407758412806583
+      Seed_02_Dirt_0: -3654572570614238138
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

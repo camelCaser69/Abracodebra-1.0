@@ -159,46 +159,34 @@ public class InventoryBarController : MonoBehaviour
     private void UpdateBarDisplay()
     {
         if (inventoryGridController == null) return;
-    
-        // Clear all bar cells first
+
+        /* 1. Clear every bar cell */
         foreach (var cell in barCells)
-        {
             cell.RemoveNode();
-        }
-    
-        // FIXED: Calculate proper inventory access
-        int columnsPerRow = inventoryGridController.inventoryColumns;
-        int startIndex = currentRow * columnsPerRow;
-        int maxInventoryIndex = inventoryGridController.TotalSlots - 1;
-    
-        Debug.Log($"[InventoryBarController] UpdateBarDisplay: CurrentRow={currentRow}, ColumnsPerRow={columnsPerRow}, StartIndex={startIndex}, MaxIndex={maxInventoryIndex}");
-    
-        // Populate current row from inventory
+
+        /* 2. Determine which inventory indices map to this bar row */
+        int columnsPerRow   = inventoryGridController.inventoryColumns;
+        int startIndex      = currentRow * columnsPerRow;
+        int maxInventoryIdx = inventoryGridController.TotalSlots - 1;
+
+        Debug.Log($"[InventoryBarController] UpdateBarDisplay: CurrentRow={currentRow}, ColumnsPerRow={columnsPerRow}, StartIndex={startIndex}, MaxIndex={maxInventoryIdx}");
+
+        /* 3. Copy items into the visible row */
         for (int i = 0; i < slotsPerRow && i < columnsPerRow; i++)
         {
             int inventoryIndex = startIndex + i;
-        
-            // FIXED: Bounds check before accessing inventory
-            if (inventoryIndex > maxInventoryIndex)
-            {
-                Debug.Log($"[InventoryBarController] Skipping bar slot {i}, inventory index {inventoryIndex} is beyond max {maxInventoryIndex}");
-                continue;
-            }
-        
-            var inventoryCell = inventoryGridController.GetInventoryCellAtIndex(inventoryIndex);
-        
-            if (inventoryCell != null && inventoryCell.HasNode())
-            {
-                // Copy the content from inventory cell to bar cell
-                CopyInventoryItemToBarCell(inventoryCell, barCells[i]);
-            }
+            if (inventoryIndex > maxInventoryIdx) continue;
+
+            var invCell = inventoryGridController.GetInventoryCellAtIndex(inventoryIndex);
+            if (invCell != null && invCell.HasNode())
+                CopyInventoryItemToBarCell(invCell, barCells[i]);
         }
-    
-        // Update arrow buttons
-        if (upArrowButton != null) upArrowButton.interactable = currentRow > 0;
-        if (downArrowButton != null) upArrowButton.interactable = currentRow < totalRows - 1;
-    
-        Debug.Log($"[InventoryBarController] UpdateBarDisplay: Row {currentRow}/{totalRows-1}, StartIndex={startIndex}");
+
+        /* 4. Enable / disable arrows so they can't overshoot */
+        if (upArrowButton   != null) upArrowButton.interactable   = currentRow > 0;
+        if (downArrowButton != null) downArrowButton.interactable = currentRow < totalRows - 1;
+
+        Debug.Log($"[InventoryBarController] UpdateBarDisplay: Row {currentRow}/{totalRows - 1}");
     }
     
     private void CopyInventoryItemToBarCell(NodeCell inventoryCell, NodeCell barCell)
@@ -231,16 +219,25 @@ public class InventoryBarController : MonoBehaviour
         // Create a visual representation of the tool (not draggable)
         GameObject toolDisplay = new GameObject($"ToolDisplay_{toolDef.displayName}", typeof(RectTransform), typeof(Image));
         toolDisplay.transform.SetParent(barCell.transform, false);
-        
+
         Image toolImage = toolDisplay.GetComponent<Image>();
         toolImage.sprite = toolDef.icon;
         toolImage.color = toolDef.iconTint;
         toolImage.raycastTarget = false; // Not interactive in bar
-        
+
+        // Apply the same global‐image scale that InventoryGridController uses
+        float globalScale = 1f;
+        if (InventoryGridController.Instance != null)
+        {
+            globalScale = InventoryGridController.Instance.NodeGlobalImageScale;
+        }
+        toolDisplay.transform.localScale = new Vector3(globalScale, globalScale, 1f);
+
         RectTransform toolRect = toolDisplay.GetComponent<RectTransform>();
         toolRect.anchoredPosition = Vector2.zero;
+        // Keep the same relative padding inside each bar cell (80% of cell size)
         toolRect.sizeDelta = cellSize * 0.8f;
-        
+
         // Store reference in the cell (but don't make it draggable)
         barCell.AssignDisplayOnly(toolDisplay, nodeData, toolDef);
     }
@@ -250,16 +247,25 @@ public class InventoryBarController : MonoBehaviour
         // Create a visual representation of the node (not draggable)
         GameObject nodeDisplay = new GameObject($"NodeDisplay_{nodeDef.displayName}", typeof(RectTransform), typeof(Image));
         nodeDisplay.transform.SetParent(barCell.transform, false);
-        
+
         Image nodeImage = nodeDisplay.GetComponent<Image>();
         nodeImage.sprite = nodeDef.thumbnail;
         nodeImage.color = nodeDef.thumbnailTintColor;
         nodeImage.raycastTarget = false; // Not interactive in bar
-        
+
+        // Apply the same global‐image scale that InventoryGridController uses
+        float globalScale = 1f;
+        if (InventoryGridController.Instance != null)
+        {
+            globalScale = InventoryGridController.Instance.NodeGlobalImageScale;
+        }
+        nodeDisplay.transform.localScale = new Vector3(globalScale, globalScale, 1f);
+
         RectTransform nodeRect = nodeDisplay.GetComponent<RectTransform>();
         nodeRect.anchoredPosition = Vector2.zero;
+        // Keep the same relative padding inside each bar cell (80% of cell size)
         nodeRect.sizeDelta = cellSize * 0.8f;
-        
+
         // Store reference in the cell (but don't make it draggable)
         barCell.AssignDisplayOnly(nodeDisplay, nodeData, null);
     }

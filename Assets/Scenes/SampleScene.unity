@@ -16021,8 +16021,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b02225d1ccd9f4d42b09de7941a00382, type: 2}
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   toolViewPrefab: {fileID: 2087977392620144478, guid: bf830caeba1e68f42afa78ca90db24c0, type: 3}
-  nodeGlobalImageScale: 2
-  nodeImageRaycastPadding: 24
+  nodeGlobalImageScale: 1
+  nodeImageRaycastPadding: 0
   cellContainer: {fileID: 1101570886}
   _rootCanvas: {fileID: 218169671}
   logInventoryChanges: 1

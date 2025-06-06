@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: a37547249d3727a469d430b45f8cb3af
+guid: 0b25a1564c2f5774583b06728dbe4bda
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -129,8 +129,8 @@ TextureImporter:
       name: Seed_02_0
       rect:
         serializedVersion: 2
-        x: 12
-        y: 12
+        x: 4
+        y: 4
         width: 8
         height: 8
       alignment: 0

@@ -21,6 +21,8 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
     private ToolDefinition _toolDefinition;
 
     private Image _backgroundImage;
+    
+    private GameObject _displayObject;   // holds the “display-only” icon used in the inventory bar
 
     public void Init(int index, NodeEditorGridController sequenceController, InventoryGridController inventoryController, Image bgImage)
     {
@@ -227,40 +229,51 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
     public void RemoveNode()
     {
         bool wasSelected = (CurrentlySelectedCell == this && !IsInventoryCell && !IsSeedSlot);
-        if (_nodeView != null) {
+
+        /* 1. Destroy the interactive NodeView (sequence / inventory) */
+        if (_nodeView != null)
+        {
             if (wasSelected) _nodeView.Unhighlight();
             Destroy(_nodeView.gameObject);
         }
-        _nodeView = null;
-        _nodeData = null;
-        _toolDefinition = null;
+
+        /* 2. Destroy any display-only object that AssignDisplayOnly() created */
+        if (_displayObject != null)
+        {
+            Destroy(_displayObject);
+            _displayObject = null;
+        }
+
+        /* 3. Reset state */
+        _nodeView        = null;
+        _nodeData        = null;
+        _toolDefinition  = null;
         if (wasSelected) NodeCell.ClearSelection();
 
         if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
-        
+
         Debug.Log($"[NodeCell {CellIndex}] RemoveNode: Cleared all references");
     }
 
     public void AssignDisplayOnly(GameObject displayObject, NodeData data, ToolDefinition toolDef)
     {
-        RemoveNode();
-    
-        _nodeView = null; 
-        _nodeData = data;
-        _toolDefinition = toolDef;
+        RemoveNode();                    // clears any prior content
 
-        // These are display only, NodeData.storedSequence is not relevant here.
-    
-        if (displayObject != null)
+        _nodeView       = null;
+        _nodeData       = data;
+        _toolDefinition = toolDef;
+        _displayObject  = displayObject; // remember so RemoveNode can clean it up
+
+        if (_displayObject != null)
         {
-            displayObject.transform.SetParent(transform, false);
-            RectTransform displayRect = displayObject.GetComponent<RectTransform>();
-            if (displayRect != null) displayRect.anchoredPosition = Vector2.zero;
-        
+            _displayObject.transform.SetParent(transform, false);
+            RectTransform rect = _displayObject.GetComponent<RectTransform>();
+            if (rect != null) rect.anchoredPosition = Vector2.zero;
+
             if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
         }
         else if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
-        
+
         Debug.Log($"[NodeCell {CellIndex}] AssignDisplayOnly: Item='{data?.nodeDisplayName ?? toolDef?.displayName}', IsDisplayOnly=true");
     }
 

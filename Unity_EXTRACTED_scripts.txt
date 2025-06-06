@@ -1,7 +1,7 @@
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my project. If the full script collection exceeds the character limit, additional parts will follow. On top of these scripts, there is a custom dual-grid package used as an extension for unity tilemaps, I'm also enclosing some guides for that in another files.
 
 ================================================================================
-UNITY PROJECT SCRIPT EXPORT - 2025-06-06 14:32:49
+UNITY PROJECT SCRIPT EXPORT - 2025-06-06 19:01:12
 ================================================================================
 
 DIRECTORY STRUCTURE
@@ -5937,174 +5937,159 @@ public class ScentLibrary : ScriptableObject
 ////////////////////////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Nodes\Core\NodeData.cs
 ////////////////////////////////////////////////////////////////////////////////
-﻿// FILE: Assets/Scripts/Nodes/Core/NodeData.cs
+﻿﻿// FILE: Assets/Scripts/Nodes/Core/NodeData.cs
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using UnityEngine;
 
 [Serializable]
 public class NodeData : ISerializationCallbackReceiver
 {
+    // ──────────────────────────────────────
+    // Public serialised fields
+    // ──────────────────────────────────────
     public string nodeId;
     public string nodeDisplayName;
     public List<NodeEffectData> effects = new List<NodeEffectData>();
     public int orderIndex;
 
-    [HideInInspector]
-    public bool canBeDeleted = true;
+    [HideInInspector] public bool canBeDeleted = true;
 
-    [System.NonSerialized]
-    private bool _isContainedInSequence = false;
-    
-    // Public getter for the internal state, primarily for cloning/utility logic.
+    // ──────────────────────────────────────
+    // Internal state flags
+    // ──────────────────────────────────────
+    [NonSerialized] private bool _isContainedInSequence = false;
     public bool IsContainedInSequence => _isContainedInSequence;
 
+    // ──────────────────────────────────────
+    // RUNTIME-ONLY reference -- **NOT** serialised
+    // ──────────────────────────────────────
+    [NonSerialized] private NodeGraph _storedSequence;
 
-    [Tooltip("If this NodeData represents a Seed, this holds its internal sequence of nodes. Should be null for non-seed nodes or nodes within a sequence.")]
-    [SerializeField] private NodeGraph _storedSequence;
-    
+    /// <summary>Access to the runtime sequence, with safety guards.</summary>
     public NodeGraph storedSequence
     {
-        get 
+        get
         {
             if (_isContainedInSequence || !IsPotentialSeedContainer())
             {
-                if (_storedSequence != null)
-                {
-                    // Debug.LogWarning($"Getter: Node '{nodeDisplayName ?? nodeId}' (IsSeedType: {IsPotentialSeedContainer()}, IsContained: {_isContainedInSequence}) had _storedSequence but shouldn't. Nullifying.");
-                    _storedSequence = null;
-                }
+                if (_storedSequence != null) _storedSequence = null;
             }
             return _storedSequence;
         }
-        set 
+        set
         {
             if (_isContainedInSequence || (!IsPotentialSeedContainer() && value != null))
             {
-                // Debug.LogWarning($"Setter: Node '{nodeDisplayName ?? nodeId}' (IsSeedType: {IsPotentialSeedContainer()}, IsContained: {_isContainedInSequence}) cannot have a stored sequence. Current value: {(value == null ? "null" : "not null")}. Nullifying.");
-                _storedSequence = null;
+                _storedSequence = null;      // Disallow illegal assignments
             }
             else
             {
                 _storedSequence = value;
-                if (IsPotentialSeedContainer() && !_isContainedInSequence && _storedSequence != null && _storedSequence.nodes != null)
+                // Ensure all inner nodes know they’re inside a sequence
+                if (_storedSequence?.nodes != null)
                 {
-                    foreach (var nodeInSequence in _storedSequence.nodes)
+                    foreach (var node in _storedSequence.nodes.Where(n => n != null))
                     {
-                        if (nodeInSequence != null)
-                        {
-                            nodeInSequence.SetContainedInSequence(true); 
-                            nodeInSequence._storedSequence = null;      
-                        }
+                        node.SetContainedInSequence(true);
+                        node._storedSequence = null;
                     }
                 }
             }
         }
     }
 
+    // ──────────────────────────────────────
+    // Constructor
+    // ──────────────────────────────────────
     public NodeData()
     {
-        nodeId = Guid.NewGuid().ToString();
-        canBeDeleted = true;
-        _storedSequence = null;
+        nodeId             = Guid.NewGuid().ToString();
+        _storedSequence    = null;
         _isContainedInSequence = false;
     }
 
-    public bool IsPotentialSeedContainer()
-    {
-        if (effects == null) return false;
-        return effects.Any(effect => effect != null && effect.effectType == NodeEffectType.SeedSpawn && effect.isPassive);
-    }
+    // ──────────────────────────────────────
+    // Seed helpers
+    // ──────────────────────────────────────
+    public bool IsPotentialSeedContainer() =>
+        effects != null &&
+        effects.Any(e => e != null &&
+                         e.effectType == NodeEffectType.SeedSpawn &&
+                         e.isPassive);
 
-    public bool IsSeed()
-    {
-        return IsPotentialSeedContainer() && !_isContainedInSequence;
-    }
-    
+    public bool IsSeed() => IsPotentialSeedContainer() && !_isContainedInSequence;
+
     public void SetContainedInSequence(bool isContained)
     {
         _isContainedInSequence = isContained;
-        if (_isContainedInSequence)
-        {
-            _storedSequence = null;
-        }
+        if (isContained) _storedSequence = null;
     }
 
     public void EnsureSeedSequenceInitialized()
     {
-        if (IsPotentialSeedContainer() && !_isContainedInSequence)
+        if (IsPotentialSeedContainer() && !_isContainedInSequence && _storedSequence == null)
         {
-            if (_storedSequence == null)
-            {
-                _storedSequence = new NodeGraph();
-                if (_storedSequence.nodes == null) 
-                {
-                    _storedSequence.nodes = new List<NodeData>();
-                }
-            }
+            _storedSequence = new NodeGraph { nodes = new List<NodeData>() };
         }
-        else
+        else if (!IsPotentialSeedContainer() || _isContainedInSequence)
         {
             _storedSequence = null;
         }
     }
 
-    public void ClearStoredSequence()
-    {
-        _storedSequence = null;
-    }
-    
+    public void ClearStoredSequence() => _storedSequence = null;
+
+    // ──────────────────────────────────────
+    // Serialization guards
+    // ──────────────────────────────────────
     public void CleanForSerialization(int depth = 0, string logPrefix = "CLEAN_SERIALIZE")
     {
-        if (depth > 7) 
+        if (depth > 7)
         {
-            Debug.LogError($"{logPrefix} (Depth {depth}) Node '{nodeDisplayName ?? nodeId}': Serialization clean depth limit. Forcing _storedSequence to null.");
+            Debug.LogError($"{logPrefix} (Depth {depth}) Node '{nodeDisplayName ?? nodeId}': " +
+                           "Serialization clean depth limit. Forcing _storedSequence to null.");
             _storedSequence = null;
             return;
         }
 
         if (_isContainedInSequence || !IsPotentialSeedContainer())
         {
-            if (_storedSequence != null)
-            {
-                // Debug.LogWarning($"{logPrefix} (Depth {depth}) Node '{nodeDisplayName ?? nodeId}': (IsSeedType: {IsPotentialSeedContainer()}, IsContained: {_isContainedInSequence}) had _storedSequence. Nullifying.");
-                _storedSequence = null;
-            }
-            return; 
+            if (_storedSequence != null) _storedSequence = null;
+            return;
         }
 
-        if (_storedSequence != null && _storedSequence.nodes != null)
+        if (_storedSequence?.nodes != null)
         {
-            foreach (var innerNode in _storedSequence.nodes)
+            foreach (var inner in _storedSequence.nodes.Where(n => n != null))
             {
-                if (innerNode == null) continue;
-                innerNode.SetContainedInSequence(true); 
-                innerNode.CleanForSerialization(depth + 1, $"{logPrefix}  Inner");
+                inner.SetContainedInSequence(true);
+                inner.CleanForSerialization(depth + 1, $"{logPrefix} Inner");
             }
         }
-        else if (_storedSequence == null && IsPotentialSeedContainer() && !_isContainedInSequence)
+        else if (_storedSequence == null)
         {
-            // Debug.Log($"{logPrefix} (Depth {depth}) Node '{nodeDisplayName ?? nodeId}': Is a top-level seed container with null _storedSequence. Initializing NodeGraph object.");
-            _storedSequence = new NodeGraph();
-            if (_storedSequence.nodes == null)
-            {
-                _storedSequence.nodes = new List<NodeData>();
-            }
+            _storedSequence = new NodeGraph { nodes = new List<NodeData>() };
         }
     }
 
+    // Unity callback -- before snapshot
     public void OnBeforeSerialize()
     {
         CleanForSerialization(0, $"OBS ({nodeDisplayName ?? nodeId})");
+        // No need to null _storedSequence here; [NonSerialized] already keeps it out of the snapshot.
     }
 
+    // Unity callback -- after load
     public void OnAfterDeserialize()
     {
-        _isContainedInSequence = false; 
+        _isContainedInSequence = false;  // Always start fresh
+        // _storedSequence is already null (not serialised), but we run the cleaner to update flags
         CleanForSerialization(0, $"OADS ({nodeDisplayName ?? nodeId})");
     }
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -6546,72 +6531,60 @@ public class NodeExecutor : MonoBehaviour
         }
     }
     
-    public GameObject SpawnPlantFromInventorySeed(NodeData seedNodeDataFromInventory, Vector3 plantingPosition, Transform parentTransform)
+    public GameObject SpawnPlantFromInventorySeed(NodeData seedData,
+        Vector3  spawnPos,
+        Transform parent)
     {
-        if (seedNodeDataFromInventory == null || !seedNodeDataFromInventory.IsSeed()) 
+        // Validate -----------------------------------------------------------
+        if (seedData == null || !seedData.IsSeed())
         {
-            DebugLogError($"Invalid seed data provided for planting: '{seedNodeDataFromInventory?.nodeDisplayName ?? "NULL"}' IsSeed: {seedNodeDataFromInventory?.IsSeed()}");
+            DebugLogError("SpawnPlantFromInventorySeed called with invalid seed.");
             return null;
         }
-        
         if (plantPrefab == null)
         {
-            DebugLogError("Plant prefab not assigned!");
+            DebugLogError("Plant prefab not assigned.");
             return null;
         }
 
-        seedNodeDataFromInventory.EnsureSeedSequenceInitialized();
-        
-        DebugLog($"Spawning plant from inventory seed '{seedNodeDataFromInventory.nodeDisplayName}' with {seedNodeDataFromInventory.storedSequence?.nodes?.Count ?? 0} internal nodes...");
-        
-        NodeGraph finalGraphForPlant = new NodeGraph();
-        finalGraphForPlant.nodes = new List<NodeData>();
-        
-        NodeData clonedSeedNodeForPlant = CloneNodeData(seedNodeDataFromInventory, false); 
-        if (clonedSeedNodeForPlant == null) { DebugLogError("Failed to clone inventory seed node for plant."); return null; }
+        // Clone seed + internal sequence ------------------------------------
+        seedData.EnsureSeedSequenceInitialized();
 
-        clonedSeedNodeForPlant.orderIndex = 0;
-        clonedSeedNodeForPlant.canBeDeleted = false;
-        finalGraphForPlant.nodes.Add(clonedSeedNodeForPlant);
-        
-        int currentOrderIndex = 1;
-        if (seedNodeDataFromInventory.storedSequence != null && seedNodeDataFromInventory.storedSequence.nodes != null)
+        NodeGraph graph = new NodeGraph { nodes = new List<NodeData>() };
+
+        NodeData seedClone = CloneNodeData(seedData, false);
+        seedClone.orderIndex   = 0;
+        seedClone.canBeDeleted = false;
+        graph.nodes.Add(seedClone);
+
+        int order = 1;
+        if (seedData.storedSequence?.nodes != null)
         {
-            foreach (NodeData nodeInSeedSequence in seedNodeDataFromInventory.storedSequence.nodes.OrderBy(n => n.orderIndex))
+            foreach (NodeData n in seedData.storedSequence.nodes.OrderBy(n => n.orderIndex))
             {
-                if (nodeInSeedSequence == null) continue;
-
-                NodeData clonedSequenceNodeForPlant = CloneNodeData(nodeInSeedSequence, false);
-                if(clonedSequenceNodeForPlant == null) { 
-                    // MODIFIED: Use Debug.LogWarning (standard Unity logging)
-                    Debug.LogWarning($"Failed to clone node '{nodeInSeedSequence.nodeDisplayName}' from inventory seed sequence."); 
-                    continue; 
-                }
-
-                clonedSequenceNodeForPlant.orderIndex = currentOrderIndex++;
-                clonedSequenceNodeForPlant.canBeDeleted = false;
-                finalGraphForPlant.nodes.Add(clonedSequenceNodeForPlant);
+                NodeData clone = CloneNodeData(n, false);
+                if (clone == null) continue;
+                clone.orderIndex   = order++;
+                clone.canBeDeleted = false;
+                graph.nodes.Add(clone);
             }
         }
-        
-        DebugLog($"Constructed final graph for plant with {finalGraphForPlant.nodes.Count} total nodes (1 seed + {finalGraphForPlant.nodes.Count - 1} from sequence).");
-        
-        GameObject plantObj = Instantiate(plantPrefab, plantingPosition, Quaternion.identity, parentTransform);
-        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
 
-        if (growthComponent != null)
+        // Instantiate & initialise ------------------------------------------
+        GameObject plantGO = Instantiate(plantPrefab, spawnPos, Quaternion.identity, parent);
+        PlantGrowth growth = plantGO.GetComponent<PlantGrowth>();
+
+        if (growth == null)
         {
-            growthComponent.InitializeAndGrow(finalGraphForPlant);
-            DebugLog($"Plant '{plantObj.name}' spawned and initialized with seed '{seedNodeDataFromInventory.nodeDisplayName}'.");
-            return plantObj;
-        }
-        else
-        {
-            DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth component! Destroying spawned object.");
-            Destroy(plantObj);
+            DebugLogError("Plant prefab missing PlantGrowth component.");
+            Destroy(plantGO);
             return null;
         }
+
+        growth.InitializeAndGrow(graph);
+        return plantGO;
     }
+
 
     private void DebugLog(string msg) {
         // Commented out for less console spam during normal operation
@@ -6841,46 +6814,34 @@ public class InventoryBarController : MonoBehaviour
     private void UpdateBarDisplay()
     {
         if (inventoryGridController == null) return;
-    
-        // Clear all bar cells first
+
+        /* 1. Clear every bar cell */
         foreach (var cell in barCells)
-        {
             cell.RemoveNode();
-        }
-    
-        // FIXED: Calculate proper inventory access
-        int columnsPerRow = inventoryGridController.inventoryColumns;
-        int startIndex = currentRow * columnsPerRow;
-        int maxInventoryIndex = inventoryGridController.TotalSlots - 1;
-    
-        Debug.Log($"[InventoryBarController] UpdateBarDisplay: CurrentRow={currentRow}, ColumnsPerRow={columnsPerRow}, StartIndex={startIndex}, MaxIndex={maxInventoryIndex}");
-    
-        // Populate current row from inventory
+
+        /* 2. Determine which inventory indices map to this bar row */
+        int columnsPerRow   = inventoryGridController.inventoryColumns;
+        int startIndex      = currentRow * columnsPerRow;
+        int maxInventoryIdx = inventoryGridController.TotalSlots - 1;
+
+        Debug.Log($"[InventoryBarController] UpdateBarDisplay: CurrentRow={currentRow}, ColumnsPerRow={columnsPerRow}, StartIndex={startIndex}, MaxIndex={maxInventoryIdx}");
+
+        /* 3. Copy items into the visible row */
         for (int i = 0; i < slotsPerRow && i < columnsPerRow; i++)
         {
             int inventoryIndex = startIndex + i;
-        
-            // FIXED: Bounds check before accessing inventory
-            if (inventoryIndex > maxInventoryIndex)
-            {
-                Debug.Log($"[InventoryBarController] Skipping bar slot {i}, inventory index {inventoryIndex} is beyond max {maxInventoryIndex}");
-                continue;
-            }
-        
-            var inventoryCell = inventoryGridController.GetInventoryCellAtIndex(inventoryIndex);
-        
-            if (inventoryCell != null && inventoryCell.HasNode())
-            {
-                // Copy the content from inventory cell to bar cell
-                CopyInventoryItemToBarCell(inventoryCell, barCells[i]);
-            }
+            if (inventoryIndex > maxInventoryIdx) continue;
+
+            var invCell = inventoryGridController.GetInventoryCellAtIndex(inventoryIndex);
+            if (invCell != null && invCell.HasNode())
+                CopyInventoryItemToBarCell(invCell, barCells[i]);
         }
-    
-        // Update arrow buttons
-        if (upArrowButton != null) upArrowButton.interactable = currentRow > 0;
-        if (downArrowButton != null) upArrowButton.interactable = currentRow < totalRows - 1;
-    
-        Debug.Log($"[InventoryBarController] UpdateBarDisplay: Row {currentRow}/{totalRows-1}, StartIndex={startIndex}");
+
+        /* 4. Enable / disable arrows so they can't overshoot */
+        if (upArrowButton   != null) upArrowButton.interactable   = currentRow > 0;
+        if (downArrowButton != null) downArrowButton.interactable = currentRow < totalRows - 1;
+
+        Debug.Log($"[InventoryBarController] UpdateBarDisplay: Row {currentRow}/{totalRows - 1}");
     }
     
     private void CopyInventoryItemToBarCell(NodeCell inventoryCell, NodeCell barCell)
@@ -6913,16 +6874,25 @@ public class InventoryBarController : MonoBehaviour
         // Create a visual representation of the tool (not draggable)
         GameObject toolDisplay = new GameObject($"ToolDisplay_{toolDef.displayName}", typeof(RectTransform), typeof(Image));
         toolDisplay.transform.SetParent(barCell.transform, false);
-        
+
         Image toolImage = toolDisplay.GetComponent<Image>();
         toolImage.sprite = toolDef.icon;
         toolImage.color = toolDef.iconTint;
         toolImage.raycastTarget = false; // Not interactive in bar
-        
+
+        // Apply the same global‐image scale that InventoryGridController uses
+        float globalScale = 1f;
+        if (InventoryGridController.Instance != null)
+        {
+            globalScale = InventoryGridController.Instance.NodeGlobalImageScale;
+        }
+        toolDisplay.transform.localScale = new Vector3(globalScale, globalScale, 1f);
+
         RectTransform toolRect = toolDisplay.GetComponent<RectTransform>();
         toolRect.anchoredPosition = Vector2.zero;
+        // Keep the same relative padding inside each bar cell (80% of cell size)
         toolRect.sizeDelta = cellSize * 0.8f;
-        
+
         // Store reference in the cell (but don't make it draggable)
         barCell.AssignDisplayOnly(toolDisplay, nodeData, toolDef);
     }
@@ -6932,16 +6902,25 @@ public class InventoryBarController : MonoBehaviour
         // Create a visual representation of the node (not draggable)
         GameObject nodeDisplay = new GameObject($"NodeDisplay_{nodeDef.displayName}", typeof(RectTransform), typeof(Image));
         nodeDisplay.transform.SetParent(barCell.transform, false);
-        
+
         Image nodeImage = nodeDisplay.GetComponent<Image>();
         nodeImage.sprite = nodeDef.thumbnail;
         nodeImage.color = nodeDef.thumbnailTintColor;
         nodeImage.raycastTarget = false; // Not interactive in bar
-        
+
+        // Apply the same global‐image scale that InventoryGridController uses
+        float globalScale = 1f;
+        if (InventoryGridController.Instance != null)
+        {
+            globalScale = InventoryGridController.Instance.NodeGlobalImageScale;
+        }
+        nodeDisplay.transform.localScale = new Vector3(globalScale, globalScale, 1f);
+
         RectTransform nodeRect = nodeDisplay.GetComponent<RectTransform>();
         nodeRect.anchoredPosition = Vector2.zero;
+        // Keep the same relative padding inside each bar cell (80% of cell size)
         nodeRect.sizeDelta = cellSize * 0.8f;
-        
+
         // Store reference in the cell (but don't make it draggable)
         barCell.AssignDisplayOnly(nodeDisplay, nodeData, null);
     }
@@ -7719,7 +7698,6 @@ public class InventoryGridController : MonoBehaviour
 // FILE: Assets\Scripts\Nodes\UI\NodeCell.cs
 ////////////////////////////////////////////////////////////////////////////////
 ﻿// FILE: Assets/Scripts/Nodes/UI/NodeCell.cs
-
 using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -7729,19 +7707,21 @@ using UnityEngine.UI;
 public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 {
     public static NodeCell CurrentlySelectedCell { get; private set; }
-    public int CellIndex { get; private set; }
+
+    public int  CellIndex       { get; private set; }
     public bool IsInventoryCell { get; private set; }
-    public bool IsSeedSlot { get; private set; }
+    public bool IsSeedSlot      { get; private set; }
 
     private NodeEditorGridController _sequenceController;
-    private InventoryGridController _inventoryController;
+    private InventoryGridController  _inventoryController;
 
-    private NodeData _nodeData;
-    private NodeView _nodeView;
+    private NodeData   _nodeData;
+    private NodeView   _nodeView;
+    private ToolDefinition _toolDefinition;
 
     private Image _backgroundImage;
     
-    private ToolDefinition _toolDefinition;
+    private GameObject _displayObject;   // holds the “display-only” icon used in the inventory bar
 
     public void Init(int index, NodeEditorGridController sequenceController, InventoryGridController inventoryController, Image bgImage)
     {
@@ -7793,7 +7773,9 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 
     public bool HasNode()
     {
-        return (_nodeData != null && _nodeView != null) || (_nodeData != null && _toolDefinition != null);
+        // Bar-copy cells: _nodeData != null, _nodeView == null, _toolDefinition == null
+        // Tool cells     : _toolDefinition != null
+        return _nodeData != null || _toolDefinition != null;
     }
 
     public NodeData GetNodeData()
@@ -7946,40 +7928,51 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
     public void RemoveNode()
     {
         bool wasSelected = (CurrentlySelectedCell == this && !IsInventoryCell && !IsSeedSlot);
-        if (_nodeView != null) {
+
+        /* 1. Destroy the interactive NodeView (sequence / inventory) */
+        if (_nodeView != null)
+        {
             if (wasSelected) _nodeView.Unhighlight();
             Destroy(_nodeView.gameObject);
         }
-        _nodeView = null;
-        _nodeData = null;
-        _toolDefinition = null;
+
+        /* 2. Destroy any display-only object that AssignDisplayOnly() created */
+        if (_displayObject != null)
+        {
+            Destroy(_displayObject);
+            _displayObject = null;
+        }
+
+        /* 3. Reset state */
+        _nodeView        = null;
+        _nodeData        = null;
+        _toolDefinition  = null;
         if (wasSelected) NodeCell.ClearSelection();
 
         if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
-        
+
         Debug.Log($"[NodeCell {CellIndex}] RemoveNode: Cleared all references");
     }
 
     public void AssignDisplayOnly(GameObject displayObject, NodeData data, ToolDefinition toolDef)
     {
-        RemoveNode();
-    
-        _nodeView = null; 
-        _nodeData = data;
-        _toolDefinition = toolDef;
+        RemoveNode();                    // clears any prior content
 
-        // These are display only, NodeData.storedSequence is not relevant here.
-    
-        if (displayObject != null)
+        _nodeView       = null;
+        _nodeData       = data;
+        _toolDefinition = toolDef;
+        _displayObject  = displayObject; // remember so RemoveNode can clean it up
+
+        if (_displayObject != null)
         {
-            displayObject.transform.SetParent(transform, false);
-            RectTransform displayRect = displayObject.GetComponent<RectTransform>();
-            if (displayRect != null) displayRect.anchoredPosition = Vector2.zero;
-        
+            _displayObject.transform.SetParent(transform, false);
+            RectTransform rect = _displayObject.GetComponent<RectTransform>();
+            if (rect != null) rect.anchoredPosition = Vector2.zero;
+
             if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
         }
         else if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
-        
+
         Debug.Log($"[NodeCell {CellIndex}] AssignDisplayOnly: Item='{data?.nodeDisplayName ?? toolDef?.displayName}', IsDisplayOnly=true");
     }
 
@@ -9921,62 +9914,37 @@ public class PlantPlacementManager : MonoBehaviour
         return false;
     }
     
-    public bool TryPlantSeedFromInventory(InventoryBarItem seedItem, Vector3Int gridPosition, Vector3 worldPosition)
+    public bool TryPlantSeedFromInventory(InventoryBarItem seedItem,
+        Vector3Int      gridPosition,
+        Vector3         worldPosition)
     {
-        if (seedItem == null || !seedItem.IsSeed())
-        {
-            if (showDebugMessages) Debug.Log("Invalid seed item provided for planting from inventory.");
-            return false;
-        }
-        
-        if (showDebugMessages)
-            Debug.Log($"[PlantPlacementManager] TryPlantSeedFromInventory for '{seedItem.GetDisplayName()}' at grid: {gridPosition}, world: {worldPosition}");
-            
-        CleanupDestroyedPlants();
-        if (IsPositionOccupied(gridPosition))
-        {
-            if (showDebugMessages) Debug.Log($"Cannot plant from inventory: Position {gridPosition} occupied.");
-            return false;
-        }
-        
+        if (seedItem == null || !seedItem.IsSeed())                     return false;
+        if (IsPositionOccupied(gridPosition))                           return false;
+
         TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
-        if (!IsTileValidForPlanting(tileDef))
-        {
-            if (showDebugMessages) Debug.Log($"Cannot plant from inventory: Tile {tileDef?.displayName ?? "Unknown"} invalid at {gridPosition}.");
-            return false;
-        }
-        
-        if (nodeExecutor == null)
-        {
-            Debug.LogError("Cannot plant from inventory: NodeExecutor reference is missing in PlantPlacementManager.");
-            return false;
-        }
-        
-        Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition); 
-        GameObject plantObj = nodeExecutor.SpawnPlantFromInventorySeed(seedItem.NodeData, plantingPosition, plantParent);
-        
-        if (plantObj != null)
-        {
-            plantsByGridPosition[gridPosition] = plantObj;
-            PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
-            if (growthModifierManager != null && plantGrowth != null)
-            {
-                growthModifierManager.RegisterPlantTile(plantGrowth, tileDef);
-                if (showDebugMessages) Debug.Log($"Plant (from inventory) registered with tile: {tileDef?.displayName ?? "Unknown"}");
-            }
-            
-            GardenerController gardener = FindAnyObjectByType<GardenerController>();
-            if (gardener != null)
-            {
-                gardener.Plant(); 
-            }
-            
-            return true;
-        }
-        
-        if (showDebugMessages) Debug.Log($"Failed to plant seed (from inventory) at {gridPosition} (NodeExecutor returned null for seed '{seedItem.GetDisplayName()}').");
-        return false;
+        if (!IsTileValidForPlanting(tileDef))                           return false;
+        if (nodeExecutor == null)                                       return false;
+
+        Vector3  spawnPos  = GetRandomizedPlantingPosition(worldPosition);
+        GameObject plantGO = nodeExecutor.SpawnPlantFromInventorySeed(
+            seedItem.NodeData, spawnPos, plantParent);
+
+        if (plantGO == null)                                            return false;
+
+        plantsByGridPosition[gridPosition] = plantGO;
+
+        // Register growth modifiers
+        PlantGrowth pg = plantGO.GetComponent<PlantGrowth>();
+        if (pg != null && growthModifierManager != null)
+            growthModifierManager.RegisterPlantTile(pg, tileDef);
+
+        // Optional planting animation
+        GardenerController g = FindAnyObjectByType<GardenerController>();
+        if (g != null) g.Plant();
+
+        return true;
     }
+
 
     private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
     {
@@ -10001,201 +9969,166 @@ public class PlantPlacementManager : MonoBehaviour
 ﻿// FILE: Assets/Scripts/Tiles/Data/PlayerTileInteractor.cs
 using UnityEngine;
 
-public class PlayerTileInteractor : MonoBehaviour
+[DefaultExecutionOrder(100)] // Ensures LateUpdate runs after TileInteractionManager.Update
+public sealed class PlayerTileInteractor : MonoBehaviour
 {
-    [Header("Debug")]
-    [SerializeField] private bool showDebugMessages = false;
-    
-    private InventoryBarController inventoryBar;
-    private TileInteractionManager tileInteractionManager; 
-    private Transform playerTransform; 
+    [Header("Scene References (optional)")]
+    [Tooltip("InventoryBarController in the scene. If left empty, the script will auto-locate it.")]
+    [SerializeField] private InventoryBarController inventoryBar;
 
-    private void Awake()
+    [Tooltip("TileInteractionManager in the scene. If left empty, the script will auto-locate it.")]
+    [SerializeField] private TileInteractionManager tileInteractionManager;
+
+    [Tooltip("Transform used to measure distance from player to target tile. Defaults to this transform.")]
+    [SerializeField] private Transform playerTransform;
+
+    [Header("Debug")]
+    [SerializeField] private bool showDebug = false;
+
+    private bool pendingClick;
+
+    void Awake()
     {
-        playerTransform = transform; 
+        if (playerTransform == null) playerTransform = transform;
     }
-    
-    private void Start()
+
+    void Start()
     {
-        inventoryBar = InventoryBarController.Instance;
-        if (inventoryBar == null && showDebugMessages)
+        FindSingletons();
+        if (showDebug)
         {
-            Debug.LogWarning("[PlayerTileInteractor] InventoryBarController instance not found!");
-        }
-        tileInteractionManager = TileInteractionManager.Instance;
-        if (tileInteractionManager == null && showDebugMessages)
-        {
-            Debug.LogWarning("[PlayerTileInteractor] TileInteractionManager instance not found!");
+            if (inventoryBar == null)
+                Debug.LogWarning("[PTI] InventoryBarController not found in scene.");
+            if (tileInteractionManager == null)
+                Debug.LogWarning("[PTI] TileInteractionManager not found in scene.");
         }
     }
 
     void Update()
     {
-        if (RunManager.Instance == null || RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
+        if (RunManager.Instance == null ||
+            RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
             return;
-        
+
         if (Input.GetMouseButtonDown(0))
-        {
-            HandleLeftClick();
-        }
+            pendingClick = true;
     }
-    
-    private void HandleLeftClick()
+
+    void LateUpdate()
     {
-        if (tileInteractionManager == null)
-        {
-            Debug.LogError("No TileInteractionManager in scene!");
-            return;
-        }
-    
-        if (inventoryBar == null)
-        {
-            inventoryBar = InventoryBarController.Instance; 
-            if (inventoryBar == null)
-            {
-                if (showDebugMessages) Debug.LogWarning("No InventoryBarController available!");
-                return;
-            }
-        }
-    
-        var selectedItem = inventoryBar.SelectedItem;
-    
-        if (showDebugMessages) 
-        {
-            Debug.Log($"[PlayerTileInteractor] HandleLeftClick - SelectedItem: {selectedItem?.GetDisplayName() ?? "NULL"}");
-            if (selectedItem != null)
-            {
-                Debug.Log($"[PlayerTileInteractor] Item Type: {selectedItem.Type}, IsSeed: {selectedItem.IsSeed()}, IsValid: {selectedItem.IsValid()}");
-            }
-        }
-    
-        if (selectedItem == null || !selectedItem.IsValid())
-        {
-            if (showDebugMessages) Debug.Log("No valid item selected in inventory bar.");
-            return;
-        }
-
-        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorldPos.z = 0f;
-        Vector3Int gridPosition = tileInteractionManager.WorldToCell(mouseWorldPos);
-        Vector3 cellCenterWorld = tileInteractionManager.interactionGrid.GetCellCenterWorld(gridPosition);
-
-        float distanceToCell = Vector2.Distance(playerTransform.position, cellCenterWorld);
-        float interactionRadius = tileInteractionManager.hoverRadius; 
-
-        if (distanceToCell > interactionRadius)
-        {
-            if (showDebugMessages) Debug.Log($"[PlayerTileInteractor] Clicked cell {gridPosition} is too far ({distanceToCell:F2} > {interactionRadius:F2}). Action aborted.");
-            return;
-        }
-        if (showDebugMessages) Debug.Log($"[PlayerTileInteractor] Clicked cell {gridPosition} (World: {cellCenterWorld}) is within range ({distanceToCell:F2} <= {interactionRadius:F2}).");
-    
-        if (selectedItem.Type == InventoryBarItem.ItemType.Tool)
-        {
-            if (showDebugMessages) Debug.Log($"Using tool: {selectedItem.GetDisplayName()} on tile {gridPosition}");
-            tileInteractionManager.ApplyToolAction(selectedItem.ToolDefinition);
-        }
-        else if (selectedItem.Type == InventoryBarItem.ItemType.Node && selectedItem.IsSeed())
-        {
-            if (showDebugMessages) Debug.Log($"Attempting to plant seed: {selectedItem.GetDisplayName()} on tile {gridPosition}");
-            HandleSeedPlanting(selectedItem, gridPosition, cellCenterWorld); 
-        }
-        else
-        {
-            if (showDebugMessages) Debug.Log($"Selected item '{selectedItem.GetDisplayName()}' cannot be used for tile interaction at {gridPosition}.");
-        }
+        if (!pendingClick) return;
+        pendingClick = false;
+        HandleLeftClick();
     }
-    
-    private void HandleSeedPlanting(InventoryBarItem seedItem, Vector3Int gridPosition, Vector3 worldPosition)
+
+    void HandleLeftClick()
     {
-        if (PlantPlacementManager.Instance == null)
+        if (!EnsureManagers()) return;
+
+        InventoryBarItem selected = inventoryBar.SelectedItem;
+        if (selected == null || !selected.IsValid())
         {
-            Debug.LogError("PlantPlacementManager not found!");
+            if (showDebug) Debug.Log("[PTI] Left-click ignored – nothing selected.");
             return;
         }
 
-        if (showDebugMessages)
+        Vector3 mouseW = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseW.z = 0f;
+        Vector3Int cellPos = tileInteractionManager.WorldToCell(mouseW);
+        Vector3 cellCenter = tileInteractionManager.interactionGrid.GetCellCenterWorld(cellPos);
+
+        float dist = Vector2.Distance(playerTransform.position, cellCenter);
+        if (dist > tileInteractionManager.hoverRadius)
         {
-            Debug.Log($"[PlayerTileInteractor] HandleSeedPlanting for seed '{seedItem.GetDisplayName()}' at grid: {gridPosition}, world: {worldPosition}");
-            if (seedItem.NodeData != null)
+            if (showDebug) Debug.Log($"[PTI] Cell too far ({dist:F2}>{tileInteractionManager.hoverRadius}).");
+            return;
+        }
+
+        // TOOL
+        if (selected.Type == InventoryBarItem.ItemType.Tool)
+        {
+            if (showDebug) Debug.Log($"[PTI] Using tool “{selected.GetDisplayName()}”.");
+            tileInteractionManager.ApplyToolAction(selected.ToolDefinition);
+            return;
+        }
+
+        // SEED
+        if (selected.Type == InventoryBarItem.ItemType.Node && selected.IsSeed())
+        {
+            if (showDebug) Debug.Log($"[PTI] Planting seed “{selected.GetDisplayName()}”.");
+            bool planted = PlantPlacementManager.Instance != null &&
+                           PlantPlacementManager.Instance.TryPlantSeedFromInventory(
+                               selected, cellPos, cellCenter);
+
+            if (planted)
             {
-                Debug.Log($"  Seed ID: {seedItem.NodeData.nodeId}, Stored Seq Count: {seedItem.NodeData.storedSequence?.nodes?.Count ?? 0}");
-                 if (seedItem.NodeData.storedSequence?.nodes != null)
-                 {
-                     foreach(var nodeInSeq in seedItem.NodeData.storedSequence.nodes)
-                     {
-                         if (nodeInSeq != null) Debug.Log($"    - Seq Node: {nodeInSeq.nodeDisplayName}, Effects: {nodeInSeq.effects?.Count ?? 0}");
-                     }
-                 }
+                RemoveSeedFromInventory(selected);
+                inventoryBar.ShowBar();
             }
-        }
-
-        bool success = PlantPlacementManager.Instance.TryPlantSeedFromInventory(seedItem, gridPosition, worldPosition);
-
-        if (success)
-        {
-            if (showDebugMessages) Debug.Log($"Successfully planted seed: {seedItem.GetDisplayName()}");
-            RemoveSeedFromInventory(seedItem);
-            if (inventoryBar != null) inventoryBar.ShowBar(); 
-        }
-        else
-        {
-            if (showDebugMessages) Debug.Log($"Failed to plant seed: {seedItem.GetDisplayName()} at {gridPosition}. Check PlantPlacementManager logs.");
-        }
-    }
-    
-    private void RemoveSeedFromInventory(InventoryBarItem seedItem)
-    {
-        if (seedItem?.NodeData == null)
-        {
-            if (showDebugMessages) Debug.LogWarning("[PlayerTileInteractor] RemoveSeedFromInventory: seedItem or NodeData is null.");
-            return;
-        }
-    
-        var inventoryController = InventoryGridController.Instance;
-        if (inventoryController == null)
-        {
-            if (showDebugMessages) Debug.LogWarning("[PlayerTileInteractor] RemoveSeedFromInventory: InventoryGridController is null.");
-            return;
-        }
-    
-        if (seedItem.ViewGameObject != null)
-        {
-            for (int i = 0; i < inventoryController.ActualCellCount; i++) 
+            else if (showDebug)
             {
-                var cell = inventoryController.GetInventoryCellAtIndex(i);
-                if (cell != null && cell.HasNode())
+                Debug.Log("[PTI] PlantPlacementManager returned FALSE.");
+            }
+            return;
+        }
+
+        if (showDebug)
+            Debug.Log($"[PTI] Item “{selected.GetDisplayName()}” is not usable.");
+    }
+
+    void RemoveSeedFromInventory(InventoryBarItem seed)
+    {
+        InventoryGridController grid = InventoryGridController.Instance;
+        if (grid == null) return;
+
+        if (seed.ViewGameObject != null)
+        {
+            for (int i = 0; i < grid.ActualCellCount; i++)
+            {
+                NodeCell cell = grid.GetInventoryCellAtIndex(i);
+                if (cell != null && cell.GetNodeView()?.gameObject == seed.ViewGameObject)
                 {
-                    var nodeView = cell.GetNodeView();
-                    if (nodeView != null && nodeView.gameObject == seedItem.ViewGameObject)
-                    {
-                        if (showDebugMessages) Debug.Log($"[PlayerTileInteractor] Removing seed '{seedItem.GetDisplayName()}' from inventory slot {i} (matched by ViewGameObject: {seedItem.ViewGameObject.name}).");
-                        cell.RemoveNode(); 
-                        return;
-                    }
-                }
-            }
-            if (showDebugMessages) Debug.LogWarning($"[PlayerTileInteractor] Could not find seed '{seedItem.GetDisplayName()}' by ViewGameObject. Falling back to NodeData ID search.");
-        }
-    
-        for (int i = 0; i < inventoryController.ActualCellCount; i++) 
-        {
-            var cell = inventoryController.GetInventoryCellAtIndex(i);
-            if (cell != null && cell.HasNode())
-            {
-                var cellNodeData = cell.GetNodeData();
-                if (cellNodeData != null && cellNodeData.nodeId == seedItem.NodeData.nodeId && cellNodeData.IsSeed())
-                {
-                    if (showDebugMessages) Debug.Log($"[PlayerTileInteractor] Removing seed '{seedItem.GetDisplayName()}' (ID: {seedItem.NodeData.nodeId}) from inventory slot {i} (matched by NodeData ID).");
                     cell.RemoveNode();
                     return;
                 }
             }
         }
-    
-        if (showDebugMessages) Debug.LogWarning($"[PlayerTileInteractor] Could not find seed '{seedItem.GetDisplayName()}' (ID: {seedItem.NodeData.nodeId}) in inventory to remove after planting.");
+
+        for (int i = 0; i < grid.ActualCellCount; i++)
+        {
+            NodeCell cell = grid.GetInventoryCellAtIndex(i);
+            if (cell != null && cell.GetNodeData()?.nodeId == seed.NodeData.nodeId)
+            {
+                cell.RemoveNode();
+                return;
+            }
+        }
+    }
+
+    bool EnsureManagers()
+    {
+        if (tileInteractionManager == null || inventoryBar == null)
+            FindSingletons();
+
+        return tileInteractionManager != null && inventoryBar != null;
+    }
+
+    void FindSingletons()
+    {
+        if (inventoryBar == null)
+        {
+            inventoryBar = InventoryBarController.Instance
+                           ?? FindAnyObjectByType<InventoryBarController>(FindObjectsInactive.Include);
+        }
+
+        if (tileInteractionManager == null)
+        {
+            tileInteractionManager = TileInteractionManager.Instance
+                                     ?? FindAnyObjectByType<TileInteractionManager>(FindObjectsInactive.Include);
+        }
     }
 }
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
