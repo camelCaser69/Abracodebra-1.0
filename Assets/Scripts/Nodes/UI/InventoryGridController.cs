@@ -23,7 +23,7 @@ public class InventoryGridController : MonoBehaviour
 
     [Header("Node Visuals (Shared or Specific)")]
     [SerializeField] private GameObject nodeViewPrefab;
-    [SerializeField] private GameObject toolViewPrefab; // NEW: Add this field
+    [SerializeField] private GameObject toolViewPrefab; 
     [Tooltip("Uniform scale factor for the gene/item image (thumbnail) within NodeViews. Default is 1.")]
     [SerializeField] private float nodeGlobalImageScale = 1f;
     [Tooltip("Padding to shrink the raycast area of node images. Negative values shrink. Default 0.")]
@@ -43,10 +43,7 @@ public class InventoryGridController : MonoBehaviour
     public float NodeGlobalImageScale => nodeGlobalImageScale;
     public float NodeImageRaycastPadding => nodeImageRaycastPadding;
     
-    // Get total slots
     public int TotalSlots => inventoryRows * inventoryColumns;
-    
-    // FIXED: Add property to get actual count of created cells
     public int ActualCellCount => inventoryCells?.Count ?? 0;
 
     void Awake()
@@ -111,7 +108,6 @@ public class InventoryGridController : MonoBehaviour
             return;
         }
 
-        // FIXED: First add auto-add tools
         if (availableTools != null)
         {
             foreach (var tool in availableTools)
@@ -128,7 +124,6 @@ public class InventoryGridController : MonoBehaviour
             }
         }
 
-        // Then add gene definitions (if there's space remaining)
         NodeDefinitionLibrary lib = NodeEditorGridController.Instance.DefinitionLibrary;
         if (lib.definitions != null) {
             int remainingSlots = TotalSlots - GetUsedSlotCount();
@@ -153,25 +148,24 @@ public class InventoryGridController : MonoBehaviour
             return false;
         }
     
-        // Create NodeData for the tool
         NodeData toolNodeData = new NodeData()
         {
             nodeId = tool.name + "_tool_" + System.Guid.NewGuid().ToString(),
             nodeDisplayName = tool.displayName,
-            effects = new List<NodeEffectData>(),
+            effects = new List<NodeEffectData>(), 
             orderIndex = -1, 
             canBeDeleted = false,
-            storedSequence = new NodeGraph()
+            storedSequence = null // Explicitly null for tools
         };
+        // toolNodeData.IsSeed() will be false, so EnsureSeedSequenceInitialized() would also null it.
     
-        // Create the tool view
         GameObject toolViewGO = CreateToolView(tool, emptyCell.transform);
         if (toolViewGO != null)
         {
-            // Initialize the ToolView component
             ToolView toolView = toolViewGO.GetComponent<ToolView>();
             if (toolView != null)
             {
+                // ToolView.Initialize will also ensure toolNodeData.storedSequence is null.
                 toolView.Initialize(toolNodeData, tool);
             }
             else
@@ -181,11 +175,9 @@ public class InventoryGridController : MonoBehaviour
                 return false;
             }
         
-            // Setup draggable behavior
             NodeDraggable draggable = toolViewGO.GetComponent<NodeDraggable>() ?? toolViewGO.AddComponent<NodeDraggable>();
             draggable.Initialize(invCtrl: this, startingCell: emptyCell);
         
-            // Assign to cell
             emptyCell.AssignToolView(toolViewGO, toolNodeData, tool);
         
             if (logInventoryChanges) 
@@ -199,7 +191,6 @@ public class InventoryGridController : MonoBehaviour
 
     private GameObject CreateToolView(ToolDefinition tool, Transform parent)
     {
-        // FIXED: Use dedicated ToolView prefab if available, fallback to NodeView prefab
         GameObject prefabToUse = toolViewPrefab != null ? toolViewPrefab : nodeViewPrefab;
     
         if (prefabToUse == null)
@@ -208,50 +199,42 @@ public class InventoryGridController : MonoBehaviour
             return null;
         }
     
-        GameObject toolView = Instantiate(prefabToUse, parent);
-        toolView.name = $"ToolView_{tool.displayName}";
+        GameObject toolViewInstance = Instantiate(prefabToUse, parent);
+        toolViewInstance.name = $"ToolView_{tool.displayName}";
     
-        // If using NodeView prefab, convert it to ToolView
         if (prefabToUse == nodeViewPrefab)
         {
-            // Remove NodeView component if it exists
-            NodeView existingNodeView = toolView.GetComponent<NodeView>();
+            NodeView existingNodeView = toolViewInstance.GetComponent<NodeView>();
             if (existingNodeView != null)
             {
-                DestroyImmediate(existingNodeView);
+                DestroyImmediate(existingNodeView); // Use DestroyImmediate if in editor context or for cleaner removal
             }
-        
-            // Add ToolView component
-            ToolView toolViewComponent = toolView.AddComponent<ToolView>();
+            toolViewInstance.AddComponent<ToolView>();
         }
-        // If using ToolView prefab, it should already have ToolView component
         else
         {
-            ToolView toolViewComponent = toolView.GetComponent<ToolView>();
+            ToolView toolViewComponent = toolViewInstance.GetComponent<ToolView>();
             if (toolViewComponent == null)
             {
                 Debug.LogError($"[Inventory] ToolView prefab '{prefabToUse.name}' is missing ToolView component!");
-                toolViewComponent = toolView.AddComponent<ToolView>();
+                toolViewInstance.AddComponent<ToolView>();
             }
         }
     
-        return toolView;
+        return toolViewInstance;
     }
 
-    // Get used slot count
     private int GetUsedSlotCount()
     {
         return inventoryCells.Count(cell => cell.HasNode());
     }
 
-    // <<< ENHANCED: Tries to use targetCellHint if provided and empty >>>
     public bool AddGeneToInventoryFromDefinition(NodeDefinition geneDef, NodeCell targetCellHint)
 {
     if (geneDef == null) return false;
 
     NodeCell cellToUse = null;
 
-    // If a target cell hint is provided and it's actually an empty inventory cell, use it.
     if (targetCellHint != null && targetCellHint.IsInventoryCell && !targetCellHint.HasNode())
     {
         cellToUse = targetCellHint;
@@ -259,7 +242,6 @@ public class InventoryGridController : MonoBehaviour
     }
     else
     {
-        // Fallback: find the first available empty cell
         cellToUse = inventoryCells.FirstOrDefault(cell => !cell.HasNode());
     }
     
@@ -268,21 +250,24 @@ public class InventoryGridController : MonoBehaviour
         NodeData inventoryNodeData = new NodeData() {
             nodeId = geneDef.name + "_inventory_" + System.Guid.NewGuid().ToString(),
             nodeDisplayName = geneDef.displayName,
-            effects = geneDef.CloneEffects(),
+            effects = geneDef.CloneEffects(), // Effects are cloned
             orderIndex = -1, 
             canBeDeleted = false,
-            storedSequence = new NodeGraph() // This should be empty for regular nodes, but populated for seeds
+            storedSequence = null // Start with null
         };
 
-        // IMPORTANT: If this is a seed, it needs its stored sequence!
-        // For now, seeds added from definitions start with empty sequences
-        // The sequence gets populated when edited in the seed slot
+        // If the definition is for a seed, initialize its sequence storage.
+        // Otherwise, storedSequence remains null.
+        inventoryNodeData.EnsureSeedSequenceInitialized();
+        
+        // CRITICAL: Clean any nested sequences that might have been created
+        inventoryNodeData.ForceCleanNestedSequences();
         
         GameObject nodeViewGO = Instantiate(nodeViewPrefab, cellToUse.transform);
         NodeView view = nodeViewGO.GetComponent<NodeView>();
         if (view == null) { Destroy(nodeViewGO); return false; }
         
-        view.Initialize(inventoryNodeData, geneDef, null);
+        view.Initialize(inventoryNodeData, geneDef, null); 
 
         NodeDraggable draggable = view.GetComponent<NodeDraggable>() ?? view.gameObject.AddComponent<NodeDraggable>();
         draggable.Initialize(invCtrl: this, startingCell: cellToUse);
@@ -291,11 +276,7 @@ public class InventoryGridController : MonoBehaviour
         
         if (logInventoryChanges) 
         {
-            Debug.Log($"[Inventory] Added '{geneDef.displayName}' to inv cell {cellToUse.CellIndex}. IsSeed: {inventoryNodeData.IsSeed()}");
-            if (inventoryNodeData.IsSeed())
-            {
-                Debug.Log($"[Inventory] Seed's stored sequence has {inventoryNodeData.storedSequence?.nodes?.Count ?? 0} nodes");
-            }
+            Debug.Log($"[Inventory] Added '{geneDef.displayName}' to inv cell {cellToUse.CellIndex}. IsSeed: {inventoryNodeData.IsSeed()}, StoredSeq: {(inventoryNodeData.storedSequence != null ? (inventoryNodeData.storedSequence.nodes != null ? inventoryNodeData.storedSequence.nodes.Count.ToString() + " nodes" : "graph exists") : "null")}");
         }
         return true;
     }
@@ -306,7 +287,6 @@ public class InventoryGridController : MonoBehaviour
     
     public InventoryBarItem GetItemAtIndex(int index)
     {
-        // FIXED: Add bounds checking
         if (index >= 0 && index < inventoryCells.Count)
         {
             var cell = inventoryCells[index];
@@ -315,7 +295,15 @@ public class InventoryGridController : MonoBehaviour
                 var toolDef = cell.GetToolDefinition();
                 if (toolDef != null)
                 {
-                    return InventoryBarItem.FromTool(toolDef, cell.GetNodeView()?.gameObject);
+                    // For tools, NodeView might be null if a dedicated ToolView prefab was used and that GO is passed.
+                    // Or it might be the NodeView if it was converted.
+                    GameObject viewObj = cell.GetNodeView()?.gameObject; 
+                    if (viewObj == null) // Check if it was a ToolView directly on the cell's child
+                    {
+                        ToolView tv = cell.transform.GetComponentInChildren<ToolView>();
+                        if (tv != null) viewObj = tv.gameObject;
+                    }
+                    return InventoryBarItem.FromTool(toolDef, viewObj);
                 }
                 else
                 {
@@ -337,8 +325,6 @@ public class InventoryGridController : MonoBehaviour
         return null;
     }
 
-    // This method takes an *existing* NodeView and its *existing* NodeData (e.g., from seed slot or sequence editor)
-    // and places it into an inventory slot.
     public void ReturnGeneToInventory(NodeView geneViewToReturn, NodeData geneDataToReturn)
     {
         if (geneViewToReturn == null || geneDataToReturn == null)
@@ -356,9 +342,12 @@ public class InventoryGridController : MonoBehaviour
             return;
         }
 
-        // Update NodeData properties for inventory context
         geneDataToReturn.orderIndex = -1;
-        geneDataToReturn.canBeDeleted = false;
+        geneDataToReturn.canBeDeleted = false; // Typically false for items returned to inventory
+
+        // If it's a seed being returned, its storedSequence should be preserved.
+        // EnsureSeedSequenceInitialized will create it if it was somehow nulled and it IS a seed.
+        geneDataToReturn.EnsureSeedSequenceInitialized();
 
         emptyCell.AssignNodeView(geneViewToReturn, geneDataToReturn);
 
@@ -377,7 +366,7 @@ public class InventoryGridController : MonoBehaviour
         if (removedData != null) {
             if (logInventoryChanges) Debug.Log($"[Inventory] Dragged out '{removedData.nodeDisplayName}' from inv cell {inventoryCell.CellIndex}");
         }
-        inventoryCell.ClearNodeReference();
+        inventoryCell.ClearNodeReference(); // This will make the cell available again
     }
 
     public NodeCell FindInventoryCellAtScreenPosition(Vector2 screenPosition)
@@ -393,176 +382,157 @@ public class InventoryGridController : MonoBehaviour
     }
 
     public void HandleDropOnInventoryCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetInventoryCell)
-{
-    if (draggedDraggable == null || originalCell == null || targetInventoryCell == null || !targetInventoryCell.IsInventoryCell) {
-        if (logInventoryChanges) Debug.LogWarning($"[Inventory HandleDrop] Pre-condition fail. Dragged: {draggedDraggable != null}, Orig: {originalCell != null}, Target: {targetInventoryCell != null}, TargetIsInv: {targetInventoryCell?.IsInventoryCell}. Resetting.");
-        draggedDraggable?.ResetPosition(); return;
-    }
-
-    // FIXED: Handle both NodeView and ToolView
-    NodeView draggedNodeView = draggedDraggable.GetComponent<NodeView>();
-    ToolView draggedToolView = draggedDraggable.GetComponent<ToolView>();
-    NodeData draggedData = null;
-    NodeDefinition draggedDef = null;
-    ToolDefinition draggedToolDef = null;
-
-    if (draggedNodeView != null)
     {
-        draggedData = draggedNodeView.GetNodeData();
-        draggedDef = draggedNodeView.GetNodeDefinition();
-    }
-    else if (draggedToolView != null)
-    {
-        draggedData = draggedToolView.GetNodeData();
-        draggedToolDef = draggedToolView.GetToolDefinition();
-    }
+        if (draggedDraggable == null || originalCell == null || targetInventoryCell == null || !targetInventoryCell.IsInventoryCell) {
+            if (logInventoryChanges) Debug.LogWarning($"[Inventory HandleDrop] Pre-condition fail. Resetting.");
+            draggedDraggable?.ResetPosition(); return;
+        }
 
-    if (draggedData == null || (draggedDef == null && draggedToolDef == null)) {
-        Debug.LogError($"[InventoryGridController] HandleDrop: Dragged object missing View/Data/Definition! DraggedNodeView: {draggedNodeView != null}, DraggedToolView: {draggedToolView != null}, DraggedData: {draggedData != null}, DraggedDef: {draggedDef != null}, DraggedToolDef: {draggedToolDef != null}. Resetting.", draggedDraggable.gameObject);
-        draggedDraggable.ResetPosition(); return;
-    }
+        NodeView draggedNodeView = draggedDraggable.GetComponent<NodeView>();
+        ToolView draggedToolView = draggedDraggable.GetComponent<ToolView>();
+        NodeData draggedData = null;
+        NodeDefinition draggedNodeDef = null; // For nodes from sequence editor
+        ToolDefinition draggedToolDef = null;   // For tools
 
-    if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Attempting drop. Original Cell - IsInv: {originalCell.IsInventoryCell}, IsSeedSlot: {originalCell.IsSeedSlot}. Target Cell: {targetInventoryCell.CellIndex} (HasNode: {targetInventoryCell.HasNode()})");
-
-    // --- Case 1: Node dragged FROM SEED SLOT TO INVENTORY ---
-    if (!originalCell.IsInventoryCell && originalCell.IsSeedSlot)
-    {
-        if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Path: SeedSlot -> Inventory. Seed: '{draggedData.nodeDisplayName}'");
-
-        NodeCell actualTargetInvCell = targetInventoryCell;
-        if (actualTargetInvCell.HasNode()) 
+        if (draggedNodeView != null)
         {
-            if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Target Inv Cell {actualTargetInvCell.CellIndex} is occupied by {actualTargetInvCell.GetNodeData()?.nodeDisplayName}. Finding empty slot.");
-            actualTargetInvCell = inventoryCells.FirstOrDefault(c => !c.HasNode());
+            draggedData = draggedNodeView.GetNodeData();
+            draggedNodeDef = draggedNodeView.GetNodeDefinition(); // This is the definition if it came from inventory/sequence
+        }
+        else if (draggedToolView != null)
+        {
+            draggedData = draggedToolView.GetNodeData(); // This is the NodeData wrapper for the tool
+            draggedToolDef = draggedToolView.GetToolDefinition();
         }
 
-        if (actualTargetInvCell == null) { 
-            if (logInventoryChanges) Debug.LogWarning($"[Inventory HandleDrop] Inventory Full. Cannot return Seed '{draggedData.nodeDisplayName}'. Resetting drag to original seed slot.");
-            draggedDraggable.ResetPosition(); 
-            return;
-        }
-        
-        if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Target inventory cell for seed is: {actualTargetInvCell.CellIndex}. Unloading from Node Editor.");
-        
-        NodeEditorGridController.Instance.UnloadSeedFromSlot();
-        
-        if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Clearing original seed slot cell ({originalCell.CellIndex}, IsSeedSlot: {originalCell.IsSeedSlot}).");
-        originalCell.ClearNodeReference(); 
-
-        if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Assigning dragged seed '{draggedData.nodeDisplayName}' (View: {draggedNodeView.gameObject.name}) to inventory cell {actualTargetInvCell.CellIndex}.");
-        actualTargetInvCell.AssignNodeView(draggedNodeView, draggedData); 
-        
-        if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Snapping '{draggedData.nodeDisplayName}' to inventory cell {actualTargetInvCell.CellIndex}.");
-        draggedDraggable.SnapToCell(actualTargetInvCell); 
-
-        if (logInventoryChanges) Debug.Log($"[Inventory] Returned Seed '{draggedData.nodeDisplayName}' from Seed Slot to inv cell {actualTargetInvCell.CellIndex}. StoredSeqCount: {draggedData.storedSequence?.nodes?.Count ?? 0}");
-    }
-    // --- Case 2: Node dragged FROM SEQUENCE EDITOR TO INVENTORY ---
-    else if (!originalCell.IsInventoryCell && !originalCell.IsSeedSlot)
-    {
-        if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Path: SequenceEditor -> Inventory. Gene: '{draggedDef.displayName}' being dropped on InvCell: {targetInventoryCell.CellIndex}");
-        
-        NodeCell actualTargetInvCell = targetInventoryCell;
-
-        if (actualTargetInvCell.HasNode()) {
-            if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Target InvCell {actualTargetInvCell.CellIndex} for sequence item is occupied by {actualTargetInvCell.GetNodeData()?.nodeDisplayName}. Finding first available empty slot.");
-            actualTargetInvCell = inventoryCells.FirstOrDefault(c => !c.HasNode());
-        }
-        
-        if (actualTargetInvCell == null) {
-            if (logInventoryChanges) Debug.LogWarning($"[Inventory HandleDrop] Inventory Full. Cannot move '{draggedDef.displayName}' from sequence. Resetting drag.");
-            draggedDraggable.ResetPosition();
-            return;
-        }
-        
-        NodeEditorGridController.Instance?.GetCellAtIndex(originalCell.CellIndex)?.RemoveNode();
-        NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();
-
-        AddGeneToInventoryFromDefinition(draggedDef, actualTargetInvCell); 
-        Destroy(draggedDraggable.gameObject);
-
-        if (logInventoryChanges) Debug.Log($"[Inventory] Moved '{draggedDef.displayName}' from seq cell {originalCell.CellIndex} to inv cell {actualTargetInvCell.CellIndex}.");
-    }
-    // --- Case 3: From INVENTORY to INVENTORY (Swapping or Moving) ---
-    else if (originalCell.IsInventoryCell)
-    {
-        if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Path: Inventory -> Inventory. Item: '{draggedData.nodeDisplayName}'");
-        if (targetInventoryCell == originalCell) {
-            if (logInventoryChanges) Debug.Log("[Inventory HandleDrop] Dropped on self in inventory. Resetting.");
-            draggedDraggable.ResetPosition(); return;
+        if (draggedData == null || (draggedNodeDef == null && draggedToolDef == null && !(originalCell.IsInventoryCell && draggedNodeView != null))) {
+             Debug.LogError($"[InventoryGridController] HandleDrop: Dragged object missing critical data. Resetting.", draggedDraggable.gameObject);
+             draggedDraggable.ResetPosition(); return;
         }
 
-        if (targetInventoryCell.HasNode()) { 
-            if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Swapping with item in target cell {targetInventoryCell.CellIndex}.");
-            
-            // FIXED: Handle swapping with both NodeView and ToolView
-            NodeView viewInTargetCell = targetInventoryCell.GetNodeView();
-            ToolView toolViewInTargetCell = null;
-            
-            if (viewInTargetCell == null)
-            {
-                // Check if it's a tool view
-                GameObject targetCellGO = null;
-                foreach (Transform child in targetInventoryCell.transform)
-                {
-                    if (child.GetComponent<ToolView>() != null)
-                    {
-                        toolViewInTargetCell = child.GetComponent<ToolView>();
-                        targetCellGO = child.gameObject;
-                        break;
-                    }
-                }
-                
-                if (toolViewInTargetCell != null)
-                {
-                    NodeData dataInTargetCell = targetInventoryCell.GetNodeData();
-                    ToolDefinition toolDefInTarget = targetInventoryCell.GetToolDefinition();
-                    
-                    originalCell.ClearNodeReference();
-                    originalCell.AssignToolView(targetCellGO, dataInTargetCell, toolDefInTarget);
-                    targetCellGO.GetComponent<NodeDraggable>()?.SnapToCell(originalCell);
-                }
+
+        if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Attempting drop. Original Cell - IsInv: {originalCell.IsInventoryCell}, IsSeedSlot: {originalCell.IsSeedSlot}. Target Cell: {targetInventoryCell.CellIndex} (HasNode: {targetInventoryCell.HasNode()})");
+
+        // --- Case 1: Node dragged FROM SEED SLOT TO INVENTORY ---
+        if (!originalCell.IsInventoryCell && originalCell.IsSeedSlot)
+        {
+            if (draggedNodeView == null || !draggedData.IsSeed()) { // Must be a NodeView and a Seed
+                 draggedDraggable.ResetPosition(); return;
             }
-            else
+            if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Path: SeedSlot -> Inventory. Seed: '{draggedData.nodeDisplayName}'");
+
+            NodeCell actualTargetInvCell = targetInventoryCell;
+            if (actualTargetInvCell.HasNode()) 
             {
+                if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Target Inv Cell {actualTargetInvCell.CellIndex} is occupied. Finding empty slot.");
+                actualTargetInvCell = inventoryCells.FirstOrDefault(c => !c.HasNode());
+            }
+
+            if (actualTargetInvCell == null) { 
+                if (logInventoryChanges) Debug.LogWarning($"[Inventory HandleDrop] Inventory Full. Resetting drag to original seed slot.");
+                draggedDraggable.ResetPosition(); 
+                return;
+            }
+            
+            NodeEditorGridController.Instance.UnloadSeedFromSlot(); // Clears sequence editor
+            originalCell.ClearNodeReference(); // Clear the seed slot cell
+
+            // draggedData is the seed. Ensure its sequence is initialized if it's a seed.
+            draggedData.EnsureSeedSequenceInitialized(); 
+
+            actualTargetInvCell.AssignNodeView(draggedNodeView, draggedData); 
+            draggedDraggable.SnapToCell(actualTargetInvCell); 
+
+            if (logInventoryChanges) Debug.Log($"[Inventory] Returned Seed '{draggedData.nodeDisplayName}' from Seed Slot to inv cell {actualTargetInvCell.CellIndex}. StoredSeqCount: {draggedData.storedSequence?.nodes?.Count ?? 0}");
+        }
+        // --- Case 2: Node dragged FROM SEQUENCE EDITOR TO INVENTORY ---
+        else if (!originalCell.IsInventoryCell && !originalCell.IsSeedSlot) // From sequence editor
+        {
+            if (draggedNodeView == null || draggedNodeDef == null) { // Must be a NodeView with a Definition
+                 draggedDraggable.ResetPosition(); return;
+            }
+            if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Path: SequenceEditor -> Inventory. Gene: '{draggedNodeDef.displayName}'");
+            
+            NodeCell actualTargetInvCell = targetInventoryCell;
+            if (actualTargetInvCell.HasNode()) {
+                if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Target InvCell {actualTargetInvCell.CellIndex} is occupied. Finding empty slot.");
+                actualTargetInvCell = inventoryCells.FirstOrDefault(c => !c.HasNode());
+            }
+            
+            if (actualTargetInvCell == null) {
+                if (logInventoryChanges) Debug.LogWarning($"[Inventory HandleDrop] Inventory Full. Resetting drag.");
+                draggedDraggable.ResetPosition();
+                return;
+            }
+            
+            NodeEditorGridController.Instance?.GetCellAtIndex(originalCell.CellIndex)?.RemoveNode();
+            NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();
+
+            // Add a *new* instance of this gene to inventory using its definition.
+            // The draggedDraggable represents the UI element from the sequence, which will be destroyed.
+            AddGeneToInventoryFromDefinition(draggedNodeDef, actualTargetInvCell); 
+            Destroy(draggedDraggable.gameObject); // Destroy the original view from sequence editor
+
+            if (logInventoryChanges) Debug.Log($"[Inventory] Moved '{draggedNodeDef.displayName}' from seq cell {originalCell.CellIndex} to inv cell {actualTargetInvCell.CellIndex}.");
+        }
+        // --- Case 3: From INVENTORY to INVENTORY (Swapping or Moving) ---
+        else if (originalCell.IsInventoryCell)
+        {
+            if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Path: Inventory -> Inventory. Item: '{draggedData.nodeDisplayName}'");
+            if (targetInventoryCell == originalCell) {
+                if (logInventoryChanges) Debug.Log("[Inventory HandleDrop] Dropped on self in inventory. Resetting.");
+                draggedDraggable.ResetPosition(); return;
+            }
+
+            if (targetInventoryCell.HasNode()) { 
+                if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Swapping with item in target cell {targetInventoryCell.CellIndex}.");
+                
+                // Get what's in the target cell
                 NodeData dataInTargetCell = targetInventoryCell.GetNodeData();
-                
+                NodeView viewInTargetCell = targetInventoryCell.GetNodeView();
+                ToolView toolViewInTargetCell = null;
+                ToolDefinition toolDefInTargetCell = targetInventoryCell.GetToolDefinition();
+
+                if (viewInTargetCell == null && toolDefInTargetCell != null) { // It's a tool in target
+                    toolViewInTargetCell = targetInventoryCell.transform.GetComponentInChildren<ToolView>();
+                }
+
+                originalCell.ClearNodeReference(); // Clear original before assigning target's item
+
+                if (toolViewInTargetCell != null && toolDefInTargetCell != null) { // Moving tool from target to original
+                    originalCell.AssignToolView(toolViewInTargetCell.gameObject, dataInTargetCell, toolDefInTargetCell);
+                    toolViewInTargetCell.GetComponent<NodeDraggable>()?.SnapToCell(originalCell);
+                } else if (viewInTargetCell != null) { // Moving node from target to original
+                    originalCell.AssignNodeView(viewInTargetCell, dataInTargetCell);
+                    viewInTargetCell.GetComponent<NodeDraggable>()?.SnapToCell(originalCell);
+                }
+                targetInventoryCell.ClearNodeReference(); 
+            } else { 
+                if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Moving to empty target cell {targetInventoryCell.CellIndex}.");
                 originalCell.ClearNodeReference(); 
-                originalCell.AssignNodeView(viewInTargetCell, dataInTargetCell);
-                viewInTargetCell.GetComponent<NodeDraggable>()?.SnapToCell(originalCell);
             }
             
-            targetInventoryCell.ClearNodeReference(); 
-        } else { 
-            if (logInventoryChanges) Debug.Log($"[Inventory HandleDrop] Moving to empty target cell {targetInventoryCell.CellIndex}.");
-            originalCell.ClearNodeReference(); 
-        }
-        
-        // FIXED: Assign based on whether it's a tool or node
-        if (draggedToolView != null)
-        {
-            targetInventoryCell.AssignToolView(draggedToolView.gameObject, draggedData, draggedToolDef);
+            // Assign the dragged item to the target cell
+            if (draggedToolView != null && draggedToolDef != null) { // Dragged item is a tool
+                targetInventoryCell.AssignToolView(draggedToolView.gameObject, draggedData, draggedToolDef);
+            } else if (draggedNodeView != null) { // Dragged item is a node
+                // Ensure seed data's sequence is initialized if it's a seed
+                draggedData.EnsureSeedSequenceInitialized();
+                targetInventoryCell.AssignNodeView(draggedNodeView, draggedData);
+            }
+            draggedDraggable.SnapToCell(targetInventoryCell);
+            if (logInventoryChanges) Debug.Log($"[Inventory] Moved inv item '{draggedData.nodeDisplayName}' from cell {originalCell.CellIndex} to cell {targetInventoryCell.CellIndex}.");
         }
         else
         {
-            targetInventoryCell.AssignNodeView(draggedNodeView, draggedData);
+            Debug.LogWarning($"[InventoryGridController HandleDrop] Unhandled drop scenario. Resetting.", gameObject);
+            draggedDraggable.ResetPosition();
         }
-        
-        draggedDraggable.SnapToCell(targetInventoryCell);
-        if (logInventoryChanges) Debug.Log($"[Inventory] Moved inv item '{draggedData.nodeDisplayName}' from cell {originalCell.CellIndex} to cell {targetInventoryCell.CellIndex}.");
     }
-    else
-    {
-        Debug.LogWarning($"[InventoryGridController HandleDrop] Unhandled drop scenario. Original IsInv: {originalCell.IsInventoryCell}, Original IsSeedSlot: {originalCell.IsSeedSlot}. Target IsInv: {targetInventoryCell.IsInventoryCell}. Resetting.", gameObject);
-        draggedDraggable.ResetPosition();
-    }
-}
 
     public NodeCell GetInventoryCellAtIndex(int index)
     {
-        // FIXED: Add bounds checking
         if (index >= 0 && index < inventoryCells.Count) return inventoryCells[index];
-        
         Debug.LogWarning($"[InventoryGridController] GetInventoryCellAtIndex: Index {index} out of bounds (0-{inventoryCells.Count-1})");
         return null;
     }

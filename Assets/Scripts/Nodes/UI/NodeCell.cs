@@ -1,4 +1,6 @@
 ﻿// FILE: Assets/Scripts/Nodes/UI/NodeCell.cs
+
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -21,7 +23,6 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
     
     private ToolDefinition _toolDefinition;
 
-    // Init for general cells (sequence or inventory)
     public void Init(int index, NodeEditorGridController sequenceController, InventoryGridController inventoryController, Image bgImage)
     {
         CellIndex = index;
@@ -29,7 +30,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         _inventoryController = inventoryController;
         _backgroundImage = bgImage;
         IsInventoryCell = (_inventoryController != null);
-        IsSeedSlot = false; // Default to not being a seed slot
+        IsSeedSlot = false; 
 
         if (_backgroundImage != null)
         {
@@ -43,7 +44,6 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         else Debug.LogWarning($"[NodeCell {CellIndex}] Init: Background Image component is not assigned.", gameObject);
     }
 
-    // Simplified Inits
     public void Init(int index, NodeEditorGridController sequenceController, Image bgImage)
     {
         Init(index, sequenceController, null, bgImage);
@@ -53,19 +53,18 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         Init(index, null, inventoryController, bgImage);
     }
 
-    // Init specifically for the Seed Slot
     public void InitAsSeedSlot(NodeEditorGridController sequenceController, Image bgImage)
     {
-        CellIndex = -1; // Or a specific sentinel value for the seed slot
-        _sequenceController = sequenceController; // The NodeEditorGridController manages the seed slot
+        CellIndex = -1; 
+        _sequenceController = sequenceController; 
         _inventoryController = null;
         _backgroundImage = bgImage;
-        IsInventoryCell = false; // Not an inventory cell
-        IsSeedSlot = true;    // This is the seed slot
+        IsInventoryCell = false; 
+        IsSeedSlot = true;    
 
         if (_backgroundImage != null)
         {
-            _backgroundImage.color = _sequenceController != null ? _sequenceController.EmptyCellColor : Color.magenta; // Use sequence empty color or a distinct color
+            _backgroundImage.color = _sequenceController != null ? _sequenceController.EmptyCellColor : Color.magenta; 
             _backgroundImage.enabled = true;
             _backgroundImage.raycastTarget = true;
         }
@@ -110,6 +109,14 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             return;
         }
 
+        // CRITICAL CHECK: Prevent creating seeds inside sequences
+        bool defIsSeed = def.effects != null && def.effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn && e.isPassive);
+        if (defIsSeed)
+        {
+            Debug.LogError($"[NodeCell {CellIndex}] Cannot place a Seed definition '{def.displayName}' inside a sequence! Seeds can only exist in inventory or the seed slot.", gameObject);
+            return;
+        }
+
         RemoveNode();
 
         _nodeData = new NodeData() {
@@ -118,9 +125,12 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             effects = def.CloneEffects(),
             orderIndex = this.CellIndex,
             canBeDeleted = true
+            // storedSequence will be null by default (from NodeData constructor)
         };
-        // Ensure storedSequence is new for regular nodes added to sequence (it won't be used by them)
-        _nodeData.storedSequence = new NodeGraph();
+        // Ensure that a node freshly created from a definition and placed into a sequence
+        // does NOT have a stored sequence, even if the definition itself was for a seed.
+        _nodeData.ClearStoredSequence();
+
 
         GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : _sequenceController.NodeViewPrefab;
         if (prefabToInstantiate == null) {
@@ -141,6 +151,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             return;
         }
 
+        // Initialize NodeView. It will also ensure its _nodeData.storedSequence is null if not a seed.
         _nodeView.Initialize(_nodeData, def, _sequenceController);
 
         RectTransform viewRectTransform = _nodeView.GetComponent<RectTransform>();
@@ -152,7 +163,6 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
     }
     
-    // Get tool definition
     public ToolDefinition GetToolDefinition()
     {
         return _toolDefinition;
@@ -162,9 +172,12 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
     {
         RemoveNode();
     
-        _nodeView = toolView?.GetComponent<NodeView>(); // Might be null for tools
+        _nodeView = toolView?.GetComponent<NodeView>(); 
         _nodeData = data;
         _toolDefinition = toolDef;
+
+        // For tools, _nodeData.storedSequence should remain null.
+        // _nodeData.EnsureSeedSequenceInitialized(); // Tools are not seeds.
     
         if (toolView != null)
         {
@@ -176,7 +189,6 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         }
         else if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
         
-        // FIXED: Debug logging to track tool assignment
         Debug.Log($"[NodeCell {CellIndex}] AssignToolView: Tool='{toolDef?.displayName}', HasView={toolView != null}, HasData={data != null}");
     }
 
@@ -186,7 +198,13 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 
          _nodeView = view;
          _nodeData = data;
-         _toolDefinition = null; // Clear tool definition when assigning node view
+         _toolDefinition = null; 
+
+         // If data represents a seed, its storedSequence should be preserved (or initialized if null).
+         // If it's not a seed, its storedSequence should be null.
+         // The NodeData instance (data) coming in should already have this handled correctly.
+         // For example, if it's a seed from inventory, EnsureSeedSequenceInitialized was called there.
+         // If it's a node being moved within the sequence editor, its storedSequence should already be null.
 
          if (_nodeView != null) {
             _nodeView.transform.SetParent(transform, false);
@@ -202,7 +220,6 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
          }
          else if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
          
-         // FIXED: Debug logging to track node assignment
          Debug.Log($"[NodeCell {CellIndex}] AssignNodeView: Node='{data?.nodeDisplayName}', HasView={view != null}");
     }
 
@@ -223,14 +240,15 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         Debug.Log($"[NodeCell {CellIndex}] RemoveNode: Cleared all references");
     }
 
-    // Assign display-only item (for inventory bar)
     public void AssignDisplayOnly(GameObject displayObject, NodeData data, ToolDefinition toolDef)
     {
         RemoveNode();
     
-        _nodeView = null; // No NodeView for display-only
+        _nodeView = null; 
         _nodeData = data;
         _toolDefinition = toolDef;
+
+        // These are display only, NodeData.storedSequence is not relevant here.
     
         if (displayObject != null)
         {
@@ -242,7 +260,6 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         }
         else if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
         
-        // FIXED: Debug logging for display-only assignment
         Debug.Log($"[NodeCell {CellIndex}] AssignDisplayOnly: Item='{data?.nodeDisplayName ?? toolDef?.displayName}', IsDisplayOnly=true");
     }
 
@@ -290,7 +307,6 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
                 ClearSelection();
                 _sequenceController.OnEmptyCellRightClicked(this, eventData);
             }
-            // Right-clicking seed slot or inventory does nothing for now
         }
         else if (eventData.button == PointerEventData.InputButton.Left)
         {
@@ -314,7 +330,6 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             return;
         }
 
-        // FIXED: Handle both NodeView and ToolView
         NodeView draggedNodeView = draggedDraggable.GetComponent<NodeView>();
         ToolView draggedToolView = draggedDraggable.GetComponent<ToolView>();
         NodeData draggedData = null;
@@ -334,7 +349,6 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
              return;
         }
 
-        // --- Drop handling logic ---
         if (this.IsSeedSlot && _sequenceController != null)
         {
             _sequenceController.HandleDropOnSeedSlot(draggedDraggable, originalCell, this);
@@ -352,5 +366,56 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             Debug.LogWarning($"[NodeCell {CellIndex} OnDrop] (IsInventory: {IsInventoryCell}, IsSeedSlot: {IsSeedSlot}) Target cell type unhandled or controller missing. Resetting.", gameObject);
             draggedDraggable.ResetPosition();
         }
+    }
+    
+    public void AssignNodeFromData(NodeData nodeData, NodeDefinition def)
+    {
+        if (nodeData == null || def == null)
+        {
+            Debug.LogError($"[NodeCell {CellIndex}] AssignNodeFromData called with null data or definition.", gameObject);
+            return;
+        }
+    
+        // Ensure this node data doesn't have a stored sequence if it's for a sequence cell
+        if (!IsInventoryCell && !IsSeedSlot)
+        {
+            nodeData.storedSequence = null;
+            nodeData.ClearStoredSequence();
+        }
+    
+        RemoveNode();
+    
+        _nodeData = nodeData;
+    
+        GameObject prefabToInstantiate = def.nodeViewPrefab != null ? def.nodeViewPrefab : _sequenceController.NodeViewPrefab;
+        if (prefabToInstantiate == null) 
+        {
+            Debug.LogError($"[NodeCell {CellIndex}] No NodeView prefab for '{def.displayName}'.", gameObject);
+            _nodeData = null;
+            if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
+            return;
+        }
+
+        GameObject nodeViewGO = Instantiate(prefabToInstantiate, transform);
+        _nodeView = nodeViewGO.GetComponent<NodeView>();
+
+        if (_nodeView == null) 
+        {
+            Debug.LogError($"[NodeCell {CellIndex}] Prefab '{prefabToInstantiate.name}' missing NodeView. Destroying.", gameObject);
+            Destroy(nodeViewGO);
+            _nodeData = null;
+            if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
+            return;
+        }
+
+        _nodeView.Initialize(_nodeData, def, _sequenceController);
+
+        RectTransform viewRectTransform = _nodeView.GetComponent<RectTransform>();
+        if (viewRectTransform != null) viewRectTransform.anchoredPosition = Vector2.zero;
+
+        NodeDraggable draggable = _nodeView.GetComponent<NodeDraggable>() ?? _nodeView.gameObject.AddComponent<NodeDraggable>();
+        draggable.Initialize(_sequenceController, null, this);
+
+        if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
     }
 }

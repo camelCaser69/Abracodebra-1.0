@@ -116,11 +116,11 @@ public class InventoryBarController : MonoBehaviour
     private void RefreshFromInventory()
     {
         if (inventoryGridController == null) return;
-    
+
         // FIXED: Calculate total rows based on actual inventory content
         int totalInventorySlots = inventoryGridController.TotalSlots;
         int inventoryColumns = inventoryGridController.inventoryColumns;
-    
+
         // Ensure inventoryColumns is valid
         if (inventoryColumns <= 0)
         {
@@ -129,13 +129,30 @@ public class InventoryBarController : MonoBehaviour
             currentRow = 0;
             return;
         }
-    
+
         totalRows = Mathf.Max(1, Mathf.CeilToInt((float)totalInventorySlots / inventoryColumns));
-    
+
         // Clamp current row to valid range
         currentRow = Mathf.Clamp(currentRow, 0, totalRows - 1);
-    
+
         Debug.Log($"[InventoryBarController] RefreshFromInventory: TotalSlots={totalInventorySlots}, Columns={inventoryColumns}, TotalRows={totalRows}, CurrentRow={currentRow}");
+    
+        // Clean any circular references in inventory items
+        if (inventoryGridController != null)
+        {
+            for (int i = 0; i < inventoryGridController.TotalSlots; i++)
+            {
+                var cell = inventoryGridController.GetInventoryCellAtIndex(i);
+                if (cell != null && cell.HasNode())
+                {
+                    var nodeData = cell.GetNodeData();
+                    if (nodeData != null)
+                    {
+                        nodeData.ForceCleanNestedSequences();
+                    }
+                }
+            }
+        }
     }
     
     private void UpdateBarDisplay()

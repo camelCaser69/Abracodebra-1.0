@@ -7,10 +7,12 @@ public class PlayerTileInteractor : MonoBehaviour
     [SerializeField] private bool showDebugMessages = false;
     
     private InventoryBarController inventoryBar;
+    private TileInteractionManager tileInteractionManager; 
+    private Transform playerTransform; 
 
     private void Awake()
     {
-        // Will be set when InventoryBarController is initialized
+        playerTransform = transform; 
     }
     
     private void Start()
@@ -20,21 +22,17 @@ public class PlayerTileInteractor : MonoBehaviour
         {
             Debug.LogWarning("[PlayerTileInteractor] InventoryBarController instance not found!");
         }
+        tileInteractionManager = TileInteractionManager.Instance;
+        if (tileInteractionManager == null && showDebugMessages)
+        {
+            Debug.LogWarning("[PlayerTileInteractor] TileInteractionManager instance not found!");
+        }
     }
 
     void Update()
     {
-        // Only handle input during Growth & Threat phase
         if (RunManager.Instance == null || RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
             return;
-    
-        // Debug mouse position
-        if (showDebugMessages && Input.GetMouseButtonDown(0))
-        {
-            Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mouseWorldPos.z = 0f;
-            Debug.Log($"[PlayerTileInteractor] Mouse clicked at world position: {mouseWorldPos}");
-        }
         
         if (Input.GetMouseButtonDown(0))
         {
@@ -44,7 +42,7 @@ public class PlayerTileInteractor : MonoBehaviour
     
     private void HandleLeftClick()
     {
-        if (TileInteractionManager.Instance == null)
+        if (tileInteractionManager == null)
         {
             Debug.LogError("No TileInteractionManager in scene!");
             return;
@@ -52,7 +50,7 @@ public class PlayerTileInteractor : MonoBehaviour
     
         if (inventoryBar == null)
         {
-            inventoryBar = InventoryBarController.Instance;
+            inventoryBar = InventoryBarController.Instance; 
             if (inventoryBar == null)
             {
                 if (showDebugMessages) Debug.LogWarning("No InventoryBarController available!");
@@ -76,26 +74,39 @@ public class PlayerTileInteractor : MonoBehaviour
             if (showDebugMessages) Debug.Log("No valid item selected in inventory bar.");
             return;
         }
+
+        Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPos.z = 0f;
+        Vector3Int gridPosition = tileInteractionManager.WorldToCell(mouseWorldPos);
+        Vector3 cellCenterWorld = tileInteractionManager.interactionGrid.GetCellCenterWorld(gridPosition);
+
+        float distanceToCell = Vector2.Distance(playerTransform.position, cellCenterWorld);
+        float interactionRadius = tileInteractionManager.hoverRadius; 
+
+        if (distanceToCell > interactionRadius)
+        {
+            if (showDebugMessages) Debug.Log($"[PlayerTileInteractor] Clicked cell {gridPosition} is too far ({distanceToCell:F2} > {interactionRadius:F2}). Action aborted.");
+            return;
+        }
+        if (showDebugMessages) Debug.Log($"[PlayerTileInteractor] Clicked cell {gridPosition} (World: {cellCenterWorld}) is within range ({distanceToCell:F2} <= {interactionRadius:F2}).");
     
         if (selectedItem.Type == InventoryBarItem.ItemType.Tool)
         {
-            // Handle tool usage directly
-            if (showDebugMessages) Debug.Log($"Using tool: {selectedItem.GetDisplayName()}");
-            TileInteractionManager.Instance.ApplyToolAction(selectedItem.ToolDefinition);
+            if (showDebugMessages) Debug.Log($"Using tool: {selectedItem.GetDisplayName()} on tile {gridPosition}");
+            tileInteractionManager.ApplyToolAction(selectedItem.ToolDefinition);
         }
         else if (selectedItem.Type == InventoryBarItem.ItemType.Node && selectedItem.IsSeed())
         {
-            // Handle seed planting directly
-            if (showDebugMessages) Debug.Log($"Planting seed: {selectedItem.GetDisplayName()}");
-            HandleSeedPlanting(selectedItem);
+            if (showDebugMessages) Debug.Log($"Attempting to plant seed: {selectedItem.GetDisplayName()} on tile {gridPosition}");
+            HandleSeedPlanting(selectedItem, gridPosition, cellCenterWorld); 
         }
         else
         {
-            if (showDebugMessages) Debug.Log($"Selected item '{selectedItem.GetDisplayName()}' cannot be used for tile interaction.");
+            if (showDebugMessages) Debug.Log($"Selected item '{selectedItem.GetDisplayName()}' cannot be used for tile interaction at {gridPosition}.");
         }
     }
     
-    private void HandleSeedPlanting(InventoryBarItem seedItem)
+    private void HandleSeedPlanting(InventoryBarItem seedItem, Vector3Int gridPosition, Vector3 worldPosition)
     {
         if (PlantPlacementManager.Instance == null)
         {
@@ -103,101 +114,85 @@ public class PlayerTileInteractor : MonoBehaviour
             return;
         }
 
-        // Add detailed debug info
         if (showDebugMessages)
         {
-            Debug.Log($"[PlayerTileInteractor] HandleSeedPlanting called with seed: {seedItem.GetDisplayName()}");
-            Debug.Log($"[PlayerTileInteractor] Seed NodeData exists: {seedItem.NodeData != null}");
-            Debug.Log($"[PlayerTileInteractor] Seed NodeDefinition exists: {seedItem.NodeDefinition != null}");
-            Debug.Log($"[PlayerTileInteractor] Seed ViewGameObject exists: {seedItem.ViewGameObject != null}");
+            Debug.Log($"[PlayerTileInteractor] HandleSeedPlanting for seed '{seedItem.GetDisplayName()}' at grid: {gridPosition}, world: {worldPosition}");
             if (seedItem.NodeData != null)
             {
-                Debug.Log($"[PlayerTileInteractor] Seed internal sequence count: {seedItem.NodeData.storedSequence?.nodes?.Count ?? 0}");
+                Debug.Log($"  Seed ID: {seedItem.NodeData.nodeId}, Stored Seq Count: {seedItem.NodeData.storedSequence?.nodes?.Count ?? 0}");
+                 if (seedItem.NodeData.storedSequence?.nodes != null)
+                 {
+                     foreach(var nodeInSeq in seedItem.NodeData.storedSequence.nodes)
+                     {
+                         if (nodeInSeq != null) Debug.Log($"    - Seq Node: {nodeInSeq.nodeDisplayName}, Effects: {nodeInSeq.effects?.Count ?? 0}");
+                     }
+                 }
             }
         }
 
-        bool success = PlantPlacementManager.Instance.TryPlantSeedFromInventory(seedItem);
+        bool success = PlantPlacementManager.Instance.TryPlantSeedFromInventory(seedItem, gridPosition, worldPosition);
 
         if (success)
         {
-            if (showDebugMessages)
-                Debug.Log($"Successfully planted seed: {seedItem.GetDisplayName()}");
-        
+            if (showDebugMessages) Debug.Log($"Successfully planted seed: {seedItem.GetDisplayName()}");
             RemoveSeedFromInventory(seedItem);
-        
-            // Refresh the inventory bar to show updated inventory
-            if (inventoryBar != null)
-            {
-                inventoryBar.ShowBar();
-            }
+            if (inventoryBar != null) inventoryBar.ShowBar(); 
         }
         else
         {
-            if (showDebugMessages)
-                Debug.Log($"Failed to plant seed: {seedItem.GetDisplayName()}");
+            if (showDebugMessages) Debug.Log($"Failed to plant seed: {seedItem.GetDisplayName()} at {gridPosition}. Check PlantPlacementManager logs.");
         }
     }
     
     private void RemoveSeedFromInventory(InventoryBarItem seedItem)
-{
-    if (seedItem?.NodeData == null) return;
-
-    var inventoryController = InventoryGridController.Instance;
-    if (inventoryController == null) return;
-
-    // If we have the ViewGameObject reference, use it to find the exact cell
-    if (seedItem.ViewGameObject != null)
     {
-        for (int i = 0; i < inventoryController.TotalSlots; i++)
+        if (seedItem?.NodeData == null)
+        {
+            if (showDebugMessages) Debug.LogWarning("[PlayerTileInteractor] RemoveSeedFromInventory: seedItem or NodeData is null.");
+            return;
+        }
+    
+        var inventoryController = InventoryGridController.Instance;
+        if (inventoryController == null)
+        {
+            if (showDebugMessages) Debug.LogWarning("[PlayerTileInteractor] RemoveSeedFromInventory: InventoryGridController is null.");
+            return;
+        }
+    
+        if (seedItem.ViewGameObject != null)
+        {
+            for (int i = 0; i < inventoryController.ActualCellCount; i++) 
+            {
+                var cell = inventoryController.GetInventoryCellAtIndex(i);
+                if (cell != null && cell.HasNode())
+                {
+                    var nodeView = cell.GetNodeView();
+                    if (nodeView != null && nodeView.gameObject == seedItem.ViewGameObject)
+                    {
+                        if (showDebugMessages) Debug.Log($"[PlayerTileInteractor] Removing seed '{seedItem.GetDisplayName()}' from inventory slot {i} (matched by ViewGameObject: {seedItem.ViewGameObject.name}).");
+                        cell.RemoveNode(); 
+                        return;
+                    }
+                }
+            }
+            if (showDebugMessages) Debug.LogWarning($"[PlayerTileInteractor] Could not find seed '{seedItem.GetDisplayName()}' by ViewGameObject. Falling back to NodeData ID search.");
+        }
+    
+        for (int i = 0; i < inventoryController.ActualCellCount; i++) 
         {
             var cell = inventoryController.GetInventoryCellAtIndex(i);
             if (cell != null && cell.HasNode())
             {
-                var nodeView = cell.GetNodeView();
-                if (nodeView != null && nodeView.gameObject == seedItem.ViewGameObject)
+                var cellNodeData = cell.GetNodeData();
+                if (cellNodeData != null && cellNodeData.nodeId == seedItem.NodeData.nodeId && cellNodeData.IsSeed())
                 {
-                    // Found the exact match
+                    if (showDebugMessages) Debug.Log($"[PlayerTileInteractor] Removing seed '{seedItem.GetDisplayName()}' (ID: {seedItem.NodeData.nodeId}) from inventory slot {i} (matched by NodeData ID).");
                     cell.RemoveNode();
-                    Debug.Log($"[PlayerTileInteractor] Removed planted seed '{seedItem.GetDisplayName()}' from inventory slot {i}");
-                    
-                    // Refresh the inventory bar
-                    if (inventoryBar != null)
-                    {
-                        inventoryBar.ShowBar();
-                    }
                     return;
                 }
             }
         }
-    }
     
-    // Fallback: Find by NodeData properties
-    Debug.Log($"[PlayerTileInteractor] ViewGameObject not found, searching by properties for seed '{seedItem.GetDisplayName()}'");
-    
-    for (int i = 0; i < inventoryController.TotalSlots; i++)
-    {
-        var cell = inventoryController.GetInventoryCellAtIndex(i);
-        if (cell != null && cell.HasNode())
-        {
-            var cellNodeData = cell.GetNodeData();
-            if (cellNodeData != null && 
-                cellNodeData.nodeDisplayName == seedItem.NodeData.nodeDisplayName &&
-                cellNodeData.IsSeed())
-            {
-                // Remove the seed from inventory
-                cell.RemoveNode();
-                Debug.Log($"[PlayerTileInteractor] Removed planted seed '{seedItem.GetDisplayName()}' from inventory slot {i} (by properties)");
-                
-                // Refresh the inventory bar
-                if (inventoryBar != null)
-                {
-                    inventoryBar.ShowBar();
-                }
-                return;
-            }
-        }
+        if (showDebugMessages) Debug.LogWarning($"[PlayerTileInteractor] Could not find seed '{seedItem.GetDisplayName()}' (ID: {seedItem.NodeData.nodeId}) in inventory to remove after planting.");
     }
-
-    Debug.LogWarning($"[PlayerTileInteractor] Could not find seed '{seedItem.GetDisplayName()}' in inventory to remove");
-}
 }
