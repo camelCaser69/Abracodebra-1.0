@@ -63,22 +63,5 @@ public class OutputNodeEffect : MonoBehaviour
              // Call the public helper with the NEW dictionaries
              parentPlantGrowth.ApplyScentDataToObject(projGO, scentRadiusBonuses, scentStrengthBonuses);
         }
-        // -----------------------------------------------
-
-        // --- Initialize Projectile Stats ---
-        SpellProjectile spellProj = projGO.GetComponent<SpellProjectile>();
-        if(spellProj != null)
-        {
-            // TODO: Get base damage/speed from effects or projectile definition?
-            float baseDamage = 10f; // Example base value
-            float baseSpeed = 5f; // Example base value
-
-            float finalDamage = baseDamage * damageMultiplier; // Apply accumulated multiplier
-            float finalSpeed = baseSpeed; // TODO: Apply speed modifiers if implemented
-
-            spellProj.Initialize(finalDamage, finalSpeed);
-            // Set other properties like friendly fire based on plant context?
-        }
-        // else { Debug.LogWarning($"[{nameof(OutputNodeEffect)}] Spawned projectile '{projGO.name}' is missing SpellProjectile component.", projGO); }
     }
 }
