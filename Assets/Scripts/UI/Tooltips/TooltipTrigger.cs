@@ -3,43 +3,34 @@ using UnityEngine.EventSystems;
 
 public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [Header("Tooltip Type")]
     [SerializeField] private TooltipType tooltipType = TooltipType.Auto;
-    
+
     public enum TooltipType
     {
-        Auto,      // Detect from components
-        Node,      // Force node tooltip
-        Tool,      // Force tool tooltip
+        Auto,
+        Node,
+        Tool,
     }
-    
-    private NodeView nodeView;
-    private ToolView toolView;
+
+    private ItemView itemView;
     private NodeCell nodeCell;
     private bool isShowingTooltip = false;
 
     void Awake()
     {
-        // Cache references
-        nodeView = GetComponent<NodeView>();
-        toolView = GetComponent<ToolView>();
+        itemView = GetComponent<ItemView>();
         nodeCell = GetComponentInParent<NodeCell>();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (UniversalTooltipManager.Instance == null) return;
-        
-        // Don't show if already showing
-        if (isShowingTooltip) return;
-        
+        if (UniversalTooltipManager.Instance == null || isShowingTooltip) return;
         ShowTooltip();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (UniversalTooltipManager.Instance == null) return;
-        
+        if (UniversalTooltipManager.Instance == null || !isShowingTooltip) return;
         HideTooltip();
     }
 
@@ -47,73 +38,49 @@ public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     {
         switch (tooltipType)
         {
-            case TooltipType.Auto:
-                ShowAutoTooltip();
-                break;
-            case TooltipType.Node:
-                ShowNodeTooltip();
-                break;
-            case TooltipType.Tool:
-                ShowToolTooltip();
-                break;
+            case TooltipType.Auto: ShowAutoTooltip(); break;
+            case TooltipType.Node: ShowNodeTooltip(); break;
+            case TooltipType.Tool: ShowToolTooltip(); break;
         }
-        
         isShowingTooltip = true;
     }
 
     private void ShowAutoTooltip()
     {
-        // Try to get from cell first (for inventory bar display items)
+        // Prioritize the ItemView on this component first
+        if (itemView != null)
+        {
+            if (itemView.GetToolDefinition() != null)
+            {
+                UniversalTooltipManager.Instance.ShowToolTooltip(itemView.GetToolDefinition());
+                return;
+            }
+            if (itemView.GetNodeDefinition() != null)
+            {
+                UniversalTooltipManager.Instance.ShowNodeTooltip(itemView.GetNodeData(), itemView.GetNodeDefinition());
+                return;
+            }
+        }
+        
+        // Fallback to checking the parent cell's data
         if (nodeCell != null)
         {
             if (nodeCell.GetToolDefinition() != null)
             {
                 UniversalTooltipManager.Instance.ShowToolTooltip(nodeCell.GetToolDefinition());
-                return;
             }
-            else if (nodeCell.GetNodeData() != null && nodeCell.GetNodeView() != null)
+            else if (nodeCell.GetNodeDefinition() != null)
             {
-                var nodeData = nodeCell.GetNodeData();
-                var nodeDef = nodeCell.GetNodeView().GetNodeDefinition();
-                if (nodeDef != null)
-                {
-                    UniversalTooltipManager.Instance.ShowNodeTooltip(nodeData, nodeDef);
-                    return;
-                }
+                UniversalTooltipManager.Instance.ShowNodeTooltip(nodeCell.GetNodeData(), nodeCell.GetNodeDefinition());
             }
-        }
-        
-        // Try direct components
-        if (toolView != null)
-        {
-            UniversalTooltipManager.Instance.ShowToolTooltip(toolView.GetToolDefinition());
-        }
-        else if (nodeView != null)
-        {
-            UniversalTooltipManager.Instance.ShowNodeTooltip(
-                nodeView.GetNodeData(), 
-                nodeView.GetNodeDefinition()
-            );
         }
     }
 
     private void ShowNodeTooltip()
     {
-        NodeData data = null;
-        NodeDefinition def = null;
-        
-        if (nodeView != null)
-        {
-            data = nodeView.GetNodeData();
-            def = nodeView.GetNodeDefinition();
-        }
-        else if (nodeCell != null)
-        {
-            data = nodeCell.GetNodeData();
-            if (nodeCell.GetNodeView() != null)
-                def = nodeCell.GetNodeView().GetNodeDefinition();
-        }
-        
+        NodeData data = itemView?.GetNodeData() ?? nodeCell?.GetNodeData();
+        NodeDefinition def = itemView?.GetNodeDefinition() ?? nodeCell?.GetNodeDefinition();
+
         if (data != null && def != null)
         {
             UniversalTooltipManager.Instance.ShowNodeTooltip(data, def);
@@ -122,17 +89,8 @@ public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void ShowToolTooltip()
     {
-        ToolDefinition def = null;
-        
-        if (toolView != null)
-        {
-            def = toolView.GetToolDefinition();
-        }
-        else if (nodeCell != null)
-        {
-            def = nodeCell.GetToolDefinition();
-        }
-        
+        ToolDefinition def = itemView?.GetToolDefinition() ?? nodeCell?.GetToolDefinition();
+
         if (def != null)
         {
             UniversalTooltipManager.Instance.ShowToolTooltip(def);
@@ -141,25 +99,12 @@ public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitH
 
     private void HideTooltip()
     {
-        if (!isShowingTooltip) return;
-        
-        UniversalTooltipManager.Instance.HideTooltip();
+        UniversalTooltipManager.Instance?.HideTooltip();
         isShowingTooltip = false;
     }
 
     void OnDisable()
     {
-        if (isShowingTooltip)
-        {
-            HideTooltip();
-        }
-    }
-
-    void OnDestroy()
-    {
-        if (isShowingTooltip)
-        {
-            HideTooltip();
-        }
+        if (isShowingTooltip) HideTooltip();
     }
 }

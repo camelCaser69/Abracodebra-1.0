@@ -1,30 +1,33 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
-using System.Linq;
 
 public class InventoryBarController : MonoBehaviour
 {
-    public static InventoryBarController Instance { get; set; }
+    public static InventoryBarController Instance { get; private set; }
 
-    [SerializeField] int slotsPerRow = 10;
-    [SerializeField] Vector2 cellSize = new Vector2(64f, 64f);
-    [SerializeField] float cellMargin = 10f;
+    [Header("Layout")]
+    [SerializeField] private int slotsPerRow = 10;
+    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
+    [SerializeField] private float cellMargin = 10f;
+    
+    [Header("UI References")]
+    [SerializeField] private Transform cellContainer;
+    [SerializeField] private Button upArrowButton;
+    [SerializeField] private Button downArrowButton;
+    [SerializeField] private GameObject selectionHighlight;
 
-    [SerializeField] Transform cellContainer;
-    [SerializeField] Button upArrowButton;
-    [SerializeField] Button downArrowButton;
-    [SerializeField] GameObject selectionHighlight;
+    [Header("Visuals")]
+    [SerializeField] private Sprite emptyCellSprite;
+    [SerializeField] private Color emptyCellColor = Color.white;
+    
+    [Header("Dependencies")]
+    [SerializeField] private InventoryGridController inventoryGridController;
 
-    [SerializeField] Sprite emptyCellSprite;
-    [SerializeField] Color emptyCellColor = Color.white;
-
-    [SerializeField] InventoryGridController inventoryGridController;
-
-    List<NodeCell> barCells = new List<NodeCell>();
-    int currentRow = 0;
-    int selectedSlot = 0; // Index within the BAR (0 to slotsPerRow-1), -1 for none selected
-    int totalRows = 0;
+    private readonly List<NodeCell> barCells = new List<NodeCell>();
+    private int currentRow = 0;
+    private int selectedSlot = 0;
+    private int totalRows = 0;
 
     public InventoryBarItem SelectedItem { get; private set; }
     public event System.Action<InventoryBarItem> OnSelectionChanged;
@@ -33,52 +36,35 @@ public class InventoryBarController : MonoBehaviour
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-        selectedSlot = 0; // Default to selecting the first slot, or -1 if nothing should be pre-selected
+        selectedSlot = 0;
     }
 
     void Start()
     {
         if (upArrowButton != null) upArrowButton.onClick.AddListener(() => ChangeRow(-1));
         if (downArrowButton != null) downArrowButton.onClick.AddListener(() => ChangeRow(1));
-
-        if (inventoryGridController == null)
-        {
-            Debug.LogError("[InventoryBarController] InventoryGridController reference is missing in Start! Bar may not function correctly.");
-        }
-        if (selectionHighlight == null)
-        {
-            Debug.LogWarning("[InventoryBarController] Selection Highlight GameObject is not assigned in the Inspector. Highlighting will not work.");
-        }
-        else
-        {
-            selectionHighlight.SetActive(false); // Ensure highlight is also initially hidden
-        }
-
+        
         SetupBarCells();
         gameObject.SetActive(false); // Start hidden
+    }
+
+    void OnDestroy()
+    {
+        if (upArrowButton != null) upArrowButton.onClick.RemoveAllListeners();
+        if (downArrowButton != null) downArrowButton.onClick.RemoveAllListeners();
     }
 
     void Update()
     {
         if (!gameObject.activeInHierarchy) return;
-
         HandleNumberKeyInput();
         HandleArrowKeyInput();
     }
 
     public void ShowBar()
     {
-        if (inventoryGridController == null)
-        {
-            Debug.LogError("[InventoryBarController] InventoryGridController reference is missing! Cannot show bar.");
-            return;
-        }
-        // When showing the bar, if nothing was selected (-1), keep it that way or select slot 0.
-        // If a slot was previously selected, try to maintain it.
-        // For simplicity, let's ensure selectedSlot is valid or default to 0 if it was -1.
+        if (inventoryGridController == null) return;
         if (selectedSlot < 0 && slotsPerRow > 0) selectedSlot = 0;
-
-
         RefreshFromInventory();
         gameObject.SetActive(true);
         UpdateBarDisplay();
@@ -88,30 +74,16 @@ public class InventoryBarController : MonoBehaviour
     public void HideBar()
     {
         gameObject.SetActive(false);
-
-        if (selectionHighlight != null)
-        {
-            selectionHighlight.SetActive(false);
-        }
-
-        if (UniversalTooltipManager.Instance != null)
-            UniversalTooltipManager.Instance.HideTooltip();
+        if (selectionHighlight != null) selectionHighlight.SetActive(false);
+        UniversalTooltipManager.Instance?.HideTooltip();
     }
-
-    void SetupBarCells()
+    
+    private void SetupBarCells()
     {
-        if (cellContainer == null)
-        {
-            Debug.LogError("[InventoryBarController] Cell Container not assigned!");
-            return;
-        }
-
         foreach (Transform child in cellContainer) Destroy(child.gameObject);
         barCells.Clear();
-
+        
         GridLayoutGroup gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
-        if (gridLayout == null) gridLayout = cellContainer.gameObject.AddComponent<GridLayoutGroup>();
-
         gridLayout.cellSize = cellSize;
         gridLayout.spacing = new Vector2(cellMargin, cellMargin);
         gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
@@ -121,110 +93,73 @@ public class InventoryBarController : MonoBehaviour
         {
             GameObject cellGO = new GameObject($"BarCell_{i}", typeof(RectTransform));
             cellGO.transform.SetParent(cellContainer, false);
-
             Image cellImage = cellGO.AddComponent<Image>();
             cellImage.sprite = emptyCellSprite;
             cellImage.color = emptyCellColor;
-            cellImage.raycastTarget = true;
-
             NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
-            cellLogic.Init(i, null, inventoryGridController, cellImage);
+            cellLogic.Init(i, inventoryGridController, cellImage);
             barCells.Add(cellLogic);
         }
     }
-
-    void RefreshFromInventory()
+    
+    private void RefreshFromInventory()
     {
         if (inventoryGridController == null) return;
-
-        int totalInventorySlots = inventoryGridController.TotalSlots;
-        int inventoryColumns = inventoryGridController.inventoryColumns;
-
-        if (inventoryColumns <= 0)
-        {
-            Debug.LogError("[InventoryBarController] Invalid inventory columns count from InventoryGridController!");
-            totalRows = 1;
-            currentRow = 0;
-            return;
-        }
-
-        totalRows = Mathf.Max(1, Mathf.CeilToInt((float)totalInventorySlots / inventoryColumns));
+        totalRows = Mathf.Max(1, Mathf.CeilToInt((float)inventoryGridController.TotalSlots / inventoryGridController.inventoryColumns));
         currentRow = Mathf.Clamp(currentRow, 0, totalRows - 1);
-
-        if (inventoryGridController != null)
-        {
-            for (int i = 0; i < inventoryGridController.TotalSlots; i++)
-            {
-                var cell = inventoryGridController.GetInventoryCellAtIndex(i);
-                if (cell != null && cell.HasNode())
-                {
-                    var nodeData = cell.GetNodeData();
-                    if (nodeData != null)
-                    {
-                        nodeData.CleanForSerialization(0, "InvBarRefresh");
-                    }
-                }
-            }
-        }
     }
-
-    void UpdateBarDisplay()
+    
+    private void UpdateBarDisplay()
     {
         if (inventoryGridController == null || barCells == null) return;
+        foreach (var cell in barCells) { cell.RemoveNode(); }
 
-        foreach (var cell in barCells)
-        {
-            cell.RemoveNode();
-        }
-
-        int mainInventoryColumns = inventoryGridController.inventoryColumns;
-         if (mainInventoryColumns <= 0) {
-             Debug.LogError("[InventoryBarController] UpdateBarDisplay: InventoryGridController has 0 columns. Cannot display items.");
-             return;
-        }
-
-        int startIndexInMainInventory = currentRow * mainInventoryColumns;
-        int maxInventoryIndex = inventoryGridController.TotalSlots - 1;
-
+        int startIndexInMainInventory = currentRow * inventoryGridController.inventoryColumns;
+        
         for (int i = 0; i < slotsPerRow; i++)
         {
-            if (i >= mainInventoryColumns) break;
+            if (i >= inventoryGridController.inventoryColumns) break;
             int inventoryIndexToDisplay = startIndexInMainInventory + i;
-            if (inventoryIndexToDisplay > maxInventoryIndex) continue;
+            if (inventoryIndexToDisplay >= inventoryGridController.TotalSlots) continue;
 
-            if (i < barCells.Count)
+            NodeCell inventoryCell = inventoryGridController.GetInventoryCellAtIndex(inventoryIndexToDisplay);
+            // --- MODIFIED: Use HasItem() ---
+            if (inventoryCell != null && inventoryCell.HasItem())
             {
-                NodeCell inventoryCell = inventoryGridController.GetInventoryCellAtIndex(inventoryIndexToDisplay);
-                if (inventoryCell != null && inventoryCell.HasNode())
-                {
-                    CopyInventoryItemToBarCell(inventoryCell, barCells[i]);
-                }
+                CopyInventoryItemToBarCell(inventoryCell, barCells[i]);
             }
         }
-
+        
         if (upArrowButton != null) upArrowButton.interactable = currentRow > 0;
         if (downArrowButton != null) downArrowButton.interactable = currentRow < totalRows - 1;
     }
-
-
-    void CopyInventoryItemToBarCell(NodeCell inventoryCell, NodeCell barCell)
+    
+    private void CopyInventoryItemToBarCell(NodeCell inventoryCell, NodeCell barCell)
     {
         NodeData nodeData = inventoryCell.GetNodeData();
-        NodeView nodeView = inventoryCell.GetNodeView();
         ToolDefinition toolDef = inventoryCell.GetToolDefinition();
+        NodeDefinition nodeDef = inventoryCell.GetNodeDefinition();
 
+        GameObject display = new GameObject("DisplayItem", typeof(RectTransform), typeof(Image));
+        display.transform.SetParent(barCell.transform, false);
+        Image displayImage = display.GetComponent<Image>();
+        displayImage.raycastTarget = false;
+        
         if (toolDef != null)
         {
-            CreateToolCopyInBarCell(toolDef, nodeData, barCell);
+            displayImage.sprite = toolDef.icon;
+            displayImage.color = toolDef.iconTint;
         }
-        else if (nodeData != null && nodeView != null)
+        else if (nodeDef != null)
         {
-            NodeDefinition nodeDef = nodeView.GetNodeDefinition();
-            if (nodeDef != null)
-            {
-                CreateNodeCopyInBarCell(nodeDef, nodeData, barCell);
-            }
+            displayImage.sprite = nodeDef.thumbnail;
+            displayImage.color = nodeDef.thumbnailTintColor;
         }
+        
+        display.transform.localScale = Vector3.one * InventoryGridController.Instance.NodeGlobalImageScale;
+        display.GetComponent<RectTransform>().sizeDelta = cellSize * 0.8f;
+        
+        barCell.AssignDisplayOnly(display, nodeData, toolDef);
     }
 
     void CreateToolCopyInBarCell(ToolDefinition toolDef, NodeData toolWrapperNodeData, NodeCell barCell)
@@ -413,9 +348,4 @@ public class InventoryBarController : MonoBehaviour
         OnSelectionChanged?.Invoke(SelectedItem);
     }
 
-    void OnDestroy()
-    {
-        if (upArrowButton != null) upArrowButton.onClick.RemoveAllListeners();
-        if (downArrowButton != null) downArrowButton.onClick.RemoveAllListeners();
-    }
 }

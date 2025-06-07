@@ -16072,7 +16072,7 @@ MonoBehaviour:
   emptyCellSprite: {fileID: 21300000, guid: e297f30aab1496f4d89df7a80efcac6a, type: 3}
   emptyCellColor: {r: 0.14150941, g: 0.14150941, b: 0.14150941, a: 1}
   emptyCellScale: {x: 1, y: 1, z: 1}
-  nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
+  inventoryItemPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   selectedNodeBackgroundColor: {r: 0.78039217, g: 0.8509804, b: 0.15686275, a: 0.9019608}
   definitionLibrary: {fileID: 11400000, guid: 11ac7fb888cbf394e81a9c81231495bd, type: 2}
   nodeDropdown: {fileID: 153740911}
@@ -16338,13 +16338,12 @@ MonoBehaviour:
   cellMargin: 0
   emptyCellSprite: {fileID: 21300000, guid: e297f30aab1496f4d89df7a80efcac6a, type: 3}
   emptyCellColor: {r: 1, g: 1, b: 1, a: 1}
+  inventoryItemPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
+  nodeGlobalImageScale: 1
+  nodeImageRaycastPadding: 0
   availableTools:
   - {fileID: 11400000, guid: 864e5c2cfc433e249b02f2a97cced049, type: 2}
   - {fileID: 11400000, guid: b02225d1ccd9f4d42b09de7941a00382, type: 2}
-  nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
-  toolViewPrefab: {fileID: 2087977392620144478, guid: bf830caeba1e68f42afa78ca90db24c0, type: 3}
-  nodeGlobalImageScale: 1
-  nodeImageRaycastPadding: 0
   cellContainer: {fileID: 1101570886}
   _rootCanvas: {fileID: 218169671}
   logInventoryChanges: 1
