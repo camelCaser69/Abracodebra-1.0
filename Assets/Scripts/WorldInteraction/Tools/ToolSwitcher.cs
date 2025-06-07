@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Tiles/Tools/ToolSwitcher.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 
 public class ToolSwitcher : MonoBehaviour
@@ -22,12 +21,6 @@ public class ToolSwitcher : MonoBehaviour
     /// Event fired when the remaining uses of the current tool changes. Passes the new remaining count (-1 for unlimited).
     /// </summary>
     public event Action<int> OnUsesChanged; // <<< NEW EVENT for UI updates
-
-    private void Awake()
-    {
-        // Debug logs from previous step can be kept or removed
-        // Debug.Log("[ToolSwitcher Awake] Initializing...");
-    }
 
     private void Start()
     {

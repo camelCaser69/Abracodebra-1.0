@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Core/ScentSource.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 // No longer requires RuntimeCircleDrawer directly
 // REMOVED: [RequireComponent(typeof(RuntimeCircleDrawer))]
@@ -22,17 +21,6 @@ public class ScentSource : MonoBehaviour
     public float EffectiveRadius => Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier);
     /// <summary> Gets the effective scent strength (Base Strength + Modifier), clamped >= 0. </summary>
     public float EffectiveStrength => Mathf.Max(0f, (definition != null ? definition.baseStrength : 0f) + strengthModifier);
-
-
-    void Awake()
-    {
-        // No longer needs to get or manage the circle drawer component here
-        // REMOVED: circleDrawer = GetComponent<RuntimeCircleDrawer>();
-        // REMOVED: circleDrawer?.HideCircle();
-    }
-
-    // REMOVED: Update() method (FloraManager handles creating/updating/hiding the external visualizer)
-
 
     // Keep Gizmo for Editor visualization (runs independently of Update and runtime drawers)
     void OnDrawGizmosSelected()

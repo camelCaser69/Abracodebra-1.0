@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 529,968 → 332,872 chars (37.2% reduction)
-Estimated tokens saved: ~49,274
+Compression Stats: 521,055 → 328,296 chars (37.0% reduction)
+Estimated tokens saved: ~48,189
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -22,90 +22,86 @@ using System;
 [Unknown]
   PixelPerfectSetup (Assets\Scripts\Core/) L29
   RunManager (Assets\Scripts\Core/) L70
-  SortableEntity (Assets\Scripts\Core/) L182
-  UIManager (Assets\Scripts\Core/) L249
-  WeatherManager (Assets\Scripts\Core/) L427
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L579
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1170
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1187
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1196
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1209
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1226
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1470
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L1670
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L1739
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L1754
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L1773
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L1812
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L1980
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2044
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2061
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2074
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2103
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2311
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L2542
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L2789
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L2818
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L2848
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L2861
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L2889
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L2950
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L2995
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3046
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3080
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3150
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3170
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3205
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3220
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3325
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L3365
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L3388
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L3406
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L3433
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L3442
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L3632
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L3683
-  PlantGrowth.Growth (Assets\Scripts\PlantSystem\Growth/) L3707
-  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L3957
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4148
-  DeselectOnClickOutside (Assets\Scripts\PlantSystem\UI/) L4478
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L4492
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L4840
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L4907
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L5365
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L5733
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L5930
-  NodeSelectable (Assets\Scripts\PlantSystem\UI/) L6496
-  NodeView (Assets\Scripts\PlantSystem\UI/) L6516
-  ToolView (Assets\Scripts\PlantSystem\UI/) L6625
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6709
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L6843
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7136
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7224
-  BurningStatusEffect (Assets\Scripts\UI\Combat/) L7311
-  SpellProjectile (Assets\Scripts\UI\Combat/) L7319
-  StatusEffect (Assets\Scripts\UI\Combat/) L7349
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7367
-  UniversalTooltipManager (Assets\Scripts\UI\Tooltips/) L7504
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L7850
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L7861
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L7945
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8050
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8429
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8465
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8655
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L8797
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L8932
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9106
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9146
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9166
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9178
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9197
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9359
+  SortableEntity (Assets\Scripts\Core/) L175
+  SpeedModifiable (Assets\Scripts\Core/) L242
+  UIManager (Assets\Scripts\Core/) L292
+  WeatherManager (Assets\Scripts\Core/) L470
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L622
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1169
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1186
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1195
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1208
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1225
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1469
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L1669
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L1738
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L1753
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L1772
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L1811
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L1979
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2043
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2060
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2073
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2102
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2310
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L2541
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L2788
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L2817
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L2847
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L2860
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L2888
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L2949
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L2994
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3045
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3079
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3149
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3169
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3204
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3219
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3324
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L3364
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L3387
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L3405
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L3432
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L3441
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L3631
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L3671
+  PlantGrowth.Growth (Assets\Scripts\PlantSystem\Growth/) L3695
+  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L3945
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4136
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L4466
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L4814
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L4881
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L5339
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L5707
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L5904
+  NodeView (Assets\Scripts\PlantSystem\UI/) L6470
+  ToolView (Assets\Scripts\PlantSystem\UI/) L6579
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6663
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L6797
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7090
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7178
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7265
+  UniversalTooltipManager (Assets\Scripts\UI\Tooltips/) L7402
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L7716
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L7727
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L7811
+  WaterReflection (Assets\Scripts\Visual\Effects/) L7916
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8295
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8331
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8521
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L8663
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L8798
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L8920
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L8960
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L8980
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L8992
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9011
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9173
 
 [for]
-  PlantGrowth.Cell (Assets\Scripts\PlantSystem\Growth/) L9369
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L9612
+  PlantGrowth.Cell (Assets\Scripts\PlantSystem\Growth/) L9183
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L9426
 
 ================================================================================
 SCRIPTS
@@ -185,13 +181,6 @@ Destroy(gameObject); // Destroy this duplicate instance
 return;
 }
 Instance = this;
-
-if (transform.parent == null) // Only call DontDestroyOnLoad if it's a root GameObject {
-DontDestroyOnLoad(gameObject);
-}
-else {
-Debug.LogWarning($"[RunManager] {gameObject.name} is not a root GameObject. DontDestroyOnLoad will not be called for it directly. If its parent is persistent, that's fine. Otherwise, make RunManager a root object if it needs to persist across scenes.", gameObject);
-}
 
 SetState(RunState.Planning, true);
 }
@@ -329,6 +318,56 @@ spriteRenderer.sortingOrder = order;
 pub void SetUseParentYCoordinate(bool value) {
 useParentYCoordinate = value;
 }
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\SpeedModifiable.cs
+
+﻿// FILE: Assets/Scripts/Core/SpeedModifiable.cs
+
+pub cls SpeedModifiable : MonoBehaviour {
+
+[SerializeField] prot float baseSpeed = 5f;
+
+[SerializeField] prot float currentSpeed;
+
+List<float> activeSpeedMultipliers = new List<float>();
+
+prot virt void Awake() {
+currentSpeed = baseSpeed;
+}
+
+pub void ApplySpeedMultiplier(float multiplier) {
+if (!activeSpeedMultipliers.Contains(multiplier)) {
+activeSpeedMultipliers.Add(multiplier);
+UpdateSpeed();
+}
+}
+
+pub void RemoveSpeedMultiplier(float multiplier) {
+if (activeSpeedMultipliers.Remove(multiplier)) {
+UpdateSpeed();
+}
+}
+
+void UpdateSpeed() {
+float lowestMultiplier = 1.0f;
+foreach (float mult in activeSpeedMultipliers) {
+if (mult < lowestMultiplier) {
+lowestMultiplier = mult;
+}
+}
+
+float newSpeed = baseSpeed * lowestMultiplier;
+
+if (!Mathf.Approximately(currentSpeed, newSpeed)) {
+currentSpeed = newSpeed;
+OnSpeedChanged(currentSpeed);
+}
+}
+
+prot virt void OnSpeedChanged(float newSpeed) { }
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -664,10 +703,11 @@ forceDaylight = false; // Don't force daylight, just pause current state
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Animals\AnimalController.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Ecosystem/Animals/AnimalController.cs
+
 using TMPro;
 
-pub cls AnimalController : MonoBehaviour {
+pub cls AnimalController : SpeedModifiable {
 AnimalDefinition definition;
 AnimalDiet animalDiet;
 
@@ -679,10 +719,9 @@ pub List<GameObject> poopPrefabs;
 pub Animator animator;
 
 [SerializeField] TextMeshProUGUI hpText;
-[SerializeField] TextMeshProUGUI hungerText; // NEW: Hunger text reference
+[SerializeField] TextMeshProUGUI hungerText;
 
-[Header("UI Settings")] // NEW HEADER
-[SerializeField] KeyCode showStatsKey = KeyCode.LeftAlt; // NEW: Configurable key for showing stats
+[SerializeField] KeyCode showStatsKey = KeyCode.LeftAlt;
 
 pub float searchRadius = 5f;
 pub float eatDistance = 0.5f;
@@ -739,9 +778,6 @@ Vector2 maxBounds;
 pub float CurrentHealth => currentHealth;
 pub string SpeciesName => definition ? definition.animalName : "Uninitialized";
 
-float baseMovementSpeed;
-List<float> activeSpeedMultipliers = new List<float>();
-
 pub void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false) {
 definition = def;
 if (definition == null) { Destroy(gameObject); return; }
@@ -763,14 +799,14 @@ if (spriteRenderer != null) {
 originalColor = spriteRenderer.color;
 }
 
-baseMovementSpeed = definition.movementSpeed;
-activeSpeedMultipliers.Clear(); // NEW
+baseSpeed = definition.movementSpeed;
+currentSpeed = baseSpeed;
 
 currentHealth = definition.maxHealth;
 currentHunger = 0f;
 hasPooped = true;
 poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
-foodReassessmentTimer = Random.Range(0f, foodReassessmentInterval); // Randomize initial timer
+foodReassessmentTimer = Random.Range(0f, foodReassessmentInterval);
 
 minBounds = shiftedMinBounds;
 maxBounds = shiftedMaxBounds;
@@ -788,12 +824,9 @@ moveDirection = Random.insideUnitCircle.normalized;
 }
 
 EnsureUITextReferences();
-
 SetStatsTextVisibility(false);
-
 UpdateHpText();
 UpdateHungerText();
-
 }
 
 void EnsureUITextReferences() {
@@ -880,7 +913,7 @@ if (rb == null || isDying) return;
 
 if (!isEating && !isPooping && moveDirection != Vector2.zero) {
 Vector2 currentPos = rb.position;
-Vector2 desiredMove = moveDirection.normalized * definition.movementSpeed * Time.fixedDeltaTime;
+Vector2 desiredMove = moveDirection.normalized * currentSpeed * Time.fixedDeltaTime;
 Vector2 nextPos = currentPos + desiredMove;
 
 if (!isSeekingScreenCenter) // Clamp only when NOT seeking {
@@ -1189,7 +1222,6 @@ pub enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
 
 void Die(CauseOfDeath cause) {
 Debug.Log($"[{SpeciesName} died: {cause}]", gameObject);
-
 StartCoroutine(FadeOutAndDestroy());
 }
 
@@ -1207,46 +1239,9 @@ if (hungerText == null || animalDiet == null) return;
 hungerText.text = $"Hunger: {Mathf.FloorToInt(currentHunger)}/{Mathf.FloorToInt(animalDiet.maxHunger)}";
 }
 
-pub void ApplySpeedMultiplier(float multiplier) {
-if (!activeSpeedMultipliers.Contains(multiplier)) {
-activeSpeedMultipliers.Add(multiplier);
-UpdateMovementSpeed();
-
-if (Debug.isDebugBuild) {
-Debug.Log($"[{gameObject.name}] Applied speed multiplier: {multiplier}. New speed: {definition.movementSpeed}");
-}
-}
-}
-
-pub void RemoveSpeedMultiplier(float multiplier) {
-if (activeSpeedMultipliers.Contains(multiplier)) {
-activeSpeedMultipliers.Remove(multiplier);
-UpdateMovementSpeed();
-
-if (Debug.isDebugBuild) {
-Debug.Log($"[{gameObject.name}] Removed speed multiplier: {multiplier}. New speed: {definition.movementSpeed}");
-}
-}
-}
-
-void UpdateMovementSpeed() {
-float newSpeed = baseMovementSpeed;
-
-if (activeSpeedMultipliers.Count > 0) {
-float lowestMultiplier = 1.0f;
-foreach (float multiplier in activeSpeedMultipliers) {
-if (multiplier < lowestMultiplier) {
-lowestMultiplier = multiplier;
-}
-}
-
-newSpeed *= lowestMultiplier;
-}
-
-definition.movementSpeed = newSpeed;
-
+prot ovr void OnSpeedChanged(float newSpeed) {
 if (animator != null) {
-float speedRatio = newSpeed / baseMovementSpeed;
+float speedRatio = (baseSpeed > 0f) ? newSpeed / baseSpeed : 1f;
 animator.speed = Mathf.Max(0.5f, speedRatio); // Don't go below half speed
 }
 }
@@ -3751,17 +3746,6 @@ if (parentPlantGrowth != null) // Check if reference exists before calling {
 
 parentPlantGrowth.ApplyScentDataToObject(projGO, scentRadiusBonuses, scentStrengthBonuses);
 }
-
-SpellProjectile spellProj = projGO.GetComponent<SpellProjectile>();
-if(spellProj != null) {
-float baseDamage = 10f; // Example base value
-float baseSpeed = 5f; // Example base value
-
-float finalDamage = baseDamage * damageMultiplier; // Apply accumulated multiplier
-float finalSpeed = baseSpeed; // TODO: Apply speed modifiers if implemented
-
-spellProj.Initialize(finalDamage, finalSpeed);
-}
 }
 }
 
@@ -4559,20 +4543,6 @@ pub bool IsOutlineEnabled() { ret enableOutline; }
 pub float GetPoopDetectionRadius() { ret poopDetectionRadius; }
 
 } // End PARTIAL Class definition
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\UI\DeselectOnClickOutside.cs
-
-﻿using UnityEngine;
-using UnityEngine.EventSystems; // Required for IPointerClickHandler
-
-pub cls DeselectOnClickOutside : MonoBehaviour, IPointerClickHandler {
-pub void OnPointerClick(PointerEventData eventData) {
-if (eventData.button == PointerEventData.InputButton.Left) {
-NodeCell.ClearSelection();
-}
-}
-}
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\InventoryBarController.cs
@@ -6579,26 +6549,6 @@ Gizmos.matrix = originalMatrix;
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\UI\NodeSelectable.cs
-
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-
-pub cls NodeSelectable : MonoBehaviour, IPointerClickHandler {
-pub stat GameObject CurrentSelected { get; set; }
-
-pub void OnPointerClick(PointerEventData eventData) {
-Select(gameObject);
-}
-
-pub stat void Select(GameObject node) {
-if (CurrentSelected != null && CurrentSelected != node) {
-}
-CurrentSelected = node;
-}
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\NodeView.cs
 
 ﻿// FILE: Assets/Scripts/Nodes/UI/NodeView.cs (MODIFIED)
@@ -7394,62 +7344,6 @@ if (this != null && gameObject != null) { if (Application.isPlaying) { Destroy(g
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\UI\Combat\BurningStatusEffect.cs
-
-﻿pub cls BurningStatusEffect : StatusEffect {
-pub BurningStatusEffect(float d, float dps) : base(d, dps) { }
-
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\UI\Combat\SpellProjectile.cs
-
-﻿using UnityEngine;
-
-pub cls SpellProjectile : MonoBehaviour {
-pub float damage;
-pub float speed;
-pub bool destroyOnHit = true;
-
-pub float burningDamage;   // DPS
-pub float burningDuration; // Duration in seconds
-
-pub bool friendlyFire = false;
-pub bool casterIsEnemy = false;
-
-pub void Initialize(float dmg, float spd) {
-damage = dmg;
-speed = spd;
-}
-
-void Update() {
-transform.Translate(Vector2.up * speed * Time.deltaTime);
-}
-
-void OnTriggerEnter2D(Collider2D collision) {
-
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\UI\Combat\StatusEffect.cs
-
-﻿pub abs cls StatusEffect {
-pub float duration; // Total duration.
-pub float damagePerSecond;
-prot float elapsed = 0f;
-
-pub float Elapsed { get { ret elapsed; } }
-
-pub StatusEffect(float d, float dps) {
-duration = d;
-damagePerSecond = dps;
-}
-
-pub bool IsExpired() => elapsed >= duration;
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\UI\Tooltips\TooltipTrigger.cs
 
 ﻿// FILE: Assets/Scripts/UI/TooltipTrigger.cs (SIMPLIFIED)
@@ -7589,12 +7483,10 @@ HideTooltip();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\UI\Tooltips\UniversalTooltipManager.cs
 
-﻿using UnityEngine;
-using UnityEngine.UI; // Required for Image, VerticalLayoutGroup, CanvasGroup
-using TMPro; // Required for TextMeshProUGUI
-using System.Text; // Required for StringBuilder
-using System.Collections; // Required for IEnumerator
-using UnityEngine.EventSystems; // Required for EventSystem
+﻿// FILE: Assets/Scripts/UI/Tooltips/UniversalTooltipManager.cs
+using TMPro;
+using System.Text;
+using UnityEngine.EventSystems;
 
 pub cls UniversalTooltipManager : MonoBehaviour {
 pub stat UniversalTooltipManager Instance { get; set; }
@@ -7604,12 +7496,11 @@ pub stat UniversalTooltipManager Instance { get; set; }
 [SerializeField] TextMeshProUGUI descriptionText;
 [SerializeField] TextMeshProUGUI detailsText;
 [SerializeField] Image backgroundImage;
-[SerializeField] CanvasGroup canvasGroup; // Ensure this is assigned or it will be added
+[SerializeField] CanvasGroup canvasGroup;
 
-[SerializeField] VerticalLayoutGroup layoutGroup; // Optional, if you use it for auto-sizing
+[SerializeField] VerticalLayoutGroup layoutGroup;
 
 [SerializeField] float fadeDuration = 0.15f;
-
 [SerializeField] bool moveTooltipWithMouse = true;
 [SerializeField] Vector2 mouseFollowOffset = new Vector2(15f, -15f);
 
@@ -7624,8 +7515,8 @@ pub stat UniversalTooltipManager Instance { get; set; }
 [SerializeField] bool showEffectsInDetails = true;
 [SerializeField] bool showSeedSequenceInfo = true;
 [SerializeField] string effectPrefix = "• ";
-[SerializeField] Color passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f); // Light blue
-[SerializeField] Color activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f); // Light orange
+[SerializeField] Color passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f);
+[SerializeField] Color activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);
 
 Coroutine fadeCoroutine;
 object currentTarget;
@@ -7649,73 +7540,15 @@ if (canvasGroup != null) canvasGroup.alpha = 0f;
 isVisible = false;
 }
 
-bool ValidateReferences() {
-if (tooltipPanel == null) { Debug.LogError("[UniversalTooltipManager] Tooltip Panel not assigned!"); ret false; }
-
-if (canvasGroup == null) canvasGroup = tooltipPanel.GetComponent<CanvasGroup>();
-if (canvasGroup == null) // If still null, add one {
-Debug.LogWarning("[UniversalTooltipManager] CanvasGroup not found on Tooltip Panel, adding one.", tooltipPanel);
-canvasGroup = tooltipPanel.AddComponent<CanvasGroup>();
-}
-
-if (layoutGroup == null) layoutGroup = tooltipPanel.GetComponent<VerticalLayoutGroup>();
-if (backgroundImage == null) backgroundImage = tooltipPanel.GetComponent<Image>();
-
-if (titleText == null) titleText = FindTextComponent("Title");
-if (descriptionText == null) descriptionText = FindTextComponent("Description"); // Optional
-if (detailsText == null) detailsText = FindTextComponent("Details"); // Optional
-
-if (titleText == null) { Debug.LogError("[UniversalTooltipManager] Missing required title text component!"); ret false; }
-
-ret true;
-}
-
-TextMeshProUGUI FindTextComponent(string nameContains) {
-if (tooltipPanel == null) ret null;
-foreach (TextMeshProUGUI text in tooltipPanel.GetComponentsInChildren<TextMeshProUGUI>(true)) {
-if (text.name.ToLower().Contains(nameContains.ToLower()))
-ret text;
-}
-ret null;
-}
-
-void SetupTooltipPanel() {
-if (canvasGroup != null) {
-canvasGroup.alpha = 0f;
-canvasGroup.interactable = false;
-canvasGroup.blocksRaycasts = false;
-}
-
-if (tooltipPanel != null) {
-ContentSizeFitter sizeFitter = tooltipPanel.GetComponent<ContentSizeFitter>();
-if (sizeFitter != null && layoutGroup != null) {
-Destroy(sizeFitter);
+void Update() {
+if (isVisible && IsTargetNullOrDestroyed(currentTarget)) {
+if (canvasGroup != null && canvasGroup.alpha > 0.01f) {
+if (fadeCoroutine == null || canvasGroup.alpha == 1f) {
+HideTooltip();
 }
 }
-
-if (backgroundImage != null)
-backgroundImage.color = backgroundColor;
-
-ApplyTextStyles();
 }
-
-void ApplyTextStyles() {
-if (titleText != null) {
-titleText.color = titleColor;
-titleText.fontSize = titleFontSize;
-titleText.fontStyle = FontStyles.Bold;
-}
-
-if (descriptionText != null) {
-descriptionText.color = descriptionColor;
-descriptionText.fontSize = descriptionFontSize;
-}
-
-if (detailsText != null) {
-detailsText.color = detailsColor;
-detailsText.fontSize = detailsFontSize;
-}
-}
+} //
 
 pub void ShowNodeTooltip(NodeData nodeData, NodeDefinition nodeDef, Transform anchor = null) {
 if (nodeData == null || nodeDef == null) return;
@@ -7751,6 +7584,33 @@ ShowNodeTooltip(item.NodeData, item.NodeDefinition, anchor);
 else if (item.Type == InventoryBarItem.ItemType.Tool) {
 ShowToolTooltip(item.ToolDefinition, anchor);
 }
+}
+
+pub void HideTooltip() {
+currentTarget = null;
+if (tooltipPanel == null || canvasGroup == null) return;
+
+if (fadeCoroutine != null)
+StopCoroutine(fadeCoroutine);
+
+if (fadeDuration > 0f && gameObject.activeInHierarchy) {
+fadeCoroutine = StartCoroutine(FadeTooltip(false));
+}
+else {
+canvasGroup.alpha = 0f;
+canvasGroup.interactable = false;
+canvasGroup.blocksRaycasts = false;
+if (tooltipPanel != null) tooltipPanel.SetActive(false);
+isVisible = false;
+}
+}
+
+bool IsTargetNullOrDestroyed(object target) {
+if (target is UnityEngine.Object unityObject) {
+ret unityObject == null;
+}
+
+ret System.Object.ReferenceEquals(target, null);
 }
 
 void ShowTooltipInternal(string title, string description, string details, Transform itemAnchor) {
@@ -7807,23 +7667,44 @@ isVisible = true;
 }
 }
 
-pub void HideTooltip() {
-currentTarget = null;
-if (tooltipPanel == null || canvasGroup == null) return;
+bool ValidateReferences() {
+if (tooltipPanel == null) { Debug.LogError("[UniversalTooltipManager] Tooltip Panel not assigned!"); ret false; }
 
-if (fadeCoroutine != null)
-StopCoroutine(fadeCoroutine);
+if (canvasGroup == null) canvasGroup = tooltipPanel.GetComponent<CanvasGroup>() ?? tooltipPanel.AddComponent<CanvasGroup>();
+if (layoutGroup == null) layoutGroup = tooltipPanel.GetComponent<VerticalLayoutGroup>();
+if (backgroundImage == null) backgroundImage = tooltipPanel.GetComponent<Image>();
+if (titleText == null) titleText = FindTextComponent("Title");
+if (descriptionText == null) descriptionText = FindTextComponent("Description");
+if (detailsText == null) detailsText = FindTextComponent("Details");
 
-if (fadeDuration > 0f && gameObject.activeInHierarchy) {
-fadeCoroutine = StartCoroutine(FadeTooltip(false));
+if (titleText == null) { Debug.LogError("[UniversalTooltipManager] Missing required title text component!"); ret false; }
+
+ret true;
 }
-else {
+
+TextMeshProUGUI FindTextComponent(string nameContains) {
+if (tooltipPanel == null) ret null;
+foreach (TextMeshProUGUI text in tooltipPanel.GetComponentsInChildren<TextMeshProUGUI>(true)) {
+if (text.name.ToLower().Contains(nameContains.ToLower()))
+ret text;
+}
+ret null;
+}
+
+void SetupTooltipPanel() {
+if (canvasGroup != null) {
 canvasGroup.alpha = 0f;
 canvasGroup.interactable = false;
 canvasGroup.blocksRaycasts = false;
-if (tooltipPanel != null) tooltipPanel.SetActive(false);
-isVisible = false;
 }
+if (backgroundImage != null) backgroundImage.color = backgroundColor;
+ApplyTextStyles();
+}
+
+void ApplyTextStyles() {
+if (titleText != null) { titleText.color = titleColor; titleText.fontSize = titleFontSize; titleText.fontStyle = FontStyles.Bold; }
+if (descriptionText != null) { descriptionText.color = descriptionColor; descriptionText.fontSize = descriptionFontSize; }
+if (detailsText != null) { detailsText.color = detailsColor; detailsText.fontSize = detailsFontSize; }
 }
 
 string BuildNodeDetails(NodeData nodeData, NodeDefinition nodeDef) {
@@ -7845,12 +7726,13 @@ if (!hasAnyEffectText) { sb.Length -= "<b>Effects:</b>\n".Length; }
 
 if (showSeedSequenceInfo && nodeData.IsSeed()) {
 if (nodeData.storedSequence != null) {
-if (sb.Length > 0 && sb[sb.Length -1] != '\n') sb.Append("\n");
+if (sb.Length > 0 && sb[sb.Length - 1] != '\n') sb.Append("\n");
 sb.Append("<b>Seed Sequence:</b> ");
 sb.Append((nodeData.storedSequence.nodes != null && nodeData.storedSequence.nodes.Count > 0) ?
 $"{nodeData.storedSequence.nodes.Count} nodes" : "Empty");
-} else {
-if (sb.Length > 0 && sb[sb.Length -1] != '\n') sb.Append("\n");
+}
+else {
+if (sb.Length > 0 && sb[sb.Length - 1] != '\n') sb.Append("\n");
 sb.Append("<b>Seed Sequence:</b> Not Initialized");
 }
 }
@@ -7908,26 +7790,6 @@ canvasGroup.blocksRaycasts = false;
 if (!fadeIn) {
 if (tooltipPanel != null) tooltipPanel.SetActive(false);
 isVisible = false;
-}
-}
-
-pub void RefreshStyles() {
-if (backgroundImage != null)
-backgroundImage.color = backgroundColor;
-ApplyTextStyles();
-}
-
-pub void DebugLogState() {
-Debug.Log($"[UniversalTooltipManager] Panel Active: {tooltipPanel?.activeSelf}, Alpha: {canvasGroup?.alpha}, IsVisible: {isVisible}, CurrentTarget: {currentTarget?.ToString() ?? "null"}");
-}
-
-void Update() {
-if (isVisible && currentTarget == null) {
-if (canvasGroup != null && canvasGroup.alpha > 0.01f) {
-if (fadeCoroutine == null || canvasGroup.alpha == 1f) {
-HideTooltip();
-}
-}
 }
 }
 }
@@ -9017,18 +8879,11 @@ tileInteractionManager = TileInteractionManager.Instance
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\GardenerController.cs
 
-﻿// FILE: Assets/Scripts/Player/GardenerController.cs
-using System.Collections.Generic; // Keep for activeSpeedMultipliers
+﻿// FILE: Assets/Scripts/WorldInteraction/Player/GardenerController.cs
 
-pub cls GardenerController : MonoBehaviour {
-pub float moveSpeed = 5f;
-
-[SerializeField] float currentMoveSpeed;
-float baseMoveSpeed;
-List<float> activeSpeedMultipliers = new List<float>();
+pub cls GardenerController : SpeedModifiable {
 
 pub Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
-
 pub bool flipSpriteWhenMovingLeft = true;
 pub bool flipHorizontalDirection = true;
 
@@ -9047,15 +8902,13 @@ bool isPlanting = false;
 float plantingTimer = 0f;
 bool wasMovingBeforePlanting = false;
 
-void Awake() {
+prot ovr void Awake() {
+base.Awake(); // This is crucial: it sets currentSpeed = baseSpeed
+
 rb = GetComponent<Rigidbody2D>();
 sortableEntity = GetComponent<SortableEntity>();
 spriteRenderer = GetComponent<SpriteRenderer>();
 animator = GetComponent<Animator>();
-
-baseMoveSpeed = moveSpeed;
-currentMoveSpeed = moveSpeed;
-activeSpeedMultipliers = new List<float>();
 
 if (sortableEntity == null)
 sortableEntity = gameObject.AddComponent<SortableEntity>();
@@ -9065,13 +8918,6 @@ Debug.LogWarning("[GardenerController Awake] Main SpriteRenderer component not f
 
 if (animator == null && useAnimations)
 Debug.LogWarning("[GardenerController Awake] Animator component not found but useAnimations is true.", gameObject);
-}
-
-void Start() {
-}
-
-void OnDestroy() {
-activeSpeedMultipliers.Clear();
 }
 
 void Update() {
@@ -9090,45 +8936,9 @@ UpdateAnimations();
 UpdateSpriteDirection();
 }
 
-pub void ApplySpeedMultiplier(float multiplier) {
-if (!activeSpeedMultipliers.Contains(multiplier)) {
-activeSpeedMultipliers.Add(multiplier);
-UpdateMovementSpeed();
-
-if (Debug.isDebugBuild) {
-Debug.Log($"[{gameObject.name}] Applied speed multiplier: {multiplier}. New speed: {currentMoveSpeed}");
-}
-}
-}
-
-void UpdateMovementSpeed() {
-float newSpeed = baseMoveSpeed;
-if (activeSpeedMultipliers.Count > 0) {
-float lowestMultiplier = 1.0f;
-foreach (float multiplier in activeSpeedMultipliers) {
-if (multiplier < lowestMultiplier) {
-lowestMultiplier = multiplier;
-}
-}
-newSpeed *= lowestMultiplier;
-}
-currentMoveSpeed = newSpeed;
-}
-
-pub void RemoveSpeedMultiplier(float multiplier) {
-if (activeSpeedMultipliers.Contains(multiplier)) {
-activeSpeedMultipliers.Remove(multiplier);
-UpdateMovementSpeed();
-
-if (Debug.isDebugBuild) {
-Debug.Log($"[{gameObject.name}] Removed speed multiplier: {multiplier}. New speed: {currentMoveSpeed}");
-}
-}
-}
-
 void FixedUpdate() {
 if (!isPlanting) {
-rb.MovePosition(rb.position + movement.normalized * currentMoveSpeed * Time.fixedDeltaTime);
+rb.MovePosition(rb.position + movement.normalized * currentSpeed * Time.fixedDeltaTime);
 }
 }
 

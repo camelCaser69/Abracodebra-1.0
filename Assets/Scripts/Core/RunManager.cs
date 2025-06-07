@@ -11,25 +11,21 @@ public enum RunState
 
 public class RunManager : MonoBehaviour
 {
-    public static RunManager Instance { get; private set; }
+    public static RunManager Instance { get; set; }
 
-    [Header("State & Timing")]
-    [SerializeField] private RunState currentState = RunState.Planning;
-    [Tooltip("Time scale multiplier during the Growth & Threat phase.")]
-    [SerializeField] private float growthPhaseTimeScale = 6f;
-    [Tooltip("Current round number, starts at 1.")]
-    [SerializeField] private int currentRoundNumber = 1;
+    [SerializeField] RunState currentState = RunState.Planning;
+    [SerializeField] float growthPhaseTimeScale = 6f;
+    [SerializeField] int currentRoundNumber = 1;
 
-    [Header("Manager References (Assign in Inspector)")]
-    [SerializeField] private WeatherManager weatherManager;
-    [SerializeField] private WaveManager waveManager;
+    [SerializeField] WeatherManager weatherManager;
+    [SerializeField] WaveManager waveManager;
 
     public RunState CurrentState => currentState;
     public int CurrentRoundNumber => currentRoundNumber;
     public event Action<RunState> OnRunStateChanged;
     public event Action<int> OnRoundChanged;
 
-    private void Awake()
+    void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -39,18 +35,10 @@ public class RunManager : MonoBehaviour
         }
         Instance = this;
 
-        // This line will work without warning IF this GameObject is a root object in the scene.
-        // If you intend for RunManager to persist across scene loads.
-        // If your game is single-scene, you might not even need DontDestroyOnLoad.
-        if (transform.parent == null) // Only call DontDestroyOnLoad if it's a root GameObject
-        {
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Debug.LogWarning($"[RunManager] {gameObject.name} is not a root GameObject. DontDestroyOnLoad will not be called for it directly. If its parent is persistent, that's fine. Otherwise, make RunManager a root object if it needs to persist across scenes.", gameObject);
-        }
-
+        // NOTE: The check for whether this is a root GameObject has been removed.
+        // It is assumed that if this object is not a root object, its parent
+        // is correctly handled to persist across scenes (e.g., by calling
+        // DontDestroyOnLoad on the parent).
 
         SetState(RunState.Planning, true);
     }
