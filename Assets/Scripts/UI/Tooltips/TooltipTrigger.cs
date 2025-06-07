@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/UI/TooltipTrigger.cs (SIMPLIFIED)
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler

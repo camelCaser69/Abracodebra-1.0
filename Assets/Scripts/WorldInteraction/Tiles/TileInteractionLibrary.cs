@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Tiles/Data/TileInteractionLibrary.cs
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System; // Needed for [Serializable]
 

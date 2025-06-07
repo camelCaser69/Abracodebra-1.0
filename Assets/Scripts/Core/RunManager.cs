@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Core/RunManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 
 public enum RunState

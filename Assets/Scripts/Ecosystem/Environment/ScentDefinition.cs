@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Scents/ScentDefinition.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "Scent_", menuName = "Ecosystem/Scent Definition")]
 public class ScentDefinition : ScriptableObject

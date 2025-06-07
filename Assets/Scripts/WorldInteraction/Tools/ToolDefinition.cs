@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Tiles/Tools/ToolDefinition.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 [CreateAssetMenu(fileName = "ToolDefinition", menuName = "Tiles/Tool Definition")]
 public class ToolDefinition : ScriptableObject

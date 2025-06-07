@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Editor/NodeEffectDrawer.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 
 [CustomPropertyDrawer(typeof(NodeEffectData))]

@@ -1,5 +1,4 @@
-﻿// FILE: Assets\Scripts\Ecosystem\Core\SlowdownZone.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 public class SlowdownZone : MonoBehaviour

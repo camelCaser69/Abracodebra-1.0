@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/UI/Tooltips/UniversalTooltipManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Text;

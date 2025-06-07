@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Visuals/OutlinePartController.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 [RequireComponent(typeof(SpriteRenderer))]
 public class OutlinePartController : MonoBehaviour

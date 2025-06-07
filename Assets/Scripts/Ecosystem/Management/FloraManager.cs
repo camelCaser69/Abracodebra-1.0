@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Core/FloraManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic; // Added for Dictionary
 #if UNITY_EDITOR
 using UnityEditor;

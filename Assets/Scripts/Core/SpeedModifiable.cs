@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Core/SpeedModifiable.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 /// <summary>

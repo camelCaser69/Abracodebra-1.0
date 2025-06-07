@@ -2,7 +2,6 @@
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-// Ensure this script is attached to a GameObject in your scene
 public class NightColorPostProcess : MonoBehaviour
 {
     [Header("Core References")]

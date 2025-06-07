@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Visuals/ShadowPartController.cs
-using UnityEngine;
+﻿using UnityEngine;
 // using UnityEngine.Rendering; // Not needed for this simple fade
 
 [RequireComponent(typeof(SpriteRenderer))]

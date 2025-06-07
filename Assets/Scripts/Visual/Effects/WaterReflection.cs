@@ -1,7 +1,6 @@
-﻿// FILE: Assets/Scripts/Visuals/WaterReflection.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-using System.Collections.Generic; // Keep for potential future extensions, not strictly needed now
+using System.Collections.Generic; 
 
 public class WaterReflection : MonoBehaviour
 {

@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Core/WaveDefinition.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 // Enum WaveSpawnLocationType remains the same

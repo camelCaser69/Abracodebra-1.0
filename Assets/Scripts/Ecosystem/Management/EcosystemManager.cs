@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Core/EcosystemManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 public class EcosystemManager : MonoBehaviour
 {

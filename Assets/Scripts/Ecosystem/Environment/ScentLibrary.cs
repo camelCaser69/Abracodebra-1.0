@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Scents/ScentLibrary.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 

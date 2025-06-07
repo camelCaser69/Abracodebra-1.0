@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Nodes/Runtime/NodeExecutor.cs
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Linq;

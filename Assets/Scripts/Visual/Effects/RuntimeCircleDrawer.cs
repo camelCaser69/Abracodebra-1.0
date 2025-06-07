@@ -1,6 +1,4 @@
-﻿// FILE: Assets/Scripts/Visuals/RuntimeCircleDrawer.cs
-
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Draws a circle outline using a LineRenderer attached to the same GameObject.

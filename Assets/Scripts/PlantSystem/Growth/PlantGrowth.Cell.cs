@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.Cell.cs
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq; // Added this namespace for OrderBy()
 using UnityEngine;
 

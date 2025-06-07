@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Visuals/PlantOutlineController.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 

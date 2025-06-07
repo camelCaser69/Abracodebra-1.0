@@ -1,6 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Core/PoopController.cs (Ensure Collider is Added)
-
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 
 [RequireComponent(typeof(Collider2D))] // Add RequireComponent for Collider2D

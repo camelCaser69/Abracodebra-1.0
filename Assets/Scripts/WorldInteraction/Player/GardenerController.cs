@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/WorldInteraction/Player/GardenerController.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 // CHANGED: Inherits from SpeedModifiable now

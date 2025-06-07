@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Core/UIManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour

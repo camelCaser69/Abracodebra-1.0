@@ -1,4 +1,4 @@
-﻿﻿// FILE: Assets/Scripts/Nodes/Core/NodeData.cs
+﻿﻿
 using System;
 using System.Collections.Generic;
 using System.Linq;

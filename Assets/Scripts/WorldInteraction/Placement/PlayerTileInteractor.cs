@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Tiles/Data/PlayerTileInteractor.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 [DefaultExecutionOrder(100)] // Ensures LateUpdate runs after TileInteractionManager.Update
 public sealed class PlayerTileInteractor : MonoBehaviour

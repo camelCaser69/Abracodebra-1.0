@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Tiles/Data/TileInteractionManager.cs
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using skner.DualGrid; // Assuming this is the correct namespace for your DualGrid package

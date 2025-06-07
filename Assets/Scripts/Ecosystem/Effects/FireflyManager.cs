@@ -1,6 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyManager.cs
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using System.Collections.Generic;
 #if UNITY_EDITOR

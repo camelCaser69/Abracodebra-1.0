@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Nodes/Core/NodeEffectData.cs
-using System;
+﻿using System;
 using UnityEngine;
 
 [Serializable]

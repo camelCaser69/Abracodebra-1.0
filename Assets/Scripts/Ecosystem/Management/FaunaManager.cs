@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Core/FaunaManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 

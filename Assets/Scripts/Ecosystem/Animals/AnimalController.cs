@@ -1,6 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Animals/AnimalController.cs
-
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;

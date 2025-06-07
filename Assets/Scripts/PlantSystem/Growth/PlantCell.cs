@@ -1,6 +1,4 @@
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantCell.cs (Fix Leaf Tracking)
-
-using UnityEngine;
+﻿using UnityEngine;
 
 // Define the enum here if it's closely tied to PlantCell,
 // or move it to a separate file (e.g., PlantEnums.cs) for better organization.

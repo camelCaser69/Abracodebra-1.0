@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Ecosystem/Core/WaveManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro; // Keep for legacy UI if any part is still used

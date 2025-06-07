@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Tiles/Data/PlantPlacementManager.cs
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Linq; // Added for LINQ
 

@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Battle/Plant/WeatherManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 
 public class WeatherManager : MonoBehaviour

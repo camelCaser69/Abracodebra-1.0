@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.Growth.cs
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq; // Keep for OrderBy

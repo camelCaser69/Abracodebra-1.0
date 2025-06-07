@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Battle/Plant/LeafData.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 /// <summary>
 /// Class to store information about leaves for regrowth tracking

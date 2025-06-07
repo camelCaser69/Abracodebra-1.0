@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Visuals/Managers/WaterReflectionManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 public class WaterReflectionManager : MonoBehaviour
 {

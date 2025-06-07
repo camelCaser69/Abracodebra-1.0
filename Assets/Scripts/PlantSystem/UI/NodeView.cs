@@ -1,7 +1,4 @@
-﻿// FILE: Assets/Scripts/Nodes/UI/NodeView.cs (MODIFIED)
-// Remove the old tooltip-related code and add TooltipTrigger
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;

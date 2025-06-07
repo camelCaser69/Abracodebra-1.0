@@ -1,6 +1,5 @@
-﻿// FILE: Assets/Scripts/Nodes/Core/OutputNodeEffect.cs
-using UnityEngine;
-using System.Collections.Generic; // Required for Dictionary
+﻿using UnityEngine;
+using System.Collections.Generic; 
 
 public class OutputNodeEffect : MonoBehaviour
 {

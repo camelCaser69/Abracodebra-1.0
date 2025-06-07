@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Visuals/PlantShadowController.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 public class PlantShadowController : MonoBehaviour

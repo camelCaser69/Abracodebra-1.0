@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Nodes/UI/NodeCell.cs
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;

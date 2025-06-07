@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/UI/InventoryBarItem.cs
-using UnityEngine;
+﻿using UnityEngine;
 
 [System.Serializable]
 public class InventoryBarItem

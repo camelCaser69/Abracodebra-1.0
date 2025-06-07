@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.NodeExecution.cs
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;

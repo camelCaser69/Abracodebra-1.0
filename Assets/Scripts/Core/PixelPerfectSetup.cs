@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Core/PixelPerfectSetup.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.U2D;
 
 [RequireComponent(typeof(Camera))]

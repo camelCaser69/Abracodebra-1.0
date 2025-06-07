@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Nodes/UI/NodeDraggable.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 

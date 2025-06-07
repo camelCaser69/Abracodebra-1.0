@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Nodes/Core/NodeDefinition.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]

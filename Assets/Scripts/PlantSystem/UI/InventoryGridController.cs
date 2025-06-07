@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Nodes/UI/InventoryGridController.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;

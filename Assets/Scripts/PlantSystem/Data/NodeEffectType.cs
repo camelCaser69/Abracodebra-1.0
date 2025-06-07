@@ -1,5 +1,4 @@
-﻿// FILE: Assets/Scripts/Nodes/Core/NodeEffectType.cs
-using System;
+﻿using System;
 using UnityEngine;
 
 public enum NodeEffectType

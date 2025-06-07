@@ -1,7 +1,4 @@
-﻿// FILE: Assets/Scripts/Tiles/Tools/ToolView.cs (MODIFIED)
-// Remove old tooltip code and add TooltipTrigger
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
