@@ -1,54 +1,51 @@
 ﻿using UnityEngine;
+using TMPro;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 
-// --- Enums ---
 public enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
 
 public partial class PlantGrowth : MonoBehaviour
 {
-    // ------------------------------------------------
-    // --- SERIALIZED FIELDS ---
-    // ------------------------------------------------
+    #region Static Instance Tracking
 
-    [Header("UI & Visuals")]
+    /// <summary>
+    /// A static list of all active PlantGrowth instances in the scene.
+    /// Used by managers to avoid expensive FindObjectsByType calls.
+    /// </summary>
+    public static readonly List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
+
+    #endregion
+
+    #region Serialized Fields
+    [Header("UI")]
     [SerializeField] private TMP_Text energyText;
+
+    [Header("Cell Prefabs")]
     [SerializeField] private GameObject seedCellPrefab;
     [SerializeField] private GameObject stemCellPrefab;
     [SerializeField] private GameObject leafCellPrefab;
     [SerializeField] private GameObject berryCellPrefab; // Used for PlantCellType.Fruit
     [SerializeField] private float cellSpacing = 0.08f;
 
-    [Header("Shadow Setup")]
-    [SerializeField] [Tooltip("Assign the PlantShadowController component from the child _ShadowRoot GameObject")]
-    private PlantShadowController shadowController;
-    [SerializeField] [Tooltip("Assign your 'PlantShadow' prefab (GO + SpriteRenderer + ShadowPartController script)")]
-    private GameObject shadowPartPrefab;
+    [Header("Visual Controllers")]
+    [SerializeField] private PlantShadowController shadowController;
+    [SerializeField] private GameObject shadowPartPrefab;
 
-    [Header("Outline Setup")]
-    [SerializeField] [Tooltip("Enable or disable plant outline visualization")]
-    private bool enableOutline = true;
-    [SerializeField] [Tooltip("Assign the PlantOutlineController component from the child _OutlineRoot GameObject")]
-    private PlantOutlineController outlineController;
-    [SerializeField] [Tooltip("Assign your outline part prefab (GO + SpriteRenderer + OutlinePartController script)")]
-    private GameObject outlinePartPrefab;
+    [Header("Outline")]
+    [SerializeField] private bool enableOutline = true;
+    [SerializeField] private PlantOutlineController outlineController;
+    [SerializeField] private GameObject outlinePartPrefab;
 
-    [Header("Growth & UI Timing")]
+    [Header("Growth UI")]
     [SerializeField] private bool showGrowthPercentage = true;
     [SerializeField] private bool allowPhotosynthesisDuringGrowth = false;
-    [SerializeField] [Tooltip("Percentage UI updates only on these increments (e.g., 5 shows 0, 5, 10...).")]
-    [Range(1, 25)] private int percentageIncrement = 5;
-    // --- NEW FIELD ---
-    [SerializeField] [Tooltip("If true, percentage display approximates smooth progress based on time. If false, it reflects discrete stem cell additions.")]
-    private bool continuousIncrement = false;
-    // -----------------
+    [SerializeField, Range(1, 25)] private int percentageIncrement = 5;
+    [SerializeField] private bool continuousIncrement = false;
+    #endregion
 
-    // ------------------------------------------------
-    // --- INTERNAL STATE & DATA ---
-    // ------------------------------------------------
-
+    #region Fields
     private NodeGraph nodeGraph;
     public PlantState currentState = PlantState.Initializing;
     public float currentEnergy = 0f;
@@ -59,17 +56,12 @@ public partial class PlantGrowth : MonoBehaviour
     private Coroutine growthCoroutine;
     private bool isGrowthCompletionHandled = false;
 
-    // ------------------------------------------------
-    // --- POOP FERTILIZER DATA ---
-    // ------------------------------------------------
+    // Poop absorption stats
     private float poopDetectionRadius = 0f;
     private float poopEnergyBonus = 0f; // Renamed from poopAbsorptionRate
     private List<LeafData> leafDataList = new List<LeafData>();
 
-    // ------------------------------------------------
-    // --- CALCULATED STATS ---
-    // ------------------------------------------------
-
+    // Final calculated stats
     private int targetStemLength;
     private float finalGrowthSpeed; // Represents time interval per step
     private int finalLeafGap;
@@ -80,29 +72,21 @@ public partial class PlantGrowth : MonoBehaviour
     private float cycleCooldown;
     private float nodeCastDelay;
 
-    // ------------------------------------------------
-    // --- RUNTIME VARIABLES ---
-    // ------------------------------------------------
-
+    // Growth state variables
     private int currentStemCount = 0;
     private float cycleTimer = 0f;
     private int displayedGrowthPercentage = -1;
     private bool? offsetRightForPattern1 = null;
-    // --- NEW FIELDS for Continuous Mode ---
     private float currentGrowthElapsedTime = 0f;
     private float estimatedTotalGrowthTime = 1f; // Default to 1 to avoid division by zero
-    // --- NEW FIELDS for better growth tracking ---
     private float actualGrowthProgress = 0f; // The normalized progress value (0-1) representing true growth completion
     private int stepsCompleted = 0; // Track how many steps have been completed
     private int totalPlannedSteps = 0; // Total number of steps in the growth plan
+    #endregion
 
-    // ------------------------------------------------
-    // --- UNITY LIFECYCLE METHODS ---
-    // ------------------------------------------------
 
-    void Awake()
+    private void Awake()
     {
-        // --- Critical Setup Check ---
         bool setupValid = true;
         if (shadowController == null) { shadowController = GetComponentInChildren<PlantShadowController>(true); if (shadowController == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantShadowController ref missing!", this); setupValid = false; } else { Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantShadowController dynamically.", this); } }
         if (shadowPartPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Shadow Part Prefab missing!", this); setupValid = false; }
@@ -110,8 +94,26 @@ public partial class PlantGrowth : MonoBehaviour
         if (seedCellPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Seed Cell Prefab missing!", this); setupValid = false; } if (energyText == null) Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Energy Text (TMP_Text) missing.", this);
         if (!setupValid) { enabled = false; return; }
         if (!enableOutline && outlineController != null) { outlineController.gameObject.SetActive(false); }
+        
         fireflyManagerInstance = FireflyManager.Instance;
         EnsureUIReferences();
+        
+        AllActivePlants.Add(this); // Register instance
+    }
+    
+    private void OnDestroy()
+    {
+        AllActivePlants.Remove(this); // Unregister instance
+
+        StopAllCoroutines(); 
+        growthCoroutine = null;
+        
+        if (PlantGrowthModifierManager.Instance != null)
+        {
+            PlantGrowthModifierManager.Instance.UnregisterPlant(this);
+        }
+        
+        ClearAllVisuals();
     }
 
     void Start()
@@ -169,13 +171,6 @@ public partial class PlantGrowth : MonoBehaviour
             case PlantState.Initializing:
                 break;
         }
-    }
-
-    private void OnDestroy()
-    {
-        StopAllCoroutines(); growthCoroutine = null;
-        if (PlantGrowthModifierManager.Instance != null) { PlantGrowthModifierManager.Instance.UnregisterPlant(this); }
-        ClearAllVisuals(); // Assumes ClearAllVisuals is in another partial file
     }
 
     // ------------------------------------------------
