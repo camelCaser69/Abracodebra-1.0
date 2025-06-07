@@ -275,17 +275,16 @@ public class InventoryBarController : MonoBehaviour
         UpdateSelection();
     }
 
-    void UpdateSelection()
+    private void UpdateSelection()
     {
         SelectedItem = null; // Reset
 
         if (selectedSlot == -1) // Explicitly deselected
         {
-            // SelectedItem remains null
+            // Do nothing, SelectedItem is already null
         }
         else if (selectedSlot >= 0 && selectedSlot < barCells.Count && inventoryGridController != null)
         {
-            // This part tries to find the actual item from the main inventory
             int mainInventoryColumns = inventoryGridController.inventoryColumns;
             if (mainInventoryColumns > 0)
             {
@@ -301,7 +300,7 @@ public class InventoryBarController : MonoBehaviour
             }
         }
 
-        // Update highlight based on SelectedItem and selectedSlot
+        // Update the visual selection highlight
         if (selectionHighlight != null)
         {
             if (SelectedItem != null && SelectedItem.IsValid() && selectedSlot >= 0 && selectedSlot < barCells.Count)
@@ -332,19 +331,26 @@ public class InventoryBarController : MonoBehaviour
             }
         }
 
-        // Update tooltip
+        // --- MODIFICATION START ---
+        // Update the tooltip based on the new selection
         if (gameObject.activeInHierarchy && SelectedItem != null && SelectedItem.IsValid() && UniversalTooltipManager.Instance != null && selectedSlot >= 0 && selectedSlot < barCells.Count)
         {
-            UniversalTooltipManager.Instance.ShowInventoryItemTooltip(
-                SelectedItem,
-                barCells[selectedSlot].transform
-            );
+            ITooltipDataProvider provider = (SelectedItem.Type == InventoryBarItem.ItemType.Node)
+                ? (ITooltipDataProvider)SelectedItem.NodeDefinition
+                : SelectedItem.ToolDefinition;
+            
+            object sourceData = (SelectedItem.Type == InventoryBarItem.ItemType.Node)
+                ? SelectedItem.NodeData
+                : null;
+
+            UniversalTooltipManager.Instance.ShowTooltip(provider, barCells[selectedSlot].transform, sourceData);
         }
         else if (UniversalTooltipManager.Instance != null)
         {
             UniversalTooltipManager.Instance.HideTooltip();
         }
-
+        // --- MODIFICATION END ---
+        
         OnSelectionChanged?.Invoke(SelectedItem);
     }
 

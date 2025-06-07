@@ -1,28 +1,48 @@
 ﻿using UnityEngine;
+using System.Text;
 
-[CreateAssetMenu(fileName = "ToolDefinition", menuName = "Tiles/Tool Definition")]
-public class ToolDefinition : ScriptableObject
+// NOTE: The ITooltipDataProvider interface is defined in UniversalTooltipManager.cs
+// It is included here in comments for clarity, but not as a live definition.
+
+[CreateAssetMenu(fileName = "Tool_", menuName = "Gameplay/New Tool Definition")]
+public class ToolDefinition : ScriptableObject, ITooltipDataProvider
 {
-    [Header("Identification")]
-    [Tooltip("Which tool type this represents (e.g. Hoe, WateringCan).")]
+    #region Fields
+    
     public ToolType toolType;
-    [Tooltip("Human-readable name (for debugging/UI).")]
     public string displayName;
 
     [Header("Visuals")]
-    [Tooltip("Icon sprite for the tool.")]
     public Sprite icon;
-    [Tooltip("Tint color to apply to the icon sprite.")]
     public Color iconTint = Color.white;
 
-    [Header("Usage Limits")]
-    [Tooltip("If true, this tool has a limited number of uses.")]
+    [Header("Usage")]
     public bool limitedUses = false;
-    [Tooltip("The number of uses the tool starts with (only relevant if Limited Uses is true).")]
-    [Min(0)]
     public int initialUses = 10;
-    
-    [Header("Auto-Add to Inventory")] // NEW SECTION
-    [Tooltip("If true, this tool will be automatically added to the inventory at the start of planning phase.")]
-    public bool autoAddToInventory = true; // NEW FIELD
+
+    [Header("Auto-Add to Inventory")]
+    public bool autoAddToInventory = true;
+
+    #endregion
+
+    #region ITooltipDataProvider Implementation
+
+    public string GetTooltipTitle()
+    {
+        return displayName ?? "Unknown Tool";
+    }
+
+    public string GetTooltipDescription()
+    {
+        return $"Tool Type: {toolType}";
+    }
+
+    public string GetTooltipDetails(object source = null)
+    {
+        var sb = new StringBuilder();
+        sb.Append(limitedUses ? $"<b>Uses:</b> {initialUses}" : "<b>Uses:</b> Unlimited");
+        return sb.ToString().TrimEnd();
+    }
+
+    #endregion
 }

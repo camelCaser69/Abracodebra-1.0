@@ -1,58 +1,150 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-[CreateAssetMenu(fileName = "NodeDefinition", menuName = "Nodes/NodeDefinition")]
-public class NodeDefinition : ScriptableObject
+// NOTE: The ITooltipDataProvider interface is defined in UniversalTooltipManager.cs
+
+[CreateAssetMenu(fileName = "Node_001_", menuName = "Nodes/Node Definition")]
+public class NodeDefinition : ScriptableObject, ITooltipDataProvider
 {
+    #region Fields
+
     [Header("Display")]
     public string displayName;
-    [TextArea]
+    [TextArea(3, 5)]
     public string description;
     public Sprite thumbnail;
-    [Tooltip("Tint color applied to the thumbnail image.")]
     public Color thumbnailTintColor = Color.white;
-    [Tooltip("Background color for the Node View representation.")]
     public Color backgroundColor = Color.gray;
 
-    [Header("Prefab & Effects")]
-    [Tooltip("Optional: Specific NodeView prefab for this node type. If null, the default from NodeEditorGridController is used.")]
+    [Header("System")]
     public GameObject nodeViewPrefab;
-    [Tooltip("List of effects this node applies. Configure these effects carefully.")]
-    public List<NodeEffectData> effects; // This is the list configured in the Inspector
+    [Space]
+    [Tooltip("The list of effects this node will have.")]
+    public List<NodeEffectData> effects;
 
-    /// <summary>
-    /// Creates a deep copy of the effects list configured in this NodeDefinition asset.
-    /// This ensures that runtime NodeData instances get their own copies of effects.
-    /// </summary>
-    /// <returns>A new list containing copies of the NodeEffectData.</returns>
+    #endregion
+
     public List<NodeEffectData> CloneEffects()
     {
-        List<NodeEffectData> copy = new List<NodeEffectData>();
-        if (effects == null) {
-            // Debug.LogWarning($"NodeDefinition '{this.name}' has a null effects list."); // Optional warning
-            return copy; // Handle null list
+        var copy = new List<NodeEffectData>();
+        if (effects == null)
+        {
+            return copy;
         }
 
         foreach (var originalEffect in effects)
         {
-            if (originalEffect == null) {
-                 Debug.LogWarning($"NodeDefinition '{this.name}' contains a null effect in its list."); // Optional warning
-                 continue; // Skip null effects
+            if (originalEffect == null)
+            {
+                Debug.LogWarning($"NodeDefinition '{this.name}' contains a null effect in its list.");
+                continue;
             }
 
-            // Create a new instance and copy ALL relevant fields
-            NodeEffectData newEffect = new NodeEffectData()
+            var newEffect = new NodeEffectData()
             {
                 effectType = originalEffect.effectType,
                 primaryValue = originalEffect.primaryValue,
                 secondaryValue = originalEffect.secondaryValue,
                 isPassive = originalEffect.isPassive,
-                // --- FIXED: Copy the ScentDefinition reference ---
                 scentDefinitionReference = originalEffect.scentDefinitionReference
-                // --------------------------------------------------
             };
             copy.Add(newEffect);
         }
         return copy;
     }
+
+    #region ITooltipDataProvider Implementation
+
+    public string GetTooltipTitle()
+    {
+        return displayName ?? "Unknown Node";
+    }
+
+    public string GetTooltipDescription()
+    {
+        return description ?? string.Empty;
+    }
+
+    public string GetTooltipDetails(object source = null)
+    {
+        var nodeData = source as NodeData;
+        if (nodeData == null) return string.Empty;
+
+        var sb = new StringBuilder();
+
+        // Build Effects Details
+        if (nodeData.effects != null && nodeData.effects.Any())
+        {
+            sb.Append("<b>Effects:</b>\n");
+            var passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f); // Blue-ish for passive
+            var activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);  // Orange-ish for active
+            const string effectPrefix = "• ";
+
+            foreach (var effect in nodeData.effects)
+            {
+                if (effect == null) continue;
+                Color effectColor = effect.isPassive ? passiveEffectColor : activeEffectColor;
+                string hexColor = ColorUtility.ToHtmlStringRGB(effectColor);
+                sb.Append($"<color=#{hexColor}>{effectPrefix}{effect.effectType}: ");
+                sb.Append(FormatEffectValue(effect));
+                sb.Append("</color>\n");
+            }
+        }
+
+        // Build Seed Sequence Details
+        if (nodeData.IsSeed())
+        {
+            if (sb.Length > 0 && sb[sb.Length - 1] != '\n') sb.Append("\n");
+            sb.Append("<b>Seed Sequence:</b> ");
+            if (nodeData.storedSequence?.nodes != null && nodeData.storedSequence.nodes.Any())
+            {
+                sb.Append($"{nodeData.storedSequence.nodes.Count} nodes");
+            }
+            else
+            {
+                sb.Append("Empty");
+            }
+        }
+
+        return sb.ToString().TrimEnd();
+    }
+
+    /// <summary>
+    /// Formats the primary and secondary values of a node effect for display.
+    /// </summary>
+    private string FormatEffectValue(NodeEffectData effect)
+    {
+        string result = effect.primaryValue.ToString("G3");
+        bool hasSecondaryValue = false;
+        
+        // Define which effects explicitly use a secondary value.
+        switch (effect.effectType)
+        {
+            case NodeEffectType.ScentModifier:
+            case NodeEffectType.PoopFertilizer:
+                hasSecondaryValue = true;
+                break;
+            default:
+                // For other types, only show secondary value if it's not zero.
+                if (effect.secondaryValue != 0) hasSecondaryValue = true;
+                break;
+        }
+
+        if (hasSecondaryValue)
+        {
+            result += $" / {effect.secondaryValue.ToString("G3")}";
+        }
+
+        // Add scent name if applicable
+        if (effect.effectType == NodeEffectType.ScentModifier && effect.scentDefinitionReference != null)
+        {
+            result += $" ({effect.scentDefinitionReference.displayName})";
+        }
+
+        return result;
+    }
+
+    #endregion
 }

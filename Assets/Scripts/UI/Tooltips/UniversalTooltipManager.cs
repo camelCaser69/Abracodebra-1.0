@@ -1,48 +1,52 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Text;
 using System.Collections;
-using UnityEngine.EventSystems;
+
+/// <summary>
+/// A common interface for any object that can provide data to the tooltip system.
+/// </summary>
+public interface ITooltipDataProvider
+{
+    string GetTooltipTitle();
+    string GetTooltipDescription();
+    string GetTooltipDetails(object source = null);
+}
 
 public class UniversalTooltipManager : MonoBehaviour
 {
-    public static UniversalTooltipManager Instance { get; set; }
+    public static UniversalTooltipManager Instance { get; private set; }
 
-    [SerializeField] GameObject tooltipPanel;
-    [SerializeField] TextMeshProUGUI titleText;
-    [SerializeField] TextMeshProUGUI descriptionText;
-    [SerializeField] TextMeshProUGUI detailsText;
-    [SerializeField] Image backgroundImage;
-    [SerializeField] CanvasGroup canvasGroup;
+    #region Serialized Fields
+    [Header("UI References")]
+    [SerializeField] private GameObject tooltipPanel;
+    [SerializeField] private TextMeshProUGUI titleText;
+    [SerializeField] private TextMeshProUGUI descriptionText;
+    [SerializeField] private TextMeshProUGUI detailsText;
+    [SerializeField] private Image backgroundImage;
+    [SerializeField] private CanvasGroup canvasGroup;
+    [SerializeField] private VerticalLayoutGroup layoutGroup;
 
-    [SerializeField] VerticalLayoutGroup layoutGroup;
-
-    [SerializeField] float fadeDuration = 0.15f;
-    [SerializeField] bool moveTooltipWithMouse = true;
-    [SerializeField] Vector2 mouseFollowOffset = new Vector2(15f, -15f);
+    [Header("Behavior")]
+    [SerializeField] private float fadeDuration = 0.15f;
+    [SerializeField] private bool moveTooltipWithMouse = true;
+    [SerializeField] private Vector2 mouseFollowOffset = new Vector2(15f, -15f);
 
     [Header("Styling")]
-    [SerializeField] Color backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
-    [SerializeField] Color titleColor = Color.white;
-    [SerializeField] Color descriptionColor = new Color(0.8f, 0.8f, 0.8f, 1f);
-    [SerializeField] Color detailsColor = new Color(0.7f, 0.7f, 0.7f, 1f);
-    [SerializeField] int titleFontSize = 18;
-    [SerializeField] int descriptionFontSize = 14;
-    [SerializeField] int detailsFontSize = 12;
-    
-    [Header("Content")]
-    [SerializeField] bool showEffectsInDetails = true;
-    [SerializeField] bool showSeedSequenceInfo = true;
-    [SerializeField] string effectPrefix = "• ";
-    [SerializeField] Color passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f);
-    [SerializeField] Color activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);
+    [SerializeField] private Color backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
+    [SerializeField] private Color titleColor = Color.white;
+    [SerializeField] private Color descriptionColor = new Color(0.8f, 0.8f, 0.8f, 1f);
+    [SerializeField] private Color detailsColor = new Color(0.7f, 0.7f, 0.7f, 1f);
+    [SerializeField] private int titleFontSize = 18;
+    [SerializeField] private int descriptionFontSize = 14;
+    [SerializeField] private int detailsFontSize = 12;
+    #endregion
 
-    Coroutine fadeCoroutine;
-    object currentTarget;
-    bool isVisible = false;
+    private Coroutine _fadeCoroutine;
+    private object _currentTarget;
+    private bool _isVisible = false;
 
-    void Awake()
+    private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -60,125 +64,70 @@ public class UniversalTooltipManager : MonoBehaviour
         SetupTooltipPanel();
         if (tooltipPanel != null) tooltipPanel.SetActive(false);
         if (canvasGroup != null) canvasGroup.alpha = 0f;
-        isVisible = false;
+        _isVisible = false;
     }
-
-    void Update()
+    
+    private void Update()
     {
-        // If the tooltip is visible but its target object has been destroyed or set to null,
-        // hide the tooltip. This uses a helper method to avoid the CS0252 warning.
-        if (isVisible && IsTargetNullOrDestroyed(currentTarget))
+        if (_isVisible && IsTargetNullOrDestroyed(_currentTarget))
         {
-            if (canvasGroup != null && canvasGroup.alpha > 0.01f)
-            {
-                if (fadeCoroutine == null || canvasGroup.alpha == 1f)
-                {
-                    HideTooltip();
-                }
-            }
+            // If the target is gone, hide the tooltip immediately.
+            HideTooltip();
         }
-    } 
-
-    public void ShowNodeTooltip(NodeData nodeData, NodeDefinition nodeDef, Transform anchor = null)
+    }
+    
+    /// <summary>
+    /// Shows the tooltip for any object that provides tooltip data.
+    /// </summary>
+    /// <param name="provider">The object providing the data (e.g., a NodeDefinition or ToolDefinition).</param>
+    /// <param name="anchor">The transform to anchor the tooltip to (optional).</param>
+    /// <param name="source">Additional context data, like a NodeData instance (optional).</param>
+    public void ShowTooltip(ITooltipDataProvider provider, Transform anchor = null, object source = null)
     {
-        if (nodeData == null || nodeDef == null) return;
+        if (provider == null) return;
+        
+        // Don't re-show for the same object
+        if (_isVisible && ReferenceEquals(_currentTarget, provider)) return;
 
-        // explicit reference check – removes CS0252
-        if (isVisible && ReferenceEquals(currentTarget, nodeData)) return;
+        _currentTarget = provider;
 
-        currentTarget = nodeData;
-
-        string title       = nodeDef.displayName ?? nodeData.nodeDisplayName ?? "Unknown Node";
-        string description = nodeDef.description ?? string.Empty;
-        string details     = BuildNodeDetails(nodeData, nodeDef);
+        string title = provider.GetTooltipTitle();
+        string description = provider.GetTooltipDescription();
+        string details = provider.GetTooltipDetails(source);
 
         ShowTooltipInternal(title, description, details, anchor);
-    }
-
-    public void ShowToolTooltip(ToolDefinition toolDef, Transform anchor = null)
-    {
-        if (toolDef == null) return;
-
-        if (isVisible && ReferenceEquals(currentTarget, toolDef)) return;
-
-        currentTarget = toolDef;
-
-        string title       = toolDef.displayName ?? "Unknown Tool";
-        string description = $"Tool Type: {toolDef.toolType}";
-        string details     = BuildToolDetails(toolDef);
-
-        ShowTooltipInternal(title, description, details, anchor);
-    }
-
-    public void ShowInventoryItemTooltip(InventoryBarItem item, Transform anchor = null)
-    {
-        if (item == null || !item.IsValid()) return;
-
-        object underlying = item.Type == InventoryBarItem.ItemType.Node
-            ? (object)item.NodeData
-            : item.ToolDefinition;
-
-        if (isVisible && ReferenceEquals(currentTarget, underlying)) return;
-
-        if (item.Type == InventoryBarItem.ItemType.Node)
-            ShowNodeTooltip(item.NodeData, item.NodeDefinition, anchor);
-        else
-            ShowToolTooltip(item.ToolDefinition, anchor);
     }
 
     public void HideTooltip()
     {
-        currentTarget = null;
+        _currentTarget = null;
         if (tooltipPanel == null || canvasGroup == null) return;
 
-        if (fadeCoroutine != null)
-            StopCoroutine(fadeCoroutine);
+        if (_fadeCoroutine != null)
+        {
+            StopCoroutine(_fadeCoroutine);
+        }
 
         if (fadeDuration > 0f && gameObject.activeInHierarchy)
         {
-            fadeCoroutine = StartCoroutine(FadeTooltip(false));
+            _fadeCoroutine = StartCoroutine(FadeTooltip(false));
         }
         else
         {
             canvasGroup.alpha = 0f;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
             if (tooltipPanel != null) tooltipPanel.SetActive(false);
-            isVisible = false;
+            _isVisible = false;
         }
-    }
-    
-    // --- Private and Helper Methods ---
-
-    /// <summary>
-    /// Safely checks if the target object is null, correctly handling both standard C# objects
-    /// and UnityEngine.Objects that may have been destroyed. This is the definitive fix for
-    /// the CS0252 "unintended reference comparison" warning.
-    /// </summary>
-    private bool IsTargetNullOrDestroyed(object target)
-    {
-        // First, explicitly check if the object is a UnityEngine.Object.
-        if (target is UnityEngine.Object unityObject)
-        {
-            // If it is, use Unity's custom '==' operator. This is the only
-            // way to correctly check if a Unity object has been destroyed.
-            return unityObject == null;
-        }
-        
-        // If the object is NOT a UnityEngine.Object, it's a standard C# type.
-        // For these types, a direct reference comparison is what we want.
-        // Using object.ReferenceEquals is the most explicit way to do this
-        // and guarantees we don't accidentally trigger Unity's overloaded operator.
-        // This completely satisfies the compiler and removes the warning.
-        return System.Object.ReferenceEquals(target, null);
     }
 
     private void ShowTooltipInternal(string title, string description, string details, Transform itemAnchor)
     {
         if (tooltipPanel == null || canvasGroup == null) return;
 
-        if (fadeCoroutine != null)
-            StopCoroutine(fadeCoroutine);
+        if (_fadeCoroutine != null)
+        {
+            StopCoroutine(_fadeCoroutine);
+        }
 
         if (titleText != null)
         {
@@ -197,72 +146,92 @@ public class UniversalTooltipManager : MonoBehaviour
         }
 
         tooltipPanel.SetActive(true);
+        // Force layout rebuild to get correct size before positioning
         if (layoutGroup != null)
         {
             LayoutRebuilder.ForceRebuildLayoutImmediate(layoutGroup.GetComponent<RectTransform>());
         }
-
+        
         if (moveTooltipWithMouse)
         {
-            RectTransform tooltipRect = tooltipPanel.GetComponent<RectTransform>();
-            Canvas rootCanvas = tooltipPanel.GetComponentInParent<Canvas>()?.rootCanvas;
-
-            if (tooltipRect != null && rootCanvas != null && Input.mousePresent)
-            {
-                Vector2 targetScreenPos = Input.mousePosition;
-                targetScreenPos += mouseFollowOffset; // Apply user offset
-
-                RectTransform parentRect = tooltipRect.parent as RectTransform;
-                if (parentRect != null)
-                {
-                    Vector2 localPos;
-                    Camera renderCamera = (rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay) ? null : rootCanvas.worldCamera;
-                    if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, targetScreenPos, renderCamera, out localPos))
-                    {
-                        tooltipRect.localPosition = localPos;
-                    }
-                }
-            }
+            PositionTooltipWithMouse();
         }
 
         if (fadeDuration > 0f)
         {
-            fadeCoroutine = StartCoroutine(FadeTooltip(true));
+            _fadeCoroutine = StartCoroutine(FadeTooltip(true));
         }
         else
         {
             canvasGroup.alpha = 1f;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-            isVisible = true;
+            _isVisible = true;
         }
     }
 
-    private bool ValidateReferences()
+    private void PositionTooltipWithMouse()
     {
-        if (tooltipPanel == null) { Debug.LogError("[UniversalTooltipManager] Tooltip Panel not assigned!"); return false; }
+        var tooltipRect = tooltipPanel.GetComponent<RectTransform>();
+        var rootCanvas = tooltipPanel.GetComponentInParent<Canvas>()?.rootCanvas;
+
+        if (tooltipRect == null || rootCanvas == null || !Input.mousePresent) return;
         
-        if (canvasGroup == null) canvasGroup = tooltipPanel.GetComponent<CanvasGroup>() ?? tooltipPanel.AddComponent<CanvasGroup>();
-        if (layoutGroup == null) layoutGroup = tooltipPanel.GetComponent<VerticalLayoutGroup>();
-        if (backgroundImage == null) backgroundImage = tooltipPanel.GetComponent<Image>();
-        if (titleText == null) titleText = FindTextComponent("Title");
-        if (descriptionText == null) descriptionText = FindTextComponent("Description");
-        if (detailsText == null) detailsText = FindTextComponent("Details");
+        Vector2 targetScreenPos = Input.mousePosition;
+        targetScreenPos += mouseFollowOffset; // Apply user offset
+        
+        // Clamp to screen boundaries
+        var panelRect = tooltipRect.rect;
+        targetScreenPos.x = Mathf.Clamp(targetScreenPos.x, 0, Screen.width - panelRect.width);
+        targetScreenPos.y = Mathf.Clamp(targetScreenPos.y, 0, Screen.height - panelRect.height);
+        
+        var parentRect = tooltipRect.parent as RectTransform;
+        if (parentRect == null) return;
 
-        if (titleText == null) { Debug.LogError("[UniversalTooltipManager] Missing required title text component!"); return false; }
-
-        return true;
-    }
-    
-    private TextMeshProUGUI FindTextComponent(string nameContains)
-    {
-        if (tooltipPanel == null) return null;
-        foreach (TextMeshProUGUI text in tooltipPanel.GetComponentsInChildren<TextMeshProUGUI>(true))
+        Camera renderCamera = (rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay) ? null : rootCanvas.worldCamera;
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, targetScreenPos, renderCamera, out var localPos))
         {
-            if (text.name.ToLower().Contains(nameContains.ToLower()))
-                return text;
+            tooltipRect.localPosition = localPos;
         }
-        return null;
+    }
+
+    private IEnumerator FadeTooltip(bool fadeIn)
+    {
+        if (canvasGroup == null) yield break;
+
+        float elapsed = 0f;
+        float startAlpha = canvasGroup.alpha;
+        float targetAlpha = fadeIn ? 1f : 0f;
+
+        if (fadeIn) _isVisible = true;
+
+        if (fadeIn && tooltipPanel != null && !tooltipPanel.activeSelf)
+            tooltipPanel.SetActive(true);
+
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            float t = (fadeDuration > 0) ? elapsed / fadeDuration : 1f;
+            canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
+            yield return null;
+        }
+        
+        canvasGroup.alpha = targetAlpha;
+
+        if (!fadeIn)
+        {
+            if (tooltipPanel != null) tooltipPanel.SetActive(false);
+            _isVisible = false;
+        }
+    }
+
+    #region Setup and Validation
+    
+    private bool IsTargetNullOrDestroyed(object target)
+    {
+        if (target is UnityEngine.Object unityObject)
+        {
+            return unityObject == null;
+        }
+        return System.Object.ReferenceEquals(target, null);
     }
     
     private void SetupTooltipPanel()
@@ -284,103 +253,32 @@ public class UniversalTooltipManager : MonoBehaviour
         if (detailsText != null) { detailsText.color = detailsColor; detailsText.fontSize = detailsFontSize; }
     }
     
-    private string BuildNodeDetails(NodeData nodeData, NodeDefinition nodeDef)
+    private bool ValidateReferences()
     {
-        StringBuilder sb = new StringBuilder();
-        if (showEffectsInDetails && nodeData.effects != null && nodeData.effects.Count > 0)
-        {
-            sb.Append("<b>Effects:</b>\n");
-            bool hasAnyEffectText = false;
-            foreach (var effect in nodeData.effects)
-            {
-                if (effect == null) continue;
-                Color effectColor = effect.isPassive ? passiveEffectColor : activeEffectColor;
-                string hexColor = ColorUtility.ToHtmlStringRGB(effectColor);
-                sb.Append($"<color=#{hexColor}>{effectPrefix}{effect.effectType}: ");
-                sb.Append(FormatEffectValue(effect));
-                sb.Append("</color>\n");
-                hasAnyEffectText = true;
-            }
-            if (!hasAnyEffectText) { sb.Length -= "<b>Effects:</b>\n".Length; }
-        }
+        if (tooltipPanel == null) { Debug.LogError("[UniversalTooltipManager] Tooltip Panel not assigned!"); return false; }
 
-        if (showSeedSequenceInfo && nodeData.IsSeed())
-        {
-            if (nodeData.storedSequence != null)
-            {
-                if (sb.Length > 0 && sb[sb.Length - 1] != '\n') sb.Append("\n");
-                sb.Append("<b>Seed Sequence:</b> ");
-                sb.Append((nodeData.storedSequence.nodes != null && nodeData.storedSequence.nodes.Count > 0) ?
-                    $"{nodeData.storedSequence.nodes.Count} nodes" : "Empty");
-            }
-            else
-            {
-                if (sb.Length > 0 && sb[sb.Length - 1] != '\n') sb.Append("\n");
-                sb.Append("<b>Seed Sequence:</b> Not Initialized");
-            }
-        }
-        return sb.ToString().TrimEnd();
-    }
+        if (canvasGroup == null) canvasGroup = tooltipPanel.GetComponent<CanvasGroup>() ?? tooltipPanel.AddComponent<CanvasGroup>();
+        if (layoutGroup == null) layoutGroup = tooltipPanel.GetComponent<VerticalLayoutGroup>();
+        if (backgroundImage == null) backgroundImage = tooltipPanel.GetComponent<Image>();
+        if (titleText == null) titleText = FindTextComponent("Title");
+        if (descriptionText == null) descriptionText = FindTextComponent("Description");
+        if (detailsText == null) detailsText = FindTextComponent("Details");
 
-    private string BuildToolDetails(ToolDefinition toolDef)
-    {
-        StringBuilder sb = new StringBuilder();
-        sb.Append(toolDef.limitedUses ? $"<b>Uses:</b> {toolDef.initialUses}\n" : "<b>Uses:</b> Unlimited\n");
-        return sb.ToString().TrimEnd();
+        if (titleText == null) { Debug.LogError("[UniversalTooltipManager] Missing required title text component!"); return false; }
+
+        return true;
     }
     
-    private string FormatEffectValue(NodeEffectData effect)
+    private TextMeshProUGUI FindTextComponent(string nameContains)
     {
-        string result = effect.primaryValue.ToString("G3");
-        bool hasSecondaryValue = false;
-        switch (effect.effectType)
+        if (tooltipPanel == null) return null;
+        foreach (var text in tooltipPanel.GetComponentsInChildren<TextMeshProUGUI>(true))
         {
-            case NodeEffectType.ScentModifier:
-            case NodeEffectType.PoopFertilizer:
-                hasSecondaryValue = true;
-                break;
-            default:
-                if (effect.secondaryValue != 0) hasSecondaryValue = true;
-                break;
+            if (text.name.ToLower().Contains(nameContains.ToLower()))
+                return text;
         }
-        if (hasSecondaryValue)
-        {
-            result += $" / {effect.secondaryValue.ToString("G3")}";
-        }
-        if (effect.effectType == NodeEffectType.ScentModifier && effect.scentDefinitionReference != null)
-        {
-            result += $" ({effect.scentDefinitionReference.displayName})";
-        }
-        return result;
+        return null;
     }
     
-    private IEnumerator FadeTooltip(bool fadeIn)
-    {
-        if (canvasGroup == null) yield break;
-        float elapsed = 0f;
-        float startAlpha = canvasGroup.alpha;
-        float targetAlpha = fadeIn ? 1f : 0f;
-
-        if (fadeIn) isVisible = true;
-
-        if (fadeIn && tooltipPanel != null && !tooltipPanel.activeSelf)
-            tooltipPanel.SetActive(true);
-
-        while (elapsed < fadeDuration)
-        {
-            elapsed += Time.unscaledDeltaTime;
-            float t = (fadeDuration > 0) ? elapsed / fadeDuration : 1f;
-            canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
-            yield return null;
-        }
-        canvasGroup.alpha = targetAlpha;
-        canvasGroup.interactable = false;
-        canvasGroup.blocksRaycasts = false;
-
-        if (!fadeIn)
-        {
-            if (tooltipPanel != null) tooltipPanel.SetActive(false);
-            isVisible = false;
-        }
-    }
+    #endregion
 }

@@ -3,108 +3,81 @@ using UnityEngine.EventSystems;
 
 public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    [SerializeField] private TooltipType tooltipType = TooltipType.Auto;
+    private ItemView _itemView;
+    private NodeCell _nodeCell;
+    private bool _isShowingTooltip = false;
 
-    public enum TooltipType
+    private void Awake()
     {
-        Auto,
-        Node,
-        Tool,
-    }
-
-    private ItemView itemView;
-    private NodeCell nodeCell;
-    private bool isShowingTooltip = false;
-
-    void Awake()
-    {
-        itemView = GetComponent<ItemView>();
-        nodeCell = GetComponentInParent<NodeCell>();
+        // Cache references to potential data sources
+        _itemView = GetComponent<ItemView>();
+        _nodeCell = GetComponentInParent<NodeCell>();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (UniversalTooltipManager.Instance == null || isShowingTooltip) return;
+        if (UniversalTooltipManager.Instance == null || _isShowingTooltip) return;
+        
         ShowTooltip();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (UniversalTooltipManager.Instance == null || !isShowingTooltip) return;
+        if (UniversalTooltipManager.Instance == null || !_isShowingTooltip) return;
+
         HideTooltip();
     }
 
     private void ShowTooltip()
     {
-        switch (tooltipType)
-        {
-            case TooltipType.Auto: ShowAutoTooltip(); break;
-            case TooltipType.Node: ShowNodeTooltip(); break;
-            case TooltipType.Tool: ShowToolTooltip(); break;
-        }
-        isShowingTooltip = true;
-    }
+        ITooltipDataProvider provider = null;
+        object sourceData = null; // For passing NodeData to a NodeDefinition provider
 
-    private void ShowAutoTooltip()
-    {
-        // Prioritize the ItemView on this component first
-        if (itemView != null)
+        // Prioritize ItemView if it exists
+        if (_itemView != null)
         {
-            if (itemView.GetToolDefinition() != null)
+            if (_itemView.GetToolDefinition() != null)
             {
-                UniversalTooltipManager.Instance.ShowToolTooltip(itemView.GetToolDefinition());
-                return;
+                provider = _itemView.GetToolDefinition();
             }
-            if (itemView.GetNodeDefinition() != null)
+            else if (_itemView.GetNodeDefinition() != null)
             {
-                UniversalTooltipManager.Instance.ShowNodeTooltip(itemView.GetNodeData(), itemView.GetNodeDefinition());
-                return;
+                provider = _itemView.GetNodeDefinition();
+                sourceData = _itemView.GetNodeData();
+            }
+        }
+        // Fallback to NodeCell if no ItemView or ItemView has no provider
+        else if (_nodeCell != null)
+        {
+            if (_nodeCell.GetToolDefinition() != null)
+            {
+                provider = _nodeCell.GetToolDefinition();
+            }
+            else if (_nodeCell.GetNodeDefinition() != null)
+            {
+                provider = _nodeCell.GetNodeDefinition();
+                sourceData = _nodeCell.GetNodeData();
             }
         }
         
-        // Fallback to checking the parent cell's data
-        if (nodeCell != null)
+        if (provider != null)
         {
-            if (nodeCell.GetToolDefinition() != null)
-            {
-                UniversalTooltipManager.Instance.ShowToolTooltip(nodeCell.GetToolDefinition());
-            }
-            else if (nodeCell.GetNodeDefinition() != null)
-            {
-                UniversalTooltipManager.Instance.ShowNodeTooltip(nodeCell.GetNodeData(), nodeCell.GetNodeDefinition());
-            }
-        }
-    }
-
-    private void ShowNodeTooltip()
-    {
-        NodeData data = itemView?.GetNodeData() ?? nodeCell?.GetNodeData();
-        NodeDefinition def = itemView?.GetNodeDefinition() ?? nodeCell?.GetNodeDefinition();
-
-        if (data != null && def != null)
-        {
-            UniversalTooltipManager.Instance.ShowNodeTooltip(data, def);
-        }
-    }
-
-    private void ShowToolTooltip()
-    {
-        ToolDefinition def = itemView?.GetToolDefinition() ?? nodeCell?.GetToolDefinition();
-
-        if (def != null)
-        {
-            UniversalTooltipManager.Instance.ShowToolTooltip(def);
+            UniversalTooltipManager.Instance.ShowTooltip(provider, transform, sourceData);
+            _isShowingTooltip = true;
         }
     }
 
     private void HideTooltip()
     {
         UniversalTooltipManager.Instance?.HideTooltip();
-        isShowingTooltip = false;
+        _isShowingTooltip = false;
     }
 
-    void OnDisable()
+    private void OnDisable()
     {
-        if (isShowingTooltip) HideTooltip();
+        if (_isShowingTooltip)
+        {
+            HideTooltip();
+        }
     }
 }
