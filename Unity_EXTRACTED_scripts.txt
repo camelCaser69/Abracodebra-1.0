@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 461,770 → 291,814 chars (36.8% reduction)
-Estimated tokens saved: ~42,489
+Compression Stats: 455,446 → 289,929 chars (36.3% reduction)
+Estimated tokens saved: ~41,379
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -44,63 +44,63 @@ using System;
   EcosystemManager (Assets\Scripts\Ecosystem\Management/) L1997
   FaunaManager (Assets\Scripts\Ecosystem\Management/) L2026
   FloraManager (Assets\Scripts\Ecosystem\Management/) L2234
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L2465
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L2712
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L2741
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L2771
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L2784
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L2812
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L2873
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L2918
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L2969
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3003
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3073
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3093
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3128
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3143
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3228
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L3268
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L3291
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L3309
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L3336
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L3345
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L3513
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L3552
-  PlantGrowth.Growth (Assets\Scripts\PlantSystem\Growth/) L3576
-  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L3826
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4017
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L4347
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L4640
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L4707
-  ItemView (Assets\Scripts\PlantSystem\UI/) L5003
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L5122
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L5326
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L5460
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L5780
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L5916
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L6209
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L6297
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L6398
-  UniversalTooltipManager (Assets\Scripts\UI\Tooltips/) L6490
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L6811
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L6822
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L6906
-  WaterReflection (Assets\Scripts\Visual\Effects/) L7011
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L7406
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L7442
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L7632
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L7774
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L7879
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L8001
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L8041
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L8061
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L8073
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L8092
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L8251
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L2464
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L2711
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L2740
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L2770
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L2783
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L2811
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L2872
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L2917
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L2968
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3002
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3072
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3092
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3127
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3142
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3227
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L3339
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L3362
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L3380
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L3407
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L3416
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L3584
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L3623
+  PlantGrowth.Growth (Assets\Scripts\PlantSystem\Growth/) L3647
+  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L3897
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4088
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L4431
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L4729
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L4796
+  ItemView (Assets\Scripts\PlantSystem\UI/) L5092
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L5211
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L5415
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L5549
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L5869
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L6005
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L6298
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L6386
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L6487
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L6556
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L6787
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L6798
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L6882
+  WaterReflection (Assets\Scripts\Visual\Effects/) L6987
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L7382
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L7418
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L7608
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L7750
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L7855
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7977
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L8017
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L8037
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L8049
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L8084
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L8243
 
 [for]
-  PlantGrowth.Cell (Assets\Scripts\PlantSystem\Growth/) L8261
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L8504
+  PlantGrowth.Cell (Assets\Scripts\PlantSystem\Growth/) L8253
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L8496
 
 ================================================================================
 SCRIPTS
@@ -2315,7 +2315,6 @@ void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { Gizmos.colo
 // Assets\Scripts\Ecosystem\Management\FloraManager.cs
 
 ﻿using UnityEngine;
-using System.Collections.Generic; // Added for Dictionary
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -2325,47 +2324,52 @@ pub stat FloraManager Instance { get; set; }
 
 [SerializeField] bool showScentRadiiRuntime = false;
 [SerializeField] Color scentRadiusColorRuntime = Color.yellow;
-[SerializeField] bool logGizmoCalls = false;
-[SerializeField] GameObject circleVisualizerPrefab; // <<< ADDED
-[SerializeField] Transform circleContainer; // <<< ADDED
 
-[Header("Debugging - Poop Absorption")] // <<< NEW HEADER
 [SerializeField] bool showPoopAbsorptionRadiiRuntime = false;
 [SerializeField] Color poopAbsorptionRadiusColorRuntime = new Color(0.6f, 0.4f, 0.2f, 0.5f); // Brown-ish color
+
+[SerializeField] GameObject circleVisualizerPrefab;
+[SerializeField] Transform circleContainer;
+
+[SerializeField] bool logGizmoCalls = false;
 
 pub bool ShowScentRadiiRuntime => showScentRadiiRuntime;
 pub Color ScentRadiusColorRuntime => scentRadiusColorRuntime;
 pub bool ShowPoopAbsorptionRadiiRuntime => showPoopAbsorptionRadiiRuntime;
 pub Color PoopAbsorptionRadiusColorRuntime => poopAbsorptionRadiusColorRuntime;
 
-Dictionary<ScentSource, RuntimeCircleDrawer> activeCircleVisualizers = new Dictionary<ScentSource, RuntimeCircleDrawer>();
-Dictionary<PlantGrowth, RuntimeCircleDrawer> activePoopAbsorptionCircleVisualizers = new Dictionary<PlantGrowth, RuntimeCircleDrawer>();
+ro Dictionary<ScentSource, RuntimeCircleDrawer> _activeCircleVisualizers = new Dictionary<ScentSource, RuntimeCircleDrawer>();
+ro Dictionary<PlantGrowth, RuntimeCircleDrawer> _activePoopAbsorptionCircleVisualizers = new Dictionary<PlantGrowth, RuntimeCircleDrawer>();
 
 void Awake() {
-if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+if (Instance != null && Instance != this) {
+Destroy(gameObject);
+return;
+}
 Instance = this;
 
 if (circleVisualizerPrefab == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Visualizer Prefab is not assigned!", this); }
 if (circleContainer == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Container transform is not assigned!", this); }
 }
 
-void Update() // Added Update loop {
+void OnDestroy() {
+if (Instance == this) Instance = null;
+
+foreach (var kvp in _activeCircleVisualizers) {
+if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+}
+_activeCircleVisualizers.Clear();
+
+foreach (var kvp in _activePoopAbsorptionCircleVisualizers) {
+if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+}
+_activePoopAbsorptionCircleVisualizers.Clear();
+}
+
+void Update() {
 if (!Application.isPlaying) return;
 UpdateRuntimeCircleVisualizers();
 UpdatePoopAbsorptionCircleVisualizers();
-}
-
-void OnDestroy() {
-if (Instance == this) Instance = null;
-foreach (var kvp in activeCircleVisualizers) {
-if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-}
-activeCircleVisualizers.Clear();
-
-foreach (var kvp in activePoopAbsorptionCircleVisualizers) {
-if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-}
-activePoopAbsorptionCircleVisualizers.Clear();
 }
 
 void UpdatePoopAbsorptionCircleVisualizers() {
@@ -2374,24 +2378,22 @@ if (!Application.isPlaying) return;
 bool showCircles = showPoopAbsorptionRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
 
 if (!showCircles) {
-foreach (var kvp in activePoopAbsorptionCircleVisualizers) {
+foreach (var kvp in _activePoopAbsorptionCircleVisualizers) {
 if (kvp.Value != null) Destroy(kvp.Value.gameObject);
 }
-activePoopAbsorptionCircleVisualizers.Clear();
+_activePoopAbsorptionCircleVisualizers.Clear();
 return;
 }
 
-PlantGrowth[] plants = FindObjectsByType<PlantGrowth>(FindObjectsSortMode.None);
-HashSet<PlantGrowth> currentPlantsSet = new HashSet<PlantGrowth>(plants);
+var currentPlantsSet = new HashSet<PlantGrowth>(PlantGrowth.AllActivePlants);
 
-List<PlantGrowth> plantsToRemove = new List<PlantGrowth>();
+var plantsToRemove = new List<PlantGrowth>();
 
-foreach (var kvp in activePoopAbsorptionCircleVisualizers) {
+foreach (var kvp in _activePoopAbsorptionCircleVisualizers) {
 PlantGrowth plant = kvp.Key;
 RuntimeCircleDrawer drawer = kvp.Value;
 
-if (plant == null || drawer == null || !plant.gameObject.activeInHierarchy ||
-!currentPlantsSet.Contains(plant)) {
+if (plant == null || drawer == null || !plant.gameObject.activeInHierarchy || !currentPlantsSet.Contains(plant)) {
 plantsToRemove.Add(plant);
 if (drawer != null) Destroy(drawer.gameObject);
 continue;
@@ -2411,25 +2413,24 @@ plantsToRemove.Add(plant); // If radius is too small or zero, remove the visuali
 }
 
 foreach (var plant in plantsToRemove) {
-if (activePoopAbsorptionCircleVisualizers.TryGetValue(plant, out RuntimeCircleDrawer drawer)) {
+if (_activePoopAbsorptionCircleVisualizers.TryGetValue(plant, out var drawer)) {
 if (drawer != null) Destroy(drawer.gameObject);
-activePoopAbsorptionCircleVisualizers.Remove(plant);
+_activePoopAbsorptionCircleVisualizers.Remove(plant);
 }
 }
 
-foreach (PlantGrowth plant in plants) {
-if (plant == null || activePoopAbsorptionCircleVisualizers.ContainsKey(plant)) continue;
+foreach (PlantGrowth plant in PlantGrowth.AllActivePlants) {
+if (plant == null || _activePoopAbsorptionCircleVisualizers.ContainsKey(plant)) continue;
 
 float poopRadius = GetPlantPoopDetectionRadius(plant);
-if (poopRadius <= 0.01f) continue; // Skip if radius is too small
+if (poopRadius <= 0.01f) continue;
 
-GameObject circleGO = Instantiate(circleVisualizerPrefab, plant.transform.position,
-Quaternion.identity, circleContainer);
-RuntimeCircleDrawer newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
+GameObject circleGO = Instantiate(circleVisualizerPrefab, plant.transform.position, Quaternion.identity, circleContainer);
+var newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
 
 if (newDrawer != null) {
 newDrawer.UpdateCircle(poopRadius, poopAbsorptionRadiusColorRuntime);
-activePoopAbsorptionCircleVisualizers.Add(plant, newDrawer);
+_activePoopAbsorptionCircleVisualizers.Add(plant, newDrawer);
 }
 else {
 Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
@@ -2444,19 +2445,18 @@ ret plant.GetPoopDetectionRadius();
 }
 
 void UpdateRuntimeCircleVisualizers() {
-if (!Application.isPlaying) return; // Only run in play mode
+if (!Application.isPlaying) return;
 
 bool showCircles = showScentRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
+var sourcesToRemove = new List<ScentSource>();
 
-List<ScentSource> sourcesToRemove = new List<ScentSource>();
-
-foreach (var kvp in activeCircleVisualizers) {
+foreach (var kvp in _activeCircleVisualizers) {
 ScentSource source = kvp.Key;
 RuntimeCircleDrawer line = kvp.Value;
 
-if (source == null || line == null || !source.gameObject.activeInHierarchy) // Source or drawer destroyed unexpectedly {
-sourcesToRemove.Add(source); // Mark for removal
-if(line != null) Destroy(line.gameObject); // Destroy orphan drawer
+if (source == null || line == null || !source.gameObject.activeInHierarchy) {
+sourcesToRemove.Add(source);
+if (line != null) Destroy(line.gameObject);
 continue;
 }
 
@@ -2464,34 +2464,32 @@ bool shouldShowThis = showCircles && source.enabled && source.definition != null
 
 if (shouldShowThis) {
 line.transform.position = source.transform.position;
-line.transform.rotation = source.transform.rotation; // Match rotation? Optional.
+line.transform.rotation = source.transform.rotation;
 line.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
 }
 else {
-line.HideCircle(); // Hide if shouldn't be shown
+line.HideCircle();
 }
 }
 
 foreach (var source in sourcesToRemove) {
-if (activeCircleVisualizers.TryGetValue(source, out RuntimeCircleDrawer drawer) && drawer != null)
+if (_activeCircleVisualizers.TryGetValue(source, out var drawer) && drawer != null)
 Destroy(drawer.gameObject);
-activeCircleVisualizers.Remove(source);
+_activeCircleVisualizers.Remove(source);
 }
 
 if (showCircles) {
 ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
-
 foreach (ScentSource source in currentSources) {
-if (source == null || activeCircleVisualizers.ContainsKey(source) || !source.enabled ||
+if (source == null || _activeCircleVisualizers.ContainsKey(source) || !source.enabled ||
 source.definition == null || source.EffectiveRadius <= 0.01f) continue;
 
-GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position,
-source.transform.rotation, circleContainer);
-RuntimeCircleDrawer newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
+GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position, source.transform.rotation, circleContainer);
+var newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
 
 if (newDrawer != null) {
 newDrawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
-activeCircleVisualizers.Add(source, newDrawer); // Add to tracking
+_activeCircleVisualizers.Add(source, newDrawer);
 }
 else {
 Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' is missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
@@ -2499,24 +2497,25 @@ Destroy(circleGO);
 }
 }
 }
-else if (!showCircles && activeCircleVisualizers.Count > 0) {
-foreach (var kvp in activeCircleVisualizers) {
+else if (!showCircles && _activeCircleVisualizers.Count > 0) {
+foreach (var kvp in _activeCircleVisualizers) {
 if (kvp.Value != null) Destroy(kvp.Value.gameObject);
 }
-activeCircleVisualizers.Clear();
+_activeCircleVisualizers.Clear();
 }
 }
 
 #if UNITY_EDITOR
 void OnDrawGizmosSelected() {
 if (showScentRadiiRuntime) {
-Gizmos.color = scentRadiusColorRuntime; // Use runtime color for gizmo too
+Gizmos.color = scentRadiusColorRuntime;
 ScentSource[] scentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
-int drawnCount = 0;
 foreach (ScentSource source in scentSources) {
 if (source == null || !source.enabled || source.definition == null) continue;
 float radius = source.EffectiveRadius;
-if (radius > 0.01f) { Gizmos.DrawWireSphere(source.transform.position, radius); drawnCount++; }
+if (radius > 0.01f) {
+Gizmos.DrawWireSphere(source.transform.position, radius);
+}
 }
 }
 
@@ -3309,8 +3308,10 @@ _storedSequence = null;
 // Assets\Scripts\PlantSystem\Data\NodeDefinition.cs
 
 ﻿using UnityEngine;
+using System.Text;
 
-pub cls NodeDefinition : ScriptableObject {
+pub cls NodeDefinition : ScriptableObject, ITooltipDataProvider {
+
 pub string displayName;
 pub string description;
 pub Sprite thumbnail;
@@ -3318,21 +3319,21 @@ pub Color thumbnailTintColor = Color.white;
 pub Color backgroundColor = Color.gray;
 
 pub GameObject nodeViewPrefab;
-pub List<NodeEffectData> effects; // This is the list configured in the Inspector
+pub List<NodeEffectData> effects;
 
 pub List<NodeEffectData> CloneEffects() {
-List<NodeEffectData> copy = new List<NodeEffectData>();
+var copy = new List<NodeEffectData>();
 if (effects == null) {
-ret copy; // Handle null list
+ret copy;
 }
 
 foreach (var originalEffect in effects) {
 if (originalEffect == null) {
-Debug.LogWarning($"NodeDefinition '{this.name}' contains a null effect in its list."); // Optional warning
-continue; // Skip null effects
+Debug.LogWarning($"NodeDefinition '{this.name}' contains a null effect in its list.");
+continue;
 }
 
-NodeEffectData newEffect = new NodeEffectData() {
+var newEffect = new NodeEffectData() {
 effectType = originalEffect.effectType,
 primaryValue = originalEffect.primaryValue,
 secondaryValue = originalEffect.secondaryValue,
@@ -3343,6 +3344,76 @@ copy.Add(newEffect);
 }
 ret copy;
 }
+
+pub string GetTooltipTitle() {
+ret displayName ?? "Unknown Node";
+}
+
+pub string GetTooltipDescription() {
+ret description ?? string.Empty;
+}
+
+pub string GetTooltipDetails(object source = null) {
+var nodeData = source as NodeData;
+if (nodeData == null) ret string.Empty;
+
+var sb = new StringBuilder();
+
+if (nodeData.effects != null && nodeData.effects.Any()) {
+sb.Append("<b>Effects:</b>\n");
+var passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f); // Blue-ish for passive
+var activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);  // Orange-ish for active
+c string effectPrefix = "• ";
+
+foreach (var effect in nodeData.effects) {
+if (effect == null) continue;
+Color effectColor = effect.isPassive ? passiveEffectColor : activeEffectColor;
+string hexColor = ColorUtility.ToHtmlStringRGB(effectColor);
+sb.Append($"<color=#{hexColor}>{effectPrefix}{effect.effectType}: ");
+sb.Append(FormatEffectValue(effect));
+sb.Append("</color>\n");
+}
+}
+
+if (nodeData.IsSeed()) {
+if (sb.Length > 0 && sb[sb.Length - 1] != '\n') sb.Append("\n");
+sb.Append("<b>Seed Sequence:</b> ");
+if (nodeData.storedSequence?.nodes != null && nodeData.storedSequence.nodes.Any()) {
+sb.Append($"{nodeData.storedSequence.nodes.Count} nodes");
+}
+else {
+sb.Append("Empty");
+}
+}
+
+ret sb.ToString().TrimEnd();
+}
+
+string FormatEffectValue(NodeEffectData effect) {
+string result = effect.primaryValue.ToString("G3");
+bool hasSecondaryValue = false;
+
+switch (effect.effectType) {
+case NodeEffectType.ScentModifier:
+case NodeEffectType.PoopFertilizer:
+hasSecondaryValue = true;
+break;
+default:
+if (effect.secondaryValue != 0) hasSecondaryValue = true;
+break;
+}
+
+if (hasSecondaryValue) {
+result += $" / {effect.secondaryValue.ToString("G3")}";
+}
+
+if (effect.effectType == NodeEffectType.ScentModifier && effect.scentDefinitionReference != null) {
+result += $" ({effect.scentDefinitionReference.displayName})";
+}
+
+ret result;
+}
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -4104,24 +4175,27 @@ pub enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature
 
 pub partial cls PlantGrowth : MonoBehaviour {
 
+pub stat ro List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
+
 [SerializeField] TMP_Text energyText;
+
 [SerializeField] GameObject seedCellPrefab;
 [SerializeField] GameObject stemCellPrefab;
 [SerializeField] GameObject leafCellPrefab;
 [SerializeField] GameObject berryCellPrefab; // Used for PlantCellType.Fruit
 [SerializeField] float cellSpacing = 0.08f;
 
-PlantShadowController shadowController;
-GameObject shadowPartPrefab;
+[SerializeField] PlantShadowController shadowController;
+[SerializeField] GameObject shadowPartPrefab;
 
-bool enableOutline = true;
-PlantOutlineController outlineController;
-GameObject outlinePartPrefab;
+[SerializeField] bool enableOutline = true;
+[SerializeField] PlantOutlineController outlineController;
+[SerializeField] GameObject outlinePartPrefab;
 
 [SerializeField] bool showGrowthPercentage = true;
 [SerializeField] bool allowPhotosynthesisDuringGrowth = false;
-[Range(1, 25)] int percentageIncrement = 5;
-bool continuousIncrement = false;
+[SerializeField, Range(1, 25)] int percentageIncrement = 5;
+[SerializeField] bool continuousIncrement = false;
 
 NodeGraph nodeGraph;
 pub PlantState currentState = PlantState.Initializing;
@@ -4165,8 +4239,24 @@ if (enableOutline) { if (outlineController == null) { outlineController = GetCom
 if (seedCellPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Seed Cell Prefab missing!", this); setupValid = false; } if (energyText == null) Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Energy Text (TMP_Text) missing.", this);
 if (!setupValid) { enabled = false; return; }
 if (!enableOutline && outlineController != null) { outlineController.gameObject.SetActive(false); }
+
 fireflyManagerInstance = FireflyManager.Instance;
 EnsureUIReferences();
+
+AllActivePlants.Add(this); // Register instance
+}
+
+void OnDestroy() {
+AllActivePlants.Remove(this); // Unregister instance
+
+StopAllCoroutines();
+growthCoroutine = null;
+
+if (PlantGrowthModifierManager.Instance != null) {
+PlantGrowthModifierManager.Instance.UnregisterPlant(this);
+}
+
+ClearAllVisuals();
 }
 
 void Start() {
@@ -4214,12 +4304,6 @@ break;
 case PlantState.Initializing:
 break;
 }
-}
-
-void OnDestroy() {
-StopAllCoroutines(); growthCoroutine = null;
-if (PlantGrowthModifierManager.Instance != null) { PlantGrowthModifierManager.Instance.UnregisterPlant(this); }
-ClearAllVisuals(); // Assumes ClearAllVisuals is in another partial file
 }
 
 pub void InitializeAndGrow(NodeGraph graph) {
@@ -4703,10 +4787,15 @@ selectionHighlight.SetActive(false);
 }
 
 if (gameObject.activeInHierarchy && SelectedItem != null && SelectedItem.IsValid() && UniversalTooltipManager.Instance != null && selectedSlot >= 0 && selectedSlot < barCells.Count) {
-UniversalTooltipManager.Instance.ShowInventoryItemTooltip(
-SelectedItem,
-barCells[selectedSlot].transform
-);
+ITooltipDataProvider provider = (SelectedItem.Type == InventoryBarItem.ItemType.Node)
+? (ITooltipDataProvider)SelectedItem.NodeDefinition
+: SelectedItem.ToolDefinition;
+
+object sourceData = (SelectedItem.Type == InventoryBarItem.ItemType.Node)
+? SelectedItem.NodeData
+: null;
+
+UniversalTooltipManager.Instance.ShowTooltip(provider, barCells[selectedSlot].transform, sourceData);
 }
 else if (UniversalTooltipManager.Instance != null) {
 UniversalTooltipManager.Instance.HideTooltip();
@@ -6482,88 +6571,65 @@ DestroyImmediate(gameObject);
 using UnityEngine.EventSystems;
 
 pub cls TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
-[SerializeField] TooltipType tooltipType = TooltipType.Auto;
-
-pub enum TooltipType {
-Auto,
-Node,
-Tool,
-}
-
-ItemView itemView;
-NodeCell nodeCell;
-bool isShowingTooltip = false;
+ItemView _itemView;
+NodeCell _nodeCell;
+bool _isShowingTooltip = false;
 
 void Awake() {
-itemView = GetComponent<ItemView>();
-nodeCell = GetComponentInParent<NodeCell>();
+_itemView = GetComponent<ItemView>();
+_nodeCell = GetComponentInParent<NodeCell>();
 }
 
 pub void OnPointerEnter(PointerEventData eventData) {
-if (UniversalTooltipManager.Instance == null || isShowingTooltip) return;
+if (UniversalTooltipManager.Instance == null || _isShowingTooltip) return;
+
 ShowTooltip();
 }
 
 pub void OnPointerExit(PointerEventData eventData) {
-if (UniversalTooltipManager.Instance == null || !isShowingTooltip) return;
+if (UniversalTooltipManager.Instance == null || !_isShowingTooltip) return;
+
 HideTooltip();
 }
 
 void ShowTooltip() {
-switch (tooltipType) {
-case TooltipType.Auto: ShowAutoTooltip(); break;
-case TooltipType.Node: ShowNodeTooltip(); break;
-case TooltipType.Tool: ShowToolTooltip(); break;
-}
-isShowingTooltip = true;
-}
+ITooltipDataProvider provider = null;
+object sourceData = null; // For passing NodeData to a NodeDefinition provider
 
-void ShowAutoTooltip() {
-if (itemView != null) {
-if (itemView.GetToolDefinition() != null) {
-UniversalTooltipManager.Instance.ShowToolTooltip(itemView.GetToolDefinition());
-return;
+if (_itemView != null) {
+if (_itemView.GetToolDefinition() != null) {
+provider = _itemView.GetToolDefinition();
 }
-if (itemView.GetNodeDefinition() != null) {
-UniversalTooltipManager.Instance.ShowNodeTooltip(itemView.GetNodeData(), itemView.GetNodeDefinition());
-return;
+else if (_itemView.GetNodeDefinition() != null) {
+provider = _itemView.GetNodeDefinition();
+sourceData = _itemView.GetNodeData();
 }
 }
-
-if (nodeCell != null) {
-if (nodeCell.GetToolDefinition() != null) {
-UniversalTooltipManager.Instance.ShowToolTooltip(nodeCell.GetToolDefinition());
+else if (_nodeCell != null) {
+if (_nodeCell.GetToolDefinition() != null) {
+provider = _nodeCell.GetToolDefinition();
 }
-else if (nodeCell.GetNodeDefinition() != null) {
-UniversalTooltipManager.Instance.ShowNodeTooltip(nodeCell.GetNodeData(), nodeCell.GetNodeDefinition());
-}
+else if (_nodeCell.GetNodeDefinition() != null) {
+provider = _nodeCell.GetNodeDefinition();
+sourceData = _nodeCell.GetNodeData();
 }
 }
 
-void ShowNodeTooltip() {
-NodeData data = itemView?.GetNodeData() ?? nodeCell?.GetNodeData();
-NodeDefinition def = itemView?.GetNodeDefinition() ?? nodeCell?.GetNodeDefinition();
-
-if (data != null && def != null) {
-UniversalTooltipManager.Instance.ShowNodeTooltip(data, def);
-}
-}
-
-void ShowToolTooltip() {
-ToolDefinition def = itemView?.GetToolDefinition() ?? nodeCell?.GetToolDefinition();
-
-if (def != null) {
-UniversalTooltipManager.Instance.ShowToolTooltip(def);
+if (provider != null) {
+UniversalTooltipManager.Instance.ShowTooltip(provider, transform, sourceData);
+_isShowingTooltip = true;
 }
 }
 
 void HideTooltip() {
 UniversalTooltipManager.Instance?.HideTooltip();
-isShowingTooltip = false;
+_isShowingTooltip = false;
 }
 
 void OnDisable() {
-if (isShowingTooltip) HideTooltip();
+if (_isShowingTooltip) {
+HideTooltip();
+}
 }
 }
 
@@ -6572,8 +6638,12 @@ if (isShowingTooltip) HideTooltip();
 
 ﻿using UnityEngine;
 using TMPro;
-using System.Text;
-using UnityEngine.EventSystems;
+
+pub ifc ITooltipDataProvider {
+string GetTooltipTitle();
+string GetTooltipDescription();
+string GetTooltipDetails(object source = null);
+}
 
 pub cls UniversalTooltipManager : MonoBehaviour {
 pub stat UniversalTooltipManager Instance { get; set; }
@@ -6584,7 +6654,6 @@ pub stat UniversalTooltipManager Instance { get; set; }
 [SerializeField] TextMeshProUGUI detailsText;
 [SerializeField] Image backgroundImage;
 [SerializeField] CanvasGroup canvasGroup;
-
 [SerializeField] VerticalLayoutGroup layoutGroup;
 
 [SerializeField] float fadeDuration = 0.15f;
@@ -6599,15 +6668,9 @@ pub stat UniversalTooltipManager Instance { get; set; }
 [SerializeField] int descriptionFontSize = 14;
 [SerializeField] int detailsFontSize = 12;
 
-[SerializeField] bool showEffectsInDetails = true;
-[SerializeField] bool showSeedSequenceInfo = true;
-[SerializeField] string effectPrefix = "• ";
-[SerializeField] Color passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f);
-[SerializeField] Color activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);
-
-Coroutine fadeCoroutine;
-object currentTarget;
-bool isVisible = false;
+Coroutine _fadeCoroutine;
+object _currentTarget;
+bool _isVisible = false;
 
 void Awake() {
 if (Instance != null && Instance != this) {
@@ -6624,94 +6687,53 @@ return;
 SetupTooltipPanel();
 if (tooltipPanel != null) tooltipPanel.SetActive(false);
 if (canvasGroup != null) canvasGroup.alpha = 0f;
-isVisible = false;
+_isVisible = false;
 }
 
 void Update() {
-if (isVisible && IsTargetNullOrDestroyed(currentTarget)) {
-if (canvasGroup != null && canvasGroup.alpha > 0.01f) {
-if (fadeCoroutine == null || canvasGroup.alpha == 1f) {
+if (_isVisible && IsTargetNullOrDestroyed(_currentTarget)) {
 HideTooltip();
 }
 }
-}
-}
 
-pub void ShowNodeTooltip(NodeData nodeData, NodeDefinition nodeDef, Transform anchor = null) {
-if (nodeData == null || nodeDef == null) return;
+pub void ShowTooltip(ITooltipDataProvider provider, Transform anchor = null, object source = null) {
+if (provider == null) return;
 
-if (isVisible && ReferenceEquals(currentTarget, nodeData)) return;
+if (_isVisible && ReferenceEquals(_currentTarget, provider)) return;
 
-currentTarget = nodeData;
+_currentTarget = provider;
 
-string title       = nodeDef.displayName ?? nodeData.nodeDisplayName ?? "Unknown Node";
-string description = nodeDef.description ?? string.Empty;
-string details     = BuildNodeDetails(nodeData, nodeDef);
+string title = provider.GetTooltipTitle();
+string description = provider.GetTooltipDescription();
+string details = provider.GetTooltipDetails(source);
 
 ShowTooltipInternal(title, description, details, anchor);
-}
-
-pub void ShowToolTooltip(ToolDefinition toolDef, Transform anchor = null) {
-if (toolDef == null) return;
-
-if (isVisible && ReferenceEquals(currentTarget, toolDef)) return;
-
-currentTarget = toolDef;
-
-string title       = toolDef.displayName ?? "Unknown Tool";
-string description = $"Tool Type: {toolDef.toolType}";
-string details     = BuildToolDetails(toolDef);
-
-ShowTooltipInternal(title, description, details, anchor);
-}
-
-pub void ShowInventoryItemTooltip(InventoryBarItem item, Transform anchor = null) {
-if (item == null || !item.IsValid()) return;
-
-object underlying = item.Type == InventoryBarItem.ItemType.Node
-? (object)item.NodeData
-: item.ToolDefinition;
-
-if (isVisible && ReferenceEquals(currentTarget, underlying)) return;
-
-if (item.Type == InventoryBarItem.ItemType.Node)
-ShowNodeTooltip(item.NodeData, item.NodeDefinition, anchor);
-else
-ShowToolTooltip(item.ToolDefinition, anchor);
 }
 
 pub void HideTooltip() {
-currentTarget = null;
+_currentTarget = null;
 if (tooltipPanel == null || canvasGroup == null) return;
 
-if (fadeCoroutine != null)
-StopCoroutine(fadeCoroutine);
+if (_fadeCoroutine != null) {
+StopCoroutine(_fadeCoroutine);
+}
 
 if (fadeDuration > 0f && gameObject.activeInHierarchy) {
-fadeCoroutine = StartCoroutine(FadeTooltip(false));
+_fadeCoroutine = StartCoroutine(FadeTooltip(false));
 }
 else {
 canvasGroup.alpha = 0f;
-canvasGroup.interactable = false;
-canvasGroup.blocksRaycasts = false;
 if (tooltipPanel != null) tooltipPanel.SetActive(false);
-isVisible = false;
+_isVisible = false;
 }
-}
-
-bool IsTargetNullOrDestroyed(object target) {
-if (target is UnityEngine.Object unityObject) {
-ret unityObject == null;
-}
-
-ret System.Object.ReferenceEquals(target, null);
 }
 
 void ShowTooltipInternal(string title, string description, string details, Transform itemAnchor) {
 if (tooltipPanel == null || canvasGroup == null) return;
 
-if (fadeCoroutine != null)
-StopCoroutine(fadeCoroutine);
+if (_fadeCoroutine != null) {
+StopCoroutine(_fadeCoroutine);
+}
 
 if (titleText != null) {
 titleText.text = title;
@@ -6732,33 +6754,88 @@ LayoutRebuilder.ForceRebuildLayoutImmediate(layoutGroup.GetComponent<RectTransfo
 }
 
 if (moveTooltipWithMouse) {
-RectTransform tooltipRect = tooltipPanel.GetComponent<RectTransform>();
-Canvas rootCanvas = tooltipPanel.GetComponentInParent<Canvas>()?.rootCanvas;
-
-if (tooltipRect != null && rootCanvas != null && Input.mousePresent) {
-Vector2 targetScreenPos = Input.mousePosition;
-targetScreenPos += mouseFollowOffset; // Apply user offset
-
-RectTransform parentRect = tooltipRect.parent as RectTransform;
-if (parentRect != null) {
-Vector2 localPos;
-Camera renderCamera = (rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay) ? null : rootCanvas.worldCamera;
-if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, targetScreenPos, renderCamera, out localPos)) {
-tooltipRect.localPosition = localPos;
-}
-}
-}
+PositionTooltipWithMouse();
 }
 
 if (fadeDuration > 0f) {
-fadeCoroutine = StartCoroutine(FadeTooltip(true));
+_fadeCoroutine = StartCoroutine(FadeTooltip(true));
 }
 else {
 canvasGroup.alpha = 1f;
+_isVisible = true;
+}
+}
+
+void PositionTooltipWithMouse() {
+var tooltipRect = tooltipPanel.GetComponent<RectTransform>();
+var rootCanvas = tooltipPanel.GetComponentInParent<Canvas>()?.rootCanvas;
+
+if (tooltipRect == null || rootCanvas == null || !Input.mousePresent) return;
+
+Vector2 targetScreenPos = Input.mousePosition;
+targetScreenPos += mouseFollowOffset; // Apply user offset
+
+var panelRect = tooltipRect.rect;
+targetScreenPos.x = Mathf.Clamp(targetScreenPos.x, 0, Screen.width - panelRect.width);
+targetScreenPos.y = Mathf.Clamp(targetScreenPos.y, 0, Screen.height - panelRect.height);
+
+var parentRect = tooltipRect.parent as RectTransform;
+if (parentRect == null) return;
+
+Camera renderCamera = (rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay) ? null : rootCanvas.worldCamera;
+if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, targetScreenPos, renderCamera, out var localPos)) {
+tooltipRect.localPosition = localPos;
+}
+}
+
+IEnumerator FadeTooltip(bool fadeIn) {
+if (canvasGroup == null) yield break;
+
+float elapsed = 0f;
+float startAlpha = canvasGroup.alpha;
+float targetAlpha = fadeIn ? 1f : 0f;
+
+if (fadeIn) _isVisible = true;
+
+if (fadeIn && tooltipPanel != null && !tooltipPanel.activeSelf)
+tooltipPanel.SetActive(true);
+
+while (elapsed < fadeDuration) {
+elapsed += Time.unscaledDeltaTime;
+float t = (fadeDuration > 0) ? elapsed / fadeDuration : 1f;
+canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
+yield ret null;
+}
+
+canvasGroup.alpha = targetAlpha;
+
+if (!fadeIn) {
+if (tooltipPanel != null) tooltipPanel.SetActive(false);
+_isVisible = false;
+}
+}
+
+bool IsTargetNullOrDestroyed(object target) {
+if (target is UnityEngine.Object unityObject) {
+ret unityObject == null;
+}
+ret System.Object.ReferenceEquals(target, null);
+}
+
+void SetupTooltipPanel() {
+if (canvasGroup != null) {
+canvasGroup.alpha = 0f;
 canvasGroup.interactable = false;
 canvasGroup.blocksRaycasts = false;
-isVisible = true;
 }
+if (backgroundImage != null) backgroundImage.color = backgroundColor;
+ApplyTextStyles();
+}
+
+void ApplyTextStyles() {
+if (titleText != null) { titleText.color = titleColor; titleText.fontSize = titleFontSize; titleText.fontStyle = FontStyles.Bold; }
+if (descriptionText != null) { descriptionText.color = descriptionColor; descriptionText.fontSize = descriptionFontSize; }
+if (detailsText != null) { detailsText.color = detailsColor; detailsText.fontSize = detailsFontSize; }
 }
 
 bool ValidateReferences() {
@@ -6778,114 +6855,13 @@ ret true;
 
 TextMeshProUGUI FindTextComponent(string nameContains) {
 if (tooltipPanel == null) ret null;
-foreach (TextMeshProUGUI text in tooltipPanel.GetComponentsInChildren<TextMeshProUGUI>(true)) {
+foreach (var text in tooltipPanel.GetComponentsInChildren<TextMeshProUGUI>(true)) {
 if (text.name.ToLower().Contains(nameContains.ToLower()))
 ret text;
 }
 ret null;
 }
 
-void SetupTooltipPanel() {
-if (canvasGroup != null) {
-canvasGroup.alpha = 0f;
-canvasGroup.interactable = false;
-canvasGroup.blocksRaycasts = false;
-}
-if (backgroundImage != null) backgroundImage.color = backgroundColor;
-ApplyTextStyles();
-}
-
-void ApplyTextStyles() {
-if (titleText != null) { titleText.color = titleColor; titleText.fontSize = titleFontSize; titleText.fontStyle = FontStyles.Bold; }
-if (descriptionText != null) { descriptionText.color = descriptionColor; descriptionText.fontSize = descriptionFontSize; }
-if (detailsText != null) { detailsText.color = detailsColor; detailsText.fontSize = detailsFontSize; }
-}
-
-string BuildNodeDetails(NodeData nodeData, NodeDefinition nodeDef) {
-StringBuilder sb = new StringBuilder();
-if (showEffectsInDetails && nodeData.effects != null && nodeData.effects.Count > 0) {
-sb.Append("<b>Effects:</b>\n");
-bool hasAnyEffectText = false;
-foreach (var effect in nodeData.effects) {
-if (effect == null) continue;
-Color effectColor = effect.isPassive ? passiveEffectColor : activeEffectColor;
-string hexColor = ColorUtility.ToHtmlStringRGB(effectColor);
-sb.Append($"<color=#{hexColor}>{effectPrefix}{effect.effectType}: ");
-sb.Append(FormatEffectValue(effect));
-sb.Append("</color>\n");
-hasAnyEffectText = true;
-}
-if (!hasAnyEffectText) { sb.Length -= "<b>Effects:</b>\n".Length; }
-}
-
-if (showSeedSequenceInfo && nodeData.IsSeed()) {
-if (nodeData.storedSequence != null) {
-if (sb.Length > 0 && sb[sb.Length - 1] != '\n') sb.Append("\n");
-sb.Append("<b>Seed Sequence:</b> ");
-sb.Append((nodeData.storedSequence.nodes != null && nodeData.storedSequence.nodes.Count > 0) ?
-$"{nodeData.storedSequence.nodes.Count} nodes" : "Empty");
-}
-else {
-if (sb.Length > 0 && sb[sb.Length - 1] != '\n') sb.Append("\n");
-sb.Append("<b>Seed Sequence:</b> Not Initialized");
-}
-}
-ret sb.ToString().TrimEnd();
-}
-
-string BuildToolDetails(ToolDefinition toolDef) {
-StringBuilder sb = new StringBuilder();
-sb.Append(toolDef.limitedUses ? $"<b>Uses:</b> {toolDef.initialUses}\n" : "<b>Uses:</b> Unlimited\n");
-ret sb.ToString().TrimEnd();
-}
-
-string FormatEffectValue(NodeEffectData effect) {
-string result = effect.primaryValue.ToString("G3");
-bool hasSecondaryValue = false;
-switch (effect.effectType) {
-case NodeEffectType.ScentModifier:
-case NodeEffectType.PoopFertilizer:
-hasSecondaryValue = true;
-break;
-default:
-if (effect.secondaryValue != 0) hasSecondaryValue = true;
-break;
-}
-if (hasSecondaryValue) {
-result += $" / {effect.secondaryValue.ToString("G3")}";
-}
-if (effect.effectType == NodeEffectType.ScentModifier && effect.scentDefinitionReference != null) {
-result += $" ({effect.scentDefinitionReference.displayName})";
-}
-ret result;
-}
-
-IEnumerator FadeTooltip(bool fadeIn) {
-if (canvasGroup == null) yield break;
-float elapsed = 0f;
-float startAlpha = canvasGroup.alpha;
-float targetAlpha = fadeIn ? 1f : 0f;
-
-if (fadeIn) isVisible = true;
-
-if (fadeIn && tooltipPanel != null && !tooltipPanel.activeSelf)
-tooltipPanel.SetActive(true);
-
-while (elapsed < fadeDuration) {
-elapsed += Time.unscaledDeltaTime;
-float t = (fadeDuration > 0) ? elapsed / fadeDuration : 1f;
-canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
-yield ret null;
-}
-canvasGroup.alpha = targetAlpha;
-canvasGroup.interactable = false;
-canvasGroup.blocksRaycasts = false;
-
-if (!fadeIn) {
-if (tooltipPanel != null) tooltipPanel.SetActive(false);
-isVisible = false;
-}
-}
 }
 
 ////////////////////////////////////////////////////////////
@@ -8154,8 +8130,10 @@ pub TileDefinition toTile;
 // Assets\Scripts\WorldInteraction\Tools\ToolDefinition.cs
 
 ﻿using UnityEngine;
+using System.Text;
 
-pub cls ToolDefinition : ScriptableObject {
+pub cls ToolDefinition : ScriptableObject, ITooltipDataProvider {
+
 pub ToolType toolType;
 pub string displayName;
 
@@ -8165,8 +8143,22 @@ pub Color iconTint = Color.white;
 pub bool limitedUses = false;
 pub int initialUses = 10;
 
-[Header("Auto-Add to Inventory")] // NEW SECTION
-pub bool autoAddToInventory = true; // NEW FIELD
+pub bool autoAddToInventory = true;
+
+pub string GetTooltipTitle() {
+ret displayName ?? "Unknown Tool";
+}
+
+pub string GetTooltipDescription() {
+ret $"Tool Type: {toolType}";
+}
+
+pub string GetTooltipDetails(object source = null) {
+var sb = new StringBuilder();
+sb.Append(limitedUses ? $"<b>Uses:</b> {initialUses}" : "<b>Uses:</b> Unlimited");
+ret sb.ToString().TrimEnd();
+}
+
 }
 
 ////////////////////////////////////////////////////////////
