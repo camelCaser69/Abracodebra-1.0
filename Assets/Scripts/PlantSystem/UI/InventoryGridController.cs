@@ -173,7 +173,6 @@ public class InventoryGridController : MonoBehaviour
                 canBeDeleted = false,
             };
             inventoryNodeData.EnsureSeedSequenceInitialized();
-            inventoryNodeData.CleanForSerialization(0, "InvGridAddGene");
 
             GameObject itemViewGO = Instantiate(inventoryItemPrefab, cellToUse.transform);
             ItemView view = itemViewGO.GetComponent<ItemView>();

@@ -63,7 +63,6 @@ public class NodeExecutor : MonoBehaviour
             clone.EnsureSeedSequenceInitialized(); // Ensures a valid (but possibly empty) sequence object exists
         }
 
-        clone.CleanForSerialization(0, "NodeExecutorClonePost");
         return clone;
     }
 
