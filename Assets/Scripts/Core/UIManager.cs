@@ -169,11 +169,45 @@ public class UIManager : MonoBehaviour
             }
         }
     }
+    private void AutoReturnSeedFromEditorSlot()
+    {
+        // Quick null-guards so we never throw from here
+        if (NodeEditorGridController.Instance == null ||
+            InventoryGridController.Instance  == null) return;
+
+        var editor   = NodeEditorGridController.Instance;
+        var seedCell = editor.SeedSlotCell;            // wrapper for the slot itself
+        if (seedCell == null || !seedCell.HasNode()) return; // slot already empty
+
+        // 1️⃣  Persist any edits the player made to the seed’s sequence
+        editor.RefreshGraphAndUpdateSeed();            // saves into storedSequence :contentReference[oaicite:0]{index=0}
+
+        // 2️⃣  Grab references to move
+        NodeView seedView = seedCell.GetNodeView();
+        NodeData seedData = seedCell.GetNodeData();
+        if (seedView == null || seedData == null) return;
+
+        // 3️⃣  Clear the editor first (UI clean-up)
+        editor.UnloadSeedFromSlot();                   // clears sequence cells & hides panel :contentReference[oaicite:1]{index=1}
+
+        // 4️⃣  Hand the seed back to inventory
+        InventoryGridController.Instance.ReturnGeneToInventory(seedView, seedData); // :contentReference[oaicite:2]{index=2}
+
+        // 5️⃣  Finally wipe the slot’s internal reference so it appears empty
+        seedCell.ClearNodeReference();
+
+        Debug.Log($"[UIManager] Auto-returned seed “{seedData.nodeDisplayName}” to inventory.");
+    }
 
     private void OnStartGrowthPhaseClicked()
     {
         Debug.Log("[UIManager] StartGrowthPhaseButton Clicked");
-        RunManager.Instance?.StartGrowthAndThreatPhase();
+
+        // Ensure the forgotten-seed edge-case is handled first
+        AutoReturnSeedFromEditorSlot();                // <— NEW
+
+        // Kick off the phase transition (inventory bar appears one frame later)
+        RunManager.Instance?.StartGrowthAndThreatPhase(); // original behaviour :contentReference[oaicite:3]{index=3}
     }
 
     private void OnStartRecoveryPhaseClicked()
