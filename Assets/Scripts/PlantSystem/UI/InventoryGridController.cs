@@ -5,30 +5,24 @@ using System.Linq;
 
 public class InventoryGridController : MonoBehaviour
 {
-    public static InventoryGridController Instance { get; private set; }
+    public static InventoryGridController Instance { get; set; }
 
-    [Header("Grid Layout")]
     [SerializeField][Min(1)] public int inventoryRows = 2;
     [SerializeField][Min(1)] public int inventoryColumns = 8;
     [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
     [SerializeField] private float cellMargin = 10f;
 
-    [Header("Cell & Item Visuals")]
     [SerializeField] private Sprite emptyCellSprite;
     [SerializeField] private Color emptyCellColor = Color.white;
-    [Tooltip("The single, unified prefab with an ItemView component, used for both Nodes and Tools.")]
     [SerializeField] private GameObject inventoryItemPrefab;
     [SerializeField] private float nodeGlobalImageScale = 1f;
     [SerializeField] private float nodeImageRaycastPadding = 0f;
 
-    [Header("Content")]
     [SerializeField] private ToolDefinition[] availableTools;
 
-    [Header("Required References")]
     [SerializeField] private Transform cellContainer;
     [SerializeField] private Canvas _rootCanvas;
 
-    [Header("Settings")]
     [SerializeField] private bool logInventoryChanges = true;
 
     private readonly List<NodeCell> inventoryCells = new List<NodeCell>();
@@ -40,7 +34,7 @@ public class InventoryGridController : MonoBehaviour
     public int TotalSlots => inventoryRows * inventoryColumns;
     public int ActualCellCount => inventoryCells?.Count ?? 0;
 
-    void Awake()
+    private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
@@ -50,7 +44,7 @@ public class InventoryGridController : MonoBehaviour
         if (_rootCanvas == null) Debug.LogError("[InventoryGridController] Root Canvas not assigned!", gameObject);
     }
 
-    void Start()
+    private void Start()
     {
         if (cellContainer != null)
         {
@@ -59,7 +53,7 @@ public class InventoryGridController : MonoBehaviour
         }
     }
 
-    void CreateInventoryCells()
+    private void CreateInventoryCells()
     {
         foreach (Transform child in cellContainer) Destroy(child.gameObject);
         inventoryCells.Clear();
@@ -91,7 +85,7 @@ public class InventoryGridController : MonoBehaviour
         }
     }
 
-    void PopulateInitialGenesFromLibrary()
+    private void PopulateInitialGenesFromLibrary()
     {
         if (NodeEditorGridController.Instance?.DefinitionLibrary == null)
         {
@@ -147,9 +141,10 @@ public class InventoryGridController : MonoBehaviour
             NodeDraggable draggable = itemViewGO.GetComponent<NodeDraggable>() ?? itemViewGO.AddComponent<NodeDraggable>();
             draggable.Initialize(this, emptyCell);
             emptyCell.AssignItemView(itemView, toolNodeData, tool);
+            if (logInventoryChanges) Debug.Log($"[Inventory] Added tool '{tool.displayName}' to cell {emptyCell.CellIndex}.");
             return true;
         }
-        
+
         Destroy(itemViewGO);
         return false;
     }
@@ -182,6 +177,7 @@ public class InventoryGridController : MonoBehaviour
             NodeDraggable draggable = view.GetComponent<NodeDraggable>() ?? view.gameObject.AddComponent<NodeDraggable>();
             draggable.Initialize(this, cellToUse);
             cellToUse.AssignItemView(view, inventoryNodeData, null);
+            if (logInventoryChanges) Debug.Log($"[Inventory] Added gene '{geneDef.displayName}' to cell {cellToUse.CellIndex}.");
             return true;
         }
         return false;
@@ -198,6 +194,7 @@ public class InventoryGridController : MonoBehaviour
         NodeCell emptyCell = inventoryCells.FirstOrDefault(cell => !cell.HasItem());
         if (emptyCell == null)
         {
+            if (logInventoryChanges) Debug.LogWarning($"[Inventory] No empty cell to return '{geneDataToReturn.nodeDisplayName}' to. Item destroyed.");
             Destroy(itemViewToReturn.gameObject);
             return;
         }
@@ -212,6 +209,7 @@ public class InventoryGridController : MonoBehaviour
         if (draggable == null) draggable = itemViewToReturn.gameObject.AddComponent<NodeDraggable>();
         draggable.Initialize(this, emptyCell);
         draggable.SnapToCell(emptyCell);
+        if (logInventoryChanges) Debug.Log($"[Inventory] Returned gene '{geneDataToReturn.nodeDisplayName}' to cell {emptyCell.CellIndex}.");
     }
 
     public void HandleDropOnInventoryCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetInventoryCell)
@@ -233,8 +231,7 @@ public class InventoryGridController : MonoBehaviour
         NodeDefinition draggedNodeDef = draggedItemView.GetNodeDefinition();
         ToolDefinition draggedToolDef = draggedItemView.GetToolDefinition();
 
-        // Case 1: Moving an item within the inventory grid
-        if (originalCell.IsInventoryCell)
+        if (originalCell.IsInventoryCell) // --- Moving within the inventory ---
         {
             if (targetInventoryCell == originalCell) { draggedDraggable.ResetPosition(); return; }
 
@@ -244,6 +241,8 @@ public class InventoryGridController : MonoBehaviour
                 NodeData dataInTargetCell = targetInventoryCell.GetNodeData();
                 ToolDefinition toolInTargetCell = targetInventoryCell.GetToolDefinition();
 
+                if (logInventoryChanges) Debug.Log($"[Inventory] Swapped item '{draggedData.nodeDisplayName}' from cell {originalCell.CellIndex} with item '{dataInTargetCell.nodeDisplayName}' from cell {targetInventoryCell.CellIndex}.");
+
                 originalCell.ClearNodeReference();
                 originalCell.AssignItemView(viewInTargetCell, dataInTargetCell, toolInTargetCell);
                 viewInTargetCell.GetComponent<NodeDraggable>()?.SnapToCell(originalCell);
@@ -251,14 +250,14 @@ public class InventoryGridController : MonoBehaviour
             }
             else // Move to empty
             {
+                if (logInventoryChanges) Debug.Log($"[Inventory] Moved item '{draggedData.nodeDisplayName}' from cell {originalCell.CellIndex} to empty cell {targetInventoryCell.CellIndex}.");
                 originalCell.ClearNodeReference();
             }
 
             targetInventoryCell.AssignItemView(draggedItemView, draggedData, draggedToolDef);
             draggedDraggable.SnapToCell(targetInventoryCell);
         }
-        // Case 2: Moving an item from the editor (sequence or seed slot) to inventory
-        else
+        else // --- Moving from node editor to inventory ---
         {
             NodeCell actualTargetInvCell = targetInventoryCell.HasItem()
                 ? inventoryCells.FirstOrDefault(c => !c.HasItem())
@@ -266,36 +265,38 @@ public class InventoryGridController : MonoBehaviour
 
             if (actualTargetInvCell == null) { draggedDraggable.ResetPosition(); return; } // Inventory full
 
-            // From seed slot
             if (originalCell.IsSeedSlot)
             {
-                 NodeEditorGridController.Instance.UnloadSeedFromSlot();
-                 originalCell.ClearNodeReference();
-                 actualTargetInvCell.AssignItemView(draggedItemView, draggedData, null);
-                 draggedDraggable.SnapToCell(actualTargetInvCell);
+                if (logInventoryChanges) Debug.Log($"[Inventory] Moved seed '{draggedData.nodeDisplayName}' from Seed Slot to inventory cell {actualTargetInvCell.CellIndex}.");
+                NodeEditorGridController.Instance.UnloadSeedFromSlot();
+                originalCell.ClearNodeReference();
+                actualTargetInvCell.AssignItemView(draggedItemView, draggedData, null);
+                draggedDraggable.SnapToCell(actualTargetInvCell);
             }
-            // From sequence editor cell
-            else
+            else // From a sequence slot
             {
+                if (logInventoryChanges) Debug.Log($"[Inventory] Returned node '{draggedNodeDef.displayName}' from sequence to inventory cell {actualTargetInvCell.CellIndex}.");
                 NodeEditorGridController.Instance?.GetCellAtIndex(originalCell.CellIndex)?.RemoveNode();
                 NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();
-                // Create a new item in inventory from the definition
                 AddGeneToInventoryFromDefinition(draggedNodeDef, actualTargetInvCell);
-                // The dragged item was a temporary copy, so destroy it
                 Destroy(draggedDraggable.gameObject);
             }
         }
     }
 
     public int GetUsedSlotCount() => inventoryCells.Count(cell => cell.HasItem());
+
     public void RemoveGeneFromInventory(NodeCell inventoryCell)
     {
         if (inventoryCell != null && inventoryCell.HasItem() && inventoryCell.IsInventoryCell)
         {
+            if (logInventoryChanges) Debug.Log($"[Inventory] Removing item '{inventoryCell.GetNodeData()?.nodeDisplayName ?? "Unknown"}' from cell {inventoryCell.CellIndex}.");
             inventoryCell.ClearNodeReference();
         }
     }
+
     public NodeCell GetInventoryCellAtIndex(int index) => (index >= 0 && index < inventoryCells.Count) ? inventoryCells[index] : null;
+
     public NodeCell FindInventoryCellAtScreenPosition(Vector2 screenPosition)
     {
         if (_rootCanvas == null) return null;
@@ -308,10 +309,11 @@ public class InventoryGridController : MonoBehaviour
         }
         return null;
     }
+
     public InventoryBarItem GetItemAtIndex(int index)
     {
         if (index < 0 || index >= inventoryCells.Count) return null;
-        
+
         var cell = inventoryCells[index];
         if (cell.HasItem())
         {

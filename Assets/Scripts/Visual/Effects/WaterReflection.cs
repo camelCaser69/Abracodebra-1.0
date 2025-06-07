@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-using System.Collections.Generic; 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class WaterReflection : MonoBehaviour
 {
@@ -94,6 +96,8 @@ public class WaterReflection : MonoBehaviour
     private Vector3 lastScale;
     private Vector3 lastPosition;
     private float lastParentY;
+    
+    #region Unity Lifecycle
 
     void Awake()
     {
@@ -425,29 +429,43 @@ public class WaterReflection : MonoBehaviour
 
     void OnValidate()
     {
-        // In OnValidate, we don't have access to the Manager's instance easily,
-        // so we'll primarily validate local settings.
-        // The ResolveSettings() call in Awake will handle combining with manager settings at runtime.
+        // OnValidate is called when the script is loaded or a value is changed in the Inspector.
+        // We need to wrap our logic in an editor check.
+        #if UNITY_EDITOR
+        // Use delayCall to prevent the "TransientArtifact" errors.
+        // This defers the execution of our preview update until after the Inspector's
+        // current update cycle is complete, breaking the feedback loop.
+        EditorApplication.delayCall -= EditorUpdatePreview; // Remove previous requests to avoid stacking
+        EditorApplication.delayCall += EditorUpdatePreview; // Add a new request
+        #endif
+    }
+
+    #if UNITY_EDITOR
+    private void EditorUpdatePreview()
+    {
+        // This method contains the logic that was previously in OnValidate.
+        // It's now called safely by the editor after the main update loop.
+        if (this == null || gameObject == null) // The object could be destroyed before the call
+        {
+            return;
+        }
+
         if (Application.isEditor && !Application.isPlaying)
         {
-            // Check if local material is needed but missing
             bool localMaterialNeeded = enableDistanceFade && (!overrides.gradientFadeBaseMaterial || localGradientFadeBaseMaterial == null);
             bool globalMaterialMightBeUsed = enableDistanceFade && !overrides.gradientFadeBaseMaterial && localGradientFadeBaseMaterial == null;
 
-            if (localMaterialNeeded && !globalMaterialMightBeUsed) // Warn if local override is on but local material missing
+            if (localMaterialNeeded && !globalMaterialMightBeUsed) // Warn if local ovr is on but local material missing
             {
-                 Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true and 'Override Gradient Material' is true, but 'Local Gradient Fade Base Material' is not assigned. Assign local material or uncheck override.", this);
+                Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true and 'Override Gradient Material' is true, but 'Local Gradient Fade Base Material' is not assigned. Assign local material or uncheck override.", this);
             }
             else if (globalMaterialMightBeUsed) // Inform that global will be used if local isn't set
             {
-                 Debug.Log($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true. If 'Local Gradient Fade Base Material' remains unassigned and override is false, the global default from WaterReflectionManager will be used in Play mode.", this);
+                Debug.Log($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true. If 'Local Gradient Fade Base Material' remains unassigned and ovr is false, the global default from WaterReflectionManager will be used in Play mode.", this);
             }
 
-
-            // Basic visual update for editor preview if possible
             if (reflectionRenderer != null && originalRenderer != null)
             {
-                // Determine settings as best as possible for editor preview (without manager)
                 Color previewTint = overrides.reflectionTint ? localReflectionTint : Color.white; // Default to white if no manager
                 float previewOpacity = overrides.reflectionOpacity ? localReflectionOpacity : 0.5f;
                 int previewSortOffset = overrides.sortingOrderOffset ? localSortingOrderOffset : -1;
@@ -464,6 +482,7 @@ public class WaterReflection : MonoBehaviour
             }
         }
     }
+    #endif
 
 
     // --- Public Methods for Runtime Control (Could be removed if not needed, or kept for dynamic changes) ---
@@ -477,4 +496,6 @@ public class WaterReflection : MonoBehaviour
         }
     }
     // Add more setters if you need to programmatically change local override values and have them take effect.
+    
+    #endregion
 }

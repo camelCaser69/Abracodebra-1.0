@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-[DefaultExecutionOrder(100)]
 public sealed class PlayerTileInteractor : MonoBehaviour
 {
     [SerializeField] private InventoryBarController inventoryBar;
@@ -10,23 +9,23 @@ public sealed class PlayerTileInteractor : MonoBehaviour
 
     private bool pendingClick;
 
-    void Awake()
+    private void Awake()
     {
         if (playerTransform == null) playerTransform = transform;
     }
 
-    void Start()
+    private void Start()
     {
         FindSingletons();
     }
 
-    void Update()
+    private void Update()
     {
         if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat) return;
         if (Input.GetMouseButtonDown(0)) pendingClick = true;
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
         if (!pendingClick) return;
         pendingClick = false;
@@ -38,26 +37,41 @@ public sealed class PlayerTileInteractor : MonoBehaviour
         if (!EnsureManagers()) return;
 
         InventoryBarItem selected = inventoryBar.SelectedItem;
-        if (selected == null || !selected.IsValid()) return;
+        if (selected == null || !selected.IsValid())
+        {
+            if (showDebug) Debug.Log("[PlayerTileInteractor] Click handled, but no valid item selected in the bar.");
+            return;
+        }
 
         Vector3 mouseW = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseW.z = 0f;
         Vector3Int cellPos = tileInteractionManager.WorldToCell(mouseW);
         Vector3 cellCenter = tileInteractionManager.interactionGrid.GetCellCenterWorld(cellPos);
 
-        if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius) return;
+        if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius)
+        {
+            if (showDebug) Debug.Log($"[PlayerTileInteractor] Clicked on cell {cellPos}, but it's too far away.");
+            return;
+        }
 
         if (selected.Type == InventoryBarItem.ItemType.Tool)
         {
+            if (showDebug) Debug.Log($"[PlayerTileInteractor] Applying tool '{selected.GetDisplayName()}' to cell {cellPos}.");
             tileInteractionManager.ApplyToolAction(selected.ToolDefinition);
         }
         else if (selected.Type == InventoryBarItem.ItemType.Node && selected.IsSeed())
         {
+            if (showDebug) Debug.Log($"[PlayerTileInteractor] Attempting to plant seed '{selected.GetDisplayName()}' at cell {cellPos}.");
             bool planted = PlantPlacementManager.Instance?.TryPlantSeedFromInventory(selected, cellPos, cellCenter) ?? false;
             if (planted)
             {
+                if (showDebug) Debug.Log($"[PlayerTileInteractor] Planted successfully. Removing seed from inventory.");
                 RemoveSeedFromInventory(selected);
                 inventoryBar.ShowBar(); // Refresh the bar
+            }
+            else
+            {
+                if (showDebug) Debug.Log($"[PlayerTileInteractor] Planting failed.");
             }
         }
     }
@@ -66,8 +80,7 @@ public sealed class PlayerTileInteractor : MonoBehaviour
     {
         InventoryGridController grid = InventoryGridController.Instance;
         if (grid == null) return;
-        
-        // --- MODIFIED: Uses GetItemView() ---
+
         if (seed.ViewGameObject != null)
         {
             for (int i = 0; i < grid.ActualCellCount; i++)
@@ -75,18 +88,20 @@ public sealed class PlayerTileInteractor : MonoBehaviour
                 NodeCell cell = grid.GetInventoryCellAtIndex(i);
                 if (cell != null && cell.GetItemView()?.gameObject == seed.ViewGameObject)
                 {
+                    if (showDebug) Debug.Log($"[PlayerTileInteractor] Removing seed '{seed.GetDisplayName()}' from inventory cell {i} by view reference.");
                     cell.RemoveNode();
                     return;
                 }
             }
         }
 
-        // Fallback check by data ID if view object doesn't match
+        // Fallback search by NodeData ID
         for (int i = 0; i < grid.ActualCellCount; i++)
         {
             NodeCell cell = grid.GetInventoryCellAtIndex(i);
             if (cell != null && cell.GetNodeData()?.nodeId == seed.NodeData.nodeId)
             {
+                if (showDebug) Debug.Log($"[PlayerTileInteractor] Removing seed '{seed.GetDisplayName()}' from inventory cell {i} by data ID fallback.");
                 cell.RemoveNode();
                 return;
             }
