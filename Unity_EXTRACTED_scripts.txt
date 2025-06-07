@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 521,055 → 328,296 chars (37.0% reduction)
-Estimated tokens saved: ~48,189
+Compression Stats: 517,351 → 326,189 chars (37.0% reduction)
+Estimated tokens saved: ~47,790
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -27,81 +27,81 @@ using System;
   UIManager (Assets\Scripts\Core/) L292
   WeatherManager (Assets\Scripts\Core/) L470
   AnimalController (Assets\Scripts\Ecosystem\Animals/) L622
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1169
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1186
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1195
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1208
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1225
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1469
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L1669
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L1738
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L1753
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L1772
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L1811
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L1979
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2043
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2060
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2073
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2102
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2310
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L2541
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L2788
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L2817
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L2847
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L2860
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L2888
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L2949
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L2994
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3045
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3079
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3149
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3169
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3204
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3219
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3324
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L3364
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L3387
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L3405
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L3432
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L3441
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L3631
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L3671
-  PlantGrowth.Growth (Assets\Scripts\PlantSystem\Growth/) L3695
-  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L3945
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4136
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L4466
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L4814
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L4881
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L5339
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L5707
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L5904
-  NodeView (Assets\Scripts\PlantSystem\UI/) L6470
-  ToolView (Assets\Scripts\PlantSystem\UI/) L6579
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6663
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L6797
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7090
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7178
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7265
-  UniversalTooltipManager (Assets\Scripts\UI\Tooltips/) L7402
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L7716
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L7727
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L7811
-  WaterReflection (Assets\Scripts\Visual\Effects/) L7916
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8295
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8331
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8521
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L8663
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L8798
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L8920
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L8960
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L8980
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L8992
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9011
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9173
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1168
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1185
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1194
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1207
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1224
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1468
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L1667
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L1735
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L1750
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L1769
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L1805
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L1973
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2037
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2054
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2067
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2096
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2304
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L2535
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L2782
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L2811
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L2841
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L2854
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L2882
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L2943
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L2988
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3039
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3073
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3143
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3163
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3198
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3213
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3318
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L3358
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L3381
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L3399
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L3426
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L3435
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L3625
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L3664
+  PlantGrowth.Growth (Assets\Scripts\PlantSystem\Growth/) L3688
+  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L3938
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4129
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L4459
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L4807
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L4874
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L5332
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L5700
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L5897
+  NodeView (Assets\Scripts\PlantSystem\UI/) L6463
+  ToolView (Assets\Scripts\PlantSystem\UI/) L6571
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6654
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L6788
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7081
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7169
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7256
+  UniversalTooltipManager (Assets\Scripts\UI\Tooltips/) L7393
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L7714
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L7725
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L7809
+  WaterReflection (Assets\Scripts\Visual\Effects/) L7914
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8292
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8328
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8518
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L8660
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L8795
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L8917
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L8957
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L8977
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L8989
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9008
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9167
 
 [for]
-  PlantGrowth.Cell (Assets\Scripts\PlantSystem\Growth/) L9183
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L9426
+  PlantGrowth.Cell (Assets\Scripts\PlantSystem\Growth/) L9177
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L9420
 
 ================================================================================
 SCRIPTS
@@ -110,7 +110,7 @@ SCRIPTS
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\PixelPerfectSetup.cs
 
-﻿// FILE: Assets/Scripts/Core/PixelPerfectSetup.cs
+﻿using UnityEngine;
 using UnityEngine.U2D;
 
 pub cls PixelPerfectSetup : MonoBehaviour {
@@ -151,7 +151,7 @@ Debug.Log($"[PixelPerfectSetup] Expected camera orthographic size: {expectedCame
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\RunManager.cs
 
-﻿// FILE: Assets/Scripts/Core/RunManager.cs
+﻿using UnityEngine;
 
 pub enum RunState {
 Planning,
@@ -323,7 +323,7 @@ useParentYCoordinate = value;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\SpeedModifiable.cs
 
-﻿// FILE: Assets/Scripts/Core/SpeedModifiable.cs
+﻿using UnityEngine;
 
 pub cls SpeedModifiable : MonoBehaviour {
 
@@ -373,7 +373,7 @@ prot virt void OnSpeedChanged(float newSpeed) { }
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\UIManager.cs
 
-﻿// FILE: Assets/Scripts/Core/UIManager.cs
+﻿using UnityEngine;
 
 pub cls UIManager : MonoBehaviour {
 pub stat UIManager Instance { get; set; }
@@ -551,7 +551,7 @@ RunManager.Instance?.StartNewPlanningPhase();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\WeatherManager.cs
 
-﻿// FILE: Assets/Scripts/Battle/Plant/WeatherManager.cs
+﻿using UnityEngine;
 
 pub cls WeatherManager : MonoBehaviour {
 pub stat WeatherManager Instance { get; set; }
@@ -703,8 +703,7 @@ forceDaylight = false; // Don't force daylight, just pause current state
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Animals\AnimalController.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Animals/AnimalController.cs
-
+﻿using System.Collections;
 using TMPro;
 
 pub cls AnimalController : SpeedModifiable {
@@ -1550,8 +1549,7 @@ if (spriteMaterialInstance != null) Destroy(spriteMaterialInstance);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyManager.cs
-
+﻿using UnityEngine;
 using UnityEngine.Rendering.Universal;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -1750,8 +1748,7 @@ if (target != null) { Gizmos.DrawLine(firefly.transform.position, target.positio
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Environment\PoopController.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Core/PoopController.cs (Ensure Collider is Added)
-
+﻿using UnityEngine;
 using TMPro;
 
 [RequireComponent(typeof(Collider2D))] // Add RequireComponent for Collider2D
@@ -1819,7 +1816,7 @@ poopCollider.isTrigger = true;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Environment\ScentDefinition.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Scents/ScentDefinition.cs
+﻿using UnityEngine;
 
 pub cls ScentDefinition : ScriptableObject {
 pub string scentID = "default_scent"; // Still useful for debugging/lookup
@@ -1834,7 +1831,7 @@ pub GameObject particleEffectPrefab;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Environment\ScentLibrary.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Scents/ScentLibrary.cs
+﻿using UnityEngine;
 
 pub cls ScentLibrary : ScriptableObject {
 pub List<ScentDefinition> scents;
@@ -1853,7 +1850,7 @@ ret scents?.Where(s => s != null).ToList() ?? new List<ScentDefinition>();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Environment\ScentSource.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Core/ScentSource.cs
+﻿using UnityEngine;
 
 pub cls ScentSource : MonoBehaviour {
 pub ScentDefinition definition; // Assigned by PlantGrowth/Node effects
@@ -1863,9 +1860,6 @@ pub float strengthModifier = 0f;
 
 pub float EffectiveRadius => Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier);
 pub float EffectiveStrength => Mathf.Max(0f, (definition != null ? definition.baseStrength : 0f) + strengthModifier);
-
-void Awake() {
-}
 
 void OnDrawGizmosSelected() {
 float effectiveRadius = EffectiveRadius; // Calculate radius for gizmo
@@ -1892,7 +1886,7 @@ Gizmos.DrawWireSphere(transform.position, 1f); // Default size for editor only
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Environment\SlowdownZone.cs
 
-﻿// FILE: Assets\Scripts\Ecosystem\Core\SlowdownZone.cs
+﻿using UnityEngine;
 
 pub cls SlowdownZone : MonoBehaviour {
 pub float speedMultiplier = 0.5f;
@@ -2154,7 +2148,7 @@ pub FoodCategory category = FoodCategory.Other;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Management\EcosystemManager.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Core/EcosystemManager.cs
+﻿using UnityEngine;
 
 pub cls EcosystemManager : MonoBehaviour {
 pub stat EcosystemManager Instance { get; set; }
@@ -2183,7 +2177,7 @@ Debug.LogWarning($"[{nameof(EcosystemManager)}] Scent Library not assigned! Scen
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Management\FaunaManager.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Core/FaunaManager.cs
+﻿using UnityEngine;
 
 pub cls FaunaManager : MonoBehaviour {
 [SerializeField] Vector2 spawnCenter = Vector2.zero;
@@ -2391,7 +2385,7 @@ void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { Gizmos.colo
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Management\FloraManager.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Core/FloraManager.cs
+﻿using UnityEngine;
 using System.Collections.Generic; // Added for Dictionary
 #if UNITY_EDITOR
 using UnityEditor;
@@ -2622,7 +2616,7 @@ Debug.Log($"[FloraManager] Drew {drawnCount} poop absorption radius gizmos");
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Management\WaveManager.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Core/WaveManager.cs
+﻿using UnityEngine;
 using TMPro; // Keep for legacy UI if any part is still used
 using UnityEngine.UI; // Keep for legacy UI
 
@@ -2869,7 +2863,7 @@ pub Camera GetMainCamera() { ret mainCamera; } // If FaunaManager still needs it
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Spawning\WaveDefinition.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Core/WaveDefinition.cs
+﻿using UnityEngine;
 
 pub enum WaveSpawnLocationType {
 GlobalSpawnArea,
@@ -3160,7 +3154,7 @@ AssetDatabase.SaveAssets();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Editor\NodeEffectDrawer.cs
 
-﻿// FILE: Assets/Editor/NodeEffectDrawer.cs
+﻿using UnityEngine;
 using UnityEditor;
 
 pub cls NodeEffectDrawer : PropertyDrawer {
@@ -3285,7 +3279,7 @@ manager.baseSortingOrder + "). Each subsequent item is " +
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\LeafData.cs
 
-﻿// FILE: Assets/Scripts/Battle/Plant/LeafData.cs
+﻿using UnityEngine;
 
 pub cls LeafData {
 pub Vector2Int GridCoord;
@@ -3300,7 +3294,7 @@ IsActive = isActive;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\NodeData.cs
 
-﻿﻿// FILE: Assets/Scripts/Nodes/Core/NodeData.cs
+﻿﻿
 
 pub cls NodeData : ISerializationCallbackReceiver {
 pub string nodeId;
@@ -3405,7 +3399,7 @@ CleanForSerialization(0, $"OADS ({nodeDisplayName ?? nodeId})");
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\NodeDefinition.cs
 
-﻿// FILE: Assets/Scripts/Nodes/Core/NodeDefinition.cs
+﻿using UnityEngine;
 
 pub cls NodeDefinition : ScriptableObject {
 pub string displayName;
@@ -3468,7 +3462,7 @@ pub List<InitialNodeConfig> initialNodes; // <<< NEW LIST ADDED
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\NodeEffectData.cs
 
-﻿// FILE: Assets/Scripts/Nodes/Core/NodeEffectData.cs
+﻿using System;
 
 pub cls NodeEffectData {
 pub NodeEffectType effectType;
@@ -3486,7 +3480,7 @@ pub ScentDefinition scentDefinitionReference; // <<< ADDED: Direct reference
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\NodeEffectType.cs
 
-﻿// FILE: Assets/Scripts/Nodes/Core/NodeEffectType.cs
+﻿using System;
 
 pub enum NodeEffectType {
 
@@ -3522,7 +3516,7 @@ pub List<NodeData> nodes = new List<NodeData>();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Execution\NodeExecutor.cs
 
-﻿// FILE: Assets/Scripts/Nodes/Runtime/NodeExecutor.cs
+﻿using System.Collections.Generic;
 using TMPro;
 
 pub cls NodeExecutor : MonoBehaviour {
@@ -3712,8 +3706,7 @@ if (debugOutput != null) debugOutput.text += $"ERROR: {msg}\n";
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\OutputNodeEffect.cs
 
-﻿// FILE: Assets/Scripts/Nodes/Core/OutputNodeEffect.cs
-using System.Collections.Generic; // Required for Dictionary
+﻿using UnityEngine;
 
 pub cls OutputNodeEffect : MonoBehaviour {
 pub GameObject projectilePrefab;
@@ -3752,7 +3745,7 @@ parentPlantGrowth.ApplyScentDataToObject(projGO, scentRadiusBonuses, scentStreng
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantCell.cs
 
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantCell.cs (Fix Leaf Tracking)
+﻿using UnityEngine;
 
 pub enum PlantCellType { Seed, Stem, Leaf, Flower, Fruit } // <<< ADDED ENUM DEFINITION
 
@@ -3776,7 +3769,7 @@ ParentPlantGrowth.ReportCellDestroyed(GridCoord);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantGrowth.Growth.cs
 
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.Growth.cs
+﻿using System.Collections;
 using System.Linq; // Keep for OrderBy
 
 pub partial cls PlantGrowth : MonoBehaviour {
@@ -4026,7 +4019,7 @@ ret leafPositions;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantGrowth.NodeExecution.cs
 
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.NodeExecution.cs
+﻿using System.Collections;
 
 pub partial cls PlantGrowth : MonoBehaviour {
 
@@ -4217,7 +4210,7 @@ Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform.posit
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantGrowth.cs
 
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.cs
+﻿using UnityEngine;
 using TMPro;
 
 pub enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
@@ -4895,7 +4888,7 @@ if (downArrowButton != null) downArrowButton.onClick.RemoveAllListeners();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\InventoryBarItem.cs
 
-﻿// FILE: Assets/Scripts/UI/InventoryBarItem.cs
+﻿using UnityEngine;
 
 pub cls InventoryBarItem {
 pub enum ItemType { Node, Tool }
@@ -4962,7 +4955,7 @@ ret itemType == ItemType.Node && nodeData != null && nodeData.IsSeed();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\InventoryGridController.cs
 
-﻿// FILE: Assets/Scripts/Nodes/UI/InventoryGridController.cs
+﻿using UnityEngine;
 
 pub cls InventoryGridController : MonoBehaviour {
 pub stat InventoryGridController Instance { get; set; }
@@ -5420,7 +5413,7 @@ ret null;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\NodeCell.cs
 
-﻿// FILE: Assets/Scripts/Nodes/UI/NodeCell.cs
+﻿using System.Linq;
 using UnityEngine.EventSystems;
 
 pub cls NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler {
@@ -5788,7 +5781,7 @@ if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\NodeDraggable.cs
 
-﻿// FILE: Assets/Scripts/Nodes/UI/NodeDraggable.cs
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 pub cls NodeDraggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
@@ -5985,7 +5978,7 @@ _canvasGroup.blocksRaycasts = true;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\NodeEditorGridController.cs
 
-﻿// FILE: Assets/Scripts/Nodes/UI/NodeEditorGridController.cs
+﻿using System.Collections;
 using UnityEngine.EventSystems;
 using TMPro;
 
@@ -6551,8 +6544,7 @@ Gizmos.matrix = originalMatrix;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\NodeView.cs
 
-﻿// FILE: Assets/Scripts/Nodes/UI/NodeView.cs (MODIFIED)
-
+﻿using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 
@@ -6660,8 +6652,7 @@ NodeCell.SelectCell(_parentCell);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\ToolView.cs
 
-﻿// FILE: Assets/Scripts/Tiles/Tools/ToolView.cs (MODIFIED)
-
+﻿using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 
@@ -6744,7 +6735,7 @@ pub void OnPointerDown(PointerEventData eventData) {
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Visual\OutlinePartController.cs
 
-﻿// FILE: Assets/Scripts/Visuals/OutlinePartController.cs
+﻿using UnityEngine;
 
 pub cls OutlinePartController : MonoBehaviour {
 SpriteRenderer outlineRenderer;
@@ -6878,7 +6869,7 @@ DestroyImmediate(gameObject);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Visual\PlantOutlineController.cs
 
-﻿// FILE: Assets/Scripts/Visuals/PlantOutlineController.cs
+﻿using UnityEngine;
 
 pub cls PlantOutlineController : MonoBehaviour {
 [SerializeField] Color outlineColor = Color.black;
@@ -7171,7 +7162,7 @@ plantCellCoords.Clear();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Visual\PlantShadowController.cs
 
-﻿// FILE: Assets/Scripts/Visuals/PlantShadowController.cs
+﻿using UnityEngine;
 
 pub cls PlantShadowController : MonoBehaviour {
 [SerializeField] Color shadowColor = new Color(0f, 0f, 0f, 0.5f);
@@ -7259,7 +7250,7 @@ shadowPartMap.Clear(); // Prevent memory leaks
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Visual\ShadowPartController.cs
 
-﻿// FILE: Assets/Scripts/Visuals/ShadowPartController.cs
+﻿using UnityEngine;
 
 pub cls ShadowPartController : MonoBehaviour {
 SpriteRenderer shadowRenderer;
@@ -7346,7 +7337,7 @@ if (this != null && gameObject != null) { if (Application.isPlaying) { Destroy(g
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\UI\Tooltips\TooltipTrigger.cs
 
-﻿// FILE: Assets/Scripts/UI/TooltipTrigger.cs (SIMPLIFIED)
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 pub cls TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
@@ -7483,7 +7474,7 @@ HideTooltip();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\UI\Tooltips\UniversalTooltipManager.cs
 
-﻿// FILE: Assets/Scripts/UI/Tooltips/UniversalTooltipManager.cs
+﻿using UnityEngine;
 using TMPro;
 using System.Text;
 using UnityEngine.EventSystems;
@@ -7548,42 +7539,49 @@ HideTooltip();
 }
 }
 }
-} //
+}
 
 pub void ShowNodeTooltip(NodeData nodeData, NodeDefinition nodeDef, Transform anchor = null) {
 if (nodeData == null || nodeDef == null) return;
-if (isVisible && currentTarget == nodeData) return;
+
+if (isVisible && ReferenceEquals(currentTarget, nodeData)) return;
 
 currentTarget = nodeData;
-string title = nodeDef.displayName ?? nodeData.nodeDisplayName ?? "Unknown Node";
-string description = nodeDef.description ?? "";
-string details = BuildNodeDetails(nodeData, nodeDef);
+
+string title       = nodeDef.displayName ?? nodeData.nodeDisplayName ?? "Unknown Node";
+string description = nodeDef.description ?? string.Empty;
+string details     = BuildNodeDetails(nodeData, nodeDef);
+
 ShowTooltipInternal(title, description, details, anchor);
 }
 
 pub void ShowToolTooltip(ToolDefinition toolDef, Transform anchor = null) {
 if (toolDef == null) return;
-if (isVisible && currentTarget == toolDef) return;
+
+if (isVisible && ReferenceEquals(currentTarget, toolDef)) return;
 
 currentTarget = toolDef;
-string title = toolDef.displayName ?? "Unknown Tool";
+
+string title       = toolDef.displayName ?? "Unknown Tool";
 string description = $"Tool Type: {toolDef.toolType}";
-string details = BuildToolDetails(toolDef);
+string details     = BuildToolDetails(toolDef);
+
 ShowTooltipInternal(title, description, details, anchor);
 }
 
 pub void ShowInventoryItemTooltip(InventoryBarItem item, Transform anchor = null) {
 if (item == null || !item.IsValid()) return;
 
-object itemUnderlyingData = item.Type == InventoryBarItem.ItemType.Node ? (object)item.NodeData : (object)item.ToolDefinition;
-if (isVisible && currentTarget == itemUnderlyingData) return;
+object underlying = item.Type == InventoryBarItem.ItemType.Node
+? (object)item.NodeData
+: item.ToolDefinition;
 
-if (item.Type == InventoryBarItem.ItemType.Node) {
+if (isVisible && ReferenceEquals(currentTarget, underlying)) return;
+
+if (item.Type == InventoryBarItem.ItemType.Node)
 ShowNodeTooltip(item.NodeData, item.NodeDefinition, anchor);
-}
-else if (item.Type == InventoryBarItem.ItemType.Tool) {
+else
 ShowToolTooltip(item.ToolDefinition, anchor);
-}
 }
 
 pub void HideTooltip() {
@@ -7892,7 +7890,7 @@ vignette.smoothness.value = Mathf.Lerp(dayVignetteSmoothness, nightVignetteSmoot
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Visual\Effects\RuntimeCircleDrawer.cs
 
-﻿// FILE: Assets/Scripts/Visuals/RuntimeCircleDrawer.cs
+﻿using UnityEngine;
 
 pub cls RuntimeCircleDrawer : MonoBehaviour {
 pub int segments = 30; // Number of line segments to approximate the circle
@@ -7997,9 +7995,8 @@ lineRenderer.SetPositions(points);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Visual\Effects\WaterReflection.cs
 
-﻿// FILE: Assets/Scripts/Visuals/WaterReflection.cs
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-using System.Collections.Generic; // Keep for potential future extensions, not strictly needed now
 
 pub cls WaterReflection : MonoBehaviour {
 pub cls OverrideSettings {
@@ -8376,7 +8373,7 @@ if (Application.isPlaying && originalRenderer != null) UpdateReflectionVisuals()
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Visual\Effects\WaterReflectionManager.cs
 
-﻿// FILE: Assets/Scripts/Visuals/Managers/WaterReflectionManager.cs
+﻿using UnityEngine;
 
 pub cls WaterReflectionManager : MonoBehaviour {
 pub stat WaterReflectionManager Instance { get; set; }
@@ -8602,7 +8599,7 @@ BuildModifierLookup();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Placement\PlantPlacementManager.cs
 
-﻿// FILE: Assets/Scripts/Tiles/Data/PlantPlacementManager.cs
+﻿using System.Collections.Generic;
 using System.Linq; // Added for LINQ
 
 pub cls PlantPlacementManager : MonoBehaviour {
@@ -8744,7 +8741,7 @@ ret centerPosition + new Vector3(offsetX, offsetY, 0f);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Placement\PlayerTileInteractor.cs
 
-﻿// FILE: Assets/Scripts/Tiles/Data/PlayerTileInteractor.cs
+﻿using UnityEngine;
 
 [DefaultExecutionOrder(100)] // Ensures LateUpdate runs after TileInteractionManager.Update
 pub sealed cls PlayerTileInteractor : MonoBehaviour {
@@ -8879,7 +8876,7 @@ tileInteractionManager = TileInteractionManager.Instance
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\GardenerController.cs
 
-﻿// FILE: Assets/Scripts/WorldInteraction/Player/GardenerController.cs
+﻿using UnityEngine;
 
 pub cls GardenerController : SpeedModifiable {
 
@@ -9041,7 +9038,7 @@ UnityEditor.EditorUtility.SetDirty(renderTilemap);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Tiles\TileInteractionLibrary.cs
 
-﻿// FILE: Assets/Scripts/Tiles/Data/TileInteractionLibrary.cs
+﻿using System.Collections.Generic;
 using System; // Needed for [Serializable]
 
 [Serializable] // Make it visible in the Inspector
@@ -9073,7 +9070,7 @@ pub TileDefinition toTile;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Tools\ToolDefinition.cs
 
-﻿// FILE: Assets/Scripts/Tiles/Tools/ToolDefinition.cs
+﻿using UnityEngine;
 
 pub cls ToolDefinition : ScriptableObject {
 pub ToolType toolType;
@@ -9092,7 +9089,7 @@ pub bool autoAddToInventory = true; // NEW FIELD
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Tools\ToolSwitcher.cs
 
-﻿// FILE: Assets/Scripts/Tiles/Tools/ToolSwitcher.cs
+﻿using UnityEngine;
 
 pub cls ToolSwitcher : MonoBehaviour {
 pub ToolDefinition[] toolDefinitions;
@@ -9104,9 +9101,6 @@ pub int CurrentRemainingUses { get; set; } = -1; // <<< NEW: Track remaining use
 
 pub event Action<ToolDefinition> OnToolChanged;
 pub event Action<int> OnUsesChanged; // <<< NEW EVENT for UI updates
-
-void Awake() {
-}
 
 void Start() {
 InitializeToolState(true); // Initialize and fire events
@@ -9264,7 +9258,7 @@ SeedPouch // New tool type
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantGrowth.Cell.cs
 
-﻿// FILE: Assets/Scripts/Battle/Plant/PlantGrowth.Cell.cs
+﻿using System.Collections.Generic;
 using System.Linq; // Added this ns for OrderBy()
 
 pub partial cls PlantGrowth : MonoBehaviour {
@@ -9507,7 +9501,7 @@ Debug.LogWarning($"[{gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Tiles\TileInteractionManager.cs
 
-﻿// FILE: Assets/Scripts/Tiles/Data/TileInteractionManager.cs
+﻿using System.Collections;
 using UnityEngine.Tilemaps;
 using skner.DualGrid; // Assuming this is the correct ns for your DualGrid package
 using TMPro;
