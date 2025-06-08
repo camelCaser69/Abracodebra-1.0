@@ -1,144 +1,90 @@
 ﻿using System.Collections.Generic;
-using System.Linq; // Added this namespace for OrderBy()
 using UnityEngine;
+using System.Linq;
+using WegoSystem;
 
-public partial class PlantGrowth : MonoBehaviour
-{
-    // ------------------------------------------------
-    // --- CELL MANAGEMENT METHODS ---
-    // ------------------------------------------------
+public partial class PlantGrowth : MonoBehaviour {
 
-    public void ReportCellDestroyed(Vector2Int coord)
-    {
-        if (cells.ContainsKey(coord))
-        {
-            // Check what type of cell is being destroyed
+    public void ReportCellDestroyed(Vector2Int coord) {
+        if (cells.ContainsKey(coord)) {
             PlantCellType cellType = cells[coord];
-        
-            // If it's a leaf, mark it as inactive for potential regrowth
-            if (cellType == PlantCellType.Leaf)
-            {
-                // Find and update the leaf data
-                for (int i = 0; i < leafDataList.Count; i++)
-                {
-                    if (leafDataList[i].GridCoord == coord)
-                    {
+
+            if (cellType == PlantCellType.Leaf) {
+                for (int i = 0; i < leafDataList.Count; i++) {
+                    if (leafDataList[i].GridCoord == coord) {
                         LeafData updatedData = leafDataList[i];
                         updatedData.IsActive = false; // Mark as eaten/missing
                         leafDataList[i] = updatedData;
-                    
+
                         if (Debug.isDebugBuild)
                             Debug.Log($"[{gameObject.name}] Leaf at {coord} marked as missing for potential regrowth via ReportCellDestroyed.");
-                    
+
                         break;
                     }
                 }
             }
-        
+
             cells.Remove(coord);
-            // Assume RemovePlantCell(GameObject) will be called externally for proper cleanup
-            // We still need to clean the GO list if destruction happened unexpectedly
             activeCellGameObjects.RemoveAll(go => go == null || (go.GetComponent<PlantCell>()?.GridCoord == coord));
 
-            // Trigger outline update after internal state change
-            if (enableOutline && outlineController != null)
-            {
+            if (enableOutline && outlineController != null) {
                 outlineController.OnPlantCellRemoved(coord);
             }
         }
     }
 
-    // RemovePlantCell (Handles shadow AND outline unregistration)
-    public void RemovePlantCell(GameObject cellToRemove)
-    {
+    public void RemovePlantCell(GameObject cellToRemove) {
         if (cellToRemove == null) return;
 
         PlantCell cellComp = cellToRemove.GetComponent<PlantCell>();
-        if (cellComp == null) { Destroy(cellToRemove); return; } // Destroy if no component
+        if (cellComp == null) { Destroy(cellToRemove); return; }
 
         Vector2Int coord = cellComp.GridCoord;
-        
-        // NEW: Check if this is a leaf and mark it as inactive in our leaf data list
-        if (cellComp.CellType == PlantCellType.Leaf)
-        {
-            // Find matching leaf data and mark as inactive (missing)
-            for (int i = 0; i < leafDataList.Count; i++)
-            {
-                if (leafDataList[i].GridCoord == coord)
-                {
+
+        if (cellComp.CellType == PlantCellType.Leaf) {
+            for (int i = 0; i < leafDataList.Count; i++) {
+                if (leafDataList[i].GridCoord == coord) {
                     LeafData updatedData = leafDataList[i];
                     updatedData.IsActive = false; // Mark as eaten/missing
                     leafDataList[i] = updatedData;
-                    
+
                     if (Debug.isDebugBuild)
                         Debug.Log($"[{gameObject.name}] Leaf at {coord} marked as missing for potential regrowth.");
-                    
+
                     break;
                 }
             }
         }
 
-        // --- Unregister Visuals FIRST ---
-        // Shadow
-        SpriteRenderer partRenderer = cellToRemove.GetComponentInChildren<SpriteRenderer>(); // More robust check
+        SpriteRenderer partRenderer = cellToRemove.GetComponentInChildren<SpriteRenderer>();
         if (shadowController != null && partRenderer != null) {
             shadowController.UnregisterPlantPart(partRenderer);
         }
 
-        // Outline (this now triggers the update based on internal state)
-        // No direct call to outlineController needed here, ReportCellDestroyed handles it.
-
-        // --- Remove from internal tracking ---
         if (cells.ContainsKey(coord)) {
             cells.Remove(coord);
         }
         activeCellGameObjects.Remove(cellToRemove);
 
-        // --- Destroy the GameObject ---
         Destroy(cellToRemove);
-
-        // --- Trigger Outline Update AFTER internal state reflects the removal ---
-        // Moved notification to ReportCellDestroyed which should be called by PlantCell OnDestroy
-        // If called directly, ensure ReportCellDestroyed is also called or call the outline update here:
-        // if (enableOutline && outlineController != null) {
-        //     outlineController.OnPlantCellRemoved(coord);
-        // }
     }
 
-
-    // ClearAllVisuals (Combined cleanup helper for Shadows and Outlines)
-    private void ClearAllVisuals()
-    {
-        // Create a copy because RemovePlantCell modifies the list
+    void ClearAllVisuals() {
         List<GameObject> cellsToClear = new List<GameObject>(activeCellGameObjects);
         foreach (GameObject cellGO in cellsToClear) {
             if (cellGO != null) {
-                // Directly destroy, OnDestroy in PlantCell calls ReportCellDestroyed -> Outline Update
                 Destroy(cellGO);
             }
         }
-        // Ensure lists/dicts are clear after iteration
         activeCellGameObjects.Clear();
         cells.Clear();
-
-        // Also clear any outlines that might be orphaned
-        if (outlineController != null) {
-             // This assumes OutlineController has a method to clear all its parts
-             // outlineController.ClearAllOutlineParts();
-             // Or simply destroy/recreate the outline controller if simpler
-        }
 
         rootCellInstance = null;
     }
 
-
-    // SpawnCellVisual - Creates a cell visual GameObject
-    private GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords,
-                                 Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = null,
-                                 Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = null)
-    {
+    GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = null, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = null) {
         if (cells.ContainsKey(coords)) {
-             Debug.LogWarning($"[{gameObject.name}] Trying to spawn {cellType} at occupied coord {coords}.");
+            Debug.LogWarning($"[{gameObject.name}] Trying to spawn {cellType} at occupied coord {coords}.");
             return null;
         }
 
@@ -155,22 +101,18 @@ public partial class PlantGrowth : MonoBehaviour
             return null;
         }
 
-        // Create visual cell
         Vector2 worldPos = (Vector2)transform.position + ((Vector2)coords * cellSpacing);
         GameObject instance = Instantiate(prefab, worldPos, Quaternion.identity, transform);
         instance.name = $"{gameObject.name}_{cellType}_{coords.x}_{coords.y}";
 
-        // Set up PlantCell component
         PlantCell cellComp = instance.GetComponent<PlantCell>() ?? instance.AddComponent<PlantCell>();
         cellComp.ParentPlantGrowth = this;
         cellComp.GridCoord = coords;
         cellComp.CellType = cellType;
 
-        // Add to tracking
         cells[coords] = cellType;
         activeCellGameObjects.Add(instance);
 
-        // Set up SortableEntity
         SortableEntity sorter = instance.GetComponent<SortableEntity>() ?? instance.AddComponent<SortableEntity>();
         if (cellType == PlantCellType.Seed) {
             sorter.SetUseParentYCoordinate(false);
@@ -178,28 +120,22 @@ public partial class PlantGrowth : MonoBehaviour
             sorter.SetUseParentYCoordinate(true);
         }
 
-        // Apply scent data if it's a fruit
         if (cellType == PlantCellType.Fruit) {
             ApplyScentDataToObject(instance, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
         }
 
-        // Register visual effects
         RegisterShadowForCell(instance, cellType.ToString());
-        // Outline registration now happens via OnPlantCellAdded call
-        if (enableOutline && outlineController != null)
-        {
-             outlineController.OnPlantCellAdded(coords, instance);
+        if (enableOutline && outlineController != null) {
+            outlineController.OnPlantCellAdded(coords, instance);
         }
 
         return instance;
     }
 
-    // --- Helper Methods for Shadow & Outline Integration ---
-    private void RegisterShadowForCell(GameObject cellInstance, string cellTypeName)
-    {
+    void RegisterShadowForCell(GameObject cellInstance, string cellTypeName) {
         if (shadowController == null || shadowPartPrefab == null || cellInstance == null) return;
 
-        SpriteRenderer partRenderer = cellInstance.GetComponentInChildren<SpriteRenderer>(); // More robust
+        SpriteRenderer partRenderer = cellInstance.GetComponentInChildren<SpriteRenderer>();
         if (partRenderer != null) {
             shadowController.RegisterPlantPart(partRenderer, shadowPartPrefab);
         } else {
@@ -207,12 +143,7 @@ public partial class PlantGrowth : MonoBehaviour
         }
     }
 
-    // REMOVED: RegisterOutlineForCell (Logic moved to SpawnCellVisual calling outlineController.OnPlantCellAdded)
-
-    // --- Stat Calculation ---
-    private void CalculateAndApplyStats()
-    {
-        // (Function body remains the same as before)
+    void CalculateAndApplyStats() {
         if (nodeGraph == null) {
             Debug.LogError($"[{gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
             return;
@@ -222,7 +153,7 @@ public partial class PlantGrowth : MonoBehaviour
         float basePhotosynthesisRate = 0.5f;
         int baseStemMin = 3;
         int baseStemMax = 5;
-        float baseGrowthSpeedInterval = 0.5f; // Base time per step
+        float baseGrowthSpeedInterval = 0.5f;
         int baseLeafGap = 1;
         int baseLeafPattern = 0;
         float baseGrowthRandomness = 0.1f;
@@ -239,10 +170,9 @@ public partial class PlantGrowth : MonoBehaviour
         float cooldownModifier = 0f;
         float castDelayModifier = 0f;
         bool seedFound = false;
-        
-        // Initialize poop fertilizer values to zero
+
         poopDetectionRadius = 0f;
-        poopEnergyBonus = 0f; // Renamed from poopAbsorptionRate
+        poopEnergyBonus = 0f;
 
         foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
             if (node?.effects == null) continue;
@@ -262,14 +192,13 @@ public partial class PlantGrowth : MonoBehaviour
                         stemLengthModifier += Mathf.RoundToInt(effect.primaryValue);
                         break;
                     case NodeEffectType.GrowthSpeed:
-                        // Modify the *time interval* per step
                         growthSpeedTimeModifier += effect.primaryValue;
                         break;
                     case NodeEffectType.LeafGap:
                         leafGapModifier += Mathf.RoundToInt(effect.primaryValue);
                         break;
                     case NodeEffectType.LeafPattern:
-                        currentLeafPattern = Mathf.Clamp(Mathf.RoundToInt(effect.primaryValue), 0, 4); // Assuming max 4 patterns defined
+                        currentLeafPattern = Mathf.Clamp(Mathf.RoundToInt(effect.primaryValue), 0, 4);
                         break;
                     case NodeEffectType.StemRandomness:
                         growthRandomnessModifier += effect.primaryValue;
@@ -282,9 +211,8 @@ public partial class PlantGrowth : MonoBehaviour
                         break;
                     case NodeEffectType.PoopFertilizer:
                         poopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
-                        poopEnergyBonus = Mathf.Max(0f, effect.secondaryValue); // Renamed from poopAbsorptionRate
+                        poopEnergyBonus = Mathf.Max(0f, effect.secondaryValue);
                         break;
-                        // Add other passive effects here if needed
                 }
             }
         }
@@ -293,7 +221,7 @@ public partial class PlantGrowth : MonoBehaviour
         finalPhotosynthesisRate = Mathf.Max(0f, basePhotosynthesisRate + accumulatedPhotosynthesis);
         int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier);
         int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
-        finalGrowthSpeed = Mathf.Max(0.01f, baseGrowthSpeedInterval + growthSpeedTimeModifier); // This is now TIME PER STEP
+        finalGrowthSpeed = Mathf.Max(0.01f, baseGrowthSpeedInterval + growthSpeedTimeModifier);
         finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
         finalLeafPattern = currentLeafPattern;
         finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
@@ -301,7 +229,11 @@ public partial class PlantGrowth : MonoBehaviour
         nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
 
         targetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
-        // REMOVED: totalGrowthDuration calculation (less relevant)
+
+        if (useWegoSystem && TickManager.Instance?.Config != null) {
+            growthTicksPerStage = TickManager.Instance.Config.plantGrowthTicksPerStage;
+            maturityCycleTicks = Mathf.RoundToInt(cycleCooldown * (TickManager.Instance.Config.ticksPerRealSecond));
+        }
 
         if (!seedFound) {
             Debug.LogWarning($"[{gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth aborted.", gameObject);

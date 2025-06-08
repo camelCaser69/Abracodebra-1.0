@@ -1,15 +1,17 @@
 ﻿using System.Collections;
-using UnityEngine;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
+using UnityEngine;
+using WegoSystem;
+using System.Linq;
 
-// CHANGED: Inherits from SpeedModifiable now
-public class AnimalController : SpeedModifiable
-{
-    // --- Member variables from original script ---
+public class AnimalController : SpeedModifiable, ITickUpdateable {
+    [SerializeField] bool useWegoMovement = true;
+    [SerializeField] int thinkingTickInterval = 3; // How often to make decisions
+
     AnimalDefinition definition;
     AnimalDiet animalDiet;
+    GridEntity gridEntity;
 
     public AnimalThoughtLibrary thoughtLibrary;
     public GameObject thoughtBubblePrefab;
@@ -20,9 +22,16 @@ public class AnimalController : SpeedModifiable
 
     [SerializeField] TextMeshProUGUI hpText;
     [SerializeField] TextMeshProUGUI hungerText;
-
-    [Header("UI Settings")]
     [SerializeField] KeyCode showStatsKey = KeyCode.LeftAlt;
+
+    GridPosition targetPosition;
+    GameObject currentTargetFood = null;
+    bool hasPlannedAction = false;
+    int lastThinkTick = 0;
+
+    int hungerTick = 0;
+    int poopTick = 0;
+    int thoughtCooldownTick = 0;
 
     public float searchRadius = 5f;
     public float eatDistance = 0.5f;
@@ -37,21 +46,17 @@ public class AnimalController : SpeedModifiable
     public float poopDuration = 1f;
     public float poopColorVariation = 0.1f;
     public float thoughtCooldownTime = 5f;
-    [SerializeField] List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
-    [SerializeField] List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
-
     public float foodReassessmentInterval = 0.5f;
-    float foodReassessmentTimer = 0f;
-
     public float starvationDamageRate = 2f;
-
     public float damageFlashDuration = 0.2f;
     public float deathFadeDuration = 1.5f;
     public Color damageFlashColor = Color.red;
 
+    [SerializeField] List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
+    [SerializeField] List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
+
     float currentHealth;
     float currentHunger;
-    GameObject currentTargetFood = null;
     Vector2 moveDirection = Vector2.zero;
     bool isEating = false;
     float eatTimer = 0f;
@@ -64,6 +69,7 @@ public class AnimalController : SpeedModifiable
     float thoughtCooldownTimer = 0f;
     bool isSeekingScreenCenter = false;
     Vector2 screenCenterTarget;
+    float foodReassessmentTimer = 0f;
 
     bool isDying = false;
     Color originalColor;
@@ -79,10 +85,7 @@ public class AnimalController : SpeedModifiable
     public float CurrentHealth => currentHealth;
     public string SpeciesName => definition ? definition.animalName : "Uninitialized";
 
-    // REMOVED: baseMovementSpeed and activeSpeedMultipliers are now handled by SpeedModifiable base class.
-
-    public void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false)
-    {
+    public void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false) {
         definition = def;
         if (definition == null) { Destroy(gameObject); return; }
 
@@ -92,26 +95,38 @@ public class AnimalController : SpeedModifiable
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         animalCollider = GetComponent<Collider2D>();
+        gridEntity = GetComponent<GridEntity>();
 
-        if (animalCollider == null)
-        {
+        if (animalCollider == null) {
             Debug.LogError($"[{gameObject.name}] Missing Collider2D!", gameObject);
             enabled = false;
             return;
         }
 
-        if (spriteRenderer != null)
-        {
+        if (useWegoMovement && gridEntity == null) {
+            gridEntity = gameObject.AddComponent<GridEntity>();
+        }
+
+        if (spriteRenderer != null) {
             originalColor = spriteRenderer.color;
         }
-        
-        // CHANGED: Set baseSpeed and currentSpeed from the new base class
+
         baseSpeed = definition.movementSpeed;
         currentSpeed = baseSpeed;
 
         currentHealth = definition.maxHealth;
         currentHunger = 0f;
         hasPooped = true;
+
+        if (TickManager.Instance?.Config != null) {
+            var config = TickManager.Instance.Config;
+            poopTick = Random.Range(
+                config.ConvertSecondsToTicks(minPoopDelay),
+                config.ConvertSecondsToTicks(maxPoopDelay)
+            );
+            thoughtCooldownTick = config.ConvertSecondsToTicks(thoughtCooldownTime);
+        }
+
         poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
         foodReassessmentTimer = Random.Range(0f, foodReassessmentInterval);
 
@@ -121,8 +136,7 @@ public class AnimalController : SpeedModifiable
         screenCenterTarget = (minBounds + maxBounds) / 2f;
 
         isSeekingScreenCenter = spawnedOffscreen;
-        if (isSeekingScreenCenter)
-        {
+        if (isSeekingScreenCenter) {
             if(Debug.isDebugBuild)
                 Debug.Log($"[{gameObject.name} Initialize] Offscreen spawn. Seeking SHIFTED center ({screenCenterTarget}). SHIFTED Bounds: min{minBounds}, max{maxBounds}", gameObject);
 
@@ -135,58 +149,298 @@ public class AnimalController : SpeedModifiable
         SetStatsTextVisibility(false);
         UpdateHpText();
         UpdateHungerText();
+
+        if (useWegoMovement && TickManager.Instance != null) {
+            TickManager.Instance.RegisterTickUpdateable(this);
+        }
     }
 
-    void EnsureUITextReferences()
-    {
-        if (hpText == null)
-        {
-            hpText = GetComponentInChildren<TextMeshProUGUI>(true);
-            if (hpText != null && hpText.gameObject.name.Contains("Hunger"))
-            {
-                hungerText = hpText;
-                hpText = null;
+    void OnDestroy() {
+        if (TickManager.Instance != null) {
+            TickManager.Instance.UnregisterTickUpdateable(this);
+        }
+    }
+
+    public void OnTickUpdate(int currentTick) {
+        if (!useWegoMovement || isDying) return;
+
+        hungerTick++;
+        if (poopTick > 0) poopTick--;
+        if (thoughtCooldownTick > 0) thoughtCooldownTick--;
+
+        if (TickManager.Instance?.Config != null) {
+            var config = TickManager.Instance.Config;
+            if (hungerTick >= config.animalHungerTickInterval) {
+                UpdateHungerTick();
+                hungerTick = 0;
             }
         }
 
-        if (hungerText == null)
-        {
-            TextMeshProUGUI[] allTexts = GetComponentsInChildren<TextMeshProUGUI>(true);
-            foreach (var text in allTexts)
-            {
-                if (text != hpText)
-                {
-                    hungerText = text;
+        if (currentTick - lastThinkTick >= thinkingTickInterval) {
+            MakeDecision();
+            lastThinkTick = currentTick;
+        }
+
+        if (hasPlannedAction) {
+            ExecutePlannedAction();
+        }
+
+        if (!hasPooped && poopTick <= 0 && !isEating) {
+            TryPoop();
+        }
+    }
+
+    void MakeDecision() {
+        if (isSeekingScreenCenter) {
+            HandleScreenCenterSeeking();
+            return;
+        }
+
+        if (currentHunger >= animalDiet.hungerThreshold) {
+            PlanFoodSeeking();
+        } else {
+            PlanWandering();
+        }
+    }
+
+    void HandleScreenCenterSeeking() {
+        if (gridEntity == null) return;
+
+        Vector2 currentPos = (Vector2)transform.position;
+        bool centerWithinBounds =
+            currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
+            currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
+
+        if (centerWithinBounds) {
+            if(Debug.isDebugBuild)
+                Debug.Log($"[{gameObject.name}] Center reached! Switching to normal AI.", gameObject);
+            isSeekingScreenCenter = false;
+            hasPlannedAction = false;
+        } else {
+            GridPosition currentGridPos = gridEntity.Position;
+            GridPosition targetGridPos = GridPositionManager.Instance.WorldToGrid(screenCenterTarget);
+            PlanMovementToward(targetGridPos);
+        }
+    }
+
+    void PlanFoodSeeking() {
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
+
+        GameObject nearestFood = FindNearestFoodInGrid();
+        if (nearestFood != null) {
+            currentTargetFood = nearestFood;
+            GridPosition foodGridPos = GridPositionManager.Instance.WorldToGrid(nearestFood.transform.position);
+
+            GridPosition myPos = gridEntity.Position;
+            int distance = myPos.ManhattanDistance(foodGridPos);
+
+            if (distance <= 1) {
+                hasPlannedAction = true;
+                targetPosition = myPos; // Stay in place to eat
+            } else {
+                PlanMovementToward(foodGridPos);
+            }
+        } else {
+            PlanWandering();
+        }
+    }
+
+    void PlanWandering() {
+        if (gridEntity == null) return;
+
+        GridPosition currentPos = gridEntity.Position;
+        GridPosition[] directions = {
+            GridPosition.Up, GridPosition.Down,
+            GridPosition.Left, GridPosition.Right
+        };
+
+        for (int i = 0; i < 3; i++) {
+            GridPosition randomDir = directions[Random.Range(0, directions.Length)];
+            GridPosition targetPos = currentPos + randomDir;
+
+            if (GridPositionManager.Instance.IsPositionValid(targetPos) &&
+                !GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
+                targetPosition = targetPos;
+                hasPlannedAction = true;
+                break;
+            }
+        }
+
+        if (!hasPlannedAction) {
+            targetPosition = currentPos;
+            hasPlannedAction = true;
+        }
+    }
+
+    void PlanMovementToward(GridPosition target) {
+        if (gridEntity == null) return;
+
+        GridPosition currentPos = gridEntity.Position;
+        GridPosition direction = new GridPosition(
+            Mathf.Clamp(target.x - currentPos.x, -1, 1),
+            Mathf.Clamp(target.y - currentPos.y, -1, 1)
+        );
+
+        GridPosition targetPos = currentPos + direction;
+
+        if (GridPositionManager.Instance.IsPositionValid(targetPos) &&
+            !GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
+            targetPosition = targetPos;
+            hasPlannedAction = true;
+        } else {
+            GridPosition[] alternatives = {
+                currentPos + new GridPosition(direction.x, 0),
+                currentPos + new GridPosition(0, direction.y),
+                currentPos + GridPosition.Up,
+                currentPos + GridPosition.Down,
+                currentPos + GridPosition.Left,
+                currentPos + GridPosition.Right
+            };
+
+            foreach (var alt in alternatives) {
+                if (GridPositionManager.Instance.IsPositionValid(alt) &&
+                    !GridPositionManager.Instance.IsPositionOccupied(alt)) {
+                    targetPosition = alt;
+                    hasPlannedAction = true;
                     break;
                 }
             }
+
+            if (!hasPlannedAction) {
+                targetPosition = currentPos; // Stay in place
+                hasPlannedAction = true;
+            }
         }
     }
 
-    void Update()
-    {
-        if (!enabled || rb == null || isDying) return;
+    void ExecutePlannedAction() {
+        if (gridEntity == null) return;
+
+        GridPosition currentPos = gridEntity.Position;
+
+        if (currentTargetFood != null && targetPosition == currentPos) {
+            Vector3 foodWorldPos = currentTargetFood.transform.position;
+            Vector3 myWorldPos = transform.position;
+
+            if (Vector3.Distance(myWorldPos, foodWorldPos) <= 2f) { // Grid-adjusted eat distance
+                StartEating();
+                return;
+            }
+        }
+
+        if (targetPosition != currentPos) {
+            gridEntity.SetPosition(targetPosition);
+        }
+
+        hasPlannedAction = false;
+    }
+
+    GameObject FindNearestFoodInGrid() {
+        if (animalDiet == null) return null;
+
+        int gridRadius = Mathf.RoundToInt(searchRadius);
+        List<GridEntity> nearbyEntities = GridPositionManager.Instance.GetEntitiesInRadius(
+            gridEntity.Position, gridRadius, true);
+
+        GameObject bestFood = null;
+        float bestScore = -1f;
+
+        foreach (var entity in nearbyEntities) {
+            if (entity == null || entity.gameObject == this.gameObject) continue;
+
+            FoodItem foodItem = entity.GetComponent<FoodItem>();
+            if (foodItem != null && foodItem.foodType != null && animalDiet.CanEat(foodItem.foodType)) {
+                var pref = animalDiet.GetPreference(foodItem.foodType);
+                if (pref == null) continue;
+
+                float distance = entity.Position.ManhattanDistance(gridEntity.Position);
+                float score = pref.preferencePriority / (1f + distance);
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestFood = entity.gameObject;
+                }
+            }
+        }
+
+        return bestFood;
+    }
+
+    void UpdateHungerTick() {
+        if (animalDiet == null) return;
+
+        currentHunger += animalDiet.hungerIncreaseRate;
+        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
+
+        if (currentHunger >= animalDiet.maxHunger) {
+            ApplyStarvationDamage();
+        }
+
+        UpdateHungerText();
+    }
+
+    void TryPoop() {
+        if (isEating || isPooping) return;
+
+        isPooping = true;
+        SpawnPoop();
+
+        if (TickManager.Instance?.Config != null) {
+            var config = TickManager.Instance.Config;
+            poopTick = Random.Range(
+                config.ConvertSecondsToTicks(minPoopDelay),
+                config.ConvertSecondsToTicks(maxPoopDelay)
+            );
+        }
+
+        hasPooped = true;
+        isPooping = false;
+
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
+    }
+
+    void StartEating() {
+        isEating = true;
+        eatTimer = eatDuration;
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
+    }
+
+    void Update() {
+        if (!enabled || isDying) return;
 
         bool showStats = Input.GetKey(showStatsKey);
         SetStatsTextVisibility(showStats);
 
-        if (isSeekingScreenCenter)
-        {
+        if (!useWegoMovement) {
+            HandleRealtimeUpdate();
+        } else {
+            if (isEating) {
+                eatTimer -= Time.deltaTime;
+                if (eatTimer <= 0f) {
+                    FinishEating();
+                }
+            }
+        }
+
+        FlipSpriteBasedOnDirection();
+        UpdateAnimationState();
+    }
+
+    void HandleRealtimeUpdate() {
+        if (isSeekingScreenCenter) {
             Vector2 currentPos = rb.position;
             bool centerWithinBounds =
                 currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
                 currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
 
-            if (centerWithinBounds)
-            {
+            if (centerWithinBounds) {
                 if(Debug.isDebugBuild)
                     Debug.Log($"[{gameObject.name} Update] Center reached SHIFTED bounds! Pos: {currentPos}. MinB: {minBounds}, MaxB: {maxBounds}. Switching to normal AI.", gameObject);
 
                 isSeekingScreenCenter = false;
                 moveDirection = Vector2.zero;
             }
-            else
-            {
+            else {
                 moveDirection = (screenCenterTarget - currentPos).normalized;
                 if (moveDirection == Vector2.zero)
                     moveDirection = Random.insideUnitCircle.normalized;
@@ -201,204 +455,123 @@ public class AnimalController : SpeedModifiable
         HandlePooping();
         UpdateThoughts();
 
-        if (isEating)
-        {
+        if (isEating) {
             HandleEating();
             moveDirection = Vector2.zero;
         }
-        else if (isPooping)
-        {
+        else if (isPooping) {
             moveDirection = Vector2.zero;
         }
-        else
-        {
+        else {
             DecideNextAction();
         }
-
-        FlipSpriteBasedOnDirection();
-        UpdateAnimationState();
     }
 
-    void SetStatsTextVisibility(bool visible)
-    {
-        if (hpText != null)
-        {
-            hpText.gameObject.SetActive(visible);
+    void FinishEating() {
+        isEating = false;
+
+        if (currentTargetFood == null) return;
+
+        FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>();
+        if (foodItem != null && foodItem.foodType != null) {
+            float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType);
+            currentHunger -= satiationGain;
+            currentHunger = Mathf.Max(0f, currentHunger);
+
+            Destroy(currentTargetFood);
+            hasPooped = false;
+            currentTargetFood = null;
+            UpdateHungerText();
         }
-
-        if (hungerText != null)
-        {
-            hungerText.gameObject.SetActive(visible);
-        }
-    }
-
-    void FixedUpdate()
-    {
-        if (rb == null || isDying) return;
-
-        if (!isEating && !isPooping && moveDirection != Vector2.zero)
-        {
-            Vector2 currentPos = rb.position;
-            // CHANGED: Use `currentSpeed` from SpeedModifiable base class
-            Vector2 desiredMove = moveDirection.normalized * currentSpeed * Time.fixedDeltaTime;
-            Vector2 nextPos = currentPos + desiredMove;
-
-            if (!isSeekingScreenCenter) // Clamp only when NOT seeking
-            {
-                nextPos.x = Mathf.Clamp(nextPos.x, minBounds.x, maxBounds.x);
-                nextPos.y = Mathf.Clamp(nextPos.y, minBounds.y, maxBounds.y);
-            }
-            rb.MovePosition(nextPos);
+        else {
+            currentTargetFood = null;
         }
     }
-    
-    // --- The rest of the methods are unchanged, except for removing speed multiplier logic ---
 
-    void UpdateHunger()
-    {
+    void UpdateHunger() {
         currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime;
         currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
 
-        if (currentHunger >= animalDiet.maxHunger)
-        {
+        if (currentHunger >= animalDiet.maxHunger) {
             ApplyStarvationDamage();
         }
 
         UpdateHungerText();
     }
 
-    void ApplyStarvationDamage()
-    {
-        float damage = starvationDamageRate * Time.deltaTime;
-        currentHealth -= damage;
-        currentHealth = Mathf.Max(0f, currentHealth);
-
-        if (!isFlashing)
-        {
-            StartCoroutine(FlashDamage());
-        }
-
-        UpdateHpText();
-
-        if (currentHealth <= 0f)
-        {
-            Die(CauseOfDeath.Starvation);
-        }
-    }
-
-    IEnumerator FlashDamage()
-    {
-        if (spriteRenderer == null) yield break;
-
-        isFlashing = true;
-        spriteRenderer.color = damageFlashColor;
-        yield return new WaitForSeconds(damageFlashDuration);
-        spriteRenderer.color = originalColor;
-        isFlashing = false;
-    }
-
-    IEnumerator FadeOutAndDestroy()
-    {
-        if (spriteRenderer == null)
-        {
-            Destroy(gameObject);
-            yield break;
-        }
-
-        isDying = true;
-        float elapsedTime = 0f;
-        Color startColor = spriteRenderer.color;
-
-        while (elapsedTime < deathFadeDuration)
-        {
-            elapsedTime += Time.deltaTime;
-            float alpha = Mathf.Lerp(startColor.a, 0f, elapsedTime / deathFadeDuration);
-            spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
-            yield return null;
-        }
-
-        Destroy(gameObject);
-    }
-
-    void HandlePooping()
-    {
-        if (!isEating && !hasPooped)
-        {
+    void HandlePooping() {
+        if (!isEating && !hasPooped) {
             poopDelayTimer -= Time.deltaTime;
-            if (!isPooping && poopDelayTimer <= 0f)
-            {
+            if (!isPooping && poopDelayTimer <= 0f) {
                 StartPooping();
             }
-            if (isPooping)
-            {
+            if (isPooping) {
                 poopTimer -= Time.deltaTime;
-                if (poopTimer <= 0f)
-                {
+                if (poopTimer <= 0f) {
                     FinishPooping();
                 }
             }
         }
     }
 
-    void UpdateThoughts()
-    {
-        if (thoughtCooldownTimer > 0)
-        {
+    void StartPooping() {
+        isPooping = true;
+        poopTimer = poopDuration;
+        moveDirection = Vector2.zero;
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
+    }
+
+    void FinishPooping() {
+        SpawnPoop();
+        isPooping = false;
+        hasPooped = true;
+    }
+
+    void UpdateThoughts() {
+        if (thoughtCooldownTimer > 0) {
             thoughtCooldownTimer -= Time.deltaTime;
         }
     }
 
-    void DecideNextAction()
-    {
-        if (currentHunger >= animalDiet.hungerThreshold)
-        {
+    void DecideNextAction() {
+        if (currentHunger >= animalDiet.hungerThreshold) {
             SeekFood();
         }
-        else
-        {
+        else {
             Wander();
             currentTargetFood = null;
         }
     }
 
-    void SeekFood()
-    {
+    void SeekFood() {
         if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
 
         foodReassessmentTimer -= Time.deltaTime;
         bool shouldReassess = foodReassessmentTimer <= 0f;
         bool targetValid = currentTargetFood != null && currentTargetFood.activeInHierarchy &&
-                           currentTargetFood.GetComponent<FoodItem>() != null;
+            currentTargetFood.GetComponent<FoodItem>() != null;
 
-        if (shouldReassess || !targetValid)
-        {
-            Vector3 oldTargetPosition = targetValid ? currentTargetFood.transform.position : Vector3.zero;
-
+        if (shouldReassess || !targetValid) {
             GameObject potentialBetterFood = FindNearestFood();
 
-            if (potentialBetterFood != null)
-            {
-                if (!targetValid)
-                {
+            if (potentialBetterFood != null) {
+                if (!targetValid) {
                     currentTargetFood = potentialBetterFood;
                     if(Debug.isDebugBuild)
                         Debug.Log($"[{gameObject.name} SeekFood] Found new food target (no previous): {potentialBetterFood.name}");
                 }
-                else if (potentialBetterFood != currentTargetFood)
-                {
+                else if (potentialBetterFood != currentTargetFood) {
                     FoodItem currentFoodItem = currentTargetFood.GetComponent<FoodItem>();
                     FoodItem newFoodItem = potentialBetterFood.GetComponent<FoodItem>();
 
-                    if (currentFoodItem != null && newFoodItem != null)
-                    {
+                    if (currentFoodItem != null && newFoodItem != null) {
                         float currentPriority = animalDiet.GetPreference(currentFoodItem.foodType)?.preferencePriority ?? 0f;
                         float newPriority = animalDiet.GetPreference(newFoodItem.foodType)?.preferencePriority ?? 0f;
 
-                        if (newPriority > currentPriority)
-                        {
+                        if (newPriority > currentPriority) {
                             if(Debug.isDebugBuild)
                                 Debug.Log($"[{gameObject.name} SeekFood] Switching to higher priority food: {newFoodItem.foodType.foodName} (priority: {newPriority}) from {currentFoodItem.foodType.foodName} (priority: {currentPriority})");
-                            
+
                             currentTargetFood = potentialBetterFood;
                         }
                     }
@@ -408,64 +581,46 @@ public class AnimalController : SpeedModifiable
             foodReassessmentTimer = foodReassessmentInterval;
         }
 
-        if (currentTargetFood != null)
-        {
+        if (currentTargetFood != null) {
             MoveTowardFood(currentTargetFood);
         }
-        else
-        {
+        else {
             Wander();
         }
     }
 
-    GameObject FindNearestFood()
-    {
+    GameObject FindNearestFood() {
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, searchRadius);
         return animalDiet.FindBestFood(colliders, transform.position);
     }
 
-    void MoveTowardFood(GameObject foodObj)
-    {
+    void MoveTowardFood(GameObject foodObj) {
         if (foodObj == null) return;
 
         float distance = Vector2.Distance(transform.position, foodObj.transform.position);
-        if (distance <= eatDistance)
-        {
+        if (distance <= eatDistance) {
             StartEating();
         }
-        else
-        {
+        else {
             moveDirection = (foodObj.transform.position - transform.position).normalized;
             isWanderPaused = false;
             wanderStateTimer = 0f;
         }
     }
 
-    void StartEating()
-    {
-        isEating = true;
-        eatTimer = eatDuration;
-        moveDirection = Vector2.zero;
-        if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
-    }
-
-    void HandleEating()
-    {
+    void HandleEating() {
         eatTimer -= Time.deltaTime;
-        if (eatTimer <= 0f)
-        {
+        if (eatTimer <= 0f) {
             isEating = false;
             FinishEatingAction();
         }
     }
 
-    void FinishEatingAction()
-    {
+    void FinishEatingAction() {
         if (currentTargetFood == null) return;
 
         FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>();
-        if (foodItem != null && foodItem.foodType != null)
-        {
+        if (foodItem != null && foodItem.foodType != null) {
             float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType);
             currentHunger -= satiationGain;
             currentHunger = Mathf.Max(0f, currentHunger);
@@ -475,29 +630,98 @@ public class AnimalController : SpeedModifiable
             currentTargetFood = null;
             UpdateHungerText();
         }
-        else
-        {
+        else {
             currentTargetFood = null;
         }
     }
 
-    void StartPooping()
-    {
-        isPooping = true;
-        poopTimer = poopDuration;
-        moveDirection = Vector2.zero;
-        if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
+    void Wander() {
+        if (wanderStateTimer <= 0f) {
+            if (isWanderPaused) {
+                isWanderPaused = false;
+                moveDirection = Random.insideUnitCircle.normalized;
+                wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
+            }
+            else {
+                if (Random.value < wanderPauseChance) {
+                    isWanderPaused = true;
+                    moveDirection = Vector2.zero;
+                    wanderStateTimer = Random.Range(wanderMinPauseDuration, wanderMaxPauseDuration);
+                }
+                else {
+                    moveDirection = Random.insideUnitCircle.normalized;
+                    wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
+                }
+            }
+        }
+        else {
+            wanderStateTimer -= Time.deltaTime;
+        }
     }
 
-    void FinishPooping()
-    {
-        SpawnPoop();
-        isPooping = false;
-        hasPooped = true;
+    void FixedUpdate() {
+        if (rb == null || isDying || useWegoMovement) return;
+
+        if (!isEating && !isPooping && moveDirection != Vector2.zero) {
+            Vector2 currentPos = rb.position;
+            Vector2 desiredMove = moveDirection.normalized * currentSpeed * Time.fixedDeltaTime;
+            Vector2 nextPos = currentPos + desiredMove;
+
+            if (!isSeekingScreenCenter) {
+                nextPos.x = Mathf.Clamp(nextPos.x, minBounds.x, maxBounds.x);
+                nextPos.y = Mathf.Clamp(nextPos.y, minBounds.y, maxBounds.y);
+            }
+            rb.MovePosition(nextPos);
+        }
     }
 
-    void SpawnPoop()
-    {
+    void ApplyStarvationDamage() {
+        float damage = starvationDamageRate * Time.deltaTime;
+        currentHealth -= damage;
+        currentHealth = Mathf.Max(0f, currentHealth);
+
+        if (!isFlashing) {
+            StartCoroutine(FlashDamage());
+        }
+
+        UpdateHpText();
+
+        if (currentHealth <= 0f) {
+            Die(CauseOfDeath.Starvation);
+        }
+    }
+
+    IEnumerator FlashDamage() {
+        if (spriteRenderer == null) yield break;
+
+        isFlashing = true;
+        spriteRenderer.color = damageFlashColor;
+        yield return new WaitForSeconds(damageFlashDuration);
+        spriteRenderer.color = originalColor;
+        isFlashing = false;
+    }
+
+    IEnumerator FadeOutAndDestroy() {
+        if (spriteRenderer == null) {
+            Destroy(gameObject);
+            yield break;
+        }
+
+        isDying = true;
+        float elapsedTime = 0f;
+        Color startColor = spriteRenderer.color;
+
+        while (elapsedTime < deathFadeDuration) {
+            elapsedTime += Time.deltaTime;
+            float alpha = Mathf.Lerp(startColor.a, 0f, elapsedTime / deathFadeDuration);
+            spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+            yield return null;
+        }
+
+        Destroy(gameObject);
+    }
+
+    void SpawnPoop() {
         if (poopPrefabs == null || poopPrefabs.Count == 0) return;
 
         int index = Random.Range(0, poopPrefabs.Count);
@@ -508,8 +732,7 @@ public class AnimalController : SpeedModifiable
         GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity);
 
         SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
-        if (sr != null)
-        {
+        if (sr != null) {
             sr.flipX = Random.value > 0.5f;
             Color c = sr.color;
             float v = poopColorVariation;
@@ -525,81 +748,53 @@ public class AnimalController : SpeedModifiable
         pc.Initialize();
     }
 
-    void Wander()
-    {
-        if (wanderStateTimer <= 0f)
-        {
-            if (isWanderPaused)
-            {
-                isWanderPaused = false;
-                moveDirection = Random.insideUnitCircle.normalized;
-                wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
-            }
-            else
-            {
-                if (Random.value < wanderPauseChance)
-                {
-                    isWanderPaused = true;
-                    moveDirection = Vector2.zero;
-                    wanderStateTimer = Random.Range(wanderMinPauseDuration, wanderMaxPauseDuration);
-                }
-                else
-                {
-                    moveDirection = Random.insideUnitCircle.normalized;
-                    wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
-                }
-            }
-        }
-        else
-        {
-            wanderStateTimer -= Time.deltaTime;
-        }
-    }
-
-    void FlipSpriteBasedOnDirection()
-    {
-        if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f)
-        {
+    void FlipSpriteBasedOnDirection() {
+        if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f) {
             spriteRenderer.flipX = moveDirection.x < 0;
         }
     }
 
-    void UpdateAnimationState()
-    {
+    void UpdateAnimationState() {
         if (animator == null) return;
         bool isMoving = !isEating && !isPooping && moveDirection.sqrMagnitude > 0.01f;
+        if (useWegoMovement && gridEntity != null) {
+            isMoving = gridEntity.IsMoving && !isEating && !isPooping;
+        }
         animator.SetBool("IsMoving", isMoving);
         animator.SetBool("IsEating", isEating);
     }
 
-    bool CanShowThought()
-    {
-        return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f;
+    bool CanShowThought() {
+        if (useWegoMovement) {
+            return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTick <= 0;
+        } else {
+            return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f;
+        }
     }
 
-    void ShowThought(ThoughtTrigger trigger)
-    {
+    void ShowThought(ThoughtTrigger trigger) {
         if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return;
 
         var entry = thoughtLibrary.allThoughts.FirstOrDefault(t =>
             t != null && t.speciesName == SpeciesName && t.trigger == trigger
         );
 
-        if (entry != null && entry.lines != null && entry.lines.Count > 0)
-        {
+        if (entry != null && entry.lines != null && entry.lines.Count > 0) {
             string line = entry.lines[Random.Range(0, entry.lines.Count)];
             Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
             GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT);
             bubbleGO.transform.localPosition = Vector3.zero;
 
             ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>();
-            if (bubble)
-            {
+            if (bubble) {
                 bubble.Initialize(line, spawnT, 2f);
-                thoughtCooldownTimer = thoughtCooldownTime;
+                if (useWegoMovement) {
+                    thoughtCooldownTick = TickManager.Instance?.Config?.ConvertSecondsToTicks(thoughtCooldownTime) ?? thoughtCooldownTick;
+                } else {
+                    thoughtCooldownTimer = thoughtCooldownTime;
+                }
             }
-            else
-            {
+            else {
                 Destroy(bubbleGO);
             }
         }
@@ -607,39 +802,77 @@ public class AnimalController : SpeedModifiable
 
     public enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
 
-    void Die(CauseOfDeath cause)
-    {
+    void Die(CauseOfDeath cause) {
         Debug.Log($"[{SpeciesName} died: {cause}]", gameObject);
         StartCoroutine(FadeOutAndDestroy());
     }
 
-    public bool SpeciesNameEquals(string other)
-    {
+    public bool SpeciesNameEquals(string other) {
         return definition != null && definition.animalName == other;
     }
 
-    void UpdateHpText()
-    {
+    void UpdateHpText() {
         if (hpText == null || definition == null) return;
         hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)}/{Mathf.FloorToInt(definition.maxHealth)}";
     }
 
-    void UpdateHungerText()
-    {
+    void UpdateHungerText() {
         if (hungerText == null || animalDiet == null) return;
         hungerText.text = $"Hunger: {Mathf.FloorToInt(currentHunger)}/{Mathf.FloorToInt(animalDiet.maxHunger)}";
     }
-    
-    // REMOVED: ApplySpeedMultiplier, RemoveSpeedMultiplier, and UpdateMovementSpeed are now in the base class.
 
-    // ADDED: Override OnSpeedChanged to handle side-effects like animation speed.
-    protected override void OnSpeedChanged(float newSpeed)
-    {
-        if (animator != null)
-        {
-            // baseSpeed is inherited from SpeedModifiable and set in Initialize
-            float speedRatio = (baseSpeed > 0f) ? newSpeed / baseSpeed : 1f;
-            animator.speed = Mathf.Max(0.5f, speedRatio); // Don't go below half speed
+    void EnsureUITextReferences() {
+        if (hpText == null) {
+            hpText = GetComponentInChildren<TextMeshProUGUI>(true);
+            if (hpText != null && hpText.gameObject.name.Contains("Hunger")) {
+                hungerText = hpText;
+                hpText = null;
+            }
         }
+
+        if (hungerText == null) {
+            TextMeshProUGUI[] allTexts = GetComponentsInChildren<TextMeshProUGUI>(true);
+            foreach (var text in allTexts) {
+                if (text != hpText) {
+                    hungerText = text;
+                    break;
+                }
+            }
+        }
+    }
+
+    void SetStatsTextVisibility(bool visible) {
+        if (hpText != null) {
+            hpText.gameObject.SetActive(visible);
+        }
+
+        if (hungerText != null) {
+            hungerText.gameObject.SetActive(visible);
+        }
+    }
+
+    protected override void OnSpeedChanged(float newSpeed) {
+        if (animator != null) {
+            float speedRatio = (baseSpeed > 0f) ? newSpeed / baseSpeed : 1f;
+            animator.speed = Mathf.Max(0.5f, speedRatio);
+        }
+    }
+
+    public void SetWegoMovement(bool enabled) {
+        useWegoMovement = enabled;
+
+        if (enabled && gridEntity == null) {
+            gridEntity = gameObject.AddComponent<GridEntity>();
+        }
+
+        if (enabled && TickManager.Instance != null) {
+            TickManager.Instance.RegisterTickUpdateable(this);
+        } else if (!enabled && TickManager.Instance != null) {
+            TickManager.Instance.UnregisterTickUpdateable(this);
+        }
+    }
+
+    public GridPosition GetCurrentGridPosition() {
+        return gridEntity?.Position ?? GridPosition.Zero;
     }
 }
