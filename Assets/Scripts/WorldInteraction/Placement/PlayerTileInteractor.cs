@@ -32,13 +32,11 @@ public sealed class PlayerTileInteractor : MonoBehaviour
         HandleLeftClick();
     }
 
-    private void HandleLeftClick()
-    {
+    void HandleLeftClick() {
         if (!EnsureManagers()) return;
 
         InventoryBarItem selected = inventoryBar.SelectedItem;
-        if (selected == null || !selected.IsValid())
-        {
+        if (selected == null || !selected.IsValid()) {
             if (showDebug) Debug.Log("[PlayerTileInteractor] Click handled, but no valid item selected in the bar.");
             return;
         }
@@ -48,32 +46,45 @@ public sealed class PlayerTileInteractor : MonoBehaviour
         Vector3Int cellPos = tileInteractionManager.WorldToCell(mouseW);
         Vector3 cellCenter = tileInteractionManager.interactionGrid.GetCellCenterWorld(cellPos);
 
-        if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius)
-        {
+        if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius) {
             if (showDebug) Debug.Log($"[PlayerTileInteractor] Clicked on cell {cellPos}, but it's too far away.");
             return;
         }
 
-        if (selected.Type == InventoryBarItem.ItemType.Tool)
-        {
-            if (showDebug) Debug.Log($"[PlayerTileInteractor] Applying tool '{selected.GetDisplayName()}' to cell {cellPos}.");
-            tileInteractionManager.ApplyToolAction(selected.ToolDefinition);
+        // CRITICAL CHANGE: Route all actions through PlayerActionManager
+        if (PlayerActionManager.Instance == null) {
+            Debug.LogError("[PlayerTileInteractor] PlayerActionManager not found!");
+            return;
         }
-        else if (selected.Type == InventoryBarItem.ItemType.Node && selected.IsSeed())
-        {
-            if (showDebug) Debug.Log($"[PlayerTileInteractor] Attempting to plant seed '{selected.GetDisplayName()}' at cell {cellPos}.");
-            bool planted = PlantPlacementManager.Instance?.TryPlantSeedFromInventory(selected, cellPos, cellCenter) ?? false;
-            if (planted)
-            {
+
+        bool actionSuccess = false;
+
+        if (selected.Type == InventoryBarItem.ItemType.Tool) {
+            if (showDebug) Debug.Log($"[PlayerTileInteractor] Using tool '{selected.GetDisplayName()}' at cell {cellPos}.");
+            actionSuccess = PlayerActionManager.Instance.ExecutePlayerAction(
+                PlayerActionType.UseTool, 
+                cellPos, 
+                selected.ToolDefinition
+            );
+        }
+        else if (selected.Type == InventoryBarItem.ItemType.Node && selected.IsSeed()) {
+            if (showDebug) Debug.Log($"[PlayerTileInteractor] Planting seed '{selected.GetDisplayName()}' at cell {cellPos}.");
+            actionSuccess = PlayerActionManager.Instance.ExecutePlayerAction(
+                PlayerActionType.PlantSeed,
+                cellPos,
+                selected
+            );
+            
+            if (actionSuccess) {
                 if (showDebug) Debug.Log($"[PlayerTileInteractor] Planted successfully. Removing seed from inventory.");
                 RemoveSeedFromInventory(selected);
                 inventoryBar.ShowBar(); // Refresh the bar
             }
-            else
-            {
-                if (showDebug) Debug.Log($"[PlayerTileInteractor] Planting failed.");
-            }
         }
+
+        // Old direct action code removed:
+        // tileInteractionManager.ApplyToolAction(selected.ToolDefinition);
+        // PlantPlacementManager.Instance?.TryPlantSeedFromInventory(selected, cellPos, cellCenter)
     }
 
     private void RemoveSeedFromInventory(InventoryBarItem seed)

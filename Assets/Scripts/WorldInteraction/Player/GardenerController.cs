@@ -1,45 +1,43 @@
-﻿using UnityEngine;
+﻿// Assets\Scripts\WorldInteraction\Player\GardenerController.cs
+
+using UnityEngine;
 using WegoSystem;
 using System.Collections.Generic;
 
 public class GardenerController : SpeedModifiable, ITickUpdateable {
-    [Header("Wego System")]
     [SerializeField] bool useWegoMovement = true;
-    
-    [Header("Movement")]
+
     public Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
     public bool flipSpriteWhenMovingLeft = true;
     public bool flipHorizontalDirection = true;
 
-    [Header("Animation")]
     public bool useAnimations = true;
     public string runningParameterName = "isRunning";
     public string plantingParameterName = "isPlanting";
     public float plantingDuration = 0.25f;
 
-    // Wego System Components
     GridEntity gridEntity;
     Queue<GridPosition> plannedMoves = new Queue<GridPosition>();
     GridPosition currentTargetPosition;
     bool hasMoveQueued = false;
 
-    // Real-time movement (fallback)
-    Rigidbody2D rb;
-    Vector2 movement;
-    
-    // Visual & Animation
+    // Remove Rigidbody2D references - no longer needed for grid movement
+    // Rigidbody2D rb;
+    // Vector2 movement;
+
     SortableEntity sortableEntity;
     SpriteRenderer spriteRenderer;
     Animator animator;
 
     bool isPlanting = false;
     float plantingTimer = 0f;
-    bool wasMovingBeforePlanting = false;
 
     protected override void Awake() {
-        base.Awake(); // This is crucial: it sets currentSpeed = baseSpeed
+        base.Awake();
 
-        rb = GetComponent<Rigidbody2D>();
+        // Remove rigidbody reference
+        // rb = GetComponent<Rigidbody2D>();
+        
         sortableEntity = GetComponent<SortableEntity>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
@@ -54,16 +52,23 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
         if (animator == null && useAnimations)
             Debug.LogWarning("[GardenerController Awake] Animator component not found but useAnimations is true.", gameObject);
 
-        if (useWegoMovement && gridEntity == null) {
-            Debug.LogWarning("[GardenerController] Wego movement enabled but no GridEntity found. Adding one.", gameObject);
+        if (gridEntity == null) {
+            Debug.Log("[GardenerController] No GridEntity found. Adding one.", gameObject);
             gridEntity = gameObject.AddComponent<GridEntity>();
         }
     }
 
     void Start() {
+        // CRITICAL: Force grid snapping on start
+        if (GridPositionManager.Instance != null) {
+            GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+            currentTargetPosition = gridEntity.Position;
+            Debug.Log($"[GardenerController] Snapped to grid position {gridEntity.Position} on start");
+        }
+
         if (useWegoMovement && TickManager.Instance != null) {
             TickManager.Instance.RegisterTickUpdateable(this);
-            
+
             if (TurnPhaseManager.Instance != null) {
                 TurnPhaseManager.Instance.OnPhaseChanged += OnPhaseChanged;
             }
@@ -74,7 +79,7 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
         if (TickManager.Instance != null) {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
-        
+
         if (TurnPhaseManager.Instance != null) {
             TurnPhaseManager.Instance.OnPhaseChanged -= OnPhaseChanged;
         }
@@ -82,7 +87,6 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
 
     void OnPhaseChanged(TurnPhase oldPhase, TurnPhase newPhase) {
         if (newPhase == TurnPhase.Planning) {
-            // Clear any pending moves when entering planning
             plannedMoves.Clear();
             hasMoveQueued = false;
         }
@@ -91,12 +95,11 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
     public void OnTickUpdate(int currentTick) {
         if (!useWegoMovement || isPlanting) return;
 
-        // Execute queued movement
         if (plannedMoves.Count > 0) {
             GridPosition nextMove = plannedMoves.Dequeue();
-            
+
             if (gridEntity != null && GridPositionManager.Instance != null) {
-                if (GridPositionManager.Instance.IsPositionValid(nextMove) && 
+                if (GridPositionManager.Instance.IsPositionValid(nextMove) &&
                     !GridPositionManager.Instance.IsPositionOccupied(nextMove)) {
                     gridEntity.SetPosition(nextMove);
                     currentTargetPosition = nextMove;
@@ -111,7 +114,7 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
         if (useWegoMovement) {
             HandleWegoInput();
         } else {
-            HandleRealtimeMovement();
+            HandleImmediateInput();
         }
 
         HandlePlanting();
@@ -123,7 +126,6 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
         if (TurnPhaseManager.Instance?.IsInPlanningPhase != true) return;
         if (isPlanting) return;
 
-        // Queue movement inputs during planning phase
         Vector2 input = Vector2.zero;
         input.x = Input.GetAxisRaw("Horizontal");
         input.y = Input.GetAxisRaw("Vertical");
@@ -132,39 +134,45 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
             GridPosition currentPos = gridEntity.Position;
             GridPosition targetPos = currentPos;
 
-            // Convert input to grid movement (one tile at a time)
             if (Mathf.Abs(input.x) > Mathf.Abs(input.y)) {
                 targetPos = currentPos + (input.x > 0 ? GridPosition.Right : GridPosition.Left);
             } else {
                 targetPos = currentPos + (input.y > 0 ? GridPosition.Up : GridPosition.Down);
             }
 
-            // Queue the move if valid and not already queued
-            if (GridPositionManager.Instance != null &&
-                GridPositionManager.Instance.IsPositionValid(targetPos) &&
-                !GridPositionManager.Instance.IsPositionOccupied(targetPos) &&
-                !plannedMoves.Contains(targetPos)) {
-                
-                plannedMoves.Enqueue(targetPos);
-                
-                if (Debug.isDebugBuild) {
-                    Debug.Log($"[GardenerController] Queued move to {targetPos}");
-                }
+            if (PlayerActionManager.Instance != null) {
+                PlayerActionManager.Instance.ExecutePlayerMove(this, currentPos, targetPos);
+            } else {
+                Debug.LogError("[GardenerController] PlayerActionManager not found!");
             }
         }
     }
 
-    void HandleRealtimeMovement() {
-        if (!isPlanting) {
-            movement.x = Input.GetAxisRaw("Horizontal");
-            movement.y = Input.GetAxisRaw("Vertical");
-            bool isMoving = movement.sqrMagnitude > 0.01f;
-            if (isMoving) wasMovingBeforePlanting = true;
+    void HandleImmediateInput() {
+        if (isPlanting) return;
+
+        // Discrete grid-based movement
+        bool shouldMove = false;
+        GridPosition moveDir = GridPosition.Zero;
+
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) {
+            moveDir = GridPosition.Up;
+            shouldMove = true;
+        } else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) {
+            moveDir = GridPosition.Down;
+            shouldMove = true;
+        } else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) {
+            moveDir = GridPosition.Left;
+            shouldMove = true;
+        } else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) {
+            moveDir = GridPosition.Right;
+            shouldMove = true;
         }
-        else {
-            movement = Vector2.zero;
-            plantingTimer -= Time.deltaTime;
-            if (plantingTimer <= 0) EndPlantingAnimation();
+
+        if (shouldMove && gridEntity != null && PlayerActionManager.Instance != null) {
+            GridPosition currentPos = gridEntity.Position;
+            GridPosition targetPos = currentPos + moveDir;
+            PlayerActionManager.Instance.ExecutePlayerMove(this, currentPos, targetPos);
         }
     }
 
@@ -175,35 +183,39 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
         }
     }
 
-    void FixedUpdate() {
-        if (!useWegoMovement && !isPlanting && rb != null) {
-            rb.MovePosition(rb.position + movement.normalized * currentSpeed * Time.fixedDeltaTime);
-        }
-    }
+    // Remove FixedUpdate entirely - no physics-based movement
+    // void FixedUpdate() {
+    //     if (!useWegoMovement && !isPlanting && rb != null) {
+    //         rb.MovePosition(rb.position + movement.normalized * currentSpeed * Time.fixedDeltaTime);
+    //     }
+    // }
 
     void UpdateAnimations() {
         if (!useAnimations || animator == null) return;
-        
+
         bool isMoving;
         if (useWegoMovement) {
             isMoving = gridEntity != null && gridEntity.IsMoving;
         } else {
-            isMoving = movement.sqrMagnitude > 0.01f;
+            isMoving = gridEntity != null && gridEntity.IsMoving;
         }
-        
+
         animator.SetBool(runningParameterName, isMoving && !isPlanting);
     }
 
     void UpdateSpriteDirection() {
         if (spriteRenderer == null || !flipSpriteWhenMovingLeft) return;
-        
-        Vector2 directionToCheck = movement;
-        if (useWegoMovement && gridEntity != null) {
-            // Use the direction the grid entity is moving
-            Vector3 worldTarget = GridPositionManager.Instance?.GridToWorld(currentTargetPosition) ?? transform.position;
-            directionToCheck = (worldTarget - transform.position).normalized;
+
+        Vector2 directionToCheck = Vector2.zero;
+        if (gridEntity != null && GridPositionManager.Instance != null) {
+            Vector3 worldTarget = GridPositionManager.Instance.GridToWorld(currentTargetPosition);
+            Vector3 currentWorld = transform.position;
+            
+            if (Vector3.Distance(worldTarget, currentWorld) > 0.01f) {
+                directionToCheck = (worldTarget - currentWorld).normalized;
+            }
         }
-        
+
         if (directionToCheck.x != 0) {
             bool shouldFlip = (directionToCheck.x < 0);
             if (flipHorizontalDirection) {
@@ -221,7 +233,6 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
         if (!useAnimations || isPlanting) return;
         isPlanting = true;
         plantingTimer = plantingDuration;
-        wasMovingBeforePlanting = movement.sqrMagnitude > 0.01f;
         if (animator != null) {
             animator.SetBool(plantingParameterName, true);
             animator.SetBool(runningParameterName, false);
@@ -232,12 +243,6 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
         isPlanting = false;
         if (animator != null) {
             animator.SetBool(plantingParameterName, false);
-            if (!useWegoMovement) {
-                movement.x = Input.GetAxisRaw("Horizontal");
-                movement.y = Input.GetAxisRaw("Vertical");
-                bool shouldResumeRunning = movement.sqrMagnitude > 0.01f;
-                animator.SetBool(runningParameterName, shouldResumeRunning);
-            }
         }
     }
 
@@ -253,7 +258,6 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
         StartPlantingAnimation();
     }
 
-    // Wego-specific methods
     public void QueueMovement(GridPosition targetPosition) {
         if (useWegoMovement && TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
             plannedMoves.Enqueue(targetPosition);
@@ -275,11 +279,11 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
 
     public void SetWegoMovement(bool enabled) {
         useWegoMovement = enabled;
-        
+
         if (enabled && gridEntity == null) {
             gridEntity = gameObject.AddComponent<GridEntity>();
         }
-        
+
         if (enabled && TickManager.Instance != null) {
             TickManager.Instance.RegisterTickUpdateable(this);
         } else if (!enabled && TickManager.Instance != null) {

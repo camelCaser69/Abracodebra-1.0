@@ -32,6 +32,10 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
     int hungerTick = 0;
     int poopTick = 0;
     int thoughtCooldownTick = 0;
+    
+    // Add grid pathfinding support
+    List<GridPosition> currentPath = new List<GridPosition>();
+    int currentPathIndex = 0;
 
     public float searchRadius = 5f;
     public float eatDistance = 0.5f;
@@ -154,6 +158,27 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
     }
+    
+    protected override void Awake() {
+        base.Awake();
+        
+        // ... existing setup ...
+        
+        gridEntity = GetComponent<GridEntity>();
+        if (gridEntity == null) {
+            gridEntity = gameObject.AddComponent<GridEntity>();
+        }
+    }
+    
+    void Start() {
+        // CRITICAL: Force grid snapping on start
+        if (GridPositionManager.Instance != null) {
+            GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+            Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridEntity.Position}");
+        }
+        
+        // ... rest of Start logic ...
+    }
 
     void OnDestroy() {
         if (TickManager.Instance != null) {
@@ -230,14 +255,16 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
         if (nearestFood != null) {
             currentTargetFood = nearestFood;
             GridPosition foodGridPos = GridPositionManager.Instance.WorldToGrid(nearestFood.transform.position);
-
-            GridPosition myPos = gridEntity.Position;
-            int distance = myPos.ManhattanDistance(foodGridPos);
-
-            if (distance <= 1) {
+            
+            // Use pathfinding
+            currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGridPos);
+            currentPathIndex = 0;
+            
+            if (currentPath.Count > 0) {
                 hasPlannedAction = true;
-                targetPosition = myPos; // Stay in place to eat
+                targetPosition = currentPath[0];
             } else {
+                // Direct movement if no path
                 PlanMovementToward(foodGridPos);
             }
         } else {
@@ -276,49 +303,55 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
         if (gridEntity == null) return;
 
         GridPosition currentPos = gridEntity.Position;
-        GridPosition direction = new GridPosition(
-            Mathf.Clamp(target.x - currentPos.x, -1, 1),
-            Mathf.Clamp(target.y - currentPos.y, -1, 1)
-        );
-
-        GridPosition targetPos = currentPos + direction;
-
-        if (GridPositionManager.Instance.IsPositionValid(targetPos) &&
-            !GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
-            targetPosition = targetPos;
-            hasPlannedAction = true;
-        } else {
-            GridPosition[] alternatives = {
-                currentPos + new GridPosition(direction.x, 0),
-                currentPos + new GridPosition(0, direction.y),
-                currentPos + GridPosition.Up,
-                currentPos + GridPosition.Down,
-                currentPos + GridPosition.Left,
-                currentPos + GridPosition.Right
-            };
-
-            foreach (var alt in alternatives) {
-                if (GridPositionManager.Instance.IsPositionValid(alt) &&
-                    !GridPositionManager.Instance.IsPositionOccupied(alt)) {
-                    targetPosition = alt;
-                    hasPlannedAction = true;
-                    break;
-                }
-            }
-
-            if (!hasPlannedAction) {
-                targetPosition = currentPos; // Stay in place
+        
+        // Simple pathfinding - try to move in the direction of the target
+        int dx = Mathf.Clamp(target.x - currentPos.x, -1, 1);
+        int dy = Mathf.Clamp(target.y - currentPos.y, -1, 1);
+        
+        // Try diagonal first if both axes have movement
+        if (dx != 0 && dy != 0) {
+            GridPosition diagonalTarget = currentPos + new GridPosition(dx, dy);
+            if (IsValidMove(diagonalTarget)) {
+                targetPosition = diagonalTarget;
                 hasPlannedAction = true;
+                return;
             }
         }
+        
+        // Try horizontal movement
+        if (dx != 0) {
+            GridPosition horizontalTarget = currentPos + new GridPosition(dx, 0);
+            if (IsValidMove(horizontalTarget)) {
+                targetPosition = horizontalTarget;
+                hasPlannedAction = true;
+                return;
+            }
+        }
+        
+        // Try vertical movement
+        if (dy != 0) {
+            GridPosition verticalTarget = currentPos + new GridPosition(0, dy);
+            if (IsValidMove(verticalTarget)) {
+                targetPosition = verticalTarget;
+                hasPlannedAction = true;
+                return;
+            }
+        }
+        
+        // If all direct paths blocked, try alternative moves
+        PlanWandering();
+    }
+    
+    bool IsValidMove(GridPosition pos) {
+        return GridPositionManager.Instance.IsPositionValid(pos) &&
+               !GridPositionManager.Instance.IsPositionOccupied(pos);
     }
 
     void ExecutePlannedAction() {
         if (gridEntity == null) return;
 
-        GridPosition currentPos = gridEntity.Position;
-
-        if (currentTargetFood != null && targetPosition == currentPos) {
+        // Check if we should eat
+        if (currentTargetFood != null && targetPosition == gridEntity.Position) {
             Vector3 foodWorldPos = currentTargetFood.transform.position;
             Vector3 myWorldPos = transform.position;
 
@@ -328,8 +361,17 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
             }
         }
 
-        if (targetPosition != currentPos) {
+        // Execute movement
+        if (targetPosition != gridEntity.Position) {
             gridEntity.SetPosition(targetPosition);
+            
+            // Advance path if following one
+            if (currentPath.Count > 0 && currentPathIndex < currentPath.Count - 1) {
+                currentPathIndex++;
+                targetPosition = currentPath[currentPathIndex];
+                hasPlannedAction = true;
+                return;
+            }
         }
 
         hasPlannedAction = false;
@@ -411,20 +453,18 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
         bool showStats = Input.GetKey(showStatsKey);
         SetStatsTextVisibility(showStats);
 
-        if (!useWegoMovement) {
-            HandleRealtimeUpdate();
-        } else {
-            if (isEating) {
-                eatTimer -= Time.deltaTime;
-                if (eatTimer <= 0f) {
-                    FinishEating();
-                }
+        // Only handle visual updates and eating timer
+        if (isEating) {
+            eatTimer -= Time.deltaTime;
+            if (eatTimer <= 0f) {
+                FinishEating();
             }
         }
 
         FlipSpriteBasedOnDirection();
         UpdateAnimationState();
     }
+
 
     void HandleRealtimeUpdate() {
         if (isSeekingScreenCenter) {
@@ -658,23 +698,7 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
             wanderStateTimer -= Time.deltaTime;
         }
     }
-
-    void FixedUpdate() {
-        if (rb == null || isDying || useWegoMovement) return;
-
-        if (!isEating && !isPooping && moveDirection != Vector2.zero) {
-            Vector2 currentPos = rb.position;
-            Vector2 desiredMove = moveDirection.normalized * currentSpeed * Time.fixedDeltaTime;
-            Vector2 nextPos = currentPos + desiredMove;
-
-            if (!isSeekingScreenCenter) {
-                nextPos.x = Mathf.Clamp(nextPos.x, minBounds.x, maxBounds.x);
-                nextPos.y = Mathf.Clamp(nextPos.y, minBounds.y, maxBounds.y);
-            }
-            rb.MovePosition(nextPos);
-        }
-    }
-
+    
     void ApplyStarvationDamage() {
         float damage = starvationDamageRate * Time.deltaTime;
         currentHealth -= damage;
@@ -749,17 +773,20 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
     }
 
     void FlipSpriteBasedOnDirection() {
-        if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f) {
-            spriteRenderer.flipX = moveDirection.x < 0;
+        if (spriteRenderer != null && gridEntity != null && gridEntity.IsMoving) {
+            Vector3 currentPos = transform.position;
+            Vector3 targetPos = GridPositionManager.Instance.GridToWorld(targetPosition);
+            Vector2 moveDirection = (targetPos - currentPos).normalized;
+            
+            if (Mathf.Abs(moveDirection.x) > 0.01f) {
+                spriteRenderer.flipX = moveDirection.x < 0;
+            }
         }
     }
 
     void UpdateAnimationState() {
         if (animator == null) return;
-        bool isMoving = !isEating && !isPooping && moveDirection.sqrMagnitude > 0.01f;
-        if (useWegoMovement && gridEntity != null) {
-            isMoving = gridEntity.IsMoving && !isEating && !isPooping;
-        }
+        bool isMoving = gridEntity != null && gridEntity.IsMoving && !isEating && !isPooping;
         animator.SetBool("IsMoving", isMoving);
         animator.SetBool("IsEating", isEating);
     }

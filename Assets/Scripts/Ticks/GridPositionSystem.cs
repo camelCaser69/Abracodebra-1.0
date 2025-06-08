@@ -99,85 +99,112 @@ namespace WegoSystem {
     }
 
     public class GridEntity : MonoBehaviour {
-        [SerializeField] GridPosition gridPosition;
-        [SerializeField] float visualInterpolationSpeed = 5f;
-        [SerializeField] bool snapToGridOnStart = true;
+    [SerializeField] GridPosition gridPosition;
+    [SerializeField] float visualInterpolationSpeed = 5f;
+    [SerializeField] bool snapToGridOnStart = true;
+    [SerializeField] AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-        GridPosition previousGridPosition;
-        Vector3 visualTargetPosition;
-        bool isMoving = false;
+    GridPosition previousGridPosition;
+    Vector3 visualStartPosition;
+    Vector3 visualTargetPosition;
+    float movementProgress = 1f;
+    bool isMoving = false;
 
-        public GridPosition Position {
-            get => gridPosition;
-            set {
-                if (gridPosition != value) {
-                    previousGridPosition = gridPosition;
-                    gridPosition = value;
-                    OnGridPositionChanged();
-                }
+    public GridPosition Position {
+        get => gridPosition;
+        set {
+            if (gridPosition != value) {
+                previousGridPosition = gridPosition;
+                gridPosition = value;
+                OnGridPositionChanged();
             }
         }
+    }
 
-        public GridPosition PreviousPosition => previousGridPosition;
-        public bool IsMoving => isMoving;
+    public GridPosition PreviousPosition => previousGridPosition;
+    public bool IsMoving => isMoving;
+    public float MovementProgress => movementProgress;
 
-        public event Action<GridPosition, GridPosition> OnPositionChanged;
-        public event Action<GridPosition> OnMovementComplete;
+    public event Action<GridPosition, GridPosition> OnPositionChanged;
+    public event Action<GridPosition> OnMovementComplete;
+    public event Action OnMovementStart;
 
-        protected virtual void Start() {
-            if (snapToGridOnStart) {
-                gridPosition = GridPositionManager.Instance.WorldToGrid(transform.position);
-                transform.position = GridPositionManager.Instance.GridToWorld(gridPosition);
-            }
-
-            visualTargetPosition = transform.position;
-            previousGridPosition = gridPosition;
-
-            GridPositionManager.Instance?.RegisterEntity(this);
+    protected virtual void Start() {
+        if (snapToGridOnStart && GridPositionManager.Instance != null) {
+            gridPosition = GridPositionManager.Instance.WorldToGrid(transform.position);
+            transform.position = GridPositionManager.Instance.GridToWorld(gridPosition);
         }
 
-        protected virtual void OnDestroy() {
-            GridPositionManager.Instance?.UnregisterEntity(this);
-        }
+        visualStartPosition = transform.position;
+        visualTargetPosition = transform.position;
+        previousGridPosition = gridPosition;
 
-        protected virtual void Update() {
-            if (Vector3.Distance(transform.position, visualTargetPosition) > 0.01f) {
-                transform.position = Vector3.Lerp(
-                    transform.position,
-                    visualTargetPosition,
-                    Time.deltaTime * visualInterpolationSpeed
-                );
-                isMoving = true;
-            }
-            else if (isMoving) {
+        GridPositionManager.Instance?.RegisterEntity(this);
+    }
+
+    protected virtual void OnDestroy() {
+        GridPositionManager.Instance?.UnregisterEntity(this);
+    }
+
+    protected virtual void Update() {
+        if (movementProgress < 1f) {
+            movementProgress += Time.deltaTime * visualInterpolationSpeed;
+            movementProgress = Mathf.Clamp01(movementProgress);
+            
+            // Use animation curve for smoother movement
+            float curvedProgress = movementCurve.Evaluate(movementProgress);
+            transform.position = Vector3.Lerp(visualStartPosition, visualTargetPosition, curvedProgress);
+            
+            if (movementProgress >= 1f) {
                 transform.position = visualTargetPosition;
                 isMoving = false;
                 OnMovementComplete?.Invoke(gridPosition);
             }
         }
+    }
 
-        protected virtual void OnGridPositionChanged() {
-            visualTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
-            OnPositionChanged?.Invoke(previousGridPosition, gridPosition);
+    protected virtual void OnGridPositionChanged() {
+        visualStartPosition = transform.position;
+        visualTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
+        movementProgress = 0f;
+        
+        if (!isMoving) {
+            isMoving = true;
+            OnMovementStart?.Invoke();
         }
+        
+        OnPositionChanged?.Invoke(previousGridPosition, gridPosition);
+    }
 
-        public void SetPosition(GridPosition newPosition, bool instant = false) {
-            Position = newPosition;
+    public void SetPosition(GridPosition newPosition, bool instant = false) {
+        Position = newPosition;
 
-            if (instant) {
-                transform.position = visualTargetPosition;
-                isMoving = false;
-            }
-        }
-
-        public void MoveInDirection(GridPosition direction) {
-            SetPosition(gridPosition + direction);
-        }
-
-        public bool CanMoveTo(GridPosition targetPosition) {
-            return GridPositionManager.Instance?.IsPositionValid(targetPosition) ?? false;
+        if (instant) {
+            transform.position = visualTargetPosition;
+            visualStartPosition = visualTargetPosition;
+            movementProgress = 1f;
+            isMoving = false;
         }
     }
+
+    public void MoveInDirection(GridPosition direction) {
+        SetPosition(gridPosition + direction);
+    }
+
+    public bool CanMoveTo(GridPosition targetPosition) {
+        return GridPositionManager.Instance?.IsPositionValid(targetPosition) ?? false;
+    }
+    
+    // Force complete current movement
+    public void CompleteMovement() {
+        if (isMoving) {
+            transform.position = visualTargetPosition;
+            movementProgress = 1f;
+            isMoving = false;
+            OnMovementComplete?.Invoke(gridPosition);
+        }
+    }
+}
 
     public class GridPositionManager : MonoBehaviour {
         public static GridPositionManager Instance { get; private set; }
@@ -189,6 +216,8 @@ namespace WegoSystem {
         [SerializeField] bool showGridGizmos = true;
         [SerializeField] Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
         [SerializeField] int gizmoGridSize = 20;
+        
+        [SerializeField] bool debugMode = false;
 
         readonly Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
         readonly HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
@@ -206,6 +235,39 @@ namespace WegoSystem {
             if (Instance == this) {
                 Instance = null;
             }
+        }
+        
+        // Add this helper method for consistent grid snapping
+        public void SnapEntityToGrid(GameObject entity) {
+            if (entity == null) return;
+        
+            GridEntity gridEntity = entity.GetComponent<GridEntity>();
+            if (gridEntity == null) {
+                gridEntity = entity.AddComponent<GridEntity>();
+            }
+        
+            // Calculate nearest grid position
+            GridPosition nearestGrid = WorldToGrid(entity.transform.position);
+            Vector3 snappedWorldPos = GridToWorld(nearestGrid);
+        
+            // Snap transform
+            entity.transform.position = snappedWorldPos;
+        
+            // Update grid entity
+            gridEntity.SetPosition(nearestGrid, instant: true);
+        
+            if (debugMode) {
+                Debug.Log($"[GridPositionManager] Snapped {entity.name} from {entity.transform.position} to grid {nearestGrid} at world {snappedWorldPos}");
+            }
+        }
+    
+        // Batch snap all entities with a specific tag or component
+        public void SnapAllEntitiesToGrid<T>() where T : Component {
+            T[] entities = FindObjectsByType<T>(FindObjectsSortMode.None);
+            foreach (var entity in entities) {
+                SnapEntityToGrid(entity.gameObject);
+            }
+            Debug.Log($"[GridPositionManager] Snapped {entities.Length} entities of type {typeof(T).Name} to grid");
         }
 
         public GridPosition WorldToGrid(Vector3 worldPosition) {
@@ -325,41 +387,83 @@ namespace WegoSystem {
         }
 
         public List<GridPosition> GetPath(GridPosition start, GridPosition end, bool allowDiagonal = false) {
-            var path = new List<GridPosition>();
-
-            GridPosition current = start;
-            while (current != end) {
-                int dx = end.x - current.x;
-                int dy = end.y - current.y;
-
-                GridPosition next = current;
-
-                if (allowDiagonal) {
-                    if (dx != 0) next.x += Math.Sign(dx);
-                    if (dy != 0) next.y += Math.Sign(dy);
-                }
-                else {
-                    if (Math.Abs(dx) > Math.Abs(dy)) {
-                        next.x += Math.Sign(dx);
-                    }
-                    else if (dy != 0) {
-                        next.y += Math.Sign(dy);
-                    }
-                    else if (dx != 0) {
-                        next.x += Math.Sign(dx);
-                    }
-                }
-
-                if (IsPositionValid(next) && !IsPositionOccupied(next)) {
-                    current = next;
+        var path = new List<GridPosition>();
+        
+        if (!IsPositionValid(start) || !IsPositionValid(end)) {
+            return path;
+        }
+        
+        // Simple A* implementation
+        var openSet = new HashSet<GridPosition>();
+        var closedSet = new HashSet<GridPosition>();
+        var cameFrom = new Dictionary<GridPosition, GridPosition>();
+        var gScore = new Dictionary<GridPosition, float>();
+        var fScore = new Dictionary<GridPosition, float>();
+        
+        openSet.Add(start);
+        gScore[start] = 0;
+        fScore[start] = HeuristicCost(start, end);
+        
+        while (openSet.Count > 0) {
+            GridPosition current = GetLowestFScore(openSet, fScore);
+            
+            if (current == end) {
+                // Reconstruct path
+                while (cameFrom.ContainsKey(current)) {
                     path.Add(current);
+                    current = cameFrom[current];
                 }
-                else {
-                    break;
+                path.Reverse();
+                return path;
+            }
+            
+            openSet.Remove(current);
+            closedSet.Add(current);
+            
+            foreach (var neighbor in current.GetNeighbors(allowDiagonal)) {
+                if (!IsPositionValid(neighbor) || IsPositionOccupied(neighbor) || closedSet.Contains(neighbor)) {
+                    continue;
+                }
+                
+                float tentativeGScore = gScore[current] + 1;
+                
+                if (!openSet.Contains(neighbor)) {
+                    openSet.Add(neighbor);
+                } else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor]) {
+                    continue;
+                }
+                
+                cameFrom[neighbor] = current;
+                gScore[neighbor] = tentativeGScore;
+                fScore[neighbor] = gScore[neighbor] + HeuristicCost(neighbor, end);
+            }
+        }
+        
+        return path; // No path found
+    }
+        float HeuristicCost(GridPosition a, GridPosition b) {
+            // Manhattan distance for grid-based movement
+            return a.ManhattanDistance(b);
+        }
+        
+        GridPosition GetLowestFScore(HashSet<GridPosition> openSet, Dictionary<GridPosition, float> fScore) {
+            GridPosition lowest = openSet.First();
+            float lowestScore = fScore.ContainsKey(lowest) ? fScore[lowest] : float.MaxValue;
+        
+            foreach (var pos in openSet) {
+                float score = fScore.ContainsKey(pos) ? fScore[pos] : float.MaxValue;
+                if (score < lowestScore) {
+                    lowest = pos;
+                    lowestScore = score;
                 }
             }
-
-            return path;
+        
+            return lowest;
+        }
+        
+        public bool PathExists(GridPosition start, GridPosition end, bool allowDiagonal = false) {
+            var path = GetPath(start, end, allowDiagonal);
+            return path.Count > 0;
         }
 
         void OnDrawGizmos() {

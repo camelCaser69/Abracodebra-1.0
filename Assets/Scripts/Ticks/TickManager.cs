@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Assets\Scripts\Ticks\TickManager.cs
+
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,16 +13,14 @@ namespace WegoSystem {
         public static TickManager Instance { get; private set; }
 
         [SerializeField] TickConfiguration tickConfig;
-        [SerializeField] bool autoAdvanceTicks = true;
-        [SerializeField] bool pauseOnPlanningPhase = true;
-
         [SerializeField] bool debugMode = false;
         [SerializeField] int currentTick = 0;
-        [SerializeField] float tickAccumulator = 0f;
 
         public int CurrentTick => currentTick;
         public TickConfiguration Config => tickConfig;
-        public bool IsRunning { get; private set; }
+        
+        // Removed: autoAdvanceTicks, tickAccumulator, IsRunning
+        // These are no longer needed in player-driven system
 
         public event Action<int> OnTickAdvanced;
         public event Action<int> OnTickStarted;
@@ -43,8 +43,6 @@ namespace WegoSystem {
                 Debug.LogError("[TickManager] No TickConfiguration assigned! Creating default config.");
                 tickConfig = ScriptableObject.CreateInstance<TickConfiguration>();
             }
-
-            IsRunning = autoAdvanceTicks;
         }
 
         void OnDestroy() {
@@ -54,23 +52,16 @@ namespace WegoSystem {
         }
 
         void Update() {
-            if (!IsRunning || tickConfig == null) return;
-
-            if (TurnPhaseManager.Instance != null && pauseOnPlanningPhase) {
-                if (TurnPhaseManager.Instance.CurrentPhase == TurnPhase.Planning) {
-                    return; // Don't auto-advance during planning
-                }
-            }
-
-            tickAccumulator += Time.deltaTime;
-            float secondsPerTick = tickConfig.GetRealSecondsPerTick();
-
-            while (tickAccumulator >= secondsPerTick) {
-                tickAccumulator -= secondsPerTick;
+            // Only debug controls remain - no automatic tick advancement
+            #if UNITY_EDITOR
+            if (debugMode && Input.GetKeyDown(KeyCode.T)) {
+                Debug.Log("[TickManager] Debug: Manual tick advance");
                 AdvanceTick();
             }
+            #endif
         }
 
+        // This is now the ONLY way ticks advance - must be called explicitly
         public void AdvanceTick() {
             AdvanceMultipleTicks(1);
         }
@@ -146,27 +137,9 @@ namespace WegoSystem {
             pendingRemovals.Clear();
         }
 
-        public void StartTicking() {
-            IsRunning = true;
-            if (debugMode) Debug.Log("[TickManager] Started ticking");
-        }
-
-        public void StopTicking() {
-            IsRunning = false;
-            tickAccumulator = 0f;
-            if (debugMode) Debug.Log("[TickManager] Stopped ticking");
-        }
-
         public void ResetTicks() {
             currentTick = 0;
-            tickAccumulator = 0f;
             if (debugMode) Debug.Log("[TickManager] Reset tick counter");
-        }
-
-        public void SetTickSpeed(float multiplier) {
-            if (tickConfig != null) {
-                tickConfig.SetTicksPerSecond(Mathf.Max(0.1f, multiplier * 2f)); // Base is 2 ticks/second
-            }
         }
 
         public int GetTicksSince(int pastTick) {

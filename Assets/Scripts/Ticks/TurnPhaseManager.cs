@@ -62,10 +62,11 @@ namespace WegoSystem {
 
         public void OnTickUpdate(int currentTick) {
             currentPhaseTicks++;
-
-            if (autoAdvancePhases) {
-                CheckAutoAdvance();
-            }
+    
+            // Remove automatic phase advancement
+            // if (autoAdvancePhases) {
+            //     CheckAutoAdvance();
+            // }
         }
 
         void CheckAutoAdvance() {
@@ -135,16 +136,18 @@ namespace WegoSystem {
             switch (phase) {
                 case TurnPhase.Planning:
                     OnPlanningPhaseStarted?.Invoke();
-                    if (TickManager.Instance != null && !autoAdvancePhases) {
-                        TickManager.Instance.StopTicking(); // Pause ticking during planning
-                    }
+                    // Remove tick control - ticks only advance by player action
+                    // if (TickManager.Instance != null && !autoAdvancePhases) {
+                    //     TickManager.Instance.StopTicking();
+                    // }
                     break;
 
                 case TurnPhase.Execution:
                     OnExecutionPhaseStarted?.Invoke();
-                    if (TickManager.Instance != null) {
-                        TickManager.Instance.StartTicking(); // Resume ticking
-                    }
+                    // Remove tick control
+                    // if (TickManager.Instance != null) {
+                    //     TickManager.Instance.StartTicking();
+                    // }
                     break;
 
                 case TurnPhase.Resolution:
