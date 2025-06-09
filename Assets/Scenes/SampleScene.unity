@@ -15898,8 +15898,8 @@ MonoBehaviour:
   additionalTickCost: 1
   affectsAnimals: 1
   affectsPlayer: 1
-  colliderShrinkAmount: 0.1
-  zoneColor: {r: 0.5, g: 0.5, b: 1, a: 0.3}
+  colliderShrinkAmount: 0
+  zoneColor: {r: 0.5, g: 0.5, b: 1, a: 0}
   showDebugMessages: 0
 --- !u!114 &1222742192
 MonoBehaviour:

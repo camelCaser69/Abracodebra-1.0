@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 496,884 → 336,624 chars (32.3% reduction)
-Estimated tokens saved: ~40,065
+Compression Stats: 502,011 → 339,795 chars (32.3% reduction)
+Estimated tokens saved: ~40,554
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -65,51 +65,52 @@ using System;
   NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4173
   OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4341
   PlantCell (Assets\Scripts\PlantSystem\Growth/) L4380
-  PlantGrowth.CellManagement (Assets\Scripts\PlantSystem\Growth/) L4404
-  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L4534
-  PlantGrowth.RealtimeFallback (Assets\Scripts\PlantSystem\Growth/) L4769
-  PlantGrowth.WegoGrowth (Assets\Scripts\PlantSystem\Growth/) L4897
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5019
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5345
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5643
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5710
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6006
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6125
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6329
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6463
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6783
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L6919
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7212
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7300
-  GridSnapStartup (Assets\Scripts\Ticks/) L7401
-  TurnPhaseManager (Assets\Scripts\Ticks/) L7467
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7583
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7652
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L7883
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L7894
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L7978
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8083
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8478
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8514
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8704
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L8846
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L8964
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9168
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9349
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9389
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9409
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9421
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9456
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9615
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4404
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4606
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4670
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4892
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5234
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5414
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5558
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5856
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5923
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6219
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6338
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6542
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6676
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6996
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7132
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7425
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7513
+  GridSnapStartup (Assets\Scripts\Ticks/) L7614
+  TurnPhaseManager (Assets\Scripts\Ticks/) L7680
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7796
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7865
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8096
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8107
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8191
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8296
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8691
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8727
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8917
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9059
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9177
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9381
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9562
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9602
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9622
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9634
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9669
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9828
 
 [WegoSystem]
-  GridPositionManager (Assets\Scripts\Ticks/) L9625
-  GridPosition (Assets\Scripts\Ticks/) L9922
-  TickConfiguration (Assets\Scripts\Ticks/) L10137
-  ITickUpdateable (Assets\Scripts\Ticks/) L10269
+  GridPositionManager (Assets\Scripts\Ticks/) L9838
+  GridPosition (Assets\Scripts\Ticks/) L10135
+  TickConfiguration (Assets\Scripts\Ticks/) L10350
+  ITickUpdateable (Assets\Scripts\Ticks/) L10482
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10431
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10644
 
 ================================================================================
 SCRIPTS
@@ -4491,22 +4492,44 @@ ParentPlantGrowth.ReportCellDestroyed(GridCoord);
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\Growth\PlantGrowth.CellManagement.cs
+// Assets\Scripts\PlantSystem\Growth\PlantCellManager.cs
 
-﻿using System.Collections.Generic;
-using WegoSystem;
+﻿using UnityEngine;
 
-pub partial cls PlantGrowth : MonoBehaviour {
+pub cls PlantCellManager {
+ro PlantGrowth plant;
+ro GameObject seedCellPrefab;
+ro GameObject stemCellPrefab;
+ro GameObject leafCellPrefab;
+ro GameObject berryCellPrefab;
+ro float cellSpacing;
+
+Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
+List<GameObject> activeCellGameObjects = new List<GameObject>();
+pub GameObject RootCellInstance { get; set; }
+pub List<LeafData> LeafDataList { get; } = new List<LeafData>();
+
+bool? offsetRightForPattern1 = null;
+
+pub PlantCellManager(PlantGrowth plant, GameObject seedPrefab, GameObject stemPrefab, GameObject leafPrefab, GameObject berryPrefab, float spacing) {
+this.plant = plant;
+seedCellPrefab = seedPrefab;
+stemCellPrefab = stemPrefab;
+leafCellPrefab = leafPrefab;
+berryCellPrefab = berryPrefab;
+cellSpacing = spacing;
+}
+
 pub void ReportCellDestroyed(Vector2Int coord) {
 if (cells.ContainsKey(coord)) {
 PlantCellType cellType = cells[coord];
 
 if (cellType == PlantCellType.Leaf) {
-for (int i = 0; i < leafDataList.Count; i++) {
-if (leafDataList[i].GridCoord == coord) {
-LeafData updatedData = leafDataList[i];
+for (int i = 0; i < LeafDataList.Count; i++) {
+if (LeafDataList[i].GridCoord == coord) {
+LeafData updatedData = LeafDataList[i];
 updatedData.IsActive = false;
-leafDataList[i] = updatedData;
+LeafDataList[i] = updatedData;
 break;
 }
 }
@@ -4515,27 +4538,27 @@ break;
 cells.Remove(coord);
 activeCellGameObjects.RemoveAll(go => go == null || (go.GetComponent<PlantCell>()?.GridCoord == coord));
 
-if (enableOutline && outlineController != null) {
-outlineController.OnPlantCellRemoved(coord);
+if (plant.IsOutlineEnabled() && plant.VisualManager.OutlineController != null) {
+plant.VisualManager.OutlineController.OnPlantCellRemoved(coord);
 }
 }
 }
 
-void ClearAllVisuals() {
+pub void ClearAllVisuals() {
 List<GameObject> cellsToClear = new List<GameObject>(activeCellGameObjects);
 foreach (GameObject cellGO in cellsToClear) {
 if (cellGO != null) {
-Destroy(cellGO);
+Object.Destroy(cellGO);
 }
 }
 activeCellGameObjects.Clear();
 cells.Clear();
-rootCellInstance = null;
+RootCellInstance = null;
 }
 
-GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = null, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = null) {
+pub GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = null, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = null) {
 if (cells.ContainsKey(coords)) {
-Debug.LogWarning($"[{gameObject.name}] Trying to spawn {cellType} at occupied coord {coords}.");
+Debug.LogWarning($"[{plant.gameObject.name}] Trying to spawn {cellType} at occupied coord {coords}.");
 ret null;
 }
 
@@ -4548,16 +4571,16 @@ case PlantCellType.Fruit: prefab = berryCellPrefab; break;
 }
 
 if (prefab == null) {
-Debug.LogError($"[{gameObject.name}] Prefab for PlantCellType.{cellType} is null!");
+Debug.LogError($"[{plant.gameObject.name}] Prefab for PlantCellType.{cellType} is null!");
 ret null;
 }
 
-Vector2 worldPos = (Vector2)transform.position + ((Vector2)coords * cellSpacing);
-GameObject instance = Instantiate(prefab, worldPos, Quaternion.identity, transform);
-instance.name = $"{gameObject.name}_{cellType}_{coords.x}_{coords.y}";
+Vector2 worldPos = (Vector2)plant.transform.position + ((Vector2)coords * cellSpacing);
+GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
+instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
 
 PlantCell cellComp = instance.GetComponent<PlantCell>() ?? instance.AddComponent<PlantCell>();
-cellComp.ParentPlantGrowth = this;
+cellComp.ParentPlantGrowth = plant;
 cellComp.GridCoord = coords;
 cellComp.CellType = cellType;
 
@@ -4568,127 +4591,773 @@ SortableEntity sorter = instance.GetComponent<SortableEntity>() ?? instance.AddC
 sorter.SetUseParentYCoordinate(cellType != PlantCellType.Seed);
 
 if (cellType == PlantCellType.Fruit) {
-ApplyScentDataToObject(instance, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+plant.ApplyScentDataToObject(instance, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
 }
 
-RegisterShadowForCell(instance, cellType.ToString());
-if (enableOutline && outlineController != null) {
-outlineController.OnPlantCellAdded(coords, instance);
+plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
+if (plant.IsOutlineEnabled() && plant.VisualManager.OutlineController != null) {
+plant.VisualManager.OutlineController.OnPlantCellAdded(coords, instance);
 }
 
 ret instance;
 }
 
-void RegisterShadowForCell(GameObject cellInstance, string cellTypeName) {
-if (shadowController == null || shadowPartPrefab == null || cellInstance == null) return;
-SpriteRenderer partRenderer = cellInstance.GetComponentInChildren<SpriteRenderer>();
-if (partRenderer != null) {
-shadowController.RegisterPlantPart(partRenderer, shadowPartPrefab);
-} else {
-Debug.LogWarning($"Plant '{gameObject.name}': {cellTypeName} missing SpriteRenderer. No shadow.", cellInstance);
-}
-}
-
-List<Vector2Int> CalculateLeafPositions(Vector2Int stemPos, int stageCounter) {
+pub List<Vector2Int> CalculateLeafPositions(Vector2Int stemPos, int stageCounter, int leafPattern) {
 List<Vector2Int> leafPositions = new List<Vector2Int>();
 Vector2Int leftBase = stemPos + Vector2Int.left;
 Vector2Int rightBase = stemPos + Vector2Int.right;
 
-switch (finalLeafPattern) {
-case 0: leafPositions.Add(leftBase); leafPositions.Add(rightBase); break;
+switch (leafPattern) {
+case 0:
+leafPositions.Add(leftBase);
+leafPositions.Add(rightBase);
+break;
 case 1:
 if (offsetRightForPattern1 == null) offsetRightForPattern1 = Random.value < 0.5f;
-if (offsetRightForPattern1.Value) { leafPositions.Add(leftBase); leafPositions.Add(rightBase + Vector2Int.up); }
-else { leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); }
+if (offsetRightForPattern1.Value) {
+leafPositions.Add(leftBase);
+leafPositions.Add(rightBase + Vector2Int.up);
+} else {
+leafPositions.Add(leftBase + Vector2Int.up);
+leafPositions.Add(rightBase);
+}
 break;
 case 2:
 switch (stageCounter % 4) {
-case 0: case 2: leafPositions.Add(leftBase); leafPositions.Add(rightBase); break;
-case 1: leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); break;
-case 3: leafPositions.Add(leftBase); leafPositions.Add(rightBase + Vector2Int.up); break;
+case 0:
+case 2:
+leafPositions.Add(leftBase);
+leafPositions.Add(rightBase);
+break;
+case 1:
+leafPositions.Add(leftBase + Vector2Int.up);
+leafPositions.Add(rightBase);
+break;
+case 3:
+leafPositions.Add(leftBase);
+leafPositions.Add(rightBase + Vector2Int.up);
+break;
 }
 break;
 case 3:
 int spiralDir = (stageCounter % 2 == 0) ? 1 : -1;
-if (spiralDir > 0) { leafPositions.Add(leftBase); leafPositions.Add(rightBase + Vector2Int.up); }
-else { leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); }
+if (spiralDir > 0) {
+leafPositions.Add(leftBase);
+leafPositions.Add(rightBase + Vector2Int.up);
+} else {
+leafPositions.Add(leftBase + Vector2Int.up);
+leafPositions.Add(rightBase);
+}
 break;
-case 4: leafPositions.Add(leftBase); leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); leafPositions.Add(rightBase + Vector2Int.up); break;
-default: leafPositions.Add(leftBase); leafPositions.Add(rightBase); break;
+case 4:
+leafPositions.Add(leftBase);
+leafPositions.Add(leftBase + Vector2Int.up);
+leafPositions.Add(rightBase);
+leafPositions.Add(rightBase + Vector2Int.up);
+break;
+default:
+leafPositions.Add(leftBase);
+leafPositions.Add(rightBase);
+break;
 }
 ret leafPositions;
+}
+
+pub bool TryRegrowLeaf() {
+int missingLeafIndex = -1;
+for (int i = 0; i < LeafDataList.Count; i++) {
+if (!LeafDataList[i].IsActive) {
+missingLeafIndex = i;
+break;
+}
+}
+if (missingLeafIndex == -1) ret false;
+
+Vector2Int leafCoord = LeafDataList[missingLeafIndex].GridCoord;
+if (cells.ContainsKey(leafCoord)) ret false;
+
+GameObject newLeaf = SpawnCellVisual(PlantCellType.Leaf, leafCoord);
+if (newLeaf != null) {
+LeafDataList[missingLeafIndex] = new LeafData(leafCoord, true);
+ret true;
+}
+ret false;
+}
+
+pub bool DoesCellExistAt(Vector2Int coord) => cells.ContainsKey(coord);
+
+pub GameObject GetCellGameObjectAt(Vector2Int coord) {
+ret activeCellGameObjects.FirstOrDefault(go => go != null && go.GetComponent<PlantCell>()?.GridCoord == coord);
+}
+
+pub Dictionary<Vector2Int, PlantCellType> GetCells() => cells;
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\PlantSystem\Growth\PlantEnergySystem.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+pub cls PlantEnergySystem {
+ro PlantGrowth plant;
+
+pub float CurrentEnergy { get; set; } = 0f;
+pub float MaxEnergy { get; set; } = 10f;
+pub float PhotosynthesisRate { get; set; } = 0.5f;
+
+FireflyManager fireflyManagerInstance;
+
+pub PlantEnergySystem(PlantGrowth plant) {
+this.plant = plant;
+fireflyManagerInstance = FireflyManager.Instance;
+}
+
+pub void AccumulateEnergy() {
+if (PhotosynthesisRate <= 0 || MaxEnergy <= 0) return;
+
+float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
+int leafCount = plant.CellManager.GetCells().Values.Count(c => c == PlantCellType.Leaf);
+float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ?
+PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(plant) : 1.0f;
+
+float fireflyBonusRate = 0f;
+if (fireflyManagerInstance != null) {
+int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(plant.transform.position, fireflyManagerInstance.photosynthesisRadius);
+fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly, fireflyManagerInstance.maxPhotosynthesisBonus);
+}
+
+float standardPhotosynthesis = PhotosynthesisRate * leafCount * sunlight;
+float totalRate = (standardPhotosynthesis + fireflyBonusRate) * tileMultiplier;
+float delta = totalRate * Time.deltaTime;
+CurrentEnergy = Mathf.Clamp(CurrentEnergy + delta, 0f, MaxEnergy);
+}
+
+pub void AccumulateEnergyTick() {
+if (PhotosynthesisRate <= 0 || MaxEnergy <= 0) return;
+
+float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
+int leafCount = plant.CellManager.GetCells().Values.Count(c => c == PlantCellType.Leaf);
+float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ?
+PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(plant) : 1.0f;
+
+float fireflyBonusRate = 0f;
+if (fireflyManagerInstance != null) {
+int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(plant.transform.position, fireflyManagerInstance.photosynthesisRadius);
+fireflyBonusRate = Mathf.Min(
+nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly,
+fireflyManagerInstance.maxPhotosynthesisBonus);
+}
+
+float ticksPerSecond = TickManager.Instance?.Config?.ticksPerRealSecond ?? 2f;
+float standardPhotosynthesis = (PhotosynthesisRate * leafCount * sunlight) / ticksPerSecond;
+float totalRate = (standardPhotosynthesis + (fireflyBonusRate / ticksPerSecond)) * tileMultiplier;
+
+CurrentEnergy = Mathf.Clamp(CurrentEnergy + totalRate, 0f, MaxEnergy);
 }
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\Growth\PlantGrowth.NodeExecution.cs
+// Assets\Scripts\PlantSystem\Growth\PlantGrowth.cs
 
-﻿using System.Collections;
+﻿using UnityEngine;
+using WegoSystem;
 
-pub partial cls PlantGrowth : MonoBehaviour {
-void ExecuteMatureCycleTick() {
-if (nodeGraph?.nodes == null || nodeGraph.nodes.Count == 0) {
-Debug.LogError($"[{gameObject.name}] NodeGraph missing or empty!");
+pub enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
+
+pub cls PlantGrowth : MonoBehaviour, ITickUpdateable {
+[SerializeField] bool useWegoSystem = true;
+
+pub stat ro List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
+
+pub PlantCellManager CellManager { get; set; }
+pub PlantNodeExecutor NodeExecutor { get; set; }
+pub PlantGrowthLogic GrowthLogic { get; set; }
+pub PlantEnergySystem EnergySystem { get; set; }
+pub PlantVisualManager VisualManager { get; set; }
+
+pub NodeGraph NodeGraph { get; set; }
+pub PlantState CurrentState { get; set; } = PlantState.Initializing;
+
+[SerializeField] GameObject seedCellPrefab;
+[SerializeField] GameObject stemCellPrefab;
+[SerializeField] GameObject leafCellPrefab;
+[SerializeField] GameObject berryCellPrefab;
+[SerializeField] float cellSpacing = 0.08f;
+
+[SerializeField] PlantShadowController shadowController;
+[SerializeField] GameObject shadowPartPrefab;
+[SerializeField] bool enableOutline = true;
+[SerializeField] PlantOutlineController outlineController;
+[SerializeField] GameObject outlinePartPrefab;
+
+[SerializeField] bool allowPhotosynthesisDuringGrowth = false;
+
+void Awake() {
+InitializeComponents();
+ValidateReferences();
+AllActivePlants.Add(this);
+}
+
+void InitializeComponents() {
+CellManager = new PlantCellManager(this, seedCellPrefab, stemCellPrefab, leafCellPrefab, berryCellPrefab, cellSpacing);
+NodeExecutor = new PlantNodeExecutor(this);
+GrowthLogic = new PlantGrowthLogic(this);
+EnergySystem = new PlantEnergySystem(this);
+VisualManager = new PlantVisualManager(this, shadowController, shadowPartPrefab, outlineController, outlinePartPrefab, enableOutline);
+}
+
+void ValidateReferences() {
+bool setupValid = true;
+
+if (shadowController == null) {
+shadowController = GetComponentInChildren<PlantShadowController>(true);
+if (shadowController == null) {
+Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantShadowController ref missing!", this);
+setupValid = false;
+}
+}
+
+if (shadowPartPrefab == null) {
+Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Shadow Part Prefab missing!", this);
+setupValid = false;
+}
+
+if (enableOutline) {
+if (outlineController == null) {
+outlineController = GetComponentInChildren<PlantOutlineController>(true);
+if (outlineController == null) {
+Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantOutlineController ref missing but outline is enabled!", this);
+setupValid = false;
+}
+}
+if (outlinePartPrefab == null) {
+Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Outline Part Prefab missing but outline is enabled!", this);
+setupValid = false;
+}
+}
+
+if (seedCellPrefab == null) {
+Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Seed Cell Prefab missing!", this);
+setupValid = false;
+}
+
+if (!setupValid) {
+enabled = false;
 return;
 }
 
-float damageMultiplier = 1.0f;
-var accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
-var accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
-float totalEnergyCostForCycle = 0f;
-
-foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-if (node?.effects == null) continue;
-foreach (var effect in node.effects) {
-if (effect == null || effect.isPassive) continue;
-switch (effect.effectType) {
-case NodeEffectType.EnergyCost: totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue); break;
-case NodeEffectType.Damage: damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue); break;
-case NodeEffectType.ScentModifier:
-if (effect.scentDefinitionReference != null) {
-ScentDefinition key = effect.scentDefinitionReference;
-accumulatedScentRadiusBonus.TryGetValue(key, out float currentRad);
-accumulatedScentRadiusBonus[key] = currentRad + effect.primaryValue;
-accumulatedScentStrengthBonus.TryGetValue(key, out float currentStr);
-accumulatedScentStrengthBonus[key] = currentStr + effect.secondaryValue;
-}
-break;
-}
+if (!enableOutline && outlineController != null) {
+outlineController.gameObject.SetActive(false);
 }
 }
 
-if (poopDetectionRadius > 0f) CheckForPoopAndAbsorb();
+void Start() {
+if (useWegoSystem && TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
+}
+VisualManager.UpdateUI();
+}
 
-if (currentEnergy < totalEnergyCostForCycle) {
-if (Debug.isDebugBuild) Debug.Log($"[{gameObject.name}] Not enough energy ({currentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
+void OnDestroy() {
+AllActivePlants.Remove(this);
+if (TickManager.Instance != null) {
+TickManager.Instance.UnregisterTickUpdateable(this);
+}
+if (PlantGrowthModifierManager.Instance != null) {
+PlantGrowthModifierManager.Instance.UnregisterPlant(this);
+}
+CellManager?.ClearAllVisuals();
+}
+
+void Update() {
+if (useWegoSystem) {
+VisualManager.UpdateWegoUI();
 return;
 }
 
-currentEnergy = Mathf.Max(0f, currentEnergy - totalEnergyCostForCycle);
+switch (CurrentState) {
+case PlantState.Growing:
+if (allowPhotosynthesisDuringGrowth) EnergySystem.AccumulateEnergy();
+VisualManager.UpdateRealtimeGrowthUI();
+break;
+case PlantState.GrowthComplete:
+GrowthLogic.HandleGrowthComplete();
+break;
+case PlantState.Mature_Idle:
+EnergySystem.AccumulateEnergy();
+VisualManager.UpdateUI();
+GrowthLogic.UpdateMaturityCycle();
+break;
+case PlantState.Mature_Executing:
+EnergySystem.AccumulateEnergy();
+VisualManager.UpdateUI();
+break;
+}
+}
 
-foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
+pub void OnTickUpdate(int currentTick) {
+if (!useWegoSystem) return;
+GrowthLogic.OnTickUpdate(currentTick);
+VisualManager.UpdateUI();
+}
+
+pub void InitializeAndGrow(NodeGraph graph) {
+if (graph == null || graph.nodes == null) {
+Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject);
+Destroy(gameObject);
+return;
+}
+
+GrowthLogic.StopGrowthCoroutine();
+CellManager.ClearAllVisuals();
+VisualManager.ResetDisplayState();
+
+NodeGraph = graph;
+CurrentState = PlantState.Initializing;
+EnergySystem.CurrentEnergy = 0f;
+CellManager.LeafDataList.Clear();
+
+GrowthLogic.CalculateAndApplyStats();
+
+GameObject spawnedSeed = CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
+if (spawnedSeed != null) {
+CellManager.RootCellInstance = spawnedSeed;
+RegisterWithManagers();
+
+if (GrowthLogic.TargetStemLength > 0) {
+CurrentState = PlantState.Growing;
+VisualManager.UpdateGrowthPercentageUI();
+if (!useWegoSystem) {
+GrowthLogic.StartRealtimeGrowth();
+}
+} else {
+Debug.LogWarning($"[{gameObject.name}] Target stem length is {GrowthLogic.TargetStemLength}. Skipping visual growth phase.", gameObject);
+GrowthLogic.CompleteGrowth();
+}
+} else {
+Debug.LogError($"[{gameObject.name}] Failed to spawn initial seed! Aborting growth.", gameObject);
+CurrentState = PlantState.Mature_Idle;
+Destroy(gameObject, 0.1f);
+}
+
+VisualManager.UpdateUI();
+}
+
+void RegisterWithManagers() {
+if (PlantGrowthModifierManager.Instance != null && TileInteractionManager.Instance != null) {
+Vector3Int gridPos = TileInteractionManager.Instance.WorldToCell(transform.position);
+TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(gridPos);
+PlantGrowthModifierManager.Instance.RegisterPlantTile(this, currentTile);
+}
+}
+
+pub void SetWegoSystem(bool enabled) {
+bool wasEnabled = useWegoSystem;
+useWegoSystem = enabled;
+
+if (enabled && !wasEnabled && TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
+if (CurrentState == PlantState.Growing) {
+GrowthLogic.StopGrowthCoroutine();
+}
+} else if (!enabled && wasEnabled && TickManager.Instance != null) {
+TickManager.Instance.UnregisterTickUpdateable(this);
+if (CurrentState == PlantState.Growing) {
+GrowthLogic.StartRealtimeGrowth();
+}
+}
+}
+
+pub bool DoesCellExistAt(Vector2Int coord) => CellManager.DoesCellExistAt(coord);
+pub float GetCellSpacing() => cellSpacing;
+pub GameObject GetCellGameObjectAt(Vector2Int coord) => CellManager.GetCellGameObjectAt(coord);
+pub bool IsOutlineEnabled() => enableOutline;
+pub float GetPoopDetectionRadius() => NodeExecutor.PoopDetectionRadius;
+pub void ReportCellDestroyed(Vector2Int coord) => CellManager.ReportCellDestroyed(coord);
+pub void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses)
+=> NodeExecutor.ApplyScentDataToObject(targetObject, scentRadiusBonuses, scentStrengthBonuses);
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\PlantSystem\Growth\PlantGrowthLogic.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+pub cls PlantGrowthLogic {
+ro PlantGrowth plant;
+
+pub int TargetStemLength { get; set; }
+pub float GrowthSpeed { get; set; }
+pub int LeafGap { get; set; }
+pub int LeafPattern { get; set; }
+pub float GrowthRandomness { get; set; }
+pub int MaturityCycleTicks { get; set; }
+pub float NodeCastDelay { get; set; }
+
+float growthProgress = 0f;
+int maturityCycleTick = 0;
+int currentStemStage = 0;
+int currentStemCount = 0;
+float cycleTimer = 0f;
+bool isGrowthCompletionHandled = false;
+
+Coroutine growthCoroutine;
+float estimatedTotalGrowthTime = 1f;
+float actualGrowthProgress = 0f;
+int stepsCompleted = 0;
+int totalPlannedSteps = 0;
+
+pub PlantGrowthLogic(PlantGrowth plant) {
+this.plant = plant;
+}
+
+pub void CalculateAndApplyStats() {
+if (plant.NodeGraph == null) {
+Debug.LogError($"[{plant.gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
+return;
+}
+
+float baseEnergyStorage = 10f;
+float basePhotosynthesisRate = 0.5f;
+int baseStemMin = 3;
+int baseStemMax = 5;
+float baseGrowthSpeedRate = 0.2f;
+int baseLeafGap = 1;
+int baseLeafPattern = 0;
+float baseGrowthRandomness = 0.1f;
+int baseCooldownTicks = 20;
+float baseCastDelay = 0.1f;
+
+float accumulatedEnergyStorage = 0f;
+float accumulatedPhotosynthesis = 0f;
+int stemLengthModifier = 0;
+float growthSpeedRateModifier = 0f;
+int leafGapModifier = 0;
+int currentLeafPattern = baseLeafPattern;
+float growthRandomnessModifier = 0f;
+int cooldownTicksModifier = 0;
+float castDelayModifier = 0f;
+bool seedFound = false;
+
+foreach (NodeData node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
 if (node?.effects == null) continue;
 foreach (var effect in node.effects) {
-if (effect == null || effect.isPassive || effect.effectType == NodeEffectType.EnergyCost || effect.effectType == NodeEffectType.Damage || effect.effectType == NodeEffectType.ScentModifier) continue;
+if (effect == null || !effect.isPassive) continue;
 switch (effect.effectType) {
-case NodeEffectType.Output:
-GetComponentInChildren<OutputNodeEffect>()?.Activate(damageMultiplier, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+case NodeEffectType.SeedSpawn: seedFound = true; break;
+case NodeEffectType.EnergyStorage: accumulatedEnergyStorage += effect.primaryValue; break;
+case NodeEffectType.EnergyPhotosynthesis: accumulatedPhotosynthesis += effect.primaryValue; break;
+case NodeEffectType.StemLength: stemLengthModifier += Mathf.RoundToInt(effect.primaryValue); break;
+case NodeEffectType.GrowthSpeed: growthSpeedRateModifier += effect.primaryValue; break;
+case NodeEffectType.LeafGap: leafGapModifier += Mathf.RoundToInt(effect.primaryValue); break;
+case NodeEffectType.LeafPattern: currentLeafPattern = Mathf.Clamp(Mathf.RoundToInt(effect.primaryValue), 0, 4); break;
+case NodeEffectType.StemRandomness: growthRandomnessModifier += effect.primaryValue; break;
+case NodeEffectType.Cooldown: cooldownTicksModifier += Mathf.RoundToInt(effect.primaryValue); break;
+case NodeEffectType.CastDelay: castDelayModifier += effect.primaryValue; break;
+}
+}
+}
+
+plant.EnergySystem.MaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
+plant.EnergySystem.PhotosynthesisRate = Mathf.Max(0f, basePhotosynthesisRate + accumulatedPhotosynthesis);
+
+int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier);
+int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
+GrowthSpeed = Mathf.Max(0.01f, baseGrowthSpeedRate + growthSpeedRateModifier);
+LeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
+LeafPattern = currentLeafPattern;
+GrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
+MaturityCycleTicks = Mathf.Max(1, baseCooldownTicks + cooldownTicksModifier);
+NodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
+TargetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
+
+plant.NodeExecutor.ProcessPassiveEffects(plant.NodeGraph);
+
+if (!seedFound) {
+Debug.LogWarning($"[{plant.gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth aborted.", plant.gameObject);
+}
+}
+
+pub void OnTickUpdate(int currentTick) {
+switch (plant.CurrentState) {
+case PlantState.Growing:
+growthProgress += GrowthSpeed;
+
+if (growthProgress >= 1.0f) {
+int stepsToGrow = Mathf.FloorToInt(growthProgress);
+growthProgress -= stepsToGrow;
+
+for (int i = 0; i < stepsToGrow; i++) {
+if (currentStemStage >= TargetStemLength) {
+CompleteGrowth();
 break;
-case NodeEffectType.GrowBerry:
-TrySpawnBerry(accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+}
+GrowNextStemStage();
+}
+}
+
+if (currentStemStage >= TargetStemLength && plant.CurrentState == PlantState.Growing) {
+CompleteGrowth();
+}
+
+break;
+
+case PlantState.Mature_Idle:
+plant.EnergySystem.AccumulateEnergyTick();
+maturityCycleTick++;
+if (maturityCycleTick >= MaturityCycleTicks && plant.EnergySystem.CurrentEnergy >= 1f) {
+plant.CurrentState = PlantState.Mature_Executing;
+plant.NodeExecutor.ExecuteMatureCycleTick();
+maturityCycleTick = 0;
+}
+break;
+
+case PlantState.Mature_Executing:
+plant.EnergySystem.AccumulateEnergyTick();
+plant.CurrentState = PlantState.Mature_Idle;
 break;
 }
 }
+
+void GrowNextStemStage() {
+if (currentStemStage >= TargetStemLength) return;
+
+currentStemStage++;
+Vector2Int stemPos = Vector2Int.up * currentStemStage;
+
+if (Random.value < GrowthRandomness) {
+stemPos += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
 }
+
+GameObject stemCell = plant.CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos, null, null);
+if (stemCell == null) {
+Debug.LogError($"[{plant.gameObject.name}] Failed to spawn stem at stage {currentStemStage}");
+return;
+}
+
+if (LeafGap >= 0 && (currentStemStage % (LeafGap + 1)) == 0) {
+var leafPositions = plant.CellManager.CalculateLeafPositions(stemPos, currentStemStage, LeafPattern);
+foreach (Vector2Int leafPos in leafPositions) {
+GameObject leafCell = plant.CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos, null, null);
+if (leafCell != null) {
+plant.CellManager.LeafDataList.Add(new LeafData(leafPos, true));
+}
+}
+}
+}
+
+pub void CompleteGrowth() {
+if (plant.CurrentState == PlantState.GrowthComplete) return;
+
+plant.CurrentState = PlantState.GrowthComplete;
+isGrowthCompletionHandled = false;
+
+if (plant.VisualManager.ShowGrowthPercentage) {
+plant.VisualManager.UpdateGrowthPercentageUI(true);
+}
+
+plant.CurrentState = PlantState.Mature_Idle;
+maturityCycleTick = 0;
+
+if (Debug.isDebugBuild) {
+Debug.Log($"[{plant.gameObject.name}] Growth completed! Transitioning to mature state.");
+}
+}
+
+pub void StartRealtimeGrowth() {
+if (growthCoroutine != null) return;
+growthCoroutine = plant.StartCoroutine(GrowthCoroutine_Time_Based());
+}
+
+pub void StopGrowthCoroutine() {
+if (growthCoroutine != null) {
+plant.StopCoroutine(growthCoroutine);
+growthCoroutine = null;
+}
+}
+
+pub void HandleGrowthComplete() {
+if (!isGrowthCompletionHandled) {
+isGrowthCompletionHandled = true;
+if (plant.VisualManager.ShowGrowthPercentage && TargetStemLength > 0) {
+plant.VisualManager.UpdateGrowthPercentageUI(true);
+}
+float rtCooldown = MaturityCycleTicks * (TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
+cycleTimer = rtCooldown;
+plant.CurrentState = PlantState.Mature_Idle;
+plant.VisualManager.UpdateUI();
+}
+}
+
+pub void UpdateMaturityCycle() {
+cycleTimer -= Time.deltaTime;
+if (cycleTimer <= 0f && plant.EnergySystem.CurrentEnergy >= 1f) {
+plant.CurrentState = PlantState.Mature_Executing;
+plant.StartCoroutine(ExecuteMatureCycle());
+}
+}
+
+IEnumerator GrowthCoroutine_Time_Based() {
+if (TargetStemLength <= 0) {
+plant.CurrentState = PlantState.GrowthComplete;
+growthCoroutine = null;
+yield break;
+}
+
+List<GrowthStep> growthPlan = PreCalculateGrowthPlan();
+totalPlannedSteps = growthPlan.Count;
+stepsCompleted = 0;
+actualGrowthProgress = 0f;
+
+if (totalPlannedSteps == 0) {
+plant.CurrentState = PlantState.GrowthComplete;
+growthCoroutine = null;
+yield break;
+}
+
+float ticksPerSecond = TickManager.Instance?.Config.ticksPerRealSecond ?? 2.0f;
+float baseTimePerStep = 1f / (Mathf.Max(0.01f, GrowthSpeed) * ticksPerSecond);
+
+if (baseTimePerStep <= 0.001f) baseTimePerStep = 0.01f;
+
+float initialTileMultiplier = PlantGrowthModifierManager.Instance?.GetGrowthSpeedMultiplier(plant) ?? 1.0f;
+initialTileMultiplier = Mathf.Clamp(initialTileMultiplier, 0.1f, 10.0f);
+float initialEffectiveTimePerStep = baseTimePerStep / initialTileMultiplier;
+if (initialEffectiveTimePerStep < 0.001f) initialEffectiveTimePerStep = 0.001f;
+
+estimatedTotalGrowthTime = totalPlannedSteps * initialEffectiveTimePerStep;
+if (estimatedTotalGrowthTime < 0.01f) estimatedTotalGrowthTime = 0.01f;
+
+float progressTowardNextStep = 0f;
+
+while (stepsCompleted < totalPlannedSteps && plant.CurrentState == PlantState.Growing) {
+float currentTileMultiplier = PlantGrowthModifierManager.Instance?.GetGrowthSpeedMultiplier(plant) ?? 1.0f;
+currentTileMultiplier = Mathf.Clamp(currentTileMultiplier, 0.1f, 10.0f);
+float currentEffectiveTimePerStep = baseTimePerStep / currentTileMultiplier;
+if (currentEffectiveTimePerStep < 0.001f) currentEffectiveTimePerStep = 0.001f;
+
+float progressRate = initialEffectiveTimePerStep / currentEffectiveTimePerStep;
+progressTowardNextStep += Time.deltaTime * progressRate;
+actualGrowthProgress = Mathf.Clamp01(progressTowardNextStep / initialEffectiveTimePerStep);
+
+int stepsToProcessThisFrame = 0;
+while (progressTowardNextStep >= initialEffectiveTimePerStep && stepsCompleted < totalPlannedSteps) {
+stepsToProcessThisFrame++;
+progressTowardNextStep -= initialEffectiveTimePerStep;
+if (stepsToProcessThisFrame >= 3) break;
+}
+
+if (stepsToProcessThisFrame > 0) {
+for (int i = 0; i < stepsToProcessThisFrame; i++) {
+int currentPlanIndex = stepsCompleted;
+if (currentPlanIndex >= totalPlannedSteps) break;
+
+GrowthStep step = growthPlan[currentPlanIndex];
+GameObject spawnedCell = plant.CellManager.SpawnCellVisual(step.CellType, step.Position, null, null);
+if (spawnedCell != null && step.CellType == PlantCellType.Leaf) {
+plant.CellManager.LeafDataList.Add(new LeafData(step.Position, true));
+}
+if (step.CellType == PlantCellType.Stem) {
+currentStemCount = step.StemIndex;
+if (!plant.VisualManager.ContinuousIncrement) plant.VisualManager.UpdateGrowthPercentageUI();
+}
+stepsCompleted++;
+if (NodeCastDelay > 0.01f && i < stepsToProcessThisFrame - 1) {
+yield ret new WaitForSeconds(NodeCastDelay);
+}
+}
+}
+yield ret null;
+}
+
+if (stepsCompleted >= totalPlannedSteps) {
+plant.CurrentState = PlantState.GrowthComplete;
+if (plant.VisualManager.ShowGrowthPercentage) plant.VisualManager.UpdateGrowthPercentageUI(true);
+}
+growthCoroutine = null;
+}
+
+List<GrowthStep> PreCalculateGrowthPlan() {
+var plan = new List<GrowthStep>();
+for (int stemIndex = 1; stemIndex <= TargetStemLength; stemIndex++) {
+Vector2Int stemPosition = Vector2Int.up * stemIndex;
+if (Random.value < GrowthRandomness) {
+stemPosition += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
+}
+plan.Add(new GrowthStep { CellType = PlantCellType.Stem, Position = stemPosition, StemIndex = stemIndex });
+
+if (LeafGap >= 0 && stemIndex > 0 && (stemIndex % (LeafGap + 1)) == 0) {
+List<Vector2Int> leafPositions = plant.CellManager.CalculateLeafPositions(stemPosition, stemIndex, LeafPattern);
+foreach (Vector2Int leafPos in leafPositions) {
+plan.Add(new GrowthStep { CellType = PlantCellType.Leaf, Position = leafPos, StemIndex = stemIndex });
+}
+}
+}
+ret plan;
 }
 
 IEnumerator ExecuteMatureCycle() {
-if (nodeGraph?.nodes == null || nodeGraph.nodes.Count == 0) {
-Debug.LogError($"[{gameObject.name}] NodeGraph missing or empty!", gameObject);
-float rtCooldown = maturityCycleTicks * (WegoSystem.TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
-cycleTimer = rtCooldown;
-currentState = PlantState.Mature_Idle;
-yield break;
+plant.NodeExecutor.ExecuteMatureCycleTick();
+
+float finalRtCooldown = MaturityCycleTicks * (TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
+cycleTimer = finalRtCooldown;
+plant.CurrentState = PlantState.Mature_Idle;
+yield ret null;
+}
+
+cls GrowthStep {
+pub PlantCellType CellType;
+pub Vector2Int Position;
+pub int StemIndex;
+}
+
+pub float GetGrowthProgress() => growthProgress;
+pub int GetCurrentStemStage() => currentStemStage;
+pub int GetCurrentStemCount() => currentStemCount;
+pub float GetActualGrowthProgress() => actualGrowthProgress;
+pub int GetStepsCompleted() => stepsCompleted;
+pub int GetTotalPlannedSteps() => totalPlannedSteps;
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\PlantSystem\Growth\PlantNodeExecutor.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+pub cls PlantNodeExecutor {
+ro PlantGrowth plant;
+
+pub float PoopDetectionRadius { get; set; }
+pub float PoopEnergyBonus { get; set; }
+
+pub PlantNodeExecutor(PlantGrowth plant) {
+this.plant = plant;
+}
+
+pub void ProcessPassiveEffects(NodeGraph nodeGraph) {
+PoopDetectionRadius = 0f;
+PoopEnergyBonus = 0f;
+
+foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
+if (node?.effects == null) continue;
+foreach (var effect in node.effects) {
+if (effect == null || !effect.isPassive) continue;
+
+if (effect.effectType == NodeEffectType.PoopFertilizer) {
+PoopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
+PoopEnergyBonus = Mathf.Max(0f, effect.secondaryValue);
+}
+}
+}
+}
+
+pub void ExecuteMatureCycleTick() {
+if (plant.NodeGraph?.nodes == null || plant.NodeGraph.nodes.Count == 0) {
+Debug.LogError($"[{plant.gameObject.name}] NodeGraph missing or empty!");
+return;
 }
 
 float damageMultiplier = 1.0f;
@@ -4696,13 +5365,17 @@ var accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
 var accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
 float totalEnergyCostForCycle = 0f;
 
-foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
+foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
 if (node?.effects == null) continue;
 foreach (var effect in node.effects) {
 if (effect == null || effect.isPassive) continue;
 switch (effect.effectType) {
-case NodeEffectType.EnergyCost: totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue); break;
-case NodeEffectType.Damage: damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue); break;
+case NodeEffectType.EnergyCost:
+totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
+break;
+case NodeEffectType.Damage:
+damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue);
+break;
 case NodeEffectType.ScentModifier:
 if (effect.scentDefinitionReference != null) {
 ScentDefinition key = effect.scentDefinitionReference;
@@ -4710,36 +5383,32 @@ accumulatedScentRadiusBonus.TryGetValue(key, out float currentRad);
 accumulatedScentRadiusBonus[key] = currentRad + effect.primaryValue;
 accumulatedScentStrengthBonus.TryGetValue(key, out float currentStr);
 accumulatedScentStrengthBonus[key] = currentStr + effect.secondaryValue;
-} else { Debug.LogWarning($"Node '{node.nodeDisplayName ?? "Unnamed"}' has ScentModifier effect but ScentDefinition reference is NULL."); }
+}
 break;
 }
 }
 }
 
-if (poopDetectionRadius > 0f) CheckForPoopAndAbsorb();
+if (PoopDetectionRadius > 0f) CheckForPoopAndAbsorb();
 
-if (currentEnergy < totalEnergyCostForCycle) {
-if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name}] Not enough energy ({currentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
-float rtCooldown = maturityCycleTicks * (WegoSystem.TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
-cycleTimer = rtCooldown;
-currentState = PlantState.Mature_Idle;
-yield break;
+if (plant.EnergySystem.CurrentEnergy < totalEnergyCostForCycle) {
+if (Debug.isDebugBuild) Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.CurrentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
+return;
 }
 
-currentEnergy = Mathf.Max(0f, currentEnergy - totalEnergyCostForCycle);
-UpdateUI();
+plant.EnergySystem.CurrentEnergy = Mathf.Max(0f, plant.EnergySystem.CurrentEnergy - totalEnergyCostForCycle);
 
-foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
+foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
 if (node?.effects == null) continue;
-bool hasActionEffectInNode = node.effects.Any(eff => eff != null && !eff.isPassive && eff.effectType != NodeEffectType.EnergyCost && eff.effectType != NodeEffectType.Damage && eff.effectType != NodeEffectType.ScentModifier);
-if (hasActionEffectInNode && nodeCastDelay > 0.01f) {
-yield ret new WaitForSeconds(nodeCastDelay);
-}
 foreach (var effect in node.effects) {
-if (effect == null || effect.isPassive || effect.effectType == NodeEffectType.EnergyCost || effect.effectType == NodeEffectType.Damage || effect.effectType == NodeEffectType.ScentModifier) continue;
+if (effect == null || effect.isPassive ||
+effect.effectType == NodeEffectType.EnergyCost ||
+effect.effectType == NodeEffectType.Damage ||
+effect.effectType == NodeEffectType.ScentModifier) continue;
+
 switch (effect.effectType) {
 case NodeEffectType.Output:
-GetComponentInChildren<OutputNodeEffect>()?.Activate(damageMultiplier, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+plant.GetComponentInChildren<OutputNodeEffect>()?.Activate(damageMultiplier, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
 break;
 case NodeEffectType.GrowBerry:
 TrySpawnBerry(accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
@@ -4747,18 +5416,16 @@ break;
 }
 }
 }
-
-float finalRtCooldown = maturityCycleTicks * (WegoSystem.TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
-cycleTimer = finalRtCooldown;
-currentState = PlantState.Mature_Idle;
 }
 
 void TrySpawnBerry(Dictionary<ScentDefinition, float> scentRadiiBonus, Dictionary<ScentDefinition, float> scentStrengthsBonus) {
+var berryCellPrefab = plant.CellManager.GetType().GetField("berryCellPrefab", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(plant.CellManager) as GameObject;
 if (berryCellPrefab == null) {
-Debug.LogWarning($"[{gameObject.name}] Berry Prefab not assigned. Cannot spawn berry.", gameObject);
+Debug.LogWarning($"[{plant.gameObject.name}] Berry Prefab not assigned. Cannot spawn berry.", plant.gameObject);
 return;
 }
 
+var cells = plant.CellManager.GetCells();
 var potentialCoords = cells
 .Where(cellKvp => cellKvp.Value == PlantCellType.Stem || cellKvp.Value == PlantCellType.Seed)
 .SelectMany(cellKvp => {
@@ -4771,12 +5438,12 @@ ret berryOffsets.Select(offset => cellKvp.Key + offset);
 
 if (potentialCoords.Count > 0) {
 Vector2Int chosenCoord = potentialCoords[Random.Range(0, potentialCoords.Count)];
-GameObject berryGO = SpawnCellVisual(PlantCellType.Fruit, chosenCoord, scentRadiiBonus, scentStrengthsBonus);
+GameObject berryGO = plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, chosenCoord, scentRadiiBonus, scentStrengthsBonus);
 if (berryGO == null) {
-Debug.LogError($"[{gameObject.name}] Failed to spawn berry visual at {chosenCoord}, SpawnCellVisual returned null.");
+Debug.LogError($"[{plant.gameObject.name}] Failed to spawn berry visual at {chosenCoord}, SpawnCellVisual returned null.");
 }
 } else {
-if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name}] No valid empty adjacent locations found to spawn a berry.");
+if (Debug.isDebugBuild) Debug.Log($"[{plant.gameObject.name}] No valid empty adjacent locations found to spawn a berry.");
 }
 }
 
@@ -4804,631 +5471,178 @@ scentSource.strengthModifier = maxStrengthBonus;
 
 if (strongestScentDef.particleEffectPrefab != null) {
 if (!targetObject.transform.GetComponentInChildren<ParticleSystem>()) {
-Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform);
+Object.Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform);
 }
 }
 }
 }
 
 void CheckForPoopAndAbsorb() {
-bool hasMissingLeaves = leafDataList.Any(leaf => !leaf.IsActive);
-bool canAddEnergy = poopEnergyBonus > 0f;
+bool hasMissingLeaves = plant.CellManager.LeafDataList.Any(leaf => !leaf.IsActive);
+bool canAddEnergy = PoopEnergyBonus > 0f;
 if (!hasMissingLeaves && !canAddEnergy) return;
 
-Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, poopDetectionRadius);
+Collider2D[] colliders = Physics2D.OverlapCircleAll(plant.transform.position, PoopDetectionRadius);
 foreach (Collider2D collider in colliders) {
 PoopController poop = collider.GetComponent<PoopController>();
 if (poop != null) {
 bool absorbed = false;
-if (hasMissingLeaves) absorbed = TryRegrowLeaf();
+if (hasMissingLeaves) absorbed = plant.CellManager.TryRegrowLeaf();
 if ((!absorbed || !hasMissingLeaves) && canAddEnergy) {
-currentEnergy = Mathf.Min(finalMaxEnergy, currentEnergy + poopEnergyBonus);
+plant.EnergySystem.CurrentEnergy = Mathf.Min(plant.EnergySystem.MaxEnergy, plant.EnergySystem.CurrentEnergy + PoopEnergyBonus);
 absorbed = true;
 }
 if (absorbed) {
-Destroy(poop.gameObject);
+Object.Destroy(poop.gameObject);
 break;
 }
 }
 }
 }
-
-bool TryRegrowLeaf() {
-int missingLeafIndex = -1;
-for (int i = 0; i < leafDataList.Count; i++) {
-if (!leafDataList[i].IsActive) {
-missingLeafIndex = i;
-break;
-}
-}
-if (missingLeafIndex == -1) ret false;
-
-Vector2Int leafCoord = leafDataList[missingLeafIndex].GridCoord;
-if (cells.ContainsKey(leafCoord)) ret false;
-
-GameObject newLeaf = SpawnCellVisual(PlantCellType.Leaf, leafCoord);
-if (newLeaf != null) {
-leafDataList[missingLeafIndex] = new LeafData(leafCoord, true);
-ret true;
-}
-ret false;
-}
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\Growth\PlantGrowth.RealtimeFallback.cs
-
-﻿using System.Collections;
-
-pub partial cls PlantGrowth : MonoBehaviour {
-cls GrowthStep { pub PlantCellType CellType; pub Vector2Int Position; pub int StemIndex; }
-
-void AccumulateEnergy() {
-if (finalPhotosynthesisRate <= 0 || finalMaxEnergy <= 0) return;
-
-float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
-int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
-float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ?
-PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(this) : 1.0f;
-
-float fireflyBonusRate = 0f;
-if (fireflyManagerInstance != null) {
-int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(transform.position, fireflyManagerInstance.photosynthesisRadius);
-fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly, fireflyManagerInstance.maxPhotosynthesisBonus);
-}
-
-float standardPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight;
-float totalRate = (standardPhotosynthesis + fireflyBonusRate) * tileMultiplier;
-float delta = totalRate * Time.deltaTime;
-currentEnergy = Mathf.Clamp(currentEnergy + delta, 0f, finalMaxEnergy);
-}
-
-IEnumerator GrowthCoroutine_Time_Based() {
-if (targetStemLength <= 0) {
-currentState = PlantState.GrowthComplete;
-growthCoroutine = null;
-yield break;
-}
-
-List<GrowthStep> growthPlan = PreCalculateGrowthPlan();
-totalPlannedSteps = growthPlan.Count;
-stepsCompleted = 0;
-actualGrowthProgress = 0f;
-
-if (totalPlannedSteps == 0) {
-currentState = PlantState.GrowthComplete;
-growthCoroutine = null;
-yield break;
-}
-
-float ticksPerSecond = WegoSystem.TickManager.Instance?.Config.ticksPerRealSecond ?? 2.0f;
-float baseTimePerStep = 1f / (Mathf.Max(0.01f, finalGrowthSpeed) * ticksPerSecond);
-
-if (baseTimePerStep <= 0.001f) baseTimePerStep = 0.01f;
-
-float initialTileMultiplier = PlantGrowthModifierManager.Instance?.GetGrowthSpeedMultiplier(this) ?? 1.0f;
-initialTileMultiplier = Mathf.Clamp(initialTileMultiplier, 0.1f, 10.0f);
-float initialEffectiveTimePerStep = baseTimePerStep / initialTileMultiplier;
-if (initialEffectiveTimePerStep < 0.001f) initialEffectiveTimePerStep = 0.001f;
-
-estimatedTotalGrowthTime = totalPlannedSteps * initialEffectiveTimePerStep;
-if (estimatedTotalGrowthTime < 0.01f) estimatedTotalGrowthTime = 0.01f;
-
-float progressTowardNextStep = 0f;
-
-while (stepsCompleted < totalPlannedSteps && currentState == PlantState.Growing) {
-float currentTileMultiplier = PlantGrowthModifierManager.Instance?.GetGrowthSpeedMultiplier(this) ?? 1.0f;
-currentTileMultiplier = Mathf.Clamp(currentTileMultiplier, 0.1f, 10.0f);
-float currentEffectiveTimePerStep = baseTimePerStep / currentTileMultiplier;
-if (currentEffectiveTimePerStep < 0.001f) currentEffectiveTimePerStep = 0.001f;
-
-float progressRate = initialEffectiveTimePerStep / currentEffectiveTimePerStep;
-progressTowardNextStep += Time.deltaTime * progressRate;
-actualGrowthProgress = Mathf.Clamp01(progressTowardNextStep / initialEffectiveTimePerStep);
-
-int stepsToProcessThisFrame = 0;
-while (progressTowardNextStep >= initialEffectiveTimePerStep && stepsCompleted < totalPlannedSteps) {
-stepsToProcessThisFrame++;
-progressTowardNextStep -= initialEffectiveTimePerStep;
-if (stepsToProcessThisFrame >= 3) break;
-}
-
-if (stepsToProcessThisFrame > 0) {
-for (int i = 0; i < stepsToProcessThisFrame; i++) {
-int currentPlanIndex = stepsCompleted;
-if (currentPlanIndex >= totalPlannedSteps) break;
-
-GrowthStep step = growthPlan[currentPlanIndex];
-GameObject spawnedCell = SpawnCellVisual(step.CellType, step.Position, null, null);
-if (spawnedCell != null && step.CellType == PlantCellType.Leaf) {
-leafDataList.Add(new LeafData(step.Position, true));
-}
-if (step.CellType == PlantCellType.Stem) {
-currentStemCount = step.StemIndex;
-if (!continuousIncrement) UpdateGrowthPercentageUI();
-}
-stepsCompleted++;
-if (nodeCastDelay > 0.01f && i < stepsToProcessThisFrame - 1) {
-yield ret new WaitForSeconds(nodeCastDelay);
-}
-}
-}
-yield ret null;
-}
-
-if (stepsCompleted >= totalPlannedSteps) {
-currentState = PlantState.GrowthComplete;
-if (showGrowthPercentage) UpdateGrowthPercentageUI(true);
-}
-growthCoroutine = null;
-}
-
-List<GrowthStep> PreCalculateGrowthPlan() {
-var plan = new List<GrowthStep>();
-for (int stemIndex = 1; stemIndex <= targetStemLength; stemIndex++) {
-Vector2Int stemPosition = Vector2Int.up * stemIndex;
-if (Random.value < finalGrowthRandomness) {
-stemPosition += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
-}
-plan.Add(new GrowthStep { CellType = PlantCellType.Stem, Position = stemPosition, StemIndex = stemIndex });
-
-if (finalLeafGap >= 0 && stemIndex > 0 && (stemIndex % (finalLeafGap + 1)) == 0) {
-List<Vector2Int> leafPositions = CalculateLeafPositions(stemPosition, stemIndex);
-foreach (Vector2Int leafPos in leafPositions) {
-plan.Add(new GrowthStep { CellType = PlantCellType.Leaf, Position = leafPos, StemIndex = stemIndex });
-}
-}
-}
-ret plan;
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\Growth\PlantGrowth.WegoGrowth.cs
+// Assets\Scripts\PlantSystem\Growth\PlantVisualManager.cs
 
 ﻿using UnityEngine;
-using WegoSystem;
-
-pub partial cls PlantGrowth : MonoBehaviour {
-pub void OnTickUpdate(int currentTick) {
-if (!useWegoSystem) return;
-
-switch (currentState) {
-case PlantState.Growing:
-growthProgress += finalGrowthSpeed;
-
-if (growthProgress >= 1.0f) {
-int stepsToGrow = Mathf.FloorToInt(growthProgress);
-growthProgress -= stepsToGrow; // Consume the whole number, keep the fraction.
-
-for (int i = 0; i < stepsToGrow; i++) {
-if (currentStemStage >= targetStemLength) {
-CompleteGrowth();
-break; // Exit loop if growth is complete.
-}
-GrowNextStemStage();
-}
-}
-
-if (currentStemStage >= targetStemLength && currentState == PlantState.Growing) {
-CompleteGrowth();
-}
-
-if (allowPhotosynthesisDuringGrowth) {
-AccumulateEnergyTick();
-}
-break;
-
-case PlantState.Mature_Idle:
-AccumulateEnergyTick();
-maturityCycleTick++;
-if (maturityCycleTick >= maturityCycleTicks && currentEnergy >= 1f) {
-currentState = PlantState.Mature_Executing;
-ExecuteMatureCycleTick(); // This is an instant action within the tick.
-maturityCycleTick = 0; // Reset for the next cycle.
-}
-break;
-
-case PlantState.Mature_Executing:
-AccumulateEnergyTick();
-currentState = PlantState.Mature_Idle;
-break;
-}
-
-UpdateUI();
-}
-
-void GrowNextStemStage() {
-if (currentStemStage >= targetStemLength) return;
-
-currentStemStage++;
-Vector2Int stemPos = Vector2Int.up * currentStemStage;
-
-if (Random.value < finalGrowthRandomness) {
-stemPos += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
-}
-
-GameObject stemCell = SpawnCellVisual(PlantCellType.Stem, stemPos, null, null);
-if (stemCell == null) {
-Debug.LogError($"[{gameObject.name}] Failed to spawn stem at stage {currentStemStage}");
-return;
-}
-
-if (finalLeafGap >= 0 && (currentStemStage % (finalLeafGap + 1)) == 0) {
-var leafPositions = CalculateLeafPositions(stemPos, currentStemStage);
-foreach (Vector2Int leafPos in leafPositions) {
-GameObject leafCell = SpawnCellVisual(PlantCellType.Leaf, leafPos, null, null);
-if (leafCell != null) {
-leafDataList.Add(new LeafData(leafPos, true));
-}
-}
-}
-}
-
-void CompleteGrowth() {
-if (currentState == PlantState.GrowthComplete) return;
-
-currentState = PlantState.GrowthComplete;
-isGrowthCompletionHandled = false; // For RT fallback compatibility
-
-if (showGrowthPercentage) UpdateGrowthPercentageUI(true);
-
-currentState = PlantState.Mature_Idle;
-maturityCycleTick = 0;
-
-if (Debug.isDebugBuild) {
-Debug.Log($"[{gameObject.name}] Growth completed! Transitioning to mature state.");
-}
-}
-
-void AccumulateEnergyTick() {
-if (finalPhotosynthesisRate <= 0 || finalMaxEnergy <= 0) return;
-
-float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
-int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
-float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ?
-PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(this) : 1.0f;
-
-float fireflyBonusRate = 0f;
-if (fireflyManagerInstance != null) {
-int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount( transform.position, fireflyManagerInstance.photosynthesisRadius);
-fireflyBonusRate = Mathf.Min(
-nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly,
-fireflyManagerInstance.maxPhotosynthesisBonus);
-}
-
-float ticksPerSecond = TickManager.Instance?.Config?.ticksPerRealSecond ?? 2f;
-float standardPhotosynthesis = (finalPhotosynthesisRate * leafCount * sunlight) / ticksPerSecond;
-float totalRate = (standardPhotosynthesis + (fireflyBonusRate / ticksPerSecond)) * tileMultiplier;
-
-currentEnergy = Mathf.Clamp(currentEnergy + totalRate, 0f, finalMaxEnergy);
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\Growth\PlantGrowth.cs
-
-﻿using System.Collections;
 using TMPro;
-using WegoSystem;
 
-pub enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
+pub cls PlantVisualManager {
+ro PlantGrowth plant;
+ro PlantShadowController shadowController;
+ro GameObject shadowPartPrefab;
+ro bool enableOutline;
 
-pub partial cls PlantGrowth : MonoBehaviour, ITickUpdateable {
+pub PlantOutlineController OutlineController { get; set; }
+ro GameObject outlinePartPrefab;
 
-[SerializeField] bool useWegoSystem = true;
+TMP_Text energyText;
+pub bool ShowGrowthPercentage { get; set; } = true;
+pub bool ContinuousIncrement { get; set; } = false;
 
-pub stat ro List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
-
-[SerializeField] TMP_Text energyText;
-[SerializeField] bool showGrowthPercentage = true;
-[SerializeField, Range(1, 25)] int percentageIncrement = 5;
-[SerializeField] bool continuousIncrement = false;
-
-[SerializeField] GameObject seedCellPrefab;
-[SerializeField] GameObject stemCellPrefab;
-[SerializeField] GameObject leafCellPrefab;
-[SerializeField] GameObject berryCellPrefab;
-[SerializeField] float cellSpacing = 0.08f;
-[SerializeField] PlantShadowController shadowController;
-[SerializeField] GameObject shadowPartPrefab;
-[SerializeField] bool enableOutline = true;
-[SerializeField] PlantOutlineController outlineController;
-[SerializeField] GameObject outlinePartPrefab;
-
-[SerializeField] bool allowPhotosynthesisDuringGrowth = false;
-
-NodeGraph nodeGraph;
-pub PlantState currentState = PlantState.Initializing;
-pub float currentEnergy = 0f;
-Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
-List<GameObject> activeCellGameObjects = new List<GameObject>();
-FireflyManager fireflyManagerInstance;
-GameObject rootCellInstance;
-
-float growthProgress = 0f;
-int maturityCycleTick = 0;
-int currentStemStage = 0;
-
-Coroutine growthCoroutine;
-bool isGrowthCompletionHandled = false;
-
-float poopDetectionRadius = 0f;
-float poopEnergyBonus = 0f;
-List<LeafData> leafDataList = new List<LeafData>();
-
-int targetStemLength;
-float finalGrowthSpeed;
-int finalLeafGap;
-int finalLeafPattern;
-float finalGrowthRandomness;
-float finalMaxEnergy;
-float finalPhotosynthesisRate;
-int maturityCycleTicks;
-float nodeCastDelay;
-
-int currentStemCount = 0;
-float cycleTimer = 0f;
+[SerializeField] int percentageIncrement = 5;
 int displayedGrowthPercentage = -1;
-bool? offsetRightForPattern1 = null;
-float estimatedTotalGrowthTime = 1f;
-float actualGrowthProgress = 0f;
-int stepsCompleted = 0;
-int totalPlannedSteps = 0;
 
-void Awake() {
-bool setupValid = true;
-if (shadowController == null) {
-shadowController = GetComponentInChildren<PlantShadowController>(true);
-if (shadowController == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantShadowController ref missing!", this); setupValid = false; }
-else { Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantShadowController dynamically.", this); }
-}
-if (shadowPartPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Shadow Part Prefab missing!", this); setupValid = false; }
-if (enableOutline) {
-if (outlineController == null) {
-outlineController = GetComponentInChildren<PlantOutlineController>(true);
-if (outlineController == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantOutlineController ref missing but outline is enabled!", this); setupValid = false; }
-else { Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantOutlineController dynamically.", this); }
-}
-if (outlinePartPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Outline Part Prefab missing but outline is enabled!", this); setupValid = false; }
-}
-if (seedCellPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Seed Cell Prefab missing!", this); setupValid = false; }
-if (energyText == null) Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Energy Text (TMP_Text) missing.", this);
-if (!setupValid) { enabled = false; return; }
-if (!enableOutline && outlineController != null) { outlineController.gameObject.SetActive(false); }
-fireflyManagerInstance = FireflyManager.Instance;
+pub PlantVisualManager(PlantGrowth plant, PlantShadowController shadowController, GameObject shadowPartPrefab, PlantOutlineController outlineController, GameObject outlinePartPrefab, bool enableOutline) {
+this.plant = plant;
+this.shadowController = shadowController;
+this.shadowPartPrefab = shadowPartPrefab;
+this.OutlineController = outlineController;
+this.outlinePartPrefab = outlinePartPrefab;
+this.enableOutline = enableOutline;
+
 EnsureUIReferences();
-AllActivePlants.Add(this);
 }
 
-void OnDestroy() {
-AllActivePlants.Remove(this);
-if (TickManager.Instance != null) { TickManager.Instance.UnregisterTickUpdateable(this); }
-StopAllCoroutines();
-growthCoroutine = null;
-if (PlantGrowthModifierManager.Instance != null) { PlantGrowthModifierManager.Instance.UnregisterPlant(this); }
-ClearAllVisuals();
+void EnsureUIReferences() {
+if (energyText) return;
+
+energyText = plant.GetComponentInChildren<TMP_Text>(true);
+if (!energyText) {
+Debug.LogWarning($"[{plant.gameObject.name}] Energy Text (TMP_Text) UI reference not assigned and not found in children.", plant.gameObject);
 }
 
-void Start() {
-if (useWegoSystem && TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-}
-UpdateUI();
+var plantType = plant.GetType();
+var showGrowthField = plantType.GetField("showGrowthPercentage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+if (showGrowthField != null) ShowGrowthPercentage = (bool)showGrowthField.GetValue(plant);
+
+var percentIncrementField = plantType.GetField("percentageIncrement", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+if (percentIncrementField != null) percentageIncrement = (int)percentIncrementField.GetValue(plant);
+
+var continuousField = plantType.GetField("continuousIncrement", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+if (continuousField != null) ContinuousIncrement = (bool)continuousField.GetValue(plant);
+
+var energyTextField = plantType.GetField("energyText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+if (energyTextField != null) energyText = (TMP_Text)energyTextField.GetValue(plant);
 }
 
-void Update() {
-if (useWegoSystem) {
-if (showGrowthPercentage && currentState == PlantState.Growing) { UpdateGrowthPercentageUI(); }
-return;
-}
-switch (currentState) {
-case PlantState.Growing:
-if (allowPhotosynthesisDuringGrowth) AccumulateEnergy();
-if (showGrowthPercentage && continuousIncrement) { UpdateGrowthPercentageUI(); }
-break;
-case PlantState.GrowthComplete:
-if (!isGrowthCompletionHandled) {
-isGrowthCompletionHandled = true;
-if (showGrowthPercentage && targetStemLength > 0) { UpdateGrowthPercentageUI(true); }
-float rtCooldown = maturityCycleTicks * (TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
-cycleTimer = rtCooldown;
-currentState = PlantState.Mature_Idle;
-UpdateUI();
-}
-break;
-case PlantState.Mature_Idle:
-AccumulateEnergy();
-UpdateUI();
-cycleTimer -= Time.deltaTime;
-if (cycleTimer <= 0f && currentEnergy >= 1f) { currentState = PlantState.Mature_Executing; StartCoroutine(ExecuteMatureCycle()); }
-break;
-case PlantState.Mature_Executing:
-AccumulateEnergy();
-UpdateUI();
-break;
-}
-}
-
-pub void InitializeAndGrow(NodeGraph graph) {
-if (graph == null || graph.nodes == null) { Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject); Destroy(gameObject); return; }
-if (growthCoroutine != null) { StopCoroutine(growthCoroutine); growthCoroutine = null; }
-ClearAllVisuals();
-rootCellInstance = null;
-isGrowthCompletionHandled = false;
-displayedGrowthPercentage = -1;
-growthProgress = 0f;
-maturityCycleTick = 0;
-currentStemStage = 0;
-currentStemCount = 0;
-offsetRightForPattern1 = null;
-estimatedTotalGrowthTime = 1f;
-stepsCompleted = 0;
-totalPlannedSteps = 0;
-actualGrowthProgress = 0f;
-nodeGraph = graph;
-currentState = PlantState.Initializing;
-currentEnergy = 0f;
-leafDataList.Clear();
-CalculateAndApplyStats();
-GameObject spawnedSeed = SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
-if (spawnedSeed != null) {
-rootCellInstance = spawnedSeed;
-if (PlantGrowthModifierManager.Instance != null && TileInteractionManager.Instance != null) {
-Vector3Int gridPos = TileInteractionManager.Instance.WorldToCell(transform.position);
-TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(gridPos);
-PlantGrowthModifierManager.Instance.RegisterPlantTile(this, currentTile);
-}
-if (targetStemLength > 0) {
-currentState = PlantState.Growing;
-UpdateGrowthPercentageUI();
-if (!useWegoSystem) { growthCoroutine = StartCoroutine(GrowthCoroutine_Time_Based()); }
+pub void RegisterShadowForCell(GameObject cellInstance, string cellTypeName) {
+if (shadowController == null || shadowPartPrefab == null || cellInstance == null) return;
+SpriteRenderer partRenderer = cellInstance.GetComponentInChildren<SpriteRenderer>();
+if (partRenderer != null) {
+shadowController.RegisterPlantPart(partRenderer, shadowPartPrefab);
 } else {
-Debug.LogWarning($"[{gameObject.name}] Target stem length is {targetStemLength}. Skipping visual growth phase.", gameObject);
-CompleteGrowth();
-}
-} else {
-Debug.LogError($"[{gameObject.name}] Failed to spawn initial seed! Aborting growth.", gameObject);
-currentState = PlantState.Mature_Idle;
-Destroy(gameObject, 0.1f);
-}
-UpdateUI();
-}
-
-void CalculateAndApplyStats() {
-if (nodeGraph == null) {
-Debug.LogError($"[{gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
-return;
-}
-
-float baseEnergyStorage = 10f;
-float basePhotosynthesisRate = 0.5f;
-int baseStemMin = 3;
-int baseStemMax = 5;
-float baseGrowthSpeedRate = 0.2f;
-int baseLeafGap = 1;
-int baseLeafPattern = 0;
-float baseGrowthRandomness = 0.1f;
-int baseCooldownTicks = 20;
-float baseCastDelay = 0.1f;
-float accumulatedEnergyStorage = 0f;
-float accumulatedPhotosynthesis = 0f;
-int stemLengthModifier = 0;
-float growthSpeedRateModifier = 0f;
-int leafGapModifier = 0;
-int currentLeafPattern = baseLeafPattern;
-float growthRandomnessModifier = 0f;
-int cooldownTicksModifier = 0;
-float castDelayModifier = 0f;
-bool seedFound = false;
-poopDetectionRadius = 0f;
-poopEnergyBonus = 0f;
-
-foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-if (node?.effects == null) continue;
-foreach (var effect in node.effects) {
-if (effect == null || !effect.isPassive) continue;
-switch (effect.effectType) {
-case NodeEffectType.SeedSpawn: seedFound = true; break;
-case NodeEffectType.EnergyStorage: accumulatedEnergyStorage += effect.primaryValue; break;
-case NodeEffectType.EnergyPhotosynthesis: accumulatedPhotosynthesis += effect.primaryValue; break;
-case NodeEffectType.StemLength: stemLengthModifier += Mathf.RoundToInt(effect.primaryValue); break;
-case NodeEffectType.GrowthSpeed: growthSpeedRateModifier += effect.primaryValue; break;
-case NodeEffectType.LeafGap: leafGapModifier += Mathf.RoundToInt(effect.primaryValue); break;
-case NodeEffectType.LeafPattern: currentLeafPattern = Mathf.Clamp(Mathf.RoundToInt(effect.primaryValue), 0, 4); break;
-case NodeEffectType.StemRandomness: growthRandomnessModifier += effect.primaryValue; break;
-case NodeEffectType.Cooldown: cooldownTicksModifier += Mathf.RoundToInt(effect.primaryValue); break;
-case NodeEffectType.CastDelay: castDelayModifier += effect.primaryValue; break;
-case NodeEffectType.PoopFertilizer: poopDetectionRadius = Mathf.Max(0f, effect.primaryValue); poopEnergyBonus = Mathf.Max(0f, effect.secondaryValue); break;
-}
+Debug.LogWarning($"Plant '{plant.gameObject.name}': {cellTypeName} missing SpriteRenderer. No shadow.", cellInstance);
 }
 }
 
-finalMaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
-finalPhotosynthesisRate = Mathf.Max(0f, basePhotosynthesisRate + accumulatedPhotosynthesis);
-int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier);
-int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
-finalGrowthSpeed = Mathf.Max(0.01f, baseGrowthSpeedRate + growthSpeedRateModifier);
-finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
-finalLeafPattern = currentLeafPattern;
-finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
-maturityCycleTicks = Mathf.Max(1, baseCooldownTicks + cooldownTicksModifier);
-nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
-targetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
-
-if (!seedFound) {
-Debug.LogWarning($"[{gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth aborted.", gameObject);
-}
-}
-
-void UpdateUI() {
+pub void UpdateUI() {
 if (energyText == null) return;
-if (showGrowthPercentage && (currentState == PlantState.Growing || (currentState == PlantState.GrowthComplete && !isGrowthCompletionHandled))) {
-}
-else {
-energyText.text = $"{Mathf.FloorToInt(currentEnergy)}/{Mathf.FloorToInt(finalMaxEnergy)}";
+if (ShowGrowthPercentage && (plant.CurrentState == PlantState.Growing ||
+(plant.CurrentState == PlantState.GrowthComplete && plant.GrowthLogic.GetStepsCompleted() > 0))) {
+} else {
+energyText.text = $"{Mathf.FloorToInt(plant.EnergySystem.CurrentEnergy)}/{Mathf.FloorToInt(plant.EnergySystem.MaxEnergy)}";
 }
 }
 
-void UpdateGrowthPercentageUI(bool forceComplete = false) {
-if (!showGrowthPercentage || energyText == null) return;
+pub void UpdateWegoUI() {
+if (ShowGrowthPercentage && plant.CurrentState == PlantState.Growing) {
+UpdateGrowthPercentageUI();
+}
+}
+
+pub void UpdateRealtimeGrowthUI() {
+if (ShowGrowthPercentage && ContinuousIncrement) {
+UpdateGrowthPercentageUI();
+}
+}
+
+pub void UpdateGrowthPercentageUI(bool forceComplete = false) {
+if (!ShowGrowthPercentage || energyText == null) return;
+
 float rawPercentageFloat;
-if (forceComplete || (currentState == PlantState.GrowthComplete && isGrowthCompletionHandled)) { rawPercentageFloat = 100f; }
-else if (useWegoSystem) {
-if (targetStemLength <= 0) { rawPercentageFloat = 100f; }
-else {
-float partialStepProgress = growthProgress * (100f / targetStemLength);
-rawPercentageFloat = ((float)currentStemStage / targetStemLength) * 100f + partialStepProgress;
-}
-}
-else if (continuousIncrement) {
-if (totalPlannedSteps > 0) {
-rawPercentageFloat = ((float)stepsCompleted / totalPlannedSteps) * 100f;
-if (actualGrowthProgress > 0f && stepsCompleted < totalPlannedSteps) {
-float stepSize = 100f / totalPlannedSteps;
-float partialStepProgress = actualGrowthProgress * stepSize;
-rawPercentageFloat = (stepsCompleted * stepSize) + partialStepProgress;
-}
-} else { rawPercentageFloat = (currentState == PlantState.Growing) ? 0f : 100f; }
+var logic = plant.GrowthLogic;
+
+if (forceComplete || plant.CurrentState == PlantState.GrowthComplete) {
+rawPercentageFloat = 100f;
+} else if (plant.GetType().GetField("useWegoSystem", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(plant) is bool useWego && useWego) {
+if (logic.TargetStemLength <= 0) {
+rawPercentageFloat = 100f;
 } else {
-if (targetStemLength <= 0) { rawPercentageFloat = 100f; }
-else { rawPercentageFloat = Mathf.Clamp(((float)currentStemCount / targetStemLength) * 100f, 0f, 100f); }
+float partialStepProgress = logic.GetGrowthProgress() * (100f / logic.TargetStemLength);
+rawPercentageFloat = ((float)logic.GetCurrentStemStage() / logic.TargetStemLength) * 100f + partialStepProgress;
 }
+} else if (ContinuousIncrement) {
+if (logic.GetTotalPlannedSteps() > 0) {
+rawPercentageFloat = ((float)logic.GetStepsCompleted() / logic.GetTotalPlannedSteps()) * 100f;
+if (logic.GetActualGrowthProgress() > 0f && logic.GetStepsCompleted() < logic.GetTotalPlannedSteps()) {
+float stepSize = 100f / logic.GetTotalPlannedSteps();
+float partialStepProgress = logic.GetActualGrowthProgress() * stepSize;
+rawPercentageFloat = (logic.GetStepsCompleted() * stepSize) + partialStepProgress;
+}
+} else {
+rawPercentageFloat = (plant.CurrentState == PlantState.Growing) ? 0f : 100f;
+}
+} else {
+if (logic.TargetStemLength <= 0) {
+rawPercentageFloat = 100f;
+} else {
+rawPercentageFloat = Mathf.Clamp(((float)logic.GetCurrentStemCount() / logic.TargetStemLength) * 100f, 0f, 100f);
+}
+}
+
 rawPercentageFloat = Mathf.Clamp(rawPercentageFloat, 0f, 100f);
 int targetDisplayValue;
-if (percentageIncrement <= 1) { targetDisplayValue = Mathf.FloorToInt(rawPercentageFloat); }
-else { targetDisplayValue = Mathf.RoundToInt(rawPercentageFloat / percentageIncrement) * percentageIncrement; }
+if (percentageIncrement <= 1) {
+targetDisplayValue = Mathf.FloorToInt(rawPercentageFloat);
+} else {
+targetDisplayValue = Mathf.RoundToInt(rawPercentageFloat / percentageIncrement) * percentageIncrement;
+}
 targetDisplayValue = Mathf.Min(targetDisplayValue, 100);
-if (targetDisplayValue == 100 && currentState == PlantState.Growing && !forceComplete) { targetDisplayValue = 99; }
+
+if (targetDisplayValue == 100 && plant.CurrentState == PlantState.Growing && !forceComplete) {
+targetDisplayValue = 99;
+}
+
 if (targetDisplayValue != displayedGrowthPercentage) {
 displayedGrowthPercentage = targetDisplayValue;
 energyText.text = $"{displayedGrowthPercentage}%";
 }
 }
 
-void EnsureUIReferences() {
-if (energyText) return;
-energyText = GetComponentInChildren<TMP_Text>(true);
-if (!energyText) { Debug.LogWarning($"[{gameObject.name}] Energy Text (TMP_Text) UI reference not assigned and not found in children.", gameObject); }
+pub void ResetDisplayState() {
+displayedGrowthPercentage = -1;
 }
-
-pub bool DoesCellExistAt(Vector2Int coord) { ret cells.ContainsKey(coord); }
-pub float GetCellSpacing() { ret this.cellSpacing; }
-pub GameObject GetCellGameObjectAt(Vector2Int coord) { ret activeCellGameObjects.FirstOrDefault(go => go != null && go.GetComponent<PlantCell>()?.GridCoord == coord); }
-pub bool IsOutlineEnabled() { ret enableOutline; }
-pub float GetPoopDetectionRadius() { ret poopDetectionRadius; }
-pub void SetWegoSystem(bool enabled) {
-bool wasEnabled = useWegoSystem;
-useWegoSystem = enabled;
-if (enabled && !wasEnabled && TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-if (currentState == PlantState.Growing && growthCoroutine != null) { StopCoroutine(growthCoroutine); growthCoroutine = null; }
-} else if (!enabled && wasEnabled && TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
-if (currentState == PlantState.Growing) { growthCoroutine = StartCoroutine(GrowthCoroutine_Time_Based()); }
-}
-}
-
 }
 
 ////////////////////////////////////////////////////////////
