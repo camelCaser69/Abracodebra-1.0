@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 515,305 → 347,800 chars (32.5% reduction)
-Estimated tokens saved: ~41,876
+Compression Stats: 496,884 → 336,624 chars (32.3% reduction)
+Estimated tokens saved: ~40,065
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -44,72 +44,72 @@ using System;
   FaunaManager (Assets\Scripts\Ecosystem\Management/) L2734
   FloraManager (Assets\Scripts\Ecosystem\Management/) L2942
   WaveManager (Assets\Scripts\Ecosystem\Management/) L3172
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3455
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3484
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3514
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3527
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3555
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3616
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3661
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3712
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3746
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3816
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3836
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3871
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3886
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3971
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4083
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4106
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4124
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4151
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4160
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4328
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4367
-  PlantGrowth.CellManagement (Assets\Scripts\PlantSystem\Growth/) L4391
-  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L4635
-  PlantGrowth.RealtimeFallback (Assets\Scripts\PlantSystem\Growth/) L4994
-  PlantGrowth.WegoGrowth (Assets\Scripts\PlantSystem\Growth/) L5228
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5402
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5780
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6078
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6145
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6441
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6560
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6764
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6898
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7218
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7354
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7647
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7735
-  GridSnapStartup (Assets\Scripts\Ticks/) L7836
-  WegoDebugUI (Assets\Scripts\Ticks/) L7902
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7939
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8008
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8239
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8250
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8334
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8439
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8834
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8870
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9060
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9202
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9320
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9685
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9889
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9929
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9949
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9961
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9996
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10155
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3453
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3482
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3512
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3525
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3553
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3614
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3659
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3710
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3744
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3814
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3834
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3869
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3884
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3969
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4096
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4119
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4137
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4164
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4173
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4341
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4380
+  PlantGrowth.CellManagement (Assets\Scripts\PlantSystem\Growth/) L4404
+  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L4534
+  PlantGrowth.RealtimeFallback (Assets\Scripts\PlantSystem\Growth/) L4769
+  PlantGrowth.WegoGrowth (Assets\Scripts\PlantSystem\Growth/) L4897
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5019
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5345
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5643
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5710
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6006
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6125
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6329
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6463
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6783
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L6919
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7212
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7300
+  GridSnapStartup (Assets\Scripts\Ticks/) L7401
+  TurnPhaseManager (Assets\Scripts\Ticks/) L7467
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7583
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7652
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L7883
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L7894
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L7978
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8083
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8478
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8514
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8704
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L8846
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L8964
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9168
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9349
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9389
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9409
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9421
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9456
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9615
 
 [WegoSystem]
-  GridPosition (Assets\Scripts\Ticks/) L10165
-  TickConfiguration (Assets\Scripts\Ticks/) L10669
-  ITickUpdateable (Assets\Scripts\Ticks/) L10801
-  TurnPhaseManager (Assets\Scripts\Ticks/) L10963
+  GridPositionManager (Assets\Scripts\Ticks/) L9625
+  GridPosition (Assets\Scripts\Ticks/) L9922
+  TickConfiguration (Assets\Scripts\Ticks/) L10137
+  ITickUpdateable (Assets\Scripts\Ticks/) L10269
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11113
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10431
 
 ================================================================================
 SCRIPTS
@@ -974,7 +974,7 @@ using WegoSystem;
 
 pub cls AnimalController : MonoBehaviour, ITickUpdateable {  // No longer inherits from SpeedModifiable
 [SerializeField] bool useWegoMovement = true;
-[SerializeField] int thinkingTickInterval = 3;
+[SerializeField] pub int thinkingTickInterval = 3;
 
 AnimalDefinition definition;
 AnimalDiet animalDiet;
@@ -3293,7 +3293,6 @@ pub stat WaveManager Instance { get; set; }
 [SerializeField] int activeWaveDefinitionIndex = -1;
 
 WaveDefinition currentActiveWaveDef = null;
-int dayCyclesRemainingForThisWaveDef = 0;
 bool hasSpawnedForThisWeatherCycle = false;
 Coroutine activeWaveExecutionCoroutine;
 
@@ -3483,7 +3482,6 @@ ClearAllActiveAnimals();
 }
 currentActiveWaveDef = null;
 activeWaveDefinitionIndex = -1;
-dayCyclesRemainingForThisWaveDef = 0;
 hasSpawnedForThisWeatherCycle = false;
 waveStartTick = 0;
 waveEndTick = 0;
@@ -4060,8 +4058,9 @@ _storedSequence = null;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\NodeDefinition.cs
 
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using System.Text;
+using WegoSystem;
 
 pub cls NodeDefinition : ScriptableObject, ITooltipDataProvider {
 
@@ -4122,7 +4121,7 @@ foreach (var effect in nodeData.effects) {
 if (effect == null) continue;
 Color effectColor = effect.isPassive ? passiveEffectColor : activeEffectColor;
 string hexColor = ColorUtility.ToHtmlStringRGB(effectColor);
-sb.Append($"<color=#{hexColor}>{effectPrefix}{effect.effectType}: ");
+sb.Append($"<color=#{hexColor}>{effectPrefix}{FormatEffectName(effect.effectType)}: ");
 sb.Append(FormatEffectValue(effect));
 sb.Append("</color>\n");
 }
@@ -4142,11 +4141,26 @@ sb.Append("Empty");
 ret sb.ToString().TrimEnd();
 }
 
+string FormatEffectName(NodeEffectType type) {
+switch (type) {
+case NodeEffectType.GrowthSpeed:
+ret "Growth Rate";
+case NodeEffectType.Cooldown:
+ret "Cooldown";
+default:
+ret type.ToString();
+}
+}
+
 string FormatEffectValue(NodeEffectData effect) {
 string result = effect.primaryValue.ToString("G3");
 bool hasSecondaryValue = false;
 
 switch (effect.effectType) {
+case NodeEffectType.GrowthSpeed:
+ret $"{effect.primaryValue:F2} (stems/tick)";
+case NodeEffectType.Cooldown:
+ret $"{Mathf.RoundToInt(effect.primaryValue)} Ticks";
 case NodeEffectType.ScentModifier:
 case NodeEffectType.PoopFertilizer:
 hasSecondaryValue = true;
@@ -4166,7 +4180,6 @@ result += $" ({effect.scentDefinitionReference.displayName})";
 
 ret result;
 }
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -4484,7 +4497,6 @@ ParentPlantGrowth.ReportCellDestroyed(GridCoord);
 using WegoSystem;
 
 pub partial cls PlantGrowth : MonoBehaviour {
-
 pub void ReportCellDestroyed(Vector2Int coord) {
 if (cells.ContainsKey(coord)) {
 PlantCellType cellType = cells[coord];
@@ -4493,12 +4505,8 @@ if (cellType == PlantCellType.Leaf) {
 for (int i = 0; i < leafDataList.Count; i++) {
 if (leafDataList[i].GridCoord == coord) {
 LeafData updatedData = leafDataList[i];
-updatedData.IsActive = false; // Mark as eaten/missing
+updatedData.IsActive = false;
 leafDataList[i] = updatedData;
-
-if (Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] Leaf at {coord} marked as missing for potential regrowth via ReportCellDestroyed.");
-
 break;
 }
 }
@@ -4513,42 +4521,6 @@ outlineController.OnPlantCellRemoved(coord);
 }
 }
 
-pub void RemovePlantCell(GameObject cellToRemove) {
-if (cellToRemove == null) return;
-
-PlantCell cellComp = cellToRemove.GetComponent<PlantCell>();
-if (cellComp == null) { Destroy(cellToRemove); return; }
-
-Vector2Int coord = cellComp.GridCoord;
-
-if (cellComp.CellType == PlantCellType.Leaf) {
-for (int i = 0; i < leafDataList.Count; i++) {
-if (leafDataList[i].GridCoord == coord) {
-LeafData updatedData = leafDataList[i];
-updatedData.IsActive = false; // Mark as eaten/missing
-leafDataList[i] = updatedData;
-
-if (Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] Leaf at {coord} marked as missing for potential regrowth.");
-
-break;
-}
-}
-}
-
-SpriteRenderer partRenderer = cellToRemove.GetComponentInChildren<SpriteRenderer>();
-if (shadowController != null && partRenderer != null) {
-shadowController.UnregisterPlantPart(partRenderer);
-}
-
-if (cells.ContainsKey(coord)) {
-cells.Remove(coord);
-}
-activeCellGameObjects.Remove(cellToRemove);
-
-Destroy(cellToRemove);
-}
-
 void ClearAllVisuals() {
 List<GameObject> cellsToClear = new List<GameObject>(activeCellGameObjects);
 foreach (GameObject cellGO in cellsToClear) {
@@ -4558,7 +4530,6 @@ Destroy(cellGO);
 }
 activeCellGameObjects.Clear();
 cells.Clear();
-
 rootCellInstance = null;
 }
 
@@ -4594,11 +4565,7 @@ cells[coords] = cellType;
 activeCellGameObjects.Add(instance);
 
 SortableEntity sorter = instance.GetComponent<SortableEntity>() ?? instance.AddComponent<SortableEntity>();
-if (cellType == PlantCellType.Seed) {
-sorter.SetUseParentYCoordinate(false);
-} else {
-sorter.SetUseParentYCoordinate(true);
-}
+sorter.SetUseParentYCoordinate(cellType != PlantCellType.Seed);
 
 if (cellType == PlantCellType.Fruit) {
 ApplyScentDataToObject(instance, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
@@ -4614,7 +4581,6 @@ ret instance;
 
 void RegisterShadowForCell(GameObject cellInstance, string cellTypeName) {
 if (shadowController == null || shadowPartPrefab == null || cellInstance == null) return;
-
 SpriteRenderer partRenderer = cellInstance.GetComponentInChildren<SpriteRenderer>();
 if (partRenderer != null) {
 shadowController.RegisterPlantPart(partRenderer, shadowPartPrefab);
@@ -4623,101 +4589,34 @@ Debug.LogWarning($"Plant '{gameObject.name}': {cellTypeName} missing SpriteRende
 }
 }
 
-void CalculateAndApplyStats() {
-if (nodeGraph == null) {
-Debug.LogError($"[{gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
-return;
+List<Vector2Int> CalculateLeafPositions(Vector2Int stemPos, int stageCounter) {
+List<Vector2Int> leafPositions = new List<Vector2Int>();
+Vector2Int leftBase = stemPos + Vector2Int.left;
+Vector2Int rightBase = stemPos + Vector2Int.right;
+
+switch (finalLeafPattern) {
+case 0: leafPositions.Add(leftBase); leafPositions.Add(rightBase); break;
+case 1:
+if (offsetRightForPattern1 == null) offsetRightForPattern1 = Random.value < 0.5f;
+if (offsetRightForPattern1.Value) { leafPositions.Add(leftBase); leafPositions.Add(rightBase + Vector2Int.up); }
+else { leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); }
+break;
+case 2:
+switch (stageCounter % 4) {
+case 0: case 2: leafPositions.Add(leftBase); leafPositions.Add(rightBase); break;
+case 1: leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); break;
+case 3: leafPositions.Add(leftBase); leafPositions.Add(rightBase + Vector2Int.up); break;
 }
-
-float baseEnergyStorage = 10f;
-float basePhotosynthesisRate = 0.5f;
-int baseStemMin = 3;
-int baseStemMax = 5;
-float baseGrowthSpeedInterval = 0.5f;
-int baseLeafGap = 1;
-int baseLeafPattern = 0;
-float baseGrowthRandomness = 0.1f;
-float baseCooldown = 5f;
-float baseCastDelay = 0.1f;
-
-float accumulatedEnergyStorage = 0f;
-float accumulatedPhotosynthesis = 0f;
-int stemLengthModifier = 0;
-float growthSpeedTimeModifier = 0f;
-int leafGapModifier = 0;
-int currentLeafPattern = baseLeafPattern;
-float growthRandomnessModifier = 0f;
-float cooldownModifier = 0f;
-float castDelayModifier = 0f;
-bool seedFound = false;
-
-poopDetectionRadius = 0f;
-poopEnergyBonus = 0f;
-
-foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-if (node?.effects == null) continue;
-foreach (var effect in node.effects) {
-if (effect == null || !effect.isPassive) continue;
-switch (effect.effectType) {
-case NodeEffectType.SeedSpawn:
-seedFound = true;
 break;
-case NodeEffectType.EnergyStorage:
-accumulatedEnergyStorage += effect.primaryValue;
+case 3:
+int spiralDir = (stageCounter % 2 == 0) ? 1 : -1;
+if (spiralDir > 0) { leafPositions.Add(leftBase); leafPositions.Add(rightBase + Vector2Int.up); }
+else { leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); }
 break;
-case NodeEffectType.EnergyPhotosynthesis:
-accumulatedPhotosynthesis += effect.primaryValue;
-break;
-case NodeEffectType.StemLength:
-stemLengthModifier += Mathf.RoundToInt(effect.primaryValue);
-break;
-case NodeEffectType.GrowthSpeed:
-growthSpeedTimeModifier += effect.primaryValue;
-break;
-case NodeEffectType.LeafGap:
-leafGapModifier += Mathf.RoundToInt(effect.primaryValue);
-break;
-case NodeEffectType.LeafPattern:
-currentLeafPattern = Mathf.Clamp(Mathf.RoundToInt(effect.primaryValue), 0, 4);
-break;
-case NodeEffectType.StemRandomness:
-growthRandomnessModifier += effect.primaryValue;
-break;
-case NodeEffectType.Cooldown:
-cooldownModifier += effect.primaryValue;
-break;
-case NodeEffectType.CastDelay:
-castDelayModifier += effect.primaryValue;
-break;
-case NodeEffectType.PoopFertilizer:
-poopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
-poopEnergyBonus = Mathf.Max(0f, effect.secondaryValue);
-break;
+case 4: leafPositions.Add(leftBase); leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); leafPositions.Add(rightBase + Vector2Int.up); break;
+default: leafPositions.Add(leftBase); leafPositions.Add(rightBase); break;
 }
-}
-}
-
-finalMaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
-finalPhotosynthesisRate = Mathf.Max(0f, basePhotosynthesisRate + accumulatedPhotosynthesis);
-int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier);
-int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
-finalGrowthSpeed = Mathf.Max(0.01f, baseGrowthSpeedInterval + growthSpeedTimeModifier);
-finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
-finalLeafPattern = currentLeafPattern;
-finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
-cycleCooldown = Mathf.Max(0.1f, baseCooldown + cooldownModifier);
-nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
-
-targetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
-
-if (useWegoSystem && TickManager.Instance?.Config != null) {
-growthTicksPerStage = TickManager.Instance.Config.plantGrowthTicksPerStage;
-maturityCycleTicks = Mathf.RoundToInt(cycleCooldown * (TickManager.Instance.Config.ticksPerRealSecond));
-}
-
-if (!seedFound) {
-Debug.LogWarning($"[{gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth aborted.", gameObject);
-}
+ret leafPositions;
 }
 }
 
@@ -4727,7 +4626,6 @@ Debug.LogWarning($"[{gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth 
 ﻿using System.Collections;
 
 pub partial cls PlantGrowth : MonoBehaviour {
-
 void ExecuteMatureCycleTick() {
 if (nodeGraph?.nodes == null || nodeGraph.nodes.Count == 0) {
 Debug.LogError($"[{gameObject.name}] NodeGraph missing or empty!");
@@ -4735,29 +4633,22 @@ return;
 }
 
 float damageMultiplier = 1.0f;
-Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
-Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
+var accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
+var accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
 float totalEnergyCostForCycle = 0f;
 
 foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-if (node?.effects == null || node.effects.Count == 0) continue;
-
+if (node?.effects == null) continue;
 foreach (var effect in node.effects) {
 if (effect == null || effect.isPassive) continue;
-
 switch (effect.effectType) {
-case NodeEffectType.EnergyCost:
-totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
-break;
-case NodeEffectType.Damage:
-damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue);
-break;
+case NodeEffectType.EnergyCost: totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue); break;
+case NodeEffectType.Damage: damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue); break;
 case NodeEffectType.ScentModifier:
 if (effect.scentDefinitionReference != null) {
 ScentDefinition key = effect.scentDefinitionReference;
 accumulatedScentRadiusBonus.TryGetValue(key, out float currentRad);
 accumulatedScentRadiusBonus[key] = currentRad + effect.primaryValue;
-
 accumulatedScentStrengthBonus.TryGetValue(key, out float currentStr);
 accumulatedScentStrengthBonus[key] = currentStr + effect.secondaryValue;
 }
@@ -4766,33 +4657,22 @@ break;
 }
 }
 
-if (poopDetectionRadius > 0f) {
-CheckForPoopAndAbsorb();
-}
+if (poopDetectionRadius > 0f) CheckForPoopAndAbsorb();
 
 if (currentEnergy < totalEnergyCostForCycle) {
-if (Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] Not enough energy ({currentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
+if (Debug.isDebugBuild) Debug.Log($"[{gameObject.name}] Not enough energy ({currentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
 return;
 }
 
 currentEnergy = Mathf.Max(0f, currentEnergy - totalEnergyCostForCycle);
 
 foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-if (node?.effects == null || node.effects.Count == 0) continue;
-
+if (node?.effects == null) continue;
 foreach (var effect in node.effects) {
-if (effect == null || effect.isPassive ||
-effect.effectType == NodeEffectType.EnergyCost ||
-effect.effectType == NodeEffectType.Damage ||
-effect.effectType == NodeEffectType.ScentModifier) continue;
-
+if (effect == null || effect.isPassive || effect.effectType == NodeEffectType.EnergyCost || effect.effectType == NodeEffectType.Damage || effect.effectType == NodeEffectType.ScentModifier) continue;
 switch (effect.effectType) {
 case NodeEffectType.Output:
-OutputNodeEffect outputComp = GetComponentInChildren<OutputNodeEffect>();
-if (outputComp != null) {
-outputComp.Activate(damageMultiplier, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
-}
+GetComponentInChildren<OutputNodeEffect>()?.Activate(damageMultiplier, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
 break;
 case NodeEffectType.GrowBerry:
 TrySpawnBerry(accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
@@ -4805,55 +4685,44 @@ break;
 IEnumerator ExecuteMatureCycle() {
 if (nodeGraph?.nodes == null || nodeGraph.nodes.Count == 0) {
 Debug.LogError($"[{gameObject.name}] NodeGraph missing or empty!", gameObject);
+float rtCooldown = maturityCycleTicks * (WegoSystem.TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
+cycleTimer = rtCooldown;
 currentState = PlantState.Mature_Idle;
-cycleTimer = cycleCooldown;
 yield break;
 }
 
 float damageMultiplier = 1.0f;
-Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
-Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
+var accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
+var accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
 float totalEnergyCostForCycle = 0f;
 
 foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-if (node?.effects == null || node.effects.Count == 0) continue;
-
+if (node?.effects == null) continue;
 foreach (var effect in node.effects) {
 if (effect == null || effect.isPassive) continue;
-
 switch (effect.effectType) {
-case NodeEffectType.EnergyCost:
-totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
-break;
-case NodeEffectType.Damage:
-damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue);
-break;
+case NodeEffectType.EnergyCost: totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue); break;
+case NodeEffectType.Damage: damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue); break;
 case NodeEffectType.ScentModifier:
 if (effect.scentDefinitionReference != null) {
 ScentDefinition key = effect.scentDefinitionReference;
 accumulatedScentRadiusBonus.TryGetValue(key, out float currentRad);
 accumulatedScentRadiusBonus[key] = currentRad + effect.primaryValue;
-
 accumulatedScentStrengthBonus.TryGetValue(key, out float currentStr);
 accumulatedScentStrengthBonus[key] = currentStr + effect.secondaryValue;
-}
-else {
-Debug.LogWarning($"Node '{node.nodeDisplayName ?? "Unnamed"}' has ScentModifier effect but ScentDefinition reference is NULL.");
-}
+} else { Debug.LogWarning($"Node '{node.nodeDisplayName ?? "Unnamed"}' has ScentModifier effect but ScentDefinition reference is NULL."); }
 break;
 }
 }
 }
 
-if (poopDetectionRadius > 0f) {
-CheckForPoopAndAbsorb();
-}
+if (poopDetectionRadius > 0f) CheckForPoopAndAbsorb();
 
 if (currentEnergy < totalEnergyCostForCycle) {
-if(Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] Not enough energy ({currentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
+if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name}] Not enough energy ({currentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
+float rtCooldown = maturityCycleTicks * (WegoSystem.TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
+cycleTimer = rtCooldown;
 currentState = PlantState.Mature_Idle;
-cycleTimer = cycleCooldown;
 yield break;
 }
 
@@ -4861,28 +4730,16 @@ currentEnergy = Mathf.Max(0f, currentEnergy - totalEnergyCostForCycle);
 UpdateUI();
 
 foreach (var node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-if (node?.effects == null || node.effects.Count == 0) continue;
-
+if (node?.effects == null) continue;
 bool hasActionEffectInNode = node.effects.Any(eff => eff != null && !eff.isPassive && eff.effectType != NodeEffectType.EnergyCost && eff.effectType != NodeEffectType.Damage && eff.effectType != NodeEffectType.ScentModifier);
-
 if (hasActionEffectInNode && nodeCastDelay > 0.01f) {
 yield ret new WaitForSeconds(nodeCastDelay);
 }
-
 foreach (var effect in node.effects) {
-if (effect == null || effect.isPassive ||
-effect.effectType == NodeEffectType.EnergyCost ||
-effect.effectType == NodeEffectType.Damage ||
-effect.effectType == NodeEffectType.ScentModifier) continue;
-
+if (effect == null || effect.isPassive || effect.effectType == NodeEffectType.EnergyCost || effect.effectType == NodeEffectType.Damage || effect.effectType == NodeEffectType.ScentModifier) continue;
 switch (effect.effectType) {
 case NodeEffectType.Output:
-OutputNodeEffect outputComp = GetComponentInChildren<OutputNodeEffect>();
-if (outputComp != null) {
-outputComp.Activate(damageMultiplier, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
-} else {
-Debug.LogWarning($"[{gameObject.name}] Node requested Output effect, but no OutputNodeEffect component found.", this);
-}
+GetComponentInChildren<OutputNodeEffect>()?.Activate(damageMultiplier, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
 break;
 case NodeEffectType.GrowBerry:
 TrySpawnBerry(accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
@@ -4891,7 +4748,8 @@ break;
 }
 }
 
-cycleTimer = cycleCooldown;
+float finalRtCooldown = maturityCycleTicks * (WegoSystem.TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
+cycleTimer = finalRtCooldown;
 currentState = PlantState.Mature_Idle;
 }
 
@@ -4904,13 +4762,8 @@ return;
 var potentialCoords = cells
 .Where(cellKvp => cellKvp.Value == PlantCellType.Stem || cellKvp.Value == PlantCellType.Seed)
 .SelectMany(cellKvp => {
-Vector2Int coord = cellKvp.Key;
 Vector2Int[] berryOffsets = { Vector2Int.up, Vector2Int.left, Vector2Int.right };
-List<Vector2Int> candidates = new List<Vector2Int>();
-foreach(var offset in berryOffsets) {
-candidates.Add(coord + offset);
-}
-ret candidates;
+ret berryOffsets.Select(offset => cellKvp.Key + offset);
 })
 .Where(coord => !cells.ContainsKey(coord))
 .Distinct()
@@ -4923,26 +4776,12 @@ if (berryGO == null) {
 Debug.LogError($"[{gameObject.name}] Failed to spawn berry visual at {chosenCoord}, SpawnCellVisual returned null.");
 }
 } else {
-if(Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] No valid empty adjacent locations found to spawn a berry.");
+if(Debug.isDebugBuild) Debug.Log($"[{gameObject.name}] No valid empty adjacent locations found to spawn a berry.");
 }
 }
 
 pub void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses) {
-if (targetObject == null) {
-Debug.LogError("ApplyScentDataToObject: targetObject is null.");
-return;
-}
-
-if (EcosystemManager.Instance == null) {
-Debug.LogError("ApplyScentDataToObject: EcosystemManager instance not found.");
-return;
-}
-
-if (EcosystemManager.Instance.scentLibrary == null) {
-Debug.LogWarning("ApplyScentDataToObject: Scent Library not assigned in EcosystemManager.");
-return;
-}
+if (targetObject == null || EcosystemManager.Instance?.scentLibrary == null) return;
 
 ScentDefinition strongestScentDef = null;
 float maxStrengthBonus = -1f;
@@ -4957,27 +4796,15 @@ strongestScentDef = kvp.Key;
 }
 
 if (strongestScentDef != null) {
-ScentSource scentSource = targetObject.GetComponent<ScentSource>();
-if (scentSource == null) {
-scentSource = targetObject.AddComponent<ScentSource>();
-}
-
+ScentSource scentSource = targetObject.GetComponent<ScentSource>() ?? targetObject.AddComponent<ScentSource>();
 scentSource.definition = strongestScentDef;
-
 scentRadiusBonuses.TryGetValue(strongestScentDef, out float radiusBonus);
 scentSource.radiusModifier = radiusBonus;
 scentSource.strengthModifier = maxStrengthBonus;
 
 if (strongestScentDef.particleEffectPrefab != null) {
-bool particleExists = false;
-foreach(Transform child in targetObject.transform){
-if(child.TryGetComponent<ParticleSystem>(out _)){
-particleExists = true;
-break;
-}
-}
-if (!particleExists) {
-Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform.position, Quaternion.identity, targetObject.transform);
+if (!targetObject.transform.GetComponentInChildren<ParticleSystem>()) {
+Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform);
 }
 }
 }
@@ -4986,45 +4813,18 @@ Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform.posit
 void CheckForPoopAndAbsorb() {
 bool hasMissingLeaves = leafDataList.Any(leaf => !leaf.IsActive);
 bool canAddEnergy = poopEnergyBonus > 0f;
-
-if (Debug.isDebugBuild && poopDetectionRadius > 0f) {
-string leafStatus = hasMissingLeaves ?
-$"Has {leafDataList.Count(l => !l.IsActive)} missing leaves" :
-"No missing leaves";
-Debug.Log($"[{gameObject.name}] PoopFertilizer: {leafStatus}, Radius: {poopDetectionRadius}, Energy bonus: {poopEnergyBonus}");
-}
-
 if (!hasMissingLeaves && !canAddEnergy) return;
 
 Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, poopDetectionRadius);
-
-if (Debug.isDebugBuild && poopDetectionRadius > 0f) {
-Debug.Log($"[{gameObject.name}] PoopFertilizer: Found {colliders.Length} colliders in radius {poopDetectionRadius}");
-int poopCount = 0;
-foreach (Collider2D col in colliders) {
-if (col.GetComponent<PoopController>() != null)
-poopCount++;
-}
-Debug.Log($"[{gameObject.name}] PoopFertilizer: {poopCount} of those colliders have PoopController");
-}
-
 foreach (Collider2D collider in colliders) {
 PoopController poop = collider.GetComponent<PoopController>();
 if (poop != null) {
 bool absorbed = false;
-
-if (hasMissingLeaves) {
-absorbed = TryRegrowLeaf();
-}
-
+if (hasMissingLeaves) absorbed = TryRegrowLeaf();
 if ((!absorbed || !hasMissingLeaves) && canAddEnergy) {
 currentEnergy = Mathf.Min(finalMaxEnergy, currentEnergy + poopEnergyBonus);
 absorbed = true;
-
-if (Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] Added {poopEnergyBonus} energy from poop fertilizer. Current energy: {currentEnergy}");
 }
-
 if (absorbed) {
 Destroy(poop.gameObject);
 break;
@@ -5035,47 +4835,22 @@ break;
 
 bool TryRegrowLeaf() {
 int missingLeafIndex = -1;
-
-if (Debug.isDebugBuild) {
-int totalLeaves = leafDataList.Count;
-int missingLeaves = leafDataList.Count(leaf => !leaf.IsActive);
-Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Total leaves: {totalLeaves}, Missing leaves: {missingLeaves}");
-}
-
 for (int i = 0; i < leafDataList.Count; i++) {
 if (!leafDataList[i].IsActive) {
 missingLeafIndex = i;
 break;
 }
 }
-
-if (missingLeafIndex == -1) {
-if (Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] TryRegrowLeaf: No missing leaves found to regrow.");
-ret false;
-}
+if (missingLeafIndex == -1) ret false;
 
 Vector2Int leafCoord = leafDataList[missingLeafIndex].GridCoord;
-
-if (cells.ContainsKey(leafCoord)) {
-if (Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Cannot regrow leaf at {leafCoord} because cell is already occupied.");
-ret false;
-}
+if (cells.ContainsKey(leafCoord)) ret false;
 
 GameObject newLeaf = SpawnCellVisual(PlantCellType.Leaf, leafCoord);
-
 if (newLeaf != null) {
 leafDataList[missingLeafIndex] = new LeafData(leafCoord, true);
-
-if (Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Successfully regrew leaf at {leafCoord} using poop fertilizer!");
 ret true;
 }
-
-if (Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] TryRegrowLeaf: Failed to spawn new leaf at {leafCoord}");
-
 ret false;
 }
 }
@@ -5086,14 +4861,29 @@ ret false;
 ﻿using System.Collections;
 
 pub partial cls PlantGrowth : MonoBehaviour {
+cls GrowthStep { pub PlantCellType CellType; pub Vector2Int Position; pub int StemIndex; }
 
-cls GrowthStep {
-pub PlantCellType CellType;
-pub Vector2Int Position;
-pub int StemIndex;
+void AccumulateEnergy() {
+if (finalPhotosynthesisRate <= 0 || finalMaxEnergy <= 0) return;
+
+float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
+int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
+float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ?
+PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(this) : 1.0f;
+
+float fireflyBonusRate = 0f;
+if (fireflyManagerInstance != null) {
+int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(transform.position, fireflyManagerInstance.photosynthesisRadius);
+fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly, fireflyManagerInstance.maxPhotosynthesisBonus);
 }
 
-IEnumerator GrowthCoroutine_TimeBased() {
+float standardPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight;
+float totalRate = (standardPhotosynthesis + fireflyBonusRate) * tileMultiplier;
+float delta = totalRate * Time.deltaTime;
+currentEnergy = Mathf.Clamp(currentEnergy + delta, 0f, finalMaxEnergy);
+}
+
+IEnumerator GrowthCoroutine_Time_Based() {
 if (targetStemLength <= 0) {
 currentState = PlantState.GrowthComplete;
 growthCoroutine = null;
@@ -5101,7 +4891,6 @@ yield break;
 }
 
 List<GrowthStep> growthPlan = PreCalculateGrowthPlan();
-
 totalPlannedSteps = growthPlan.Count;
 stepsCompleted = 0;
 actualGrowthProgress = 0f;
@@ -5112,54 +4901,35 @@ growthCoroutine = null;
 yield break;
 }
 
-int stemStepsCount = growthPlan.Count(step => step.CellType == PlantCellType.Stem);
-if (stemStepsCount == 0) stemStepsCount = 1;
+float ticksPerSecond = WegoSystem.TickManager.Instance?.Config.ticksPerRealSecond ?? 2.0f;
+float baseTimePerStep = 1f / (Mathf.Max(0.01f, finalGrowthSpeed) * ticksPerSecond);
 
-currentGrowthElapsedTime = 0f;
-float baseTimePerStep = finalGrowthSpeed;
 if (baseTimePerStep <= 0.001f) baseTimePerStep = 0.01f;
 
-float initialTileMultiplier = 1.0f;
-if (PlantGrowthModifierManager.Instance != null) {
-initialTileMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(this);
+float initialTileMultiplier = PlantGrowthModifierManager.Instance?.GetGrowthSpeedMultiplier(this) ?? 1.0f;
 initialTileMultiplier = Mathf.Clamp(initialTileMultiplier, 0.1f, 10.0f);
-}
 float initialEffectiveTimePerStep = baseTimePerStep / initialTileMultiplier;
 if (initialEffectiveTimePerStep < 0.001f) initialEffectiveTimePerStep = 0.001f;
 
-estimatedTotalGrowthTime = stemStepsCount * initialEffectiveTimePerStep;
+estimatedTotalGrowthTime = totalPlannedSteps * initialEffectiveTimePerStep;
 if (estimatedTotalGrowthTime < 0.01f) estimatedTotalGrowthTime = 0.01f;
-
-float lastUpdateTime = Time.time;
-float updateProgressInterval = 0.1f;
 
 float progressTowardNextStep = 0f;
 
 while (stepsCompleted < totalPlannedSteps && currentState == PlantState.Growing) {
-float frameDeltaTime = Time.deltaTime;
-currentGrowthElapsedTime += frameDeltaTime;
-
-float currentTileMultiplier = 1.0f;
-if (PlantGrowthModifierManager.Instance != null) {
-currentTileMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(this);
+float currentTileMultiplier = PlantGrowthModifierManager.Instance?.GetGrowthSpeedMultiplier(this) ?? 1.0f;
 currentTileMultiplier = Mathf.Clamp(currentTileMultiplier, 0.1f, 10.0f);
-}
-
 float currentEffectiveTimePerStep = baseTimePerStep / currentTileMultiplier;
 if (currentEffectiveTimePerStep < 0.001f) currentEffectiveTimePerStep = 0.001f;
 
 float progressRate = initialEffectiveTimePerStep / currentEffectiveTimePerStep;
-
-progressTowardNextStep += frameDeltaTime * progressRate;
-
+progressTowardNextStep += Time.deltaTime * progressRate;
 actualGrowthProgress = Mathf.Clamp01(progressTowardNextStep / initialEffectiveTimePerStep);
 
 int stepsToProcessThisFrame = 0;
-
 while (progressTowardNextStep >= initialEffectiveTimePerStep && stepsCompleted < totalPlannedSteps) {
 stepsToProcessThisFrame++;
 progressTowardNextStep -= initialEffectiveTimePerStep;
-
 if (stepsToProcessThisFrame >= 3) break;
 }
 
@@ -5170,33 +4940,19 @@ if (currentPlanIndex >= totalPlannedSteps) break;
 
 GrowthStep step = growthPlan[currentPlanIndex];
 GameObject spawnedCell = SpawnCellVisual(step.CellType, step.Position, null, null);
-
-if (spawnedCell != null) {
-if (step.CellType == PlantCellType.Leaf) {
+if (spawnedCell != null && step.CellType == PlantCellType.Leaf) {
 leafDataList.Add(new LeafData(step.Position, true));
 }
-}
-
 if (step.CellType == PlantCellType.Stem) {
 currentStemCount = step.StemIndex;
-if (!continuousIncrement) {
-UpdateGrowthPercentageUI();
+if (!continuousIncrement) UpdateGrowthPercentageUI();
 }
-}
-
 stepsCompleted++;
-
 if (nodeCastDelay > 0.01f && i < stepsToProcessThisFrame - 1) {
 yield ret new WaitForSeconds(nodeCastDelay);
 }
 }
 }
-
-if (continuousIncrement && Time.time - lastUpdateTime >= updateProgressInterval) {
-UpdateGrowthPercentageUI();
-lastUpdateTime = Time.time;
-}
-
 yield ret null;
 }
 
@@ -5204,148 +4960,89 @@ if (stepsCompleted >= totalPlannedSteps) {
 currentState = PlantState.GrowthComplete;
 if (showGrowthPercentage) UpdateGrowthPercentageUI(true);
 }
-
 growthCoroutine = null;
 }
 
 List<GrowthStep> PreCalculateGrowthPlan() {
 var plan = new List<GrowthStep>();
-
 for (int stemIndex = 1; stemIndex <= targetStemLength; stemIndex++) {
-Vector2Int stemPosition = CalculateStemPosition(stemIndex);
-plan.Add(new GrowthStep {
-CellType = PlantCellType.Stem,
-Position = stemPosition,
-StemIndex = stemIndex
-});
+Vector2Int stemPosition = Vector2Int.up * stemIndex;
+if (Random.value < finalGrowthRandomness) {
+stemPosition += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
+}
+plan.Add(new GrowthStep { CellType = PlantCellType.Stem, Position = stemPosition, StemIndex = stemIndex });
 
 if (finalLeafGap >= 0 && stemIndex > 0 && (stemIndex % (finalLeafGap + 1)) == 0) {
 List<Vector2Int> leafPositions = CalculateLeafPositions(stemPosition, stemIndex);
 foreach (Vector2Int leafPos in leafPositions) {
-plan.Add(new GrowthStep {
-CellType = PlantCellType.Leaf,
-Position = leafPos,
-StemIndex = stemIndex
-});
+plan.Add(new GrowthStep { CellType = PlantCellType.Leaf, Position = leafPos, StemIndex = stemIndex });
 }
 }
 }
-
 ret plan;
-}
-
-Vector2Int CalculateStemPosition(int stemIndex) {
-Vector2Int stemPos = Vector2Int.up * stemIndex;
-
-if (Random.value < finalGrowthRandomness) {
-stemPos += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
-}
-
-ret stemPos;
-}
-
-List<Vector2Int> CalculateLeafPositions(Vector2Int stemPos, int stageCounter) {
-List<Vector2Int> leafPositions = new List<Vector2Int>();
-Vector2Int leftBase = stemPos + Vector2Int.left;
-Vector2Int rightBase = stemPos + Vector2Int.right;
-
-switch (finalLeafPattern) {
-case 0: // Parallel leaves
-leafPositions.Add(leftBase);
-leafPositions.Add(rightBase);
-break;
-
-case 1: // Alternating Offset leaves
-if (offsetRightForPattern1 == null)
-offsetRightForPattern1 = Random.value < 0.5f;
-
-if (offsetRightForPattern1.Value) {
-leafPositions.Add(leftBase);
-leafPositions.Add(rightBase + Vector2Int.up);
-} else {
-leafPositions.Add(leftBase + Vector2Int.up);
-leafPositions.Add(rightBase);
-}
-break;
-
-case 2: // Alternating Parallel/Offset combination
-switch (stageCounter % 4) {
-case 0:
-case 2: // Parallel
-leafPositions.Add(leftBase);
-leafPositions.Add(rightBase);
-break;
-case 1: // Offset left up
-leafPositions.Add(leftBase + Vector2Int.up);
-leafPositions.Add(rightBase);
-break;
-case 3: // Offset right up
-leafPositions.Add(leftBase);
-leafPositions.Add(rightBase + Vector2Int.up);
-break;
-}
-break;
-
-case 3: // Spiral leaves
-int spiralDir = (stageCounter % 2 == 0) ? 1 : -1;
-if (spiralDir > 0) {
-leafPositions.Add(leftBase);
-leafPositions.Add(rightBase + Vector2Int.up);
-} else {
-leafPositions.Add(leftBase + Vector2Int.up);
-leafPositions.Add(rightBase);
-}
-break;
-
-case 4: // Symmetric double leaves
-leafPositions.Add(leftBase);
-leafPositions.Add(leftBase + Vector2Int.up);
-leafPositions.Add(rightBase);
-leafPositions.Add(rightBase + Vector2Int.up);
-break;
-
-default: // Fallback to parallel
-leafPositions.Add(leftBase);
-leafPositions.Add(rightBase);
-break;
-}
-
-ret leafPositions;
 }
 }
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantGrowth.WegoGrowth.cs
 
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
 using WegoSystem;
 
 pub partial cls PlantGrowth : MonoBehaviour {
+pub void OnTickUpdate(int currentTick) {
+if (!useWegoSystem) return;
 
-void HandleWegoGrowth() {
-currentGrowthTick++;
+switch (currentState) {
+case PlantState.Growing:
+growthProgress += finalGrowthSpeed;
 
-if (currentGrowthTick >= growthTicksPerStage) {
-GrowNextStemStage();
-currentGrowthTick = 0;
-}
+if (growthProgress >= 1.0f) {
+int stepsToGrow = Mathf.FloorToInt(growthProgress);
+growthProgress -= stepsToGrow; // Consume the whole number, keep the fraction.
 
-if (finalLeafGap >= 0 && currentStemStage > 0 && (currentStemStage % (finalLeafGap + 1)) == 0) {
-SpawnLeavesForCurrentStage();
-}
-
+for (int i = 0; i < stepsToGrow; i++) {
 if (currentStemStage >= targetStemLength) {
+CompleteGrowth();
+break; // Exit loop if growth is complete.
+}
+GrowNextStemStage();
+}
+}
+
+if (currentStemStage >= targetStemLength && currentState == PlantState.Growing) {
 CompleteGrowth();
 }
 
-if (showGrowthPercentage) UpdateGrowthPercentageUI();
+if (allowPhotosynthesisDuringGrowth) {
+AccumulateEnergyTick();
+}
+break;
+
+case PlantState.Mature_Idle:
+AccumulateEnergyTick();
+maturityCycleTick++;
+if (maturityCycleTick >= maturityCycleTicks && currentEnergy >= 1f) {
+currentState = PlantState.Mature_Executing;
+ExecuteMatureCycleTick(); // This is an instant action within the tick.
+maturityCycleTick = 0; // Reset for the next cycle.
+}
+break;
+
+case PlantState.Mature_Executing:
+AccumulateEnergyTick();
+currentState = PlantState.Mature_Idle;
+break;
+}
+
+UpdateUI();
 }
 
 void GrowNextStemStage() {
 if (currentStemStage >= targetStemLength) return;
 
 currentStemStage++;
-Vector2Int stemPos = Vector2Int.up * currentStemStage; // Simple upward growth
+Vector2Int stemPos = Vector2Int.up * currentStemStage;
 
 if (Random.value < finalGrowthRandomness) {
 stemPos += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
@@ -5354,17 +5051,11 @@ stemPos += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
 GameObject stemCell = SpawnCellVisual(PlantCellType.Stem, stemPos, null, null);
 if (stemCell == null) {
 Debug.LogError($"[{gameObject.name}] Failed to spawn stem at stage {currentStemStage}");
+return;
 }
 
-if (Debug.isDebugBuild) {
-Debug.Log($"[{gameObject.name}] Grew stem stage {currentStemStage}/{targetStemLength}");
-}
-}
-
-void SpawnLeavesForCurrentStage() {
-Vector2Int stemPos = Vector2Int.up * currentStemStage;
-List<Vector2Int> leafPositions = CalculateLeafPositions(stemPos, currentStemStage);
-
+if (finalLeafGap >= 0 && (currentStemStage % (finalLeafGap + 1)) == 0) {
+var leafPositions = CalculateLeafPositions(stemPos, currentStemStage);
 foreach (Vector2Int leafPos in leafPositions) {
 GameObject leafCell = SpawnCellVisual(PlantCellType.Leaf, leafPos, null, null);
 if (leafCell != null) {
@@ -5372,10 +5063,13 @@ leafDataList.Add(new LeafData(leafPos, true));
 }
 }
 }
+}
 
 void CompleteGrowth() {
+if (currentState == PlantState.GrowthComplete) return;
+
 currentState = PlantState.GrowthComplete;
-isGrowthCompletionHandled = false;
+isGrowthCompletionHandled = false; // For RT fallback compatibility
 
 if (showGrowthPercentage) UpdateGrowthPercentageUI(true);
 
@@ -5409,83 +5103,6 @@ float totalRate = (standardPhotosynthesis + (fireflyBonusRate / ticksPerSecond))
 
 currentEnergy = Mathf.Clamp(currentEnergy + totalRate, 0f, finalMaxEnergy);
 }
-
-void AccumulateEnergy() {
-if (finalPhotosynthesisRate <= 0 || finalMaxEnergy <= 0) return;
-
-float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
-int leafCount = cells.Values.Count(c => c == PlantCellType.Leaf);
-float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ?
-PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(this) : 1.0f;
-
-float fireflyBonusRate = 0f;
-if (fireflyManagerInstance != null) {
-int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(transform.position, fireflyManagerInstance.photosynthesisRadius);
-fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly, fireflyManagerInstance.maxPhotosynthesisBonus);
-}
-
-float standardPhotosynthesis = finalPhotosynthesisRate * leafCount * sunlight;
-float totalRate = (standardPhotosynthesis + fireflyBonusRate) * tileMultiplier;
-float delta = totalRate * Time.deltaTime;
-currentEnergy = Mathf.Clamp(currentEnergy + delta, 0f, finalMaxEnergy);
-}
-
-void UpdateGrowthPercentageUI(bool forceComplete = false) {
-if (!showGrowthPercentage || energyText == null) return;
-
-float rawPercentageFloat = 0f;
-
-if (forceComplete || currentState == PlantState.GrowthComplete) {
-rawPercentageFloat = 100f;
-}
-else if (useWegoSystem) {
-if (targetStemLength <= 0) {
-rawPercentageFloat = 0f;
-} else {
-rawPercentageFloat = Mathf.Clamp(((float)currentStemStage / targetStemLength) * 100f, 0f, 100f);
-}
-}
-else if (continuousIncrement) {
-if (totalPlannedSteps > 0) {
-rawPercentageFloat = ((float)stepsCompleted / totalPlannedSteps) * 100f;
-
-if (actualGrowthProgress > 0f && stepsCompleted < totalPlannedSteps) {
-float stepSize = 100f / totalPlannedSteps;
-float partialStepProgress = actualGrowthProgress * stepSize;
-rawPercentageFloat = (stepsCompleted * stepSize) + partialStepProgress;
-}
-}
-else {
-rawPercentageFloat = (currentState == PlantState.Growing) ? 0f : 100f;
-}
-}
-else {
-if (targetStemLength <= 0) {
-rawPercentageFloat = 0f;
-}
-else {
-rawPercentageFloat = Mathf.Clamp(((float)currentStemCount / targetStemLength) * 100f, 0f, 100f);
-}
-}
-
-int targetDisplayValue;
-if (percentageIncrement <= 1) {
-targetDisplayValue = Mathf.FloorToInt(rawPercentageFloat);
-}
-else {
-targetDisplayValue = Mathf.RoundToInt(rawPercentageFloat / percentageIncrement) * percentageIncrement;
-}
-targetDisplayValue = Mathf.Min(targetDisplayValue, 100);
-
-if (targetDisplayValue == 100 && currentState == PlantState.Growing && !forceComplete) {
-targetDisplayValue = 95;
-}
-
-if (targetDisplayValue != displayedGrowthPercentage) {
-displayedGrowthPercentage = targetDisplayValue;
-energyText.text = $"{displayedGrowthPercentage}%";
-}
-}
 }
 
 ////////////////////////////////////////////////////////////
@@ -5498,31 +5115,28 @@ using WegoSystem;
 pub enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
 
 pub partial cls PlantGrowth : MonoBehaviour, ITickUpdateable {
+
 [SerializeField] bool useWegoSystem = true;
-[SerializeField] int growthTicksPerStage = 5;
-[SerializeField] int maturityCycleTicks = 10;
 
 pub stat ro List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
 
 [SerializeField] TMP_Text energyText;
+[SerializeField] bool showGrowthPercentage = true;
+[SerializeField, Range(1, 25)] int percentageIncrement = 5;
+[SerializeField] bool continuousIncrement = false;
 
 [SerializeField] GameObject seedCellPrefab;
 [SerializeField] GameObject stemCellPrefab;
 [SerializeField] GameObject leafCellPrefab;
-[SerializeField] GameObject berryCellPrefab; // Used for PlantCellType.Fruit
+[SerializeField] GameObject berryCellPrefab;
 [SerializeField] float cellSpacing = 0.08f;
-
 [SerializeField] PlantShadowController shadowController;
 [SerializeField] GameObject shadowPartPrefab;
-
 [SerializeField] bool enableOutline = true;
 [SerializeField] PlantOutlineController outlineController;
 [SerializeField] GameObject outlinePartPrefab;
 
-[SerializeField] bool showGrowthPercentage = true;
 [SerializeField] bool allowPhotosynthesisDuringGrowth = false;
-[SerializeField, Range(1, 25)] int percentageIncrement = 5;
-[SerializeField] bool continuousIncrement = false;
 
 NodeGraph nodeGraph;
 pub PlantState currentState = PlantState.Initializing;
@@ -5532,7 +5146,7 @@ List<GameObject> activeCellGameObjects = new List<GameObject>();
 FireflyManager fireflyManagerInstance;
 GameObject rootCellInstance;
 
-int currentGrowthTick = 0;
+float growthProgress = 0f;
 int maturityCycleTick = 0;
 int currentStemStage = 0;
 
@@ -5550,14 +5164,13 @@ int finalLeafPattern;
 float finalGrowthRandomness;
 float finalMaxEnergy;
 float finalPhotosynthesisRate;
-float cycleCooldown;
+int maturityCycleTicks;
 float nodeCastDelay;
 
 int currentStemCount = 0;
 float cycleTimer = 0f;
 int displayedGrowthPercentage = -1;
 bool? offsetRightForPattern1 = null;
-float currentGrowthElapsedTime = 0f;
 float estimatedTotalGrowthTime = 1f;
 float actualGrowthProgress = 0f;
 int stepsCompleted = 0;
@@ -5567,72 +5180,33 @@ void Awake() {
 bool setupValid = true;
 if (shadowController == null) {
 shadowController = GetComponentInChildren<PlantShadowController>(true);
-if (shadowController == null) {
-Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantShadowController ref missing!", this);
-setupValid = false;
-} else {
-Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantShadowController dynamically.", this);
+if (shadowController == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantShadowController ref missing!", this); setupValid = false; }
+else { Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantShadowController dynamically.", this); }
 }
-}
-
-if (shadowPartPrefab == null) {
-Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Shadow Part Prefab missing!", this);
-setupValid = false;
-}
-
+if (shadowPartPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Shadow Part Prefab missing!", this); setupValid = false; }
 if (enableOutline) {
 if (outlineController == null) {
 outlineController = GetComponentInChildren<PlantOutlineController>(true);
-if (outlineController == null) {
-Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantOutlineController ref missing but outline is enabled!", this);
-setupValid = false;
-} else {
-Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantOutlineController dynamically.", this);
+if (outlineController == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantOutlineController ref missing but outline is enabled!", this); setupValid = false; }
+else { Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Found PlantOutlineController dynamically.", this); }
 }
+if (outlinePartPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Outline Part Prefab missing but outline is enabled!", this); setupValid = false; }
 }
-if (outlinePartPrefab == null) {
-Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Outline Part Prefab missing but outline is enabled!", this);
-setupValid = false;
-}
-}
-
-if (seedCellPrefab == null) {
-Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Seed Cell Prefab missing!", this);
-setupValid = false;
-}
-
-if (energyText == null)
-Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Energy Text (TMP_Text) missing.", this);
-
-if (!setupValid) {
-enabled = false;
-return;
-}
-
-if (!enableOutline && outlineController != null) {
-outlineController.gameObject.SetActive(false);
-}
-
+if (seedCellPrefab == null) { Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Seed Cell Prefab missing!", this); setupValid = false; }
+if (energyText == null) Debug.LogWarning($"PlantGrowth on '{gameObject.name}': Energy Text (TMP_Text) missing.", this);
+if (!setupValid) { enabled = false; return; }
+if (!enableOutline && outlineController != null) { outlineController.gameObject.SetActive(false); }
 fireflyManagerInstance = FireflyManager.Instance;
 EnsureUIReferences();
-
-AllActivePlants.Add(this); // Register instance
+AllActivePlants.Add(this);
 }
 
 void OnDestroy() {
-AllActivePlants.Remove(this); // Unregister instance
-
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
-}
-
+AllActivePlants.Remove(this);
+if (TickManager.Instance != null) { TickManager.Instance.UnregisterTickUpdateable(this); }
 StopAllCoroutines();
 growthCoroutine = null;
-
-if (PlantGrowthModifierManager.Instance != null) {
-PlantGrowthModifierManager.Instance.UnregisterPlant(this);
-}
-
+if (PlantGrowthModifierManager.Instance != null) { PlantGrowthModifierManager.Instance.UnregisterPlant(this); }
 ClearAllVisuals();
 }
 
@@ -5643,168 +5217,199 @@ TickManager.Instance.RegisterTickUpdateable(this);
 UpdateUI();
 }
 
-pub void OnTickUpdate(int currentTick) {
-if (!useWegoSystem) return;
-
-switch (currentState) {
-case PlantState.Growing:
-HandleWegoGrowth();
-if (allowPhotosynthesisDuringGrowth) AccumulateEnergyTick();
-break;
-
-case PlantState.Mature_Idle:
-AccumulateEnergyTick();
-maturityCycleTick++;
-if (maturityCycleTick >= maturityCycleTicks && currentEnergy >= 1f) {
-currentState = PlantState.Mature_Executing;
-ExecuteMatureCycleTick();
-maturityCycleTick = 0;
-}
-break;
-
-case PlantState.Mature_Executing:
-AccumulateEnergyTick();
-currentState = PlantState.Mature_Idle;
-break;
-}
-
-UpdateUI();
-}
-
 void Update() {
 if (useWegoSystem) {
-if (showGrowthPercentage && continuousIncrement && currentState == PlantState.Growing) {
-UpdateGrowthPercentageUI();
-}
+if (showGrowthPercentage && currentState == PlantState.Growing) { UpdateGrowthPercentageUI(); }
 return;
 }
-
 switch (currentState) {
 case PlantState.Growing:
-if (allowPhotosynthesisDuringGrowth)
-AccumulateEnergy();
-
-if (showGrowthPercentage && continuousIncrement) {
-UpdateGrowthPercentageUI();
-}
+if (allowPhotosynthesisDuringGrowth) AccumulateEnergy();
+if (showGrowthPercentage && continuousIncrement) { UpdateGrowthPercentageUI(); }
 break;
-
 case PlantState.GrowthComplete:
 if (!isGrowthCompletionHandled) {
 isGrowthCompletionHandled = true;
-if (showGrowthPercentage && targetStemLength > 0) {
-UpdateGrowthPercentageUI(true);
-}
+if (showGrowthPercentage && targetStemLength > 0) { UpdateGrowthPercentageUI(true); }
+float rtCooldown = maturityCycleTicks * (TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
+cycleTimer = rtCooldown;
 currentState = PlantState.Mature_Idle;
-cycleTimer = cycleCooldown;
 UpdateUI();
 }
 break;
-
 case PlantState.Mature_Idle:
 AccumulateEnergy();
 UpdateUI();
 cycleTimer -= Time.deltaTime;
-if (cycleTimer <= 0f && currentEnergy >= 1f) {
-currentState = PlantState.Mature_Executing;
-StartCoroutine(ExecuteMatureCycle());
-}
+if (cycleTimer <= 0f && currentEnergy >= 1f) { currentState = PlantState.Mature_Executing; StartCoroutine(ExecuteMatureCycle()); }
 break;
-
 case PlantState.Mature_Executing:
 AccumulateEnergy();
 UpdateUI();
-break;
-
-case PlantState.Initializing:
 break;
 }
 }
 
 pub void InitializeAndGrow(NodeGraph graph) {
-if (graph == null || graph.nodes == null) {
-Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject);
-Destroy(gameObject);
-return;
-}
-
-if (growthCoroutine != null) {
-StopCoroutine(growthCoroutine);
-growthCoroutine = null;
-}
-
+if (graph == null || graph.nodes == null) { Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject); Destroy(gameObject); return; }
+if (growthCoroutine != null) { StopCoroutine(growthCoroutine); growthCoroutine = null; }
 ClearAllVisuals();
 rootCellInstance = null;
-currentStemCount = 0;
-offsetRightForPattern1 = null;
 isGrowthCompletionHandled = false;
 displayedGrowthPercentage = -1;
-
-currentGrowthTick = 0;
+growthProgress = 0f;
 maturityCycleTick = 0;
 currentStemStage = 0;
-
-currentGrowthElapsedTime = 0f;
+currentStemCount = 0;
+offsetRightForPattern1 = null;
 estimatedTotalGrowthTime = 1f;
 stepsCompleted = 0;
 totalPlannedSteps = 0;
 actualGrowthProgress = 0f;
-
 nodeGraph = graph;
 currentState = PlantState.Initializing;
 currentEnergy = 0f;
 leafDataList.Clear();
-
 CalculateAndApplyStats();
-
 GameObject spawnedSeed = SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
 if (spawnedSeed != null) {
 rootCellInstance = spawnedSeed;
-
 if (PlantGrowthModifierManager.Instance != null && TileInteractionManager.Instance != null) {
 Vector3Int gridPos = TileInteractionManager.Instance.WorldToCell(transform.position);
 TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(gridPos);
 PlantGrowthModifierManager.Instance.RegisterPlantTile(this, currentTile);
 }
-
 if (targetStemLength > 0) {
 currentState = PlantState.Growing;
-UpdateGrowthPercentageUI(); // Initial UI update (0%)
-
-if (!useWegoSystem) {
-growthCoroutine = StartCoroutine(GrowthCoroutine_TimeBased());
-}
+UpdateGrowthPercentageUI();
+if (!useWegoSystem) { growthCoroutine = StartCoroutine(GrowthCoroutine_Time_Based()); }
 } else {
 Debug.LogWarning($"[{gameObject.name}] Target stem length is {targetStemLength}. Skipping visual growth phase.", gameObject);
-currentState = PlantState.GrowthComplete;
-isGrowthCompletionHandled = false;
-UpdateUI();
+CompleteGrowth();
 }
 } else {
 Debug.LogError($"[{gameObject.name}] Failed to spawn initial seed! Aborting growth.", gameObject);
 currentState = PlantState.Mature_Idle;
 Destroy(gameObject, 0.1f);
 }
-
 UpdateUI();
+}
+
+void CalculateAndApplyStats() {
+if (nodeGraph == null) {
+Debug.LogError($"[{gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
+return;
+}
+
+float baseEnergyStorage = 10f;
+float basePhotosynthesisRate = 0.5f;
+int baseStemMin = 3;
+int baseStemMax = 5;
+float baseGrowthSpeedRate = 0.2f;
+int baseLeafGap = 1;
+int baseLeafPattern = 0;
+float baseGrowthRandomness = 0.1f;
+int baseCooldownTicks = 20;
+float baseCastDelay = 0.1f;
+float accumulatedEnergyStorage = 0f;
+float accumulatedPhotosynthesis = 0f;
+int stemLengthModifier = 0;
+float growthSpeedRateModifier = 0f;
+int leafGapModifier = 0;
+int currentLeafPattern = baseLeafPattern;
+float growthRandomnessModifier = 0f;
+int cooldownTicksModifier = 0;
+float castDelayModifier = 0f;
+bool seedFound = false;
+poopDetectionRadius = 0f;
+poopEnergyBonus = 0f;
+
+foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
+if (node?.effects == null) continue;
+foreach (var effect in node.effects) {
+if (effect == null || !effect.isPassive) continue;
+switch (effect.effectType) {
+case NodeEffectType.SeedSpawn: seedFound = true; break;
+case NodeEffectType.EnergyStorage: accumulatedEnergyStorage += effect.primaryValue; break;
+case NodeEffectType.EnergyPhotosynthesis: accumulatedPhotosynthesis += effect.primaryValue; break;
+case NodeEffectType.StemLength: stemLengthModifier += Mathf.RoundToInt(effect.primaryValue); break;
+case NodeEffectType.GrowthSpeed: growthSpeedRateModifier += effect.primaryValue; break;
+case NodeEffectType.LeafGap: leafGapModifier += Mathf.RoundToInt(effect.primaryValue); break;
+case NodeEffectType.LeafPattern: currentLeafPattern = Mathf.Clamp(Mathf.RoundToInt(effect.primaryValue), 0, 4); break;
+case NodeEffectType.StemRandomness: growthRandomnessModifier += effect.primaryValue; break;
+case NodeEffectType.Cooldown: cooldownTicksModifier += Mathf.RoundToInt(effect.primaryValue); break;
+case NodeEffectType.CastDelay: castDelayModifier += effect.primaryValue; break;
+case NodeEffectType.PoopFertilizer: poopDetectionRadius = Mathf.Max(0f, effect.primaryValue); poopEnergyBonus = Mathf.Max(0f, effect.secondaryValue); break;
+}
+}
+}
+
+finalMaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
+finalPhotosynthesisRate = Mathf.Max(0f, basePhotosynthesisRate + accumulatedPhotosynthesis);
+int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier);
+int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
+finalGrowthSpeed = Mathf.Max(0.01f, baseGrowthSpeedRate + growthSpeedRateModifier);
+finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
+finalLeafPattern = currentLeafPattern;
+finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
+maturityCycleTicks = Mathf.Max(1, baseCooldownTicks + cooldownTicksModifier);
+nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
+targetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
+
+if (!seedFound) {
+Debug.LogWarning($"[{gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth aborted.", gameObject);
+}
 }
 
 void UpdateUI() {
 if (energyText == null) return;
-
-if (showGrowthPercentage && (currentState == PlantState.Growing || currentState == PlantState.GrowthComplete)) {
+if (showGrowthPercentage && (currentState == PlantState.Growing || (currentState == PlantState.GrowthComplete && !isGrowthCompletionHandled))) {
 }
 else {
 energyText.text = $"{Mathf.FloorToInt(currentEnergy)}/{Mathf.FloorToInt(finalMaxEnergy)}";
 }
 }
 
+void UpdateGrowthPercentageUI(bool forceComplete = false) {
+if (!showGrowthPercentage || energyText == null) return;
+float rawPercentageFloat;
+if (forceComplete || (currentState == PlantState.GrowthComplete && isGrowthCompletionHandled)) { rawPercentageFloat = 100f; }
+else if (useWegoSystem) {
+if (targetStemLength <= 0) { rawPercentageFloat = 100f; }
+else {
+float partialStepProgress = growthProgress * (100f / targetStemLength);
+rawPercentageFloat = ((float)currentStemStage / targetStemLength) * 100f + partialStepProgress;
+}
+}
+else if (continuousIncrement) {
+if (totalPlannedSteps > 0) {
+rawPercentageFloat = ((float)stepsCompleted / totalPlannedSteps) * 100f;
+if (actualGrowthProgress > 0f && stepsCompleted < totalPlannedSteps) {
+float stepSize = 100f / totalPlannedSteps;
+float partialStepProgress = actualGrowthProgress * stepSize;
+rawPercentageFloat = (stepsCompleted * stepSize) + partialStepProgress;
+}
+} else { rawPercentageFloat = (currentState == PlantState.Growing) ? 0f : 100f; }
+} else {
+if (targetStemLength <= 0) { rawPercentageFloat = 100f; }
+else { rawPercentageFloat = Mathf.Clamp(((float)currentStemCount / targetStemLength) * 100f, 0f, 100f); }
+}
+rawPercentageFloat = Mathf.Clamp(rawPercentageFloat, 0f, 100f);
+int targetDisplayValue;
+if (percentageIncrement <= 1) { targetDisplayValue = Mathf.FloorToInt(rawPercentageFloat); }
+else { targetDisplayValue = Mathf.RoundToInt(rawPercentageFloat / percentageIncrement) * percentageIncrement; }
+targetDisplayValue = Mathf.Min(targetDisplayValue, 100);
+if (targetDisplayValue == 100 && currentState == PlantState.Growing && !forceComplete) { targetDisplayValue = 99; }
+if (targetDisplayValue != displayedGrowthPercentage) {
+displayedGrowthPercentage = targetDisplayValue;
+energyText.text = $"{displayedGrowthPercentage}%";
+}
+}
+
 void EnsureUIReferences() {
 if (energyText) return;
 energyText = GetComponentInChildren<TMP_Text>(true);
-if (!energyText) {
-Debug.LogWarning($"[{gameObject.name}] Energy Text (TMP_Text) UI reference not assigned in Inspector and not found in children.", gameObject);
-}
+if (!energyText) { Debug.LogWarning($"[{gameObject.name}] Energy Text (TMP_Text) UI reference not assigned and not found in children.", gameObject); }
 }
 
 pub bool DoesCellExistAt(Vector2Int coord) { ret cells.ContainsKey(coord); }
@@ -5812,58 +5417,18 @@ pub float GetCellSpacing() { ret this.cellSpacing; }
 pub GameObject GetCellGameObjectAt(Vector2Int coord) { ret activeCellGameObjects.FirstOrDefault(go => go != null && go.GetComponent<PlantCell>()?.GridCoord == coord); }
 pub bool IsOutlineEnabled() { ret enableOutline; }
 pub float GetPoopDetectionRadius() { ret poopDetectionRadius; }
-
 pub void SetWegoSystem(bool enabled) {
 bool wasEnabled = useWegoSystem;
 useWegoSystem = enabled;
-
 if (enabled && !wasEnabled && TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
-
-if (currentState == PlantState.Growing && TickManager.Instance.Config != null) {
-var config = TickManager.Instance.Config;
-growthTicksPerStage = config.plantGrowthTicksPerStage;
-
-if (growthCoroutine != null) {
-StopCoroutine(growthCoroutine);
-growthCoroutine = null;
-}
-}
+if (currentState == PlantState.Growing && growthCoroutine != null) { StopCoroutine(growthCoroutine); growthCoroutine = null; }
 } else if (!enabled && wasEnabled && TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
-
-if (currentState == PlantState.Growing) {
-growthCoroutine = StartCoroutine(GrowthCoroutine_TimeBased());
-}
+if (currentState == PlantState.Growing) { growthCoroutine = StartCoroutine(GrowthCoroutine_Time_Based()); }
 }
 }
 
-pub PlantState GetCurrentState() {
-ret currentState;
-}
-
-pub int GetCurrentGrowthTick() {
-ret currentGrowthTick;
-}
-
-pub int GetGrowthTicksPerStage() {
-ret growthTicksPerStage;
-}
-
-pub int GetCurrentStemStage() {
-ret currentStemStage;
-}
-
-pub int GetTargetStemLength() {
-ret targetStemLength;
-}
-
-pub void ForceCompleteGrowth() {
-if (Application.isEditor || Debug.isDebugBuild) {
-currentStemStage = targetStemLength;
-CompleteGrowth();
-}
-}
 }
 
 ////////////////////////////////////////////////////////////
@@ -7989,39 +7554,118 @@ PerformGridSnapping();
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Ticks\WegoDebugUI.cs
+// Assets\Scripts\Ticks\TurnPhaseManager.cs
 
-﻿using UnityEngine;
+﻿using System;
 using WegoSystem;
 
-pub cls WegoDebugUI : MonoBehaviour {
-void OnGUI() {
-GUILayout.BeginArea(new Rect(10, 10, 300, 200));
-
-GUILayout.Label($"Phase: {TurnPhaseManager.Instance?.CurrentPhase}");
-GUILayout.Label($"Tick: {TickManager.Instance?.CurrentTick}");
-
-var gardener = FindObjectOfType<GardenerController>();
-if (gardener != null) {
-GUILayout.Label($"Player Queue: {gardener.GetQueuedMoveCount()} moves");
-GUILayout.Label($"Grid Pos: {gardener.GetCurrentGridPosition()}");
+pub enum TurnPhase {
+Planning,
+Execution
 }
 
-if (TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
-if (GUILayout.Button("End Planning Phase")) {
-TurnPhaseManager.Instance.EndPlanningPhase();
+pub cls TurnPhaseManager : MonoBehaviour, ITickUpdateable {
+pub stat TurnPhaseManager Instance { get; set; }
+
+[SerializeField] TurnPhase currentPhase = TurnPhase.Planning;
+[SerializeField] int currentPhaseTicks = 0;
+[SerializeField] bool debugMode = false;
+
+pub TurnPhase CurrentPhase => currentPhase;
+pub int CurrentPhaseTicks => currentPhaseTicks;
+pub bool IsInPlanningPhase => currentPhase == TurnPhase.Planning;
+pub bool IsInExecutionPhase => currentPhase == TurnPhase.Execution;
+
+pub event Action<TurnPhase, TurnPhase> OnPhaseChanged;
+pub event Action OnPlanningPhaseStarted;
+pub event Action OnExecutionPhaseStarted;
+
+void Awake() {
+if (Instance != null && Instance != this) {
+Destroy(gameObject);
+return;
+}
+Instance = this;
+}
+
+void Start() {
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
+}
+else {
+Debug.LogError("[TurnPhaseManager] TickManager not found!");
+}
+
+TransitionToPhase(TurnPhase.Planning);
+}
+
+void OnDestroy() {
+if (Instance == this) {
+Instance = null;
+}
+
+if (TickManager.Instance != null) {
+TickManager.Instance.UnregisterTickUpdateable(this);
 }
 }
 
-if (GUILayout.Button("Force Planning Phase")) {
-TurnPhaseManager.Instance?.ForcePhase(TurnPhase.Planning);
+pub void OnTickUpdate(int currentTick) {
+currentPhaseTicks++;
 }
 
-if (GUILayout.Button("Clear Move Queue")) {
-gardener?.ClearQueuedMoves();
+bool HasActionsToProcess() {
+var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
+foreach (var gardener in gardeners) {
 }
 
-GUILayout.EndArea();
+var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+foreach (var animal in animals) {
+if (currentPhaseTicks % animal.thinkingTickInterval == 0) ret true;
+}
+
+var plants = PlantGrowth.AllActivePlants;
+if (plants.Count > 0) ret true; // Plants always need processing
+
+ret false;
+}
+
+pub void EndPlanningPhase() {
+if (currentPhase == TurnPhase.Planning) {
+TransitionToPhase(TurnPhase.Execution);
+}
+else {
+Debug.LogWarning($"[TurnPhaseManager] Cannot end planning phase - current phase is {currentPhase}");
+}
+}
+
+pub void TransitionToPhase(TurnPhase newPhase) {
+if (currentPhase == newPhase) return;
+
+TurnPhase oldPhase = currentPhase;
+currentPhase = newPhase;
+currentPhaseTicks = 0;
+
+switch (newPhase) {
+case TurnPhase.Planning:
+OnPlanningPhaseStarted?.Invoke();
+break;
+
+case TurnPhase.Execution:
+OnExecutionPhaseStarted?.Invoke();
+break;
+}
+
+OnPhaseChanged?.Invoke(oldPhase, newPhase);
+
+if (debugMode) {
+Debug.Log($"[TurnPhaseManager] Phase transition: {oldPhase} -> {newPhase}");
+}
+}
+
+pub void ForcePhase(TurnPhase phase) {
+if (Application.isEditor || Debug.isDebugBuild) {
+TransitionToPhase(phase);
+}
 }
 }
 
@@ -9425,9 +9069,7 @@ pub string plantingParameterName = "isPlanting";
 pub float plantingDuration = 0.25f;
 
 GridEntity gridEntity;
-Queue<GridPosition> plannedMoves = new Queue<GridPosition>();
 GridPosition currentTargetPosition;
-bool hasMoveQueued = false;
 
 SortableEntity sortableEntity;
 SpriteRenderer spriteRenderer;
@@ -9435,13 +9077,6 @@ Animator animator;
 
 bool isPlanting = false;
 float plantingTimer = 0f;
-
-bool isProcessingMove = false;
-
-bool upPressed = false;
-bool downPressed = false;
-bool leftPressed = false;
-bool rightPressed = false;
 
 void Awake() {
 sortableEntity = GetComponent<SortableEntity>();
@@ -9481,10 +9116,6 @@ Debug.Log($"[GardenerController] Snapped to tile grid position {cellPos} at worl
 
 if (useWegoMovement && TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
-
-if (TurnPhaseManager.Instance != null) {
-TurnPhaseManager.Instance.OnPhaseChanged += OnPhaseChanged;
-}
 }
 }
 
@@ -9492,73 +9123,19 @@ void OnDestroy() {
 if (TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
 }
-
-if (TurnPhaseManager.Instance != null) {
-TurnPhaseManager.Instance.OnPhaseChanged -= OnPhaseChanged;
-}
-}
-
-void OnPhaseChanged(TurnPhase oldPhase, TurnPhase newPhase) {
-if (newPhase == TurnPhase.Planning) {
-plannedMoves.Clear();
-hasMoveQueued = false;
-isProcessingMove = false;
-
-if (gridEntity != null) {
-currentTargetPosition = gridEntity.Position;
-}
-}
 }
 
 pub void OnTickUpdate(int currentTick) {
-if (!useWegoMovement || isPlanting) return;
-
-if (TurnPhaseManager.Instance?.CurrentPhase == TurnPhase.Execution) {
-if (!isProcessingMove && plannedMoves.Count > 0) {
-ProcessNextMove();
-}
-}
-
-hasMoveQueued = plannedMoves.Count > 0;
-}
-
-void ProcessNextMove() {
-if (plannedMoves.Count == 0) return;
-
-isProcessingMove = true;
-GridPosition nextMove = plannedMoves.Dequeue();
-
-if (gridEntity != null && GridPositionManager.Instance != null) {
-if (GridPositionManager.Instance.IsPositionValid(nextMove) &&
-!GridPositionManager.Instance.IsPositionOccupied(nextMove)) {
-
-Vector3 worldPos = GridPositionManager.Instance.GridToWorld(nextMove);
-int moveCost = 1; // Default cost
-
-if (PlayerActionManager.Instance != null) {
-moveCost = PlayerActionManager.Instance.GetMovementTickCost(worldPos);
-}
-
-gridEntity.SetPosition(nextMove);
-currentTargetPosition = nextMove;
-
-Debug.Log($"[GardenerController] Executed move to {nextMove}, cost {moveCost} ticks");
-
-if (TickManager.Instance != null) {
-}
-} else {
-Debug.Log($"[GardenerController] Move to {nextMove} blocked");
-}
-}
-
-isProcessingMove = false;
+if (!useWegoMovement) return;
 }
 
 void Update() {
 if (useWegoMovement) {
-HandleWegoInput();
-} else {
-HandleImmediateInput();
+if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.Planning) {
+HandleImmediateWegoMovement();
+}
+}
+else {
 }
 
 HandlePlanting();
@@ -9566,99 +9143,33 @@ UpdateAnimations();
 UpdateSpriteDirection();
 }
 
-void HandleWegoInput() {
-if (TurnPhaseManager.Instance?.IsInPlanningPhase != true) return;
-if (isPlanting) return;
+void HandleImmediateWegoMovement() {
+if (isPlanting || gridEntity == null) return;
 
-bool shouldMove = false;
 GridPosition moveDir = GridPosition.Zero;
 
-if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && !upPressed) {
-moveDir = GridPosition.Up;
-shouldMove = true;
-upPressed = true;
-} else if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.UpArrow)) {
-upPressed = false;
-}
+if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) moveDir = GridPosition.Up;
+else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) moveDir = GridPosition.Down;
+else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) moveDir = GridPosition.Left;
+else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) moveDir = GridPosition.Right;
 
-if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && !downPressed) {
-moveDir = GridPosition.Down;
-shouldMove = true;
-downPressed = true;
-} else if (!Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.DownArrow)) {
-downPressed = false;
-}
+if (moveDir != GridPosition.Zero) {
+GridPosition targetPos = gridEntity.Position + moveDir;
 
-if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && !leftPressed) {
-moveDir = GridPosition.Left;
-shouldMove = true;
-leftPressed = true;
-} else if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.LeftArrow)) {
-leftPressed = false;
-}
-
-if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && !rightPressed) {
-moveDir = GridPosition.Right;
-shouldMove = true;
-rightPressed = true;
-} else if (!Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.RightArrow)) {
-rightPressed = false;
-}
-
-if (shouldMove && gridEntity != null) {
-GridPosition currentPos = gridEntity.Position;
-
-if (plannedMoves.Count > 0) {
-var moves = plannedMoves.ToArray();
-currentPos = moves[moves.Length - 1];
-}
-
-GridPosition targetPos = currentPos + moveDir;
-
-if (PlayerActionManager.Instance != null) {
-PlayerActionManager.Instance.ExecutePlayerMove(this, currentPos, targetPos);
-} else {
-Debug.LogError("[GardenerController] PlayerActionManager not found!");
-}
-}
-}
-
-void HandleImmediateInput() {
-if (isPlanting) return;
-
-bool shouldMove = false;
-GridPosition moveDir = GridPosition.Zero;
-
-if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) {
-moveDir = GridPosition.Up;
-shouldMove = true;
-} else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) {
-moveDir = GridPosition.Down;
-shouldMove = true;
-} else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) {
-moveDir = GridPosition.Left;
-shouldMove = true;
-} else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) {
-moveDir = GridPosition.Right;
-shouldMove = true;
-}
-
-if (shouldMove && gridEntity != null) {
-GridPosition currentPos = gridEntity.Position;
-GridPosition targetPos = currentPos + moveDir;
-
-if (GridPositionManager.Instance != null &&
+if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
 GridPositionManager.Instance.IsPositionValid(targetPos) &&
 !GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
-
 gridEntity.SetPosition(targetPos);
-currentTargetPosition = targetPos;
+currentTargetPosition = targetPos; // For sprite flipping
 
-if (TickManager.Instance != null) {
-Vector3 worldPos = GridPositionManager.Instance.GridToWorld(targetPos);
-int moveCost = PlayerActionManager.Instance?.GetMovementTickCost(worldPos) ?? 1;
+int moveCost = PlayerActionManager.Instance.GetMovementTickCost( GridPositionManager.Instance.GridToWorld(targetPos)
+);
+
 TickManager.Instance.AdvanceMultipleTicks(moveCost);
+Debug.Log($"[GardenerController] Moved to {targetPos}. Advanced game by {moveCost} tick(s).");
 }
+else {
+Debug.Log($"[GardenerController] Move to {targetPos} is invalid or blocked.");
 }
 }
 }
@@ -9724,30 +9235,8 @@ pub Vector2 GetPlantingPosition() {
 ret (Vector2)transform.position + seedPlantingOffset;
 }
 
-pub void SetPlantingDuration(float duration) {
-plantingDuration = Mathf.Max(0.1f, duration);
-}
-
 pub void Plant() {
 StartPlantingAnimation();
-}
-
-pub void QueueMovement(GridPosition targetPosition) {
-if (useWegoMovement && TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
-plannedMoves.Enqueue(targetPosition);
-hasMoveQueued = true;
-Debug.Log($"[GardenerController] Queued move to {targetPosition}. Total queued: {plannedMoves.Count}");
-}
-}
-
-pub void ClearQueuedMoves() {
-plannedMoves.Clear();
-hasMoveQueued = false;
-isProcessingMove = false;
-}
-
-pub int GetQueuedMoveCount() {
-ret plannedMoves.Count;
 }
 
 pub GridPosition GetCurrentGridPosition() {
@@ -9756,25 +9245,19 @@ ret gridEntity?.Position ?? GridPosition.Zero;
 
 pub void SetWegoMovement(bool enabled) {
 useWegoMovement = enabled;
-
-if (enabled && gridEntity == null) {
-gridEntity = gameObject.AddComponent<GridEntity>();
-}
-
 if (enabled && TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
-} else if (!enabled && TickManager.Instance != null) {
+}
+else if (!enabled && TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
 }
-
-ClearQueuedMoves();
 }
 }
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
 
-﻿using UnityEngine;
+﻿using System;
 using WegoSystem;
 
 pub enum PlayerActionType {
@@ -9807,28 +9290,6 @@ void OnDestroy() {
 if (Instance == this) Instance = null;
 }
 
-pub bool ExecutePlayerMove(GardenerController gardener, GridPosition from, GridPosition to) {
-if (gardener == null) {
-OnActionFailed?.Invoke("No gardener controller");
-ret false;
-}
-
-if (!ValidateMovement(from, to)) {
-OnActionFailed?.Invoke("Invalid movement");
-ret false;
-}
-
-if (TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
-gardener.QueueMovement(to);
-if (debugMode) Debug.Log($"[PlayerActionManager] Queued move from {from} to {to}");
-OnActionExecuted?.Invoke(PlayerActionType.Move, true);
-ret true;
-}
-
-if (debugMode) Debug.Log("[PlayerActionManager] Move requested outside planning phase - ignored");
-ret false;
-}
-
 pub bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null) {
 if (debugMode) Debug.Log($"[PlayerActionManager] Executing {actionType} at {gridPosition}");
 
@@ -9859,11 +9320,10 @@ break;
 }
 
 if (success) {
-if (TurnPhaseManager.Instance?.CurrentPhase == TurnPhase.Execution) {
 AdvanceGameTick(tickCost);
-}
 OnActionExecuted?.Invoke(actionType, true);
-} else {
+}
+else {
 OnActionFailed?.Invoke($"{actionType} failed");
 }
 
@@ -10252,216 +9712,16 @@ SeedPouch // New tool type
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Ticks\GridPositionSystem.cs
+// Assets\Scripts\Ticks\GridPositionManager.cs
 
-﻿// Assets\Scripts\Ticks\GridPositionSystem.cs
+﻿using System;
 
-ns WegoSystem {
-pub struct GridPosition : IEquatable<GridPosition> {
-pub int x;
-pub int y;
-
-pub GridPosition(int x, int y) {
-this.x = x;
-this.y = y;
-}
-
-pub GridPosition(Vector3Int vector3Int) {
-this.x = vector3Int.x;
-this.y = vector3Int.y;
-}
-
-pub GridPosition(Vector2Int vector2Int) {
-this.x = vector2Int.x;
-this.y = vector2Int.y;
-}
-
-pub stat GridPosition operator +(GridPosition a, GridPosition b) {
-ret new GridPosition(a.x + b.x, a.y + b.y);
-}
-
-pub stat GridPosition operator -(GridPosition a, GridPosition b) {
-ret new GridPosition(a.x - b.x, a.y - b.y);
-}
-
-pub stat bool operator ==(GridPosition a, GridPosition b) {
-ret a.x == b.x && a.y == b.y;
-}
-
-pub stat bool operator !=(GridPosition a, GridPosition b) {
-ret !(a == b);
-}
-
-pub Vector3Int ToVector3Int() => new Vector3Int(x, y, 0);
-pub Vector2Int ToVector2Int() => new Vector2Int(x, y);
-pub Vector3 ToWorldPosition(float cellSize = 1f) => new Vector3(x * cellSize, y * cellSize, 0);
-
-pub stat ro GridPosition Up = new GridPosition(0, 1);
-pub stat ro GridPosition Down = new GridPosition(0, -1);
-pub stat ro GridPosition Left = new GridPosition(-1, 0);
-pub stat ro GridPosition Right = new GridPosition(1, 0);
-pub stat ro GridPosition UpLeft = new GridPosition(-1, 1);
-pub stat ro GridPosition UpRight = new GridPosition(1, 1);
-pub stat ro GridPosition DownLeft = new GridPosition(-1, -1);
-pub stat ro GridPosition DownRight = new GridPosition(1, -1);
-pub stat ro GridPosition Zero = new GridPosition(0, 0);
-
-pub int ManhattanDistance(GridPosition other) {
-ret Mathf.Abs(x - other.x) + Mathf.Abs(y - other.y);
-}
-
-pub int ChebyshevDistance(GridPosition other) {
-ret Mathf.Max(Mathf.Abs(x - other.x), Mathf.Abs(y - other.y));
-}
-
-pub float EuclideanDistance(GridPosition other) {
-int dx = x - other.x;
-int dy = y - other.y;
-ret Mathf.Sqrt(dx * dx + dy * dy);
-}
-
-pub GridPosition[] GetNeighbors(bool includeDiagonals = false) {
-if (includeDiagonals) {
-ret new GridPosition[] {
-this + Up, this + Down, this + Left, this + Right,
-this + UpLeft, this + UpRight, this + DownLeft, this + DownRight
-};
-}
-else {
-ret new GridPosition[] {
-this + Up, this + Down, this + Left, this + Right
-};
-}
-}
-
-pub bool Equals(GridPosition other) {
-ret x == other.x && y == other.y;
-}
-
-pub ovr bool Equals(object obj) {
-ret obj is GridPosition other && Equals(other);
-}
-
-pub ovr int GetHashCode() {
-ret HashCode.Combine(x, y);
-}
-
-pub ovr string ToString() {
-ret $"({x}, {y})";
-}
-}
-
-pub cls GridEntity : MonoBehaviour {
-[SerializeField] GridPosition gridPosition;
-[SerializeField] float visualInterpolationSpeed = 5f;
-[SerializeField] bool snapToGridOnStart = true;
-[SerializeField] AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-
-GridPosition previousGridPosition;
-Vector3 visualStartPosition;
-Vector3 visualTargetPosition;
-float movementProgress = 1f;
-bool isMoving = false;
-
-pub GridPosition Position {
-get => gridPosition;
-set {
-if (gridPosition != value) {
-previousGridPosition = gridPosition;
-gridPosition = value;
-OnGridPositionChanged();
-}
-}
-}
-
-pub GridPosition PreviousPosition => previousGridPosition;
-pub bool IsMoving => isMoving;
-pub float MovementProgress => movementProgress;
-
-pub event Action<GridPosition, GridPosition> OnPositionChanged;
-pub event Action<GridPosition> OnMovementComplete;
-pub event Action OnMovementStart;
-
-prot virt void Start() {
-if (snapToGridOnStart && GridPositionManager.Instance != null) {
-gridPosition = GridPositionManager.Instance.WorldToGrid(transform.position);
-transform.position = GridPositionManager.Instance.GridToWorld(gridPosition);
-}
-
-visualStartPosition = transform.position;
-visualTargetPosition = transform.position;
-previousGridPosition = gridPosition;
-
-GridPositionManager.Instance?.RegisterEntity(this);
-}
-
-prot virt void OnDestroy() {
-GridPositionManager.Instance?.UnregisterEntity(this);
-}
-
-prot virt void Update() {
-if (movementProgress < 1f) {
-movementProgress += Time.deltaTime * visualInterpolationSpeed;
-movementProgress = Mathf.Clamp01(movementProgress);
-
-float curvedProgress = movementCurve.Evaluate(movementProgress);
-transform.position = Vector3.Lerp(visualStartPosition, visualTargetPosition, curvedProgress);
-
-if (movementProgress >= 1f) {
-transform.position = visualTargetPosition;
-isMoving = false;
-OnMovementComplete?.Invoke(gridPosition);
-}
-}
-}
-
-prot virt void OnGridPositionChanged() {
-visualStartPosition = transform.position;
-visualTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
-movementProgress = 0f;
-
-if (!isMoving) {
-isMoving = true;
-OnMovementStart?.Invoke();
-}
-
-OnPositionChanged?.Invoke(previousGridPosition, gridPosition);
-}
-
-pub void SetPosition(GridPosition newPosition, bool instant = false) {
-Position = newPosition;
-
-if (instant) {
-transform.position = visualTargetPosition;
-visualStartPosition = visualTargetPosition;
-movementProgress = 1f;
-isMoving = false;
-}
-}
-
-pub void MoveInDirection(GridPosition direction) {
-SetPosition(gridPosition + direction);
-}
-
-pub bool CanMoveTo(GridPosition targetPosition) {
-ret GridPositionManager.Instance?.IsPositionValid(targetPosition) ?? false;
-}
-
-pub void CompleteMovement() {
-if (isMoving) {
-transform.position = visualTargetPosition;
-movementProgress = 1f;
-isMoving = false;
-OnMovementComplete?.Invoke(gridPosition);
-}
-}
-}
-
+namespace WegoSystem {
 pub cls GridPositionManager : MonoBehaviour {
 pub stat GridPositionManager Instance { get; set; }
 
-[SerializeField] float cellSize = 1f;
-[SerializeField] Vector3 gridOrigin = Vector3.zero;
+Grid tilemapGrid;
+
 [SerializeField] Vector2Int gridBounds = new Vector2Int(100, 100);
 
 [SerializeField] bool showGridGizmos = true;
@@ -10493,28 +9753,25 @@ Instance = null;
 
 pub void SyncWithTileGrid() {
 if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null) {
-var tileGrid = TileInteractionManager.Instance.interactionGrid;
+this.tilemapGrid = TileInteractionManager.Instance.interactionGrid;
 
-cellSize = tileGrid.cellSize.x; // Assuming square cells
-gridOrigin = tileGrid.transform.position;
-
-Debug.Log($"[GridPositionManager] Synced with tile grid. Cell size: {cellSize}, Origin: {gridOrigin}");
+if (debugMode)
+Debug.Log($"[GridPositionManager] Successfully synced with TileInteractionManager's grid: '{this.tilemapGrid.name}'.");
+}
+else {
+Debug.LogError("[GridPositionManager] Could not find TileInteractionManager or its grid to sync with! Grid system may be misaligned.");
 }
 }
 
 pub GridPosition WorldToGrid(Vector3 worldPosition) {
-Vector3 localPosition = worldPosition - gridOrigin;
-int x = Mathf.RoundToInt(localPosition.x / cellSize);
-int y = Mathf.RoundToInt(localPosition.y / cellSize);
-ret new GridPosition(x, y);
+if (tilemapGrid == null) ret GridPosition.Zero;
+Vector3Int cellPos = tilemapGrid.WorldToCell(worldPosition);
+ret new GridPosition(cellPos);
 }
 
 pub Vector3 GridToWorld(GridPosition gridPosition) {
-ret new Vector3(
-gridPosition.x * cellSize + gridOrigin.x,
-gridPosition.y * cellSize + gridOrigin.y,
-gridOrigin.z
-);
+if (tilemapGrid == null) ret Vector3.zero;
+ret tilemapGrid.GetCellCenterWorld(gridPosition.ToVector3Int());
 }
 
 pub Vector3 GetCellCenter(GridPosition gridPosition) {
@@ -10659,7 +9916,8 @@ float tentativeGScore = gScore[current] + 1;
 
 if (!openSet.Contains(neighbor)) {
 openSet.Add(neighbor);
-} else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor]) {
+}
+else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor]) {
 continue;
 }
 
@@ -10704,15 +9962,10 @@ if (gridEntity == null) {
 gridEntity = entity.AddComponent<GridEntity>();
 }
 
-GridPosition nearestGrid = WorldToGrid(entity.transform.position);
-Vector3 snappedWorldPos = GridToWorld(nearestGrid);
-
-entity.transform.position = snappedWorldPos;
-
-gridEntity.SetPosition(nearestGrid, instant: true);
+gridEntity.SnapToGrid();
 
 if (debugMode) {
-Debug.Log($"[GridPositionManager] Snapped {entity.name} from {entity.transform.position} to grid {nearestGrid} at world {snappedWorldPos}");
+Debug.Log($"[GridPositionManager] Snapped {entity.name} to grid {gridEntity.Position}");
 }
 }
 
@@ -10725,7 +9978,7 @@ Debug.Log($"[GridPositionManager] Snapped {entities.Length} entities of type {ty
 }
 
 void OnDrawGizmos() {
-if (!showGridGizmos) return;
+if (!showGridGizmos || tilemapGrid == null) return;
 
 Gizmos.color = gridColor;
 
@@ -10748,8 +10001,223 @@ Gizmos.color = Color.red;
 foreach (var kvp in entitiesByPosition) {
 if (kvp.Value.Count > 0) {
 Vector3 cellCenter = GridToWorld(kvp.Key);
-Gizmos.DrawWireCube(cellCenter, Vector3.one * cellSize * 0.8f);
+Gizmos.DrawWireCube(cellCenter, Vector3.one * tilemapGrid.cellSize.x * 0.8f);
 }
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Ticks\GridPositionSystem.cs
+
+﻿using System;
+
+namespace WegoSystem {
+pub struct GridPosition : IEquatable<GridPosition> {
+pub int x;
+pub int y;
+
+pub GridPosition(int x, int y) {
+this.x = x;
+this.y = y;
+}
+
+pub GridPosition(Vector3Int vector3Int) {
+this.x = vector3Int.x;
+this.y = vector3Int.y;
+}
+
+pub GridPosition(Vector2Int vector2Int) {
+this.x = vector2Int.x;
+this.y = vector2Int.y;
+}
+
+pub stat GridPosition operator +(GridPosition a, GridPosition b) {
+ret new GridPosition(a.x + b.x, a.y + b.y);
+}
+
+pub stat GridPosition operator -(GridPosition a, GridPosition b) {
+ret new GridPosition(a.x - b.x, a.y - b.y);
+}
+
+pub stat bool operator ==(GridPosition a, GridPosition b) {
+ret a.x == b.x && a.y == b.y;
+}
+
+pub stat bool operator !=(GridPosition a, GridPosition b) {
+ret !(a == b);
+}
+
+pub Vector3Int ToVector3Int() => new Vector3Int(x, y, 0);
+pub Vector2Int ToVector2Int() => new Vector2Int(x, y);
+pub Vector3 ToWorldPosition(float cellSize = 1f) => new Vector3(x * cellSize, y * cellSize, 0);
+
+pub stat ro GridPosition Up = new GridPosition(0, 1);
+pub stat ro GridPosition Down = new GridPosition(0, -1);
+pub stat ro GridPosition Left = new GridPosition(-1, 0);
+pub stat ro GridPosition Right = new GridPosition(1, 0);
+pub stat ro GridPosition UpLeft = new GridPosition(-1, 1);
+pub stat ro GridPosition UpRight = new GridPosition(1, 1);
+pub stat ro GridPosition DownLeft = new GridPosition(-1, -1);
+pub stat ro GridPosition DownRight = new GridPosition(1, -1);
+pub stat ro GridPosition Zero = new GridPosition(0, 0);
+
+pub int ManhattanDistance(GridPosition other) {
+ret Mathf.Abs(x - other.x) + Mathf.Abs(y - other.y);
+}
+
+pub int ChebyshevDistance(GridPosition other) {
+ret Mathf.Max(Mathf.Abs(x - other.x), Mathf.Abs(y - other.y));
+}
+
+pub float EuclideanDistance(GridPosition other) {
+int dx = x - other.x;
+int dy = y - other.y;
+ret Mathf.Sqrt(dx * dx + dy * dy);
+}
+
+pub GridPosition[] GetNeighbors(bool includeDiagonals = false) {
+if (includeDiagonals) {
+ret new GridPosition[] {
+this + Up, this + Down, this + Left, this + Right,
+this + UpLeft, this + UpRight, this + DownLeft, this + DownRight
+};
+}
+else {
+ret new GridPosition[] {
+this + Up, this + Down, this + Left, this + Right
+};
+}
+}
+
+pub bool Equals(GridPosition other) {
+ret x == other.x && y == other.y;
+}
+
+pub ovr bool Equals(object obj) {
+ret obj is GridPosition other && Equals(other);
+}
+
+pub ovr int GetHashCode() {
+ret HashCode.Combine(x, y);
+}
+
+pub ovr string ToString() {
+ret $"({x}, {y})";
+}
+}
+
+pub cls GridEntity : MonoBehaviour {
+[SerializeField] GridPosition gridPosition;
+[SerializeField] bool snapToGridOnStart = true;
+
+[SerializeField] Vector3 visualOffset = Vector3.zero;
+[SerializeField] float visualInterpolationSpeed = 5f;
+[SerializeField] AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+
+GridPosition previousGridPosition;
+Vector3 visualStartPosition;
+Vector3 visualTargetPosition;
+float movementProgress = 1f;
+bool isMoving = false;
+
+pub GridPosition Position {
+get => gridPosition;
+set // Keep setter to be controlled by SetPosition method {
+if (gridPosition != value) {
+previousGridPosition = gridPosition;
+gridPosition = value;
+OnGridPositionChanged();
+}
+}
+}
+
+pub GridPosition PreviousPosition => previousGridPosition;
+pub bool IsMoving => isMoving;
+pub float MovementProgress => movementProgress;
+
+pub event Action<GridPosition, GridPosition> OnPositionChanged;
+pub event Action<GridPosition> OnMovementComplete;
+pub event Action OnMovementStart;
+
+prot virt void Start() {
+if (snapToGridOnStart) {
+SnapToGrid();
+}
+
+visualStartPosition = transform.position;
+visualTargetPosition = transform.position;
+previousGridPosition = gridPosition;
+
+GridPositionManager.Instance?.RegisterEntity(this);
+}
+
+prot virt void OnDestroy() {
+GridPositionManager.Instance?.UnregisterEntity(this);
+}
+
+prot virt void Update() {
+if (movementProgress < 1f) {
+movementProgress += Time.deltaTime * visualInterpolationSpeed;
+movementProgress = Mathf.Clamp01(movementProgress);
+
+float curvedProgress = movementCurve.Evaluate(movementProgress);
+transform.position = Vector3.Lerp(visualStartPosition, visualTargetPosition, curvedProgress);
+
+if (movementProgress >= 1f) {
+transform.position = visualTargetPosition;
+isMoving = false;
+OnMovementComplete?.Invoke(gridPosition);
+}
+}
+}
+
+prot virt void OnGridPositionChanged() {
+visualStartPosition = transform.position;
+visualTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition) + visualOffset;
+movementProgress = 0f;
+
+if (!isMoving) {
+isMoving = true;
+OnMovementStart?.Invoke();
+}
+
+OnPositionChanged?.Invoke(previousGridPosition, gridPosition);
+}
+
+pub void SetPosition(GridPosition newPosition, bool instant = false) {
+Position = newPosition;
+
+if (instant) {
+transform.position = GridPositionManager.Instance.GridToWorld(Position) + visualOffset;
+visualStartPosition = transform.position;
+visualTargetPosition = transform.position;
+movementProgress = 1f;
+isMoving = false;
+}
+}
+
+pub void SnapToGrid() {
+if (GridPositionManager.Instance == null) return;
+GridPosition currentGridPos = GridPositionManager.Instance.WorldToGrid(transform.position);
+SetPosition(currentGridPos, true);
+}
+
+pub void MoveInDirection(GridPosition direction) {
+SetPosition(gridPosition + direction);
+}
+
+pub bool CanMoveTo(GridPosition targetPosition) {
+ret GridPositionManager.Instance?.IsPositionValid(targetPosition) ?? false;
+}
+
+pub void CompleteMovement() {
+if (isMoving) {
+transform.position = visualTargetPosition;
+movementProgress = 1f;
+isMoving = false;
+OnMovementComplete?.Invoke(gridPosition);
 }
 }
 }
@@ -11045,156 +10513,6 @@ AdvanceTick();
 
 pub int GetRegisteredUpdateableCount() {
 ret tickUpdateables.Count;
-}
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\Ticks\TurnPhaseManager.cs
-
-﻿using UnityEngine;
-using WegoSystem;
-
-ns WegoSystem {
-pub enum TurnPhase {
-Planning,
-Execution
-}
-
-pub cls TurnPhaseManager : MonoBehaviour, ITickUpdateable {
-pub stat TurnPhaseManager Instance { get; set; }
-
-[SerializeField] TurnPhase currentPhase = TurnPhase.Planning;
-[SerializeField] int currentPhaseTicks = 0;
-[SerializeField] bool debugMode = false;
-
-[SerializeField] bool autoAdvanceTicks = true;
-[SerializeField] float tickInterval = 0.5f; // Time between automatic ticks during execution
-
-float tickTimer = 0f;
-
-pub TurnPhase CurrentPhase => currentPhase;
-pub int CurrentPhaseTicks => currentPhaseTicks;
-pub bool IsInPlanningPhase => currentPhase == TurnPhase.Planning;
-pub bool IsInExecutionPhase => currentPhase == TurnPhase.Execution;
-
-pub event Action<TurnPhase, TurnPhase> OnPhaseChanged;
-pub event Action OnPlanningPhaseStarted;
-pub event Action OnExecutionPhaseStarted;
-
-void Awake() {
-if (Instance != null && Instance != this) {
-Destroy(gameObject);
-return;
-}
-Instance = this;
-}
-
-void Start() {
-if (TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-}
-else {
-Debug.LogError("[TurnPhaseManager] TickManager not found!");
-}
-
-TransitionToPhase(TurnPhase.Planning);
-}
-
-void OnDestroy() {
-if (Instance == this) {
-Instance = null;
-}
-
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
-}
-}
-
-void Update() {
-if (currentPhase == TurnPhase.Execution && autoAdvanceTicks) {
-tickTimer += Time.deltaTime;
-
-if (tickTimer >= tickInterval) {
-tickTimer = 0f;
-
-if (HasActionsToProcess()) {
-TickManager.Instance?.AdvanceTick();
-} else {
-TransitionToPhase(TurnPhase.Planning);
-}
-}
-}
-}
-
-pub void OnTickUpdate(int currentTick) {
-currentPhaseTicks++;
-
-}
-
-bool HasActionsToProcess() {
-var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
-foreach (var gardener in gardeners) {
-if (gardener.GetQueuedMoveCount() > 0) ret true;
-}
-
-var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-foreach (var animal in animals) {
-if (currentPhaseTicks % animal.thinkingTickInterval == 0) ret true;
-}
-
-var plants = PlantGrowth.AllActivePlants;
-if (plants.Count > 0) ret true; // Plants always need processing
-
-ret false;
-}
-
-pub void EndPlanningPhase() {
-if (currentPhase == TurnPhase.Planning) {
-TransitionToPhase(TurnPhase.Execution);
-}
-else {
-Debug.LogWarning($"[TurnPhaseManager] Cannot end planning phase - current phase is {currentPhase}");
-}
-}
-
-pub void TransitionToPhase(TurnPhase newPhase) {
-if (currentPhase == newPhase) return;
-
-TurnPhase oldPhase = currentPhase;
-currentPhase = newPhase;
-currentPhaseTicks = 0;
-tickTimer = 0f;
-
-switch (newPhase) {
-case TurnPhase.Planning:
-OnPlanningPhaseStarted?.Invoke();
-break;
-
-case TurnPhase.Execution:
-OnExecutionPhaseStarted?.Invoke();
-break;
-}
-
-OnPhaseChanged?.Invoke(oldPhase, newPhase);
-
-if (debugMode) {
-Debug.Log($"[TurnPhaseManager] Phase transition: {oldPhase} -> {newPhase}");
-}
-}
-
-pub void ForcePhase(TurnPhase phase) {
-if (Application.isEditor || Debug.isDebugBuild) {
-TransitionToPhase(phase);
-}
-}
-
-pub float GetPhaseProgress() {
-ret currentPhase == TurnPhase.Execution ? 1f : 0f;
-}
-
-pub int GetRemainingPhaseTicks() {
-ret -1;
 }
 }
 }

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 using WegoSystem;
 
-public partial class PlantGrowth : MonoBehaviour {
-
+public partial class PlantGrowth : MonoBehaviour
+{
     public void ReportCellDestroyed(Vector2Int coord) {
         if (cells.ContainsKey(coord)) {
             PlantCellType cellType = cells[coord];
@@ -13,12 +12,8 @@ public partial class PlantGrowth : MonoBehaviour {
                 for (int i = 0; i < leafDataList.Count; i++) {
                     if (leafDataList[i].GridCoord == coord) {
                         LeafData updatedData = leafDataList[i];
-                        updatedData.IsActive = false; // Mark as eaten/missing
+                        updatedData.IsActive = false;
                         leafDataList[i] = updatedData;
-
-                        if (Debug.isDebugBuild)
-                            Debug.Log($"[{gameObject.name}] Leaf at {coord} marked as missing for potential regrowth via ReportCellDestroyed.");
-
                         break;
                     }
                 }
@@ -33,43 +28,7 @@ public partial class PlantGrowth : MonoBehaviour {
         }
     }
 
-    public void RemovePlantCell(GameObject cellToRemove) {
-        if (cellToRemove == null) return;
-
-        PlantCell cellComp = cellToRemove.GetComponent<PlantCell>();
-        if (cellComp == null) { Destroy(cellToRemove); return; }
-
-        Vector2Int coord = cellComp.GridCoord;
-
-        if (cellComp.CellType == PlantCellType.Leaf) {
-            for (int i = 0; i < leafDataList.Count; i++) {
-                if (leafDataList[i].GridCoord == coord) {
-                    LeafData updatedData = leafDataList[i];
-                    updatedData.IsActive = false; // Mark as eaten/missing
-                    leafDataList[i] = updatedData;
-
-                    if (Debug.isDebugBuild)
-                        Debug.Log($"[{gameObject.name}] Leaf at {coord} marked as missing for potential regrowth.");
-
-                    break;
-                }
-            }
-        }
-
-        SpriteRenderer partRenderer = cellToRemove.GetComponentInChildren<SpriteRenderer>();
-        if (shadowController != null && partRenderer != null) {
-            shadowController.UnregisterPlantPart(partRenderer);
-        }
-
-        if (cells.ContainsKey(coord)) {
-            cells.Remove(coord);
-        }
-        activeCellGameObjects.Remove(cellToRemove);
-
-        Destroy(cellToRemove);
-    }
-
-    void ClearAllVisuals() {
+    private void ClearAllVisuals() {
         List<GameObject> cellsToClear = new List<GameObject>(activeCellGameObjects);
         foreach (GameObject cellGO in cellsToClear) {
             if (cellGO != null) {
@@ -78,11 +37,10 @@ public partial class PlantGrowth : MonoBehaviour {
         }
         activeCellGameObjects.Clear();
         cells.Clear();
-
         rootCellInstance = null;
     }
 
-    GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = null, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = null) {
+    private GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = null, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = null) {
         if (cells.ContainsKey(coords)) {
             Debug.LogWarning($"[{gameObject.name}] Trying to spawn {cellType} at occupied coord {coords}.");
             return null;
@@ -114,11 +72,7 @@ public partial class PlantGrowth : MonoBehaviour {
         activeCellGameObjects.Add(instance);
 
         SortableEntity sorter = instance.GetComponent<SortableEntity>() ?? instance.AddComponent<SortableEntity>();
-        if (cellType == PlantCellType.Seed) {
-            sorter.SetUseParentYCoordinate(false);
-        } else {
-            sorter.SetUseParentYCoordinate(true);
-        }
+        sorter.SetUseParentYCoordinate(cellType != PlantCellType.Seed);
 
         if (cellType == PlantCellType.Fruit) {
             ApplyScentDataToObject(instance, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
@@ -132,9 +86,8 @@ public partial class PlantGrowth : MonoBehaviour {
         return instance;
     }
 
-    void RegisterShadowForCell(GameObject cellInstance, string cellTypeName) {
+    private void RegisterShadowForCell(GameObject cellInstance, string cellTypeName) {
         if (shadowController == null || shadowPartPrefab == null || cellInstance == null) return;
-
         SpriteRenderer partRenderer = cellInstance.GetComponentInChildren<SpriteRenderer>();
         if (partRenderer != null) {
             shadowController.RegisterPlantPart(partRenderer, shadowPartPrefab);
@@ -142,101 +95,34 @@ public partial class PlantGrowth : MonoBehaviour {
             Debug.LogWarning($"Plant '{gameObject.name}': {cellTypeName} missing SpriteRenderer. No shadow.", cellInstance);
         }
     }
+    
+    private List<Vector2Int> CalculateLeafPositions(Vector2Int stemPos, int stageCounter) {
+        List<Vector2Int> leafPositions = new List<Vector2Int>();
+        Vector2Int leftBase = stemPos + Vector2Int.left;
+        Vector2Int rightBase = stemPos + Vector2Int.right;
 
-    void CalculateAndApplyStats() {
-        if (nodeGraph == null) {
-            Debug.LogError($"[{gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
-            return;
-        }
-
-        float baseEnergyStorage = 10f;
-        float basePhotosynthesisRate = 0.5f;
-        int baseStemMin = 3;
-        int baseStemMax = 5;
-        float baseGrowthSpeedInterval = 0.5f;
-        int baseLeafGap = 1;
-        int baseLeafPattern = 0;
-        float baseGrowthRandomness = 0.1f;
-        float baseCooldown = 5f;
-        float baseCastDelay = 0.1f;
-
-        float accumulatedEnergyStorage = 0f;
-        float accumulatedPhotosynthesis = 0f;
-        int stemLengthModifier = 0;
-        float growthSpeedTimeModifier = 0f;
-        int leafGapModifier = 0;
-        int currentLeafPattern = baseLeafPattern;
-        float growthRandomnessModifier = 0f;
-        float cooldownModifier = 0f;
-        float castDelayModifier = 0f;
-        bool seedFound = false;
-
-        poopDetectionRadius = 0f;
-        poopEnergyBonus = 0f;
-
-        foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-            if (node?.effects == null) continue;
-            foreach (var effect in node.effects) {
-                if (effect == null || !effect.isPassive) continue;
-                switch (effect.effectType) {
-                    case NodeEffectType.SeedSpawn:
-                        seedFound = true;
-                        break;
-                    case NodeEffectType.EnergyStorage:
-                        accumulatedEnergyStorage += effect.primaryValue;
-                        break;
-                    case NodeEffectType.EnergyPhotosynthesis:
-                        accumulatedPhotosynthesis += effect.primaryValue;
-                        break;
-                    case NodeEffectType.StemLength:
-                        stemLengthModifier += Mathf.RoundToInt(effect.primaryValue);
-                        break;
-                    case NodeEffectType.GrowthSpeed:
-                        growthSpeedTimeModifier += effect.primaryValue;
-                        break;
-                    case NodeEffectType.LeafGap:
-                        leafGapModifier += Mathf.RoundToInt(effect.primaryValue);
-                        break;
-                    case NodeEffectType.LeafPattern:
-                        currentLeafPattern = Mathf.Clamp(Mathf.RoundToInt(effect.primaryValue), 0, 4);
-                        break;
-                    case NodeEffectType.StemRandomness:
-                        growthRandomnessModifier += effect.primaryValue;
-                        break;
-                    case NodeEffectType.Cooldown:
-                        cooldownModifier += effect.primaryValue;
-                        break;
-                    case NodeEffectType.CastDelay:
-                        castDelayModifier += effect.primaryValue;
-                        break;
-                    case NodeEffectType.PoopFertilizer:
-                        poopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
-                        poopEnergyBonus = Mathf.Max(0f, effect.secondaryValue);
-                        break;
+        switch (finalLeafPattern) {
+            case 0: leafPositions.Add(leftBase); leafPositions.Add(rightBase); break;
+            case 1:
+                if (offsetRightForPattern1 == null) offsetRightForPattern1 = Random.value < 0.5f;
+                if (offsetRightForPattern1.Value) { leafPositions.Add(leftBase); leafPositions.Add(rightBase + Vector2Int.up); } 
+                else { leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); }
+                break;
+            case 2:
+                switch (stageCounter % 4) {
+                    case 0: case 2: leafPositions.Add(leftBase); leafPositions.Add(rightBase); break;
+                    case 1: leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); break;
+                    case 3: leafPositions.Add(leftBase); leafPositions.Add(rightBase + Vector2Int.up); break;
                 }
-            }
+                break;
+            case 3:
+                int spiralDir = (stageCounter % 2 == 0) ? 1 : -1;
+                if (spiralDir > 0) { leafPositions.Add(leftBase); leafPositions.Add(rightBase + Vector2Int.up); } 
+                else { leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); }
+                break;
+            case 4: leafPositions.Add(leftBase); leafPositions.Add(leftBase + Vector2Int.up); leafPositions.Add(rightBase); leafPositions.Add(rightBase + Vector2Int.up); break;
+            default: leafPositions.Add(leftBase); leafPositions.Add(rightBase); break;
         }
-
-        finalMaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
-        finalPhotosynthesisRate = Mathf.Max(0f, basePhotosynthesisRate + accumulatedPhotosynthesis);
-        int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier);
-        int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
-        finalGrowthSpeed = Mathf.Max(0.01f, baseGrowthSpeedInterval + growthSpeedTimeModifier);
-        finalLeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
-        finalLeafPattern = currentLeafPattern;
-        finalGrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
-        cycleCooldown = Mathf.Max(0.1f, baseCooldown + cooldownModifier);
-        nodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
-
-        targetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
-
-        if (useWegoSystem && TickManager.Instance?.Config != null) {
-            growthTicksPerStage = TickManager.Instance.Config.plantGrowthTicksPerStage;
-            maturityCycleTicks = Mathf.RoundToInt(cycleCooldown * (TickManager.Instance.Config.ticksPerRealSecond));
-        }
-
-        if (!seedFound) {
-            Debug.LogWarning($"[{gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth aborted.", gameObject);
-        }
+        return leafPositions;
     }
 }
