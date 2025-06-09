@@ -9,8 +9,10 @@ namespace WegoSystem
     {
         public static GridPositionManager Instance { get; set; }
 
-        [SerializeField] private float cellSize = 1f;
-        [SerializeField] private Vector3 gridOrigin = Vector3.zero;
+        // These are now private to enforce synchronization from the tile grid
+        private float cellSize = 1f;
+        private Vector3 gridOrigin = Vector3.zero;
+
         [SerializeField] private Vector2Int gridBounds = new Vector2Int(100, 100);
 
         [SerializeField] private bool showGridGizmos = true;
@@ -34,6 +36,7 @@ namespace WegoSystem
 
         void Start()
         {
+            // The single source of truth for grid alignment
             SyncWithTileGrid();
         }
 
@@ -51,10 +54,16 @@ namespace WegoSystem
             {
                 var tileGrid = TileInteractionManager.Instance.interactionGrid;
 
-                cellSize = tileGrid.cellSize.x; // Assuming square cells
-                gridOrigin = tileGrid.transform.position;
+                // Set internal parameters from the authoritative grid
+                this.cellSize = tileGrid.cellSize.x;
+                this.gridOrigin = tileGrid.transform.position;
 
-                Debug.Log($"[GridPositionManager] Synced with tile grid. Cell size: {cellSize}, Origin: {gridOrigin}");
+                if (debugMode)
+                    Debug.Log($"[GridPositionManager] Successfully synced with TileInteractionManager's grid. CellSize: {cellSize}, Origin: {gridOrigin}");
+            }
+            else
+            {
+                Debug.LogError("[GridPositionManager] Could not find TileInteractionManager or its grid to sync with! Grid system may be misaligned.");
             }
         }
 

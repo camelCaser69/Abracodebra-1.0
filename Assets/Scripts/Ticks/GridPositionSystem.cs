@@ -118,9 +118,13 @@ namespace WegoSystem
 
     public class GridEntity : MonoBehaviour
     {
+        [Header("Grid Logic")]
         [SerializeField] private GridPosition gridPosition;
-        [SerializeField] private float visualInterpolationSpeed = 5f;
         [SerializeField] private bool snapToGridOnStart = true;
+
+        [Header("Visuals")]
+        [SerializeField] private Vector3 visualOffset = Vector3.zero;
+        [SerializeField] private float visualInterpolationSpeed = 5f;
         [SerializeField] private AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
         private GridPosition previousGridPosition;
@@ -132,7 +136,7 @@ namespace WegoSystem
         public GridPosition Position
         {
             get => gridPosition;
-            set
+            private set // Keep setter private to be controlled by SetPosition method
             {
                 if (gridPosition != value)
                 {
@@ -153,10 +157,9 @@ namespace WegoSystem
 
         protected virtual void Start()
         {
-            if (snapToGridOnStart && GridPositionManager.Instance != null)
+            if (snapToGridOnStart)
             {
-                gridPosition = GridPositionManager.Instance.WorldToGrid(transform.position);
-                transform.position = GridPositionManager.Instance.GridToWorld(gridPosition);
+                SnapToGrid();
             }
 
             visualStartPosition = transform.position;
@@ -193,7 +196,8 @@ namespace WegoSystem
         protected virtual void OnGridPositionChanged()
         {
             visualStartPosition = transform.position;
-            visualTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
+            // The target position is the grid cell center PLUS the visual offset.
+            visualTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition) + visualOffset;
             movementProgress = 0f;
 
             if (!isMoving)
@@ -211,11 +215,20 @@ namespace WegoSystem
 
             if (instant)
             {
-                transform.position = visualTargetPosition;
-                visualStartPosition = visualTargetPosition;
+                // Instantly apply the position including the visual offset
+                transform.position = GridPositionManager.Instance.GridToWorld(Position) + visualOffset;
+                visualStartPosition = transform.position;
+                visualTargetPosition = transform.position;
                 movementProgress = 1f;
                 isMoving = false;
             }
+        }
+
+        public void SnapToGrid()
+        {
+            if (GridPositionManager.Instance == null) return;
+            GridPosition currentGridPos = GridPositionManager.Instance.WorldToGrid(transform.position);
+            SetPosition(currentGridPos, true);
         }
 
         public void MoveInDirection(GridPosition direction)
