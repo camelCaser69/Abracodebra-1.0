@@ -9,12 +9,13 @@ namespace WegoSystem
     {
         public static GridPositionManager Instance { get; set; }
 
-        // These are now private to enforce synchronization from the tile grid
-        private float cellSize = 1f;
-        private Vector3 gridOrigin = Vector3.zero;
+        // The authoritative grid, obtained from TileInteractionManager.
+        private Grid tilemapGrid;
 
+        [Header("Grid Boundaries")]
         [SerializeField] private Vector2Int gridBounds = new Vector2Int(100, 100);
 
+        [Header("Gizmos & Debug")]
         [SerializeField] private bool showGridGizmos = true;
         [SerializeField] private Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
         [SerializeField] private int gizmoGridSize = 20;
@@ -36,7 +37,7 @@ namespace WegoSystem
 
         void Start()
         {
-            // The single source of truth for grid alignment
+            // The single source of truth for grid alignment.
             SyncWithTileGrid();
         }
 
@@ -52,14 +53,11 @@ namespace WegoSystem
         {
             if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null)
             {
-                var tileGrid = TileInteractionManager.Instance.interactionGrid;
-
-                // Set internal parameters from the authoritative grid
-                this.cellSize = tileGrid.cellSize.x;
-                this.gridOrigin = tileGrid.transform.position;
+                // Store a direct reference to the authoritative grid component.
+                this.tilemapGrid = TileInteractionManager.Instance.interactionGrid;
 
                 if (debugMode)
-                    Debug.Log($"[GridPositionManager] Successfully synced with TileInteractionManager's grid. CellSize: {cellSize}, Origin: {gridOrigin}");
+                    Debug.Log($"[GridPositionManager] Successfully synced with TileInteractionManager's grid: '{this.tilemapGrid.name}'.");
             }
             else
             {
@@ -69,19 +67,18 @@ namespace WegoSystem
 
         public GridPosition WorldToGrid(Vector3 worldPosition)
         {
-            Vector3 localPosition = worldPosition - gridOrigin;
-            int x = Mathf.RoundToInt(localPosition.x / cellSize);
-            int y = Mathf.RoundToInt(localPosition.y / cellSize);
-            return new GridPosition(x, y);
+            if (tilemapGrid == null) return GridPosition.Zero;
+            // Use the authoritative grid's built-in conversion method.
+            Vector3Int cellPos = tilemapGrid.WorldToCell(worldPosition);
+            return new GridPosition(cellPos);
         }
 
         public Vector3 GridToWorld(GridPosition gridPosition)
         {
-            return new Vector3(
-                gridPosition.x * cellSize + gridOrigin.x,
-                gridPosition.y * cellSize + gridOrigin.y,
-                gridOrigin.z
-            );
+            if (tilemapGrid == null) return Vector3.zero;
+            // Use the authoritative grid's method to get the *center* of the cell.
+            // This solves the corner-snapping issue.
+            return tilemapGrid.GetCellCenterWorld(gridPosition.ToVector3Int());
         }
 
         public Vector3 GetCellCenter(GridPosition gridPosition)
@@ -91,6 +88,7 @@ namespace WegoSystem
 
         public bool IsPositionValid(GridPosition position)
         {
+            // This boundary check is independent of the grid component itself.
             return position.x >= -gridBounds.x / 2 && position.x < gridBounds.x / 2 &&
                    position.y >= -gridBounds.y / 2 && position.y < gridBounds.y / 2;
         }
@@ -310,16 +308,11 @@ namespace WegoSystem
                 gridEntity = entity.AddComponent<GridEntity>();
             }
 
-            GridPosition nearestGrid = WorldToGrid(entity.transform.position);
-            Vector3 snappedWorldPos = GridToWorld(nearestGrid);
-
-            entity.transform.position = snappedWorldPos;
-
-            gridEntity.SetPosition(nearestGrid, instant: true);
+            gridEntity.SnapToGrid();
 
             if (debugMode)
             {
-                Debug.Log($"[GridPositionManager] Snapped {entity.name} from {entity.transform.position} to grid {nearestGrid} at world {snappedWorldPos}");
+                Debug.Log($"[GridPositionManager] Snapped {entity.name} to grid {gridEntity.Position}");
             }
         }
 
@@ -335,7 +328,7 @@ namespace WegoSystem
 
         void OnDrawGizmos()
         {
-            if (!showGridGizmos) return;
+            if (!showGridGizmos || tilemapGrid == null) return;
 
             Gizmos.color = gridColor;
 
@@ -362,7 +355,7 @@ namespace WegoSystem
                 if (kvp.Value.Count > 0)
                 {
                     Vector3 cellCenter = GridToWorld(kvp.Key);
-                    Gizmos.DrawWireCube(cellCenter, Vector3.one * cellSize * 0.8f);
+                    Gizmos.DrawWireCube(cellCenter, Vector3.one * tilemapGrid.cellSize.x * 0.8f);
                 }
             }
         }
