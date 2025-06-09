@@ -1,75 +1,93 @@
-﻿using UnityEngine;
+﻿// Assets\Scripts\Ecosystem\Environment\SlowdownZone.cs
+
+using UnityEngine;
 using System.Collections.Generic;
+using WegoSystem;
 
-public class SlowdownZone : MonoBehaviour
-{
-    [Header("Slowdown Settings")]
-    [Tooltip("How much to multiply movement speed by (0.5 = half speed)")]
-    [Range(0.1f, 1.0f)]
-    public float speedMultiplier = 0.5f;
-
-    [Header("Collider Adjustment")]
-    [Tooltip("How much to shrink the collider from its edges (in units). Only works with BoxCollider2D.")]
-    [Range(0f, 1f)]
-    public float colliderShrinkAmount = 0.2f; // Defaulted to 0.2f in original, if 0 no warning will show for non-BoxColliders
-
+public class SlowdownZone : MonoBehaviour {
+    [Header("Tick Cost Settings")]
+    [SerializeField] int additionalTickCost = 1; // Moving through this zone costs extra ticks
+    [SerializeField] bool affectsAnimals = true;
+    [SerializeField] bool affectsPlayer = true;
+    
+    [Header("Visual Settings")]
+    [SerializeField] float colliderShrinkAmount = 0.2f;
+    [SerializeField] Color zoneColor = new Color(0.5f, 0.5f, 1f, 0.3f); // Blue tint for water
+    
     [Header("Debug")]
-    [SerializeField] private bool showDebugMessages = false;
+    [SerializeField] bool showDebugMessages = false;
 
-    private Dictionary<int, AnimalController> affectedAnimals = new Dictionary<int, AnimalController>();
-    private Dictionary<int, GardenerController> affectedPlayers = new Dictionary<int, GardenerController>();
+    // Track entities in zone
+    Dictionary<int, GridEntity> entitiesInZone = new Dictionary<int, GridEntity>();
 
-    private Vector2 originalSize;
-    private Vector2 originalOffset;
-    private BoxCollider2D boxCollider; // Cached BoxCollider2D, null if not a BoxCollider2D
+    Vector2 originalSize;
+    Vector2 originalOffset;
+    BoxCollider2D boxCollider;
+    SpriteRenderer visualRenderer;
 
-    private const float SHRINK_EPSILON = 0.001f; // For comparing colliderShrinkAmount against zero
+    const float SHRINK_EPSILON = 0.001f;
 
-    private void Awake()
-    {
+    void Awake() {
         Collider2D col = GetComponent<Collider2D>();
-        if (col == null)
-        {
+        if (col == null) {
             Debug.LogError($"SlowdownZone on '{gameObject.name}' requires a Collider2D component!", gameObject);
             enabled = false;
             return;
         }
 
-        if (!col.isTrigger)
-        {
+        if (!col.isTrigger) {
             col.isTrigger = true;
-            // Optional: Log that trigger was auto-enabled
-            // if (showDebugMessages) Debug.Log($"SlowdownZone on '{gameObject.name}' automatically enabled isTrigger on its collider.");
         }
 
-        boxCollider = col as BoxCollider2D; // Attempt to cast to BoxCollider2D
+        boxCollider = col as BoxCollider2D;
 
-        if (boxCollider != null)
-        {
-            // It's a BoxCollider2D
+        if (boxCollider != null) {
             originalSize = boxCollider.size;
             originalOffset = boxCollider.offset;
 
-            if (colliderShrinkAmount > SHRINK_EPSILON)
-            {
+            if (colliderShrinkAmount > SHRINK_EPSILON) {
                 ShrinkCollider();
             }
-            // No warning needed if it's a BoxCollider2D, regardless of shrinkAmount
         }
-        else
-        {
-            // It's NOT a BoxCollider2D (e.g., TilemapCollider2D, PolygonCollider2D)
-            if (colliderShrinkAmount > SHRINK_EPSILON) // Only warn if shrinking was actually intended
-            {
-               // Debug.LogWarning($"SlowdownZone on '{gameObject.name}' has a 'Collider Shrink Amount' of {colliderShrinkAmount} but is using a '{col.GetType().Name}'. This collider type does not support automatic shrinking. Shrinking will be ignored.", gameObject);
+        else {
+            if (colliderShrinkAmount > SHRINK_EPSILON) {
+                Debug.LogWarning($"SlowdownZone on '{gameObject.name}': Collider shrinking only works with BoxCollider2D. Current collider type: {col.GetType().Name}");
             }
-            // If colliderShrinkAmount is 0 (or very close), no warning is issued, which is correct.
+        }
+
+        // Setup visual indicator
+        SetupVisualIndicator();
+    }
+
+    void SetupVisualIndicator() {
+        // Check if we already have a visual renderer
+        visualRenderer = GetComponent<SpriteRenderer>();
+        
+        if (visualRenderer == null) {
+            // Create a child object for the visual
+            GameObject visualObj = new GameObject("ZoneVisual");
+            visualObj.transform.SetParent(transform);
+            visualObj.transform.localPosition = Vector3.zero;
+            visualObj.transform.localScale = Vector3.one;
+            
+            visualRenderer = visualObj.AddComponent<SpriteRenderer>();
+            visualRenderer.sprite = CreateSquareSprite();
+            visualRenderer.color = zoneColor;
+            visualRenderer.sortingOrder = -10; // Render behind most things
         }
     }
 
-    private void ShrinkCollider()
-    {
-        if (boxCollider == null) return; // Should not happen if called correctly, but safety first
+    Sprite CreateSquareSprite() {
+        // Create a simple white square sprite for the zone visual
+        Texture2D tex = new Texture2D(1, 1);
+        tex.SetPixel(0, 0, Color.white);
+        tex.Apply();
+        
+        return Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1);
+    }
+
+    void ShrinkCollider() {
+        if (boxCollider == null) return;
 
         Vector2 newSize = new Vector2(
             Mathf.Max(0.1f, originalSize.x - (colliderShrinkAmount * 2f)),
@@ -77,155 +95,132 @@ public class SlowdownZone : MonoBehaviour
         );
 
         boxCollider.size = newSize;
-        // Note: originalOffset is not changed by this shrinking method.
 
-        if (showDebugMessages)
-        {
+        if (showDebugMessages) {
             Debug.Log($"SlowdownZone on '{gameObject.name}': Shrunk BoxCollider2D from {originalSize} to {newSize}");
         }
     }
 
-    private void RestoreCollider()
-    {
+    void RestoreCollider() {
         if (boxCollider == null) return;
 
         boxCollider.size = originalSize;
-        boxCollider.offset = originalOffset; // Ensure offset is also restored
+        boxCollider.offset = originalOffset;
 
-        if (showDebugMessages)
-        {
+        if (showDebugMessages) {
             Debug.Log($"SlowdownZone on '{gameObject.name}': Restored BoxCollider2D to original size {originalSize} and offset {originalOffset}");
         }
     }
 
-    private void OnValidate()
-    {
-        // This method is called in the editor when a script's properties are changed.
-        // It's also called when the script is first loaded or a value is changed in the Inspector.
-
-        // If we have a cached BoxCollider2D (meaning it was a BoxCollider2D at Awake)
-        if (boxCollider != null)
-        {
-            if (colliderShrinkAmount > SHRINK_EPSILON)
-            {
-                // If playing, originalSize should be set. If not playing, Awake might not have run.
-                // To be safe, only shrink if originalSize seems valid (not zero).
-                if (originalSize != Vector2.zero || Application.isPlaying) // Application.isPlaying ensures Awake has run
-                {
-                     ShrinkCollider();
-                }
-                else if (showDebugMessages && !Application.isPlaying)
-                {
-                    // Debug.Log($"SlowdownZone OnValidate (Editor): '{gameObject.name}' BoxCollider2D detected, but originalSize not cached (Awake likely not run yet for this specific validation). Shrinking will apply on Play.");
+    void OnValidate() {
+        if (boxCollider != null) {
+            if (colliderShrinkAmount > SHRINK_EPSILON) {
+                if (originalSize != Vector2.zero || Application.isPlaying) {
+                    ShrinkCollider();
                 }
             }
-            else // colliderShrinkAmount is effectively zero
-            {
-                // If originalSize is known, restore it.
-                if (originalSize != Vector2.zero || Application.isPlaying)
-                {
+            else {
+                if (originalSize != Vector2.zero || Application.isPlaying) {
                     RestoreCollider();
                 }
-                else if (showDebugMessages && !Application.isPlaying)
-                {
-                    // Debug.Log($"SlowdownZone OnValidate (Editor): '{gameObject.name}' BoxCollider2D detected, shrink amount is zero, but originalSize not cached. Restoration will apply on Play if needed.");
+            }
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other) {
+        // Check for GridEntity component
+        GridEntity gridEntity = other.GetComponent<GridEntity>();
+        if (gridEntity == null) return;
+
+        // Check if it's a type we affect
+        bool shouldAffect = false;
+        
+        if (affectsAnimals && other.GetComponent<AnimalController>() != null) {
+            shouldAffect = true;
+        }
+        else if (affectsPlayer && other.GetComponent<GardenerController>() != null) {
+            shouldAffect = true;
+        }
+
+        if (shouldAffect) {
+            int id = gridEntity.GetInstanceID();
+            if (!entitiesInZone.ContainsKey(id)) {
+                entitiesInZone.Add(id, gridEntity);
+                
+                // In future, we could notify the entity it's in a slow zone
+                // For now, the PlayerActionManager will check zone status when moving
+                
+                if (showDebugMessages) {
+                    Debug.Log($"SlowdownZone: '{other.name}' entered zone (will cost {1 + additionalTickCost} ticks to move)");
                 }
             }
         }
-        // If boxCollider is null, it means it wasn't a BoxCollider2D at Awake (or Awake hasn't run).
-        // In this case, OnValidate won't attempt to shrink or restore, aligning with Awake's logic.
-        // The warning about non-BoxCollider shrinking (if applicable) is handled by Awake at runtime.
     }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        AnimalController animal = other.GetComponent<AnimalController>();
-        if (animal != null)
-        {
-            int id = animal.GetInstanceID();
-            if (!affectedAnimals.ContainsKey(id)) // Ensure not already added
-            {
-                affectedAnimals.Add(id, animal);
-                animal.ApplySpeedMultiplier(speedMultiplier);
-                if (showDebugMessages)
-                    Debug.Log($"SlowdownZone: '{animal.name}' entered zone, applied multiplier {speedMultiplier}");
-            }
-            return;
-        }
+    void OnTriggerExit2D(Collider2D other) {
+        GridEntity gridEntity = other.GetComponent<GridEntity>();
+        if (gridEntity == null) return;
 
-        GardenerController player = other.GetComponent<GardenerController>();
-        if (player != null)
-        {
-            int id = player.GetInstanceID();
-            if (!affectedPlayers.ContainsKey(id)) // Ensure not already added
-            {
-                affectedPlayers.Add(id, player);
-                player.ApplySpeedMultiplier(speedMultiplier);
-                if (showDebugMessages)
-                    Debug.Log($"SlowdownZone: Player '{player.name}' entered zone, applied multiplier {speedMultiplier}");
+        int id = gridEntity.GetInstanceID();
+        if (entitiesInZone.ContainsKey(id)) {
+            entitiesInZone.Remove(id);
+            
+            if (showDebugMessages) {
+                Debug.Log($"SlowdownZone: '{other.name}' exited zone (movement cost back to normal)");
             }
         }
     }
 
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        AnimalController animal = other.GetComponent<AnimalController>();
-        if (animal != null)
-        {
-            int id = animal.GetInstanceID();
-            if (affectedAnimals.ContainsKey(id))
-            {
-                animal.RemoveSpeedMultiplier(speedMultiplier); // Call RemoveSpeedMultiplier on the animal
-                affectedAnimals.Remove(id);
-                if (showDebugMessages)
-                    Debug.Log($"SlowdownZone: '{animal.name}' exited zone, removed multiplier");
-            }
-            return;
+    // Public method to check if a position is in this zone
+    public bool IsPositionInZone(Vector3 worldPosition) {
+        if (boxCollider != null) {
+            return boxCollider.bounds.Contains(worldPosition);
         }
-
-        GardenerController player = other.GetComponent<GardenerController>();
-        if (player != null)
-        {
-            int id = player.GetInstanceID();
-            if (affectedPlayers.ContainsKey(id))
-            {
-                player.RemoveSpeedMultiplier(speedMultiplier); // Call RemoveSpeedMultiplier on the player
-                affectedPlayers.Remove(id);
-                if (showDebugMessages)
-                    Debug.Log($"SlowdownZone: Player '{player.name}' exited zone, removed multiplier");
-            }
+        
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) {
+            return col.bounds.Contains(worldPosition);
         }
+        
+        return false;
     }
 
-    private void OnDestroy()
-    {
-        foreach (var animalEntry in affectedAnimals)
-        {
-            if (animalEntry.Value != null) // Check if animal still exists
-            {
-                animalEntry.Value.RemoveSpeedMultiplier(speedMultiplier);
-            }
-        }
-        affectedAnimals.Clear();
+    // Public method to get tick cost for being in this zone
+    public int GetAdditionalTickCost() {
+        return additionalTickCost;
+    }
 
-        foreach (var playerEntry in affectedPlayers)
-        {
-            if (playerEntry.Value != null) // Check if player still exists
-            {
-                playerEntry.Value.RemoveSpeedMultiplier(speedMultiplier);
-            }
-        }
-        affectedPlayers.Clear();
+    // Check if a specific entity is in this zone
+    public bool IsEntityInZone(GridEntity entity) {
+        if (entity == null) return false;
+        return entitiesInZone.ContainsKey(entity.GetInstanceID());
+    }
 
-        // Restore collider on destroy if it was shrunk
-        if (boxCollider != null && colliderShrinkAmount > SHRINK_EPSILON)
-        {
-             // Check if originalSize is valid before restoring.
-             // This is mostly relevant if OnDestroy is called before Awake fully completes,
-             // or if the object is destroyed from the editor without playing.
-            if (originalSize != Vector2.zero)
-            {
+    void OnDestroy() {
+        entitiesInZone.Clear();
+
+        if (boxCollider != null && colliderShrinkAmount > SHRINK_EPSILON) {
+            if (originalSize != Vector2.zero) {
                 RestoreCollider();
+            }
+        }
+    }
+
+    void OnDrawGizmos() {
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) {
+            Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.3f);
+            
+            if (col is BoxCollider2D box) {
+                Vector3 center = transform.position + (Vector3)box.offset;
+                Vector3 size = new Vector3(box.size.x, box.size.y, 0) * transform.lossyScale.x;
+                Gizmos.DrawCube(center, size);
+                
+                Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.8f);
+                Gizmos.DrawWireCube(center, size);
+            }
+            else {
+                Gizmos.DrawWireCube(col.bounds.center, col.bounds.size);
             }
         }
     }

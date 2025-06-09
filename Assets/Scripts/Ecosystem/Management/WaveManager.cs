@@ -273,36 +273,30 @@ public class WaveManager : MonoBehaviour
         UpdateLegacyWaveStatusText();
     }
 
-    private void UpdateLegacyTimeTrackerUI()
-    {
+    void UpdateLegacyTimeTrackerUI() {
         if (timeTrackerText == null || weatherManager == null) return;
-        // ... (same as before, but consider if this UI is still needed)
         WeatherManager.CyclePhase phase = weatherManager.CurrentPhase;
         float total = weatherManager.CurrentTotalPhaseTime;
         float remaining = weatherManager.CurrentPhaseTimer;
         float progressPercent = (total > 0) ? (1f - (remaining / total)) * 100f : 0f;
         string phaseName = phase.ToString().Replace("Transition", "");
         timeTrackerText.text = $"{phaseName} [{progressPercent:F0}%]";
-         if (RunManager.Instance != null)
-         {
+        if (RunManager.Instance != null) {
             if(RunManager.Instance.CurrentState == RunState.Planning) timeTrackerText.text += " (Planning)";
-            else if(RunManager.Instance.CurrentState == RunState.Recovery) timeTrackerText.text += " (Recovery)";
-         }
+            else if(RunManager.Instance.CurrentState == RunState.GrowthAndThreat) timeTrackerText.text += " (Growth & Threat)";
+            // REMOVED: Recovery state check since it doesn't exist anymore
+        }
     }
 
-    private void UpdateLegacyWaveStatusText()
-    {
+    void UpdateLegacyWaveStatusText() {
         if (waveStatusText == null) return;
         if (RunManager.Instance == null) return;
 
-        if (RunManager.Instance.CurrentState == RunState.Planning)
-        {
+        if (RunManager.Instance.CurrentState == RunState.Planning) {
             waveStatusText.text = $"Prepare for Round {RunManager.Instance.CurrentRoundNumber}";
         }
-        else if (RunManager.Instance.CurrentState == RunState.GrowthAndThreat)
-        {
-            if (currentActiveWaveDef != null)
-            {
+        else if (RunManager.Instance.CurrentState == RunState.GrowthAndThreat) {
+            if (currentActiveWaveDef != null) {
                 string waveNamePart = string.IsNullOrEmpty(currentActiveWaveDef.waveName) ? $"Wave {activeWaveDefinitionIndex + 1}" : currentActiveWaveDef.waveName;
                 if (currentInternalState == InternalWaveState.WaitingForSpawnTime)
                     waveStatusText.text = $"{waveNamePart} - Waiting...";
@@ -311,17 +305,15 @@ public class WaveManager : MonoBehaviour
                 else if (currentInternalState == InternalWaveState.WaveActive)
                     waveStatusText.text = $"{waveNamePart} [{dayCyclesRemainingForThisWaveDef} cycles left]";
                 else if (currentInternalState == InternalWaveState.Idle && dayCyclesRemainingForThisWaveDef <=0) // Wave finished
-                     waveStatusText.text = $"{waveNamePart} - Cleared";
+                    waveStatusText.text = $"{waveNamePart} - Cleared";
             }
             else if (currentInternalState == InternalWaveState.Idle) // No wave for this round, or sequence finished
             {
                 waveStatusText.text = "All waves for round complete.";
             }
         }
-        else if (RunManager.Instance.CurrentState == RunState.Recovery)
-        {
-            waveStatusText.text = "Round Recovering";
-        }
+        // REMOVED: Recovery state handling since it doesn't exist anymore
     }
+    
     public Camera GetMainCamera() { return mainCamera; } // If FaunaManager still needs it via WaveManager
 }

@@ -5,9 +5,9 @@ using UnityEngine;
 using WegoSystem;
 using System.Linq;
 
-public class AnimalController : SpeedModifiable, ITickUpdateable {
+public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer inherits from SpeedModifiable
     [SerializeField] bool useWegoMovement = true;
-    [SerializeField] int thinkingTickInterval = 3; // How often to make decisions
+    [SerializeField] int thinkingTickInterval = 3;
 
     AnimalDefinition definition;
     AnimalDiet animalDiet;
@@ -115,9 +115,6 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
             originalColor = spriteRenderer.color;
         }
 
-        baseSpeed = definition.movementSpeed;
-        currentSpeed = baseSpeed;
-
         currentHealth = definition.maxHealth;
         currentHunger = 0f;
         hasPooped = true;
@@ -159,10 +156,11 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
         }
     }
     
-    protected override void Awake() {
-        base.Awake();
-        
-        // ... existing setup ...
+    void Awake() {
+        animalDiet = definition?.diet;
+        gridEntity = GetComponent<GridEntity>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        animalCollider = GetComponent<Collider2D>();
         
         gridEntity = GetComponent<GridEntity>();
         if (gridEntity == null) {
@@ -875,13 +873,6 @@ public class AnimalController : SpeedModifiable, ITickUpdateable {
 
         if (hungerText != null) {
             hungerText.gameObject.SetActive(visible);
-        }
-    }
-
-    protected override void OnSpeedChanged(float newSpeed) {
-        if (animator != null) {
-            float speedRatio = (baseSpeed > 0f) ? newSpeed / baseSpeed : 1f;
-            animator.speed = Mathf.Max(0.5f, speedRatio);
         }
     }
 

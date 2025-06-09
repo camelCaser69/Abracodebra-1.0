@@ -48,6 +48,10 @@ public class PlayerActionManager : MonoBehaviour {
             return false;
         }
 
+        // Calculate tick cost based on destination
+        Vector3 worldPos = GridPositionManager.Instance.GridToWorld(to);
+        int movementCost = GetMovementTickCost(worldPos);
+
         // Check if we're in planning phase (if using turn system)
         if (TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
             // Queue the move but don't advance tick yet
@@ -59,8 +63,8 @@ public class PlayerActionManager : MonoBehaviour {
 
         // Execute immediate movement (for simplified system)
         if (ExecuteImmediateMove(gardener, to)) {
-            // CRITICAL: Only advance tick on successful action
-            AdvanceGameTick(tickCostPerAction);
+            // CRITICAL: Advance tick by movement cost
+            AdvanceGameTick(movementCost);
             OnActionExecuted?.Invoke(PlayerActionType.Move, true);
             return true;
         }
@@ -96,117 +100,136 @@ public class PlayerActionManager : MonoBehaviour {
                 break;
                 
             case PlayerActionType.Interact:
-                success = ExecuteInteraction(gridPosition, actionData);
-                break;
-        }
+               success = ExecuteInteraction(gridPosition, actionData);
+               break;
+       }
 
-        if (success) {
-            // CRITICAL: Only advance tick on successful action
-            AdvanceGameTick(tickCost);
-            OnActionExecuted?.Invoke(actionType, true);
-        } else {
-            OnActionFailed?.Invoke($"{actionType} failed");
-        }
+       if (success) {
+           // CRITICAL: Only advance tick on successful action
+           AdvanceGameTick(tickCost);
+           OnActionExecuted?.Invoke(actionType, true);
+       } else {
+           OnActionFailed?.Invoke($"{actionType} failed");
+       }
 
-        return success;
-    }
+       return success;
+   }
 
-    // Validation methods
-    bool ValidateMovement(GridPosition from, GridPosition to) {
-        // Must be adjacent
-        int distance = from.ManhattanDistance(to);
-        if (distance != 1) {
-            if (debugMode) Debug.Log($"[PlayerActionManager] Movement validation failed: distance {distance} != 1");
-            return false;
-        }
+   // Validation methods
+   bool ValidateMovement(GridPosition from, GridPosition to) {
+       // Must be adjacent
+       int distance = from.ManhattanDistance(to);
+       if (distance != 1) {
+           if (debugMode) Debug.Log($"[PlayerActionManager] Movement validation failed: distance {distance} != 1");
+           return false;
+       }
 
-        // Check bounds
-        if (!GridPositionManager.Instance.IsPositionValid(to)) {
-            if (debugMode) Debug.Log($"[PlayerActionManager] Movement validation failed: position {to} out of bounds");
-            return false;
-        }
+       // Check bounds
+       if (!GridPositionManager.Instance.IsPositionValid(to)) {
+           if (debugMode) Debug.Log($"[PlayerActionManager] Movement validation failed: position {to} out of bounds");
+           return false;
+       }
 
-        // Check occupancy
-        if (GridPositionManager.Instance.IsPositionOccupied(to)) {
-            if (debugMode) Debug.Log($"[PlayerActionManager] Movement validation failed: position {to} occupied");
-            return false;
-        }
+       // Check occupancy
+       if (GridPositionManager.Instance.IsPositionOccupied(to)) {
+           if (debugMode) Debug.Log($"[PlayerActionManager] Movement validation failed: position {to} occupied");
+           return false;
+       }
 
-        return true;
-    }
+       return true;
+   }
 
-    bool ExecuteImmediateMove(GardenerController gardener, GridPosition to) {
-        var gridEntity = gardener.GetComponent<GridEntity>();
-        if (gridEntity == null) return false;
+   bool ExecuteImmediateMove(GardenerController gardener, GridPosition to) {
+       var gridEntity = gardener.GetComponent<GridEntity>();
+       if (gridEntity == null) return false;
 
-        gridEntity.SetPosition(to);
-        return true;
-    }
+       gridEntity.SetPosition(to);
+       return true;
+   }
+   
+   int GetMovementTickCost(Vector3 worldPosition) {
+       int baseCost = tickCostPerAction;
+    
+       // Check all slowdown zones in the scene
+       SlowdownZone[] allZones = FindObjectsByType<SlowdownZone>(FindObjectsSortMode.None);
+    
+       foreach (var zone in allZones) {
+           if (zone.IsPositionInZone(worldPosition)) {
+               baseCost += zone.GetAdditionalTickCost();
+               if (debugMode) {
+                   Debug.Log($"[PlayerActionManager] Movement to {worldPosition} is in slowdown zone, costs {baseCost} ticks");
+               }
+               break; // Only apply one zone's cost
+           }
+       }
+    
+       return baseCost;
+   }
 
-    bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool) {
-        if (tool == null) return false;
+   bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool) {
+       if (tool == null) return false;
 
-        // Route through existing tile interaction system
-        TileInteractionManager.Instance?.ApplyToolAction(tool);
-        return true;
-    }
+       // Route through existing tile interaction system
+       TileInteractionManager.Instance?.ApplyToolAction(tool);
+       return true;
+   }
 
-    bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem) {
-        if (seedItem == null || !seedItem.IsSeed()) return false;
+   bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem) {
+       if (seedItem == null || !seedItem.IsSeed()) return false;
 
-        // Use existing plant placement system
-        return PlantPlacementManager.Instance?.TryPlantSeedFromInventory(
-            seedItem, gridPosition, TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)
-        ) ?? false;
-    }
+       // Use existing plant placement system
+       return PlantPlacementManager.Instance?.TryPlantSeedFromInventory(
+           seedItem, gridPosition, TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)
+       ) ?? false;
+   }
 
-    bool ExecuteWatering(Vector3Int gridPosition) {
-        // TODO: Implement watering logic
-        if (debugMode) Debug.Log($"[PlayerActionManager] Watering at {gridPosition} - NOT IMPLEMENTED");
-        return false;
-    }
+   bool ExecuteWatering(Vector3Int gridPosition) {
+       // TODO: Implement watering logic
+       if (debugMode) Debug.Log($"[PlayerActionManager] Watering at {gridPosition} - NOT IMPLEMENTED");
+       return false;
+   }
 
-    bool ExecuteHarvest(Vector3Int gridPosition) {
-        // TODO: Implement harvest logic
-        if (debugMode) Debug.Log($"[PlayerActionManager] Harvesting at {gridPosition} - NOT IMPLEMENTED");
-        return false;
-    }
+   bool ExecuteHarvest(Vector3Int gridPosition) {
+       // TODO: Implement harvest logic
+       if (debugMode) Debug.Log($"[PlayerActionManager] Harvesting at {gridPosition} - NOT IMPLEMENTED");
+       return false;
+   }
 
-    bool ExecuteInteraction(Vector3Int gridPosition, object interactionData) {
-        // Generic interaction point for future expansion
-        if (debugMode) Debug.Log($"[PlayerActionManager] Interaction at {gridPosition}");
-        return true;
-    }
+   bool ExecuteInteraction(Vector3Int gridPosition, object interactionData) {
+       // Generic interaction point for future expansion
+       if (debugMode) Debug.Log($"[PlayerActionManager] Interaction at {gridPosition}");
+       return true;
+   }
 
-    // Central tick advancement - ALL player actions go through here
-    void AdvanceGameTick(int tickCount = 1) {
-        if (TickManager.Instance == null) {
-            Debug.LogError("[PlayerActionManager] TickManager not found!");
-            return;
-        }
+   // Central tick advancement - ALL player actions go through here
+   void AdvanceGameTick(int tickCount = 1) {
+       if (TickManager.Instance == null) {
+           Debug.LogError("[PlayerActionManager] TickManager not found!");
+           return;
+       }
 
-        if (debugMode) Debug.Log($"[PlayerActionManager] Advancing {tickCount} tick(s) after player action");
-        
-        // This is the ONLY place outside debug that should advance ticks
-        TickManager.Instance.AdvanceMultipleTicks(tickCount);
-    }
+       if (debugMode) Debug.Log($"[PlayerActionManager] Advancing {tickCount} tick(s) after player action");
+       
+       // This is the ONLY place outside debug that should advance ticks
+       TickManager.Instance.AdvanceMultipleTicks(tickCount);
+   }
 
-    // Public method to check if an action would be valid without executing
-    public bool CanExecuteAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null) {
-        switch (actionType) {
-            case PlayerActionType.Move:
-                // Special case for movement validation
-                return false; // Use ValidateMovement instead
-                
-            case PlayerActionType.UseTool:
-                return actionData is ToolDefinition;
-                
-            case PlayerActionType.PlantSeed:
-                var seedItem = actionData as InventoryBarItem;
-                return seedItem != null && seedItem.IsSeed();
-                
-            default:
-                return true;
-        }
-    }
+   // Public method to check if an action would be valid without executing
+   public bool CanExecuteAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null) {
+       switch (actionType) {
+           case PlayerActionType.Move:
+               // Special case for movement validation
+               return false; // Use ValidateMovement instead
+               
+           case PlayerActionType.UseTool:
+               return actionData is ToolDefinition;
+               
+           case PlayerActionType.PlantSeed:
+               var seedItem = actionData as InventoryBarItem;
+               return seedItem != null && seedItem.IsSeed();
+               
+           default:
+               return true;
+       }
+   }
 }

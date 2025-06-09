@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 525,041 → 347,487 chars (33.8% reduction)
-Estimated tokens saved: ~44,388
+Compression Stats: 515,329 → 345,846 chars (32.9% reduction)
+Estimated tokens saved: ~42,370
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -22,93 +22,94 @@ using System;
 [Unknown]
   PixelPerfectSetup (Assets\Scripts\Core/) L29
   RunManager (Assets\Scripts\Core/) L70
-  SortableEntity (Assets\Scripts\Core/) L323
-  SpeedModifiable (Assets\Scripts\Core/) L390
-  UIManager (Assets\Scripts\Core/) L440
-  WeatherManager (Assets\Scripts\Core/) L816
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L1120
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1999
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L2016
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L2025
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L2038
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L2055
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2299
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2498
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2566
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2581
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2600
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2636
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2804
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2868
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2885
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2898
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2927
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L3135
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3365
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3612
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3641
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3671
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3684
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3712
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3773
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3818
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3869
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3903
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3973
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3993
-  LeafData (Assets\Scripts\PlantSystem\Data/) L4028
-  NodeData (Assets\Scripts\PlantSystem\Data/) L4043
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4128
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4240
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4263
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4281
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4308
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4317
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4485
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4524
-  PlantGrowth.CellManagement (Assets\Scripts\PlantSystem\Growth/) L4548
-  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L4792
-  PlantGrowth.RealtimeFallback (Assets\Scripts\PlantSystem\Growth/) L5151
-  PlantGrowth.WegoGrowth (Assets\Scripts\PlantSystem\Growth/) L5385
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5559
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5939
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6237
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6304
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6600
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6719
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6923
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L7057
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7377
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7513
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7806
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7894
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7995
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8064
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8295
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8306
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8390
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8495
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8890
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8926
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9116
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9258
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9377
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9682
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9873
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9913
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9933
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9945
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9980
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10139
+  SortableEntity (Assets\Scripts\Core/) L192
+  UIManager (Assets\Scripts\Core/) L259
+  WeatherManager (Assets\Scripts\Core/) L633
+  WegoSystemCleanup (Assets\Scripts\Core/) L836
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L946
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1828
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1845
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1854
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1867
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1884
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2128
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2327
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2395
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2410
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2429
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2465
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2678
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2742
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2759
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2772
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2801
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L3009
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L3239
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3486
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3515
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3545
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3558
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3586
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3647
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3692
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3743
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3777
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3847
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3867
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3902
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3917
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4002
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4114
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4137
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4155
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4182
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4191
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4359
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4398
+  PlantGrowth.CellManagement (Assets\Scripts\PlantSystem\Growth/) L4422
+  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L4666
+  PlantGrowth.RealtimeFallback (Assets\Scripts\PlantSystem\Growth/) L5025
+  PlantGrowth.WegoGrowth (Assets\Scripts\PlantSystem\Growth/) L5259
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5433
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5813
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6111
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6178
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6474
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6593
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6797
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6931
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7251
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7387
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7680
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7768
+  GridSnapStartup (Assets\Scripts\Ticks/) L7869
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7935
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8004
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8235
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8246
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8330
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8435
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8830
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8866
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9056
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9198
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9316
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9593
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9805
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9845
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9865
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9877
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9912
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10071
 
 [WegoSystem]
-  GridPosition (Assets\Scripts\Ticks/) L10149
-  TickConfiguration (Assets\Scripts\Ticks/) L10545
-  ITickUpdateable (Assets\Scripts\Ticks/) L10662
-  TurnPhaseManager (Assets\Scripts\Ticks/) L10824
+  GridPosition (Assets\Scripts\Ticks/) L10081
+  TickConfiguration (Assets\Scripts\Ticks/) L10570
+  ITickUpdateable (Assets\Scripts\Ticks/) L10687
+  TurnPhaseManager (Assets\Scripts\Ticks/) L10849
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11059
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10971
 
 ================================================================================
 SCRIPTS
@@ -158,23 +159,20 @@ Debug.Log($"[PixelPerfectSetup] Expected camera orthographic size: {expectedCame
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\RunManager.cs
 
-﻿using UnityEngine;
+﻿// Assets\Scripts\Core\RunManager.cs
+
 using WegoSystem;
 
 pub enum RunState {
 Planning,
-GrowthAndThreat,
-Recovery
+GrowthAndThreat
 }
 
 pub cls RunManager : MonoBehaviour {
 pub stat RunManager Instance { get; set; }
 
 [SerializeField] bool useWegoSystem = true;
-[SerializeField] bool autoAdvanceFromPlanning = false;
-
 [SerializeField] RunState currentState = RunState.Planning;
-[SerializeField] float growthPhaseTimeScale = 6f;
 [SerializeField] int currentRoundNumber = 1;
 
 [SerializeField] WeatherManager weatherManager;
@@ -197,10 +195,8 @@ SetState(RunState.Planning, true);
 }
 
 void Start() {
-if (useWegoSystem) {
-if (TurnPhaseManager.Instance != null) {
+if (useWegoSystem && TurnPhaseManager.Instance != null) {
 TurnPhaseManager.Instance.OnPhaseChanged += HandleWegoPhaseChanged;
-}
 }
 }
 
@@ -215,24 +211,14 @@ if (!useWegoSystem) return;
 
 switch (newPhase) {
 case TurnPhase.Planning:
-if (currentState != RunState.Planning) {
-if (currentState == RunState.Recovery) {
-StartNewPlanningPhase();
-} else {
-SetState(RunState.Planning);
-}
+if (currentState == RunState.GrowthAndThreat) {
+StartNewRound();
 }
 break;
 
 case TurnPhase.Execution:
 if (currentState == RunState.Planning) {
 StartGrowthAndThreatPhase();
-}
-break;
-
-case TurnPhase.Resolution:
-if (currentState == RunState.GrowthAndThreat) {
-StartRecoveryPhase();
 }
 break;
 }
@@ -246,25 +232,12 @@ Debug.Log($"[RunManager] State changed to: {currentState}");
 
 switch (currentState) {
 case RunState.Planning:
-if (!useWegoSystem) {
-Time.timeScale = 0f;
 weatherManager?.PauseCycleAtDay();
-}
 break;
 
 case RunState.GrowthAndThreat:
-if (!useWegoSystem) {
-Time.timeScale = growthPhaseTimeScale;
 weatherManager?.ResumeCycle();
-}
 waveManager?.StartWaveForRound(currentRoundNumber);
-break;
-
-case RunState.Recovery:
-if (!useWegoSystem) {
-Time.timeScale = 0f;
-weatherManager?.PauseCycle();
-}
 break;
 }
 
@@ -273,7 +246,7 @@ OnRunStateChanged?.Invoke(currentState);
 
 pub void StartGrowthAndThreatPhase() {
 if (currentState == RunState.Planning) {
-Debug.Log($"[RunManager] Transitioning: Planning -> Growth & Threat for Round {currentRoundNumber}");
+Debug.Log($"[RunManager] Starting Growth & Threat for Round {currentRoundNumber}");
 SetState(RunState.GrowthAndThreat);
 
 if (useWegoSystem && TurnPhaseManager.Instance != null) {
@@ -282,129 +255,26 @@ TurnPhaseManager.Instance.EndPlanningPhase();
 }
 }
 }
-else {
-Debug.LogWarning($"[RunManager] Cannot start Growth phase from state: {currentState}");
-}
 }
 
-pub void StartRecoveryPhase() {
-if (currentState == RunState.GrowthAndThreat) {
-Debug.Log("[RunManager] Transitioning: Growth & Threat -> Recovery");
-waveManager?.StopCurrentWaveSpawning();
-SetState(RunState.Recovery);
-
-if (useWegoSystem && TurnPhaseManager.Instance != null) {
-if (TurnPhaseManager.Instance.CurrentPhase != TurnPhase.Resolution) {
-TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Resolution);
-}
-}
-}
-else {
-Debug.LogWarning($"[RunManager] Cannot start Recovery phase from state: {currentState}");
-}
-}
-
-pub void StartNewPlanningPhase() {
-if (currentState == RunState.Recovery) {
+void StartNewRound() {
 currentRoundNumber++;
-Debug.Log($"[RunManager] Transitioning: Recovery -> Planning (New Round: {currentRoundNumber})");
+Debug.Log($"[RunManager] Starting new round: {currentRoundNumber}");
 waveManager?.ResetForNewRound();
 SetState(RunState.Planning);
 OnRoundChanged?.Invoke(currentRoundNumber);
-
-if (useWegoSystem && TurnPhaseManager.Instance != null) {
-TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Planning);
-}
-}
-else {
-Debug.LogWarning($"[RunManager] Cannot start new Planning phase from state: {currentState}");
-}
-}
-
-void Update() {
-if (!useWegoSystem && currentState == RunState.GrowthAndThreat) {
-if (waveManager != null && waveManager.IsCurrentWaveDefeated()) {
-Debug.Log("[RunManager] Current wave defeated. Transitioning to Recovery.");
-StartRecoveryPhase();
-}
-}
 }
 
 pub void ManualStartGrowthPhase() {
 StartGrowthAndThreatPhase();
 }
 
-pub void ManualStartRecoveryPhase() {
-StartRecoveryPhase();
-}
-
-pub void ManualStartNewPlanningPhase() {
-StartNewPlanningPhase();
-}
-
 pub void SetWegoSystem(bool enabled) {
-bool wasEnabled = useWegoSystem;
 useWegoSystem = enabled;
-
-if (enabled && !wasEnabled) {
-if (TurnPhaseManager.Instance != null) {
-TurnPhaseManager.Instance.OnPhaseChanged += HandleWegoPhaseChanged;
-
-switch (currentState) {
-case RunState.Planning:
-TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Planning);
-break;
-case RunState.GrowthAndThreat:
-TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Execution);
-break;
-case RunState.Recovery:
-TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Resolution);
-break;
-}
-}
-
-Time.timeScale = 1f;
-
-} else if (!enabled && wasEnabled) {
-if (TurnPhaseManager.Instance != null) {
-TurnPhaseManager.Instance.OnPhaseChanged -= HandleWegoPhaseChanged;
-}
-
-switch (currentState) {
-case RunState.Planning:
-case RunState.Recovery:
-Time.timeScale = 0f;
-break;
-case RunState.GrowthAndThreat:
-Time.timeScale = growthPhaseTimeScale;
-break;
-}
-}
 }
 
 pub bool IsWegoSystemEnabled() {
 ret useWegoSystem;
-}
-
-pub void SetAutoAdvanceFromPlanning(bool enabled) {
-autoAdvanceFromPlanning = enabled;
-
-if (useWegoSystem && TurnPhaseManager.Instance != null) {
-TurnPhaseManager.Instance.ForcePhase(TurnPhaseManager.Instance.CurrentPhase);
-}
-}
-
-pub void DebugForceState(RunState state) {
-if (Application.isEditor || Debug.isDebugBuild) {
-SetState(state, true);
-}
-}
-
-pub void DebugAdvanceRound() {
-if (Application.isEditor || Debug.isDebugBuild) {
-currentRoundNumber++;
-OnRoundChanged?.Invoke(currentRoundNumber);
-}
 }
 }
 
@@ -476,59 +346,10 @@ useParentYCoordinate = value;
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Core\SpeedModifiable.cs
-
-﻿using UnityEngine;
-
-pub cls SpeedModifiable : MonoBehaviour {
-
-[SerializeField] prot float baseSpeed = 5f;
-
-[SerializeField] prot float currentSpeed;
-
-List<float> activeSpeedMultipliers = new List<float>();
-
-prot virt void Awake() {
-currentSpeed = baseSpeed;
-}
-
-pub void ApplySpeedMultiplier(float multiplier) {
-if (!activeSpeedMultipliers.Contains(multiplier)) {
-activeSpeedMultipliers.Add(multiplier);
-UpdateSpeed();
-}
-}
-
-pub void RemoveSpeedMultiplier(float multiplier) {
-if (activeSpeedMultipliers.Remove(multiplier)) {
-UpdateSpeed();
-}
-}
-
-void UpdateSpeed() {
-float lowestMultiplier = 1.0f;
-foreach (float mult in activeSpeedMultipliers) {
-if (mult < lowestMultiplier) {
-lowestMultiplier = mult;
-}
-}
-
-float newSpeed = baseSpeed * lowestMultiplier;
-
-if (!Mathf.Approximately(currentSpeed, newSpeed)) {
-currentSpeed = newSpeed;
-OnSpeedChanged(currentSpeed);
-}
-}
-
-prot virt void OnSpeedChanged(float newSpeed) { }
-
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\UIManager.cs
 
-﻿using System;
+﻿// Assets\Scripts\Core\UIManager.cs
+
 using TMPro;
 using WegoSystem;
 
@@ -634,7 +455,10 @@ tickSpeedSlider.gameObject.SetActive(false);
 void HandleRunStateChanged(RunState newState) {
 if (planningPanel != null) planningPanel.SetActive(newState == RunState.Planning);
 if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
-if (recoveryPanel != null) recoveryPanel.SetActive(newState == RunState.Recovery);
+
+if (recoveryPanel != null) {
+recoveryPanel.SetActive(false);
+}
 
 if (nodeEditorPanel != null) nodeEditorPanel.SetActive(newState == RunState.Planning);
 
@@ -669,11 +493,11 @@ startGrowthPhaseButton.interactable = (state == RunState.Planning);
 }
 
 if (startRecoveryPhaseButton != null) {
-startRecoveryPhaseButton.interactable = (state == RunState.GrowthAndThreat);
+startRecoveryPhaseButton.gameObject.SetActive(false);
 }
 
 if (startNewPlanningPhaseButton != null) {
-startNewPlanningPhaseButton.interactable = (state == RunState.Recovery);
+startNewPlanningPhaseButton.interactable = (state == RunState.GrowthAndThreat);
 }
 
 if (endPlanningPhaseButton != null && TurnPhaseManager.Instance != null) {
@@ -706,15 +530,9 @@ tickCounterText.text = $"Tick: {TickManager.Instance.CurrentTick}";
 }
 
 if (phaseProgressText != null && TurnPhaseManager.Instance != null) {
-int remainingTicks = TurnPhaseManager.Instance.GetRemainingPhaseTicks();
 int currentPhaseTicks = TurnPhaseManager.Instance.CurrentPhaseTicks;
 
-if (remainingTicks >= 0) {
-phaseProgressText.text = $"Phase Progress: {currentPhaseTicks} (Remaining: {remainingTicks})";
-}
-else {
-phaseProgressText.text = $"Phase Progress: {currentPhaseTicks} (Unlimited)";
-}
+phaseProgressText.text = $"Phase Ticks: {currentPhaseTicks}";
 }
 
 UpdateButtonStates(RunManager.Instance?.CurrentState ?? RunState.Planning);
@@ -811,7 +629,7 @@ if (TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
 OnEndPlanningPhaseClicked();
 }
 else {
-OnAdvanceTickClicked();
+Debug.Log("[UIManager] Time only advances through player actions!");
 }
 }
 
@@ -821,7 +639,7 @@ TurnPhaseManager.Instance?.ForcePhase(TurnPhase.Planning);
 }
 }
 
-if (Time.frameCount % 10 == 0) // Update every 10 frames to reduce overhead {
+if (Time.frameCount % 10 == 0) { // Update every 10 frames to reduce overhead
 UpdateWegoUI();
 }
 }
@@ -916,9 +734,6 @@ pub enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
 
 pub bool dayNightCycleEnabled = true;
 
-pub float dayDuration = 20f;
-pub float nightDuration = 20f;
-pub float transitionDuration = 5f;
 pub AnimationCurve transitionCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
 pub float sunIntensity = 1f;
@@ -927,20 +742,15 @@ pub SpriteRenderer fadeSprite;
 pub float minAlpha = 0f;
 pub float maxAlpha = 1f;
 
-pub float timeScaleMultiplier = 1f;
 pub bool IsPaused { get; set; } = false;
 
 int currentPhaseTicks = 0;
 int totalPhaseTicksTarget = 0;
 
-float phaseTimer = 0f;
-float totalPhaseTime = 0f;
 bool forceDaylight = false;
 
 pub CyclePhase CurrentPhase => currentPhase;
 pub event Action<CyclePhase> OnPhaseChanged;
-pub float CurrentPhaseTimer => useWegoSystem ? (totalPhaseTicksTarget - currentPhaseTicks) : phaseTimer;
-pub float CurrentTotalPhaseTime => useWegoSystem ? totalPhaseTicksTarget : totalPhaseTime;
 
 CyclePhase currentPhase = CyclePhase.Day;
 
@@ -957,7 +767,7 @@ if (useWegoSystem && TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
 
-EnterPhase(CyclePhase.Day, true); // Start at day
+EnterPhase(CyclePhase.Day, true);
 }
 
 void OnDestroy() {
@@ -981,41 +791,9 @@ UpdateFadeSprite();
 }
 
 void Update() {
-if (useWegoSystem) {
 if (!IsPaused && !forceDaylight) {
 UpdateSunIntensity();
 }
-UpdateFadeSprite();
-return;
-}
-
-if (Time.timeScale == 0f && !IsPaused) {
-UpdateFadeSprite(); // Still update visual representation of current sunIntensity
-return;
-}
-
-if (IsPaused) {
-if (forceDaylight) {
-sunIntensity = 1.0f; // Maintain full daylight if forced
-}
-UpdateFadeSprite();
-return;
-}
-
-if (!dayNightCycleEnabled) {
-sunIntensity = fixedSunIntensity;
-UpdateFadeSprite();
-return;
-}
-
-phaseTimer -= Time.deltaTime * timeScaleMultiplier;
-
-if (phaseTimer <= 0f) {
-AdvanceToNextPhase();
-} else {
-UpdateSunIntensity();
-}
-
 UpdateFadeSprite();
 }
 
@@ -1034,7 +812,7 @@ void EnterPhase(CyclePhase nextPhase, bool forceEvent = false) {
 CyclePhase previousPhase = currentPhase;
 currentPhase = nextPhase;
 
-if (useWegoSystem && TickManager.Instance?.Config != null) {
+if (TickManager.Instance?.Config != null) {
 var config = TickManager.Instance.Config;
 switch (nextPhase) {
 case CyclePhase.Day:
@@ -1049,18 +827,9 @@ totalPhaseTicksTarget = config.transitionTicks;
 break;
 }
 currentPhaseTicks = 0;
-} else {
-switch (nextPhase) {
-case CyclePhase.Day: totalPhaseTime = dayDuration; break;
-case CyclePhase.Night: totalPhaseTime = nightDuration; break;
-case CyclePhase.TransitionToNight:
-case CyclePhase.TransitionToDay: totalPhaseTime = transitionDuration; break;
-}
-totalPhaseTime = Mathf.Max(0.01f, totalPhaseTime); // Avoid division by zero
-phaseTimer = totalPhaseTime;
 }
 
-UpdateSunIntensity(); // Calculate intensity for the new phase start
+UpdateSunIntensity();
 
 if (previousPhase != currentPhase || forceEvent) {
 if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
@@ -1074,12 +843,7 @@ sunIntensity = 1.0f;
 return;
 }
 
-float progress;
-if (useWegoSystem) {
-progress = totalPhaseTicksTarget > 0 ? (float)currentPhaseTicks / totalPhaseTicksTarget : 0f;
-} else {
-progress = totalPhaseTime > 0 ? 1f - Mathf.Clamp01(phaseTimer / totalPhaseTime) : 0f;
-}
+float progress = totalPhaseTicksTarget > 0 ? (float)currentPhaseTicks / totalPhaseTicksTarget : 0f;
 
 switch (currentPhase) {
 case CyclePhase.Day:
@@ -1111,9 +875,9 @@ pub void PauseCycleAtDay() {
 Debug.Log("[WeatherManager] PauseCycleAtDay called.");
 IsPaused = true;
 forceDaylight = true;
-sunIntensity = 1.0f; // Immediately set to full day
-UpdateFadeSprite(); // Update visuals immediately
-OnPhaseChanged?.Invoke(CyclePhase.Day); // Notify that effectively it's day
+sunIntensity = 1.0f;
+UpdateFadeSprite();
+OnPhaseChanged?.Invoke(CyclePhase.Day);
 }
 
 pub void ResumeCycle() {
@@ -1125,7 +889,7 @@ forceDaylight = false;
 pub void PauseCycle() {
 Debug.Log("[WeatherManager] PauseCycle called.");
 IsPaused = true;
-forceDaylight = false; // Don't force daylight, just pause current state
+forceDaylight = false;
 }
 
 pub void SetWegoSystem(bool enabled) {
@@ -1134,60 +898,13 @@ useWegoSystem = enabled;
 
 if (enabled && !wasEnabled && TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
-ConvertCurrentPhaseToTicks();
 } else if (!enabled && wasEnabled && TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
-ConvertCurrentPhaseToRealtime();
 }
-}
-
-void ConvertCurrentPhaseToTicks() {
-if (TickManager.Instance?.Config == null) return;
-
-var config = TickManager.Instance.Config;
-float realTimeProgress = totalPhaseTime > 0 ? (1f - (phaseTimer / totalPhaseTime)) : 0f;
-
-switch (currentPhase) {
-case CyclePhase.Day:
-totalPhaseTicksTarget = config.dayPhaseTicks;
-break;
-case CyclePhase.Night:
-totalPhaseTicksTarget = config.nightPhaseTicks;
-break;
-case CyclePhase.TransitionToNight:
-case CyclePhase.TransitionToDay:
-totalPhaseTicksTarget = config.transitionTicks;
-break;
-}
-
-currentPhaseTicks = Mathf.RoundToInt(realTimeProgress * totalPhaseTicksTarget);
-}
-
-void ConvertCurrentPhaseToRealtime() {
-float tickProgress = totalPhaseTicksTarget > 0 ? (float)currentPhaseTicks / totalPhaseTicksTarget : 0f;
-
-switch (currentPhase) {
-case CyclePhase.Day:
-totalPhaseTime = dayDuration;
-break;
-case CyclePhase.Night:
-totalPhaseTime = nightDuration;
-break;
-case CyclePhase.TransitionToNight:
-case CyclePhase.TransitionToDay:
-totalPhaseTime = transitionDuration;
-break;
-}
-
-phaseTimer = totalPhaseTime * (1f - tickProgress);
 }
 
 pub float GetPhaseProgress() {
-if (useWegoSystem) {
 ret totalPhaseTicksTarget > 0 ? (float)currentPhaseTicks / totalPhaseTicksTarget : 0f;
-} else {
-ret totalPhaseTime > 0 ? (1f - (phaseTimer / totalPhaseTime)) : 0f;
-}
 }
 
 pub int GetCurrentPhaseTicks() {
@@ -1206,15 +923,125 @@ EnterPhase(phase, true);
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\WegoSystemCleanup.cs
+
+﻿// Assets\Scripts\Core\WegoSystemCleanup.cs
+
+pub cls WegoSystemCleanup : MonoBehaviour {
+[SerializeField] bool removeSpeedModifiableComponents = true;
+[SerializeField] bool removeRigidbody2DFromEntities = true;
+[SerializeField] bool removeObsoleteScripts = true;
+[SerializeField] bool logActions = true;
+
+[SerializeField] List<string> obsoleteScriptNames = new List<string> {
+"SpeedModifiable",
+"RunManager" // If we're simplifying the turn system
+};
+
+pub void PerformCleanup() {
+int totalRemoved = 0;
+
+if (removeRigidbody2DFromEntities) {
+totalRemoved += RemoveRigidbodiesFromEntities();
+}
+
+if (removeObsoleteScripts) {
+totalRemoved += RemoveObsoleteComponents();
+}
+
+if (logActions) {
+Debug.Log($"[WegoSystemCleanup] Cleanup complete. Removed {totalRemoved} components.");
+}
+}
+
+int RemoveRigidbodiesFromEntities() {
+int removed = 0;
+
+var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
+foreach (var gardener in gardeners) {
+var rb = gardener.GetComponent<Rigidbody2D>();
+if (rb != null) {
+if (logActions) Debug.Log($"[WegoSystemCleanup] Removing Rigidbody2D from {gardener.name}");
+DestroyImmediate(rb);
+removed++;
+}
+}
+
+var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+foreach (var animal in animals) {
+var rb = animal.GetComponent<Rigidbody2D>();
+if (rb != null) {
+if (logActions) Debug.Log($"[WegoSystemCleanup] Removing Rigidbody2D from {animal.name}");
+DestroyImmediate(rb);
+removed++;
+}
+}
+
+ret removed;
+}
+
+int RemoveObsoleteComponents() {
+int removed = 0;
+
+var allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+
+foreach (var obj in allObjects) {
+var components = obj.GetComponents<Component>();
+foreach (var component in components) {
+if (component == null) {
+if (logActions) Debug.Log($"[WegoSystemCleanup] Found missing script on {obj.name}");
+removed++;
+}
+else if (obsoleteScriptNames.Contains(component.GetType().Name)) {
+if (logActions) Debug.Log($"[WegoSystemCleanup] Removing {component.GetType().Name} from {obj.name}");
+DestroyImmediate(component);
+removed++;
+}
+}
+}
+
+ret removed;
+}
+
+pub void ListComponentsToRemove() {
+Debug.Log("[WegoSystemCleanup] === Components that will be removed ===");
+
+var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
+foreach (var gardener in gardeners) {
+if (gardener.GetComponent<Rigidbody2D>() != null) {
+Debug.Log($"- Rigidbody2D on {gardener.name}");
+}
+}
+
+var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+foreach (var animal in animals) {
+if (animal.GetComponent<Rigidbody2D>() != null) {
+Debug.Log($"- Rigidbody2D on {animal.name}");
+}
+}
+
+var allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+foreach (var obj in allObjects) {
+var components = obj.GetComponents<Component>();
+foreach (var component in components) {
+if (component != null && obsoleteScriptNames.Contains(component.GetType().Name)) {
+Debug.Log($"- {component.GetType().Name} on {obj.name}");
+}
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Animals\AnimalController.cs
 
 ﻿using System.Collections;
 using TMPro;
 using WegoSystem;
 
-pub cls AnimalController : SpeedModifiable, ITickUpdateable {
+pub cls AnimalController : MonoBehaviour, ITickUpdateable {  // No longer inherits from SpeedModifiable
 [SerializeField] bool useWegoMovement = true;
-[SerializeField] int thinkingTickInterval = 3; // How often to make decisions
+[SerializeField] int thinkingTickInterval = 3;
 
 AnimalDefinition definition;
 AnimalDiet animalDiet;
@@ -1239,6 +1066,9 @@ int lastThinkTick = 0;
 int hungerTick = 0;
 int poopTick = 0;
 int thoughtCooldownTick = 0;
+
+List<GridPosition> currentPath = new List<GridPosition>();
+int currentPathIndex = 0;
 
 pub float searchRadius = 5f;
 pub float eatDistance = 0.5f;
@@ -1318,9 +1148,6 @@ if (spriteRenderer != null) {
 originalColor = spriteRenderer.color;
 }
 
-baseSpeed = definition.movementSpeed;
-currentSpeed = baseSpeed;
-
 currentHealth = definition.maxHealth;
 currentHunger = 0f;
 hasPooped = true;
@@ -1360,6 +1187,26 @@ UpdateHungerText();
 if (useWegoMovement && TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
+}
+
+void Awake() {
+animalDiet = definition?.diet;
+gridEntity = GetComponent<GridEntity>();
+spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+animalCollider = GetComponent<Collider2D>();
+
+gridEntity = GetComponent<GridEntity>();
+if (gridEntity == null) {
+gridEntity = gameObject.AddComponent<GridEntity>();
+}
+}
+
+void Start() {
+if (GridPositionManager.Instance != null) {
+GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridEntity.Position}");
+}
+
 }
 
 void OnDestroy() {
@@ -1438,12 +1285,12 @@ if (nearestFood != null) {
 currentTargetFood = nearestFood;
 GridPosition foodGridPos = GridPositionManager.Instance.WorldToGrid(nearestFood.transform.position);
 
-GridPosition myPos = gridEntity.Position;
-int distance = myPos.ManhattanDistance(foodGridPos);
+currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGridPos);
+currentPathIndex = 0;
 
-if (distance <= 1) {
+if (currentPath.Count > 0) {
 hasPlannedAction = true;
-targetPosition = myPos; // Stay in place to eat
+targetPosition = currentPath[0];
 } else {
 PlanMovementToward(foodGridPos);
 }
@@ -1483,49 +1330,49 @@ void PlanMovementToward(GridPosition target) {
 if (gridEntity == null) return;
 
 GridPosition currentPos = gridEntity.Position;
-GridPosition direction = new GridPosition(
-Mathf.Clamp(target.x - currentPos.x, -1, 1),
-Mathf.Clamp(target.y - currentPos.y, -1, 1)
-);
 
-GridPosition targetPos = currentPos + direction;
+int dx = Mathf.Clamp(target.x - currentPos.x, -1, 1);
+int dy = Mathf.Clamp(target.y - currentPos.y, -1, 1);
 
-if (GridPositionManager.Instance.IsPositionValid(targetPos) &&
-!GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
-targetPosition = targetPos;
+if (dx != 0 && dy != 0) {
+GridPosition diagonalTarget = currentPos + new GridPosition(dx, dy);
+if (IsValidMove(diagonalTarget)) {
+targetPosition = diagonalTarget;
 hasPlannedAction = true;
-} else {
-GridPosition[] alternatives = {
-currentPos + new GridPosition(direction.x, 0),
-currentPos + new GridPosition(0, direction.y),
-currentPos + GridPosition.Up,
-currentPos + GridPosition.Down,
-currentPos + GridPosition.Left,
-currentPos + GridPosition.Right
-};
-
-foreach (var alt in alternatives) {
-if (GridPositionManager.Instance.IsPositionValid(alt) &&
-!GridPositionManager.Instance.IsPositionOccupied(alt)) {
-targetPosition = alt;
-hasPlannedAction = true;
-break;
+return;
 }
 }
 
-if (!hasPlannedAction) {
-targetPosition = currentPos; // Stay in place
+if (dx != 0) {
+GridPosition horizontalTarget = currentPos + new GridPosition(dx, 0);
+if (IsValidMove(horizontalTarget)) {
+targetPosition = horizontalTarget;
 hasPlannedAction = true;
+return;
 }
 }
+
+if (dy != 0) {
+GridPosition verticalTarget = currentPos + new GridPosition(0, dy);
+if (IsValidMove(verticalTarget)) {
+targetPosition = verticalTarget;
+hasPlannedAction = true;
+return;
+}
+}
+
+PlanWandering();
+}
+
+bool IsValidMove(GridPosition pos) {
+ret GridPositionManager.Instance.IsPositionValid(pos) &&
+!GridPositionManager.Instance.IsPositionOccupied(pos);
 }
 
 void ExecutePlannedAction() {
 if (gridEntity == null) return;
 
-GridPosition currentPos = gridEntity.Position;
-
-if (currentTargetFood != null && targetPosition == currentPos) {
+if (currentTargetFood != null && targetPosition == gridEntity.Position) {
 Vector3 foodWorldPos = currentTargetFood.transform.position;
 Vector3 myWorldPos = transform.position;
 
@@ -1535,8 +1382,15 @@ return;
 }
 }
 
-if (targetPosition != currentPos) {
+if (targetPosition != gridEntity.Position) {
 gridEntity.SetPosition(targetPosition);
+
+if (currentPath.Count > 0 && currentPathIndex < currentPath.Count - 1) {
+currentPathIndex++;
+targetPosition = currentPath[currentPathIndex];
+hasPlannedAction = true;
+return;
+}
 }
 
 hasPlannedAction = false;
@@ -1618,14 +1472,10 @@ if (!enabled || isDying) return;
 bool showStats = Input.GetKey(showStatsKey);
 SetStatsTextVisibility(showStats);
 
-if (!useWegoMovement) {
-HandleRealtimeUpdate();
-} else {
 if (isEating) {
 eatTimer -= Time.deltaTime;
 if (eatTimer <= 0f) {
 FinishEating();
-}
 }
 }
 
@@ -1866,22 +1716,6 @@ wanderStateTimer -= Time.deltaTime;
 }
 }
 
-void FixedUpdate() {
-if (rb == null || isDying || useWegoMovement) return;
-
-if (!isEating && !isPooping && moveDirection != Vector2.zero) {
-Vector2 currentPos = rb.position;
-Vector2 desiredMove = moveDirection.normalized * currentSpeed * Time.fixedDeltaTime;
-Vector2 nextPos = currentPos + desiredMove;
-
-if (!isSeekingScreenCenter) {
-nextPos.x = Mathf.Clamp(nextPos.x, minBounds.x, maxBounds.x);
-nextPos.y = Mathf.Clamp(nextPos.y, minBounds.y, maxBounds.y);
-}
-rb.MovePosition(nextPos);
-}
-}
-
 void ApplyStarvationDamage() {
 float damage = starvationDamageRate * Time.deltaTime;
 currentHealth -= damage;
@@ -1956,17 +1790,20 @@ pc.Initialize();
 }
 
 void FlipSpriteBasedOnDirection() {
-if (spriteRenderer != null && Mathf.Abs(moveDirection.x) > 0.01f) {
+if (spriteRenderer != null && gridEntity != null && gridEntity.IsMoving) {
+Vector3 currentPos = transform.position;
+Vector3 targetPos = GridPositionManager.Instance.GridToWorld(targetPosition);
+Vector2 moveDirection = (targetPos - currentPos).normalized;
+
+if (Mathf.Abs(moveDirection.x) > 0.01f) {
 spriteRenderer.flipX = moveDirection.x < 0;
+}
 }
 }
 
 void UpdateAnimationState() {
 if (animator == null) return;
-bool isMoving = !isEating && !isPooping && moveDirection.sqrMagnitude > 0.01f;
-if (useWegoMovement && gridEntity != null) {
-isMoving = gridEntity.IsMoving && !isEating && !isPooping;
-}
+bool isMoving = gridEntity != null && gridEntity.IsMoving && !isEating && !isPooping;
 animator.SetBool("IsMoving", isMoving);
 animator.SetBool("IsEating", isEating);
 }
@@ -2055,13 +1892,6 @@ hpText.gameObject.SetActive(visible);
 
 if (hungerText != null) {
 hungerText.gameObject.SetActive(visible);
-}
-}
-
-prot ovr void OnSpeedChanged(float newSpeed) {
-if (animator != null) {
-float speedRatio = (baseSpeed > 0f) ? newSpeed / baseSpeed : 1f;
-animator.speed = Mathf.Max(0.5f, speedRatio);
 }
 }
 
@@ -2724,23 +2554,28 @@ Gizmos.DrawWireSphere(transform.position, 1f); // Default size for editor only
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Environment\SlowdownZone.cs
 
-﻿using UnityEngine;
+﻿// Assets\Scripts\Ecosystem\Environment\SlowdownZone.cs
+
+using WegoSystem;
 
 pub cls SlowdownZone : MonoBehaviour {
-pub float speedMultiplier = 0.5f;
+[SerializeField] int additionalTickCost = 1; // Moving through this zone costs extra ticks
+[SerializeField] bool affectsAnimals = true;
+[SerializeField] bool affectsPlayer = true;
 
-pub float colliderShrinkAmount = 0.2f; // Defaulted to 0.2f in original, if 0 no warning will show for non-BoxColliders
+[SerializeField] float colliderShrinkAmount = 0.2f;
+[SerializeField] Color zoneColor = new Color(0.5f, 0.5f, 1f, 0.3f); // Blue tint for water
 
 [SerializeField] bool showDebugMessages = false;
 
-Dictionary<int, AnimalController> affectedAnimals = new Dictionary<int, AnimalController>();
-Dictionary<int, GardenerController> affectedPlayers = new Dictionary<int, GardenerController>();
+Dictionary<int, GridEntity> entitiesInZone = new Dictionary<int, GridEntity>();
 
 Vector2 originalSize;
 Vector2 originalOffset;
-BoxCollider2D boxCollider; // Cached BoxCollider2D, null if not a BoxCollider2D
+BoxCollider2D boxCollider;
+SpriteRenderer visualRenderer;
 
-c float SHRINK_EPSILON = 0.001f; // For comparing colliderShrinkAmount against zero
+c float SHRINK_EPSILON = 0.001f;
 
 void Awake() {
 Collider2D col = GetComponent<Collider2D>();
@@ -2754,7 +2589,7 @@ if (!col.isTrigger) {
 col.isTrigger = true;
 }
 
-boxCollider = col as BoxCollider2D; // Attempt to cast to BoxCollider2D
+boxCollider = col as BoxCollider2D;
 
 if (boxCollider != null) {
 originalSize = boxCollider.size;
@@ -2765,13 +2600,40 @@ ShrinkCollider();
 }
 }
 else {
-if (colliderShrinkAmount > SHRINK_EPSILON) // Only warn if shrinking was actually intended {
-}
+if (colliderShrinkAmount > SHRINK_EPSILON) {
+Debug.LogWarning($"SlowdownZone on '{gameObject.name}': Collider shrinking only works with BoxCollider2D. Current collider type: {col.GetType().Name}");
 }
 }
 
+SetupVisualIndicator();
+}
+
+void SetupVisualIndicator() {
+visualRenderer = GetComponent<SpriteRenderer>();
+
+if (visualRenderer == null) {
+GameObject visualObj = new GameObject("ZoneVisual");
+visualObj.transform.SetParent(transform);
+visualObj.transform.localPosition = Vector3.zero;
+visualObj.transform.localScale = Vector3.one;
+
+visualRenderer = visualObj.AddComponent<SpriteRenderer>();
+visualRenderer.sprite = CreateSquareSprite();
+visualRenderer.color = zoneColor;
+visualRenderer.sortingOrder = -10; // Render behind most things
+}
+}
+
+Sprite CreateSquareSprite() {
+Texture2D tex = new Texture2D(1, 1);
+tex.SetPixel(0, 0, Color.white);
+tex.Apply();
+
+ret Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1);
+}
+
 void ShrinkCollider() {
-if (boxCollider == null) return; // Should not happen if called correctly, but safety first
+if (boxCollider == null) return;
 
 Vector2 newSize = new Vector2(
 Mathf.Max(0.1f, originalSize.x - (colliderShrinkAmount * 2f)),
@@ -2789,7 +2651,7 @@ void RestoreCollider() {
 if (boxCollider == null) return;
 
 boxCollider.size = originalSize;
-boxCollider.offset = originalOffset; // Ensure offset is also restored
+boxCollider.offset = originalOffset;
 
 if (showDebugMessages) {
 Debug.Log($"SlowdownZone on '{gameObject.name}': Restored BoxCollider2D to original size {originalSize} and offset {originalOffset}");
@@ -2797,93 +2659,106 @@ Debug.Log($"SlowdownZone on '{gameObject.name}': Restored BoxCollider2D to origi
 }
 
 void OnValidate() {
-
 if (boxCollider != null) {
 if (colliderShrinkAmount > SHRINK_EPSILON) {
-if (originalSize != Vector2.zero || Application.isPlaying) // Application.isPlaying ensures Awake has run {
+if (originalSize != Vector2.zero || Application.isPlaying) {
 ShrinkCollider();
 }
-else if (showDebugMessages && !Application.isPlaying) {
 }
-}
-else // colliderShrinkAmount is effectively zero {
+else {
 if (originalSize != Vector2.zero || Application.isPlaying) {
 RestoreCollider();
-}
-else if (showDebugMessages && !Application.isPlaying) {
 }
 }
 }
 }
 
 void OnTriggerEnter2D(Collider2D other) {
-AnimalController animal = other.GetComponent<AnimalController>();
-if (animal != null) {
-int id = animal.GetInstanceID();
-if (!affectedAnimals.ContainsKey(id)) // Ensure not already added {
-affectedAnimals.Add(id, animal);
-animal.ApplySpeedMultiplier(speedMultiplier);
-if (showDebugMessages)
-Debug.Log($"SlowdownZone: '{animal.name}' entered zone, applied multiplier {speedMultiplier}");
+GridEntity gridEntity = other.GetComponent<GridEntity>();
+if (gridEntity == null) return;
+
+bool shouldAffect = false;
+
+if (affectsAnimals && other.GetComponent<AnimalController>() != null) {
+shouldAffect = true;
 }
-return;
+else if (affectsPlayer && other.GetComponent<GardenerController>() != null) {
+shouldAffect = true;
 }
 
-GardenerController player = other.GetComponent<GardenerController>();
-if (player != null) {
-int id = player.GetInstanceID();
-if (!affectedPlayers.ContainsKey(id)) // Ensure not already added {
-affectedPlayers.Add(id, player);
-player.ApplySpeedMultiplier(speedMultiplier);
-if (showDebugMessages)
-Debug.Log($"SlowdownZone: Player '{player.name}' entered zone, applied multiplier {speedMultiplier}");
+if (shouldAffect) {
+int id = gridEntity.GetInstanceID();
+if (!entitiesInZone.ContainsKey(id)) {
+entitiesInZone.Add(id, gridEntity);
+
+if (showDebugMessages) {
+Debug.Log($"SlowdownZone: '{other.name}' entered zone (will cost {1 + additionalTickCost} ticks to move)");
+}
 }
 }
 }
 
 void OnTriggerExit2D(Collider2D other) {
-AnimalController animal = other.GetComponent<AnimalController>();
-if (animal != null) {
-int id = animal.GetInstanceID();
-if (affectedAnimals.ContainsKey(id)) {
-animal.RemoveSpeedMultiplier(speedMultiplier); // Call RemoveSpeedMultiplier on the animal
-affectedAnimals.Remove(id);
-if (showDebugMessages)
-Debug.Log($"SlowdownZone: '{animal.name}' exited zone, removed multiplier");
+GridEntity gridEntity = other.GetComponent<GridEntity>();
+if (gridEntity == null) return;
+
+int id = gridEntity.GetInstanceID();
+if (entitiesInZone.ContainsKey(id)) {
+entitiesInZone.Remove(id);
+
+if (showDebugMessages) {
+Debug.Log($"SlowdownZone: '{other.name}' exited zone (movement cost back to normal)");
 }
-return;
+}
 }
 
-GardenerController player = other.GetComponent<GardenerController>();
-if (player != null) {
-int id = player.GetInstanceID();
-if (affectedPlayers.ContainsKey(id)) {
-player.RemoveSpeedMultiplier(speedMultiplier); // Call RemoveSpeedMultiplier on the player
-affectedPlayers.Remove(id);
-if (showDebugMessages)
-Debug.Log($"SlowdownZone: Player '{player.name}' exited zone, removed multiplier");
+pub bool IsPositionInZone(Vector3 worldPosition) {
+if (boxCollider != null) {
+ret boxCollider.bounds.Contains(worldPosition);
 }
+
+Collider2D col = GetComponent<Collider2D>();
+if (col != null) {
+ret col.bounds.Contains(worldPosition);
 }
+
+ret false;
+}
+
+pub int GetAdditionalTickCost() {
+ret additionalTickCost;
+}
+
+pub bool IsEntityInZone(GridEntity entity) {
+if (entity == null) ret false;
+ret entitiesInZone.ContainsKey(entity.GetInstanceID());
 }
 
 void OnDestroy() {
-foreach (var animalEntry in affectedAnimals) {
-if (animalEntry.Value != null) // Check if animal still exists {
-animalEntry.Value.RemoveSpeedMultiplier(speedMultiplier);
-}
-}
-affectedAnimals.Clear();
-
-foreach (var playerEntry in affectedPlayers) {
-if (playerEntry.Value != null) // Check if player still exists {
-playerEntry.Value.RemoveSpeedMultiplier(speedMultiplier);
-}
-}
-affectedPlayers.Clear();
+entitiesInZone.Clear();
 
 if (boxCollider != null && colliderShrinkAmount > SHRINK_EPSILON) {
 if (originalSize != Vector2.zero) {
 RestoreCollider();
+}
+}
+}
+
+void OnDrawGizmos() {
+Collider2D col = GetComponent<Collider2D>();
+if (col != null) {
+Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.3f);
+
+if (col is BoxCollider2D box) {
+Vector3 center = transform.position + (Vector3)box.offset;
+Vector3 size = new Vector3(box.size.x, box.size.y, 0) * transform.lossyScale.x;
+Gizmos.DrawCube(center, size);
+
+Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.8f);
+Gizmos.DrawWireCube(center, size);
+}
+else {
+Gizmos.DrawWireCube(col.bounds.center, col.bounds.size);
 }
 }
 }
@@ -8081,6 +7956,72 @@ DestroyImmediate(gameObject);
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Ticks\GridSnapStartup.cs
+
+﻿// Assets\Scripts\Core\GridSnapStartup.cs
+
+using WegoSystem;
+
+pub cls GridSnapStartup : MonoBehaviour {
+[SerializeField] bool snapAllAnimals = true;
+[SerializeField] bool snapAllPlants = true;
+[SerializeField] bool snapPlayer = true;
+[SerializeField] bool debugLog = true;
+
+void Awake() {
+if (GridPositionManager.Instance == null) {
+Debug.LogError("[GridSnapStartup] GridPositionManager not found! Cannot snap entities.");
+return;
+}
+}
+
+void Start() {
+PerformGridSnapping();
+}
+
+void PerformGridSnapping() {
+int snappedCount = 0;
+
+if (snapPlayer) {
+GardenerController[] gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
+foreach (var gardener in gardeners) {
+GridPositionManager.Instance.SnapEntityToGrid(gardener.gameObject);
+snappedCount++;
+}
+}
+
+if (snapAllAnimals) {
+AnimalController[] animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+foreach (var animal in animals) {
+GridPositionManager.Instance.SnapEntityToGrid(animal.gameObject);
+snappedCount++;
+}
+}
+
+if (snapAllPlants) {
+PlantGrowth[] plants = FindObjectsByType<PlantGrowth>(FindObjectsSortMode.None);
+foreach (var plant in plants) {
+GridPositionManager.Instance.SnapEntityToGrid(plant.gameObject);
+snappedCount++;
+}
+}
+
+if (debugLog) {
+Debug.Log($"[GridSnapStartup] Snapped {snappedCount} entities to grid on startup");
+}
+}
+
+void SnapAllEntitiesNow() {
+if (GridPositionManager.Instance == null) {
+Debug.LogError("GridPositionManager not found in scene!");
+return;
+}
+
+PerformGridSnapping();
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\UI\Tooltips\TooltipTrigger.cs
 
 ﻿using UnityEngine;
@@ -9346,7 +9287,7 @@ ret centerPosition + new Vector3(offsetX, offsetY, 0f);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Placement\PlayerTileInteractor.cs
 
-﻿using UnityEngine;
+﻿// Assets\Scripts\WorldInteraction\Placement\PlayerTileInteractor.cs
 
 pub sealed cls PlayerTileInteractor : MonoBehaviour {
 [SerializeField] InventoryBarController inventoryBar;
@@ -9423,7 +9364,6 @@ RemoveSeedFromInventory(selected);
 inventoryBar.ShowBar(); // Refresh the bar
 }
 }
-
 }
 
 void RemoveSeedFromInventory(InventoryBarItem seed) {
@@ -9465,10 +9405,11 @@ if (tileInteractionManager == null) tileInteractionManager = TileInteractionMana
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\GardenerController.cs
 
-﻿using UnityEngine;
+﻿// Assets\Scripts\WorldInteraction\Player\GardenerController.cs
+
 using WegoSystem;
 
-pub cls GardenerController : SpeedModifiable, ITickUpdateable {
+pub cls GardenerController : MonoBehaviour, ITickUpdateable {  // No longer inherits from SpeedModifiable
 [SerializeField] bool useWegoMovement = true;
 
 pub Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
@@ -9485,21 +9426,14 @@ Queue<GridPosition> plannedMoves = new Queue<GridPosition>();
 GridPosition currentTargetPosition;
 bool hasMoveQueued = false;
 
-Rigidbody2D rb;
-Vector2 movement;
-
 SortableEntity sortableEntity;
 SpriteRenderer spriteRenderer;
 Animator animator;
 
 bool isPlanting = false;
 float plantingTimer = 0f;
-bool wasMovingBeforePlanting = false;
 
-prot ovr void Awake() {
-base.Awake(); // This is crucial: it sets currentSpeed = baseSpeed
-
-rb = GetComponent<Rigidbody2D>();
+void Awake() {
 sortableEntity = GetComponent<SortableEntity>();
 spriteRenderer = GetComponent<SpriteRenderer>();
 animator = GetComponent<Animator>();
@@ -9514,13 +9448,19 @@ Debug.LogWarning("[GardenerController Awake] Main SpriteRenderer component not f
 if (animator == null && useAnimations)
 Debug.LogWarning("[GardenerController Awake] Animator component not found but useAnimations is true.", gameObject);
 
-if (useWegoMovement && gridEntity == null) {
-Debug.LogWarning("[GardenerController] Wego movement enabled but no GridEntity found. Adding one.", gameObject);
+if (gridEntity == null) {
+Debug.Log("[GardenerController] No GridEntity found. Adding one.", gameObject);
 gridEntity = gameObject.AddComponent<GridEntity>();
 }
 }
 
 void Start() {
+if (GridPositionManager.Instance != null) {
+GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+currentTargetPosition = gridEntity.Position;
+Debug.Log($"[GardenerController] Snapped to grid position {gridEntity.Position} on start");
+}
+
 if (useWegoMovement && TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 
@@ -9569,7 +9509,7 @@ void Update() {
 if (useWegoMovement) {
 HandleWegoInput();
 } else {
-HandleImmediateInput(); // New discrete input handling
+HandleImmediateInput();
 }
 
 HandlePlanting();
@@ -9600,16 +9540,11 @@ PlayerActionManager.Instance.ExecutePlayerMove(this, currentPos, targetPos);
 } else {
 Debug.LogError("[GardenerController] PlayerActionManager not found!");
 }
-
 }
 }
 
 void HandleImmediateInput() {
 if (isPlanting) return;
-
-Vector2 input = Vector2.zero;
-input.x = Input.GetAxisRaw("Horizontal");
-input.y = Input.GetAxisRaw("Vertical");
 
 bool shouldMove = false;
 GridPosition moveDir = GridPosition.Zero;
@@ -9635,30 +9570,10 @@ PlayerActionManager.Instance.ExecutePlayerMove(this, currentPos, targetPos);
 }
 }
 
-void HandleRealtimeMovement() {
-if (!isPlanting) {
-movement.x = Input.GetAxisRaw("Horizontal");
-movement.y = Input.GetAxisRaw("Vertical");
-bool isMoving = movement.sqrMagnitude > 0.01f;
-if (isMoving) wasMovingBeforePlanting = true;
-}
-else {
-movement = Vector2.zero;
-plantingTimer -= Time.deltaTime;
-if (plantingTimer <= 0) EndPlantingAnimation();
-}
-}
-
 void HandlePlanting() {
 if (isPlanting) {
 plantingTimer -= Time.deltaTime;
 if (plantingTimer <= 0) EndPlantingAnimation();
-}
-}
-
-void FixedUpdate() {
-if (!useWegoMovement && !isPlanting && rb != null) {
-rb.MovePosition(rb.position + movement.normalized * currentSpeed * Time.fixedDeltaTime);
 }
 }
 
@@ -9669,7 +9584,7 @@ bool isMoving;
 if (useWegoMovement) {
 isMoving = gridEntity != null && gridEntity.IsMoving;
 } else {
-isMoving = movement.sqrMagnitude > 0.01f;
+isMoving = gridEntity != null && gridEntity.IsMoving;
 }
 
 animator.SetBool(runningParameterName, isMoving && !isPlanting);
@@ -9678,10 +9593,14 @@ animator.SetBool(runningParameterName, isMoving && !isPlanting);
 void UpdateSpriteDirection() {
 if (spriteRenderer == null || !flipSpriteWhenMovingLeft) return;
 
-Vector2 directionToCheck = movement;
-if (useWegoMovement && gridEntity != null) {
-Vector3 worldTarget = GridPositionManager.Instance?.GridToWorld(currentTargetPosition) ?? transform.position;
-directionToCheck = (worldTarget - transform.position).normalized;
+Vector2 directionToCheck = Vector2.zero;
+if (gridEntity != null && GridPositionManager.Instance != null) {
+Vector3 worldTarget = GridPositionManager.Instance.GridToWorld(currentTargetPosition);
+Vector3 currentWorld = transform.position;
+
+if (Vector3.Distance(worldTarget, currentWorld) > 0.01f) {
+directionToCheck = (worldTarget - currentWorld).normalized;
+}
 }
 
 if (directionToCheck.x != 0) {
@@ -9701,7 +9620,6 @@ pub void StartPlantingAnimation() {
 if (!useAnimations || isPlanting) return;
 isPlanting = true;
 plantingTimer = plantingDuration;
-wasMovingBeforePlanting = movement.sqrMagnitude > 0.01f;
 if (animator != null) {
 animator.SetBool(plantingParameterName, true);
 animator.SetBool(runningParameterName, false);
@@ -9712,12 +9630,6 @@ void EndPlantingAnimation() {
 isPlanting = false;
 if (animator != null) {
 animator.SetBool(plantingParameterName, false);
-if (!useWegoMovement) {
-movement.x = Input.GetAxisRaw("Horizontal");
-movement.y = Input.GetAxisRaw("Vertical");
-bool shouldResumeRunning = movement.sqrMagnitude > 0.01f;
-animator.SetBool(runningParameterName, shouldResumeRunning);
-}
 }
 }
 
@@ -9815,6 +9727,9 @@ OnActionFailed?.Invoke("Invalid movement");
 ret false;
 }
 
+Vector3 worldPos = GridPositionManager.Instance.GridToWorld(to);
+int movementCost = GetMovementTickCost(worldPos);
+
 if (TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
 gardener.QueueMovement(to);
 if (debugMode) Debug.Log($"[PlayerActionManager] Queued move to {to}");
@@ -9823,7 +9738,7 @@ ret true;
 }
 
 if (ExecuteImmediateMove(gardener, to)) {
-AdvanceGameTick(tickCostPerAction);
+AdvanceGameTick(movementCost);
 OnActionExecuted?.Invoke(PlayerActionType.Move, true);
 ret true;
 }
@@ -9897,6 +9812,24 @@ if (gridEntity == null) ret false;
 
 gridEntity.SetPosition(to);
 ret true;
+}
+
+int GetMovementTickCost(Vector3 worldPosition) {
+int baseCost = tickCostPerAction;
+
+SlowdownZone[] allZones = FindObjectsByType<SlowdownZone>(FindObjectsSortMode.None);
+
+foreach (var zone in allZones) {
+if (zone.IsPositionInZone(worldPosition)) {
+baseCost += zone.GetAdditionalTickCost();
+if (debugMode) {
+Debug.Log($"[PlayerActionManager] Movement to {worldPosition} is in slowdown zone, costs {baseCost} ticks");
+}
+break; // Only apply one zone's cost
+}
+}
+
+ret baseCost;
 }
 
 bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool) {
@@ -10237,8 +10170,7 @@ SeedPouch // New tool type
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridPositionSystem.cs
 
-﻿using System;
-using System.Linq; // Added this line to fix FirstOrDefault
+﻿// Assets\Scripts\Ticks\GridPositionSystem.cs
 
 ns WegoSystem {
 pub struct GridPosition : IEquatable<GridPosition> {
@@ -10339,9 +10271,12 @@ pub cls GridEntity : MonoBehaviour {
 [SerializeField] GridPosition gridPosition;
 [SerializeField] float visualInterpolationSpeed = 5f;
 [SerializeField] bool snapToGridOnStart = true;
+[SerializeField] AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
 GridPosition previousGridPosition;
+Vector3 visualStartPosition;
 Vector3 visualTargetPosition;
+float movementProgress = 1f;
 bool isMoving = false;
 
 pub GridPosition Position {
@@ -10357,16 +10292,19 @@ OnGridPositionChanged();
 
 pub GridPosition PreviousPosition => previousGridPosition;
 pub bool IsMoving => isMoving;
+pub float MovementProgress => movementProgress;
 
 pub event Action<GridPosition, GridPosition> OnPositionChanged;
 pub event Action<GridPosition> OnMovementComplete;
+pub event Action OnMovementStart;
 
 prot virt void Start() {
-if (snapToGridOnStart) {
+if (snapToGridOnStart && GridPositionManager.Instance != null) {
 gridPosition = GridPositionManager.Instance.WorldToGrid(transform.position);
 transform.position = GridPositionManager.Instance.GridToWorld(gridPosition);
 }
 
+visualStartPosition = transform.position;
 visualTargetPosition = transform.position;
 previousGridPosition = gridPosition;
 
@@ -10378,23 +10316,31 @@ GridPositionManager.Instance?.UnregisterEntity(this);
 }
 
 prot virt void Update() {
-if (Vector3.Distance(transform.position, visualTargetPosition) > 0.01f) {
-transform.position = Vector3.Lerp(
-transform.position,
-visualTargetPosition,
-Time.deltaTime * visualInterpolationSpeed
-);
-isMoving = true;
-}
-else if (isMoving) {
+if (movementProgress < 1f) {
+movementProgress += Time.deltaTime * visualInterpolationSpeed;
+movementProgress = Mathf.Clamp01(movementProgress);
+
+float curvedProgress = movementCurve.Evaluate(movementProgress);
+transform.position = Vector3.Lerp(visualStartPosition, visualTargetPosition, curvedProgress);
+
+if (movementProgress >= 1f) {
 transform.position = visualTargetPosition;
 isMoving = false;
 OnMovementComplete?.Invoke(gridPosition);
 }
 }
+}
 
 prot virt void OnGridPositionChanged() {
+visualStartPosition = transform.position;
 visualTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
+movementProgress = 0f;
+
+if (!isMoving) {
+isMoving = true;
+OnMovementStart?.Invoke();
+}
+
 OnPositionChanged?.Invoke(previousGridPosition, gridPosition);
 }
 
@@ -10403,6 +10349,8 @@ Position = newPosition;
 
 if (instant) {
 transform.position = visualTargetPosition;
+visualStartPosition = visualTargetPosition;
+movementProgress = 1f;
 isMoving = false;
 }
 }
@@ -10413,6 +10361,15 @@ SetPosition(gridPosition + direction);
 
 pub bool CanMoveTo(GridPosition targetPosition) {
 ret GridPositionManager.Instance?.IsPositionValid(targetPosition) ?? false;
+}
+
+pub void CompleteMovement() {
+if (isMoving) {
+transform.position = visualTargetPosition;
+movementProgress = 1f;
+isMoving = false;
+OnMovementComplete?.Invoke(gridPosition);
+}
 }
 }
 
@@ -10426,6 +10383,7 @@ pub stat GridPositionManager Instance { get; set; }
 [SerializeField] bool showGridGizmos = true;
 [SerializeField] Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
 [SerializeField] int gizmoGridSize = 20;
+[SerializeField] bool debugMode = false;
 
 ro Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
 ro HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
@@ -10564,39 +10522,107 @@ ret nearest;
 pub List<GridPosition> GetPath(GridPosition start, GridPosition end, bool allowDiagonal = false) {
 var path = new List<GridPosition>();
 
-GridPosition current = start;
-while (current != end) {
-int dx = end.x - current.x;
-int dy = end.y - current.y;
-
-GridPosition next = current;
-
-if (allowDiagonal) {
-if (dx != 0) next.x += Math.Sign(dx);
-if (dy != 0) next.y += Math.Sign(dy);
-}
-else {
-if (Math.Abs(dx) > Math.Abs(dy)) {
-next.x += Math.Sign(dx);
-}
-else if (dy != 0) {
-next.y += Math.Sign(dy);
-}
-else if (dx != 0) {
-next.x += Math.Sign(dx);
-}
-}
-
-if (IsPositionValid(next) && !IsPositionOccupied(next)) {
-current = next;
-path.Add(current);
-}
-else {
-break;
-}
-}
-
+if (!IsPositionValid(start) || !IsPositionValid(end)) {
 ret path;
+}
+
+var openSet = new HashSet<GridPosition>();
+var closedSet = new HashSet<GridPosition>();
+var cameFrom = new Dictionary<GridPosition, GridPosition>();
+var gScore = new Dictionary<GridPosition, float>();
+var fScore = new Dictionary<GridPosition, float>();
+
+openSet.Add(start);
+gScore[start] = 0;
+fScore[start] = HeuristicCost(start, end);
+
+while (openSet.Count > 0) {
+GridPosition current = GetLowestFScore(openSet, fScore);
+
+if (current == end) {
+while (cameFrom.ContainsKey(current)) {
+path.Add(current);
+current = cameFrom[current];
+}
+path.Reverse();
+ret path;
+}
+
+openSet.Remove(current);
+closedSet.Add(current);
+
+foreach (var neighbor in current.GetNeighbors(allowDiagonal)) {
+if (!IsPositionValid(neighbor) || IsPositionOccupied(neighbor) || closedSet.Contains(neighbor)) {
+continue;
+}
+
+float tentativeGScore = gScore[current] + 1;
+
+if (!openSet.Contains(neighbor)) {
+openSet.Add(neighbor);
+} else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor]) {
+continue;
+}
+
+cameFrom[neighbor] = current;
+gScore[neighbor] = tentativeGScore;
+fScore[neighbor] = gScore[neighbor] + HeuristicCost(neighbor, end);
+}
+}
+
+ret path; // No path found
+}
+
+float HeuristicCost(GridPosition a, GridPosition b) {
+ret a.ManhattanDistance(b);
+}
+
+GridPosition GetLowestFScore(HashSet<GridPosition> openSet, Dictionary<GridPosition, float> fScore) {
+GridPosition lowest = openSet.First();
+float lowestScore = fScore.ContainsKey(lowest) ? fScore[lowest] : float.MaxValue;
+
+foreach (var pos in openSet) {
+float score = fScore.ContainsKey(pos) ? fScore[pos] : float.MaxValue;
+if (score < lowestScore) {
+lowest = pos;
+lowestScore = score;
+}
+}
+
+ret lowest;
+}
+
+pub bool PathExists(GridPosition start, GridPosition end, bool allowDiagonal = false) {
+var path = GetPath(start, end, allowDiagonal);
+ret path.Count > 0;
+}
+
+pub void SnapEntityToGrid(GameObject entity) {
+if (entity == null) return;
+
+GridEntity gridEntity = entity.GetComponent<GridEntity>();
+if (gridEntity == null) {
+gridEntity = entity.AddComponent<GridEntity>();
+}
+
+GridPosition nearestGrid = WorldToGrid(entity.transform.position);
+Vector3 snappedWorldPos = GridToWorld(nearestGrid);
+
+entity.transform.position = snappedWorldPos;
+
+gridEntity.SetPosition(nearestGrid, instant: true);
+
+if (debugMode) {
+Debug.Log($"[GridPositionManager] Snapped {entity.name} from {entity.transform.position} to grid {nearestGrid} at world {snappedWorldPos}");
+}
+}
+
+pub void SnapAllEntitiesToGrid<T>() where T : Component {
+T[] entities = FindObjectsByType<T>(FindObjectsSortMode.None);
+foreach (var entity in entities) {
+SnapEntityToGrid(entity.gameObject);
+}
+Debug.Log($"[GridPositionManager] Snapped {entities.Length} entities of type {typeof(T).Name} to grid");
 }
 
 void OnDrawGizmos() {
@@ -10912,43 +10938,35 @@ ret tickUpdateables.Count;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\TurnPhaseManager.cs
 
-﻿using System;
+﻿// Assets\Scripts\Ticks\TurnPhaseManager.cs
 
 ns WegoSystem {
 pub enum TurnPhase {
 Planning,
-Execution,
-Resolution
+Execution
 }
 
 pub cls TurnPhaseManager : MonoBehaviour, ITickUpdateable {
 pub stat TurnPhaseManager Instance { get; set; }
 
 [SerializeField] TurnPhase currentPhase = TurnPhase.Planning;
-[SerializeField] bool autoAdvancePhases = false;
-[SerializeField] int planningPhaseStartTick = 0;
 [SerializeField] int currentPhaseTicks = 0;
-
 [SerializeField] bool debugMode = false;
 
 pub TurnPhase CurrentPhase => currentPhase;
 pub int CurrentPhaseTicks => currentPhaseTicks;
 pub bool IsInPlanningPhase => currentPhase == TurnPhase.Planning;
 pub bool IsInExecutionPhase => currentPhase == TurnPhase.Execution;
-pub bool IsInResolutionPhase => currentPhase == TurnPhase.Resolution;
 
-pub event Action<TurnPhase, TurnPhase> OnPhaseChanged; // oldPhase, newPhase
+pub event Action<TurnPhase, TurnPhase> OnPhaseChanged;
 pub event Action OnPlanningPhaseStarted;
 pub event Action OnExecutionPhaseStarted;
-pub event Action OnResolutionPhaseStarted;
-pub event Action OnTurnCycleCompleted;
 
 void Awake() {
 if (Instance != null && Instance != this) {
 Destroy(gameObject);
 return;
 }
-
 Instance = this;
 }
 
@@ -10976,111 +10994,18 @@ TickManager.Instance.UnregisterTickUpdateable(this);
 pub void OnTickUpdate(int currentTick) {
 currentPhaseTicks++;
 
-}
-
-void CheckAutoAdvance() {
-if (TickManager.Instance?.Config == null) return;
-
-var config = TickManager.Instance.Config;
-bool shouldAdvance = false;
-
-switch (currentPhase) {
-case TurnPhase.Planning:
-if (config.maxPlanningPhaseTicks > 0 && currentPhaseTicks >= config.maxPlanningPhaseTicks) {
-shouldAdvance = true;
-}
-break;
-
-case TurnPhase.Execution:
-if (currentPhaseTicks >= config.executionPhaseTicks) {
-shouldAdvance = true;
-}
-break;
-
-case TurnPhase.Resolution:
-if (currentPhaseTicks >= config.resolutionPhaseTicks) {
-shouldAdvance = true;
-}
-break;
-}
-
-if (shouldAdvance) {
-AdvanceToNextPhase();
+if (currentPhase == TurnPhase.Execution && AllEntitiesActed()) {
+TransitionToPhase(TurnPhase.Planning);
 }
 }
 
-pub void AdvanceToNextPhase() {
-TurnPhase nextPhase = GetNextPhase(currentPhase);
-TransitionToPhase(nextPhase);
+bool AllEntitiesActed() {
+var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
+foreach (var gardener in gardeners) {
+if (gardener.GetQueuedMoveCount() > 0) ret false;
 }
 
-pub void TransitionToPhase(TurnPhase newPhase) {
-if (currentPhase == newPhase) return;
-
-TurnPhase oldPhase = currentPhase;
-
-ExitPhase(oldPhase);
-
-EnterPhase(newPhase);
-
-OnPhaseChanged?.Invoke(oldPhase, newPhase);
-
-if (debugMode) {
-Debug.Log($"[TurnPhaseManager] Phase transition: {oldPhase} -> {newPhase}");
-}
-
-if (oldPhase == TurnPhase.Resolution && newPhase == TurnPhase.Planning) {
-OnTurnCycleCompleted?.Invoke();
-if (debugMode) {
-Debug.Log("[TurnPhaseManager] Turn cycle completed");
-}
-}
-}
-
-void EnterPhase(TurnPhase phase) {
-currentPhase = phase;
-currentPhaseTicks = 0;
-planningPhaseStartTick = TickManager.Instance?.CurrentTick ?? 0;
-
-switch (phase) {
-case TurnPhase.Planning:
-OnPlanningPhaseStarted?.Invoke();
-break;
-
-case TurnPhase.Execution:
-OnExecutionPhaseStarted?.Invoke();
-break;
-
-case TurnPhase.Resolution:
-OnResolutionPhaseStarted?.Invoke();
-break;
-}
-}
-
-void ExitPhase(TurnPhase phase) {
-switch (phase) {
-case TurnPhase.Planning:
-break;
-
-case TurnPhase.Execution:
-break;
-
-case TurnPhase.Resolution:
-break;
-}
-}
-
-TurnPhase GetNextPhase(TurnPhase current) {
-switch (current) {
-case TurnPhase.Planning:
-ret TurnPhase.Execution;
-case TurnPhase.Execution:
-ret TurnPhase.Resolution;
-case TurnPhase.Resolution:
-ret TurnPhase.Planning;
-default:
-ret TurnPhase.Planning;
-}
+ret true;
 }
 
 pub void EndPlanningPhase() {
@@ -11092,6 +11017,30 @@ Debug.LogWarning($"[TurnPhaseManager] Cannot end planning phase - current phase 
 }
 }
 
+pub void TransitionToPhase(TurnPhase newPhase) {
+if (currentPhase == newPhase) return;
+
+TurnPhase oldPhase = currentPhase;
+currentPhase = newPhase;
+currentPhaseTicks = 0;
+
+switch (newPhase) {
+case TurnPhase.Planning:
+OnPlanningPhaseStarted?.Invoke();
+break;
+
+case TurnPhase.Execution:
+OnExecutionPhaseStarted?.Invoke();
+break;
+}
+
+OnPhaseChanged?.Invoke(oldPhase, newPhase);
+
+if (debugMode) {
+Debug.Log($"[TurnPhaseManager] Phase transition: {oldPhase} -> {newPhase}");
+}
+}
+
 pub void ForcePhase(TurnPhase phase) {
 if (Application.isEditor || Debug.isDebugBuild) {
 TransitionToPhase(phase);
@@ -11099,47 +11048,11 @@ TransitionToPhase(phase);
 }
 
 pub float GetPhaseProgress() {
-if (TickManager.Instance?.Config == null) ret 0f;
-
-var config = TickManager.Instance.Config;
-int maxTicks = 0;
-
-switch (currentPhase) {
-case TurnPhase.Planning:
-maxTicks = config.maxPlanningPhaseTicks;
-if (maxTicks <= 0) ret 0f; // Unlimited planning time
-break;
-case TurnPhase.Execution:
-maxTicks = config.executionPhaseTicks;
-break;
-case TurnPhase.Resolution:
-maxTicks = config.resolutionPhaseTicks;
-break;
-}
-
-ret maxTicks > 0 ? (float)currentPhaseTicks / maxTicks : 0f;
+ret currentPhase == TurnPhase.Execution ? 1f : 0f;
 }
 
 pub int GetRemainingPhaseTicks() {
-if (TickManager.Instance?.Config == null) ret -1;
-
-var config = TickManager.Instance.Config;
-int maxTicks = 0;
-
-switch (currentPhase) {
-case TurnPhase.Planning:
-maxTicks = config.maxPlanningPhaseTicks;
-if (maxTicks <= 0) ret -1; // Unlimited
-break;
-case TurnPhase.Execution:
-maxTicks = config.executionPhaseTicks;
-break;
-case TurnPhase.Resolution:
-maxTicks = config.resolutionPhaseTicks;
-break;
-}
-
-ret Mathf.Max(0, maxTicks - currentPhaseTicks);
+ret -1;
 }
 }
 }

@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿// Assets\Scripts\Ticks\TickConfiguration.cs
+
+using UnityEngine;
 
 namespace WegoSystem {
-    [CreateAssetMenu(fileName = "TickConfig", menuName = "Wego System/Tick Configuration")]
     public class TickConfiguration : ScriptableObject {
         [SerializeField] public float ticksPerRealSecond = 2f; // Made public
 
@@ -15,7 +16,7 @@ namespace WegoSystem {
 
         public int maxPlanningPhaseTicks = 0;
         public int executionPhaseTicks = 5;
-        public int resolutionPhaseTicks = 2;
+        // REMOVED: public int resolutionPhaseTicks = 2; - Resolution phase removed
 
         public int plantGrowthTicksPerStage = 5;
 
@@ -50,7 +51,7 @@ namespace WegoSystem {
             switch (phase) {
                 case TurnPhase.Planning: return maxPlanningPhaseTicks;
                 case TurnPhase.Execution: return executionPhaseTicks;
-                case TurnPhase.Resolution: return resolutionPhaseTicks;
+                // REMOVED: case TurnPhase.Resolution: return resolutionPhaseTicks;
                 default: return 1;
             }
         }
@@ -72,7 +73,7 @@ namespace WegoSystem {
             nightPhaseTicks = 80;
             transitionTicks = 20;
             executionPhaseTicks = 10;
-            resolutionPhaseTicks = 5;
+            // REMOVED: resolutionPhaseTicks = 5;
             plantGrowthTicksPerStage = 8;
             animalHungerTickInterval = 5;
         }
@@ -83,7 +84,7 @@ namespace WegoSystem {
             nightPhaseTicks = 20;
             transitionTicks = 5;
             executionPhaseTicks = 3;
-            resolutionPhaseTicks = 1;
+            // REMOVED: resolutionPhaseTicks = 1;
             plantGrowthTicksPerStage = 2;
             animalHungerTickInterval = 2;
         }
@@ -94,7 +95,7 @@ namespace WegoSystem {
             nightPhaseTicks = 40;
             transitionTicks = 10;
             executionPhaseTicks = 5;
-            resolutionPhaseTicks = 2;
+            // REMOVED: resolutionPhaseTicks = 2;
             plantGrowthTicksPerStage = 5;
             animalHungerTickInterval = 3;
         }
@@ -105,7 +106,7 @@ namespace WegoSystem {
             nightPhaseTicks = Mathf.Max(1, nightPhaseTicks);
             transitionTicks = Mathf.Max(1, transitionTicks);
             executionPhaseTicks = Mathf.Max(1, executionPhaseTicks);
-            resolutionPhaseTicks = Mathf.Max(1, resolutionPhaseTicks);
+            // REMOVED: resolutionPhaseTicks = Mathf.Max(1, resolutionPhaseTicks);
             plantGrowthTicksPerStage = Mathf.Max(1, plantGrowthTicksPerStage);
             animalHungerTickInterval = Mathf.Max(1, animalHungerTickInterval);
             animalThinkingInterval = Mathf.Max(1, animalThinkingInterval);

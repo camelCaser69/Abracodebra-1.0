@@ -47,7 +47,6 @@ public partial class PlantGrowth : MonoBehaviour, ITickUpdateable {
     int currentGrowthTick = 0;
     int maturityCycleTick = 0;
     int currentStemStage = 0;
-    int leafSpawnTick = 0;
     
     // Real-time fallback
     Coroutine growthCoroutine;
@@ -261,7 +260,6 @@ public partial class PlantGrowth : MonoBehaviour, ITickUpdateable {
         currentGrowthTick = 0;
         maturityCycleTick = 0;
         currentStemStage = 0;
-        leafSpawnTick = 0;
         
         // Reset real-time variables
         currentGrowthElapsedTime = 0f;

@@ -1,32 +1,29 @@
-﻿using UnityEngine;
+﻿// Assets\Scripts\WorldInteraction\Placement\PlayerTileInteractor.cs
 
-public sealed class PlayerTileInteractor : MonoBehaviour
-{
-    [SerializeField] private InventoryBarController inventoryBar;
-    [SerializeField] private TileInteractionManager tileInteractionManager;
-    [SerializeField] private Transform playerTransform;
-    [SerializeField] private bool showDebug = false;
+using UnityEngine;
 
-    private bool pendingClick;
+public sealed class PlayerTileInteractor : MonoBehaviour {
+    [SerializeField] InventoryBarController inventoryBar;
+    [SerializeField] TileInteractionManager tileInteractionManager;
+    [SerializeField] Transform playerTransform;
+    [SerializeField] bool showDebug = false;
 
-    private void Awake()
-    {
+    bool pendingClick;
+
+    void Awake() {
         if (playerTransform == null) playerTransform = transform;
     }
 
-    private void Start()
-    {
+    void Start() {
         FindSingletons();
     }
 
-    private void Update()
-    {
+    void Update() {
         if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat) return;
         if (Input.GetMouseButtonDown(0)) pendingClick = true;
     }
 
-    private void LateUpdate()
-    {
+    void LateUpdate() {
         if (!pendingClick) return;
         pendingClick = false;
         HandleLeftClick();
@@ -81,24 +78,16 @@ public sealed class PlayerTileInteractor : MonoBehaviour
                 inventoryBar.ShowBar(); // Refresh the bar
             }
         }
-
-        // Old direct action code removed:
-        // tileInteractionManager.ApplyToolAction(selected.ToolDefinition);
-        // PlantPlacementManager.Instance?.TryPlantSeedFromInventory(selected, cellPos, cellCenter)
     }
 
-    private void RemoveSeedFromInventory(InventoryBarItem seed)
-    {
+    void RemoveSeedFromInventory(InventoryBarItem seed) {
         InventoryGridController grid = InventoryGridController.Instance;
         if (grid == null) return;
 
-        if (seed.ViewGameObject != null)
-        {
-            for (int i = 0; i < grid.ActualCellCount; i++)
-            {
+        if (seed.ViewGameObject != null) {
+            for (int i = 0; i < grid.ActualCellCount; i++) {
                 NodeCell cell = grid.GetInventoryCellAtIndex(i);
-                if (cell != null && cell.GetItemView()?.gameObject == seed.ViewGameObject)
-                {
+                if (cell != null && cell.GetItemView()?.gameObject == seed.ViewGameObject) {
                     if (showDebug) Debug.Log($"[PlayerTileInteractor] Removing seed '{seed.GetDisplayName()}' from inventory cell {i} by view reference.");
                     cell.RemoveNode();
                     return;
@@ -106,12 +95,9 @@ public sealed class PlayerTileInteractor : MonoBehaviour
             }
         }
 
-        // Fallback search by NodeData ID
-        for (int i = 0; i < grid.ActualCellCount; i++)
-        {
+        for (int i = 0; i < grid.ActualCellCount; i++) {
             NodeCell cell = grid.GetInventoryCellAtIndex(i);
-            if (cell != null && cell.GetNodeData()?.nodeId == seed.NodeData.nodeId)
-            {
+            if (cell != null && cell.GetNodeData()?.nodeId == seed.NodeData.nodeId) {
                 if (showDebug) Debug.Log($"[PlayerTileInteractor] Removing seed '{seed.GetDisplayName()}' from inventory cell {i} by data ID fallback.");
                 cell.RemoveNode();
                 return;
@@ -119,14 +105,12 @@ public sealed class PlayerTileInteractor : MonoBehaviour
         }
     }
 
-    private bool EnsureManagers()
-    {
+    bool EnsureManagers() {
         if (tileInteractionManager == null || inventoryBar == null) FindSingletons();
         return tileInteractionManager != null && inventoryBar != null;
     }
 
-    private void FindSingletons()
-    {
+    void FindSingletons() {
         if (inventoryBar == null) inventoryBar = InventoryBarController.Instance ?? FindAnyObjectByType<InventoryBarController>(FindObjectsInactive.Include);
         if (tileInteractionManager == null) tileInteractionManager = TileInteractionManager.Instance ?? FindAnyObjectByType<TileInteractionManager>(FindObjectsInactive.Include);
     }

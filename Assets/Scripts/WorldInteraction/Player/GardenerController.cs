@@ -4,7 +4,7 @@ using UnityEngine;
 using WegoSystem;
 using System.Collections.Generic;
 
-public class GardenerController : SpeedModifiable, ITickUpdateable {
+public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer inherits from SpeedModifiable
     [SerializeField] bool useWegoMovement = true;
 
     public Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
@@ -21,10 +21,6 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
     GridPosition currentTargetPosition;
     bool hasMoveQueued = false;
 
-    // Remove Rigidbody2D references - no longer needed for grid movement
-    // Rigidbody2D rb;
-    // Vector2 movement;
-
     SortableEntity sortableEntity;
     SpriteRenderer spriteRenderer;
     Animator animator;
@@ -32,12 +28,7 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
     bool isPlanting = false;
     float plantingTimer = 0f;
 
-    protected override void Awake() {
-        base.Awake();
-
-        // Remove rigidbody reference
-        // rb = GetComponent<Rigidbody2D>();
-        
+    void Awake() {
         sortableEntity = GetComponent<SortableEntity>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
@@ -182,13 +173,6 @@ public class GardenerController : SpeedModifiable, ITickUpdateable {
             if (plantingTimer <= 0) EndPlantingAnimation();
         }
     }
-
-    // Remove FixedUpdate entirely - no physics-based movement
-    // void FixedUpdate() {
-    //     if (!useWegoMovement && !isPlanting && rb != null) {
-    //         rb.MovePosition(rb.position + movement.normalized * currentSpeed * Time.fixedDeltaTime);
-    //     }
-    // }
 
     void UpdateAnimations() {
         if (!useAnimations || animator == null) return;
