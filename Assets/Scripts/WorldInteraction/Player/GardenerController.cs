@@ -1,10 +1,8 @@
-﻿// Assets\Scripts\WorldInteraction\Player\GardenerController.cs
-
-using UnityEngine;
-using WegoSystem;
+﻿using UnityEngine;
 using System.Collections.Generic;
+using WegoSystem;
 
-public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer inherits from SpeedModifiable
+public class GardenerController : MonoBehaviour, ITickUpdateable {
     [SerializeField] bool useWegoMovement = true;
 
     public Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
@@ -27,6 +25,15 @@ public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer
 
     bool isPlanting = false;
     float plantingTimer = 0f;
+    
+    // Track if we're currently processing a move to prevent multiple moves per tick
+    bool isProcessingMove = false;
+    
+    // Add input tracking to prevent multiple queues per key press
+    bool upPressed = false;
+    bool downPressed = false;
+    bool leftPressed = false;
+    bool rightPressed = false;
 
     void Awake() {
         sortableEntity = GetComponent<SortableEntity>();
@@ -50,11 +57,20 @@ public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer
     }
 
     void Start() {
-        // CRITICAL: Force grid snapping on start
-        if (GridPositionManager.Instance != null) {
-            GridPositionManager.Instance.SnapEntityToGrid(gameObject);
-            currentTargetPosition = gridEntity.Position;
-            Debug.Log($"[GardenerController] Snapped to grid position {gridEntity.Position} on start");
+        // Snap to tile grid instead of generic grid
+        if (TileInteractionManager.Instance != null) {
+            Vector3Int cellPos = TileInteractionManager.Instance.WorldToCell(transform.position);
+            Vector3 snappedPos = TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(cellPos);
+            transform.position = snappedPos;
+            
+            // Update grid entity position
+            if (gridEntity != null && GridPositionManager.Instance != null) {
+                GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(snappedPos);
+                gridEntity.SetPosition(gridPos, true);
+                currentTargetPosition = gridPos;
+            }
+            
+            Debug.Log($"[GardenerController] Snapped to tile grid position {cellPos} at world {snappedPos}");
         }
 
         if (useWegoMovement && TickManager.Instance != null) {
@@ -78,27 +94,68 @@ public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer
 
     void OnPhaseChanged(TurnPhase oldPhase, TurnPhase newPhase) {
         if (newPhase == TurnPhase.Planning) {
+            // Clear any remaining moves when returning to planning
             plannedMoves.Clear();
             hasMoveQueued = false;
+            isProcessingMove = false;
+            
+            // Ensure we're snapped to our current position
+            if (gridEntity != null) {
+                currentTargetPosition = gridEntity.Position;
+            }
         }
     }
 
     public void OnTickUpdate(int currentTick) {
         if (!useWegoMovement || isPlanting) return;
-
-        if (plannedMoves.Count > 0) {
-            GridPosition nextMove = plannedMoves.Dequeue();
-
-            if (gridEntity != null && GridPositionManager.Instance != null) {
-                if (GridPositionManager.Instance.IsPositionValid(nextMove) &&
-                    !GridPositionManager.Instance.IsPositionOccupied(nextMove)) {
-                    gridEntity.SetPosition(nextMove);
-                    currentTargetPosition = nextMove;
-                }
+        
+        // Only process moves during execution phase
+        if (TurnPhaseManager.Instance?.CurrentPhase == TurnPhase.Execution) {
+            // Process one move per tick
+            if (!isProcessingMove && plannedMoves.Count > 0) {
+                ProcessNextMove();
             }
         }
-
+        
         hasMoveQueued = plannedMoves.Count > 0;
+    }
+    
+    void ProcessNextMove() {
+        if (plannedMoves.Count == 0) return;
+        
+        isProcessingMove = true;
+        GridPosition nextMove = plannedMoves.Dequeue();
+        
+        if (gridEntity != null && GridPositionManager.Instance != null) {
+            if (GridPositionManager.Instance.IsPositionValid(nextMove) &&
+                !GridPositionManager.Instance.IsPositionOccupied(nextMove)) {
+                
+                // Calculate tick cost before moving
+                Vector3 worldPos = GridPositionManager.Instance.GridToWorld(nextMove);
+                int moveCost = 1; // Default cost
+                
+                // Check for slowdown zones
+                if (PlayerActionManager.Instance != null) {
+                    moveCost = PlayerActionManager.Instance.GetMovementTickCost(worldPos);
+                }
+                
+                // Execute the move
+                gridEntity.SetPosition(nextMove);
+                currentTargetPosition = nextMove;
+                
+                Debug.Log($"[GardenerController] Executed move to {nextMove}, cost {moveCost} ticks");
+                
+                // Schedule next tick for movement cost
+                if (TickManager.Instance != null) {
+                    // Don't advance ticks here - let TurnPhaseManager handle it
+                    // Just wait for the next natural tick
+                }
+            } else {
+                Debug.Log($"[GardenerController] Move to {nextMove} blocked");
+            }
+        }
+        
+        isProcessingMove = false;
     }
 
     void Update() {
@@ -117,19 +174,52 @@ public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer
         if (TurnPhaseManager.Instance?.IsInPlanningPhase != true) return;
         if (isPlanting) return;
 
-        Vector2 input = Vector2.zero;
-        input.x = Input.GetAxisRaw("Horizontal");
-        input.y = Input.GetAxisRaw("Vertical");
+        // Use GetKeyDown for single press detection
+        bool shouldMove = false;
+        GridPosition moveDir = GridPosition.Zero;
+        
+        if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && !upPressed) {
+            moveDir = GridPosition.Up;
+            shouldMove = true;
+            upPressed = true;
+        } else if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.UpArrow)) {
+            upPressed = false;
+        }
+        
+        if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && !downPressed) {
+            moveDir = GridPosition.Down;
+            shouldMove = true;
+            downPressed = true;
+        } else if (!Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.DownArrow)) {
+            downPressed = false;
+        }
+        
+        if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && !leftPressed) {
+            moveDir = GridPosition.Left;
+            shouldMove = true;
+            leftPressed = true;
+        } else if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.LeftArrow)) {
+            leftPressed = false;
+        }
+        
+        if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && !rightPressed) {
+            moveDir = GridPosition.Right;
+            shouldMove = true;
+            rightPressed = true;
+        } else if (!Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.RightArrow)) {
+            rightPressed = false;
+        }
 
-        if (input.sqrMagnitude > 0.01f && gridEntity != null) {
+        if (shouldMove && gridEntity != null) {
             GridPosition currentPos = gridEntity.Position;
-            GridPosition targetPos = currentPos;
-
-            if (Mathf.Abs(input.x) > Mathf.Abs(input.y)) {
-                targetPos = currentPos + (input.x > 0 ? GridPosition.Right : GridPosition.Left);
-            } else {
-                targetPos = currentPos + (input.y > 0 ? GridPosition.Up : GridPosition.Down);
+            
+            // If we have queued moves, use the last queued position as our starting point
+            if (plannedMoves.Count > 0) {
+                var moves = plannedMoves.ToArray();
+                currentPos = moves[moves.Length - 1];
             }
+            
+            GridPosition targetPos = currentPos + moveDir;
 
             if (PlayerActionManager.Instance != null) {
                 PlayerActionManager.Instance.ExecutePlayerMove(this, currentPos, targetPos);
@@ -142,7 +232,6 @@ public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer
     void HandleImmediateInput() {
         if (isPlanting) return;
 
-        // Discrete grid-based movement
         bool shouldMove = false;
         GridPosition moveDir = GridPosition.Zero;
 
@@ -160,10 +249,25 @@ public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer
             shouldMove = true;
         }
 
-        if (shouldMove && gridEntity != null && PlayerActionManager.Instance != null) {
+        if (shouldMove && gridEntity != null) {
             GridPosition currentPos = gridEntity.Position;
             GridPosition targetPos = currentPos + moveDir;
-            PlayerActionManager.Instance.ExecutePlayerMove(this, currentPos, targetPos);
+            
+            // In immediate mode, execute the move directly
+            if (GridPositionManager.Instance != null &&
+                GridPositionManager.Instance.IsPositionValid(targetPos) &&
+                !GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
+                
+                gridEntity.SetPosition(targetPos);
+                currentTargetPosition = targetPos;
+                
+                // Advance tick in immediate mode
+                if (TickManager.Instance != null) {
+                    Vector3 worldPos = GridPositionManager.Instance.GridToWorld(targetPos);
+                    int moveCost = PlayerActionManager.Instance?.GetMovementTickCost(worldPos) ?? 1;
+                    TickManager.Instance.AdvanceMultipleTicks(moveCost);
+                }
+            }
         }
     }
 
@@ -177,13 +281,7 @@ public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer
     void UpdateAnimations() {
         if (!useAnimations || animator == null) return;
 
-        bool isMoving;
-        if (useWegoMovement) {
-            isMoving = gridEntity != null && gridEntity.IsMoving;
-        } else {
-            isMoving = gridEntity != null && gridEntity.IsMoving;
-        }
-
+        bool isMoving = gridEntity != null && gridEntity.IsMoving;
         animator.SetBool(runningParameterName, isMoving && !isPlanting);
     }
 
@@ -194,7 +292,7 @@ public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer
         if (gridEntity != null && GridPositionManager.Instance != null) {
             Vector3 worldTarget = GridPositionManager.Instance.GridToWorld(currentTargetPosition);
             Vector3 currentWorld = transform.position;
-            
+
             if (Vector3.Distance(worldTarget, currentWorld) > 0.01f) {
                 directionToCheck = (worldTarget - currentWorld).normalized;
             }
@@ -245,12 +343,15 @@ public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer
     public void QueueMovement(GridPosition targetPosition) {
         if (useWegoMovement && TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
             plannedMoves.Enqueue(targetPosition);
+            hasMoveQueued = true;
+            Debug.Log($"[GardenerController] Queued move to {targetPosition}. Total queued: {plannedMoves.Count}");
         }
     }
 
     public void ClearQueuedMoves() {
         plannedMoves.Clear();
         hasMoveQueued = false;
+        isProcessingMove = false;
     }
 
     public int GetQueuedMoveCount() {
@@ -273,5 +374,8 @@ public class GardenerController : MonoBehaviour, ITickUpdateable {  // No longer
         } else if (!enabled && TickManager.Instance != null) {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
+        
+        // Clear any queued moves when switching modes
+        ClearQueuedMoves();
     }
 }

@@ -1,7 +1,9 @@
-﻿// Assets\Scripts\Core\WeatherManager.cs
-
+﻿using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using System;
-using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 using WegoSystem;
 
 public class WeatherManager : MonoBehaviour, ITickUpdateable {
@@ -30,7 +32,6 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
 
     CyclePhase currentPhase = CyclePhase.Day;
 
-    // NEW PROPERTIES - These were missing and causing compiler errors
     public float CurrentTotalPhaseTime => totalPhaseTicksTarget * (TickManager.Instance?.Config?.GetRealSecondsPerTick() ?? 0.5f);
     public float CurrentPhaseTimer => (totalPhaseTicksTarget - currentPhaseTicks) * (TickManager.Instance?.Config?.GetRealSecondsPerTick() ?? 0.5f);
 
@@ -59,19 +60,42 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
     public void OnTickUpdate(int currentTick) {
         if (!useWegoSystem || !dayNightCycleEnabled || IsPaused) return;
 
-        currentPhaseTicks++;
-
-        if (currentPhaseTicks >= totalPhaseTicksTarget) {
-            AdvanceToNextPhase();
-        } else {
-            UpdateSunIntensity();
+        // Use tick-based day progress
+        if (TickManager.Instance?.Config != null) {
+            float dayProgress = TickManager.Instance.Config.GetDayProgressNormalized(currentTick);
+            
+            // Map progress to cycle phases
+            CyclePhase newPhase = currentPhase;
+            
+            if (dayProgress < 0.4f) {
+                newPhase = CyclePhase.Day;
+                sunIntensity = 1f;
+            } else if (dayProgress < 0.5f) {
+                newPhase = CyclePhase.TransitionToNight;
+                float transitionProgress = (dayProgress - 0.4f) / 0.1f;
+                sunIntensity = Mathf.Lerp(1f, 0f, transitionCurve.Evaluate(transitionProgress));
+            } else if (dayProgress < 0.9f) {
+                newPhase = CyclePhase.Night;
+                sunIntensity = 0f;
+            } else {
+                newPhase = CyclePhase.TransitionToDay;
+                float transitionProgress = (dayProgress - 0.9f) / 0.1f;
+                sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(transitionProgress));
+            }
+            
+            // Update phase if changed
+            if (newPhase != currentPhase) {
+                currentPhase = newPhase;
+                if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
+                OnPhaseChanged?.Invoke(currentPhase);
+            }
         }
-
+        
         UpdateFadeSprite();
     }
 
     void Update() {
-        if (!IsPaused && !forceDaylight) {
+        if (!IsPaused && !forceDaylight && !useWegoSystem) {
             UpdateSunIntensity();
         }
         UpdateFadeSprite();
@@ -141,7 +165,7 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
         }
         sunIntensity = Mathf.Clamp01(sunIntensity);
     }
-
+    
     void UpdateFadeSprite() {
         if (fadeSprite != null) {
             float alpha = Mathf.Lerp(maxAlpha, minAlpha, sunIntensity);
@@ -199,5 +223,5 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
         if (Application.isEditor || Debug.isDebugBuild) {
             EnterPhase(phase, true);
         }
-    }
-}
+    }  
+}  

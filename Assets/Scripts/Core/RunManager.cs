@@ -1,7 +1,8 @@
-﻿// Assets\Scripts\Core\RunManager.cs
-
-using UnityEngine;
+﻿using UnityEngine;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using WegoSystem;
 
 public enum RunState {
@@ -53,7 +54,10 @@ public class RunManager : MonoBehaviour {
         switch (newPhase) {
             case TurnPhase.Planning:
                 if (currentState == RunState.GrowthAndThreat) {
-                    StartNewRound();
+                    // Check if wave is complete
+                    if (waveManager != null && waveManager.IsCurrentWaveDefeated()) {
+                        StartNewRound();
+                    }
                 }
                 break;
 
@@ -98,24 +102,35 @@ public class RunManager : MonoBehaviour {
         }
     }
 
-    // NEW METHODS - These were missing and causing compiler errors
     public void StartRecoveryPhase() {
-        // Recovery phase was removed from the design, so this does nothing
-        // or transitions back to planning
         Debug.Log("[RunManager] StartRecoveryPhase called - transitioning to Planning instead");
         StartNewPlanningPhase();
     }
 
     public void StartNewPlanningPhase() {
         Debug.Log("[RunManager] Starting new planning phase");
-        StartNewRound();
+        
+        // Don't increment round if we're already in planning
+        if (currentState != RunState.Planning) {
+            StartNewRound();
+        }
     }
 
     void StartNewRound() {
         currentRoundNumber++;
         Debug.Log($"[RunManager] Starting new round: {currentRoundNumber}");
+        
+        // Reset wave manager
         waveManager?.ResetForNewRound();
+        
+        // Ensure we're in planning state
         SetState(RunState.Planning);
+        
+        // Force turn phase to planning
+        if (useWegoSystem && TurnPhaseManager.Instance != null) {
+            TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Planning);
+        }
+        
         OnRoundChanged?.Invoke(currentRoundNumber);
     }
 

@@ -1,7 +1,9 @@
-﻿// Assets\Scripts\Ticks\TurnPhaseManager.cs
-
+﻿using UnityEngine;
 using System;
-using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using WegoSystem;
 
 namespace WegoSystem {
     public enum TurnPhase {
@@ -15,6 +17,12 @@ namespace WegoSystem {
         [SerializeField] TurnPhase currentPhase = TurnPhase.Planning;
         [SerializeField] int currentPhaseTicks = 0;
         [SerializeField] bool debugMode = false;
+        
+        // Track if player has moves to process
+        [SerializeField] bool autoAdvanceTicks = true;
+        [SerializeField] float tickInterval = 0.5f; // Time between automatic ticks during execution
+        
+        float tickTimer = 0f;
 
         public TurnPhase CurrentPhase => currentPhase;
         public int CurrentPhaseTicks => currentPhaseTicks;
@@ -41,7 +49,6 @@ namespace WegoSystem {
                 Debug.LogError("[TurnPhaseManager] TickManager not found!");
             }
 
-            // FIXED: Changed from EnterPhase to TransitionToPhase
             TransitionToPhase(TurnPhase.Planning);
         }
 
@@ -55,21 +62,51 @@ namespace WegoSystem {
             }
         }
 
-        public void OnTickUpdate(int currentTick) {
-            currentPhaseTicks++;
-
-            if (currentPhase == TurnPhase.Execution && AllEntitiesActed()) {
-                TransitionToPhase(TurnPhase.Planning);
+        void Update() {
+            // During execution phase, automatically advance ticks
+            if (currentPhase == TurnPhase.Execution && autoAdvanceTicks) {
+                tickTimer += Time.deltaTime;
+                
+                if (tickTimer >= tickInterval) {
+                    tickTimer = 0f;
+                    
+                    // Check if anyone has actions to process
+                    if (HasActionsToProcess()) {
+                        TickManager.Instance?.AdvanceTick();
+                    } else {
+                        // No more actions, return to planning
+                        TransitionToPhase(TurnPhase.Planning);
+                    }
+                }
             }
         }
 
-        bool AllEntitiesActed() {
+        public void OnTickUpdate(int currentTick) {
+            currentPhaseTicks++;
+            
+            // Don't auto-transition based on tick count alone
+            // Let the system handle it based on actions
+        }
+
+        bool HasActionsToProcess() {
+            // Check player moves
             var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
             foreach (var gardener in gardeners) {
-                if (gardener.GetQueuedMoveCount() > 0) return false;
+                if (gardener.GetQueuedMoveCount() > 0) return true;
             }
-
-            return true;
+            
+            // Check animal moves
+            var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+            foreach (var animal in animals) {
+                // Animals process every thinking interval
+                if (currentPhaseTicks % animal.thinkingTickInterval == 0) return true;
+            }
+            
+            // Check plants
+            var plants = PlantGrowth.AllActivePlants;
+            if (plants.Count > 0) return true; // Plants always need processing
+            
+            return false;
         }
 
         public void EndPlanningPhase() {
@@ -87,6 +124,7 @@ namespace WegoSystem {
             TurnPhase oldPhase = currentPhase;
             currentPhase = newPhase;
             currentPhaseTicks = 0;
+            tickTimer = 0f;
 
             switch (newPhase) {
                 case TurnPhase.Planning:

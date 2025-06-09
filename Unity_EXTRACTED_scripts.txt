@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 515,329 → 345,846 chars (32.9% reduction)
-Estimated tokens saved: ~42,370
+Compression Stats: 515,305 → 347,800 chars (32.5% reduction)
+Estimated tokens saved: ~41,876
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -22,94 +22,94 @@ using System;
 [Unknown]
   PixelPerfectSetup (Assets\Scripts\Core/) L29
   RunManager (Assets\Scripts\Core/) L70
-  SortableEntity (Assets\Scripts\Core/) L192
-  UIManager (Assets\Scripts\Core/) L259
-  WeatherManager (Assets\Scripts\Core/) L633
-  WegoSystemCleanup (Assets\Scripts\Core/) L836
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L946
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1828
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1845
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1854
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1867
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1884
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2128
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2327
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2395
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2410
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2429
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2465
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2678
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2742
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2759
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2772
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2801
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L3009
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3239
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3486
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3515
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3545
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3558
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3586
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3647
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3692
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3743
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3777
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3847
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3867
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3902
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3917
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4002
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4114
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4137
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4155
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4182
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4191
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4359
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4398
-  PlantGrowth.CellManagement (Assets\Scripts\PlantSystem\Growth/) L4422
-  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L4666
-  PlantGrowth.RealtimeFallback (Assets\Scripts\PlantSystem\Growth/) L5025
-  PlantGrowth.WegoGrowth (Assets\Scripts\PlantSystem\Growth/) L5259
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5433
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5813
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6111
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6178
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6474
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6593
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6797
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6931
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7251
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7387
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7680
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7768
-  GridSnapStartup (Assets\Scripts\Ticks/) L7869
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7935
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8004
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8235
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8246
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8330
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8435
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8830
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8866
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9056
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9198
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9316
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9593
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9805
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9845
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9865
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9877
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9912
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10071
+  SortableEntity (Assets\Scripts\Core/) L213
+  UIManager (Assets\Scripts\Core/) L280
+  WeatherManager (Assets\Scripts\Core/) L654
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L879
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1761
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1778
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1787
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1800
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1817
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2061
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2260
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2328
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2343
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2362
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2398
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2611
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2675
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2692
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2705
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2734
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2942
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L3172
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3455
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3484
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3514
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3527
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3555
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3616
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3661
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3712
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3746
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3816
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3836
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3871
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3886
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3971
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4083
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4106
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4124
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4151
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4160
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4328
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4367
+  PlantGrowth.CellManagement (Assets\Scripts\PlantSystem\Growth/) L4391
+  PlantGrowth.NodeExecution (Assets\Scripts\PlantSystem\Growth/) L4635
+  PlantGrowth.RealtimeFallback (Assets\Scripts\PlantSystem\Growth/) L4994
+  PlantGrowth.WegoGrowth (Assets\Scripts\PlantSystem\Growth/) L5228
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5402
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5780
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6078
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6145
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6441
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6560
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6764
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6898
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7218
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7354
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7647
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7735
+  GridSnapStartup (Assets\Scripts\Ticks/) L7836
+  WegoDebugUI (Assets\Scripts\Ticks/) L7902
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7939
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8008
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8239
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8250
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8334
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8439
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8834
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8870
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9060
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9202
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9320
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9685
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9889
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9929
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9949
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9961
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9996
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10155
 
 [WegoSystem]
-  GridPosition (Assets\Scripts\Ticks/) L10081
-  TickConfiguration (Assets\Scripts\Ticks/) L10570
-  ITickUpdateable (Assets\Scripts\Ticks/) L10687
-  TurnPhaseManager (Assets\Scripts\Ticks/) L10849
+  GridPosition (Assets\Scripts\Ticks/) L10165
+  TickConfiguration (Assets\Scripts\Ticks/) L10669
+  ITickUpdateable (Assets\Scripts\Ticks/) L10801
+  TurnPhaseManager (Assets\Scripts\Ticks/) L10963
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10971
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11113
 
 ================================================================================
 SCRIPTS
@@ -159,8 +159,7 @@ Debug.Log($"[PixelPerfectSetup] Expected camera orthographic size: {expectedCame
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\RunManager.cs
 
-﻿// Assets\Scripts\Core\RunManager.cs
-
+﻿using UnityEngine;
 using WegoSystem;
 
 pub enum RunState {
@@ -212,7 +211,9 @@ if (!useWegoSystem) return;
 switch (newPhase) {
 case TurnPhase.Planning:
 if (currentState == RunState.GrowthAndThreat) {
+if (waveManager != null && waveManager.IsCurrentWaveDefeated()) {
 StartNewRound();
+}
 }
 break;
 
@@ -257,11 +258,31 @@ TurnPhaseManager.Instance.EndPlanningPhase();
 }
 }
 
+pub void StartRecoveryPhase() {
+Debug.Log("[RunManager] StartRecoveryPhase called - transitioning to Planning instead");
+StartNewPlanningPhase();
+}
+
+pub void StartNewPlanningPhase() {
+Debug.Log("[RunManager] Starting new planning phase");
+
+if (currentState != RunState.Planning) {
+StartNewRound();
+}
+}
+
 void StartNewRound() {
 currentRoundNumber++;
 Debug.Log($"[RunManager] Starting new round: {currentRoundNumber}");
+
 waveManager?.ResetForNewRound();
+
 SetState(RunState.Planning);
+
+if (useWegoSystem && TurnPhaseManager.Instance != null) {
+TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Planning);
+}
+
 OnRoundChanged?.Invoke(currentRoundNumber);
 }
 
@@ -722,7 +743,9 @@ TickManager.Instance?.AdvanceMultipleTicks(count);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\WeatherManager.cs
 
-﻿using System;
+﻿using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 using WegoSystem;
 
 pub cls WeatherManager : MonoBehaviour, ITickUpdateable {
@@ -733,9 +756,7 @@ pub stat WeatherManager Instance { get; set; }
 pub enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
 
 pub bool dayNightCycleEnabled = true;
-
 pub AnimationCurve transitionCurve = AnimationCurve.Linear(0, 0, 1, 1);
-
 pub float sunIntensity = 1f;
 pub float fixedSunIntensity = 1f;
 pub SpriteRenderer fadeSprite;
@@ -746,13 +767,15 @@ pub bool IsPaused { get; set; } = false;
 
 int currentPhaseTicks = 0;
 int totalPhaseTicksTarget = 0;
-
 bool forceDaylight = false;
 
 pub CyclePhase CurrentPhase => currentPhase;
 pub event Action<CyclePhase> OnPhaseChanged;
 
 CyclePhase currentPhase = CyclePhase.Day;
+
+pub float CurrentTotalPhaseTime => totalPhaseTicksTarget * (TickManager.Instance?.Config?.GetRealSecondsPerTick() ?? 0.5f);
+pub float CurrentPhaseTimer => (totalPhaseTicksTarget - currentPhaseTicks) * (TickManager.Instance?.Config?.GetRealSecondsPerTick() ?? 0.5f);
 
 void Awake() {
 if (Instance != null && Instance != this) {
@@ -779,19 +802,39 @@ TickManager.Instance.UnregisterTickUpdateable(this);
 pub void OnTickUpdate(int currentTick) {
 if (!useWegoSystem || !dayNightCycleEnabled || IsPaused) return;
 
-currentPhaseTicks++;
+if (TickManager.Instance?.Config != null) {
+float dayProgress = TickManager.Instance.Config.GetDayProgressNormalized(currentTick);
 
-if (currentPhaseTicks >= totalPhaseTicksTarget) {
-AdvanceToNextPhase();
+CyclePhase newPhase = currentPhase;
+
+if (dayProgress < 0.4f) {
+newPhase = CyclePhase.Day;
+sunIntensity = 1f;
+} else if (dayProgress < 0.5f) {
+newPhase = CyclePhase.TransitionToNight;
+float transitionProgress = (dayProgress - 0.4f) / 0.1f;
+sunIntensity = Mathf.Lerp(1f, 0f, transitionCurve.Evaluate(transitionProgress));
+} else if (dayProgress < 0.9f) {
+newPhase = CyclePhase.Night;
+sunIntensity = 0f;
 } else {
-UpdateSunIntensity();
+newPhase = CyclePhase.TransitionToDay;
+float transitionProgress = (dayProgress - 0.9f) / 0.1f;
+sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(transitionProgress));
+}
+
+if (newPhase != currentPhase) {
+currentPhase = newPhase;
+if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
+OnPhaseChanged?.Invoke(currentPhase);
+}
 }
 
 UpdateFadeSprite();
 }
 
 void Update() {
-if (!IsPaused && !forceDaylight) {
+if (!IsPaused && !forceDaylight && !useWegoSystem) {
 UpdateSunIntensity();
 }
 UpdateFadeSprite();
@@ -918,116 +961,6 @@ ret totalPhaseTicksTarget;
 pub void ForcePhase(CyclePhase phase) {
 if (Application.isEditor || Debug.isDebugBuild) {
 EnterPhase(phase, true);
-}
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\Core\WegoSystemCleanup.cs
-
-﻿// Assets\Scripts\Core\WegoSystemCleanup.cs
-
-pub cls WegoSystemCleanup : MonoBehaviour {
-[SerializeField] bool removeSpeedModifiableComponents = true;
-[SerializeField] bool removeRigidbody2DFromEntities = true;
-[SerializeField] bool removeObsoleteScripts = true;
-[SerializeField] bool logActions = true;
-
-[SerializeField] List<string> obsoleteScriptNames = new List<string> {
-"SpeedModifiable",
-"RunManager" // If we're simplifying the turn system
-};
-
-pub void PerformCleanup() {
-int totalRemoved = 0;
-
-if (removeRigidbody2DFromEntities) {
-totalRemoved += RemoveRigidbodiesFromEntities();
-}
-
-if (removeObsoleteScripts) {
-totalRemoved += RemoveObsoleteComponents();
-}
-
-if (logActions) {
-Debug.Log($"[WegoSystemCleanup] Cleanup complete. Removed {totalRemoved} components.");
-}
-}
-
-int RemoveRigidbodiesFromEntities() {
-int removed = 0;
-
-var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
-foreach (var gardener in gardeners) {
-var rb = gardener.GetComponent<Rigidbody2D>();
-if (rb != null) {
-if (logActions) Debug.Log($"[WegoSystemCleanup] Removing Rigidbody2D from {gardener.name}");
-DestroyImmediate(rb);
-removed++;
-}
-}
-
-var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-foreach (var animal in animals) {
-var rb = animal.GetComponent<Rigidbody2D>();
-if (rb != null) {
-if (logActions) Debug.Log($"[WegoSystemCleanup] Removing Rigidbody2D from {animal.name}");
-DestroyImmediate(rb);
-removed++;
-}
-}
-
-ret removed;
-}
-
-int RemoveObsoleteComponents() {
-int removed = 0;
-
-var allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
-
-foreach (var obj in allObjects) {
-var components = obj.GetComponents<Component>();
-foreach (var component in components) {
-if (component == null) {
-if (logActions) Debug.Log($"[WegoSystemCleanup] Found missing script on {obj.name}");
-removed++;
-}
-else if (obsoleteScriptNames.Contains(component.GetType().Name)) {
-if (logActions) Debug.Log($"[WegoSystemCleanup] Removing {component.GetType().Name} from {obj.name}");
-DestroyImmediate(component);
-removed++;
-}
-}
-}
-
-ret removed;
-}
-
-pub void ListComponentsToRemove() {
-Debug.Log("[WegoSystemCleanup] === Components that will be removed ===");
-
-var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
-foreach (var gardener in gardeners) {
-if (gardener.GetComponent<Rigidbody2D>() != null) {
-Debug.Log($"- Rigidbody2D on {gardener.name}");
-}
-}
-
-var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-foreach (var animal in animals) {
-if (animal.GetComponent<Rigidbody2D>() != null) {
-Debug.Log($"- Rigidbody2D on {animal.name}");
-}
-}
-
-var allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
-foreach (var obj in allObjects) {
-var components = obj.GetComponents<Component>();
-foreach (var component in components) {
-if (component != null && obsoleteScriptNames.Contains(component.GetType().Name)) {
-Debug.Log($"- {component.GetType().Name} on {obj.name}");
-}
-}
 }
 }
 }
@@ -3329,14 +3262,14 @@ Debug.Log($"[FloraManager] Drew {drawnCount} poop absorption radius gizmos");
 // Assets\Scripts\Ecosystem\Management\WaveManager.cs
 
 ﻿using UnityEngine;
-using TMPro; // Keep for legacy UI if any part is still used
-using UnityEngine.UI; // Keep for legacy UI
+using TMPro;
+using WegoSystem;
 
 pub enum InternalWaveState {
-Idle,                // Not currently processing a wave
-WaitingForSpawnTime, // Wave active, waiting for correct time in WeatherManager cycle to spawn
-SpawningInProgress,  // FaunaManager has been told to execute spawn entries
-WaveActive           // Spawns done for this wave def, wave duration timer running (dayCyclesRemaining)
+Idle,
+WaitingForSpawnTime,
+SpawningInProgress,
+WaveActive
 }
 
 pub cls WaveManager : MonoBehaviour {
@@ -3344,7 +3277,7 @@ pub stat WaveManager Instance { get; set; }
 
 [SerializeField] FaunaManager faunaManager;
 [SerializeField] WeatherManager weatherManager;
-[SerializeField] Camera mainCamera; // Keep for FaunaManager if it still needs it
+[SerializeField] Camera mainCamera;
 
 [SerializeField] List<WaveDefinition> wavesSequence;
 
@@ -3357,21 +3290,27 @@ pub stat WaveManager Instance { get; set; }
 [SerializeField] TextMeshProUGUI timeTrackerText;
 
 [SerializeField] InternalWaveState currentInternalState = InternalWaveState.Idle;
-[SerializeField] int activeWaveDefinitionIndex = -1; // Index within wavesSequence for the current round's wave
+[SerializeField] int activeWaveDefinitionIndex = -1;
 
 WaveDefinition currentActiveWaveDef = null;
 int dayCyclesRemainingForThisWaveDef = 0;
 bool hasSpawnedForThisWeatherCycle = false;
-Coroutine activeWaveExecutionCoroutine; // To manage FaunaManager spawning for current WaveDef
+Coroutine activeWaveExecutionCoroutine;
+
+int waveStartTick = 0;
+int waveEndTick = 0;
 
 pub bool IsCurrentWaveDefeated() {
-bool durationMet = currentInternalState == InternalWaveState.WaveActive && dayCyclesRemainingForThisWaveDef <= 0;
-bool isIdle = currentInternalState == InternalWaveState.Idle;
-
-if (isIdle && activeWaveDefinitionIndex != -1) {
+if (currentInternalState == InternalWaveState.Idle && activeWaveDefinitionIndex != -1) {
 ret true;
 }
-ret durationMet;
+
+if (currentActiveWaveDef != null && TickManager.Instance != null) {
+int currentTick = TickManager.Instance.CurrentTick;
+ret currentTick >= waveEndTick;
+}
+
+ret false;
 }
 
 void Awake() {
@@ -3381,16 +3320,38 @@ Instance = this;
 if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager missing!", this);
 if (weatherManager == null) Debug.LogError("[WaveManager] WeatherManager missing!", this);
 if (wavesSequence == null || wavesSequence.Count == 0) Debug.LogWarning("[WaveManager] Wave Sequence empty. No waves will spawn.", this);
+
+if (TickManager.Instance != null) {
+TickManager.Instance.OnTickAdvanced += OnTickAdvanced;
+}
 }
 
 void Start() {
 if (weatherManager != null) weatherManager.OnPhaseChanged += HandleWeatherPhaseChange;
-SetInternalState(InternalWaveState.Idle); // Start idle, wait for RunManager
+SetInternalState(InternalWaveState.Idle);
 }
 
 void OnDestroy() {
 if (weatherManager != null) weatherManager.OnPhaseChanged -= HandleWeatherPhaseChange;
-StopAllCoroutines(); // Ensure any wave execution stops
+if (TickManager.Instance != null) {
+TickManager.Instance.OnTickAdvanced -= OnTickAdvanced;
+}
+StopAllCoroutines();
+}
+
+void OnTickAdvanced(int currentTick) {
+if (currentActiveWaveDef != null && currentTick >= waveEndTick) {
+EndCurrentWave();
+}
+}
+
+int GetWaveDurationTicks() {
+var config = TickManager.Instance?.Config;
+if (config == null) ret 50;
+
+ret config.wavesDependOnDayCycle ?
+config.ticksPerDay * waveDurationInDayCycles :
+config.ticksPerWave;
 }
 
 void SetInternalState(InternalWaveState newState) {
@@ -3411,7 +3372,7 @@ activeWaveDefinitionIndex = roundNumber - 1;
 if (wavesSequence == null || activeWaveDefinitionIndex < 0 || activeWaveDefinitionIndex >= wavesSequence.Count) {
 Debug.LogWarning($"[WaveManager] No WaveDefinition for round {roundNumber} (index {activeWaveDefinitionIndex}). Max index: {(wavesSequence?.Count - 1) ?? -1}. No wave will start.");
 currentActiveWaveDef = null;
-SetInternalState(InternalWaveState.Idle); // Effectively, this round has no wave.
+SetInternalState(InternalWaveState.Idle);
 return;
 }
 
@@ -3426,11 +3387,32 @@ if (deletePreviousWaveAnimals) {
 ClearAllActiveAnimals();
 }
 
-Debug.Log($"[WaveManager] Starting wave '{currentActiveWaveDef.waveName}' for Round {roundNumber}. Duration: {waveDurationInDayCycles} day cycles.");
-dayCyclesRemainingForThisWaveDef = waveDurationInDayCycles;
+waveStartTick = TickManager.Instance.CurrentTick;
+int waveDuration = GetWaveDurationTicks();
+waveEndTick = waveStartTick + waveDuration;
+
+Debug.Log($"[WaveManager] Starting wave '{currentActiveWaveDef.waveName}' for Round {roundNumber}. Duration: {waveDuration} ticks (ends at tick {waveEndTick}).");
+
 hasSpawnedForThisWeatherCycle = false;
 SetInternalState(InternalWaveState.WaitingForSpawnTime);
-Update_WaitingForSpawnTimeCheck(); // Initial check in case conditions are already met
+Update_WaitingForSpawnTimeCheck();
+}
+
+void EndCurrentWave() {
+Debug.Log($"[WaveManager] Ending wave '{currentActiveWaveDef?.waveName}'");
+
+StopCurrentWaveSpawning();
+currentActiveWaveDef = null;
+SetInternalState(InternalWaveState.Idle);
+
+if (RunManager.Instance != null) {
+RunManager.Instance.StartNewPlanningPhase();
+}
+
+if (TurnPhaseManager.Instance != null &&
+TurnPhaseManager.Instance.CurrentPhase != TurnPhase.Planning) {
+TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Planning);
+}
 }
 
 pub void StopCurrentWaveSpawning() {
@@ -3440,36 +3422,24 @@ StopCoroutine(activeWaveExecutionCoroutine);
 activeWaveExecutionCoroutine = null;
 }
 faunaManager?.StopAllSpawnCoroutines();
-SetInternalState(InternalWaveState.Idle); // Wave is considered done for this round.
+SetInternalState(InternalWaveState.Idle);
 }
 
 void HandleWeatherPhaseChange(WeatherManager.CyclePhase newPhase) {
 if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat || currentActiveWaveDef == null) return;
 
-if (newPhase == WeatherManager.CyclePhase.TransitionToDay) // A new day starts {
-if (currentInternalState == InternalWaveState.WaveActive || currentInternalState == InternalWaveState.SpawningInProgress || currentInternalState == InternalWaveState.WaitingForSpawnTime) {
-dayCyclesRemainingForThisWaveDef--;
-hasSpawnedForThisWeatherCycle = false; // Reset for the new day cycle
-if (Debug.isDebugBuild) Debug.Log($"[WaveManager] Day cycle ended for wave '{currentActiveWaveDef.waveName}'. Cycles remaining: {dayCyclesRemainingForThisWaveDef}");
-
-if (dayCyclesRemainingForThisWaveDef <= 0) {
-Debug.Log($"[WaveManager] Wave '{currentActiveWaveDef.waveName}' duration met. Marking as complete for this round.");
-StopCurrentWaveSpawning(); // This will set state to Idle
+if (newPhase == WeatherManager.CyclePhase.TransitionToDay) {
+hasSpawnedForThisWeatherCycle = false;
 }
-else {
-SetInternalState(InternalWaveState.WaitingForSpawnTime);
-}
-}
-}
-else if (newPhase == spawnStartPhase && (currentInternalState == InternalWaveState.WaitingForSpawnTime || currentInternalState == InternalWaveState.WaveActive) ) {
+else if (newPhase == spawnStartPhase && (currentInternalState == InternalWaveState.WaitingForSpawnTime || currentInternalState == InternalWaveState.WaveActive)) {
 Update_WaitingForSpawnTimeCheck();
 }
 }
 
 void Update_WaitingForSpawnTimeCheck() {
 if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat || currentActiveWaveDef == null) return;
-if (currentInternalState != InternalWaveState.WaitingForSpawnTime && currentInternalState != InternalWaveState.WaveActive) return; // Only proceed if waiting or already active (for subsequent day spawns)
-if (hasSpawnedForThisWeatherCycle) return; // Already spawned in this specific weather cycle
+if (currentInternalState != InternalWaveState.WaitingForSpawnTime && currentInternalState != InternalWaveState.WaveActive) return;
+if (hasSpawnedForThisWeatherCycle) return;
 
 if (weatherManager == null) return;
 WeatherManager.CyclePhase currentPhase = weatherManager.CurrentPhase;
@@ -3487,8 +3457,8 @@ if (currentActiveWaveDef == null) return;
 if (faunaManager == null) { Debug.LogError("[WaveManager] FaunaManager missing, cannot spawn!"); return; }
 
 Debug.Log($"[WaveManager] Spawning animals for WaveDefinition: '{currentActiveWaveDef.waveName}' (Phase: {spawnStartPhase} >= {spawnStartPercentage}%)");
-SetInternalState(InternalWaveState.SpawningInProgress); // Indicate spawning has started
-hasSpawnedForThisWeatherCycle = true; // Mark as spawned for *this* specific day's spawn window
+SetInternalState(InternalWaveState.SpawningInProgress);
+hasSpawnedForThisWeatherCycle = true;
 
 faunaManager.ExecuteSpawnWave(currentActiveWaveDef);
 
@@ -3507,18 +3477,20 @@ if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Destroyed {count} animals.");
 
 pub void ResetForNewRound() {
 Debug.Log("[WaveManager] Resetting for new round.");
-StopCurrentWaveSpawning(); // Stop any ongoing coroutines and clear FaunaManager
-if (deletePreviousWaveAnimals) // This flag can decide if animals carry over or not {
+StopCurrentWaveSpawning();
+if (deletePreviousWaveAnimals) {
 ClearAllActiveAnimals();
 }
 currentActiveWaveDef = null;
 activeWaveDefinitionIndex = -1;
 dayCyclesRemainingForThisWaveDef = 0;
 hasSpawnedForThisWeatherCycle = false;
+waveStartTick = 0;
+waveEndTick = 0;
 SetInternalState(InternalWaveState.Idle);
 }
 
-void Update() // Keep this for legacy UI or other periodic checks if necessary {
+void Update() {
 if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat) {
 if (currentInternalState == InternalWaveState.WaitingForSpawnTime) {
 Update_WaitingForSpawnTimeCheck();
@@ -3538,7 +3510,7 @@ string phaseName = phase.ToString().Replace("Transition", "");
 timeTrackerText.text = $"{phaseName} [{progressPercent:F0}%]";
 if (RunManager.Instance != null) {
 if(RunManager.Instance.CurrentState == RunState.Planning) timeTrackerText.text += " (Planning)";
-else if(RunManager.Instance.CurrentState == RunState.Recovery) timeTrackerText.text += " (Recovery)";
+else if(RunManager.Instance.CurrentState == RunState.GrowthAndThreat) timeTrackerText.text += " (Growth & Threat)";
 }
 }
 
@@ -3552,24 +3524,21 @@ waveStatusText.text = $"Prepare for Round {RunManager.Instance.CurrentRoundNumbe
 else if (RunManager.Instance.CurrentState == RunState.GrowthAndThreat) {
 if (currentActiveWaveDef != null) {
 string waveNamePart = string.IsNullOrEmpty(currentActiveWaveDef.waveName) ? $"Wave {activeWaveDefinitionIndex + 1}" : currentActiveWaveDef.waveName;
-if (currentInternalState == InternalWaveState.WaitingForSpawnTime)
-waveStatusText.text = $"{waveNamePart} - Waiting...";
-else if (currentInternalState == InternalWaveState.SpawningInProgress)
-waveStatusText.text = $"{waveNamePart} - Spawning...";
-else if (currentInternalState == InternalWaveState.WaveActive)
-waveStatusText.text = $"{waveNamePart} [{dayCyclesRemainingForThisWaveDef} cycles left]";
-else if (currentInternalState == InternalWaveState.Idle && dayCyclesRemainingForThisWaveDef <=0) // Wave finished
-waveStatusText.text = $"{waveNamePart} - Cleared";
+
+if (TickManager.Instance != null) {
+int ticksRemaining = Mathf.Max(0, waveEndTick - TickManager.Instance.CurrentTick);
+waveStatusText.text = $"{waveNamePart} [{ticksRemaining} ticks left]";
+} else {
+waveStatusText.text = waveNamePart;
 }
-else if (currentInternalState == InternalWaveState.Idle) // No wave for this round, or sequence finished {
+}
+else if (currentInternalState == InternalWaveState.Idle) {
 waveStatusText.text = "All waves for round complete.";
 }
 }
-else if (RunManager.Instance.CurrentState == RunState.Recovery) {
-waveStatusText.text = "Round Recovering";
 }
-}
-pub Camera GetMainCamera() { ret mainCamera; } // If FaunaManager still needs it via WaveManager
+
+pub Camera GetMainCamera() { ret mainCamera; }
 }
 
 ////////////////////////////////////////////////////////////
@@ -5566,7 +5535,6 @@ GameObject rootCellInstance;
 int currentGrowthTick = 0;
 int maturityCycleTick = 0;
 int currentStemStage = 0;
-int leafSpawnTick = 0;
 
 Coroutine growthCoroutine;
 bool isGrowthCompletionHandled = false;
@@ -5775,7 +5743,6 @@ displayedGrowthPercentage = -1;
 currentGrowthTick = 0;
 maturityCycleTick = 0;
 currentStemStage = 0;
-leafSpawnTick = 0;
 
 currentGrowthElapsedTime = 0f;
 estimatedTotalGrowthTime = 1f;
@@ -8022,6 +7989,43 @@ PerformGridSnapping();
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Ticks\WegoDebugUI.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+pub cls WegoDebugUI : MonoBehaviour {
+void OnGUI() {
+GUILayout.BeginArea(new Rect(10, 10, 300, 200));
+
+GUILayout.Label($"Phase: {TurnPhaseManager.Instance?.CurrentPhase}");
+GUILayout.Label($"Tick: {TickManager.Instance?.CurrentTick}");
+
+var gardener = FindObjectOfType<GardenerController>();
+if (gardener != null) {
+GUILayout.Label($"Player Queue: {gardener.GetQueuedMoveCount()} moves");
+GUILayout.Label($"Grid Pos: {gardener.GetCurrentGridPosition()}");
+}
+
+if (TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
+if (GUILayout.Button("End Planning Phase")) {
+TurnPhaseManager.Instance.EndPlanningPhase();
+}
+}
+
+if (GUILayout.Button("Force Planning Phase")) {
+TurnPhaseManager.Instance?.ForcePhase(TurnPhase.Planning);
+}
+
+if (GUILayout.Button("Clear Move Queue")) {
+gardener?.ClearQueuedMoves();
+}
+
+GUILayout.EndArea();
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\UI\Tooltips\TooltipTrigger.cs
 
 ﻿using UnityEngine;
@@ -9405,11 +9409,10 @@ if (tileInteractionManager == null) tileInteractionManager = TileInteractionMana
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\GardenerController.cs
 
-﻿// Assets\Scripts\WorldInteraction\Player\GardenerController.cs
-
+﻿using UnityEngine;
 using WegoSystem;
 
-pub cls GardenerController : MonoBehaviour, ITickUpdateable {  // No longer inherits from SpeedModifiable
+pub cls GardenerController : MonoBehaviour, ITickUpdateable {
 [SerializeField] bool useWegoMovement = true;
 
 pub Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
@@ -9433,6 +9436,13 @@ Animator animator;
 bool isPlanting = false;
 float plantingTimer = 0f;
 
+bool isProcessingMove = false;
+
+bool upPressed = false;
+bool downPressed = false;
+bool leftPressed = false;
+bool rightPressed = false;
+
 void Awake() {
 sortableEntity = GetComponent<SortableEntity>();
 spriteRenderer = GetComponent<SpriteRenderer>();
@@ -9455,10 +9465,18 @@ gridEntity = gameObject.AddComponent<GridEntity>();
 }
 
 void Start() {
-if (GridPositionManager.Instance != null) {
-GridPositionManager.Instance.SnapEntityToGrid(gameObject);
-currentTargetPosition = gridEntity.Position;
-Debug.Log($"[GardenerController] Snapped to grid position {gridEntity.Position} on start");
+if (TileInteractionManager.Instance != null) {
+Vector3Int cellPos = TileInteractionManager.Instance.WorldToCell(transform.position);
+Vector3 snappedPos = TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(cellPos);
+transform.position = snappedPos;
+
+if (gridEntity != null && GridPositionManager.Instance != null) {
+GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(snappedPos);
+gridEntity.SetPosition(gridPos, true);
+currentTargetPosition = gridPos;
+}
+
+Debug.Log($"[GardenerController] Snapped to tile grid position {cellPos} at world {snappedPos}");
 }
 
 if (useWegoMovement && TickManager.Instance != null) {
@@ -9484,25 +9502,56 @@ void OnPhaseChanged(TurnPhase oldPhase, TurnPhase newPhase) {
 if (newPhase == TurnPhase.Planning) {
 plannedMoves.Clear();
 hasMoveQueued = false;
+isProcessingMove = false;
+
+if (gridEntity != null) {
+currentTargetPosition = gridEntity.Position;
+}
 }
 }
 
 pub void OnTickUpdate(int currentTick) {
 if (!useWegoMovement || isPlanting) return;
 
-if (plannedMoves.Count > 0) {
+if (TurnPhaseManager.Instance?.CurrentPhase == TurnPhase.Execution) {
+if (!isProcessingMove && plannedMoves.Count > 0) {
+ProcessNextMove();
+}
+}
+
+hasMoveQueued = plannedMoves.Count > 0;
+}
+
+void ProcessNextMove() {
+if (plannedMoves.Count == 0) return;
+
+isProcessingMove = true;
 GridPosition nextMove = plannedMoves.Dequeue();
 
 if (gridEntity != null && GridPositionManager.Instance != null) {
 if (GridPositionManager.Instance.IsPositionValid(nextMove) &&
 !GridPositionManager.Instance.IsPositionOccupied(nextMove)) {
+
+Vector3 worldPos = GridPositionManager.Instance.GridToWorld(nextMove);
+int moveCost = 1; // Default cost
+
+if (PlayerActionManager.Instance != null) {
+moveCost = PlayerActionManager.Instance.GetMovementTickCost(worldPos);
+}
+
 gridEntity.SetPosition(nextMove);
 currentTargetPosition = nextMove;
+
+Debug.Log($"[GardenerController] Executed move to {nextMove}, cost {moveCost} ticks");
+
+if (TickManager.Instance != null) {
 }
+} else {
+Debug.Log($"[GardenerController] Move to {nextMove} blocked");
 }
 }
 
-hasMoveQueued = plannedMoves.Count > 0;
+isProcessingMove = false;
 }
 
 void Update() {
@@ -9521,19 +9570,50 @@ void HandleWegoInput() {
 if (TurnPhaseManager.Instance?.IsInPlanningPhase != true) return;
 if (isPlanting) return;
 
-Vector2 input = Vector2.zero;
-input.x = Input.GetAxisRaw("Horizontal");
-input.y = Input.GetAxisRaw("Vertical");
+bool shouldMove = false;
+GridPosition moveDir = GridPosition.Zero;
 
-if (input.sqrMagnitude > 0.01f && gridEntity != null) {
-GridPosition currentPos = gridEntity.Position;
-GridPosition targetPos = currentPos;
-
-if (Mathf.Abs(input.x) > Mathf.Abs(input.y)) {
-targetPos = currentPos + (input.x > 0 ? GridPosition.Right : GridPosition.Left);
-} else {
-targetPos = currentPos + (input.y > 0 ? GridPosition.Up : GridPosition.Down);
+if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && !upPressed) {
+moveDir = GridPosition.Up;
+shouldMove = true;
+upPressed = true;
+} else if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.UpArrow)) {
+upPressed = false;
 }
+
+if ((Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) && !downPressed) {
+moveDir = GridPosition.Down;
+shouldMove = true;
+downPressed = true;
+} else if (!Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.DownArrow)) {
+downPressed = false;
+}
+
+if ((Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) && !leftPressed) {
+moveDir = GridPosition.Left;
+shouldMove = true;
+leftPressed = true;
+} else if (!Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.LeftArrow)) {
+leftPressed = false;
+}
+
+if ((Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) && !rightPressed) {
+moveDir = GridPosition.Right;
+shouldMove = true;
+rightPressed = true;
+} else if (!Input.GetKey(KeyCode.D) && !Input.GetKey(KeyCode.RightArrow)) {
+rightPressed = false;
+}
+
+if (shouldMove && gridEntity != null) {
+GridPosition currentPos = gridEntity.Position;
+
+if (plannedMoves.Count > 0) {
+var moves = plannedMoves.ToArray();
+currentPos = moves[moves.Length - 1];
+}
+
+GridPosition targetPos = currentPos + moveDir;
 
 if (PlayerActionManager.Instance != null) {
 PlayerActionManager.Instance.ExecutePlayerMove(this, currentPos, targetPos);
@@ -9563,10 +9643,23 @@ moveDir = GridPosition.Right;
 shouldMove = true;
 }
 
-if (shouldMove && gridEntity != null && PlayerActionManager.Instance != null) {
+if (shouldMove && gridEntity != null) {
 GridPosition currentPos = gridEntity.Position;
 GridPosition targetPos = currentPos + moveDir;
-PlayerActionManager.Instance.ExecutePlayerMove(this, currentPos, targetPos);
+
+if (GridPositionManager.Instance != null &&
+GridPositionManager.Instance.IsPositionValid(targetPos) &&
+!GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
+
+gridEntity.SetPosition(targetPos);
+currentTargetPosition = targetPos;
+
+if (TickManager.Instance != null) {
+Vector3 worldPos = GridPositionManager.Instance.GridToWorld(targetPos);
+int moveCost = PlayerActionManager.Instance?.GetMovementTickCost(worldPos) ?? 1;
+TickManager.Instance.AdvanceMultipleTicks(moveCost);
+}
+}
 }
 }
 
@@ -9580,13 +9673,7 @@ if (plantingTimer <= 0) EndPlantingAnimation();
 void UpdateAnimations() {
 if (!useAnimations || animator == null) return;
 
-bool isMoving;
-if (useWegoMovement) {
-isMoving = gridEntity != null && gridEntity.IsMoving;
-} else {
-isMoving = gridEntity != null && gridEntity.IsMoving;
-}
-
+bool isMoving = gridEntity != null && gridEntity.IsMoving;
 animator.SetBool(runningParameterName, isMoving && !isPlanting);
 }
 
@@ -9648,12 +9735,15 @@ StartPlantingAnimation();
 pub void QueueMovement(GridPosition targetPosition) {
 if (useWegoMovement && TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
 plannedMoves.Enqueue(targetPosition);
+hasMoveQueued = true;
+Debug.Log($"[GardenerController] Queued move to {targetPosition}. Total queued: {plannedMoves.Count}");
 }
 }
 
 pub void ClearQueuedMoves() {
 plannedMoves.Clear();
 hasMoveQueued = false;
+isProcessingMove = false;
 }
 
 pub int GetQueuedMoveCount() {
@@ -9676,14 +9766,15 @@ TickManager.Instance.RegisterTickUpdateable(this);
 } else if (!enabled && TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
 }
+
+ClearQueuedMoves();
 }
 }
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
 
-﻿// Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
-
+﻿using UnityEngine;
 using WegoSystem;
 
 pub enum PlayerActionType {
@@ -9699,7 +9790,7 @@ pub cls PlayerActionManager : MonoBehaviour {
 pub stat PlayerActionManager Instance { get; set; }
 
 [SerializeField] bool debugMode = true;
-[SerializeField] int tickCostPerAction = 1; // Most actions cost 1 tick
+[SerializeField] int tickCostPerAction = 1;
 
 pub event Action<PlayerActionType, bool> OnActionExecuted;
 pub event Action<string> OnActionFailed;
@@ -9727,23 +9818,14 @@ OnActionFailed?.Invoke("Invalid movement");
 ret false;
 }
 
-Vector3 worldPos = GridPositionManager.Instance.GridToWorld(to);
-int movementCost = GetMovementTickCost(worldPos);
-
 if (TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
 gardener.QueueMovement(to);
-if (debugMode) Debug.Log($"[PlayerActionManager] Queued move to {to}");
+if (debugMode) Debug.Log($"[PlayerActionManager] Queued move from {from} to {to}");
 OnActionExecuted?.Invoke(PlayerActionType.Move, true);
 ret true;
 }
 
-if (ExecuteImmediateMove(gardener, to)) {
-AdvanceGameTick(movementCost);
-OnActionExecuted?.Invoke(PlayerActionType.Move, true);
-ret true;
-}
-
-OnActionFailed?.Invoke("Movement blocked");
+if (debugMode) Debug.Log("[PlayerActionManager] Move requested outside planning phase - ignored");
 ret false;
 }
 
@@ -9777,7 +9859,9 @@ break;
 }
 
 if (success) {
+if (TurnPhaseManager.Instance?.CurrentPhase == TurnPhase.Execution) {
 AdvanceGameTick(tickCost);
+}
 OnActionExecuted?.Invoke(actionType, true);
 } else {
 OnActionFailed?.Invoke($"{actionType} failed");
@@ -9814,7 +9898,7 @@ gridEntity.SetPosition(to);
 ret true;
 }
 
-int GetMovementTickCost(Vector3 worldPosition) {
+pub int GetMovementTickCost(Vector3 worldPosition) {
 int baseCost = tickCostPerAction;
 
 SlowdownZone[] allZones = FindObjectsByType<SlowdownZone>(FindObjectsSortMode.None);
@@ -9825,7 +9909,7 @@ baseCost += zone.GetAdditionalTickCost();
 if (debugMode) {
 Debug.Log($"[PlayerActionManager] Movement to {worldPosition} is in slowdown zone, costs {baseCost} ticks");
 }
-break; // Only apply one zone's cost
+break;
 }
 }
 
@@ -9876,7 +9960,7 @@ TickManager.Instance.AdvanceMultipleTicks(tickCount);
 pub bool CanExecuteAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null) {
 switch (actionType) {
 case PlayerActionType.Move:
-ret false; // Use ValidateMovement instead
+ret false;
 
 case PlayerActionType.UseTool:
 ret actionData is ToolDefinition;
@@ -10397,9 +10481,24 @@ return;
 Instance = this;
 }
 
+void Start() {
+SyncWithTileGrid();
+}
+
 void OnDestroy() {
 if (Instance == this) {
 Instance = null;
+}
+}
+
+pub void SyncWithTileGrid() {
+if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null) {
+var tileGrid = TileInteractionManager.Instance.interactionGrid;
+
+cellSize = tileGrid.cellSize.x; // Assuming square cells
+gridOrigin = tileGrid.transform.position;
+
+Debug.Log($"[GridPositionManager] Synced with tile grid. Cell size: {cellSize}, Origin: {gridOrigin}");
 }
 }
 
@@ -10660,22 +10759,26 @@ Gizmos.DrawWireCube(cellCenter, Vector3.one * cellSize * 0.8f);
 // Assets\Scripts\Ticks\TickConfiguration.cs
 
 ﻿using UnityEngine;
+using WegoSystem;
 
 ns WegoSystem {
 pub cls TickConfiguration : ScriptableObject {
-[SerializeField] pub float ticksPerRealSecond = 2f; // Made public
+[SerializeField] pub float ticksPerRealSecond = 2f;
 
 pub int ticksPerGameHour = 10;
 pub int hoursPerDay = 24;
 pub int TicksPerDay => ticksPerGameHour * hoursPerDay;
 
+pub int ticksPerDay = 100;  // Total ticks for one full day
 pub int dayPhaseTicks = 60;
 pub int nightPhaseTicks = 40;
 pub int transitionTicks = 10;
 
+pub int ticksPerWave = 50;  // How long each wave lasts in ticks
+pub bool wavesDependOnDayCycle = false;  // If true, waves end with day cycles
+
 pub int maxPlanningPhaseTicks = 0;
 pub int executionPhaseTicks = 5;
-pub int resolutionPhaseTicks = 2;
 
 pub int plantGrowthTicksPerStage = 5;
 
@@ -10710,7 +10813,6 @@ pub int GetPhaseTickDuration(TurnPhase phase) {
 switch (phase) {
 case TurnPhase.Planning: ret maxPlanningPhaseTicks;
 case TurnPhase.Execution: ret executionPhaseTicks;
-case TurnPhase.Resolution: ret resolutionPhaseTicks;
 default: ret 1;
 }
 }
@@ -10726,46 +10828,58 @@ pub void SetTicksPerSecond(float newRate) {
 ticksPerRealSecond = Mathf.Max(0.1f, newRate);
 }
 
+pub int GetDayProgress(int currentTick) {
+ret currentTick % ticksPerDay;
+}
+
+pub float GetDayProgressNormalized(int currentTick) {
+ret (float)(currentTick % ticksPerDay) / ticksPerDay;
+}
+
 void ApplySlowPacedPreset() {
 ticksPerRealSecond = 1f;
+ticksPerDay = 200;
+ticksPerWave = 100;
 dayPhaseTicks = 120;
 nightPhaseTicks = 80;
 transitionTicks = 20;
 executionPhaseTicks = 10;
-resolutionPhaseTicks = 5;
 plantGrowthTicksPerStage = 8;
 animalHungerTickInterval = 5;
 }
 
 void ApplyFastPacedPreset() {
 ticksPerRealSecond = 4f;
+ticksPerDay = 50;
+ticksPerWave = 25;
 dayPhaseTicks = 30;
 nightPhaseTicks = 20;
 transitionTicks = 5;
 executionPhaseTicks = 3;
-resolutionPhaseTicks = 1;
 plantGrowthTicksPerStage = 2;
 animalHungerTickInterval = 2;
 }
 
 void ApplyBalancedPreset() {
 ticksPerRealSecond = 2f;
+ticksPerDay = 100;
+ticksPerWave = 50;
 dayPhaseTicks = 60;
 nightPhaseTicks = 40;
 transitionTicks = 10;
 executionPhaseTicks = 5;
-resolutionPhaseTicks = 2;
 plantGrowthTicksPerStage = 5;
 animalHungerTickInterval = 3;
 }
 
 void OnValidate() {
 ticksPerRealSecond = Mathf.Max(0.1f, ticksPerRealSecond);
+ticksPerDay = Mathf.Max(10, ticksPerDay);
+ticksPerWave = Mathf.Max(10, ticksPerWave);
 dayPhaseTicks = Mathf.Max(1, dayPhaseTicks);
 nightPhaseTicks = Mathf.Max(1, nightPhaseTicks);
 transitionTicks = Mathf.Max(1, transitionTicks);
 executionPhaseTicks = Mathf.Max(1, executionPhaseTicks);
-resolutionPhaseTicks = Mathf.Max(1, resolutionPhaseTicks);
 plantGrowthTicksPerStage = Mathf.Max(1, plantGrowthTicksPerStage);
 animalHungerTickInterval = Mathf.Max(1, animalHungerTickInterval);
 animalThinkingInterval = Mathf.Max(1, animalThinkingInterval);
@@ -10938,7 +11052,8 @@ ret tickUpdateables.Count;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\TurnPhaseManager.cs
 
-﻿// Assets\Scripts\Ticks\TurnPhaseManager.cs
+﻿using UnityEngine;
+using WegoSystem;
 
 ns WegoSystem {
 pub enum TurnPhase {
@@ -10952,6 +11067,11 @@ pub stat TurnPhaseManager Instance { get; set; }
 [SerializeField] TurnPhase currentPhase = TurnPhase.Planning;
 [SerializeField] int currentPhaseTicks = 0;
 [SerializeField] bool debugMode = false;
+
+[SerializeField] bool autoAdvanceTicks = true;
+[SerializeField] float tickInterval = 0.5f; // Time between automatic ticks during execution
+
+float tickTimer = 0f;
 
 pub TurnPhase CurrentPhase => currentPhase;
 pub int CurrentPhaseTicks => currentPhaseTicks;
@@ -10978,7 +11098,7 @@ else {
 Debug.LogError("[TurnPhaseManager] TickManager not found!");
 }
 
-EnterPhase(TurnPhase.Planning);
+TransitionToPhase(TurnPhase.Planning);
 }
 
 void OnDestroy() {
@@ -10991,21 +11111,42 @@ TickManager.Instance.UnregisterTickUpdateable(this);
 }
 }
 
-pub void OnTickUpdate(int currentTick) {
-currentPhaseTicks++;
+void Update() {
+if (currentPhase == TurnPhase.Execution && autoAdvanceTicks) {
+tickTimer += Time.deltaTime;
 
-if (currentPhase == TurnPhase.Execution && AllEntitiesActed()) {
+if (tickTimer >= tickInterval) {
+tickTimer = 0f;
+
+if (HasActionsToProcess()) {
+TickManager.Instance?.AdvanceTick();
+} else {
 TransitionToPhase(TurnPhase.Planning);
 }
 }
-
-bool AllEntitiesActed() {
-var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
-foreach (var gardener in gardeners) {
-if (gardener.GetQueuedMoveCount() > 0) ret false;
+}
 }
 
-ret true;
+pub void OnTickUpdate(int currentTick) {
+currentPhaseTicks++;
+
+}
+
+bool HasActionsToProcess() {
+var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
+foreach (var gardener in gardeners) {
+if (gardener.GetQueuedMoveCount() > 0) ret true;
+}
+
+var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+foreach (var animal in animals) {
+if (currentPhaseTicks % animal.thinkingTickInterval == 0) ret true;
+}
+
+var plants = PlantGrowth.AllActivePlants;
+if (plants.Count > 0) ret true; // Plants always need processing
+
+ret false;
 }
 
 pub void EndPlanningPhase() {
@@ -11023,6 +11164,7 @@ if (currentPhase == newPhase) return;
 TurnPhase oldPhase = currentPhase;
 currentPhase = newPhase;
 currentPhaseTicks = 0;
+tickTimer = 0f;
 
 switch (newPhase) {
 case TurnPhase.Planning:

@@ -188,10 +188,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd23192a25d94d8b8bde743aa013c216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  currentMoveSpeed: 0
+  useWegoMovement: 1
   seedPlantingOffset: {x: 0, y: -1}
-  toolIconRenderer: {fileID: 0}
   flipSpriteWhenMovingLeft: 1
   flipHorizontalDirection: 0
   useAnimations: 1
@@ -532,4 +530,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de6a2709b96d424e84cf46ac1940a547, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showDebugMessages: 0
+  inventoryBar: {fileID: 0}
+  tileInteractionManager: {fileID: 0}
+  playerTransform: {fileID: 0}
+  showDebug: 0

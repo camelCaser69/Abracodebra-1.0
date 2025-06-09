@@ -11032,6 +11032,7 @@ Transform:
   - {fileID: 1758318370}
   - {fileID: 1792164763}
   - {fileID: 1486390868}
+  - {fileID: 1792501334}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &899449967
@@ -15894,8 +15895,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24eb369f19434b65babb843d505c2a3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speedMultiplier: 0.6
+  additionalTickCost: 1
+  affectsAnimals: 1
+  affectsPlayer: 1
   colliderShrinkAmount: 0.1
+  zoneColor: {r: 0.5, g: 0.5, b: 1, a: 0.3}
   showDebugMessages: 0
 --- !u!114 &1222742192
 MonoBehaviour:
@@ -16433,21 +16437,6 @@ MonoBehaviour:
   cellContainer: {fileID: 1101570886}
   _rootCanvas: {fileID: 218169671}
   logInventoryChanges: 1
---- !u!115 &1351511481
-MonoScript:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 7
-  m_DefaultReferences: {}
-  m_Icon: {fileID: 0}
-  m_Type: 0
-  m_ExecutionOrder: 0
-  m_ClassName: GridPositionManager
-  m_Namespace: WegoSystem
-  m_AssemblyName: Assembly-CSharp
 --- !u!1 &1359589579
 GameObject:
   m_ObjectHideFlags: 0
@@ -16819,6 +16808,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1486390868}
+  - component: {fileID: 1486390870}
   - component: {fileID: 1486390869}
   m_Layer: 0
   m_Name: Grid Position Manager
@@ -16851,15 +16841,32 @@ MonoBehaviour:
   m_GameObject: {fileID: 1486390867}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1351511481}
+  m_Script: {fileID: 11500000, guid: 74d3ef1d66ec4b24bf910187e4453519, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cellSize: 1
-  gridOrigin: {x: 0, y: 0, z: 0}
+  cellSize: 0.96
+  gridOrigin: {x: 0.48, y: 0.48, z: 0}
   gridBounds: {x: 100, y: 100}
   showGridGizmos: 1
   gridColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.3}
   gizmoGridSize: 20
+  debugMode: 0
+--- !u!114 &1486390870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486390867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bfe2c5578944c2aa40e2c8c33c7b34e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  snapAllAnimals: 1
+  snapAllPlants: 1
+  snapPlayer: 1
+  debugLog: 1
 --- !u!4 &1491144816 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
@@ -20602,10 +20609,41 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentPhase: 0
-  autoAdvancePhases: 0
-  planningPhaseStartTick: 0
   currentPhaseTicks: 0
   debugMode: 0
+  autoAdvanceTicks: 1
+  tickInterval: 0.5
+--- !u!1 &1792501333
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1792501334}
+  m_Layer: 0
+  m_Name: Tick Configuration
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1792501334
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1792501333}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 879874785}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1863356075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20807,9 +20845,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useWegoSystem: 1
   dayNightCycleEnabled: 1
-  dayDuration: 20
-  nightDuration: 20
-  transitionDuration: 5
   transitionCurve:
     serializedVersion: 2
     m_Curve:
@@ -20839,7 +20874,6 @@ MonoBehaviour:
   fadeSprite: {fileID: 1517185764}
   minAlpha: 0.12
   maxAlpha: 0.4
-  timeScaleMultiplier: 1
 --- !u!4 &1966203508
 Transform:
   m_ObjectHideFlags: 0
@@ -20903,9 +20937,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useWegoSystem: 1
-  autoAdvanceFromPlanning: 0
   currentState: 0
-  growthPhaseTimeScale: 1
   currentRoundNumber: 1
   weatherManager: {fileID: 1966203507}
   waveManager: {fileID: 1296760034}

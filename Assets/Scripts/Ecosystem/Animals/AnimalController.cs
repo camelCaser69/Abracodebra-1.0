@@ -7,7 +7,7 @@ using System.Linq;
 
 public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer inherits from SpeedModifiable
     [SerializeField] bool useWegoMovement = true;
-    [SerializeField] int thinkingTickInterval = 3;
+    [SerializeField] public int thinkingTickInterval = 3;
 
     AnimalDefinition definition;
     AnimalDiet animalDiet;
