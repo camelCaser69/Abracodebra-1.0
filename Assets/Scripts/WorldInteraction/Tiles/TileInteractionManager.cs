@@ -483,7 +483,7 @@ public class TileInteractionManager : MonoBehaviour
         return Vector3.zero; // Or grid.CellToWorld(cellPos) + grid.cellSize * 0.5f if grid guaranteed?
     }
 
-    private void HandleSeedPlanting(Vector3Int cellPosition)
+    void HandleSeedPlanting(Vector3Int cellPosition)
     {
         PlantPlacementManager plantManager = PlantPlacementManager.Instance;
         if (plantManager == null) { Debug.LogError("Cannot plant: PlantPlacementManager not found!"); return; }
@@ -492,30 +492,19 @@ public class TileInteractionManager : MonoBehaviour
         if (!plantManager.IsTileValidForPlanting(tileDef))
         {
             if (debugLogs) Debug.Log($"Cannot plant on {tileDef?.displayName ?? "Unknown"} - invalid tile.");
-            // Maybe add player feedback here (sound/visual)
             return;
         }
 
         GardenerController gardener = player?.GetComponent<GardenerController>();
         if (gardener == null) { Debug.LogError("Cannot plant: GardenerController not found on player!"); return; }
 
+        gardener.Plant(); // Trigger one-shot animation
+
         Vector3 worldPosition = CellCenterWorld(cellPosition); // Plant near cell center
 
-        gardener.Plant(); // Trigger animation
-        StartCoroutine(PlantAfterAnimation(gardener, plantManager, cellPosition, worldPosition));
-    }
-
-    private IEnumerator PlantAfterAnimation(GardenerController gardener, PlantPlacementManager plantManager, Vector3Int cellPosition, Vector3 worldPosition)
-    {
-        // Ensure gardener and duration are valid
-        float waitTime = (gardener != null) ? gardener.plantingDuration : 0.1f;
-        yield return new WaitForSeconds(waitTime);
-
-        if (plantManager != null) // Check again in case it was destroyed
-        {
-            bool planted = plantManager.TryPlantSeed(cellPosition, worldPosition);
-            if (debugLogs) Debug.Log(planted ? $"Planted seed successfully at {cellPosition}" : $"Failed to plant seed at {cellPosition}");
-        }
+        // --- MODIFIED: Directly attempt to plant without waiting for an animation. ---
+        bool planted = plantManager.TryPlantSeed(cellPosition, worldPosition);
+        if (debugLogs) Debug.Log(planted ? $"Planted seed successfully at {cellPosition}" : $"Failed to plant seed at {cellPosition}");
     }
 
     // --- ApplyToolAction is MODIFIED ---

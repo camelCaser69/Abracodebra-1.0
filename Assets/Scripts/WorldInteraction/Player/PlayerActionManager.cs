@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
+
+using System;
 using UnityEngine;
 using WegoSystem;
 
@@ -16,8 +18,8 @@ public class PlayerActionManager : MonoBehaviour
 {
     public static PlayerActionManager Instance { get; set; }
 
-    [SerializeField] private bool debugMode = true;
-    [SerializeField] private int tickCostPerAction = 1;
+    [SerializeField] bool debugMode = true;
+    [SerializeField] int tickCostPerAction = 1;
 
     public event Action<PlayerActionType, bool> OnActionExecuted;
     public event Action<string> OnActionFailed;
@@ -36,7 +38,7 @@ public class PlayerActionManager : MonoBehaviour
     {
         if (Instance == this) Instance = null;
     }
-    
+
     public bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null)
     {
         if (debugMode) Debug.Log($"[PlayerActionManager] Executing {actionType} at {gridPosition}");
@@ -70,7 +72,6 @@ public class PlayerActionManager : MonoBehaviour
 
         if (success)
         {
-            // Only advance ticks if the action is successful
             AdvanceGameTick(tickCost);
             OnActionExecuted?.Invoke(actionType, true);
         }
@@ -82,7 +83,7 @@ public class PlayerActionManager : MonoBehaviour
         return success;
     }
 
-    private bool ValidateMovement(GridPosition from, GridPosition to)
+    bool ValidateMovement(GridPosition from, GridPosition to)
     {
         int distance = from.ManhattanDistance(to);
         if (distance != 1)
@@ -106,7 +107,7 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
-    private bool ExecuteImmediateMove(GardenerController gardener, GridPosition to)
+    bool ExecuteImmediateMove(GardenerController gardener, GridPosition to)
     {
         var gridEntity = gardener.GetComponent<GridEntity>();
         if (gridEntity == null) return false;
@@ -115,9 +116,10 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
-    public int GetMovementTickCost(Vector3 worldPosition)
+    public int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null)
     {
         int baseCost = tickCostPerAction;
+        int maxAdditionalCost = 0; // Find the highest penalty if zones overlap
 
         SlowdownZone[] allZones = FindObjectsByType<SlowdownZone>(FindObjectsSortMode.None);
 
@@ -125,19 +127,38 @@ public class PlayerActionManager : MonoBehaviour
         {
             if (zone.IsPositionInZone(worldPosition))
             {
-                baseCost += zone.GetAdditionalTickCost();
-                if (debugMode)
+                bool shouldAffect = false;
+                // Determine if the zone should affect this specific entity
+                if (movingEntity == null) // If entity not specified, assume it affects by default
                 {
-                    Debug.Log($"[PlayerActionManager] Movement to {worldPosition} is in slowdown zone, costs {baseCost} ticks");
+                    shouldAffect = true;
                 }
-                break;
+                else if (movingEntity is GardenerController && zone.AffectsPlayer)
+                {
+                    shouldAffect = true;
+                }
+                else if (movingEntity is AnimalController && zone.AffectsAnimals)
+                {
+                    shouldAffect = true;
+                }
+
+                if (shouldAffect)
+                {
+                    maxAdditionalCost = Mathf.Max(maxAdditionalCost, zone.GetAdditionalTickCost());
+                }
             }
         }
 
-        return baseCost;
+        if (maxAdditionalCost > 0 && debugMode)
+        {
+            string entityName = movingEntity != null ? movingEntity.gameObject.name : "Unknown Entity";
+            Debug.Log($"[PlayerActionManager] Movement for '{entityName}' from {worldPosition} is in a slowdown zone. Additional cost: {maxAdditionalCost}. Total cost: {baseCost + maxAdditionalCost} ticks");
+        }
+
+        return baseCost + maxAdditionalCost;
     }
 
-    private bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool)
+    bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool)
     {
         if (tool == null) return false;
 
@@ -145,7 +166,7 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
-    private bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem)
+    bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem)
     {
         if (seedItem == null || !seedItem.IsSeed()) return false;
 
@@ -154,25 +175,25 @@ public class PlayerActionManager : MonoBehaviour
         ) ?? false;
     }
 
-    private bool ExecuteWatering(Vector3Int gridPosition)
+    bool ExecuteWatering(Vector3Int gridPosition)
     {
         if (debugMode) Debug.Log($"[PlayerActionManager] Watering at {gridPosition} - NOT IMPLEMENTED");
         return false;
     }
 
-    private bool ExecuteHarvest(Vector3Int gridPosition)
+    bool ExecuteHarvest(Vector3Int gridPosition)
     {
         if (debugMode) Debug.Log($"[PlayerActionManager] Harvesting at {gridPosition} - NOT IMPLEMENTED");
         return false;
     }
 
-    private bool ExecuteInteraction(Vector3Int gridPosition, object interactionData)
+    bool ExecuteInteraction(Vector3Int gridPosition, object interactionData)
     {
         if (debugMode) Debug.Log($"[PlayerActionManager] Interaction at {gridPosition}");
         return true;
     }
 
-    private void AdvanceGameTick(int tickCount = 1)
+    void AdvanceGameTick(int tickCount = 1)
     {
         if (TickManager.Instance == null)
         {

@@ -1,18 +1,19 @@
-﻿using UnityEngine;
+﻿// Assets\Scripts\WorldInteraction\Player\GardenerController.cs
+
+using UnityEngine;
 using WegoSystem;
 
 public class GardenerController : MonoBehaviour, ITickUpdateable
 {
-    [SerializeField] private bool useWegoMovement = true;
+    // --- REMOVED: useWegoMovement, seedPlantingOffset, plantingDuration ---
 
-    public Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
     public bool flipSpriteWhenMovingLeft = true;
     public bool flipHorizontalDirection = true;
 
     public bool useAnimations = true;
     public string runningParameterName = "isRunning";
-    public string plantingParameterName = "isPlanting";
-    public float plantingDuration = 0.25f;
+// --- MODIFIED: Use a trigger for a one-shot animation ---
+    public string plantingTriggerName = "plantTrigger"; // Changed from a bool parameter name
 
     private GridEntity gridEntity;
     private GridPosition currentTargetPosition;
@@ -21,8 +22,7 @@ public class GardenerController : MonoBehaviour, ITickUpdateable
     private SpriteRenderer spriteRenderer;
     private Animator animator;
 
-    private bool isPlanting = false;
-    private float plantingTimer = 0f;
+    // --- REMOVED: isPlanting, plantingTimer ---
 
     void Awake()
     {
@@ -65,51 +65,43 @@ public class GardenerController : MonoBehaviour, ITickUpdateable
             Debug.Log($"[GardenerController] Snapped to tile grid position {cellPos} at world {snappedPos}");
         }
 
-        // We still register for OnTickUpdate for potential future non-movement tick-based actions
-        if (useWegoMovement && TickManager.Instance != null)
+        // --- MODIFIED: Unconditional registration with TickManager ---
+        if (TickManager.Instance != null)
         {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
     }
-    
+
     void OnDestroy()
     {
+        // --- MODIFIED: Unconditional un-registration ---
         if (TickManager.Instance != null)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
     }
 
-    // This method is now much simpler. It can be used for other tick-based logic if needed.
     public void OnTickUpdate(int currentTick)
     {
-        if (!useWegoMovement) return;
-        // The movement logic has been moved to Update(), as it is now player-input-driven.
+        // This can be used for future tick-based gardener logic if needed.
     }
 
     void Update()
     {
-        if (useWegoMovement)
+        // --- MODIFIED: Simplified Update loop ---
+        if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.Planning)
         {
-            // Only allow direct movement when not in the planning phase.
-            if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.Planning)
-            {
-                HandleImmediateWegoMovement();
-            }
-        }
-        else
-        {
-            // Non-wego movement can be handled here if you need a separate real-time mode.
+            HandleImmediateWegoMovement();
         }
 
-        HandlePlanting();
         UpdateAnimations();
         UpdateSpriteDirection();
     }
 
-    private void HandleImmediateWegoMovement()
+    void HandleImmediateWegoMovement()
     {
-        if (isPlanting || gridEntity == null) return;
+        // --- REMOVED: isPlanting check, as planting is now an instantaneous action. ---
+        if (gridEntity == null) return;
 
         GridPosition moveDir = GridPosition.Zero;
 
@@ -122,49 +114,37 @@ public class GardenerController : MonoBehaviour, ITickUpdateable
         {
             GridPosition targetPos = gridEntity.Position + moveDir;
 
-            // Validate the move before executing
             if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
                 GridPositionManager.Instance.IsPositionValid(targetPos) &&
                 !GridPositionManager.Instance.IsPositionOccupied(targetPos))
             {
-                // Execute the move on the grid
+                int moveCost = PlayerActionManager.Instance.GetMovementTickCost(transform.position, this);
+
                 gridEntity.SetPosition(targetPos);
-                currentTargetPosition = targetPos; // For sprite flipping
+                currentTargetPosition = targetPos;
 
-                // Calculate tick cost for the move
-                int moveCost = PlayerActionManager.Instance.GetMovementTickCost(
-                    GridPositionManager.Instance.GridToWorld(targetPos)
-                );
-
-                // Advance the game ticks
                 TickManager.Instance.AdvanceMultipleTicks(moveCost);
                 Debug.Log($"[GardenerController] Moved to {targetPos}. Advanced game by {moveCost} tick(s).");
             }
             else
             {
-                 Debug.Log($"[GardenerController] Move to {targetPos} is invalid or blocked.");
+                Debug.Log($"[GardenerController] Move to {targetPos} is invalid or blocked.");
             }
         }
     }
-    
-    private void HandlePlanting()
-    {
-        if (isPlanting)
-        {
-            plantingTimer -= Time.deltaTime;
-            if (plantingTimer <= 0) EndPlantingAnimation();
-        }
-    }
 
-    private void UpdateAnimations()
+    // --- REMOVED: HandlePlanting() method ---
+
+    void UpdateAnimations()
     {
         if (!useAnimations || animator == null) return;
 
         bool isMoving = gridEntity != null && gridEntity.IsMoving;
-        animator.SetBool(runningParameterName, isMoving && !isPlanting);
+        // --- MODIFIED: Removed !isPlanting check ---
+        animator.SetBool(runningParameterName, isMoving);
     }
 
-    private void UpdateSpriteDirection()
+    void UpdateSpriteDirection()
     {
         if (spriteRenderer == null || !flipSpriteWhenMovingLeft) return;
 
@@ -196,35 +176,20 @@ public class GardenerController : MonoBehaviour, ITickUpdateable
         }
     }
 
-    public void StartPlantingAnimation()
-    {
-        if (!useAnimations || isPlanting) return;
-        isPlanting = true;
-        plantingTimer = plantingDuration;
-        if (animator != null)
-        {
-            animator.SetBool(plantingParameterName, true);
-            animator.SetBool(runningParameterName, false);
-        }
-    }
+    // --- REMOVED: StartPlantingAnimation() and EndPlantingAnimation() ---
 
-    private void EndPlantingAnimation()
-    {
-        isPlanting = false;
-        if (animator != null)
-        {
-            animator.SetBool(plantingParameterName, false);
-        }
-    }
+    // --- REMOVED: GetPlantingPosition() method ---
 
-    public Vector2 GetPlantingPosition()
-    {
-        return (Vector2)transform.position + seedPlantingOffset;
-    }
-
+    /// <summary>
+    /// Called by external managers when a planting action occurs. Triggers a one-shot animation.
+    /// </summary>
     public void Plant()
     {
-        StartPlantingAnimation();
+        if (useAnimations && animator != null)
+        {
+            // --- MODIFIED: Use SetTrigger instead of SetBool ---
+            animator.SetTrigger(plantingTriggerName);
+        }
     }
 
     public GridPosition GetCurrentGridPosition()
@@ -232,16 +197,5 @@ public class GardenerController : MonoBehaviour, ITickUpdateable
         return gridEntity?.Position ?? GridPosition.Zero;
     }
 
-    public void SetWegoMovement(bool enabled)
-    {
-        useWegoMovement = enabled;
-        if (enabled && TickManager.Instance != null)
-        {
-            TickManager.Instance.RegisterTickUpdateable(this);
-        }
-        else if (!enabled && TickManager.Instance != null)
-        {
-            TickManager.Instance.UnregisterTickUpdateable(this);
-        }
-    }
+    // --- REMOVED: SetWegoMovement() method ---
 }

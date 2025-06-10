@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 502,011 → 339,795 chars (32.3% reduction)
-Estimated tokens saved: ~40,554
+Compression Stats: 501,626 → 338,441 chars (32.5% reduction)
+Estimated tokens saved: ~40,796
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -24,93 +24,94 @@ using System;
   RunManager (Assets\Scripts\Core/) L70
   SortableEntity (Assets\Scripts\Core/) L213
   UIManager (Assets\Scripts\Core/) L280
-  WeatherManager (Assets\Scripts\Core/) L654
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L879
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1761
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1778
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1787
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1800
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1817
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2061
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2260
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2328
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2343
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2362
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2398
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2611
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2675
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2692
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2705
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2734
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2942
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3172
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3453
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3482
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3512
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3525
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3553
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3614
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3659
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3710
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3744
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3814
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3834
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3869
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3884
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3969
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4096
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4119
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4137
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4164
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4173
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4341
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4380
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4404
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4606
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4670
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4892
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5234
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5414
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5558
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5856
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5923
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6219
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6338
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6542
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6676
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6996
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7132
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7425
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7513
-  GridSnapStartup (Assets\Scripts\Ticks/) L7614
-  TurnPhaseManager (Assets\Scripts\Ticks/) L7680
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7796
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7865
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8096
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8107
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8191
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8296
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8691
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8727
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8917
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9059
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9177
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9381
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9562
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9602
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9622
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9634
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9669
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9828
+  WeatherManager (Assets\Scripts\Core/) L649
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L874
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1756
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1773
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1782
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1795
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1812
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2056
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2255
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2323
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2338
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2357
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2393
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2549
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2613
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2630
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2643
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2672
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2880
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L3110
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3391
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3420
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3450
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3463
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3491
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3552
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3597
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3648
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3682
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3752
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3772
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3807
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3822
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3907
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4034
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4057
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4075
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4102
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4111
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4279
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4318
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4342
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4544
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4608
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4830
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5172
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5352
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5496
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5794
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5861
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6157
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6276
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6480
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6614
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6934
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7070
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7363
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7451
+  GridSnapStartup (Assets\Scripts\Ticks/) L7552
+  TurnPhaseManager (Assets\Scripts\Ticks/) L7618
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7734
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7803
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8034
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8045
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8074
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8158
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8263
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8658
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8694
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8884
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9026
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9144
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9301
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9498
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9538
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9558
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9570
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9605
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9764
 
 [WegoSystem]
-  GridPositionManager (Assets\Scripts\Ticks/) L9838
-  GridPosition (Assets\Scripts\Ticks/) L10135
-  TickConfiguration (Assets\Scripts\Ticks/) L10350
-  ITickUpdateable (Assets\Scripts\Ticks/) L10482
+  GridPositionManager (Assets\Scripts\Ticks/) L9774
+  GridPosition (Assets\Scripts\Ticks/) L10071
+  TickConfiguration (Assets\Scripts\Ticks/) L10286
+  ITickUpdateable (Assets\Scripts\Ticks/) L10418
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10644
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10580
 
 ================================================================================
 SCRIPTS
@@ -631,11 +632,6 @@ plant.SetWegoSystem(enabled);
 var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
 foreach (var animal in animals) {
 animal.SetWegoMovement(enabled);
-}
-
-var gardener = FindFirstObjectByType<GardenerController>();
-if (gardener != null) {
-gardener.SetWegoMovement(enabled);
 }
 
 UpdateWegoUI();
@@ -2493,53 +2489,60 @@ Gizmos.DrawWireSphere(transform.position, 1f); // Default size for editor only
 using WegoSystem;
 
 pub cls SlowdownZone : MonoBehaviour {
-[SerializeField] int additionalTickCost = 1; // Moving through this zone costs extra ticks
+[SerializeField] int additionalTickCost = 1;
 [SerializeField] bool affectsAnimals = true;
 [SerializeField] bool affectsPlayer = true;
 
-[SerializeField] float colliderShrinkAmount = 0.2f;
-[SerializeField] Color zoneColor = new Color(0.5f, 0.5f, 1f, 0.3f); // Blue tint for water
+pub bool AffectsPlayer => affectsPlayer;
+pub bool AffectsAnimals => affectsAnimals;
 
+[SerializeField] float colliderShrinkAmount = 0.2f;
+[SerializeField] Color zoneColor = new Color(0.5f, 0.5f, 1f, 0.3f);
 [SerializeField] bool showDebugMessages = false;
 
-Dictionary<int, GridEntity> entitiesInZone = new Dictionary<int, GridEntity>();
-
+Collider2D zoneCollider;
+BoxCollider2D boxCollider; // Kept for shrink logic compatibility
 Vector2 originalSize;
 Vector2 originalOffset;
-BoxCollider2D boxCollider;
 SpriteRenderer visualRenderer;
-
 c float SHRINK_EPSILON = 0.001f;
 
 void Awake() {
-Collider2D col = GetComponent<Collider2D>();
-if (col == null) {
+zoneCollider = GetComponent<Collider2D>();
+if (zoneCollider == null) {
 Debug.LogError($"SlowdownZone on '{gameObject.name}' requires a Collider2D component!", gameObject);
 enabled = false;
 return;
 }
 
-if (!col.isTrigger) {
-col.isTrigger = true;
+if (!zoneCollider.isTrigger) {
+zoneCollider.isTrigger = true;
 }
 
-boxCollider = col as BoxCollider2D;
-
+boxCollider = zoneCollider as BoxCollider2D;
 if (boxCollider != null) {
 originalSize = boxCollider.size;
 originalOffset = boxCollider.offset;
-
 if (colliderShrinkAmount > SHRINK_EPSILON) {
 ShrinkCollider();
 }
 }
-else {
-if (colliderShrinkAmount > SHRINK_EPSILON) {
-Debug.LogWarning($"SlowdownZone on '{gameObject.name}': Collider shrinking only works with BoxCollider2D. Current collider type: {col.GetType().Name}");
-}
+else if (colliderShrinkAmount > SHRINK_EPSILON) {
+Debug.LogWarning($"SlowdownZone on '{gameObject.name}': Collider shrinking only works with BoxCollider2D. Current collider type: {zoneCollider.GetType().Name}");
 }
 
 SetupVisualIndicator();
+}
+
+pub bool IsPositionInZone(Vector3 worldPosition) {
+if (zoneCollider != null) {
+ret zoneCollider.OverlapPoint(worldPosition);
+}
+ret false;
+}
+
+pub int GetAdditionalTickCost() {
+ret additionalTickCost;
 }
 
 void SetupVisualIndicator() {
@@ -2607,70 +2610,7 @@ RestoreCollider();
 }
 }
 
-void OnTriggerEnter2D(Collider2D other) {
-GridEntity gridEntity = other.GetComponent<GridEntity>();
-if (gridEntity == null) return;
-
-bool shouldAffect = false;
-
-if (affectsAnimals && other.GetComponent<AnimalController>() != null) {
-shouldAffect = true;
-}
-else if (affectsPlayer && other.GetComponent<GardenerController>() != null) {
-shouldAffect = true;
-}
-
-if (shouldAffect) {
-int id = gridEntity.GetInstanceID();
-if (!entitiesInZone.ContainsKey(id)) {
-entitiesInZone.Add(id, gridEntity);
-
-if (showDebugMessages) {
-Debug.Log($"SlowdownZone: '{other.name}' entered zone (will cost {1 + additionalTickCost} ticks to move)");
-}
-}
-}
-}
-
-void OnTriggerExit2D(Collider2D other) {
-GridEntity gridEntity = other.GetComponent<GridEntity>();
-if (gridEntity == null) return;
-
-int id = gridEntity.GetInstanceID();
-if (entitiesInZone.ContainsKey(id)) {
-entitiesInZone.Remove(id);
-
-if (showDebugMessages) {
-Debug.Log($"SlowdownZone: '{other.name}' exited zone (movement cost back to normal)");
-}
-}
-}
-
-pub bool IsPositionInZone(Vector3 worldPosition) {
-if (boxCollider != null) {
-ret boxCollider.bounds.Contains(worldPosition);
-}
-
-Collider2D col = GetComponent<Collider2D>();
-if (col != null) {
-ret col.bounds.Contains(worldPosition);
-}
-
-ret false;
-}
-
-pub int GetAdditionalTickCost() {
-ret additionalTickCost;
-}
-
-pub bool IsEntityInZone(GridEntity entity) {
-if (entity == null) ret false;
-ret entitiesInZone.ContainsKey(entity.GetInstanceID());
-}
-
 void OnDestroy() {
-entitiesInZone.Clear();
-
 if (boxCollider != null && colliderShrinkAmount > SHRINK_EPSILON) {
 if (originalSize != Vector2.zero) {
 RestoreCollider();
@@ -2679,11 +2619,10 @@ RestoreCollider();
 }
 
 void OnDrawGizmos() {
-Collider2D col = GetComponent<Collider2D>();
-if (col != null) {
+if (zoneCollider != null) {
 Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.3f);
 
-if (col is BoxCollider2D box) {
+if (zoneCollider is BoxCollider2D box) {
 Vector3 center = transform.position + (Vector3)box.offset;
 Vector3 size = new Vector3(box.size.x, box.size.y, 0) * transform.lossyScale.x;
 Gizmos.DrawCube(center, size);
@@ -2692,7 +2631,7 @@ Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.8f);
 Gizmos.DrawWireCube(center, size);
 }
 else {
-Gizmos.DrawWireCube(col.bounds.center, col.bounds.size);
+Gizmos.DrawWireCube(zoneCollider.bounds.center, zoneCollider.bounds.size);
 }
 }
 }
@@ -8195,6 +8134,35 @@ ret new Color(c.r, c.g, c.b, alpha);
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\UI\Utilities\PrefabOrigin.cs
+
+﻿// Assets/Scripts/Utility/PrefabOrigin.cs
+
+pub cls PrefabOrigin : MonoBehaviour {
+pub Transform originTransform;
+
+void Awake() {
+if (originTransform == null) {
+Debug.LogError($"[PrefabOrigin] The 'Origin Transform' is not assigned on '{gameObject.name}'. The script cannot function.", this);
+Destroy(this); // Destroy self if not configured
+return;
+}
+
+if (!originTransform.IsChildOf(transform)) {
+Debug.LogError($"[PrefabOrigin] The assigned 'Origin Transform' ('{originTransform.name}') is not a child of '{gameObject.name}'. The script cannot function.", this);
+Destroy(this); // Destroy self if configuration is invalid
+return;
+}
+
+Vector3 worldOffset = transform.TransformVector(originTransform.localPosition);
+
+transform.position -= worldOffset;
+
+Destroy(this);
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\Visual\Effects\NightColorPostProcess.cs
 
 ﻿using UnityEngine;
@@ -9267,20 +9235,18 @@ if (tileInteractionManager == null) tileInteractionManager = TileInteractionMana
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\GardenerController.cs
 
-﻿using UnityEngine;
+﻿// Assets\Scripts\WorldInteraction\Player\GardenerController.cs
+
 using WegoSystem;
 
 pub cls GardenerController : MonoBehaviour, ITickUpdateable {
-[SerializeField] bool useWegoMovement = true;
 
-pub Vector2 seedPlantingOffset = new Vector2(0f, -0.5f);
 pub bool flipSpriteWhenMovingLeft = true;
 pub bool flipHorizontalDirection = true;
 
 pub bool useAnimations = true;
 pub string runningParameterName = "isRunning";
-pub string plantingParameterName = "isPlanting";
-pub float plantingDuration = 0.25f;
+pub string plantingTriggerName = "plantTrigger"; // Changed from a bool parameter name
 
 GridEntity gridEntity;
 GridPosition currentTargetPosition;
@@ -9288,9 +9254,6 @@ GridPosition currentTargetPosition;
 SortableEntity sortableEntity;
 SpriteRenderer spriteRenderer;
 Animator animator;
-
-bool isPlanting = false;
-float plantingTimer = 0f;
 
 void Awake() {
 sortableEntity = GetComponent<SortableEntity>();
@@ -9328,7 +9291,7 @@ currentTargetPosition = gridPos;
 Debug.Log($"[GardenerController] Snapped to tile grid position {cellPos} at world {snappedPos}");
 }
 
-if (useWegoMovement && TickManager.Instance != null) {
+if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
 }
@@ -9340,25 +9303,19 @@ TickManager.Instance.UnregisterTickUpdateable(this);
 }
 
 pub void OnTickUpdate(int currentTick) {
-if (!useWegoMovement) return;
 }
 
 void Update() {
-if (useWegoMovement) {
 if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.Planning) {
 HandleImmediateWegoMovement();
 }
-}
-else {
-}
 
-HandlePlanting();
 UpdateAnimations();
 UpdateSpriteDirection();
 }
 
 void HandleImmediateWegoMovement() {
-if (isPlanting || gridEntity == null) return;
+if (gridEntity == null) return;
 
 GridPosition moveDir = GridPosition.Zero;
 
@@ -9373,11 +9330,10 @@ GridPosition targetPos = gridEntity.Position + moveDir;
 if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
 GridPositionManager.Instance.IsPositionValid(targetPos) &&
 !GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
-gridEntity.SetPosition(targetPos);
-currentTargetPosition = targetPos; // For sprite flipping
+int moveCost = PlayerActionManager.Instance.GetMovementTickCost(transform.position, this);
 
-int moveCost = PlayerActionManager.Instance.GetMovementTickCost( GridPositionManager.Instance.GridToWorld(targetPos)
-);
+gridEntity.SetPosition(targetPos);
+currentTargetPosition = targetPos;
 
 TickManager.Instance.AdvanceMultipleTicks(moveCost);
 Debug.Log($"[GardenerController] Moved to {targetPos}. Advanced game by {moveCost} tick(s).");
@@ -9388,18 +9344,11 @@ Debug.Log($"[GardenerController] Move to {targetPos} is invalid or blocked.");
 }
 }
 
-void HandlePlanting() {
-if (isPlanting) {
-plantingTimer -= Time.deltaTime;
-if (plantingTimer <= 0) EndPlantingAnimation();
-}
-}
-
 void UpdateAnimations() {
 if (!useAnimations || animator == null) return;
 
 bool isMoving = gridEntity != null && gridEntity.IsMoving;
-animator.SetBool(runningParameterName, isMoving && !isPlanting);
+animator.SetBool(runningParameterName, isMoving);
 }
 
 void UpdateSpriteDirection() {
@@ -9428,50 +9377,23 @@ transform.localScale = scale;
 }
 }
 
-pub void StartPlantingAnimation() {
-if (!useAnimations || isPlanting) return;
-isPlanting = true;
-plantingTimer = plantingDuration;
-if (animator != null) {
-animator.SetBool(plantingParameterName, true);
-animator.SetBool(runningParameterName, false);
-}
-}
-
-void EndPlantingAnimation() {
-isPlanting = false;
-if (animator != null) {
-animator.SetBool(plantingParameterName, false);
-}
-}
-
-pub Vector2 GetPlantingPosition() {
-ret (Vector2)transform.position + seedPlantingOffset;
-}
-
 pub void Plant() {
-StartPlantingAnimation();
+if (useAnimations && animator != null) {
+animator.SetTrigger(plantingTriggerName);
+}
 }
 
 pub GridPosition GetCurrentGridPosition() {
 ret gridEntity?.Position ?? GridPosition.Zero;
 }
 
-pub void SetWegoMovement(bool enabled) {
-useWegoMovement = enabled;
-if (enabled && TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-}
-else if (!enabled && TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
-}
-}
 }
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
 
-﻿using System;
+﻿// Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
+
 using WegoSystem;
 
 pub enum PlayerActionType {
@@ -9572,22 +9494,37 @@ gridEntity.SetPosition(to);
 ret true;
 }
 
-pub int GetMovementTickCost(Vector3 worldPosition) {
+pub int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null) {
 int baseCost = tickCostPerAction;
+int maxAdditionalCost = 0; // Find the highest penalty if zones overlap
 
 SlowdownZone[] allZones = FindObjectsByType<SlowdownZone>(FindObjectsSortMode.None);
 
 foreach (var zone in allZones) {
 if (zone.IsPositionInZone(worldPosition)) {
-baseCost += zone.GetAdditionalTickCost();
-if (debugMode) {
-Debug.Log($"[PlayerActionManager] Movement to {worldPosition} is in slowdown zone, costs {baseCost} ticks");
+bool shouldAffect = false;
+if (movingEntity == null) // If entity not specified, assume it affects by default {
+shouldAffect = true;
 }
-break;
+else if (movingEntity is GardenerController && zone.AffectsPlayer) {
+shouldAffect = true;
+}
+else if (movingEntity is AnimalController && zone.AffectsAnimals) {
+shouldAffect = true;
+}
+
+if (shouldAffect) {
+maxAdditionalCost = Mathf.Max(maxAdditionalCost, zone.GetAdditionalTickCost());
+}
 }
 }
 
-ret baseCost;
+if (maxAdditionalCost > 0 && debugMode) {
+string entityName = movingEntity != null ? movingEntity.gameObject.name : "Unknown Entity";
+Debug.Log($"[PlayerActionManager] Movement for '{entityName}' from {worldPosition} is in a slowdown zone. Additional cost: {maxAdditionalCost}. Total cost: {baseCost + maxAdditionalCost} ticks");
+}
+
+ret baseCost + maxAdditionalCost;
 }
 
 bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool) {
@@ -11118,20 +11055,12 @@ return;
 GardenerController gardener = player?.GetComponent<GardenerController>();
 if (gardener == null) { Debug.LogError("Cannot plant: GardenerController not found on player!"); return; }
 
+gardener.Plant(); // Trigger one-shot animation
+
 Vector3 worldPosition = CellCenterWorld(cellPosition); // Plant near cell center
 
-gardener.Plant(); // Trigger animation
-StartCoroutine(PlantAfterAnimation(gardener, plantManager, cellPosition, worldPosition));
-}
-
-IEnumerator PlantAfterAnimation(GardenerController gardener, PlantPlacementManager plantManager, Vector3Int cellPosition, Vector3 worldPosition) {
-float waitTime = (gardener != null) ? gardener.plantingDuration : 0.1f;
-yield ret new WaitForSeconds(waitTime);
-
-if (plantManager != null) // Check again in case it was destroyed {
 bool planted = plantManager.TryPlantSeed(cellPosition, worldPosition);
 if (debugLogs) Debug.Log(planted ? $"Planted seed successfully at {cellPosition}" : $"Failed to plant seed at {cellPosition}");
-}
 }
 
 pub void ApplyToolAction(ToolDefinition toolDef) {

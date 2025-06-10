@@ -254,32 +254,40 @@ public class UIManager : MonoBehaviour {
         TickManager.Instance?.DebugAdvanceTick();
     }
 
-    void OnWegoSystemToggled(bool enabled) {
+    void OnWegoSystemToggled(bool enabled)
+    {
         isWegoMode = enabled;
 
-        if (RunManager.Instance != null) {
+        if (RunManager.Instance != null)
+        {
             RunManager.Instance.SetWegoSystem(enabled);
         }
 
-        if (WeatherManager.Instance != null) {
+        if (WeatherManager.Instance != null)
+        {
             WeatherManager.Instance.SetWegoSystem(enabled);
         }
 
-        foreach (var plant in PlantGrowth.AllActivePlants) {
-            if (plant != null) {
+        foreach (var plant in PlantGrowth.AllActivePlants)
+        {
+            if (plant != null)
+            {
                 plant.SetWegoSystem(enabled);
             }
         }
 
         var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-        foreach (var animal in animals) {
+        foreach (var animal in animals)
+        {
             animal.SetWegoMovement(enabled);
         }
 
-        var gardener = FindFirstObjectByType<GardenerController>();
-        if (gardener != null) {
-            gardener.SetWegoMovement(enabled);
-        }
+        // --- MODIFIED: The gardener no longer needs its movement mode toggled. ---
+        // The following block has been removed:
+        // var gardener = FindFirstObjectByType<GardenerController>();
+        // if (gardener != null) {
+        //     gardener.SetWegoMovement(enabled);
+        // }
 
         UpdateWegoUI();
 

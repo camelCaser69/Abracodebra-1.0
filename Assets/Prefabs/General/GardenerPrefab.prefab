@@ -136,6 +136,37 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &3048052100972099363
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 948324920771965820}
+  m_Layer: 0
+  m_Name: ORIGIN
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &948324920771965820
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3048052100972099363}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -0.133, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5575549963909954597}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3865789443703534087
 GameObject:
   m_ObjectHideFlags: 0
@@ -152,6 +183,7 @@ GameObject:
   - component: {fileID: 4692275394440683169}
   - component: {fileID: -6875346460999449028}
   - component: {fileID: 777715186571388838}
+  - component: {fileID: 6381843948659092967}
   m_Layer: 0
   m_Name: GardenerPrefab
   m_TagString: Untagged
@@ -174,6 +206,7 @@ Transform:
   m_Children:
   - {fileID: 4126343535530882793}
   - {fileID: 1655836248603051620}
+  - {fileID: 948324920771965820}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-1214040801718707697
@@ -188,14 +221,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd23192a25d94d8b8bde743aa013c216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useWegoMovement: 1
-  seedPlantingOffset: {x: 0, y: -1}
   flipSpriteWhenMovingLeft: 1
   flipHorizontalDirection: 0
   useAnimations: 1
   runningParameterName: isRunning
-  plantingParameterName: isPlanting
-  plantingDuration: 0.25
+  plantingTriggerName: plantTrigger
 --- !u!114 &1316135351782374134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -384,6 +414,19 @@ MonoBehaviour:
   localUseWaterMasking: 1
   localWaterTilemapTag: Water
   localShowDebugInfo: 0
+--- !u!114 &6381843948659092967
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3865789443703534087}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a6e10858f1a4c2d89f579f3967650c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  originTransform: {fileID: 948324920771965820}
 --- !u!1 &4330577973963285420
 GameObject:
   m_ObjectHideFlags: 0
