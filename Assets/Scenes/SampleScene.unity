@@ -1415,6 +1415,7 @@ MonoBehaviour:
   nightVignetteIntensity: 0.23
   dayVignetteSmoothness: 0.2
   nightVignetteSmoothness: 1
+  transitionSmoothingSpeed: 5
 --- !u!1 &226833454
 GameObject:
   m_ObjectHideFlags: 0
@@ -10908,9 +10909,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa0397c3838c4c9aa01e9859a5f1e1ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showScentRadiiRuntime: 0
+  showScentRadiiRuntime: 1
   scentRadiusColorRuntime: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  showPoopAbsorptionRadiiRuntime: 0
+  showPoopAbsorptionRadiiRuntime: 1
   poopAbsorptionRadiusColorRuntime: {r: 0.2264151, g: 0.15966536, b: 0.09291563, a: 1}
   circleVisualizerPrefab: {fileID: 4489783331620860270, guid: d6976fed002367344b9cc1365d0a1201, type: 3}
   circleContainer: {fileID: 1232000946}
@@ -16850,6 +16851,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74d3ef1d66ec4b24bf910187e4453519, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tileInteractionManager: {fileID: 1097838751}
   gridBounds: {x: 100, y: 100}
   showGridGizmos: 1
   gridColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.3}
