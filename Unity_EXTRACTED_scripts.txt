@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 503,614 → 338,655 chars (32.8% reduction)
-Estimated tokens saved: ~41,239
+Compression Stats: 504,074 → 339,957 chars (32.6% reduction)
+Estimated tokens saved: ~41,029
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -58,61 +58,61 @@ using System;
   LeafData (Assets\Scripts\PlantSystem\Data/) L3787
   NodeData (Assets\Scripts\PlantSystem\Data/) L3802
   NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3887
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4014
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4037
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4055
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4082
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4091
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4259
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4298
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4322
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4524
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4588
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4810
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5152
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5332
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5476
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5774
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5841
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6137
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6256
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6460
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6594
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6914
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7050
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7343
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7431
-  GridSnapStartup (Assets\Scripts\Ticks/) L7532
-  TurnPhaseManager (Assets\Scripts\Ticks/) L7598
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7714
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7783
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8014
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8025
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8054
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8138
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8243
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8638
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8674
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8864
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9006
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9124
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9268
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9473
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9513
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9533
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9545
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9580
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9739
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4019
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4042
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4060
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4087
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4096
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4264
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4303
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4327
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4529
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4593
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4815
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5168
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5352
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5496
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5794
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5861
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6157
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6276
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6480
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6614
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6934
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7070
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7363
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7451
+  GridSnapStartup (Assets\Scripts\Ticks/) L7552
+  TurnPhaseManager (Assets\Scripts\Ticks/) L7618
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7734
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7803
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8034
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8045
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8074
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8170
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8275
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8670
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8706
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8896
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9038
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9156
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9300
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9505
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9545
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9565
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9577
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9612
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9771
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L9749
-  GridPosition (Assets\Scripts\Ticks/) L9900
-  GridPositionManager (Assets\Scripts\Ticks/) L10001
-  TickConfiguration (Assets\Scripts\Ticks/) L10298
-  ITickUpdateable (Assets\Scripts\Ticks/) L10430
+  GridEntity (Assets\Scripts\Ticks/) L9781
+  GridPosition (Assets\Scripts\Ticks/) L9932
+  GridPositionManager (Assets\Scripts\Ticks/) L10033
+  TickConfiguration (Assets\Scripts\Ticks/) L10349
+  ITickUpdateable (Assets\Scripts\Ticks/) L10481
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10592
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10643
 
 ================================================================================
 SCRIPTS
@@ -2457,7 +2457,7 @@ pub ScentDefinition definition; // Assigned by PlantGrowth/Node effects
 pub float radiusModifier = 0f;
 pub float strengthModifier = 0f;
 
-pub float EffectiveRadius => Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier);
+pub float EffectiveRadius => Mathf.RoundToInt(Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier));
 pub float EffectiveStrength => Mathf.Max(0f, (definition != null ? definition.baseStrength : 0f) + strengthModifier);
 
 void OnDrawGizmosSelected() {
@@ -3979,14 +3979,15 @@ _storedSequence = null;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\NodeDefinition.cs
 
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
 using System.Text;
 using WegoSystem;
 
 pub cls NodeDefinition : ScriptableObject, ITooltipDataProvider {
-
 pub string displayName;
+
 pub string description;
+
 pub Sprite thumbnail;
 pub Color thumbnailTintColor = Color.white;
 pub Color backgroundColor = Color.gray;
@@ -4068,6 +4069,8 @@ case NodeEffectType.GrowthSpeed:
 ret "Growth Rate";
 case NodeEffectType.Cooldown:
 ret "Cooldown";
+case NodeEffectType.CastDelay:
+ret "Cast Delay";
 default:
 ret type.ToString();
 }
@@ -4081,6 +4084,8 @@ switch (effect.effectType) {
 case NodeEffectType.GrowthSpeed:
 ret $"{effect.primaryValue:F2} (stems/tick)";
 case NodeEffectType.Cooldown:
+ret $"{Mathf.RoundToInt(effect.primaryValue)} Ticks";
+case NodeEffectType.CastDelay:
 ret $"{Mathf.RoundToInt(effect.primaryValue)} Ticks";
 case NodeEffectType.ScentModifier:
 case NodeEffectType.PoopFertilizer:
@@ -4914,7 +4919,7 @@ pub int LeafGap { get; set; }
 pub int LeafPattern { get; set; }
 pub float GrowthRandomness { get; set; }
 pub int MaturityCycleTicks { get; set; }
-pub float NodeCastDelay { get; set; }
+pub int NodeCastDelayTicks { get; set; } // Renamed from NodeCastDelay (float to int)
 
 float growthProgress = 0f;
 int maturityCycleTick = 0;
@@ -4948,7 +4953,7 @@ int baseLeafGap = 1;
 int baseLeafPattern = 0;
 float baseGrowthRandomness = 0.1f;
 int baseCooldownTicks = 20;
-float baseCastDelay = 0.1f;
+int baseCastDelayTicks = 0; // Changed from float to int
 
 float accumulatedEnergyStorage = 0f;
 float accumulatedPhotosynthesis = 0f;
@@ -4958,15 +4963,22 @@ int leafGapModifier = 0;
 int currentLeafPattern = baseLeafPattern;
 float growthRandomnessModifier = 0f;
 int cooldownTicksModifier = 0;
-float castDelayModifier = 0f;
+int castDelayTicksModifier = 0; // Changed from float to int
 bool seedFound = false;
 
 foreach (NodeData node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
 if (node?.effects == null) continue;
 foreach (var effect in node.effects) {
-if (effect == null || !effect.isPassive) continue;
+if (effect == null) continue;
+
+if (effect.effectType == NodeEffectType.SeedSpawn) {
+seedFound = true;
+continue; // Skip to the next effect, as SeedSpawn has no other passive value.
+}
+
+if (!effect.isPassive) continue;
+
 switch (effect.effectType) {
-case NodeEffectType.SeedSpawn: seedFound = true; break;
 case NodeEffectType.EnergyStorage: accumulatedEnergyStorage += effect.primaryValue; break;
 case NodeEffectType.EnergyPhotosynthesis: accumulatedPhotosynthesis += effect.primaryValue; break;
 case NodeEffectType.StemLength: stemLengthModifier += Mathf.RoundToInt(effect.primaryValue); break;
@@ -4975,7 +4987,7 @@ case NodeEffectType.LeafGap: leafGapModifier += Mathf.RoundToInt(effect.primaryV
 case NodeEffectType.LeafPattern: currentLeafPattern = Mathf.Clamp(Mathf.RoundToInt(effect.primaryValue), 0, 4); break;
 case NodeEffectType.StemRandomness: growthRandomnessModifier += effect.primaryValue; break;
 case NodeEffectType.Cooldown: cooldownTicksModifier += Mathf.RoundToInt(effect.primaryValue); break;
-case NodeEffectType.CastDelay: castDelayModifier += effect.primaryValue; break;
+case NodeEffectType.CastDelay: castDelayTicksModifier += Mathf.RoundToInt(effect.primaryValue); break; // Round to int
 }
 }
 }
@@ -4990,13 +5002,14 @@ LeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
 LeafPattern = currentLeafPattern;
 GrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
 MaturityCycleTicks = Mathf.Max(1, baseCooldownTicks + cooldownTicksModifier);
-NodeCastDelay = Mathf.Max(0.01f, baseCastDelay + castDelayModifier);
+NodeCastDelayTicks = Mathf.Max(0, baseCastDelayTicks + castDelayTicksModifier); // Use int ticks
+
 TargetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
 
 plant.NodeExecutor.ProcessPassiveEffects(plant.NodeGraph);
 
 if (!seedFound) {
-Debug.LogWarning($"[{plant.gameObject.name}] NodeGraph lacks SeedSpawn effect. Growth aborted.", plant.gameObject);
+Debug.LogWarning($"[{plant.gameObject.name}] NodeGraph lacks a SeedSpawn effect. Growth aborted.", plant.gameObject);
 }
 }
 
@@ -5152,6 +5165,8 @@ if (estimatedTotalGrowthTime < 0.01f) estimatedTotalGrowthTime = 0.01f;
 
 float progressTowardNextStep = 0f;
 
+float castDelayInSeconds = NodeCastDelayTicks * (TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
+
 while (stepsCompleted < totalPlannedSteps && plant.CurrentState == PlantState.Growing) {
 float currentTileMultiplier = PlantGrowthModifierManager.Instance?.GetGrowthSpeedMultiplier(plant) ?? 1.0f;
 currentTileMultiplier = Mathf.Clamp(currentTileMultiplier, 0.1f, 10.0f);
@@ -5184,8 +5199,9 @@ currentStemCount = step.StemIndex;
 if (!plant.VisualManager.ContinuousIncrement) plant.VisualManager.UpdateGrowthPercentageUI();
 }
 stepsCompleted++;
-if (NodeCastDelay > 0.01f && i < stepsToProcessThisFrame - 1) {
-yield ret new WaitForSeconds(NodeCastDelay);
+
+if (castDelayInSeconds > 0.01f && i < stepsToProcessThisFrame - 1) {
+yield ret new WaitForSeconds(castDelayInSeconds);
 }
 }
 }
@@ -5362,7 +5378,8 @@ GameObject berryGO = plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, chos
 if (berryGO == null) {
 Debug.LogError($"[{plant.gameObject.name}] Failed to spawn berry visual at {chosenCoord}, SpawnCellVisual returned null.");
 }
-} else {
+}
+else {
 if (Debug.isDebugBuild) Debug.Log($"[{plant.gameObject.name}] No valid empty adjacent locations found to spawn a berry.");
 }
 }
@@ -5402,7 +5419,10 @@ bool hasMissingLeaves = plant.CellManager.LeafDataList.Any(leaf => !leaf.IsActiv
 bool canAddEnergy = PoopEnergyBonus > 0f;
 if (!hasMissingLeaves && !canAddEnergy) return;
 
-Collider2D[] colliders = Physics2D.OverlapCircleAll(plant.transform.position, PoopDetectionRadius);
+float discreteRadius = Mathf.RoundToInt(PoopDetectionRadius);
+if (discreteRadius <= 0f) return;
+
+Collider2D[] colliders = Physics2D.OverlapCircleAll(plant.transform.position, discreteRadius);
 foreach (Collider2D collider in colliders) {
 PoopController poop = collider.GetComponent<PoopController>();
 if (poop != null) {
@@ -8152,26 +8172,34 @@ using UnityEngine.Rendering.Universal;
 
 pub cls NightColorPostProcess : MonoBehaviour {
 pub WeatherManager weatherManager;
+
 pub Volume globalVolume;
+
+pub Color dayColorFilter = Color.white;
+pub Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
+
+pub float dayPostExposure = 0f;
+pub float nightPostExposure = -0.5f;
+
+pub float daySaturation = 0f;
+pub float nightSaturation = -50f;
+
+pub float dayFilmGrainIntensity = 0.1f;
+pub float nightFilmGrainIntensity = 0.5f;
+
+pub float dayVignetteIntensity = 0.2f;
+pub float nightVignetteIntensity = 0.5f;
+
+pub float dayVignetteSmoothness = 0.2f;
+pub float nightVignetteSmoothness = 0.3f;
+
+[SerializeField] float transitionSmoothingSpeed = 5f;
 
 ColorAdjustments colorAdjustments;
 FilmGrain filmGrain;
 Vignette vignette;
 
-pub Color dayColorFilter = Color.white;
-pub Color nightColorFilter = new Color(0.75f, 0.8f, 1f, 1f);
-pub float dayPostExposure = 0f;
-pub float nightPostExposure = -0.5f;
-pub float daySaturation = 0f;
-pub float nightSaturation = -50f;
-
-[Range(0f, 1f)] pub float dayFilmGrainIntensity = 0.1f;
-[Range(0f, 1f)] pub float nightFilmGrainIntensity = 0.5f;
-
-[Range(0f, 1f)] pub float dayVignetteIntensity = 0.2f;
-[Range(0f, 1f)] pub float nightVignetteIntensity = 0.5f;
-[Range(0.01f, 1f)] pub float dayVignetteSmoothness = 0.2f;
-[Range(0.01f, 1f)] pub float nightVignetteSmoothness = 0.3f;
+float smoothedSunIntensity;
 
 void Start() {
 if (!weatherManager) {
@@ -8200,13 +8228,18 @@ if (!globalVolume.profile.TryGet<Vignette>(out vignette)) {
 Debug.LogWarning($"[{nameof(NightColorPostProcess)}] Vignette ovr not found in Volume profile.", this);
 }
 
+smoothedSunIntensity = weatherManager.sunIntensity;
 }
 
 void Update() {
 if (colorAdjustments == null && filmGrain == null && vignette == null)
 return; // Nothing to update if no overrides were found
 
-float sun = Mathf.Clamp01(weatherManager.sunIntensity);
+if (weatherManager != null) {
+smoothedSunIntensity = Mathf.Lerp(smoothedSunIntensity, weatherManager.sunIntensity, transitionSmoothingSpeed * Time.deltaTime);
+}
+
+float sun = Mathf.Clamp01(smoothedSunIntensity); // Use the smoothed value
 float t = 1f - sun;  // t=0 at day, t=1 at night
 
 if (colorAdjustments != null) {
@@ -8223,7 +8256,6 @@ if (vignette != null) {
 vignette.intensity.value = Mathf.Lerp(dayVignetteIntensity, nightVignetteIntensity, t);
 vignette.smoothness.value = Mathf.Lerp(dayVignetteSmoothness, nightVignetteSmoothness, t);
 }
-
 }
 }
 
@@ -10093,11 +10125,17 @@ ret $"({x}, {y})";
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridPositionManager.cs
 
-﻿// Assets/Scripts/Ticks/GridPositionManager.cs
+﻿using System;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace WegoSystem {
 pub cls GridPositionManager : MonoBehaviour {
 pub stat GridPositionManager Instance { get; set; }
+
+[SerializeField] TileInteractionManager tileInteractionManager;
 
 Grid _tilemapGrid;
 
@@ -10137,14 +10175,25 @@ Instance = null;
 }
 
 pub void SyncWithTileGrid() {
+if (tileInteractionManager != null && tileInteractionManager.interactionGrid != null) {
+this._tilemapGrid = tileInteractionManager.interactionGrid;
+if (debugMode) {
+Debug.Log($"[GridPositionManager] Synced with assigned TileInteractionManager's grid: '{this._tilemapGrid.name}'.");
+}
+return; // Success
+}
+
 if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null) {
 this._tilemapGrid = TileInteractionManager.Instance.interactionGrid;
-
-if (debugMode && this._tilemapGrid != null)
-Debug.Log($"[GridPositionManager] Successfully synced with TileInteractionManager's grid: '{this._tilemapGrid.name}'.");
+tileInteractionManager = TileInteractionManager.Instance;
+if (debugMode) {
+Debug.Log($"[GridPositionManager] Synced with singleton TileInteractionManager.Instance's grid: '{this._tilemapGrid.name}'.");
 }
-else if (_tilemapGrid == null) { // Only log the error if we truly don't have a grid.
-Debug.LogError("[GridPositionManager] Could not find TileInteractionManager or its grid to sync with! Grid system may be misaligned.");
+return; // Success
+}
+
+if (_tilemapGrid == null) {
+Debug.LogError("[GridPositionManager] Could not find TileInteractionManager or its grid to sync with! Grid system may be misaligned. Please assign the TileInteractionManager in the Inspector.");
 }
 }
 
@@ -10229,7 +10278,8 @@ var checkPos = new GridPosition(center.x + x, center.y + y);
 
 if (useManhattan) {
 if (checkPos.ManhattanDistance(center) > radius) continue;
-} else {
+}
+else {
 if (checkPos.ChebyshevDistance(center) > radius) continue;
 }
 
@@ -10298,7 +10348,8 @@ float tentativeGScore = gScore[current] + 1;
 
 if (!openSet.Contains(neighbor)) {
 openSet.Add(neighbor);
-} else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor]) {
+}
+else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor]) {
 continue;
 }
 
