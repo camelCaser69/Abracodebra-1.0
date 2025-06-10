@@ -4,8 +4,7 @@ using System;
 using UnityEngine;
 using WegoSystem;
 
-public enum PlayerActionType
-{
+public enum PlayerActionType {
     Move,
     UseTool,
     PlantSeed,
@@ -116,45 +115,49 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
-    public int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null)
-    {
+    public int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null) {
         int baseCost = tickCostPerAction;
         int maxAdditionalCost = 0; // Find the highest penalty if zones overlap
-
-        SlowdownZone[] allZones = FindObjectsByType<SlowdownZone>(FindObjectsSortMode.None);
-
-        foreach (var zone in allZones)
+    
+        // Determine the precise position to check, using the ground point if available.
+        Vector3 positionToCheck = worldPosition;
+        if (movingEntity != null)
         {
-            if (zone.IsPositionInZone(worldPosition))
+            GridEntity gridEntity = movingEntity.GetComponent<GridEntity>();
+            if (gridEntity != null)
             {
+                positionToCheck = gridEntity.GroundWorldPosition;
+            }
+        }
+    
+        SlowdownZone[] allZones = FindObjectsByType<SlowdownZone>(FindObjectsSortMode.None);
+    
+        foreach (var zone in allZones) {
+            // Use the calculated positionToCheck instead of the raw worldPosition
+            if (zone.IsPositionInZone(positionToCheck)) {
                 bool shouldAffect = false;
-                // Determine if the zone should affect this specific entity
-                if (movingEntity == null) // If entity not specified, assume it affects by default
+                if (movingEntity == null) // If entity not specified, assume it affects by default 
                 {
                     shouldAffect = true;
                 }
-                else if (movingEntity is GardenerController && zone.AffectsPlayer)
-                {
+                else if (movingEntity is GardenerController && zone.AffectsPlayer) {
                     shouldAffect = true;
                 }
-                else if (movingEntity is AnimalController && zone.AffectsAnimals)
-                {
+                else if (movingEntity is AnimalController && zone.AffectsAnimals) {
                     shouldAffect = true;
                 }
-
-                if (shouldAffect)
-                {
+    
+                if (shouldAffect) {
                     maxAdditionalCost = Mathf.Max(maxAdditionalCost, zone.GetAdditionalTickCost());
                 }
             }
         }
-
-        if (maxAdditionalCost > 0 && debugMode)
-        {
+    
+        if (maxAdditionalCost > 0 && debugMode) {
             string entityName = movingEntity != null ? movingEntity.gameObject.name : "Unknown Entity";
-            Debug.Log($"[PlayerActionManager] Movement for '{entityName}' from {worldPosition} is in a slowdown zone. Additional cost: {maxAdditionalCost}. Total cost: {baseCost + maxAdditionalCost} ticks");
+            Debug.Log($"[PlayerActionManager] Movement for '{entityName}' from {positionToCheck} is in a slowdown zone. Additional cost: {maxAdditionalCost}. Total cost: {baseCost + maxAdditionalCost} ticks");
         }
-
+    
         return baseCost + maxAdditionalCost;
     }
 

@@ -47,27 +47,12 @@ public class GardenerController : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void Start()
+    void Start() 
     {
-        if (TileInteractionManager.Instance != null)
-        {
-            Vector3Int cellPos = TileInteractionManager.Instance.WorldToCell(transform.position);
-            Vector3 snappedPos = TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(cellPos);
-            transform.position = snappedPos;
+        // The snapping logic is now entirely handled by the GridSnapStartup script.
+        // We only need to register for tick updates here.
 
-            if (gridEntity != null && GridPositionManager.Instance != null)
-            {
-                GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(snappedPos);
-                gridEntity.SetPosition(gridPos, true);
-                currentTargetPosition = gridPos;
-            }
-
-            Debug.Log($"[GardenerController] Snapped to tile grid position {cellPos} at world {snappedPos}");
-        }
-
-        // --- MODIFIED: Unconditional registration with TickManager ---
-        if (TickManager.Instance != null)
-        {
+        if (TickManager.Instance != null) {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
     }

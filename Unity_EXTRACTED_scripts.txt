@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 501,626 → 338,441 chars (32.5% reduction)
-Estimated tokens saved: ~40,796
+Compression Stats: 503,614 → 338,655 chars (32.8% reduction)
+Estimated tokens saved: ~41,239
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -37,81 +37,82 @@ using System;
   ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2338
   ScentSource (Assets\Scripts\Ecosystem\Environment/) L2357
   SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2393
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2549
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2613
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2630
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2643
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2672
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2880
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3110
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3391
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3420
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3450
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3463
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3491
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3552
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3597
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3648
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3682
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3752
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3772
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3807
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3822
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3907
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4034
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4057
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4075
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4102
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4111
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4279
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4318
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4342
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4544
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4608
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4830
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5172
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5352
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5496
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5794
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5861
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6157
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6276
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6480
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6614
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6934
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7070
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7363
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7451
-  GridSnapStartup (Assets\Scripts\Ticks/) L7552
-  TurnPhaseManager (Assets\Scripts\Ticks/) L7618
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7734
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7803
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8034
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8045
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8074
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8158
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8263
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8658
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8694
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8884
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9026
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9144
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9301
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9498
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9538
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9558
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9570
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9605
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9764
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2529
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2593
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2610
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2623
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2652
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2860
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L3090
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3371
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3400
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3430
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3443
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3471
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3532
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3577
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3628
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3662
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3732
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3752
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3787
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3802
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3887
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4014
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4037
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4055
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4082
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4091
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4259
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4298
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4322
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4524
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4588
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4810
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5152
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5332
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5476
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5774
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5841
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6137
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6256
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6460
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6594
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6914
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7050
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7343
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7431
+  GridSnapStartup (Assets\Scripts\Ticks/) L7532
+  TurnPhaseManager (Assets\Scripts\Ticks/) L7598
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7714
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7783
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8014
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8025
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8054
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8138
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8243
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8638
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8674
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8864
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9006
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9124
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9268
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9473
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9513
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9533
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9545
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9580
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9739
 
 [WegoSystem]
-  GridPositionManager (Assets\Scripts\Ticks/) L9774
-  GridPosition (Assets\Scripts\Ticks/) L10071
-  TickConfiguration (Assets\Scripts\Ticks/) L10286
-  ITickUpdateable (Assets\Scripts\Ticks/) L10418
+  GridEntity (Assets\Scripts\Ticks/) L9749
+  GridPosition (Assets\Scripts\Ticks/) L9900
+  GridPositionManager (Assets\Scripts\Ticks/) L10001
+  TickConfiguration (Assets\Scripts\Ticks/) L10298
+  ITickUpdateable (Assets\Scripts\Ticks/) L10430
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10580
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10592
 
 ================================================================================
 SCRIPTS
@@ -2484,7 +2485,7 @@ Gizmos.DrawWireSphere(transform.position, 1f); // Default size for editor only
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Environment\SlowdownZone.cs
 
-﻿// Assets\Scripts\Ecosystem\Environment\SlowdownZone.cs
+﻿// Assets/Scripts/Ecosystem/Environment/SlowdownZone.cs
 
 using WegoSystem;
 
@@ -2496,6 +2497,7 @@ pub cls SlowdownZone : MonoBehaviour {
 pub bool AffectsPlayer => affectsPlayer;
 pub bool AffectsAnimals => affectsAnimals;
 
+[SerializeField] bool showVisualIndicator = true;
 [SerializeField] float colliderShrinkAmount = 0.2f;
 [SerializeField] Color zoneColor = new Color(0.5f, 0.5f, 1f, 0.3f);
 [SerializeField] bool showDebugMessages = false;
@@ -2503,7 +2505,6 @@ pub bool AffectsAnimals => affectsAnimals;
 Collider2D zoneCollider;
 BoxCollider2D boxCollider; // Kept for shrink logic compatibility
 Vector2 originalSize;
-Vector2 originalOffset;
 SpriteRenderer visualRenderer;
 c float SHRINK_EPSILON = 0.001f;
 
@@ -2522,13 +2523,9 @@ zoneCollider.isTrigger = true;
 boxCollider = zoneCollider as BoxCollider2D;
 if (boxCollider != null) {
 originalSize = boxCollider.size;
-originalOffset = boxCollider.offset;
 if (colliderShrinkAmount > SHRINK_EPSILON) {
 ShrinkCollider();
 }
-}
-else if (colliderShrinkAmount > SHRINK_EPSILON) {
-Debug.LogWarning($"SlowdownZone on '{gameObject.name}': Collider shrinking only works with BoxCollider2D. Current collider type: {zoneCollider.GetType().Name}");
 }
 
 SetupVisualIndicator();
@@ -2546,18 +2543,37 @@ ret additionalTickCost;
 }
 
 void SetupVisualIndicator() {
-visualRenderer = GetComponent<SpriteRenderer>();
+if (visualRenderer == null) {
+Transform existingVisual = transform.Find("ZoneVisual");
+if (existingVisual != null) {
+visualRenderer = existingVisual.GetComponent<SpriteRenderer>();
+}
+}
+
+if (!showVisualIndicator) {
+if (visualRenderer != null) {
+visualRenderer.gameObject.SetActive(false);
+}
+return;
+}
 
 if (visualRenderer == null) {
 GameObject visualObj = new GameObject("ZoneVisual");
 visualObj.transform.SetParent(transform);
-visualObj.transform.localPosition = Vector3.zero;
-visualObj.transform.localScale = Vector3.one;
 
 visualRenderer = visualObj.AddComponent<SpriteRenderer>();
 visualRenderer.sprite = CreateSquareSprite();
-visualRenderer.color = zoneColor;
 visualRenderer.sortingOrder = -10; // Render behind most things
+}
+
+visualRenderer.gameObject.SetActive(true);
+
+visualRenderer.color = zoneColor;
+
+if (zoneCollider != null) {
+Bounds bounds = zoneCollider.bounds;
+visualRenderer.transform.position = bounds.center;
+visualRenderer.transform.localScale = bounds.size;
 }
 }
 
@@ -2565,7 +2581,7 @@ Sprite CreateSquareSprite() {
 Texture2D tex = new Texture2D(1, 1);
 tex.SetPixel(0, 0, Color.white);
 tex.Apply();
-
+tex.wrapMode = TextureWrapMode.Clamp;
 ret Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1);
 }
 
@@ -2584,55 +2600,20 @@ Debug.Log($"SlowdownZone on '{gameObject.name}': Shrunk BoxCollider2D from {orig
 }
 }
 
-void RestoreCollider() {
-if (boxCollider == null) return;
-
-boxCollider.size = originalSize;
-boxCollider.offset = originalOffset;
-
-if (showDebugMessages) {
-Debug.Log($"SlowdownZone on '{gameObject.name}': Restored BoxCollider2D to original size {originalSize} and offset {originalOffset}");
-}
-}
-
 void OnValidate() {
-if (boxCollider != null) {
-if (colliderShrinkAmount > SHRINK_EPSILON) {
-if (originalSize != Vector2.zero || Application.isPlaying) {
-ShrinkCollider();
+if (Application.isEditor) {
+UnityEditor.EditorApplication.delayCall += () => {
+if (this != null && gameObject != null) {
+SetupVisualIndicator();
 }
-}
-else {
-if (originalSize != Vector2.zero || Application.isPlaying) {
-RestoreCollider();
-}
-}
-}
-}
-
-void OnDestroy() {
-if (boxCollider != null && colliderShrinkAmount > SHRINK_EPSILON) {
-if (originalSize != Vector2.zero) {
-RestoreCollider();
-}
+};
 }
 }
 
 void OnDrawGizmos() {
 if (zoneCollider != null) {
-Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.3f);
-
-if (zoneCollider is BoxCollider2D box) {
-Vector3 center = transform.position + (Vector3)box.offset;
-Vector3 size = new Vector3(box.size.x, box.size.y, 0) * transform.lossyScale.x;
-Gizmos.DrawCube(center, size);
-
 Gizmos.color = new Color(0.5f, 0.5f, 1f, 0.8f);
-Gizmos.DrawWireCube(center, size);
-}
-else {
 Gizmos.DrawWireCube(zoneCollider.bounds.center, zoneCollider.bounds.size);
-}
 }
 }
 }
@@ -9277,19 +9258,6 @@ gridEntity = gameObject.AddComponent<GridEntity>();
 }
 
 void Start() {
-if (TileInteractionManager.Instance != null) {
-Vector3Int cellPos = TileInteractionManager.Instance.WorldToCell(transform.position);
-Vector3 snappedPos = TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(cellPos);
-transform.position = snappedPos;
-
-if (gridEntity != null && GridPositionManager.Instance != null) {
-GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(snappedPos);
-gridEntity.SetPosition(gridPos, true);
-currentTargetPosition = gridPos;
-}
-
-Debug.Log($"[GardenerController] Snapped to tile grid position {cellPos} at world {snappedPos}");
-}
 
 if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
@@ -9498,10 +9466,18 @@ pub int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null
 int baseCost = tickCostPerAction;
 int maxAdditionalCost = 0; // Find the highest penalty if zones overlap
 
+Vector3 positionToCheck = worldPosition;
+if (movingEntity != null) {
+GridEntity gridEntity = movingEntity.GetComponent<GridEntity>();
+if (gridEntity != null) {
+positionToCheck = gridEntity.GroundWorldPosition;
+}
+}
+
 SlowdownZone[] allZones = FindObjectsByType<SlowdownZone>(FindObjectsSortMode.None);
 
 foreach (var zone in allZones) {
-if (zone.IsPositionInZone(worldPosition)) {
+if (zone.IsPositionInZone(positionToCheck)) {
 bool shouldAffect = false;
 if (movingEntity == null) // If entity not specified, assume it affects by default {
 shouldAffect = true;
@@ -9521,7 +9497,7 @@ maxAdditionalCost = Mathf.Max(maxAdditionalCost, zone.GetAdditionalTickCost());
 
 if (maxAdditionalCost > 0 && debugMode) {
 string entityName = movingEntity != null ? movingEntity.gameObject.name : "Unknown Entity";
-Debug.Log($"[PlayerActionManager] Movement for '{entityName}' from {worldPosition} is in a slowdown zone. Additional cost: {maxAdditionalCost}. Total cost: {baseCost + maxAdditionalCost} ticks");
+Debug.Log($"[PlayerActionManager] Movement for '{entityName}' from {positionToCheck} is in a slowdown zone. Additional cost: {maxAdditionalCost}. Total cost: {baseCost + maxAdditionalCost} ticks");
 }
 
 ret baseCost + maxAdditionalCost;
@@ -9863,306 +9839,160 @@ SeedPouch // New tool type
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Ticks\GridPositionManager.cs
+// Assets\Scripts\Ticks\GridEntity.cs
 
-﻿using System;
+﻿// Assets/Scripts/Ticks/GridEntity.cs
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace WegoSystem {
-pub cls GridPositionManager : MonoBehaviour {
-pub stat GridPositionManager Instance { get; set; }
+pub cls GridEntity : MonoBehaviour {
 
-Grid tilemapGrid;
+GridPosition gridPosition;
 
-[SerializeField] Vector2Int gridBounds = new Vector2Int(100, 100);
+Vector3 groundPointOffset = Vector3.zero;
+Vector3 visualOffset = Vector3.zero;
 
-[SerializeField] bool showGridGizmos = true;
-[SerializeField] Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
-[SerializeField] int gizmoGridSize = 20;
-[SerializeField] bool debugMode = false;
+float visualInterpolationSpeed = 5f;
+AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-ro Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
-ro HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
+GridPosition previousGridPosition;
+Vector3 visualStartPosition;
+Vector3 visualTargetPosition;
+float movementProgress = 1f;
+bool isMoving = false;
 
-void Awake() {
-if (Instance != null && Instance != this) {
-Destroy(gameObject);
-return;
-}
-
-Instance = this;
-}
-
-void Start() {
-SyncWithTileGrid();
-}
-
-void OnDestroy() {
-if (Instance == this) {
-Instance = null;
-}
-}
-
-pub void SyncWithTileGrid() {
-if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null) {
-this.tilemapGrid = TileInteractionManager.Instance.interactionGrid;
-
-if (debugMode)
-Debug.Log($"[GridPositionManager] Successfully synced with TileInteractionManager's grid: '{this.tilemapGrid.name}'.");
-}
-else {
-Debug.LogError("[GridPositionManager] Could not find TileInteractionManager or its grid to sync with! Grid system may be misaligned.");
-}
-}
-
-pub GridPosition WorldToGrid(Vector3 worldPosition) {
-if (tilemapGrid == null) ret GridPosition.Zero;
-Vector3Int cellPos = tilemapGrid.WorldToCell(worldPosition);
-ret new GridPosition(cellPos);
-}
-
-pub Vector3 GridToWorld(GridPosition gridPosition) {
-if (tilemapGrid == null) ret Vector3.zero;
-ret tilemapGrid.GetCellCenterWorld(gridPosition.ToVector3Int());
-}
-
-pub Vector3 GetCellCenter(GridPosition gridPosition) {
-ret GridToWorld(gridPosition);
-}
-
-pub bool IsPositionValid(GridPosition position) {
-ret position.x >= -gridBounds.x / 2 && position.x < gridBounds.x / 2 &&
-position.y >= -gridBounds.y / 2 && position.y < gridBounds.y / 2;
-}
-
-pub bool IsPositionOccupied(GridPosition position) {
-ret entitiesByPosition.ContainsKey(position) && entitiesByPosition[position].Count > 0;
-}
-
-pub void RegisterEntity(GridEntity entity) {
-if (entity == null || allEntities.Contains(entity)) return;
-
-allEntities.Add(entity);
-AddEntityToPosition(entity, entity.Position);
-
-entity.OnPositionChanged += OnEntityPositionChanged;
-}
-
-pub void UnregisterEntity(GridEntity entity) {
-if (entity == null || !allEntities.Contains(entity)) return;
-
-allEntities.Remove(entity);
-RemoveEntityFromPosition(entity, entity.Position);
-
-entity.OnPositionChanged -= OnEntityPositionChanged;
-}
-
-void OnEntityPositionChanged(GridPosition oldPosition, GridPosition newPosition) {
-var entity = allEntities.FirstOrDefault(e => e.Position == newPosition && e.PreviousPosition == oldPosition);
-if (entity != null) {
-RemoveEntityFromPosition(entity, oldPosition);
-AddEntityToPosition(entity, newPosition);
-}
-}
-
-void AddEntityToPosition(GridEntity entity, GridPosition position) {
-if (!entitiesByPosition.ContainsKey(position)) {
-entitiesByPosition[position] = new HashSet<GridEntity>();
-}
-entitiesByPosition[position].Add(entity);
-}
-
-void RemoveEntityFromPosition(GridEntity entity, GridPosition position) {
-if (entitiesByPosition.ContainsKey(position)) {
-entitiesByPosition[position].Remove(entity);
-if (entitiesByPosition[position].Count == 0) {
-entitiesByPosition.Remove(position);
+pub GridPosition Position {
+get => gridPosition;
+set // Keep setter to be controlled by SetPosition method {
+if (gridPosition != value) {
+previousGridPosition = gridPosition;
+gridPosition = value;
+OnGridPositionChanged();
 }
 }
 }
 
-pub HashSet<GridEntity> GetEntitiesAt(GridPosition position) {
-ret entitiesByPosition.ContainsKey(position)
-? new HashSet<GridEntity>(entitiesByPosition[position])
-: new HashSet<GridEntity>();
+pub GridPosition PreviousPosition => previousGridPosition;
+pub bool IsMoving => isMoving;
+pub float MovementProgress => movementProgress;
+
+pub Vector3 GroundWorldPosition => transform.position + groundPointOffset;
+
+pub event Action<GridPosition, GridPosition> OnPositionChanged;
+pub event Action<GridPosition> OnMovementComplete;
+pub event Action OnMovementStart;
+
+prot virt void Start() {
+
+visualStartPosition = transform.position;
+visualTargetPosition = transform.position;
+previousGridPosition = gridPosition;
+
+GridPositionManager.Instance?.RegisterEntity(this);
 }
 
-pub List<GridEntity> GetEntitiesInRadius(GridPosition center, int radius, bool useManhattan = true) {
-var result = new List<GridEntity>();
-
-for (int x = -radius; x <= radius; x++) {
-for (int y = -radius; y <= radius; y++) {
-var checkPos = new GridPosition(center.x + x, center.y + y);
-
-if (useManhattan) {
-if (checkPos.ManhattanDistance(center) > radius) continue;
-}
-else {
-if (checkPos.ChebyshevDistance(center) > radius) continue;
+prot virt void OnDestroy() {
+GridPositionManager.Instance?.UnregisterEntity(this);
 }
 
-if (entitiesByPosition.ContainsKey(checkPos)) {
-result.AddRange(entitiesByPosition[checkPos]);
-}
-}
-}
+prot virt void Update() {
+if (movementProgress < 1f) {
+movementProgress += Time.deltaTime * visualInterpolationSpeed;
+movementProgress = Mathf.Clamp01(movementProgress);
 
-ret result;
+float curvedProgress = movementCurve.Evaluate(movementProgress);
+transform.position = Vector3.Lerp(visualStartPosition, visualTargetPosition, curvedProgress);
+
+if (movementProgress >= 1f) {
+transform.position = visualTargetPosition;
+isMoving = false;
+OnMovementComplete?.Invoke(gridPosition);
 }
-
-pub GridEntity GetNearestEntity(GridPosition position, System.Func<GridEntity, bool> predicate = null) {
-GridEntity nearest = null;
-float nearestDistance = float.MaxValue;
-
-foreach (var entity in allEntities) {
-if (predicate != null && !predicate(entity)) continue;
-
-float distance = entity.Position.EuclideanDistance(position);
-if (distance < nearestDistance) {
-nearest = entity;
-nearestDistance = distance;
 }
 }
 
-ret nearest;
+#if UNITY_EDITOR
+void OnDrawGizmosSelected() {
+Vector3 groundWorldPosition = transform.position + groundPointOffset;
+Gizmos.color = Color.green;
+Gizmos.DrawLine(transform.position, groundWorldPosition);
+Gizmos.DrawWireSphere(groundWorldPosition, 0.1f);
+UnityEditor.Handles.Label(groundWorldPosition + Vector3.up * 0.2f, "Ground Point");
+
+if (Application.isPlaying && GridPositionManager.Instance != null) {
+Gizmos.color = Color.yellow;
+Vector3 gridCenter = GridPositionManager.Instance.GetCellCenter(gridPosition);
+Gizmos.DrawSphere(gridCenter, 0.08f);
+}
+}
+#endif
+
+prot virt void OnGridPositionChanged() {
+visualStartPosition = transform.position;
+
+Vector3 groundTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
+visualTargetPosition = groundTargetPosition - groundPointOffset + visualOffset;
+
+movementProgress = 0f;
+
+if (!isMoving) {
+isMoving = true;
+OnMovementStart?.Invoke();
 }
 
-pub List<GridPosition> GetPath(GridPosition start, GridPosition end, bool allowDiagonal = false) {
-var path = new List<GridPosition>();
-
-if (!IsPositionValid(start) || !IsPositionValid(end)) {
-ret path;
+OnPositionChanged?.Invoke(previousGridPosition, gridPosition);
 }
 
-var openSet = new HashSet<GridPosition>();
-var closedSet = new HashSet<GridPosition>();
-var cameFrom = new Dictionary<GridPosition, GridPosition>();
-var gScore = new Dictionary<GridPosition, float>();
-var fScore = new Dictionary<GridPosition, float>();
+pub void SetPosition(GridPosition newPosition, bool instant = false) {
+Position = newPosition; // This invokes OnGridPositionChanged which sets up the tween
 
-openSet.Add(start);
-gScore[start] = 0;
-fScore[start] = HeuristicCost(start, end);
+if (instant) {
+if (GridPositionManager.Instance == null) return;
 
-while (openSet.Count > 0) {
-GridPosition current = GetLowestFScore(openSet, fScore);
+Vector3 groundTargetPosition = GridPositionManager.Instance.GridToWorld(Position);
+transform.position = groundTargetPosition - groundPointOffset + visualOffset;
 
-if (current == end) {
-while (cameFrom.ContainsKey(current)) {
-path.Add(current);
-current = cameFrom[current];
-}
-path.Reverse();
-ret path;
-}
-
-openSet.Remove(current);
-closedSet.Add(current);
-
-foreach (var neighbor in current.GetNeighbors(allowDiagonal)) {
-if (!IsPositionValid(neighbor) || IsPositionOccupied(neighbor) || closedSet.Contains(neighbor)) {
-continue;
-}
-
-float tentativeGScore = gScore[current] + 1;
-
-if (!openSet.Contains(neighbor)) {
-openSet.Add(neighbor);
-}
-else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor]) {
-continue;
-}
-
-cameFrom[neighbor] = current;
-gScore[neighbor] = tentativeGScore;
-fScore[neighbor] = gScore[neighbor] + HeuristicCost(neighbor, end);
+visualStartPosition = transform.position;
+visualTargetPosition = transform.position;
+movementProgress = 1f;
+isMoving = false;
 }
 }
 
-ret path; // No path found
+pub void SnapToGrid() {
+if (GridPositionManager.Instance == null) return;
+
+Vector3 groundWorldPos = transform.position + groundPointOffset;
+GridPosition currentGridPos = GridPositionManager.Instance.WorldToGrid(groundWorldPos);
+SetPosition(currentGridPos, true);
 }
 
-float HeuristicCost(GridPosition a, GridPosition b) {
-ret a.ManhattanDistance(b);
+pub void MoveInDirection(GridPosition direction) {
+SetPosition(gridPosition + direction);
 }
 
-GridPosition GetLowestFScore(HashSet<GridPosition> openSet, Dictionary<GridPosition, float> fScore) {
-GridPosition lowest = openSet.First();
-float lowestScore = fScore.ContainsKey(lowest) ? fScore[lowest] : float.MaxValue;
-
-foreach (var pos in openSet) {
-float score = fScore.ContainsKey(pos) ? fScore[pos] : float.MaxValue;
-if (score < lowestScore) {
-lowest = pos;
-lowestScore = score;
-}
+pub bool CanMoveTo(GridPosition targetPosition) {
+ret GridPositionManager.Instance?.IsPositionValid(targetPosition) ?? false;
 }
 
-ret lowest;
-}
-
-pub bool PathExists(GridPosition start, GridPosition end, bool allowDiagonal = false) {
-var path = GetPath(start, end, allowDiagonal);
-ret path.Count > 0;
-}
-
-pub void SnapEntityToGrid(GameObject entity) {
-if (entity == null) return;
-
-GridEntity gridEntity = entity.GetComponent<GridEntity>();
-if (gridEntity == null) {
-gridEntity = entity.AddComponent<GridEntity>();
-}
-
-gridEntity.SnapToGrid();
-
-if (debugMode) {
-Debug.Log($"[GridPositionManager] Snapped {entity.name} to grid {gridEntity.Position}");
-}
-}
-
-pub void SnapAllEntitiesToGrid<T>() where T : Component {
-T[] entities = FindObjectsByType<T>(FindObjectsSortMode.None);
-foreach (var entity in entities) {
-SnapEntityToGrid(entity.gameObject);
-}
-Debug.Log($"[GridPositionManager] Snapped {entities.Length} entities of type {typeof(T).Name} to grid");
-}
-
-void OnDrawGizmos() {
-if (!showGridGizmos || tilemapGrid == null) return;
-
-Gizmos.color = gridColor;
-
-int halfWidth = gizmoGridSize / 2;
-int halfHeight = gizmoGridSize / 2;
-
-for (int x = -halfWidth; x <= halfWidth; x++) {
-Vector3 start = GridToWorld(new GridPosition(x, -halfHeight));
-Vector3 end = GridToWorld(new GridPosition(x, halfHeight));
-Gizmos.DrawLine(start, end);
-}
-
-for (int y = -halfHeight; y <= halfHeight; y++) {
-Vector3 start = GridToWorld(new GridPosition(-halfWidth, y));
-Vector3 end = GridToWorld(new GridPosition(halfWidth, y));
-Gizmos.DrawLine(start, end);
-}
-
-Gizmos.color = Color.red;
-foreach (var kvp in entitiesByPosition) {
-if (kvp.Value.Count > 0) {
-Vector3 cellCenter = GridToWorld(kvp.Key);
-Gizmos.DrawWireCube(cellCenter, Vector3.one * tilemapGrid.cellSize.x * 0.8f);
-}
+pub void CompleteMovement() {
+if (isMoving) {
+transform.position = visualTargetPosition;
+movementProgress = 1f;
+isMoving = false;
+OnMovementComplete?.Invoke(gridPosition);
 }
 }
 }
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Ticks\GridPositionSystem.cs
+// Assets\Scripts\Ticks\GridPosition.cs
 
-﻿using System;
+﻿// Assets/Scripts/Ticks/GridPosition.cs
 
 namespace WegoSystem {
 pub struct GridPosition : IEquatable<GridPosition> {
@@ -10258,117 +10088,300 @@ pub ovr string ToString() {
 ret $"({x}, {y})";
 }
 }
+}
 
-pub cls GridEntity : MonoBehaviour {
-[SerializeField] GridPosition gridPosition;
-[SerializeField] bool snapToGridOnStart = true;
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Ticks\GridPositionManager.cs
 
-[SerializeField] Vector3 visualOffset = Vector3.zero;
-[SerializeField] float visualInterpolationSpeed = 5f;
-[SerializeField] AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+﻿// Assets/Scripts/Ticks/GridPositionManager.cs
 
-GridPosition previousGridPosition;
-Vector3 visualStartPosition;
-Vector3 visualTargetPosition;
-float movementProgress = 1f;
-bool isMoving = false;
+namespace WegoSystem {
+pub cls GridPositionManager : MonoBehaviour {
+pub stat GridPositionManager Instance { get; set; }
 
-pub GridPosition Position {
-get => gridPosition;
-set // Keep setter to be controlled by SetPosition method {
-if (gridPosition != value) {
-previousGridPosition = gridPosition;
-gridPosition = value;
-OnGridPositionChanged();
+Grid _tilemapGrid;
+
+Grid TilemapGrid {
+get {
+if (_tilemapGrid == null) {
+SyncWithTileGrid(); // Attempt to sync again if it's null
+}
+ret _tilemapGrid;
+}
+}
+
+[SerializeField] Vector2Int gridBounds = new Vector2Int(100, 100);
+
+[SerializeField] bool showGridGizmos = true;
+[SerializeField] Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
+[SerializeField] int gizmoGridSize = 20;
+[SerializeField] bool debugMode = false;
+
+ro Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
+ro HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
+
+void Awake() {
+if (Instance != null && Instance != this) {
+Destroy(gameObject);
+return;
+}
+Instance = this;
+
+SyncWithTileGrid();
+}
+
+void OnDestroy() {
+if (Instance == this) {
+Instance = null;
+}
+}
+
+pub void SyncWithTileGrid() {
+if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null) {
+this._tilemapGrid = TileInteractionManager.Instance.interactionGrid;
+
+if (debugMode && this._tilemapGrid != null)
+Debug.Log($"[GridPositionManager] Successfully synced with TileInteractionManager's grid: '{this._tilemapGrid.name}'.");
+}
+else if (_tilemapGrid == null) { // Only log the error if we truly don't have a grid.
+Debug.LogError("[GridPositionManager] Could not find TileInteractionManager or its grid to sync with! Grid system may be misaligned.");
+}
+}
+
+pub GridPosition WorldToGrid(Vector3 worldPosition) {
+if (TilemapGrid == null) ret GridPosition.Zero;
+Vector3Int cellPos = TilemapGrid.WorldToCell(worldPosition);
+ret new GridPosition(cellPos);
+}
+
+pub Vector3 GridToWorld(GridPosition gridPosition) {
+if (TilemapGrid == null) ret Vector3.zero;
+ret TilemapGrid.GetCellCenterWorld(gridPosition.ToVector3Int());
+}
+
+pub Vector3 GetCellCenter(GridPosition gridPosition) {
+ret GridToWorld(gridPosition);
+}
+
+pub bool IsPositionValid(GridPosition position) {
+ret position.x >= -gridBounds.x / 2 && position.x < gridBounds.x / 2 &&
+position.y >= -gridBounds.y / 2 && position.y < gridBounds.y / 2;
+}
+
+pub bool IsPositionOccupied(GridPosition position) {
+ret entitiesByPosition.ContainsKey(position) && entitiesByPosition[position].Count > 0;
+}
+
+pub void RegisterEntity(GridEntity entity) {
+if (entity == null || allEntities.Contains(entity)) return;
+
+allEntities.Add(entity);
+AddEntityToPosition(entity, entity.Position);
+
+entity.OnPositionChanged += OnEntityPositionChanged;
+}
+
+pub void UnregisterEntity(GridEntity entity) {
+if (entity == null || !allEntities.Contains(entity)) return;
+
+allEntities.Remove(entity);
+RemoveEntityFromPosition(entity, entity.Position);
+
+entity.OnPositionChanged -= OnEntityPositionChanged;
+}
+
+void OnEntityPositionChanged(GridPosition oldPosition, GridPosition newPosition) {
+var entity = allEntities.FirstOrDefault(e => e.Position == newPosition && e.PreviousPosition == oldPosition);
+if (entity != null) {
+RemoveEntityFromPosition(entity, oldPosition);
+AddEntityToPosition(entity, newPosition);
+}
+}
+
+void AddEntityToPosition(GridEntity entity, GridPosition position) {
+if (!entitiesByPosition.ContainsKey(position)) {
+entitiesByPosition[position] = new HashSet<GridEntity>();
+}
+entitiesByPosition[position].Add(entity);
+}
+
+void RemoveEntityFromPosition(GridEntity entity, GridPosition position) {
+if (entitiesByPosition.ContainsKey(position)) {
+entitiesByPosition[position].Remove(entity);
+if (entitiesByPosition[position].Count == 0) {
+entitiesByPosition.Remove(position);
 }
 }
 }
 
-pub GridPosition PreviousPosition => previousGridPosition;
-pub bool IsMoving => isMoving;
-pub float MovementProgress => movementProgress;
-
-pub event Action<GridPosition, GridPosition> OnPositionChanged;
-pub event Action<GridPosition> OnMovementComplete;
-pub event Action OnMovementStart;
-
-prot virt void Start() {
-if (snapToGridOnStart) {
-SnapToGrid();
+pub HashSet<GridEntity> GetEntitiesAt(GridPosition position) {
+ret entitiesByPosition.ContainsKey(position)
+? new HashSet<GridEntity>(entitiesByPosition[position])
+: new HashSet<GridEntity>();
 }
 
-visualStartPosition = transform.position;
-visualTargetPosition = transform.position;
-previousGridPosition = gridPosition;
+pub List<GridEntity> GetEntitiesInRadius(GridPosition center, int radius, bool useManhattan = true) {
+var result = new List<GridEntity>();
 
-GridPositionManager.Instance?.RegisterEntity(this);
+for (int x = -radius; x <= radius; x++) {
+for (int y = -radius; y <= radius; y++) {
+var checkPos = new GridPosition(center.x + x, center.y + y);
+
+if (useManhattan) {
+if (checkPos.ManhattanDistance(center) > radius) continue;
+} else {
+if (checkPos.ChebyshevDistance(center) > radius) continue;
 }
 
-prot virt void OnDestroy() {
-GridPositionManager.Instance?.UnregisterEntity(this);
-}
-
-prot virt void Update() {
-if (movementProgress < 1f) {
-movementProgress += Time.deltaTime * visualInterpolationSpeed;
-movementProgress = Mathf.Clamp01(movementProgress);
-
-float curvedProgress = movementCurve.Evaluate(movementProgress);
-transform.position = Vector3.Lerp(visualStartPosition, visualTargetPosition, curvedProgress);
-
-if (movementProgress >= 1f) {
-transform.position = visualTargetPosition;
-isMoving = false;
-OnMovementComplete?.Invoke(gridPosition);
+if (entitiesByPosition.ContainsKey(checkPos)) {
+result.AddRange(entitiesByPosition[checkPos]);
 }
 }
 }
-
-prot virt void OnGridPositionChanged() {
-visualStartPosition = transform.position;
-visualTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition) + visualOffset;
-movementProgress = 0f;
-
-if (!isMoving) {
-isMoving = true;
-OnMovementStart?.Invoke();
+ret result;
 }
 
-OnPositionChanged?.Invoke(previousGridPosition, gridPosition);
+pub GridEntity GetNearestEntity(GridPosition position, System.Func<GridEntity, bool> predicate = null) {
+GridEntity nearest = null;
+float nearestDistance = float.MaxValue;
+
+foreach (var entity in allEntities) {
+if (predicate != null && !predicate(entity)) continue;
+
+float distance = entity.Position.EuclideanDistance(position);
+if (distance < nearestDistance) {
+nearest = entity;
+nearestDistance = distance;
+}
+}
+ret nearest;
 }
 
-pub void SetPosition(GridPosition newPosition, bool instant = false) {
-Position = newPosition;
+pub List<GridPosition> GetPath(GridPosition start, GridPosition end, bool allowDiagonal = false) {
+var path = new List<GridPosition>();
 
-if (instant) {
-transform.position = GridPositionManager.Instance.GridToWorld(Position) + visualOffset;
-visualStartPosition = transform.position;
-visualTargetPosition = transform.position;
-movementProgress = 1f;
-isMoving = false;
+if (!IsPositionValid(start) || !IsPositionValid(end)) {
+ret path;
+}
+
+var openSet = new HashSet<GridPosition>();
+var closedSet = new HashSet<GridPosition>();
+var cameFrom = new Dictionary<GridPosition, GridPosition>();
+var gScore = new Dictionary<GridPosition, float>();
+var fScore = new Dictionary<GridPosition, float>();
+
+openSet.Add(start);
+gScore[start] = 0;
+fScore[start] = HeuristicCost(start, end);
+
+while (openSet.Count > 0) {
+GridPosition current = GetLowestFScore(openSet, fScore);
+
+if (current == end) {
+while (cameFrom.ContainsKey(current)) {
+path.Add(current);
+current = cameFrom[current];
+}
+path.Reverse();
+ret path;
+}
+
+openSet.Remove(current);
+closedSet.Add(current);
+
+foreach (var neighbor in current.GetNeighbors(allowDiagonal)) {
+if (!IsPositionValid(neighbor) || IsPositionOccupied(neighbor) || closedSet.Contains(neighbor)) {
+continue;
+}
+
+float tentativeGScore = gScore[current] + 1;
+
+if (!openSet.Contains(neighbor)) {
+openSet.Add(neighbor);
+} else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor]) {
+continue;
+}
+
+cameFrom[neighbor] = current;
+gScore[neighbor] = tentativeGScore;
+fScore[neighbor] = gScore[neighbor] + HeuristicCost(neighbor, end);
+}
+}
+ret path; // No path found
+}
+
+float HeuristicCost(GridPosition a, GridPosition b) {
+ret a.ManhattanDistance(b);
+}
+
+GridPosition GetLowestFScore(HashSet<GridPosition> openSet, Dictionary<GridPosition, float> fScore) {
+GridPosition lowest = openSet.First();
+float lowestScore = fScore.ContainsKey(lowest) ? fScore[lowest] : float.MaxValue;
+
+foreach (var pos in openSet) {
+float score = fScore.ContainsKey(pos) ? fScore[pos] : float.MaxValue;
+if (score < lowestScore) {
+lowest = pos;
+lowestScore = score;
+}
+}
+ret lowest;
+}
+
+pub bool PathExists(GridPosition start, GridPosition end, bool allowDiagonal = false) {
+var path = GetPath(start, end, allowDiagonal);
+ret path.Count > 0;
+}
+
+pub void SnapEntityToGrid(GameObject entity) {
+if (entity == null) return;
+
+GridEntity gridEntity = entity.GetComponent<GridEntity>();
+if (gridEntity == null) {
+gridEntity = entity.AddComponent<GridEntity>();
+}
+
+gridEntity.SnapToGrid();
+
+if (debugMode) {
+Debug.Log($"[GridPositionManager] Snapped {entity.name} to grid {gridEntity.Position}");
 }
 }
 
-pub void SnapToGrid() {
-if (GridPositionManager.Instance == null) return;
-GridPosition currentGridPos = GridPositionManager.Instance.WorldToGrid(transform.position);
-SetPosition(currentGridPos, true);
+pub void SnapAllEntitiesToGrid<T>() where T : Component {
+T[] entities = FindObjectsByType<T>(FindObjectsSortMode.None);
+foreach (var entity in entities) {
+SnapEntityToGrid(entity.gameObject);
+}
+Debug.Log($"[GridPositionManager] Snapped {entities.Length} entities of type {typeof(T).Name} to grid");
 }
 
-pub void MoveInDirection(GridPosition direction) {
-SetPosition(gridPosition + direction);
+void OnDrawGizmos() {
+if (!showGridGizmos || TilemapGrid == null) return;
+
+Gizmos.color = gridColor;
+
+int halfWidth = gizmoGridSize / 2;
+int halfHeight = gizmoGridSize / 2;
+
+for (int x = -halfWidth; x <= halfWidth; x++) {
+Vector3 start = GridToWorld(new GridPosition(x, -halfHeight));
+Vector3 end = GridToWorld(new GridPosition(x, halfHeight));
+Gizmos.DrawLine(start, end);
 }
 
-pub bool CanMoveTo(GridPosition targetPosition) {
-ret GridPositionManager.Instance?.IsPositionValid(targetPosition) ?? false;
+for (int y = -halfHeight; y <= halfHeight; y++) {
+Vector3 start = GridToWorld(new GridPosition(-halfWidth, y));
+Vector3 end = GridToWorld(new GridPosition(halfWidth, y));
+Gizmos.DrawLine(start, end);
 }
 
-pub void CompleteMovement() {
-if (isMoving) {
-transform.position = visualTargetPosition;
-movementProgress = 1f;
-isMoving = false;
-OnMovementComplete?.Invoke(gridPosition);
+Gizmos.color = Color.red;
+foreach (var kvp in entitiesByPosition) {
+if (kvp.Value.Count > 0) {
+Vector3 cellCenter = GridToWorld(kvp.Key);
+Gizmos.DrawWireCube(cellCenter, Vector3.one * TilemapGrid.cellSize.x * 0.8f);
+}
 }
 }
 }
