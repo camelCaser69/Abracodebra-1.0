@@ -5,6 +5,7 @@ using skner.DualGrid; // Assuming this is the correct namespace for your DualGri
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using WegoSystem;
 #if UNITY_EDITOR
 using UnityEditor; // Correct placement for editor-specific using directive
 #endif
@@ -374,43 +375,48 @@ public class TileInteractionManager : MonoBehaviour
         return foundDef;
     }
 
-    private void HandleTileHover()
-    {
+    void HandleTileHover() {
         if (mainCamera == null || player == null) return;
-
+    
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-        mouseWorldPos.z = 0f; // Ensure Z is 0 for 2D comparison
+        mouseWorldPos.z = 0f;
         Vector3Int cellPos = WorldToCell(mouseWorldPos);
-
-        // Check distance only if player reference exists
-        float distance = (player != null) ? Vector2.Distance(player.position, CellCenterWorld(cellPos)) : float.MaxValue;
-
+    
+        // Get player grid position
+        GridEntity playerGrid = player.GetComponent<GridEntity>();
+        if (playerGrid == null) return;
+    
+        // Convert hover radius to grid tiles
+        int gridRadius = Mathf.CeilToInt(hoverRadius);
+    
+        // Check if cell is within circular radius
+        GridPosition playerGridPos = playerGrid.Position;
+        GridPosition hoveredGridPos = new GridPosition(cellPos.x, cellPos.y);
+    
+        bool withinRadius = GridRadiusUtility.IsWithinCircleRadius(hoveredGridPos, playerGridPos, gridRadius);
+    
         TileDefinition foundTile = FindWhichTileDefinitionAt(cellPos);
-
-        // Only update hover state if within radius
-        if (distance <= hoverRadius)
-        {
-            bool changedCell = !currentlyHoveredCell.HasValue || currentlyHoveredCell.Value != cellPos;
+    
+        if (withinRadius) {
             currentlyHoveredCell = cellPos;
             hoveredTileDef = foundTile;
-
-            if (hoverHighlightObject != null)
-            {
+        
+            if (hoverHighlightObject != null) {
                 hoverHighlightObject.SetActive(true);
                 hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
             }
-            //if (debugLogs && changedCell) Debug.Log($"[Hover Enter] Cell={cellPos}, Tile={foundTile?.displayName ?? "None"}, Dist={distance:F2}");
+        
+            // Show tool use radius visualization
+            if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
+                GridDebugVisualizer.Instance.VisualizeToolUseRadius(playerGridPos, gridRadius, 0.1f);
+            }
         }
-        else
-        {
-            bool changedCell = currentlyHoveredCell.HasValue;
+        else {
             currentlyHoveredCell = null;
             hoveredTileDef = null;
-            if (hoverHighlightObject != null)
-            {
+            if (hoverHighlightObject != null) {
                 hoverHighlightObject.SetActive(false);
             }
-            //if (debugLogs && changedCell) Debug.Log($"[Hover Exit] Cell outside radius ({distance:F2} > {hoverRadius})");
         }
     }
 

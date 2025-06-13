@@ -1,242 +1,250 @@
-﻿using System.Collections;
+﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
-using TMPro;
-using UnityEngine;
-using WegoSystem;
 using System.Linq;
+using TMPro;
+using WegoSystem;
 
-public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer inherits from SpeedModifiable
-    [SerializeField] bool useWegoMovement = true;
-    [SerializeField] public int thinkingTickInterval = 3;
-
-    AnimalDefinition definition;
-    AnimalDiet animalDiet;
-    GridEntity gridEntity;
-
-    public AnimalThoughtLibrary thoughtLibrary;
-    public GameObject thoughtBubblePrefab;
-    public Transform bubbleSpawnTransform;
-    public Transform poopSpawnPoint;
-    public List<GameObject> poopPrefabs;
-    public Animator animator;
-
+public class AnimalController : MonoBehaviour, ITickUpdateable {
+    [Header("References")]
+    [SerializeField] public AnimalDefinition definition;
+    [SerializeField] GameObject thoughtBubblePrefab;
+    [SerializeField] Transform bubbleSpawnTransform;
+    [SerializeField] Transform poopSpawnPoint;
+    [SerializeField] List<GameObject> poopPrefabs;
+    [SerializeField] Animator animator;
+    
+    [Header("UI")]
     [SerializeField] TextMeshProUGUI hpText;
     [SerializeField] TextMeshProUGUI hungerText;
     [SerializeField] KeyCode showStatsKey = KeyCode.LeftAlt;
-
+    
+    // Core Components
+    AnimalDiet animalDiet;
+    GridEntity gridEntity;
+    AnimalThoughtLibrary thoughtLibrary;
+    
+    public int thinkingTickInterval = 3;  // Add this field
+    
+    // Grid Movement
     GridPosition targetPosition;
     GameObject currentTargetFood = null;
     bool hasPlannedAction = false;
     int lastThinkTick = 0;
-
-    int hungerTick = 0;
-    int poopTick = 0;
-    int thoughtCooldownTick = 0;
-    
-    // Add grid pathfinding support
     List<GridPosition> currentPath = new List<GridPosition>();
     int currentPathIndex = 0;
-
-    public float searchRadius = 5f;
-    public float eatDistance = 0.5f;
-    public float eatDuration = 1.5f;
-    public float wanderPauseChance = 0.3f;
-    public float wanderMinMoveDuration = 1f;
-    public float wanderMaxMoveDuration = 3f;
-    public float wanderMinPauseDuration = 0.5f;
-    public float wanderMaxPauseDuration = 2f;
-    public float minPoopDelay = 5f;
-    public float maxPoopDelay = 10f;
-    public float poopDuration = 1f;
-    public float poopColorVariation = 0.1f;
-    public float thoughtCooldownTime = 5f;
-    public float foodReassessmentInterval = 0.5f;
-    public float starvationDamageRate = 2f;
-    public float damageFlashDuration = 0.2f;
-    public float deathFadeDuration = 1.5f;
-    public Color damageFlashColor = Color.red;
-
-    [SerializeField] List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
-    [SerializeField] List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
-
+    
+    // Tick Counters
+    int hungerTick = 0;
+    int poopDelayTick = 0;
+    int currentPoopCooldownTick = 0;
+    int thoughtCooldownTick = 0;
+    int eatRemainingTicks = 0;
+    int starvationTick = 0;
+    int deathFadeRemainingTicks = 0;
+    int flashRemainingTicks = 0;
+    int wanderPauseTicks = 0;
+    
+    // State
     float currentHealth;
     float currentHunger;
-    Vector2 moveDirection = Vector2.zero;
     bool isEating = false;
-    float eatTimer = 0f;
-    bool isWanderPaused = false;
-    float wanderStateTimer = 0f;
     bool isPooping = false;
-    float poopTimer = 0f;
-    float poopDelayTimer = 0f;
     bool hasPooped = true;
-    float thoughtCooldownTimer = 0f;
+    bool isDying = false;
+    bool isWanderPaused = false;
+    bool isFlashing = false;
+    
+    // Spawn Behavior
     bool isSeekingScreenCenter = false;
     Vector2 screenCenterTarget;
-    float foodReassessmentTimer = 0f;
-
-    bool isDying = false;
-    Color originalColor;
-    bool isFlashing = false;
-
+    Vector2 minBounds;
+    Vector2 maxBounds;
+    
+    // Cached References
     Rigidbody2D rb;
     SpriteRenderer spriteRenderer;
     Collider2D animalCollider;
-
-    Vector2 minBounds;
-    Vector2 maxBounds;
-
+    Color originalColor;
+    
     public float CurrentHealth => currentHealth;
     public string SpeciesName => definition ? definition.animalName : "Uninitialized";
-
-    public void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false) {
-        definition = def;
-        if (definition == null) { Destroy(gameObject); return; }
-
-        animalDiet = def.diet;
-        if (animalDiet == null) { enabled = false; return; }
-
-        rb = GetComponent<Rigidbody2D>();
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        animalCollider = GetComponent<Collider2D>();
-        gridEntity = GetComponent<GridEntity>();
-
-        if (animalCollider == null) {
-            Debug.LogError($"[{gameObject.name}] Missing Collider2D!", gameObject);
-            enabled = false;
-            return;
-        }
-
-        if (useWegoMovement && gridEntity == null) {
-            gridEntity = gameObject.AddComponent<GridEntity>();
-        }
-
-        if (spriteRenderer != null) {
-            originalColor = spriteRenderer.color;
-        }
-
-        currentHealth = definition.maxHealth;
-        currentHunger = 0f;
-        hasPooped = true;
-
-        if (TickManager.Instance?.Config != null) {
-            var config = TickManager.Instance.Config;
-            poopTick = Random.Range(
-                config.ConvertSecondsToTicks(minPoopDelay),
-                config.ConvertSecondsToTicks(maxPoopDelay)
-            );
-            thoughtCooldownTick = config.ConvertSecondsToTicks(thoughtCooldownTime);
-        }
-
-        poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
-        foodReassessmentTimer = Random.Range(0f, foodReassessmentInterval);
-
-        minBounds = shiftedMinBounds;
-        maxBounds = shiftedMaxBounds;
-
-        screenCenterTarget = (minBounds + maxBounds) / 2f;
-
-        isSeekingScreenCenter = spawnedOffscreen;
-        if (isSeekingScreenCenter) {
-            if(Debug.isDebugBuild)
-                Debug.Log($"[{gameObject.name} Initialize] Offscreen spawn. Seeking SHIFTED center ({screenCenterTarget}). SHIFTED Bounds: min{minBounds}, max{maxBounds}", gameObject);
-
-            moveDirection = (screenCenterTarget - (Vector2)transform.position).normalized;
-            if (moveDirection == Vector2.zero)
-                moveDirection = Random.insideUnitCircle.normalized;
-        }
-
-        EnsureUITextReferences();
-        SetStatsTextVisibility(false);
-        UpdateHpText();
-        UpdateHungerText();
-
-        if (useWegoMovement && TickManager.Instance != null) {
-            TickManager.Instance.RegisterTickUpdateable(this);
-        }
-    }
     
     void Awake() {
-        animalDiet = definition?.diet;
-        gridEntity = GetComponent<GridEntity>();
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        animalCollider = GetComponent<Collider2D>();
-        
-        gridEntity = GetComponent<GridEntity>();
-        if (gridEntity == null) {
-            gridEntity = gameObject.AddComponent<GridEntity>();
-        }
+        ValidateComponents();
+        CacheComponents();
     }
     
     void Start() {
-        // CRITICAL: Force grid snapping on start
         if (GridPositionManager.Instance != null) {
             GridPositionManager.Instance.SnapEntityToGrid(gameObject);
             Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridEntity.Position}");
         }
         
-        // ... rest of Start logic ...
+        if (TickManager.Instance != null) {
+            TickManager.Instance.RegisterTickUpdateable(this);
+        }
     }
-
+    
     void OnDestroy() {
         if (TickManager.Instance != null) {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
     }
-
+    
+    void ValidateComponents() {
+        if (definition == null) {
+            Debug.LogError($"[{gameObject.name}] Missing AnimalDefinition!", this);
+            enabled = false;
+            return;
+        }
+        
+        animalDiet = definition.diet;
+        if (animalDiet == null) {
+            Debug.LogError($"[{gameObject.name}] AnimalDefinition missing diet!", this);
+            enabled = false;
+            return;
+        }
+    }
+    
+    void CacheComponents() {
+        rb = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        animalCollider = GetComponent<Collider2D>();
+        gridEntity = GetComponent<GridEntity>();
+        
+        if (gridEntity == null) {
+            gridEntity = gameObject.AddComponent<GridEntity>();
+        }
+        
+        if (spriteRenderer != null) {
+            originalColor = spriteRenderer.color;
+        }
+        
+        if (animalCollider == null) {
+            Debug.LogError($"[{gameObject.name}] Missing Collider2D!", this);
+            enabled = false;
+        }
+    }
+    
+    public void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false) {
+        definition = def;
+        if (definition == null) {
+            Destroy(gameObject);
+            return;
+        }
+        
+        ValidateComponents();
+        
+        currentHealth = definition.maxHealth;
+        currentHunger = 0f;
+        hasPooped = true;
+        
+        // Initialize tick counters
+        poopDelayTick = Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
+        thoughtCooldownTick = 0;
+        
+        minBounds = shiftedMinBounds;
+        maxBounds = shiftedMaxBounds;
+        screenCenterTarget = (minBounds + maxBounds) / 2f;
+        
+        isSeekingScreenCenter = spawnedOffscreen;
+        if (isSeekingScreenCenter && gridEntity != null) {
+            GridPosition targetGridPos = GridPositionManager.Instance.WorldToGrid(screenCenterTarget);
+            hasPlannedAction = true;
+            targetPosition = targetGridPos;
+        }
+        
+        EnsureUITextReferences();
+        SetStatsTextVisibility(false);
+        UpdateUI();
+    }
+    
     public void OnTickUpdate(int currentTick) {
-        if (!useWegoMovement || isDying) return;
-
+        if (isDying) return;
+        
+        // Update tick counters
         hungerTick++;
-        if (poopTick > 0) poopTick--;
+        if (poopDelayTick > 0) poopDelayTick--;
         if (thoughtCooldownTick > 0) thoughtCooldownTick--;
-
+        if (currentPoopCooldownTick > 0) currentPoopCooldownTick--;
+        if (eatRemainingTicks > 0) eatRemainingTicks--;
+        if (wanderPauseTicks > 0) wanderPauseTicks--;
+        if (flashRemainingTicks > 0) flashRemainingTicks--;
+        
+        // Process hunger
         if (TickManager.Instance?.Config != null) {
-            var config = TickManager.Instance.Config;
-            if (hungerTick >= config.animalHungerTickInterval) {
+            if (hungerTick >= TickManager.Instance.Config.animalHungerTickInterval) {
                 UpdateHungerTick();
                 hungerTick = 0;
             }
         }
-
-        if (currentTick - lastThinkTick >= thinkingTickInterval) {
+        
+        // Process starvation damage
+        if (currentHunger >= animalDiet.maxHunger) {
+            starvationTick++;
+            if (starvationTick >= definition.starvationDamageTickInterval) {
+                ApplyStarvationDamage();
+                starvationTick = 0;
+            }
+        }
+        
+        // Process eating
+        if (isEating && eatRemainingTicks <= 0) {
+            FinishEating();
+        }
+        
+        // Process pooping
+        if (!hasPooped && poopDelayTick <= 0 && currentPoopCooldownTick <= 0 && !isEating) {
+            TryPoop();
+        }
+        
+        // Make decisions
+        if (currentTick - lastThinkTick >= definition.thinkingTickInterval) {
             MakeDecision();
             lastThinkTick = currentTick;
         }
-
-        if (hasPlannedAction) {
+        
+        // Execute movement
+        if (hasPlannedAction && !isEating && !isPooping && wanderPauseTicks <= 0) {
             ExecutePlannedAction();
         }
-
-        if (!hasPooped && poopTick <= 0 && !isEating) {
-            TryPoop();
+        
+        // Process death fade
+        if (deathFadeRemainingTicks > 0) {
+            deathFadeRemainingTicks--;
+            UpdateDeathFade();
+            if (deathFadeRemainingTicks <= 0) {
+                Destroy(gameObject);
+            }
         }
+        
+        // Update visuals
+        UpdateAnimations();
+        UpdateFlashEffect();
     }
-
+    
     void MakeDecision() {
         if (isSeekingScreenCenter) {
             HandleScreenCenterSeeking();
             return;
         }
-
+        
         if (currentHunger >= animalDiet.hungerThreshold) {
             PlanFoodSeeking();
         } else {
             PlanWandering();
         }
     }
-
+    
     void HandleScreenCenterSeeking() {
         if (gridEntity == null) return;
-
-        Vector2 currentPos = (Vector2)transform.position;
-        bool centerWithinBounds =
-            currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
-            currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
-
+        
+        Vector2 currentPos = transform.position;
+        bool centerWithinBounds = currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
+                                 currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
+        
         if (centerWithinBounds) {
-            if(Debug.isDebugBuild)
-                Debug.Log($"[{gameObject.name}] Center reached! Switching to normal AI.", gameObject);
             isSeekingScreenCenter = false;
             hasPlannedAction = false;
         } else {
@@ -245,16 +253,15 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
             PlanMovementToward(targetGridPos);
         }
     }
-
+    
     void PlanFoodSeeking() {
         if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
-
+        
         GameObject nearestFood = FindNearestFoodInGrid();
         if (nearestFood != null) {
             currentTargetFood = nearestFood;
             GridPosition foodGridPos = GridPositionManager.Instance.WorldToGrid(nearestFood.transform.position);
             
-            // Use pathfinding
             currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGridPos);
             currentPathIndex = 0;
             
@@ -262,51 +269,52 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
                 hasPlannedAction = true;
                 targetPosition = currentPath[0];
             } else {
-                // Direct movement if no path
                 PlanMovementToward(foodGridPos);
             }
         } else {
             PlanWandering();
         }
     }
-
+    
     void PlanWandering() {
         if (gridEntity == null) return;
-
+        
+        // Check for wander pause
+        if (Random.Range(0, 100) < definition.wanderPauseTickChance) {
+            isWanderPaused = true;
+            wanderPauseTicks = Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
+            hasPlannedAction = false;
+            return;
+        }
+        
+        // Normal wander movement
         GridPosition currentPos = gridEntity.Position;
         GridPosition[] directions = {
             GridPosition.Up, GridPosition.Down,
             GridPosition.Left, GridPosition.Right
         };
-
+        
         for (int i = 0; i < 3; i++) {
             GridPosition randomDir = directions[Random.Range(0, directions.Length)];
             GridPosition targetPos = currentPos + randomDir;
-
-            if (GridPositionManager.Instance.IsPositionValid(targetPos) &&
-                !GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
+            
+            if (IsValidMove(targetPos)) {
                 targetPosition = targetPos;
                 hasPlannedAction = true;
+                wanderPauseTicks = Random.Range(definition.minWanderMoveTicks, definition.maxWanderMoveTicks);
                 break;
             }
         }
-
-        if (!hasPlannedAction) {
-            targetPosition = currentPos;
-            hasPlannedAction = true;
-        }
     }
-
+    
     void PlanMovementToward(GridPosition target) {
         if (gridEntity == null) return;
-
-        GridPosition currentPos = gridEntity.Position;
         
-        // Simple pathfinding - try to move in the direction of the target
+        GridPosition currentPos = gridEntity.Position;
         int dx = Mathf.Clamp(target.x - currentPos.x, -1, 1);
         int dy = Mathf.Clamp(target.y - currentPos.y, -1, 1);
         
-        // Try diagonal first if both axes have movement
+        // Try diagonal first
         if (dx != 0 && dy != 0) {
             GridPosition diagonalTarget = currentPos + new GridPosition(dx, dy);
             if (IsValidMove(diagonalTarget)) {
@@ -316,7 +324,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
             }
         }
         
-        // Try horizontal movement
+        // Try horizontal
         if (dx != 0) {
             GridPosition horizontalTarget = currentPos + new GridPosition(dx, 0);
             if (IsValidMove(horizontalTarget)) {
@@ -326,7 +334,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
             }
         }
         
-        // Try vertical movement
+        // Try vertical
         if (dy != 0) {
             GridPosition verticalTarget = currentPos + new GridPosition(0, dy);
             if (IsValidMove(verticalTarget)) {
@@ -336,7 +344,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
             }
         }
         
-        // If all direct paths blocked, try alternative moves
+        // Can't move closer, try wandering
         PlanWandering();
     }
     
@@ -344,26 +352,26 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
         return GridPositionManager.Instance.IsPositionValid(pos) &&
                !GridPositionManager.Instance.IsPositionOccupied(pos);
     }
-
+    
     void ExecutePlannedAction() {
         if (gridEntity == null) return;
-
-        // Check if we should eat
+        
+        // Check if we're at food
         if (currentTargetFood != null && targetPosition == gridEntity.Position) {
-            Vector3 foodWorldPos = currentTargetFood.transform.position;
-            Vector3 myWorldPos = transform.position;
-
-            if (Vector3.Distance(myWorldPos, foodWorldPos) <= 2f) { // Grid-adjusted eat distance
+            GridPosition foodPos = GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position);
+            int distance = gridEntity.Position.ManhattanDistance(foodPos);
+            
+            if (distance <= definition.eatDistanceTiles) {
                 StartEating();
                 return;
             }
         }
-
-        // Execute movement
+        
+        // Move to target
         if (targetPosition != gridEntity.Position) {
             gridEntity.SetPosition(targetPosition);
             
-            // Advance path if following one
+            // Continue path if we have one
             if (currentPath.Count > 0 && currentPathIndex < currentPath.Count - 1) {
                 currentPathIndex++;
                 targetPosition = currentPath[currentPathIndex];
@@ -371,393 +379,110 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
                 return;
             }
         }
-
+        
         hasPlannedAction = false;
     }
-
+    
     GameObject FindNearestFoodInGrid() {
         if (animalDiet == null) return null;
-
-        int gridRadius = Mathf.RoundToInt(searchRadius);
-        List<GridEntity> nearbyEntities = GridPositionManager.Instance.GetEntitiesInRadius(
-            gridEntity.Position, gridRadius, true);
-
+    
+        // Get all tiles within search radius using circle approximation
+        var tilesInRange = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, definition.searchRadiusTiles);
+    
         GameObject bestFood = null;
         float bestScore = -1f;
-
-        foreach (var entity in nearbyEntities) {
-            if (entity == null || entity.gameObject == this.gameObject) continue;
-
-            FoodItem foodItem = entity.GetComponent<FoodItem>();
-            if (foodItem != null && foodItem.foodType != null && animalDiet.CanEat(foodItem.foodType)) {
-                var pref = animalDiet.GetPreference(foodItem.foodType);
-                if (pref == null) continue;
-
-                float distance = entity.Position.ManhattanDistance(gridEntity.Position);
-                float score = pref.preferencePriority / (1f + distance);
-
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestFood = entity.gameObject;
-                }
-            }
+    
+        // Debug visualization
+        if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
+            GridDebugVisualizer.Instance.VisualizeAnimalSearchRadius(this, gridEntity.Position, definition.searchRadiusTiles);
         }
-
-        return bestFood;
-    }
-
-    void UpdateHungerTick() {
-        if (animalDiet == null) return;
-
-        currentHunger += animalDiet.hungerIncreaseRate;
-        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
-
-        if (currentHunger >= animalDiet.maxHunger) {
-            ApplyStarvationDamage();
-        }
-
-        UpdateHungerText();
-    }
-
-    void TryPoop() {
-        if (isEating || isPooping) return;
-
-        isPooping = true;
-        SpawnPoop();
-
-        if (TickManager.Instance?.Config != null) {
-            var config = TickManager.Instance.Config;
-            poopTick = Random.Range(
-                config.ConvertSecondsToTicks(minPoopDelay),
-                config.ConvertSecondsToTicks(maxPoopDelay)
-            );
-        }
-
-        hasPooped = true;
-        isPooping = false;
-
-        if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
-    }
-
-    void StartEating() {
-        isEating = true;
-        eatTimer = eatDuration;
-        if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
-    }
-
-    void Update() {
-        if (!enabled || isDying) return;
-
-        bool showStats = Input.GetKey(showStatsKey);
-        SetStatsTextVisibility(showStats);
-
-        // Only handle visual updates and eating timer
-        if (isEating) {
-            eatTimer -= Time.deltaTime;
-            if (eatTimer <= 0f) {
-                FinishEating();
-            }
-        }
-
-        FlipSpriteBasedOnDirection();
-        UpdateAnimationState();
-    }
-
-
-    void HandleRealtimeUpdate() {
-        if (isSeekingScreenCenter) {
-            Vector2 currentPos = rb.position;
-            bool centerWithinBounds =
-                currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
-                currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
-
-            if (centerWithinBounds) {
-                if(Debug.isDebugBuild)
-                    Debug.Log($"[{gameObject.name} Update] Center reached SHIFTED bounds! Pos: {currentPos}. MinB: {minBounds}, MaxB: {maxBounds}. Switching to normal AI.", gameObject);
-
-                isSeekingScreenCenter = false;
-                moveDirection = Vector2.zero;
-            }
-            else {
-                moveDirection = (screenCenterTarget - currentPos).normalized;
-                if (moveDirection == Vector2.zero)
-                    moveDirection = Random.insideUnitCircle.normalized;
-
-                FlipSpriteBasedOnDirection();
-                UpdateAnimationState();
-                return; // Skip normal AI
-            }
-        }
-
-        UpdateHunger();
-        HandlePooping();
-        UpdateThoughts();
-
-        if (isEating) {
-            HandleEating();
-            moveDirection = Vector2.zero;
-        }
-        else if (isPooping) {
-            moveDirection = Vector2.zero;
-        }
-        else {
-            DecideNextAction();
-        }
-    }
-
-    void FinishEating() {
-        isEating = false;
-
-        if (currentTargetFood == null) return;
-
-        FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>();
-        if (foodItem != null && foodItem.foodType != null) {
-            float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType);
-            currentHunger -= satiationGain;
-            currentHunger = Mathf.Max(0f, currentHunger);
-
-            Destroy(currentTargetFood);
-            hasPooped = false;
-            currentTargetFood = null;
-            UpdateHungerText();
-        }
-        else {
-            currentTargetFood = null;
-        }
-    }
-
-    void UpdateHunger() {
-        currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime;
-        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
-
-        if (currentHunger >= animalDiet.maxHunger) {
-            ApplyStarvationDamage();
-        }
-
-        UpdateHungerText();
-    }
-
-    void HandlePooping() {
-        if (!isEating && !hasPooped) {
-            poopDelayTimer -= Time.deltaTime;
-            if (!isPooping && poopDelayTimer <= 0f) {
-                StartPooping();
-            }
-            if (isPooping) {
-                poopTimer -= Time.deltaTime;
-                if (poopTimer <= 0f) {
-                    FinishPooping();
-                }
-            }
-        }
-    }
-
-    void StartPooping() {
-        isPooping = true;
-        poopTimer = poopDuration;
-        moveDirection = Vector2.zero;
-        if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
-    }
-
-    void FinishPooping() {
-        SpawnPoop();
-        isPooping = false;
-        hasPooped = true;
-    }
-
-    void UpdateThoughts() {
-        if (thoughtCooldownTimer > 0) {
-            thoughtCooldownTimer -= Time.deltaTime;
-        }
-    }
-
-    void DecideNextAction() {
-        if (currentHunger >= animalDiet.hungerThreshold) {
-            SeekFood();
-        }
-        else {
-            Wander();
-            currentTargetFood = null;
-        }
-    }
-
-    void SeekFood() {
-        if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
-
-        foodReassessmentTimer -= Time.deltaTime;
-        bool shouldReassess = foodReassessmentTimer <= 0f;
-        bool targetValid = currentTargetFood != null && currentTargetFood.activeInHierarchy &&
-            currentTargetFood.GetComponent<FoodItem>() != null;
-
-        if (shouldReassess || !targetValid) {
-            GameObject potentialBetterFood = FindNearestFood();
-
-            if (potentialBetterFood != null) {
-                if (!targetValid) {
-                    currentTargetFood = potentialBetterFood;
-                    if(Debug.isDebugBuild)
-                        Debug.Log($"[{gameObject.name} SeekFood] Found new food target (no previous): {potentialBetterFood.name}");
-                }
-                else if (potentialBetterFood != currentTargetFood) {
-                    FoodItem currentFoodItem = currentTargetFood.GetComponent<FoodItem>();
-                    FoodItem newFoodItem = potentialBetterFood.GetComponent<FoodItem>();
-
-                    if (currentFoodItem != null && newFoodItem != null) {
-                        float currentPriority = animalDiet.GetPreference(currentFoodItem.foodType)?.preferencePriority ?? 0f;
-                        float newPriority = animalDiet.GetPreference(newFoodItem.foodType)?.preferencePriority ?? 0f;
-
-                        if (newPriority > currentPriority) {
-                            if(Debug.isDebugBuild)
-                                Debug.Log($"[{gameObject.name} SeekFood] Switching to higher priority food: {newFoodItem.foodType.foodName} (priority: {newPriority}) from {currentFoodItem.foodType.foodName} (priority: {currentPriority})");
-
-                            currentTargetFood = potentialBetterFood;
-                        }
+    
+        foreach (var tilePos in tilesInRange) {
+            // Check all entities at this tile position
+            var entitiesAtTile = GridPositionManager.Instance.GetEntitiesAt(tilePos);
+        
+            foreach (var entity in entitiesAtTile) {
+                if (entity == null || entity.gameObject == this.gameObject) continue;
+            
+                FoodItem foodItem = entity.GetComponent<FoodItem>();
+                if (foodItem != null && foodItem.foodType != null && animalDiet.CanEat(foodItem.foodType)) {
+                    var pref = animalDiet.GetPreference(foodItem.foodType);
+                    if (pref == null) continue;
+                
+                    float distance = entity.Position.ManhattanDistance(gridEntity.Position);
+                    float score = pref.preferencePriority / (1f + distance);
+                
+                    if (score > bestScore) {
+                        bestScore = score;
+                        bestFood = entity.gameObject;
                     }
                 }
             }
-
-            foodReassessmentTimer = foodReassessmentInterval;
         }
-
-        if (currentTargetFood != null) {
-            MoveTowardFood(currentTargetFood);
-        }
-        else {
-            Wander();
-        }
+    
+        return bestFood;
     }
-
-    GameObject FindNearestFood() {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, searchRadius);
-        return animalDiet.FindBestFood(colliders, transform.position);
+    
+    void StartEating() {
+        isEating = true;
+        eatRemainingTicks = definition.eatDurationTicks;
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
     }
-
-    void MoveTowardFood(GameObject foodObj) {
-        if (foodObj == null) return;
-
-        float distance = Vector2.Distance(transform.position, foodObj.transform.position);
-        if (distance <= eatDistance) {
-            StartEating();
-        }
-        else {
-            moveDirection = (foodObj.transform.position - transform.position).normalized;
-            isWanderPaused = false;
-            wanderStateTimer = 0f;
-        }
-    }
-
-    void HandleEating() {
-        eatTimer -= Time.deltaTime;
-        if (eatTimer <= 0f) {
-            isEating = false;
-            FinishEatingAction();
-        }
-    }
-
-    void FinishEatingAction() {
+    
+    void FinishEating() {
+        isEating = false;
+        
         if (currentTargetFood == null) return;
-
+        
         FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>();
         if (foodItem != null && foodItem.foodType != null) {
             float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType);
             currentHunger -= satiationGain;
             currentHunger = Mathf.Max(0f, currentHunger);
+            
             Destroy(currentTargetFood);
             hasPooped = false;
-            poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
+            poopDelayTick = Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
             currentTargetFood = null;
-            UpdateHungerText();
-        }
-        else {
-            currentTargetFood = null;
-        }
-    }
-
-    void Wander() {
-        if (wanderStateTimer <= 0f) {
-            if (isWanderPaused) {
-                isWanderPaused = false;
-                moveDirection = Random.insideUnitCircle.normalized;
-                wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
-            }
-            else {
-                if (Random.value < wanderPauseChance) {
-                    isWanderPaused = true;
-                    moveDirection = Vector2.zero;
-                    wanderStateTimer = Random.Range(wanderMinPauseDuration, wanderMaxPauseDuration);
-                }
-                else {
-                    moveDirection = Random.insideUnitCircle.normalized;
-                    wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
-                }
-            }
-        }
-        else {
-            wanderStateTimer -= Time.deltaTime;
+            UpdateUI();
         }
     }
     
-    void ApplyStarvationDamage() {
-        float damage = starvationDamageRate * Time.deltaTime;
-        currentHealth -= damage;
-        currentHealth = Mathf.Max(0f, currentHealth);
-
-        if (!isFlashing) {
-            StartCoroutine(FlashDamage());
-        }
-
-        UpdateHpText();
-
-        if (currentHealth <= 0f) {
-            Die(CauseOfDeath.Starvation);
-        }
+    void UpdateHungerTick() {
+        if (animalDiet == null) return;
+        
+        currentHunger += animalDiet.hungerIncreaseRate;
+        currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
+        UpdateUI();
     }
-
-    IEnumerator FlashDamage() {
-        if (spriteRenderer == null) yield break;
-
-        isFlashing = true;
-        spriteRenderer.color = damageFlashColor;
-        yield return new WaitForSeconds(damageFlashDuration);
-        spriteRenderer.color = originalColor;
-        isFlashing = false;
+    
+    void TryPoop() {
+        if (isEating || isPooping) return;
+        
+        isPooping = true;
+        currentPoopCooldownTick = definition.poopCooldownTicks;
+        SpawnPoop();
+        hasPooped = true;
+        isPooping = false;
+        
+        if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
     }
-
-    IEnumerator FadeOutAndDestroy() {
-        if (spriteRenderer == null) {
-            Destroy(gameObject);
-            yield break;
-        }
-
-        isDying = true;
-        float elapsedTime = 0f;
-        Color startColor = spriteRenderer.color;
-
-        while (elapsedTime < deathFadeDuration) {
-            elapsedTime += Time.deltaTime;
-            float alpha = Mathf.Lerp(startColor.a, 0f, elapsedTime / deathFadeDuration);
-            spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
-            yield return null;
-        }
-
-        Destroy(gameObject);
-    }
-
+    
     void SpawnPoop() {
         if (poopPrefabs == null || poopPrefabs.Count == 0) return;
-
+        
         int index = Random.Range(0, poopPrefabs.Count);
         GameObject prefab = poopPrefabs[index];
         if (prefab == null) return;
-
+        
         Transform spawnT = poopSpawnPoint ? poopSpawnPoint : transform;
         GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity);
-
+        
         SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
         if (sr != null) {
             sr.flipX = Random.value > 0.5f;
             Color c = sr.color;
-            float v = poopColorVariation;
+            float v = definition.poopColorVariation;
             sr.color = new Color(
                 Mathf.Clamp01(c.r + Random.Range(-v, v)),
                 Mathf.Clamp01(c.g + Random.Range(-v, v)),
@@ -765,12 +490,89 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
                 c.a
             );
         }
-
+        
         PoopController pc = poopObj.GetComponent<PoopController>() ?? poopObj.AddComponent<PoopController>();
         pc.Initialize();
     }
-
-    void FlipSpriteBasedOnDirection() {
+    
+    void ApplyStarvationDamage() {
+        currentHealth -= definition.damagePerStarvationTick;
+        currentHealth = Mathf.Max(0f, currentHealth);
+        
+        if (!isFlashing) {
+            flashRemainingTicks = definition.damageFlashTicks;
+            isFlashing = true;
+        }
+        
+        UpdateUI();
+        
+        if (currentHealth <= 0f) {
+            Die(CauseOfDeath.Starvation);
+        }
+    }
+    
+    void UpdateFlashEffect() {
+        if (flashRemainingTicks > 0 && spriteRenderer != null) {
+            spriteRenderer.color = definition.damageFlashColor;
+        } else if (isFlashing && spriteRenderer != null) {
+            spriteRenderer.color = originalColor;
+            isFlashing = false;
+        }
+    }
+    
+    public enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
+    
+    void Die(CauseOfDeath cause) {
+        Debug.Log($"[{SpeciesName}] died: {cause}", gameObject);
+        isDying = true;
+        deathFadeRemainingTicks = definition.deathFadeTicks;
+    }
+    
+    void UpdateDeathFade() {
+        if (spriteRenderer != null && definition.deathFadeTicks > 0) {
+            float alpha = (float)deathFadeRemainingTicks / definition.deathFadeTicks;
+            Color c = spriteRenderer.color;
+            c.a = alpha;
+            spriteRenderer.color = c;
+        }
+    }
+    
+    bool CanShowThought() {
+        return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTick <= 0;
+    }
+    
+    void ShowThought(ThoughtTrigger trigger) {
+        if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return;
+        
+        var entry = thoughtLibrary.allThoughts.FirstOrDefault(t =>
+            t != null && t.speciesName == SpeciesName && t.trigger == trigger
+        );
+        
+        if (entry != null && entry.lines != null && entry.lines.Count > 0) {
+            string line = entry.lines[Random.Range(0, entry.lines.Count)];
+            Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
+            GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT);
+            
+            ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>();
+            if (bubble) {
+                bubble.Initialize(line, spawnT, 2f);
+                thoughtCooldownTick = definition.thoughtCooldownTicks;
+            } else {
+                Destroy(bubbleGO);
+            }
+        }
+    }
+    
+    void Update() {
+        if (!enabled || isDying) return;
+        
+        bool showStats = Input.GetKey(showStatsKey);
+        SetStatsTextVisibility(showStats);
+        
+        UpdateSpriteFlipping();
+    }
+    
+    void UpdateSpriteFlipping() {
         if (spriteRenderer != null && gridEntity != null && gridEntity.IsMoving) {
             Vector3 currentPos = transform.position;
             Vector3 targetPos = GridPositionManager.Instance.GridToWorld(targetPosition);
@@ -781,71 +583,29 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
             }
         }
     }
-
-    void UpdateAnimationState() {
+    
+    void UpdateAnimations() {
         if (animator == null) return;
         bool isMoving = gridEntity != null && gridEntity.IsMoving && !isEating && !isPooping;
         animator.SetBool("IsMoving", isMoving);
         animator.SetBool("IsEating", isEating);
     }
-
-    bool CanShowThought() {
-        if (useWegoMovement) {
-            return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTick <= 0;
-        } else {
-            return thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f;
-        }
+    
+    void UpdateUI() {
+        UpdateHpText();
+        UpdateHungerText();
     }
-
-    void ShowThought(ThoughtTrigger trigger) {
-        if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return;
-
-        var entry = thoughtLibrary.allThoughts.FirstOrDefault(t =>
-            t != null && t.speciesName == SpeciesName && t.trigger == trigger
-        );
-
-        if (entry != null && entry.lines != null && entry.lines.Count > 0) {
-            string line = entry.lines[Random.Range(0, entry.lines.Count)];
-            Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
-            GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT);
-            bubbleGO.transform.localPosition = Vector3.zero;
-
-            ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>();
-            if (bubble) {
-                bubble.Initialize(line, spawnT, 2f);
-                if (useWegoMovement) {
-                    thoughtCooldownTick = TickManager.Instance?.Config?.ConvertSecondsToTicks(thoughtCooldownTime) ?? thoughtCooldownTick;
-                } else {
-                    thoughtCooldownTimer = thoughtCooldownTime;
-                }
-            }
-            else {
-                Destroy(bubbleGO);
-            }
-        }
-    }
-
-    public enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
-
-    void Die(CauseOfDeath cause) {
-        Debug.Log($"[{SpeciesName} died: {cause}]", gameObject);
-        StartCoroutine(FadeOutAndDestroy());
-    }
-
-    public bool SpeciesNameEquals(string other) {
-        return definition != null && definition.animalName == other;
-    }
-
+    
     void UpdateHpText() {
         if (hpText == null || definition == null) return;
         hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)}/{Mathf.FloorToInt(definition.maxHealth)}";
     }
-
+    
     void UpdateHungerText() {
         if (hungerText == null || animalDiet == null) return;
         hungerText.text = $"Hunger: {Mathf.FloorToInt(currentHunger)}/{Mathf.FloorToInt(animalDiet.maxHunger)}";
     }
-
+    
     void EnsureUITextReferences() {
         if (hpText == null) {
             hpText = GetComponentInChildren<TextMeshProUGUI>(true);
@@ -854,7 +614,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
                 hpText = null;
             }
         }
-
+        
         if (hungerText == null) {
             TextMeshProUGUI[] allTexts = GetComponentsInChildren<TextMeshProUGUI>(true);
             foreach (var text in allTexts) {
@@ -865,31 +625,12 @@ public class AnimalController : MonoBehaviour, ITickUpdateable {  // No longer i
             }
         }
     }
-
+    
     void SetStatsTextVisibility(bool visible) {
-        if (hpText != null) {
-            hpText.gameObject.SetActive(visible);
-        }
-
-        if (hungerText != null) {
-            hungerText.gameObject.SetActive(visible);
-        }
+        if (hpText != null) hpText.gameObject.SetActive(visible);
+        if (hungerText != null) hungerText.gameObject.SetActive(visible);
     }
-
-    public void SetWegoMovement(bool enabled) {
-        useWegoMovement = enabled;
-
-        if (enabled && gridEntity == null) {
-            gridEntity = gameObject.AddComponent<GridEntity>();
-        }
-
-        if (enabled && TickManager.Instance != null) {
-            TickManager.Instance.RegisterTickUpdateable(this);
-        } else if (!enabled && TickManager.Instance != null) {
-            TickManager.Instance.UnregisterTickUpdateable(this);
-        }
-    }
-
+    
     public GridPosition GetCurrentGridPosition() {
         return gridEntity?.Position ?? GridPosition.Zero;
     }

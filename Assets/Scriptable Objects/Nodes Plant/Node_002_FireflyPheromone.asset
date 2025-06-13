@@ -19,8 +19,8 @@ MonoBehaviour:
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   effects:
-  - effectType: 15
+  - effectType: 16
     primaryValue: 1
     secondaryValue: 1
-    isPassive: 0
+    isPassive: 1
     scentDefinitionReference: {fileID: 11400000, guid: caaf706f86468d545951ef96005f0761, type: 2}

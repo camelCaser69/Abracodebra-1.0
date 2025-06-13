@@ -2,22 +2,43 @@
 using UnityEngine;
 
 [Serializable]
-public class NodeEffectData
-{
+public class NodeEffectData {
     public NodeEffectType effectType;
-
-    [Tooltip("Primary numeric value for the effect (e.g., Amount, Duration, Radius Bonus).")] // Updated tooltip
+    
+    [Tooltip("Primary value - meaning depends on effect type")]
     public float primaryValue;
-    [Tooltip("Secondary numeric value for the effect (e.g., Speed, Intensity, Strength Bonus).")] // Updated tooltip
+    
+    [Tooltip("Secondary value - meaning depends on effect type")]
     public float secondaryValue;
-
-    [Tooltip("If TRUE, effect runs once during growth. If FALSE, effect executes during mature cycles.")]
+    
     public bool isPassive = false;
-
-    // --- Scent Specific ---
-    // [Tooltip("Identifier (scentID from ScentDefinition) of the scent to apply. Used only if effectType is ScentModifier.")]
-    // public string scentIdentifier; // <<< REMOVED
-
-    [Tooltip("The Scent Definition to apply/modify. Used only if effectType is ScentModifier.")]
-    public ScentDefinition scentDefinitionReference; // <<< ADDED: Direct reference
+    
+    [Tooltip("For ScentModifier effects only")]
+    public ScentDefinition scentDefinitionReference;
+    
+    // Helper methods for clarity
+    public int GetPrimaryValueAsInt() => Mathf.RoundToInt(primaryValue);
+    public int GetSecondaryValueAsInt() => Mathf.RoundToInt(secondaryValue);
+    
+    // Validation
+    public void ValidateForTicks() {
+        switch (effectType) {
+            case NodeEffectType.GrowthSpeed:
+            case NodeEffectType.Cooldown:
+            case NodeEffectType.CastDelay:
+                // These should be integers
+                primaryValue = Mathf.Max(1, Mathf.RoundToInt(primaryValue));
+                break;
+                
+            case NodeEffectType.PoopAbsorption:
+                // Radius in tiles (integer)
+                primaryValue = Mathf.Max(0, Mathf.RoundToInt(primaryValue));
+                break;
+                
+            case NodeEffectType.EnergyPerTick:
+                // Can be fractional
+                primaryValue = Mathf.Max(0f, primaryValue);
+                break;
+        }
+    }
 }

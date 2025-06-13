@@ -183,32 +183,39 @@ namespace WegoSystem
                 : new HashSet<GridEntity>();
         }
 
-        public List<GridEntity> GetEntitiesInRadius(GridPosition center, int radius, bool useManhattan = true)
-        {
+        // Add these methods to GridPositionManager class:
+
+        public List<GridEntity> GetEntitiesInRadius(GridPosition center, int radius, bool useCircle = true) {
             var result = new List<GridEntity>();
-
-            for (int x = -radius; x <= radius; x++)
-            {
-                for (int y = -radius; y <= radius; y++)
-                {
-                    var checkPos = new GridPosition(center.x + x, center.y + y);
-
-                    if (useManhattan)
-                    {
-                        if (checkPos.ManhattanDistance(center) > radius) continue;
+    
+            if (useCircle) {
+                var tilesInRadius = GridRadiusUtility.GetTilesInCircle(center, radius);
+                foreach (var pos in tilesInRadius) {
+                    if (entitiesByPosition.ContainsKey(pos)) {
+                        result.AddRange(entitiesByPosition[pos]);
                     }
-                    else
-                    {
-                        if (checkPos.ChebyshevDistance(center) > radius) continue;
-                    }
-
-                    if (entitiesByPosition.ContainsKey(checkPos))
-                    {
-                        result.AddRange(entitiesByPosition[checkPos]);
+                }
+            } else {
+                // Fallback to Manhattan distance if needed
+                for (int x = -radius; x <= radius; x++) {
+                    for (int y = -radius; y <= radius; y++) {
+                        var checkPos = new GridPosition(center.x + x, center.y + y);
+                        if (checkPos.ManhattanDistance(center) <= radius && entitiesByPosition.ContainsKey(checkPos)) {
+                            result.AddRange(entitiesByPosition[checkPos]);
+                        }
                     }
                 }
             }
+    
             return result;
+        }
+
+        public bool IsPositionWithinRadius(GridPosition position, GridPosition center, int radius, bool useCircle = true) {
+            if (useCircle) {
+                return GridRadiusUtility.IsWithinCircleRadius(position, center, radius);
+            } else {
+                return position.ManhattanDistance(center) <= radius;
+            }
         }
 
         public GridEntity GetNearestEntity(GridPosition position, System.Func<GridEntity, bool> predicate = null)
@@ -228,6 +235,10 @@ namespace WegoSystem
                 }
             }
             return nearest;
+        }
+        
+        public Grid GetTilemapGrid() {
+            return TilemapGrid;
         }
 
         public List<GridPosition> GetPath(GridPosition start, GridPosition end, bool allowDiagonal = false)
@@ -341,12 +352,33 @@ namespace WegoSystem
 
         public void SnapAllEntitiesToGrid<T>() where T : Component
         {
-            T[] entities = FindObjectsByType<T>(FindObjectsSortMode.None);
+            T[] entities = FindObjectsOfType<T>();
             foreach (var entity in entities)
             {
                 SnapEntityToGrid(entity.gameObject);
             }
             Debug.Log($"[GridPositionManager] Snapped {entities.Length} entities of type {typeof(T).Name} to grid");
+        }
+        
+        public static List<GridPosition> GetTilesInRadius(GridPosition center, int radius, bool useManhattan = true) {
+            var result = new List<GridPosition>();
+    
+            for (int x = -radius; x <= radius; x++) {
+                for (int y = -radius; y <= radius; y++) {
+                    var offset = new GridPosition(x, y);
+                    var checkPos = center + offset;
+            
+                    int distance = useManhattan 
+                        ? Mathf.Abs(x) + Mathf.Abs(y) 
+                        : Mathf.Max(Mathf.Abs(x), Mathf.Abs(y));
+            
+                    if (distance <= radius) {
+                        result.Add(checkPos);
+                    }
+                }
+            }
+    
+            return result;
         }
 
         private void OnDrawGizmos()

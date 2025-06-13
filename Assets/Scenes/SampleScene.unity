@@ -11275,20 +11275,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weatherManager: {fileID: 1966203507}
   fireflyPrefab: {fileID: 4042090984494424328, guid: 88309470b9e69f94c9faea1346030ab1, type: 3}
+  defaultFireflyDefinition: {fileID: 11400000, guid: 1cc89b90f50ee864d861d27e677a0e04, type: 2}
   fireflyParent: {fileID: 1613962853}
   maxFireflies: 14
-  spawnInterval: 0.5
+  spawnIntervalTicks: 3
   nightThreshold: 0.25
   spawnCenter: {x: 0, y: 0}
   spawnAreaSize: {x: 20, y: 10}
-  movementMinBounds: {x: -8.5, y: -4.5}
-  movementMaxBounds: {x: 8.5, y: 4.5}
   photosynthesisRadius: 2
   photosynthesisIntensityPerFly: 0.2
   maxPhotosynthesisBonus: 0.5
   showAttractionLinesRuntime: 1
   attractionLineColorRuntime: {r: 1, g: 0, b: 1, a: 1}
-  logGizmoCalls: 0
   lineVisualizerPrefab: {fileID: 4489783331620860270, guid: 90a334b6403ffa946a0f007b37a0456d, type: 3}
   lineContainer: {fileID: 813162424}
 --- !u!1 &988154461

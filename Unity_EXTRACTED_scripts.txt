@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 504,074 → 339,957 chars (32.6% reduction)
-Estimated tokens saved: ~41,029
+Compression Stats: 511,888 → 346,817 chars (32.2% reduction)
+Estimated tokens saved: ~41,267
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -24,95 +24,101 @@ using System;
   RunManager (Assets\Scripts\Core/) L70
   SortableEntity (Assets\Scripts\Core/) L213
   UIManager (Assets\Scripts\Core/) L280
-  WeatherManager (Assets\Scripts\Core/) L649
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L874
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1756
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1773
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1782
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1795
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1812
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2056
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2255
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2323
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2338
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2357
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2393
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2529
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2593
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2610
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2623
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2652
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2860
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3090
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3371
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3400
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3430
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3443
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3471
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3532
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3577
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3628
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3662
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3732
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3752
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3787
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3802
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3887
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4019
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4042
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4060
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4087
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4096
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4264
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4303
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4327
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4529
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4593
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4815
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5168
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5352
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5496
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5794
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5861
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6157
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6276
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6480
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6614
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6934
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7070
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7363
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7451
-  GridSnapStartup (Assets\Scripts\Ticks/) L7552
-  TurnPhaseManager (Assets\Scripts\Ticks/) L7618
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7734
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7803
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8034
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8045
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8074
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8170
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8275
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8670
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8706
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L8896
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9038
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9156
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9300
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9505
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9545
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9565
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9577
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9612
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9771
+  WeatherManager (Assets\Scripts\Core/) L647
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L872
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1480
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1522
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1531
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1544
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1561
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1876
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1905
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2166
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2234
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2249
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2268
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2326
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2462
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2526
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2543
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2556
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2585
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2793
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L3023
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3304
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3333
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3363
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3376
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3404
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3465
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3510
+  NodeDefinitionMigrationTool (Assets\Scripts\Editor/) L3561
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3686
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3720
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3790
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3851
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3871
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3906
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3921
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4006
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4173
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4196
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4234
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4270
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4279
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4447
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4486
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4510
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4712
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4792
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5014
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5260
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5496
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5640
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5938
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6005
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6301
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6420
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6624
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6758
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7078
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7214
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7507
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7595
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L7696
+  GridSnapStartup (Assets\Scripts\Ticks/) L7797
+  TickDebugMonitor (Assets\Scripts\Ticks/) L7863
+  TurnPhaseManager (Assets\Scripts\Ticks/) L8034
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8150
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8219
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8450
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8461
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8490
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8586
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8691
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9086
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9122
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9312
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9454
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9572
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9716
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9921
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9961
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9981
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9993
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10028
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10187
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L9781
-  GridPosition (Assets\Scripts\Ticks/) L9932
-  GridPositionManager (Assets\Scripts\Ticks/) L10033
-  TickConfiguration (Assets\Scripts\Ticks/) L10349
-  ITickUpdateable (Assets\Scripts\Ticks/) L10481
+  GridEntity (Assets\Scripts\Ticks/) L10197
+  GridPosition (Assets\Scripts\Ticks/) L10348
+  GridPositionManager (Assets\Scripts\Ticks/) L10449
+  GridRadiusUtility (Assets\Scripts\Ticks/) L10800
+  TickConfiguration (Assets\Scripts\Ticks/) L10944
+  ITickUpdateable (Assets\Scripts\Ticks/) L11050
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10643
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11212
 
 ================================================================================
 SCRIPTS
@@ -373,7 +379,6 @@ useParentYCoordinate = value;
 // Assets\Scripts\Core\UIManager.cs
 
 ﻿// Assets\Scripts\Core\UIManager.cs
-
 using TMPro;
 using WegoSystem;
 
@@ -444,6 +449,29 @@ TurnPhaseManager.Instance.OnPhaseChanged -= HandleWegoPhaseChanged;
 
 if (TickManager.Instance != null) {
 TickManager.Instance.OnTickAdvanced -= HandleTickAdvanced;
+}
+}
+
+void Update() {
+if (!isWegoMode) return;
+
+if (Input.GetKeyDown(KeyCode.Space)) {
+if (TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
+OnEndPlanningPhaseClicked();
+}
+else {
+Debug.Log("[UIManager] Time only advances through player actions!");
+}
+}
+
+if (Input.GetKeyDown(KeyCode.R)) {
+if (Application.isEditor || Debug.isDebugBuild) {
+TurnPhaseManager.Instance?.ForcePhase(TurnPhase.Planning);
+}
+}
+
+if (Time.frameCount % 10 == 0) // Update every 10 frames to reduce overhead {
+UpdateWegoUI();
 }
 }
 
@@ -531,6 +559,10 @@ endPlanningPhaseButton.interactable = TurnPhaseManager.Instance.IsInPlanningPhas
 if (advanceTickButton != null && TurnPhaseManager.Instance != null) {
 advanceTickButton.interactable = !TurnPhaseManager.Instance.IsInPlanningPhase;
 }
+}
+
+pub void SetWegoMovement(bool enabled) {
+Debug.Log($"[UIManager] SetWegoMovement called with: {enabled}. This method is now obsolete.");
 }
 
 void UpdateWegoUI() {
@@ -630,37 +662,9 @@ plant.SetWegoSystem(enabled);
 }
 }
 
-var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-foreach (var animal in animals) {
-animal.SetWegoMovement(enabled);
-}
-
 UpdateWegoUI();
 
 Debug.Log($"[UIManager] Switched to {(enabled ? "Wego" : "Real-Time")} mode");
-}
-
-void Update() {
-if (!isWegoMode) return;
-
-if (Input.GetKeyDown(KeyCode.Space)) {
-if (TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
-OnEndPlanningPhaseClicked();
-}
-else {
-Debug.Log("[UIManager] Time only advances through player actions!");
-}
-}
-
-if (Input.GetKeyDown(KeyCode.R)) {
-if (Application.isEditor || Debug.isDebugBuild) {
-TurnPhaseManager.Instance?.ForcePhase(TurnPhase.Planning);
-}
-}
-
-if (Time.frameCount % 10 == 0) { // Update every 10 frames to reduce overhead
-UpdateWegoUI();
-}
 }
 
 pub void SetWegoMode(bool enabled) {
@@ -966,170 +970,70 @@ EnterPhase(phase, true);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Animals\AnimalController.cs
 
-﻿using System.Collections;
+﻿using UnityEngine;
 using TMPro;
 using WegoSystem;
 
-pub cls AnimalController : MonoBehaviour, ITickUpdateable {  // No longer inherits from SpeedModifiable
-[SerializeField] bool useWegoMovement = true;
-[SerializeField] pub int thinkingTickInterval = 3;
-
-AnimalDefinition definition;
-AnimalDiet animalDiet;
-GridEntity gridEntity;
-
-pub AnimalThoughtLibrary thoughtLibrary;
-pub GameObject thoughtBubblePrefab;
-pub Transform bubbleSpawnTransform;
-pub Transform poopSpawnPoint;
-pub List<GameObject> poopPrefabs;
-pub Animator animator;
+pub cls AnimalController : MonoBehaviour, ITickUpdateable {
+[SerializeField] pub AnimalDefinition definition;
+[SerializeField] GameObject thoughtBubblePrefab;
+[SerializeField] Transform bubbleSpawnTransform;
+[SerializeField] Transform poopSpawnPoint;
+[SerializeField] List<GameObject> poopPrefabs;
+[SerializeField] Animator animator;
 
 [SerializeField] TextMeshProUGUI hpText;
 [SerializeField] TextMeshProUGUI hungerText;
 [SerializeField] KeyCode showStatsKey = KeyCode.LeftAlt;
 
+AnimalDiet animalDiet;
+GridEntity gridEntity;
+AnimalThoughtLibrary thoughtLibrary;
+
+pub int thinkingTickInterval = 3;  // Add this field
+
 GridPosition targetPosition;
 GameObject currentTargetFood = null;
 bool hasPlannedAction = false;
 int lastThinkTick = 0;
-
-int hungerTick = 0;
-int poopTick = 0;
-int thoughtCooldownTick = 0;
-
 List<GridPosition> currentPath = new List<GridPosition>();
 int currentPathIndex = 0;
 
-pub float searchRadius = 5f;
-pub float eatDistance = 0.5f;
-pub float eatDuration = 1.5f;
-pub float wanderPauseChance = 0.3f;
-pub float wanderMinMoveDuration = 1f;
-pub float wanderMaxMoveDuration = 3f;
-pub float wanderMinPauseDuration = 0.5f;
-pub float wanderMaxPauseDuration = 2f;
-pub float minPoopDelay = 5f;
-pub float maxPoopDelay = 10f;
-pub float poopDuration = 1f;
-pub float poopColorVariation = 0.1f;
-pub float thoughtCooldownTime = 5f;
-pub float foodReassessmentInterval = 0.5f;
-pub float starvationDamageRate = 2f;
-pub float damageFlashDuration = 0.2f;
-pub float deathFadeDuration = 1.5f;
-pub Color damageFlashColor = Color.red;
-
-[SerializeField] List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
-[SerializeField] List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
+int hungerTick = 0;
+int poopDelayTick = 0;
+int currentPoopCooldownTick = 0;
+int thoughtCooldownTick = 0;
+int eatRemainingTicks = 0;
+int starvationTick = 0;
+int deathFadeRemainingTicks = 0;
+int flashRemainingTicks = 0;
+int wanderPauseTicks = 0;
 
 float currentHealth;
 float currentHunger;
-Vector2 moveDirection = Vector2.zero;
 bool isEating = false;
-float eatTimer = 0f;
-bool isWanderPaused = false;
-float wanderStateTimer = 0f;
 bool isPooping = false;
-float poopTimer = 0f;
-float poopDelayTimer = 0f;
 bool hasPooped = true;
-float thoughtCooldownTimer = 0f;
+bool isDying = false;
+bool isWanderPaused = false;
+bool isFlashing = false;
+
 bool isSeekingScreenCenter = false;
 Vector2 screenCenterTarget;
-float foodReassessmentTimer = 0f;
-
-bool isDying = false;
-Color originalColor;
-bool isFlashing = false;
+Vector2 minBounds;
+Vector2 maxBounds;
 
 Rigidbody2D rb;
 SpriteRenderer spriteRenderer;
 Collider2D animalCollider;
-
-Vector2 minBounds;
-Vector2 maxBounds;
+Color originalColor;
 
 pub float CurrentHealth => currentHealth;
 pub string SpeciesName => definition ? definition.animalName : "Uninitialized";
 
-pub void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false) {
-definition = def;
-if (definition == null) { Destroy(gameObject); return; }
-
-animalDiet = def.diet;
-if (animalDiet == null) { enabled = false; return; }
-
-rb = GetComponent<Rigidbody2D>();
-spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-animalCollider = GetComponent<Collider2D>();
-gridEntity = GetComponent<GridEntity>();
-
-if (animalCollider == null) {
-Debug.LogError($"[{gameObject.name}] Missing Collider2D!", gameObject);
-enabled = false;
-return;
-}
-
-if (useWegoMovement && gridEntity == null) {
-gridEntity = gameObject.AddComponent<GridEntity>();
-}
-
-if (spriteRenderer != null) {
-originalColor = spriteRenderer.color;
-}
-
-currentHealth = definition.maxHealth;
-currentHunger = 0f;
-hasPooped = true;
-
-if (TickManager.Instance?.Config != null) {
-var config = TickManager.Instance.Config;
-poopTick = Random.Range(
-config.ConvertSecondsToTicks(minPoopDelay),
-config.ConvertSecondsToTicks(maxPoopDelay)
-);
-thoughtCooldownTick = config.ConvertSecondsToTicks(thoughtCooldownTime);
-}
-
-poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
-foodReassessmentTimer = Random.Range(0f, foodReassessmentInterval);
-
-minBounds = shiftedMinBounds;
-maxBounds = shiftedMaxBounds;
-
-screenCenterTarget = (minBounds + maxBounds) / 2f;
-
-isSeekingScreenCenter = spawnedOffscreen;
-if (isSeekingScreenCenter) {
-if(Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name} Initialize] Offscreen spawn. Seeking SHIFTED center ({screenCenterTarget}). SHIFTED Bounds: min{minBounds}, max{maxBounds}", gameObject);
-
-moveDirection = (screenCenterTarget - (Vector2)transform.position).normalized;
-if (moveDirection == Vector2.zero)
-moveDirection = Random.insideUnitCircle.normalized;
-}
-
-EnsureUITextReferences();
-SetStatsTextVisibility(false);
-UpdateHpText();
-UpdateHungerText();
-
-if (useWegoMovement && TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-}
-}
-
 void Awake() {
-animalDiet = definition?.diet;
-gridEntity = GetComponent<GridEntity>();
-spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-animalCollider = GetComponent<Collider2D>();
-
-gridEntity = GetComponent<GridEntity>();
-if (gridEntity == null) {
-gridEntity = gameObject.AddComponent<GridEntity>();
-}
+ValidateComponents();
+CacheComponents();
 }
 
 void Start() {
@@ -1138,6 +1042,9 @@ GridPositionManager.Instance.SnapEntityToGrid(gameObject);
 Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridEntity.Position}");
 }
 
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
+}
 }
 
 void OnDestroy() {
@@ -1146,33 +1053,126 @@ TickManager.Instance.UnregisterTickUpdateable(this);
 }
 }
 
+void ValidateComponents() {
+if (definition == null) {
+Debug.LogError($"[{gameObject.name}] Missing AnimalDefinition!", this);
+enabled = false;
+return;
+}
+
+animalDiet = definition.diet;
+if (animalDiet == null) {
+Debug.LogError($"[{gameObject.name}] AnimalDefinition missing diet!", this);
+enabled = false;
+return;
+}
+}
+
+void CacheComponents() {
+rb = GetComponent<Rigidbody2D>();
+spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+animalCollider = GetComponent<Collider2D>();
+gridEntity = GetComponent<GridEntity>();
+
+if (gridEntity == null) {
+gridEntity = gameObject.AddComponent<GridEntity>();
+}
+
+if (spriteRenderer != null) {
+originalColor = spriteRenderer.color;
+}
+
+if (animalCollider == null) {
+Debug.LogError($"[{gameObject.name}] Missing Collider2D!", this);
+enabled = false;
+}
+}
+
+pub void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false) {
+definition = def;
+if (definition == null) {
+Destroy(gameObject);
+return;
+}
+
+ValidateComponents();
+
+currentHealth = definition.maxHealth;
+currentHunger = 0f;
+hasPooped = true;
+
+poopDelayTick = Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
+thoughtCooldownTick = 0;
+
+minBounds = shiftedMinBounds;
+maxBounds = shiftedMaxBounds;
+screenCenterTarget = (minBounds + maxBounds) / 2f;
+
+isSeekingScreenCenter = spawnedOffscreen;
+if (isSeekingScreenCenter && gridEntity != null) {
+GridPosition targetGridPos = GridPositionManager.Instance.WorldToGrid(screenCenterTarget);
+hasPlannedAction = true;
+targetPosition = targetGridPos;
+}
+
+EnsureUITextReferences();
+SetStatsTextVisibility(false);
+UpdateUI();
+}
+
 pub void OnTickUpdate(int currentTick) {
-if (!useWegoMovement || isDying) return;
+if (isDying) return;
 
 hungerTick++;
-if (poopTick > 0) poopTick--;
+if (poopDelayTick > 0) poopDelayTick--;
 if (thoughtCooldownTick > 0) thoughtCooldownTick--;
+if (currentPoopCooldownTick > 0) currentPoopCooldownTick--;
+if (eatRemainingTicks > 0) eatRemainingTicks--;
+if (wanderPauseTicks > 0) wanderPauseTicks--;
+if (flashRemainingTicks > 0) flashRemainingTicks--;
 
 if (TickManager.Instance?.Config != null) {
-var config = TickManager.Instance.Config;
-if (hungerTick >= config.animalHungerTickInterval) {
+if (hungerTick >= TickManager.Instance.Config.animalHungerTickInterval) {
 UpdateHungerTick();
 hungerTick = 0;
 }
 }
 
-if (currentTick - lastThinkTick >= thinkingTickInterval) {
+if (currentHunger >= animalDiet.maxHunger) {
+starvationTick++;
+if (starvationTick >= definition.starvationDamageTickInterval) {
+ApplyStarvationDamage();
+starvationTick = 0;
+}
+}
+
+if (isEating && eatRemainingTicks <= 0) {
+FinishEating();
+}
+
+if (!hasPooped && poopDelayTick <= 0 && currentPoopCooldownTick <= 0 && !isEating) {
+TryPoop();
+}
+
+if (currentTick - lastThinkTick >= definition.thinkingTickInterval) {
 MakeDecision();
 lastThinkTick = currentTick;
 }
 
-if (hasPlannedAction) {
+if (hasPlannedAction && !isEating && !isPooping && wanderPauseTicks <= 0) {
 ExecutePlannedAction();
 }
 
-if (!hasPooped && poopTick <= 0 && !isEating) {
-TryPoop();
+if (deathFadeRemainingTicks > 0) {
+deathFadeRemainingTicks--;
+UpdateDeathFade();
+if (deathFadeRemainingTicks <= 0) {
+Destroy(gameObject);
 }
+}
+
+UpdateAnimations();
+UpdateFlashEffect();
 }
 
 void MakeDecision() {
@@ -1191,14 +1191,11 @@ PlanWandering();
 void HandleScreenCenterSeeking() {
 if (gridEntity == null) return;
 
-Vector2 currentPos = (Vector2)transform.position;
-bool centerWithinBounds =
-currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
+Vector2 currentPos = transform.position;
+bool centerWithinBounds = currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
 currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
 
 if (centerWithinBounds) {
-if(Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name}] Center reached! Switching to normal AI.", gameObject);
 isSeekingScreenCenter = false;
 hasPlannedAction = false;
 } else {
@@ -1233,6 +1230,13 @@ PlanWandering();
 void PlanWandering() {
 if (gridEntity == null) return;
 
+if (Random.Range(0, 100) < definition.wanderPauseTickChance) {
+isWanderPaused = true;
+wanderPauseTicks = Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
+hasPlannedAction = false;
+return;
+}
+
 GridPosition currentPos = gridEntity.Position;
 GridPosition[] directions = {
 GridPosition.Up, GridPosition.Down,
@@ -1243,17 +1247,12 @@ for (int i = 0; i < 3; i++) {
 GridPosition randomDir = directions[Random.Range(0, directions.Length)];
 GridPosition targetPos = currentPos + randomDir;
 
-if (GridPositionManager.Instance.IsPositionValid(targetPos) &&
-!GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
+if (IsValidMove(targetPos)) {
 targetPosition = targetPos;
 hasPlannedAction = true;
+wanderPauseTicks = Random.Range(definition.minWanderMoveTicks, definition.maxWanderMoveTicks);
 break;
 }
-}
-
-if (!hasPlannedAction) {
-targetPosition = currentPos;
-hasPlannedAction = true;
 }
 }
 
@@ -1261,7 +1260,6 @@ void PlanMovementToward(GridPosition target) {
 if (gridEntity == null) return;
 
 GridPosition currentPos = gridEntity.Position;
-
 int dx = Mathf.Clamp(target.x - currentPos.x, -1, 1);
 int dy = Mathf.Clamp(target.y - currentPos.y, -1, 1);
 
@@ -1304,10 +1302,10 @@ void ExecutePlannedAction() {
 if (gridEntity == null) return;
 
 if (currentTargetFood != null && targetPosition == gridEntity.Position) {
-Vector3 foodWorldPos = currentTargetFood.transform.position;
-Vector3 myWorldPos = transform.position;
+GridPosition foodPos = GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position);
+int distance = gridEntity.Position.ManhattanDistance(foodPos);
 
-if (Vector3.Distance(myWorldPos, foodWorldPos) <= 2f) { // Grid-adjusted eat distance
+if (distance <= definition.eatDistanceTiles) {
 StartEating();
 return;
 }
@@ -1330,14 +1328,19 @@ hasPlannedAction = false;
 GameObject FindNearestFoodInGrid() {
 if (animalDiet == null) ret null;
 
-int gridRadius = Mathf.RoundToInt(searchRadius);
-List<GridEntity> nearbyEntities = GridPositionManager.Instance.GetEntitiesInRadius(
-gridEntity.Position, gridRadius, true);
+var tilesInRange = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, definition.searchRadiusTiles);
 
 GameObject bestFood = null;
 float bestScore = -1f;
 
-foreach (var entity in nearbyEntities) {
+if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
+GridDebugVisualizer.Instance.VisualizeAnimalSearchRadius(this, gridEntity.Position, definition.searchRadiusTiles);
+}
+
+foreach (var tilePos in tilesInRange) {
+var entitiesAtTile = GridPositionManager.Instance.GetEntitiesAt(tilePos);
+
+foreach (var entity in entitiesAtTile) {
 if (entity == null || entity.gameObject == this.gameObject) continue;
 
 FoodItem foodItem = entity.GetComponent<FoodItem>();
@@ -1354,105 +1357,15 @@ bestFood = entity.gameObject;
 }
 }
 }
+}
 
 ret bestFood;
 }
 
-void UpdateHungerTick() {
-if (animalDiet == null) return;
-
-currentHunger += animalDiet.hungerIncreaseRate;
-currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
-
-if (currentHunger >= animalDiet.maxHunger) {
-ApplyStarvationDamage();
-}
-
-UpdateHungerText();
-}
-
-void TryPoop() {
-if (isEating || isPooping) return;
-
-isPooping = true;
-SpawnPoop();
-
-if (TickManager.Instance?.Config != null) {
-var config = TickManager.Instance.Config;
-poopTick = Random.Range(
-config.ConvertSecondsToTicks(minPoopDelay),
-config.ConvertSecondsToTicks(maxPoopDelay)
-);
-}
-
-hasPooped = true;
-isPooping = false;
-
-if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
-}
-
 void StartEating() {
 isEating = true;
-eatTimer = eatDuration;
+eatRemainingTicks = definition.eatDurationTicks;
 if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
-}
-
-void Update() {
-if (!enabled || isDying) return;
-
-bool showStats = Input.GetKey(showStatsKey);
-SetStatsTextVisibility(showStats);
-
-if (isEating) {
-eatTimer -= Time.deltaTime;
-if (eatTimer <= 0f) {
-FinishEating();
-}
-}
-
-FlipSpriteBasedOnDirection();
-UpdateAnimationState();
-}
-
-void HandleRealtimeUpdate() {
-if (isSeekingScreenCenter) {
-Vector2 currentPos = rb.position;
-bool centerWithinBounds =
-currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
-currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
-
-if (centerWithinBounds) {
-if(Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name} Update] Center reached SHIFTED bounds! Pos: {currentPos}. MinB: {minBounds}, MaxB: {maxBounds}. Switching to normal AI.", gameObject);
-
-isSeekingScreenCenter = false;
-moveDirection = Vector2.zero;
-}
-else {
-moveDirection = (screenCenterTarget - currentPos).normalized;
-if (moveDirection == Vector2.zero)
-moveDirection = Random.insideUnitCircle.normalized;
-
-FlipSpriteBasedOnDirection();
-UpdateAnimationState();
-return; // Skip normal AI
-}
-}
-
-UpdateHunger();
-HandlePooping();
-UpdateThoughts();
-
-if (isEating) {
-HandleEating();
-moveDirection = Vector2.zero;
-}
-else if (isPooping) {
-moveDirection = Vector2.zero;
-}
-else {
-DecideNextAction();
-}
 }
 
 void FinishEating() {
@@ -1468,229 +1381,30 @@ currentHunger = Mathf.Max(0f, currentHunger);
 
 Destroy(currentTargetFood);
 hasPooped = false;
+poopDelayTick = Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
 currentTargetFood = null;
-UpdateHungerText();
-}
-else {
-currentTargetFood = null;
+UpdateUI();
 }
 }
 
-void UpdateHunger() {
-currentHunger += animalDiet.hungerIncreaseRate * Time.deltaTime;
+void UpdateHungerTick() {
+if (animalDiet == null) return;
+
+currentHunger += animalDiet.hungerIncreaseRate;
 currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
-
-if (currentHunger >= animalDiet.maxHunger) {
-ApplyStarvationDamage();
+UpdateUI();
 }
 
-UpdateHungerText();
-}
+void TryPoop() {
+if (isEating || isPooping) return;
 
-void HandlePooping() {
-if (!isEating && !hasPooped) {
-poopDelayTimer -= Time.deltaTime;
-if (!isPooping && poopDelayTimer <= 0f) {
-StartPooping();
-}
-if (isPooping) {
-poopTimer -= Time.deltaTime;
-if (poopTimer <= 0f) {
-FinishPooping();
-}
-}
-}
-}
-
-void StartPooping() {
 isPooping = true;
-poopTimer = poopDuration;
-moveDirection = Vector2.zero;
-if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
-}
-
-void FinishPooping() {
+currentPoopCooldownTick = definition.poopCooldownTicks;
 SpawnPoop();
-isPooping = false;
 hasPooped = true;
-}
+isPooping = false;
 
-void UpdateThoughts() {
-if (thoughtCooldownTimer > 0) {
-thoughtCooldownTimer -= Time.deltaTime;
-}
-}
-
-void DecideNextAction() {
-if (currentHunger >= animalDiet.hungerThreshold) {
-SeekFood();
-}
-else {
-Wander();
-currentTargetFood = null;
-}
-}
-
-void SeekFood() {
-if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
-
-foodReassessmentTimer -= Time.deltaTime;
-bool shouldReassess = foodReassessmentTimer <= 0f;
-bool targetValid = currentTargetFood != null && currentTargetFood.activeInHierarchy &&
-currentTargetFood.GetComponent<FoodItem>() != null;
-
-if (shouldReassess || !targetValid) {
-GameObject potentialBetterFood = FindNearestFood();
-
-if (potentialBetterFood != null) {
-if (!targetValid) {
-currentTargetFood = potentialBetterFood;
-if(Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name} SeekFood] Found new food target (no previous): {potentialBetterFood.name}");
-}
-else if (potentialBetterFood != currentTargetFood) {
-FoodItem currentFoodItem = currentTargetFood.GetComponent<FoodItem>();
-FoodItem newFoodItem = potentialBetterFood.GetComponent<FoodItem>();
-
-if (currentFoodItem != null && newFoodItem != null) {
-float currentPriority = animalDiet.GetPreference(currentFoodItem.foodType)?.preferencePriority ?? 0f;
-float newPriority = animalDiet.GetPreference(newFoodItem.foodType)?.preferencePriority ?? 0f;
-
-if (newPriority > currentPriority) {
-if(Debug.isDebugBuild)
-Debug.Log($"[{gameObject.name} SeekFood] Switching to higher priority food: {newFoodItem.foodType.foodName} (priority: {newPriority}) from {currentFoodItem.foodType.foodName} (priority: {currentPriority})");
-
-currentTargetFood = potentialBetterFood;
-}
-}
-}
-}
-
-foodReassessmentTimer = foodReassessmentInterval;
-}
-
-if (currentTargetFood != null) {
-MoveTowardFood(currentTargetFood);
-}
-else {
-Wander();
-}
-}
-
-GameObject FindNearestFood() {
-Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, searchRadius);
-ret animalDiet.FindBestFood(colliders, transform.position);
-}
-
-void MoveTowardFood(GameObject foodObj) {
-if (foodObj == null) return;
-
-float distance = Vector2.Distance(transform.position, foodObj.transform.position);
-if (distance <= eatDistance) {
-StartEating();
-}
-else {
-moveDirection = (foodObj.transform.position - transform.position).normalized;
-isWanderPaused = false;
-wanderStateTimer = 0f;
-}
-}
-
-void HandleEating() {
-eatTimer -= Time.deltaTime;
-if (eatTimer <= 0f) {
-isEating = false;
-FinishEatingAction();
-}
-}
-
-void FinishEatingAction() {
-if (currentTargetFood == null) return;
-
-FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>();
-if (foodItem != null && foodItem.foodType != null) {
-float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType);
-currentHunger -= satiationGain;
-currentHunger = Mathf.Max(0f, currentHunger);
-Destroy(currentTargetFood);
-hasPooped = false;
-poopDelayTimer = Random.Range(minPoopDelay, maxPoopDelay);
-currentTargetFood = null;
-UpdateHungerText();
-}
-else {
-currentTargetFood = null;
-}
-}
-
-void Wander() {
-if (wanderStateTimer <= 0f) {
-if (isWanderPaused) {
-isWanderPaused = false;
-moveDirection = Random.insideUnitCircle.normalized;
-wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
-}
-else {
-if (Random.value < wanderPauseChance) {
-isWanderPaused = true;
-moveDirection = Vector2.zero;
-wanderStateTimer = Random.Range(wanderMinPauseDuration, wanderMaxPauseDuration);
-}
-else {
-moveDirection = Random.insideUnitCircle.normalized;
-wanderStateTimer = Random.Range(wanderMinMoveDuration, wanderMaxMoveDuration);
-}
-}
-}
-else {
-wanderStateTimer -= Time.deltaTime;
-}
-}
-
-void ApplyStarvationDamage() {
-float damage = starvationDamageRate * Time.deltaTime;
-currentHealth -= damage;
-currentHealth = Mathf.Max(0f, currentHealth);
-
-if (!isFlashing) {
-StartCoroutine(FlashDamage());
-}
-
-UpdateHpText();
-
-if (currentHealth <= 0f) {
-Die(CauseOfDeath.Starvation);
-}
-}
-
-IEnumerator FlashDamage() {
-if (spriteRenderer == null) yield break;
-
-isFlashing = true;
-spriteRenderer.color = damageFlashColor;
-yield ret new WaitForSeconds(damageFlashDuration);
-spriteRenderer.color = originalColor;
-isFlashing = false;
-}
-
-IEnumerator FadeOutAndDestroy() {
-if (spriteRenderer == null) {
-Destroy(gameObject);
-yield break;
-}
-
-isDying = true;
-float elapsedTime = 0f;
-Color startColor = spriteRenderer.color;
-
-while (elapsedTime < deathFadeDuration) {
-elapsedTime += Time.deltaTime;
-float alpha = Mathf.Lerp(startColor.a, 0f, elapsedTime / deathFadeDuration);
-spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
-yield ret null;
-}
-
-Destroy(gameObject);
+if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
 }
 
 void SpawnPoop() {
@@ -1707,7 +1421,7 @@ SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
 if (sr != null) {
 sr.flipX = Random.value > 0.5f;
 Color c = sr.color;
-float v = poopColorVariation;
+float v = definition.poopColorVariation;
 sr.color = new Color(
 Mathf.Clamp01(c.r + Random.Range(-v, v)),
 Mathf.Clamp01(c.g + Random.Range(-v, v)),
@@ -1720,31 +1434,50 @@ PoopController pc = poopObj.GetComponent<PoopController>() ?? poopObj.AddCompone
 pc.Initialize();
 }
 
-void FlipSpriteBasedOnDirection() {
-if (spriteRenderer != null && gridEntity != null && gridEntity.IsMoving) {
-Vector3 currentPos = transform.position;
-Vector3 targetPos = GridPositionManager.Instance.GridToWorld(targetPosition);
-Vector2 moveDirection = (targetPos - currentPos).normalized;
+void ApplyStarvationDamage() {
+currentHealth -= definition.damagePerStarvationTick;
+currentHealth = Mathf.Max(0f, currentHealth);
 
-if (Mathf.Abs(moveDirection.x) > 0.01f) {
-spriteRenderer.flipX = moveDirection.x < 0;
-}
-}
+if (!isFlashing) {
+flashRemainingTicks = definition.damageFlashTicks;
+isFlashing = true;
 }
 
-void UpdateAnimationState() {
-if (animator == null) return;
-bool isMoving = gridEntity != null && gridEntity.IsMoving && !isEating && !isPooping;
-animator.SetBool("IsMoving", isMoving);
-animator.SetBool("IsEating", isEating);
+UpdateUI();
+
+if (currentHealth <= 0f) {
+Die(CauseOfDeath.Starvation);
+}
+}
+
+void UpdateFlashEffect() {
+if (flashRemainingTicks > 0 && spriteRenderer != null) {
+spriteRenderer.color = definition.damageFlashColor;
+} else if (isFlashing && spriteRenderer != null) {
+spriteRenderer.color = originalColor;
+isFlashing = false;
+}
+}
+
+pub enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
+
+void Die(CauseOfDeath cause) {
+Debug.Log($"[{SpeciesName}] died: {cause}", gameObject);
+isDying = true;
+deathFadeRemainingTicks = definition.deathFadeTicks;
+}
+
+void UpdateDeathFade() {
+if (spriteRenderer != null && definition.deathFadeTicks > 0) {
+float alpha = (float)deathFadeRemainingTicks / definition.deathFadeTicks;
+Color c = spriteRenderer.color;
+c.a = alpha;
+spriteRenderer.color = c;
+}
 }
 
 bool CanShowThought() {
-if (useWegoMovement) {
 ret thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTick <= 0;
-} else {
-ret thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTimer <= 0f;
-}
 }
 
 void ShowThought(ThoughtTrigger trigger) {
@@ -1758,32 +1491,48 @@ if (entry != null && entry.lines != null && entry.lines.Count > 0) {
 string line = entry.lines[Random.Range(0, entry.lines.Count)];
 Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
 GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT);
-bubbleGO.transform.localPosition = Vector3.zero;
 
 ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>();
 if (bubble) {
 bubble.Initialize(line, spawnT, 2f);
-if (useWegoMovement) {
-thoughtCooldownTick = TickManager.Instance?.Config?.ConvertSecondsToTicks(thoughtCooldownTime) ?? thoughtCooldownTick;
+thoughtCooldownTick = definition.thoughtCooldownTicks;
 } else {
-thoughtCooldownTimer = thoughtCooldownTime;
-}
-}
-else {
 Destroy(bubbleGO);
 }
 }
 }
 
-pub enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
+void Update() {
+if (!enabled || isDying) return;
 
-void Die(CauseOfDeath cause) {
-Debug.Log($"[{SpeciesName} died: {cause}]", gameObject);
-StartCoroutine(FadeOutAndDestroy());
+bool showStats = Input.GetKey(showStatsKey);
+SetStatsTextVisibility(showStats);
+
+UpdateSpriteFlipping();
 }
 
-pub bool SpeciesNameEquals(string other) {
-ret definition != null && definition.animalName == other;
+void UpdateSpriteFlipping() {
+if (spriteRenderer != null && gridEntity != null && gridEntity.IsMoving) {
+Vector3 currentPos = transform.position;
+Vector3 targetPos = GridPositionManager.Instance.GridToWorld(targetPosition);
+Vector2 moveDirection = (targetPos - currentPos).normalized;
+
+if (Mathf.Abs(moveDirection.x) > 0.01f) {
+spriteRenderer.flipX = moveDirection.x < 0;
+}
+}
+}
+
+void UpdateAnimations() {
+if (animator == null) return;
+bool isMoving = gridEntity != null && gridEntity.IsMoving && !isEating && !isPooping;
+animator.SetBool("IsMoving", isMoving);
+animator.SetBool("IsEating", isEating);
+}
+
+void UpdateUI() {
+UpdateHpText();
+UpdateHungerText();
 }
 
 void UpdateHpText() {
@@ -1817,27 +1566,8 @@ break;
 }
 
 void SetStatsTextVisibility(bool visible) {
-if (hpText != null) {
-hpText.gameObject.SetActive(visible);
-}
-
-if (hungerText != null) {
-hungerText.gameObject.SetActive(visible);
-}
-}
-
-pub void SetWegoMovement(bool enabled) {
-useWegoMovement = enabled;
-
-if (enabled && gridEntity == null) {
-gridEntity = gameObject.AddComponent<GridEntity>();
-}
-
-if (enabled && TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-} else if (!enabled && TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
-}
+if (hpText != null) hpText.gameObject.SetActive(visible);
+if (hungerText != null) hungerText.gameObject.SetActive(visible);
 }
 
 pub GridPosition GetCurrentGridPosition() {
@@ -1852,14 +1582,39 @@ ret gridEntity?.Position ?? GridPosition.Zero;
 
 pub cls AnimalDefinition : ScriptableObject {
 pub string animalName = "DefaultAnimal";
-
-pub float maxHealth = 10f; // Keep health for potential future damage/predators
-pub float movementSpeed = 2f;
-
-pub AnimalDiet diet; // Needs to reference the simplified AnimalDiet SO
-
 pub GameObject prefab;
 
+pub float maxHealth = 10f;
+pub float movementSpeed = 2f; // Grid units per tick
+
+pub int thinkingTickInterval = 3;
+pub int wanderPauseTickChance = 30; // Percentage
+pub int minWanderMoveTicks = 2;
+pub int maxWanderMoveTicks = 6;
+pub int minWanderPauseTicks = 1;
+pub int maxWanderPauseTicks = 4;
+
+pub int searchRadiusTiles = 5; // In grid tiles
+pub int eatDistanceTiles = 1; // Must be adjacent
+
+pub int eatDurationTicks = 3;
+pub int thoughtCooldownTicks = 10;
+pub int starvationDamageTickInterval = 4;
+pub float damagePerStarvationTick = 2f;
+pub int deathFadeTicks = 3;
+
+pub int minPoopDelayTicks = 10;
+pub int maxPoopDelayTicks = 20;
+pub int poopCooldownTicks = 2;
+
+pub float poopColorVariation = 0.1f;
+pub Color damageFlashColor = Color.red;
+pub int damageFlashTicks = 1;
+
+pub AnimalDiet diet;
+
+pub List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
+pub List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 }
 
 ////////////////////////////////////////////////////////////
@@ -1904,444 +1659,606 @@ pub List<string> lines;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Effects\FireflyController.cs
 
-﻿using UnityEngine;
+﻿// Assets\Scripts\Ecosystem\Effects\FireflyController.cs
+using WegoSystem;
 using UnityEngine.Rendering.Universal;
 
-pub cls FireflyController : MonoBehaviour {
-[SerializeField] Light2D pointLight;
+pub cls FireflyController : MonoBehaviour, ITickUpdateable {
+[SerializeField] FireflyDefinition definition;
+[SerializeField] Light2D glowLight;
 [SerializeField] SpriteRenderer spriteRenderer;
+[SerializeField] TrailRenderer trailRenderer;
+[SerializeField] ParticleSystem glowParticles;
 
-[SerializeField] Vector2 speedRange = new Vector2(0.5f, 1.5f);
-[SerializeField] float directionChangeInterval = 2.0f;
-[SerializeField] [Range(0f, 1f)] float pauseChance = 0.2f;
-[SerializeField] Vector2 pauseDurationRange = new Vector2(0.5f, 1.5f);
+GridEntity gridEntity;
+int currentAgeTicks = 0;
+int lifetimeTicks;
+int lastMovementTick = 0;
+int spawnEffectRemainingTicks = 0;
 
-[SerializeField] Vector2 lifetimeRange = new Vector2(8f, 18f);
-[SerializeField] float fadeInDuration = 0.75f;
-[SerializeField] float fadeOutDuration = 1.5f;
+Vector3 currentTileCenter;
+Vector3 localTargetPosition;
+float localMovementAngle;
+float currentLocalSpeed;
+float tileSize = 1f;
+float maxLocalOffset;
 
-[SerializeField] bool enableFlicker = true;
-[SerializeField] Vector2 intensityRange = new Vector2(1.5f, 3.0f);
-[SerializeField] float flickerSpeed = 5.0f;
+float baseGlowIntensity;
+float currentGlowIntensity;
+float glowFlickerTime;
 
-[SerializeField] bool enableSpawnEffect = true;
-[SerializeField] float spawnEffectDuration = 0.5f;
-[SerializeField] float spawnBaseIntensity = 2.0f;
-[SerializeField] [Range(0f, 1f)] float spawnBlackoutChance = 0.3f;
-[SerializeField] Vector2 blackoutDurationRange = new Vector2(0.01f, 0.08f);
-[SerializeField] Vector2 blackoutSpacingRange = new Vector2(0.05f, 0.2f);
+Color originalColor;
 
-[SerializeField] float scentCheckInterval = 1.0f;
-[SerializeField] float scentOverlapCheckRadius = 10f;
-[SerializeField] float attractionStrength = 2.0f;
-[SerializeField] float orbitDistance = 0.8f;
-[SerializeField] float attractionWobble = 0.5f;
-[SerializeField] List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
-
-pub Transform AttractionTarget => attractionTarget;
-
-FireflyManager manager;
-Vector2 currentVelocity;
-float currentSpeed;
-float stateTimer;
-bool isPaused;
-float lifetime;
-float age = 0f;
-float currentAlpha = 0f; // Overall transparency/fade progress
-float flickerOffset;
-Material spriteMaterialInstance; // Instanced material for modification
-
-Transform attractionTarget = null;
-float scentCheckTimer;
-ScentDefinition currentTargetScentDef = null;
-
-Vector2 minBounds;
-Vector2 maxBounds;
-
-Color baseEmissionColor = Color.black; // Default to black if reading fails
-
-float nextBlackoutTime = 0f;
-float blackoutEndTime = 0f;
-bool isInBlackout = false;
+pub bool IsAlive { get; set; } = true;
+pub Transform AttractionTarget { get; set; }
 
 void Awake() {
-if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
-if (spriteRenderer != null && spriteRenderer.material != null) {
-spriteMaterialInstance = spriteRenderer.material;
-if (spriteMaterialInstance.HasProperty("_EmissionColor")) {
-baseEmissionColor = spriteMaterialInstance.GetColor("_EmissionColor");
-} else {
-Debug.LogWarning($"[{gameObject.name}] Material '{spriteMaterialInstance.name}' does not have an '_EmissionColor' property.", gameObject);
-}
-} else if (spriteRenderer == null || spriteRenderer.material == null) {
-Debug.LogWarning($"[{gameObject.name}] FireflyController: Cannot modify material properties (flicker/fade), SpriteRenderer or its material is missing.", gameObject);
-enableFlicker = false;
-enableSpawnEffect = false;
+gridEntity = GetComponent<GridEntity>();
+if (gridEntity == null) {
+gridEntity = gameObject.AddComponent<GridEntity>();
 }
 
-flickerOffset = Random.Range(0f, 100f);
+if (glowLight != null) {
+baseGlowIntensity = glowLight.intensity;
+currentGlowIntensity = baseGlowIntensity;
 }
 
-pub void Initialize(FireflyManager owner, Vector2 minB, Vector2 maxB) {
-manager = owner;
-minBounds = minB;
-maxBounds = maxB;
-
-lifetime = Random.Range(lifetimeRange.x, lifetimeRange.y);
-age = 0f;
-currentAlpha = 0f;
-
-attractionTarget = null;
-currentTargetScentDef = null;
-scentCheckTimer = Random.Range(0, scentCheckInterval);
-
-isInBlackout = false;
-
-if (Random.value < spawnBlackoutChance) {
-float initialDelay = Random.Range(0.01f, 0.1f); // Small random delay before first blackout
-nextBlackoutTime = Time.time + initialDelay;
-} else {
-nextBlackoutTime = Time.time + spawnEffectDuration + 1f;
-}
-blackoutEndTime = 0f;
-
-PickNewWanderState();
-ApplyVisualState(0f);
+if (spriteRenderer != null) {
+originalColor = spriteRenderer.color;
 }
 
-void Update() {
-age += Time.deltaTime;
-
-HandleLifetimeAndFade(); // Calculates currentAlpha
-if (currentAlpha <= 0f && age > fadeInDuration) { Die(); return; }
-
-HandleScentDetection();
-HandleMovement();
-HandleGlowAndFlicker(); // Calculates target intensity & calls ApplyVisualState
 }
 
-void HandleLifetimeAndFade() {
-if (age < fadeInDuration) {
-currentAlpha = Mathf.Clamp01(age / fadeInDuration); // Fade In
-} else if (lifetime - age < fadeOutDuration) {
-currentAlpha = Mathf.Clamp01((lifetime - age) / fadeOutDuration); // Fade Out
-} else {
-currentAlpha = 1.0f; // Fully Visible
+void Start() {
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
 }
-
-if (age >= lifetime && currentAlpha > 0) {
-currentAlpha = Mathf.Clamp01((lifetime - age + fadeOutDuration) / fadeOutDuration);
-if(currentAlpha <= 0) Die();
-}
-}
-
-void HandleScentDetection() {
-scentCheckTimer -= Time.deltaTime;
-if (scentCheckTimer <= 0f) { FindAttractionTarget(); scentCheckTimer = scentCheckInterval; }
-if (attractionTarget != null) { if (!attractionTarget.gameObject.activeInHierarchy || !attractionTarget.TryGetComponent<ScentSource>(out var currentScent) || currentScent.definition != currentTargetScentDef || (attractionTarget.position - transform.position).sqrMagnitude > (currentScent.EffectiveRadius * currentScent.EffectiveRadius) ) { attractionTarget = null; currentTargetScentDef = null; } }
-}
-
-void FindAttractionTarget() {
-Transform bestTarget = null; ScentDefinition bestScentDef = null; float bestScore = -1f;
-Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, scentOverlapCheckRadius);
-foreach (Collider2D hit in hits) {
-if (hit.TryGetComponent<ScentSource>(out ScentSource scent) && scent.definition != null) {
-if (attractiveScentDefinitions.Contains(scent.definition)) {
-float distSq = (hit.transform.position - transform.position).sqrMagnitude; float scentRadiusSq = scent.EffectiveRadius * scent.EffectiveRadius;
-if (distSq <= scentRadiusSq) { float score = 1.0f / (distSq + 0.01f); if (score > bestScore) { bestScore = score; bestTarget = hit.transform; bestScentDef = scent.definition; } }
-}
-}
-}
-if (bestTarget != attractionTarget) { attractionTarget = bestTarget; currentTargetScentDef = bestScentDef; if (attractionTarget != null) { isPaused = false; } }
-}
-
-void HandleMovement() {
-stateTimer -= Time.deltaTime;
-if (attractionTarget != null) {
-Vector2 directionToTarget = (attractionTarget.position - transform.position); float distanceToTarget = directionToTarget.magnitude; if (distanceToTarget > 0.01f) { directionToTarget /= distanceToTarget; }
-Vector2 orbitOffsetDir = new Vector2(-directionToTarget.y, directionToTarget.x) * Mathf.Sign(currentSpeed + 0.1f); Vector2 desiredDirection = directionToTarget * attractionStrength;
-if (distanceToTarget <= orbitDistance) { desiredDirection += orbitOffsetDir * (currentSpeed * 0.5f); } desiredDirection += Random.insideUnitCircle * attractionWobble;
-currentVelocity = Vector2.Lerp(currentVelocity.normalized, desiredDirection.normalized, Time.deltaTime * 5f) * currentSpeed;
-} else { if (stateTimer <= 0f) { PickNewWanderState(); } }
-if (!isPaused) {
-Vector2 currentPos = transform.position; Vector2 newPos = currentPos + currentVelocity * Time.deltaTime; bool clampedX = false; bool clampedY = false;
-if (newPos.x <= minBounds.x || newPos.x >= maxBounds.x) { clampedX = true; newPos.x = Mathf.Clamp(newPos.x, minBounds.x, maxBounds.x); } if (newPos.y <= minBounds.y || newPos.y >= maxBounds.y) { clampedY = true; newPos.y = Mathf.Clamp(newPos.y, minBounds.y, maxBounds.y); }
-if (clampedX || clampedY) { Vector2 reflectionNormal = Vector2.zero; if(clampedX) reflectionNormal.x = -Mathf.Sign(currentVelocity.x); if(clampedY) reflectionNormal.y = -Mathf.Sign(currentVelocity.y); currentVelocity = Vector2.Reflect(currentVelocity, reflectionNormal.normalized + Random.insideUnitCircle * 0.1f).normalized * currentSpeed; if (currentVelocity.sqrMagnitude < 0.01f) { currentVelocity = Random.insideUnitCircle.normalized * currentSpeed; } PickNewWanderState(true); }
-transform.position = newPos;
-}
-}
-
-void PickNewWanderState(bool forceMove = false) {
-if (attractionTarget != null && !forceMove) return;
-if (!forceMove && Random.value < pauseChance) { isPaused = true; currentVelocity = Vector2.zero; stateTimer = Random.Range(pauseDurationRange.x, pauseDurationRange.y); }
-else { isPaused = false; currentSpeed = Random.Range(speedRange.x, speedRange.y); if(currentVelocity.sqrMagnitude < 0.01f || forceMove) currentVelocity = Random.insideUnitCircle.normalized * currentSpeed; else currentVelocity = (currentVelocity.normalized + Random.insideUnitCircle * 0.5f).normalized * currentSpeed; stateTimer = directionChangeInterval * Random.Range(0.7f, 1.3f); }
-}
-
-void HandleGlowAndFlicker() {
-float targetFlickerIntensity;
-
-if (enableSpawnEffect && age < spawnEffectDuration) {
-float progress = age / spawnEffectDuration;
-float baseIntensity = Mathf.Lerp(0f, spawnBaseIntensity, progress);
-
-if (Time.time >= nextBlackoutTime && !isInBlackout) {
-if (Random.value < spawnBlackoutChance) {
-isInBlackout = true;
-float blackoutDuration = Random.Range(blackoutDurationRange.x, blackoutDurationRange.y);
-blackoutEndTime = Time.time + blackoutDuration;
-
-float spacingTime = Random.Range(blackoutSpacingRange.x, blackoutSpacingRange.y);
-nextBlackoutTime = blackoutEndTime + spacingTime;
-} else {
-float spacingTime = Random.Range(blackoutSpacingRange.x, blackoutSpacingRange.y);
-nextBlackoutTime = Time.time + spacingTime;
-}
-}
-
-if (isInBlackout && Time.time > blackoutEndTime) {
-isInBlackout = false;
-}
-
-targetFlickerIntensity = isInBlackout ? 0f : baseIntensity;
-}
-else if (enableFlicker) {
-float noise = Mathf.PerlinNoise(Time.time * flickerSpeed, flickerOffset);
-targetFlickerIntensity = Mathf.Lerp(intensityRange.x, intensityRange.y, noise);
-}
-else {
-targetFlickerIntensity = intensityRange.x;
-}
-
-ApplyVisualState(targetFlickerIntensity);
-}
-
-void ApplyVisualState(float flickerIntensity) {
-if (spriteMaterialInstance != null) {
-if (spriteMaterialInstance.HasProperty("_Color")) {
-Color baseColor = spriteMaterialInstance.GetColor("_Color");
-baseColor.a = currentAlpha; // Apply fade alpha
-spriteMaterialInstance.SetColor("_Color", baseColor);
-}
-
-if (spriteMaterialInstance.HasProperty("_EmissionColor")) {
-Color finalEmissionColor = baseEmissionColor * Mathf.LinearToGammaSpace(flickerIntensity);
-spriteMaterialInstance.SetColor("_EmissionColor", finalEmissionColor);
-}
-}
-
-if (pointLight != null) {
-pointLight.intensity = flickerIntensity * currentAlpha;
-}
-}
-
-void Die() {
-if (manager != null) manager.ReportFireflyDespawned(this);
-currentAlpha = 0f; ApplyVisualState(0f); // Ensure visuals are off
-Destroy(gameObject);
 }
 
 void OnDestroy() {
-if (spriteMaterialInstance != null) Destroy(spriteMaterialInstance);
+if (TickManager.Instance != null) {
+TickManager.Instance.UnregisterTickUpdateable(this);
 }
+}
+
+pub void Initialize() {
+if (definition == null) {
+Debug.LogError("[FireflyController] No FireflyDefinition assigned!", this);
+enabled = false;
+return;
+}
+
+lifetimeTicks = Random.Range(definition.minLifetimeTicks, definition.maxLifetimeTicks + 1);
+
+if (definition.useSpawnEffect) {
+spawnEffectRemainingTicks = definition.spawnEffectTicks;
+}
+
+if (GridPositionManager.Instance != null) {
+var grid = GridPositionManager.Instance.GetTilemapGrid();
+if (grid != null) {
+tileSize = grid.cellSize.x; // Assuming square tiles
+maxLocalOffset = tileSize * definition.localMovementRadius;
+}
+}
+
+UpdateTileCenter();
+localMovementAngle = Random.Range(0f, 360f);
+UpdateLocalTargetPosition();
+
+if (GridPositionManager.Instance != null) {
+GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+}
+
+ApplyVisualState(0f);
+}
+
+pub void OnTickUpdate(int currentTick) {
+if (!IsAlive) return;
+
+currentAgeTicks++;
+
+if (currentAgeTicks >= lifetimeTicks) {
+Die();
+return;
+}
+
+UpdateLifetimeFade();
+
+if (spawnEffectRemainingTicks > 0) {
+spawnEffectRemainingTicks--;
+}
+
+if (currentTick - lastMovementTick >= definition.movementTickInterval) {
+MakeMovementDecision();
+lastMovementTick = currentTick;
+}
+}
+
+void Update() {
+if (!IsAlive) return;
+UpdateLocalMovement();
+HandleGlowAndFlicker();
+}
+
+void MakeMovementDecision() {
+GridPosition bestPosition = gridEntity.Position;
+float bestScore = EvaluateTile(gridEntity.Position);
+
+var nearbyPositions = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, definition.tileSearchRadius, true);
+
+foreach (var pos in nearbyPositions) {
+if (!GridPositionManager.Instance.IsPositionValid(pos) ||
+GridPositionManager.Instance.IsPositionOccupied(pos)) {
+continue;
+}
+
+float score = EvaluateTile(pos);
+if (score > bestScore) {
+bestScore = score;
+bestPosition = pos;
+}
+}
+
+if (bestPosition != gridEntity.Position) {
+gridEntity.SetPosition(bestPosition);
+UpdateTileCenter();
+}
+}
+
+float EvaluateTile(GridPosition tilePos) {
+float score = Random.Range(0f, 1f); // Base randomness
+
+var tilesInRange = GridRadiusUtility.GetTilesInCircle(tilePos, definition.tileSearchRadius);
+
+Transform bestTarget = null;
+float bestTargetScore = 0f;
+
+foreach (var checkPos in tilesInRange) {
+Vector3 worldPos = GridPositionManager.Instance.GridToWorld(checkPos);
+Collider2D[] hits = Physics2D.OverlapPointAll(worldPos);
+
+foreach (var hit in hits) {
+ScentSource scent = hit.GetComponent<ScentSource>();
+if (scent != null && scent.definition != null &&
+definition.attractiveScentDefinitions.Contains(scent.definition)) {
+GridPosition scentGridPos = GridPositionManager.Instance.WorldToGrid(hit.transform.position);
+int distance = tilePos.ManhattanDistance(scentGridPos);
+float distanceScore = 1f - (distance / (float)definition.tileSearchRadius);
+float scentScore = distanceScore * scent.EffectiveStrength;
+
+if (scentScore > bestTargetScore) {
+bestTargetScore = scentScore;
+bestTarget = hit.transform;
+}
+}
+
+PlantGrowth plant = hit.GetComponent<PlantGrowth>();
+if (plant != null && plant.CurrentState == PlantState.Growing) {
+score += definition.growingPlantAttraction;
+}
+}
+}
+
+this.AttractionTarget = bestTarget;
+score += bestTargetScore * definition.scentAttractionWeight;
+
+ret score;
+}
+
+void UpdateTileCenter() {
+if (GridPositionManager.Instance != null) {
+currentTileCenter = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
+}
+}
+
+void UpdateLocalTargetPosition() {
+localMovementAngle += Random.Range(-definition.localMovementTurnSpeed, definition.localMovementTurnSpeed) * Time.deltaTime;
+
+Vector2 direction = new Vector2(Mathf.Cos(localMovementAngle * Mathf.Deg2Rad),
+Mathf.Sin(localMovementAngle * Mathf.Deg2Rad));
+
+float targetDistance = Random.Range(maxLocalOffset * 0.5f, maxLocalOffset);
+localTargetPosition = currentTileCenter + (Vector3)(direction * targetDistance);
+
+currentLocalSpeed = Random.Range(definition.minLocalSpeed, definition.maxLocalSpeed);
+}
+
+void UpdateLocalMovement() {
+Vector3 toTarget = localTargetPosition - transform.position;
+float distanceToTarget = toTarget.magnitude;
+
+if (distanceToTarget < 0.1f) {
+UpdateLocalTargetPosition();
+}
+else {
+Vector3 movement = toTarget.normalized * currentLocalSpeed * Time.deltaTime;
+Vector3 newPosition = transform.position + movement;
+Vector3 fromCenter = newPosition - currentTileCenter;
+
+if (fromCenter.magnitude > maxLocalOffset) {
+fromCenter = fromCenter.normalized * maxLocalOffset;
+newPosition = currentTileCenter + fromCenter;
+UpdateLocalTargetPosition();
+}
+transform.position = newPosition;
+}
+}
+
+void UpdateLifetimeFade() {
+if (currentAgeTicks < definition.fadeInTicks) {
+float fadeProgress = (float)currentAgeTicks / definition.fadeInTicks;
+ApplyVisualState(fadeProgress);
+}
+else if (currentAgeTicks > lifetimeTicks - definition.fadeOutTicks) {
+int fadeOutTicksElapsed = currentAgeTicks - (lifetimeTicks - definition.fadeOutTicks);
+float fadeProgress = 1f - ((float)fadeOutTicksElapsed / definition.fadeOutTicks);
+ApplyVisualState(fadeProgress);
+}
+else {
+ApplyVisualState(1f);
+}
+}
+
+void ApplyVisualState(float intensity) {
+if (spriteRenderer != null) {
+Color color = originalColor;
+color.a = originalColor.a * intensity;
+spriteRenderer.color = color;
+}
+
+if (glowLight != null) {
+glowLight.intensity = baseGlowIntensity * intensity;
+currentGlowIntensity = glowLight.intensity;
+}
+
+if (trailRenderer != null) {
+Color startColor = trailRenderer.startColor;
+Color endColor = trailRenderer.endColor;
+startColor.a = intensity * 0.5f;
+endColor.a = 0f;
+trailRenderer.startColor = startColor;
+trailRenderer.endColor = endColor;
+}
+
+if (glowParticles != null) {
+var main = glowParticles.main;
+Color particleColor = main.startColor.color;
+particleColor.a = intensity * 0.7f;
+main.startColor = particleColor;
+}
+}
+
+void HandleGlowAndFlicker() {
+if (glowLight == null || definition.glowFlickerAmount <= 0f) return;
+
+glowFlickerTime += Time.deltaTime * definition.glowFlickerSpeed;
+float flicker = Mathf.PerlinNoise(glowFlickerTime, 0f) * 2f - 1f;
+glowLight.intensity = currentGlowIntensity + (flicker * definition.glowFlickerAmount);
+}
+
+void Die() {
+IsAlive = false;
+
+if (FireflyManager.Instance != null) {
+FireflyManager.Instance.ReportFireflyDespawned(this);
+}
+
+if (TickManager.Instance != null) {
+TickManager.Instance.UnregisterTickUpdateable(this);
+}
+
+if (glowParticles != null) {
+glowParticles.Stop();
+Destroy(gameObject, glowParticles.main.duration);
+}
+else {
+Destroy(gameObject);
+}
+}
+
+void OnDrawGizmosSelected() {
+if (definition == null) return;
+
+Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
+Gizmos.DrawWireSphere(transform.position, definition.tileSearchRadius * tileSize);
+
+Gizmos.color = new Color(0f, 1f, 1f, 0.5f);
+Gizmos.DrawWireSphere(currentTileCenter, maxLocalOffset);
+
+Gizmos.color = Color.yellow;
+Gizmos.DrawLine(transform.position, localTargetPosition);
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Ecosystem\Effects\FireflyDefinition.cs
+
+﻿// Assets\Scripts\Ecosystem\Effects\FireflyDefinition.cs
+
+pub cls FireflyDefinition : ScriptableObject {
+pub int movementTickInterval = 5;    // How often firefly decides to move tiles
+pub int tileSearchRadius = 3;        // How far to look for attraction targets
+
+pub float localMovementRadius = 0.4f; // Fraction of tile size for wander radius
+pub float localMovementTurnSpeed = 90f; // Degrees per second
+pub float minLocalSpeed = 0.5f;       // Units per second within tile
+pub float maxLocalSpeed = 1.0f;       // Units per second within tile
+
+pub int minLifetimeTicks = 40;
+pub int maxLifetimeTicks = 90;
+pub int fadeInTicks = 4;
+pub int fadeOutTicks = 8;
+
+pub float glowFlickerAmount = 0.2f;  // Intensity variance from base
+pub float glowFlickerSpeed = 5.0f;   // How fast the glow flickers
+pub bool useSpawnEffect = true;      // Use a visual effect on spawn
+pub int spawnEffectTicks = 3;        // How long the spawn effect lasts
+
+pub List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
+pub float scentAttractionWeight = 2.0f; // Multiplier for scent scores
+pub float growingPlantAttraction = 1.0f; // Bonus score for being near a growing plant
 }
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
 
-﻿using UnityEngine;
-using UnityEngine.Rendering.Universal;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+﻿// Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
+using WegoSystem;
 
-pub cls FireflyManager : MonoBehaviour {
+pub cls FireflyManager : MonoBehaviour, ITickUpdateable {
 pub stat FireflyManager Instance { get; set; }
 
 [SerializeField] WeatherManager weatherManager;
 [SerializeField] GameObject fireflyPrefab;
+[SerializeField] FireflyDefinition defaultFireflyDefinition;
 [SerializeField] Transform fireflyParent;
 
 [SerializeField] int maxFireflies = 50;
-[SerializeField] float spawnInterval = 0.5f;
+[SerializeField] int spawnIntervalTicks = 3;
 [SerializeField] [Range(0f, 1f)] float nightThreshold = 0.25f;
 
 [SerializeField] Vector2 spawnCenter = Vector2.zero;
 [SerializeField] Vector2 spawnAreaSize = new Vector2(20f, 10f);
-
-[SerializeField] Vector2 movementMinBounds = new Vector2(-12f, -7f);
-[SerializeField] Vector2 movementMaxBounds = new Vector2(12f, 7f);
 
 pub float photosynthesisRadius = 3f;
 pub float photosynthesisIntensityPerFly = 0.05f;
 pub float maxPhotosynthesisBonus = 0.5f;
 
 [SerializeField] bool showAttractionLinesRuntime = false;
-[SerializeField] Color attractionLineColorRuntime = Color.magenta; // Renamed for Gizmo
-[SerializeField] bool logGizmoCalls = false;
-[Space] // Add space for visual separation
-[SerializeField] GameObject lineVisualizerPrefab; // <<< ADDED
-[SerializeField] Transform lineContainer; // <<< ADDED
+[SerializeField] Color attractionLineColorRuntime = Color.magenta;
+[SerializeField] GameObject lineVisualizerPrefab;
+[SerializeField] Transform lineContainer;
+
+List<FireflyController> activeFireflies = new List<FireflyController>();
+Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
+
+int spawnTickCounter = 0;
+bool isNight = false;
 
 pub bool ShowAttractionLinesRuntime => showAttractionLinesRuntime;
 
-List<FireflyController> activeFireflies = new List<FireflyController>();
-float spawnTimer;
-bool isNight = false;
-
-Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
-
 void Awake() {
-if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+if (Instance != null && Instance != this) {
+Destroy(gameObject);
+return;
+}
 Instance = this;
-if (weatherManager == null) { Debug.LogError($"[{nameof(FireflyManager)}] WeatherManager missing!", this); enabled = false; return; }
-if (fireflyPrefab == null) { Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing!", this); enabled = false; return; }
-if (fireflyPrefab.GetComponent<FireflyController>() == null) { Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing Controller script!", this); enabled = false; return; }
-if (fireflyParent == null) { fireflyParent = transform; }
 
-if (lineVisualizerPrefab == null) { Debug.LogError($"[{nameof(FireflyManager)}] Line Visualizer Prefab is not assigned!", this); }
-if (lineContainer == null) { Debug.LogError($"[{nameof(FireflyManager)}] Line Container transform is not assigned!", this); }
+ValidateReferences();
 }
 
-void Update() {
+void Start() {
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
+}
+}
+
+void OnDestroy() {
+if (Instance == this) Instance = null;
+
+if (TickManager.Instance != null) {
+TickManager.Instance.UnregisterTickUpdateable(this);
+}
+
+CleanupVisualizers();
+}
+
+void ValidateReferences() {
+if (weatherManager == null) {
+Debug.LogError($"[{nameof(FireflyManager)}] WeatherManager not assigned!", this);
+enabled = false;
+return;
+}
+
+if (fireflyPrefab == null) {
+Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab not assigned!", this);
+enabled = false;
+return;
+}
+
+if (defaultFireflyDefinition == null) {
+Debug.LogError($"[{nameof(FireflyManager)}] Default Firefly Definition not assigned!", this);
+enabled = false;
+return;
+}
+
+FireflyController controller = fireflyPrefab.GetComponent<FireflyController>();
+if (controller == null) {
+Debug.LogError($"[{nameof(FireflyManager)}] Firefly Prefab missing FireflyController script!", this);
+enabled = false;
+return;
+}
+
+if (fireflyParent == null) {
+fireflyParent = transform;
+}
+}
+
+pub void OnTickUpdate(int currentTick) {
 isNight = weatherManager.sunIntensity <= nightThreshold;
 
 if (isNight) {
-spawnTimer -= Time.deltaTime;
-if (spawnTimer <= 0f) { TrySpawnFirefly(); spawnTimer = spawnInterval; }
-} else { spawnTimer = spawnInterval; }
+spawnTickCounter++;
+if (spawnTickCounter >= spawnIntervalTicks) {
+TrySpawnFirefly();
+spawnTickCounter = 0;
+}
+}
+else {
+spawnTickCounter = 0;
+}
 
+activeFireflies.RemoveAll(f => f == null || !f.IsAlive);
+}
+
+void Update() {
 UpdateRuntimeLineVisualizers();
 }
 
 void TrySpawnFirefly() {
 if (activeFireflies.Count >= maxFireflies) return;
 
-float spawnX = spawnCenter.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
-float spawnY = spawnCenter.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
-Vector2 spawnPos = new Vector2(spawnX, spawnY);
+GridPosition spawnGridPos = FindValidSpawnPosition();
+if (spawnGridPos == GridPosition.Zero) return;
 
-GameObject fireflyGO = Instantiate(fireflyPrefab, spawnPos, Quaternion.identity, fireflyParent);
+Vector3 spawnWorldPos = GridPositionManager.Instance.GridToWorld(spawnGridPos);
+
+GameObject fireflyGO = Instantiate(fireflyPrefab, spawnWorldPos, Quaternion.identity, fireflyParent);
 FireflyController controller = fireflyGO.GetComponent<FireflyController>();
 
 if (controller != null) {
-controller.Initialize(this, movementMinBounds, movementMaxBounds);
+controller.Initialize(); // Corrected call with no parameters
 activeFireflies.Add(controller);
+}
+}
+
+GridPosition FindValidSpawnPosition() {
+Vector2 minBounds = spawnCenter - spawnAreaSize * 0.5f;
+Vector2 maxBounds = spawnCenter + spawnAreaSize * 0.5f;
+
+GridPosition minGrid = GridPositionManager.Instance.WorldToGrid(minBounds);
+GridPosition maxGrid = GridPositionManager.Instance.WorldToGrid(maxBounds);
+
+for (int i = 0; i < 10; i++) // Try 10 times to find a spot {
+int x = Random.Range(minGrid.x, maxGrid.x + 1);
+int y = Random.Range(minGrid.y, maxGrid.y + 1);
+GridPosition pos = new GridPosition(x, y);
+
+if (GridPositionManager.Instance.IsPositionValid(pos) &&
+!GridPositionManager.Instance.IsPositionOccupied(pos)) {
+ret pos;
+}
+}
+
+ret GridPosition.Zero; // Failed to find a spot
 }
 
 pub void ReportFireflyDespawned(FireflyController firefly) {
 activeFireflies.Remove(firefly);
 
 if (activeLineVisualizers.TryGetValue(firefly, out LineRenderer line)) {
-if (line != null) Destroy(line.gameObject); // Destroy the visualizer GO
+if (line != null) Destroy(line.gameObject);
 activeLineVisualizers.Remove(firefly);
 }
 }
 
-void UpdateRuntimeLineVisualizers() {
-if (!Application.isPlaying) return; // Only run in play mode
+pub int GetNearbyFireflyCount(Vector3 position, float radius) {
+int count = 0;
+float radiusSq = radius * radius;
 
-bool showLines = showAttractionLinesRuntime && lineVisualizerPrefab != null && lineContainer != null;
-
-List<FireflyController> firefliesToRemoveLine = new List<FireflyController>();
-
-foreach (var kvp in activeLineVisualizers) {
-FireflyController firefly = kvp.Key;
-LineRenderer line = kvp.Value;
-
-if (firefly == null || line == null) // Firefly or line destroyed unexpectedly {
-firefliesToRemoveLine.Add(firefly); // Mark for removal
-if(line != null) Destroy(line.gameObject); // Destroy orphan line
+for (int i = activeFireflies.Count - 1; i >= 0; i--) {
+if (activeFireflies[i] == null) {
+activeFireflies.RemoveAt(i);
 continue;
 }
 
-Transform target = firefly.AttractionTarget;
-
-if (showLines && target != null) // Should be visible and has target {
-line.enabled = true;
-line.SetPosition(0, firefly.transform.position);
-line.SetPosition(1, target.position);
-
-if (line.startColor != attractionLineColorRuntime || line.endColor != attractionLineColorRuntime) {
-line.startColor = attractionLineColorRuntime;
-line.endColor = attractionLineColorRuntime;
-
-if (Debug.isDebugBuild)
-Debug.Log($"[FireflyManager] Set line color to {attractionLineColorRuntime}", line.gameObject);
-}
-}
-else // Should be hidden or lost target {
-line.enabled = false;
+if ((activeFireflies[i].transform.position - position).sqrMagnitude <= radiusSq) {
+count++;
 }
 }
 
-foreach (var firefly in firefliesToRemoveLine) {
+ret count;
+}
+
+void UpdateRuntimeLineVisualizers() {
+if (!Application.isPlaying || !showAttractionLinesRuntime) {
+CleanupVisualizers();
+return;
+}
+
+var toRemove = new List<FireflyController>();
+foreach (var kvp in activeLineVisualizers) {
+if (kvp.Key == null || kvp.Value == null) {
+toRemove.Add(kvp.Key);
+continue;
+}
+
+Transform target = kvp.Key.AttractionTarget;
+if (target != null) {
+kvp.Value.enabled = true;
+kvp.Value.SetPosition(0, kvp.Key.transform.position);
+kvp.Value.SetPosition(1, target.position);
+kvp.Value.startColor = attractionLineColorRuntime;
+kvp.Value.endColor = attractionLineColorRuntime;
+}
+else {
+kvp.Value.enabled = false;
+}
+}
+
+foreach (var firefly in toRemove) {
+if (activeLineVisualizers.TryGetValue(firefly, out var line) && line != null) {
+Destroy(line.gameObject);
+}
 activeLineVisualizers.Remove(firefly);
 }
 
-if (showLines) {
-foreach (FireflyController firefly in activeFireflies) {
-if (firefly == null || activeLineVisualizers.ContainsKey(firefly)) continue; // Skip nulls or those already processed
+if (lineVisualizerPrefab != null && lineContainer != null) {
+foreach (var firefly in activeFireflies) {
+if (firefly == null || activeLineVisualizers.ContainsKey(firefly)) continue;
 
-Transform target = firefly.AttractionTarget;
-if (target != null) // Only create if it has a target AND should be shown {
-GameObject lineGO = Instantiate(lineVisualizerPrefab, lineContainer); // Instantiate under container
+if (firefly.AttractionTarget != null) {
+GameObject lineGO = Instantiate(lineVisualizerPrefab, lineContainer);
 LineRenderer newLine = lineGO.GetComponent<LineRenderer>();
+
 if (newLine != null) {
 newLine.SetPosition(0, firefly.transform.position);
-newLine.SetPosition(1, target.position);
-
+newLine.SetPosition(1, firefly.AttractionTarget.position);
 newLine.startColor = attractionLineColorRuntime;
 newLine.endColor = attractionLineColorRuntime;
-
 newLine.enabled = true;
-activeLineVisualizers.Add(firefly, newLine); // Add to tracking dictionary
-
-if (Debug.isDebugBuild)
-Debug.Log($"[FireflyManager] Created new line with color {attractionLineColorRuntime}", newLine.gameObject);
+activeLineVisualizers.Add(firefly, newLine);
 }
 else {
-Debug.LogError($"Line Visualizer Prefab '{lineVisualizerPrefab.name}' is missing LineRenderer component!", lineVisualizerPrefab);
-Destroy(lineGO); // Destroy invalid instance
+Debug.LogError($"Line Visualizer Prefab missing LineRenderer!", lineVisualizerPrefab);
+Destroy(lineGO);
 }
 }
 }
 }
-else if (!showLines && activeLineVisualizers.Count > 0) {
+}
+
+void CleanupVisualizers() {
 foreach (var kvp in activeLineVisualizers) {
 if (kvp.Value != null) Destroy(kvp.Value.gameObject);
 }
 activeLineVisualizers.Clear();
 }
-}
 
-pub int GetNearbyFireflyCount(Vector3 position, float radius) {
-int count = 0; float radiusSq = radius * radius;
-for (int i = activeFireflies.Count - 1; i >= 0; i--) {
-if (activeFireflies[i] == null) { activeFireflies.RemoveAt(i); continue; }
-if ((activeFireflies[i].transform.position - position).sqrMagnitude <= radiusSq) { count++; }
-}
-ret count;
-}
-
-#if UNITY_EDITOR
 void OnDrawGizmosSelected() {
-Gizmos.color = Color.green; Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
-Gizmos.color = Color.blue;
-Vector3 boundsCenter = (movementMinBounds + movementMaxBounds) / 2f;
-Vector3 boundsSize = movementMaxBounds - movementMinBounds;
-Gizmos.DrawWireCube(boundsCenter, boundsSize);
+Gizmos.color = Color.green;
+Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
 
 if (showAttractionLinesRuntime && Application.isPlaying) {
-bool didDrawLine = false;
-Gizmos.color = attractionLineColorRuntime; // Use Gizmo color
-foreach (FireflyController firefly in activeFireflies) {
-if (firefly == null) continue;
-Transform target = firefly.AttractionTarget;
-if (target != null) { Gizmos.DrawLine(firefly.transform.position, target.position); didDrawLine = true; }
+Gizmos.color = attractionLineColorRuntime;
+foreach (var firefly in activeFireflies) {
+if (firefly != null && firefly.AttractionTarget != null) {
+Gizmos.DrawLine(firefly.transform.position, firefly.AttractionTarget.position);
 }
 }
 }
-#endif
+}
 }
 
 ////////////////////////////////////////////////////////////
@@ -2450,34 +2367,56 @@ ret scents?.Where(s => s != null).ToList() ?? new List<ScentDefinition>();
 // Assets\Scripts\Ecosystem\Environment\ScentSource.cs
 
 ﻿using UnityEngine;
+using WegoSystem;
 
 pub cls ScentSource : MonoBehaviour {
-pub ScentDefinition definition; // Assigned by PlantGrowth/Node effects
-
+pub ScentDefinition definition;
 pub float radiusModifier = 0f;
 pub float strengthModifier = 0f;
 
-pub float EffectiveRadius => Mathf.RoundToInt(Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier));
+GridEntity gridEntity;
+
+pub float EffectiveRadius => Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier);
 pub float EffectiveStrength => Mathf.Max(0f, (definition != null ? definition.baseStrength : 0f) + strengthModifier);
 
-void OnDrawGizmosSelected() {
-float effectiveRadius = EffectiveRadius; // Calculate radius for gizmo
+void Awake() {
+gridEntity = GetComponent<GridEntity>();
+if (gridEntity == null) {
+gridEntity = gameObject.AddComponent<GridEntity>();
+}
+}
 
-if (definition != null) // Check if a definition is assigned {
-if (effectiveRadius > 0.01f) // Only draw if radius is meaningful {
-int prevState = Random.state.GetHashCode(); // Store previous state
+void OnDrawGizmosSelected() {
+if (definition == null || !Application.isPlaying) return;
+
+if (gridEntity == null) gridEntity = GetComponent<GridEntity>();
+if (gridEntity == null) return;
+
+int effectiveRadiusTiles = Mathf.RoundToInt(EffectiveRadius);
+if (effectiveRadiusTiles <= 0) return;
+
+var affectedTiles = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, effectiveRadiusTiles);
+
+Random.State prevState = Random.state;
 Random.InitState(definition.name.GetHashCode());
 Color gizmoColor = Random.ColorHSV(0f, 1f, 0.7f, 0.9f, 0.8f, 1f);
-gizmoColor.a = 0.3f; // Set alpha for gizmo
-Random.InitState(prevState); // Restore previous state
+gizmoColor.a = 0.3f;
+Random.state = prevState;
 
 Gizmos.color = gizmoColor;
-Gizmos.DrawWireSphere(transform.position, effectiveRadius);
+
+foreach (var tile in affectedTiles) {
+Vector3 tileWorld = GridPositionManager.Instance.GridToWorld(tile);
+Gizmos.DrawCube(tileWorld, Vector3.one * 0.9f); // Slightly smaller than full tile
 }
-}
-else // Draw default gray if no definition assigned yet {
-Gizmos.color = new Color(0.8f, 0.8f, 0.8f, 0.2f);
-Gizmos.DrawWireSphere(transform.position, 1f); // Default size for editor only
+
+var outlineTiles = GridRadiusUtility.GetCircleOutline(gridEntity.Position, effectiveRadiusTiles);
+gizmoColor.a = 0.8f;
+Gizmos.color = gizmoColor;
+
+foreach (var tile in outlineTiles) {
+Vector3 tileWorld = GridPositionManager.Instance.GridToWorld(tile);
+Gizmos.DrawWireCube(tileWorld, Vector3.one);
 }
 }
 }
@@ -3718,6 +3657,131 @@ Debug.Log("NodeDefinitionLibrary updated. Total definitions: " + library.definit
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Editor\NodeDefinitionMigrationTool.cs
+
+﻿using UnityEngine;
+using UnityEditor;
+
+pub cls NodeDefinitionMigrationTool : EditorWindow {
+Vector2 scrollPos;
+List<NodeDefinition> definitions = new List<NodeDefinition>();
+
+stat void ShowWindow() {
+var window = GetWindow<NodeDefinitionMigrationTool>("Node Migration");
+window.minSize = new Vector2(400, 300);
+}
+
+void OnEnable() {
+RefreshDefinitions();
+}
+
+void RefreshDefinitions() {
+definitions.Clear();
+string[] guids = AssetDatabase.FindAssets("t:NodeDefinition");
+
+foreach (string guid in guids) {
+string path = AssetDatabase.GUIDToAssetPath(guid);
+NodeDefinition def = AssetDatabase.LoadAssetAtPath<NodeDefinition>(path);
+if (def != null) {
+definitions.Add(def);
+}
+}
+}
+
+void OnGUI() {
+EditorGUILayout.LabelField("Node Definition Migration Tool", EditorStyles.boldLabel);
+EditorGUILayout.HelpBox("This tool converts time-based values from seconds to ticks.", MessageType.Info);
+
+if (GUILayout.Button("Refresh List")) {
+RefreshDefinitions();
+}
+
+EditorGUILayout.Space();
+
+scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+
+foreach (var def in definitions) {
+EditorGUILayout.BeginHorizontal();
+EditorGUILayout.LabelField(def.name, GUILayout.Width(200));
+
+if (GUILayout.Button("Migrate", GUILayout.Width(80))) {
+MigrateDefinition(def);
+}
+
+EditorGUILayout.EndHorizontal();
+}
+
+EditorGUILayout.EndScrollView();
+
+EditorGUILayout.Space();
+
+if (GUILayout.Button("Migrate All", GUILayout.Height(30))) {
+if (EditorUtility.DisplayDialog("Migrate All",
+"This will migrate all node definitions to use tick-based values. This cannot be undone. Continue?",
+"Yes", "No")) {
+MigrateAll();
+}
+}
+}
+
+void MigrateDefinition(NodeDefinition def) {
+if (def.effects == null) return;
+
+bool changed = false;
+float ticksPerSecond = 2f; // Default assumption
+
+foreach (var effect in def.effects) {
+if (effect == null) continue;
+
+switch (effect.effectType) {
+case NodeEffectType.CooldownTicks:
+case NodeEffectType.CastDelayTicks:
+if (effect.primaryValue < 10) { // Likely still in seconds
+effect.primaryValue = Mathf.RoundToInt(effect.primaryValue * ticksPerSecond);
+changed = true;
+Debug.Log($"Migrated {def.name} - {effect.effectType}: {effect.primaryValue / ticksPerSecond}s -> {effect.primaryValue} ticks");
+}
+break;
+
+case NodeEffectType.GrowthTicksPerStage:
+if (effect.primaryValue < 1) { // Old growth speed was a multiplier
+effect.primaryValue = Mathf.Max(1, Mathf.RoundToInt(5f / effect.primaryValue));
+changed = true;
+Debug.Log($"Migrated {def.name} - Growth: speed {5f / effect.primaryValue}x -> {effect.primaryValue} ticks");
+}
+break;
+
+case NodeEffectType.EnergyPerTick:
+if (effect.primaryValue > 0.5f) { // Likely still per second
+effect.primaryValue = effect.primaryValue / ticksPerSecond;
+changed = true;
+Debug.Log($"Migrated {def.name} - Energy: {effect.primaryValue * ticksPerSecond}/s -> {effect.primaryValue}/tick");
+}
+break;
+}
+
+effect.ValidateForTicks();
+}
+
+if (changed) {
+EditorUtility.SetDirty(def);
+AssetDatabase.SaveAssets();
+}
+}
+
+void MigrateAll() {
+foreach (var def in definitions) {
+MigrateDefinition(def);
+}
+
+AssetDatabase.SaveAssets();
+AssetDatabase.Refresh();
+
+Debug.Log($"Migration complete for {definitions.Count} node definitions.");
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\Editor\NodeDefinitionPostprocessor.cs
 
 ﻿using UnityEngine;
@@ -3818,6 +3882,67 @@ height += EditorGUIUtility.standardVerticalSpacing + EditorGUIUtility.singleLine
 }
 
 ret height;
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Editor\RadiusPatternTester.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+#if UNITY_EDITOR
+using UnityEditor;
+
+pub cls RadiusPatternTesterEditor : Editor {
+pub ovr void OnInspectorGUI() {
+DrawDefaultInspector();
+
+RadiusPatternTester tester = (RadiusPatternTester)target;
+
+if (GUILayout.Button("Test Radius Pattern")) {
+tester.TestRadiusPattern();
+}
+
+if (GUILayout.Button("Compare All Patterns")) {
+tester.CompareAllPatterns();
+}
+}
+}
+#endif
+
+pub cls RadiusPatternTester : MonoBehaviour {
+pub int testRadius = 3;
+
+pub void TestRadiusPattern() {
+GridRadiusUtility.DebugPrintRadius(GridPosition.Zero, testRadius);
+}
+
+pub void CompareAllPatterns() {
+Debug.Log("=== RADIUS PATTERN COMPARISON ===");
+
+for (int r = 1; r <= 5; r++) {
+Debug.Log($"\n--- Radius {r} ---");
+
+var circleTiles = GridRadiusUtility.GetTilesInCircle(GridPosition.Zero, r);
+Debug.Log($"Circle tiles: {circleTiles.Count}");
+
+GridRadiusUtility.DebugPrintRadius(GridPosition.Zero, r);
+
+int manhattanCount = 0;
+int chebyshevCount = 0;
+
+for (int x = -r; x <= r; x++) {
+for (int y = -r; y <= r; y++) {
+if (Mathf.Abs(x) + Mathf.Abs(y) <= r) manhattanCount++;
+if (Mathf.Max(Mathf.Abs(x), Mathf.Abs(y)) <= r) chebyshevCount++;
+}
+}
+
+Debug.Log($"Manhattan (diamond): {manhattanCount} tiles");
+Debug.Log($"Chebyshev (square): {chebyshevCount} tiles");
+Debug.Log($"Circle (ours): {circleTiles.Count} tiles");
+}
 }
 }
 
@@ -4027,6 +4152,41 @@ pub string GetTooltipDescription() {
 ret description ?? string.Empty;
 }
 
+pub string GetStatsAsString() {
+if (effects == null || effects.Count == 0) ret "No effects";
+
+var result = new System.Text.StringBuilder();
+
+foreach (var effect in effects) {
+switch (effect.effectType) {
+case NodeEffectType.GrowthSpeed:
+case NodeEffectType.GrowthTicksPerStage:
+result.AppendLine($"Growth Ticks Per Stage: {effect.primaryValue}");
+break;
+
+case NodeEffectType.Cooldown:
+case NodeEffectType.CooldownTicks:
+result.AppendLine($"Cooldown Ticks: {effect.primaryValue}");
+break;
+
+case NodeEffectType.CastDelay:
+case NodeEffectType.CastDelayTicks:
+result.AppendLine($"Cast Delay Ticks: {effect.primaryValue}");
+break;
+
+case NodeEffectType.PoopFertilizer:
+result.AppendLine($"Poop Fertilizer Range: {effect.primaryValue}");
+break;
+
+default:
+result.AppendLine($"{effect.effectType}: {effect.primaryValue}");
+break;
+}
+}
+
+ret result.ToString();
+}
+
 pub string GetTooltipDetails(object source = null) {
 var nodeData = source as NodeData;
 if (nodeData == null) ret string.Empty;
@@ -4139,14 +4299,34 @@ pub List<InitialNodeConfig> initialNodes; // <<< NEW LIST ADDED
 pub cls NodeEffectData {
 pub NodeEffectType effectType;
 
-[Tooltip("Primary numeric value for the effect (e.g., Amount, Duration, Radius Bonus).")] // Updated tooltip
 pub float primaryValue;
-[Tooltip("Secondary numeric value for the effect (e.g., Speed, Intensity, Strength Bonus).")] // Updated tooltip
+
 pub float secondaryValue;
 
 pub bool isPassive = false;
 
-pub ScentDefinition scentDefinitionReference; // <<< ADDED: Direct reference
+pub ScentDefinition scentDefinitionReference;
+
+pub int GetPrimaryValueAsInt() => Mathf.RoundToInt(primaryValue);
+pub int GetSecondaryValueAsInt() => Mathf.RoundToInt(secondaryValue);
+
+pub void ValidateForTicks() {
+switch (effectType) {
+case NodeEffectType.GrowthTicksPerStage:
+case NodeEffectType.CooldownTicks:
+case NodeEffectType.CastDelayTicks:
+primaryValue = Mathf.Max(1, Mathf.RoundToInt(primaryValue));
+break;
+
+case NodeEffectType.PoopDetectionRadius:
+primaryValue = Mathf.Max(0, Mathf.RoundToInt(primaryValue));
+break;
+
+case NodeEffectType.EnergyPerTick:
+primaryValue = Mathf.Max(0f, primaryValue);
+break;
+}
+}
 }
 
 ////////////////////////////////////////////////////////////
@@ -4155,25 +4335,34 @@ pub ScentDefinition scentDefinitionReference; // <<< ADDED: Direct reference
 ﻿using System;
 
 pub enum NodeEffectType {
+EnergyStorage,           // Amount of max energy
+EnergyPerTick,          // Energy generated per tick (was EnergyPhotosynthesis)
+EnergyCostPerCycle,     // Energy cost when executing (was EnergyCost)
 
-EnergyStorage,
-EnergyPhotosynthesis,
-SeedSpawn,
-StemLength,
-GrowthSpeed,
-LeafGap,
-LeafPattern,
-StemRandomness,
-Cooldown,
-CastDelay,
-PoopFertilizer,
+StemLength,             // Number of stem segments
+GrowthTicksPerStage,    // Ticks between growth stages (was GrowthSpeed)
+LeafGap,                // Stem segments between leaves
+LeafPattern,            // Pattern type (0-4)
+StemRandomness,         // Chance of random stem direction (0-1)
 
-EnergyCost, // <<< RENAMED/ADDED
-Output,
-Damage,
-GrowBerry,
+GrowthSpeed,        // Deprecated but needed for compatibility
+Cooldown,           // Deprecated but needed for compatibility
+CastDelay,          // Deprecated but needed for compatibility
+PoopFertilizer,     // For poop detection functionality
 
-ScentModifier,
+CooldownTicks,          // Ticks between mature cycles (was Cooldown)
+CastDelayTicks,         // Ticks between growth stages (was CastDelay)
+
+PoopDetectionRadius,    // Radius in tiles (was part of PoopFertilizer)
+PoopEnergyBonus,        // Energy gained from poop
+
+Damage,                 // Damage multiplier
+Output,                 // Triggers projectile
+
+GrowBerry,              // Spawns berry
+SeedSpawn,              // Makes this a seed
+
+ScentModifier,          // Modifies scent radius/strength
 }
 
 ////////////////////////////////////////////////////////////
@@ -4621,7 +4810,7 @@ pub Dictionary<Vector2Int, PlantCellType> GetCells() => cells;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantEnergySystem.cs
 
-﻿using UnityEngine;
+﻿// Assets\Scripts\PlantSystem\Growth\PlantEnergySystem.cs
 using WegoSystem;
 
 pub cls PlantEnergySystem {
@@ -4668,10 +4857,26 @@ PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(plant) : 1.0f;
 
 float fireflyBonusRate = 0f;
 if (fireflyManagerInstance != null) {
-int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(plant.transform.position, fireflyManagerInstance.photosynthesisRadius);
+GridEntity plantGrid = plant.GetComponent<GridEntity>();
+if (plantGrid != null) {
+int radiusTiles = Mathf.CeilToInt(fireflyManagerInstance.photosynthesisRadius);
+
+int nearbyFlyCount = 0;
+var fireflies = Object.FindObjectsOfType<FireflyController>();
+
+foreach (var firefly in fireflies) {
+GridEntity fireflyGrid = firefly.GetComponent<GridEntity>();
+if (fireflyGrid != null &&
+GridRadiusUtility.IsWithinCircleRadius(fireflyGrid.Position, plantGrid.Position, radiusTiles)) {
+nearbyFlyCount++;
+}
+}
+
 fireflyBonusRate = Mathf.Min(
 nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly,
-fireflyManagerInstance.maxPhotosynthesisBonus);
+fireflyManagerInstance.maxPhotosynthesisBonus
+);
+}
 }
 
 float ticksPerSecond = TickManager.Instance?.Config?.ticksPerRealSecond ?? 2f;
@@ -4914,25 +5119,19 @@ pub cls PlantGrowthLogic {
 ro PlantGrowth plant;
 
 pub int TargetStemLength { get; set; }
-pub float GrowthSpeed { get; set; }
+pub int GrowthTicksPerStage { get; set; }
 pub int LeafGap { get; set; }
 pub int LeafPattern { get; set; }
 pub float GrowthRandomness { get; set; }
 pub int MaturityCycleTicks { get; set; }
-pub int NodeCastDelayTicks { get; set; } // Renamed from NodeCastDelay (float to int)
+pub int NodeCastDelayTicks { get; set; }
 
-float growthProgress = 0f;
+pub float EnergyPerTick { get; set; }
+pub float EnergyCostPerCycle { get; set; }
+
+float growthProgressTicks = 0f;
 int maturityCycleTick = 0;
 int currentStemStage = 0;
-int currentStemCount = 0;
-float cycleTimer = 0f;
-bool isGrowthCompletionHandled = false;
-
-Coroutine growthCoroutine;
-float estimatedTotalGrowthTime = 1f;
-float actualGrowthProgress = 0f;
-int stepsCompleted = 0;
-int totalPlannedSteps = 0;
 
 pub PlantGrowthLogic(PlantGrowth plant) {
 this.plant = plant;
@@ -4945,66 +5144,96 @@ return;
 }
 
 float baseEnergyStorage = 10f;
-float basePhotosynthesisRate = 0.5f;
+float baseEnergyPerTick = 0.25f; // Was 0.5f per second, now per tick
 int baseStemMin = 3;
 int baseStemMax = 5;
-float baseGrowthSpeedRate = 0.2f;
+int baseGrowthTicksPerStage = 5;
 int baseLeafGap = 1;
 int baseLeafPattern = 0;
 float baseGrowthRandomness = 0.1f;
 int baseCooldownTicks = 20;
-int baseCastDelayTicks = 0; // Changed from float to int
+int baseCastDelayTicks = 0;
 
 float accumulatedEnergyStorage = 0f;
-float accumulatedPhotosynthesis = 0f;
+float accumulatedEnergyPerTick = 0f;
 int stemLengthModifier = 0;
-float growthSpeedRateModifier = 0f;
+int growthTicksModifier = 0;
 int leafGapModifier = 0;
 int currentLeafPattern = baseLeafPattern;
 float growthRandomnessModifier = 0f;
 int cooldownTicksModifier = 0;
-int castDelayTicksModifier = 0; // Changed from float to int
+int castDelayTicksModifier = 0;
 bool seedFound = false;
 
 foreach (NodeData node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
 if (node?.effects == null) continue;
+
 foreach (var effect in node.effects) {
 if (effect == null) continue;
 
+effect.ValidateForTicks();
+
 if (effect.effectType == NodeEffectType.SeedSpawn) {
 seedFound = true;
-continue; // Skip to the next effect, as SeedSpawn has no other passive value.
+continue;
 }
 
 if (!effect.isPassive) continue;
 
 switch (effect.effectType) {
-case NodeEffectType.EnergyStorage: accumulatedEnergyStorage += effect.primaryValue; break;
-case NodeEffectType.EnergyPhotosynthesis: accumulatedPhotosynthesis += effect.primaryValue; break;
-case NodeEffectType.StemLength: stemLengthModifier += Mathf.RoundToInt(effect.primaryValue); break;
-case NodeEffectType.GrowthSpeed: growthSpeedRateModifier += effect.primaryValue; break;
-case NodeEffectType.LeafGap: leafGapModifier += Mathf.RoundToInt(effect.primaryValue); break;
-case NodeEffectType.LeafPattern: currentLeafPattern = Mathf.Clamp(Mathf.RoundToInt(effect.primaryValue), 0, 4); break;
-case NodeEffectType.StemRandomness: growthRandomnessModifier += effect.primaryValue; break;
-case NodeEffectType.Cooldown: cooldownTicksModifier += Mathf.RoundToInt(effect.primaryValue); break;
-case NodeEffectType.CastDelay: castDelayTicksModifier += Mathf.RoundToInt(effect.primaryValue); break; // Round to int
+case NodeEffectType.EnergyStorage:
+accumulatedEnergyStorage += effect.primaryValue;
+break;
+
+case NodeEffectType.EnergyPerTick:
+accumulatedEnergyPerTick += effect.primaryValue;
+break;
+
+case NodeEffectType.StemLength:
+stemLengthModifier += effect.GetPrimaryValueAsInt();
+break;
+
+case NodeEffectType.GrowthTicksPerStage:
+growthTicksModifier += effect.GetPrimaryValueAsInt();
+break;
+
+case NodeEffectType.LeafGap:
+leafGapModifier += effect.GetPrimaryValueAsInt();
+break;
+
+case NodeEffectType.LeafPattern:
+currentLeafPattern = Mathf.Clamp(effect.GetPrimaryValueAsInt(), 0, 4);
+break;
+
+case NodeEffectType.StemRandomness:
+growthRandomnessModifier += effect.primaryValue;
+break;
+
+case NodeEffectType.CooldownTicks:
+cooldownTicksModifier += effect.GetPrimaryValueAsInt();
+break;
+
+case NodeEffectType.CastDelayTicks:
+castDelayTicksModifier += effect.GetPrimaryValueAsInt();
+break;
 }
 }
 }
 
 plant.EnergySystem.MaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
-plant.EnergySystem.PhotosynthesisRate = Mathf.Max(0f, basePhotosynthesisRate + accumulatedPhotosynthesis);
+EnergyPerTick = Mathf.Max(0f, baseEnergyPerTick + accumulatedEnergyPerTick);
+plant.EnergySystem.PhotosynthesisRate = EnergyPerTick; // Set the per-tick rate
 
 int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier);
 int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
-GrowthSpeed = Mathf.Max(0.01f, baseGrowthSpeedRate + growthSpeedRateModifier);
+TargetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
+
+GrowthTicksPerStage = Mathf.Max(1, baseGrowthTicksPerStage + growthTicksModifier);
 LeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
 LeafPattern = currentLeafPattern;
 GrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
 MaturityCycleTicks = Mathf.Max(1, baseCooldownTicks + cooldownTicksModifier);
-NodeCastDelayTicks = Mathf.Max(0, baseCastDelayTicks + castDelayTicksModifier); // Use int ticks
-
-TargetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
+NodeCastDelayTicks = Mathf.Max(0, baseCastDelayTicks + castDelayTicksModifier);
 
 plant.NodeExecutor.ProcessPassiveEffects(plant.NodeGraph);
 
@@ -5016,30 +5245,23 @@ Debug.LogWarning($"[{plant.gameObject.name}] NodeGraph lacks a SeedSpawn effect.
 pub void OnTickUpdate(int currentTick) {
 switch (plant.CurrentState) {
 case PlantState.Growing:
-growthProgress += GrowthSpeed;
+growthProgressTicks += 1f;
 
-if (growthProgress >= 1.0f) {
-int stepsToGrow = Mathf.FloorToInt(growthProgress);
-growthProgress -= stepsToGrow;
+if (growthProgressTicks >= GrowthTicksPerStage) {
+growthProgressTicks = 0f;
 
-for (int i = 0; i < stepsToGrow; i++) {
-if (currentStemStage >= TargetStemLength) {
-CompleteGrowth();
-break;
-}
+if (currentStemStage < TargetStemLength) {
 GrowNextStemStage();
-}
-}
-
-if (currentStemStage >= TargetStemLength && plant.CurrentState == PlantState.Growing) {
+} else {
 CompleteGrowth();
 }
-
+}
 break;
 
 case PlantState.Mature_Idle:
 plant.EnergySystem.AccumulateEnergyTick();
 maturityCycleTick++;
+
 if (maturityCycleTick >= MaturityCycleTicks && plant.EnergySystem.CurrentEnergy >= 1f) {
 plant.CurrentState = PlantState.Mature_Executing;
 plant.NodeExecutor.ExecuteMatureCycleTick();
@@ -5084,13 +5306,6 @@ plant.CellManager.LeafDataList.Add(new LeafData(leafPos, true));
 pub void CompleteGrowth() {
 if (plant.CurrentState == PlantState.GrowthComplete) return;
 
-plant.CurrentState = PlantState.GrowthComplete;
-isGrowthCompletionHandled = false;
-
-if (plant.VisualManager.ShowGrowthPercentage) {
-plant.VisualManager.UpdateGrowthPercentageUI(true);
-}
-
 plant.CurrentState = PlantState.Mature_Idle;
 maturityCycleTick = 0;
 
@@ -5099,162 +5314,45 @@ Debug.Log($"[{plant.gameObject.name}] Growth completed! Transitioning to mature 
 }
 }
 
-pub void StartRealtimeGrowth() {
-if (growthCoroutine != null) return;
-growthCoroutine = plant.StartCoroutine(GrowthCoroutine_Time_Based());
+pub float GetGrowthProgressNormalized() {
+if (GrowthTicksPerStage <= 0) ret 1f;
+ret growthProgressTicks / GrowthTicksPerStage;
 }
 
-pub void StopGrowthCoroutine() {
-if (growthCoroutine != null) {
-plant.StopCoroutine(growthCoroutine);
-growthCoroutine = null;
-}
-}
+pub int GetCurrentStemStage() => currentStemStage;
 
 pub void HandleGrowthComplete() {
-if (!isGrowthCompletionHandled) {
-isGrowthCompletionHandled = true;
-if (plant.VisualManager.ShowGrowthPercentage && TargetStemLength > 0) {
-plant.VisualManager.UpdateGrowthPercentageUI(true);
-}
-float rtCooldown = MaturityCycleTicks * (TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
-cycleTimer = rtCooldown;
-plant.CurrentState = PlantState.Mature_Idle;
-plant.VisualManager.UpdateUI();
-}
+CompleteGrowth();
 }
 
 pub void UpdateMaturityCycle() {
-cycleTimer -= Time.deltaTime;
-if (cycleTimer <= 0f && plant.EnergySystem.CurrentEnergy >= 1f) {
-plant.CurrentState = PlantState.Mature_Executing;
-plant.StartCoroutine(ExecuteMatureCycle());
-}
 }
 
-IEnumerator GrowthCoroutine_Time_Based() {
-if (TargetStemLength <= 0) {
-plant.CurrentState = PlantState.GrowthComplete;
-growthCoroutine = null;
-yield break;
+pub void StopGrowthCoroutine() {
 }
 
-List<GrowthStep> growthPlan = PreCalculateGrowthPlan();
-totalPlannedSteps = growthPlan.Count;
-stepsCompleted = 0;
-actualGrowthProgress = 0f;
-
-if (totalPlannedSteps == 0) {
-plant.CurrentState = PlantState.GrowthComplete;
-growthCoroutine = null;
-yield break;
+pub void StartRealtimeGrowth() {
 }
 
-float ticksPerSecond = TickManager.Instance?.Config.ticksPerRealSecond ?? 2.0f;
-float baseTimePerStep = 1f / (Mathf.Max(0.01f, GrowthSpeed) * ticksPerSecond);
-
-if (baseTimePerStep <= 0.001f) baseTimePerStep = 0.01f;
-
-float initialTileMultiplier = PlantGrowthModifierManager.Instance?.GetGrowthSpeedMultiplier(plant) ?? 1.0f;
-initialTileMultiplier = Mathf.Clamp(initialTileMultiplier, 0.1f, 10.0f);
-float initialEffectiveTimePerStep = baseTimePerStep / initialTileMultiplier;
-if (initialEffectiveTimePerStep < 0.001f) initialEffectiveTimePerStep = 0.001f;
-
-estimatedTotalGrowthTime = totalPlannedSteps * initialEffectiveTimePerStep;
-if (estimatedTotalGrowthTime < 0.01f) estimatedTotalGrowthTime = 0.01f;
-
-float progressTowardNextStep = 0f;
-
-float castDelayInSeconds = NodeCastDelayTicks * (TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
-
-while (stepsCompleted < totalPlannedSteps && plant.CurrentState == PlantState.Growing) {
-float currentTileMultiplier = PlantGrowthModifierManager.Instance?.GetGrowthSpeedMultiplier(plant) ?? 1.0f;
-currentTileMultiplier = Mathf.Clamp(currentTileMultiplier, 0.1f, 10.0f);
-float currentEffectiveTimePerStep = baseTimePerStep / currentTileMultiplier;
-if (currentEffectiveTimePerStep < 0.001f) currentEffectiveTimePerStep = 0.001f;
-
-float progressRate = initialEffectiveTimePerStep / currentEffectiveTimePerStep;
-progressTowardNextStep += Time.deltaTime * progressRate;
-actualGrowthProgress = Mathf.Clamp01(progressTowardNextStep / initialEffectiveTimePerStep);
-
-int stepsToProcessThisFrame = 0;
-while (progressTowardNextStep >= initialEffectiveTimePerStep && stepsCompleted < totalPlannedSteps) {
-stepsToProcessThisFrame++;
-progressTowardNextStep -= initialEffectiveTimePerStep;
-if (stepsToProcessThisFrame >= 3) break;
+pub int GetStepsCompleted() {
+ret currentStemStage;
 }
 
-if (stepsToProcessThisFrame > 0) {
-for (int i = 0; i < stepsToProcessThisFrame; i++) {
-int currentPlanIndex = stepsCompleted;
-if (currentPlanIndex >= totalPlannedSteps) break;
-
-GrowthStep step = growthPlan[currentPlanIndex];
-GameObject spawnedCell = plant.CellManager.SpawnCellVisual(step.CellType, step.Position, null, null);
-if (spawnedCell != null && step.CellType == PlantCellType.Leaf) {
-plant.CellManager.LeafDataList.Add(new LeafData(step.Position, true));
-}
-if (step.CellType == PlantCellType.Stem) {
-currentStemCount = step.StemIndex;
-if (!plant.VisualManager.ContinuousIncrement) plant.VisualManager.UpdateGrowthPercentageUI();
-}
-stepsCompleted++;
-
-if (castDelayInSeconds > 0.01f && i < stepsToProcessThisFrame - 1) {
-yield ret new WaitForSeconds(castDelayInSeconds);
-}
-}
-}
-yield ret null;
+pub float GetGrowthProgress() {
+ret TargetStemLength > 0 ? (float)currentStemStage / TargetStemLength : 0f;
 }
 
-if (stepsCompleted >= totalPlannedSteps) {
-plant.CurrentState = PlantState.GrowthComplete;
-if (plant.VisualManager.ShowGrowthPercentage) plant.VisualManager.UpdateGrowthPercentageUI(true);
-}
-growthCoroutine = null;
+pub int GetTotalPlannedSteps() {
+ret TargetStemLength;
 }
 
-List<GrowthStep> PreCalculateGrowthPlan() {
-var plan = new List<GrowthStep>();
-for (int stemIndex = 1; stemIndex <= TargetStemLength; stemIndex++) {
-Vector2Int stemPosition = Vector2Int.up * stemIndex;
-if (Random.value < GrowthRandomness) {
-stemPosition += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
-}
-plan.Add(new GrowthStep { CellType = PlantCellType.Stem, Position = stemPosition, StemIndex = stemIndex });
-
-if (LeafGap >= 0 && stemIndex > 0 && (stemIndex % (LeafGap + 1)) == 0) {
-List<Vector2Int> leafPositions = plant.CellManager.CalculateLeafPositions(stemPosition, stemIndex, LeafPattern);
-foreach (Vector2Int leafPos in leafPositions) {
-plan.Add(new GrowthStep { CellType = PlantCellType.Leaf, Position = leafPos, StemIndex = stemIndex });
-}
-}
-}
-ret plan;
+pub float GetActualGrowthProgress() {
+ret GrowthTicksPerStage > 0 ? growthProgressTicks / GrowthTicksPerStage : 0f;
 }
 
-IEnumerator ExecuteMatureCycle() {
-plant.NodeExecutor.ExecuteMatureCycleTick();
-
-float finalRtCooldown = MaturityCycleTicks * (TickManager.Instance?.Config.GetRealSecondsPerTick() ?? 0.5f);
-cycleTimer = finalRtCooldown;
-plant.CurrentState = PlantState.Mature_Idle;
-yield ret null;
+pub int GetCurrentStemCount() {
+ret currentStemStage;
 }
-
-cls GrowthStep {
-pub PlantCellType CellType;
-pub Vector2Int Position;
-pub int StemIndex;
-}
-
-pub float GetGrowthProgress() => growthProgress;
-pub int GetCurrentStemStage() => currentStemStage;
-pub int GetCurrentStemCount() => currentStemCount;
-pub float GetActualGrowthProgress() => actualGrowthProgress;
-pub int GetStepsCompleted() => stepsCompleted;
-pub int GetTotalPlannedSteps() => totalPlannedSteps;
 }
 
 ////////////////////////////////////////////////////////////
@@ -5279,12 +5377,18 @@ PoopEnergyBonus = 0f;
 
 foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
 if (node?.effects == null) continue;
+
 foreach (var effect in node.effects) {
 if (effect == null || !effect.isPassive) continue;
 
-if (effect.effectType == NodeEffectType.PoopFertilizer) {
+switch (effect.effectType) {
+case NodeEffectType.PoopDetectionRadius:
 PoopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
-PoopEnergyBonus = Mathf.Max(0f, effect.secondaryValue);
+break;
+
+case NodeEffectType.PoopEnergyBonus:
+PoopEnergyBonus = Mathf.Max(0f, effect.primaryValue);
+break;
 }
 }
 }
@@ -5303,32 +5407,44 @@ float totalEnergyCostForCycle = 0f;
 
 foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
 if (node?.effects == null) continue;
+
 foreach (var effect in node.effects) {
 if (effect == null || effect.isPassive) continue;
+
 switch (effect.effectType) {
-case NodeEffectType.EnergyCost:
+case NodeEffectType.EnergyCostPerCycle:
 totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
 break;
+
 case NodeEffectType.Damage:
 damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue);
 break;
+
 case NodeEffectType.ScentModifier:
 if (effect.scentDefinitionReference != null) {
 ScentDefinition key = effect.scentDefinitionReference;
-accumulatedScentRadiusBonus.TryGetValue(key, out float currentRad);
-accumulatedScentRadiusBonus[key] = currentRad + effect.primaryValue;
-accumulatedScentStrengthBonus.TryGetValue(key, out float currentStr);
-accumulatedScentStrengthBonus[key] = currentStr + effect.secondaryValue;
+
+if (!accumulatedScentRadiusBonus.ContainsKey(key))
+accumulatedScentRadiusBonus[key] = 0f;
+accumulatedScentRadiusBonus[key] += effect.primaryValue;
+
+if (!accumulatedScentStrengthBonus.ContainsKey(key))
+accumulatedScentStrengthBonus[key] = 0f;
+accumulatedScentStrengthBonus[key] += effect.secondaryValue;
 }
 break;
 }
 }
 }
 
-if (PoopDetectionRadius > 0f) CheckForPoopAndAbsorb();
+if (PoopDetectionRadius > 0f) {
+CheckForPoopAndAbsorb();
+}
 
 if (plant.EnergySystem.CurrentEnergy < totalEnergyCostForCycle) {
-if (Debug.isDebugBuild) Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.CurrentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
+if (Debug.isDebugBuild) {
+Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.CurrentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
+}
 return;
 }
 
@@ -5336,16 +5452,22 @@ plant.EnergySystem.CurrentEnergy = Mathf.Max(0f, plant.EnergySystem.CurrentEnerg
 
 foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
 if (node?.effects == null) continue;
+
 foreach (var effect in node.effects) {
 if (effect == null || effect.isPassive ||
-effect.effectType == NodeEffectType.EnergyCost ||
+effect.effectType == NodeEffectType.EnergyCostPerCycle ||
 effect.effectType == NodeEffectType.Damage ||
 effect.effectType == NodeEffectType.ScentModifier) continue;
 
 switch (effect.effectType) {
 case NodeEffectType.Output:
-plant.GetComponentInChildren<OutputNodeEffect>()?.Activate(damageMultiplier, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+plant.GetComponentInChildren<OutputNodeEffect>()?.Activate(
+damageMultiplier,
+accumulatedScentRadiusBonus,
+accumulatedScentStrengthBonus
+);
 break;
+
 case NodeEffectType.GrowBerry:
 TrySpawnBerry(accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
 break;
@@ -5354,8 +5476,54 @@ break;
 }
 }
 
+void CheckForPoopAndAbsorb() {
+bool hasMissingLeaves = plant.CellManager.LeafDataList.Any(leaf => !leaf.IsActive);
+bool canAddEnergy = PoopEnergyBonus > 0f;
+if (!hasMissingLeaves && !canAddEnergy) return;
+
+int discreteRadius = Mathf.RoundToInt(PoopDetectionRadius);
+if (discreteRadius <= 0) return;
+
+GridEntity plantGrid = plant.GetComponent<GridEntity>();
+if (plantGrid == null) return;
+
+var tilesInRange = GridRadiusUtility.GetTilesInCircle(plantGrid.Position, discreteRadius);
+
+foreach (var tilePos in tilesInRange) {
+Vector3 worldPos = GridPositionManager.Instance.GridToWorld(tilePos);
+Collider2D[] colliders = Physics2D.OverlapPointAll(worldPos);
+
+foreach (Collider2D collider in colliders) {
+PoopController poop = collider.GetComponent<PoopController>();
+if (poop != null) {
+bool absorbed = false;
+
+if (hasMissingLeaves) {
+absorbed = plant.CellManager.TryRegrowLeaf();
+}
+
+if ((!absorbed || !hasMissingLeaves) && canAddEnergy) {
+plant.EnergySystem.CurrentEnergy = Mathf.Min(
+plant.EnergySystem.MaxEnergy,
+plant.EnergySystem.CurrentEnergy + PoopEnergyBonus
+);
+absorbed = true;
+}
+
+if (absorbed) {
+Object.Destroy(poop.gameObject);
+return; // Only absorb one poop per tick
+}
+}
+}
+}
+}
+
 void TrySpawnBerry(Dictionary<ScentDefinition, float> scentRadiiBonus, Dictionary<ScentDefinition, float> scentStrengthsBonus) {
-var berryCellPrefab = plant.CellManager.GetType().GetField("berryCellPrefab", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(plant.CellManager) as GameObject;
+var berryCellPrefab = plant.CellManager.GetType()
+.GetField("berryCellPrefab", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+.GetValue(plant.CellManager) as GameObject;
+
 if (berryCellPrefab == null) {
 Debug.LogWarning($"[{plant.gameObject.name}] Berry Prefab not assigned. Cannot spawn berry.", plant.gameObject);
 return;
@@ -5374,13 +5542,20 @@ ret berryOffsets.Select(offset => cellKvp.Key + offset);
 
 if (potentialCoords.Count > 0) {
 Vector2Int chosenCoord = potentialCoords[Random.Range(0, potentialCoords.Count)];
-GameObject berryGO = plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, chosenCoord, scentRadiiBonus, scentStrengthsBonus);
+GameObject berryGO = plant.CellManager.SpawnCellVisual(
+PlantCellType.Fruit,
+chosenCoord,
+scentRadiiBonus,
+scentStrengthsBonus
+);
+
 if (berryGO == null) {
-Debug.LogError($"[{plant.gameObject.name}] Failed to spawn berry visual at {chosenCoord}, SpawnCellVisual returned null.");
+Debug.LogError($"[{plant.gameObject.name}] Failed to spawn berry visual at {chosenCoord}");
 }
+} else {
+if (Debug.isDebugBuild) {
+Debug.Log($"[{plant.gameObject.name}] No valid empty adjacent locations found to spawn a berry.");
 }
-else {
-if (Debug.isDebugBuild) Debug.Log($"[{plant.gameObject.name}] No valid empty adjacent locations found to spawn a berry.");
 }
 }
 
@@ -5402,6 +5577,7 @@ strongestScentDef = kvp.Key;
 if (strongestScentDef != null) {
 ScentSource scentSource = targetObject.GetComponent<ScentSource>() ?? targetObject.AddComponent<ScentSource>();
 scentSource.definition = strongestScentDef;
+
 scentRadiusBonuses.TryGetValue(strongestScentDef, out float radiusBonus);
 scentSource.radiusModifier = radiusBonus;
 scentSource.strengthModifier = maxStrengthBonus;
@@ -5409,32 +5585,6 @@ scentSource.strengthModifier = maxStrengthBonus;
 if (strongestScentDef.particleEffectPrefab != null) {
 if (!targetObject.transform.GetComponentInChildren<ParticleSystem>()) {
 Object.Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform);
-}
-}
-}
-}
-
-void CheckForPoopAndAbsorb() {
-bool hasMissingLeaves = plant.CellManager.LeafDataList.Any(leaf => !leaf.IsActive);
-bool canAddEnergy = PoopEnergyBonus > 0f;
-if (!hasMissingLeaves && !canAddEnergy) return;
-
-float discreteRadius = Mathf.RoundToInt(PoopDetectionRadius);
-if (discreteRadius <= 0f) return;
-
-Collider2D[] colliders = Physics2D.OverlapCircleAll(plant.transform.position, discreteRadius);
-foreach (Collider2D collider in colliders) {
-PoopController poop = collider.GetComponent<PoopController>();
-if (poop != null) {
-bool absorbed = false;
-if (hasMissingLeaves) absorbed = plant.CellManager.TryRegrowLeaf();
-if ((!absorbed || !hasMissingLeaves) && canAddEnergy) {
-plant.EnergySystem.CurrentEnergy = Mathf.Min(plant.EnergySystem.MaxEnergy, plant.EnergySystem.CurrentEnergy + PoopEnergyBonus);
-absorbed = true;
-}
-if (absorbed) {
-Object.Destroy(poop.gameObject);
-break;
 }
 }
 }
@@ -7642,6 +7792,107 @@ DestroyImmediate(gameObject);
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Ticks\GridDebugVisualizer.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+pub cls GridDebugVisualizer : MonoBehaviour {
+pub stat GridDebugVisualizer Instance { get; set; }
+
+[SerializeField] bool showRadiusVisualizations = true;
+[SerializeField] float tileVisualizationAlpha = 0.3f;
+[SerializeField] GameObject tilePrefab; // Simple square sprite
+
+[SerializeField] Color animalSearchRadiusColor = new Color(1f, 0.5f, 0f, 0.3f);
+[SerializeField] Color plantPoopRadiusColor = new Color(0.6f, 0.4f, 0.2f, 0.3f);
+[SerializeField] Color scentRadiusColor = new Color(1f, 1f, 0f, 0.3f);
+[SerializeField] Color fireflyPhotosynthesisColor = new Color(0f, 1f, 0.5f, 0.3f);
+[SerializeField] Color toolUseRadiusColor = new Color(0f, 0.5f, 1f, 0.3f);
+
+Dictionary<object, List<GameObject>> visualizedRadii = new Dictionary<object, List<GameObject>>();
+
+void Awake() {
+if (Instance != null && Instance != this) {
+Destroy(gameObject);
+return;
+}
+Instance = this;
+}
+
+void OnDestroy() {
+ClearAllVisualizations();
+if (Instance == this) Instance = null;
+}
+
+pub void VisualizeRadius(object source, GridPosition center, int radius, Color color, float duration = 0f) {
+if (!showRadiusVisualizations || tilePrefab == null) return;
+
+ClearVisualization(source);
+
+var tiles = GridRadiusUtility.GetTilesInCircle(center, radius);
+var tileObjects = new List<GameObject>();
+
+foreach (var tile in tiles) {
+Vector3 worldPos = GridPositionManager.Instance.GridToWorld(tile);
+GameObject tileVis = Instantiate(tilePrefab, worldPos, Quaternion.identity, transform);
+
+SpriteRenderer sr = tileVis.GetComponent<SpriteRenderer>();
+if (sr != null) {
+Color finalColor = color;
+finalColor.a = tileVisualizationAlpha;
+sr.color = finalColor;
+sr.sortingOrder = -100; // Behind everything
+}
+
+tileObjects.Add(tileVis);
+
+if (duration > 0) {
+Destroy(tileVis, duration);
+}
+}
+
+if (duration <= 0) {
+visualizedRadii[source] = tileObjects;
+}
+}
+
+pub void ClearVisualization(object source) {
+if (visualizedRadii.TryGetValue(source, out var tiles)) {
+foreach (var tile in tiles) {
+if (tile != null) Destroy(tile);
+}
+visualizedRadii.Remove(source);
+}
+}
+
+pub void ClearAllVisualizations() {
+foreach (var kvp in visualizedRadii) {
+foreach (var tile in kvp.Value) {
+if (tile != null) Destroy(tile);
+}
+}
+visualizedRadii.Clear();
+}
+
+pub void VisualizeAnimalSearchRadius(AnimalController animal, GridPosition center, int radius) {
+VisualizeRadius(animal, center, radius, animalSearchRadiusColor);
+}
+
+pub void VisualizePlantPoopRadius(PlantGrowth plant, GridPosition center, int radius) {
+VisualizeRadius(plant, center, radius, plantPoopRadiusColor);
+}
+
+pub void VisualizeScentRadius(ScentSource scent, GridPosition center, int radius) {
+VisualizeRadius(scent, center, radius, scentRadiusColor);
+}
+
+pub void VisualizeToolUseRadius(GridPosition center, int radius, float duration = 1f) {
+VisualizeRadius("tool_use", center, radius, toolUseRadiusColor, duration);
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridSnapStartup.cs
 
 ﻿// Assets\Scripts\Core\GridSnapStartup.cs
@@ -7704,6 +7955,177 @@ return;
 }
 
 PerformGridSnapping();
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Ticks\TickDebugMonitor.cs
+
+﻿using UnityEngine;
+using TMPro;
+using WegoSystem;
+
+pub cls TickDebugMonitor : MonoBehaviour {
+[SerializeField] GameObject monitorPanel;
+[SerializeField] TextMeshProUGUI tickCounterText;
+[SerializeField] TextMeshProUGUI tickRateText;
+[SerializeField] TextMeshProUGUI dayProgressText;
+[SerializeField] TextMeshProUGUI phaseText;
+
+[SerializeField] TextMeshProUGUI animalCountText;
+[SerializeField] TextMeshProUGUI plantCountText;
+[SerializeField] TextMeshProUGUI fireflyCountText;
+
+[SerializeField] TextMeshProUGUI tickDurationText;
+[SerializeField] Slider tickDurationBar;
+[SerializeField] float maxTickDuration = 50f; // milliseconds
+
+[SerializeField] Transform effectListContainer;
+[SerializeField] GameObject effectEntryPrefab;
+
+[SerializeField] KeyCode toggleKey = KeyCode.F3;
+[SerializeField] bool showOnStart = false;
+
+float lastTickStartTime;
+float lastTickDuration;
+Queue<float> tickDurationHistory = new Queue<float>();
+c int HISTORY_SIZE = 60;
+
+Dictionary<string, TickEffectEntry> activeEffects = new Dictionary<string, TickEffectEntry>();
+List<GameObject> effectUIEntries = new List<GameObject>();
+
+cls TickEffectEntry {
+pub string name;
+pub string source;
+pub int remainingTicks;
+pub Color color;
+}
+
+void Start() {
+monitorPanel.SetActive(showOnStart);
+
+if (TickManager.Instance != null) {
+TickManager.Instance.OnTickStarted += OnTickStarted;
+TickManager.Instance.OnTickCompleted += OnTickCompleted;
+}
+}
+
+void OnDestroy() {
+if (TickManager.Instance != null) {
+TickManager.Instance.OnTickStarted -= OnTickStarted;
+TickManager.Instance.OnTickCompleted -= OnTickCompleted;
+}
+}
+
+void Update() {
+if (Input.GetKeyDown(toggleKey)) {
+monitorPanel.SetActive(!monitorPanel.activeSelf);
+}
+
+if (monitorPanel.activeSelf) {
+UpdateDisplay();
+}
+}
+
+void OnTickStarted(int tick) {
+lastTickStartTime = Time.realtimeSinceStartup;
+}
+
+void OnTickCompleted(int tick) {
+lastTickDuration = (Time.realtimeSinceStartup - lastTickStartTime) * 1000f; // Convert to ms
+
+tickDurationHistory.Enqueue(lastTickDuration);
+if (tickDurationHistory.Count > HISTORY_SIZE) {
+tickDurationHistory.Dequeue();
+}
+}
+
+void UpdateDisplay() {
+if (TickManager.Instance == null) return;
+
+tickCounterText.text = $"Tick: {TickManager.Instance.CurrentTick}";
+tickRateText.text = $"Rate: {TickManager.Instance.Config.ticksPerRealSecond:F1} ticks/sec";
+
+if (TickManager.Instance.Config != null) {
+int dayProgress = TickManager.Instance.Config.GetDayProgress(TickManager.Instance.CurrentTick);
+float dayPercent = TickManager.Instance.Config.GetDayProgressNormalized(TickManager.Instance.CurrentTick) * 100f;
+dayProgressText.text = $"Day: {dayProgress}/{TickManager.Instance.Config.ticksPerDay} ({dayPercent:F0}%)";
+}
+
+if (TurnPhaseManager.Instance != null) {
+phaseText.text = $"Phase: {TurnPhaseManager.Instance.CurrentPhase} (Tick {TurnPhaseManager.Instance.CurrentPhaseTicks})";
+}
+
+animalCountText.text = $"Animals: {CountEntities<AnimalController>()}";
+plantCountText.text = $"Plants: {PlantGrowth.AllActivePlants.Count}";
+fireflyCountText.text = $"Fireflies: {CountEntities<FireflyController>()}";
+
+float avgTickDuration = tickDurationHistory.Count > 0 ? tickDurationHistory.Average() : 0f;
+tickDurationText.text = $"Tick Time: {avgTickDuration:F1}ms (Last: {lastTickDuration:F1}ms)";
+tickDurationBar.value = avgTickDuration / maxTickDuration;
+
+if (avgTickDuration < maxTickDuration * 0.5f) {
+tickDurationBar.fillRect.GetComponent<Image>().color = Color.green;
+} else if (avgTickDuration < maxTickDuration * 0.8f) {
+tickDurationBar.fillRect.GetComponent<Image>().color = Color.yellow;
+} else {
+tickDurationBar.fillRect.GetComponent<Image>().color = Color.red;
+}
+
+UpdateActiveEffects();
+}
+
+int CountEntities<T>() where T : Component {
+ret FindObjectsByType<T>(FindObjectsSortMode.None).Length;
+}
+
+void UpdateActiveEffects() {
+activeEffects.Clear();
+
+var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+foreach (var animal in animals) {
+if (animal.CurrentHealth < animal.definition.maxHealth * 0.3f) {
+AddEffect($"{animal.SpeciesName}_low_health", "Low Health", animal.SpeciesName, -1, Color.red);
+}
+}
+
+foreach (var plant in PlantGrowth.AllActivePlants) {
+if (plant.CurrentState == PlantState.Growing) {
+var logic = plant.GrowthLogic;
+int remainingTicks = logic.GrowthTicksPerStage - Mathf.FloorToInt(logic.GetGrowthProgressNormalized() * logic.GrowthTicksPerStage);
+AddEffect($"plant_growing_{plant.GetInstanceID()}", "Growing", plant.name, remainingTicks, Color.green);
+}
+}
+
+RefreshEffectUI();
+}
+
+void AddEffect(string id, string name, string source, int remainingTicks, Color color) {
+activeEffects[id] = new TickEffectEntry {
+name = name,
+source = source,
+remainingTicks = remainingTicks,
+color = color
+};
+}
+
+void RefreshEffectUI() {
+foreach (var entry in effectUIEntries) {
+Destroy(entry);
+}
+effectUIEntries.Clear();
+
+foreach (var effect in activeEffects.Values.OrderBy(e => e.source)) {
+GameObject entry = Instantiate(effectEntryPrefab, effectListContainer);
+effectUIEntries.Add(entry);
+
+TextMeshProUGUI text = entry.GetComponentInChildren<TextMeshProUGUI>();
+if (text != null) {
+string tickText = effect.remainingTicks >= 0 ? $"{effect.remainingTicks}t" : "∞";
+text.text = $"{effect.source}: {effect.name} [{tickText}]";
+text.color = effect.color;
+}
+}
 }
 }
 
@@ -10269,26 +10691,36 @@ ret entitiesByPosition.ContainsKey(position)
 : new HashSet<GridEntity>();
 }
 
-pub List<GridEntity> GetEntitiesInRadius(GridPosition center, int radius, bool useManhattan = true) {
+pub List<GridEntity> GetEntitiesInRadius(GridPosition center, int radius, bool useCircle = true) {
 var result = new List<GridEntity>();
 
+if (useCircle) {
+var tilesInRadius = GridRadiusUtility.GetTilesInCircle(center, radius);
+foreach (var pos in tilesInRadius) {
+if (entitiesByPosition.ContainsKey(pos)) {
+result.AddRange(entitiesByPosition[pos]);
+}
+}
+} else {
 for (int x = -radius; x <= radius; x++) {
 for (int y = -radius; y <= radius; y++) {
 var checkPos = new GridPosition(center.x + x, center.y + y);
-
-if (useManhattan) {
-if (checkPos.ManhattanDistance(center) > radius) continue;
-}
-else {
-if (checkPos.ChebyshevDistance(center) > radius) continue;
-}
-
-if (entitiesByPosition.ContainsKey(checkPos)) {
+if (checkPos.ManhattanDistance(center) <= radius && entitiesByPosition.ContainsKey(checkPos)) {
 result.AddRange(entitiesByPosition[checkPos]);
 }
 }
 }
+}
+
 ret result;
+}
+
+pub bool IsPositionWithinRadius(GridPosition position, GridPosition center, int radius, bool useCircle = true) {
+if (useCircle) {
+ret GridRadiusUtility.IsWithinCircleRadius(position, center, radius);
+} else {
+ret position.ManhattanDistance(center) <= radius;
+}
 }
 
 pub GridEntity GetNearestEntity(GridPosition position, System.Func<GridEntity, bool> predicate = null) {
@@ -10305,6 +10737,10 @@ nearestDistance = distance;
 }
 }
 ret nearest;
+}
+
+pub Grid GetTilemapGrid() {
+ret TilemapGrid;
 }
 
 pub List<GridPosition> GetPath(GridPosition start, GridPosition end, bool allowDiagonal = false) {
@@ -10400,11 +10836,32 @@ Debug.Log($"[GridPositionManager] Snapped {entity.name} to grid {gridEntity.Posi
 }
 
 pub void SnapAllEntitiesToGrid<T>() where T : Component {
-T[] entities = FindObjectsByType<T>(FindObjectsSortMode.None);
+T[] entities = FindObjectsOfType<T>();
 foreach (var entity in entities) {
 SnapEntityToGrid(entity.gameObject);
 }
 Debug.Log($"[GridPositionManager] Snapped {entities.Length} entities of type {typeof(T).Name} to grid");
+}
+
+pub stat List<GridPosition> GetTilesInRadius(GridPosition center, int radius, bool useManhattan = true) {
+var result = new List<GridPosition>();
+
+for (int x = -radius; x <= radius; x++) {
+for (int y = -radius; y <= radius; y++) {
+var offset = new GridPosition(x, y);
+var checkPos = center + offset;
+
+int distance = useManhattan
+? Mathf.Abs(x) + Mathf.Abs(y)
+: Mathf.Max(Mathf.Abs(x), Mathf.Abs(y));
+
+if (distance <= radius) {
+result.Add(checkPos);
+}
+}
+}
+
+ret result;
 }
 
 void OnDrawGizmos() {
@@ -10439,6 +10896,150 @@ Gizmos.DrawWireCube(cellCenter, Vector3.one * TilemapGrid.cellSize.x * 0.8f);
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Ticks\GridRadiusUtility.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+ns WegoSystem {
+pub stat cls GridRadiusUtility {
+pub stat List<GridPosition> GetTilesInCircle(GridPosition center, int radius, bool filled = true) {
+var result = new List<GridPosition>();
+
+if (radius <= 0) {
+result.Add(center);
+ret result;
+}
+
+for (int dx = -radius; dx <= radius; dx++) {
+for (int dy = -radius; dy <= radius; dy++) {
+float distance = Mathf.Sqrt(dx * dx + dy * dy);
+
+if (filled) {
+if (distance <= radius + 0.5f) {
+result.Add(new GridPosition(center.x + dx, center.y + dy));
+}
+} else {
+if (distance >= radius - 0.5f && distance <= radius + 0.5f) {
+result.Add(new GridPosition(center.x + dx, center.y + dy));
+}
+}
+}
+}
+
+ret result;
+}
+
+pub stat List<GridPosition> GetPerfectCircleTiles(GridPosition center, int radius) {
+var result = new HashSet<GridPosition>();
+
+if (radius == 0) {
+result.Add(center);
+ret new List<GridPosition>(result);
+}
+
+int x = 0;
+int y = radius;
+int d = 3 - 2 * radius;
+
+while (x <= y) {
+AddCirclePoints(result, center, x, y);
+
+if (d < 0) {
+d = d + 4 * x + 6;
+} else {
+d = d + 4 * (x - y) + 10;
+y--;
+}
+x++;
+}
+
+var filledResult = new List<GridPosition>();
+int minX = center.x - radius;
+int maxX = center.x + radius;
+
+for (int scanY = center.y - radius; scanY <= center.y + radius; scanY++) {
+bool inside = false;
+int startX = minX;
+
+for (int scanX = minX; scanX <= maxX; scanX++) {
+var pos = new GridPosition(scanX, scanY);
+if (result.Contains(pos)) {
+if (!inside) {
+inside = true;
+startX = scanX;
+}
+} else if (inside) {
+for (int fillX = startX; fillX < scanX; fillX++) {
+filledResult.Add(new GridPosition(fillX, scanY));
+}
+inside = false;
+}
+}
+
+if (inside) {
+for (int fillX = startX; fillX <= maxX; fillX++) {
+var pos = new GridPosition(fillX, scanY);
+if (result.Contains(pos) || fillX == maxX) {
+for (int fill = startX; fill <= fillX; fill++) {
+filledResult.Add(new GridPosition(fill, scanY));
+}
+break;
+}
+}
+}
+}
+
+ret filledResult;
+}
+
+stat void AddCirclePoints(HashSet<GridPosition> result, GridPosition center, int x, int y) {
+result.Add(new GridPosition(center.x + x, center.y + y));
+result.Add(new GridPosition(center.x - x, center.y + y));
+result.Add(new GridPosition(center.x + x, center.y - y));
+result.Add(new GridPosition(center.x - x, center.y - y));
+result.Add(new GridPosition(center.x + y, center.y + x));
+result.Add(new GridPosition(center.x - y, center.y + x));
+result.Add(new GridPosition(center.x + y, center.y - x));
+result.Add(new GridPosition(center.x - y, center.y - x));
+}
+
+pub stat bool IsWithinCircleRadius(GridPosition position, GridPosition center, int radius) {
+int dx = position.x - center.x;
+int dy = position.y - center.y;
+float distance = Mathf.Sqrt(dx * dx + dy * dy);
+ret distance <= radius + 0.5f;
+}
+
+pub stat List<GridPosition> GetCircleOutline(GridPosition center, int radius) {
+ret GetTilesInCircle(center, radius, false);
+}
+
+pub stat void DebugPrintRadius(GridPosition center, int radius) {
+var tiles = GetTilesInCircle(center, radius);
+var tileSet = new HashSet<GridPosition>(tiles);
+
+Debug.Log($"Circle pattern for radius {radius}:");
+
+for (int y = radius; y >= -radius; y--) {
+string line = "";
+for (int x = -radius; x <= radius; x++) {
+var pos = new GridPosition(center.x + x, center.y + y);
+if (pos.Equals(center)) {
+line += "◉ "; // Center
+} else if (tileSet.Contains(pos)) {
+line += "● "; // Included tile
+} else {
+line += "· "; // Not included
+}
+}
+Debug.Log(line);
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\TickConfiguration.cs
 
 ﻿using UnityEngine;
@@ -10448,40 +11049,28 @@ ns WegoSystem {
 pub cls TickConfiguration : ScriptableObject {
 [SerializeField] pub float ticksPerRealSecond = 2f;
 
-pub int ticksPerGameHour = 10;
-pub int hoursPerDay = 24;
-pub int TicksPerDay => ticksPerGameHour * hoursPerDay;
-
-pub int ticksPerDay = 100;  // Total ticks for one full day
+pub int ticksPerDay = 100;
 pub int dayPhaseTicks = 60;
 pub int nightPhaseTicks = 40;
 pub int transitionTicks = 10;
 
-pub int ticksPerWave = 50;  // How long each wave lasts in ticks
-pub bool wavesDependOnDayCycle = false;  // If true, waves end with day cycles
+pub int ticksPerWave = 50;
+pub bool wavesDependOnDayCycle = false;
 
-pub int maxPlanningPhaseTicks = 0;
+pub int maxPlanningPhaseTicks = 0; // 0 = unlimited
 pub int executionPhaseTicks = 5;
-
-pub int plantGrowthTicksPerStage = 5;
 
 pub int animalHungerTickInterval = 3;
 pub int animalThinkingInterval = 3;
 
-pub int waveSpawnDelayTicks = 20;
+pub int defaultPlantGrowthTicksPerStage = 5;
+pub int defaultPlantMaturityCycleTicks = 20;
 
 pub int movementTicksPerTile = 1;
 pub int movementCooldownTicks = 0;
 
-[SerializeField] bool useVariableTickRate = false;
-[SerializeField] AnimationCurve tickRateCurve = AnimationCurve.Linear(0, 1, 1, 1);
-
 pub float GetRealSecondsPerTick() {
 ret ticksPerRealSecond > 0 ? 1f / ticksPerRealSecond : 0.5f;
-}
-
-pub int GetTotalDayNightCycleTicks() {
-ret dayPhaseTicks + nightPhaseTicks + (transitionTicks * 2);
 }
 
 pub int ConvertSecondsToTicks(float seconds) {
@@ -10492,31 +11081,30 @@ pub float ConvertTicksToSeconds(int ticks) {
 ret ticks / ticksPerRealSecond;
 }
 
-pub int GetPhaseTickDuration(TurnPhase phase) {
-switch (phase) {
-case TurnPhase.Planning: ret maxPlanningPhaseTicks;
-case TurnPhase.Execution: ret executionPhaseTicks;
-default: ret 1;
-}
-}
-
-pub float GetTickRateMultiplier(int currentTick) {
-if (!useVariableTickRate) ret 1f;
-
-float normalizedTime = (currentTick % TicksPerDay) / (float)TicksPerDay;
-ret tickRateCurve.Evaluate(normalizedTime);
-}
-
-pub void SetTicksPerSecond(float newRate) {
-ticksPerRealSecond = Mathf.Max(0.1f, newRate);
-}
-
 pub int GetDayProgress(int currentTick) {
 ret currentTick % ticksPerDay;
 }
 
 pub float GetDayProgressNormalized(int currentTick) {
 ret (float)(currentTick % ticksPerDay) / ticksPerDay;
+}
+
+pub void SetTicksPerSecond(float newRate) {
+ticksPerRealSecond = Mathf.Max(0.1f, newRate);
+}
+
+void OnValidate() {
+ticksPerRealSecond = Mathf.Max(0.1f, ticksPerRealSecond);
+ticksPerDay = Mathf.Max(10, ticksPerDay);
+ticksPerWave = Mathf.Max(10, ticksPerWave);
+dayPhaseTicks = Mathf.Max(1, dayPhaseTicks);
+nightPhaseTicks = Mathf.Max(1, nightPhaseTicks);
+transitionTicks = Mathf.Max(1, transitionTicks);
+executionPhaseTicks = Mathf.Max(1, executionPhaseTicks);
+animalHungerTickInterval = Mathf.Max(1, animalHungerTickInterval);
+animalThinkingInterval = Mathf.Max(1, animalThinkingInterval);
+defaultPlantGrowthTicksPerStage = Mathf.Max(1, defaultPlantGrowthTicksPerStage);
+defaultPlantMaturityCycleTicks = Mathf.Max(1, defaultPlantMaturityCycleTicks);
 }
 
 void ApplySlowPacedPreset() {
@@ -10527,7 +11115,7 @@ dayPhaseTicks = 120;
 nightPhaseTicks = 80;
 transitionTicks = 20;
 executionPhaseTicks = 10;
-plantGrowthTicksPerStage = 8;
+defaultPlantGrowthTicksPerStage = 8;
 animalHungerTickInterval = 5;
 }
 
@@ -10539,7 +11127,7 @@ dayPhaseTicks = 30;
 nightPhaseTicks = 20;
 transitionTicks = 5;
 executionPhaseTicks = 3;
-plantGrowthTicksPerStage = 2;
+defaultPlantGrowthTicksPerStage = 2;
 animalHungerTickInterval = 2;
 }
 
@@ -10551,21 +11139,8 @@ dayPhaseTicks = 60;
 nightPhaseTicks = 40;
 transitionTicks = 10;
 executionPhaseTicks = 5;
-plantGrowthTicksPerStage = 5;
+defaultPlantGrowthTicksPerStage = 5;
 animalHungerTickInterval = 3;
-}
-
-void OnValidate() {
-ticksPerRealSecond = Mathf.Max(0.1f, ticksPerRealSecond);
-ticksPerDay = Mathf.Max(10, ticksPerDay);
-ticksPerWave = Mathf.Max(10, ticksPerWave);
-dayPhaseTicks = Mathf.Max(1, dayPhaseTicks);
-nightPhaseTicks = Mathf.Max(1, nightPhaseTicks);
-transitionTicks = Mathf.Max(1, transitionTicks);
-executionPhaseTicks = Mathf.Max(1, executionPhaseTicks);
-plantGrowthTicksPerStage = Mathf.Max(1, plantGrowthTicksPerStage);
-animalHungerTickInterval = Mathf.Max(1, animalHungerTickInterval);
-animalThinkingInterval = Mathf.Max(1, animalThinkingInterval);
 }
 }
 }
@@ -10739,6 +11314,7 @@ ret tickUpdateables.Count;
 using UnityEngine.Tilemaps;
 using skner.DualGrid; // Assuming this is the correct ns for your DualGrid package
 using TMPro;
+using WegoSystem;
 #if UNITY_EDITOR
 using UnityEditor; // Correct placement for editor-specific using directive
 #endif
@@ -11024,15 +11600,22 @@ void HandleTileHover() {
 if (mainCamera == null || player == null) return;
 
 Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-mouseWorldPos.z = 0f; // Ensure Z is 0 for 2D comparison
+mouseWorldPos.z = 0f;
 Vector3Int cellPos = WorldToCell(mouseWorldPos);
 
-float distance = (player != null) ? Vector2.Distance(player.position, CellCenterWorld(cellPos)) : float.MaxValue;
+GridEntity playerGrid = player.GetComponent<GridEntity>();
+if (playerGrid == null) return;
+
+int gridRadius = Mathf.CeilToInt(hoverRadius);
+
+GridPosition playerGridPos = playerGrid.Position;
+GridPosition hoveredGridPos = new GridPosition(cellPos.x, cellPos.y);
+
+bool withinRadius = GridRadiusUtility.IsWithinCircleRadius(hoveredGridPos, playerGridPos, gridRadius);
 
 TileDefinition foundTile = FindWhichTileDefinitionAt(cellPos);
 
-if (distance <= hoverRadius) {
-bool changedCell = !currentlyHoveredCell.HasValue || currentlyHoveredCell.Value != cellPos;
+if (withinRadius) {
 currentlyHoveredCell = cellPos;
 hoveredTileDef = foundTile;
 
@@ -11040,9 +11623,12 @@ if (hoverHighlightObject != null) {
 hoverHighlightObject.SetActive(true);
 hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
 }
+
+if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
+GridDebugVisualizer.Instance.VisualizeToolUseRadius(playerGridPos, gridRadius, 0.1f);
+}
 }
 else {
-bool changedCell = currentlyHoveredCell.HasValue;
 currentlyHoveredCell = null;
 hoveredTileDef = null;
 if (hoverHighlightObject != null) {

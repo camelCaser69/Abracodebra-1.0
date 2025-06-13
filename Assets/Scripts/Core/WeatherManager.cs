@@ -59,14 +59,12 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
 
     public void OnTickUpdate(int currentTick) {
         if (!useWegoSystem || !dayNightCycleEnabled || IsPaused) return;
-
-        // Use tick-based day progress
+    
         if (TickManager.Instance?.Config != null) {
             float dayProgress = TickManager.Instance.Config.GetDayProgressNormalized(currentTick);
-            
-            // Map progress to cycle phases
+        
             CyclePhase newPhase = currentPhase;
-            
+        
             if (dayProgress < 0.4f) {
                 newPhase = CyclePhase.Day;
                 sunIntensity = 1f;
@@ -82,15 +80,14 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
                 float transitionProgress = (dayProgress - 0.9f) / 0.1f;
                 sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(transitionProgress));
             }
-            
-            // Update phase if changed
+        
             if (newPhase != currentPhase) {
                 currentPhase = newPhase;
                 if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
                 OnPhaseChanged?.Invoke(currentPhase);
             }
         }
-        
+    
         UpdateFadeSprite();
     }
 

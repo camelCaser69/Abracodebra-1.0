@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2668219994839306107}
   - component: {fileID: 9051004935783722688}
   - component: {fileID: 4638215477615662194}
+  - component: {fileID: 6719265720484650256}
   m_Layer: 0
   m_Name: FireflyPrefab
   m_TagString: Untagged
@@ -47,31 +48,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f2aa964cbc294620ba6dd9d72376102a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pointLight: {fileID: 4638215477615662194}
+  definition: {fileID: 11400000, guid: 1cc89b90f50ee864d861d27e677a0e04, type: 2}
+  glowLight: {fileID: 4638215477615662194}
   spriteRenderer: {fileID: 2668219994839306107}
-  speedRange: {x: 0.3, y: 1.2}
-  directionChangeInterval: 1
-  pauseChance: 0
-  pauseDurationRange: {x: 0.2, y: 0.8}
-  lifetimeRange: {x: 5, y: 15}
-  fadeInDuration: 0.75
-  fadeOutDuration: 1.5
-  enableFlicker: 1
-  intensityRange: {x: 2, y: 3}
-  flickerSpeed: 2
-  enableSpawnEffect: 1
-  spawnEffectDuration: 2
-  spawnBaseIntensity: 2
-  spawnBlackoutChance: 1
-  blackoutDurationRange: {x: 0.04, y: 0.12}
-  blackoutSpacingRange: {x: 0.06, y: 0.5}
-  scentCheckInterval: 1
-  scentOverlapCheckRadius: 10
-  attractionStrength: 1.1
-  orbitDistance: 2
-  attractionWobble: 1
-  attractiveScentDefinitions:
-  - {fileID: 11400000, guid: caaf706f86468d545951ef96005f0761, type: 2}
+  trailRenderer: {fileID: 0}
+  glowParticles: {fileID: 0}
 --- !u!212 &2668219994839306107
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -194,3 +175,45 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
+--- !u!114 &6719265720484650256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4042090984494424328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfbd677749bc48f381a146220bb35a7d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gridPosition:
+    x: 0
+    y: 0
+  groundPointOffset: {x: 0, y: 0, z: 0}
+  visualOffset: {x: 0, y: 0, z: 0}
+  visualInterpolationSpeed: 5
+  movementCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

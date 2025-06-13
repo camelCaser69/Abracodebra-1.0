@@ -1,51 +1,32 @@
 ﻿using System;
-using UnityEngine;
 
-public enum NodeEffectType
-{
-    // --- Passive / Growth Phase Effects (isPassive = true) ---
-    // These typically run once at the start to define the plant's structure and base stats.
+public enum NodeEffectType {
+    // Energy & Resources
+    EnergyStorage,           // Max energy capacity
+    EnergyPerTick,          // Energy generated per tick
+    EnergyCost,             // Energy cost when executing mature cycle
 
-    // [Tooltip("Base cost calculation (Not currently implemented in PlantGrowth execution).")]
-    // ManaCost, // REMOVED
-    [Tooltip("Determines the maximum energy the plant can store.")]
-    EnergyStorage,
-    [Tooltip("Determines the base rate of energy generation through photosynthesis per leaf.")]
-    EnergyPhotosynthesis,
-    [Tooltip("A required marker effect for a node chain to be spawnable as a plant.")]
-    SeedSpawn,
-    [Tooltip("Modifies the minimum and maximum potential length of the main stem.")]
-    StemLength,
-    [Tooltip("Modifies the time interval between each step of stem/leaf growth.")]
-    GrowthSpeed,
-    [Tooltip("Modifies the number of stem segments between leaf spawns.")]
-    LeafGap,
-    [Tooltip("Sets the pattern in which leaves are spawned (e.g., Parallel, Alternating).")]
-    LeafPattern,
-    [Tooltip("Modifies the chance for the stem to grow diagonally instead of straight up.")]
-    StemRandomness,
-    [Tooltip("Modifies the base time duration between Mature Phase execution cycles.")]
-    Cooldown,
-    [Tooltip("Modifies the base time delay between executing the effects of sequential nodes within a Mature Phase cycle.")]
-    CastDelay,
-    [Tooltip("Allows the plant to absorb poop within a radius and regrow eaten leaves or gain energy. PrimaryValue=Detection Radius, SecondaryValue=Energy Added.")]
-    PoopFertilizer,
+    // Growth & Structure
+    StemLength,             // Number of stem segments
+    GrowthSpeed,            // Ticks between growth stages
+    LeafGap,                // Stem segments between leaves
+    LeafPattern,            // Pattern type (0-4)
+    StemRandomness,         // Chance of random stem direction (0-1)
 
+    // Timing
+    Cooldown,               // Ticks between mature cycles
+    CastDelay,              // Ticks delay before growth starts
 
-    // --- Active / Mature Phase Effects (isPassive = false) ---
-    // These execute periodically after the plant has finished growing.
+    // Environmental Interaction
+    PoopAbsorption,         // Detection radius (primary) and energy bonus (secondary)
 
-    [Tooltip("Energy cost deducted from the plant when this node's active effects are executed during the mature cycle.")]
-    EnergyCost, // <<< RENAMED/ADDED
-    [Tooltip("Triggers the spawning of a projectile or other output effect (requires OutputNodeEffect component).")]
-    Output,
-    [Tooltip("Modifies the damage potential of subsequent 'Output' effects in the same cycle.")]
-    Damage,
-    [Tooltip("Causes the plant to attempt to spawn a berry in an available adjacent slot during the mature cycle.")]
-    GrowBerry,
-    // Add potentially more active effects: Heal, ApplyStatus, AreaEffect, etc.
-    
-    
-    [Tooltip("Modifies the scent emitted by the next spawned carrier (Berry, Projectile). PrimaryValue=Radius Add, SecondaryValue=Strength Add.")]
-    ScentModifier,
+    // Combat & Effects
+    Damage,                 // Damage multiplier
+
+    // Spawning
+    GrowBerry,              // Spawns berry
+    SeedSpawn,              // Makes this a seed
+
+    // Modifiers
+    ScentModifier,          // Modifies scent radius/strength
 }
