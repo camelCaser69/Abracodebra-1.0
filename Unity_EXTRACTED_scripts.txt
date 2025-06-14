@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 511,888 → 346,817 chars (32.2% reduction)
-Estimated tokens saved: ~41,267
+Compression Stats: 517,858 → 352,681 chars (31.9% reduction)
+Estimated tokens saved: ~41,294
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -52,73 +52,73 @@ using System;
   NodeDefinitionCreator (Assets\Scripts\Editor/) L3404
   NodeDefinitionEditor (Assets\Scripts\Editor/) L3465
   NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3510
-  NodeDefinitionMigrationTool (Assets\Scripts\Editor/) L3561
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3686
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3720
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3790
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3851
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3871
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3906
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3921
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4006
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4173
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4196
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4234
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4270
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4279
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4447
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4486
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4510
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4712
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4792
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5014
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5260
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5496
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5640
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5938
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6005
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6301
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6420
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6624
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6758
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7078
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7214
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7507
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7595
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L7696
-  GridSnapStartup (Assets\Scripts\Ticks/) L7797
-  TickDebugMonitor (Assets\Scripts\Ticks/) L7863
-  TurnPhaseManager (Assets\Scripts\Ticks/) L8034
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8150
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8219
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8450
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8461
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8490
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8586
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8691
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9086
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9122
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9312
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9454
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9572
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9716
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9921
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9961
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9981
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9993
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10028
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10187
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3561
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3595
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3818
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3879
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3899
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3934
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3949
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4034
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4260
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4283
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4336
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4365
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4374
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4399
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4567
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4606
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4630
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4832
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4912
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5134
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5379
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5604
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5748
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6046
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6113
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6419
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6538
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6742
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6876
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7196
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7332
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7625
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7713
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L7814
+  GridSnapStartup (Assets\Scripts\Ticks/) L7915
+  TickDebugMonitor (Assets\Scripts\Ticks/) L7981
+  TurnPhaseManager (Assets\Scripts\Ticks/) L8152
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8268
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8337
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8568
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8579
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8608
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8704
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8809
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9204
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9240
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9430
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9572
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9690
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9834
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10039
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10079
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10099
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10111
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10146
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10305
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L10197
-  GridPosition (Assets\Scripts\Ticks/) L10348
-  GridPositionManager (Assets\Scripts\Ticks/) L10449
-  GridRadiusUtility (Assets\Scripts\Ticks/) L10800
-  TickConfiguration (Assets\Scripts\Ticks/) L10944
-  ITickUpdateable (Assets\Scripts\Ticks/) L11050
+  GridEntity (Assets\Scripts\Ticks/) L10315
+  GridPosition (Assets\Scripts\Ticks/) L10466
+  GridPositionManager (Assets\Scripts\Ticks/) L10567
+  GridRadiusUtility (Assets\Scripts\Ticks/) L10918
+  TickConfiguration (Assets\Scripts\Ticks/) L11062
+  ITickUpdateable (Assets\Scripts\Ticks/) L11168
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11212
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11330
 
 ================================================================================
 SCRIPTS
@@ -3657,131 +3657,6 @@ Debug.Log("NodeDefinitionLibrary updated. Total definitions: " + library.definit
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Editor\NodeDefinitionMigrationTool.cs
-
-﻿using UnityEngine;
-using UnityEditor;
-
-pub cls NodeDefinitionMigrationTool : EditorWindow {
-Vector2 scrollPos;
-List<NodeDefinition> definitions = new List<NodeDefinition>();
-
-stat void ShowWindow() {
-var window = GetWindow<NodeDefinitionMigrationTool>("Node Migration");
-window.minSize = new Vector2(400, 300);
-}
-
-void OnEnable() {
-RefreshDefinitions();
-}
-
-void RefreshDefinitions() {
-definitions.Clear();
-string[] guids = AssetDatabase.FindAssets("t:NodeDefinition");
-
-foreach (string guid in guids) {
-string path = AssetDatabase.GUIDToAssetPath(guid);
-NodeDefinition def = AssetDatabase.LoadAssetAtPath<NodeDefinition>(path);
-if (def != null) {
-definitions.Add(def);
-}
-}
-}
-
-void OnGUI() {
-EditorGUILayout.LabelField("Node Definition Migration Tool", EditorStyles.boldLabel);
-EditorGUILayout.HelpBox("This tool converts time-based values from seconds to ticks.", MessageType.Info);
-
-if (GUILayout.Button("Refresh List")) {
-RefreshDefinitions();
-}
-
-EditorGUILayout.Space();
-
-scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
-
-foreach (var def in definitions) {
-EditorGUILayout.BeginHorizontal();
-EditorGUILayout.LabelField(def.name, GUILayout.Width(200));
-
-if (GUILayout.Button("Migrate", GUILayout.Width(80))) {
-MigrateDefinition(def);
-}
-
-EditorGUILayout.EndHorizontal();
-}
-
-EditorGUILayout.EndScrollView();
-
-EditorGUILayout.Space();
-
-if (GUILayout.Button("Migrate All", GUILayout.Height(30))) {
-if (EditorUtility.DisplayDialog("Migrate All",
-"This will migrate all node definitions to use tick-based values. This cannot be undone. Continue?",
-"Yes", "No")) {
-MigrateAll();
-}
-}
-}
-
-void MigrateDefinition(NodeDefinition def) {
-if (def.effects == null) return;
-
-bool changed = false;
-float ticksPerSecond = 2f; // Default assumption
-
-foreach (var effect in def.effects) {
-if (effect == null) continue;
-
-switch (effect.effectType) {
-case NodeEffectType.CooldownTicks:
-case NodeEffectType.CastDelayTicks:
-if (effect.primaryValue < 10) { // Likely still in seconds
-effect.primaryValue = Mathf.RoundToInt(effect.primaryValue * ticksPerSecond);
-changed = true;
-Debug.Log($"Migrated {def.name} - {effect.effectType}: {effect.primaryValue / ticksPerSecond}s -> {effect.primaryValue} ticks");
-}
-break;
-
-case NodeEffectType.GrowthTicksPerStage:
-if (effect.primaryValue < 1) { // Old growth speed was a multiplier
-effect.primaryValue = Mathf.Max(1, Mathf.RoundToInt(5f / effect.primaryValue));
-changed = true;
-Debug.Log($"Migrated {def.name} - Growth: speed {5f / effect.primaryValue}x -> {effect.primaryValue} ticks");
-}
-break;
-
-case NodeEffectType.EnergyPerTick:
-if (effect.primaryValue > 0.5f) { // Likely still per second
-effect.primaryValue = effect.primaryValue / ticksPerSecond;
-changed = true;
-Debug.Log($"Migrated {def.name} - Energy: {effect.primaryValue * ticksPerSecond}/s -> {effect.primaryValue}/tick");
-}
-break;
-}
-
-effect.ValidateForTicks();
-}
-
-if (changed) {
-EditorUtility.SetDirty(def);
-AssetDatabase.SaveAssets();
-}
-}
-
-void MigrateAll() {
-foreach (var def in definitions) {
-MigrateDefinition(def);
-}
-
-AssetDatabase.SaveAssets();
-AssetDatabase.Refresh();
-
-Debug.Log($"Migration complete for {definitions.Count} node definitions.");
-}
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\Editor\NodeDefinitionPostprocessor.cs
 
 ﻿using UnityEngine;
@@ -3829,56 +3704,209 @@ var effectTypeProp = property.FindPropertyRelative("effectType");
 var primaryValueProp = property.FindPropertyRelative("primaryValue");
 var secondaryValueProp = property.FindPropertyRelative("secondaryValue");
 var isPassiveProp = property.FindPropertyRelative("isPassive");
-var scentDefRefProp = property.FindPropertyRelative("scentDefinitionReference"); // ADDED
+var scentDefRefProp = property.FindPropertyRelative("scentDefinitionReference");
+var seedDataProp = property.FindPropertyRelative("seedData");
 
-Rect typeRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-Rect passiveRect = new Rect(position.x, typeRect.yMax + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
-Rect primaryRect = new Rect(position.x, passiveRect.yMax + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
-Rect secondaryRect = new Rect(position.x, primaryRect.yMax + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
-Rect scentRect = new Rect(position.x, secondaryRect.yMax + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight); // Reuse rect position
+float yPos = position.y;
+float lineHeight = EditorGUIUtility.singleLineHeight;
+float spacing = EditorGUIUtility.standardVerticalSpacing;
 
-EditorGUI.PropertyField(typeRect, effectTypeProp);
-EditorGUI.PropertyField(passiveRect, isPassiveProp);
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), effectTypeProp);
+yPos += lineHeight + spacing;
 
-GUIContent primaryLabel = new GUIContent(primaryValueProp.displayName);
-GUIContent secondaryLabel = new GUIContent(secondaryValueProp.displayName);
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), isPassiveProp);
+yPos += lineHeight + spacing;
 
 NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
 
+if (currentType == NodeEffectType.SeedSpawn) {
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight),
+primaryValueProp, new GUIContent("Enabled", "Set to 1 to make this a seed"));
+yPos += lineHeight + spacing;
+
+if (primaryValueProp.floatValue > 0) {
+EditorGUI.indentLevel++;
+
+EditorGUI.LabelField(new Rect(position.x, yPos, position.width, lineHeight), "Growth Properties", EditorStyles.boldLabel);
+yPos += lineHeight + spacing;
+
+var growthSpeedProp = seedDataProp.FindPropertyRelative("growthSpeed");
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), growthSpeedProp);
+yPos += lineHeight + spacing;
+
+var stemMinProp = seedDataProp.FindPropertyRelative("stemLengthMin");
+var stemMaxProp = seedDataProp.FindPropertyRelative("stemLengthMax");
+float halfWidth = (position.width - 10) / 2;
+EditorGUI.PropertyField(new Rect(position.x, yPos, halfWidth, lineHeight), stemMinProp, new GUIContent("Stem Min"));
+EditorGUI.PropertyField(new Rect(position.x + halfWidth + 10, yPos, halfWidth, lineHeight), stemMaxProp, new GUIContent("Stem Max"));
+yPos += lineHeight + spacing;
+
+var leafGapProp = seedDataProp.FindPropertyRelative("leafGap");
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), leafGapProp);
+yPos += lineHeight + spacing;
+
+var leafPatternProp = seedDataProp.FindPropertyRelative("leafPattern");
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), leafPatternProp);
+yPos += lineHeight + spacing;
+
+var stemRandomnessProp = seedDataProp.FindPropertyRelative("stemRandomness");
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), stemRandomnessProp);
+yPos += lineHeight + spacing;
+
+EditorGUI.LabelField(new Rect(position.x, yPos, position.width, lineHeight), "Energy Properties", EditorStyles.boldLabel);
+yPos += lineHeight + spacing;
+
+var energyStorageProp = seedDataProp.FindPropertyRelative("energyStorage");
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), energyStorageProp);
+yPos += lineHeight + spacing;
+
+EditorGUI.LabelField(new Rect(position.x, yPos, position.width, lineHeight), "Timing Properties", EditorStyles.boldLabel);
+yPos += lineHeight + spacing;
+
+var cooldownProp = seedDataProp.FindPropertyRelative("cooldown");
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), cooldownProp);
+yPos += lineHeight + spacing;
+
+var castDelayProp = seedDataProp.FindPropertyRelative("castDelay");
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), castDelayProp);
+
+EditorGUI.indentLevel--;
+}
+}
+else {
+GUIContent primaryLabel = new GUIContent("Primary Value");
+GUIContent secondaryLabel = new GUIContent("Secondary Value");
+bool showSecondary = false;
 bool showScentField = false;
+
 switch (currentType) {
-case NodeEffectType.ScentModifier:
-primaryLabel.text = "Radius Bonus"; // Contextual label
-secondaryLabel.text = "Strength Bonus"; // Contextual label
-showScentField = true;
+case NodeEffectType.EnergyStorage:
+primaryLabel.text = "Max Energy Increase";
+primaryLabel.tooltip = "Additional maximum energy capacity";
 break;
+
+case NodeEffectType.EnergyPerTick:
+primaryLabel.text = "Energy Per Tick";
+primaryLabel.tooltip = "Energy generated each tick (affected by sunlight and leaves)";
+break;
+
+case NodeEffectType.EnergyCost:
+primaryLabel.text = "Energy Cost";
+primaryLabel.tooltip = "Energy required to execute mature cycle";
+break;
+
+case NodeEffectType.StemLength:
+primaryLabel.text = "Min Segments Add";
+primaryLabel.tooltip = "Minimum stem segments to add";
+secondaryLabel.text = "Max Segments Add";
+secondaryLabel.tooltip = "Maximum stem segments to add";
+showSecondary = true;
+break;
+
+case NodeEffectType.GrowthSpeed:
+primaryLabel.text = "Ticks Per Stage";
+primaryLabel.tooltip = "Number of ticks between each growth stage (lower = faster)";
+break;
+
+case NodeEffectType.LeafGap:
+primaryLabel.text = "Segments Between Leaves";
+primaryLabel.tooltip = "0 = leaves every segment, 1 = leaves every 2 segments, etc.";
+break;
+
+case NodeEffectType.LeafPattern:
+primaryLabel.text = "Pattern Type";
+primaryLabel.tooltip = "0=Symmetrical, 1=Offset, 2=Alternating, 3=Spiral, 4=Dense";
+break;
+
+case NodeEffectType.StemRandomness:
+primaryLabel.text = "Wobble Chance (0-1)";
+primaryLabel.tooltip = "Probability that stem will grow sideways";
+break;
+
+case NodeEffectType.Cooldown:
+primaryLabel.text = "Cooldown Ticks";
+primaryLabel.tooltip = "Ticks between mature cycle activations";
+break;
+
+case NodeEffectType.CastDelay:
+primaryLabel.text = "Delay Ticks";
+primaryLabel.tooltip = "Ticks to wait before starting growth";
+break;
+
+case NodeEffectType.PoopAbsorption:
+primaryLabel.text = "Detection Radius";
+primaryLabel.tooltip = "Radius in tiles to detect fertilizer";
+secondaryLabel.text = "Energy Per Poop";
+secondaryLabel.tooltip = "Energy gained when absorbing fertilizer";
+showSecondary = true;
+break;
+
 case NodeEffectType.Damage:
 primaryLabel.text = "Damage Multiplier Add";
+primaryLabel.tooltip = "Adds to damage multiplier (1.0 = +100% damage)";
 break;
-default:
+
+case NodeEffectType.GrowBerry:
+primaryLabel.text = "Enabled";
+primaryLabel.tooltip = "Set to 1 to enable berry growth";
+break;
+
+case NodeEffectType.ScentModifier:
+primaryLabel.text = "Radius Modifier";
+primaryLabel.tooltip = "Adds/subtracts from scent radius";
+secondaryLabel.text = "Strength Modifier";
+secondaryLabel.tooltip = "Adds/subtracts from scent strength";
+showSecondary = true;
+showScentField = true;
 break;
 }
 
-EditorGUI.PropertyField(primaryRect, primaryValueProp, primaryLabel);
-EditorGUI.PropertyField(secondaryRect, secondaryValueProp, secondaryLabel);
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), primaryValueProp, primaryLabel);
+yPos += lineHeight + spacing;
+
+if (showSecondary) {
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), secondaryValueProp, secondaryLabel);
+yPos += lineHeight + spacing;
+}
 
 if (showScentField) {
-EditorGUI.ObjectField(scentRect, scentDefRefProp, typeof(ScentDefinition), new GUIContent("Scent Definition")); // Use correct label
+EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight),
+scentDefRefProp, new GUIContent("Scent Definition", "Which scent type to modify"));
+}
 }
 
 EditorGUI.EndProperty();
 }
 
 pub ovr float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-float height = EditorGUIUtility.singleLineHeight; // Type
-height += EditorGUIUtility.standardVerticalSpacing + EditorGUIUtility.singleLineHeight; // Passive
-height += EditorGUIUtility.standardVerticalSpacing + EditorGUIUtility.singleLineHeight; // Primary
-height += EditorGUIUtility.standardVerticalSpacing + EditorGUIUtility.singleLineHeight; // Secondary
+float height = EditorGUIUtility.singleLineHeight * 2; // Type + Passive
+height += EditorGUIUtility.standardVerticalSpacing * 2;
 
 var effectTypeProp = property.FindPropertyRelative("effectType");
+var primaryValueProp = property.FindPropertyRelative("primaryValue");
 NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
+
+if (currentType == NodeEffectType.SeedSpawn) {
+height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Enabled field
+
+if (primaryValueProp.floatValue > 0) {
+height += (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * 12;
+}
+}
+else {
+height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Primary value
+
+switch (currentType) {
+case NodeEffectType.StemLength:
+case NodeEffectType.PoopAbsorption:
+case NodeEffectType.ScentModifier:
+height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+break;
+}
+
 if (currentType == NodeEffectType.ScentModifier) {
-height += EditorGUIUtility.standardVerticalSpacing + EditorGUIUtility.singleLineHeight; // Scent Definition Reference
+height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+}
 }
 
 ret height;
@@ -4104,19 +4132,16 @@ _storedSequence = null;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\NodeDefinition.cs
 
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using System.Text;
 using WegoSystem;
 
 pub cls NodeDefinition : ScriptableObject, ITooltipDataProvider {
 pub string displayName;
-
 pub string description;
-
 pub Sprite thumbnail;
 pub Color thumbnailTintColor = Color.white;
 pub Color backgroundColor = Color.gray;
-
 pub GameObject nodeViewPrefab;
 pub List<NodeEffectData> effects;
 
@@ -4139,6 +4164,21 @@ secondaryValue = originalEffect.secondaryValue,
 isPassive = originalEffect.isPassive,
 scentDefinitionReference = originalEffect.scentDefinitionReference
 };
+
+if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null) {
+newEffect.seedData = new SeedSpawnData {
+growthSpeed = originalEffect.seedData.growthSpeed,
+stemLengthMin = originalEffect.seedData.stemLengthMin,
+stemLengthMax = originalEffect.seedData.stemLengthMax,
+leafGap = originalEffect.seedData.leafGap,
+leafPattern = originalEffect.seedData.leafPattern,
+stemRandomness = originalEffect.seedData.stemRandomness,
+energyStorage = originalEffect.seedData.energyStorage,
+cooldown = originalEffect.seedData.cooldown,
+castDelay = originalEffect.seedData.castDelay
+};
+}
+
 copy.Add(newEffect);
 }
 ret copy;
@@ -4152,41 +4192,6 @@ pub string GetTooltipDescription() {
 ret description ?? string.Empty;
 }
 
-pub string GetStatsAsString() {
-if (effects == null || effects.Count == 0) ret "No effects";
-
-var result = new System.Text.StringBuilder();
-
-foreach (var effect in effects) {
-switch (effect.effectType) {
-case NodeEffectType.GrowthSpeed:
-case NodeEffectType.GrowthTicksPerStage:
-result.AppendLine($"Growth Ticks Per Stage: {effect.primaryValue}");
-break;
-
-case NodeEffectType.Cooldown:
-case NodeEffectType.CooldownTicks:
-result.AppendLine($"Cooldown Ticks: {effect.primaryValue}");
-break;
-
-case NodeEffectType.CastDelay:
-case NodeEffectType.CastDelayTicks:
-result.AppendLine($"Cast Delay Ticks: {effect.primaryValue}");
-break;
-
-case NodeEffectType.PoopFertilizer:
-result.AppendLine($"Poop Fertilizer Range: {effect.primaryValue}");
-break;
-
-default:
-result.AppendLine($"{effect.effectType}: {effect.primaryValue}");
-break;
-}
-}
-
-ret result.ToString();
-}
-
 pub string GetTooltipDetails(object source = null) {
 var nodeData = source as NodeData;
 if (nodeData == null) ret string.Empty;
@@ -4195,16 +4200,16 @@ var sb = new StringBuilder();
 
 if (nodeData.effects != null && nodeData.effects.Any()) {
 sb.Append("<b>Effects:</b>\n");
-var passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f); // Blue-ish for passive
-var activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);  // Orange-ish for active
+var passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f);
+var activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);
 c string effectPrefix = "• ";
 
 foreach (var effect in nodeData.effects) {
 if (effect == null) continue;
 Color effectColor = effect.isPassive ? passiveEffectColor : activeEffectColor;
 string hexColor = ColorUtility.ToHtmlStringRGB(effectColor);
-sb.Append($"<color=#{hexColor}>{effectPrefix}{FormatEffectName(effect.effectType)}: ");
-sb.Append(FormatEffectValue(effect));
+sb.Append($"<color=#{hexColor}>{effectPrefix}{GetEffectDisplayName(effect.effectType)}: ");
+sb.Append(GetEffectDescription(effect));
 sb.Append("</color>\n");
 }
 }
@@ -4223,48 +4228,130 @@ sb.Append("Empty");
 ret sb.ToString().TrimEnd();
 }
 
-string FormatEffectName(NodeEffectType type) {
+string GetEffectDisplayName(NodeEffectType type) {
 switch (type) {
-case NodeEffectType.GrowthSpeed:
-ret "Growth Rate";
-case NodeEffectType.Cooldown:
-ret "Cooldown";
-case NodeEffectType.CastDelay:
-ret "Cast Delay";
-default:
-ret type.ToString();
+case NodeEffectType.EnergyStorage: ret "Energy Storage";
+case NodeEffectType.EnergyPerTick: ret "Energy/Tick";
+case NodeEffectType.EnergyCost: ret "Energy Cost";
+case NodeEffectType.StemLength: ret "Stem Length";
+case NodeEffectType.GrowthSpeed: ret "Growth Speed";
+case NodeEffectType.LeafGap: ret "Leaf Gap";
+case NodeEffectType.LeafPattern: ret "Leaf Pattern";
+case NodeEffectType.StemRandomness: ret "Stem Wobble";
+case NodeEffectType.Cooldown: ret "Cooldown";
+case NodeEffectType.CastDelay: ret "Cast Delay";
+case NodeEffectType.PoopAbsorption: ret "Poop Absorption";
+case NodeEffectType.Damage: ret "Damage";
+case NodeEffectType.GrowBerry: ret "Berry Growth";
+case NodeEffectType.SeedSpawn: ret "Seed";
+case NodeEffectType.ScentModifier: ret "Scent";
+default: ret type.ToString();
 }
 }
 
-string FormatEffectValue(NodeEffectData effect) {
-string result = effect.primaryValue.ToString("G3");
-bool hasSecondaryValue = false;
-
+string GetEffectDescription(NodeEffectData effect) {
 switch (effect.effectType) {
+case NodeEffectType.EnergyStorage:
+ret $"+{effect.primaryValue:F0} max energy";
+
+case NodeEffectType.EnergyPerTick:
+ret $"+{effect.primaryValue:F2} energy/tick";
+
+case NodeEffectType.EnergyCost:
+ret $"{effect.primaryValue:F0} energy to activate";
+
+case NodeEffectType.StemLength:
+if (effect.secondaryValue > 0 && effect.secondaryValue != effect.primaryValue) {
+ret $"+{effect.primaryValue:F0} to +{effect.secondaryValue:F0} stem segments";
+} else {
+ret $"+{effect.primaryValue:F0} stem segments";
+}
+
 case NodeEffectType.GrowthSpeed:
-ret $"{effect.primaryValue:F2} (stems/tick)";
+ret effect.primaryValue <= 1
+? "Instant growth"
+: $"{effect.primaryValue:F0} ticks/stage";
+
+case NodeEffectType.LeafGap:
+ret effect.primaryValue == 0
+? "Leaves every segment"
+: $"Leaves every {effect.primaryValue + 1:F0} segments";
+
+case NodeEffectType.LeafPattern:
+string patternName = GetLeafPatternName((int)effect.primaryValue);
+ret $"Pattern: {patternName}";
+
+case NodeEffectType.StemRandomness:
+ret $"{effect.primaryValue * 100:F0}% chance to wobble";
+
 case NodeEffectType.Cooldown:
-ret $"{Mathf.RoundToInt(effect.primaryValue)} Ticks";
+ret $"{effect.primaryValue:F0} tick cooldown";
+
 case NodeEffectType.CastDelay:
-ret $"{Mathf.RoundToInt(effect.primaryValue)} Ticks";
+ret effect.primaryValue > 0
+? $"{effect.primaryValue:F0} tick delay"
+: "No delay";
+
+case NodeEffectType.PoopAbsorption:
+string result = "";
+if (effect.primaryValue > 0) result += $"{effect.primaryValue:F0} tile radius";
+if (effect.secondaryValue > 0) {
+if (result.Length > 0) result += ", ";
+result += $"+{effect.secondaryValue:F0} energy";
+}
+ret result;
+
+case NodeEffectType.Damage:
+ret $"+{effect.primaryValue * 100:F0}% damage";
+
+case NodeEffectType.GrowBerry:
+ret "Grows berries";
+
+case NodeEffectType.SeedSpawn:
+ret effect.isPassive ? "Contains seed" : "Active seed";
+
 case NodeEffectType.ScentModifier:
-case NodeEffectType.PoopFertilizer:
-hasSecondaryValue = true;
-break;
-default:
-if (effect.secondaryValue != 0) hasSecondaryValue = true;
-break;
+string result = "";
+if (effect.primaryValue != 0) result += $"Radius {(effect.primaryValue >= 0 ? "+" : "")}{effect.primaryValue:F0}";
+if (effect.secondaryValue != 0) {
+if (result.Length > 0) result += ", ";
+result += $"Strength {(effect.secondaryValue >= 0 ? "+" : "")}{effect.secondaryValue:F0}";
 }
-
-if (hasSecondaryValue) {
-result += $" / {effect.secondaryValue.ToString("G3")}";
-}
-
-if (effect.effectType == NodeEffectType.ScentModifier && effect.scentDefinitionReference != null) {
+if (effect.scentDefinitionReference != null) {
 result += $" ({effect.scentDefinitionReference.displayName})";
 }
-
 ret result;
+
+default:
+string defaultResult = $"{effect.primaryValue:F1}";
+if (effect.secondaryValue != 0) {
+defaultResult += $" / {effect.secondaryValue:F1}";
+}
+ret defaultResult;
+}
+}
+
+string GetLeafPatternName(int pattern) {
+switch (pattern) {
+case 0: ret "Symmetrical";
+case 1: ret "Offset";
+case 2: ret "Alternating";
+case 3: ret "Spiral";
+case 4: ret "Dense";
+default: ret $"Pattern {pattern}";
+}
+}
+
+pub string GetStatsAsString() {
+if (effects == null || effects.Count == 0) ret "No effects";
+
+var result = new System.Text.StringBuilder();
+
+foreach (var effect in effects) {
+result.AppendLine($"{GetEffectDisplayName(effect.effectType)}: {GetEffectDescription(effect)}");
+}
+
+ret result.ToString();
 }
 }
 
@@ -4298,32 +4385,47 @@ pub List<InitialNodeConfig> initialNodes; // <<< NEW LIST ADDED
 
 pub cls NodeEffectData {
 pub NodeEffectType effectType;
-
 pub float primaryValue;
-
 pub float secondaryValue;
-
 pub bool isPassive = false;
-
 pub ScentDefinition scentDefinitionReference;
+
+pub SeedSpawnData seedData;
 
 pub int GetPrimaryValueAsInt() => Mathf.RoundToInt(primaryValue);
 pub int GetSecondaryValueAsInt() => Mathf.RoundToInt(secondaryValue);
 
 pub void ValidateForTicks() {
 switch (effectType) {
-case NodeEffectType.GrowthTicksPerStage:
-case NodeEffectType.CooldownTicks:
-case NodeEffectType.CastDelayTicks:
+case NodeEffectType.GrowthSpeed:
+case NodeEffectType.Cooldown:
+case NodeEffectType.CastDelay:
 primaryValue = Mathf.Max(1, Mathf.RoundToInt(primaryValue));
 break;
 
-case NodeEffectType.PoopDetectionRadius:
+case NodeEffectType.PoopAbsorption:
 primaryValue = Mathf.Max(0, Mathf.RoundToInt(primaryValue));
+secondaryValue = Mathf.Max(0f, secondaryValue);
 break;
 
 case NodeEffectType.EnergyPerTick:
+case NodeEffectType.EnergyStorage:
+case NodeEffectType.EnergyCost:
 primaryValue = Mathf.Max(0f, primaryValue);
+break;
+
+case NodeEffectType.SeedSpawn:
+if (seedData != null) {
+seedData.growthSpeed = Mathf.Max(1, seedData.growthSpeed);
+seedData.stemLengthMin = Mathf.Max(1, seedData.stemLengthMin);
+seedData.stemLengthMax = Mathf.Max(seedData.stemLengthMin, seedData.stemLengthMax);
+seedData.leafGap = Mathf.Max(0, seedData.leafGap);
+seedData.leafPattern = Mathf.Clamp(seedData.leafPattern, 0, 4);
+seedData.stemRandomness = Mathf.Clamp01(seedData.stemRandomness);
+seedData.energyStorage = Mathf.Max(1f, seedData.energyStorage);
+seedData.cooldown = Mathf.Max(1, seedData.cooldown);
+seedData.castDelay = Mathf.Max(0, seedData.castDelay);
+}
 break;
 }
 }
@@ -4335,34 +4437,27 @@ break;
 ﻿using System;
 
 pub enum NodeEffectType {
-EnergyStorage,           // Amount of max energy
-EnergyPerTick,          // Energy generated per tick (was EnergyPhotosynthesis)
-EnergyCostPerCycle,     // Energy cost when executing (was EnergyCost)
+EnergyStorage = 0,           // Max energy capacity
+EnergyPerTick = 1,          // Energy generated per tick
+EnergyCost = 2,             // Energy cost when executing mature cycle
 
-StemLength,             // Number of stem segments
-GrowthTicksPerStage,    // Ticks between growth stages (was GrowthSpeed)
-LeafGap,                // Stem segments between leaves
-LeafPattern,            // Pattern type (0-4)
-StemRandomness,         // Chance of random stem direction (0-1)
+StemLength = 3,             // Number of stem segments
+GrowthSpeed = 4,            // Ticks between growth stages
+LeafGap = 5,                // Stem segments between leaves
+LeafPattern = 6,            // Pattern type (0-4)
+StemRandomness = 7,         // Chance of random stem direction (0-1)
 
-GrowthSpeed,        // Deprecated but needed for compatibility
-Cooldown,           // Deprecated but needed for compatibility
-CastDelay,          // Deprecated but needed for compatibility
-PoopFertilizer,     // For poop detection functionality
+Cooldown = 8,               // Ticks between mature cycles
+CastDelay = 9,              // Ticks delay before growth starts
 
-CooldownTicks,          // Ticks between mature cycles (was Cooldown)
-CastDelayTicks,         // Ticks between growth stages (was CastDelay)
+PoopAbsorption = 10,        // Detection radius (primary) and energy bonus (secondary)
 
-PoopDetectionRadius,    // Radius in tiles (was part of PoopFertilizer)
-PoopEnergyBonus,        // Energy gained from poop
+Damage = 11,                // Damage multiplier
 
-Damage,                 // Damage multiplier
-Output,                 // Triggers projectile
+GrowBerry = 12,             // Spawns berry
+SeedSpawn = 13,             // Makes this a seed with comprehensive plant data
 
-GrowBerry,              // Spawns berry
-SeedSpawn,              // Makes this a seed
-
-ScentModifier,          // Modifies scent radius/strength
+ScentModifier = 14,         // Modifies scent radius/strength
 }
 
 ////////////////////////////////////////////////////////////
@@ -4372,6 +4467,31 @@ ScentModifier,          // Modifies scent radius/strength
 
 pub cls NodeGraph {
 pub List<NodeData> nodes = new List<NodeData>();
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\PlantSystem\Data\SeedSpawnData.cs
+
+﻿using System;
+
+pub cls SeedSpawnData {
+pub int growthSpeed = 5;
+
+pub int stemLengthMin = 3;
+
+pub int stemLengthMax = 5;
+
+pub int leafGap = 1;
+
+pub int leafPattern = 0;
+
+pub float stemRandomness = 0.1f;
+
+pub float energyStorage = 10f;
+
+pub int cooldown = 20;
+
+pub int castDelay = 0;
 }
 
 ////////////////////////////////////////////////////////////
@@ -5112,7 +5232,7 @@ pub void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinit
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantGrowthLogic.cs
 
-﻿using UnityEngine;
+﻿using System.Linq;
 using WegoSystem;
 
 pub cls PlantGrowthLogic {
@@ -5144,7 +5264,7 @@ return;
 }
 
 float baseEnergyStorage = 10f;
-float baseEnergyPerTick = 0.25f; // Was 0.5f per second, now per tick
+float baseEnergyPerTick = 0.25f;
 int baseStemMin = 3;
 int baseStemMax = 5;
 int baseGrowthTicksPerStage = 5;
@@ -5154,9 +5274,29 @@ float baseGrowthRandomness = 0.1f;
 int baseCooldownTicks = 20;
 int baseCastDelayTicks = 0;
 
+NodeData firstNode = plant.NodeGraph.nodes.FirstOrDefault();
+bool hasComprehensiveSeed = false;
+
+if (firstNode != null) {
+var seedEffect = firstNode.effects?.FirstOrDefault(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
+if (seedEffect != null && seedEffect.seedData != null) {
+hasComprehensiveSeed = true;
+baseEnergyStorage = seedEffect.seedData.energyStorage;
+baseGrowthTicksPerStage = seedEffect.seedData.growthSpeed;
+baseStemMin = seedEffect.seedData.stemLengthMin;
+baseStemMax = seedEffect.seedData.stemLengthMax;
+baseLeafGap = seedEffect.seedData.leafGap;
+baseLeafPattern = seedEffect.seedData.leafPattern;
+baseGrowthRandomness = seedEffect.seedData.stemRandomness;
+baseCooldownTicks = seedEffect.seedData.cooldown;
+baseCastDelayTicks = seedEffect.seedData.castDelay;
+}
+}
+
 float accumulatedEnergyStorage = 0f;
 float accumulatedEnergyPerTick = 0f;
-int stemLengthModifier = 0;
+int stemLengthMinModifier = 0;
+int stemLengthMaxModifier = 0;
 int growthTicksModifier = 0;
 int leafGapModifier = 0;
 int currentLeafPattern = baseLeafPattern;
@@ -5175,7 +5315,7 @@ effect.ValidateForTicks();
 
 if (effect.effectType == NodeEffectType.SeedSpawn) {
 seedFound = true;
-continue;
+if (hasComprehensiveSeed && node == firstNode) continue;
 }
 
 if (!effect.isPassive) continue;
@@ -5190,10 +5330,11 @@ accumulatedEnergyPerTick += effect.primaryValue;
 break;
 
 case NodeEffectType.StemLength:
-stemLengthModifier += effect.GetPrimaryValueAsInt();
+stemLengthMinModifier += effect.GetPrimaryValueAsInt();
+stemLengthMaxModifier += effect.GetSecondaryValueAsInt();
 break;
 
-case NodeEffectType.GrowthTicksPerStage:
+case NodeEffectType.GrowthSpeed:
 growthTicksModifier += effect.GetPrimaryValueAsInt();
 break;
 
@@ -5209,11 +5350,11 @@ case NodeEffectType.StemRandomness:
 growthRandomnessModifier += effect.primaryValue;
 break;
 
-case NodeEffectType.CooldownTicks:
+case NodeEffectType.Cooldown:
 cooldownTicksModifier += effect.GetPrimaryValueAsInt();
 break;
 
-case NodeEffectType.CastDelayTicks:
+case NodeEffectType.CastDelay:
 castDelayTicksModifier += effect.GetPrimaryValueAsInt();
 break;
 }
@@ -5222,10 +5363,10 @@ break;
 
 plant.EnergySystem.MaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
 EnergyPerTick = Mathf.Max(0f, baseEnergyPerTick + accumulatedEnergyPerTick);
-plant.EnergySystem.PhotosynthesisRate = EnergyPerTick; // Set the per-tick rate
+plant.EnergySystem.PhotosynthesisRate = EnergyPerTick;
 
-int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthModifier);
-int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthModifier);
+int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthMinModifier);
+int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthMaxModifier);
 TargetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
 
 GrowthTicksPerStage = Mathf.Max(1, baseGrowthTicksPerStage + growthTicksModifier);
@@ -5240,6 +5381,8 @@ plant.NodeExecutor.ProcessPassiveEffects(plant.NodeGraph);
 if (!seedFound) {
 Debug.LogWarning($"[{plant.gameObject.name}] NodeGraph lacks a SeedSpawn effect. Growth aborted.", plant.gameObject);
 }
+
+Debug.Log($"[{plant.gameObject.name}] Growth stats: TargetStem={TargetStemLength}, GrowthTicks={GrowthTicksPerStage}, Cooldown={MaturityCycleTicks}");
 }
 
 pub void OnTickUpdate(int currentTick) {
@@ -5320,45 +5463,21 @@ ret growthProgressTicks / GrowthTicksPerStage;
 }
 
 pub int GetCurrentStemStage() => currentStemStage;
-
-pub void HandleGrowthComplete() {
-CompleteGrowth();
-}
-
-pub void UpdateMaturityCycle() {
-}
-
-pub void StopGrowthCoroutine() {
-}
-
-pub void StartRealtimeGrowth() {
-}
-
-pub int GetStepsCompleted() {
-ret currentStemStage;
-}
-
-pub float GetGrowthProgress() {
-ret TargetStemLength > 0 ? (float)currentStemStage / TargetStemLength : 0f;
-}
-
-pub int GetTotalPlannedSteps() {
-ret TargetStemLength;
-}
-
-pub float GetActualGrowthProgress() {
-ret GrowthTicksPerStage > 0 ? growthProgressTicks / GrowthTicksPerStage : 0f;
-}
-
-pub int GetCurrentStemCount() {
-ret currentStemStage;
-}
+pub void HandleGrowthComplete() => CompleteGrowth();
+pub void UpdateMaturityCycle() { }
+pub void StopGrowthCoroutine() { }
+pub void StartRealtimeGrowth() { }
+pub int GetStepsCompleted() => currentStemStage;
+pub float GetGrowthProgress() => TargetStemLength > 0 ? (float)currentStemStage / TargetStemLength : 0f;
+pub int GetTotalPlannedSteps() => TargetStemLength;
+pub float GetActualGrowthProgress() => GrowthTicksPerStage > 0 ? growthProgressTicks / GrowthTicksPerStage : 0f;
+pub int GetCurrentStemCount() => currentStemStage;
 }
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantNodeExecutor.cs
 
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using WegoSystem;
 
 pub cls PlantNodeExecutor {
@@ -5382,12 +5501,9 @@ foreach (var effect in node.effects) {
 if (effect == null || !effect.isPassive) continue;
 
 switch (effect.effectType) {
-case NodeEffectType.PoopDetectionRadius:
+case NodeEffectType.PoopAbsorption:
 PoopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
-break;
-
-case NodeEffectType.PoopEnergyBonus:
-PoopEnergyBonus = Mathf.Max(0f, effect.primaryValue);
+PoopEnergyBonus = Mathf.Max(0f, effect.secondaryValue);
 break;
 }
 }
@@ -5412,7 +5528,7 @@ foreach (var effect in node.effects) {
 if (effect == null || effect.isPassive) continue;
 
 switch (effect.effectType) {
-case NodeEffectType.EnergyCostPerCycle:
+case NodeEffectType.EnergyCost:
 totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
 break;
 
@@ -5455,19 +5571,11 @@ if (node?.effects == null) continue;
 
 foreach (var effect in node.effects) {
 if (effect == null || effect.isPassive ||
-effect.effectType == NodeEffectType.EnergyCostPerCycle ||
+effect.effectType == NodeEffectType.EnergyCost ||
 effect.effectType == NodeEffectType.Damage ||
 effect.effectType == NodeEffectType.ScentModifier) continue;
 
 switch (effect.effectType) {
-case NodeEffectType.Output:
-plant.GetComponentInChildren<OutputNodeEffect>()?.Activate(
-damageMultiplier,
-accumulatedScentRadiusBonus,
-accumulatedScentStrengthBonus
-);
-break;
-
 case NodeEffectType.GrowBerry:
 TrySpawnBerry(accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
 break;
@@ -5512,7 +5620,7 @@ absorbed = true;
 
 if (absorbed) {
 Object.Destroy(poop.gameObject);
-return; // Only absorb one poop per tick
+return;
 }
 }
 }
@@ -6103,7 +6211,8 @@ ret itemType == ItemType.Node && nodeData != null && nodeData.IsSeed();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\InventoryGridController.cs
 
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 pub cls InventoryGridController : MonoBehaviour {
 pub stat InventoryGridController Instance { get; set; }
@@ -6249,7 +6358,13 @@ effects = geneDef.CloneEffects(),
 orderIndex = -1,
 canBeDeleted = false,
 };
+
+bool isSeed = inventoryNodeData.effects != null &&
+inventoryNodeData.effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
+
+if (isSeed) {
 inventoryNodeData.EnsureSeedSequenceInitialized();
+}
 
 GameObject itemViewGO = Instantiate(inventoryItemPrefab, cellToUse.transform);
 ItemView view = itemViewGO.GetComponent<ItemView>();
@@ -6259,7 +6374,7 @@ view.Initialize(inventoryNodeData, geneDef, null);
 NodeDraggable draggable = view.GetComponent<NodeDraggable>() ?? view.gameObject.AddComponent<NodeDraggable>();
 draggable.Initialize(this, cellToUse);
 cellToUse.AssignItemView(view, inventoryNodeData, null);
-if (logInventoryChanges) Debug.Log($"[Inventory] Added gene '{geneDef.displayName}' to cell {cellToUse.CellIndex}.");
+if (logInventoryChanges) Debug.Log($"[Inventory] Added gene '{geneDef.displayName}' (seed: {isSeed}) to cell {cellToUse.CellIndex}.");
 ret true;
 }
 ret false;
@@ -6280,7 +6395,10 @@ return;
 
 geneDataToReturn.orderIndex = -1;
 geneDataToReturn.canBeDeleted = false;
+
+if (geneDataToReturn.IsSeed()) {
 geneDataToReturn.EnsureSeedSequenceInitialized();
+}
 
 emptyCell.AssignItemView(itemViewToReturn, geneDataToReturn, null);
 
@@ -6307,10 +6425,10 @@ NodeData draggedData = draggedItemView.GetNodeData();
 NodeDefinition draggedNodeDef = draggedItemView.GetNodeDefinition();
 ToolDefinition draggedToolDef = draggedItemView.GetToolDefinition();
 
-if (originalCell.IsInventoryCell) // --- Moving within the inventory --- {
+if (originalCell.IsInventoryCell) {
 if (targetInventoryCell == originalCell) { draggedDraggable.ResetPosition(); return; }
 
-if (targetInventoryCell.HasItem()) // Swap {
+if (targetInventoryCell.HasItem()) {
 ItemView viewInTargetCell = targetInventoryCell.GetItemView();
 NodeData dataInTargetCell = targetInventoryCell.GetNodeData();
 ToolDefinition toolInTargetCell = targetInventoryCell.GetToolDefinition();
@@ -6322,7 +6440,7 @@ originalCell.AssignItemView(viewInTargetCell, dataInTargetCell, toolInTargetCell
 viewInTargetCell.GetComponent<NodeDraggable>()?.SnapToCell(originalCell);
 targetInventoryCell.ClearNodeReference();
 }
-else // Move to empty {
+else {
 if (logInventoryChanges) Debug.Log($"[Inventory] Moved item '{draggedData.nodeDisplayName}' from cell {originalCell.CellIndex} to empty cell {targetInventoryCell.CellIndex}.");
 originalCell.ClearNodeReference();
 }
@@ -6330,12 +6448,12 @@ originalCell.ClearNodeReference();
 targetInventoryCell.AssignItemView(draggedItemView, draggedData, draggedToolDef);
 draggedDraggable.SnapToCell(targetInventoryCell);
 }
-else // --- Moving from node editor to inventory --- {
+else {
 NodeCell actualTargetInvCell = targetInventoryCell.HasItem()
 ? inventoryCells.FirstOrDefault(c => !c.HasItem())
 : targetInventoryCell;
 
-if (actualTargetInvCell == null) { draggedDraggable.ResetPosition(); return; } // Inventory full
+if (actualTargetInvCell == null) { draggedDraggable.ResetPosition(); return; }
 
 if (originalCell.IsSeedSlot) {
 if (logInventoryChanges) Debug.Log($"[Inventory] Moved seed '{draggedData.nodeDisplayName}' from Seed Slot to inventory cell {actualTargetInvCell.CellIndex}.");
@@ -6344,7 +6462,7 @@ originalCell.ClearNodeReference();
 actualTargetInvCell.AssignItemView(draggedItemView, draggedData, null);
 draggedDraggable.SnapToCell(actualTargetInvCell);
 }
-else // From a sequence slot {
+else {
 if (logInventoryChanges) Debug.Log($"[Inventory] Returned node '{draggedNodeDef.displayName}' from sequence to inventory cell {actualTargetInvCell.CellIndex}.");
 NodeEditorGridController.Instance?.GetCellAtIndex(originalCell.CellIndex)?.RemoveNode();
 NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();

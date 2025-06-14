@@ -12,10 +12,12 @@ public class NodeExecutor : MonoBehaviour
     public static List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
     {
         if (originalList == null) return new List<NodeEffectData>();
+    
         List<NodeEffectData> newList = new List<NodeEffectData>(originalList.Count);
         foreach (var originalEffect in originalList)
         {
             if (originalEffect == null) continue;
+
             NodeEffectData newEffect = new NodeEffectData
             {
                 effectType = originalEffect.effectType,
@@ -24,6 +26,24 @@ public class NodeExecutor : MonoBehaviour
                 isPassive = originalEffect.isPassive,
                 scentDefinitionReference = originalEffect.scentDefinitionReference
             };
+        
+            // --- FIX: Perform a deep copy of seedData ---
+            if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null)
+            {
+                newEffect.seedData = new SeedSpawnData
+                {
+                    growthSpeed = originalEffect.seedData.growthSpeed,
+                    stemLengthMin = originalEffect.seedData.stemLengthMin,
+                    stemLengthMax = originalEffect.seedData.stemLengthMax,
+                    leafGap = originalEffect.seedData.leafGap,
+                    leafPattern = originalEffect.seedData.leafPattern,
+                    stemRandomness = originalEffect.seedData.stemRandomness,
+                    energyStorage = originalEffect.seedData.energyStorage,
+                    cooldown = originalEffect.seedData.cooldown,
+                    castDelay = originalEffect.seedData.castDelay
+                };
+            }
+        
             newList.Add(newEffect);
         }
         return newList;

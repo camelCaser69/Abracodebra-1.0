@@ -15534,8 +15534,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92840148c9b740a6a5d66b7201ba4609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultGrowthSpeedMultiplier: 0.1
-  defaultEnergyRechargeMultiplier: 0.1
+  defaultGrowthSpeedMultiplier: 0.5
+  defaultEnergyRechargeMultiplier: 0.5
   tileUpdateInterval: 1
   tileModifiers:
   - tileDefinition: {fileID: 11400000, guid: 2efc2db88b0caff4693943889a86ccac, type: 2}

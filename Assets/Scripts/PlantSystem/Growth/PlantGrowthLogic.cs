@@ -24,12 +24,17 @@ public class PlantGrowthLogic {
         this.plant = plant;
     }
 
-    public void CalculateAndApplyStats() {
-        if (plant.NodeGraph == null) {
+    // In file: Assets\Scripts\PlantSystem\Growth\PlantGrowthLogic.cs
+
+public void CalculateAndApplyStats()
+    {
+        if (plant.NodeGraph == null)
+        {
             Debug.LogError($"[{plant.gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
             return;
         }
 
+        // --- Step 1: Set hardcoded default base values ---
         float baseEnergyStorage = 10f;
         float baseEnergyPerTick = 0.25f;
         int baseStemMin = 3;
@@ -40,76 +45,75 @@ public class PlantGrowthLogic {
         float baseGrowthRandomness = 0.1f;
         int baseCooldownTicks = 20;
         int baseCastDelayTicks = 0;
+        bool seedFound = false;
 
+        // --- Step 2: If a comprehensive seed exists, use its data to OVERWRITE the defaults ---
+        NodeData firstNode = plant.NodeGraph.nodes.FirstOrDefault();
+        if (firstNode != null)
+        {
+            var seedEffect = firstNode.effects?.FirstOrDefault(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
+            if (seedEffect != null && seedEffect.seedData != null)
+            {
+                seedFound = true;
+                baseEnergyStorage = seedEffect.seedData.energyStorage;
+                baseGrowthTicksPerStage = seedEffect.seedData.growthSpeed;
+                baseStemMin = seedEffect.seedData.stemLengthMin;
+                baseStemMax = seedEffect.seedData.stemLengthMax;
+                baseLeafGap = seedEffect.seedData.leafGap;
+                baseLeafPattern = seedEffect.seedData.leafPattern;
+                baseGrowthRandomness = seedEffect.seedData.stemRandomness;
+                baseCooldownTicks = seedEffect.seedData.cooldown;
+                baseCastDelayTicks = seedEffect.seedData.castDelay;
+            }
+        }
+
+        // --- Step 3: Loop through ALL passive effects to calculate additional modifiers ---
         float accumulatedEnergyStorage = 0f;
         float accumulatedEnergyPerTick = 0f;
         int stemLengthMinModifier = 0;
         int stemLengthMaxModifier = 0;
         int growthTicksModifier = 0;
         int leafGapModifier = 0;
-        int currentLeafPattern = baseLeafPattern;
+        int currentLeafPattern = baseLeafPattern; // Start with the (potentially seed-overwritten) base
         float growthRandomnessModifier = 0f;
         int cooldownTicksModifier = 0;
         int castDelayTicksModifier = 0;
-        bool seedFound = false;
 
-        // Process passive effects
-        foreach (NodeData node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
+        foreach (NodeData node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex))
+        {
             if (node?.effects == null) continue;
 
-            foreach (var effect in node.effects) {
-                if (effect == null) continue;
+            foreach (var effect in node.effects)
+            {
+                if (effect == null || !effect.isPassive) continue;
 
-                effect.ValidateForTicks();
-
-                if (effect.effectType == NodeEffectType.SeedSpawn) {
-                    seedFound = true;
+                // The SeedSpawn effect itself doesn't grant stats; its *data* was already used.
+                // We only process other passive modifiers here.
+                if (effect.effectType == NodeEffectType.SeedSpawn)
+                {
+                    seedFound = true; // Still need to confirm a seed exists
                     continue;
                 }
 
-                if (!effect.isPassive) continue;
+                effect.ValidateForTicks();
 
-                switch (effect.effectType) {
-                    case NodeEffectType.EnergyStorage:
-                        accumulatedEnergyStorage += effect.primaryValue;
-                        break;
-
-                    case NodeEffectType.EnergyPerTick:
-                        accumulatedEnergyPerTick += effect.primaryValue;
-                        break;
-
-                    case NodeEffectType.StemLength:
-                        stemLengthMinModifier += effect.GetPrimaryValueAsInt();
-                        stemLengthMaxModifier += effect.GetSecondaryValueAsInt();
-                        break;
-
-                    case NodeEffectType.GrowthSpeed:
-                        growthTicksModifier += effect.GetPrimaryValueAsInt();
-                        break;
-
-                    case NodeEffectType.LeafGap:
-                        leafGapModifier += effect.GetPrimaryValueAsInt();
-                        break;
-
-                    case NodeEffectType.LeafPattern:
-                        currentLeafPattern = Mathf.Clamp(effect.GetPrimaryValueAsInt(), 0, 4);
-                        break;
-
-                    case NodeEffectType.StemRandomness:
-                        growthRandomnessModifier += effect.primaryValue;
-                        break;
-
-                    case NodeEffectType.Cooldown:
-                        cooldownTicksModifier += effect.GetPrimaryValueAsInt();
-                        break;
-
-                    case NodeEffectType.CastDelay:
-                        castDelayTicksModifier += effect.GetPrimaryValueAsInt();
-                        break;
+                switch (effect.effectType)
+                {
+                    case NodeEffectType.EnergyStorage:   accumulatedEnergyStorage += effect.primaryValue; break;
+                    case NodeEffectType.EnergyPerTick:   accumulatedEnergyPerTick += effect.primaryValue; break;
+                    case NodeEffectType.StemLength:      stemLengthMinModifier += effect.GetPrimaryValueAsInt();
+                                                         stemLengthMaxModifier += effect.GetSecondaryValueAsInt(); break;
+                    case NodeEffectType.GrowthSpeed:     growthTicksModifier += effect.GetPrimaryValueAsInt(); break;
+                    case NodeEffectType.LeafGap:         leafGapModifier += effect.GetPrimaryValueAsInt(); break;
+                    case NodeEffectType.LeafPattern:     currentLeafPattern = Mathf.Clamp(effect.GetPrimaryValueAsInt(), 0, 4); break;
+                    case NodeEffectType.StemRandomness:  growthRandomnessModifier += effect.primaryValue; break;
+                    case NodeEffectType.Cooldown:        cooldownTicksModifier += effect.GetPrimaryValueAsInt(); break;
+                    case NodeEffectType.CastDelay:       castDelayTicksModifier += effect.GetPrimaryValueAsInt(); break;
                 }
             }
         }
 
+        // --- Step 4: Apply final calculated stats ---
         plant.EnergySystem.MaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
         EnergyPerTick = Mathf.Max(0f, baseEnergyPerTick + accumulatedEnergyPerTick);
         plant.EnergySystem.PhotosynthesisRate = EnergyPerTick;
@@ -127,27 +131,44 @@ public class PlantGrowthLogic {
 
         plant.NodeExecutor.ProcessPassiveEffects(plant.NodeGraph);
 
-        if (!seedFound) {
+        if (!seedFound)
+        {
             Debug.LogWarning($"[{plant.gameObject.name}] NodeGraph lacks a SeedSpawn effect. Growth aborted.", plant.gameObject);
         }
-
+        
         Debug.Log($"[{plant.gameObject.name}] Growth stats: TargetStem={TargetStemLength}, GrowthTicks={GrowthTicksPerStage}, Cooldown={MaturityCycleTicks}");
     }
 
-    public void OnTickUpdate(int currentTick) {
-        switch (plant.CurrentState) {
+    // In file: Assets\Scripts\PlantSystem\Growth\PlantGrowthLogic.cs
+
+    // In file: Assets\Scripts\PlantSystem\Growth\PlantGrowthLogic.cs
+
+    public void OnTickUpdate(int currentTick)
+    {
+        // --- State-based Tick Logic ---
+        switch (plant.CurrentState)
+        {
             case PlantState.Growing:
-                growthProgressTicks += 1f;
+                // Fetch the growth multiplier from the manager every tick.
+                float growthMultiplier = 1.0f;
+                if (PlantGrowthModifierManager.Instance != null)
+                {
+                    growthMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(plant);
+                }
 
-                Debug.Log($"[{plant.gameObject.name}] Growth progress: {growthProgressTicks}/{GrowthTicksPerStage} (Stage {currentStemStage}/{TargetStemLength})");
+                // Apply the multiplier to the growth progress.
+                growthProgressTicks += growthMultiplier;
 
-                if (growthProgressTicks >= GrowthTicksPerStage) {
+                if (growthProgressTicks >= GrowthTicksPerStage)
+                {
+                    // Reset timer and grow the next stage
                     growthProgressTicks = 0f;
+                    GrowNextStemStage();
 
-                    if (currentStemStage < TargetStemLength) {
-                        GrowNextStemStage();
-                    } else {
-                        CompleteGrowth();
+                    // Check for completion *immediately after* growing.
+                    if (currentStemStage >= TargetStemLength)
+                    {
+                        CompleteGrowth(); // This will change the state to Mature_Idle
                     }
                 }
                 break;
@@ -156,7 +177,8 @@ public class PlantGrowthLogic {
                 plant.EnergySystem.AccumulateEnergyTick();
                 maturityCycleTick++;
 
-                if (maturityCycleTick >= MaturityCycleTicks && plant.EnergySystem.CurrentEnergy >= 1f) {
+                if (maturityCycleTick >= MaturityCycleTicks && plant.EnergySystem.CurrentEnergy >= 1f)
+                {
                     plant.CurrentState = PlantState.Mature_Executing;
                     plant.NodeExecutor.ExecuteMatureCycleTick();
                     maturityCycleTick = 0;
@@ -165,6 +187,7 @@ public class PlantGrowthLogic {
 
             case PlantState.Mature_Executing:
                 plant.EnergySystem.AccumulateEnergyTick();
+                // Transition back to idle after executing.
                 plant.CurrentState = PlantState.Mature_Idle;
                 break;
         }

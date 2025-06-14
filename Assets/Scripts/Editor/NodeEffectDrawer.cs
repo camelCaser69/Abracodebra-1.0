@@ -1,153 +1,127 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
+using UnityEngine;
 
 [CustomPropertyDrawer(typeof(NodeEffectData))]
-public class NodeEffectDrawer : PropertyDrawer {
-    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
+public class NodeEffectDrawer : PropertyDrawer
+{
+    // Define a fixed height for the standard fields plus some padding.
+    // This will be added to the height of any complex fields.
+    private const float BASE_PROPERTY_HEIGHT = 42f;
+
+    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+    {
         EditorGUI.BeginProperty(position, label, property);
 
+        // Get all property references
         var effectTypeProp = property.FindPropertyRelative("effectType");
-        var primaryValueProp = property.FindPropertyRelative("primaryValue");
-        var secondaryValueProp = property.FindPropertyRelative("secondaryValue");
         var isPassiveProp = property.FindPropertyRelative("isPassive");
-        var scentDefRefProp = property.FindPropertyRelative("scentDefinitionReference");
+        var seedDataProp = property.FindPropertyRelative("seedData");
 
-        Rect typeRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
-        Rect passiveRect = new Rect(position.x, typeRect.yMax + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
-        Rect primaryRect = new Rect(position.x, passiveRect.yMax + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
-        Rect secondaryRect = new Rect(position.x, primaryRect.yMax + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
-        Rect scentRect = new Rect(position.x, secondaryRect.yMax + EditorGUIUtility.standardVerticalSpacing, position.width, EditorGUIUtility.singleLineHeight);
+        // --- Draw the standard fields ---
+        Rect currentRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+        EditorGUI.PropertyField(currentRect, effectTypeProp);
+        currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        EditorGUI.PropertyField(currentRect, isPassiveProp);
+        currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
-        EditorGUI.PropertyField(typeRect, effectTypeProp);
-        EditorGUI.PropertyField(passiveRect, isPassiveProp);
-
+        // --- Draw the context-sensitive fields ---
         NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
 
-        // Set contextual labels based on effect type
-        GUIContent primaryLabel = new GUIContent("Primary Value");
-        GUIContent secondaryLabel = new GUIContent("Secondary Value");
-        bool showSecondary = false;
-        bool showScentField = false;
-
-        switch (currentType) {
-            // Energy & Resources
-            case NodeEffectType.EnergyStorage:
-                primaryLabel.text = "Max Energy Increase";
-                primaryLabel.tooltip = "Additional maximum energy capacity";
-                break;
-
-            case NodeEffectType.EnergyPerTick:
-                primaryLabel.text = "Energy Per Tick";
-                primaryLabel.tooltip = "Energy generated each tick (affected by sunlight and leaves)";
-                break;
-
-            case NodeEffectType.EnergyCost:
-                primaryLabel.text = "Energy Cost";
-                primaryLabel.tooltip = "Energy required to execute mature cycle";
-                break;
-
-            // Growth & Structure
-            case NodeEffectType.StemLength:
-                primaryLabel.text = "Min Segments Add";
-                primaryLabel.tooltip = "Minimum stem segments to add";
-                secondaryLabel.text = "Max Segments Add";
-                secondaryLabel.tooltip = "Maximum stem segments to add (will randomly pick between min and max)";
-                showSecondary = true;
-                break;
-
-            case NodeEffectType.GrowthSpeed:
-                primaryLabel.text = "Ticks Per Stage";
-                primaryLabel.tooltip = "Number of ticks between each growth stage (lower = faster)";
-                break;
-
-            case NodeEffectType.LeafGap:
-                primaryLabel.text = "Segments Between Leaves";
-                primaryLabel.tooltip = "0 = leaves every segment, 1 = leaves every 2 segments, etc.";
-                break;
-
-            case NodeEffectType.LeafPattern:
-                primaryLabel.text = "Pattern Type";
-                primaryLabel.tooltip = "0=Symmetrical, 1=Offset, 2=Alternating, 3=Spiral, 4=Dense";
-                break;
-
-            case NodeEffectType.StemRandomness:
-                primaryLabel.text = "Wobble Chance (0-1)";
-                primaryLabel.tooltip = "Probability that stem will grow sideways";
-                break;
-
-            // Timing
-            case NodeEffectType.Cooldown:
-                primaryLabel.text = "Cooldown Ticks";
-                primaryLabel.tooltip = "Ticks between mature cycle activations";
-                break;
-
-            case NodeEffectType.CastDelay:
-                primaryLabel.text = "Delay Ticks";
-                primaryLabel.tooltip = "Ticks to wait before starting growth";
-                break;
-
-            // Environmental
-            case NodeEffectType.PoopAbsorption:
-                primaryLabel.text = "Detection Radius";
-                primaryLabel.tooltip = "Radius in tiles to detect fertilizer";
-                secondaryLabel.text = "Energy Per Poop";
-                secondaryLabel.tooltip = "Energy gained when absorbing fertilizer";
-                showSecondary = true;
-                break;
-
-            // Combat & Effects
-            case NodeEffectType.Damage:
-                primaryLabel.text = "Damage Multiplier Add";
-                primaryLabel.tooltip = "Adds to damage multiplier (1.0 = +100% damage)";
-                break;
-
-            // Spawning
-            case NodeEffectType.GrowBerry:
-                primaryLabel.text = "Enabled";
-                primaryLabel.tooltip = "Set to 1 to enable berry growth";
-                break;
-
-            case NodeEffectType.SeedSpawn:
-                primaryLabel.text = "Enabled";
-                primaryLabel.tooltip = "Set to 1 to make this a seed container";
-                break;
-
-            // Modifiers
-            case NodeEffectType.ScentModifier:
-                primaryLabel.text = "Radius Modifier";
-                primaryLabel.tooltip = "Adds/subtracts from scent radius";
-                secondaryLabel.text = "Strength Modifier";
-                secondaryLabel.tooltip = "Adds/subtracts from scent strength";
-                showSecondary = true;
-                showScentField = true;
-                break;
+        if (currentType == NodeEffectType.SeedSpawn)
+        {
+            // Let Unity draw the SeedSpawnData fields automatically. This is robust and respects layout.
+            EditorGUI.PropertyField(currentRect, seedDataProp, true);
         }
-
-        EditorGUI.PropertyField(primaryRect, primaryValueProp, primaryLabel);
-        
-        if (showSecondary) {
-            EditorGUI.PropertyField(secondaryRect, secondaryValueProp, secondaryLabel);
-        }
-
-        if (showScentField) {
-            EditorGUI.PropertyField(scentRect, scentDefRefProp, new GUIContent("Scent Definition", "Which scent type to modify"));
+        else
+        {
+            // For other types, draw the primary/secondary values as before
+            DrawStandardValueFields(currentRect, property, currentType);
         }
 
         EditorGUI.EndProperty();
     }
 
-    public override float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-        float height = EditorGUIUtility.singleLineHeight; // Type
-        height += EditorGUIUtility.standardVerticalSpacing + EditorGUIUtility.singleLineHeight; // Passive
-        height += EditorGUIUtility.standardVerticalSpacing + EditorGUIUtility.singleLineHeight; // Primary
-        height += EditorGUIUtility.standardVerticalSpacing + EditorGUIUtility.singleLineHeight; // Secondary
+    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+    {
+        // Start with the height of the two standard fields (EffectType, IsPassive).
+        float totalHeight = BASE_PROPERTY_HEIGHT;
 
-        var effectTypeProp = property.FindPropertyRelative("effectType");
-        NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
-        if (currentType == NodeEffectType.ScentModifier) {
-            height += EditorGUIUtility.standardVerticalSpacing + EditorGUIUtility.singleLineHeight; // Scent Definition Reference
+        NodeEffectType currentType = (NodeEffectType)property.FindPropertyRelative("effectType").enumValueIndex;
+
+        if (currentType == NodeEffectType.SeedSpawn)
+        {
+            // Get the automatic height for the entire SeedSpawnData property.
+            totalHeight += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("seedData"), true);
+        }
+        else
+        {
+            // Calculate height for standard primary/secondary value fields.
+            // This logic remains the same as it was working correctly.
+            totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Primary value is always shown
+
+            switch (currentType)
+            {
+                case NodeEffectType.StemLength:
+                case NodeEffectType.PoopAbsorption:
+                case NodeEffectType.ScentModifier:
+                    totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // For secondary value
+                    break;
+            }
+
+            if (currentType == NodeEffectType.ScentModifier)
+            {
+                totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // For scent reference
+            }
         }
 
-        return height;
+        return totalHeight;
+    }
+    
+    // Helper method to keep the OnGUI method cleaner
+    private void DrawStandardValueFields(Rect startRect, SerializedProperty property, NodeEffectType currentType)
+    {
+        var primaryValueProp = property.FindPropertyRelative("primaryValue");
+        var secondaryValueProp = property.FindPropertyRelative("secondaryValue");
+        var scentDefRefProp = property.FindPropertyRelative("scentDefinitionReference");
+        
+        GUIContent primaryLabel = new GUIContent("Primary Value");
+        GUIContent secondaryLabel = new GUIContent("Secondary Value");
+        bool showSecondary = false;
+        bool showScentField = false;
+
+        // Label customization logic (same as before)
+        switch (currentType)
+        {
+            case NodeEffectType.EnergyStorage: primaryLabel.text = "Max Energy Increase"; break;
+            case NodeEffectType.EnergyPerTick: primaryLabel.text = "Energy Per Tick"; break;
+            case NodeEffectType.EnergyCost: primaryLabel.text = "Energy Cost"; break;
+            case NodeEffectType.StemLength: primaryLabel.text = "Min Segments Add"; secondaryLabel.text = "Max Segments Add"; showSecondary = true; break;
+            case NodeEffectType.GrowthSpeed: primaryLabel.text = "Ticks Per Stage"; break;
+            case NodeEffectType.LeafGap: primaryLabel.text = "Segments Between Leaves"; break;
+            case NodeEffectType.LeafPattern: primaryLabel.text = "Pattern Type"; break;
+            case NodeEffectType.StemRandomness: primaryLabel.text = "Wobble Chance (0-1)"; break;
+            case NodeEffectType.Cooldown: primaryLabel.text = "Cooldown Ticks"; break;
+            case NodeEffectType.CastDelay: primaryLabel.text = "Delay Ticks"; break;
+            case NodeEffectType.PoopAbsorption: primaryLabel.text = "Detection Radius"; secondaryLabel.text = "Energy Per Poop"; showSecondary = true; break;
+            case NodeEffectType.Damage: primaryLabel.text = "Damage Multiplier Add"; break;
+            case NodeEffectType.GrowBerry: primaryLabel.text = "Enabled"; break;
+            case NodeEffectType.ScentModifier: primaryLabel.text = "Radius Modifier"; secondaryLabel.text = "Strength Modifier"; showSecondary = true; showScentField = true; break;
+        }
+
+        Rect currentRect = startRect;
+        
+        EditorGUI.PropertyField(currentRect, primaryValueProp, primaryLabel);
+        currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
+        if (showSecondary)
+        {
+            EditorGUI.PropertyField(currentRect, secondaryValueProp, secondaryLabel);
+            currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        }
+
+        if (showScentField)
+        {
+            EditorGUI.PropertyField(currentRect, scentDefRefProp, new GUIContent("Scent Definition"));
+        }
     }
 }

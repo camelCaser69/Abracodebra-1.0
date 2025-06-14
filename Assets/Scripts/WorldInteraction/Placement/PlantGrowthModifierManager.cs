@@ -1,60 +1,37 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using WegoSystem;
 
-public class PlantGrowthModifierManager : MonoBehaviour
+public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
 {
-    public static PlantGrowthModifierManager Instance { get; private set; }
+    public static PlantGrowthModifierManager Instance { get; set; }
 
     [System.Serializable]
     public class TileGrowthModifier
     {
-        [Tooltip("The tile definition this modifier applies to")]
         public TileDefinition tileDefinition;
-
-        [Tooltip("Multiplier for plant growth speed when on this tile (1.0 = normal)")]
-        [Range(0.1f, 3.0f)]
+        [Tooltip("Multiplier for how fast the plant gains growth progress. >1 is faster, <1 is slower.")]
         public float growthSpeedMultiplier = 1.0f;
-
-        [Tooltip("Multiplier for energy recharge speed when on this tile (1.0 = normal)")]
-        [Range(0.1f, 3.0f)]
+        [Tooltip("Multiplier for how much energy the plant recharges via photosynthesis. >1 is more, <1 is less.")]
         public float energyRechargeMultiplier = 1.0f;
     }
 
-    [Header("Default Settings")]
-    [Tooltip("Default multiplier for tiles that aren't specifically configured")]
-    [Range(0.1f, 3.0f)]
+    [Header("Default Modifiers")]
     public float defaultGrowthSpeedMultiplier = 1.0f;
-
-    [Tooltip("Default multiplier for energy recharge on tiles that aren't specifically configured")]
-    [Range(0.1f, 3.0f)]
     public float defaultEnergyRechargeMultiplier = 1.0f;
-
-    [Header("Tile Update Settings")]
-    [Tooltip("How often (in seconds) to check if plants are on different tiles")]
-    [Range(0.5f, 5.0f)]
-    public float tileUpdateInterval = 1.0f;
-
-    [Header("Tile Growth Modifiers")]
-    [Tooltip("Define growth and energy recharge multipliers for specific tiles")]
+    
+    [Header("Tile-Specific Modifiers")]
     public List<TileGrowthModifier> tileModifiers = new List<TileGrowthModifier>();
 
-    [Header("References")]
+    [Header("Dependencies & Debug")]
     [SerializeField] private TileInteractionManager tileInteractionManager;
-
-    [Header("Debug")]
     [SerializeField] private bool showDebugMessages = true;
     [SerializeField] private bool showTileChangeMessages = true;
-
-    // Dictionary for faster lookup of modifiers by tile definition
+    
     private Dictionary<TileDefinition, TileGrowthModifier> modifierLookup = new Dictionary<TileDefinition, TileGrowthModifier>();
-
-    // Dictionary to track what tile each plant is on
     private Dictionary<PlantGrowth, TileDefinition> plantTiles = new Dictionary<PlantGrowth, TileDefinition>();
     
-    // Timer for tile updates
-    private float tileUpdateTimer = 0f;
-
-    private void Awake()
+    void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -63,13 +40,11 @@ public class PlantGrowthModifierManager : MonoBehaviour
         }
         Instance = this;
 
-        // Build lookup dictionary for faster access
         BuildModifierLookup();
     }
 
-    private void Start()
+    void Start()
     {
-        // Find TileInteractionManager if not assigned
         if (tileInteractionManager == null)
         {
             tileInteractionManager = TileInteractionManager.Instance;
@@ -79,69 +54,65 @@ public class PlantGrowthModifierManager : MonoBehaviour
             }
         }
         
-        // Start with a tile update
-        tileUpdateTimer = 0f;
-    }
-
-    private void Update()
-    {
-        // Update timer
-        tileUpdateTimer -= Time.deltaTime;
-        
-        // Check if it's time to update tiles
-        if (tileUpdateTimer <= 0f)
+        // Register this manager with the TickManager to receive tick updates
+        if (TickManager.Instance != null)
         {
-            UpdateAllPlantTiles();
-            tileUpdateTimer = tileUpdateInterval;
+            TickManager.Instance.RegisterTickUpdateable(this);
+        }
+        else
+        {
+            Debug.LogError("[PlantGrowthModifierManager] TickManager not found! Modifiers will not update.");
         }
     }
 
-    // Check all plants to see if their tiles have changed
-    private void UpdateAllPlantTiles()
+    void OnDestroy()
     {
-        if (tileInteractionManager == null)
+        if (TickManager.Instance != null)
         {
-            return;
+            TickManager.Instance.UnregisterTickUpdateable(this);
         }
-        
-        // We need to copy the keys to avoid modifying the dictionary during iteration
+    }
+
+    // This method is now called every game tick by the TickManager
+    public void OnTickUpdate(int currentTick)
+    {
+        UpdateAllPlantTiles();
+    }
+    
+    void UpdateAllPlantTiles()
+    {
+        if (tileInteractionManager == null) return;
+
+        // Use a temporary list to avoid issues with modifying the dictionary while iterating
         List<PlantGrowth> plantsToCheck = new List<PlantGrowth>(plantTiles.Keys);
-        
+
         foreach (PlantGrowth plant in plantsToCheck)
         {
             if (plant == null)
             {
-                // Plant has been destroyed, remove from dictionary
                 plantTiles.Remove(plant);
                 continue;
             }
-            
-            // Convert plant position to grid position
+
             Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
-            
-            // Get current tile definition at this position
             TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
-            
-            // Get previously stored tile definition
-            TileDefinition previousTileDef = plantTiles[plant];
-            
-            // Check if tile has changed
-            if (currentTileDef != previousTileDef)
+
+            // If the plant's tile has changed, update our record
+            if (plantTiles.TryGetValue(plant, out TileDefinition previousTileDef) && currentTileDef != previousTileDef)
             {
-                // Update stored tile
                 plantTiles[plant] = currentTileDef;
-                
+
                 if (showTileChangeMessages)
                 {
                     string previousTileName = previousTileDef != null ? previousTileDef.displayName : "None";
                     string currentTileName = currentTileDef != null ? currentTileDef.displayName : "None";
-                    Debug.Log($"Plant tile changed: {previousTileName} -> {currentTileName}");
+                    Debug.Log($"Plant '{plant.name}' tile changed: {previousTileName} -> {currentTileName}");
                 }
             }
         }
     }
 
-    private void BuildModifierLookup()
+    void BuildModifierLookup()
     {
         modifierLookup.Clear();
         foreach (var modifier in tileModifiers)
@@ -151,19 +122,11 @@ public class PlantGrowthModifierManager : MonoBehaviour
                 modifierLookup.Add(modifier.tileDefinition, modifier);
             }
         }
-
-        if (showDebugMessages)
-        {
-            Debug.Log($"PlantGrowthModifierManager: Built lookup with {modifierLookup.Count} tile modifiers");
-        }
     }
 
-    // Call this when a plant is created to register its tile
     public void RegisterPlantTile(PlantGrowth plant, TileDefinition tileDef)
     {
-        if (plant == null)
-            return;
-
+        if (plant == null) return;
         plantTiles[plant] = tileDef;
 
         if (showDebugMessages)
@@ -173,91 +136,72 @@ public class PlantGrowthModifierManager : MonoBehaviour
         }
     }
 
-    // Call this when a plant is destroyed to clean up
     public void UnregisterPlant(PlantGrowth plant)
     {
-        if (plant == null)
-            return;
-
-        if (plantTiles.ContainsKey(plant))
+        if (plant != null)
         {
             plantTiles.Remove(plant);
         }
     }
 
-    // Get growth speed multiplier for a plant based on its tile
     public float GetGrowthSpeedMultiplier(PlantGrowth plant)
     {
-        if (plant == null)
-            return defaultGrowthSpeedMultiplier;
-        
-        // If plant not in dictionary, register it with its current tile
+        if (plant == null) return defaultGrowthSpeedMultiplier;
+
         if (!plantTiles.ContainsKey(plant))
         {
-            RegisterNewPlant(plant);
-        }
-        
-        TileDefinition tileDef = plantTiles[plant];
-        if (tileDef == null)
-        {
-            return defaultGrowthSpeedMultiplier;
+            RegisterNewPlant(plant); // Auto-register if not found
         }
 
-        if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
+        if (plantTiles.TryGetValue(plant, out TileDefinition tileDef) && tileDef != null)
         {
-            return modifier.growthSpeedMultiplier;
+            if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
+            {
+                return modifier.growthSpeedMultiplier;
+            }
         }
 
         return defaultGrowthSpeedMultiplier;
     }
 
-    // Get energy recharge multiplier for a plant based on its tile
     public float GetEnergyRechargeMultiplier(PlantGrowth plant)
     {
-        if (plant == null)
-            return defaultEnergyRechargeMultiplier;
-        
-        // If plant not in dictionary, register it with its current tile
+        if (plant == null) return defaultEnergyRechargeMultiplier;
+
         if (!plantTiles.ContainsKey(plant))
         {
-            RegisterNewPlant(plant);
+            RegisterNewPlant(plant); // Auto-register if not found
         }
         
-        TileDefinition tileDef = plantTiles[plant];
-        if (tileDef == null)
+        if (plantTiles.TryGetValue(plant, out TileDefinition tileDef) && tileDef != null)
         {
-            return defaultEnergyRechargeMultiplier;
+            if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
+            {
+                return modifier.energyRechargeMultiplier;
+            }
         }
-
-        if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
-        {
-            return modifier.energyRechargeMultiplier;
-        }
-
+        
         return defaultEnergyRechargeMultiplier;
     }
     
-    // Helper method to register a new plant with its current tile
     private void RegisterNewPlant(PlantGrowth plant)
     {
-        if (plant == null || tileInteractionManager == null)
-            return;
-            
+        if (plant == null || tileInteractionManager == null) return;
+
         Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
         TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
-        
         plantTiles[plant] = currentTileDef;
-        
+
         if (showDebugMessages)
         {
             string tileName = currentTileDef != null ? currentTileDef.displayName : "Unknown Tile";
-            Debug.Log($"Auto-registered plant {plant.name} on tile {tileName}");
+            Debug.Log($"Auto-registered new plant {plant.name} on tile {tileName}");
         }
     }
-
-    // For editor support - rebuild lookup when modifiers change
-    public void OnValidate()
+    
+    void OnValidate()
     {
+        // Rebuild the lookup in the editor for immediate feedback
         BuildModifierLookup();
     }
 }

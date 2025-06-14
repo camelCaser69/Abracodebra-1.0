@@ -19,53 +19,18 @@ MonoBehaviour:
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   effects:
-  - effectType: 15
-    primaryValue: 0
-    secondaryValue: 0
-    isPassive: 1
-    scentDefinitionReference: {fileID: 0}
-  - effectType: 8
-    primaryValue: 4
-    secondaryValue: 0
-    isPassive: 1
-    scentDefinitionReference: {fileID: 0}
-  - effectType: 9
+  - effectType: 13
     primaryValue: 1
     secondaryValue: 0
     isPassive: 1
     scentDefinitionReference: {fileID: 0}
-  - effectType: 4
-    primaryValue: 1
-    secondaryValue: 0
-    isPassive: 1
-    scentDefinitionReference: {fileID: 0}
-  - effectType: 3
-    primaryValue: 6
-    secondaryValue: 11
-    isPassive: 1
-    scentDefinitionReference: {fileID: 0}
-  - effectType: 7
-    primaryValue: 0.5
-    secondaryValue: 0
-    isPassive: 1
-    scentDefinitionReference: {fileID: 0}
-  - effectType: 5
-    primaryValue: 1
-    secondaryValue: 0
-    isPassive: 1
-    scentDefinitionReference: {fileID: 0}
-  - effectType: 6
-    primaryValue: 0
-    secondaryValue: 0
-    isPassive: 1
-    scentDefinitionReference: {fileID: 0}
-  - effectType: 0
-    primaryValue: 40
-    secondaryValue: 0
-    isPassive: 1
-    scentDefinitionReference: {fileID: 0}
-  - effectType: 1
-    primaryValue: 0.2
-    secondaryValue: 0
-    isPassive: 1
-    scentDefinitionReference: {fileID: 0}
+    seedData:
+      growthSpeed: 2
+      stemLengthMin: 4
+      stemLengthMax: 6
+      leafGap: 1
+      leafPattern: 0
+      stemRandomness: 0.5
+      energyStorage: 40
+      cooldown: 4
+      castDelay: 1
