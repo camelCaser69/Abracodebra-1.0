@@ -1,6 +1,4 @@
-﻿// Assets/Scripts/Ticks/GridEntity.cs
-
-using System;
+﻿using System;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -9,47 +7,31 @@ using UnityEditor;
 
 namespace WegoSystem
 {
-    /// <summary>
-    /// Component to be added to any GameObject that should exist on the grid.
-    /// Manages the object's grid position and its visual representation, including smooth movement.
-    /// Allows pre-configuration of a "ground point" offset on prefabs.
-    /// </summary>
     public class GridEntity : MonoBehaviour
     {
-        #region Fields
+        // The new checkbox to control occupancy behavior
+        [Tooltip("If true, this entity will block other entities from entering its tile. If false, it can share its tile.")]
+        public bool isTileOccupant = true;
 
-        [Header("Grid Position")]
-        [SerializeField]
         private GridPosition gridPosition;
-        // The 'snapToGridOnStart' field has been removed as it's no longer used.
 
-        [Header("Visuals & Positioning")]
-        [Tooltip("The local offset from the object's pivot to its 'ground' or 'feet' position. This point is used for grid calculations.")]
-        [SerializeField]
-        private Vector3 groundPointOffset = Vector3.zero;
-        [Tooltip("An additional visual offset applied after grid positioning. Useful for tweaking Z-order or slight positional adjustments without affecting grid logic.")]
-        [SerializeField]
-        private Vector3 visualOffset = Vector3.zero;
+        [Header("Movement Settings")]
+        [SerializeField] private Vector3 groundPointOffset = Vector3.zero;
+        [SerializeField] private Vector3 visualOffset = Vector3.zero;
+        [SerializeField] private float visualInterpolationSpeed = 5f;
+        [SerializeField] private AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-        [Header("Movement Tweening")]
-        [SerializeField]
-        private float visualInterpolationSpeed = 5f;
-        [SerializeField]
-        private AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
-
+        // Movement State
         private GridPosition previousGridPosition;
         private Vector3 visualStartPosition;
         private Vector3 visualTargetPosition;
         private float movementProgress = 1f;
         private bool isMoving = false;
 
-        #endregion
-
-        #region Properties
         public GridPosition Position
         {
             get => gridPosition;
-            private set // Keep setter to be controlled by SetPosition method
+            private set // Keep setter private to be controlled by SetPosition method
             {
                 if (gridPosition != value)
                 {
@@ -63,26 +45,14 @@ namespace WegoSystem
         public GridPosition PreviousPosition => previousGridPosition;
         public bool IsMoving => isMoving;
         public float MovementProgress => movementProgress;
-        
-        /// <summary>
-        /// Calculates the world position of this entity's defined ground point.
-        /// </summary>
         public Vector3 GroundWorldPosition => transform.position + groundPointOffset;
 
-        #endregion
-
-        #region Events
         public event Action<GridPosition, GridPosition> OnPositionChanged;
         public event Action<GridPosition> OnMovementComplete;
         public event Action OnMovementStart;
-        #endregion
 
-        #region Unity Methods
         protected virtual void Start()
         {
-            // Snapping is now handled externally by GridSnapStartup.cs.
-
-            // This initialization is still important.
             visualStartPosition = transform.position;
             visualTargetPosition = transform.position;
             previousGridPosition = gridPosition;
@@ -117,14 +87,14 @@ namespace WegoSystem
 #if UNITY_EDITOR
         void OnDrawGizmosSelected()
         {
-            // Draw a line from the pivot to the ground point
+            // Draw Ground Point
             Vector3 groundWorldPosition = transform.position + groundPointOffset;
             Gizmos.color = Color.green;
             Gizmos.DrawLine(transform.position, groundWorldPosition);
             Gizmos.DrawWireSphere(groundWorldPosition, 0.1f);
             UnityEditor.Handles.Label(groundWorldPosition + Vector3.up * 0.2f, "Ground Point");
 
-            // If playing, show where the grid thinks the ground is
+            // Draw current Grid Position
             if (Application.isPlaying && GridPositionManager.Instance != null)
             {
                 Gizmos.color = Color.yellow;
@@ -133,17 +103,16 @@ namespace WegoSystem
             }
         }
 #endif
-        #endregion
 
-        #region Positioning Logic
         protected virtual void OnGridPositionChanged()
         {
             visualStartPosition = transform.position;
 
-            // The target position from the grid manager is the GROUND position.
-            Vector3 groundTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
-            // The final transform position must be offset by our ground point.
-            visualTargetPosition = groundTargetPosition - groundPointOffset + visualOffset;
+            if (GridPositionManager.Instance != null)
+            {
+                Vector3 groundTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
+                visualTargetPosition = groundTargetPosition - groundPointOffset + visualOffset;
+            }
 
             movementProgress = 0f;
 
@@ -163,13 +132,10 @@ namespace WegoSystem
             if (instant)
             {
                 if (GridPositionManager.Instance == null) return;
-                
-                // The target position from the grid manager is the GROUND position.
+
                 Vector3 groundTargetPosition = GridPositionManager.Instance.GridToWorld(Position);
-                // The final transform position must be offset by our ground point.
                 transform.position = groundTargetPosition - groundPointOffset + visualOffset;
 
-                // Reset tweening variables
                 visualStartPosition = transform.position;
                 visualTargetPosition = transform.position;
                 movementProgress = 1f;
@@ -181,7 +147,6 @@ namespace WegoSystem
         {
             if (GridPositionManager.Instance == null) return;
 
-            // Use the ground point to determine the grid position
             Vector3 groundWorldPos = transform.position + groundPointOffset;
             GridPosition currentGridPos = GridPositionManager.Instance.WorldToGrid(groundWorldPos);
             SetPosition(currentGridPos, true);
@@ -207,6 +172,5 @@ namespace WegoSystem
                 OnMovementComplete?.Invoke(gridPosition);
             }
         }
-        #endregion
     }
 }

@@ -1,47 +1,48 @@
-﻿// Assets\Scripts\Ecosystem\Effects\FireflyController.cs
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using WegoSystem;
 using UnityEngine.Rendering.Universal;
 
-[RequireComponent(typeof(GridEntity))]
 public class FireflyController : MonoBehaviour, ITickUpdateable
 {
-    [SerializeField] FireflyDefinition definition;
-    [SerializeField] Light2D glowLight;
-    [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] TrailRenderer trailRenderer;
-    [SerializeField] ParticleSystem glowParticles;
+    [SerializeField] private FireflyDefinition definition;
+    [SerializeField] private Light2D glowLight;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private TrailRenderer trailRenderer;
+    [SerializeField] private ParticleSystem glowParticles;
+    
+    // The firefly now uses its GridEntity component for all position and movement logic
+    private GridEntity gridEntity;
+    
+    private int currentAgeTicks = 0;
+    private int lifetimeTicks;
+    private int lastMovementTick = 0;
+    private int spawnEffectRemainingTicks = 0;
 
-    GridEntity gridEntity;
-    int currentAgeTicks = 0;
-    int lifetimeTicks;
-    int lastMovementTick = 0;
-    int spawnEffectRemainingTicks = 0;
+    private Vector3 currentTileCenter;
+    private Vector3 localTargetPosition;
+    private float localMovementAngle;
+    private float currentLocalSpeed;
+    private float tileSize = 1f;
+    private float maxLocalOffset;
 
-    Vector3 currentTileCenter;
-    Vector3 localTargetPosition;
-    float localMovementAngle;
-    float currentLocalSpeed;
-    float tileSize = 1f;
-    float maxLocalOffset;
+    private float baseGlowIntensity;
+    private float currentGlowIntensity;
+    private float glowFlickerTime;
 
-    float baseGlowIntensity;
-    float currentGlowIntensity;
-    float glowFlickerTime;
+    private Color originalColor;
 
-    Color originalColor;
-
-    public bool IsAlive { get; private set; } = true;
-    public Transform AttractionTarget { get; private set; }
+    public bool IsAlive { get; set; } = true;
+    public Transform AttractionTarget { get; set; }
 
     void Awake()
     {
+        // Get the GridEntity component, which is now required.
         gridEntity = GetComponent<GridEntity>();
         if (gridEntity == null)
         {
-            gridEntity = gameObject.AddComponent<GridEntity>();
+            Debug.LogError($"[FireflyController] Firefly prefab is missing the required GridEntity component!", this);
+            enabled = false;
+            return;
         }
 
         if (glowLight != null)
@@ -54,8 +55,6 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         {
             originalColor = spriteRenderer.color;
         }
-
-        // Initialization is now called from the manager after instantiation
     }
 
     void Start()
@@ -76,9 +75,9 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
 
     public void Initialize()
     {
-        if (definition == null)
+        if (definition == null || gridEntity == null)
         {
-            Debug.LogError("[FireflyController] No FireflyDefinition assigned!", this);
+            Debug.LogError("[FireflyController] Initialization failed: Missing definition or GridEntity!", this);
             enabled = false;
             return;
         }
@@ -98,17 +97,14 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
                 tileSize = grid.cellSize.x; // Assuming square tiles
                 maxLocalOffset = tileSize * definition.localMovementRadius;
             }
+            // Snap the entity to the grid initially to set its starting position.
+            GridPositionManager.Instance.SnapEntityToGrid(gameObject);
         }
 
         UpdateTileCenter();
         localMovementAngle = Random.Range(0f, 360f);
         UpdateLocalTargetPosition();
-
-        if (GridPositionManager.Instance != null)
-        {
-            GridPositionManager.Instance.SnapEntityToGrid(gameObject);
-        }
-
+        
         ApplyVisualState(0f);
     }
 
@@ -145,17 +141,19 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         HandleGlowAndFlicker();
     }
 
-    void MakeMovementDecision()
+    private void MakeMovementDecision()
     {
-        GridPosition bestPosition = gridEntity.Position;
-        float bestScore = EvaluateTile(gridEntity.Position);
+        if (gridEntity == null) return;
+        
+        GridPosition currentPos = gridEntity.Position;
+        GridPosition bestPosition = currentPos;
+        float bestScore = EvaluateTile(currentPos);
 
-        var nearbyPositions = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, definition.tileSearchRadius, true);
+        var nearbyPositions = GridRadiusUtility.GetTilesInCircle(currentPos, definition.tileSearchRadius, true);
 
         foreach (var pos in nearbyPositions)
         {
-            if (!GridPositionManager.Instance.IsPositionValid(pos) ||
-                GridPositionManager.Instance.IsPositionOccupied(pos))
+            if (!GridPositionManager.Instance.IsPositionValid(pos))
             {
                 continue;
             }
@@ -168,14 +166,15 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
             }
         }
 
-        if (bestPosition != gridEntity.Position)
+        if (bestPosition != currentPos)
         {
+            // CRITICAL FIX: Call SetPosition on the GridEntity to trigger the smooth move.
             gridEntity.SetPosition(bestPosition);
             UpdateTileCenter();
         }
     }
 
-    float EvaluateTile(GridPosition tilePos)
+    private float EvaluateTile(GridPosition tilePos)
     {
         float score = Random.Range(0f, 1f); // Base randomness
 
@@ -195,15 +194,17 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
                 if (scent != null && scent.definition != null &&
                     definition.attractiveScentDefinitions.Contains(scent.definition))
                 {
-                    GridPosition scentGridPos = GridPositionManager.Instance.WorldToGrid(hit.transform.position);
-                    int distance = tilePos.ManhattanDistance(scentGridPos);
-                    float distanceScore = 1f - (distance / (float)definition.tileSearchRadius);
-                    float scentScore = distanceScore * scent.EffectiveStrength;
+                    GridEntity scentEntity = scent.GetComponent<GridEntity>();
+                    if (scentEntity != null) {
+                        int distance = tilePos.ManhattanDistance(scentEntity.Position);
+                        float distanceScore = 1f - (distance / (float)definition.tileSearchRadius);
+                        float scentScore = distanceScore * scent.EffectiveStrength;
 
-                    if (scentScore > bestTargetScore)
-                    {
-                        bestTargetScore = scentScore;
-                        bestTarget = hit.transform;
+                        if (scentScore > bestTargetScore)
+                        {
+                            bestTargetScore = scentScore;
+                            bestTarget = hit.transform;
+                        }
                     }
                 }
 
@@ -214,27 +215,27 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
                 }
             }
         }
-        
+
         this.AttractionTarget = bestTarget;
         score += bestTargetScore * definition.scentAttractionWeight;
 
         return score;
     }
 
-    void UpdateTileCenter()
+    private void UpdateTileCenter()
     {
-        if (GridPositionManager.Instance != null)
+        if (GridPositionManager.Instance != null && gridEntity != null)
         {
             currentTileCenter = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
         }
     }
 
-    void UpdateLocalTargetPosition()
+    private void UpdateLocalTargetPosition()
     {
         localMovementAngle += Random.Range(-definition.localMovementTurnSpeed, definition.localMovementTurnSpeed) * Time.deltaTime;
 
         Vector2 direction = new Vector2(Mathf.Cos(localMovementAngle * Mathf.Deg2Rad),
-            Mathf.Sin(localMovementAngle * Mathf.Deg2Rad));
+                                        Mathf.Sin(localMovementAngle * Mathf.Deg2Rad));
 
         float targetDistance = Random.Range(maxLocalOffset * 0.5f, maxLocalOffset);
         localTargetPosition = currentTileCenter + (Vector3)(direction * targetDistance);
@@ -242,7 +243,7 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         currentLocalSpeed = Random.Range(definition.minLocalSpeed, definition.maxLocalSpeed);
     }
 
-    void UpdateLocalMovement()
+    private void UpdateLocalMovement()
     {
         Vector3 toTarget = localTargetPosition - transform.position;
         float distanceToTarget = toTarget.magnitude;
@@ -267,7 +268,7 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void UpdateLifetimeFade()
+    private void UpdateLifetimeFade()
     {
         if (currentAgeTicks < definition.fadeInTicks)
         {
@@ -286,7 +287,7 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void ApplyVisualState(float intensity)
+    private void ApplyVisualState(float intensity)
     {
         if (spriteRenderer != null)
         {
@@ -320,7 +321,7 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void HandleGlowAndFlicker()
+    private void HandleGlowAndFlicker()
     {
         if (glowLight == null || definition.glowFlickerAmount <= 0f) return;
 
@@ -329,7 +330,7 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         glowLight.intensity = currentGlowIntensity + (flicker * definition.glowFlickerAmount);
     }
 
-    void Die()
+    private void Die()
     {
         IsAlive = false;
 
@@ -337,7 +338,7 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         {
             FireflyManager.Instance.ReportFireflyDespawned(this);
         }
-        
+
         if (TickManager.Instance != null)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);

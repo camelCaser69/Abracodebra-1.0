@@ -122,7 +122,13 @@ namespace WegoSystem
 
         public bool IsPositionOccupied(GridPosition position)
         {
-            return entitiesByPosition.ContainsKey(position) && entitiesByPosition[position].Count > 0;
+            // A position is occupied only if it contains at least one entity
+            // that is flagged as a tile occupant.
+            if (entitiesByPosition.TryGetValue(position, out var entities))
+            {
+                return entities.Any(entity => entity.isTileOccupant);
+            }
+            return false;
         }
 
         public void RegisterEntity(GridEntity entity)
@@ -266,6 +272,7 @@ namespace WegoSystem
 
                 if (current == end)
                 {
+                    // Reconstruct path
                     while (cameFrom.ContainsKey(current))
                     {
                         path.Add(current);
@@ -280,12 +287,14 @@ namespace WegoSystem
 
                 foreach (var neighbor in current.GetNeighbors(allowDiagonal))
                 {
-                    if (!IsPositionValid(neighbor) || IsPositionOccupied(neighbor) || closedSet.Contains(neighbor))
+                    // Pathfinding now correctly checks IsPositionOccupied, which respects the new flag.
+                    // It also ignores the end tile for occupancy checks, allowing movement *to* an occupied tile.
+                    if (!IsPositionValid(neighbor) || closedSet.Contains(neighbor) || (neighbor != end && IsPositionOccupied(neighbor)))
                     {
                         continue;
                     }
 
-                    float tentativeGScore = gScore[current] + 1;
+                    float tentativeGScore = gScore[current] + 1; // Assuming cost of 1 per tile
 
                     if (!openSet.Contains(neighbor))
                     {
@@ -293,9 +302,10 @@ namespace WegoSystem
                     }
                     else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor])
                     {
-                        continue;
+                        continue; // This path is not better
                     }
 
+                    // This path is the best until now. Record it.
                     cameFrom[neighbor] = current;
                     gScore[neighbor] = tentativeGScore;
                     fScore[neighbor] = gScore[neighbor] + HeuristicCost(neighbor, end);
@@ -352,7 +362,8 @@ namespace WegoSystem
 
         public void SnapAllEntitiesToGrid<T>() where T : Component
         {
-            T[] entities = FindObjectsOfType<T>();
+            // Use modern, faster FindObjectsByType
+            T[] entities = FindObjectsByType<T>(FindObjectsSortMode.None);
             foreach (var entity in entities)
             {
                 SnapEntityToGrid(entity.gameObject);

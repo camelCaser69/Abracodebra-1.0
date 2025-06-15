@@ -145,27 +145,27 @@ public void CalculateAndApplyStats()
 
     public void OnTickUpdate(int currentTick)
     {
-        // --- State-based Tick Logic ---
         switch (plant.CurrentState)
         {
             case PlantState.Growing:
-                // Fetch the growth multiplier from the manager every tick.
+                if (plant.allowPhotosynthesisDuringGrowth)
+                {
+                    plant.EnergySystem.AccumulateEnergyTick();
+                }
+
                 float growthMultiplier = 1.0f;
                 if (PlantGrowthModifierManager.Instance != null)
                 {
                     growthMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(plant);
                 }
 
-                // Apply the multiplier to the growth progress.
                 growthProgressTicks += growthMultiplier;
 
                 if (growthProgressTicks >= GrowthTicksPerStage)
                 {
-                    // Reset timer and grow the next stage
                     growthProgressTicks = 0f;
                     GrowNextStemStage();
 
-                    // Check for completion *immediately after* growing.
                     if (currentStemStage >= TargetStemLength)
                     {
                         CompleteGrowth(); // This will change the state to Mature_Idle
@@ -187,7 +187,6 @@ public void CalculateAndApplyStats()
 
             case PlantState.Mature_Executing:
                 plant.EnergySystem.AccumulateEnergyTick();
-                // Transition back to idle after executing.
                 plant.CurrentState = PlantState.Mature_Idle;
                 break;
         }

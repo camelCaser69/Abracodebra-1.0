@@ -41,7 +41,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
 
     // --- Gameplay Settings ---
     [Header("Gameplay Settings")]
-    [SerializeField] bool allowPhotosynthesisDuringGrowth = false;
+    [SerializeField] public bool allowPhotosynthesisDuringGrowth = false;
 
 
     void Awake()

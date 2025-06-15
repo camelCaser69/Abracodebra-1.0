@@ -59,8 +59,8 @@ public class PlantEnergySystem
                 int radiusTiles = Mathf.CeilToInt(fireflyManagerInstance.photosynthesisRadius);
 
                 int nearbyFlyCount = 0;
-                // Corrected: Use Object.FindObjectsOfType since this is not a MonoBehaviour
-                var fireflies = Object.FindObjectsOfType<FireflyController>();
+                // Use modern, faster FindObjectsByType
+                var fireflies = Object.FindObjectsByType<FireflyController>(FindObjectsSortMode.None);
 
                 foreach (var firefly in fireflies)
                 {

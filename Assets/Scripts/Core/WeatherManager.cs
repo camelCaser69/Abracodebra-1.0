@@ -1,107 +1,122 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using WegoSystem;
 
-public class WeatherManager : MonoBehaviour, ITickUpdateable {
-    public static WeatherManager Instance { get; private set; }
+public class WeatherManager : MonoBehaviour, ITickUpdateable
+{
+    public static WeatherManager Instance { get; set; }
 
     public enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
 
+    [Header("Cycle Settings")]
     public bool dayNightCycleEnabled = true;
     public AnimationCurve transitionCurve = AnimationCurve.Linear(0, 0, 1, 1);
     public float sunIntensity = 1f;
-    public float fixedSunIntensity = 1f;
+
+    [Header("Visuals")]
+    public float fixedSunIntensity = 1f; // This seems unused, but keeping it as it wasn't part of a warning
     public SpriteRenderer fadeSprite;
     public float minAlpha = 0f;
     public float maxAlpha = 1f;
 
-    public bool IsPaused { get; private set; } = false;
+    public bool IsPaused { get; set; } = false;
 
-    int currentPhaseTicks = 0;
-    int totalPhaseTicksTarget = 0;
-    bool forceDaylight = false;
+    private int currentPhaseTicks = 0;
+    private int totalPhaseTicksTarget = 0;
 
     public CyclePhase CurrentPhase => currentPhase;
     public event Action<CyclePhase> OnPhaseChanged;
 
-    CyclePhase currentPhase = CyclePhase.Day;
+    private CyclePhase currentPhase = CyclePhase.Day;
 
     public float CurrentTotalPhaseTime => totalPhaseTicksTarget * (TickManager.Instance?.Config?.GetRealSecondsPerTick() ?? 0.5f);
     public float CurrentPhaseTimer => (totalPhaseTicksTarget - currentPhaseTicks) * (TickManager.Instance?.Config?.GetRealSecondsPerTick() ?? 0.5f);
 
-    void Awake() {
-        if (Instance != null && Instance != this) {
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
             Destroy(gameObject);
             return;
         }
         Instance = this;
 
-        // Always register with TickManager
-        if (TickManager.Instance != null) {
+        if (TickManager.Instance != null)
+        {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
     }
 
-    void Start() {
-        // Always register with TickManager (no more useWegoSystem check)
-        if (TickManager.Instance != null) {
+    void Start()
+    {
+        if (TickManager.Instance != null)
+        {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
     }
 
-    void OnDestroy() {
-        // Always unregister
-        if (TickManager.Instance != null) {
+    void OnDestroy()
+    {
+        if (TickManager.Instance != null)
+        {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
     }
 
-    public void OnTickUpdate(int currentTick) {
-        // Remove the useWegoSystem check from the condition
+    public void OnTickUpdate(int currentTick)
+    {
         if (!dayNightCycleEnabled || IsPaused) return;
 
-        if (TickManager.Instance?.Config != null) {
+        if (TickManager.Instance?.Config != null)
+        {
             float dayProgress = TickManager.Instance.Config.GetDayProgressNormalized(currentTick);
-    
+
             CyclePhase newPhase = currentPhase;
-    
-            if (dayProgress < 0.4f) {
+
+            if (dayProgress < 0.4f)
+            {
                 newPhase = CyclePhase.Day;
                 sunIntensity = 1f;
-            } else if (dayProgress < 0.5f) {
+            }
+            else if (dayProgress < 0.5f)
+            {
                 newPhase = CyclePhase.TransitionToNight;
                 float transitionProgress = (dayProgress - 0.4f) / 0.1f;
                 sunIntensity = Mathf.Lerp(1f, 0f, transitionCurve.Evaluate(transitionProgress));
-            } else if (dayProgress < 0.9f) {
+            }
+            else if (dayProgress < 0.9f)
+            {
                 newPhase = CyclePhase.Night;
                 sunIntensity = 0f;
-            } else {
+            }
+            else
+            {
                 newPhase = CyclePhase.TransitionToDay;
                 float transitionProgress = (dayProgress - 0.9f) / 0.1f;
                 sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(transitionProgress));
             }
-    
-            if (newPhase != currentPhase) {
+
+            if (newPhase != currentPhase)
+            {
                 currentPhase = newPhase;
                 if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
                 OnPhaseChanged?.Invoke(currentPhase);
             }
         }
-    
-        // Note: UpdateFadeSprite() is called every frame in Update() for smooth visuals
     }
 
-    void Update() {
+    void Update()
+    {
         UpdateFadeSprite();
     }
 
-    void AdvanceToNextPhase() {
+    private void AdvanceToNextPhase()
+    {
         CyclePhase nextPhase = currentPhase;
-        switch (currentPhase) {
+        switch (currentPhase)
+        {
             case CyclePhase.Day: nextPhase = CyclePhase.TransitionToNight; break;
             case CyclePhase.TransitionToNight: nextPhase = CyclePhase.Night; break;
             case CyclePhase.Night: nextPhase = CyclePhase.TransitionToDay; break;
@@ -110,13 +125,16 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
         EnterPhase(nextPhase);
     }
 
-    void EnterPhase(CyclePhase nextPhase, bool forceEvent = false) {
+    private void EnterPhase(CyclePhase nextPhase, bool forceEvent = false)
+    {
         CyclePhase previousPhase = currentPhase;
         currentPhase = nextPhase;
 
-        if (TickManager.Instance?.Config != null) {
+        if (TickManager.Instance?.Config != null)
+        {
             var config = TickManager.Instance.Config;
-            switch (nextPhase) {
+            switch (nextPhase)
+            {
                 case CyclePhase.Day:
                     totalPhaseTicksTarget = config.dayPhaseTicks;
                     break;
@@ -131,14 +149,17 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
             currentPhaseTicks = 0;
         }
 
-        if (previousPhase != currentPhase || forceEvent) {
+        if (previousPhase != currentPhase || forceEvent)
+        {
             if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
             OnPhaseChanged?.Invoke(currentPhase);
         }
     }
-    
-    void UpdateFadeSprite() {
-        if (fadeSprite != null) {
+
+    private void UpdateFadeSprite()
+    {
+        if (fadeSprite != null)
+        {
             float alpha = Mathf.Lerp(maxAlpha, minAlpha, sunIntensity);
             Color c = fadeSprite.color;
             c.a = alpha;
@@ -146,42 +167,47 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
         }
     }
 
-    public void PauseCycleAtDay() {
+    public void PauseCycleAtDay()
+    {
         Debug.Log("[WeatherManager] PauseCycleAtDay called.");
         IsPaused = true;
-        forceDaylight = true;
         sunIntensity = 1.0f;
         UpdateFadeSprite();
         OnPhaseChanged?.Invoke(CyclePhase.Day);
     }
 
-    public void ResumeCycle() {
+    public void ResumeCycle()
+    {
         Debug.Log("[WeatherManager] ResumeCycle called.");
         IsPaused = false;
-        forceDaylight = false;
     }
 
-    public void PauseCycle() {
+    public void PauseCycle()
+    {
         Debug.Log("[WeatherManager] PauseCycle called.");
         IsPaused = true;
-        forceDaylight = false;
     }
 
-    public float GetPhaseProgress() {
+    public float GetPhaseProgress()
+    {
         return totalPhaseTicksTarget > 0 ? (float)currentPhaseTicks / totalPhaseTicksTarget : 0f;
     }
 
-    public int GetCurrentPhaseTicks() {
+    public int GetCurrentPhaseTicks()
+    {
         return currentPhaseTicks;
     }
 
-    public int GetTotalPhaseTicksTarget() {
+    public int GetTotalPhaseTicksTarget()
+    {
         return totalPhaseTicksTarget;
     }
 
-    public void ForcePhase(CyclePhase phase) {
-        if (Application.isEditor || Debug.isDebugBuild) {
+    public void ForcePhase(CyclePhase phase)
+    {
+        if (Application.isEditor || Debug.isDebugBuild)
+        {
             EnterPhase(phase, true);
         }
-    }  
-}  
+    }
+}
