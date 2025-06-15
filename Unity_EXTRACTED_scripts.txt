@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 517,858 → 352,681 chars (31.9% reduction)
-Estimated tokens saved: ~41,294
+Compression Stats: 514,763 → 349,708 chars (32.1% reduction)
+Estimated tokens saved: ~41,263
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -54,71 +54,71 @@ using System;
   NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3510
   NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3561
   NodeEffectDrawer (Assets\Scripts\Editor/) L3595
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3818
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3879
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3899
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3934
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3949
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4034
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4260
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4283
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4336
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4365
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4374
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4399
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4567
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4606
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4630
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4832
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4912
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5134
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5379
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5604
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5748
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6046
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6113
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6419
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6538
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6742
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6876
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7196
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7332
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7625
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7713
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L7814
-  GridSnapStartup (Assets\Scripts\Ticks/) L7915
-  TickDebugMonitor (Assets\Scripts\Ticks/) L7981
-  TurnPhaseManager (Assets\Scripts\Ticks/) L8152
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8268
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8337
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8568
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8579
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8608
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8704
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8809
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9204
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9240
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9430
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9572
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9690
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9834
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10039
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10079
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10099
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10111
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10146
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10305
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3698
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3759
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3779
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3814
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3829
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3914
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4174
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4197
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4250
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4279
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4288
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4313
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4498
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4537
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4561
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4763
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4843
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5068
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5287
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5512
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5604
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5902
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5969
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6275
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6394
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6598
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6732
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7052
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7188
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7481
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7569
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L7670
+  GridSnapStartup (Assets\Scripts\Ticks/) L7771
+  TickDebugMonitor (Assets\Scripts\Ticks/) L7837
+  TurnPhaseManager (Assets\Scripts\Ticks/) L8008
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8124
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8193
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8424
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8435
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8464
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8560
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8665
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9060
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9096
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9260
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9402
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9520
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9664
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9869
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9909
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9929
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9941
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9976
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10135
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L10315
-  GridPosition (Assets\Scripts\Ticks/) L10466
-  GridPositionManager (Assets\Scripts\Ticks/) L10567
-  GridRadiusUtility (Assets\Scripts\Ticks/) L10918
-  TickConfiguration (Assets\Scripts\Ticks/) L11062
-  ITickUpdateable (Assets\Scripts\Ticks/) L11168
+  GridEntity (Assets\Scripts\Ticks/) L10145
+  GridPosition (Assets\Scripts\Ticks/) L10296
+  GridPositionManager (Assets\Scripts\Ticks/) L10397
+  GridRadiusUtility (Assets\Scripts\Ticks/) L10748
+  TickConfiguration (Assets\Scripts\Ticks/) L10892
+  ITickUpdateable (Assets\Scripts\Ticks/) L10998
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11330
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11160
 
 ================================================================================
 SCRIPTS
@@ -3693,223 +3693,103 @@ AssetDatabase.SaveAssets();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Editor\NodeEffectDrawer.cs
 
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
 
 pub cls NodeEffectDrawer : PropertyDrawer {
+c float BASE_PROPERTY_HEIGHT = 42f;
+
 pub ovr void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
 EditorGUI.BeginProperty(position, label, property);
 
 var effectTypeProp = property.FindPropertyRelative("effectType");
-var primaryValueProp = property.FindPropertyRelative("primaryValue");
-var secondaryValueProp = property.FindPropertyRelative("secondaryValue");
 var isPassiveProp = property.FindPropertyRelative("isPassive");
-var scentDefRefProp = property.FindPropertyRelative("scentDefinitionReference");
 var seedDataProp = property.FindPropertyRelative("seedData");
 
-float yPos = position.y;
-float lineHeight = EditorGUIUtility.singleLineHeight;
-float spacing = EditorGUIUtility.standardVerticalSpacing;
-
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), effectTypeProp);
-yPos += lineHeight + spacing;
-
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), isPassiveProp);
-yPos += lineHeight + spacing;
+Rect currentRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
+EditorGUI.PropertyField(currentRect, effectTypeProp);
+currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+EditorGUI.PropertyField(currentRect, isPassiveProp);
+currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
 NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
 
 if (currentType == NodeEffectType.SeedSpawn) {
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight),
-primaryValueProp, new GUIContent("Enabled", "Set to 1 to make this a seed"));
-yPos += lineHeight + spacing;
-
-if (primaryValueProp.floatValue > 0) {
-EditorGUI.indentLevel++;
-
-EditorGUI.LabelField(new Rect(position.x, yPos, position.width, lineHeight), "Growth Properties", EditorStyles.boldLabel);
-yPos += lineHeight + spacing;
-
-var growthSpeedProp = seedDataProp.FindPropertyRelative("growthSpeed");
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), growthSpeedProp);
-yPos += lineHeight + spacing;
-
-var stemMinProp = seedDataProp.FindPropertyRelative("stemLengthMin");
-var stemMaxProp = seedDataProp.FindPropertyRelative("stemLengthMax");
-float halfWidth = (position.width - 10) / 2;
-EditorGUI.PropertyField(new Rect(position.x, yPos, halfWidth, lineHeight), stemMinProp, new GUIContent("Stem Min"));
-EditorGUI.PropertyField(new Rect(position.x + halfWidth + 10, yPos, halfWidth, lineHeight), stemMaxProp, new GUIContent("Stem Max"));
-yPos += lineHeight + spacing;
-
-var leafGapProp = seedDataProp.FindPropertyRelative("leafGap");
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), leafGapProp);
-yPos += lineHeight + spacing;
-
-var leafPatternProp = seedDataProp.FindPropertyRelative("leafPattern");
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), leafPatternProp);
-yPos += lineHeight + spacing;
-
-var stemRandomnessProp = seedDataProp.FindPropertyRelative("stemRandomness");
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), stemRandomnessProp);
-yPos += lineHeight + spacing;
-
-EditorGUI.LabelField(new Rect(position.x, yPos, position.width, lineHeight), "Energy Properties", EditorStyles.boldLabel);
-yPos += lineHeight + spacing;
-
-var energyStorageProp = seedDataProp.FindPropertyRelative("energyStorage");
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), energyStorageProp);
-yPos += lineHeight + spacing;
-
-EditorGUI.LabelField(new Rect(position.x, yPos, position.width, lineHeight), "Timing Properties", EditorStyles.boldLabel);
-yPos += lineHeight + spacing;
-
-var cooldownProp = seedDataProp.FindPropertyRelative("cooldown");
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), cooldownProp);
-yPos += lineHeight + spacing;
-
-var castDelayProp = seedDataProp.FindPropertyRelative("castDelay");
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), castDelayProp);
-
-EditorGUI.indentLevel--;
-}
+EditorGUI.PropertyField(currentRect, seedDataProp, true);
 }
 else {
-GUIContent primaryLabel = new GUIContent("Primary Value");
-GUIContent secondaryLabel = new GUIContent("Secondary Value");
-bool showSecondary = false;
-bool showScentField = false;
-
-switch (currentType) {
-case NodeEffectType.EnergyStorage:
-primaryLabel.text = "Max Energy Increase";
-primaryLabel.tooltip = "Additional maximum energy capacity";
-break;
-
-case NodeEffectType.EnergyPerTick:
-primaryLabel.text = "Energy Per Tick";
-primaryLabel.tooltip = "Energy generated each tick (affected by sunlight and leaves)";
-break;
-
-case NodeEffectType.EnergyCost:
-primaryLabel.text = "Energy Cost";
-primaryLabel.tooltip = "Energy required to execute mature cycle";
-break;
-
-case NodeEffectType.StemLength:
-primaryLabel.text = "Min Segments Add";
-primaryLabel.tooltip = "Minimum stem segments to add";
-secondaryLabel.text = "Max Segments Add";
-secondaryLabel.tooltip = "Maximum stem segments to add";
-showSecondary = true;
-break;
-
-case NodeEffectType.GrowthSpeed:
-primaryLabel.text = "Ticks Per Stage";
-primaryLabel.tooltip = "Number of ticks between each growth stage (lower = faster)";
-break;
-
-case NodeEffectType.LeafGap:
-primaryLabel.text = "Segments Between Leaves";
-primaryLabel.tooltip = "0 = leaves every segment, 1 = leaves every 2 segments, etc.";
-break;
-
-case NodeEffectType.LeafPattern:
-primaryLabel.text = "Pattern Type";
-primaryLabel.tooltip = "0=Symmetrical, 1=Offset, 2=Alternating, 3=Spiral, 4=Dense";
-break;
-
-case NodeEffectType.StemRandomness:
-primaryLabel.text = "Wobble Chance (0-1)";
-primaryLabel.tooltip = "Probability that stem will grow sideways";
-break;
-
-case NodeEffectType.Cooldown:
-primaryLabel.text = "Cooldown Ticks";
-primaryLabel.tooltip = "Ticks between mature cycle activations";
-break;
-
-case NodeEffectType.CastDelay:
-primaryLabel.text = "Delay Ticks";
-primaryLabel.tooltip = "Ticks to wait before starting growth";
-break;
-
-case NodeEffectType.PoopAbsorption:
-primaryLabel.text = "Detection Radius";
-primaryLabel.tooltip = "Radius in tiles to detect fertilizer";
-secondaryLabel.text = "Energy Per Poop";
-secondaryLabel.tooltip = "Energy gained when absorbing fertilizer";
-showSecondary = true;
-break;
-
-case NodeEffectType.Damage:
-primaryLabel.text = "Damage Multiplier Add";
-primaryLabel.tooltip = "Adds to damage multiplier (1.0 = +100% damage)";
-break;
-
-case NodeEffectType.GrowBerry:
-primaryLabel.text = "Enabled";
-primaryLabel.tooltip = "Set to 1 to enable berry growth";
-break;
-
-case NodeEffectType.ScentModifier:
-primaryLabel.text = "Radius Modifier";
-primaryLabel.tooltip = "Adds/subtracts from scent radius";
-secondaryLabel.text = "Strength Modifier";
-secondaryLabel.tooltip = "Adds/subtracts from scent strength";
-showSecondary = true;
-showScentField = true;
-break;
-}
-
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), primaryValueProp, primaryLabel);
-yPos += lineHeight + spacing;
-
-if (showSecondary) {
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight), secondaryValueProp, secondaryLabel);
-yPos += lineHeight + spacing;
-}
-
-if (showScentField) {
-EditorGUI.PropertyField(new Rect(position.x, yPos, position.width, lineHeight),
-scentDefRefProp, new GUIContent("Scent Definition", "Which scent type to modify"));
-}
+DrawStandardValueFields(currentRect, property, currentType);
 }
 
 EditorGUI.EndProperty();
 }
 
 pub ovr float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-float height = EditorGUIUtility.singleLineHeight * 2; // Type + Passive
-height += EditorGUIUtility.standardVerticalSpacing * 2;
+float totalHeight = BASE_PROPERTY_HEIGHT;
 
-var effectTypeProp = property.FindPropertyRelative("effectType");
-var primaryValueProp = property.FindPropertyRelative("primaryValue");
-NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
+NodeEffectType currentType = (NodeEffectType)property.FindPropertyRelative("effectType").enumValueIndex;
 
 if (currentType == NodeEffectType.SeedSpawn) {
-height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Enabled field
-
-if (primaryValueProp.floatValue > 0) {
-height += (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * 12;
-}
+totalHeight += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("seedData"), true);
 }
 else {
-height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Primary value
+totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Primary value is always shown
 
 switch (currentType) {
 case NodeEffectType.StemLength:
 case NodeEffectType.PoopAbsorption:
 case NodeEffectType.ScentModifier:
-height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // For secondary value
 break;
 }
 
 if (currentType == NodeEffectType.ScentModifier) {
-height += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // For scent reference
 }
 }
 
-ret height;
+ret totalHeight;
+}
+
+void DrawStandardValueFields(Rect startRect, SerializedProperty property, NodeEffectType currentType) {
+var primaryValueProp = property.FindPropertyRelative("primaryValue");
+var secondaryValueProp = property.FindPropertyRelative("secondaryValue");
+var scentDefRefProp = property.FindPropertyRelative("scentDefinitionReference");
+
+GUIContent primaryLabel = new GUIContent("Primary Value");
+GUIContent secondaryLabel = new GUIContent("Secondary Value");
+bool showSecondary = false;
+bool showScentField = false;
+
+switch (currentType) {
+case NodeEffectType.EnergyStorage: primaryLabel.text = "Max Energy Increase"; break;
+case NodeEffectType.EnergyPerTick: primaryLabel.text = "Energy Per Tick"; break;
+case NodeEffectType.EnergyCost: primaryLabel.text = "Energy Cost"; break;
+case NodeEffectType.StemLength: primaryLabel.text = "Min Segments Add"; secondaryLabel.text = "Max Segments Add"; showSecondary = true; break;
+case NodeEffectType.GrowthSpeed: primaryLabel.text = "Ticks Per Stage"; break;
+case NodeEffectType.LeafGap: primaryLabel.text = "Segments Between Leaves"; break;
+case NodeEffectType.LeafPattern: primaryLabel.text = "Pattern Type"; break;
+case NodeEffectType.StemRandomness: primaryLabel.text = "Wobble Chance (0-1)"; break;
+case NodeEffectType.Cooldown: primaryLabel.text = "Cooldown Ticks"; break;
+case NodeEffectType.CastDelay: primaryLabel.text = "Delay Ticks"; break;
+case NodeEffectType.PoopAbsorption: primaryLabel.text = "Detection Radius"; secondaryLabel.text = "Energy Per Poop"; showSecondary = true; break;
+case NodeEffectType.Damage: primaryLabel.text = "Damage Multiplier Add"; break;
+case NodeEffectType.GrowBerry: primaryLabel.text = "Enabled"; break;
+case NodeEffectType.ScentModifier: primaryLabel.text = "Radius Modifier"; secondaryLabel.text = "Strength Modifier"; showSecondary = true; showScentField = true; break;
+}
+
+Rect currentRect = startRect;
+
+EditorGUI.PropertyField(currentRect, primaryValueProp, primaryLabel);
+currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
+if (showSecondary) {
+EditorGUI.PropertyField(currentRect, secondaryValueProp, secondaryLabel);
+currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+}
+
+if (showScentField) {
+EditorGUI.PropertyField(currentRect, scentDefRefProp, new GUIContent("Scent Definition"));
+}
 }
 }
 
@@ -4137,11 +4017,15 @@ using System.Text;
 using WegoSystem;
 
 pub cls NodeDefinition : ScriptableObject, ITooltipDataProvider {
+
 pub string displayName;
+
 pub string description;
+
 pub Sprite thumbnail;
 pub Color thumbnailTintColor = Color.white;
 pub Color backgroundColor = Color.gray;
+
 pub GameObject nodeViewPrefab;
 pub List<NodeEffectData> effects;
 
@@ -4200,17 +4084,45 @@ var sb = new StringBuilder();
 
 if (nodeData.effects != null && nodeData.effects.Any()) {
 sb.Append("<b>Effects:</b>\n");
-var passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f);
-var activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);
+var passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f); // Light Blue
+var activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);  // Light Orange
 c string effectPrefix = "• ";
+c string seedDetailPrefix = "    └ ";
 
 foreach (var effect in nodeData.effects) {
 if (effect == null) continue;
 Color effectColor = effect.isPassive ? passiveEffectColor : activeEffectColor;
 string hexColor = ColorUtility.ToHtmlStringRGB(effectColor);
+
 sb.Append($"<color=#{hexColor}>{effectPrefix}{GetEffectDisplayName(effect.effectType)}: ");
 sb.Append(GetEffectDescription(effect));
 sb.Append("</color>\n");
+
+if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null && effect.isPassive) {
+var energyStorageEffect = new NodeEffectData { effectType = NodeEffectType.EnergyStorage, primaryValue = effect.seedData.energyStorage };
+sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(energyStorageEffect.effectType)}: {GetEffectDescription(energyStorageEffect)}</color>\n");
+
+var growthSpeedEffect = new NodeEffectData { effectType = NodeEffectType.GrowthSpeed, primaryValue = effect.seedData.growthSpeed };
+sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(growthSpeedEffect.effectType)}: {GetEffectDescription(growthSpeedEffect)}</color>\n");
+
+var stemLengthEffect = new NodeEffectData { effectType = NodeEffectType.StemLength, primaryValue = effect.seedData.stemLengthMin, secondaryValue = effect.seedData.stemLengthMax };
+sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(stemLengthEffect.effectType)}: {GetEffectDescription(stemLengthEffect)}</color>\n");
+
+var leafGapEffect = new NodeEffectData { effectType = NodeEffectType.LeafGap, primaryValue = effect.seedData.leafGap };
+sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(leafGapEffect.effectType)}: {GetEffectDescription(leafGapEffect)}</color>\n");
+
+var leafPatternEffect = new NodeEffectData { effectType = NodeEffectType.LeafPattern, primaryValue = effect.seedData.leafPattern };
+sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(leafPatternEffect.effectType)}: {GetEffectDescription(leafPatternEffect)}</color>\n");
+
+var stemRandomnessEffect = new NodeEffectData { effectType = NodeEffectType.StemRandomness, primaryValue = effect.seedData.stemRandomness };
+sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(stemRandomnessEffect.effectType)}: {GetEffectDescription(stemRandomnessEffect)}</color>\n");
+
+var cooldownEffect = new NodeEffectData { effectType = NodeEffectType.Cooldown, primaryValue = effect.seedData.cooldown };
+sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(cooldownEffect.effectType)}: {GetEffectDescription(cooldownEffect)}</color>\n");
+
+var castDelayEffect = new NodeEffectData { effectType = NodeEffectType.CastDelay, primaryValue = effect.seedData.castDelay };
+sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(castDelayEffect.effectType)}: {GetEffectDescription(castDelayEffect)}</color>\n");
+}
 }
 }
 
@@ -4262,9 +4174,10 @@ ret $"{effect.primaryValue:F0} energy to activate";
 
 case NodeEffectType.StemLength:
 if (effect.secondaryValue > 0 && effect.secondaryValue != effect.primaryValue) {
-ret $"+{effect.primaryValue:F0} to +{effect.secondaryValue:F0} stem segments";
-} else {
-ret $"+{effect.primaryValue:F0} stem segments";
+ret $"+{effect.primaryValue:F0} to +{effect.secondaryValue:F0} segments";
+}
+else {
+ret $"+{effect.primaryValue:F0} segments";
 }
 
 case NodeEffectType.GrowthSpeed:
@@ -4311,16 +4224,16 @@ case NodeEffectType.SeedSpawn:
 ret effect.isPassive ? "Contains seed" : "Active seed";
 
 case NodeEffectType.ScentModifier:
-string result = "";
-if (effect.primaryValue != 0) result += $"Radius {(effect.primaryValue >= 0 ? "+" : "")}{effect.primaryValue:F0}";
+string scentResult = "";
+if (effect.primaryValue != 0) scentResult += $"Radius {(effect.primaryValue >= 0 ? "+" : "")}{effect.primaryValue:F0}";
 if (effect.secondaryValue != 0) {
-if (result.Length > 0) result += ", ";
-result += $"Strength {(effect.secondaryValue >= 0 ? "+" : "")}{effect.secondaryValue:F0}";
+if (scentResult.Length > 0) scentResult += ", ";
+scentResult += $"Strength {(effect.secondaryValue >= 0 ? "+" : "")}{effect.secondaryValue:F0}";
 }
 if (effect.scentDefinitionReference != null) {
-result += $" ({effect.scentDefinitionReference.displayName})";
+scentResult += $" ({effect.scentDefinitionReference.displayName})";
 }
-ret result;
+ret scentResult;
 
 default:
 string defaultResult = $"{effect.primaryValue:F1}";
@@ -4353,6 +4266,7 @@ result.AppendLine($"{GetEffectDisplayName(effect.effectType)}: {GetEffectDescrip
 
 ret result.ToString();
 }
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -4506,9 +4420,11 @@ pub cls NodeExecutor : MonoBehaviour {
 
 pub stat List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList) {
 if (originalList == null) ret new List<NodeEffectData>();
+
 List<NodeEffectData> newList = new List<NodeEffectData>(originalList.Count);
 foreach (var originalEffect in originalList) {
 if (originalEffect == null) continue;
+
 NodeEffectData newEffect = new NodeEffectData {
 effectType = originalEffect.effectType,
 primaryValue = originalEffect.primaryValue,
@@ -4516,6 +4432,21 @@ secondaryValue = originalEffect.secondaryValue,
 isPassive = originalEffect.isPassive,
 scentDefinitionReference = originalEffect.scentDefinitionReference
 };
+
+if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null) {
+newEffect.seedData = new SeedSpawnData {
+growthSpeed = originalEffect.seedData.growthSpeed,
+stemLengthMin = originalEffect.seedData.stemLengthMin,
+stemLengthMax = originalEffect.seedData.stemLengthMax,
+leafGap = originalEffect.seedData.leafGap,
+leafPattern = originalEffect.seedData.leafPattern,
+stemRandomness = originalEffect.seedData.stemRandomness,
+energyStorage = originalEffect.seedData.energyStorage,
+cooldown = originalEffect.seedData.cooldown,
+castDelay = originalEffect.seedData.castDelay
+};
+}
+
 newList.Add(newEffect);
 }
 ret newList;
@@ -5010,7 +4941,7 @@ CurrentEnergy = Mathf.Clamp(CurrentEnergy + totalRate, 0f, MaxEnergy);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantGrowth.cs
 
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using WegoSystem;
 
 pub enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
@@ -5019,13 +4950,11 @@ pub cls PlantGrowth : MonoBehaviour, ITickUpdateable {
 [SerializeField] bool useWegoSystem = true;
 
 pub stat ro List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
-
 pub PlantCellManager CellManager { get; set; }
 pub PlantNodeExecutor NodeExecutor { get; set; }
 pub PlantGrowthLogic GrowthLogic { get; set; }
 pub PlantEnergySystem EnergySystem { get; set; }
 pub PlantVisualManager VisualManager { get; set; }
-
 pub NodeGraph NodeGraph { get; set; }
 pub PlantState CurrentState { get; set; } = PlantState.Initializing;
 
@@ -5040,6 +4969,8 @@ pub PlantState CurrentState { get; set; } = PlantState.Initializing;
 [SerializeField] bool enableOutline = true;
 [SerializeField] PlantOutlineController outlineController;
 [SerializeField] GameObject outlinePartPrefab;
+
+[SerializeField] pub bool showGrowthPercentage = true; // This is the only UI setting needed now
 
 [SerializeField] bool allowPhotosynthesisDuringGrowth = false;
 
@@ -5181,11 +5112,13 @@ VisualManager.UpdateGrowthPercentageUI();
 if (!useWegoSystem) {
 GrowthLogic.StartRealtimeGrowth();
 }
-} else {
+}
+else {
 Debug.LogWarning($"[{gameObject.name}] Target stem length is {GrowthLogic.TargetStemLength}. Skipping visual growth phase.", gameObject);
 GrowthLogic.CompleteGrowth();
 }
-} else {
+}
+else {
 Debug.LogError($"[{gameObject.name}] Failed to spawn initial seed! Aborting growth.", gameObject);
 CurrentState = PlantState.Mature_Idle;
 Destroy(gameObject, 0.1f);
@@ -5211,7 +5144,8 @@ TickManager.Instance.RegisterTickUpdateable(this);
 if (CurrentState == PlantState.Growing) {
 GrowthLogic.StopGrowthCoroutine();
 }
-} else if (!enabled && wasEnabled && TickManager.Instance != null) {
+}
+else if (!enabled && wasEnabled && TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
 if (CurrentState == PlantState.Growing) {
 GrowthLogic.StartRealtimeGrowth();
@@ -5273,14 +5207,13 @@ int baseLeafPattern = 0;
 float baseGrowthRandomness = 0.1f;
 int baseCooldownTicks = 20;
 int baseCastDelayTicks = 0;
+bool seedFound = false;
 
 NodeData firstNode = plant.NodeGraph.nodes.FirstOrDefault();
-bool hasComprehensiveSeed = false;
-
 if (firstNode != null) {
 var seedEffect = firstNode.effects?.FirstOrDefault(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
 if (seedEffect != null && seedEffect.seedData != null) {
-hasComprehensiveSeed = true;
+seedFound = true;
 baseEnergyStorage = seedEffect.seedData.energyStorage;
 baseGrowthTicksPerStage = seedEffect.seedData.growthSpeed;
 baseStemMin = seedEffect.seedData.stemLengthMin;
@@ -5299,64 +5232,35 @@ int stemLengthMinModifier = 0;
 int stemLengthMaxModifier = 0;
 int growthTicksModifier = 0;
 int leafGapModifier = 0;
-int currentLeafPattern = baseLeafPattern;
+int currentLeafPattern = baseLeafPattern; // Start with the (potentially seed-overwritten) base
 float growthRandomnessModifier = 0f;
 int cooldownTicksModifier = 0;
 int castDelayTicksModifier = 0;
-bool seedFound = false;
 
 foreach (NodeData node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
 if (node?.effects == null) continue;
 
 foreach (var effect in node.effects) {
-if (effect == null) continue;
+if (effect == null || !effect.isPassive) continue;
+
+if (effect.effectType == NodeEffectType.SeedSpawn) {
+seedFound = true; // Still need to confirm a seed exists
+continue;
+}
 
 effect.ValidateForTicks();
 
-if (effect.effectType == NodeEffectType.SeedSpawn) {
-seedFound = true;
-if (hasComprehensiveSeed && node == firstNode) continue;
-}
-
-if (!effect.isPassive) continue;
-
 switch (effect.effectType) {
-case NodeEffectType.EnergyStorage:
-accumulatedEnergyStorage += effect.primaryValue;
-break;
-
-case NodeEffectType.EnergyPerTick:
-accumulatedEnergyPerTick += effect.primaryValue;
-break;
-
-case NodeEffectType.StemLength:
-stemLengthMinModifier += effect.GetPrimaryValueAsInt();
-stemLengthMaxModifier += effect.GetSecondaryValueAsInt();
-break;
-
-case NodeEffectType.GrowthSpeed:
-growthTicksModifier += effect.GetPrimaryValueAsInt();
-break;
-
-case NodeEffectType.LeafGap:
-leafGapModifier += effect.GetPrimaryValueAsInt();
-break;
-
-case NodeEffectType.LeafPattern:
-currentLeafPattern = Mathf.Clamp(effect.GetPrimaryValueAsInt(), 0, 4);
-break;
-
-case NodeEffectType.StemRandomness:
-growthRandomnessModifier += effect.primaryValue;
-break;
-
-case NodeEffectType.Cooldown:
-cooldownTicksModifier += effect.GetPrimaryValueAsInt();
-break;
-
-case NodeEffectType.CastDelay:
-castDelayTicksModifier += effect.GetPrimaryValueAsInt();
-break;
+case NodeEffectType.EnergyStorage:   accumulatedEnergyStorage += effect.primaryValue; break;
+case NodeEffectType.EnergyPerTick:   accumulatedEnergyPerTick += effect.primaryValue; break;
+case NodeEffectType.StemLength:      stemLengthMinModifier += effect.GetPrimaryValueAsInt();
+stemLengthMaxModifier += effect.GetSecondaryValueAsInt(); break;
+case NodeEffectType.GrowthSpeed:     growthTicksModifier += effect.GetPrimaryValueAsInt(); break;
+case NodeEffectType.LeafGap:         leafGapModifier += effect.GetPrimaryValueAsInt(); break;
+case NodeEffectType.LeafPattern:     currentLeafPattern = Mathf.Clamp(effect.GetPrimaryValueAsInt(), 0, 4); break;
+case NodeEffectType.StemRandomness:  growthRandomnessModifier += effect.primaryValue; break;
+case NodeEffectType.Cooldown:        cooldownTicksModifier += effect.GetPrimaryValueAsInt(); break;
+case NodeEffectType.CastDelay:       castDelayTicksModifier += effect.GetPrimaryValueAsInt(); break;
 }
 }
 }
@@ -5388,15 +5292,19 @@ Debug.Log($"[{plant.gameObject.name}] Growth stats: TargetStem={TargetStemLength
 pub void OnTickUpdate(int currentTick) {
 switch (plant.CurrentState) {
 case PlantState.Growing:
-growthProgressTicks += 1f;
+float growthMultiplier = 1.0f;
+if (PlantGrowthModifierManager.Instance != null) {
+growthMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(plant);
+}
+
+growthProgressTicks += growthMultiplier;
 
 if (growthProgressTicks >= GrowthTicksPerStage) {
 growthProgressTicks = 0f;
-
-if (currentStemStage < TargetStemLength) {
 GrowNextStemStage();
-} else {
-CompleteGrowth();
+
+if (currentStemStage >= TargetStemLength) {
+CompleteGrowth(); // This will change the state to Mature_Idle
 }
 }
 break;
@@ -5715,10 +5623,7 @@ pub PlantOutlineController OutlineController { get; set; }
 ro GameObject outlinePartPrefab;
 
 TMP_Text energyText;
-pub bool ShowGrowthPercentage { get; set; } = true;
-pub bool ContinuousIncrement { get; set; } = false;
-
-[SerializeField] int percentageIncrement = 5;
+bool showGrowthPercentage;
 int displayedGrowthPercentage = -1;
 
 pub PlantVisualManager(PlantGrowth plant, PlantShadowController shadowController, GameObject shadowPartPrefab, PlantOutlineController outlineController, GameObject outlinePartPrefab, bool enableOutline) {
@@ -5740,18 +5645,7 @@ if (!energyText) {
 Debug.LogWarning($"[{plant.gameObject.name}] Energy Text (TMP_Text) UI reference not assigned and not found in children.", plant.gameObject);
 }
 
-var plantType = plant.GetType();
-var showGrowthField = plantType.GetField("showGrowthPercentage", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-if (showGrowthField != null) ShowGrowthPercentage = (bool)showGrowthField.GetValue(plant);
-
-var percentIncrementField = plantType.GetField("percentageIncrement", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-if (percentIncrementField != null) percentageIncrement = (int)percentIncrementField.GetValue(plant);
-
-var continuousField = plantType.GetField("continuousIncrement", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-if (continuousField != null) ContinuousIncrement = (bool)continuousField.GetValue(plant);
-
-var energyTextField = plantType.GetField("energyText", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-if (energyTextField != null) energyText = (TMP_Text)energyTextField.GetValue(plant);
+showGrowthPercentage = plant.showGrowthPercentage;
 }
 
 pub void RegisterShadowForCell(GameObject cellInstance, string cellTypeName) {
@@ -5759,78 +5653,40 @@ if (shadowController == null || shadowPartPrefab == null || cellInstance == null
 SpriteRenderer partRenderer = cellInstance.GetComponentInChildren<SpriteRenderer>();
 if (partRenderer != null) {
 shadowController.RegisterPlantPart(partRenderer, shadowPartPrefab);
-} else {
+}
+else {
 Debug.LogWarning($"Plant '{plant.gameObject.name}': {cellTypeName} missing SpriteRenderer. No shadow.", cellInstance);
 }
 }
 
 pub void UpdateUI() {
 if (energyText == null) return;
-if (ShowGrowthPercentage && (plant.CurrentState == PlantState.Growing ||
-(plant.CurrentState == PlantState.GrowthComplete && plant.GrowthLogic.GetStepsCompleted() > 0))) {
-} else {
+
+if (showGrowthPercentage && (plant.CurrentState == PlantState.Growing || plant.CurrentState == PlantState.Initializing)) {
+UpdateGrowthPercentageUI();
+}
+else // State is Mature_Idle, Mature_Executing, GrowthComplete, etc. {
 energyText.text = $"{Mathf.FloorToInt(plant.EnergySystem.CurrentEnergy)}/{Mathf.FloorToInt(plant.EnergySystem.MaxEnergy)}";
 }
 }
 
-pub void UpdateWegoUI() {
-if (ShowGrowthPercentage && plant.CurrentState == PlantState.Growing) {
-UpdateGrowthPercentageUI();
-}
-}
+pub void UpdateWegoUI() => UpdateUI();
+pub void UpdateRealtimeGrowthUI() => UpdateUI();
 
-pub void UpdateRealtimeGrowthUI() {
-if (ShowGrowthPercentage && ContinuousIncrement) {
-UpdateGrowthPercentageUI();
-}
-}
+pub void UpdateGrowthPercentageUI() {
+if (!showGrowthPercentage || energyText == null) return;
 
-pub void UpdateGrowthPercentageUI(bool forceComplete = false) {
-if (!ShowGrowthPercentage || energyText == null) return;
-
-float rawPercentageFloat;
 var logic = plant.GrowthLogic;
+float totalSteps = logic.GetTotalPlannedSteps();
 
-if (forceComplete || plant.CurrentState == PlantState.GrowthComplete) {
-rawPercentageFloat = 100f;
-} else if (plant.GetType().GetField("useWegoSystem", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(plant) is bool useWego && useWego) {
-if (logic.TargetStemLength <= 0) {
-rawPercentageFloat = 100f;
-} else {
-float partialStepProgress = logic.GetGrowthProgress() * (100f / logic.TargetStemLength);
-rawPercentageFloat = ((float)logic.GetCurrentStemStage() / logic.TargetStemLength) * 100f + partialStepProgress;
-}
-} else if (ContinuousIncrement) {
-if (logic.GetTotalPlannedSteps() > 0) {
-rawPercentageFloat = ((float)logic.GetStepsCompleted() / logic.GetTotalPlannedSteps()) * 100f;
-if (logic.GetActualGrowthProgress() > 0f && logic.GetStepsCompleted() < logic.GetTotalPlannedSteps()) {
-float stepSize = 100f / logic.GetTotalPlannedSteps();
-float partialStepProgress = logic.GetActualGrowthProgress() * stepSize;
-rawPercentageFloat = (logic.GetStepsCompleted() * stepSize) + partialStepProgress;
-}
-} else {
-rawPercentageFloat = (plant.CurrentState == PlantState.Growing) ? 0f : 100f;
-}
-} else {
-if (logic.TargetStemLength <= 0) {
-rawPercentageFloat = 100f;
-} else {
-rawPercentageFloat = Mathf.Clamp(((float)logic.GetCurrentStemCount() / logic.TargetStemLength) * 100f, 0f, 100f);
-}
+if (totalSteps <= 0) {
+return;
 }
 
-rawPercentageFloat = Mathf.Clamp(rawPercentageFloat, 0f, 100f);
-int targetDisplayValue;
-if (percentageIncrement <= 1) {
-targetDisplayValue = Mathf.FloorToInt(rawPercentageFloat);
-} else {
-targetDisplayValue = Mathf.RoundToInt(rawPercentageFloat / percentageIncrement) * percentageIncrement;
-}
-targetDisplayValue = Mathf.Min(targetDisplayValue, 100);
+float completedSteps = logic.GetCurrentStemStage();
 
-if (targetDisplayValue == 100 && plant.CurrentState == PlantState.Growing && !forceComplete) {
-targetDisplayValue = 99;
-}
+float rawPercentageFloat = (completedSteps / totalSteps) * 100f;
+int targetDisplayValue = Mathf.FloorToInt(rawPercentageFloat);
 
 if (targetDisplayValue != displayedGrowthPercentage) {
 displayedGrowthPercentage = targetDisplayValue;
@@ -9339,36 +9195,28 @@ Debug.LogWarning("[WaterReflectionManager] Default Gradient Fade Material is not
 // Assets\Scripts\WorldInteraction\Placement\PlantGrowthModifierManager.cs
 
 ﻿using System.Collections.Generic;
+using WegoSystem;
 
-pub cls PlantGrowthModifierManager : MonoBehaviour {
+pub cls PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable {
 pub stat PlantGrowthModifierManager Instance { get; set; }
 
 pub cls TileGrowthModifier {
 pub TileDefinition tileDefinition;
-
 pub float growthSpeedMultiplier = 1.0f;
-
 pub float energyRechargeMultiplier = 1.0f;
 }
 
 pub float defaultGrowthSpeedMultiplier = 1.0f;
-
 pub float defaultEnergyRechargeMultiplier = 1.0f;
-
-pub float tileUpdateInterval = 1.0f;
 
 pub List<TileGrowthModifier> tileModifiers = new List<TileGrowthModifier>();
 
 [SerializeField] TileInteractionManager tileInteractionManager;
-
 [SerializeField] bool showDebugMessages = true;
 [SerializeField] bool showTileChangeMessages = true;
 
 Dictionary<TileDefinition, TileGrowthModifier> modifierLookup = new Dictionary<TileDefinition, TileGrowthModifier>();
-
 Dictionary<PlantGrowth, TileDefinition> plantTiles = new Dictionary<PlantGrowth, TileDefinition>();
-
-float tileUpdateTimer = 0f;
 
 void Awake() {
 if (Instance != null && Instance != this) {
@@ -9388,22 +9236,26 @@ Debug.LogWarning("PlantGrowthModifierManager: TileInteractionManager not found!"
 }
 }
 
-tileUpdateTimer = 0f;
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
+}
+else {
+Debug.LogError("[PlantGrowthModifierManager] TickManager not found! Modifiers will not update.");
+}
 }
 
-void Update() {
-tileUpdateTimer -= Time.deltaTime;
+void OnDestroy() {
+if (TickManager.Instance != null) {
+TickManager.Instance.UnregisterTickUpdateable(this);
+}
+}
 
-if (tileUpdateTimer <= 0f) {
+pub void OnTickUpdate(int currentTick) {
 UpdateAllPlantTiles();
-tileUpdateTimer = tileUpdateInterval;
-}
 }
 
 void UpdateAllPlantTiles() {
-if (tileInteractionManager == null) {
-return;
-}
+if (tileInteractionManager == null) return;
 
 List<PlantGrowth> plantsToCheck = new List<PlantGrowth>(plantTiles.Keys);
 
@@ -9414,18 +9266,15 @@ continue;
 }
 
 Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
-
 TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
 
-TileDefinition previousTileDef = plantTiles[plant];
-
-if (currentTileDef != previousTileDef) {
+if (plantTiles.TryGetValue(plant, out TileDefinition previousTileDef) && currentTileDef != previousTileDef) {
 plantTiles[plant] = currentTileDef;
 
 if (showTileChangeMessages) {
 string previousTileName = previousTileDef != null ? previousTileDef.displayName : "None";
 string currentTileName = currentTileDef != null ? currentTileDef.displayName : "None";
-Debug.Log($"Plant tile changed: {previousTileName} -> {currentTileName}");
+Debug.Log($"Plant '{plant.name}' tile changed: {previousTileName} -> {currentTileName}");
 }
 }
 }
@@ -9438,16 +9287,10 @@ if (modifier.tileDefinition != null && !modifierLookup.ContainsKey(modifier.tile
 modifierLookup.Add(modifier.tileDefinition, modifier);
 }
 }
-
-if (showDebugMessages) {
-Debug.Log($"PlantGrowthModifierManager: Built lookup with {modifierLookup.Count} tile modifiers");
-}
 }
 
 pub void RegisterPlantTile(PlantGrowth plant, TileDefinition tileDef) {
-if (plant == null)
-return;
-
+if (plant == null) return;
 plantTiles[plant] = tileDef;
 
 if (showDebugMessages) {
@@ -9457,70 +9300,57 @@ Debug.Log($"Registered plant {plant.name} on tile {tileName}");
 }
 
 pub void UnregisterPlant(PlantGrowth plant) {
-if (plant == null)
-return;
-
-if (plantTiles.ContainsKey(plant)) {
+if (plant != null) {
 plantTiles.Remove(plant);
 }
 }
 
 pub float GetGrowthSpeedMultiplier(PlantGrowth plant) {
-if (plant == null)
-ret defaultGrowthSpeedMultiplier;
+if (plant == null) ret defaultGrowthSpeedMultiplier;
 
 if (!plantTiles.ContainsKey(plant)) {
-RegisterNewPlant(plant);
+RegisterNewPlant(plant); // Auto-register if not found
 }
 
-TileDefinition tileDef = plantTiles[plant];
-if (tileDef == null) {
-ret defaultGrowthSpeedMultiplier;
-}
-
+if (plantTiles.TryGetValue(plant, out TileDefinition tileDef) && tileDef != null) {
 if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier)) {
 ret modifier.growthSpeedMultiplier;
+}
 }
 
 ret defaultGrowthSpeedMultiplier;
 }
 
 pub float GetEnergyRechargeMultiplier(PlantGrowth plant) {
-if (plant == null)
-ret defaultEnergyRechargeMultiplier;
+if (plant == null) ret defaultEnergyRechargeMultiplier;
 
 if (!plantTiles.ContainsKey(plant)) {
-RegisterNewPlant(plant);
+RegisterNewPlant(plant); // Auto-register if not found
 }
 
-TileDefinition tileDef = plantTiles[plant];
-if (tileDef == null) {
-ret defaultEnergyRechargeMultiplier;
-}
-
+if (plantTiles.TryGetValue(plant, out TileDefinition tileDef) && tileDef != null) {
 if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier)) {
 ret modifier.energyRechargeMultiplier;
+}
 }
 
 ret defaultEnergyRechargeMultiplier;
 }
 
 void RegisterNewPlant(PlantGrowth plant) {
-if (plant == null || tileInteractionManager == null)
-return;
+if (plant == null || tileInteractionManager == null) return;
 
 Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
 TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
-
 plantTiles[plant] = currentTileDef;
 
 if (showDebugMessages) {
 string tileName = currentTileDef != null ? currentTileDef.displayName : "Unknown Tile";
-Debug.Log($"Auto-registered plant {plant.name} on tile {tileName}");
+Debug.Log($"Auto-registered new plant {plant.name} on tile {tileName}");
 }
 }
 
-pub void OnValidate() {
+void OnValidate() {
 BuildModifierLookup();
 }
 }
