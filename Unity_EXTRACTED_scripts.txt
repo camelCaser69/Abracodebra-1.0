@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 514,763 → 349,708 chars (32.1% reduction)
-Estimated tokens saved: ~41,263
+Compression Stats: 507,958 → 345,174 chars (32.0% reduction)
+Estimated tokens saved: ~40,696
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -22,103 +22,103 @@ using System;
 [Unknown]
   PixelPerfectSetup (Assets\Scripts\Core/) L29
   RunManager (Assets\Scripts\Core/) L70
-  SortableEntity (Assets\Scripts\Core/) L213
-  UIManager (Assets\Scripts\Core/) L280
-  WeatherManager (Assets\Scripts\Core/) L647
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L872
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1480
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1522
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1531
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1544
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1561
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1876
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1905
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2166
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2234
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2249
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2268
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2326
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2462
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2526
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2543
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2556
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2585
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2793
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3023
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3304
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3333
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3363
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3376
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3404
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3465
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3510
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3561
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3595
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3698
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3759
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3779
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3814
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3829
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3914
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4174
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4197
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4250
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4279
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4288
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4313
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4498
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4537
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4561
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4763
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4843
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5068
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5287
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5512
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5604
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5902
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5969
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6275
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6394
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6598
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6732
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7052
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7188
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7481
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7569
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L7670
-  GridSnapStartup (Assets\Scripts\Ticks/) L7771
-  TickDebugMonitor (Assets\Scripts\Ticks/) L7837
-  TurnPhaseManager (Assets\Scripts\Ticks/) L8008
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8124
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8193
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8424
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8435
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8464
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8560
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8665
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9060
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9096
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9260
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9402
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9520
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9664
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9869
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9909
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9929
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9941
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9976
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10135
+  SortableEntity (Assets\Scripts\Core/) L204
+  UIManager (Assets\Scripts\Core/) L271
+  WeatherManager (Assets\Scripts\Core/) L558
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L741
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1349
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1391
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1400
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1413
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1430
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1745
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1774
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2035
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2103
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2118
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2137
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2195
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2331
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2395
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2412
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2425
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2454
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2662
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L2892
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3173
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3202
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3232
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3245
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3273
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3334
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3379
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3430
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3464
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3567
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3628
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3648
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3683
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3698
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3783
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4043
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4066
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4119
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4148
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4157
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4182
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4367
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4406
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4430
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4632
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4712
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4891
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5107
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5332
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5424
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5722
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5789
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6095
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6214
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6418
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6552
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6872
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7008
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7301
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7389
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L7490
+  GridSnapStartup (Assets\Scripts\Ticks/) L7591
+  TickDebugMonitor (Assets\Scripts\Ticks/) L7657
+  TurnPhaseManager (Assets\Scripts\Ticks/) L7828
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7944
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8013
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8244
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8255
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8284
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8380
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8485
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8880
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8916
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9080
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9222
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9340
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9478
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9683
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9723
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9743
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9755
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9790
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9949
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L10145
-  GridPosition (Assets\Scripts\Ticks/) L10296
-  GridPositionManager (Assets\Scripts\Ticks/) L10397
-  GridRadiusUtility (Assets\Scripts\Ticks/) L10748
-  TickConfiguration (Assets\Scripts\Ticks/) L10892
-  ITickUpdateable (Assets\Scripts\Ticks/) L10998
+  GridEntity (Assets\Scripts\Ticks/) L9959
+  GridPosition (Assets\Scripts\Ticks/) L10110
+  GridPositionManager (Assets\Scripts\Ticks/) L10211
+  GridRadiusUtility (Assets\Scripts\Ticks/) L10562
+  TickConfiguration (Assets\Scripts\Ticks/) L10706
+  ITickUpdateable (Assets\Scripts\Ticks/) L10812
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11160
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10974
 
 ================================================================================
 SCRIPTS
@@ -179,7 +179,6 @@ GrowthAndThreat
 pub cls RunManager : MonoBehaviour {
 pub stat RunManager Instance { get; set; }
 
-[SerializeField] bool useWegoSystem = true;
 [SerializeField] RunState currentState = RunState.Planning;
 [SerializeField] int currentRoundNumber = 1;
 
@@ -203,7 +202,7 @@ SetState(RunState.Planning, true);
 }
 
 void Start() {
-if (useWegoSystem && TurnPhaseManager.Instance != null) {
+if (TurnPhaseManager.Instance != null) {
 TurnPhaseManager.Instance.OnPhaseChanged += HandleWegoPhaseChanged;
 }
 }
@@ -215,7 +214,6 @@ TurnPhaseManager.Instance.OnPhaseChanged -= HandleWegoPhaseChanged;
 }
 
 void HandleWegoPhaseChanged(TurnPhase oldPhase, TurnPhase newPhase) {
-if (!useWegoSystem) return;
 
 switch (newPhase) {
 case TurnPhase.Planning:
@@ -259,7 +257,7 @@ if (currentState == RunState.Planning) {
 Debug.Log($"[RunManager] Starting Growth & Threat for Round {currentRoundNumber}");
 SetState(RunState.GrowthAndThreat);
 
-if (useWegoSystem && TurnPhaseManager.Instance != null) {
+if (TurnPhaseManager.Instance != null) {
 if (TurnPhaseManager.Instance.CurrentPhase == TurnPhase.Planning) {
 TurnPhaseManager.Instance.EndPlanningPhase();
 }
@@ -288,7 +286,7 @@ waveManager?.ResetForNewRound();
 
 SetState(RunState.Planning);
 
-if (useWegoSystem && TurnPhaseManager.Instance != null) {
+if (TurnPhaseManager.Instance != null) {
 TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Planning);
 }
 
@@ -299,13 +297,6 @@ pub void ManualStartGrowthPhase() {
 StartGrowthAndThreatPhase();
 }
 
-pub void SetWegoSystem(bool enabled) {
-useWegoSystem = enabled;
-}
-
-pub bool IsWegoSystemEnabled() {
-ret useWegoSystem;
-}
 }
 
 ////////////////////////////////////////////////////////////
@@ -378,7 +369,7 @@ useParentYCoordinate = value;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\UIManager.cs
 
-﻿// Assets\Scripts\Core\UIManager.cs
+﻿using System.Collections;
 using TMPro;
 using WegoSystem;
 
@@ -396,17 +387,10 @@ pub stat UIManager Instance { get; set; }
 
 [SerializeField] GameObject wegoControlPanel;
 [SerializeField] Button endPlanningPhaseButton;
-[SerializeField] Toggle autoAdvanceToggle; // Obsolete but kept for reference
-[SerializeField] Slider tickSpeedSlider; // Obsolete but kept for reference
 [SerializeField] TextMeshProUGUI currentPhaseText;
 [SerializeField] TextMeshProUGUI tickCounterText;
 [SerializeField] TextMeshProUGUI phaseProgressText;
 [SerializeField] Button advanceTickButton;
-
-[SerializeField] Toggle wegoSystemToggle;
-[SerializeField] TextMeshProUGUI systemModeText;
-
-bool isWegoMode = true;
 
 void Awake() {
 if (Instance != null && Instance != this) {
@@ -433,7 +417,6 @@ TickManager.Instance.OnTickAdvanced += HandleTickAdvanced;
 }
 
 SetupButtons();
-SetupWegoControls();
 HandleRunStateChanged(RunManager.Instance.CurrentState);
 UpdateWegoUI();
 }
@@ -453,8 +436,6 @@ TickManager.Instance.OnTickAdvanced -= HandleTickAdvanced;
 }
 
 void Update() {
-if (!isWegoMode) return;
-
 if (Input.GetKeyDown(KeyCode.Space)) {
 if (TurnPhaseManager.Instance?.IsInPlanningPhase == true) {
 OnEndPlanningPhaseClicked();
@@ -470,7 +451,7 @@ TurnPhaseManager.Instance?.ForcePhase(TurnPhase.Planning);
 }
 }
 
-if (Time.frameCount % 10 == 0) // Update every 10 frames to reduce overhead {
+if (Time.frameCount % 10 == 0) {
 UpdateWegoUI();
 }
 }
@@ -489,30 +470,18 @@ if (advanceTickButton != null)
 advanceTickButton.onClick.AddListener(OnAdvanceTickClicked);
 }
 
-void SetupWegoControls() {
-if (wegoSystemToggle != null) {
-wegoSystemToggle.isOn = isWegoMode;
-wegoSystemToggle.onValueChanged.AddListener(OnWegoSystemToggled);
-}
-
-if (autoAdvanceToggle != null) {
-autoAdvanceToggle.gameObject.SetActive(false);
-}
-
-if (tickSpeedSlider != null) {
-tickSpeedSlider.gameObject.SetActive(false);
-}
-}
-
 void HandleRunStateChanged(RunState newState) {
-if (planningPanel != null) planningPanel.SetActive(newState == RunState.Planning);
-if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
+if (planningPanel != null)
+planningPanel.SetActive(newState == RunState.Planning);
+if (growthAndThreatPanel != null)
+growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
 
 if (recoveryPanel != null) {
 recoveryPanel.SetActive(false);
 }
 
-if (nodeEditorPanel != null) nodeEditorPanel.SetActive(newState == RunState.Planning);
+if (nodeEditorPanel != null)
+nodeEditorPanel.SetActive(newState == RunState.Planning);
 
 if (InventoryGridController.Instance != null) {
 InventoryGridController.Instance.gameObject.SetActive(newState == RunState.Planning);
@@ -561,20 +530,10 @@ advanceTickButton.interactable = !TurnPhaseManager.Instance.IsInPlanningPhase;
 }
 }
 
-pub void SetWegoMovement(bool enabled) {
-Debug.Log($"[UIManager] SetWegoMovement called with: {enabled}. This method is now obsolete.");
-}
-
 void UpdateWegoUI() {
-if (systemModeText != null) {
-systemModeText.text = isWegoMode ? "Wego Mode" : "Real-Time Mode";
-}
-
 if (wegoControlPanel != null) {
-wegoControlPanel.SetActive(isWegoMode);
+wegoControlPanel.SetActive(true);
 }
-
-if (!isWegoMode) return;
 
 if (currentPhaseText != null && TurnPhaseManager.Instance != null) {
 TurnPhase currentPhase = TurnPhaseManager.Instance.CurrentPhase;
@@ -587,7 +546,6 @@ tickCounterText.text = $"Tick: {TickManager.Instance.CurrentTick}";
 
 if (phaseProgressText != null && TurnPhaseManager.Instance != null) {
 int currentPhaseTicks = TurnPhaseManager.Instance.CurrentPhaseTicks;
-
 phaseProgressText.text = $"Phase Ticks: {currentPhaseTicks}";
 }
 
@@ -645,41 +603,6 @@ void OnAdvanceTickClicked() {
 TickManager.Instance?.DebugAdvanceTick();
 }
 
-void OnWegoSystemToggled(bool enabled) {
-isWegoMode = enabled;
-
-if (RunManager.Instance != null) {
-RunManager.Instance.SetWegoSystem(enabled);
-}
-
-if (WeatherManager.Instance != null) {
-WeatherManager.Instance.SetWegoSystem(enabled);
-}
-
-foreach (var plant in PlantGrowth.AllActivePlants) {
-if (plant != null) {
-plant.SetWegoSystem(enabled);
-}
-}
-
-UpdateWegoUI();
-
-Debug.Log($"[UIManager] Switched to {(enabled ? "Wego" : "Real-Time")} mode");
-}
-
-pub void SetWegoMode(bool enabled) {
-if (wegoSystemToggle != null) {
-wegoSystemToggle.isOn = enabled;
-}
-else {
-OnWegoSystemToggled(enabled);
-}
-}
-
-pub bool IsWegoMode() {
-ret isWegoMode;
-}
-
 pub void ShowNotification(string message, float duration = 3f) {
 StartCoroutine(ShowNotificationCoroutine(message, duration));
 }
@@ -723,18 +646,6 @@ yield ret null;
 Destroy(notification);
 }
 
-pub void DebugToggleWegoMode() {
-if (Application.isEditor || Debug.isDebugBuild) {
-SetWegoMode(!isWegoMode);
-}
-}
-
-pub void DebugForcePhase(TurnPhase phase) {
-if (Application.isEditor || Debug.isDebugBuild) {
-TurnPhaseManager.Instance?.ForcePhase(phase);
-}
-}
-
 pub void DebugAdvanceMultipleTicks(int count) {
 if (Application.isEditor || Debug.isDebugBuild) {
 TickManager.Instance?.AdvanceMultipleTicks(count);
@@ -752,8 +663,6 @@ using WegoSystem;
 
 pub cls WeatherManager : MonoBehaviour, ITickUpdateable {
 pub stat WeatherManager Instance { get; set; }
-
-[SerializeField] bool useWegoSystem = true;
 
 pub enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
 
@@ -785,14 +694,16 @@ Destroy(gameObject);
 return;
 }
 Instance = this;
+
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
+}
 }
 
 void Start() {
-if (useWegoSystem && TickManager.Instance != null) {
+if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
-
-EnterPhase(CyclePhase.Day, true);
 }
 
 void OnDestroy() {
@@ -802,7 +713,7 @@ TickManager.Instance.UnregisterTickUpdateable(this);
 }
 
 pub void OnTickUpdate(int currentTick) {
-if (!useWegoSystem || !dayNightCycleEnabled || IsPaused) return;
+if (!dayNightCycleEnabled || IsPaused) return;
 
 if (TickManager.Instance?.Config != null) {
 float dayProgress = TickManager.Instance.Config.GetDayProgressNormalized(currentTick);
@@ -832,13 +743,9 @@ OnPhaseChanged?.Invoke(currentPhase);
 }
 }
 
-UpdateFadeSprite();
 }
 
 void Update() {
-if (!IsPaused && !forceDaylight && !useWegoSystem) {
-UpdateSunIntensity();
-}
 UpdateFadeSprite();
 }
 
@@ -874,37 +781,10 @@ break;
 currentPhaseTicks = 0;
 }
 
-UpdateSunIntensity();
-
 if (previousPhase != currentPhase || forceEvent) {
 if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
 OnPhaseChanged?.Invoke(currentPhase);
 }
-}
-
-void UpdateSunIntensity() {
-if (forceDaylight && IsPaused) {
-sunIntensity = 1.0f;
-return;
-}
-
-float progress = totalPhaseTicksTarget > 0 ? (float)currentPhaseTicks / totalPhaseTicksTarget : 0f;
-
-switch (currentPhase) {
-case CyclePhase.Day:
-sunIntensity = 1f;
-break;
-case CyclePhase.TransitionToNight:
-sunIntensity = Mathf.Lerp(1f, 0f, transitionCurve.Evaluate(progress));
-break;
-case CyclePhase.Night:
-sunIntensity = 0f;
-break;
-case CyclePhase.TransitionToDay:
-sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(progress));
-break;
-}
-sunIntensity = Mathf.Clamp01(sunIntensity);
 }
 
 void UpdateFadeSprite() {
@@ -935,17 +815,6 @@ pub void PauseCycle() {
 Debug.Log("[WeatherManager] PauseCycle called.");
 IsPaused = true;
 forceDaylight = false;
-}
-
-pub void SetWegoSystem(bool enabled) {
-bool wasEnabled = useWegoSystem;
-useWegoSystem = enabled;
-
-if (enabled && !wasEnabled && TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-} else if (!enabled && wasEnabled && TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
-}
 }
 
 pub float GetPhaseProgress() {
@@ -4947,7 +4816,6 @@ using WegoSystem;
 pub enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
 
 pub cls PlantGrowth : MonoBehaviour, ITickUpdateable {
-[SerializeField] bool useWegoSystem = true;
 
 pub stat ro List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
 pub PlantCellManager CellManager { get; set; }
@@ -5034,7 +4902,7 @@ outlineController.gameObject.SetActive(false);
 }
 
 void Start() {
-if (useWegoSystem && TickManager.Instance != null) {
+if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
 VisualManager.UpdateUI();
@@ -5052,33 +4920,10 @@ CellManager?.ClearAllVisuals();
 }
 
 void Update() {
-if (useWegoSystem) {
 VisualManager.UpdateWegoUI();
-return;
-}
-
-switch (CurrentState) {
-case PlantState.Growing:
-if (allowPhotosynthesisDuringGrowth) EnergySystem.AccumulateEnergy();
-VisualManager.UpdateRealtimeGrowthUI();
-break;
-case PlantState.GrowthComplete:
-GrowthLogic.HandleGrowthComplete();
-break;
-case PlantState.Mature_Idle:
-EnergySystem.AccumulateEnergy();
-VisualManager.UpdateUI();
-GrowthLogic.UpdateMaturityCycle();
-break;
-case PlantState.Mature_Executing:
-EnergySystem.AccumulateEnergy();
-VisualManager.UpdateUI();
-break;
-}
 }
 
 pub void OnTickUpdate(int currentTick) {
-if (!useWegoSystem) return;
 GrowthLogic.OnTickUpdate(currentTick);
 VisualManager.UpdateUI();
 }
@@ -5090,7 +4935,6 @@ Destroy(gameObject);
 return;
 }
 
-GrowthLogic.StopGrowthCoroutine();
 CellManager.ClearAllVisuals();
 VisualManager.ResetDisplayState();
 
@@ -5109,9 +4953,6 @@ RegisterWithManagers();
 if (GrowthLogic.TargetStemLength > 0) {
 CurrentState = PlantState.Growing;
 VisualManager.UpdateGrowthPercentageUI();
-if (!useWegoSystem) {
-GrowthLogic.StartRealtimeGrowth();
-}
 }
 else {
 Debug.LogWarning($"[{gameObject.name}] Target stem length is {GrowthLogic.TargetStemLength}. Skipping visual growth phase.", gameObject);
@@ -5132,24 +4973,6 @@ if (PlantGrowthModifierManager.Instance != null && TileInteractionManager.Instan
 Vector3Int gridPos = TileInteractionManager.Instance.WorldToCell(transform.position);
 TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(gridPos);
 PlantGrowthModifierManager.Instance.RegisterPlantTile(this, currentTile);
-}
-}
-
-pub void SetWegoSystem(bool enabled) {
-bool wasEnabled = useWegoSystem;
-useWegoSystem = enabled;
-
-if (enabled && !wasEnabled && TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-if (CurrentState == PlantState.Growing) {
-GrowthLogic.StopGrowthCoroutine();
-}
-}
-else if (!enabled && wasEnabled && TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
-if (CurrentState == PlantState.Growing) {
-GrowthLogic.StartRealtimeGrowth();
-}
 }
 }
 
@@ -5372,9 +5195,6 @@ ret growthProgressTicks / GrowthTicksPerStage;
 
 pub int GetCurrentStemStage() => currentStemStage;
 pub void HandleGrowthComplete() => CompleteGrowth();
-pub void UpdateMaturityCycle() { }
-pub void StopGrowthCoroutine() { }
-pub void StartRealtimeGrowth() { }
 pub int GetStepsCompleted() => currentStemStage;
 pub float GetGrowthProgress() => TargetStemLength > 0 ? (float)currentStemStage / TargetStemLength : 0f;
 pub int GetTotalPlannedSteps() => TargetStemLength;
@@ -9673,15 +9493,9 @@ TickManager.Instance.UnregisterTickUpdateable(this);
 }
 
 pub void OnTickUpdate(int currentTick) {
-}
-
-void Update() {
 if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.Planning) {
 HandleImmediateWegoMovement();
 }
-
-UpdateAnimations();
-UpdateSpriteDirection();
 }
 
 void HandleImmediateWegoMovement() {

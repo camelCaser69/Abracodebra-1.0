@@ -9,7 +9,6 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
 {
     // --- System Toggles ---
     [Header("System Toggles")]
-    [SerializeField] bool useWegoSystem = true;
 
     // --- Core Component Managers (Initialized in Awake) ---
     public static readonly List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
@@ -116,10 +115,9 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void Start()
-    {
-        if (useWegoSystem && TickManager.Instance != null)
-        {
+    void Start() {
+        // Always register with TickManager
+        if (TickManager.Instance != null) {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
         VisualManager.UpdateUI();
@@ -139,53 +137,24 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         CellManager?.ClearAllVisuals();
     }
 
-    void Update()
-    {
-        if (useWegoSystem)
-        {
-            VisualManager.UpdateWegoUI();
-            return;
-        }
-
-        // Real-time logic (currently unused but kept for potential future use)
-        switch (CurrentState)
-        {
-            case PlantState.Growing:
-                if (allowPhotosynthesisDuringGrowth) EnergySystem.AccumulateEnergy();
-                VisualManager.UpdateRealtimeGrowthUI();
-                break;
-            case PlantState.GrowthComplete:
-                GrowthLogic.HandleGrowthComplete();
-                break;
-            case PlantState.Mature_Idle:
-                EnergySystem.AccumulateEnergy();
-                VisualManager.UpdateUI();
-                GrowthLogic.UpdateMaturityCycle();
-                break;
-            case PlantState.Mature_Executing:
-                EnergySystem.AccumulateEnergy();
-                VisualManager.UpdateUI();
-                break;
-        }
+    void Update() {
+        // Only update visual elements - remove all real-time growth logic
+        VisualManager.UpdateWegoUI();
     }
 
-    public void OnTickUpdate(int currentTick)
-    {
-        if (!useWegoSystem) return;
+    public void OnTickUpdate(int currentTick) {
+        // Remove the useWegoSystem check
         GrowthLogic.OnTickUpdate(currentTick);
         VisualManager.UpdateUI();
     }
 
-    public void InitializeAndGrow(NodeGraph graph)
-    {
-        if (graph == null || graph.nodes == null)
-        {
+    public void InitializeAndGrow(NodeGraph graph) {
+        if (graph == null || graph.nodes == null) {
             Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject);
             Destroy(gameObject);
             return;
         }
 
-        GrowthLogic.StopGrowthCoroutine();
         CellManager.ClearAllVisuals();
         VisualManager.ResetDisplayState();
 
@@ -197,28 +166,20 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         GrowthLogic.CalculateAndApplyStats();
 
         GameObject spawnedSeed = CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
-        if (spawnedSeed != null)
-        {
+        if (spawnedSeed != null) {
             CellManager.RootCellInstance = spawnedSeed;
             RegisterWithManagers();
 
-            if (GrowthLogic.TargetStemLength > 0)
-            {
+            if (GrowthLogic.TargetStemLength > 0) {
                 CurrentState = PlantState.Growing;
                 VisualManager.UpdateGrowthPercentageUI();
-                if (!useWegoSystem)
-                {
-                    GrowthLogic.StartRealtimeGrowth();
-                }
             }
-            else
-            {
+            else {
                 Debug.LogWarning($"[{gameObject.name}] Target stem length is {GrowthLogic.TargetStemLength}. Skipping visual growth phase.", gameObject);
                 GrowthLogic.CompleteGrowth();
             }
         }
-        else
-        {
+        else {
             Debug.LogError($"[{gameObject.name}] Failed to spawn initial seed! Aborting growth.", gameObject);
             CurrentState = PlantState.Mature_Idle;
             Destroy(gameObject, 0.1f);
@@ -234,29 +195,6 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
             Vector3Int gridPos = TileInteractionManager.Instance.WorldToCell(transform.position);
             TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(gridPos);
             PlantGrowthModifierManager.Instance.RegisterPlantTile(this, currentTile);
-        }
-    }
-    
-    public void SetWegoSystem(bool enabled)
-    {
-        bool wasEnabled = useWegoSystem;
-        useWegoSystem = enabled;
-
-        if (enabled && !wasEnabled && TickManager.Instance != null)
-        {
-            TickManager.Instance.RegisterTickUpdateable(this);
-            if (CurrentState == PlantState.Growing)
-            {
-                GrowthLogic.StopGrowthCoroutine();
-            }
-        }
-        else if (!enabled && wasEnabled && TickManager.Instance != null)
-        {
-            TickManager.Instance.UnregisterTickUpdateable(this);
-            if (CurrentState == PlantState.Growing)
-            {
-                GrowthLogic.StartRealtimeGrowth();
-            }
         }
     }
 

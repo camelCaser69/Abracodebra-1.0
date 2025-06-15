@@ -13,7 +13,6 @@ public enum RunState {
 public class RunManager : MonoBehaviour {
     public static RunManager Instance { get; private set; }
 
-    [SerializeField] bool useWegoSystem = true;
     [SerializeField] RunState currentState = RunState.Planning;
     [SerializeField] int currentRoundNumber = 1;
 
@@ -37,7 +36,8 @@ public class RunManager : MonoBehaviour {
     }
 
     void Start() {
-        if (useWegoSystem && TurnPhaseManager.Instance != null) {
+        // Always subscribe to phase changes (remove useWegoSystem check)
+        if (TurnPhaseManager.Instance != null) {
             TurnPhaseManager.Instance.OnPhaseChanged += HandleWegoPhaseChanged;
         }
     }
@@ -49,12 +49,12 @@ public class RunManager : MonoBehaviour {
     }
 
     void HandleWegoPhaseChanged(TurnPhase oldPhase, TurnPhase newPhase) {
-        if (!useWegoSystem) return;
+        // Remove the useWegoSystem check at the beginning
+        // if (!useWegoSystem) return;  <-- DELETE THIS LINE
 
         switch (newPhase) {
             case TurnPhase.Planning:
                 if (currentState == RunState.GrowthAndThreat) {
-                    // Check if wave is complete
                     if (waveManager != null && waveManager.IsCurrentWaveDefeated()) {
                         StartNewRound();
                     }
@@ -94,7 +94,8 @@ public class RunManager : MonoBehaviour {
             Debug.Log($"[RunManager] Starting Growth & Threat for Round {currentRoundNumber}");
             SetState(RunState.GrowthAndThreat);
 
-            if (useWegoSystem && TurnPhaseManager.Instance != null) {
+            // Always handle phase transitions (remove useWegoSystem check)
+            if (TurnPhaseManager.Instance != null) {
                 if (TurnPhaseManager.Instance.CurrentPhase == TurnPhase.Planning) {
                     TurnPhaseManager.Instance.EndPlanningPhase();
                 }
@@ -119,18 +120,16 @@ public class RunManager : MonoBehaviour {
     void StartNewRound() {
         currentRoundNumber++;
         Debug.Log($"[RunManager] Starting new round: {currentRoundNumber}");
-        
-        // Reset wave manager
+
         waveManager?.ResetForNewRound();
-        
-        // Ensure we're in planning state
+
         SetState(RunState.Planning);
-        
-        // Force turn phase to planning
-        if (useWegoSystem && TurnPhaseManager.Instance != null) {
+
+        // Always transition to planning phase (remove useWegoSystem check)
+        if (TurnPhaseManager.Instance != null) {
             TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Planning);
         }
-        
+
         OnRoundChanged?.Invoke(currentRoundNumber);
     }
 
@@ -138,11 +137,4 @@ public class RunManager : MonoBehaviour {
         StartGrowthAndThreatPhase();
     }
 
-    public void SetWegoSystem(bool enabled) {
-        useWegoSystem = enabled;
-    }
-
-    public bool IsWegoSystemEnabled() {
-        return useWegoSystem;
-    }
 }

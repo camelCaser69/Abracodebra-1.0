@@ -1,7 +1,4 @@
-﻿// Assets\Scripts\Core\UIManager.cs
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -9,38 +6,27 @@ using WegoSystem;
 
 public class UIManager : MonoBehaviour
 {
-    public static UIManager Instance { get; set; }
+    public static UIManager Instance { get; private set; }
 
-    #region Serialized Fields
-    [Header("State Panels")]
+    [Header("UI Panels")]
     [SerializeField] GameObject planningPanel;
     [SerializeField] GameObject growthAndThreatPanel;
     [SerializeField] GameObject recoveryPanel;
     [SerializeField] GameObject nodeEditorPanel;
 
-    [Header("Legacy State Buttons")]
+    [Header("Phase Transition Buttons")]
     [SerializeField] Button startGrowthPhaseButton;
     [SerializeField] Button startRecoveryPhaseButton;
     [SerializeField] Button startNewPlanningPhaseButton;
 
-    [Header("Wego Controls")]
+    [Header("Wego Control Panel")]
     [SerializeField] GameObject wegoControlPanel;
     [SerializeField] Button endPlanningPhaseButton;
-    [SerializeField] Toggle autoAdvanceToggle; // Obsolete but kept for reference
-    [SerializeField] Slider tickSpeedSlider; // Obsolete but kept for reference
     [SerializeField] TextMeshProUGUI currentPhaseText;
     [SerializeField] TextMeshProUGUI tickCounterText;
     [SerializeField] TextMeshProUGUI phaseProgressText;
     [SerializeField] Button advanceTickButton;
 
-    [Header("System Mode")]
-    [SerializeField] Toggle wegoSystemToggle;
-    [SerializeField] TextMeshProUGUI systemModeText;
-    #endregion
-
-    bool isWegoMode = true;
-
-    #region Unity Lifecycle
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -55,7 +41,7 @@ public class UIManager : MonoBehaviour
     {
         if (RunManager.Instance == null)
         {
-            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not fn correctly.");
+            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not function correctly.");
             return;
         }
 
@@ -72,7 +58,6 @@ public class UIManager : MonoBehaviour
         }
 
         SetupButtons();
-        SetupWegoControls();
         HandleRunStateChanged(RunManager.Instance.CurrentState);
         UpdateWegoUI();
     }
@@ -97,8 +82,6 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (!isWegoMode) return;
-
         if (Input.GetKeyDown(KeyCode.Space))
         {
             if (TurnPhaseManager.Instance?.IsInPlanningPhase == true)
@@ -119,14 +102,13 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        if (Time.frameCount % 10 == 0) // Update every 10 frames to reduce overhead
+        // Update UI every 10 frames to reduce overhead
+        if (Time.frameCount % 10 == 0)
         {
             UpdateWegoUI();
         }
     }
-    #endregion
 
-    #region Setup
     void SetupButtons()
     {
         if (startGrowthPhaseButton != null)
@@ -142,38 +124,20 @@ public class UIManager : MonoBehaviour
             advanceTickButton.onClick.AddListener(OnAdvanceTickClicked);
     }
 
-    void SetupWegoControls()
-    {
-        if (wegoSystemToggle != null)
-        {
-            wegoSystemToggle.isOn = isWegoMode;
-            wegoSystemToggle.onValueChanged.AddListener(OnWegoSystemToggled);
-        }
-
-        if (autoAdvanceToggle != null)
-        {
-            autoAdvanceToggle.gameObject.SetActive(false);
-        }
-
-        if (tickSpeedSlider != null)
-        {
-            tickSpeedSlider.gameObject.SetActive(false);
-        }
-    }
-    #endregion
-
-    #region Event Handlers
     void HandleRunStateChanged(RunState newState)
     {
-        if (planningPanel != null) planningPanel.SetActive(newState == RunState.Planning);
-        if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
+        if (planningPanel != null) 
+            planningPanel.SetActive(newState == RunState.Planning);
+        if (growthAndThreatPanel != null) 
+            growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
 
         if (recoveryPanel != null)
         {
             recoveryPanel.SetActive(false);
         }
 
-        if (nodeEditorPanel != null) nodeEditorPanel.SetActive(newState == RunState.Planning);
+        if (nodeEditorPanel != null) 
+            nodeEditorPanel.SetActive(newState == RunState.Planning);
 
         if (InventoryGridController.Instance != null)
         {
@@ -204,9 +168,7 @@ public class UIManager : MonoBehaviour
     {
         UpdateWegoUI();
     }
-    #endregion
 
-    #region UI Update
     void UpdateButtonStates(RunState state)
     {
         if (startGrowthPhaseButton != null)
@@ -235,26 +197,12 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void SetWegoMovement(bool enabled)
-    {
-        // This method is obsolete as AnimalController now handles its own movement system internally.
-        // It's kept here to prevent breaking any potential remaining references, but it does nothing.
-        Debug.Log($"[UIManager] SetWegoMovement called with: {enabled}. This method is now obsolete.");
-    }
-
     void UpdateWegoUI()
     {
-        if (systemModeText != null)
-        {
-            systemModeText.text = isWegoMode ? "Wego Mode" : "Real-Time Mode";
-        }
-
         if (wegoControlPanel != null)
         {
-            wegoControlPanel.SetActive(isWegoMode);
+            wegoControlPanel.SetActive(true);
         }
-
-        if (!isWegoMode) return;
 
         if (currentPhaseText != null && TurnPhaseManager.Instance != null)
         {
@@ -270,7 +218,6 @@ public class UIManager : MonoBehaviour
         if (phaseProgressText != null && TurnPhaseManager.Instance != null)
         {
             int currentPhaseTicks = TurnPhaseManager.Instance.CurrentPhaseTicks;
-
             phaseProgressText.text = $"Phase Ticks: {currentPhaseTicks}";
         }
 
@@ -282,9 +229,7 @@ public class UIManager : MonoBehaviour
         yield return null; // Wait one frame
         InventoryBarController.Instance?.ShowBar();
     }
-    #endregion
 
-    #region Logic
     void AutoReturnSeedFromEditorSlot()
     {
         if (NodeEditorGridController.Instance == null || InventoryGridController.Instance == null) return;
@@ -307,9 +252,7 @@ public class UIManager : MonoBehaviour
         seedCell.ClearNodeReference();
         Debug.Log($"[UIManager] Auto-returned seed \"{seedData.nodeDisplayName}\" to inventory.");
     }
-    #endregion
 
-    #region Button Callbacks
     void OnStartGrowthPhaseClicked()
     {
         AutoReturnSeedFromEditorSlot();
@@ -338,59 +281,6 @@ public class UIManager : MonoBehaviour
     void OnAdvanceTickClicked()
     {
         TickManager.Instance?.DebugAdvanceTick();
-    }
-
-    void OnWegoSystemToggled(bool enabled)
-    {
-        isWegoMode = enabled;
-
-        if (RunManager.Instance != null)
-        {
-            RunManager.Instance.SetWegoSystem(enabled);
-        }
-
-        if (WeatherManager.Instance != null)
-        {
-            WeatherManager.Instance.SetWegoSystem(enabled);
-        }
-
-        foreach (var plant in PlantGrowth.AllActivePlants)
-        {
-            if (plant != null)
-            {
-                plant.SetWegoSystem(enabled);
-            }
-        }
-        
-        // This is now obsolete; animal controllers manage their own state.
-        // var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-        // foreach (var animal in animals)
-        // {
-        //     animal.SetWegoMovement(enabled);
-        // }
-
-        UpdateWegoUI();
-
-        Debug.Log($"[UIManager] Switched to {(enabled ? "Wego" : "Real-Time")} mode");
-    }
-    #endregion
-
-    #region Public Methods & Debug
-    public void SetWegoMode(bool enabled)
-    {
-        if (wegoSystemToggle != null)
-        {
-            wegoSystemToggle.isOn = enabled;
-        }
-        else
-        {
-            OnWegoSystemToggled(enabled);
-        }
-    }
-
-    public bool IsWegoMode()
-    {
-        return isWegoMode;
     }
 
     public void ShowNotification(string message, float duration = 3f)
@@ -440,22 +330,6 @@ public class UIManager : MonoBehaviour
         Destroy(notification);
     }
 
-    public void DebugToggleWegoMode()
-    {
-        if (Application.isEditor || Debug.isDebugBuild)
-        {
-            SetWegoMode(!isWegoMode);
-        }
-    }
-
-    public void DebugForcePhase(TurnPhase phase)
-    {
-        if (Application.isEditor || Debug.isDebugBuild)
-        {
-            TurnPhaseManager.Instance?.ForcePhase(phase);
-        }
-    }
-
     public void DebugAdvanceMultipleTicks(int count)
     {
         if (Application.isEditor || Debug.isDebugBuild)
@@ -463,5 +337,4 @@ public class UIManager : MonoBehaviour
             TickManager.Instance?.AdvanceMultipleTicks(count);
         }
     }
-    #endregion
 }

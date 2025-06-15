@@ -238,9 +238,6 @@ public void CalculateAndApplyStats()
 
     public int GetCurrentStemStage() => currentStemStage;
     public void HandleGrowthComplete() => CompleteGrowth();
-    public void UpdateMaturityCycle() { }
-    public void StopGrowthCoroutine() { }
-    public void StartRealtimeGrowth() { }
     public int GetStepsCompleted() => currentStemStage;
     public float GetGrowthProgress() => TargetStemLength > 0 ? (float)currentStemStage / TargetStemLength : 0f;
     public int GetTotalPlannedSteps() => TargetStemLength;

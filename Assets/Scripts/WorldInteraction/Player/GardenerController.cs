@@ -66,26 +66,14 @@ public class GardenerController : MonoBehaviour, ITickUpdateable
         }
     }
 
-    public void OnTickUpdate(int currentTick)
-    {
-        // This can be used for future tick-based gardener logic if needed.
-    }
-
-    void Update()
-    {
-        // --- MODIFIED: Simplified Update loop ---
-        if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.Planning)
-        {
+    public void OnTickUpdate(int currentTick) {
+        // Handle movement input during non-planning phases
+        if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.Planning) {
             HandleImmediateWegoMovement();
         }
-
-        UpdateAnimations();
-        UpdateSpriteDirection();
     }
 
-    void HandleImmediateWegoMovement()
-    {
-        // --- REMOVED: isPlanting check, as planting is now an instantaneous action. ---
+    void HandleImmediateWegoMovement() {
         if (gridEntity == null) return;
 
         GridPosition moveDir = GridPosition.Zero;
@@ -95,14 +83,12 @@ public class GardenerController : MonoBehaviour, ITickUpdateable
         else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) moveDir = GridPosition.Left;
         else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) moveDir = GridPosition.Right;
 
-        if (moveDir != GridPosition.Zero)
-        {
+        if (moveDir != GridPosition.Zero) {
             GridPosition targetPos = gridEntity.Position + moveDir;
 
             if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
                 GridPositionManager.Instance.IsPositionValid(targetPos) &&
-                !GridPositionManager.Instance.IsPositionOccupied(targetPos))
-            {
+                !GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
                 int moveCost = PlayerActionManager.Instance.GetMovementTickCost(transform.position, this);
 
                 gridEntity.SetPosition(targetPos);
@@ -111,8 +97,7 @@ public class GardenerController : MonoBehaviour, ITickUpdateable
                 TickManager.Instance.AdvanceMultipleTicks(moveCost);
                 Debug.Log($"[GardenerController] Moved to {targetPos}. Advanced game by {moveCost} tick(s).");
             }
-            else
-            {
+            else {
                 Debug.Log($"[GardenerController] Move to {targetPos} is invalid or blocked.");
             }
         }

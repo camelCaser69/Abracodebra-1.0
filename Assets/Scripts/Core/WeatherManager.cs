@@ -9,8 +9,6 @@ using WegoSystem;
 public class WeatherManager : MonoBehaviour, ITickUpdateable {
     public static WeatherManager Instance { get; private set; }
 
-    [SerializeField] bool useWegoSystem = true;
-
     public enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
 
     public bool dayNightCycleEnabled = true;
@@ -41,30 +39,36 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
             return;
         }
         Instance = this;
+
+        // Always register with TickManager
+        if (TickManager.Instance != null) {
+            TickManager.Instance.RegisterTickUpdateable(this);
+        }
     }
 
     void Start() {
-        if (useWegoSystem && TickManager.Instance != null) {
+        // Always register with TickManager (no more useWegoSystem check)
+        if (TickManager.Instance != null) {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
-
-        EnterPhase(CyclePhase.Day, true);
     }
 
     void OnDestroy() {
+        // Always unregister
         if (TickManager.Instance != null) {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
     }
 
     public void OnTickUpdate(int currentTick) {
-        if (!useWegoSystem || !dayNightCycleEnabled || IsPaused) return;
-    
+        // Remove the useWegoSystem check from the condition
+        if (!dayNightCycleEnabled || IsPaused) return;
+
         if (TickManager.Instance?.Config != null) {
             float dayProgress = TickManager.Instance.Config.GetDayProgressNormalized(currentTick);
-        
+    
             CyclePhase newPhase = currentPhase;
-        
+    
             if (dayProgress < 0.4f) {
                 newPhase = CyclePhase.Day;
                 sunIntensity = 1f;
@@ -80,7 +84,7 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
                 float transitionProgress = (dayProgress - 0.9f) / 0.1f;
                 sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(transitionProgress));
             }
-        
+    
             if (newPhase != currentPhase) {
                 currentPhase = newPhase;
                 if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
@@ -88,13 +92,10 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
             }
         }
     
-        UpdateFadeSprite();
+        // Note: UpdateFadeSprite() is called every frame in Update() for smooth visuals
     }
 
     void Update() {
-        if (!IsPaused && !forceDaylight && !useWegoSystem) {
-            UpdateSunIntensity();
-        }
         UpdateFadeSprite();
     }
 
@@ -130,37 +131,10 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
             currentPhaseTicks = 0;
         }
 
-        UpdateSunIntensity();
-
         if (previousPhase != currentPhase || forceEvent) {
             if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentPhase}");
             OnPhaseChanged?.Invoke(currentPhase);
         }
-    }
-
-    void UpdateSunIntensity() {
-        if (forceDaylight && IsPaused) {
-            sunIntensity = 1.0f;
-            return;
-        }
-
-        float progress = totalPhaseTicksTarget > 0 ? (float)currentPhaseTicks / totalPhaseTicksTarget : 0f;
-
-        switch (currentPhase) {
-            case CyclePhase.Day:
-                sunIntensity = 1f;
-                break;
-            case CyclePhase.TransitionToNight:
-                sunIntensity = Mathf.Lerp(1f, 0f, transitionCurve.Evaluate(progress));
-                break;
-            case CyclePhase.Night:
-                sunIntensity = 0f;
-                break;
-            case CyclePhase.TransitionToDay:
-                sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(progress));
-                break;
-        }
-        sunIntensity = Mathf.Clamp01(sunIntensity);
     }
     
     void UpdateFadeSprite() {
@@ -191,17 +165,6 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable {
         Debug.Log("[WeatherManager] PauseCycle called.");
         IsPaused = true;
         forceDaylight = false;
-    }
-
-    public void SetWegoSystem(bool enabled) {
-        bool wasEnabled = useWegoSystem;
-        useWegoSystem = enabled;
-
-        if (enabled && !wasEnabled && TickManager.Instance != null) {
-            TickManager.Instance.RegisterTickUpdateable(this);
-        } else if (!enabled && wasEnabled && TickManager.Instance != null) {
-            TickManager.Instance.UnregisterTickUpdateable(this);
-        }
     }
 
     public float GetPhaseProgress() {
