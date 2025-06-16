@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 507,958 → 345,174 chars (32.0% reduction)
-Estimated tokens saved: ~40,696
+Compression Stats: 508,945 → 346,235 chars (32.0% reduction)
+Estimated tokens saved: ~40,677
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -25,100 +25,100 @@ using System;
   SortableEntity (Assets\Scripts\Core/) L204
   UIManager (Assets\Scripts\Core/) L271
   WeatherManager (Assets\Scripts\Core/) L558
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L741
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1349
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1391
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1400
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1413
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1430
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1745
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1774
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2035
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2103
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2118
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2137
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2195
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2331
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2395
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2412
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2425
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2454
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2662
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L2892
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3173
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3202
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3232
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3245
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3273
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3334
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3379
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3430
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3464
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3567
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3628
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3648
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3683
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3698
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3783
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4043
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4066
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4119
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4148
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4157
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4182
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4367
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4406
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4430
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4632
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4712
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4891
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5107
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5332
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5424
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5722
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5789
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6095
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6214
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6418
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6552
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6872
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7008
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7301
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7389
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L7490
-  GridSnapStartup (Assets\Scripts\Ticks/) L7591
-  TickDebugMonitor (Assets\Scripts\Ticks/) L7657
-  TurnPhaseManager (Assets\Scripts\Ticks/) L7828
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7944
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8013
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8244
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8255
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8284
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8380
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8485
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8880
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8916
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9080
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9222
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9340
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9478
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9683
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9723
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9743
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9755
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9790
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9949
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L740
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1354
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1396
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1405
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1418
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1435
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1746
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1775
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2036
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2104
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2119
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2138
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2196
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2332
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2396
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2413
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2426
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2455
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2663
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L2893
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3174
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3203
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3233
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3246
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3274
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3335
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3380
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3431
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3465
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3568
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3629
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3649
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3684
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3699
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3784
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4044
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4067
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4120
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4149
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4158
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4183
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4368
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4407
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4431
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4633
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4713
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4892
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5112
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5337
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5429
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5727
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L5794
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6100
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6219
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6423
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6557
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L6877
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7013
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7306
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7394
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L7495
+  GridSnapStartup (Assets\Scripts\Ticks/) L7596
+  TickDebugMonitor (Assets\Scripts\Ticks/) L7662
+  TurnPhaseManager (Assets\Scripts\Ticks/) L7833
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7949
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8018
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8249
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8260
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8289
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8385
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8490
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8885
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8921
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9085
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9227
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9345
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9467
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9672
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9712
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9732
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9744
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9779
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9938
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L9959
-  GridPosition (Assets\Scripts\Ticks/) L10110
-  GridPositionManager (Assets\Scripts\Ticks/) L10211
-  GridRadiusUtility (Assets\Scripts\Ticks/) L10562
-  TickConfiguration (Assets\Scripts\Ticks/) L10706
-  ITickUpdateable (Assets\Scripts\Ticks/) L10812
+  GridEntity (Assets\Scripts\Ticks/) L9948
+  GridPosition (Assets\Scripts\Ticks/) L10099
+  GridPositionManager (Assets\Scripts\Ticks/) L10200
+  GridRadiusUtility (Assets\Scripts\Ticks/) L10554
+  TickConfiguration (Assets\Scripts\Ticks/) L10698
+  ITickUpdateable (Assets\Scripts\Ticks/) L10804
 
 [for]
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10974
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10966
 
 ================================================================================
 SCRIPTS
@@ -656,7 +656,7 @@ TickManager.Instance?.AdvanceMultipleTicks(count);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\WeatherManager.cs
 
-﻿using UnityEngine;
+﻿using System;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using WegoSystem;
@@ -669,7 +669,8 @@ pub enum CyclePhase { Day, TransitionToNight, Night, TransitionToDay }
 pub bool dayNightCycleEnabled = true;
 pub AnimationCurve transitionCurve = AnimationCurve.Linear(0, 0, 1, 1);
 pub float sunIntensity = 1f;
-pub float fixedSunIntensity = 1f;
+
+pub float fixedSunIntensity = 1f; // This seems unused, but keeping it as it wasn't part of a warning
 pub SpriteRenderer fadeSprite;
 pub float minAlpha = 0f;
 pub float maxAlpha = 1f;
@@ -678,7 +679,6 @@ pub bool IsPaused { get; set; } = false;
 
 int currentPhaseTicks = 0;
 int totalPhaseTicksTarget = 0;
-bool forceDaylight = false;
 
 pub CyclePhase CurrentPhase => currentPhase;
 pub event Action<CyclePhase> OnPhaseChanged;
@@ -723,14 +723,17 @@ CyclePhase newPhase = currentPhase;
 if (dayProgress < 0.4f) {
 newPhase = CyclePhase.Day;
 sunIntensity = 1f;
-} else if (dayProgress < 0.5f) {
+}
+else if (dayProgress < 0.5f) {
 newPhase = CyclePhase.TransitionToNight;
 float transitionProgress = (dayProgress - 0.4f) / 0.1f;
 sunIntensity = Mathf.Lerp(1f, 0f, transitionCurve.Evaluate(transitionProgress));
-} else if (dayProgress < 0.9f) {
+}
+else if (dayProgress < 0.9f) {
 newPhase = CyclePhase.Night;
 sunIntensity = 0f;
-} else {
+}
+else {
 newPhase = CyclePhase.TransitionToDay;
 float transitionProgress = (dayProgress - 0.9f) / 0.1f;
 sunIntensity = Mathf.Lerp(0f, 1f, transitionCurve.Evaluate(transitionProgress));
@@ -742,7 +745,6 @@ if (Debug.isDebugBuild) Debug.Log($"[WeatherManager] Phase Changed To: {currentP
 OnPhaseChanged?.Invoke(currentPhase);
 }
 }
-
 }
 
 void Update() {
@@ -799,7 +801,6 @@ fadeSprite.color = c;
 pub void PauseCycleAtDay() {
 Debug.Log("[WeatherManager] PauseCycleAtDay called.");
 IsPaused = true;
-forceDaylight = true;
 sunIntensity = 1.0f;
 UpdateFadeSprite();
 OnPhaseChanged?.Invoke(CyclePhase.Day);
@@ -808,13 +809,11 @@ OnPhaseChanged?.Invoke(CyclePhase.Day);
 pub void ResumeCycle() {
 Debug.Log("[WeatherManager] ResumeCycle called.");
 IsPaused = false;
-forceDaylight = false;
 }
 
 pub void PauseCycle() {
 Debug.Log("[WeatherManager] PauseCycle called.");
 IsPaused = true;
-forceDaylight = false;
 }
 
 pub float GetPhaseProgress() {
@@ -839,11 +838,12 @@ EnterPhase(phase, true);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Animals\AnimalController.cs
 
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using TMPro;
 using WegoSystem;
 
 pub cls AnimalController : MonoBehaviour, ITickUpdateable {
+
 [SerializeField] pub AnimalDefinition definition;
 [SerializeField] GameObject thoughtBubblePrefab;
 [SerializeField] Transform bubbleSpawnTransform;
@@ -857,9 +857,9 @@ pub cls AnimalController : MonoBehaviour, ITickUpdateable {
 
 AnimalDiet animalDiet;
 GridEntity gridEntity;
-AnimalThoughtLibrary thoughtLibrary;
+AnimalThoughtLibrary thoughtLibrary; // Note: This needs to be assigned, perhaps via a manager.
 
-pub int thinkingTickInterval = 3;  // Add this field
+pub int thinkingTickInterval = 3;
 
 GridPosition targetPosition;
 GameObject currentTargetFood = null;
@@ -884,7 +884,6 @@ bool isEating = false;
 bool isPooping = false;
 bool hasPooped = true;
 bool isDying = false;
-bool isWanderPaused = false;
 bool isFlashing = false;
 
 bool isSeekingScreenCenter = false;
@@ -920,6 +919,15 @@ void OnDestroy() {
 if (TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
 }
+}
+
+void Update() {
+if (!enabled || isDying) return;
+
+bool showStats = Input.GetKey(showStatsKey);
+SetStatsTextVisibility(showStats);
+
+UpdateSpriteFlipping();
 }
 
 void ValidateComponents() {
@@ -1052,9 +1060,37 @@ return;
 
 if (currentHunger >= animalDiet.hungerThreshold) {
 PlanFoodSeeking();
-} else {
+}
+else {
 PlanWandering();
 }
+}
+
+void ExecutePlannedAction() {
+if (gridEntity == null) return;
+
+if (currentTargetFood != null && targetPosition == gridEntity.Position) {
+GridPosition foodPos = GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position);
+int distance = gridEntity.Position.ManhattanDistance(foodPos);
+
+if (distance <= definition.eatDistanceTiles) {
+StartEating();
+return;
+}
+}
+
+if (targetPosition != gridEntity.Position) {
+gridEntity.SetPosition(targetPosition);
+
+if (currentPath.Count > 0 && currentPathIndex < currentPath.Count - 1) {
+currentPathIndex++;
+targetPosition = currentPath[currentPathIndex];
+hasPlannedAction = true; // Stay in action mode
+return;
+}
+}
+
+hasPlannedAction = false;
 }
 
 void HandleScreenCenterSeeking() {
@@ -1067,7 +1103,8 @@ currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
 if (centerWithinBounds) {
 isSeekingScreenCenter = false;
 hasPlannedAction = false;
-} else {
+}
+else {
 GridPosition currentGridPos = gridEntity.Position;
 GridPosition targetGridPos = GridPositionManager.Instance.WorldToGrid(screenCenterTarget);
 PlanMovementToward(targetGridPos);
@@ -1088,10 +1125,12 @@ currentPathIndex = 0;
 if (currentPath.Count > 0) {
 hasPlannedAction = true;
 targetPosition = currentPath[0];
-} else {
+}
+else {
 PlanMovementToward(foodGridPos);
 }
-} else {
+}
+else {
 PlanWandering();
 }
 }
@@ -1100,7 +1139,6 @@ void PlanWandering() {
 if (gridEntity == null) return;
 
 if (Random.Range(0, 100) < definition.wanderPauseTickChance) {
-isWanderPaused = true;
 wanderPauseTicks = Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
 hasPlannedAction = false;
 return;
@@ -1112,7 +1150,7 @@ GridPosition.Up, GridPosition.Down,
 GridPosition.Left, GridPosition.Right
 };
 
-for (int i = 0; i < 3; i++) {
+for (int i = 0; i < 3; i++) // Try up to 3 times to find a valid random move {
 GridPosition randomDir = directions[Random.Range(0, directions.Length)];
 GridPosition targetPos = currentPos + randomDir;
 
@@ -1165,33 +1203,6 @@ PlanWandering();
 bool IsValidMove(GridPosition pos) {
 ret GridPositionManager.Instance.IsPositionValid(pos) &&
 !GridPositionManager.Instance.IsPositionOccupied(pos);
-}
-
-void ExecutePlannedAction() {
-if (gridEntity == null) return;
-
-if (currentTargetFood != null && targetPosition == gridEntity.Position) {
-GridPosition foodPos = GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position);
-int distance = gridEntity.Position.ManhattanDistance(foodPos);
-
-if (distance <= definition.eatDistanceTiles) {
-StartEating();
-return;
-}
-}
-
-if (targetPosition != gridEntity.Position) {
-gridEntity.SetPosition(targetPosition);
-
-if (currentPath.Count > 0 && currentPathIndex < currentPath.Count - 1) {
-currentPathIndex++;
-targetPosition = currentPath[currentPathIndex];
-hasPlannedAction = true;
-return;
-}
-}
-
-hasPlannedAction = false;
 }
 
 GameObject FindNearestFoodInGrid() {
@@ -1319,21 +1330,22 @@ Die(CauseOfDeath.Starvation);
 }
 }
 
-void UpdateFlashEffect() {
-if (flashRemainingTicks > 0 && spriteRenderer != null) {
-spriteRenderer.color = definition.damageFlashColor;
-} else if (isFlashing && spriteRenderer != null) {
-spriteRenderer.color = originalColor;
-isFlashing = false;
-}
-}
-
 pub enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
 
 void Die(CauseOfDeath cause) {
 Debug.Log($"[{SpeciesName}] died: {cause}", gameObject);
 isDying = true;
 deathFadeRemainingTicks = definition.deathFadeTicks;
+}
+
+void UpdateFlashEffect() {
+if (flashRemainingTicks > 0 && spriteRenderer != null) {
+spriteRenderer.color = definition.damageFlashColor;
+}
+else if (isFlashing && spriteRenderer != null) {
+spriteRenderer.color = originalColor;
+isFlashing = false;
+}
 }
 
 void UpdateDeathFade() {
@@ -1365,19 +1377,11 @@ ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>(
 if (bubble) {
 bubble.Initialize(line, spawnT, 2f);
 thoughtCooldownTick = definition.thoughtCooldownTicks;
-} else {
+}
+else {
 Destroy(bubbleGO);
 }
 }
-}
-
-void Update() {
-if (!enabled || isDying) return;
-
-bool showStats = Input.GetKey(showStatsKey);
-SetStatsTextVisibility(showStats);
-
-UpdateSpriteFlipping();
 }
 
 void UpdateSpriteFlipping() {
@@ -1426,7 +1430,7 @@ hpText = null;
 if (hungerText == null) {
 TextMeshProUGUI[] allTexts = GetComponentsInChildren<TextMeshProUGUI>(true);
 foreach (var text in allTexts) {
-if (text != hpText) {
+if (text != hpText) // Find the other text component {
 hungerText = text;
 break;
 }
@@ -1442,6 +1446,7 @@ if (hungerText != null) hungerText.gameObject.SetActive(visible);
 pub GridPosition GetCurrentGridPosition() {
 ret gridEntity?.Position ?? GridPosition.Zero;
 }
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -1528,18 +1533,24 @@ pub List<string> lines;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Effects\FireflyController.cs
 
-﻿// Assets\Scripts\Ecosystem\Effects\FireflyController.cs
+﻿using UnityEngine;
 using WegoSystem;
 using UnityEngine.Rendering.Universal;
 
 pub cls FireflyController : MonoBehaviour, ITickUpdateable {
 [SerializeField] FireflyDefinition definition;
+
 [SerializeField] Light2D glowLight;
+[SerializeField] Light2D groundLight;
 [SerializeField] SpriteRenderer spriteRenderer;
 [SerializeField] TrailRenderer trailRenderer;
 [SerializeField] ParticleSystem glowParticles;
 
+[SerializeField] float groundLightMaxHeight = 0.8f;
+[SerializeField] float groundLightRadiusMultiplier = 2.5f;
+
 GridEntity gridEntity;
+
 int currentAgeTicks = 0;
 int lifetimeTicks;
 int lastMovementTick = 0;
@@ -1547,15 +1558,13 @@ int spawnEffectRemainingTicks = 0;
 
 Vector3 currentTileCenter;
 Vector3 localTargetPosition;
-float localMovementAngle;
 float currentLocalSpeed;
-float tileSize = 1f;
-float maxLocalOffset;
 
 float baseGlowIntensity;
 float currentGlowIntensity;
+float baseGroundLightIntensity;
+float baseGroundLightOuterRadius;
 float glowFlickerTime;
-
 Color originalColor;
 
 pub bool IsAlive { get; set; } = true;
@@ -1564,18 +1573,24 @@ pub Transform AttractionTarget { get; set; }
 void Awake() {
 gridEntity = GetComponent<GridEntity>();
 if (gridEntity == null) {
-gridEntity = gameObject.AddComponent<GridEntity>();
+Debug.LogError($"[FireflyController] Firefly prefab is missing the required GridEntity component!", this);
+enabled = false;
+return;
 }
 
 if (glowLight != null) {
 baseGlowIntensity = glowLight.intensity;
-currentGlowIntensity = baseGlowIntensity;
+currentGlowIntensity = glowLight.intensity;
 }
 
 if (spriteRenderer != null) {
 originalColor = spriteRenderer.color;
 }
 
+if (groundLight != null) {
+baseGroundLightIntensity = groundLight.intensity;
+baseGroundLightOuterRadius = groundLight.pointLightOuterRadius;
+}
 }
 
 void Start() {
@@ -1591,8 +1606,8 @@ TickManager.Instance.UnregisterTickUpdateable(this);
 }
 
 pub void Initialize() {
-if (definition == null) {
-Debug.LogError("[FireflyController] No FireflyDefinition assigned!", this);
+if (definition == null || gridEntity == null) {
+Debug.LogError("[FireflyController] Initialization failed: Missing definition or GridEntity!", this);
 enabled = false;
 return;
 }
@@ -1604,21 +1619,11 @@ spawnEffectRemainingTicks = definition.spawnEffectTicks;
 }
 
 if (GridPositionManager.Instance != null) {
-var grid = GridPositionManager.Instance.GetTilemapGrid();
-if (grid != null) {
-tileSize = grid.cellSize.x; // Assuming square tiles
-maxLocalOffset = tileSize * definition.localMovementRadius;
-}
-}
-
-UpdateTileCenter();
-localMovementAngle = Random.Range(0f, 360f);
-UpdateLocalTargetPosition();
-
-if (GridPositionManager.Instance != null) {
 GridPositionManager.Instance.SnapEntityToGrid(gameObject);
 }
 
+UpdateTileCenter();
+UpdateLocalTargetPosition();
 ApplyVisualState(0f);
 }
 
@@ -1632,7 +1637,7 @@ Die();
 return;
 }
 
-UpdateLifetimeFade();
+UpdateLifetimeVisuals();
 
 if (spawnEffectRemainingTicks > 0) {
 spawnEffectRemainingTicks--;
@@ -1651,14 +1656,16 @@ HandleGlowAndFlicker();
 }
 
 void MakeMovementDecision() {
-GridPosition bestPosition = gridEntity.Position;
-float bestScore = EvaluateTile(gridEntity.Position);
+if (gridEntity == null) return;
 
-var nearbyPositions = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, definition.tileSearchRadius, true);
+GridPosition currentPos = gridEntity.Position;
+GridPosition bestPosition = currentPos;
+float bestScore = EvaluateTile(currentPos);
+
+var nearbyPositions = GridRadiusUtility.GetTilesInCircle(currentPos, definition.tileSearchRadius, true);
 
 foreach (var pos in nearbyPositions) {
-if (!GridPositionManager.Instance.IsPositionValid(pos) ||
-GridPositionManager.Instance.IsPositionOccupied(pos)) {
+if (!GridPositionManager.Instance.IsPositionValid(pos)) {
 continue;
 }
 
@@ -1669,17 +1676,15 @@ bestPosition = pos;
 }
 }
 
-if (bestPosition != gridEntity.Position) {
+if (bestPosition != currentPos) {
 gridEntity.SetPosition(bestPosition);
 UpdateTileCenter();
 }
 }
 
 float EvaluateTile(GridPosition tilePos) {
-float score = Random.Range(0f, 1f); // Base randomness
-
+float score = Random.Range(0f, 1f);
 var tilesInRange = GridRadiusUtility.GetTilesInCircle(tilePos, definition.tileSearchRadius);
-
 Transform bestTarget = null;
 float bestTargetScore = 0f;
 
@@ -1691,82 +1696,69 @@ foreach (var hit in hits) {
 ScentSource scent = hit.GetComponent<ScentSource>();
 if (scent != null && scent.definition != null &&
 definition.attractiveScentDefinitions.Contains(scent.definition)) {
-GridPosition scentGridPos = GridPositionManager.Instance.WorldToGrid(hit.transform.position);
-int distance = tilePos.ManhattanDistance(scentGridPos);
+GridEntity scentEntity = scent.GetComponent<GridEntity>();
+if (scentEntity != null) {
+int distance = tilePos.ManhattanDistance(scentEntity.Position);
 float distanceScore = 1f - (distance / (float)definition.tileSearchRadius);
 float scentScore = distanceScore * scent.EffectiveStrength;
-
 if (scentScore > bestTargetScore) {
 bestTargetScore = scentScore;
 bestTarget = hit.transform;
 }
 }
-
+}
 PlantGrowth plant = hit.GetComponent<PlantGrowth>();
 if (plant != null && plant.CurrentState == PlantState.Growing) {
 score += definition.growingPlantAttraction;
 }
 }
 }
-
 this.AttractionTarget = bestTarget;
 score += bestTargetScore * definition.scentAttractionWeight;
-
 ret score;
 }
 
 void UpdateTileCenter() {
-if (GridPositionManager.Instance != null) {
+if (GridPositionManager.Instance != null && gridEntity != null) {
 currentTileCenter = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
 }
 }
 
 void UpdateLocalTargetPosition() {
-localMovementAngle += Random.Range(-definition.localMovementTurnSpeed, definition.localMovementTurnSpeed) * Time.deltaTime;
-
-Vector2 direction = new Vector2(Mathf.Cos(localMovementAngle * Mathf.Deg2Rad),
-Mathf.Sin(localMovementAngle * Mathf.Deg2Rad));
-
-float targetDistance = Random.Range(maxLocalOffset * 0.5f, maxLocalOffset);
-localTargetPosition = currentTileCenter + (Vector3)(direction * targetDistance);
-
+if (definition == null) return;
+Vector3 flightBoxCenter = currentTileCenter + new Vector3(0, definition.flightBounds.y / 2f, 0);
+float randomX = Random.Range(-definition.flightBounds.x / 2f, definition.flightBounds.x / 2f);
+float randomY = Random.Range(-definition.flightBounds.y / 2f, definition.flightBounds.y / 2f);
+localTargetPosition = flightBoxCenter + new Vector3(randomX, randomY, 0);
 currentLocalSpeed = Random.Range(definition.minLocalSpeed, definition.maxLocalSpeed);
 }
 
 void UpdateLocalMovement() {
+if (definition == null) return;
 Vector3 toTarget = localTargetPosition - transform.position;
-float distanceToTarget = toTarget.magnitude;
-
-if (distanceToTarget < 0.1f) {
+if (toTarget.magnitude < 0.1f) {
 UpdateLocalTargetPosition();
 }
 else {
-Vector3 movement = toTarget.normalized * currentLocalSpeed * Time.deltaTime;
-Vector3 newPosition = transform.position + movement;
-Vector3 fromCenter = newPosition - currentTileCenter;
-
-if (fromCenter.magnitude > maxLocalOffset) {
-fromCenter = fromCenter.normalized * maxLocalOffset;
-newPosition = currentTileCenter + fromCenter;
-UpdateLocalTargetPosition();
+transform.position += toTarget.normalized * currentLocalSpeed * Time.deltaTime;
 }
-transform.position = newPosition;
-}
+Vector3 flightBoxCenter = currentTileCenter + new Vector3(0, definition.flightBounds.y / 2f, 0);
+Vector3 positionRelativeToFlightBox = transform.position - flightBoxCenter;
+positionRelativeToFlightBox.x = Mathf.Clamp(positionRelativeToFlightBox.x, -definition.flightBounds.x / 2f, definition.flightBounds.x / 2f);
+positionRelativeToFlightBox.y = Mathf.Clamp(positionRelativeToFlightBox.y, -definition.flightBounds.y / 2f, definition.flightBounds.y / 2f);
+transform.position = flightBoxCenter + positionRelativeToFlightBox;
 }
 
-void UpdateLifetimeFade() {
+void UpdateLifetimeVisuals() {
+float overallIntensity = 1f;
 if (currentAgeTicks < definition.fadeInTicks) {
-float fadeProgress = (float)currentAgeTicks / definition.fadeInTicks;
-ApplyVisualState(fadeProgress);
+overallIntensity = (float)currentAgeTicks / definition.fadeInTicks;
 }
 else if (currentAgeTicks > lifetimeTicks - definition.fadeOutTicks) {
 int fadeOutTicksElapsed = currentAgeTicks - (lifetimeTicks - definition.fadeOutTicks);
-float fadeProgress = 1f - ((float)fadeOutTicksElapsed / definition.fadeOutTicks);
-ApplyVisualState(fadeProgress);
+overallIntensity = 1f - ((float)fadeOutTicksElapsed / definition.fadeOutTicks);
 }
-else {
-ApplyVisualState(1f);
-}
+ApplyVisualState(overallIntensity);
 }
 
 void ApplyVisualState(float intensity) {
@@ -1775,12 +1767,10 @@ Color color = originalColor;
 color.a = originalColor.a * intensity;
 spriteRenderer.color = color;
 }
-
 if (glowLight != null) {
 glowLight.intensity = baseGlowIntensity * intensity;
 currentGlowIntensity = glowLight.intensity;
 }
-
 if (trailRenderer != null) {
 Color startColor = trailRenderer.startColor;
 Color endColor = trailRenderer.endColor;
@@ -1789,18 +1779,29 @@ endColor.a = 0f;
 trailRenderer.startColor = startColor;
 trailRenderer.endColor = endColor;
 }
-
 if (glowParticles != null) {
 var main = glowParticles.main;
 Color particleColor = main.startColor.color;
 particleColor.a = intensity * 0.7f;
 main.startColor = particleColor;
 }
+UpdateGroundLightEffect(intensity);
+}
+
+void UpdateGroundLightEffect(float overallIntensity) {
+if (groundLight == null) return;
+groundLight.transform.position = currentTileCenter;
+float height = Mathf.Max(0, transform.position.y - currentTileCenter.y);
+float t = Mathf.Clamp01(height / groundLightMaxHeight);
+float heightAdjustedIntensity = Mathf.Lerp(baseGroundLightIntensity, 0f, t);
+float heightAdjustedRadius = Mathf.Lerp(baseGroundLightOuterRadius, baseGroundLightOuterRadius * groundLightRadiusMultiplier, t);
+groundLight.intensity = heightAdjustedIntensity * overallIntensity;
+groundLight.pointLightOuterRadius = heightAdjustedRadius;
+groundLight.enabled = spriteRenderer != null && spriteRenderer.enabled;
 }
 
 void HandleGlowAndFlicker() {
 if (glowLight == null || definition.glowFlickerAmount <= 0f) return;
-
 glowFlickerTime += Time.deltaTime * definition.glowFlickerSpeed;
 float flicker = Mathf.PerlinNoise(glowFlickerTime, 0f) * 2f - 1f;
 glowLight.intensity = currentGlowIntensity + (flicker * definition.glowFlickerAmount);
@@ -1808,15 +1809,8 @@ glowLight.intensity = currentGlowIntensity + (flicker * definition.glowFlickerAm
 
 void Die() {
 IsAlive = false;
-
-if (FireflyManager.Instance != null) {
-FireflyManager.Instance.ReportFireflyDespawned(this);
-}
-
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
-}
-
+if (FireflyManager.Instance != null) FireflyManager.Instance.ReportFireflyDespawned(this);
+if (TickManager.Instance != null) TickManager.Instance.UnregisterTickUpdateable(this);
 if (glowParticles != null) {
 glowParticles.Stop();
 Destroy(gameObject, glowParticles.main.duration);
@@ -1829,44 +1823,51 @@ Destroy(gameObject);
 void OnDrawGizmosSelected() {
 if (definition == null) return;
 
+float tileSize = 1f; // Assuming default for gizmos
+if (Application.isPlaying && GridPositionManager.Instance?.GetTilemapGrid() != null) {
+tileSize = GridPositionManager.Instance.GetTilemapGrid().cellSize.x;
+}
+
 Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
 Gizmos.DrawWireSphere(transform.position, definition.tileSearchRadius * tileSize);
 
+if (Application.isPlaying) {
+Vector3 flightBoxCenter = currentTileCenter + new Vector3(0, definition.flightBounds.y / 2f, 0);
 Gizmos.color = new Color(0f, 1f, 1f, 0.5f);
-Gizmos.DrawWireSphere(currentTileCenter, maxLocalOffset);
-
+Gizmos.DrawWireCube(flightBoxCenter, new Vector3(definition.flightBounds.x, definition.flightBounds.y, 0.1f));
 Gizmos.color = Color.yellow;
 Gizmos.DrawLine(transform.position, localTargetPosition);
+}
 }
 }
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Effects\FireflyDefinition.cs
 
-﻿// Assets\Scripts\Ecosystem\Effects\FireflyDefinition.cs
+﻿using System.Collections.Generic;
 
 pub cls FireflyDefinition : ScriptableObject {
-pub int movementTickInterval = 5;    // How often firefly decides to move tiles
-pub int tileSearchRadius = 3;        // How far to look for attraction targets
+pub int movementTickInterval = 5;
+pub int tileSearchRadius = 3;
 
-pub float localMovementRadius = 0.4f; // Fraction of tile size for wander radius
-pub float localMovementTurnSpeed = 90f; // Degrees per second
-pub float minLocalSpeed = 0.5f;       // Units per second within tile
-pub float maxLocalSpeed = 1.0f;       // Units per second within tile
+pub Vector2 flightBounds = new Vector2(0.4f, 0.4f); // This field replaces localMovementRadius
+pub float localMovementTurnSpeed = 90f;
+pub float minLocalSpeed = 0.5f;
+pub float maxLocalSpeed = 1.0f;
 
 pub int minLifetimeTicks = 40;
 pub int maxLifetimeTicks = 90;
 pub int fadeInTicks = 4;
 pub int fadeOutTicks = 8;
 
-pub float glowFlickerAmount = 0.2f;  // Intensity variance from base
-pub float glowFlickerSpeed = 5.0f;   // How fast the glow flickers
-pub bool useSpawnEffect = true;      // Use a visual effect on spawn
-pub int spawnEffectTicks = 3;        // How long the spawn effect lasts
+pub float glowFlickerAmount = 0.2f;
+pub float glowFlickerSpeed = 5.0f;
+pub bool useSpawnEffect = true;
+pub int spawnEffectTicks = 3;
 
 pub List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
-pub float scentAttractionWeight = 2.0f; // Multiplier for scent scores
-pub float growingPlantAttraction = 1.0f; // Bonus score for being near a growing plant
+pub float scentAttractionWeight = 2.0f;
+pub float growingPlantAttraction = 1.0f;
 }
 
 ////////////////////////////////////////////////////////////
@@ -4782,7 +4783,7 @@ if (plantGrid != null) {
 int radiusTiles = Mathf.CeilToInt(fireflyManagerInstance.photosynthesisRadius);
 
 int nearbyFlyCount = 0;
-var fireflies = Object.FindObjectsOfType<FireflyController>();
+var fireflies = Object.FindObjectsByType<FireflyController>(FindObjectsSortMode.None);
 
 foreach (var firefly in fireflies) {
 GridEntity fireflyGrid = firefly.GetComponent<GridEntity>();
@@ -4840,7 +4841,7 @@ pub PlantState CurrentState { get; set; } = PlantState.Initializing;
 
 [SerializeField] pub bool showGrowthPercentage = true; // This is the only UI setting needed now
 
-[SerializeField] bool allowPhotosynthesisDuringGrowth = false;
+[SerializeField] pub bool allowPhotosynthesisDuringGrowth = false;
 
 void Awake() {
 InitializeComponents();
@@ -5115,6 +5116,10 @@ Debug.Log($"[{plant.gameObject.name}] Growth stats: TargetStem={TargetStemLength
 pub void OnTickUpdate(int currentTick) {
 switch (plant.CurrentState) {
 case PlantState.Growing:
+if (plant.allowPhotosynthesisDuringGrowth) {
+plant.EnergySystem.AccumulateEnergyTick();
+}
+
 float growthMultiplier = 1.0f;
 if (PlantGrowthModifierManager.Instance != null) {
 growthMultiplier = PlantGrowthModifierManager.Instance.GetGrowthSpeedMultiplier(plant);
@@ -9438,25 +9443,22 @@ if (tileInteractionManager == null) tileInteractionManager = TileInteractionMana
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\GardenerController.cs
 
-﻿// Assets\Scripts\WorldInteraction\Player\GardenerController.cs
-
+﻿using UnityEngine;
 using WegoSystem;
 
-pub cls GardenerController : MonoBehaviour, ITickUpdateable {
-
+pub cls GardenerController : MonoBehaviour {
 pub bool flipSpriteWhenMovingLeft = true;
 pub bool flipHorizontalDirection = true;
-
 pub bool useAnimations = true;
 pub string runningParameterName = "isRunning";
-pub string plantingTriggerName = "plantTrigger"; // Changed from a bool parameter name
+pub string plantingTriggerName = "plantTrigger";
 
 GridEntity gridEntity;
-GridPosition currentTargetPosition;
-
 SortableEntity sortableEntity;
 SpriteRenderer spriteRenderer;
 Animator animator;
+
+GridPosition currentTargetPosition;
 
 void Awake() {
 sortableEntity = GetComponent<SortableEntity>();
@@ -9479,27 +9481,17 @@ gridEntity = gameObject.AddComponent<GridEntity>();
 }
 }
 
-void Start() {
-
-if (TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-}
+void Update() {
+if (RunManager.Instance != null && RunManager.Instance.CurrentState == RunState.GrowthAndThreat) {
+HandlePlayerInput();
 }
 
-void OnDestroy() {
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
-}
+UpdateAnimations();
+UpdateSpriteDirection();
 }
 
-pub void OnTickUpdate(int currentTick) {
-if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.Planning) {
-HandleImmediateWegoMovement();
-}
-}
-
-void HandleImmediateWegoMovement() {
-if (gridEntity == null) return;
+void HandlePlayerInput() {
+if (gridEntity == null || gridEntity.IsMoving) return;
 
 GridPosition moveDir = GridPosition.Zero;
 
@@ -9509,7 +9501,12 @@ else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) mov
 else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) moveDir = GridPosition.Right;
 
 if (moveDir != GridPosition.Zero) {
-GridPosition targetPos = gridEntity.Position + moveDir;
+TryMove(moveDir);
+}
+}
+
+void TryMove(GridPosition direction) {
+GridPosition targetPos = gridEntity.Position + direction;
 
 if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
 GridPositionManager.Instance.IsPositionValid(targetPos) &&
@@ -9517,14 +9514,13 @@ GridPositionManager.Instance.IsPositionValid(targetPos) &&
 int moveCost = PlayerActionManager.Instance.GetMovementTickCost(transform.position, this);
 
 gridEntity.SetPosition(targetPos);
-currentTargetPosition = targetPos;
+currentTargetPosition = targetPos; // Update target for sprite flipping
 
 TickManager.Instance.AdvanceMultipleTicks(moveCost);
 Debug.Log($"[GardenerController] Moved to {targetPos}. Advanced game by {moveCost} tick(s).");
 }
 else {
 Debug.Log($"[GardenerController] Move to {targetPos} is invalid or blocked.");
-}
 }
 }
 
@@ -9536,20 +9532,14 @@ animator.SetBool(runningParameterName, isMoving);
 }
 
 void UpdateSpriteDirection() {
-if (spriteRenderer == null || !flipSpriteWhenMovingLeft) return;
+if (spriteRenderer == null || !flipSpriteWhenMovingLeft || gridEntity == null || !gridEntity.IsMoving) return;
 
-Vector2 directionToCheck = Vector2.zero;
-if (gridEntity != null && GridPositionManager.Instance != null) {
 Vector3 worldTarget = GridPositionManager.Instance.GridToWorld(currentTargetPosition);
 Vector3 currentWorld = transform.position;
+Vector2 directionToCheck = (worldTarget - currentWorld).normalized;
 
-if (Vector3.Distance(worldTarget, currentWorld) > 0.01f) {
-directionToCheck = (worldTarget - currentWorld).normalized;
-}
-}
-
-if (directionToCheck.x != 0) {
-bool shouldFlip = (directionToCheck.x < 0);
+if (Mathf.Abs(directionToCheck.x) > 0.01f) {
+bool shouldFlip = directionToCheck.x < 0;
 if (flipHorizontalDirection) {
 spriteRenderer.flipX = shouldFlip;
 }
@@ -9570,7 +9560,6 @@ animator.SetTrigger(plantingTriggerName);
 pub GridPosition GetCurrentGridPosition() {
 ret gridEntity?.Position ?? GridPosition.Zero;
 }
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -10057,7 +10046,7 @@ SeedPouch // New tool type
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridEntity.cs
 
-﻿// Assets/Scripts/Ticks/GridEntity.cs
+﻿using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -10065,14 +10054,14 @@ using UnityEditor;
 
 namespace WegoSystem {
 pub cls GridEntity : MonoBehaviour {
+pub bool isTileOccupant = true;
 
 GridPosition gridPosition;
 
-Vector3 groundPointOffset = Vector3.zero;
-Vector3 visualOffset = Vector3.zero;
-
-float visualInterpolationSpeed = 5f;
-AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+[SerializeField] Vector3 groundPointOffset = Vector3.zero;
+[SerializeField] Vector3 visualOffset = Vector3.zero;
+[SerializeField] float visualInterpolationSpeed = 5f;
+[SerializeField] AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
 GridPosition previousGridPosition;
 Vector3 visualStartPosition;
@@ -10094,7 +10083,6 @@ OnGridPositionChanged();
 pub GridPosition PreviousPosition => previousGridPosition;
 pub bool IsMoving => isMoving;
 pub float MovementProgress => movementProgress;
-
 pub Vector3 GroundWorldPosition => transform.position + groundPointOffset;
 
 pub event Action<GridPosition, GridPosition> OnPositionChanged;
@@ -10102,7 +10090,6 @@ pub event Action<GridPosition> OnMovementComplete;
 pub event Action OnMovementStart;
 
 prot virt void Start() {
-
 visualStartPosition = transform.position;
 visualTargetPosition = transform.position;
 previousGridPosition = gridPosition;
@@ -10149,8 +10136,10 @@ Gizmos.DrawSphere(gridCenter, 0.08f);
 prot virt void OnGridPositionChanged() {
 visualStartPosition = transform.position;
 
+if (GridPositionManager.Instance != null) {
 Vector3 groundTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
 visualTargetPosition = groundTargetPosition - groundPointOffset + visualOffset;
+}
 
 movementProgress = 0f;
 
@@ -10402,7 +10391,10 @@ position.y >= -gridBounds.y / 2 && position.y < gridBounds.y / 2;
 }
 
 pub bool IsPositionOccupied(GridPosition position) {
-ret entitiesByPosition.ContainsKey(position) && entitiesByPosition[position].Count > 0;
+if (entitiesByPosition.TryGetValue(position, out var entities)) {
+ret entities.Any(entity => entity.isTileOccupant);
+}
+ret false;
 }
 
 pub void RegisterEntity(GridEntity entity) {
@@ -10538,17 +10530,17 @@ openSet.Remove(current);
 closedSet.Add(current);
 
 foreach (var neighbor in current.GetNeighbors(allowDiagonal)) {
-if (!IsPositionValid(neighbor) || IsPositionOccupied(neighbor) || closedSet.Contains(neighbor)) {
+if (!IsPositionValid(neighbor) || closedSet.Contains(neighbor) || (neighbor != end && IsPositionOccupied(neighbor))) {
 continue;
 }
 
-float tentativeGScore = gScore[current] + 1;
+float tentativeGScore = gScore[current] + 1; // Assuming cost of 1 per tile
 
 if (!openSet.Contains(neighbor)) {
 openSet.Add(neighbor);
 }
 else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor]) {
-continue;
+continue; // This path is not better
 }
 
 cameFrom[neighbor] = current;
@@ -10598,7 +10590,7 @@ Debug.Log($"[GridPositionManager] Snapped {entity.name} to grid {gridEntity.Posi
 }
 
 pub void SnapAllEntitiesToGrid<T>() where T : Component {
-T[] entities = FindObjectsOfType<T>();
+T[] entities = FindObjectsByType<T>(FindObjectsSortMode.None);
 foreach (var entity in entities) {
 SnapEntityToGrid(entity.gameObject);
 }
