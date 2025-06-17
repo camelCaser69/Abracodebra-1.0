@@ -78,24 +78,29 @@ public class InventoryBarController : MonoBehaviour
         UniversalTooltipManager.Instance?.HideTooltip();
     }
     
-    private void SetupBarCells()
-    {
+    void SetupBarCells() {
         foreach (Transform child in cellContainer) Destroy(child.gameObject);
         barCells.Clear();
-        
+
         GridLayoutGroup gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
         gridLayout.cellSize = cellSize;
         gridLayout.spacing = new Vector2(cellMargin, cellMargin);
         gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         gridLayout.constraintCount = slotsPerRow;
 
-        for (int i = 0; i < slotsPerRow; i++)
-        {
+        for (int i = 0; i < slotsPerRow; i++) {
             GameObject cellGO = new GameObject($"BarCell_{i}", typeof(RectTransform));
             cellGO.transform.SetParent(cellContainer, false);
             Image cellImage = cellGO.AddComponent<Image>();
             cellImage.sprite = emptyCellSprite;
-            cellImage.color = emptyCellColor;
+        
+            // Use the inventory's empty cell color for consistency
+            if (inventoryGridController != null) {
+                cellImage.color = inventoryGridController.EmptyCellColor;
+            } else {
+                cellImage.color = emptyCellColor;
+            }
+        
             NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
             cellLogic.Init(i, inventoryGridController, cellImage);
             barCells.Add(cellLogic);
@@ -109,33 +114,38 @@ public class InventoryBarController : MonoBehaviour
         currentRow = Mathf.Clamp(currentRow, 0, totalRows - 1);
     }
     
-    private void UpdateBarDisplay()
-    {
+    void UpdateBarDisplay() {
         if (inventoryGridController == null || barCells == null) return;
-        foreach (var cell in barCells) { cell.RemoveNode(); }
+    
+        // Clear all bar cells first and reset their colors
+        foreach (var cell in barCells) { 
+            cell.RemoveNode(); 
+        
+            // Reset to empty cell color
+            Image cellImage = cell.GetComponent<Image>();
+            if (cellImage != null && inventoryGridController != null) {
+                cellImage.color = inventoryGridController.EmptyCellColor;
+            }
+        }
 
         int startIndexInMainInventory = currentRow * inventoryGridController.inventoryColumns;
-        
-        for (int i = 0; i < slotsPerRow; i++)
-        {
+
+        for (int i = 0; i < slotsPerRow; i++) {
             if (i >= inventoryGridController.inventoryColumns) break;
             int inventoryIndexToDisplay = startIndexInMainInventory + i;
             if (inventoryIndexToDisplay >= inventoryGridController.TotalSlots) continue;
 
             NodeCell inventoryCell = inventoryGridController.GetInventoryCellAtIndex(inventoryIndexToDisplay);
-            // --- MODIFIED: Use HasItem() ---
-            if (inventoryCell != null && inventoryCell.HasItem())
-            {
+            if (inventoryCell != null && inventoryCell.HasItem()) {
                 CopyInventoryItemToBarCell(inventoryCell, barCells[i]);
             }
         }
-        
+
         if (upArrowButton != null) upArrowButton.interactable = currentRow > 0;
         if (downArrowButton != null) downArrowButton.interactable = currentRow < totalRows - 1;
     }
     
-    private void CopyInventoryItemToBarCell(NodeCell inventoryCell, NodeCell barCell)
-    {
+    void CopyInventoryItemToBarCell(NodeCell inventoryCell, NodeCell barCell) {
         NodeData nodeData = inventoryCell.GetNodeData();
         ToolDefinition toolDef = inventoryCell.GetToolDefinition();
         NodeDefinition nodeDef = inventoryCell.GetNodeDefinition();
@@ -144,21 +154,25 @@ public class InventoryBarController : MonoBehaviour
         display.transform.SetParent(barCell.transform, false);
         Image displayImage = display.GetComponent<Image>();
         displayImage.raycastTarget = false;
-        
-        if (toolDef != null)
-        {
+
+        if (toolDef != null) {
             displayImage.sprite = toolDef.icon;
             displayImage.color = toolDef.iconTint;
         }
-        else if (nodeDef != null)
-        {
+        else if (nodeDef != null) {
             displayImage.sprite = nodeDef.thumbnail;
             displayImage.color = nodeDef.thumbnailTintColor;
         }
-        
+
         display.transform.localScale = Vector3.one * InventoryGridController.Instance.NodeGlobalImageScale;
         display.GetComponent<RectTransform>().sizeDelta = cellSize * 0.8f;
-        
+
+        // Apply the cell background tint
+        if (barCell.GetComponent<Image>() != null && InventoryColorManager.Instance != null) {
+            Color cellColor = InventoryColorManager.Instance.GetCellColorForItem(nodeData, nodeDef, toolDef);
+            barCell.GetComponent<Image>().color = cellColor;
+        }
+
         barCell.AssignDisplayOnly(display, nodeData, toolDef);
     }
 

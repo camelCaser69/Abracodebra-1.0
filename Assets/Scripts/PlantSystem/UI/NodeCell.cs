@@ -54,6 +54,15 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             _backgroundImage.color = _sequenceController != null ? _sequenceController.EmptyCellColor : Color.magenta;
         }
     }
+    
+    public void UpdateCellBackgroundColor()
+    {
+        if (_backgroundImage != null && HasItem() && InventoryColorManager.Instance != null)
+        {
+            Color cellColor = InventoryColorManager.Instance.GetCellColorForItem(_nodeData, _nodeDefinition, _toolDefinition);
+            _backgroundImage.color = cellColor;
+        }
+    }
 
     public bool HasItem() => _itemView != null || _displayObject != null;
     public NodeData GetNodeData() => _nodeData;

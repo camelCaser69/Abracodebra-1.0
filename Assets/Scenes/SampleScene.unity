@@ -3280,14 +3280,10 @@ MonoBehaviour:
   startNewPlanningPhaseButton: {fileID: 157553981}
   wegoControlPanel: {fileID: 0}
   endPlanningPhaseButton: {fileID: 0}
-  autoAdvanceToggle: {fileID: 0}
-  tickSpeedSlider: {fileID: 0}
   currentPhaseText: {fileID: 0}
   tickCounterText: {fileID: 0}
   phaseProgressText: {fileID: 0}
   advanceTickButton: {fileID: 0}
-  wegoSystemToggle: {fileID: 0}
-  systemModeText: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -15536,7 +15532,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultGrowthSpeedMultiplier: 0.5
   defaultEnergyRechargeMultiplier: 0.5
-  tileUpdateInterval: 1
   tileModifiers:
   - tileDefinition: {fileID: 11400000, guid: 2efc2db88b0caff4693943889a86ccac, type: 2}
     growthSpeedMultiplier: 1
@@ -16393,6 +16388,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1351473040}
   - component: {fileID: 1351473041}
+  - component: {fileID: 1351473042}
   m_Layer: 0
   m_Name: Manager_Inventory
   m_TagString: Untagged
@@ -16442,6 +16438,23 @@ MonoBehaviour:
   cellContainer: {fileID: 1101570886}
   _rootCanvas: {fileID: 218169671}
   logInventoryChanges: 1
+--- !u!114 &1351473042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1351473039}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d3a9e23460cb45c8b27d1ea3bea54c12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toolCellColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  seedCellColor: {r: 0.1509434, g: 0.1509434, b: 0.1509434, a: 1}
+  passiveGeneCellColor: {r: 0.8700099, g: 1, b: 0.43867922, a: 1}
+  activeGeneCellColor: {r: 0.94509804, g: 0.32549024, b: 0.5551241, a: 1}
+  defaultCellColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1359589579
 GameObject:
   m_ObjectHideFlags: 0
@@ -20845,7 +20858,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9ecc97e1d1d43649fa486c4178a0afc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useWegoSystem: 1
   dayNightCycleEnabled: 1
   transitionCurve:
     serializedVersion: 2
@@ -20938,7 +20950,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce0aaa6e043a4b92a2e72718f99ac586, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  useWegoSystem: 1
   currentState: 0
   currentRoundNumber: 1
   weatherManager: {fileID: 1966203507}

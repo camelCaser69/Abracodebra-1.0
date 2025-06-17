@@ -73,24 +73,20 @@ public class ItemView : MonoBehaviour, IPointerDownHandler
         SetupVisuals();
     }
 
-    private void SetupVisuals()
-    {
+    void SetupVisuals() {
         UpdateParentCellReference();
         _tooltipTrigger = GetComponent<TooltipTrigger>() ?? gameObject.AddComponent<TooltipTrigger>();
 
         float globalScaleFactor = 1f;
         float raycastPaddingValue = 0f;
-        if (InventoryGridController.Instance != null)
-        {
+        if (InventoryGridController.Instance != null) {
             globalScaleFactor = InventoryGridController.Instance.NodeGlobalImageScale;
             raycastPaddingValue = InventoryGridController.Instance.NodeImageRaycastPadding;
         }
-        
+
         Vector4 raycastPaddingVector = new Vector4(raycastPaddingValue, raycastPaddingValue, raycastPaddingValue, raycastPaddingValue);
-        
-        // Assign Thumbnail
-        if (thumbnailImage != null)
-        {
+
+        if (thumbnailImage != null) {
             thumbnailImage.sprite = (_displayType == DisplayType.Node) ? _nodeDefinition.thumbnail : _toolDefinition.icon;
             thumbnailImage.color = (_displayType == DisplayType.Node) ? _nodeDefinition.thumbnailTintColor : _toolDefinition.iconTint;
             thumbnailImage.rectTransform.localScale = new Vector3(globalScaleFactor, globalScaleFactor, 1f);
@@ -99,11 +95,16 @@ public class ItemView : MonoBehaviour, IPointerDownHandler
             thumbnailImage.raycastPadding = raycastPaddingVector;
         }
 
-        // Assign Background
-        if (backgroundImage != null)
-        {
-            // Use the node's background color, or a default gray for tools
-            _originalBackgroundColor = (_displayType == DisplayType.Node) ? _nodeDefinition.backgroundColor : new Color(0.5f, 0.5f, 0.5f, 1f);
+        if (backgroundImage != null) {
+            // Use InventoryColorManager if available, otherwise fall back to definition colors
+            if (InventoryColorManager.Instance != null) {
+                _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(_nodeData, _nodeDefinition, _toolDefinition);
+            }
+            else {
+                // Fallback to original behavior
+                _originalBackgroundColor = (_displayType == DisplayType.Node) ? _nodeDefinition.backgroundColor : new Color(0.5f, 0.5f, 0.5f, 1f);
+            }
+        
             backgroundImage.color = _originalBackgroundColor;
             backgroundImage.enabled = true;
             backgroundImage.raycastTarget = true;

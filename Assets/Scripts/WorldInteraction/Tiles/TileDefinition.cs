@@ -14,7 +14,7 @@ public class TileDefinition : ScriptableObject
     
     [Header("Auto-Reversion (optional)")]
     [Tooltip("If > 0, after this many seconds, the tile reverts to 'revertToTile'.")]
-    public float revertAfterSeconds = 0f;
+    public int revertAfterTicks = 0;  // Changed from float revertAfterSeconds
 
     [Tooltip("If revertAfterSeconds > 0, tile reverts to this tile definition.")]
     public TileDefinition revertToTile;
@@ -28,23 +28,16 @@ public class TileDefinition : ScriptableObject
     public bool isWaterTile = false;
 
 #if UNITY_EDITOR
-    // This method will be called from the custom editor
-    public void UpdateColor()
-    {
-        // Find the TileInteractionManager in the scene using the non-deprecated method
+    public void UpdateColor() {
         var manager = UnityEngine.Object.FindAnyObjectByType<TileInteractionManager>();
         if (manager == null) return;
 
-        foreach (var mapping in manager.tileDefinitionMappings)
-        {
-            if (mapping.tileDef == this && mapping.tilemapModule != null)
-            {
+        foreach (var mapping in manager.tileDefinitionMappings) {
+            if (mapping.tileDef == this && mapping.tilemapModule != null) {
                 Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-                if (renderTilemapTransform != null)
-                {
+                if (renderTilemapTransform != null) {
                     Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
-                    if (renderTilemap != null)
-                    {
+                    if (renderTilemap != null) {
                         renderTilemap.color = tintColor;
                         UnityEditor.EditorUtility.SetDirty(renderTilemap);
                     }
