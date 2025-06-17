@@ -15,18 +15,20 @@ MonoBehaviour:
   movementTickInterval: 5
   tileSearchRadius: 3
   flightBounds: {x: 0.4, y: 1}
+  flightHeightOffset: 0.2
   localMovementTurnSpeed: 90
   minLocalSpeed: 0.3
   maxLocalSpeed: 0.6
   minLifetimeTicks: 40
   maxLifetimeTicks: 90
-  fadeInTicks: 2
-  fadeOutTicks: 4
+  fadeInSeconds: 1.5
+  fadeOutSeconds: 2.5
   glowFlickerAmount: 0.2
   glowFlickerSpeed: 5
-  useSpawnEffect: 0
-  spawnEffectTicks: 3
+  groundLightMinIntensity: 0.2
   attractiveScentDefinitions:
   - {fileID: 11400000, guid: caaf706f86468d545951ef96005f0761, type: 2}
   scentAttractionWeight: 2
   growingPlantAttraction: 1
+  useSpawnEffect: 0
+  spawnEffectTicks: 3
