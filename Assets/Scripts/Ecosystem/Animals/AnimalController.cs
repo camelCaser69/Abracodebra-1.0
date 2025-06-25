@@ -8,7 +8,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 {
     #region Fields and Properties
 
-    [Header("Configuration")]
     [SerializeField] public AnimalDefinition definition;
     [SerializeField] private GameObject thoughtBubblePrefab;
     [SerializeField] private Transform bubbleSpawnTransform;
@@ -16,7 +15,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     [SerializeField] private List<GameObject> poopPrefabs;
     [SerializeField] private Animator animator;
 
-    [Header("UI & Debug")]
+    [Header("UI Debug")]
     [SerializeField] private TextMeshProUGUI hpText;
     [SerializeField] private TextMeshProUGUI hungerText;
     [SerializeField] private KeyCode showStatsKey = KeyCode.LeftAlt;
@@ -27,7 +26,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
     public int thinkingTickInterval = 3;
 
-    // State Variables
     private GridPosition targetPosition;
     private GameObject currentTargetFood = null;
     private bool hasPlannedAction = false;
@@ -35,7 +33,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     private List<GridPosition> currentPath = new List<GridPosition>();
     private int currentPathIndex = 0;
 
-    // Tick Counters
     private int hungerTick = 0;
     private int poopDelayTick = 0;
     private int currentPoopCooldownTick = 0;
@@ -46,7 +43,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     private int flashRemainingTicks = 0;
     private int wanderPauseTicks = 0;
 
-    // Status Flags & Values
     private float currentHealth;
     private float currentHunger;
     private bool isEating = false;
@@ -55,13 +51,11 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     private bool isDying = false;
     private bool isFlashing = false;
 
-    // Movement & Bounds
     private bool isSeekingScreenCenter = false;
     private Vector2 screenCenterTarget;
     private Vector2 minBounds;
     private Vector2 maxBounds;
 
-    // Components
     private Rigidbody2D rb;
     private SpriteRenderer spriteRenderer;
     private Collider2D animalCollider;
@@ -76,7 +70,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
     void Awake()
     {
-        ValidateComponents();
+        // ValidateComponents(); // DO NOT validate here. The 'definition' is not set until Initialize() is called.
         CacheComponents();
     }
 
@@ -195,13 +189,12 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
     #endregion
 
-    #region Tick Update & State Machine
+    #region Tick Updates & Decisions
 
     public void OnTickUpdate(int currentTick)
     {
         if (isDying) return;
 
-        // Decrement all active timers
         hungerTick++;
         if (poopDelayTick > 0) poopDelayTick--;
         if (thoughtCooldownTick > 0) thoughtCooldownTick--;
@@ -210,7 +203,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         if (wanderPauseTicks > 0) wanderPauseTicks--;
         if (flashRemainingTicks > 0) flashRemainingTicks--;
 
-        // Hunger and Starvation
         if (TickManager.Instance?.Config != null)
         {
             if (hungerTick >= TickManager.Instance.Config.animalHungerTickInterval)
@@ -230,7 +222,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             }
         }
 
-        // State-based actions
         if (isEating && eatRemainingTicks <= 0)
         {
             FinishEating();
@@ -241,20 +232,17 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             TryPoop();
         }
 
-        // Decision Making
         if (currentTick - lastThinkTick >= definition.thinkingTickInterval)
         {
             MakeDecision();
             lastThinkTick = currentTick;
         }
 
-        // Action Execution
         if (hasPlannedAction && !isEating && !isPooping && wanderPauseTicks <= 0)
         {
             ExecutePlannedAction();
         }
 
-        // Dying process
         if (deathFadeRemainingTicks > 0)
         {
             deathFadeRemainingTicks--;
@@ -265,7 +253,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             }
         }
 
-        // Visual updates
         UpdateAnimations();
         UpdateFlashEffect();
     }
@@ -292,7 +279,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     {
         if (gridEntity == null) return;
 
-        // Check if we arrived at a food target
         if (currentTargetFood != null && targetPosition == gridEntity.Position)
         {
             GridPosition foodPos = GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position);
@@ -305,12 +291,10 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             }
         }
 
-        // Move to the target position
         if (targetPosition != gridEntity.Position)
         {
             gridEntity.SetPosition(targetPosition);
 
-            // If we are following a path, update the next target
             if (currentPath.Count > 0 && currentPathIndex < currentPath.Count - 1)
             {
                 currentPathIndex++;
@@ -320,13 +304,12 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             }
         }
 
-        // Action is complete, clear the plan
         hasPlannedAction = false;
     }
 
     #endregion
 
-    #region Behavior Planning
+    #region Movement & Planning
 
     private void HandleScreenCenterSeeking()
     {
@@ -334,7 +317,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
         Vector2 currentPos = transform.position;
         bool centerWithinBounds = currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
-                                 currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
+                                  currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
 
         if (centerWithinBounds)
         {
@@ -359,7 +342,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             currentTargetFood = nearestFood;
             GridPosition foodGridPos = GridPositionManager.Instance.WorldToGrid(nearestFood.transform.position);
 
-            // Try to find a path
             currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGridPos);
             currentPathIndex = 0;
 
@@ -370,13 +352,11 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             }
             else
             {
-                // Fallback to simple directional movement if pathfinding fails
                 PlanMovementToward(foodGridPos);
             }
         }
         else
         {
-            // No food found, just wander
             PlanWandering();
         }
     }
@@ -421,7 +401,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         int dx = Mathf.Clamp(target.x - currentPos.x, -1, 1);
         int dy = Mathf.Clamp(target.y - currentPos.y, -1, 1);
 
-        // Prioritize diagonal movement if possible
         if (dx != 0 && dy != 0)
         {
             GridPosition diagonalTarget = currentPos + new GridPosition(dx, dy);
@@ -433,7 +412,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             }
         }
 
-        // Try horizontal move
         if (dx != 0)
         {
             GridPosition horizontalTarget = currentPos + new GridPosition(dx, 0);
@@ -445,7 +423,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             }
         }
 
-        // Try vertical move
         if (dy != 0)
         {
             GridPosition verticalTarget = currentPos + new GridPosition(0, dy);
@@ -457,7 +434,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             }
         }
 
-        // If all else fails, wander randomly
         PlanWandering();
     }
 
@@ -469,7 +445,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
     #endregion
 
-    #region Actions & Effects
+    #region Actions (Eating, Pooping, etc.)
 
     private GameObject FindNearestFoodInGrid()
     {
@@ -575,7 +551,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         Transform spawnT = poopSpawnPoint ? poopSpawnPoint : transform;
         GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity);
 
-        // Randomize poop appearance
         SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
         if (sr != null)
         {
@@ -594,12 +569,15 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         pc.Initialize();
     }
 
+    #endregion
+
+    #region Health & Damage
+
     private void ApplyStarvationDamage()
     {
         currentHealth -= definition.damagePerStarvationTick;
         currentHealth = Mathf.Max(0f, currentHealth);
 
-        // Trigger flash effect
         if (!isFlashing)
         {
             flashRemainingTicks = definition.damageFlashTicks;
@@ -622,10 +600,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         isDying = true;
         deathFadeRemainingTicks = definition.deathFadeTicks;
     }
-
-    #endregion
-
-    #region Visuals & UI
 
     private void UpdateFlashEffect()
     {
@@ -650,6 +624,10 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             spriteRenderer.color = c;
         }
     }
+
+    #endregion
+
+    #region UI & Visuals
 
     private bool CanShowThought()
     {
@@ -726,13 +704,11 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
     private void EnsureUITextReferences()
     {
-        // This logic helps find UI text if not explicitly assigned in the inspector
         if (hpText == null)
         {
             hpText = GetComponentInChildren<TextMeshProUGUI>(true);
             if (hpText != null && hpText.gameObject.name.Contains("Hunger"))
             {
-                // If the first one found is hunger, swap them
                 hungerText = hpText;
                 hpText = null;
             }
@@ -757,10 +733,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         if (hpText != null) hpText.gameObject.SetActive(visible);
         if (hungerText != null) hungerText.gameObject.SetActive(visible);
     }
-
-    #endregion
-
-    #region Public Getters
 
     public GridPosition GetCurrentGridPosition()
     {

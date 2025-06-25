@@ -13,7 +13,28 @@ MonoBehaviour:
   m_Name: Animal_000_Bunny
   m_EditorClassIdentifier: 
   animalName: Bunny
+  prefab: {fileID: 1618699628824306755, guid: bff8100a661511448a2c59532d7d9859, type: 3}
   maxHealth: 10
   movementSpeed: 1
+  thinkingTickInterval: 3
+  wanderPauseTickChance: 30
+  minWanderMoveTicks: 2
+  maxWanderMoveTicks: 6
+  minWanderPauseTicks: 1
+  maxWanderPauseTicks: 1
+  searchRadiusTiles: 5
+  eatDistanceTiles: 1
+  eatDurationTicks: 3
+  thoughtCooldownTicks: 10
+  starvationDamageTickInterval: 4
+  damagePerStarvationTick: 2
+  deathFadeTicks: 3
+  minPoopDelayTicks: 10
+  maxPoopDelayTicks: 20
+  poopCooldownTicks: 2
+  poopColorVariation: 0.1
+  damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  damageFlashTicks: 1
   diet: {fileID: 11400000, guid: 766f7dacca78d7646a516088c17e8f54, type: 2}
-  prefab: {fileID: 1618699628824306755, guid: bff8100a661511448a2c59532d7d9859, type: 3}
+  attractiveScentDefinitions: []
+  repellentScentDefinitions: []

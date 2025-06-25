@@ -190,13 +190,18 @@ public class WaveManager : MonoBehaviour {
         if (hasSpawnedForThisWeatherCycle) return;
 
         if (weatherManager == null) return;
+    
+        // Simplified spawn check - just spawn immediately at start of day phase
         WeatherManager.CyclePhase currentPhase = weatherManager.CurrentPhase;
-        float totalPhaseTime = weatherManager.CurrentTotalPhaseTime;
-        float remainingPhaseTime = weatherManager.CurrentPhaseTimer;
-        float progressPercent = (totalPhaseTime > 0) ? (1f - (remainingPhaseTime / totalPhaseTime)) * 100f : 0f;
-
-        if (currentPhase == spawnStartPhase && progressPercent >= spawnStartPercentage) {
-            TriggerFaunaSpawning();
+    
+        if (currentPhase == spawnStartPhase) {
+            float phaseProgress = weatherManager.GetPhaseProgress() * 100f;
+        
+            Debug.Log($"[WaveManager] Checking spawn: Phase={currentPhase}, Progress={phaseProgress:F1}%, Required={spawnStartPercentage}%");
+        
+            if (phaseProgress >= spawnStartPercentage) {
+                TriggerFaunaSpawning();
+            }
         }
     }
 
