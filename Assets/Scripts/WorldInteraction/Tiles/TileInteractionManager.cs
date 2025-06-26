@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using System.Linq;
 using skner.DualGrid;
 using TMPro;
 using WegoSystem;
@@ -11,63 +11,61 @@ using UnityEditor;
 #endif
 
 public class TileInteractionManager : MonoBehaviour, ITickUpdateable {
-    public static TileInteractionManager Instance { get; set; }
-    
-    [System.Serializable] 
-    public class TileDefinitionMapping { 
-        public TileDefinition tileDef; 
-        public DualGridTilemapModule tilemapModule; 
+    public static TileInteractionManager Instance { get; private set; }
+
+    [System.Serializable]
+    public class TileDefinitionMapping {
+        public TileDefinition tileDef;
+        public DualGridTilemapModule tilemapModule;
     }
-    
-    [Header("Tile Definition Mappings")] 
-    public List<TileDefinitionMapping> tileDefinitionMappings;
-    
-    [Header("Interaction Library")] 
-    public TileInteractionLibrary interactionLibrary;
-    
-    [Header("Grid & Scene References")] 
-    public Grid interactionGrid; 
-    public Camera mainCamera; 
-    public Transform player; 
-    public float hoverRadius = 3f; 
-    public GameObject hoverHighlightObject;
-    
-    [Header("Tilemap Rendering Settings")] 
-    public int baseSortingOrder = 0;
-    
-    [Header("Debug / UI")] 
-    public bool debugLogs = false; 
-    public TextMeshProUGUI hoveredTileText; 
-    public TextMeshProUGUI currentToolText;
-    
-    Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
-    Dictionary<DualGridTilemapModule, TileDefinition> definitionByModule;
-    Vector3Int? currentlyHoveredCell = null;
-    TileDefinition hoveredTileDef = null;
-    
-    struct TimedTileState { 
-        public TileDefinition tileDef; 
+
+    [System.Serializable]
+    public struct TimedTileState {
+        public TileDefinition tileDef;
         public int ticksRemaining;
     }
-    Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
+
+    [Header("Core Setup")]
+    public List<TileDefinitionMapping> tileDefinitionMappings;
+    public TileInteractionLibrary interactionLibrary;
+    public Grid interactionGrid;
+    public Camera mainCamera;
+    public Transform player;
+    public float hoverRadius = 3f;
+
+    [Header("Hover Visual")]
+    public GameObject hoverHighlightObject;
+    public TileHoverColorManager hoverColorManager;
+
+    [Header("Rendering")]
+    public int baseSortingOrder = 0;
+
+    [Header("Debug")]
+    public bool debugLogs = false;
+    public TextMeshProUGUI hoveredTileText;
+    public TextMeshProUGUI currentToolText;
+
+    // Private variables
+    private Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
+    private Dictionary<DualGridTilemapModule, TileDefinition> definitionByModule;
+    private Vector3Int? currentlyHoveredCell;
+    private TileDefinition hoveredTileDef;
+    private Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
+    private SpriteRenderer hoverSpriteRenderer;
+    private bool isWithinInteractionRange = false;
 
     void Awake() {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
-
-        moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
-        definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
-
+        
         SetupTilemaps();
+        CacheHoverSpriteRenderer();
     }
 
     void Start() {
-        if (moduleByDefinition == null || moduleByDefinition.Count == 0 || definitionByModule == null || definitionByModule.Count == 0) {
-            Debug.LogWarning("[TileInteractionManager Start] Dictionaries were empty or null, re-running SetupTilemaps.");
-            SetupTilemaps();
-        }
-
-        // Register with TickManager
         if (TickManager.Instance != null) {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
@@ -77,26 +75,34 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable {
         if (TickManager.Instance != null) {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
+        if (Instance == this) Instance = null;
     }
 
-    // Implement ITickUpdateable
+    private void CacheHoverSpriteRenderer() {
+        if (hoverHighlightObject != null) {
+            hoverSpriteRenderer = hoverHighlightObject.GetComponent<SpriteRenderer>();
+            if (hoverSpriteRenderer == null) {
+                Debug.LogWarning("[TileInteractionManager] hoverHighlightObject has no SpriteRenderer component. Color management will not work.", this);
+            }
+        }
+    }
+
     public void OnTickUpdate(int currentTick) {
         UpdateReversionTicks();
     }
 
     void SetupTilemaps() {
-        moduleByDefinition.Clear();
-        definitionByModule.Clear();
+        moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
+        definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
 
         if (tileDefinitionMappings == null) {
-            Debug.LogError("[TileInteractionManager SetupTilemaps] Tile Definition Mappings list is null!", this);
+            if (debugLogs) Debug.LogWarning("[TileInteractionManager SetupTilemaps] No mappings defined.");
             return;
         }
 
-        for (int i = 0; i < tileDefinitionMappings.Count; i++) {
-            var mapping = tileDefinitionMappings[i];
+        foreach (var mapping in tileDefinitionMappings) {
             if (mapping == null || mapping.tileDef == null || mapping.tilemapModule == null) {
-                Debug.LogWarning($"[TileInteractionManager SetupTilemaps] Skipping null or incomplete mapping at index {i}.");
+                Debug.LogWarning("[TileInteractionManager SetupTilemaps] Null or incomplete mapping found. Skipping.");
                 continue;
             }
 
@@ -104,23 +110,9 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable {
                 moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
                 definitionByModule[mapping.tilemapModule] = mapping.tileDef;
 
-                Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-                if (renderTilemapTransform != null) {
-                    TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
-                    if (renderer != null) {
-                        renderer.sortingOrder = baseSortingOrder - i;
-                        if (debugLogs) Debug.Log($"Setting sorting order for {mapping.tileDef.displayName} to {renderer.sortingOrder}");
-                    }
-                    else { Debug.LogWarning($"RenderTilemap for {mapping.tileDef.displayName} missing TilemapRenderer.", renderTilemapTransform); }
-
-                    Tilemap tilemap = renderTilemapTransform.GetComponent<Tilemap>();
-                    if (tilemap != null) {
-                        tilemap.color = mapping.tileDef.tintColor;
-                        if (debugLogs) Debug.Log($"Setting color for {mapping.tileDef.displayName} to {tilemap.color}");
-                    }
-                    else { Debug.LogWarning($"RenderTilemap for {mapping.tileDef.displayName} missing Tilemap component.", renderTilemapTransform); }
+                if (mapping.tilemapModule.DataTilemap == null) {
+                    Debug.LogWarning($"Module for '{mapping.tileDef.displayName}' has no DataTilemap assigned.", mapping.tilemapModule.gameObject);
                 }
-                else { Debug.LogWarning($"Could not find 'RenderTilemap' child for module of {mapping.tileDef.displayName}.", mapping.tilemapModule.gameObject); }
 
                 if (debugLogs) Debug.Log($"[Mapping] Added: {mapping.tileDef.displayName} => {mapping.tilemapModule.gameObject.name}");
             }
@@ -218,74 +210,54 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable {
         }
     }
 
-    void RegisterTimedTile(Vector3Int cellPos, TileDefinition tileDef) {
-        if (tileDef != null && tileDef.revertAfterTicks > 0) {
-            TimedTileState newState = new TimedTileState {
-                tileDef = tileDef,
-                ticksRemaining = tileDef.revertAfterTicks
-            };
-            timedCells[cellPos] = newState;
-            if (debugLogs) Debug.Log($"Registered timed reversion for {tileDef.displayName} at {cellPos} ({tileDef.revertAfterTicks} ticks).");
-        }
-        else if (timedCells.ContainsKey(cellPos)) {
-            timedCells.Remove(cellPos);
-            if (debugLogs) Debug.Log($"Cleared timed reversion for {cellPos} because revert ticks is not positive.");
-        }
-    }
-
     public void PlaceTile(TileDefinition tileDef, Vector3Int cellPos) {
-        if (tileDef == null) { Debug.LogWarning($"PlaceTile: Attempted to place a NULL TileDefinition at {cellPos}."); return; }
-
-        if (moduleByDefinition == null || !moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) || module == null) {
-            Debug.LogWarning($"PlaceTile: No mapped module found for TileDefinition '{tileDef.displayName}'. Cannot place tile.");
+        if (tileDef == null) {
+            Debug.LogWarning("[PlaceTile] Null tile definition.");
             return;
         }
 
-        if (!tileDef.keepBottomTile) {
-            TileDefinition existingDef = FindWhichTileDefinitionAt(cellPos);
-            if (existingDef != null && existingDef != tileDef) {
-                if (debugLogs) Debug.Log($"Placing '{tileDef.displayName}' (KeepBottom=false), removing existing '{existingDef.displayName}' at {cellPos}.");
-                RemoveTile(existingDef, cellPos);
-            }
-        } else {
-            if (debugLogs) Debug.Log($"Placing '{tileDef.displayName}' (KeepBottom=true) over whatever is at {cellPos}.");
+        if (!moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module)) {
+            Debug.LogError($"[PlaceTile] No module mapping found for TileDefinition '{tileDef.displayName}'");
+            return;
         }
 
-        if (module.DataTilemap != null) {
+        if (module?.DataTilemap != null) {
+            // Create a tile instance like in your existing code
             TileBase dataTile = ScriptableObject.CreateInstance<Tile>();
             module.DataTilemap.SetTile(cellPos, dataTile);
-        } else { Debug.LogWarning($"Module for '{tileDef.displayName}' has no DataTilemap assigned.", module.gameObject); }
 
-        Transform renderTilemapTransform = module.transform.Find("RenderTilemap");
-        if (renderTilemapTransform != null) {
-            Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
-            if (renderTilemap != null) {
-                renderTilemap.color = tileDef.tintColor;
-#if UNITY_EDITOR
-                if (!Application.isPlaying) EditorUtility.SetDirty(renderTilemap);
-#endif
+            if (tileDef.revertAfterTicks > 0) {
+                TimedTileState timedState = new TimedTileState {
+                    tileDef = tileDef,
+                    ticksRemaining = tileDef.revertAfterTicks
+                };
+                timedCells[cellPos] = timedState;
+                if (debugLogs) Debug.Log($"Set up timed reversion for {tileDef.displayName} at {cellPos}, reverting in {tileDef.revertAfterTicks} ticks.");
             }
-        }
 
-        RegisterTimedTile(cellPos, tileDef);
+            if (debugLogs) Debug.Log($"Placed tile '{tileDef.displayName}' at {cellPos}");
+        } else {
+            Debug.LogWarning($"Module for '{tileDef.displayName}' has no DataTilemap assigned.", module.gameObject);
+        }
     }
 
     public void RemoveTile(TileDefinition tileDef, Vector3Int cellPos) {
-        if (tileDef == null) { Debug.LogWarning($"RemoveTile: Attempted to remove a NULL TileDefinition at {cellPos}."); return; }
-
-        if (moduleByDefinition == null || !moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) || module == null) {
-            if (debugLogs) Debug.LogWarning($"RemoveTile: No mapped module found for TileDefinition '{tileDef.displayName}'. Cannot remove tile.");
+        if (tileDef == null) {
+            Debug.LogWarning("[RemoveTile] Null tile definition.");
             return;
         }
 
-        if (module.DataTilemap != null) {
-            if (module.DataTilemap.HasTile(cellPos)) {
-                module.DataTilemap.SetTile(cellPos, null);
-                if (debugLogs) Debug.Log($"Removed '{tileDef.displayName}' from DataTilemap at {cellPos}.");
-            } else {
-                if (debugLogs) Debug.Log($"RemoveTile: Tile '{tileDef.displayName}' not found on DataTilemap at {cellPos}, skipping removal.");
-            }
-        } else { Debug.LogWarning($"Module for '{tileDef.displayName}' has no DataTilemap assigned.", module.gameObject); }
+        if (!moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module)) {
+            Debug.LogError($"[RemoveTile] No module mapping found for TileDefinition '{tileDef.displayName}'");
+            return;
+        }
+
+        if (module?.DataTilemap != null) {
+            module.DataTilemap.SetTile(cellPos, null);
+            if (debugLogs) Debug.Log($"Removed tile '{tileDef.displayName}' from {cellPos}");
+        } else {
+            Debug.LogWarning($"Module for '{tileDef.displayName}' has no DataTilemap assigned.", module.gameObject);
+        }
 
         if (timedCells.TryGetValue(cellPos, out TimedTileState timedState) && timedState.tileDef == tileDef) {
             timedCells.Remove(cellPos);
@@ -343,41 +315,45 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable {
         GridPosition hoveredGridPos = new GridPosition(cellPos.x, cellPos.y);
 
         bool withinRadius = GridRadiusUtility.IsWithinCircleRadius(hoveredGridPos, playerGridPos, gridRadius);
-
         TileDefinition foundTile = FindWhichTileDefinitionAt(cellPos);
 
-        if (withinRadius) {
-            currentlyHoveredCell = cellPos;
-            hoveredTileDef = foundTile;
+        // Always update hover state
+        currentlyHoveredCell = cellPos;
+        hoveredTileDef = foundTile;
+        isWithinInteractionRange = withinRadius;
 
-            if (hoverHighlightObject != null) {
-                hoverHighlightObject.SetActive(true);
-                hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
-            }
+        // Always show the highlight object now
+        if (hoverHighlightObject != null) {
+            hoverHighlightObject.SetActive(true);
+            hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
+            
+            // Update color based on range using the color manager
+            UpdateHoverHighlightColor(withinRadius);
+        }
 
-            if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
-                GridDebugVisualizer.Instance.VisualizeToolUseRadius(playerGridPos, gridRadius, 0.1f);
-            }
+        if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
+            GridDebugVisualizer.Instance.VisualizeToolUseRadius(playerGridPos, gridRadius, 0.1f);
         }
-        else {
-            currentlyHoveredCell = null;
-            hoveredTileDef = null;
-            if (hoverHighlightObject != null) {
-                hoverHighlightObject.SetActive(false);
-            }
-        }
+    }
+
+    private void UpdateHoverHighlightColor(bool withinRange) {
+        if (hoverSpriteRenderer == null || hoverColorManager == null) return;
+
+        Color targetColor = hoverColorManager.GetColorForRange(withinRange);
+        hoverSpriteRenderer.color = targetColor;
     }
 
     void UpdateDebugUI() {
         if (hoveredTileText != null) {
             string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
-            
-            // Add reversion info if applicable
+
             if (currentlyHoveredCell.HasValue && timedCells.TryGetValue(currentlyHoveredCell.Value, out TimedTileState timedState)) {
                 tileName += $" [{timedState.ticksRemaining}t]";
             }
-            
-            hoveredTileText.text = $"Hover: {tileName}";
+
+            // Add range indicator
+            string rangeIndicator = isWithinInteractionRange ? " [IN RANGE]" : " [OUT OF RANGE]";
+            hoveredTileText.text = $"Hover: {tileName}{rangeIndicator}";
         }
 
         if (currentToolText != null) {
@@ -495,4 +471,16 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable {
             RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
         }
     }
+
+    public void TryUseSeed() {
+        if (!currentlyHoveredCell.HasValue) return;
+        if (!isWithinInteractionRange) return; // Only allow seed planting within range
+
+        HandleSeedPlanting(currentlyHoveredCell.Value);
+    }
+
+    // Properties for external access
+    public bool IsWithinInteractionRange => isWithinInteractionRange;
+    public Vector3Int? CurrentlyHoveredCell => currentlyHoveredCell;
+    public TileDefinition HoveredTileDef => hoveredTileDef;
 }

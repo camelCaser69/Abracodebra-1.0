@@ -15158,6 +15158,7 @@ MonoBehaviour:
   player: {fileID: 1491144816}
   hoverRadius: 3
   hoverHighlightObject: {fileID: 1547083800}
+  hoverColorManager: {fileID: 11400000, guid: 13378dd3cbc1677489e27a96ad120303, type: 2}
   baseSortingOrder: 0
   debugLogs: 0
   hoveredTileText: {fileID: 0}

@@ -224,7 +224,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85a75fc8b3b544a484c5c4f0642416f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thoughtLibrary: {fileID: 11400000, guid: 8abd92eb95108124a8478425e6e2cfb5, type: 2}
+  definition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}
   thoughtBubblePrefab: {fileID: 7019603340007582860, guid: e00dc2bef6e577f4788d3a0262749be1, type: 3}
   bubbleSpawnTransform: {fileID: 1385400547619210892}
   poopSpawnPoint: {fileID: 8180810422158951206}
@@ -235,22 +235,7 @@ MonoBehaviour:
   hpText: {fileID: 6910504263885416475}
   hungerText: {fileID: 62953140653497763}
   showStatsKey: 308
-  searchRadius: 10
-  eatDistance: 0.1
-  eatDuration: 2
-  wanderPauseChance: 0.3
-  wanderMinMoveDuration: 0.5
-  wanderMaxMoveDuration: 5
-  wanderMinPauseDuration: 0.5
-  wanderMaxPauseDuration: 2
-  minPoopDelay: 0.5
-  maxPoopDelay: 3
-  poopDuration: 1.5
-  poopColorVariation: 0.12
-  thoughtCooldownTime: 5
-  attractiveScentDefinitions: []
-  repellentScentDefinitions: []
-  foodReassessmentInterval: 0.5
+  thinkingTickInterval: 3
 --- !u!114 &1716373188419040610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -456,19 +441,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e3b763aac349f9893880f6600308e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  overrides:
+    reflectionOpacity: 0
+    reflectionTint: 0
+    gradientFadeBaseMaterial: 0
+    sortingOrderOffset: 0
+    useWaterMasking: 0
+    waterTilemapTag: 0
+    showDebugInfo: 0
   useParentAsReference: 0
   yOffset: -1.75
-  reflectionOpacity: 0.5
-  reflectionTint: {r: 1, g: 1, b: 1, a: 1}
+  localReflectionOpacity: 0.5
+  localReflectionTint: {r: 1, g: 1, b: 1, a: 1}
   enableDistanceFade: 1
   fadeStartDistance: 0.3
   fadeEndDistance: 1.5
   minFadeAlpha: 0
-  gradientFadeBaseMaterial: {fileID: 2100000, guid: 9c89380ac3c2b264391225c5e0baa010, type: 2}
-  sortingOrderOffset: -100
-  useWaterMasking: 1
-  waterTilemapTag: Water
-  showDebugInfo: 0
+  localGradientFadeBaseMaterial: {fileID: 0}
+  localSortingOrderOffset: -1
+  localUseWaterMasking: 1
+  localWaterTilemapTag: Water
+  localShowDebugInfo: 0
 --- !u!1 &2461211831445650058
 GameObject:
   m_ObjectHideFlags: 0
