@@ -1,17 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewAnimalDefinition", menuName = "Ecosystem/Animal Definition")]
-public class AnimalDefinition : ScriptableObject {
-    [Header("Basic Info")]
+public class AnimalDefinition : ScriptableObject 
+{
     public string animalName = "DefaultAnimal";
     public GameObject prefab;
 
-    [Header("Health & Movement")]
     public float maxHealth = 10f;
     public float movementSpeed = 2f; // Grid units per tick
 
-    [Header("AI Timing (in ticks)")]
     public int thinkingTickInterval = 3;
     public int wanderPauseTickChance = 30; // Percentage
     public int minWanderMoveTicks = 2;
@@ -19,36 +16,33 @@ public class AnimalDefinition : ScriptableObject {
     public int minWanderPauseTicks = 1;
     public int maxWanderPauseTicks = 4;
 
-    [Header("Food & Eating")]
     public int searchRadiusTiles = 5; // In grid tiles
     public int eatDistanceTiles = 1; // Must be adjacent
     public int eatDurationTicks = 3;
 
-    [Header("Interaction Timing")]
     public int thoughtCooldownTicks = 10;
-    
-    [Header("Health & Damage")]
+
     public int starvationDamageTickInterval = 4;
     public float damagePerStarvationTick = 2f;
     public int deathFadeTicks = 3;
     public Color damageFlashColor = Color.red;
     public int damageFlashTicks = 1;
 
-    [Header("Pooping")]
     public int minPoopDelayTicks = 10;
     public int maxPoopDelayTicks = 20;
     public int poopCooldownTicks = 2;
     public float poopColorVariation = 0.1f;
 
-    [Header("Diet")]
     public AnimalDiet diet;
+    
+    // Added: Reference to thought library for this animal type
+    public AnimalThoughtLibrary thoughtLibrary;
 
-    [Header("Scents")]
     public List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
     public List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
-    void OnValidate() {
-        // Ensure all tick values are positive
+    void OnValidate() 
+    {
         thinkingTickInterval = Mathf.Max(1, thinkingTickInterval);
         searchRadiusTiles = Mathf.Max(1, searchRadiusTiles);
         eatDistanceTiles = Mathf.Max(1, eatDistanceTiles);

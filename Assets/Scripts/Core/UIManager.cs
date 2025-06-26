@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -6,27 +7,33 @@ using WegoSystem;
 
 public class UIManager : MonoBehaviour
 {
-    public static UIManager Instance { get; private set; }
+    #region Fields
+    public static UIManager Instance { get; set; }
 
-    [Header("UI Panels")]
+    [Header("Phase Panels")]
     [SerializeField] GameObject planningPanel;
     [SerializeField] GameObject growthAndThreatPanel;
     [SerializeField] GameObject recoveryPanel;
     [SerializeField] GameObject nodeEditorPanel;
 
-    [Header("Phase Transition Buttons")]
+    [Header("Phase Buttons")]
     [SerializeField] Button startGrowthPhaseButton;
     [SerializeField] Button startRecoveryPhaseButton;
     [SerializeField] Button startNewPlanningPhaseButton;
 
-    [Header("Wego Control Panel")]
+    [Header("Wego Controls")]
     [SerializeField] GameObject wegoControlPanel;
     [SerializeField] Button endPlanningPhaseButton;
     [SerializeField] TextMeshProUGUI currentPhaseText;
-    [SerializeField] TextMeshProUGUI tickCounterText;
+    [SerializeField] TextMeshProUGUI tickCounterText; // The one inside the Wego panel
     [SerializeField] TextMeshProUGUI phaseProgressText;
     [SerializeField] Button advanceTickButton;
+    
+    [Header("Persistent HUD")]
+    [SerializeField] TextMeshProUGUI persistentTickCounterText; // <<< NEW FIELD
+    #endregion
 
+    #region Unity Lifecycle
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -41,7 +48,7 @@ public class UIManager : MonoBehaviour
     {
         if (RunManager.Instance == null)
         {
-            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not function correctly.");
+            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not fn correctly.");
             return;
         }
 
@@ -102,13 +109,14 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // Update UI every 10 frames to reduce overhead
         if (Time.frameCount % 10 == 0)
         {
             UpdateWegoUI();
         }
     }
+    #endregion
 
+    #region Setup
     void SetupButtons()
     {
         if (startGrowthPhaseButton != null)
@@ -123,12 +131,14 @@ public class UIManager : MonoBehaviour
         if (advanceTickButton != null)
             advanceTickButton.onClick.AddListener(OnAdvanceTickClicked);
     }
+    #endregion
 
+    #region Event Handlers
     void HandleRunStateChanged(RunState newState)
     {
-        if (planningPanel != null) 
+        if (planningPanel != null)
             planningPanel.SetActive(newState == RunState.Planning);
-        if (growthAndThreatPanel != null) 
+        if (growthAndThreatPanel != null)
             growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
 
         if (recoveryPanel != null)
@@ -136,7 +146,7 @@ public class UIManager : MonoBehaviour
             recoveryPanel.SetActive(false);
         }
 
-        if (nodeEditorPanel != null) 
+        if (nodeEditorPanel != null)
             nodeEditorPanel.SetActive(newState == RunState.Planning);
 
         if (InventoryGridController.Instance != null)
@@ -168,7 +178,9 @@ public class UIManager : MonoBehaviour
     {
         UpdateWegoUI();
     }
+    #endregion
 
+    #region UI Updates
     void UpdateButtonStates(RunState state)
     {
         if (startGrowthPhaseButton != null)
@@ -209,10 +221,19 @@ public class UIManager : MonoBehaviour
             TurnPhase currentPhase = TurnPhaseManager.Instance.CurrentPhase;
             currentPhaseText.text = $"Phase: {currentPhase}";
         }
-
-        if (tickCounterText != null && TickManager.Instance != null)
+        
+        // Update both the original and new tick counters
+        if (TickManager.Instance != null)
         {
-            tickCounterText.text = $"Tick: {TickManager.Instance.CurrentTick}";
+            string tickInfo = $"Tick: {TickManager.Instance.CurrentTick}";
+            if (tickCounterText != null)
+            {
+                tickCounterText.text = tickInfo;
+            }
+            if (persistentTickCounterText != null)
+            {
+                persistentTickCounterText.text = tickInfo;
+            }
         }
 
         if (phaseProgressText != null && TurnPhaseManager.Instance != null)
@@ -229,7 +250,9 @@ public class UIManager : MonoBehaviour
         yield return null; // Wait one frame
         InventoryBarController.Instance?.ShowBar();
     }
+    #endregion
 
+    #region Logic and Actions
     void AutoReturnSeedFromEditorSlot()
     {
         if (NodeEditorGridController.Instance == null || InventoryGridController.Instance == null) return;
@@ -282,7 +305,9 @@ public class UIManager : MonoBehaviour
     {
         TickManager.Instance?.DebugAdvanceTick();
     }
+    #endregion
 
+    #region Notifications & Debug
     public void ShowNotification(string message, float duration = 3f)
     {
         StartCoroutine(ShowNotificationCoroutine(message, duration));
@@ -337,4 +362,5 @@ public class UIManager : MonoBehaviour
             TickManager.Instance?.AdvanceMultipleTicks(count);
         }
     }
+    #endregion
 }

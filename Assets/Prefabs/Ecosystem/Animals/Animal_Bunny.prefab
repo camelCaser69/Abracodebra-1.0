@@ -235,7 +235,7 @@ MonoBehaviour:
   hpText: {fileID: 6910504263885416475}
   hungerText: {fileID: 62953140653497763}
   showStatsKey: 308
-  thinkingTickInterval: 3
+  showPathfindingDebugLine: 1
 --- !u!114 &1716373188419040610
 MonoBehaviour:
   m_ObjectHideFlags: 0

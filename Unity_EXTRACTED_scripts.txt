@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 510,716 → 351,651 chars (31.1% reduction)
-Estimated tokens saved: ~39,766
+Compression Stats: 510,954 → 351,300 chars (31.2% reduction)
+Estimated tokens saved: ~39,913
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -26,99 +26,99 @@ using System;
   UIManager (Assets\Scripts\Core/) L271
   WeatherManager (Assets\Scripts\Core/) L558
   AnimalController (Assets\Scripts\Ecosystem\Animals/) L757
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1370
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1431
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1440
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1453
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1470
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1860
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1891
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2152
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2220
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2235
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2254
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2312
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2448
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2524
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2541
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2554
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2583
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2791
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3021
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3306
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3335
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3371
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3384
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3412
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3473
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3518
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3569
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3603
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3706
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3767
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3787
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3822
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3837
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3922
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4182
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4205
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4258
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4287
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4296
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4321
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4506
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4545
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4569
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4771
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4851
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5030
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5250
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5475
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5567
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5884
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L5951
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6022
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6328
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6453
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6664
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6798
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7118
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7254
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7547
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7635
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L7736
-  GridSnapStartup (Assets\Scripts\Ticks/) L7837
-  TickDebugMonitor (Assets\Scripts\Ticks/) L7903
-  TurnPhaseManager (Assets\Scripts\Ticks/) L8074
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8192
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8261
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8492
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8503
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8532
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8628
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8733
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9128
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9164
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9328
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9470
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9588
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9710
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9915
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L9955
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9979
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L9999
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10473
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10485
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10520
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10679
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1401
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1464
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1473
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1486
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1503
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1893
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1924
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2185
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2253
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2268
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2287
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2345
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2481
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2557
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2574
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2587
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2616
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2824
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L3054
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3328
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3357
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3393
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3406
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3434
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3495
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3540
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3591
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3625
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3728
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3789
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3809
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3844
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3859
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3944
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4204
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4227
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4280
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4309
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4318
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4343
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4528
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4567
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4591
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4793
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4873
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5052
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5272
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5497
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5589
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5906
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L5973
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6044
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6350
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6475
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6686
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6820
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7140
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7276
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7569
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7657
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L7758
+  GridSnapStartup (Assets\Scripts\Ticks/) L7859
+  TickDebugMonitor (Assets\Scripts\Ticks/) L7925
+  TurnPhaseManager (Assets\Scripts\Ticks/) L8096
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8214
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8283
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8514
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8525
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8554
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8650
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8755
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9150
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9186
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9350
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9492
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9610
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9732
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9937
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L9977
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10001
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10021
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10495
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10507
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10542
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10701
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L10689
-  GridPosition (Assets\Scripts\Ticks/) L10840
-  GridPositionManager (Assets\Scripts\Ticks/) L10941
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11295
-  TickConfiguration (Assets\Scripts\Ticks/) L11439
-  ITickUpdateable (Assets\Scripts\Ticks/) L11545
+  GridEntity (Assets\Scripts\Ticks/) L10711
+  GridPosition (Assets\Scripts\Ticks/) L10862
+  GridPositionManager (Assets\Scripts\Ticks/) L10963
+  GridRadiusUtility (Assets\Scripts\Ticks/) L11317
+  TickConfiguration (Assets\Scripts\Ticks/) L11461
+  ITickUpdateable (Assets\Scripts\Ticks/) L11544
 
 ================================================================================
 SCRIPTS
@@ -873,7 +873,7 @@ pub cls AnimalController : MonoBehaviour, ITickUpdateable {
 
 AnimalDiet animalDiet;
 GridEntity gridEntity;
-AnimalThoughtLibrary thoughtLibrary; // Note: This needs to be assigned, perhaps via a manager.
+AnimalThoughtLibrary thoughtLibrary;
 
 GridPosition targetPosition;
 GameObject currentTargetFood = null;
@@ -889,8 +889,10 @@ int thoughtCooldownTick = 0;
 int eatRemainingTicks = 0;
 int starvationTick = 0;
 int deathFadeRemainingTicks = 0;
-int flashRemainingTicks = 0;
 int wanderPauseTicks = 0;
+
+float flashRemainingTime = 0f;
+float flashDurationSeconds = 0.2f; // Default flash duration in seconds
 
 float currentHealth;
 float currentHunger;
@@ -899,6 +901,7 @@ bool isPooping = false;
 bool hasPooped = true;
 bool isDying = false;
 bool isFlashing = false;
+bool isHungryAndSearching = false; // Track if we're actively searching for food
 
 bool isSeekingScreenCenter = false;
 Vector2 screenCenterTarget;
@@ -926,6 +929,13 @@ Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridE
 if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
+
+if (EcosystemManager.Instance != null) {
+thoughtLibrary = EcosystemManager.Instance.GetComponentInChildren<AnimalThoughtLibrary>();
+if (thoughtLibrary == null && definition != null && definition.thoughtLibrary != null) {
+thoughtLibrary = definition.thoughtLibrary;
+}
+}
 }
 
 void OnDestroy() {
@@ -941,6 +951,8 @@ bool showStats = Input.GetKey(showStatsKey);
 SetStatsTextVisibility(showStats);
 
 UpdateSpriteFlipping();
+
+UpdateFlashEffect();
 }
 
 void ValidateComponents() {
@@ -955,6 +967,10 @@ if (animalDiet == null) {
 Debug.LogError($"[{gameObject.name}] AnimalDefinition missing diet!", this);
 enabled = false;
 return;
+}
+
+if (definition != null && TickManager.Instance?.Config != null) {
+flashDurationSeconds = definition.damageFlashTicks / TickManager.Instance.Config.ticksPerRealSecond;
 }
 }
 
@@ -1005,6 +1021,10 @@ hasPlannedAction = true;
 targetPosition = targetGridPos;
 }
 
+if (thoughtLibrary == null && definition.thoughtLibrary != null) {
+thoughtLibrary = definition.thoughtLibrary;
+}
+
 EnsureUITextReferences();
 SetStatsTextVisibility(false);
 UpdateUI();
@@ -1019,12 +1039,16 @@ if (thoughtCooldownTick > 0) thoughtCooldownTick--;
 if (currentPoopCooldownTick > 0) currentPoopCooldownTick--;
 if (eatRemainingTicks > 0) eatRemainingTicks--;
 if (wanderPauseTicks > 0) wanderPauseTicks--;
-if (flashRemainingTicks > 0) flashRemainingTicks--;
 
 if (TickManager.Instance?.Config != null) {
 if (hungerTick >= TickManager.Instance.Config.animalHungerTickInterval) {
 UpdateHungerTick();
 hungerTick = 0;
+
+if (!isHungryAndSearching && currentHunger >= animalDiet.hungerThreshold) {
+isHungryAndSearching = true;
+MakeDecision();
+}
 }
 }
 
@@ -1062,7 +1086,6 @@ Destroy(gameObject);
 }
 
 UpdateAnimations();
-UpdateFlashEffect();
 }
 
 void MakeDecision() {
@@ -1075,6 +1098,7 @@ if (currentHunger >= animalDiet.hungerThreshold) {
 PlanFoodSeeking();
 }
 else {
+isHungryAndSearching = false;
 PlanWandering();
 }
 }
@@ -1098,7 +1122,7 @@ gridEntity.SetPosition(targetPosition);
 if (currentPath.Count > 0 && currentPathIndex < currentPath.Count - 1) {
 currentPathIndex++;
 targetPosition = currentPath[currentPathIndex];
-hasPlannedAction = true; // Stay in action mode
+hasPlannedAction = true;
 return;
 }
 }
@@ -1165,7 +1189,7 @@ GridPosition.Up, GridPosition.Down,
 GridPosition.Left, GridPosition.Right
 };
 
-for (int i = 0; i < 3; i++) // Try up to 3 times to find a valid random move {
+for (int i = 0; i < 3; i++) {
 GridPosition randomDir = directions[Random.Range(0, directions.Length)];
 GridPosition targetPos = currentPos + randomDir;
 
@@ -1278,6 +1302,11 @@ Destroy(currentTargetFood);
 hasPooped = false;
 poopDelayTick = Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
 currentTargetFood = null;
+
+if (currentHunger < animalDiet.hungerThreshold) {
+isHungryAndSearching = false;
+}
+
 UpdateUI();
 }
 }
@@ -1334,7 +1363,7 @@ currentHealth -= definition.damagePerStarvationTick;
 currentHealth = Mathf.Max(0f, currentHealth);
 
 if (!isFlashing) {
-flashRemainingTicks = definition.damageFlashTicks;
+flashRemainingTime = flashDurationSeconds;
 isFlashing = true;
 }
 
@@ -1354,12 +1383,14 @@ deathFadeRemainingTicks = definition.deathFadeTicks;
 }
 
 void UpdateFlashEffect() {
-if (flashRemainingTicks > 0 && spriteRenderer != null) {
+if (flashRemainingTime > 0 && spriteRenderer != null) {
 spriteRenderer.color = definition.damageFlashColor;
+flashRemainingTime -= Time.deltaTime;
 }
 else if (isFlashing && spriteRenderer != null) {
 spriteRenderer.color = originalColor;
 isFlashing = false;
+flashRemainingTime = 0f;
 }
 }
 
@@ -1502,6 +1533,8 @@ pub int poopCooldownTicks = 2;
 pub float poopColorVariation = 0.1f;
 
 pub AnimalDiet diet;
+
+pub AnimalThoughtLibrary thoughtLibrary;
 
 pub List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
 pub List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
@@ -3119,29 +3152,26 @@ Debug.Log($"[FloraManager] Drew {drawnCount} poop absorption radius gizmos");
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Management\WaveManager.cs
 
-﻿using UnityEngine;
+﻿using System.Collections;
 using TMPro;
 using WegoSystem;
 
 pub enum InternalWaveState {
 Idle,
 WaitingForSpawnTime,
-SpawningInProgress,
-WaveActive
+Spawning
 }
 
 pub cls WaveManager : MonoBehaviour {
 pub stat WaveManager Instance { get; set; }
 
+[SerializeField] Camera mainCamera;
 [SerializeField] FaunaManager faunaManager;
 [SerializeField] WeatherManager weatherManager;
-[SerializeField] Camera mainCamera;
-
 [SerializeField] List<WaveDefinition> wavesSequence;
 
-[SerializeField][Range(1, 10)] int waveDurationInDayCycles = 1;
-[SerializeField] WeatherManager.CyclePhase spawnStartPhase = WeatherManager.CyclePhase.Day;
-[SerializeField][Range(0f, 100f)] float spawnStartPercentage = 50f;
+[SerializeField] int waveDurationInDayCycles = 1;
+[SerializeField] float spawnStartPercentage = 50f;
 [SerializeField] bool deletePreviousWaveAnimals = true;
 
 [SerializeField] TextMeshProUGUI waveStatusText;
@@ -3206,9 +3236,7 @@ int GetWaveDurationTicks() {
 var config = TickManager.Instance?.Config;
 if (config == null) ret 50;
 
-ret config.wavesDependOnDayCycle ?
-config.ticksPerDay * waveDurationInDayCycles :
-config.ticksPerWave;
+ret config.ticksPerDay * waveDurationInDayCycles;
 }
 
 void SetInternalState(InternalWaveState newState) {
@@ -3278,56 +3306,48 @@ if (activeWaveExecutionCoroutine != null) {
 StopCoroutine(activeWaveExecutionCoroutine);
 activeWaveExecutionCoroutine = null;
 }
-faunaManager?.StopAllSpawnCoroutines();
-SetInternalState(InternalWaveState.Idle);
+faunaManager.StopAllSpawnCoroutines();
 }
 
 void HandleWeatherPhaseChange(WeatherManager.CyclePhase newPhase) {
-if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat || currentActiveWaveDef == null) return;
+if (currentActiveWaveDef == null || currentInternalState != InternalWaveState.WaitingForSpawnTime) return;
 
-if (newPhase == WeatherManager.CyclePhase.TransitionToDay) {
 hasSpawnedForThisWeatherCycle = false;
-}
-else if (newPhase == spawnStartPhase && (currentInternalState == InternalWaveState.WaitingForSpawnTime || currentInternalState == InternalWaveState.WaveActive)) {
 Update_WaitingForSpawnTimeCheck();
-}
 }
 
 void Update_WaitingForSpawnTimeCheck() {
-if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat || currentActiveWaveDef == null) return;
-if (currentInternalState != InternalWaveState.WaitingForSpawnTime && currentInternalState != InternalWaveState.WaveActive) return;
-if (hasSpawnedForThisWeatherCycle) return;
+if (currentInternalState != InternalWaveState.WaitingForSpawnTime || currentActiveWaveDef == null) return;
 
-if (weatherManager == null) return;
-
-WeatherManager.CyclePhase currentPhase = weatherManager.CurrentPhase;
-
-if (currentPhase == spawnStartPhase) {
-float phaseProgress = weatherManager.GetPhaseProgress() * 100f;
-
-Debug.Log($"[WaveManager] Checking spawn: Phase={currentPhase}, Progress={phaseProgress:F1}%, Required={spawnStartPercentage}%");
-
-if (phaseProgress >= spawnStartPercentage) {
-TriggerFaunaSpawning();
-}
-}
+float currentPhaseProgress = 0f;
+if (weatherManager != null) {
+float totalPhaseTime = weatherManager.CurrentTotalPhaseTime;
+float phaseTimer = weatherManager.CurrentPhaseTimer;
+currentPhaseProgress = (totalPhaseTime > 0) ? ((totalPhaseTime - phaseTimer) / totalPhaseTime) * 100f : 0f;
 }
 
-void TriggerFaunaSpawning() {
-if (currentActiveWaveDef == null) return;
-if (faunaManager == null) { Debug.LogError("[WaveManager] FaunaManager missing, cannot spawn!"); return; }
-
-Debug.Log($"[WaveManager] Spawning animals for WaveDefinition: '{currentActiveWaveDef.waveName}' (Phase: {spawnStartPhase} >= {spawnStartPercentage}%)");
-SetInternalState(InternalWaveState.SpawningInProgress);
+if (!hasSpawnedForThisWeatherCycle && currentPhaseProgress >= spawnStartPercentage) {
 hasSpawnedForThisWeatherCycle = true;
+Debug.Log($"[WaveManager] Weather phase progress ({currentPhaseProgress:F0}%) reached spawn threshold ({spawnStartPercentage:F0}%). Starting wave spawn for '{currentActiveWaveDef.waveName}'.");
+
+SetInternalState(InternalWaveState.Spawning);
+activeWaveExecutionCoroutine = StartCoroutine(ExecuteWaveSpawnCoroutine());
+}
+}
+
+IEnumerator ExecuteWaveSpawnCoroutine() {
+if (faunaManager == null || currentActiveWaveDef == null) yield break;
 
 faunaManager.ExecuteSpawnWave(currentActiveWaveDef);
 
-SetInternalState(InternalWaveState.WaveActive);
+yield ret new WaitForSeconds(1f);
+
+Debug.Log($"[WaveManager] Finished initiating spawn coroutines for wave '{currentActiveWaveDef.waveName}'. FaunaManager is now handling individual spawn entries.");
+SetInternalState(InternalWaveState.WaitingForSpawnTime);
 }
 
 void ClearAllActiveAnimals() {
-if(Debug.isDebugBuild) Debug.Log("[WaveManager] Clearing all active animals.");
+Debug.Log("[WaveManager] Clearing all active animals.");
 AnimalController[] activeAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
 int count = 0;
 foreach(AnimalController animal in activeAnimals) {
@@ -3383,12 +3403,14 @@ waveStatusText.text = $"Prepare for Round {RunManager.Instance.CurrentRoundNumbe
 }
 else if (RunManager.Instance.CurrentState == RunState.GrowthAndThreat) {
 if (currentActiveWaveDef != null) {
-string waveNamePart = string.IsNullOrEmpty(currentActiveWaveDef.waveName) ? $"Wave {activeWaveDefinitionIndex + 1}" : currentActiveWaveDef.waveName;
+string waveNamePart = string.IsNullOrEmpty(currentActiveWaveDef.waveName) ?
+$"Wave {activeWaveDefinitionIndex + 1}" : currentActiveWaveDef.waveName;
 
 if (TickManager.Instance != null) {
 int ticksRemaining = Mathf.Max(0, waveEndTick - TickManager.Instance.CurrentTick);
 waveStatusText.text = $"{waveNamePart} [{ticksRemaining} ticks left]";
-} else {
+}
+else {
 waveStatusText.text = waveNamePart;
 }
 }
@@ -11538,9 +11560,8 @@ Debug.Log(line);
 // Assets\Scripts\Ticks\TickConfiguration.cs
 
 ﻿using UnityEngine;
-using WegoSystem;
 
-ns WegoSystem {
+namespace WegoSystem {
 pub cls TickConfiguration : ScriptableObject {
 [SerializeField] pub float ticksPerRealSecond = 2f;
 
@@ -11549,17 +11570,8 @@ pub int dayPhaseTicks = 60;
 pub int nightPhaseTicks = 40;
 pub int transitionTicks = 10;
 
-pub int ticksPerWave = 50;
-pub bool wavesDependOnDayCycle = false;
-
-pub int maxPlanningPhaseTicks = 0; // 0 = unlimited
-pub int executionPhaseTicks = 5;
-
 pub int animalHungerTickInterval = 3;
 pub int animalThinkingInterval = 3;
-
-pub int defaultPlantGrowthTicksPerStage = 5;
-pub int defaultPlantMaturityCycleTicks = 20;
 
 pub int movementTicksPerTile = 1;
 pub int movementCooldownTicks = 0;
@@ -11591,50 +11603,37 @@ ticksPerRealSecond = Mathf.Max(0.1f, newRate);
 void OnValidate() {
 ticksPerRealSecond = Mathf.Max(0.1f, ticksPerRealSecond);
 ticksPerDay = Mathf.Max(10, ticksPerDay);
-ticksPerWave = Mathf.Max(10, ticksPerWave);
 dayPhaseTicks = Mathf.Max(1, dayPhaseTicks);
 nightPhaseTicks = Mathf.Max(1, nightPhaseTicks);
 transitionTicks = Mathf.Max(1, transitionTicks);
-executionPhaseTicks = Mathf.Max(1, executionPhaseTicks);
 animalHungerTickInterval = Mathf.Max(1, animalHungerTickInterval);
 animalThinkingInterval = Mathf.Max(1, animalThinkingInterval);
-defaultPlantGrowthTicksPerStage = Mathf.Max(1, defaultPlantGrowthTicksPerStage);
-defaultPlantMaturityCycleTicks = Mathf.Max(1, defaultPlantMaturityCycleTicks);
 }
 
 void ApplySlowPacedPreset() {
 ticksPerRealSecond = 1f;
 ticksPerDay = 200;
-ticksPerWave = 100;
 dayPhaseTicks = 120;
 nightPhaseTicks = 80;
 transitionTicks = 20;
-executionPhaseTicks = 10;
-defaultPlantGrowthTicksPerStage = 8;
 animalHungerTickInterval = 5;
 }
 
 void ApplyFastPacedPreset() {
 ticksPerRealSecond = 4f;
 ticksPerDay = 50;
-ticksPerWave = 25;
 dayPhaseTicks = 30;
 nightPhaseTicks = 20;
 transitionTicks = 5;
-executionPhaseTicks = 3;
-defaultPlantGrowthTicksPerStage = 2;
 animalHungerTickInterval = 2;
 }
 
 void ApplyBalancedPreset() {
 ticksPerRealSecond = 2f;
 ticksPerDay = 100;
-ticksPerWave = 50;
 dayPhaseTicks = 60;
 nightPhaseTicks = 40;
 transitionTicks = 10;
-executionPhaseTicks = 5;
-defaultPlantGrowthTicksPerStage = 5;
 animalHungerTickInterval = 3;
 }
 }

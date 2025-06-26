@@ -22,7 +22,7 @@ MonoBehaviour:
   maxWanderMoveTicks: 6
   minWanderPauseTicks: 1
   maxWanderPauseTicks: 1
-  searchRadiusTiles: 15
+  searchRadiusTiles: 20
   eatDistanceTiles: 1
   eatDurationTicks: 3
   thoughtCooldownTicks: 10
@@ -36,5 +36,6 @@ MonoBehaviour:
   poopCooldownTicks: 2
   poopColorVariation: 0.1
   diet: {fileID: 11400000, guid: 766f7dacca78d7646a516088c17e8f54, type: 2}
+  thoughtLibrary: {fileID: 11400000, guid: 8abd92eb95108124a8478425e6e2cfb5, type: 2}
   attractiveScentDefinitions: []
   repellentScentDefinitions: []
