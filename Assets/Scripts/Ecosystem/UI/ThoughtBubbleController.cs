@@ -1,30 +1,33 @@
 ﻿using UnityEngine;
 using TMPro;
+using WegoSystem;
 
-public class ThoughtBubbleController : MonoBehaviour
-{
+public class ThoughtBubbleController : MonoBehaviour {
     public TMP_Text messageText;
-    public float lifetime = 2f;
-
+    
+    private float lifetimeTicks;
     private Transform followTarget;
 
-    public void Initialize(string message, Transform target, float duration = 2f)
-    {
+    public void Initialize(string message, Transform target, float durationInTicks) {
         if (messageText != null)
             messageText.text = message;
         followTarget = target;
-        lifetime = duration;
+        lifetimeTicks = durationInTicks;
     }
 
-    private void Update()
-    {
-        lifetime -= Time.deltaTime;
-        if (lifetime <= 0f)
+    void Update() {
+        // Convert real-time to tick-based countdown
+        if (TickManager.Instance?.Config != null) {
+            lifetimeTicks -= TickManager.Instance.Config.ticksPerRealSecond * Time.deltaTime;
+        } else {
+            // Fallback: assume 2 ticks per second
+            lifetimeTicks -= 2f * Time.deltaTime;
+        }
+
+        if (lifetimeTicks <= 0f)
             Destroy(gameObject);
 
-        // Follow the target if needed (optional if already a child)
-        if (followTarget != null)
-        {
+        if (followTarget != null) {
             transform.position = followTarget.position;
         }
     }

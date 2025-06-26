@@ -1,106 +1,87 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
-// Simplified Preference: Links FoodType to satiation amount and behavior priority
 [System.Serializable]
-public class DietPreferenceSimplified
-{
-    [Tooltip("The specific FoodType this preference applies to.")]
+public class DietPreferenceSimplified {
     public FoodType foodType;
-
-    [Tooltip("How much satiation (hunger reduction) is gained when this food is eaten.")]
+    [Tooltip("How much hunger this food reduces when eaten")]
     public float satiationAmount = 5f;
-
-    [Tooltip("Priority for seeking this food (higher value = higher priority). Used for choosing between nearby valid foods.")]
-    [Range(0.1f, 5f)]
+    [Tooltip("Higher values = more preferred. Used for AI decision making")]
     public float preferencePriority = 1f;
 }
 
-
-// Simplified Diet: Defines hunger stats and list of preferences
-[CreateAssetMenu(fileName = "Diet_", menuName = "Ecosystem/Animal Diet (Simplified)")]
-public class AnimalDiet : ScriptableObject
-{
-    [Header("Diet Preferences")]
-    [Tooltip("List of foods this animal can eat and how much they satisfy hunger.")]
+[CreateAssetMenu(fileName = "NewAnimalDiet", menuName = "Ecosystem/Animal Diet")]
+public class AnimalDiet : ScriptableObject {
+    [Header("Food Preferences")]
     public List<DietPreferenceSimplified> acceptableFoods = new List<DietPreferenceSimplified>();
 
-    [Header("Hunger Mechanics")]
-    [Tooltip("Maximum hunger level.")]
+    [Header("Hunger Settings")]
+    [Tooltip("Maximum hunger value before starvation damage begins")]
     public float maxHunger = 20f;
-    [Tooltip("Rate at which hunger increases per second.")]
+    
+    [Tooltip("How much hunger increases per hunger tick (see TickManager config)")]
     public float hungerIncreaseRate = 0.5f;
-    [Tooltip("Hunger level above which the animal will actively seek food.")]
+    
+    [Tooltip("When hunger reaches this value, animal will seek food")]
     public float hungerThreshold = 10f;
 
-    // Removed starvation for simplicity, can be added back later if needed
-    // [Header("Starvation")]
-    // public float starvationDamageRate = 0.5f;
-
-    /// <summary>
-    /// Checks if a specific FoodType is included in this diet's acceptable foods.
-    /// </summary>
-    public bool CanEat(FoodType food)
-    {
+    public bool CanEat(FoodType food) {
         if (food == null) return false;
         return acceptableFoods.Any(pref => pref.foodType == food);
     }
 
-    /// <summary>
-    /// Gets the DietPreferenceSimplified entry for a specific FoodType.
-    /// </summary>
-    public DietPreferenceSimplified GetPreference(FoodType food)
-    {
-         if (food == null) return null;
-         return acceptableFoods.FirstOrDefault(p => p.foodType == food);
+    public DietPreferenceSimplified GetPreference(FoodType food) {
+        if (food == null) return null;
+        return acceptableFoods.FirstOrDefault(p => p.foodType == food);
     }
 
-    /// <summary>
-    /// Gets the satiation amount provided by a specific FoodType for this diet.
-    /// </summary>
-    public float GetSatiationValue(FoodType food)
-    {
+    public float GetSatiationValue(FoodType food) {
         var pref = GetPreference(food);
         return pref != null ? pref.satiationAmount : 0f;
     }
 
-    /// <summary>
-    /// Finds the best food target from nearby colliders based on preference and distance.
-    /// </summary>
-    public GameObject FindBestFood(Collider2D[] nearbyColliders, Vector3 animalPosition)
-    {
+    public GameObject FindBestFood(Collider2D[] nearbyColliders, Vector3 animalPosition) {
         GameObject bestTarget = null;
-        float highestScore = -1f; // Start below any possible score
+        float highestScore = -1f;
 
-        foreach (var collider in nearbyColliders)
-        {
+        foreach (var collider in nearbyColliders) {
             if (collider == null) continue;
 
-            // BUGFIX: Skip objects with PoopController to prevent animals from eating poop
+            // Skip poop
             PoopController poopController = collider.GetComponent<PoopController>();
             if (poopController != null) continue;
 
+            // Check for food
             FoodItem foodItem = collider.GetComponent<FoodItem>();
-
-            // Must have FoodItem and its FoodType must be edible by this diet
-            if (foodItem != null && foodItem.foodType != null && CanEat(foodItem.foodType))
-            {
+            if (foodItem != null && foodItem.foodType != null && CanEat(foodItem.foodType)) {
                 DietPreferenceSimplified pref = GetPreference(foodItem.foodType);
-                if (pref == null) continue; // Should be caught by CanEat, but safe check
+                if (pref == null) continue;
 
                 float distance = Vector3.Distance(animalPosition, collider.transform.position);
-                // Simple score: Higher preference is better, closer is better.
-                // Avoid division by zero or very small distances inflating score excessively.
                 float score = pref.preferencePriority / (1f + distance); // Inverse distance weighting
 
-                if (score > highestScore)
-                {
+                if (score > highestScore) {
                     highestScore = score;
                     bestTarget = collider.gameObject;
                 }
             }
         }
         return bestTarget;
+    }
+
+    void OnValidate() {
+        // Ensure all values are positive and make sense
+        maxHunger = Mathf.Max(1f, maxHunger);
+        hungerIncreaseRate = Mathf.Max(0.1f, hungerIncreaseRate);
+        hungerThreshold = Mathf.Clamp(hungerThreshold, 0f, maxHunger);
+
+        // Validate food preferences
+        foreach (var pref in acceptableFoods) {
+            if (pref != null) {
+                pref.satiationAmount = Mathf.Max(0.1f, pref.satiationAmount);
+                pref.preferencePriority = Mathf.Max(0.1f, pref.preferencePriority);
+            }
+        }
     }
 }

@@ -2,15 +2,13 @@
 using UnityEngine;
 using WegoSystem;
 
-public enum TurnPhase
-{
+public enum TurnPhase {
     Planning,
     Execution
 }
 
-public class TurnPhaseManager : MonoBehaviour, ITickUpdateable
-{
-    public static TurnPhaseManager Instance { get; set; }
+public class TurnPhaseManager : MonoBehaviour, ITickUpdateable {
+    public static TurnPhaseManager Instance { get; private set; }
 
     [SerializeField] private TurnPhase currentPhase = TurnPhase.Planning;
     [SerializeField] private int currentPhaseTicks = 0;
@@ -25,61 +23,51 @@ public class TurnPhaseManager : MonoBehaviour, ITickUpdateable
     public event Action OnPlanningPhaseStarted;
     public event Action OnExecutionPhaseStarted;
 
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
+    void Awake() {
+        if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
         }
         Instance = this;
     }
 
-    void Start()
-    {
-        if (TickManager.Instance != null)
-        {
+    void Start() {
+        if (TickManager.Instance != null) {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
-        else
-        {
+        else {
             Debug.LogError("[TurnPhaseManager] TickManager not found!");
         }
 
         TransitionToPhase(TurnPhase.Planning);
     }
 
-    void OnDestroy()
-    {
-        if (Instance == this)
-        {
+    void OnDestroy() {
+        if (Instance == this) {
             Instance = null;
         }
 
-        if (TickManager.Instance != null)
-        {
+        if (TickManager.Instance != null) {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
     }
 
-    public void OnTickUpdate(int currentTick)
-    {
+    public void OnTickUpdate(int currentTick) {
         currentPhaseTicks++;
     }
 
-    private bool HasActionsToProcess()
-    {
+    bool HasActionsToProcess() {
         var gardeners = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
-        foreach (var gardener in gardeners)
-        {
-            // This logic is now obsolete with immediate movement
-            // if (gardener.GetQueuedMoveCount() > 0) return true; 
+        foreach (var gardener in gardeners) {
+            // Check if gardener has pending actions
         }
 
         var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-        foreach (var animal in animals)
-        {
-            if (currentPhaseTicks % animal.thinkingTickInterval == 0) return true;
+        foreach (var animal in animals) {
+            // FIXED: Use animal.definition.thinkingTickInterval instead of animal.thinkingTickInterval
+            if (animal.definition != null && currentPhaseTicks % animal.definition.thinkingTickInterval == 0) {
+                return true;
+            }
         }
 
         var plants = PlantGrowth.AllActivePlants;
@@ -88,28 +76,23 @@ public class TurnPhaseManager : MonoBehaviour, ITickUpdateable
         return false;
     }
 
-    public void EndPlanningPhase()
-    {
-        if (currentPhase == TurnPhase.Planning)
-        {
+    public void EndPlanningPhase() {
+        if (currentPhase == TurnPhase.Planning) {
             TransitionToPhase(TurnPhase.Execution);
         }
-        else
-        {
+        else {
             Debug.LogWarning($"[TurnPhaseManager] Cannot end planning phase - current phase is {currentPhase}");
         }
     }
 
-    public void TransitionToPhase(TurnPhase newPhase)
-    {
+    public void TransitionToPhase(TurnPhase newPhase) {
         if (currentPhase == newPhase) return;
 
         TurnPhase oldPhase = currentPhase;
         currentPhase = newPhase;
         currentPhaseTicks = 0;
 
-        switch (newPhase)
-        {
+        switch (newPhase) {
             case TurnPhase.Planning:
                 OnPlanningPhaseStarted?.Invoke();
                 break;
@@ -121,16 +104,13 @@ public class TurnPhaseManager : MonoBehaviour, ITickUpdateable
 
         OnPhaseChanged?.Invoke(oldPhase, newPhase);
 
-        if (debugMode)
-        {
+        if (debugMode) {
             Debug.Log($"[TurnPhaseManager] Phase transition: {oldPhase} -> {newPhase}");
         }
     }
 
-    public void ForcePhase(TurnPhase phase)
-    {
-        if (Application.isEditor || Debug.isDebugBuild)
-        {
+    public void ForcePhase(TurnPhase phase) {
+        if (Application.isEditor || Debug.isDebugBuild) {
             TransitionToPhase(phase);
         }
     }

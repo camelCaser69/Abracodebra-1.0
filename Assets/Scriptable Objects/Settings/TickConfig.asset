@@ -13,16 +13,17 @@ MonoBehaviour:
   m_Name: TickConfig
   m_EditorClassIdentifier: 
   ticksPerRealSecond: 2
-  ticksPerGameHour: 10
-  hoursPerDay: 24
+  ticksPerDay: 100
   dayPhaseTicks: 60
   nightPhaseTicks: 40
   transitionTicks: 10
+  ticksPerWave: 80
+  wavesDependOnDayCycle: 0
   maxPlanningPhaseTicks: 0
   executionPhaseTicks: 5
-  resolutionPhaseTicks: 2
-  plantGrowthTicksPerStage: 5
-  animalHungerTickInterval: 3
-  waveSpawnDelayTicks: 20
+  animalHungerTickInterval: 1
+  animalThinkingInterval: 3
+  defaultPlantGrowthTicksPerStage: 5
+  defaultPlantMaturityCycleTicks: 20
   movementTicksPerTile: 1
   movementCooldownTicks: 0
