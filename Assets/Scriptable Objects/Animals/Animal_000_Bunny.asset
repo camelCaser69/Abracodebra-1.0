@@ -22,12 +22,12 @@ MonoBehaviour:
   maxWanderMoveTicks: 6
   minWanderPauseTicks: 1
   maxWanderPauseTicks: 1
-  searchRadiusTiles: 20
+  searchRadiusTiles: 12
   eatDistanceTiles: 1
-  eatDurationTicks: 3
+  eatDurationTicks: 1
   thoughtCooldownTicks: 10
   starvationDamageTickInterval: 1
-  damagePerStarvationTick: 2
+  damagePerStarvationTick: 1
   deathFadeTicks: 3
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
   damageFlashTicks: 1

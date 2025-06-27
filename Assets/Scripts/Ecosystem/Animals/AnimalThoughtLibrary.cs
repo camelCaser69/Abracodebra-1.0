@@ -1,21 +1,41 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-[CreateAssetMenu(fileName = "AnimalThoughtLibrary", menuName = "Ecosystem/Animal Thought Library")]
+[CreateAssetMenu(fileName = "NewAnimalThoughtLibrary", menuName = "Ecosystem/Animal Thought Library")]
 public class AnimalThoughtLibrary : ScriptableObject
 {
-    public List<AnimalThoughtLine> allThoughts;
-}
-
-[System.Serializable]
-public class AnimalThoughtLine
-{
-    [Header("Which Animal?")]
-    public string speciesName; // e.g. "Bunny", "Fox", "Bird"
-
-    [Header("Trigger Condition")]
-    public ThoughtTrigger trigger;
-
-    [Header("Possible Lines to Randomly Choose From")]
-    public List<string> lines;
+    [Header("Thought Messages")]
+    public string[] hungryThoughts = new string[] 
+    { 
+        "I'm hungry!", 
+        "Need food...", 
+        "Where's the food?" 
+    };
+    
+    public string[] eatingThoughts = new string[] 
+    { 
+        "Yum!", 
+        "Delicious!", 
+        "Nom nom nom" 
+    };
+    
+    public string[] healthLowThoughts = new string[] 
+    { 
+        "I don't feel good...", 
+        "Help me!", 
+        "Ouch!" 
+    };
+    
+    public string[] fleeingThoughts = new string[] 
+    { 
+        "Run away!", 
+        "Scary!", 
+        "Help!" 
+    };
+    
+    public string[] poopingThoughts = new string[] 
+    { 
+        "Nature calls!", 
+        "Gotta go!", 
+        "..." 
+    };
 }

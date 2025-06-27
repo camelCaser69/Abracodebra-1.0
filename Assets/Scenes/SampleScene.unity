@@ -16898,8 +16898,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   showRadiusVisualizations: 1
-  tileVisualizationAlpha: 0.3
-  tilePrefab: {fileID: 0}
+  tileVisualizationAlpha: 0.2
+  tilePrefab: {fileID: 4886254577836975288, guid: 4d4a6b97107455a4e9d4070dd042ca75, type: 3}
   animalSearchRadiusColor: {r: 1, g: 0.5, b: 0, a: 0.3}
   plantPoopRadiusColor: {r: 0.6, g: 0.4, b: 0.2, a: 0.3}
   scentRadiusColor: {r: 1, g: 1, b: 0, a: 0.3}

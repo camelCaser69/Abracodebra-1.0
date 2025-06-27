@@ -200,47 +200,69 @@ public class FaunaManager : MonoBehaviour
         return null;
     }
 
-    private GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn)
+    // Add this method to FaunaManager.cs to replace the existing SpawnAnimal method
+
+GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn)
+{
+    if (definition == null || definition.prefab == null)
     {
-        if (definition == null || definition.prefab == null) { Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab."); return null; }
-        if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!"); return null; }
-
-        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-
-        Vector2 minPaddedBounds, maxPaddedBounds;
-        float camHeight = mainCamera.orthographicSize * 2f;
-        float camWidth = camHeight * mainCamera.aspect;
-
-        minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
-        maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
-        minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
-        maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
-
-        GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
-
-        if (ecosystemParent != null)
-        {
-            Transform speciesParent = ecosystemParent;
-            if (EcosystemManager.Instance != null && EcosystemManager.Instance.sortAnimalsBySpecies && !string.IsNullOrEmpty(definition.animalName))
-            {
-                speciesParent = ecosystemParent.Find(definition.animalName);
-                if (speciesParent == null)
-                {
-                    GameObject subParentGO = new GameObject(definition.animalName);
-                    subParentGO.transform.SetParent(ecosystemParent);
-                    speciesParent = subParentGO.transform;
-                }
-            }
-            animalObj.transform.SetParent(speciesParent);
-        }
-
-        AnimalController controller = animalObj.GetComponent<AnimalController>();
-        if (controller != null) {
-            controller.Initialize(definition, minPaddedBounds, maxPaddedBounds, isOffscreenSpawn);
-        } else { Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj); Destroy(animalObj); return null; }
-        return animalObj;
+        Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab.");
+        return null;
     }
+    
+    if (mainCamera == null)
+    {
+        Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!");
+        return null;
+    }
+    
+    Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+    Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+    
+    Vector2 minPaddedBounds, maxPaddedBounds;
+    float camHeight = mainCamera.orthographicSize * 2f;
+    float camWidth = camHeight * mainCamera.aspect;
+    
+    minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
+    maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
+    minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
+    maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
+    
+    GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
+    
+    if (ecosystemParent != null)
+    {
+        Transform speciesParent = ecosystemParent;
+        if (EcosystemManager.Instance != null && EcosystemManager.Instance.sortAnimalsBySpecies && !string.IsNullOrEmpty(definition.animalName))
+        {
+            speciesParent = ecosystemParent.Find(definition.animalName);
+            if (speciesParent == null)
+            {
+                GameObject subParentGO = new GameObject(definition.animalName);
+                subParentGO.transform.SetParent(ecosystemParent);
+                speciesParent = subParentGO.transform;
+            }
+        }
+        animalObj.transform.SetParent(speciesParent);
+    }
+    
+    AnimalController controller = animalObj.GetComponent<AnimalController>();
+    if (controller != null)
+    {
+        // The new AnimalController doesn't need Initialize, but we can set up screen seeking if needed
+        if (isOffscreenSpawn)
+        {
+            Vector2 screenCenter = (minPaddedBounds + maxPaddedBounds) / 2f;
+            controller.SetSeekingScreenCenter(screenCenter, minPaddedBounds, maxPaddedBounds);
+        }
+    }
+    else
+    {
+        Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj);
+    }
+    
+    return animalObj;
+}
 
     void OnDrawGizmos()
     {

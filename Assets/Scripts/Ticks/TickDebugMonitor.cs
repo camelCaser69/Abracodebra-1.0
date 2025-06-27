@@ -133,28 +133,32 @@ public class TickDebugMonitor : MonoBehaviour {
         return FindObjectsByType<T>(FindObjectsSortMode.None).Length;
     }
     
-    void UpdateActiveEffects() {
-        // Clear old effects
+    // Replace the UpdateActiveEffects method in TickDebugMonitor.cs with this fixed version:
+
+    void UpdateActiveEffects()
+    {
         activeEffects.Clear();
-        
-        // Track animal states
+    
         var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-        foreach (var animal in animals) {
-            if (animal.CurrentHealth < animal.definition.maxHealth * 0.3f) {
+        foreach (var animal in animals)
+        {
+            // Access health through the Needs component
+            if (animal.Needs != null && animal.Needs.CurrentHealth < animal.Definition.maxHealth * 0.3f)
+            {
                 AddEffect($"{animal.SpeciesName}_low_health", "Low Health", animal.SpeciesName, -1, Color.red);
             }
         }
-        
-        // Track plant growth
-        foreach (var plant in PlantGrowth.AllActivePlants) {
-            if (plant.CurrentState == PlantState.Growing) {
+    
+        foreach (var plant in PlantGrowth.AllActivePlants)
+        {
+            if (plant.CurrentState == PlantState.Growing)
+            {
                 var logic = plant.GrowthLogic;
                 int remainingTicks = logic.GrowthTicksPerStage - Mathf.FloorToInt(logic.GetGrowthProgressNormalized() * logic.GrowthTicksPerStage);
                 AddEffect($"plant_growing_{plant.GetInstanceID()}", "Growing", plant.name, remainingTicks, Color.green);
             }
         }
-        
-        // Update UI
+    
         RefreshEffectUI();
     }
     
