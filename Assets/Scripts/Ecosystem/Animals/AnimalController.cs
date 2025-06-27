@@ -100,6 +100,10 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
+        if (GridDebugVisualizer.Instance != null)
+        {
+            GridDebugVisualizer.Instance.HideContinuousRadius(this);
+        }
     }
 
     void Update()
@@ -112,10 +116,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         UpdateSpriteFlipping();
         UpdateFlashEffect();
 
-        if (showPathfindingDebugLine)
-        {
-            UpdatePathDebugLine();
-        }
+        UpdatePathDebugLine();
     }
 
     #endregion
@@ -171,23 +172,27 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     
     void SetupDebugLineRenderer()
     {
-        if (!showPathfindingDebugLine) return;
-
         pathDebugLine = gameObject.GetComponent<LineRenderer>();
-        if (pathDebugLine == null)
+        if (showPathfindingDebugLine)
         {
-            pathDebugLine = gameObject.AddComponent<LineRenderer>();
+            if (pathDebugLine == null)
+            {
+                pathDebugLine = gameObject.AddComponent<LineRenderer>();
+            }
+            pathDebugLine.enabled = true;
+            pathDebugLine.startWidth = 0.05f;
+            pathDebugLine.endWidth = 0.05f;
+            pathDebugLine.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+            pathDebugLine.startColor = Color.cyan;
+            pathDebugLine.endColor = Color.magenta;
+            pathDebugLine.positionCount = 0;
+            pathDebugLine.sortingLayerName = "UI";
+            pathDebugLine.sortingOrder = 100;
         }
-        
-        // Configure the LineRenderer for debugging
-        pathDebugLine.startWidth = 0.05f;
-        pathDebugLine.endWidth = 0.05f;
-        pathDebugLine.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
-        pathDebugLine.startColor = Color.cyan;
-        pathDebugLine.endColor = Color.magenta;
-        pathDebugLine.positionCount = 0;
-        pathDebugLine.sortingLayerName = "UI"; // A high sorting layer to ensure visibility
-        pathDebugLine.sortingOrder = 100;
+        else if(pathDebugLine != null)
+        {
+            pathDebugLine.enabled = false;
+        }
     }
 
     public void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false)
@@ -255,6 +260,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
                 if (!isHungryAndSearching && currentHunger >= animalDiet.hungerThreshold)
                 {
                     isHungryAndSearching = true;
+                    // Force an immediate decision when becoming hungry
                     MakeDecision();
                 }
             }
@@ -306,7 +312,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
     void MakeDecision()
     {
-        if (isEating || isDying) return;
+        if (isEating || isDying || gridEntity.IsMoving) return;
         
         if (isSeekingScreenCenter)
         {
@@ -314,12 +320,9 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             return;
         }
         
-        // If we are already moving, don't make a new decision until we've stopped.
-        // This prevents overwriting a path while it's being executed.
-        if(gridEntity.IsMoving) return;
-
         if (currentHunger >= animalDiet.hungerThreshold)
         {
+            isHungryAndSearching = true;
             PlanFoodSeeking();
         }
         else
@@ -329,56 +332,55 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         }
     }
 
+    // <<< FIX: Completely rewritten for robust path execution.
     void ExecutePlannedAction()
     {
-        if (gridEntity == null || !hasPlannedAction) return;
+        if (gridEntity == null || !hasPlannedAction || gridEntity.IsMoving) return;
 
-        // Priority 1: Check if we can eat.
-        if (currentTargetFood != null)
+        // Step 1: Check for the goal condition (eating).
+        if (currentTargetFood != null && gridEntity.Position.ManhattanDistance(GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position)) <= definition.eatDistanceTiles)
         {
-            GridPosition foodPos = GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position);
-            if (gridEntity.Position.ManhattanDistance(foodPos) <= definition.eatDistanceTiles)
-            {
-                StartEating();
-                hasPlannedAction = false;
-                currentPath.Clear();
-                ClearPathDebugLine();
-                return;
-            }
+            StartEating();
+            return;
         }
 
-        // Priority 2: If we have reached our current waypoint, figure out the next one.
-        if (gridEntity.Position == targetPosition)
+        // Step 2: If we have a path, get the next waypoint.
+        if (currentPath != null && currentPath.Count > 0 && currentPathIndex < currentPath.Count)
         {
-            if (currentPath != null && currentPathIndex < currentPath.Count - 1)
-            {
-                // Path has more steps, advance to the next waypoint.
-                currentPathIndex++;
-                targetPosition = currentPath[currentPathIndex];
-            }
-            else
-            {
-                // Reached the end of the path or it was a single-step wander. Plan is complete.
-                hasPlannedAction = false;
-                currentPath.Clear();
-                ClearPathDebugLine();
-                return;
-            }
-        }
-        
-        // Priority 3: Execute the move towards the current targetPosition.
-        if (gridEntity.Position != targetPosition)
-        {
-            gridEntity.SetPosition(targetPosition);
+            targetPosition = currentPath[currentPathIndex];
         }
         else
         {
-            // This case can happen if the path is a single point we are already on.
-            // The logic above handles advancing, so if we reach here, we are done.
+            // If there's no path, this must be a single-step wander.
+            // 'targetPosition' is already set from PlanWandering.
+        }
+
+        // Step 3: Execute the move if we aren't at our immediate target.
+        if (gridEntity.Position != targetPosition)
+        {
+            gridEntity.SetPosition(targetPosition);
+            
+            // Step 4: After *initiating* the move, prepare for the next tick.
+            if (currentPath != null && currentPath.Count > 0)
+            {
+                // Advance the path index so next tick we aim for the next waypoint.
+                currentPathIndex++;
+            }
+            else
+            {
+                // It was a single-step move, so the plan is now complete.
+                hasPlannedAction = false;
+            }
+        }
+        else
+        {
+            // We are already at our target position. This can happen if the path is blocked
+            // or if it was a single point. In any case, this plan is done.
             hasPlannedAction = false;
+            currentPath.Clear();
+            ClearPathDebugLine();
         }
     }
-
 
     #endregion
 
@@ -407,6 +409,12 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
     void PlanFoodSeeking()
     {
+        // <<< FIX: Turn on the search radius visual.
+        if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild)
+        {
+            GridDebugVisualizer.Instance.VisualizeAnimalSearchRadius(this, gridEntity.Position, definition.searchRadiusTiles);
+        }
+
         if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
 
         GameObject nearestFood = FindNearestFoodInGrid();
@@ -421,27 +429,30 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             if (currentPath.Count > 0)
             {
                 hasPlannedAction = true;
-                targetPosition = currentPath[0];
             }
             else
             {
-                // Can't path to food, try moving towards it one step
                 PlanMovementToward(foodGridPos);
-                currentPath.Clear(); // Ensure no old path data remains
+                currentPath.Clear();
             }
         }
         else
         {
-            // No food found, just wander
             PlanWandering();
         }
     }
 
     void PlanWandering()
     {
-        if (gridEntity == null) return;
-
+        // <<< FIX: Turn off the search radius and path visuals when not seeking food.
+        if (GridDebugVisualizer.Instance != null)
+        {
+            GridDebugVisualizer.Instance.HideContinuousRadius(this);
+        }
         ClearPathDebugLine();
+
+        if (gridEntity == null) return;
+        
         currentPath.Clear();
         currentTargetFood = null;
 
@@ -460,7 +471,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             GridPosition.Left, GridPosition.Right
         };
 
-        // Try a few times to find a valid direction
         for (int i = 0; i < 4; i++)
         {
             GridPosition randomDir = directions[UnityEngine.Random.Range(0, directions.Length)];
@@ -470,11 +480,10 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             {
                 targetPosition = targetPos;
                 hasPlannedAction = true;
-                return; // Found a move, exit
+                return;
             }
         }
         
-        // Could not find a valid move, do nothing this tick.
         hasPlannedAction = false;
     }
 
@@ -525,19 +534,15 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     bool IsValidMove(GridPosition pos)
     {
         if (GridPositionManager.Instance == null) return false;
-        // Allow moving to an occupied tile ONLY if it's the food target
-        bool isOccupiedByOther = GridPositionManager.Instance.IsPositionOccupied(pos);
-        if (isOccupiedByOther)
+        
+        if (GridPositionManager.Instance.IsPositionOccupied(pos))
         {
             if (currentTargetFood != null)
             {
                 var foodGridPos = GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position);
-                if (pos == foodGridPos)
-                {
-                    return true; // It's the food, we can move there.
-                }
+                if (pos == foodGridPos) return true;
             }
-            return false; // Occupied by something else, invalid.
+            return false;
         }
 
         return GridPositionManager.Instance.IsPositionValid(pos);
@@ -551,11 +556,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
         GameObject bestFood = null;
         float bestScore = -1f;
-
-        if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild)
-        {
-            GridDebugVisualizer.Instance.VisualizeAnimalSearchRadius(this, gridEntity.Position, definition.searchRadiusTiles);
-        }
 
         foreach (var tilePos in tilesInRange)
         {
@@ -592,6 +592,15 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
     void StartEating()
     {
+        // <<< FIX: Turn off all debug visuals when eating.
+        if (GridDebugVisualizer.Instance != null)
+        {
+            GridDebugVisualizer.Instance.HideContinuousRadius(this);
+        }
+        ClearPathDebugLine();
+        currentPath.Clear();
+        hasPlannedAction = false;
+
         isEating = true;
         eatRemainingTicks = definition.eatDurationTicks;
         if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
@@ -614,8 +623,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             hasPooped = false;
             poopDelayTick = UnityEngine.Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
             currentTargetFood = null;
-            ClearPathDebugLine();
-
+            
             if (currentHunger < animalDiet.hungerThreshold)
             {
                 isHungryAndSearching = false;
@@ -710,23 +718,29 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
 
     void UpdatePathDebugLine()
     {
-        if (pathDebugLine == null || !isHungryAndSearching || currentPath == null || currentPath.Count == 0 || currentTargetFood == null)
-        {
-            if (pathDebugLine != null) pathDebugLine.positionCount = 0;
-            return;
-        }
-
-        // +1 for the animal's current position
-        pathDebugLine.positionCount = (currentPath.Count - currentPathIndex) + 1;
+        if (pathDebugLine == null || !showPathfindingDebugLine) return;
         
-        // Start the line from the animal's current world position
-        pathDebugLine.SetPosition(0, transform.position);
-
-        // Add the rest of the path waypoints
-        for (int i = 0; i < currentPath.Count - currentPathIndex; i++)
+        // <<< FIX: Simplified and corrected logic.
+        if (isHungryAndSearching && currentPath != null && currentPath.Count > 0 && currentTargetFood != null)
         {
-            Vector3 worldPos = GridPositionManager.Instance.GridToWorld(currentPath[i + currentPathIndex]);
-            pathDebugLine.SetPosition(i + 1, worldPos);
+            // Number of points is the animal's current position + remaining waypoints.
+            int remainingWaypoints = currentPath.Count - currentPathIndex;
+            pathDebugLine.positionCount = 1 + remainingWaypoints;
+
+            // First point is always the animal's current ground position.
+            pathDebugLine.SetPosition(0, gridEntity.GroundWorldPosition);
+
+            // Add the rest of the waypoints from the path.
+            for (int i = 0; i < remainingWaypoints; i++)
+            {
+                Vector3 worldPos = GridPositionManager.Instance.GridToWorld(currentPath[i + currentPathIndex]);
+                pathDebugLine.SetPosition(i + 1, worldPos);
+            }
+        }
+        else
+        {
+            // If not actively pathing to food, clear the line.
+            pathDebugLine.positionCount = 0;
         }
     }
 
@@ -881,4 +895,4 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     }
 
     #endregion
-}
+} 

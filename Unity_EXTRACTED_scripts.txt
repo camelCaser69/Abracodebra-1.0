@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 510,954 → 351,300 chars (31.2% reduction)
-Estimated tokens saved: ~39,913
+Compression Stats: 519,491 → 355,521 chars (31.6% reduction)
+Estimated tokens saved: ~40,992
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -24,101 +24,101 @@ using System;
   RunManager (Assets\Scripts\Core/) L70
   SortableEntity (Assets\Scripts\Core/) L204
   UIManager (Assets\Scripts\Core/) L271
-  WeatherManager (Assets\Scripts\Core/) L558
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L757
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1401
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1464
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1473
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1486
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1503
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1893
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1924
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2185
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2253
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2268
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2287
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2345
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2481
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2557
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2574
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2587
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2616
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2824
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3054
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3328
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3357
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3393
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3406
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3434
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3495
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3540
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3591
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3625
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3728
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3789
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3809
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3844
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3859
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L3944
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4204
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4227
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4280
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4309
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4318
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4343
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4528
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4567
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4591
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4793
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4873
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5052
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5272
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5497
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5589
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5906
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L5973
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6044
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6350
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6475
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6686
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6820
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7140
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7276
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7569
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7657
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L7758
-  GridSnapStartup (Assets\Scripts\Ticks/) L7859
-  TickDebugMonitor (Assets\Scripts\Ticks/) L7925
-  TurnPhaseManager (Assets\Scripts\Ticks/) L8096
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8214
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8283
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8514
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8525
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8554
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8650
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8755
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9150
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9186
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9350
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9492
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9610
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9732
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9937
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L9977
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10001
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10021
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10495
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10507
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10542
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10701
+  WeatherManager (Assets\Scripts\Core/) L566
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L765
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1490
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1553
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1562
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1575
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1592
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1982
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2013
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2274
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2342
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2357
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2376
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2434
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2570
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2646
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2663
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2676
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2705
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2913
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L3143
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3417
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3446
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3482
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3495
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3523
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3584
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3629
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3680
+  NodeEffectDrawer (Assets\Scripts\Editor/) L3714
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3817
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3878
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3898
+  LeafData (Assets\Scripts\PlantSystem\Data/) L3933
+  NodeData (Assets\Scripts\PlantSystem\Data/) L3948
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4033
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4293
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4316
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4369
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4398
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4407
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4432
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4617
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4656
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4680
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4882
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4962
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5141
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5361
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5586
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5678
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5995
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L6062
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6133
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6439
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L6564
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6775
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6909
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7229
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7365
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7658
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7746
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L7847
+  GridSnapStartup (Assets\Scripts\Ticks/) L8022
+  TickDebugMonitor (Assets\Scripts\Ticks/) L8088
+  TurnPhaseManager (Assets\Scripts\Ticks/) L8259
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8377
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8446
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8677
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8688
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8717
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8813
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8918
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9313
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9349
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9513
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9655
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9773
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9895
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10100
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10140
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10164
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10184
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10672
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10684
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10719
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10878
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L10711
-  GridPosition (Assets\Scripts\Ticks/) L10862
-  GridPositionManager (Assets\Scripts\Ticks/) L10963
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11317
-  TickConfiguration (Assets\Scripts\Ticks/) L11461
-  ITickUpdateable (Assets\Scripts\Ticks/) L11544
+  GridEntity (Assets\Scripts\Ticks/) L10888
+  GridPosition (Assets\Scripts\Ticks/) L11039
+  GridPositionManager (Assets\Scripts\Ticks/) L11140
+  GridRadiusUtility (Assets\Scripts\Ticks/) L11494
+  TickConfiguration (Assets\Scripts\Ticks/) L11638
+  ITickUpdateable (Assets\Scripts\Ticks/) L11721
 
 ================================================================================
 SCRIPTS
@@ -388,9 +388,11 @@ pub stat UIManager Instance { get; set; }
 [SerializeField] GameObject wegoControlPanel;
 [SerializeField] Button endPlanningPhaseButton;
 [SerializeField] TextMeshProUGUI currentPhaseText;
-[SerializeField] TextMeshProUGUI tickCounterText;
+[SerializeField] TextMeshProUGUI tickCounterText; // The one inside the Wego panel
 [SerializeField] TextMeshProUGUI phaseProgressText;
 [SerializeField] Button advanceTickButton;
+
+[SerializeField] TextMeshProUGUI persistentTickCounterText; // <<< NEW FIELD
 
 void Awake() {
 if (Instance != null && Instance != this) {
@@ -540,8 +542,14 @@ TurnPhase currentPhase = TurnPhaseManager.Instance.CurrentPhase;
 currentPhaseText.text = $"Phase: {currentPhase}";
 }
 
-if (tickCounterText != null && TickManager.Instance != null) {
-tickCounterText.text = $"Tick: {TickManager.Instance.CurrentTick}";
+if (TickManager.Instance != null) {
+string tickInfo = $"Tick: {TickManager.Instance.CurrentTick}";
+if (tickCounterText != null) {
+tickCounterText.text = tickInfo;
+}
+if (persistentTickCounterText != null) {
+persistentTickCounterText.text = tickInfo;
+}
 }
 
 if (phaseProgressText != null && TurnPhaseManager.Instance != null) {
@@ -855,11 +863,12 @@ EnterPhase(phase, true);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Animals\AnimalController.cs
 
-﻿using System.Collections.Generic;
+﻿using System;
 using TMPro;
 using WegoSystem;
 
 pub cls AnimalController : MonoBehaviour, ITickUpdateable {
+
 [SerializeField] pub AnimalDefinition definition;
 [SerializeField] GameObject thoughtBubblePrefab;
 [SerializeField] Transform bubbleSpawnTransform;
@@ -871,9 +880,12 @@ pub cls AnimalController : MonoBehaviour, ITickUpdateable {
 [SerializeField] TextMeshProUGUI hungerText;
 [SerializeField] KeyCode showStatsKey = KeyCode.LeftAlt;
 
+[SerializeField] bool showPathfindingDebugLine = false;
+
 AnimalDiet animalDiet;
 GridEntity gridEntity;
 AnimalThoughtLibrary thoughtLibrary;
+LineRenderer pathDebugLine;
 
 GridPosition targetPosition;
 GameObject currentTargetFood = null;
@@ -892,7 +904,7 @@ int deathFadeRemainingTicks = 0;
 int wanderPauseTicks = 0;
 
 float flashRemainingTime = 0f;
-float flashDurationSeconds = 0.2f; // Default flash duration in seconds
+float flashDurationSeconds = 0.2f;
 
 float currentHealth;
 float currentHunger;
@@ -901,7 +913,7 @@ bool isPooping = false;
 bool hasPooped = true;
 bool isDying = false;
 bool isFlashing = false;
-bool isHungryAndSearching = false; // Track if we're actively searching for food
+bool isHungryAndSearching = false;
 
 bool isSeekingScreenCenter = false;
 Vector2 screenCenterTarget;
@@ -918,6 +930,7 @@ pub string SpeciesName => definition ? definition.animalName : "Uninitialized";
 
 void Awake() {
 CacheComponents();
+SetupDebugLineRenderer();
 }
 
 void Start() {
@@ -929,18 +942,14 @@ Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridE
 if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
-
-if (EcosystemManager.Instance != null) {
-thoughtLibrary = EcosystemManager.Instance.GetComponentInChildren<AnimalThoughtLibrary>();
-if (thoughtLibrary == null && definition != null && definition.thoughtLibrary != null) {
-thoughtLibrary = definition.thoughtLibrary;
-}
-}
 }
 
 void OnDestroy() {
 if (TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
+}
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(this);
 }
 }
 
@@ -951,8 +960,9 @@ bool showStats = Input.GetKey(showStatsKey);
 SetStatsTextVisibility(showStats);
 
 UpdateSpriteFlipping();
-
 UpdateFlashEffect();
+
+UpdatePathDebugLine();
 }
 
 void ValidateComponents() {
@@ -994,6 +1004,27 @@ enabled = false;
 }
 }
 
+void SetupDebugLineRenderer() {
+pathDebugLine = gameObject.GetComponent<LineRenderer>();
+if (showPathfindingDebugLine) {
+if (pathDebugLine == null) {
+pathDebugLine = gameObject.AddComponent<LineRenderer>();
+}
+pathDebugLine.enabled = true;
+pathDebugLine.startWidth = 0.05f;
+pathDebugLine.endWidth = 0.05f;
+pathDebugLine.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+pathDebugLine.startColor = Color.cyan;
+pathDebugLine.endColor = Color.magenta;
+pathDebugLine.positionCount = 0;
+pathDebugLine.sortingLayerName = "UI";
+pathDebugLine.sortingOrder = 100;
+}
+else if(pathDebugLine != null) {
+pathDebugLine.enabled = false;
+}
+}
+
 pub void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false) {
 definition = def;
 if (definition == null) {
@@ -1007,7 +1038,7 @@ currentHealth = definition.maxHealth;
 currentHunger = 0f;
 hasPooped = true;
 
-poopDelayTick = Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
+poopDelayTick = UnityEngine.Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
 thoughtCooldownTick = 0;
 
 minBounds = shiftedMinBounds;
@@ -1073,7 +1104,7 @@ MakeDecision();
 lastThinkTick = currentTick;
 }
 
-if (hasPlannedAction && !isEating && !isPooping && wanderPauseTicks <= 0) {
+if (hasPlannedAction && !isEating && !isPooping) {
 ExecutePlannedAction();
 }
 
@@ -1089,12 +1120,15 @@ UpdateAnimations();
 }
 
 void MakeDecision() {
+if (isEating || isDying || gridEntity.IsMoving) return;
+
 if (isSeekingScreenCenter) {
 HandleScreenCenterSeeking();
 return;
 }
 
 if (currentHunger >= animalDiet.hungerThreshold) {
+isHungryAndSearching = true;
 PlanFoodSeeking();
 }
 else {
@@ -1104,30 +1138,34 @@ PlanWandering();
 }
 
 void ExecutePlannedAction() {
-if (gridEntity == null) return;
+if (gridEntity == null || !hasPlannedAction || gridEntity.IsMoving) return;
 
-if (currentTargetFood != null && targetPosition == gridEntity.Position) {
-GridPosition foodPos = GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position);
-int distance = gridEntity.Position.ManhattanDistance(foodPos);
-
-if (distance <= definition.eatDistanceTiles) {
+if (currentTargetFood != null && gridEntity.Position.ManhattanDistance(GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position)) <= definition.eatDistanceTiles) {
 StartEating();
 return;
 }
+
+if (currentPath != null && currentPath.Count > 0 && currentPathIndex < currentPath.Count) {
+targetPosition = currentPath[currentPathIndex];
+}
+else {
 }
 
-if (targetPosition != gridEntity.Position) {
+if (gridEntity.Position != targetPosition) {
 gridEntity.SetPosition(targetPosition);
 
-if (currentPath.Count > 0 && currentPathIndex < currentPath.Count - 1) {
+if (currentPath != null && currentPath.Count > 0) {
 currentPathIndex++;
-targetPosition = currentPath[currentPathIndex];
-hasPlannedAction = true;
-return;
 }
-}
-
+else {
 hasPlannedAction = false;
+}
+}
+else {
+hasPlannedAction = false;
+currentPath.Clear();
+ClearPathDebugLine();
+}
 }
 
 void HandleScreenCenterSeeking() {
@@ -1149,6 +1187,10 @@ PlanMovementToward(targetGridPos);
 }
 
 void PlanFoodSeeking() {
+if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
+GridDebugVisualizer.Instance.VisualizeAnimalSearchRadius(this, gridEntity.Position, definition.searchRadiusTiles);
+}
+
 if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
 
 GameObject nearestFood = FindNearestFoodInGrid();
@@ -1161,10 +1203,10 @@ currentPathIndex = 0;
 
 if (currentPath.Count > 0) {
 hasPlannedAction = true;
-targetPosition = currentPath[0];
 }
 else {
 PlanMovementToward(foodGridPos);
+currentPath.Clear();
 }
 }
 else {
@@ -1173,12 +1215,20 @@ PlanWandering();
 }
 
 void PlanWandering() {
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(this);
+}
+ClearPathDebugLine();
+
 if (gridEntity == null) return;
+
+currentPath.Clear();
+currentTargetFood = null;
 
 if (wanderPauseTicks > 0) return;
 
-if (Random.Range(0, 100) < definition.wanderPauseTickChance) {
-wanderPauseTicks = Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
+if (UnityEngine.Random.Range(0, 100) < definition.wanderPauseTickChance) {
+wanderPauseTicks = UnityEngine.Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
 hasPlannedAction = false;
 return;
 }
@@ -1189,17 +1239,18 @@ GridPosition.Up, GridPosition.Down,
 GridPosition.Left, GridPosition.Right
 };
 
-for (int i = 0; i < 3; i++) {
-GridPosition randomDir = directions[Random.Range(0, directions.Length)];
+for (int i = 0; i < 4; i++) {
+GridPosition randomDir = directions[UnityEngine.Random.Range(0, directions.Length)];
 GridPosition targetPos = currentPos + randomDir;
 
 if (IsValidMove(targetPos)) {
 targetPosition = targetPos;
 hasPlannedAction = true;
-wanderPauseTicks = Random.Range(definition.minWanderMoveTicks, definition.maxWanderMoveTicks);
-break;
+return;
 }
 }
+
+hasPlannedAction = false;
 }
 
 void PlanMovementToward(GridPosition target) {
@@ -1240,8 +1291,17 @@ PlanWandering();
 }
 
 bool IsValidMove(GridPosition pos) {
-ret GridPositionManager.Instance.IsPositionValid(pos) &&
-!GridPositionManager.Instance.IsPositionOccupied(pos);
+if (GridPositionManager.Instance == null) ret false;
+
+if (GridPositionManager.Instance.IsPositionOccupied(pos)) {
+if (currentTargetFood != null) {
+var foodGridPos = GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position);
+if (pos == foodGridPos) ret true;
+}
+ret false;
+}
+
+ret GridPositionManager.Instance.IsPositionValid(pos);
 }
 
 GameObject FindNearestFoodInGrid() {
@@ -1251,10 +1311,6 @@ var tilesInRange = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, defin
 
 GameObject bestFood = null;
 float bestScore = -1f;
-
-if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
-GridDebugVisualizer.Instance.VisualizeAnimalSearchRadius(this, gridEntity.Position, definition.searchRadiusTiles);
-}
 
 foreach (var tilePos in tilesInRange) {
 var entitiesAtTile = GridPositionManager.Instance.GetEntitiesAt(tilePos);
@@ -1282,6 +1338,13 @@ ret bestFood;
 }
 
 void StartEating() {
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(this);
+}
+ClearPathDebugLine();
+currentPath.Clear();
+hasPlannedAction = false;
+
 isEating = true;
 eatRemainingTicks = definition.eatDurationTicks;
 if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
@@ -1300,7 +1363,7 @@ currentHunger = Mathf.Max(0f, currentHunger);
 
 Destroy(currentTargetFood);
 hasPooped = false;
-poopDelayTick = Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
+poopDelayTick = UnityEngine.Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
 currentTargetFood = null;
 
 if (currentHunger < animalDiet.hungerThreshold) {
@@ -1334,7 +1397,7 @@ if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
 void SpawnPoop() {
 if (poopPrefabs == null || poopPrefabs.Count == 0) return;
 
-int index = Random.Range(0, poopPrefabs.Count);
+int index = UnityEngine.Random.Range(0, poopPrefabs.Count);
 GameObject prefab = poopPrefabs[index];
 if (prefab == null) return;
 
@@ -1343,13 +1406,13 @@ GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity);
 
 SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
 if (sr != null) {
-sr.flipX = Random.value > 0.5f;
+sr.flipX = UnityEngine.Random.value > 0.5f;
 Color c = sr.color;
 float v = definition.poopColorVariation;
 sr.color = new Color(
-Mathf.Clamp01(c.r + Random.Range(-v, v)),
-Mathf.Clamp01(c.g + Random.Range(-v, v)),
-Mathf.Clamp01(c.b + Random.Range(-v, v)),
+Mathf.Clamp01(c.r + UnityEngine.Random.Range(-v, v)),
+Mathf.Clamp01(c.g + UnityEngine.Random.Range(-v, v)),
+Mathf.Clamp01(c.b + UnityEngine.Random.Range(-v, v)),
 c.a
 );
 }
@@ -1380,6 +1443,31 @@ void Die(CauseOfDeath cause) {
 Debug.Log($"[{SpeciesName}] died: {cause}", gameObject);
 isDying = true;
 deathFadeRemainingTicks = definition.deathFadeTicks;
+}
+
+void UpdatePathDebugLine() {
+if (pathDebugLine == null || !showPathfindingDebugLine) return;
+
+if (isHungryAndSearching && currentPath != null && currentPath.Count > 0 && currentTargetFood != null) {
+int remainingWaypoints = currentPath.Count - currentPathIndex;
+pathDebugLine.positionCount = 1 + remainingWaypoints;
+
+pathDebugLine.SetPosition(0, gridEntity.GroundWorldPosition);
+
+for (int i = 0; i < remainingWaypoints; i++) {
+Vector3 worldPos = GridPositionManager.Instance.GridToWorld(currentPath[i + currentPathIndex]);
+pathDebugLine.SetPosition(i + 1, worldPos);
+}
+}
+else {
+pathDebugLine.positionCount = 0;
+}
+}
+
+void ClearPathDebugLine() {
+if (pathDebugLine != null) {
+pathDebugLine.positionCount = 0;
+}
 }
 
 void UpdateFlashEffect() {
@@ -1415,7 +1503,7 @@ t != null && t.speciesName == SpeciesName && t.trigger == trigger
 );
 
 if (entry != null && entry.lines != null && entry.lines.Count > 0) {
-string line = entry.lines[Random.Range(0, entry.lines.Count)];
+string line = entry.lines[UnityEngine.Random.Range(0, entry.lines.Count)];
 Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
 GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT);
 
@@ -1494,6 +1582,7 @@ if (hungerText != null) hungerText.gameObject.SetActive(visible);
 pub GridPosition GetCurrentGridPosition() {
 ret gridEntity?.Position ?? GridPosition.Zero;
 }
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -7856,15 +7945,23 @@ DestroyImmediate(gameObject);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridDebugVisualizer.cs
 
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using WegoSystem;
 
 pub cls GridDebugVisualizer : MonoBehaviour {
 pub stat GridDebugVisualizer Instance { get; set; }
 
+pub enum RadiusType {
+AnimalSearch,
+PlantPoop,
+Scent,
+FireflyPhotosynthesis,
+ToolUse
+}
+
 [SerializeField] bool showRadiusVisualizations = true;
 [SerializeField] float tileVisualizationAlpha = 0.3f;
-[SerializeField] GameObject tilePrefab; // Simple square sprite
+[SerializeField] GameObject tilePrefab;
 
 [SerializeField] Color animalSearchRadiusColor = new Color(1f, 0.5f, 0f, 0.3f);
 [SerializeField] Color plantPoopRadiusColor = new Color(0.6f, 0.4f, 0.2f, 0.3f);
@@ -7872,7 +7969,15 @@ pub stat GridDebugVisualizer Instance { get; set; }
 [SerializeField] Color fireflyPhotosynthesisColor = new Color(0f, 1f, 0.5f, 0.3f);
 [SerializeField] Color toolUseRadiusColor = new Color(0f, 0.5f, 1f, 0.3f);
 
-Dictionary<object, List<GameObject>> visualizedRadii = new Dictionary<object, List<GameObject>>();
+cls RadiusRequest {
+pub GridPosition Center;
+pub int Radius;
+pub RadiusType Type;
+}
+
+Dictionary<object, List<GameObject>> oneShotVisualizations = new Dictionary<object, List<GameObject>>();
+Dictionary<object, RadiusRequest> continuousRequests = new Dictionary<object, RadiusRequest>();
+Dictionary<object, (GridPosition center, int radius)> lastDrawnState = new Dictionary<object, (GridPosition, int)>();
 
 void Awake() {
 if (Instance != null && Instance != this) {
@@ -7885,6 +7990,28 @@ Instance = this;
 void OnDestroy() {
 ClearAllVisualizations();
 if (Instance == this) Instance = null;
+}
+
+void Update() {
+ProcessContinuousRequests();
+}
+
+pub void ShowContinuousRadius(object source, GridPosition center, int radius, RadiusType type) {
+if (!showRadiusVisualizations || source == null) return;
+
+if (!continuousRequests.ContainsKey(source)) {
+continuousRequests.Add(source, new RadiusRequest());
+}
+continuousRequests[source].Center = center;
+continuousRequests[source].Radius = radius;
+continuousRequests[source].Type = type;
+}
+
+pub void HideContinuousRadius(object source) {
+if (source == null) return;
+
+if (continuousRequests.Remove(source)) {
+}
 }
 
 pub void VisualizeRadius(object source, GridPosition center, int radius, Color color, float duration = 0f) {
@@ -7904,9 +8031,8 @@ if (sr != null) {
 Color finalColor = color;
 finalColor.a = tileVisualizationAlpha;
 sr.color = finalColor;
-sr.sortingOrder = -100; // Behind everything
+sr.sortingOrder = -100;
 }
-
 tileObjects.Add(tileVis);
 
 if (duration > 0) {
@@ -7915,42 +8041,79 @@ Destroy(tileVis, duration);
 }
 
 if (duration <= 0) {
-visualizedRadii[source] = tileObjects;
+oneShotVisualizations[source] = tileObjects;
 }
 }
 
 pub void ClearVisualization(object source) {
-if (visualizedRadii.TryGetValue(source, out var tiles)) {
+if (oneShotVisualizations.TryGetValue(source, out var tiles)) {
 foreach (var tile in tiles) {
 if (tile != null) Destroy(tile);
 }
-visualizedRadii.Remove(source);
+oneShotVisualizations.Remove(source);
+}
+if (lastDrawnState.ContainsKey(source)) {
+lastDrawnState.Remove(source);
 }
 }
 
-pub void ClearAllVisualizations() {
-foreach (var kvp in visualizedRadii) {
+pub void VisualizeAnimalSearchRadius(AnimalController animal, GridPosition center, int radius) {
+ShowContinuousRadius(animal, center, radius, RadiusType.AnimalSearch);
+}
+
+void ProcessContinuousRequests() {
+List<object> sourcesToRemove = new List<object>();
+foreach (var drawnSource in lastDrawnState.Keys) {
+if (!continuousRequests.ContainsKey(drawnSource)) {
+sourcesToRemove.Add(drawnSource);
+}
+}
+foreach(var source in sourcesToRemove) {
+ClearVisualization(source);
+}
+
+foreach (var kvp in continuousRequests) {
+object source = kvp.Key;
+RadiusRequest request = kvp.Value;
+
+bool needsRedraw = false;
+if (lastDrawnState.TryGetValue(source, out var lastState)) {
+if (lastState.center != request.Center || lastState.radius != request.Radius) {
+needsRedraw = true;
+}
+}
+else {
+needsRedraw = true;
+}
+
+if (needsRedraw) {
+Color color = GetColorForType(request.Type);
+VisualizeRadius(source, request.Center, request.Radius, color, 0);
+lastDrawnState[source] = (request.Center, request.Radius);
+}
+}
+}
+
+Color GetColorForType(RadiusType type) {
+switch (type) {
+case RadiusType.AnimalSearch: ret animalSearchRadiusColor;
+case RadiusType.PlantPoop: ret plantPoopRadiusColor;
+case RadiusType.Scent: ret scentRadiusColor;
+case RadiusType.FireflyPhotosynthesis: ret fireflyPhotosynthesisColor;
+case RadiusType.ToolUse: ret toolUseRadiusColor;
+default: ret Color.white;
+}
+}
+
+void ClearAllVisualizations() {
+foreach (var kvp in oneShotVisualizations) {
 foreach (var tile in kvp.Value) {
 if (tile != null) Destroy(tile);
 }
 }
-visualizedRadii.Clear();
-}
-
-pub void VisualizeAnimalSearchRadius(AnimalController animal, GridPosition center, int radius) {
-VisualizeRadius(animal, center, radius, animalSearchRadiusColor);
-}
-
-pub void VisualizePlantPoopRadius(PlantGrowth plant, GridPosition center, int radius) {
-VisualizeRadius(plant, center, radius, plantPoopRadiusColor);
-}
-
-pub void VisualizeScentRadius(ScentSource scent, GridPosition center, int radius) {
-VisualizeRadius(scent, center, radius, scentRadiusColor);
-}
-
-pub void VisualizeToolUseRadius(GridPosition center, int radius, float duration = 1f) {
-VisualizeRadius("tool_use", center, radius, toolUseRadiusColor, duration);
+oneShotVisualizations.Clear();
+continuousRequests.Clear();
+lastDrawnState.Clear();
 }
 }
 
@@ -10189,6 +10352,12 @@ TickManager.Instance.UnregisterTickUpdateable(this);
 if (Instance == this) Instance = null;
 }
 
+void OnDisable() {
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius("player_tool_use");
+}
+}
+
 void CacheHoverSpriteRenderer() {
 if (hoverHighlightObject != null) {
 hoverSpriteRenderer = hoverHighlightObject.GetComponent<SpriteRenderer>();
@@ -10313,7 +10482,8 @@ RemoveTile(stateToRevert.tileDef, cellPos);
 if (stateToRevert.tileDef.revertToTile != null) {
 if (debugLogs) Debug.Log($"Reverting tile at {cellPos} from {stateToRevert.tileDef.displayName} to {stateToRevert.tileDef.revertToTile.displayName}");
 PlaceTile(stateToRevert.tileDef.revertToTile, cellPos);
-} else {
+}
+else {
 if (debugLogs) Debug.Log($"Tile {stateToRevert.tileDef.displayName} at {cellPos} expired and removed (no revert target).");
 }
 }
@@ -10346,7 +10516,8 @@ if (debugLogs) Debug.Log($"Set up timed reversion for {tileDef.displayName} at {
 }
 
 if (debugLogs) Debug.Log($"Placed tile '{tileDef.displayName}' at {cellPos}");
-} else {
+}
+else {
 Debug.LogWarning($"Module for '{tileDef.displayName}' has no DataTilemap assigned.", module.gameObject);
 }
 }
@@ -10365,7 +10536,8 @@ return;
 if (module?.DataTilemap != null) {
 module.DataTilemap.SetTile(cellPos, null);
 if (debugLogs) Debug.Log($"Removed tile '{tileDef.displayName}' from {cellPos}");
-} else {
+}
+else {
 Debug.LogWarning($"Module for '{tileDef.displayName}' has no DataTilemap assigned.", module.gameObject);
 }
 
@@ -10434,12 +10606,17 @@ isWithinInteractionRange = withinRadius;
 if (hoverHighlightObject != null) {
 hoverHighlightObject.SetActive(true);
 hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
-
 UpdateHoverHighlightColor(withinRadius);
 }
 
 if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
-GridDebugVisualizer.Instance.VisualizeToolUseRadius(playerGridPos, gridRadius, 0.1f);
+string visKey = "player_tool_use";
+GridDebugVisualizer.Instance.ShowContinuousRadius(
+visKey,
+playerGridPos,
+gridRadius,
+GridDebugVisualizer.RadiusType.ToolUse
+);
 }
 }
 
@@ -10580,7 +10757,7 @@ RemoveTile(hoveredTileDef, currentlyHoveredCell.Value);
 
 pub void TryUseSeed() {
 if (!currentlyHoveredCell.HasValue) return;
-if (!isWithinInteractionRange) return; // Only allow seed planting within range
+if (!isWithinInteractionRange) return;
 
 HandleSeedPlanting(currentlyHoveredCell.Value);
 }

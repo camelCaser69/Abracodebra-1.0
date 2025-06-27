@@ -35,11 +35,8 @@ public class GridDebugVisualizer : MonoBehaviour
         public RadiusType Type;
     }
 
-    // Stores visualizations that are cleared manually or when the source is destroyed
     private Dictionary<object, List<GameObject>> oneShotVisualizations = new Dictionary<object, List<GameObject>>();
-    // Stores visualizations that are updated every frame (like the player's tool range)
     private Dictionary<object, RadiusRequest> continuousRequests = new Dictionary<object, RadiusRequest>();
-    // Stores the last drawn state to check if a redraw is needed
     private Dictionary<object, (GridPosition center, int radius)> lastDrawnState = new Dictionary<object, (GridPosition, int)>();
 
     void Awake()
@@ -60,16 +57,9 @@ public class GridDebugVisualizer : MonoBehaviour
 
     void Update()
     {
-        // Process continuous radius requests every frame
         ProcessContinuousRequests();
     }
     
-    // --- Public Methods ---
-
-    /// <summary>
-    /// Shows a radius visualization that persists and updates until hidden.
-    /// Ideal for things like player interaction range.
-    /// </summary>
     public void ShowContinuousRadius(object source, GridPosition center, int radius, RadiusType type)
     {
         if (!showRadiusVisualizations || source == null) return;
@@ -83,9 +73,6 @@ public class GridDebugVisualizer : MonoBehaviour
         continuousRequests[source].Type = type;
     }
 
-    /// <summary>
-    /// Hides a continuous radius visualization.
-    /// </summary>
     public void HideContinuousRadius(object source)
     {
         if (source == null) return;
@@ -96,15 +83,11 @@ public class GridDebugVisualizer : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Shows a static, one-shot radius visualization.
-    /// Ideal for things like an animal's search that happens on a single tick.
-    /// </summary>
     public void VisualizeRadius(object source, GridPosition center, int radius, Color color, float duration = 0f)
     {
         if (!showRadiusVisualizations || tilePrefab == null) return;
 
-        ClearVisualization(source); // Clear any previous vis for this source
+        ClearVisualization(source);
 
         var tiles = GridRadiusUtility.GetTilesInCircle(center, radius);
         var tileObjects = new List<GameObject>();
@@ -120,7 +103,7 @@ public class GridDebugVisualizer : MonoBehaviour
                 Color finalColor = color;
                 finalColor.a = tileVisualizationAlpha;
                 sr.color = finalColor;
-                sr.sortingOrder = -100; // Behind everything
+                sr.sortingOrder = -100;
             }
             tileObjects.Add(tileVis);
 
@@ -130,16 +113,12 @@ public class GridDebugVisualizer : MonoBehaviour
             }
         }
 
-        // Only store if it's not a timed "fire and forget" visualization
         if (duration <= 0)
         {
             oneShotVisualizations[source] = tileObjects;
         }
     }
 
-    /// <summary>
-    /// Clears a specific one-shot visualization.
-    /// </summary>
     public void ClearVisualization(object source)
     {
         if (oneShotVisualizations.TryGetValue(source, out var tiles))
@@ -156,19 +135,16 @@ public class GridDebugVisualizer : MonoBehaviour
         }
     }
     
-    // --- Specific Visualization Triggers (for convenience) ---
-
+    /// <summary>
+    /// Now uses the continuous visualizer. The AnimalController will be responsible for hiding it.
+    /// </summary>
     public void VisualizeAnimalSearchRadius(AnimalController animal, GridPosition center, int radius)
     {
-        // Use the one-shot visualizer that auto-clears
-        VisualizeRadius(animal, center, radius, animalSearchRadiusColor, 0.5f);
+        ShowContinuousRadius(animal, center, radius, RadiusType.AnimalSearch);
     }
     
-    // --- Internal Logic ---
-
     private void ProcessContinuousRequests()
     {
-        // Check for any continuous visualizations that need to be removed
         List<object> sourcesToRemove = new List<object>();
         foreach (var drawnSource in lastDrawnState.Keys)
         {
@@ -182,7 +158,6 @@ public class GridDebugVisualizer : MonoBehaviour
             ClearVisualization(source);
         }
 
-        // Update active continuous visualizations
         foreach (var kvp in continuousRequests)
         {
             object source = kvp.Key;
@@ -198,13 +173,13 @@ public class GridDebugVisualizer : MonoBehaviour
             }
             else
             {
-                needsRedraw = true; // First time drawing for this source
+                needsRedraw = true;
             }
 
             if (needsRedraw)
             {
                 Color color = GetColorForType(request.Type);
-                VisualizeRadius(source, request.Center, request.Radius, color, 0); // Use the managed one-shot visualizer
+                VisualizeRadius(source, request.Center, request.Radius, color, 0);
                 lastDrawnState[source] = (request.Center, request.Radius);
             }
         }
