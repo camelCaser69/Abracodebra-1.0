@@ -16,26 +16,26 @@ MonoBehaviour:
   prefab: {fileID: 1618699628824306755, guid: bff8100a661511448a2c59532d7d9859, type: 3}
   maxHealth: 10
   movementSpeed: 1
+  diet: {fileID: 11400000, guid: 766f7dacca78d7646a516088c17e8f54, type: 2}
   thinkingTickInterval: 3
+  searchRadiusTiles: 12
+  eatDistanceTiles: 1
+  eatDurationTicks: 1
   wanderPauseTickChance: 30
   minWanderMoveTicks: 2
   maxWanderMoveTicks: 6
   minWanderPauseTicks: 1
   maxWanderPauseTicks: 1
-  searchRadiusTiles: 12
-  eatDistanceTiles: 1
-  eatDurationTicks: 1
-  thoughtCooldownTicks: 10
   starvationDamageTickInterval: 1
   damagePerStarvationTick: 1
-  deathFadeTicks: 3
   damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
   damageFlashTicks: 1
-  minPoopDelayTicks: 10
+  deathFadeTicks: 3
+  minPoopDelayTicks: 4
   maxPoopDelayTicks: 20
   poopCooldownTicks: 2
   poopColorVariation: 0.1
-  diet: {fileID: 11400000, guid: 766f7dacca78d7646a516088c17e8f54, type: 2}
   thoughtLibrary: {fileID: 11400000, guid: 8abd92eb95108124a8478425e6e2cfb5, type: 2}
+  thoughtCooldownTicks: 10
   attractiveScentDefinitions: []
   repellentScentDefinitions: []

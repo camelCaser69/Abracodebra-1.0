@@ -57,7 +57,7 @@ public class AnimalNeeds : MonoBehaviour
     {
         UpdateHunger();
         UpdateStarvation();
-        UpdateFlashEffect();
+        // Note: UpdateFlashEffect moved to Update() for real-time effect
     }
     
     private void UpdateHunger()
@@ -95,6 +95,11 @@ public class AnimalNeeds : MonoBehaviour
     
     private void UpdateFlashEffect()
     {
+        // Flash effect happens in real-time, not per tick
+    }
+    
+    void Update()
+    {
         if (!isFlashing || spriteRenderer == null) return;
         
         flashRemainingTime -= Time.deltaTime;
@@ -106,8 +111,8 @@ public class AnimalNeeds : MonoBehaviour
         }
         else
         {
-            // Pulse effect
-            float t = Mathf.PingPong(flashRemainingTime * 10f, 1f);
+            // Quick flash effect
+            float t = (flashRemainingTime / flashDurationSeconds);
             spriteRenderer.color = Color.Lerp(originalColor, definition.damageFlashColor, t);
         }
     }
@@ -124,6 +129,9 @@ public class AnimalNeeds : MonoBehaviour
         {
             controller.ShowThought(ThoughtTrigger.HealthLow);
         }
+        
+        // Don't call controller.TakeDamage here - it would create infinite loop
+        // The controller will check health in its OnTickUpdate
     }
     
     private void ApplyStarvationDamage()

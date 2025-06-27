@@ -196,6 +196,8 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
+    // Replace the AdvanceGameTick method in PlayerActionManager.cs:
+
     void AdvanceGameTick(int tickCount = 1)
     {
         if (TickManager.Instance == null)
@@ -203,10 +205,22 @@ public class PlayerActionManager : MonoBehaviour
             Debug.LogError("[PlayerActionManager] TickManager not found!");
             return;
         }
-
-        if (debugMode) Debug.Log($"[PlayerActionManager] Advancing {tickCount} tick(s) after player action");
-
-        TickManager.Instance.AdvanceMultipleTicks(tickCount);
+    
+        // Process each tick individually to ensure proper updates
+        for (int i = 0; i < tickCount; i++)
+        {
+            TickManager.Instance.AdvanceTick();
+        
+            if (debugMode && tickCount > 1)
+            {
+                Debug.Log($"[PlayerActionManager] Processing tick {i + 1}/{tickCount}");
+            }
+        }
+    
+        if (debugMode)
+        {
+            Debug.Log($"[PlayerActionManager] Advanced game by {tickCount} tick(s)");
+        }
     }
 
     public bool CanExecuteAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null)

@@ -81,24 +81,37 @@ public class GardenerController : MonoBehaviour
     /// <summary>
     /// Attempts to move the player one tile in the given direction, advancing the game ticks if successful.
     /// </summary>
-    private void TryMove(GridPosition direction)
+    // Update the TryMove method in GardenerController.cs:
+
+    void TryMove(GridPosition direction)
     {
         GridPosition targetPos = gridEntity.Position + direction;
-
+    
         if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
             GridPositionManager.Instance.IsPositionValid(targetPos) &&
             !GridPositionManager.Instance.IsPositionOccupied(targetPos))
         {
-            // Calculate the cost of the move before performing it
-            int moveCost = PlayerActionManager.Instance.GetMovementTickCost(transform.position, this);
-
-            // Set the new position for the GridEntity to handle visual interpolation
+            // Get movement cost BEFORE moving
+            Vector3 targetWorldPos = GridPositionManager.Instance.GridToWorld(targetPos);
+            int moveCost = PlayerActionManager.Instance.GetMovementTickCost(targetWorldPos, this);
+        
+            // Move the player
             gridEntity.SetPosition(targetPos);
             currentTargetPosition = targetPos; // Update target for sprite flipping
-
-            // Advance the game state by the cost of the action
-            TickManager.Instance.AdvanceMultipleTicks(moveCost);
-            Debug.Log($"[GardenerController] Moved to {targetPos}. Advanced game by {moveCost} tick(s).");
+        
+            // Advance ticks one by one to ensure proper tick processing
+            for (int i = 0; i < moveCost; i++)
+            {
+                TickManager.Instance.AdvanceTick();
+            
+                // Add a small delay between ticks if in slowdown zone
+                if (i < moveCost - 1 && moveCost > 1)
+                {
+                    Debug.Log($"[GardenerController] Processing slowdown tick {i + 1}/{moveCost}");
+                }
+            }
+        
+            Debug.Log($"[GardenerController] Moved to {targetPos}. Advanced game by {moveCost} tick(s) total.");
         }
         else
         {

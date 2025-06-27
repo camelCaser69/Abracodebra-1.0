@@ -30,7 +30,8 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     
     // State
     private bool isDying = false;
-    private int deathFadeRemainingTicks = 0;
+    private float deathFadeTimer = 0f;
+    private float deathFadeDuration = 1f; // Real-time seconds
     private int thoughtCooldownTick = 0;
     
     // Properties
@@ -73,7 +74,20 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     
     void Update()
     {
-        if (!enabled || isDying) return;
+        if (!enabled) return;
+        
+        // Handle real-time death fade
+        if (isDying && deathFadeTimer > 0)
+        {
+            deathFadeTimer -= Time.deltaTime;
+            UpdateDeathFade();
+            
+            if (deathFadeTimer <= 0)
+            {
+                Destroy(gameObject);
+            }
+            return;
+        }
         
         bool showStats = Input.GetKey(showStatsKey);
         SetStatsTextVisibility(showStats);
@@ -84,23 +98,25 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     
     public void OnTickUpdate(int currentTick)
     {
-        if (!enabled || definition == null || isDying) return;
+        if (!enabled || definition == null) return;
         
-        // Update components
+        // Check for death before doing anything else
+        if (!isDying && needs != null && needs.CurrentHealth <= 0)
+        {
+            StartDying();
+            return;
+        }
+        
+        if (isDying)
+        {
+            // Death is handled in Update() for real-time fade
+            return;
+        }
+        
+        // Update components only if not dying
         needs.OnTickUpdate(currentTick);
         behavior.OnTickUpdate(currentTick);
         movement.OnTickUpdate(currentTick);
-        
-        // Handle death fade
-        if (deathFadeRemainingTicks > 0)
-        {
-            deathFadeRemainingTicks--;
-            UpdateDeathFade();
-            if (deathFadeRemainingTicks <= 0)
-            {
-                Destroy(gameObject);
-            }
-        }
         
         // Update thought cooldown
         if (thoughtCooldownTick > 0)
@@ -174,32 +190,53 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     
     public void TakeDamage(float amount)
     {
+        if (isDying) return; // Don't process damage if already dying
+        
         needs.TakeDamage(amount);
         
-        if (needs.CurrentHealth <= 0 && !isDying)
-        {
-            StartDying();
-        }
+        // Death is now checked in OnTickUpdate to avoid recursion
     }
     
     private void StartDying()
     {
+        if (isDying) return; // Prevent multiple calls
+        
         isDying = true;
-        deathFadeRemainingTicks = definition.deathFadeTicks;
+        
+        // Calculate real-time duration from tick duration
+        if (TickManager.Instance?.Config != null)
+        {
+            deathFadeDuration = definition.deathFadeTicks / TickManager.Instance.Config.ticksPerRealSecond;
+        }
+        else
+        {
+            deathFadeDuration = definition.deathFadeTicks * 0.5f; // Default 0.5 seconds per tick
+        }
+        
+        deathFadeTimer = deathFadeDuration;
+        
+        Debug.Log($"[AnimalController] {SpeciesName} is dying! Fade duration: {deathFadeDuration}s");
         
         if (GridDebugVisualizer.Instance != null)
         {
             GridDebugVisualizer.Instance.HideContinuousRadius(this);
         }
         
+        // Stop all movement and actions
         movement.StopAllMovement();
+        behavior.CancelCurrentAction();
+        
+        // Disable components to prevent further updates
+        if (movement != null) movement.enabled = false;
+        if (behavior != null) behavior.enabled = false;
+        if (needs != null) needs.enabled = false;
     }
     
     private void UpdateDeathFade()
     {
-        if (spriteRenderer == null || deathFadeRemainingTicks <= 0) return;
+        if (spriteRenderer == null) return;
         
-        float fadeProgress = 1f - (deathFadeRemainingTicks / (float)definition.deathFadeTicks);
+        float fadeProgress = 1f - (deathFadeTimer / deathFadeDuration);
         Color color = spriteRenderer.color;
         color.a = Mathf.Lerp(1f, 0f, fadeProgress);
         spriteRenderer.color = color;

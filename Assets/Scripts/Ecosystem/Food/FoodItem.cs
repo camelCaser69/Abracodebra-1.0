@@ -10,7 +10,6 @@ public class FoodItem : MonoBehaviour
     
     [Header("Grid Integration")]
     [SerializeField] private bool snapToGridOnStart = true;
-    [SerializeField] private bool registerAsGridEntity = true;
     
     private GridEntity gridEntity;
     

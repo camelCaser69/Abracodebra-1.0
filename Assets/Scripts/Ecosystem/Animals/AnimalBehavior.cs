@@ -32,6 +32,13 @@ public class AnimalBehavior : MonoBehaviour
     {
         this.controller = controller;
         this.definition = definition;
+        
+        // Initialize poop state
+        hasPooped = true;
+        poopDelayTick = 0;
+        currentPoopCooldownTick = 0;
+        
+        Debug.Log($"[AnimalBehavior] Initialized for {controller.SpeciesName}. Poop delay range: {definition.minPoopDelayTicks}-{definition.maxPoopDelayTicks} ticks");
     }
     
     public void OnTickUpdate(int currentTick)
@@ -50,6 +57,10 @@ public class AnimalBehavior : MonoBehaviour
         if (poopDelayTick > 0)
         {
             poopDelayTick--;
+            if (poopDelayTick == 0)
+            {
+                Debug.Log($"[AnimalBehavior] {controller.SpeciesName} poop delay timer reached 0");
+            }
         }
         
         if (currentPoopCooldownTick > 0)
@@ -60,6 +71,7 @@ public class AnimalBehavior : MonoBehaviour
         // Try to poop if ready
         if (!hasPooped && poopDelayTick <= 0 && currentPoopCooldownTick <= 0 && CanAct)
         {
+            Debug.Log($"[AnimalBehavior] {controller.SpeciesName} ready to poop! hasPooped={hasPooped}, delay={poopDelayTick}, cooldown={currentPoopCooldownTick}, canAct={CanAct}");
             TryPoop();
         }
     }
@@ -115,7 +127,7 @@ public class AnimalBehavior : MonoBehaviour
             hasPooped = false;
             poopDelayTick = Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
             
-            Debug.Log($"[AnimalBehavior] {controller.SpeciesName} finished eating");
+            Debug.Log($"[AnimalBehavior] {controller.SpeciesName} finished eating. Will poop in {poopDelayTick} ticks");
         }
         
         currentEatingTarget = null;
@@ -137,6 +149,8 @@ public class AnimalBehavior : MonoBehaviour
         {
             controller.ShowThought(ThoughtTrigger.Pooping);
         }
+        
+        Debug.Log($"[AnimalBehavior] {controller.SpeciesName} pooped!");
     }
     
     private void SpawnPoop()

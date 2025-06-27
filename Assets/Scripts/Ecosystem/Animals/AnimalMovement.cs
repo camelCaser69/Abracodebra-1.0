@@ -45,7 +45,7 @@ public class AnimalMovement : MonoBehaviour
     
     public void OnTickUpdate(int currentTick)
     {
-        if (controller.IsDying || controller.Behavior.IsEating || controller.Behavior.IsPooping) return;
+        if (!enabled || controller.IsDying || controller.Behavior.IsEating || controller.Behavior.IsPooping) return;
         
         // Decrement wander pause
         if (wanderPauseTicks > 0)

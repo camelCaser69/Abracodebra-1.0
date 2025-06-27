@@ -1,84 +1,118 @@
-﻿using UnityEngine;
-using TMPro;
+﻿// Update the PoopController.cs with these changes:
 
-[RequireComponent(typeof(Collider2D))] // Add RequireComponent for Collider2D
-public class PoopController : MonoBehaviour
+using UnityEngine;
+using WegoSystem;
+
+[RequireComponent(typeof(GridEntity))]
+public class PoopController : MonoBehaviour, ITickUpdateable
 {
-    [Tooltip("Total lifetime of this poop (in seconds) before disappearing.")]
-    public float lifetime = 10f;
-    [Tooltip("Duration at the end of the lifetime during which the poop fades out.")]
-    public float fadeDuration = 2f;
-    [Tooltip("Fadeout curve to control the alpha during fade-out. X axis goes from 0 (start of fade) to 1 (end of fade).")]
-    public AnimationCurve fadeCurve = AnimationCurve.Linear(0f, 1f, 1f, 0f);
-
-    private SpriteRenderer sr;
-    private float timer = 0f;
-    private Color initialColor;
-    private Collider2D poopCollider; // Reference to the collider
-
-    private void Awake()
+    [Header("Configuration")]
+    [SerializeField] private int lifetimeTicks = 20;
+    [SerializeField] private int fadeStartTicks = 15;
+    [SerializeField] private float fadeRealTimeDuration = 1f; // Real-time seconds for fade
+    
+    private GridEntity gridEntity;
+    private SpriteRenderer spriteRenderer;
+    private int currentLifetimeTicks;
+    private bool isFading = false;
+    private float fadeTimer = 0f;
+    private Color originalColor;
+    
+    void Awake()
     {
-        sr = GetComponent<SpriteRenderer>();
-        if (sr != null)
+        gridEntity = GetComponent<GridEntity>();
+        if (gridEntity == null)
         {
-            initialColor = sr.color;
+            gridEntity = gameObject.AddComponent<GridEntity>();
         }
+        gridEntity.isTileOccupant = false;
         
-        // Ensure there's a collider and it's properly configured
-        poopCollider = GetComponent<Collider2D>();
-        if (poopCollider == null)
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
         {
-            // If no collider exists, add a CircleCollider2D
-            poopCollider = gameObject.AddComponent<CircleCollider2D>();
-            Debug.Log($"Added CircleCollider2D to {gameObject.name} for poop detection", gameObject);
-        }
-        
-        // Make sure it's a trigger so it doesn't block movement
-        poopCollider.isTrigger = true;
-    }
-
-    private void Update()
-    {
-        timer += Time.deltaTime;
-        if (timer >= lifetime)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        // If within fadeDuration at the end, apply fade-out using the fadeCurve.
-        float remaining = lifetime - timer;
-        if (remaining < fadeDuration && sr != null)
-        {
-            // Normalize fade time (0 = start, 1 = end)
-            float t = 1f - (remaining / fadeDuration);
-            float alphaMultiplier = fadeCurve.Evaluate(t);
-            Color newColor = initialColor;
-            newColor.a = alphaMultiplier;
-            sr.color = newColor;
+            originalColor = spriteRenderer.color;
         }
     }
-
-    // Initialize with default parameters if none are provided.
-    public void Initialize(float lifetimeValue = -1f, float fadeDurationValue = -1f)
+    
+    void Start()
     {
-        if (lifetimeValue > 0f)
-            lifetime = lifetimeValue;
-        if (fadeDurationValue > 0f)
-            fadeDuration = fadeDurationValue;
-        timer = 0f;
-        if (sr != null)
-            initialColor = sr.color;
+        currentLifetimeTicks = lifetimeTicks;
+        
+        if (TickManager.Instance != null)
+        {
+            TickManager.Instance.RegisterTickUpdateable(this);
+        }
+        
+        // Snap to grid
+        if (GridPositionManager.Instance != null)
+        {
+            GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+        }
+    }
+    
+    void OnDestroy()
+    {
+        if (TickManager.Instance != null)
+        {
+            TickManager.Instance.UnregisterTickUpdateable(this);
+        }
+    }
+    
+    void Update()
+    {
+        // Handle real-time fade
+        if (isFading && fadeTimer > 0)
+        {
+            fadeTimer -= Time.deltaTime;
+            UpdateFade();
             
-        // Ensure collider is configured properly
-        if (poopCollider == null)
-        {
-            poopCollider = GetComponent<Collider2D>();
-            if (poopCollider == null)
+            if (fadeTimer <= 0)
             {
-                poopCollider = gameObject.AddComponent<CircleCollider2D>();
+                Destroy(gameObject);
             }
-            poopCollider.isTrigger = true;
         }
+    }
+    
+    public void OnTickUpdate(int currentTick)
+    {
+        if (isFading) return;
+        
+        currentLifetimeTicks--;
+        
+        // Start fade when reaching fade threshold
+        if (currentLifetimeTicks <= (lifetimeTicks - fadeStartTicks) && !isFading)
+        {
+            StartFading();
+        }
+    }
+    
+    private void StartFading()
+    {
+        isFading = true;
+        
+        // Calculate real-time duration
+        if (TickManager.Instance?.Config != null)
+        {
+            fadeRealTimeDuration = (lifetimeTicks - fadeStartTicks) / TickManager.Instance.Config.ticksPerRealSecond;
+        }
+        
+        fadeTimer = fadeRealTimeDuration;
+        Debug.Log($"[PoopController] Starting fade. Duration: {fadeRealTimeDuration}s");
+    }
+    
+    private void UpdateFade()
+    {
+        if (spriteRenderer == null) return;
+        
+        float fadeProgress = 1f - (fadeTimer / fadeRealTimeDuration);
+        Color color = originalColor;
+        color.a = Mathf.Lerp(1f, 0f, fadeProgress);
+        spriteRenderer.color = color;
+    }
+    
+    public void Initialize()
+    {
+        // Called by AnimalBehavior after spawning
+        // Can be used to set custom lifetime or other properties
     }
 }
