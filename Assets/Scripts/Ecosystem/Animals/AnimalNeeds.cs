@@ -136,8 +136,16 @@ public class AnimalNeeds : MonoBehaviour
     
     private void ApplyStarvationDamage()
     {
-        TakeDamage(definition.damagePerStarvationTick);
+        // Take damage but don't trigger death check here
+        currentHealth -= definition.damagePerStarvationTick;
+        currentHealth = Mathf.Clamp(currentHealth, 0f, definition.maxHealth);
+        
+        StartDamageFlash();
+        controller.UpdateUI();
+        
         Debug.Log($"[AnimalNeeds] {controller.SpeciesName} taking starvation damage. Health: {currentHealth}");
+        
+        // Death will be checked in controller's OnTickUpdate
     }
     
     public void Eat(FoodItem foodItem)

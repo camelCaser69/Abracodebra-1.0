@@ -515,8 +515,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isTileOccupant: 1
-  groundPointOffset: {x: 0, y: 0, z: 0}
-  visualOffset: {x: 0, y: -0.75, z: 0}
+  groundPointOffset: {x: 0, y: -0.85, z: 0}
+  visualOffset: {x: 0, y: 0, z: 0}
   visualInterpolationSpeed: 5
   movementCurve:
     serializedVersion: 2

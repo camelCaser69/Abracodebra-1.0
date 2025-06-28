@@ -213,9 +213,10 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             deathFadeDuration = definition.deathFadeTicks * 0.5f; // Default 0.5 seconds per tick
         }
         
+        // Start fade immediately
         deathFadeTimer = deathFadeDuration;
         
-        Debug.Log($"[AnimalController] {SpeciesName} is dying! Fade duration: {deathFadeDuration}s");
+        Debug.Log($"[AnimalController] {SpeciesName} is dying! Starting fade immediately. Duration: {deathFadeDuration}s");
         
         if (GridDebugVisualizer.Instance != null)
         {

@@ -426,10 +426,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bfbd677749bc48f381a146220bb35a7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridPosition:
-    x: 0
-    y: 0
-  snapToGridOnStart: 1
+  isTileOccupant: 1
   groundPointOffset: {x: 0, y: -0.75, z: 0}
   visualOffset: {x: 0, y: 0, z: 0}
   visualInterpolationSpeed: 5

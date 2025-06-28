@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 519,491 → 355,521 chars (31.6% reduction)
-Estimated tokens saved: ~40,992
+Compression Stats: 540,539 → 366,473 chars (32.2% reduction)
+Estimated tokens saved: ~43,516
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -25,100 +25,103 @@ using System;
   SortableEntity (Assets\Scripts\Core/) L204
   UIManager (Assets\Scripts\Core/) L271
   WeatherManager (Assets\Scripts\Core/) L566
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L765
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1490
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1553
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1562
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1575
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1592
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1982
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2013
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2274
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2342
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2357
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2376
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2434
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2570
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2646
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2663
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2676
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2705
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2913
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3143
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3417
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3446
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3482
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3495
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3523
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L3584
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3629
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3680
-  NodeEffectDrawer (Assets\Scripts\Editor/) L3714
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3817
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3878
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3898
-  LeafData (Assets\Scripts\PlantSystem\Data/) L3933
-  NodeData (Assets\Scripts\PlantSystem\Data/) L3948
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4033
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4293
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4316
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4369
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4398
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4407
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4432
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4617
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4656
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4680
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4882
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L4962
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5141
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5361
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5586
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L5678
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L5995
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L6062
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6133
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6439
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L6564
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L6775
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L6909
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7229
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7365
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7658
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7746
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L7847
-  GridSnapStartup (Assets\Scripts\Ticks/) L8022
-  TickDebugMonitor (Assets\Scripts\Ticks/) L8088
-  TurnPhaseManager (Assets\Scripts\Ticks/) L8259
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8377
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8446
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8677
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8688
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8717
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8813
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8918
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9313
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9349
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9513
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9655
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9773
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9895
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10100
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10140
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10164
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10184
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10672
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10684
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10719
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10878
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L765
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L942
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1236
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1322
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L1331
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1730
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1876
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1889
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1926
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L2316
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2347
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2608
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2703
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2718
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2737
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2795
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2931
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L3007
+  FoodType (Assets\Scripts\Ecosystem\Food/) L3065
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L3078
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L3107
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L3329
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L3559
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3833
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3862
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3898
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3911
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3939
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L4000
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L4045
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L4096
+  NodeEffectDrawer (Assets\Scripts\Editor/) L4130
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L4233
+  TileDefinitionEditor (Assets\Scripts\Editor/) L4294
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L4314
+  LeafData (Assets\Scripts\PlantSystem\Data/) L4349
+  NodeData (Assets\Scripts\PlantSystem\Data/) L4364
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4449
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4709
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4732
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4785
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4814
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4823
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4848
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L5033
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L5072
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L5096
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L5298
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5378
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5557
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5808
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L6033
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L6125
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6442
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L6509
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6580
+  ItemView (Assets\Scripts\PlantSystem\UI/) L6886
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L7011
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L7222
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L7356
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7676
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7812
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8105
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8193
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L8294
+  GridSnapStartup (Assets\Scripts\Ticks/) L8469
+  TickDebugMonitor (Assets\Scripts\Ticks/) L8535
+  TurnPhaseManager (Assets\Scripts\Ticks/) L8706
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8824
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8893
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L9124
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9135
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L9164
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L9260
+  WaterReflection (Assets\Scripts\Visual\Effects/) L9365
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9760
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9796
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9960
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10102
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L10220
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L10371
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10614
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10654
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10678
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10698
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L11186
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L11198
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L11233
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L11392
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L10888
-  GridPosition (Assets\Scripts\Ticks/) L11039
-  GridPositionManager (Assets\Scripts\Ticks/) L11140
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11494
-  TickConfiguration (Assets\Scripts\Ticks/) L11638
-  ITickUpdateable (Assets\Scripts\Ticks/) L11721
+  GridEntity (Assets\Scripts\Ticks/) L11402
+  GridPosition (Assets\Scripts\Ticks/) L11553
+  GridPositionManager (Assets\Scripts\Ticks/) L11654
+  GridRadiusUtility (Assets\Scripts\Ticks/) L12008
+  TickConfiguration (Assets\Scripts\Ticks/) L12152
+  ITickUpdateable (Assets\Scripts\Ticks/) L12235
 
 ================================================================================
 SCRIPTS
@@ -861,83 +864,226 @@ EnterPhase(phase, true);
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Ecosystem\Animals\AnimalBehavior.cs
+
+﻿using System.Collections.Generic;
+using WegoSystem;
+
+pub cls AnimalBehavior : MonoBehaviour {
+[SerializeField] Transform poopSpawnPoint;
+[SerializeField] List<GameObject> poopPrefabs;
+
+AnimalController controller;
+AnimalDefinition definition;
+
+bool isEating = false;
+bool isPooping = false;
+bool hasPooped = true;
+GameObject currentEatingTarget = null;
+
+int eatRemainingTicks = 0;
+int poopDelayTick = 0;
+int currentPoopCooldownTick = 0;
+
+pub bool IsEating => isEating;
+pub bool IsPooping => isPooping;
+pub bool CanAct => !isEating && !isPooping && !controller.IsDying;
+
+pub void Initialize(AnimalController controller, AnimalDefinition definition) {
+this.controller = controller;
+this.definition = definition;
+
+hasPooped = true;
+poopDelayTick = 0;
+currentPoopCooldownTick = 0;
+
+Debug.Log($"[AnimalBehavior] Initialized for {controller.SpeciesName}. Poop delay range: {definition.minPoopDelayTicks}-{definition.maxPoopDelayTicks} ticks");
+}
+
+pub void OnTickUpdate(int currentTick) {
+if (isEating) {
+eatRemainingTicks--;
+if (eatRemainingTicks <= 0) {
+FinishEating();
+}
+}
+
+if (poopDelayTick > 0) {
+poopDelayTick--;
+if (poopDelayTick == 0) {
+Debug.Log($"[AnimalBehavior] {controller.SpeciesName} poop delay timer reached 0");
+}
+}
+
+if (currentPoopCooldownTick > 0) {
+currentPoopCooldownTick--;
+}
+
+if (!hasPooped && poopDelayTick <= 0 && currentPoopCooldownTick <= 0 && CanAct) {
+Debug.Log($"[AnimalBehavior] {controller.SpeciesName} ready to poop! hasPooped={hasPooped}, delay={poopDelayTick}, cooldown={currentPoopCooldownTick}, canAct={CanAct}");
+TryPoop();
+}
+}
+
+pub void StartEating(GameObject food) {
+if (food == null || !CanAct) return;
+
+FoodItem foodItem = food.GetComponent<FoodItem>();
+if (foodItem == null || foodItem.foodType == null || !definition.diet.CanEat(foodItem.foodType)) {
+Debug.LogWarning($"[AnimalBehavior] {controller.SpeciesName} cannot eat this food!");
+return;
+}
+
+controller.Movement.ClearMovementPlan();
+
+isEating = true;
+currentEatingTarget = food;
+eatRemainingTicks = definition.eatDurationTicks;
+
+if (controller.CanShowThought()) {
+controller.ShowThought(ThoughtTrigger.Eating);
+}
+
+Debug.Log($"[AnimalBehavior] {controller.SpeciesName} started eating {foodItem.foodType.foodName}");
+}
+
+void FinishEating() {
+isEating = false;
+
+if (currentEatingTarget == null) {
+currentEatingTarget = null;
+return;
+}
+
+FoodItem foodItem = currentEatingTarget.GetComponent<FoodItem>();
+if (foodItem != null) {
+controller.Needs.Eat(foodItem);
+
+Destroy(currentEatingTarget);
+
+hasPooped = false;
+poopDelayTick = Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
+
+Debug.Log($"[AnimalBehavior] {controller.SpeciesName} finished eating. Will poop in {poopDelayTick} ticks");
+}
+
+currentEatingTarget = null;
+}
+
+void TryPoop() {
+if (!CanAct) return;
+
+isPooping = true;
+currentPoopCooldownTick = definition.poopCooldownTicks;
+
+SpawnPoop();
+
+hasPooped = true;
+isPooping = false;
+
+if (controller.CanShowThought()) {
+controller.ShowThought(ThoughtTrigger.Pooping);
+}
+
+Debug.Log($"[AnimalBehavior] {controller.SpeciesName} pooped!");
+}
+
+void SpawnPoop() {
+if (poopPrefabs == null || poopPrefabs.Count == 0) {
+Debug.LogWarning($"[AnimalBehavior] No poop prefabs assigned for {controller.SpeciesName}");
+return;
+}
+
+int index = Random.Range(0, poopPrefabs.Count);
+GameObject prefab = poopPrefabs[index];
+if (prefab == null) return;
+
+Transform spawnTransform = poopSpawnPoint != null ? poopSpawnPoint : transform;
+GameObject poopObj = Instantiate(prefab, spawnTransform.position, Quaternion.identity);
+
+SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
+if (sr != null) {
+sr.flipX = Random.value > 0.5f;
+
+Color c = sr.color;
+float v = definition.poopColorVariation;
+sr.color = new Color(
+Mathf.Clamp01(c.r + Random.Range(-v, v)),
+Mathf.Clamp01(c.g + Random.Range(-v, v)),
+Mathf.Clamp01(c.b + Random.Range(-v, v)),
+c.a
+);
+}
+
+PoopController pc = poopObj.GetComponent<PoopController>();
+if (pc == null) {
+pc = poopObj.AddComponent<PoopController>();
+}
+
+if (GridPositionManager.Instance != null) {
+GridPositionManager.Instance.SnapEntityToGrid(poopObj);
+}
+
+Debug.Log($"[AnimalBehavior] {controller.SpeciesName} pooped at {poopObj.transform.position}");
+}
+
+pub void CancelCurrentAction() {
+if (isEating) {
+isEating = false;
+eatRemainingTicks = 0;
+currentEatingTarget = null;
+}
+
+if (isPooping) {
+isPooping = false;
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Animals\AnimalController.cs
 
-﻿using System;
+﻿using System.Collections.Generic;
 using TMPro;
 using WegoSystem;
 
 pub cls AnimalController : MonoBehaviour, ITickUpdateable {
-
 [SerializeField] pub AnimalDefinition definition;
+
 [SerializeField] GameObject thoughtBubblePrefab;
 [SerializeField] Transform bubbleSpawnTransform;
-[SerializeField] Transform poopSpawnPoint;
-[SerializeField] List<GameObject> poopPrefabs;
 [SerializeField] Animator animator;
 
 [SerializeField] TextMeshProUGUI hpText;
 [SerializeField] TextMeshProUGUI hungerText;
 [SerializeField] KeyCode showStatsKey = KeyCode.LeftAlt;
 
-[SerializeField] bool showPathfindingDebugLine = false;
-
-AnimalDiet animalDiet;
+AnimalMovement movement;
+AnimalNeeds needs;
+AnimalBehavior behavior;
 GridEntity gridEntity;
-AnimalThoughtLibrary thoughtLibrary;
-LineRenderer pathDebugLine;
-
-GridPosition targetPosition;
-GameObject currentTargetFood = null;
-bool hasPlannedAction = false;
-int lastThinkTick = 0;
-List<GridPosition> currentPath = new List<GridPosition>();
-int currentPathIndex = 0;
-
-int hungerTick = 0;
-int poopDelayTick = 0;
-int currentPoopCooldownTick = 0;
-int thoughtCooldownTick = 0;
-int eatRemainingTicks = 0;
-int starvationTick = 0;
-int deathFadeRemainingTicks = 0;
-int wanderPauseTicks = 0;
-
-float flashRemainingTime = 0f;
-float flashDurationSeconds = 0.2f;
-
-float currentHealth;
-float currentHunger;
-bool isEating = false;
-bool isPooping = false;
-bool hasPooped = true;
-bool isDying = false;
-bool isFlashing = false;
-bool isHungryAndSearching = false;
-
-bool isSeekingScreenCenter = false;
-Vector2 screenCenterTarget;
-Vector2 minBounds;
-Vector2 maxBounds;
-
-Rigidbody2D rb;
 SpriteRenderer spriteRenderer;
-Collider2D animalCollider;
-Color originalColor;
 
-pub float CurrentHealth => currentHealth;
-pub string SpeciesName => definition ? definition.animalName : "Uninitialized";
+bool isDying = false;
+float deathFadeTimer = 0f;
+float deathFadeDuration = 1f; // Real-time seconds
+int thoughtCooldownTick = 0;
+
+pub AnimalDefinition Definition => definition;
+pub GridEntity GridEntity => gridEntity;
+pub AnimalMovement Movement => movement;
+pub AnimalNeeds Needs => needs;
+pub AnimalBehavior Behavior => behavior;
+pub bool IsDying => isDying;
+pub string SpeciesName => definition != null ? definition.animalName : "Uninitialized";
 
 void Awake() {
 CacheComponents();
-SetupDebugLineRenderer();
+ValidateComponents();
 }
 
 void Start() {
-if (GridPositionManager.Instance != null) {
-GridPositionManager.Instance.SnapEntityToGrid(gameObject);
-Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridEntity.Position}");
-}
+InitializeAnimal();
 
 if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
@@ -948,21 +1094,77 @@ void OnDestroy() {
 if (TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
 }
+
 if (GridDebugVisualizer.Instance != null) {
 GridDebugVisualizer.Instance.HideContinuousRadius(this);
 }
 }
 
 void Update() {
-if (!enabled || isDying) return;
+if (!enabled) return;
+
+if (isDying && deathFadeTimer > 0) {
+deathFadeTimer -= Time.deltaTime;
+UpdateDeathFade();
+
+if (deathFadeTimer <= 0) {
+Destroy(gameObject);
+}
+return;
+}
 
 bool showStats = Input.GetKey(showStatsKey);
 SetStatsTextVisibility(showStats);
 
 UpdateSpriteFlipping();
-UpdateFlashEffect();
+movement.UpdateVisuals();
+}
 
-UpdatePathDebugLine();
+pub void OnTickUpdate(int currentTick) {
+if (!enabled || definition == null) return;
+
+if (!isDying && needs != null && needs.CurrentHealth <= 0) {
+StartDying();
+return;
+}
+
+if (isDying) {
+return;
+}
+
+needs.OnTickUpdate(currentTick);
+behavior.OnTickUpdate(currentTick);
+movement.OnTickUpdate(currentTick);
+
+if (thoughtCooldownTick > 0) {
+thoughtCooldownTick--;
+}
+
+UpdateAnimations();
+}
+
+void CacheComponents() {
+gridEntity = GetComponent<GridEntity>();
+if (gridEntity == null) {
+gridEntity = gameObject.AddComponent<GridEntity>();
+}
+
+movement = GetComponent<AnimalMovement>();
+if (movement == null) {
+movement = gameObject.AddComponent<AnimalMovement>();
+}
+
+needs = GetComponent<AnimalNeeds>();
+if (needs == null) {
+needs = gameObject.AddComponent<AnimalNeeds>();
+}
+
+behavior = GetComponent<AnimalBehavior>();
+if (behavior == null) {
+behavior = gameObject.AddComponent<AnimalBehavior>();
+}
+
+spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 }
 
 void ValidateComponents() {
@@ -972,617 +1174,164 @@ enabled = false;
 return;
 }
 
-animalDiet = definition.diet;
-if (animalDiet == null) {
+if (definition.diet == null) {
 Debug.LogError($"[{gameObject.name}] AnimalDefinition missing diet!", this);
 enabled = false;
 return;
 }
+}
 
-if (definition != null && TickManager.Instance?.Config != null) {
-flashDurationSeconds = definition.damageFlashTicks / TickManager.Instance.Config.ticksPerRealSecond;
+void InitializeAnimal() {
+movement.Initialize(this, definition);
+needs.Initialize(this, definition);
+behavior.Initialize(this, definition);
+
+if (GridPositionManager.Instance != null) {
+GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridEntity.Position}");
 }
 }
 
-void CacheComponents() {
-rb = GetComponent<Rigidbody2D>();
-spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-animalCollider = GetComponent<Collider2D>();
-gridEntity = GetComponent<GridEntity>();
+pub void TakeDamage(float amount) {
+if (isDying) return; // Don't process damage if already dying
 
-if (gridEntity == null) {
-gridEntity = gameObject.AddComponent<GridEntity>();
+needs.TakeDamage(amount);
+
 }
 
-if (spriteRenderer != null) {
-originalColor = spriteRenderer.color;
-}
+void StartDying() {
+if (isDying) return; // Prevent multiple calls
 
-if (animalCollider == null) {
-Debug.LogError($"[{gameObject.name}] Missing Collider2D!", this);
-enabled = false;
-}
-}
-
-void SetupDebugLineRenderer() {
-pathDebugLine = gameObject.GetComponent<LineRenderer>();
-if (showPathfindingDebugLine) {
-if (pathDebugLine == null) {
-pathDebugLine = gameObject.AddComponent<LineRenderer>();
-}
-pathDebugLine.enabled = true;
-pathDebugLine.startWidth = 0.05f;
-pathDebugLine.endWidth = 0.05f;
-pathDebugLine.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
-pathDebugLine.startColor = Color.cyan;
-pathDebugLine.endColor = Color.magenta;
-pathDebugLine.positionCount = 0;
-pathDebugLine.sortingLayerName = "UI";
-pathDebugLine.sortingOrder = 100;
-}
-else if(pathDebugLine != null) {
-pathDebugLine.enabled = false;
-}
-}
-
-pub void Initialize(AnimalDefinition def, Vector2 shiftedMinBounds, Vector2 shiftedMaxBounds, bool spawnedOffscreen = false) {
-definition = def;
-if (definition == null) {
-Destroy(gameObject);
-return;
-}
-
-ValidateComponents();
-
-currentHealth = definition.maxHealth;
-currentHunger = 0f;
-hasPooped = true;
-
-poopDelayTick = UnityEngine.Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
-thoughtCooldownTick = 0;
-
-minBounds = shiftedMinBounds;
-maxBounds = shiftedMaxBounds;
-screenCenterTarget = (minBounds + maxBounds) / 2f;
-
-isSeekingScreenCenter = spawnedOffscreen;
-if (isSeekingScreenCenter && gridEntity != null) {
-GridPosition targetGridPos = GridPositionManager.Instance.WorldToGrid(screenCenterTarget);
-hasPlannedAction = true;
-targetPosition = targetGridPos;
-}
-
-if (thoughtLibrary == null && definition.thoughtLibrary != null) {
-thoughtLibrary = definition.thoughtLibrary;
-}
-
-EnsureUITextReferences();
-SetStatsTextVisibility(false);
-UpdateUI();
-}
-
-pub void OnTickUpdate(int currentTick) {
-if (isDying) return;
-
-hungerTick++;
-if (poopDelayTick > 0) poopDelayTick--;
-if (thoughtCooldownTick > 0) thoughtCooldownTick--;
-if (currentPoopCooldownTick > 0) currentPoopCooldownTick--;
-if (eatRemainingTicks > 0) eatRemainingTicks--;
-if (wanderPauseTicks > 0) wanderPauseTicks--;
+isDying = true;
 
 if (TickManager.Instance?.Config != null) {
-if (hungerTick >= TickManager.Instance.Config.animalHungerTickInterval) {
-UpdateHungerTick();
-hungerTick = 0;
-
-if (!isHungryAndSearching && currentHunger >= animalDiet.hungerThreshold) {
-isHungryAndSearching = true;
-MakeDecision();
-}
-}
-}
-
-if (currentHunger >= animalDiet.maxHunger) {
-starvationTick++;
-if (starvationTick >= definition.starvationDamageTickInterval) {
-ApplyStarvationDamage();
-starvationTick = 0;
-}
-}
-
-if (isEating && eatRemainingTicks <= 0) {
-FinishEating();
-}
-
-if (!hasPooped && poopDelayTick <= 0 && currentPoopCooldownTick <= 0 && !isEating) {
-TryPoop();
-}
-
-if (currentTick - lastThinkTick >= definition.thinkingTickInterval) {
-MakeDecision();
-lastThinkTick = currentTick;
-}
-
-if (hasPlannedAction && !isEating && !isPooping) {
-ExecutePlannedAction();
-}
-
-if (deathFadeRemainingTicks > 0) {
-deathFadeRemainingTicks--;
-UpdateDeathFade();
-if (deathFadeRemainingTicks <= 0) {
-Destroy(gameObject);
-}
-}
-
-UpdateAnimations();
-}
-
-void MakeDecision() {
-if (isEating || isDying || gridEntity.IsMoving) return;
-
-if (isSeekingScreenCenter) {
-HandleScreenCenterSeeking();
-return;
-}
-
-if (currentHunger >= animalDiet.hungerThreshold) {
-isHungryAndSearching = true;
-PlanFoodSeeking();
+deathFadeDuration = definition.deathFadeTicks / TickManager.Instance.Config.ticksPerRealSecond;
 }
 else {
-isHungryAndSearching = false;
-PlanWandering();
-}
+deathFadeDuration = definition.deathFadeTicks * 0.5f; // Default 0.5 seconds per tick
 }
 
-void ExecutePlannedAction() {
-if (gridEntity == null || !hasPlannedAction || gridEntity.IsMoving) return;
+deathFadeTimer = deathFadeDuration;
 
-if (currentTargetFood != null && gridEntity.Position.ManhattanDistance(GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position)) <= definition.eatDistanceTiles) {
-StartEating();
-return;
-}
+Debug.Log($"[AnimalController] {SpeciesName} is dying! Starting fade immediately. Duration: {deathFadeDuration}s");
 
-if (currentPath != null && currentPath.Count > 0 && currentPathIndex < currentPath.Count) {
-targetPosition = currentPath[currentPathIndex];
-}
-else {
-}
-
-if (gridEntity.Position != targetPosition) {
-gridEntity.SetPosition(targetPosition);
-
-if (currentPath != null && currentPath.Count > 0) {
-currentPathIndex++;
-}
-else {
-hasPlannedAction = false;
-}
-}
-else {
-hasPlannedAction = false;
-currentPath.Clear();
-ClearPathDebugLine();
-}
-}
-
-void HandleScreenCenterSeeking() {
-if (gridEntity == null) return;
-
-Vector2 currentPos = transform.position;
-bool centerWithinBounds = currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
-currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
-
-if (centerWithinBounds) {
-isSeekingScreenCenter = false;
-hasPlannedAction = false;
-}
-else {
-GridPosition currentGridPos = gridEntity.Position;
-GridPosition targetGridPos = GridPositionManager.Instance.WorldToGrid(screenCenterTarget);
-PlanMovementToward(targetGridPos);
-}
-}
-
-void PlanFoodSeeking() {
-if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
-GridDebugVisualizer.Instance.VisualizeAnimalSearchRadius(this, gridEntity.Position, definition.searchRadiusTiles);
-}
-
-if (CanShowThought()) ShowThought(ThoughtTrigger.Hungry);
-
-GameObject nearestFood = FindNearestFoodInGrid();
-if (nearestFood != null) {
-currentTargetFood = nearestFood;
-GridPosition foodGridPos = GridPositionManager.Instance.WorldToGrid(nearestFood.transform.position);
-
-currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGridPos);
-currentPathIndex = 0;
-
-if (currentPath.Count > 0) {
-hasPlannedAction = true;
-}
-else {
-PlanMovementToward(foodGridPos);
-currentPath.Clear();
-}
-}
-else {
-PlanWandering();
-}
-}
-
-void PlanWandering() {
 if (GridDebugVisualizer.Instance != null) {
 GridDebugVisualizer.Instance.HideContinuousRadius(this);
 }
-ClearPathDebugLine();
 
-if (gridEntity == null) return;
+movement.StopAllMovement();
+behavior.CancelCurrentAction();
 
-currentPath.Clear();
-currentTargetFood = null;
-
-if (wanderPauseTicks > 0) return;
-
-if (UnityEngine.Random.Range(0, 100) < definition.wanderPauseTickChance) {
-wanderPauseTicks = UnityEngine.Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
-hasPlannedAction = false;
-return;
-}
-
-GridPosition currentPos = gridEntity.Position;
-GridPosition[] directions = {
-GridPosition.Up, GridPosition.Down,
-GridPosition.Left, GridPosition.Right
-};
-
-for (int i = 0; i < 4; i++) {
-GridPosition randomDir = directions[UnityEngine.Random.Range(0, directions.Length)];
-GridPosition targetPos = currentPos + randomDir;
-
-if (IsValidMove(targetPos)) {
-targetPosition = targetPos;
-hasPlannedAction = true;
-return;
-}
-}
-
-hasPlannedAction = false;
-}
-
-void PlanMovementToward(GridPosition target) {
-if (gridEntity == null) return;
-
-GridPosition currentPos = gridEntity.Position;
-int dx = Mathf.Clamp(target.x - currentPos.x, -1, 1);
-int dy = Mathf.Clamp(target.y - currentPos.y, -1, 1);
-
-if (dx != 0 && dy != 0) {
-GridPosition diagonalTarget = currentPos + new GridPosition(dx, dy);
-if (IsValidMove(diagonalTarget)) {
-targetPosition = diagonalTarget;
-hasPlannedAction = true;
-return;
-}
-}
-
-if (dx != 0) {
-GridPosition horizontalTarget = currentPos + new GridPosition(dx, 0);
-if (IsValidMove(horizontalTarget)) {
-targetPosition = horizontalTarget;
-hasPlannedAction = true;
-return;
-}
-}
-
-if (dy != 0) {
-GridPosition verticalTarget = currentPos + new GridPosition(0, dy);
-if (IsValidMove(verticalTarget)) {
-targetPosition = verticalTarget;
-hasPlannedAction = true;
-return;
-}
-}
-
-PlanWandering();
-}
-
-bool IsValidMove(GridPosition pos) {
-if (GridPositionManager.Instance == null) ret false;
-
-if (GridPositionManager.Instance.IsPositionOccupied(pos)) {
-if (currentTargetFood != null) {
-var foodGridPos = GridPositionManager.Instance.WorldToGrid(currentTargetFood.transform.position);
-if (pos == foodGridPos) ret true;
-}
-ret false;
-}
-
-ret GridPositionManager.Instance.IsPositionValid(pos);
-}
-
-GameObject FindNearestFoodInGrid() {
-if (animalDiet == null) ret null;
-
-var tilesInRange = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, definition.searchRadiusTiles);
-
-GameObject bestFood = null;
-float bestScore = -1f;
-
-foreach (var tilePos in tilesInRange) {
-var entitiesAtTile = GridPositionManager.Instance.GetEntitiesAt(tilePos);
-
-foreach (var entity in entitiesAtTile) {
-if (entity == null || entity.gameObject == this.gameObject) continue;
-
-FoodItem foodItem = entity.GetComponent<FoodItem>();
-if (foodItem != null && foodItem.foodType != null && animalDiet.CanEat(foodItem.foodType)) {
-var pref = animalDiet.GetPreference(foodItem.foodType);
-if (pref == null) continue;
-
-float distance = entity.Position.ManhattanDistance(gridEntity.Position);
-float score = pref.preferencePriority / (1f + distance);
-
-if (score > bestScore) {
-bestScore = score;
-bestFood = entity.gameObject;
-}
-}
-}
-}
-
-ret bestFood;
-}
-
-void StartEating() {
-if (GridDebugVisualizer.Instance != null) {
-GridDebugVisualizer.Instance.HideContinuousRadius(this);
-}
-ClearPathDebugLine();
-currentPath.Clear();
-hasPlannedAction = false;
-
-isEating = true;
-eatRemainingTicks = definition.eatDurationTicks;
-if (CanShowThought()) ShowThought(ThoughtTrigger.Eating);
-}
-
-void FinishEating() {
-isEating = false;
-
-if (currentTargetFood == null) return;
-
-FoodItem foodItem = currentTargetFood.GetComponent<FoodItem>();
-if (foodItem != null && foodItem.foodType != null) {
-float satiationGain = animalDiet.GetSatiationValue(foodItem.foodType);
-currentHunger -= satiationGain;
-currentHunger = Mathf.Max(0f, currentHunger);
-
-Destroy(currentTargetFood);
-hasPooped = false;
-poopDelayTick = UnityEngine.Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
-currentTargetFood = null;
-
-if (currentHunger < animalDiet.hungerThreshold) {
-isHungryAndSearching = false;
-}
-
-UpdateUI();
-}
-}
-
-void UpdateHungerTick() {
-if (animalDiet == null) return;
-
-currentHunger += animalDiet.hungerIncreaseRate;
-currentHunger = Mathf.Min(currentHunger, animalDiet.maxHunger);
-UpdateUI();
-}
-
-void TryPoop() {
-if (isEating || isPooping) return;
-
-isPooping = true;
-currentPoopCooldownTick = definition.poopCooldownTicks;
-SpawnPoop();
-hasPooped = true;
-isPooping = false;
-
-if (CanShowThought()) ShowThought(ThoughtTrigger.Pooping);
-}
-
-void SpawnPoop() {
-if (poopPrefabs == null || poopPrefabs.Count == 0) return;
-
-int index = UnityEngine.Random.Range(0, poopPrefabs.Count);
-GameObject prefab = poopPrefabs[index];
-if (prefab == null) return;
-
-Transform spawnT = poopSpawnPoint ? poopSpawnPoint : transform;
-GameObject poopObj = Instantiate(prefab, spawnT.position, Quaternion.identity);
-
-SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
-if (sr != null) {
-sr.flipX = UnityEngine.Random.value > 0.5f;
-Color c = sr.color;
-float v = definition.poopColorVariation;
-sr.color = new Color(
-Mathf.Clamp01(c.r + UnityEngine.Random.Range(-v, v)),
-Mathf.Clamp01(c.g + UnityEngine.Random.Range(-v, v)),
-Mathf.Clamp01(c.b + UnityEngine.Random.Range(-v, v)),
-c.a
-);
-}
-
-PoopController pc = poopObj.GetComponent<PoopController>() ?? poopObj.AddComponent<PoopController>();
-pc.Initialize();
-}
-
-void ApplyStarvationDamage() {
-currentHealth -= definition.damagePerStarvationTick;
-currentHealth = Mathf.Max(0f, currentHealth);
-
-if (!isFlashing) {
-flashRemainingTime = flashDurationSeconds;
-isFlashing = true;
-}
-
-UpdateUI();
-
-if (currentHealth <= 0f) {
-Die(CauseOfDeath.Starvation);
-}
-}
-
-pub enum CauseOfDeath { Unknown, Starvation, EatenByPredator }
-
-void Die(CauseOfDeath cause) {
-Debug.Log($"[{SpeciesName}] died: {cause}", gameObject);
-isDying = true;
-deathFadeRemainingTicks = definition.deathFadeTicks;
-}
-
-void UpdatePathDebugLine() {
-if (pathDebugLine == null || !showPathfindingDebugLine) return;
-
-if (isHungryAndSearching && currentPath != null && currentPath.Count > 0 && currentTargetFood != null) {
-int remainingWaypoints = currentPath.Count - currentPathIndex;
-pathDebugLine.positionCount = 1 + remainingWaypoints;
-
-pathDebugLine.SetPosition(0, gridEntity.GroundWorldPosition);
-
-for (int i = 0; i < remainingWaypoints; i++) {
-Vector3 worldPos = GridPositionManager.Instance.GridToWorld(currentPath[i + currentPathIndex]);
-pathDebugLine.SetPosition(i + 1, worldPos);
-}
-}
-else {
-pathDebugLine.positionCount = 0;
-}
-}
-
-void ClearPathDebugLine() {
-if (pathDebugLine != null) {
-pathDebugLine.positionCount = 0;
-}
-}
-
-void UpdateFlashEffect() {
-if (flashRemainingTime > 0 && spriteRenderer != null) {
-spriteRenderer.color = definition.damageFlashColor;
-flashRemainingTime -= Time.deltaTime;
-}
-else if (isFlashing && spriteRenderer != null) {
-spriteRenderer.color = originalColor;
-isFlashing = false;
-flashRemainingTime = 0f;
-}
+if (movement != null) movement.enabled = false;
+if (behavior != null) behavior.enabled = false;
+if (needs != null) needs.enabled = false;
 }
 
 void UpdateDeathFade() {
-if (spriteRenderer != null && definition.deathFadeTicks > 0) {
-float alpha = (float)deathFadeRemainingTicks / definition.deathFadeTicks;
-Color c = spriteRenderer.color;
-c.a = alpha;
-spriteRenderer.color = c;
-}
-}
+if (spriteRenderer == null) return;
 
-bool CanShowThought() {
-ret thoughtLibrary != null && thoughtBubblePrefab != null && thoughtCooldownTick <= 0;
+float fadeProgress = 1f - (deathFadeTimer / deathFadeDuration);
+Color color = spriteRenderer.color;
+color.a = Mathf.Lerp(1f, 0f, fadeProgress);
+spriteRenderer.color = color;
 }
 
-void ShowThought(ThoughtTrigger trigger) {
-if (thoughtLibrary == null || thoughtLibrary.allThoughts == null) return;
+pub void ShowThought(ThoughtTrigger trigger) {
+if (!CanShowThought()) return;
 
-var entry = thoughtLibrary.allThoughts.FirstOrDefault(t =>
-t != null && t.speciesName == SpeciesName && t.trigger == trigger
-);
-
-if (entry != null && entry.lines != null && entry.lines.Count > 0) {
-string line = entry.lines[UnityEngine.Random.Range(0, entry.lines.Count)];
-Transform spawnT = bubbleSpawnTransform ? bubbleSpawnTransform : transform;
-GameObject bubbleGO = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity, spawnT);
-
-ThoughtBubbleController bubble = bubbleGO.GetComponent<ThoughtBubbleController>();
-if (bubble) {
-float durationInTicks = TickManager.Instance?.Config != null ?
-2f * TickManager.Instance.Config.ticksPerRealSecond : 4f;
-bubble.Initialize(line, spawnT, durationInTicks);
 thoughtCooldownTick = definition.thoughtCooldownTicks;
+
+if (definition.thoughtLibrary == null || thoughtBubblePrefab == null) return;
+
+string message = "";
+
+switch (trigger) {
+case ThoughtTrigger.Hungry:
+message = definition.thoughtLibrary?.hungryThoughts?.Length > 0
+? definition.thoughtLibrary.hungryThoughts[Random.Range(0, definition.thoughtLibrary.hungryThoughts.Length)]
+: "";
+break;
+case ThoughtTrigger.Eating:
+message = definition.thoughtLibrary?.eatingThoughts?.Length > 0
+? definition.thoughtLibrary.eatingThoughts[Random.Range(0, definition.thoughtLibrary.eatingThoughts.Length)]
+: "";
+break;
+case ThoughtTrigger.HealthLow:
+message = definition.thoughtLibrary?.healthLowThoughts?.Length > 0
+? definition.thoughtLibrary.healthLowThoughts[Random.Range(0, definition.thoughtLibrary.healthLowThoughts.Length)]
+: "";
+break;
+case ThoughtTrigger.Fleeing:
+message = definition.thoughtLibrary?.fleeingThoughts?.Length > 0
+? definition.thoughtLibrary.fleeingThoughts[Random.Range(0, definition.thoughtLibrary.fleeingThoughts.Length)]
+: "";
+break;
+case ThoughtTrigger.Pooping:
+message = definition.thoughtLibrary?.poopingThoughts?.Length > 0
+? definition.thoughtLibrary.poopingThoughts[Random.Range(0, definition.thoughtLibrary.poopingThoughts.Length)]
+: "";
+break;
 }
-else {
-Destroy(bubbleGO);
+
+if (!string.IsNullOrEmpty(message)) {
+Transform spawnT = bubbleSpawnTransform != null ? bubbleSpawnTransform : transform;
+GameObject bubble = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity);
+
+ThoughtBubbleController controller = bubble.GetComponent<ThoughtBubbleController>();
+if (controller != null) {
+controller.Initialize(message, spawnT, 3f);
 }
 }
 }
 
-void UpdateSpriteFlipping() {
-if (spriteRenderer != null && gridEntity != null && gridEntity.IsMoving) {
-Vector3 currentPos = transform.position;
-Vector3 targetPos = GridPositionManager.Instance.GridToWorld(targetPosition);
-Vector2 moveDirection = (targetPos - currentPos).normalized;
-
-if (Mathf.Abs(moveDirection.x) > 0.01f) {
-spriteRenderer.flipX = moveDirection.x < 0;
-}
-}
+pub bool CanShowThought() {
+ret thoughtCooldownTick <= 0 && !isDying;
 }
 
 void UpdateAnimations() {
 if (animator == null) return;
-bool isMoving = gridEntity != null && gridEntity.IsMoving && !isEating && !isPooping;
-animator.SetBool("IsMoving", isMoving);
-animator.SetBool("IsEating", isEating);
+
+bool isMoving = gridEntity != null && gridEntity.IsMoving;
+bool isEating = behavior != null && behavior.IsEating;
+
+animator.SetBool("isMoving", isMoving);
+animator.SetBool("isEating", isEating);
+animator.SetBool("isDying", isDying);
 }
 
-void UpdateUI() {
-UpdateHpText();
-UpdateHungerText();
-}
+void UpdateSpriteFlipping() {
+if (spriteRenderer == null || movement == null) return;
 
-void UpdateHpText() {
-if (hpText == null || definition == null) return;
-hpText.text = $"HP: {Mathf.FloorToInt(currentHealth)}/{Mathf.FloorToInt(definition.maxHealth)}";
-}
-
-void UpdateHungerText() {
-if (hungerText == null || animalDiet == null) return;
-hungerText.text = $"Hunger: {Mathf.FloorToInt(currentHunger)}/{Mathf.FloorToInt(animalDiet.maxHunger)}";
-}
-
-void EnsureUITextReferences() {
-if (hpText == null) {
-hpText = GetComponentInChildren<TextMeshProUGUI>(true);
-if (hpText != null && hpText.gameObject.name.Contains("Hunger")) {
-hungerText = hpText;
-hpText = null;
-}
-}
-
-if (hungerText == null) {
-TextMeshProUGUI[] allTexts = GetComponentsInChildren<TextMeshProUGUI>(true);
-foreach (var text in allTexts) {
-if (text != hpText) {
-hungerText = text;
-break;
-}
-}
+Vector2 moveDirection = movement.GetLastMoveDirection();
+if (Mathf.Abs(moveDirection.x) > 0.01f) {
+spriteRenderer.flipX = moveDirection.x < 0;
 }
 }
 
 void SetStatsTextVisibility(bool visible) {
 if (hpText != null) hpText.gameObject.SetActive(visible);
 if (hungerText != null) hungerText.gameObject.SetActive(visible);
+
+if (visible) {
+UpdateUI();
+}
 }
 
-pub GridPosition GetCurrentGridPosition() {
-ret gridEntity?.Position ?? GridPosition.Zero;
+pub void UpdateUI() {
+if (needs == null) return;
+
+if (hpText != null) {
+hpText.text = $"{Mathf.CeilToInt(needs.CurrentHealth)}/{Mathf.CeilToInt(definition.maxHealth)}";
 }
 
+if (hungerText != null) {
+hungerText.text = $"{Mathf.CeilToInt(needs.CurrentHunger)}/{Mathf.CeilToInt(definition.diet.maxHunger)}";
+}
+}
+
+pub void SetSeekingScreenCenter(Vector2 target, Vector2 minBounds, Vector2 maxBounds) {
+movement.SetSeekingScreenCenter(target, minBounds, maxBounds);
+}
 }
 
 ////////////////////////////////////////////////////////////
@@ -1595,56 +1344,79 @@ pub string animalName = "DefaultAnimal";
 pub GameObject prefab;
 
 pub float maxHealth = 10f;
-pub float movementSpeed = 2f; // Grid units per tick
 
-pub int thinkingTickInterval = 3;
-pub int wanderPauseTickChance = 30; // Percentage
-pub int minWanderMoveTicks = 2;
-pub int maxWanderMoveTicks = 6;
-pub int minWanderPauseTicks = 1;
-pub int maxWanderPauseTicks = 4;
-
-pub int searchRadiusTiles = 5; // In grid tiles
-pub int eatDistanceTiles = 1; // Must be adjacent
-pub int eatDurationTicks = 3;
-
-pub int thoughtCooldownTicks = 10;
-
-pub int starvationDamageTickInterval = 4;
-pub float damagePerStarvationTick = 2f;
-pub int deathFadeTicks = 3;
-pub Color damageFlashColor = Color.red;
-pub int damageFlashTicks = 1;
-
-pub int minPoopDelayTicks = 10;
-pub int maxPoopDelayTicks = 20;
-pub int poopCooldownTicks = 2;
-pub float poopColorVariation = 0.1f;
+pub float movementSpeed = 2f;
 
 pub AnimalDiet diet;
 
+pub int thinkingTickInterval = 3;
+
+pub int searchRadiusTiles = 5;
+
+pub int eatDistanceTiles = 1;
+
+pub int eatDurationTicks = 3;
+
+pub int wanderPauseTickChance = 30;
+
+pub int minWanderMoveTicks = 2;
+
+pub int maxWanderMoveTicks = 6;
+
+pub int minWanderPauseTicks = 1;
+
+pub int maxWanderPauseTicks = 4;
+
+pub int starvationDamageTickInterval = 4;
+
+pub float damagePerStarvationTick = 2f;
+
+pub Color damageFlashColor = Color.red;
+
+pub int damageFlashTicks = 1;
+
+pub int deathFadeTicks = 3;
+
+pub int minPoopDelayTicks = 10;
+
+pub int maxPoopDelayTicks = 20;
+
+pub int poopCooldownTicks = 2;
+
+pub float poopColorVariation = 0.1f;
+
 pub AnimalThoughtLibrary thoughtLibrary;
 
+pub int thoughtCooldownTicks = 10;
+
 pub List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
+
 pub List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
 void OnValidate() {
+maxHealth = Mathf.Max(1f, maxHealth);
+movementSpeed = Mathf.Max(0.1f, movementSpeed);
+
 thinkingTickInterval = Mathf.Max(1, thinkingTickInterval);
 searchRadiusTiles = Mathf.Max(1, searchRadiusTiles);
 eatDistanceTiles = Mathf.Max(1, eatDistanceTiles);
 eatDurationTicks = Mathf.Max(1, eatDurationTicks);
-thoughtCooldownTicks = Mathf.Max(1, thoughtCooldownTicks);
-starvationDamageTickInterval = Mathf.Max(1, starvationDamageTickInterval);
-deathFadeTicks = Mathf.Max(1, deathFadeTicks);
-damageFlashTicks = Mathf.Max(1, damageFlashTicks);
-minPoopDelayTicks = Mathf.Max(1, minPoopDelayTicks);
-maxPoopDelayTicks = Mathf.Max(minPoopDelayTicks, maxPoopDelayTicks);
-poopCooldownTicks = Mathf.Max(1, poopCooldownTicks);
+
 minWanderMoveTicks = Mathf.Max(1, minWanderMoveTicks);
 maxWanderMoveTicks = Mathf.Max(minWanderMoveTicks, maxWanderMoveTicks);
 minWanderPauseTicks = Mathf.Max(1, minWanderPauseTicks);
 maxWanderPauseTicks = Mathf.Max(minWanderPauseTicks, maxWanderPauseTicks);
-wanderPauseTickChance = Mathf.Clamp(wanderPauseTickChance, 0, 100);
+
+starvationDamageTickInterval = Mathf.Max(1, starvationDamageTickInterval);
+damagePerStarvationTick = Mathf.Max(0.1f, damagePerStarvationTick);
+deathFadeTicks = Mathf.Max(1, deathFadeTicks);
+damageFlashTicks = Mathf.Max(1, damageFlashTicks);
+
+minPoopDelayTicks = Mathf.Max(1, minPoopDelayTicks);
+maxPoopDelayTicks = Mathf.Max(minPoopDelayTicks, maxPoopDelayTicks);
+poopCooldownTicks = Mathf.Max(1, poopCooldownTicks);
+
+thoughtCooldownTicks = Mathf.Max(1, thoughtCooldownTicks);
 }
 }
 
@@ -1655,6 +1427,551 @@ wanderPauseTickChance = Mathf.Clamp(wanderPauseTickChance, 0, 100);
 
 pub cls AnimalLibrary : ScriptableObject {
 pub List<AnimalDefinition> animals;
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Ecosystem\Animals\AnimalMovement.cs
+
+﻿using System.Collections.Generic;
+using WegoSystem;
+
+pub cls AnimalMovement : MonoBehaviour {
+[SerializeField] bool showPathfindingDebugLine = false;
+
+AnimalController controller;
+AnimalDefinition definition;
+GridEntity gridEntity;
+LineRenderer pathDebugLine;
+
+List<GridPosition> currentPath = new List<GridPosition>();
+int currentPathIndex = 0;
+GameObject currentTargetFood = null;
+bool hasPlannedAction = false;
+int wanderPauseTicks = 0;
+int lastThinkTick = 0;
+
+bool isSeekingScreenCenter = false;
+Vector2 screenCenterTarget;
+Vector2 minBounds;
+Vector2 maxBounds;
+
+Vector2 lastMoveDirection;
+
+pub bool HasTarget => currentTargetFood != null || hasPlannedAction;
+pub GameObject CurrentTargetFood => currentTargetFood;
+
+pub void Initialize(AnimalController controller, AnimalDefinition definition) {
+this.controller = controller;
+this.definition = definition;
+this.gridEntity = controller.GridEntity;
+
+SetupDebugLineRenderer();
+}
+
+pub void OnTickUpdate(int currentTick) {
+if (!enabled || controller.IsDying || controller.Behavior.IsEating || controller.Behavior.IsPooping) return;
+
+if (wanderPauseTicks > 0) {
+wanderPauseTicks--;
+return;
+}
+
+if (currentTick - lastThinkTick >= definition.thinkingTickInterval) {
+MakeMovementDecision();
+lastThinkTick = currentTick;
+}
+
+if (hasPlannedAction && !gridEntity.IsMoving) {
+ExecutePlannedMovement();
+}
+}
+
+pub void UpdateVisuals() {
+UpdatePathDebugLine();
+}
+
+void MakeMovementDecision() {
+if (gridEntity.IsMoving) return;
+
+if (isSeekingScreenCenter) {
+HandleScreenCenterSeeking();
+return;
+}
+
+if (controller.Needs.IsHungry) {
+PlanFoodSeeking();
+}
+else {
+PlanWandering();
+}
+}
+
+void PlanFoodSeeking() {
+if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
+GridDebugVisualizer.Instance.VisualizeAnimalSearchRadius(controller, gridEntity.Position, definition.searchRadiusTiles);
+}
+
+if (controller.CanShowThought()) {
+controller.ShowThought(ThoughtTrigger.Hungry);
+}
+
+GameObject nearestFood = FindNearestFood();
+if (nearestFood != null) {
+SetTargetFood(nearestFood);
+}
+else {
+PlanWandering();
+}
+}
+
+GameObject FindNearestFood() {
+if (definition.diet == null) ret null;
+
+GameObject foodFromGrid = FindFoodInGrid();
+if (foodFromGrid != null) ret foodFromGrid;
+
+ret FindFoodByCollider();
+}
+
+GameObject FindFoodInGrid() {
+var entitiesInRadius = GridPositionManager.Instance.GetEntitiesInRadius(
+gridEntity.Position,
+definition.searchRadiusTiles,
+true
+);
+
+GameObject bestFood = null;
+float bestScore = -1f;
+
+foreach (var entity in entitiesInRadius) {
+if (entity == null || entity.gameObject == this.gameObject) continue;
+
+FoodItem foodItem = entity.GetComponent<FoodItem>();
+if (foodItem != null && foodItem.foodType != null && definition.diet.CanEat(foodItem.foodType)) {
+var pref = definition.diet.GetPreference(foodItem.foodType);
+if (pref == null) continue;
+
+float distance = entity.Position.ManhattanDistance(gridEntity.Position);
+float score = pref.preferencePriority / (1f + distance);
+
+if (score > bestScore) {
+bestScore = score;
+bestFood = entity.gameObject;
+}
+}
+}
+
+ret bestFood;
+}
+
+GameObject FindFoodByCollider() {
+Vector3 worldPos = transform.position;
+float worldRadius = definition.searchRadiusTiles * GridPositionManager.Instance.GetTilemapGrid().cellSize.x;
+
+Collider2D[] colliders = Physics2D.OverlapCircleAll(worldPos, worldRadius);
+
+GameObject bestFood = null;
+float bestScore = -1f;
+
+foreach (var collider in colliders) {
+if (collider == null || collider.gameObject == this.gameObject) continue;
+
+if (collider.GetComponent<PoopController>() != null) continue;
+
+FoodItem foodItem = collider.GetComponent<FoodItem>();
+if (foodItem != null && foodItem.foodType != null && definition.diet.CanEat(foodItem.foodType)) {
+var pref = definition.diet.GetPreference(foodItem.foodType);
+if (pref == null) continue;
+
+float distance = Vector3.Distance(worldPos, collider.transform.position);
+float score = pref.preferencePriority / (1f + distance);
+
+if (score > bestScore) {
+bestScore = score;
+bestFood = collider.gameObject;
+}
+}
+}
+
+ret bestFood;
+}
+
+void SetTargetFood(GameObject food) {
+currentTargetFood = food;
+
+GridPosition foodGridPos;
+GridEntity foodGridEntity = food.GetComponent<GridEntity>();
+
+if (foodGridEntity != null) {
+foodGridPos = foodGridEntity.Position;
+}
+else {
+foodGridPos = GridPositionManager.Instance.WorldToGrid(food.transform.position);
+}
+
+currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGridPos, false);
+currentPathIndex = 0;
+
+if (currentPath.Count > 0) {
+hasPlannedAction = true;
+}
+else {
+currentPath.Clear();
+hasPlannedAction = false;
+}
+}
+
+void PlanWandering() {
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(controller);
+}
+ClearPathDebugLine();
+
+currentPath.Clear();
+currentTargetFood = null;
+
+if (Random.Range(0, 100) < definition.wanderPauseTickChance) {
+wanderPauseTicks = Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
+hasPlannedAction = false;
+return;
+}
+
+GridPosition currentPos = gridEntity.Position;
+GridPosition[] directions = {
+GridPosition.Up, GridPosition.Down,
+GridPosition.Left, GridPosition.Right
+};
+
+for (int i = 0; i < directions.Length; i++) {
+int randomIndex = Random.Range(i, directions.Length);
+GridPosition temp = directions[i];
+directions[i] = directions[randomIndex];
+directions[randomIndex] = temp;
+}
+
+foreach (var dir in directions) {
+GridPosition targetPos = currentPos + dir;
+if (IsValidMove(targetPos)) {
+currentPath.Clear();
+currentPath.Add(targetPos);
+currentPathIndex = 0;
+hasPlannedAction = true;
+return;
+}
+}
+
+hasPlannedAction = false;
+}
+
+void ExecutePlannedMovement() {
+if (!hasPlannedAction || gridEntity.IsMoving) return;
+
+if (currentTargetFood != null) {
+GridPosition foodPos = GetFoodGridPosition(currentTargetFood);
+int distance = gridEntity.Position.ManhattanDistance(foodPos);
+
+if (distance <= definition.eatDistanceTiles) {
+controller.Behavior.StartEating(currentTargetFood);
+ClearMovementPlan();
+return;
+}
+}
+
+if (currentPath != null && currentPath.Count > 0 && currentPathIndex < currentPath.Count) {
+GridPosition nextPosition = currentPath[currentPathIndex];
+
+if (TryMoveTo(nextPosition)) {
+currentPathIndex++;
+
+if (currentPathIndex >= currentPath.Count) {
+ClearMovementPlan();
+}
+}
+else {
+if (currentTargetFood != null) {
+SetTargetFood(currentTargetFood);
+}
+else {
+ClearMovementPlan();
+}
+}
+}
+else {
+hasPlannedAction = false;
+}
+}
+
+bool TryMoveTo(GridPosition targetPos) {
+if (!IsValidMove(targetPos)) ret false;
+
+Vector3 currentWorld = transform.position;
+Vector3 targetWorld = GridPositionManager.Instance.GridToWorld(targetPos);
+lastMoveDirection = (targetWorld - currentWorld).normalized;
+
+gridEntity.SetPosition(targetPos);
+ret true;
+}
+
+bool IsValidMove(GridPosition pos) {
+if (GridPositionManager.Instance == null) ret false;
+
+if (!GridPositionManager.Instance.IsPositionValid(pos)) ret false;
+
+if (GridPositionManager.Instance.IsPositionOccupied(pos)) {
+if (currentTargetFood != null) {
+GridPosition foodPos = GetFoodGridPosition(currentTargetFood);
+if (pos == foodPos) ret true;
+}
+ret false;
+}
+
+ret true;
+}
+
+GridPosition GetFoodGridPosition(GameObject food) {
+if (food == null) ret GridPosition.Zero;
+
+GridEntity foodGridEntity = food.GetComponent<GridEntity>();
+if (foodGridEntity != null) {
+ret foodGridEntity.Position;
+}
+else {
+ret GridPositionManager.Instance.WorldToGrid(food.transform.position);
+}
+}
+
+void HandleScreenCenterSeeking() {
+Vector2 currentPos = transform.position;
+bool centerWithinBounds = currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
+currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
+
+if (centerWithinBounds) {
+isSeekingScreenCenter = false;
+hasPlannedAction = false;
+}
+else {
+GridPosition targetGridPos = GridPositionManager.Instance.WorldToGrid(screenCenterTarget);
+currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, targetGridPos, false);
+currentPathIndex = 0;
+hasPlannedAction = currentPath.Count > 0;
+}
+}
+
+pub void SetSeekingScreenCenter(Vector2 target, Vector2 minBounds, Vector2 maxBounds) {
+isSeekingScreenCenter = true;
+screenCenterTarget = target;
+this.minBounds = minBounds;
+this.maxBounds = maxBounds;
+}
+
+pub void StopAllMovement() {
+ClearMovementPlan();
+wanderPauseTicks = 0;
+isSeekingScreenCenter = false;
+}
+
+pub void ClearMovementPlan() {
+currentPath.Clear();
+currentPathIndex = 0;
+currentTargetFood = null;
+hasPlannedAction = false;
+ClearPathDebugLine();
+
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(controller);
+}
+}
+
+pub Vector2 GetLastMoveDirection() {
+ret lastMoveDirection;
+}
+
+void SetupDebugLineRenderer() {
+if (!showPathfindingDebugLine) return;
+
+GameObject lineObj = new GameObject("PathDebugLine");
+lineObj.transform.SetParent(transform);
+pathDebugLine = lineObj.AddComponent<LineRenderer>();
+pathDebugLine.startWidth = 0.05f;
+pathDebugLine.endWidth = 0.05f;
+pathDebugLine.material = new Material(Shader.Find("Sprites/Default"));
+pathDebugLine.startColor = Color.yellow;
+pathDebugLine.endColor = Color.red;
+pathDebugLine.sortingOrder = 100;
+}
+
+void UpdatePathDebugLine() {
+if (!showPathfindingDebugLine || pathDebugLine == null || currentPath == null || currentPath.Count == 0) {
+if (pathDebugLine != null) pathDebugLine.positionCount = 0;
+return;
+}
+
+List<Vector3> positions = new List<Vector3>();
+
+Vector3 groundPosition = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
+positions.Add(groundPosition);
+
+for (int i = currentPathIndex; i < currentPath.Count; i++) {
+Vector3 worldPos = GridPositionManager.Instance.GridToWorld(currentPath[i]);
+positions.Add(worldPos);
+}
+
+pathDebugLine.positionCount = positions.Count;
+pathDebugLine.SetPositions(positions.ToArray());
+}
+
+void ClearPathDebugLine() {
+if (pathDebugLine != null) {
+pathDebugLine.positionCount = 0;
+}
+}
+
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Ecosystem\Animals\AnimalNeeds.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+pub cls AnimalNeeds : MonoBehaviour {
+AnimalController controller;
+AnimalDefinition definition;
+AnimalDiet diet;
+SpriteRenderer spriteRenderer;
+
+float currentHealth;
+float currentHunger;
+
+int hungerTick = 0;
+int starvationTick = 0;
+
+float flashRemainingTime = 0f;
+float flashDurationSeconds = 0.2f;
+bool isFlashing = false;
+Color originalColor;
+
+pub float CurrentHealth => currentHealth;
+pub float CurrentHunger => currentHunger;
+pub bool IsHungry => currentHunger >= diet.hungerThreshold;
+pub bool IsStarving => currentHunger >= diet.maxHunger;
+
+pub void Initialize(AnimalController controller, AnimalDefinition definition) {
+this.controller = controller;
+this.definition = definition;
+this.diet = definition.diet;
+
+spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+if (spriteRenderer != null) {
+originalColor = spriteRenderer.color;
+}
+
+if (TickManager.Instance?.Config != null) {
+flashDurationSeconds = definition.damageFlashTicks / TickManager.Instance.Config.ticksPerRealSecond;
+}
+
+currentHealth = definition.maxHealth;
+currentHunger = 0f;
+}
+
+pub void OnTickUpdate(int currentTick) {
+UpdateHunger();
+UpdateStarvation();
+}
+
+void UpdateHunger() {
+if (TickManager.Instance?.Config == null || diet == null) return;
+
+hungerTick++;
+if (hungerTick >= TickManager.Instance.Config.animalHungerTickInterval) {
+hungerTick = 0;
+
+currentHunger += diet.hungerIncreaseRate;
+currentHunger = Mathf.Min(currentHunger, diet.maxHunger);
+
+controller.UpdateUI();
+}
+}
+
+void UpdateStarvation() {
+if (!IsStarving) {
+starvationTick = 0;
+return;
+}
+
+starvationTick++;
+if (starvationTick >= definition.starvationDamageTickInterval) {
+starvationTick = 0;
+ApplyStarvationDamage();
+}
+}
+
+void UpdateFlashEffect() {
+}
+
+void Update() {
+if (!isFlashing || spriteRenderer == null) return;
+
+flashRemainingTime -= Time.deltaTime;
+
+if (flashRemainingTime <= 0) {
+spriteRenderer.color = originalColor;
+isFlashing = false;
+}
+else {
+float t = (flashRemainingTime / flashDurationSeconds);
+spriteRenderer.color = Color.Lerp(originalColor, definition.damageFlashColor, t);
+}
+}
+
+pub void TakeDamage(float amount) {
+currentHealth -= amount;
+currentHealth = Mathf.Clamp(currentHealth, 0f, definition.maxHealth);
+
+StartDamageFlash();
+controller.UpdateUI();
+
+if (currentHealth <= definition.maxHealth * 0.3f && controller.CanShowThought()) {
+controller.ShowThought(ThoughtTrigger.HealthLow);
+}
+
+}
+
+void ApplyStarvationDamage() {
+currentHealth -= definition.damagePerStarvationTick;
+currentHealth = Mathf.Clamp(currentHealth, 0f, definition.maxHealth);
+
+StartDamageFlash();
+controller.UpdateUI();
+
+Debug.Log($"[AnimalNeeds] {controller.SpeciesName} taking starvation damage. Health: {currentHealth}");
+
+}
+
+pub void Eat(FoodItem foodItem) {
+if (foodItem == null || foodItem.foodType == null || diet == null) return;
+
+float satiationGain = diet.GetSatiationValue(foodItem.foodType);
+currentHunger -= satiationGain;
+currentHunger = Mathf.Max(0f, currentHunger);
+
+controller.UpdateUI();
+
+Debug.Log($"[AnimalNeeds] {controller.SpeciesName} ate {foodItem.foodType.foodName}. Hunger: {currentHunger}/{diet.maxHunger}");
+}
+
+pub void Heal(float amount) {
+currentHealth += amount;
+currentHealth = Mathf.Clamp(currentHealth, 0f, definition.maxHealth);
+controller.UpdateUI();
+}
+
+void StartDamageFlash() {
+if (spriteRenderer == null) return;
+
+isFlashing = true;
+flashRemainingTime = flashDurationSeconds;
+}
 }
 
 ////////////////////////////////////////////////////////////
@@ -1673,18 +1990,38 @@ pub float spawnTimer = 0f;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Animals\AnimalThoughtLibrary.cs
 
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
 
 pub cls AnimalThoughtLibrary : ScriptableObject {
-pub List<AnimalThoughtLine> allThoughts;
-}
+pub string[] hungryThoughts = new string[] {
+"I'm hungry!",
+"Need food...",
+"Where's the food?"
+};
 
-pub cls AnimalThoughtLine {
-pub string speciesName; // e.g. "Bunny", "Fox", "Bird"
+pub string[] eatingThoughts = new string[] {
+"Yum!",
+"Delicious!",
+"Nom nom nom"
+};
 
-pub ThoughtTrigger trigger;
+pub string[] healthLowThoughts = new string[] {
+"I don't feel good...",
+"Help me!",
+"Ouch!"
+};
 
-pub List<string> lines;
+pub string[] fleeingThoughts = new string[] {
+"Run away!",
+"Scary!",
+"Help!"
+};
+
+pub string[] poopingThoughts = new string[] {
+"Nature calls!",
+"Gotta go!",
+"..."
+};
 }
 
 ////////////////////////////////////////////////////////////
@@ -2372,68 +2709,95 @@ Gizmos.DrawLine(firefly.transform.position, firefly.AttractionTarget.position);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Environment\PoopController.cs
 
-﻿using UnityEngine;
-using TMPro;
+﻿// Update the PoopController.cs with these changes:
 
-[RequireComponent(typeof(Collider2D))] // Add RequireComponent for Collider2D
-pub cls PoopController : MonoBehaviour {
-pub float lifetime = 10f;
-pub float fadeDuration = 2f;
-pub AnimationCurve fadeCurve = AnimationCurve.Linear(0f, 1f, 1f, 0f);
+using WegoSystem;
 
-SpriteRenderer sr;
-float timer = 0f;
-Color initialColor;
-Collider2D poopCollider; // Reference to the collider
+pub cls PoopController : MonoBehaviour, ITickUpdateable {
+[SerializeField] int lifetimeTicks = 20;
+[SerializeField] int fadeStartTicks = 15;
+[SerializeField] float fadeRealTimeDuration = 1f; // Real-time seconds for fade
+
+GridEntity gridEntity;
+SpriteRenderer spriteRenderer;
+int currentLifetimeTicks;
+bool isFading = false;
+float fadeTimer = 0f;
+Color originalColor;
 
 void Awake() {
-sr = GetComponent<SpriteRenderer>();
-if (sr != null) {
-initialColor = sr.color;
+gridEntity = GetComponent<GridEntity>();
+if (gridEntity == null) {
+gridEntity = gameObject.AddComponent<GridEntity>();
+}
+gridEntity.isTileOccupant = false;
+
+spriteRenderer = GetComponent<SpriteRenderer>();
+if (spriteRenderer != null) {
+originalColor = spriteRenderer.color;
+}
 }
 
-poopCollider = GetComponent<Collider2D>();
-if (poopCollider == null) {
-poopCollider = gameObject.AddComponent<CircleCollider2D>();
-Debug.Log($"Added CircleCollider2D to {gameObject.name} for poop detection", gameObject);
+void Start() {
+currentLifetimeTicks = lifetimeTicks;
+
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
 }
 
-poopCollider.isTrigger = true;
+if (GridPositionManager.Instance != null) {
+GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+}
+}
+
+void OnDestroy() {
+if (TickManager.Instance != null) {
+TickManager.Instance.UnregisterTickUpdateable(this);
+}
 }
 
 void Update() {
-timer += Time.deltaTime;
-if (timer >= lifetime) {
+if (isFading && fadeTimer > 0) {
+fadeTimer -= Time.deltaTime;
+UpdateFade();
+
+if (fadeTimer <= 0) {
 Destroy(gameObject);
-return;
 }
-
-float remaining = lifetime - timer;
-if (remaining < fadeDuration && sr != null) {
-float t = 1f - (remaining / fadeDuration);
-float alphaMultiplier = fadeCurve.Evaluate(t);
-Color newColor = initialColor;
-newColor.a = alphaMultiplier;
-sr.color = newColor;
 }
 }
 
-pub void Initialize(float lifetimeValue = -1f, float fadeDurationValue = -1f) {
-if (lifetimeValue > 0f)
-lifetime = lifetimeValue;
-if (fadeDurationValue > 0f)
-fadeDuration = fadeDurationValue;
-timer = 0f;
-if (sr != null)
-initialColor = sr.color;
+pub void OnTickUpdate(int currentTick) {
+if (isFading) return;
 
-if (poopCollider == null) {
-poopCollider = GetComponent<Collider2D>();
-if (poopCollider == null) {
-poopCollider = gameObject.AddComponent<CircleCollider2D>();
+currentLifetimeTicks--;
+
+if (currentLifetimeTicks <= (lifetimeTicks - fadeStartTicks) && !isFading) {
+StartFading();
 }
-poopCollider.isTrigger = true;
 }
+
+void StartFading() {
+isFading = true;
+
+if (TickManager.Instance?.Config != null) {
+fadeRealTimeDuration = (lifetimeTicks - fadeStartTicks) / TickManager.Instance.Config.ticksPerRealSecond;
+}
+
+fadeTimer = fadeRealTimeDuration;
+Debug.Log($"[PoopController] Starting fade. Duration: {fadeRealTimeDuration}s");
+}
+
+void UpdateFade() {
+if (spriteRenderer == null) return;
+
+float fadeProgress = 1f - (fadeTimer / fadeRealTimeDuration);
+Color color = originalColor;
+color.a = Mathf.Lerp(1f, 0f, fadeProgress);
+spriteRenderer.color = color;
+}
+
+pub void Initialize() {
 }
 }
 
@@ -2745,16 +3109,57 @@ pref.preferencePriority = Mathf.Max(0.1f, pref.preferencePriority);
 // Assets\Scripts\Ecosystem\Food\FoodItem.cs
 
 ﻿using UnityEngine;
+using WegoSystem;
 
-[RequireComponent(typeof(Collider2D))] // Still need collider for detection
 pub cls FoodItem : MonoBehaviour {
 pub FoodType foodType;
+
+[SerializeField] bool snapToGridOnStart = true;
+
+GridEntity gridEntity;
+
+void Awake() {
+gridEntity = GetComponent<GridEntity>();
+if (gridEntity == null) {
+gridEntity = gameObject.AddComponent<GridEntity>();
+}
+
+gridEntity.isTileOccupant = false;
+}
 
 void Start() {
 if (foodType == null) {
 Debug.LogWarning($"FoodItem on GameObject '{gameObject.name}' is missing its FoodType reference!", gameObject);
-enabled = false; // Disable script if not configured
+enabled = false;
+return;
 }
+
+if (snapToGridOnStart && GridPositionManager.Instance != null) {
+GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+Debug.Log($"[FoodItem] {foodType.foodName} snapped to grid position {gridEntity.Position}");
+}
+
+Collider2D col = GetComponent<Collider2D>();
+if (col != null) {
+col.isTrigger = true;
+}
+}
+
+void OnDestroy() {
+}
+
+pub bool CanBeEatenBy(AnimalController animal) {
+if (animal == null || animal.Definition == null || animal.Definition.diet == null)
+ret false;
+
+ret animal.Definition.diet.CanEat(foodType);
+}
+
+pub float GetSatiationValueFor(AnimalController animal) {
+if (animal == null || animal.Definition == null || animal.Definition.diet == null)
+ret 0f;
+
+ret animal.Definition.diet.GetSatiationValue(foodType);
 }
 }
 
@@ -2954,8 +3359,15 @@ ret null;
 }
 
 GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn) {
-if (definition == null || definition.prefab == null) { Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab."); ret null; }
-if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!"); ret null; }
+if (definition == null || definition.prefab == null) {
+Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab.");
+ret null;
+}
+
+if (mainCamera == null) {
+Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!");
+ret null;
+}
 
 Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
 Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
@@ -2986,8 +3398,15 @@ animalObj.transform.SetParent(speciesParent);
 
 AnimalController controller = animalObj.GetComponent<AnimalController>();
 if (controller != null) {
-controller.Initialize(definition, minPaddedBounds, maxPaddedBounds, isOffscreenSpawn);
-} else { Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj); Destroy(animalObj); ret null; }
+if (isOffscreenSpawn) {
+Vector2 screenCenter = (minPaddedBounds + maxPaddedBounds) / 2f;
+controller.SetSeekingScreenCenter(screenCenter, minPaddedBounds, maxPaddedBounds);
+}
+}
+else {
+Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj);
+}
+
 ret animalObj;
 }
 
@@ -5408,10 +5827,41 @@ void GrowNextStemStage() {
 if (currentStemStage >= TargetStemLength) return;
 
 currentStemStage++;
-Vector2Int stemPos = Vector2Int.up * currentStemStage;
+
+Vector2Int stemPos;
+if (currentStemStage == 1) {
+stemPos = Vector2Int.up;
+}
+else {
+Vector2Int previousStemPos = Vector2Int.zero;
+bool foundPreviousStem = false;
+
+for (int i = currentStemStage - 1; i >= 1; i--) {
+var cells = plant.CellManager.GetCells();
+foreach (var kvp in cells) {
+if (kvp.Value == PlantCellType.Stem && kvp.Key.y == i) {
+previousStemPos = kvp.Key;
+foundPreviousStem = true;
+break;
+}
+}
+if (foundPreviousStem) break;
+}
+
+if (!foundPreviousStem) {
+Debug.LogError($"[{plant.gameObject.name}] Could not find previous stem at stage {currentStemStage - 1}! Using default position.");
+previousStemPos = Vector2Int.up * (currentStemStage - 1);
+}
+
+stemPos = previousStemPos + Vector2Int.up;
 
 if (Random.value < GrowthRandomness) {
-stemPos += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
+int wobbleDirection = (Random.value < 0.5f) ? -1 : 1;
+stemPos.x = previousStemPos.x + wobbleDirection;
+}
+else {
+stemPos.x = previousStemPos.x; // Grow straight up
+}
 }
 
 GameObject stemCell = plant.CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos, null, null);
@@ -8309,7 +8759,7 @@ activeEffects.Clear();
 
 var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
 foreach (var animal in animals) {
-if (animal.CurrentHealth < animal.definition.maxHealth * 0.3f) {
+if (animal.Needs != null && animal.Needs.CurrentHealth < animal.Definition.maxHealth * 0.3f) {
 AddEffect($"{animal.SpeciesName}_low_health", "Low Health", animal.SpeciesName, -1, Color.red);
 }
 }
@@ -9871,34 +10321,37 @@ if (tileInteractionManager == null) tileInteractionManager = TileInteractionMana
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\GardenerController.cs
 
-﻿using UnityEngine;
+﻿using System.Collections;
 using WegoSystem;
+using TMPro;
 
 pub cls GardenerController : MonoBehaviour {
-pub bool flipSpriteWhenMovingLeft = true;
-pub bool flipHorizontalDirection = true;
-pub bool useAnimations = true;
-pub string runningParameterName = "isRunning";
-pub string plantingTriggerName = "plantTrigger";
+[SerializeField] float multiTickDelay = 0.5f; // Delay between ticks for multi-tick actions
+
+[SerializeField] bool useAnimations = true;
+[SerializeField] Animator animator;
+[SerializeField] string runningParameterName = "isRunning";
+[SerializeField] string plantingTriggerName = "plant";
+
+[SerializeField] SpriteRenderer spriteRenderer;
+[SerializeField] bool flipSpriteWhenMovingLeft = true;
+[SerializeField] bool flipHorizontalDirection = true;
 
 GridEntity gridEntity;
-SortableEntity sortableEntity;
-SpriteRenderer spriteRenderer;
-Animator animator;
-
 GridPosition currentTargetPosition;
+bool isProcessingMovement = false;
 
 void Awake() {
-sortableEntity = GetComponent<SortableEntity>();
-spriteRenderer = GetComponent<SpriteRenderer>();
-animator = GetComponent<Animator>();
 gridEntity = GetComponent<GridEntity>();
-
-if (sortableEntity == null)
-sortableEntity = gameObject.AddComponent<SortableEntity>();
+if (gridEntity == null) {
+Debug.LogError("[GardenerController Awake] GridEntity component is required!", gameObject);
+}
 
 if (spriteRenderer == null)
-Debug.LogWarning("[GardenerController Awake] Main SpriteRenderer component not found.", gameObject);
+spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+if (spriteRenderer == null)
+Debug.LogWarning("[GardenerController Awake] SpriteRenderer not found. Sprite flipping disabled.", gameObject);
 
 if (animator == null && useAnimations)
 Debug.LogWarning("[GardenerController Awake] Animator component not found but useAnimations is true.", gameObject);
@@ -9919,7 +10372,7 @@ UpdateSpriteDirection();
 }
 
 void HandlePlayerInput() {
-if (gridEntity == null || gridEntity.IsMoving) return;
+if (gridEntity == null || gridEntity.IsMoving || isProcessingMovement) return;
 
 GridPosition moveDir = GridPosition.Zero;
 
@@ -9939,17 +10392,43 @@ GridPosition targetPos = gridEntity.Position + direction;
 if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
 GridPositionManager.Instance.IsPositionValid(targetPos) &&
 !GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
-int moveCost = PlayerActionManager.Instance.GetMovementTickCost(transform.position, this);
+Vector3 targetWorldPos = GridPositionManager.Instance.GridToWorld(targetPos);
+int moveCost = PlayerActionManager.Instance.GetMovementTickCost(targetWorldPos, this);
 
+if (moveCost > 1) {
+StartCoroutine(ProcessMultiTickMovement(targetPos, moveCost));
+}
+else {
 gridEntity.SetPosition(targetPos);
-currentTargetPosition = targetPos; // Update target for sprite flipping
-
-TickManager.Instance.AdvanceMultipleTicks(moveCost);
-Debug.Log($"[GardenerController] Moved to {targetPos}. Advanced game by {moveCost} tick(s).");
+currentTargetPosition = targetPos;
+TickManager.Instance.AdvanceTick();
+Debug.Log($"[GardenerController] Moved to {targetPos}. Advanced game by 1 tick.");
+}
 }
 else {
 Debug.Log($"[GardenerController] Move to {targetPos} is invalid or blocked.");
 }
+}
+
+IEnumerator ProcessMultiTickMovement(GridPosition targetPos, int tickCost) {
+isProcessingMovement = true;
+
+Debug.Log($"[GardenerController] Starting multi-tick movement. Cost: {tickCost} ticks");
+
+for (int i = 0; i < tickCost - 1; i++) {
+Debug.Log($"[GardenerController] Processing tick {i + 1}/{tickCost} (delay tick)");
+TickManager.Instance.AdvanceTick();
+
+yield ret new WaitForSeconds(multiTickDelay);
+}
+
+gridEntity.SetPosition(targetPos);
+currentTargetPosition = targetPos;
+TickManager.Instance.AdvanceTick();
+
+Debug.Log($"[GardenerController] Completed movement to {targetPos}. Total ticks: {tickCost}");
+
+isProcessingMovement = false;
 }
 
 void UpdateAnimations() {
@@ -10012,13 +10491,15 @@ pub stat PlayerActionManager Instance { get; set; }
 [SerializeField] bool debugMode = true;
 [SerializeField] int tickCostPerAction = 1;
 
+[SerializeField] float multiTickActionDelay = 0.5f; // Delay between ticks for multi-tick actions
+
 pub event Action<PlayerActionType, bool> OnActionExecuted;
 pub event Action<string> OnActionFailed;
 
 void Awake() {
 if (Instance != null && Instance != this) {
 Destroy(gameObject);
-return;
+return;;
 }
 Instance = this;
 }
@@ -10039,8 +10520,14 @@ success = ExecuteToolUse(gridPosition, actionData as ToolDefinition);
 break;
 
 case PlayerActionType.PlantSeed:
-success = ExecutePlantSeed(gridPosition, actionData as InventoryBarItem);
 tickCost = 2;
+if (tickCost > 1) {
+StartCoroutine(ExecuteDelayedAction(() => ExecutePlantSeed(gridPosition, actionData as InventoryBarItem), tickCost));
+ret true; // Return early, coroutine will handle the rest
+}
+else {
+success = ExecutePlantSeed(gridPosition, actionData as InventoryBarItem);
+}
 break;
 
 case PlayerActionType.Water:
@@ -10065,6 +10552,28 @@ OnActionFailed?.Invoke($"{actionType} failed");
 }
 
 ret success;
+}
+
+IEnumerator ExecuteDelayedAction(System.Func<bool> action, int tickCost) {
+Debug.Log($"[PlayerActionManager] Starting delayed action. Cost: {tickCost} ticks");
+
+for (int i = 0; i < tickCost - 1; i++) {
+Debug.Log($"[PlayerActionManager] Processing tick {i + 1}/{tickCost} (delay tick)");
+TickManager.Instance.AdvanceTick();
+
+yield ret new WaitForSeconds(multiTickActionDelay);
+}
+
+bool success = action.Invoke();
+TickManager.Instance.AdvanceTick();
+
+if (success) {
+OnActionExecuted?.Invoke(PlayerActionType.PlantSeed, true);
+Debug.Log($"[PlayerActionManager] Completed delayed action. Total ticks: {tickCost}");
+}
+else {
+OnActionFailed?.Invoke("Delayed action failed");
+}
 }
 
 bool ValidateMovement(GridPosition from, GridPosition to) {
@@ -10172,9 +10681,17 @@ Debug.LogError("[PlayerActionManager] TickManager not found!");
 return;
 }
 
-if (debugMode) Debug.Log($"[PlayerActionManager] Advancing {tickCount} tick(s) after player action");
+for (int i = 0; i < tickCount; i++) {
+TickManager.Instance.AdvanceTick();
 
-TickManager.Instance.AdvanceMultipleTicks(tickCount);
+if (debugMode && tickCount > 1) {
+Debug.Log($"[PlayerActionManager] Processing tick {i + 1}/{tickCount}");
+}
+}
+
+if (debugMode) {
+Debug.Log($"[PlayerActionManager] Advanced game by {tickCount} tick(s)");
+}
 }
 
 pub bool CanExecuteAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null) {

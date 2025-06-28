@@ -192,32 +192,87 @@ public void CalculateAndApplyStats()
         }
     }
 
-    void GrowNextStemStage() {
-        if (currentStemStage >= TargetStemLength) return;
+    // Replace the GrowNextStemStage method in PlantGrowthLogic.cs:
 
-        currentStemStage++;
-        Vector2Int stemPos = Vector2Int.up * currentStemStage;
-
-        if (Random.value < GrowthRandomness) {
-            stemPos += (Random.value < 0.5f) ? Vector2Int.left : Vector2Int.right;
-        }
-
-        GameObject stemCell = plant.CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos, null, null);
-        if (stemCell == null) {
-            Debug.LogError($"[{plant.gameObject.name}] Failed to spawn stem at stage {currentStemStage}");
-            return;
-        }
-
-        if (LeafGap >= 0 && (currentStemStage % (LeafGap + 1)) == 0) {
-            var leafPositions = plant.CellManager.CalculateLeafPositions(stemPos, currentStemStage, LeafPattern);
-            foreach (Vector2Int leafPos in leafPositions) {
-                GameObject leafCell = plant.CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos, null, null);
-                if (leafCell != null) {
-                    plant.CellManager.LeafDataList.Add(new LeafData(leafPos, true));
+void GrowNextStemStage()
+{
+    if (currentStemStage >= TargetStemLength) return;
+    
+    currentStemStage++;
+    
+    // Always grow stem from the previous stem position
+    Vector2Int stemPos;
+    if (currentStemStage == 1)
+    {
+        // First stem grows from seed at (0,0)
+        stemPos = Vector2Int.up;
+    }
+    else
+    {
+        // Find the previous stem position
+        Vector2Int previousStemPos = Vector2Int.zero;
+        bool foundPreviousStem = false;
+        
+        // Search for the highest stem that exists
+        for (int i = currentStemStage - 1; i >= 1; i--)
+        {
+            // Check for stem at this height
+            var cells = plant.CellManager.GetCells();
+            foreach (var kvp in cells)
+            {
+                if (kvp.Value == PlantCellType.Stem && kvp.Key.y == i)
+                {
+                    previousStemPos = kvp.Key;
+                    foundPreviousStem = true;
+                    break;
                 }
+            }
+            if (foundPreviousStem) break;
+        }
+        
+        if (!foundPreviousStem)
+        {
+            Debug.LogError($"[{plant.gameObject.name}] Could not find previous stem at stage {currentStemStage - 1}! Using default position.");
+            previousStemPos = Vector2Int.up * (currentStemStage - 1);
+        }
+        
+        // New stem grows from previous stem position
+        stemPos = previousStemPos + Vector2Int.up;
+        
+        // Apply randomness for wobble effect
+        if (Random.value < GrowthRandomness)
+        {
+            int wobbleDirection = (Random.value < 0.5f) ? -1 : 1;
+            stemPos.x = previousStemPos.x + wobbleDirection;
+        }
+        else
+        {
+            stemPos.x = previousStemPos.x; // Grow straight up
+        }
+    }
+    
+    // Spawn the stem cell
+    GameObject stemCell = plant.CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos, null, null);
+    if (stemCell == null)
+    {
+        Debug.LogError($"[{plant.gameObject.name}] Failed to spawn stem at stage {currentStemStage}");
+        return;
+    }
+    
+    // Add leaves if appropriate
+    if (LeafGap >= 0 && (currentStemStage % (LeafGap + 1)) == 0)
+    {
+        var leafPositions = plant.CellManager.CalculateLeafPositions(stemPos, currentStemStage, LeafPattern);
+        foreach (Vector2Int leafPos in leafPositions)
+        {
+            GameObject leafCell = plant.CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos, null, null);
+            if (leafCell != null)
+            {
+                plant.CellManager.LeafDataList.Add(new LeafData(leafPos, true));
             }
         }
     }
+}
 
     public void CompleteGrowth() {
         if (plant.CurrentState == PlantState.GrowthComplete) return;

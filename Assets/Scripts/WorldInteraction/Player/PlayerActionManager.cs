@@ -1,6 +1,7 @@
 ﻿// Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
 
 using System;
+using System.Collections;
 using UnityEngine;
 using WegoSystem;
 
@@ -19,6 +20,8 @@ public class PlayerActionManager : MonoBehaviour
 
     [SerializeField] bool debugMode = true;
     [SerializeField] int tickCostPerAction = 1;
+    
+    [SerializeField] private float multiTickActionDelay = 0.5f; // Delay between ticks for multi-tick actions
 
     public event Action<PlayerActionType, bool> OnActionExecuted;
     public event Action<string> OnActionFailed;
@@ -28,7 +31,7 @@ public class PlayerActionManager : MonoBehaviour
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
-            return;
+            return;;
         }
         Instance = this;
     }
@@ -41,34 +44,43 @@ public class PlayerActionManager : MonoBehaviour
     public bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null)
     {
         if (debugMode) Debug.Log($"[PlayerActionManager] Executing {actionType} at {gridPosition}");
-
+    
         bool success = false;
         int tickCost = tickCostPerAction;
-
+    
         switch (actionType)
         {
             case PlayerActionType.UseTool:
                 success = ExecuteToolUse(gridPosition, actionData as ToolDefinition);
                 break;
-
+            
             case PlayerActionType.PlantSeed:
-                success = ExecutePlantSeed(gridPosition, actionData as InventoryBarItem);
+                // Planting takes 2 ticks
                 tickCost = 2;
+                if (tickCost > 1)
+                {
+                    StartCoroutine(ExecuteDelayedAction(() => ExecutePlantSeed(gridPosition, actionData as InventoryBarItem), tickCost));
+                    return true; // Return early, coroutine will handle the rest
+                }
+                else
+                {
+                    success = ExecutePlantSeed(gridPosition, actionData as InventoryBarItem);
+                }
                 break;
-
+            
             case PlayerActionType.Water:
                 success = ExecuteWatering(gridPosition);
                 break;
-
+            
             case PlayerActionType.Harvest:
                 success = ExecuteHarvest(gridPosition);
                 break;
-
+            
             case PlayerActionType.Interact:
                 success = ExecuteInteraction(gridPosition, actionData);
                 break;
         }
-
+    
         if (success)
         {
             AdvanceGameTick(tickCost);
@@ -78,8 +90,37 @@ public class PlayerActionManager : MonoBehaviour
         {
             OnActionFailed?.Invoke($"{actionType} failed");
         }
-
+    
         return success;
+    }
+    
+    IEnumerator ExecuteDelayedAction(System.Func<bool> action, int tickCost)
+    {
+        Debug.Log($"[PlayerActionManager] Starting delayed action. Cost: {tickCost} ticks");
+    
+        // Process all ticks except the last one
+        for (int i = 0; i < tickCost - 1; i++)
+        {
+            Debug.Log($"[PlayerActionManager] Processing tick {i + 1}/{tickCost} (delay tick)");
+            TickManager.Instance.AdvanceTick();
+        
+            // Wait for the specified delay
+            yield return new WaitForSeconds(multiTickActionDelay);
+        }
+    
+        // On the final tick, execute the action
+        bool success = action.Invoke();
+        TickManager.Instance.AdvanceTick();
+    
+        if (success)
+        {
+            OnActionExecuted?.Invoke(PlayerActionType.PlantSeed, true);
+            Debug.Log($"[PlayerActionManager] Completed delayed action. Total ticks: {tickCost}");
+        }
+        else
+        {
+            OnActionFailed?.Invoke("Delayed action failed");
+        }
     }
 
     bool ValidateMovement(GridPosition from, GridPosition to)

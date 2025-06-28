@@ -476,7 +476,10 @@ public class AnimalMovement : MonoBehaviour
         }
         
         List<Vector3> positions = new List<Vector3>();
-        positions.Add(transform.position);
+        
+        // Start from the ground position (tile center), not the visual position
+        Vector3 groundPosition = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
+        positions.Add(groundPosition);
         
         for (int i = currentPathIndex; i < currentPath.Count; i++)
         {
