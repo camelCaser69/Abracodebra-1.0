@@ -1,43 +1,37 @@
-﻿// Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using WegoSystem;
 
 public class FireflyManager : MonoBehaviour, ITickUpdateable
 {
-    public static FireflyManager Instance { get; set; }
+    public static FireflyManager Instance { get; private set; }
 
-    [SerializeField] WeatherManager weatherManager;
-    [SerializeField] GameObject fireflyPrefab;
-    [SerializeField] FireflyDefinition defaultFireflyDefinition;
-    [SerializeField] Transform fireflyParent;
+    [SerializeField] private WeatherManager weatherManager;
+    [SerializeField] private GameObject fireflyPrefab;
+    [SerializeField] public FireflyDefinition defaultFireflyDefinition; // Made public to fix access issue
+    [SerializeField] private Transform fireflyParent;
 
-    [Header("Spawning")]
-    [SerializeField] int maxFireflies = 50;
-    [SerializeField] int spawnIntervalTicks = 3;
-    [SerializeField] [Range(0f, 1f)] float nightThreshold = 0.25f;
+    [SerializeField] private int maxFireflies = 50;
+    [SerializeField] private int spawnIntervalTicks = 3;
+    [SerializeField] [Range(0f, 1f)] private float nightThreshold = 0.25f;
 
-    [Header("Spawn Area")]
-    [SerializeField] Vector2 spawnCenter = Vector2.zero;
-    [SerializeField] Vector2 spawnAreaSize = new Vector2(20f, 10f);
+    [SerializeField] private Vector2 spawnCenter = Vector2.zero;
+    [SerializeField] private Vector2 spawnAreaSize = new Vector2(20f, 10f);
 
-    [Header("Mechanics")]
     public float photosynthesisRadius = 3f;
     public float photosynthesisIntensityPerFly = 0.05f;
     public float maxPhotosynthesisBonus = 0.5f;
 
-    [Header("Debug")]
-    [SerializeField] bool showAttractionLinesRuntime = false;
-    [SerializeField] Color attractionLineColorRuntime = Color.magenta;
-    [SerializeField] GameObject lineVisualizerPrefab;
-    [SerializeField] Transform lineContainer;
+    [SerializeField] private bool showAttractionLinesRuntime = false;
+    [SerializeField] private Color attractionLineColorRuntime = Color.magenta;
+    [SerializeField] private GameObject lineVisualizerPrefab;
+    [SerializeField] private Transform lineContainer;
 
-    List<FireflyController> activeFireflies = new List<FireflyController>();
-    Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
+    private List<FireflyController> activeFireflies = new List<FireflyController>();
+    private Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
 
-    int spawnTickCounter = 0;
-    bool isNight = false;
+    private int spawnTickCounter = 0;
+    private bool isNight = false;
 
     public bool ShowAttractionLinesRuntime => showAttractionLinesRuntime;
 
@@ -150,7 +144,7 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
 
         if (controller != null)
         {
-            controller.Initialize(); // Corrected call with no parameters
+            controller.Initialize();
             activeFireflies.Add(controller);
         }
     }
@@ -287,24 +281,29 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
     {
         foreach (var kvp in activeLineVisualizers)
         {
-            if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+            if (kvp.Value != null)
+            {
+                Destroy(kvp.Value.gameObject);
+            }
         }
         activeLineVisualizers.Clear();
     }
 
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.green;
+        // Draw spawn area
+        Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
         Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
 
-        if (showAttractionLinesRuntime && Application.isPlaying)
+        // Draw photosynthesis radius for each active firefly
+        if (Application.isPlaying)
         {
-            Gizmos.color = attractionLineColorRuntime;
+            Gizmos.color = new Color(0f, 1f, 0.5f, 0.2f);
             foreach (var firefly in activeFireflies)
             {
-                if (firefly != null && firefly.AttractionTarget != null)
+                if (firefly != null)
                 {
-                    Gizmos.DrawLine(firefly.transform.position, firefly.AttractionTarget.position);
+                    Gizmos.DrawWireSphere(firefly.transform.position, photosynthesisRadius);
                 }
             }
         }

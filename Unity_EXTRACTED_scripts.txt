@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 540,549 → 366,473 chars (32.2% reduction)
-Estimated tokens saved: ~43,519
+Compression Stats: 536,953 → 366,942 chars (31.7% reduction)
+Estimated tokens saved: ~42,502
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -30,53 +30,53 @@ using System;
   AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1236
   AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1322
   AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L1331
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1730
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1876
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1889
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1926
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L2316
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2347
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2608
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2703
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2718
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2737
-  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2795
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2931
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L3007
-  FoodType (Assets\Scripts\Ecosystem\Food/) L3065
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L3078
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L3107
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L3329
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3559
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3833
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3862
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3898
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3911
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L3939
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L4000
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L4045
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L4096
-  NodeEffectDrawer (Assets\Scripts\Editor/) L4130
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L4233
-  TileDefinitionEditor (Assets\Scripts\Editor/) L4294
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L4314
-  LeafData (Assets\Scripts\PlantSystem\Data/) L4349
-  NodeData (Assets\Scripts\PlantSystem\Data/) L4364
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4449
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4709
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4732
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4785
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4814
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4823
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4848
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L5033
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L5072
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L5096
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L5298
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5378
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5557
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5808
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L6033
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1719
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1865
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1878
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1915
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L2213
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2244
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2507
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2602
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2617
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2636
+  SlowdownZone (Assets\Scripts\Ecosystem\Environment/) L2718
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2854
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2930
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2996
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L3009
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L3038
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L3260
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L3445
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3719
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3748
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3784
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3797
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3825
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L3886
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L3931
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L3982
+  NodeEffectDrawer (Assets\Scripts\Editor/) L4016
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L4119
+  TileDefinitionEditor (Assets\Scripts\Editor/) L4180
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L4200
+  LeafData (Assets\Scripts\PlantSystem\Data/) L4235
+  NodeData (Assets\Scripts\PlantSystem\Data/) L4250
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4335
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L4595
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L4618
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4671
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L4700
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4709
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4734
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4919
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4958
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4982
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L5249
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5341
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5589
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5840
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5997
   InventoryBarController (Assets\Scripts\PlantSystem\UI/) L6125
   InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6442
   InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L6509
@@ -87,41 +87,41 @@ using System;
   NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L7356
   OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7676
   PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7812
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8105
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8193
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L8294
-  GridSnapStartup (Assets\Scripts\Ticks/) L8469
-  TickDebugMonitor (Assets\Scripts\Ticks/) L8535
-  TurnPhaseManager (Assets\Scripts\Ticks/) L8706
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8824
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8893
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L9124
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9135
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L9164
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L9260
-  WaterReflection (Assets\Scripts\Visual\Effects/) L9365
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9760
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9796
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9960
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10102
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L10220
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L10371
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10614
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10654
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10678
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10698
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L11186
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L11198
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L11233
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L11392
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8121
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8209
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L8310
+  GridSnapStartup (Assets\Scripts\Ticks/) L8548
+  TickDebugMonitor (Assets\Scripts\Ticks/) L8614
+  TurnPhaseManager (Assets\Scripts\Ticks/) L8785
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8903
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8972
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L9203
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9214
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L9243
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L9339
+  WaterReflection (Assets\Scripts\Visual\Effects/) L9444
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9839
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9875
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L10039
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10181
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L10299
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L10450
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10693
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10733
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10757
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10777
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L11265
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L11277
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L11312
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L11471
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L11402
-  GridPosition (Assets\Scripts\Ticks/) L11553
-  GridPositionManager (Assets\Scripts\Ticks/) L11654
-  GridRadiusUtility (Assets\Scripts\Ticks/) L12008
-  TickConfiguration (Assets\Scripts\Ticks/) L12152
-  ITickUpdateable (Assets\Scripts\Ticks/) L12235
+  GridEntity (Assets\Scripts\Ticks/) L11481
+  GridPosition (Assets\Scripts\Ticks/) L11632
+  GridPositionManager (Assets\Scripts\Ticks/) L11733
+  GridRadiusUtility (Assets\Scripts\Ticks/) L12087
+  TickConfiguration (Assets\Scripts\Ticks/) L12231
+  ITickUpdateable (Assets\Scripts\Ticks/) L12314
 
 ================================================================================
 SCRIPTS
@@ -1551,7 +1551,9 @@ if (foodItem != null && foodItem.foodType != null && definition.diet.CanEat(food
 var pref = definition.diet.GetPreference(foodItem.foodType);
 if (pref == null) continue;
 
-float distance = entity.Position.ManhattanDistance(gridEntity.Position);
+GridPosition foodGroundPos = GetFoodGroundPosition(entity.gameObject);
+float distance = gridEntity.Position.ManhattanDistance(foodGroundPos);
+
 float score = pref.preferencePriority / (1f + distance);
 
 if (score > bestScore) {
@@ -1566,17 +1568,16 @@ ret bestFood;
 
 GameObject FindFoodByCollider() {
 Vector3 worldPos = transform.position;
-float worldRadius = definition.searchRadiusTiles * GridPositionManager.Instance.GetTilemapGrid().cellSize.x;
+float tileSize = GridPositionManager.Instance.GetTilemapGrid()?.cellSize.x ?? 1f;
+float searchRadius = definition.searchRadiusTiles * tileSize;
 
-Collider2D[] colliders = Physics2D.OverlapCircleAll(worldPos, worldRadius);
+Collider2D[] colliders = Physics2D.OverlapCircleAll(worldPos, searchRadius);
 
 GameObject bestFood = null;
 float bestScore = -1f;
 
 foreach (var collider in colliders) {
-if (collider == null || collider.gameObject == this.gameObject) continue;
-
-if (collider.GetComponent<PoopController>() != null) continue;
+if (collider.gameObject == this.gameObject) continue;
 
 FoodItem foodItem = collider.GetComponent<FoodItem>();
 if (foodItem != null && foodItem.foodType != null && definition.diet.CanEat(foodItem.foodType)) {
@@ -1596,28 +1597,28 @@ bestFood = collider.gameObject;
 ret bestFood;
 }
 
+GridPosition GetFoodGroundPosition(GameObject food) {
+GridEntity foodEntity = food.GetComponent<GridEntity>();
+if (foodEntity != null) {
+ret foodEntity.Position;
+}
+
+Vector3 foodWorldPos = food.transform.position;
+ret GridPositionManager.Instance.WorldToGrid(foodWorldPos);
+}
+
 void SetTargetFood(GameObject food) {
 currentTargetFood = food;
+GridPosition foodGroundPos = GetFoodGroundPosition(food);
 
-GridPosition foodGridPos;
-GridEntity foodGridEntity = food.GetComponent<GridEntity>();
-
-if (foodGridEntity != null) {
-foodGridPos = foodGridEntity.Position;
-}
-else {
-foodGridPos = GridPositionManager.Instance.WorldToGrid(food.transform.position);
-}
-
-currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGridPos, false);
+List<GridPosition> path = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGroundPos, false);
+if (path != null && path.Count > 0) {
+currentPath = path;
 currentPathIndex = 0;
-
-if (currentPath.Count > 0) {
 hasPlannedAction = true;
 }
 else {
-currentPath.Clear();
-hasPlannedAction = false;
+currentTargetFood = null;
 }
 }
 
@@ -1667,7 +1668,7 @@ void ExecutePlannedMovement() {
 if (!hasPlannedAction || gridEntity.IsMoving) return;
 
 if (currentTargetFood != null) {
-GridPosition foodPos = GetFoodGridPosition(currentTargetFood);
+GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
 int distance = gridEntity.Position.ManhattanDistance(foodPos);
 
 if (distance <= definition.eatDistanceTiles) {
@@ -1689,10 +1690,10 @@ ClearMovementPlan();
 }
 else {
 if (currentTargetFood != null) {
-SetTargetFood(currentTargetFood);
+SetTargetFood(currentTargetFood); // Re-path to the same food
 }
 else {
-ClearMovementPlan();
+ClearMovementPlan(); // Or just clear if it was a wander
 }
 }
 }
@@ -1702,7 +1703,8 @@ hasPlannedAction = false;
 }
 
 bool TryMoveTo(GridPosition targetPos) {
-if (!IsValidMove(targetPos)) ret false;
+if (!IsValidMove(targetPos))
+ret false;
 
 Vector3 currentWorld = transform.position;
 Vector3 targetWorld = GridPositionManager.Instance.GridToWorld(targetPos);
@@ -1719,25 +1721,13 @@ if (!GridPositionManager.Instance.IsPositionValid(pos)) ret false;
 
 if (GridPositionManager.Instance.IsPositionOccupied(pos)) {
 if (currentTargetFood != null) {
-GridPosition foodPos = GetFoodGridPosition(currentTargetFood);
+GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
 if (pos == foodPos) ret true;
 }
 ret false;
 }
 
 ret true;
-}
-
-GridPosition GetFoodGridPosition(GameObject food) {
-if (food == null) ret GridPosition.Zero;
-
-GridEntity foodGridEntity = food.GetComponent<GridEntity>();
-if (foodGridEntity != null) {
-ret foodGridEntity.Position;
-}
-else {
-ret GridPositionManager.Instance.WorldToGrid(food.transform.position);
-}
 }
 
 void HandleScreenCenterSeeking() {
@@ -1825,7 +1815,6 @@ if (pathDebugLine != null) {
 pathDebugLine.positionCount = 0;
 }
 }
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -2032,8 +2021,7 @@ using UnityEngine.Rendering.Universal;
 using WegoSystem;
 
 pub cls FireflyController : MonoBehaviour, ITickUpdateable {
-
-FireflyDefinition definition;
+[SerializeField] FireflyDefinition definition;
 
 [SerializeField] Light2D glowLight;
 [SerializeField] Light2D groundLight;
@@ -2098,43 +2086,44 @@ void OnDestroy() {
 if (TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
 }
+
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(this);
+}
 }
 
 pub void Initialize() {
-if (definition == null || gridEntity == null) {
+if (FireflyManager.Instance?.defaultFireflyDefinition == null || gridEntity == null) {
 Debug.LogError("[FireflyController] Initialization failed: Missing definition or GridEntity!", this);
 enabled = false;
 return;
 }
 
-lifetimeTicks = Random.Range(definition.minLifetimeTicks, definition.maxLifetimeTicks + 1);
-if (TickManager.Instance?.Config != null) {
-maxLifetimeSeconds = TickManager.Instance.Config.ConvertTicksToSeconds(lifetimeTicks);
-}
-else {
-maxLifetimeSeconds = lifetimeTicks * 0.5f; // Fallback
-}
-currentLifetimeSeconds = 0f;
+definition = FireflyManager.Instance.defaultFireflyDefinition;
 
 if (GridPositionManager.Instance != null) {
 GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+currentTileCenter = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
 }
 
-UpdateTileCenter();
-UpdateLocalTargetPosition();
-ApplyVisualState(0f);
+lifetimeTicks = Random.Range(definition.minLifetimeTicks, definition.maxLifetimeTicks + 1);
+currentLocalSpeed = Random.Range(definition.minLocalSpeed, definition.maxLocalSpeed);
+
+SetRandomLocalTarget();
+
+if (glowParticles != null) {
+glowParticles.Play();
+}
+
+if (TickManager.Instance?.Config != null) {
+maxLifetimeSeconds = lifetimeTicks / TickManager.Instance.Config.ticksPerRealSecond;
+}
+else {
+maxLifetimeSeconds = lifetimeTicks * 0.5f;
+}
 }
 
 pub void OnTickUpdate(int currentTick) {
-if (!IsAlive) return;
-
-if (currentTick - lastMovementTick >= definition.movementTickInterval) {
-MakeMovementDecision();
-lastMovementTick = currentTick;
-}
-}
-
-void Update() {
 if (!IsAlive) return;
 
 currentLifetimeSeconds += Time.deltaTime;
@@ -2143,244 +2132,148 @@ Die();
 return;
 }
 
-UpdateLifetimeVisuals();
+if (currentTick - lastMovementTick >= definition.movementTickInterval) {
+UpdateMovement();
+lastMovementTick = currentTick;
+}
+
+UpdatePhotosynthesisVisualization();
+}
+
+void Update() {
+if (!IsAlive) return;
+
 UpdateLocalMovement();
-HandleGlowAndFlicker();
+UpdateGlowEffect();
+UpdateGroundLight();
 }
 
-void MakeMovementDecision() {
-if (gridEntity == null) return;
-
-if (AttractionTarget != null && !AttractionTarget.gameObject.activeInHierarchy) {
-AttractionTarget = null;
-}
-
-if (AttractionTarget == null) {
-FindNewAttractionTarget();
-}
+void UpdateMovement() {
+FindAttractionTarget();
 
 if (AttractionTarget != null) {
-PlanMovementTowardTarget();
+Vector3 attractionDirection = (AttractionTarget.position - currentTileCenter).normalized;
+localTargetPosition = currentTileCenter + attractionDirection * Random.Range(0.1f, 0.3f);
 }
 else {
-WanderRandomly();
+SetRandomLocalTarget();
 }
 }
 
-void FindNewAttractionTarget() {
-if (gridEntity == null) return;
+void UpdatePhotosynthesisVisualization() {
+if (GridDebugVisualizer.Instance != null && FireflyManager.Instance != null && gridEntity != null) {
+int photosynthesisRadius = Mathf.RoundToInt(FireflyManager.Instance.photosynthesisRadius);
+if (photosynthesisRadius > 0) {
+GridDebugVisualizer.Instance.VisualizeFireflyPhotosynthesisRadius(this, gridEntity.Position, photosynthesisRadius);
+}
+}
+}
 
-var tilesToSearch = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, definition.tileSearchRadius, true);
+void FindAttractionTarget() {
+if (definition == null || gridEntity == null) return;
+
+float bestScore = 0f;
 Transform bestTarget = null;
-float bestScore = -1f;
 
-foreach (var tilePos in tilesToSearch) {
-var entitiesAtTile = GridPositionManager.Instance.GetEntitiesAt(tilePos);
-if (entitiesAtTile == null) continue;
+GridPosition currentPos = gridEntity.Position;
+int searchRadius = definition.tileSearchRadius;
 
-foreach (var entity in entitiesAtTile) {
-if (entity == null) continue;
+for (int x = currentPos.x - searchRadius; x <= currentPos.x + searchRadius; x++) {
+for (int y = currentPos.y - searchRadius; y <= currentPos.y + searchRadius; y++) {
+GridPosition checkPos = new GridPosition(x, y);
+if (!GridPositionManager.Instance.IsPositionValid(checkPos)) continue;
 
-float currentScore = -1f;
-int distance = gridEntity.Position.ManhattanDistance(entity.Position);
-if (distance == 0) distance = 1;
+float distance = Vector2.Distance(currentPos.ToVector2Int(), checkPos.ToVector2Int());
+if (distance > searchRadius) continue;
 
-ScentSource scent = entity.GetComponent<ScentSource>();
-if (scent != null && scent.definition != null && definition.attractiveScentDefinitions.Contains(scent.definition)) {
-currentScore = (scent.EffectiveStrength * definition.scentAttractionWeight) / distance;
-}
-
-PlantGrowth plant = entity.GetComponent<PlantGrowth>();
-if (plant != null && plant.CurrentState == PlantState.Growing) {
-float plantScore = definition.growingPlantAttraction / distance;
-if (plantScore > currentScore) {
-currentScore = plantScore;
-}
-}
-
-if (currentScore > bestScore) {
-bestScore = currentScore;
+var entitiesAtPosition = GridPositionManager.Instance.GetEntitiesAt(checkPos);
+foreach (var entity in entitiesAtPosition) {
+var scentSources = entity.GetComponentsInChildren<ScentSource>();
+foreach (var source in scentSources) {
+if (definition.attractiveScentDefinitions.Contains(source.Definition)) {
+float score = definition.scentAttractionWeight / (distance + 1f);
+if (score > bestScore) {
+bestScore = score;
 bestTarget = entity.transform;
 }
 }
 }
+
+var plantGrowth = entity.GetComponent<PlantGrowth>();
+if (plantGrowth != null && plantGrowth.CurrentState == PlantState.Growing) {
+float score = definition.growingPlantAttraction / (distance + 1f);
+if (score > bestScore) {
+bestScore = score;
+bestTarget = entity.transform;
+}
+}
+}
+}
+}
+
 AttractionTarget = bestTarget;
 }
 
-void PlanMovementTowardTarget() {
-if (gridEntity == null || AttractionTarget == null) return;
-
-GridEntity targetEntity = AttractionTarget.GetComponent<GridEntity>();
-if (targetEntity == null) {
-WanderRandomly();
-return;
-}
-
-GridPosition currentPos = gridEntity.Position;
-GridPosition targetPos = targetEntity.Position;
-if (currentPos.ManhattanDistance(targetPos) <= 1) return;
-
-GridPosition bestMove = GridPosition.Zero;
-int bestDistance = int.MaxValue;
-GridPosition[] directions = { GridPosition.Up, GridPosition.Down, GridPosition.Left, GridPosition.Right };
-
-foreach (var dir in directions) {
-GridPosition nextPos = currentPos + dir;
-if (GridPositionManager.Instance.IsPositionValid(nextPos)) {
-int newDist = nextPos.ManhattanDistance(targetPos);
-if (newDist < bestDistance) {
-bestDistance = newDist;
-bestMove = dir;
-}
-}
-}
-
-if (bestMove != GridPosition.Zero) {
-gridEntity.SetPosition(currentPos + bestMove);
-UpdateTileCenter();
-}
-else {
-WanderRandomly();
-}
-}
-
-void WanderRandomly() {
-if (gridEntity == null) return;
-
-GridPosition currentPos = gridEntity.Position;
-var validMoves = new List<GridPosition>();
-GridPosition[] directions = { GridPosition.Up, GridPosition.Down, GridPosition.Left, GridPosition.Right };
-
-foreach (var dir in directions) {
-GridPosition nextPos = currentPos + dir;
-if (GridPositionManager.Instance.IsPositionValid(nextPos)) {
-validMoves.Add(nextPos);
-}
-}
-
-if (validMoves.Count > 0) {
-GridPosition newPos = validMoves[Random.Range(0, validMoves.Count)];
-gridEntity.SetPosition(newPos);
-UpdateTileCenter();
-}
-}
-
-void UpdateTileCenter() {
-if (GridPositionManager.Instance != null && gridEntity != null) {
-currentTileCenter = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
-}
-}
-
-void UpdateLocalTargetPosition() {
+void SetRandomLocalTarget() {
 if (definition == null) return;
-Vector3 flightBoxCenter = currentTileCenter + new Vector3(0, definition.flightHeightOffset + definition.flightBounds.y / 2f, 0);
-float randomX = Random.Range(-definition.flightBounds.x / 2f, definition.flightBounds.x / 2f);
-float randomY = Random.Range(-definition.flightBounds.y / 2f, definition.flightBounds.y / 2f);
-localTargetPosition = flightBoxCenter + new Vector3(randomX, randomY, 0);
-currentLocalSpeed = Random.Range(definition.minLocalSpeed, definition.maxLocalSpeed);
+
+Vector2 randomOffset = new Vector2(
+Random.Range(-definition.flightBounds.x * 0.5f, definition.flightBounds.x * 0.5f),
+Random.Range(definition.flightHeightOffset, definition.flightHeightOffset + definition.flightBounds.y)
+);
+
+localTargetPosition = currentTileCenter + (Vector3)randomOffset;
 }
 
 void UpdateLocalMovement() {
 if (definition == null) return;
 
+transform.position = Vector3.MoveTowards(transform.position, localTargetPosition, currentLocalSpeed * Time.deltaTime);
+
 Vector3 direction = (localTargetPosition - transform.position).normalized;
-transform.position += direction * currentLocalSpeed * Time.deltaTime;
-
-if ((localTargetPosition - transform.position).sqrMagnitude < 0.01f) {
-UpdateLocalTargetPosition();
-}
-
-Vector3 flightBoxCenter = currentTileCenter + new Vector3(0, definition.flightHeightOffset + definition.flightBounds.y / 2f, 0);
-Vector3 halfBounds = new Vector3(definition.flightBounds.x / 2f, definition.flightBounds.y / 2f, 0);
-Vector3 minBounds = flightBoxCenter - halfBounds;
-Vector3 maxBounds = flightBoxCenter + halfBounds;
-
-transform.position = new Vector3(
-Mathf.Clamp(transform.position.x, minBounds.x, maxBounds.x),
-Mathf.Clamp(transform.position.y, minBounds.y, maxBounds.y),
-transform.position.z
-);
-}
-
-void UpdateLifetimeVisuals() {
-float overallIntensity = 1f;
-
-if (currentLifetimeSeconds < definition.fadeInSeconds) {
-overallIntensity = Mathf.Clamp01(currentLifetimeSeconds / definition.fadeInSeconds);
-}
-else if (maxLifetimeSeconds > 0 && currentLifetimeSeconds > maxLifetimeSeconds - definition.fadeOutSeconds) {
-float timeIntoFadeOut = currentLifetimeSeconds - (maxLifetimeSeconds - definition.fadeOutSeconds);
-overallIntensity = 1f - Mathf.Clamp01(timeIntoFadeOut / definition.fadeOutSeconds);
-}
-
-ApplyVisualState(overallIntensity);
-UpdateGroundLightEffect(overallIntensity);
-}
-
-void ApplyVisualState(float intensity) {
-if (spriteRenderer != null) {
-Color color = originalColor;
-color.a = originalColor.a * intensity;
-spriteRenderer.color = color;
-}
-if (glowLight != null) {
-glowLight.intensity = baseGlowIntensity * intensity;
-currentGlowIntensity = glowLight.intensity;
-}
-if (trailRenderer != null) {
-Color startColor = trailRenderer.startColor;
-Color endColor = trailRenderer.endColor;
-startColor.a = intensity * 0.5f;
-endColor.a = 0f;
-trailRenderer.startColor = startColor;
-trailRenderer.endColor = endColor;
-}
-if (glowParticles != null) {
-var main = glowParticles.main;
-Color particleColor = main.startColor.color;
-particleColor.a = intensity * 0.7f;
-main.startColor = particleColor;
+if (direction.magnitude > 0.1f) {
+float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+float currentAngle = transform.eulerAngles.z;
+float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, definition.localMovementTurnSpeed * Time.deltaTime);
+transform.rotation = Quaternion.AngleAxis(newAngle, Vector3.forward);
 }
 }
 
-void UpdateGroundLightEffect(float overallIntensity) {
-if (groundLight == null || definition == null) return;
+void UpdateGlowEffect() {
+if (glowParticles == null) return;
 
-Vector3 lightPosition = groundLight.transform.position;
-lightPosition.x = transform.position.x;
-lightPosition.y = currentTileCenter.y;
-groundLight.transform.position = lightPosition;
-
-float lowestFlightPointY = currentTileCenter.y + definition.flightHeightOffset;
-float verticalFlightRange = definition.flightBounds.y;
-
-float currentHeightInBox = transform.position.y - lowestFlightPointY;
-float t = 0f;
-if (verticalFlightRange > 0.001f) {
-t = Mathf.Clamp01(currentHeightInBox / verticalFlightRange);
-}
-
-float minIntensityAtMaxHeight = baseGroundLightIntensity * definition.groundLightMinIntensity;
-
-float heightAdjustedIntensity = Mathf.Lerp(baseGroundLightIntensity, minIntensityAtMaxHeight, t);
-float heightAdjustedRadius = Mathf.Lerp(baseGroundLightOuterRadius, baseGroundLightOuterRadius * groundLightRadiusMultiplier, t);
-
-groundLight.intensity = heightAdjustedIntensity * overallIntensity;
-groundLight.pointLightOuterRadius = heightAdjustedRadius;
-groundLight.enabled = spriteRenderer != null && spriteRenderer.enabled;
-}
-
-void HandleGlowAndFlicker() {
-if (glowLight == null || definition.glowFlickerAmount <= 0f) return;
 glowFlickerTime += Time.deltaTime * definition.glowFlickerSpeed;
-float flicker = Mathf.PerlinNoise(glowFlickerTime, 0f) * 2f - 1f;
-glowLight.intensity = currentGlowIntensity + (flicker * definition.glowFlickerAmount);
+float flicker = Mathf.Sin(glowFlickerTime) * definition.glowFlickerAmount;
+currentGlowIntensity = Mathf.Clamp01(baseGlowIntensity + flicker);
+
+var emission = glowParticles.emission;
+emission.rateOverTime = currentGlowIntensity * 10f;
+}
+
+void UpdateGroundLight() {
+if (groundLight == null) return;
+
+glowFlickerTime += Time.deltaTime * definition.glowFlickerSpeed;
+float flicker = Mathf.Sin(glowFlickerTime) * definition.glowFlickerAmount;
+
+groundLight.intensity = Mathf.Clamp(baseGroundLightIntensity + flicker, definition.groundLightMinIntensity, 1f);
+groundLight.pointLightOuterRadius = baseGroundLightOuterRadius * groundLightRadiusMultiplier;
 }
 
 void Die() {
 IsAlive = false;
-if (FireflyManager.Instance != null) FireflyManager.Instance.ReportFireflyDespawned(this);
-if (TickManager.Instance != null) TickManager.Instance.UnregisterTickUpdateable(this);
+
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(this);
+}
+
+if (FireflyManager.Instance != null) {
+FireflyManager.Instance.ReportFireflyDespawned(this);
+}
+
+if (TickManager.Instance != null) {
+TickManager.Instance.UnregisterTickUpdateable(this);
+}
 
 if (glowParticles != null) {
 glowParticles.Stop();
@@ -2402,6 +2295,11 @@ tileSize = GridPositionManager.Instance.GetTilemapGrid().cellSize.x;
 Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
 Gizmos.DrawWireSphere(transform.position, definition.tileSearchRadius * tileSize);
 
+if (Application.isPlaying && FireflyManager.Instance != null) {
+Gizmos.color = new Color(0f, 1f, 0.5f, 0.3f);
+Gizmos.DrawWireSphere(transform.position, FireflyManager.Instance.photosynthesisRadius * tileSize);
+}
+
 if (Application.isPlaying) {
 Vector3 flightBoxCenter = currentTileCenter + new Vector3(0, definition.flightHeightOffset + definition.flightBounds.y / 2f, 0);
 Gizmos.color = new Color(0f, 1f, 1f, 0.5f);
@@ -2411,7 +2309,6 @@ Gizmos.color = Color.yellow;
 Gizmos.DrawLine(transform.position, localTargetPosition);
 }
 }
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -2448,7 +2345,7 @@ pub float growingPlantAttraction = 1.0f;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
 
-﻿// Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
+﻿using System.Collections.Generic;
 using WegoSystem;
 
 pub cls FireflyManager : MonoBehaviour, ITickUpdateable {
@@ -2456,7 +2353,7 @@ pub stat FireflyManager Instance { get; set; }
 
 [SerializeField] WeatherManager weatherManager;
 [SerializeField] GameObject fireflyPrefab;
-[SerializeField] FireflyDefinition defaultFireflyDefinition;
+[SerializeField] pub FireflyDefinition defaultFireflyDefinition; // Made pub to fix access issue
 [SerializeField] Transform fireflyParent;
 
 [SerializeField] int maxFireflies = 50;
@@ -2573,7 +2470,7 @@ GameObject fireflyGO = Instantiate(fireflyPrefab, spawnWorldPos, Quaternion.iden
 FireflyController controller = fireflyGO.GetComponent<FireflyController>();
 
 if (controller != null) {
-controller.Initialize(); // Corrected call with no parameters
+controller.Initialize();
 activeFireflies.Add(controller);
 }
 }
@@ -2686,20 +2583,22 @@ Destroy(lineGO);
 
 void CleanupVisualizers() {
 foreach (var kvp in activeLineVisualizers) {
-if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+if (kvp.Value != null) {
+Destroy(kvp.Value.gameObject);
+}
 }
 activeLineVisualizers.Clear();
 }
 
 void OnDrawGizmosSelected() {
-Gizmos.color = Color.green;
+Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
 Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
 
-if (showAttractionLinesRuntime && Application.isPlaying) {
-Gizmos.color = attractionLineColorRuntime;
+if (Application.isPlaying) {
+Gizmos.color = new Color(0f, 1f, 0.5f, 0.2f);
 foreach (var firefly in activeFireflies) {
-if (firefly != null && firefly.AttractionTarget != null) {
-Gizmos.DrawLine(firefly.transform.position, firefly.AttractionTarget.position);
+if (firefly != null) {
+Gizmos.DrawWireSphere(firefly.transform.position, photosynthesisRadius);
 }
 }
 }
@@ -2842,14 +2741,15 @@ ret scents?.Where(s => s != null).ToList() ?? new List<ScentDefinition>();
 using WegoSystem;
 
 pub cls ScentSource : MonoBehaviour {
-pub ScentDefinition definition;
-pub float radiusModifier = 0f;
-pub float strengthModifier = 0f;
+[SerializeField] ScentDefinition definition;
+[SerializeField] float radiusModifier = 0f;
+[SerializeField] float strengthModifier = 0f;
+
+pub ScentDefinition Definition => definition;
+pub float EffectiveRadius => definition != null ? Mathf.Max(0f, definition.baseRadius + radiusModifier) : 0f;
+pub float EffectiveStrength => definition != null ? Mathf.Max(0f, definition.baseStrength + strengthModifier) : 0f;
 
 GridEntity gridEntity;
-
-pub float EffectiveRadius => Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier);
-pub float EffectiveStrength => Mathf.Max(0f, (definition != null ? definition.baseStrength : 0f) + strengthModifier);
 
 void Awake() {
 gridEntity = GetComponent<GridEntity>();
@@ -2858,38 +2758,61 @@ gridEntity = gameObject.AddComponent<GridEntity>();
 }
 }
 
-void OnDrawGizmosSelected() {
-if (definition == null || !Application.isPlaying) return;
-
-if (gridEntity == null) gridEntity = GetComponent<GridEntity>();
-if (gridEntity == null) return;
-
-int effectiveRadiusTiles = Mathf.RoundToInt(EffectiveRadius);
-if (effectiveRadiusTiles <= 0) return;
-
-var affectedTiles = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, effectiveRadiusTiles);
-
-Random.State prevState = Random.state;
-Random.InitState(definition.name.GetHashCode());
-Color gizmoColor = Random.ColorHSV(0f, 1f, 0.7f, 0.9f, 0.8f, 1f);
-gizmoColor.a = 0.3f;
-Random.state = prevState;
-
-Gizmos.color = gizmoColor;
-
-foreach (var tile in affectedTiles) {
-Vector3 tileWorld = GridPositionManager.Instance.GridToWorld(tile);
-Gizmos.DrawCube(tileWorld, Vector3.one * 0.9f); // Slightly smaller than full tile
+void Start() {
+if (GridPositionManager.Instance != null) {
+GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+}
 }
 
-var outlineTiles = GridRadiusUtility.GetCircleOutline(gridEntity.Position, effectiveRadiusTiles);
-gizmoColor.a = 0.8f;
-Gizmos.color = gizmoColor;
-
-foreach (var tile in outlineTiles) {
-Vector3 tileWorld = GridPositionManager.Instance.GridToWorld(tile);
-Gizmos.DrawWireCube(tileWorld, Vector3.one);
+void Update() {
+UpdateRadiusVisualization();
 }
+
+void UpdateRadiusVisualization() {
+if (GridDebugVisualizer.Instance != null && definition != null && gridEntity != null) {
+float effectiveRadius = EffectiveRadius;
+if (effectiveRadius > 0.01f) {
+int radiusTiles = Mathf.RoundToInt(effectiveRadius);
+GridDebugVisualizer.Instance.VisualizeScentRadius(this, gridEntity.Position, radiusTiles);
+}
+else {
+GridDebugVisualizer.Instance.HideContinuousRadius(this);
+}
+}
+}
+
+pub void SetDefinition(ScentDefinition newDefinition) {
+definition = newDefinition;
+UpdateRadiusVisualization(); // Update visualization when definition changes
+}
+
+pub void SetRadiusModifier(float modifier) {
+radiusModifier = modifier;
+}
+
+pub void SetStrengthModifier(float modifier) {
+strengthModifier = modifier;
+}
+
+pub void ApplyModifiers(float radiusMod, float strengthMod) {
+radiusModifier += radiusMod;
+strengthModifier += strengthMod;
+}
+
+void OnDestroy() {
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(this);
+}
+}
+
+void OnDisable() {
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(this);
+}
+}
+
+void OnEnable() {
+UpdateRadiusVisualization();
 }
 }
 
@@ -3114,7 +3037,7 @@ using WegoSystem;
 pub cls FoodItem : MonoBehaviour {
 pub FoodType foodType;
 
-[SerializeField] bool snapToGridOnStart = true;
+bool snapToGridOnStart = true;
 
 GridEntity gridEntity;
 
@@ -3134,9 +3057,17 @@ enabled = false;
 return;
 }
 
+PlantGrowth parentPlant = GetComponentInParent<PlantGrowth>();
+if (parentPlant != null) {
+if (gridEntity != null) {
+gridEntity.enabled = false;
+}
+snapToGridOnStart = false;
+}
+
 if (snapToGridOnStart && GridPositionManager.Instance != null) {
 GridPositionManager.Instance.SnapEntityToGrid(gameObject);
-Debug.Log($"[FoodItem] {foodType.foodName} snapped to grid position {gridEntity.Position}");
+Debug.Log($"[FoodItem] Standalone food '{foodType.foodName}' snapped to grid position {gridEntity.Position}");
 }
 
 Collider2D col = GetComponent<Collider2D>();
@@ -3430,32 +3361,16 @@ void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { Gizmos.colo
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Management\FloraManager.cs
 
-﻿using UnityEngine;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+﻿using System.Collections.Generic;
+using WegoSystem;
 
 pub cls FloraManager : MonoBehaviour {
 pub stat FloraManager Instance { get; set; }
 
-[SerializeField] bool showScentRadiiRuntime = false;
-[SerializeField] Color scentRadiusColorRuntime = Color.yellow;
+[SerializeField] bool enableDebugLogging = false;
 
-[SerializeField] bool showPoopAbsorptionRadiiRuntime = false;
-[SerializeField] Color poopAbsorptionRadiusColorRuntime = new Color(0.6f, 0.4f, 0.2f, 0.5f); // Brown-ish color
-
-[SerializeField] GameObject circleVisualizerPrefab;
-[SerializeField] Transform circleContainer;
-
-[SerializeField] bool logGizmoCalls = false;
-
-pub bool ShowScentRadiiRuntime => showScentRadiiRuntime;
-pub Color ScentRadiusColorRuntime => scentRadiusColorRuntime;
-pub bool ShowPoopAbsorptionRadiiRuntime => showPoopAbsorptionRadiiRuntime;
-pub Color PoopAbsorptionRadiusColorRuntime => poopAbsorptionRadiusColorRuntime;
-
-ro Dictionary<ScentSource, RuntimeCircleDrawer> _activeCircleVisualizers = new Dictionary<ScentSource, RuntimeCircleDrawer>();
-ro Dictionary<PlantGrowth, RuntimeCircleDrawer> _activePoopAbsorptionCircleVisualizers = new Dictionary<PlantGrowth, RuntimeCircleDrawer>();
+ro HashSet<ScentSource> trackedScentSources = new HashSet<ScentSource>();
+ro HashSet<PlantGrowth> trackedPlants = new HashSet<PlantGrowth>();
 
 void Awake() {
 if (Instance != null && Instance != this) {
@@ -3464,197 +3379,168 @@ return;
 }
 Instance = this;
 
-if (circleVisualizerPrefab == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Visualizer Prefab is not assigned!", this); }
-if (circleContainer == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Container transform is not assigned!", this); }
+if (enableDebugLogging) {
+Debug.Log($"[FloraManager] Initialized - all radius visualization controlled by GridDebugVisualizer only");
+}
 }
 
 void OnDestroy() {
 if (Instance == this) Instance = null;
 
-foreach (var kvp in _activeCircleVisualizers) {
-if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-}
-_activeCircleVisualizers.Clear();
-
-foreach (var kvp in _activePoopAbsorptionCircleVisualizers) {
-if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-}
-_activePoopAbsorptionCircleVisualizers.Clear();
+CleanupAllVisualizations();
 }
 
 void Update() {
-if (!Application.isPlaying) return;
-UpdateRuntimeCircleVisualizers();
-UpdatePoopAbsorptionCircleVisualizers();
+if (!Application.isPlaying || GridDebugVisualizer.Instance == null) return;
+
+UpdateScentRadiusTracking();
+UpdatePoopAbsorptionTracking();
 }
 
-void UpdatePoopAbsorptionCircleVisualizers() {
-if (!Application.isPlaying) return;
-
-bool showCircles = showPoopAbsorptionRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
-
-if (!showCircles) {
-foreach (var kvp in _activePoopAbsorptionCircleVisualizers) {
-if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+pub float GetPlantPoopDetectionRadius(PlantGrowth plant) {
+if (plant == null || plant.NodeExecutor == null) ret 0f;
+ret plant.GetPoopDetectionRadius();
 }
-_activePoopAbsorptionCircleVisualizers.Clear();
+
+void UpdateScentRadiusTracking() {
+bool shouldShow = GridDebugVisualizer.Instance.IsScentRadiusEnabled &&
+GridDebugVisualizer.Instance.IsRadiusVisualizationEnabled;
+
+if (!shouldShow) {
+foreach (var source in trackedScentSources) {
+if (source != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(source);
+}
+}
+trackedScentSources.Clear();
+return;
+}
+
+ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
+var currentSourcesSet = new HashSet<ScentSource>(currentSources);
+
+var sourcesToRemove = new HashSet<ScentSource>();
+foreach (var source in trackedScentSources) {
+if (source == null || !source.enabled || !currentSourcesSet.Contains(source)) {
+sourcesToRemove.Add(source);
+if (source != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(source);
+}
+}
+}
+
+foreach (var source in sourcesToRemove) {
+trackedScentSources.Remove(source);
+}
+
+foreach (ScentSource source in currentSources) {
+if (source == null || !source.enabled || source.Definition == null) continue;
+
+float radius = source.EffectiveRadius;
+if (radius <= 0.01f) {
+if (trackedScentSources.Contains(source)) {
+GridDebugVisualizer.Instance.HideContinuousRadius(source);
+trackedScentSources.Remove(source);
+}
+continue;
+}
+
+GridEntity gridEntity = source.GetComponent<GridEntity>();
+if (gridEntity != null) {
+int radiusTiles = Mathf.RoundToInt(radius);
+GridDebugVisualizer.Instance.VisualizeScentRadius(source, gridEntity.Position, radiusTiles);
+trackedScentSources.Add(source);
+}
+else if (GridPositionManager.Instance != null) {
+GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(source.transform.position);
+int radiusTiles = Mathf.RoundToInt(radius);
+GridDebugVisualizer.Instance.VisualizeScentRadius(source, gridPos, radiusTiles);
+trackedScentSources.Add(source);
+}
+}
+}
+
+void UpdatePoopAbsorptionTracking() {
+bool shouldShow = GridDebugVisualizer.Instance.IsPlantPoopRadiusEnabled &&
+GridDebugVisualizer.Instance.IsRadiusVisualizationEnabled;
+
+if (!shouldShow) {
+foreach (var plant in trackedPlants) {
+if (plant != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(plant);
+}
+}
+trackedPlants.Clear();
 return;
 }
 
 var currentPlantsSet = new HashSet<PlantGrowth>(PlantGrowth.AllActivePlants);
 
-var plantsToRemove = new List<PlantGrowth>();
-
-foreach (var kvp in _activePoopAbsorptionCircleVisualizers) {
-PlantGrowth plant = kvp.Key;
-RuntimeCircleDrawer drawer = kvp.Value;
-
-if (plant == null || drawer == null || !plant.gameObject.activeInHierarchy || !currentPlantsSet.Contains(plant)) {
+var plantsToRemove = new HashSet<PlantGrowth>();
+foreach (var plant in trackedPlants) {
+if (plant == null || !plant.gameObject.activeInHierarchy || !currentPlantsSet.Contains(plant)) {
 plantsToRemove.Add(plant);
-if (drawer != null) Destroy(drawer.gameObject);
-continue;
+if (plant != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(plant);
 }
-
-float poopRadius = GetPlantPoopDetectionRadius(plant);
-bool shouldShowThis = showCircles && poopRadius > 0.01f;
-
-if (shouldShowThis) {
-drawer.transform.position = plant.transform.position;
-drawer.UpdateCircle(poopRadius, poopAbsorptionRadiusColorRuntime);
-}
-else {
-drawer.HideCircle();
-plantsToRemove.Add(plant); // If radius is too small or zero, remove the visualizer
 }
 }
 
 foreach (var plant in plantsToRemove) {
-if (_activePoopAbsorptionCircleVisualizers.TryGetValue(plant, out var drawer)) {
-if (drawer != null) Destroy(drawer.gameObject);
-_activePoopAbsorptionCircleVisualizers.Remove(plant);
-}
+trackedPlants.Remove(plant);
 }
 
 foreach (PlantGrowth plant in PlantGrowth.AllActivePlants) {
-if (plant == null || _activePoopAbsorptionCircleVisualizers.ContainsKey(plant)) continue;
+if (plant == null || !plant.gameObject.activeInHierarchy) continue;
 
 float poopRadius = GetPlantPoopDetectionRadius(plant);
-if (poopRadius <= 0.01f) continue;
-
-GameObject circleGO = Instantiate(circleVisualizerPrefab, plant.transform.position, Quaternion.identity, circleContainer);
-var newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
-
-if (newDrawer != null) {
-newDrawer.UpdateCircle(poopRadius, poopAbsorptionRadiusColorRuntime);
-_activePoopAbsorptionCircleVisualizers.Add(plant, newDrawer);
+if (poopRadius <= 0.01f) {
+if (trackedPlants.Contains(plant)) {
+GridDebugVisualizer.Instance.HideContinuousRadius(plant);
+trackedPlants.Remove(plant);
 }
-else {
-Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
-Destroy(circleGO);
-}
-}
-}
-
-float GetPlantPoopDetectionRadius(PlantGrowth plant) {
-if (plant == null) ret 0f;
-ret plant.GetPoopDetectionRadius();
-}
-
-void UpdateRuntimeCircleVisualizers() {
-if (!Application.isPlaying) return;
-
-bool showCircles = showScentRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
-var sourcesToRemove = new List<ScentSource>();
-
-foreach (var kvp in _activeCircleVisualizers) {
-ScentSource source = kvp.Key;
-RuntimeCircleDrawer line = kvp.Value;
-
-if (source == null || line == null || !source.gameObject.activeInHierarchy) {
-sourcesToRemove.Add(source);
-if (line != null) Destroy(line.gameObject);
 continue;
 }
 
-bool shouldShowThis = showCircles && source.enabled && source.definition != null && source.EffectiveRadius > 0.01f;
-
-if (shouldShowThis) {
-line.transform.position = source.transform.position;
-line.transform.rotation = source.transform.rotation;
-line.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
+GridEntity gridEntity = plant.GetComponent<GridEntity>();
+if (gridEntity != null) {
+int radiusTiles = Mathf.RoundToInt(poopRadius);
+GridDebugVisualizer.Instance.VisualizePlantPoopRadius(plant, gridEntity.Position, radiusTiles);
+trackedPlants.Add(plant);
 }
-else {
-line.HideCircle();
-}
-}
-
-foreach (var source in sourcesToRemove) {
-if (_activeCircleVisualizers.TryGetValue(source, out var drawer) && drawer != null)
-Destroy(drawer.gameObject);
-_activeCircleVisualizers.Remove(source);
-}
-
-if (showCircles) {
-ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
-foreach (ScentSource source in currentSources) {
-if (source == null || _activeCircleVisualizers.ContainsKey(source) || !source.enabled ||
-source.definition == null || source.EffectiveRadius <= 0.01f) continue;
-
-GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position, source.transform.rotation, circleContainer);
-var newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
-
-if (newDrawer != null) {
-newDrawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
-_activeCircleVisualizers.Add(source, newDrawer);
-}
-else {
-Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' is missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
-Destroy(circleGO);
-}
-}
-}
-else if (!showCircles && _activeCircleVisualizers.Count > 0) {
-foreach (var kvp in _activeCircleVisualizers) {
-if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-}
-_activeCircleVisualizers.Clear();
-}
-}
-
-#if UNITY_EDITOR
-void OnDrawGizmosSelected() {
-if (showScentRadiiRuntime) {
-Gizmos.color = scentRadiusColorRuntime;
-ScentSource[] scentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
-foreach (ScentSource source in scentSources) {
-if (source == null || !source.enabled || source.definition == null) continue;
-float radius = source.EffectiveRadius;
-if (radius > 0.01f) {
-Gizmos.DrawWireSphere(source.transform.position, radius);
+else if (GridPositionManager.Instance != null) {
+GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(plant.transform.position);
+int radiusTiles = Mathf.RoundToInt(poopRadius);
+GridDebugVisualizer.Instance.VisualizePlantPoopRadius(plant, gridPos, radiusTiles);
+trackedPlants.Add(plant);
 }
 }
 }
 
-if (showPoopAbsorptionRadiiRuntime) {
-Gizmos.color = poopAbsorptionRadiusColorRuntime;
-PlantGrowth[] plants = FindObjectsByType<PlantGrowth>(FindObjectsSortMode.None);
-int drawnCount = 0;
+void CleanupAllVisualizations() {
+if (GridDebugVisualizer.Instance == null) return;
 
-foreach (PlantGrowth plant in plants) {
-if (plant == null) continue;
-float radius = GetPlantPoopDetectionRadius(plant);
-if (radius > 0.01f) {
-Gizmos.DrawWireSphere(plant.transform.position, radius);
-drawnCount++;
+foreach (var source in trackedScentSources) {
+if (source != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(source);
 }
 }
 
-if (logGizmoCalls && drawnCount > 0) {
-Debug.Log($"[FloraManager] Drew {drawnCount} poop absorption radius gizmos");
+foreach (var plant in trackedPlants) {
+if (plant != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(plant);
 }
 }
+
+trackedScentSources.Clear();
+trackedPlants.Clear();
 }
-#endif
+
+pub bool HasScentSourcesTracked => trackedScentSources.Count > 0;
+pub bool HasPlantsTracked => trackedPlants.Count > 0;
+pub int TrackedScentSourceCount => trackedScentSources.Count;
+pub int TrackedPlantCount => trackedPlants.Count;
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -5175,12 +5061,12 @@ parentPlantGrowth.ApplyScentDataToObject(projGO, scentRadiusBonuses, scentStreng
 
 ﻿using UnityEngine;
 
-pub enum PlantCellType { Seed, Stem, Leaf, Flower, Fruit } // <<< ADDED ENUM DEFINITION
+pub enum PlantCellType { Seed, Stem, Leaf, Flower, Fruit }
 
 pub cls PlantCell : MonoBehaviour {
 [HideInInspector] pub PlantGrowth ParentPlantGrowth;
 [HideInInspector] pub Vector2Int GridCoord;
-[HideInInspector] pub PlantCellType CellType; // Uses the enum defined above
+[HideInInspector] pub PlantCellType CellType;
 
 void OnDestroy() {
 if (ParentPlantGrowth != null) {
@@ -5197,7 +5083,8 @@ ParentPlantGrowth.ReportCellDestroyed(GridCoord);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantCellManager.cs
 
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using WegoSystem;
 
 pub cls PlantCellManager {
 ro PlantGrowth plant;
@@ -5207,10 +5094,11 @@ ro GameObject leafCellPrefab;
 ro GameObject berryCellPrefab;
 ro float cellSpacing;
 
-Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
-List<GameObject> activeCellGameObjects = new List<GameObject>();
-pub GameObject RootCellInstance { get; set; }
+ro Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
+ro List<GameObject> activeCellGameObjects = new List<GameObject>();
+
 pub List<LeafData> LeafDataList { get; } = new List<LeafData>();
+pub GameObject RootCellInstance { get; set; }
 
 bool? offsetRightForPattern1 = null;
 
@@ -5221,6 +5109,10 @@ stemCellPrefab = stemPrefab;
 leafCellPrefab = leafPrefab;
 berryCellPrefab = berryPrefab;
 cellSpacing = spacing;
+}
+
+pub GameObject CreateSeedCell(Vector2Int coords) {
+ret SpawnCellVisual(PlantCellType.Seed, coords);
 }
 
 pub void ReportCellDestroyed(Vector2Int coord) {
@@ -5282,6 +5174,13 @@ Vector2 worldPos = (Vector2)plant.transform.position + ((Vector2)coords * cellSp
 GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
 instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
 
+if (cellType != PlantCellType.Seed) {
+GridEntity partGridEntity = instance.GetComponent<GridEntity>();
+if (partGridEntity != null) {
+Object.Destroy(partGridEntity);
+}
+}
+
 PlantCell cellComp = instance.GetComponent<PlantCell>() ?? instance.AddComponent<PlantCell>();
 cellComp.ParentPlantGrowth = plant;
 cellComp.GridCoord = coords;
@@ -5291,41 +5190,69 @@ cells[coords] = cellType;
 activeCellGameObjects.Add(instance);
 
 SortableEntity sorter = instance.GetComponent<SortableEntity>() ?? instance.AddComponent<SortableEntity>();
-sorter.SetUseParentYCoordinate(cellType != PlantCellType.Seed);
 
-if (cellType == PlantCellType.Fruit) {
-plant.ApplyScentDataToObject(instance, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+if (cellType == PlantCellType.Leaf) {
+LeafDataList.Add(new LeafData(coords, true));
 }
 
 plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
+
 if (plant.IsOutlineEnabled() && plant.VisualManager.OutlineController != null) {
-plant.VisualManager.OutlineController.OnPlantCellAdded(coords, instance);
+plant.VisualManager.OutlineController.RegisterPlantPart(instance.GetComponentInChildren<SpriteRenderer>(), plant.outlinePartPrefab);
+}
+
+if (accumulatedScentRadiusBonus != null && accumulatedScentStrengthBonus != null) {
+plant.ApplyScentDataToObject(instance, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
 }
 
 ret instance;
 }
 
-pub List<Vector2Int> CalculateLeafPositions(Vector2Int stemPos, int stageCounter, int leafPattern) {
+pub GameObject CreateStemSegment(int stemIndex, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = null, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = null) {
+Vector2Int stemCoord = new Vector2Int(0, stemIndex + 1);
+ret SpawnCellVisual(PlantCellType.Stem, stemCoord, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+}
+
+pub List<GameObject> CreateLeavesForStemSegment(int stemIndex, int leafGap, int leafPattern, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus = null, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus = null) {
+List<GameObject> newLeaves = new List<GameObject>();
+
+if (leafGap == 0 || (stemIndex % (leafGap + 1)) == 0) {
+Vector2Int stemCoord = new Vector2Int(0, stemIndex + 1);
+List<Vector2Int> leafPositions = CalculateLeafPositions(stemCoord, leafPattern, stemIndex);
+
+foreach (Vector2Int leafCoord in leafPositions) {
+GameObject leafInstance = SpawnCellVisual(PlantCellType.Leaf, leafCoord, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+if (leafInstance != null) {
+newLeaves.Add(leafInstance);
+}
+}
+}
+
+ret newLeaves;
+}
+
+pub List<Vector2Int> CalculateLeafPositions(Vector2Int stemPos, int leafPattern, int stageCounter) {
 List<Vector2Int> leafPositions = new List<Vector2Int>();
 Vector2Int leftBase = stemPos + Vector2Int.left;
 Vector2Int rightBase = stemPos + Vector2Int.right;
 
 switch (leafPattern) {
-case 0:
+case 0: // Symmetrical
 leafPositions.Add(leftBase);
 leafPositions.Add(rightBase);
 break;
-case 1:
+case 1: // Offset
 if (offsetRightForPattern1 == null) offsetRightForPattern1 = Random.value < 0.5f;
 if (offsetRightForPattern1.Value) {
 leafPositions.Add(leftBase);
 leafPositions.Add(rightBase + Vector2Int.up);
-} else {
+}
+else {
 leafPositions.Add(leftBase + Vector2Int.up);
 leafPositions.Add(rightBase);
 }
 break;
-case 2:
+case 2: // Alternating
 switch (stageCounter % 4) {
 case 0:
 case 2:
@@ -5342,27 +5269,27 @@ leafPositions.Add(rightBase + Vector2Int.up);
 break;
 }
 break;
-case 3:
+case 3: // Spiral
 int spiralDir = (stageCounter % 2 == 0) ? 1 : -1;
 if (spiralDir > 0) {
-leafPositions.Add(leftBase);
-leafPositions.Add(rightBase + Vector2Int.up);
-} else {
-leafPositions.Add(leftBase + Vector2Int.up);
 leafPositions.Add(rightBase);
 }
+else {
+leafPositions.Add(leftBase);
+}
 break;
-case 4:
+case 4: // Dense
 leafPositions.Add(leftBase);
 leafPositions.Add(leftBase + Vector2Int.up);
 leafPositions.Add(rightBase);
 leafPositions.Add(rightBase + Vector2Int.up);
 break;
-default:
+default: // Fallback to symmetrical
 leafPositions.Add(leftBase);
 leafPositions.Add(rightBase);
 break;
 }
+
 ret leafPositions;
 }
 
@@ -5374,7 +5301,7 @@ missingLeafIndex = i;
 break;
 }
 }
-if (missingLeafIndex == -1) ret false;
+if (missingLeafIndex == -1) ret false; // No missing leaves to regrow
 
 Vector2Int leafCoord = LeafDataList[missingLeafIndex].GridCoord;
 if (cells.ContainsKey(leafCoord)) ret false;
@@ -5394,12 +5321,36 @@ ret activeCellGameObjects.FirstOrDefault(go => go != null && go.GetComponent<Pla
 }
 
 pub Dictionary<Vector2Int, PlantCellType> GetCells() => cells;
+
+pub bool HasCellAt(Vector2Int coord) {
+ret cells.ContainsKey(coord);
+}
+
+pub PlantCellType? GetCellTypeAt(Vector2Int coord) {
+if (cells.TryGetValue(coord, out PlantCellType cellType)) {
+ret cellType;
+}
+ret null;
+}
+
+pub int GetActiveLeafCount() {
+int count = 0;
+foreach (var leafData in LeafDataList) {
+if (leafData.IsActive) {
+count++;
+}
+}
+ret count;
+}
+
+pub List<GameObject> ActiveCellGameObjects => activeCellGameObjects;
+pub Dictionary<Vector2Int, PlantCellType> Cells => cells;
 }
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantEnergySystem.cs
 
-﻿// Assets\Scripts\PlantSystem\Growth\PlantEnergySystem.cs
+﻿using System.Linq;
 using WegoSystem;
 
 pub cls PlantEnergySystem {
@@ -5474,6 +5425,18 @@ float totalRate = (standardPhotosynthesis + (fireflyBonusRate / ticksPerSecond))
 
 CurrentEnergy = Mathf.Clamp(CurrentEnergy + totalRate, 0f, MaxEnergy);
 }
+
+pub void SpendEnergy(float amount) {
+CurrentEnergy = Mathf.Max(0f, CurrentEnergy - amount);
+}
+
+pub void AddEnergy(float amount) {
+CurrentEnergy = Mathf.Clamp(CurrentEnergy + amount, 0f, MaxEnergy);
+}
+
+pub bool HasEnergy(float amount) {
+ret CurrentEnergy >= amount;
+}
 }
 
 ////////////////////////////////////////////////////////////
@@ -5485,8 +5448,8 @@ using WegoSystem;
 pub enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
 
 pub cls PlantGrowth : MonoBehaviour, ITickUpdateable {
-
 pub stat ro List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
+
 pub PlantCellManager CellManager { get; set; }
 pub PlantNodeExecutor NodeExecutor { get; set; }
 pub PlantGrowthLogic GrowthLogic { get; set; }
@@ -5505,10 +5468,8 @@ pub PlantState CurrentState { get; set; } = PlantState.Initializing;
 [SerializeField] GameObject shadowPartPrefab;
 [SerializeField] bool enableOutline = true;
 [SerializeField] PlantOutlineController outlineController;
-[SerializeField] GameObject outlinePartPrefab;
 
-[SerializeField] pub bool showGrowthPercentage = true; // This is the only UI setting needed now
-
+[SerializeField] pub bool showGrowthPercentage = true;
 [SerializeField] pub bool allowPhotosynthesisDuringGrowth = false;
 
 void Awake() {
@@ -5549,6 +5510,7 @@ Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': PlantOutlineControlle
 setupValid = false;
 }
 }
+
 if (outlinePartPrefab == null) {
 Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Outline Part Prefab missing but outline is enabled!", this);
 setupValid = false;
@@ -5579,12 +5541,19 @@ VisualManager.UpdateUI();
 
 void OnDestroy() {
 AllActivePlants.Remove(this);
+
 if (TickManager.Instance != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
 }
+
 if (PlantGrowthModifierManager.Instance != null) {
 PlantGrowthModifierManager.Instance.UnregisterPlant(this);
 }
+
+if (GridDebugVisualizer.Instance != null) {
+GridDebugVisualizer.Instance.HideContinuousRadius(this);
+}
+
 CellManager?.ClearAllVisuals();
 }
 
@@ -5593,8 +5562,51 @@ VisualManager.UpdateWegoUI();
 }
 
 pub void OnTickUpdate(int currentTick) {
+if (!enabled) return;
+
+switch (CurrentState) {
+case PlantState.Initializing:
+break;
+
+case PlantState.Growing:
 GrowthLogic.OnTickUpdate(currentTick);
+if (allowPhotosynthesisDuringGrowth) {
+EnergySystem.AccumulateEnergyTick();
+}
+break;
+
+case PlantState.GrowthComplete:
+TransitionToMature();
+break;
+
+case PlantState.Mature_Idle:
+EnergySystem.AccumulateEnergyTick();
+NodeExecutor.ExecuteMatureCycleTick();
+UpdateRadiusVisualizations(); // Update visualizations during mature state
+break;
+
+case PlantState.Mature_Executing:
+EnergySystem.AccumulateEnergyTick();
+break;
+}
+
 VisualManager.UpdateUI();
+}
+
+void UpdateRadiusVisualizations() {
+if (GridDebugVisualizer.Instance != null) {
+GridEntity gridEntity = GetComponent<GridEntity>();
+if (gridEntity != null) {
+float poopRadius = GetPoopDetectionRadius();
+if (poopRadius > 0.01f) {
+int radiusTiles = Mathf.RoundToInt(poopRadius);
+GridDebugVisualizer.Instance.VisualizePlantPoopRadius(this, gridEntity.Position, radiusTiles);
+}
+else {
+GridDebugVisualizer.Instance.HideContinuousRadius(this);
+}
+}
+}
 }
 
 pub void InitializeAndGrow(NodeGraph graph) {
@@ -5613,8 +5625,9 @@ EnergySystem.CurrentEnergy = 0f;
 CellManager.LeafDataList.Clear();
 
 GrowthLogic.CalculateAndApplyStats();
+NodeExecutor.ProcessPassiveEffects(NodeGraph);
 
-GameObject spawnedSeed = CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
+GameObject spawnedSeed = CellManager.CreateSeedCell(Vector2Int.zero);
 if (spawnedSeed != null) {
 CellManager.RootCellInstance = spawnedSeed;
 RegisterWithManagers();
@@ -5627,14 +5640,27 @@ else {
 Debug.LogWarning($"[{gameObject.name}] Target stem length is {GrowthLogic.TargetStemLength}. Skipping visual growth phase.", gameObject);
 GrowthLogic.CompleteGrowth();
 }
+
+VisualManager.UpdateShadow();
+VisualManager.UpdateOutline();
 }
 else {
 Debug.LogError($"[{gameObject.name}] Failed to spawn initial seed! Aborting growth.", gameObject);
 CurrentState = PlantState.Mature_Idle;
 Destroy(gameObject, 0.1f);
 }
+}
 
-VisualManager.UpdateUI();
+void TransitionToMature() {
+CurrentState = PlantState.Mature_Idle;
+
+if (GrowthLogic.GrowthTicksPerStage <= 1) {
+Debug.Log($"[{gameObject.name}] Growth completed instantly. Skipping visual growth phase.", gameObject);
+GrowthLogic.CompleteGrowth();
+}
+else {
+Debug.Log($"[{gameObject.name}] Growth completed! Transitioning to mature state.");
+}
 }
 
 void RegisterWithManagers() {
@@ -5645,10 +5671,16 @@ PlantGrowthModifierManager.Instance.RegisterPlantTile(this, currentTile);
 }
 }
 
-pub bool DoesCellExistAt(Vector2Int coord) => CellManager.DoesCellExistAt(coord);
 pub float GetCellSpacing() => cellSpacing;
-pub GameObject GetCellGameObjectAt(Vector2Int coord) => CellManager.GetCellGameObjectAt(coord);
+
 pub bool IsOutlineEnabled() => enableOutline;
+
+pub GameObject GetCellGameObjectAt(Vector2Int coord) => CellManager.GetCellGameObjectAt(coord);
+
+pub GameObject outlinePartPrefab => this.outlinePartPrefab;
+
+pub bool DoesCellExistAt(Vector2Int coord) => CellManager.DoesCellExistAt(coord);
+
 pub float GetPoopDetectionRadius() => NodeExecutor.PoopDetectionRadius;
 pub void ReportCellDestroyed(Vector2Int coord) => CellManager.ReportCellDestroyed(coord);
 pub void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses)
@@ -5996,138 +6028,70 @@ Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.Cur
 return;
 }
 
-plant.EnergySystem.CurrentEnergy = Mathf.Max(0f, plant.EnergySystem.CurrentEnergy - totalEnergyCostForCycle);
+plant.EnergySystem.SpendEnergy(totalEnergyCostForCycle);
 
-foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-if (node?.effects == null) continue;
-
-foreach (var effect in node.effects) {
-if (effect == null || effect.isPassive ||
-effect.effectType == NodeEffectType.EnergyCost ||
-effect.effectType == NodeEffectType.Damage ||
-effect.effectType == NodeEffectType.ScentModifier) continue;
-
-switch (effect.effectType) {
-case NodeEffectType.GrowBerry:
-TrySpawnBerry(accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
-break;
-}
-}
+if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0) {
+ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
 }
 }
 
 void CheckForPoopAndAbsorb() {
-bool hasMissingLeaves = plant.CellManager.LeafDataList.Any(leaf => !leaf.IsActive);
-bool canAddEnergy = PoopEnergyBonus > 0f;
-if (!hasMissingLeaves && !canAddEnergy) return;
-
-int discreteRadius = Mathf.RoundToInt(PoopDetectionRadius);
-if (discreteRadius <= 0) return;
+if (PoopDetectionRadius <= 0f) return;
 
 GridEntity plantGrid = plant.GetComponent<GridEntity>();
 if (plantGrid == null) return;
 
-var tilesInRange = GridRadiusUtility.GetTilesInCircle(plantGrid.Position, discreteRadius);
+int radiusTiles = Mathf.RoundToInt(PoopDetectionRadius);
+var tilesInRadius = GridRadiusUtility.GetTilesInCircle(plantGrid.Position, radiusTiles);
 
-foreach (var tilePos in tilesInRange) {
-Vector3 worldPos = GridPositionManager.Instance.GridToWorld(tilePos);
-Collider2D[] colliders = Physics2D.OverlapPointAll(worldPos);
-
-foreach (Collider2D collider in colliders) {
-PoopController poop = collider.GetComponent<PoopController>();
+foreach (var tile in tilesInRadius) {
+var entitiesAtTile = GridPositionManager.Instance.GetEntitiesAt(tile);
+foreach (var entity in entitiesAtTile) {
+PoopController poop = entity.GetComponent<PoopController>();
 if (poop != null) {
-bool absorbed = false;
-
-if (hasMissingLeaves) {
-absorbed = plant.CellManager.TryRegrowLeaf();
-}
-
-if ((!absorbed || !hasMissingLeaves) && canAddEnergy) {
-plant.EnergySystem.CurrentEnergy = Mathf.Min(
-plant.EnergySystem.MaxEnergy,
-plant.EnergySystem.CurrentEnergy + PoopEnergyBonus
-);
-absorbed = true;
-}
-
-if (absorbed) {
-Object.Destroy(poop.gameObject);
-return;
-}
-}
-}
-}
-}
-
-void TrySpawnBerry(Dictionary<ScentDefinition, float> scentRadiiBonus, Dictionary<ScentDefinition, float> scentStrengthsBonus) {
-var berryCellPrefab = plant.CellManager.GetType()
-.GetField("berryCellPrefab", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-.GetValue(plant.CellManager) as GameObject;
-
-if (berryCellPrefab == null) {
-Debug.LogWarning($"[{plant.gameObject.name}] Berry Prefab not assigned. Cannot spawn berry.", plant.gameObject);
-return;
-}
-
-var cells = plant.CellManager.GetCells();
-var potentialCoords = cells
-.Where(cellKvp => cellKvp.Value == PlantCellType.Stem || cellKvp.Value == PlantCellType.Seed)
-.SelectMany(cellKvp => {
-Vector2Int[] berryOffsets = { Vector2Int.up, Vector2Int.left, Vector2Int.right };
-ret berryOffsets.Select(offset => cellKvp.Key + offset);
-})
-.Where(coord => !cells.ContainsKey(coord))
-.Distinct()
-.ToList();
-
-if (potentialCoords.Count > 0) {
-Vector2Int chosenCoord = potentialCoords[Random.Range(0, potentialCoords.Count)];
-GameObject berryGO = plant.CellManager.SpawnCellVisual(
-PlantCellType.Fruit,
-chosenCoord,
-scentRadiiBonus,
-scentStrengthsBonus
-);
-
-if (berryGO == null) {
-Debug.LogError($"[{plant.gameObject.name}] Failed to spawn berry visual at {chosenCoord}");
-}
-} else {
+if (PoopEnergyBonus > 0f) {
+plant.EnergySystem.AddEnergy(PoopEnergyBonus);
 if (Debug.isDebugBuild) {
-Debug.Log($"[{plant.gameObject.name}] No valid empty adjacent locations found to spawn a berry.");
+Debug.Log($"[{plant.gameObject.name}] Absorbed poop and gained {PoopEnergyBonus} energy!");
+}
+}
+
+Object.Destroy(poop.gameObject);
+break; // Only absorb one poop per tile per cycle
+}
 }
 }
 }
 
 pub void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses) {
-if (targetObject == null || EcosystemManager.Instance?.scentLibrary == null) return;
+if (targetObject == null) return;
 
-ScentDefinition strongestScentDef = null;
-float maxStrengthBonus = -1f;
+foreach (var kvp in scentRadiusBonuses) {
+ScentDefinition scentDef = kvp.Key;
+float radiusBonus = kvp.Value;
+float strengthBonus = scentStrengthBonuses.ContainsKey(scentDef) ? scentStrengthBonuses[scentDef] : 0f;
 
-if (scentStrengthBonuses != null && scentStrengthBonuses.Count > 0) {
-foreach (var kvp in scentStrengthBonuses) {
-if (kvp.Key != null && kvp.Value > maxStrengthBonus) {
-maxStrengthBonus = kvp.Value;
-strongestScentDef = kvp.Key;
+ScentSource existingSource = targetObject.GetComponentsInChildren<ScentSource>()
+.FirstOrDefault(s => s.Definition == scentDef);
+
+if (existingSource != null) {
+existingSource.ApplyModifiers(radiusBonus, strengthBonus);
+}
+else {
+GameObject scentSourceObj = new GameObject($"ScentSource_{scentDef.displayName}");
+scentSourceObj.transform.SetParent(targetObject.transform);
+scentSourceObj.transform.localPosition = Vector3.zero;
+
+ScentSource newSource = scentSourceObj.AddComponent<ScentSource>();
+SetScentSourceDefinition(newSource, scentDef);
+newSource.SetRadiusModifier(radiusBonus);
+newSource.SetStrengthModifier(strengthBonus);
 }
 }
 }
 
-if (strongestScentDef != null) {
-ScentSource scentSource = targetObject.GetComponent<ScentSource>() ?? targetObject.AddComponent<ScentSource>();
-scentSource.definition = strongestScentDef;
-
-scentRadiusBonuses.TryGetValue(strongestScentDef, out float radiusBonus);
-scentSource.radiusModifier = radiusBonus;
-scentSource.strengthModifier = maxStrengthBonus;
-
-if (strongestScentDef.particleEffectPrefab != null) {
-if (!targetObject.transform.GetComponentInChildren<ParticleSystem>()) {
-Object.Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform);
-}
-}
-}
+void SetScentSourceDefinition(ScentSource source, ScentDefinition definition) {
+source.SetDefinition(definition);
 }
 }
 
@@ -6136,6 +6100,7 @@ Object.Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transfor
 
 ﻿using UnityEngine;
 using TMPro;
+using WegoSystem;
 
 pub cls PlantVisualManager {
 ro PlantGrowth plant;
@@ -6174,6 +6139,7 @@ showGrowthPercentage = plant.showGrowthPercentage;
 
 pub void RegisterShadowForCell(GameObject cellInstance, string cellTypeName) {
 if (shadowController == null || shadowPartPrefab == null || cellInstance == null) return;
+
 SpriteRenderer partRenderer = cellInstance.GetComponentInChildren<SpriteRenderer>();
 if (partRenderer != null) {
 shadowController.RegisterPlantPart(partRenderer, shadowPartPrefab);
@@ -6190,36 +6156,70 @@ if (showGrowthPercentage && (plant.CurrentState == PlantState.Growing || plant.C
 UpdateGrowthPercentageUI();
 }
 else // State is Mature_Idle, Mature_Executing, GrowthComplete, etc. {
-energyText.text = $"{Mathf.FloorToInt(plant.EnergySystem.CurrentEnergy)}/{Mathf.FloorToInt(plant.EnergySystem.MaxEnergy)}";
+UpdateEnergyUI();
 }
 }
-
-pub void UpdateWegoUI() => UpdateUI();
-pub void UpdateRealtimeGrowthUI() => UpdateUI();
 
 pub void UpdateGrowthPercentageUI() {
-if (!showGrowthPercentage || energyText == null) return;
+if (energyText == null || !showGrowthPercentage) return;
 
-var logic = plant.GrowthLogic;
-float totalSteps = logic.GetTotalPlannedSteps();
-
-if (totalSteps <= 0) {
-return;
+int currentPercentage = 0;
+if (plant.GrowthLogic != null) {
+currentPercentage = Mathf.RoundToInt(plant.GrowthLogic.GetGrowthProgress() * 100f);
 }
 
-float completedSteps = logic.GetCurrentStemStage();
-
-float rawPercentageFloat = (completedSteps / totalSteps) * 100f;
-int targetDisplayValue = Mathf.FloorToInt(rawPercentageFloat);
-
-if (targetDisplayValue != displayedGrowthPercentage) {
-displayedGrowthPercentage = targetDisplayValue;
+if (currentPercentage != displayedGrowthPercentage) {
+displayedGrowthPercentage = currentPercentage;
 energyText.text = $"{displayedGrowthPercentage}%";
 }
 }
 
+pub void UpdateEnergyUI() {
+if (energyText == null) return;
+
+float currentEnergy = plant.EnergySystem.CurrentEnergy;
+float maxEnergy = plant.EnergySystem.MaxEnergy;
+energyText.text = $"{currentEnergy:F1}/{maxEnergy:F0}";
+}
+
+pub void UpdateWegoUI() {
+UpdateUI();
+}
+
 pub void ResetDisplayState() {
 displayedGrowthPercentage = -1;
+}
+
+pub void UpdateShadow() {
+if (shadowController == null) return;
+
+}
+
+pub void UpdateOutline() {
+if (!enableOutline || OutlineController == null) return;
+
+}
+
+pub void SetEnergyTextVisibility(bool visible) {
+if (energyText != null) {
+energyText.gameObject.SetActive(visible);
+}
+}
+
+pub void SetGrowthPercentageDisplay(bool enabled) {
+showGrowthPercentage = enabled;
+if (!enabled) {
+displayedGrowthPercentage = -1;
+}
+}
+
+pub bool IsEnergyTextVisible() {
+ret energyText != null && energyText.gameObject.activeInHierarchy;
+}
+
+pub void ForceUIUpdate() {
+displayedGrowthPercentage = -1; // Force refresh
+UpdateUI();
 }
 }
 
@@ -7913,13 +7913,13 @@ DestroyImmediate(gameObject);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Visual\PlantOutlineController.cs
 
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 
 pub cls PlantOutlineController : MonoBehaviour {
 [SerializeField] Color outlineColor = Color.black;
 [SerializeField] bool excludeOuterCorners = false;
 [SerializeField] bool excludeBaseCell = true;
-[SerializeField] GameObject outlinePartPrefab;
+[SerializeField] pub GameObject outlinePartPrefab; // Made pub to fix access issue
 
 [SerializeField] string outlineSortingLayerName = "Default";
 [SerializeField] int outlineSortingOrder = -1;
@@ -7979,6 +7979,22 @@ transform.localScale = Vector3.one;
 
 if (debugLogging)
 Debug.Log($"[{gameObject.name} Awake] Initialized outline controller for {parentPlantGrowth.gameObject.name}");
+}
+
+pub void RegisterPlantPart(SpriteRenderer plantPartRenderer, GameObject outlinePartPrefab) {
+if (plantPartRenderer == null || outlinePartPrefab == null) {
+if (debugLogging)
+Debug.LogWarning($"[{gameObject.name}] RegisterPlantPart: Null parameters provided");
+return;
+}
+
+PlantCell plantCell = plantPartRenderer.GetComponentInParent<PlantCell>();
+if (plantCell != null) {
+OnPlantCellAdded(plantCell.GridCoord, plantCell.gameObject);
+}
+else if (debugLogging) {
+Debug.LogWarning($"[{gameObject.name}] RegisterPlantPart: No PlantCell found for renderer {plantPartRenderer.name}");
+}
 }
 
 pub void OnPlantCellAdded(Vector2Int plantCoord, GameObject plantCellGO) {
@@ -8413,11 +8429,17 @@ ToolUse
 [SerializeField] float tileVisualizationAlpha = 0.3f;
 [SerializeField] GameObject tilePrefab;
 
-[SerializeField] Color animalSearchRadiusColor = new Color(1f, 0.5f, 0f, 0.3f);
-[SerializeField] Color plantPoopRadiusColor = new Color(0.6f, 0.4f, 0.2f, 0.3f);
-[SerializeField] Color scentRadiusColor = new Color(1f, 1f, 0f, 0.3f);
-[SerializeField] Color fireflyPhotosynthesisColor = new Color(0f, 1f, 0.5f, 0.3f);
-[SerializeField] Color toolUseRadiusColor = new Color(0f, 0.5f, 1f, 0.3f);
+[SerializeField] pub Color animalSearchRadiusColor = new Color(1f, 0.5f, 0f, 0.3f);
+[SerializeField] pub Color plantPoopRadiusColor = new Color(0.6f, 0.4f, 0.2f, 0.3f);
+[SerializeField] pub Color scentRadiusColor = new Color(1f, 1f, 0f, 0.3f);
+[SerializeField] pub Color fireflyPhotosynthesisColor = new Color(0f, 1f, 0.5f, 0.3f);
+[SerializeField] pub Color toolUseRadiusColor = new Color(0f, 0.5f, 1f, 0.3f);
+
+[SerializeField] bool enableAnimalSearchRadius = true;
+[SerializeField] bool enablePlantPoopRadius = true;
+[SerializeField] bool enableScentRadius = true;
+[SerializeField] bool enableFireflyPhotosynthesis = true;
+[SerializeField] bool enableToolUseRadius = true;
 
 cls RadiusRequest {
 pub GridPosition Center;
@@ -8425,9 +8447,9 @@ pub int Radius;
 pub RadiusType Type;
 }
 
-Dictionary<object, List<GameObject>> oneShotVisualizations = new Dictionary<object, List<GameObject>>();
-Dictionary<object, RadiusRequest> continuousRequests = new Dictionary<object, RadiusRequest>();
-Dictionary<object, (GridPosition center, int radius)> lastDrawnState = new Dictionary<object, (GridPosition, int)>();
+ro Dictionary<object, List<GameObject>> oneShotVisualizations = new Dictionary<object, List<GameObject>>();
+ro Dictionary<object, RadiusRequest> continuousRequests = new Dictionary<object, RadiusRequest>();
+ro Dictionary<object, (GridPosition center, int radius)> lastDrawnState = new Dictionary<object, (GridPosition, int)>();
 
 void Awake() {
 if (Instance != null && Instance != this) {
@@ -8447,7 +8469,7 @@ ProcessContinuousRequests();
 }
 
 pub void ShowContinuousRadius(object source, GridPosition center, int radius, RadiusType type) {
-if (!showRadiusVisualizations || source == null) return;
+if (!showRadiusVisualizations || source == null || !IsTypeEnabled(type)) return;
 
 if (!continuousRequests.ContainsKey(source)) {
 continuousRequests.Add(source, new RadiusRequest());
@@ -8461,6 +8483,7 @@ pub void HideContinuousRadius(object source) {
 if (source == null) return;
 
 if (continuousRequests.Remove(source)) {
+ClearVisualization(source);
 }
 }
 
@@ -8511,20 +8534,80 @@ pub void VisualizeAnimalSearchRadius(AnimalController animal, GridPosition cente
 ShowContinuousRadius(animal, center, radius, RadiusType.AnimalSearch);
 }
 
+pub void VisualizePlantPoopRadius(PlantGrowth plant, GridPosition center, int radius) {
+ShowContinuousRadius(plant, center, radius, RadiusType.PlantPoop);
+}
+
+pub void VisualizeScentRadius(ScentSource scentSource, GridPosition center, int radius) {
+ShowContinuousRadius(scentSource, center, radius, RadiusType.Scent);
+}
+
+pub void VisualizeFireflyPhotosynthesisRadius(FireflyController firefly, GridPosition center, int radius) {
+ShowContinuousRadius(firefly, center, radius, RadiusType.FireflyPhotosynthesis);
+}
+
+pub void VisualizeToolUseRadius(object tool, GridPosition center, int radius) {
+ShowContinuousRadius(tool, center, radius, RadiusType.ToolUse);
+}
+
+pub void SetAnimalSearchRadiusEnabled(bool enabled) { enableAnimalSearchRadius = enabled; }
+pub void SetPlantPoopRadiusEnabled(bool enabled) { enablePlantPoopRadius = enabled; }
+pub void SetScentRadiusEnabled(bool enabled) { enableScentRadius = enabled; }
+pub void SetFireflyPhotosynthesisEnabled(bool enabled) { enableFireflyPhotosynthesis = enabled; }
+pub void SetToolUseRadiusEnabled(bool enabled) { enableToolUseRadius = enabled; }
+
+pub void SetRadiusVisualizationsEnabled(bool enabled) {
+showRadiusVisualizations = enabled;
+if (!enabled) {
+ClearAllVisualizations();
+}
+}
+
+pub Color GetColorForType(RadiusType type) {
+switch (type) {
+case RadiusType.AnimalSearch: ret animalSearchRadiusColor;
+case RadiusType.PlantPoop: ret plantPoopRadiusColor;
+case RadiusType.Scent: ret scentRadiusColor;
+case RadiusType.FireflyPhotosynthesis: ret fireflyPhotosynthesisColor;
+case RadiusType.ToolUse: ret toolUseRadiusColor;
+default: ret Color.white;
+}
+}
+
+bool IsTypeEnabled(RadiusType type) {
+switch (type) {
+case RadiusType.AnimalSearch: ret enableAnimalSearchRadius;
+case RadiusType.PlantPoop: ret enablePlantPoopRadius;
+case RadiusType.Scent: ret enableScentRadius;
+case RadiusType.FireflyPhotosynthesis: ret enableFireflyPhotosynthesis;
+case RadiusType.ToolUse: ret enableToolUseRadius;
+default: ret true;
+}
+}
+
 void ProcessContinuousRequests() {
+if (!showRadiusVisualizations || tilePrefab == null) return;
+
 List<object> sourcesToRemove = new List<object>();
 foreach (var drawnSource in lastDrawnState.Keys) {
 if (!continuousRequests.ContainsKey(drawnSource)) {
 sourcesToRemove.Add(drawnSource);
 }
 }
-foreach(var source in sourcesToRemove) {
+foreach (var source in sourcesToRemove) {
 ClearVisualization(source);
 }
 
 foreach (var kvp in continuousRequests) {
 object source = kvp.Key;
 RadiusRequest request = kvp.Value;
+
+if (!IsTypeEnabled(request.Type)) {
+if (lastDrawnState.ContainsKey(source)) {
+ClearVisualization(source);
+}
+continue;
+}
 
 bool needsRedraw = false;
 if (lastDrawnState.TryGetValue(source, out var lastState)) {
@@ -8544,17 +8627,6 @@ lastDrawnState[source] = (request.Center, request.Radius);
 }
 }
 
-Color GetColorForType(RadiusType type) {
-switch (type) {
-case RadiusType.AnimalSearch: ret animalSearchRadiusColor;
-case RadiusType.PlantPoop: ret plantPoopRadiusColor;
-case RadiusType.Scent: ret scentRadiusColor;
-case RadiusType.FireflyPhotosynthesis: ret fireflyPhotosynthesisColor;
-case RadiusType.ToolUse: ret toolUseRadiusColor;
-default: ret Color.white;
-}
-}
-
 void ClearAllVisualizations() {
 foreach (var kvp in oneShotVisualizations) {
 foreach (var tile in kvp.Value) {
@@ -8565,6 +8637,13 @@ oneShotVisualizations.Clear();
 continuousRequests.Clear();
 lastDrawnState.Clear();
 }
+
+pub bool IsRadiusVisualizationEnabled => showRadiusVisualizations;
+pub bool IsAnimalSearchRadiusEnabled => enableAnimalSearchRadius;
+pub bool IsPlantPoopRadiusEnabled => enablePlantPoopRadius;
+pub bool IsScentRadiusEnabled => enableScentRadius;
+pub bool IsFireflyPhotosynthesisEnabled => enableFireflyPhotosynthesis;
+pub bool IsToolUseRadiusEnabled => enableToolUseRadius;
 }
 
 ////////////////////////////////////////////////////////////

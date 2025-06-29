@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using WegoSystem;
 
@@ -7,11 +6,8 @@ public enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mat
 
 public class PlantGrowth : MonoBehaviour, ITickUpdateable
 {
-    // --- System Toggles ---
-    [Header("System Toggles")]
-
-    // --- Core Component Managers (Initialized in Awake) ---
     public static readonly List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
+
     public PlantCellManager CellManager { get; set; }
     public PlantNodeExecutor NodeExecutor { get; set; }
     public PlantGrowthLogic GrowthLogic { get; set; }
@@ -20,29 +16,20 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
     public NodeGraph NodeGraph { get; set; }
     public PlantState CurrentState { get; set; } = PlantState.Initializing;
 
-    // --- Prefab & Visual References ---
-    [Header("Prefab & Visual References")]
     [SerializeField] GameObject seedCellPrefab;
     [SerializeField] GameObject stemCellPrefab;
     [SerializeField] GameObject leafCellPrefab;
     [SerializeField] GameObject berryCellPrefab;
     [SerializeField] float cellSpacing = 0.08f;
 
-    [Header("Shadow & Outline")]
     [SerializeField] PlantShadowController shadowController;
     [SerializeField] GameObject shadowPartPrefab;
     [SerializeField] bool enableOutline = true;
     [SerializeField] PlantOutlineController outlineController;
-    [SerializeField] GameObject outlinePartPrefab;
+    [SerializeField] GameObject outlinePartPrefab; // Added missing field
 
-    // --- UI Display Settings ---
-    [Header("UI Display Settings")]
-    [SerializeField] public bool showGrowthPercentage = true; // This is the only UI setting needed now
-
-    // --- Gameplay Settings ---
-    [Header("Gameplay Settings")]
+    [SerializeField] public bool showGrowthPercentage = true;
     [SerializeField] public bool allowPhotosynthesisDuringGrowth = false;
-
 
     void Awake()
     {
@@ -57,7 +44,19 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         NodeExecutor = new PlantNodeExecutor(this);
         GrowthLogic = new PlantGrowthLogic(this);
         EnergySystem = new PlantEnergySystem(this);
-        VisualManager = new PlantVisualManager(this, shadowController, shadowPartPrefab, outlineController, outlinePartPrefab, enableOutline);
+        
+        // Get the outline part prefab from the controller if available
+        GameObject outlinePrefabToUse = null;
+        if (outlineController != null && outlineController.outlinePartPrefab != null)
+        {
+            outlinePrefabToUse = outlineController.outlinePartPrefab;
+        }
+        else
+        {
+            outlinePrefabToUse = outlinePartPrefab;
+        }
+        
+        VisualManager = new PlantVisualManager(this, shadowController, shadowPartPrefab, outlineController, outlinePrefabToUse, enableOutline);
     }
 
     void ValidateReferences()
@@ -91,14 +90,18 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
                     setupValid = false;
                 }
             }
-            if (outlinePartPrefab == null)
+
+            // Check if we can get outline part prefab from either source
+            GameObject availableOutlinePrefab = GetOutlinePartPrefab();
+            if (availableOutlinePrefab == null)
             {
                 Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Outline Part Prefab missing but outline is enabled!", this);
                 setupValid = false;
             }
         }
 
-        if (seedCellPrefab == null) {
+        if (seedCellPrefab == null)
+        {
             Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Seed Cell Prefab missing!", this);
             setupValid = false;
         }
@@ -115,9 +118,10 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void Start() {
-        // Always register with TickManager
-        if (TickManager.Instance != null) {
+    void Start()
+    {
+        if (TickManager.Instance != null)
+        {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
         VisualManager.UpdateUI();
@@ -126,32 +130,93 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
     void OnDestroy()
     {
         AllActivePlants.Remove(this);
+
         if (TickManager.Instance != null)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
+
         if (PlantGrowthModifierManager.Instance != null)
         {
             PlantGrowthModifierManager.Instance.UnregisterPlant(this);
         }
+
+        if (GridDebugVisualizer.Instance != null)
+        {
+            GridDebugVisualizer.Instance.HideContinuousRadius(this);
+        }
+
         CellManager?.ClearAllVisuals();
     }
 
-    void Update() {
-        // Only update visual elements - remove all real-time growth logic
+    void Update()
+    {
         VisualManager.UpdateWegoUI();
     }
 
-    public void OnTickUpdate(int currentTick) {
-        // Remove the useWegoSystem check
-        GrowthLogic.OnTickUpdate(currentTick);
+    public void OnTickUpdate(int currentTick)
+    {
+        if (!enabled) return;
+
+        switch (CurrentState)
+        {
+            case PlantState.Initializing:
+                break;
+
+            case PlantState.Growing:
+                GrowthLogic.OnTickUpdate(currentTick);
+                if (allowPhotosynthesisDuringGrowth)
+                {
+                    EnergySystem.AccumulateEnergyTick();
+                }
+                break;
+
+            case PlantState.GrowthComplete:
+                TransitionToMature();
+                break;
+
+            case PlantState.Mature_Idle:
+                EnergySystem.AccumulateEnergyTick();
+                NodeExecutor.ExecuteMatureCycleTick();
+                UpdateRadiusVisualizations(); // Update visualizations during mature state
+                break;
+
+            case PlantState.Mature_Executing:
+                EnergySystem.AccumulateEnergyTick();
+                break;
+        }
+
         VisualManager.UpdateUI();
     }
 
-    public void InitializeAndGrow(NodeGraph graph) {
-        if (graph == null || graph.nodes == null) {
-            Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject);
-            Destroy(gameObject);
+    void UpdateRadiusVisualizations()
+    {
+        if (GridDebugVisualizer.Instance != null)
+        {
+            GridEntity gridEntity = GetComponent<GridEntity>();
+            if (gridEntity != null)
+            {
+                float poopRadius = GetPoopDetectionRadius();
+                if (poopRadius > 0.01f)
+                {
+                    int radiusTiles = Mathf.RoundToInt(poopRadius);
+                    GridDebugVisualizer.Instance.VisualizePlantPoopRadius(this, gridEntity.Position, radiusTiles);
+                }
+                else
+                {
+                    GridDebugVisualizer.Instance.HideContinuousRadius(this);
+                }
+            }
+        }
+    }
+
+    public void InitializeAndGrow(NodeGraph graph)
+    {
+        if (graph == null || graph.nodes == null || graph.nodes.Count == 0)
+        {
+            Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided. Aborting growth.", gameObject);
+            CurrentState = PlantState.Mature_Idle;
+            Destroy(gameObject, 0.1f);
             return;
         }
 
@@ -164,31 +229,52 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         CellManager.LeafDataList.Clear();
 
         GrowthLogic.CalculateAndApplyStats();
+        NodeExecutor.ProcessPassiveEffects(NodeGraph);
 
-        GameObject spawnedSeed = CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero, null, null);
-        if (spawnedSeed != null) {
+        GameObject spawnedSeed = CellManager.CreateSeedCell(Vector2Int.zero);
+        if (spawnedSeed != null)
+        {
             CellManager.RootCellInstance = spawnedSeed;
             RegisterWithManagers();
 
-            if (GrowthLogic.TargetStemLength > 0) {
+            if (GrowthLogic.TargetStemLength > 0)
+            {
                 CurrentState = PlantState.Growing;
                 VisualManager.UpdateGrowthPercentageUI();
             }
-            else {
+            else
+            {
                 Debug.LogWarning($"[{gameObject.name}] Target stem length is {GrowthLogic.TargetStemLength}. Skipping visual growth phase.", gameObject);
                 GrowthLogic.CompleteGrowth();
             }
+
+            VisualManager.UpdateShadow();
+            VisualManager.UpdateOutline();
         }
-        else {
+        else
+        {
             Debug.LogError($"[{gameObject.name}] Failed to spawn initial seed! Aborting growth.", gameObject);
             CurrentState = PlantState.Mature_Idle;
             Destroy(gameObject, 0.1f);
         }
-
-        VisualManager.UpdateUI();
     }
 
-    private void RegisterWithManagers()
+    void TransitionToMature()
+    {
+        CurrentState = PlantState.Mature_Idle;
+
+        if (GrowthLogic.GrowthTicksPerStage <= 1)
+        {
+            Debug.Log($"[{gameObject.name}] Growth completed instantly. Skipping visual growth phase.", gameObject);
+            GrowthLogic.CompleteGrowth();
+        }
+        else
+        {
+            Debug.Log($"[{gameObject.name}] Growth completed! Transitioning to mature state.");
+        }
+    }
+
+    void RegisterWithManagers()
     {
         if (PlantGrowthModifierManager.Instance != null && TileInteractionManager.Instance != null)
         {
@@ -198,11 +284,25 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         }
     }
 
-    // --- Helper Getters ---
-    public bool DoesCellExistAt(Vector2Int coord) => CellManager.DoesCellExistAt(coord);
     public float GetCellSpacing() => cellSpacing;
-    public GameObject GetCellGameObjectAt(Vector2Int coord) => CellManager.GetCellGameObjectAt(coord);
+
     public bool IsOutlineEnabled() => enableOutline;
+
+    public GameObject GetCellGameObjectAt(Vector2Int coord) => CellManager.GetCellGameObjectAt(coord);
+
+    // FIXED: Use proper property to access the outlinePartPrefab
+    public GameObject GetOutlinePartPrefab()
+    {
+        // Try to get from outline controller first, fallback to direct reference
+        if (outlineController != null && outlineController.outlinePartPrefab != null)
+        {
+            return outlineController.outlinePartPrefab;
+        }
+        return outlinePartPrefab;
+    }
+
+    public bool DoesCellExistAt(Vector2Int coord) => CellManager.DoesCellExistAt(coord);
+
     public float GetPoopDetectionRadius() => NodeExecutor.PoopDetectionRadius;
     public void ReportCellDestroyed(Vector2Int coord) => CellManager.ReportCellDestroyed(coord);
     public void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses)

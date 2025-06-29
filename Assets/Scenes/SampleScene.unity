@@ -10907,13 +10907,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa0397c3838c4c9aa01e9859a5f1e1ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showScentRadiiRuntime: 1
-  scentRadiusColorRuntime: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  showPoopAbsorptionRadiiRuntime: 1
-  poopAbsorptionRadiusColorRuntime: {r: 0.2264151, g: 0.15966536, b: 0.09291563, a: 1}
-  circleVisualizerPrefab: {fileID: 4489783331620860270, guid: d6976fed002367344b9cc1365d0a1201, type: 3}
-  circleContainer: {fileID: 1232000946}
-  logGizmoCalls: 0
+  enableDebugLogging: 0
 --- !u!1 &865245884
 GameObject:
   m_ObjectHideFlags: 0
@@ -15532,12 +15526,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92840148c9b740a6a5d66b7201ba4609, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  defaultGrowthSpeedMultiplier: 0.5
-  defaultEnergyRechargeMultiplier: 0.5
+  defaultGrowthSpeedMultiplier: 1
+  defaultEnergyRechargeMultiplier: 1
   tileModifiers:
   - tileDefinition: {fileID: 11400000, guid: 2efc2db88b0caff4693943889a86ccac, type: 2}
-    growthSpeedMultiplier: 1
-    energyRechargeMultiplier: 1
+    growthSpeedMultiplier: 2
+    energyRechargeMultiplier: 2
   tileInteractionManager: {fileID: 1097838751}
   showDebugMessages: 0
   showTileChangeMessages: 0
@@ -16898,14 +16892,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a37449bddd8400b944e2b7ce73fc89b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showRadiusVisualizations: 0
+  showRadiusVisualizations: 1
   tileVisualizationAlpha: 0.2
   tilePrefab: {fileID: 4886254577836975288, guid: 4d4a6b97107455a4e9d4070dd042ca75, type: 3}
   animalSearchRadiusColor: {r: 1, g: 0.5, b: 0, a: 0.3}
-  plantPoopRadiusColor: {r: 0.6, g: 0.4, b: 0.2, a: 0.3}
-  scentRadiusColor: {r: 1, g: 1, b: 0, a: 0.3}
+  plantPoopRadiusColor: {r: 0.2264151, g: 0.16714133, b: 0.10786757, a: 0.3}
+  scentRadiusColor: {r: 1, g: 0, b: 0.5031934, a: 0.3}
   fireflyPhotosynthesisColor: {r: 0, g: 1, b: 0.5, a: 0.3}
   toolUseRadiusColor: {r: 0, g: 0.5, b: 1, a: 0.3}
+  enableAnimalSearchRadius: 0
+  enablePlantPoopRadius: 1
+  enableScentRadius: 1
+  enableFireflyPhotosynthesis: 1
+  enableToolUseRadius: 0
 --- !u!4 &1491144816 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}

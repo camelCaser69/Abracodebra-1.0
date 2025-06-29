@@ -1,11 +1,10 @@
-﻿// Assets\Scripts\PlantSystem\Growth\PlantEnergySystem.cs
-using System.Linq;
+﻿using System.Linq;
 using UnityEngine;
 using WegoSystem;
 
 public class PlantEnergySystem
 {
-    private readonly PlantGrowth plant;
+    readonly PlantGrowth plant;
 
     public float CurrentEnergy { get; set; } = 0f;
     public float MaxEnergy { get; set; } = 10f;
@@ -59,7 +58,6 @@ public class PlantEnergySystem
                 int radiusTiles = Mathf.CeilToInt(fireflyManagerInstance.photosynthesisRadius);
 
                 int nearbyFlyCount = 0;
-                // Use modern, faster FindObjectsByType
                 var fireflies = Object.FindObjectsByType<FireflyController>(FindObjectsSortMode.None);
 
                 foreach (var firefly in fireflies)
@@ -84,5 +82,20 @@ public class PlantEnergySystem
         float totalRate = (standardPhotosynthesis + (fireflyBonusRate / ticksPerSecond)) * tileMultiplier;
 
         CurrentEnergy = Mathf.Clamp(CurrentEnergy + totalRate, 0f, MaxEnergy);
+    }
+
+    public void SpendEnergy(float amount)
+    {
+        CurrentEnergy = Mathf.Max(0f, CurrentEnergy - amount);
+    }
+
+    public void AddEnergy(float amount)
+    {
+        CurrentEnergy = Mathf.Clamp(CurrentEnergy + amount, 0f, MaxEnergy);
+    }
+
+    public bool HasEnergy(float amount)
+    {
+        return CurrentEnergy >= amount;
     }
 }

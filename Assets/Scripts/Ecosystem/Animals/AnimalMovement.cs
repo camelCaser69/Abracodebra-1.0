@@ -1,39 +1,29 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using WegoSystem;
 
 public class AnimalMovement : MonoBehaviour
 {
-    #region Standard Unity Using Statements
-    // These are commonly used and can be added back for clarity.
-    // using System;
-    // using System.Collections;
-    #endregion
+    [SerializeField] bool showPathfindingDebugLine = false;
 
-    [Header("Debugging")]
-    [SerializeField] private bool showPathfindingDebugLine = false;
+    AnimalController controller;
+    AnimalDefinition definition;
+    GridEntity gridEntity;
+    LineRenderer pathDebugLine;
 
-    // --- Component References ---
-    private AnimalController controller;
-    private AnimalDefinition definition;
-    private GridEntity gridEntity;
-    private LineRenderer pathDebugLine;
+    List<GridPosition> currentPath = new List<GridPosition>();
+    int currentPathIndex = 0;
+    GameObject currentTargetFood = null;
+    bool hasPlannedAction = false;
+    int wanderPauseTicks = 0;
+    int lastThinkTick = 0;
 
-    // --- State ---
-    private List<GridPosition> currentPath = new List<GridPosition>();
-    private int currentPathIndex = 0;
-    private GameObject currentTargetFood = null;
-    private bool hasPlannedAction = false;
-    private int wanderPauseTicks = 0;
-    private int lastThinkTick = 0;
+    bool isSeekingScreenCenter = false;
+    Vector2 screenCenterTarget;
+    Vector2 minBounds;
+    Vector2 maxBounds;
 
-    private bool isSeekingScreenCenter = false;
-    private Vector2 screenCenterTarget;
-    private Vector2 minBounds;
-    private Vector2 maxBounds;
-
-    private Vector2 lastMoveDirection;
+    Vector2 lastMoveDirection;
 
     public bool HasTarget => currentTargetFood != null || hasPlannedAction;
     public GameObject CurrentTargetFood => currentTargetFood;
@@ -57,14 +47,12 @@ public class AnimalMovement : MonoBehaviour
             return;
         }
 
-        // Think about what to do next
         if (currentTick - lastThinkTick >= definition.thinkingTickInterval)
         {
             MakeMovementDecision();
             lastThinkTick = currentTick;
         }
 
-        // If we have a plan and we're not moving, execute the next step
         if (hasPlannedAction && !gridEntity.IsMoving)
         {
             ExecutePlannedMovement();
@@ -76,7 +64,7 @@ public class AnimalMovement : MonoBehaviour
         UpdatePathDebugLine();
     }
 
-    private void MakeMovementDecision()
+    void MakeMovementDecision()
     {
         if (gridEntity.IsMoving) return;
 
@@ -96,7 +84,7 @@ public class AnimalMovement : MonoBehaviour
         }
     }
 
-    private void PlanFoodSeeking()
+    void PlanFoodSeeking()
     {
         if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild)
         {
@@ -115,24 +103,21 @@ public class AnimalMovement : MonoBehaviour
         }
         else
         {
-            // No food found, just wander
             PlanWandering();
         }
     }
 
-    private GameObject FindNearestFood()
+    GameObject FindNearestFood()
     {
         if (definition.diet == null) return null;
 
-        // Try the more optimized grid-based search first
         GameObject foodFromGrid = FindFoodInGrid();
         if (foodFromGrid != null) return foodFromGrid;
 
-        // Fallback to collider-based search
         return FindFoodByCollider();
     }
 
-    private GameObject FindFoodInGrid()
+    GameObject FindFoodInGrid()
     {
         var entitiesInRadius = GridPositionManager.Instance.GetEntitiesInRadius(
             gridEntity.Position,
@@ -153,7 +138,6 @@ public class AnimalMovement : MonoBehaviour
                 var pref = definition.diet.GetPreference(foodItem.foodType);
                 if (pref == null) continue;
 
-                // --- FIX: Use the helper to get the food's *actual* ground position for distance calculation.
                 GridPosition foodGroundPos = GetFoodGroundPosition(entity.gameObject);
                 float distance = gridEntity.Position.ManhattanDistance(foodGroundPos);
 
@@ -162,7 +146,7 @@ public class AnimalMovement : MonoBehaviour
                 if (score > bestScore)
                 {
                     bestScore = score;
-                    bestFood = entity.gameObject; // We still return the specific part to eat.
+                    bestFood = entity.gameObject;
                 }
             }
         }
@@ -170,22 +154,20 @@ public class AnimalMovement : MonoBehaviour
         return bestFood;
     }
 
-    private GameObject FindFoodByCollider()
+    GameObject FindFoodByCollider()
     {
         Vector3 worldPos = transform.position;
-        float worldRadius = definition.searchRadiusTiles * GridPositionManager.Instance.GetTilemapGrid().cellSize.x;
+        float tileSize = GridPositionManager.Instance.GetTilemapGrid()?.cellSize.x ?? 1f;
+        float searchRadius = definition.searchRadiusTiles * tileSize;
 
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(worldPos, worldRadius);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(worldPos, searchRadius);
 
         GameObject bestFood = null;
         float bestScore = -1f;
 
         foreach (var collider in colliders)
         {
-            if (collider == null || collider.gameObject == this.gameObject) continue;
-
-            // Ignore poop
-            if (collider.GetComponent<PoopController>() != null) continue;
+            if (collider.gameObject == this.gameObject) continue;
 
             FoodItem foodItem = collider.GetComponent<FoodItem>();
             if (foodItem != null && foodItem.foodType != null && definition.diet.CanEat(foodItem.foodType))
@@ -193,10 +175,7 @@ public class AnimalMovement : MonoBehaviour
                 var pref = definition.diet.GetPreference(foodItem.foodType);
                 if (pref == null) continue;
 
-                // --- FIX: Use the helper to get the food's ground position and calculate distance based on the grid
-                GridPosition foodGroundPos = GetFoodGroundPosition(collider.gameObject);
-                float distance = gridEntity.Position.ManhattanDistance(foodGroundPos);
-                
+                float distance = Vector3.Distance(worldPos, collider.transform.position);
                 float score = pref.preferencePriority / (1f + distance);
 
                 if (score > bestScore)
@@ -210,62 +189,37 @@ public class AnimalMovement : MonoBehaviour
         return bestFood;
     }
 
-    /// <summary>
-    /// Gets the root grid position of a food object, correctly handling plants.
-    /// This is the key to ensuring animals navigate to the base of a plant, not an offset part like a leaf.
-    /// </summary>
-    private GridPosition GetFoodGroundPosition(GameObject food)
+    GridPosition GetFoodGroundPosition(GameObject food)
     {
-        if (food == null) return GridPosition.Zero;
-
-        // The most reliable way to find a plant's root is to look for the PlantGrowth component in its hierarchy.
-        // GetComponentInParent will check the object itself and then its parents.
-        PlantGrowth plantRoot = food.GetComponentInParent<PlantGrowth>();
-
-        if (plantRoot != null)
+        GridEntity foodEntity = food.GetComponent<GridEntity>();
+        if (foodEntity != null)
         {
-            // If we found a PlantGrowth root, its GridEntity holds the true ground position.
-            GridEntity plantGridEntity = plantRoot.GetComponent<GridEntity>();
-            if (plantGridEntity != null)
-            {
-                return plantGridEntity.Position;
-            }
+            return foodEntity.Position;
         }
 
-        // If it's not part of a plant, try to get its own GridEntity.
-        GridEntity foodGridEntity = food.GetComponent<GridEntity>();
-        if (foodGridEntity != null)
-        {
-            return foodGridEntity.Position;
-        }
-
-        // Fallback: if no GridEntity is found, calculate from world position.
-        return GridPositionManager.Instance.WorldToGrid(food.transform.position);
+        Vector3 foodWorldPos = food.transform.position;
+        return GridPositionManager.Instance.WorldToGrid(foodWorldPos);
     }
 
-
-    private void SetTargetFood(GameObject food)
+    void SetTargetFood(GameObject food)
     {
         currentTargetFood = food;
+        GridPosition foodGroundPos = GetFoodGroundPosition(food);
 
-        // --- FIX: Use the helper to get the correct ground-level grid position for the food
-        GridPosition foodGridPos = GetFoodGroundPosition(food);
-
-        currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGridPos, false);
-        currentPathIndex = 0;
-
-        if (currentPath.Count > 0)
+        List<GridPosition> path = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGroundPos, false);
+        if (path != null && path.Count > 0)
         {
+            currentPath = path;
+            currentPathIndex = 0;
             hasPlannedAction = true;
         }
         else
         {
-            currentPath.Clear();
-            hasPlannedAction = false;
+            currentTargetFood = null;
         }
     }
 
-    private void PlanWandering()
+    void PlanWandering()
     {
         if (GridDebugVisualizer.Instance != null)
         {
@@ -276,7 +230,6 @@ public class AnimalMovement : MonoBehaviour
         currentPath.Clear();
         currentTargetFood = null;
 
-        // Chance to just pause for a bit
         if (Random.Range(0, 100) < definition.wanderPauseTickChance)
         {
             wanderPauseTicks = Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
@@ -290,7 +243,6 @@ public class AnimalMovement : MonoBehaviour
             GridPosition.Left, GridPosition.Right
         };
 
-        // Shuffle directions to avoid bias
         for (int i = 0; i < directions.Length; i++)
         {
             int randomIndex = Random.Range(i, directions.Length);
@@ -299,7 +251,6 @@ public class AnimalMovement : MonoBehaviour
             directions[randomIndex] = temp;
         }
 
-        // Try to move in a random valid direction
         foreach (var dir in directions)
         {
             GridPosition targetPos = currentPos + dir;
@@ -313,18 +264,15 @@ public class AnimalMovement : MonoBehaviour
             }
         }
 
-        // No valid moves found
         hasPlannedAction = false;
     }
 
-    private void ExecutePlannedMovement()
+    void ExecutePlannedMovement()
     {
         if (!hasPlannedAction || gridEntity.IsMoving) return;
 
-        // If we are close enough to our food target, eat it
         if (currentTargetFood != null)
         {
-            // --- FIX: Use the helper to get the correct ground position for distance checking
             GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
             int distance = gridEntity.Position.ManhattanDistance(foodPos);
 
@@ -336,7 +284,6 @@ public class AnimalMovement : MonoBehaviour
             }
         }
 
-        // Otherwise, continue moving along the path
         if (currentPath != null && currentPath.Count > 0 && currentPathIndex < currentPath.Count)
         {
             GridPosition nextPosition = currentPath[currentPathIndex];
@@ -345,7 +292,6 @@ public class AnimalMovement : MonoBehaviour
             {
                 currentPathIndex++;
 
-                // If we've reached the end of the path, clear the plan
                 if (currentPathIndex >= currentPath.Count)
                 {
                     ClearMovementPlan();
@@ -353,7 +299,6 @@ public class AnimalMovement : MonoBehaviour
             }
             else
             {
-                // If we can't move to the next position, re-plan
                 if (currentTargetFood != null)
                 {
                     SetTargetFood(currentTargetFood); // Re-path to the same food
@@ -366,14 +311,14 @@ public class AnimalMovement : MonoBehaviour
         }
         else
         {
-            // No path, or path is complete
             hasPlannedAction = false;
         }
     }
 
-    private bool TryMoveTo(GridPosition targetPos)
+    bool TryMoveTo(GridPosition targetPos)
     {
-        if (!IsValidMove(targetPos)) return false;
+        if (!IsValidMove(targetPos))
+            return false;
 
         Vector3 currentWorld = transform.position;
         Vector3 targetWorld = GridPositionManager.Instance.GridToWorld(targetPos);
@@ -383,17 +328,14 @@ public class AnimalMovement : MonoBehaviour
         return true;
     }
 
-    private bool IsValidMove(GridPosition pos)
+    bool IsValidMove(GridPosition pos)
     {
         if (GridPositionManager.Instance == null) return false;
 
-        // Is the position within the grid bounds?
         if (!GridPositionManager.Instance.IsPositionValid(pos)) return false;
 
-        // Is the tile occupied by something we can't move into?
         if (GridPositionManager.Instance.IsPositionOccupied(pos))
         {
-            // Exception: we can move "into" our food target's tile to eat it
             if (currentTargetFood != null)
             {
                 GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
@@ -405,7 +347,7 @@ public class AnimalMovement : MonoBehaviour
         return true;
     }
 
-    private void HandleScreenCenterSeeking()
+    void HandleScreenCenterSeeking()
     {
         Vector2 currentPos = transform.position;
         bool centerWithinBounds = currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
@@ -413,13 +355,11 @@ public class AnimalMovement : MonoBehaviour
 
         if (centerWithinBounds)
         {
-            // We've reached the screen, stop seeking
             isSeekingScreenCenter = false;
             hasPlannedAction = false;
         }
         else
         {
-            // Still offscreen, plan a path to the center
             GridPosition targetGridPos = GridPositionManager.Instance.WorldToGrid(screenCenterTarget);
             currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, targetGridPos, false);
             currentPathIndex = 0;
@@ -461,8 +401,7 @@ public class AnimalMovement : MonoBehaviour
         return lastMoveDirection;
     }
 
-    #region Debugging
-    private void SetupDebugLineRenderer()
+    void SetupDebugLineRenderer()
     {
         if (!showPathfindingDebugLine) return;
 
@@ -477,7 +416,7 @@ public class AnimalMovement : MonoBehaviour
         pathDebugLine.sortingOrder = 100;
     }
 
-    private void UpdatePathDebugLine()
+    void UpdatePathDebugLine()
     {
         if (!showPathfindingDebugLine || pathDebugLine == null || currentPath == null || currentPath.Count == 0)
         {
@@ -486,12 +425,10 @@ public class AnimalMovement : MonoBehaviour
         }
 
         List<Vector3> positions = new List<Vector3>();
-        
-        // Start the line from the animal's current ground position
+
         Vector3 groundPosition = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
         positions.Add(groundPosition);
 
-        // Add the rest of the path waypoints
         for (int i = currentPathIndex; i < currentPath.Count; i++)
         {
             Vector3 worldPos = GridPositionManager.Instance.GridToWorld(currentPath[i]);
@@ -502,12 +439,11 @@ public class AnimalMovement : MonoBehaviour
         pathDebugLine.SetPositions(positions.ToArray());
     }
 
-    private void ClearPathDebugLine()
+    void ClearPathDebugLine()
     {
         if (pathDebugLine != null)
         {
             pathDebugLine.positionCount = 0;
         }
     }
-    #endregion
 }

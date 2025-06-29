@@ -1,59 +1,101 @@
 ﻿using UnityEngine;
 using WegoSystem;
 
-public class ScentSource : MonoBehaviour {
-    public ScentDefinition definition;
-    public float radiusModifier = 0f;
-    public float strengthModifier = 0f;
-    
+public class ScentSource : MonoBehaviour
+{
+    [SerializeField] ScentDefinition definition;
+    [SerializeField] float radiusModifier = 0f;
+    [SerializeField] float strengthModifier = 0f;
+
+    public ScentDefinition Definition => definition;
+    public float EffectiveRadius => definition != null ? Mathf.Max(0f, definition.baseRadius + radiusModifier) : 0f;
+    public float EffectiveStrength => definition != null ? Mathf.Max(0f, definition.baseStrength + strengthModifier) : 0f;
+
     GridEntity gridEntity;
-    
-    public float EffectiveRadius => Mathf.Max(0f, (definition != null ? definition.baseRadius : 0f) + radiusModifier);
-    public float EffectiveStrength => Mathf.Max(0f, (definition != null ? definition.baseStrength : 0f) + strengthModifier);
-    
-    void Awake() {
+
+    void Awake()
+    {
         gridEntity = GetComponent<GridEntity>();
-        if (gridEntity == null) {
+        if (gridEntity == null)
+        {
             gridEntity = gameObject.AddComponent<GridEntity>();
         }
     }
-    
-    void OnDrawGizmosSelected() {
-        if (definition == null || !Application.isPlaying) return;
-        
-        // Get grid position
-        if (gridEntity == null) gridEntity = GetComponent<GridEntity>();
-        if (gridEntity == null) return;
-        
-        int effectiveRadiusTiles = Mathf.RoundToInt(EffectiveRadius);
-        if (effectiveRadiusTiles <= 0) return;
-        
-        // Draw grid-based radius
-        var affectedTiles = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, effectiveRadiusTiles);
-        
-        // Set color based on definition
-        Random.State prevState = Random.state;
-        Random.InitState(definition.name.GetHashCode());
-        Color gizmoColor = Random.ColorHSV(0f, 1f, 0.7f, 0.9f, 0.8f, 1f);
-        gizmoColor.a = 0.3f;
-        Random.state = prevState;
-        
-        Gizmos.color = gizmoColor;
-        
-        // Draw each affected tile
-        foreach (var tile in affectedTiles) {
-            Vector3 tileWorld = GridPositionManager.Instance.GridToWorld(tile);
-            Gizmos.DrawCube(tileWorld, Vector3.one * 0.9f); // Slightly smaller than full tile
+
+    void Start()
+    {
+        // Snap to grid if needed
+        if (GridPositionManager.Instance != null)
+        {
+            GridPositionManager.Instance.SnapEntityToGrid(gameObject);
         }
-        
-        // Draw outline
-        var outlineTiles = GridRadiusUtility.GetCircleOutline(gridEntity.Position, effectiveRadiusTiles);
-        gizmoColor.a = 0.8f;
-        Gizmos.color = gizmoColor;
-        
-        foreach (var tile in outlineTiles) {
-            Vector3 tileWorld = GridPositionManager.Instance.GridToWorld(tile);
-            Gizmos.DrawWireCube(tileWorld, Vector3.one);
+    }
+
+    void Update()
+    {
+        UpdateRadiusVisualization();
+    }
+
+    void UpdateRadiusVisualization()
+    {
+        if (GridDebugVisualizer.Instance != null && definition != null && gridEntity != null)
+        {
+            float effectiveRadius = EffectiveRadius;
+            if (effectiveRadius > 0.01f)
+            {
+                int radiusTiles = Mathf.RoundToInt(effectiveRadius);
+                GridDebugVisualizer.Instance.VisualizeScentRadius(this, gridEntity.Position, radiusTiles);
+            }
+            else
+            {
+                GridDebugVisualizer.Instance.HideContinuousRadius(this);
+            }
         }
+    }
+
+    public void SetDefinition(ScentDefinition newDefinition)
+    {
+        definition = newDefinition;
+        UpdateRadiusVisualization(); // Update visualization when definition changes
+    }
+
+    public void SetRadiusModifier(float modifier)
+    {
+        radiusModifier = modifier;
+    }
+
+    public void SetStrengthModifier(float modifier)
+    {
+        strengthModifier = modifier;
+    }
+
+    public void ApplyModifiers(float radiusMod, float strengthMod)
+    {
+        radiusModifier += radiusMod;
+        strengthModifier += strengthMod;
+    }
+
+    void OnDestroy()
+    {
+        // Clean up radius visualization when scent source is destroyed
+        if (GridDebugVisualizer.Instance != null)
+        {
+            GridDebugVisualizer.Instance.HideContinuousRadius(this);
+        }
+    }
+
+    void OnDisable()
+    {
+        // Hide visualization when disabled
+        if (GridDebugVisualizer.Instance != null)
+        {
+            GridDebugVisualizer.Instance.HideContinuousRadius(this);
+        }
+    }
+
+    void OnEnable()
+    {
+        // Show visualization when enabled (if appropriate)
+        UpdateRadiusVisualization();
     }
 }

@@ -194,29 +194,28 @@ public void CalculateAndApplyStats()
 
     // Replace the GrowNextStemStage method in PlantGrowthLogic.cs:
 
+// PARTIAL FIX: Only the GrowNextStemStage method needs to be updated
+// Replace the existing GrowNextStemStage method in PlantGrowthLogic.cs with this:
+
 void GrowNextStemStage()
 {
     if (currentStemStage >= TargetStemLength) return;
-    
+
     currentStemStage++;
-    
-    // Always grow stem from the previous stem position
+
     Vector2Int stemPos;
     if (currentStemStage == 1)
     {
-        // First stem grows from seed at (0,0)
         stemPos = Vector2Int.up;
     }
     else
     {
-        // Find the previous stem position
         Vector2Int previousStemPos = Vector2Int.zero;
         bool foundPreviousStem = false;
-        
-        // Search for the highest stem that exists
+
+        // Find the previous stem position
         for (int i = currentStemStage - 1; i >= 1; i--)
         {
-            // Check for stem at this height
             var cells = plant.CellManager.GetCells();
             foreach (var kvp in cells)
             {
@@ -229,17 +228,16 @@ void GrowNextStemStage()
             }
             if (foundPreviousStem) break;
         }
-        
+
         if (!foundPreviousStem)
         {
             Debug.LogError($"[{plant.gameObject.name}] Could not find previous stem at stage {currentStemStage - 1}! Using default position.");
             previousStemPos = Vector2Int.up * (currentStemStage - 1);
         }
-        
-        // New stem grows from previous stem position
+
+        // Calculate new stem position
         stemPos = previousStemPos + Vector2Int.up;
-        
-        // Apply randomness for wobble effect
+
         if (Random.value < GrowthRandomness)
         {
             int wobbleDirection = (Random.value < 0.5f) ? -1 : 1;
@@ -249,26 +247,68 @@ void GrowNextStemStage()
         {
             stemPos.x = previousStemPos.x; // Grow straight up
         }
+
+        // FIXED: Check if the position is already occupied and find alternative
+        int attempts = 0;
+        while (plant.CellManager.HasCellAt(stemPos) && attempts < 5)
+        {
+            attempts++;
+            // Try alternative positions: straight up, then left, then right
+            switch (attempts)
+            {
+                case 1:
+                    stemPos = previousStemPos + Vector2Int.up; // Straight up
+                    break;
+                case 2:
+                    stemPos = previousStemPos + Vector2Int.up + Vector2Int.left; // Up-left
+                    break;
+                case 3:
+                    stemPos = previousStemPos + Vector2Int.up + Vector2Int.right; // Up-right
+                    break;
+                case 4:
+                    stemPos = previousStemPos + Vector2Int.up + new Vector2Int(0, 1); // Two up
+                    break;
+                default:
+                    stemPos = previousStemPos + Vector2Int.up; // Default fallback
+                    break;
+            }
+        }
+
+        // If still occupied after all attempts, log detailed error
+        if (plant.CellManager.HasCellAt(stemPos))
+        {
+            var existingCellType = plant.CellManager.GetCellTypeAt(stemPos);
+            Debug.LogError($"[{plant.gameObject.name}] Cannot spawn stem at stage {currentStemStage} - position {stemPos} occupied by {existingCellType}! Previous stem was at {previousStemPos}");
+            return;
+        }
     }
-    
-    // Spawn the stem cell
+
+    // Spawn the stem
     GameObject stemCell = plant.CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos, null, null);
     if (stemCell == null)
     {
-        Debug.LogError($"[{plant.gameObject.name}] Failed to spawn stem at stage {currentStemStage}");
+        Debug.LogError($"[{plant.gameObject.name}] Failed to spawn stem at stage {currentStemStage} at position {stemPos}");
         return;
     }
-    
+
     // Add leaves if appropriate
     if (LeafGap >= 0 && (currentStemStage % (LeafGap + 1)) == 0)
     {
         var leafPositions = plant.CellManager.CalculateLeafPositions(stemPos, currentStemStage, LeafPattern);
         foreach (Vector2Int leafPos in leafPositions)
         {
-            GameObject leafCell = plant.CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos, null, null);
-            if (leafCell != null)
+            // Check if leaf position is available before spawning
+            if (!plant.CellManager.HasCellAt(leafPos))
             {
-                plant.CellManager.LeafDataList.Add(new LeafData(leafPos, true));
+                GameObject leafCell = plant.CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos, null, null);
+                if (leafCell != null)
+                {
+                    plant.CellManager.LeafDataList.Add(new LeafData(leafPos, true));
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[{plant.gameObject.name}] Skipping leaf at {leafPos} - position occupied");
             }
         }
     }

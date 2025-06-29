@@ -1,38 +1,19 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
+﻿using System.Collections.Generic;
+using UnityEngine;
+using WegoSystem;
 
 public class FloraManager : MonoBehaviour
 {
     public static FloraManager Instance { get; private set; }
 
-    [Header("Scent Visualization")]
-    [SerializeField] private bool showScentRadiiRuntime = false;
-    [SerializeField] private Color scentRadiusColorRuntime = Color.yellow;
+    [Header("Debug")]
+    [SerializeField] private bool enableDebugLogging = false;
 
-    [Header("Poop Absorption Visualization")]
-    [SerializeField] private bool showPoopAbsorptionRadiiRuntime = false;
-    [SerializeField] private Color poopAbsorptionRadiusColorRuntime = new Color(0.6f, 0.4f, 0.2f, 0.5f); // Brown-ish color
+    // Tracking sets for what we're currently monitoring (not controlling!)
+    private readonly HashSet<ScentSource> trackedScentSources = new HashSet<ScentSource>();
+    private readonly HashSet<PlantGrowth> trackedPlants = new HashSet<PlantGrowth>();
 
-    [Header("System References")]
-    [SerializeField] private GameObject circleVisualizerPrefab;
-    [SerializeField] private Transform circleContainer;
-
-    [Header("Debugging")]
-    [SerializeField] private bool logGizmoCalls = false;
-
-    public bool ShowScentRadiiRuntime => showScentRadiiRuntime;
-    public Color ScentRadiusColorRuntime => scentRadiusColorRuntime;
-    public bool ShowPoopAbsorptionRadiiRuntime => showPoopAbsorptionRadiiRuntime;
-    public Color PoopAbsorptionRadiusColorRuntime => poopAbsorptionRadiusColorRuntime;
-
-    private readonly Dictionary<ScentSource, RuntimeCircleDrawer> _activeCircleVisualizers = new Dictionary<ScentSource, RuntimeCircleDrawer>();
-    private readonly Dictionary<PlantGrowth, RuntimeCircleDrawer> _activePoopAbsorptionCircleVisualizers = new Dictionary<PlantGrowth, RuntimeCircleDrawer>();
-
-    private void Awake()
+    void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -41,243 +22,219 @@ public class FloraManager : MonoBehaviour
         }
         Instance = this;
 
-        if (circleVisualizerPrefab == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Visualizer Prefab is not assigned!", this); }
-        if (circleContainer == null) { Debug.LogError($"[{nameof(FloraManager)}] Circle Container transform is not assigned!", this); }
+        if (enableDebugLogging)
+        {
+            Debug.Log($"[FloraManager] Initialized - all radius visualization controlled by GridDebugVisualizer only");
+        }
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
         if (Instance == this) Instance = null;
 
-        foreach (var kvp in _activeCircleVisualizers)
-        {
-            if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-        }
-        _activeCircleVisualizers.Clear();
-
-        foreach (var kvp in _activePoopAbsorptionCircleVisualizers)
-        {
-            if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-        }
-        _activePoopAbsorptionCircleVisualizers.Clear();
+        // Clean up any active visualizations through GridDebugVisualizer
+        CleanupAllVisualizations();
     }
 
-    private void Update()
+    void Update()
     {
-        if (!Application.isPlaying) return;
-        UpdateRuntimeCircleVisualizers();
-        UpdatePoopAbsorptionCircleVisualizers();
+        if (!Application.isPlaying || GridDebugVisualizer.Instance == null) return;
+
+        // Automatically track scent sources and plants based on GridDebugVisualizer settings
+        UpdateScentRadiusTracking();
+        UpdatePoopAbsorptionTracking();
     }
 
-    private void UpdatePoopAbsorptionCircleVisualizers()
+    public float GetPlantPoopDetectionRadius(PlantGrowth plant)
     {
-        if (!Application.isPlaying) return;
-
-        bool showCircles = showPoopAbsorptionRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
-
-        if (!showCircles)
-        {
-            foreach (var kvp in _activePoopAbsorptionCircleVisualizers)
-            {
-                if (kvp.Value != null) Destroy(kvp.Value.gameObject);
-            }
-            _activePoopAbsorptionCircleVisualizers.Clear();
-            return;
-        }
-
-        // --- MODIFICATION START ---
-        // Use the cached static list of plants instead of FindObjectsByType
-        var currentPlantsSet = new HashSet<PlantGrowth>(PlantGrowth.AllActivePlants);
-        // --- MODIFICATION END ---
-        
-        var plantsToRemove = new List<PlantGrowth>();
-
-        // Prune visualizers for destroyed or inactive plants
-        foreach (var kvp in _activePoopAbsorptionCircleVisualizers)
-        {
-            PlantGrowth plant = kvp.Key;
-            RuntimeCircleDrawer drawer = kvp.Value;
-
-            if (plant == null || drawer == null || !plant.gameObject.activeInHierarchy || !currentPlantsSet.Contains(plant))
-            {
-                plantsToRemove.Add(plant);
-                if (drawer != null) Destroy(drawer.gameObject);
-                continue;
-            }
-
-            float poopRadius = GetPlantPoopDetectionRadius(plant);
-            bool shouldShowThis = showCircles && poopRadius > 0.01f;
-
-            if (shouldShowThis)
-            {
-                drawer.transform.position = plant.transform.position;
-                drawer.UpdateCircle(poopRadius, poopAbsorptionRadiusColorRuntime);
-            }
-            else
-            {
-                drawer.HideCircle();
-                plantsToRemove.Add(plant); // If radius is too small or zero, remove the visualizer
-            }
-        }
-
-        foreach (var plant in plantsToRemove)
-        {
-            if (_activePoopAbsorptionCircleVisualizers.TryGetValue(plant, out var drawer))
-            {
-                if (drawer != null) Destroy(drawer.gameObject);
-                _activePoopAbsorptionCircleVisualizers.Remove(plant);
-            }
-        }
-
-        // --- MODIFICATION START ---
-        // Add visualizers for new plants by iterating the static list
-        foreach (PlantGrowth plant in PlantGrowth.AllActivePlants)
-        // --- MODIFICATION END ---
-        {
-            if (plant == null || _activePoopAbsorptionCircleVisualizers.ContainsKey(plant)) continue;
-
-            float poopRadius = GetPlantPoopDetectionRadius(plant);
-            if (poopRadius <= 0.01f) continue;
-
-            GameObject circleGO = Instantiate(circleVisualizerPrefab, plant.transform.position, Quaternion.identity, circleContainer);
-            var newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
-
-            if (newDrawer != null)
-            {
-                newDrawer.UpdateCircle(poopRadius, poopAbsorptionRadiusColorRuntime);
-                _activePoopAbsorptionCircleVisualizers.Add(plant, newDrawer);
-            }
-            else
-            {
-                Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
-                Destroy(circleGO);
-            }
-        }
-    }
-
-    private float GetPlantPoopDetectionRadius(PlantGrowth plant)
-    {
-        if (plant == null) return 0f;
+        if (plant == null || plant.NodeExecutor == null) return 0f;
         return plant.GetPoopDetectionRadius();
     }
 
-    private void UpdateRuntimeCircleVisualizers()
+    void UpdateScentRadiusTracking()
     {
-        if (!Application.isPlaying) return;
+        // Check if scent radius visualization is enabled in GridDebugVisualizer
+        bool shouldShow = GridDebugVisualizer.Instance.IsScentRadiusEnabled && 
+                         GridDebugVisualizer.Instance.IsRadiusVisualizationEnabled;
 
-        bool showCircles = showScentRadiiRuntime && circleVisualizerPrefab != null && circleContainer != null;
-        var sourcesToRemove = new List<ScentSource>();
-
-        // Prune visualizers for destroyed or inactive sources
-        foreach (var kvp in _activeCircleVisualizers)
+        if (!shouldShow)
         {
-            ScentSource source = kvp.Key;
-            RuntimeCircleDrawer line = kvp.Value;
+            // Hide all scent visualizations if disabled in GridDebugVisualizer
+            foreach (var source in trackedScentSources)
+            {
+                if (source != null)
+                {
+                    GridDebugVisualizer.Instance.HideContinuousRadius(source);
+                }
+            }
+            trackedScentSources.Clear();
+            return;
+        }
 
-            if (source == null || line == null || !source.gameObject.activeInHierarchy)
+        // Get all current scent sources
+        ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
+        var currentSourcesSet = new HashSet<ScentSource>(currentSources);
+
+        // Remove visualizations for sources that no longer exist or are disabled
+        var sourcesToRemove = new HashSet<ScentSource>();
+        foreach (var source in trackedScentSources)
+        {
+            if (source == null || !source.enabled || !currentSourcesSet.Contains(source))
             {
                 sourcesToRemove.Add(source);
-                if (line != null) Destroy(line.gameObject);
-                continue;
-            }
-
-            bool shouldShowThis = showCircles && source.enabled && source.definition != null && source.EffectiveRadius > 0.01f;
-
-            if (shouldShowThis)
-            {
-                line.transform.position = source.transform.position;
-                line.transform.rotation = source.transform.rotation;
-                line.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
-            }
-            else
-            {
-                line.HideCircle();
+                if (source != null)
+                {
+                    GridDebugVisualizer.Instance.HideContinuousRadius(source);
+                }
             }
         }
 
         foreach (var source in sourcesToRemove)
         {
-            if (_activeCircleVisualizers.TryGetValue(source, out var drawer) && drawer != null)
-                Destroy(drawer.gameObject);
-            _activeCircleVisualizers.Remove(source);
+            trackedScentSources.Remove(source);
         }
 
-        if (showCircles)
+        // Add visualizations for active scent sources
+        foreach (ScentSource source in currentSources)
         {
-            // Add visualizers for new ScentSource objects
-            ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
-            foreach (ScentSource source in currentSources)
-            {
-                if (source == null || _activeCircleVisualizers.ContainsKey(source) || !source.enabled ||
-                    source.definition == null || source.EffectiveRadius <= 0.01f) continue;
+            if (source == null || !source.enabled || source.Definition == null) continue;
 
-                GameObject circleGO = Instantiate(circleVisualizerPrefab, source.transform.position, source.transform.rotation, circleContainer);
-                var newDrawer = circleGO.GetComponent<RuntimeCircleDrawer>();
-
-                if (newDrawer != null)
-                {
-                    newDrawer.UpdateCircle(source.EffectiveRadius, scentRadiusColorRuntime);
-                    _activeCircleVisualizers.Add(source, newDrawer);
-                }
-                else
-                {
-                    Debug.LogError($"Circle Visualizer Prefab '{circleVisualizerPrefab.name}' is missing RuntimeCircleDrawer script!", circleVisualizerPrefab);
-                    Destroy(circleGO);
-                }
-            }
-        }
-        else if (!showCircles && _activeCircleVisualizers.Count > 0)
-        {
-            // If disabled, destroy all existing scent visualizers
-            foreach (var kvp in _activeCircleVisualizers)
+            float radius = source.EffectiveRadius;
+            if (radius <= 0.01f) 
             {
-                if (kvp.Value != null) Destroy(kvp.Value.gameObject);
+                if (trackedScentSources.Contains(source))
+                {
+                    GridDebugVisualizer.Instance.HideContinuousRadius(source);
+                    trackedScentSources.Remove(source);
+                }
+                continue;
             }
-            _activeCircleVisualizers.Clear();
+
+            // Get the grid position for the scent source
+            GridEntity gridEntity = source.GetComponent<GridEntity>();
+            if (gridEntity != null)
+            {
+                int radiusTiles = Mathf.RoundToInt(radius);
+                GridDebugVisualizer.Instance.VisualizeScentRadius(source, gridEntity.Position, radiusTiles);
+                trackedScentSources.Add(source);
+            }
+            else if (GridPositionManager.Instance != null)
+            {
+                // Fallback for sources without GridEntity
+                GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(source.transform.position);
+                int radiusTiles = Mathf.RoundToInt(radius);
+                GridDebugVisualizer.Instance.VisualizeScentRadius(source, gridPos, radiusTiles);
+                trackedScentSources.Add(source);
+            }
         }
     }
 
-#if UNITY_EDITOR
-    private void OnDrawGizmosSelected()
+    void UpdatePoopAbsorptionTracking()
     {
-        if (showScentRadiiRuntime)
+        // Check if poop absorption radius visualization is enabled in GridDebugVisualizer
+        bool shouldShow = GridDebugVisualizer.Instance.IsPlantPoopRadiusEnabled && 
+                         GridDebugVisualizer.Instance.IsRadiusVisualizationEnabled;
+
+        if (!shouldShow)
         {
-            Gizmos.color = scentRadiusColorRuntime;
-            ScentSource[] scentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
-            foreach (ScentSource source in scentSources)
+            // Hide all poop absorption visualizations if disabled in GridDebugVisualizer
+            foreach (var plant in trackedPlants)
             {
-                if (source == null || !source.enabled || source.definition == null) continue;
-                float radius = source.EffectiveRadius;
-                if (radius > 0.01f)
+                if (plant != null)
                 {
-                    Gizmos.DrawWireSphere(source.transform.position, radius);
+                    GridDebugVisualizer.Instance.HideContinuousRadius(plant);
+                }
+            }
+            trackedPlants.Clear();
+            return;
+        }
+
+        // Get all current plants
+        var currentPlantsSet = new HashSet<PlantGrowth>(PlantGrowth.AllActivePlants);
+
+        // Remove visualizations for plants that no longer exist or are inactive
+        var plantsToRemove = new HashSet<PlantGrowth>();
+        foreach (var plant in trackedPlants)
+        {
+            if (plant == null || !plant.gameObject.activeInHierarchy || !currentPlantsSet.Contains(plant))
+            {
+                plantsToRemove.Add(plant);
+                if (plant != null)
+                {
+                    GridDebugVisualizer.Instance.HideContinuousRadius(plant);
                 }
             }
         }
 
-        if (showPoopAbsorptionRadiiRuntime)
+        foreach (var plant in plantsToRemove)
         {
-            Gizmos.color = poopAbsorptionRadiusColorRuntime;
-            // This still uses FindObjectsByType as it's editor-only and doesn't impact runtime performance.
-            PlantGrowth[] plants = FindObjectsByType<PlantGrowth>(FindObjectsSortMode.None); 
-            int drawnCount = 0;
+            trackedPlants.Remove(plant);
+        }
 
-            foreach (PlantGrowth plant in plants)
+        // Add visualizations for active plants
+        foreach (PlantGrowth plant in PlantGrowth.AllActivePlants)
+        {
+            if (plant == null || !plant.gameObject.activeInHierarchy) continue;
+
+            float poopRadius = GetPlantPoopDetectionRadius(plant);
+            if (poopRadius <= 0.01f)
             {
-                if (plant == null) continue;
-                float radius = GetPlantPoopDetectionRadius(plant);
-                if (radius > 0.01f)
+                if (trackedPlants.Contains(plant))
                 {
-                    Gizmos.DrawWireSphere(plant.transform.position, radius);
-                    drawnCount++;
+                    GridDebugVisualizer.Instance.HideContinuousRadius(plant);
+                    trackedPlants.Remove(plant);
                 }
+                continue;
             }
 
-            if (logGizmoCalls && drawnCount > 0)
+            // Get the grid position for the plant
+            GridEntity gridEntity = plant.GetComponent<GridEntity>();
+            if (gridEntity != null)
             {
-                Debug.Log($"[FloraManager] Drew {drawnCount} poop absorption radius gizmos");
+                int radiusTiles = Mathf.RoundToInt(poopRadius);
+                GridDebugVisualizer.Instance.VisualizePlantPoopRadius(plant, gridEntity.Position, radiusTiles);
+                trackedPlants.Add(plant);
+            }
+            else if (GridPositionManager.Instance != null)
+            {
+                // Fallback for plants without GridEntity
+                GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(plant.transform.position);
+                int radiusTiles = Mathf.RoundToInt(poopRadius);
+                GridDebugVisualizer.Instance.VisualizePlantPoopRadius(plant, gridPos, radiusTiles);
+                trackedPlants.Add(plant);
             }
         }
     }
-#endif
+
+    void CleanupAllVisualizations()
+    {
+        if (GridDebugVisualizer.Instance == null) return;
+
+        foreach (var source in trackedScentSources)
+        {
+            if (source != null)
+            {
+                GridDebugVisualizer.Instance.HideContinuousRadius(source);
+            }
+        }
+
+        foreach (var plant in trackedPlants)
+        {
+            if (plant != null)
+            {
+                GridDebugVisualizer.Instance.HideContinuousRadius(plant);
+            }
+        }
+
+        trackedScentSources.Clear();
+        trackedPlants.Clear();
+    }
+
+    // Read-only status methods for external components that need to know what's being tracked
+    public bool HasScentSourcesTracked => trackedScentSources.Count > 0;
+    public bool HasPlantsTracked => trackedPlants.Count > 0;
+    public int TrackedScentSourceCount => trackedScentSources.Count;
+    public int TrackedPlantCount => trackedPlants.Count;
+
+    // NO ENABLE/DISABLE METHODS - All control is in GridDebugVisualizer!
 }

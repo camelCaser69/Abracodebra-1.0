@@ -3,27 +3,33 @@ using System.Linq;
 using UnityEngine;
 using WegoSystem;
 
-public class PlantNodeExecutor {
+public class PlantNodeExecutor
+{
     readonly PlantGrowth plant;
 
     public float PoopDetectionRadius { get; private set; }
     public float PoopEnergyBonus { get; private set; }
 
-    public PlantNodeExecutor(PlantGrowth plant) {
+    public PlantNodeExecutor(PlantGrowth plant)
+    {
         this.plant = plant;
     }
 
-    public void ProcessPassiveEffects(NodeGraph nodeGraph) {
+    public void ProcessPassiveEffects(NodeGraph nodeGraph)
+    {
         PoopDetectionRadius = 0f;
         PoopEnergyBonus = 0f;
 
-        foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex)) {
+        foreach (NodeData node in nodeGraph.nodes.OrderBy(n => n.orderIndex))
+        {
             if (node?.effects == null) continue;
 
-            foreach (var effect in node.effects) {
+            foreach (var effect in node.effects)
+            {
                 if (effect == null || !effect.isPassive) continue;
 
-                switch (effect.effectType) {
+                switch (effect.effectType)
+                {
                     case NodeEffectType.PoopAbsorption:
                         PoopDetectionRadius = Mathf.Max(0f, effect.primaryValue);
                         PoopEnergyBonus = Mathf.Max(0f, effect.secondaryValue);
@@ -33,8 +39,10 @@ public class PlantNodeExecutor {
         }
     }
 
-    public void ExecuteMatureCycleTick() {
-        if (plant.NodeGraph?.nodes == null || plant.NodeGraph.nodes.Count == 0) {
+    public void ExecuteMatureCycleTick()
+    {
+        if (plant.NodeGraph?.nodes == null || plant.NodeGraph.nodes.Count == 0)
+        {
             Debug.LogError($"[{plant.gameObject.name}] NodeGraph missing or empty!");
             return;
         }
@@ -44,13 +52,16 @@ public class PlantNodeExecutor {
         var accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
         float totalEnergyCostForCycle = 0f;
 
-        foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
+        foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex))
+        {
             if (node?.effects == null) continue;
 
-            foreach (var effect in node.effects) {
+            foreach (var effect in node.effects)
+            {
                 if (effect == null || effect.isPassive) continue;
 
-                switch (effect.effectType) {
+                switch (effect.effectType)
+                {
                     case NodeEffectType.EnergyCost:
                         totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
                         break;
@@ -60,7 +71,8 @@ public class PlantNodeExecutor {
                         break;
 
                     case NodeEffectType.ScentModifier:
-                        if (effect.scentDefinitionReference != null) {
+                        if (effect.scentDefinitionReference != null)
+                        {
                             ScentDefinition key = effect.scentDefinitionReference;
 
                             if (!accumulatedScentRadiusBonus.ContainsKey(key))
@@ -76,148 +88,103 @@ public class PlantNodeExecutor {
             }
         }
 
-        if (PoopDetectionRadius > 0f) {
+        // Check for poop absorption if the plant has this ability
+        if (PoopDetectionRadius > 0f)
+        {
             CheckForPoopAndAbsorb();
         }
 
-        if (plant.EnergySystem.CurrentEnergy < totalEnergyCostForCycle) {
-            if (Debug.isDebugBuild) {
+        if (plant.EnergySystem.CurrentEnergy < totalEnergyCostForCycle)
+        {
+            if (Debug.isDebugBuild)
+            {
                 Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.CurrentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
             }
             return;
         }
 
-        plant.EnergySystem.CurrentEnergy = Mathf.Max(0f, plant.EnergySystem.CurrentEnergy - totalEnergyCostForCycle);
+        plant.EnergySystem.SpendEnergy(totalEnergyCostForCycle);
 
-        foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-            if (node?.effects == null) continue;
-
-            foreach (var effect in node.effects) {
-                if (effect == null || effect.isPassive ||
-                    effect.effectType == NodeEffectType.EnergyCost ||
-                    effect.effectType == NodeEffectType.Damage ||
-                    effect.effectType == NodeEffectType.ScentModifier) continue;
-
-                switch (effect.effectType) {
-                    case NodeEffectType.GrowBerry:
-                        TrySpawnBerry(accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
-                        break;
-                }
-            }
+        // Apply scent effects to plant if any
+        if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0)
+        {
+            ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
         }
     }
 
-    void CheckForPoopAndAbsorb() {
-        bool hasMissingLeaves = plant.CellManager.LeafDataList.Any(leaf => !leaf.IsActive);
-        bool canAddEnergy = PoopEnergyBonus > 0f;
-        if (!hasMissingLeaves && !canAddEnergy) return;
-
-        int discreteRadius = Mathf.RoundToInt(PoopDetectionRadius);
-        if (discreteRadius <= 0) return;
+    void CheckForPoopAndAbsorb()
+    {
+        if (PoopDetectionRadius <= 0f) return;
 
         GridEntity plantGrid = plant.GetComponent<GridEntity>();
         if (plantGrid == null) return;
 
-        var tilesInRange = GridRadiusUtility.GetTilesInCircle(plantGrid.Position, discreteRadius);
+        int radiusTiles = Mathf.RoundToInt(PoopDetectionRadius);
+        var tilesInRadius = GridRadiusUtility.GetTilesInCircle(plantGrid.Position, radiusTiles);
 
-        foreach (var tilePos in tilesInRange) {
-            Vector3 worldPos = GridPositionManager.Instance.GridToWorld(tilePos);
-            Collider2D[] colliders = Physics2D.OverlapPointAll(worldPos);
-
-            foreach (Collider2D collider in colliders) {
-                PoopController poop = collider.GetComponent<PoopController>();
-                if (poop != null) {
-                    bool absorbed = false;
-
-                    if (hasMissingLeaves) {
-                        absorbed = plant.CellManager.TryRegrowLeaf();
+        foreach (var tile in tilesInRadius)
+        {
+            var entitiesAtTile = GridPositionManager.Instance.GetEntitiesAt(tile);
+            foreach (var entity in entitiesAtTile)
+            {
+                PoopController poop = entity.GetComponent<PoopController>();
+                if (poop != null)
+                {
+                    // Absorb the poop and gain energy
+                    if (PoopEnergyBonus > 0f)
+                    {
+                        plant.EnergySystem.AddEnergy(PoopEnergyBonus);
+                        if (Debug.isDebugBuild)
+                        {
+                            Debug.Log($"[{plant.gameObject.name}] Absorbed poop and gained {PoopEnergyBonus} energy!");
+                        }
                     }
-
-                    if ((!absorbed || !hasMissingLeaves) && canAddEnergy) {
-                        plant.EnergySystem.CurrentEnergy = Mathf.Min(
-                            plant.EnergySystem.MaxEnergy,
-                            plant.EnergySystem.CurrentEnergy + PoopEnergyBonus
-                        );
-                        absorbed = true;
-                    }
-
-                    if (absorbed) {
-                        Object.Destroy(poop.gameObject);
-                        return;
-                    }
+                    
+                    // Destroy the poop
+                    Object.Destroy(poop.gameObject);
+                    break; // Only absorb one poop per tile per cycle
                 }
             }
         }
     }
 
-    void TrySpawnBerry(Dictionary<ScentDefinition, float> scentRadiiBonus, Dictionary<ScentDefinition, float> scentStrengthsBonus) {
-        var berryCellPrefab = plant.CellManager.GetType()
-            .GetField("berryCellPrefab", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-            .GetValue(plant.CellManager) as GameObject;
+    public void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses)
+    {
+        if (targetObject == null) return;
 
-        if (berryCellPrefab == null) {
-            Debug.LogWarning($"[{plant.gameObject.name}] Berry Prefab not assigned. Cannot spawn berry.", plant.gameObject);
-            return;
-        }
+        foreach (var kvp in scentRadiusBonuses)
+        {
+            ScentDefinition scentDef = kvp.Key;
+            float radiusBonus = kvp.Value;
+            float strengthBonus = scentStrengthBonuses.ContainsKey(scentDef) ? scentStrengthBonuses[scentDef] : 0f;
 
-        var cells = plant.CellManager.GetCells();
-        var potentialCoords = cells
-            .Where(cellKvp => cellKvp.Value == PlantCellType.Stem || cellKvp.Value == PlantCellType.Seed)
-            .SelectMany(cellKvp => {
-                Vector2Int[] berryOffsets = { Vector2Int.up, Vector2Int.left, Vector2Int.right };
-                return berryOffsets.Select(offset => cellKvp.Key + offset);
-            })
-            .Where(coord => !cells.ContainsKey(coord))
-            .Distinct()
-            .ToList();
+            // Try to find existing scent source with this definition
+            ScentSource existingSource = targetObject.GetComponentsInChildren<ScentSource>()
+                .FirstOrDefault(s => s.Definition == scentDef);
 
-        if (potentialCoords.Count > 0) {
-            Vector2Int chosenCoord = potentialCoords[Random.Range(0, potentialCoords.Count)];
-            GameObject berryGO = plant.CellManager.SpawnCellVisual(
-                PlantCellType.Fruit,
-                chosenCoord,
-                scentRadiiBonus,
-                scentStrengthsBonus
-            );
-
-            if (berryGO == null) {
-                Debug.LogError($"[{plant.gameObject.name}] Failed to spawn berry visual at {chosenCoord}");
+            if (existingSource != null)
+            {
+                // Modify existing scent source
+                existingSource.ApplyModifiers(radiusBonus, strengthBonus);
             }
-        } else {
-            if (Debug.isDebugBuild) {
-                Debug.Log($"[{plant.gameObject.name}] No valid empty adjacent locations found to spawn a berry.");
+            else
+            {
+                // Create new scent source
+                GameObject scentSourceObj = new GameObject($"ScentSource_{scentDef.displayName}");
+                scentSourceObj.transform.SetParent(targetObject.transform);
+                scentSourceObj.transform.localPosition = Vector3.zero;
+
+                ScentSource newSource = scentSourceObj.AddComponent<ScentSource>();
+                SetScentSourceDefinition(newSource, scentDef);
+                newSource.SetRadiusModifier(radiusBonus);
+                newSource.SetStrengthModifier(strengthBonus);
             }
         }
     }
 
-    public void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses) {
-        if (targetObject == null || EcosystemManager.Instance?.scentLibrary == null) return;
-
-        ScentDefinition strongestScentDef = null;
-        float maxStrengthBonus = -1f;
-
-        if (scentStrengthBonuses != null && scentStrengthBonuses.Count > 0) {
-            foreach (var kvp in scentStrengthBonuses) {
-                if (kvp.Key != null && kvp.Value > maxStrengthBonus) {
-                    maxStrengthBonus = kvp.Value;
-                    strongestScentDef = kvp.Key;
-                }
-            }
-        }
-
-        if (strongestScentDef != null) {
-            ScentSource scentSource = targetObject.GetComponent<ScentSource>() ?? targetObject.AddComponent<ScentSource>();
-            scentSource.definition = strongestScentDef;
-
-            scentRadiusBonuses.TryGetValue(strongestScentDef, out float radiusBonus);
-            scentSource.radiusModifier = radiusBonus;
-            scentSource.strengthModifier = maxStrengthBonus;
-
-            if (strongestScentDef.particleEffectPrefab != null) {
-                if (!targetObject.transform.GetComponentInChildren<ParticleSystem>()) {
-                    Object.Instantiate(strongestScentDef.particleEffectPrefab, targetObject.transform);
-                }
-            }
-        }
+    // Helper method to set scent source definition
+    void SetScentSourceDefinition(ScentSource source, ScentDefinition definition)
+    {
+        source.SetDefinition(definition);
     }
 }

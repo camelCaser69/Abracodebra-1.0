@@ -1,32 +1,25 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using WegoSystem;
 
 public class FireflyController : MonoBehaviour, ITickUpdateable
 {
-    #region Fields
+    [SerializeField] private FireflyDefinition definition;
 
-    [SerializeField]
-    private FireflyDefinition definition;
-
-    [Header("Component References")]
     [SerializeField] private Light2D glowLight;
     [SerializeField] private Light2D groundLight;
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private TrailRenderer trailRenderer;
     [SerializeField] private ParticleSystem glowParticles;
 
-    [Header("Visual Effects")]
     [SerializeField] private float groundLightRadiusMultiplier = 2.5f;
 
     private GridEntity gridEntity;
 
-    // State
     private int lifetimeTicks;
     private int lastMovementTick = 0;
-    
+
     private float currentLifetimeSeconds = 0f;
     private float maxLifetimeSeconds = 0f;
 
@@ -43,10 +36,6 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
 
     public bool IsAlive { get; set; } = true;
     public Transform AttractionTarget { get; set; }
-
-    #endregion
-
-    #region Unity Lifecycle
 
     void Awake()
     {
@@ -90,53 +79,55 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
+
+        if (GridDebugVisualizer.Instance != null)
+        {
+            GridDebugVisualizer.Instance.HideContinuousRadius(this);
+        }
     }
 
     public void Initialize()
     {
-        if (definition == null || gridEntity == null)
+        // Access the public definition field directly from FireflyManager
+        if (FireflyManager.Instance?.defaultFireflyDefinition == null || gridEntity == null)
         {
             Debug.LogError("[FireflyController] Initialization failed: Missing definition or GridEntity!", this);
             enabled = false;
             return;
         }
 
-        lifetimeTicks = Random.Range(definition.minLifetimeTicks, definition.maxLifetimeTicks + 1);
-        if (TickManager.Instance?.Config != null)
-        {
-            maxLifetimeSeconds = TickManager.Instance.Config.ConvertTicksToSeconds(lifetimeTicks);
-        }
-        else
-        {
-            maxLifetimeSeconds = lifetimeTicks * 0.5f; // Fallback
-        }
-        currentLifetimeSeconds = 0f;
-        
+        definition = FireflyManager.Instance.defaultFireflyDefinition;
+
         if (GridPositionManager.Instance != null)
         {
             GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+            currentTileCenter = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
         }
 
-        UpdateTileCenter();
-        UpdateLocalTargetPosition();
-        ApplyVisualState(0f);
+        lifetimeTicks = Random.Range(definition.minLifetimeTicks, definition.maxLifetimeTicks + 1);
+        currentLocalSpeed = Random.Range(definition.minLocalSpeed, definition.maxLocalSpeed);
+
+        SetRandomLocalTarget();
+
+        if (glowParticles != null)
+        {
+            glowParticles.Play();
+        }
+
+        if (TickManager.Instance?.Config != null)
+        {
+            maxLifetimeSeconds = lifetimeTicks / TickManager.Instance.Config.ticksPerRealSecond;
+        }
+        else
+        {
+            maxLifetimeSeconds = lifetimeTicks * 0.5f;
+        }
     }
 
     public void OnTickUpdate(int currentTick)
     {
         if (!IsAlive) return;
 
-        if (currentTick - lastMovementTick >= definition.movementTickInterval)
-        {
-            MakeMovementDecision();
-            lastMovementTick = currentTick;
-        }
-    }
-
-    void Update()
-    {
-        if (!IsAlive) return;
-        
         currentLifetimeSeconds += Time.deltaTime;
         if (currentLifetimeSeconds >= maxLifetimeSeconds)
         {
@@ -144,300 +135,210 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
             return;
         }
 
-        UpdateLifetimeVisuals();
-        UpdateLocalMovement();
-        HandleGlowAndFlicker();
+        if (currentTick - lastMovementTick >= definition.movementTickInterval)
+        {
+            UpdateMovement();
+            lastMovementTick = currentTick;
+        }
+
+        UpdatePhotosynthesisVisualization();
     }
 
-    #endregion
-
-    #region AI & Movement
-
-    private void MakeMovementDecision()
+    void Update()
     {
-        if (gridEntity == null) return;
+        if (!IsAlive) return;
 
-        if (AttractionTarget != null && !AttractionTarget.gameObject.activeInHierarchy)
-        {
-            AttractionTarget = null;
-        }
+        UpdateLocalMovement();
+        UpdateGlowEffect();
+        UpdateGroundLight();
+    }
 
-        if (AttractionTarget == null)
-        {
-            FindNewAttractionTarget();
-        }
+    // PARTIAL FIX: Only the UpdateMovement method needs to be updated
+// Replace the existing UpdateMovement method in FireflyController.cs with this:
+
+    void UpdateMovement()
+    {
+        FindAttractionTarget();
 
         if (AttractionTarget != null)
         {
-            PlanMovementTowardTarget();
+            Vector3 attractionDirection = (AttractionTarget.position - currentTileCenter).normalized;
+            localTargetPosition = currentTileCenter + attractionDirection * Random.Range(0.1f, 0.3f);
         }
         else
         {
-            WanderRandomly();
+            // FIXED: Actually move to different tiles sometimes
+            if (Random.value < 0.3f) // 30% chance to move to a new tile
+            {
+                GridPosition currentPos = gridEntity.Position;
+                GridPosition[] possibleMoves = new GridPosition[]
+                {
+                    new GridPosition(currentPos.x + 1, currentPos.y),
+                    new GridPosition(currentPos.x - 1, currentPos.y),
+                    new GridPosition(currentPos.x, currentPos.y + 1),
+                    new GridPosition(currentPos.x, currentPos.y - 1)
+                };
+
+                // Try to move to a valid adjacent tile
+                for (int i = 0; i < possibleMoves.Length; i++)
+                {
+                    GridPosition newPos = possibleMoves[Random.Range(0, possibleMoves.Length)];
+                    if (GridPositionManager.Instance != null && 
+                        GridPositionManager.Instance.IsPositionValid(newPos) && 
+                        !GridPositionManager.Instance.IsPositionOccupied(newPos))
+                    {
+                        // Move to new tile
+                        gridEntity.SetPosition(newPos);
+                        currentTileCenter = GridPositionManager.Instance.GridToWorld(newPos);
+                        SetRandomLocalTarget();
+                        return;
+                    }
+                }
+            }
+        
+            // If no tile movement, just set a new local target within current tile
+            SetRandomLocalTarget();
         }
     }
 
-    private void FindNewAttractionTarget()
+    void UpdatePhotosynthesisVisualization()
     {
-        if (gridEntity == null) return;
-
-        var tilesToSearch = GridRadiusUtility.GetTilesInCircle(gridEntity.Position, definition.tileSearchRadius, true);
-        Transform bestTarget = null;
-        float bestScore = -1f;
-
-        foreach (var tilePos in tilesToSearch)
+        if (GridDebugVisualizer.Instance != null && FireflyManager.Instance != null && gridEntity != null)
         {
-            var entitiesAtTile = GridPositionManager.Instance.GetEntitiesAt(tilePos);
-            if (entitiesAtTile == null) continue;
-
-            foreach (var entity in entitiesAtTile)
+            int photosynthesisRadius = Mathf.RoundToInt(FireflyManager.Instance.photosynthesisRadius);
+            if (photosynthesisRadius > 0)
             {
-                if (entity == null) continue;
+                GridDebugVisualizer.Instance.VisualizeFireflyPhotosynthesisRadius(this, gridEntity.Position, photosynthesisRadius);
+            }
+        }
+    }
 
-                float currentScore = -1f;
-                int distance = gridEntity.Position.ManhattanDistance(entity.Position);
-                if (distance == 0) distance = 1;
+    void FindAttractionTarget()
+    {
+        if (definition == null || gridEntity == null) return;
 
-                ScentSource scent = entity.GetComponent<ScentSource>();
-                if (scent != null && scent.definition != null && definition.attractiveScentDefinitions.Contains(scent.definition))
+        float bestScore = 0f;
+        Transform bestTarget = null;
+
+        GridPosition currentPos = gridEntity.Position;
+        int searchRadius = definition.tileSearchRadius;
+
+        for (int x = currentPos.x - searchRadius; x <= currentPos.x + searchRadius; x++)
+        {
+            for (int y = currentPos.y - searchRadius; y <= currentPos.y + searchRadius; y++)
+            {
+                GridPosition checkPos = new GridPosition(x, y);
+                if (!GridPositionManager.Instance.IsPositionValid(checkPos)) continue;
+
+                // Fixed: Use proper distance calculation with ToVector2Int()
+                float distance = Vector2.Distance(currentPos.ToVector2Int(), checkPos.ToVector2Int());
+                if (distance > searchRadius) continue;
+
+                // Fixed: Use GetEntitiesAt instead of GetEntitiesAtPosition
+                var entitiesAtPosition = GridPositionManager.Instance.GetEntitiesAt(checkPos);
+                foreach (var entity in entitiesAtPosition)
                 {
-                    currentScore = (scent.EffectiveStrength * definition.scentAttractionWeight) / distance;
-                }
-
-                PlantGrowth plant = entity.GetComponent<PlantGrowth>();
-                if (plant != null && plant.CurrentState == PlantState.Growing)
-                {
-                    float plantScore = definition.growingPlantAttraction / distance;
-                    if (plantScore > currentScore)
+                    var scentSources = entity.GetComponentsInChildren<ScentSource>();
+                    foreach (var source in scentSources)
                     {
-                        currentScore = plantScore;
+                        if (definition.attractiveScentDefinitions.Contains(source.Definition))
+                        {
+                            float score = definition.scentAttractionWeight / (distance + 1f);
+                            if (score > bestScore)
+                            {
+                                bestScore = score;
+                                bestTarget = entity.transform;
+                            }
+                        }
                     }
-                }
 
-                if (currentScore > bestScore)
-                {
-                    bestScore = currentScore;
-                    bestTarget = entity.transform;
+                    // Check for growing plants
+                    var plantGrowth = entity.GetComponent<PlantGrowth>();
+                    if (plantGrowth != null && plantGrowth.CurrentState == PlantState.Growing)
+                    {
+                        float score = definition.growingPlantAttraction / (distance + 1f);
+                        if (score > bestScore)
+                        {
+                            bestScore = score;
+                            bestTarget = entity.transform;
+                        }
+                    }
                 }
             }
         }
+
         AttractionTarget = bestTarget;
     }
 
-    private void PlanMovementTowardTarget()
-    {
-        if (gridEntity == null || AttractionTarget == null) return;
-
-        GridEntity targetEntity = AttractionTarget.GetComponent<GridEntity>();
-        if (targetEntity == null)
-        {
-            WanderRandomly();
-            return;
-        }
-
-        GridPosition currentPos = gridEntity.Position;
-        GridPosition targetPos = targetEntity.Position;
-        if (currentPos.ManhattanDistance(targetPos) <= 1) return;
-
-        GridPosition bestMove = GridPosition.Zero;
-        int bestDistance = int.MaxValue;
-        GridPosition[] directions = { GridPosition.Up, GridPosition.Down, GridPosition.Left, GridPosition.Right };
-
-        foreach (var dir in directions)
-        {
-            GridPosition nextPos = currentPos + dir;
-            if (GridPositionManager.Instance.IsPositionValid(nextPos))
-            {
-                int newDist = nextPos.ManhattanDistance(targetPos);
-                if (newDist < bestDistance)
-                {
-                    bestDistance = newDist;
-                    bestMove = dir;
-                }
-            }
-        }
-
-        if (bestMove != GridPosition.Zero)
-        {
-            gridEntity.SetPosition(currentPos + bestMove);
-            UpdateTileCenter();
-        }
-        else
-        {
-            WanderRandomly();
-        }
-    }
-
-    private void WanderRandomly()
-    {
-        if (gridEntity == null) return;
-
-        GridPosition currentPos = gridEntity.Position;
-        var validMoves = new List<GridPosition>();
-        GridPosition[] directions = { GridPosition.Up, GridPosition.Down, GridPosition.Left, GridPosition.Right };
-
-        foreach (var dir in directions)
-        {
-            GridPosition nextPos = currentPos + dir;
-            if (GridPositionManager.Instance.IsPositionValid(nextPos))
-            {
-                validMoves.Add(nextPos);
-            }
-        }
-
-        if (validMoves.Count > 0)
-        {
-            GridPosition newPos = validMoves[Random.Range(0, validMoves.Count)];
-            gridEntity.SetPosition(newPos);
-            UpdateTileCenter();
-        }
-    }
-
-    #endregion
-
-    #region Visuals & Effects
-
-    private void UpdateTileCenter()
-    {
-        if (GridPositionManager.Instance != null && gridEntity != null)
-        {
-            currentTileCenter = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
-        }
-    }
-
-    private void UpdateLocalTargetPosition()
-    {
-        if (definition == null) return;
-        Vector3 flightBoxCenter = currentTileCenter + new Vector3(0, definition.flightHeightOffset + definition.flightBounds.y / 2f, 0);
-        float randomX = Random.Range(-definition.flightBounds.x / 2f, definition.flightBounds.x / 2f);
-        float randomY = Random.Range(-definition.flightBounds.y / 2f, definition.flightBounds.y / 2f);
-        localTargetPosition = flightBoxCenter + new Vector3(randomX, randomY, 0);
-        currentLocalSpeed = Random.Range(definition.minLocalSpeed, definition.maxLocalSpeed);
-    }
-    
-    private void UpdateLocalMovement()
+    void SetRandomLocalTarget()
     {
         if (definition == null) return;
 
-        // Move towards the current local target
-        Vector3 direction = (localTargetPosition - transform.position).normalized;
-        transform.position += direction * currentLocalSpeed * Time.deltaTime;
-
-        // After moving, check if we've arrived. If so, get a new target for the next frame.
-        if ((localTargetPosition - transform.position).sqrMagnitude < 0.01f)
-        {
-            UpdateLocalTargetPosition();
-        }
-        
-        // Clamp position to ensure it stays within the flight volume
-        Vector3 flightBoxCenter = currentTileCenter + new Vector3(0, definition.flightHeightOffset + definition.flightBounds.y / 2f, 0);
-        Vector3 halfBounds = new Vector3(definition.flightBounds.x / 2f, definition.flightBounds.y / 2f, 0);
-        Vector3 minBounds = flightBoxCenter - halfBounds;
-        Vector3 maxBounds = flightBoxCenter + halfBounds;
-
-        transform.position = new Vector3(
-            Mathf.Clamp(transform.position.x, minBounds.x, maxBounds.x),
-            Mathf.Clamp(transform.position.y, minBounds.y, maxBounds.y),
-            transform.position.z
+        Vector2 randomOffset = new Vector2(
+            Random.Range(-definition.flightBounds.x * 0.5f, definition.flightBounds.x * 0.5f),
+            Random.Range(definition.flightHeightOffset, definition.flightHeightOffset + definition.flightBounds.y)
         );
+
+        localTargetPosition = currentTileCenter + (Vector3)randomOffset;
     }
 
-    private void UpdateLifetimeVisuals()
+    void UpdateLocalMovement()
     {
-        float overallIntensity = 1f;
+        if (definition == null) return;
 
-        if (currentLifetimeSeconds < definition.fadeInSeconds)
-        {
-            overallIntensity = Mathf.Clamp01(currentLifetimeSeconds / definition.fadeInSeconds);
-        }
-        else if (maxLifetimeSeconds > 0 && currentLifetimeSeconds > maxLifetimeSeconds - definition.fadeOutSeconds)
-        {
-            float timeIntoFadeOut = currentLifetimeSeconds - (maxLifetimeSeconds - definition.fadeOutSeconds);
-            overallIntensity = 1f - Mathf.Clamp01(timeIntoFadeOut / definition.fadeOutSeconds);
-        }
-        
-        ApplyVisualState(overallIntensity);
-        UpdateGroundLightEffect(overallIntensity);
-    }
+        transform.position = Vector3.MoveTowards(transform.position, localTargetPosition, currentLocalSpeed * Time.deltaTime);
 
-    private void ApplyVisualState(float intensity)
-    {
-        if (spriteRenderer != null)
+        Vector3 direction = (localTargetPosition - transform.position).normalized;
+        if (direction.magnitude > 0.1f)
         {
-            Color color = originalColor;
-            color.a = originalColor.a * intensity;
-            spriteRenderer.color = color;
-        }
-        if (glowLight != null)
-        {
-            glowLight.intensity = baseGlowIntensity * intensity;
-            currentGlowIntensity = glowLight.intensity;
-        }
-        if (trailRenderer != null)
-        {
-            Color startColor = trailRenderer.startColor;
-            Color endColor = trailRenderer.endColor;
-            startColor.a = intensity * 0.5f;
-            endColor.a = 0f;
-            trailRenderer.startColor = startColor;
-            trailRenderer.endColor = endColor;
-        }
-        if (glowParticles != null)
-        {
-            var main = glowParticles.main;
-            Color particleColor = main.startColor.color;
-            particleColor.a = intensity * 0.7f;
-            main.startColor = particleColor;
+            float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+            float currentAngle = transform.eulerAngles.z;
+            float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, definition.localMovementTurnSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.AngleAxis(newAngle, Vector3.forward);
         }
     }
 
-    private void UpdateGroundLightEffect(float overallIntensity)
+    void UpdateGlowEffect()
     {
-        if (groundLight == null || definition == null) return;
+        if (glowParticles == null) return;
 
-        // Horizontally follow the firefly, but stay vertically on the tile's ground plane
-        Vector3 lightPosition = groundLight.transform.position;
-        lightPosition.x = transform.position.x;
-        lightPosition.y = currentTileCenter.y;
-        groundLight.transform.position = lightPosition;
-
-        // Define the vertical flight range based on the definition
-        float lowestFlightPointY = currentTileCenter.y + definition.flightHeightOffset;
-        float verticalFlightRange = definition.flightBounds.y;
-
-        // Calculate normalized progress (t) within the vertical flight range
-        float currentHeightInBox = transform.position.y - lowestFlightPointY;
-        float t = 0f;
-        if (verticalFlightRange > 0.001f)
-        {
-            t = Mathf.Clamp01(currentHeightInBox / verticalFlightRange);
-        }
-
-        // Determine min and max intensity for interpolation
-        float minIntensityAtMaxHeight = baseGroundLightIntensity * definition.groundLightMinIntensity;
-        
-        // Interpolate intensity and radius based on t
-        float heightAdjustedIntensity = Mathf.Lerp(baseGroundLightIntensity, minIntensityAtMaxHeight, t);
-        float heightAdjustedRadius = Mathf.Lerp(baseGroundLightOuterRadius, baseGroundLightOuterRadius * groundLightRadiusMultiplier, t);
-
-        groundLight.intensity = heightAdjustedIntensity * overallIntensity;
-        groundLight.pointLightOuterRadius = heightAdjustedRadius;
-        groundLight.enabled = spriteRenderer != null && spriteRenderer.enabled;
-    }
-
-    private void HandleGlowAndFlicker()
-    {
-        if (glowLight == null || definition.glowFlickerAmount <= 0f) return;
         glowFlickerTime += Time.deltaTime * definition.glowFlickerSpeed;
-        float flicker = Mathf.PerlinNoise(glowFlickerTime, 0f) * 2f - 1f;
-        glowLight.intensity = currentGlowIntensity + (flicker * definition.glowFlickerAmount);
+        float flicker = Mathf.Sin(glowFlickerTime) * definition.glowFlickerAmount;
+        currentGlowIntensity = Mathf.Clamp01(baseGlowIntensity + flicker);
+
+        var emission = glowParticles.emission;
+        emission.rateOverTime = currentGlowIntensity * 10f;
     }
 
-    private void Die()
+    void UpdateGroundLight()
+    {
+        if (groundLight == null) return;
+
+        glowFlickerTime += Time.deltaTime * definition.glowFlickerSpeed;
+        float flicker = Mathf.Sin(glowFlickerTime) * definition.glowFlickerAmount;
+
+        groundLight.intensity = Mathf.Clamp(baseGroundLightIntensity + flicker, definition.groundLightMinIntensity, 1f);
+        groundLight.pointLightOuterRadius = baseGroundLightOuterRadius * groundLightRadiusMultiplier;
+    }
+
+    void Die()
     {
         IsAlive = false;
-        if (FireflyManager.Instance != null) FireflyManager.Instance.ReportFireflyDespawned(this);
-        if (TickManager.Instance != null) TickManager.Instance.UnregisterTickUpdateable(this);
+
+        if (GridDebugVisualizer.Instance != null)
+        {
+            GridDebugVisualizer.Instance.HideContinuousRadius(this);
+        }
+
+        if (FireflyManager.Instance != null)
+        {
+            FireflyManager.Instance.ReportFireflyDespawned(this);
+        }
+
+        if (TickManager.Instance != null)
+        {
+            TickManager.Instance.UnregisterTickUpdateable(this);
+        }
 
         if (glowParticles != null)
         {
@@ -450,7 +351,7 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         }
     }
 
-    private void OnDrawGizmosSelected()
+    void OnDrawGizmosSelected()
     {
         if (definition == null) return;
 
@@ -463,6 +364,12 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
         Gizmos.DrawWireSphere(transform.position, definition.tileSearchRadius * tileSize);
 
+        if (Application.isPlaying && FireflyManager.Instance != null)
+        {
+            Gizmos.color = new Color(0f, 1f, 0.5f, 0.3f);
+            Gizmos.DrawWireSphere(transform.position, FireflyManager.Instance.photosynthesisRadius * tileSize);
+        }
+
         if (Application.isPlaying)
         {
             Vector3 flightBoxCenter = currentTileCenter + new Vector3(0, definition.flightHeightOffset + definition.flightBounds.y / 2f, 0);
@@ -473,6 +380,4 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
             Gizmos.DrawLine(transform.position, localTargetPosition);
         }
     }
-
-    #endregion
 }
