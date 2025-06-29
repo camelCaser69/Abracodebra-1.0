@@ -153,9 +153,6 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         UpdateGroundLight();
     }
 
-    // PARTIAL FIX: Only the UpdateMovement method needs to be updated
-// Replace the existing UpdateMovement method in FireflyController.cs with this:
-
     void UpdateMovement()
     {
         FindAttractionTarget();
@@ -167,36 +164,6 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         }
         else
         {
-            // FIXED: Actually move to different tiles sometimes
-            if (Random.value < 0.3f) // 30% chance to move to a new tile
-            {
-                GridPosition currentPos = gridEntity.Position;
-                GridPosition[] possibleMoves = new GridPosition[]
-                {
-                    new GridPosition(currentPos.x + 1, currentPos.y),
-                    new GridPosition(currentPos.x - 1, currentPos.y),
-                    new GridPosition(currentPos.x, currentPos.y + 1),
-                    new GridPosition(currentPos.x, currentPos.y - 1)
-                };
-
-                // Try to move to a valid adjacent tile
-                for (int i = 0; i < possibleMoves.Length; i++)
-                {
-                    GridPosition newPos = possibleMoves[Random.Range(0, possibleMoves.Length)];
-                    if (GridPositionManager.Instance != null && 
-                        GridPositionManager.Instance.IsPositionValid(newPos) && 
-                        !GridPositionManager.Instance.IsPositionOccupied(newPos))
-                    {
-                        // Move to new tile
-                        gridEntity.SetPosition(newPos);
-                        currentTileCenter = GridPositionManager.Instance.GridToWorld(newPos);
-                        SetRandomLocalTarget();
-                        return;
-                    }
-                }
-            }
-        
-            // If no tile movement, just set a new local target within current tile
             SetRandomLocalTarget();
         }
     }

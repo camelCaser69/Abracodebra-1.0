@@ -40,75 +40,225 @@ public class PlantNodeExecutor
     }
 
     public void ExecuteMatureCycleTick()
+{
+    if (plant.NodeGraph?.nodes == null || plant.NodeGraph.nodes.Count == 0)
     {
-        if (plant.NodeGraph?.nodes == null || plant.NodeGraph.nodes.Count == 0)
+        Debug.LogError($"[{plant.gameObject.name}] NodeGraph missing or empty!");
+        return;
+    }
+
+    float damageMultiplier = 1.0f;
+    var accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
+    var accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
+    float totalEnergyCostForCycle = 0f;
+
+    foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex))
+    {
+        if (node?.effects == null) continue;
+
+        foreach (var effect in node.effects)
         {
-            Debug.LogError($"[{plant.gameObject.name}] NodeGraph missing or empty!");
+            if (effect == null || effect.isPassive) continue;
+
+            switch (effect.effectType)
+            {
+                case NodeEffectType.EnergyCost:
+                    totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
+                    break;
+
+                case NodeEffectType.Damage:
+                    damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue);
+                    break;
+
+                // FIXED: Added missing GrowBerry case
+                case NodeEffectType.GrowBerry:
+                    SpawnBerry();
+                    break;
+
+                case NodeEffectType.ScentModifier:
+                    if (effect.scentDefinitionReference != null)
+                    {
+                        ScentDefinition key = effect.scentDefinitionReference;
+
+                        if (!accumulatedScentRadiusBonus.ContainsKey(key))
+                            accumulatedScentRadiusBonus[key] = 0f;
+                        accumulatedScentRadiusBonus[key] += effect.primaryValue;
+
+                        if (!accumulatedScentStrengthBonus.ContainsKey(key))
+                            accumulatedScentStrengthBonus[key] = 0f;
+                        accumulatedScentStrengthBonus[key] += effect.secondaryValue;
+                    }
+                    break;
+            }
+        }
+    }
+
+    if (PoopDetectionRadius > 0f)
+    {
+        CheckForPoopAndAbsorb();
+    }
+
+    if (plant.EnergySystem.CurrentEnergy < totalEnergyCostForCycle)
+    {
+        if (Debug.isDebugBuild)
+        {
+            Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.CurrentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
+        }
+        return;
+    }
+
+    plant.EnergySystem.SpendEnergy(totalEnergyCostForCycle);
+
+    if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0)
+    {
+        ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+    }
+}
+    
+    private void SpawnBerry()
+    {
+        var cells = plant.CellManager.GetCells();
+        if (cells.Count == 0) return;
+
+        int maxBerriesAllowed = plant.GrowthLogic.MaxBerries;
+        bool hasLimit = maxBerriesAllowed > 0;
+
+        int currentBerryCount = 0;
+        foreach (var kvp in cells)
+        {
+            if (kvp.Value == PlantCellType.Fruit)
+            {
+                currentBerryCount++;
+            }
+        }
+
+        if (hasLimit && currentBerryCount >= maxBerriesAllowed)
+        {
+            Debug.Log($"[{plant.gameObject.name}] Already has {currentBerryCount} berries (max: {maxBerriesAllowed}). Skipping berry spawn.");
             return;
         }
 
-        float damageMultiplier = 1.0f;
-        var accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
-        var accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
-        float totalEnergyCostForCycle = 0f;
+        HashSet<Vector2Int> availablePositions = new HashSet<Vector2Int>();
 
-        foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex))
+        // Find all empty positions adjacent to existing stems or leaves
+        foreach (var kvp in cells)
         {
-            if (node?.effects == null) continue;
-
-            foreach (var effect in node.effects)
+            if (kvp.Value == PlantCellType.Stem || kvp.Value == PlantCellType.Leaf)
             {
-                if (effect == null || effect.isPassive) continue;
+                Vector2Int cellPos = kvp.Key;
 
-                switch (effect.effectType)
+                Vector2Int[] surroundingPositions = new Vector2Int[]
                 {
-                    case NodeEffectType.EnergyCost:
-                        totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
-                        break;
+                    cellPos + Vector2Int.up,
+                    cellPos + Vector2Int.down,
+                    cellPos + Vector2Int.left,
+                    cellPos + Vector2Int.right,
+                    cellPos + Vector2Int.up + Vector2Int.left,    // up-left
+                    cellPos + Vector2Int.up + Vector2Int.right,   // up-right
+                    cellPos + Vector2Int.down + Vector2Int.left,  // down-left
+                    cellPos + Vector2Int.down + Vector2Int.right  // down-right
+                };
 
-                    case NodeEffectType.Damage:
-                        damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue);
-                        break;
-
-                    case NodeEffectType.ScentModifier:
-                        if (effect.scentDefinitionReference != null)
-                        {
-                            ScentDefinition key = effect.scentDefinitionReference;
-
-                            if (!accumulatedScentRadiusBonus.ContainsKey(key))
-                                accumulatedScentRadiusBonus[key] = 0f;
-                            accumulatedScentRadiusBonus[key] += effect.primaryValue;
-
-                            if (!accumulatedScentStrengthBonus.ContainsKey(key))
-                                accumulatedScentStrengthBonus[key] = 0f;
-                            accumulatedScentStrengthBonus[key] += effect.secondaryValue;
-                        }
-                        break;
+                foreach (Vector2Int pos in surroundingPositions)
+                {
+                    if (!plant.CellManager.HasCellAt(pos))
+                    {
+                        availablePositions.Add(pos);
+                    }
                 }
             }
         }
 
-        // Check for poop absorption if the plant has this ability
-        if (PoopDetectionRadius > 0f)
-        {
-            CheckForPoopAndAbsorb();
-        }
+        List<Vector2Int> candidatePositions = availablePositions.ToList();
 
-        if (plant.EnergySystem.CurrentEnergy < totalEnergyCostForCycle)
+        if (candidatePositions.Count == 0)
         {
-            if (Debug.isDebugBuild)
-            {
-                Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.CurrentEnergy}/{totalEnergyCostForCycle}) for mature cycle.");
-            }
+            Debug.LogWarning($"[{plant.gameObject.name}] No available space to spawn berry (all positions occupied)");
             return;
         }
+        
+        // ** THE FIX IS HERE **
+        // Instead of sorting by height, we now pick a random position from the list of candidates.
+        int randomIndex = Random.Range(0, candidatePositions.Count);
+        Vector2Int chosenPosition = candidatePositions[randomIndex];
 
-        plant.EnergySystem.SpendEnergy(totalEnergyCostForCycle);
+        GameObject berry = plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, chosenPosition, null, null);
 
-        // Apply scent effects to plant if any
-        if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0)
+        if (berry != null)
         {
-            ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+            string limitInfo = hasLimit ? $"#{currentBerryCount + 1}/{maxBerriesAllowed}" : $"#{currentBerryCount + 1} (no limit)";
+            Debug.Log($"[{plant.gameObject.name}] Spawned berry {limitInfo} at {chosenPosition}");
+
+            AddFoodComponentToBerry(berry);
+        }
+        else
+        {
+            Debug.LogWarning($"[{plant.gameObject.name}] Failed to spawn berry at {chosenPosition}");
+        }
+    }
+    
+    float GetMinDistanceToExistingBerries(Vector2Int position, Dictionary<Vector2Int, PlantCellType> cells)
+    {
+        float minDistance = float.MaxValue;
+        bool foundBerry = false;
+    
+        foreach (var kvp in cells)
+        {
+            if (kvp.Value == PlantCellType.Fruit)
+            {
+                foundBerry = true;
+                float distance = Vector2Int.Distance(position, kvp.Key);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                }
+            }
+        }
+    
+        return foundBerry ? minDistance : float.MaxValue; // If no berries exist, return max value
+    }
+
+// Helper method to get berry food type (you may need to adjust this based on your setup)
+    FoodType GetBerryFoodType()
+    {
+        // Try multiple approaches to find a berry food type
+    
+        // Approach 1: Try to load from Resources
+        FoodType berryType = Resources.Load<FoodType>("FoodTypes/Berry");
+        if (berryType != null) return berryType;
+    
+        berryType = Resources.Load<FoodType>("Berry");
+        if (berryType != null) return berryType;
+    
+        // Approach 2: Find any food type with Plant_Fruit category
+        FoodType[] allFoodTypes = Resources.LoadAll<FoodType>("");
+        foreach (FoodType foodType in allFoodTypes)
+        {
+            if (foodType.category == FoodType.FoodCategory.Plant_Fruit)
+            {
+                return foodType;
+            }
+        }
+    
+        // Approach 3: If no specific berry type found, create a warning
+        Debug.LogWarning($"[{plant.gameObject.name}] No berry FoodType found. Berry won't be edible by animals.");
+        return null;
+    }
+    
+    void AddFoodComponentToBerry(GameObject berry)
+    {
+        if (berry == null) return;
+
+        FoodItem foodItem = berry.GetComponent<FoodItem>();
+        if (foodItem != null) return; // Already has FoodItem component
+
+        // Try to find a berry food type
+        FoodType berryFoodType = GetBerryFoodType();
+        if (berryFoodType != null)
+        {
+            foodItem = berry.AddComponent<FoodItem>();
+            foodItem.foodType = berryFoodType;
+            Debug.Log($"[{plant.gameObject.name}] Added FoodItem component to berry");
         }
     }
 

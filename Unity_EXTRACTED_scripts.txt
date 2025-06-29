@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 536,953 → 366,942 chars (31.7% reduction)
-Estimated tokens saved: ~42,502
+Compression Stats: 545,532 → 373,311 chars (31.6% reduction)
+Estimated tokens saved: ~43,055
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -68,60 +68,60 @@ using System;
   NodeEffectType (Assets\Scripts\PlantSystem\Data/) L4671
   NodeGraph (Assets\Scripts\PlantSystem\Data/) L4700
   SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L4709
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4734
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4919
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4958
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4982
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L5249
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5341
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5589
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5840
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L5997
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L6125
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6442
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L6509
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6580
-  ItemView (Assets\Scripts\PlantSystem\UI/) L6886
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L7011
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L7222
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L7356
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7676
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7812
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8121
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8209
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L8310
-  GridSnapStartup (Assets\Scripts\Ticks/) L8548
-  TickDebugMonitor (Assets\Scripts\Ticks/) L8614
-  TurnPhaseManager (Assets\Scripts\Ticks/) L8785
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8903
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8972
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L9203
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9214
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L9243
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L9339
-  WaterReflection (Assets\Scripts\Visual\Effects/) L9444
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9839
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9875
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L10039
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10181
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L10299
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L10450
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10693
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10733
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10757
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10777
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L11265
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L11277
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L11312
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L11471
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4736
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L4921
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L4960
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4984
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L5271
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5363
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5628
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L5918
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L6204
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L6342
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6659
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L6726
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6797
+  ItemView (Assets\Scripts\PlantSystem\UI/) L7103
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L7228
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L7439
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L7573
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7893
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L8029
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8338
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8426
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L8527
+  GridSnapStartup (Assets\Scripts\Ticks/) L8765
+  TickDebugMonitor (Assets\Scripts\Ticks/) L8831
+  TurnPhaseManager (Assets\Scripts\Ticks/) L9002
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9120
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L9189
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L9420
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9431
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L9460
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L9556
+  WaterReflection (Assets\Scripts\Visual\Effects/) L9661
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10056
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10092
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L10256
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10398
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L10516
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L10667
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10910
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10950
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10974
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10994
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L11482
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L11494
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L11529
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L11688
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L11481
-  GridPosition (Assets\Scripts\Ticks/) L11632
-  GridPositionManager (Assets\Scripts\Ticks/) L11733
-  GridRadiusUtility (Assets\Scripts\Ticks/) L12087
-  TickConfiguration (Assets\Scripts\Ticks/) L12231
-  ITickUpdateable (Assets\Scripts\Ticks/) L12314
+  GridEntity (Assets\Scripts\Ticks/) L11698
+  GridPosition (Assets\Scripts\Ticks/) L11849
+  GridPositionManager (Assets\Scripts\Ticks/) L11950
+  GridRadiusUtility (Assets\Scripts\Ticks/) L12304
+  TickConfiguration (Assets\Scripts\Ticks/) L12448
+  ITickUpdateable (Assets\Scripts\Ticks/) L12531
 
 ================================================================================
 SCRIPTS
@@ -4830,6 +4830,8 @@ pub float energyStorage = 10f;
 pub int cooldown = 20;
 
 pub int castDelay = 0;
+
+pub int maxBerries = 3; // 0 = no limit (only space limit)
 }
 
 ////////////////////////////////////////////////////////////
@@ -5198,7 +5200,7 @@ LeafDataList.Add(new LeafData(coords, true));
 plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
 
 if (plant.IsOutlineEnabled() && plant.VisualManager.OutlineController != null) {
-plant.VisualManager.OutlineController.RegisterPlantPart(instance.GetComponentInChildren<SpriteRenderer>(), plant.outlinePartPrefab);
+plant.VisualManager.RegisterOutlineForCell(instance, cellType.ToString());
 }
 
 if (accumulatedScentRadiusBonus != null && accumulatedScentStrengthBonus != null) {
@@ -5345,6 +5347,26 @@ ret count;
 
 pub List<GameObject> ActiveCellGameObjects => activeCellGameObjects;
 pub Dictionary<Vector2Int, PlantCellType> Cells => cells;
+
+pub int GetBerryCount() {
+int count = 0;
+foreach (var kvp in cells) {
+if (kvp.Value == PlantCellType.Fruit) {
+count++;
+}
+}
+ret count;
+}
+
+pub List<Vector2Int> GetBerryPositions() {
+List<Vector2Int> berryPositions = new List<Vector2Int>();
+foreach (var kvp in cells) {
+if (kvp.Value == PlantCellType.Fruit) {
+berryPositions.Add(kvp.Key);
+}
+}
+ret berryPositions;
+}
 }
 
 ////////////////////////////////////////////////////////////
@@ -5468,6 +5490,7 @@ pub PlantState CurrentState { get; set; } = PlantState.Initializing;
 [SerializeField] GameObject shadowPartPrefab;
 [SerializeField] bool enableOutline = true;
 [SerializeField] PlantOutlineController outlineController;
+[SerializeField] GameObject outlinePartPrefab; // Added missing field
 
 [SerializeField] pub bool showGrowthPercentage = true;
 [SerializeField] pub bool allowPhotosynthesisDuringGrowth = false;
@@ -5483,7 +5506,16 @@ CellManager = new PlantCellManager(this, seedCellPrefab, stemCellPrefab, leafCel
 NodeExecutor = new PlantNodeExecutor(this);
 GrowthLogic = new PlantGrowthLogic(this);
 EnergySystem = new PlantEnergySystem(this);
-VisualManager = new PlantVisualManager(this, shadowController, shadowPartPrefab, outlineController, outlinePartPrefab, enableOutline);
+
+GameObject outlinePrefabToUse = null;
+if (outlineController != null && outlineController.outlinePartPrefab != null) {
+outlinePrefabToUse = outlineController.outlinePartPrefab;
+}
+else {
+outlinePrefabToUse = outlinePartPrefab;
+}
+
+VisualManager = new PlantVisualManager(this, shadowController, shadowPartPrefab, outlineController, outlinePrefabToUse, enableOutline);
 }
 
 void ValidateReferences() {
@@ -5511,7 +5543,8 @@ setupValid = false;
 }
 }
 
-if (outlinePartPrefab == null) {
+GameObject availableOutlinePrefab = GetOutlinePartPrefab();
+if (availableOutlinePrefab == null) {
 Debug.LogError($"PlantGrowth ERROR on '{gameObject.name}': Outline Part Prefab missing but outline is enabled!", this);
 setupValid = false;
 }
@@ -5581,8 +5614,8 @@ break;
 
 case PlantState.Mature_Idle:
 EnergySystem.AccumulateEnergyTick();
-NodeExecutor.ExecuteMatureCycleTick();
-UpdateRadiusVisualizations(); // Update visualizations during mature state
+GrowthLogic.OnTickUpdate(currentTick);
+UpdateRadiusVisualizations();
 break;
 
 case PlantState.Mature_Executing:
@@ -5610,9 +5643,10 @@ GridDebugVisualizer.Instance.HideContinuousRadius(this);
 }
 
 pub void InitializeAndGrow(NodeGraph graph) {
-if (graph == null || graph.nodes == null) {
-Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided.", gameObject);
-Destroy(gameObject);
+if (graph == null || graph.nodes == null || graph.nodes.Count == 0) {
+Debug.LogError($"[{gameObject.name}] Null/empty NodeGraph provided. Aborting growth.", gameObject);
+CurrentState = PlantState.Mature_Idle;
+Destroy(gameObject, 0.1f);
 return;
 }
 
@@ -5677,7 +5711,12 @@ pub bool IsOutlineEnabled() => enableOutline;
 
 pub GameObject GetCellGameObjectAt(Vector2Int coord) => CellManager.GetCellGameObjectAt(coord);
 
-pub GameObject outlinePartPrefab => this.outlinePartPrefab;
+pub GameObject GetOutlinePartPrefab() {
+if (outlineController != null && outlineController.outlinePartPrefab != null) {
+ret outlineController.outlinePartPrefab;
+}
+ret outlinePartPrefab;
+}
 
 pub bool DoesCellExistAt(Vector2Int coord) => CellManager.DoesCellExistAt(coord);
 
@@ -5711,6 +5750,8 @@ float growthProgressTicks = 0f;
 int maturityCycleTick = 0;
 int currentStemStage = 0;
 
+pub int MaxBerries { get; set; }
+
 pub PlantGrowthLogic(PlantGrowth plant) {
 this.plant = plant;
 }
@@ -5732,6 +5773,7 @@ float baseGrowthRandomness = 0.1f;
 int baseCooldownTicks = 20;
 int baseCastDelayTicks = 0;
 bool seedFound = false;
+int baseMaxBerries = 3;
 
 NodeData firstNode = plant.NodeGraph.nodes.FirstOrDefault();
 if (firstNode != null) {
@@ -5747,6 +5789,7 @@ baseLeafPattern = seedEffect.seedData.leafPattern;
 baseGrowthRandomness = seedEffect.seedData.stemRandomness;
 baseCooldownTicks = seedEffect.seedData.cooldown;
 baseCastDelayTicks = seedEffect.seedData.castDelay;
+baseMaxBerries = seedEffect.seedData.maxBerries; // ADD THIS LINE
 }
 }
 
@@ -5811,6 +5854,8 @@ Debug.LogWarning($"[{plant.gameObject.name}] NodeGraph lacks a SeedSpawn effect.
 }
 
 Debug.Log($"[{plant.gameObject.name}] Growth stats: TargetStem={TargetStemLength}, GrowthTicks={GrowthTicksPerStage}, Cooldown={MaturityCycleTicks}");
+
+MaxBerries = baseMaxBerries;
 }
 
 pub void OnTickUpdate(int currentTick) {
@@ -5894,20 +5939,53 @@ stemPos.x = previousStemPos.x + wobbleDirection;
 else {
 stemPos.x = previousStemPos.x; // Grow straight up
 }
+
+int attempts = 0;
+while (plant.CellManager.HasCellAt(stemPos) && attempts < 5) {
+attempts++;
+switch (attempts) {
+case 1:
+stemPos = previousStemPos + Vector2Int.up; // Straight up
+break;
+case 2:
+stemPos = previousStemPos + Vector2Int.up + Vector2Int.left; // Up-left
+break;
+case 3:
+stemPos = previousStemPos + Vector2Int.up + Vector2Int.right; // Up-right
+break;
+case 4:
+stemPos = previousStemPos + Vector2Int.up + new Vector2Int(0, 1); // Two up
+break;
+default:
+stemPos = previousStemPos + Vector2Int.up; // Default fallback
+break;
+}
+}
+
+if (plant.CellManager.HasCellAt(stemPos)) {
+var existingCellType = plant.CellManager.GetCellTypeAt(stemPos);
+Debug.LogError($"[{plant.gameObject.name}] Cannot spawn stem at stage {currentStemStage} - position {stemPos} occupied by {existingCellType}! Previous stem was at {previousStemPos}");
+return;
+}
 }
 
 GameObject stemCell = plant.CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos, null, null);
 if (stemCell == null) {
-Debug.LogError($"[{plant.gameObject.name}] Failed to spawn stem at stage {currentStemStage}");
+Debug.LogError($"[{plant.gameObject.name}] Failed to spawn stem at stage {currentStemStage} at position {stemPos}");
 return;
 }
 
 if (LeafGap >= 0 && (currentStemStage % (LeafGap + 1)) == 0) {
-var leafPositions = plant.CellManager.CalculateLeafPositions(stemPos, currentStemStage, LeafPattern);
+var leafPositions = plant.CellManager.CalculateLeafPositions(stemPos, LeafPattern, currentStemStage);
 foreach (Vector2Int leafPos in leafPositions) {
+if (!plant.CellManager.HasCellAt(leafPos)) {
 GameObject leafCell = plant.CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos, null, null);
 if (leafCell != null) {
 plant.CellManager.LeafDataList.Add(new LeafData(leafPos, true));
+}
+}
+else {
+Debug.LogWarning($"[{plant.gameObject.name}] Skipping leaf at {leafPos} - position occupied");
 }
 }
 }
@@ -6000,6 +6078,10 @@ case NodeEffectType.Damage:
 damageMultiplier = Mathf.Max(0.1f, damageMultiplier + effect.primaryValue);
 break;
 
+case NodeEffectType.GrowBerry:
+SpawnBerry();
+break;
+
 case NodeEffectType.ScentModifier:
 if (effect.scentDefinitionReference != null) {
 ScentDefinition key = effect.scentDefinitionReference;
@@ -6032,6 +6114,131 @@ plant.EnergySystem.SpendEnergy(totalEnergyCostForCycle);
 
 if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0) {
 ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+}
+}
+
+void SpawnBerry() {
+var cells = plant.CellManager.GetCells();
+if (cells.Count == 0) return;
+
+int maxBerriesAllowed = plant.GrowthLogic.MaxBerries;
+bool hasLimit = maxBerriesAllowed > 0;
+
+int currentBerryCount = 0;
+foreach (var kvp in cells) {
+if (kvp.Value == PlantCellType.Fruit) {
+currentBerryCount++;
+}
+}
+
+if (hasLimit && currentBerryCount >= maxBerriesAllowed) {
+Debug.Log($"[{plant.gameObject.name}] Already has {currentBerryCount} berries (max: {maxBerriesAllowed}). Skipping berry spawn.");
+return;
+}
+
+HashSet<Vector2Int> availablePositions = new HashSet<Vector2Int>();
+
+foreach (var kvp in cells) {
+if (kvp.Value == PlantCellType.Stem || kvp.Value == PlantCellType.Leaf) {
+Vector2Int cellPos = kvp.Key;
+
+Vector2Int[] surroundingPositions = new Vector2Int[] {
+cellPos + Vector2Int.up,
+cellPos + Vector2Int.down,
+cellPos + Vector2Int.left,
+cellPos + Vector2Int.right,
+cellPos + Vector2Int.up + Vector2Int.left,    // up-left
+cellPos + Vector2Int.up + Vector2Int.right,   // up-right
+cellPos + Vector2Int.down + Vector2Int.left,  // down-left
+cellPos + Vector2Int.down + Vector2Int.right  // down-right
+};
+
+foreach (Vector2Int pos in surroundingPositions) {
+if (!plant.CellManager.HasCellAt(pos)) {
+availablePositions.Add(pos);
+}
+}
+}
+}
+
+List<Vector2Int> candidatePositions = availablePositions.ToList();
+
+if (candidatePositions.Count == 0) {
+Debug.LogWarning($"[{plant.gameObject.name}] No available space to spawn berry (all positions occupied)");
+return;
+}
+
+candidatePositions.Sort((pos1, pos2) => {
+int heightComparison = pos2.y.CompareTo(pos1.y);
+if (heightComparison != 0) ret heightComparison;
+
+float minDistanceToBerry1 = GetMinDistanceToExistingBerries(pos1, cells);
+float minDistanceToBerry2 = GetMinDistanceToExistingBerries(pos2, cells);
+
+ret minDistanceToBerry2.CompareTo(minDistanceToBerry1);
+});
+
+Vector2Int chosenPosition = candidatePositions[0];
+GameObject berry = plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, chosenPosition, null, null);
+
+if (berry != null) {
+string limitInfo = hasLimit ? $"#{currentBerryCount + 1}/{maxBerriesAllowed}" : $"#{currentBerryCount + 1} (no limit)";
+Debug.Log($"[{plant.gameObject.name}] Spawned berry {limitInfo} at {chosenPosition}");
+
+AddFoodComponentToBerry(berry);
+}
+else {
+Debug.LogWarning($"[{plant.gameObject.name}] Failed to spawn berry at {chosenPosition}");
+}
+}
+
+float GetMinDistanceToExistingBerries(Vector2Int position, Dictionary<Vector2Int, PlantCellType> cells) {
+float minDistance = float.MaxValue;
+bool foundBerry = false;
+
+foreach (var kvp in cells) {
+if (kvp.Value == PlantCellType.Fruit) {
+foundBerry = true;
+float distance = Vector2Int.Distance(position, kvp.Key);
+if (distance < minDistance) {
+minDistance = distance;
+}
+}
+}
+
+ret foundBerry ? minDistance : float.MaxValue; // If no berries exist, ret max value
+}
+
+FoodType GetBerryFoodType() {
+
+FoodType berryType = Resources.Load<FoodType>("FoodTypes/Berry");
+if (berryType != null) ret berryType;
+
+berryType = Resources.Load<FoodType>("Berry");
+if (berryType != null) ret berryType;
+
+FoodType[] allFoodTypes = Resources.LoadAll<FoodType>("");
+foreach (FoodType foodType in allFoodTypes) {
+if (foodType.category == FoodType.FoodCategory.Plant_Fruit) {
+ret foodType;
+}
+}
+
+Debug.LogWarning($"[{plant.gameObject.name}] No berry FoodType found. Berry won't be edible by animals.");
+ret null;
+}
+
+void AddFoodComponentToBerry(GameObject berry) {
+if (berry == null) return;
+
+FoodItem foodItem = berry.GetComponent<FoodItem>();
+if (foodItem != null) return; // Already has FoodItem component
+
+FoodType berryFoodType = GetBerryFoodType();
+if (berryFoodType != null) {
+foodItem = berry.AddComponent<FoodItem>();
+foodItem.foodType = berryFoodType;
+Debug.Log($"[{plant.gameObject.name}] Added FoodItem component to berry");
 }
 }
 
@@ -6149,6 +6356,18 @@ Debug.LogWarning($"Plant '{plant.gameObject.name}': {cellTypeName} missing Sprit
 }
 }
 
+pub void RegisterOutlineForCell(GameObject cellInstance, string cellTypeName) {
+if (!enableOutline || OutlineController == null || cellInstance == null) return;
+
+SpriteRenderer partRenderer = cellInstance.GetComponentInChildren<SpriteRenderer>();
+if (partRenderer != null) {
+OutlineController.RegisterPlantPart(partRenderer, OutlineController.outlinePartPrefab);
+}
+else {
+Debug.LogWarning($"Plant '{plant.gameObject.name}': {cellTypeName} missing SpriteRenderer. No outline.", cellInstance);
+}
+}
+
 pub void UpdateUI() {
 if (energyText == null) return;
 
@@ -6192,12 +6411,10 @@ displayedGrowthPercentage = -1;
 
 pub void UpdateShadow() {
 if (shadowController == null) return;
-
 }
 
 pub void UpdateOutline() {
 if (!enableOutline || OutlineController == null) return;
-
 }
 
 pub void SetEnergyTextVisibility(bool visible) {

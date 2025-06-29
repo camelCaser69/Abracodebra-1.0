@@ -307,4 +307,30 @@ public class PlantCellManager
 
     public List<GameObject> ActiveCellGameObjects => activeCellGameObjects;
     public Dictionary<Vector2Int, PlantCellType> Cells => cells;
+    
+    public int GetBerryCount()
+    {
+        int count = 0;
+        foreach (var kvp in cells)
+        {
+            if (kvp.Value == PlantCellType.Fruit)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public List<Vector2Int> GetBerryPositions()
+    {
+        List<Vector2Int> berryPositions = new List<Vector2Int>();
+        foreach (var kvp in cells)
+        {
+            if (kvp.Value == PlantCellType.Fruit)
+            {
+                berryPositions.Add(kvp.Key);
+            }
+        }
+        return berryPositions;
+    }
 }

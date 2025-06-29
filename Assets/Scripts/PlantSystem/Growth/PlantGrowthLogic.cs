@@ -19,6 +19,8 @@ public class PlantGrowthLogic {
     float growthProgressTicks = 0f;
     int maturityCycleTick = 0;
     int currentStemStage = 0;
+    
+    public int MaxBerries { get; set; }
 
     public PlantGrowthLogic(PlantGrowth plant) {
         this.plant = plant;
@@ -46,14 +48,14 @@ public void CalculateAndApplyStats()
         int baseCooldownTicks = 20;
         int baseCastDelayTicks = 0;
         bool seedFound = false;
+        int baseMaxBerries = 3;
 
         // --- Step 2: If a comprehensive seed exists, use its data to OVERWRITE the defaults ---
         NodeData firstNode = plant.NodeGraph.nodes.FirstOrDefault();
         if (firstNode != null)
         {
             var seedEffect = firstNode.effects?.FirstOrDefault(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
-            if (seedEffect != null && seedEffect.seedData != null)
-            {
+            if (seedEffect != null && seedEffect.seedData != null) {
                 seedFound = true;
                 baseEnergyStorage = seedEffect.seedData.energyStorage;
                 baseGrowthTicksPerStage = seedEffect.seedData.growthSpeed;
@@ -64,6 +66,7 @@ public void CalculateAndApplyStats()
                 baseGrowthRandomness = seedEffect.seedData.stemRandomness;
                 baseCooldownTicks = seedEffect.seedData.cooldown;
                 baseCastDelayTicks = seedEffect.seedData.castDelay;
+                baseMaxBerries = seedEffect.seedData.maxBerries; // ADD THIS LINE
             }
         }
 
@@ -137,22 +140,17 @@ public void CalculateAndApplyStats()
         }
         
         Debug.Log($"[{plant.gameObject.name}] Growth stats: TargetStem={TargetStemLength}, GrowthTicks={GrowthTicksPerStage}, Cooldown={MaturityCycleTicks}");
+        
+        MaxBerries = baseMaxBerries;
     }
-
-    // In file: Assets\Scripts\PlantSystem\Growth\PlantGrowthLogic.cs
-
-    // In file: Assets\Scripts\PlantSystem\Growth\PlantGrowthLogic.cs
 
     public void OnTickUpdate(int currentTick)
     {
         switch (plant.CurrentState)
         {
             case PlantState.Growing:
-                if (plant.allowPhotosynthesisDuringGrowth)
-                {
-                    plant.EnergySystem.AccumulateEnergyTick();
-                }
-
+                // REMOVED: Redundant energy accumulation was happening here and in PlantGrowth.
+                
                 float growthMultiplier = 1.0f;
                 if (PlantGrowthModifierManager.Instance != null)
                 {
@@ -174,7 +172,7 @@ public void CalculateAndApplyStats()
                 break;
 
             case PlantState.Mature_Idle:
-                plant.EnergySystem.AccumulateEnergyTick();
+                // REMOVED: Redundant energy accumulation.
                 maturityCycleTick++;
 
                 if (maturityCycleTick >= MaturityCycleTicks && plant.EnergySystem.CurrentEnergy >= 1f)
@@ -186,7 +184,7 @@ public void CalculateAndApplyStats()
                 break;
 
             case PlantState.Mature_Executing:
-                plant.EnergySystem.AccumulateEnergyTick();
+                // REMOVED: Redundant energy accumulation.
                 plant.CurrentState = PlantState.Mature_Idle;
                 break;
         }
@@ -197,7 +195,7 @@ public void CalculateAndApplyStats()
 // PARTIAL FIX: Only the GrowNextStemStage method needs to be updated
 // Replace the existing GrowNextStemStage method in PlantGrowthLogic.cs with this:
 
-void GrowNextStemStage()
+    void GrowNextStemStage()
 {
     if (currentStemStage >= TargetStemLength) return;
 
@@ -248,7 +246,7 @@ void GrowNextStemStage()
             stemPos.x = previousStemPos.x; // Grow straight up
         }
 
-        // FIXED: Check if the position is already occupied and find alternative
+        // Check if the position is already occupied and find alternative
         int attempts = 0;
         while (plant.CellManager.HasCellAt(stemPos) && attempts < 5)
         {
@@ -291,10 +289,11 @@ void GrowNextStemStage()
         return;
     }
 
-    // Add leaves if appropriate
+    // FIXED: Add leaves with correct parameter order and proper LeafGap logic
     if (LeafGap >= 0 && (currentStemStage % (LeafGap + 1)) == 0)
     {
-        var leafPositions = plant.CellManager.CalculateLeafPositions(stemPos, currentStemStage, LeafPattern);
+        // FIXED: Use correct parameter order: stemPos, leafPattern, stageCounter
+        var leafPositions = plant.CellManager.CalculateLeafPositions(stemPos, LeafPattern, currentStemStage);
         foreach (Vector2Int leafPos in leafPositions)
         {
             // Check if leaf position is available before spawning

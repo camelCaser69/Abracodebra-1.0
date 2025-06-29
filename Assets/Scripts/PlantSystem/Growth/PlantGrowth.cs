@@ -177,12 +177,15 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
 
             case PlantState.Mature_Idle:
                 EnergySystem.AccumulateEnergyTick();
-                NodeExecutor.ExecuteMatureCycleTick();
-                UpdateRadiusVisualizations(); // Update visualizations during mature state
+                GrowthLogic.OnTickUpdate(currentTick);
+                UpdateRadiusVisualizations();
                 break;
 
             case PlantState.Mature_Executing:
                 EnergySystem.AccumulateEnergyTick();
+                // This call was missing. It allows the logic component to transition
+                // the state back to Mature_Idle on the next tick.
+                GrowthLogic.OnTickUpdate(currentTick);
                 break;
         }
 

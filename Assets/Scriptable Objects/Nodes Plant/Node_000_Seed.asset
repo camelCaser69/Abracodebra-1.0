@@ -26,11 +26,12 @@ MonoBehaviour:
     scentDefinitionReference: {fileID: 0}
     seedData:
       growthSpeed: 2
-      stemLengthMin: 4
-      stemLengthMax: 6
+      stemLengthMin: 6
+      stemLengthMax: 8
       leafGap: 1
       leafPattern: 0
       stemRandomness: 0.5
       energyStorage: 40
       cooldown: 4
       castDelay: 1
+      maxBerries: 4

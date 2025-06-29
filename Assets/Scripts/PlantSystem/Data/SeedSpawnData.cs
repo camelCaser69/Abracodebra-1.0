@@ -34,4 +34,8 @@ public class SeedSpawnData {
     
     [Tooltip("Ticks before growth starts")]
     public int castDelay = 0;
+    
+    [Header("Berry Configuration")]
+    [Tooltip("0 = no limit (only space limit)")]
+    public int maxBerries = 3; // 0 = no limit (only space limit)
 }
