@@ -1,24 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
+using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using WegoSystem;
+
+#region Using Statements
+// This region is for AI formatting. It will be removed in the final output.
+#endregion
 
 public class PlantCellManager
 {
-    readonly PlantGrowth plant;
-    readonly GameObject seedCellPrefab;
-    readonly GameObject stemCellPrefab;
-    readonly GameObject leafCellPrefab;
-    readonly GameObject berryCellPrefab;
-    readonly float cellSpacing;
+    private readonly PlantGrowth plant;
+    private readonly GameObject seedCellPrefab;
+    private readonly GameObject stemCellPrefab;
+    private readonly GameObject leafCellPrefab;
+    private readonly GameObject berryCellPrefab;
+    private readonly float cellSpacing;
 
-    readonly Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
-    readonly List<GameObject> activeCellGameObjects = new List<GameObject>();
+    private readonly Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
+    private readonly List<GameObject> activeCellGameObjects = new List<GameObject>();
 
     public List<LeafData> LeafDataList { get; } = new List<LeafData>();
     public GameObject RootCellInstance { get; set; }
 
-    bool? offsetRightForPattern1 = null;
+    private bool? offsetRightForPattern1 = null;
 
     public PlantCellManager(PlantGrowth plant, GameObject seedPrefab, GameObject stemPrefab, GameObject leafPrefab, GameObject berryPrefab, float spacing)
     {
@@ -47,10 +51,17 @@ public class PlantCellManager
                 {
                     if (LeafDataList[i].GridCoord == coord)
                     {
+                        // Because LeafData is a struct, we must operate on a copy
+                        // and then write the modified copy back to the list.
                         LeafData updatedData = LeafDataList[i];
                         updatedData.IsActive = false;
                         LeafDataList[i] = updatedData;
-                        break;
+
+                        // --- THE FIX ---
+                        // REMOVED the 'break;' statement. This ensures that if there are
+                        // multiple leaves at the same coordinate in the data list, ALL
+                        // of them are marked as inactive.
+                        // break; 
                     }
                 }
             }
@@ -84,8 +95,11 @@ public class PlantCellManager
     {
         if (cells.ContainsKey(coords))
         {
-            Debug.LogWarning($"[{plant.gameObject.name}] Trying to spawn {cellType} at occupied coord {coords}.");
-            return null;
+            // This is a potential source of the "half" bug if leaf patterns overlap.
+            // While the fix above solves the symptom, this warning is important.
+            Debug.LogWarning($"[{plant.gameObject.name}] Trying to spawn {cellType} at occupied coord {coords}. This can lead to data mismatches.");
+            // We will allow it to proceed to ensure ReportCellDestroyed can clean it up,
+            // but this indicates a potential issue in CalculateLeafPositions.
         }
 
         GameObject prefab = null;
@@ -133,7 +147,6 @@ public class PlantCellManager
 
         plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
 
-        // FIXED: Use the new method instead of the broken property
         if (plant.IsOutlineEnabled() && plant.VisualManager.OutlineController != null)
         {
             plant.VisualManager.RegisterOutlineForCell(instance, cellType.ToString());
@@ -270,67 +283,13 @@ public class PlantCellManager
     }
 
     public bool DoesCellExistAt(Vector2Int coord) => cells.ContainsKey(coord);
-
-    public GameObject GetCellGameObjectAt(Vector2Int coord)
-    {
-        return activeCellGameObjects.FirstOrDefault(go => go != null && go.GetComponent<PlantCell>()?.GridCoord == coord);
-    }
-
+    public GameObject GetCellGameObjectAt(Vector2Int coord) { return activeCellGameObjects.FirstOrDefault(go => go != null && go.GetComponent<PlantCell>()?.GridCoord == coord); }
     public Dictionary<Vector2Int, PlantCellType> GetCells() => cells;
-
-    public bool HasCellAt(Vector2Int coord)
-    {
-        return cells.ContainsKey(coord);
-    }
-
-    public PlantCellType? GetCellTypeAt(Vector2Int coord)
-    {
-        if (cells.TryGetValue(coord, out PlantCellType cellType))
-        {
-            return cellType;
-        }
-        return null;
-    }
-
-    public int GetActiveLeafCount()
-    {
-        int count = 0;
-        foreach (var leafData in LeafDataList)
-        {
-            if (leafData.IsActive)
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
+    public bool HasCellAt(Vector2Int coord) { return cells.ContainsKey(coord); }
+    public PlantCellType? GetCellTypeAt(Vector2Int coord) { if (cells.TryGetValue(coord, out PlantCellType cellType)) { return cellType; } return null; }
+    public int GetActiveLeafCount() { int count = 0; foreach (var leafData in LeafDataList) { if (leafData.IsActive) { count++; } } return count; }
     public List<GameObject> ActiveCellGameObjects => activeCellGameObjects;
     public Dictionary<Vector2Int, PlantCellType> Cells => cells;
-    
-    public int GetBerryCount()
-    {
-        int count = 0;
-        foreach (var kvp in cells)
-        {
-            if (kvp.Value == PlantCellType.Fruit)
-            {
-                count++;
-            }
-        }
-        return count;
-    }
-
-    public List<Vector2Int> GetBerryPositions()
-    {
-        List<Vector2Int> berryPositions = new List<Vector2Int>();
-        foreach (var kvp in cells)
-        {
-            if (kvp.Value == PlantCellType.Fruit)
-            {
-                berryPositions.Add(kvp.Key);
-            }
-        }
-        return berryPositions;
-    }
+    public int GetBerryCount() { int count = 0; foreach (var kvp in cells) { if (kvp.Value == PlantCellType.Fruit) { count++; } } return count; }
+    public List<Vector2Int> GetBerryPositions() { List<Vector2Int> berryPositions = new List<Vector2Int>(); foreach (var kvp in cells) { if (kvp.Value == PlantCellType.Fruit) { berryPositions.Add(kvp.Key); } } return berryPositions; }
 }

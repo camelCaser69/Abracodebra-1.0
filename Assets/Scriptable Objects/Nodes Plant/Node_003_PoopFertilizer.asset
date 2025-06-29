@@ -22,7 +22,7 @@ MonoBehaviour:
   - effectType: 10
     primaryValue: 2
     secondaryValue: 4
-    isPassive: 0
+    isPassive: 1
     scentDefinitionReference: {fileID: 0}
     seedData:
       growthSpeed: 5

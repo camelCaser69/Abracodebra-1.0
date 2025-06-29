@@ -1,54 +1,55 @@
-﻿using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Linq;
 using WegoSystem;
+
+#region Using Statements
+// This region is for AI formatting. It will be removed in the final output.
+#endregion
 
 public class PlantEnergySystem
 {
-    readonly PlantGrowth plant;
+    private readonly PlantGrowth plant;
 
     public float CurrentEnergy { get; set; } = 0f;
     public float MaxEnergy { get; set; } = 10f;
-    public float PhotosynthesisRate { get; set; } = 0.5f;
+    
+    // This property is not used in calculations and is effectively obsolete.
+    public float PhotosynthesisRate { get; set; }
 
-    FireflyManager fireflyManagerInstance;
+    private FireflyManager fireflyManagerInstance;
 
     public PlantEnergySystem(PlantGrowth plant)
     {
         this.plant = plant;
         fireflyManagerInstance = FireflyManager.Instance;
     }
-
-    public void AccumulateEnergy()
-    {
-        if (PhotosynthesisRate <= 0 || MaxEnergy <= 0) return;
-
-        float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
-        int leafCount = plant.CellManager.GetCells().Values.Count(c => c == PlantCellType.Leaf);
-        float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ?
-            PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(plant) : 1.0f;
-
-        float fireflyBonusRate = 0f;
-        if (fireflyManagerInstance != null)
-        {
-            int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(plant.transform.position, fireflyManagerInstance.photosynthesisRadius);
-            fireflyBonusRate = Mathf.Min(nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly, fireflyManagerInstance.maxPhotosynthesisBonus);
-        }
-
-        float standardPhotosynthesis = PhotosynthesisRate * leafCount * sunlight;
-        float totalRate = (standardPhotosynthesis + fireflyBonusRate) * tileMultiplier;
-        float delta = totalRate * Time.deltaTime;
-        CurrentEnergy = Mathf.Clamp(CurrentEnergy + delta, 0f, MaxEnergy);
-    }
-
+    
     public void AccumulateEnergyTick()
     {
-        if (PhotosynthesisRate <= 0 || MaxEnergy <= 0) return;
+        if (plant.GrowthLogic == null || MaxEnergy <= 0) return;
 
+        // --- THE ONLY SOURCE OF PHOTOSYNTHESIS ---
+        // 1. Get the current, accurate number of active leaves.
+        int leafCount = plant.CellManager.GetActiveLeafCount();
+
+        // 2. If there are no leaves, we gain no energy from photosynthesis. Period.
+        if (leafCount <= 0)
+        {
+            return;
+        }
+
+        // --- ALL SUBSEQUENT CALCULATIONS ONLY RUN IF leafCount > 0 ---
+        
+        // 3. Get environmental modifiers
         float sunlight = WeatherManager.Instance ? WeatherManager.Instance.sunIntensity : 1f;
-        int leafCount = plant.CellManager.GetCells().Values.Count(c => c == PlantCellType.Leaf);
         float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ?
             PlantGrowthModifierManager.Instance.GetEnergyRechargeMultiplier(plant) : 1.0f;
+        float ticksPerSecond = TickManager.Instance?.Config?.ticksPerRealSecond ?? 2f;
 
+        // 4. Get the base efficiency PER LEAF from the plant's calculated stats
+        float efficiencyPerLeaf = plant.GrowthLogic.PhotosynthesisEfficiencyPerLeaf;
+
+        // 5. Calculate firefly bonus. This is a flat bonus to the overall process.
         float fireflyBonusRate = 0f;
         if (fireflyManagerInstance != null)
         {
@@ -56,10 +57,8 @@ public class PlantEnergySystem
             if (plantGrid != null)
             {
                 int radiusTiles = Mathf.CeilToInt(fireflyManagerInstance.photosynthesisRadius);
-
                 int nearbyFlyCount = 0;
                 var fireflies = Object.FindObjectsByType<FireflyController>(FindObjectsSortMode.None);
-
                 foreach (var firefly in fireflies)
                 {
                     GridEntity fireflyGrid = firefly.GetComponent<GridEntity>();
@@ -69,19 +68,19 @@ public class PlantEnergySystem
                         nearbyFlyCount++;
                     }
                 }
-
                 fireflyBonusRate = Mathf.Min(
                     nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly,
                     fireflyManagerInstance.maxPhotosynthesisBonus
                 );
             }
         }
+        
+        // 6. Calculate final energy gain for this tick
+        float totalPhotosynthesisRatePerLeaf = (efficiencyPerLeaf * sunlight) + fireflyBonusRate;
+        float energyThisTick = (totalPhotosynthesisRatePerLeaf * leafCount) / ticksPerSecond;
+        float totalGain = energyThisTick * tileMultiplier;
 
-        float ticksPerSecond = TickManager.Instance?.Config?.ticksPerRealSecond ?? 2f;
-        float standardPhotosynthesis = (PhotosynthesisRate * leafCount * sunlight) / ticksPerSecond;
-        float totalRate = (standardPhotosynthesis + (fireflyBonusRate / ticksPerSecond)) * tileMultiplier;
-
-        CurrentEnergy = Mathf.Clamp(CurrentEnergy + totalRate, 0f, MaxEnergy);
+        CurrentEnergy = Mathf.Clamp(CurrentEnergy + totalGain, 0f, MaxEnergy);
     }
 
     public void SpendEnergy(float amount)

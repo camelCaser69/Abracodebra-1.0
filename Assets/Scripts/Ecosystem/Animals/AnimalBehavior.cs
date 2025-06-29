@@ -1,49 +1,46 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections.Generic;
 using WegoSystem;
+
+#region Using Statements
+// This region is for AI formatting. It will be removed in the final output.
+#endregion
 
 public class AnimalBehavior : MonoBehaviour
 {
-    [Header("Spawning Points")]
-    [SerializeField] Transform poopSpawnPoint;
-    [SerializeField] List<GameObject> poopPrefabs;
-    
-    // References
+    [SerializeField] private Transform poopSpawnPoint;
+    [SerializeField] private List<GameObject> poopPrefabs;
+
     private AnimalController controller;
     private AnimalDefinition definition;
-    
-    // State
+
     private bool isEating = false;
     private bool isPooping = false;
     private bool hasPooped = true;
     private GameObject currentEatingTarget = null;
-    
-    // Tick counters
+
     private int eatRemainingTicks = 0;
     private int poopDelayTick = 0;
     private int currentPoopCooldownTick = 0;
-    
-    // Properties
+
     public bool IsEating => isEating;
     public bool IsPooping => isPooping;
     public bool CanAct => !isEating && !isPooping && !controller.IsDying;
-    
+
     public void Initialize(AnimalController controller, AnimalDefinition definition)
     {
         this.controller = controller;
         this.definition = definition;
-        
-        // Initialize poop state
+
         hasPooped = true;
         poopDelayTick = 0;
         currentPoopCooldownTick = 0;
-        
+
         Debug.Log($"[AnimalBehavior] Initialized for {controller.SpeciesName}. Poop delay range: {definition.minPoopDelayTicks}-{definition.maxPoopDelayTicks} ticks");
     }
-    
+
     public void OnTickUpdate(int currentTick)
     {
-        // Update eating
         if (isEating)
         {
             eatRemainingTicks--;
@@ -52,8 +49,7 @@ public class AnimalBehavior : MonoBehaviour
                 FinishEating();
             }
         }
-        
-        // Update poop timers
+
         if (poopDelayTick > 0)
         {
             poopDelayTick--;
@@ -62,97 +58,106 @@ public class AnimalBehavior : MonoBehaviour
                 Debug.Log($"[AnimalBehavior] {controller.SpeciesName} poop delay timer reached 0");
             }
         }
-        
+
         if (currentPoopCooldownTick > 0)
         {
             currentPoopCooldownTick--;
         }
-        
-        // Try to poop if ready
+
         if (!hasPooped && poopDelayTick <= 0 && currentPoopCooldownTick <= 0 && CanAct)
         {
             Debug.Log($"[AnimalBehavior] {controller.SpeciesName} ready to poop! hasPooped={hasPooped}, delay={poopDelayTick}, cooldown={currentPoopCooldownTick}, canAct={CanAct}");
             TryPoop();
         }
     }
-    
+
     public void StartEating(GameObject food)
     {
         if (food == null || !CanAct) return;
-        
-        // Validate food
+
         FoodItem foodItem = food.GetComponent<FoodItem>();
         if (foodItem == null || foodItem.foodType == null || !definition.diet.CanEat(foodItem.foodType))
         {
             Debug.LogWarning($"[AnimalBehavior] {controller.SpeciesName} cannot eat this food!");
             return;
         }
-        
-        // Clear movement
+
         controller.Movement.ClearMovementPlan();
-        
-        // Start eating
+
         isEating = true;
         currentEatingTarget = food;
         eatRemainingTicks = definition.eatDurationTicks;
-        
+
         if (controller.CanShowThought())
         {
             controller.ShowThought(ThoughtTrigger.Eating);
         }
-        
+
         Debug.Log($"[AnimalBehavior] {controller.SpeciesName} started eating {foodItem.foodType.foodName}");
     }
-    
+
     private void FinishEating()
     {
         isEating = false;
-        
+
         if (currentEatingTarget == null)
         {
-            currentEatingTarget = null;
+            // No need to set it to null again if it already is.
             return;
         }
-        
-        // Get food component and eat
+
         FoodItem foodItem = currentEatingTarget.GetComponent<FoodItem>();
         if (foodItem != null)
         {
             controller.Needs.Eat(foodItem);
-            
-            // Destroy the food
+
+            // --- THE FIX ---
+            // We must manually report that the cell is destroyed BEFORE we call Destroy().
+            // This ensures the plant's leaf count is updated *within the same tick*,
+            // before the plant calculates its energy for this tick.
+            PlantCell plantCell = currentEatingTarget.GetComponent<PlantCell>();
+            if (plantCell != null && plantCell.ParentPlantGrowth != null)
+            {
+                if (Debug.isDebugBuild)
+                {
+                    Debug.Log($"[AnimalBehavior] Eating a plant cell. Manually reporting destruction of cell at {plantCell.GridCoord} to plant '{plantCell.ParentPlantGrowth.name}' before Destroy() is called.");
+                }
+                // This call updates the plant's LeafDataList instantly.
+                plantCell.ParentPlantGrowth.ReportCellDestroyed(plantCell.GridCoord);
+            }
+
+            // Now we can safely queue the object for destruction at the end of the frame.
             Destroy(currentEatingTarget);
-            
-            // Set up poop timer
+
             hasPooped = false;
             poopDelayTick = Random.Range(definition.minPoopDelayTicks, definition.maxPoopDelayTicks);
-            
+
             Debug.Log($"[AnimalBehavior] {controller.SpeciesName} finished eating. Will poop in {poopDelayTick} ticks");
         }
-        
+
         currentEatingTarget = null;
     }
-    
+
     private void TryPoop()
     {
         if (!CanAct) return;
-        
+
         isPooping = true;
         currentPoopCooldownTick = definition.poopCooldownTicks;
-        
+
         SpawnPoop();
-        
+
         hasPooped = true;
         isPooping = false;
-        
+
         if (controller.CanShowThought())
         {
             controller.ShowThought(ThoughtTrigger.Pooping);
         }
-        
+
         Debug.Log($"[AnimalBehavior] {controller.SpeciesName} pooped!");
     }
-    
+
     private void SpawnPoop()
     {
         if (poopPrefabs == null || poopPrefabs.Count == 0)
@@ -160,24 +165,19 @@ public class AnimalBehavior : MonoBehaviour
             Debug.LogWarning($"[AnimalBehavior] No poop prefabs assigned for {controller.SpeciesName}");
             return;
         }
-        
-        // Select random poop prefab
+
         int index = Random.Range(0, poopPrefabs.Count);
         GameObject prefab = poopPrefabs[index];
         if (prefab == null) return;
-        
-        // Determine spawn position
+
         Transform spawnTransform = poopSpawnPoint != null ? poopSpawnPoint : transform;
         GameObject poopObj = Instantiate(prefab, spawnTransform.position, Quaternion.identity);
-        
-        // Apply visual variations
+
         SpriteRenderer sr = poopObj.GetComponent<SpriteRenderer>();
         if (sr != null)
         {
-            // Random flip
             sr.flipX = Random.value > 0.5f;
-            
-            // Color variation
+
             Color c = sr.color;
             float v = definition.poopColorVariation;
             sr.color = new Color(
@@ -187,23 +187,21 @@ public class AnimalBehavior : MonoBehaviour
                 c.a
             );
         }
-        
-        // Initialize poop controller
+
         PoopController pc = poopObj.GetComponent<PoopController>();
         if (pc == null)
         {
             pc = poopObj.AddComponent<PoopController>();
         }
-        
-        // Snap poop to grid
+
         if (GridPositionManager.Instance != null)
         {
             GridPositionManager.Instance.SnapEntityToGrid(poopObj);
         }
-        
+
         Debug.Log($"[AnimalBehavior] {controller.SpeciesName} pooped at {poopObj.transform.position}");
     }
-    
+
     public void CancelCurrentAction()
     {
         if (isEating)
@@ -212,7 +210,7 @@ public class AnimalBehavior : MonoBehaviour
             eatRemainingTicks = 0;
             currentEatingTarget = null;
         }
-        
+
         if (isPooping)
         {
             isPooping = false;

@@ -16892,7 +16892,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a37449bddd8400b944e2b7ce73fc89b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showRadiusVisualizations: 1
+  showRadiusVisualizations: 0
   tileVisualizationAlpha: 0.2
   tilePrefab: {fileID: 4886254577836975288, guid: 4d4a6b97107455a4e9d4070dd042ca75, type: 3}
   animalSearchRadiusColor: {r: 1, g: 0.5, b: 0, a: 0.3}
