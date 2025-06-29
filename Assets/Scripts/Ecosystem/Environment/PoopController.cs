@@ -3,20 +3,18 @@ using WegoSystem;
 
 public class PoopController : MonoBehaviour, ITickUpdateable
 {
-    [Tooltip("The number of ticks this object exists before it starts to fade away.")]
-    [SerializeField] private int lifetimeTicks = 20;
-    
-    [Tooltip("The duration of the fade-out animation, in real-time seconds.")]
-    [SerializeField] private float fadeRealTimeDuration = 1f;
+    [SerializeField] int lifetimeTicks = 20;
 
-    private GridEntity gridEntity;
-    private SpriteRenderer spriteRenderer;
-    private int currentLifetimeTicks;
-    private bool isFading = false;
-    private float fadeTimer = 0f;
-    private Color originalColor;
+    [SerializeField] float fadeRealTimeDuration = 1f;
 
-    private void Awake()
+    GridEntity gridEntity;
+    SpriteRenderer spriteRenderer;
+    int currentLifetimeTicks;
+    bool isFading = false;
+    float fadeTimer = 0f;
+    Color originalColor;
+
+    void Awake()
     {
         gridEntity = GetComponent<GridEntity>();
         if (gridEntity == null)
@@ -30,9 +28,21 @@ public class PoopController : MonoBehaviour, ITickUpdateable
         {
             originalColor = spriteRenderer.color;
         }
+
+        // CRITICAL FIX: Snap and register the entity immediately upon creation.
+        // This prevents a race condition where the plant's tick update could run
+        // before this object's Start() method has been called.
+        if (GridPositionManager.Instance != null)
+        {
+            GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+        }
+        else
+        {
+            Debug.LogError($"[{gameObject.name}] GridPositionManager not found on Awake! Poop will not be registered correctly.");
+        }
     }
 
-    private void Start()
+    void Start()
     {
         currentLifetimeTicks = lifetimeTicks;
 
@@ -41,13 +51,10 @@ public class PoopController : MonoBehaviour, ITickUpdateable
             TickManager.Instance.RegisterTickUpdateable(this);
         }
 
-        if (GridPositionManager.Instance != null)
-        {
-            GridPositionManager.Instance.SnapEntityToGrid(gameObject);
-        }
+        // The SnapEntityToGrid call was moved to Awake().
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
         if (TickManager.Instance != null)
         {
@@ -55,7 +62,7 @@ public class PoopController : MonoBehaviour, ITickUpdateable
         }
     }
 
-    private void Update()
+    void Update()
     {
         if (isFading && fadeTimer > 0)
         {
@@ -75,26 +82,24 @@ public class PoopController : MonoBehaviour, ITickUpdateable
 
         currentLifetimeTicks--;
 
-        // --- FIX: Simplified lifetime check ---
         if (currentLifetimeTicks <= 0)
         {
             StartFading();
         }
     }
 
-    private void StartFading()
+    void StartFading()
     {
         isFading = true;
         fadeTimer = fadeRealTimeDuration;
-        
-        // Unregister from tick updates once fading starts to save performance.
+
         if (TickManager.Instance != null)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
     }
 
-    private void UpdateFade()
+    void UpdateFade()
     {
         if (spriteRenderer == null) return;
 

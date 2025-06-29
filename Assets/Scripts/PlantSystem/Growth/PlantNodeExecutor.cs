@@ -1,11 +1,16 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using WegoSystem;
 
 public class PlantNodeExecutor
 {
     private readonly PlantGrowth plant;
+
+    // This set no longer needs to contain PoopAbsorption
+    static readonly HashSet<NodeEffectType> EnergyFreeEffectTypes = new HashSet<NodeEffectType>
+    {
+    };
 
     public PlantNodeExecutor(PlantGrowth plant)
     {
@@ -20,10 +25,8 @@ public class PlantNodeExecutor
             return;
         }
 
-        // --- PHASE 1: CALCULATION & PREPARATION ---
-        // First, we gather all active effects and calculate the total energy cost.
-
-        var effectsToExecute = new List<NodeEffectData>();
+        var energyFreeEffects = new List<NodeEffectData>();
+        var energyRequiringEffects = new List<NodeEffectData>();
         var accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
         var accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
         float totalEnergyCostForCycle = 0f;
@@ -34,111 +37,127 @@ public class PlantNodeExecutor
 
             foreach (var effect in node.effects)
             {
-                if (effect == null || effect.isPassive) continue; // We only care about ACTIVE effects now
+                if (effect == null || effect.isPassive) continue; // Skip null and passive effects
 
-                // Add this active effect to our list for later execution
-                effectsToExecute.Add(effect);
-
-                // If this effect has a cost, add it to the total
-                if (effect.effectType == NodeEffectType.EnergyCost)
+                if (IsEnergyFreeEffect(effect.effectType))
                 {
-                    totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
+                    energyFreeEffects.Add(effect);
+                }
+                else
+                {
+                    energyRequiringEffects.Add(effect);
+
+                    if (effect.effectType == NodeEffectType.EnergyCost)
+                    {
+                        totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
+                    }
                 }
             }
         }
 
-        // --- PHASE 2: ENERGY CHECK ---
-        // Now, check if we have enough energy BEFORE executing anything.
+        if (Debug.isDebugBuild)
+        {
+            Debug.Log($"[{plant.gameObject.name}] Executing {energyFreeEffects.Count} energy-free effects");
+        }
+        foreach (var effect in energyFreeEffects)
+        {
+            ExecuteEffect(effect, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+        }
 
-        if (plant.EnergySystem.CurrentEnergy < totalEnergyCostForCycle)
+        if (totalEnergyCostForCycle > 0 && plant.EnergySystem.CurrentEnergy < totalEnergyCostForCycle)
         {
             if (Debug.isDebugBuild)
             {
-                Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.CurrentEnergy}/{totalEnergyCostForCycle}) for mature cycle. Abilities will not fire.");
+                Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.CurrentEnergy}/{totalEnergyCostForCycle}) for energy-requiring abilities.");
             }
-            return; // Not enough energy, so we stop here.
-        }
-
-        // --- PHASE 3: EXECUTION ---
-        // We have enough energy. Spend it, then execute all queued effects.
-
-        plant.EnergySystem.SpendEnergy(totalEnergyCostForCycle);
-
-        foreach (var effect in effectsToExecute)
-        {
-            switch (effect.effectType)
+            if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0)
             {
-                // FIX: Poop Absorption is now a standard active effect.
-                case NodeEffectType.PoopAbsorption:
-                    CheckForPoopAndAbsorb(effect.primaryValue, effect.secondaryValue);
-                    break;
-
-                case NodeEffectType.GrowBerry:
-                    SpawnBerry();
-                    break;
-                
-                // We still gather scent data here for a final application after the loop
-                case NodeEffectType.ScentModifier:
-                    if (effect.scentDefinitionReference != null)
-                    {
-                        ScentDefinition key = effect.scentDefinitionReference;
-                        if (!accumulatedScentRadiusBonus.ContainsKey(key))
-                            accumulatedScentRadiusBonus[key] = 0f;
-                        accumulatedScentRadiusBonus[key] += effect.primaryValue;
-
-                        if (!accumulatedScentStrengthBonus.ContainsKey(key))
-                            accumulatedScentStrengthBonus[key] = 0f;
-                        accumulatedScentStrengthBonus[key] += effect.secondaryValue;
-                    }
-                    break;
-                
-                // Note: Damage and EnergyCost effects are handled elsewhere or are purely for calculation
-                // and don't have an execution step here.
+                ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
             }
+            return;
         }
 
-        // Finally, apply any scent modifiers that were gathered.
+        if (totalEnergyCostForCycle > 0)
+        {
+            plant.EnergySystem.SpendEnergy(totalEnergyCostForCycle);
+        }
+
+        if (Debug.isDebugBuild)
+        {
+            Debug.Log($"[{plant.gameObject.name}] Executing {energyRequiringEffects.Count} energy-requiring effects");
+        }
+        foreach (var effect in energyRequiringEffects)
+        {
+            ExecuteEffect(effect, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+        }
+
         if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0)
         {
             ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
         }
     }
 
-    private void CheckForPoopAndAbsorb(float detectionRadius, float energyBonus)
+    private bool IsEnergyFreeEffect(NodeEffectType effectType)
     {
-        if (detectionRadius <= 0f) return;
+        return EnergyFreeEffectTypes.Contains(effectType);
+    }
 
-        GridEntity plantGrid = plant.GetComponent<GridEntity>();
-        if (plantGrid == null) return;
-
-        int radiusTiles = Mathf.RoundToInt(detectionRadius);
-        var tilesInRadius = GridRadiusUtility.GetTilesInCircle(plantGrid.Position, radiusTiles);
-
-        foreach (var tile in tilesInRadius)
+    private void ExecuteEffect(NodeEffectData effect, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus)
+    {
+        switch (effect.effectType)
         {
-            var entitiesAtTile = GridPositionManager.Instance.GetEntitiesAt(tile);
-            foreach (var entity in entitiesAtTile)
-            {
-                PoopController poop = entity.GetComponent<PoopController>();
-                if (poop != null)
-                {
-                    if (energyBonus > 0f)
-                    {
-                        plant.EnergySystem.AddEnergy(energyBonus);
-                        if (Debug.isDebugBuild)
-                        {
-                            Debug.Log($"[{plant.gameObject.name}] Absorbed poop and gained {energyBonus} energy!");
-                        }
-                    }
+            case NodeEffectType.PoopAbsorption:
+                // NEW: Add a safeguard warning if this effect is ever misconfigured as "active"
+                Debug.LogWarning($"[{plant.gameObject.name}] Tried to execute PoopAbsorption as an ACTIVE effect. It should be PASSIVE. Please check the 'Is Passive' box on its NodeDefinition in the Inspector.");
+                break;
 
-                    Object.Destroy(poop.gameObject);
-                    break;
+            case NodeEffectType.GrowBerry:
+                SpawnBerry();
+                break;
+
+            case NodeEffectType.ScentModifier:
+                if (effect.scentDefinitionReference != null)
+                {
+                    ScentDefinition key = effect.scentDefinitionReference;
+                    if (!accumulatedScentRadiusBonus.ContainsKey(key))
+                        accumulatedScentRadiusBonus[key] = 0f;
+                    accumulatedScentRadiusBonus[key] += effect.primaryValue;
+
+                    if (!accumulatedScentStrengthBonus.ContainsKey(key))
+                        accumulatedScentStrengthBonus[key] = 0f;
+                    accumulatedScentStrengthBonus[key] += effect.secondaryValue;
                 }
-            }
+                break;
         }
     }
 
-    private void SpawnBerry()
+    public void ExecutePassiveAbilities(List<NodeEffectData> passiveEffects = null)
+    {
+        if (plant.NodeGraph?.nodes == null || plant.NodeGraph.nodes.Count == 0) return;
+
+        if (passiveEffects == null)
+        {
+            passiveEffects = new List<NodeEffectData>();
+            foreach (var node in plant.NodeGraph.nodes)
+            {
+                if (node?.effects == null) continue;
+                foreach (var effect in node.effects)
+                {
+                    if (effect != null && effect.isPassive)
+                    {
+                        passiveEffects.Add(effect);
+                    }
+                }
+            }
+        }
+
+        foreach (var effect in passiveEffects)
+        {
+            // Future passive abilities could be executed here if needed.
+        }
+    }
+
+    void SpawnBerry()
     {
         var cells = plant.CellManager.GetCells();
         if (cells.Count == 0) return;
@@ -150,7 +169,8 @@ public class PlantNodeExecutor
 
         if (hasLimit && currentBerryCount >= maxBerriesAllowed)
         {
-            Debug.Log($"[{plant.gameObject.name}] Already has {currentBerryCount} berries (max: {maxBerriesAllowed}). Skipping berry spawn.");
+            if (Debug.isDebugBuild)
+                Debug.Log($"[{plant.gameObject.name}] Already has {currentBerryCount} berries (max: {maxBerriesAllowed}). Skipping berry spawn.");
             return;
         }
 
@@ -161,8 +181,7 @@ public class PlantNodeExecutor
             if (kvp.Value == PlantCellType.Stem || kvp.Value == PlantCellType.Leaf)
             {
                 Vector2Int cellPos = kvp.Key;
-                Vector2Int[] surroundingPositions = new Vector2Int[]
-                {
+                Vector2Int[] surroundingPositions = new Vector2Int[] {
                     cellPos + Vector2Int.up,
                     cellPos + Vector2Int.down,
                     cellPos + Vector2Int.left,
@@ -183,16 +202,19 @@ public class PlantNodeExecutor
             }
         }
 
+        // Don't spawn berries on the ground line or below
         availablePositions.RemoveWhere(pos => pos.y <= 0);
 
         List<Vector2Int> candidatePositions = availablePositions.ToList();
 
         if (candidatePositions.Count == 0)
         {
-            Debug.LogWarning($"[{plant.gameObject.name}] No available space to spawn berry (all valid positions occupied or filtered).");
+            if (Debug.isDebugBuild)
+                Debug.LogWarning($"[{plant.gameObject.name}] No available space to spawn berry (all valid positions occupied or filtered).");
             return;
         }
 
+        // --- Prefer positions that are NOT adjacent to existing berries ---
         List<Vector2Int> existingBerryPositions = plant.CellManager.GetBerryPositions();
         List<Vector2Int> preferredPositions = new List<Vector2Int>();
         List<Vector2Int> otherPositions = new List<Vector2Int>();
@@ -203,30 +225,36 @@ public class PlantNodeExecutor
             {
                 if (IsAdjacentToExistingBerries(candidate, existingBerryPositions))
                 {
-                    otherPositions.Add(candidate);
+                    otherPositions.Add(candidate); // It's adjacent, so it's not preferred
                 }
                 else
                 {
-                    preferredPositions.Add(candidate);
+                    preferredPositions.Add(candidate); // Not adjacent, so preferred
                 }
             }
         }
         else
         {
+            // No existing berries, all candidates are equally preferred
             preferredPositions.AddRange(candidatePositions);
         }
 
+        // Use preferred positions if any exist, otherwise fall back to any valid position
         List<Vector2Int> finalCandidates = preferredPositions.Count > 0 ? preferredPositions : otherPositions;
-        
-        if (finalCandidates.Count == 0) {
+
+        // This check is a safeguard; if otherPositions was also empty, it means all candidates were adjacent.
+        // In that case, we must allow spawning adjacent.
+        if (finalCandidates.Count == 0)
+        {
             finalCandidates = otherPositions;
         }
-        
-        if (finalCandidates.Count == 0) {
-            Debug.LogWarning($"[{plant.gameObject.name}] No final candidates to spawn berry.");
+
+        if (finalCandidates.Count == 0)
+        {
+             if (Debug.isDebugBuild)
+                Debug.LogWarning($"[{plant.gameObject.name}] No final candidates to spawn berry.");
             return;
         }
-
 
         int randomIndex = Random.Range(0, finalCandidates.Count);
         Vector2Int chosenPosition = finalCandidates[randomIndex];
@@ -235,19 +263,22 @@ public class PlantNodeExecutor
         if (berry != null)
         {
             string limitInfo = hasLimit ? $"#{currentBerryCount + 1}/{maxBerriesAllowed}" : $"#{currentBerryCount + 1} (no limit)";
-            Debug.Log($"[{plant.gameObject.name}] Spawned berry {limitInfo} at {chosenPosition}");
+            if (Debug.isDebugBuild)
+                Debug.Log($"[{plant.gameObject.name}] Spawned berry {limitInfo} at {chosenPosition}");
             AddFoodComponentToBerry(berry);
         }
         else
         {
-            Debug.LogWarning($"[{plant.gameObject.name}] Failed to spawn berry at {chosenPosition}");
+             if (Debug.isDebugBuild)
+                Debug.LogWarning($"[{plant.gameObject.name}] Failed to spawn berry at {chosenPosition}");
         }
     }
 
-    private bool IsAdjacentToExistingBerries(Vector2Int position, List<Vector2Int> existingBerries)
+    bool IsAdjacentToExistingBerries(Vector2Int position, List<Vector2Int> existingBerries)
     {
-        foreach (var berryPos in existingBerries)
+        foreach(var berryPos in existingBerries)
         {
+            // Chebyshev distance of 1 means they are touching cardinally or diagonally
             if (Mathf.Max(Mathf.Abs(position.x - berryPos.x), Mathf.Abs(position.y - berryPos.y)) == 1)
             {
                 return true;
@@ -256,10 +287,11 @@ public class PlantNodeExecutor
         return false;
     }
 
-    private void AddFoodComponentToBerry(GameObject berry)
+    void AddFoodComponentToBerry(GameObject berry)
     {
         if (berry == null) return;
 
+        // Don't add if one already exists
         FoodItem foodItem = berry.GetComponent<FoodItem>();
         if (foodItem != null) return;
 
@@ -271,13 +303,15 @@ public class PlantNodeExecutor
         }
     }
 
-    private FoodType GetBerryFoodType()
+    FoodType GetBerryFoodType()
     {
+        // Try loading a specific "Berry" food type first for consistency
         FoodType berryType = Resources.Load<FoodType>("FoodTypes/Berry");
         if (berryType != null) return berryType;
 
+        // Fallback: Find any food type with the "Plant_Fruit" category
         FoodType[] allFoodTypes = Resources.LoadAll<FoodType>("");
-        foreach (FoodType foodType in allFoodTypes)
+        foreach(FoodType foodType in allFoodTypes)
         {
             if (foodType.category == FoodType.FoodCategory.Plant_Fruit)
             {
@@ -304,10 +338,12 @@ public class PlantNodeExecutor
 
             if (existingSource != null)
             {
+                // Modify existing source
                 existingSource.ApplyModifiers(radiusBonus, strengthBonus);
             }
             else
             {
+                // Create a new ScentSource component
                 GameObject scentSourceObj = new GameObject($"ScentSource_{scentDef.displayName}");
                 scentSourceObj.transform.SetParent(targetObject.transform);
                 scentSourceObj.transform.localPosition = Vector3.zero;
@@ -320,7 +356,8 @@ public class PlantNodeExecutor
         }
     }
 
-    private void SetScentSourceDefinition(ScentSource source, ScentDefinition definition)
+    // Helper to abstract setting the definition, might be useful if you use reflection or custom editors later
+    void SetScentSourceDefinition(ScentSource source, ScentDefinition definition)
     {
         source.SetDefinition(definition);
     }

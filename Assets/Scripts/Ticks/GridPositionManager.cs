@@ -352,11 +352,16 @@ namespace WegoSystem
                 gridEntity = entity.AddComponent<GridEntity>();
             }
 
+            // This snaps the entity's internal position and visual transform
             gridEntity.SnapToGrid();
+
+            // NEW: Immediately register the entity with the manager.
+            // This ensures it is discoverable in the same tick/frame it is spawned.
+            RegisterEntity(gridEntity);
 
             if (debugMode)
             {
-                Debug.Log($"[GridPositionManager] Snapped {entity.name} to grid {gridEntity.Position}");
+                Debug.Log($"[GridPositionManager] Snapped and Registered {entity.name} to grid {gridEntity.Position}");
             }
         }
 

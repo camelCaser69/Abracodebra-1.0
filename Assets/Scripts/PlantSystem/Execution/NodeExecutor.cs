@@ -1,18 +1,22 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
-using System;
 using TMPro;
+using System.Linq;
+using WegoSystem;
+using System.Collections.Generic;
+
+#region Using Statements
+// This region is for AI formatting. It will be removed in the final output.
+#endregion
 
 public class NodeExecutor : MonoBehaviour
 {
-    [SerializeField] private GameObject plantPrefab;
-    [SerializeField] private TMP_Text debugOutput;
+    [SerializeField] GameObject plantPrefab;
+    [SerializeField] TMP_Text debugOutput;
 
     public static List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
     {
         if (originalList == null) return new List<NodeEffectData>();
-    
+
         List<NodeEffectData> newList = new List<NodeEffectData>(originalList.Count);
         foreach (var originalEffect in originalList)
         {
@@ -26,8 +30,7 @@ public class NodeExecutor : MonoBehaviour
                 isPassive = originalEffect.isPassive,
                 scentDefinitionReference = originalEffect.scentDefinitionReference
             };
-        
-            // --- FIX: Perform a deep copy of seedData ---
+
             if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null)
             {
                 newEffect.seedData = new SeedSpawnData
@@ -43,7 +46,7 @@ public class NodeExecutor : MonoBehaviour
                     castDelay = originalEffect.seedData.castDelay
                 };
             }
-        
+
             newList.Add(newEffect);
         }
         return newList;
@@ -106,16 +109,15 @@ public class NodeExecutor : MonoBehaviour
 
         seedNodeDataInSlot.EnsureSeedSequenceInitialized();
 
-        // This call should now work
         NodeGraph sequenceFromEditor = NodeEditorGridController.Instance.GetCurrentGraphInEditorForSpawning();
 
-        DebugLog($"Attempting to plant seed '{seedNodeDataInSlot.nodeDisplayName}' with {sequenceFromEditor.nodes.Count} internal nodes from editor...");
+        DebugLog($"Attempting to plant seed '{seedNodeDataInSlot.nodeDisplayName}' with {sequenceFromEditor.nodes.Count} int nodes from editor...");
 
         NodeGraph finalGraphForPlant = new NodeGraph { nodes = new List<NodeData>() };
 
         NodeData clonedSeedNodeForPlant = CloneNodeData(seedNodeDataInSlot, false);
         if (clonedSeedNodeForPlant == null) { DebugLogError("Failed to clone seed node for plant."); return null; }
-        
+
         clonedSeedNodeForPlant.orderIndex = 0;
         clonedSeedNodeForPlant.canBeDeleted = false;
         finalGraphForPlant.nodes.Add(clonedSeedNodeForPlant);
@@ -124,7 +126,7 @@ public class NodeExecutor : MonoBehaviour
         foreach (NodeData nodeFromEditorSequence in sequenceFromEditor.nodes.OrderBy(n => n.orderIndex))
         {
             if (nodeFromEditorSequence == null) continue;
-            
+
             NodeData clonedSequenceNodeForPlant = CloneNodeData(nodeFromEditorSequence, false);
             if (clonedSequenceNodeForPlant == null) continue;
 
@@ -134,6 +136,17 @@ public class NodeExecutor : MonoBehaviour
         }
 
         GameObject plantObj = Instantiate(plantPrefab, plantingPosition, Quaternion.identity, parentTransform);
+        
+        // FIX: Snap the newly created plant to the grid so its GridPosition is correctly calculated and registered.
+        if (GridPositionManager.Instance != null)
+        {
+            GridPositionManager.Instance.SnapEntityToGrid(plantObj);
+        }
+        else
+        {
+            DebugLogError("GridPositionManager not found! Plant may not function correctly.");
+        }
+
         PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
 
         if (growthComponent != null)
@@ -186,6 +199,17 @@ public class NodeExecutor : MonoBehaviour
         }
 
         GameObject plantGO = Instantiate(plantPrefab, spawnPos, Quaternion.identity, parent);
+        
+        // FIX: Snap the newly created plant to the grid so its GridPosition is correctly calculated and registered.
+        if (GridPositionManager.Instance != null)
+        {
+            GridPositionManager.Instance.SnapEntityToGrid(plantGO);
+        }
+        else
+        {
+            DebugLogError("GridPositionManager not found! Plant may not function correctly.");
+        }
+        
         PlantGrowth growth = plantGO.GetComponent<PlantGrowth>();
 
         if (growth == null)

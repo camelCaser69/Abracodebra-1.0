@@ -53,11 +53,12 @@ namespace WegoSystem
 
         protected virtual void Start()
         {
+            // OLD LOGIC: GridPositionManager.Instance?.RegisterEntity(this); <<< THIS LINE IS REMOVED
+            // The manager will now explicitly register the entity when it is snapped or created.
+
             visualStartPosition = transform.position;
             visualTargetPosition = transform.position;
             previousGridPosition = gridPosition;
-
-            GridPositionManager.Instance?.RegisterEntity(this);
         }
 
         protected virtual void OnDestroy()
