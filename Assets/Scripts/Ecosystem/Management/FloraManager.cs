@@ -1,19 +1,26 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections.Generic;
 using WegoSystem;
+
+#region Using Statements
+// This region is for AI formatting. It will be removed in the final output.
+#endregion
 
 public class FloraManager : MonoBehaviour
 {
-    public static FloraManager Instance { get; private set; }
+    public static FloraManager Instance { get; set; }
 
-    [Header("Debug")]
     [SerializeField] private bool enableDebugLogging = false;
 
-    // Tracking sets for what we're currently monitoring (not controlling!)
+    // --- NEW FIELD ---
+    [Header("Plant Balance Settings")]
+    [Tooltip("The base energy generated per leaf, per tick, at 100% sunlight, before any gene modifications.")]
+    [SerializeField] public float basePhotosynthesisRatePerLeaf = 0.1f;
+    
     private readonly HashSet<ScentSource> trackedScentSources = new HashSet<ScentSource>();
     private readonly HashSet<PlantGrowth> trackedPlants = new HashSet<PlantGrowth>();
 
-    void Awake()
+    private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -28,19 +35,17 @@ public class FloraManager : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         if (Instance == this) Instance = null;
 
-        // Clean up any active visualizations through GridDebugVisualizer
         CleanupAllVisualizations();
     }
 
-    void Update()
+    private void Update()
     {
         if (!Application.isPlaying || GridDebugVisualizer.Instance == null) return;
 
-        // Automatically track scent sources and plants based on GridDebugVisualizer settings
         UpdateScentRadiusTracking();
         UpdatePoopAbsorptionTracking();
     }
@@ -51,15 +56,13 @@ public class FloraManager : MonoBehaviour
         return plant.GetPoopDetectionRadius();
     }
 
-    void UpdateScentRadiusTracking()
+    private void UpdateScentRadiusTracking()
     {
-        // Check if scent radius visualization is enabled in GridDebugVisualizer
-        bool shouldShow = GridDebugVisualizer.Instance.IsScentRadiusEnabled && 
-                         GridDebugVisualizer.Instance.IsRadiusVisualizationEnabled;
+        bool shouldShow = GridDebugVisualizer.Instance.IsScentRadiusEnabled &&
+                          GridDebugVisualizer.Instance.IsRadiusVisualizationEnabled;
 
         if (!shouldShow)
         {
-            // Hide all scent visualizations if disabled in GridDebugVisualizer
             foreach (var source in trackedScentSources)
             {
                 if (source != null)
@@ -71,11 +74,9 @@ public class FloraManager : MonoBehaviour
             return;
         }
 
-        // Get all current scent sources
         ScentSource[] currentSources = FindObjectsByType<ScentSource>(FindObjectsSortMode.None);
         var currentSourcesSet = new HashSet<ScentSource>(currentSources);
 
-        // Remove visualizations for sources that no longer exist or are disabled
         var sourcesToRemove = new HashSet<ScentSource>();
         foreach (var source in trackedScentSources)
         {
@@ -94,13 +95,12 @@ public class FloraManager : MonoBehaviour
             trackedScentSources.Remove(source);
         }
 
-        // Add visualizations for active scent sources
         foreach (ScentSource source in currentSources)
         {
             if (source == null || !source.enabled || source.Definition == null) continue;
 
             float radius = source.EffectiveRadius;
-            if (radius <= 0.01f) 
+            if (radius <= 0.01f)
             {
                 if (trackedScentSources.Contains(source))
                 {
@@ -110,7 +110,6 @@ public class FloraManager : MonoBehaviour
                 continue;
             }
 
-            // Get the grid position for the scent source
             GridEntity gridEntity = source.GetComponent<GridEntity>();
             if (gridEntity != null)
             {
@@ -120,7 +119,6 @@ public class FloraManager : MonoBehaviour
             }
             else if (GridPositionManager.Instance != null)
             {
-                // Fallback for sources without GridEntity
                 GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(source.transform.position);
                 int radiusTiles = Mathf.RoundToInt(radius);
                 GridDebugVisualizer.Instance.VisualizeScentRadius(source, gridPos, radiusTiles);
@@ -129,15 +127,13 @@ public class FloraManager : MonoBehaviour
         }
     }
 
-    void UpdatePoopAbsorptionTracking()
+    private void UpdatePoopAbsorptionTracking()
     {
-        // Check if poop absorption radius visualization is enabled in GridDebugVisualizer
-        bool shouldShow = GridDebugVisualizer.Instance.IsPlantPoopRadiusEnabled && 
-                         GridDebugVisualizer.Instance.IsRadiusVisualizationEnabled;
+        bool shouldShow = GridDebugVisualizer.Instance.IsPlantPoopRadiusEnabled &&
+                          GridDebugVisualizer.Instance.IsRadiusVisualizationEnabled;
 
         if (!shouldShow)
         {
-            // Hide all poop absorption visualizations if disabled in GridDebugVisualizer
             foreach (var plant in trackedPlants)
             {
                 if (plant != null)
@@ -149,10 +145,8 @@ public class FloraManager : MonoBehaviour
             return;
         }
 
-        // Get all current plants
         var currentPlantsSet = new HashSet<PlantGrowth>(PlantGrowth.AllActivePlants);
 
-        // Remove visualizations for plants that no longer exist or are inactive
         var plantsToRemove = new HashSet<PlantGrowth>();
         foreach (var plant in trackedPlants)
         {
@@ -171,7 +165,6 @@ public class FloraManager : MonoBehaviour
             trackedPlants.Remove(plant);
         }
 
-        // Add visualizations for active plants
         foreach (PlantGrowth plant in PlantGrowth.AllActivePlants)
         {
             if (plant == null || !plant.gameObject.activeInHierarchy) continue;
@@ -187,7 +180,6 @@ public class FloraManager : MonoBehaviour
                 continue;
             }
 
-            // Get the grid position for the plant
             GridEntity gridEntity = plant.GetComponent<GridEntity>();
             if (gridEntity != null)
             {
@@ -197,7 +189,6 @@ public class FloraManager : MonoBehaviour
             }
             else if (GridPositionManager.Instance != null)
             {
-                // Fallback for plants without GridEntity
                 GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(plant.transform.position);
                 int radiusTiles = Mathf.RoundToInt(poopRadius);
                 GridDebugVisualizer.Instance.VisualizePlantPoopRadius(plant, gridPos, radiusTiles);
@@ -206,7 +197,7 @@ public class FloraManager : MonoBehaviour
         }
     }
 
-    void CleanupAllVisualizations()
+    private void CleanupAllVisualizations()
     {
         if (GridDebugVisualizer.Instance == null) return;
 
@@ -230,11 +221,8 @@ public class FloraManager : MonoBehaviour
         trackedPlants.Clear();
     }
 
-    // Read-only status methods for external components that need to know what's being tracked
     public bool HasScentSourcesTracked => trackedScentSources.Count > 0;
     public bool HasPlantsTracked => trackedPlants.Count > 0;
     public int TrackedScentSourceCount => trackedScentSources.Count;
     public int TrackedPlantCount => trackedPlants.Count;
-
-    // NO ENABLE/DISABLE METHODS - All control is in GridDebugVisualizer!
 }

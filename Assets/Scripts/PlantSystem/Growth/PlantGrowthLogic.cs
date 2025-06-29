@@ -44,9 +44,14 @@ public class PlantGrowthLogic
             Debug.LogError($"[{plant.gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
             return;
         }
+        
+        // --- FIX: Fetch the base rate from the FloraManager singleton ---
+        // Provides a default fallback value if the manager doesn't exist.
+        float basePhotosynthesisEfficiency = FloraManager.Instance != null 
+            ? FloraManager.Instance.basePhotosynthesisRatePerLeaf 
+            : 0.1f;
 
         float baseEnergyStorage = 10f;
-        float basePhotosynthesisEfficiency = 0.1f; // Base rate per leaf
         int baseStemMin = 3;
         int baseStemMax = 5;
         int baseGrowthTicksPerStage = 5;

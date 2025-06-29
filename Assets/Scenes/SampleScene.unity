@@ -10908,6 +10908,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enableDebugLogging: 0
+  basePhotosynthesisRatePerLeaf: 0.1
 --- !u!1 &865245884
 GameObject:
   m_ObjectHideFlags: 0
