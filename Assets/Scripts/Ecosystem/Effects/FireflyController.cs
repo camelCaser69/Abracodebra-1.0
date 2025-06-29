@@ -277,15 +277,32 @@ public class FireflyController : MonoBehaviour, ITickUpdateable
         emission.rateOverTime = currentGlowIntensity * 10f;
     }
 
-    void UpdateGroundLight()
+    private void UpdateGroundLight()
     {
         if (groundLight == null) return;
 
+        // 1. Lock ground light position to the center of its tile.
+        // This ensures the light stays on the ground plane of the tile, not moving up/down with the firefly.
+        groundLight.transform.position = currentTileCenter;
+
+        // 2. Calculate the firefly's height above the ground and normalize it (0 to 1).
+        float height = Mathf.Max(0, transform.position.y - currentTileCenter.y);
+        float maxFlightHeight = definition.flightBounds.y + definition.flightHeightOffset;
+        float heightT = (maxFlightHeight > 0) ? Mathf.Clamp01(height / maxFlightHeight) : 0f;
+
+        // 3. Determine intensity and radius based on height.
+        // As the firefly gets higher, the light becomes dimmer but casts a wider glow on the ground.
+        float heightBasedIntensity = Mathf.Lerp(baseGroundLightIntensity, baseGroundLightIntensity * 0.5f, heightT); // Dims to 50% at max height
+        float heightBasedRadiusMultiplier = Mathf.Lerp(1f, groundLightRadiusMultiplier, heightT); // Scales from 1x to the max multiplier
+        float finalRadius = baseGroundLightOuterRadius * heightBasedRadiusMultiplier;
+        
+        // 4. Apply flicker effect as before.
         glowFlickerTime += Time.deltaTime * definition.glowFlickerSpeed;
         float flicker = Mathf.Sin(glowFlickerTime) * definition.glowFlickerAmount;
 
-        groundLight.intensity = Mathf.Clamp(baseGroundLightIntensity + flicker, definition.groundLightMinIntensity, 1f);
-        groundLight.pointLightOuterRadius = baseGroundLightOuterRadius * groundLightRadiusMultiplier;
+        // 5. Combine height-based values with flicker and set the final light properties.
+        groundLight.intensity = Mathf.Clamp(heightBasedIntensity + flicker, definition.groundLightMinIntensity, 1f);
+        groundLight.pointLightOuterRadius = finalRadius;
     }
 
     void Die()

@@ -10,27 +10,28 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
     public class TileGrowthModifier
     {
         public TileDefinition tileDefinition;
-        [Tooltip("Multiplier for how fast the plant gains growth progress. >1 is faster, <1 is slower.")]
+        [Tooltip("Multiplier for growth progress per tick. 2.0 is twice as fast, 0.5 is half speed.")]
         public float growthSpeedMultiplier = 1.0f;
-        [Tooltip("Multiplier for how much energy the plant recharges via photosynthesis. >1 is more, <1 is less.")]
+        [Tooltip("Multiplier for energy gained per tick. 2.0 is twice as much, 0.5 is half.")]
         public float energyRechargeMultiplier = 1.0f;
     }
 
     [Header("Default Modifiers")]
     public float defaultGrowthSpeedMultiplier = 1.0f;
     public float defaultEnergyRechargeMultiplier = 1.0f;
-    
+
     [Header("Tile-Specific Modifiers")]
     public List<TileGrowthModifier> tileModifiers = new List<TileGrowthModifier>();
 
-    [Header("Dependencies & Debug")]
+    [Header("Setup")]
     [SerializeField] private TileInteractionManager tileInteractionManager;
     [SerializeField] private bool showDebugMessages = true;
     [SerializeField] private bool showTileChangeMessages = true;
-    
-    private Dictionary<TileDefinition, TileGrowthModifier> modifierLookup = new Dictionary<TileDefinition, TileGrowthModifier>();
+
+    // --- CHANGE 1: The dictionary now uses a string (the tile's display name) as the key. ---
+    private Dictionary<string, TileGrowthModifier> modifierLookup = new Dictionary<string, TileGrowthModifier>();
     private Dictionary<PlantGrowth, TileDefinition> plantTiles = new Dictionary<PlantGrowth, TileDefinition>();
-    
+
     void Awake()
     {
         if (Instance != null && Instance != this)
@@ -53,8 +54,7 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
                 Debug.LogWarning("PlantGrowthModifierManager: TileInteractionManager not found!");
             }
         }
-        
-        // Register this manager with the TickManager to receive tick updates
+
         if (TickManager.Instance != null)
         {
             TickManager.Instance.RegisterTickUpdateable(this);
@@ -73,17 +73,15 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
         }
     }
 
-    // This method is now called every game tick by the TickManager
     public void OnTickUpdate(int currentTick)
     {
         UpdateAllPlantTiles();
     }
-    
-    void UpdateAllPlantTiles()
+
+    private void UpdateAllPlantTiles()
     {
         if (tileInteractionManager == null) return;
 
-        // Use a temporary list to avoid issues with modifying the dictionary while iterating
         List<PlantGrowth> plantsToCheck = new List<PlantGrowth>(plantTiles.Keys);
 
         foreach (PlantGrowth plant in plantsToCheck)
@@ -97,7 +95,6 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
             Vector3Int gridPosition = tileInteractionManager.WorldToCell(plant.transform.position);
             TileDefinition currentTileDef = tileInteractionManager.FindWhichTileDefinitionAt(gridPosition);
 
-            // If the plant's tile has changed, update our record
             if (plantTiles.TryGetValue(plant, out TileDefinition previousTileDef) && currentTileDef != previousTileDef)
             {
                 plantTiles[plant] = currentTileDef;
@@ -112,14 +109,15 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void BuildModifierLookup()
+    private void BuildModifierLookup()
     {
         modifierLookup.Clear();
         foreach (var modifier in tileModifiers)
         {
-            if (modifier.tileDefinition != null && !modifierLookup.ContainsKey(modifier.tileDefinition))
+            // --- CHANGE 2: Use the tile's display name for the lookup key. ---
+            if (modifier.tileDefinition != null && !string.IsNullOrEmpty(modifier.tileDefinition.displayName) && !modifierLookup.ContainsKey(modifier.tileDefinition.displayName))
             {
-                modifierLookup.Add(modifier.tileDefinition, modifier);
+                modifierLookup.Add(modifier.tileDefinition.displayName, modifier);
             }
         }
     }
@@ -155,7 +153,8 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
 
         if (plantTiles.TryGetValue(plant, out TileDefinition tileDef) && tileDef != null)
         {
-            if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
+            // --- CHANGE 3: Perform the lookup using the tile's display name. ---
+            if (modifierLookup.TryGetValue(tileDef.displayName, out TileGrowthModifier modifier))
             {
                 return modifier.growthSpeedMultiplier;
             }
@@ -172,18 +171,19 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
         {
             RegisterNewPlant(plant); // Auto-register if not found
         }
-        
+
         if (plantTiles.TryGetValue(plant, out TileDefinition tileDef) && tileDef != null)
         {
-            if (modifierLookup.TryGetValue(tileDef, out TileGrowthModifier modifier))
+            // --- CHANGE 4: Perform the lookup using the tile's display name. ---
+            if (modifierLookup.TryGetValue(tileDef.displayName, out TileGrowthModifier modifier))
             {
                 return modifier.energyRechargeMultiplier;
             }
         }
-        
+
         return defaultEnergyRechargeMultiplier;
     }
-    
+
     private void RegisterNewPlant(PlantGrowth plant)
     {
         if (plant == null || tileInteractionManager == null) return;
@@ -198,10 +198,10 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
             Debug.Log($"Auto-registered new plant {plant.name} on tile {tileName}");
         }
     }
-    
+
     void OnValidate()
     {
-        // Rebuild the lookup in the editor for immediate feedback
+        // Rebuild the lookup in the editor when values change.
         BuildModifierLookup();
     }
 }

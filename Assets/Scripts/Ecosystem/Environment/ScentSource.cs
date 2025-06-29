@@ -22,12 +22,16 @@ public class ScentSource : MonoBehaviour
         }
     }
 
-    void Start()
+    private void Start()
     {
-        // Snap to grid if needed
-        if (GridPositionManager.Instance != null)
+        // ADDED CHECK: Only snap to grid if this is a standalone entity.
+        // If it's part of a plant, the parent PlantGrowth object handles positioning.
+        if (GetComponentInParent<PlantGrowth>() == null)
         {
-            GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+            if (GridPositionManager.Instance != null)
+            {
+                GridPositionManager.Instance.SnapEntityToGrid(gameObject);
+            }
         }
     }
 
