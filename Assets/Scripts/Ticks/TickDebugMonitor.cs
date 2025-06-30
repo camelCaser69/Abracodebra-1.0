@@ -87,36 +87,36 @@ public class TickDebugMonitor : MonoBehaviour {
         }
     }
     
+    // In TickDebugMonitor.cs, replace the UpdateDisplay method with this corrected version:
+
     void UpdateDisplay() {
         if (TickManager.Instance == null) return;
-        
-        // Tick info
+    
         tickCounterText.text = $"Tick: {TickManager.Instance.CurrentTick}";
         tickRateText.text = $"Rate: {TickManager.Instance.Config.ticksPerRealSecond:F1} ticks/sec";
-        
-        // Day progress
+    
         if (TickManager.Instance.Config != null) {
             int dayProgress = TickManager.Instance.Config.GetDayProgress(TickManager.Instance.CurrentTick);
             float dayPercent = TickManager.Instance.Config.GetDayProgressNormalized(TickManager.Instance.CurrentTick) * 100f;
             dayProgressText.text = $"Day: {dayProgress}/{TickManager.Instance.Config.ticksPerDay} ({dayPercent:F0}%)";
         }
-        
-        // Phase info
-        if (TurnPhaseManager.Instance != null) {
-            phaseText.text = $"Phase: {TurnPhaseManager.Instance.CurrentPhase} (Tick {TurnPhaseManager.Instance.CurrentPhaseTicks})";
+    
+        // Updated to use RunManager instead of TurnPhaseManager
+        if (RunManager.Instance != null) {
+            phaseText.text = $"Phase: {RunManager.Instance.CurrentPhase} (Tick {RunManager.Instance.CurrentPhaseTicks})";
         }
-        
-        // Entity counts
+    
         animalCountText.text = $"Animals: {CountEntities<AnimalController>()}";
         plantCountText.text = $"Plants: {PlantGrowth.AllActivePlants.Count}";
         fireflyCountText.text = $"Fireflies: {CountEntities<FireflyController>()}";
-        
-        // Performance
-        float avgTickDuration = tickDurationHistory.Count > 0 ? tickDurationHistory.Average() : 0f;
+    
+        // Update tick duration display
+        float avgTickDuration = tickDurationHistory.Count > 0 ? 
+            tickDurationHistory.Average() : 0f;
         tickDurationText.text = $"Tick Time: {avgTickDuration:F1}ms (Last: {lastTickDuration:F1}ms)";
         tickDurationBar.value = avgTickDuration / maxTickDuration;
-        
-        // Color code the bar
+    
+        // Update tick duration bar color
         if (avgTickDuration < maxTickDuration * 0.5f) {
             tickDurationBar.fillRect.GetComponent<Image>().color = Color.green;
         } else if (avgTickDuration < maxTickDuration * 0.8f) {
@@ -124,7 +124,7 @@ public class TickDebugMonitor : MonoBehaviour {
         } else {
             tickDurationBar.fillRect.GetComponent<Image>().color = Color.red;
         }
-        
+    
         // Update active effects
         UpdateActiveEffects();
     }

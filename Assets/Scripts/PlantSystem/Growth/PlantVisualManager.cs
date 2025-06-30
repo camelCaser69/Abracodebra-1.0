@@ -112,9 +112,8 @@ public class PlantVisualManager
         energyText.text = $"{currentEnergy:F1}/{maxEnergy:F0}";
     }
 
-    public void UpdateWegoUI()
-    {
-        UpdateUI();
+    public void UpdateWegoUI() {
+        UpdateUI();  // Simply delegate to the main update method
     }
 
     public void ResetDisplayState()
