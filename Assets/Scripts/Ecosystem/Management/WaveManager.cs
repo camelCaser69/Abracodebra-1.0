@@ -1,319 +1,309 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using WegoSystem;
 
-public enum InternalWaveState 
-{
-    Idle,
-    WaitingForSpawnTime,
-    Spawning
+public enum WaveState {
+    Idle,           // No wave active
+    Active,         // Wave is currently running
+    Spawning        // Currently spawning enemies
 }
 
-public class WaveManager : MonoBehaviour 
-{
+public class WaveManager : MonoBehaviour {
     public static WaveManager Instance { get; private set; }
 
+    [Header("Core References")]
     [SerializeField] Camera mainCamera;
     [SerializeField] FaunaManager faunaManager;
-    [SerializeField] WeatherManager weatherManager;
     [SerializeField] List<WaveDefinition> wavesSequence;
     
-    [SerializeField] int waveDurationInDayCycles = 1;
-    [SerializeField] float spawnStartPercentage = 50f;
+    [Header("Wave Timing")]
+    [SerializeField] int waveDurationInDays = 1; // Default: one wave per full day/night cycle
+    [SerializeField] float spawnTimeNormalized = 0.1f; // When in the wave to start spawning (0-1)
+    [SerializeField] bool continuousSpawning = false; // If true, spawns throughout the wave
+    
+    [Header("Wave Settings")]
     [SerializeField] bool deletePreviousWaveAnimals = true;
-
+    
+    [Header("UI")]
     [SerializeField] TextMeshProUGUI waveStatusText;
     [SerializeField] TextMeshProUGUI timeTrackerText;
-
-    [SerializeField] InternalWaveState currentInternalState = InternalWaveState.Idle;
-    [SerializeField] int activeWaveDefinitionIndex = -1;
-
-    WaveDefinition currentActiveWaveDef = null;
-    bool hasSpawnedForThisWeatherCycle = false;
-    Coroutine activeWaveExecutionCoroutine;
-
+    
+    // State tracking
+    WaveState currentState = WaveState.Idle;
+    WaveDefinition currentWaveDef = null;
+    int currentWaveIndex = -1;
+    
+    // Timing
     int waveStartTick = 0;
     int waveEndTick = 0;
+    int waveSpawnTick = 0;
+    bool hasSpawnedThisWave = false;
+    
+    // Coroutines
+    Coroutine activeSpawnCoroutine = null;
 
-    public bool IsCurrentWaveDefeated() 
-    {
-        if (currentInternalState == InternalWaveState.Idle && activeWaveDefinitionIndex != -1) 
-        {
-            return true;
+    public bool IsWaveActive => currentState != WaveState.Idle;
+    public bool IsCurrentWaveDefeated() => currentState == WaveState.Idle && currentWaveIndex >= 0;
+
+    void Awake() {
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+            return;
         }
-
-        if (currentActiveWaveDef != null && TickManager.Instance != null) 
-        {
-            int currentTick = TickManager.Instance.CurrentTick;
-            return currentTick >= waveEndTick;
-        }
-
-        return false;
+        Instance = this;
+        
+        ValidateReferences();
     }
 
-    void Awake() 
-    {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
-
-        if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager missing!", this);
-        if (weatherManager == null) Debug.LogError("[WaveManager] WeatherManager missing!", this);
-        if (wavesSequence == null || wavesSequence.Count == 0) Debug.LogWarning("[WaveManager] Wave Sequence empty. No waves will spawn.", this);
-
-        if (TickManager.Instance != null) 
-        {
+    void Start() {
+        if (TickManager.Instance != null) {
             TickManager.Instance.OnTickAdvanced += OnTickAdvanced;
         }
     }
 
-    void Start() 
-    {
-        if (weatherManager != null) weatherManager.OnPhaseChanged += HandleWeatherPhaseChange;
-        SetInternalState(InternalWaveState.Idle);
-    }
-
-    void OnDestroy() 
-    {
-        if (weatherManager != null) weatherManager.OnPhaseChanged -= HandleWeatherPhaseChange;
-        if (TickManager.Instance != null) 
-        {
+    void OnDestroy() {
+        if (TickManager.Instance != null) {
             TickManager.Instance.OnTickAdvanced -= OnTickAdvanced;
         }
         StopAllCoroutines();
     }
 
-    void OnTickAdvanced(int currentTick) 
-    {
-        if (currentActiveWaveDef != null && currentTick >= waveEndTick) 
-        {
+    void ValidateReferences() {
+        if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager missing!", this);
+        if (wavesSequence == null || wavesSequence.Count == 0) 
+            Debug.LogWarning("[WaveManager] Wave Sequence empty. No waves will spawn.", this);
+    }
+
+    void OnTickAdvanced(int currentTick) {
+        if (currentState == WaveState.Active) {
+            // Check if wave should end
+            if (currentTick >= waveEndTick) {
+                EndCurrentWave();
+            }
+            // Check if we should spawn
+            else if (!hasSpawnedThisWave && currentTick >= waveSpawnTick) {
+                StartSpawning();
+            }
+            // Handle continuous spawning
+            else if (continuousSpawning && hasSpawnedThisWave) {
+                // Could implement periodic spawning here if needed
+            }
+        }
+    }
+
+    public void StartWaveForRound(int roundNumber) {
+        if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat) {
+            Debug.LogWarning("[WaveManager] Cannot start wave - not in GrowthAndThreat state.");
+            return;
+        }
+
+        currentWaveIndex = roundNumber - 1;
+        
+        if (!IsValidWaveIndex(currentWaveIndex)) {
+            Debug.LogWarning($"[WaveManager] No wave definition for round {roundNumber}");
+            currentState = WaveState.Idle;
+            return;
+        }
+
+        currentWaveDef = wavesSequence[currentWaveIndex];
+        if (currentWaveDef == null) {
+            Debug.LogError($"[WaveManager] Wave definition at index {currentWaveIndex} is null!");
+            currentState = WaveState.Idle;
+            return;
+        }
+
+        StartWave();
+    }
+
+    void StartWave() {
+        if (deletePreviousWaveAnimals) {
+            ClearAllActiveAnimals();
+        }
+
+        // Calculate wave timing based on day cycles
+        var config = TickManager.Instance?.Config;
+        if (config == null) {
+            Debug.LogError("[WaveManager] No TickConfiguration found!");
+            return;
+        }
+
+        waveStartTick = TickManager.Instance.CurrentTick;
+        int waveDurationTicks = config.ticksPerDay * waveDurationInDays;
+        waveEndTick = waveStartTick + waveDurationTicks;
+        
+        // Calculate when to spawn within the wave
+        waveSpawnTick = waveStartTick + Mathf.RoundToInt(waveDurationTicks * spawnTimeNormalized);
+        
+        hasSpawnedThisWave = false;
+        currentState = WaveState.Active;
+        
+        Debug.Log($"[WaveManager] Starting wave '{currentWaveDef.waveName}' " +
+                  $"Duration: {waveDurationTicks} ticks ({waveDurationInDays} days) " +
+                  $"Spawn at tick: {waveSpawnTick}");
+    }
+
+    void StartSpawning() {
+        if (currentWaveDef == null || faunaManager == null) return;
+        
+        hasSpawnedThisWave = true;
+        currentState = WaveState.Spawning;
+        
+        Debug.Log($"[WaveManager] Beginning spawn for wave '{currentWaveDef.waveName}'");
+        
+        if (activeSpawnCoroutine != null) {
+            StopCoroutine(activeSpawnCoroutine);
+        }
+        
+        activeSpawnCoroutine = StartCoroutine(ExecuteWaveSpawn());
+    }
+
+    IEnumerator ExecuteWaveSpawn() {
+        faunaManager.ExecuteSpawnWave(currentWaveDef);
+        
+        // Wait a bit for spawning to complete
+        yield return new WaitForSeconds(1f);
+        
+        // Return to active state after spawning
+        if (currentState == WaveState.Spawning) {
+            currentState = WaveState.Active;
+        }
+        
+        activeSpawnCoroutine = null;
+    }
+
+    void EndCurrentWave() {
+        Debug.Log($"[WaveManager] Ending wave '{currentWaveDef?.waveName}'");
+        
+        StopCurrentWaveSpawning();
+        currentWaveDef = null;
+        currentState = WaveState.Idle;
+        
+        // Notify other systems
+        if (RunManager.Instance != null) {
+            RunManager.Instance.StartNewPlanningPhase();
+        }
+    }
+
+    public void StopCurrentWaveSpawning() {
+        if (activeSpawnCoroutine != null) {
+            StopCoroutine(activeSpawnCoroutine);
+            activeSpawnCoroutine = null;
+        }
+        
+        faunaManager?.StopAllSpawnCoroutines();
+    }
+
+    public void ResetForNewRound() {
+        Debug.Log("[WaveManager] Resetting for new round");
+        
+        StopCurrentWaveSpawning();
+        
+        if (deletePreviousWaveAnimals) {
+            ClearAllActiveAnimals();
+        }
+        
+        currentWaveDef = null;
+        currentWaveIndex = -1;
+        currentState = WaveState.Idle;
+        hasSpawnedThisWave = false;
+        waveStartTick = 0;
+        waveEndTick = 0;
+        waveSpawnTick = 0;
+    }
+
+    void ClearAllActiveAnimals() {
+        AnimalController[] animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+        int count = 0;
+        
+        foreach (var animal in animals) {
+            if (animal != null) {
+                Destroy(animal.gameObject);
+                count++;
+            }
+        }
+        
+        Debug.Log($"[WaveManager] Cleared {count} animals");
+    }
+
+    bool IsValidWaveIndex(int index) {
+        return wavesSequence != null && 
+               index >= 0 && 
+               index < wavesSequence.Count;
+    }
+
+    void Update() {
+        UpdateUI();
+    }
+
+    void UpdateUI() {
+        UpdateTimeTracker();
+        UpdateWaveStatus();
+    }
+
+    void UpdateTimeTracker() {
+        if (timeTrackerText == null || TickManager.Instance == null) return;
+        
+        var config = TickManager.Instance.Config;
+        if (config == null) return;
+        
+        // Show current day progress
+        float dayProgress = config.GetDayProgressNormalized(TickManager.Instance.CurrentTick);
+        int dayNumber = TickManager.Instance.CurrentTick / config.ticksPerDay + 1;
+        
+        timeTrackerText.text = $"Day {dayNumber} - {(dayProgress * 100):F0}%";
+        
+        // Add phase info if in a wave
+        if (currentState != WaveState.Idle) {
+            int ticksIntoWave = TickManager.Instance.CurrentTick - waveStartTick;
+            int totalWaveTicks = waveEndTick - waveStartTick;
+            float waveProgress = totalWaveTicks > 0 ? (float)ticksIntoWave / totalWaveTicks : 0;
+            timeTrackerText.text += $" | Wave: {(waveProgress * 100):F0}%";
+        }
+    }
+
+    void UpdateWaveStatus() {
+        if (waveStatusText == null) return;
+        
+        if (RunManager.Instance == null) {
+            waveStatusText.text = "System Offline";
+            return;
+        }
+
+        if (RunManager.Instance.CurrentState == RunState.Planning) {
+            waveStatusText.text = $"Prepare for Round {RunManager.Instance.CurrentRoundNumber}";
+        }
+        else if (RunManager.Instance.CurrentState == RunState.GrowthAndThreat) {
+            if (currentWaveDef != null) {
+                int ticksRemaining = Mathf.Max(0, waveEndTick - TickManager.Instance.CurrentTick);
+                string waveName = string.IsNullOrEmpty(currentWaveDef.waveName) 
+                    ? $"Wave {currentWaveIndex + 1}" 
+                    : currentWaveDef.waveName;
+                
+                string status = currentState == WaveState.Spawning ? " [SPAWNING]" : "";
+                waveStatusText.text = $"{waveName}{status} - {ticksRemaining} ticks left";
+            }
+            else {
+                waveStatusText.text = "No active wave";
+            }
+        }
+    }
+
+    public Camera GetMainCamera() => mainCamera;
+
+    // Editor helpers
+    [ContextMenu("Force End Current Wave")]
+    void Debug_ForceEndWave() {
+        if (Application.isEditor && currentState != WaveState.Idle) {
             EndCurrentWave();
         }
     }
 
-    int GetWaveDurationTicks() 
-    {
-        var config = TickManager.Instance?.Config;
-        if (config == null) return 50;
-
-        // Simplified: Waves always use day cycles as their duration unit
-        // This is clearer and more consistent
-        return config.ticksPerDay * waveDurationInDayCycles;
-    }
-
-    void SetInternalState(InternalWaveState newState) 
-    {
-        if (currentInternalState == newState) return;
-        if (Debug.isDebugBuild) Debug.Log($"[WaveManager] Internal State Change: {currentInternalState} -> {newState}");
-        currentInternalState = newState;
-        UpdateLegacyWaveStatusText();
-    }
-
-    public void StartWaveForRound(int roundNumber) 
-    {
-        if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat) 
-        {
-            Debug.LogWarning("[WaveManager] Attempted to StartWaveForRound, but RunManager not in GrowthAndThreat state.");
-            return;
-        }
-
-        activeWaveDefinitionIndex = roundNumber - 1;
-
-        if (wavesSequence == null || activeWaveDefinitionIndex < 0 || activeWaveDefinitionIndex >= wavesSequence.Count) 
-        {
-            Debug.LogWarning($"[WaveManager] No WaveDefinition for round {roundNumber} (index {activeWaveDefinitionIndex}). Max index: {(wavesSequence?.Count - 1) ?? -1}. No wave will start.");
-            currentActiveWaveDef = null;
-            SetInternalState(InternalWaveState.Idle);
-            return;
-        }
-
-        currentActiveWaveDef = wavesSequence[activeWaveDefinitionIndex];
-        if (currentActiveWaveDef == null) 
-        {
-            Debug.LogError($"[WaveManager] WaveDefinition at index {activeWaveDefinitionIndex} for round {roundNumber} is NULL.");
-            SetInternalState(InternalWaveState.Idle);
-            return;
-        }
-
-        if (deletePreviousWaveAnimals) 
-        {
-            ClearAllActiveAnimals();
-        }
-
-        waveStartTick = TickManager.Instance.CurrentTick;
-        int waveDuration = GetWaveDurationTicks();
-        waveEndTick = waveStartTick + waveDuration;
-
-        Debug.Log($"[WaveManager] Starting wave '{currentActiveWaveDef.waveName}' for Round {roundNumber}. Duration: {waveDuration} ticks (ends at tick {waveEndTick}).");
-
-        hasSpawnedForThisWeatherCycle = false;
-        SetInternalState(InternalWaveState.WaitingForSpawnTime);
-        Update_WaitingForSpawnTimeCheck();
-    }
-
-    void EndCurrentWave() 
-    {
-        Debug.Log($"[WaveManager] Ending wave '{currentActiveWaveDef?.waveName}'");
-
-        StopCurrentWaveSpawning();
-        currentActiveWaveDef = null;
-        SetInternalState(InternalWaveState.Idle);
-
-        if (RunManager.Instance != null) 
-        {
-            RunManager.Instance.StartNewPlanningPhase();
-        }
-
-        if (TurnPhaseManager.Instance != null &&
-            TurnPhaseManager.Instance.CurrentPhase != TurnPhase.Planning) 
-        {
-            TurnPhaseManager.Instance.TransitionToPhase(TurnPhase.Planning);
+    [ContextMenu("Force Start Spawning")]
+    void Debug_ForceSpawn() {
+        if (Application.isEditor && currentState == WaveState.Active && !hasSpawnedThisWave) {
+            StartSpawning();
         }
     }
-
-    public void StopCurrentWaveSpawning() 
-    {
-        Debug.Log("[WaveManager] StopCurrentWaveSpawning called (e.g., round ending).");
-        if (activeWaveExecutionCoroutine != null) 
-        {
-            StopCoroutine(activeWaveExecutionCoroutine);
-            activeWaveExecutionCoroutine = null;
-        }
-        faunaManager.StopAllSpawnCoroutines();
-    }
-
-    void HandleWeatherPhaseChange(WeatherManager.CyclePhase newPhase) 
-    {
-        if (currentActiveWaveDef == null || currentInternalState != InternalWaveState.WaitingForSpawnTime) return;
-
-        hasSpawnedForThisWeatherCycle = false;
-        Update_WaitingForSpawnTimeCheck();
-    }
-
-    void Update_WaitingForSpawnTimeCheck() 
-    {
-        if (currentInternalState != InternalWaveState.WaitingForSpawnTime || currentActiveWaveDef == null) return;
-
-        float currentPhaseProgress = 0f;
-        if (weatherManager != null) 
-        {
-            float totalPhaseTime = weatherManager.CurrentTotalPhaseTime;
-            float phaseTimer = weatherManager.CurrentPhaseTimer;
-            currentPhaseProgress = (totalPhaseTime > 0) ? ((totalPhaseTime - phaseTimer) / totalPhaseTime) * 100f : 0f;
-        }
-
-        if (!hasSpawnedForThisWeatherCycle && currentPhaseProgress >= spawnStartPercentage) 
-        {
-            hasSpawnedForThisWeatherCycle = true;
-            Debug.Log($"[WaveManager] Weather phase progress ({currentPhaseProgress:F0}%) reached spawn threshold ({spawnStartPercentage:F0}%). Starting wave spawn for '{currentActiveWaveDef.waveName}'.");
-
-            SetInternalState(InternalWaveState.Spawning);
-            activeWaveExecutionCoroutine = StartCoroutine(ExecuteWaveSpawnCoroutine());
-        }
-    }
-
-    IEnumerator ExecuteWaveSpawnCoroutine() 
-    {
-        if (faunaManager == null || currentActiveWaveDef == null) yield break;
-
-        faunaManager.ExecuteSpawnWave(currentActiveWaveDef);
-
-        yield return new WaitForSeconds(1f);
-
-        Debug.Log($"[WaveManager] Finished initiating spawn coroutines for wave '{currentActiveWaveDef.waveName}'. FaunaManager is now handling individual spawn entries.");
-        SetInternalState(InternalWaveState.WaitingForSpawnTime);
-    }
-
-    void ClearAllActiveAnimals() 
-    {
-        Debug.Log("[WaveManager] Clearing all active animals.");
-        AnimalController[] activeAnimals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-        int count = 0;
-        foreach(AnimalController animal in activeAnimals) 
-        {
-            if(animal != null) { Destroy(animal.gameObject); count++; }
-        }
-        if(Debug.isDebugBuild) Debug.Log($"[WaveManager] Destroyed {count} animals.");
-    }
-
-    public void ResetForNewRound() 
-    {
-        Debug.Log("[WaveManager] Resetting for new round.");
-        StopCurrentWaveSpawning();
-        if (deletePreviousWaveAnimals) 
-        {
-            ClearAllActiveAnimals();
-        }
-        currentActiveWaveDef = null;
-        activeWaveDefinitionIndex = -1;
-        hasSpawnedForThisWeatherCycle = false;
-        waveStartTick = 0;
-        waveEndTick = 0;
-        SetInternalState(InternalWaveState.Idle);
-    }
-
-    void Update() 
-    {
-        if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat) 
-        {
-            if (currentInternalState == InternalWaveState.WaitingForSpawnTime) 
-            {
-                Update_WaitingForSpawnTimeCheck();
-            }
-        }
-        UpdateLegacyTimeTrackerUI();
-        UpdateLegacyWaveStatusText();
-    }
-
-    void UpdateLegacyTimeTrackerUI() 
-    {
-        if (timeTrackerText == null || weatherManager == null) return;
-        WeatherManager.CyclePhase phase = weatherManager.CurrentPhase;
-        float total = weatherManager.CurrentTotalPhaseTime;
-        float remaining = weatherManager.CurrentPhaseTimer;
-        float progressPercent = (total > 0) ? (1f - (remaining / total)) * 100f : 0f;
-        string phaseName = phase.ToString().Replace("Transition", "");
-        timeTrackerText.text = $"{phaseName} [{progressPercent:F0}%]";
-        if (RunManager.Instance != null) 
-        {
-            if(RunManager.Instance.CurrentState == RunState.Planning) timeTrackerText.text += " (Planning)";
-            else if(RunManager.Instance.CurrentState == RunState.GrowthAndThreat) timeTrackerText.text += " (Growth & Threat)";
-        }
-    }
-
-    void UpdateLegacyWaveStatusText() 
-    {
-        if (waveStatusText == null) return;
-        if (RunManager.Instance == null) return;
-
-        if (RunManager.Instance.CurrentState == RunState.Planning) 
-        {
-            waveStatusText.text = $"Prepare for Round {RunManager.Instance.CurrentRoundNumber}";
-        }
-        else if (RunManager.Instance.CurrentState == RunState.GrowthAndThreat) 
-        {
-            if (currentActiveWaveDef != null) 
-            {
-                string waveNamePart = string.IsNullOrEmpty(currentActiveWaveDef.waveName) ? 
-                    $"Wave {activeWaveDefinitionIndex + 1}" : currentActiveWaveDef.waveName;
-
-                if (TickManager.Instance != null) 
-                {
-                    int ticksRemaining = Mathf.Max(0, waveEndTick - TickManager.Instance.CurrentTick);
-                    waveStatusText.text = $"{waveNamePart} [{ticksRemaining} ticks left]";
-                } 
-                else 
-                {
-                    waveStatusText.text = waveNamePart;
-                }
-            }
-            else if (currentInternalState == InternalWaveState.Idle) 
-            {
-                waveStatusText.text = "All waves for round complete.";
-            }
-        }
-    }
-
-    public Camera GetMainCamera() { return mainCamera; }
 }
