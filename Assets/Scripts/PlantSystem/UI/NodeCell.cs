@@ -93,45 +93,69 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         }
     }
 
-    public void AssignNode(NodeDefinition def)
-    {
-        if (def == null || IsInventoryCell || IsSeedSlot || _sequenceController == null) return;
-        if (def.effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn)) return;
-
-        RemoveNode();
-
-        _nodeData = new NodeData
-        {
-            nodeId = System.Guid.NewGuid().ToString(),
-            nodeDisplayName = def.displayName,
-            effects = def.CloneEffects(),
-            orderIndex = this.CellIndex,
-            canBeDeleted = true
-        };
-        _nodeData.ClearStoredSequence();
-        _nodeDefinition = def;
-        _toolDefinition = null;
-
-        // --- FIXED: Access the prefab from the correct controller ---
-        GameObject prefabToInstantiate = _sequenceController.InventoryItemPrefab;
-        if (prefabToInstantiate == null)
-        {
-            Debug.LogError($"[NodeCell {CellIndex}] Sequence controller is missing its InventoryItemPrefab!", gameObject);
-            return;
+    public void AssignNode(NodeDefinition def) {
+    if (def == null || IsInventoryCell || IsSeedSlot || _sequenceController == null) return;
+    if (def.effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn)) return;
+    
+    RemoveNode();
+    
+    // Debug: Log the definition's effects
+    Debug.Log($"[NodeCell] AssignNode '{def.displayName}' - Definition has {def.effects?.Count ?? 0} effects:");
+    if (def.effects != null) {
+        foreach (var effect in def.effects) {
+            Debug.Log($"  - {effect.effectType} (passive: {effect.isPassive}, primary: {effect.primaryValue}, secondary: {effect.secondaryValue})");
         }
-        
-        GameObject itemViewGO = Instantiate(prefabToInstantiate, transform);
-        _itemView = itemViewGO.GetComponent<ItemView>();
-        
-        if (_itemView == null) { Destroy(itemViewGO); return; }
-
-        _itemView.Initialize(_nodeData, def, _sequenceController);
-        
-        NodeDraggable draggable = _itemView.GetComponent<NodeDraggable>() ?? _itemView.gameObject.AddComponent<NodeDraggable>();
-        draggable.Initialize(_sequenceController, this);
-        
-        if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
     }
+    
+    // Clone the effects
+    var clonedEffects = def.CloneEffects();
+    Debug.Log($"[NodeCell] Cloned {clonedEffects?.Count ?? 0} effects");
+    
+    _nodeData = new NodeData {
+        nodeId = System.Guid.NewGuid().ToString(),
+        nodeDisplayName = def.displayName,
+        effects = clonedEffects,
+        orderIndex = this.CellIndex,
+        canBeDeleted = true
+    };
+    
+    // Clear any stored sequence (nodes in editor can't have sequences)
+    _nodeData.ClearStoredSequence();
+    
+    // Debug: Verify the node data has effects
+    Debug.Log($"[NodeCell] Created NodeData with {_nodeData.effects?.Count ?? 0} effects");
+    
+    _nodeDefinition = def;
+    _toolDefinition = null;
+    
+    GameObject prefabToInstantiate = _sequenceController.InventoryItemPrefab;
+    if (prefabToInstantiate == null) {
+        Debug.LogError($"[NodeCell {CellIndex}] Sequence controller is missing its InventoryItemPrefab!", gameObject);
+        return;
+    }
+    
+    GameObject itemViewGO = Instantiate(prefabToInstantiate, transform);
+    _itemView = itemViewGO.GetComponent<ItemView>();
+    
+    if (_itemView == null) { 
+        Destroy(itemViewGO); 
+        return; 
+    }
+    
+    _itemView.Initialize(_nodeData, def, _sequenceController);
+    
+    NodeDraggable draggable = _itemView.GetComponent<NodeDraggable>();
+    if (draggable == null) {
+        draggable = itemViewGO.AddComponent<NodeDraggable>();
+    }
+    draggable.Initialize(_sequenceController, this);
+    
+    if (_backgroundImage != null) {
+        _backgroundImage.raycastTarget = false;
+    }
+    
+    UpdateCellBackgroundColor();
+}
 
     public void RemoveNode()
     {

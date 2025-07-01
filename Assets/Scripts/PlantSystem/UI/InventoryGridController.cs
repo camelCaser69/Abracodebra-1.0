@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -133,42 +134,54 @@ public class InventoryGridController : MonoBehaviour {
         return false;
     }
 
-    public bool AddGeneToInventoryFromDefinition(NodeDefinition geneDef, NodeCell targetCellHint) {
+    public bool AddGeneToInventoryFromDefinition(NodeDefinition geneDef, NodeCell targetCellHint = null) {
         if (geneDef == null) return false;
-
+        
+        // Find an empty cell (prefer hint if provided)
         NodeCell cellToUse = (targetCellHint != null && targetCellHint.IsInventoryCell && !targetCellHint.HasItem())
             ? targetCellHint
             : inventoryCells.FirstOrDefault(cell => !cell.HasItem());
-
-        if (cellToUse != null) {
-            NodeData inventoryNodeData = new NodeData {
-                nodeId = geneDef.name + "_inventory_" + System.Guid.NewGuid().ToString(),
-                nodeDisplayName = geneDef.displayName,
-                effects = geneDef.CloneEffects(),
-                orderIndex = -1,
-                canBeDeleted = false,
-            };
             
-            // THIS IS THE KEY FIX: Check if this definition has a SeedSpawn effect
-            bool isSeed = inventoryNodeData.effects != null && 
-                         inventoryNodeData.effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
-            
-            if (isSeed) {
-                inventoryNodeData.EnsureSeedSequenceInitialized();
-            }
-
-            GameObject itemViewGO = Instantiate(inventoryItemPrefab, cellToUse.transform);
-            ItemView view = itemViewGO.GetComponent<ItemView>();
-            if (view == null) { Destroy(itemViewGO); return false; }
-
-            view.Initialize(inventoryNodeData, geneDef, null);
-            NodeDraggable draggable = view.GetComponent<NodeDraggable>() ?? view.gameObject.AddComponent<NodeDraggable>();
-            draggable.Initialize(this, cellToUse);
-            cellToUse.AssignItemView(view, inventoryNodeData, null);
-            if (logInventoryChanges) Debug.Log($"[Inventory] Added gene '{geneDef.displayName}' (seed: {isSeed}) to cell {cellToUse.CellIndex}.");
-            return true;
+        if (cellToUse == null) return false;
+        
+        // Create node data for inventory
+        NodeData inventoryNode = new NodeData {
+            nodeId = geneDef.name + "_inventory_" + Guid.NewGuid().ToString(),
+            nodeDisplayName = geneDef.displayName,
+            effects = geneDef.CloneEffects(),
+            orderIndex = -1,
+            canBeDeleted = false
+        };
+        
+        // If it's a seed, ensure it has an initialized sequence
+        if (inventoryNode.IsSeed()) {
+            inventoryNode.EnsureSeedSequenceInitialized();
         }
-        return false;
+        
+        // Create the visual representation
+        GameObject itemViewGO = Instantiate(inventoryItemPrefab, cellToUse.transform);
+        ItemView view = itemViewGO.GetComponent<ItemView>();
+        if (view == null) {
+            Destroy(itemViewGO);
+            return false;
+        }
+        
+        // Initialize and assign
+        view.Initialize(inventoryNode, geneDef, null);
+        
+        NodeDraggable draggable = view.GetComponent<NodeDraggable>();
+        if (draggable == null) {
+            draggable = view.gameObject.AddComponent<NodeDraggable>();
+        }
+        draggable.Initialize(this, cellToUse);
+        
+        cellToUse.AssignItemView(view, inventoryNode, null);
+        
+        if (logInventoryChanges) {
+            Debug.Log($"[Inventory] Added gene '{geneDef.displayName}' (seed: {inventoryNode.IsSeed()}) to cell {cellToUse.CellIndex}");
+        }
+        
+        return true;
     }
 
     public void ReturnGeneToInventory(ItemView itemViewToReturn, NodeData geneDataToReturn) {
@@ -176,29 +189,40 @@ public class InventoryGridController : MonoBehaviour {
             if (itemViewToReturn != null) Destroy(itemViewToReturn.gameObject);
             return;
         }
-
+        
+        // Find empty cell
         NodeCell emptyCell = inventoryCells.FirstOrDefault(cell => !cell.HasItem());
         if (emptyCell == null) {
-            if (logInventoryChanges) Debug.LogWarning($"[Inventory] No empty cell to return '{geneDataToReturn.nodeDisplayName}' to. Item destroyed.");
+            if (logInventoryChanges) {
+                Debug.LogWarning($"[Inventory] No empty cell to return '{geneDataToReturn.nodeDisplayName}' to. Item destroyed.");
+            }
             Destroy(itemViewToReturn.gameObject);
             return;
         }
-
+        
+        // Reset node properties for inventory
         geneDataToReturn.orderIndex = -1;
         geneDataToReturn.canBeDeleted = false;
         
-        // Ensure seed sequence is initialized if it's a seed
+        // Ensure seeds have their sequence container
         if (geneDataToReturn.IsSeed()) {
             geneDataToReturn.EnsureSeedSequenceInitialized();
         }
-
+        
+        // Assign to cell
         emptyCell.AssignItemView(itemViewToReturn, geneDataToReturn, null);
-
+        
+        // Setup dragging
         NodeDraggable draggable = itemViewToReturn.GetComponent<NodeDraggable>();
-        if (draggable == null) draggable = itemViewToReturn.gameObject.AddComponent<NodeDraggable>();
+        if (draggable == null) {
+            draggable = itemViewToReturn.gameObject.AddComponent<NodeDraggable>();
+        }
         draggable.Initialize(this, emptyCell);
         draggable.SnapToCell(emptyCell);
-        if (logInventoryChanges) Debug.Log($"[Inventory] Returned gene '{geneDataToReturn.nodeDisplayName}' to cell {emptyCell.CellIndex}.");
+        
+        if (logInventoryChanges) {
+            Debug.Log($"[Inventory] Returned gene '{geneDataToReturn.nodeDisplayName}' to cell {emptyCell.CellIndex}");
+        }
     }
 
     public void HandleDropOnInventoryCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetInventoryCell) {

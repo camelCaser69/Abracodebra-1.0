@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 565,116 → 384,122 chars (32.0% reduction)
-Estimated tokens saved: ~45,248
+Compression Stats: 572,168 → 388,958 chars (32.0% reduction)
+Estimated tokens saved: ~45,802
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -78,51 +78,52 @@ using System;
   PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L5685
   PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L5935
   PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L6263
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L6584
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L6722
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7039
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7106
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7177
-  ItemView (Assets\Scripts\PlantSystem\UI/) L7498
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L7623
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L7858
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L7992
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8358
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L8494
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8803
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8891
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L8992
-  GridSnapStartup (Assets\Scripts\Ticks/) L9230
-  TickDebugMonitor (Assets\Scripts\Ticks/) L9296
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9468
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L9537
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L9768
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9779
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L9808
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L9904
-  WaterReflection (Assets\Scripts\Visual\Effects/) L10009
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10404
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10440
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L10604
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10746
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L10864
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11015
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11258
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11298
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L11322
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11342
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L11830
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L11842
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L11877
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12036
+  PlantSetupValidator (Assets\Scripts\PlantSystem\Growth/) L6584
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L6755
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L6893
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7210
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7277
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7348
+  ItemView (Assets\Scripts\PlantSystem\UI/) L7669
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L7794
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8029
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8163
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8529
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L8665
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8974
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9062
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L9163
+  GridSnapStartup (Assets\Scripts\Ticks/) L9401
+  TickDebugMonitor (Assets\Scripts\Ticks/) L9467
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9639
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L9708
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L9939
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9950
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L9979
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10075
+  WaterReflection (Assets\Scripts\Visual\Effects/) L10180
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10575
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10611
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L10775
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10917
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11035
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11186
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11429
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11469
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L11493
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11513
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12001
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12013
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12048
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12207
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L12046
-  GridPosition (Assets\Scripts\Ticks/) L12196
-  GridPositionManager (Assets\Scripts\Ticks/) L12297
-  GridRadiusUtility (Assets\Scripts\Ticks/) L12653
-  TickConfiguration (Assets\Scripts\Ticks/) L12797
-  ITickUpdateable (Assets\Scripts\Ticks/) L12880
+  GridEntity (Assets\Scripts\Ticks/) L12217
+  GridPosition (Assets\Scripts\Ticks/) L12367
+  GridPositionManager (Assets\Scripts\Ticks/) L12468
+  GridRadiusUtility (Assets\Scripts\Ticks/) L12824
+  TickConfiguration (Assets\Scripts\Ticks/) L12968
+  ITickUpdateable (Assets\Scripts\Ticks/) L13051
 
 ================================================================================
 SCRIPTS
@@ -6682,6 +6683,177 @@ void SetScentSourceDefinition(ScentSource source, ScentDefinition definition) {
 source.SetDefinition(definition);
 }
 }
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\PlantSystem\Growth\PlantSetupValidator.cs
+
+﻿using UnityEngine;
+using UnityEditor;
+using WegoSystem;
+
+#if UNITY_EDITOR
+pub cls PlantSetupValidator : EditorWindow {
+Vector2 scrollPos;
+List<string> issues = new List<string>();
+List<string> warnings = new List<string>();
+
+stat void ShowWindow() {
+var window = GetWindow<PlantSetupValidator>("Plant Setup Validator");
+window.minSize = new Vector2(400, 300);
+}
+
+void OnGUI() {
+EditorGUILayout.LabelField("Plant System Validator", EditorStyles.boldLabel);
+EditorGUILayout.Space();
+
+if (GUILayout.Button("Run Validation", GUILayout.Height(30))) {
+ValidateSetup();
+}
+
+EditorGUILayout.Space();
+
+scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
+
+if (issues.Count > 0) {
+EditorGUILayout.LabelField($"Critical Issues ({issues.Count})", EditorStyles.boldLabel);
+GUI.color = Color.red;
+foreach (var issue in issues) {
+EditorGUILayout.HelpBox(issue, MessageType.Error);
+}
+GUI.color = Color.white;
+}
+
+if (warnings.Count > 0) {
+EditorGUILayout.Space();
+EditorGUILayout.LabelField($"Warnings ({warnings.Count})", EditorStyles.boldLabel);
+GUI.color = Color.yellow;
+foreach (var warning in warnings) {
+EditorGUILayout.HelpBox(warning, MessageType.Warning);
+}
+GUI.color = Color.white;
+}
+
+if (issues.Count == 0 && warnings.Count == 0) {
+GUI.color = Color.green;
+EditorGUILayout.HelpBox("All systems validated successfully!", MessageType.Info);
+GUI.color = Color.white;
+}
+
+EditorGUILayout.EndScrollView();
+}
+
+void ValidateSetup() {
+issues.Clear();
+warnings.Clear();
+
+CheckManager<FloraManager>("FloraManager");
+CheckManager<NodeExecutor>("NodeExecutor");
+CheckManager<WeatherManager>("WeatherManager");
+CheckManager<TickManager>("TickManager");
+
+var plantPrefabs = Resources.LoadAll<GameObject>("").Where(go => go.GetComponent<PlantGrowth>() != null);
+
+foreach (var prefab in plantPrefabs) {
+ValidatePlantPrefab(prefab);
+}
+
+var nodeDefinitions = Resources.LoadAll<NodeDefinition>("");
+ValidateNodeDefinitions(nodeDefinitions);
+
+var nodeExecutor = FindObjectOfType<NodeExecutor>();
+if (nodeExecutor != null) {
+var plantPrefabField = nodeExecutor.GetType().GetField("plantPrefab",
+System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+if (plantPrefabField != null) {
+var plantPrefab = plantPrefabField.GetValue(nodeExecutor) as GameObject;
+if (plantPrefab == null) {
+issues.Add("NodeExecutor: Plant prefab is not assigned!");
+}
+}
+}
+
+Repaint();
+}
+
+void CheckManager<T>(string managerName) where T : MonoBehaviour {
+var manager = FindObjectOfType<T>();
+if (manager == null) {
+issues.Add($"{managerName} not found in scene!");
+}
+}
+
+void ValidatePlantPrefab(GameObject prefab) {
+var plant = prefab.GetComponent<PlantGrowth>();
+string prefabName = prefab.name;
+
+var cellManagerType = plant.CellManager?.GetType();
+if (cellManagerType == null) {
+var seedPrefab = GetSerializedField<GameObject>(plant, "seedCellPrefab");
+var stemPrefab = GetSerializedField<GameObject>(plant, "stemCellPrefab");
+var leafPrefab = GetSerializedField<GameObject>(plant, "leafCellPrefab");
+var berryPrefab = GetSerializedField<GameObject>(plant, "berryCellPrefab");
+
+if (seedPrefab == null) issues.Add($"{prefabName}: Seed cell prefab not assigned!");
+if (stemPrefab == null) issues.Add($"{prefabName}: Stem cell prefab not assigned!");
+if (leafPrefab == null) issues.Add($"{prefabName}: Leaf cell prefab not assigned!");
+if (berryPrefab == null) issues.Add($"{prefabName}: Berry cell prefab not assigned! Berries won't spawn!");
+}
+
+if (prefab.GetComponent<GridEntity>() == null) {
+issues.Add($"{prefabName}: Missing GridEntity component!");
+}
+}
+
+void ValidateNodeDefinitions(NodeDefinition[] definitions) {
+foreach (var def in definitions) {
+if (def.effects == null || def.effects.Count == 0) {
+warnings.Add($"NodeDefinition '{def.name}': No effects defined");
+continue;
+}
+
+foreach (var effect in def.effects) {
+if (effect == null) continue;
+
+switch (effect.effectType) {
+case NodeEffectType.PoopAbsorption:
+if (!effect.isPassive) {
+issues.Add($"NodeDefinition '{def.name}': PoopAbsorption must be marked as Passive!");
+}
+if (effect.primaryValue <= 0) {
+warnings.Add($"NodeDefinition '{def.name}': PoopAbsorption has no detection radius!");
+}
+if (effect.secondaryValue <= 0) {
+warnings.Add($"NodeDefinition '{def.name}': PoopAbsorption gives no energy!");
+}
+break;
+
+case NodeEffectType.GrowBerry:
+if (effect.isPassive) {
+issues.Add($"NodeDefinition '{def.name}': GrowBerry should NOT be passive!");
+}
+break;
+
+case NodeEffectType.SeedSpawn:
+if (!effect.isPassive) {
+warnings.Add($"NodeDefinition '{def.name}': SeedSpawn is usually passive");
+}
+break;
+}
+}
+}
+}
+
+T GetSerializedField<T>(object obj, string fieldName) where T : cls {
+var field = obj.GetType().GetField(fieldName,
+System.Reflection.BindingFlags.NonPublic |
+System.Reflection.BindingFlags.Public |
+System.Reflection.BindingFlags.Instance);
+
+ret field?.GetValue(obj) as T;
+}
+}
+#endif
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantVisualManager.cs

@@ -38,52 +38,56 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
     /// especially for complex data types like SeedSpawnData.
     /// </summary>
     /// <returns>A new list containing deep copies of the NodeEffectData.</returns>
-    public List<NodeEffectData> CloneEffects()
-    {
-        var copy = new List<NodeEffectData>();
-        if (effects == null)
-        {
-            return copy;
-        }
+    // In NodeDefinition.cs, replace the CloneEffects method with this debug version:
 
-        foreach (var originalEffect in effects)
-        {
-            if (originalEffect == null)
-            {
-                Debug.LogWarning($"NodeDefinition '{this.name}' contains a null effect in its list.");
-                continue;
-            }
-
-            var newEffect = new NodeEffectData()
-            {
-                effectType = originalEffect.effectType,
-                primaryValue = originalEffect.primaryValue,
-                secondaryValue = originalEffect.secondaryValue,
-                isPassive = originalEffect.isPassive,
-                scentDefinitionReference = originalEffect.scentDefinitionReference
-            };
-
-            // Deep copy the SeedSpawnData if it exists
-            if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null)
-            {
-                newEffect.seedData = new SeedSpawnData
-                {
-                    growthSpeed = originalEffect.seedData.growthSpeed,
-                    stemLengthMin = originalEffect.seedData.stemLengthMin,
-                    stemLengthMax = originalEffect.seedData.stemLengthMax,
-                    leafGap = originalEffect.seedData.leafGap,
-                    leafPattern = originalEffect.seedData.leafPattern,
-                    stemRandomness = originalEffect.seedData.stemRandomness,
-                    energyStorage = originalEffect.seedData.energyStorage,
-                    cooldown = originalEffect.seedData.cooldown,
-                    castDelay = originalEffect.seedData.castDelay
-                };
-            }
-
-            copy.Add(newEffect);
-        }
+public List<NodeEffectData> CloneEffects() {
+    var copy = new List<NodeEffectData>();
+    
+    if (effects == null) {
+        Debug.LogWarning($"[NodeDefinition '{this.name}'] No effects to clone");
         return copy;
     }
+    
+    Debug.Log($"[NodeDefinition '{this.name}'] Cloning {effects.Count} effects:");
+    
+    foreach (var originalEffect in effects) {
+        if (originalEffect == null) {
+            Debug.LogWarning($"[NodeDefinition '{this.name}'] Contains a null effect in its list.");
+            continue;
+        }
+        
+        var newEffect = new NodeEffectData() {
+            effectType = originalEffect.effectType,
+            primaryValue = originalEffect.primaryValue,
+            secondaryValue = originalEffect.secondaryValue,
+            isPassive = originalEffect.isPassive,
+            scentDefinitionReference = originalEffect.scentDefinitionReference
+        };
+        
+        // Clone seed data if present
+        if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null) {
+            newEffect.seedData = new SeedSpawnData {
+                growthSpeed = originalEffect.seedData.growthSpeed,
+                stemLengthMin = originalEffect.seedData.stemLengthMin,
+                stemLengthMax = originalEffect.seedData.stemLengthMax,
+                leafGap = originalEffect.seedData.leafGap,
+                leafPattern = originalEffect.seedData.leafPattern,
+                stemRandomness = originalEffect.seedData.stemRandomness,
+                energyStorage = originalEffect.seedData.energyStorage,
+                cooldown = originalEffect.seedData.cooldown,
+                castDelay = originalEffect.seedData.castDelay,
+                maxBerries = originalEffect.seedData.maxBerries
+            };
+        }
+        
+        Debug.Log($"  - Cloned: {newEffect.effectType} (passive: {newEffect.isPassive}, primary: {newEffect.primaryValue}, secondary: {newEffect.secondaryValue})");
+        
+        copy.Add(newEffect);
+    }
+    
+    Debug.Log($"[NodeDefinition '{this.name}'] Successfully cloned {copy.Count} effects");
+    return copy;
+}
 
     #endregion
 

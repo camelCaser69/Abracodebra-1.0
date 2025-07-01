@@ -69,26 +69,43 @@ public class NodeEditorGridController : MonoBehaviour
     }
 
     // --- ADDED METHOD: Restored from original functionality ---
-    public NodeGraph GetCurrentGraphInEditorForSpawning()
-    {
+    // In NodeEditorGridController.cs, replace GetCurrentGraphInEditorForSpawning with this debug version:
+
+    public NodeGraph GetCurrentGraphInEditorForSpawning() {
         NodeGraph clone = new NodeGraph { nodes = new List<NodeData>() };
-        if (_currentlyEditedSequence?.nodes != null)
-        {
-            foreach (var nodeData in _currentlyEditedSequence.nodes)
-            {
+    
+        Debug.Log($"[NodeEditor] GetCurrentGraphInEditorForSpawning - Editor has {_currentlyEditedSequence?.nodes?.Count ?? 0} nodes");
+    
+        if (_currentlyEditedSequence?.nodes != null) {
+            foreach (var nodeData in _currentlyEditedSequence.nodes) {
                 if (nodeData == null) continue;
-                NodeData clonedNode = new NodeData
-                {
+            
+                // Debug log the original node
+                Debug.Log($"[NodeEditor] Processing node '{nodeData.nodeDisplayName}' with {nodeData.effects?.Count ?? 0} effects:");
+                if (nodeData.effects != null) {
+                    foreach (var effect in nodeData.effects) {
+                        Debug.Log($"  - {effect.effectType} (passive: {effect.isPassive}, primary: {effect.primaryValue})");
+                    }
+                }
+            
+                // Create a clean clone without any stored sequences
+                NodeData clonedNode = new NodeData {
                     nodeId = nodeData.nodeId,
                     nodeDisplayName = nodeData.nodeDisplayName,
                     effects = NodeExecutor.CloneEffectsList(nodeData.effects),
                     orderIndex = nodeData.orderIndex,
                     canBeDeleted = nodeData.canBeDeleted,
-                    storedSequence = null // Nodes *within* a sequence for spawning DO NOT have their own stored sequences
+                    // storedSequence is intentionally null - nodes in editor don't have sequences
                 };
+            
+                // Debug log the cloned node
+                Debug.Log($"[NodeEditor] Cloned node has {clonedNode.effects?.Count ?? 0} effects");
+            
                 clone.nodes.Add(clonedNode);
             }
         }
+    
+        Debug.Log($"[NodeEditor] Returning graph with {clone.nodes.Count} nodes");
         return clone;
     }
 
@@ -152,35 +169,38 @@ public class NodeEditorGridController : MonoBehaviour
         }
     }
     
-    public void LoadSequenceFromSeed(NodeData seedData)
-    {
-        if (_actualSeedSlotCell == null || seedData == null || !seedData.IsSeed())
-        {
+    public void LoadSequenceFromSeed(NodeData seedData) {
+        if (_actualSeedSlotCell == null || seedData == null || !seedData.IsSeed()) {
             HideNodeEditorPanel();
             _currentlyEditedSequence.nodes.Clear();
             return;
         }
-
+        
+        // Ensure seed has initialized sequence
         seedData.EnsureSeedSequenceInitialized();
+        
+        // Clear current editor
         ClearSequenceEditorCells();
         _currentlyEditedSequence.nodes.Clear();
-
-        if (seedData.storedSequence?.nodes != null)
-        {
-            foreach (NodeData nodeDataInSeedSequence in seedData.storedSequence.nodes.OrderBy(n => n.orderIndex))
-            {
-                if (nodeDataInSeedSequence == null || nodeDataInSeedSequence.orderIndex >= nodeCells.Count) continue;
+        
+        // Load nodes from seed's stored sequence
+        if (seedData.storedSequence?.nodes != null) {
+            foreach (NodeData storedNode in seedData.storedSequence.nodes.OrderBy(n => n.orderIndex)) {
+                if (storedNode == null || storedNode.orderIndex >= nodeCells.Count) continue;
                 
-                NodeCell targetCell = nodeCells[nodeDataInSeedSequence.orderIndex];
-                NodeDefinition def = definitionLibrary.definitions.FirstOrDefault(d => d.displayName == nodeDataInSeedSequence.nodeDisplayName);
-
-                if (def != null)
-                {
-                    targetCell.AssignNode(def); // AssignNode creates a new view
+                // Find the matching definition
+                NodeCell targetCell = nodeCells[storedNode.orderIndex];
+                NodeDefinition definition = definitionLibrary.definitions
+                    .FirstOrDefault(d => d.displayName == storedNode.nodeDisplayName);
+                
+                if (definition != null) {
+                    // AssignNode creates a new view and node instance
+                    targetCell.AssignNode(definition);
                     _currentlyEditedSequence.nodes.Add(targetCell.GetNodeData());
                 }
             }
         }
+        
         ShowNodeEditorPanel();
     }
 
@@ -234,41 +254,68 @@ public class NodeEditorGridController : MonoBehaviour
         }
     }
 
-    public void RefreshGraphAndUpdateSeed()
-    {
-        if (_actualSeedSlotCell == null) return;
-
-        _currentlyEditedSequence.nodes.Clear();
-        foreach (var cell in nodeCells.OrderBy(c => c.CellIndex))
-        {
-            if (cell.HasItem())
-            {
-                NodeData dataFromCell = cell.GetNodeData();
-                dataFromCell.orderIndex = cell.CellIndex;
-                dataFromCell.ClearStoredSequence();
-                _currentlyEditedSequence.nodes.Add(dataFromCell);
+    public void RefreshGraphAndUpdateSeed() {
+    if (_actualSeedSlotCell == null) return;
+    
+    Debug.Log("[NodeEditor] RefreshGraphAndUpdateSeed - Rebuilding sequence");
+    
+    _currentlyEditedSequence.nodes.Clear();
+    
+    foreach (var cell in nodeCells.OrderBy(c => c.CellIndex)) {
+        if (cell.HasItem()) {
+            NodeData dataFromCell = cell.GetNodeData();
+            if (dataFromCell == null) continue;
+            
+            Debug.Log($"[NodeEditor] Cell {cell.CellIndex} has node '{dataFromCell.nodeDisplayName}' with {dataFromCell.effects?.Count ?? 0} effects:");
+            if (dataFromCell.effects != null) {
+                foreach (var effect in dataFromCell.effects) {
+                    Debug.Log($"  - {effect.effectType} (passive: {effect.isPassive})");
+                }
             }
-        }
-
-        NodeData currentSeedInSlot = GetCurrentSeedInSlot();
-        if (currentSeedInSlot != null && currentSeedInSlot.IsSeed())
-        {
-            currentSeedInSlot.EnsureSeedSequenceInitialized();
-            currentSeedInSlot.storedSequence.nodes.Clear();
-            foreach (NodeData uiNodeData in _currentlyEditedSequence.nodes)
-            {
-                currentSeedInSlot.storedSequence.nodes.Add(new NodeData
-                {
-                    nodeId = uiNodeData.nodeId,
-                    nodeDisplayName = uiNodeData.nodeDisplayName,
-                    effects = NodeExecutor.CloneEffectsList(uiNodeData.effects),
-                    orderIndex = uiNodeData.orderIndex,
-                    canBeDeleted = uiNodeData.canBeDeleted,
-                    storedSequence = null
-                });
-            }
+            
+            dataFromCell.orderIndex = cell.CellIndex;
+            dataFromCell.ClearStoredSequence();
+            _currentlyEditedSequence.nodes.Add(dataFromCell);
         }
     }
+    
+    Debug.Log($"[NodeEditor] Sequence rebuilt with {_currentlyEditedSequence.nodes.Count} nodes");
+    
+    // Now update the seed's stored sequence
+    NodeData currentSeedInSlot = GetCurrentSeedInSlot();
+    
+    if (currentSeedInSlot != null && currentSeedInSlot.IsSeed()) {
+        Debug.Log($"[NodeEditor] Updating seed '{currentSeedInSlot.nodeDisplayName}' stored sequence");
+        
+        // Ensure the seed has a sequence container
+        currentSeedInSlot.EnsureSeedSequenceInitialized();
+        
+        // Clear and rebuild the seed's stored sequence from editor
+        currentSeedInSlot.storedSequence.nodes.Clear();
+        
+        foreach (NodeData editorNode in _currentlyEditedSequence.nodes) {
+            if (editorNode == null) continue;
+            
+            // Create a clean copy for storage in the seed
+            NodeData nodeForStorage = new NodeData {
+                nodeId = editorNode.nodeId,
+                nodeDisplayName = editorNode.nodeDisplayName,
+                effects = NodeExecutor.CloneEffectsList(editorNode.effects),
+                orderIndex = editorNode.orderIndex,
+                canBeDeleted = editorNode.canBeDeleted
+            };
+            
+            Debug.Log($"[NodeEditor] Storing node '{nodeForStorage.nodeDisplayName}' with {nodeForStorage.effects?.Count ?? 0} effects in seed");
+            
+            // Mark it as part of a sequence
+            nodeForStorage.SetPartOfSequence(true);
+            
+            currentSeedInSlot.storedSequence.nodes.Add(nodeForStorage);
+        }
+        
+        Debug.Log($"[NodeEditor] Seed now contains {currentSeedInSlot.storedSequence.nodes.Count} nodes");
+    }
+}
 
     public void HandleDropOnSeedSlot(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetSeedSlotCell)
     {

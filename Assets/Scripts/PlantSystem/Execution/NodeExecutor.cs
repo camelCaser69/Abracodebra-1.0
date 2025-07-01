@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using TMPro;
 using System.Linq;
 using WegoSystem;
@@ -13,214 +14,240 @@ public class NodeExecutor : MonoBehaviour
     [SerializeField] GameObject plantPrefab;
     [SerializeField] TMP_Text debugOutput;
 
-    public static List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalList)
-    {
-        if (originalList == null) return new List<NodeEffectData>();
-
-        List<NodeEffectData> newList = new List<NodeEffectData>(originalList.Count);
-        foreach (var originalEffect in originalList)
-        {
-            if (originalEffect == null) continue;
-
-            NodeEffectData newEffect = new NodeEffectData
-            {
-                effectType = originalEffect.effectType,
-                primaryValue = originalEffect.primaryValue,
-                secondaryValue = originalEffect.secondaryValue,
-                isPassive = originalEffect.isPassive,
-                scentDefinitionReference = originalEffect.scentDefinitionReference
+    public static List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalEffects) {
+        if (originalEffects == null) return new List<NodeEffectData>();
+        
+        var clonedList = new List<NodeEffectData>();
+        
+        foreach (var effect in originalEffects) {
+            if (effect == null) continue;
+            
+            var clonedEffect = new NodeEffectData {
+                effectType = effect.effectType,
+                primaryValue = effect.primaryValue,
+                secondaryValue = effect.secondaryValue,
+                isPassive = effect.isPassive,
+                scentDefinitionReference = effect.scentDefinitionReference
             };
-
-            if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null)
-            {
-                newEffect.seedData = new SeedSpawnData
-                {
-                    growthSpeed = originalEffect.seedData.growthSpeed,
-                    stemLengthMin = originalEffect.seedData.stemLengthMin,
-                    stemLengthMax = originalEffect.seedData.stemLengthMax,
-                    leafGap = originalEffect.seedData.leafGap,
-                    leafPattern = originalEffect.seedData.leafPattern,
-                    stemRandomness = originalEffect.seedData.stemRandomness,
-                    energyStorage = originalEffect.seedData.energyStorage,
-                    cooldown = originalEffect.seedData.cooldown,
-                    castDelay = originalEffect.seedData.castDelay
+            
+            // Clone seed data if present
+            if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null) {
+                clonedEffect.seedData = new SeedSpawnData {
+                    growthSpeed = effect.seedData.growthSpeed,
+                    stemLengthMin = effect.seedData.stemLengthMin,
+                    stemLengthMax = effect.seedData.stemLengthMax,
+                    leafGap = effect.seedData.leafGap,
+                    leafPattern = effect.seedData.leafPattern,
+                    stemRandomness = effect.seedData.stemRandomness,
+                    energyStorage = effect.seedData.energyStorage,
+                    cooldown = effect.seedData.cooldown,
+                    castDelay = effect.seedData.castDelay
                 };
             }
-
-            newList.Add(newEffect);
+            
+            clonedList.Add(clonedEffect);
         }
-        return newList;
+        
+        return clonedList;
     }
 
-    public static NodeData CloneNodeData(NodeData original, bool preserveStoredSequence = false)
-    {
+    public static NodeData CloneNode(NodeData original) {
         if (original == null) return null;
-
-        NodeData clone = new NodeData
-        {
-            nodeId = System.Guid.NewGuid().ToString(),
+        
+        var clone = new NodeData {
+            nodeId = Guid.NewGuid().ToString(),
             nodeDisplayName = original.nodeDisplayName,
             effects = CloneEffectsList(original.effects),
             orderIndex = original.orderIndex,
-            canBeDeleted = original.canBeDeleted,
+            canBeDeleted = original.canBeDeleted
         };
-
-        if (preserveStoredSequence && original.IsPotentialSeedContainer() && original.storedSequence != null)
-        {
+        
+        // If original is a seed with a sequence, clone the sequence too
+        if (original.IsSeed() && original.storedSequence != null) {
             clone.EnsureSeedSequenceInitialized();
-            if (clone.storedSequence.nodes == null)
-            {
-                clone.storedSequence.nodes = new List<NodeData>();
-            }
-
-            foreach (var nodeInOriginalSequence in original.storedSequence.nodes)
-            {
-                if (nodeInOriginalSequence == null) continue;
-                NodeData innerClone = CloneNodeData(nodeInOriginalSequence, false); // Inner nodes never preserve sequence
-                innerClone.SetContainedInSequence(true);
-                clone.storedSequence.nodes.Add(innerClone);
+            
+            foreach (var nodeInSequence in original.storedSequence.nodes) {
+                if (nodeInSequence == null) continue;
+                
+                // Clone nodes in sequence WITHOUT their sequences (no nested sequences)
+                var sequenceNodeClone = CloneNodeWithoutSequence(nodeInSequence);
+                sequenceNodeClone.SetPartOfSequence(true);
+                clone.storedSequence.nodes.Add(sequenceNodeClone);
             }
         }
-        else
-        {
-            clone.EnsureSeedSequenceInitialized(); // Ensures a valid (but possibly empty) sequence object exists
+        
+        return clone;
+    }
+    
+    public static NodeData CloneNodeWithoutSequence(NodeData original) {
+        if (original == null) return null;
+        
+        var clone = new NodeData {
+            nodeId = Guid.NewGuid().ToString(),
+            nodeDisplayName = original.nodeDisplayName,
+            effects = CloneEffectsList(original.effects),
+            orderIndex = original.orderIndex,
+            canBeDeleted = original.canBeDeleted
+        };
+        
+        // Debug verification
+        if (Debug.isDebugBuild) {
+            Debug.Log($"[NodeExecutor] CloneNodeWithoutSequence: '{original.nodeDisplayName}' - Original effects: {original.effects?.Count ?? 0}, Clone effects: {clone.effects?.Count ?? 0}");
         }
-
+        
         return clone;
     }
 
-    public GameObject SpawnPlantFromSeedInSlot(Vector3 plantingPosition, Transform parentTransform)
-    {
-        if (NodeEditorGridController.Instance == null) { DebugLogError("Node Editor Grid Controller not found!"); return null; }
-        if (plantPrefab == null) { DebugLogError("Plant prefab not assigned!"); return null; }
-
-        NodeData seedNodeDataInSlot = NodeEditorGridController.Instance.GetCurrentSeedInSlot();
-
-        if (seedNodeDataInSlot == null)
-        {
-            DebugLog("No seed in slot to plant.");
+    public GameObject SpawnPlantFromSeedInSlot(Vector3 plantingPosition, Transform parentTransform) {
+        if (NodeEditorGridController.Instance == null) {
+            Debug.LogError("[NodeExecutor] Node Editor Grid Controller not found!");
             return null;
         }
-        if (!seedNodeDataInSlot.IsSeed())
-        {
-            DebugLogError($"Item '{seedNodeDataInSlot.nodeDisplayName}' in seed slot is not a valid seed container!");
+        
+        if (plantPrefab == null) {
+            Debug.LogError("[NodeExecutor] Plant prefab not assigned!");
             return null;
         }
-
-        seedNodeDataInSlot.EnsureSeedSequenceInitialized();
-
-        NodeGraph sequenceFromEditor = NodeEditorGridController.Instance.GetCurrentGraphInEditorForSpawning();
-
-        DebugLog($"Attempting to plant seed '{seedNodeDataInSlot.nodeDisplayName}' with {sequenceFromEditor.nodes.Count} int nodes from editor...");
-
-        NodeGraph finalGraphForPlant = new NodeGraph { nodes = new List<NodeData>() };
-
-        NodeData clonedSeedNodeForPlant = CloneNodeData(seedNodeDataInSlot, false);
-        if (clonedSeedNodeForPlant == null) { DebugLogError("Failed to clone seed node for plant."); return null; }
-
-        clonedSeedNodeForPlant.orderIndex = 0;
-        clonedSeedNodeForPlant.canBeDeleted = false;
-        finalGraphForPlant.nodes.Add(clonedSeedNodeForPlant);
-
-        int currentOrderIndex = 1;
-        foreach (NodeData nodeFromEditorSequence in sequenceFromEditor.nodes.OrderBy(n => n.orderIndex))
-        {
-            if (nodeFromEditorSequence == null) continue;
-
-            NodeData clonedSequenceNodeForPlant = CloneNodeData(nodeFromEditorSequence, false);
-            if (clonedSequenceNodeForPlant == null) continue;
-
-            clonedSequenceNodeForPlant.orderIndex = currentOrderIndex++;
-            clonedSequenceNodeForPlant.canBeDeleted = false;
-            finalGraphForPlant.nodes.Add(clonedSequenceNodeForPlant);
+        
+        NodeData seedInSlot = NodeEditorGridController.Instance.GetCurrentSeedInSlot();
+        
+        if (seedInSlot == null) {
+            Debug.Log("[NodeExecutor] No seed in slot to plant.");
+            return null;
         }
-
+        
+        if (!seedInSlot.IsSeed()) {
+            Debug.LogError($"[NodeExecutor] Item '{seedInSlot.nodeDisplayName}' in seed slot is not a valid seed!");
+            return null;
+        }
+        
+        // Debug: Log seed effects
+        Debug.Log($"[NodeExecutor] Seed '{seedInSlot.nodeDisplayName}' has {seedInSlot.effects?.Count ?? 0} effects:");
+        if (seedInSlot.effects != null) {
+            foreach (var effect in seedInSlot.effects) {
+                Debug.Log($"  - {effect.effectType} (passive: {effect.isPassive})");
+            }
+        }
+        
+        // Get the current sequence from the editor
+        NodeGraph editorSequence = NodeEditorGridController.Instance.GetCurrentGraphInEditorForSpawning();
+        Debug.Log($"[NodeExecutor] Editor sequence has {editorSequence.nodes.Count} nodes");
+        
+        // Build the final graph for the plant
+        NodeGraph plantGraph = new NodeGraph { nodes = new List<NodeData>() };
+        
+        // 1. Add the seed node (without its stored sequence)
+        NodeData seedClone = CloneNodeWithoutSequence(seedInSlot);
+        seedClone.orderIndex = 0;
+        seedClone.canBeDeleted = false;
+        plantGraph.nodes.Add(seedClone);
+        
+        // Debug: Verify seed clone
+        Debug.Log($"[NodeExecutor] Seed clone has {seedClone.effects?.Count ?? 0} effects");
+        
+        // 2. Add nodes from the editor sequence
+        int orderIndex = 1;
+        foreach (NodeData editorNode in editorSequence.nodes.OrderBy(n => n.orderIndex)) {
+            if (editorNode == null) continue;
+            
+            // Debug: Log editor node effects
+            Debug.Log($"[NodeExecutor] Editor node '{editorNode.nodeDisplayName}' has {editorNode.effects?.Count ?? 0} effects:");
+            if (editorNode.effects != null) {
+                foreach (var effect in editorNode.effects) {
+                    Debug.Log($"  - {effect.effectType} (passive: {effect.isPassive}, primary: {effect.primaryValue}, secondary: {effect.secondaryValue})");
+                }
+            }
+            
+            NodeData nodeClone = CloneNodeWithoutSequence(editorNode);
+            nodeClone.orderIndex = orderIndex++;
+            nodeClone.canBeDeleted = false;
+            plantGraph.nodes.Add(nodeClone);
+            
+            // Debug: Verify clone
+            Debug.Log($"[NodeExecutor] Node clone has {nodeClone.effects?.Count ?? 0} effects");
+        }
+        
+        // Debug: Final graph verification
+        Debug.Log($"[NodeExecutor] Final plant graph has {plantGraph.nodes.Count} nodes:");
+        foreach (var node in plantGraph.nodes) {
+            Debug.Log($"  - {node.nodeDisplayName} (order: {node.orderIndex}) with {node.effects?.Count ?? 0} effects");
+            if (node.effects != null) {
+                foreach (var effect in node.effects) {
+                    Debug.Log($"    - {effect.effectType} (passive: {effect.isPassive}, primary: {effect.primaryValue})");
+                }
+            }
+        }
+        
+        // Create and initialize the plant
         GameObject plantObj = Instantiate(plantPrefab, plantingPosition, Quaternion.identity, parentTransform);
         
-        // FIX: Snap the newly created plant to the grid so its GridPosition is correctly calculated and registered.
-        if (GridPositionManager.Instance != null)
-        {
+        if (GridPositionManager.Instance != null) {
             GridPositionManager.Instance.SnapEntityToGrid(plantObj);
         }
-        else
-        {
-            DebugLogError("GridPositionManager not found! Plant may not function correctly.");
-        }
-
+        
         PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
-
-        if (growthComponent != null)
-        {
-            growthComponent.InitializeAndGrow(finalGraphForPlant);
-            DebugLog($"Plant '{plantObj.name}' spawned and initialized with seed '{seedNodeDataInSlot.nodeDisplayName}'.");
+        if (growthComponent != null) {
+            growthComponent.InitializeAndGrow(plantGraph);
+            Debug.Log($"[NodeExecutor] Plant spawned with seed '{seedInSlot.nodeDisplayName}'");
             return plantObj;
         }
-        else
-        {
-            DebugLogError($"Prefab '{plantPrefab.name}' missing PlantGrowth component! Destroying spawned object.");
+        else {
+            Debug.LogError($"[NodeExecutor] Plant prefab missing PlantGrowth component!");
             Destroy(plantObj);
             return null;
         }
     }
 
-    public GameObject SpawnPlantFromInventorySeed(NodeData seedData, Vector3 spawnPos, Transform parent)
-    {
-        if (seedData == null || !seedData.IsSeed())
-        {
-            DebugLogError("SpawnPlantFromInventorySeed called with invalid seed.");
+    public GameObject SpawnPlantFromInventorySeed(NodeData seedData, Vector3 spawnPos, Transform parent) {
+        if (seedData == null || !seedData.IsSeed()) {
+            Debug.LogError("[NodeExecutor] Invalid seed data provided!");
             return null;
         }
-        if (plantPrefab == null)
-        {
-            DebugLogError("Plant prefab not assigned.");
+        
+        if (plantPrefab == null) {
+            Debug.LogError("[NodeExecutor] Plant prefab not assigned!");
             return null;
         }
-
-        seedData.EnsureSeedSequenceInitialized();
-
-        NodeGraph graph = new NodeGraph { nodes = new List<NodeData>() };
-
-        NodeData seedClone = CloneNodeData(seedData, false);
+        
+        // Build graph from seed and its stored sequence
+        NodeGraph plantGraph = new NodeGraph { nodes = new List<NodeData>() };
+        
+        // 1. Add seed node
+        NodeData seedClone = CloneNodeWithoutSequence(seedData);
         seedClone.orderIndex = 0;
         seedClone.canBeDeleted = false;
-        graph.nodes.Add(seedClone);
-
-        int order = 1;
-        if (seedData.storedSequence?.nodes != null)
-        {
-            foreach (NodeData n in seedData.storedSequence.nodes.OrderBy(n => n.orderIndex))
-            {
-                NodeData clone = CloneNodeData(n, false);
-                if (clone == null) continue;
-                clone.orderIndex = order++;
-                clone.canBeDeleted = false;
-                graph.nodes.Add(clone);
+        plantGraph.nodes.Add(seedClone);
+        
+        // 2. Add nodes from seed's stored sequence
+        if (seedData.storedSequence?.nodes != null) {
+            int orderIndex = 1;
+            foreach (NodeData sequenceNode in seedData.storedSequence.nodes.OrderBy(n => n.orderIndex)) {
+                if (sequenceNode == null) continue;
+                
+                NodeData nodeClone = CloneNodeWithoutSequence(sequenceNode);
+                nodeClone.orderIndex = orderIndex++;
+                nodeClone.canBeDeleted = false;
+                plantGraph.nodes.Add(nodeClone);
             }
         }
-
-        GameObject plantGO = Instantiate(plantPrefab, spawnPos, Quaternion.identity, parent);
         
-        // FIX: Snap the newly created plant to the grid so its GridPosition is correctly calculated and registered.
-        if (GridPositionManager.Instance != null)
-        {
-            GridPositionManager.Instance.SnapEntityToGrid(plantGO);
-        }
-        else
-        {
-            DebugLogError("GridPositionManager not found! Plant may not function correctly.");
+        // Create and initialize plant
+        GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity, parent);
+        
+        if (GridPositionManager.Instance != null) {
+            GridPositionManager.Instance.SnapEntityToGrid(plantObj);
         }
         
-        PlantGrowth growth = plantGO.GetComponent<PlantGrowth>();
-
-        if (growth == null)
-        {
-            DebugLogError("Plant prefab missing PlantGrowth component.");
-            Destroy(plantGO);
+        PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
+        if (growthComponent != null) {
+            growthComponent.InitializeAndGrow(plantGraph);
+            return plantObj;
+        }
+        else {
+            Debug.LogError("[NodeExecutor] Plant prefab missing PlantGrowth component!");
+            Destroy(plantObj);
             return null;
         }
-
-        growth.InitializeAndGrow(graph);
-        return plantGO;
     }
 
     private void DebugLog(string msg)
