@@ -1,8 +1,8 @@
-﻿using System.Collections;
+﻿using UnityEngine;
+using UnityEngine.Tilemaps;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using UnityEngine.Tilemaps;
 using skner.DualGrid;
 using TMPro;
 using WegoSystem;
@@ -12,7 +12,7 @@ using UnityEditor;
 
 public class TileInteractionManager : MonoBehaviour, ITickUpdateable
 {
-    public static TileInteractionManager Instance { get; set; }
+    public static TileInteractionManager Instance { get; private set; }
 
     [System.Serializable]
     public class TileDefinitionMapping
@@ -83,13 +83,11 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
 
     void OnDisable()
     {
-        // Clean up the continuous visualization when this manager is disabled
         if (GridDebugVisualizer.Instance != null)
         {
             GridDebugVisualizer.Instance.HideContinuousRadius("player_tool_use");
         }
     }
-
 
     void CacheHoverSpriteRenderer()
     {
@@ -162,9 +160,9 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
                 if (renderer != null)
                 {
                     renderer.sortingOrder = baseSortingOrder - i;
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     if (!Application.isPlaying) EditorUtility.SetDirty(renderer);
-                    #endif
+#endif
                     if (debugLogs) Debug.Log($"Updated sorting order for {mapping.tileDef.displayName} to {renderer.sortingOrder}");
                 }
             }
@@ -185,9 +183,9 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
                 if (renderTilemap != null)
                 {
                     renderTilemap.color = mapping.tileDef.tintColor;
-                    #if UNITY_EDITOR
+#if UNITY_EDITOR
                     if (!Application.isPlaying) EditorUtility.SetDirty(renderTilemap);
-                    #endif
+#endif
                     if (debugLogs) Debug.Log($"Updated color for {mapping.tileDef.displayName} to {renderTilemap.color}");
                 }
             }
@@ -396,15 +394,13 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
             UpdateHoverHighlightColor(withinRadius);
         }
 
-        // CORRECTED: Use the new stateful visualization system
         if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild)
         {
-            // This key should be unique for this specific visualization
-            string visKey = "player_tool_use"; 
+            string visKey = "player_tool_use";
             GridDebugVisualizer.Instance.ShowContinuousRadius(
-                visKey, 
-                playerGridPos, 
-                gridRadius, 
+                visKey,
+                playerGridPos,
+                gridRadius,
                 GridDebugVisualizer.RadiusType.ToolUse
             );
         }
@@ -530,21 +526,22 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
 
         if (debugLogs) Debug.Log($"[ApplyToolAction] Using Tool='{toolDef.toolType}', On Tile='{hoveredTileDef.displayName}', At Cell={currentlyHoveredCell.Value}");
 
+        // --- START: MODIFIED BLOCK ---
         bool wasRefillAction = false;
-        if (interactionLibrary != null && interactionLibrary.refillRules != null)
+        if (interactionLibrary?.refillRules != null && ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool == toolDef)
         {
             foreach (var refillRule in interactionLibrary.refillRules)
             {
                 if (refillRule != null && refillRule.toolToRefill == toolDef && refillRule.refillSourceTile == hoveredTileDef)
                 {
-                    if (debugLogs) Debug.Log($"Refill rule matched: Tool '{toolDef.displayName}' on Tile '{hoveredTileDef.displayName}'.");
-
-                    Debug.Log($"[TileInteractionManager] Tool refill not implemented for inventory-based tools yet.");
+                    if (debugLogs) Debug.Log($"Refill rule matched for currently held tool: '{toolDef.displayName}' on Tile '{hoveredTileDef.displayName}'.");
+                    ToolSwitcher.Instance.RefillCurrentTool();
                     wasRefillAction = true;
                     break;
                 }
             }
         }
+        // --- END: MODIFIED BLOCK ---
 
         if (wasRefillAction) return;
 

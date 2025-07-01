@@ -1,8 +1,8 @@
-﻿// Assets\Scripts\WorldInteraction\Placement\PlayerTileInteractor.cs
+﻿using UnityEngine;
+using System.Linq;
 
-using UnityEngine;
-
-public sealed class PlayerTileInteractor : MonoBehaviour {
+public sealed class PlayerTileInteractor : MonoBehaviour
+{
     [SerializeField] InventoryBarController inventoryBar;
     [SerializeField] TileInteractionManager tileInteractionManager;
     [SerializeField] Transform playerTransform;
@@ -10,30 +10,36 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
 
     bool pendingClick;
 
-    void Awake() {
+    void Awake()
+    {
         if (playerTransform == null) playerTransform = transform;
     }
 
-    void Start() {
+    void Start()
+    {
         FindSingletons();
     }
 
-    void Update() {
+    void Update()
+    {
         if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat) return;
         if (Input.GetMouseButtonDown(0)) pendingClick = true;
     }
 
-    void LateUpdate() {
+    void LateUpdate()
+    {
         if (!pendingClick) return;
         pendingClick = false;
         HandleLeftClick();
     }
 
-    void HandleLeftClick() {
+    void HandleLeftClick()
+    {
         if (!EnsureManagers()) return;
 
         InventoryBarItem selected = inventoryBar.SelectedItem;
-        if (selected == null || !selected.IsValid()) {
+        if (selected == null || !selected.IsValid())
+        {
             if (showDebug) Debug.Log("[PlayerTileInteractor] Click handled, but no valid item selected in the bar.");
             return;
         }
@@ -43,51 +49,63 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
         Vector3Int cellPos = tileInteractionManager.WorldToCell(mouseW);
         Vector3 cellCenter = tileInteractionManager.interactionGrid.GetCellCenterWorld(cellPos);
 
-        if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius) {
+        if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius)
+        {
             if (showDebug) Debug.Log($"[PlayerTileInteractor] Clicked on cell {cellPos}, but it's too far away.");
             return;
         }
 
-        // CRITICAL CHANGE: Route all actions through PlayerActionManager
-        if (PlayerActionManager.Instance == null) {
+        if (PlayerActionManager.Instance == null)
+        {
             Debug.LogError("[PlayerTileInteractor] PlayerActionManager not found!");
             return;
         }
 
-        bool actionSuccess = false;
-
-        if (selected.Type == InventoryBarItem.ItemType.Tool) {
+        if (selected.Type == InventoryBarItem.ItemType.Tool)
+        {
             if (showDebug) Debug.Log($"[PlayerTileInteractor] Using tool '{selected.GetDisplayName()}' at cell {cellPos}.");
-            actionSuccess = PlayerActionManager.Instance.ExecutePlayerAction(
-                PlayerActionType.UseTool, 
-                cellPos, 
+            PlayerActionManager.Instance.ExecutePlayerAction(
+                PlayerActionType.UseTool,
+                cellPos,
                 selected.ToolDefinition
             );
         }
-        else if (selected.Type == InventoryBarItem.ItemType.Node && selected.IsSeed()) {
+        else if (selected.Type == InventoryBarItem.ItemType.Node && selected.IsSeed())
+        {
             if (showDebug) Debug.Log($"[PlayerTileInteractor] Planting seed '{selected.GetDisplayName()}' at cell {cellPos}.");
-            actionSuccess = PlayerActionManager.Instance.ExecutePlayerAction(
+
+            // --- START: MODIFIED BLOCK ---
+            // Create a callback that will be executed ONLY on successful planting
+            System.Action onSuccess = () => {
+                if (showDebug) Debug.Log($"[PlayerTileInteractor] Planting was successful. Removing seed '{selected.GetDisplayName()}' from inventory via callback.");
+                RemoveSeedFromInventory(selected);
+                inventoryBar.ShowBar(); // Refresh the bar after item is removed
+            };
+
+            // Pass the action and the callback to the manager
+            PlayerActionManager.Instance.ExecutePlayerAction(
                 PlayerActionType.PlantSeed,
                 cellPos,
-                selected
+                selected,
+                onSuccess
             );
-            
-            if (actionSuccess) {
-                if (showDebug) Debug.Log($"[PlayerTileInteractor] Planted successfully. Removing seed from inventory.");
-                RemoveSeedFromInventory(selected);
-                inventoryBar.ShowBar(); // Refresh the bar
-            }
+            // --- END: MODIFIED BLOCK ---
         }
     }
 
-    void RemoveSeedFromInventory(InventoryBarItem seed) {
+    public void RemoveSeedFromInventory(InventoryBarItem seed)
+    {
         InventoryGridController grid = InventoryGridController.Instance;
         if (grid == null) return;
 
-        if (seed.ViewGameObject != null) {
-            for (int i = 0; i < grid.ActualCellCount; i++) {
+        // Try to find by direct GameObject reference first (most reliable)
+        if (seed.ViewGameObject != null)
+        {
+            for (int i = 0; i < grid.ActualCellCount; i++)
+            {
                 NodeCell cell = grid.GetInventoryCellAtIndex(i);
-                if (cell != null && cell.GetItemView()?.gameObject == seed.ViewGameObject) {
+                if (cell != null && cell.GetItemView()?.gameObject == seed.ViewGameObject)
+                {
                     if (showDebug) Debug.Log($"[PlayerTileInteractor] Removing seed '{seed.GetDisplayName()}' from inventory cell {i} by view reference.");
                     cell.RemoveNode();
                     return;
@@ -95,9 +113,12 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
             }
         }
 
-        for (int i = 0; i < grid.ActualCellCount; i++) {
+        // Fallback to finding by NodeData ID if view reference fails or is null
+        for (int i = 0; i < grid.ActualCellCount; i++)
+        {
             NodeCell cell = grid.GetInventoryCellAtIndex(i);
-            if (cell != null && cell.GetNodeData()?.nodeId == seed.NodeData.nodeId) {
+            if (cell != null && cell.GetNodeData()?.nodeId == seed.NodeData.nodeId)
+            {
                 if (showDebug) Debug.Log($"[PlayerTileInteractor] Removing seed '{seed.GetDisplayName()}' from inventory cell {i} by data ID fallback.");
                 cell.RemoveNode();
                 return;
@@ -105,12 +126,14 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
         }
     }
 
-    bool EnsureManagers() {
+    bool EnsureManagers()
+    {
         if (tileInteractionManager == null || inventoryBar == null) FindSingletons();
         return tileInteractionManager != null && inventoryBar != null;
     }
 
-    void FindSingletons() {
+    void FindSingletons()
+    {
         if (inventoryBar == null) inventoryBar = InventoryBarController.Instance ?? FindAnyObjectByType<InventoryBarController>(FindObjectsInactive.Include);
         if (tileInteractionManager == null) tileInteractionManager = TileInteractionManager.Instance ?? FindAnyObjectByType<TileInteractionManager>(FindObjectsInactive.Include);
     }

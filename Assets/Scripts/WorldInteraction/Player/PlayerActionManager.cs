@@ -1,11 +1,10 @@
-﻿// Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
-
-using System;
+﻿using UnityEngine;
 using System.Collections;
-using UnityEngine;
+using System;
 using WegoSystem;
 
-public enum PlayerActionType {
+public enum PlayerActionType
+{
     Move,
     UseTool,
     PlantSeed,
@@ -16,12 +15,12 @@ public enum PlayerActionType {
 
 public class PlayerActionManager : MonoBehaviour
 {
-    public static PlayerActionManager Instance { get; set; }
+    public static PlayerActionManager Instance { get; private set; }
 
     [SerializeField] bool debugMode = true;
     [SerializeField] int tickCostPerAction = 1;
-    
-    [SerializeField] private float multiTickActionDelay = 0.5f; // Delay between ticks for multi-tick actions
+
+    [SerializeField] float multiTickActionDelay = 0.5f; // Delay between ticks for multi-tick actions
 
     public event Action<PlayerActionType, bool> OnActionExecuted;
     public event Action<string> OnActionFailed;
@@ -31,7 +30,7 @@ public class PlayerActionManager : MonoBehaviour
         if (Instance != null && Instance != this)
         {
             Destroy(gameObject);
-            return;;
+            return;
         }
         Instance = this;
     }
@@ -41,25 +40,25 @@ public class PlayerActionManager : MonoBehaviour
         if (Instance == this) Instance = null;
     }
 
-    public bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null)
+    public bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null, Action onSuccessCallback = null)
     {
         if (debugMode) Debug.Log($"[PlayerActionManager] Executing {actionType} at {gridPosition}");
-    
+
         bool success = false;
         int tickCost = tickCostPerAction;
-    
+
         switch (actionType)
         {
             case PlayerActionType.UseTool:
                 success = ExecuteToolUse(gridPosition, actionData as ToolDefinition);
                 break;
-            
+
             case PlayerActionType.PlantSeed:
-                // Planting takes 2 ticks
                 tickCost = 2;
                 if (tickCost > 1)
                 {
-                    StartCoroutine(ExecuteDelayedAction(() => ExecutePlantSeed(gridPosition, actionData as InventoryBarItem), tickCost));
+                    // Pass the success callback to the coroutine
+                    StartCoroutine(ExecuteDelayedAction(() => ExecutePlantSeed(gridPosition, actionData as InventoryBarItem), tickCost, onSuccessCallback));
                     return true; // Return early, coroutine will handle the rest
                 }
                 else
@@ -67,53 +66,55 @@ public class PlayerActionManager : MonoBehaviour
                     success = ExecutePlantSeed(gridPosition, actionData as InventoryBarItem);
                 }
                 break;
-            
+
             case PlayerActionType.Water:
                 success = ExecuteWatering(gridPosition);
                 break;
-            
+
             case PlayerActionType.Harvest:
                 success = ExecuteHarvest(gridPosition);
                 break;
-            
+
             case PlayerActionType.Interact:
                 success = ExecuteInteraction(gridPosition, actionData);
                 break;
         }
-    
+
         if (success)
         {
+            // Only non-delayed actions advance tick and call callbacks here
             AdvanceGameTick(tickCost);
+            onSuccessCallback?.Invoke();
             OnActionExecuted?.Invoke(actionType, true);
         }
         else
         {
             OnActionFailed?.Invoke($"{actionType} failed");
         }
-    
+
         return success;
     }
-    
-    IEnumerator ExecuteDelayedAction(System.Func<bool> action, int tickCost)
+
+    IEnumerator ExecuteDelayedAction(Func<bool> action, int tickCost, Action onSuccessCallback)
     {
         Debug.Log($"[PlayerActionManager] Starting delayed action. Cost: {tickCost} ticks");
-    
-        // Process all ticks except the last one
+
+        // Process delay ticks first
         for (int i = 0; i < tickCost - 1; i++)
         {
             Debug.Log($"[PlayerActionManager] Processing tick {i + 1}/{tickCost} (delay tick)");
             TickManager.Instance.AdvanceTick();
-        
-            // Wait for the specified delay
+
             yield return new WaitForSeconds(multiTickActionDelay);
         }
-    
-        // On the final tick, execute the action
+
+        // Perform the action and advance the final tick
         bool success = action.Invoke();
         TickManager.Instance.AdvanceTick();
-    
+
         if (success)
         {
+            onSuccessCallback?.Invoke(); // Critical: only call this on success
             OnActionExecuted?.Invoke(PlayerActionType.PlantSeed, true);
             Debug.Log($"[PlayerActionManager] Completed delayed action. Total ticks: {tickCost}");
         }
@@ -156,11 +157,11 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
-    public int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null) {
+    public int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null)
+    {
         int baseCost = tickCostPerAction;
         int maxAdditionalCost = 0; // Find the highest penalty if zones overlap
-    
-        // Determine the precise position to check, using the ground point if available.
+
         Vector3 positionToCheck = worldPosition;
         if (movingEntity != null)
         {
@@ -170,35 +171,40 @@ public class PlayerActionManager : MonoBehaviour
                 positionToCheck = gridEntity.GroundWorldPosition;
             }
         }
-    
+
         SlowdownZone[] allZones = FindObjectsByType<SlowdownZone>(FindObjectsSortMode.None);
-    
-        foreach (var zone in allZones) {
-            // Use the calculated positionToCheck instead of the raw worldPosition
-            if (zone.IsPositionInZone(positionToCheck)) {
+
+        foreach (var zone in allZones)
+        {
+            if (zone.IsPositionInZone(positionToCheck))
+            {
                 bool shouldAffect = false;
-                if (movingEntity == null) // If entity not specified, assume it affects by default 
+                if (movingEntity == null) // If entity not specified, assume it affects by default
                 {
                     shouldAffect = true;
                 }
-                else if (movingEntity is GardenerController && zone.AffectsPlayer) {
+                else if (movingEntity is GardenerController && zone.AffectsPlayer)
+                {
                     shouldAffect = true;
                 }
-                else if (movingEntity is AnimalController && zone.AffectsAnimals) {
+                else if (movingEntity is AnimalController && zone.AffectsAnimals)
+                {
                     shouldAffect = true;
                 }
-    
-                if (shouldAffect) {
+
+                if (shouldAffect)
+                {
                     maxAdditionalCost = Mathf.Max(maxAdditionalCost, zone.GetAdditionalTickCost());
                 }
             }
         }
-    
-        if (maxAdditionalCost > 0 && debugMode) {
+
+        if (maxAdditionalCost > 0 && debugMode)
+        {
             string entityName = movingEntity != null ? movingEntity.gameObject.name : "Unknown Entity";
             Debug.Log($"[PlayerActionManager] Movement for '{entityName}' from {positionToCheck} is in a slowdown zone. Additional cost: {maxAdditionalCost}. Total cost: {baseCost + maxAdditionalCost} ticks");
         }
-    
+
         return baseCost + maxAdditionalCost;
     }
 
@@ -237,8 +243,6 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
-    // Replace the AdvanceGameTick method in PlayerActionManager.cs:
-
     void AdvanceGameTick(int tickCount = 1)
     {
         if (TickManager.Instance == null)
@@ -246,18 +250,17 @@ public class PlayerActionManager : MonoBehaviour
             Debug.LogError("[PlayerActionManager] TickManager not found!");
             return;
         }
-    
-        // Process each tick individually to ensure proper updates
+
         for (int i = 0; i < tickCount; i++)
         {
             TickManager.Instance.AdvanceTick();
-        
+
             if (debugMode && tickCount > 1)
             {
                 Debug.Log($"[PlayerActionManager] Processing tick {i + 1}/{tickCount}");
             }
         }
-    
+
         if (debugMode)
         {
             Debug.Log($"[PlayerActionManager] Advanced game by {tickCount} tick(s)");
