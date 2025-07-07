@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 565,116 → 384,122 chars (32.0% reduction)
-Estimated tokens saved: ~45,248
+Compression Stats: 563,235 → 384,370 chars (31.8% reduction)
+Estimated tokens saved: ~44,716
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -107,22 +107,22 @@ using System;
   PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10746
   GardenerController (Assets\Scripts\WorldInteraction\Player/) L10864
   PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11015
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11258
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11298
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L11322
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11342
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11259
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11299
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L11323
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11343
   TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L11830
   ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L11842
   ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L11877
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12036
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12052
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L12046
-  GridPosition (Assets\Scripts\Ticks/) L12196
-  GridPositionManager (Assets\Scripts\Ticks/) L12297
-  GridRadiusUtility (Assets\Scripts\Ticks/) L12653
-  TickConfiguration (Assets\Scripts\Ticks/) L12797
-  ITickUpdateable (Assets\Scripts\Ticks/) L12880
+  GridEntity (Assets\Scripts\Ticks/) L12062
+  GridPosition (Assets\Scripts\Ticks/) L12212
+  GridPositionManager (Assets\Scripts\Ticks/) L12313
+  GridRadiusUtility (Assets\Scripts\Ticks/) L12669
+  TickConfiguration (Assets\Scripts\Ticks/) L12813
+  ITickUpdateable (Assets\Scripts\Ticks/) L12896
 
 ================================================================================
 SCRIPTS
@@ -10848,7 +10848,7 @@ ret centerPosition + new Vector3(offsetX, offsetY, 0f);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Placement\PlayerTileInteractor.cs
 
-﻿// Assets\Scripts\WorldInteraction\Placement\PlayerTileInteractor.cs
+﻿using UnityEngine;
 
 pub sealed cls PlayerTileInteractor : MonoBehaviour {
 [SerializeField] InventoryBarController inventoryBar;
@@ -10901,11 +10901,9 @@ Debug.LogError("[PlayerTileInteractor] PlayerActionManager not found!");
 return;
 }
 
-bool actionSuccess = false;
-
 if (selected.Type == InventoryBarItem.ItemType.Tool) {
 if (showDebug) Debug.Log($"[PlayerTileInteractor] Using tool '{selected.GetDisplayName()}' at cell {cellPos}.");
-actionSuccess = PlayerActionManager.Instance.ExecutePlayerAction(
+PlayerActionManager.Instance.ExecutePlayerAction(
 PlayerActionType.UseTool,
 cellPos,
 selected.ToolDefinition
@@ -10913,21 +10911,23 @@ selected.ToolDefinition
 }
 else if (selected.Type == InventoryBarItem.ItemType.Node && selected.IsSeed()) {
 if (showDebug) Debug.Log($"[PlayerTileInteractor] Planting seed '{selected.GetDisplayName()}' at cell {cellPos}.");
-actionSuccess = PlayerActionManager.Instance.ExecutePlayerAction(
+
+System.Action onSuccess = () => {
+if (showDebug) Debug.Log($"[PlayerTileInteractor] Planting was successful. Removing seed '{selected.GetDisplayName()}' from inventory via callback.");
+RemoveSeedFromInventory(selected);
+inventoryBar.ShowBar(); // Refresh the bar after item is removed
+};
+
+PlayerActionManager.Instance.ExecutePlayerAction(
 PlayerActionType.PlantSeed,
 cellPos,
-selected
+selected,
+onSuccess
 );
-
-if (actionSuccess) {
-if (showDebug) Debug.Log($"[PlayerTileInteractor] Planted successfully. Removing seed from inventory.");
-RemoveSeedFromInventory(selected);
-inventoryBar.ShowBar(); // Refresh the bar
-}
 }
 }
 
-void RemoveSeedFromInventory(InventoryBarItem seed) {
+pub void RemoveSeedFromInventory(InventoryBarItem seed) {
 InventoryGridController grid = InventoryGridController.Instance;
 if (grid == null) return;
 
@@ -11117,8 +11117,7 @@ ret gridEntity?.Position ?? GridPosition.Zero;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
 
-﻿// Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
-
+﻿using UnityEngine;
 using WegoSystem;
 
 pub enum PlayerActionType {
@@ -11144,7 +11143,7 @@ pub event Action<string> OnActionFailed;
 void Awake() {
 if (Instance != null && Instance != this) {
 Destroy(gameObject);
-return;;
+return;
 }
 Instance = this;
 }
@@ -11153,7 +11152,7 @@ void OnDestroy() {
 if (Instance == this) Instance = null;
 }
 
-pub bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null) {
+pub bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null, Action onSuccessCallback = null) {
 if (debugMode) Debug.Log($"[PlayerActionManager] Executing {actionType} at {gridPosition}");
 
 bool success = false;
@@ -11167,7 +11166,7 @@ break;
 case PlayerActionType.PlantSeed:
 tickCost = 2;
 if (tickCost > 1) {
-StartCoroutine(ExecuteDelayedAction(() => ExecutePlantSeed(gridPosition, actionData as InventoryBarItem), tickCost));
+StartCoroutine(ExecuteDelayedAction(() => ExecutePlantSeed(gridPosition, actionData as InventoryBarItem), tickCost, onSuccessCallback));
 ret true; // Return early, coroutine will handle the rest
 }
 else {
@@ -11190,6 +11189,7 @@ break;
 
 if (success) {
 AdvanceGameTick(tickCost);
+onSuccessCallback?.Invoke();
 OnActionExecuted?.Invoke(actionType, true);
 }
 else {
@@ -11199,7 +11199,7 @@ OnActionFailed?.Invoke($"{actionType} failed");
 ret success;
 }
 
-IEnumerator ExecuteDelayedAction(System.Func<bool> action, int tickCost) {
+IEnumerator ExecuteDelayedAction(Func<bool> action, int tickCost, Action onSuccessCallback) {
 Debug.Log($"[PlayerActionManager] Starting delayed action. Cost: {tickCost} ticks");
 
 for (int i = 0; i < tickCost - 1; i++) {
@@ -11213,6 +11213,7 @@ bool success = action.Invoke();
 TickManager.Instance.AdvanceTick();
 
 if (success) {
+onSuccessCallback?.Invoke(); // Critical: only call this on success
 OnActionExecuted?.Invoke(PlayerActionType.PlantSeed, true);
 Debug.Log($"[PlayerActionManager] Completed delayed action. Total ticks: {tickCost}");
 }
@@ -11444,7 +11445,7 @@ pub List<ToolRefillRule> refillRules; // <<< NEW LIST FOR REFILLS
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Tiles\TileInteractionManager.cs
 
-﻿using System.Collections;
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 using skner.DualGrid;
 using TMPro;
@@ -11882,12 +11883,11 @@ if (distance > hoverRadius) { if (debugLogs) Debug.Log($"ApplyToolAction: Cell t
 if (debugLogs) Debug.Log($"[ApplyToolAction] Using Tool='{toolDef.toolType}', On Tile='{hoveredTileDef.displayName}', At Cell={currentlyHoveredCell.Value}");
 
 bool wasRefillAction = false;
-if (interactionLibrary != null && interactionLibrary.refillRules != null) {
+if (interactionLibrary?.refillRules != null && ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool == toolDef) {
 foreach (var refillRule in interactionLibrary.refillRules) {
 if (refillRule != null && refillRule.toolToRefill == toolDef && refillRule.refillSourceTile == hoveredTileDef) {
-if (debugLogs) Debug.Log($"Refill rule matched: Tool '{toolDef.displayName}' on Tile '{hoveredTileDef.displayName}'.");
-
-Debug.Log($"[TileInteractionManager] Tool refill not implemented for inventory-based tools yet.");
+if (debugLogs) Debug.Log($"Refill rule matched for currently held tool: '{toolDef.displayName}' on Tile '{hoveredTileDef.displayName}'.");
+ToolSwitcher.Instance.RefillCurrentTool();
 wasRefillAction = true;
 break;
 }
@@ -11979,21 +11979,37 @@ ret sb.ToString().TrimEnd();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Tools\ToolSwitcher.cs
 
-﻿using UnityEngine;
+﻿using System;
 
 pub cls ToolSwitcher : MonoBehaviour {
+pub stat ToolSwitcher Instance { get; set; }
+
 pub ToolDefinition[] toolDefinitions;
 
 int currentIndex = 0;
 
 pub ToolDefinition CurrentTool { get; set; } = null;
-pub int CurrentRemainingUses { get; set; } = -1; // <<< NEW: Track remaining uses (-1 for unlimited)
+pub int CurrentRemainingUses { get; set; } = -1; // -1 for unlimited
 
 pub event Action<ToolDefinition> OnToolChanged;
-pub event Action<int> OnUsesChanged; // <<< NEW EVENT for UI updates
+pub event Action<int> OnUsesChanged;
+
+void Awake() {
+if (Instance != null && Instance != this) {
+Destroy(gameObject);
+return;
+}
+Instance = this;
+}
 
 void Start() {
 InitializeToolState(true); // Initialize and fire events
+}
+
+void OnDestroy() {
+if (Instance == this) {
+Instance = null;
+}
 }
 
 void Update() {
@@ -12074,7 +12090,7 @@ return;
 Debug.LogWarning($"[ToolSwitcher] Tool '{toolDef.displayName}' not found in definitions array");
 }
 
-pub void RefillCurrentTool() // <<< NEW METHOD {
+pub void RefillCurrentTool() {
 if (CurrentTool == null) {
 Debug.LogWarning("[ToolSwitcher RefillCurrentTool] Cannot refill: No tool selected.");
 return;
