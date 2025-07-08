@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a3c413eaecb462e830bcbf2c00d5190, type: 3}
+  m_Name: StatusEffect_000_Wet
+  m_EditorClassIdentifier: 
+  effectID: wet
+  displayName: Wet
+  icon: {fileID: 0}
+  unicodeSymbol: "\U0001F4A7"
+  effectColor: {r: 0.41037738, g: 0.6863123, b: 1, a: 1}
+  isPermanent: 0
+  durationTicks: 10
+  modifyAnimalColor: 0
+  animalTintColor: {r: 0.2971698, g: 0.6632516, b: 1, a: 0.20392157}
+  visualEffectPrefab: {fileID: 0}
+  damagePerTick: 0
+  damageAmount: 0
+  healPerTick: 0
+  healAmount: 0
+  modifyHunger: 0
+  hungerModifier: 0
+  movementSpeedMultiplier: 1
+  damageResistanceMultiplier: 1
+  canStack: 0
+  maxStacks: 1

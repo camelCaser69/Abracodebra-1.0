@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e94f34fb4544c3aa9b2d6093e1f7ff, type: 3}
+  m_Name: AnimalThoughtLibrary
+  m_EditorClassIdentifier: 
+  allThoughts:
+  - speciesName: Bunny
+    trigger: 0
+    lines:
+    - "\u201CI\u2019m starving!\u201D"
+    - "\u201CNeed something to nibble on\u2026\u201D"
+  - speciesName: Deer
+    trigger: 0
+    lines:
+    - "\u201CDeez nuts\u201D"
+    - "\u201CYum yum WEEEED\u201D"

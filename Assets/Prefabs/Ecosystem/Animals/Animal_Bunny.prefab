@@ -190,6 +190,8 @@ GameObject:
   - component: {fileID: 5337159753638111056}
   - component: {fileID: 6958314175792756636}
   - component: {fileID: 3186041380271538739}
+  - component: {fileID: 4138277716778358582}
+  - component: {fileID: -918275410289300327}
   m_Layer: 0
   m_Name: Animal_Bunny
   m_TagString: Herbivore
@@ -229,6 +231,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   definition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}
+  wetStatusEffect: {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
+  waterTileDefinition: {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}
   thoughtBubblePrefab: {fileID: 7019603340007582860, guid: e00dc2bef6e577f4788d3a0262749be1, type: 3}
   bubbleSpawnTransform: {fileID: 1385400547619210892}
   animator: {fileID: 0}
@@ -542,6 +546,33 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4138277716778358582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1618699628824306755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3c534a7389140ada275bba6ad79abbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-918275410289300327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1618699628824306755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0352e5de0a44730995e3aa8c3b4bd72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effectIconContainer: {fileID: 8690851404544601141}
+  effectIconPrefab: {fileID: 6027093001628851131, guid: 333d2abbda8c2c54da48bd0147f9fe14, type: 3}
+  iconSpacing: 10
 --- !u!1 &2461211831445650058
 GameObject:
   m_ObjectHideFlags: 0
@@ -740,6 +771,68 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2467199068900137623}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8796900866295853131
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8690851404544601141}
+  - component: {fileID: 8064484406943837975}
+  m_Layer: 5
+  m_Name: StatusEffectIcons
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &8690851404544601141
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8796900866295853131}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3801848513294672494}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -0.04}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &8064484406943837975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8796900866295853131}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_Spacing: 5
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &9042164723536416850
 GameObject:
   m_ObjectHideFlags: 0
@@ -773,6 +866,7 @@ RectTransform:
   m_Children:
   - {fileID: 1416537801211254073}
   - {fileID: 1457706308939362998}
+  - {fileID: 8690851404544601141}
   m_Father: {fileID: 2467199068900137623}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1b0b985110e44dfcac626c66fbf90fd8, type: 3}
+  m_Name: Wave_002
+  m_EditorClassIdentifier: 
+  waveName: Wave_001
+  spawnEntries:
+  - description: Bunnies
+    animalDefinition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}
+    spawnCount: 1
+    delayAfterSpawnTime: 0
+    spawnInterval: 1
+    spawnLocationType: 2
+    spawnRadius: 0
+  - description: Deers
+    animalDefinition: {fileID: 11400000, guid: 099ce8f023809384288f8daf16f43fd2, type: 2}
+    spawnCount: 1
+    delayAfterSpawnTime: 0
+    spawnInterval: 3
+    spawnLocationType: 2
+    spawnRadius: 0

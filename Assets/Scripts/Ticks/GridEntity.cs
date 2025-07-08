@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Assets/Scripts/Ticks/GridEntity.cs
+using System;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -9,29 +10,26 @@ namespace WegoSystem
 {
     public class GridEntity : MonoBehaviour
     {
-        // The new checkbox to control occupancy behavior
-        [Tooltip("If true, this entity will block other entities from entering its tile. If false, it can share its tile.")]
         public bool isTileOccupant = true;
 
-        private GridPosition gridPosition;
+        GridPosition gridPosition;
 
-        [Header("Movement Settings")]
-        [SerializeField] private Vector3 groundPointOffset = Vector3.zero;
-        [SerializeField] private Vector3 visualOffset = Vector3.zero;
-        [SerializeField] private float visualInterpolationSpeed = 5f;
-        [SerializeField] private AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        [SerializeField] Vector3 groundPointOffset = Vector3.zero;
+        [SerializeField] Vector3 visualOffset = Vector3.zero;
+        [SerializeField] float visualInterpolationSpeed = 5f;
+        [SerializeField] AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-        // Movement State
-        private GridPosition previousGridPosition;
-        private Vector3 visualStartPosition;
-        private Vector3 visualTargetPosition;
-        private float movementProgress = 1f;
-        private bool isMoving = false;
+        GridPosition previousGridPosition;
+        Vector3 visualStartPosition;
+        Vector3 visualTargetPosition;
+        float movementProgress = 1f;
+        bool isMoving = false;
+        float speedMultiplier = 1f;
 
         public GridPosition Position
         {
             get => gridPosition;
-            private set // Keep setter private to be controlled by SetPosition method
+            set
             {
                 if (gridPosition != value)
                 {
@@ -53,9 +51,6 @@ namespace WegoSystem
 
         protected virtual void Start()
         {
-            // OLD LOGIC: GridPositionManager.Instance?.RegisterEntity(this); <<< THIS LINE IS REMOVED
-            // The manager will now explicitly register the entity when it is snapped or created.
-
             visualStartPosition = transform.position;
             visualTargetPosition = transform.position;
             previousGridPosition = gridPosition;
@@ -70,7 +65,7 @@ namespace WegoSystem
         {
             if (movementProgress < 1f)
             {
-                movementProgress += Time.deltaTime * visualInterpolationSpeed;
+                movementProgress += Time.deltaTime * visualInterpolationSpeed * speedMultiplier;
                 movementProgress = Mathf.Clamp01(movementProgress);
 
                 float curvedProgress = movementCurve.Evaluate(movementProgress);
@@ -88,14 +83,12 @@ namespace WegoSystem
 #if UNITY_EDITOR
         void OnDrawGizmosSelected()
         {
-            // Draw Ground Point
             Vector3 groundWorldPosition = transform.position + groundPointOffset;
             Gizmos.color = Color.green;
             Gizmos.DrawLine(transform.position, groundWorldPosition);
             Gizmos.DrawWireSphere(groundWorldPosition, 0.1f);
             UnityEditor.Handles.Label(groundWorldPosition + Vector3.up * 0.2f, "Ground Point");
 
-            // Draw current Grid Position
             if (Application.isPlaying && GridPositionManager.Instance != null)
             {
                 Gizmos.color = Color.yellow;
@@ -142,6 +135,11 @@ namespace WegoSystem
                 movementProgress = 1f;
                 isMoving = false;
             }
+        }
+        
+        public void SetSpeedMultiplier(float multiplier)
+        {
+            this.speedMultiplier = multiplier;
         }
 
         public void SnapToGrid()

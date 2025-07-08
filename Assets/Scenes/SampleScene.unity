@@ -10031,7 +10031,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 769811490}
-  - component: {fileID: 769811491}
   m_Layer: 0
   m_Name: Manager_StatusEffect
   m_TagString: Untagged
@@ -10054,23 +10053,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 697039534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &769811491
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 769811489}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 92c720ad42f24e2cbdc1ffcfe76473ba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  allStatusEffects:
-  - {fileID: 11400000, guid: e555d2f6c3bebfe4fbd246ffba86ad63, type: 2}
-  enableDebugCommands: 1
-  showDebugLogs: 0
-  autoRefreshInEditor: 1
 --- !u!1 &784806747
 GameObject:
   m_ObjectHideFlags: 0

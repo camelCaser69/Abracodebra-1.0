@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c1555d13fe046b385413c49ebdf929f, type: 3}
+  m_Name: Animal_001_Deer
+  m_EditorClassIdentifier: 
+  animalName: Deer
+  prefab: {fileID: 1618699628824306755, guid: d923bc59d2e576d47a01121e5661ba10, type: 3}
+  maxHealth: 10
+  movementSpeed: 1
+  thinkingTickInterval: 3
+  wanderPauseTickChance: 30
+  minWanderMoveTicks: 2
+  maxWanderMoveTicks: 6
+  minWanderPauseTicks: 1
+  maxWanderPauseTicks: 4
+  searchRadiusTiles: 5
+  eatDistanceTiles: 1
+  eatDurationTicks: 3
+  thoughtCooldownTicks: 10
+  starvationDamageTickInterval: 4
+  damagePerStarvationTick: 2
+  deathFadeTicks: 3
+  damageFlashColor: {r: 1, g: 0, b: 0, a: 1}
+  damageFlashTicks: 1
+  minPoopDelayTicks: 10
+  maxPoopDelayTicks: 20
+  poopCooldownTicks: 2
+  poopColorVariation: 0.1
+  diet: {fileID: 11400000, guid: 766f7dacca78d7646a516088c17e8f54, type: 2}
+  thoughtLibrary: {fileID: 11400000, guid: 8abd92eb95108124a8478425e6e2cfb5, type: 2}
+  attractiveScentDefinitions: []
+  repellentScentDefinitions: []

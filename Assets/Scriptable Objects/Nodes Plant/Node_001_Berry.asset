@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d27f72fdfc3f4962b8c5577d1ed14561, type: 3}
+  m_Name: Node_001_Berry
+  m_EditorClassIdentifier: 
+  displayName: Berry
+  description: 
+  thumbnail: {fileID: 21300000, guid: ebe1776787f1660439ef11382de7896c, type: 3}
+  thumbnailTintColor: {r: 0.5152225, g: 0.14733891, b: 0.7264151, a: 1}
+  backgroundColor: {r: 0, g: 0, b: 0, a: 0}
+  nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
+  effects:
+  - effectType: 12
+    primaryValue: 0
+    secondaryValue: 0
+    isPassive: 0
+    scentDefinitionReference: {fileID: 0}
+    seedData:
+      growthSpeed: 5
+      stemLengthMin: 3
+      stemLengthMax: 5
+      leafGap: 1
+      leafPattern: 0
+      stemRandomness: 0.1
+      energyStorage: 10
+      cooldown: 20
+      castDelay: 0
+  - effectType: 2
+    primaryValue: 10
+    secondaryValue: 0
+    isPassive: 0
+    scentDefinitionReference: {fileID: 0}
+    seedData:
+      growthSpeed: 5
+      stemLengthMin: 3
+      stemLengthMax: 5
+      leafGap: 1
+      leafPattern: 0
+      stemRandomness: 0.1
+      energyStorage: 10
+      cooldown: 20
+      castDelay: 0
