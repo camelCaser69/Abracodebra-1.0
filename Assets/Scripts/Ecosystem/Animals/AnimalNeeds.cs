@@ -104,13 +104,9 @@ public class AnimalNeeds : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        float finalDamage = amount;
-        if (controller.StatusEffects != null)
-        {
-            finalDamage *= controller.StatusEffects.DamageResistanceMultiplier;
-        }
-        
-        currentHealth -= finalDamage;
+        // The damage calculation is now done in AnimalController before this is called.
+        // This method now simply applies the final calculated damage.
+        currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, definition.maxHealth);
 
         StartDamageFlash();

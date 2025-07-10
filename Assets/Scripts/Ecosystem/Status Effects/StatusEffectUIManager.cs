@@ -11,10 +11,10 @@ public class StatusEffectUIManager : MonoBehaviour
     [SerializeField] private GameObject effectIconPrefab; // Simple UI icon prefab
     [SerializeField] private float iconSpacing = 35f;
 
-    private AnimalStatusEffectManager statusManager;
+    private StatusEffectManager statusManager;
     private Dictionary<string, StatusEffectIconUI> activeIcons = new Dictionary<string, StatusEffectIconUI>();
 
-    public void Initialize(AnimalStatusEffectManager manager)
+    public void Initialize(StatusEffectManager manager)
     {
         statusManager = manager;
 

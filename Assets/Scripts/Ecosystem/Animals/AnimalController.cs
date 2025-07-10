@@ -5,13 +5,14 @@ using UnityEngine;
 using TMPro;
 using WegoSystem;
 
-public class AnimalController : MonoBehaviour, ITickUpdateable
+// Implement the new interface here
+public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable 
 {
     [SerializeField] public AnimalDefinition definition;
 
-    [Header("Status Effect Integration")] // <<< NEW
-    [SerializeField] private StatusEffect wetStatusEffect; // <<< NEW
-    [SerializeField] private TileDefinition waterTileDefinition; // <<< NEW
+    [Header("Status Effect Integration")] 
+    [SerializeField] private StatusEffect wetStatusEffect; 
+    [SerializeField] private TileDefinition waterTileDefinition; 
 
     [Header("Component References")]
     [SerializeField] GameObject thoughtBubblePrefab;
@@ -23,28 +24,29 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     [SerializeField] TextMeshProUGUI hungerText;
     [SerializeField] KeyCode showStatsKey = KeyCode.LeftAlt;
 
-    // --- Private Components ---
     AnimalMovement movement;
     AnimalNeeds needs;
     AnimalBehavior behavior;
     GridEntity gridEntity;
     SpriteRenderer spriteRenderer;
-    AnimalStatusEffectManager statusEffectManager;
+    StatusEffectManager statusManager; // Renamed from AnimalStatusEffectManager
     StatusEffectUIManager statusEffectUI;
 
 
     bool isDying = false;
     float deathFadeTimer = 0f;
-    float deathFadeDuration = 1f; // Real-time seconds
+    float deathFadeDuration = 1f; 
     int thoughtCooldownTick = 0;
 
+    // --- Interface Properties ---
+    public GridEntity GridEntity => gridEntity;
+    public StatusEffectManager StatusManager => statusManager;
+    
     // --- Public Properties ---
     public AnimalDefinition Definition => definition;
-    public GridEntity GridEntity => gridEntity;
     public AnimalMovement Movement => movement;
     public AnimalNeeds Needs => needs;
     public AnimalBehavior Behavior => behavior;
-    public AnimalStatusEffectManager StatusEffects => statusEffectManager;
     public bool IsDying => isDying;
     public string SpeciesName => definition != null ? definition.animalName : "Uninitialized";
 
@@ -63,7 +65,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             TickManager.Instance.RegisterTickUpdateable(this);
         }
         
-        // <<< NEW: Subscribe to the movement event from the GridEntity
         if (gridEntity != null)
         {
             gridEntity.OnPositionChanged += CheckTileForStatusEffect;
@@ -82,7 +83,6 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             GridDebugVisualizer.Instance.HideContinuousRadius(this);
         }
         
-        // <<< NEW: Unsubscribe from the event to prevent memory leaks
         if (gridEntity != null)
         {
             gridEntity.OnPositionChanged -= CheckTileForStatusEffect;
@@ -97,17 +97,12 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         {
             deathFadeTimer -= Time.deltaTime;
             UpdateDeathFade();
-
-            if (deathFadeTimer <= 0)
-            {
-                Destroy(gameObject);
-            }
+            if (deathFadeTimer <= 0) Destroy(gameObject);
             return;
         }
 
         bool showStats = Input.GetKey(showStatsKey);
         SetStatsTextVisibility(showStats);
-
         UpdateSpriteFlipping();
         movement.UpdateVisuals();
     }
@@ -122,87 +117,71 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
             return;
         }
 
-        if (isDying)
-        {
-            return;
-        }
+        if (isDying) return;
 
         needs.OnTickUpdate(currentTick);
         behavior.OnTickUpdate(currentTick);
         movement.OnTickUpdate(currentTick);
-        statusEffectManager.OnTickUpdate(currentTick);
+        statusManager.OnTickUpdate(currentTick);
 
-        if (gridEntity != null && statusEffectManager != null)
+        if (gridEntity != null && statusManager != null)
         {
-            gridEntity.SetSpeedMultiplier(statusEffectManager.MovementSpeedMultiplier);
+            gridEntity.SetSpeedMultiplier(statusManager.MovementSpeedMultiplier);
         }
 
-        if (thoughtCooldownTick > 0)
-        {
-            thoughtCooldownTick--;
-        }
+        if (thoughtCooldownTick > 0) thoughtCooldownTick--;
 
         UpdateAnimations();
     }
+    
+    // --- Interface Methods ---
+    public string GetDisplayName()
+    {
+        return SpeciesName;
+    }
 
-    // <<< NEW: This method is called whenever the animal moves to a new grid cell
+    public void Heal(float amount)
+    {
+        if (needs != null) needs.Heal(amount);
+    }
+    
+    public void ModifyHunger(float amount)
+    {
+        if (needs != null) needs.ModifyHunger(amount);
+    }
+    // --- End Interface Methods ---
+    
     private void CheckTileForStatusEffect(GridPosition oldPos, GridPosition newPos)
     {
-        // Don't apply effects if references are missing
-        if (wetStatusEffect == null || waterTileDefinition == null || TileInteractionManager.Instance == null)
-        {
-            return;
-        }
-
-        // Find out what tile definition is at the animal's new position
+        if (wetStatusEffect == null || waterTileDefinition == null || TileInteractionManager.Instance == null) return;
         TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(newPos.ToVector3Int());
-
-        // If the tile is the water tile, apply the wet effect
         if (currentTile == waterTileDefinition)
         {
-            statusEffectManager.ApplyStatusEffect(wetStatusEffect);
+            statusManager.ApplyStatusEffect(wetStatusEffect);
         }
     }
 
     void CacheComponents()
     {
         gridEntity = GetComponent<GridEntity>();
-        if (gridEntity == null)
-        {
-            gridEntity = gameObject.AddComponent<GridEntity>();
-        }
-
+        if (gridEntity == null) gridEntity = gameObject.AddComponent<GridEntity>();
+        
         movement = GetComponent<AnimalMovement>();
-        if (movement == null)
-        {
-            movement = gameObject.AddComponent<AnimalMovement>();
-        }
-
+        if (movement == null) movement = gameObject.AddComponent<AnimalMovement>();
+        
         needs = GetComponent<AnimalNeeds>();
-        if (needs == null)
-        {
-            needs = gameObject.AddComponent<AnimalNeeds>();
-        }
-
+        if (needs == null) needs = gameObject.AddComponent<AnimalNeeds>();
+        
         behavior = GetComponent<AnimalBehavior>();
-        if (behavior == null)
-        {
-            behavior = gameObject.AddComponent<AnimalBehavior>();
-        }
-
+        if (behavior == null) behavior = gameObject.AddComponent<AnimalBehavior>();
+        
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
-        statusEffectManager = GetComponent<AnimalStatusEffectManager>();
-        if (statusEffectManager == null)
-        {
-            statusEffectManager = gameObject.AddComponent<AnimalStatusEffectManager>();
-        }
+        statusManager = GetComponent<StatusEffectManager>();
+        if (statusManager == null) statusManager = gameObject.AddComponent<StatusEffectManager>();
         
-        statusEffectUI = GetComponentInChildren<StatusEffectUIManager>(true); // Search inactive as well
-        if (statusEffectUI == null)
-        {
-            Debug.LogWarning($"StatusEffectUIManager not found on a child of {gameObject.name}. Icons will not display.", this);
-        }
+        statusEffectUI = GetComponentInChildren<StatusEffectUIManager>(true);
+        if (statusEffectUI == null) Debug.LogWarning($"StatusEffectUIManager not found on a child of {gameObject.name}. Icons will not display.", this);
     }
 
     void ValidateComponents()
@@ -227,11 +206,11 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         movement.Initialize(this, definition);
         needs.Initialize(this, definition);
         behavior.Initialize(this, definition);
-        statusEffectManager.Initialize(this);
+        statusManager.Initialize(this); // Pass 'this' as the IStatusEffectable
         
         if (statusEffectUI != null)
         {
-            statusEffectUI.Initialize(statusEffectManager);
+            statusEffectUI.Initialize(statusManager);
         }
 
         if (GridPositionManager.Instance != null)
@@ -245,38 +224,29 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
     {
         if (isDying) return;
 
+        // Calculate the final damage here, applying the resistance multiplier.
         float finalDamage = amount;
-        if (statusEffectManager != null)
+        if (statusManager != null)
         {
-            finalDamage *= statusEffectManager.DamageResistanceMultiplier;
+            finalDamage *= statusManager.DamageResistanceMultiplier;
         }
-        
+    
+        // Pass the final, calculated damage to the Needs component.
         needs.TakeDamage(finalDamage);
     }
 
     void StartDying()
     {
         if (isDying) return;
-
         isDying = true;
 
-        if (TickManager.Instance?.Config != null)
-        {
-            deathFadeDuration = definition.deathFadeTicks / TickManager.Instance.Config.ticksPerRealSecond;
-        }
-        else
-        {
-            deathFadeDuration = definition.deathFadeTicks * 0.5f; // Default 0.5 seconds per tick
-        }
+        if (TickManager.Instance?.Config != null) deathFadeDuration = definition.deathFadeTicks / TickManager.Instance.Config.ticksPerRealSecond;
+        else deathFadeDuration = definition.deathFadeTicks * 0.5f;
 
         deathFadeTimer = deathFadeDuration;
-
-        Debug.Log($"[AnimalController] {SpeciesName} is dying! Starting fade immediately. Duration: {deathFadeDuration}s");
-
-        if (GridDebugVisualizer.Instance != null)
-        {
-            GridDebugVisualizer.Instance.HideContinuousRadius(this);
-        }
+        Debug.Log($"[AnimalController] {SpeciesName} is dying! Duration: {deathFadeDuration}s");
+        
+        if (GridDebugVisualizer.Instance != null) GridDebugVisualizer.Instance.HideContinuousRadius(this);
 
         movement.StopAllMovement();
         behavior.CancelCurrentAction();
@@ -285,125 +255,17 @@ public class AnimalController : MonoBehaviour, ITickUpdateable
         if (behavior != null) behavior.enabled = false;
         if (needs != null) needs.enabled = false;
     }
-
-    void UpdateDeathFade()
-    {
-        if (spriteRenderer == null) return;
-
-        float fadeProgress = 1f - (deathFadeTimer / deathFadeDuration);
-        Color color = spriteRenderer.color;
-        color.a = Mathf.Lerp(1f, 0f, fadeProgress);
-        spriteRenderer.color = color;
-    }
-
-    public void ShowThought(ThoughtTrigger trigger)
-    {
-        if (!CanShowThought()) return;
-
-        thoughtCooldownTick = definition.thoughtCooldownTicks;
-
-        if (definition.thoughtLibrary == null || thoughtBubblePrefab == null) return;
-
-        string message = "";
-
-        switch (trigger)
-        {
-            case ThoughtTrigger.Hungry:
-                message = definition.thoughtLibrary?.hungryThoughts?.Length > 0
-                    ? definition.thoughtLibrary.hungryThoughts[Random.Range(0, definition.thoughtLibrary.hungryThoughts.Length)]
-                    : "";
-                break;
-            case ThoughtTrigger.Eating:
-                message = definition.thoughtLibrary?.eatingThoughts?.Length > 0
-                    ? definition.thoughtLibrary.eatingThoughts[Random.Range(0, definition.thoughtLibrary.eatingThoughts.Length)]
-                    : "";
-                break;
-            case ThoughtTrigger.HealthLow:
-                message = definition.thoughtLibrary?.healthLowThoughts?.Length > 0
-                    ? definition.thoughtLibrary.healthLowThoughts[Random.Range(0, definition.thoughtLibrary.healthLowThoughts.Length)]
-                    : "";
-                break;
-            case ThoughtTrigger.Fleeing:
-                message = definition.thoughtLibrary?.fleeingThoughts?.Length > 0
-                    ? definition.thoughtLibrary.fleeingThoughts[Random.Range(0, definition.thoughtLibrary.fleeingThoughts.Length)]
-                    : "";
-                break;
-            case ThoughtTrigger.Pooping:
-                message = definition.thoughtLibrary?.poopingThoughts?.Length > 0
-                    ? definition.thoughtLibrary.poopingThoughts[Random.Range(0, definition.thoughtLibrary.poopingThoughts.Length)]
-                    : "";
-                break;
-        }
-
-        if (!string.IsNullOrEmpty(message))
-        {
-            Transform spawnT = bubbleSpawnTransform != null ? bubbleSpawnTransform : transform;
-            GameObject bubble = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity);
-
-            ThoughtBubbleController controller = bubble.GetComponent<ThoughtBubbleController>();
-            if (controller != null)
-            {
-                controller.Initialize(message, spawnT, 3f);
-            }
-        }
-    }
-
-    public bool CanShowThought()
-    {
-        return thoughtCooldownTick <= 0 && !isDying;
-    }
-
-    void UpdateAnimations()
-    {
-        if (animator == null) return;
-
-        bool isMoving = gridEntity != null && gridEntity.IsMoving;
-        bool isEating = behavior != null && behavior.IsEating;
-
-        animator.SetBool("isMoving", isMoving);
-        animator.SetBool("isEating", isEating);
-        animator.SetBool("isDying", isDying);
-    }
-
-    void UpdateSpriteFlipping()
-    {
-        if (spriteRenderer == null || movement == null) return;
-
-        Vector2 moveDirection = movement.GetLastMoveDirection();
-        if (Mathf.Abs(moveDirection.x) > 0.01f)
-        {
-            spriteRenderer.flipX = moveDirection.x < 0;
-        }
-    }
-
-    void SetStatsTextVisibility(bool visible)
-    {
-        if (hpText != null) hpText.gameObject.SetActive(visible);
-        if (hungerText != null) hungerText.gameObject.SetActive(visible);
-
-        if (visible)
-        {
-            UpdateUI();
-        }
-    }
-
-    public void UpdateUI()
-    {
-        if (needs == null) return;
-
-        if (hpText != null)
-        {
-            hpText.text = $"{Mathf.CeilToInt(needs.CurrentHealth)}/{Mathf.CeilToInt(definition.maxHealth)}";
-        }
-
-        if (hungerText != null)
-        {
-            hungerText.text = $"{Mathf.CeilToInt(needs.CurrentHunger)}/{Mathf.CeilToInt(definition.diet.maxHunger)}";
-        }
-    }
-
-    public void SetSeekingScreenCenter(Vector2 target, Vector2 minBounds, Vector2 maxBounds)
-    {
-        movement.SetSeekingScreenCenter(target, minBounds, maxBounds);
-    }
+    
+    // ... (All other methods like UpdateDeathFade, ShowThought, UpdateAnimations, etc. remain the same) ...
+    // Note: I'm omitting them here for brevity but they are included in the copy-paste block
+    void UpdateDeathFade(){if(spriteRenderer==null)return;float fadeProgress=1f-(deathFadeTimer/deathFadeDuration);Color color=spriteRenderer.color;color.a=Mathf.Lerp(1f,0f,fadeProgress);spriteRenderer.color=color;}
+    public void ShowThought(ThoughtTrigger trigger){if(!CanShowThought())return;thoughtCooldownTick=definition.thoughtCooldownTicks;if(definition.thoughtLibrary==null||thoughtBubblePrefab==null)return;string message="";switch(trigger){case ThoughtTrigger.Hungry:message=definition.thoughtLibrary?.hungryThoughts?.Length>0?definition.thoughtLibrary.hungryThoughts[Random.Range(0,definition.thoughtLibrary.hungryThoughts.Length)]:"";break;case ThoughtTrigger.Eating:message=definition.thoughtLibrary?.eatingThoughts?.Length>0?definition.thoughtLibrary.eatingThoughts[Random.Range(0,definition.thoughtLibrary.eatingThoughts.Length)]:"";break;case ThoughtTrigger.HealthLow:message=definition.thoughtLibrary?.healthLowThoughts?.Length>0?definition.thoughtLibrary.healthLowThoughts[Random.Range(0,definition.thoughtLibrary.healthLowThoughts.Length)]:"";break;case ThoughtTrigger.Fleeing:message=definition.thoughtLibrary?.fleeingThoughts?.Length>0?definition.thoughtLibrary.fleeingThoughts[Random.Range(0,definition.thoughtLibrary.fleeingThoughts.Length)]:"";break;case ThoughtTrigger.Pooping:message=definition.thoughtLibrary?.poopingThoughts?.Length>0?definition.thoughtLibrary.poopingThoughts[Random.Range(0,definition.thoughtLibrary.poopingThoughts.Length)]:"";break;}
+    if(!string.IsNullOrEmpty(message)){Transform spawnT=bubbleSpawnTransform!=null?bubbleSpawnTransform:transform;GameObject bubble=Instantiate(thoughtBubblePrefab,spawnT.position,Quaternion.identity);ThoughtBubbleController controller=bubble.GetComponent<ThoughtBubbleController>();if(controller!=null){controller.Initialize(message,spawnT,3f);}}}
+    public bool CanShowThought(){return thoughtCooldownTick<=0&&!isDying;}
+    void UpdateAnimations(){if(animator==null)return;bool isMoving=gridEntity!=null&&gridEntity.IsMoving;bool isEating=behavior!=null&&behavior.IsEating;animator.SetBool("isMoving",isMoving);animator.SetBool("isEating",isEating);animator.SetBool("isDying",isDying);}
+    void UpdateSpriteFlipping(){if(spriteRenderer==null||movement==null)return;Vector2 moveDirection=movement.GetLastMoveDirection();if(Mathf.Abs(moveDirection.x)>0.01f){spriteRenderer.flipX=moveDirection.x<0;}}
+    void SetStatsTextVisibility(bool visible){if(hpText!=null)hpText.gameObject.SetActive(visible);if(hungerText!=null)hungerText.gameObject.SetActive(visible);if(visible){UpdateUI();}}
+    public void UpdateUI(){if(needs==null)return;if(hpText!=null){hpText.text=$"{Mathf.CeilToInt(needs.CurrentHealth)}/{Mathf.CeilToInt(definition.maxHealth)}";}
+    if(hungerText!=null){hungerText.text=$"{Mathf.CeilToInt(needs.CurrentHunger)}/{Mathf.CeilToInt(definition.diet.maxHunger)}";}}
+    public void SetSeekingScreenCenter(Vector2 target,Vector2 minBounds,Vector2 maxBounds){movement.SetSeekingScreenCenter(target,minBounds,maxBounds);}
 }

@@ -1,10 +1,11 @@
-﻿// Assets/Scripts/Ecosystem/StatusEffects/AnimalStatusEffectManager.cs
+﻿// Assets/Scripts/Ecosystem/StatusEffects/StatusEffectManager.cs
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AnimalStatusEffectManager : MonoBehaviour
+public class StatusEffectManager : MonoBehaviour
 {
-    private AnimalController controller;
+    // The interface allows this to work with Animals, Players, or anything else
+    private IStatusEffectable owner; 
     private List<StatusEffectInstance> activeEffects = new List<StatusEffectInstance>();
     private Dictionary<string, StatusEffectInstance> effectLookup = new Dictionary<string, StatusEffectInstance>();
 
@@ -17,19 +18,31 @@ public class AnimalStatusEffectManager : MonoBehaviour
     public float MovementSpeedMultiplier => cachedMovementSpeedMultiplier;
     public float DamageResistanceMultiplier => cachedDamageResistanceMultiplier;
 
-    public void Initialize(AnimalController controller)
+    // The Initialize method now takes the generic interface
+    public void Initialize(IStatusEffectable owner)
     {
-        this.controller = controller;
-        spriteRenderer = controller.GetComponentInChildren<SpriteRenderer>();
-        if (spriteRenderer != null)
+        this.owner = owner;
+        
+        // We need to get the SpriteRenderer from the owner's GameObject
+        Component ownerComponent = owner as Component;
+        if (ownerComponent != null)
         {
-            originalColor = spriteRenderer.color;
+            spriteRenderer = ownerComponent.GetComponentInChildren<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                originalColor = spriteRenderer.color;
+            }
         }
     }
 
     public void OnTickUpdate(int currentTick)
     {
-        if (!enabled || controller.IsDying) return;
+        // Check if the owner is still valid
+        if (owner == null || (owner as Component) == null)
+        {
+            Destroy(this); // Clean up if owner is gone
+            return;
+        }
 
         ProcessStatusEffects();
         UpdateCachedModifiers();
@@ -46,11 +59,11 @@ public class AnimalStatusEffectManager : MonoBehaviour
             if (effect.canStack && existing.stackCount < effect.maxStacks)
             {
                 existing.stackCount++;
-                existing.remainingTicks = effect.durationTicks; // Refresh duration
+                existing.remainingTicks = effect.durationTicks;
             }
             else if (!effect.canStack)
             {
-                existing.remainingTicks = effect.durationTicks; // Just refresh duration
+                existing.remainingTicks = effect.durationTicks;
             }
         }
         else
@@ -59,21 +72,21 @@ public class AnimalStatusEffectManager : MonoBehaviour
             activeEffects.Add(instance);
             effectLookup[effect.effectID] = instance;
 
-            // Create visual effect
             if (effect.visualEffectPrefab != null)
             {
                 instance.visualEffectInstance = Instantiate(
                     effect.visualEffectPrefab,
-                    transform.position,
+                    (owner as Component).transform.position,
                     Quaternion.identity,
-                    transform
+                    (owner as Component).transform
                 );
             }
 
-            Debug.Log($"[StatusEffect] Applied {effect.displayName} to {controller.SpeciesName}");
+            Debug.Log($"[StatusEffect] Applied {effect.displayName} to {owner.GetDisplayName()}");
         }
     }
-
+    
+    // ... (RemoveStatusEffect and HasStatusEffect remain the same) ...
     public void RemoveStatusEffect(string effectID)
     {
         if (!effectLookup.ContainsKey(effectID)) return;
@@ -87,13 +100,14 @@ public class AnimalStatusEffectManager : MonoBehaviour
         activeEffects.Remove(instance);
         effectLookup.Remove(effectID);
 
-        Debug.Log($"[StatusEffect] Removed {instance.effect.displayName} from {controller.SpeciesName}");
+        Debug.Log($"[StatusEffect] Removed {instance.effect.displayName} from {owner.GetDisplayName()}");
     }
 
     public bool HasStatusEffect(string effectID)
     {
         return effectLookup.ContainsKey(effectID);
     }
+
 
     private void ProcessStatusEffects()
     {
@@ -102,23 +116,22 @@ public class AnimalStatusEffectManager : MonoBehaviour
             var instance = activeEffects[i];
             var effect = instance.effect;
 
-            // Apply tick effects
+            // Use the interface methods to apply effects
             if (effect.damagePerTick)
             {
-                controller.TakeDamage(effect.damageAmount * instance.stackCount);
+                owner.TakeDamage(effect.damageAmount * instance.stackCount);
             }
 
             if (effect.healPerTick)
             {
-                controller.Needs.Heal(effect.healAmount * instance.stackCount);
+                owner.Heal(effect.healAmount * instance.stackCount);
             }
 
             if (effect.modifyHunger)
             {
-                controller.Needs.ModifyHunger(effect.hungerModifier * instance.stackCount);
+                owner.ModifyHunger(effect.hungerModifier * instance.stackCount);
             }
 
-            // Update duration
             if (!effect.isPermanent)
             {
                 instance.remainingTicks--;
@@ -147,7 +160,6 @@ public class AnimalStatusEffectManager : MonoBehaviour
     {
         if (spriteRenderer == null) return;
 
-        // Find the highest priority color effect
         Color targetColor = originalColor;
         bool hasColorEffect = false;
 
@@ -157,7 +169,7 @@ public class AnimalStatusEffectManager : MonoBehaviour
             {
                 targetColor = instance.effect.animalTintColor;
                 hasColorEffect = true;
-                break; // Use first color effect found
+                break;
             }
         }
 
@@ -168,7 +180,7 @@ public class AnimalStatusEffectManager : MonoBehaviour
     {
         return new List<StatusEffectInstance>(activeEffects);
     }
-
+    
     public void ClearAllEffects()
     {
         for (int i = activeEffects.Count - 1; i >= 0; i--)
@@ -179,7 +191,6 @@ public class AnimalStatusEffectManager : MonoBehaviour
     
     private void OnDestroy()
     {
-        // Clean up visual effects
         foreach (var instance in activeEffects)
         {
             if (instance.visualEffectInstance != null)

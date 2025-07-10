@@ -184,6 +184,8 @@ GameObject:
   - component: {fileID: -6875346460999449028}
   - component: {fileID: 777715186571388838}
   - component: {fileID: 2337176063074046415}
+  - component: {fileID: 1954282247598751719}
+  - component: {fileID: 2900701976880247653}
   m_Layer: 0
   m_Name: GardenerPrefab
   m_TagString: Untagged
@@ -221,11 +223,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd23192a25d94d8b8bde743aa013c216, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flipSpriteWhenMovingLeft: 1
-  flipHorizontalDirection: 0
+  multiTickDelay: 0.5
+  wetStatusEffect: {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
+  waterTileDefinition: {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}
   useAnimations: 1
+  animator: {fileID: 0}
   runningParameterName: isRunning
   plantingTriggerName: plantTrigger
+  spriteRenderer: {fileID: 0}
+  flipSpriteWhenMovingLeft: 1
+  flipHorizontalDirection: 1
 --- !u!114 &1316135351782374134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -454,6 +461,33 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1954282247598751719
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3865789443703534087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3c534a7389140ada275bba6ad79abbc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2900701976880247653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3865789443703534087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0352e5de0a44730995e3aa8c3b4bd72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  effectIconContainer: {fileID: 7195026228079028697}
+  effectIconPrefab: {fileID: 6027093001628851131, guid: 333d2abbda8c2c54da48bd0147f9fe14, type: 3}
+  iconSpacing: 10
 --- !u!1 &4330577973963285420
 GameObject:
   m_ObjectHideFlags: 0
@@ -486,6 +520,7 @@ RectTransform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 6455509855850659925}
+  - {fileID: 7195026228079028697}
   m_Father: {fileID: 5575549963909954597}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -556,6 +591,68 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!1 &5765701244577453906
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7195026228079028697}
+  - component: {fileID: 368692709715271782}
+  m_Layer: 5
+  m_Name: StatusEffectIcons
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &7195026228079028697
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5765701244577453906}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4126343535530882793}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0.18}
+  m_SizeDelta: {x: 100, y: 100}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &368692709715271782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5765701244577453906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30649d3a9faa99c48a7b1166b86bf2a0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Padding:
+    m_Left: 0
+    m_Right: 0
+    m_Top: 0
+    m_Bottom: 0
+  m_ChildAlignment: 4
+  m_Spacing: 5
+  m_ChildForceExpandWidth: 1
+  m_ChildForceExpandHeight: 1
+  m_ChildControlWidth: 0
+  m_ChildControlHeight: 0
+  m_ChildScaleWidth: 0
+  m_ChildScaleHeight: 0
+  m_ReverseArrangement: 0
 --- !u!1 &7022531830783394042
 GameObject:
   m_ObjectHideFlags: 0

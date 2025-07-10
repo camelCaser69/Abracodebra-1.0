@@ -1,54 +1,101 @@
-﻿using System.Collections;
+﻿// Assets/Scripts/WorldInteraction/Player/GardenerController.cs
+using System.Collections;
 using UnityEngine;
 using WegoSystem;
-using TMPro;
 
-[RequireComponent(typeof(Collider2D))]
-[RequireComponent(typeof(GridEntity))]
-public class GardenerController : MonoBehaviour
+// MODIFIED: Now implements ITickUpdateable for status effect durations
+public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdateable
 {
-    [Header("Movement")]
-    [SerializeField] private float multiTickDelay = 0.5f; // Delay between ticks for multi-tick actions
-    
+    [Header("Configuration")]
+    [SerializeField] float multiTickDelay = 0.5f;
+
+    [Header("Status Effect Integration")] // <<< NEW HEADER
+    [SerializeField] private StatusEffect wetStatusEffect;
+    [SerializeField] private TileDefinition waterTileDefinition;
+
     [Header("Animation")]
     [SerializeField] bool useAnimations = true;
     [SerializeField] Animator animator;
     [SerializeField] string runningParameterName = "isRunning";
     [SerializeField] string plantingTriggerName = "plant";
-    
-    [Header("Sprite")]
+
+    [Header("Visuals")]
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] bool flipSpriteWhenMovingLeft = true;
     [SerializeField] bool flipHorizontalDirection = true;
-    
+
+    // --- Private Components ---
     GridEntity gridEntity;
+    StatusEffectManager statusManager;
+    StatusEffectUIManager statusEffectUI;
+
     GridPosition currentTargetPosition;
-    private bool isProcessingMovement = false;
-    
+    bool isProcessingMovement = false;
+
+    // --- Interface Properties ---
+    public GridEntity GridEntity => gridEntity;
+    public StatusEffectManager StatusManager => statusManager;
+
     void Awake()
     {
         gridEntity = GetComponent<GridEntity>();
-        if (gridEntity == null)
-        {
-            Debug.LogError("[GardenerController Awake] GridEntity component is required!", gameObject);
-        }
+        if (gridEntity == null) gridEntity = gameObject.AddComponent<GridEntity>();
         
-        if (spriteRenderer == null)
-            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        
-        if (spriteRenderer == null)
-            Debug.LogWarning("[GardenerController Awake] SpriteRenderer not found. Sprite flipping disabled.", gameObject);
-        
-        if (animator == null && useAnimations)
-            Debug.LogWarning("[GardenerController Awake] Animator component not found but useAnimations is true.", gameObject);
-        
-        if (gridEntity == null)
-        {
-            Debug.Log("[GardenerController] No GridEntity found. Adding one.", gameObject);
-            gridEntity = gameObject.AddComponent<GridEntity>();
-        }
+        statusManager = GetComponent<StatusEffectManager>();
+        if (statusManager == null) statusManager = gameObject.AddComponent<StatusEffectManager>();
+
+        statusEffectUI = GetComponentInChildren<StatusEffectUIManager>(true);
+        if (statusEffectUI == null) Debug.LogWarning("[GardenerController] StatusEffectUIManager not found in children. Icons won't display.", this);
+
+        if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (spriteRenderer == null) Debug.LogWarning("[GardenerController] SpriteRenderer not found.", gameObject);
+        if (animator == null && useAnimations) Debug.LogWarning("[GardenerController] Animator not found.", gameObject);
     }
     
+    void Start()
+    {
+        // Initialize the managers
+        statusManager.Initialize(this);
+        if (statusEffectUI != null)
+        {
+            statusEffectUI.Initialize(statusManager);
+        }
+
+        // <<< NEW: Subscribe to the TickManager for effect duration updates
+        if (TickManager.Instance != null)
+        {
+            TickManager.Instance.RegisterTickUpdateable(this);
+        }
+        
+        // <<< NEW: Subscribe to the movement event to check tiles
+        if (gridEntity != null)
+        {
+            gridEntity.OnPositionChanged += CheckTileForStatusEffect;
+        }
+    }
+
+    void OnDestroy()
+    {
+        // <<< NEW: Unsubscribe from events to prevent memory leaks
+        if (TickManager.Instance != null)
+        {
+            TickManager.Instance.UnregisterTickUpdateable(this);
+        }
+        if (gridEntity != null)
+        {
+            gridEntity.OnPositionChanged -= CheckTileForStatusEffect;
+        }
+    }
+
+    // <<< NEW: This method allows status effect durations to count down
+    public void OnTickUpdate(int currentTick)
+    {
+        if (statusManager != null)
+        {
+            statusManager.OnTickUpdate(currentTick);
+        }
+    }
+
     void Update()
     {
         if (RunManager.Instance != null && RunManager.Instance.CurrentState == RunState.GrowthAndThreat)
@@ -56,51 +103,76 @@ public class GardenerController : MonoBehaviour
             HandlePlayerInput();
         }
         
+        if(gridEntity != null && statusManager != null)
+        {
+            gridEntity.SetSpeedMultiplier(statusManager.MovementSpeedMultiplier);
+        }
+
         UpdateAnimations();
         UpdateSpriteDirection();
     }
-    
+
+    // --- Interface Implementation ---
+    public string GetDisplayName() { return "Gardener"; }
+    public void TakeDamage(float amount) { Debug.Log($"Gardener took {amount} damage!"); }
+    public void Heal(float amount) { Debug.Log($"Gardener was healed for {amount}!"); }
+    public void ModifyHunger(float amount) { /* Player doesn't have hunger. */ }
+    // --- End Interface Implementation ---
+
+    // <<< NEW: This method is now called whenever the player moves to a new cell
+    private void CheckTileForStatusEffect(GridPosition oldPos, GridPosition newPos)
+    {
+        if (wetStatusEffect == null || waterTileDefinition == null || TileInteractionManager.Instance == null)
+        {
+            return;
+        }
+
+        TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(newPos.ToVector3Int());
+
+        if (currentTile == waterTileDefinition)
+        {
+            statusManager.ApplyStatusEffect(wetStatusEffect);
+        }
+    }
+
     void HandlePlayerInput()
     {
         if (gridEntity == null || gridEntity.IsMoving || isProcessingMovement) return;
-        
+
         GridPosition moveDir = GridPosition.Zero;
-        
+
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) moveDir = GridPosition.Up;
         else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) moveDir = GridPosition.Down;
         else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) moveDir = GridPosition.Left;
         else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) moveDir = GridPosition.Right;
-        
+
         if (moveDir != GridPosition.Zero)
         {
             TryMove(moveDir);
         }
     }
-    
+
     void TryMove(GridPosition direction)
     {
+        if (gridEntity == null) return;
         GridPosition targetPos = gridEntity.Position + direction;
-        
+
         if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
             GridPositionManager.Instance.IsPositionValid(targetPos) &&
             !GridPositionManager.Instance.IsPositionOccupied(targetPos))
         {
-            // Get movement cost BEFORE moving
             Vector3 targetWorldPos = GridPositionManager.Instance.GridToWorld(targetPos);
             int moveCost = PlayerActionManager.Instance.GetMovementTickCost(targetWorldPos, this);
-            
+
             if (moveCost > 1)
             {
-                // Multi-tick movement with delay
                 StartCoroutine(ProcessMultiTickMovement(targetPos, moveCost));
             }
             else
             {
-                // Single tick movement - immediate
                 gridEntity.SetPosition(targetPos);
                 currentTargetPosition = targetPos;
                 TickManager.Instance.AdvanceTick();
-                Debug.Log($"[GardenerController] Moved to {targetPos}. Advanced game by 1 tick.");
             }
         }
         else
@@ -108,65 +180,41 @@ public class GardenerController : MonoBehaviour
             Debug.Log($"[GardenerController] Move to {targetPos} is invalid or blocked.");
         }
     }
-    
+
     IEnumerator ProcessMultiTickMovement(GridPosition targetPos, int tickCost)
     {
         isProcessingMovement = true;
-        
-        Debug.Log($"[GardenerController] Starting multi-tick movement. Cost: {tickCost} ticks");
-        
-        // Process all ticks except the last one
         for (int i = 0; i < tickCost - 1; i++)
         {
-            Debug.Log($"[GardenerController] Processing tick {i + 1}/{tickCost} (delay tick)");
             TickManager.Instance.AdvanceTick();
-            
-            // Wait for the specified delay
             yield return new WaitForSeconds(multiTickDelay);
         }
-        
-        // On the final tick, actually move the player
         gridEntity.SetPosition(targetPos);
         currentTargetPosition = targetPos;
         TickManager.Instance.AdvanceTick();
-        
-        Debug.Log($"[GardenerController] Completed movement to {targetPos}. Total ticks: {tickCost}");
-        
         isProcessingMovement = false;
     }
-    
+
     void UpdateAnimations()
     {
         if (!useAnimations || animator == null) return;
-        
         bool isMoving = gridEntity != null && gridEntity.IsMoving;
         animator.SetBool(runningParameterName, isMoving);
     }
-    
+
     void UpdateSpriteDirection()
     {
         if (spriteRenderer == null || !flipSpriteWhenMovingLeft || gridEntity == null || !gridEntity.IsMoving) return;
-        
         Vector3 worldTarget = GridPositionManager.Instance.GridToWorld(currentTargetPosition);
         Vector3 currentWorld = transform.position;
         Vector2 directionToCheck = (worldTarget - currentWorld).normalized;
-        
         if (Mathf.Abs(directionToCheck.x) > 0.01f)
         {
             bool shouldFlip = directionToCheck.x < 0;
-            if (flipHorizontalDirection)
-            {
-                spriteRenderer.flipX = shouldFlip;
-            }
-            else
-            {
-                Vector3 scale = transform.localScale;
-                scale.x = shouldFlip ? -Mathf.Abs(scale.x) : Mathf.Abs(scale.x);
-                transform.localScale = scale;
-            }
+            spriteRenderer.flipX = flipHorizontalDirection ? shouldFlip : !shouldFlip;
         }
     }
-    
+
     public void Plant()
     {
         if (useAnimations && animator != null)
@@ -174,7 +222,7 @@ public class GardenerController : MonoBehaviour
             animator.SetTrigger(plantingTriggerName);
         }
     }
-    
+
     public GridPosition GetCurrentGridPosition()
     {
         return gridEntity?.Position ?? GridPosition.Zero;
