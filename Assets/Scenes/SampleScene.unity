@@ -10031,6 +10031,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 769811490}
+  - component: {fileID: 769811491}
   m_Layer: 0
   m_Name: Manager_StatusEffect
   m_TagString: Untagged
@@ -10053,6 +10054,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 697039534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &769811491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769811489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de85d08ffac04538bce81b442143be30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  tileRules:
+  - tile: {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}
+    statusEffectToApply: {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
 --- !u!1 &784806747
 GameObject:
   m_ObjectHideFlags: 0

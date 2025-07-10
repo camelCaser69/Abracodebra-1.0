@@ -3,15 +3,14 @@ using System.Collections;
 using UnityEngine;
 using WegoSystem;
 
-// MODIFIED: Now implements ITickUpdateable for status effect durations
 public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdateable
 {
     [Header("Configuration")]
     [SerializeField] float multiTickDelay = 0.5f;
 
-    [Header("Status Effect Integration")] // <<< NEW HEADER
-    [SerializeField] private StatusEffect wetStatusEffect;
-    [SerializeField] private TileDefinition waterTileDefinition;
+    // References have been removed to centralize the logic
+    // [SerializeField] private StatusEffect wetStatusEffect;
+    // [SerializeField] private TileDefinition waterTileDefinition;
 
     [Header("Animation")]
     [SerializeField] bool useAnimations = true;
@@ -24,7 +23,6 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
     [SerializeField] bool flipSpriteWhenMovingLeft = true;
     [SerializeField] bool flipHorizontalDirection = true;
 
-    // --- Private Components ---
     GridEntity gridEntity;
     StatusEffectManager statusManager;
     StatusEffectUIManager statusEffectUI;
@@ -32,7 +30,6 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
     GridPosition currentTargetPosition;
     bool isProcessingMovement = false;
 
-    // --- Interface Properties ---
     public GridEntity GridEntity => gridEntity;
     public StatusEffectManager StatusManager => statusManager;
 
@@ -54,40 +51,33 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
     
     void Start()
     {
-        // Initialize the managers
         statusManager.Initialize(this);
         if (statusEffectUI != null)
         {
             statusEffectUI.Initialize(statusManager);
         }
-
-        // <<< NEW: Subscribe to the TickManager for effect duration updates
         if (TickManager.Instance != null)
         {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
-        
-        // <<< NEW: Subscribe to the movement event to check tiles
         if (gridEntity != null)
         {
-            gridEntity.OnPositionChanged += CheckTileForStatusEffect;
+            gridEntity.OnPositionChanged += OnGridPositionChanged;
         }
     }
 
     void OnDestroy()
     {
-        // <<< NEW: Unsubscribe from events to prevent memory leaks
         if (TickManager.Instance != null)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
         if (gridEntity != null)
         {
-            gridEntity.OnPositionChanged -= CheckTileForStatusEffect;
+            gridEntity.OnPositionChanged -= OnGridPositionChanged;
         }
     }
 
-    // <<< NEW: This method allows status effect durations to count down
     public void OnTickUpdate(int currentTick)
     {
         if (statusManager != null)
@@ -112,29 +102,17 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         UpdateSpriteDirection();
     }
 
-    // --- Interface Implementation ---
+    private void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos)
+    {
+        // The central system now handles this every tick, so this call is redundant.
+        // EnvironmentalStatusEffectSystem.Instance?.CheckAndApplyEffects(this);
+    }
+
     public string GetDisplayName() { return "Gardener"; }
     public void TakeDamage(float amount) { Debug.Log($"Gardener took {amount} damage!"); }
     public void Heal(float amount) { Debug.Log($"Gardener was healed for {amount}!"); }
     public void ModifyHunger(float amount) { /* Player doesn't have hunger. */ }
-    // --- End Interface Implementation ---
-
-    // <<< NEW: This method is now called whenever the player moves to a new cell
-    private void CheckTileForStatusEffect(GridPosition oldPos, GridPosition newPos)
-    {
-        if (wetStatusEffect == null || waterTileDefinition == null || TileInteractionManager.Instance == null)
-        {
-            return;
-        }
-
-        TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(newPos.ToVector3Int());
-
-        if (currentTile == waterTileDefinition)
-        {
-            statusManager.ApplyStatusEffect(wetStatusEffect);
-        }
-    }
-
+    
     void HandlePlayerInput()
     {
         if (gridEntity == null || gridEntity.IsMoving || isProcessingMovement) return;
