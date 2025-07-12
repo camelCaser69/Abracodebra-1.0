@@ -10,7 +10,7 @@ public class StatusEffect : ScriptableObject
     public string effectID = "status_effect";
     public string displayName = "Status Effect";
     public Sprite icon;
-    public string unicodeSymbol = "?"; // Fallback if no icon sprite
+    public string unicodeSymbol = "?";
     public Color effectColor = Color.white;
     #endregion
 
@@ -41,8 +41,14 @@ public class StatusEffect : ScriptableObject
 
     #region Modifiers
     [Header("Modifiers")]
-    public float movementSpeedMultiplier = 1f;
+    [Tooltip("Modifies the visual speed of the movement animation. Does NOT affect the tick cost. 1 = normal, 0.5 = 50% slower, 2 = 200% faster.")]
+    public float visualSpeedMultiplier = 1f; // <<< RENAMED
+    
+    [Tooltip("Modifies incoming damage. 1 = normal, 0.5 = 50% resistance, 2 = 200% vulnerability.")]
     public float damageResistanceMultiplier = 1f;
+    
+    [Tooltip("How many extra ticks a 1-tile move costs. 1 means a move takes 2 ticks total.")]
+    public int additionalMoveTicks = 0;
     #endregion
 
     #region Stacking

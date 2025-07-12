@@ -115,7 +115,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
 
         if (gridEntity != null && statusManager != null)
         {
-            gridEntity.SetSpeedMultiplier(statusManager.MovementSpeedMultiplier);
+            gridEntity.SetSpeedMultiplier(statusManager.VisualSpeedMultiplier); // <<< RENAMED
         }
 
         if (thoughtCooldownTick > 0) thoughtCooldownTick--;

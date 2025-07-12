@@ -4,26 +4,25 @@ using UnityEngine;
 
 public class StatusEffectManager : MonoBehaviour
 {
-    // The interface allows this to work with Animals, Players, or anything else
     private IStatusEffectable owner; 
     private List<StatusEffectInstance> activeEffects = new List<StatusEffectInstance>();
     private Dictionary<string, StatusEffectInstance> effectLookup = new Dictionary<string, StatusEffectInstance>();
 
     // Cached values
-    private float cachedMovementSpeedMultiplier = 1f;
+    private float cachedVisualSpeedMultiplier = 1f; // <<< RENAMED
     private float cachedDamageResistanceMultiplier = 1f;
+    private int cachedAdditionalMoveTicks = 0;
     private Color originalColor;
     private SpriteRenderer spriteRenderer;
 
-    public float MovementSpeedMultiplier => cachedMovementSpeedMultiplier;
+    public float VisualSpeedMultiplier => cachedVisualSpeedMultiplier; // <<< RENAMED
     public float DamageResistanceMultiplier => cachedDamageResistanceMultiplier;
+    public int AdditionalMoveTicks => cachedAdditionalMoveTicks;
 
-    // The Initialize method now takes the generic interface
     public void Initialize(IStatusEffectable owner)
     {
         this.owner = owner;
         
-        // We need to get the SpriteRenderer from the owner's GameObject
         Component ownerComponent = owner as Component;
         if (ownerComponent != null)
         {
@@ -37,10 +36,9 @@ public class StatusEffectManager : MonoBehaviour
 
     public void OnTickUpdate(int currentTick)
     {
-        // Check if the owner is still valid
         if (owner == null || (owner as Component) == null)
         {
-            Destroy(this); // Clean up if owner is gone
+            Destroy(this); 
             return;
         }
 
@@ -81,34 +79,26 @@ public class StatusEffectManager : MonoBehaviour
                     (owner as Component).transform
                 );
             }
-
             Debug.Log($"[StatusEffect] Applied {effect.displayName} to {owner.GetDisplayName()}");
         }
+        
+        UpdateCachedModifiers();
     }
     
-    // ... (RemoveStatusEffect and HasStatusEffect remain the same) ...
     public void RemoveStatusEffect(string effectID)
     {
         if (!effectLookup.ContainsKey(effectID)) return;
-
         var instance = effectLookup[effectID];
         if (instance.visualEffectInstance != null)
         {
             Destroy(instance.visualEffectInstance);
         }
-
         activeEffects.Remove(instance);
         effectLookup.Remove(effectID);
-
         Debug.Log($"[StatusEffect] Removed {instance.effect.displayName} from {owner.GetDisplayName()}");
+        UpdateCachedModifiers();
     }
-
-    public bool HasStatusEffect(string effectID)
-    {
-        return effectLookup.ContainsKey(effectID);
-    }
-
-
+    
     private void ProcessStatusEffects()
     {
         for (int i = activeEffects.Count - 1; i >= 0; i--)
@@ -116,22 +106,10 @@ public class StatusEffectManager : MonoBehaviour
             var instance = activeEffects[i];
             var effect = instance.effect;
 
-            // Use the interface methods to apply effects
-            if (effect.damagePerTick)
-            {
-                owner.TakeDamage(effect.damageAmount * instance.stackCount);
-            }
-
-            if (effect.healPerTick)
-            {
-                owner.Heal(effect.healAmount * instance.stackCount);
-            }
-
-            if (effect.modifyHunger)
-            {
-                owner.ModifyHunger(effect.hungerModifier * instance.stackCount);
-            }
-
+            if (effect.damagePerTick) owner.TakeDamage(effect.damageAmount * instance.stackCount);
+            if (effect.healPerTick) owner.Heal(effect.healAmount * instance.stackCount);
+            if (effect.modifyHunger) owner.ModifyHunger(effect.hungerModifier * instance.stackCount);
+            
             if (!effect.isPermanent)
             {
                 instance.remainingTicks--;
@@ -142,61 +120,27 @@ public class StatusEffectManager : MonoBehaviour
             }
         }
     }
-
+    
     private void UpdateCachedModifiers()
     {
-        cachedMovementSpeedMultiplier = 1f;
+        cachedVisualSpeedMultiplier = 1f; // <<< RENAMED
         cachedDamageResistanceMultiplier = 1f;
+        cachedAdditionalMoveTicks = 0;
 
         foreach (var instance in activeEffects)
         {
             var effect = instance.effect;
-            cachedMovementSpeedMultiplier *= effect.movementSpeedMultiplier;
+            cachedVisualSpeedMultiplier *= effect.visualSpeedMultiplier; // <<< RENAMED
             cachedDamageResistanceMultiplier *= effect.damageResistanceMultiplier;
-        }
-    }
-
-    private void UpdateVisualEffects()
-    {
-        if (spriteRenderer == null) return;
-
-        Color targetColor = originalColor;
-        bool hasColorEffect = false;
-
-        foreach (var instance in activeEffects)
-        {
-            if (instance.effect.modifyAnimalColor)
-            {
-                targetColor = instance.effect.animalTintColor;
-                hasColorEffect = true;
-                break;
-            }
-        }
-
-        spriteRenderer.color = hasColorEffect ? targetColor : originalColor;
-    }
-
-    public List<StatusEffectInstance> GetActiveEffects()
-    {
-        return new List<StatusEffectInstance>(activeEffects);
-    }
-    
-    public void ClearAllEffects()
-    {
-        for (int i = activeEffects.Count - 1; i >= 0; i--)
-        {
-            RemoveStatusEffect(activeEffects[i].effect.effectID);
+            cachedAdditionalMoveTicks += effect.additionalMoveTicks * instance.stackCount;
         }
     }
     
-    private void OnDestroy()
-    {
-        foreach (var instance in activeEffects)
-        {
-            if (instance.visualEffectInstance != null)
-            {
-                Destroy(instance.visualEffectInstance);
-            }
-        }
-    }
+    // --- Unchanged Methods ---
+    public bool HasStatusEffect(string effectID) { return effectLookup.ContainsKey(effectID); }
+    private void UpdateVisualEffects() { if(spriteRenderer==null)return;Color targetColor=originalColor;bool hasColorEffect=false;foreach(var instance in activeEffects){if(instance.effect.modifyAnimalColor){targetColor=instance.effect.animalTintColor;hasColorEffect=true;break;}}
+    spriteRenderer.color=hasColorEffect?targetColor:originalColor;}
+    public List<StatusEffectInstance> GetActiveEffects() { return new List<StatusEffectInstance>(activeEffects); }
+    public void ClearAllEffects() { for(int i=activeEffects.Count-1;i>=0;i--){RemoveStatusEffect(activeEffects[i].effect.effectID);}}
+    private void OnDestroy() { foreach(var instance in activeEffects){if(instance.visualEffectInstance!=null){Destroy(instance.visualEffectInstance);}}}
 }

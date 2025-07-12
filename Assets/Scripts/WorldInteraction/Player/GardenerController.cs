@@ -95,7 +95,7 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         
         if(gridEntity != null && statusManager != null)
         {
-            gridEntity.SetSpeedMultiplier(statusManager.MovementSpeedMultiplier);
+            gridEntity.SetSpeedMultiplier(statusManager.VisualSpeedMultiplier); // <<< RENAMED
         }
 
         UpdateAnimations();
