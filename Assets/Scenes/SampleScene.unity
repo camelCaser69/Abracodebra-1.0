@@ -1974,7 +1974,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 368692709715271782, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_Spacing
-      value: 0.01
+      value: 0.06
       objectReference: {fileID: 0}
     - target: {fileID: 450235667417177311, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_IsActive
@@ -14793,6 +14793,7 @@ MonoBehaviour:
   mainCamera: {fileID: 519420031}
   player: {fileID: 1491144816}
   hoverRadius: 3
+  wetStatusEffect: {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
   hoverHighlightObject: {fileID: 1547083800}
   hoverColorManager: {fileID: 11400000, guid: 13378dd3cbc1677489e27a96ad120303, type: 2}
   baseSortingOrder: 0
