@@ -13,27 +13,40 @@ public class StatusEffectIconUI : MonoBehaviour
     {
         currentEffect = instance.effect;
 
-        // Find UI components by name
+        // Find the parent 'Icon' GameObject first
         Transform iconTransform = transform.Find("Icon");
         if (iconTransform != null)
         {
+            // <<< THIS IS THE CRITICAL FIX
+            // Ensure the parent 'Icon' GameObject itself is active.
+            iconTransform.gameObject.SetActive(true);
+
+            // Now, find the components within it
             iconImage = iconTransform.GetComponent<Image>();
             iconText = iconTransform.GetComponentInChildren<TextMeshProUGUI>();
 
-            // Use sprite if available, otherwise use unicode
+            // The rest of the logic can now correctly enable/disable the components
             if (currentEffect.icon != null)
             {
+                // Use sprite if available
                 if (iconImage != null)
                 {
                     iconImage.sprite = currentEffect.icon;
                     iconImage.color = currentEffect.effectColor;
                     iconImage.enabled = true;
                 }
-                if (iconText != null) iconText.enabled = false;
+                if (iconText != null)
+                {
+                    iconText.enabled = false;
+                }
             }
             else
             {
-                if (iconImage != null) iconImage.enabled = false;
+                // Otherwise, use unicode symbol
+                if (iconImage != null)
+                {
+                    iconImage.enabled = false;
+                }
                 if (iconText != null)
                 {
                     iconText.text = currentEffect.unicodeSymbol;
@@ -41,6 +54,10 @@ public class StatusEffectIconUI : MonoBehaviour
                     iconText.enabled = true;
                 }
             }
+        }
+        else
+        {
+            Debug.LogError("Could not find child GameObject named 'Icon' in the StatusEffectIcon prefab!", this);
         }
     }
 }

@@ -224,8 +224,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiTickDelay: 0.5
-  wetStatusEffect: {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
-  waterTileDefinition: {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}
   useAnimations: 1
   animator: {fileID: 0}
   runningParameterName: isRunning
@@ -487,7 +485,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectIconContainer: {fileID: 7195026228079028697}
   effectIconPrefab: {fileID: 6027093001628851131, guid: 333d2abbda8c2c54da48bd0147f9fe14, type: 3}
-  iconSpacing: 10
 --- !u!1 &4330577973963285420
 GameObject:
   m_ObjectHideFlags: 0
@@ -645,13 +642,13 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 4
-  m_Spacing: 5
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
+  m_Spacing: 0.06
+  m_ChildForceExpandWidth: 0
+  m_ChildForceExpandHeight: 0
+  m_ChildControlWidth: 1
+  m_ChildControlHeight: 1
+  m_ChildScaleWidth: 1
+  m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
 --- !u!1 &7022531830783394042
 GameObject:

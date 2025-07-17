@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a3c413eaecb462e830bcbf2c00d5190, type: 3}
   m_Name: StatusEffect_000_Slow
   m_EditorClassIdentifier: 
-  effectID: wet
-  displayName: Wet
+  effectID: slow
+  displayName: Slow
   icon: {fileID: 0}
   unicodeSymbol: "\U0001F40C"
-  effectColor: {r: 0.41037738, g: 0.6863123, b: 1, a: 1}
+  effectColor: {r: 0, g: 0, b: 0, a: 1}
   isPermanent: 0
   durationTicks: 1
   modifyAnimalColor: 0
@@ -30,6 +30,6 @@ MonoBehaviour:
   hungerModifier: 0
   visualSpeedMultiplier: 0.5
   damageResistanceMultiplier: 1
-  additionalMoveTicks: 0
+  additionalMoveTicks: 1
   canStack: 0
   maxStacks: 1

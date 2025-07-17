@@ -1972,6 +1972,10 @@ PrefabInstance:
       propertyPath: seedPlantingOffset.y
       value: -1
       objectReference: {fileID: 0}
+    - target: {fileID: 368692709715271782, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: m_Spacing
+      value: 0.01
+      objectReference: {fileID: 0}
     - target: {fileID: 450235667417177311, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_IsActive
       value: 0
@@ -10068,7 +10072,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tileRules:
   - tile: {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}
-    statusEffectToApply: {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
+    statusEffectsToApply:
+    - {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
+    - {fileID: 11400000, guid: d2ccc8ac712bdc842b0d5d9a4850275c, type: 2}
 --- !u!1 &784806747
 GameObject:
   m_ObjectHideFlags: 0
@@ -15046,7 +15052,6 @@ GameObject:
   - component: {fileID: 1219388325}
   - component: {fileID: 1219388324}
   - component: {fileID: 1219388326}
-  - component: {fileID: 1219388327}
   m_Layer: 4
   m_Name: DataTilemap_Dirt_Water
   m_TagString: Untagged
@@ -15346,7 +15351,7 @@ TilemapCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1219388322}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -15377,25 +15382,6 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
---- !u!114 &1219388327
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1219388322}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 24eb369f19434b65babb843d505c2a3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  additionalTickCost: 1
-  affectsAnimals: 1
-  affectsPlayer: 1
-  showVisualIndicator: 0
-  colliderShrinkAmount: 0
-  zoneColor: {r: 0.5, g: 0.5, b: 1, a: 0}
-  showDebugMessages: 0
 --- !u!114 &1222742192
 MonoBehaviour:
   m_ObjectHideFlags: 0

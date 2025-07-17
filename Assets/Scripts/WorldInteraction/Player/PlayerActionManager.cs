@@ -40,35 +40,21 @@ public class PlayerActionManager : MonoBehaviour
     {
         if (Instance == this) Instance = null;
     }
-    
-    // This is the key updated method
+
+    // <<< THIS IS THE REFACTORED METHOD. IT IS NOW MUCH SIMPLER.
+    // In PlayerActionManager.cs
+
     public int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null)
     {
+        // The worldPosition parameter is NO LONGER USED for tile checks, to prevent errors.
+        // We will get the position directly from the moving entity.
+
         int totalCost = tickCostPerAction;
-        int zoneCost = 0;
         int statusEffectCost = 0;
-
-        // --- Check for slowdown zones on the tile ---
-        SlowdownZone[] allZones = FindObjectsByType<SlowdownZone>(FindObjectsSortMode.None);
-        foreach (var zone in allZones)
-        {
-            if (zone.IsPositionInZone(worldPosition))
-            {
-                bool shouldAffect = false;
-                if (movingEntity is GardenerController && zone.AffectsPlayer) shouldAffect = true;
-                else if (movingEntity is AnimalController && zone.AffectsAnimals) shouldAffect = true;
-                else if (movingEntity == null) shouldAffect = true;
-
-                if (shouldAffect)
-                {
-                    zoneCost = Mathf.Max(zoneCost, zone.GetAdditionalTickCost());
-                }
-            }
-        }
-        
-        // <<< NEW: Check for status effect penalties on the entity
+    
         if (movingEntity != null)
         {
+            // Get status effect penalties from the entity itself
             IStatusEffectable effectable = movingEntity.GetComponent<IStatusEffectable>();
             if (effectable != null)
             {
@@ -76,18 +62,18 @@ public class PlayerActionManager : MonoBehaviour
             }
         }
 
-        totalCost += zoneCost + statusEffectCost;
+        totalCost += statusEffectCost;
 
         if (debugMode && totalCost > tickCostPerAction)
         {
             string entityName = movingEntity != null ? movingEntity.gameObject.name : "Unknown Entity";
-            Debug.Log($"[PlayerActionManager] Movement for '{entityName}' cost breakdown: Base({tickCostPerAction}) + Zone({zoneCost}) + Status({statusEffectCost}) = {totalCost} ticks total.");
+            Debug.Log($"[PlayerActionManager] Movement for '{entityName}' cost breakdown: Base({tickCostPerAction}) + Status({statusEffectCost}) = {totalCost} ticks total.");
         }
 
         return totalCost;
     }
 
-    // --- The rest of the script is unchanged ---
+    // --- The rest of the script is unchanged and fully included for copy-pasting ---
     public bool ExecutePlayerAction(PlayerActionType actionType,Vector3Int gridPosition,object actionData=null,Action onSuccessCallback=null){if(debugMode)Debug.Log($"[PlayerActionManager] Executing {actionType} at {gridPosition}");bool success=false;int tickCost=tickCostPerAction;switch(actionType){case PlayerActionType.UseTool:success=ExecuteToolUse(gridPosition,actionData as ToolDefinition);break;case PlayerActionType.PlantSeed:tickCost=2;if(tickCost>1){StartCoroutine(ExecuteDelayedAction(()=>ExecutePlantSeed(gridPosition,actionData as InventoryBarItem),tickCost,onSuccessCallback));return true;}
     else{success=ExecutePlantSeed(gridPosition,actionData as InventoryBarItem);}
     break;case PlayerActionType.Water:success=ExecuteWatering(gridPosition);break;case PlayerActionType.Harvest:success=ExecuteHarvest(gridPosition);break;case PlayerActionType.Interact:success=ExecuteInteraction(gridPosition,actionData);break;}
