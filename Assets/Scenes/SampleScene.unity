@@ -10075,6 +10075,10 @@ MonoBehaviour:
     statusEffectsToApply:
     - {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
     - {fileID: 11400000, guid: d2ccc8ac712bdc842b0d5d9a4850275c, type: 2}
+  toolRules:
+  - tool: {fileID: 11400000, guid: 864e5c2cfc433e249b02f2a97cced049, type: 2}
+    statusEffectsToApply:
+    - {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
 --- !u!1 &784806747
 GameObject:
   m_ObjectHideFlags: 0
@@ -14793,7 +14797,6 @@ MonoBehaviour:
   mainCamera: {fileID: 519420031}
   player: {fileID: 1491144816}
   hoverRadius: 3
-  wetStatusEffect: {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
   hoverHighlightObject: {fileID: 1547083800}
   hoverColorManager: {fileID: 11400000, guid: 13378dd3cbc1677489e27a96ad120303, type: 2}
   baseSortingOrder: 0
