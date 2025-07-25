@@ -1,33 +1,46 @@
-﻿// Assets/Scripts/WorldInteraction/Player/GardenerController.cs
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using WegoSystem;
 
 public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdateable
 {
-    [Header("Configuration")]
-    [SerializeField] float multiTickDelay = 0.5f;
+    [SerializeField] private float multiTickDelay = 0.5f;
 
     [Header("Animation")]
-    [SerializeField] bool useAnimations = true;
-    [SerializeField] Animator animator;
-    [SerializeField] string runningParameterName = "isRunning";
-    [SerializeField] string plantingTriggerName = "plant";
+    [SerializeField] private bool useAnimations = true;
+    [SerializeField] private Animator animator;
+    [SerializeField] private string runningParameterName = "isRunning";
+    [SerializeField] private string plantingTriggerName = "plant";
 
     [Header("Visuals")]
-    [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] bool flipSpriteWhenMovingLeft = true;
-    [SerializeField] bool flipHorizontalDirection = true;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private bool flipSpriteWhenMovingLeft = true;
+    [SerializeField] private bool flipHorizontalDirection = true;
 
-    GridEntity gridEntity;
-    StatusEffectManager statusManager;
-    StatusEffectUIManager statusEffectUI;
+    [Header("Pouch Settings")]
+    [SerializeField] private int pouchCapacity = 10;
 
-    GridPosition currentTargetPosition;
-    bool isProcessingMovement = false;
+    // Core Systems
+    private GridEntity gridEntity;
+    private StatusEffectManager statusManager;
+    private StatusEffectUIManager statusEffectUI;
+    private PlayerHungerSystem hungerSystem;
+
+    // Pouch Inventory
+    private readonly List<HarvestedItem> _harvestedItems = new List<HarvestedItem>();
+    public event Action<int, int> OnPouchContentChanged; // current count, capacity
+    public bool IsPouchFull => _harvestedItems.Count >= pouchCapacity;
+    public int PouchItemCount => _harvestedItems.Count;
+
+    // State
+    private GridPosition currentTargetPosition;
+    private bool isProcessingMovement = false;
 
     public GridEntity GridEntity => gridEntity;
     public StatusEffectManager StatusManager => statusManager;
+    public PlayerHungerSystem HungerSystem => hungerSystem;
 
     void Awake()
     {
@@ -35,13 +48,16 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         if (gridEntity == null) gridEntity = gameObject.AddComponent<GridEntity>();
         statusManager = GetComponent<StatusEffectManager>();
         if (statusManager == null) statusManager = gameObject.AddComponent<StatusEffectManager>();
+        hungerSystem = GetComponent<PlayerHungerSystem>();
+        if (hungerSystem == null) hungerSystem = gameObject.AddComponent<PlayerHungerSystem>();
+
         statusEffectUI = GetComponentInChildren<StatusEffectUIManager>(true);
         if (statusEffectUI == null) Debug.LogWarning("[GardenerController] StatusEffectUIManager not found in children. Icons won't display.", this);
         if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         if (spriteRenderer == null) Debug.LogWarning("[GardenerController] SpriteRenderer not found.", gameObject);
         if (animator == null && useAnimations) Debug.LogWarning("[GardenerController] Animator not found.", gameObject);
     }
-    
+
     void Start()
     {
         statusManager.Initialize(this);
@@ -73,52 +89,102 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
 
     public void OnTickUpdate(int currentTick)
     {
-        if (statusManager != null)
-        {
-            statusManager.OnTickUpdate(currentTick);
-        }
+        statusManager?.OnTickUpdate(currentTick);
     }
 
     void Update()
     {
-        if (RunManager.Instance != null && RunManager.Instance.CurrentState == RunState.GrowthAndThreat)
+        if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)
         {
             HandlePlayerInput();
         }
-        if(gridEntity != null && statusManager != null)
+        if (gridEntity != null && statusManager != null)
         {
             gridEntity.SetSpeedMultiplier(statusManager.VisualSpeedMultiplier);
         }
         UpdateAnimations();
         UpdateSpriteDirection();
     }
-    
-    private void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos)
+
+    void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos)
     {
-        // <<< THIS IS THE FIX. It calls the correctly named method.
         EnvironmentalStatusEffectSystem.Instance?.CheckAndApplyTileEffects(this);
     }
 
+    #region IStatusEffectable Implementation
     public string GetDisplayName() { return "Gardener"; }
     public void TakeDamage(float amount) { Debug.Log($"Gardener took {amount} damage!"); }
     public void Heal(float amount) { Debug.Log($"Gardener was healed for {amount}!"); }
-    public void ModifyHunger(float amount) { /* Player doesn't have hunger. */ }
-    
-    void HandlePlayerInput()
+    public void ModifyHunger(float amount)
+    {
+        if (hungerSystem != null)
+        {
+            // A negative amount would add hunger (heal), positive would remove it.
+            hungerSystem.Eat(-amount);
+        }
+    }
+    #endregion
+
+    private void HandlePlayerInput()
     {
         if (gridEntity == null || gridEntity.IsMoving || isProcessingMovement) return;
+
         GridPosition moveDir = GridPosition.Zero;
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) moveDir = GridPosition.Up;
         else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) moveDir = GridPosition.Down;
         else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) moveDir = GridPosition.Left;
         else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) moveDir = GridPosition.Right;
+
         if (moveDir != GridPosition.Zero)
         {
             TryMove(moveDir);
+            return;
         }
+
+        // Removed the right-click to consume logic as requested.
+        // The pouch can be used by other systems if needed, but is no longer tied to this input.
     }
 
-    void TryMove(GridPosition direction)
+    public int AddToPouch(List<NodeData> harvestedItemData)
+    {
+        int countAdded = 0;
+        foreach (var data in harvestedItemData)
+        {
+            if (IsPouchFull) break;
+            _harvestedItems.Add(new HarvestedItem(data));
+            countAdded++;
+        }
+
+        if (countAdded > 0)
+        {
+            Debug.Log($"Added {countAdded} items to pouch. Total: {PouchItemCount}/{pouchCapacity}");
+            OnPouchContentChanged?.Invoke(PouchItemCount, pouchCapacity);
+        }
+        return countAdded;
+    }
+
+    private void ConsumeFromPouch()
+    {
+        if (_harvestedItems.Count == 0)
+        {
+            Debug.Log("Pouch is empty, nothing to consume.");
+            return;
+        }
+
+        HarvestedItem itemToConsume = _harvestedItems[0];
+        _harvestedItems.RemoveAt(0);
+
+        float nutrition = itemToConsume.GetNutritionValue();
+        if (nutrition > 0 && hungerSystem != null)
+        {
+            hungerSystem.Eat(nutrition);
+            PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Interact, gridEntity.Position.ToVector3Int(), "Eating");
+        }
+
+        OnPouchContentChanged?.Invoke(PouchItemCount, pouchCapacity);
+    }
+
+    private void TryMove(GridPosition direction)
     {
         if (gridEntity == null) return;
         GridPosition targetPos = gridEntity.Position + direction;
@@ -141,7 +207,7 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         }
     }
 
-    IEnumerator ProcessMultiTickMovement(GridPosition targetPos, int tickCost)
+    private IEnumerator ProcessMultiTickMovement(GridPosition targetPos, int tickCost)
     {
         isProcessingMovement = true;
         for (int i = 0; i < tickCost - 1; i++)
@@ -155,14 +221,14 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         isProcessingMovement = false;
     }
 
-    void UpdateAnimations()
+    private void UpdateAnimations()
     {
         if (!useAnimations || animator == null) return;
         bool isMoving = gridEntity != null && gridEntity.IsMoving;
         animator.SetBool(runningParameterName, isMoving);
     }
 
-    void UpdateSpriteDirection()
+    private void UpdateSpriteDirection()
     {
         if (spriteRenderer == null || !flipSpriteWhenMovingLeft || gridEntity == null || !gridEntity.IsMoving) return;
         Vector3 worldTarget = GridPositionManager.Instance.GridToWorld(currentTargetPosition);

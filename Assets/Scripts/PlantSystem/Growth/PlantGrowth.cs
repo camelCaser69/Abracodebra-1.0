@@ -1,11 +1,7 @@
-﻿using UnityEngine;
-using WegoSystem;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-
-#region Using Statements
-// This region is for AI formatting. It will be removed in the final output.
-#endregion
+using UnityEngine;
+using WegoSystem;
 
 public enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
 
@@ -21,17 +17,22 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
     public NodeGraph NodeGraph { get; set; }
     public PlantState CurrentState { get; set; } = PlantState.Initializing;
 
+    [Header("Cell Prefabs")]
     [SerializeField] private GameObject seedCellPrefab;
     [SerializeField] private GameObject stemCellPrefab;
     [SerializeField] private GameObject leafCellPrefab;
     [SerializeField] private GameObject berryCellPrefab;
     [SerializeField] private float cellSpacing = 0.08f;
 
+    [Header("Visual Controllers")]
     [SerializeField] private PlantShadowController shadowController;
     [SerializeField] private GameObject shadowPartPrefab;
     [SerializeField] private bool enableOutline = true;
     [SerializeField] private PlantOutlineController outlineController;
     [SerializeField] private GameObject outlinePartPrefab;
+
+    [Header("Behavior & Data")]
+    [SerializeField] public NodeDefinition berryNodeDefinition; // This is what the plant produces when harvested
 
     [SerializeField] public bool showGrowthPercentage = true;
     [SerializeField] public bool allowPhotosynthesisDuringGrowth = false;
@@ -151,15 +152,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
 
         CellManager?.ClearAllVisuals();
     }
-    
-    // --- FIX: REMOVED the Update() method entirely to ensure only OnTickUpdate is called ---
-    /*
-    void Update()
-    {
-        VisualManager.UpdateWegoUI();
-    }
-    */
-    
+
     public void OnTickUpdate(int currentTick)
     {
         if (!enabled) return;
@@ -193,7 +186,6 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
                 break;
         }
 
-        // We can call this here, it's just a visual update.
         VisualManager.UpdateWegoUI();
     }
 
@@ -289,6 +281,57 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
             TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(gridPos);
             PlantGrowthModifierManager.Instance.RegisterPlantTile(this, currentTile);
         }
+    }
+
+    public List<NodeDefinition> Harvest()
+    {
+        var harvestedDefs = new List<NodeDefinition>();
+        var harvestableBerries = new List<GameObject>();
+
+        var tags = GetComponentsInChildren<HarvestableTag>();
+        foreach (var tag in tags)
+        {
+            if (tag.HarvestedItemDefinition == null)
+            {
+                Debug.LogWarning($"Found a harvestable berry on '{gameObject.name}' but its HarvestedItemDefinition was null. It will not be harvested. Check Plant an Berry Node Definition assignment.", tag.gameObject);
+                continue;
+            }
+
+            // A PlantCell is not strictly required, but if it exists, we use it.
+            var cell = tag.GetComponent<PlantCell>();
+            if (cell != null && cell.CellType == PlantCellType.Fruit)
+            {
+                harvestableBerries.Add(tag.gameObject);
+            }
+            else if (cell == null) // Also harvest items that might not be on the plant's grid system
+            {
+                harvestableBerries.Add(tag.gameObject);
+            }
+        }
+
+        if (harvestableBerries.Count == 0)
+        {
+            Debug.LogWarning($"[PlantGrowth] Harvest called on '{gameObject.name}', but no GameObjects with a valid 'HarvestableTag' component were found as children. Ensure the berry-producing gene has a PASSIVE 'Harvestable' effect.", gameObject);
+            return harvestedDefs;
+        }
+
+        foreach (var berryGO in harvestableBerries)
+        {
+            var tag = berryGO.GetComponent<HarvestableTag>();
+            var cell = berryGO.GetComponent<PlantCell>();
+
+            // Add the definition from the tag itself
+            harvestedDefs.Add(tag.HarvestedItemDefinition);
+
+            if (cell != null)
+            {
+                ReportCellDestroyed(cell.GridCoord);
+            }
+            Destroy(berryGO);
+        }
+
+        Debug.Log($"[PlantGrowth] Harvested {harvestedDefs.Count} berries from {gameObject.name}");
+        return harvestedDefs;
     }
 
     public float GetCellSpacing() => cellSpacing;

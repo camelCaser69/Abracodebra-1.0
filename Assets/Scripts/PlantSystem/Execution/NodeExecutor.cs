@@ -14,25 +14,30 @@ public class NodeExecutor : MonoBehaviour
     [SerializeField] GameObject plantPrefab;
     [SerializeField] TMP_Text debugOutput;
 
-    public static List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalEffects) {
+    public static List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalEffects)
+    {
         if (originalEffects == null) return new List<NodeEffectData>();
-        
+
         var clonedList = new List<NodeEffectData>();
-        
-        foreach (var effect in originalEffects) {
+
+        foreach (var effect in originalEffects)
+        {
             if (effect == null) continue;
-            
-            var clonedEffect = new NodeEffectData {
+
+            var clonedEffect = new NodeEffectData
+            {
                 effectType = effect.effectType,
                 primaryValue = effect.primaryValue,
                 secondaryValue = effect.secondaryValue,
                 isPassive = effect.isPassive,
+                consumedOnTrigger = effect.consumedOnTrigger, // <<< NEW
                 scentDefinitionReference = effect.scentDefinitionReference
             };
-            
-            // Clone seed data if present
-            if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null) {
-                clonedEffect.seedData = new SeedSpawnData {
+
+            if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null)
+            {
+                clonedEffect.seedData = new SeedSpawnData
+                {
                     growthSpeed = effect.seedData.growthSpeed,
                     stemLengthMin = effect.seedData.stemLengthMin,
                     stemLengthMax = effect.seedData.stemLengthMax,
@@ -44,10 +49,10 @@ public class NodeExecutor : MonoBehaviour
                     castDelay = effect.seedData.castDelay
                 };
             }
-            
+
             clonedList.Add(clonedEffect);
         }
-        
+
         return clonedList;
     }
 

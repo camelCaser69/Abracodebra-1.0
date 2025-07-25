@@ -1,32 +1,31 @@
 ﻿using System;
 
-public enum NodeEffectType {
-    // Energy & Resources
-    EnergyStorage = 0,           // Max energy capacity
-    EnergyPerTick = 1,          // Energy generated per tick
-    EnergyCost = 2,             // Energy cost when executing mature cycle
+public enum NodeEffectType
+{
+    // --- Growth & Stats (Mostly Passive) ---
+    EnergyStorage = 0,
+    EnergyPerTick = 1,
+    EnergyCost = 2,
+    StemLength = 3,
+    GrowthSpeed = 4,
+    LeafGap = 5,
+    LeafPattern = 6,
+    StemRandomness = 7,
+    Cooldown = 8,
+    CastDelay = 9,
+    PoopAbsorption = 10,
+    ScentModifier = 14,
+    SeedSpawn = 13,
 
-    // Growth & Structure
-    StemLength = 3,             // Number of stem segments
-    GrowthSpeed = 4,            // Ticks between growth stages
-    LeafGap = 5,                // Stem segments between leaves
-    LeafPattern = 6,            // Pattern type (0-4)
-    StemRandomness = 7,         // Chance of random stem direction (0-1)
+    // --- Spell Triggers (Casts) ---
+    TimerCast = 15,
+    ProximityCast = 16,
+    EatCast = 17,
+    LeafLossCast = 18,
 
-    // Timing
-    Cooldown = 8,               // Ticks between mature cycles
-    CastDelay = 9,              // Ticks delay before growth starts
-
-    // Environmental Interaction
-    PoopAbsorption = 10,        // Detection radius (primary) and energy bonus (secondary)
-
-    // Combat & Effects
-    Damage = 11,                // Damage multiplier
-
-    // Spawning
-    GrowBerry = 12,             // Spawns berry
-    SeedSpawn = 13,             // Makes this a seed with comprehensive plant data
-
-    // Modifiers
-    ScentModifier = 14,         // Modifies scent radius/strength
+    // --- Spell Spawners & Effects ---
+    GrowBerry = 12,
+    Damage = 11,
+    Nutritious = 19,
+    Harvestable = 20 // <<< NEW
 }

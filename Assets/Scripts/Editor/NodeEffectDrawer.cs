@@ -1,40 +1,44 @@
 ﻿using UnityEditor;
 using UnityEngine;
+using WegoSystem;
 
 [CustomPropertyDrawer(typeof(NodeEffectData))]
 public class NodeEffectDrawer : PropertyDrawer
 {
-    // Define a fixed height for the standard fields plus some padding.
-    // This will be added to the height of any complex fields.
-    private const float BASE_PROPERTY_HEIGHT = 42f;
+    // Adjusted base height to account for the new "Consumed on Trigger" field potentially showing
+    private const float BASE_PROPERTY_HEIGHT = 58f;
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         EditorGUI.BeginProperty(position, label, property);
 
-        // Get all property references
         var effectTypeProp = property.FindPropertyRelative("effectType");
         var isPassiveProp = property.FindPropertyRelative("isPassive");
+        var consumedOnTriggerProp = property.FindPropertyRelative("consumedOnTrigger");
         var seedDataProp = property.FindPropertyRelative("seedData");
 
-        // --- Draw the standard fields ---
         Rect currentRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
         EditorGUI.PropertyField(currentRect, effectTypeProp);
         currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
         EditorGUI.PropertyField(currentRect, isPassiveProp);
         currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
-        // --- Draw the context-sensitive fields ---
         NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
+
+        // Only show "Consumed on Trigger" for cast types
+        if (IsCastType(currentType))
+        {
+            EditorGUI.PropertyField(currentRect, consumedOnTriggerProp, new GUIContent("Consumed on Trigger"));
+            currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        }
 
         if (currentType == NodeEffectType.SeedSpawn)
         {
-            // Let Unity draw the SeedSpawnData fields automatically. This is robust and respects layout.
             EditorGUI.PropertyField(currentRect, seedDataProp, true);
         }
         else
         {
-            // For other types, draw the primary/secondary values as before
             DrawStandardValueFields(currentRect, property, currentType);
         }
 
@@ -43,20 +47,22 @@ public class NodeEffectDrawer : PropertyDrawer
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        // Start with the height of the two standard fields (EffectType, IsPassive).
         float totalHeight = BASE_PROPERTY_HEIGHT;
 
         NodeEffectType currentType = (NodeEffectType)property.FindPropertyRelative("effectType").enumValueIndex;
 
+        if (IsCastType(currentType))
+        {
+            // Add height for the "Consumed on Trigger" checkbox
+            totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        }
+
         if (currentType == NodeEffectType.SeedSpawn)
         {
-            // Get the automatic height for the entire SeedSpawnData property.
             totalHeight += EditorGUI.GetPropertyHeight(property.FindPropertyRelative("seedData"), true);
         }
         else
         {
-            // Calculate height for standard primary/secondary value fields.
-            // This logic remains the same as it was working correctly.
             totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Primary value is always shown
 
             switch (currentType)
@@ -76,20 +82,26 @@ public class NodeEffectDrawer : PropertyDrawer
 
         return totalHeight;
     }
-    
-    // Helper method to keep the OnGUI method cleaner
+
+    private bool IsCastType(NodeEffectType type)
+    {
+        return type == NodeEffectType.TimerCast ||
+               type == NodeEffectType.ProximityCast ||
+               type == NodeEffectType.EatCast ||
+               type == NodeEffectType.LeafLossCast;
+    }
+
     private void DrawStandardValueFields(Rect startRect, SerializedProperty property, NodeEffectType currentType)
     {
         var primaryValueProp = property.FindPropertyRelative("primaryValue");
         var secondaryValueProp = property.FindPropertyRelative("secondaryValue");
         var scentDefRefProp = property.FindPropertyRelative("scentDefinitionReference");
-        
+
         GUIContent primaryLabel = new GUIContent("Primary Value");
         GUIContent secondaryLabel = new GUIContent("Secondary Value");
         bool showSecondary = false;
         bool showScentField = false;
 
-        // Label customization logic (same as before)
         switch (currentType)
         {
             case NodeEffectType.EnergyStorage: primaryLabel.text = "Max Energy Increase"; break;
@@ -106,10 +118,16 @@ public class NodeEffectDrawer : PropertyDrawer
             case NodeEffectType.Damage: primaryLabel.text = "Damage Multiplier Add"; break;
             case NodeEffectType.GrowBerry: primaryLabel.text = "Enabled"; break;
             case NodeEffectType.ScentModifier: primaryLabel.text = "Radius Modifier"; secondaryLabel.text = "Strength Modifier"; showSecondary = true; showScentField = true; break;
+
+            // Spellcrafting Types
+            case NodeEffectType.TimerCast: primaryLabel.text = "Tick Interval"; break;
+            case NodeEffectType.ProximityCast: primaryLabel.text = "Detection Range (Tiles)"; break;
+            case NodeEffectType.Nutritious: primaryLabel.text = "Hunger Restored"; break; // <<< NEW
+            // EatCast and LeafLossCast don't have special values for now
         }
 
         Rect currentRect = startRect;
-        
+
         EditorGUI.PropertyField(currentRect, primaryValueProp, primaryLabel);
         currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 

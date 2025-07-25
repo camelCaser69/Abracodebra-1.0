@@ -297,19 +297,42 @@ void SpawnBerry() {
         return false;
     }
 
-    void AddFoodComponentToBerry(GameObject berry)
+    private void AddFoodComponentToBerry(GameObject berry)
     {
         if (berry == null) return;
 
-        // Don't add if one already exists
+        // Add the FoodItem component so animals can eat it
         FoodItem foodItem = berry.GetComponent<FoodItem>();
-        if (foodItem != null) return;
-
-        FoodType berryFoodType = GetBerryFoodType();
-        if (berryFoodType != null)
+        if (foodItem == null)
         {
-            foodItem = berry.AddComponent<FoodItem>();
-            foodItem.foodType = berryFoodType;
+            FoodType berryFoodType = GetBerryFoodType();
+            if (berryFoodType != null)
+            {
+                foodItem = berry.AddComponent<FoodItem>();
+                foodItem.foodType = berryFoodType;
+            }
+        }
+        
+        // --- NEW, ROBUST LOGIC ---
+        // Get the definition for the berry item from the parent plant itself.
+        PlantGrowth parentPlant = berry.GetComponentInParent<PlantGrowth>();
+        if (parentPlant == null || parentPlant.berryNodeDefinition == null)
+        {
+            Debug.LogError($"[PlantNodeExecutor] Plant '{plant.name}' created a berry, but the plant's 'Berry Node Definition' is not assigned in the Inspector. The berry cannot be made harvestable.", plant.gameObject);
+            return;
+        }
+
+        NodeDefinition berryItemDef = parentPlant.berryNodeDefinition;
+
+        // Check if the DEFINITION FOR THE HARVESTED ITEM contains the 'Harvestable' tag.
+        bool isHarvestable = berryItemDef.effects.Any(eff => eff.isPassive && eff.effectType == NodeEffectType.Harvestable);
+
+        if (isHarvestable)
+        {
+            HarvestableTag tag = berry.AddComponent<HarvestableTag>();
+            // The berry now knows what it will become when harvested.
+            tag.HarvestedItemDefinition = berryItemDef;
+            Debug.Log($"[PlantNodeExecutor] Added HarvestableTag to berry and assigned '{berryItemDef.displayName}' as its item definition.", berry);
         }
     }
 

@@ -40,54 +40,61 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
     /// <returns>A new list containing deep copies of the NodeEffectData.</returns>
     // In NodeDefinition.cs, replace the CloneEffects method with this debug version:
 
-public List<NodeEffectData> CloneEffects() {
-    var copy = new List<NodeEffectData>();
-    
-    if (effects == null) {
-        Debug.LogWarning($"[NodeDefinition '{this.name}'] No effects to clone");
+    public List<NodeEffectData> CloneEffects()
+    {
+        var copy = new List<NodeEffectData>();
+
+        if (effects == null)
+        {
+            Debug.LogWarning($"[NodeDefinition '{this.name}'] No effects to clone");
+            return copy;
+        }
+
+        Debug.Log($"[NodeDefinition '{this.name}'] Cloning {effects.Count} effects:");
+
+        foreach (var originalEffect in effects)
+        {
+            if (originalEffect == null)
+            {
+                Debug.LogWarning($"[NodeDefinition '{this.name}'] Contains a null effect in its list.");
+                continue;
+            }
+
+            var newEffect = new NodeEffectData()
+            {
+                effectType = originalEffect.effectType,
+                primaryValue = originalEffect.primaryValue,
+                secondaryValue = originalEffect.secondaryValue,
+                isPassive = originalEffect.isPassive,
+                consumedOnTrigger = originalEffect.consumedOnTrigger, // <<< NEW
+                scentDefinitionReference = originalEffect.scentDefinitionReference
+            };
+
+            if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null)
+            {
+                newEffect.seedData = new SeedSpawnData
+                {
+                    growthSpeed = originalEffect.seedData.growthSpeed,
+                    stemLengthMin = originalEffect.seedData.stemLengthMin,
+                    stemLengthMax = originalEffect.seedData.stemLengthMax,
+                    leafGap = originalEffect.seedData.leafGap,
+                    leafPattern = originalEffect.seedData.leafPattern,
+                    stemRandomness = originalEffect.seedData.stemRandomness,
+                    energyStorage = originalEffect.seedData.energyStorage,
+                    cooldown = originalEffect.seedData.cooldown,
+                    castDelay = originalEffect.seedData.castDelay,
+                    maxBerries = originalEffect.seedData.maxBerries
+                };
+            }
+
+            Debug.Log($"  - Cloned: {newEffect.effectType} (passive: {newEffect.isPassive}, primary: {newEffect.primaryValue}, secondary: {newEffect.secondaryValue})");
+
+            copy.Add(newEffect);
+        }
+
+        Debug.Log($"[NodeDefinition '{this.name}'] Successfully cloned {copy.Count} effects");
         return copy;
     }
-    
-    Debug.Log($"[NodeDefinition '{this.name}'] Cloning {effects.Count} effects:");
-    
-    foreach (var originalEffect in effects) {
-        if (originalEffect == null) {
-            Debug.LogWarning($"[NodeDefinition '{this.name}'] Contains a null effect in its list.");
-            continue;
-        }
-        
-        var newEffect = new NodeEffectData() {
-            effectType = originalEffect.effectType,
-            primaryValue = originalEffect.primaryValue,
-            secondaryValue = originalEffect.secondaryValue,
-            isPassive = originalEffect.isPassive,
-            scentDefinitionReference = originalEffect.scentDefinitionReference
-        };
-        
-        // Clone seed data if present
-        if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null) {
-            newEffect.seedData = new SeedSpawnData {
-                growthSpeed = originalEffect.seedData.growthSpeed,
-                stemLengthMin = originalEffect.seedData.stemLengthMin,
-                stemLengthMax = originalEffect.seedData.stemLengthMax,
-                leafGap = originalEffect.seedData.leafGap,
-                leafPattern = originalEffect.seedData.leafPattern,
-                stemRandomness = originalEffect.seedData.stemRandomness,
-                energyStorage = originalEffect.seedData.energyStorage,
-                cooldown = originalEffect.seedData.cooldown,
-                castDelay = originalEffect.seedData.castDelay,
-                maxBerries = originalEffect.seedData.maxBerries
-            };
-        }
-        
-        Debug.Log($"  - Cloned: {newEffect.effectType} (passive: {newEffect.isPassive}, primary: {newEffect.primaryValue}, secondary: {newEffect.secondaryValue})");
-        
-        copy.Add(newEffect);
-    }
-    
-    Debug.Log($"[NodeDefinition '{this.name}'] Successfully cloned {copy.Count} effects");
-    return copy;
-}
 
     #endregion
 
@@ -202,6 +209,11 @@ public List<NodeEffectData> CloneEffects() {
             case NodeEffectType.GrowBerry: return "Berry Growth";
             case NodeEffectType.SeedSpawn: return "Seed";
             case NodeEffectType.ScentModifier: return "Scent";
+            case NodeEffectType.TimerCast: return "Timer Cast";
+            case NodeEffectType.ProximityCast: return "Proximity Cast";
+            case NodeEffectType.EatCast: return "Eat Cast";
+            case NodeEffectType.LeafLossCast: return "Leaf Loss Cast";
+            case NodeEffectType.Nutritious: return "Nutritious"; // <<< NEW
             default: return type.ToString();
         }
     }
@@ -209,7 +221,7 @@ public List<NodeEffectData> CloneEffects() {
     /// <summary>
     /// Generates a descriptive string for a specific node effect instance.
     /// </summary>
-    private string GetEffectDescription(NodeEffectData effect)
+     private string GetEffectDescription(NodeEffectData effect)
     {
         switch (effect.effectType)
         {
@@ -289,6 +301,17 @@ public List<NodeEffectData> CloneEffects() {
                     scentResult += $" ({effect.scentDefinitionReference.displayName})";
                 }
                 return scentResult;
+
+            case NodeEffectType.TimerCast:
+                return $"Triggers every {effect.primaryValue:F0} ticks";
+            case NodeEffectType.ProximityCast:
+                return $"Triggers within {effect.primaryValue:F0} tiles";
+            case NodeEffectType.EatCast:
+                return "Triggers when eaten";
+            case NodeEffectType.LeafLossCast:
+                return "Triggers when a leaf is lost";
+            case NodeEffectType.Nutritious:
+                return $"Restores {effect.primaryValue:F0} hunger"; // <<< NEW
 
             default:
                 string defaultResult = $"{effect.primaryValue:F1}";

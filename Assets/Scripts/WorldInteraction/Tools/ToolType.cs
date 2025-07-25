@@ -3,6 +3,6 @@
     None,
     Hoe,
     WateringCan,
-    SeedPouch // New tool type
-    // etc.
+    SeedPouch,
+    HarvestPouch // <<< NEW
 }
