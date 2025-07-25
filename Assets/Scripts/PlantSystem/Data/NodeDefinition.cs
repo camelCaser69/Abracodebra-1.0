@@ -4,41 +4,20 @@ using System.Text;
 using UnityEngine;
 using WegoSystem;
 
-/// <summary>
-/// A ScriptableObject that defines the template for a "gene" or "node".
-/// It contains all the base properties and effects that a node can have.
-/// This acts as the source from which NodeData instances are created.
-/// </summary>
-[CreateAssetMenu(fileName = "Node_001_", menuName = "Nodes/Node Definition")]
+[CreateAssetMenu(fileName = "Node_", menuName = "Plant System/Node Definition")]
 public class NodeDefinition : ScriptableObject, ITooltipDataProvider
 {
-    #region Core Properties
-
-    [Header("Display Information")]
     public string displayName;
 
-    [TextArea(3, 10)]
+    [TextArea]
     public string description;
 
     public Sprite thumbnail;
     public Color thumbnailTintColor = Color.white;
     public Color backgroundColor = Color.gray;
 
-    [Header("Prefab & Effects")]
     public GameObject nodeViewPrefab;
     public List<NodeEffectData> effects;
-
-    #endregion
-
-    #region Data Handling
-
-    /// <summary>
-    /// Creates a deep copy of the effects list. This is crucial to ensure that
-    /// each NodeData instance gets its own modifiable copy of the effects,
-    /// especially for complex data types like SeedSpawnData.
-    /// </summary>
-    /// <returns>A new list containing deep copies of the NodeEffectData.</returns>
-    // In NodeDefinition.cs, replace the CloneEffects method with this debug version:
 
     public List<NodeEffectData> CloneEffects()
     {
@@ -49,8 +28,6 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
             Debug.LogWarning($"[NodeDefinition '{this.name}'] No effects to clone");
             return copy;
         }
-
-        Debug.Log($"[NodeDefinition '{this.name}'] Cloning {effects.Count} effects:");
 
         foreach (var originalEffect in effects)
         {
@@ -66,8 +43,9 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
                 primaryValue = originalEffect.primaryValue,
                 secondaryValue = originalEffect.secondaryValue,
                 isPassive = originalEffect.isPassive,
-                consumedOnTrigger = originalEffect.consumedOnTrigger, // <<< NEW
-                scentDefinitionReference = originalEffect.scentDefinitionReference
+                consumedOnTrigger = originalEffect.consumedOnTrigger,
+                scentDefinitionReference = originalEffect.scentDefinitionReference,
+                nodeDefinitionReference = originalEffect.nodeDefinitionReference // This will now copy the non-null reference
             };
 
             if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null)
@@ -86,19 +64,10 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
                     maxBerries = originalEffect.seedData.maxBerries
                 };
             }
-
-            Debug.Log($"  - Cloned: {newEffect.effectType} (passive: {newEffect.isPassive}, primary: {newEffect.primaryValue}, secondary: {newEffect.secondaryValue})");
-
             copy.Add(newEffect);
         }
-
-        Debug.Log($"[NodeDefinition '{this.name}'] Successfully cloned {copy.Count} effects");
         return copy;
     }
-
-    #endregion
-
-    #region Tooltip Implementation
 
     public string GetTooltipTitle()
     {
@@ -117,7 +86,6 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
 
         var sb = new StringBuilder();
 
-        // Display all effects associated with this node.
         if (nodeData.effects != null && nodeData.effects.Any())
         {
             sb.Append("<b>Effects:</b>\n");
@@ -132,15 +100,12 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
                 Color effectColor = effect.isPassive ? passiveEffectColor : activeEffectColor;
                 string hexColor = ColorUtility.ToHtmlStringRGB(effectColor);
 
-                // Print the primary effect line
                 sb.Append($"<color=#{hexColor}>{effectPrefix}{GetEffectDisplayName(effect.effectType)}: ");
                 sb.Append(GetEffectDescription(effect));
                 sb.Append("</color>\n");
 
-                // If this is a passive seed, also display its packaged stats for convenience.
                 if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null && effect.isPassive)
                 {
-                    // Create temporary effect data to reuse the description generation logic
                     var energyStorageEffect = new NodeEffectData { effectType = NodeEffectType.EnergyStorage, primaryValue = effect.seedData.energyStorage };
                     sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(energyStorageEffect.effectType)}: {GetEffectDescription(energyStorageEffect)}</color>\n");
 
@@ -168,7 +133,6 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
             }
         }
 
-        // If the node is a seed, display its sequence information.
         if (nodeData.IsSeed())
         {
             if (sb.Length > 0 && sb[sb.Length - 1] != '\n') sb.Append("\n");
@@ -186,10 +150,6 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
         return sb.ToString().TrimEnd();
     }
 
-
-    /// <summary>
-    /// Gets a user-friendly name for a given effect type.
-    /// </summary>
     private string GetEffectDisplayName(NodeEffectType type)
     {
         switch (type)
@@ -213,15 +173,13 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
             case NodeEffectType.ProximityCast: return "Proximity Cast";
             case NodeEffectType.EatCast: return "Eat Cast";
             case NodeEffectType.LeafLossCast: return "Leaf Loss Cast";
-            case NodeEffectType.Nutritious: return "Nutritious"; // <<< NEW
+            case NodeEffectType.Nutritious: return "Nutritious";
+            case NodeEffectType.Harvestable: return "Harvestable";
             default: return type.ToString();
         }
     }
 
-    /// <summary>
-    /// Generates a descriptive string for a specific node effect instance.
-    /// </summary>
-     private string GetEffectDescription(NodeEffectData effect)
+    private string GetEffectDescription(NodeEffectData effect)
     {
         switch (effect.effectType)
         {
@@ -311,7 +269,7 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
             case NodeEffectType.LeafLossCast:
                 return "Triggers when a leaf is lost";
             case NodeEffectType.Nutritious:
-                return $"Restores {effect.primaryValue:F0} hunger"; // <<< NEW
+                return $"Restores {effect.primaryValue:F0} hunger";
 
             default:
                 string defaultResult = $"{effect.primaryValue:F1}";
@@ -323,9 +281,6 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
         }
     }
 
-    /// <summary>
-    /// Gets a user-friendly name for a given leaf pattern index.
-    /// </summary>
     private string GetLeafPatternName(int pattern)
     {
         switch (pattern)
@@ -339,13 +294,6 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
         }
     }
 
-    #endregion
-
-    #region Utility
-
-    /// <summary>
-    /// Gets a simple string representation of all effects. Useful for debugging.
-    /// </summary>
     public string GetStatsAsString()
     {
         if (effects == null || effects.Count == 0) return "No effects";
@@ -359,6 +307,4 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
 
         return result.ToString();
     }
-
-    #endregion
 }

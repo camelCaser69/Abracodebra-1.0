@@ -30,8 +30,9 @@ public class NodeExecutor : MonoBehaviour
                 primaryValue = effect.primaryValue,
                 secondaryValue = effect.secondaryValue,
                 isPassive = effect.isPassive,
-                consumedOnTrigger = effect.consumedOnTrigger, // <<< NEW
-                scentDefinitionReference = effect.scentDefinitionReference
+                consumedOnTrigger = effect.consumedOnTrigger,
+                scentDefinitionReference = effect.scentDefinitionReference,
+                nodeDefinitionReference = effect.nodeDefinitionReference // <<< THIS LINE FIXES THE ISSUE
             };
 
             if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null)

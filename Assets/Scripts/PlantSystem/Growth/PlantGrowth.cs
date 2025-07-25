@@ -32,7 +32,6 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
     [SerializeField] private GameObject outlinePartPrefab;
 
     [Header("Behavior & Data")]
-    [SerializeField] public NodeDefinition berryNodeDefinition; // This is what the plant produces when harvested
 
     [SerializeField] public bool showGrowthPercentage = true;
     [SerializeField] public bool allowPhotosynthesisDuringGrowth = false;

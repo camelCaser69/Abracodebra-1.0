@@ -5,8 +5,8 @@ using WegoSystem;
 [CustomPropertyDrawer(typeof(NodeEffectData))]
 public class NodeEffectDrawer : PropertyDrawer
 {
-    // Adjusted base height to account for the new "Consumed on Trigger" field potentially showing
-    private const float BASE_PROPERTY_HEIGHT = 58f;
+    // Increased base height to accommodate potential new field
+    private const float BASE_PROPERTY_HEIGHT = 58f; 
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
@@ -16,6 +16,7 @@ public class NodeEffectDrawer : PropertyDrawer
         var isPassiveProp = property.FindPropertyRelative("isPassive");
         var consumedOnTriggerProp = property.FindPropertyRelative("consumedOnTrigger");
         var seedDataProp = property.FindPropertyRelative("seedData");
+        var nodeDefRefProp = property.FindPropertyRelative("nodeDefinitionReference"); // <<< GET NEW PROPERTY
 
         Rect currentRect = new Rect(position.x, position.y, position.width, EditorGUIUtility.singleLineHeight);
         EditorGUI.PropertyField(currentRect, effectTypeProp);
@@ -26,10 +27,16 @@ public class NodeEffectDrawer : PropertyDrawer
 
         NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
 
-        // Only show "Consumed on Trigger" for cast types
         if (IsCastType(currentType))
         {
             EditorGUI.PropertyField(currentRect, consumedOnTriggerProp, new GUIContent("Consumed on Trigger"));
+            currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        }
+        
+        // <<< NEW LOGIC TO SHOW THE REFERENCE FIELD
+        if (currentType == NodeEffectType.GrowBerry)
+        {
+            EditorGUI.PropertyField(currentRect, nodeDefRefProp, new GUIContent("Harvested Item Def"));
             currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
         }
 
@@ -39,6 +46,7 @@ public class NodeEffectDrawer : PropertyDrawer
         }
         else
         {
+            // Pass the modified rect to the standard drawing method
             DrawStandardValueFields(currentRect, property, currentType);
         }
 
@@ -48,12 +56,16 @@ public class NodeEffectDrawer : PropertyDrawer
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
         float totalHeight = BASE_PROPERTY_HEIGHT;
-
         NodeEffectType currentType = (NodeEffectType)property.FindPropertyRelative("effectType").enumValueIndex;
 
         if (IsCastType(currentType))
         {
-            // Add height for the "Consumed on Trigger" checkbox
+            totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        }
+
+        // <<< NEW LOGIC TO ADD HEIGHT FOR THE REFERENCE FIELD
+        if (currentType == NodeEffectType.GrowBerry)
+        {
             totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
         }
 
@@ -63,20 +75,20 @@ public class NodeEffectDrawer : PropertyDrawer
         }
         else
         {
-            totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Primary value is always shown
+            totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; 
 
             switch (currentType)
             {
                 case NodeEffectType.StemLength:
                 case NodeEffectType.PoopAbsorption:
                 case NodeEffectType.ScentModifier:
-                    totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // For secondary value
+                    totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                     break;
             }
 
             if (currentType == NodeEffectType.ScentModifier)
             {
-                totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // For scent reference
+                totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
         }
 
@@ -119,17 +131,19 @@ public class NodeEffectDrawer : PropertyDrawer
             case NodeEffectType.GrowBerry: primaryLabel.text = "Enabled"; break;
             case NodeEffectType.ScentModifier: primaryLabel.text = "Radius Modifier"; secondaryLabel.text = "Strength Modifier"; showSecondary = true; showScentField = true; break;
 
-            // Spellcrafting Types
             case NodeEffectType.TimerCast: primaryLabel.text = "Tick Interval"; break;
             case NodeEffectType.ProximityCast: primaryLabel.text = "Detection Range (Tiles)"; break;
-            case NodeEffectType.Nutritious: primaryLabel.text = "Hunger Restored"; break; // <<< NEW
-            // EatCast and LeafLossCast don't have special values for now
+            case NodeEffectType.Nutritious: primaryLabel.text = "Hunger Restored"; break;
         }
 
         Rect currentRect = startRect;
 
-        EditorGUI.PropertyField(currentRect, primaryValueProp, primaryLabel);
-        currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        // Do not draw the primary value for GrowBerry, as it's just an enable/disable flag now.
+        if (currentType != NodeEffectType.GrowBerry)
+        {
+            EditorGUI.PropertyField(currentRect, primaryValueProp, primaryLabel);
+            currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        }
 
         if (showSecondary)
         {

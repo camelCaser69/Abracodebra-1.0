@@ -125,12 +125,11 @@ public void ExecuteMatureCycleTick() {
         switch (effect.effectType)
         {
             case NodeEffectType.PoopAbsorption:
-                // NEW: Add a safeguard warning if this effect is ever misconfigured as "active"
                 Debug.LogWarning($"[{plant.gameObject.name}] Tried to execute PoopAbsorption as an ACTIVE effect. It should be PASSIVE. Please check the 'Is Passive' box on its NodeDefinition in the Inspector.");
                 break;
 
             case NodeEffectType.GrowBerry:
-                SpawnBerry();
+                SpawnBerry(effect); // <<< MODIFIED: Pass the effect data
                 break;
 
             case NodeEffectType.ScentModifier:
@@ -177,112 +176,125 @@ public void ExecuteMatureCycleTick() {
 
     // In PlantNodeExecutor.cs, replace the SpawnBerry method with this debug version:
 
-void SpawnBerry() {
-    Debug.Log($"[{plant.gameObject.name}] SpawnBerry called!");
-    
-    // Check if we have the berry prefab
-    if (plant.CellManager == null) {
-        Debug.LogError($"[{plant.gameObject.name}] CellManager is null!");
-        return;
-    }
-    
-    var cells = plant.CellManager.GetCells();
-    if (cells.Count == 0) {
-        Debug.LogWarning($"[{plant.gameObject.name}] No cells in plant!");
-        return;
-    }
-    
-    int maxBerriesAllowed = plant.GrowthLogic.MaxBerries;
-    bool hasLimit = maxBerriesAllowed > 0;
-    
-    int currentBerryCount = plant.CellManager.GetBerryCount();
-    
-    if (hasLimit && currentBerryCount >= maxBerriesAllowed) {
-        Debug.Log($"[{plant.gameObject.name}] Already has {currentBerryCount} berries (max: {maxBerriesAllowed}). Skipping berry spawn.");
-        return;
-    }
-    
-    // Find available positions
-    HashSet<Vector2Int> availablePositions = new HashSet<Vector2Int>();
-    
-    foreach (var kvp in cells) {
-        if (kvp.Value == PlantCellType.Stem || kvp.Value == PlantCellType.Leaf) {
-            Vector2Int cellPos = kvp.Key;
-            Vector2Int[] surroundingPositions = new Vector2Int[] {
-                cellPos + Vector2Int.up,
-                cellPos + Vector2Int.down,
-                cellPos + Vector2Int.left,
-                cellPos + Vector2Int.right,
-                cellPos + Vector2Int.up + Vector2Int.left,
-                cellPos + Vector2Int.up + Vector2Int.right,
-                cellPos + Vector2Int.down + Vector2Int.left,
-                cellPos + Vector2Int.down + Vector2Int.right
-            };
-            
-            foreach (Vector2Int pos in surroundingPositions) {
-                if (!plant.CellManager.HasCellAt(pos)) {
-                    availablePositions.Add(pos);
+private void SpawnBerry(NodeEffectData growEffectData) // <<< MODIFIED: Accept effect data
+    {
+        if (growEffectData.nodeDefinitionReference == null)
+        {
+            Debug.LogError($"[PlantNodeExecutor] 'Grow Berry' effect on plant '{plant.name}' was triggered, but it has no 'Harvested Item Def' assigned in its NodeDefinition. Berry cannot be spawned.", plant.gameObject);
+            return;
+        }
+        
+        Debug.Log($"[{plant.gameObject.name}] SpawnBerry called!");
+
+        if (plant.CellManager == null)
+        {
+            Debug.LogError($"[{plant.gameObject.name}] CellManager is null!");
+            return;
+        }
+
+        var cells = plant.CellManager.GetCells();
+        if (cells.Count == 0)
+        {
+            Debug.LogWarning($"[{plant.gameObject.name}] No cells in plant!");
+            return;
+        }
+
+        int maxBerriesAllowed = plant.GrowthLogic.MaxBerries;
+        bool hasLimit = maxBerriesAllowed > 0;
+
+        int currentBerryCount = plant.CellManager.GetBerryCount();
+
+        if (hasLimit && currentBerryCount >= maxBerriesAllowed)
+        {
+            Debug.Log($"[{plant.gameObject.name}] Already has {currentBerryCount} berries (max: {maxBerriesAllowed}). Skipping berry spawn.");
+            return;
+        }
+
+        HashSet<Vector2Int> availablePositions = new HashSet<Vector2Int>();
+
+        foreach (var kvp in cells)
+        {
+            if (kvp.Value == PlantCellType.Stem || kvp.Value == PlantCellType.Leaf)
+            {
+                Vector2Int cellPos = kvp.Key;
+                Vector2Int[] surroundingPositions = new Vector2Int[] {
+                    cellPos + Vector2Int.up,
+                    cellPos + Vector2Int.down,
+                    cellPos + Vector2Int.left,
+                    cellPos + Vector2Int.right,
+                    cellPos + Vector2Int.up + Vector2Int.left,
+                    cellPos + Vector2Int.up + Vector2Int.right,
+                    cellPos + Vector2Int.down + Vector2Int.left,
+                    cellPos + Vector2Int.down + Vector2Int.right
+                };
+
+                foreach (Vector2Int pos in surroundingPositions)
+                {
+                    if (!plant.CellManager.HasCellAt(pos))
+                    {
+                        availablePositions.Add(pos);
+                    }
                 }
             }
         }
-    }
-    
-    Debug.Log($"[{plant.gameObject.name}] Found {availablePositions.Count} potential berry positions");
-    
-    // Remove positions at or below ground level
-    availablePositions.RemoveWhere(pos => pos.y <= 0);
-    
-    Debug.Log($"[{plant.gameObject.name}] After filtering ground level: {availablePositions.Count} positions");
-    
-    List<Vector2Int> candidatePositions = availablePositions.ToList();
-    
-    if (candidatePositions.Count == 0) {
-        Debug.LogWarning($"[{plant.gameObject.name}] No available space to spawn berry!");
-        return;
-    }
-    
-    // Get existing berry positions
-    List<Vector2Int> existingBerryPositions = plant.CellManager.GetBerryPositions();
-    List<Vector2Int> preferredPositions = new List<Vector2Int>();
-    List<Vector2Int> otherPositions = new List<Vector2Int>();
-    
-    if (existingBerryPositions.Count > 0) {
-        foreach (var candidate in candidatePositions) {
-            if (IsAdjacentToExistingBerries(candidate, existingBerryPositions)) {
-                otherPositions.Add(candidate);
-            }
-            else {
-                preferredPositions.Add(candidate);
+
+        availablePositions.RemoveWhere(pos => pos.y <= 0);
+        
+        List<Vector2Int> candidatePositions = availablePositions.ToList();
+
+        if (candidatePositions.Count == 0)
+        {
+            Debug.LogWarning($"[{plant.gameObject.name}] No available space to spawn berry!");
+            return;
+        }
+
+        List<Vector2Int> existingBerryPositions = plant.CellManager.GetBerryPositions();
+        List<Vector2Int> preferredPositions = new List<Vector2Int>();
+        List<Vector2Int> otherPositions = new List<Vector2Int>();
+
+        if (existingBerryPositions.Count > 0)
+        {
+            foreach (var candidate in candidatePositions)
+            {
+                if (IsAdjacentToExistingBerries(candidate, existingBerryPositions))
+                {
+                    otherPositions.Add(candidate);
+                }
+                else
+                {
+                    preferredPositions.Add(candidate);
+                }
             }
         }
+        else
+        {
+            preferredPositions.AddRange(candidatePositions);
+        }
+
+        List<Vector2Int> finalCandidates = preferredPositions.Count > 0 ? preferredPositions : otherPositions;
+
+        if (finalCandidates.Count == 0)
+        {
+            Debug.LogWarning($"[{plant.gameObject.name}] No final candidates to spawn berry.");
+            return;
+        }
+
+        int randomIndex = Random.Range(0, finalCandidates.Count);
+        Vector2Int chosenPosition = finalCandidates[randomIndex];
+        
+        GameObject berry = plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, chosenPosition, null, null);
+
+        if (berry != null)
+        {
+            string limitInfo = hasLimit ? $"#{currentBerryCount + 1}/{maxBerriesAllowed}" : $"#{currentBerryCount + 1} (no limit)";
+            Debug.Log($"[{plant.gameObject.name}] SUCCESS: Spawned berry {limitInfo} at {chosenPosition}");
+            AddFoodComponentToBerry(berry, growEffectData.nodeDefinitionReference); // <<< MODIFIED: Pass the definition
+        }
+        else
+        {
+            Debug.LogError($"[{plant.gameObject.name}] FAILED to spawn berry at {chosenPosition} - SpawnCellVisual returned null!");
+        }
     }
-    else {
-        preferredPositions.AddRange(candidatePositions);
-    }
-    
-    List<Vector2Int> finalCandidates = preferredPositions.Count > 0 ? preferredPositions : otherPositions;
-    
-    if (finalCandidates.Count == 0) {
-        Debug.LogWarning($"[{plant.gameObject.name}] No final candidates to spawn berry.");
-        return;
-    }
-    
-    int randomIndex = Random.Range(0, finalCandidates.Count);
-    Vector2Int chosenPosition = finalCandidates[randomIndex];
-    
-    Debug.Log($"[{plant.gameObject.name}] Attempting to spawn berry at position {chosenPosition}");
-    
-    GameObject berry = plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, chosenPosition, null, null);
-    
-    if (berry != null) {
-        string limitInfo = hasLimit ? $"#{currentBerryCount + 1}/{maxBerriesAllowed}" : $"#{currentBerryCount + 1} (no limit)";
-        Debug.Log($"[{plant.gameObject.name}] SUCCESS: Spawned berry {limitInfo} at {chosenPosition}");
-        AddFoodComponentToBerry(berry);
-    }
-    else {
-        Debug.LogError($"[{plant.gameObject.name}] FAILED to spawn berry at {chosenPosition} - SpawnCellVisual returned null!");
-    }
-}
 
     bool IsAdjacentToExistingBerries(Vector2Int position, List<Vector2Int> existingBerries)
     {
@@ -297,11 +309,10 @@ void SpawnBerry() {
         return false;
     }
 
-    private void AddFoodComponentToBerry(GameObject berry)
+    private void AddFoodComponentToBerry(GameObject berry, NodeDefinition harvestedItemDef) // <<< MODIFIED: Accept definition
     {
         if (berry == null) return;
-
-        // Add the FoodItem component so animals can eat it
+        
         FoodItem foodItem = berry.GetComponent<FoodItem>();
         if (foodItem == null)
         {
@@ -312,27 +323,22 @@ void SpawnBerry() {
                 foodItem.foodType = berryFoodType;
             }
         }
-        
-        // --- NEW, ROBUST LOGIC ---
-        // Get the definition for the berry item from the parent plant itself.
-        PlantGrowth parentPlant = berry.GetComponentInParent<PlantGrowth>();
-        if (parentPlant == null || parentPlant.berryNodeDefinition == null)
+
+        if (harvestedItemDef == null)
         {
-            Debug.LogError($"[PlantNodeExecutor] Plant '{plant.name}' created a berry, but the plant's 'Berry Node Definition' is not assigned in the Inspector. The berry cannot be made harvestable.", plant.gameObject);
+            Debug.LogError("[PlantNodeExecutor] Cannot add HarvestableTag because the provided harvestedItemDef is null.", berry);
             return;
         }
 
-        NodeDefinition berryItemDef = parentPlant.berryNodeDefinition;
-
         // Check if the DEFINITION FOR THE HARVESTED ITEM contains the 'Harvestable' tag.
-        bool isHarvestable = berryItemDef.effects.Any(eff => eff.isPassive && eff.effectType == NodeEffectType.Harvestable);
+        bool isHarvestable = harvestedItemDef.effects.Any(eff => eff.isPassive && eff.effectType == NodeEffectType.Harvestable);
 
         if (isHarvestable)
         {
             HarvestableTag tag = berry.AddComponent<HarvestableTag>();
             // The berry now knows what it will become when harvested.
-            tag.HarvestedItemDefinition = berryItemDef;
-            Debug.Log($"[PlantNodeExecutor] Added HarvestableTag to berry and assigned '{berryItemDef.displayName}' as its item definition.", berry);
+            tag.HarvestedItemDefinition = harvestedItemDef;
+            Debug.Log($"[PlantNodeExecutor] Added HarvestableTag to berry and assigned '{harvestedItemDef.displayName}' as its item definition.", berry);
         }
     }
 
