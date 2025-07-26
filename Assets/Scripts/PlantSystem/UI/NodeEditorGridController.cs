@@ -313,8 +313,6 @@ public class NodeEditorGridController : MonoBehaviour
         
         if (originalCell.IsInventoryCell)
         {
-            // --- FIX IS HERE ---
-            // We must not destroy the ItemView being dragged, only detach it from its original cell.
             originalCell.ClearNodeReference();
         }
         else
@@ -324,7 +322,7 @@ public class NodeEditorGridController : MonoBehaviour
         
         draggedData.EnsureSeedSequenceInitialized();
         _actualSeedSlotCell.AssignItemView(draggedView, draggedData, null);
-        draggedDraggable.SnapToCell(_actualSeedSlotCell);
+        draggedDraggable.SnapToCell(targetSeedSlotCell);
         LoadSequenceFromSeed(draggedData);
     }
 
@@ -347,33 +345,35 @@ public class NodeEditorGridController : MonoBehaviour
 
         if (originalCell.IsInventoryCell)
         {
-            NodeData draggedData = draggedView.GetNodeData();
+            // --- FIX STARTS HERE ---
             ItemView viewInTarget = targetSequenceCell.GetItemView();
+            NodeDefinition definitionFromInventory = draggedView.GetNodeDefinition();
 
-            if (viewInTarget == null)
+            if (viewInTarget != null)
             {
+                // Swapping inventory item with sequence item
+                NodeDefinition definitionFromSequence = viewInTarget.GetNodeDefinition();
+                
+                // Destroy both old items
                 originalCell.RemoveNode();
-                targetSequenceCell.AssignNode(draggedNodeDef);
+                targetSequenceCell.RemoveNode();
+                
+                // Recreate them in their new homes
+                InventoryGridController.Instance.AddGeneToInventoryFromDefinition(definitionFromSequence, originalCell);
+                targetSequenceCell.AssignNode(definitionFromInventory);
             }
             else
             {
-                NodeData dataInTarget = targetSequenceCell.GetNodeData();
-                NodeDraggable draggableInTarget = viewInTarget.GetComponent<NodeDraggable>();
-                
-                originalCell.ClearNodeReference();
-                targetSequenceCell.ClearNodeReference();
-                
-                originalCell.AssignItemView(viewInTarget, dataInTarget, null);
-                draggableInTarget?.Initialize(InventoryGridController.Instance, originalCell);
-                draggableInTarget?.SnapToCell(originalCell);
-                
-                targetSequenceCell.AssignItemView(draggedView, draggedData, null);
-                draggedDraggable.Initialize(this, targetSequenceCell);
-                draggedDraggable.SnapToCell(targetSequenceCell);
+                // Moving from inventory to an EMPTY sequence cell
+                originalCell.RemoveNode(); // Consume the inventory item
+                targetSequenceCell.AssignNode(definitionFromInventory); // Create a new instance in the sequence
             }
+            NodeCell.SelectCell(targetSequenceCell);
+            // --- FIX ENDS HERE ---
         }
         else if (!originalCell.IsSeedSlot)
         {
+            // Swapping two genes within the sequence editor (this logic is correct)
             NodeData draggedData = draggedView.GetNodeData();
             ItemView viewInTarget = targetSequenceCell.GetItemView();
 

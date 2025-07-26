@@ -273,7 +273,6 @@ public class InventoryGridController : MonoBehaviour
 
         if (originalCell.IsInventoryCell)
         {
-            // Case 1: Swapping items within the inventory
             if (targetInventoryCell == originalCell) { draggedDraggable.ResetPosition(); return; }
 
             if (targetInventoryCell.HasItem())
@@ -297,53 +296,48 @@ public class InventoryGridController : MonoBehaviour
         }
         else
         {
-            // Case 2: Item is coming from the sequence editor or seed slot
+            // --- FIX STARTS HERE ---
             if (targetInventoryCell.HasItem())
             {
-                // Swapping between inventory and sequence editor
-                ItemView viewInInventory = targetInventoryCell.GetItemView();
-                NodeData dataInInventory = targetInventoryCell.GetNodeData();
-                NodeDraggable draggableInInventory = viewInInventory.GetComponent<NodeDraggable>();
+                // Swapping item from editor with item in inventory
+                NodeDefinition definitionInInventory = targetInventoryCell.GetNodeDefinition();
+                ToolDefinition toolInInventory = targetInventoryCell.GetToolDefinition();
 
-                if (dataInInventory.IsSeed()) // Cannot swap a gene for a seed
+                if ((definitionInInventory != null && definitionInInventory.effects.Any(e => e.effectType == NodeEffectType.SeedSpawn)) || toolInInventory != null)
                 {
                     draggedDraggable.ResetPosition();
                     return;
                 }
-
-                // Detach both items without destroying them
-                originalCell.ClearNodeReference();
-                targetInventoryCell.ClearNodeReference();
-
-                // Move inventory item to sequence editor cell
-                originalCell.AssignItemView(viewInInventory, dataInInventory, null);
-                draggableInInventory?.Initialize(NodeEditorGridController.Instance, originalCell);
-                draggableInInventory?.SnapToCell(originalCell);
-
-                // Move sequence item to inventory cell
-                targetInventoryCell.AssignItemView(draggedItemView, draggedData, null);
-                draggedDraggable.Initialize(this, targetInventoryCell);
-                draggedDraggable.SnapToCell(targetInventoryCell);
+                
+                NodeDefinition definitionFromSequence = draggedItemView.GetNodeDefinition();
+                
+                originalCell.RemoveNode();
+                targetInventoryCell.RemoveNode();
+                
+                AddGeneToInventoryFromDefinition(definitionFromSequence, targetInventoryCell);
+                originalCell.AssignNode(definitionInInventory);
             }
             else 
             {
-                // --- FIX STARTS HERE ---
-                // Moving from sequence to an EMPTY inventory cell
+                // Moving from sequence/seed slot to an EMPTY inventory cell
                 if (originalCell.IsSeedSlot)
                 {
+                    // Important: Refresh to save the sequence data before moving the seed
+                    NodeEditorGridController.Instance.RefreshGraphAndUpdateSeed();
                     NodeEditorGridController.Instance.UnloadSeedFromSlot();
                 }
 
                 // Detach the dragged view from its original cell without destroying it
                 originalCell.ClearNodeReference();
 
-                // Assign the existing ItemView to the new empty inventory cell
-                targetInventoryCell.AssignItemView(draggedItemView, draggedData, null);
+                // Assign the existing ItemView and its data to the new empty inventory cell
+                targetInventoryCell.AssignItemView(draggedItemView, draggedData, draggedToolDef);
+                
                 // Re-initialize the draggable component for its new controller
                 draggedDraggable.Initialize(this, targetInventoryCell);
                 draggedDraggable.SnapToCell(targetInventoryCell);
-                // --- FIX ENDS HERE ---
             }
+            // --- FIX ENDS HERE ---
 
             NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();
         }

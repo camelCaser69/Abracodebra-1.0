@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 580,060 → 400,914 chars (30.9% reduction)
-Estimated tokens saved: ~44,786
+Compression Stats: 580,831 → 400,438 chars (31.1% reduction)
+Estimated tokens saved: ~45,098
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -90,50 +90,50 @@ using System;
   InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7549
   InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7616
   InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7687
-  ItemView (Assets\Scripts\PlantSystem\UI/) L8010
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L8147
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8397
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8531
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8880
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L9016
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9325
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9413
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L9514
-  GridSnapStartup (Assets\Scripts\Ticks/) L9752
-  TickDebugMonitor (Assets\Scripts\Ticks/) L9818
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9990
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L10059
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L10290
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10301
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10330
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10426
-  WaterReflection (Assets\Scripts\Visual\Effects/) L10531
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10926
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10962
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11126
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11268
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11434
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11604
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11612
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11639
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11686
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11889
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11950
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11990
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L12014
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12034
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12339
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12351
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12386
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12561
+  ItemView (Assets\Scripts\PlantSystem\UI/) L8020
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L8157
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8407
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8541
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8890
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L9026
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9335
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9423
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L9524
+  GridSnapStartup (Assets\Scripts\Ticks/) L9762
+  TickDebugMonitor (Assets\Scripts\Ticks/) L9828
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L10000
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L10069
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L10300
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10311
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10340
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10436
+  WaterReflection (Assets\Scripts\Visual\Effects/) L10541
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10936
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10972
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11136
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11278
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11444
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11614
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11622
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11649
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11696
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11899
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11960
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L12000
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L12024
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12044
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12349
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12361
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12396
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12571
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L12572
-  GridPosition (Assets\Scripts\Ticks/) L12726
-  GridPositionManager (Assets\Scripts\Ticks/) L12827
-  GridRadiusUtility (Assets\Scripts\Ticks/) L13183
-  TickConfiguration (Assets\Scripts\Ticks/) L13327
-  ITickUpdateable (Assets\Scripts\Ticks/) L13410
+  GridEntity (Assets\Scripts\Ticks/) L12582
+  GridPosition (Assets\Scripts\Ticks/) L12736
+  GridPositionManager (Assets\Scripts\Ticks/) L12837
+  GridRadiusUtility (Assets\Scripts\Ticks/) L13193
+  TickConfiguration (Assets\Scripts\Ticks/) L13337
+  ITickUpdateable (Assets\Scripts\Ticks/) L13420
 
 ================================================================================
 SCRIPTS
@@ -7800,7 +7800,7 @@ ret ItemCategory.Default;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\InventoryGridController.cs
 
-﻿using System;
+﻿// Assets/Scripts/PlantSystem/UI/InventoryGridController.cs
 using UnityEngine.EventSystems;
 
 pub cls InventoryGridController : MonoBehaviour {
@@ -8028,7 +8028,6 @@ return;
 }
 
 NodeData draggedData = draggedItemView.GetNodeData();
-NodeDefinition draggedNodeDef = draggedItemView.GetNodeDefinition();
 ToolDefinition draggedToolDef = draggedItemView.GetToolDefinition();
 
 if (originalCell.IsInventoryCell) {
@@ -8039,15 +8038,12 @@ ItemView viewInTargetCell = targetInventoryCell.GetItemView();
 NodeData dataInTargetCell = targetInventoryCell.GetNodeData();
 ToolDefinition toolInTargetCell = targetInventoryCell.GetToolDefinition();
 
-if (logInventoryChanges) Debug.Log($"[Inventory] Swapped item '{draggedData.nodeDisplayName}' from cell {originalCell.CellIndex} with item '{dataInTargetCell.nodeDisplayName}' from cell {targetInventoryCell.CellIndex}.");
-
 originalCell.ClearNodeReference();
 originalCell.AssignItemView(viewInTargetCell, dataInTargetCell, toolInTargetCell);
 viewInTargetCell.GetComponent<NodeDraggable>()?.SnapToCell(originalCell);
 targetInventoryCell.ClearNodeReference();
 }
 else {
-if (logInventoryChanges) Debug.Log($"[Inventory] Moved item '{draggedData.nodeDisplayName}' from cell {originalCell.CellIndex} to empty cell {targetInventoryCell.CellIndex}.");
 originalCell.ClearNodeReference();
 }
 
@@ -8055,26 +8051,40 @@ targetInventoryCell.AssignItemView(draggedItemView, draggedData, draggedToolDef)
 draggedDraggable.SnapToCell(targetInventoryCell);
 }
 else {
-NodeCell actualTargetInvCell = targetInventoryCell.HasItem()
-? inventoryCells.FirstOrDefault(c => !c.HasItem())
-: targetInventoryCell;
+if (targetInventoryCell.HasItem()) {
+ItemView viewInInventory = targetInventoryCell.GetItemView();
+NodeData dataInInventory = targetInventoryCell.GetNodeData();
+NodeDraggable draggableInInventory = viewInInventory.GetComponent<NodeDraggable>();
 
-if (actualTargetInvCell == null) { draggedDraggable.ResetPosition(); return; }
+if (dataInInventory.IsSeed()) // Cannot swap a gene for a seed {
+draggedDraggable.ResetPosition();
+return;
+}
 
-if (originalCell.IsSeedSlot) {
-if (logInventoryChanges) Debug.Log($"[Inventory] Moved seed '{draggedData.nodeDisplayName}' from Seed Slot to inventory cell {actualTargetInvCell.CellIndex}.");
-NodeEditorGridController.Instance.UnloadSeedFromSlot();
 originalCell.ClearNodeReference();
-actualTargetInvCell.AssignItemView(draggedItemView, draggedData, null);
-draggedDraggable.SnapToCell(actualTargetInvCell);
+targetInventoryCell.ClearNodeReference();
+
+originalCell.AssignItemView(viewInInventory, dataInInventory, null);
+draggableInInventory?.Initialize(NodeEditorGridController.Instance, originalCell);
+draggableInInventory?.SnapToCell(originalCell);
+
+targetInventoryCell.AssignItemView(draggedItemView, draggedData, null);
+draggedDraggable.Initialize(this, targetInventoryCell);
+draggedDraggable.SnapToCell(targetInventoryCell);
 }
 else {
-if (logInventoryChanges) Debug.Log($"[Inventory] Returned node '{draggedNodeDef.displayName}' from sequence to inventory cell {actualTargetInvCell.CellIndex}.");
-NodeEditorGridController.Instance?.GetCellAtIndex(originalCell.CellIndex)?.RemoveNode();
-NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();
-AddGeneToInventoryFromDefinition(draggedNodeDef, actualTargetInvCell);
-Destroy(draggedDraggable.gameObject);
+if (originalCell.IsSeedSlot) {
+NodeEditorGridController.Instance.UnloadSeedFromSlot();
 }
+
+originalCell.ClearNodeReference();
+
+targetInventoryCell.AssignItemView(draggedItemView, draggedData, null);
+draggedDraggable.Initialize(this, targetInventoryCell);
+draggedDraggable.SnapToCell(targetInventoryCell);
+}
+
+NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();
 }
 }
 
@@ -8083,7 +8093,7 @@ pub int GetUsedSlotCount() => inventoryCells.Count(cell => cell.HasItem());
 pub void RemoveGeneFromInventory(NodeCell inventoryCell) {
 if (inventoryCell != null && inventoryCell.HasItem() && inventoryCell.IsInventoryCell) {
 if (logInventoryChanges) Debug.Log($"[Inventory] Removing item '{inventoryCell.GetNodeData()?.nodeDisplayName ?? "Unknown"}' from cell {inventoryCell.CellIndex}.");
-inventoryCell.ClearNodeReference();
+inventoryCell.RemoveNode();
 }
 }
 
@@ -8697,7 +8707,7 @@ if (nodeDropdown != null) nodeDropdown.gameObject.SetActive(false);
 if (seedSlotContainer != null) CreateSeedSlot();
 if (cellContainer != null && definitionLibrary != null) {
 CreateSequenceCells();
-HideNodeEditorPanel(); // Start hidden
+HideNodeEditorPanel();
 }
 }
 
@@ -8913,7 +8923,7 @@ InventoryGridController.Instance.ReturnGeneToInventory(existingSeedViewInSlot, e
 }
 
 if (originalCell.IsInventoryCell) {
-InventoryGridController.Instance.RemoveGeneFromInventory(originalCell);
+originalCell.ClearNodeReference();
 }
 else {
 originalCell.RemoveNode();
@@ -8940,28 +8950,28 @@ draggedDraggable.ResetPosition(); return;
 }
 
 if (originalCell.IsInventoryCell) {
-InventoryGridController.Instance?.RemoveGeneFromInventory(originalCell);
+ItemView viewInTarget = targetSequenceCell.GetItemView();
 
-ItemView existingViewInTargetSeq = targetSequenceCell.GetItemView();
-if (existingViewInTargetSeq != null) {
-InventoryGridController.Instance.ReturnGeneToInventory(existingViewInTargetSeq, targetSequenceCell.GetNodeData());
-targetSequenceCell.ClearNodeReference();
+if (viewInTarget != null) {
+InventoryGridController.Instance.ReturnGeneToInventory(viewInTarget, targetSequenceCell.GetNodeData());
+targetSequenceCell.ClearNodeReference(); // The cell is now visually and logically empty
 }
+
+originalCell.RemoveNode();
 
 targetSequenceCell.AssignNode(draggedNodeDef);
 NodeCell.SelectCell(targetSequenceCell);
-Destroy(draggedDraggable.gameObject);
 }
 else if (!originalCell.IsSeedSlot) {
 NodeData draggedData = draggedView.GetNodeData();
 ItemView viewInTarget = targetSequenceCell.GetItemView();
 
-if (viewInTarget == null) // Moving to an empty cell {
+if (viewInTarget == null) {
 originalCell.ClearNodeReference();
 targetSequenceCell.AssignItemView(draggedView, draggedData, null);
 draggedDraggable.SnapToCell(targetSequenceCell);
 }
-else // Swapping with an existing item {
+else {
 NodeData dataInTarget = targetSequenceCell.GetNodeData();
 NodeDraggable draggableInTarget = viewInTarget.GetComponent<NodeDraggable>();
 
