@@ -1,7 +1,8 @@
-﻿using System;
+﻿// Assets/Scripts/PlantSystem/Data/NodeGraph.cs
+using System;
 using System.Collections.Generic;
 
-[Serializable]  // Add this!
+[Serializable]
 public class NodeGraph {
     public List<NodeData> nodes = new List<NodeData>();
 }
