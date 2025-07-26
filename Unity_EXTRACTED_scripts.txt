@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 578,975 → 397,324 chars (31.4% reduction)
-Estimated tokens saved: ~45,412
+Compression Stats: 578,271 → 398,020 chars (31.2% reduction)
+Estimated tokens saved: ~45,062
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -70,69 +70,69 @@ using System;
   WaveManagerEditor (Assets\Scripts\Editor/) L4708
   LeafData (Assets\Scripts\PlantSystem\Data/) L4883
   NodeData (Assets\Scripts\PlantSystem\Data/) L4898
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4986
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L5262
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L5285
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L5310
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L5341
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L5351
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L5378
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L5618
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L5657
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L5681
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L5926
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L6020
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6363
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L6691
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7004
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7142
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7459
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7526
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7597
-  ItemView (Assets\Scripts\PlantSystem\UI/) L7918
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L8043
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8278
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8412
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8778
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L8914
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9223
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9311
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L9412
-  GridSnapStartup (Assets\Scripts\Ticks/) L9650
-  TickDebugMonitor (Assets\Scripts\Ticks/) L9716
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9888
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L9957
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L10188
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10199
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10228
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10324
-  WaterReflection (Assets\Scripts\Visual\Effects/) L10429
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10824
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10860
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11024
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11166
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11284
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11494
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11502
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11523
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11570
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11773
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11834
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11874
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L11898
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11918
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12223
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12235
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12270
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12445
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4987
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L5263
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L5286
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L5311
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L5342
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L5352
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L5379
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L5621
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L5660
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L5684
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L5929
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L6023
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6365
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L6693
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7006
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7144
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7466
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7533
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7604
+  ItemView (Assets\Scripts\PlantSystem\UI/) L7927
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L8064
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8300
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8434
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8801
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L8937
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9246
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9334
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L9435
+  GridSnapStartup (Assets\Scripts\Ticks/) L9673
+  TickDebugMonitor (Assets\Scripts\Ticks/) L9739
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9911
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L9980
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L10211
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10222
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10251
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10347
+  WaterReflection (Assets\Scripts\Visual\Effects/) L10452
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10847
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10883
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11047
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11189
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11355
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11525
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11533
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11560
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11607
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11810
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11871
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11911
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L11935
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11955
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12260
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12272
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12307
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12482
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L12456
-  GridPosition (Assets\Scripts\Ticks/) L12610
-  GridPositionManager (Assets\Scripts\Ticks/) L12711
-  GridRadiusUtility (Assets\Scripts\Ticks/) L13067
-  TickConfiguration (Assets\Scripts\Ticks/) L13211
-  ITickUpdateable (Assets\Scripts\Ticks/) L13294
+  GridEntity (Assets\Scripts\Ticks/) L12493
+  GridPosition (Assets\Scripts\Ticks/) L12647
+  GridPositionManager (Assets\Scripts\Ticks/) L12748
+  GridRadiusUtility (Assets\Scripts\Ticks/) L13104
+  TickConfiguration (Assets\Scripts\Ticks/) L13248
+  ITickUpdateable (Assets\Scripts\Ticks/) L13331
 
 ================================================================================
 SCRIPTS
@@ -5014,6 +5014,7 @@ IsActive = isActive;
 
 pub cls NodeData : ISerializationCallbackReceiver {
 pub string nodeId;
+pub string definitionName; // The asset name of the NodeDefinition
 pub string nodeDisplayName;
 pub List<NodeEffectData> effects = new List<NodeEffectData>();
 pub int orderIndex;
@@ -5540,6 +5541,7 @@ if (original == null) ret null;
 
 var clone = new NodeData {
 nodeId = Guid.NewGuid().ToString(),
+definitionName = original.definitionName,
 nodeDisplayName = original.nodeDisplayName,
 effects = CloneEffectsList(original.effects),
 orderIndex = original.orderIndex,
@@ -5566,6 +5568,7 @@ if (original == null) ret null;
 
 var clone = new NodeData {
 nodeId = Guid.NewGuid().ToString(),
+definitionName = original.definitionName,
 nodeDisplayName = original.nodeDisplayName,
 effects = CloneEffectsList(original.effects),
 orderIndex = original.orderIndex,
@@ -6132,10 +6135,17 @@ ret CurrentEnergy >= amount;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantGrowth.cs
 
-﻿using System.Collections.Generic;
+﻿// Assets/Scripts/PlantSystem/Growth/PlantGrowth.cs
+
 using WegoSystem;
 
-pub enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
+pub enum PlantState {
+Initializing,
+Growing,
+GrowthComplete,
+Mature_Idle,
+Mature_Executing
+}
 
 pub cls PlantGrowth : MonoBehaviour, ITickUpdateable {
 pub stat ro List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
@@ -6381,73 +6391,50 @@ var cell = tag.GetComponent<PlantCell>();
 if (cell != null && cell.CellType == PlantCellType.Fruit) {
 harvestableBerries.Add(tag.gameObject);
 }
-else if (cell == null) // Also harvest items that might not be on the plant's grid system {
-harvestableBerries.Add(tag.gameObject);
-}
 }
 
 if (harvestableBerries.Count == 0) {
-Debug.LogWarning($"[PlantGrowth] Harvest called on '{gameObject.name}', but no harvestable berries found.", gameObject);
+Debug.LogWarning($"[PlantGrowth] Harvest called on '{gameObject.name}', but no fruit with HarvestableTag found.", gameObject);
 ret harvestedDefs;
 }
 
+if (NodeGraph?.nodes == null) {
+Debug.LogError($"[PlantGrowth] Cannot determine harvest item because NodeGraph is null.", gameObject);
+ret harvestedDefs;
+}
+
+var berryNode = NodeGraph.nodes.FirstOrDefault(n => n != null && n.effects.Any(e => e != null && e.effectType == NodeEffectType.GrowBerry));
+
+if (berryNode == null) {
+Debug.LogError($"[PlantGrowth] Found harvestable fruit tags, but no NodeData with a 'GrowBerry' effect exists in the plant's NodeGraph. Cannot determine what to give the player.", gameObject);
+ret harvestedDefs;
+}
+
+string matchingNodeDefinitionName = berryNode.definitionName;
 NodeDefinition harvestableDefinition = null;
-string matchingNodeId = null;
 
-if (NodeGraph?.nodes != null) {
-foreach (var node in NodeGraph.nodes) {
-if (node?.effects == null) continue;
-
-bool hasGrowBerry = node.effects.Any(e => e.effectType == NodeEffectType.GrowBerry);
-bool hasHarvestable = node.effects.Any(e => e.effectType == NodeEffectType.Harvestable && e.isPassive);
-
-if (hasGrowBerry && hasHarvestable) {
-matchingNodeId = node.nodeId;
-Debug.Log($"[PlantGrowth] Found harvestable node: {node.nodeDisplayName} (ID: {node.nodeId})");
-break;
+if (!string.IsNullOrEmpty(matchingNodeDefinitionName)) {
+var library = NodeEditorGridController.Instance?.DefinitionLibrary;
+if (library?.definitions != null) {
+harvestableDefinition = library.definitions.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
 }
-}
-}
-
-if (!string.IsNullOrEmpty(matchingNodeId)) {
-if (storedDefinitions != null && storedDefinitions.Count > 0) {
-harvestableDefinition = storedDefinitions.FirstOrDefault(d =>
-d != null && (d.name == matchingNodeId || d.displayName == matchingNodeId));
-}
-
-if (harvestableDefinition == null && NodeEditorGridController.Instance?.DefinitionLibrary != null) {
-var library = NodeEditorGridController.Instance.DefinitionLibrary;
-if (library.definitions != null) {
-harvestableDefinition = library.definitions.FirstOrDefault(d =>
-d != null && (d.name == matchingNodeId || d.displayName == matchingNodeId));
-}
-}
-
-if (harvestableDefinition == null) {
-harvestableDefinition = Resources.Load<NodeDefinition>($"NodeDefinitions/{matchingNodeId}");
 
 if (harvestableDefinition == null) {
 var allDefs = Resources.LoadAll<NodeDefinition>("");
-harvestableDefinition = allDefs.FirstOrDefault(d =>
-d.name == matchingNodeId || d.displayName == matchingNodeId);
-}
+harvestableDefinition = allDefs.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
 }
 }
 
 if (harvestableDefinition == null) {
-Debug.LogError($"[PlantGrowth] Could not find NodeDefinition for harvestable berry! Searched for: '{matchingNodeId}'. " +
-"Make sure:\n1. Your berry gene has both GrowBerry and passive Harvestable effects\n" +
-"2. The NodeDefinition exists in Resources or the Definition Library", gameObject);
+Debug.LogError($"[PlantGrowth] Could not find NodeDefinition asset with name '{matchingNodeDefinitionName ?? "NULL"}'. The 'GrowBerry' gene is present, but its source asset is missing from the library or Resources.", gameObject);
 ret harvestedDefs;
 }
 
-Debug.Log($"[PlantGrowth] Using definition '{harvestableDefinition.displayName}' (thumbnail: {(harvestableDefinition.thumbnail != null ? "YES" : "NO")}) for harvest");
+Debug.Log($"[PlantGrowth] Using definition '{harvestableDefinition.displayName}' for harvest.");
 
 foreach (var berryGO in harvestableBerries) {
 var cell = berryGO.GetComponent<PlantCell>();
-
 harvestedDefs.Add(harvestableDefinition);
-
 if (cell != null) {
 ReportCellDestroyed(cell.GridCoord);
 }
@@ -6465,8 +6452,23 @@ storedDefinitions = new List<NodeDefinition>(definitions);
 pub float GetCellSpacing() => cellSpacing;
 pub bool IsOutlineEnabled() => enableOutline;
 pub GameObject GetCellGameObjectAt(Vector2Int coord) => CellManager.GetCellGameObjectAt(coord);
-pub GameObject GetOutlinePartPrefab() { if (outlineController != null && outlineController.outlinePartPrefab != null) { ret outlineController.outlinePartPrefab; } ret outlinePartPrefab; }
-pub float GetPoopDetectionRadius() { if (NodeGraph?.nodes == null) ret 0f; foreach (var node in NodeGraph.nodes) { if (node?.effects == null) continue; var poopEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.PoopAbsorption); if (poopEffect != null) { ret poopEffect.primaryValue; } } ret 0f; }
+pub GameObject GetOutlinePartPrefab() {
+if (outlineController != null && outlineController.outlinePartPrefab != null) {
+ret outlineController.outlinePartPrefab;
+}
+ret outlinePartPrefab;
+}
+pub float GetPoopDetectionRadius() {
+if (NodeGraph?.nodes == null) ret 0f;
+foreach (var node in NodeGraph.nodes) {
+if (node?.effects == null) continue;
+var poopEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.PoopAbsorption);
+if (poopEffect != null) {
+ret poopEffect.primaryValue;
+}
+}
+ret 0f;
+}
 pub bool DoesCellExistAt(Vector2Int coord) => CellManager.DoesCellExistAt(coord);
 pub void ReportCellDestroyed(Vector2Int coord) => CellManager.ReportCellDestroyed(coord);
 pub void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses) => NodeExecutor.ApplyScentDataToObject(targetObject, scentRadiusBonuses, scentStrengthBonuses);
@@ -7254,7 +7256,7 @@ UpdateUI();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\InventoryBarController.cs
 
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 
 pub cls InventoryBarController : MonoBehaviour {
 pub stat InventoryBarController Instance { get; set; }
@@ -7339,7 +7341,8 @@ cellImage.sprite = emptyCellSprite;
 
 if (inventoryGridController != null) {
 cellImage.color = inventoryGridController.EmptyCellColor;
-} else {
+}
+else {
 cellImage.color = emptyCellColor;
 }
 
@@ -7359,18 +7362,18 @@ void UpdateBarDisplay() {
 if (inventoryGridController == null || barCells == null) return;
 
 foreach (var cell in barCells) {
-cell.RemoveNode();
+cell.RemoveNode(); // This will destroy any existing ItemView/DisplayObject
 
 Image cellImage = cell.GetComponent<Image>();
 if (cellImage != null && inventoryGridController != null) {
-cellImage.color = inventoryGridController.EmptyCellColor;
+cellImage.color = inventoryGridController.EmptyCellColor; // Reset to empty color
 }
 }
 
 int startIndexInMainInventory = currentRow * inventoryGridController.inventoryColumns;
 
 for (int i = 0; i < slotsPerRow; i++) {
-if (i >= inventoryGridController.inventoryColumns) break;
+if (i >= inventoryGridController.inventoryColumns) break; // Don't try to access beyond inventory width
 int inventoryIndexToDisplay = startIndexInMainInventory + i;
 if (inventoryIndexToDisplay >= inventoryGridController.TotalSlots) continue;
 
@@ -7389,29 +7392,33 @@ NodeData nodeData = inventoryCell.GetNodeData();
 ToolDefinition toolDef = inventoryCell.GetToolDefinition();
 NodeDefinition nodeDef = inventoryCell.GetNodeDefinition();
 
-GameObject display = new GameObject("DisplayItem", typeof(RectTransform), typeof(Image));
-display.transform.SetParent(barCell.transform, false);
-Image displayImage = display.GetComponent<Image>();
-displayImage.raycastTarget = false;
+if (InventoryGridController.Instance.InventoryItemPrefab == null) {
+Debug.LogError("[InventoryBarController] InventoryItemPrefab is not set on InventoryGridController!");
+return;
+}
+
+GameObject itemViewGO = Instantiate(InventoryGridController.Instance.InventoryItemPrefab, barCell.transform);
+ItemView itemView = itemViewGO.GetComponent<ItemView>();
+
+if (itemView == null) {
+Debug.LogError("[InventoryBarController] The InventoryItemPrefab is missing the ItemView component!", itemViewGO);
+Destroy(itemViewGO);
+return;
+}
 
 if (toolDef != null) {
-displayImage.sprite = toolDef.icon;
-displayImage.color = toolDef.iconTint;
+itemView.Initialize(nodeData, toolDef);
 }
 else if (nodeDef != null) {
-displayImage.sprite = nodeDef.thumbnail;
-displayImage.color = nodeDef.thumbnailTintColor;
+itemView.Initialize(nodeData, nodeDef, null); // Sequence controller is null for inventory items
 }
 
-display.transform.localScale = Vector3.one * InventoryGridController.Instance.NodeGlobalImageScale;
-display.GetComponent<RectTransform>().sizeDelta = cellSize * 0.8f;
-
-if (barCell.GetComponent<Image>() != null && InventoryColorManager.Instance != null) {
-Color cellColor = InventoryColorManager.Instance.GetCellColorForItem(nodeData, nodeDef, toolDef);
-barCell.GetComponent<Image>().color = cellColor;
+NodeDraggable draggable = itemView.GetComponent<NodeDraggable>();
+if (draggable != null) {
+draggable.enabled = false;
 }
 
-barCell.AssignDisplayOnly(display, nodeData, toolDef);
+barCell.AssignItemView(itemView, nodeData, toolDef);
 }
 
 void CreateToolCopyInBarCell(ToolDefinition toolDef, NodeData toolWrapperNodeData, NodeCell barCell) {
@@ -7817,6 +7824,7 @@ if (emptyCell == null) ret false;
 
 NodeData toolNodeData = new NodeData {
 nodeId = tool.name + "_tool_" + System.Guid.NewGuid().ToString(),
+definitionName = tool.name,
 nodeDisplayName = tool.displayName,
 effects = new List<NodeEffectData>(),
 orderIndex = -1,
@@ -7852,6 +7860,7 @@ if (cellToUse == null) ret false;
 
 NodeData inventoryNode = new NodeData {
 nodeId = geneDef.name + "_inventory_" + Guid.NewGuid().ToString(),
+definitionName = geneDef.name,
 nodeDisplayName = geneDef.displayName,
 effects = geneDef.CloneEffects(),
 orderIndex = -1,
@@ -8030,12 +8039,14 @@ ret null;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\ItemView.cs
 
-﻿using UnityEngine;
+﻿// Assets/Scripts/PlantSystem/UI/ItemView.cs
+
 using UnityEngine.EventSystems;
 
 pub cls ItemView : MonoBehaviour, IPointerDownHandler {
 [SerializeField] Image thumbnailImage;
 [SerializeField] Image backgroundImage;
+[SerializeField] Sprite fallbackThumbnail; // New field for a fallback icon
 
 NodeData _nodeData;
 NodeDefinition _nodeDefinition;
@@ -8096,10 +8107,20 @@ raycastPaddingValue = InventoryGridController.Instance.NodeImageRaycastPadding;
 Vector4 raycastPaddingVector = new Vector4(raycastPaddingValue, raycastPaddingValue, raycastPaddingValue, raycastPaddingValue);
 
 if (thumbnailImage != null) {
-thumbnailImage.sprite = (_displayType == DisplayType.Node) ? _nodeDefinition.thumbnail : _toolDefinition.icon;
+Sprite spriteToShow = (_displayType == DisplayType.Node) ? _nodeDefinition.thumbnail : _toolDefinition.icon;
+
+if (spriteToShow == null) {
+spriteToShow = fallbackThumbnail;
+if (_displayType == DisplayType.Node) {
+Debug.LogWarning($"[ItemView] NodeDefinition '{_nodeDefinition.displayName}' is missing a thumbnail. Using fallback.", this);
+}
+}
+
+thumbnailImage.sprite = spriteToShow;
 thumbnailImage.color = (_displayType == DisplayType.Node) ? _nodeDefinition.thumbnailTintColor : _toolDefinition.iconTint;
 thumbnailImage.rectTransform.localScale = new Vector3(globalScaleFactor, globalScaleFactor, 1f);
-thumbnailImage.enabled = (thumbnailImage.sprite != null);
+thumbnailImage.enabled = (thumbnailImage.sprite != null); // Now this is less likely to be false
+
 thumbnailImage.raycastTarget = true;
 thumbnailImage.raycastPadding = raycastPaddingVector;
 }
@@ -8256,6 +8277,7 @@ Debug.Log($"[NodeCell] Cloned {clonedEffects?.Count ?? 0} effects");
 
 _nodeData = new NodeData {
 nodeId = System.Guid.NewGuid().ToString(),
+definitionName = def.name, // THE FIX
 nodeDisplayName = def.displayName,
 effects = clonedEffects,
 orderIndex = this.CellIndex,
@@ -8783,13 +8805,14 @@ if (editorNode == null) continue;
 
 NodeData nodeForStorage = new NodeData {
 nodeId = editorNode.nodeId,
+definitionName = editorNode.definitionName, // THE FIX IS HERE
 nodeDisplayName = editorNode.nodeDisplayName,
 effects = NodeExecutor.CloneEffectsList(editorNode.effects),
 orderIndex = editorNode.orderIndex,
 canBeDeleted = editorNode.canBeDeleted
 };
 
-Debug.Log($"[NodeEditor] Storing node '{nodeForStorage.nodeDisplayName}' with {nodeForStorage.effects?.Count ?? 0} effects in seed");
+Debug.Log($"[NodeEditor] Storing node '{nodeForStorage.nodeDisplayName}' with def name '{nodeForStorage.definitionName}' in seed");
 
 nodeForStorage.SetPartOfSequence(true);
 
@@ -11278,7 +11301,9 @@ ret centerPosition + new Vector3(offsetX, offsetY, 0f);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Placement\PlayerTileInteractor.cs
 
-﻿using UnityEngine;
+﻿// Assets/Scripts/WorldInteraction/Placement/PlayerTileInteractor.cs
+
+using WegoSystem;
 
 pub sealed cls PlayerTileInteractor : MonoBehaviour {
 [SerializeField] InventoryBarController inventoryBar;
@@ -11286,7 +11311,8 @@ pub sealed cls PlayerTileInteractor : MonoBehaviour {
 [SerializeField] Transform playerTransform;
 [SerializeField] bool showDebug = false;
 
-bool pendingClick;
+bool pendingLeftClick;
+bool pendingRightClick;
 
 void Awake() {
 if (playerTransform == null) playerTransform = transform;
@@ -11298,13 +11324,58 @@ FindSingletons();
 
 void Update() {
 if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat) return;
-if (Input.GetMouseButtonDown(0)) pendingClick = true;
+if (Input.GetMouseButtonDown(0)) pendingLeftClick = true;
+if (Input.GetMouseButtonDown(1)) pendingRightClick = true;
 }
 
 void LateUpdate() {
-if (!pendingClick) return;
-pendingClick = false;
+if (pendingLeftClick) {
+pendingLeftClick = false;
 HandleLeftClick();
+}
+if (pendingRightClick) {
+pendingRightClick = false;
+HandleRightClick();
+}
+}
+
+void HandleRightClick() {
+if (!EnsureManagers()) return;
+
+InventoryBarItem selected = inventoryBar.SelectedItem;
+if (selected == null || !selected.IsValid() || selected.Type != InventoryBarItem.ItemType.Node) {
+if (showDebug) Debug.Log("[PlayerTileInteractor] Right-clicked, but no valid consumable node is selected.");
+return;
+}
+
+var itemData = new HarvestedItem(selected.NodeData);
+if (!itemData.IsConsumable()) {
+if (showDebug) Debug.Log($"[PlayerTileInteractor] Item '{selected.GetDisplayName()}' is not consumable.");
+return;
+}
+
+GardenerController player = playerTransform.GetComponent<GardenerController>();
+if (player == null || player.HungerSystem == null) {
+Debug.LogError("[PlayerTileInteractor] Cannot consume item: Player or their HungerSystem not found!");
+return;
+}
+
+if (showDebug) Debug.Log($"[PlayerTileInteractor] Consuming item '{selected.GetDisplayName()}'.");
+
+player.HungerSystem.Eat(itemData.GetNutritionValue());
+
+System.Action onSuccess = () => {
+if (showDebug) Debug.Log($"[PlayerTileInteractor] Consumption successful. Removing '{selected.GetDisplayName()}' from inventory.");
+RemoveSeedFromInventory(selected);
+inventoryBar.ShowBar();
+};
+
+PlayerActionManager.Instance.ExecutePlayerAction(
+PlayerActionType.Interact,
+tileInteractionManager.WorldToCell(playerTransform.position),
+"Eating",
+onSuccess
+);
 }
 
 void HandleLeftClick() {
@@ -11345,7 +11416,7 @@ if (showDebug) Debug.Log($"[PlayerTileInteractor] Planting seed '{selected.GetDi
 System.Action onSuccess = () => {
 if (showDebug) Debug.Log($"[PlayerTileInteractor] Planting was successful. Removing seed '{selected.GetDisplayName()}' from inventory via callback.");
 RemoveSeedFromInventory(selected);
-inventoryBar.ShowBar(); // Refresh the bar after item is removed
+inventoryBar.ShowBar();
 };
 
 PlayerActionManager.Instance.ExecutePlayerAction(
@@ -11396,7 +11467,8 @@ if (tileInteractionManager == null) tileInteractionManager = TileInteractionMana
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\GardenerController.cs
 
-﻿using System;
+﻿// Assets/Scripts/WorldInteraction/Player/GardenerController.cs
+
 using WegoSystem;
 
 pub cls GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdateable {
@@ -11411,17 +11483,10 @@ pub cls GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdateable {
 [SerializeField] bool flipSpriteWhenMovingLeft = true;
 [SerializeField] bool flipHorizontalDirection = true;
 
-[SerializeField] int pouchCapacity = 10;
-
 GridEntity gridEntity;
 StatusEffectManager statusManager;
 StatusEffectUIManager statusEffectUI;
 PlayerHungerSystem hungerSystem;
-
-ro List<HarvestedItem> _harvestedItems = new List<HarvestedItem>();
-pub event Action<int, int> OnPouchContentChanged; // current count, capacity
-pub bool IsPouchFull => _harvestedItems.Count >= pouchCapacity;
-pub int PouchItemCount => _harvestedItems.Count;
 
 GridPosition currentTargetPosition;
 bool isProcessingMovement = false;
@@ -11508,40 +11573,6 @@ if (moveDir != GridPosition.Zero) {
 TryMove(moveDir);
 return;
 }
-
-}
-
-pub int AddToPouch(List<NodeData> harvestedItemData) {
-int countAdded = 0;
-foreach (var data in harvestedItemData) {
-if (IsPouchFull) break;
-_harvestedItems.Add(new HarvestedItem(data));
-countAdded++;
-}
-
-if (countAdded > 0) {
-Debug.Log($"Added {countAdded} items to pouch. Total: {PouchItemCount}/{pouchCapacity}");
-OnPouchContentChanged?.Invoke(PouchItemCount, pouchCapacity);
-}
-ret countAdded;
-}
-
-void ConsumeFromPouch() {
-if (_harvestedItems.Count == 0) {
-Debug.Log("Pouch is empty, nothing to consume.");
-return;
-}
-
-HarvestedItem itemToConsume = _harvestedItems[0];
-_harvestedItems.RemoveAt(0);
-
-float nutrition = itemToConsume.GetNutritionValue();
-if (nutrition > 0 && hungerSystem != null) {
-hungerSystem.Eat(nutrition);
-PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Interact, gridEntity.Position.ToVector3Int(), "Eating");
-}
-
-OnPouchContentChanged?.Invoke(PouchItemCount, pouchCapacity);
 }
 
 void TryMove(GridPosition direction) {
@@ -11614,7 +11645,9 @@ pub cls HarvestableTag : MonoBehaviour {
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\HarvestedItem.cs
 
-﻿using System.Linq;
+﻿// Assets/Scripts/WorldInteraction/Player/HarvestedItem.cs
+
+using WegoSystem;
 
 pub cls HarvestedItem {
 pub NodeData HarvestedNodeData { get; set; }
@@ -11629,6 +11662,10 @@ if (HarvestedNodeData?.effects == null) ret 0f;
 ret HarvestedNodeData.effects
 .Where(e => e.effectType == NodeEffectType.Nutritious)
 .Sum(e => e.primaryValue);
+}
+
+pub bool IsConsumable() {
+ret GetNutritionValue() > 0;
 }
 }
 

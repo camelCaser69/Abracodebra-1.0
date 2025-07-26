@@ -1,9 +1,11 @@
-﻿using System.Linq;
-using System.Collections.Generic;
+﻿// Assets/Scripts/WorldInteraction/Player/HarvestedItem.cs
+
+using System.Linq;
+using WegoSystem;
 
 public class HarvestedItem
 {
-    public NodeData HarvestedNodeData { get; private set; }
+    public NodeData HarvestedNodeData { get; set; }
 
     public HarvestedItem(NodeData data)
     {
@@ -14,9 +16,13 @@ public class HarvestedItem
     {
         if (HarvestedNodeData?.effects == null) return 0f;
 
-        // Sum up all nutritious effects on the item
         return HarvestedNodeData.effects
             .Where(e => e.effectType == NodeEffectType.Nutritious)
             .Sum(e => e.primaryValue);
+    }
+
+    public bool IsConsumable()
+    {
+        return GetNutritionValue() > 0;
     }
 }

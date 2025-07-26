@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Assets/Scripts/WorldInteraction/Player/GardenerController.cs
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,23 +20,15 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private bool flipSpriteWhenMovingLeft = true;
     [SerializeField] private bool flipHorizontalDirection = true;
+    
+    // The pouch capacity and item list are no longer needed here.
+    // Inventory is managed by InventoryGridController.
 
-    [Header("Pouch Settings")]
-    [SerializeField] private int pouchCapacity = 10;
-
-    // Core Systems
     private GridEntity gridEntity;
     private StatusEffectManager statusManager;
     private StatusEffectUIManager statusEffectUI;
     private PlayerHungerSystem hungerSystem;
 
-    // Pouch Inventory
-    private readonly List<HarvestedItem> _harvestedItems = new List<HarvestedItem>();
-    public event Action<int, int> OnPouchContentChanged; // current count, capacity
-    public bool IsPouchFull => _harvestedItems.Count >= pouchCapacity;
-    public int PouchItemCount => _harvestedItems.Count;
-
-    // State
     private GridPosition currentTargetPosition;
     private bool isProcessingMovement = false;
 
@@ -42,7 +36,7 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
     public StatusEffectManager StatusManager => statusManager;
     public PlayerHungerSystem HungerSystem => hungerSystem;
 
-    void Awake()
+    private void Awake()
     {
         gridEntity = GetComponent<GridEntity>();
         if (gridEntity == null) gridEntity = gameObject.AddComponent<GridEntity>();
@@ -58,7 +52,7 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         if (animator == null && useAnimations) Debug.LogWarning("[GardenerController] Animator not found.", gameObject);
     }
 
-    void Start()
+    private void Start()
     {
         statusManager.Initialize(this);
         if (statusEffectUI != null)
@@ -75,7 +69,7 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         }
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         if (TickManager.Instance != null)
         {
@@ -92,7 +86,7 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         statusManager?.OnTickUpdate(currentTick);
     }
 
-    void Update()
+    private void Update()
     {
         if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)
         {
@@ -106,12 +100,11 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         UpdateSpriteDirection();
     }
 
-    void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos)
+    private void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos)
     {
         EnvironmentalStatusEffectSystem.Instance?.CheckAndApplyTileEffects(this);
     }
 
-    #region IStatusEffectable Implementation
     public string GetDisplayName() { return "Gardener"; }
     public void TakeDamage(float amount) { Debug.Log($"Gardener took {amount} damage!"); }
     public void Heal(float amount) { Debug.Log($"Gardener was healed for {amount}!"); }
@@ -119,11 +112,9 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
     {
         if (hungerSystem != null)
         {
-            // A negative amount would add hunger (heal), positive would remove it.
             hungerSystem.Eat(-amount);
         }
     }
-    #endregion
 
     private void HandlePlayerInput()
     {
@@ -140,50 +131,8 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
             TryMove(moveDir);
             return;
         }
-
-        // Removed the right-click to consume logic as requested.
-        // The pouch can be used by other systems if needed, but is no longer tied to this input.
     }
-
-    public int AddToPouch(List<NodeData> harvestedItemData)
-    {
-        int countAdded = 0;
-        foreach (var data in harvestedItemData)
-        {
-            if (IsPouchFull) break;
-            _harvestedItems.Add(new HarvestedItem(data));
-            countAdded++;
-        }
-
-        if (countAdded > 0)
-        {
-            Debug.Log($"Added {countAdded} items to pouch. Total: {PouchItemCount}/{pouchCapacity}");
-            OnPouchContentChanged?.Invoke(PouchItemCount, pouchCapacity);
-        }
-        return countAdded;
-    }
-
-    private void ConsumeFromPouch()
-    {
-        if (_harvestedItems.Count == 0)
-        {
-            Debug.Log("Pouch is empty, nothing to consume.");
-            return;
-        }
-
-        HarvestedItem itemToConsume = _harvestedItems[0];
-        _harvestedItems.RemoveAt(0);
-
-        float nutrition = itemToConsume.GetNutritionValue();
-        if (nutrition > 0 && hungerSystem != null)
-        {
-            hungerSystem.Eat(nutrition);
-            PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Interact, gridEntity.Position.ToVector3Int(), "Eating");
-        }
-
-        OnPouchContentChanged?.Invoke(PouchItemCount, pouchCapacity);
-    }
-
+    
     private void TryMove(GridPosition direction)
     {
         if (gridEntity == null) return;

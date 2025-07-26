@@ -186,6 +186,7 @@ GameObject:
   - component: {fileID: 2337176063074046415}
   - component: {fileID: 1954282247598751719}
   - component: {fileID: 2900701976880247653}
+  - component: {fileID: 4094730311420470352}
   m_Layer: 0
   m_Name: GardenerPrefab
   m_TagString: Untagged
@@ -231,6 +232,7 @@ MonoBehaviour:
   spriteRenderer: {fileID: 0}
   flipSpriteWhenMovingLeft: 1
   flipHorizontalDirection: 1
+  pouchCapacity: 10
 --- !u!114 &1316135351782374134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -485,6 +487,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectIconContainer: {fileID: 7195026228079028697}
   effectIconPrefab: {fileID: 6027093001628851131, guid: 333d2abbda8c2c54da48bd0147f9fe14, type: 3}
+--- !u!114 &4094730311420470352
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3865789443703534087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b290fc09cd87490980a6671b6bda80bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHunger: 100
+  startingHunger: 100
+  hungerDepletionPerTick: 1
 --- !u!1 &4330577973963285420
 GameObject:
   m_ObjectHideFlags: 0
