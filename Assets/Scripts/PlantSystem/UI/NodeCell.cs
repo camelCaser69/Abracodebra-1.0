@@ -95,29 +95,19 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             }
 
             if (_backgroundImage != null) _backgroundImage.raycastTarget = false; // Disable background raycast
+            UpdateCellBackgroundColor(); // Update color when an item is assigned
         }
     }
 
     public void AssignNode(NodeDefinition def)
     {
         if (def == null || IsInventoryCell || IsSeedSlot || _sequenceController == null) return;
-        // Prevent assigning seeds to the sequence editor
         if (def.effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn)) return;
 
         RemoveNode();
-
-        Debug.Log($"[NodeCell] AssignNode '{def.displayName}' - Definition has {def.effects?.Count ?? 0} effects:");
-        if (def.effects != null)
-        {
-            foreach (var effect in def.effects)
-            {
-                Debug.Log($"  - {effect.effectType} (passive: {effect.IsPassive}, primary: {effect.primaryValue}, secondary: {effect.secondaryValue})");
-            }
-        }
-
+        
         var clonedEffects = def.CloneEffects();
-        Debug.Log($"[NodeCell] Cloned {clonedEffects?.Count ?? 0} effects");
-
+        
         _nodeData = new NodeData
         {
             nodeId = System.Guid.NewGuid().ToString(),
@@ -128,9 +118,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             canBeDeleted = true
         };
 
-        _nodeData.ClearStoredSequence(); // Ensure no sequence is carried over
-
-        Debug.Log($"[NodeCell] Created NodeData with {_nodeData.effects?.Count ?? 0} effects");
+        _nodeData.ClearStoredSequence();
 
         _nodeDefinition = def;
         _toolDefinition = null;
@@ -164,7 +152,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         {
             _backgroundImage.raycastTarget = false;
         }
-
+        
         UpdateCellBackgroundColor();
     }
 
@@ -180,7 +168,21 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         _toolDefinition = null;
         _displayObject = null;
 
-        if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
+        if (_backgroundImage != null)
+        {
+            _backgroundImage.raycastTarget = true;
+
+            Color emptyColor = Color.gray;
+            if (IsInventoryCell && _inventoryController != null)
+            {
+                emptyColor = _inventoryController.EmptyCellColor;
+            }
+            else if (!IsInventoryCell && _sequenceController != null)
+            {
+                emptyColor = _sequenceController.EmptyCellColor;
+            }
+            _backgroundImage.color = emptyColor;
+        }
     }
 
     public void ClearNodeReference()
@@ -189,7 +191,24 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         _nodeData = null;
         _nodeDefinition = null;
         _toolDefinition = null;
-        if (_backgroundImage != null) _backgroundImage.raycastTarget = true;
+
+        if (_backgroundImage != null)
+        {
+            _backgroundImage.raycastTarget = true;
+
+            // --- FIX IS HERE ---
+            // This method must also reset the background color, just like RemoveNode().
+            Color emptyColor = Color.gray; // A safe default
+            if (IsInventoryCell && _inventoryController != null)
+            {
+                emptyColor = _inventoryController.EmptyCellColor;
+            }
+            else if (!IsInventoryCell && _sequenceController != null) // Includes sequence cells and the seed slot
+            {
+                emptyColor = _sequenceController.EmptyCellColor;
+            }
+            _backgroundImage.color = emptyColor;
+        }
     }
 
     public static void SelectCell(NodeCell cellToSelect)
