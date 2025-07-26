@@ -36,11 +36,12 @@ public class NodeData : ISerializationCallbackReceiver
     /// <summary>
     /// Checks if this node has the potential to be a seed (has passive SeedSpawn effect)
     /// </summary>
-    public bool HasSeedEffect() {
-        return effects != null && 
-               effects.Any(e => e != null && 
-                          e.effectType == NodeEffectType.SeedSpawn && 
-                          e.isPassive);
+    public bool HasSeedEffect()
+    {
+        return effects != null &&
+               effects.Any(e => e != null &&
+                                e.effectType == NodeEffectType.SeedSpawn &&
+                                e.IsPassive); // FIX: Changed from isPassive to IsPassive
     }
     
     /// <summary>

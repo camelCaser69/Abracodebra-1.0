@@ -1,24 +1,28 @@
-﻿using UnityEngine;
+﻿// Assets/Scripts/PlantSystem/UI/NodeCell.cs
+using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
 using UnityEngine.EventSystems;
+using System.Linq;
 
 public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 {
-    public static NodeCell CurrentlySelectedCell { get; private set; }
+    public static NodeCell CurrentlySelectedCell { get; set; }
 
-    public int CellIndex { get; private set; }
-    public bool IsInventoryCell { get; private set; }
-    public bool IsSeedSlot { get; private set; }
+    public int CellIndex { get; set; }
+    public bool IsInventoryCell { get; set; }
+    public bool IsSeedSlot { get; set; }
 
+    // References to controllers
     private NodeEditorGridController _sequenceController;
     private InventoryGridController _inventoryController;
 
+    // Item data
     private ItemView _itemView;
     private NodeData _nodeData;
     private NodeDefinition _nodeDefinition;
     private ToolDefinition _toolDefinition;
 
+    // Visuals
     private Image _backgroundImage;
     private GameObject _displayObject; // For inventory bar display-only items
 
@@ -43,7 +47,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
     public void Init(int index, InventoryGridController inventoryController, Image bgImage) => Init(index, null, inventoryController, bgImage);
     public void InitAsSeedSlot(NodeEditorGridController sequenceController, Image bgImage)
     {
-        CellIndex = -1;
+        CellIndex = -1; // Special index for the seed slot
         _sequenceController = sequenceController;
         _inventoryController = null;
         _backgroundImage = bgImage;
@@ -54,7 +58,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
             _backgroundImage.color = _sequenceController != null ? _sequenceController.EmptyCellColor : Color.magenta;
         }
     }
-    
+
     public void UpdateCellBackgroundColor()
     {
         if (_backgroundImage != null && HasItem() && InventoryColorManager.Instance != null)
@@ -72,30 +76,32 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
 
     public void AssignItemView(ItemView view, NodeData data, ToolDefinition toolDef)
     {
-        RemoveNode();
+        RemoveNode(); // Clear existing content
 
         _itemView = view;
         _nodeData = data;
         _toolDefinition = toolDef;
-        _nodeDefinition = view?.GetNodeDefinition();
+        _nodeDefinition = view?.GetNodeDefinition(); // Get definition from view if it's a node
 
         if (_itemView != null)
         {
             _itemView.transform.SetParent(transform, false);
             _itemView.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 
+            // If this is a sequence cell, update the node's order index
             if (_nodeData != null && !IsInventoryCell && !IsSeedSlot && _sequenceController != null)
             {
                 _nodeData.orderIndex = this.CellIndex;
             }
 
-            if (_backgroundImage != null) _backgroundImage.raycastTarget = false;
+            if (_backgroundImage != null) _backgroundImage.raycastTarget = false; // Disable background raycast
         }
     }
 
     public void AssignNode(NodeDefinition def)
     {
         if (def == null || IsInventoryCell || IsSeedSlot || _sequenceController == null) return;
+        // Prevent assigning seeds to the sequence editor
         if (def.effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn)) return;
 
         RemoveNode();
@@ -105,7 +111,7 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         {
             foreach (var effect in def.effects)
             {
-                Debug.Log($"  - {effect.effectType} (passive: {effect.isPassive}, primary: {effect.primaryValue}, secondary: {effect.secondaryValue})");
+                Debug.Log($"  - {effect.effectType} (passive: {effect.IsPassive}, primary: {effect.primaryValue}, secondary: {effect.secondaryValue})");
             }
         }
 
@@ -115,14 +121,14 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         _nodeData = new NodeData
         {
             nodeId = System.Guid.NewGuid().ToString(),
-            definitionName = def.name, // THE FIX
+            definitionName = def.name,
             nodeDisplayName = def.displayName,
             effects = clonedEffects,
             orderIndex = this.CellIndex,
             canBeDeleted = true
         };
 
-        _nodeData.ClearStoredSequence();
+        _nodeData.ClearStoredSequence(); // Ensure no sequence is carried over
 
         Debug.Log($"[NodeCell] Created NodeData with {_nodeData.effects?.Count ?? 0} effects");
 
@@ -162,13 +168,12 @@ public class NodeCell : MonoBehaviour, IPointerClickHandler, IDropHandler
         UpdateCellBackgroundColor();
     }
 
-
     public void RemoveNode()
     {
         if (CurrentlySelectedCell == this) NodeCell.ClearSelection();
         if (_itemView != null) Destroy(_itemView.gameObject);
         if (_displayObject != null) Destroy(_displayObject);
-        
+
         _itemView = null;
         _nodeData = null;
         _nodeDefinition = null;

@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿// Assets/Scripts/PlantSystem/UI/NodeEditorGridController.cs
+using UnityEngine;
+using UnityEngine.UI; // --- FIX: Added this using statement ---
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,27 +9,26 @@ using TMPro;
 
 public class NodeEditorGridController : MonoBehaviour
 {
-    public static NodeEditorGridController Instance { get; private set; }
+    public static NodeEditorGridController Instance { get; set; }
 
-    [Header("Grid & Cell Layout")]
-    [SerializeField][Min(1)] private int emptyCellsCount = 8;
-    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
-    [SerializeField] private float cellMargin = 10f;
+    [Header("Grid Layout")]
+    [SerializeField][Min(1)] int emptyCellsCount = 8;
+    [SerializeField] Vector2 cellSize = new Vector2(64f, 64f);
+    [SerializeField] float cellMargin = 10f;
 
-    [Header("Visuals & Prefabs")]
-    [SerializeField] private Sprite emptyCellSprite;
-    [SerializeField] private Color emptyCellColor = Color.white;
-    [SerializeField] private Vector3 emptyCellScale = Vector3.one;
-    [Tooltip("The single, unified prefab with an ItemView component, used for all nodes in the editor.")]
-    [SerializeField] private GameObject inventoryItemPrefab;
-    [SerializeField] private Color selectedNodeBackgroundColor = new Color(0.9f, 0.9f, 0.7f, 1f);
+    [Header("Visuals")]
+    [SerializeField] Sprite emptyCellSprite;
+    [SerializeField] Color emptyCellColor = Color.white;
+    [SerializeField] Vector3 emptyCellScale = Vector3.one;
+    [SerializeField] GameObject inventoryItemPrefab;
+    [SerializeField] Color selectedNodeBackgroundColor = new Color(0.9f, 0.9f, 0.7f, 1f);
 
-    [Header("Dependencies")]
-    [SerializeField] private NodeDefinitionLibrary definitionLibrary;
-    [SerializeField] private TMP_Dropdown nodeDropdown;
+    [Header("References")]
+    [SerializeField] NodeDefinitionLibrary definitionLibrary;
+    [SerializeField] TMP_Dropdown nodeDropdown;
     [SerializeField] public GameObject gridUIParent;
-    [SerializeField] private Transform cellContainer;
-    [SerializeField] private Transform seedSlotContainer;
+    [SerializeField] Transform cellContainer;
+    [SerializeField] Transform seedSlotContainer;
 
     private readonly List<NodeCell> nodeCells = new List<NodeCell>();
     private NodeCell _actualSeedSlotCell;
@@ -64,52 +64,52 @@ public class NodeEditorGridController : MonoBehaviour
         if (cellContainer != null && definitionLibrary != null)
         {
             CreateSequenceCells();
-            HideNodeEditorPanel();
+            HideNodeEditorPanel(); // Start hidden
         }
     }
 
-    // --- ADDED METHOD: Restored from original functionality ---
-    // In NodeEditorGridController.cs, replace GetCurrentGraphInEditorForSpawning with this debug version:
-
-    public NodeGraph GetCurrentGraphInEditorForSpawning() {
+    public NodeGraph GetCurrentGraphInEditorForSpawning()
+    {
         NodeGraph clone = new NodeGraph { nodes = new List<NodeData>() };
-    
+
         Debug.Log($"[NodeEditor] GetCurrentGraphInEditorForSpawning - Editor has {_currentlyEditedSequence?.nodes?.Count ?? 0} nodes");
-    
-        if (_currentlyEditedSequence?.nodes != null) {
-            foreach (var nodeData in _currentlyEditedSequence.nodes) {
+
+        if (_currentlyEditedSequence?.nodes != null)
+        {
+            foreach (var nodeData in _currentlyEditedSequence.nodes)
+            {
                 if (nodeData == null) continue;
-            
-                // Debug log the original node
+
                 Debug.Log($"[NodeEditor] Processing node '{nodeData.nodeDisplayName}' with {nodeData.effects?.Count ?? 0} effects:");
-                if (nodeData.effects != null) {
-                    foreach (var effect in nodeData.effects) {
-                        Debug.Log($"  - {effect.effectType} (passive: {effect.isPassive}, primary: {effect.primaryValue})");
+                if (nodeData.effects != null)
+                {
+                    foreach (var effect in nodeData.effects)
+                    {
+                        Debug.Log($"  - {effect.effectType} (passive: {effect.IsPassive}, primary: {effect.primaryValue})");
                     }
                 }
-            
-                // Create a clean clone without any stored sequences
-                NodeData clonedNode = new NodeData {
-                    nodeId = nodeData.nodeId,
+
+                // Create a clean, deep clone for spawning
+                NodeData clonedNode = new NodeData
+                {
+                    nodeId = nodeData.nodeId, // Keep original ID for potential reference if needed
                     nodeDisplayName = nodeData.nodeDisplayName,
                     effects = NodeExecutor.CloneEffectsList(nodeData.effects),
                     orderIndex = nodeData.orderIndex,
                     canBeDeleted = nodeData.canBeDeleted,
-                    // storedSequence is intentionally null - nodes in editor don't have sequences
                 };
-            
-                // Debug log the cloned node
+
                 Debug.Log($"[NodeEditor] Cloned node has {clonedNode.effects?.Count ?? 0} effects");
-            
+
                 clone.nodes.Add(clonedNode);
             }
         }
-    
+
         Debug.Log($"[NodeEditor] Returning graph with {clone.nodes.Count} nodes");
         return clone;
     }
 
-    private void CreateSeedSlot()
+    void CreateSeedSlot()
     {
         foreach (Transform child in seedSlotContainer) Destroy(child.gameObject);
 
@@ -124,12 +124,12 @@ public class NodeEditorGridController : MonoBehaviour
         _actualSeedSlotCell = cellLogic;
     }
 
-    private void CreateSequenceCells()
+    void CreateSequenceCells()
     {
         foreach (Transform child in cellContainer) Destroy(child.gameObject);
         nodeCells.Clear();
         NodeCell.ClearSelection();
-        
+
         GridLayoutGroup gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
         gridLayout.cellSize = cellSize;
         gridLayout.spacing = new Vector2(cellMargin, cellMargin);
@@ -168,39 +168,39 @@ public class NodeEditorGridController : MonoBehaviour
             }
         }
     }
-    
-    public void LoadSequenceFromSeed(NodeData seedData) {
-        if (_actualSeedSlotCell == null || seedData == null || !seedData.IsSeed()) {
+
+    public void LoadSequenceFromSeed(NodeData seedData)
+    {
+        if (_actualSeedSlotCell == null || seedData == null || !seedData.IsSeed())
+        {
             HideNodeEditorPanel();
             _currentlyEditedSequence.nodes.Clear();
             return;
         }
-        
-        // Ensure seed has initialized sequence
+
         seedData.EnsureSeedSequenceInitialized();
-        
-        // Clear current editor
+
         ClearSequenceEditorCells();
         _currentlyEditedSequence.nodes.Clear();
-        
-        // Load nodes from seed's stored sequence
-        if (seedData.storedSequence?.nodes != null) {
-            foreach (NodeData storedNode in seedData.storedSequence.nodes.OrderBy(n => n.orderIndex)) {
+
+        if (seedData.storedSequence?.nodes != null)
+        {
+            foreach (NodeData storedNode in seedData.storedSequence.nodes.OrderBy(n => n.orderIndex))
+            {
                 if (storedNode == null || storedNode.orderIndex >= nodeCells.Count) continue;
-                
-                // Find the matching definition
+
                 NodeCell targetCell = nodeCells[storedNode.orderIndex];
                 NodeDefinition definition = definitionLibrary.definitions
-                    .FirstOrDefault(d => d.displayName == storedNode.nodeDisplayName);
-                
-                if (definition != null) {
-                    // AssignNode creates a new view and node instance
+                    .FirstOrDefault(d => d.name == storedNode.definitionName); // Use asset name for robust lookup
+
+                if (definition != null)
+                {
                     targetCell.AssignNode(definition);
                     _currentlyEditedSequence.nodes.Add(targetCell.GetNodeData());
                 }
             }
         }
-        
+
         ShowNodeEditorPanel();
     }
 
@@ -214,17 +214,17 @@ public class NodeEditorGridController : MonoBehaviour
     public void OnEmptyCellRightClicked(NodeCell cell, PointerEventData eventData)
     {
         if (cell.IsInventoryCell || cell == _actualSeedSlotCell || nodeDropdown == null) return;
-        StopCoroutine(nameof(ShowDropdownCoroutine));
+        StopCoroutine(nameof(ShowDropdownCoroutine)); // Prevent multiple dropdowns
         StartCoroutine(ShowDropdownCoroutine(cell, eventData));
     }
 
-    private IEnumerator ShowDropdownCoroutine(NodeCell cell, PointerEventData eventData)
+    IEnumerator ShowDropdownCoroutine(NodeCell cell, PointerEventData eventData)
     {
         var sortedDefinitions = definitionLibrary.definitions
             .Where(def => def != null && !def.effects.Any(e => e.effectType == NodeEffectType.SeedSpawn))
             .OrderBy(def => def.displayName)
             .ToList();
-            
+
         List<TMP_Dropdown.OptionData> options = new List<TMP_Dropdown.OptionData> { new TMP_Dropdown.OptionData("Select Node...") };
         options.AddRange(sortedDefinitions.Select(def => new TMP_Dropdown.OptionData { text = def.displayName, image = def.thumbnail }));
 
@@ -236,13 +236,13 @@ public class NodeEditorGridController : MonoBehaviour
         RectTransformUtility.ScreenPointToLocalPointInRectangle(nodeDropdown.transform.parent as RectTransform, eventData.position, _rootCanvas.worldCamera, out Vector2 localPos);
         (nodeDropdown.transform as RectTransform).localPosition = localPos;
         nodeDropdown.gameObject.SetActive(true);
-        yield return null;
+        yield return null; // Wait one frame for UI to update
         nodeDropdown.Show();
-        nodeDropdown.value = 0;
+        nodeDropdown.value = 0; // Reset to placeholder
         nodeDropdown.RefreshShownValue();
     }
 
-    private void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefinitions)
+    void OnDropdownValueChanged(int selectedIndex, NodeCell targetCell, List<NodeDefinition> sortedDefinitions)
     {
         HideDropdown();
         if (selectedIndex > 0 && (selectedIndex - 1) < sortedDefinitions.Count)
@@ -254,7 +254,7 @@ public class NodeEditorGridController : MonoBehaviour
         }
     }
 
-     public void RefreshGraphAndUpdateSeed()
+    public void RefreshGraphAndUpdateSeed()
     {
         if (_actualSeedSlotCell == null) return;
 
@@ -274,12 +274,12 @@ public class NodeEditorGridController : MonoBehaviour
                 {
                     foreach (var effect in dataFromCell.effects)
                     {
-                        Debug.Log($"  - {effect.effectType} (passive: {effect.isPassive})");
+                        Debug.Log($"  - {effect.effectType} (passive: {effect.IsPassive})");
                     }
                 }
 
                 dataFromCell.orderIndex = cell.CellIndex;
-                dataFromCell.ClearStoredSequence();
+                dataFromCell.ClearStoredSequence(); // Ensure it's not treated as a nested seed
                 _currentlyEditedSequence.nodes.Add(dataFromCell);
             }
         }
@@ -294,16 +294,19 @@ public class NodeEditorGridController : MonoBehaviour
 
             currentSeedInSlot.EnsureSeedSequenceInitialized();
 
+            // Clear old sequence before adding the new one
             currentSeedInSlot.storedSequence.nodes.Clear();
 
+            // Create deep clones of the editor nodes for storage in the seed
             foreach (NodeData editorNode in _currentlyEditedSequence.nodes)
             {
                 if (editorNode == null) continue;
 
+                // Create a clean copy for storage
                 NodeData nodeForStorage = new NodeData
                 {
-                    nodeId = editorNode.nodeId,
-                    definitionName = editorNode.definitionName, // THE FIX IS HERE
+                    nodeId = editorNode.nodeId, // Keep ID for potential tracking, though maybe should be new
+                    definitionName = editorNode.definitionName,
                     nodeDisplayName = editorNode.nodeDisplayName,
                     effects = NodeExecutor.CloneEffectsList(editorNode.effects),
                     orderIndex = editorNode.orderIndex,
@@ -312,7 +315,7 @@ public class NodeEditorGridController : MonoBehaviour
 
                 Debug.Log($"[NodeEditor] Storing node '{nodeForStorage.nodeDisplayName}' with def name '{nodeForStorage.definitionName}' in seed");
 
-                nodeForStorage.SetPartOfSequence(true);
+                nodeForStorage.SetPartOfSequence(true); // Mark this node as being inside a sequence
 
                 currentSeedInSlot.storedSequence.nodes.Add(nodeForStorage);
             }
@@ -336,30 +339,33 @@ public class NodeEditorGridController : MonoBehaviour
             draggedDraggable.ResetPosition(); return;
         }
 
+        // If there's already a seed in the slot, return it to inventory
         ItemView existingSeedViewInSlot = _actualSeedSlotCell.GetItemView();
         if (existingSeedViewInSlot != null)
         {
-            RefreshGraphAndUpdateSeed();
+            RefreshGraphAndUpdateSeed(); // Save the sequence from the old seed first
             NodeData existingSeedInSlotData = _actualSeedSlotCell.GetNodeData();
-            _actualSeedSlotCell.ClearNodeReference();
+            _actualSeedSlotCell.ClearNodeReference(); // Unlink from slot
             InventoryGridController.Instance.ReturnGeneToInventory(existingSeedViewInSlot, existingSeedInSlotData);
         }
 
+        // Remove the dragged seed from its original location
         if (originalCell.IsInventoryCell)
         {
             InventoryGridController.Instance.RemoveGeneFromInventory(originalCell);
         }
-        else
+        else // This case shouldn't happen for seeds, but handle it
         {
             originalCell.RemoveNode();
         }
 
+        // Place the new seed in the slot
         draggedData.EnsureSeedSequenceInitialized();
         _actualSeedSlotCell.AssignItemView(draggedView, draggedData, null);
         draggedDraggable.SnapToCell(_actualSeedSlotCell);
         LoadSequenceFromSeed(draggedData);
     }
-    
+
     public void HandleDropOnSequenceCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetSequenceCell)
     {
         if (draggedDraggable == null || originalCell == null || targetSequenceCell == null || targetSequenceCell.IsInventoryCell || targetSequenceCell.IsSeedSlot)
@@ -373,6 +379,7 @@ public class NodeEditorGridController : MonoBehaviour
         NodeDefinition draggedNodeDef = draggedView.GetNodeDefinition();
         NodeData draggedData = draggedView.GetNodeData();
 
+        // Prevent dropping seeds into the sequence
         if (draggedNodeDef != null && draggedNodeDef.effects.Any(e => e.effectType == NodeEffectType.SeedSpawn))
         {
             draggedDraggable.ResetPosition(); return;
@@ -380,19 +387,24 @@ public class NodeEditorGridController : MonoBehaviour
 
         if (originalCell.IsInventoryCell)
         {
+            // Dropping a gene from inventory into the sequence
             InventoryGridController.Instance?.RemoveGeneFromInventory(originalCell);
+
+            // If target cell has an item, return it to inventory
             ItemView existingViewInTargetSeq = targetSequenceCell.GetItemView();
             if (existingViewInTargetSeq != null)
             {
                 InventoryGridController.Instance.ReturnGeneToInventory(existingViewInTargetSeq, targetSequenceCell.GetNodeData());
                 targetSequenceCell.ClearNodeReference();
             }
+
             targetSequenceCell.AssignNode(draggedNodeDef);
             NodeCell.SelectCell(targetSequenceCell);
-            Destroy(draggedDraggable.gameObject);
+            Destroy(draggedDraggable.gameObject); // Destroy the original inventory item
         }
         else if (!originalCell.IsSeedSlot)
         {
+            // Swapping two genes within the sequence editor
             ItemView existingViewInTarget = targetSequenceCell.GetItemView();
             NodeData existingDataInTarget = targetSequenceCell.GetNodeData();
 
@@ -407,7 +419,7 @@ public class NodeEditorGridController : MonoBehaviour
             draggedDraggable.SnapToCell(targetSequenceCell);
             NodeCell.SelectCell(targetSequenceCell);
         }
-        else
+        else // Dragging from the seed slot (not allowed into sequence)
         {
             draggedDraggable.ResetPosition();
         }
@@ -415,9 +427,9 @@ public class NodeEditorGridController : MonoBehaviour
         RefreshGraphAndUpdateSeed();
     }
 
-    private void HideNodeEditorPanel() { if (gridUIParent != null) gridUIParent.SetActive(false); }
-    private void ShowNodeEditorPanel() { if (gridUIParent != null) gridUIParent.SetActive(true); }
-    private void ClearSequenceEditorCells() { foreach (NodeCell cell in nodeCells) { cell.RemoveNode(); } }
+    void HideNodeEditorPanel() { if (gridUIParent != null) gridUIParent.SetActive(false); }
+    void ShowNodeEditorPanel() { if (gridUIParent != null) gridUIParent.SetActive(true); }
+    void ClearSequenceEditorCells() { foreach (NodeCell cell in nodeCells) { cell.RemoveNode(); } }
     public void HideDropdown() { if (nodeDropdown != null && nodeDropdown.gameObject.activeSelf) { nodeDropdown.Hide(); nodeDropdown.gameObject.SetActive(false); } }
     public NodeCell GetCellAtIndex(int index) => (index >= 0 && index < nodeCells.Count) ? nodeCells[index] : null;
 }

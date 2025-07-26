@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Assets/Scripts/PlantSystem/Data/NodeEffectData.cs
+using System;
 using UnityEngine;
 using WegoSystem;
 
@@ -6,13 +7,16 @@ using WegoSystem;
 public class NodeEffectData
 {
     public NodeEffectType effectType;
-    public bool isPassive = false;
     public bool consumedOnTrigger = false;
     public float primaryValue = 0f;
     public float secondaryValue = 0f;
     public SeedSpawnData seedData;
-    
-    // REMOVED: nodeDefinitionReference - no longer needed!
+
+    // NEW: Property to check if effect is passive
+    public bool IsPassive => NodeEffectTypeHelper.IsPassiveEffect(effectType);
+
+    // NEW: Property to check if effect is active
+    public bool IsActive => NodeEffectTypeHelper.IsActiveEffect(effectType);
 
     public int GetPrimaryValueAsInt() => Mathf.RoundToInt(primaryValue);
     public int GetSecondaryValueAsInt() => Mathf.RoundToInt(secondaryValue);

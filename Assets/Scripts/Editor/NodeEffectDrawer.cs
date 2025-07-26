@@ -1,43 +1,15 @@
-﻿using UnityEngine;
+﻿// Assets/Scripts/Editor/NodeEffectDrawer.cs
+using UnityEngine;
 using UnityEditor;
 
 [CustomPropertyDrawer(typeof(NodeEffectData))]
 public class NodeEffectDrawer : PropertyDrawer
 {
-    const float BASE_PROPERTY_HEIGHT = 65f;
-
-    bool IsCastType(NodeEffectType type)
-    {
-        return type == NodeEffectType.TimerCast ||
-               type == NodeEffectType.ProximityCast ||
-               type == NodeEffectType.EatCast ||
-               type == NodeEffectType.LeafLossCast;
-    }
-
-    void DrawStandardValueFields(Rect position, SerializedProperty property, NodeEffectType currentType)
-    {
-        SerializedProperty primaryValueProp = property.FindPropertyRelative("primaryValue");
-        SerializedProperty secondaryValueProp = property.FindPropertyRelative("secondaryValue");
-
-        EditorGUI.PropertyField(position, primaryValueProp, new GUIContent("Primary Value"));
-        position.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-
-        switch (currentType)
-        {
-            case NodeEffectType.StemLength:
-            case NodeEffectType.PoopAbsorption:
-            case NodeEffectType.ScentModifier:
-                EditorGUI.PropertyField(position, secondaryValueProp, new GUIContent("Secondary Value"));
-                break;
-        }
-    }
-
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
     {
         EditorGUI.BeginProperty(position, label, property);
 
         SerializedProperty effectTypeProp = property.FindPropertyRelative("effectType");
-        SerializedProperty isPassiveProp = property.FindPropertyRelative("isPassive");
         SerializedProperty consumedOnTriggerProp = property.FindPropertyRelative("consumedOnTrigger");
         SerializedProperty seedDataProp = property.FindPropertyRelative("seedData");
 
@@ -45,44 +17,68 @@ public class NodeEffectDrawer : PropertyDrawer
         EditorGUI.PropertyField(currentRect, effectTypeProp);
         currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
-        EditorGUI.PropertyField(currentRect, isPassiveProp);
-        currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-
         NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
 
-        if (IsCastType(currentType))
+        // NEW: Show passive/active indicator
+        EditorGUI.BeginDisabledGroup(true);
+        bool isPassive = NodeEffectTypeHelper.IsPassiveEffect(currentType);
+        string effectNatureLabel = isPassive ? "Passive" : "Active";
+        EditorGUI.LabelField(currentRect, "Effect Type", effectNatureLabel);
+        EditorGUI.EndDisabledGroup();
+        currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
+        // Only show consumedOnTrigger for trigger effects
+        if (NodeEffectTypeHelper.IsTriggerEffect(currentType))
         {
             EditorGUI.PropertyField(currentRect, consumedOnTriggerProp, new GUIContent("Consumed on Trigger"));
             currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
         }
 
-        // REMOVED: GrowBerry nodeDefinitionReference field - no longer needed!
-
-        // REMOVED: Special handling for ScentModifier - no longer needed
-        
+        // Conditional value fields
         if (currentType == NodeEffectType.SeedSpawn)
         {
             EditorGUI.PropertyField(currentRect, seedDataProp, true);
         }
         else
         {
-            DrawStandardValueFields(currentRect, property, currentType);
+            // Only show value fields if needed
+            DrawStandardValueFields(currentRect, property);
         }
 
         EditorGUI.EndProperty();
     }
 
+    void DrawStandardValueFields(Rect position, SerializedProperty property)
+    {
+        NodeEffectType currentType = (NodeEffectType)property.FindPropertyRelative("effectType").enumValueIndex;
+        SerializedProperty primaryValueProp = property.FindPropertyRelative("primaryValue");
+        SerializedProperty secondaryValueProp = property.FindPropertyRelative("secondaryValue");
+
+        // Show primary value with appropriate label
+        if (NodeEffectTypeHelper.RequiresPrimaryValue(currentType))
+        {
+            string primaryLabel = GetPrimaryValueLabel(currentType);
+            EditorGUI.PropertyField(position, primaryValueProp, new GUIContent(primaryLabel));
+            position.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        }
+
+        // Show secondary value only when needed
+        if (NodeEffectTypeHelper.RequiresSecondaryValue(currentType))
+        {
+            string secondaryLabel = GetSecondaryValueLabel(currentType);
+            EditorGUI.PropertyField(position, secondaryValueProp, new GUIContent(secondaryLabel));
+        }
+    }
+
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        float totalHeight = BASE_PROPERTY_HEIGHT;
+        float totalHeight = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * 2; // Type dropdown + Passive/Active label
         NodeEffectType currentType = (NodeEffectType)property.FindPropertyRelative("effectType").enumValueIndex;
 
-        if (IsCastType(currentType))
+        if (NodeEffectTypeHelper.IsTriggerEffect(currentType))
         {
             totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
         }
-
-        // REMOVED: GrowBerry height calculation - no longer needed!
 
         if (currentType == NodeEffectType.SeedSpawn)
         {
@@ -90,18 +86,51 @@ public class NodeEffectDrawer : PropertyDrawer
         }
         else
         {
-            totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-
-            switch (currentType)
+            if (NodeEffectTypeHelper.RequiresPrimaryValue(currentType))
             {
-                case NodeEffectType.StemLength:
-                case NodeEffectType.PoopAbsorption:
-                case NodeEffectType.ScentModifier:
-                    totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                    break;
+                totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            }
+            if (NodeEffectTypeHelper.RequiresSecondaryValue(currentType))
+            {
+                totalHeight += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
         }
 
-        return totalHeight;
+        return totalHeight + EditorGUIUtility.standardVerticalSpacing;
+    }
+
+    string GetPrimaryValueLabel(NodeEffectType type)
+    {
+        switch (type)
+        {
+            case NodeEffectType.EnergyStorage: return "Max Energy";
+            case NodeEffectType.EnergyPerTick: return "Energy/Tick";
+            case NodeEffectType.EnergyCost: return "Energy Cost";
+            case NodeEffectType.StemLength: return "Min Length";
+            case NodeEffectType.GrowthSpeed: return "Ticks/Stage";
+            case NodeEffectType.LeafGap: return "Gap Size";
+            case NodeEffectType.LeafPattern: return "Pattern ID";
+            case NodeEffectType.StemRandomness: return "Wobble %";
+            case NodeEffectType.PoopAbsorption: return "Radius";
+            case NodeEffectType.Damage: return "Damage %";
+            case NodeEffectType.TimerCast: return "Tick Interval";
+            case NodeEffectType.ProximityCast: return "Range";
+            case NodeEffectType.Cooldown: return "Cooldown Ticks";
+            case NodeEffectType.CastDelay: return "Delay Ticks";
+            case NodeEffectType.Nutritious: return "Hunger Restore";
+            case NodeEffectType.ScentModifier: return "Radius Mod";
+            default: return "Value";
+        }
+    }
+
+    string GetSecondaryValueLabel(NodeEffectType type)
+    {
+        switch (type)
+        {
+            case NodeEffectType.StemLength: return "Max Length";
+            case NodeEffectType.PoopAbsorption: return "Energy Gain";
+            case NodeEffectType.ScentModifier: return "Strength Mod";
+            default: return "Secondary";
+        }
     }
 }
