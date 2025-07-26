@@ -64,7 +64,7 @@ public class NodeEditorGridController : MonoBehaviour
         if (cellContainer != null && definitionLibrary != null)
         {
             CreateSequenceCells();
-            HideNodeEditorPanel(); // Start hidden
+            HideNodeEditorPanel();
         }
     }
 
@@ -77,7 +77,7 @@ public class NodeEditorGridController : MonoBehaviour
             foreach (var nodeData in _currentlyEditedSequence.nodes)
             {
                 if (nodeData == null) continue;
-                
+
                 NodeData clonedNode = new NodeData
                 {
                     nodeId = nodeData.nodeId,
@@ -313,7 +313,9 @@ public class NodeEditorGridController : MonoBehaviour
         
         if (originalCell.IsInventoryCell)
         {
-            InventoryGridController.Instance.RemoveGeneFromInventory(originalCell);
+            // --- FIX IS HERE ---
+            // We must not destroy the ItemView being dragged, only detach it from its original cell.
+            originalCell.ClearNodeReference();
         }
         else
         {
@@ -345,49 +347,56 @@ public class NodeEditorGridController : MonoBehaviour
 
         if (originalCell.IsInventoryCell)
         {
-            InventoryGridController.Instance?.RemoveGeneFromInventory(originalCell);
-            
-            ItemView existingViewInTargetSeq = targetSequenceCell.GetItemView();
-            if (existingViewInTargetSeq != null)
-            {
-                InventoryGridController.Instance.ReturnGeneToInventory(existingViewInTargetSeq, targetSequenceCell.GetNodeData());
-                targetSequenceCell.ClearNodeReference();
-            }
-            
-            targetSequenceCell.AssignNode(draggedNodeDef);
-            NodeCell.SelectCell(targetSequenceCell);
-            Destroy(draggedDraggable.gameObject);
-        }
-        else if (!originalCell.IsSeedSlot)
-        {
-            // --- FIX STARTS HERE ---
             NodeData draggedData = draggedView.GetNodeData();
             ItemView viewInTarget = targetSequenceCell.GetItemView();
 
-            if (viewInTarget == null) // Moving to an empty cell
+            if (viewInTarget == null)
+            {
+                originalCell.RemoveNode();
+                targetSequenceCell.AssignNode(draggedNodeDef);
+            }
+            else
+            {
+                NodeData dataInTarget = targetSequenceCell.GetNodeData();
+                NodeDraggable draggableInTarget = viewInTarget.GetComponent<NodeDraggable>();
+                
+                originalCell.ClearNodeReference();
+                targetSequenceCell.ClearNodeReference();
+                
+                originalCell.AssignItemView(viewInTarget, dataInTarget, null);
+                draggableInTarget?.Initialize(InventoryGridController.Instance, originalCell);
+                draggableInTarget?.SnapToCell(originalCell);
+                
+                targetSequenceCell.AssignItemView(draggedView, draggedData, null);
+                draggedDraggable.Initialize(this, targetSequenceCell);
+                draggedDraggable.SnapToCell(targetSequenceCell);
+            }
+        }
+        else if (!originalCell.IsSeedSlot)
+        {
+            NodeData draggedData = draggedView.GetNodeData();
+            ItemView viewInTarget = targetSequenceCell.GetItemView();
+
+            if (viewInTarget == null)
             {
                 originalCell.ClearNodeReference();
                 targetSequenceCell.AssignItemView(draggedView, draggedData, null);
                 draggedDraggable.SnapToCell(targetSequenceCell);
             }
-            else // Swapping with an existing item
+            else
             {
                 NodeData dataInTarget = targetSequenceCell.GetNodeData();
                 NodeDraggable draggableInTarget = viewInTarget.GetComponent<NodeDraggable>();
 
-                // Detach both items from their cells without destroying them
                 originalCell.ClearNodeReference();
                 targetSequenceCell.ClearNodeReference();
 
-                // Move the item that was in the target cell to the original cell
                 originalCell.AssignItemView(viewInTarget, dataInTarget, null);
                 draggableInTarget?.SnapToCell(originalCell);
 
-                // Move the dragged item to the target cell
                 targetSequenceCell.AssignItemView(draggedView, draggedData, null);
                 draggedDraggable.SnapToCell(targetSequenceCell);
             }
-            // --- FIX ENDS HERE ---
             NodeCell.SelectCell(targetSequenceCell);
         }
         else
