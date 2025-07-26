@@ -1,6 +1,7 @@
 ﻿// Assets/Scripts/Editor/NodeEffectDrawer.cs
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
+using WegoSystem;
 
 [CustomPropertyDrawer(typeof(NodeEffectData))]
 public class NodeEffectDrawer : PropertyDrawer
@@ -19,29 +20,21 @@ public class NodeEffectDrawer : PropertyDrawer
 
         NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
 
-        // NEW: Show passive/active indicator
-        EditorGUI.BeginDisabledGroup(true);
-        bool isPassive = NodeEffectTypeHelper.IsPassiveEffect(currentType);
-        string effectNatureLabel = isPassive ? "Passive" : "Active";
-        EditorGUI.LabelField(currentRect, "Effect Type", effectNatureLabel);
-        EditorGUI.EndDisabledGroup();
-        currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+        // REMOVED: The display for Passive/Active is no longer needed here, as it's part of the NodeDefinition.
+        // This resolves the 'IsPassiveEffect' compiler error.
 
-        // Only show consumedOnTrigger for trigger effects
         if (NodeEffectTypeHelper.IsTriggerEffect(currentType))
         {
             EditorGUI.PropertyField(currentRect, consumedOnTriggerProp, new GUIContent("Consumed on Trigger"));
             currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
         }
 
-        // Conditional value fields
         if (currentType == NodeEffectType.SeedSpawn)
         {
             EditorGUI.PropertyField(currentRect, seedDataProp, true);
         }
         else
         {
-            // Only show value fields if needed
             DrawStandardValueFields(currentRect, property);
         }
 
@@ -54,7 +47,6 @@ public class NodeEffectDrawer : PropertyDrawer
         SerializedProperty primaryValueProp = property.FindPropertyRelative("primaryValue");
         SerializedProperty secondaryValueProp = property.FindPropertyRelative("secondaryValue");
 
-        // Show primary value with appropriate label
         if (NodeEffectTypeHelper.RequiresPrimaryValue(currentType))
         {
             string primaryLabel = GetPrimaryValueLabel(currentType);
@@ -62,7 +54,6 @@ public class NodeEffectDrawer : PropertyDrawer
             position.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
         }
 
-        // Show secondary value only when needed
         if (NodeEffectTypeHelper.RequiresSecondaryValue(currentType))
         {
             string secondaryLabel = GetSecondaryValueLabel(currentType);
@@ -72,7 +63,8 @@ public class NodeEffectDrawer : PropertyDrawer
 
     public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
     {
-        float totalHeight = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * 2; // Type dropdown + Passive/Active label
+        // Adjusted height calculation after removing the Passive/Active label
+        float totalHeight = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Only for the Type dropdown
         NodeEffectType currentType = (NodeEffectType)property.FindPropertyRelative("effectType").enumValueIndex;
 
         if (NodeEffectTypeHelper.IsTriggerEffect(currentType))

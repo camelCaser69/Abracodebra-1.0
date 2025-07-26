@@ -1,17 +1,12 @@
 ﻿// Assets/Scripts/PlantSystem/Growth/PlantNodeExecutor.cs
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using WegoSystem;
 
 public class PlantNodeExecutor
 {
     private readonly PlantGrowth plant;
-
-    private static readonly HashSet<NodeEffectType> EnergyFreeEffectTypes = new HashSet<NodeEffectType>
-    {
-        // Add any truly energy-free active effects here if they exist
-    };
 
     public PlantNodeExecutor(PlantGrowth plant)
     {
@@ -26,153 +21,132 @@ public class PlantNodeExecutor
             return;
         }
 
-        Debug.Log($"[{plant.gameObject.name}] Executing mature cycle tick. Current energy: {plant.EnergySystem.CurrentEnergy:F1}/{plant.EnergySystem.MaxEnergy:F0}");
-
-        var energyFreeEffects = new List<NodeEffectData>();
-        var energyRequiringEffects = new List<NodeEffectData>();
-        var accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
-        var accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
-        float totalEnergyCostForCycle = 0f;
-
-        foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex))
+        var library = NodeEditorGridController.Instance?.DefinitionLibrary;
+        if (library == null)
         {
-            if (node?.effects == null) continue;
-
-            Debug.Log($"[{plant.gameObject.name}] Processing node '{node.nodeDisplayName}' with {node.effects.Count} effects");
-
-            foreach (var effect in node.effects)
-            {
-                if (effect == null) continue;
-
-                if (effect.IsPassive)
-                {
-                    Debug.Log($"[{plant.gameObject.name}] Skipping passive effect: {effect.effectType}");
-                    continue;
-                }
-
-                if (IsEnergyFreeEffect(effect.effectType))
-                {
-                    energyFreeEffects.Add(effect);
-                }
-                else
-                {
-                    energyRequiringEffects.Add(effect);
-
-                    if (effect.effectType == NodeEffectType.EnergyCost)
-                    {
-                        totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
-                    }
-                }
-
-                Debug.Log($"[{plant.gameObject.name}] Found active effect: {effect.effectType} (energy-free: {IsEnergyFreeEffect(effect.effectType)})");
-            }
-        }
-
-        if (energyFreeEffects.Count > 0)
-        {
-            Debug.Log($"[{plant.gameObject.name}] Executing {energyFreeEffects.Count} energy-free effects");
-            foreach (var effect in energyFreeEffects)
-            {
-                ExecuteEffect(effect, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
-            }
-        }
-
-        float totalCostForAbilities = totalEnergyCostForCycle;
-
-        // Tally up costs for other abilities if they have an implicit cost
-        foreach (var effect in energyRequiringEffects)
-        {
-            if (effect.effectType != NodeEffectType.EnergyCost && effect.effectType == NodeEffectType.GrowBerry) // Example: Berries cost 1 energy
-            {
-                totalCostForAbilities += 1f;
-            }
-        }
-
-        Debug.Log($"[{plant.gameObject.name}] Total energy cost for abilities: {totalCostForAbilities}");
-
-        if (totalCostForAbilities > 0 && plant.EnergySystem.CurrentEnergy < totalCostForAbilities)
-        {
-            Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.CurrentEnergy:F1}/{totalCostForAbilities:F1}) for abilities. Skipping.");
-
-            // Still apply any passive scent mods if necessary (though they should be handled differently)
-            if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0)
-            {
-                ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
-            }
+            Debug.LogError($"[{plant.gameObject.name}] Cannot execute cycle, NodeDefinitionLibrary not found!");
             return;
         }
 
-        if (totalCostForAbilities > 0)
-        {
-            plant.EnergySystem.SpendEnergy(totalCostForAbilities);
-            Debug.Log($"[{plant.gameObject.name}] Spent {totalCostForAbilities} energy. Remaining: {plant.EnergySystem.CurrentEnergy:F1}");
-        }
+        var nodes = plant.NodeGraph.nodes;
 
-        if (energyRequiringEffects.Count > 0)
+        // Iterate through all nodes to find Active genes
+        for (int i = 0; i < nodes.Count; i++)
         {
-            Debug.Log($"[{plant.gameObject.name}] Executing {energyRequiringEffects.Count} energy-requiring effects");
-            foreach (var effect in energyRequiringEffects)
+            var nodeData = nodes[i];
+            if (nodeData == null) continue;
+
+            var nodeDef = library.definitions.FirstOrDefault(d => d.name == nodeData.definitionName);
+
+            // Skip if not an Active gene
+            if (nodeDef == null || nodeDef.ActivationType != GeneActivationType.Active)
             {
-                ExecuteEffect(effect, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+                continue;
+            }
+
+            // This is an Active gene. Check its cost and execute it.
+            float cost = CalculateGeneEnergyCost(nodeData);
+            if (plant.EnergySystem.HasEnergy(cost))
+            {
+                plant.EnergySystem.SpendEnergy(cost);
+
+                bool isTrigger = nodeData.effects.Any(e => e != null && NodeEffectTypeHelper.IsTriggerEffect(e.effectType));
+
+                if (isTrigger)
+                {
+                    // This Active gene is a Trigger. Find and execute the next Payload gene.
+                    ExecuteTrigger(i);
+                }
+                else
+                {
+                    // This is a simple Active gene. Execute its own effects.
+                    ExecuteAllEffectsOfGene(nodeData);
+                }
+            }
+            else
+            {
+                if (Debug.isDebugBuild)
+                {
+                    Debug.Log($"[{plant.gameObject.name}] Not enough energy for gene '{nodeDef.displayName}'. Have {plant.EnergySystem.CurrentEnergy:F1}, need {cost:F1}.");
+                }
             }
         }
+    }
 
-        // Apply accumulated scent data if any
-        if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0)
+    private void ExecuteTrigger(int triggerGeneIndex)
+    {
+        var nodes = plant.NodeGraph.nodes;
+        var library = NodeEditorGridController.Instance.DefinitionLibrary;
+
+        // Start searching for a payload from the node *after* the trigger
+        for (int i = triggerGeneIndex + 1; i < nodes.Count; i++)
         {
-            ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+            var payloadNodeData = nodes[i];
+            if (payloadNodeData == null) continue;
+
+            var payloadNodeDef = library.definitions.FirstOrDefault(d => d.name == payloadNodeData.definitionName);
+            
+            if (payloadNodeDef != null && payloadNodeDef.ActivationType == GeneActivationType.Payload)
+            {
+                // Found the payload. Execute its effects and stop searching.
+                if (Debug.isDebugBuild)
+                {
+                    var triggerDef = library.definitions.FirstOrDefault(d => d.name == nodes[triggerGeneIndex].definitionName);
+                    Debug.Log($"[{plant.gameObject.name}] Trigger '{triggerDef?.displayName}' is activating Payload '{payloadNodeDef.displayName}'.");
+                }
+                ExecuteAllEffectsOfGene(payloadNodeData);
+                return; // Only execute the first payload found
+            }
         }
     }
 
-    bool IsEnergyFreeEffect(NodeEffectType effectType)
+    private float CalculateGeneEnergyCost(NodeData nodeData)
     {
-        return EnergyFreeEffectTypes.Contains(effectType);
+        if (nodeData?.effects == null) return 0f;
+
+        float totalCost = 0f;
+        foreach (var effect in nodeData.effects)
+        {
+            if (effect.effectType == NodeEffectType.EnergyCost)
+            {
+                totalCost += effect.primaryValue;
+            }
+        }
+        return totalCost;
     }
 
-    void ExecuteEffect(NodeEffectData effect, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus)
+    private void ExecuteAllEffectsOfGene(NodeData nodeData)
     {
+        if (nodeData?.effects == null) return;
+        
+        foreach (var effect in nodeData.effects)
+        {
+            ExecuteEffect(effect);
+        }
+    }
+
+    private void ExecuteEffect(NodeEffectData effect)
+    {
+        // This is where the logic for what each effect *does* goes.
         switch (effect.effectType)
         {
-            case NodeEffectType.PoopAbsorption:
-                Debug.LogWarning($"[{plant.gameObject.name}] Tried to execute PoopAbsorption as an ACTIVE effect. It should be PASSIVE. This is automatically handled; no need to set a checkbox.", plant.gameObject);
-                break;
-
             case NodeEffectType.GrowBerry:
                 SpawnBerry(effect);
                 break;
-
+            
+            // Add cases for other Active/Payload effects like Damage, ScentModifier etc.
+            case NodeEffectType.Damage:
+                // Example: Fire a projectile
+                Debug.Log("Executing Damage Effect - NOT IMPLEMENTED");
+                break;
+                
             case NodeEffectType.ScentModifier:
                 Debug.LogWarning($"[{plant.gameObject.name}] ScentModifier effect needs to be reimplemented without scentDefinitionReference");
                 break;
         }
     }
 
-    public void ExecutePassiveAbilities(List<NodeEffectData> passiveEffects = null)
-    {
-        if (plant.NodeGraph?.nodes == null || plant.NodeGraph.nodes.Count == 0) return;
-
-        if (passiveEffects == null)
-        {
-            passiveEffects = new List<NodeEffectData>();
-            foreach (var node in plant.NodeGraph.nodes)
-            {
-                if (node?.effects == null) continue;
-                foreach (var effect in node.effects)
-                {
-                    if (effect != null && effect.IsPassive)
-                    {
-                        passiveEffects.Add(effect);
-                    }
-                }
-            }
-        }
-
-        foreach (var effect in passiveEffects)
-        {
-            // Execute passive abilities here if they need active logic (uncommon)
-        }
-    }
-
+    // This method is now public to be called by the executor
     public void SpawnBerry(NodeEffectData growEffectData)
     {
         if (plant == null || (plant.CurrentState != PlantState.Mature_Idle && plant.CurrentState != PlantState.Mature_Executing))
@@ -180,8 +154,6 @@ public class PlantNodeExecutor
             Debug.LogWarning($"[{plant?.gameObject.name ?? "Unknown"}] Berry cannot be spawned.", plant?.gameObject);
             return;
         }
-
-        Debug.Log($"[{plant.gameObject.name}] SpawnBerry called!");
 
         if (plant.CellManager == null)
         {
@@ -202,18 +174,18 @@ public class PlantNodeExecutor
 
         if (hasLimit && currentBerryCount >= maxBerriesAllowed)
         {
-            Debug.Log($"[{plant.gameObject.name}] Already has {currentBerryCount} berries (max: {maxBerriesAllowed}). Skipping berry spawn.");
+            if(Debug.isDebugBuild) Debug.Log($"[{plant.gameObject.name}] Already has {currentBerryCount} berries (max: {maxBerriesAllowed}). Skipping berry spawn.");
             return;
         }
 
+        // Find available positions around the plant to spawn a berry
         HashSet<Vector2Int> availablePositions = new HashSet<Vector2Int>();
         foreach (var kvp in cells)
         {
             if (kvp.Value == PlantCellType.Stem || kvp.Value == PlantCellType.Leaf)
             {
                 Vector2Int cellPos = kvp.Key;
-                Vector2Int[] surroundingPositions = new Vector2Int[]
-                {
+                Vector2Int[] surroundingPositions = new Vector2Int[] {
                     cellPos + Vector2Int.up,
                     cellPos + Vector2Int.down,
                     cellPos + Vector2Int.left,
@@ -233,20 +205,22 @@ public class PlantNodeExecutor
                 }
             }
         }
-
+        
         availablePositions.RemoveWhere(pos => pos.y <= 0);
         List<Vector2Int> candidatePositions = availablePositions.ToList();
 
         if (candidatePositions.Count == 0)
         {
-            Debug.LogWarning($"[{plant.gameObject.name}] No available space to spawn berry!");
+            if(Debug.isDebugBuild) Debug.LogWarning($"[{plant.gameObject.name}] No available space to spawn berry!");
             return;
         }
-
+        
+        // --- Find best position ---
         List<Vector2Int> existingBerryPositions = plant.CellManager.GetBerryPositions();
         List<Vector2Int> preferredPositions = new List<Vector2Int>();
         List<Vector2Int> otherPositions = new List<Vector2Int>();
-
+        
+        // Prefer spots not adjacent to existing berries to spread them out
         if (existingBerryPositions.Count > 0)
         {
             foreach (var candidate in candidatePositions)
@@ -265,18 +239,19 @@ public class PlantNodeExecutor
         {
             preferredPositions.AddRange(candidatePositions);
         }
-
+        
         List<Vector2Int> finalCandidates = preferredPositions.Count > 0 ? preferredPositions : otherPositions;
 
         if (finalCandidates.Count == 0)
         {
-            Debug.LogWarning($"[{plant.gameObject.name}] No final candidates to spawn berry.");
+            if(Debug.isDebugBuild) Debug.LogWarning($"[{plant.gameObject.name}] No final candidates to spawn berry.");
             return;
         }
 
         int randomIndex = Random.Range(0, finalCandidates.Count);
         Vector2Int chosenPosition = finalCandidates[randomIndex];
-
+        
+        // --- Spawn the berry ---
         GameObject berry = plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, chosenPosition, null, null);
 
         if (berry != null)
@@ -292,7 +267,7 @@ public class PlantNodeExecutor
         }
     }
 
-    bool IsAdjacentToExistingBerries(Vector2Int position, List<Vector2Int> existingBerries)
+    private bool IsAdjacentToExistingBerries(Vector2Int position, List<Vector2Int> existingBerries)
     {
         foreach (var berryPos in existingBerries)
         {
@@ -304,7 +279,7 @@ public class PlantNodeExecutor
         return false;
     }
 
-    void AddFoodComponentToBerry(GameObject berry)
+    private void AddFoodComponentToBerry(GameObject berry)
     {
         if (berry == null) return;
 
@@ -318,19 +293,25 @@ public class PlantNodeExecutor
                 foodItem.foodType = berryFoodType;
             }
         }
-
-        HarvestableTag tag = berry.AddComponent<HarvestableTag>();
-
-        Debug.Log($"[PlantNodeExecutor] Added HarvestableTag to berry", berry);
+        
+        // Add harvestable tag if any node in the plant provides it
+        bool isHarvestable = plant.NodeGraph.nodes.Any(node => node.effects.Any(e => e.effectType == NodeEffectType.Harvestable));
+        if (isHarvestable)
+        {
+            if (berry.GetComponent<HarvestableTag>() == null)
+            {
+                berry.AddComponent<HarvestableTag>();
+                Debug.Log($"[PlantNodeExecutor] Added HarvestableTag to berry", berry);
+            }
+        }
     }
 
-    FoodType GetBerryFoodType()
+    private FoodType GetBerryFoodType()
     {
-        // A more robust way to load specific assets
+        // A more robust way would be a central asset manager, but this works.
         FoodType berryType = Resources.Load<FoodType>("FoodTypes/Berry");
         if (berryType != null) return berryType;
 
-        // Fallback to searching all loaded FoodTypes
         FoodType[] allFoodTypes = Resources.LoadAll<FoodType>("");
         foreach (FoodType foodType in allFoodTypes)
         {
@@ -343,7 +324,7 @@ public class PlantNodeExecutor
         Debug.LogWarning($"[{plant.gameObject.name}] No berry FoodType found. Berry won't be edible by animals.");
         return null;
     }
-
+    
     public void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses)
     {
         if (targetObject == null) return;
@@ -363,21 +344,15 @@ public class PlantNodeExecutor
             }
             else
             {
-                // Create a new ScentSource if one for this definition doesn't exist
                 GameObject scentSourceObj = new GameObject($"ScentSource_{scentDef.displayName}");
                 scentSourceObj.transform.SetParent(targetObject.transform);
                 scentSourceObj.transform.localPosition = Vector3.zero;
 
                 ScentSource newSource = scentSourceObj.AddComponent<ScentSource>();
-                SetScentSourceDefinition(newSource, scentDef); // Use helper to set definition
+                newSource.SetDefinition(scentDef);
                 newSource.SetRadiusModifier(radiusBonus);
                 newSource.SetStrengthModifier(strengthBonus);
             }
         }
-    }
-
-    void SetScentSourceDefinition(ScentSource source, ScentDefinition definition)
-    {
-        source.SetDefinition(definition);
     }
 }

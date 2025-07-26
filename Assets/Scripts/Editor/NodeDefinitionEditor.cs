@@ -1,50 +1,86 @@
-﻿using UnityEditor;
+﻿// Assets/Scripts/Editor/NodeDefinitionEditor.cs
+using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(NodeDefinition))]
 public class NodeDefinitionEditor : Editor
 {
-    // Serialized properties for all the fields in NodeDefinition
-    SerializedProperty displayName;
-    SerializedProperty description;
-    SerializedProperty thumbnail;
-    SerializedProperty thumbnailTintColor;
-    SerializedProperty backgroundColor;
-    SerializedProperty nodeViewPrefab;
-    SerializedProperty effects;
+    // Properties to draw manually
+    SerializedProperty activationTypeProp;
+    SerializedProperty displayNameProp;
+    SerializedProperty descriptionProp;
+    SerializedProperty thumbnailProp;
+    SerializedProperty thumbnailTintColorProp;
+    SerializedProperty backgroundColorProp;
+    SerializedProperty nodeViewPrefabProp;
+    SerializedProperty effectsProp;
 
-    private void OnEnable()
+    void OnEnable()
     {
-        displayName = serializedObject.FindProperty("displayName");
-        description = serializedObject.FindProperty("description");
-        thumbnail = serializedObject.FindProperty("thumbnail");
-        thumbnailTintColor = serializedObject.FindProperty("thumbnailTintColor");
-        backgroundColor = serializedObject.FindProperty("backgroundColor");
-        nodeViewPrefab = serializedObject.FindProperty("nodeViewPrefab");
-        effects = serializedObject.FindProperty("effects");
+        // Cache serialized properties
+        activationTypeProp = serializedObject.FindProperty("activationType");
+        displayNameProp = serializedObject.FindProperty("displayName");
+        descriptionProp = serializedObject.FindProperty("description");
+        thumbnailProp = serializedObject.FindProperty("thumbnail");
+        thumbnailTintColorProp = serializedObject.FindProperty("thumbnailTintColor");
+        backgroundColorProp = serializedObject.FindProperty("backgroundColor");
+        nodeViewPrefabProp = serializedObject.FindProperty("nodeViewPrefab");
+        effectsProp = serializedObject.FindProperty("effects");
     }
 
     public override void OnInspectorGUI()
     {
         serializedObject.Update();
 
-        // "Display" section
-        EditorGUILayout.LabelField("Display", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(displayName);
-        EditorGUILayout.PropertyField(description);
-        EditorGUILayout.PropertyField(thumbnail);
-        EditorGUILayout.PropertyField(thumbnailTintColor);
-        EditorGUILayout.PropertyField(backgroundColor);
+        // --- Custom Activation Type Selector ---
+        EditorGUILayout.Space();
+        EditorGUILayout.LabelField("Gene Activation Type", EditorStyles.boldLabel);
+
+        // Record changes for undo functionality
+        EditorGUI.BeginChangeCheck();
+        EditorGUILayout.PropertyField(activationTypeProp, new GUIContent("Activation Type"));
+        if (EditorGUI.EndChangeCheck())
+        {
+            // This block executes if the enum value was changed by the user
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        // Show a help box explaining what the selected type does
+        ShowActivationTypeHelp((GeneActivationType)activationTypeProp.enumValueIndex);
+        EditorGUILayout.Space();
+
+        // --- Draw the rest of the properties manually ---
+        EditorGUILayout.LabelField("Display Properties", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(displayNameProp);
+        EditorGUILayout.PropertyField(descriptionProp);
+        EditorGUILayout.PropertyField(thumbnailProp);
+        EditorGUILayout.PropertyField(thumbnailTintColorProp);
+        EditorGUILayout.PropertyField(backgroundColorProp);
 
         EditorGUILayout.Space();
 
-        // "Prefab & Effects" section
-        EditorGUILayout.LabelField("Prefab & Effects", EditorStyles.boldLabel);
-        EditorGUILayout.PropertyField(nodeViewPrefab);
+        EditorGUILayout.LabelField("System Properties", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(nodeViewPrefabProp);
 
-        // Draw the effects field with a minimum height
-        EditorGUILayout.PropertyField(effects, new GUIContent("Effects"), true, GUILayout.MinHeight(1300f));
+        EditorGUILayout.Space();
+        
+        // Use the custom property drawer for effects
+        EditorGUILayout.PropertyField(effectsProp, new GUIContent("Node Effects"), true);
+
 
         serializedObject.ApplyModifiedProperties();
+    }
+
+    private void ShowActivationTypeHelp(GeneActivationType type)
+    {
+        string helpText = type switch
+        {
+            GeneActivationType.Passive => "Passive: This gene is always active. Its effects are calculated once when the plant is created to determine its base stats (like growth speed, max energy, etc.).",
+            GeneActivationType.Active => "Active: This gene executes during the plant's mature cooldown cycle and consumes energy. It can perform an action itself, or act as a Trigger for a subsequent Payload gene.",
+            GeneActivationType.Payload => "Payload: This gene does nothing on its own. It is only activated when a preceding Active/Trigger gene in the sequence executes.",
+            _ => "Unknown activation type."
+        };
+
+        EditorGUILayout.HelpBox(helpText, MessageType.Info);
     }
 }

@@ -1,16 +1,18 @@
 ﻿// Assets/Scripts/PlantSystem/Execution/NodeExecutor.cs
-using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEngine;
 using WegoSystem;
 
 public class NodeExecutor : MonoBehaviour
 {
-    [SerializeField] GameObject plantPrefab;
-    [SerializeField] TMP_Text debugOutput;
+    [SerializeField] private GameObject plantPrefab;
+    [SerializeField] private TMP_Text debugOutput;
 
+    #region Static Cloning Methods
+    
     public static List<NodeEffectData> CloneEffectsList(List<NodeEffectData> originalEffects)
     {
         if (originalEffects == null) return new List<NodeEffectData>();
@@ -82,7 +84,7 @@ public class NodeExecutor : MonoBehaviour
 
         return clone;
     }
-
+    
     public static NodeData CloneNodeWithoutSequence(NodeData original)
     {
         if (original == null) return null;
@@ -104,6 +106,10 @@ public class NodeExecutor : MonoBehaviour
 
         return clone;
     }
+    
+    #endregion
+
+    #region Planting Logic
 
     public GameObject SpawnPlantFromSeedInSlot(Vector3 plantingPosition, Transform parentTransform)
     {
@@ -138,7 +144,8 @@ public class NodeExecutor : MonoBehaviour
         {
             foreach (var effect in seedInSlot.effects)
             {
-                Debug.Log($"  - {effect.effectType} (passive: {effect.IsPassive})");
+                // Removed passive check to fix compiler error. This is now just a log.
+                Debug.Log($"  - {effect.effectType}");
             }
         }
 
@@ -147,7 +154,7 @@ public class NodeExecutor : MonoBehaviour
 
         NodeGraph plantGraph = new NodeGraph { nodes = new List<NodeData>() };
 
-        // 1. Add the seed itself to the graph
+        // 1. Add the seed itself as the first node in the plant's graph
         NodeData seedClone = CloneNodeWithoutSequence(seedInSlot);
         seedClone.orderIndex = 0;
         seedClone.canBeDeleted = false; // The root seed cannot be deleted from a grown plant
@@ -155,7 +162,7 @@ public class NodeExecutor : MonoBehaviour
 
         Debug.Log($"[NodeExecutor] Seed clone has {seedClone.effects?.Count ?? 0} effects");
 
-        // 2. Add all nodes from the editor sequence
+        // 2. Add all nodes from the editor sequence after the seed
         int orderIndex = 1;
         foreach (NodeData editorNode in editorSequence.nodes.OrderBy(n => n.orderIndex))
         {
@@ -166,7 +173,8 @@ public class NodeExecutor : MonoBehaviour
             {
                 foreach (var effect in editorNode.effects)
                 {
-                    Debug.Log($"  - {effect.effectType} (passive: {effect.IsPassive}, primary: {effect.primaryValue}, secondary: {effect.secondaryValue})");
+                    // Removed passive check to fix compiler error.
+                    Debug.Log($"  - {effect.effectType} (primary: {effect.primaryValue}, secondary: {effect.secondaryValue})");
                 }
             }
 
@@ -186,11 +194,13 @@ public class NodeExecutor : MonoBehaviour
             {
                 foreach (var effect in node.effects)
                 {
-                    Debug.Log($"    - {effect.effectType} (passive: {effect.IsPassive}, primary: {effect.primaryValue})");
+                    // Removed passive check to fix compiler error.
+                    Debug.Log($"    - {effect.effectType} (primary: {effect.primaryValue})");
                 }
             }
         }
 
+        // 3. Instantiate and initialize the plant
         GameObject plantObj = Instantiate(plantPrefab, plantingPosition, Quaternion.identity, parentTransform);
 
         if (GridPositionManager.Instance != null)
@@ -229,13 +239,13 @@ public class NodeExecutor : MonoBehaviour
 
         NodeGraph plantGraph = new NodeGraph { nodes = new List<NodeData>() };
 
-        // 1. Add a clone of the seed itself
+        // 1. Add the seed itself
         NodeData seedClone = CloneNodeWithoutSequence(seedData);
         seedClone.orderIndex = 0;
         seedClone.canBeDeleted = false;
         plantGraph.nodes.Add(seedClone);
 
-        // 2. Add clones of nodes from the seed's stored sequence
+        // 2. Add the seed's stored sequence
         if (seedData.storedSequence?.nodes != null)
         {
             int orderIndex = 1;
@@ -250,6 +260,7 @@ public class NodeExecutor : MonoBehaviour
             }
         }
 
+        // 3. Instantiate and initialize
         GameObject plantObj = Instantiate(plantPrefab, spawnPos, Quaternion.identity, parent);
 
         if (GridPositionManager.Instance != null)
@@ -271,6 +282,9 @@ public class NodeExecutor : MonoBehaviour
         }
     }
 
+    #endregion
+    
+    #region Debugging
     private void DebugLog(string msg)
     {
         if (debugOutput != null) debugOutput.text += msg + "\n";
@@ -281,4 +295,5 @@ public class NodeExecutor : MonoBehaviour
         Debug.LogError($"[NodeExecutor] {msg}");
         if (debugOutput != null) debugOutput.text += $"ERROR: {msg}\n";
     }
+    #endregion
 }

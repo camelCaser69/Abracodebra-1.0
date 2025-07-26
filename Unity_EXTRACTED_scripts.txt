@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 578,356 → 399,609 chars (30.9% reduction)
-Estimated tokens saved: ~44,686
+Compression Stats: 580,035 → 398,902 chars (31.2% reduction)
+Estimated tokens saved: ~45,283
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -60,80 +60,81 @@ using System;
   NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L4145
   NodeDefinitionCreator (Assets\Scripts\Editor/) L4173
   NodeDefinitionEditor (Assets\Scripts\Editor/) L4234
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L4279
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L4330
-  NodeEffectDrawer (Assets\Scripts\Editor/) L4364
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L4478
-  TileDefinitionEditor (Assets\Scripts\Editor/) L4539
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L4559
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L4594
-  WaveManagerEditor (Assets\Scripts\Editor/) L4731
-  LeafData (Assets\Scripts\PlantSystem\Data/) L4906
-  NodeData (Assets\Scripts\PlantSystem\Data/) L4921
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L5010
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L5284
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L5307
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L5335
-  NodeEffectTypeHelper (Assets\Scripts\PlantSystem\Data/) L5366
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L5426
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L5436
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L5463
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L5704
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L5743
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L5767
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6012
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L6106
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6448
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L6776
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7089
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7227
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7516
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7583
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7654
-  ItemView (Assets\Scripts\PlantSystem\UI/) L7997
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L8134
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8384
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8518
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8873
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L9009
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9318
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9406
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L9507
-  GridSnapStartup (Assets\Scripts\Ticks/) L9745
-  TickDebugMonitor (Assets\Scripts\Ticks/) L9811
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9983
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L10052
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L10283
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10294
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10323
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10419
-  WaterReflection (Assets\Scripts\Visual\Effects/) L10524
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10919
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10955
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11119
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11261
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11427
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11597
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11605
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11632
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11679
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11882
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11943
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11983
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L12007
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12027
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12332
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12344
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12379
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12554
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L4307
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L4358
+  NodeEffectDrawer (Assets\Scripts\Editor/) L4392
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L4500
+  TileDefinitionEditor (Assets\Scripts\Editor/) L4561
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L4581
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L4616
+  WaveManagerEditor (Assets\Scripts\Editor/) L4753
+  GeneActivationType (Assets\Scripts\PlantSystem\Data/) L4928
+  LeafData (Assets\Scripts\PlantSystem\Data/) L4941
+  NodeData (Assets\Scripts\PlantSystem\Data/) L4956
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L5043
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L5330
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L5353
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L5379
+  NodeEffectTypeHelper (Assets\Scripts\PlantSystem\Data/) L5410
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L5442
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L5452
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L5479
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L5720
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L5759
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L5783
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6028
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L6122
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6464
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L6806
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7092
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7230
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7519
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7586
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7655
+  ItemView (Assets\Scripts\PlantSystem\UI/) L7998
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L8135
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8385
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8519
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8874
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L9010
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9319
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9407
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L9508
+  GridSnapStartup (Assets\Scripts\Ticks/) L9746
+  TickDebugMonitor (Assets\Scripts\Ticks/) L9812
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9984
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L10053
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L10284
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10295
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10324
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10420
+  WaterReflection (Assets\Scripts\Visual\Effects/) L10525
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10920
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10956
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11120
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11262
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11428
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11598
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11606
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11633
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11680
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11883
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11944
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11984
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L12008
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12028
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12333
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12345
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12380
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12555
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L12565
-  GridPosition (Assets\Scripts\Ticks/) L12719
-  GridPositionManager (Assets\Scripts\Ticks/) L12820
-  GridRadiusUtility (Assets\Scripts\Ticks/) L13176
-  TickConfiguration (Assets\Scripts\Ticks/) L13320
-  ITickUpdateable (Assets\Scripts\Ticks/) L13403
+  GridEntity (Assets\Scripts\Ticks/) L12566
+  GridPosition (Assets\Scripts\Ticks/) L12720
+  GridPositionManager (Assets\Scripts\Ticks/) L12821
+  GridRadiusUtility (Assets\Scripts\Ticks/) L13177
+  TickConfiguration (Assets\Scripts\Ticks/) L13321
+  ITickUpdateable (Assets\Scripts\Ticks/) L13404
 
 ================================================================================
 SCRIPTS
@@ -4347,45 +4348,73 @@ ret nextNumber;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Editor\NodeDefinitionEditor.cs
 
-﻿using UnityEditor;
+﻿// Assets/Scripts/Editor/NodeDefinitionEditor.cs
+using UnityEditor;
 
 pub cls NodeDefinitionEditor : Editor {
-SerializedProperty displayName;
-SerializedProperty description;
-SerializedProperty thumbnail;
-SerializedProperty thumbnailTintColor;
-SerializedProperty backgroundColor;
-SerializedProperty nodeViewPrefab;
-SerializedProperty effects;
+SerializedProperty activationTypeProp;
+SerializedProperty displayNameProp;
+SerializedProperty descriptionProp;
+SerializedProperty thumbnailProp;
+SerializedProperty thumbnailTintColorProp;
+SerializedProperty backgroundColorProp;
+SerializedProperty nodeViewPrefabProp;
+SerializedProperty effectsProp;
 
 void OnEnable() {
-displayName = serializedObject.FindProperty("displayName");
-description = serializedObject.FindProperty("description");
-thumbnail = serializedObject.FindProperty("thumbnail");
-thumbnailTintColor = serializedObject.FindProperty("thumbnailTintColor");
-backgroundColor = serializedObject.FindProperty("backgroundColor");
-nodeViewPrefab = serializedObject.FindProperty("nodeViewPrefab");
-effects = serializedObject.FindProperty("effects");
+activationTypeProp = serializedObject.FindProperty("activationType");
+displayNameProp = serializedObject.FindProperty("displayName");
+descriptionProp = serializedObject.FindProperty("description");
+thumbnailProp = serializedObject.FindProperty("thumbnail");
+thumbnailTintColorProp = serializedObject.FindProperty("thumbnailTintColor");
+backgroundColorProp = serializedObject.FindProperty("backgroundColor");
+nodeViewPrefabProp = serializedObject.FindProperty("nodeViewPrefab");
+effectsProp = serializedObject.FindProperty("effects");
 }
 
 pub ovr void OnInspectorGUI() {
 serializedObject.Update();
 
-EditorGUILayout.LabelField("Display", EditorStyles.boldLabel);
-EditorGUILayout.PropertyField(displayName);
-EditorGUILayout.PropertyField(description);
-EditorGUILayout.PropertyField(thumbnail);
-EditorGUILayout.PropertyField(thumbnailTintColor);
-EditorGUILayout.PropertyField(backgroundColor);
+EditorGUILayout.Space();
+EditorGUILayout.LabelField("Gene Activation Type", EditorStyles.boldLabel);
+
+EditorGUI.BeginChangeCheck();
+EditorGUILayout.PropertyField(activationTypeProp, new GUIContent("Activation Type"));
+if (EditorGUI.EndChangeCheck()) {
+serializedObject.ApplyModifiedProperties();
+}
+
+ShowActivationTypeHelp((GeneActivationType)activationTypeProp.enumValueIndex);
+EditorGUILayout.Space();
+
+EditorGUILayout.LabelField("Display Properties", EditorStyles.boldLabel);
+EditorGUILayout.PropertyField(displayNameProp);
+EditorGUILayout.PropertyField(descriptionProp);
+EditorGUILayout.PropertyField(thumbnailProp);
+EditorGUILayout.PropertyField(thumbnailTintColorProp);
+EditorGUILayout.PropertyField(backgroundColorProp);
 
 EditorGUILayout.Space();
 
-EditorGUILayout.LabelField("Prefab & Effects", EditorStyles.boldLabel);
-EditorGUILayout.PropertyField(nodeViewPrefab);
+EditorGUILayout.LabelField("System Properties", EditorStyles.boldLabel);
+EditorGUILayout.PropertyField(nodeViewPrefabProp);
 
-EditorGUILayout.PropertyField(effects, new GUIContent("Effects"), true, GUILayout.MinHeight(1300f));
+EditorGUILayout.Space();
+
+EditorGUILayout.PropertyField(effectsProp, new GUIContent("Node Effects"), true);
 
 serializedObject.ApplyModifiedProperties();
+}
+
+void ShowActivationTypeHelp(GeneActivationType type) {
+string helpText = type switch {
+GeneActivationType.Passive => "Passive: This gene is always active. Its effects are calculated once when the plant is created to determine its base stats (like growth speed, max energy, etc.).",
+GeneActivationType.Active => "Active: This gene executes during the plant's mature cooldown cycle and consumes energy. It can perform an action itself, or act as a Trigger for a subsequent Payload gene.",
+GeneActivationType.Payload => "Payload: This gene does nothing on its own. It is only activated when a preceding Active/Trigger gene in the sequence executes.",
+_ => "Unknown activation type."
+};
+
+EditorGUILayout.HelpBox(helpText, MessageType.Info);
 }
 }
 
@@ -4479,6 +4508,7 @@ AssetDatabase.SaveAssets();
 
 ﻿// Assets/Scripts/Editor/NodeEffectDrawer.cs
 using UnityEditor;
+using WegoSystem;
 
 pub cls NodeEffectDrawer : PropertyDrawer {
 pub ovr void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
@@ -4493,13 +4523,6 @@ EditorGUI.PropertyField(currentRect, effectTypeProp);
 currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
 NodeEffectType currentType = (NodeEffectType)effectTypeProp.enumValueIndex;
-
-EditorGUI.BeginDisabledGroup(true);
-bool isPassive = NodeEffectTypeHelper.IsPassiveEffect(currentType);
-string effectNatureLabel = isPassive ? "Passive" : "Active";
-EditorGUI.LabelField(currentRect, "Effect Type", effectNatureLabel);
-EditorGUI.EndDisabledGroup();
-currentRect.y += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
 if (NodeEffectTypeHelper.IsTriggerEffect(currentType)) {
 EditorGUI.PropertyField(currentRect, consumedOnTriggerProp, new GUIContent("Consumed on Trigger"));
@@ -4534,7 +4557,7 @@ EditorGUI.PropertyField(position, secondaryValueProp, new GUIContent(secondaryLa
 }
 
 pub ovr float GetPropertyHeight(SerializedProperty property, GUIContent label) {
-float totalHeight = (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * 2; // Type dropdown + Passive/Active label
+float totalHeight = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing; // Only for the Type dropdown
 NodeEffectType currentType = (NodeEffectType)property.FindPropertyRelative("effectType").enumValueIndex;
 
 if (NodeEffectTypeHelper.IsTriggerEffect(currentType)) {
@@ -5017,6 +5040,19 @@ EditorGUILayout.HelpBox("Wave progress visualization requires exposing runtime d
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\PlantSystem\Data\GeneActivationType.cs
+
+﻿// Assets/Scripts/PlantSystem/Data/GeneActivationType.cs
+
+pub enum GeneActivationType {
+Passive,
+
+Active,
+
+Payload
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\LeafData.cs
 
 ﻿using UnityEngine;
@@ -5034,7 +5070,7 @@ IsActive = isActive;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\NodeData.cs
 
-﻿using System;
+﻿// Assets/Scripts/PlantSystem/Data/NodeData.cs
 
 pub cls NodeData : ISerializationCallbackReceiver {
 pub string nodeId;
@@ -5046,7 +5082,6 @@ pub int orderIndex;
 pub bool canBeDeleted = true;
 
 NodeGraph _storedSequence;
-
 bool _isPartOfSequence = false;
 
 pub NodeData() {
@@ -5057,9 +5092,7 @@ _isPartOfSequence = false;
 
 pub bool HasSeedEffect() {
 ret effects != null &&
-effects.Any(e => e != null &&
-e.effectType == NodeEffectType.SeedSpawn &&
-e.IsPassive); // FIX: Changed from isPassive to IsPassive
+effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
 }
 
 pub bool IsSeed() {
@@ -5081,7 +5114,7 @@ _storedSequence = value;
 if (_storedSequence?.nodes != null) {
 foreach (var node in _storedSequence.nodes.Where(n => n != null)) {
 node._isPartOfSequence = true;
-node._storedSequence = null; // Nested sequences not allowed
+node._storedSequence = null; // Nested sequences are not allowed
 }
 }
 }
@@ -5118,6 +5151,7 @@ if (!HasSeedEffect()) {
 _storedSequence = null;
 }
 }
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -5128,6 +5162,9 @@ using System.Text;
 using WegoSystem;
 
 pub cls NodeDefinition : ScriptableObject, ITooltipDataProvider {
+GeneActivationType activationType = GeneActivationType.Passive;
+pub GeneActivationType ActivationType => activationType;
+
 pub string displayName;
 pub string description;
 
@@ -5192,46 +5229,46 @@ if (nodeData == null) ret string.Empty;
 
 var sb = new StringBuilder();
 
+Color activationColor = GetColorForActivationType(ActivationType);
+string hexActivationColor = ColorUtility.ToHtmlStringRGB(activationColor);
+sb.Append($"<color=#{hexActivationColor}><b>Activation: {ActivationType}</b></color>\n");
+
 if (nodeData.effects != null && nodeData.effects.Any()) {
 sb.Append("<b>Effects:</b>\n");
-var passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f); // Light Blue
-var activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);  // Light Orange
 c string effectPrefix = "• ";
 c string seedDetailPrefix = "    └ ";
 
 foreach (var effect in nodeData.effects) {
 if (effect == null) continue;
-Color effectColor = effect.IsPassive ? passiveEffectColor : activeEffectColor;
-string hexColor = ColorUtility.ToHtmlStringRGB(effectColor);
 
-sb.Append($"<color=#{hexColor}>{effectPrefix}{GetEffectDisplayName(effect.effectType)}: ");
+sb.Append($"{effectPrefix}{GetEffectDisplayName(effect.effectType)}: ");
 sb.Append(GetEffectDescription(effect));
-sb.Append("</color>\n");
+sb.Append("\n");
 
-if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null && effect.IsPassive) {
+if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null && ActivationType == GeneActivationType.Passive) {
 var energyStorageEffect = new NodeEffectData { effectType = NodeEffectType.EnergyStorage, primaryValue = effect.seedData.energyStorage };
-sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(energyStorageEffect.effectType)}: {GetEffectDescription(energyStorageEffect)}</color>\n");
+sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(energyStorageEffect.effectType)}: {GetEffectDescription(energyStorageEffect)}\n");
 
 var growthSpeedEffect = new NodeEffectData { effectType = NodeEffectType.GrowthSpeed, primaryValue = effect.seedData.growthSpeed };
-sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(growthSpeedEffect.effectType)}: {GetEffectDescription(growthSpeedEffect)}</color>\n");
+sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(growthSpeedEffect.effectType)}: {GetEffectDescription(growthSpeedEffect)}\n");
 
 var stemLengthEffect = new NodeEffectData { effectType = NodeEffectType.StemLength, primaryValue = effect.seedData.stemLengthMin, secondaryValue = effect.seedData.stemLengthMax };
-sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(stemLengthEffect.effectType)}: {GetEffectDescription(stemLengthEffect)}</color>\n");
+sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(stemLengthEffect.effectType)}: {GetEffectDescription(stemLengthEffect)}\n");
 
 var leafGapEffect = new NodeEffectData { effectType = NodeEffectType.LeafGap, primaryValue = effect.seedData.leafGap };
-sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(leafGapEffect.effectType)}: {GetEffectDescription(leafGapEffect)}</color>\n");
+sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(leafGapEffect.effectType)}: {GetEffectDescription(leafGapEffect)}\n");
 
 var leafPatternEffect = new NodeEffectData { effectType = NodeEffectType.LeafPattern, primaryValue = effect.seedData.leafPattern };
-sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(leafPatternEffect.effectType)}: {GetEffectDescription(leafPatternEffect)}</color>\n");
+sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(leafPatternEffect.effectType)}: {GetEffectDescription(leafPatternEffect)}\n");
 
 var stemRandomnessEffect = new NodeEffectData { effectType = NodeEffectType.StemRandomness, primaryValue = effect.seedData.stemRandomness };
-sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(stemRandomnessEffect.effectType)}: {GetEffectDescription(stemRandomnessEffect)}</color>\n");
+sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(stemRandomnessEffect.effectType)}: {GetEffectDescription(stemRandomnessEffect)}\n");
 
 var cooldownEffect = new NodeEffectData { effectType = NodeEffectType.Cooldown, primaryValue = effect.seedData.cooldown };
-sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(cooldownEffect.effectType)}: {GetEffectDescription(cooldownEffect)}</color>\n");
+sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(cooldownEffect.effectType)}: {GetEffectDescription(cooldownEffect)}\n");
 
 var castDelayEffect = new NodeEffectData { effectType = NodeEffectType.CastDelay, primaryValue = effect.seedData.castDelay };
-sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(castDelayEffect.effectType)}: {GetEffectDescription(castDelayEffect)}</color>\n");
+sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(castDelayEffect.effectType)}: {GetEffectDescription(castDelayEffect)}\n");
 }
 }
 }
@@ -5248,6 +5285,15 @@ sb.Append("Empty");
 }
 
 ret sb.ToString().TrimEnd();
+}
+
+Color GetColorForActivationType(GeneActivationType type) {
+switch (type) {
+case GeneActivationType.Passive: ret new Color(0.6f, 0.8f, 1f, 1f); // Light Blue
+case GeneActivationType.Active: ret new Color(1f, 0.8f, 0.6f, 1f);  // Light Orange
+case GeneActivationType.Payload: ret new Color(1f, 0.6f, 1f, 1f);  // Magenta
+default: ret Color.white;
+}
 }
 
 string GetEffectDisplayName(NodeEffectType type) {
@@ -5337,7 +5383,7 @@ case NodeEffectType.GrowBerry:
 ret "Grows berries";
 
 case NodeEffectType.SeedSpawn:
-ret effect.IsPassive ? "Contains seed" : "Active seed";
+ret "Defines a new seed type";
 
 case NodeEffectType.ScentModifier:
 string scentResult = "";
@@ -5392,6 +5438,7 @@ result.AppendLine($"{GetEffectDisplayName(effect.effectType)}: {GetEffectDescrip
 
 ret result.ToString();
 }
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -5430,17 +5477,15 @@ pub float primaryValue = 0f;
 pub float secondaryValue = 0f;
 pub SeedSpawnData seedData;
 
-pub bool IsPassive => NodeEffectTypeHelper.IsPassiveEffect(effectType);
-
-pub bool IsActive => NodeEffectTypeHelper.IsActiveEffect(effectType);
-
 pub int GetPrimaryValueAsInt() => Mathf.RoundToInt(primaryValue);
 pub int GetSecondaryValueAsInt() => Mathf.RoundToInt(secondaryValue);
 
 pub void ValidateForTicks() {
 if (effectType == NodeEffectType.EnergyPerTick && TickManager.Instance?.Config != null) {
 float ticksPerSecond = TickManager.Instance.Config.ticksPerRealSecond;
+if (ticksPerSecond > 0) {
 primaryValue /= ticksPerSecond;
+}
 }
 }
 }
@@ -5482,43 +5527,15 @@ Harvestable = 20 // <<< NEW
 ﻿// Assets/Scripts/PlantSystem/Data/NodeEffectTypeHelper.cs
 
 pub stat cls NodeEffectTypeHelper {
-stat ro HashSet<NodeEffectType> PassiveEffects = new HashSet<NodeEffectType> {
-NodeEffectType.EnergyStorage,
-NodeEffectType.EnergyPerTick,
-NodeEffectType.StemLength,
-NodeEffectType.GrowthSpeed,
-NodeEffectType.LeafGap,
-NodeEffectType.LeafPattern,
-NodeEffectType.StemRandomness,
-NodeEffectType.PoopAbsorption,
-NodeEffectType.SeedSpawn,
-NodeEffectType.Nutritious,
-NodeEffectType.Harvestable
-};
-
-stat ro HashSet<NodeEffectType> ActiveEffects = new HashSet<NodeEffectType> {
-NodeEffectType.EnergyCost,
-NodeEffectType.GrowBerry,
-NodeEffectType.ScentModifier,
-NodeEffectType.Damage
-};
 
 stat ro HashSet<NodeEffectType> TriggerEffects = new HashSet<NodeEffectType> {
 NodeEffectType.TimerCast,
 NodeEffectType.ProximityCast,
 NodeEffectType.EatCast,
 NodeEffectType.LeafLossCast,
-NodeEffectType.Cooldown,
-NodeEffectType.CastDelay
+NodeEffectType.Cooldown, // Cooldown itself is a trigger-related property
+NodeEffectType.CastDelay // CastDelay is also a trigger-related property
 };
-
-pub stat bool IsPassiveEffect(NodeEffectType type) {
-ret PassiveEffects.Contains(type);
-}
-
-pub stat bool IsActiveEffect(NodeEffectType type) {
-ret ActiveEffects.Contains(type) || TriggerEffects.Contains(type);
-}
 
 pub stat bool IsTriggerEffect(NodeEffectType type) {
 ret TriggerEffects.Contains(type);
@@ -5692,7 +5709,7 @@ ret null;
 Debug.Log($"[NodeExecutor] Seed '{seedInSlot.nodeDisplayName}' has {seedInSlot.effects?.Count ?? 0} effects:");
 if (seedInSlot.effects != null) {
 foreach (var effect in seedInSlot.effects) {
-Debug.Log($"  - {effect.effectType} (passive: {effect.IsPassive})");
+Debug.Log($"  - {effect.effectType}");
 }
 }
 
@@ -5715,7 +5732,7 @@ if (editorNode == null) continue;
 Debug.Log($"[NodeExecutor] Editor node '{editorNode.nodeDisplayName}' has {editorNode.effects?.Count ?? 0} effects:");
 if (editorNode.effects != null) {
 foreach (var effect in editorNode.effects) {
-Debug.Log($"  - {effect.effectType} (passive: {effect.IsPassive}, primary: {effect.primaryValue}, secondary: {effect.secondaryValue})");
+Debug.Log($"  - {effect.effectType} (primary: {effect.primaryValue}, secondary: {effect.secondaryValue})");
 }
 }
 
@@ -5732,7 +5749,7 @@ foreach (var node in plantGraph.nodes) {
 Debug.Log($"  - {node.nodeDisplayName} (order: {node.orderIndex}) with {node.effects?.Count ?? 0} effects");
 if (node.effects != null) {
 foreach (var effect in node.effects) {
-Debug.Log($"    - {effect.effectType} (passive: {effect.IsPassive}, primary: {effect.primaryValue})");
+Debug.Log($"    - {effect.effectType} (primary: {effect.primaryValue})");
 }
 }
 }
@@ -6561,7 +6578,7 @@ pub void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinit
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantGrowthLogic.cs
 
-﻿using UnityEngine;
+﻿// Assets/Scripts/PlantSystem/Growth/PlantGrowthLogic.cs
 using WegoSystem;
 
 pub cls PlantGrowthLogic {
@@ -6584,7 +6601,7 @@ pub float EnergyPerPoop { get; set; }
 float growthProgressTicks = 0f;
 int maturityCycleTick = 0;
 int currentStemStage = 0;
-List<PoopController> _poopsToAbsorbNextTick = new List<PoopController>();
+ro List<PoopController> _poopsToAbsorbNextTick = new List<PoopController>();
 int _poopScanCooldownTicks = 0;
 c int POOP_ABSORB_COOLDOWN = 5;
 
@@ -6645,15 +6662,24 @@ int castDelayTicksModifier = 0;
 PoopDetectionRadius = 0f;
 EnergyPerPoop = 0f;
 
+var library = NodeEditorGridController.Instance?.DefinitionLibrary;
+if (library == null) {
+Debug.LogError($"[{plant.gameObject.name}] Cannot calculate stats, NodeDefinitionLibrary not found!", plant.gameObject);
+return;
+}
+
 foreach (NodeData node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
 if (node?.effects == null) continue;
 
-foreach (var effect in node.effects) {
-if (effect == null || !effect.IsPassive) continue;
-if (effect.effectType == NodeEffectType.SeedSpawn) {
-seedFound = true; // Re-confirm if another seed node exists (shouldn't happen)
+NodeDefinition nodeDef = library.definitions.FirstOrDefault(d => d.name == node.definitionName);
+if (nodeDef == null || nodeDef.ActivationType != GeneActivationType.Passive) {
 continue;
 }
+
+foreach (var effect in node.effects) {
+if (effect == null) continue;
+if (effect.effectType == NodeEffectType.SeedSpawn) continue; // Seed effect only provides base stats from the root.
+
 effect.ValidateForTicks(); // Adjust time-based values
 
 switch (effect.effectType) {
@@ -6775,7 +6801,7 @@ if (poop != null) {
 _poopsToAbsorbNextTick.Add(poop);
 if (Debug.isDebugBuild)
 Debug.Log($"[{plant.gameObject.name}] <color=green>SUCCESS:</color> Detected poop at {poop.GetComponent<GridEntity>().Position}. Will absorb next tick.");
-return;
+return; // Found one, stop scanning
 }
 }
 }
@@ -6879,10 +6905,15 @@ ret growthProgressTicks / GrowthTicksPerStage;
 }
 
 pub int GetCurrentStemStage() => currentStemStage;
+
 pub void HandleGrowthComplete() => CompleteGrowth();
+
 pub int GetStepsCompleted() => currentStemStage;
+
 pub float GetGrowthProgress() => TargetStemLength > 0 ? (float)currentStemStage / TargetStemLength : 0f;
+
 pub float GetActualGrowthProgress() => GrowthTicksPerStage > 0 ? growthProgressTicks / GrowthTicksPerStage : 0f;
+
 pub int GetCurrentStemCount() => currentStemStage;
 }
 
@@ -6895,9 +6926,6 @@ using WegoSystem;
 pub cls PlantNodeExecutor {
 ro PlantGrowth plant;
 
-stat ro HashSet<NodeEffectType> EnergyFreeEffectTypes = new HashSet<NodeEffectType> {
-};
-
 pub PlantNodeExecutor(PlantGrowth plant) {
 this.plant = plant;
 }
@@ -6908,97 +6936,94 @@ Debug.LogError($"[{plant.gameObject.name}] NodeGraph missing or empty!");
 return;
 }
 
-Debug.Log($"[{plant.gameObject.name}] Executing mature cycle tick. Current energy: {plant.EnergySystem.CurrentEnergy:F1}/{plant.EnergySystem.MaxEnergy:F0}");
-
-var energyFreeEffects = new List<NodeEffectData>();
-var energyRequiringEffects = new List<NodeEffectData>();
-var accumulatedScentRadiusBonus = new Dictionary<ScentDefinition, float>();
-var accumulatedScentStrengthBonus = new Dictionary<ScentDefinition, float>();
-float totalEnergyCostForCycle = 0f;
-
-foreach (var node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex)) {
-if (node?.effects == null) continue;
-
-Debug.Log($"[{plant.gameObject.name}] Processing node '{node.nodeDisplayName}' with {node.effects.Count} effects");
-
-foreach (var effect in node.effects) {
-if (effect == null) continue;
-
-if (effect.IsPassive) {
-Debug.Log($"[{plant.gameObject.name}] Skipping passive effect: {effect.effectType}");
-continue;
-}
-
-if (IsEnergyFreeEffect(effect.effectType)) {
-energyFreeEffects.Add(effect);
-}
-else {
-energyRequiringEffects.Add(effect);
-
-if (effect.effectType == NodeEffectType.EnergyCost) {
-totalEnergyCostForCycle += Mathf.Max(0f, effect.primaryValue);
-}
-}
-
-Debug.Log($"[{plant.gameObject.name}] Found active effect: {effect.effectType} (energy-free: {IsEnergyFreeEffect(effect.effectType)})");
-}
-}
-
-if (energyFreeEffects.Count > 0) {
-Debug.Log($"[{plant.gameObject.name}] Executing {energyFreeEffects.Count} energy-free effects");
-foreach (var effect in energyFreeEffects) {
-ExecuteEffect(effect, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
-}
-}
-
-float totalCostForAbilities = totalEnergyCostForCycle;
-
-foreach (var effect in energyRequiringEffects) {
-if (effect.effectType != NodeEffectType.EnergyCost && effect.effectType == NodeEffectType.GrowBerry) // Example: Berries cost 1 energy {
-totalCostForAbilities += 1f;
-}
-}
-
-Debug.Log($"[{plant.gameObject.name}] Total energy cost for abilities: {totalCostForAbilities}");
-
-if (totalCostForAbilities > 0 && plant.EnergySystem.CurrentEnergy < totalCostForAbilities) {
-Debug.Log($"[{plant.gameObject.name}] Not enough energy ({plant.EnergySystem.CurrentEnergy:F1}/{totalCostForAbilities:F1}) for abilities. Skipping.");
-
-if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0) {
-ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
-}
+var library = NodeEditorGridController.Instance?.DefinitionLibrary;
+if (library == null) {
+Debug.LogError($"[{plant.gameObject.name}] Cannot execute cycle, NodeDefinitionLibrary not found!");
 return;
 }
 
-if (totalCostForAbilities > 0) {
-plant.EnergySystem.SpendEnergy(totalCostForAbilities);
-Debug.Log($"[{plant.gameObject.name}] Spent {totalCostForAbilities} energy. Remaining: {plant.EnergySystem.CurrentEnergy:F1}");
+var nodes = plant.NodeGraph.nodes;
+
+for (int i = 0; i < nodes.Count; i++) {
+var nodeData = nodes[i];
+if (nodeData == null) continue;
+
+var nodeDef = library.definitions.FirstOrDefault(d => d.name == nodeData.definitionName);
+
+if (nodeDef == null || nodeDef.ActivationType != GeneActivationType.Active) {
+continue;
 }
 
-if (energyRequiringEffects.Count > 0) {
-Debug.Log($"[{plant.gameObject.name}] Executing {energyRequiringEffects.Count} energy-requiring effects");
-foreach (var effect in energyRequiringEffects) {
-ExecuteEffect(effect, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+float cost = CalculateGeneEnergyCost(nodeData);
+if (plant.EnergySystem.HasEnergy(cost)) {
+plant.EnergySystem.SpendEnergy(cost);
+
+bool isTrigger = nodeData.effects.Any(e => e != null && NodeEffectTypeHelper.IsTriggerEffect(e.effectType));
+
+if (isTrigger) {
+ExecuteTrigger(i);
+}
+else {
+ExecuteAllEffectsOfGene(nodeData);
+}
+}
+else {
+if (Debug.isDebugBuild) {
+Debug.Log($"[{plant.gameObject.name}] Not enough energy for gene '{nodeDef.displayName}'. Have {plant.EnergySystem.CurrentEnergy:F1}, need {cost:F1}.");
+}
+}
 }
 }
 
-if (accumulatedScentRadiusBonus.Count > 0 || accumulatedScentStrengthBonus.Count > 0) {
-ApplyScentDataToObject(plant.gameObject, accumulatedScentRadiusBonus, accumulatedScentStrengthBonus);
+void ExecuteTrigger(int triggerGeneIndex) {
+var nodes = plant.NodeGraph.nodes;
+var library = NodeEditorGridController.Instance.DefinitionLibrary;
+
+for (int i = triggerGeneIndex + 1; i < nodes.Count; i++) {
+var payloadNodeData = nodes[i];
+if (payloadNodeData == null) continue;
+
+var payloadNodeDef = library.definitions.FirstOrDefault(d => d.name == payloadNodeData.definitionName);
+
+if (payloadNodeDef != null && payloadNodeDef.ActivationType == GeneActivationType.Payload) {
+if (Debug.isDebugBuild) {
+var triggerDef = library.definitions.FirstOrDefault(d => d.name == nodes[triggerGeneIndex].definitionName);
+Debug.Log($"[{plant.gameObject.name}] Trigger '{triggerDef?.displayName}' is activating Payload '{payloadNodeDef.displayName}'.");
+}
+ExecuteAllEffectsOfGene(payloadNodeData);
+return; // Only execute the first payload found
+}
 }
 }
 
-bool IsEnergyFreeEffect(NodeEffectType effectType) {
-ret EnergyFreeEffectTypes.Contains(effectType);
+float CalculateGeneEnergyCost(NodeData nodeData) {
+if (nodeData?.effects == null) ret 0f;
+
+float totalCost = 0f;
+foreach (var effect in nodeData.effects) {
+if (effect.effectType == NodeEffectType.EnergyCost) {
+totalCost += effect.primaryValue;
+}
+}
+ret totalCost;
 }
 
-void ExecuteEffect(NodeEffectData effect, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus) {
+void ExecuteAllEffectsOfGene(NodeData nodeData) {
+if (nodeData?.effects == null) return;
+
+foreach (var effect in nodeData.effects) {
+ExecuteEffect(effect);
+}
+}
+
+void ExecuteEffect(NodeEffectData effect) {
 switch (effect.effectType) {
-case NodeEffectType.PoopAbsorption:
-Debug.LogWarning($"[{plant.gameObject.name}] Tried to execute PoopAbsorption as an ACTIVE effect. It should be PASSIVE. This is automatically handled; no need to set a checkbox.", plant.gameObject);
-break;
-
 case NodeEffectType.GrowBerry:
 SpawnBerry(effect);
+break;
+
+case NodeEffectType.Damage:
+Debug.Log("Executing Damage Effect - NOT IMPLEMENTED");
 break;
 
 case NodeEffectType.ScentModifier:
@@ -7007,32 +7032,11 @@ break;
 }
 }
 
-pub void ExecutePassiveAbilities(List<NodeEffectData> passiveEffects = null) {
-if (plant.NodeGraph?.nodes == null || plant.NodeGraph.nodes.Count == 0) return;
-
-if (passiveEffects == null) {
-passiveEffects = new List<NodeEffectData>();
-foreach (var node in plant.NodeGraph.nodes) {
-if (node?.effects == null) continue;
-foreach (var effect in node.effects) {
-if (effect != null && effect.IsPassive) {
-passiveEffects.Add(effect);
-}
-}
-}
-}
-
-foreach (var effect in passiveEffects) {
-}
-}
-
 pub void SpawnBerry(NodeEffectData growEffectData) {
 if (plant == null || (plant.CurrentState != PlantState.Mature_Idle && plant.CurrentState != PlantState.Mature_Executing)) {
 Debug.LogWarning($"[{plant?.gameObject.name ?? "Unknown"}] Berry cannot be spawned.", plant?.gameObject);
 return;
 }
-
-Debug.Log($"[{plant.gameObject.name}] SpawnBerry called!");
 
 if (plant.CellManager == null) {
 Debug.LogError($"[{plant.gameObject.name}] CellManager is null!");
@@ -7050,7 +7054,7 @@ bool hasLimit = maxBerriesAllowed > 0;
 int currentBerryCount = plant.CellManager.GetBerryCount();
 
 if (hasLimit && currentBerryCount >= maxBerriesAllowed) {
-Debug.Log($"[{plant.gameObject.name}] Already has {currentBerryCount} berries (max: {maxBerriesAllowed}). Skipping berry spawn.");
+if(Debug.isDebugBuild) Debug.Log($"[{plant.gameObject.name}] Already has {currentBerryCount} berries (max: {maxBerriesAllowed}). Skipping berry spawn.");
 return;
 }
 
@@ -7081,7 +7085,7 @@ availablePositions.RemoveWhere(pos => pos.y <= 0);
 List<Vector2Int> candidatePositions = availablePositions.ToList();
 
 if (candidatePositions.Count == 0) {
-Debug.LogWarning($"[{plant.gameObject.name}] No available space to spawn berry!");
+if(Debug.isDebugBuild) Debug.LogWarning($"[{plant.gameObject.name}] No available space to spawn berry!");
 return;
 }
 
@@ -7106,7 +7110,7 @@ preferredPositions.AddRange(candidatePositions);
 List<Vector2Int> finalCandidates = preferredPositions.Count > 0 ? preferredPositions : otherPositions;
 
 if (finalCandidates.Count == 0) {
-Debug.LogWarning($"[{plant.gameObject.name}] No final candidates to spawn berry.");
+if(Debug.isDebugBuild) Debug.LogWarning($"[{plant.gameObject.name}] No final candidates to spawn berry.");
 return;
 }
 
@@ -7147,9 +7151,13 @@ foodItem.foodType = berryFoodType;
 }
 }
 
-HarvestableTag tag = berry.AddComponent<HarvestableTag>();
-
+bool isHarvestable = plant.NodeGraph.nodes.Any(node => node.effects.Any(e => e.effectType == NodeEffectType.Harvestable));
+if (isHarvestable) {
+if (berry.GetComponent<HarvestableTag>() == null) {
+berry.AddComponent<HarvestableTag>();
 Debug.Log($"[PlantNodeExecutor] Added HarvestableTag to berry", berry);
+}
+}
 }
 
 FoodType GetBerryFoodType() {
@@ -7187,15 +7195,11 @@ scentSourceObj.transform.SetParent(targetObject.transform);
 scentSourceObj.transform.localPosition = Vector3.zero;
 
 ScentSource newSource = scentSourceObj.AddComponent<ScentSource>();
-SetScentSourceDefinition(newSource, scentDef); // Use helper to set definition
+newSource.SetDefinition(scentDef);
 newSource.SetRadiusModifier(radiusBonus);
 newSource.SetStrengthModifier(strengthBonus);
 }
 }
-}
-
-void SetScentSourceDefinition(ScentSource source, ScentDefinition definition) {
-source.SetDefinition(definition);
 }
 }
 
@@ -7701,11 +7705,12 @@ ret itemType == ItemType.Node && nodeData != null && nodeData.IsSeed();
 pub cls InventoryColorManager : MonoBehaviour {
 pub stat InventoryColorManager Instance { get; set; }
 
-[SerializeField] Color toolCellColor = new Color(0.5f, 0.5f, 0.5f, 1f); // Gray
-[SerializeField] Color seedCellColor = new Color(0.8f, 1f, 0.8f, 1f); // Light Green
-[SerializeField] Color passiveGeneCellColor = new Color(0.8f, 0.8f, 1f, 1f); // Light Blue
-[SerializeField] Color activeGeneCellColor = new Color(1f, 0.8f, 0.8f, 1f); // Light Red
-[SerializeField] Color defaultCellColor = new Color(0.9f, 0.9f, 0.9f, 1f); // Light Gray
+[SerializeField] Color toolCellColor = new Color(0.5f, 0.5f, 0.5f, 1f);       // Gray
+[SerializeField] Color seedCellColor = new Color(0.8f, 1f, 0.8f, 1f);       // Light Green
+[SerializeField] Color passiveGeneCellColor = new Color(0.8f, 0.8f, 1f, 1f);    // Light Blue
+[SerializeField] Color activeGeneCellColor = new Color(1f, 0.8f, 0.8f, 1f);     // Light Red / Orange
+[SerializeField] Color payloadGeneCellColor = new Color(1f, 0.7f, 1f, 1f);    // Light Magenta
+[SerializeField] Color defaultCellColor = new Color(0.9f, 0.9f, 0.9f, 1f);    // Light Gray
 
 void Awake() {
 if (Instance != null && Instance != this) {
@@ -7716,28 +7721,20 @@ Instance = this;
 }
 
 pub Color GetCellColorForItem(NodeData nodeData, NodeDefinition nodeDefinition, ToolDefinition toolDefinition) {
-if (toolDefinition != null) {
+switch (GetItemCategory(nodeData, nodeDefinition, toolDefinition)) {
+case ItemCategory.Tool:
 ret toolCellColor;
-}
-
-if (nodeData != null && nodeDefinition != null) {
-if (nodeData.IsSeed()) {
+case ItemCategory.Seed:
 ret seedCellColor;
-}
-
-if (nodeData.effects != null && nodeData.effects.Count > 0) {
-bool hasActiveEffects = nodeData.effects.Any(e => e != null && e.IsActive);
-
-if (hasActiveEffects) {
-ret activeGeneCellColor;
-}
-else {
+case ItemCategory.PassiveGene:
 ret passiveGeneCellColor;
-}
-}
-}
-
+case ItemCategory.ActiveGene:
+ret activeGeneCellColor;
+case ItemCategory.PayloadGene:
+ret payloadGeneCellColor;
+default:
 ret defaultCellColor;
+}
 }
 
 pub enum ItemCategory {
@@ -7745,6 +7742,7 @@ Tool,
 Seed,
 PassiveGene,
 ActiveGene,
+PayloadGene,
 Default
 }
 
@@ -7754,9 +7752,13 @@ if (toolDefinition != null) ret ItemCategory.Tool;
 if (nodeData != null && nodeDefinition != null) {
 if (nodeData.IsSeed()) ret ItemCategory.Seed;
 
-if (nodeData.effects != null && nodeData.effects.Count > 0) {
-bool hasActiveEffects = nodeData.effects.Any(e => e != null && e.IsActive);
-ret hasActiveEffects ? ItemCategory.ActiveGene : ItemCategory.PassiveGene;
+switch (nodeDefinition.ActivationType) {
+case GeneActivationType.Passive:
+ret ItemCategory.PassiveGene;
+case GeneActivationType.Active:
+ret ItemCategory.ActiveGene;
+case GeneActivationType.Payload:
+ret ItemCategory.PayloadGene;
 }
 }
 

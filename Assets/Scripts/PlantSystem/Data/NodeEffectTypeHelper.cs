@@ -3,51 +3,18 @@ using System.Collections.Generic;
 
 public static class NodeEffectTypeHelper
 {
-    // Passive effects that modify stats/properties
-    private static readonly HashSet<NodeEffectType> PassiveEffects = new HashSet<NodeEffectType>
-    {
-        NodeEffectType.EnergyStorage,
-        NodeEffectType.EnergyPerTick,
-        NodeEffectType.StemLength,
-        NodeEffectType.GrowthSpeed,
-        NodeEffectType.LeafGap,
-        NodeEffectType.LeafPattern,
-        NodeEffectType.StemRandomness,
-        NodeEffectType.PoopAbsorption,
-        NodeEffectType.SeedSpawn,
-        NodeEffectType.Nutritious,
-        NodeEffectType.Harvestable
-    };
+    // PassiveEffects and ActiveEffects HashSets are removed.
+    // IsPassiveEffect and IsActiveEffect methods are removed.
 
-    // Active effects that consume energy or execute actions
-    private static readonly HashSet<NodeEffectType> ActiveEffects = new HashSet<NodeEffectType>
-    {
-        NodeEffectType.EnergyCost,
-        NodeEffectType.GrowBerry,
-        NodeEffectType.ScentModifier,
-        NodeEffectType.Damage
-    };
-
-    // Trigger effects (special active category)
     private static readonly HashSet<NodeEffectType> TriggerEffects = new HashSet<NodeEffectType>
     {
         NodeEffectType.TimerCast,
         NodeEffectType.ProximityCast,
         NodeEffectType.EatCast,
         NodeEffectType.LeafLossCast,
-        NodeEffectType.Cooldown,
-        NodeEffectType.CastDelay
+        NodeEffectType.Cooldown, // Cooldown itself is a trigger-related property
+        NodeEffectType.CastDelay // CastDelay is also a trigger-related property
     };
-
-    public static bool IsPassiveEffect(NodeEffectType type)
-    {
-        return PassiveEffects.Contains(type);
-    }
-
-    public static bool IsActiveEffect(NodeEffectType type)
-    {
-        return ActiveEffects.Contains(type) || TriggerEffects.Contains(type);
-    }
 
     public static bool IsTriggerEffect(NodeEffectType type)
     {
@@ -56,7 +23,8 @@ public static class NodeEffectTypeHelper
 
     public static bool RequiresPrimaryValue(NodeEffectType type)
     {
-        // Effects that don't need primary value
+        // A gene being harvestable is a flag, it doesn't need a value.
+        // Growing a berry is also a flag; the properties of the berry come from other effects.
         return type != NodeEffectType.Harvestable &&
                type != NodeEffectType.GrowBerry;
     }

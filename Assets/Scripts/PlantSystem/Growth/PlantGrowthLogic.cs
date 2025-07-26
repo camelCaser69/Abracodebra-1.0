@@ -1,16 +1,14 @@
-﻿using UnityEngine;
+﻿// Assets/Scripts/PlantSystem/Growth/PlantGrowthLogic.cs
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using WegoSystem;
-
-#region Using Statements
-// This region is for AI formatting. It will be removed in the final output.
-#endregion
 
 public class PlantGrowthLogic
 {
     private readonly PlantGrowth plant;
 
+    #region Properties
     public int TargetStemLength { get; set; }
     public int GrowthTicksPerStage { get; set; }
     public int LeafGap { get; set; }
@@ -24,11 +22,12 @@ public class PlantGrowthLogic
 
     public float PoopDetectionRadius { get; set; }
     public float EnergyPerPoop { get; set; }
+    #endregion
 
     private float growthProgressTicks = 0f;
     private int maturityCycleTick = 0;
     private int currentStemStage = 0;
-    private List<PoopController> _poopsToAbsorbNextTick = new List<PoopController>();
+    private readonly List<PoopController> _poopsToAbsorbNextTick = new List<PoopController>();
     private int _poopScanCooldownTicks = 0;
     private const int POOP_ABSORB_COOLDOWN = 5;
 
@@ -37,123 +36,134 @@ public class PlantGrowthLogic
         this.plant = plant;
     }
 
-    // In file: Assets/Scripts/PlantSystem/Growth/PlantGrowthLogic.cs
-public void CalculateAndApplyStats()
-{
-    if (plant.NodeGraph == null)
+    public void CalculateAndApplyStats()
     {
-        Debug.LogError($"[{plant.gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
-        return;
-    }
-
-    float basePhotosynthesisEfficiency = FloraManager.Instance != null
-        ? FloraManager.Instance.basePhotosynthesisRatePerLeaf
-        : 0.1f;
-
-    // Default values if no seed is found or seed is basic
-    float baseEnergyStorage = 10f;
-    int baseStemMin = 3;
-    int baseStemMax = 5;
-    int baseGrowthTicksPerStage = 5;
-    int baseLeafGap = 1;
-    int baseLeafPattern = 0;
-    float baseGrowthRandomness = 0.1f;
-    int baseCooldownTicks = 20;
-    int baseCastDelayTicks = 0;
-    bool seedFound = false;
-    int baseMaxBerries = 3;
-
-    NodeData firstNode = plant.NodeGraph.nodes.FirstOrDefault();
-    if (firstNode != null)
-    {
-        var seedEffect = firstNode.effects?.FirstOrDefault(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
-        if (seedEffect != null && seedEffect.seedData != null)
+        if (plant.NodeGraph == null)
         {
-            seedFound = true;
-            baseEnergyStorage = seedEffect.seedData.energyStorage;
-            baseGrowthTicksPerStage = seedEffect.seedData.growthSpeed;
-            baseStemMin = seedEffect.seedData.stemLengthMin;
-            baseStemMax = seedEffect.seedData.stemLengthMax;
-            baseLeafGap = seedEffect.seedData.leafGap;
-            baseLeafPattern = seedEffect.seedData.leafPattern;
-            baseGrowthRandomness = seedEffect.seedData.stemRandomness;
-            baseCooldownTicks = seedEffect.seedData.cooldown;
-            baseCastDelayTicks = seedEffect.seedData.castDelay;
-            baseMaxBerries = seedEffect.seedData.maxBerries;
+            Debug.LogError($"[{plant.gameObject.name}] CalculateAndApplyStats called with null NodeGraph!");
+            return;
         }
-    }
 
-    // Accumulators for stat modifications
-    float accumulatedEnergyStorage = 0f;
-    float accumulatedPhotosynthesisEfficiency = 0f;
-    int stemLengthMinModifier = 0;
-    int stemLengthMaxModifier = 0;
-    int growthTicksModifier = 0;
-    int leafGapModifier = 0;
-    int currentLeafPattern = baseLeafPattern;
-    float growthRandomnessModifier = 0f;
-    int cooldownTicksModifier = 0;
-    int castDelayTicksModifier = 0;
-    PoopDetectionRadius = 0f;
-    EnergyPerPoop = 0f;
+        // --- BASE STATS ---
+        float basePhotosynthesisEfficiency = FloraManager.Instance != null
+            ? FloraManager.Instance.basePhotosynthesisRatePerLeaf
+            : 0.1f;
 
-    foreach (NodeData node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex))
-    {
-        if (node?.effects == null) continue;
+        float baseEnergyStorage = 10f;
+        int baseStemMin = 3;
+        int baseStemMax = 5;
+        int baseGrowthTicksPerStage = 5;
+        int baseLeafGap = 1;
+        int baseLeafPattern = 0;
+        float baseGrowthRandomness = 0.1f;
+        int baseCooldownTicks = 20;
+        int baseCastDelayTicks = 0;
+        bool seedFound = false;
+        int baseMaxBerries = 3;
 
-        foreach (var effect in node.effects)
+        // Load base stats from the root seed node
+        NodeData firstNode = plant.NodeGraph.nodes.FirstOrDefault();
+        if (firstNode != null)
         {
-            // --- FIX: Replaced !effect.isPassive with !effect.IsPassive ---
-            if (effect == null || !effect.IsPassive) continue;
-            if (effect.effectType == NodeEffectType.SeedSpawn)
+            var seedEffect = firstNode.effects?.FirstOrDefault(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
+            if (seedEffect != null && seedEffect.seedData != null)
             {
-                seedFound = true; // Re-confirm if another seed node exists (shouldn't happen)
+                seedFound = true;
+                baseEnergyStorage = seedEffect.seedData.energyStorage;
+                baseGrowthTicksPerStage = seedEffect.seedData.growthSpeed;
+                baseStemMin = seedEffect.seedData.stemLengthMin;
+                baseStemMax = seedEffect.seedData.stemLengthMax;
+                baseLeafGap = seedEffect.seedData.leafGap;
+                baseLeafPattern = seedEffect.seedData.leafPattern;
+                baseGrowthRandomness = seedEffect.seedData.stemRandomness;
+                baseCooldownTicks = seedEffect.seedData.cooldown;
+                baseCastDelayTicks = seedEffect.seedData.castDelay;
+                baseMaxBerries = seedEffect.seedData.maxBerries;
+            }
+        }
+
+        // --- ACCUMULATE MODIFIERS FROM PASSIVE GENES ---
+        float accumulatedEnergyStorage = 0f;
+        float accumulatedPhotosynthesisEfficiency = 0f;
+        int stemLengthMinModifier = 0;
+        int stemLengthMaxModifier = 0;
+        int growthTicksModifier = 0;
+        int leafGapModifier = 0;
+        int currentLeafPattern = baseLeafPattern;
+        float growthRandomnessModifier = 0f;
+        int cooldownTicksModifier = 0;
+        int castDelayTicksModifier = 0;
+        PoopDetectionRadius = 0f;
+        EnergyPerPoop = 0f;
+
+        var library = NodeEditorGridController.Instance?.DefinitionLibrary;
+        if (library == null)
+        {
+            Debug.LogError($"[{plant.gameObject.name}] Cannot calculate stats, NodeDefinitionLibrary not found!", plant.gameObject);
+            return;
+        }
+
+        foreach (NodeData node in plant.NodeGraph.nodes.OrderBy(n => n.orderIndex))
+        {
+            if (node?.effects == null) continue;
+
+            NodeDefinition nodeDef = library.definitions.FirstOrDefault(d => d.name == node.definitionName);
+            if (nodeDef == null || nodeDef.ActivationType != GeneActivationType.Passive)
+            {
+                // This node is not passive, so its effects do not contribute to base stats.
                 continue;
             }
-            effect.ValidateForTicks(); // Adjust time-based values
 
-            switch (effect.effectType)
+            // This is a PASSIVE gene, so apply all its effects to the stats.
+            foreach (var effect in node.effects)
             {
-                case NodeEffectType.EnergyStorage: accumulatedEnergyStorage += effect.primaryValue; break;
-                case NodeEffectType.EnergyPerTick: accumulatedPhotosynthesisEfficiency += effect.primaryValue; break;
-                case NodeEffectType.StemLength:
-                    stemLengthMinModifier += effect.GetPrimaryValueAsInt();
-                    stemLengthMaxModifier += effect.GetSecondaryValueAsInt(); break;
-                case NodeEffectType.GrowthSpeed: growthTicksModifier += effect.GetPrimaryValueAsInt(); break;
-                case NodeEffectType.LeafGap: leafGapModifier += effect.GetPrimaryValueAsInt(); break;
-                case NodeEffectType.LeafPattern: currentLeafPattern = Mathf.Clamp(effect.GetPrimaryValueAsInt(), 0, 4); break;
-                case NodeEffectType.StemRandomness: growthRandomnessModifier += effect.primaryValue; break;
-                case NodeEffectType.Cooldown: cooldownTicksModifier += effect.GetPrimaryValueAsInt(); break;
-                case NodeEffectType.CastDelay: castDelayTicksModifier += effect.GetPrimaryValueAsInt(); break;
-                case NodeEffectType.PoopAbsorption:
-                    PoopDetectionRadius = Mathf.Max(PoopDetectionRadius, effect.primaryValue);
-                    EnergyPerPoop = Mathf.Max(EnergyPerPoop, effect.secondaryValue);
-                    break;
+                if (effect == null) continue;
+                if (effect.effectType == NodeEffectType.SeedSpawn) continue; // Seed effect only provides base stats from the root.
+
+                effect.ValidateForTicks(); // Adjust time-based values
+
+                switch (effect.effectType)
+                {
+                    case NodeEffectType.EnergyStorage: accumulatedEnergyStorage += effect.primaryValue; break;
+                    case NodeEffectType.EnergyPerTick: accumulatedPhotosynthesisEfficiency += effect.primaryValue; break;
+                    case NodeEffectType.StemLength:
+                        stemLengthMinModifier += effect.GetPrimaryValueAsInt();
+                        stemLengthMaxModifier += effect.GetSecondaryValueAsInt(); break;
+                    case NodeEffectType.GrowthSpeed: growthTicksModifier += effect.GetPrimaryValueAsInt(); break;
+                    case NodeEffectType.LeafGap: leafGapModifier += effect.GetPrimaryValueAsInt(); break;
+                    case NodeEffectType.LeafPattern: currentLeafPattern = Mathf.Clamp(effect.GetPrimaryValueAsInt(), 0, 4); break;
+                    case NodeEffectType.StemRandomness: growthRandomnessModifier += effect.primaryValue; break;
+                    case NodeEffectType.Cooldown: cooldownTicksModifier += effect.GetPrimaryValueAsInt(); break;
+                    case NodeEffectType.CastDelay: castDelayTicksModifier += effect.GetPrimaryValueAsInt(); break;
+                    case NodeEffectType.PoopAbsorption:
+                        PoopDetectionRadius = Mathf.Max(PoopDetectionRadius, effect.primaryValue);
+                        EnergyPerPoop = Mathf.Max(EnergyPerPoop, effect.secondaryValue);
+                        break;
+                }
             }
         }
+
+        // --- APPLY FINAL STATS ---
+        plant.EnergySystem.MaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
+        PhotosynthesisEfficiencyPerLeaf = Mathf.Max(0f, basePhotosynthesisEfficiency + accumulatedPhotosynthesisEfficiency);
+
+        int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthMinModifier);
+        int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthMaxModifier);
+        TargetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
+
+        GrowthTicksPerStage = Mathf.Max(1, baseGrowthTicksPerStage + growthTicksModifier);
+        LeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
+        LeafPattern = currentLeafPattern;
+        GrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
+        MaturityCycleTicks = Mathf.Max(1, baseCooldownTicks + cooldownTicksModifier);
+        NodeCastDelayTicks = Mathf.Max(0, baseCastDelayTicks + castDelayTicksModifier);
+        MaxBerries = baseMaxBerries;
+
+        if (!seedFound)
+        {
+            Debug.LogWarning($"[{plant.gameObject.name}] NodeGraph lacks a SeedSpawn effect. Growth aborted.", plant.gameObject);
+        }
     }
-
-    // Apply final calculated stats
-    plant.EnergySystem.MaxEnergy = Mathf.Max(1f, baseEnergyStorage + accumulatedEnergyStorage);
-    PhotosynthesisEfficiencyPerLeaf = Mathf.Max(0f, basePhotosynthesisEfficiency + accumulatedPhotosynthesisEfficiency);
-
-    int finalStemMin = Mathf.Max(1, baseStemMin + stemLengthMinModifier);
-    int finalStemMax = Mathf.Max(finalStemMin, baseStemMax + stemLengthMaxModifier);
-    TargetStemLength = seedFound ? Random.Range(finalStemMin, finalStemMax + 1) : 0;
-
-    GrowthTicksPerStage = Mathf.Max(1, baseGrowthTicksPerStage + growthTicksModifier);
-    LeafGap = Mathf.Max(0, baseLeafGap + leafGapModifier);
-    LeafPattern = currentLeafPattern;
-    GrowthRandomness = Mathf.Clamp01(baseGrowthRandomness + growthRandomnessModifier);
-    MaturityCycleTicks = Mathf.Max(1, baseCooldownTicks + cooldownTicksModifier);
-    NodeCastDelayTicks = Mathf.Max(0, baseCastDelayTicks + castDelayTicksModifier);
-    MaxBerries = baseMaxBerries;
-
-    if (!seedFound)
-    {
-        Debug.LogWarning($"[{plant.gameObject.name}] NodeGraph lacks a SeedSpawn effect. Growth aborted.", plant.gameObject);
-    }
-}
 
     public void OnTickUpdate(int currentTick)
     {
@@ -251,7 +261,7 @@ public void CalculateAndApplyStats()
                         _poopsToAbsorbNextTick.Add(poop);
                         if (Debug.isDebugBuild)
                             Debug.Log($"[{plant.gameObject.name}] <color=green>SUCCESS:</color> Detected poop at {poop.GetComponent<GridEntity>().Position}. Will absorb next tick.");
-                        return;
+                        return; // Found one, stop scanning
                     }
                 }
             }
@@ -264,6 +274,7 @@ public void CalculateAndApplyStats()
         currentStemStage++;
 
         Vector2Int stemPos;
+        // Determine position for the new stem segment based on randomness and avoiding collisions
         if (currentStemStage == 1)
         {
             stemPos = Vector2Int.up;
@@ -272,7 +283,8 @@ public void CalculateAndApplyStats()
         {
             Vector2Int previousStemPos = Vector2Int.zero;
             bool foundPreviousStem = false;
-
+            
+            // Find the last grown stem
             for (int i = currentStemStage - 1; i >= 1; i--)
             {
                 var cells = plant.CellManager.GetCells();
@@ -288,8 +300,7 @@ public void CalculateAndApplyStats()
                 if (foundPreviousStem) break;
             }
 
-            if (!foundPreviousStem)
-            {
+            if (!foundPreviousStem) {
                 Debug.LogError($"[{plant.gameObject.name}] Could not find previous stem at stage {currentStemStage - 1}! Using default position.");
                 previousStemPos = Vector2Int.up * (currentStemStage - 1);
             }
@@ -306,6 +317,7 @@ public void CalculateAndApplyStats()
                 stemPos.x = previousStemPos.x;
             }
 
+            // Simple collision avoidance
             int attempts = 0;
             while (plant.CellManager.HasCellAt(stemPos) && attempts < 5)
             {
@@ -319,8 +331,7 @@ public void CalculateAndApplyStats()
                     default: stemPos = previousStemPos + Vector2Int.up; break;
                 }
             }
-            if (plant.CellManager.HasCellAt(stemPos))
-            {
+            if (plant.CellManager.HasCellAt(stemPos)) {
                 var existingCellType = plant.CellManager.GetCellTypeAt(stemPos);
                 Debug.LogError($"[{plant.gameObject.name}] Cannot spawn stem at stage {currentStemStage} - position {stemPos} occupied by {existingCellType}! Previous stem was at {previousStemPos}");
                 return;
@@ -328,12 +339,12 @@ public void CalculateAndApplyStats()
         }
 
         GameObject stemCell = plant.CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos, null, null);
-        if (stemCell == null)
-        {
+        if (stemCell == null) {
             Debug.LogError($"[{plant.gameObject.name}] Failed to spawn stem at stage {currentStemStage} at position {stemPos}");
             return;
         }
-
+        
+        // Grow leaves if applicable for this stage
         if (LeafGap >= 0 && (currentStemStage % (LeafGap + 1)) == 0)
         {
             var leafPositions = plant.CellManager.CalculateLeafPositions(stemPos, LeafPattern, currentStemStage);
@@ -369,6 +380,7 @@ public void CalculateAndApplyStats()
         }
     }
 
+    #region Helper Getters
     public float GetGrowthProgressNormalized()
     {
         if (GrowthTicksPerStage <= 0) return 1f;
@@ -376,9 +388,15 @@ public void CalculateAndApplyStats()
     }
 
     public int GetCurrentStemStage() => currentStemStage;
+
     public void HandleGrowthComplete() => CompleteGrowth();
+
     public int GetStepsCompleted() => currentStemStage;
+
     public float GetGrowthProgress() => TargetStemLength > 0 ? (float)currentStemStage / TargetStemLength : 0f;
+
     public float GetActualGrowthProgress() => GrowthTicksPerStage > 0 ? growthProgressTicks / GrowthTicksPerStage : 0f;
+
     public int GetCurrentStemCount() => currentStemStage;
+    #endregion
 }

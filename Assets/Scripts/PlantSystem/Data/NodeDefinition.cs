@@ -1,25 +1,33 @@
 ﻿// Assets/Scripts/PlantSystem/Data/NodeDefinition.cs
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 using WegoSystem;
 
 [CreateAssetMenu(fileName = "Node_", menuName = "Nodes/Node Definition")]
 public class NodeDefinition : ScriptableObject, ITooltipDataProvider
 {
+    [Header("Gene Configuration")]
+    [SerializeField]
+    private GeneActivationType activationType = GeneActivationType.Passive;
+    public GeneActivationType ActivationType => activationType;
+
+
+    [Header("Display Properties")]
     public string displayName;
     [TextArea(3, 5)]
     public string description;
 
-    [Header("Visuals")]
     public Sprite thumbnail;
     public Color thumbnailTintColor = Color.white;
     public Color backgroundColor = Color.gray;
 
-    [Header("Data")]
+    [Header("System Properties")]
     public GameObject nodeViewPrefab;
     public List<NodeEffectData> effects;
+
+    #region Methods
 
     public List<NodeEffectData> CloneEffects()
     {
@@ -47,6 +55,7 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
                 consumedOnTrigger = originalEffect.consumedOnTrigger,
             };
 
+            // Deep copy seed data if it exists
             if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null)
             {
                 newEffect.seedData = new SeedSpawnData
@@ -68,6 +77,10 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
         return copy;
     }
 
+    #endregion
+
+    #region Tooltip Implementation
+
     public string GetTooltipTitle()
     {
         return displayName ?? "Unknown Node";
@@ -85,50 +98,52 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
 
         var sb = new StringBuilder();
 
+        // --- Activation Type ---
+        Color activationColor = GetColorForActivationType(ActivationType);
+        string hexActivationColor = ColorUtility.ToHtmlStringRGB(activationColor);
+        sb.Append($"<color=#{hexActivationColor}><b>Activation: {ActivationType}</b></color>\n");
+
+
         if (nodeData.effects != null && nodeData.effects.Any())
         {
             sb.Append("<b>Effects:</b>\n");
-            var passiveEffectColor = new Color(0.6f, 0.8f, 1f, 1f); // Light Blue
-            var activeEffectColor = new Color(1f, 0.8f, 0.6f, 1f);  // Light Orange
             const string effectPrefix = "• ";
             const string seedDetailPrefix = "    └ ";
 
             foreach (var effect in nodeData.effects)
             {
                 if (effect == null) continue;
-                // --- FIX: Replaced effect.isPassive with effect.IsPassive ---
-                Color effectColor = effect.IsPassive ? passiveEffectColor : activeEffectColor;
-                string hexColor = ColorUtility.ToHtmlStringRGB(effectColor);
 
-                sb.Append($"<color=#{hexColor}>{effectPrefix}{GetEffectDisplayName(effect.effectType)}: ");
+                sb.Append($"{effectPrefix}{GetEffectDisplayName(effect.effectType)}: ");
                 sb.Append(GetEffectDescription(effect));
-                sb.Append("</color>\n");
+                sb.Append("\n");
 
-                if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null && effect.IsPassive)
+                // Show details for passive seed effects
+                if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null && ActivationType == GeneActivationType.Passive)
                 {
                     var energyStorageEffect = new NodeEffectData { effectType = NodeEffectType.EnergyStorage, primaryValue = effect.seedData.energyStorage };
-                    sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(energyStorageEffect.effectType)}: {GetEffectDescription(energyStorageEffect)}</color>\n");
+                    sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(energyStorageEffect.effectType)}: {GetEffectDescription(energyStorageEffect)}\n");
 
                     var growthSpeedEffect = new NodeEffectData { effectType = NodeEffectType.GrowthSpeed, primaryValue = effect.seedData.growthSpeed };
-                    sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(growthSpeedEffect.effectType)}: {GetEffectDescription(growthSpeedEffect)}</color>\n");
+                    sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(growthSpeedEffect.effectType)}: {GetEffectDescription(growthSpeedEffect)}\n");
 
                     var stemLengthEffect = new NodeEffectData { effectType = NodeEffectType.StemLength, primaryValue = effect.seedData.stemLengthMin, secondaryValue = effect.seedData.stemLengthMax };
-                    sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(stemLengthEffect.effectType)}: {GetEffectDescription(stemLengthEffect)}</color>\n");
+                    sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(stemLengthEffect.effectType)}: {GetEffectDescription(stemLengthEffect)}\n");
 
                     var leafGapEffect = new NodeEffectData { effectType = NodeEffectType.LeafGap, primaryValue = effect.seedData.leafGap };
-                    sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(leafGapEffect.effectType)}: {GetEffectDescription(leafGapEffect)}</color>\n");
+                    sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(leafGapEffect.effectType)}: {GetEffectDescription(leafGapEffect)}\n");
 
                     var leafPatternEffect = new NodeEffectData { effectType = NodeEffectType.LeafPattern, primaryValue = effect.seedData.leafPattern };
-                    sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(leafPatternEffect.effectType)}: {GetEffectDescription(leafPatternEffect)}</color>\n");
+                    sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(leafPatternEffect.effectType)}: {GetEffectDescription(leafPatternEffect)}\n");
 
                     var stemRandomnessEffect = new NodeEffectData { effectType = NodeEffectType.StemRandomness, primaryValue = effect.seedData.stemRandomness };
-                    sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(stemRandomnessEffect.effectType)}: {GetEffectDescription(stemRandomnessEffect)}</color>\n");
+                    sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(stemRandomnessEffect.effectType)}: {GetEffectDescription(stemRandomnessEffect)}\n");
 
                     var cooldownEffect = new NodeEffectData { effectType = NodeEffectType.Cooldown, primaryValue = effect.seedData.cooldown };
-                    sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(cooldownEffect.effectType)}: {GetEffectDescription(cooldownEffect)}</color>\n");
+                    sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(cooldownEffect.effectType)}: {GetEffectDescription(cooldownEffect)}\n");
 
                     var castDelayEffect = new NodeEffectData { effectType = NodeEffectType.CastDelay, primaryValue = effect.seedData.castDelay };
-                    sb.Append($"<color=#{hexColor}>{seedDetailPrefix}{GetEffectDisplayName(castDelayEffect.effectType)}: {GetEffectDescription(castDelayEffect)}</color>\n");
+                    sb.Append($"{seedDetailPrefix}{GetEffectDisplayName(castDelayEffect.effectType)}: {GetEffectDescription(castDelayEffect)}\n");
                 }
             }
         }
@@ -150,7 +165,18 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
         return sb.ToString().TrimEnd();
     }
 
-    string GetEffectDisplayName(NodeEffectType type)
+    private Color GetColorForActivationType(GeneActivationType type)
+    {
+        switch (type)
+        {
+            case GeneActivationType.Passive: return new Color(0.6f, 0.8f, 1f, 1f); // Light Blue
+            case GeneActivationType.Active: return new Color(1f, 0.8f, 0.6f, 1f);  // Light Orange
+            case GeneActivationType.Payload: return new Color(1f, 0.6f, 1f, 1f);  // Magenta
+            default: return Color.white;
+        }
+    }
+
+    private string GetEffectDisplayName(NodeEffectType type)
     {
         switch (type)
         {
@@ -179,7 +205,7 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
         }
     }
 
-    string GetEffectDescription(NodeEffectData effect)
+    private string GetEffectDescription(NodeEffectData effect)
     {
         switch (effect.effectType)
         {
@@ -244,8 +270,7 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
                 return "Grows berries";
 
             case NodeEffectType.SeedSpawn:
-                // --- FIX: Replaced effect.isPassive with effect.IsPassive ---
-                return effect.IsPassive ? "Contains seed" : "Active seed";
+                return "Defines a new seed type";
 
             case NodeEffectType.ScentModifier:
                 string scentResult = "";
@@ -280,7 +305,7 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
         }
     }
 
-    string GetLeafPatternName(int pattern)
+    private string GetLeafPatternName(int pattern)
     {
         switch (pattern)
         {
@@ -306,4 +331,6 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
 
         return result.ToString();
     }
+
+    #endregion
 }

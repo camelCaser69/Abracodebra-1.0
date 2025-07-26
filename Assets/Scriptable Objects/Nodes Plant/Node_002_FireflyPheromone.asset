@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d27f72fdfc3f4962b8c5577d1ed14561, type: 3}
   m_Name: Node_002_FireflyPheromone
   m_EditorClassIdentifier: 
+  activationType: 0
   displayName: Firefly Pheromone
   description: 
   thumbnail: {fileID: 21300000, guid: 04f2c1d127895284ca33662715099692, type: 3}
@@ -20,10 +21,9 @@ MonoBehaviour:
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   effects:
   - effectType: 14
+    consumedOnTrigger: 0
     primaryValue: 1
     secondaryValue: 1
-    isPassive: 1
-    scentDefinitionReference: {fileID: 11400000, guid: caaf706f86468d545951ef96005f0761, type: 2}
     seedData:
       growthSpeed: 5
       stemLengthMin: 3
@@ -34,3 +34,4 @@ MonoBehaviour:
       energyStorage: 10
       cooldown: 20
       castDelay: 0
+      maxBerries: 3

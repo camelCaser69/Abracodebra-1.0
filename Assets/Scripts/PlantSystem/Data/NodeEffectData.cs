@@ -1,9 +1,8 @@
 ﻿// Assets/Scripts/PlantSystem/Data/NodeEffectData.cs
-using System;
 using UnityEngine;
 using WegoSystem;
 
-[Serializable]
+[System.Serializable]
 public class NodeEffectData
 {
     public NodeEffectType effectType;
@@ -11,22 +10,25 @@ public class NodeEffectData
     public float primaryValue = 0f;
     public float secondaryValue = 0f;
     public SeedSpawnData seedData;
-
-    // NEW: Property to check if effect is passive
-    public bool IsPassive => NodeEffectTypeHelper.IsPassiveEffect(effectType);
-
-    // NEW: Property to check if effect is active
-    public bool IsActive => NodeEffectTypeHelper.IsActiveEffect(effectType);
+    
+    // IsPassive and IsActive properties are removed.
+    // This logic is now handled by NodeDefinition.ActivationType.
 
     public int GetPrimaryValueAsInt() => Mathf.RoundToInt(primaryValue);
     public int GetSecondaryValueAsInt() => Mathf.RoundToInt(secondaryValue);
 
+    /// <summary>
+    /// If the effect is time-based (per second), this converts it to a per-tick value.
+    /// </summary>
     public void ValidateForTicks()
     {
         if (effectType == NodeEffectType.EnergyPerTick && TickManager.Instance?.Config != null)
         {
             float ticksPerSecond = TickManager.Instance.Config.ticksPerRealSecond;
-            primaryValue /= ticksPerSecond;
+            if (ticksPerSecond > 0)
+            {
+                primaryValue /= ticksPerSecond;
+            }
         }
     }
 }

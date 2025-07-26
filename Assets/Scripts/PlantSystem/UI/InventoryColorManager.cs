@@ -4,14 +4,15 @@ using System.Linq;
 
 public class InventoryColorManager : MonoBehaviour
 {
-    public static InventoryColorManager Instance { get; set; }
+    public static InventoryColorManager Instance { get; private set; }
 
     [Header("Cell Background Colors")]
-    [SerializeField] Color toolCellColor = new Color(0.5f, 0.5f, 0.5f, 1f); // Gray
-    [SerializeField] Color seedCellColor = new Color(0.8f, 1f, 0.8f, 1f); // Light Green
-    [SerializeField] Color passiveGeneCellColor = new Color(0.8f, 0.8f, 1f, 1f); // Light Blue
-    [SerializeField] Color activeGeneCellColor = new Color(1f, 0.8f, 0.8f, 1f); // Light Red
-    [SerializeField] Color defaultCellColor = new Color(0.9f, 0.9f, 0.9f, 1f); // Light Gray
+    [SerializeField] private Color toolCellColor = new Color(0.5f, 0.5f, 0.5f, 1f);       // Gray
+    [SerializeField] private Color seedCellColor = new Color(0.8f, 1f, 0.8f, 1f);       // Light Green
+    [SerializeField] private Color passiveGeneCellColor = new Color(0.8f, 0.8f, 1f, 1f);    // Light Blue
+    [SerializeField] private Color activeGeneCellColor = new Color(1f, 0.8f, 0.8f, 1f);     // Light Red / Orange
+    [SerializeField] private Color payloadGeneCellColor = new Color(1f, 0.7f, 1f, 1f);    // Light Magenta
+    [SerializeField] private Color defaultCellColor = new Color(0.9f, 0.9f, 0.9f, 1f);    // Light Gray
 
     void Awake()
     {
@@ -25,35 +26,21 @@ public class InventoryColorManager : MonoBehaviour
 
     public Color GetCellColorForItem(NodeData nodeData, NodeDefinition nodeDefinition, ToolDefinition toolDefinition)
     {
-        if (toolDefinition != null)
+        switch (GetItemCategory(nodeData, nodeDefinition, toolDefinition))
         {
-            return toolCellColor;
-        }
-
-        if (nodeData != null && nodeDefinition != null)
-        {
-            if (nodeData.IsSeed())
-            {
+            case ItemCategory.Tool:
+                return toolCellColor;
+            case ItemCategory.Seed:
                 return seedCellColor;
-            }
-
-            if (nodeData.effects != null && nodeData.effects.Count > 0)
-            {
-                // Check if any effect is considered active
-                bool hasActiveEffects = nodeData.effects.Any(e => e != null && e.IsActive);
-
-                if (hasActiveEffects)
-                {
-                    return activeGeneCellColor;
-                }
-                else
-                {
-                    return passiveGeneCellColor;
-                }
-            }
+            case ItemCategory.PassiveGene:
+                return passiveGeneCellColor;
+            case ItemCategory.ActiveGene:
+                return activeGeneCellColor;
+            case ItemCategory.PayloadGene:
+                return payloadGeneCellColor;
+            default:
+                return defaultCellColor;
         }
-
-        return defaultCellColor;
     }
 
     public enum ItemCategory
@@ -62,6 +49,7 @@ public class InventoryColorManager : MonoBehaviour
         Seed,
         PassiveGene,
         ActiveGene,
+        PayloadGene,
         Default
     }
 
@@ -73,10 +61,15 @@ public class InventoryColorManager : MonoBehaviour
         {
             if (nodeData.IsSeed()) return ItemCategory.Seed;
 
-            if (nodeData.effects != null && nodeData.effects.Count > 0)
+            // This logic is now based on the NodeDefinition's ActivationType, fixing the compiler error.
+            switch (nodeDefinition.ActivationType)
             {
-                bool hasActiveEffects = nodeData.effects.Any(e => e != null && e.IsActive);
-                return hasActiveEffects ? ItemCategory.ActiveGene : ItemCategory.PassiveGene;
+                case GeneActivationType.Passive:
+                    return ItemCategory.PassiveGene;
+                case GeneActivationType.Active:
+                    return ItemCategory.ActiveGene;
+                case GeneActivationType.Payload:
+                    return ItemCategory.PayloadGene;
             }
         }
 

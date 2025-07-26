@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d27f72fdfc3f4962b8c5577d1ed14561, type: 3}
   m_Name: Node_001_Berry
   m_EditorClassIdentifier: 
+  activationType: 1
   displayName: Berry
   description: 
   thumbnail: {fileID: 21300000, guid: ebe1776787f1660439ef11382de7896c, type: 3}
@@ -20,7 +21,6 @@ MonoBehaviour:
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   effects:
   - effectType: 12
-    isPassive: 0
     consumedOnTrigger: 0
     primaryValue: 0
     secondaryValue: 0
@@ -36,7 +36,6 @@ MonoBehaviour:
       castDelay: 0
       maxBerries: 3
   - effectType: 2
-    isPassive: 0
     consumedOnTrigger: 0
     primaryValue: 10
     secondaryValue: 0
@@ -52,7 +51,6 @@ MonoBehaviour:
       castDelay: 0
       maxBerries: 3
   - effectType: 17
-    isPassive: 0
     consumedOnTrigger: 0
     primaryValue: 0
     secondaryValue: 0
@@ -68,7 +66,6 @@ MonoBehaviour:
       castDelay: 0
       maxBerries: 3
   - effectType: 20
-    isPassive: 1
     consumedOnTrigger: 0
     primaryValue: 0
     secondaryValue: 0
@@ -84,7 +81,6 @@ MonoBehaviour:
       castDelay: 0
       maxBerries: 3
   - effectType: 19
-    isPassive: 1
     consumedOnTrigger: 0
     primaryValue: 10
     secondaryValue: 0

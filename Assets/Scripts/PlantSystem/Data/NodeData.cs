@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Assets/Scripts/PlantSystem/Data/NodeData.cs
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,118 +14,109 @@ public class NodeData : ISerializationCallbackReceiver
     public int orderIndex;
 
     public bool canBeDeleted = true;
-    
-    // Sequence storage - only seeds can store sequences
-    [NonSerialized] 
+
+    // These fields are for managing sequences within seeds
     private NodeGraph _storedSequence;
-    
-    [NonSerialized] 
     private bool _isPartOfSequence = false;
-    
-    // Constructor
-    public NodeData() {
+
+    public NodeData()
+    {
         nodeId = Guid.NewGuid().ToString();
         _storedSequence = null;
         _isPartOfSequence = false;
     }
-    
-    // ====== SEED DETECTION ======
-    // A seed is a node that:
-    // 1. Has a passive SeedSpawn effect
-    // 2. Is NOT part of another sequence
-    
+
     /// <summary>
-    /// Checks if this node has the potential to be a seed (has passive SeedSpawn effect)
+    /// Checks if this node contains a SeedSpawn effect, defining it as a potential seed.
     /// </summary>
     public bool HasSeedEffect()
     {
+        // A node is a seed if it contains the SeedSpawn effect. The activation type is irrelevant for this check.
+        // This resolves the 'IsPassive' compiler error.
         return effects != null &&
-               effects.Any(e => e != null &&
-                                e.effectType == NodeEffectType.SeedSpawn &&
-                                e.IsPassive); // FIX: Changed from isPassive to IsPassive
+               effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
     }
-    
+
     /// <summary>
-    /// Checks if this is actually a seed (has seed effect AND is not part of a sequence)
+    /// A NodeData represents a usable Seed if it has a seed effect AND is not part of another seed's sequence.
     /// </summary>
-    public bool IsSeed() {
+    public bool IsSeed()
+    {
         return HasSeedEffect() && !_isPartOfSequence;
     }
-    
-    // ====== SEQUENCE MANAGEMENT ======
-    
-    /// <summary>
-    /// Gets or sets the stored sequence. Only seeds can store sequences.
-    /// </summary>
-    public NodeGraph storedSequence {
-        get {
-            // Only return sequence if this is a seed
+
+    public NodeGraph storedSequence
+    {
+        get
+        {
             return IsSeed() ? _storedSequence : null;
         }
-        set {
-            // Only seeds can store sequences
-            if (!HasSeedEffect() || _isPartOfSequence) {
+        set
+        {
+            if (!HasSeedEffect() || _isPartOfSequence)
+            {
                 _storedSequence = null;
                 return;
             }
-            
+
             _storedSequence = value;
-            
-            // Mark all nodes in the sequence as "part of sequence"
-            if (_storedSequence?.nodes != null) {
-                foreach (var node in _storedSequence.nodes.Where(n => n != null)) {
+
+            if (_storedSequence?.nodes != null)
+            {
+                foreach (var node in _storedSequence.nodes.Where(n => n != null))
+                {
                     node._isPartOfSequence = true;
-                    node._storedSequence = null; // Nested sequences not allowed
+                    node._storedSequence = null; // Nested sequences are not allowed
                 }
             }
         }
     }
-    
-    /// <summary>
-    /// Marks this node as being part of a sequence (or not)
-    /// </summary>
-    public void SetPartOfSequence(bool isPartOfSequence) {
+
+    public void SetPartOfSequence(bool isPartOfSequence)
+    {
         _isPartOfSequence = isPartOfSequence;
-        
-        // If node becomes part of a sequence, it can't have its own sequence
-        if (isPartOfSequence) {
+
+        if (isPartOfSequence)
+        {
             _storedSequence = null;
         }
     }
-    
-    /// <summary>
-    /// Ensures a seed has an initialized sequence container
-    /// </summary>
-    public void EnsureSeedSequenceInitialized() {
-        if (IsSeed() && _storedSequence == null) {
+
+    public void EnsureSeedSequenceInitialized()
+    {
+        if (IsSeed() && _storedSequence == null)
+        {
             _storedSequence = new NodeGraph { nodes = new List<NodeData>() };
         }
     }
-    
-    /// <summary>
-    /// Clears the stored sequence
-    /// </summary>
-    public void ClearStoredSequence() {
+
+    public void ClearStoredSequence()
+    {
         _storedSequence = null;
     }
-    
-    // ====== SERIALIZATION ======
-    // Clean up invalid states during serialization
-    
-    public void OnBeforeSerialize() {
-        // Nodes that are part of sequences can't have their own sequences
-        if (_isPartOfSequence) {
+
+    #region Serialization Callbacks
+
+    public void OnBeforeSerialize()
+    {
+        // To prevent serialization loops or invalid data, ensure a node within a sequence cannot also store a sequence.
+        if (_isPartOfSequence)
+        {
             _storedSequence = null;
         }
     }
-    
-    public void OnAfterDeserialize() {
-        // Reset runtime state
+
+    public void OnAfterDeserialize()
+    {
+        // By default, an item is not part of a sequence until it's explicitly added to one.
         _isPartOfSequence = false;
-        
-        // Non-seeds can't have sequences
-        if (!HasSeedEffect()) {
+
+        // If this item isn't a seed, it can't have a stored sequence.
+        if (!HasSeedEffect())
+        {
             _storedSequence = null;
         }
     }
+
+    #endregion
 }
