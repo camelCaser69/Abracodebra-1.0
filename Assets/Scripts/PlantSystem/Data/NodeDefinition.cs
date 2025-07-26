@@ -33,7 +33,7 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
         {
             if (originalEffect == null)
             {
-                Debug.LogWarning($"[NodeDefinition '{this.name}'] Contains a null effect in its list.");
+                Debug.LogWarning($"[NodeDefinition '{this.name}'] Contains a null effect in its list. Skipping.");
                 continue;
             }
 
@@ -44,8 +44,8 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
                 secondaryValue = originalEffect.secondaryValue,
                 isPassive = originalEffect.isPassive,
                 consumedOnTrigger = originalEffect.consumedOnTrigger,
-                scentDefinitionReference = originalEffect.scentDefinitionReference,
-                nodeDefinitionReference = originalEffect.nodeDefinitionReference // This will now copy the non-null reference
+                // REMOVED: scentDefinitionReference = originalEffect.scentDefinitionReference,
+                // REMOVED: nodeDefinitionReference = originalEffect.nodeDefinitionReference
             };
 
             if (originalEffect.effectType == NodeEffectType.SeedSpawn && originalEffect.seedData != null)
@@ -179,107 +179,107 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
         }
     }
 
-    private string GetEffectDescription(NodeEffectData effect)
+    string GetEffectDescription(NodeEffectData effect)
+{
+    switch (effect.effectType)
     {
-        switch (effect.effectType)
-        {
-            case NodeEffectType.EnergyStorage:
-                return $"+{effect.primaryValue:F0} max energy";
+        case NodeEffectType.EnergyStorage:
+            return $"+{effect.primaryValue:F0} max energy";
 
-            case NodeEffectType.EnergyPerTick:
-                return $"+{effect.primaryValue:F2} energy/tick";
+        case NodeEffectType.EnergyPerTick:
+            return $"+{effect.primaryValue:F2} energy/tick";
 
-            case NodeEffectType.EnergyCost:
-                return $"{effect.primaryValue:F0} energy to activate";
+        case NodeEffectType.EnergyCost:
+            return $"{effect.primaryValue:F0} energy to activate";
 
-            case NodeEffectType.StemLength:
-                if (effect.secondaryValue > 0 && effect.secondaryValue != effect.primaryValue)
-                {
-                    return $"+{effect.primaryValue:F0} to +{effect.secondaryValue:F0} segments";
-                }
-                else
-                {
-                    return $"+{effect.primaryValue:F0} segments";
-                }
+        case NodeEffectType.StemLength:
+            if (effect.secondaryValue > 0 && effect.secondaryValue != effect.primaryValue)
+            {
+                return $"+{effect.primaryValue:F0} to +{effect.secondaryValue:F0} segments";
+            }
+            else
+            {
+                return $"+{effect.primaryValue:F0} segments";
+            }
 
-            case NodeEffectType.GrowthSpeed:
-                return effect.primaryValue <= 1
-                    ? "Instant growth"
-                    : $"{effect.primaryValue:F0} ticks/stage";
+        case NodeEffectType.GrowthSpeed:
+            return effect.primaryValue <= 1
+                ? "Instant growth"
+                : $"{effect.primaryValue:F0} ticks/stage";
 
-            case NodeEffectType.LeafGap:
-                return effect.primaryValue == 0
-                    ? "Leaves every segment"
-                    : $"Leaves every {effect.primaryValue + 1:F0} segments";
+        case NodeEffectType.LeafGap:
+            return effect.primaryValue == 0
+                ? "Leaves every segment"
+                : $"Leaves every {effect.primaryValue + 1:F0} segments";
 
-            case NodeEffectType.LeafPattern:
-                string patternName = GetLeafPatternName((int)effect.primaryValue);
-                return $"Pattern: {patternName}";
+        case NodeEffectType.LeafPattern:
+            string patternName = GetLeafPatternName((int)effect.primaryValue);
+            return $"Pattern: {patternName}";
 
-            case NodeEffectType.StemRandomness:
-                return $"{effect.primaryValue * 100:F0}% chance to wobble";
+        case NodeEffectType.StemRandomness:
+            return $"{effect.primaryValue * 100:F0}% chance to wobble";
 
-            case NodeEffectType.Cooldown:
-                return $"{effect.primaryValue:F0} tick cooldown";
+        case NodeEffectType.Cooldown:
+            return $"{effect.primaryValue:F0} tick cooldown";
 
-            case NodeEffectType.CastDelay:
-                return effect.primaryValue > 0
-                    ? $"{effect.primaryValue:F0} tick delay"
-                    : "No delay";
+        case NodeEffectType.CastDelay:
+            return effect.primaryValue > 0
+                ? $"{effect.primaryValue:F0} tick delay"
+                : "No delay";
 
-            case NodeEffectType.PoopAbsorption:
-                string result = "";
-                if (effect.primaryValue > 0) result += $"{effect.primaryValue:F0} tile radius";
-                if (effect.secondaryValue > 0)
-                {
-                    if (result.Length > 0) result += ", ";
-                    result += $"+{effect.secondaryValue:F0} energy";
-                }
-                return result;
+        case NodeEffectType.PoopAbsorption:
+            string result = "";
+            if (effect.primaryValue > 0) result += $"{effect.primaryValue:F0} tile radius";
+            if (effect.secondaryValue > 0)
+            {
+                if (result.Length > 0) result += ", ";
+                result += $"+{effect.secondaryValue:F0} energy";
+            }
+            return result;
 
-            case NodeEffectType.Damage:
-                return $"+{effect.primaryValue * 100:F0}% damage";
+        case NodeEffectType.Damage:
+            return $"+{effect.primaryValue * 100:F0}% damage";
 
-            case NodeEffectType.GrowBerry:
-                return "Grows berries";
+        case NodeEffectType.GrowBerry:
+            return "Grows berries";
 
-            case NodeEffectType.SeedSpawn:
-                return effect.isPassive ? "Contains seed" : "Active seed";
+        case NodeEffectType.SeedSpawn:
+            return effect.isPassive ? "Contains seed" : "Active seed";
 
-            case NodeEffectType.ScentModifier:
-                string scentResult = "";
-                if (effect.primaryValue != 0) scentResult += $"Radius {(effect.primaryValue >= 0 ? "+" : "")}{effect.primaryValue:F0}";
-                if (effect.secondaryValue != 0)
-                {
-                    if (scentResult.Length > 0) scentResult += ", ";
-                    scentResult += $"Strength {(effect.secondaryValue >= 0 ? "+" : "")}{effect.secondaryValue:F0}";
-                }
-                if (effect.scentDefinitionReference != null)
-                {
-                    scentResult += $" ({effect.scentDefinitionReference.displayName})";
-                }
-                return scentResult;
+        case NodeEffectType.ScentModifier:
+            // SIMPLIFIED: No longer referencing scentDefinitionReference
+            string scentResult = "";
+            if (effect.primaryValue != 0) scentResult += $"Radius {(effect.primaryValue >= 0 ? "+" : "")}{effect.primaryValue:F0}";
+            if (effect.secondaryValue != 0)
+            {
+                if (scentResult.Length > 0) scentResult += ", ";
+                scentResult += $"Strength {(effect.secondaryValue >= 0 ? "+" : "")}{effect.secondaryValue:F0}";
+            }
+            // REMOVED: reference to scentDefinitionReference.displayName
+            return scentResult;
 
-            case NodeEffectType.TimerCast:
-                return $"Triggers every {effect.primaryValue:F0} ticks";
-            case NodeEffectType.ProximityCast:
-                return $"Triggers within {effect.primaryValue:F0} tiles";
-            case NodeEffectType.EatCast:
-                return "Triggers when eaten";
-            case NodeEffectType.LeafLossCast:
-                return "Triggers when a leaf is lost";
-            case NodeEffectType.Nutritious:
-                return $"Restores {effect.primaryValue:F0} hunger";
+        case NodeEffectType.TimerCast:
+            return $"Triggers every {effect.primaryValue:F0} ticks";
+        case NodeEffectType.ProximityCast:
+            return $"Triggers within {effect.primaryValue:F0} tiles";
+        case NodeEffectType.EatCast:
+            return "Triggers when eaten";
+        case NodeEffectType.LeafLossCast:
+            return "Triggers when a leaf is lost";
+        case NodeEffectType.Nutritious:
+            return $"Restores {effect.primaryValue:F0} hunger";
+        case NodeEffectType.Harvestable:
+            return "Can be harvested";
 
-            default:
-                string defaultResult = $"{effect.primaryValue:F1}";
-                if (effect.secondaryValue != 0)
-                {
-                    defaultResult += $" / {effect.secondaryValue:F1}";
-                }
-                return defaultResult;
-        }
+        default:
+            string defaultResult = $"{effect.primaryValue:F1}";
+            if (effect.secondaryValue != 0)
+            {
+                defaultResult += $" / {effect.secondaryValue:F1}";
+            }
+            return defaultResult;
     }
+}
 
     private string GetLeafPatternName(int pattern)
     {

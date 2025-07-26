@@ -20,11 +20,10 @@ MonoBehaviour:
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   effects:
   - effectType: 12
-    primaryValue: 0
-    secondaryValue: 0
     isPassive: 0
     consumedOnTrigger: 0
-    scentDefinitionReference: {fileID: 0}
+    primaryValue: 0
+    secondaryValue: 0
     seedData:
       growthSpeed: 5
       stemLengthMin: 3
@@ -37,11 +36,10 @@ MonoBehaviour:
       castDelay: 0
       maxBerries: 3
   - effectType: 2
-    primaryValue: 10
-    secondaryValue: 0
     isPassive: 0
     consumedOnTrigger: 0
-    scentDefinitionReference: {fileID: 0}
+    primaryValue: 10
+    secondaryValue: 0
     seedData:
       growthSpeed: 5
       stemLengthMin: 3
@@ -54,11 +52,10 @@ MonoBehaviour:
       castDelay: 0
       maxBerries: 3
   - effectType: 17
-    primaryValue: 10
-    secondaryValue: 0
     isPassive: 0
     consumedOnTrigger: 0
-    scentDefinitionReference: {fileID: 0}
+    primaryValue: 0
+    secondaryValue: 0
     seedData:
       growthSpeed: 5
       stemLengthMin: 3
@@ -71,11 +68,26 @@ MonoBehaviour:
       castDelay: 0
       maxBerries: 3
   - effectType: 20
+    isPassive: 1
+    consumedOnTrigger: 0
+    primaryValue: 0
+    secondaryValue: 0
+    seedData:
+      growthSpeed: 5
+      stemLengthMin: 3
+      stemLengthMax: 5
+      leafGap: 1
+      leafPattern: 0
+      stemRandomness: 0.1
+      energyStorage: 10
+      cooldown: 20
+      castDelay: 0
+      maxBerries: 3
+  - effectType: 19
+    isPassive: 1
+    consumedOnTrigger: 0
     primaryValue: 10
     secondaryValue: 0
-    isPassive: 0
-    consumedOnTrigger: 0
-    scentDefinitionReference: {fileID: 0}
     seedData:
       growthSpeed: 5
       stemLengthMin: 3

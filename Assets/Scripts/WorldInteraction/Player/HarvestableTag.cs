@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// A marker component for any part of a plant that can be harvested.
-/// It holds a reference to the NodeDefinition that this item becomes in the inventory.
+/// Simple tag component that marks a GameObject as harvestable.
+/// The actual harvested item is determined by the plant's NodeGraph.
 /// </summary>
 public class HarvestableTag : MonoBehaviour
 {
-    public NodeDefinition HarvestedItemDefinition;
+    // No fields needed - this is just a marker component!
+    // The harvest logic will look at the plant's NodeGraph to determine what to harvest
 }

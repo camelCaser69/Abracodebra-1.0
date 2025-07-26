@@ -2,19 +2,17 @@
 using UnityEngine;
 using WegoSystem;
 
-[Serializable] // <<< THIS IS THE CRITICAL FIX
+[Serializable]
 public class NodeEffectData
 {
     public NodeEffectType effectType;
-    public float primaryValue;
-    public float secondaryValue;
     public bool isPassive = false;
     public bool consumedOnTrigger = false;
-    public ScentDefinition scentDefinitionReference;
+    public float primaryValue = 0f;
+    public float secondaryValue = 0f;
     public SeedSpawnData seedData;
     
-    // This field can now be correctly serialized by Unity
-    public NodeDefinition nodeDefinitionReference;
+    // REMOVED: nodeDefinitionReference - no longer needed!
 
     public int GetPrimaryValueAsInt() => Mathf.RoundToInt(primaryValue);
     public int GetSecondaryValueAsInt() => Mathf.RoundToInt(secondaryValue);

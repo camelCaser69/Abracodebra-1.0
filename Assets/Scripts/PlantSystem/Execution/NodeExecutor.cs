@@ -31,8 +31,8 @@ public class NodeExecutor : MonoBehaviour
                 secondaryValue = effect.secondaryValue,
                 isPassive = effect.isPassive,
                 consumedOnTrigger = effect.consumedOnTrigger,
-                scentDefinitionReference = effect.scentDefinitionReference,
-                nodeDefinitionReference = effect.nodeDefinitionReference // <<< THIS LINE FIXES THE ISSUE
+                // REMOVED: scentDefinitionReference = effect.scentDefinitionReference,
+                // REMOVED: nodeDefinitionReference = effect.nodeDefinitionReference
             };
 
             if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null)
@@ -47,7 +47,8 @@ public class NodeExecutor : MonoBehaviour
                     stemRandomness = effect.seedData.stemRandomness,
                     energyStorage = effect.seedData.energyStorage,
                     cooldown = effect.seedData.cooldown,
-                    castDelay = effect.seedData.castDelay
+                    castDelay = effect.seedData.castDelay,
+                    maxBerries = effect.seedData.maxBerries
                 };
             }
 

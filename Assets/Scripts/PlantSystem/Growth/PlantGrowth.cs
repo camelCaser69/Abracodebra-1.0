@@ -1,9 +1,18 @@
-﻿using System.Collections.Generic;
+﻿// Assets/Scripts/PlantSystem/Growth/PlantGrowth.cs
+
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using WegoSystem;
 
-public enum PlantState { Initializing, Growing, GrowthComplete, Mature_Idle, Mature_Executing }
+public enum PlantState
+{
+    Initializing,
+    Growing,
+    GrowthComplete,
+    Mature_Idle,
+    Mature_Executing
+}
 
 public class PlantGrowth : MonoBehaviour, ITickUpdateable
 {
@@ -17,33 +26,31 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
     public NodeGraph NodeGraph { get; set; }
     public PlantState CurrentState { get; set; } = PlantState.Initializing;
 
-    [Header("Cell Prefabs")]
-    [SerializeField] private GameObject seedCellPrefab;
-    [SerializeField] private GameObject stemCellPrefab;
-    [SerializeField] private GameObject leafCellPrefab;
-    [SerializeField] private GameObject berryCellPrefab;
-    [SerializeField] private float cellSpacing = 0.08f;
+    List<NodeDefinition> storedDefinitions = new List<NodeDefinition>();
 
-    [Header("Visual Controllers")]
-    [SerializeField] private PlantShadowController shadowController;
-    [SerializeField] private GameObject shadowPartPrefab;
-    [SerializeField] private bool enableOutline = true;
-    [SerializeField] private PlantOutlineController outlineController;
-    [SerializeField] private GameObject outlinePartPrefab;
+    [SerializeField] GameObject seedCellPrefab;
+    [SerializeField] GameObject stemCellPrefab;
+    [SerializeField] GameObject leafCellPrefab;
+    [SerializeField] GameObject berryCellPrefab;
+    [SerializeField] float cellSpacing = 0.08f;
 
-    [Header("Behavior & Data")]
+    [SerializeField] PlantShadowController shadowController;
+    [SerializeField] GameObject shadowPartPrefab;
+    [SerializeField] bool enableOutline = true;
+    [SerializeField] PlantOutlineController outlineController;
+    [SerializeField] GameObject outlinePartPrefab;
 
     [SerializeField] public bool showGrowthPercentage = true;
     [SerializeField] public bool allowPhotosynthesisDuringGrowth = false;
 
-    private void Awake()
+    void Awake()
     {
         InitializeComponents();
         ValidateReferences();
         AllActivePlants.Add(this);
     }
 
-    private void InitializeComponents()
+    void InitializeComponents()
     {
         CellManager = new PlantCellManager(this, seedCellPrefab, stemCellPrefab, leafCellPrefab, berryCellPrefab, cellSpacing);
         NodeExecutor = new PlantNodeExecutor(this);
@@ -63,7 +70,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         VisualManager = new PlantVisualManager(this, shadowController, shadowPartPrefab, outlineController, outlinePrefabToUse, enableOutline);
     }
 
-    private void ValidateReferences()
+    void ValidateReferences()
     {
         bool setupValid = true;
 
@@ -121,7 +128,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         }
     }
 
-    private void Start()
+    void Start()
     {
         if (TickManager.Instance != null)
         {
@@ -130,7 +137,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         VisualManager.UpdateUI();
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
         AllActivePlants.Remove(this);
 
@@ -188,7 +195,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         VisualManager.UpdateWegoUI();
     }
 
-    private void UpdateRadiusVisualizations()
+    void UpdateRadiusVisualizations()
     {
         if (GridDebugVisualizer.Instance != null)
         {
@@ -257,7 +264,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         }
     }
 
-    private void TransitionToMature()
+    void TransitionToMature()
     {
         CurrentState = PlantState.Mature_Idle;
 
@@ -272,7 +279,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         }
     }
 
-    private void RegisterWithManagers()
+    void RegisterWithManagers()
     {
         if (PlantGrowthModifierManager.Instance != null && TileInteractionManager.Instance != null)
         {
@@ -290,13 +297,6 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         var tags = GetComponentsInChildren<HarvestableTag>();
         foreach (var tag in tags)
         {
-            if (tag.HarvestedItemDefinition == null)
-            {
-                Debug.LogWarning($"Found a harvestable berry on '{gameObject.name}' but its HarvestedItemDefinition was null. It will not be harvested. Check Plant an Berry Node Definition assignment.", tag.gameObject);
-                continue;
-            }
-
-            // A PlantCell is not strictly required, but if it exists, we use it.
             var cell = tag.GetComponent<PlantCell>();
             if (cell != null && cell.CellType == PlantCellType.Fruit)
             {
@@ -310,17 +310,75 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
 
         if (harvestableBerries.Count == 0)
         {
-            Debug.LogWarning($"[PlantGrowth] Harvest called on '{gameObject.name}', but no GameObjects with a valid 'HarvestableTag' component were found as children. Ensure the berry-producing gene has a PASSIVE 'Harvestable' effect.", gameObject);
+            Debug.LogWarning($"[PlantGrowth] Harvest called on '{gameObject.name}', but no harvestable berries found.", gameObject);
             return harvestedDefs;
         }
 
+        NodeDefinition harvestableDefinition = null;
+        string matchingNodeDisplayName = null; // Changed variable name for clarity
+
+        if (NodeGraph?.nodes != null)
+        {
+            foreach (var node in NodeGraph.nodes)
+            {
+                if (node?.effects == null) continue;
+
+                bool hasGrowBerry = node.effects.Any(e => e.effectType == NodeEffectType.GrowBerry);
+                bool hasHarvestable = node.effects.Any(e => e.effectType == NodeEffectType.Harvestable && e.isPassive);
+
+                if (hasGrowBerry && hasHarvestable)
+                {
+                    matchingNodeDisplayName = node.nodeDisplayName; // THE FIX
+                    Debug.Log($"[PlantGrowth] Found harvestable node: {node.nodeDisplayName}");
+                    break;
+                }
+            }
+        }
+
+        if (!string.IsNullOrEmpty(matchingNodeDisplayName))
+        {
+            // Search method 1: Stored definitions (if this system were fully implemented)
+            if (storedDefinitions != null && storedDefinitions.Count > 0)
+            {
+                harvestableDefinition = storedDefinitions.FirstOrDefault(d =>
+                    d != null && d.displayName == matchingNodeDisplayName);
+            }
+
+            // Search method 2: Main definition library from the editor controller
+            if (harvestableDefinition == null && NodeEditorGridController.Instance?.DefinitionLibrary != null)
+            {
+                var library = NodeEditorGridController.Instance.DefinitionLibrary;
+                if (library.definitions != null)
+                {
+                    harvestableDefinition = library.definitions.FirstOrDefault(d =>
+                        d != null && d.displayName == matchingNodeDisplayName);
+                }
+            }
+
+            // Search method 3: Fallback to searching all loaded NodeDefinitions in Resources
+            if (harvestableDefinition == null)
+            {
+                var allDefs = Resources.LoadAll<NodeDefinition>("");
+                harvestableDefinition = allDefs.FirstOrDefault(d =>
+                    d != null && d.displayName == matchingNodeDisplayName);
+            }
+        }
+
+        if (harvestableDefinition == null)
+        {
+            Debug.LogError($"[PlantGrowth] Could not find NodeDefinition for harvestable berry! Searched for display name: '{matchingNodeDisplayName}'. " +
+                           "Make sure:\n1. Your berry gene has both GrowBerry and passive Harvestable effects\n" +
+                           "2. The NodeDefinition exists in Resources or the Definition Library", gameObject);
+            return harvestedDefs;
+        }
+
+        Debug.Log($"[PlantGrowth] Using definition '{harvestableDefinition.displayName}' (thumbnail: {(harvestableDefinition.thumbnail != null ? "YES" : "NO")}) for harvest");
+
         foreach (var berryGO in harvestableBerries)
         {
-            var tag = berryGO.GetComponent<HarvestableTag>();
             var cell = berryGO.GetComponent<PlantCell>();
 
-            // Add the definition from the tag itself
-            harvestedDefs.Add(tag.HarvestedItemDefinition);
+            harvestedDefs.Add(harvestableDefinition);
 
             if (cell != null)
             {
@@ -333,11 +391,36 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         return harvestedDefs;
     }
 
+    public void StoreOriginalDefinitions(List<NodeDefinition> definitions)
+    {
+        storedDefinitions = new List<NodeDefinition>(definitions);
+    }
+
     public float GetCellSpacing() => cellSpacing;
     public bool IsOutlineEnabled() => enableOutline;
     public GameObject GetCellGameObjectAt(Vector2Int coord) => CellManager.GetCellGameObjectAt(coord);
-    public GameObject GetOutlinePartPrefab() { if (outlineController != null && outlineController.outlinePartPrefab != null) { return outlineController.outlinePartPrefab; } return outlinePartPrefab; }
-    public float GetPoopDetectionRadius() { if (NodeGraph?.nodes == null) return 0f; foreach (var node in NodeGraph.nodes) { if (node?.effects == null) continue; var poopEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.PoopAbsorption); if (poopEffect != null) { return poopEffect.primaryValue; } } return 0f; }
+    public GameObject GetOutlinePartPrefab()
+    {
+        if (outlineController != null && outlineController.outlinePartPrefab != null)
+        {
+            return outlineController.outlinePartPrefab;
+        }
+        return outlinePartPrefab;
+    }
+    public float GetPoopDetectionRadius()
+    {
+        if (NodeGraph?.nodes == null) return 0f;
+        foreach (var node in NodeGraph.nodes)
+        {
+            if (node?.effects == null) continue;
+            var poopEffect = node.effects.FirstOrDefault(e => e.effectType == NodeEffectType.PoopAbsorption);
+            if (poopEffect != null)
+            {
+                return poopEffect.primaryValue;
+            }
+        }
+        return 0f;
+    }
     public bool DoesCellExistAt(Vector2Int coord) => CellManager.DoesCellExistAt(coord);
     public void ReportCellDestroyed(Vector2Int coord) => CellManager.ReportCellDestroyed(coord);
     public void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses) => NodeExecutor.ApplyScentDataToObject(targetObject, scentRadiusBonuses, scentStrengthBonuses);

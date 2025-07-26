@@ -120,7 +120,7 @@ public void ExecuteMatureCycleTick() {
         return EnergyFreeEffectTypes.Contains(effectType);
     }
 
-    private void ExecuteEffect(NodeEffectData effect, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus)
+    void ExecuteEffect(NodeEffectData effect, Dictionary<ScentDefinition, float> accumulatedScentRadiusBonus, Dictionary<ScentDefinition, float> accumulatedScentStrengthBonus)
     {
         switch (effect.effectType)
         {
@@ -129,21 +129,13 @@ public void ExecuteMatureCycleTick() {
                 break;
 
             case NodeEffectType.GrowBerry:
-                SpawnBerry(effect); // <<< MODIFIED: Pass the effect data
+                SpawnBerry(effect);
                 break;
 
             case NodeEffectType.ScentModifier:
-                if (effect.scentDefinitionReference != null)
-                {
-                    ScentDefinition key = effect.scentDefinitionReference;
-                    if (!accumulatedScentRadiusBonus.ContainsKey(key))
-                        accumulatedScentRadiusBonus[key] = 0f;
-                    accumulatedScentRadiusBonus[key] += effect.primaryValue;
-
-                    if (!accumulatedScentStrengthBonus.ContainsKey(key))
-                        accumulatedScentStrengthBonus[key] = 0f;
-                    accumulatedScentStrengthBonus[key] += effect.secondaryValue;
-                }
+                // SIMPLIFIED: Since we removed scentDefinitionReference, we can't handle scent modifiers this way anymore
+                // You'll need to implement a different approach if you need scent modifiers
+                Debug.LogWarning($"[{plant.gameObject.name}] ScentModifier effect needs to be reimplemented without scentDefinitionReference");
                 break;
         }
     }
@@ -176,14 +168,14 @@ public void ExecuteMatureCycleTick() {
 
     // In PlantNodeExecutor.cs, replace the SpawnBerry method with this debug version:
 
-private void SpawnBerry(NodeEffectData growEffectData) // <<< MODIFIED: Accept effect data
+public void SpawnBerry(NodeEffectData growEffectData)
     {
-        if (growEffectData.nodeDefinitionReference == null)
+        if (plant == null || (plant.CurrentState != PlantState.Mature_Idle && plant.CurrentState != PlantState.Mature_Executing))
         {
-            Debug.LogError($"[PlantNodeExecutor] 'Grow Berry' effect on plant '{plant.name}' was triggered, but it has no 'Harvested Item Def' assigned in its NodeDefinition. Berry cannot be spawned.", plant.gameObject);
+            Debug.LogWarning($"[{plant?.gameObject.name ?? "Unknown"}] Berry cannot be spawned.", plant?.gameObject);
             return;
         }
-        
+
         Debug.Log($"[{plant.gameObject.name}] SpawnBerry called!");
 
         if (plant.CellManager == null)
@@ -201,7 +193,6 @@ private void SpawnBerry(NodeEffectData growEffectData) // <<< MODIFIED: Accept e
 
         int maxBerriesAllowed = plant.GrowthLogic.MaxBerries;
         bool hasLimit = maxBerriesAllowed > 0;
-
         int currentBerryCount = plant.CellManager.GetBerryCount();
 
         if (hasLimit && currentBerryCount >= maxBerriesAllowed)
@@ -210,8 +201,8 @@ private void SpawnBerry(NodeEffectData growEffectData) // <<< MODIFIED: Accept e
             return;
         }
 
+        // Find available positions (same logic as before)
         HashSet<Vector2Int> availablePositions = new HashSet<Vector2Int>();
-
         foreach (var kvp in cells)
         {
             if (kvp.Value == PlantCellType.Stem || kvp.Value == PlantCellType.Leaf)
@@ -239,7 +230,6 @@ private void SpawnBerry(NodeEffectData growEffectData) // <<< MODIFIED: Accept e
         }
 
         availablePositions.RemoveWhere(pos => pos.y <= 0);
-        
         List<Vector2Int> candidatePositions = availablePositions.ToList();
 
         if (candidatePositions.Count == 0)
@@ -248,6 +238,7 @@ private void SpawnBerry(NodeEffectData growEffectData) // <<< MODIFIED: Accept e
             return;
         }
 
+        // Select position (same logic as before)
         List<Vector2Int> existingBerryPositions = plant.CellManager.GetBerryPositions();
         List<Vector2Int> preferredPositions = new List<Vector2Int>();
         List<Vector2Int> otherPositions = new List<Vector2Int>();
@@ -281,14 +272,17 @@ private void SpawnBerry(NodeEffectData growEffectData) // <<< MODIFIED: Accept e
 
         int randomIndex = Random.Range(0, finalCandidates.Count);
         Vector2Int chosenPosition = finalCandidates[randomIndex];
-        
+
+        // Spawn the berry
         GameObject berry = plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, chosenPosition, null, null);
 
         if (berry != null)
         {
             string limitInfo = hasLimit ? $"#{currentBerryCount + 1}/{maxBerriesAllowed}" : $"#{currentBerryCount + 1} (no limit)";
             Debug.Log($"[{plant.gameObject.name}] SUCCESS: Spawned berry {limitInfo} at {chosenPosition}");
-            AddFoodComponentToBerry(berry, growEffectData.nodeDefinitionReference); // <<< MODIFIED: Pass the definition
+            
+            // SIMPLIFIED: Just add components to the berry, no need for external definition reference
+            AddFoodComponentToBerry(berry);
         }
         else
         {
@@ -298,9 +292,8 @@ private void SpawnBerry(NodeEffectData growEffectData) // <<< MODIFIED: Accept e
 
     bool IsAdjacentToExistingBerries(Vector2Int position, List<Vector2Int> existingBerries)
     {
-        foreach(var berryPos in existingBerries)
+        foreach (var berryPos in existingBerries)
         {
-            // Chebyshev distance of 1 means they are touching cardinally or diagonally
             if (Mathf.Max(Mathf.Abs(position.x - berryPos.x), Mathf.Abs(position.y - berryPos.y)) == 1)
             {
                 return true;
@@ -309,10 +302,11 @@ private void SpawnBerry(NodeEffectData growEffectData) // <<< MODIFIED: Accept e
         return false;
     }
 
-    private void AddFoodComponentToBerry(GameObject berry, NodeDefinition harvestedItemDef) // <<< MODIFIED: Accept definition
+    void AddFoodComponentToBerry(GameObject berry)
     {
         if (berry == null) return;
-        
+
+        // Add FoodItem component if needed
         FoodItem foodItem = berry.GetComponent<FoodItem>();
         if (foodItem == null)
         {
@@ -324,33 +318,20 @@ private void SpawnBerry(NodeEffectData growEffectData) // <<< MODIFIED: Accept e
             }
         }
 
-        if (harvestedItemDef == null)
-        {
-            Debug.LogError("[PlantNodeExecutor] Cannot add HarvestableTag because the provided harvestedItemDef is null.", berry);
-            return;
-        }
-
-        // Check if the DEFINITION FOR THE HARVESTED ITEM contains the 'Harvestable' tag.
-        bool isHarvestable = harvestedItemDef.effects.Any(eff => eff.isPassive && eff.effectType == NodeEffectType.Harvestable);
-
-        if (isHarvestable)
-        {
-            HarvestableTag tag = berry.AddComponent<HarvestableTag>();
-            // The berry now knows what it will become when harvested.
-            tag.HarvestedItemDefinition = harvestedItemDef;
-            Debug.Log($"[PlantNodeExecutor] Added HarvestableTag to berry and assigned '{harvestedItemDef.displayName}' as its item definition.", berry);
-        }
+        // SIMPLIFIED: Always add HarvestableTag, it will reference the plant's NodeGraph
+        HarvestableTag tag = berry.AddComponent<HarvestableTag>();
+        // The tag doesn't need a definition reference here - it will be set during harvest
+        
+        Debug.Log($"[PlantNodeExecutor] Added HarvestableTag to berry", berry);
     }
 
     FoodType GetBerryFoodType()
     {
-        // Try loading a specific "Berry" food type first for consistency
         FoodType berryType = Resources.Load<FoodType>("FoodTypes/Berry");
         if (berryType != null) return berryType;
 
-        // Fallback: Find any food type with the "Plant_Fruit" category
         FoodType[] allFoodTypes = Resources.LoadAll<FoodType>("");
-        foreach(FoodType foodType in allFoodTypes)
+        foreach (FoodType foodType in allFoodTypes)
         {
             if (foodType.category == FoodType.FoodCategory.Plant_Fruit)
             {
