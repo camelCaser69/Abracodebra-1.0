@@ -35,6 +35,9 @@ public class InventoryGridController : MonoBehaviour
 
     private readonly List<NodeCell> inventoryCells = new List<NodeCell>();
 
+    // <<< NEW >>> Event to notify listeners of changes
+    public event Action OnInventoryChanged;
+
     public GameObject InventoryItemPrefab => inventoryItemPrefab;
     public Color EmptyCellColor => emptyCellColor;
     public float NodeGlobalImageScale => nodeGlobalImageScale;
@@ -122,6 +125,7 @@ public class InventoryGridController : MonoBehaviour
                 AddGeneToInventoryFromDefinition(def, null);
             }
         }
+        // No need to fire OnInventoryChanged here, as this is part of initial setup.
     }
 
     bool AddToolToInventory(ToolDefinition tool)
@@ -151,6 +155,8 @@ public class InventoryGridController : MonoBehaviour
             draggable.Initialize(this, emptyCell);
             emptyCell.AssignItemView(itemView, toolNodeData, tool);
             if (logInventoryChanges) Debug.Log($"[Inventory] Added tool '{tool.displayName}' to cell {emptyCell.CellIndex}.");
+
+            OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
             return true;
         }
 
@@ -207,6 +213,7 @@ public class InventoryGridController : MonoBehaviour
             Debug.Log($"[Inventory] Added gene '{geneDef.displayName}' (seed: {inventoryNode.IsSeed()}) to cell {cellToUse.CellIndex}");
         }
 
+        OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
         return true;
     }
 
@@ -251,6 +258,8 @@ public class InventoryGridController : MonoBehaviour
         {
             Debug.Log($"[Inventory] Returned gene '{geneDataToReturn.nodeDisplayName}' to cell {emptyCell.CellIndex}");
         }
+
+        OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
     }
 
     public void HandleDropOnInventoryCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetInventoryCell)
@@ -296,13 +305,13 @@ public class InventoryGridController : MonoBehaviour
         }
         else
         {
-            // --- FIX STARTS HERE ---
+            NodeDefinition draggedNodeDef = draggedItemView.GetNodeDefinition();
+
             if (targetInventoryCell.HasItem())
             {
-                // Swapping item from editor with item in inventory
                 NodeDefinition definitionInInventory = targetInventoryCell.GetNodeDefinition();
                 ToolDefinition toolInInventory = targetInventoryCell.GetToolDefinition();
-
+                
                 if ((definitionInInventory != null && definitionInInventory.effects.Any(e => e.effectType == NodeEffectType.SeedSpawn)) || toolInInventory != null)
                 {
                     draggedDraggable.ResetPosition();
@@ -315,32 +324,28 @@ public class InventoryGridController : MonoBehaviour
                 targetInventoryCell.RemoveNode();
                 
                 AddGeneToInventoryFromDefinition(definitionFromSequence, targetInventoryCell);
-                originalCell.AssignNode(definitionInInventory);
+                originalCell.AssignNode(definitionFromSequence);
             }
-            else 
+            else
             {
-                // Moving from sequence/seed slot to an EMPTY inventory cell
                 if (originalCell.IsSeedSlot)
                 {
-                    // Important: Refresh to save the sequence data before moving the seed
                     NodeEditorGridController.Instance.RefreshGraphAndUpdateSeed();
                     NodeEditorGridController.Instance.UnloadSeedFromSlot();
                 }
 
-                // Detach the dragged view from its original cell without destroying it
                 originalCell.ClearNodeReference();
-
-                // Assign the existing ItemView and its data to the new empty inventory cell
+                
                 targetInventoryCell.AssignItemView(draggedItemView, draggedData, draggedToolDef);
                 
-                // Re-initialize the draggable component for its new controller
                 draggedDraggable.Initialize(this, targetInventoryCell);
                 draggedDraggable.SnapToCell(targetInventoryCell);
             }
-            // --- FIX ENDS HERE ---
 
             NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();
         }
+
+        OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
     }
 
     public int GetUsedSlotCount() => inventoryCells.Count(cell => cell.HasItem());
@@ -351,6 +356,7 @@ public class InventoryGridController : MonoBehaviour
         {
             if (logInventoryChanges) Debug.Log($"[Inventory] Removing item '{inventoryCell.GetNodeData()?.nodeDisplayName ?? "Unknown"}' from cell {inventoryCell.CellIndex}.");
             inventoryCell.RemoveNode();
+            OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
         }
     }
 

@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 580,831 → 400,438 chars (31.1% reduction)
-Estimated tokens saved: ~45,098
+Compression Stats: 578,356 → 399,609 chars (30.9% reduction)
+Estimated tokens saved: ~44,686
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -87,53 +87,53 @@ using System;
   PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L6776
   PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7089
   InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7227
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7549
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7616
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7687
-  ItemView (Assets\Scripts\PlantSystem\UI/) L8020
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L8157
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8407
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8541
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8890
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L9026
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9335
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9423
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L9524
-  GridSnapStartup (Assets\Scripts\Ticks/) L9762
-  TickDebugMonitor (Assets\Scripts\Ticks/) L9828
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L10000
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L10069
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L10300
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10311
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10340
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10436
-  WaterReflection (Assets\Scripts\Visual\Effects/) L10541
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10936
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10972
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11136
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11278
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11444
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11614
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11622
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11649
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11696
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11899
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11960
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L12000
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L12024
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12044
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12349
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12361
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12396
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12571
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7516
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7583
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7654
+  ItemView (Assets\Scripts\PlantSystem\UI/) L7997
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L8134
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8384
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8518
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8873
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L9009
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9318
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9406
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L9507
+  GridSnapStartup (Assets\Scripts\Ticks/) L9745
+  TickDebugMonitor (Assets\Scripts\Ticks/) L9811
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9983
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L10052
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L10283
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10294
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10323
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10419
+  WaterReflection (Assets\Scripts\Visual\Effects/) L10524
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10919
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10955
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11119
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11261
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11427
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11597
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11605
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11632
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11679
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11882
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11943
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11983
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L12007
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12027
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12332
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12344
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12379
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12554
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L12582
-  GridPosition (Assets\Scripts\Ticks/) L12736
-  GridPositionManager (Assets\Scripts\Ticks/) L12837
-  GridRadiusUtility (Assets\Scripts\Ticks/) L13193
-  TickConfiguration (Assets\Scripts\Ticks/) L13337
-  ITickUpdateable (Assets\Scripts\Ticks/) L13420
+  GridEntity (Assets\Scripts\Ticks/) L12565
+  GridPosition (Assets\Scripts\Ticks/) L12719
+  GridPositionManager (Assets\Scripts\Ticks/) L12820
+  GridRadiusUtility (Assets\Scripts\Ticks/) L13176
+  TickConfiguration (Assets\Scripts\Ticks/) L13320
+  ITickUpdateable (Assets\Scripts\Ticks/) L13403
 
 ================================================================================
 SCRIPTS
@@ -7340,7 +7340,7 @@ UpdateUI();
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\InventoryBarController.cs
 
-﻿using System.Collections.Generic;
+﻿// Assets/Scripts/PlantSystem/UI/InventoryBarController.cs
 
 pub cls InventoryBarController : MonoBehaviour {
 pub stat InventoryBarController Instance { get; set; }
@@ -7353,10 +7353,8 @@ pub stat InventoryBarController Instance { get; set; }
 [SerializeField] Button upArrowButton;
 [SerializeField] Button downArrowButton;
 [SerializeField] GameObject selectionHighlight;
-
 [SerializeField] Sprite emptyCellSprite;
 [SerializeField] Color emptyCellColor = Color.white;
-
 [SerializeField] InventoryGridController inventoryGridController;
 
 ro List<NodeCell> barCells = new List<NodeCell>();
@@ -7377,6 +7375,10 @@ void Start() {
 if (upArrowButton != null) upArrowButton.onClick.AddListener(() => ChangeRow(-1));
 if (downArrowButton != null) downArrowButton.onClick.AddListener(() => ChangeRow(1));
 
+if (inventoryGridController != null) {
+inventoryGridController.OnInventoryChanged += HandleInventoryChanged;
+}
+
 SetupBarCells();
 gameObject.SetActive(false); // Start hidden
 }
@@ -7384,6 +7386,18 @@ gameObject.SetActive(false); // Start hidden
 void OnDestroy() {
 if (upArrowButton != null) upArrowButton.onClick.RemoveAllListeners();
 if (downArrowButton != null) downArrowButton.onClick.RemoveAllListeners();
+
+if (inventoryGridController != null) {
+inventoryGridController.OnInventoryChanged -= HandleInventoryChanged;
+}
+}
+
+void HandleInventoryChanged() {
+if (gameObject.activeInHierarchy) {
+RefreshFromInventory();
+UpdateBarDisplay();
+UpdateSelection(); // Also update selection in case the selected item moved or was removed
+}
 }
 
 void Update() {
@@ -7505,50 +7519,6 @@ draggable.enabled = false;
 barCell.AssignItemView(itemView, nodeData, toolDef);
 }
 
-void CreateToolCopyInBarCell(ToolDefinition toolDef, NodeData toolWrapperNodeData, NodeCell barCell) {
-GameObject toolDisplay = new GameObject($"ToolDisplay_{toolDef.displayName}", typeof(RectTransform), typeof(Image));
-toolDisplay.transform.SetParent(barCell.transform, false);
-
-Image toolImage = toolDisplay.GetComponent<Image>();
-toolImage.sprite = toolDef.icon;
-toolImage.color = toolDef.iconTint;
-toolImage.raycastTarget = false;
-
-float globalScale = 1f;
-if (InventoryGridController.Instance != null) {
-globalScale = InventoryGridController.Instance.NodeGlobalImageScale;
-}
-toolDisplay.transform.localScale = new Vector3(globalScale, globalScale, 1f);
-
-RectTransform toolRect = toolDisplay.GetComponent<RectTransform>();
-toolRect.anchoredPosition = Vector2.zero;
-toolRect.sizeDelta = cellSize * 0.8f;
-
-barCell.AssignDisplayOnly(toolDisplay, toolWrapperNodeData, toolDef);
-}
-
-void CreateNodeCopyInBarCell(NodeDefinition nodeDef, NodeData originalNodeData, NodeCell barCell) {
-GameObject nodeDisplay = new GameObject($"NodeDisplay_{nodeDef.displayName}", typeof(RectTransform), typeof(Image));
-nodeDisplay.transform.SetParent(barCell.transform, false);
-
-Image nodeImage = nodeDisplay.GetComponent<Image>();
-nodeImage.sprite = nodeDef.thumbnail;
-nodeImage.color = nodeDef.thumbnailTintColor;
-nodeImage.raycastTarget = false;
-
-float globalScale = 1f;
-if (InventoryGridController.Instance != null) {
-globalScale = InventoryGridController.Instance.NodeGlobalImageScale;
-}
-nodeDisplay.transform.localScale = new Vector3(globalScale, globalScale, 1f);
-
-RectTransform nodeRect = nodeDisplay.GetComponent<RectTransform>();
-nodeRect.anchoredPosition = Vector2.zero;
-nodeRect.sizeDelta = cellSize * 0.8f;
-
-barCell.AssignDisplayOnly(nodeDisplay, originalNodeData, null);
-}
-
 void HandleNumberKeyInput() {
 for (int i = 1; i <= 9; i++) {
 KeyCode key = (KeyCode)((int)KeyCode.Alpha1 + (i - 1));
@@ -7600,9 +7570,7 @@ UpdateSelection();
 void UpdateSelection() {
 SelectedItem = null; // Reset
 
-if (selectedSlot == -1) // Explicitly deselected {
-}
-else if (selectedSlot >= 0 && selectedSlot < barCells.Count && inventoryGridController != null) {
+if (selectedSlot >= 0 && selectedSlot < barCells.Count && inventoryGridController != null) {
 int mainInventoryColumns = inventoryGridController.inventoryColumns;
 if (mainInventoryColumns > 0) {
 int inventoryIndex = currentRow * mainInventoryColumns + selectedSlot;
@@ -7656,7 +7624,6 @@ UniversalTooltipManager.Instance.HideTooltip();
 
 OnSelectionChanged?.Invoke(SelectedItem);
 }
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -7826,6 +7793,8 @@ pub stat InventoryGridController Instance { get; set; }
 
 ro List<NodeCell> inventoryCells = new List<NodeCell>();
 
+pub event Action OnInventoryChanged;
+
 pub GameObject InventoryItemPrefab => inventoryItemPrefab;
 pub Color EmptyCellColor => emptyCellColor;
 pub float NodeGlobalImageScale => nodeGlobalImageScale;
@@ -7926,6 +7895,8 @@ NodeDraggable draggable = itemViewGO.GetComponent<NodeDraggable>() ?? itemViewGO
 draggable.Initialize(this, emptyCell);
 emptyCell.AssignItemView(itemView, toolNodeData, tool);
 if (logInventoryChanges) Debug.Log($"[Inventory] Added tool '{tool.displayName}' to cell {emptyCell.CellIndex}.");
+
+OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
 ret true;
 }
 
@@ -7976,6 +7947,7 @@ if (logInventoryChanges) {
 Debug.Log($"[Inventory] Added gene '{geneDef.displayName}' (seed: {inventoryNode.IsSeed()}) to cell {cellToUse.CellIndex}");
 }
 
+OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
 ret true;
 }
 
@@ -8013,6 +7985,8 @@ draggable.SnapToCell(emptyCell);
 if (logInventoryChanges) {
 Debug.Log($"[Inventory] Returned gene '{geneDataToReturn.nodeDisplayName}' to cell {emptyCell.CellIndex}");
 }
+
+OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
 }
 
 pub void HandleDropOnInventoryCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetInventoryCell) {
@@ -8051,41 +8025,43 @@ targetInventoryCell.AssignItemView(draggedItemView, draggedData, draggedToolDef)
 draggedDraggable.SnapToCell(targetInventoryCell);
 }
 else {
-if (targetInventoryCell.HasItem()) {
-ItemView viewInInventory = targetInventoryCell.GetItemView();
-NodeData dataInInventory = targetInventoryCell.GetNodeData();
-NodeDraggable draggableInInventory = viewInInventory.GetComponent<NodeDraggable>();
+NodeDefinition draggedNodeDef = draggedItemView.GetNodeDefinition();
 
-if (dataInInventory.IsSeed()) // Cannot swap a gene for a seed {
+if (targetInventoryCell.HasItem()) {
+NodeDefinition definitionInInventory = targetInventoryCell.GetNodeDefinition();
+ToolDefinition toolInInventory = targetInventoryCell.GetToolDefinition();
+
+if ((definitionInInventory != null && definitionInInventory.effects.Any(e => e.effectType == NodeEffectType.SeedSpawn)) || toolInInventory != null) {
 draggedDraggable.ResetPosition();
 return;
 }
 
-originalCell.ClearNodeReference();
-targetInventoryCell.ClearNodeReference();
+NodeDefinition definitionFromSequence = draggedItemView.GetNodeDefinition();
 
-originalCell.AssignItemView(viewInInventory, dataInInventory, null);
-draggableInInventory?.Initialize(NodeEditorGridController.Instance, originalCell);
-draggableInInventory?.SnapToCell(originalCell);
+originalCell.RemoveNode();
+targetInventoryCell.RemoveNode();
 
-targetInventoryCell.AssignItemView(draggedItemView, draggedData, null);
-draggedDraggable.Initialize(this, targetInventoryCell);
-draggedDraggable.SnapToCell(targetInventoryCell);
+AddGeneToInventoryFromDefinition(definitionFromSequence, targetInventoryCell);
+originalCell.AssignNode(definitionFromSequence);
 }
 else {
 if (originalCell.IsSeedSlot) {
+NodeEditorGridController.Instance.RefreshGraphAndUpdateSeed();
 NodeEditorGridController.Instance.UnloadSeedFromSlot();
 }
 
 originalCell.ClearNodeReference();
 
-targetInventoryCell.AssignItemView(draggedItemView, draggedData, null);
+targetInventoryCell.AssignItemView(draggedItemView, draggedData, draggedToolDef);
+
 draggedDraggable.Initialize(this, targetInventoryCell);
 draggedDraggable.SnapToCell(targetInventoryCell);
 }
 
 NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();
 }
+
+OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
 }
 
 pub int GetUsedSlotCount() => inventoryCells.Count(cell => cell.HasItem());
@@ -8094,6 +8070,7 @@ pub void RemoveGeneFromInventory(NodeCell inventoryCell) {
 if (inventoryCell != null && inventoryCell.HasItem() && inventoryCell.IsInventoryCell) {
 if (logInventoryChanges) Debug.Log($"[Inventory] Removing item '{inventoryCell.GetNodeData()?.nodeDisplayName ?? "Unknown"}' from cell {inventoryCell.CellIndex}.");
 inventoryCell.RemoveNode();
+OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
 }
 }
 
@@ -8931,7 +8908,7 @@ originalCell.RemoveNode();
 
 draggedData.EnsureSeedSequenceInitialized();
 _actualSeedSlotCell.AssignItemView(draggedView, draggedData, null);
-draggedDraggable.SnapToCell(_actualSeedSlotCell);
+draggedDraggable.SnapToCell(targetSeedSlotCell);
 LoadSequenceFromSeed(draggedData);
 }
 
@@ -8951,15 +8928,21 @@ draggedDraggable.ResetPosition(); return;
 
 if (originalCell.IsInventoryCell) {
 ItemView viewInTarget = targetSequenceCell.GetItemView();
+NodeDefinition definitionFromInventory = draggedView.GetNodeDefinition();
 
 if (viewInTarget != null) {
-InventoryGridController.Instance.ReturnGeneToInventory(viewInTarget, targetSequenceCell.GetNodeData());
-targetSequenceCell.ClearNodeReference(); // The cell is now visually and logically empty
-}
+NodeDefinition definitionFromSequence = viewInTarget.GetNodeDefinition();
 
 originalCell.RemoveNode();
+targetSequenceCell.RemoveNode();
 
-targetSequenceCell.AssignNode(draggedNodeDef);
+InventoryGridController.Instance.AddGeneToInventoryFromDefinition(definitionFromSequence, originalCell);
+targetSequenceCell.AssignNode(definitionFromInventory);
+}
+else {
+originalCell.RemoveNode(); // Consume the inventory item
+targetSequenceCell.AssignNode(definitionFromInventory); // Create a new instance in the sequence
+}
 NodeCell.SelectCell(targetSequenceCell);
 }
 else if (!originalCell.IsSeedSlot) {

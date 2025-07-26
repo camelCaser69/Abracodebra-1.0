@@ -1,24 +1,25 @@
-﻿using System.Collections.Generic;
+﻿// Assets/Scripts/PlantSystem/UI/InventoryBarController.cs
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class InventoryBarController : MonoBehaviour
 {
     public static InventoryBarController Instance { get; set; }
 
-    [SerializeField] private int slotsPerRow = 10;
-    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
-    [SerializeField] private float cellMargin = 10f;
+    [Header("Layout")]
+    [SerializeField] int slotsPerRow = 10;
+    [SerializeField] Vector2 cellSize = new Vector2(64f, 64f);
+    [SerializeField] float cellMargin = 10f;
 
-    [SerializeField] private Transform cellContainer;
-    [SerializeField] private Button upArrowButton;
-    [SerializeField] private Button downArrowButton;
-    [SerializeField] private GameObject selectionHighlight;
-
-    [SerializeField] private Sprite emptyCellSprite;
-    [SerializeField] private Color emptyCellColor = Color.white;
-
-    [SerializeField] private InventoryGridController inventoryGridController;
+    [Header("References")]
+    [SerializeField] Transform cellContainer;
+    [SerializeField] Button upArrowButton;
+    [SerializeField] Button downArrowButton;
+    [SerializeField] GameObject selectionHighlight;
+    [SerializeField] Sprite emptyCellSprite;
+    [SerializeField] Color emptyCellColor = Color.white;
+    [SerializeField] InventoryGridController inventoryGridController;
 
     private readonly List<NodeCell> barCells = new List<NodeCell>();
     private int currentRow = 0;
@@ -28,29 +29,53 @@ public class InventoryBarController : MonoBehaviour
     public InventoryBarItem SelectedItem { get; set; }
     public event System.Action<InventoryBarItem> OnSelectionChanged;
 
-    private void Awake()
+    void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
         selectedSlot = 0;
     }
 
-    private void Start()
+    void Start()
     {
         if (upArrowButton != null) upArrowButton.onClick.AddListener(() => ChangeRow(-1));
         if (downArrowButton != null) downArrowButton.onClick.AddListener(() => ChangeRow(1));
+
+        // <<< NEW >>> Subscribe to the inventory change event
+        if (inventoryGridController != null)
+        {
+            inventoryGridController.OnInventoryChanged += HandleInventoryChanged;
+        }
 
         SetupBarCells();
         gameObject.SetActive(false); // Start hidden
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
         if (upArrowButton != null) upArrowButton.onClick.RemoveAllListeners();
         if (downArrowButton != null) downArrowButton.onClick.RemoveAllListeners();
+
+        // <<< NEW >>> Unsubscribe to prevent memory leaks
+        if (inventoryGridController != null)
+        {
+            inventoryGridController.OnInventoryChanged -= HandleInventoryChanged;
+        }
     }
 
-    private void Update()
+    // <<< NEW >>> Event handler to refresh the bar when inventory changes
+    private void HandleInventoryChanged()
+    {
+        // Only refresh if the bar is currently active to avoid unnecessary work
+        if (gameObject.activeInHierarchy)
+        {
+            RefreshFromInventory();
+            UpdateBarDisplay();
+            UpdateSelection(); // Also update selection in case the selected item moved or was removed
+        }
+    }
+
+    void Update()
     {
         if (!gameObject.activeInHierarchy) return;
         HandleNumberKeyInput();
@@ -74,7 +99,7 @@ public class InventoryBarController : MonoBehaviour
         UniversalTooltipManager.Instance?.HideTooltip();
     }
 
-    private void SetupBarCells()
+    void SetupBarCells()
     {
         foreach (Transform child in cellContainer) Destroy(child.gameObject);
         barCells.Clear();
@@ -107,18 +132,17 @@ public class InventoryBarController : MonoBehaviour
         }
     }
 
-    private void RefreshFromInventory()
+    void RefreshFromInventory()
     {
         if (inventoryGridController == null) return;
         totalRows = Mathf.Max(1, Mathf.CeilToInt((float)inventoryGridController.TotalSlots / inventoryGridController.inventoryColumns));
         currentRow = Mathf.Clamp(currentRow, 0, totalRows - 1);
     }
 
-    private void UpdateBarDisplay()
+    void UpdateBarDisplay()
     {
         if (inventoryGridController == null || barCells == null) return;
 
-        // First, clear all existing items from the bar cells
         foreach (var cell in barCells)
         {
             cell.RemoveNode(); // This will destroy any existing ItemView/DisplayObject
@@ -132,7 +156,6 @@ public class InventoryBarController : MonoBehaviour
 
         int startIndexInMainInventory = currentRow * inventoryGridController.inventoryColumns;
 
-        // Now, copy the current state of the main inventory to the bar
         for (int i = 0; i < slotsPerRow; i++)
         {
             if (i >= inventoryGridController.inventoryColumns) break; // Don't try to access beyond inventory width
@@ -142,7 +165,6 @@ public class InventoryBarController : MonoBehaviour
             NodeCell inventoryCell = inventoryGridController.GetInventoryCellAtIndex(inventoryIndexToDisplay);
             if (inventoryCell != null && inventoryCell.HasItem())
             {
-                // Use the new, robust copy method
                 CopyInventoryItemToBarCell(inventoryCell, barCells[i]);
             }
         }
@@ -150,22 +172,19 @@ public class InventoryBarController : MonoBehaviour
         if (upArrowButton != null) upArrowButton.interactable = currentRow > 0;
         if (downArrowButton != null) downArrowButton.interactable = currentRow < totalRows - 1;
     }
-    
-    // --- THIS METHOD IS THE CORE FIX ---
-    private void CopyInventoryItemToBarCell(NodeCell inventoryCell, NodeCell barCell)
+
+    void CopyInventoryItemToBarCell(NodeCell inventoryCell, NodeCell barCell)
     {
         NodeData nodeData = inventoryCell.GetNodeData();
         ToolDefinition toolDef = inventoryCell.GetToolDefinition();
         NodeDefinition nodeDef = inventoryCell.GetNodeDefinition();
 
-        // Ensure we have the prefab reference from the main inventory controller
         if (InventoryGridController.Instance.InventoryItemPrefab == null)
         {
             Debug.LogError("[InventoryBarController] InventoryItemPrefab is not set on InventoryGridController!");
             return;
         }
 
-        // Instantiate the proper prefab, not a primitive GameObject
         GameObject itemViewGO = Instantiate(InventoryGridController.Instance.InventoryItemPrefab, barCell.transform);
         ItemView itemView = itemViewGO.GetComponent<ItemView>();
 
@@ -176,7 +195,6 @@ public class InventoryBarController : MonoBehaviour
             return;
         }
 
-        // Initialize the ItemView with the data from the main inventory
         if (toolDef != null)
         {
             itemView.Initialize(nodeData, toolDef);
@@ -186,67 +204,15 @@ public class InventoryBarController : MonoBehaviour
             itemView.Initialize(nodeData, nodeDef, null); // Sequence controller is null for inventory items
         }
 
-        // Draggable component should be disabled for the bar, it's display-only
         NodeDraggable draggable = itemView.GetComponent<NodeDraggable>();
         if (draggable != null)
         {
             draggable.enabled = false;
         }
 
-        // Assign this newly created, fully-functional ItemView to the bar cell
-        // The bar cell will now hold a complete visual object
         barCell.AssignItemView(itemView, nodeData, toolDef);
     }
-
-    void CreateToolCopyInBarCell(ToolDefinition toolDef, NodeData toolWrapperNodeData, NodeCell barCell)
-    {
-        GameObject toolDisplay = new GameObject($"ToolDisplay_{toolDef.displayName}", typeof(RectTransform), typeof(Image));
-        toolDisplay.transform.SetParent(barCell.transform, false);
-
-        Image toolImage = toolDisplay.GetComponent<Image>();
-        toolImage.sprite = toolDef.icon;
-        toolImage.color = toolDef.iconTint;
-        toolImage.raycastTarget = false;
-
-        float globalScale = 1f;
-        if (InventoryGridController.Instance != null)
-        {
-            globalScale = InventoryGridController.Instance.NodeGlobalImageScale;
-        }
-        toolDisplay.transform.localScale = new Vector3(globalScale, globalScale, 1f);
-
-        RectTransform toolRect = toolDisplay.GetComponent<RectTransform>();
-        toolRect.anchoredPosition = Vector2.zero;
-        toolRect.sizeDelta = cellSize * 0.8f;
-
-        barCell.AssignDisplayOnly(toolDisplay, toolWrapperNodeData, toolDef);
-    }
-
-    void CreateNodeCopyInBarCell(NodeDefinition nodeDef, NodeData originalNodeData, NodeCell barCell)
-    {
-        GameObject nodeDisplay = new GameObject($"NodeDisplay_{nodeDef.displayName}", typeof(RectTransform), typeof(Image));
-        nodeDisplay.transform.SetParent(barCell.transform, false);
-
-        Image nodeImage = nodeDisplay.GetComponent<Image>();
-        nodeImage.sprite = nodeDef.thumbnail;
-        nodeImage.color = nodeDef.thumbnailTintColor;
-        nodeImage.raycastTarget = false;
-
-        float globalScale = 1f;
-        if (InventoryGridController.Instance != null)
-        {
-            globalScale = InventoryGridController.Instance.NodeGlobalImageScale;
-        }
-        nodeDisplay.transform.localScale = new Vector3(globalScale, globalScale, 1f);
-
-        RectTransform nodeRect = nodeDisplay.GetComponent<RectTransform>();
-        nodeRect.anchoredPosition = Vector2.zero;
-        nodeRect.sizeDelta = cellSize * 0.8f;
-
-        barCell.AssignDisplayOnly(nodeDisplay, originalNodeData, null);
-    }
-
-
+    
     void HandleNumberKeyInput()
     {
         for (int i = 1; i <= 9; i++)
@@ -298,28 +264,22 @@ public class InventoryBarController : MonoBehaviour
 
     void SelectSlot(int slotIndexInBar)
     {
-        // If the pressed key corresponds to the already selected slot and an item is indeed selected
         if (this.selectedSlot == slotIndexInBar && this.SelectedItem != null)
         {
             this.selectedSlot = -1; // Mark as deselected
         }
         else
         {
-            // Otherwise, select the new slot
             this.selectedSlot = Mathf.Clamp(slotIndexInBar, 0, slotsPerRow - 1);
         }
         UpdateSelection();
     }
 
-    private void UpdateSelection()
+    void UpdateSelection()
     {
         SelectedItem = null; // Reset
 
-        if (selectedSlot == -1) // Explicitly deselected
-        {
-            // Do nothing, SelectedItem is already null
-        }
-        else if (selectedSlot >= 0 && selectedSlot < barCells.Count && inventoryGridController != null)
+        if (selectedSlot >= 0 && selectedSlot < barCells.Count && inventoryGridController != null)
         {
             int mainInventoryColumns = inventoryGridController.inventoryColumns;
             if (mainInventoryColumns > 0)
@@ -336,7 +296,6 @@ public class InventoryBarController : MonoBehaviour
             }
         }
 
-        // Update the visual selection highlight
         if (selectionHighlight != null)
         {
             if (SelectedItem != null && SelectedItem.IsValid() && selectedSlot >= 0 && selectedSlot < barCells.Count)
@@ -367,14 +326,12 @@ public class InventoryBarController : MonoBehaviour
             }
         }
 
-        // --- MODIFICATION START ---
-        // Update the tooltip based on the new selection
         if (gameObject.activeInHierarchy && SelectedItem != null && SelectedItem.IsValid() && UniversalTooltipManager.Instance != null && selectedSlot >= 0 && selectedSlot < barCells.Count)
         {
             ITooltipDataProvider provider = (SelectedItem.Type == InventoryBarItem.ItemType.Node)
                 ? (ITooltipDataProvider)SelectedItem.NodeDefinition
                 : SelectedItem.ToolDefinition;
-            
+
             object sourceData = (SelectedItem.Type == InventoryBarItem.ItemType.Node)
                 ? SelectedItem.NodeData
                 : null;
@@ -385,9 +342,7 @@ public class InventoryBarController : MonoBehaviour
         {
             UniversalTooltipManager.Instance.HideTooltip();
         }
-        // --- MODIFICATION END ---
-        
+
         OnSelectionChanged?.Invoke(SelectedItem);
     }
-
 }
