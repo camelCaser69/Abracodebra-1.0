@@ -17,6 +17,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 155e1e1e7c78be942b9e766f383efc47, type: 2}
   - {fileID: 11400000, guid: 4493db067ab561f46934373e4bb2851a, type: 2}
   - {fileID: 11400000, guid: a9515042c727d2646bfe7af12231b8eb, type: 2}
+  - {fileID: 11400000, guid: c8b5af8f8e72ee24ab305dcadbf4a0b8, type: 2}
   initialNodes:
   - nodeDefinition: {fileID: 11400000, guid: c2658bfcc287ffb41a5358a5a8d5dbcb, type: 2}
     cellIndex: 0
@@ -32,5 +33,9 @@ MonoBehaviour:
     canDelete: 1
   - nodeDefinition: {fileID: 11400000, guid: a9515042c727d2646bfe7af12231b8eb, type: 2}
     cellIndex: 3
+    canMove: 1
+    canDelete: 1
+  - nodeDefinition: {fileID: 11400000, guid: c8b5af8f8e72ee24ab305dcadbf4a0b8, type: 2}
+    cellIndex: 4
     canMove: 1
     canDelete: 1

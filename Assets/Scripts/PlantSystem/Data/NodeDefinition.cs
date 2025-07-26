@@ -264,7 +264,7 @@ public class NodeDefinition : ScriptableObject, ITooltipDataProvider
                 return result;
 
             case NodeEffectType.Damage:
-                return $"+{effect.primaryValue * 100:F0}% damage";
+                return $"Deals {effect.primaryValue:F0} damage"; // <<< MODIFIED
 
             case NodeEffectType.GrowBerry:
                 return "Grows berries";

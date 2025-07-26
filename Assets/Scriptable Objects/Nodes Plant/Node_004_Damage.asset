@@ -10,28 +10,28 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d27f72fdfc3f4962b8c5577d1ed14561, type: 3}
-  m_Name: Node_000_Seed
+  m_Name: Node_004_Damage
   m_EditorClassIdentifier: 
-  activationType: 0
-  displayName: Seed
+  activationType: 2
+  displayName: Damage
   description: 
-  thumbnail: {fileID: 21300000, guid: 1db862c5c07e3d04f989efcb5a55e5b4, type: 3}
-  thumbnailTintColor: {r: 0.5566038, g: 0.41829857, b: 0.2284176, a: 1}
+  thumbnail: {fileID: 21300000, guid: 0aac42833f760c64ab80dcdabdeb253f, type: 3}
+  thumbnailTintColor: {r: 1, g: 1, b: 1, a: 1}
   backgroundColor: {r: 0, g: 0, b: 0, a: 0}
   nodeViewPrefab: {fileID: 2087977392620144478, guid: 0d4be6cefc5e34842a57cf6362a60603, type: 3}
   effects:
-  - effectType: 13
+  - effectType: 11
     consumedOnTrigger: 0
-    primaryValue: 1
+    primaryValue: 4
     secondaryValue: 0
     seedData:
-      growthSpeed: 2
-      stemLengthMin: 6
-      stemLengthMax: 8
-      leafGap: 1
+      growthSpeed: 0
+      stemLengthMin: 0
+      stemLengthMax: 0
+      leafGap: 0
       leafPattern: 0
-      stemRandomness: 0.5
-      energyStorage: 40
-      cooldown: 4
-      castDelay: 1
-      maxBerries: 6
+      stemRandomness: 0
+      energyStorage: 0
+      cooldown: 0
+      castDelay: 0
+      maxBerries: 0

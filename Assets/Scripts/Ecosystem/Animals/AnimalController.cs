@@ -1,41 +1,40 @@
 ﻿// Assets/Scripts/Ecosystem/Animals/AnimalController.cs
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using WegoSystem;
 
-public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable
+// CORRECTED: Implemented the new ITriggerTarget marker interface.
+public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, ITriggerTarget
 {
+    [Header("Configuration")]
     [SerializeField] public AnimalDefinition definition;
 
-    // Direct references have been removed to centralize the logic
-    // [SerializeField] private StatusEffect wetStatusEffect;
-    // [SerializeField] private TileDefinition waterTileDefinition;
+    [Header("UI & Visuals")]
+    [SerializeField] private GameObject thoughtBubblePrefab;
+    [SerializeField] private Transform bubbleSpawnTransform;
+    [SerializeField] private Animator animator;
 
-    [Header("Component References")]
-    [SerializeField] GameObject thoughtBubblePrefab;
-    [SerializeField] Transform bubbleSpawnTransform;
-    [SerializeField] Animator animator;
+    [Header("Debug")]
+    [SerializeField] private TextMeshProUGUI hpText;
+    [SerializeField] private TextMeshProUGUI hungerText;
+    [SerializeField] private KeyCode showStatsKey = KeyCode.LeftAlt;
 
-    [Header("UI References")]
-    [SerializeField] TextMeshProUGUI hpText;
-    [SerializeField] TextMeshProUGUI hungerText;
-    [SerializeField] KeyCode showStatsKey = KeyCode.LeftAlt;
+    // Component References
+    private AnimalMovement movement;
+    private AnimalNeeds needs;
+    private AnimalBehavior behavior;
+    private GridEntity gridEntity;
+    private SpriteRenderer spriteRenderer;
+    private StatusEffectManager statusManager;
+    private StatusEffectUIManager statusEffectUI;
 
-    AnimalMovement movement;
-    AnimalNeeds needs;
-    AnimalBehavior behavior;
-    GridEntity gridEntity;
-    SpriteRenderer spriteRenderer;
-    StatusEffectManager statusManager;
-    StatusEffectUIManager statusEffectUI;
+    // State
+    private bool isDying = false;
+    private float deathFadeTimer = 0f;
+    private float deathFadeDuration = 1f;
+    private int thoughtCooldownTick = 0;
 
-    bool isDying = false;
-    float deathFadeTimer = 0f;
-    float deathFadeDuration = 1f;
-    int thoughtCooldownTick = 0;
-
+    #region Properties
     public GridEntity GridEntity => gridEntity;
     public StatusEffectManager StatusManager => statusManager;
     public AnimalDefinition Definition => definition;
@@ -44,7 +43,9 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     public AnimalBehavior Behavior => behavior;
     public bool IsDying => isDying;
     public string SpeciesName => definition != null ? definition.animalName : "Uninitialized";
+    #endregion
 
+    #region Unity Lifecycle
     void Awake()
     {
         CacheComponents();
@@ -97,6 +98,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         UpdateSpriteFlipping();
         movement.UpdateVisuals();
     }
+    #endregion
 
     public void OnTickUpdate(int currentTick)
     {
@@ -115,23 +117,23 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
 
         if (gridEntity != null && statusManager != null)
         {
-            gridEntity.SetSpeedMultiplier(statusManager.VisualSpeedMultiplier); // <<< RENAMED
+            gridEntity.SetSpeedMultiplier(statusManager.VisualSpeedMultiplier);
         }
 
         if (thoughtCooldownTick > 0) thoughtCooldownTick--;
         UpdateAnimations();
     }
-    
+
     private void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos)
     {
-        // The central system now handles this every tick, so this call is redundant.
-        // EnvironmentalStatusEffectSystem.Instance?.CheckAndApplyEffects(this);
+        // Future logic can go here
     }
-    
+
+    #region IStatusEffectable Implementation
     public string GetDisplayName() { return SpeciesName; }
     public void Heal(float amount) { if (needs != null) needs.Heal(amount); }
     public void ModifyHunger(float amount) { if (needs != null) needs.ModifyHunger(amount); }
-    
+
     public void TakeDamage(float amount)
     {
         if (isDying) return;
@@ -142,8 +144,9 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         }
         needs.TakeDamage(finalDamage);
     }
+    #endregion
 
-    void CacheComponents()
+    private void CacheComponents()
     {
         gridEntity = GetComponent<GridEntity>();
         if (gridEntity == null) gridEntity = gameObject.AddComponent<GridEntity>();
@@ -160,13 +163,13 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         if (statusEffectUI == null) Debug.LogWarning($"StatusEffectUIManager not found on a child of {gameObject.name}. Icons will not display.", this);
     }
 
-    void ValidateComponents()
+    private void ValidateComponents()
     {
         if (definition == null) { Debug.LogError($"[{gameObject.name}] Missing AnimalDefinition!", this); enabled = false; return; }
         if (definition.diet == null) { Debug.LogError($"[{gameObject.name}] AnimalDefinition missing diet!", this); enabled = false; return; }
     }
 
-    void InitializeAnimal()
+    private void InitializeAnimal()
     {
         movement.Initialize(this, definition);
         needs.Initialize(this, definition);
@@ -182,8 +185,8 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
             Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridEntity.Position}");
         }
     }
-    
-    void StartDying()
+
+    private void StartDying()
     {
         if (isDying) return;
         isDying = true;
@@ -199,23 +202,23 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         deathFadeTimer = deathFadeDuration;
 
         Debug.Log($"[AnimalController] {SpeciesName} is dying! Duration: {deathFadeDuration}s");
-        
+
         if (GridDebugVisualizer.Instance != null)
         {
             GridDebugVisualizer.Instance.HideContinuousRadius(this);
         }
         movement.StopAllMovement();
         behavior.CancelCurrentAction();
-        
+
         if (movement != null) movement.enabled = false;
         if (behavior != null) behavior.enabled = false;
         if (needs != null) needs.enabled = false;
     }
-    
-    void UpdateDeathFade()
+
+    private void UpdateDeathFade()
     {
         if (spriteRenderer == null) return;
-        
+
         float fadeProgress = 1f - (deathFadeTimer / deathFadeDuration);
         Color color = spriteRenderer.color;
         color.a = Mathf.Lerp(1f, 0f, fadeProgress);
@@ -225,10 +228,10 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     public void ShowThought(ThoughtTrigger trigger)
     {
         if (!CanShowThought()) return;
-        
+
         thoughtCooldownTick = definition.thoughtCooldownTicks;
         if (definition.thoughtLibrary == null || thoughtBubblePrefab == null) return;
-        
+
         string message = "";
         switch (trigger)
         {
@@ -265,45 +268,45 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     {
         return thoughtCooldownTick <= 0 && !isDying;
     }
-    
-    void UpdateAnimations()
+
+    private void UpdateAnimations()
     {
         if (animator == null) return;
-        
+
         bool isMoving = gridEntity != null && gridEntity.IsMoving;
         bool isEating = behavior != null && behavior.IsEating;
-        
+
         animator.SetBool("isMoving", isMoving);
         animator.SetBool("isEating", isEating);
         animator.SetBool("isDying", isDying);
     }
-    
-    void UpdateSpriteFlipping()
+
+    private void UpdateSpriteFlipping()
     {
         if (spriteRenderer == null || movement == null) return;
-        
+
         Vector2 moveDirection = movement.GetLastMoveDirection();
         if (Mathf.Abs(moveDirection.x) > 0.01f)
         {
             spriteRenderer.flipX = moveDirection.x < 0;
         }
     }
-    
-    void SetStatsTextVisibility(bool visible)
+
+    private void SetStatsTextVisibility(bool visible)
     {
         if (hpText != null) hpText.gameObject.SetActive(visible);
         if (hungerText != null) hungerText.gameObject.SetActive(visible);
-        
+
         if (visible)
         {
             UpdateUI();
         }
     }
-    
+
     public void UpdateUI()
     {
         if (needs == null) return;
-        
+
         if (hpText != null)
         {
             hpText.text = $"{Mathf.CeilToInt(needs.CurrentHealth)}/{Mathf.CeilToInt(definition.maxHealth)}";
@@ -313,7 +316,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
             hungerText.text = $"{Mathf.CeilToInt(needs.CurrentHunger)}/{Mathf.CeilToInt(definition.diet.maxHunger)}";
         }
     }
-    
+
     public void SetSeekingScreenCenter(Vector2 target, Vector2 minBounds, Vector2 maxBounds)
     {
         movement.SetSeekingScreenCenter(target, minBounds, maxBounds);

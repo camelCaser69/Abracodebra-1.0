@@ -10,7 +10,7 @@ public class PlantEnergySystem
     public float MaxEnergy { get; set; } = 10f;
     public float PhotosynthesisRate { get; set; }
 
-    private FireflyManager fireflyManagerInstance;
+    private readonly FireflyManager fireflyManagerInstance;
 
     public PlantEnergySystem(PlantGrowth plant)
     {
@@ -23,22 +23,18 @@ public class PlantEnergySystem
         if (plant.GrowthLogic == null || MaxEnergy <= 0) return;
 
         int leafCount = plant.CellManager.GetActiveLeafCount();
-
         if (leafCount <= 0)
         {
             return;
         }
 
+        // --- FIX: Simplified sunlight calculation for robustness ---
+        // The previous check for IsPaused was causing issues where the plant would ignore
+        // the weather state. Now, it simply reads the current sun intensity directly.
         float sunlight = 1f; // Default to full sunlight
-
         if (WeatherManager.Instance != null)
         {
-            // This is the critical check. If dayNightCycleEnabled is false, sunlight remains 1.0
-            if (WeatherManager.Instance.dayNightCycleEnabled &&
-                !WeatherManager.Instance.IsPaused)
-            {
-                sunlight = WeatherManager.Instance.sunIntensity;
-            }
+            sunlight = WeatherManager.Instance.sunIntensity;
         }
 
         float tileMultiplier = (PlantGrowthModifierManager.Instance != null) ?
@@ -47,7 +43,6 @@ public class PlantEnergySystem
 
         float efficiencyPerLeaf = plant.GrowthLogic.PhotosynthesisEfficiencyPerLeaf;
 
-        // Calculate firefly bonus
         float fireflyBonusRate = 0f;
         if (fireflyManagerInstance != null)
         {

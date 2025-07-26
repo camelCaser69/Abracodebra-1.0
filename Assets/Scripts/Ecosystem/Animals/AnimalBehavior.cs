@@ -1,10 +1,7 @@
-﻿using UnityEngine;
+﻿// Assets/Scripts/Ecosystem/Animals/AnimalBehavior.cs
 using System.Collections.Generic;
+using UnityEngine;
 using WegoSystem;
-
-#region Using Statements
-// This region is for AI formatting. It will be removed in the final output.
-#endregion
 
 public class AnimalBehavior : MonoBehaviour
 {
@@ -102,7 +99,6 @@ public class AnimalBehavior : MonoBehaviour
 
         if (currentEatingTarget == null)
         {
-            // No need to set it to null again if it already is.
             return;
         }
 
@@ -111,22 +107,20 @@ public class AnimalBehavior : MonoBehaviour
         {
             controller.Needs.Eat(foodItem);
 
-            // --- THE FIX ---
-            // We must manually report that the cell is destroyed BEFORE we call Destroy().
-            // This ensures the plant's leaf count is updated *within the same tick*,
-            // before the plant calculates its energy for this tick.
+            // <<< NEW LOGIC: Check if the eaten item was part of a plant and trigger its effects. >>>
             PlantCell plantCell = currentEatingTarget.GetComponent<PlantCell>();
             if (plantCell != null && plantCell.ParentPlantGrowth != null)
             {
+                // This is the crucial link. The animal tells the plant it has been eaten.
+                plantCell.ParentPlantGrowth.TriggerEatCast(controller);
+
                 if (Debug.isDebugBuild)
                 {
                     Debug.Log($"[AnimalBehavior] Eating a plant cell. Manually reporting destruction of cell at {plantCell.GridCoord} to plant '{plantCell.ParentPlantGrowth.name}' before Destroy() is called.");
                 }
-                // This call updates the plant's LeafDataList instantly.
                 plantCell.ParentPlantGrowth.ReportCellDestroyed(plantCell.GridCoord);
             }
 
-            // Now we can safely queue the object for destruction at the end of the frame.
             Destroy(currentEatingTarget);
 
             hasPooped = false;

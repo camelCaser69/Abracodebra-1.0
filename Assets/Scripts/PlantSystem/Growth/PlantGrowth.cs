@@ -1,5 +1,4 @@
 ﻿// Assets/Scripts/PlantSystem/Growth/PlantGrowth.cs
-
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -18,6 +17,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
 {
     public static readonly List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
 
+    #region Components and Properties
     public PlantCellManager CellManager { get; set; }
     public PlantNodeExecutor NodeExecutor { get; set; }
     public PlantGrowthLogic GrowthLogic { get; set; }
@@ -26,23 +26,30 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
     public NodeGraph NodeGraph { get; set; }
     public PlantState CurrentState { get; set; } = PlantState.Initializing;
 
-    List<NodeDefinition> storedDefinitions = new List<NodeDefinition>();
+    private List<NodeDefinition> storedDefinitions = new List<NodeDefinition>();
+    #endregion
 
-    [SerializeField] GameObject seedCellPrefab;
-    [SerializeField] GameObject stemCellPrefab;
-    [SerializeField] GameObject leafCellPrefab;
-    [SerializeField] GameObject berryCellPrefab;
-    [SerializeField] float cellSpacing = 0.08f;
+    #region Serialized Fields
+    [Header("Cell Prefabs")]
+    [SerializeField] private GameObject seedCellPrefab;
+    [SerializeField] private GameObject stemCellPrefab;
+    [SerializeField] private GameObject leafCellPrefab;
+    [SerializeField] private GameObject berryCellPrefab;
+    [SerializeField] private float cellSpacing = 0.08f;
 
-    [SerializeField] PlantShadowController shadowController;
-    [SerializeField] GameObject shadowPartPrefab;
-    [SerializeField] bool enableOutline = true;
-    [SerializeField] PlantOutlineController outlineController;
-    [SerializeField] GameObject outlinePartPrefab;
+    [Header("Visual Controllers")]
+    [SerializeField] private PlantShadowController shadowController;
+    [SerializeField] private GameObject shadowPartPrefab;
+    [SerializeField] private bool enableOutline = true;
+    [SerializeField] private PlantOutlineController outlineController;
+    [SerializeField] private GameObject outlinePartPrefab;
 
+    [Header("UI")]
     [SerializeField] public bool showGrowthPercentage = true;
     [SerializeField] public bool allowPhotosynthesisDuringGrowth = false;
+    #endregion
 
+    #region Unity Methods
     void Awake()
     {
         InitializeComponents();
@@ -50,7 +57,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         AllActivePlants.Add(this);
     }
 
-    void InitializeComponents()
+    private void InitializeComponents()
     {
         CellManager = new PlantCellManager(this, seedCellPrefab, stemCellPrefab, leafCellPrefab, berryCellPrefab, cellSpacing);
         NodeExecutor = new PlantNodeExecutor(this);
@@ -70,7 +77,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         VisualManager = new PlantVisualManager(this, shadowController, shadowPartPrefab, outlineController, outlinePrefabToUse, enableOutline);
     }
 
-    void ValidateReferences()
+    private void ValidateReferences()
     {
         bool setupValid = true;
 
@@ -116,6 +123,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
             setupValid = false;
         }
 
+
         if (!setupValid)
         {
             enabled = false;
@@ -158,6 +166,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
 
         CellManager?.ClearAllVisuals();
     }
+    #endregion
 
     public void OnTickUpdate(int currentTick)
     {
@@ -195,7 +204,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         VisualManager.UpdateWegoUI();
     }
 
-    void UpdateRadiusVisualizations()
+    private void UpdateRadiusVisualizations()
     {
         if (GridDebugVisualizer.Instance != null)
         {
@@ -264,7 +273,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void TransitionToMature()
+    private void TransitionToMature()
     {
         CurrentState = PlantState.Mature_Idle;
 
@@ -279,7 +288,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void RegisterWithManagers()
+    private void RegisterWithManagers()
     {
         if (PlantGrowthModifierManager.Instance != null && TileInteractionManager.Instance != null)
         {
@@ -294,7 +303,6 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         var harvestedDefs = new List<NodeDefinition>();
         var harvestableBerries = new List<GameObject>();
 
-        // Step 1: Find all physical, harvestable items on this plant.
         var tags = GetComponentsInChildren<HarvestableTag>();
         foreach (var tag in tags)
         {
@@ -317,7 +325,6 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
             return harvestedDefs;
         }
 
-        // Step 2: Find the single gene in the plant's DNA that is responsible for growing berries.
         var berryNode = NodeGraph.nodes.FirstOrDefault(n => n != null && n.effects.Any(e => e != null && e.effectType == NodeEffectType.GrowBerry));
 
         if (berryNode == null)
@@ -329,7 +336,6 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         string matchingNodeDefinitionName = berryNode.definitionName;
         NodeDefinition harvestableDefinition = null;
 
-        // Step 3: Use the name from that gene to find the master NodeDefinition asset.
         if (!string.IsNullOrEmpty(matchingNodeDefinitionName))
         {
             var library = NodeEditorGridController.Instance?.DefinitionLibrary;
@@ -340,8 +346,8 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
 
             if (harvestableDefinition == null)
             {
-                 var allDefs = Resources.LoadAll<NodeDefinition>("");
-                 harvestableDefinition = allDefs.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
+                var allDefs = Resources.LoadAll<NodeDefinition>("");
+                harvestableDefinition = allDefs.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
             }
         }
 
@@ -350,8 +356,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
             Debug.LogError($"[PlantGrowth] Could not find NodeDefinition asset with name '{matchingNodeDefinitionName ?? "NULL"}'. The 'GrowBerry' gene is present, but its source asset is missing from the library or Resources.", gameObject);
             return harvestedDefs;
         }
-        
-        // Step 4: Add one definition to the list for each physical berry found and destroy the berry.
+
         Debug.Log($"[PlantGrowth] Using definition '{harvestableDefinition.displayName}' for harvest.");
 
         foreach (var berryGO in harvestableBerries)
@@ -369,11 +374,30 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         return harvestedDefs;
     }
 
+    /// <summary>
+    /// Called by an external source (like an animal) when part of this plant is eaten.
+    /// It then tells the NodeExecutor to find and fire any relevant `EatCast` triggers.
+    /// </summary>
+    /// <param name="target">The entity that did the eating.</param>
+    public void TriggerEatCast(ITriggerTarget target)
+    {
+        if (NodeExecutor != null)
+        {
+            if (Debug.isDebugBuild)
+            {
+                string targetName = (target is IStatusEffectable statusEffectable) ? statusEffectable.GetDisplayName() : "Unknown";
+                Debug.Log($"[{gameObject.name}] Eaten by '{targetName}'. Checking for EatCast triggers.", gameObject);
+            }
+            NodeExecutor.TriggerEffectsByType(NodeEffectType.EatCast, target);
+        }
+    }
+
     public void StoreOriginalDefinitions(List<NodeDefinition> definitions)
     {
         storedDefinitions = new List<NodeDefinition>(definitions);
     }
 
+    #region Helper Methods
     public float GetCellSpacing() => cellSpacing;
     public bool IsOutlineEnabled() => enableOutline;
     public GameObject GetCellGameObjectAt(Vector2Int coord) => CellManager.GetCellGameObjectAt(coord);
@@ -385,6 +409,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         }
         return outlinePartPrefab;
     }
+
     public float GetPoopDetectionRadius()
     {
         if (NodeGraph?.nodes == null) return 0f;
@@ -399,7 +424,9 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         }
         return 0f;
     }
+
     public bool DoesCellExistAt(Vector2Int coord) => CellManager.DoesCellExistAt(coord);
     public void ReportCellDestroyed(Vector2Int coord) => CellManager.ReportCellDestroyed(coord);
     public void ApplyScentDataToObject(GameObject targetObject, Dictionary<ScentDefinition, float> scentRadiusBonuses, Dictionary<ScentDefinition, float> scentStrengthBonuses) => NodeExecutor.ApplyScentDataToObject(targetObject, scentRadiusBonuses, scentStrengthBonuses);
+    #endregion
 }
