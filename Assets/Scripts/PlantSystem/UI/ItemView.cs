@@ -1,36 +1,27 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
+﻿// Assets/Scripts/PlantSystem/UI/ItemView.cs
+
+using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class ItemView : MonoBehaviour, IPointerDownHandler
 {
-    #region Serialized Fields
-    [Header("UI References")]
     [SerializeField] private Image thumbnailImage;
     [SerializeField] private Image backgroundImage;
-    #endregion
+    [SerializeField] private Sprite fallbackThumbnail; // New field for a fallback icon
 
-    #region Private State
-    // Item Data
     private NodeData _nodeData;
     private NodeDefinition _nodeDefinition;
     private ToolDefinition _toolDefinition;
 
-    // Context & State
     private NodeEditorGridController _sequenceGridControllerRef;
     private NodeCell _parentCell;
     private Color _originalBackgroundColor;
     private TooltipTrigger _tooltipTrigger;
     private DisplayType _displayType;
 
-    // --- FIXED: The enum must be public to be used by a public method ---
     public enum DisplayType { None, Node, Tool }
-    #endregion
 
-    #region Initialization
-    /// <summary>
-    /// Initializes the view to display a Node.
-    /// </summary>
     public void Initialize(NodeData data, NodeDefinition definition, NodeEditorGridController sequenceController)
     {
         _displayType = DisplayType.Node;
@@ -45,7 +36,6 @@ public class ItemView : MonoBehaviour, IPointerDownHandler
             return;
         }
 
-        // A node inside a sequence cannot itself be a seed or contain a sequence.
         if (!_nodeData.IsSeed())
         {
             _nodeData.ClearStoredSequence();
@@ -54,9 +44,6 @@ public class ItemView : MonoBehaviour, IPointerDownHandler
         SetupVisuals();
     }
 
-    /// <summary>
-    /// Initializes the view to display a Tool.
-    /// </summary>
     public void Initialize(NodeData data, ToolDefinition toolDef)
     {
         _displayType = DisplayType.Tool;
@@ -69,51 +56,68 @@ public class ItemView : MonoBehaviour, IPointerDownHandler
             gameObject.SetActive(false);
             return;
         }
-        
+
         SetupVisuals();
     }
 
-    void SetupVisuals() {
+    private void SetupVisuals()
+    {
         UpdateParentCellReference();
         _tooltipTrigger = GetComponent<TooltipTrigger>() ?? gameObject.AddComponent<TooltipTrigger>();
 
         float globalScaleFactor = 1f;
         float raycastPaddingValue = 0f;
-        if (InventoryGridController.Instance != null) {
+        if (InventoryGridController.Instance != null)
+        {
             globalScaleFactor = InventoryGridController.Instance.NodeGlobalImageScale;
             raycastPaddingValue = InventoryGridController.Instance.NodeImageRaycastPadding;
         }
 
         Vector4 raycastPaddingVector = new Vector4(raycastPaddingValue, raycastPaddingValue, raycastPaddingValue, raycastPaddingValue);
 
-        if (thumbnailImage != null) {
-            thumbnailImage.sprite = (_displayType == DisplayType.Node) ? _nodeDefinition.thumbnail : _toolDefinition.icon;
+        if (thumbnailImage != null)
+        {
+            // --- MODIFIED LOGIC START ---
+            Sprite spriteToShow = (_displayType == DisplayType.Node) ? _nodeDefinition.thumbnail : _toolDefinition.icon;
+
+            // If the intended sprite is null, try to use the fallback.
+            if (spriteToShow == null)
+            {
+                spriteToShow = fallbackThumbnail;
+                if (_displayType == DisplayType.Node)
+                {
+                    Debug.LogWarning($"[ItemView] NodeDefinition '{_nodeDefinition.displayName}' is missing a thumbnail. Using fallback.", this);
+                }
+            }
+            
+            thumbnailImage.sprite = spriteToShow;
             thumbnailImage.color = (_displayType == DisplayType.Node) ? _nodeDefinition.thumbnailTintColor : _toolDefinition.iconTint;
             thumbnailImage.rectTransform.localScale = new Vector3(globalScaleFactor, globalScaleFactor, 1f);
-            thumbnailImage.enabled = (thumbnailImage.sprite != null);
+            thumbnailImage.enabled = (thumbnailImage.sprite != null); // Now this is less likely to be false
+            // --- MODIFIED LOGIC END ---
+
             thumbnailImage.raycastTarget = true;
             thumbnailImage.raycastPadding = raycastPaddingVector;
         }
 
-        if (backgroundImage != null) {
-            // Use InventoryColorManager if available, otherwise fall back to definition colors
-            if (InventoryColorManager.Instance != null) {
+        if (backgroundImage != null)
+        {
+            if (InventoryColorManager.Instance != null)
+            {
                 _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(_nodeData, _nodeDefinition, _toolDefinition);
             }
-            else {
-                // Fallback to original behavior
+            else
+            {
                 _originalBackgroundColor = (_displayType == DisplayType.Node) ? _nodeDefinition.backgroundColor : new Color(0.5f, 0.5f, 0.5f, 1f);
             }
-        
+
             backgroundImage.color = _originalBackgroundColor;
             backgroundImage.enabled = true;
             backgroundImage.raycastTarget = true;
             backgroundImage.raycastPadding = raycastPaddingVector;
         }
     }
-    #endregion
-    
-    #region Public Methods & Properties
+
     public NodeData GetNodeData() => _nodeData;
     public NodeDefinition GetNodeDefinition() => _nodeDefinition;
     public ToolDefinition GetToolDefinition() => _toolDefinition;
@@ -140,21 +144,17 @@ public class ItemView : MonoBehaviour, IPointerDownHandler
             backgroundImage.color = _originalBackgroundColor;
         }
     }
-    #endregion
 
-    #region Event Handlers
     public void OnPointerDown(PointerEventData eventData)
     {
         if (_parentCell == null) UpdateParentCellReference();
 
         if (_parentCell != null && eventData.button == PointerEventData.InputButton.Left)
         {
-            // Selection logic only applies to Nodes in the sequence editor
             if (!_parentCell.IsInventoryCell && !_parentCell.IsSeedSlot && _displayType == DisplayType.Node)
             {
                 NodeCell.SelectCell(_parentCell);
             }
         }
     }
-    #endregion
 }

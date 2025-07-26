@@ -294,6 +294,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         var harvestedDefs = new List<NodeDefinition>();
         var harvestableBerries = new List<GameObject>();
 
+        // Step 1: Find all physical, harvestable items on this plant.
         var tags = GetComponentsInChildren<HarvestableTag>();
         foreach (var tag in tags)
         {
@@ -302,15 +303,11 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
             {
                 harvestableBerries.Add(tag.gameObject);
             }
-            else if (cell == null)
-            {
-                harvestableBerries.Add(tag.gameObject);
-            }
         }
 
         if (harvestableBerries.Count == 0)
         {
-            Debug.LogWarning($"[PlantGrowth] Harvest called on '{gameObject.name}', but no harvestable berries with HarvestableTag found.", gameObject);
+            Debug.LogWarning($"[PlantGrowth] Harvest called on '{gameObject.name}', but no fruit with HarvestableTag found.", gameObject);
             return harvestedDefs;
         }
 
@@ -320,50 +317,42 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
             return harvestedDefs;
         }
 
-        // THE FIX: Find the node that CREATES the berry to determine what item to give.
-        // No longer pre-emptively checking for a separate "Harvestable" flag.
-        NodeDefinition harvestableDefinition = null;
-        string matchingNodeDefinitionName = null;
-        
+        // Step 2: Find the single gene in the plant's DNA that is responsible for growing berries.
         var berryNode = NodeGraph.nodes.FirstOrDefault(n => n != null && n.effects.Any(e => e != null && e.effectType == NodeEffectType.GrowBerry));
 
-        if (berryNode != null)
+        if (berryNode == null)
         {
-            matchingNodeDefinitionName = berryNode.definitionName;
-            Debug.Log($"[PlantGrowth] Found berry-creating node. Definition asset name: {matchingNodeDefinitionName}");
+            Debug.LogError($"[PlantGrowth] Found harvestable fruit tags, but no NodeData with a 'GrowBerry' effect exists in the plant's NodeGraph. Cannot determine what to give the player.", gameObject);
+            return harvestedDefs;
         }
 
-        // Now, perform the lookup using the found definition name.
+        string matchingNodeDefinitionName = berryNode.definitionName;
+        NodeDefinition harvestableDefinition = null;
+
+        // Step 3: Use the name from that gene to find the master NodeDefinition asset.
         if (!string.IsNullOrEmpty(matchingNodeDefinitionName))
         {
-            if (storedDefinitions != null && storedDefinitions.Count > 0)
+            var library = NodeEditorGridController.Instance?.DefinitionLibrary;
+            if (library?.definitions != null)
             {
-                harvestableDefinition = storedDefinitions.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
+                harvestableDefinition = library.definitions.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
             }
 
-            if (harvestableDefinition == null && NodeEditorGridController.Instance?.DefinitionLibrary != null)
-            {
-                var library = NodeEditorGridController.Instance.DefinitionLibrary;
-                if (library.definitions != null)
-                {
-                    harvestableDefinition = library.definitions.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
-                }
-            }
-            
             if (harvestableDefinition == null)
             {
-                var allDefs = Resources.LoadAll<NodeDefinition>("");
-                harvestableDefinition = allDefs.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
+                 var allDefs = Resources.LoadAll<NodeDefinition>("");
+                 harvestableDefinition = allDefs.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
             }
         }
 
         if (harvestableDefinition == null)
         {
-            Debug.LogError($"[PlantGrowth] Could not find NodeDefinition for harvestable berry! Searched for asset name: '{matchingNodeDefinitionName ?? "NULL"}'. Make sure:\n1. Your plant's genes include one with a 'GrowBerry' effect.\n2. The corresponding NodeDefinition asset exists and the data path is correct.", gameObject);
+            Debug.LogError($"[PlantGrowth] Could not find NodeDefinition asset with name '{matchingNodeDefinitionName ?? "NULL"}'. The 'GrowBerry' gene is present, but its source asset is missing from the library or Resources.", gameObject);
             return harvestedDefs;
         }
-
-        Debug.Log($"[PlantGrowth] Using definition '{harvestableDefinition.displayName}' (thumbnail: {(harvestableDefinition.thumbnail != null ? "YES" : "NO")}) for harvest");
+        
+        // Step 4: Add one definition to the list for each physical berry found and destroy the berry.
+        Debug.Log($"[PlantGrowth] Using definition '{harvestableDefinition.displayName}' for harvest.");
 
         foreach (var berryGO in harvestableBerries)
         {
