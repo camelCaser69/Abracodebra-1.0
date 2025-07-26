@@ -302,7 +302,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
             {
                 harvestableBerries.Add(tag.gameObject);
             }
-            else if (cell == null) // Also harvest items that might not be on the plant's grid system
+            else if (cell == null)
             {
                 harvestableBerries.Add(tag.gameObject);
             }
@@ -310,65 +310,56 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
 
         if (harvestableBerries.Count == 0)
         {
-            Debug.LogWarning($"[PlantGrowth] Harvest called on '{gameObject.name}', but no harvestable berries found.", gameObject);
+            Debug.LogWarning($"[PlantGrowth] Harvest called on '{gameObject.name}', but no harvestable berries with HarvestableTag found.", gameObject);
             return harvestedDefs;
         }
 
-        NodeDefinition harvestableDefinition = null;
-        string matchingNodeDisplayName = null; // Changed variable name for clarity
-
-        if (NodeGraph?.nodes != null)
+        if (NodeGraph?.nodes == null)
         {
-            foreach (var node in NodeGraph.nodes)
-            {
-                if (node?.effects == null) continue;
-
-                bool hasGrowBerry = node.effects.Any(e => e.effectType == NodeEffectType.GrowBerry);
-                bool hasHarvestable = node.effects.Any(e => e.effectType == NodeEffectType.Harvestable && e.isPassive);
-
-                if (hasGrowBerry && hasHarvestable)
-                {
-                    matchingNodeDisplayName = node.nodeDisplayName; // THE FIX
-                    Debug.Log($"[PlantGrowth] Found harvestable node: {node.nodeDisplayName}");
-                    break;
-                }
-            }
+            Debug.LogError($"[PlantGrowth] Cannot determine harvest item because NodeGraph is null.", gameObject);
+            return harvestedDefs;
         }
 
-        if (!string.IsNullOrEmpty(matchingNodeDisplayName))
+        // THE FIX: Find the node that CREATES the berry to determine what item to give.
+        // No longer pre-emptively checking for a separate "Harvestable" flag.
+        NodeDefinition harvestableDefinition = null;
+        string matchingNodeDefinitionName = null;
+        
+        var berryNode = NodeGraph.nodes.FirstOrDefault(n => n != null && n.effects.Any(e => e != null && e.effectType == NodeEffectType.GrowBerry));
+
+        if (berryNode != null)
         {
-            // Search method 1: Stored definitions (if this system were fully implemented)
+            matchingNodeDefinitionName = berryNode.definitionName;
+            Debug.Log($"[PlantGrowth] Found berry-creating node. Definition asset name: {matchingNodeDefinitionName}");
+        }
+
+        // Now, perform the lookup using the found definition name.
+        if (!string.IsNullOrEmpty(matchingNodeDefinitionName))
+        {
             if (storedDefinitions != null && storedDefinitions.Count > 0)
             {
-                harvestableDefinition = storedDefinitions.FirstOrDefault(d =>
-                    d != null && d.displayName == matchingNodeDisplayName);
+                harvestableDefinition = storedDefinitions.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
             }
 
-            // Search method 2: Main definition library from the editor controller
             if (harvestableDefinition == null && NodeEditorGridController.Instance?.DefinitionLibrary != null)
             {
                 var library = NodeEditorGridController.Instance.DefinitionLibrary;
                 if (library.definitions != null)
                 {
-                    harvestableDefinition = library.definitions.FirstOrDefault(d =>
-                        d != null && d.displayName == matchingNodeDisplayName);
+                    harvestableDefinition = library.definitions.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
                 }
             }
-
-            // Search method 3: Fallback to searching all loaded NodeDefinitions in Resources
+            
             if (harvestableDefinition == null)
             {
                 var allDefs = Resources.LoadAll<NodeDefinition>("");
-                harvestableDefinition = allDefs.FirstOrDefault(d =>
-                    d != null && d.displayName == matchingNodeDisplayName);
+                harvestableDefinition = allDefs.FirstOrDefault(d => d != null && d.name == matchingNodeDefinitionName);
             }
         }
 
         if (harvestableDefinition == null)
         {
-            Debug.LogError($"[PlantGrowth] Could not find NodeDefinition for harvestable berry! Searched for display name: '{matchingNodeDisplayName}'. " +
-                           "Make sure:\n1. Your berry gene has both GrowBerry and passive Harvestable effects\n" +
-                           "2. The NodeDefinition exists in Resources or the Definition Library", gameObject);
+            Debug.LogError($"[PlantGrowth] Could not find NodeDefinition for harvestable berry! Searched for asset name: '{matchingNodeDefinitionName ?? "NULL"}'. Make sure:\n1. Your plant's genes include one with a 'GrowBerry' effect.\n2. The corresponding NodeDefinition asset exists and the data path is correct.", gameObject);
             return harvestedDefs;
         }
 
@@ -377,9 +368,7 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         foreach (var berryGO in harvestableBerries)
         {
             var cell = berryGO.GetComponent<PlantCell>();
-
             harvestedDefs.Add(harvestableDefinition);
-
             if (cell != null)
             {
                 ReportCellDestroyed(cell.GridCoord);

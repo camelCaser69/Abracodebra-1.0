@@ -4,14 +4,14 @@ using System.Linq;
 using UnityEngine;
 
 [Serializable]
-public class NodeData : ISerializationCallbackReceiver {
-    // Core node properties
+public class NodeData : ISerializationCallbackReceiver
+{
     public string nodeId;
+    public string definitionName; // The asset name of the NodeDefinition
     public string nodeDisplayName;
     public List<NodeEffectData> effects = new List<NodeEffectData>();
     public int orderIndex;
-    
-    [HideInInspector] 
+
     public bool canBeDeleted = true;
     
     // Sequence storage - only seeds can store sequences

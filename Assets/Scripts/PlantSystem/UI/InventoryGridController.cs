@@ -104,12 +104,15 @@ public class InventoryGridController : MonoBehaviour {
         }
     }
 
-    bool AddToolToInventory(ToolDefinition tool) {
+    private bool AddToolToInventory(ToolDefinition tool)
+    {
         NodeCell emptyCell = inventoryCells.FirstOrDefault(cell => !cell.HasItem());
         if (emptyCell == null) return false;
 
-        NodeData toolNodeData = new NodeData {
+        NodeData toolNodeData = new NodeData
+        {
             nodeId = tool.name + "_tool_" + System.Guid.NewGuid().ToString(),
+            definitionName = tool.name,
             nodeDisplayName = tool.displayName,
             effects = new List<NodeEffectData>(),
             orderIndex = -1,
@@ -120,7 +123,8 @@ public class InventoryGridController : MonoBehaviour {
         GameObject itemViewGO = Instantiate(inventoryItemPrefab, emptyCell.transform);
         ItemView itemView = itemViewGO.GetComponent<ItemView>();
 
-        if (itemView != null) {
+        if (itemView != null)
+        {
             itemView.Initialize(toolNodeData, tool);
 
             NodeDraggable draggable = itemViewGO.GetComponent<NodeDraggable>() ?? itemViewGO.AddComponent<NodeDraggable>();
@@ -134,53 +138,55 @@ public class InventoryGridController : MonoBehaviour {
         return false;
     }
 
-    public bool AddGeneToInventoryFromDefinition(NodeDefinition geneDef, NodeCell targetCellHint = null) {
+    public bool AddGeneToInventoryFromDefinition(NodeDefinition geneDef, NodeCell targetCellHint = null)
+    {
         if (geneDef == null) return false;
-        
-        // Find an empty cell (prefer hint if provided)
+
         NodeCell cellToUse = (targetCellHint != null && targetCellHint.IsInventoryCell && !targetCellHint.HasItem())
             ? targetCellHint
             : inventoryCells.FirstOrDefault(cell => !cell.HasItem());
-            
+
         if (cellToUse == null) return false;
-        
-        // Create node data for inventory
-        NodeData inventoryNode = new NodeData {
+
+        NodeData inventoryNode = new NodeData
+        {
             nodeId = geneDef.name + "_inventory_" + Guid.NewGuid().ToString(),
+            definitionName = geneDef.name,
             nodeDisplayName = geneDef.displayName,
             effects = geneDef.CloneEffects(),
             orderIndex = -1,
             canBeDeleted = false
         };
-        
-        // If it's a seed, ensure it has an initialized sequence
-        if (inventoryNode.IsSeed()) {
+
+        if (inventoryNode.IsSeed())
+        {
             inventoryNode.EnsureSeedSequenceInitialized();
         }
-        
-        // Create the visual representation
+
         GameObject itemViewGO = Instantiate(inventoryItemPrefab, cellToUse.transform);
         ItemView view = itemViewGO.GetComponent<ItemView>();
-        if (view == null) {
+        if (view == null)
+        {
             Destroy(itemViewGO);
             return false;
         }
-        
-        // Initialize and assign
+
         view.Initialize(inventoryNode, geneDef, null);
-        
+
         NodeDraggable draggable = view.GetComponent<NodeDraggable>();
-        if (draggable == null) {
+        if (draggable == null)
+        {
             draggable = view.gameObject.AddComponent<NodeDraggable>();
         }
         draggable.Initialize(this, cellToUse);
-        
+
         cellToUse.AssignItemView(view, inventoryNode, null);
-        
-        if (logInventoryChanges) {
+
+        if (logInventoryChanges)
+        {
             Debug.Log($"[Inventory] Added gene '{geneDef.displayName}' (seed: {inventoryNode.IsSeed()}) to cell {cellToUse.CellIndex}");
         }
-        
+
         return true;
     }
 

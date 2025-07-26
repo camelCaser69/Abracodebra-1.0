@@ -58,52 +58,59 @@ public class NodeExecutor : MonoBehaviour
         return clonedList;
     }
 
-    public static NodeData CloneNode(NodeData original) {
+    public static NodeData CloneNode(NodeData original)
+    {
         if (original == null) return null;
-        
-        var clone = new NodeData {
+
+        var clone = new NodeData
+        {
             nodeId = Guid.NewGuid().ToString(),
+            definitionName = original.definitionName,
             nodeDisplayName = original.nodeDisplayName,
             effects = CloneEffectsList(original.effects),
             orderIndex = original.orderIndex,
             canBeDeleted = original.canBeDeleted
         };
-        
-        // If original is a seed with a sequence, clone the sequence too
-        if (original.IsSeed() && original.storedSequence != null) {
+
+        if (original.IsSeed() && original.storedSequence != null)
+        {
             clone.EnsureSeedSequenceInitialized();
-            
-            foreach (var nodeInSequence in original.storedSequence.nodes) {
+
+            foreach (var nodeInSequence in original.storedSequence.nodes)
+            {
                 if (nodeInSequence == null) continue;
-                
-                // Clone nodes in sequence WITHOUT their sequences (no nested sequences)
+
                 var sequenceNodeClone = CloneNodeWithoutSequence(nodeInSequence);
                 sequenceNodeClone.SetPartOfSequence(true);
                 clone.storedSequence.nodes.Add(sequenceNodeClone);
             }
         }
-        
+
         return clone;
     }
     
-    public static NodeData CloneNodeWithoutSequence(NodeData original) {
+    public static NodeData CloneNodeWithoutSequence(NodeData original)
+    {
         if (original == null) return null;
-        
-        var clone = new NodeData {
+
+        var clone = new NodeData
+        {
             nodeId = Guid.NewGuid().ToString(),
+            definitionName = original.definitionName,
             nodeDisplayName = original.nodeDisplayName,
             effects = CloneEffectsList(original.effects),
             orderIndex = original.orderIndex,
             canBeDeleted = original.canBeDeleted
         };
-        
-        // Debug verification
-        if (Debug.isDebugBuild) {
+
+        if (Debug.isDebugBuild)
+        {
             Debug.Log($"[NodeExecutor] CloneNodeWithoutSequence: '{original.nodeDisplayName}' - Original effects: {original.effects?.Count ?? 0}, Clone effects: {clone.effects?.Count ?? 0}");
         }
-        
+
         return clone;
     }
+
 
     public GameObject SpawnPlantFromSeedInSlot(Vector3 plantingPosition, Transform parentTransform) {
         if (NodeEditorGridController.Instance == null) {
