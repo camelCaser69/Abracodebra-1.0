@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 583,867 → 402,017 chars (31.1% reduction)
-Estimated tokens saved: ~45,462
+Compression Stats: 585,170 → 403,108 chars (31.1% reduction)
+Estimated tokens saved: ~45,515
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -72,70 +72,70 @@ using System;
   ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4943
   LeafData (Assets\Scripts\PlantSystem\Data/) L4951
   NodeData (Assets\Scripts\PlantSystem\Data/) L4966
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L5080
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L5367
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L5390
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L5416
-  NodeEffectTypeHelper (Assets\Scripts\PlantSystem\Data/) L5447
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L5479
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L5488
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L5515
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L5756
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L5795
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L5819
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6064
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L6153
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6506
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L6848
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7151
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7289
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7578
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7645
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7714
-  ItemView (Assets\Scripts\PlantSystem\UI/) L8057
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L8194
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8444
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8578
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8933
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L9069
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9378
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9466
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L9567
-  GridSnapStartup (Assets\Scripts\Ticks/) L9805
-  TickDebugMonitor (Assets\Scripts\Ticks/) L9871
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L10043
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L10112
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L10343
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10354
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10383
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10479
-  WaterReflection (Assets\Scripts\Visual\Effects/) L10584
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10979
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L11015
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11179
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11321
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11487
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11657
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11665
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11692
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11739
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11942
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L12003
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L12043
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L12067
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12087
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12392
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12404
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12439
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12614
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L5116
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L5403
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L5426
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L5452
+  NodeEffectTypeHelper (Assets\Scripts\PlantSystem\Data/) L5483
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L5515
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L5524
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L5551
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L5792
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L5831
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L5855
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6100
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L6189
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6542
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L6884
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7187
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7325
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7614
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7681
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7750
+  ItemView (Assets\Scripts\PlantSystem\UI/) L8093
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L8230
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8480
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8614
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8969
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L9105
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9414
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9502
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L9603
+  GridSnapStartup (Assets\Scripts\Ticks/) L9841
+  TickDebugMonitor (Assets\Scripts\Ticks/) L9907
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L10079
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L10148
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L10379
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10390
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10419
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10515
+  WaterReflection (Assets\Scripts\Visual\Effects/) L10620
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L11015
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L11051
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11215
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11357
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11523
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11693
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11701
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11728
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11775
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11978
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L12039
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L12079
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L12103
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12123
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12428
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12440
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12475
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12650
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L12625
-  GridPosition (Assets\Scripts\Ticks/) L12779
-  GridPositionManager (Assets\Scripts\Ticks/) L12880
-  GridRadiusUtility (Assets\Scripts\Ticks/) L13236
-  TickConfiguration (Assets\Scripts\Ticks/) L13380
-  ITickUpdateable (Assets\Scripts\Ticks/) L13463
+  GridEntity (Assets\Scripts\Ticks/) L12661
+  GridPosition (Assets\Scripts\Ticks/) L12815
+  GridPositionManager (Assets\Scripts\Ticks/) L12916
+  GridRadiusUtility (Assets\Scripts\Ticks/) L13272
+  TickConfiguration (Assets\Scripts\Ticks/) L13416
+  ITickUpdateable (Assets\Scripts\Ticks/) L13499
 
 ================================================================================
 SCRIPTS
@@ -5160,7 +5160,7 @@ var copy = new NodeData {
 nodeId = node.nodeId,
 definitionName = node.definitionName,
 nodeDisplayName = node.nodeDisplayName,
-effects = node.effects, // This is safe as effects don't reference NodeData
+effects = CloneEffectsListForSerialization(node.effects), // Deep clone effects
 orderIndex = node.orderIndex,
 canBeDeleted = node.canBeDeleted
 };
@@ -5189,6 +5189,42 @@ _serializedSequenceNodes = null; // Clear after reconstruction
 else {
 _storedSequence = null;
 }
+}
+
+stat List<NodeEffectData> CloneEffectsListForSerialization(List<NodeEffectData> originalEffects) {
+if (originalEffects == null) ret new List<NodeEffectData>();
+
+var clonedList = new List<NodeEffectData>();
+
+foreach (var effect in originalEffects) {
+if (effect == null) continue;
+
+var clonedEffect = new NodeEffectData {
+effectType = effect.effectType,
+primaryValue = effect.primaryValue,
+secondaryValue = effect.secondaryValue,
+consumedOnTrigger = effect.consumedOnTrigger,
+};
+
+if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null) {
+clonedEffect.seedData = new SeedSpawnData {
+growthSpeed = effect.seedData.growthSpeed,
+stemLengthMin = effect.seedData.stemLengthMin,
+stemLengthMax = effect.seedData.stemLengthMax,
+leafGap = effect.seedData.leafGap,
+leafPattern = effect.seedData.leafPattern,
+stemRandomness = effect.seedData.stemRandomness,
+energyStorage = effect.seedData.energyStorage,
+cooldown = effect.seedData.cooldown,
+castDelay = effect.seedData.castDelay,
+maxBerries = effect.seedData.maxBerries
+};
+}
+
+clonedList.Add(clonedEffect);
+}
+
+ret clonedList;
 }
 }
 

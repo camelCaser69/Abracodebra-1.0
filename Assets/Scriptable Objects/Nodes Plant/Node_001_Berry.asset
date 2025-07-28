@@ -51,7 +51,7 @@ MonoBehaviour:
       castDelay: 0
       maxBerries: 3
   - effectType: 17
-    consumedOnTrigger: 0
+    consumedOnTrigger: 1
     primaryValue: 0
     secondaryValue: 0
     seedData:

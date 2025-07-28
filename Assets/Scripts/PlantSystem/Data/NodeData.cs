@@ -4,7 +4,8 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
-[Serializable]
+// Assets/Scripts/PlantSystem/Data/NodeData.cs
+
 public class NodeData : ISerializationCallbackReceiver {
     public string nodeId;
     public string definitionName; // The asset name of the NodeDefinition
@@ -14,12 +15,10 @@ public class NodeData : ISerializationCallbackReceiver {
     
     public bool canBeDeleted = true;
     
-    // IMPORTANT: Do NOT mark these with [SerializeField] to avoid circular references
-    [NonSerialized] private NodeGraph _storedSequence;
-    [NonSerialized] private bool _isPartOfSequence = false;
+    [NonSerialized] NodeGraph _storedSequence;
+    [NonSerialized] bool _isPartOfSequence = false;
     
-    // For serialization, we'll store the sequence data separately
-    [SerializeField] private List<NodeData> _serializedSequenceNodes;
+    [SerializeField] List<NodeData> _serializedSequenceNodes;
     
     public NodeData() {
         nodeId = Guid.NewGuid().ToString();
@@ -29,7 +28,7 @@ public class NodeData : ISerializationCallbackReceiver {
     
     public bool HasSeedEffect() {
         return effects != null && 
-               effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
+            effects.Any(e => e != null && e.effectType == NodeEffectType.SeedSpawn);
     }
     
     public bool IsSeed() {
@@ -75,19 +74,16 @@ public class NodeData : ISerializationCallbackReceiver {
         _storedSequence = null;
     }
     
-    // ISerializationCallbackReceiver implementation to handle serialization properly
     public void OnBeforeSerialize() {
-        // If this is a seed with a sequence, serialize just the node data
         if (IsSeed() && _storedSequence?.nodes != null) {
             _serializedSequenceNodes = new List<NodeData>();
             foreach (var node in _storedSequence.nodes) {
                 if (node != null) {
-                    // Create a shallow copy to avoid circular references
                     var copy = new NodeData {
                         nodeId = node.nodeId,
                         definitionName = node.definitionName,
                         nodeDisplayName = node.nodeDisplayName,
-                        effects = node.effects, // This is safe as effects don't reference NodeData
+                        effects = CloneEffectsListForSerialization(node.effects), // Deep clone effects
                         orderIndex = node.orderIndex,
                         canBeDeleted = node.canBeDeleted
                     };
@@ -103,7 +99,6 @@ public class NodeData : ISerializationCallbackReceiver {
     public void OnAfterDeserialize() {
         _isPartOfSequence = false;
         
-        // Reconstruct the sequence from serialized data
         if (_serializedSequenceNodes != null && _serializedSequenceNodes.Count > 0 && HasSeedEffect()) {
             _storedSequence = new NodeGraph { nodes = new List<NodeData>() };
             foreach (var serializedNode in _serializedSequenceNodes) {
@@ -117,5 +112,43 @@ public class NodeData : ISerializationCallbackReceiver {
         else {
             _storedSequence = null;
         }
+    }
+    
+    // Helper method to deep clone effects list for serialization
+    private static List<NodeEffectData> CloneEffectsListForSerialization(List<NodeEffectData> originalEffects) {
+        if (originalEffects == null) return new List<NodeEffectData>();
+        
+        var clonedList = new List<NodeEffectData>();
+        
+        foreach (var effect in originalEffects) {
+            if (effect == null) continue;
+            
+            var clonedEffect = new NodeEffectData {
+                effectType = effect.effectType,
+                primaryValue = effect.primaryValue,
+                secondaryValue = effect.secondaryValue,
+                consumedOnTrigger = effect.consumedOnTrigger,
+            };
+            
+            // Deep clone seedData if present, but EXCLUDE any nested NodeData references
+            if (effect.effectType == NodeEffectType.SeedSpawn && effect.seedData != null) {
+                clonedEffect.seedData = new SeedSpawnData {
+                    growthSpeed = effect.seedData.growthSpeed,
+                    stemLengthMin = effect.seedData.stemLengthMin,
+                    stemLengthMax = effect.seedData.stemLengthMax,
+                    leafGap = effect.seedData.leafGap,
+                    leafPattern = effect.seedData.leafPattern,
+                    stemRandomness = effect.seedData.stemRandomness,
+                    energyStorage = effect.seedData.energyStorage,
+                    cooldown = effect.seedData.cooldown,
+                    castDelay = effect.seedData.castDelay,
+                    maxBerries = effect.seedData.maxBerries
+                };
+            }
+            
+            clonedList.Add(clonedEffect);
+        }
+        
+        return clonedList;
     }
 }
