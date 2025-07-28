@@ -25,8 +25,7 @@ public class PlantNodeExecutor
         if (library == null) return;
 
         var nodes = plant.NodeGraph.nodes;
-
-        // --- FIX: This loop now correctly finds and executes ALL active genes, not just TimerCasts ---
+        
         for (int i = 0; i < nodes.Count; i++)
         {
             var nodeData = nodes[i];
@@ -35,8 +34,8 @@ public class PlantNodeExecutor
             var nodeDef = library.definitions.FirstOrDefault(d => d.name == nodeData.definitionName);
             if (nodeDef == null || nodeDef.ActivationType != GeneActivationType.Active) continue;
 
-            // This is an Active gene, so execute it. The target is null because it's a time-based cycle.
-            ExecuteActiveGene(i, nodeData, nodeDef, null);
+            // An Active gene in the mature cycle is always executed. The target is null.
+            ExecuteActiveGene(i, nodeData, nodeDef, null, null);
         }
     }
 
@@ -59,11 +58,11 @@ public class PlantNodeExecutor
 
             var nodeDef = library.definitions.FirstOrDefault(d => d.name == nodeData.definitionName);
             if (nodeDef == null || nodeDef.ActivationType != GeneActivationType.Active) continue;
-
-            // If this Active gene has the specified trigger effect, execute it with the provided target.
+            
             if (nodeData.effects.Any(e => e.effectType == triggerType))
             {
-                ExecuteActiveGene(i, nodeData, nodeDef, target);
+                // This gene has the specific trigger we're looking for. Execute it.
+                ExecuteActiveGene(i, nodeData, nodeDef, target, triggerType);
             }
         }
     }
@@ -72,32 +71,43 @@ public class PlantNodeExecutor
     /// Central logic for executing any Active gene. Handles energy cost and determines if it's
     /// a simple action, a trigger for a payload, or both.
     /// </summary>
-    private void ExecuteActiveGene(int index, NodeData nodeData, NodeDefinition nodeDef, ITriggerTarget target)
+    /// <param name="triggerContext">The specific trigger that invoked this execution, if any.</param>
+    private void ExecuteActiveGene(int index, NodeData nodeData, NodeDefinition nodeDef, ITriggerTarget target, NodeEffectType? triggerContext)
     {
         float cost = CalculateGeneEnergyCost(nodeData);
-        if (plant.EnergySystem.HasEnergy(cost))
+        if (!plant.EnergySystem.HasEnergy(cost))
         {
-            plant.EnergySystem.SpendEnergy(cost);
-
-            // An Active gene can be a simple action, a trigger, or both.
-            bool isSimpleAction = nodeData.effects.Any(e => e != null && !NodeEffectTypeHelper.IsTriggerEffect(e.effectType));
-            bool isTrigger = nodeData.effects.Any(e => e != null && NodeEffectTypeHelper.IsTriggerEffect(e.effectType));
-
-            if (isSimpleAction)
-            {
-                ExecuteAllEffectsOfGene(nodeData, target);
-            }
-            if (isTrigger)
-            {
-                ExecuteTrigger(index, target);
-            }
+            if (Debug.isDebugBuild) Debug.Log($"[{plant.gameObject.name}] Not enough energy for gene '{nodeDef.displayName}'. Have {plant.EnergySystem.CurrentEnergy:F1}, need {cost:F1}.");
+            return;
         }
-        else if (Debug.isDebugBuild)
+        
+        // --- REVISED LOGIC ---
+        // An Active gene can have both action effects (like GrowBerry) and trigger effects (like EatCast).
+        // We must handle them based on the context of the call.
+
+        bool hasActionEffects = nodeData.effects.Any(e => e != null && !NodeEffectTypeHelper.IsTriggerEffect(e.effectType));
+        bool hasTriggerEffects = nodeData.effects.Any(e => e != null && NodeEffectTypeHelper.IsTriggerEffect(e.effectType));
+
+        // 1. If this execution was NOT caused by an event trigger (i.e., it's the mature tick), run its simple actions.
+        if (triggerContext == null && hasActionEffects)
         {
-            Debug.Log($"[{plant.gameObject.name}] Not enough energy for gene '{nodeDef.displayName}'. Have {plant.EnergySystem.CurrentEnergy:F1}, need {cost:F1}.");
+            plant.EnergySystem.SpendEnergy(cost); // Spend energy only once if it's going to do anything
+            ExecuteAllEffectsOfGene(nodeData, target);
+        }
+
+        // 2. If the gene has triggers, and either it's an event trigger OR it's a timer trigger, execute the payload search.
+        bool isTimerTrigger = triggerContext == null && nodeData.effects.Any(e => e.effectType == NodeEffectType.TimerCast);
+        if (hasTriggerEffects && (triggerContext != null || isTimerTrigger))
+        {
+            // If we haven't spent energy yet (e.g., an event-only trigger with no actions), spend it now.
+            if (triggerContext != null && !hasActionEffects)
+            {
+                 plant.EnergySystem.SpendEnergy(cost);
+            }
+            ExecuteTrigger(index, target);
         }
     }
-
+    
     private void ExecuteTrigger(int triggerGeneIndex, ITriggerTarget target)
     {
         var nodes = plant.NodeGraph.nodes;
@@ -143,7 +153,6 @@ public class PlantNodeExecutor
         switch (effect.effectType)
         {
             case NodeEffectType.Damage:
-                // --- PROACTIVE FIX & IMPLEMENTATION ---
                 if (target is IStatusEffectable damageableTarget)
                 {
                     damageableTarget.TakeDamage(effect.primaryValue);
@@ -156,7 +165,12 @@ public class PlantNodeExecutor
                 break;
 
             case NodeEffectType.GrowBerry:
-                SpawnBerry(effect);
+                // FIX: Only grow a berry if there is no target. This means it was triggered by the
+                // time-based mature cycle, NOT by an event like an animal eating a berry.
+                if (target == null)
+                {
+                    SpawnBerry(effect);
+                }
                 break;
 
             case NodeEffectType.ScentModifier:
