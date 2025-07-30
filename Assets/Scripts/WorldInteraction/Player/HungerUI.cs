@@ -12,7 +12,7 @@ public class HungerUI : MonoBehaviour
     {
         if (playerHungerSystem == null)
         {
-            GardenerController player = FindObjectOfType<GardenerController>();
+            GardenerController player = FindAnyObjectByType<GardenerController>();
             if (player != null)
             {
                 playerHungerSystem = player.GetComponent<PlayerHungerSystem>();

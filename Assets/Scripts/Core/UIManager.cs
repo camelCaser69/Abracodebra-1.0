@@ -64,15 +64,17 @@ public class UIManager : MonoBehaviour {
         UpdateTickDisplay();
     }
     
-    void OnDestroy() {
-        // Unsubscribe from events
-        if (runManager != null) {
+    void OnDestroy()
+    {
+        if (runManager != null)
+        {
             runManager.OnRunStateChanged -= HandleRunStateChanged;
             runManager.OnPhaseChanged -= HandlePhaseChanged;
             runManager.OnRoundChanged -= HandleRoundChanged;
         }
-        
-        if (tickManager != null) {
+
+        if (tickManager != null)
+        {
             tickManager.OnTickAdvanced -= HandleTickAdvanced;
         }
     }
