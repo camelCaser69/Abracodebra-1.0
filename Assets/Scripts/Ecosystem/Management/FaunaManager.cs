@@ -1,29 +1,23 @@
-﻿using UnityEngine;
+﻿// Assets/Scripts/Ecosystem/Management/FaunaManager.cs
+
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using WegoSystem; // Correctly referencing the namespace for RunManager
 
 public class FaunaManager : MonoBehaviour
 {
-    [Header("Spawning Area (Global)")]
     [SerializeField] private Vector2 spawnCenter = Vector2.zero;
     [SerializeField] private Vector2 spawnAreaSize = new Vector2(20f, 10f);
 
-    [Header("General Settings")]
     [SerializeField] private Transform ecosystemParent;
-    [Tooltip("How far INSIDE the screen edge the effective animal movement bounds are.")]
-    [SerializeField][Min(0f)] private float screenBoundsPadding = 0.5f;
-    [Tooltip("How far OUTSIDE the screen edge the 'Offscreen' spawn area starts.")]
-    [SerializeField][Min(0f)] private float offscreenSpawnMargin = 2.0f;
+    [SerializeField] [Min(0f)] private float screenBoundsPadding = 0.5f;
+    [SerializeField] [Min(0f)] private float offscreenSpawnMargin = 2.0f;
 
-    [Header("Debugging")]
-    [Tooltip("Show gizmos visualizing the Margin (Red) and Padding (Green) bounds.")]
     [SerializeField] private bool showBoundsGizmos = false;
 
-    [Header("Functional Bounds Offset")]
-    [Tooltip("Functional horizontal shift for gameplay bounds and spawning relative to camera view.")]
-    [SerializeField][Range(-10f, 10f)] private float boundsOffsetX = 0f;
-    [Tooltip("Functional vertical shift for gameplay bounds and spawning relative to camera view.")]
-    [SerializeField][Range(-10f, 10f)] private float boundsOffsetY = 0f;
+    [SerializeField] [Range(-10f, 10f)] private float boundsOffsetX = 0f;
+    [SerializeField] [Range(-10f, 10f)] private float boundsOffsetY = 0f;
 
     private List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
     private Camera mainCamera; // Ensure this is assigned or found
@@ -33,10 +27,9 @@ public class FaunaManager : MonoBehaviour
         InitializeManager();
     }
 
-    void InitializeManager()
+    private void InitializeManager()
     {
         activeSpawnCoroutines.Clear();
-        // Attempt to get camera from WaveManager first, then fallback
         if (WaveManager.Instance != null) mainCamera = WaveManager.Instance.GetMainCamera();
         if (mainCamera == null) mainCamera = Camera.main;
         if (mainCamera == null) Debug.LogError("[FaunaManager] Cannot find Main Camera!", this);
@@ -62,7 +55,6 @@ public class FaunaManager : MonoBehaviour
         if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; }
 
         Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'");
-        // Stop any previously running spawn coroutines for this FaunaManager instance
         StopAllSpawnCoroutines(); // Ensures only one waveDef's entries are spawning at a time from this manager
 
         foreach (WaveSpawnEntry entry in waveDef.spawnEntries)
@@ -70,7 +62,6 @@ public class FaunaManager : MonoBehaviour
             if (entry.animalDefinition == null) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', null AnimalDefinition for wave '{waveDef.waveName}'."); continue; }
             if (entry.spawnCount <= 0) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', Spawn Count <= 0 for wave '{waveDef.waveName}'."); continue; }
 
-            // Check RunManager state before starting new coroutines
             if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
             {
                 Debug.Log($"[FaunaManager] Halting further spawn entry processing for wave '{waveDef.waveName}', RunManager not in GrowthAndThreat state.");
@@ -106,19 +97,11 @@ public class FaunaManager : MonoBehaviour
 
         for (int i = 0; i < entry.spawnCount; i++)
         {
-            // Check RunManager state before each spawn
             if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
             {
                 Debug.Log($"[FaunaManager] Halting spawn for entry '{entry.description}' in wave '{waveNameForDebug}', RunManager no longer in GrowthAndThreat state.");
                 break; // Exit loop if game state changed
             }
-
-            // WaveManager.IsRunActive is now less reliable here, use RunManager state.
-            // if (WaveManager.Instance != null && !WaveManager.Instance.IsRunActive)
-            // {
-            //     Debug.Log($"[FaunaManager] Halting spawn '{entry.description}', run no longer active.");
-            //     break;
-            // }
 
             Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius);
             bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen;
@@ -129,15 +112,7 @@ public class FaunaManager : MonoBehaviour
                 yield return new WaitForSeconds(entry.spawnInterval);
             }
         }
-        // Coroutine completes, remove itself from the list if it was added
-        // This removal is a bit tricky if coroutines are stopped externally.
-        // A more robust way is to check `activeSpawnCoroutines.Remove(thisCoroutineInstance)`
-        // but `thisCoroutineInstance` is not directly available here.
-        // For simplicity, we'll rely on StopAllSpawnCoroutines to clear the list.
-        // Or, pass the coroutine itself into this method and remove it.
-        // For now, let's clear it more carefully in StopAll and on completion.
     }
-
 
     private Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius)
     {
@@ -166,14 +141,17 @@ public class FaunaManager : MonoBehaviour
                 break;
 
             case WaveSpawnLocationType.RandomNearPlayer:
-                 Transform playerT = FindPlayerTransform();
-                 if (playerT != null) {
+                Transform playerT = FindPlayerTransform();
+                if (playerT != null)
+                {
                     spawnPos = (Vector2)playerT.position + Random.insideUnitCircle * radius;
-                 } else {
-                     Debug.LogWarning("[FaunaManager] Player not found for RandomNearPlayer. Falling back to Global.");
-                     goto case WaveSpawnLocationType.GlobalSpawnArea;
-                 }
-                 break;
+                }
+                else
+                {
+                    Debug.LogWarning("[FaunaManager] Player not found for RandomNearPlayer. Falling back to Global.");
+                    goto case WaveSpawnLocationType.GlobalSpawnArea;
+                }
+                break;
 
             case WaveSpawnLocationType.GlobalSpawnArea:
             default:
@@ -186,11 +164,9 @@ public class FaunaManager : MonoBehaviour
 
     private Transform FindPlayerTransform()
     {
-        // This can be simplified if player is consistently tagged or has a singleton reference
         GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
         if (playerGO != null) return playerGO.transform;
 
-        // Fallback or more specific searches
         PlayerTileInteractor pti = FindAnyObjectByType<PlayerTileInteractor>();
         if (pti != null) return pti.transform;
 
@@ -200,69 +176,66 @@ public class FaunaManager : MonoBehaviour
         return null;
     }
 
-    // Add this method to FaunaManager.cs to replace the existing SpawnAnimal method
-
-GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn)
-{
-    if (definition == null || definition.prefab == null)
+    private GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn)
     {
-        Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab.");
-        return null;
-    }
-    
-    if (mainCamera == null)
-    {
-        Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!");
-        return null;
-    }
-    
-    Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-    Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-    
-    Vector2 minPaddedBounds, maxPaddedBounds;
-    float camHeight = mainCamera.orthographicSize * 2f;
-    float camWidth = camHeight * mainCamera.aspect;
-    
-    minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
-    maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
-    minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
-    maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
-    
-    GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
-    
-    if (ecosystemParent != null)
-    {
-        Transform speciesParent = ecosystemParent;
-        if (EcosystemManager.Instance != null && EcosystemManager.Instance.sortAnimalsBySpecies && !string.IsNullOrEmpty(definition.animalName))
+        if (definition == null || definition.prefab == null)
         {
-            speciesParent = ecosystemParent.Find(definition.animalName);
-            if (speciesParent == null)
+            Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab.");
+            return null;
+        }
+
+        if (mainCamera == null)
+        {
+            Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!");
+            return null;
+        }
+
+        Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+        Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+
+        Vector2 minPaddedBounds, maxPaddedBounds;
+        float camHeight = mainCamera.orthographicSize * 2f;
+        float camWidth = camHeight * mainCamera.aspect;
+
+        minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
+        maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
+        minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
+        maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
+
+        GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
+
+        if (ecosystemParent != null)
+        {
+            Transform speciesParent = ecosystemParent;
+            if (EcosystemManager.Instance != null && EcosystemManager.Instance.sortAnimalsBySpecies && !string.IsNullOrEmpty(definition.animalName))
             {
-                GameObject subParentGO = new GameObject(definition.animalName);
-                subParentGO.transform.SetParent(ecosystemParent);
-                speciesParent = subParentGO.transform;
+                speciesParent = ecosystemParent.Find(definition.animalName);
+                if (speciesParent == null)
+                {
+                    GameObject subParentGO = new GameObject(definition.animalName);
+                    subParentGO.transform.SetParent(ecosystemParent);
+                    speciesParent = subParentGO.transform;
+                }
+            }
+            animalObj.transform.SetParent(speciesParent);
+        }
+
+        AnimalController controller = animalObj.GetComponent<AnimalController>();
+        if (controller != null)
+        {
+            if (isOffscreenSpawn)
+            {
+                Vector2 screenCenter = (minPaddedBounds + maxPaddedBounds) / 2f;
+                controller.SetSeekingScreenCenter(screenCenter, minPaddedBounds, maxPaddedBounds);
             }
         }
-        animalObj.transform.SetParent(speciesParent);
-    }
-    
-    AnimalController controller = animalObj.GetComponent<AnimalController>();
-    if (controller != null)
-    {
-        // The new AnimalController doesn't need Initialize, but we can set up screen seeking if needed
-        if (isOffscreenSpawn)
+        else
         {
-            Vector2 screenCenter = (minPaddedBounds + maxPaddedBounds) / 2f;
-            controller.SetSeekingScreenCenter(screenCenter, minPaddedBounds, maxPaddedBounds);
+            Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj);
         }
+
+        return animalObj;
     }
-    else
-    {
-        Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj);
-    }
-    
-    return animalObj;
-}
 
     void OnDrawGizmos()
     {

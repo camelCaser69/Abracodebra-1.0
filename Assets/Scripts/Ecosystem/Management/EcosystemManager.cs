@@ -1,31 +1,19 @@
-﻿using UnityEngine;
+﻿// Assets/Scripts/Ecosystem/Management/EcosystemManager.cs
+using UnityEngine;
+using WegoSystem;
 
-public class EcosystemManager : MonoBehaviour
+public class EcosystemManager : SingletonMonoBehaviour<EcosystemManager>
 {
-    public static EcosystemManager Instance { get; private set; }
-
-    [Header("Parent Transforms")]
     public Transform animalParent;
     public Transform plantParent;
 
-    [Header("Libraries")]
-    [Tooltip("Reference to the Scent Library asset.")]
-    public ScentLibrary scentLibrary; // <<< ADDED
+    public ScentLibrary scentLibrary;
 
-    [Header("Sorting Options")]
     public bool sortAnimalsBySpecies = true;
     public bool sortPlantsBySpecies = true;
-
-    private void Awake()
+    
+    protected override void OnAwake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-
-        // Validate Library Reference
         if (scentLibrary == null)
         {
             Debug.LogWarning($"[{nameof(EcosystemManager)}] Scent Library not assigned! Scent effects will not work.", this);

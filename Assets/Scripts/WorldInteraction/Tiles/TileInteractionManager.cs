@@ -1,9 +1,8 @@
 ﻿// Assets/Scripts/WorldInteraction/Tiles/TileInteractionManager.cs
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System.Collections.Generic;
+using System.Linq;
 using skner.DualGrid;
 using TMPro;
 using WegoSystem;
@@ -11,10 +10,8 @@ using WegoSystem;
 using UnityEditor;
 #endif
 
-public class TileInteractionManager : MonoBehaviour, ITickUpdateable
+public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionManager>, ITickUpdateable
 {
-    public static TileInteractionManager Instance { get; set; }
-
     [System.Serializable]
     public class TileDefinitionMapping
     {
@@ -22,31 +19,24 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
         public DualGridTilemapModule tilemapModule;
     }
 
-    [System.Serializable]
     public struct TimedTileState
     {
         public TileDefinition tileDef;
         public int ticksRemaining;
     }
 
-    [Header("Core References")]
     public List<TileDefinitionMapping> tileDefinitionMappings;
     public TileInteractionLibrary interactionLibrary;
     public Grid interactionGrid;
     public Camera mainCamera;
     public Transform player;
-
-    [Header("Interaction Settings")]
+    
     public float hoverRadius = 3f;
 
-    // Tool-specific effect logic has been correctly moved to EnvironmentalStatusEffectSystem
-    
-    [Header("UI & Visuals")]
     public GameObject hoverHighlightObject;
     public TileHoverColorManager hoverColorManager;
     public int baseSortingOrder = 0;
 
-    [Header("Debugging")]
     public bool debugLogs = false;
     public TextMeshProUGUI hoveredTileText;
     public TextMeshProUGUI currentToolText;
@@ -58,11 +48,9 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
     private Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
     private SpriteRenderer hoverSpriteRenderer;
     private bool isWithinInteractionRange = false;
-
-    void Awake()
+    
+    protected override void OnAwake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-        Instance = this;
         SetupTilemaps();
         CacheHoverSpriteRenderer();
     }
@@ -71,11 +59,14 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
     {
         if (TickManager.Instance != null) TickManager.Instance.RegisterTickUpdateable(this);
     }
-
+    
     void OnDestroy()
     {
         if (TickManager.Instance != null) TickManager.Instance.UnregisterTickUpdateable(this);
-        if (Instance == this) Instance = null;
+        if (Instance == this)
+        {
+            // Clear static instance on destruction if this is the singleton
+        }
     }
 
     void OnDisable()
@@ -96,15 +87,12 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
         if (toolDef == null || !currentlyHoveredCell.HasValue) return;
 
         Vector3Int targetCell = currentlyHoveredCell.Value;
-        
-        // This method is now only responsible for tile-based interactions.
-        // Entity-based effects are handled by the EnvironmentalStatusEffectSystem.
+
         TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
         if (currentTileDef == null) return;
-
+        
         if (debugLogs) Debug.Log($"[TileInteractionManager] Checking tile interactions for Tool='{toolDef.toolType}' on Tile='{currentTileDef.displayName}'");
 
-        // Check for tool refill rules
         if (interactionLibrary?.refillRules != null && ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool == toolDef)
         {
             foreach (var refillRule in interactionLibrary.refillRules)
@@ -117,7 +105,6 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
             }
         }
         
-        // Check for tile transformation rules
         if (interactionLibrary?.rules != null)
         {
             TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == currentTileDef);
@@ -136,7 +123,7 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
         }
     }
     
-    void CacheHoverSpriteRenderer()
+    private void CacheHoverSpriteRenderer()
     {
         if (hoverHighlightObject != null)
         {
@@ -147,8 +134,8 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
             }
         }
     }
-
-    void SetupTilemaps()
+    
+    private void SetupTilemaps()
     {
         moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
         definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
@@ -175,7 +162,7 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
             }
         }
     }
-
+    
     public void UpdateSortingOrder()
     {
         if (tileDefinitionMappings == null) return;
@@ -197,7 +184,7 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
             }
         }
     }
-
+    
     public void UpdateAllColors()
     {
         if (tileDefinitionMappings == null) return;
@@ -224,8 +211,8 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
         HandleTileHover();
         UpdateDebugUI();
     }
-
-    void UpdateReversionTicks()
+    
+    private void UpdateReversionTicks()
     {
         if (timedCells.Count == 0) return;
         List<Vector3Int> cellsToRevert = null;
@@ -240,7 +227,10 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
                 if (cellsToRevert == null) cellsToRevert = new List<Vector3Int>();
                 cellsToRevert.Add(cellPos);
             }
-            else { timedCells[cellPos] = state; }
+            else
+            {
+                timedCells[cellPos] = state;
+            }
         }
         if (cellsToRevert != null)
         {
@@ -309,21 +299,26 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
         }
         return foundDef;
     }
-
-    void HandleTileHover()
+    
+    private void HandleTileHover()
     {
         if (mainCamera == null || player == null) return;
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = 0f;
         Vector3Int cellPos = WorldToCell(mouseWorldPos);
+
         GridEntity playerGrid = player.GetComponent<GridEntity>();
         if (playerGrid == null) return;
+
         int gridRadius = Mathf.CeilToInt(hoverRadius);
         GridPosition playerGridPos = playerGrid.Position;
         GridPosition hoveredGridPos = new GridPosition(cellPos.x, cellPos.y);
+
         isWithinInteractionRange = GridRadiusUtility.IsWithinCircleRadius(hoveredGridPos, playerGridPos, gridRadius);
+        
         hoveredTileDef = FindWhichTileDefinitionAt(cellPos);
         currentlyHoveredCell = cellPos;
+
         if (hoverHighlightObject != null)
         {
             hoverHighlightObject.SetActive(true);
@@ -332,15 +327,15 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void UpdateHoverHighlightColor(bool withinRange)
+    private void UpdateHoverHighlightColor(bool withinRange)
     {
         if (hoverSpriteRenderer != null && hoverColorManager != null)
         {
             hoverSpriteRenderer.color = hoverColorManager.GetColorForRange(withinRange);
         }
     }
-
-    void UpdateDebugUI()
+    
+    private void UpdateDebugUI()
     {
         if (hoveredTileText != null)
         {
@@ -358,18 +353,21 @@ public class TileInteractionManager : MonoBehaviour, ITickUpdateable
             {
                 currentToolText.text = $"Selected: {InventoryBarController.Instance.SelectedItem.GetDisplayName()}";
             }
-            else { currentToolText.text = "Nothing Selected"; }
+            else
+            {
+                currentToolText.text = "Nothing Selected";
+            }
         }
     }
-
+    
     public Vector3Int WorldToCell(Vector3 worldPos)
     {
         if (interactionGrid != null) return interactionGrid.WorldToCell(worldPos);
         Debug.LogWarning("[WorldToCell] No valid interactionGrid found.");
         return Vector3Int.zero;
     }
-
-    Vector3 CellCenterWorld(Vector3Int cellPos)
+    
+    private Vector3 CellCenterWorld(Vector3Int cellPos)
     {
         if (interactionGrid != null) return interactionGrid.GetCellCenterWorld(cellPos);
         Debug.LogWarning("[CellCenterWorld] No valid interactionGrid found.");

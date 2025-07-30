@@ -1,7 +1,9 @@
-﻿using System;
+﻿// Assets/Scripts/Ticks/GridPositionManager.cs
+using UnityEngine;
+using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using System;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -9,12 +11,8 @@ using UnityEditor;
 
 namespace WegoSystem
 {
-    public class GridPositionManager : MonoBehaviour
+    public class GridPositionManager : SingletonMonoBehaviour<GridPositionManager>
     {
-        public static GridPositionManager Instance { get; set; }
-
-        [Header("Dependencies")]
-        [Tooltip("Optional: Manually assign the TileInteractionManager to avoid script execution order issues.")]
         [SerializeField] private TileInteractionManager tileInteractionManager;
 
         private Grid _tilemapGrid;
@@ -31,10 +29,8 @@ namespace WegoSystem
             }
         }
 
-        [Header("Grid Settings")]
         [SerializeField] private Vector2Int gridBounds = new Vector2Int(100, 100);
 
-        [Header("Gizmos & Debug")]
         [SerializeField] private bool showGridGizmos = true;
         [SerializeField] private Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
         [SerializeField] private int gizmoGridSize = 20;
@@ -42,30 +38,22 @@ namespace WegoSystem
 
         private readonly Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
         private readonly HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
-
-        private void Awake()
+        
+        protected override void OnAwake()
         {
-            if (Instance != null && Instance != this)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            Instance = this;
-
             SyncWithTileGrid();
         }
 
-        private void OnDestroy()
+        void OnDestroy()
         {
             if (Instance == this)
             {
-                Instance = null;
+                // Clear static instance on destruction if this is the singleton
             }
         }
 
         public void SyncWithTileGrid()
         {
-            // Prioritize the explicitly assigned manager
             if (tileInteractionManager != null && tileInteractionManager.interactionGrid != null)
             {
                 this._tilemapGrid = tileInteractionManager.interactionGrid;
@@ -76,11 +64,9 @@ namespace WegoSystem
                 return; // Success
             }
 
-            // Fallback to singleton instance if manual assignment is missing
             if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null)
             {
                 this._tilemapGrid = TileInteractionManager.Instance.interactionGrid;
-                // Assign the found instance to our field for future reference and inspector visibility
                 tileInteractionManager = TileInteractionManager.Instance;
                 if (debugMode)
                 {
@@ -89,7 +75,6 @@ namespace WegoSystem
                 return; // Success
             }
 
-            // If we reach here, both methods failed.
             if (_tilemapGrid == null)
             {
                 Debug.LogError("[GridPositionManager] Could not find TileInteractionManager or its grid to sync with! Grid system may be misaligned. Please assign the TileInteractionManager in the Inspector.");
@@ -122,8 +107,6 @@ namespace WegoSystem
 
         public bool IsPositionOccupied(GridPosition position)
         {
-            // A position is occupied only if it contains at least one entity
-            // that is flagged as a tile occupant.
             if (entitiesByPosition.TryGetValue(position, out var entities))
             {
                 return entities.Any(entity => entity.isTileOccupant);
@@ -150,7 +133,7 @@ namespace WegoSystem
 
             entity.OnPositionChanged -= OnEntityPositionChanged;
         }
-
+        
         private void OnEntityPositionChanged(GridPosition oldPosition, GridPosition newPosition)
         {
             var entity = allEntities.FirstOrDefault(e => e.Position == newPosition && e.PreviousPosition == oldPosition);
@@ -188,38 +171,46 @@ namespace WegoSystem
                 ? new HashSet<GridEntity>(entitiesByPosition[position])
                 : new HashSet<GridEntity>();
         }
-
-        // Add these methods to GridPositionManager class:
-
-        public List<GridEntity> GetEntitiesInRadius(GridPosition center, int radius, bool useCircle = true) {
+        
+        public List<GridEntity> GetEntitiesInRadius(GridPosition center, int radius, bool useCircle = true)
+        {
             var result = new List<GridEntity>();
-    
-            if (useCircle) {
+
+            if (useCircle)
+            {
                 var tilesInRadius = GridRadiusUtility.GetTilesInCircle(center, radius);
-                foreach (var pos in tilesInRadius) {
-                    if (entitiesByPosition.ContainsKey(pos)) {
+                foreach (var pos in tilesInRadius)
+                {
+                    if (entitiesByPosition.ContainsKey(pos))
+                    {
                         result.AddRange(entitiesByPosition[pos]);
                     }
                 }
-            } else {
-                // Fallback to Manhattan distance if needed
-                for (int x = -radius; x <= radius; x++) {
-                    for (int y = -radius; y <= radius; y++) {
+            } else
+            {
+                for (int x = -radius; x <= radius; x++)
+                {
+                    for (int y = -radius; y <= radius; y++)
+                    {
                         var checkPos = new GridPosition(center.x + x, center.y + y);
-                        if (checkPos.ManhattanDistance(center) <= radius && entitiesByPosition.ContainsKey(checkPos)) {
+                        if (checkPos.ManhattanDistance(center) <= radius && entitiesByPosition.ContainsKey(checkPos))
+                        {
                             result.AddRange(entitiesByPosition[checkPos]);
                         }
                     }
                 }
             }
-    
+            
             return result;
         }
 
-        public bool IsPositionWithinRadius(GridPosition position, GridPosition center, int radius, bool useCircle = true) {
-            if (useCircle) {
+        public bool IsPositionWithinRadius(GridPosition position, GridPosition center, int radius, bool useCircle = true)
+        {
+            if (useCircle)
+            {
                 return GridRadiusUtility.IsWithinCircleRadius(position, center, radius);
-            } else {
+            } else
+            {
                 return position.ManhattanDistance(center) <= radius;
             }
         }
@@ -243,10 +234,11 @@ namespace WegoSystem
             return nearest;
         }
         
-        public Grid GetTilemapGrid() {
+        public Grid GetTilemapGrid()
+        {
             return TilemapGrid;
         }
-
+        
         public List<GridPosition> GetPath(GridPosition start, GridPosition end, bool allowDiagonal = false)
         {
             var path = new List<GridPosition>();
@@ -272,7 +264,6 @@ namespace WegoSystem
 
                 if (current == end)
                 {
-                    // Reconstruct path
                     while (cameFrom.ContainsKey(current))
                     {
                         path.Add(current);
@@ -287,8 +278,6 @@ namespace WegoSystem
 
                 foreach (var neighbor in current.GetNeighbors(allowDiagonal))
                 {
-                    // Pathfinding now correctly checks IsPositionOccupied, which respects the new flag.
-                    // It also ignores the end tile for occupancy checks, allowing movement *to* an occupied tile.
                     if (!IsPositionValid(neighbor) || closedSet.Contains(neighbor) || (neighbor != end && IsPositionOccupied(neighbor)))
                     {
                         continue;
@@ -304,8 +293,7 @@ namespace WegoSystem
                     {
                         continue; // This path is not better
                     }
-
-                    // This path is the best until now. Record it.
+                    
                     cameFrom[neighbor] = current;
                     gScore[neighbor] = tentativeGScore;
                     fScore[neighbor] = gScore[neighbor] + HeuristicCost(neighbor, end);
@@ -352,13 +340,10 @@ namespace WegoSystem
                 gridEntity = entity.AddComponent<GridEntity>();
             }
 
-            // This snaps the entity's internal position and visual transform
             gridEntity.SnapToGrid();
-
-            // NEW: Immediately register the entity with the manager.
-            // This ensures it is discoverable in the same tick/frame it is spawned.
+            
             RegisterEntity(gridEntity);
-
+            
             if (debugMode)
             {
                 Debug.Log($"[GridPositionManager] Snapped and Registered {entity.name} to grid {gridEntity.Position}");
@@ -367,7 +352,6 @@ namespace WegoSystem
 
         public void SnapAllEntitiesToGrid<T>() where T : Component
         {
-            // Use modern, faster FindObjectsByType
             T[] entities = FindObjectsByType<T>(FindObjectsSortMode.None);
             foreach (var entity in entities)
             {
@@ -376,31 +360,35 @@ namespace WegoSystem
             Debug.Log($"[GridPositionManager] Snapped {entities.Length} entities of type {typeof(T).Name} to grid");
         }
         
-        public static List<GridPosition> GetTilesInRadius(GridPosition center, int radius, bool useManhattan = true) {
+        public static List<GridPosition> GetTilesInRadius(GridPosition center, int radius, bool useManhattan = true)
+        {
             var result = new List<GridPosition>();
-    
-            for (int x = -radius; x <= radius; x++) {
-                for (int y = -radius; y <= radius; y++) {
+            
+            for (int x = -radius; x <= radius; x++)
+            {
+                for (int y = -radius; y <= radius; y++)
+                {
                     var offset = new GridPosition(x, y);
                     var checkPos = center + offset;
-            
-                    int distance = useManhattan 
-                        ? Mathf.Abs(x) + Mathf.Abs(y) 
+
+                    int distance = useManhattan
+                        ? Mathf.Abs(x) + Mathf.Abs(y)
                         : Mathf.Max(Mathf.Abs(x), Mathf.Abs(y));
-            
-                    if (distance <= radius) {
+
+                    if (distance <= radius)
+                    {
                         result.Add(checkPos);
                     }
                 }
             }
-    
+
             return result;
         }
-
-        private void OnDrawGizmos()
+        
+        void OnDrawGizmos()
         {
             if (!showGridGizmos || TilemapGrid == null) return;
-
+            
             Gizmos.color = gridColor;
 
             int halfWidth = gizmoGridSize / 2;
