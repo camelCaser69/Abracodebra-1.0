@@ -9583,6 +9583,8 @@ Transform:
   - {fileID: 1351473040}
   - {fileID: 477121556}
   - {fileID: 769811490}
+  - {fileID: 1758318370}
+  - {fileID: 1486390868}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &706932636
@@ -11024,9 +11026,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1758318370}
-  - {fileID: 1486390868}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &885505429
@@ -16777,7 +16777,7 @@ GameObject:
   - component: {fileID: 1486390869}
   - component: {fileID: 1486390871}
   m_Layer: 0
-  m_Name: Grid Position Manager
+  m_Name: Manager_GridPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16796,7 +16796,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 879874785}
+  m_Father: {fileID: 697039534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1486390869
 MonoBehaviour:
@@ -16853,9 +16853,9 @@ MonoBehaviour:
   fireflyPhotosynthesisColor: {r: 0, g: 1, b: 0.5, a: 0.3}
   toolUseRadiusColor: {r: 0, g: 0.5, b: 1, a: 0.3}
   enableAnimalSearchRadius: 0
-  enablePlantPoopRadius: 1
-  enableScentRadius: 1
-  enableFireflyPhotosynthesis: 1
+  enablePlantPoopRadius: 0
+  enableScentRadius: 0
+  enableFireflyPhotosynthesis: 0
   enableToolUseRadius: 0
 --- !u!4 &1491144816 stripped
 Transform:
@@ -20594,7 +20594,7 @@ GameObject:
   - component: {fileID: 1758318370}
   - component: {fileID: 1758318371}
   m_Layer: 0
-  m_Name: Tick Manager
+  m_Name: Manager_Tick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -20613,7 +20613,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 879874785}
+  m_Father: {fileID: 697039534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1758318371
 MonoBehaviour:

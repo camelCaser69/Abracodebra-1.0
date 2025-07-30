@@ -123,6 +123,22 @@ public class PlantShadowController : MonoBehaviour
 
     void OnDestroy()
     {
-        shadowPartMap.Clear(); // Prevent memory leaks
+        // Destroy all child shadow parts that this controller created
+        foreach (var kvp in shadowPartMap)
+        {
+            if (kvp.Value != null)
+            {
+                // In play mode, this destroys the GameObject. In editor, it's safer.
+                if (Application.isPlaying)
+                {
+                    Destroy(kvp.Value.gameObject);
+                }
+                else
+                {
+                    DestroyImmediate(kvp.Value.gameObject);
+                }
+            }
+        }
+        shadowPartMap.Clear(); // Prevent memory leaks from the dictionary itself
     }
 }

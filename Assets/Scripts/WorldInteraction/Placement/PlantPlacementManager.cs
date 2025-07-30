@@ -74,37 +74,48 @@ public class PlantPlacementManager : MonoBehaviour
     public void CleanupDestroyedPlants()
     {
         List<Vector3Int> keysToRemove = plantsByGridPosition.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key).ToList();
-        foreach (var key in keysToRemove) plantsByGridPosition.Remove(key);
-        if (showDebugMessages && keysToRemove.Count > 0) Debug.Log($"PPM: Removed {keysToRemove.Count} destroyed plant refs.");
+        foreach (var key in keysToRemove)
+        {
+            plantsByGridPosition.Remove(key);
+        }
+        if (showDebugMessages && keysToRemove.Count > 0)
+        {
+            Debug.Log($"PPM: Removed {keysToRemove.Count} destroyed plant refs.");
+        }
     }
 
     // This method is for planting from the SEED SLOT (Node Editor)
     public bool TryPlantSeed(Vector3Int gridPosition, Vector3 worldPosition)
     {
         CleanupDestroyedPlants();
-        if (IsPositionOccupied(gridPosition)) {
+        if (IsPositionOccupied(gridPosition))
+        {
             if (showDebugMessages) Debug.Log($"Cannot plant (from seed slot): Position {gridPosition} occupied.");
             return false;
         }
-        
+
         TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
-        if (!IsTileValidForPlanting(tileDef)) {
+        if (!IsTileValidForPlanting(tileDef))
+        {
             if (showDebugMessages) Debug.Log($"Cannot plant (from seed slot): Tile {tileDef?.displayName ?? "Unknown"} invalid.");
             return false;
         }
 
-        if (nodeExecutor == null) {
+        if (nodeExecutor == null)
+        {
             Debug.LogError("Cannot plant (from seed slot): NodeExecutor reference is missing in PlantPlacementManager.");
             return false;
         }
-        
+
         Vector3 plantingPosition = GetRandomizedPlantingPosition(worldPosition);
         GameObject plantObj = nodeExecutor.SpawnPlantFromSeedInSlot(plantingPosition, plantParent);
 
-        if (plantObj != null) {
+        if (plantObj != null)
+        {
             plantsByGridPosition[gridPosition] = plantObj;
             PlantGrowth plantGrowth = plantObj.GetComponent<PlantGrowth>();
-            if (growthModifierManager != null && plantGrowth != null) {
+            if (growthModifierManager != null && plantGrowth != null)
+            {
                 growthModifierManager.RegisterPlantTile(plantGrowth, tileDef);
                 if (showDebugMessages) Debug.Log($"Plant (from seed slot) registered with tile: {tileDef?.displayName ?? "Unknown"}");
             }
@@ -114,31 +125,29 @@ public class PlantPlacementManager : MonoBehaviour
         return false;
     }
     
-    public bool TryPlantSeedFromInventory(InventoryBarItem seedItem,
-        Vector3Int      gridPosition,
-        Vector3         worldPosition)
+    public bool TryPlantSeedFromInventory(InventoryBarItem seedItem, Vector3Int gridPosition, Vector3 worldPosition)
     {
-        if (seedItem == null || !seedItem.IsSeed())                     return false;
-        if (IsPositionOccupied(gridPosition))                           return false;
+        if (seedItem == null || !seedItem.IsSeed()) return false;
+		
+        CleanupDestroyedPlants(); // Clean up before checking occupation
+        if (IsPositionOccupied(gridPosition)) return false;
 
         TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
-        if (!IsTileValidForPlanting(tileDef))                           return false;
-        if (nodeExecutor == null)                                       return false;
+        if (!IsTileValidForPlanting(tileDef)) return false;
+        if (nodeExecutor == null) return false;
 
-        Vector3  spawnPos  = GetRandomizedPlantingPosition(worldPosition);
+        Vector3 spawnPos = GetRandomizedPlantingPosition(worldPosition);
         GameObject plantGO = nodeExecutor.SpawnPlantFromInventorySeed(
             seedItem.NodeData, spawnPos, plantParent);
 
-        if (plantGO == null)                                            return false;
+        if (plantGO == null) return false;
 
         plantsByGridPosition[gridPosition] = plantGO;
 
-        // Register growth modifiers
         PlantGrowth pg = plantGO.GetComponent<PlantGrowth>();
         if (pg != null && growthModifierManager != null)
             growthModifierManager.RegisterPlantTile(pg, tileDef);
 
-        // Optional planting animation
         GardenerController g = FindAnyObjectByType<GardenerController>();
         if (g != null) g.Plant();
 

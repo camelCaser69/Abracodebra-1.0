@@ -28,10 +28,7 @@ public class PlantEnergySystem
             return;
         }
 
-        // --- FIX: Simplified sunlight calculation for robustness ---
-        // The previous check for IsPaused was causing issues where the plant would ignore
-        // the weather state. Now, it simply reads the current sun intensity directly.
-        float sunlight = 1f; // Default to full sunlight
+        float sunlight = 0f; // Default to NO sunlight if manager is unavailable
         if (WeatherManager.Instance != null)
         {
             sunlight = WeatherManager.Instance.sunIntensity;
