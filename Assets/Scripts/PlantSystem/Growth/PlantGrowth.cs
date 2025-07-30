@@ -138,10 +138,14 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
 
     void Start()
     {
-        if (TickManager.Instance != null)
+        if (TickManager.Instance == null)
         {
-            TickManager.Instance.RegisterTickUpdateable(this);
+            Debug.LogError($"[{GetType().Name}] TickManager not found! Disabling component.", this);
+            enabled = false;
+            return;
         }
+		
+        TickManager.Instance.RegisterTickUpdateable(this);
         VisualManager.UpdateUI();
     }
 

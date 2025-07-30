@@ -24,6 +24,16 @@ public class StatusEffectUIManager : MonoBehaviour
         }
     }
 
+    void Start()
+    {
+        // This check ensures that the UIManager is properly initialized before it starts trying to update.
+        if (statusManager == null)
+        {
+            Debug.LogError($"[{GetType().Name}] StatusManager reference is null. This component was not initialized correctly. Disabling.", this);
+            enabled = false;
+        }
+    }
+
     void Update()
     {
         if (statusManager == null || effectIconContainer == null) return;

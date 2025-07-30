@@ -1,33 +1,52 @@
-﻿using UnityEngine;
+﻿// Assets/Scripts/Ecosystem/UI/ThoughtBubbleController.cs
+
+using UnityEngine;
 using TMPro;
 using WegoSystem;
 
-public class ThoughtBubbleController : MonoBehaviour {
+public class ThoughtBubbleController : MonoBehaviour
+{
     public TMP_Text messageText;
-    
-    private float lifetimeTicks;
-    private Transform followTarget;
 
-    public void Initialize(string message, Transform target, float durationInTicks) {
+    float lifetimeTicks;
+    Transform followTarget;
+    TickManager _tickManagerInstance; // Cached instance
+
+    void Start()
+    {
+        _tickManagerInstance = TickManager.Instance;
+        if (_tickManagerInstance == null)
+        {
+            Debug.LogWarning($"[{GetType().Name}] TickManager not found! Lifetime will use a fallback duration.", this);
+        }
+    }
+	
+    public void Initialize(string message, Transform target, float durationInTicks)
+    {
         if (messageText != null)
             messageText.text = message;
+		
         followTarget = target;
         lifetimeTicks = durationInTicks;
     }
 
-    void Update() {
-        // Convert real-time to tick-based countdown
-        if (TickManager.Instance?.Config != null) {
-            lifetimeTicks -= TickManager.Instance.Config.ticksPerRealSecond * Time.deltaTime;
-        } else {
-            // Fallback: assume 2 ticks per second
+    void Update()
+    {
+        if (_tickManagerInstance?.Config != null)
+        {
+            lifetimeTicks -= _tickManagerInstance.Config.ticksPerRealSecond * Time.deltaTime;
+        }
+        else
+        {
+            // Fallback if TickManager is not available
             lifetimeTicks -= 2f * Time.deltaTime;
         }
 
         if (lifetimeTicks <= 0f)
             Destroy(gameObject);
 
-        if (followTarget != null) {
+        if (followTarget != null)
+        {
             transform.position = followTarget.position;
         }
     }

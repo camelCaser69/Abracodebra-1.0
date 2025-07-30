@@ -56,10 +56,14 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     {
         InitializeAnimal();
 
-        if (TickManager.Instance != null)
+        if (TickManager.Instance == null)
         {
-            TickManager.Instance.RegisterTickUpdateable(this);
+            Debug.LogError($"[{GetType().Name}] TickManager not found! Disabling component.", this);
+            enabled = false;
+            return;
         }
+
+        TickManager.Instance.RegisterTickUpdateable(this);
 
         if (gridEntity != null)
         {
