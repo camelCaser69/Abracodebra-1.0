@@ -38,15 +38,18 @@ namespace WegoSystem
         
         protected override void OnAwake()
         {
-            // Initialization logic from the old Awake method.
             SetState(RunState.Planning, true);
         }
 
-        void Start()
+        public void Initialize()
         {
             if (TickManager.Instance != null)
             {
                 TickManager.Instance.RegisterTickUpdateable(new PhaseTickHandler(this));
+            }
+            else
+            {
+                Debug.LogError("[RunManager] Initialization failed: TickManager not found!");
             }
         }
 

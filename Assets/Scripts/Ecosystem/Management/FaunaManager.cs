@@ -22,7 +22,7 @@ public class FaunaManager : MonoBehaviour
     private List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
     private Camera mainCamera; // Ensure this is assigned or found
 
-    void Start()
+    public void Initialize()
     {
         InitializeManager();
     }

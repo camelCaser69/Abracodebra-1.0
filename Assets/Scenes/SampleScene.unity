@@ -3030,6 +3030,7 @@ GameObject:
   m_Component:
   - component: {fileID: 513545528}
   - component: {fileID: 513545529}
+  - component: {fileID: 513545530}
   m_Layer: 0
   m_Name: Manager_UI
   m_TagString: Untagged
@@ -3076,6 +3077,34 @@ MonoBehaviour:
   tickCounterText: {fileID: 0}
   persistentTickCounterText: {fileID: 1709125727}
   phaseProgressText: {fileID: 0}
+--- !u!114 &513545530
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 513545527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a42864ebf024de2bebc9035cb57e4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 363d92d9fb813fa43a8c17370eaf6af0, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 513545529}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -9585,6 +9614,7 @@ Transform:
   - {fileID: 769811490}
   - {fileID: 1758318370}
   - {fileID: 1486390868}
+  - {fileID: 763889561}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &706932636
@@ -10380,6 +10410,53 @@ SpriteMask:
   m_IsCustomRangeActive: 0
   m_SpriteSortPoint: 0
   m_MaskSource: 1
+--- !u!1 &763889560
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 763889561}
+  - component: {fileID: 763889562}
+  m_Layer: 0
+  m_Name: Manager_INITIALIZATION
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &763889561
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 763889560}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 697039534}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &763889562
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 763889560}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86841c44a04f4ece9f200236b71d303b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onCoreSystemsInitialized: {fileID: 11400000, guid: 8f838b61b1406ec4ea5d61d07d27532e, type: 2}
+  onGameManagersInitialized: {fileID: 11400000, guid: 5e473c46c07dd064286f45bce365b3bb, type: 2}
+  onGameplaySystemsInitialized: {fileID: 11400000, guid: 363d92d9fb813fa43a8c17370eaf6af0, type: 2}
 --- !u!1 &769811489
 GameObject:
   m_ObjectHideFlags: 0
@@ -10998,37 +11075,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ShowMaskGraphic: 0
---- !u!1 &879874784
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 879874785}
-  m_Layer: 0
-  m_Name: Wego System
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &879874785
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 879874784}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &885505429
 GameObject:
   m_ObjectHideFlags: 0
@@ -16499,6 +16545,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1384832980}
   - component: {fileID: 1384832981}
+  - component: {fileID: 1384832982}
   m_Layer: 0
   m_Name: Manager_Fauna
   m_TagString: Untagged
@@ -16541,6 +16588,34 @@ MonoBehaviour:
   showBoundsGizmos: 1
   boundsOffsetX: 0
   boundsOffsetY: 1
+--- !u!114 &1384832982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1384832979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a42864ebf024de2bebc9035cb57e4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 363d92d9fb813fa43a8c17370eaf6af0, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1384832981}
+        m_TargetAssemblyTypeName: FaunaManager, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1442999825
 GameObject:
   m_ObjectHideFlags: 0
@@ -16776,6 +16851,7 @@ GameObject:
   - component: {fileID: 1486390870}
   - component: {fileID: 1486390869}
   - component: {fileID: 1486390871}
+  - component: {fileID: 1486390872}
   m_Layer: 0
   m_Name: Manager_GridPosition
   m_TagString: Untagged
@@ -16857,6 +16933,34 @@ MonoBehaviour:
   enableScentRadius: 0
   enableFireflyPhotosynthesis: 0
   enableToolUseRadius: 0
+--- !u!114 &1486390872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1486390867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a42864ebf024de2bebc9035cb57e4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 8f838b61b1406ec4ea5d61d07d27532e, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1486390869}
+        m_TargetAssemblyTypeName: WegoSystem.GridPositionManager, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!4 &1491144816 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
@@ -21113,6 +21217,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1970727775}
   - component: {fileID: 1970727776}
+  - component: {fileID: 1970727777}
   m_Layer: 0
   m_Name: Manager_Run
   m_TagString: Untagged
@@ -21153,6 +21258,34 @@ MonoBehaviour:
   currentPhase: 0
   currentRoundNumber: 1
   currentPhaseTicks: 0
+--- !u!114 &1970727777
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1970727774}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a42864ebf024de2bebc9035cb57e4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 5e473c46c07dd064286f45bce365b3bb, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1970727776}
+        m_TargetAssemblyTypeName: WegoSystem.RunManager, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1979072003
 GameObject:
   m_ObjectHideFlags: 0
@@ -21501,4 +21634,3 @@ SceneRoots:
   - {fileID: 192826961}
   - {fileID: 757587767}
   - {fileID: 218169672}
-  - {fileID: 879874785}

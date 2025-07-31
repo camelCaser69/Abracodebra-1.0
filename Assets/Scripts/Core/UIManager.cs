@@ -37,28 +37,28 @@ public class UIManager : MonoBehaviour {
         Instance = this;
     }
     
-    void Start() {
-        // Cache references
+    public void Initialize()
+    {
         runManager = RunManager.Instance;
         tickManager = TickManager.Instance;
-        
-        if (runManager == null) {
-            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not function correctly.");
+
+        if (runManager == null)
+        {
+            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not fn correctly.");
             return;
         }
-        
-        // Subscribe to events - NO MORE POLLING!
+
         runManager.OnRunStateChanged += HandleRunStateChanged;
         runManager.OnPhaseChanged += HandlePhaseChanged;
         runManager.OnRoundChanged += HandleRoundChanged;
-        
-        if (tickManager != null) {
+
+        if (tickManager != null)
+        {
             tickManager.OnTickAdvanced += HandleTickAdvanced;
         }
-        
+
         SetupButtons();
-        
-        // Initial UI setup
+
         HandleRunStateChanged(runManager.CurrentState);
         UpdatePhaseDisplay();
         UpdateTickDisplay();

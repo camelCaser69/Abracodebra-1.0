@@ -32,11 +32,6 @@ namespace WegoSystem
         private readonly Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
         private readonly HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
         
-        protected override void OnAwake()
-        {
-            SyncWithTileGrid();
-        }
-
         void OnDestroy()
         {
             if (Instance == this)
@@ -44,28 +39,28 @@ namespace WegoSystem
                 // Clear static instance on destruction if this is the singleton
             }
         }
+        
+        public void Initialize()
+        {
+            SyncWithTileGrid();
+        }
 
         public void SyncWithTileGrid()
         {
+            // Logic moved from OnAwake
             if (tileInteractionManager != null && tileInteractionManager.interactionGrid != null)
             {
                 this._tilemapGrid = tileInteractionManager.interactionGrid;
-                if (debugMode)
-                {
-                    Debug.Log($"[GridPositionManager] Synced with assigned TileInteractionManager's grid: '{this._tilemapGrid.name}'.");
-                }
-                return; // Success
+                if (debugMode) Debug.Log($"[GridPositionManager] Synced with assigned TileInteractionManager's grid: '{this._tilemapGrid.name}'.");
+                return;
             }
 
             if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null)
             {
                 this._tilemapGrid = TileInteractionManager.Instance.interactionGrid;
                 tileInteractionManager = TileInteractionManager.Instance;
-                if (debugMode)
-                {
-                    Debug.Log($"[GridPositionManager] Synced with singleton TileInteractionManager.Instance's grid: '{this._tilemapGrid.name}'.");
-                }
-                return; // Success
+                if (debugMode) Debug.Log($"[GridPositionManager] Synced with singleton TileInteractionManager.Instance's grid: '{this._tilemapGrid.name}'.");
+                return;
             }
 
             if (_tilemapGrid == null)
