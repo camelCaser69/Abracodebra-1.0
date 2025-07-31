@@ -16253,6 +16253,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1296760033}
   - component: {fileID: 1296760034}
+  - component: {fileID: 1296760035}
   m_Layer: 0
   m_Name: Manager_Waves
   m_TagString: Untagged
@@ -16298,6 +16299,34 @@ MonoBehaviour:
   deletePreviousWaveAnimals: 0
   waveStatusText: {fileID: 1448792457}
   timeTrackerText: {fileID: 339075667}
+--- !u!114 &1296760035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1296760032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a42864ebf024de2bebc9035cb57e4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 5e473c46c07dd064286f45bce365b3bb, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1296760034}
+        m_TargetAssemblyTypeName: WaveManager, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1297169898
 GameObject:
   m_ObjectHideFlags: 0
@@ -21397,8 +21426,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce0aaa6e043a4b92a2e72718f99ac586, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weatherManager: {fileID: 1966203507}
-  waveManager: {fileID: 1296760034}
   currentState: 0
   currentPhase: 0
   currentRoundNumber: 1

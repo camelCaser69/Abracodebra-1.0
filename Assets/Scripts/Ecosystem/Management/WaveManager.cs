@@ -1,59 +1,58 @@
-﻿using System.Collections;
+﻿// Assets/Scripts/Ecosystem/Management/WaveManager.cs
+using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEngine;
 using WegoSystem;
 
-public enum WaveState {
+// This enum definition was missing in the previous response. It must be here.
+public enum WaveState
+{
     Idle,           // No wave active
     Active,         // Wave is currently running
     Spawning        // Currently spawning enemies
 }
 
-public class WaveManager : MonoBehaviour {
-    public static WaveManager Instance { get; private set; }
+public class WaveManager : MonoBehaviour
+{
+    public static WaveManager Instance { get; set; }
 
-    [Header("Core References")]
-    [SerializeField] Camera mainCamera;
-    [SerializeField] FaunaManager faunaManager;
-    [SerializeField] List<WaveDefinition> wavesSequence;
-    
-    [Header("Wave Timing")]
-    [SerializeField] int waveDurationInDays = 1; // Default: one wave per full day/night cycle
-    [SerializeField] float spawnTimeNormalized = 0.1f; // When in the wave to start spawning (0-1)
-    [SerializeField] bool continuousSpawning = false; // If true, spawns throughout the wave
-    
-    [Header("Wave Settings")]
-    [SerializeField] bool deletePreviousWaveAnimals = true;
-    
-    [Header("UI")]
-    [SerializeField] TextMeshProUGUI waveStatusText;
-    [SerializeField] TextMeshProUGUI timeTrackerText;
-    
-    // State tracking
-    WaveState currentState = WaveState.Idle;
-    WaveDefinition currentWaveDef = null;
-    int currentWaveIndex = -1;
-    
-    // Timing
-    int waveStartTick = 0;
-    int waveEndTick = 0;
-    int waveSpawnTick = 0;
-    bool hasSpawnedThisWave = false;
-    
-    // Coroutines
-    Coroutine activeSpawnCoroutine = null;
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private FaunaManager faunaManager;
+    [SerializeField] private List<WaveDefinition> wavesSequence;
+
+    [SerializeField] private int waveDurationInDays = 1;
+    [SerializeField] private float spawnTimeNormalized = 0.1f;
+    [SerializeField] private bool continuousSpawning = false;
+
+    [SerializeField] private bool deletePreviousWaveAnimals = true;
+
+    [SerializeField] private TextMeshProUGUI waveStatusText;
+    [SerializeField] private TextMeshProUGUI timeTrackerText;
+
+    private WaveState currentState = WaveState.Idle;
+    private WaveDefinition currentWaveDef = null;
+    private int currentWaveIndex = -1;
+
+    private int waveStartTick = 0;
+    private int waveEndTick = 0;
+    private int waveSpawnTick = 0;
+    private bool hasSpawnedThisWave = false;
+
+    private Coroutine activeSpawnCoroutine = null;
 
     public bool IsWaveActive => currentState != WaveState.Idle;
     public bool IsCurrentWaveDefeated() => currentState == WaveState.Idle && currentWaveIndex >= 0;
 
-    void Awake() {
-        if (Instance != null && Instance != this) {
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
             Destroy(gameObject);
             return;
         }
         Instance = this;
-        
+
         ValidateReferences();
     }
 
@@ -62,6 +61,11 @@ public class WaveManager : MonoBehaviour {
         if (TickManager.Instance != null)
         {
             TickManager.Instance.OnTickAdvanced += OnTickAdvanced;
+            Debug.Log("[WaveManager] Initialized and subscribed to TickManager events.");
+        }
+        else
+        {
+            Debug.LogError("[WaveManager] Initialization failed: TickManager not found!");
         }
     }
 
@@ -74,11 +78,8 @@ public class WaveManager : MonoBehaviour {
         StopAllCoroutines();
     }
 
-    // Assets/Scripts/Ecosystem/Management/WaveManager.cs
-
     private void ValidateReferences()
     {
-        // If faunaManager is not assigned in the Inspector, try to find it.
         if (faunaManager == null)
         {
             faunaManager = FindAnyObjectByType<FaunaManager>();
@@ -88,51 +89,54 @@ public class WaveManager : MonoBehaviour {
             }
         }
 
-        // Now, after trying to find it, log an error if it's still missing.
         if (faunaManager == null)
         {
             Debug.LogError("[WaveManager] CRITICAL: FaunaManager is missing and could not be found in the scene! Waves will not spawn.", this);
         }
 
         if (wavesSequence == null || wavesSequence.Count == 0)
-        {
             Debug.LogWarning("[WaveManager] Wave Sequence empty. No waves will spawn.", this);
-        }
     }
 
-    void OnTickAdvanced(int currentTick) {
-        if (currentState == WaveState.Active) {
-            // Check if wave should end
-            if (currentTick >= waveEndTick) {
+    private void OnTickAdvanced(int currentTick)
+    {
+        if (currentState == WaveState.Active)
+        {
+            if (currentTick >= waveEndTick)
+            {
                 EndCurrentWave();
             }
-            // Check if we should spawn
-            else if (!hasSpawnedThisWave && currentTick >= waveSpawnTick) {
+            else if (!hasSpawnedThisWave && currentTick >= waveSpawnTick)
+            {
                 StartSpawning();
             }
-            // Handle continuous spawning
-            else if (continuousSpawning && hasSpawnedThisWave) {
-                // Could implement periodic spawning here if needed
+            else if (continuousSpawning && hasSpawnedThisWave)
+            {
+                // Future logic for continuous spawning can go here
             }
         }
     }
 
-    public void StartWaveForRound(int roundNumber) {
-        if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat) {
+    public void StartWaveForRound(int roundNumber)
+    {
+        if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat)
+        {
             Debug.LogWarning("[WaveManager] Cannot start wave - not in GrowthAndThreat state.");
             return;
         }
 
         currentWaveIndex = roundNumber - 1;
-        
-        if (!IsValidWaveIndex(currentWaveIndex)) {
+
+        if (!IsValidWaveIndex(currentWaveIndex))
+        {
             Debug.LogWarning($"[WaveManager] No wave definition for round {roundNumber}");
             currentState = WaveState.Idle;
             return;
         }
 
         currentWaveDef = wavesSequence[currentWaveIndex];
-        if (currentWaveDef == null) {
+        if (currentWaveDef == null)
+        {
             Debug.LogError($"[WaveManager] Wave definition at index {currentWaveIndex} is null!");
             currentState = WaveState.Idle;
             return;
@@ -141,14 +145,16 @@ public class WaveManager : MonoBehaviour {
         StartWave();
     }
 
-    void StartWave() {
-        if (deletePreviousWaveAnimals) {
+    private void StartWave()
+    {
+        if (deletePreviousWaveAnimals)
+        {
             ClearAllActiveAnimals();
         }
 
-        // Calculate wave timing based on day cycles
         var config = TickManager.Instance?.Config;
-        if (config == null) {
+        if (config == null)
+        {
             Debug.LogError("[WaveManager] No TickConfiguration found!");
             return;
         }
@@ -156,78 +162,84 @@ public class WaveManager : MonoBehaviour {
         waveStartTick = TickManager.Instance.CurrentTick;
         int waveDurationTicks = config.ticksPerDay * waveDurationInDays;
         waveEndTick = waveStartTick + waveDurationTicks;
-        
-        // Calculate when to spawn within the wave
+
         waveSpawnTick = waveStartTick + Mathf.RoundToInt(waveDurationTicks * spawnTimeNormalized);
-        
+
         hasSpawnedThisWave = false;
         currentState = WaveState.Active;
-        
+
         Debug.Log($"[WaveManager] Starting wave '{currentWaveDef.waveName}' " +
                   $"Duration: {waveDurationTicks} ticks ({waveDurationInDays} days) " +
                   $"Spawn at tick: {waveSpawnTick}");
     }
 
-    void StartSpawning() {
+    private void StartSpawning()
+    {
         if (currentWaveDef == null || faunaManager == null) return;
-        
+
         hasSpawnedThisWave = true;
         currentState = WaveState.Spawning;
-        
+
         Debug.Log($"[WaveManager] Beginning spawn for wave '{currentWaveDef.waveName}'");
-        
-        if (activeSpawnCoroutine != null) {
+
+        if (activeSpawnCoroutine != null)
+        {
             StopCoroutine(activeSpawnCoroutine);
         }
-        
+
         activeSpawnCoroutine = StartCoroutine(ExecuteWaveSpawn());
     }
 
-    IEnumerator ExecuteWaveSpawn() {
+    private IEnumerator ExecuteWaveSpawn()
+    {
         faunaManager.ExecuteSpawnWave(currentWaveDef);
-        
-        // Wait a bit for spawning to complete
+
         yield return new WaitForSeconds(1f);
-        
-        // Return to active state after spawning
-        if (currentState == WaveState.Spawning) {
+
+        if (currentState == WaveState.Spawning)
+        {
             currentState = WaveState.Active;
         }
-        
+
         activeSpawnCoroutine = null;
     }
 
-    void EndCurrentWave() {
+    private void EndCurrentWave()
+    {
         Debug.Log($"[WaveManager] Ending wave '{currentWaveDef?.waveName}'");
-        
+
         StopCurrentWaveSpawning();
         currentWaveDef = null;
         currentState = WaveState.Idle;
-        
-        // Notify other systems
-        if (RunManager.Instance != null) {
+
+        if (RunManager.Instance != null)
+        {
             RunManager.Instance.StartNewPlanningPhase();
         }
     }
 
-    public void StopCurrentWaveSpawning() {
-        if (activeSpawnCoroutine != null) {
+    public void StopCurrentWaveSpawning()
+    {
+        if (activeSpawnCoroutine != null)
+        {
             StopCoroutine(activeSpawnCoroutine);
             activeSpawnCoroutine = null;
         }
-        
+
         faunaManager?.StopAllSpawnCoroutines();
     }
 
-    public void ResetForNewRound() {
+    public void ResetForNewRound()
+    {
         Debug.Log("[WaveManager] Resetting for new round");
-        
+
         StopCurrentWaveSpawning();
-        
-        if (deletePreviousWaveAnimals) {
+
+        if (deletePreviousWaveAnimals)
+        {
             ClearAllActiveAnimals();
         }
-        
+
         currentWaveDef = null;
         currentWaveIndex = -1;
         currentState = WaveState.Idle;
@@ -237,49 +249,55 @@ public class WaveManager : MonoBehaviour {
         waveSpawnTick = 0;
     }
 
-    void ClearAllActiveAnimals() {
+    private void ClearAllActiveAnimals()
+    {
         AnimalController[] animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
         int count = 0;
-        
-        foreach (var animal in animals) {
-            if (animal != null) {
+
+        foreach (var animal in animals)
+        {
+            if (animal != null)
+            {
                 Destroy(animal.gameObject);
                 count++;
             }
         }
-        
+
         Debug.Log($"[WaveManager] Cleared {count} animals");
     }
 
-    bool IsValidWaveIndex(int index) {
-        return wavesSequence != null && 
-               index >= 0 && 
+    private bool IsValidWaveIndex(int index)
+    {
+        return wavesSequence != null &&
+               index >= 0 &&
                index < wavesSequence.Count;
     }
 
-    void Update() {
+    void Update()
+    {
         UpdateUI();
     }
 
-    void UpdateUI() {
+    private void UpdateUI()
+    {
         UpdateTimeTracker();
         UpdateWaveStatus();
     }
 
-    void UpdateTimeTracker() {
+    private void UpdateTimeTracker()
+    {
         if (timeTrackerText == null || TickManager.Instance == null) return;
-        
+
         var config = TickManager.Instance.Config;
         if (config == null) return;
-        
-        // Show current day progress
+
         float dayProgress = config.GetDayProgressNormalized(TickManager.Instance.CurrentTick);
         int dayNumber = TickManager.Instance.CurrentTick / config.ticksPerDay + 1;
-        
+
         timeTrackerText.text = $"Day {dayNumber} - {(dayProgress * 100):F0}%";
-        
-        // Add phase info if in a wave
-        if (currentState != WaveState.Idle) {
+
+        if (currentState != WaveState.Idle)
+        {
             int ticksIntoWave = TickManager.Instance.CurrentTick - waveStartTick;
             int totalWaveTicks = waveEndTick - waveStartTick;
             float waveProgress = totalWaveTicks > 0 ? (float)ticksIntoWave / totalWaveTicks : 0;
@@ -287,28 +305,34 @@ public class WaveManager : MonoBehaviour {
         }
     }
 
-    void UpdateWaveStatus() {
+    private void UpdateWaveStatus()
+    {
         if (waveStatusText == null) return;
-        
-        if (RunManager.Instance == null) {
+
+        if (RunManager.Instance == null)
+        {
             waveStatusText.text = "System Offline";
             return;
         }
 
-        if (RunManager.Instance.CurrentState == RunState.Planning) {
+        if (RunManager.Instance.CurrentState == RunState.Planning)
+        {
             waveStatusText.text = $"Prepare for Round {RunManager.Instance.CurrentRoundNumber}";
         }
-        else if (RunManager.Instance.CurrentState == RunState.GrowthAndThreat) {
-            if (currentWaveDef != null) {
+        else if (RunManager.Instance.CurrentState == RunState.GrowthAndThreat)
+        {
+            if (currentWaveDef != null)
+            {
                 int ticksRemaining = Mathf.Max(0, waveEndTick - TickManager.Instance.CurrentTick);
-                string waveName = string.IsNullOrEmpty(currentWaveDef.waveName) 
-                    ? $"Wave {currentWaveIndex + 1}" 
+                string waveName = string.IsNullOrEmpty(currentWaveDef.waveName)
+                    ? $"Wave {currentWaveIndex + 1}"
                     : currentWaveDef.waveName;
-                
+
                 string status = currentState == WaveState.Spawning ? " [SPAWNING]" : "";
                 waveStatusText.text = $"{waveName}{status} - {ticksRemaining} ticks left";
             }
-            else {
+            else
+            {
                 waveStatusText.text = "No active wave";
             }
         }
@@ -316,17 +340,18 @@ public class WaveManager : MonoBehaviour {
 
     public Camera GetMainCamera() => mainCamera;
 
-    // Editor helpers
-    [ContextMenu("Force End Current Wave")]
-    void Debug_ForceEndWave() {
-        if (Application.isEditor && currentState != WaveState.Idle) {
+    void Debug_ForceEndWave()
+    {
+        if (Application.isEditor && currentState != WaveState.Idle)
+        {
             EndCurrentWave();
         }
     }
 
-    [ContextMenu("Force Start Spawning")]
-    void Debug_ForceSpawn() {
-        if (Application.isEditor && currentState == WaveState.Active && !hasSpawnedThisWave) {
+    void Debug_ForceSpawn()
+    {
+        if (Application.isEditor && currentState == WaveState.Active && !hasSpawnedThisWave)
+        {
             StartSpawning();
         }
     }
