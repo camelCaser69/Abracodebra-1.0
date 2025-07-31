@@ -35,14 +35,14 @@ public class PlantPlacementManager : MonoBehaviour
         RebuildInvalidTilesSet();
     }
 
-    private void Start()
+    public void Initialize()
     {
         if (plantParent == null && EcosystemManager.Instance != null) plantParent = EcosystemManager.Instance.plantParent;
         if (tileInteractionManager == null) tileInteractionManager = TileInteractionManager.Instance;
         if (growthModifierManager == null) growthModifierManager = PlantGrowthModifierManager.Instance;
         if (nodeExecutor == null)
         {
-            nodeExecutor = FindAnyObjectByType<NodeExecutor>(); 
+            nodeExecutor = FindAnyObjectByType<NodeExecutor>();
             if (nodeExecutor == null) Debug.LogError("[PlantPlacementManager] NodeExecutor instance not found!");
         }
     }

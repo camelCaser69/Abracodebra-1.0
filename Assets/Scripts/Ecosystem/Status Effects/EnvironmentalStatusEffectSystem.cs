@@ -44,13 +44,12 @@ public class EnvironmentalStatusEffectSystem : MonoBehaviour, ITickUpdateable
         BuildLookups();
     }
 
-    void Start()
+    public void Initialize()
     {
         if (TickManager.Instance != null)
         {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
-        // <<< NEW: Subscribe to the player action event
         if (PlayerActionManager.Instance != null)
         {
             PlayerActionManager.Instance.OnActionExecuted += HandlePlayerAction;

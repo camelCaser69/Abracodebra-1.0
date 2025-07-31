@@ -44,7 +44,7 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
         BuildModifierLookup();
     }
 
-    void Start()
+    public void Initialize()
     {
         if (tileInteractionManager == null)
         {

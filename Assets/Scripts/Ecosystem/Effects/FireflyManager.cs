@@ -47,7 +47,7 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
         ValidateReferences();
     }
 
-    void Start()
+    public void Initialize()
     {
         if (TickManager.Instance != null)
         {

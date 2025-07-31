@@ -57,8 +57,10 @@ public class WaveManager : MonoBehaviour {
         ValidateReferences();
     }
 
-    void Start() {
-        if (TickManager.Instance != null) {
+    public void Initialize()
+    {
+        if (TickManager.Instance != null)
+        {
             TickManager.Instance.OnTickAdvanced += OnTickAdvanced;
         }
     }

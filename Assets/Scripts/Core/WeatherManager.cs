@@ -57,7 +57,7 @@ public class WeatherManager : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void Start()
+    public void Initialize()
     {
         if (TickManager.Instance != null)
         {

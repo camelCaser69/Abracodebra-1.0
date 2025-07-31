@@ -10467,6 +10467,7 @@ GameObject:
   m_Component:
   - component: {fileID: 769811490}
   - component: {fileID: 769811491}
+  - component: {fileID: 769811492}
   m_Layer: 0
   m_Name: Manager_StatusEffect
   m_TagString: Untagged
@@ -10510,6 +10511,34 @@ MonoBehaviour:
   - tool: {fileID: 11400000, guid: 864e5c2cfc433e249b02f2a97cced049, type: 2}
     statusEffectsToApply:
     - {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
+--- !u!114 &769811492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 769811489}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a42864ebf024de2bebc9035cb57e4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 363d92d9fb813fa43a8c17370eaf6af0, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 769811491}
+        m_TargetAssemblyTypeName: EnvironmentalStatusEffectSystem, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &784806747
 GameObject:
   m_ObjectHideFlags: 0
@@ -11348,6 +11377,7 @@ GameObject:
   m_Component:
   - component: {fileID: 976596915}
   - component: {fileID: 976596916}
+  - component: {fileID: 976596917}
   m_Layer: 0
   m_Name: Manager_Fireflies
   m_TagString: Untagged
@@ -11398,6 +11428,34 @@ MonoBehaviour:
   attractionLineColorRuntime: {r: 1, g: 0, b: 1, a: 1}
   lineVisualizerPrefab: {fileID: 4489783331620860270, guid: 90a334b6403ffa946a0f007b37a0456d, type: 3}
   lineContainer: {fileID: 813162424}
+--- !u!114 &976596917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 976596914}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a42864ebf024de2bebc9035cb57e4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 363d92d9fb813fa43a8c17370eaf6af0, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 976596916}
+        m_TargetAssemblyTypeName: FireflyManager, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &988154461
 GameObject:
   m_ObjectHideFlags: 0
@@ -15420,6 +15478,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1190077646}
   - component: {fileID: 1190077647}
+  - component: {fileID: 1190077648}
   m_Layer: 0
   m_Name: Manager_Plant_Placement
   m_TagString: Untagged
@@ -15464,6 +15523,34 @@ MonoBehaviour:
   - {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}
   - {fileID: 11400000, guid: b82b8add4da60854b89d053b81886617, type: 2}
   showDebugMessages: 0
+--- !u!114 &1190077648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1190077645}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a42864ebf024de2bebc9035cb57e4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 363d92d9fb813fa43a8c17370eaf6af0, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1190077647}
+        m_TargetAssemblyTypeName: PlantPlacementManager, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1197055834
 GameObject:
   m_ObjectHideFlags: 0
@@ -15474,6 +15561,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1197055835}
   - component: {fileID: 1197055836}
+  - component: {fileID: 1197055837}
   m_Layer: 0
   m_Name: Manager_Plant_Modifiers
   m_TagString: Untagged
@@ -15517,6 +15605,34 @@ MonoBehaviour:
   tileInteractionManager: {fileID: 1097838751}
   showDebugMessages: 0
   showTileChangeMessages: 0
+--- !u!114 &1197055837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1197055834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a42864ebf024de2bebc9035cb57e4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 5e473c46c07dd064286f45bce365b3bb, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1197055836}
+        m_TargetAssemblyTypeName: PlantGrowthModifierManager, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1219388322
 GameObject:
   m_ObjectHideFlags: 0
@@ -21140,6 +21256,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1966203508}
   - component: {fileID: 1966203507}
+  - component: {fileID: 1966203509}
   m_Layer: 0
   m_Name: Manager_Weather
   m_TagString: Untagged
@@ -21207,6 +21324,34 @@ Transform:
   - {fileID: 1442999826}
   m_Father: {fileID: 697039534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1966203509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1966203506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a42864ebf024de2bebc9035cb57e4c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameEvent: {fileID: 11400000, guid: 5e473c46c07dd064286f45bce365b3bb, type: 2}
+  response:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1966203507}
+        m_TargetAssemblyTypeName: WeatherManager, Assembly-CSharp
+        m_MethodName: Initialize
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1970727774
 GameObject:
   m_ObjectHideFlags: 0
