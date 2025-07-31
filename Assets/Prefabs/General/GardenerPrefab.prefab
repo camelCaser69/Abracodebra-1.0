@@ -226,13 +226,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   multiTickDelay: 0.5
   useAnimations: 1
-  animator: {fileID: 0}
+  animator: {fileID: 195879902307507124}
   runningParameterName: isRunning
   plantingTriggerName: plantTrigger
   spriteRenderer: {fileID: 0}
   flipSpriteWhenMovingLeft: 1
   flipHorizontalDirection: 1
-  pouchCapacity: 10
 --- !u!114 &1316135351782374134
 MonoBehaviour:
   m_ObjectHideFlags: 0

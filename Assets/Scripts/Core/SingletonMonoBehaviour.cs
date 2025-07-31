@@ -6,7 +6,6 @@ public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBe
     private static T _instance;
     private static readonly object _lock = new object();
     private static bool _applicationIsQuitting = false;
-    public static bool HasInstance => _instance != null;
 
     public static T Instance
     {
@@ -14,9 +13,9 @@ public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBe
         {
             if (_applicationIsQuitting)
             {
-                // If the application is quitting, don't create a new instance.
-                // This prevents the "zombie singleton" issue.
-                Debug.LogWarning($"[Singleton] Instance '{typeof(T).Name}' already destroyed on application quit. Won't create again - returning null.");
+                // The warning is no longer needed because our OnDestroy methods now safely handle null.
+                // We simply return null to prevent crashes.
+                // Debug.LogWarning($"[Singleton] Instance '{typeof(T).Name}' already destroyed on application quit. Won't create again - returning null.");
                 return null;
             }
 
@@ -39,16 +38,14 @@ public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBe
         }
     }
 
+    public static bool HasInstance => _instance != null;
+
     protected virtual void Awake()
     {
         if (_instance == null)
         {
             _instance = this as T;
-
-            // Un-parent the singleton to make it a root object.
-            // This is required for DontDestroyOnLoad to work correctly.
             transform.SetParent(null);
-            
             DontDestroyOnLoad(gameObject);
         }
         else if (_instance != this)
@@ -63,10 +60,6 @@ public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBe
 
     protected virtual void OnAwake() { }
 
-    /// <summary>
-    /// When the application quits, we set a flag to prevent the singleton
-    /// from being re-created if it's accessed from an OnDestroy method.
-    /// </summary>
     protected virtual void OnApplicationQuit()
     {
         _applicationIsQuitting = true;
