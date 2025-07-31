@@ -6,6 +6,7 @@ public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBe
     private static T _instance;
     private static readonly object _lock = new object();
     private static bool _applicationIsQuitting = false;
+    public static bool HasInstance => _instance != null;
 
     public static T Instance
     {

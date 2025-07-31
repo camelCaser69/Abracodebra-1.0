@@ -13,14 +13,15 @@ namespace WegoSystem
 
     public enum GamePhase
     {
-        Planning,      // Players place nodes/plan strategy
-        Execution      // Game executes actions/waves
+        Planning,
+        Execution
     }
 
     public class RunManager : SingletonMonoBehaviour<RunManager>
     {
-        [SerializeField] private WeatherManager weatherManager;
-        [SerializeField] private WaveManager waveManager;
+        // These serialized fields are removed as we will now use the singletons directly.
+        // [SerializeField] private WeatherManager weatherManager;
+        // [SerializeField] private WaveManager waveManager;
 
         [SerializeField] private RunState currentState = RunState.Planning;
         [SerializeField] private GamePhase currentPhase = GamePhase.Planning;
@@ -52,7 +53,7 @@ namespace WegoSystem
                 Debug.LogError("[RunManager] Initialization failed: TickManager not found!");
             }
         }
-
+        
         private void SetState(RunState newState, bool force = false)
         {
             if (currentState == newState && !force) return;
@@ -63,20 +64,22 @@ namespace WegoSystem
             switch (currentState)
             {
                 case RunState.Planning:
-                    weatherManager?.PauseCycleAtDay();
+                    // Use Singleton Instance
+                    WeatherManager.Instance?.PauseCycleAtDay();
                     SetPhase(GamePhase.Planning);
                     break;
 
                 case RunState.GrowthAndThreat:
-                    weatherManager?.ResumeCycle();
-                    waveManager?.StartWaveForRound(currentRoundNumber);
+                    // Use Singleton Instance
+                    WeatherManager.Instance?.ResumeCycle();
+                    WaveManager.Instance?.StartWaveForRound(currentRoundNumber);
                     SetPhase(GamePhase.Execution);
                     break;
             }
 
             OnRunStateChanged?.Invoke(currentState);
         }
-        
+
         private void SetPhase(GamePhase newPhase)
         {
             if (currentPhase == newPhase) return;
@@ -88,7 +91,7 @@ namespace WegoSystem
             Debug.Log($"[RunManager] Phase changed: {oldPhase} -> {newPhase}");
             OnPhaseChanged?.Invoke(oldPhase, newPhase);
         }
-
+        
         public void StartGrowthAndThreatPhase()
         {
             if (currentState == RunState.Planning)
@@ -113,7 +116,8 @@ namespace WegoSystem
 
             if (currentState != RunState.Planning)
             {
-                if (waveManager != null && waveManager.IsCurrentWaveDefeated())
+                // Use Singleton Instance
+                if (WaveManager.Instance != null && WaveManager.Instance.IsCurrentWaveDefeated())
                 {
                     StartNewRound();
                 }
@@ -129,12 +133,13 @@ namespace WegoSystem
             currentRoundNumber++;
             Debug.Log($"[RunManager] Starting new round: {currentRoundNumber}");
 
-            waveManager?.ResetForNewRound();
+            // Use Singleton Instance
+            WaveManager.Instance?.ResetForNewRound();
             SetState(RunState.Planning);
 
             OnRoundChanged?.Invoke(currentRoundNumber);
         }
-        
+
         private class PhaseTickHandler : ITickUpdateable
         {
             private RunManager manager;

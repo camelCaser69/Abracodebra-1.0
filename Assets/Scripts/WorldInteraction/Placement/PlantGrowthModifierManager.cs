@@ -65,9 +65,11 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
         }
     }
 
+    // Assets/Scripts/WorldInteraction/Placement/PlantGrowthModifierManager.cs
+
     void OnDestroy()
     {
-        if (TickManager.Instance != null)
+        if (TickManager.HasInstance)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }

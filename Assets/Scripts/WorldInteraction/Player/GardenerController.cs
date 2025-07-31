@@ -52,14 +52,17 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         if (animator == null && useAnimations) Debug.LogWarning("[GardenerController] Animator not found.", gameObject);
     }
 
+    // Assets/Scripts/WorldInteraction/Player/GardenerController.cs
+
     void Start()
     {
         statusManager.Initialize(this);
 
-        // The following line is now obsolete and has been removed.
-        // if (statusEffectUI != null) {
-        //    statusEffectUI.Initialize(statusManager);
-        // }
+        // This line is now restored and placed correctly in Start().
+        if (statusEffectUI != null)
+        {
+            statusEffectUI.Initialize(statusManager);
+        }
 
         if (TickManager.Instance != null)
         {
@@ -71,9 +74,9 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
         }
     }
 
-    private void OnDestroy()
+    void OnDestroy()
     {
-        if (TickManager.Instance != null)
+        if (TickManager.HasInstance)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }

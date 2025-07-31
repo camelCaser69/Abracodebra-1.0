@@ -65,17 +65,39 @@ public class WaveManager : MonoBehaviour {
         }
     }
 
-    void OnDestroy() {
-        if (TickManager.Instance != null) {
+    void OnDestroy()
+    {
+        if (TickManager.HasInstance)
+        {
             TickManager.Instance.OnTickAdvanced -= OnTickAdvanced;
         }
         StopAllCoroutines();
     }
 
-    void ValidateReferences() {
-        if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager missing!", this);
-        if (wavesSequence == null || wavesSequence.Count == 0) 
+    // Assets/Scripts/Ecosystem/Management/WaveManager.cs
+
+    private void ValidateReferences()
+    {
+        // If faunaManager is not assigned in the Inspector, try to find it.
+        if (faunaManager == null)
+        {
+            faunaManager = FindAnyObjectByType<FaunaManager>();
+            if (faunaManager != null)
+            {
+                Debug.LogWarning("[WaveManager] FaunaManager was not assigned in the Inspector. Found it automatically.", this);
+            }
+        }
+
+        // Now, after trying to find it, log an error if it's still missing.
+        if (faunaManager == null)
+        {
+            Debug.LogError("[WaveManager] CRITICAL: FaunaManager is missing and could not be found in the scene! Waves will not spawn.", this);
+        }
+
+        if (wavesSequence == null || wavesSequence.Count == 0)
+        {
             Debug.LogWarning("[WaveManager] Wave Sequence empty. No waves will spawn.", this);
+        }
     }
 
     void OnTickAdvanced(int currentTick) {

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b0b985110e44dfcac626c66fbf90fd8, type: 3}
   m_Name: Wave_002
   m_EditorClassIdentifier: 
-  waveName: Wave_001
+  waveName: Wave_002
   spawnEntries:
   - description: Bunnies
     animalDefinition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}

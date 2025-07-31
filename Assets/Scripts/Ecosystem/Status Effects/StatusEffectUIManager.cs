@@ -14,21 +14,10 @@ public class StatusEffectUIManager : MonoBehaviour
     StatusEffectManager statusManager;
     Dictionary<string, StatusEffectIconUI> activeIcons = new Dictionary<string, StatusEffectIconUI>();
 
-    void Awake()
+    // Re-introducing the public Initialize method.
+    public void Initialize(StatusEffectManager manager)
     {
-        // Find the owner and its StatusManager in Awake to guarantee it runs before any Start() methods.
-        IStatusEffectable owner = GetComponentInParent<IStatusEffectable>();
-        if (owner != null && owner.StatusManager != null)
-        {
-            statusManager = owner.StatusManager;
-        }
-        else
-        {
-            // This error will now correctly fire if the prefab is set up incorrectly.
-            Debug.LogError($"[{GetType().Name}] Could not find a valid IStatusEffectable owner or its StatusManager in parents of '{gameObject.name}'. Disabling.", this);
-            enabled = false;
-            return;
-        }
+        statusManager = manager;
 
         if (effectIconPrefab == null)
         {
@@ -36,16 +25,15 @@ public class StatusEffectUIManager : MonoBehaviour
         }
     }
 
-    // The Initialize method is no longer needed from external scripts.
-    // public void Initialize(StatusEffectManager manager) { ... }
-
+    // Removing the Awake and Start methods that caused the race condition.
+    
     void Update()
     {
         if (statusManager == null || effectIconContainer == null) return;
 
         UpdateStatusIcons();
     }
-
+    
     private void UpdateStatusIcons()
     {
         var currentEffectInstances = statusManager.GetActiveEffects();

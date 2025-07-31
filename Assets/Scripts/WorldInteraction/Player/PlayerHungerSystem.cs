@@ -31,7 +31,7 @@ public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable
 
     void OnDestroy()
     {
-        if (TickManager.Instance != null)
+        if (TickManager.HasInstance)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }

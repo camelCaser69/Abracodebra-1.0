@@ -56,15 +56,19 @@ public class EnvironmentalStatusEffectSystem : MonoBehaviour, ITickUpdateable
         }
     }
 
+    // Assets/Scripts/Ecosystem/Status Effects/EnvironmentalStatusEffectSystem.cs
+
     void OnDestroy()
     {
         if (Instance == this) Instance = null;
 
-        if (TickManager.Instance != null)
+        // Safe check for TickManager, which is a full SingletonMonoBehaviour
+        if (TickManager.HasInstance)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
-        // <<< NEW: Unsubscribe from the player action event
+        
+        // Safe check for PlayerActionManager, which also uses the simple singleton pattern.
         if (PlayerActionManager.Instance != null)
         {
             PlayerActionManager.Instance.OnActionExecuted -= HandlePlayerAction;

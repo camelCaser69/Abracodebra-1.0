@@ -58,7 +58,10 @@ namespace WegoSystem
 
         protected virtual void OnDestroy()
         {
-            GridPositionManager.Instance?.UnregisterEntity(this);
+            if (GridPositionManager.HasInstance)
+            {
+                GridPositionManager.Instance.UnregisterEntity(this);
+            }
         }
 
         protected virtual void Update()

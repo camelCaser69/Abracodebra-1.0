@@ -149,21 +149,26 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         VisualManager.UpdateUI();
     }
 
+    // Assets/Scripts/PlantSystem/Growth/PlantGrowth.cs
+
     void OnDestroy()
     {
         AllActivePlants.Remove(this);
 
-        if (TickManager.Instance != null)
+        // TickManager is a SingletonMonoBehaviour, so HasInstance is correct.
+        if (TickManager.HasInstance)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
 
+        // PlantGrowthModifierManager uses the simple singleton pattern.
+        // We must check its instance directly.
         if (PlantGrowthModifierManager.Instance != null)
         {
             PlantGrowthModifierManager.Instance.UnregisterPlant(this);
         }
 
-        if (GridDebugVisualizer.Instance != null)
+        if (GridDebugVisualizer.Instance != null) // GridDebugVisualizer is not a persistent singleton
         {
             GridDebugVisualizer.Instance.HideContinuousRadius(this);
         }

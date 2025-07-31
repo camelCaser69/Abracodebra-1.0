@@ -59,7 +59,7 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
     {
         if (Instance == this) Instance = null;
 
-        if (TickManager.Instance != null)
+        if (TickManager.HasInstance)
         {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
