@@ -1,30 +1,30 @@
 ﻿// Assets/Scripts/Core/SingletonMonoBehaviour.cs
 using UnityEngine;
 
-/// <summary>
-/// An abstract base class for creating a thread-safe, lazy-initialized singleton MonoBehaviour.
-/// If an instance is not found in the scene, a new one will be created automatically.
-/// </summary>
-/// <typeparam name="T">The type of the singleton.</typeparam>
 public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
 {
     private static T _instance;
     private static readonly object _lock = new object();
+    private static bool _applicationIsQuitting = false;
 
     public static T Instance
     {
         get
         {
-            // Lock to ensure thread safety, especially in multi-threaded scenarios.
+            if (_applicationIsQuitting)
+            {
+                // If the application is quitting, don't create a new instance.
+                // This prevents the "zombie singleton" issue.
+                Debug.LogWarning($"[Singleton] Instance '{typeof(T).Name}' already destroyed on application quit. Won't create again - returning null.");
+                return null;
+            }
+
             lock (_lock)
             {
-                // If the instance is null, try to find it in the scene.
                 if (_instance == null)
                 {
-                    // Use the modern, non-obsolete FindFirstObjectByType.
                     _instance = FindFirstObjectByType<T>();
 
-                    // If it's still null and we're in play mode, create a new GameObject for it.
                     if (_instance == null && Application.isPlaying)
                     {
                         Debug.LogWarning($"[Singleton] Instance of '{typeof(T).Name}' not found. A new one will be created.");
@@ -38,34 +38,36 @@ public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBe
         }
     }
 
-    /// <summary>
-    /// This is the standard Unity Awake method that handles the singleton pattern.
-    /// It ensures that only one instance of the singleton exists.
-    /// If another instance already exists, this one is destroyed.
-    /// </summary>
     protected virtual void Awake()
     {
         if (_instance == null)
         {
-            // If no instance exists yet, this one becomes the singleton instance.
             _instance = this as T;
-            DontDestroyOnLoad(gameObject); // Make it persistent across scenes
+
+            // Un-parent the singleton to make it a root object.
+            // This is required for DontDestroyOnLoad to work correctly.
+            transform.SetParent(null);
+            
+            DontDestroyOnLoad(gameObject);
         }
         else if (_instance != this)
         {
-            // If an instance already exists and it's not this one, destroy this one.
             Debug.LogWarning($"[Singleton] Another instance of '{typeof(T).Name}' already exists. Destroying duplicate on '{gameObject.name}'.", gameObject);
             Destroy(gameObject);
             return;
         }
-
-        // Call the virtual OnAwake method for derived classes to implement their own Awake logic.
+        
         OnAwake();
     }
 
-    /// <summary>
-    /// This virtual method is called from Awake() after the singleton instance has been confirmed.
-    /// Derived classes should override this method instead of Awake() for their initialization logic.
-    /// </summary>
     protected virtual void OnAwake() { }
+
+    /// <summary>
+    /// When the application quits, we set a flag to prevent the singleton
+    /// from being re-created if it's accessed from an OnDestroy method.
+    /// </summary>
+    protected virtual void OnApplicationQuit()
+    {
+        _applicationIsQuitting = true;
+    }
 }

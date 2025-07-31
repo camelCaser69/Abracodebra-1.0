@@ -1,22 +1,34 @@
-﻿// Assets/Scripts/Ecosystem/StatusEffects/StatusEffectUIManager.cs
-using System.Collections.Generic;
+﻿// Assets/Scripts/Ecosystem/Status Effects/StatusEffectUIManager.cs
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+using System.Collections.Generic;
 using System.Linq;
+using TMPro;
+using WegoSystem;
 
 public class StatusEffectUIManager : MonoBehaviour
 {
-    [Header("UI Configuration")]
-    [SerializeField] private Transform effectIconContainer; // Set this in prefab
-    [SerializeField] private GameObject effectIconPrefab; // Simple UI icon prefab
+    [SerializeField] Transform effectIconContainer;
+    [SerializeField] GameObject effectIconPrefab;
 
-    private StatusEffectManager statusManager;
-    private Dictionary<string, StatusEffectIconUI> activeIcons = new Dictionary<string, StatusEffectIconUI>();
+    StatusEffectManager statusManager;
+    Dictionary<string, StatusEffectIconUI> activeIcons = new Dictionary<string, StatusEffectIconUI>();
 
-    public void Initialize(StatusEffectManager manager)
+    void Awake()
     {
-        statusManager = manager;
+        // Find the owner and its StatusManager in Awake to guarantee it runs before any Start() methods.
+        IStatusEffectable owner = GetComponentInParent<IStatusEffectable>();
+        if (owner != null && owner.StatusManager != null)
+        {
+            statusManager = owner.StatusManager;
+        }
+        else
+        {
+            // This error will now correctly fire if the prefab is set up incorrectly.
+            Debug.LogError($"[{GetType().Name}] Could not find a valid IStatusEffectable owner or its StatusManager in parents of '{gameObject.name}'. Disabling.", this);
+            enabled = false;
+            return;
+        }
 
         if (effectIconPrefab == null)
         {
@@ -24,15 +36,8 @@ public class StatusEffectUIManager : MonoBehaviour
         }
     }
 
-    void Start()
-    {
-        // This check ensures that the UIManager is properly initialized before it starts trying to update.
-        if (statusManager == null)
-        {
-            Debug.LogError($"[{GetType().Name}] StatusManager reference is null. This component was not initialized correctly. Disabling.", this);
-            enabled = false;
-        }
-    }
+    // The Initialize method is no longer needed from external scripts.
+    // public void Initialize(StatusEffectManager manager) { ... }
 
     void Update()
     {
@@ -47,7 +52,7 @@ public class StatusEffectUIManager : MonoBehaviour
         var currentEffectIDs = currentEffectInstances.Select(e => e.effect.effectID).ToList();
         var displayedIconIDs = activeIcons.Keys.ToList();
 
-        // 1. Remove icons for effects that are no longer active
+        // Remove icons for effects that are no longer active
         foreach (var id in displayedIconIDs)
         {
             if (!currentEffectIDs.Contains(id))
@@ -60,7 +65,7 @@ public class StatusEffectUIManager : MonoBehaviour
             }
         }
 
-        // 2. Add icons for new effects that aren't displayed yet
+        // Add icons for new effects
         foreach (var instance in currentEffectInstances)
         {
             if (!activeIcons.ContainsKey(instance.effect.effectID))
@@ -68,8 +73,8 @@ public class StatusEffectUIManager : MonoBehaviour
                 CreateEffectIcon(instance);
             }
         }
-        
-        // 3. Ensure correct order by re-ordering the transforms in the hierarchy
+
+        // Ensure icon order matches effect order
         for (int i = 0; i < currentEffectInstances.Count; i++)
         {
             string effectID = currentEffectInstances[i].effect.effectID;
@@ -100,7 +105,6 @@ public class StatusEffectUIManager : MonoBehaviour
 
     private void CreateDefaultIconPrefab()
     {
-        // <<< SIZES ARE NOW MUCH SMALLER TO WORK IN WORLD SPACE
         float iconSize = 0.32f; // e.g., 0.32 world units
         float iconPadding = 0.04f;
         float fontSize = 0.2f;
@@ -120,7 +124,7 @@ public class StatusEffectUIManager : MonoBehaviour
         Image iconImage = icon.AddComponent<Image>();
         iconImage.enabled = false;
         icon.GetComponent<RectTransform>().sizeDelta = new Vector2(iconSize - iconPadding, iconSize - iconPadding);
-        
+
         GameObject unicodeTextGO = new GameObject("UnicodeText");
         unicodeTextGO.transform.SetParent(icon.transform, false);
         TextMeshProUGUI tmpText = unicodeTextGO.AddComponent<TextMeshProUGUI>();

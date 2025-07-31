@@ -179,10 +179,12 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         needs.Initialize(this, definition);
         behavior.Initialize(this, definition);
         statusManager.Initialize(this);
-        if (statusEffectUI != null)
-        {
-            statusEffectUI.Initialize(statusManager);
-        }
+		
+        // The following line is now obsolete and has been removed.
+        // if (statusEffectUI != null) {
+        //    statusEffectUI.Initialize(statusManager);
+        // }
+
         if (GridPositionManager.Instance != null)
         {
             GridPositionManager.Instance.SnapEntityToGrid(gameObject);
