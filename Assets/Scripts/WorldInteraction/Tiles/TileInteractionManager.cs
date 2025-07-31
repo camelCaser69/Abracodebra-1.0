@@ -62,8 +62,14 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
     
     void OnDestroy()
     {
-        if (TickManager.HasInstance) TickManager.Instance.UnregisterTickUpdateable(this);
-        // The rest of the OnDestroy can remain as it was
+        // Safely get the instance once
+        var tickManager = TickManager.Instance;
+        if (tickManager != null)
+        {
+            tickManager.UnregisterTickUpdateable(this);
+        }
+		
+        // The rest of your OnDestroy logic can go here if any
     }
 
     void OnDisable()

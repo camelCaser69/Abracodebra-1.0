@@ -76,10 +76,13 @@ public class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdatea
 
     void OnDestroy()
     {
-        if (TickManager.HasInstance)
+        // Safely get the instance once
+        var tickManager = TickManager.Instance;
+        if (tickManager != null)
         {
-            TickManager.Instance.UnregisterTickUpdateable(this);
+            tickManager.UnregisterTickUpdateable(this);
         }
+		
         if (gridEntity != null)
         {
             gridEntity.OnPositionChanged -= OnGridPositionChanged;

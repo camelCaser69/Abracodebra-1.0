@@ -155,20 +155,20 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
     {
         AllActivePlants.Remove(this);
 
-        // TickManager is a SingletonMonoBehaviour, so HasInstance is correct.
-        if (TickManager.HasInstance)
+        // Safely get the instance once
+        var tickManager = TickManager.Instance;
+        if (tickManager != null)
         {
-            TickManager.Instance.UnregisterTickUpdateable(this);
+            tickManager.UnregisterTickUpdateable(this);
         }
 
-        // PlantGrowthModifierManager uses the simple singleton pattern.
-        // We must check its instance directly.
+        // This one uses a simple singleton pattern, so a direct null check is fine.
         if (PlantGrowthModifierManager.Instance != null)
         {
             PlantGrowthModifierManager.Instance.UnregisterPlant(this);
         }
 
-        if (GridDebugVisualizer.Instance != null) // GridDebugVisualizer is not a persistent singleton
+        if (GridDebugVisualizer.Instance != null)
         {
             GridDebugVisualizer.Instance.HideContinuousRadius(this);
         }

@@ -62,13 +62,14 @@ public class EnvironmentalStatusEffectSystem : MonoBehaviour, ITickUpdateable
     {
         if (Instance == this) Instance = null;
 
-        // Safe check for TickManager, which is a full SingletonMonoBehaviour
-        if (TickManager.HasInstance)
+        // Safely get the instance once for TickManager
+        var tickManager = TickManager.Instance;
+        if (tickManager != null)
         {
-            TickManager.Instance.UnregisterTickUpdateable(this);
+            tickManager.UnregisterTickUpdateable(this);
         }
-        
-        // Safe check for PlayerActionManager, which also uses the simple singleton pattern.
+
+        // Safe check for PlayerActionManager, which uses a different singleton pattern
         if (PlayerActionManager.Instance != null)
         {
             PlayerActionManager.Instance.OnActionExecuted -= HandlePlayerAction;

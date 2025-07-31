@@ -71,9 +71,11 @@ public class WaveManager : MonoBehaviour
 
     void OnDestroy()
     {
-        if (TickManager.HasInstance)
+        // Safely get the instance once
+        var tickManager = TickManager.Instance;
+        if (tickManager != null)
         {
-            TickManager.Instance.OnTickAdvanced -= OnTickAdvanced;
+            tickManager.OnTickAdvanced -= OnTickAdvanced;
         }
         StopAllCoroutines();
     }

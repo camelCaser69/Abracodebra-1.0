@@ -69,9 +69,11 @@ public class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable
 
     void OnDestroy()
     {
-        if (TickManager.HasInstance)
+        // Safely get the instance once
+        var tickManager = TickManager.Instance;
+        if (tickManager != null)
         {
-            TickManager.Instance.UnregisterTickUpdateable(this);
+            tickManager.UnregisterTickUpdateable(this);
         }
     }
 
