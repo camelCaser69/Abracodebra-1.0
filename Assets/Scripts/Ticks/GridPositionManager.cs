@@ -17,17 +17,10 @@ namespace WegoSystem
 
         private Grid _tilemapGrid;
 
-        private Grid TilemapGrid
-        {
-            get
-            {
-                if (_tilemapGrid == null)
-                {
-                    SyncWithTileGrid(); // Attempt to sync again if it's null
-                }
-                return _tilemapGrid;
-            }
-        }
+        // The property is now simplified to just return the private field.
+        // Initialization is now the sole responsibility of the OnAwake method.
+        // This prevents OnDrawGizmos from causing a race condition.
+        private Grid TilemapGrid => _tilemapGrid;
 
         [SerializeField] private Vector2Int gridBounds = new Vector2Int(100, 100);
 
@@ -387,7 +380,9 @@ namespace WegoSystem
         
         void OnDrawGizmos()
         {
-            if (!showGridGizmos || TilemapGrid == null) return;
+            // This check is crucial. It prevents the method from running in the editor
+            // before the _tilemapGrid has been initialized in OnAwake.
+            if (!showGridGizmos || _tilemapGrid == null) return;
             
             Gizmos.color = gridColor;
 

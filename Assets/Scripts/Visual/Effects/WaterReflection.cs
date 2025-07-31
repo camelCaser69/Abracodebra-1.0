@@ -440,49 +440,53 @@ public class WaterReflection : MonoBehaviour
         #endif
     }
 
-    #if UNITY_EDITOR
-    private void EditorUpdatePreview()
-    {
-        // This method contains the logic that was previously in OnValidate.
-        // It's now called safely by the editor after the main update loop.
-        if (this == null || gameObject == null) // The object could be destroyed before the call
-        {
-            return;
-        }
+    // Assets/Scripts/Visual/Effects/WaterReflection.cs
 
-        if (Application.isEditor && !Application.isPlaying)
-        {
-            bool localMaterialNeeded = enableDistanceFade && (!overrides.gradientFadeBaseMaterial || localGradientFadeBaseMaterial == null);
-            bool globalMaterialMightBeUsed = enableDistanceFade && !overrides.gradientFadeBaseMaterial && localGradientFadeBaseMaterial == null;
+#if UNITY_EDITOR
+	void EditorUpdatePreview()
+	{
+		if (this == null || gameObject == null) // The object could be destroyed before the call
+		{
+			return;
+		}
 
-            if (localMaterialNeeded && !globalMaterialMightBeUsed) // Warn if local ovr is on but local material missing
-            {
-                Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true and 'Override Gradient Material' is true, but 'Local Gradient Fade Base Material' is not assigned. Assign local material or uncheck override.", this);
-            }
-            else if (globalMaterialMightBeUsed) // Inform that global will be used if local isn't set
-            {
-                Debug.Log($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true. If 'Local Gradient Fade Base Material' remains unassigned and ovr is false, the global default from WaterReflectionManager will be used in Play mode.", this);
-            }
+		if (Application.isEditor && !Application.isPlaying)
+		{
+			// Only show validation logs if the local debug flag is enabled.
+			if (localShowDebugInfo)
+			{
+				bool localMaterialNeeded = enableDistanceFade && (!overrides.gradientFadeBaseMaterial || localGradientFadeBaseMaterial == null);
+				bool globalMaterialMightBeUsed = enableDistanceFade && !overrides.gradientFadeBaseMaterial && localGradientFadeBaseMaterial == null;
 
-            if (reflectionRenderer != null && originalRenderer != null)
-            {
-                Color previewTint = overrides.reflectionTint ? localReflectionTint : Color.white; // Default to white if no manager
-                float previewOpacity = overrides.reflectionOpacity ? localReflectionOpacity : 0.5f;
-                int previewSortOffset = overrides.sortingOrderOffset ? localSortingOrderOffset : -1;
+				if (localMaterialNeeded && !globalMaterialMightBeUsed) // Warn if local ovr is on but local material missing
+				{
+					Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true and 'Override Gradient Material' is true, but 'Local Gradient Fade Base Material' is not assigned. Assign local material or uncheck override.", this);
+				}
+				else if (globalMaterialMightBeUsed) // Inform that global will be used if local isn't set
+				{
+					Debug.Log($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true. If 'Local Gradient Fade Base Material' remains unassigned and ovr is false, the global default from WaterReflectionManager will be used in Play mode.", this);
+				}
+			}
+			
+			if (reflectionRenderer != null && originalRenderer != null)
+			{
+				Color previewTint = overrides.reflectionTint ? localReflectionTint : Color.white; // Default to white if no manager
+				float previewOpacity = overrides.reflectionOpacity ? localReflectionOpacity : 0.5f;
+				int previewSortOffset = overrides.sortingOrderOffset ? localSortingOrderOffset : -1;
 
-                reflectionRenderer.sprite = originalRenderer.sprite;
-                reflectionRenderer.flipX = originalRenderer.flipX;
-                reflectionRenderer.flipY = originalRenderer.flipY;
-                reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + previewSortOffset;
-                Color baseOriginalSpriteColor = originalRenderer.color;
-                Color finalReflectionTintedColor = baseOriginalSpriteColor * previewTint;
-                float finalCombinedAlpha = baseOriginalSpriteColor.a * previewOpacity;
-                reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
-                UpdateReflectionTransform(); // Keep transform updated
-            }
-        }
-    }
-    #endif
+				reflectionRenderer.sprite = originalRenderer.sprite;
+				reflectionRenderer.flipX = originalRenderer.flipX;
+				reflectionRenderer.flipY = originalRenderer.flipY;
+				reflectionRenderer.sortingOrder = originalRenderer.sortingOrder + previewSortOffset;
+				Color baseOriginalSpriteColor = originalRenderer.color;
+				Color finalReflectionTintedColor = baseOriginalSpriteColor * previewTint;
+				float finalCombinedAlpha = baseOriginalSpriteColor.a * previewOpacity;
+				reflectionRenderer.color = new Color(finalReflectionTintedColor.r, finalReflectionTintedColor.g, finalReflectionTintedColor.b, finalCombinedAlpha);
+				UpdateReflectionTransform(); // Keep transform updated
+			}
+		}
+	}
+#endif
 
 
     // --- Public Methods for Runtime Control (Could be removed if not needed, or kept for dynamic changes) ---
