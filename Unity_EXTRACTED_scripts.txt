@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 585,170 → 403,108 chars (31.1% reduction)
-Estimated tokens saved: ~45,515
+Compression Stats: 589,525 → 407,096 chars (30.9% reduction)
+Estimated tokens saved: ~45,607
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -20,126 +20,225 @@ Common using statements (add these back when needed):
 using System;
 
 [Unknown]
-  PixelPerfectSetup (Assets\Scripts\Core/) L29
-  RunManager (Assets\Scripts\Core/) L70
-  SortableEntity (Assets\Scripts\Core/) L213
-  UIManager (Assets\Scripts\Core/) L280
-  WeatherManager (Assets\Scripts\Core/) L542
-  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L741
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L927
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1200
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1286
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L1295
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1683
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1830
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1843
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1880
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L2188
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2219
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2482
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2575
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2590
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2609
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2693
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2769
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2835
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2848
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2877
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L3099
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L3285
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3575
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L3604
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3740
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3758
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3796
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3844
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3862
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3988
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L4098
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L4134
-  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L4147
-  NodeDefinitionCreator (Assets\Scripts\Editor/) L4175
-  NodeDefinitionEditor (Assets\Scripts\Editor/) L4236
-  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L4309
-  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L4360
-  NodeEffectDrawer (Assets\Scripts\Editor/) L4394
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L4502
-  TileDefinitionEditor (Assets\Scripts\Editor/) L4563
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L4583
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L4618
-  WaveManagerEditor (Assets\Scripts\Editor/) L4755
-  GeneActivationType (Assets\Scripts\PlantSystem\Data/) L4930
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4943
-  LeafData (Assets\Scripts\PlantSystem\Data/) L4951
-  NodeData (Assets\Scripts\PlantSystem\Data/) L4966
-  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L5116
-  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L5403
-  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L5426
-  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L5452
-  NodeEffectTypeHelper (Assets\Scripts\PlantSystem\Data/) L5483
-  NodeGraph (Assets\Scripts\PlantSystem\Data/) L5515
-  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L5524
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L5551
-  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L5792
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L5831
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L5855
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6100
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L6189
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6542
-  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L6884
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7187
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7325
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7614
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7681
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7750
-  ItemView (Assets\Scripts\PlantSystem\UI/) L8093
-  NodeCell (Assets\Scripts\PlantSystem\UI/) L8230
-  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8480
-  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8614
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8969
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L9105
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9414
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9502
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L9603
-  GridSnapStartup (Assets\Scripts\Ticks/) L9841
-  TickDebugMonitor (Assets\Scripts\Ticks/) L9907
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L10079
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L10148
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L10379
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10390
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10419
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10515
-  WaterReflection (Assets\Scripts\Visual\Effects/) L10620
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L11015
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L11051
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11215
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11357
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11523
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11693
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11701
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11728
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11775
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11978
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L12039
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L12079
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L12103
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12123
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12428
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12440
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12475
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12650
+  GameEvent (Assets\Scripts\Core\Events/) L29
+  GameEventListener (Assets\Scripts\Core\Events/) L56
+  IGameEventListener (Assets\Scripts\Core\Events/) L83
+  InitializationManager (Assets\Scripts\Core/) L91
+  PixelPerfectSetup (Assets\Scripts\Core/) L121
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L162
+  SortableEntity (Assets\Scripts\Core/) L218
+  UIManager (Assets\Scripts\Core/) L285
+  WeatherManager (Assets\Scripts\Core/) L547
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L747
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L933
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L1212
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1298
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L1307
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1695
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1842
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1855
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1892
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L2201
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2232
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2496
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2589
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2604
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2623
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2707
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2783
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2849
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2862
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2884
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L3070
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L3375
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L3404
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3542
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3560
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3598
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3646
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3664
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3790
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3901
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3948
+  NodeDefinitionAutoAdder (Assets\Scripts\Editor/) L3961
+  NodeDefinitionCreator (Assets\Scripts\Editor/) L3989
+  NodeDefinitionEditor (Assets\Scripts\Editor/) L4050
+  NodeDefinitionLibraryEditor (Assets\Scripts\Editor/) L4123
+  NodeDefinitionPostprocessor (Assets\Scripts\Editor/) L4174
+  NodeEffectDrawer (Assets\Scripts\Editor/) L4208
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L4316
+  TileDefinitionEditor (Assets\Scripts\Editor/) L4377
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L4397
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L4432
+  WaveManagerEditor (Assets\Scripts\Editor/) L4569
+  GeneActivationType (Assets\Scripts\PlantSystem\Data/) L4744
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4757
+  LeafData (Assets\Scripts\PlantSystem\Data/) L4765
+  NodeData (Assets\Scripts\PlantSystem\Data/) L4780
+  NodeDefinition (Assets\Scripts\PlantSystem\Data/) L4930
+  InitialNodeConfig (Assets\Scripts\PlantSystem\Data/) L5217
+  NodeEffectData (Assets\Scripts\PlantSystem\Data/) L5240
+  NodeEffectType (Assets\Scripts\PlantSystem\Data/) L5266
+  NodeEffectTypeHelper (Assets\Scripts\PlantSystem\Data/) L5297
+  NodeGraph (Assets\Scripts\PlantSystem\Data/) L5329
+  SeedSpawnData (Assets\Scripts\PlantSystem\Data/) L5338
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L5365
+  OutputNodeEffect (Assets\Scripts\PlantSystem\Growth/) L5606
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L5645
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L5669
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L5914
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L6003
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6361
+  PlantNodeExecutor (Assets\Scripts\PlantSystem\Growth/) L6703
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7006
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7144
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7433
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7500
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7569
+  ItemView (Assets\Scripts\PlantSystem\UI/) L7912
+  NodeCell (Assets\Scripts\PlantSystem\UI/) L8049
+  NodeDraggable (Assets\Scripts\PlantSystem\UI/) L8299
+  NodeEditorGridController (Assets\Scripts\PlantSystem\UI/) L8433
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8788
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L8924
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9233
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9331
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L9432
+  GridSnapStartup (Assets\Scripts\Ticks/) L9670
+  TickDebugMonitor (Assets\Scripts\Ticks/) L9736
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9908
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L9977
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L10208
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L10219
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10248
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10344
+  WaterReflection (Assets\Scripts\Visual\Effects/) L10449
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10846
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10882
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11047
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11195
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11361
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11535
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L11543
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L11570
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11617
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11820
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L11882
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11922
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L11946
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11966
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L12279
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L12291
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L12326
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12501
 
 [WegoSystem]
-  GridEntity (Assets\Scripts\Ticks/) L12661
-  GridPosition (Assets\Scripts\Ticks/) L12815
-  GridPositionManager (Assets\Scripts\Ticks/) L12916
-  GridRadiusUtility (Assets\Scripts\Ticks/) L13272
-  TickConfiguration (Assets\Scripts\Ticks/) L13416
-  ITickUpdateable (Assets\Scripts\Ticks/) L13499
+  RunManager (Assets\Scripts\Core/) L12512
+  GridEntity (Assets\Scripts\Ticks/) L12648
+  GridPosition (Assets\Scripts\Ticks/) L12805
+  GridPositionManager (Assets\Scripts\Ticks/) L12906
+  GridRadiusUtility (Assets\Scripts\Ticks/) L13243
+  TickConfiguration (Assets\Scripts\Ticks/) L13387
+  ITickUpdateable (Assets\Scripts\Ticks/) L13470
+
+[for]
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L13622
 
 ================================================================================
 SCRIPTS
 ================================================================================
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\Events\GameEvent.cs
+
+﻿// Assets/Scripts/Core/Events/GameEvent.cs
+
+pub cls GameEvent : ScriptableObject {
+ro List<IGameEventListener> _listeners = new List<IGameEventListener>();
+
+pub void Raise() {
+for (int i = _listeners.Count - 1; i >= 0; i--) {
+_listeners[i].OnEventRaised();
+}
+}
+
+pub void RegisterListener(IGameEventListener listener) {
+if (!_listeners.Contains(listener)) {
+_listeners.Add(listener);
+}
+}
+
+pub void UnregisterListener(IGameEventListener listener) {
+if (_listeners.Contains(listener)) {
+_listeners.Remove(listener);
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\Events\GameEventListener.cs
+
+﻿// Assets/Scripts/Core/Events/GameEventListener.cs
+
+pub cls GameEventListener : MonoBehaviour, IGameEventListener {
+[SerializeField] GameEvent gameEvent;
+
+[SerializeField] UnityEvent response;
+
+void OnEnable() {
+if (gameEvent != null) {
+gameEvent.RegisterListener(this);
+}
+}
+
+void OnDisable() {
+if (gameEvent != null) {
+gameEvent.UnregisterListener(this);
+}
+}
+
+pub void OnEventRaised() {
+response.Invoke();
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\Events\IGameEventListener.cs
+
+﻿// Assets/Scripts/Core/Events/IGameEventListener.cs
+pub ifc IGameEventListener {
+void OnEventRaised();
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\InitializationManager.cs
+
+﻿// Assets/Scripts/Core/InitializationManager.cs
+using WegoSystem;
+
+pub cls InitializationManager : SingletonMonoBehaviour<InitializationManager> {
+[SerializeField] GameEvent onCoreSystemsInitialized;
+[SerializeField] GameEvent onGameManagersInitialized;
+[SerializeField] GameEvent onGameplaySystemsInitialized;
+
+IEnumerator Start() {
+Debug.Log("[InitializationManager] Starting initialization sequence...");
+
+Debug.Log("[InitializationManager] Phase 1: Initializing Core Systems...");
+onCoreSystemsInitialized.Raise();
+yield ret null; // Wait one frame
+
+Debug.Log("[InitializationManager] Phase 2: Initializing Game Managers...");
+onGameManagersInitialized.Raise();
+yield ret null; // Wait one frame
+
+Debug.Log("[InitializationManager] Phase 3: Initializing Gameplay Systems & UI...");
+onGameplaySystemsInitialized.Raise();
+yield ret null; // Wait one frame
+
+Debug.Log("[InitializationManager] All systems initialized successfully.");
+}
+}
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\PixelPerfectSetup.cs
@@ -183,145 +282,58 @@ Debug.Log($"[PixelPerfectSetup] Expected camera orthographic size: {expectedCame
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Core\RunManager.cs
+// Assets\Scripts\Core\SingletonMonoBehaviour.cs
 
-﻿using System;
-using UnityEngine.Serialization;
-using WegoSystem;
+﻿// Assets/Scripts/Core/SingletonMonoBehaviour.cs
 
-pub enum RunState {
-Planning,
-GrowthAndThreat
+pub abs cls SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour {
+stat T _instance;
+stat ro object _lock = new object();
+stat bool _applicationIsQuitting = false;
+
+pub stat T Instance {
+get {
+if (_applicationIsQuitting) {
+ret null;
 }
 
-pub enum GamePhase {
-Planning,      // Players place nodes/plan strategy
-Execution      // Game executes actions/waves
+lock (_lock) {
+if (_instance == null) {
+_instance = FindFirstObjectByType<T>();
+
+if (_instance == null && Application.isPlaying) {
+Debug.LogWarning($"[Singleton] Instance of '{typeof(T).Name}' not found. A new one will be created.");
+GameObject singletonObject = new GameObject();
+_instance = singletonObject.AddComponent<T>();
+singletonObject.name = $"[Singleton] {typeof(T).Name}";
+}
+}
+ret _instance;
+}
+}
 }
 
-pub cls RunManager : MonoBehaviour {
-pub stat RunManager Instance { get; set; }
+pub stat bool HasInstance => _instance != null;
 
-[SerializeField] WeatherManager weatherManager;
-[SerializeField] WaveManager waveManager;
-
-[SerializeField] RunState currentState = RunState.Planning;
-[SerializeField] GamePhase currentPhase = GamePhase.Planning;
-[SerializeField] int currentRoundNumber = 1;
-[SerializeField] int currentPhaseTicks = 0;
-
-pub RunState CurrentState => currentState;
-pub GamePhase CurrentPhase => currentPhase;
-pub int CurrentRoundNumber => currentRoundNumber;
-pub int CurrentPhaseTicks => currentPhaseTicks;
-
-pub event Action<RunState> OnRunStateChanged;
-pub event Action<GamePhase, GamePhase> OnPhaseChanged;
-pub event Action<int> OnRoundChanged;
-
-void Awake() {
-if (Instance != null && Instance != this) {
-Debug.LogWarning($"[RunManager] Another instance already exists. Destroying this one.", gameObject);
+prot virt void Awake() {
+if (_instance == null) {
+_instance = this as T;
+transform.SetParent(null);
+DontDestroyOnLoad(gameObject);
+}
+else if (_instance != this) {
+Debug.LogWarning($"[Singleton] Another instance of '{typeof(T).Name}' already exists. Destroying duplicate on '{gameObject.name}'.", gameObject);
 Destroy(gameObject);
 return;
 }
-Instance = this;
 
-SetState(RunState.Planning, true);
+OnAwake();
 }
 
-void Start() {
-if (TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(new PhaseTickHandler(this));
-}
-}
+prot virt void OnAwake() { }
 
-void SetState(RunState newState, bool force = false) {
-if (currentState == newState && !force) return;
-
-currentState = newState;
-Debug.Log($"[RunManager] State changed to: {currentState}");
-
-switch (currentState) {
-case RunState.Planning:
-weatherManager?.PauseCycleAtDay();
-SetPhase(GamePhase.Planning);
-break;
-
-case RunState.GrowthAndThreat:
-weatherManager?.ResumeCycle();
-waveManager?.StartWaveForRound(currentRoundNumber);
-SetPhase(GamePhase.Execution);
-break;
-}
-
-OnRunStateChanged?.Invoke(currentState);
-}
-
-void SetPhase(GamePhase newPhase) {
-if (currentPhase == newPhase) return;
-
-GamePhase oldPhase = currentPhase;
-currentPhase = newPhase;
-currentPhaseTicks = 0;
-
-Debug.Log($"[RunManager] Phase changed: {oldPhase} -> {newPhase}");
-OnPhaseChanged?.Invoke(oldPhase, newPhase);
-}
-
-pub void StartGrowthAndThreatPhase() {
-if (currentState == RunState.Planning) {
-Debug.Log($"[RunManager] Starting Growth & Threat for Round {currentRoundNumber}");
-SetState(RunState.GrowthAndThreat);
-}
-}
-
-pub void EndPlanningPhase() {
-if (currentState == RunState.Planning && currentPhase == GamePhase.Planning) {
-SetPhase(GamePhase.Execution);
-StartGrowthAndThreatPhase();
-}
-}
-
-pub void StartNewPlanningPhase() {
-Debug.Log("[RunManager] Starting new planning phase");
-
-if (currentState != RunState.Planning) {
-if (waveManager != null && waveManager.IsCurrentWaveDefeated()) {
-StartNewRound();
-}
-else {
-SetState(RunState.Planning);
-}
-}
-}
-
-void StartNewRound() {
-currentRoundNumber++;
-Debug.Log($"[RunManager] Starting new round: {currentRoundNumber}");
-
-waveManager?.ResetForNewRound();
-SetState(RunState.Planning);
-
-OnRoundChanged?.Invoke(currentRoundNumber);
-}
-
-cls PhaseTickHandler : ITickUpdateable {
-RunManager manager;
-
-pub PhaseTickHandler(RunManager manager) {
-this.manager = manager;
-}
-
-pub void OnTickUpdate(int currentTick) {
-manager.currentPhaseTicks++;
-}
-}
-
-pub void ForcePhase(GamePhase phase) {
-if (Application.isEditor || Debug.isDebugBuild) {
-SetPhase(phase);
-}
+prot virt void OnApplicationQuit() {
+_applicationIsQuitting = true;
 }
 }
 
@@ -428,7 +440,7 @@ return;
 Instance = this;
 }
 
-void Start() {
+pub void Initialize() {
 runManager = RunManager.Instance;
 tickManager = TickManager.Instance;
 
@@ -706,7 +718,7 @@ TickManager.Instance.RegisterTickUpdateable(this);
 }
 }
 
-void Start() {
+pub void Initialize() {
 if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
@@ -715,8 +727,9 @@ EnterPhase(CyclePhase.Day, true);
 }
 
 void OnDestroy() {
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.UnregisterTickUpdateable(this);
 }
 }
 
@@ -1087,9 +1100,13 @@ ValidateComponents();
 void Start() {
 InitializeAnimal();
 
-if (TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
+if (TickManager.Instance == null) {
+Debug.LogError($"[{GetType().Name}] TickManager not found! Disabling component.", this);
+enabled = false;
+return;
 }
+
+TickManager.Instance.RegisterTickUpdateable(this);
 
 if (gridEntity != null) {
 gridEntity.OnPositionChanged += OnGridPositionChanged;
@@ -1185,9 +1202,11 @@ movement.Initialize(this, definition);
 needs.Initialize(this, definition);
 behavior.Initialize(this, definition);
 statusManager.Initialize(this);
+
 if (statusEffectUI != null) {
 statusEffectUI.Initialize(statusManager);
 }
+
 if (GridPositionManager.Instance != null) {
 GridPositionManager.Instance.SnapEntityToGrid(gameObject);
 Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridEntity.Position}");
@@ -2062,7 +2081,8 @@ TickManager.Instance.RegisterTickUpdateable(this);
 }
 
 void OnDestroy() {
-if (TickManager.Instance != null) {
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
 TickManager.Instance.UnregisterTickUpdateable(this);
 }
 
@@ -2379,7 +2399,7 @@ Instance = this;
 ValidateReferences();
 }
 
-void Start() {
+pub void Initialize() {
 if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
@@ -2388,8 +2408,9 @@ TickManager.Instance.RegisterTickUpdateable(this);
 void OnDestroy() {
 if (Instance == this) Instance = null;
 
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.UnregisterTickUpdateable(this);
 }
 
 CleanupVisualizers();
@@ -2963,252 +2984,23 @@ pub FoodCategory category = FoodCategory.Other;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Management\EcosystemManager.cs
 
-﻿using UnityEngine;
+﻿// Assets/Scripts/Ecosystem/Management/EcosystemManager.cs
+using WegoSystem;
 
-pub cls EcosystemManager : MonoBehaviour {
-pub stat EcosystemManager Instance { get; set; }
-
+pub cls EcosystemManager : SingletonMonoBehaviour<EcosystemManager> {
 pub Transform animalParent;
 pub Transform plantParent;
 
-pub ScentLibrary scentLibrary; // <<< ADDED
+pub ScentLibrary scentLibrary;
 
 pub bool sortAnimalsBySpecies = true;
 pub bool sortPlantsBySpecies = true;
 
-void Awake() {
-if (Instance != null && Instance != this) {
-Destroy(gameObject);
-return;
-}
-Instance = this;
-
+prot ovr void OnAwake() {
 if (scentLibrary == null) {
 Debug.LogWarning($"[{nameof(EcosystemManager)}] Scent Library not assigned! Scent effects will not work.", this);
 }
 }
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\Ecosystem\Management\FaunaManager.cs
-
-﻿using UnityEngine;
-
-pub cls FaunaManager : MonoBehaviour {
-[SerializeField] Vector2 spawnCenter = Vector2.zero;
-[SerializeField] Vector2 spawnAreaSize = new Vector2(20f, 10f);
-
-[SerializeField] Transform ecosystemParent;
-[SerializeField][Min(0f)] float screenBoundsPadding = 0.5f;
-[SerializeField][Min(0f)] float offscreenSpawnMargin = 2.0f;
-
-[SerializeField] bool showBoundsGizmos = false;
-
-[SerializeField][Range(-10f, 10f)] float boundsOffsetX = 0f;
-[SerializeField][Range(-10f, 10f)] float boundsOffsetY = 0f;
-
-List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
-Camera mainCamera; // Ensure this is assigned or found
-
-void Start() {
-InitializeManager();
-}
-
-void InitializeManager() {
-activeSpawnCoroutines.Clear();
-if (WaveManager.Instance != null) mainCamera = WaveManager.Instance.GetMainCamera();
-if (mainCamera == null) mainCamera = Camera.main;
-if (mainCamera == null) Debug.LogError("[FaunaManager] Cannot find Main Camera!", this);
-
-if (ecosystemParent == null) {
-if (EcosystemManager.Instance != null && EcosystemManager.Instance.animalParent != null) {
-ecosystemParent = EcosystemManager.Instance.animalParent;
-Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned from EcosystemManager.animalParent.", this);
-}
-else {
-ecosystemParent = transform;
-Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned to self as fallback.", this);
-}
-}
-}
-
-pub void ExecuteSpawnWave(WaveDefinition waveDef) {
-if (waveDef == null) { Debug.LogError("[FaunaManager] ExecuteSpawnWave called with null WaveDefinition!", this); return; }
-if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; }
-
-Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'");
-StopAllSpawnCoroutines(); // Ensures only one waveDef's entries are spawning at a time from this manager
-
-foreach (WaveSpawnEntry entry in waveDef.spawnEntries) {
-if (entry.animalDefinition == null) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', null AnimalDefinition for wave '{waveDef.waveName}'."); continue; }
-if (entry.spawnCount <= 0) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', Spawn Count <= 0 for wave '{waveDef.waveName}'."); continue; }
-
-if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
-Debug.Log($"[FaunaManager] Halting further spawn entry processing for wave '{waveDef.waveName}', RunManager not in GrowthAndThreat state.");
-break; // Don't start new coroutines if not in the correct game state
-}
-
-WaveSpawnEntry currentEntry = entry; // Closure capture
-Coroutine spawnCoroutine = StartCoroutine(SpawnWaveEntryCoroutine(currentEntry, waveDef.waveName));
-activeSpawnCoroutines.Add(spawnCoroutine);
-}
-Debug.Log($"[FaunaManager] Started {activeSpawnCoroutines.Count} spawn entry coroutine(s) for '{waveDef.waveName}'.");
-}
-
-pub void StopAllSpawnCoroutines() {
-if (activeSpawnCoroutines.Count > 0) {
-Debug.Log($"[FaunaManager] Stopping all ({activeSpawnCoroutines.Count}) active spawn coroutines.");
-foreach (Coroutine co in activeSpawnCoroutines) {
-if (co != null) StopCoroutine(co);
-}
-activeSpawnCoroutines.Clear();
-}
-}
-
-IEnumerator SpawnWaveEntryCoroutine(WaveSpawnEntry entry, string waveNameForDebug) {
-if (entry.delayAfterSpawnTime > 0) {
-yield ret new WaitForSeconds(entry.delayAfterSpawnTime);
-}
-
-for (int i = 0; i < entry.spawnCount; i++) {
-if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
-Debug.Log($"[FaunaManager] Halting spawn for entry '{entry.description}' in wave '{waveNameForDebug}', RunManager no longer in GrowthAndThreat state.");
-break; // Exit loop if game state changed
-}
-
-Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius);
-bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen;
-GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen);
-
-if (entry.spawnInterval > 0 && i < entry.spawnCount - 1) // Don't wait after the last one {
-yield ret new WaitForSeconds(entry.spawnInterval);
-}
-}
-}
-
-Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius) {
-if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera for CalculateSpawnPosition!"); ret spawnCenter; }
-
-Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-
-Vector2 spawnPos = Vector2.zero;
-float camHeight = mainCamera.orthographicSize * 2f;
-float camWidth = camHeight * mainCamera.aspect;
-
-switch (locationType) {
-case WaveSpawnLocationType.Offscreen:
-float marginMinX = effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin;
-float marginMaxX = effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin;
-float marginMinY = effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin;
-float marginMaxY = effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin;
-float extraOffset = 0.1f;
-int edge = Random.Range(0, 4);
-if (edge == 0) { spawnPos.x = marginMinX - extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
-else if (edge == 1) { spawnPos.x = marginMaxX + extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
-else if (edge == 2) { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMinY - extraOffset; }
-else { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMaxY + extraOffset; }
-break;
-
-case WaveSpawnLocationType.RandomNearPlayer:
-Transform playerT = FindPlayerTransform();
-if (playerT != null) {
-spawnPos = (Vector2)playerT.position + Random.insideUnitCircle * radius;
-} else {
-Debug.LogWarning("[FaunaManager] Player not found for RandomNearPlayer. Falling back to Global.");
-goto case WaveSpawnLocationType.GlobalSpawnArea;
-}
-break;
-
-case WaveSpawnLocationType.GlobalSpawnArea:
-default:
-spawnPos.x = effectiveCamPos.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
-spawnPos.y = effectiveCamPos.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
-break;
-}
-ret spawnPos;
-}
-
-Transform FindPlayerTransform() {
-GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
-if (playerGO != null) ret playerGO.transform;
-
-PlayerTileInteractor pti = FindAnyObjectByType<PlayerTileInteractor>();
-if (pti != null) ret pti.transform;
-
-GardenerController gc = FindAnyObjectByType<GardenerController>();
-if (gc != null) ret gc.transform;
-
-ret null;
-}
-
-GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn) {
-if (definition == null || definition.prefab == null) {
-Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab.");
-ret null;
-}
-
-if (mainCamera == null) {
-Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!");
-ret null;
-}
-
-Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-
-Vector2 minPaddedBounds, maxPaddedBounds;
-float camHeight = mainCamera.orthographicSize * 2f;
-float camWidth = camHeight * mainCamera.aspect;
-
-minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
-maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
-minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
-maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
-
-GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
-
-if (ecosystemParent != null) {
-Transform speciesParent = ecosystemParent;
-if (EcosystemManager.Instance != null && EcosystemManager.Instance.sortAnimalsBySpecies && !string.IsNullOrEmpty(definition.animalName)) {
-speciesParent = ecosystemParent.Find(definition.animalName);
-if (speciesParent == null) {
-GameObject subParentGO = new GameObject(definition.animalName);
-subParentGO.transform.SetParent(ecosystemParent);
-speciesParent = subParentGO.transform;
-}
-}
-animalObj.transform.SetParent(speciesParent);
-}
-
-AnimalController controller = animalObj.GetComponent<AnimalController>();
-if (controller != null) {
-if (isOffscreenSpawn) {
-Vector2 screenCenter = (minPaddedBounds + maxPaddedBounds) / 2f;
-controller.SetSeekingScreenCenter(screenCenter, minPaddedBounds, maxPaddedBounds);
-}
-}
-else {
-Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj);
-}
-
-ret animalObj;
-}
-
-void OnDrawGizmos() {
-if (!showBoundsGizmos || mainCamera == null) return;
-Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-float camHeight = mainCamera.orthographicSize * 2f;
-float camWidth = camHeight * mainCamera.aspect;
-Vector2 paddedMin = new Vector2(effectiveCamPos.x - camWidth / 2f + screenBoundsPadding, effectiveCamPos.y - camHeight / 2f + screenBoundsPadding);
-Vector2 paddedMax = new Vector2(effectiveCamPos.x + camWidth / 2f - screenBoundsPadding, effectiveCamPos.y + camHeight / 2f - screenBoundsPadding);
-DrawWireRectangleGizmo(paddedMin, paddedMax, Color.green);
-Vector2 marginMin = new Vector2(effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin, effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin);
-Vector2 marginMax = new Vector2(effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin, effectiveCamPos.y + camHeight / 2f - offscreenSpawnMargin);
-DrawWireRectangleGizmo(marginMin, marginMax, Color.red);
-}
-
-void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { Gizmos.color = color; Gizmos.DrawLine(new Vector3(min.x, min.y, 0), new Vector3(max.x, min.y, 0)); Gizmos.DrawLine(new Vector3(max.x, min.y, 0), new Vector3(max.x, max.y, 0)); Gizmos.DrawLine(new Vector3(max.x, max.y, 0), new Vector3(min.x, max.y, 0)); Gizmos.DrawLine(new Vector3(min.x, max.y, 0), new Vector3(min.x, min.y, 0)); }
 }
 
 ////////////////////////////////////////////////////////////
@@ -3400,7 +3192,7 @@ pub int TrackedPlantCount => trackedPlants.Count;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Management\WaveManager.cs
 
-﻿using System.Collections;
+﻿// Assets/Scripts/Ecosystem/Management/WaveManager.cs
 using TMPro;
 using WegoSystem;
 
@@ -3417,9 +3209,9 @@ pub stat WaveManager Instance { get; set; }
 [SerializeField] FaunaManager faunaManager;
 [SerializeField] List<WaveDefinition> wavesSequence;
 
-[SerializeField] int waveDurationInDays = 1; // Default: one wave per full day/night cycle
-[SerializeField] float spawnTimeNormalized = 0.1f; // When in the wave to start spawning (0-1)
-[SerializeField] bool continuousSpawning = false; // If true, spawns throughout the wave
+[SerializeField] int waveDurationInDays = 1;
+[SerializeField] float spawnTimeNormalized = 0.1f;
+[SerializeField] bool continuousSpawning = false;
 
 [SerializeField] bool deletePreviousWaveAnimals = true;
 
@@ -3450,21 +3242,36 @@ Instance = this;
 ValidateReferences();
 }
 
-void Start() {
+pub void Initialize() {
 if (TickManager.Instance != null) {
 TickManager.Instance.OnTickAdvanced += OnTickAdvanced;
+Debug.Log("[WaveManager] Initialized and subscribed to TickManager events.");
+}
+else {
+Debug.LogError("[WaveManager] Initialization failed: TickManager not found!");
 }
 }
 
 void OnDestroy() {
-if (TickManager.Instance != null) {
-TickManager.Instance.OnTickAdvanced -= OnTickAdvanced;
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.OnTickAdvanced -= OnTickAdvanced;
 }
 StopAllCoroutines();
 }
 
 void ValidateReferences() {
-if (faunaManager == null) Debug.LogError("[WaveManager] FaunaManager missing!", this);
+if (faunaManager == null) {
+faunaManager = FindAnyObjectByType<FaunaManager>();
+if (faunaManager != null) {
+Debug.LogWarning("[WaveManager] FaunaManager was not assigned in the Inspector. Found it automatically.", this);
+}
+}
+
+if (faunaManager == null) {
+Debug.LogError("[WaveManager] CRITICAL: FaunaManager is missing and could not be found in the scene! Waves will not spawn.", this);
+}
+
 if (wavesSequence == null || wavesSequence.Count == 0)
 Debug.LogWarning("[WaveManager] Wave Sequence empty. No waves will spawn.", this);
 }
@@ -3752,7 +3559,7 @@ Instance = this;
 BuildLookups();
 }
 
-void Start() {
+pub void Initialize() {
 if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
@@ -3764,9 +3571,11 @@ PlayerActionManager.Instance.OnActionExecuted += HandlePlayerAction;
 void OnDestroy() {
 if (Instance == this) Instance = null;
 
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.UnregisterTickUpdateable(this);
 }
+
 if (PlayerActionManager.Instance != null) {
 PlayerActionManager.Instance.OnActionExecuted -= HandlePlayerAction;
 }
@@ -4103,12 +3912,13 @@ void OnDestroy() { foreach(var instance in activeEffects){if(instance.visualEffe
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Status Effects\StatusEffectUIManager.cs
 
-﻿// Assets/Scripts/Ecosystem/StatusEffects/StatusEffectUIManager.cs
+﻿// Assets/Scripts/Ecosystem/Status Effects/StatusEffectUIManager.cs
 using TMPro;
+using WegoSystem;
 
 pub cls StatusEffectUIManager : MonoBehaviour {
-[SerializeField] Transform effectIconContainer; // Set this in prefab
-[SerializeField] GameObject effectIconPrefab; // Simple UI icon prefab
+[SerializeField] Transform effectIconContainer;
+[SerializeField] GameObject effectIconPrefab;
 
 StatusEffectManager statusManager;
 Dictionary<string, StatusEffectIconUI> activeIcons = new Dictionary<string, StatusEffectIconUI>();
@@ -4213,7 +4023,8 @@ effectIconPrefab.SetActive(false);
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\UI\ThoughtBubbleController.cs
 
-﻿using UnityEngine;
+﻿// Assets/Scripts/Ecosystem/UI/ThoughtBubbleController.cs
+
 using TMPro;
 using WegoSystem;
 
@@ -4222,18 +4033,28 @@ pub TMP_Text messageText;
 
 float lifetimeTicks;
 Transform followTarget;
+TickManager _tickManagerInstance; // Cached instance
+
+void Start() {
+_tickManagerInstance = TickManager.Instance;
+if (_tickManagerInstance == null) {
+Debug.LogWarning($"[{GetType().Name}] TickManager not found! Lifetime will use a fallback duration.", this);
+}
+}
 
 pub void Initialize(string message, Transform target, float durationInTicks) {
 if (messageText != null)
 messageText.text = message;
+
 followTarget = target;
 lifetimeTicks = durationInTicks;
 }
 
 void Update() {
-if (TickManager.Instance?.Config != null) {
-lifetimeTicks -= TickManager.Instance.Config.ticksPerRealSecond * Time.deltaTime;
-} else {
+if (_tickManagerInstance?.Config != null) {
+lifetimeTicks -= _tickManagerInstance.Config.ticksPerRealSecond * Time.deltaTime;
+}
+else {
 lifetimeTicks -= 2f * Time.deltaTime;
 }
 
@@ -6240,7 +6061,7 @@ if (leafCount <= 0) {
 return;
 }
 
-float sunlight = 1f; // Default to full sunlight
+float sunlight = 0f; // Default to NO sunlight if manager is unavailable
 if (WeatherManager.Instance != null) {
 sunlight = WeatherManager.Instance.sunIntensity;
 }
@@ -6414,17 +6235,22 @@ outlineController.gameObject.SetActive(false);
 }
 
 void Start() {
-if (TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
+if (TickManager.Instance == null) {
+Debug.LogError($"[{GetType().Name}] TickManager not found! Disabling component.", this);
+enabled = false;
+return;
 }
+
+TickManager.Instance.RegisterTickUpdateable(this);
 VisualManager.UpdateUI();
 }
 
 void OnDestroy() {
 AllActivePlants.Remove(this);
 
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.UnregisterTickUpdateable(this);
 }
 
 if (PlantGrowthModifierManager.Instance != null) {
@@ -9610,7 +9436,17 @@ shadowPartMap.Remove(plantPartRenderer);
 }
 
 void OnDestroy() {
-shadowPartMap.Clear(); // Prevent memory leaks
+foreach (var kvp in shadowPartMap) {
+if (kvp.Value != null) {
+if (Application.isPlaying) {
+Destroy(kvp.Value.gameObject);
+}
+else {
+DestroyImmediate(kvp.Value.gameObject);
+}
+}
+}
+shadowPartMap.Clear(); // Prevent memory leaks from the dictionary itself
 }
 }
 
@@ -11088,6 +10924,7 @@ return;
 }
 
 if (Application.isEditor && !Application.isPlaying) {
+if (localShowDebugInfo) {
 bool localMaterialNeeded = enableDistanceFade && (!overrides.gradientFadeBaseMaterial || localGradientFadeBaseMaterial == null);
 bool globalMaterialMightBeUsed = enableDistanceFade && !overrides.gradientFadeBaseMaterial && localGradientFadeBaseMaterial == null;
 
@@ -11096,6 +10933,7 @@ Debug.LogWarning($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Dis
 }
 else if (globalMaterialMightBeUsed) // Inform that global will be used if local isn't set {
 Debug.Log($"[WaterReflection OnValidate] '{gameObject.name}': 'Enable Distance Fade' is true. If 'Local Gradient Fade Base Material' remains unassigned and ovr is false, the global default from WaterReflectionManager will be used in Play mode.", this);
+}
 }
 
 if (reflectionRenderer != null && originalRenderer != null) {
@@ -11200,7 +11038,7 @@ Instance = this;
 BuildModifierLookup();
 }
 
-void Start() {
+pub void Initialize() {
 if (tileInteractionManager == null) {
 tileInteractionManager = TileInteractionManager.Instance;
 if (tileInteractionManager == null && showDebugMessages) {
@@ -11217,8 +11055,9 @@ Debug.LogError("[PlantGrowthModifierManager] TickManager not found! Modifiers wi
 }
 
 void OnDestroy() {
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.UnregisterTickUpdateable(this);
 }
 }
 
@@ -11357,7 +11196,7 @@ Instance = this;
 RebuildInvalidTilesSet();
 }
 
-void Start() {
+pub void Initialize() {
 if (plantParent == null && EcosystemManager.Instance != null) plantParent = EcosystemManager.Instance.plantParent;
 if (tileInteractionManager == null) tileInteractionManager = TileInteractionManager.Instance;
 if (growthModifierManager == null) growthModifierManager = PlantGrowthModifierManager.Instance;
@@ -11390,8 +11229,12 @@ ret !invalidTilesSet.Contains(tileDef);
 
 pub void CleanupDestroyedPlants() {
 List<Vector3Int> keysToRemove = plantsByGridPosition.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key).ToList();
-foreach (var key in keysToRemove) plantsByGridPosition.Remove(key);
-if (showDebugMessages && keysToRemove.Count > 0) Debug.Log($"PPM: Removed {keysToRemove.Count} destroyed plant refs.");
+foreach (var key in keysToRemove) {
+plantsByGridPosition.Remove(key);
+}
+if (showDebugMessages && keysToRemove.Count > 0) {
+Debug.Log($"PPM: Removed {keysToRemove.Count} destroyed plant refs.");
+}
 }
 
 pub bool TryPlantSeed(Vector3Int gridPosition, Vector3 worldPosition) {
@@ -11428,19 +11271,21 @@ if (showDebugMessages) Debug.Log($"Failed to plant seed (from seed slot) at {gri
 ret false;
 }
 
-pub bool TryPlantSeedFromInventory(InventoryBarItem seedItem, Vector3Int      gridPosition, Vector3         worldPosition) {
-if (seedItem == null || !seedItem.IsSeed())                     ret false;
-if (IsPositionOccupied(gridPosition))                           ret false;
+pub bool TryPlantSeedFromInventory(InventoryBarItem seedItem, Vector3Int gridPosition, Vector3 worldPosition) {
+if (seedItem == null || !seedItem.IsSeed()) ret false;
+
+CleanupDestroyedPlants(); // Clean up before checking occupation
+if (IsPositionOccupied(gridPosition)) ret false;
 
 TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
-if (!IsTileValidForPlanting(tileDef))                           ret false;
-if (nodeExecutor == null)                                       ret false;
+if (!IsTileValidForPlanting(tileDef)) ret false;
+if (nodeExecutor == null) ret false;
 
-Vector3  spawnPos  = GetRandomizedPlantingPosition(worldPosition);
+Vector3 spawnPos = GetRandomizedPlantingPosition(worldPosition);
 GameObject plantGO = nodeExecutor.SpawnPlantFromInventorySeed(
 seedItem.NodeData, spawnPos, plantParent);
 
-if (plantGO == null)                                            ret false;
+if (plantGO == null) ret false;
 
 plantsByGridPosition[gridPosition] = plantGO;
 
@@ -11683,9 +11528,11 @@ if (animator == null && useAnimations) Debug.LogWarning("[GardenerController] An
 
 void Start() {
 statusManager.Initialize(this);
+
 if (statusEffectUI != null) {
 statusEffectUI.Initialize(statusManager);
 }
+
 if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
 }
@@ -11695,9 +11542,11 @@ gridEntity.OnPositionChanged += OnGridPositionChanged;
 }
 
 void OnDestroy() {
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.UnregisterTickUpdateable(this);
 }
+
 if (gridEntity != null) {
 gridEntity.OnPositionChanged -= OnGridPositionChanged;
 }
@@ -11853,7 +11702,7 @@ pub cls HungerUI : MonoBehaviour {
 
 void Start() {
 if (playerHungerSystem == null) {
-GardenerController player = FindObjectOfType<GardenerController>();
+GardenerController player = FindAnyObjectByType<GardenerController>();
 if (player != null) {
 playerHungerSystem = player.GetComponent<PlayerHungerSystem>();
 }
@@ -12120,8 +11969,9 @@ Debug.LogError("[PlayerHungerSystem] TickManager not found! Hunger will not depl
 }
 
 void OnDestroy() {
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.UnregisterTickUpdateable(this);
 }
 }
 
@@ -12247,9 +12097,7 @@ using WegoSystem;
 using UnityEditor;
 #endif
 
-pub cls TileInteractionManager : MonoBehaviour, ITickUpdateable {
-pub stat TileInteractionManager Instance { get; set; }
-
+pub cls TileInteractionManager : SingletonMonoBehaviour<TileInteractionManager>, ITickUpdateable {
 pub cls TileDefinitionMapping {
 pub TileDefinition tileDef;
 pub DualGridTilemapModule tilemapModule;
@@ -12284,9 +12132,7 @@ Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, T
 SpriteRenderer hoverSpriteRenderer;
 bool isWithinInteractionRange = false;
 
-void Awake() {
-if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-Instance = this;
+prot ovr void OnAwake() {
 SetupTilemaps();
 CacheHoverSpriteRenderer();
 }
@@ -12296,8 +12142,11 @@ if (TickManager.Instance != null) TickManager.Instance.RegisterTickUpdateable(th
 }
 
 void OnDestroy() {
-if (TickManager.Instance != null) TickManager.Instance.UnregisterTickUpdateable(this);
-if (Instance == this) Instance = null;
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.UnregisterTickUpdateable(this);
+}
+
 }
 
 void OnDisable() {
@@ -12426,7 +12275,9 @@ if (state.ticksRemaining <= 0) {
 if (cellsToRevert == null) cellsToRevert = new List<Vector3Int>();
 cellsToRevert.Add(cellPos);
 }
-else { timedCells[cellPos] = state; }
+else {
+timedCells[cellPos] = state;
+}
 }
 if (cellsToRevert != null) {
 foreach (var cellPos in cellsToRevert) {
@@ -12485,14 +12336,19 @@ if (mainCamera == null || player == null) return;
 Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
 mouseWorldPos.z = 0f;
 Vector3Int cellPos = WorldToCell(mouseWorldPos);
+
 GridEntity playerGrid = player.GetComponent<GridEntity>();
 if (playerGrid == null) return;
+
 int gridRadius = Mathf.CeilToInt(hoverRadius);
 GridPosition playerGridPos = playerGrid.Position;
 GridPosition hoveredGridPos = new GridPosition(cellPos.x, cellPos.y);
+
 isWithinInteractionRange = GridRadiusUtility.IsWithinCircleRadius(hoveredGridPos, playerGridPos, gridRadius);
+
 hoveredTileDef = FindWhichTileDefinitionAt(cellPos);
 currentlyHoveredCell = cellPos;
+
 if (hoverHighlightObject != null) {
 hoverHighlightObject.SetActive(true);
 hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
@@ -12519,7 +12375,9 @@ if (currentToolText != null) {
 if (InventoryBarController.Instance?.SelectedItem != null) {
 currentToolText.text = $"Selected: {InventoryBarController.Instance.SelectedItem.GetDisplayName()}";
 }
-else { currentToolText.text = "Nothing Selected"; }
+else {
+currentToolText.text = "Nothing Selected";
+}
 }
 }
 
@@ -12774,6 +12632,142 @@ HarvestPouch // <<< NEW
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\RunManager.cs
+
+﻿// Assets/Scripts/Core/RunManager.cs
+using WegoSystem;
+
+namespace WegoSystem {
+pub enum RunState {
+Planning,
+GrowthAndThreat
+}
+
+pub enum GamePhase {
+Planning,
+Execution
+}
+
+pub cls RunManager : SingletonMonoBehaviour<RunManager> {
+
+[SerializeField] RunState currentState = RunState.Planning;
+[SerializeField] GamePhase currentPhase = GamePhase.Planning;
+[SerializeField] int currentRoundNumber = 1;
+[SerializeField] int currentPhaseTicks = 0;
+
+pub RunState CurrentState => currentState;
+pub GamePhase CurrentPhase => currentPhase;
+pub int CurrentRoundNumber => currentRoundNumber;
+pub int CurrentPhaseTicks => currentPhaseTicks;
+
+pub event Action<RunState> OnRunStateChanged;
+pub event Action<GamePhase, GamePhase> OnPhaseChanged;
+pub event Action<int> OnRoundChanged;
+
+prot ovr void OnAwake() {
+SetState(RunState.Planning, true);
+}
+
+pub void Initialize() {
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(new PhaseTickHandler(this));
+}
+else {
+Debug.LogError("[RunManager] Initialization failed: TickManager not found!");
+}
+}
+
+void SetState(RunState newState, bool force = false) {
+if (currentState == newState && !force) return;
+
+currentState = newState;
+Debug.Log($"[RunManager] State changed to: {currentState}");
+
+switch (currentState) {
+case RunState.Planning:
+WeatherManager.Instance?.PauseCycleAtDay();
+SetPhase(GamePhase.Planning);
+break;
+
+case RunState.GrowthAndThreat:
+WeatherManager.Instance?.ResumeCycle();
+WaveManager.Instance?.StartWaveForRound(currentRoundNumber);
+SetPhase(GamePhase.Execution);
+break;
+}
+
+OnRunStateChanged?.Invoke(currentState);
+}
+
+void SetPhase(GamePhase newPhase) {
+if (currentPhase == newPhase) return;
+
+GamePhase oldPhase = currentPhase;
+currentPhase = newPhase;
+currentPhaseTicks = 0;
+
+Debug.Log($"[RunManager] Phase changed: {oldPhase} -> {newPhase}");
+OnPhaseChanged?.Invoke(oldPhase, newPhase);
+}
+
+pub void StartGrowthAndThreatPhase() {
+if (currentState == RunState.Planning) {
+Debug.Log($"[RunManager] Starting Growth & Threat for Round {currentRoundNumber}");
+SetState(RunState.GrowthAndThreat);
+}
+}
+
+pub void EndPlanningPhase() {
+if (currentState == RunState.Planning && currentPhase == GamePhase.Planning) {
+SetPhase(GamePhase.Execution);
+StartGrowthAndThreatPhase();
+}
+}
+
+pub void StartNewPlanningPhase() {
+Debug.Log("[RunManager] Starting new planning phase");
+
+if (currentState != RunState.Planning) {
+if (WaveManager.Instance != null && WaveManager.Instance.IsCurrentWaveDefeated()) {
+StartNewRound();
+}
+else {
+SetState(RunState.Planning);
+}
+}
+}
+
+void StartNewRound() {
+currentRoundNumber++;
+Debug.Log($"[RunManager] Starting new round: {currentRoundNumber}");
+
+WaveManager.Instance?.ResetForNewRound();
+SetState(RunState.Planning);
+
+OnRoundChanged?.Invoke(currentRoundNumber);
+}
+
+cls PhaseTickHandler : ITickUpdateable {
+RunManager manager;
+
+pub PhaseTickHandler(RunManager manager) {
+this.manager = manager;
+}
+
+pub void OnTickUpdate(int currentTick) {
+manager.currentPhaseTicks++;
+}
+}
+
+pub void ForcePhase(GamePhase phase) {
+if (Application.isEditor || Debug.isDebugBuild) {
+SetPhase(phase);
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridEntity.cs
 
 ﻿// Assets/Scripts/Ticks/GridEntity.cs
@@ -12827,7 +12821,10 @@ previousGridPosition = gridPosition;
 }
 
 prot virt void OnDestroy() {
-GridPositionManager.Instance?.UnregisterEntity(this);
+var gridManager = GridPositionManager.Instance;
+if (gridManager != null) {
+gridManager.UnregisterEntity(this);
+}
 }
 
 prot virt void Update() {
@@ -13031,28 +13028,20 @@ ret $"({x}, {y})";
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridPositionManager.cs
 
-﻿using System;
+﻿// Assets/Scripts/Ticks/GridPositionManager.cs
+using UnityEngine.Tilemaps;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace WegoSystem {
-pub cls GridPositionManager : MonoBehaviour {
-pub stat GridPositionManager Instance { get; set; }
-
+pub cls GridPositionManager : SingletonMonoBehaviour<GridPositionManager> {
 [SerializeField] TileInteractionManager tileInteractionManager;
 
 Grid _tilemapGrid;
 
-Grid TilemapGrid {
-get {
-if (_tilemapGrid == null) {
-SyncWithTileGrid(); // Attempt to sync again if it's null
-}
-ret _tilemapGrid;
-}
-}
+Grid TilemapGrid => _tilemapGrid;
 
 [SerializeField] Vector2Int gridBounds = new Vector2Int(100, 100);
 
@@ -13064,38 +13053,27 @@ ret _tilemapGrid;
 ro Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
 ro HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
 
-void Awake() {
-if (Instance != null && Instance != this) {
-Destroy(gameObject);
-return;
-}
-Instance = this;
-
-SyncWithTileGrid();
-}
-
 void OnDestroy() {
 if (Instance == this) {
-Instance = null;
 }
+}
+
+pub void Initialize() {
+SyncWithTileGrid();
 }
 
 pub void SyncWithTileGrid() {
 if (tileInteractionManager != null && tileInteractionManager.interactionGrid != null) {
 this._tilemapGrid = tileInteractionManager.interactionGrid;
-if (debugMode) {
-Debug.Log($"[GridPositionManager] Synced with assigned TileInteractionManager's grid: '{this._tilemapGrid.name}'.");
-}
-return; // Success
+if (debugMode) Debug.Log($"[GridPositionManager] Synced with assigned TileInteractionManager's grid: '{this._tilemapGrid.name}'.");
+return;
 }
 
 if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null) {
 this._tilemapGrid = TileInteractionManager.Instance.interactionGrid;
 tileInteractionManager = TileInteractionManager.Instance;
-if (debugMode) {
-Debug.Log($"[GridPositionManager] Synced with singleton TileInteractionManager.Instance's grid: '{this._tilemapGrid.name}'.");
-}
-return; // Success
+if (debugMode) Debug.Log($"[GridPositionManager] Synced with singleton TileInteractionManager.Instance's grid: '{this._tilemapGrid.name}'.");
+return;
 }
 
 if (_tilemapGrid == null) {
@@ -13354,7 +13332,7 @@ ret result;
 }
 
 void OnDrawGizmos() {
-if (!showGridGizmos || TilemapGrid == null) return;
+if (!showGridGizmos || _tilemapGrid == null) return;
 
 Gizmos.color = gridColor;
 
@@ -13614,16 +13592,14 @@ animalHungerTickInterval = 3;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\TickManager.cs
 
-﻿// Assets\Scripts\Ticks\TickManager.cs
+﻿// Assets/Scripts/Ticks/TickManager.cs
 
-ns WegoSystem {
+namespace WegoSystem {
 pub ifc ITickUpdateable {
 void OnTickUpdate(int currentTick);
 }
 
-pub cls TickManager : MonoBehaviour {
-pub stat TickManager Instance { get; set; }
-
+pub cls TickManager : SingletonMonoBehaviour<TickManager> {
 [SerializeField] TickConfiguration tickConfig;
 [SerializeField] bool debugMode = false;
 [SerializeField] int currentTick = 0;
@@ -13640,14 +13616,7 @@ ro List<ITickUpdateable> pendingAdditions = new List<ITickUpdateable>();
 ro List<ITickUpdateable> pendingRemovals = new List<ITickUpdateable>();
 bool isProcessingTick = false;
 
-void Awake() {
-if (Instance != null && Instance != this) {
-Destroy(gameObject);
-return;
-}
-
-Instance = this;
-
+prot ovr void OnAwake() {
 if (tickConfig == null) {
 Debug.LogError("[TickManager] No TickConfiguration assigned! Creating default config.");
 tickConfig = ScriptableObject.CreateInstance<TickConfiguration>();
@@ -13656,7 +13625,6 @@ tickConfig = ScriptableObject.CreateInstance<TickConfiguration>();
 
 void OnDestroy() {
 if (Instance == this) {
-Instance = null;
 }
 }
 
@@ -13771,4 +13739,229 @@ pub int GetRegisteredUpdateableCount() {
 ret tickUpdateables.Count;
 }
 }
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Ecosystem\Management\FaunaManager.cs
+
+﻿// Assets/Scripts/Ecosystem/Management/FaunaManager.cs
+
+using WegoSystem; // Correctly referencing the ns for RunManager
+
+pub cls FaunaManager : MonoBehaviour {
+[SerializeField] Vector2 spawnCenter = Vector2.zero;
+[SerializeField] Vector2 spawnAreaSize = new Vector2(20f, 10f);
+
+[SerializeField] Transform ecosystemParent;
+[SerializeField] [Min(0f)] float screenBoundsPadding = 0.5f;
+[SerializeField] [Min(0f)] float offscreenSpawnMargin = 2.0f;
+
+[SerializeField] bool showBoundsGizmos = false;
+
+[SerializeField] [Range(-10f, 10f)] float boundsOffsetX = 0f;
+[SerializeField] [Range(-10f, 10f)] float boundsOffsetY = 0f;
+
+List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
+Camera mainCamera; // Ensure this is assigned or found
+
+pub void Initialize() {
+InitializeManager();
+}
+
+void InitializeManager() {
+activeSpawnCoroutines.Clear();
+if (WaveManager.Instance != null) mainCamera = WaveManager.Instance.GetMainCamera();
+if (mainCamera == null) mainCamera = Camera.main;
+if (mainCamera == null) Debug.LogError("[FaunaManager] Cannot find Main Camera!", this);
+
+if (ecosystemParent == null) {
+if (EcosystemManager.Instance != null && EcosystemManager.Instance.animalParent != null) {
+ecosystemParent = EcosystemManager.Instance.animalParent;
+Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned from EcosystemManager.animalParent.", this);
+}
+else {
+ecosystemParent = transform;
+Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned to self as fallback.", this);
+}
+}
+}
+
+pub void ExecuteSpawnWave(WaveDefinition waveDef) {
+if (waveDef == null) { Debug.LogError("[FaunaManager] ExecuteSpawnWave called with null WaveDefinition!", this); return; }
+if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; }
+
+Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'");
+StopAllSpawnCoroutines(); // Ensures only one waveDef's entries are spawning at a time from this manager
+
+foreach (WaveSpawnEntry entry in waveDef.spawnEntries) {
+if (entry.animalDefinition == null) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', null AnimalDefinition for wave '{waveDef.waveName}'."); continue; }
+if (entry.spawnCount <= 0) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', Spawn Count <= 0 for wave '{waveDef.waveName}'."); continue; }
+
+if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
+Debug.Log($"[FaunaManager] Halting further spawn entry processing for wave '{waveDef.waveName}', RunManager not in GrowthAndThreat state.");
+break; // Don't start new coroutines if not in the correct game state
+}
+
+WaveSpawnEntry currentEntry = entry; // Closure capture
+Coroutine spawnCoroutine = StartCoroutine(SpawnWaveEntryCoroutine(currentEntry, waveDef.waveName));
+activeSpawnCoroutines.Add(spawnCoroutine);
+}
+Debug.Log($"[FaunaManager] Started {activeSpawnCoroutines.Count} spawn entry coroutine(s) for '{waveDef.waveName}'.");
+}
+
+pub void StopAllSpawnCoroutines() {
+if (activeSpawnCoroutines.Count > 0) {
+Debug.Log($"[FaunaManager] Stopping all ({activeSpawnCoroutines.Count}) active spawn coroutines.");
+foreach (Coroutine co in activeSpawnCoroutines) {
+if (co != null) StopCoroutine(co);
+}
+activeSpawnCoroutines.Clear();
+}
+}
+
+IEnumerator SpawnWaveEntryCoroutine(WaveSpawnEntry entry, string waveNameForDebug) {
+if (entry.delayAfterSpawnTime > 0) {
+yield ret new WaitForSeconds(entry.delayAfterSpawnTime);
+}
+
+for (int i = 0; i < entry.spawnCount; i++) {
+if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
+Debug.Log($"[FaunaManager] Halting spawn for entry '{entry.description}' in wave '{waveNameForDebug}', RunManager no longer in GrowthAndThreat state.");
+break; // Exit loop if game state changed
+}
+
+Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius);
+bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen;
+GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen);
+
+if (entry.spawnInterval > 0 && i < entry.spawnCount - 1) // Don't wait after the last one {
+yield ret new WaitForSeconds(entry.spawnInterval);
+}
+}
+}
+
+Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius) {
+if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera for CalculateSpawnPosition!"); ret spawnCenter; }
+
+Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+
+Vector2 spawnPos = Vector2.zero;
+float camHeight = mainCamera.orthographicSize * 2f;
+float camWidth = camHeight * mainCamera.aspect;
+
+switch (locationType) {
+case WaveSpawnLocationType.Offscreen:
+float marginMinX = effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin;
+float marginMaxX = effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin;
+float marginMinY = effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin;
+float marginMaxY = effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin;
+float extraOffset = 0.1f;
+int edge = Random.Range(0, 4);
+if (edge == 0) { spawnPos.x = marginMinX - extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
+else if (edge == 1) { spawnPos.x = marginMaxX + extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
+else if (edge == 2) { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMinY - extraOffset; }
+else { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMaxY + extraOffset; }
+break;
+
+case WaveSpawnLocationType.RandomNearPlayer:
+Transform playerT = FindPlayerTransform();
+if (playerT != null) {
+spawnPos = (Vector2)playerT.position + Random.insideUnitCircle * radius;
+}
+else {
+Debug.LogWarning("[FaunaManager] Player not found for RandomNearPlayer. Falling back to Global.");
+goto case WaveSpawnLocationType.GlobalSpawnArea;
+}
+break;
+
+case WaveSpawnLocationType.GlobalSpawnArea:
+default:
+spawnPos.x = effectiveCamPos.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
+spawnPos.y = effectiveCamPos.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
+break;
+}
+ret spawnPos;
+}
+
+Transform FindPlayerTransform() {
+GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+if (playerGO != null) ret playerGO.transform;
+
+PlayerTileInteractor pti = FindAnyObjectByType<PlayerTileInteractor>();
+if (pti != null) ret pti.transform;
+
+GardenerController gc = FindAnyObjectByType<GardenerController>();
+if (gc != null) ret gc.transform;
+
+ret null;
+}
+
+GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn) {
+if (definition == null || definition.prefab == null) {
+Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab.");
+ret null;
+}
+
+if (mainCamera == null) {
+Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!");
+ret null;
+}
+
+Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+
+Vector2 minPaddedBounds, maxPaddedBounds;
+float camHeight = mainCamera.orthographicSize * 2f;
+float camWidth = camHeight * mainCamera.aspect;
+
+minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
+maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
+minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
+maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
+
+GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
+
+if (ecosystemParent != null) {
+Transform speciesParent = ecosystemParent;
+if (EcosystemManager.Instance != null && EcosystemManager.Instance.sortAnimalsBySpecies && !string.IsNullOrEmpty(definition.animalName)) {
+speciesParent = ecosystemParent.Find(definition.animalName);
+if (speciesParent == null) {
+GameObject subParentGO = new GameObject(definition.animalName);
+subParentGO.transform.SetParent(ecosystemParent);
+speciesParent = subParentGO.transform;
+}
+}
+animalObj.transform.SetParent(speciesParent);
+}
+
+AnimalController controller = animalObj.GetComponent<AnimalController>();
+if (controller != null) {
+if (isOffscreenSpawn) {
+Vector2 screenCenter = (minPaddedBounds + maxPaddedBounds) / 2f;
+controller.SetSeekingScreenCenter(screenCenter, minPaddedBounds, maxPaddedBounds);
+}
+}
+else {
+Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj);
+}
+
+ret animalObj;
+}
+
+void OnDrawGizmos() {
+if (!showBoundsGizmos || mainCamera == null) return;
+Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+float camHeight = mainCamera.orthographicSize * 2f;
+float camWidth = camHeight * mainCamera.aspect;
+Vector2 paddedMin = new Vector2(effectiveCamPos.x - camWidth / 2f + screenBoundsPadding, effectiveCamPos.y - camHeight / 2f + screenBoundsPadding);
+Vector2 paddedMax = new Vector2(effectiveCamPos.x + camWidth / 2f - screenBoundsPadding, effectiveCamPos.y + camHeight / 2f - screenBoundsPadding);
+DrawWireRectangleGizmo(paddedMin, paddedMax, Color.green);
+Vector2 marginMin = new Vector2(effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin, effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin);
+Vector2 marginMax = new Vector2(effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin, effectiveCamPos.y + camHeight / 2f - offscreenSpawnMargin);
+DrawWireRectangleGizmo(marginMin, marginMax, Color.red);
+}
+
+void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { Gizmos.color = color; Gizmos.DrawLine(new Vector3(min.x, min.y, 0), new Vector3(max.x, min.y, 0)); Gizmos.DrawLine(new Vector3(max.x, min.y, 0), new Vector3(max.x, max.y, 0)); Gizmos.DrawLine(new Vector3(max.x, max.y, 0), new Vector3(min.x, max.y, 0)); Gizmos.DrawLine(new Vector3(min.x, max.y, 0), new Vector3(min.x, min.y, 0)); }
 }
