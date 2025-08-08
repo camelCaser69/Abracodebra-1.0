@@ -10,8 +10,8 @@ public class PlantPlacementManager : MonoBehaviour
 
     [SerializeField] private Transform plantParent;
     [SerializeField] private TileInteractionManager tileInteractionManager;
-    [SerializeField] private NodeExecutor nodeExecutor; // This is our "Plant Spawner" now
-    [SerializeField] private float spawnRadius = 0.25f;
+    [SerializeField] private NodeExecutor nodeExecutor;
+    [SerializeField] private float spawnRadius = 0.25f; // FIX: This will now be used
     [SerializeField] private List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
 
     private HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
@@ -26,9 +26,10 @@ public class PlantPlacementManager : MonoBehaviour
 
     public void Initialize()
     {
-        if (plantParent == null && EcosystemManager.Instance != null) plantParent = EcosystemManager.Instance.plantParent;
+        if (plantParent == null && EcosystemManager.Instance != null) plantParent = EcosystemManager.Instance.animalParent;
         if (tileInteractionManager == null) tileInteractionManager = TileInteractionManager.Instance;
-        if (nodeExecutor == null) nodeExecutor = FindObjectOfType<NodeExecutor>();
+        // FIX: Replaced obsolete FindObjectOfType with FindFirstObjectByType
+        if (nodeExecutor == null) nodeExecutor = FindFirstObjectByType<NodeExecutor>();
     }
 
     private void RebuildInvalidTilesSet()
@@ -56,11 +57,9 @@ public class PlantPlacementManager : MonoBehaviour
         }
     }
 
-    // FIX: This method is now the primary way to plant. It takes an InventoryBarItem.
     public bool TryPlantSeedFromInventory(InventoryBarItem seedItem, Vector3Int gridPosition, Vector3 worldPosition)
     {
         if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed) return false;
-
         if (IsPositionOccupied(gridPosition)) return false;
 
         TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
@@ -72,12 +71,23 @@ public class PlantPlacementManager : MonoBehaviour
              return false;
         }
 
+        // FIX: Use the spawnRadius to add a slight random offset to the planting position
+        Vector3 finalPlantingPosition = GetRandomizedPlantingPosition(worldPosition);
         SeedTemplate templateToPlant = seedItem.SeedTemplate;
-        GameObject plantGO = nodeExecutor.SpawnPlantFromTemplate(templateToPlant, worldPosition, plantParent);
+        GameObject plantGO = nodeExecutor.SpawnPlantFromTemplate(templateToPlant, finalPlantingPosition, plantParent);
 
         if (plantGO == null) return false;
 
         plantsByGridPosition[gridPosition] = plantGO;
         return true;
+    }
+
+    // FIX: Added this helper method to use the spawnRadius field
+    private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
+    {
+        if (spawnRadius <= 0f) return centerPosition;
+        
+        Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
+        return centerPosition + new Vector3(randomOffset.x, randomOffset.y, 0);
     }
 }

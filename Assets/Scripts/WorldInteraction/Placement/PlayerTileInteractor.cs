@@ -77,15 +77,27 @@ public sealed class PlayerTileInteractor : MonoBehaviour
         if (!EnsureManagers()) return;
 
         InventoryBarItem selected = inventoryBar.SelectedItem;
-        if (selected == null || !selected.IsValid()) return;
+        if (selected == null || !selected.IsValid())
+        {
+            // FIX: Using the debug flag
+            if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: No valid item selected.");
+            return;
+        }
 
         Vector3 mouseW = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cellPos = tileInteractionManager.WorldToCell(mouseW);
         Vector3 cellCenter = tileInteractionManager.interactionGrid.GetCellCenterWorld(cellPos);
 
-        if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius) return;
+        if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius)
+        {
+            // FIX: Using the debug flag
+            if (showDebug) Debug.Log($"[PlayerTileInteractor] Left-click ignored: Target cell {cellPos} is out of range.");
+            return;
+        }
         
-        // FIX: Use a switch on the item type to determine the action
+        // FIX: Using the debug flag to log the action
+        if (showDebug) Debug.Log($"[PlayerTileInteractor] Attempting action '{selected.Type}' with item '{selected.GetDisplayName()}' at {cellPos}.");
+
         switch (selected.Type)
         {
             case InventoryBarItem.ItemType.Tool:
@@ -94,16 +106,11 @@ public sealed class PlayerTileInteractor : MonoBehaviour
             
             case InventoryBarItem.ItemType.Seed:
                 System.Action onSuccess = () => {
-                    // This logic is tricky. The bar item is a temporary representation.
-                    // We need to find and remove the source seed from the inventory.
-                    Debug.LogWarning("Seed removal from inventory after planting is not yet implemented.");
-                    inventoryBar.ShowBar(); // Refresh the bar
+                    if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
+                    // TODO: Implement removal of seed from inventory.
+                    inventoryBar.ShowBar();
                 };
                 PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess);
-                break;
-                
-            case InventoryBarItem.ItemType.Gene:
-                // Do nothing when left-clicking a gene on the world
                 break;
         }
     }

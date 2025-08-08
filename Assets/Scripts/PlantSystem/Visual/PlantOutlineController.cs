@@ -116,7 +116,6 @@ public class PlantOutlineController : MonoBehaviour
 
         GameObject outlineInstance = Instantiate(outlinePartPrefab, transform);
         
-        // FIX: The error was here. Changed parentPlantGrowth.GetCellSpacing() to parentPlantGrowth.cellSpacing
         float spacing = parentPlantGrowth.cellSpacing;
         outlineInstance.transform.localPosition = (Vector2)coord * spacing;
 
@@ -125,6 +124,10 @@ public class PlantOutlineController : MonoBehaviour
         {
             outlineController.Initialize(sourceRenderer, coord, this);
             outlinePartMap.Add(coord, outlineController);
+            
+            // FIX: Using the debug flag
+            if (debugLogging)
+                Debug.Log($"[{gameObject.name}] Created outline part at {coord}");
         }
         else
         {
@@ -163,6 +166,10 @@ public class PlantOutlineController : MonoBehaviour
                 }
             }
         }
+        // FIX: Using the debug flag
+        if (debugLogging)
+            Debug.LogWarning($"[{gameObject.name}] Could not find any valid neighbor renderer for outline at {coord}");
         return null;
     }
+
 }
