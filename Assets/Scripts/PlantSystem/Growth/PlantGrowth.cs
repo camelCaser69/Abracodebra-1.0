@@ -115,10 +115,13 @@ public class PlantGrowth : MonoBehaviour, ITickUpdateable
         return CellManager?.GetCellGameObjectAt(coord);
     }
 
+    // ADD THIS METHOD TO THE EXISTING PlantGrowth.cs SCRIPT
     public Transform[] GetFruitSpawnPoints()
     {
+        // This is a simple implementation. A more robust one might cache these.
         return GetComponentsInChildren<Transform>()
             .Where(t => t.CompareTag("FruitSpawn"))
             .ToArray();
     }
+    
 }

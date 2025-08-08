@@ -7,13 +7,12 @@ using Abracodabra.Genes.Core;
 namespace Abracodabra.Genes.Runtime
 {
     [Serializable]
-    public class RuntimeGeneInstance
+    public class RuntimeGeneInstance : ISerializationCallbackReceiver
     {
         [SerializeField] private string geneGUID;
         [SerializeField] private string geneName; // Fallback for missing genes
         [SerializeField] private GeneInstanceData instanceData;
 
-        // Runtime reference (not serialized)
         [NonSerialized] private GeneBase cachedGene;
 
         public RuntimeGeneInstance(GeneBase sourceGene)
@@ -49,7 +48,6 @@ namespace Abracodabra.Genes.Runtime
             cachedGene = SafeGeneLoader.LoadGeneWithFallback(geneGUID, geneName);
             if (cachedGene != null)
             {
-                // Handle version migration if needed
                 if (instanceData.version < cachedGene.Version)
                 {
                     cachedGene.MigrateFromVersion(instanceData.version, instanceData);
@@ -72,6 +70,22 @@ namespace Abracodabra.Genes.Runtime
         {
             instanceData.ModifyValue(key, delta);
         }
+
+        #region Serialization Callbacks
+        // FIX: Added serialization methods
+        public void OnBeforeSerialize()
+        {
+            // Nothing needed here. We want to serialize our GUID and data.
+        }
+
+        public void OnAfterDeserialize()
+        {
+            // After Unity loads this object from disk, the non-serialized
+            // 'cachedGene' will be null. We ensure it stays null so that the
+            // next call to GetGene() will trigger a reload via SafeGeneLoader.
+            cachedGene = null;
+        }
+        #endregion
     }
 
     [Serializable]

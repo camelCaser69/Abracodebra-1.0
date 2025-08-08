@@ -57,6 +57,13 @@ namespace Abracodabra.UI.Genes
                 Debug.LogError("GeneEventBus service not found!", this);
             }
         }
+        
+        // ADD THIS METHOD TO THE EXISTING GeneSlotUI.cs SCRIPT
+        void OnDestroy()
+        {
+            // Unsubscribe from events to prevent memory leaks
+            eventBus?.Unsubscribe<GeneExecutedEvent>(OnGeneExecuted);
+        }
 
         void OnEnable()
         {
@@ -255,4 +262,5 @@ namespace Abracodabra.UI.Genes
             UpdateVisuals();
         }
     }
+    
 }

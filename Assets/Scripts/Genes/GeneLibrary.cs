@@ -1,4 +1,4 @@
-﻿// File: Assets/Scripts/Genes/GeneLibrary.cs
+﻿// REWORKED FILE: Assets/Scripts/Genes/GeneLibrary.cs
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +17,12 @@ namespace Abracodabra.Genes
             {
                 if (_instance == null)
                 {
+                    // FIX: This is now the ONLY way the instance is loaded.
+                    // It ensures consistency by always loading from the same path.
                     _instance = Resources.Load<GeneLibrary>("GeneLibrary");
                     if (_instance == null)
                     {
-                        Debug.LogError("A 'GeneLibrary' asset must exist in a 'Resources' folder!");
+                        Debug.LogError("FATAL: GeneLibrary asset not found at 'Assets/Resources/GeneLibrary.asset'!");
                     }
                 }
                 return _instance;
@@ -37,10 +39,11 @@ namespace Abracodabra.Genes
         public List<GeneBase> starterGenes = new List<GeneBase>();
         public PlaceholderGene placeholderGene;
 
-        // Lookup caches for fast access at runtime
+        // Caches for fast runtime access
         private Dictionary<string, GeneBase> _guidLookup;
         private Dictionary<string, GeneBase> _nameLookup;
 
+        // OnEnable is called when the ScriptableObject is loaded.
         void OnEnable()
         {
             BuildLookupCaches();
@@ -74,14 +77,14 @@ namespace Abracodabra.Genes
         public GeneBase GetGeneByGUID(string guid)
         {
             if (string.IsNullOrEmpty(guid)) return null;
-            if (_guidLookup == null) BuildLookupCaches();
+            if (_guidLookup == null) BuildLookupCaches(); // Safety check
             return _guidLookup.TryGetValue(guid, out var gene) ? gene : null;
         }
 
         public GeneBase GetGeneByName(string name)
         {
             if (string.IsNullOrEmpty(name)) return null;
-            if (_nameLookup == null) BuildLookupCaches();
+            if (_nameLookup == null) BuildLookupCaches(); // Safety check
             return _nameLookup.TryGetValue(name, out var gene) ? gene : null;
         }
 
@@ -90,11 +93,9 @@ namespace Abracodabra.Genes
             if (placeholderGene == null)
             {
                 Debug.LogError("PlaceholderGene is not assigned in the GeneLibrary asset!");
-                // Create a temporary runtime instance as a last resort
                 placeholderGene = ScriptableObject.CreateInstance<PlaceholderGene>();
-                placeholderGene.name = "RUNTIME_MISSING_GENE";
+                placeholderGene.name = "RUNTIME_PLACEHOLDER";
             }
-
             return placeholderGene;
         }
 
@@ -125,7 +126,7 @@ namespace Abracodabra.Genes
                 string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
                 GeneBase gene = UnityEditor.AssetDatabase.LoadAssetAtPath<GeneBase>(path);
 
-                if (gene is PlaceholderGene) continue; // Don't add the placeholder to the main lists
+                if (gene is PlaceholderGene) continue;
 
                 if (gene is PassiveGene p)
                     passiveGenes.Add(p);
