@@ -2,6 +2,7 @@
 using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
+using Abracodabra.Genes.Components;
 
 namespace Abracodabra.Genes.Implementations
 {

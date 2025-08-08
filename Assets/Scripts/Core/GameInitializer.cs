@@ -1,22 +1,29 @@
-﻿// File: Assets/Scripts/Core/GameInitializer.cs
+﻿// REWORKED FILE: Assets/Scripts/Core/GameInitializer.cs
 using UnityEngine;
 using Abracodabra.Genes.Services;
 
-/// <summary>
-/// A simple script that runs at the very start of the game to initialize
-/// critical systems, like the Gene Services.
-/// </summary>
 public class GameInitializer : MonoBehaviour
 {
-    void Awake()
+    // FIX: This method is now static and will be called by the Unity runtime
+    // automatically before any scene loads, guaranteeing services are ready.
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    static void InitializeServices()
     {
-        // Initialize gene services before anything else can use them
         GeneServices.Initialize();
 
-        // Verify the GeneLibrary asset is available in Resources
         if (Abracodabra.Genes.GeneLibrary.Instance == null)
         {
-            Debug.LogError("FATAL: Gene Library could not be loaded! Ensure a 'GeneLibrary.asset' exists in a 'Resources' folder.", this);
+            Debug.LogError("FATAL: Gene Library could not be loaded! Ensure a 'GeneLibrary.asset' exists in a 'Resources' folder.");
+        }
+    }
+
+    void Awake()
+    {
+        // The GameObject in the scene can still be used to host singleton MonoBehaviours.
+        // Ensure the GeneEffectPool singleton instance is created.
+        if (GeneEffectPool.Instance == null)
+        {
+            Debug.LogError("GeneEffectPool instance could not be created.");
         }
     }
 }

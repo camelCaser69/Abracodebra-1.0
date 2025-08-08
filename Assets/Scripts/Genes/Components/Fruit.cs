@@ -1,13 +1,11 @@
 ﻿// File: Assets/Scripts/Genes/Components/Fruit.cs
 using UnityEngine;
-using Abracodabra.Genes.Runtime;
+using Abracodabra.Genes.Core;
 
-namespace Abracodabra.Genes.Core
+namespace Abracodabra.Genes.Components
 {
     /// <summary>
-    /// A placeholder component to be attached to fruit GameObjects.
-    /// This allows payload genes to find and configure it.
-    /// This should be expanded with actual fruit logic later.
+    /// A component attached to fruit GameObjects, making them interactable and configurable by genes.
     /// </summary>
     public class Fruit : MonoBehaviour
     {
@@ -16,23 +14,23 @@ namespace Abracodabra.Genes.Core
 
         public void LaunchImmediate(Vector2 force)
         {
-            // Placeholder for future physics logic
-            Debug.Log($"Fruit '{gameObject.name}' launched with force {force}");
+            var rb = GetComponent<Rigidbody2D>() ?? gameObject.AddComponent<Rigidbody2D>();
+            rb.AddForce(force, ForceMode2D.Impulse);
         }
 
         public void StartGrowing()
         {
-            // Placeholder for growth logic
-            Debug.Log($"Fruit '{gameObject.name}' has started growing for {GrowthTime}s");
+            // Placeholder for a simple growth timer
+            Debug.Log($"Fruit '{gameObject.name}' has started growing for {GrowthTime}s.", this);
         }
 
         public void AddVisualEffect(Color color)
         {
-            // Placeholder for visual feedback
             var renderer = GetComponent<SpriteRenderer>();
             if (renderer != null)
             {
-                renderer.color = color;
+                // Tints the fruit to show a payload is active
+                renderer.color = Color.Lerp(renderer.color, color, 0.5f);
             }
         }
     }

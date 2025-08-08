@@ -5,9 +5,6 @@ using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.UI.Genes
 {
-    /// <summary>
-    /// Manages a single row in the active sequence UI, containing modifier, active, and payload slots.
-    /// </summary>
     public class SequenceRowUI : MonoBehaviour
     {
         [Header("Slot References")]
@@ -23,7 +20,6 @@ namespace Abracodabra.UI.Genes
             rowIndex = index;
             parentSequence = parent;
 
-            // Configure slots
             if (modifierSlot != null)
             {
                 modifierSlot.acceptedCategory = GeneCategory.Modifier;
@@ -44,12 +40,8 @@ namespace Abracodabra.UI.Genes
         public void LoadSlot(RuntimeSequenceSlot slotData)
         {
             activeSlot?.SetGeneInstance(slotData.activeInstance);
-            
-            // For simplicity in this example, we assume one modifier/payload slot.
-            // A real implementation would handle lists.
             modifierSlot?.SetGeneInstance(slotData.modifierInstances.Count > 0 ? slotData.modifierInstances[0] : null);
             payloadSlot?.SetGeneInstance(slotData.payloadInstances.Count > 0 ? slotData.payloadInstances[0] : null);
-
             UpdateAttachmentSlots(GetActiveGene());
         }
 
@@ -68,7 +60,6 @@ namespace Abracodabra.UI.Genes
 
         public void UpdateAttachmentSlots(ActiveGene activeGene)
         {
-            // Lock/unlock modifier and payload slots based on the active gene
             bool hasActive = activeGene != null;
             if (modifierSlot != null)
             {

@@ -1,6 +1,7 @@
 ﻿// File: Assets/Scripts/Genes/Core/PayloadGene.cs
 using UnityEngine;
 using Abracodabra.Genes.Runtime;
+using Abracodabra.Genes.Components; // FIX: Added using statement for Fruit
 
 namespace Abracodabra.Genes.Core
 {
@@ -16,14 +17,10 @@ namespace Abracodabra.Genes.Core
         public PayloadType payloadType;
         public float basePotency = 1f;
 
-        /// <summary>
-        /// Called when the parent Active gene executes, applying this payload's effect.
-        /// </summary>
+        // Applied when the active gene executes
         public abstract void ApplyPayload(PayloadContext context);
 
-        /// <summary>
-        /// A specific helper for fruit-based active genes to attach components.
-        /// </summary>
+        // For fruit-based actives
         public virtual void ConfigureFruit(Fruit fruit, RuntimeGeneInstance instance) { }
 
         /// <summary>
