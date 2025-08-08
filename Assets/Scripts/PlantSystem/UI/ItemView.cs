@@ -1,160 +1,107 @@
-﻿// Assets/Scripts/PlantSystem/UI/ItemView.cs
-
+﻿// Reworked File: Assets/Scripts/PlantSystem/UI/ItemView.cs
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Templates;
+using Abracodabra.Genes.Runtime;
 
-public class ItemView : MonoBehaviour, IPointerDownHandler
+namespace Abracodabra.UI.Genes
 {
-    [SerializeField] private Image thumbnailImage;
-    [SerializeField] private Image backgroundImage;
-    [SerializeField] private Sprite fallbackThumbnail; // New field for a fallback icon
-
-    private NodeData _nodeData;
-    private NodeDefinition _nodeDefinition;
-    private ToolDefinition _toolDefinition;
-
-    private NodeEditorGridController _sequenceGridControllerRef;
-    private NodeCell _parentCell;
-    private Color _originalBackgroundColor;
-    private TooltipTrigger _tooltipTrigger;
-    private DisplayType _displayType;
-
-    public enum DisplayType { None, Node, Tool }
-
-    public void Initialize(NodeData data, NodeDefinition definition, NodeEditorGridController sequenceController)
+    /// <summary>
+    /// A component that holds the visual and data references for an item in a UI slot.
+    /// It works in conjunction with a GeneSlotUI.
+    /// </summary>
+    public class ItemView : MonoBehaviour
     {
-        _displayType = DisplayType.Node;
-        _nodeData = data;
-        _nodeDefinition = definition;
-        _sequenceGridControllerRef = sequenceController;
+        [Header("Visual Elements")]
+        [SerializeField] private Image thumbnailImage;
+        [SerializeField] private Image backgroundImage;
+        [SerializeField] private Sprite fallbackThumbnail;
 
-        if (_nodeData == null || _nodeDefinition == null)
+        // Data References
+        private GeneBase _gene;
+        private RuntimeGeneInstance _runtimeInstance;
+        private ToolDefinition _toolDefinition;
+        private SeedTemplate _seedTemplate;
+
+        private GeneSlotUI _parentSlot;
+        private Color _originalBackgroundColor;
+
+        void Awake()
         {
-            Debug.LogError($"[ItemView Initialize Node] NodeData or NodeDefinition is null for {gameObject.name}. Disabling.", gameObject);
-            gameObject.SetActive(false);
-            return;
+            _parentSlot = GetComponent<GeneSlotUI>();
         }
 
-        if (!_nodeData.IsSeed())
+        public void InitializeAsGene(RuntimeGeneInstance instance)
         {
-            _nodeData.ClearStoredSequence();
+            _runtimeInstance = instance;
+            _gene = instance.GetGene();
+            _toolDefinition = null;
+            _seedTemplate = null;
+            SetupVisuals();
         }
 
-        SetupVisuals();
-    }
-
-    public void Initialize(NodeData data, ToolDefinition toolDef)
-    {
-        _displayType = DisplayType.Tool;
-        _nodeData = data; // This is the wrapper NodeData for the tool
-        _toolDefinition = toolDef;
-
-        if (_toolDefinition == null)
+        public void InitializeAsTool(ToolDefinition toolDef)
         {
-            Debug.LogError($"[ItemView Initialize Tool] ToolDefinition is null for {gameObject.name}. Disabling.", gameObject);
-            gameObject.SetActive(false);
-            return;
+            _runtimeInstance = null;
+            _gene = null;
+            _toolDefinition = toolDef;
+            _seedTemplate = null;
+            SetupVisuals();
         }
 
-        SetupVisuals();
-    }
-
-    private void SetupVisuals()
-    {
-        UpdateParentCellReference();
-        _tooltipTrigger = GetComponent<TooltipTrigger>() ?? gameObject.AddComponent<TooltipTrigger>();
-
-        float globalScaleFactor = 1f;
-        float raycastPaddingValue = 0f;
-        if (InventoryGridController.Instance != null)
+        public void InitializeAsSeed(SeedTemplate seed)
         {
-            globalScaleFactor = InventoryGridController.Instance.NodeGlobalImageScale;
-            raycastPaddingValue = InventoryGridController.Instance.NodeImageRaycastPadding;
+            _runtimeInstance = null;
+            _gene = null;
+            _toolDefinition = null;
+            _seedTemplate = seed;
+            SetupVisuals();
         }
 
-        Vector4 raycastPaddingVector = new Vector4(raycastPaddingValue, raycastPaddingValue, raycastPaddingValue, raycastPaddingValue);
-
-        if (thumbnailImage != null)
+        private void SetupVisuals()
         {
-            // --- MODIFIED LOGIC START ---
-            Sprite spriteToShow = (_displayType == DisplayType.Node) ? _nodeDefinition.thumbnail : _toolDefinition.icon;
+            // Determine what this ItemView represents
+            Sprite spriteToShow = fallbackThumbnail;
+            Color tintColor = Color.white;
+            _originalBackgroundColor = Color.gray;
 
-            // If the intended sprite is null, try to use the fallback.
-            if (spriteToShow == null)
+            if (_gene != null)
             {
-                spriteToShow = fallbackThumbnail;
-                if (_displayType == DisplayType.Node)
-                {
-                    Debug.LogWarning($"[ItemView] NodeDefinition '{_nodeDefinition.displayName}' is missing a thumbnail. Using fallback.", this);
-                }
+                spriteToShow = _gene.icon ?? fallbackThumbnail;
+                tintColor = _gene.geneColor;
+                _originalBackgroundColor = _gene.geneColor;
             }
-            
-            thumbnailImage.sprite = spriteToShow;
-            thumbnailImage.color = (_displayType == DisplayType.Node) ? _nodeDefinition.thumbnailTintColor : _toolDefinition.iconTint;
-            thumbnailImage.rectTransform.localScale = new Vector3(globalScaleFactor, globalScaleFactor, 1f);
-            thumbnailImage.enabled = (thumbnailImage.sprite != null); // Now this is less likely to be false
-            // --- MODIFIED LOGIC END ---
-
-            thumbnailImage.raycastTarget = true;
-            thumbnailImage.raycastPadding = raycastPaddingVector;
-        }
-
-        if (backgroundImage != null)
-        {
-            if (InventoryColorManager.Instance != null)
+            else if (_toolDefinition != null)
             {
-                _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(_nodeData, _nodeDefinition, _toolDefinition);
+                spriteToShow = _toolDefinition.icon ?? fallbackThumbnail;
+                tintColor = _toolDefinition.iconTint;
+                _originalBackgroundColor = Color.gray; // Placeholder for tool color
             }
-            else
+            else if (_seedTemplate != null)
             {
-                _originalBackgroundColor = (_displayType == DisplayType.Node) ? _nodeDefinition.backgroundColor : new Color(0.5f, 0.5f, 0.5f, 1f);
+                spriteToShow = _seedTemplate.icon ?? fallbackThumbnail;
+                tintColor = Color.white;
+                _originalBackgroundColor = Color.green; // Placeholder for seed color
             }
 
-            backgroundImage.color = _originalBackgroundColor;
-            backgroundImage.enabled = true;
-            backgroundImage.raycastTarget = true;
-            backgroundImage.raycastPadding = raycastPaddingVector;
-        }
-    }
-
-    public NodeData GetNodeData() => _nodeData;
-    public NodeDefinition GetNodeDefinition() => _nodeDefinition;
-    public ToolDefinition GetToolDefinition() => _toolDefinition;
-    public NodeCell GetParentCell() => _parentCell;
-    public DisplayType GetDisplayType() => _displayType;
-
-    public void UpdateParentCellReference()
-    {
-        _parentCell = GetComponentInParent<NodeCell>();
-    }
-
-    public void Highlight()
-    {
-        if (backgroundImage != null && _sequenceGridControllerRef != null && _parentCell != null && !_parentCell.IsInventoryCell && _displayType == DisplayType.Node)
-        {
-            backgroundImage.color = _sequenceGridControllerRef.SelectedNodeBackgroundColor;
-        }
-    }
-
-    public void Unhighlight()
-    {
-        if (backgroundImage != null)
-        {
-            backgroundImage.color = _originalBackgroundColor;
-        }
-    }
-
-    public void OnPointerDown(PointerEventData eventData)
-    {
-        if (_parentCell == null) UpdateParentCellReference();
-
-        if (_parentCell != null && eventData.button == PointerEventData.InputButton.Left)
-        {
-            if (!_parentCell.IsInventoryCell && !_parentCell.IsSeedSlot && _displayType == DisplayType.Node)
+            if (thumbnailImage != null)
             {
-                NodeCell.SelectCell(_parentCell);
+                thumbnailImage.sprite = spriteToShow;
+                thumbnailImage.color = tintColor;
+                thumbnailImage.enabled = (thumbnailImage.sprite != null);
+            }
+
+            if (backgroundImage != null)
+            {
+                backgroundImage.color = _originalBackgroundColor;
             }
         }
+        
+        // Data Accessors
+        public GeneBase GetGene() => _gene;
+        public RuntimeGeneInstance GetRuntimeInstance() => _runtimeInstance;
+        public ToolDefinition GetToolDefinition() => _toolDefinition;
+        public SeedTemplate GetSeedTemplate() => _seedTemplate;
     }
 }

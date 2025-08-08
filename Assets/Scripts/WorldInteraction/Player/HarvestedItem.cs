@@ -1,24 +1,33 @@
-﻿// Assets/Scripts/WorldInteraction/Player/HarvestedItem.cs
-
+﻿// Reworked File: Assets/Scripts/WorldInteraction/Player/HarvestedItem.cs
 using System.Linq;
-using WegoSystem;
+using Abracodabra.Genes.Runtime;
+using Abracodabra.Genes.Implementations; // For NutritionComponent
 
+/// <summary>
+/// Represents an item harvested from a plant, now wrapping a RuntimeGeneInstance.
+/// </summary>
 public class HarvestedItem
 {
-    public NodeData HarvestedNodeData { get; set; }
+    public RuntimeGeneInstance HarvestedGeneInstance { get; set; }
 
-    public HarvestedItem(NodeData data)
+    public HarvestedItem(RuntimeGeneInstance instance)
     {
-        HarvestedNodeData = data;
+        HarvestedGeneInstance = instance;
     }
 
     public float GetNutritionValue()
     {
-        if (HarvestedNodeData?.effects == null) return 0f;
+        if (HarvestedGeneInstance == null) return 0f;
 
-        return HarvestedNodeData.effects
-            .Where(e => e.effectType == NodeEffectType.Nutritious)
-            .Sum(e => e.primaryValue);
+        // In the new system, nutrition value is a property of a payload.
+        // A proper implementation would check for a "NutritiousPayload" or similar.
+        // For now, let's assume a conventional value or look for a specific component.
+        if (HarvestedGeneInstance.GetGene() is NutritiousPayload nutritiousGene)
+        {
+            return nutritiousGene.nutritionValue;
+        }
+
+        return 0f; // Default if not a nutritious gene
     }
 
     public bool IsConsumable()

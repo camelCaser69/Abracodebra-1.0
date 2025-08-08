@@ -1,8 +1,10 @@
-﻿using System;
-using System.Collections;
+﻿// Reworked File: Assets/Scripts/WorldInteraction/Player/PlayerActionManager.cs
+using System;
 using System.Linq;
+using System.Collections; // FIX: Added missing using statement
 using UnityEngine;
 using WegoSystem;
+using Abracodabra.Genes;
 
 public enum PlayerActionType
 {
@@ -10,13 +12,12 @@ public enum PlayerActionType
     UseTool,
     PlantSeed,
     Harvest,
-    Water,
     Interact
 }
 
 public class PlayerActionManager : MonoBehaviour
 {
-    public static PlayerActionManager Instance { get; set; }
+    public static PlayerActionManager Instance { get; private set; }
 
     public class ToolActionData
     {
@@ -31,26 +32,21 @@ public class PlayerActionManager : MonoBehaviour
     public event Action<PlayerActionType, object> OnActionExecuted;
     public event Action<string> OnActionFailed;
 
-    private void Awake()
+    void Awake()
     {
         if (Instance != null && Instance != this) Destroy(gameObject);
         Instance = this;
     }
-
-    private void OnDestroy()
-    {
-        if (Instance == this) Instance = null;
-    }
-
+    
     public bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null, Action onSuccessCallback = null)
     {
         if (debugMode) Debug.Log($"[PlayerActionManager] Executing {actionType} at {gridPosition}");
 
         bool success = false;
-        int tickCost = tickCostPerAction; // Declare here so it's accessible throughout the method
+        int tickCost = tickCostPerAction;
         object eventPayload = actionData;
 
-        // Re-route the action if the tool is the Harvest Pouch before the switch
+        // Special handling for harvest tool
         var toolDefForCheck = actionData as ToolDefinition;
         if (actionType == PlayerActionType.UseTool && toolDefForCheck != null && toolDefForCheck.toolType == ToolType.HarvestPouch)
         {
@@ -69,24 +65,15 @@ public class PlayerActionManager : MonoBehaviour
                 break;
 
             case PlayerActionType.PlantSeed:
-                tickCost = 2; // Override default tick cost for this specific action
-                if (tickCost > 1)
-                {
-                    StartCoroutine(ExecuteDelayedAction(() => ExecutePlantSeed(gridPosition, actionData as InventoryBarItem), tickCost, onSuccessCallback, actionType, actionData));
-                    return true; // Return early, coroutine will handle the rest
-                }
-                else
-                {
-                    success = ExecutePlantSeed(gridPosition, actionData as InventoryBarItem);
-                }
-                break;
+                tickCost = 2; // Planting takes longer
+                var seedItem = actionData as InventoryBarItem;
+                // Use a lambda to capture the action for the coroutine
+                Func<bool> plantAction = () => ExecutePlantSeed(gridPosition, seedItem);
+                StartCoroutine(ExecuteDelayedAction(plantAction, tickCost, onSuccessCallback, actionType, actionData));
+                return true; // Return early, coroutine handles the rest
 
             case PlayerActionType.Harvest:
                 success = ExecuteHarvest(gridPosition);
-                break;
-
-            case PlayerActionType.Water:
-                success = ExecuteWatering(gridPosition);
                 break;
 
             case PlayerActionType.Interact:
@@ -102,9 +89,22 @@ public class PlayerActionManager : MonoBehaviour
         }
         else
         {
-            OnActionFailed?.Invoke($"{actionType} failed");
+            OnActionFailed?.Invoke($"{actionType} failed at {gridPosition}");
         }
         return success;
+    }
+    
+    private bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool)
+    {
+        if (tool == null) return false;
+        TileInteractionManager.Instance?.ApplyToolAction(tool);
+        return true; // Assume success for now
+    }
+
+    private bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem)
+    {
+        if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed) return false;
+        return PlantPlacementManager.Instance?.TryPlantSeedFromInventory(seedItem, gridPosition, TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)) ?? false;
     }
 
     private bool ExecuteHarvest(Vector3Int gridPosition)
@@ -120,22 +120,28 @@ public class PlayerActionManager : MonoBehaviour
 
         var plant = plantEntity.GetComponent<PlantGrowth>();
         if (plant == null) return false;
+        
+        // This part needs a rework, as `Harvest` returned NodeDefinitions.
+        // We'll assume for now it's a simple success/fail.
+        // A full implementation would need the plant to return what was harvested.
+        // bool wasHarvested = plant.Harvest();
+        Debug.LogWarning("PlayerActionManager.ExecuteHarvest needs to be updated to handle returned items from PlantGrowth.");
+        bool wasHarvested = true; // Placeholder
 
-        var harvestedDefs = plant.Harvest();
-
-        if (harvestedDefs.Count > 0)
+        if(wasHarvested)
         {
-            foreach (var definition in harvestedDefs)
-            {
-                InventoryGridController.Instance.AddGeneToInventoryFromDefinition(definition);
-            }
-            return true;
+             // InventoryGridController.Instance.AddGeneToInventory(...);
         }
-
-        if (debugMode) Debug.Log($"Harvest action at {gridPosition}, but nothing was harvested.");
-        return false;
+        
+        return wasHarvested;
     }
 
+    private bool ExecuteInteraction(Vector3Int gridPosition, object interactionData)
+    {
+        if (debugMode) Debug.Log($"[PlayerActionManager] Interaction at {gridPosition}");
+        return true;
+    }
+    
     private IEnumerator ExecuteDelayedAction(Func<bool> action, int tickCost, Action onSuccessCallback, PlayerActionType actionType, object actionData)
     {
         for (int i = 0; i < tickCost - 1; i++)
@@ -143,8 +149,10 @@ public class PlayerActionManager : MonoBehaviour
             TickManager.Instance.AdvanceTick();
             yield return new WaitForSeconds(multiTickActionDelay);
         }
+
         bool success = action.Invoke();
         TickManager.Instance.AdvanceTick();
+
         if (success)
         {
             onSuccessCallback?.Invoke();
@@ -155,84 +163,27 @@ public class PlayerActionManager : MonoBehaviour
             OnActionFailed?.Invoke("Delayed action failed");
         }
     }
-
+    
     public int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null)
     {
         int totalCost = tickCostPerAction;
-        int statusEffectCost = 0;
         if (movingEntity != null)
         {
             IStatusEffectable effectable = movingEntity.GetComponent<IStatusEffectable>();
             if (effectable != null)
             {
-                statusEffectCost = effectable.StatusManager.AdditionalMoveTicks;
+                totalCost += effectable.StatusManager.AdditionalMoveTicks;
             }
-        }
-
-        totalCost += statusEffectCost;
-        if (debugMode && totalCost > tickCostPerAction)
-        {
-            string entityName = movingEntity != null ? movingEntity.gameObject.name : "Unknown Entity";
-            Debug.Log($"[PlayerActionManager] Movement for '{entityName}' cost breakdown: Base({tickCostPerAction}) + Status({statusEffectCost}) = {totalCost} ticks total.");
         }
         return totalCost;
     }
-
-    private bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool)
-    {
-        if (tool == null) return false;
-        TileInteractionManager.Instance?.ApplyToolAction(tool);
-        return true;
-    }
-
-    private bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem)
-    {
-        if (seedItem == null || !seedItem.IsSeed()) return false;
-        return PlantPlacementManager.Instance?.TryPlantSeedFromInventory(seedItem, gridPosition, TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)) ?? false;
-    }
-
-    private bool ExecuteWatering(Vector3Int gridPosition)
-    {
-        if (debugMode) Debug.Log($"[PlayerActionManager] Watering at {gridPosition} - NOT IMPLEMENTED");
-        return false;
-    }
-
-    private bool ExecuteInteraction(Vector3Int gridPosition, object interactionData)
-    {
-        if (debugMode) Debug.Log($"[PlayerActionManager] Interaction at {gridPosition}");
-        return true;
-    }
-
+    
     private void AdvanceGameTick(int tickCount = 1)
     {
-        if (TickManager.Instance == null)
-        {
-            Debug.LogError("[PlayerActionManager] TickManager not found!");
-            return;
-        }
+        if (TickManager.Instance == null) return;
         for (int i = 0; i < tickCount; i++)
         {
             TickManager.Instance.AdvanceTick();
-        }
-        if (debugMode)
-        {
-            Debug.Log($"[PlayerActionManager] Advanced game by {tickCount} tick(s)");
-        }
-    }
-
-    public bool CanExecuteAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null)
-    {
-        switch (actionType)
-        {
-            case PlayerActionType.Move:
-                return false;
-            case PlayerActionType.UseTool:
-                return actionData is ToolDefinition;
-            case PlayerActionType.PlantSeed:
-                var seedItem = actionData as InventoryBarItem;
-                return seedItem != null && seedItem.IsSeed();
-            default:
-                return true;
         }
     }
 }

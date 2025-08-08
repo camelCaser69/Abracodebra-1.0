@@ -1,79 +1,65 @@
-﻿using UnityEngine;
+﻿// Reworked File: Assets/Scripts/UI/Tooltips/TooltipTrigger.cs
+using UnityEngine;
 using UnityEngine.EventSystems;
+using Abracodabra.UI.Genes; // For ItemView
+using Abracodabra.Genes.Core; // For GeneTooltipContext
 
 public class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     private ItemView _itemView;
-    private NodeCell _nodeCell;
     private bool _isShowingTooltip = false;
 
-    private void Awake()
+    void Awake()
     {
-        // Cache references to potential data sources
         _itemView = GetComponent<ItemView>();
-        _nodeCell = GetComponentInParent<NodeCell>();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (UniversalTooltipManager.Instance == null || _isShowingTooltip) return;
-        
+        if (UniversalTooltipManager.Instance == null || _isShowingTooltip || _itemView == null) return;
         ShowTooltip();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (UniversalTooltipManager.Instance == null || !_isShowingTooltip) return;
-
         HideTooltip();
     }
 
-    private void ShowTooltip()
+    void ShowTooltip()
     {
         ITooltipDataProvider provider = null;
-        object sourceData = null; // For passing NodeData to a NodeDefinition provider
+        GeneTooltipContext context = new GeneTooltipContext();
 
-        // Prioritize ItemView if it exists
-        if (_itemView != null)
+        if (_itemView.GetGene() != null)
         {
-            if (_itemView.GetToolDefinition() != null)
-            {
-                provider = _itemView.GetToolDefinition();
-            }
-            else if (_itemView.GetNodeDefinition() != null)
-            {
-                provider = _itemView.GetNodeDefinition();
-                sourceData = _itemView.GetNodeData();
-            }
+            provider = _itemView.GetGene();
+            context.instance = _itemView.GetRuntimeInstance();
         }
-        // Fallback to NodeCell if no ItemView or ItemView has no provider
-        else if (_nodeCell != null)
+        else if (_itemView.GetToolDefinition() != null)
         {
-            if (_nodeCell.GetToolDefinition() != null)
-            {
-                provider = _nodeCell.GetToolDefinition();
-            }
-            else if (_nodeCell.GetNodeDefinition() != null)
-            {
-                provider = _nodeCell.GetNodeDefinition();
-                sourceData = _nodeCell.GetNodeData();
-            }
+            provider = _itemView.GetToolDefinition();
         }
-        
+        else if (_itemView.GetSeedTemplate() != null)
+        {
+            // Assuming SeedTemplate will implement ITooltipDataProvider
+            // provider = _itemView.GetSeedTemplate(); 
+        }
+
         if (provider != null)
         {
-            UniversalTooltipManager.Instance.ShowTooltip(provider, transform, sourceData);
+            UniversalTooltipManager.Instance.ShowTooltip(provider, transform, context);
             _isShowingTooltip = true;
         }
     }
 
-    private void HideTooltip()
+    void HideTooltip()
     {
         UniversalTooltipManager.Instance?.HideTooltip();
         _isShowingTooltip = false;
     }
 
-    private void OnDisable()
+    void OnDisable()
     {
         if (_isShowingTooltip)
         {

@@ -1,78 +1,58 @@
-﻿// Assets/Scripts/PlantSystem/UI/InventoryGridController.cs
+﻿// Reworked File: Assets/Scripts/PlantSystem/UI/InventoryGridController.cs
 using UnityEngine;
 using UnityEngine.UI;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.EventSystems;
+using Abracodabra.Genes;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Runtime;
+using Abracodabra.Genes.Templates;
+using Abracodabra.UI.Genes;
 
 public class InventoryGridController : MonoBehaviour
 {
-    public static InventoryGridController Instance { get; set; }
+    public static InventoryGridController Instance { get; private set; }
 
-    [Header("Grid Layout")]
-    [SerializeField][Min(1)] public int inventoryRows = 2;
-    [SerializeField][Min(1)] public int inventoryColumns = 8;
-    [SerializeField] Vector2 cellSize = new Vector2(64f, 64f);
-    [SerializeField] float cellMargin = 10f;
+    [Header("Grid Configuration")]
+    [SerializeField][Min(1)] private int inventoryRows = 2;
+    [SerializeField][Min(1)] private int inventoryColumns = 8;
+    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
+    [SerializeField] private float cellMargin = 10f;
 
-    [Header("Visuals & Prefabs")]
-    [SerializeField] Sprite emptyCellSprite;
-    [SerializeField] Color emptyCellColor = Color.white;
-    [SerializeField] GameObject inventoryItemPrefab;
-    [SerializeField] float nodeGlobalImageScale = 1f;
-    [SerializeField] float nodeImageRaycastPadding = 0f;
+    [Header("Prefabs & References")]
+    [SerializeField] private GameObject geneSlotPrefab; // IMPORTANT: Must have GeneSlotUI component
+    [SerializeField] private Transform cellContainer;
+    [SerializeField] private GeneLibrary geneLibrary; // To populate initial genes
 
-    [Header("Initial Items")]
-    [SerializeField] ToolDefinition[] availableTools;
+    private List<GeneSlotUI> inventorySlots = new List<GeneSlotUI>();
 
-    [Header("References")]
-    [SerializeField] Transform cellContainer;
-    [SerializeField] Canvas _rootCanvas;
-
-    [Header("Debugging")]
-    [SerializeField] bool logInventoryChanges = true;
-
-    private readonly List<NodeCell> inventoryCells = new List<NodeCell>();
-
-    // <<< NEW >>> Event to notify listeners of changes
-    public event Action OnInventoryChanged;
-
-    public GameObject InventoryItemPrefab => inventoryItemPrefab;
-    public Color EmptyCellColor => emptyCellColor;
-    public float NodeGlobalImageScale => nodeGlobalImageScale;
-    public float NodeImageRaycastPadding => nodeImageRaycastPadding;
-    public int TotalSlots => inventoryRows * inventoryColumns;
-    public int ActualCellCount => inventoryCells?.Count ?? 0;
+    public event System.Action OnInventoryChanged;
 
     void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
-
-        if (cellContainer == null) Debug.LogError("[InventoryGridController] Cell Container not assigned!", gameObject);
-        if (inventoryItemPrefab == null) Debug.LogError("[InventoryGridController] Inventory Item Prefab not assigned!", gameObject);
-        if (_rootCanvas == null) Debug.LogError("[InventoryGridController] Root Canvas not assigned!", gameObject);
     }
 
     void Start()
     {
-        if (cellContainer != null)
-        {
-            CreateInventoryCells();
-            PopulateInitialGenesFromLibrary();
-        }
+        if (cellContainer == null) Debug.LogError("InventoryGridController: Cell Container not assigned!", this);
+        if (geneSlotPrefab == null) Debug.LogError("InventoryGridController: Gene Slot Prefab not assigned!", this);
+        if (geneLibrary == null) geneLibrary = GeneLibrary.Instance;
+
+        CreateInventoryCells();
+        PopulateInitialInventory();
     }
 
-    void CreateInventoryCells()
+    private void CreateInventoryCells()
     {
         foreach (Transform child in cellContainer) Destroy(child.gameObject);
-        inventoryCells.Clear();
+        inventorySlots.Clear();
 
         GridLayoutGroup gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
         if (gridLayout == null)
         {
-            Debug.LogError("[InventoryGridController] Cell Container MUST have a GridLayoutGroup.", cellContainer.gameObject);
+            Debug.LogError("InventoryGridController: Cell Container MUST have a GridLayoutGroup component.", this);
             return;
         }
 
@@ -84,318 +64,69 @@ public class InventoryGridController : MonoBehaviour
         int totalCells = inventoryRows * inventoryColumns;
         for (int i = 0; i < totalCells; i++)
         {
-            GameObject cellGO = new GameObject($"InventoryCell_{i}", typeof(RectTransform));
-            cellGO.transform.SetParent(cellContainer, false);
-            Image cellImage = cellGO.AddComponent<Image>();
-            cellImage.sprite = emptyCellSprite;
-            cellImage.color = emptyCellColor;
-            cellImage.raycastTarget = true;
-            NodeCell cellLogic = cellGO.AddComponent<NodeCell>();
-            cellLogic.Init(i, this, cellImage);
-            inventoryCells.Add(cellLogic);
-        }
-    }
-
-    void PopulateInitialGenesFromLibrary()
-    {
-        if (NodeEditorGridController.Instance?.DefinitionLibrary == null)
-        {
-            Debug.LogWarning("[InventoryGridController] Cannot populate: NodeEditorGridController or DefinitionLibrary not ready.");
-            return;
-        }
-
-        if (availableTools != null)
-        {
-            foreach (var tool in availableTools)
+            GameObject cellGO = Instantiate(geneSlotPrefab, cellContainer);
+            GeneSlotUI slotUI = cellGO.GetComponent<GeneSlotUI>();
+            if (slotUI != null)
             {
-                if (tool != null && tool.autoAddToInventory)
-                {
-                    AddToolToInventory(tool);
-                }
+                slotUI.slotIndex = i;
+                inventorySlots.Add(slotUI);
+            }
+            else
+            {
+                Debug.LogError($"The provided Gene Slot Prefab for the inventory is missing the 'GeneSlotUI' component!", geneSlotPrefab);
             }
         }
+    }
 
-        NodeDefinitionLibrary lib = NodeEditorGridController.Instance.DefinitionLibrary;
-        if (lib.definitions != null)
+    private void PopulateInitialInventory()
+    {
+        if (geneLibrary == null) return;
+
+        // Add starter genes to inventory
+        foreach (var gene in geneLibrary.starterGenes)
         {
-            int remainingSlots = TotalSlots - GetUsedSlotCount();
-            var definitionsToAdd = lib.definitions.Where(d => d != null).Take(remainingSlots).ToList();
-            foreach (var def in definitionsToAdd)
+            if (gene != null)
             {
-                AddGeneToInventoryFromDefinition(def, null);
+                AddGeneToInventory(gene);
             }
         }
-        // No need to fire OnInventoryChanged here, as this is part of initial setup.
     }
 
-    bool AddToolToInventory(ToolDefinition tool)
+    public bool AddGeneToInventory(GeneBase gene)
     {
-        NodeCell emptyCell = inventoryCells.FirstOrDefault(cell => !cell.HasItem());
-        if (emptyCell == null) return false;
+        if (gene == null) return false;
 
-        NodeData toolNodeData = new NodeData
+        GeneSlotUI emptySlot = inventorySlots.FirstOrDefault(slot => slot.GetGeneInstance() == null);
+        if (emptySlot == null)
         {
-            nodeId = tool.name + "_tool_" + System.Guid.NewGuid().ToString(),
-            definitionName = tool.name,
-            nodeDisplayName = tool.displayName,
-            effects = new List<NodeEffectData>(),
-            orderIndex = -1,
-            canBeDeleted = false,
-            storedSequence = null
-        };
-
-        GameObject itemViewGO = Instantiate(inventoryItemPrefab, emptyCell.transform);
-        ItemView itemView = itemViewGO.GetComponent<ItemView>();
-
-        if (itemView != null)
-        {
-            itemView.Initialize(toolNodeData, tool);
-
-            NodeDraggable draggable = itemViewGO.GetComponent<NodeDraggable>() ?? itemViewGO.AddComponent<NodeDraggable>();
-            draggable.Initialize(this, emptyCell);
-            emptyCell.AssignItemView(itemView, toolNodeData, tool);
-            if (logInventoryChanges) Debug.Log($"[Inventory] Added tool '{tool.displayName}' to cell {emptyCell.CellIndex}.");
-
-            OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
-            return true;
-        }
-
-        Destroy(itemViewGO);
-        return false;
-    }
-
-    public bool AddGeneToInventoryFromDefinition(NodeDefinition geneDef, NodeCell targetCellHint = null)
-    {
-        if (geneDef == null) return false;
-
-        NodeCell cellToUse = (targetCellHint != null && targetCellHint.IsInventoryCell && !targetCellHint.HasItem())
-            ? targetCellHint
-            : inventoryCells.FirstOrDefault(cell => !cell.HasItem());
-
-        if (cellToUse == null) return false;
-
-        NodeData inventoryNode = new NodeData
-        {
-            nodeId = geneDef.name + "_inventory_" + Guid.NewGuid().ToString(),
-            definitionName = geneDef.name,
-            nodeDisplayName = geneDef.displayName,
-            effects = geneDef.CloneEffects(),
-            orderIndex = -1,
-            canBeDeleted = false
-        };
-
-        if (inventoryNode.IsSeed())
-        {
-            inventoryNode.EnsureSeedSequenceInitialized();
-        }
-
-        GameObject itemViewGO = Instantiate(inventoryItemPrefab, cellToUse.transform);
-        ItemView view = itemViewGO.GetComponent<ItemView>();
-        if (view == null)
-        {
-            Destroy(itemViewGO);
+            Debug.LogWarning("Inventory is full! Cannot add new gene.");
             return false;
         }
 
-        view.Initialize(inventoryNode, geneDef, null);
-
-        NodeDraggable draggable = view.GetComponent<NodeDraggable>();
-        if (draggable == null)
-        {
-            draggable = view.gameObject.AddComponent<NodeDraggable>();
-        }
-        draggable.Initialize(this, cellToUse);
-
-        cellToUse.AssignItemView(view, inventoryNode, null);
-
-        if (logInventoryChanges)
-        {
-            Debug.Log($"[Inventory] Added gene '{geneDef.displayName}' (seed: {inventoryNode.IsSeed()}) to cell {cellToUse.CellIndex}");
-        }
-
-        OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
+        var runtimeInstance = new RuntimeGeneInstance(gene);
+        emptySlot.SetGeneInstance(runtimeInstance);
+        
+        OnInventoryChanged?.Invoke();
         return true;
     }
 
-    public void ReturnGeneToInventory(ItemView itemViewToReturn, NodeData geneDataToReturn)
+    public void RemoveGeneFromInventory(RuntimeGeneInstance instance)
     {
-        if (itemViewToReturn == null || geneDataToReturn == null)
+        if (instance == null) return;
+        
+        GeneSlotUI slot = inventorySlots.FirstOrDefault(s => s.GetGeneInstance() == instance);
+        if (slot != null)
         {
-            if (itemViewToReturn != null) Destroy(itemViewToReturn.gameObject);
-            return;
-        }
-
-        NodeCell emptyCell = inventoryCells.FirstOrDefault(cell => !cell.HasItem());
-        if (emptyCell == null)
-        {
-            if (logInventoryChanges)
-            {
-                Debug.LogWarning($"[Inventory] No empty cell to return '{geneDataToReturn.nodeDisplayName}' to. Item destroyed.");
-            }
-            Destroy(itemViewToReturn.gameObject);
-            return;
-        }
-
-        geneDataToReturn.orderIndex = -1;
-        geneDataToReturn.canBeDeleted = false;
-
-        if (geneDataToReturn.IsSeed())
-        {
-            geneDataToReturn.EnsureSeedSequenceInitialized();
-        }
-
-        emptyCell.AssignItemView(itemViewToReturn, geneDataToReturn, null);
-
-        NodeDraggable draggable = itemViewToReturn.GetComponent<NodeDraggable>();
-        if (draggable == null)
-        {
-            draggable = itemViewToReturn.gameObject.AddComponent<NodeDraggable>();
-        }
-        draggable.Initialize(this, emptyCell);
-        draggable.SnapToCell(emptyCell);
-
-        if (logInventoryChanges)
-        {
-            Debug.Log($"[Inventory] Returned gene '{geneDataToReturn.nodeDisplayName}' to cell {emptyCell.CellIndex}");
-        }
-
-        OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
-    }
-
-    public void HandleDropOnInventoryCell(NodeDraggable draggedDraggable, NodeCell originalCell, NodeCell targetInventoryCell)
-    {
-        if (draggedDraggable == null || originalCell == null || targetInventoryCell == null || !targetInventoryCell.IsInventoryCell)
-        {
-            draggedDraggable?.ResetPosition();
-            return;
-        }
-
-        ItemView draggedItemView = draggedDraggable.GetComponent<ItemView>();
-        if (draggedItemView == null)
-        {
-            draggedDraggable.ResetPosition();
-            return;
-        }
-
-        NodeData draggedData = draggedItemView.GetNodeData();
-        ToolDefinition draggedToolDef = draggedItemView.GetToolDefinition();
-
-        if (originalCell.IsInventoryCell)
-        {
-            if (targetInventoryCell == originalCell) { draggedDraggable.ResetPosition(); return; }
-
-            if (targetInventoryCell.HasItem())
-            {
-                ItemView viewInTargetCell = targetInventoryCell.GetItemView();
-                NodeData dataInTargetCell = targetInventoryCell.GetNodeData();
-                ToolDefinition toolInTargetCell = targetInventoryCell.GetToolDefinition();
-
-                originalCell.ClearNodeReference();
-                originalCell.AssignItemView(viewInTargetCell, dataInTargetCell, toolInTargetCell);
-                viewInTargetCell.GetComponent<NodeDraggable>()?.SnapToCell(originalCell);
-                targetInventoryCell.ClearNodeReference();
-            }
-            else
-            {
-                originalCell.ClearNodeReference();
-            }
-
-            targetInventoryCell.AssignItemView(draggedItemView, draggedData, draggedToolDef);
-            draggedDraggable.SnapToCell(targetInventoryCell);
-        }
-        else
-        {
-            NodeDefinition draggedNodeDef = draggedItemView.GetNodeDefinition();
-
-            if (targetInventoryCell.HasItem())
-            {
-                NodeDefinition definitionInInventory = targetInventoryCell.GetNodeDefinition();
-                ToolDefinition toolInInventory = targetInventoryCell.GetToolDefinition();
-                
-                if ((definitionInInventory != null && definitionInInventory.effects.Any(e => e.effectType == NodeEffectType.SeedSpawn)) || toolInInventory != null)
-                {
-                    draggedDraggable.ResetPosition();
-                    return;
-                }
-                
-                NodeDefinition definitionFromSequence = draggedItemView.GetNodeDefinition();
-                
-                originalCell.RemoveNode();
-                targetInventoryCell.RemoveNode();
-                
-                AddGeneToInventoryFromDefinition(definitionFromSequence, targetInventoryCell);
-                originalCell.AssignNode(definitionFromSequence);
-            }
-            else
-            {
-                if (originalCell.IsSeedSlot)
-                {
-                    NodeEditorGridController.Instance.RefreshGraphAndUpdateSeed();
-                    NodeEditorGridController.Instance.UnloadSeedFromSlot();
-                }
-
-                originalCell.ClearNodeReference();
-                
-                targetInventoryCell.AssignItemView(draggedItemView, draggedData, draggedToolDef);
-                
-                draggedDraggable.Initialize(this, targetInventoryCell);
-                draggedDraggable.SnapToCell(targetInventoryCell);
-            }
-
-            NodeEditorGridController.Instance?.RefreshGraphAndUpdateSeed();
-        }
-
-        OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
-    }
-
-    public int GetUsedSlotCount() => inventoryCells.Count(cell => cell.HasItem());
-
-    public void RemoveGeneFromInventory(NodeCell inventoryCell)
-    {
-        if (inventoryCell != null && inventoryCell.HasItem() && inventoryCell.IsInventoryCell)
-        {
-            if (logInventoryChanges) Debug.Log($"[Inventory] Removing item '{inventoryCell.GetNodeData()?.nodeDisplayName ?? "Unknown"}' from cell {inventoryCell.CellIndex}.");
-            inventoryCell.RemoveNode();
-            OnInventoryChanged?.Invoke(); // <<< MODIFIED >>>
+            slot.ClearSlot();
+            OnInventoryChanged?.Invoke();
         }
     }
 
-    public NodeCell GetInventoryCellAtIndex(int index) => (index >= 0 && index < inventoryCells.Count) ? inventoryCells[index] : null;
-
-    public NodeCell FindInventoryCellAtScreenPosition(Vector2 screenPosition)
+    public List<RuntimeGeneInstance> GetAllGenes()
     {
-        if (_rootCanvas == null) return null;
-        foreach (NodeCell cell in inventoryCells)
-        {
-            if (RectTransformUtility.RectangleContainsScreenPoint(cell.GetComponent<RectTransform>(), screenPosition, _rootCanvas.worldCamera))
-            {
-                return cell;
-            }
-        }
-        return null;
-    }
-
-    public InventoryBarItem GetItemAtIndex(int index)
-    {
-        if (index < 0 || index >= inventoryCells.Count) return null;
-
-        var cell = inventoryCells[index];
-        if (cell.HasItem())
-        {
-            var itemView = cell.GetItemView();
-            var toolDef = cell.GetToolDefinition();
-            var nodeDef = cell.GetNodeDefinition();
-            var nodeData = cell.GetNodeData();
-
-            if (toolDef != null)
-            {
-                return InventoryBarItem.FromTool(toolDef, itemView?.gameObject);
-            }
-            if (nodeDef != null && nodeData != null)
-            {
-                return InventoryBarItem.FromNode(nodeData, nodeDef, itemView?.gameObject);
-            }
-        }
-        return null;
+        return inventorySlots
+            .Where(s => s.GetGeneInstance() != null)
+            .Select(s => s.GetGeneInstance())
+            .ToList();
     }
 }

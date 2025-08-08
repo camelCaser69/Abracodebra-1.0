@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// Reworked File: Assets/Scripts/PlantSystem/Growth/PlantCell.cs
+using UnityEngine;
 
 public enum PlantCellType { Seed, Stem, Leaf, Flower, Fruit }
 
@@ -10,14 +11,10 @@ public class PlantCell : MonoBehaviour
 
     void OnDestroy()
     {
+        // Notify the parent PlantGrowth component that this cell was destroyed.
+        // The PlantGrowth component is responsible for updating its internal state.
         if (ParentPlantGrowth != null)
         {
-            if (CellType == PlantCellType.Leaf)
-            {
-                if (Debug.isDebugBuild)
-                    Debug.Log($"[PlantCell OnDestroy] Leaf at {GridCoord} is being destroyed - notifying parent plant", gameObject);
-            }
-
             ParentPlantGrowth.ReportCellDestroyed(GridCoord);
         }
     }

@@ -1,45 +1,37 @@
-﻿// Assets/Scripts/PlantSystem/UI/InventoryColorManager.cs
+﻿// Reworked File: Assets/Scripts/PlantSystem/UI/InventoryColorManager.cs
 using UnityEngine;
-using System.Linq;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Templates;
 
 public class InventoryColorManager : MonoBehaviour
 {
     public static InventoryColorManager Instance { get; private set; }
 
-    [Header("Cell Background Colors")]
-    [SerializeField] private Color toolCellColor = new Color(0.5f, 0.5f, 0.5f, 1f);       // Gray
-    [SerializeField] private Color seedCellColor = new Color(0.8f, 1f, 0.8f, 1f);       // Light Green
-    [SerializeField] private Color passiveGeneCellColor = new Color(0.8f, 0.8f, 1f, 1f);    // Light Blue
-    [SerializeField] private Color activeGeneCellColor = new Color(1f, 0.8f, 0.8f, 1f);     // Light Red / Orange
-    [SerializeField] private Color payloadGeneCellColor = new Color(1f, 0.7f, 1f, 1f);    // Light Magenta
-    [SerializeField] private Color defaultCellColor = new Color(0.9f, 0.9f, 0.9f, 1f);    // Light Gray
+    [SerializeField] private Color toolCellColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+    [SerializeField] private Color seedCellColor = new Color(0.8f, 1f, 0.8f, 1f);
+    [SerializeField] private Color passiveGeneCellColor = new Color(0.8f, 0.8f, 1f, 1f);
+    [SerializeField] private Color activeGeneCellColor = new Color(1f, 0.8f, 0.8f, 1f);
+    [SerializeField] private Color modifierGeneCellColor = new Color(1f, 1f, 0.7f, 1f); // Yellowish
+    [SerializeField] private Color payloadGeneCellColor = new Color(1f, 0.7f, 1f, 1f);
+    [SerializeField] private Color defaultCellColor = new Color(0.9f, 0.9f, 0.9f, 1f);
 
     void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
+        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
         Instance = this;
     }
 
-    public Color GetCellColorForItem(NodeData nodeData, NodeDefinition nodeDefinition, ToolDefinition toolDefinition)
+    public Color GetCellColorForItem(GeneBase gene, SeedTemplate seed, ToolDefinition tool)
     {
-        switch (GetItemCategory(nodeData, nodeDefinition, toolDefinition))
+        switch (GetItemCategory(gene, seed, tool))
         {
-            case ItemCategory.Tool:
-                return toolCellColor;
-            case ItemCategory.Seed:
-                return seedCellColor;
-            case ItemCategory.PassiveGene:
-                return passiveGeneCellColor;
-            case ItemCategory.ActiveGene:
-                return activeGeneCellColor;
-            case ItemCategory.PayloadGene:
-                return payloadGeneCellColor;
-            default:
-                return defaultCellColor;
+            case ItemCategory.Tool: return toolCellColor;
+            case ItemCategory.Seed: return seedCellColor;
+            case ItemCategory.PassiveGene: return passiveGeneCellColor;
+            case ItemCategory.ActiveGene: return activeGeneCellColor;
+            case ItemCategory.ModifierGene: return modifierGeneCellColor;
+            case ItemCategory.PayloadGene: return payloadGeneCellColor;
+            default: return defaultCellColor;
         }
     }
 
@@ -49,30 +41,25 @@ public class InventoryColorManager : MonoBehaviour
         Seed,
         PassiveGene,
         ActiveGene,
+        ModifierGene,
         PayloadGene,
         Default
     }
 
-    public ItemCategory GetItemCategory(NodeData nodeData, NodeDefinition nodeDefinition, ToolDefinition toolDefinition)
+    public ItemCategory GetItemCategory(GeneBase gene, SeedTemplate seed, ToolDefinition tool)
     {
-        if (toolDefinition != null) return ItemCategory.Tool;
-
-        if (nodeData != null && nodeDefinition != null)
+        if (tool != null) return ItemCategory.Tool;
+        if (seed != null) return ItemCategory.Seed;
+        if (gene != null)
         {
-            if (nodeData.IsSeed()) return ItemCategory.Seed;
-
-            // This logic is now based on the NodeDefinition's ActivationType, fixing the compiler error.
-            switch (nodeDefinition.ActivationType)
+            switch (gene.Category)
             {
-                case GeneActivationType.Passive:
-                    return ItemCategory.PassiveGene;
-                case GeneActivationType.Active:
-                    return ItemCategory.ActiveGene;
-                case GeneActivationType.Payload:
-                    return ItemCategory.PayloadGene;
+                case GeneCategory.Passive: return ItemCategory.PassiveGene;
+                case GeneCategory.Active: return ItemCategory.ActiveGene;
+                case GeneCategory.Modifier: return ItemCategory.ModifierGene;
+                case GeneCategory.Payload: return ItemCategory.PayloadGene;
             }
         }
-
         return ItemCategory.Default;
     }
 }
