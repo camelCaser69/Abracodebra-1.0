@@ -1,10 +1,10 @@
-﻿// Reworked File: Assets/Scripts/WorldInteraction/Player/PlayerActionManager.cs
-using System;
+﻿using System;
+using System.Collections;
 using System.Linq;
-using System.Collections; // FIX: Added missing using statement
 using UnityEngine;
 using WegoSystem;
 using Abracodabra.Genes;
+using Abracodabra.UI.Genes; // FIX: Added the missing using statement for PlantPlacementManager
 
 public enum PlayerActionType
 {
@@ -34,10 +34,14 @@ public class PlayerActionManager : MonoBehaviour
 
     void Awake()
     {
-        if (Instance != null && Instance != this) Destroy(gameObject);
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
     }
-    
+
     public bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null, Action onSuccessCallback = null)
     {
         if (debugMode) Debug.Log($"[PlayerActionManager] Executing {actionType} at {gridPosition}");
@@ -46,7 +50,6 @@ public class PlayerActionManager : MonoBehaviour
         int tickCost = tickCostPerAction;
         object eventPayload = actionData;
 
-        // Special handling for harvest tool
         var toolDefForCheck = actionData as ToolDefinition;
         if (actionType == PlayerActionType.UseTool && toolDefForCheck != null && toolDefForCheck.toolType == ToolType.HarvestPouch)
         {
@@ -67,7 +70,6 @@ public class PlayerActionManager : MonoBehaviour
             case PlayerActionType.PlantSeed:
                 tickCost = 2; // Planting takes longer
                 var seedItem = actionData as InventoryBarItem;
-                // Use a lambda to capture the action for the coroutine
                 Func<bool> plantAction = () => ExecutePlantSeed(gridPosition, seedItem);
                 StartCoroutine(ExecuteDelayedAction(plantAction, tickCost, onSuccessCallback, actionType, actionData));
                 return true; // Return early, coroutine handles the rest
@@ -93,7 +95,7 @@ public class PlayerActionManager : MonoBehaviour
         }
         return success;
     }
-    
+
     private bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool)
     {
         if (tool == null) return false;
@@ -120,19 +122,15 @@ public class PlayerActionManager : MonoBehaviour
 
         var plant = plantEntity.GetComponent<PlantGrowth>();
         if (plant == null) return false;
-        
-        // This part needs a rework, as `Harvest` returned NodeDefinitions.
-        // We'll assume for now it's a simple success/fail.
-        // A full implementation would need the plant to return what was harvested.
-        // bool wasHarvested = plant.Harvest();
+
         Debug.LogWarning("PlayerActionManager.ExecuteHarvest needs to be updated to handle returned items from PlantGrowth.");
         bool wasHarvested = true; // Placeholder
 
         if(wasHarvested)
         {
-             // InventoryGridController.Instance.AddGeneToInventory(...);
+            // Future: Add harvested item to inventory
         }
-        
+
         return wasHarvested;
     }
 
@@ -141,8 +139,8 @@ public class PlayerActionManager : MonoBehaviour
         if (debugMode) Debug.Log($"[PlayerActionManager] Interaction at {gridPosition}");
         return true;
     }
-    
-    private IEnumerator ExecuteDelayedAction(Func<bool> action, int tickCost, Action onSuccessCallback, PlayerActionType actionType, object actionData)
+
+    IEnumerator ExecuteDelayedAction(Func<bool> action, int tickCost, Action onSuccessCallback, PlayerActionType actionType, object actionData)
     {
         for (int i = 0; i < tickCost - 1; i++)
         {
@@ -163,7 +161,7 @@ public class PlayerActionManager : MonoBehaviour
             OnActionFailed?.Invoke("Delayed action failed");
         }
     }
-    
+
     public int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null)
     {
         int totalCost = tickCostPerAction;
@@ -177,7 +175,7 @@ public class PlayerActionManager : MonoBehaviour
         }
         return totalCost;
     }
-    
+
     private void AdvanceGameTick(int tickCount = 1)
     {
         if (TickManager.Instance == null) return;

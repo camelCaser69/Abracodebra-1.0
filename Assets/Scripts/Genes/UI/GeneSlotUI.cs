@@ -1,28 +1,30 @@
-﻿// REWORKED FILE: Assets/Scripts/UI/Genes/GeneSlotUI.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
+using Abracodabra.Genes.Runtime;
+using Abracodabra.UI.Genes;
+using Abracodabra.Genes.Templates;
+// The incorrect 'using Abracodabra.Core;' line has been removed.
 
 namespace Abracodabra.UI.Genes
 {
-    // This now represents a generic inventory/sequence slot, not just for genes.
     public class GeneSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
-        public GeneCategory acceptedCategory; // Still useful for sequence slots
+        public GeneCategory acceptedCategory;
         public int slotIndex;
         public bool isLocked = false;
         public bool isDraggable = true;
 
-        [Header("Visuals")]
+        [Header("Visual Components")]
         [SerializeField] private Image slotBackground;
         [SerializeField] private GameObject emptyIndicator;
         [SerializeField] private GameObject lockedOverlay;
         [SerializeField] private GameObject invalidDropOverlay;
         [SerializeField] private GameObject executingEffect;
-        [SerializeField] private ItemView itemView; // The view that shows the item's icon
+        [SerializeField] private ItemView itemView;
 
         [Header("Colors")]
         [SerializeField] private Color normalColor = Color.white;
@@ -34,16 +36,15 @@ namespace Abracodabra.UI.Genes
 
         private GeneSequenceUI parentSequence;
         private IGeneEventBus eventBus;
-        
+
         private GameObject draggedVisual;
         private Canvas canvas;
 
-        private void Awake()
+        void Awake()
         {
             parentSequence = GetComponentInParent<GeneSequenceUI>();
             canvas = GetComponentInParent<Canvas>();
 
-            // The ItemView should be a child of this slot object.
             if (itemView == null)
             {
                 itemView = GetComponentInChildren<ItemView>();
@@ -54,29 +55,21 @@ namespace Abracodabra.UI.Genes
             }
         }
 
-        private void Start()
+        void Start()
         {
             eventBus = GeneServices.Get<IGeneEventBus>();
-            if (eventBus == null)
-            {
-                Debug.LogError("GeneEventBus service not found!", this);
-            }
+            // No error needed if null, just a potential feature loss
         }
 
-        #region Event Handling
-        // Subscribing in OnEnable and unsubscribing in OnDisable is the standard,
-        // robust pattern for handling events on MonoBehaviours that can be
-        // toggled on and off. This prevents memory leaks and duplicate subscriptions.
-        private void OnEnable()
+        void OnEnable()
         {
             eventBus?.Subscribe<GeneExecutedEvent>(OnGeneExecuted);
         }
 
-        private void OnDisable()
+        void OnDisable()
         {
             eventBus?.Unsubscribe<GeneExecutedEvent>(OnGeneExecuted);
         }
-        #endregion
 
         public void SetItem(InventoryBarItem item)
         {
@@ -98,8 +91,7 @@ namespace Abracodabra.UI.Genes
 
             if (!isEmpty)
             {
-                // Let the ItemView handle its own initialization
-                switch(CurrentItem.Type)
+                switch (CurrentItem.Type)
                 {
                     case InventoryBarItem.ItemType.Gene:
                         itemView.InitializeAsGene(CurrentItem.GeneInstance);
@@ -107,23 +99,22 @@ namespace Abracodabra.UI.Genes
                         break;
                     case InventoryBarItem.ItemType.Seed:
                         itemView.InitializeAsSeed(CurrentItem.SeedTemplate);
-                        if (slotBackground != null) slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, CurrentItem.SeedTemplate, null);
+                        if (slotBackground != null && InventoryColorManager.Instance != null) slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, CurrentItem.SeedTemplate, null);
                         break;
                     case InventoryBarItem.ItemType.Tool:
                         itemView.InitializeAsTool(CurrentItem.ToolDefinition);
-                        if (slotBackground != null) slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, null, CurrentItem.ToolDefinition);
+                        if (slotBackground != null && InventoryColorManager.Instance != null) slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, null, CurrentItem.ToolDefinition);
                         break;
                 }
             }
             else
             {
-                 if (slotBackground != null) slotBackground.color = normalColor;
+                if (slotBackground != null) slotBackground.color = normalColor;
             }
 
             if (lockedOverlay != null) lockedOverlay.SetActive(isLocked);
         }
 
-        #region Drag and Drop
         public void OnBeginDrag(PointerEventData eventData)
         {
             if (!isDraggable || CurrentItem == null || isLocked)
@@ -150,7 +141,7 @@ namespace Abracodabra.UI.Genes
                 draggedVisual = null;
             }
         }
-        
+
         public void OnDrop(PointerEventData eventData)
         {
             if (isLocked) return;
@@ -159,43 +150,63 @@ namespace Abracodabra.UI.Genes
             if (sourceSlot == null || sourceSlot == this) return;
 
             var draggedItem = sourceSlot.CurrentItem;
-            if (draggedItem == null) return;
+            if (draggedItem == null || draggedItem.Type != InventoryBarItem.ItemType.Gene)
+            {
+                ShowInvalidDropFeedback();
+                return;
+            }
             
-            // For a gene, check if it can be attached to this slot's active gene
+            // Validate category
+            var draggedGene = draggedItem.GeneInstance.GetGene();
+            if (draggedGene.Category != acceptedCategory)
+            {
+                 ShowInvalidDropFeedback();
+                 return;
+            }
+
+            // Validate attachment for modifiers/payloads
             if (acceptedCategory == GeneCategory.Modifier || acceptedCategory == GeneCategory.Payload)
             {
                 var activeGene = parentSequence?.GetActiveGeneForRow(slotIndex);
-                if (activeGene == null || !draggedItem.GeneInstance.GetGene().CanAttachTo(activeGene))
+                if (activeGene == null || !draggedGene.CanAttachTo(activeGene))
                 {
                     ShowInvalidDropFeedback();
                     return;
                 }
             }
-            
-            // Swap items
-            var previousItemInThisSlot = this.CurrentItem;
-            SetItem(draggedItem);
-            sourceSlot.SetItem(previousItemInThisSlot);
-        }
-        #endregion
 
-        #region Pointer Events
+            // If we are in a sequence builder, notify the parent to update the data model
+            if (parentSequence != null)
+            {
+                parentSequence.UpdateGeneInSequence(slotIndex, acceptedCategory, draggedItem);
+                
+                // The source slot should now contain what was in this slot before the drop
+                // This logic might need to be expanded if you want to drag *from* the inventory grid
+                // For now, we assume swaps happen within the sequence UI
+                sourceSlot.parentSequence.UpdateGeneInSequence(sourceSlot.slotIndex, sourceSlot.acceptedCategory, this.CurrentItem);
+            }
+            else // Otherwise, perform a simple swap (for inventory grid)
+            {
+                var previousItemInThisSlot = this.CurrentItem;
+                SetItem(draggedItem);
+                sourceSlot.SetItem(previousItemInThisSlot);
+            }
+        }
+
+
         public void OnPointerEnter(PointerEventData eventData)
         {
             if (isLocked || slotBackground == null || eventData.pointerDrag == null) return;
-            
-            // TODO: Add proper validation logic here if needed
+
             slotBackground.color = highlightColor;
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            // Reset color, UpdateVisuals will set it correctly based on content
-            if (slotBackground != null) slotBackground.color = normalColor; 
+            if (slotBackground != null) slotBackground.color = normalColor;
             UpdateVisuals();
             if (invalidDropOverlay != null) invalidDropOverlay.SetActive(false);
         }
-        #endregion
 
         private void CreateDragVisual()
         {
@@ -219,7 +230,7 @@ namespace Abracodabra.UI.Genes
             StartCoroutine(FlashColor(invalidColor));
         }
 
-        private IEnumerator FlashColor(Color flashColor)
+        IEnumerator FlashColor(Color flashColor)
         {
             if (slotBackground == null) yield break;
             Color originalColor = slotBackground.color;
@@ -229,7 +240,6 @@ namespace Abracodabra.UI.Genes
             UpdateVisuals();
         }
 
-        #region Execution Feedback
         private void OnGeneExecuted(GeneExecutedEvent evt)
         {
             if (CurrentItem != null && CurrentItem.Type == InventoryBarItem.ItemType.Gene && CurrentItem.GeneInstance.GetGene()?.GUID == evt.Gene.GUID)
@@ -250,6 +260,5 @@ namespace Abracodabra.UI.Genes
             if (executingEffect != null) executingEffect.SetActive(false);
             UpdateVisuals();
         }
-        #endregion
     }
 }
