@@ -1,4 +1,5 @@
 ﻿// File: Assets/Scripts/Genes/PlantSequenceExecutor.cs
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,17 +18,23 @@ namespace Abracodabra.Genes
         public float tickInterval = 1f;
         public bool isPaused = false;
 
-        Coroutine executionCoroutine;
-        IGeneEventBus eventBus;
-        IDeterministicRandom random;
+        private Coroutine executionCoroutine;
+        private IGeneEventBus eventBus;
+        private IDeterministicRandom random;
 
-        void Awake()
+        private void Awake()
         {
             eventBus = GeneServices.Get<IGeneEventBus>();
             random = GeneServices.Get<IDeterministicRandom>();
+
+            if (eventBus == null || random == null)
+            {
+                Debug.LogError($"[{nameof(PlantSequenceExecutor)}] on {gameObject.name} could not retrieve required gene services! This indicates a critical initialization order problem. The component will be disabled.", this);
+                enabled = false;
+            }
         }
 
-        void Start()
+        private void Start()
         {
             if (plantGrowth == null)
                 plantGrowth = GetComponent<PlantGrowth>();
@@ -36,23 +43,9 @@ namespace Abracodabra.Genes
         public void InitializeWithTemplate(SeedTemplate template)
         {
             runtimeState = template.CreateRuntimeState();
-            ApplyPassiveGenes();
+            // The call to ApplyPassiveGenes() has been removed from here.
+            // PlantGrowth now handles this in the correct order.
             StartExecution();
-        }
-
-        void ApplyPassiveGenes()
-        {
-            if (runtimeState == null) return;
-
-            foreach (var instance in runtimeState.passiveInstances)
-            {
-                var passive = instance.GetGene<PassiveGene>();
-                if (passive != null && passive.MeetsRequirements(plantGrowth))
-                {
-                    passive.ApplyToPlant(plantGrowth, instance);
-                    Debug.Log($"Applied passive gene: {passive.geneName} to {plantGrowth.name}");
-                }
-            }
         }
 
         public void StartExecution()

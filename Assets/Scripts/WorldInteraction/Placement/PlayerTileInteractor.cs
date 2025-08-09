@@ -43,14 +43,16 @@ public sealed class PlayerTileInteractor : MonoBehaviour
         }
     }
 
+    // In file: Assets/Scripts/WorldInteraction/Placement/PlayerTileInteractor.cs
+
     private void HandleRightClick()
     {
         if (!EnsureManagers()) return;
 
         InventoryBarItem selected = inventoryBar.SelectedItem;
         if (selected == null || !selected.IsValid()) return;
-        
-        // FIX: Logic for consuming items (right-click)
+
+        // Only consumable genes can be right-clicked to be eaten
         if (selected.Type == InventoryBarItem.ItemType.Gene)
         {
             var itemData = new HarvestedItem(selected.GeneInstance);
@@ -58,62 +60,94 @@ public sealed class PlayerTileInteractor : MonoBehaviour
 
             GardenerController player = playerTransform.GetComponent<GardenerController>();
             if (player == null || player.HungerSystem == null) return;
-            
+
+            // Eat the item
             player.HungerSystem.Eat(itemData.GetNutritionValue());
 
-            System.Action onSuccess = () => {
-                // Remove the gene from the main inventory grid
-                InventoryGridController.Instance.RemoveGeneFromInventory(selected.GeneInstance);
-                inventoryBar.ShowBar(); // Refresh the bar
+            // Define what happens on a successful action
+            System.Action onSuccess = () =>
+            {
+                // THIS IS THE FIX: Call the correct generic removal method
+                InventoryGridController.Instance.RemoveItemFromInventory(selected);
+
+                // Refresh the bar to show the item has been removed
+                inventoryBar.ShowBar(); 
             };
-            
-            PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Interact, 
+
+            // Execute the action with the success callback
+            PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Interact,
                 tileInteractionManager.WorldToCell(playerTransform.position), "Eating", onSuccess);
         }
     }
 
-    private void HandleLeftClick()
-    {
-        if (!EnsureManagers()) return;
+    
+        // In file: Assets/Scripts/WorldInteraction/Placement/PlayerTileInteractor.cs
 
-        InventoryBarItem selected = inventoryBar.SelectedItem;
-        if (selected == null || !selected.IsValid())
+        // In file: Assets/Scripts/WorldInteraction/Placement/PlayerTileInteractor.cs
+
+        // In file: Assets/Scripts/WorldInteraction/Placement/PlayerTileInteractor.cs
+
+        private void HandleLeftClick()
         {
-            // FIX: Using the debug flag
-            if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: No valid item selected.");
-            return;
-        }
+            if (!EnsureManagers()) return;
 
-        Vector3 mouseW = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3Int cellPos = tileInteractionManager.WorldToCell(mouseW);
-        Vector3 cellCenter = tileInteractionManager.interactionGrid.GetCellCenterWorld(cellPos);
+            InventoryBarItem selected = inventoryBar.SelectedItem;
+            if (selected == null || !selected.IsValid())
+            {
+                if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: No valid item selected.");
+                return;
+            }
 
-        if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius)
-        {
-            // FIX: Using the debug flag
-            if (showDebug) Debug.Log($"[PlayerTileInteractor] Left-click ignored: Target cell {cellPos} is out of range.");
-            return;
-        }
-        
-        // FIX: Using the debug flag to log the action
-        if (showDebug) Debug.Log($"[PlayerTileInteractor] Attempting action '{selected.Type}' with item '{selected.GetDisplayName()}' at {cellPos}.");
+            Vector3 mouseW = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3Int cellPos = tileInteractionManager.WorldToCell(mouseW);
+            Vector3 cellCenter = tileInteractionManager.interactionGrid.GetCellCenterWorld(cellPos);
 
-        switch (selected.Type)
-        {
-            case InventoryBarItem.ItemType.Tool:
-                PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.UseTool, cellPos, selected.ToolDefinition);
-                break;
-            
-            case InventoryBarItem.ItemType.Seed:
-                System.Action onSuccess = () => {
-                    if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
-                    // TODO: Implement removal of seed from inventory.
-                    inventoryBar.ShowBar();
-                };
-                PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess);
-                break;
+            if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius)
+            {
+                if (showDebug) Debug.Log($"[PlayerTileInteractor] Left-click ignored: Target cell {cellPos} is out of range.");
+                return;
+            }
+
+            if (showDebug) Debug.Log($"[PlayerTileInteractor] Attempting action '{selected.Type}' with item '{selected.GetDisplayName()}' at {cellPos}.");
+
+            switch (selected.Type)
+            {
+                case InventoryBarItem.ItemType.Tool:
+                    var toolDef = selected.ToolDefinition;
+
+                    if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool != toolDef)
+                    {
+                        ToolSwitcher.Instance.SelectToolByDefinition(toolDef);
+                    }
+
+                    if (ToolSwitcher.Instance != null)
+                    {
+                        if (!ToolSwitcher.Instance.TryConsumeUse())
+                        {
+                            if (showDebug) Debug.Log($"[PlayerTileInteractor] Action blocked: Tool '{selected.GetDisplayName()}' is out of uses.");
+                            return;
+                        }
+                    }
+
+                    PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.UseTool, cellPos, toolDef);
+                    break;
+
+                case InventoryBarItem.ItemType.Seed:
+                    // This is the success callback that will be executed by the PlayerActionManager
+                    System.Action onSuccess = () =>
+                    {
+                        if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
+
+                        // THIS IS THE FIX: Call the generic RemoveItemFromInventory with the specific item instance.
+                        InventoryGridController.Instance?.RemoveItemFromInventory(selected);
+
+                        // Refresh the bar to show the change
+                        inventoryBar.ShowBar();
+                    };
+                    PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess);
+                    break;
+            }
         }
-    }
 
     private bool EnsureManagers()
     {

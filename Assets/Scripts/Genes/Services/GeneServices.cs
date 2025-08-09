@@ -1,8 +1,9 @@
 ﻿// REWORKED FILE: Assets/Scripts/Genes/Services/GeneServices.cs
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using Abracodabra.Genes.Core; // FIX: Added missing using statement for GeneBase
+using Abracodabra.Genes.Core;
 
 namespace Abracodabra.Genes.Services
 {
@@ -15,11 +16,8 @@ namespace Abracodabra.Genes.Services
         {
             if (isInitialized) return;
 
-            // FIX: Only register services that don't depend on a scene asset.
-            // The GeneLibrary will be registered by its own loader.
             Register<IGeneEventBus>(new GeneEventBus());
             Register<IDeterministicRandom>(new DeterministicRandom(DateTime.Now.Millisecond));
-            // GeneEffectPool is a MonoBehaviour, so it will be registered by its loader/instance.
 
             isInitialized = true;
             Debug.Log("Core Gene Services initialized (EventBus, Random).");
@@ -38,6 +36,26 @@ namespace Abracodabra.Genes.Services
                 return null;
             }
 
+            // Fallback for GeneLibrary if it wasn't registered in time
+            if (typeof(T) == typeof(IGeneLibrary) && !services.ContainsKey(typeof(T)))
+            {
+                Debug.LogWarning("IGeneLibrary service was requested before it was registered. Attempting to find and register it now.");
+                var library = GeneLibrary.Instance ?? Resources.FindObjectsOfTypeAll<GeneLibrary>().FirstOrDefault();
+                if (library != null)
+                {
+                    if (GeneLibrary.Instance == null)
+                    {
+                        library.SetActiveInstance(); // Ensures the lookups are built
+                    }
+                    Register<IGeneLibrary>(library);
+                    Debug.Log("Successfully found and registered IGeneLibrary service on-demand.");
+                }
+                else
+                {
+                    Debug.LogError("CRITICAL: Could not find any GeneLibrary asset to register as a fallback service!");
+                }
+            }
+
             if (services.TryGetValue(typeof(T), out object service))
                 return (T)service;
 
@@ -52,7 +70,6 @@ namespace Abracodabra.Genes.Services
         }
     }
 
-    #region Service Interfaces
     public interface IGeneLibrary
     {
         GeneBase GetGeneByGUID(string guid);
@@ -79,5 +96,4 @@ namespace Abracodabra.Genes.Services
         int Range(int min, int max);
         void SetSeed(int seed);
     }
-    #endregion
 }

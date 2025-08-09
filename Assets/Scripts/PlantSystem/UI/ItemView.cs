@@ -7,30 +7,18 @@ using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.UI.Genes
 {
-    /// <summary>
-    /// A component that holds the visual and data references for an item in a UI slot.
-    /// It works in conjunction with a GeneSlotUI.
-    /// </summary>
     public class ItemView : MonoBehaviour
     {
-        [Header("Visual Elements")]
         [SerializeField] private Image thumbnailImage;
         [SerializeField] private Image backgroundImage;
         [SerializeField] private Sprite fallbackThumbnail;
 
-        // Data References
         private GeneBase _gene;
         private RuntimeGeneInstance _runtimeInstance;
         private ToolDefinition _toolDefinition;
         private SeedTemplate _seedTemplate;
 
-        private GeneSlotUI _parentSlot;
         private Color _originalBackgroundColor;
-
-        void Awake()
-        {
-            _parentSlot = GetComponent<GeneSlotUI>();
-        }
 
         public void InitializeAsGene(RuntimeGeneInstance instance)
         {
@@ -39,6 +27,7 @@ namespace Abracodabra.UI.Genes
             _toolDefinition = null;
             _seedTemplate = null;
             SetupVisuals();
+            gameObject.SetActive(true);
         }
 
         public void InitializeAsTool(ToolDefinition toolDef)
@@ -48,6 +37,7 @@ namespace Abracodabra.UI.Genes
             _toolDefinition = toolDef;
             _seedTemplate = null;
             SetupVisuals();
+            gameObject.SetActive(true);
         }
 
         public void InitializeAsSeed(SeedTemplate seed)
@@ -57,11 +47,11 @@ namespace Abracodabra.UI.Genes
             _toolDefinition = null;
             _seedTemplate = seed;
             SetupVisuals();
+            gameObject.SetActive(true);
         }
 
         private void SetupVisuals()
         {
-            // Determine what this ItemView represents
             Sprite spriteToShow = fallbackThumbnail;
             Color tintColor = Color.white;
             _originalBackgroundColor = Color.gray;
@@ -70,19 +60,19 @@ namespace Abracodabra.UI.Genes
             {
                 spriteToShow = _gene.icon ?? fallbackThumbnail;
                 tintColor = _gene.geneColor;
-                _originalBackgroundColor = _gene.geneColor;
+                _originalBackgroundColor = _gene.geneColor.WithAlpha(0.5f);
             }
             else if (_toolDefinition != null)
             {
                 spriteToShow = _toolDefinition.icon ?? fallbackThumbnail;
                 tintColor = _toolDefinition.iconTint;
-                _originalBackgroundColor = Color.gray; // Placeholder for tool color
+                _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(null, null, _toolDefinition);
             }
             else if (_seedTemplate != null)
             {
                 spriteToShow = _seedTemplate.icon ?? fallbackThumbnail;
                 tintColor = Color.white;
-                _originalBackgroundColor = Color.green; // Placeholder for seed color
+                _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(null, _seedTemplate, null);
             }
 
             if (thumbnailImage != null)
@@ -98,7 +88,15 @@ namespace Abracodabra.UI.Genes
             }
         }
         
-        // Data Accessors
+        public void Clear()
+        {
+            _gene = null;
+            _runtimeInstance = null;
+            _toolDefinition = null;
+            _seedTemplate = null;
+            gameObject.SetActive(false);
+        }
+
         public GeneBase GetGene() => _gene;
         public RuntimeGeneInstance GetRuntimeInstance() => _runtimeInstance;
         public ToolDefinition GetToolDefinition() => _toolDefinition;

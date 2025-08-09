@@ -4,9 +4,6 @@ using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Templates;
 
-/// <summary>
-/// Represents a selectable item in the inventory bar, rebuilt for the new gene system.
-/// </summary>
 public class InventoryBarItem
 {
     public enum ItemType { Gene, Seed, Tool }
@@ -15,38 +12,37 @@ public class InventoryBarItem
     public RuntimeGeneInstance GeneInstance { get; private set; }
     public SeedTemplate SeedTemplate { get; private set; }
     public ToolDefinition ToolDefinition { get; private set; }
-    public GameObject ViewGameObject { get; private set; } // The UI object in the inventory
+    
+    // NOTE: The ViewGameObject property has been removed to simplify the design
+    // and resolve the inaccessible setter error. The UI component will hold this data object.
 
-    public static InventoryBarItem FromGene(RuntimeGeneInstance instance, GameObject viewObj = null)
+    public static InventoryBarItem FromGene(RuntimeGeneInstance instance)
     {
         if (instance == null) return null;
         return new InventoryBarItem
         {
             Type = ItemType.Gene,
-            GeneInstance = instance,
-            ViewGameObject = viewObj
+            GeneInstance = instance
         };
     }
 
-    public static InventoryBarItem FromSeed(SeedTemplate seed, GameObject viewObj = null)
+    public static InventoryBarItem FromSeed(SeedTemplate seed)
     {
         if (seed == null) return null;
         return new InventoryBarItem
         {
             Type = ItemType.Seed,
-            SeedTemplate = seed,
-            ViewGameObject = viewObj
+            SeedTemplate = seed
         };
     }
 
-    public static InventoryBarItem FromTool(ToolDefinition tool, GameObject viewObj = null)
+    public static InventoryBarItem FromTool(ToolDefinition tool)
     {
         if (tool == null) return null;
         return new InventoryBarItem
         {
             Type = ItemType.Tool,
-            ToolDefinition = tool,
-            ViewGameObject = viewObj
+            ToolDefinition = tool
         };
     }
 
@@ -71,7 +67,7 @@ public class InventoryBarItem
             default: return null;
         }
     }
-    
+
     public bool IsValid()
     {
         switch (Type)

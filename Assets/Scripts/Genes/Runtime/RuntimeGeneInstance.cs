@@ -6,6 +6,10 @@ using Abracodabra.Genes.Core;
 
 namespace Abracodabra.Genes.Runtime
 {
+    /// <summary>
+    /// Represents a single, unique instance of a GeneBase asset. This class holds any
+    /// runtime-specific data or modifications for that gene instance.
+    /// </summary>
     [Serializable]
     public class RuntimeGeneInstance : ISerializationCallbackReceiver
     {
@@ -46,7 +50,7 @@ namespace Abracodabra.Genes.Runtime
         private void LoadGene()
         {
             cachedGene = SafeGeneLoader.LoadGeneWithFallback(geneGUID, geneName);
-            if (cachedGene != null)
+            if (cachedGene != null && instanceData != null)
             {
                 if (instanceData.version < cachedGene.Version)
                 {
@@ -71,18 +75,15 @@ namespace Abracodabra.Genes.Runtime
             instanceData.ModifyValue(key, delta);
         }
 
-        #region Serialization Callbacks
-        // FIX: Added serialization methods
+        #region Serialization
         public void OnBeforeSerialize()
         {
-            // Save the current gene reference to ensure it persists
             if (cachedGene != null)
             {
                 geneGUID = cachedGene.GUID;
                 geneName = cachedGene.geneName;
-        
-                // Update version if needed
-                if (instanceData.version < cachedGene.Version)
+
+                if (instanceData != null && instanceData.version < cachedGene.Version)
                 {
                     instanceData.version = cachedGene.Version;
                 }
@@ -91,36 +92,88 @@ namespace Abracodabra.Genes.Runtime
 
         public void OnAfterDeserialize()
         {
-            // Clear cached reference to force reload
+            // Clear the cache, forcing a reload via SafeGeneLoader next time GetGene() is called.
+            // This ensures we always have the correct, up-to-date gene asset.
             cachedGene = null;
         }
         #endregion
     }
 
+    /// <summary>
+    /// Holds the serializable data for a RuntimeGeneInstance.
+    /// Implements ISerializationCallbackReceiver to handle the serialization of a dictionary,
+    /// which Unity cannot do by default. It converts the dictionary to two lists before serialization
+    /// and back to a dictionary after deserialization.
+    /// </summary>
     [Serializable]
-    public class GeneInstanceData
+    public class GeneInstanceData : ISerializationCallbackReceiver
     {
         public int version = 1;
-        public Dictionary<string, float> values = new Dictionary<string, float>();
+
+        // Serialized fields
+        [SerializeField] private List<string> _keys = new List<string>();
+        [SerializeField] private List<float> _values = new List<float>();
+
+        // Runtime dictionary (fast lookups)
+        [NonSerialized] private Dictionary<string, float> _runtimeValues = new Dictionary<string, float>();
+        
         public int stackCount = 1;
         public float powerMultiplier = 1f;
 
         public float GetValue(string key, float defaultValue = 0f)
         {
-            return values.TryGetValue(key, out float value) ? value : defaultValue;
+            return _runtimeValues.TryGetValue(key, out float value) ? value : defaultValue;
         }
 
         public void SetValue(string key, float value)
         {
-            values[key] = value;
+            _runtimeValues[key] = value;
         }
 
         public void ModifyValue(string key, float delta)
         {
-            if (values.ContainsKey(key))
-                values[key] += delta;
+            if (_runtimeValues.TryGetValue(key, out float currentValue))
+            {
+                _runtimeValues[key] = currentValue + delta;
+            }
             else
-                values[key] = delta;
+            {
+                _runtimeValues[key] = delta;
+            }
+        }
+
+        public void OnBeforeSerialize()
+        {
+            _keys.Clear();
+            _values.Clear();
+
+            if (_runtimeValues == null)
+            {
+                return;
+            }
+
+            foreach (var kvp in _runtimeValues)
+            {
+                _keys.Add(kvp.Key);
+                _values.Add(kvp.Value);
+            }
+        }
+
+        public void OnAfterDeserialize()
+        {
+            _runtimeValues = new Dictionary<string, float>();
+
+            if (_keys != null && _values != null && _keys.Count == _values.Count)
+            {
+                for (int i = 0; i < _keys.Count; i++)
+                {
+                    // Guard against duplicate or null keys which could happen during serialization
+                    if (!string.IsNullOrEmpty(_keys[i]) && !_runtimeValues.ContainsKey(_keys[i]))
+                    {
+                        _runtimeValues.Add(_keys[i], _values[i]);
+                    }
+                }
+            }
         }
     }
 }

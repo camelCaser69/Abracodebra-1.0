@@ -7,7 +7,6 @@ namespace Abracodabra.UI.Genes
 {
     public class SequenceRowUI : MonoBehaviour
     {
-        [Header("Slot References")]
         public GeneSlotUI modifierSlot;
         public GeneSlotUI activeSlot;
         public GeneSlotUI payloadSlot;
@@ -39,9 +38,14 @@ namespace Abracodabra.UI.Genes
 
         public void LoadSlot(RuntimeSequenceSlot slotData)
         {
-            activeSlot?.SetGeneInstance(slotData.activeInstance);
-            modifierSlot?.SetGeneInstance(slotData.modifierInstances.Count > 0 ? slotData.modifierInstances[0] : null);
-            payloadSlot?.SetGeneInstance(slotData.payloadInstances.Count > 0 ? slotData.payloadInstances[0] : null);
+            activeSlot?.SetItem(slotData.activeInstance != null ? InventoryBarItem.FromGene(slotData.activeInstance) : null);
+            
+            var modInstance = slotData.modifierInstances.Count > 0 ? slotData.modifierInstances[0] : null;
+            modifierSlot?.SetItem(modInstance != null ? InventoryBarItem.FromGene(modInstance) : null);
+            
+            var payloadInstance = slotData.payloadInstances.Count > 0 ? slotData.payloadInstances[0] : null;
+            payloadSlot?.SetItem(payloadInstance != null ? InventoryBarItem.FromGene(payloadInstance) : null);
+
             UpdateAttachmentSlots(GetActiveGene());
         }
 
@@ -55,7 +59,8 @@ namespace Abracodabra.UI.Genes
 
         public ActiveGene GetActiveGene()
         {
-            return activeSlot?.GetGeneInstance()?.GetGene<ActiveGene>();
+            // Get the item, check if it's a gene, then get the gene and cast it
+            return activeSlot?.CurrentItem?.GeneInstance?.GetGene<ActiveGene>();
         }
 
         public void UpdateAttachmentSlots(ActiveGene activeGene)

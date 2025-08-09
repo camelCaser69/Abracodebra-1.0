@@ -73,6 +73,8 @@ namespace Abracodabra.Genes
             if (tickManager != null) { tickManager.UnregisterTickUpdateable(this); }
         }
 
+        // In file: Assets/Scripts/PlantSystem/Growth/PlantGrowth.cs
+
         public void InitializeFromTemplate(SeedTemplate template)
         {
             if (template == null)
@@ -84,32 +86,32 @@ namespace Abracodabra.Genes
 
             this.seedTemplate = template;
             geneRuntimeState = template.CreateRuntimeState();
-            
-            // Initialize energy system with template values
-            EnergySystem.MaxEnergy = geneRuntimeState.maxEnergy * energyStorageMultiplier;
-            EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
-            
-            // Initialize growth logic with template values
-            GrowthLogic.PhotosynthesisEfficiencyPerLeaf = template.energyRegenRate * energyGenerationMultiplier;
-            GrowthLogic.TargetStemLength = minHeight; // Will be modified by passive genes
-            
-            // Setup sequence executor
+
+            // Get or add the executor component and link it to this plant
             sequenceExecutor = GetComponent<PlantSequenceExecutor>();
             if (sequenceExecutor == null)
             {
                 sequenceExecutor = gameObject.AddComponent<PlantSequenceExecutor>();
             }
-
             sequenceExecutor.plantGrowth = this;
-            sequenceExecutor.InitializeWithTemplate(template);
+            
+            // --- REORDERED LOGIC ---
 
-            // Apply passive genes (this will modify our stat multipliers)
+            // 1. Apply all passive gene effects first. This will correctly set all multipliers
+            //    (growthSpeedMultiplier, energyStorageMultiplier, etc.) on this component.
             GrowthLogic.CalculateAndApplyPassiveStats();
+
+            // 2. Now that multipliers are correct, initialize the energy system.
+            EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
+            EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
+            GrowthLogic.PhotosynthesisEfficiencyPerLeaf = template.energyRegenRate * energyGenerationMultiplier;
             
-            // Spawn initial seed cell
+            // 3. Finally, initialize the sequence executor, which will start the active gene loop.
+            sequenceExecutor.InitializeWithTemplate(template);
+            
+            // --- END REORDERED LOGIC ---
+
             CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
-            
-            // Start growing!
             CurrentState = PlantState.Growing;
 
             if (TickManager.Instance != null)

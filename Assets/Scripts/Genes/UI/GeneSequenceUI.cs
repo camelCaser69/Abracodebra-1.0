@@ -1,47 +1,41 @@
 ﻿// REWORKED FILE: Assets/Scripts/UI/Genes/GeneSequenceUI.cs
 using UnityEngine;
-using System.Collections.Generic;
 using UnityEngine.UI;
+using System.Collections.Generic;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
-using Abracodabra.Genes; // FIX: Added missing using statement for PlantSequenceExecutor
+using Abracodabra.Genes;
 
 namespace Abracodabra.UI.Genes
 {
-    // ... (rest of the file is identical to the one I sent previously)
     public class GeneSequenceUI : MonoBehaviour
     {
-        [Header("UI Structure")]
         public Transform passiveGenesContainer;
         public Transform activeSequenceContainer;
         public GameObject sequenceRowPrefab;
         public GameObject passiveSlotPrefab;
 
-        [Header("Display Elements")]
         public TMPro.TextMeshProUGUI energyCostText;
         public TMPro.TextMeshProUGUI currentEnergyText;
         public TMPro.TextMeshProUGUI rechargeTimeText;
         public Slider rechargeProgress;
         public TMPro.TextMeshProUGUI validationMessage;
 
-        [Header("Configuration")]
         public int maxPassiveSlots = 6;
         public int maxSequenceLength = 5;
 
-        // Runtime
         private PlantGeneRuntimeState runtimeState;
         private List<GeneSlotUI> passiveSlots = new List<GeneSlotUI>();
         private List<SequenceRowUI> sequenceRows = new List<SequenceRowUI>();
         private PlantSequenceExecutor executor;
 
-        void Start()
+        private void Start()
         {
             InitializeUI();
         }
 
-        void InitializeUI()
+        private void InitializeUI()
         {
-            // Create passive slots
             for (int i = 0; i < maxPassiveSlots; i++)
             {
                 GameObject slotObj = Instantiate(passiveSlotPrefab, passiveGenesContainer);
@@ -51,7 +45,6 @@ namespace Abracodabra.UI.Genes
                 passiveSlots.Add(slot);
             }
 
-            // Create sequence rows
             for (int i = 0; i < maxSequenceLength; i++)
             {
                 GameObject rowObj = Instantiate(sequenceRowPrefab, activeSequenceContainer);
@@ -66,16 +59,21 @@ namespace Abracodabra.UI.Genes
             runtimeState = state;
             if (state == null) return;
 
-            // Load passive genes
+            // Update Passive Slots
             for (int i = 0; i < passiveSlots.Count; i++)
             {
                 if (i < state.passiveInstances.Count)
-                    passiveSlots[i].SetGeneInstance(state.passiveInstances[i]);
+                {
+                    var instance = state.passiveInstances[i];
+                    passiveSlots[i].SetItem(InventoryBarItem.FromGene(instance));
+                }
                 else
+                {
                     passiveSlots[i].ClearSlot();
+                }
             }
 
-            // Load active sequence
+            // Update Active Sequence Rows
             for (int i = 0; i < sequenceRows.Count; i++)
             {
                 if (i < state.activeSequence.Count)
@@ -86,15 +84,9 @@ namespace Abracodabra.UI.Genes
 
             UpdateDisplay();
         }
-
-        public void OnActiveGeneChanged(int rowIndex, ActiveGene gene)
-        {
-            if (rowIndex >= 0 && rowIndex < sequenceRows.Count)
-            {
-                sequenceRows[rowIndex].UpdateAttachmentSlots(gene);
-            }
-            UpdateDisplay();
-        }
+        
+        // This method is no longer needed as the slots are not gene-specific anymore
+        // public void OnActiveGeneChanged(int rowIndex, ActiveGene gene) { ... }
 
         public ActiveGene GetActiveGeneForRow(int rowIndex)
         {
@@ -105,7 +97,7 @@ namespace Abracodabra.UI.Genes
             return null;
         }
 
-        void UpdateDisplay()
+        private void UpdateDisplay()
         {
             if (runtimeState == null) return;
 
@@ -118,10 +110,10 @@ namespace Abracodabra.UI.Genes
             if(validationMessage != null) validationMessage.gameObject.SetActive(!isValid);
         }
 
-        bool ValidateConfiguration()
+        private bool ValidateConfiguration()
         {
             if (runtimeState == null) return false;
-            
+
             bool hasActiveGene = false;
             foreach (var slot in runtimeState.activeSequence)
             {
@@ -146,11 +138,10 @@ namespace Abracodabra.UI.Genes
             executor = exec;
         }
 
-        void Update()
+        private void Update()
         {
             if (executor != null && runtimeState != null && runtimeState.template != null)
             {
-                // Update recharge progress
                 if (rechargeProgress != null && runtimeState.template.baseRechargeTime > 0)
                 {
                     float progress = 1f - (runtimeState.rechargeTicksRemaining / (float)runtimeState.template.baseRechargeTime);
