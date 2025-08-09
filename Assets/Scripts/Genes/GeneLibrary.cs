@@ -10,23 +10,16 @@ namespace Abracodabra.Genes
     [CreateAssetMenu(fileName = "GeneLibrary", menuName = "Abracodabra/Gene Library")]
     public class GeneLibrary : ScriptableObject, IGeneLibrary
     {
-        private static GeneLibrary _instance;
-        public static GeneLibrary Instance
+        public static GeneLibrary Instance { get; private set; }
+
+        public void SetActiveInstance()
         {
-            get
+            if (Instance != null && Instance != this)
             {
-                if (_instance == null)
-                {
-                    // FIX: This is now the ONLY way the instance is loaded.
-                    // It ensures consistency by always loading from the same path.
-                    _instance = Resources.Load<GeneLibrary>("GeneLibrary");
-                    if (_instance == null)
-                    {
-                        Debug.LogError("FATAL: GeneLibrary asset not found at 'Assets/Resources/GeneLibrary.asset'!");
-                    }
-                }
-                return _instance;
+                Debug.LogWarning("An existing GeneLibrary instance was already active. It is being overwritten.", this);
             }
+            Instance = this;
+            Initialize();
         }
 
         [Header("Gene Collections")]
@@ -41,15 +34,15 @@ namespace Abracodabra.Genes
 
         // Caches for fast runtime access
         private Dictionary<string, GeneBase> _guidLookup;
+        // FIX: Corrected the typo "Gene-base" to "GeneBase"
         private Dictionary<string, GeneBase> _nameLookup;
 
-        // OnEnable is called when the ScriptableObject is loaded.
-        void OnEnable()
+        private void Initialize()
         {
             BuildLookupCaches();
         }
 
-        void BuildLookupCaches()
+        private void BuildLookupCaches()
         {
             _guidLookup = new Dictionary<string, GeneBase>();
             _nameLookup = new Dictionary<string, GeneBase>();
@@ -57,10 +50,8 @@ namespace Abracodabra.Genes
             foreach (var gene in GetAllGenes())
             {
                 if (gene == null) continue;
-
                 if (!string.IsNullOrEmpty(gene.GUID) && !_guidLookup.ContainsKey(gene.GUID))
                     _guidLookup[gene.GUID] = gene;
-
                 if (!string.IsNullOrEmpty(gene.geneName) && !_nameLookup.ContainsKey(gene.geneName))
                     _nameLookup[gene.geneName] = gene;
             }
@@ -77,14 +68,14 @@ namespace Abracodabra.Genes
         public GeneBase GetGeneByGUID(string guid)
         {
             if (string.IsNullOrEmpty(guid)) return null;
-            if (_guidLookup == null) BuildLookupCaches(); // Safety check
+            if (_guidLookup == null) BuildLookupCaches();
             return _guidLookup.TryGetValue(guid, out var gene) ? gene : null;
         }
 
         public GeneBase GetGeneByName(string name)
         {
             if (string.IsNullOrEmpty(name)) return null;
-            if (_nameLookup == null) BuildLookupCaches(); // Safety check
+            if (_nameLookup == null) BuildLookupCaches();
             return _nameLookup.TryGetValue(name, out var gene) ? gene : null;
         }
 

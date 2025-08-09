@@ -15,13 +15,14 @@ namespace Abracodabra.Genes.Services
         {
             if (isInitialized) return;
 
-            Register<IGeneLibrary>(GeneLibrary.Instance);
+            // FIX: Only register services that don't depend on a scene asset.
+            // The GeneLibrary will be registered by its own loader.
             Register<IGeneEventBus>(new GeneEventBus());
-            Register<IGeneEffectPool>(GeneEffectPool.Instance);
             Register<IDeterministicRandom>(new DeterministicRandom(DateTime.Now.Millisecond));
+            // GeneEffectPool is a MonoBehaviour, so it will be registered by its loader/instance.
 
             isInitialized = true;
-            Debug.Log("Gene Services initialized");
+            Debug.Log("Core Gene Services initialized (EventBus, Random).");
         }
 
         public static void Register<T>(T service) where T : class
