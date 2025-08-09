@@ -1,17 +1,14 @@
-﻿// File: Assets/Scripts/Genes/Templates/SeedTemplate.cs
+﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Templates
 {
-    [CreateAssetMenu(fileName = "SeedTemplate", menuName = "Abracodabra/Seed Template")]
+    [CreateAssetMenu(fileName = "NewSeedTemplate", menuName = "Abracodabra/Genes/Seed Template")]
     public class SeedTemplate : ScriptableObject
     {
-        [Header("Template Info")]
         public string templateName;
-        [TextArea]
         public string description;
         public Sprite icon;
 
@@ -19,18 +16,15 @@ namespace Abracodabra.Genes.Templates
         public List<GeneTemplateEntry> passiveGenes = new List<GeneTemplateEntry>();
         public List<SequenceSlotTemplate> activeSequence = new List<SequenceSlotTemplate>();
 
-        [Header("Base Settings")]
+        [Header("Plant Base Stats")]
         public int baseRechargeTime = 3;
         public float energyRegenRate = 10f;
         public float maxEnergy = 100f;
 
-        [Header("Unlock Requirements")]
+        [Header("Unlocking")]
         public bool isUnlocked = true;
         public List<string> unlockRequirements = new List<string>();
 
-        /// <summary>
-        /// Validates the entire template in the editor.
-        /// </summary>
         public bool IsValid()
         {
             if (activeSequence.Count == 0) return false;
@@ -44,9 +38,6 @@ namespace Abracodabra.Genes.Templates
             return true;
         }
 
-        /// <summary>
-        /// Creates a new runtime state instance from this template blueprint.
-        /// </summary>
         public PlantGeneRuntimeState CreateRuntimeState()
         {
             var state = new PlantGeneRuntimeState();
@@ -60,27 +51,30 @@ namespace Abracodabra.Genes.Templates
     public class GeneTemplateEntry
     {
         public GeneBase gene;
+        [Range(0f, 5f)]
         public float powerMultiplier = 1f;
-        // public Dictionary<string, float> initialValues = new Dictionary<string, float>(); // Note: Dictionaries don't serialize well in inspector by default
     }
 
     [System.Serializable]
     public class SequenceSlotTemplate
     {
         public ActiveGene activeGene;
-        public List<ModifierGene> modifiers = new List<ModifierGene>();
-        public List<PayloadGene> payloads = new List<PayloadGene>();
+        // FIX: Use GeneTemplateEntry to store power multipliers
+        public List<GeneTemplateEntry> modifiers = new List<GeneTemplateEntry>();
+        public List<GeneTemplateEntry> payloads = new List<GeneTemplateEntry>();
 
         public bool Validate()
         {
             if (activeGene == null) return false;
 
-            // Check slot limits
             if (modifiers.Count > activeGene.slotConfig.modifierSlots) return false;
             if (payloads.Count > activeGene.slotConfig.payloadSlots) return false;
 
-            // Validate configuration
-            return activeGene.IsValidConfiguration(modifiers, payloads);
+            // Note: This validation might need to be updated to extract the GeneBase from the entry
+            var modifierGenes = modifiers.ConvertAll(m => m.gene as ModifierGene);
+            var payloadGenes = payloads.ConvertAll(p => p.gene as PayloadGene);
+
+            return activeGene.IsValidConfiguration(modifierGenes, payloadGenes);
         }
     }
 }

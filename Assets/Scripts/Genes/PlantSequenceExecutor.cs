@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
@@ -16,11 +15,11 @@ namespace Abracodabra.Genes
         public float tickInterval = 1f;
         public bool isPaused = false;
 
-        private Coroutine executionCoroutine;
-        private IGeneEventBus eventBus;
-        private IDeterministicRandom random;
+        Coroutine executionCoroutine;
+        IGeneEventBus eventBus;
+        IDeterministicRandom random;
 
-        private void Awake()
+        void Awake()
         {
             eventBus = GeneServices.Get<IGeneEventBus>();
             random = GeneServices.Get<IDeterministicRandom>();
@@ -32,7 +31,7 @@ namespace Abracodabra.Genes
             }
         }
 
-        private void Start()
+        void Start()
         {
             if (plantGrowth == null)
             {
@@ -67,7 +66,7 @@ namespace Abracodabra.Genes
             executionCoroutine = StartCoroutine(ExecutionLoop());
         }
 
-        private IEnumerator ExecutionLoop()
+        IEnumerator ExecutionLoop()
         {
             yield return null;
 
@@ -79,13 +78,19 @@ namespace Abracodabra.Genes
                 {
                     continue;
                 }
+                
+                // FIX: Only execute active genes if the plant is mature.
+                if (plantGrowth.CurrentState != PlantState.Mature)
+                {
+                    continue;
+                }
 
                 var energySystem = plantGrowth.EnergySystem;
                 if (energySystem == null)
                 {
                     continue;
                 }
-                
+
                 runtimeState.currentEnergy = energySystem.CurrentEnergy;
 
                 if (runtimeState.rechargeTicksRemaining > 0)
@@ -106,7 +111,7 @@ namespace Abracodabra.Genes
             }
         }
 
-        private bool TryExecuteCurrentSlot()
+        bool TryExecuteCurrentSlot()
         {
             if (runtimeState.currentPosition >= runtimeState.activeSequence.Count)
             {
@@ -149,8 +154,7 @@ namespace Abracodabra.Genes
                 executor = this,
                 random = random
             };
-            
-            // Pre-execution and energy spending happen immediately for both normal and delayed execution.
+
             foreach (var modInstance in slot.modifierInstances)
             {
                 var modifierGene = modInstance?.GetGene<ModifierGene>();
@@ -168,25 +172,22 @@ namespace Abracodabra.Genes
             runtimeState.currentEnergy = energySystem.CurrentEnergy;
             slot.isExecuting = true;
 
-            // Check if we need to delay the execution
             if (activeGene.executionDelay > 0)
             {
                 StartCoroutine(DelayedExecution(activeGene, context, slot, energyCost));
             }
             else
             {
-                // Execute immediately if no delay is set
                 PerformExecutionLogic(activeGene, context, slot, energyCost);
             }
 
             return true;
         }
 
-        private void PerformExecutionLogic(ActiveGene activeGene, ActiveGeneContext context, RuntimeSequenceSlot slot, float energyCost)
+        void PerformExecutionLogic(ActiveGene activeGene, ActiveGeneContext context, RuntimeSequenceSlot slot, float energyCost)
         {
             activeGene.Execute(context);
 
-            // Post-execution logic
             foreach (var modInstance in slot.modifierInstances)
             {
                 var modifierGene = modInstance?.GetGene<ModifierGene>();
@@ -206,19 +207,18 @@ namespace Abracodabra.Genes
 
             StartCoroutine(ClearExecutionFlag(slot));
         }
-        
-        private IEnumerator DelayedExecution(ActiveGene activeGene, ActiveGeneContext context, RuntimeSequenceSlot slot, float energyCost)
+
+        IEnumerator DelayedExecution(ActiveGene activeGene, ActiveGeneContext context, RuntimeSequenceSlot slot, float energyCost)
         {
             yield return new WaitForSeconds(activeGene.executionDelay);
 
-            // Safety check: ensure the plant still exists after the delay before executing.
             if (plantGrowth != null && plantGrowth.gameObject != null)
             {
                 PerformExecutionLogic(activeGene, context, slot, energyCost);
             }
         }
 
-        private IEnumerator ClearExecutionFlag(RuntimeSequenceSlot slot)
+        IEnumerator ClearExecutionFlag(RuntimeSequenceSlot slot)
         {
             yield return new WaitForSeconds(0.5f);
             if(slot != null)
@@ -227,7 +227,7 @@ namespace Abracodabra.Genes
             }
         }
 
-        private void OnSequenceComplete()
+        void OnSequenceComplete()
         {
             var energySystem = plantGrowth.EnergySystem;
 
@@ -244,7 +244,7 @@ namespace Abracodabra.Genes
         public void PauseExecution() => isPaused = true;
         public void ResumeExecution() => isPaused = false;
 
-        private void OnDestroy()
+        void OnDestroy()
         {
             if (executionCoroutine != null)
             {
