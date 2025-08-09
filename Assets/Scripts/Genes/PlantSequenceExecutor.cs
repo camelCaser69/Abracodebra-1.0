@@ -48,6 +48,17 @@ namespace Abracodabra.Genes
 
         public void StartExecution()
         {
+            if (runtimeState == null || runtimeState.activeSequence == null || runtimeState.activeSequence.Count == 0)
+            {
+                Debug.LogWarning($"Plant '{plantGrowth.name}' has no active gene sequence. Executor will remain idle.", this);
+                if (executionCoroutine != null)
+                {
+                    StopCoroutine(executionCoroutine);
+                    executionCoroutine = null;
+                }
+                return;
+            }
+
             if (executionCoroutine != null)
             {
                 StopCoroutine(executionCoroutine);

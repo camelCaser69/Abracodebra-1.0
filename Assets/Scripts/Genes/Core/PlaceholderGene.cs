@@ -1,19 +1,17 @@
-﻿// NEW FILE: Assets/Scripts/Genes/Core/PlaceholderGene.cs
-using UnityEngine;
+﻿using UnityEngine;
 using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Core
 {
     /// <summary>
-    /// A special passive gene used for error recovery when a gene asset is missing.
-    /// It does nothing but ensures the system doesn't crash.
+    /// A special gene that is used as a fallback when a gene cannot be loaded from its GUID.
+    /// This prevents null reference exceptions throughout the system.
     /// </summary>
-    [CreateAssetMenu(fileName = "PlaceholderGene", menuName = "Abracodabra/Genes/System/Placeholder")]
     public class PlaceholderGene : PassiveGene
     {
         public override void ApplyToPlant(PlantGrowth plant, RuntimeGeneInstance instance)
         {
-            // Do nothing - this is for error recovery
+            // A placeholder gene has no effect.
         }
 
         public override string GetStatModificationText()

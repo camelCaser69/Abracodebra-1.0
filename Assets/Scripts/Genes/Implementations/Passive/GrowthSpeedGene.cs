@@ -1,32 +1,29 @@
-﻿// File: Assets/Scripts/Genes/Implementations/Passive/GrowthSpeedGene.cs
-using UnityEngine;
+﻿using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "GrowthSpeedGene", menuName = "Abracodabra/Genes/Passive/Growth Speed")]
     public class GrowthSpeedGene : PassiveGene
     {
-        [Header("Growth Settings")]
-        [Range(0.5f, 3f)]
-        public float growthMultiplier = 1.5f;
-
+        // The ApplyToPlant logic is now centralized in PlantGrowthLogic.
+        // This gene now just needs to provide its data correctly.
+        public GrowthSpeedGene()
+        {
+            statToModify = PassiveStatType.GrowthSpeed;
+            baseValue = 1.5f; // This now represents a 50% increase
+            stacksAdditively = true;
+        }
+        
         public override void ApplyToPlant(PlantGrowth plant, RuntimeGeneInstance instance)
         {
-            if (plant == null) return;
-
-            float finalMultiplier = growthMultiplier * instance.GetValue("power_multiplier", 1f);
-    
-            // Actually apply the multiplier to the plant
-            plant.growthSpeedMultiplier *= finalMultiplier;
-
-            Debug.Log($"Applied Growth Speed Gene: {finalMultiplier}x modifier to {plant.name}. Total multiplier now: {plant.growthSpeedMultiplier}");
+            // This method is now handled by the centralized logic in PlantGrowthLogic.
+            // It can be left empty or used for unique, non-standard effects.
         }
 
         public override string GetStatModificationText()
         {
-            float percentage = (growthMultiplier - 1f) * 100f;
+            float percentage = (baseValue - 1f) * 100f;
             return percentage >= 0
                 ? $"+{percentage:F0}% Growth Speed"
                 : $"{percentage:F0}% Growth Speed";
@@ -34,14 +31,19 @@ namespace Abracodabra.Genes.Implementations
 
         public override string GetTooltip(GeneTooltipContext context)
         {
-            float finalMultiplier = growthMultiplier;
+            float finalMultiplier = baseValue;
             if (context.instance != null)
             {
-                finalMultiplier *= context.instance.GetValue("power_multiplier", 1f);
+                finalMultiplier = baseValue * context.instance.GetValue("power_multiplier", 1f);
             }
-                
+            float finalPercentage = (finalMultiplier - 1f) * 100f;
+
+            string effectText = finalPercentage >= 0
+                ? $"+{finalPercentage:F0}% Growth Speed"
+                : $"{finalPercentage:F0}% Growth Speed";
+
             return $"{description}\n\n" +
-                   $"<b>Effect:</b> {GetStatModificationText()}\n" +
+                   $"<b>Effect:</b> {effectText}\n" +
                    "Reduces the time required for the plant to reach maturity.";
         }
     }

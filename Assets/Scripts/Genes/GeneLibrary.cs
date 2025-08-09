@@ -1,16 +1,18 @@
-﻿// REWORKED FILE: Assets/Scripts/Genes/GeneLibrary.cs
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Core;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace Abracodabra.Genes
 {
-    [CreateAssetMenu(fileName = "GeneLibrary", menuName = "Abracodabra/Gene Library")]
     public class GeneLibrary : ScriptableObject, IGeneLibrary
     {
-        public static GeneLibrary Instance { get; private set; }
+        public static GeneLibrary Instance { get; set; }
 
         public void SetActiveInstance()
         {
@@ -22,19 +24,15 @@ namespace Abracodabra.Genes
             Initialize();
         }
 
-        [Header("Gene Collections")]
         public List<PassiveGene> passiveGenes = new List<PassiveGene>();
         public List<ActiveGene> activeGenes = new List<ActiveGene>();
         public List<ModifierGene> modifierGenes = new List<ModifierGene>();
         public List<PayloadGene> payloadGenes = new List<PayloadGene>();
 
-        [Header("Starter & System Genes")]
         public List<GeneBase> starterGenes = new List<GeneBase>();
         public PlaceholderGene placeholderGene;
 
-        // Caches for fast runtime access
         private Dictionary<string, GeneBase> _guidLookup;
-        // FIX: Corrected the typo "Gene-base" to "GeneBase"
         private Dictionary<string, GeneBase> _nameLookup;
 
         private void Initialize()
@@ -49,12 +47,7 @@ namespace Abracodabra.Genes
 
             foreach (var gene in GetAllGenes())
             {
-                if (gene == null)
-                {
-                    continue;
-                }
-
-                // Check and add GUID
+                if (gene == null) continue;
                 if (!string.IsNullOrEmpty(gene.GUID))
                 {
                     if (!_guidLookup.ContainsKey(gene.GUID))
@@ -63,13 +56,9 @@ namespace Abracodabra.Genes
                     }
                     else
                     {
-                        Debug.LogWarning($"Gene Library: Duplicate GUID '{gene.GUID}' detected. " +
-                                         $"The gene '{gene.name}' will be ignored by GUID lookup. " +
-                                         $"The existing entry is '{_guidLookup[gene.GUID].name}'.", gene);
+                        Debug.LogWarning($"Gene Library: Duplicate GUID '{gene.GUID}' detected. The gene '{gene.name}' will be ignored by GUID lookup. The existing entry is '{_guidLookup[gene.GUID].name}'.", gene);
                     }
                 }
-
-                // Check and add Name
                 if (!string.IsNullOrEmpty(gene.geneName))
                 {
                     if (!_nameLookup.ContainsKey(gene.geneName))
@@ -78,9 +67,7 @@ namespace Abracodabra.Genes
                     }
                     else
                     {
-                        Debug.LogWarning($"Gene Library: Duplicate gene name '{gene.geneName}' detected. " +
-                                         $"The gene '{gene.name}' will be ignored by name lookup. " +
-                                         $"The existing entry is '{_nameLookup[gene.geneName].name}'.", gene);
+                        Debug.LogWarning($"Gene Library: Duplicate gene name '{gene.geneName}' detected. The gene '{gene.name}' will be ignored by name lookup. The existing entry is '{_nameLookup[gene.geneName].name}'.", gene);
                     }
                 }
             }
@@ -112,7 +99,8 @@ namespace Abracodabra.Genes
         {
             if (placeholderGene == null)
             {
-                Debug.LogError("PlaceholderGene is not assigned in the GeneLibrary asset!");
+                Debug.LogError("PlaceholderGene is not assigned in the GeneLibrary asset! The system may be unstable. Please assign it in the editor.", this);
+                // Create a temporary instance as a last resort to prevent crashes.
                 placeholderGene = ScriptableObject.CreateInstance<PlaceholderGene>();
                 placeholderGene.name = "RUNTIME_PLACEHOLDER";
             }
@@ -132,19 +120,38 @@ namespace Abracodabra.Genes
         }
 
 #if UNITY_EDITOR
-        [ContextMenu("Auto-populate Library from Project")]
-        void AutoPopulate()
+        private void OnValidate()
+        {
+            // This ensures a placeholder gene is always assigned in the editor.
+            if (placeholderGene == null)
+            {
+                string[] guids = AssetDatabase.FindAssets("t:PlaceholderGene");
+                if (guids.Length > 0)
+                {
+                    string path = AssetDatabase.GUIDToAssetPath(guids[0]);
+                    placeholderGene = AssetDatabase.LoadAssetAtPath<PlaceholderGene>(path);
+                    Debug.LogWarning("GeneLibrary's PlaceholderGene was unassigned. Auto-assigned from project assets.", this);
+                    EditorUtility.SetDirty(this);
+                }
+                else
+                {
+                    Debug.LogError("Could not find a 'PlaceholderGene' asset in the project. Please create one.", this);
+                }
+            }
+        }
+
+        private void AutoPopulate()
         {
             passiveGenes.Clear();
             activeGenes.Clear();
             modifierGenes.Clear();
             payloadGenes.Clear();
 
-            string[] guids = UnityEditor.AssetDatabase.FindAssets("t:GeneBase");
+            string[] guids = AssetDatabase.FindAssets("t:GeneBase");
             foreach (string guid in guids)
             {
-                string path = UnityEditor.AssetDatabase.GUIDToAssetPath(guid);
-                GeneBase gene = UnityEditor.AssetDatabase.LoadAssetAtPath<GeneBase>(path);
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                GeneBase gene = AssetDatabase.LoadAssetAtPath<GeneBase>(path);
 
                 if (gene is PlaceholderGene) continue;
 
@@ -157,8 +164,14 @@ namespace Abracodabra.Genes
                 else if (gene is PayloadGene pay)
                     payloadGenes.Add(pay);
             }
-
-            UnityEditor.EditorUtility.SetDirty(this);
+            
+            // Sort lists alphabetically for consistency
+            passiveGenes = passiveGenes.OrderBy(g => g.name).ToList();
+            activeGenes = activeGenes.OrderBy(g => g.name).ToList();
+            modifierGenes = modifierGenes.OrderBy(g => g.name).ToList();
+            payloadGenes = payloadGenes.OrderBy(g => g.name).ToList();
+            
+            EditorUtility.SetDirty(this);
             Debug.Log($"Auto-populated library: {passiveGenes.Count} passive, {activeGenes.Count} active, {modifierGenes.Count} modifier, {payloadGenes.Count} payload genes.");
         }
 #endif

@@ -60,18 +60,25 @@ public class PlantPlacementManager : MonoBehaviour
     public bool TryPlantSeedFromInventory(InventoryBarItem seedItem, Vector3Int gridPosition, Vector3 worldPosition)
     {
         if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed) return false;
+
+        // Validate the template before planting
+        if (!seedItem.SeedTemplate.IsValid())
+        {
+            Debug.LogError($"Cannot plant '{seedItem.SeedTemplate.templateName}': The seed template configuration is invalid.", seedItem.SeedTemplate);
+            return false;
+        }
+    
         if (IsPositionOccupied(gridPosition)) return false;
 
         TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
         if (!IsTileValidForPlanting(tileDef)) return false;
-        
+
         if (nodeExecutor == null)
         {
-             Debug.LogError("Cannot plant: NodeExecutor reference is missing in PlantPlacementManager.");
-             return false;
+            Debug.LogError("Cannot plant: NodeExecutor reference is missing in PlantPlacementManager.");
+            return false;
         }
 
-        // FIX: Use the spawnRadius to add a slight random offset to the planting position
         Vector3 finalPlantingPosition = GetRandomizedPlantingPosition(worldPosition);
         SeedTemplate templateToPlant = seedItem.SeedTemplate;
         GameObject plantGO = nodeExecutor.SpawnPlantFromTemplate(templateToPlant, finalPlantingPosition, plantParent);
