@@ -1,23 +1,19 @@
-﻿// Reworked File: Assets/Scripts/PlantSystem/Execution/NodeExecutor.cs
-
+﻿using UnityEngine;
 using Abracodabra.Genes;
-using UnityEngine;
 using WegoSystem;
 using Abracodabra.Genes.Templates;
+using Abracodabra.Genes.Runtime;
 
-/// <summary>
-/// REPURPOSED: This class is no longer a node executor.
-/// It is now the central spawner for creating new plants from SeedTemplates.
-/// </summary>
 public class NodeExecutor : MonoBehaviour
 {
     [SerializeField] private GameObject plantPrefab;
 
-    public GameObject SpawnPlantFromTemplate(SeedTemplate seedTemplate, Vector3 plantingPosition, Transform parentTransform)
+    // MODIFIED: This method now accepts the fully-configured state.
+    public GameObject SpawnPlantFromState(PlantGeneRuntimeState runtimeState, Vector3 plantingPosition, Transform parentTransform)
     {
-        if (seedTemplate == null)
+        if (runtimeState == null)
         {
-            Debug.LogError("[NodeExecutor] Cannot spawn plant: Provided SeedTemplate is null!");
+            Debug.LogError("[NodeExecutor] Cannot spawn plant: Provided PlantGeneRuntimeState is null!");
             return null;
         }
 
@@ -29,16 +25,14 @@ public class NodeExecutor : MonoBehaviour
 
         GameObject plantObj = Instantiate(plantPrefab, plantingPosition, Quaternion.identity, parentTransform);
 
-        if (GridPositionManager.Instance != null)
-        {
-            GridPositionManager.Instance.SnapEntityToGrid(plantObj);
-        }
+        // Grid snapping should happen after instantiation.
+        // The PlantPlacementManager will handle this now.
 
         PlantGrowth growthComponent = plantObj.GetComponent<PlantGrowth>();
         if (growthComponent != null)
         {
-            growthComponent.InitializeFromTemplate(seedTemplate);
-            Debug.Log($"[NodeExecutor] Plant spawned from seed template '{seedTemplate.templateName}'");
+            growthComponent.InitializeWithState(runtimeState);
+            Debug.Log($"[NodeExecutor] Plant spawned from seed template '{runtimeState.template.templateName}'");
             return plantObj;
         }
         else

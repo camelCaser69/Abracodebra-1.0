@@ -105,8 +105,9 @@ public class PlayerActionManager : MonoBehaviour
 
     private bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem)
     {
+        // MODIFIED: Pass the SeedRuntimeState from the item, not the item itself.
         if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed) return false;
-        return PlantPlacementManager.Instance?.TryPlantSeedFromInventory(seedItem, gridPosition, TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)) ?? false;
+        return PlantPlacementManager.Instance?.TryPlantSeedFromInventory(seedItem.SeedRuntimeState, gridPosition, TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)) ?? false;
     }
 
     private bool ExecuteHarvest(Vector3Int gridPosition)

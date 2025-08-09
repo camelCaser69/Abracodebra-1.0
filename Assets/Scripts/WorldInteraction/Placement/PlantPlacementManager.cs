@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Abracodabra.Genes.Templates;
+using Abracodabra.Genes.Runtime; // Added for PlantGeneRuntimeState
 
 namespace Abracodabra.UI.Genes
 {
@@ -27,7 +28,7 @@ namespace Abracodabra.UI.Genes
 
         public void Initialize()
         {
-            if (plantParent == null && EcosystemManager.Instance != null) plantParent = EcosystemManager.Instance.plantParent; // Corrected to plantParent
+            if (plantParent == null && EcosystemManager.Instance != null) plantParent = EcosystemManager.Instance.plantParent;
             if (tileInteractionManager == null) tileInteractionManager = TileInteractionManager.Instance;
             if (nodeExecutor == null) nodeExecutor = FindFirstObjectByType<NodeExecutor>();
         }
@@ -56,14 +57,15 @@ namespace Abracodabra.UI.Genes
                 plantsByGridPosition.Remove(key);
             }
         }
-
-        public bool TryPlantSeedFromInventory(InventoryBarItem seedItem, Vector3Int gridPosition, Vector3 worldPosition)
+        
+        // MODIFIED: This method now accepts the runtime state directly.
+        public bool TryPlantSeedFromInventory(PlantGeneRuntimeState runtimeState, Vector3Int gridPosition, Vector3 worldPosition)
         {
-            if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed) return false;
-
-            if (!seedItem.SeedTemplate.IsValid())
+            if (runtimeState == null || runtimeState.template == null) return false;
+            
+            if (!runtimeState.template.IsValid())
             {
-                Debug.LogError($"Cannot plant '{seedItem.SeedTemplate.templateName}': The seed template configuration is invalid.", seedItem.SeedTemplate);
+                Debug.LogError($"Cannot plant '{runtimeState.template.templateName}': The seed template configuration is invalid.", runtimeState.template);
                 return false;
             }
 
@@ -79,16 +81,13 @@ namespace Abracodabra.UI.Genes
             }
 
             Vector3 finalPlantingPosition = GetRandomizedPlantingPosition(worldPosition);
-            SeedTemplate templateToPlant = seedItem.SeedTemplate;
-            GameObject plantGO = nodeExecutor.SpawnPlantFromTemplate(templateToPlant, finalPlantingPosition, plantParent);
+            GameObject plantGO = nodeExecutor.SpawnPlantFromState(runtimeState, finalPlantingPosition, plantParent);
 
             if (plantGO == null) return false;
 
-            // FIX: Re-snap the entity to the grid *after* applying the random offset to get its true final grid position.
             WegoSystem.GridPositionManager.Instance.SnapEntityToGrid(plantGO);
             var finalGridEntity = plantGO.GetComponent<WegoSystem.GridEntity>();
             Vector3Int finalGridPosition = finalGridEntity.Position.ToVector3Int();
-
 
             plantsByGridPosition[finalGridPosition] = plantGO;
             return true;

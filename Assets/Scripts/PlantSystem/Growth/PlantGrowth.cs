@@ -6,7 +6,6 @@ using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
-// Note: FoodType is in the global namespace, so no 'using' statement is required here.
 
 namespace Abracodabra.Genes
 {
@@ -21,14 +20,14 @@ namespace Abracodabra.Genes
     {
         public static readonly List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
 
-        public SeedTemplate seedTemplate;
+        public SeedTemplate seedTemplate { get; private set; } // Can still be useful for reference
         public PlantGeneRuntimeState geneRuntimeState { get; set; }
-        public PlantSequenceExecutor sequenceExecutor { get; set; }
+        public PlantSequenceExecutor sequenceExecutor { get; private set; }
 
-        public PlantCellManager CellManager { get; set; }
-        public PlantGrowthLogic GrowthLogic { get; set; }
-        public PlantEnergySystem EnergySystem { get; set; }
-        public PlantVisualManager VisualManager { get; set; }
+        public PlantCellManager CellManager { get; private set; }
+        public PlantGrowthLogic GrowthLogic { get; private set; }
+        public PlantEnergySystem EnergySystem { get; private set; }
+        public PlantVisualManager VisualManager { get; private set; }
 
         [Header("Cell Configuration")]
         [SerializeField] public float cellSpacing = 0.08f;
@@ -42,16 +41,15 @@ namespace Abracodabra.Genes
         [SerializeField] private PlantOutlineController outlineController;
         [SerializeField] private GameObject outlinePartPrefab;
         [SerializeField] private bool enableOutline = true;
-        
-        [Header("Food Configuration")]
-        [Tooltip("The FoodType ScriptableObject representing a leaf that can be eaten.")]
         [SerializeField] private FoodType leafFoodType;
 
-        [Header("Growth Parameters")]
+        [Header("Passive Stat Multipliers")]
         public float growthSpeedMultiplier = 1f;
         public float energyGenerationMultiplier = 1f;
         public float energyStorageMultiplier = 1f;
         public float fruitYieldMultiplier = 1f;
+        
+        [Header("Growth Parameters")]
         public float poopAbsorptionRadius = 3f;
         public float poopAbsorptionEfficiency = 1f;
         public int minHeight = 3;
@@ -63,16 +61,14 @@ namespace Abracodabra.Genes
 
         private IDeterministicRandom _deterministicRandom;
 
-        private void Awake()
+        void Awake()
         {
             AllActivePlants.Add(this);
-            // Pass the FoodType reference to the CellManager's constructor
             CellManager = new PlantCellManager(this, seedCellPrefab, stemCellPrefab, leafCellPrefab, berryCellPrefab, cellSpacing, leafFoodType);
             GrowthLogic = new PlantGrowthLogic(this);
             EnergySystem = new PlantEnergySystem(this);
             VisualManager = new PlantVisualManager(this, shadowController, null, outlineController, outlinePartPrefab, enableOutline);
-            
-            // Get the deterministic random service
+
             _deterministicRandom = GeneServices.Get<IDeterministicRandom>();
             if (_deterministicRandom == null)
             {
@@ -80,7 +76,7 @@ namespace Abracodabra.Genes
             }
         }
 
-        private void OnDestroy()
+        void OnDestroy()
         {
             AllActivePlants.Remove(this);
             var tickManager = TickManager.Instance;
@@ -90,17 +86,18 @@ namespace Abracodabra.Genes
             }
         }
 
-        public void InitializeFromTemplate(SeedTemplate template)
+        // MODIFIED: This method now accepts the fully-configured state.
+        public void InitializeWithState(PlantGeneRuntimeState state)
         {
-            if (template == null)
+            if (state == null || state.template == null)
             {
-                Debug.LogError($"Cannot initialize plant on '{gameObject.name}': Provided SeedTemplate is null.", this);
+                Debug.LogError($"Cannot initialize plant on '{gameObject.name}': Provided state or its template is null.", this);
                 Destroy(gameObject);
                 return;
             }
 
-            this.seedTemplate = template;
-            geneRuntimeState = template.CreateRuntimeState();
+            this.seedTemplate = state.template;
+            this.geneRuntimeState = state;
 
             sequenceExecutor = GetComponent<PlantSequenceExecutor>();
             if (sequenceExecutor == null)
@@ -113,9 +110,11 @@ namespace Abracodabra.Genes
 
             EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
             EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
-            GrowthLogic.PhotosynthesisEfficiencyPerLeaf = template.energyRegenRate * energyGenerationMultiplier;
-
-            sequenceExecutor.InitializeWithTemplate(template);
+            GrowthLogic.PhotosynthesisEfficiencyPerLeaf = seedTemplate.energyRegenRate * energyGenerationMultiplier;
+            
+            // The executor now gets the state directly, not a template to create a state from.
+            sequenceExecutor.runtimeState = this.geneRuntimeState;
+            sequenceExecutor.StartExecution();
 
             CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
             CurrentState = PlantState.Growing;
@@ -125,7 +124,7 @@ namespace Abracodabra.Genes
                 TickManager.Instance.RegisterTickUpdateable(this);
             }
 
-            Debug.Log($"Plant '{gameObject.name}' initialized from template '{template.templateName}'. State: {CurrentState}");
+            Debug.Log($"Plant '{gameObject.name}' initialized from template '{seedTemplate.templateName}'. State: {CurrentState}");
         }
 
         public void OnTickUpdate(int currentTick)
@@ -134,7 +133,6 @@ namespace Abracodabra.Genes
 
             if (CurrentState == PlantState.Growing && CellManager.cells.Count < maxHeight * 2)
             {
-                // Use the deterministic random service, with a fallback to Unity's Random if the service isn't available.
                 float randomValue = (_deterministicRandom != null) ? _deterministicRandom.Range(0f, 1f) : Random.value;
                 if (randomValue < 0.1f * growthSpeedMultiplier)
                 {
@@ -143,8 +141,9 @@ namespace Abracodabra.Genes
             }
         }
 
-        private void GrowSomething()
+        void GrowSomething()
         {
+            // FIX: The lambda expression should directly compare the dictionary's value (c.Value) to the enum.
             int currentHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
             if (currentHeight < maxHeight)
             {

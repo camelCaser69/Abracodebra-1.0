@@ -7,7 +7,6 @@ using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.UI.Genes;
 using Abracodabra.Genes.Templates;
-// The incorrect 'using Abracodabra.Core;' line has been removed.
 
 namespace Abracodabra.UI.Genes
 {
@@ -150,46 +149,56 @@ namespace Abracodabra.UI.Genes
             if (sourceSlot == null || sourceSlot == this) return;
 
             var draggedItem = sourceSlot.CurrentItem;
-            if (draggedItem == null || draggedItem.Type != InventoryBarItem.ItemType.Gene)
-            {
-                ShowInvalidDropFeedback();
-                return;
-            }
-            
-            // Validate category
-            var draggedGene = draggedItem.GeneInstance.GetGene();
-            if (draggedGene.Category != acceptedCategory)
-            {
-                 ShowInvalidDropFeedback();
-                 return;
-            }
 
-            // Validate attachment for modifiers/payloads
-            if (acceptedCategory == GeneCategory.Modifier || acceptedCategory == GeneCategory.Payload)
+            // Allow dragging empty slots (to clear another slot)
+            if (draggedItem != null)
             {
-                var activeGene = parentSequence?.GetActiveGeneForRow(slotIndex);
-                if (activeGene == null || !draggedGene.CanAttachTo(activeGene))
+                if (draggedItem.Type != InventoryBarItem.ItemType.Gene)
                 {
                     ShowInvalidDropFeedback();
                     return;
                 }
-            }
 
-            // If we are in a sequence builder, notify the parent to update the data model
-            if (parentSequence != null)
-            {
-                parentSequence.UpdateGeneInSequence(slotIndex, acceptedCategory, draggedItem);
-                
-                // The source slot should now contain what was in this slot before the drop
-                // This logic might need to be expanded if you want to drag *from* the inventory grid
-                // For now, we assume swaps happen within the sequence UI
-                sourceSlot.parentSequence.UpdateGeneInSequence(sourceSlot.slotIndex, sourceSlot.acceptedCategory, this.CurrentItem);
+                var draggedGene = draggedItem.GeneInstance.GetGene();
+                if (draggedGene.Category != acceptedCategory)
+                {
+                    ShowInvalidDropFeedback();
+                    return;
+                }
+
+                if (acceptedCategory == GeneCategory.Modifier || acceptedCategory == GeneCategory.Payload)
+                {
+                    var activeGene = parentSequence?.GetActiveGeneForRow(slotIndex);
+                    if (activeGene == null || !draggedGene.CanAttachTo(activeGene))
+                    {
+                        ShowInvalidDropFeedback();
+                        return;
+                    }
+                }
             }
-            else // Otherwise, perform a simple swap (for inventory grid)
+            
+            // --- Symmetrical Swap Logic ---
+            var itemThatWasInThisSlot = this.CurrentItem;
+            var itemThatWasInSourceSlot = sourceSlot.CurrentItem;
+
+            // Update this (destination) slot
+            if (this.parentSequence != null)
             {
-                var previousItemInThisSlot = this.CurrentItem;
-                SetItem(draggedItem);
-                sourceSlot.SetItem(previousItemInThisSlot);
+                this.parentSequence.UpdateGeneInSequence(this.slotIndex, this.acceptedCategory, itemThatWasInSourceSlot);
+            }
+            else
+            {
+                this.SetItem(itemThatWasInSourceSlot);
+            }
+            
+            // Update the source slot
+            if (sourceSlot.parentSequence != null)
+            {
+                sourceSlot.parentSequence.UpdateGeneInSequence(sourceSlot.slotIndex, sourceSlot.acceptedCategory, itemThatWasInThisSlot);
+            }
+            else
+            {
+                sourceSlot.SetItem(itemThatWasInThisSlot);
             }
         }
 
