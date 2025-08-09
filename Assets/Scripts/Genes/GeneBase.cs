@@ -1,42 +1,49 @@
-﻿// File: Assets/Scripts/Genes/Core/GeneBase.cs
-using UnityEngine;
-using System;
+﻿using UnityEngine;
 using Abracodabra.Genes.Runtime; // For RuntimeGeneInstance in context
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Abracodabra.Genes.Core
 {
-    /// <summary>
-    /// The abstract base class for all gene ScriptableObjects.
-    /// Defines common properties and a persistent GUID for reliable referencing.
-    /// </summary>
     public abstract class GeneBase : ScriptableObject, ITooltipDataProvider
     {
-        [Header("Basic Info")]
         public string geneName;
-        [TextArea(3, 5)]
         public string description;
         public Sprite icon;
         public int tier = 1;
 
-        [Header("Visual")]
         public Color geneColor = Color.white;
         public GameObject effectPrefab;
 
-        [Header("System")]
-        [SerializeField, HideInInspector]
+        [SerializeField]
         private string _persistentGUID;
         [SerializeField]
         private int _version = 1;
+
+#if UNITY_EDITOR
+        private void OnValidate()
+        {
+            // This ensures the GUID is assigned and saved as soon as the asset is created or modified in the editor.
+            if (string.IsNullOrEmpty(_persistentGUID))
+            {
+                _persistentGUID = System.Guid.NewGuid().ToString();
+                EditorUtility.SetDirty(this);
+            }
+        }
+#endif
 
         public string GUID
         {
             get
             {
 #if UNITY_EDITOR
+                // This getter remains as a fallback, ensuring a GUID is always available in the editor, even for old assets.
                 if (string.IsNullOrEmpty(_persistentGUID))
                 {
                     _persistentGUID = System.Guid.NewGuid().ToString();
-                    UnityEditor.EditorUtility.SetDirty(this);
+                    EditorUtility.SetDirty(this);
                 }
 #endif
                 return _persistentGUID;
@@ -46,7 +53,6 @@ namespace Abracodabra.Genes.Core
         public int Version => _version;
         public abstract GeneCategory Category { get; }
 
-        // Interface Implementation
         public abstract string GetTooltip(GeneTooltipContext context);
         public string GetTooltipTitle() => geneName;
         public string GetTooltipDescription() => $"Tier {tier} {Category} Gene";
@@ -71,9 +77,6 @@ namespace Abracodabra.Genes.Core
         Payload
     }
 
-    /// <summary>
-    /// Context object passed to GetTooltip to provide more detailed information.
-    /// </summary>
     public class GeneTooltipContext
     {
         public PlantGrowth plant; // The plant the gene is on

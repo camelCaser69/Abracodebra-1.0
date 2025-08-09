@@ -86,45 +86,67 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
     }
 
     public void ApplyToolAction(ToolDefinition toolDef)
+{
+    if (toolDef == null || !currentlyHoveredCell.HasValue)
     {
-        if (toolDef == null || !currentlyHoveredCell.HasValue) return;
+        return;
+    }
 
-        Vector3Int targetCell = currentlyHoveredCell.Value;
+    Vector3Int targetCell = currentlyHoveredCell.Value;
+    TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
 
-        TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
-        if (currentTileDef == null) return;
-        
-        if (debugLogs) Debug.Log($"[TileInteractionManager] Checking tile interactions for Tool='{toolDef.toolType}' on Tile='{currentTileDef.displayName}'");
+    if (currentTileDef == null)
+    {
+        return;
+    }
 
-        if (interactionLibrary?.refillRules != null && ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool == toolDef)
+    if (debugLogs)
+    {
+        Debug.Log($"[TileInteractionManager] Checking tile interactions for Tool='{toolDef.displayName}' on Tile='{currentTileDef.displayName}'");
+    }
+
+    // --- Refill Logic ---
+    if (interactionLibrary?.refillRules != null)
+    {
+        foreach (var refillRule in interactionLibrary.refillRules)
         {
-            foreach (var refillRule in interactionLibrary.refillRules)
+            // Rule must be valid, for the tool we just used, and on the correct source tile.
+            if (refillRule != null &&
+                refillRule.toolToRefill == toolDef &&
+                refillRule.refillSourceTile == currentTileDef)
             {
-                if (refillRule != null && refillRule.toolToRefill == toolDef && refillRule.refillSourceTile == currentTileDef)
+                // Also ensure the tool being refilled is the one currently selected in the ToolSwitcher.
+                if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool == toolDef)
                 {
                     ToolSwitcher.Instance.RefillCurrentTool();
-                    return; // Refill action was performed, we are done.
-                }
-            }
-        }
-        
-        if (interactionLibrary?.rules != null)
-        {
-            TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == currentTileDef);
-            if (rule != null)
-            {
-                if (rule.toTile != null)
-                {
-                    if (!rule.toTile.keepBottomTile) RemoveTile(currentTileDef, targetCell);
-                    PlaceTile(rule.toTile, targetCell);
-                }
-                else
-                {
-                    RemoveTile(currentTileDef, targetCell);
+                    return; // Refill action was performed, so we are done with this interaction.
                 }
             }
         }
     }
+
+    // --- Transformation Logic ---
+    // If no refill occurred, check for tile transformation rules.
+    if (interactionLibrary?.rules != null)
+    {
+        TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == currentTileDef);
+        if (rule != null)
+        {
+            if (rule.toTile != null)
+            {
+                if (!rule.toTile.keepBottomTile)
+                {
+                    RemoveTile(currentTileDef, targetCell);
+                }
+                PlaceTile(rule.toTile, targetCell);
+            }
+            else // If toTile is null, it means the tool just removes the fromTile.
+            {
+                RemoveTile(currentTileDef, targetCell);
+            }
+        }
+    }
+}
     
     private void CacheHoverSpriteRenderer()
     {

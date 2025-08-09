@@ -49,11 +49,40 @@ namespace Abracodabra.Genes
 
             foreach (var gene in GetAllGenes())
             {
-                if (gene == null) continue;
-                if (!string.IsNullOrEmpty(gene.GUID) && !_guidLookup.ContainsKey(gene.GUID))
-                    _guidLookup[gene.GUID] = gene;
-                if (!string.IsNullOrEmpty(gene.geneName) && !_nameLookup.ContainsKey(gene.geneName))
-                    _nameLookup[gene.geneName] = gene;
+                if (gene == null)
+                {
+                    continue;
+                }
+
+                // Check and add GUID
+                if (!string.IsNullOrEmpty(gene.GUID))
+                {
+                    if (!_guidLookup.ContainsKey(gene.GUID))
+                    {
+                        _guidLookup[gene.GUID] = gene;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Gene Library: Duplicate GUID '{gene.GUID}' detected. " +
+                                         $"The gene '{gene.name}' will be ignored by GUID lookup. " +
+                                         $"The existing entry is '{_guidLookup[gene.GUID].name}'.", gene);
+                    }
+                }
+
+                // Check and add Name
+                if (!string.IsNullOrEmpty(gene.geneName))
+                {
+                    if (!_nameLookup.ContainsKey(gene.geneName))
+                    {
+                        _nameLookup[gene.geneName] = gene;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Gene Library: Duplicate gene name '{gene.geneName}' detected. " +
+                                         $"The gene '{gene.name}' will be ignored by name lookup. " +
+                                         $"The existing entry is '{_nameLookup[gene.geneName].name}'.", gene);
+                    }
+                }
             }
         }
 

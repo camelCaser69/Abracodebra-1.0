@@ -1,9 +1,9 @@
-﻿// Reworked File: Assets/Scripts/PlantSystem/Growth/PlantCellManager.cs
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Abracodabra.Genes;
 using WegoSystem;
+// Note: FoodType is in the global namespace, so no 'using' statement is required here.
 
 public class PlantCellManager
 {
@@ -13,6 +13,7 @@ public class PlantCellManager
     private readonly GameObject leafCellPrefab;
     private readonly GameObject berryCellPrefab;
     private readonly float cellSpacing;
+    private readonly FoodType _leafFoodType; // Added field to hold the reference
 
     public readonly Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
     private readonly List<GameObject> activeCellGameObjects = new List<GameObject>();
@@ -20,7 +21,8 @@ public class PlantCellManager
     public List<LeafData> LeafDataList { get; } = new List<LeafData>();
     public GameObject RootCellInstance { get; set; }
 
-    public PlantCellManager(PlantGrowth plant, GameObject seedPrefab, GameObject stemPrefab, GameObject leafPrefab, GameObject berryPrefab, float spacing)
+    // Updated constructor to accept the FoodType
+    public PlantCellManager(PlantGrowth plant, GameObject seedPrefab, GameObject stemPrefab, GameObject leafPrefab, GameObject berryPrefab, float spacing, FoodType leafFoodType)
     {
         this.plant = plant;
         this.seedCellPrefab = seedPrefab;
@@ -28,6 +30,7 @@ public class PlantCellManager
         this.leafCellPrefab = leafPrefab;
         this.berryCellPrefab = berryPrefab;
         this.cellSpacing = spacing;
+        this._leafFoodType = leafFoodType; // Store the reference
     }
 
     public void ReportCellDestroyed(Vector2Int coord)
@@ -38,14 +41,11 @@ public class PlantCellManager
 
             if (cellObj != null)
             {
-                // Unregister from visual systems BEFORE destroying the object
                 plant.VisualManager.UnregisterShadowForCell(cellObj);
                 plant.VisualManager.OutlineController?.OnPlantCellRemoved(coord);
-            
-                // Update internal data tracking
+
                 activeCellGameObjects.Remove(cellObj);
-                
-                // Finally, destroy the actual GameObject
+
                 Object.Destroy(cellObj);
             }
 
@@ -55,8 +55,7 @@ public class PlantCellManager
                 {
                     if (LeafDataList[i].GridCoord == coord)
                     {
-                        // Mark as inactive instead of removing to preserve indices if needed
-                        LeafDataList[i] = new LeafData(coord, false); 
+                        LeafDataList[i] = new LeafData(coord, false);
                         break;
                     }
                 }
@@ -68,7 +67,6 @@ public class PlantCellManager
 
     public void ClearAllVisuals()
     {
-        // Use a copy to avoid modification during iteration
         foreach (GameObject cellGO in new List<GameObject>(activeCellGameObjects))
         {
             if (cellGO != null)
@@ -115,8 +113,18 @@ public class PlantCellManager
         if (cellType == PlantCellType.Leaf)
         {
             LeafDataList.Add(new LeafData(coords, true));
-            // Tag leaves as fruit spawn points
             instance.tag = "FruitSpawn";
+
+            // Add FoodItem component to the leaf so it can be eaten
+            if (_leafFoodType != null)
+            {
+                var foodItem = instance.AddComponent<FoodItem>();
+                foodItem.foodType = _leafFoodType;
+            }
+            else
+            {
+                Debug.LogWarning($"[{plant.gameObject.name}] Cannot add FoodItem to leaf. The 'Leaf Food Type' is not assigned in the PlantGrowth inspector.", plant);
+            }
         }
 
         plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());

@@ -45,9 +45,48 @@ public class InventoryGridController : MonoBehaviour
     }
 
     private void CreateInventoryCells()
+{
+    if (itemSlotPrefab == null || cellContainer == null)
     {
-        // ... (Grid layout setup remains the same)
+        return;
     }
+
+    // Clear any existing slots just in case
+    foreach (Transform child in cellContainer)
+    {
+        Destroy(child.gameObject);
+    }
+    inventorySlots.Clear();
+
+    // Set up GridLayoutGroup
+    var gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
+    if (gridLayout == null)
+    {
+        gridLayout = cellContainer.gameObject.AddComponent<GridLayoutGroup>();
+    }
+    gridLayout.cellSize = cellSize;
+    gridLayout.spacing = new Vector2(cellMargin, cellMargin);
+    gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+    gridLayout.constraintCount = inventoryColumns;
+
+    // Create slots
+    for (int i = 0; i < inventoryRows * inventoryColumns; i++)
+    {
+        GameObject slotObj = Instantiate(itemSlotPrefab, cellContainer);
+        slotObj.name = $"ItemSlot_{i}";
+        GeneSlotUI slot = slotObj.GetComponent<GeneSlotUI>();
+        if (slot != null)
+        {
+            slot.slotIndex = i;
+            inventorySlots.Add(slot);
+        }
+        else
+        {
+            Debug.LogError($"[InventoryGridController] The 'itemSlotPrefab' is missing the required GeneSlotUI component!", itemSlotPrefab);
+            Destroy(slotObj); // Clean up the bad instance
+        }
+    }
+}
 
     private void PopulateInitialInventory()
     {

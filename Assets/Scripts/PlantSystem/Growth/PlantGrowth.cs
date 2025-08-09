@@ -1,12 +1,12 @@
-﻿// REWORKED FILE: Assets/Scripts/PlantSystem/Growth/PlantGrowth.cs
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using WegoSystem;
-using Abracodabra.Genes;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Services;
+// Note: FoodType is in the global namespace, so no 'using' statement is required here.
 
 namespace Abracodabra.Genes
 {
@@ -21,29 +21,33 @@ namespace Abracodabra.Genes
     {
         public static readonly List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
 
-        [Header("Configuration")]
         public SeedTemplate seedTemplate;
-        public PlantGeneRuntimeState geneRuntimeState { get; private set; }
-        public PlantSequenceExecutor sequenceExecutor { get; private set; }
+        public PlantGeneRuntimeState geneRuntimeState { get; set; }
+        public PlantSequenceExecutor sequenceExecutor { get; set; }
 
-        [Header("Systems")]
-        public PlantCellManager CellManager { get; private set; }
-        public PlantGrowthLogic GrowthLogic { get; private set; }
-        public PlantEnergySystem EnergySystem { get; private set; }
-        public PlantVisualManager VisualManager { get; private set; }
+        public PlantCellManager CellManager { get; set; }
+        public PlantGrowthLogic GrowthLogic { get; set; }
+        public PlantEnergySystem EnergySystem { get; set; }
+        public PlantVisualManager VisualManager { get; set; }
 
-        [Header("Plant Configuration")]
+        [Header("Cell Configuration")]
         [SerializeField] public float cellSpacing = 0.08f;
-        [SerializeField] GameObject seedCellPrefab;
-        [SerializeField] GameObject stemCellPrefab;
-        [SerializeField] GameObject leafCellPrefab;
-        [SerializeField] GameObject berryCellPrefab;
-        [SerializeField] PlantShadowController shadowController;
-        [SerializeField] PlantOutlineController outlineController;
-        [SerializeField] GameObject outlinePartPrefab;
-        [SerializeField] bool enableOutline = true;
+        [SerializeField] private GameObject seedCellPrefab;
+        [SerializeField] private GameObject stemCellPrefab;
+        [SerializeField] private GameObject leafCellPrefab;
+        [SerializeField] private GameObject berryCellPrefab;
 
-        [Header("Stat Modifiers (Modified by Passive Genes)")]
+        [Header("Visuals")]
+        [SerializeField] private PlantShadowController shadowController;
+        [SerializeField] private PlantOutlineController outlineController;
+        [SerializeField] private GameObject outlinePartPrefab;
+        [SerializeField] private bool enableOutline = true;
+        
+        [Header("Food Configuration")]
+        [Tooltip("The FoodType ScriptableObject representing a leaf that can be eaten.")]
+        [SerializeField] private FoodType leafFoodType;
+
+        [Header("Growth Parameters")]
         public float growthSpeedMultiplier = 1f;
         public float energyGenerationMultiplier = 1f;
         public float energyStorageMultiplier = 1f;
@@ -55,25 +59,36 @@ namespace Abracodabra.Genes
         public int leafDensity = 2;
         public int leafGap = 1;
 
-        public PlantState CurrentState { get; private set; } = PlantState.Initializing;
+        public PlantState CurrentState { get; set; } = PlantState.Initializing;
 
-        void Awake()
+        private IDeterministicRandom _deterministicRandom;
+
+        private void Awake()
         {
             AllActivePlants.Add(this);
-            CellManager = new PlantCellManager(this, seedCellPrefab, stemCellPrefab, leafCellPrefab, berryCellPrefab, cellSpacing);
+            // Pass the FoodType reference to the CellManager's constructor
+            CellManager = new PlantCellManager(this, seedCellPrefab, stemCellPrefab, leafCellPrefab, berryCellPrefab, cellSpacing, leafFoodType);
             GrowthLogic = new PlantGrowthLogic(this);
             EnergySystem = new PlantEnergySystem(this);
             VisualManager = new PlantVisualManager(this, shadowController, null, outlineController, outlinePartPrefab, enableOutline);
+            
+            // Get the deterministic random service
+            _deterministicRandom = GeneServices.Get<IDeterministicRandom>();
+            if (_deterministicRandom == null)
+            {
+                Debug.LogError($"[{nameof(PlantGrowth)}] could not retrieve IDeterministicRandom service! Growth will be non-deterministic.", this);
+            }
         }
 
-        void OnDestroy()
+        private void OnDestroy()
         {
             AllActivePlants.Remove(this);
             var tickManager = TickManager.Instance;
-            if (tickManager != null) { tickManager.UnregisterTickUpdateable(this); }
+            if (tickManager != null)
+            {
+                tickManager.UnregisterTickUpdateable(this);
+            }
         }
-
-        // In file: Assets/Scripts/PlantSystem/Growth/PlantGrowth.cs
 
         public void InitializeFromTemplate(SeedTemplate template)
         {
@@ -87,29 +102,20 @@ namespace Abracodabra.Genes
             this.seedTemplate = template;
             geneRuntimeState = template.CreateRuntimeState();
 
-            // Get or add the executor component and link it to this plant
             sequenceExecutor = GetComponent<PlantSequenceExecutor>();
             if (sequenceExecutor == null)
             {
                 sequenceExecutor = gameObject.AddComponent<PlantSequenceExecutor>();
             }
             sequenceExecutor.plantGrowth = this;
-            
-            // --- REORDERED LOGIC ---
 
-            // 1. Apply all passive gene effects first. This will correctly set all multipliers
-            //    (growthSpeedMultiplier, energyStorageMultiplier, etc.) on this component.
             GrowthLogic.CalculateAndApplyPassiveStats();
 
-            // 2. Now that multipliers are correct, initialize the energy system.
             EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
             EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
             GrowthLogic.PhotosynthesisEfficiencyPerLeaf = template.energyRegenRate * energyGenerationMultiplier;
-            
-            // 3. Finally, initialize the sequence executor, which will start the active gene loop.
+
             sequenceExecutor.InitializeWithTemplate(template);
-            
-            // --- END REORDERED LOGIC ---
 
             CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
             CurrentState = PlantState.Growing;
@@ -125,27 +131,25 @@ namespace Abracodabra.Genes
         public void OnTickUpdate(int currentTick)
         {
             EnergySystem.OnTickUpdate();
-            
-            // Simulate growth (simplified for now)
+
             if (CurrentState == PlantState.Growing && CellManager.cells.Count < maxHeight * 2)
             {
-                // Simple growth logic - this would be more complex in real game
-                if (Random.value < 0.1f * growthSpeedMultiplier)
+                // Use the deterministic random service, with a fallback to Unity's Random if the service isn't available.
+                float randomValue = (_deterministicRandom != null) ? _deterministicRandom.Range(0f, 1f) : Random.value;
+                if (randomValue < 0.1f * growthSpeedMultiplier)
                 {
                     GrowSomething();
                 }
             }
         }
-        
-        void GrowSomething()
+
+        private void GrowSomething()
         {
-            // Simplified growth - just add a stem or leaf
             int currentHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
             if (currentHeight < maxHeight)
             {
                 CellManager.SpawnCellVisual(PlantCellType.Stem, new Vector2Int(0, currentHeight + 1));
-                
-                // Add leaves around stem based on leaf density
+
                 if (currentHeight % leafGap == 0)
                 {
                     for (int i = 0; i < leafDensity; i++)
@@ -153,8 +157,7 @@ namespace Abracodabra.Genes
                         int xOffset = (i % 2 == 0) ? -1 : 1;
                         var leafPos = new Vector2Int(xOffset, currentHeight + 1);
                         var leafObj = CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos);
-                        
-                        // Tag leaves as fruit spawn points
+
                         if (leafObj != null)
                         {
                             leafObj.tag = "FruitSpawn";

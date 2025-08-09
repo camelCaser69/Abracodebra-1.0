@@ -1,5 +1,4 @@
-﻿// REWORKED FILE: Assets/Scripts/Genes/Services/GeneServices.cs
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,6 +10,11 @@ namespace Abracodabra.Genes.Services
     {
         private static Dictionary<Type, object> services = new Dictionary<Type, object>();
         private static bool isInitialized = false;
+
+        /// <summary>
+        /// Gets a value indicating whether the core gene services have been initialized.
+        /// </summary>
+        public static bool IsInitialized => isInitialized;
 
         public static void Initialize()
         {
@@ -32,11 +36,11 @@ namespace Abracodabra.Genes.Services
         {
             if (!isInitialized)
             {
-                Debug.LogError("GeneServices not initialized! Call Initialize() first.");
-                return null;
+                Debug.LogWarning($"GeneServices accessed for type '{typeof(T).Name}' before explicit initialization. Auto-initializing now. Please check script execution order.");
+                Initialize(); // Auto-initialize if needed
             }
 
-            // Fallback for GeneLibrary if it wasn't registered in time
+            // Special on-demand registration for GeneLibrary if it's requested before being set up by its loader.
             if (typeof(T) == typeof(IGeneLibrary) && !services.ContainsKey(typeof(T)))
             {
                 Debug.LogWarning("IGeneLibrary service was requested before it was registered. Attempting to find and register it now.");
@@ -57,9 +61,11 @@ namespace Abracodabra.Genes.Services
             }
 
             if (services.TryGetValue(typeof(T), out object service))
+            {
                 return (T)service;
+            }
 
-            Debug.LogError($"Service {typeof(T)} not registered!");
+            Debug.LogError($"Service {typeof(T).Name} not registered!");
             return null;
         }
 

@@ -59,13 +59,20 @@ namespace Abracodabra.UI.Genes
             runtimeState = state;
             if (state == null) return;
 
-            // Update Passive Slots
             for (int i = 0; i < passiveSlots.Count; i++)
             {
                 if (i < state.passiveInstances.Count)
                 {
                     var instance = state.passiveInstances[i];
-                    passiveSlots[i].SetItem(InventoryBarItem.FromGene(instance));
+                    // ADDED: Validation for the instance and its underlying gene
+                    if (instance != null && instance.GetGene() != null)
+                    {
+                        passiveSlots[i].SetItem(InventoryBarItem.FromGene(instance));
+                    }
+                    else
+                    {
+                        passiveSlots[i].ClearSlot();
+                    }
                 }
                 else
                 {
@@ -73,13 +80,16 @@ namespace Abracodabra.UI.Genes
                 }
             }
 
-            // Update Active Sequence Rows
             for (int i = 0; i < sequenceRows.Count; i++)
             {
                 if (i < state.activeSequence.Count)
+                {
                     sequenceRows[i].LoadSlot(state.activeSequence[i]);
+                }
                 else
+                {
                     sequenceRows[i].ClearRow();
+                }
             }
 
             UpdateDisplay();
