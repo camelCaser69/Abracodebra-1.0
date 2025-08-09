@@ -1,7 +1,6 @@
 ﻿// REWORKED FILE: Assets/Scripts/PlantSystem/Growth/PlantVisualManager.cs
-
-using Abracodabra.Genes;
 using UnityEngine;
+using Abracodabra.Genes;
 using TMPro;
 
 public class PlantVisualManager
@@ -10,12 +9,9 @@ public class PlantVisualManager
     private readonly PlantShadowController shadowController;
     private readonly GameObject shadowPartPrefab;
     private readonly bool enableOutline;
-    public PlantOutlineController OutlineController { get; private set; }
+    public PlantOutlineController OutlineController { get; set; }
     private readonly GameObject outlinePartPrefab;
     private readonly TMP_Text energyText;
-    
-    // FIX: Removed the unused 'displayedGrowthPercentage' field.
-    // private int displayedGrowthPercentage = -1; 
 
     public PlantVisualManager(PlantGrowth plant, PlantShadowController shadowController, GameObject shadowPartPrefab, PlantOutlineController outlineController, GameObject outlinePartPrefab, bool enableOutline)
     {
@@ -35,12 +31,23 @@ public class PlantVisualManager
             shadowController.RegisterPlantPart(partRenderer, shadowPartPrefab);
         }
     }
+    
+    /// <summary>
+    /// Notifies the PlantShadowController to remove the shadow associated with a given plant cell.
+    /// </summary>
+    /// <param name="cellInstance">The plant cell's GameObject that is being destroyed.</param>
+    public void UnregisterShadowForCell(GameObject cellInstance)
+    {
+        if (shadowController != null && cellInstance != null && cellInstance.TryGetComponent<SpriteRenderer>(out var partRenderer))
+        {
+            shadowController.UnregisterPlantPart(partRenderer);
+        }
+    }
 
     public void RegisterOutlineForCell(GameObject cellInstance, string cellTypeName)
     {
         if (enableOutline && OutlineController != null && cellInstance != null && cellInstance.TryGetComponent<SpriteRenderer>(out var partRenderer))
         {
-            // The prefab is now passed from PlantGrowth to avoid null issues
             OutlineController.RegisterPlantPart(partRenderer, outlinePartPrefab);
         }
     }
@@ -48,7 +55,7 @@ public class PlantVisualManager
     public void UpdateUI()
     {
         if (energyText == null) return;
-        
+
         if (plant.CurrentState == PlantState.Growing || plant.CurrentState == PlantState.Initializing)
         {
             UpdateGrowthPercentageUI();
@@ -61,7 +68,10 @@ public class PlantVisualManager
 
     private void UpdateGrowthPercentageUI()
     {
-        energyText.text = "Growing...";
+        if (energyText != null)
+        {
+            energyText.text = "Growing...";
+        }
     }
 
     private void UpdateEnergyUI()
@@ -71,7 +81,4 @@ public class PlantVisualManager
         float maxEnergy = plant.EnergySystem.MaxEnergy;
         energyText.text = $"{currentEnergy:F1}/{maxEnergy:F0}";
     }
-    
-    // This method is no longer needed as the variable it reset is gone.
-    // public void ResetDisplayState() { ... }
 }

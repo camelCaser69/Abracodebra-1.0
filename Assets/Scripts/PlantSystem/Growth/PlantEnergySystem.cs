@@ -1,22 +1,23 @@
 ﻿// Reworked File: Assets/Scripts/PlantSystem/Growth/PlantEnergySystem.cs
-
-using Abracodabra.Genes;
 using UnityEngine;
+using Abracodabra.Genes;
 using WegoSystem;
 
 public class PlantEnergySystem
 {
-    readonly PlantGrowth plant;
+    private readonly PlantGrowth plant;
 
     public float CurrentEnergy { get; set; }
     public float MaxEnergy { get; set; }
-    public float BaseEnergyPerLeaf { get; set; } = 0.1f; // Base rate from template
+    public float BaseEnergyPerLeaf { get; set; } // Base rate from template
 
-    readonly FireflyManager fireflyManagerInstance;
+    // Cache the FireflyManager instance to avoid repeated singleton lookups
+    private readonly FireflyManager fireflyManagerInstance;
 
     public PlantEnergySystem(PlantGrowth plant)
     {
         this.plant = plant;
+        // Cache the reference once during construction. It's okay if it's null.
         this.fireflyManagerInstance = FireflyManager.Instance;
     }
 
@@ -27,10 +28,13 @@ public class PlantEnergySystem
         int leafCount = plant.CellManager.GetActiveLeafCount();
         if (leafCount <= 0) return;
 
-        float sunlight = WeatherManager.Instance != null ? WeatherManager.Instance.sunIntensity : 1f;
+        // Ensure WeatherManager exists before using it
+        float sunlight = (WeatherManager.Instance != null) ? WeatherManager.Instance.sunIntensity : 1f;
 
         float fireflyBonusRate = 0f;
-        if (fireflyManagerInstance != null)
+        // --- NULL-SAFETY CHECK ---
+        // Only attempt to calculate the firefly bonus if the manager was found and is active.
+        if (fireflyManagerInstance != null && fireflyManagerInstance.isActiveAndEnabled)
         {
             int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(plant.transform.position, fireflyManagerInstance.photosynthesisRadius);
             fireflyBonusRate = Mathf.Min(
@@ -39,7 +43,6 @@ public class PlantEnergySystem
             );
         }
 
-        // Use base rate from template/passives, modified by plant's multiplier
         float effectiveRate = BaseEnergyPerLeaf * plant.energyGenerationMultiplier;
         float totalPhotosynthesisRatePerLeaf = (effectiveRate * sunlight) + fireflyBonusRate;
         float energyThisTick = totalPhotosynthesisRatePerLeaf * leafCount;

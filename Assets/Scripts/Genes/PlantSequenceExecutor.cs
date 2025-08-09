@@ -92,24 +92,31 @@ namespace Abracodabra.Genes
             }
         }
 
-        bool TryExecuteCurrentSlot()
+        // In file: Assets/Scripts/Genes/PlantSequenceExecutor.cs
+
+        private bool TryExecuteCurrentSlot()
         {
             if (runtimeState.currentPosition >= runtimeState.activeSequence.Count)
                 return false;
 
             var slot = runtimeState.activeSequence[runtimeState.currentPosition];
-            if (!slot.HasContent) return true; // Skip empty slots and advance
+            if (!slot.HasContent)
+            {
+                // Slot is empty, so we successfully "executed" it by skipping.
+                return true; 
+            }
 
-            var activeGene = slot.activeInstance.GetGene<ActiveGene>();
+            var activeGene = slot.activeInstance?.GetGene<ActiveGene>();
             if (activeGene == null)
             {
-                Debug.LogError("Active gene instance has a null gene reference!", this);
-                return true; // Skip broken slots
-            }
+                // The gene asset might be missing or failed to load. Log an error and skip the slot.
+                Debug.LogError($"Active gene instance at sequence position {runtimeState.currentPosition} has a null or invalid gene reference! Skipping slot.", this);
+                return true;
+}
 
             float energyCost = slot.GetEnergyCost();
             var energySystem = plantGrowth.EnergySystem;
-            
+
             if (!energySystem.HasEnergy(energyCost))
             {
                 eventBus?.Publish(new GeneValidationFailedEvent
@@ -131,18 +138,33 @@ namespace Abracodabra.Genes
                 random = random
             };
 
+            // Pre-Execution step for modifiers
             foreach (var modInstance in slot.modifierInstances)
             {
-                modInstance.GetGene<ModifierGene>()?.PreExecution(context);
+                var modifierGene = modInstance?.GetGene<ModifierGene>();
+                if (modifierGene != null)
+                {
+                    modifierGene.PreExecution(context);
+                }
+                else
+                {
+                    Debug.LogWarning($"A modifier gene in the slot at position {runtimeState.currentPosition} is missing or invalid.", this);
+                }
             }
 
+            // Execute the main gene
             slot.isExecuting = true;
             activeGene.Execute(context);
             energySystem.SpendEnergy(energyCost);
 
+            // Post-Execution step for modifiers
             foreach (var modInstance in slot.modifierInstances)
             {
-                modInstance.GetGene<ModifierGene>()?.PostExecution(context);
+                 var modifierGene = modInstance?.GetGene<ModifierGene>();
+                if (modifierGene != null)
+                {
+                    modifierGene.PostExecution(context);
+                }
             }
 
             eventBus?.Publish(new GeneExecutedEvent

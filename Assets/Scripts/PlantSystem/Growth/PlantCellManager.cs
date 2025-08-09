@@ -1,14 +1,10 @@
 ﻿// Reworked File: Assets/Scripts/PlantSystem/Growth/PlantCellManager.cs
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Abracodabra.Genes;
 using WegoSystem;
 
-/// <summary>
-/// A manager class, owned by a PlantGrowth instance, responsible for creating and tracking
-/// the visual GameObjects that make up a plant.
-/// </summary>
 public class PlantCellManager
 {
     private readonly PlantGrowth plant;
@@ -38,23 +34,35 @@ public class PlantCellManager
     {
         if (cells.TryGetValue(coord, out PlantCellType cellType))
         {
+            GameObject cellObj = GetCellGameObjectAt(coord);
+
+            if (cellObj != null)
+            {
+                // Unregister from visual systems BEFORE destroying the object
+                plant.VisualManager.UnregisterShadowForCell(cellObj);
+                plant.VisualManager.OutlineController?.OnPlantCellRemoved(coord);
+            
+                // Update internal data tracking
+                activeCellGameObjects.Remove(cellObj);
+                
+                // Finally, destroy the actual GameObject
+                Object.Destroy(cellObj);
+            }
+
             if (cellType == PlantCellType.Leaf)
             {
-                // Mark the leaf data as inactive for photosynthesis calculations
                 for (int i = 0; i < LeafDataList.Count; i++)
                 {
                     if (LeafDataList[i].GridCoord == coord)
                     {
-                        LeafDataList[i] = new LeafData(coord, false);
+                        // Mark as inactive instead of removing to preserve indices if needed
+                        LeafDataList[i] = new LeafData(coord, false); 
                         break;
                     }
                 }
             }
 
             cells.Remove(coord);
-            activeCellGameObjects.RemoveAll(go => go == null || (go.GetComponent<PlantCell>()?.GridCoord == coord));
-
-            plant.VisualManager.OutlineController?.OnPlantCellRemoved(coord);
         }
     }
 
