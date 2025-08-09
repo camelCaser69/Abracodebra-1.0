@@ -1,4 +1,6 @@
 ﻿// REWORKED FILE: Assets/Scripts/PlantSystem/Growth/PlantVisualManager.cs
+
+using Abracodabra.Genes;
 using UnityEngine;
 using TMPro;
 

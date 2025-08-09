@@ -2,49 +2,43 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Abracodabra.Genes.Runtime;
-using Abracodabra.Genes.Services;
 
 namespace Abracodabra.Genes.Core
 {
-    [System.Serializable]
-    public class ActiveGeneSlotConfig
-    {
-        public int modifierSlots = 1;
-        public int payloadSlots = 2;
-
-        public bool CanAcceptMoreModifiers(int current) => current < modifierSlots;
-        public bool CanAcceptMorePayloads(int current) => current < payloadSlots;
-    }
-
     /// <summary>
-    /// Base class for genes that are the main executable actions in a sequence.
-    /// They consume energy and can be altered by Modifiers and enhanced by Payloads.
+    /// The base class for all genes that perform an action when their
+    /// position in a sequence is reached.
     /// </summary>
     public abstract class ActiveGene : GeneBase
     {
         public override GeneCategory Category => GeneCategory.Active;
 
-        [Header("Active Settings")]
+        [Header("Active Gene Settings")]
         public float baseEnergyCost = 20f;
-        public ActiveGeneSlotConfig slotConfig;
+        public ActiveGeneSlotConfig slotConfig = new ActiveGeneSlotConfig();
+        
+        [Tooltip("If true, this gene can execute even with no payloads attached.")]
         public bool canExecuteEmpty = false;
 
-        [Header("Execution")]
+        [Tooltip("Delay in seconds before the effect visually happens (not implemented).")]
         public float executionDelay = 0f;
+        
+        [Tooltip("Does this gene require a specific target to execute? (not implemented)")]
         public bool requiresTarget = false;
 
         /// <summary>
-        /// Validates if the attached modifiers and payloads are a valid combination at configuration time.
+        /// Checks if the current combination of modifiers and payloads is valid for this gene.
         /// </summary>
         public virtual bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
         {
             if (!canExecuteEmpty && payloads.Count == 0)
                 return false;
+            
             return true;
         }
 
         /// <summary>
-        /// Validates if the gene can be executed at runtime (e.g., sufficient energy).
+        /// Checks if the plant has enough energy to execute this gene right now.
         /// </summary>
         public virtual bool CanExecuteNow(PlantGrowth plant, float availableEnergy)
         {
@@ -52,7 +46,7 @@ namespace Abracodabra.Genes.Core
         }
 
         /// <summary>
-        /// Calculates the final energy cost after applying all modifier effects.
+        /// Calculates the final energy cost of this gene after all attached modifiers are applied.
         /// </summary>
         public float GetFinalEnergyCost(List<RuntimeGeneInstance> modifiers)
         {
@@ -67,22 +61,9 @@ namespace Abracodabra.Genes.Core
         }
 
         /// <summary>
-        /// The main execution method for the gene's action.
+        /// The main execution logic for this active gene.
         /// </summary>
+        /// <param name="context">All contextual data needed for execution.</param>
         public abstract void Execute(ActiveGeneContext context);
-    }
-
-    /// <summary>
-    /// A context object containing all necessary information for an ActiveGene's execution.
-    /// </summary>
-    public class ActiveGeneContext
-    {
-        public PlantGrowth plant;
-        public RuntimeGeneInstance activeInstance;
-        public List<RuntimeGeneInstance> modifiers;
-        public List<RuntimeGeneInstance> payloads;
-        public int sequencePosition;
-        public PlantSequenceExecutor executor;
-        public IDeterministicRandom random;
     }
 }

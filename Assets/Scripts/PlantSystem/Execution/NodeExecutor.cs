@@ -1,4 +1,6 @@
 ﻿// Reworked File: Assets/Scripts/PlantSystem/Execution/NodeExecutor.cs
+
+using Abracodabra.Genes;
 using UnityEngine;
 using WegoSystem;
 using Abracodabra.Genes.Templates;

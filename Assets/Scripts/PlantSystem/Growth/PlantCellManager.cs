@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using Abracodabra.Genes;
 using WegoSystem;
 
 /// <summary>
@@ -17,7 +18,7 @@ public class PlantCellManager
     private readonly GameObject berryCellPrefab;
     private readonly float cellSpacing;
 
-    private readonly Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
+    public readonly Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
     private readonly List<GameObject> activeCellGameObjects = new List<GameObject>();
 
     public List<LeafData> LeafDataList { get; } = new List<LeafData>();
@@ -86,8 +87,7 @@ public class PlantCellManager
         Vector2 worldPos = (Vector2)plant.transform.position + ((Vector2)coords * cellSpacing);
         GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
         instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
-        
-        // Remove GridEntity from parts to avoid registering them with the GridPositionManager
+
         if (cellType != PlantCellType.Seed)
         {
             if (instance.TryGetComponent<GridEntity>(out var partGridEntity))
@@ -95,21 +95,22 @@ public class PlantCellManager
                 Object.Destroy(partGridEntity);
             }
         }
-        
+
         var cellComp = instance.GetComponent<PlantCell>() ?? instance.AddComponent<PlantCell>();
         cellComp.ParentPlantGrowth = plant;
         cellComp.GridCoord = coords;
         cellComp.CellType = cellType;
-        
+
         cells[coords] = cellType;
         activeCellGameObjects.Add(instance);
-        
+
         if (cellType == PlantCellType.Leaf)
         {
             LeafDataList.Add(new LeafData(coords, true));
+            // Tag leaves as fruit spawn points
+            instance.tag = "FruitSpawn";
         }
 
-        // Register for visual systems
         plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
         plant.VisualManager.RegisterOutlineForCell(instance, cellType.ToString());
 

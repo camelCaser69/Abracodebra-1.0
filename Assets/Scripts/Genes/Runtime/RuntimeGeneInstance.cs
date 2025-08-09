@@ -75,14 +75,23 @@ namespace Abracodabra.Genes.Runtime
         // FIX: Added serialization methods
         public void OnBeforeSerialize()
         {
-            // Nothing needed here. We want to serialize our GUID and data.
+            // Save the current gene reference to ensure it persists
+            if (cachedGene != null)
+            {
+                geneGUID = cachedGene.GUID;
+                geneName = cachedGene.geneName;
+        
+                // Update version if needed
+                if (instanceData.version < cachedGene.Version)
+                {
+                    instanceData.version = cachedGene.Version;
+                }
+            }
         }
 
         public void OnAfterDeserialize()
         {
-            // After Unity loads this object from disk, the non-serialized
-            // 'cachedGene' will be null. We ensure it stays null so that the
-            // next call to GetGene() will trigger a reload via SafeGeneLoader.
+            // Clear cached reference to force reload
             cachedGene = null;
         }
         #endregion

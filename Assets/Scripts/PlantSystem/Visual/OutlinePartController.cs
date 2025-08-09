@@ -1,4 +1,6 @@
 ﻿// REWORKED FILE: Assets/Scripts/PlantSystem/Visual/OutlinePartController.cs
+
+using Abracodabra.Genes;
 using UnityEngine;
 
 public class OutlinePartController : MonoBehaviour

@@ -1,5 +1,6 @@
 ﻿// Assets\Scripts\Core\GridSnapStartup.cs
 
+using Abracodabra.Genes;
 using UnityEngine;
 using WegoSystem;
 

@@ -1,4 +1,6 @@
 ﻿// Reworked File: Assets/Scripts/PlantSystem/Growth/PlantCell.cs
+
+using Abracodabra.Genes;
 using UnityEngine;
 
 public enum PlantCellType { Seed, Stem, Leaf, Flower, Fruit }

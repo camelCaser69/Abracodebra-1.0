@@ -5,6 +5,7 @@ using TMPro;
 using WegoSystem;
 using System.Collections.Generic;
 using System.Linq;
+using Abracodabra.Genes;
 
 public class TickDebugMonitor : MonoBehaviour
 {

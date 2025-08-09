@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Templates;
 using Abracodabra.UI.Genes; // For ItemView
 
@@ -97,24 +98,46 @@ public class InventoryBarController : MonoBehaviour
         }
     }
 
-    private void UpdateBarDisplay()
+    void UpdateBarDisplay()
     {
-        // This logic needs to be adapted based on what the inventory holds.
-        // For now, let's assume it holds SeedTemplates for planting.
-        // A more complex system would handle tools and genes.
-        
-        // Clear old items
-        foreach(var slot in barSlots)
+        // Clear existing items in bar slots
+        foreach (var slot in barSlots)
         {
-            foreach(Transform child in slot.transform)
+            foreach (Transform child in slot.transform)
             {
                 Destroy(child.gameObject);
             }
         }
 
-        // TODO: This part requires a list of items the player can actually use from the bar,
-        // which would come from a reworked InventoryGridController.
-        // For now, this will remain empty until the inventory logic is fully fleshed out.
+        if (inventoryGridController == null) return;
+
+        // Get items from inventory grid (first row)
+        var allGenes = inventoryGridController.GetAllGenes();
+    
+        for (int i = 0; i < Mathf.Min(allGenes.Count, slotsPerRow); i++)
+        {
+            if (i >= barSlots.Count) break;
+        
+            var gene = allGenes[i];
+            if (gene == null) continue;
+        
+            // Create visual representation in bar slot
+            GameObject itemVisual = new GameObject("ItemVisual");
+            itemVisual.transform.SetParent(barSlots[i].transform, false);
+        
+            var itemImage = itemVisual.AddComponent<Image>();
+            var geneBase = gene.GetGene();
+            if (geneBase != null && geneBase.icon != null)
+            {
+                itemImage.sprite = geneBase.icon;
+                itemImage.color = geneBase.geneColor;
+            }
+        
+            // Store reference for selection
+            var barItem = itemVisual.AddComponent<InventoryBarItemComponent>();
+            barItem.runtimeInstance = gene;
+            barItem.slotIndex = i;
+        }
     }
     
     private void HandleNumberKeyInput()
@@ -133,17 +156,36 @@ public class InventoryBarController : MonoBehaviour
         }
     }
 
-    private void SelectSlot(int slotIndex)
+    void SelectSlot(int slotIndex)
     {
-        if (this.selectedSlot == slotIndex && this.SelectedItem != null)
+        if (slotIndex < 0 || slotIndex >= slotsPerRow) return;
+    
+        // Find item in slot
+        if (slotIndex < barSlots.Count)
         {
-            this.selectedSlot = -1; // Deselect
+            var slot = barSlots[slotIndex];
+            var itemComponent = slot.GetComponentInChildren<InventoryBarItemComponent>();
+        
+            if (itemComponent != null && itemComponent.runtimeInstance != null)
+            {
+                // Create InventoryBarItem for selection
+                SelectedItem = InventoryBarItem.FromGene(itemComponent.runtimeInstance, slot);
+                selectedSlot = slotIndex;
+            }
+            else
+            {
+                SelectedItem = null;
+                selectedSlot = -1;
+            }
         }
-        else
-        {
-            this.selectedSlot = Mathf.Clamp(slotIndex, 0, slotsPerRow - 1);
-        }
+    
         UpdateSelection();
+    }
+    
+    public class InventoryBarItemComponent : MonoBehaviour
+    {
+        public RuntimeGeneInstance runtimeInstance;
+        public int slotIndex;
     }
 
     private void UpdateSelection()

@@ -15,15 +15,13 @@ namespace Abracodabra.Genes.Implementations
         public override void ApplyToPlant(PlantGrowth plant, RuntimeGeneInstance instance)
         {
             if (plant == null) return;
-            
-            // Note: This assumes PlantGrowth will be reworked to have these properties.
-            // We are pre-emptively coding against the future state of PlantGrowth.
-            float finalMultiplier = growthMultiplier * instance.GetValue("power_multiplier", 1f);
 
-            // Example of modifying a hypothetical growth property
-            // plant.GrowthSpeedModifier *= finalMultiplier; 
-            
-            Debug.Log($"Applied Growth Speed Gene: {finalMultiplier}x modifier to {plant.name}");
+            float finalMultiplier = growthMultiplier * instance.GetValue("power_multiplier", 1f);
+    
+            // Actually apply the multiplier to the plant
+            plant.growthSpeedMultiplier *= finalMultiplier;
+
+            Debug.Log($"Applied Growth Speed Gene: {finalMultiplier}x modifier to {plant.name}. Total multiplier now: {plant.growthSpeedMultiplier}");
         }
 
         public override string GetStatModificationText()

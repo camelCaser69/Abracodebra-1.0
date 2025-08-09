@@ -1,6 +1,7 @@
 ﻿// File: Assets/Scripts/Genes/PlantSequenceExecutor.cs
-using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
@@ -10,21 +11,18 @@ namespace Abracodabra.Genes
 {
     public class PlantSequenceExecutor : MonoBehaviour
     {
-        [Header("References")]
         public PlantGrowth plantGrowth;
         public PlantGeneRuntimeState runtimeState;
 
-        [Header("Execution Settings")]
         public float tickInterval = 1f;
         public bool isPaused = false;
 
-        private Coroutine executionCoroutine;
-        private IGeneEventBus eventBus;
-        private IDeterministicRandom random;
+        Coroutine executionCoroutine;
+        IGeneEventBus eventBus;
+        IDeterministicRandom random;
 
         void Awake()
         {
-            // Retrieve services. Ensure GeneServices is initialized at game start.
             eventBus = GeneServices.Get<IGeneEventBus>();
             random = GeneServices.Get<IDeterministicRandom>();
         }
@@ -33,9 +31,6 @@ namespace Abracodabra.Genes
         {
             if (plantGrowth == null)
                 plantGrowth = GetComponent<PlantGrowth>();
-
-            // The executor is initialized externally by PlantGrowth
-            // by calling InitializeWithTemplate.
         }
 
         public void InitializeWithTemplate(SeedTemplate template)
@@ -70,36 +65,32 @@ namespace Abracodabra.Genes
 
         IEnumerator ExecutionLoop()
         {
-            // Wait one frame to ensure everything is initialized
             yield return null;
 
             while (true)
             {
                 yield return new WaitForSeconds(tickInterval);
 
-                if (isPaused || runtimeState == null || runtimeState.template == null)
+                if (isPaused || runtimeState == null || runtimeState.template == null || plantGrowth == null)
                     continue;
 
-                // 1. Regenerate energy
-                runtimeState.currentEnergy = Mathf.Min(
-                    runtimeState.currentEnergy + runtimeState.template.energyRegenRate * tickInterval,
-                    runtimeState.maxEnergy
-                );
+                // Use the plant's actual energy system
+                var energySystem = plantGrowth.EnergySystem;
+                if (energySystem == null)
+                    continue;
 
-                // 2. Handle recharge cooldown
+                // Energy regeneration is handled by PlantEnergySystem.OnTickUpdate()
+                // We just need to check if we're in recharge
                 if (runtimeState.rechargeTicksRemaining > 0)
                 {
                     runtimeState.rechargeTicksRemaining--;
                     continue;
                 }
 
-                // 3. Try to execute the current slot in the sequence
                 if (TryExecuteCurrentSlot())
                 {
-                    // Advance to the next position in the sequence
                     runtimeState.currentPosition++;
 
-                    // Check if the entire sequence has completed
                     if (runtimeState.currentPosition >= runtimeState.activeSequence.Count)
                     {
                         OnSequenceComplete();
@@ -123,19 +114,19 @@ namespace Abracodabra.Genes
                 return true; // Skip broken slots
             }
 
-            // Check if there is enough energy
             float energyCost = slot.GetEnergyCost();
-            if (runtimeState.currentEnergy < energyCost)
+            var energySystem = plantGrowth.EnergySystem;
+            
+            if (!energySystem.HasEnergy(energyCost))
             {
                 eventBus?.Publish(new GeneValidationFailedEvent
                 {
                     GeneId = activeGene.GUID,
-                    Reason = $"Insufficient energy. Has {runtimeState.currentEnergy}, needs {energyCost}."
+                    Reason = $"Insufficient energy. Has {energySystem.CurrentEnergy}, needs {energyCost}."
                 });
                 return false; // Not enough energy, try again next tick
             }
 
-            // Create context for the execution
             var context = new ActiveGeneContext
             {
                 plant = plantGrowth,
@@ -147,24 +138,20 @@ namespace Abracodabra.Genes
                 random = random
             };
 
-            // Run Pre-Execution modifiers
             foreach (var modInstance in slot.modifierInstances)
             {
                 modInstance.GetGene<ModifierGene>()?.PreExecution(context);
             }
 
-            // Execute the gene
             slot.isExecuting = true;
             activeGene.Execute(context);
-            runtimeState.currentEnergy -= energyCost;
+            energySystem.SpendEnergy(energyCost);
 
-            // Run Post-Execution modifiers
             foreach (var modInstance in slot.modifierInstances)
             {
                 modInstance.GetGene<ModifierGene>()?.PostExecution(context);
             }
 
-            // Publish success event
             eventBus?.Publish(new GeneExecutedEvent
             {
                 Gene = activeGene,
@@ -186,10 +173,12 @@ namespace Abracodabra.Genes
 
         void OnSequenceComplete()
         {
+            var energySystem = plantGrowth.EnergySystem;
+            
             eventBus?.Publish(new SequenceCompletedEvent
             {
                 TotalSlotsExecuted = runtimeState.activeSequence.Count,
-                TotalEnergyUsed = runtimeState.maxEnergy - runtimeState.currentEnergy // Assuming energy starts full
+                TotalEnergyUsed = energySystem.MaxEnergy - energySystem.CurrentEnergy
             });
 
             runtimeState.currentPosition = 0;

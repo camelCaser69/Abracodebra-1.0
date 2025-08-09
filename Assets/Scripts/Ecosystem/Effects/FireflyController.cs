@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Abracodabra.Genes;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using WegoSystem;

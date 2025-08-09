@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Abracodabra.Genes;
+using UnityEngine;
 using WegoSystem;
 
 public class FoodItem : MonoBehaviour
