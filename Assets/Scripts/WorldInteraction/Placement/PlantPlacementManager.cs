@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Abracodabra.Genes.Templates;
-using Abracodabra.Genes.Runtime; // Added for PlantGeneRuntimeState
+using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.UI.Genes
 {
@@ -58,11 +58,10 @@ namespace Abracodabra.UI.Genes
             }
         }
         
-        // MODIFIED: This method now accepts the runtime state directly.
         public bool TryPlantSeedFromInventory(PlantGeneRuntimeState runtimeState, Vector3Int gridPosition, Vector3 worldPosition)
         {
             if (runtimeState == null || runtimeState.template == null) return false;
-            
+
             if (!runtimeState.template.IsValid())
             {
                 Debug.LogError($"Cannot plant '{runtimeState.template.templateName}': The seed template configuration is invalid.", runtimeState.template);
@@ -74,10 +73,15 @@ namespace Abracodabra.UI.Genes
             TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
             if (!IsTileValidForPlanting(tileDef)) return false;
 
+            // FIX: Add a fallback check for the NodeExecutor to make planting more robust.
             if (nodeExecutor == null)
             {
-                Debug.LogError("Cannot plant: NodeExecutor reference is missing in PlantPlacementManager.");
-                return false;
+                nodeExecutor = FindFirstObjectByType<NodeExecutor>();
+                if (nodeExecutor == null)
+                {
+                    Debug.LogError("Cannot plant: NodeExecutor reference is missing in PlantPlacementManager and could not be found in the scene!");
+                    return false;
+                }
             }
 
             Vector3 finalPlantingPosition = GetRandomizedPlantingPosition(worldPosition);

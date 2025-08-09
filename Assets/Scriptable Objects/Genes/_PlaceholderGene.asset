@@ -18,8 +18,9 @@ MonoBehaviour:
   tier: 1
   geneColor: {r: 1, g: 1, b: 1, a: 1}
   effectPrefab: {fileID: 0}
-  _persistentGUID: 
+  _persistentGUID: e21a7993-fcc4-467c-a5f1-b034c1fa688c
   _version: 1
-  stacksAdditively: 1
+  statToModify: 0
   baseValue: 1
+  stacksAdditively: 1
   maxStacks: -1

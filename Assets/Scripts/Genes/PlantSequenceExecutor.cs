@@ -38,7 +38,7 @@ namespace Abracodabra.Genes
                 plantGrowth = GetComponent<PlantGrowth>();
             }
         }
-
+        
         public void InitializeWithTemplate(SeedTemplate template)
         {
             runtimeState = template.CreateRuntimeState();
@@ -79,7 +79,6 @@ namespace Abracodabra.Genes
                     continue;
                 }
                 
-                // FIX: Only execute active genes if the plant is mature.
                 if (plantGrowth.CurrentState != PlantState.Mature)
                 {
                     continue;
@@ -90,8 +89,8 @@ namespace Abracodabra.Genes
                 {
                     continue;
                 }
-
-                runtimeState.currentEnergy = energySystem.CurrentEnergy;
+                
+                // REMOVED: runtimeState.currentEnergy = energySystem.CurrentEnergy;
 
                 if (runtimeState.rechargeTicksRemaining > 0)
                 {
@@ -141,7 +140,7 @@ namespace Abracodabra.Genes
                     GeneId = activeGene.GUID,
                     Reason = $"Insufficient energy. Has {energySystem.CurrentEnergy}, needs {energyCost}."
                 });
-                return false; // Not enough energy, try again next tick
+                return false; 
             }
 
             var context = new ActiveGeneContext
@@ -169,7 +168,7 @@ namespace Abracodabra.Genes
             }
 
             energySystem.SpendEnergy(energyCost);
-            runtimeState.currentEnergy = energySystem.CurrentEnergy;
+            // REMOVED: runtimeState.currentEnergy = energySystem.CurrentEnergy;
             slot.isExecuting = true;
 
             if (activeGene.executionDelay > 0)

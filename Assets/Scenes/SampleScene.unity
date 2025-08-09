@@ -9146,10 +9146,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 763889560}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a70455b301b44d6dbae7d60b1678a64e, type: 3}
+  m_Script: {fileID: 11500000, guid: 908bb7a02fea4a369f4def9e83819885, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  geneLibraryAsset: {fileID: 11400000, guid: 0d19a2e88d43b574aa24172d9145a140, type: 2}
 --- !u!1 &769811489
 GameObject:
   m_ObjectHideFlags: 0
@@ -14583,9 +14582,10 @@ MonoBehaviour:
   inventoryColumns: 10
   cellSize: {x: 96, y: 96}
   cellMargin: 16
-  geneSlotPrefab: {fileID: 6330258185181202584, guid: 3ee6fff2b56730a46bc44b4878e57c93, type: 3}
+  itemSlotPrefab: {fileID: 0}
   cellContainer: {fileID: 1272485094}
   geneLibrary: {fileID: 11400000, guid: 0d19a2e88d43b574aa24172d9145a140, type: 2}
+  toolSwitcher: {fileID: 0}
 --- !u!114 &1351473042
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -54,8 +54,6 @@ namespace Abracodabra.UI.Genes
                 GeneSlotUI slot = slotObj.GetComponent<GeneSlotUI>();
                 slot.acceptedCategory = GeneCategory.Passive;
                 slot.slotIndex = i;
-                // Add a listener to handle drops
-                // slot.OnItemDropped += HandlePassiveGeneDrop; 
                 passiveSlots.Add(slot);
             }
 
@@ -75,14 +73,12 @@ namespace Abracodabra.UI.Genes
             if (state == null)
             {
                 Debug.LogError("Cannot load null runtime state into GeneSequenceUI");
-                // Optionally clear the UI here
                 return;
             }
 
             RefreshAllVisuals();
         }
         
-        // This is the new central method for handling changes
         public void UpdateGeneInSequence(int rowIndex, GeneCategory slotCategory, InventoryBarItem newItem)
         {
             if (runtimeState == null || rowIndex < 0 || rowIndex >= runtimeState.activeSequence.Count) return;
@@ -96,14 +92,12 @@ namespace Abracodabra.UI.Genes
                     sequenceSlot.activeInstance = newInstance;
                     break;
                 case GeneCategory.Modifier:
-                    // This assumes one modifier slot per row for simplicity
                     if (sequenceSlot.modifierInstances.Count > 0)
                         sequenceSlot.modifierInstances[0] = newInstance;
                     else if (newInstance != null)
                         sequenceSlot.modifierInstances.Add(newInstance);
                     break;
                 case GeneCategory.Payload:
-                    // This assumes one payload slot per row for simplicity
                     if (sequenceSlot.payloadInstances.Count > 0)
                         sequenceSlot.payloadInstances[0] = newInstance;
                     else if (newInstance != null)
@@ -111,7 +105,6 @@ namespace Abracodabra.UI.Genes
                     break;
             }
             
-            // After changing the data model, refresh the UI to reflect it
             RefreshAllVisuals();
         }
 
@@ -128,7 +121,6 @@ namespace Abracodabra.UI.Genes
         {
             if (runtimeState == null) return;
 
-            // Refresh passive slots
             for (int i = 0; i < passiveSlots.Count; i++)
             {
                 if (i < runtimeState.passiveInstances.Count)
@@ -149,7 +141,6 @@ namespace Abracodabra.UI.Genes
                 }
             }
 
-            // Refresh sequence rows
             for (int i = 0; i < sequenceRows.Count; i++)
             {
                 if (i < runtimeState.activeSequence.Count)
@@ -170,12 +161,23 @@ namespace Abracodabra.UI.Genes
             if (runtimeState == null) return;
 
             float totalCost = runtimeState.CalculateTotalEnergyCost();
-            if (energyCostText != null) energyCostText.text = $"Cost: {totalCost:F0}⚡/cycle";
-            if (currentEnergyText != null) currentEnergyText.text = $"Energy: {runtimeState.currentEnergy:F0}/{runtimeState.maxEnergy:F0}";
-            if (rechargeTimeText != null) rechargeTimeText.text = $"Recharge: {runtimeState.template.baseRechargeTime} ticks";
+            if(energyCostText != null) energyCostText.text = $"Cost: {totalCost:F0}⚡/cycle";
+            if(rechargeTimeText != null) rechargeTimeText.text = $"Recharge: {runtimeState.template.baseRechargeTime} ticks";
+            
+            // FIX: Read energy values from the authoritative source, the EnergySystem, via the executor.
+            if (executor != null && executor.plantGrowth != null && executor.plantGrowth.EnergySystem != null)
+            {
+                var energySystem = executor.plantGrowth.EnergySystem;
+                if(currentEnergyText != null) currentEnergyText.text = $"Energy: {energySystem.CurrentEnergy:F0}/{energySystem.MaxEnergy:F0}";
+            }
+            else if (runtimeState.template != null)
+            {
+                // Fallback for when the executor isn't connected yet (e.g., in planning phase)
+                if(currentEnergyText != null) currentEnergyText.text = $"Energy: --/{runtimeState.template.maxEnergy:F0}";
+            }
 
             bool isValid = ValidateConfiguration();
-            if (validationMessage != null) validationMessage.gameObject.SetActive(!isValid);
+            if(validationMessage != null) validationMessage.gameObject.SetActive(!isValid);
         }
 
         private bool ValidateConfiguration()
@@ -208,9 +210,10 @@ namespace Abracodabra.UI.Genes
 
         void Update()
         {
-            if (executor != null && runtimeState != null && runtimeState.template != null)
+            if (executor != null && executor.plantGrowth != null && executor.plantGrowth.EnergySystem != null && runtimeState != null)
             {
-                // Update dynamic displays like progress bars or current energy
+                var energySystem = executor.plantGrowth.EnergySystem;
+
                 if (rechargeProgress != null && runtimeState.template.baseRechargeTime > 0)
                 {
                     float progress = 1f - (runtimeState.rechargeTicksRemaining / (float)runtimeState.template.baseRechargeTime);
@@ -219,8 +222,8 @@ namespace Abracodabra.UI.Genes
 
                 if (currentEnergyText != null)
                 {
-                    // This data comes from the executor's runtime state, which is tracking the plant's energy
-                    currentEnergyText.text = $"Energy: {runtimeState.currentEnergy:F0}/{runtimeState.maxEnergy:F0}";
+                    // FIX: Read from the authoritative source during Update as well.
+                    currentEnergyText.text = $"Energy: {energySystem.CurrentEnergy:F0}/{energySystem.MaxEnergy:F0}";
                 }
             }
         }

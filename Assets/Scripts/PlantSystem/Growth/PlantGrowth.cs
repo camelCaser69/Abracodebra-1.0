@@ -20,7 +20,7 @@ namespace Abracodabra.Genes
     {
         public static readonly List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
 
-        public SeedTemplate seedTemplate { get; private set; } // Can still be useful for reference
+        public SeedTemplate seedTemplate { get; private set; }
         public PlantGeneRuntimeState geneRuntimeState { get; set; }
         public PlantSequenceExecutor sequenceExecutor { get; private set; }
 
@@ -85,8 +85,7 @@ namespace Abracodabra.Genes
                 tickManager.UnregisterTickUpdateable(this);
             }
         }
-
-        // MODIFIED: This method now accepts the fully-configured state.
+        
         public void InitializeWithState(PlantGeneRuntimeState state)
         {
             if (state == null || state.template == null)
@@ -110,9 +109,10 @@ namespace Abracodabra.Genes
 
             EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
             EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
-            GrowthLogic.PhotosynthesisEfficiencyPerLeaf = seedTemplate.energyRegenRate * energyGenerationMultiplier;
             
-            // The executor now gets the state directly, not a template to create a state from.
+            // FIX: Assign the base energy regeneration rate to the EnergySystem.
+            EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
+            
             sequenceExecutor.runtimeState = this.geneRuntimeState;
             sequenceExecutor.StartExecution();
 
@@ -143,7 +143,6 @@ namespace Abracodabra.Genes
 
         void GrowSomething()
         {
-            // FIX: The lambda expression should directly compare the dictionary's value (c.Value) to the enum.
             int currentHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
             if (currentHeight < maxHeight)
             {

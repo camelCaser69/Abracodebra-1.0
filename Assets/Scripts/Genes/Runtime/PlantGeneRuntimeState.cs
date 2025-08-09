@@ -16,8 +16,8 @@ namespace Abracodabra.Genes.Runtime
         [NonSerialized] public int currentPosition = 0;
         [NonSerialized] public int rechargeTicksRemaining = 0;
         [NonSerialized] public bool isExecuting = false;
-        [NonSerialized] public float currentEnergy;
-        [NonSerialized] public float maxEnergy;
+        // REMOVED: [NonSerialized] public float currentEnergy;
+        // REMOVED: [NonSerialized] public float maxEnergy;
 
         public void InitializeFromTemplate()
         {
@@ -42,8 +42,8 @@ namespace Abracodabra.Genes.Runtime
                 activeSequence.Add(slot);
             }
 
-            maxEnergy = template.maxEnergy;
-            currentEnergy = maxEnergy;
+            // REMOVED: maxEnergy = template.maxEnergy;
+            // REMOVED: currentEnergy = maxEnergy;
         }
 
         public void Reset()
@@ -51,7 +51,7 @@ namespace Abracodabra.Genes.Runtime
             currentPosition = 0;
             rechargeTicksRemaining = 0;
             isExecuting = false;
-            currentEnergy = maxEnergy;
+            // REMOVED: currentEnergy = maxEnergy;
         }
 
         public float CalculateTotalEnergyCost()
