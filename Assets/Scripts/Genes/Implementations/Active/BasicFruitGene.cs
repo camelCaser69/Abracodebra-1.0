@@ -83,10 +83,11 @@ namespace Abracodabra.Genes.Implementations
 
         public override string GetTooltip(GeneTooltipContext context)
         {
+            // FIX: Replaced '⚡' with 'E' to prevent font warnings.
             return $"{description}\n\n" +
                    $"Grows <b>{fruitCount}</b> fruit(s).\n" +
                    $"Growth Time: <b>{growthTime}s</b>\n" +
-                   $"Energy Cost: <b>{baseEnergyCost}⚡</b>\n" +
+                   $"Energy Cost: <b>{baseEnergyCost} E</b>\n" +
                    $"Slots: <b>{slotConfig.modifierSlots}</b> Modifiers, <b>{slotConfig.payloadSlots}</b> Payloads";
         }
     }

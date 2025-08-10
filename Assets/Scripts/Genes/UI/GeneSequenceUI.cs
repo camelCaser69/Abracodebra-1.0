@@ -161,10 +161,10 @@ namespace Abracodabra.UI.Genes
             if (runtimeState == null) return;
 
             float totalCost = runtimeState.CalculateTotalEnergyCost();
-            if(energyCostText != null) energyCostText.text = $"Cost: {totalCost:F0}⚡/cycle";
+            // FIX: Replaced '⚡' with 'E' to prevent font warnings.
+            if(energyCostText != null) energyCostText.text = $"Cost: {totalCost:F0} E/cycle";
             if(rechargeTimeText != null) rechargeTimeText.text = $"Recharge: {runtimeState.template.baseRechargeTime} ticks";
             
-            // FIX: Read energy values from the authoritative source, the EnergySystem, via the executor.
             if (executor != null && executor.plantGrowth != null && executor.plantGrowth.EnergySystem != null)
             {
                 var energySystem = executor.plantGrowth.EnergySystem;
@@ -172,7 +172,6 @@ namespace Abracodabra.UI.Genes
             }
             else if (runtimeState.template != null)
             {
-                // Fallback for when the executor isn't connected yet (e.g., in planning phase)
                 if(currentEnergyText != null) currentEnergyText.text = $"Energy: --/{runtimeState.template.maxEnergy:F0}";
             }
 
