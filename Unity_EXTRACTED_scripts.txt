@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 494,031 → 331,367 chars (32.9% reduction)
-Estimated tokens saved: ~40,666
+Compression Stats: 518,538 → 351,088 chars (32.3% reduction)
+Estimated tokens saved: ~41,862
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -115,64 +115,66 @@ using System;
   WaveDefinitionEditor (Assets\Scripts\Editor/) L6093
   WaveManagerEditor (Assets\Scripts\Editor/) L6230
   GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6405
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6430
-  LeafData (Assets\Scripts\PlantSystem\Data/) L6438
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6453
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6492
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6513
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6645
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6703
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L6789
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L6858
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6968
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7039
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7099
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7225
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7331
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7479
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7577
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L7678
-  GridSnapStartup (Assets\Scripts\Ticks/) L7917
-  TickDebugMonitor (Assets\Scripts\Ticks/) L7984
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8020
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8078
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8309
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8320
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8349
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8445
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8550
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8947
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8983
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9149
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9277
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9451
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9459
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L9488
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9535
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L9696
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L9758
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L9798
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9822
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L9842
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10167
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10179
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10214
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10389
+  CompleteUISetup (Assets\Scripts\Helpers/) L6430
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6824
+  LeafData (Assets\Scripts\PlantSystem\Data/) L6832
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6847
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6886
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6907
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L7039
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L7097
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7183
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7252
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7362
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7433
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7493
+  SeedEditorLinker (Assets\Scripts\PlantSystem\UI/) L7619
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7667
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7773
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7921
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8019
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L8120
+  GridSnapStartup (Assets\Scripts\Ticks/) L8359
+  TickDebugMonitor (Assets\Scripts\Ticks/) L8426
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8462
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8520
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8751
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8762
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8791
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8887
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8992
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9389
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9425
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9591
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9719
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9893
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9901
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L9930
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9977
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10138
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10200
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10240
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10264
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10284
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10609
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10621
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10656
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10831
 
 [WegoSystem]
-  RunManager (Assets\Scripts\Core/) L10400
-  GridEntity (Assets\Scripts\Ticks/) L10536
-  GridPosition (Assets\Scripts\Ticks/) L10693
-  GridPositionManager (Assets\Scripts\Ticks/) L10794
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11131
-  TickConfiguration (Assets\Scripts\Ticks/) L11275
-  ITickUpdateable (Assets\Scripts\Ticks/) L11358
+  RunManager (Assets\Scripts\Core/) L10842
+  GridEntity (Assets\Scripts\Ticks/) L10978
+  GridPosition (Assets\Scripts\Ticks/) L11135
+  GridPositionManager (Assets\Scripts\Ticks/) L11236
+  GridRadiusUtility (Assets\Scripts\Ticks/) L11573
+  TickConfiguration (Assets\Scripts\Ticks/) L11717
+  ITickUpdateable (Assets\Scripts\Ticks/) L11800
 
 [for]
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L11510
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L11952
 
 [namespace]
-  GeneEventBus (Assets\Scripts\Genes\Services/) L11735
+  GeneEventBus (Assets\Scripts\Genes\Services/) L12177
 
 ================================================================================
 SCRIPTS
@@ -1158,7 +1160,7 @@ pub ovr string GetTooltip(GeneTooltipContext context) {
 ret $"{description}\n\n" +
 $"Grows <b>{fruitCount}</b> fruit(s).\n" +
 $"Growth Time: <b>{growthTime}s</b>\n" +
-$"Energy Cost: <b>{baseEnergyCost}⚡</b>\n" +
+$"Energy Cost: <b>{baseEnergyCost} E</b>\n" +
 $"Slots: <b>{slotConfig.modifierSlots}</b> Modifiers, <b>{slotConfig.payloadSlots}</b> Payloads";
 }
 }
@@ -1945,7 +1947,7 @@ void UpdateDisplay() {
 if (runtimeState == null) return;
 
 float totalCost = runtimeState.CalculateTotalEnergyCost();
-if(energyCostText != null) energyCostText.text = $"Cost: {totalCost:F0}⚡/cycle";
+if(energyCostText != null) energyCostText.text = $"Cost: {totalCost:F0} E/cycle";
 if(rechargeTimeText != null) rechargeTimeText.text = $"Recharge: {runtimeState.template.baseRechargeTime} ticks";
 
 if (executor != null && executor.plantGrowth != null && executor.plantGrowth.EnergySystem != null) {
@@ -6580,6 +6582,400 @@ Debug.Log("GeneLibrary instance was successfully set, initialized, and registere
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Helpers\CompleteUISetup.cs
+
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using TMPro;
+using Abracodabra.Genes.Core;
+using Abracodabra.UI.Genes;
+using WegoSystem;
+using System.Reflection;
+
+pub cls CompleteUISetup : MonoBehaviour {
+[SerializeField] bool destroyAfterSetup = true;
+
+[SerializeField] Color panelBackgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
+[SerializeField] Color slotNormalColor = new Color(0.3f, 0.3f, 0.3f, 1f);
+[SerializeField] TMP_FontAsset defaultFontAsset;
+
+pub void GenerateCompleteUI() {
+Debug.Log("[CompleteUISetup] Starting complete UI setup...");
+
+CreateEventSystem();
+Canvas mainCanvas = CreateMainCanvas();
+GameObject prefabContainer = new GameObject("[Generated Prefabs]");
+prefabContainer.SetActive(false);
+
+GameObject planningPanel = CreatePanel("PlanningPanel", mainCanvas.transform);
+GameObject growthThreatPanel = CreatePanel("GrowthAndThreatPanel", mainCanvas.transform);
+planningPanel.SetActive(true); // Start with planning panel active
+growthThreatPanel.SetActive(false);
+
+GameObject itemViewPrefab = CreateItemViewPrefab();
+itemViewPrefab.transform.SetParent(prefabContainer.transform);
+
+GameObject itemSlotPrefab = CreateItemSlotPrefab(itemViewPrefab);
+itemSlotPrefab.transform.SetParent(prefabContainer.transform);
+
+GameObject passiveSlotPrefab = CreateGeneSlot("PassiveSlotPrefab", GeneCategory.Passive, itemViewPrefab);
+passiveSlotPrefab.transform.SetParent(prefabContainer.transform);
+
+GameObject sequenceRowPrefab = CreateSequenceRowPrefab(itemViewPrefab);
+sequenceRowPrefab.transform.SetParent(prefabContainer.transform);
+
+InventoryGridController inventoryGrid = CreateInventoryGrid(planningPanel.transform, itemSlotPrefab);
+CreateInventoryBar(growthThreatPanel.transform, itemViewPrefab, inventoryGrid);
+GeneSequenceUI geneSequenceUI = CreateGeneSequenceUI(planningPanel.transform, passiveSlotPrefab, sequenceRowPrefab);
+
+CreateControlButtons(planningPanel.transform, growthThreatPanel.transform);
+GameObject wegoPanel = CreateDebugUI(mainCanvas.transform);
+
+LinkToUIManager(planningPanel, growthThreatPanel, geneSequenceUI, wegoPanel);
+
+Debug.Log("[CompleteUISetup] UI setup complete! You should now create Prefab Assets from the GameObjects inside '[Generated Prefabs]'.");
+
+if (destroyAfterSetup) {
+if (Application.isPlaying) Destroy(gameObject);
+else DestroyImmediate(gameObject);
+}
+}
+
+void CreateEventSystem() {
+if (FindObjectOfType<EventSystem>() == null) {
+new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
+}
+}
+
+Canvas CreateMainCanvas() {
+GameObject existingRoot = GameObject.Find("Generated_UI_Root");
+if (existingRoot != null) DestroyImmediate(existingRoot);
+
+var canvasObj = new GameObject("Generated_UI_Root");
+canvasObj.layer = LayerMask.NameToLayer("UI");
+
+Canvas canvas = canvasObj.AddComponent<Canvas>();
+canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+
+var scaler = canvasObj.AddComponent<CanvasScaler>();
+scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+scaler.referenceResolution = new Vector2(1920, 1080);
+
+canvasObj.AddComponent<GraphicRaycaster>();
+ret canvas;
+}
+
+GameObject CreatePanel(string name, Transform parent) {
+var panel = new GameObject(name, typeof(RectTransform), typeof(Image));
+panel.transform.SetParent(parent, false);
+SetAnchorsAndOffsets(panel, Vector2.zero, Vector2.one);
+panel.GetComponent<Image>().color = panelBackgroundColor;
+ret panel;
+}
+
+GameObject CreateItemViewPrefab() {
+var prefab = new GameObject("InventoryItemViewPrefab", typeof(RectTransform));
+prefab.SetActive(false);
+prefab.GetComponent<RectTransform>().sizeDelta = new Vector2(60, 60);
+CreateItemView(prefab.transform);
+ret prefab;
+}
+
+GameObject CreateItemSlotPrefab(GameObject itemViewPrefab) {
+var prefab = CreateGeneSlot("ItemSlotPrefab", GeneCategory.Passive, itemViewPrefab); // Category is a placeholder
+prefab.GetComponent<GeneSlotUI>().acceptedCategory = 0; // Will be overwritten by controller/sequencer
+ret prefab;
+}
+
+GameObject CreateSequenceRowPrefab(GameObject itemViewPrefab) {
+var prefab = new GameObject("SequenceRowPrefab", typeof(RectTransform), typeof(HorizontalLayoutGroup), typeof(SequenceRowUI));
+prefab.SetActive(false);
+prefab.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 70);
+var layout = prefab.GetComponent<HorizontalLayoutGroup>();
+layout.spacing = 15;
+layout.childAlignment = TextAnchor.MiddleCenter;
+
+SequenceRowUI rowUI = prefab.GetComponent<SequenceRowUI>();
+
+rowUI.modifierSlot = CreateGeneSlot("ModifierSlot", GeneCategory.Modifier, itemViewPrefab, prefab.transform).GetComponent<GeneSlotUI>();
+rowUI.activeSlot = CreateGeneSlot("ActiveSlot", GeneCategory.Active, itemViewPrefab, prefab.transform).GetComponent<GeneSlotUI>();
+rowUI.payloadSlot = CreateGeneSlot("PayloadSlot", GeneCategory.Payload, itemViewPrefab, prefab.transform).GetComponent<GeneSlotUI>();
+
+ret prefab;
+}
+
+InventoryGridController CreateInventoryGrid(Transform parent, GameObject itemSlotPrefab) {
+var inventoryGridObj = new GameObject("InventoryGrid", typeof(Image), typeof(InventoryGridController));
+inventoryGridObj.transform.SetParent(parent, false);
+SetAnchorsAndOffsets(inventoryGridObj, new Vector2(0.05f, 0.1f), new Vector2(0.35f, 0.85f));
+inventoryGridObj.GetComponent<Image>().color = new Color(0.15f, 0.15f, 0.15f, 0.9f);
+var gridTitle = CreateText("Title", inventoryGridObj.transform, "INVENTORY", 20, TextAlignmentOptions.Center);
+SetAnchorsAndOffsets(gridTitle, new Vector2(0, 0.9f), new Vector2(1, 1f));
+
+InventoryGridController gridController = inventoryGridObj.GetComponent<InventoryGridController>();
+
+var cellContainer = new GameObject("CellContainer", typeof(RectTransform), typeof(GridLayoutGroup));
+cellContainer.transform.SetParent(inventoryGridObj.transform, false);
+SetAnchorsAndOffsets(cellContainer, new Vector2(0.05f, 0.05f), new Vector2(0.95f, 0.9f));
+
+var gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
+gridLayout.padding = new RectOffset(10, 10, 10, 10);
+gridLayout.cellSize = new Vector2(64, 64);
+gridLayout.spacing = new Vector2(10, 10);
+gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+gridLayout.constraintCount = 4;
+
+SetPrivateField(gridController, "cellContainer", cellContainer.transform);
+SetPrivateField(gridController, "itemSlotPrefab", itemSlotPrefab);
+ret gridController;
+}
+
+void CreateInventoryBar(Transform parent, GameObject itemViewPrefab, InventoryGridController gridController) {
+var inventoryBarObj = new GameObject("InventoryBar", typeof(Image), typeof(InventoryBarController));
+inventoryBarObj.transform.SetParent(parent, false);
+SetAnchorsAndOffsets(inventoryBarObj, new Vector2(0.3f, 0.02f), new Vector2(0.7f, 0.12f));
+inventoryBarObj.GetComponent<Image>().color = new Color(0.1f, 0.1f, 0.1f, 0.8f);
+
+InventoryBarController barController = inventoryBarObj.GetComponent<InventoryBarController>();
+
+var barCellContainer = new GameObject("CellContainer", typeof(RectTransform), typeof(GridLayoutGroup));
+barCellContainer.transform.SetParent(inventoryBarObj.transform, false);
+SetAnchorsAndOffsets(barCellContainer, new Vector2(0.05f, 0.1f), new Vector2(0.95f, 0.9f));
+
+var barGridLayout = barCellContainer.GetComponent<GridLayoutGroup>();
+barGridLayout.cellSize = new Vector2(60, 60);
+barGridLayout.spacing = new Vector2(5, 0);
+barGridLayout.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+barGridLayout.constraintCount = 1;
+
+var selectionHighlight = CreateSelectionHighlight(inventoryBarObj.transform);
+
+SetPrivateField(barController, "cellContainer", barCellContainer.transform);
+SetPrivateField(barController, "selectionHighlight", selectionHighlight);
+SetPrivateField(barController, "inventoryItemViewPrefab", itemViewPrefab);
+SetPrivateField(barController, "inventoryGridController", gridController);
+}
+
+GeneSequenceUI CreateGeneSequenceUI(Transform parent, GameObject passiveSlotPrefab, GameObject sequenceRowPrefab) {
+var geneSequenceUIObj = new GameObject("GeneSequenceUI", typeof(Image), typeof(GeneSequenceUI));
+geneSequenceUIObj.transform.SetParent(parent, false);
+SetAnchorsAndOffsets(geneSequenceUIObj, new Vector2(0.4f, 0.1f), new Vector2(0.95f, 0.85f));
+geneSequenceUIObj.GetComponent<Image>().color = new Color(0.12f, 0.12f, 0.15f, 0.9f);
+var title = CreateText("Title", geneSequenceUIObj.transform, "SEED EDITOR", 20, TextAlignmentOptions.Center);
+SetAnchorsAndOffsets(title, new Vector2(0, 0.95f), new Vector2(1, 1f));
+
+GeneSequenceUI sequenceUI = geneSequenceUIObj.GetComponent<GeneSequenceUI>();
+
+var passiveContainer = new GameObject("PassiveGenesContainer", typeof(RectTransform), typeof(HorizontalLayoutGroup));
+passiveContainer.transform.SetParent(geneSequenceUIObj.transform, false);
+passiveContainer.GetComponent<HorizontalLayoutGroup>().spacing = 10;
+SetAnchorsAndOffsets(passiveContainer, new Vector2(0.05f, 0.8f), new Vector2(0.95f, 0.95f));
+
+var activeContainer = new GameObject("ActiveSequenceContainer", typeof(RectTransform), typeof(VerticalLayoutGroup));
+activeContainer.transform.SetParent(geneSequenceUIObj.transform, false);
+var activeLayout = activeContainer.GetComponent<VerticalLayoutGroup>();
+activeLayout.spacing = 10;
+activeLayout.childControlWidth = true;
+activeLayout.childForceExpandWidth = true;
+SetAnchorsAndOffsets(activeContainer, new Vector2(0.05f, 0.25f), new Vector2(0.95f, 0.75f));
+
+CreateSequenceInfoDisplay(geneSequenceUIObj.transform, sequenceUI);
+
+sequenceUI.passiveGenesContainer = passiveContainer.transform;
+sequenceUI.activeSequenceContainer = activeContainer.transform;
+sequenceUI.sequenceRowPrefab = sequenceRowPrefab;
+sequenceUI.passiveSlotPrefab = passiveSlotPrefab;
+ret sequenceUI;
+}
+
+void CreateSequenceInfoDisplay(Transform parent, GeneSequenceUI sequenceUI) {
+var infoPanel = new GameObject("InfoPanel", typeof(RectTransform));
+infoPanel.transform.SetParent(parent, false);
+SetAnchorsAndOffsets(infoPanel, new Vector2(0.05f, 0.05f), new Vector2(0.95f, 0.2f));
+
+var energyCostObj = CreateText("EnergyCostText", infoPanel.transform, "Cost: 0 E/cycle", 16, TextAlignmentOptions.Left);
+SetAnchorsAndOffsets(energyCostObj, new Vector2(0, 0.5f), new Vector2(0.4f, 1f));
+
+var rechargeObj = CreateText("RechargeTimeText", infoPanel.transform, "Recharge: 3 ticks", 16, TextAlignmentOptions.Right);
+SetAnchorsAndOffsets(rechargeObj, new Vector2(0.6f, 0.5f), new Vector2(1f, 1f));
+
+var currentEnergyObj = CreateText("CurrentEnergyText", infoPanel.transform, "Energy: --/100", 14, TextAlignmentOptions.Center);
+SetAnchorsAndOffsets(currentEnergyObj, new Vector2(0, 0f), new Vector2(1f, 0.5f));
+
+sequenceUI.energyCostText = energyCostObj.GetComponent<TextMeshProUGUI>();
+sequenceUI.currentEnergyText = currentEnergyObj.GetComponent<TextMeshProUGUI>();
+sequenceUI.rechargeTimeText = rechargeObj.GetComponent<TextMeshProUGUI>();
+sequenceUI.rechargeProgress = null;
+sequenceUI.validationMessage = null;
+}
+
+void CreateControlButtons(Transform planningParent, Transform growthParent) {
+CreateButton("EndPlanningButton", planningParent, "Start Growth", new Vector2(0.5f, 0.02f), new Vector2(0.8f, 0.08f));
+CreateButton("ReturnToPlanningButton", growthParent, "End Day", new Vector2(0.8f, 0.9f), new Vector2(0.95f, 0.95f));
+}
+
+GameObject CreateDebugUI(Transform parent) {
+GameObject wegoPanel = CreatePanel("WegoControlPanel", parent);
+wegoPanel.GetComponent<Image>().color = new Color(0, 0, 0, 0.5f);
+SetAnchorsAndOffsets(wegoPanel, new Vector2(0.01f, 0.01f), new Vector2(0.2f, 0.15f));
+
+var phaseText = CreateText("CurrentPhaseText", wegoPanel.transform, "Phase: Planning", 14, TextAlignmentOptions.Left);
+SetAnchorsAndOffsets(phaseText, new Vector2(0.1f, 0.6f), new Vector2(0.9f, 0.9f));
+
+var tickText = CreateText("TickCounterText", wegoPanel.transform, "Tick: 0", 14, TextAlignmentOptions.Left);
+SetAnchorsAndOffsets(tickText, new Vector2(0.1f, 0.3f), new Vector2(0.9f, 0.6f));
+
+var phaseProgressText = CreateText("PhaseProgressText", wegoPanel.transform, "Phase Ticks: 0", 12, TextAlignmentOptions.Left);
+SetAnchorsAndOffsets(phaseProgressText, new Vector2(0.1f, 0.0f), new Vector2(0.9f, 0.3f));
+
+ret wegoPanel;
+}
+
+void LinkToUIManager(GameObject planningPanel, GameObject growthThreatPanel, GeneSequenceUI geneSequenceUI, GameObject wegoPanel) {
+UIManager uiManager = FindObjectOfType<UIManager>();
+if (uiManager == null) {
+uiManager = new GameObject("UIManager").AddComponent<UIManager>();
+}
+
+SetPrivateField(uiManager, "planningPanel", planningPanel);
+SetPrivateField(uiManager, "growthAndThreatPanel", growthThreatPanel);
+SetPrivateField(uiManager, "geneSequenceUIPanel", geneSequenceUI.gameObject);
+
+var endPlanningBtn = planningPanel.transform.Find("EndPlanningButton")?.GetComponent<Button>();
+var newPlanningBtn = growthThreatPanel.transform.Find("ReturnToPlanningButton")?.GetComponent<Button>();
+
+SetPrivateField(uiManager, "endPlanningPhaseButton", endPlanningBtn);
+SetPrivateField(uiManager, "startNewPlanningPhaseButton", newPlanningBtn);
+
+var currentPhaseText = wegoPanel.transform.Find("CurrentPhaseText")?.GetComponent<TextMeshProUGUI>();
+var tickCounterText = wegoPanel.transform.Find("TickCounterText")?.GetComponent<TextMeshProUGUI>();
+var phaseProgressText = wegoPanel.transform.Find("PhaseProgressText")?.GetComponent<TextMeshProUGUI>();
+
+SetPrivateField(uiManager, "wegoControlPanel", wegoPanel);
+SetPrivateField(uiManager, "currentPhaseText", currentPhaseText);
+SetPrivateField(uiManager, "tickCounterText", tickCounterText);
+SetPrivateField(uiManager, "phaseProgressText", phaseProgressText);
+}
+
+GameObject CreateText(string name, Transform parent, string text, int fontSize, TextAlignmentOptions alignment) {
+var textObj = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
+textObj.transform.SetParent(parent, false);
+var tmp = textObj.GetComponent<TextMeshProUGUI>();
+tmp.text = text;
+tmp.fontSize = fontSize;
+tmp.alignment = alignment;
+tmp.color = Color.white;
+if (defaultFontAsset != null) tmp.font = defaultFontAsset;
+ret textObj;
+}
+
+GameObject CreateButton(string name, Transform parent, string text, Vector2 anchorMin, Vector2 anchorMax) {
+var buttonObj = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
+buttonObj.transform.SetParent(parent, false);
+SetAnchorsAndOffsets(buttonObj, anchorMin, anchorMax);
+Image bg = buttonObj.GetComponent<Image>();
+bg.color = new Color(0.2f, 0.3f, 0.4f, 1f);
+Button button = buttonObj.GetComponent<Button>();
+button.targetGraphic = bg;
+GameObject textObj = CreateText("Text", buttonObj.transform, text, 16, TextAlignmentOptions.Center);
+SetAnchorsAndOffsets(textObj, Vector2.zero, Vector2.one, new Vector2(10, 5), new Vector2(-10, -5));
+ret buttonObj;
+}
+
+GameObject CreateItemView(Transform parent) {
+var itemView = new GameObject("ItemView", typeof(RectTransform), typeof(Image), typeof(ItemView), typeof(TooltipTrigger));
+itemView.transform.SetParent(parent, false);
+SetAnchorsAndOffsets(itemView, Vector2.zero, Vector2.one);
+
+Image bgImage = itemView.GetComponent<Image>();
+bgImage.color = new Color(0.2f, 0.2f, 0.2f, 0.3f);
+
+var thumbnail = new GameObject("ThumbnailImage", typeof(RectTransform), typeof(Image));
+thumbnail.transform.SetParent(itemView.transform, false);
+SetAnchorsAndOffsets(thumbnail, Vector2.zero, Vector2.one, new Vector2(2, 2), new Vector2(-2, -2));
+thumbnail.GetComponent<Image>().preserveAspect = true;
+
+ItemView itemViewComponent = itemView.GetComponent<ItemView>();
+SetPrivateField(itemViewComponent, "thumbnailImage", thumbnail.GetComponent<Image>());
+SetPrivateField(itemViewComponent, "backgroundImage", bgImage);
+
+ret itemView;
+}
+
+GameObject CreateGeneSlot(string name, GeneCategory category, GameObject itemViewPrefab, Transform parent = null) {
+var slot = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(GeneSlotUI));
+if (parent != null) slot.transform.SetParent(parent, false);
+
+slot.GetComponent<RectTransform>().sizeDelta = new Vector2(64, 64);
+slot.GetComponent<Image>().color = GetSlotColorForCategory(category);
+
+GeneSlotUI slotUI = slot.GetComponent<GeneSlotUI>();
+slotUI.acceptedCategory = category;
+
+var emptyIndicator = CreateText("EmptyIndicator", slot.transform, GetEmptyTextForCategory(category), 12, TextAlignmentOptions.Center);
+SetAnchorsAndOffsets(emptyIndicator, Vector2.zero, Vector2.one);
+emptyIndicator.GetComponent<TextMeshProUGUI>().color = new Color(0.6f, 0.6f, 0.6f, 0.5f);
+
+var itemViewInstance = Instantiate(itemViewPrefab);
+itemViewInstance.transform.SetParent(slot.transform, false);
+itemViewInstance.name = "ItemView";
+itemViewInstance.SetActive(false);
+
+SetPrivateField(slotUI, "slotBackground", slot.GetComponent<Image>());
+SetPrivateField(slotUI, "emptyIndicator", emptyIndicator);
+SetPrivateField(slotUI, "itemView", itemViewInstance.GetComponent<ItemView>());
+
+ret slot;
+}
+
+GameObject CreateSelectionHighlight(Transform parent) {
+var highlight = new GameObject("SelectionHighlight", typeof(RectTransform), typeof(Image));
+highlight.transform.SetParent(parent, false);
+highlight.GetComponent<RectTransform>().sizeDelta = new Vector2(68, 68);
+Image highlightImage = highlight.GetComponent<Image>();
+highlightImage.color = new Color(1f, 0.9f, 0.3f, 0.5f);
+highlightImage.raycastTarget = false;
+highlight.SetActive(false);
+ret highlight;
+}
+
+void SetAnchorsAndOffsets(GameObject obj, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin = default, Vector2 offsetMax = default) {
+if (obj.GetComponent<RectTransform>() is RectTransform rect) {
+rect.anchorMin = anchorMin;
+rect.anchorMax = anchorMax;
+rect.offsetMin = offsetMin;
+rect.offsetMax = offsetMax;
+}
+}
+
+void SetPrivateField(object obj, string fieldName, object value) {
+var field = obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
+if (field != null) field.SetValue(obj, value);
+else Debug.LogWarning($"[CompleteUISetup] Could not find field '{fieldName}' on object '{obj}'.");
+}
+
+Color GetSlotColorForCategory(GeneCategory category) {
+switch (category) {
+case GeneCategory.Active:   ret new Color(0.4f, 0.2f, 0.2f, 1f);
+case GeneCategory.Passive:  ret new Color(0.2f, 0.2f, 0.4f, 1f);
+case GeneCategory.Modifier: ret new Color(0.4f, 0.4f, 0.2f, 1f);
+case GeneCategory.Payload:  ret new Color(0.4f, 0.2f, 0.4f, 1f);
+default:                    ret slotNormalColor;
+}
+}
+
+string GetEmptyTextForCategory(GeneCategory category) {
+switch (category) {
+case GeneCategory.Active:   ret "ACTIVE";
+case GeneCategory.Passive:  ret "PASSIVE";
+case GeneCategory.Modifier: ret "MOD";
+case GeneCategory.Payload:  ret "LOAD";
+default:                    ret "+";
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\ITriggerTarget.cs
 
 ﻿// Assets/Scripts/PlantSystem/Execution/ITriggerTarget.cs
@@ -7371,6 +7767,54 @@ ret inventorySlots
 .Where(s => s.CurrentItem != null && s.CurrentItem.IsValid())
 .Select(s => s.CurrentItem)
 .ToList();
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\PlantSystem\UI\SeedEditorLinker.cs
+
+﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using Abracodabra.UI.Genes;
+
+pub cls SeedEditorLinker : MonoBehaviour {
+GeneSequenceUI geneSequenceUI;
+
+InventoryGridController inventoryGridController;
+
+void Awake() {
+inventoryGridController = GetComponent<InventoryGridController>();
+if (geneSequenceUI == null) {
+geneSequenceUI = FindObjectOfType<GeneSequenceUI>();
+}
+
+if (geneSequenceUI == null) {
+Debug.LogError("[SeedEditorLinker] GeneSequenceUI reference is missing! The seed editor will not open.", this);
+enabled = false;
+}
+}
+
+void Update() {
+if (Input.GetMouseButtonDown(0)) {
+PointerEventData eventData = new PointerEventData(EventSystem.current);
+eventData.position = Input.mousePosition;
+
+var results = new System.Collections.Generic.List<RaycastResult>();
+EventSystem.current.RaycastAll(eventData, results);
+
+foreach (var result in results) {
+GeneSlotUI clickedSlot = result.gameObject.GetComponentInParent<GeneSlotUI>();
+if (clickedSlot != null && clickedSlot.CurrentItem != null) {
+if (clickedSlot.transform.IsChildOf(inventoryGridController.transform)) {
+if (clickedSlot.CurrentItem.Type == InventoryBarItem.ItemType.Seed) {
+Debug.Log($"Loading seed '{clickedSlot.CurrentItem.GetDisplayName()}' into editor.");
+geneSequenceUI.LoadRuntimeState(clickedSlot.CurrentItem.SeedRuntimeState);
+return;
+}
+}
+}
+}
+}
 }
 }
 
