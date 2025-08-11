@@ -10,9 +10,12 @@ using UnityEditor;
 
 namespace Abracodabra.Genes
 {
+    // This asset now serves as a master database of ALL possible genes in the game.
+    // It is no longer responsible for defining which items the player starts with.
+    [CreateAssetMenu(fileName = "GeneLibrary", menuName = "Abracodabra/Genes/Gene Library")]
     public class GeneLibrary : ScriptableObject, IGeneLibrary
     {
-        public static GeneLibrary Instance { get; set; }
+        public static GeneLibrary Instance { get; private set; }
 
         public void SetActiveInstance()
         {
@@ -24,12 +27,13 @@ namespace Abracodabra.Genes
             Initialize();
         }
 
+        [Header("Gene Categories")]
         public List<PassiveGene> passiveGenes = new List<PassiveGene>();
         public List<ActiveGene> activeGenes = new List<ActiveGene>();
         public List<ModifierGene> modifierGenes = new List<ModifierGene>();
         public List<PayloadGene> payloadGenes = new List<PayloadGene>();
-
-        public List<GeneBase> starterGenes = new List<GeneBase>();
+        
+        [Header("System Genes")]
         public PlaceholderGene placeholderGene;
 
         private Dictionary<string, GeneBase> _guidLookup;
@@ -48,6 +52,8 @@ namespace Abracodabra.Genes
             foreach (var gene in GetAllGenes())
             {
                 if (gene == null) continue;
+
+                // GUID Lookup
                 if (!string.IsNullOrEmpty(gene.GUID))
                 {
                     if (!_guidLookup.ContainsKey(gene.GUID))
@@ -59,6 +65,8 @@ namespace Abracodabra.Genes
                         Debug.LogWarning($"Gene Library: Duplicate GUID '{gene.GUID}' detected. The gene '{gene.name}' will be ignored by GUID lookup. The existing entry is '{_guidLookup[gene.GUID].name}'.", gene);
                     }
                 }
+
+                // Name Lookup
                 if (!string.IsNullOrEmpty(gene.geneName))
                 {
                     if (!_nameLookup.ContainsKey(gene.geneName))
@@ -100,7 +108,6 @@ namespace Abracodabra.Genes
             if (placeholderGene == null)
             {
                 Debug.LogError("PlaceholderGene is not assigned in the GeneLibrary asset! The system may be unstable. Please assign it in the editor.", this);
-                // Create a temporary instance as a last resort to prevent crashes.
                 placeholderGene = ScriptableObject.CreateInstance<PlaceholderGene>();
                 placeholderGene.name = "RUNTIME_PLACEHOLDER";
             }
@@ -119,10 +126,9 @@ namespace Abracodabra.Genes
             }
         }
 
-#if UNITY_EDITOR
-        private void OnValidate()
+        #if UNITY_EDITOR
+        void OnValidate()
         {
-            // This ensures a placeholder gene is always assigned in the editor.
             if (placeholderGene == null)
             {
                 string[] guids = AssetDatabase.FindAssets("t:PlaceholderGene");
@@ -140,7 +146,9 @@ namespace Abracodabra.Genes
             }
         }
 
-        private void AutoPopulate()
+        // This editor-only method is useful for automatically finding all gene assets in your project.
+        [ContextMenu("Auto-Populate All Gene Lists")]
+        void AutoPopulate()
         {
             passiveGenes.Clear();
             activeGenes.Clear();
@@ -164,16 +172,16 @@ namespace Abracodabra.Genes
                 else if (gene is PayloadGene pay)
                     payloadGenes.Add(pay);
             }
-            
-            // Sort lists alphabetically for consistency
+
+            // Sort lists alphabetically for easier viewing in the Inspector
             passiveGenes = passiveGenes.OrderBy(g => g.name).ToList();
             activeGenes = activeGenes.OrderBy(g => g.name).ToList();
             modifierGenes = modifierGenes.OrderBy(g => g.name).ToList();
             payloadGenes = payloadGenes.OrderBy(g => g.name).ToList();
-            
+
             EditorUtility.SetDirty(this);
             Debug.Log($"Auto-populated library: {passiveGenes.Count} passive, {activeGenes.Count} active, {modifierGenes.Count} modifier, {payloadGenes.Count} payload genes.");
         }
-#endif
+        #endif
     }
 }

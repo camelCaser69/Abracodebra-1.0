@@ -15483,8 +15483,7 @@ MonoBehaviour:
   cellMargin: 16
   itemSlotPrefab: {fileID: 2625715489423964964, guid: 0120ee7fcd5b4e94eb78b43ab8e07649, type: 3}
   cellContainer: {fileID: 183649041}
-  geneLibrary: {fileID: 11400000, guid: 0d19a2e88d43b574aa24172d9145a140, type: 2}
-  toolSwitcher: {fileID: 0}
+  startingInventory: {fileID: 0}
 --- !u!114 &1351473042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16122,8 +16121,7 @@ MonoBehaviour:
   cellMargin: 10
   itemSlotPrefab: {fileID: 2625715489423964964, guid: 0120ee7fcd5b4e94eb78b43ab8e07649, type: 3}
   cellContainer: {fileID: 183649041}
-  geneLibrary: {fileID: 11400000, guid: 0d19a2e88d43b574aa24172d9145a140, type: 2}
-  toolSwitcher: {fileID: 0}
+  startingInventory: {fileID: 11400000, guid: 82920e03e74deba47a7cb08ff8e2e293, type: 2}
 --- !u!224 &1502243628
 RectTransform:
   m_ObjectHideFlags: 0

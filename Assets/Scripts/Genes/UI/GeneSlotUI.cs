@@ -21,7 +21,6 @@ namespace Abracodabra.UI.Genes
         [SerializeField] private Image slotBackground;
         [SerializeField] private GameObject emptyIndicator;
         [SerializeField] private GameObject lockedOverlay;
-        [SerializeField] private GameObject invalidDropOverlay;
         [SerializeField] private GameObject executingEffect;
         [SerializeField] private ItemView itemView;
 
@@ -38,26 +37,21 @@ namespace Abracodabra.UI.Genes
 
         private GameObject draggedVisual;
         private Canvas canvas;
+        private bool isPointerOver = false;
 
         void Awake()
         {
             parentSequence = GetComponentInParent<GeneSequenceUI>();
             canvas = GetComponentInParent<Canvas>();
 
-            if (itemView == null)
-            {
-                itemView = GetComponentInChildren<ItemView>();
-            }
-            if (itemView == null)
-            {
-                Debug.LogError($"GeneSlotUI on {gameObject.name} is missing its ItemView child component.", this);
-            }
+            if (itemView == null) itemView = GetComponentInChildren<ItemView>(true);
+            if (itemView == null) Debug.LogError($"GeneSlotUI on {gameObject.name} is missing its ItemView child component.", this);
         }
 
         void Start()
         {
             eventBus = GeneServices.Get<IGeneEventBus>();
-            // No error needed if null, just a potential feature loss
+            UpdateVisuals();
         }
 
         void OnEnable()
@@ -83,10 +77,12 @@ namespace Abracodabra.UI.Genes
 
         private void UpdateVisuals()
         {
+            if (itemView == null || slotBackground == null) return;
+
             bool isEmpty = CurrentItem == null || !CurrentItem.IsValid();
 
             if (emptyIndicator != null) emptyIndicator.SetActive(isEmpty);
-            if (itemView != null) itemView.gameObject.SetActive(!isEmpty);
+            itemView.gameObject.SetActive(!isEmpty);
 
             if (!isEmpty)
             {
@@ -94,31 +90,38 @@ namespace Abracodabra.UI.Genes
                 {
                     case InventoryBarItem.ItemType.Gene:
                         itemView.InitializeAsGene(CurrentItem.GeneInstance);
-                        if (slotBackground != null) slotBackground.color = CurrentItem.GeneInstance.GetGene().geneColor.WithAlpha(0.5f);
+                        slotBackground.color = CurrentItem.GeneInstance.GetGene().geneColor.WithAlpha(0.5f);
                         break;
                     case InventoryBarItem.ItemType.Seed:
                         itemView.InitializeAsSeed(CurrentItem.SeedTemplate);
-                        if (slotBackground != null && InventoryColorManager.Instance != null) slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, CurrentItem.SeedTemplate, null);
+                        if (InventoryColorManager.Instance != null)
+                            slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, CurrentItem.SeedTemplate, null);
                         break;
                     case InventoryBarItem.ItemType.Tool:
                         itemView.InitializeAsTool(CurrentItem.ToolDefinition);
-                        if (slotBackground != null && InventoryColorManager.Instance != null) slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, null, CurrentItem.ToolDefinition);
+                        if (InventoryColorManager.Instance != null)
+                            slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, null, CurrentItem.ToolDefinition);
                         break;
                 }
             }
             else
             {
-                if (slotBackground != null) slotBackground.color = normalColor;
+                slotBackground.color = normalColor;
             }
 
             if (lockedOverlay != null) lockedOverlay.SetActive(isLocked);
+
+            if (isPointerOver)
+            {
+                slotBackground.color = highlightColor;
+            }
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
             if (!isDraggable || CurrentItem == null || isLocked)
             {
-                eventData.pointerDrag = null; // Prevent drag
+                eventData.pointerDrag = null;
                 return;
             }
             CreateDragVisual();
@@ -144,92 +147,77 @@ namespace Abracodabra.UI.Genes
         public void OnDrop(PointerEventData eventData)
         {
             if (isLocked) return;
-
             GeneSlotUI sourceSlot = eventData.pointerDrag?.GetComponent<GeneSlotUI>();
             if (sourceSlot == null || sourceSlot == this) return;
 
             var draggedItem = sourceSlot.CurrentItem;
-
-            // Allow dragging empty slots (to clear another slot)
-            if (draggedItem != null)
+            
+            // FIX: The strict validation logic should ONLY run if this slot is part of a gene sequencer.
+            // An inventory slot should accept any valid item.
+            if (parentSequence != null && draggedItem != null)
             {
                 if (draggedItem.Type != InventoryBarItem.ItemType.Gene)
                 {
-                    ShowInvalidDropFeedback();
-                    return;
+                    ShowInvalidDropFeedback(); return;
                 }
-
+                
                 var draggedGene = draggedItem.GeneInstance.GetGene();
                 if (draggedGene.Category != acceptedCategory)
                 {
-                    ShowInvalidDropFeedback();
-                    return;
+                    ShowInvalidDropFeedback(); return;
                 }
-
+                
                 if (acceptedCategory == GeneCategory.Modifier || acceptedCategory == GeneCategory.Payload)
                 {
-                    var activeGene = parentSequence?.GetActiveGeneForRow(slotIndex);
+                    var activeGene = parentSequence.GetActiveGeneForRow(slotIndex);
                     if (activeGene == null || !draggedGene.CanAttachTo(activeGene))
                     {
-                        ShowInvalidDropFeedback();
-                        return;
+                        ShowInvalidDropFeedback(); return;
                     }
                 }
             }
-            
-            // --- Symmetrical Swap Logic ---
+
+            // The symmetrical swap logic works for all cases (inventory-to-inventory, sequence-to-inventory, etc.)
             var itemThatWasInThisSlot = this.CurrentItem;
             var itemThatWasInSourceSlot = sourceSlot.CurrentItem;
 
-            // Update this (destination) slot
-            if (this.parentSequence != null)
-            {
-                this.parentSequence.UpdateGeneInSequence(this.slotIndex, this.acceptedCategory, itemThatWasInSourceSlot);
-            }
-            else
-            {
-                this.SetItem(itemThatWasInSourceSlot);
-            }
+            if (this.parentSequence != null) this.parentSequence.UpdateGeneInSequence(this.slotIndex, this.acceptedCategory, itemThatWasInSourceSlot);
+            else this.SetItem(itemThatWasInSourceSlot);
             
-            // Update the source slot
-            if (sourceSlot.parentSequence != null)
-            {
-                sourceSlot.parentSequence.UpdateGeneInSequence(sourceSlot.slotIndex, sourceSlot.acceptedCategory, itemThatWasInThisSlot);
-            }
-            else
-            {
-                sourceSlot.SetItem(itemThatWasInThisSlot);
-            }
+            if (sourceSlot.parentSequence != null) sourceSlot.parentSequence.UpdateGeneInSequence(sourceSlot.slotIndex, sourceSlot.acceptedCategory, itemThatWasInThisSlot);
+            else sourceSlot.SetItem(itemThatWasInThisSlot);
         }
-
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (isLocked || slotBackground == null || eventData.pointerDrag == null) return;
+            isPointerOver = true;
+            if (isLocked || slotBackground == null) return;
 
-            slotBackground.color = highlightColor;
+            if (eventData.pointerDrag != null)
+            {
+                slotBackground.color = highlightColor;
+            }
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (slotBackground != null) slotBackground.color = normalColor;
-            UpdateVisuals();
-            if (invalidDropOverlay != null) invalidDropOverlay.SetActive(false);
+            isPointerOver = false;
+            if (slotBackground != null)
+            {
+                UpdateVisuals();
+            }
         }
 
         private void CreateDragVisual()
         {
             if (canvas == null || CurrentItem == null) return;
-
             draggedVisual = new GameObject("DragVisual");
             draggedVisual.transform.SetParent(canvas.transform, false);
             draggedVisual.transform.SetAsLastSibling();
-
             var image = draggedVisual.AddComponent<Image>();
             image.sprite = CurrentItem.GetIcon();
             image.color = new Color(1, 1, 1, 0.7f);
             image.raycastTarget = false;
-
             var rect = draggedVisual.GetComponent<RectTransform>();
             rect.sizeDelta = new Vector2(64, 64);
         }
