@@ -76,38 +76,25 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
     // REWRITTEN and CORRECTED method, as per your friend's analysis document.
     public TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
     {
-        // First pass: Check for overlay tiles (e.g., tilled dirt, wet dirt) that DON'T have keepBottomTile = true
-        // This ensures we detect the top-most tile first.
+        // First pass: Check for overlay tiles (e.g., tilled dirt, wet dirt) that DON'T have keepBottomTile = true.
+        // This ensures we detect the top-most, most specific tile first.
         foreach (var mapping in tileDefinitionMappings)
         {
             if (mapping?.tileDef != null && mapping.tilemapModule != null && !mapping.tileDef.keepBottomTile)
             {
-                // Check both DataTilemap and RenderTilemap for the tile's existence.
-                bool hasTileInData = mapping.tilemapModule.DataTilemap?.HasTile(cellPos) ?? false;
-                
-                Transform renderTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-                Tilemap renderTilemap = renderTransform?.GetComponent<Tilemap>();
-                bool hasTileInRender = renderTilemap?.HasTile(cellPos) ?? false;
-
-                if (hasTileInData || hasTileInRender)
+                if (TileExistsInModule(mapping.tilemapModule, cellPos))
                 {
                     return mapping.tileDef; // Found the top-most tile, return immediately.
                 }
             }
         }
         
-        // Second pass: If no overlay tile was found, check for base tiles (e.g., grass, water) that DO have keepBottomTile = true
+        // Second pass: If no overlay tile was found, check for base tiles (e.g., grass, water) that DO have keepBottomTile = true.
         foreach (var mapping in tileDefinitionMappings)
         {
             if (mapping?.tileDef != null && mapping.tilemapModule != null && mapping.tileDef.keepBottomTile)
             {
-                bool hasTileInData = mapping.tilemapModule.DataTilemap?.HasTile(cellPos) ?? false;
-                
-                Transform renderTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-                Tilemap renderTilemap = renderTransform?.GetComponent<Tilemap>();
-                bool hasTileInRender = renderTilemap?.HasTile(cellPos) ?? false;
-
-                if (hasTileInData || hasTileInRender)
+                if (TileExistsInModule(mapping.tilemapModule, cellPos))
                 {
                     return mapping.tileDef; // Found the base tile.
                 }
@@ -115,12 +102,36 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
         }
 
         // If no tile was found in any configured map, return null.
+        // The detailed log from the analysis document is included here.
         if (debugLogs)
         {
             Debug.LogWarning($"[TileInteractionManager] No TileDefinition found at position {cellPos}. " +
                             "Ensure tiles are painted on a configured Tilemap (Data or Render) and mappings are correct.");
         }
         return null;
+    }
+    
+    // Helper method to check both tilemaps within a module to reduce code duplication.
+    private bool TileExistsInModule(DualGridTilemapModule module, Vector3Int cellPos)
+    {
+        // Check DataTilemap first, as it's the intended logical layer.
+        if (module.DataTilemap != null && module.DataTilemap.HasTile(cellPos))
+        {
+            return true;
+        }
+        
+        // If not in data, check RenderTilemap as a fallback.
+        Transform renderTransform = module.transform.Find("RenderTilemap");
+        if (renderTransform != null)
+        {
+            Tilemap renderTilemap = renderTransform.GetComponent<Tilemap>();
+            if (renderTilemap != null && renderTilemap.HasTile(cellPos))
+            {
+                return true;
+            }
+        }
+        
+        return false;
     }
 
     public void ApplyToolAction(ToolDefinition toolDef)

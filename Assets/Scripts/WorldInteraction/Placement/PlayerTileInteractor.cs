@@ -87,7 +87,9 @@ public sealed class PlayerTileInteractor : MonoBehaviour
 
         // In file: Assets/Scripts/WorldInteraction/Placement/PlayerTileInteractor.cs
 
-        private void HandleLeftClick()
+        // Only the HandleLeftClick method needs to be changed.
+
+        void HandleLeftClick()
         {
             if (!EnsureManagers()) return;
 
@@ -99,6 +101,11 @@ public sealed class PlayerTileInteractor : MonoBehaviour
             }
 
             Vector3 mouseW = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            
+            // FIX: This is the critical missing line. We must force the Z position
+            // to be on the same plane as our 2D grid before converting to a cell coordinate.
+            mouseW.z = 0f;
+
             Vector3Int cellPos = tileInteractionManager.WorldToCell(mouseW);
             Vector3 cellCenter = tileInteractionManager.interactionGrid.GetCellCenterWorld(cellPos);
 
@@ -133,15 +140,10 @@ public sealed class PlayerTileInteractor : MonoBehaviour
                     break;
 
                 case InventoryBarItem.ItemType.Seed:
-                    // This is the success callback that will be executed by the PlayerActionManager
                     System.Action onSuccess = () =>
                     {
                         if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
-
-                        // THIS IS THE FIX: Call the generic RemoveItemFromInventory with the specific item instance.
                         InventoryGridController.Instance?.RemoveItemFromInventory(selected);
-
-                        // Refresh the bar to show the change
                         inventoryBar.ShowBar();
                     };
                     PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess);
