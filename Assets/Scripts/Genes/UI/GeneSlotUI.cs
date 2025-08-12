@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
-using System.Reflection; // FIX: Added the missing using statement for BindingFlags.
+using System.Reflection;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Runtime;
@@ -79,9 +79,7 @@ namespace Abracodabra.UI.Genes
         private void UpdateVisuals()
         {
             if (itemView == null || slotBackground == null) return;
-
             bool isEmpty = CurrentItem == null || !CurrentItem.IsValid();
-
             if (emptyIndicator != null) emptyIndicator.SetActive(isEmpty);
             itemView.gameObject.SetActive(!isEmpty);
 
@@ -111,7 +109,6 @@ namespace Abracodabra.UI.Genes
             }
 
             if (lockedOverlay != null) lockedOverlay.SetActive(isLocked);
-
             if (isPointerOver)
             {
                 slotBackground.color = highlightColor;
@@ -144,71 +141,98 @@ namespace Abracodabra.UI.Genes
                 draggedVisual = null;
             }
         }
-
+        
         public void OnDrop(PointerEventData eventData)
         {
             if (isLocked) return;
             GeneSlotUI sourceSlot = eventData.pointerDrag?.GetComponent<GeneSlotUI>();
             if (sourceSlot == null || sourceSlot == this) return;
-
-            var draggedItem = sourceSlot.CurrentItem;
-
-            var seedEditSlotField = parentSequence?.GetType().GetField("seedEditSlot", BindingFlags.NonPublic | BindingFlags.Instance);
-            GeneSlotUI seedEditSlot = seedEditSlotField?.GetValue(parentSequence) as GeneSlotUI;
-
-            if (parentSequence != null && this == seedEditSlot)
+        
+            if (!IsValidDrop(sourceSlot, this))
             {
-                if (draggedItem != null && draggedItem.Type == InventoryBarItem.ItemType.Seed)
+                ShowInvalidDropFeedback();
+                return;
+            }
+        
+            var itemFromSource = sourceSlot.CurrentItem;
+            var itemFromDestination = this.CurrentItem;
+        
+            UpdateSlotContents(sourceSlot, itemFromDestination);
+            UpdateSlotContents(this, itemFromSource);
+        }
+        
+        private bool IsValidDrop(GeneSlotUI source, GeneSlotUI destination)
+        {
+            var sourceItem = source.CurrentItem;
+            var destinationItem = destination.CurrentItem;
+        
+            if (!IsItemValidForSlot(sourceItem, destination)) return false;
+            if (!IsItemValidForSlot(destinationItem, source)) return false;
+        
+            return true;
+        }
+
+        private bool IsItemValidForSlot(InventoryBarItem item, GeneSlotUI slot)
+        {
+            if (item == null) return true;
+        
+            var seedEditSlotField = slot.parentSequence?.GetType().GetField("seedEditSlot", BindingFlags.NonPublic | BindingFlags.Instance);
+            GeneSlotUI seedEditSlot = seedEditSlotField?.GetValue(slot.parentSequence) as GeneSlotUI;
+
+            if (slot == seedEditSlot)
+            {
+                return item.Type == InventoryBarItem.ItemType.Seed;
+            }
+        
+            if (slot.parentSequence != null)
+            {
+                if (item.Type != InventoryBarItem.ItemType.Gene) return false;
+        
+                var gene = item.GeneInstance.GetGene();
+                if (gene.Category != slot.acceptedCategory) return false;
+        
+                if (slot.acceptedCategory == GeneCategory.Modifier || slot.acceptedCategory == GeneCategory.Payload)
                 {
-                    var previousItem = this.CurrentItem;
-                    parentSequence.LoadSeedForEditing(draggedItem);
-                    sourceSlot.SetItem(previousItem); 
+                    var activeGene = slot.parentSequence.GetActiveGeneForRow(slot.slotIndex);
+                    if (activeGene == null || !gene.CanAttachTo(activeGene)) return false;
+                }
+            }
+            
+            return true;
+        }
+
+        // MODIFIED: This method now correctly routes passive gene updates.
+        private void UpdateSlotContents(GeneSlotUI slot, InventoryBarItem newItem)
+        {
+            var seedEditSlotField = slot.parentSequence?.GetType().GetField("seedEditSlot", BindingFlags.NonPublic | BindingFlags.Instance);
+            GeneSlotUI seedEditSlot = seedEditSlotField?.GetValue(slot.parentSequence) as GeneSlotUI;
+            
+            if (slot == seedEditSlot)
+            {
+                slot.parentSequence.LoadSeedForEditing(newItem);
+            }
+            else if (slot.parentSequence != null)
+            {
+                // This is the key fix: check the category to call the right method.
+                if (slot.acceptedCategory == GeneCategory.Passive)
+                {
+                    slot.parentSequence.UpdatePassiveGene(slot.slotIndex, newItem);
                 }
                 else
                 {
-                    ShowInvalidDropFeedback();
+                    slot.parentSequence.UpdateGeneInSequence(slot.slotIndex, slot.acceptedCategory, newItem);
                 }
-                return;
             }
-            
-            if (parentSequence != null && draggedItem != null)
+            else // This is a plain inventory slot
             {
-                if (draggedItem.Type != InventoryBarItem.ItemType.Gene)
-                {
-                    ShowInvalidDropFeedback(); return;
-                }
-                
-                var draggedGene = draggedItem.GeneInstance.GetGene();
-                if (draggedGene.Category != acceptedCategory)
-                {
-                    ShowInvalidDropFeedback(); return;
-                }
-                
-                if (acceptedCategory == GeneCategory.Modifier || acceptedCategory == GeneCategory.Payload)
-                {
-                    var activeGene = parentSequence.GetActiveGeneForRow(slotIndex);
-                    if (activeGene == null || !draggedGene.CanAttachTo(activeGene))
-                    {
-                        ShowInvalidDropFeedback(); return;
-                    }
-                }
+                slot.SetItem(newItem);
             }
-
-            var itemThatWasInThisSlot = this.CurrentItem;
-            var itemThatWasInSourceSlot = sourceSlot.CurrentItem;
-
-            if (this.parentSequence != null) this.parentSequence.UpdateGeneInSequence(this.slotIndex, this.acceptedCategory, itemThatWasInSourceSlot);
-            else this.SetItem(itemThatWasInSourceSlot);
-            
-            if (sourceSlot.parentSequence != null) sourceSlot.parentSequence.UpdateGeneInSequence(sourceSlot.slotIndex, sourceSlot.acceptedCategory, itemThatWasInThisSlot);
-            else sourceSlot.SetItem(itemThatWasInThisSlot);
         }
-
+        
         public void OnPointerEnter(PointerEventData eventData)
         {
             isPointerOver = true;
             if (isLocked || slotBackground == null) return;
-
             if (eventData.pointerDrag != null)
             {
                 slotBackground.color = highlightColor;

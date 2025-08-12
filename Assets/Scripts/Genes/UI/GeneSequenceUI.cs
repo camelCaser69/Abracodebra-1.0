@@ -26,7 +26,6 @@ namespace Abracodabra.UI.Genes
         public Slider rechargeProgress;
         public TMPro.TextMeshProUGUI validationMessage;
 
-        // FIX: Restored the missing configuration fields.
         [Header("Configuration")]
         public int maxPassiveSlots = 6;
         public int maxSequenceLength = 5;
@@ -50,7 +49,6 @@ namespace Abracodabra.UI.Genes
             passiveSlots.Clear();
             sequenceRows.Clear();
 
-            // This loop now works because maxPassiveSlots exists.
             for (int i = 0; i < maxPassiveSlots; i++)
             {
                 GameObject slotObj = Instantiate(passiveSlotPrefab, passiveGenesContainer);
@@ -60,10 +58,13 @@ namespace Abracodabra.UI.Genes
                 passiveSlots.Add(slot);
             }
 
-            // This loop now works because maxSequenceLength exists.
             for (int i = 0; i < maxSequenceLength; i++)
             {
                 GameObject rowObj = Instantiate(sequenceRowPrefab, activeSequenceContainer);
+                
+                // FIX: Explicitly activate the newly created row GameObject.
+                rowObj.SetActive(true);
+
                 SequenceRowUI row = rowObj.GetComponent<SequenceRowUI>();
                 row.Initialize(i, this);
                 sequenceRows.Add(row);
@@ -107,7 +108,6 @@ namespace Abracodabra.UI.Genes
             foreach (var row in sequenceRows)
             {
                 if (row.activeSlot != null) row.activeSlot.isLocked = isLocked;
-                // Attachment slot locking is handled by SequenceRowUI based on active gene's presence.
             }
         }
 
@@ -124,18 +124,32 @@ namespace Abracodabra.UI.Genes
                     sequenceSlot.activeInstance = newInstance;
                     break;
                 case GeneCategory.Modifier:
-                    if (sequenceSlot.modifierInstances.Count > 0)
-                        sequenceSlot.modifierInstances[0] = newInstance;
-                    else if (newInstance != null)
-                        sequenceSlot.modifierInstances.Add(newInstance);
+                    // Assuming one modifier slot for now
+                    if (sequenceSlot.modifierInstances.Count == 0) sequenceSlot.modifierInstances.Add(null);
+                    sequenceSlot.modifierInstances[0] = newInstance;
                     break;
                 case GeneCategory.Payload:
-                    if (sequenceSlot.payloadInstances.Count > 0)
-                        sequenceSlot.payloadInstances[0] = newInstance;
-                    else if (newInstance != null)
-                        sequenceSlot.payloadInstances.Add(newInstance);
+                    // Assuming one payload slot for now
+                    if (sequenceSlot.payloadInstances.Count == 0) sequenceSlot.payloadInstances.Add(null);
+                    sequenceSlot.payloadInstances[0] = newInstance;
                     break;
             }
+            
+            RefreshAllVisuals();
+        }
+
+        // NEW: Dedicated method for updating passive genes.
+        public void UpdatePassiveGene(int slotIndex, InventoryBarItem newItem)
+        {
+            if (runtimeState == null || slotIndex < 0) return;
+
+            // Ensure the passive instances list is large enough
+            while (runtimeState.passiveInstances.Count <= slotIndex)
+            {
+                runtimeState.passiveInstances.Add(null);
+            }
+
+            runtimeState.passiveInstances[slotIndex] = newItem?.GeneInstance;
             
             RefreshAllVisuals();
         }
@@ -222,7 +236,6 @@ namespace Abracodabra.UI.Genes
         private bool ValidateConfiguration()
         {
             if (runtimeState == null) return false;
-
             bool hasActiveGene = false;
             foreach (var slot in runtimeState.activeSequence)
             {
@@ -232,7 +245,6 @@ namespace Abracodabra.UI.Genes
                     break;
                 }
             }
-
             if (!hasActiveGene)
             {
                 if (validationMessage != null) validationMessage.text = "Sequence requires at least one Active Gene.";
@@ -256,7 +268,6 @@ namespace Abracodabra.UI.Genes
                     float progress = 1f - (runtimeState.rechargeTicksRemaining / (float)runtimeState.template.baseRechargeTime);
                     rechargeProgress.value = progress;
                 }
-
                 if (currentEnergyText != null)
                 {
                     currentEnergyText.text = $"Energy: {energySystem.CurrentEnergy:F0}/{energySystem.MaxEnergy:F0}";

@@ -8591,7 +8591,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5940723014211282020, guid: fa87a610bbd2afd44b5d86e99f932c75, type: 3}
       propertyPath: isDraggable
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8018089918901219648, guid: fa87a610bbd2afd44b5d86e99f932c75, type: 3}
       propertyPath: m_Pivot.x
