@@ -198,6 +198,7 @@ public class CompleteUISetup : MonoBehaviour
         SetPrivateField(barController, "inventoryGridController", gridController);
     }
 
+        // Find the CreateGeneSequenceUI method and replace it with this version.
     GeneSequenceUI CreateGeneSequenceUI(Transform parent, GameObject passiveSlotPrefab, GameObject sequenceRowPrefab)
     {
         var geneSequenceUIObj = new GameObject("GeneSequenceUI", typeof(Image), typeof(GeneSequenceUI));
@@ -209,10 +210,19 @@ public class CompleteUISetup : MonoBehaviour
 
         GeneSequenceUI sequenceUI = geneSequenceUIObj.GetComponent<GeneSequenceUI>();
 
+        // NEW: Create the dedicated Seed Edit Slot
+        var itemViewPrefab = CreateItemViewPrefab(); // We need an ItemView for the slot
+        itemViewPrefab.transform.SetParent(geneSequenceUIObj.transform); // Temporarily parent to create slot
+        var seedEditSlot = CreateGeneSlot("SeedEditSlot", GeneCategory.Passive, itemViewPrefab, geneSequenceUIObj.transform); // Category doesn't matter, will be overridden
+        SetAnchorsAndOffsets(seedEditSlot, new Vector2(0.5f, 0.85f), new Vector2(0.5f, 0.85f), new Vector2(-32, -32), new Vector2(32, 32)); // Center it
+        var seedSlotUI = seedEditSlot.GetComponent<GeneSlotUI>();
+        seedSlotUI.isDraggable = false; // You can't drag the seed away once it's being edited
+        DestroyImmediate(itemViewPrefab); // Clean up temp object
+
         var passiveContainer = new GameObject("PassiveGenesContainer", typeof(RectTransform), typeof(HorizontalLayoutGroup));
         passiveContainer.transform.SetParent(geneSequenceUIObj.transform, false);
         passiveContainer.GetComponent<HorizontalLayoutGroup>().spacing = 10;
-        SetAnchorsAndOffsets(passiveContainer, new Vector2(0.05f, 0.8f), new Vector2(0.95f, 0.95f));
+        SetAnchorsAndOffsets(passiveContainer, new Vector2(0.05f, 0.7f), new Vector2(0.95f, 0.8f));
 
         var activeContainer = new GameObject("ActiveSequenceContainer", typeof(RectTransform), typeof(VerticalLayoutGroup));
         activeContainer.transform.SetParent(geneSequenceUIObj.transform, false);
@@ -220,10 +230,12 @@ public class CompleteUISetup : MonoBehaviour
         activeLayout.spacing = 10;
         activeLayout.childControlWidth = true;
         activeLayout.childForceExpandWidth = true;
-        SetAnchorsAndOffsets(activeContainer, new Vector2(0.05f, 0.25f), new Vector2(0.95f, 0.75f));
+        SetAnchorsAndOffsets(activeContainer, new Vector2(0.05f, 0.25f), new Vector2(0.95f, 0.65f));
 
         CreateSequenceInfoDisplay(geneSequenceUIObj.transform, sequenceUI);
-
+        
+        // Link the new slot to the GeneSequenceUI script
+        SetPrivateField(sequenceUI, "seedEditSlot", seedSlotUI);
         sequenceUI.passiveGenesContainer = passiveContainer.transform;
         sequenceUI.activeSequenceContainer = activeContainer.transform;
         sequenceUI.sequenceRowPrefab = sequenceRowPrefab;

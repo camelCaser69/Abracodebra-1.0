@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
+using System.Reflection; // FIX: Added the missing using statement for BindingFlags.
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Runtime;
@@ -151,9 +152,25 @@ namespace Abracodabra.UI.Genes
             if (sourceSlot == null || sourceSlot == this) return;
 
             var draggedItem = sourceSlot.CurrentItem;
+
+            var seedEditSlotField = parentSequence?.GetType().GetField("seedEditSlot", BindingFlags.NonPublic | BindingFlags.Instance);
+            GeneSlotUI seedEditSlot = seedEditSlotField?.GetValue(parentSequence) as GeneSlotUI;
+
+            if (parentSequence != null && this == seedEditSlot)
+            {
+                if (draggedItem != null && draggedItem.Type == InventoryBarItem.ItemType.Seed)
+                {
+                    var previousItem = this.CurrentItem;
+                    parentSequence.LoadSeedForEditing(draggedItem);
+                    sourceSlot.SetItem(previousItem); 
+                }
+                else
+                {
+                    ShowInvalidDropFeedback();
+                }
+                return;
+            }
             
-            // FIX: The strict validation logic should ONLY run if this slot is part of a gene sequencer.
-            // An inventory slot should accept any valid item.
             if (parentSequence != null && draggedItem != null)
             {
                 if (draggedItem.Type != InventoryBarItem.ItemType.Gene)
@@ -177,7 +194,6 @@ namespace Abracodabra.UI.Genes
                 }
             }
 
-            // The symmetrical swap logic works for all cases (inventory-to-inventory, sequence-to-inventory, etc.)
             var itemThatWasInThisSlot = this.CurrentItem;
             var itemThatWasInSourceSlot = sourceSlot.CurrentItem;
 

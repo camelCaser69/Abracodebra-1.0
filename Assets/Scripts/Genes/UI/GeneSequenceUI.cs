@@ -12,6 +12,8 @@ namespace Abracodabra.UI.Genes
         [Header("Containers")]
         public Transform passiveGenesContainer;
         public Transform activeSequenceContainer;
+        [Tooltip("The dedicated slot where a seed is placed to be edited.")]
+        [SerializeField] private GeneSlotUI seedEditSlot;
 
         [Header("Prefabs")]
         public GameObject sequenceRowPrefab;
@@ -24,11 +26,11 @@ namespace Abracodabra.UI.Genes
         public Slider rechargeProgress;
         public TMPro.TextMeshProUGUI validationMessage;
 
+        // FIX: Restored the missing configuration fields.
         [Header("Configuration")]
         public int maxPassiveSlots = 6;
         public int maxSequenceLength = 5;
 
-        // --- State ---
         private PlantGeneRuntimeState runtimeState;
         private List<GeneSlotUI> passiveSlots = new List<GeneSlotUI>();
         private List<SequenceRowUI> sequenceRows = new List<SequenceRowUI>();
@@ -37,17 +39,18 @@ namespace Abracodabra.UI.Genes
         void Start()
         {
             InitializeUI();
+            SetEditorLocked(true);
+            RefreshAllVisuals();
         }
 
         private void InitializeUI()
         {
-            // Clear existing
             foreach (Transform child in passiveGenesContainer) Destroy(child.gameObject);
             foreach (Transform child in activeSequenceContainer) Destroy(child.gameObject);
             passiveSlots.Clear();
             sequenceRows.Clear();
 
-            // Create passive slots
+            // This loop now works because maxPassiveSlots exists.
             for (int i = 0; i < maxPassiveSlots; i++)
             {
                 GameObject slotObj = Instantiate(passiveSlotPrefab, passiveGenesContainer);
@@ -57,7 +60,7 @@ namespace Abracodabra.UI.Genes
                 passiveSlots.Add(slot);
             }
 
-            // Create sequence rows
+            // This loop now works because maxSequenceLength exists.
             for (int i = 0; i < maxSequenceLength; i++)
             {
                 GameObject rowObj = Instantiate(sequenceRowPrefab, activeSequenceContainer);
@@ -66,19 +69,48 @@ namespace Abracodabra.UI.Genes
                 sequenceRows.Add(row);
             }
         }
-
-        public void LoadRuntimeState(PlantGeneRuntimeState state)
+        
+        public void LoadSeedForEditing(InventoryBarItem seedItem)
         {
-            this.runtimeState = state;
-            if (state == null)
+            if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed)
             {
-                Debug.LogError("Cannot load null runtime state into GeneSequenceUI");
+                ClearEditor();
                 return;
             }
+            
+            this.runtimeState = seedItem.SeedRuntimeState;
+            if (seedEditSlot != null)
+            {
+                seedEditSlot.SetItem(seedItem);
+            }
+            SetEditorLocked(false);
+            RefreshAllVisuals();
+        }
 
+        private void ClearEditor()
+        {
+            this.runtimeState = null;
+            if (seedEditSlot != null)
+            {
+                seedEditSlot.ClearSlot();
+            }
+            SetEditorLocked(true);
             RefreshAllVisuals();
         }
         
+        private void SetEditorLocked(bool isLocked)
+        {
+            foreach (var slot in passiveSlots)
+            {
+                slot.isLocked = isLocked;
+            }
+            foreach (var row in sequenceRows)
+            {
+                if (row.activeSlot != null) row.activeSlot.isLocked = isLocked;
+                // Attachment slot locking is handled by SequenceRowUI based on active gene's presence.
+            }
+        }
+
         public void UpdateGeneInSequence(int rowIndex, GeneCategory slotCategory, InventoryBarItem newItem)
         {
             if (runtimeState == null || rowIndex < 0 || rowIndex >= runtimeState.activeSequence.Count) return;
@@ -119,21 +151,20 @@ namespace Abracodabra.UI.Genes
 
         private void RefreshAllVisuals()
         {
-            if (runtimeState == null) return;
+            if (runtimeState == null)
+            {
+                for (int i = 0; i < passiveSlots.Count; i++) passiveSlots[i].ClearSlot();
+                for (int i = 0; i < sequenceRows.Count; i++) sequenceRows[i].ClearRow();
+                UpdateDisplay();
+                return;
+            }
 
             for (int i = 0; i < passiveSlots.Count; i++)
             {
                 if (i < runtimeState.passiveInstances.Count)
                 {
                     var instance = runtimeState.passiveInstances[i];
-                    if (instance != null && instance.GetGene() != null)
-                    {
-                        passiveSlots[i].SetItem(InventoryBarItem.FromGene(instance));
-                    }
-                    else
-                    {
-                        passiveSlots[i].ClearSlot();
-                    }
+                    passiveSlots[i].SetItem(instance != null && instance.GetGene() != null ? InventoryBarItem.FromGene(instance) : null);
                 }
                 else
                 {
@@ -152,31 +183,40 @@ namespace Abracodabra.UI.Genes
                     sequenceRows[i].ClearRow();
                 }
             }
-
             UpdateDisplay();
         }
 
         private void UpdateDisplay()
         {
-            if (runtimeState == null) return;
+            if (runtimeState == null)
+            {
+                if (energyCostText != null) energyCostText.text = "Cost: --";
+                if (currentEnergyText != null) currentEnergyText.text = "Energy: --/--";
+                if (rechargeTimeText != null) rechargeTimeText.text = "Recharge: --";
+                if (validationMessage != null)
+                {
+                    validationMessage.gameObject.SetActive(true);
+                    validationMessage.text = "Drop a seed into the slot above to begin editing.";
+                }
+                return;
+            }
 
             float totalCost = runtimeState.CalculateTotalEnergyCost();
-            // FIX: Replaced '⚡' with 'E' to prevent font warnings.
-            if(energyCostText != null) energyCostText.text = $"Cost: {totalCost:F0} E/cycle";
-            if(rechargeTimeText != null) rechargeTimeText.text = $"Recharge: {runtimeState.template.baseRechargeTime} ticks";
-            
+            if (energyCostText != null) energyCostText.text = $"Cost: {totalCost:F0} E/cycle";
+            if (rechargeTimeText != null) rechargeTimeText.text = $"Recharge: {runtimeState.template.baseRechargeTime} ticks";
+
             if (executor != null && executor.plantGrowth != null && executor.plantGrowth.EnergySystem != null)
             {
                 var energySystem = executor.plantGrowth.EnergySystem;
-                if(currentEnergyText != null) currentEnergyText.text = $"Energy: {energySystem.CurrentEnergy:F0}/{energySystem.MaxEnergy:F0}";
+                if (currentEnergyText != null) currentEnergyText.text = $"Energy: {energySystem.CurrentEnergy:F0}/{energySystem.MaxEnergy:F0}";
             }
-            else if (runtimeState.template != null)
+            else
             {
-                if(currentEnergyText != null) currentEnergyText.text = $"Energy: --/{runtimeState.template.maxEnergy:F0}";
+                if (currentEnergyText != null) currentEnergyText.text = $"Energy: --/{runtimeState.template.maxEnergy:F0}";
             }
 
             bool isValid = ValidateConfiguration();
-            if(validationMessage != null) validationMessage.gameObject.SetActive(!isValid);
+            if (validationMessage != null) validationMessage.gameObject.SetActive(!isValid);
         }
 
         private bool ValidateConfiguration()
@@ -198,7 +238,6 @@ namespace Abracodabra.UI.Genes
                 if (validationMessage != null) validationMessage.text = "Sequence requires at least one Active Gene.";
                 return false;
             }
-
             return true;
         }
 
@@ -212,7 +251,6 @@ namespace Abracodabra.UI.Genes
             if (executor != null && executor.plantGrowth != null && executor.plantGrowth.EnergySystem != null && runtimeState != null)
             {
                 var energySystem = executor.plantGrowth.EnergySystem;
-
                 if (rechargeProgress != null && runtimeState.template.baseRechargeTime > 0)
                 {
                     float progress = 1f - (runtimeState.rechargeTicksRemaining / (float)runtimeState.template.baseRechargeTime);
@@ -221,7 +259,6 @@ namespace Abracodabra.UI.Genes
 
                 if (currentEnergyText != null)
                 {
-                    // FIX: Read from the authoritative source during Update as well.
                     currentEnergyText.text = $"Energy: {energySystem.CurrentEnergy:F0}/{energySystem.MaxEnergy:F0}";
                 }
             }
