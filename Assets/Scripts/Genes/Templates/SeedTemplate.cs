@@ -21,6 +21,19 @@ namespace Abracodabra.Genes.Templates
         public List<GeneTemplateEntry> passiveGenes = new List<GeneTemplateEntry>();
         public List<SequenceSlotTemplate> activeSequence = new List<SequenceSlotTemplate>();
 
+        // NEW: The section for defining seed-specific growth properties.
+        [Header("Base Growth Parameters")]
+        [Tooltip("The base chance (0 to 1) for the plant to attempt a growth step each tick.")]
+        [Range(0f, 1f)] public float baseGrowthChance = 0.1f;
+        [Tooltip("The minimum number of stem segments the plant will grow.")]
+        public int minHeight = 3;
+        [Tooltip("The maximum number of stem segments the plant will grow.")]
+        public int maxHeight = 5;
+        [Tooltip("The number of leaves that will attempt to grow at each leaf-spawning step.")]
+        public int leafDensity = 2;
+        [Tooltip("How many stem segments to grow before spawning new leaves (1 = every segment, 2 = every other).")]
+        public int leafGap = 1;
+
         [Header("Plant Base Stats")]
         public int baseRechargeTime = 3;
         public float energyRegenRate = 10f;
@@ -30,33 +43,15 @@ namespace Abracodabra.Genes.Templates
         public bool isUnlocked = true;
         public List<string> unlockRequirements = new List<string>();
 
-        // REWRITTEN and CORRECTED IsValid() method
         public bool IsValid()
         {
             bool hasAtLeastOneActiveGene = false;
-
-            // Go through each slot in the sequence
             foreach (var slot in activeSequence)
             {
-                // If the slot has no active gene, it's just an empty slot. This is perfectly valid, so we skip it.
-                if (slot.activeGene == null)
-                {
-                    continue;
-                }
-
-                // If we find a slot that IS configured, we mark that the template has an active gene.
+                if (slot.activeGene == null) continue;
                 hasAtLeastOneActiveGene = true;
-
-                // Now, for this configured slot, we must ensure its own configuration is valid (e.g., not too many modifiers).
-                if (!slot.Validate())
-                {
-                    // If a configured slot is invalid, the entire template is invalid.
-                    return false;
-                }
+                if (!slot.Validate()) return false;
             }
-
-            // The template is only valid if we found at least one configured active gene.
-            // A template with zero active genes is not plantable.
             return hasAtLeastOneActiveGene;
         }
 
@@ -70,23 +65,10 @@ namespace Abracodabra.Genes.Templates
 
         private void OnValidate()
         {
-            while (passiveGenes.Count < passiveSlotCount)
-            {
-                passiveGenes.Add(new GeneTemplateEntry());
-            }
-            while (passiveGenes.Count > passiveSlotCount)
-            {
-                passiveGenes.RemoveAt(passiveGenes.Count - 1);
-            }
-
-            while (activeSequence.Count < activeSequenceLength)
-            {
-                activeSequence.Add(new SequenceSlotTemplate());
-            }
-            while (activeSequence.Count > activeSequenceLength)
-            {
-                activeSequence.RemoveAt(activeSequence.Count - 1);
-            }
+            while (passiveGenes.Count < passiveSlotCount) passiveGenes.Add(new GeneTemplateEntry());
+            while (passiveGenes.Count > passiveSlotCount) passiveGenes.RemoveAt(passiveGenes.Count - 1);
+            while (activeSequence.Count < activeSequenceLength) activeSequence.Add(new SequenceSlotTemplate());
+            while (activeSequence.Count > activeSequenceLength) activeSequence.RemoveAt(activeSequence.Count - 1);
         }
     }
 
@@ -107,13 +89,11 @@ namespace Abracodabra.Genes.Templates
 
         public bool Validate()
         {
-            if (activeGene == null) return true; // An empty slot is inherently valid.
+            if (activeGene == null) return true;
             if (modifiers.Count > activeGene.slotConfig.modifierSlots) return false;
             if (payloads.Count > activeGene.slotConfig.payloadSlots) return false;
-
             var modifierGenes = modifiers.Select(m => m.gene as ModifierGene).ToList();
             var payloadGenes = payloads.Select(p => p.gene as PayloadGene).ToList();
-
             return activeGene.IsValidConfiguration(modifierGenes, payloadGenes);
         }
     }

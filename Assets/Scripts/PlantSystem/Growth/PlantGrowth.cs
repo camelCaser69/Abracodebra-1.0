@@ -49,13 +49,13 @@ namespace Abracodabra.Genes
         public float energyStorageMultiplier = 1f;
         public float fruitYieldMultiplier = 1f;
         
-        [Header("Growth Parameters")]
-        public float poopAbsorptionRadius = 3f;
-        public float poopAbsorptionEfficiency = 1f;
-        public int minHeight = 3;
-        public int maxHeight = 5;
-        public int leafDensity = 2;
-        public int leafGap = 1;
+        // MODIFIED: These are now the runtime values, copied from the seed template.
+        [Header("Runtime Growth Parameters")]
+        public float baseGrowthChance; 
+        public int minHeight;
+        public int maxHeight;
+        public int leafDensity;
+        public int leafGap;
 
         public PlantState CurrentState { get; set; } = PlantState.Initializing;
 
@@ -98,6 +98,13 @@ namespace Abracodabra.Genes
             this.seedTemplate = state.template;
             this.geneRuntimeState = state;
 
+            // NEW: Copy base growth parameters from the seed template to this plant instance.
+            this.baseGrowthChance = seedTemplate.baseGrowthChance;
+            this.minHeight = seedTemplate.minHeight;
+            this.maxHeight = seedTemplate.maxHeight;
+            this.leafDensity = seedTemplate.leafDensity;
+            this.leafGap = seedTemplate.leafGap;
+
             sequenceExecutor = GetComponent<PlantSequenceExecutor>();
             if (sequenceExecutor == null)
             {
@@ -109,8 +116,6 @@ namespace Abracodabra.Genes
 
             EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
             EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
-            
-            // FIX: Assign the base energy regeneration rate to the EnergySystem.
             EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
             
             sequenceExecutor.runtimeState = this.geneRuntimeState;
@@ -131,10 +136,11 @@ namespace Abracodabra.Genes
         {
             EnergySystem.OnTickUpdate();
 
-            if (CurrentState == PlantState.Growing && CellManager.cells.Count < maxHeight * 2)
+            if (CurrentState == PlantState.Growing)
             {
                 float randomValue = (_deterministicRandom != null) ? _deterministicRandom.Range(0f, 1f) : Random.value;
-                if (randomValue < 0.1f * growthSpeedMultiplier)
+                // MODIFIED: Use the baseGrowthChance from the seed, modified by passive genes.
+                if (randomValue < baseGrowthChance * growthSpeedMultiplier)
                 {
                     GrowSomething();
                 }
@@ -143,6 +149,7 @@ namespace Abracodabra.Genes
 
         void GrowSomething()
         {
+            // This logic now correctly uses the per-seed parameters (maxHeight, leafGap, leafDensity).
             int currentHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
             if (currentHeight < maxHeight)
             {

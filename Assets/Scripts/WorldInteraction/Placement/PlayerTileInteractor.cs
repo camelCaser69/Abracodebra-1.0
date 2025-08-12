@@ -89,6 +89,8 @@ public sealed class PlayerTileInteractor : MonoBehaviour
 
         // Only the HandleLeftClick method needs to be changed.
 
+        // Only the HandleLeftClick method is changed.
+
         void HandleLeftClick()
         {
             if (!EnsureManagers()) return;
@@ -101,9 +103,6 @@ public sealed class PlayerTileInteractor : MonoBehaviour
             }
 
             Vector3 mouseW = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            
-            // FIX: This is the critical missing line. We must force the Z position
-            // to be on the same plane as our 2D grid before converting to a cell coordinate.
             mouseW.z = 0f;
 
             Vector3Int cellPos = tileInteractionManager.WorldToCell(mouseW);
@@ -140,11 +139,17 @@ public sealed class PlayerTileInteractor : MonoBehaviour
                     break;
 
                 case InventoryBarItem.ItemType.Seed:
+                    // FIX: The success callback is now rewritten to be more robust.
                     System.Action onSuccess = () =>
                     {
                         if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
+                        
+                        // 1. Remove the consumed seed from the main inventory.
                         InventoryGridController.Instance?.RemoveItemFromInventory(selected);
-                        inventoryBar.ShowBar();
+
+                        // 2. Force the inventory bar to re-select the first slot (index 0).
+                        //    This ensures a tool is likely selected and avoids the 'null selection' bug.
+                        inventoryBar.SelectSlotByIndex(0);
                     };
                     PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess);
                     break;

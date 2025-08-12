@@ -173,6 +173,13 @@ public class InventoryBarController : MonoBehaviour
         UpdateSelection(); 
     }
     
+    public void SelectSlotByIndex(int slotIndex)
+    {
+        // We only want to select a valid slot, default to 0 if out of bounds.
+        int targetSlot = Mathf.Clamp(slotIndex, 0, slotsPerRow - 1);
+        SelectSlot(targetSlot);
+    }
+    
     private void UpdateSelection() 
     { 
         if (selectionHighlight != null) 
