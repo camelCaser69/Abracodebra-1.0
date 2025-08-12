@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 522,249 → 353,082 chars (32.4% reduction)
-Estimated tokens saved: ~42,291
+Compression Stats: 522,703 → 352,793 chars (32.5% reduction)
+Estimated tokens saved: ~42,477
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -74,107 +74,107 @@ using System;
   GeneSystemInitializer (Assets\Scripts\Core/) L2490
   InitializationManager (Assets\Scripts\Core/) L2504
   PixelPerfectSetup (Assets\Scripts\Core/) L2534
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L2575
-  SortableEntity (Assets\Scripts\Core/) L2631
-  UIManager (Assets\Scripts\Core/) L2698
-  WeatherManager (Assets\Scripts\Core/) L2932
-  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L3132
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L3185
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L3464
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L3550
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L3559
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L3947
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L4094
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L4107
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L4144
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L4454
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L4485
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L4749
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L4842
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L4857
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L4876
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L4960
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L5036
-  FoodType (Assets\Scripts\Ecosystem\Food/) L5102
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L5115
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L5137
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L5156
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L5461
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L5490
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L5628
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L5646
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L5684
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L5732
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L5750
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L5876
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L5987
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L6034
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L6047
-  TileDefinitionEditor (Assets\Scripts\Editor/) L6108
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L6128
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L6163
-  WaveManagerEditor (Assets\Scripts\Editor/) L6300
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6475
-  CompleteUISetup (Assets\Scripts\Helpers/) L6500
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6896
-  LeafData (Assets\Scripts\PlantSystem\Data/) L6904
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6919
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6958
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6979
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L7111
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L7169
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7255
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7324
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7486
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7557
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7617
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7740
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7756
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7862
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8010
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8108
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L8209
-  GridSnapStartup (Assets\Scripts\Ticks/) L8448
-  TickDebugMonitor (Assets\Scripts\Ticks/) L8515
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8551
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8609
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8840
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8851
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8880
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8976
-  WaterReflection (Assets\Scripts\Visual\Effects/) L9081
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9478
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9514
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9680
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9808
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9982
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9990
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L10019
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L10066
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10233
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10295
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10335
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10359
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10379
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10704
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10716
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10751
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10926
+  SortableEntity (Assets\Scripts\Core/) L2575
+  UIManager (Assets\Scripts\Core/) L2642
+  WeatherManager (Assets\Scripts\Core/) L2876
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L3076
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L3129
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L3408
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L3494
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L3503
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L3891
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L4038
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L4051
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L4088
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L4398
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L4429
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L4693
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L4786
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L4801
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L4820
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L4904
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L4980
+  FoodType (Assets\Scripts\Ecosystem\Food/) L5046
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L5059
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L5081
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L5100
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L5405
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L5434
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L5572
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L5590
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L5628
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L5676
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L5694
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L5820
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L5931
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L5978
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L5991
+  TileDefinitionEditor (Assets\Scripts\Editor/) L6052
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L6072
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L6107
+  WaveManagerEditor (Assets\Scripts\Editor/) L6244
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6419
+  CompleteUISetup (Assets\Scripts\Helpers/) L6444
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6840
+  LeafData (Assets\Scripts\PlantSystem\Data/) L6848
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6863
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6902
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6923
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L7055
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L7113
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7199
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7268
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7430
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7501
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7561
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7684
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7700
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7806
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7954
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8052
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L8153
+  GridSnapStartup (Assets\Scripts\Ticks/) L8392
+  TickDebugMonitor (Assets\Scripts\Ticks/) L8459
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8495
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8553
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8784
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8795
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8824
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8920
+  WaterReflection (Assets\Scripts\Visual\Effects/) L9025
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9422
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9458
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9624
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9752
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9926
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9934
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L9963
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L10010
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10177
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10239
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10279
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10303
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10323
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10639
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10651
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10686
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10861
 
 [WegoSystem]
-  RunManager (Assets\Scripts\Core/) L10937
-  GridEntity (Assets\Scripts\Ticks/) L11073
-  GridPosition (Assets\Scripts\Ticks/) L11230
-  GridPositionManager (Assets\Scripts\Ticks/) L11331
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11668
-  TickConfiguration (Assets\Scripts\Ticks/) L11812
-  ITickUpdateable (Assets\Scripts\Ticks/) L11895
+  RunManager (Assets\Scripts\Core/) L10872
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L11008
+  GridEntity (Assets\Scripts\Ticks/) L11065
+  GridPosition (Assets\Scripts\Ticks/) L11222
+  GridPositionManager (Assets\Scripts\Ticks/) L11323
+  GridRadiusUtility (Assets\Scripts\Ticks/) L11660
+  TickConfiguration (Assets\Scripts\Ticks/) L11804
+  ITickUpdateable (Assets\Scripts\Ticks/) L11887
 
 [for]
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L12047
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L12039
 
 [namespace]
-  GeneEventBus (Assets\Scripts\Genes\Services/) L12272
+  GeneEventBus (Assets\Scripts\Genes\Services/) L12264
 
 ================================================================================
 SCRIPTS
@@ -2723,62 +2723,6 @@ Debug.Log($"[PixelPerfectSetup] Configured for {referenceResolutionX}x{reference
 void Start() {
 float expectedCameraSize = (float)referenceResolutionY / (2f * pixelsPerUnit);
 Debug.Log($"[PixelPerfectSetup] Expected camera orthographic size: {expectedCameraSize}");
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\Core\SingletonMonoBehaviour.cs
-
-﻿// Assets/Scripts/Core/SingletonMonoBehaviour.cs
-
-pub abs cls SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour {
-stat T _instance;
-stat ro object _lock = new object();
-stat bool _applicationIsQuitting = false;
-
-pub stat T Instance {
-get {
-if (_applicationIsQuitting) {
-ret null;
-}
-
-lock (_lock) {
-if (_instance == null) {
-_instance = FindFirstObjectByType<T>();
-
-if (_instance == null && Application.isPlaying) {
-Debug.LogWarning($"[Singleton] Instance of '{typeof(T).Name}' not found. A new one will be created.");
-GameObject singletonObject = new GameObject();
-_instance = singletonObject.AddComponent<T>();
-singletonObject.name = $"[Singleton] {typeof(T).Name}";
-}
-}
-ret _instance;
-}
-}
-}
-
-pub stat bool HasInstance => _instance != null;
-
-prot virt void Awake() {
-if (_instance == null) {
-_instance = this as T;
-transform.SetParent(null);
-DontDestroyOnLoad(gameObject);
-}
-else if (_instance != this) {
-Debug.LogWarning($"[Singleton] Another instance of '{typeof(T).Name}' already exists. Destroying duplicate on '{gameObject.name}'.", gameObject);
-Destroy(gameObject);
-return;
-}
-
-OnAwake();
-}
-
-prot virt void OnAwake() { }
-
-prot virt void OnApplicationQuit() {
-_applicationIsQuitting = true;
 }
 }
 
@@ -10533,7 +10477,7 @@ pub List<ToolRefillRule> refillRules; // <<< NEW LIST FOR REFILLS
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Tiles\TileInteractionManager.cs
 
-﻿// Assets/Scripts/WorldInteraction/Tiles/TileInteractionManager.cs
+﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 using skner.DualGrid;
 using TMPro;
@@ -10591,43 +10535,64 @@ var tickManager = TickManager.Instance;
 if (tickManager != null) {
 tickManager.UnregisterTickUpdateable(this);
 }
-
-}
-
-void OnDisable() {
-if (GridDebugVisualizer.Instance != null) {
-GridDebugVisualizer.Instance.HideContinuousRadius("player_tool_use");
-}
 }
 
 pub void OnTickUpdate(int currentTick) {
 UpdateReversionTicks();
 }
 
-pub void ApplyToolAction(ToolDefinition toolDef) {
-if (toolDef == null || !currentlyHoveredCell.HasValue) {
-return;
+pub TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos) {
+foreach (var mapping in tileDefinitionMappings) {
+if (mapping?.tileDef != null && mapping.tilemapModule != null && !mapping.tileDef.keepBottomTile) {
+bool hasTileInData = mapping.tilemapModule.DataTilemap?.HasTile(cellPos) ?? false;
+
+Transform renderTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+Tilemap renderTilemap = renderTransform?.GetComponent<Tilemap>();
+bool hasTileInRender = renderTilemap?.HasTile(cellPos) ?? false;
+
+if (hasTileInData || hasTileInRender) {
+ret mapping.tileDef; // Found the top-most tile, ret immediately.
 }
+}
+}
+
+foreach (var mapping in tileDefinitionMappings) {
+if (mapping?.tileDef != null && mapping.tilemapModule != null && mapping.tileDef.keepBottomTile) {
+bool hasTileInData = mapping.tilemapModule.DataTilemap?.HasTile(cellPos) ?? false;
+
+Transform renderTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+Tilemap renderTilemap = renderTransform?.GetComponent<Tilemap>();
+bool hasTileInRender = renderTilemap?.HasTile(cellPos) ?? false;
+
+if (hasTileInData || hasTileInRender) {
+ret mapping.tileDef; // Found the base tile.
+}
+}
+}
+
+if (debugLogs) {
+Debug.LogWarning($"[TileInteractionManager] No TileDefinition found at position {cellPos}. " +
+"Ensure tiles are painted on a configured Tilemap (Data or Render) and mappings are correct.");
+}
+ret null;
+}
+
+pub void ApplyToolAction(ToolDefinition toolDef) {
+if (toolDef == null || !currentlyHoveredCell.HasValue) return;
 
 Vector3Int targetCell = currentlyHoveredCell.Value;
 TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
 
-if (currentTileDef == null) {
-return;
-}
+if (currentTileDef == null) return;
 
-if (debugLogs) {
-Debug.Log($"[TileInteractionManager] Checking tile interactions for Tool='{toolDef.displayName}' on Tile='{currentTileDef.displayName}'");
-}
+if (debugLogs) Debug.Log($"[TileInteractionManager] Checking interactions for Tool='{toolDef.displayName}' on Tile='{currentTileDef.displayName}'");
 
 if (interactionLibrary?.refillRules != null) {
 foreach (var refillRule in interactionLibrary.refillRules) {
-if (refillRule != null &&
-refillRule.toolToRefill == toolDef &&
-refillRule.refillSourceTile == currentTileDef) {
+if (refillRule != null && refillRule.toolToRefill == toolDef && refillRule.refillSourceTile == currentTileDef) {
 if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool == toolDef) {
 ToolSwitcher.Instance.RefillCurrentTool();
-return; // Refill action was performed, so we are done with this interaction.
+return;
 }
 }
 }
@@ -10637,12 +10602,10 @@ if (interactionLibrary?.rules != null) {
 TileInteractionRule rule = interactionLibrary.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == currentTileDef);
 if (rule != null) {
 if (rule.toTile != null) {
-if (!rule.toTile.keepBottomTile) {
-RemoveTile(currentTileDef, targetCell);
-}
+if (!rule.toTile.keepBottomTile) RemoveTile(currentTileDef, targetCell);
 PlaceTile(rule.toTile, targetCell);
 }
-else // If toTile is null, it means the tool just removes the fromTile. {
+else {
 RemoveTile(currentTileDef, targetCell);
 }
 }
@@ -10652,30 +10615,23 @@ RemoveTile(currentTileDef, targetCell);
 void CacheHoverSpriteRenderer() {
 if (hoverHighlightObject != null) {
 hoverSpriteRenderer = hoverHighlightObject.GetComponent<SpriteRenderer>();
-if (hoverSpriteRenderer == null) {
-Debug.LogWarning("[TileInteractionManager] hoverHighlightObject has no SpriteRenderer component. Color management will not work.", this);
-}
+if (hoverSpriteRenderer == null) Debug.LogWarning("[TileInteractionManager] hoverHighlightObject has no SpriteRenderer component.", this);
 }
 }
 
 void SetupTilemaps() {
 moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
 definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
-if (tileDefinitionMappings == null) {
-if (debugLogs) Debug.LogWarning("[TileInteractionManager SetupTilemaps] No mappings defined.");
-return;
-}
+if (tileDefinitionMappings == null) return;
+
 foreach (var mapping in tileDefinitionMappings) {
-if (mapping == null || mapping.tileDef == null || mapping.tilemapModule == null) {
-Debug.LogWarning("[TileInteractionManager SetupTilemaps] Null or incomplete mapping found. Skipping.");
-continue;
-}
+if (mapping?.tileDef == null || mapping.tilemapModule == null) continue;
 if (!moduleByDefinition.ContainsKey(mapping.tileDef)) {
 moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
 definitionByModule[mapping.tilemapModule] = mapping.tileDef;
 }
 else {
-Debug.LogWarning($"[TileInteractionManager SetupTilemaps] Duplicate TileDefinition '{mapping.tileDef.displayName}' found in mappings.", mapping.tileDef);
+Debug.LogWarning($"[TileInteractionManager] Duplicate TileDefinition '{mapping.tileDef.displayName}' found in mappings.", mapping.tileDef);
 }
 }
 }
@@ -10684,7 +10640,7 @@ pub void UpdateSortingOrder() {
 if (tileDefinitionMappings == null) return;
 for (int i = 0; i < tileDefinitionMappings.Count; i++) {
 var mapping = tileDefinitionMappings[i];
-if (mapping == null || mapping.tileDef == null || mapping.tilemapModule == null) continue;
+if (mapping?.tilemapModule == null) continue;
 Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
 if (renderTilemapTransform != null) {
 TilemapRenderer renderer = renderTilemapTransform.GetComponent<TilemapRenderer>();
@@ -10701,7 +10657,7 @@ if (!Application.isPlaying) EditorUtility.SetDirty(renderer);
 pub void UpdateAllColors() {
 if (tileDefinitionMappings == null) return;
 foreach (var mapping in tileDefinitionMappings) {
-if (mapping == null || mapping.tileDef == null || mapping.tilemapModule == null) continue;
+if (mapping?.tileDef == null || mapping.tilemapModule == null) continue;
 Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
 if (renderTilemapTransform != null) {
 Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
@@ -10722,28 +10678,29 @@ UpdateDebugUI();
 
 void UpdateReversionTicks() {
 if (timedCells.Count == 0) return;
-List<Vector3Int> cellsToRevert = null;
+List<Vector3Int> cellsToRevert = new List<Vector3Int>();
 foreach (var kvp in timedCells.ToList()) {
 Vector3Int cellPos = kvp.Key;
 TimedTileState state = kvp.Value;
-if (state.tileDef == null) { timedCells.Remove(cellPos); continue; }
+if (state.tileDef == null) {
+timedCells.Remove(cellPos);
+continue;
+}
 state.ticksRemaining--;
 if (state.ticksRemaining <= 0) {
-if (cellsToRevert == null) cellsToRevert = new List<Vector3Int>();
 cellsToRevert.Add(cellPos);
 }
 else {
 timedCells[cellPos] = state;
 }
 }
-if (cellsToRevert != null) {
+
 foreach (var cellPos in cellsToRevert) {
 if (timedCells.TryGetValue(cellPos, out TimedTileState stateToRevert)) {
 timedCells.Remove(cellPos);
 RemoveTile(stateToRevert.tileDef, cellPos);
 if (stateToRevert.tileDef.revertToTile != null) {
 PlaceTile(stateToRevert.tileDef.revertToTile, cellPos);
-}
 }
 }
 }
@@ -10766,26 +10723,9 @@ if (!moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module)) 
 if (module?.DataTilemap != null) {
 module.DataTilemap.SetTile(cellPos, null);
 }
-if (timedCells.TryGetValue(cellPos, out TimedTileState timedState) && timedState.tileDef == tileDef) {
+if (timedCells.ContainsKey(cellPos)) {
 timedCells.Remove(cellPos);
 }
-}
-
-pub TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos) {
-TileDefinition foundDef = null;
-foreach (var mapping in tileDefinitionMappings) {
-if (mapping?.tileDef != null && mapping.tilemapModule?.DataTilemap != null && mapping.tileDef.keepBottomTile) {
-if (mapping.tilemapModule.DataTilemap.HasTile(cellPos)) { foundDef = mapping.tileDef; break; }
-}
-}
-if (foundDef == null) {
-foreach (var kvp in definitionByModule) {
-if (kvp.Key?.DataTilemap != null && kvp.Value != null && !kvp.Value.keepBottomTile) {
-if (kvp.Key.DataTilemap.HasTile(cellPos)) { foundDef = kvp.Value; break; }
-}
-}
-}
-ret foundDef;
 }
 
 void HandleTileHover() {
@@ -10799,10 +10739,9 @@ if (playerGrid == null) return;
 
 int gridRadius = Mathf.CeilToInt(hoverRadius);
 GridPosition playerGridPos = playerGrid.Position;
-GridPosition hoveredGridPos = new GridPosition(cellPos.x, cellPos.y);
+GridPosition hoveredGridPos = new GridPosition(cellPos);
 
 isWithinInteractionRange = GridRadiusUtility.IsWithinCircleRadius(hoveredGridPos, playerGridPos, gridRadius);
-
 hoveredTileDef = FindWhichTileDefinitionAt(cellPos);
 currentlyHoveredCell = cellPos;
 
@@ -10839,15 +10778,11 @@ currentToolText.text = "Nothing Selected";
 }
 
 pub Vector3Int WorldToCell(Vector3 worldPos) {
-if (interactionGrid != null) ret interactionGrid.WorldToCell(worldPos);
-Debug.LogWarning("[WorldToCell] No valid interactionGrid found.");
-ret Vector3Int.zero;
+ret interactionGrid != null ? interactionGrid.WorldToCell(worldPos) : Vector3Int.zero;
 }
 
 Vector3 CellCenterWorld(Vector3Int cellPos) {
-if (interactionGrid != null) ret interactionGrid.GetCellCenterWorld(cellPos);
-Debug.LogWarning("[CellCenterWorld] No valid interactionGrid found.");
-ret Vector3.zero;
+ret interactionGrid != null ? interactionGrid.GetCellCenterWorld(cellPos) : Vector3.zero;
 }
 
 pub bool IsWithinInteractionRange => isWithinInteractionRange;
@@ -11220,6 +11155,63 @@ pub void ForcePhase(GamePhase phase) {
 if (Application.isEditor || Debug.isDebugBuild) {
 SetPhase(phase);
 }
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\SingletonMonoBehaviour.cs
+
+﻿using UnityEngine;
+
+namespace WegoSystem {
+pub abs cls SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour {
+stat T _instance;
+stat ro object _lock = new object();
+stat bool _applicationIsQuitting = false;
+
+pub stat T Instance {
+get {
+if (_applicationIsQuitting) {
+ret null;
+}
+
+lock (_lock) {
+if (_instance == null) {
+_instance = FindFirstObjectByType<T>();
+
+if (_instance == null) {
+Debug.LogError($"[Singleton] CRITICAL: An instance of '{typeof(T).Name}' is needed in the scene, but none was found. " +
+"Ensure a GameObject with this component exists and is active in your scene.");
+}
+}
+ret _instance;
+}
+}
+}
+
+pub stat bool HasInstance => _instance != null;
+
+prot virt void Awake() {
+if (_instance == null) {
+_instance = this as T;
+
+transform.SetParent(null);
+DontDestroyOnLoad(gameObject);
+}
+else if (_instance != this) {
+Debug.LogWarning($"[Singleton] Another instance of '{typeof(T).Name}' already exists. Destroying duplicate on '{gameObject.name}'.", gameObject);
+Destroy(gameObject);
+return;
+}
+
+OnAwake();
+}
+
+prot virt void OnAwake() { }
+
+prot virt void OnApplicationQuit() {
+_applicationIsQuitting = true;
 }
 }
 }
