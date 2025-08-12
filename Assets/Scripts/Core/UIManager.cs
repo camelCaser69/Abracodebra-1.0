@@ -1,5 +1,4 @@
-﻿// Reworked File: Assets/Scripts/Core/UIManager.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using TMPro;
@@ -9,18 +8,15 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
-    [Header("Phase Panels")]
     [SerializeField] private GameObject planningPanel;
     [SerializeField] private GameObject growthAndThreatPanel;
-    [SerializeField] private GameObject geneSequenceUIPanel; // Reworked reference
+    [SerializeField] private GameObject geneSequenceUIPanel;
 
-    [Header("Buttons")]
     [SerializeField] private Button startGrowthPhaseButton;
     [SerializeField] private Button startNewPlanningPhaseButton;
     [SerializeField] private Button endPlanningPhaseButton;
     [SerializeField] private Button advanceTickButton;
 
-    [Header("WE-GO Display")]
     [SerializeField] private GameObject wegoControlPanel;
     [SerializeField] private TextMeshProUGUI currentPhaseText;
     [SerializeField] private TextMeshProUGUI tickCounterText;
@@ -51,6 +47,7 @@ public class UIManager : MonoBehaviour
             return;
         }
 
+        // It is more robust to subscribe to events rather than poll in Update.
         runManager.OnRunStateChanged += HandleRunStateChanged;
         runManager.OnPhaseChanged += HandlePhaseChanged;
         runManager.OnRoundChanged += HandleRoundChanged;
@@ -62,6 +59,7 @@ public class UIManager : MonoBehaviour
 
         SetupButtons();
 
+        // Initial setup calls
         HandleRunStateChanged(runManager.CurrentState);
         UpdatePhaseDisplay();
         UpdateTickDisplay();
@@ -92,15 +90,9 @@ public class UIManager : MonoBehaviour
 
     void HandleRunStateChanged(RunState newState)
     {
-        if (planningPanel != null)
-            planningPanel.SetActive(newState == RunState.Planning);
-
-        if (growthAndThreatPanel != null)
-            growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
-        
-        // The gene editor is now part of the planning phase UI
-        if (geneSequenceUIPanel != null)
-            geneSequenceUIPanel.SetActive(newState == RunState.Planning);
+        if (planningPanel != null) planningPanel.SetActive(newState == RunState.Planning);
+        if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
+        if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(newState == RunState.Planning);
 
         if (InventoryGridController.Instance != null)
         {
@@ -110,7 +102,9 @@ public class UIManager : MonoBehaviour
         if (newState == RunState.GrowthAndThreat)
         {
             if (InventoryBarController.Instance != null)
+            {
                 StartCoroutine(ShowInventoryBarDelayed());
+            }
         }
         else
         {
@@ -120,99 +114,57 @@ public class UIManager : MonoBehaviour
         UpdateButtonStates(newState);
     }
 
-    private void HandlePhaseChanged(GamePhase oldPhase, GamePhase newPhase)
+    void HandlePhaseChanged(GamePhase oldPhase, GamePhase newPhase)
     {
         UpdatePhaseDisplay();
         UpdateButtonStates(runManager.CurrentState);
     }
 
-    private void HandleRoundChanged(int newRound) { }
+    void HandleRoundChanged(int newRound)
+    {
+        // Placeholder for any logic needed when a new round starts
+    }
 
-    private void HandleTickAdvanced(int currentTick)
+    void HandleTickAdvanced(int currentTick)
     {
         UpdateTickDisplay();
         UpdatePhaseProgressDisplay();
     }
 
-    void UpdatePhaseDisplay()
-    {
-        if (currentPhaseText != null && runManager != null)
-        {
-            currentPhaseText.text = $"Phase: {runManager.CurrentPhase}";
-        }
-    }
-
-    void UpdateTickDisplay()
-    {
-        if (tickManager == null) return;
-        string tickInfo = $"Tick: {tickManager.CurrentTick}";
-        if (tickCounterText != null) tickCounterText.text = tickInfo;
-        if (persistentTickCounterText != null) persistentTickCounterText.text = tickInfo;
-    }
-
-    void UpdatePhaseProgressDisplay()
-    {
-        if (phaseProgressText != null && runManager != null)
-        {
-            phaseProgressText.text = $"Phase Ticks: {runManager.CurrentPhaseTicks}";
-        }
-    }
+    void UpdatePhaseDisplay() { if (currentPhaseText != null && runManager != null) currentPhaseText.text = $"Phase: {runManager.CurrentPhase}"; }
+    void UpdateTickDisplay() { if (tickManager == null) return; string tickInfo = $"Tick: {tickManager.CurrentTick}"; if (tickCounterText != null) tickCounterText.text = tickInfo; if (persistentTickCounterText != null) persistentTickCounterText.text = tickInfo; }
+    void UpdatePhaseProgressDisplay() { if (phaseProgressText != null && runManager != null) phaseProgressText.text = $"Phase Ticks: {runManager.CurrentPhaseTicks}"; }
 
     void UpdateButtonStates(RunState state)
     {
         bool isPlanning = (state == RunState.Planning);
         bool isPlanningPhase = (runManager?.CurrentPhase == GamePhase.Planning);
 
-        if (startGrowthPhaseButton != null)
-            startGrowthPhaseButton.interactable = isPlanning && isPlanningPhase;
-
-        if (startNewPlanningPhaseButton != null)
-            startNewPlanningPhaseButton.interactable = !isPlanning;
-
-        if (endPlanningPhaseButton != null)
-            endPlanningPhaseButton.interactable = isPlanning && isPlanningPhase;
-
-        if (advanceTickButton != null)
-            advanceTickButton.interactable = !isPlanningPhase;
+        if (startGrowthPhaseButton != null) startGrowthPhaseButton.interactable = isPlanning && isPlanningPhase;
+        if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.interactable = !isPlanning;
+        if (endPlanningPhaseButton != null) endPlanningPhaseButton.interactable = isPlanning && isPlanningPhase;
+        if (advanceTickButton != null) advanceTickButton.interactable = !isPlanningPhase;
     }
 
-    void OnStartGrowthPhaseClicked()
-    {
-        runManager?.StartGrowthAndThreatPhase();
-    }
+    void OnStartGrowthPhaseClicked() { runManager?.StartGrowthAndThreatPhase(); }
+    void OnStartNewPlanningPhaseClicked() { runManager?.StartNewPlanningPhase(); }
+    void OnEndPlanningPhaseClicked() { runManager?.EndPlanningPhase(); }
+    void OnAdvanceTickClicked() { tickManager?.DebugAdvanceTick(); }
 
-    void OnStartNewPlanningPhaseClicked()
+    IEnumerator ShowInventoryBarDelayed()
     {
-        runManager?.StartNewPlanningPhase();
-    }
-
-    void OnEndPlanningPhaseClicked()
-    {
-        runManager?.EndPlanningPhase();
-    }
-
-    void OnAdvanceTickClicked()
-    {
-        tickManager?.DebugAdvanceTick();
-    }
-
-    private IEnumerator ShowInventoryBarDelayed()
-    {
-        yield return null; // Wait one frame for everything to initialize
+        yield return null;
         InventoryBarController.Instance?.ShowBar();
     }
-    
-    // AutoReturnSeedFromEditorSlot is removed as the concept no longer exists.
-    
-    // Notification system remains unchanged
+
+    // RESTORED: The full notification system.
     public void ShowNotification(string message, float duration = 3f)
     {
         StartCoroutine(ShowNotificationCoroutine(message, duration));
     }
 
-    private IEnumerator ShowNotificationCoroutine(string message, float duration)
+    IEnumerator ShowNotificationCoroutine(string message, float duration)
     {
-        // This implementation remains the same
         GameObject notification = new GameObject("Notification");
         notification.transform.SetParent(transform, false);
 
@@ -225,7 +177,7 @@ public class UIManager : MonoBehaviour
         rectTransform.anchorMin = new Vector2(0.5f, 0.8f);
         rectTransform.anchorMax = new Vector2(0.5f, 0.8f);
         rectTransform.sizeDelta = new Vector2(300, 60);
-        
+
         image.color = new Color(0, 0, 0, 0.8f);
         text.text = message;
         text.color = Color.white;
@@ -234,7 +186,8 @@ public class UIManager : MonoBehaviour
         text.rectTransform.sizeDelta = rectTransform.sizeDelta;
 
         float elapsedTime = 0f;
-        while (elapsedTime < 0.5f) {
+        while (elapsedTime < 0.5f)
+        {
             canvasGroup.alpha = elapsedTime / 0.5f;
             elapsedTime += Time.deltaTime;
             yield return null;
@@ -244,7 +197,8 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(duration - 1f);
 
         elapsedTime = 0f;
-        while (elapsedTime < 0.5f) {
+        while (elapsedTime < 0.5f)
+        {
             canvasGroup.alpha = 1f - (elapsedTime / 0.5f);
             elapsedTime += Time.deltaTime;
             yield return null;
@@ -261,12 +215,7 @@ public class UIManager : MonoBehaviour
             {
                 OnEndPlanningPhaseClicked();
             }
-            else
-            {
-                Debug.Log("[UIManager] Time only advances through player actions!");
-            }
         }
-
         if (Input.GetKeyDown(KeyCode.R) && (Application.isEditor || Debug.isDebugBuild))
         {
             runManager?.ForcePhase(GamePhase.Planning);

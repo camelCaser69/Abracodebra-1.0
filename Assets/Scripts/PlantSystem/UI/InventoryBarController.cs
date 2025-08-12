@@ -21,10 +21,7 @@ public class InventoryBarController : MonoBehaviour
     public InventoryBarItem SelectedItem { get; private set; }
     public event System.Action<InventoryBarItem> OnSelectionChanged;
 
-    public class InventoryBarItemComponent : MonoBehaviour
-    {
-        public InventoryBarItem item;
-    }
+    public class InventoryBarItemComponent : MonoBehaviour { public InventoryBarItem item; }
 
     void Awake()
     {
@@ -35,56 +32,38 @@ public class InventoryBarController : MonoBehaviour
 
     void Start()
     {
-        if (inventoryGridController != null)
-        {
-            inventoryGridController.OnInventoryChanged += HandleInventoryChanged;
-        }
-        else
-        {
-            Debug.LogError($"[{nameof(InventoryBarController)}] InventoryGridController not assigned!", this);
-        }
+        if (inventoryGridController != null) inventoryGridController.OnInventoryChanged += HandleInventoryChanged;
+        else Debug.LogError($"[{nameof(InventoryBarController)}] InventoryGridController not assigned!", this);
 
-        if (inventoryItemViewPrefab == null)
-        {
-            Debug.LogError($"[{nameof(InventoryBarController)}] InventoryItemViewPrefab not assigned! Bar cannot display items.", this);
-        }
+        if (inventoryItemViewPrefab == null) Debug.LogError($"[{nameof(InventoryBarController)}] InventoryItemViewPrefab not assigned!", this);
 
         SetupBarCells();
-        gameObject.SetActive(false); // Start hidden
+        gameObject.SetActive(false);
     }
 
     void OnDestroy()
     {
-        if (inventoryGridController != null)
-        {
-            inventoryGridController.OnInventoryChanged -= HandleInventoryChanged;
-        }
+        if (inventoryGridController != null) inventoryGridController.OnInventoryChanged -= HandleInventoryChanged;
     }
 
     private void UpdateBarDisplay()
     {
         foreach (var slot in barSlots)
         {
-            foreach (Transform child in slot.transform)
-            {
-                Destroy(child.gameObject);
-            }
+            foreach (Transform child in slot.transform) Destroy(child.gameObject);
         }
 
         if (inventoryGridController == null || inventoryItemViewPrefab == null) return;
-
         var allItems = inventoryGridController.GetAllItems();
         int itemsToDisplay = Mathf.Min(allItems.Count, slotsPerRow);
 
         for (int i = 0; i < itemsToDisplay; i++)
         {
             if (i >= barSlots.Count) break;
-
             var item = allItems[i];
             if (item == null || !item.IsValid()) continue;
 
             GameObject itemViewGO = Instantiate(inventoryItemViewPrefab, barSlots[i].transform);
-            
             var itemView = itemViewGO.GetComponentInChildren<ItemView>();
             if (itemView == null)
             {
@@ -92,45 +71,57 @@ public class InventoryBarController : MonoBehaviour
                 Destroy(itemViewGO);
                 continue;
             }
-
             itemViewGO.SetActive(true);
 
             switch(item.Type)
             {
-                case InventoryBarItem.ItemType.Gene:
-                    itemView.InitializeAsGene(item.GeneInstance);
-                    break;
-                case InventoryBarItem.ItemType.Seed:
-                    itemView.InitializeAsSeed(item.SeedTemplate);
-                    break;
-                case InventoryBarItem.ItemType.Tool:
-                    itemView.InitializeAsTool(item.ToolDefinition);
-                    break;
+                case InventoryBarItem.ItemType.Gene: itemView.InitializeAsGene(item.GeneInstance); break;
+                case InventoryBarItem.ItemType.Seed: itemView.InitializeAsSeed(item.SeedTemplate); break;
+                case InventoryBarItem.ItemType.Tool: itemView.InitializeAsTool(item.ToolDefinition); break;
             }
-
             var barItemComponent = itemViewGO.AddComponent<InventoryBarItemComponent>();
             barItemComponent.item = item;
         }
     }
 
-    private void HandleInventoryChanged() { if (gameObject.activeInHierarchy) { UpdateBarDisplay(); UpdateSelection(); } }
+    private void HandleInventoryChanged() 
+    { 
+        if (gameObject.activeInHierarchy) 
+        { 
+            UpdateBarDisplay(); 
+            UpdateSelection(); 
+        } 
+    }
     
-    void Update() { if (!gameObject.activeInHierarchy) return; HandleNumberKeyInput(); }
+    void Update() 
+    { 
+        if (!gameObject.activeInHierarchy) return; 
+        HandleNumberKeyInput(); 
+    }
     
-    public void ShowBar() { RefreshBar(); gameObject.SetActive(true); }
+    public void ShowBar() 
+    { 
+        RefreshBar(); 
+        gameObject.SetActive(true); 
+    }
     
-    public void HideBar() { gameObject.SetActive(false); if (selectionHighlight != null) selectionHighlight.SetActive(false); }
+    public void HideBar() 
+    { 
+        gameObject.SetActive(false); 
+        if (selectionHighlight != null) selectionHighlight.SetActive(false); 
+    }
     
-    private void RefreshBar() { if (selectedSlot < 0 && slotsPerRow > 0) selectedSlot = 0; UpdateBarDisplay(); UpdateSelection(); }
+    private void RefreshBar() 
+    { 
+        if (selectedSlot < 0 && slotsPerRow > 0) selectedSlot = 0; 
+        UpdateBarDisplay(); 
+        UpdateSelection(); 
+    }
     
     private void SetupBarCells() 
     { 
         foreach (Transform child in cellContainer) Destroy(child.gameObject); 
         barSlots.Clear(); 
-        
-        // FIX: The line that incorrectly set the constraint count has been removed.
-        // The GridLayoutGroup's properties will now be respected from the editor settings.
-        
         for (int i = 0; i < slotsPerRow; i++) 
         { 
             GameObject cellGO = new GameObject($"BarCell_{i}", typeof(RectTransform)); 
@@ -141,43 +132,22 @@ public class InventoryBarController : MonoBehaviour
     
     private void HandleNumberKeyInput() 
     { 
-        for (int i = 1; i <= 9; i++) 
-        { 
-            if (Input.GetKeyDown(KeyCode.Alpha0 + i)) 
-            { 
-                SelectSlot(i - 1); return; 
-            } 
-        } 
-        if (Input.GetKeyDown(KeyCode.Alpha0)) 
-        { 
-            SelectSlot(9); 
-        } 
+        for (int i = 1; i <= 9; i++) { if (Input.GetKeyDown(KeyCode.Alpha0 + i)) { SelectSlot(i - 1); return; } } 
+        if (Input.GetKeyDown(KeyCode.Alpha0)) { SelectSlot(9); } 
     }
     
     private void SelectSlot(int slotIndex) 
     { 
         if (slotIndex < 0 || slotIndex >= slotsPerRow) return; 
-        
         SelectedItem = null; 
         selectedSlot = slotIndex; 
-        
         if (slotIndex < barSlots.Count) 
         { 
             var slot = barSlots[slotIndex]; 
             var itemComponent = slot.GetComponentInChildren<InventoryBarItemComponent>(); 
-            if (itemComponent != null) 
-            { 
-                SelectedItem = itemComponent.item; 
-            } 
+            if (itemComponent != null) { SelectedItem = itemComponent.item; } 
         } 
         UpdateSelection(); 
-    }
-    
-    public void SelectSlotByIndex(int slotIndex)
-    {
-        // We only want to select a valid slot, default to 0 if out of bounds.
-        int targetSlot = Mathf.Clamp(slotIndex, 0, slotsPerRow - 1);
-        SelectSlot(targetSlot);
     }
     
     private void UpdateSelection() 
@@ -193,5 +163,11 @@ public class InventoryBarController : MonoBehaviour
             } 
         } 
         OnSelectionChanged?.Invoke(SelectedItem); 
+    }
+
+    public void SelectSlotByIndex(int slotIndex)
+    {
+        int targetSlot = Mathf.Clamp(slotIndex, 0, slotsPerRow - 1);
+        SelectSlot(targetSlot);
     }
 }
