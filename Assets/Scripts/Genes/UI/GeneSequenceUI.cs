@@ -23,8 +23,8 @@ namespace Abracodabra.UI.Genes
         public TMPro.TextMeshProUGUI energyCostText;
         public TMPro.TextMeshProUGUI currentEnergyText;
         public TMPro.TextMeshProUGUI rechargeTimeText;
-        public Slider rechargeProgress;
         public TMPro.TextMeshProUGUI validationMessage;
+        public Slider rechargeProgress; // Restored this public field
 
         [Header("Configuration")]
         public int maxPassiveSlots = 6;
@@ -37,40 +37,10 @@ namespace Abracodabra.UI.Genes
 
         void Start()
         {
-            InitializeUI();
-            SetEditorLocked(true);
-            RefreshAllVisuals();
+            // InitializeUI was removed from here to support dynamic creation
+            ClearEditor();
         }
 
-        private void InitializeUI()
-        {
-            foreach (Transform child in passiveGenesContainer) Destroy(child.gameObject);
-            foreach (Transform child in activeSequenceContainer) Destroy(child.gameObject);
-            passiveSlots.Clear();
-            sequenceRows.Clear();
-
-            for (int i = 0; i < maxPassiveSlots; i++)
-            {
-                GameObject slotObj = Instantiate(passiveSlotPrefab, passiveGenesContainer);
-                GeneSlotUI slot = slotObj.GetComponent<GeneSlotUI>();
-                slot.acceptedCategory = GeneCategory.Passive;
-                slot.slotIndex = i;
-                passiveSlots.Add(slot);
-            }
-
-            for (int i = 0; i < maxSequenceLength; i++)
-            {
-                GameObject rowObj = Instantiate(sequenceRowPrefab, activeSequenceContainer);
-                
-                // FIX: Explicitly activate the newly created row GameObject.
-                rowObj.SetActive(true);
-
-                SequenceRowUI row = rowObj.GetComponent<SequenceRowUI>();
-                row.Initialize(i, this);
-                sequenceRows.Add(row);
-            }
-        }
-        
         public void LoadSeedForEditing(InventoryBarItem seedItem)
         {
             if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed)
@@ -78,12 +48,14 @@ namespace Abracodabra.UI.Genes
                 ClearEditor();
                 return;
             }
-            
+
             this.runtimeState = seedItem.SeedRuntimeState;
             if (seedEditSlot != null)
             {
                 seedEditSlot.SetItem(seedItem);
             }
+
+            GenerateSlotsFromState();
             SetEditorLocked(false);
             RefreshAllVisuals();
         }
@@ -95,62 +67,86 @@ namespace Abracodabra.UI.Genes
             {
                 seedEditSlot.ClearSlot();
             }
+
+            foreach (var slot in passiveSlots) if(slot != null) Destroy(slot.gameObject);
+            foreach (var row in sequenceRows) if(row != null) Destroy(row.gameObject);
+            passiveSlots.Clear();
+            sequenceRows.Clear();
+
             SetEditorLocked(true);
             RefreshAllVisuals();
         }
-        
+
+        private void GenerateSlotsFromState()
+        {
+            foreach (var slot in passiveSlots) if(slot != null) Destroy(slot.gameObject);
+            foreach (var row in sequenceRows) if(row != null) Destroy(row.gameObject);
+            passiveSlots.Clear();
+            sequenceRows.Clear();
+
+            if (runtimeState == null) return;
+            
+            // This now uses the seed's specific template counts
+            for (int i = 0; i < runtimeState.template.passiveSlotCount; i++)
+            {
+                GameObject slotObj = Instantiate(passiveSlotPrefab, passiveGenesContainer);
+                slotObj.SetActive(true);
+                GeneSlotUI slot = slotObj.GetComponent<GeneSlotUI>();
+                slot.acceptedCategory = GeneCategory.Passive;
+                slot.slotIndex = i;
+                passiveSlots.Add(slot);
+            }
+
+            for (int i = 0; i < runtimeState.template.activeSequenceLength; i++)
+            {
+                GameObject rowObj = Instantiate(sequenceRowPrefab, activeSequenceContainer);
+                rowObj.SetActive(true);
+                SequenceRowUI row = rowObj.GetComponent<SequenceRowUI>();
+                row.Initialize(i, this);
+                sequenceRows.Add(row);
+            }
+        }
+
         private void SetEditorLocked(bool isLocked)
         {
-            foreach (var slot in passiveSlots)
-            {
-                slot.isLocked = isLocked;
-            }
+            foreach (var slot in passiveSlots) slot.isLocked = isLocked;
             foreach (var row in sequenceRows)
             {
                 if (row.activeSlot != null) row.activeSlot.isLocked = isLocked;
             }
         }
 
-        public void UpdateGeneInSequence(int rowIndex, GeneCategory slotCategory, InventoryBarItem newItem)
+        public void UpdateDataForSlot(int slotIndex, GeneCategory slotCategory, InventoryBarItem newItem)
         {
-            if (runtimeState == null || rowIndex < 0 || rowIndex >= runtimeState.activeSequence.Count) return;
+            if (runtimeState == null) return;
+            var newInstance = newItem?.GeneInstance;
 
-            RuntimeSequenceSlot sequenceSlot = runtimeState.activeSequence[rowIndex];
-            RuntimeGeneInstance newInstance = newItem?.GeneInstance;
-
-            switch (slotCategory)
+            if (slotCategory == GeneCategory.Passive)
             {
-                case GeneCategory.Active:
-                    sequenceSlot.activeInstance = newInstance;
-                    break;
-                case GeneCategory.Modifier:
-                    // Assuming one modifier slot for now
-                    if (sequenceSlot.modifierInstances.Count == 0) sequenceSlot.modifierInstances.Add(null);
-                    sequenceSlot.modifierInstances[0] = newInstance;
-                    break;
-                case GeneCategory.Payload:
-                    // Assuming one payload slot for now
-                    if (sequenceSlot.payloadInstances.Count == 0) sequenceSlot.payloadInstances.Add(null);
-                    sequenceSlot.payloadInstances[0] = newInstance;
-                    break;
+                if (slotIndex < 0) return;
+                while (runtimeState.passiveInstances.Count <= slotIndex) runtimeState.passiveInstances.Add(null);
+                runtimeState.passiveInstances[slotIndex] = newInstance;
             }
-            
-            RefreshAllVisuals();
-        }
-
-        // NEW: Dedicated method for updating passive genes.
-        public void UpdatePassiveGene(int slotIndex, InventoryBarItem newItem)
-        {
-            if (runtimeState == null || slotIndex < 0) return;
-
-            // Ensure the passive instances list is large enough
-            while (runtimeState.passiveInstances.Count <= slotIndex)
+            else
             {
-                runtimeState.passiveInstances.Add(null);
+                if (slotIndex < 0 || slotIndex >= runtimeState.activeSequence.Count) return;
+                RuntimeSequenceSlot sequenceSlot = runtimeState.activeSequence[slotIndex];
+                
+                switch (slotCategory)
+                {
+                    case GeneCategory.Active:
+                        sequenceSlot.activeInstance = newInstance;
+                        break;
+                    case GeneCategory.Modifier:
+                        if (sequenceSlot.modifierInstances.Count == 0) sequenceSlot.modifierInstances.Add(newInstance);
+                        else sequenceSlot.modifierInstances[0] = newInstance;
+                        break;
+                    case GeneCategory.Payload:
+                        if (sequenceSlot.payloadInstances.Count == 0) sequenceSlot.payloadInstances.Add(newInstance);
+                        else sequenceSlot.payloadInstances[0] = newInstance;
+                        break;
+                }
             }
-
-            runtimeState.passiveInstances[slotIndex] = newItem?.GeneInstance;
-            
             RefreshAllVisuals();
         }
 
@@ -158,7 +154,7 @@ namespace Abracodabra.UI.Genes
         {
             if (runtimeState != null && rowIndex >= 0 && rowIndex < runtimeState.activeSequence.Count)
             {
-                return runtimeState.activeSequence[rowIndex].activeInstance?.GetGene<ActiveGene>();
+                return runtimeState.activeSequence[rowIndex]?.activeInstance?.GetGene<ActiveGene>();
             }
             return null;
         }
@@ -167,8 +163,6 @@ namespace Abracodabra.UI.Genes
         {
             if (runtimeState == null)
             {
-                for (int i = 0; i < passiveSlots.Count; i++) passiveSlots[i].ClearSlot();
-                for (int i = 0; i < sequenceRows.Count; i++) sequenceRows[i].ClearRow();
                 UpdateDisplay();
                 return;
             }
@@ -218,16 +212,7 @@ namespace Abracodabra.UI.Genes
             float totalCost = runtimeState.CalculateTotalEnergyCost();
             if (energyCostText != null) energyCostText.text = $"Cost: {totalCost:F0} E/cycle";
             if (rechargeTimeText != null) rechargeTimeText.text = $"Recharge: {runtimeState.template.baseRechargeTime} ticks";
-
-            if (executor != null && executor.plantGrowth != null && executor.plantGrowth.EnergySystem != null)
-            {
-                var energySystem = executor.plantGrowth.EnergySystem;
-                if (currentEnergyText != null) currentEnergyText.text = $"Energy: {energySystem.CurrentEnergy:F0}/{energySystem.MaxEnergy:F0}";
-            }
-            else
-            {
-                if (currentEnergyText != null) currentEnergyText.text = $"Energy: --/{runtimeState.template.maxEnergy:F0}";
-            }
+            if (currentEnergyText != null) currentEnergyText.text = $"Energy: --/{runtimeState.template.maxEnergy:F0}";
 
             bool isValid = ValidateConfiguration();
             if (validationMessage != null) validationMessage.gameObject.SetActive(!isValid);
@@ -252,12 +237,14 @@ namespace Abracodabra.UI.Genes
             }
             return true;
         }
-
+        
+        // Restored Method
         public void ConnectToExecutor(PlantSequenceExecutor exec)
         {
             executor = exec;
         }
 
+        // Restored Method
         void Update()
         {
             if (executor != null && executor.plantGrowth != null && executor.plantGrowth.EnergySystem != null && runtimeState != null)

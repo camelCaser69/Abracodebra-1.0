@@ -30,12 +30,10 @@ namespace Abracodabra.UI.Genes
         [SerializeField] private Color highlightColor = Color.yellow;
         [SerializeField] private Color invalidColor = Color.red;
         [SerializeField] private Color executingColor = Color.cyan;
-
+        
         public InventoryBarItem CurrentItem { get; private set; }
-
         private GeneSequenceUI parentSequence;
         private IGeneEventBus eventBus;
-
         private GameObject draggedVisual;
         private Canvas canvas;
         private bool isPointerOver = false;
@@ -44,7 +42,6 @@ namespace Abracodabra.UI.Genes
         {
             parentSequence = GetComponentInParent<GeneSequenceUI>();
             canvas = GetComponentInParent<Canvas>();
-
             if (itemView == null) itemView = GetComponentInChildren<ItemView>(true);
             if (itemView == null) Debug.LogError($"GeneSlotUI on {gameObject.name} is missing its ItemView child component.", this);
         }
@@ -55,11 +52,13 @@ namespace Abracodabra.UI.Genes
             UpdateVisuals();
         }
 
+        // Restored Method
         void OnEnable()
         {
             eventBus?.Subscribe<GeneExecutedEvent>(OnGeneExecuted);
         }
 
+        // Restored Method
         void OnDisable()
         {
             eventBus?.Unsubscribe<GeneExecutedEvent>(OnGeneExecuted);
@@ -75,7 +74,7 @@ namespace Abracodabra.UI.Genes
         {
             SetItem(null);
         }
-
+        
         private void UpdateVisuals()
         {
             if (itemView == null || slotBackground == null) return;
@@ -109,36 +108,9 @@ namespace Abracodabra.UI.Genes
             }
 
             if (lockedOverlay != null) lockedOverlay.SetActive(isLocked);
-            if (isPointerOver)
+            if (isPointerOver && !isLocked)
             {
                 slotBackground.color = highlightColor;
-            }
-        }
-
-        public void OnBeginDrag(PointerEventData eventData)
-        {
-            if (!isDraggable || CurrentItem == null || isLocked)
-            {
-                eventData.pointerDrag = null;
-                return;
-            }
-            CreateDragVisual();
-        }
-
-        public void OnDrag(PointerEventData eventData)
-        {
-            if (draggedVisual != null)
-            {
-                draggedVisual.transform.position = eventData.position;
-            }
-        }
-
-        public void OnEndDrag(PointerEventData eventData)
-        {
-            if (draggedVisual != null)
-            {
-                Destroy(draggedVisual);
-                draggedVisual = null;
             }
         }
         
@@ -165,11 +137,7 @@ namespace Abracodabra.UI.Genes
         {
             var sourceItem = source.CurrentItem;
             var destinationItem = destination.CurrentItem;
-        
-            if (!IsItemValidForSlot(sourceItem, destination)) return false;
-            if (!IsItemValidForSlot(destinationItem, source)) return false;
-        
-            return true;
+            return IsItemValidForSlot(sourceItem, destination) && IsItemValidForSlot(destinationItem, source);
         }
 
         private bool IsItemValidForSlot(InventoryBarItem item, GeneSlotUI slot)
@@ -179,15 +147,11 @@ namespace Abracodabra.UI.Genes
             var seedEditSlotField = slot.parentSequence?.GetType().GetField("seedEditSlot", BindingFlags.NonPublic | BindingFlags.Instance);
             GeneSlotUI seedEditSlot = seedEditSlotField?.GetValue(slot.parentSequence) as GeneSlotUI;
 
-            if (slot == seedEditSlot)
-            {
-                return item.Type == InventoryBarItem.ItemType.Seed;
-            }
+            if (slot == seedEditSlot) return item.Type == InventoryBarItem.ItemType.Seed;
         
             if (slot.parentSequence != null)
             {
                 if (item.Type != InventoryBarItem.ItemType.Gene) return false;
-        
                 var gene = item.GeneInstance.GetGene();
                 if (gene.Category != slot.acceptedCategory) return false;
         
@@ -197,11 +161,9 @@ namespace Abracodabra.UI.Genes
                     if (activeGene == null || !gene.CanAttachTo(activeGene)) return false;
                 }
             }
-            
             return true;
         }
 
-        // MODIFIED: This method now correctly routes passive gene updates.
         private void UpdateSlotContents(GeneSlotUI slot, InventoryBarItem newItem)
         {
             var seedEditSlotField = slot.parentSequence?.GetType().GetField("seedEditSlot", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -213,17 +175,9 @@ namespace Abracodabra.UI.Genes
             }
             else if (slot.parentSequence != null)
             {
-                // This is the key fix: check the category to call the right method.
-                if (slot.acceptedCategory == GeneCategory.Passive)
-                {
-                    slot.parentSequence.UpdatePassiveGene(slot.slotIndex, newItem);
-                }
-                else
-                {
-                    slot.parentSequence.UpdateGeneInSequence(slot.slotIndex, slot.acceptedCategory, newItem);
-                }
+                slot.parentSequence.UpdateDataForSlot(slot.slotIndex, slot.acceptedCategory, newItem);
             }
-            else // This is a plain inventory slot
+            else
             {
                 slot.SetItem(newItem);
             }
@@ -232,22 +186,31 @@ namespace Abracodabra.UI.Genes
         public void OnPointerEnter(PointerEventData eventData)
         {
             isPointerOver = true;
-            if (isLocked || slotBackground == null) return;
-            if (eventData.pointerDrag != null)
-            {
-                slotBackground.color = highlightColor;
-            }
+            UpdateVisuals();
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
             isPointerOver = false;
-            if (slotBackground != null)
-            {
-                UpdateVisuals();
-            }
+            UpdateVisuals();
         }
 
+        public void OnBeginDrag(PointerEventData eventData)
+        {
+            if (!isDraggable || CurrentItem == null || isLocked) { eventData.pointerDrag = null; return; }
+            CreateDragVisual();
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            if (draggedVisual != null) draggedVisual.transform.position = eventData.position;
+        }
+
+        public void OnEndDrag(PointerEventData eventData)
+        {
+            if (draggedVisual != null) Destroy(draggedVisual);
+        }
+        
         private void CreateDragVisual()
         {
             if (canvas == null || CurrentItem == null) return;
@@ -262,11 +225,7 @@ namespace Abracodabra.UI.Genes
             rect.sizeDelta = new Vector2(64, 64);
         }
 
-        private void ShowInvalidDropFeedback()
-        {
-            StartCoroutine(FlashColor(invalidColor));
-        }
-
+        private void ShowInvalidDropFeedback() { StartCoroutine(FlashColor(invalidColor)); }
         IEnumerator FlashColor(Color flashColor)
         {
             if (slotBackground == null) yield break;
@@ -276,7 +235,8 @@ namespace Abracodabra.UI.Genes
             slotBackground.color = originalColor;
             UpdateVisuals();
         }
-
+        
+        // Restored Method
         private void OnGeneExecuted(GeneExecutedEvent evt)
         {
             if (CurrentItem != null && CurrentItem.Type == InventoryBarItem.ItemType.Gene && CurrentItem.GeneInstance.GetGene()?.GUID == evt.Gene.GUID)
@@ -285,6 +245,7 @@ namespace Abracodabra.UI.Genes
             }
         }
 
+        // Restored Method
         public void ShowExecuting()
         {
             if (executingEffect != null) executingEffect.SetActive(true);
@@ -292,6 +253,7 @@ namespace Abracodabra.UI.Genes
             Invoke(nameof(HideExecuting), 0.5f);
         }
 
+        // Restored Method
         public void HideExecuting()
         {
             if (executingEffect != null) executingEffect.SetActive(false);

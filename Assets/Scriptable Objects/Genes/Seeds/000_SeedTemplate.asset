@@ -15,11 +15,25 @@ MonoBehaviour:
   templateName: Starter Seed Template
   description: 
   icon: {fileID: 21300000, guid: 1db862c5c07e3d04f989efcb5a55e5b4, type: 3}
+  passiveSlotCount: 4
+  activeSequenceLength: 3
   passiveGenes:
   - gene: {fileID: 0}
     powerMultiplier: 0
+  - gene: {fileID: 0}
+    powerMultiplier: 1
+  - gene: {fileID: 0}
+    powerMultiplier: 1
+  - gene: {fileID: 0}
+    powerMultiplier: 1
   activeSequence:
   - activeGene: {fileID: 11400000, guid: 0fcc40c60bfe57149b2d4d2fe5dd94c3, type: 2}
+    modifiers: []
+    payloads: []
+  - activeGene: {fileID: 0}
+    modifiers: []
+    payloads: []
+  - activeGene: {fileID: 0}
     modifiers: []
     payloads: []
   baseRechargeTime: 3
