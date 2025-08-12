@@ -4,7 +4,7 @@ using System.Linq;
 using UnityEngine;
 using WegoSystem;
 using Abracodabra.Genes;
-using Abracodabra.UI.Genes; // FIX: Added the missing using statement for PlantPlacementManager
+using Abracodabra.UI.Genes;
 
 public enum PlayerActionType
 {
@@ -67,12 +67,13 @@ public class PlayerActionManager : MonoBehaviour
                 }
                 break;
 
+            // FIX: This case has been restructured to be synchronous, following the analysis document.
             case PlayerActionType.PlantSeed:
                 tickCost = 2; // Planting takes longer
                 var seedItem = actionData as InventoryBarItem;
-                Func<bool> plantAction = () => ExecutePlantSeed(gridPosition, seedItem);
-                StartCoroutine(ExecuteDelayedAction(plantAction, tickCost, onSuccessCallback, actionType, actionData));
-                return true; // Return early, coroutine handles the rest
+                success = ExecutePlantSeed(gridPosition, seedItem);
+                // We no longer start a coroutine or return early. The standard success handling below will now work correctly.
+                break;
 
             case PlayerActionType.Harvest:
                 success = ExecuteHarvest(gridPosition);
@@ -100,14 +101,28 @@ public class PlayerActionManager : MonoBehaviour
     {
         if (tool == null) return false;
         TileInteractionManager.Instance?.ApplyToolAction(tool);
-        return true; // Assume success for now
+        return true;
     }
 
+    // FIX: Added the recommended debug logs for better traceability.
     private bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem)
     {
-        // MODIFIED: Pass the SeedRuntimeState from the item, not the item itself.
-        if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed) return false;
-        return PlantPlacementManager.Instance?.TryPlantSeedFromInventory(seedItem.SeedRuntimeState, gridPosition, TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)) ?? false;
+        if (debugMode) Debug.Log($"[ExecutePlantSeed] Attempting to plant {seedItem?.GetDisplayName()} at {gridPosition}");
+
+        if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed) 
+        {
+            Debug.LogError("[ExecutePlantSeed] Action failed: Provided item was not a valid seed.");
+            return false;
+        }
+    
+        bool result = PlantPlacementManager.Instance?.TryPlantSeedFromInventory(
+            seedItem.SeedRuntimeState, 
+            gridPosition, 
+            TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)
+        ) ?? false;
+    
+        if (debugMode) Debug.Log($"[ExecutePlantSeed] PlantPlacementManager returned: {result}");
+        return result;
     }
 
     private bool ExecuteHarvest(Vector3Int gridPosition)
@@ -125,12 +140,7 @@ public class PlayerActionManager : MonoBehaviour
         if (plant == null) return false;
 
         Debug.LogWarning("PlayerActionManager.ExecuteHarvest needs to be updated to handle returned items from PlantGrowth.");
-        bool wasHarvested = true; // Placeholder
-
-        if(wasHarvested)
-        {
-            // Future: Add harvested item to inventory
-        }
+        bool wasHarvested = true;
 
         return wasHarvested;
     }
@@ -141,25 +151,27 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
+    // This method is no longer used by the planting action, but is kept for other potential delayed actions.
     IEnumerator ExecuteDelayedAction(Func<bool> action, int tickCost, Action onSuccessCallback, PlayerActionType actionType, object actionData)
     {
-        for (int i = 0; i < tickCost - 1; i++)
+        // This simulates the action taking time before the result is known.
+        for (int i = 0; i < tickCost -1; i++)
         {
-            TickManager.Instance.AdvanceTick();
             yield return new WaitForSeconds(multiTickActionDelay);
+            AdvanceGameTick(1);
         }
 
         bool success = action.Invoke();
-        TickManager.Instance.AdvanceTick();
 
         if (success)
         {
+            AdvanceGameTick(1); // Final tick
             onSuccessCallback?.Invoke();
             OnActionExecuted?.Invoke(actionType, actionData);
         }
         else
         {
-            OnActionFailed?.Invoke("Delayed action failed");
+            OnActionFailed?.Invoke($"{actionType} (delayed) failed");
         }
     }
 

@@ -1,15 +1,14 @@
-﻿// File: Assets/Scripts/Genes/Implementations/Active/BasicFruitGene.cs
-using UnityEngine;
+﻿using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Components;
+using System.Collections.Generic; // Required for List
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "BasicFruitGene", menuName = "Abracodabra/Genes/Active/Basic Fruit")]
+    [CreateAssetMenu(fileName = "NewBasicFruitGene", menuName = "Abracodabra/Genes/Active/Basic Fruit Gene")]
     public class BasicFruitGene : ActiveGene
     {
-        [Header("Fruit Settings")]
         public GameObject fruitPrefab;
         public float growthTime = 2f;
         public int fruitCount = 1;
@@ -24,7 +23,6 @@ namespace Abracodabra.Genes.Implementations
             }
 
             var effectPool = GeneServices.Get<IGeneEffectPool>();
-            // This assumes PlantGrowth will be updated to have a method like GetFruitSpawnPoints()
             Transform[] fruitPoints = context.plant.GetFruitSpawnPoints();
 
             if (fruitPoints.Length == 0)
@@ -74,16 +72,21 @@ namespace Abracodabra.Genes.Implementations
             fruit.SourcePlant = context.plant;
             fruit.GrowthTime = growthTime;
 
-            // Apply all attached payload effects to the fruit instance
             foreach (var payloadInstance in context.payloads)
             {
                 payloadInstance.GetGene<PayloadGene>()?.ConfigureFruit(fruit, payloadInstance);
             }
         }
+        
+        // FIX: Override the validation to allow this gene to be valid even without a payload.
+        public override bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
+        {
+            // A basic fruit is always a valid configuration. It doesn't require a payload to function.
+            return true;
+        }
 
         public override string GetTooltip(GeneTooltipContext context)
         {
-            // FIX: Replaced '⚡' with 'E' to prevent font warnings.
             return $"{description}\n\n" +
                    $"Grows <b>{fruitCount}</b> fruit(s).\n" +
                    $"Growth Time: <b>{growthTime}s</b>\n" +

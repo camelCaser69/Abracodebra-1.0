@@ -58,28 +58,42 @@ namespace Abracodabra.UI.Genes
             }
         }
         
+        // REWRITTEN WITH DETAILED LOGGING
         public bool TryPlantSeedFromInventory(PlantGeneRuntimeState runtimeState, Vector3Int gridPosition, Vector3 worldPosition)
         {
-            if (runtimeState == null || runtimeState.template == null) return false;
-
+            if (runtimeState == null || runtimeState.template == null)
+            {
+                Debug.LogError("[PlantPlacementManager] Failed: RuntimeState or its template was null.");
+                return false;
+            }
+            
             if (!runtimeState.template.IsValid())
             {
-                Debug.LogError($"Cannot plant '{runtimeState.template.templateName}': The seed template configuration is invalid.", runtimeState.template);
+                Debug.LogError($"[PlantPlacementManager] Failed: Seed template '{runtimeState.template.templateName}' configuration is invalid.", runtimeState.template);
                 return false;
             }
 
-            if (IsPositionOccupied(gridPosition)) return false;
+            if (IsPositionOccupied(gridPosition))
+            {
+                // THIS IS THE MOST LIKELY CULPRIT.
+                Debug.LogWarning($"[PlantPlacementManager] Failed: Position {gridPosition} is already occupied by another plant in the dictionary.", this);
+                return false;
+            }
 
             TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
-            if (!IsTileValidForPlanting(tileDef)) return false;
+            if (!IsTileValidForPlanting(tileDef))
+            {
+                string tileName = tileDef != null ? tileDef.displayName : "NULL";
+                Debug.LogWarning($"[PlantPlacementManager] Failed: Tile '{tileName}' at {gridPosition} is not a valid planting tile.", this);
+                return false;
+            }
 
-            // FIX: Add a fallback check for the NodeExecutor to make planting more robust.
             if (nodeExecutor == null)
             {
                 nodeExecutor = FindFirstObjectByType<NodeExecutor>();
                 if (nodeExecutor == null)
                 {
-                    Debug.LogError("Cannot plant: NodeExecutor reference is missing in PlantPlacementManager and could not be found in the scene!");
+                    Debug.LogError("[PlantPlacementManager] Failed: NodeExecutor reference is missing and could not be found in the scene!");
                     return false;
                 }
             }
@@ -87,20 +101,24 @@ namespace Abracodabra.UI.Genes
             Vector3 finalPlantingPosition = GetRandomizedPlantingPosition(worldPosition);
             GameObject plantGO = nodeExecutor.SpawnPlantFromState(runtimeState, finalPlantingPosition, plantParent);
 
-            if (plantGO == null) return false;
+            if (plantGO == null)
+            {
+                Debug.LogError("[PlantPlacementManager] Failed: NodeExecutor returned a null plant GameObject. Check NodeExecutor's logs (is its Plant Prefab assigned?).", this);
+                return false;
+            }
 
             WegoSystem.GridPositionManager.Instance.SnapEntityToGrid(plantGO);
             var finalGridEntity = plantGO.GetComponent<WegoSystem.GridEntity>();
             Vector3Int finalGridPosition = finalGridEntity.Position.ToVector3Int();
 
             plantsByGridPosition[finalGridPosition] = plantGO;
+            Debug.Log($"[PlantPlacementManager] Successfully planted '{runtimeState.template.templateName}' and registered it at final grid position {finalGridPosition}.");
             return true;
         }
 
         private Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition)
         {
             if (spawnRadius <= 0f) return centerPosition;
-
             Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
             return centerPosition + new Vector3(randomOffset.x, randomOffset.y, 0);
         }

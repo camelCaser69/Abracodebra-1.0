@@ -14,7 +14,6 @@ namespace Abracodabra.Genes.Templates
         public Sprite icon;
 
         [Header("Gene Slot Configuration")]
-        // FIX: Added these two fields. They are required by GeneSequenceUI.
         [Range(1, 8)] public int passiveSlotCount = 3;
         [Range(1, 8)] public int activeSequenceLength = 3;
 
@@ -31,15 +30,34 @@ namespace Abracodabra.Genes.Templates
         public bool isUnlocked = true;
         public List<string> unlockRequirements = new List<string>();
 
+        // REWRITTEN and CORRECTED IsValid() method
         public bool IsValid()
         {
-            if (activeSequence.Count == 0) return false;
+            bool hasAtLeastOneActiveGene = false;
+
+            // Go through each slot in the sequence
             foreach (var slot in activeSequence)
             {
-                if (slot.activeGene == null) return false;
-                if (!slot.Validate()) return false;
+                // If the slot has no active gene, it's just an empty slot. This is perfectly valid, so we skip it.
+                if (slot.activeGene == null)
+                {
+                    continue;
+                }
+
+                // If we find a slot that IS configured, we mark that the template has an active gene.
+                hasAtLeastOneActiveGene = true;
+
+                // Now, for this configured slot, we must ensure its own configuration is valid (e.g., not too many modifiers).
+                if (!slot.Validate())
+                {
+                    // If a configured slot is invalid, the entire template is invalid.
+                    return false;
+                }
             }
-            return true;
+
+            // The template is only valid if we found at least one configured active gene.
+            // A template with zero active genes is not plantable.
+            return hasAtLeastOneActiveGene;
         }
 
         public PlantGeneRuntimeState CreateRuntimeState()
@@ -50,10 +68,8 @@ namespace Abracodabra.Genes.Templates
             return state;
         }
 
-        // This method is useful for ensuring the data structure matches the counts.
         private void OnValidate()
         {
-            // Ensure passive gene list matches the slot count
             while (passiveGenes.Count < passiveSlotCount)
             {
                 passiveGenes.Add(new GeneTemplateEntry());
@@ -63,7 +79,6 @@ namespace Abracodabra.Genes.Templates
                 passiveGenes.RemoveAt(passiveGenes.Count - 1);
             }
 
-            // Ensure active sequence list matches the length
             while (activeSequence.Count < activeSequenceLength)
             {
                 activeSequence.Add(new SequenceSlotTemplate());
@@ -92,7 +107,7 @@ namespace Abracodabra.Genes.Templates
 
         public bool Validate()
         {
-            if (activeGene == null) return false;
+            if (activeGene == null) return true; // An empty slot is inherently valid.
             if (modifiers.Count > activeGene.slotConfig.modifierSlots) return false;
             if (payloads.Count > activeGene.slotConfig.payloadSlots) return false;
 
