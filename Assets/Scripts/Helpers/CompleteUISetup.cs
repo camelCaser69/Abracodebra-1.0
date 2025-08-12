@@ -24,19 +24,16 @@ public class CompleteUISetup : MonoBehaviour
     {
         Debug.Log("[CompleteUISetup] Starting complete UI setup...");
 
-        // 1. Setup Core Scene Requirements
         CreateEventSystem();
         Canvas mainCanvas = CreateMainCanvas();
         GameObject prefabContainer = new GameObject("[Generated Prefabs]");
         prefabContainer.SetActive(false);
 
-        // 2. Create UI Panels
         GameObject planningPanel = CreatePanel("PlanningPanel", mainCanvas.transform);
         GameObject growthThreatPanel = CreatePanel("GrowthAndThreatPanel", mainCanvas.transform);
-        planningPanel.SetActive(true); // Start with planning panel active
+        planningPanel.SetActive(true);
         growthThreatPanel.SetActive(false);
 
-        // 3. Create All Required Prefab Assets (as GameObjects first)
         GameObject itemViewPrefab = CreateItemViewPrefab();
         itemViewPrefab.transform.SetParent(prefabContainer.transform);
 
@@ -49,7 +46,6 @@ public class CompleteUISetup : MonoBehaviour
         GameObject sequenceRowPrefab = CreateSequenceRowPrefab(itemViewPrefab);
         sequenceRowPrefab.transform.SetParent(prefabContainer.transform);
 
-        // 4. Populate Panels with UI Modules
         InventoryGridController inventoryGrid = CreateInventoryGrid(planningPanel.transform, itemSlotPrefab);
         CreateInventoryBar(growthThreatPanel.transform, itemViewPrefab, inventoryGrid);
         GeneSequenceUI geneSequenceUI = CreateGeneSequenceUI(planningPanel.transform, passiveSlotPrefab, sequenceRowPrefab);
@@ -57,10 +53,9 @@ public class CompleteUISetup : MonoBehaviour
         CreateControlButtons(planningPanel.transform, growthThreatPanel.transform);
         GameObject wegoPanel = CreateDebugUI(mainCanvas.transform);
 
-        // 5. Link everything to the UIManager
         LinkToUIManager(planningPanel, growthThreatPanel, geneSequenceUI, wegoPanel);
 
-        Debug.Log("[CompleteUISetup] UI setup complete! You should now create Prefab Assets from the GameObjects inside '[Generated Prefabs]'.");
+        Debug.Log("[CompleteUISetup] UI setup complete! Please create Prefab Assets from the GameObjects inside '[Generated Prefabs]'.");
 
         if (destroyAfterSetup)
         {
@@ -69,7 +64,7 @@ public class CompleteUISetup : MonoBehaviour
         }
     }
 
-    #region Core Scene & Panel Creation
+    #region Core & Panel Creation
     void CreateEventSystem()
     {
         if (FindObjectOfType<EventSystem>() == null)
@@ -110,17 +105,29 @@ public class CompleteUISetup : MonoBehaviour
     #region Prefab Definitions
     GameObject CreateItemViewPrefab()
     {
-        var prefab = new GameObject("InventoryItemViewPrefab", typeof(RectTransform));
+        var prefab = new GameObject("ItemViewPrefab", typeof(RectTransform), typeof(Image), typeof(ItemView), typeof(TooltipTrigger));
         prefab.SetActive(false);
         prefab.GetComponent<RectTransform>().sizeDelta = new Vector2(60, 60);
-        CreateItemView(prefab.transform);
+
+        Image bgImage = prefab.GetComponent<Image>();
+        bgImage.color = new Color(0.2f, 0.2f, 0.2f, 0.3f);
+
+        var thumbnail = new GameObject("ThumbnailImage", typeof(RectTransform), typeof(Image));
+        thumbnail.transform.SetParent(prefab.transform, false);
+        SetAnchorsAndOffsets(thumbnail, Vector2.zero, Vector2.one, new Vector2(4, 4), new Vector2(-4, -4));
+        thumbnail.GetComponent<Image>().preserveAspect = true;
+
+        ItemView itemViewComponent = prefab.GetComponent<ItemView>();
+        SetPrivateField(itemViewComponent, "thumbnailImage", thumbnail.GetComponent<Image>());
+        SetPrivateField(itemViewComponent, "backgroundImage", bgImage);
+
         return prefab;
     }
 
     GameObject CreateItemSlotPrefab(GameObject itemViewPrefab)
     {
         var prefab = CreateGeneSlot("ItemSlotPrefab", GeneCategory.Passive, itemViewPrefab); // Category is a placeholder
-        prefab.GetComponent<GeneSlotUI>().acceptedCategory = 0; // Will be overwritten by controller/sequencer
+        prefab.GetComponent<GeneSlotUI>().acceptedCategory = 0;
         return prefab;
     }
 
@@ -132,13 +139,13 @@ public class CompleteUISetup : MonoBehaviour
         var layout = prefab.GetComponent<HorizontalLayoutGroup>();
         layout.spacing = 15;
         layout.childAlignment = TextAnchor.MiddleCenter;
-
+        
         SequenceRowUI rowUI = prefab.GetComponent<SequenceRowUI>();
-
+        
         rowUI.modifierSlot = CreateGeneSlot("ModifierSlot", GeneCategory.Modifier, itemViewPrefab, prefab.transform).GetComponent<GeneSlotUI>();
         rowUI.activeSlot = CreateGeneSlot("ActiveSlot", GeneCategory.Active, itemViewPrefab, prefab.transform).GetComponent<GeneSlotUI>();
         rowUI.payloadSlot = CreateGeneSlot("PayloadSlot", GeneCategory.Payload, itemViewPrefab, prefab.transform).GetComponent<GeneSlotUI>();
-
+        
         return prefab;
     }
     #endregion
@@ -154,7 +161,6 @@ public class CompleteUISetup : MonoBehaviour
         SetAnchorsAndOffsets(gridTitle, new Vector2(0, 0.9f), new Vector2(1, 1f));
 
         InventoryGridController gridController = inventoryGridObj.GetComponent<InventoryGridController>();
-
         var cellContainer = new GameObject("CellContainer", typeof(RectTransform), typeof(GridLayoutGroup));
         cellContainer.transform.SetParent(inventoryGridObj.transform, false);
         SetAnchorsAndOffsets(cellContainer, new Vector2(0.05f, 0.05f), new Vector2(0.95f, 0.9f));
@@ -179,7 +185,6 @@ public class CompleteUISetup : MonoBehaviour
         inventoryBarObj.GetComponent<Image>().color = new Color(0.1f, 0.1f, 0.1f, 0.8f);
 
         InventoryBarController barController = inventoryBarObj.GetComponent<InventoryBarController>();
-
         var barCellContainer = new GameObject("CellContainer", typeof(RectTransform), typeof(GridLayoutGroup));
         barCellContainer.transform.SetParent(inventoryBarObj.transform, false);
         SetAnchorsAndOffsets(barCellContainer, new Vector2(0.05f, 0.1f), new Vector2(0.95f, 0.9f));
@@ -191,14 +196,12 @@ public class CompleteUISetup : MonoBehaviour
         barGridLayout.constraintCount = 1;
 
         var selectionHighlight = CreateSelectionHighlight(inventoryBarObj.transform);
-
         SetPrivateField(barController, "cellContainer", barCellContainer.transform);
         SetPrivateField(barController, "selectionHighlight", selectionHighlight);
         SetPrivateField(barController, "inventoryItemViewPrefab", itemViewPrefab);
         SetPrivateField(barController, "inventoryGridController", gridController);
     }
-
-        // Find the CreateGeneSequenceUI method and replace it with this version.
+    
     GeneSequenceUI CreateGeneSequenceUI(Transform parent, GameObject passiveSlotPrefab, GameObject sequenceRowPrefab)
     {
         var geneSequenceUIObj = new GameObject("GeneSequenceUI", typeof(Image), typeof(GeneSequenceUI));
@@ -209,16 +212,15 @@ public class CompleteUISetup : MonoBehaviour
         SetAnchorsAndOffsets(title, new Vector2(0, 0.95f), new Vector2(1, 1f));
 
         GeneSequenceUI sequenceUI = geneSequenceUIObj.GetComponent<GeneSequenceUI>();
-
-        // NEW: Create the dedicated Seed Edit Slot
-        var itemViewPrefab = CreateItemViewPrefab(); // We need an ItemView for the slot
-        itemViewPrefab.transform.SetParent(geneSequenceUIObj.transform); // Temporarily parent to create slot
-        var seedEditSlot = CreateGeneSlot("SeedEditSlot", GeneCategory.Passive, itemViewPrefab, geneSequenceUIObj.transform); // Category doesn't matter, will be overridden
-        SetAnchorsAndOffsets(seedEditSlot, new Vector2(0.5f, 0.85f), new Vector2(0.5f, 0.85f), new Vector2(-32, -32), new Vector2(32, 32)); // Center it
-        var seedSlotUI = seedEditSlot.GetComponent<GeneSlotUI>();
-        seedSlotUI.isDraggable = false; // You can't drag the seed away once it's being edited
-        DestroyImmediate(itemViewPrefab); // Clean up temp object
-
+        
+        var itemViewPrefab = CreateItemViewPrefab();
+        itemViewPrefab.transform.SetParent(geneSequenceUIObj.transform, true);
+        itemViewPrefab.hideFlags = HideFlags.HideInHierarchy;
+        
+        var seedEditSlot = CreateGeneSlot("SeedEditSlot", GeneCategory.Seed, itemViewPrefab, geneSequenceUIObj.transform);
+        SetAnchorsAndOffsets(seedEditSlot, new Vector2(0.5f, 0.85f), new Vector2(0.5f, 0.85f), new Vector2(-32, -32), new Vector2(32, 32));
+        seedEditSlot.GetComponent<GeneSlotUI>().isDraggable = true;
+        
         var passiveContainer = new GameObject("PassiveGenesContainer", typeof(RectTransform), typeof(HorizontalLayoutGroup));
         passiveContainer.transform.SetParent(geneSequenceUIObj.transform, false);
         passiveContainer.GetComponent<HorizontalLayoutGroup>().spacing = 10;
@@ -234,23 +236,22 @@ public class CompleteUISetup : MonoBehaviour
 
         CreateSequenceInfoDisplay(geneSequenceUIObj.transform, sequenceUI);
         
-        // Link the new slot to the GeneSequenceUI script
-        SetPrivateField(sequenceUI, "seedEditSlot", seedSlotUI);
+        SetPrivateField(sequenceUI, "seedEditSlot", seedEditSlot.GetComponent<GeneSlotUI>());
         sequenceUI.passiveGenesContainer = passiveContainer.transform;
         sequenceUI.activeSequenceContainer = activeContainer.transform;
         sequenceUI.sequenceRowPrefab = sequenceRowPrefab;
         sequenceUI.passiveSlotPrefab = passiveSlotPrefab;
+        
+        DestroyImmediate(itemViewPrefab);
         return sequenceUI;
     }
-
+    
     void CreateSequenceInfoDisplay(Transform parent, GeneSequenceUI sequenceUI)
     {
-        // FIX: The InfoPanel now correctly gets a RectTransform.
         var infoPanel = new GameObject("InfoPanel", typeof(RectTransform));
         infoPanel.transform.SetParent(parent, false);
         SetAnchorsAndOffsets(infoPanel, new Vector2(0.05f, 0.05f), new Vector2(0.95f, 0.2f));
 
-        // FIX: Replaced '⚡' with 'E' to prevent font warnings.
         var energyCostObj = CreateText("EnergyCostText", infoPanel.transform, "Cost: 0 E/cycle", 16, TextAlignmentOptions.Left);
         SetAnchorsAndOffsets(energyCostObj, new Vector2(0, 0.5f), new Vector2(0.4f, 1f));
         
@@ -272,7 +273,7 @@ public class CompleteUISetup : MonoBehaviour
         CreateButton("EndPlanningButton", planningParent, "Start Growth", new Vector2(0.5f, 0.02f), new Vector2(0.8f, 0.08f));
         CreateButton("ReturnToPlanningButton", growthParent, "End Day", new Vector2(0.8f, 0.9f), new Vector2(0.95f, 0.95f));
     }
-
+    
     GameObject CreateDebugUI(Transform parent)
     {
         GameObject wegoPanel = CreatePanel("WegoControlPanel", parent);
@@ -308,7 +309,6 @@ public class CompleteUISetup : MonoBehaviour
         var endPlanningBtn = planningPanel.transform.Find("EndPlanningButton")?.GetComponent<Button>();
         var newPlanningBtn = growthThreatPanel.transform.Find("ReturnToPlanningButton")?.GetComponent<Button>();
         
-        // FIX: Correctly link the buttons that are actually created.
         SetPrivateField(uiManager, "endPlanningPhaseButton", endPlanningBtn);
         SetPrivateField(uiManager, "startNewPlanningPhaseButton", newPlanningBtn);
             
@@ -351,27 +351,6 @@ public class CompleteUISetup : MonoBehaviour
         return buttonObj;
     }
 
-    GameObject CreateItemView(Transform parent)
-    {
-        var itemView = new GameObject("ItemView", typeof(RectTransform), typeof(Image), typeof(ItemView), typeof(TooltipTrigger));
-        itemView.transform.SetParent(parent, false);
-        SetAnchorsAndOffsets(itemView, Vector2.zero, Vector2.one);
-        
-        Image bgImage = itemView.GetComponent<Image>();
-        bgImage.color = new Color(0.2f, 0.2f, 0.2f, 0.3f);
-        
-        var thumbnail = new GameObject("ThumbnailImage", typeof(RectTransform), typeof(Image));
-        thumbnail.transform.SetParent(itemView.transform, false);
-        SetAnchorsAndOffsets(thumbnail, Vector2.zero, Vector2.one, new Vector2(2, 2), new Vector2(-2, -2));
-        thumbnail.GetComponent<Image>().preserveAspect = true;
-        
-        ItemView itemViewComponent = itemView.GetComponent<ItemView>();
-        SetPrivateField(itemViewComponent, "thumbnailImage", thumbnail.GetComponent<Image>());
-        SetPrivateField(itemViewComponent, "backgroundImage", bgImage);
-        
-        return itemView;
-    }
-    
     GameObject CreateGeneSlot(string name, GeneCategory category, GameObject itemViewPrefab, Transform parent = null)
     {
         var slot = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(GeneSlotUI));
@@ -437,6 +416,7 @@ public class CompleteUISetup : MonoBehaviour
             case GeneCategory.Passive:  return new Color(0.2f, 0.2f, 0.4f, 1f);
             case GeneCategory.Modifier: return new Color(0.4f, 0.4f, 0.2f, 1f);
             case GeneCategory.Payload:  return new Color(0.4f, 0.2f, 0.4f, 1f);
+            case GeneCategory.Seed:     return new Color(0.2f, 0.4f, 0.2f, 1f); // Added a color for the seed slot
             default:                    return slotNormalColor;
         }
     }
@@ -449,6 +429,7 @@ public class CompleteUISetup : MonoBehaviour
             case GeneCategory.Passive:  return "PASSIVE";
             case GeneCategory.Modifier: return "MOD";
             case GeneCategory.Payload:  return "LOAD";
+            case GeneCategory.Seed:     return "SEED";
             default:                    return "+";
         }
     }

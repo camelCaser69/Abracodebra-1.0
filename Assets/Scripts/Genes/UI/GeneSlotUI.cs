@@ -52,13 +52,11 @@ namespace Abracodabra.UI.Genes
             UpdateVisuals();
         }
 
-        // Restored Method
         void OnEnable()
         {
             eventBus?.Subscribe<GeneExecutedEvent>(OnGeneExecuted);
         }
 
-        // Restored Method
         void OnDisable()
         {
             eventBus?.Unsubscribe<GeneExecutedEvent>(OnGeneExecuted);
@@ -74,7 +72,7 @@ namespace Abracodabra.UI.Genes
         {
             SetItem(null);
         }
-        
+
         private void UpdateVisuals()
         {
             if (itemView == null || slotBackground == null) return;
@@ -133,21 +131,14 @@ namespace Abracodabra.UI.Genes
             UpdateSlotContents(this, itemFromSource);
         }
         
-        private bool IsValidDrop(GeneSlotUI source, GeneSlotUI destination)
-        {
-            var sourceItem = source.CurrentItem;
-            var destinationItem = destination.CurrentItem;
-            return IsItemValidForSlot(sourceItem, destination) && IsItemValidForSlot(destinationItem, source);
-        }
-
         private bool IsItemValidForSlot(InventoryBarItem item, GeneSlotUI slot)
         {
             if (item == null) return true;
         
-            var seedEditSlotField = slot.parentSequence?.GetType().GetField("seedEditSlot", BindingFlags.NonPublic | BindingFlags.Instance);
-            GeneSlotUI seedEditSlot = seedEditSlotField?.GetValue(slot.parentSequence) as GeneSlotUI;
-
-            if (slot == seedEditSlot) return item.Type == InventoryBarItem.ItemType.Seed;
+            if (slot.acceptedCategory == GeneCategory.Seed)
+            {
+                return item.Type == InventoryBarItem.ItemType.Seed;
+            }
         
             if (slot.parentSequence != null)
             {
@@ -164,12 +155,16 @@ namespace Abracodabra.UI.Genes
             return true;
         }
 
+        private bool IsValidDrop(GeneSlotUI source, GeneSlotUI destination)
+        {
+            var sourceItem = source.CurrentItem;
+            var destinationItem = destination.CurrentItem;
+            return IsItemValidForSlot(sourceItem, destination) && IsItemValidForSlot(destinationItem, source);
+        }
+
         private void UpdateSlotContents(GeneSlotUI slot, InventoryBarItem newItem)
         {
-            var seedEditSlotField = slot.parentSequence?.GetType().GetField("seedEditSlot", BindingFlags.NonPublic | BindingFlags.Instance);
-            GeneSlotUI seedEditSlot = seedEditSlotField?.GetValue(slot.parentSequence) as GeneSlotUI;
-            
-            if (slot == seedEditSlot)
+            if (slot.acceptedCategory == GeneCategory.Seed && slot.parentSequence != null)
             {
                 slot.parentSequence.LoadSeedForEditing(newItem);
             }
@@ -210,7 +205,7 @@ namespace Abracodabra.UI.Genes
         {
             if (draggedVisual != null) Destroy(draggedVisual);
         }
-        
+
         private void CreateDragVisual()
         {
             if (canvas == null || CurrentItem == null) return;
@@ -225,7 +220,11 @@ namespace Abracodabra.UI.Genes
             rect.sizeDelta = new Vector2(64, 64);
         }
 
-        private void ShowInvalidDropFeedback() { StartCoroutine(FlashColor(invalidColor)); }
+        private void ShowInvalidDropFeedback()
+        {
+            StartCoroutine(FlashColor(invalidColor));
+        }
+
         IEnumerator FlashColor(Color flashColor)
         {
             if (slotBackground == null) yield break;
@@ -235,8 +234,7 @@ namespace Abracodabra.UI.Genes
             slotBackground.color = originalColor;
             UpdateVisuals();
         }
-        
-        // Restored Method
+
         private void OnGeneExecuted(GeneExecutedEvent evt)
         {
             if (CurrentItem != null && CurrentItem.Type == InventoryBarItem.ItemType.Gene && CurrentItem.GeneInstance.GetGene()?.GUID == evt.Gene.GUID)
@@ -245,7 +243,6 @@ namespace Abracodabra.UI.Genes
             }
         }
 
-        // Restored Method
         public void ShowExecuting()
         {
             if (executingEffect != null) executingEffect.SetActive(true);
@@ -253,7 +250,6 @@ namespace Abracodabra.UI.Genes
             Invoke(nameof(HideExecuting), 0.5f);
         }
 
-        // Restored Method
         public void HideExecuting()
         {
             if (executingEffect != null) executingEffect.SetActive(false);

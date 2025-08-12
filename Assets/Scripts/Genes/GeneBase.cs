@@ -69,12 +69,14 @@ namespace Abracodabra.Genes.Core
         public virtual void MigrateFromVersion(int oldVersion, GeneInstanceData instanceData) { }
     }
 
+    // Find the GeneCategory enum at the bottom of the file and add 'Seed'.
     public enum GeneCategory
     {
         Passive,
         Active,
         Modifier,
-        Payload
+        Payload,
+        Seed // NEW: The dedicated category for the editor slot.
     }
 
     public class GeneTooltipContext
