@@ -48,6 +48,7 @@ public class InventoryBarController : MonoBehaviour
 
     private void UpdateBarDisplay()
     {
+        // This loop destroys the children of the slots (the item views), but not the highlight.
         foreach (var slot in barSlots)
         {
             foreach (Transform child in slot.transform) Destroy(child.gameObject);
@@ -88,8 +89,7 @@ public class InventoryBarController : MonoBehaviour
     { 
         if (gameObject.activeInHierarchy) 
         { 
-            UpdateBarDisplay(); 
-            UpdateSelection(); 
+            RefreshBar();
         } 
     }
     
@@ -158,8 +158,8 @@ public class InventoryBarController : MonoBehaviour
             selectionHighlight.SetActive(itemIsValid); 
             if (itemIsValid && selectedSlot < barSlots.Count) 
             {
-                selectionHighlight.transform.SetParent(barSlots[selectedSlot].transform, false);
-                selectionHighlight.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                // This is the robust positioning logic.
+                selectionHighlight.transform.position = barSlots[selectedSlot].transform.position;
             } 
         } 
         OnSelectionChanged?.Invoke(SelectedItem); 

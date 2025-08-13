@@ -1,36 +1,39 @@
-﻿// Assets/Scripts/Core/InitializationManager.cs
+﻿using UnityEngine;
 using System.Collections;
-using UnityEngine;
 using WegoSystem;
 
 public class InitializationManager : SingletonMonoBehaviour<InitializationManager>
 {
-    [Header("Initialization Events")]
     [SerializeField] private GameEvent onCoreSystemsInitialized;
     [SerializeField] private GameEvent onGameManagersInitialized;
     [SerializeField] private GameEvent onGameplaySystemsInitialized;
 
-    private IEnumerator Start()
+    IEnumerator Start()
     {
         Debug.Log("[InitializationManager] Starting initialization sequence...");
 
-        // Phase 1: Core Systems (Lowest level, no dependencies on other managers)
-        // e.g., TickManager, TileInteractionManager
         Debug.Log("[InitializationManager] Phase 1: Initializing Core Systems...");
         onCoreSystemsInitialized.Raise();
-        yield return null; // Wait one frame
+        yield return null;
 
-        // Phase 2: Game Managers (Depend on Core Systems)
-        // e.g., GridPositionManager, RunManager, WaveManager, EcosystemManager
         Debug.Log("[InitializationManager] Phase 2: Initializing Game Managers...");
         onGameManagersInitialized.Raise();
-        yield return null; // Wait one frame
+        yield return null;
 
-        // Phase 3: Gameplay & UI (Depend on Game Managers)
-        // e.g., FaunaManager, UIManager, Player controllers, etc.
+        // FIX: Explicitly initialize the UIManager here to ensure it subscribes to events.
+        if (UIManager.Instance != null)
+        {
+            Debug.Log("[InitializationManager] Initializing UIManager...");
+            UIManager.Instance.Initialize();
+        }
+        else
+        {
+            Debug.LogError("[InitializationManager] UIManager instance not found! UI will not be initialized.");
+        }
+
         Debug.Log("[InitializationManager] Phase 3: Initializing Gameplay Systems & UI...");
         onGameplaySystemsInitialized.Raise();
-        yield return null; // Wait one frame
+        yield return null;
 
         Debug.Log("[InitializationManager] All systems initialized successfully.");
     }

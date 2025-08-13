@@ -36,6 +36,7 @@ public class UIManager : MonoBehaviour
         Instance = this;
     }
 
+    // This method MUST be called by an InitializationManager to ensure correct order.
     public void Initialize()
     {
         runManager = RunManager.Instance;
@@ -47,11 +48,11 @@ public class UIManager : MonoBehaviour
             return;
         }
 
-        // It is more robust to subscribe to events rather than poll in Update.
+        // Subscribe to events to get updates.
         runManager.OnRunStateChanged += HandleRunStateChanged;
         runManager.OnPhaseChanged += HandlePhaseChanged;
         runManager.OnRoundChanged += HandleRoundChanged;
-
+        
         if (tickManager != null)
         {
             tickManager.OnTickAdvanced += HandleTickAdvanced;
@@ -59,7 +60,7 @@ public class UIManager : MonoBehaviour
 
         SetupButtons();
 
-        // Initial setup calls
+        // Perform initial setup based on the current state.
         HandleRunStateChanged(runManager.CurrentState);
         UpdatePhaseDisplay();
         UpdateTickDisplay();
@@ -67,6 +68,7 @@ public class UIManager : MonoBehaviour
 
     void OnDestroy()
     {
+        // Always unsubscribe from events when the object is destroyed.
         if (runManager != null)
         {
             runManager.OnRunStateChanged -= HandleRunStateChanged;
@@ -110,7 +112,6 @@ public class UIManager : MonoBehaviour
         {
             InventoryBarController.Instance?.HideBar();
         }
-
         UpdateButtonStates(newState);
     }
 
@@ -156,8 +157,7 @@ public class UIManager : MonoBehaviour
         yield return null;
         InventoryBarController.Instance?.ShowBar();
     }
-
-    // RESTORED: The full notification system.
+    
     public void ShowNotification(string message, float duration = 3f)
     {
         StartCoroutine(ShowNotificationCoroutine(message, duration));
