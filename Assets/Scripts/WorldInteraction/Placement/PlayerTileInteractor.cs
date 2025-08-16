@@ -91,7 +91,7 @@ public sealed class PlayerTileInteractor : MonoBehaviour
 
         // Only the HandleLeftClick method is changed.
 
-        void HandleLeftClick()
+                void HandleLeftClick()
         {
             if (!EnsureManagers()) return;
 
@@ -102,17 +102,15 @@ public sealed class PlayerTileInteractor : MonoBehaviour
                 return;
             }
 
-            Vector3 mouseW = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            mouseW.z = 0f;
-
-            Vector3Int cellPos = tileInteractionManager.WorldToCell(mouseW);
-            Vector3 cellCenter = tileInteractionManager.interactionGrid.GetCellCenterWorld(cellPos);
-
-            if (Vector2.Distance(playerTransform.position, cellCenter) > tileInteractionManager.hoverRadius)
+            // FIX: The validation for range is now done by asking the TileInteractionManager directly.
+            // This ensures the action logic and the visual hover highlight are always in sync.
+            if (!tileInteractionManager.IsWithinInteractionRange)
             {
-                if (showDebug) Debug.Log($"[PlayerTileInteractor] Left-click ignored: Target cell {cellPos} is out of range.");
+                if (showDebug) Debug.Log($"[PlayerTileInteractor] Left-click ignored: Target cell is out of range according to TileInteractionManager.");
                 return;
             }
+
+            Vector3Int cellPos = tileInteractionManager.CurrentlyHoveredCell.Value;
 
             if (showDebug) Debug.Log($"[PlayerTileInteractor] Attempting action '{selected.Type}' with item '{selected.GetDisplayName()}' at {cellPos}.");
 
@@ -139,16 +137,10 @@ public sealed class PlayerTileInteractor : MonoBehaviour
                     break;
 
                 case InventoryBarItem.ItemType.Seed:
-                    // FIX: The success callback is now rewritten to be more robust.
                     System.Action onSuccess = () =>
                     {
                         if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
-                        
-                        // 1. Remove the consumed seed from the main inventory.
                         InventoryGridController.Instance?.RemoveItemFromInventory(selected);
-
-                        // 2. Force the inventory bar to re-select the first slot (index 0).
-                        //    This ensures a tool is likely selected and avoids the 'null selection' bug.
                         inventoryBar.SelectSlotByIndex(0);
                     };
                     PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess);
