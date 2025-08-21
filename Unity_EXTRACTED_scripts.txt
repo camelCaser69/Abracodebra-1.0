@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 533,738 → 358,317 chars (32.9% reduction)
-Estimated tokens saved: ~43,855
+Compression Stats: 534,336 → 359,449 chars (32.7% reduction)
+Estimated tokens saved: ~43,721
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -155,35 +155,35 @@ using System;
   TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10229
   ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10253
   TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10273
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10570
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10582
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10617
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10792
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10587
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10599
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10634
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10809
 
 [WegoSystem]
-  RunManager (Assets\Scripts\Core/) L10803
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L10939
-  GridEntity (Assets\Scripts\Ticks/) L10996
-  GridPosition (Assets\Scripts\Ticks/) L11153
-  GridPositionManager (Assets\Scripts\Ticks/) L11254
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11591
-  TickConfiguration (Assets\Scripts\Ticks/) L11735
-  ITickUpdateable (Assets\Scripts\Ticks/) L11818
+  RunManager (Assets\Scripts\Core/) L10820
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L10956
+  GridEntity (Assets\Scripts\Ticks/) L11013
+  GridPosition (Assets\Scripts\Ticks/) L11170
+  GridPositionManager (Assets\Scripts\Ticks/) L11271
+  GridRadiusUtility (Assets\Scripts\Ticks/) L11608
+  TickConfiguration (Assets\Scripts\Ticks/) L11752
+  ITickUpdateable (Assets\Scripts\Ticks/) L11835
 
 [WegoSystem.ProceduralGeneration]
-  MapGenerationProfile (Assets\Scripts\ProceduralGeneration/) L11970
-  NoiseToTileMapping (Assets\Scripts\ProceduralGeneration/) L11997
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12009
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12092
+  MapGenerationProfile (Assets\Scripts\ProceduralGeneration/) L11987
+  NoiseToTileMapping (Assets\Scripts\ProceduralGeneration/) L12015
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12028
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12128
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12243
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12280
 
 [for]
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L12270
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L12308
 
 [namespace]
-  GeneEventBus (Assets\Scripts\Genes\Services/) L12495
+  GeneEventBus (Assets\Scripts\Genes\Services/) L12533
 
 ================================================================================
 SCRIPTS
@@ -10479,9 +10479,19 @@ TileDefinition hoveredTileDef;
 SpriteRenderer hoverSpriteRenderer;
 bool isWithinInteractionRange = false;
 
+bool isInitialized = false;
+
 prot ovr void OnAwake() {
-SetupTilemaps();
+EnsureInitialized();
 CacheHoverSpriteRenderer();
+}
+
+void EnsureInitialized() {
+if (moduleByDefinition == null) {
+if(debugLogs) Debug.Log("[TileInteractionManager] Dictionaries are null. Initializing now.");
+SetupTilemaps();
+}
+isInitialized = true;
 }
 
 void Start() {
@@ -10506,6 +10516,10 @@ UpdateDebugUI();
 }
 
 pub TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos) {
+EnsureInitialized(); // Call at the beginning of the pub method.
+
+if (tileDefinitionMappings == null) ret null;
+
 foreach (var mapping in tileDefinitionMappings) {
 if (mapping?.tileDef != null && !mapping.tileDef.keepBottomTile && mapping.tilemapModule != null) {
 if (TileExistsInModule(mapping.tilemapModule, cellPos)) {
@@ -10536,6 +10550,7 @@ ret false;
 }
 
 pub void ApplyToolAction(ToolDefinition toolDef) {
+EnsureInitialized();
 if (toolDef == null || !currentlyHoveredCell.HasValue) return;
 Vector3Int targetCell = currentlyHoveredCell.Value;
 TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
@@ -10549,7 +10564,7 @@ if (debugLogs) Debug.Log($"[TileInteractionManager] Rule found! Transforming '{c
 if (rule.toTile != null && rule.toTile.keepBottomTile) {
 RemoveTile(currentTileDef, targetCell);
 }
-else if (rule.toTile == null) // This is an explicit removal rule (e.g. shovel) {
+else if (rule.toTile == null) {
 RemoveTile(currentTileDef, targetCell);
 }
 
@@ -10591,6 +10606,7 @@ timedCells[cellPos] = state;
 }
 
 pub void PlaceTile(TileDefinition tileDef, Vector3Int cellPos) {
+EnsureInitialized(); // Call at the beginning of the pub method.
 if (tileDef == null) return;
 if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null) {
 module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
@@ -10601,6 +10617,7 @@ timedCells[cellPos] = new TimedTileState { tileDef = tileDef, ticksRemaining = t
 }
 
 pub void RemoveTile(TileDefinition tileDef, Vector3Int cellPos) {
+EnsureInitialized(); // Call at the beginning of the pub method.
 if (tileDef == null) return;
 if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null) {
 module.DataTilemap.SetTile(cellPos, null);
@@ -12133,6 +12150,7 @@ ret tickUpdateables.Count;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\ProceduralGeneration\MapGenerationProfile.cs
 
+﻿// FILE: Assets/Scripts/ProceduralGeneration/MapGenerationProfile.cs
 using WegoSystem.ProceduralGeneration;
 
 namespace WegoSystem.ProceduralGeneration {
@@ -12155,11 +12173,12 @@ worldSeed = Random.Range(0, int.MaxValue);
 noiseParameters.seed = worldSeed;
 }
 }
-}*/
+}
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\ProceduralGeneration\NoiseToTileMapping.cs
 
+﻿// FILE: Assets/Scripts/ProceduralGeneration/NoiseToTileMapping.cs
 
 namespace WegoSystem.ProceduralGeneration {
 pub cls NoiseToTileMapping : ScriptableObject {
@@ -12167,11 +12186,12 @@ pub TileDefinition tileToPlace;
 
 pub float noiseThreshold = 0.5f;
 }
-}*/
+}
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\ProceduralGeneration\ProceduralMapGenerator.cs
 
+﻿using UnityEngine;
 using WegoSystem;
 
 namespace WegoSystem.ProceduralGeneration {
@@ -12182,33 +12202,37 @@ List<NoiseToTileMapping> tileMappings;
 
 TileInteractionManager tileManager;
 
+Dictionary<Vector2Int, TileDefinition> tileMap = new Dictionary<Vector2Int, TileDefinition>();
+
 pub void GenerateMap() {
 if (!ValidateConfiguration()) {
 return;
 }
 
+profile.InitializeSeed();
 Debug.Log($"Starting map generation with seed: {profile.worldSeed}...");
 
 ClearMap();
-profile.InitializeSeed();
 
 var sortedMappings = tileMappings.OrderBy(m => m.noiseThreshold).ToList();
 
 for (int x = 0; x < profile.mapSize.x; x++) {
 for (int y = 0; y < profile.mapSize.y; y++) {
 float noiseValue = profile.noiseParameters.Sample(x, y);
-float normalizedNoise = (noiseValue + 1f) / 2f;
+float normalizedNoise = SimplexNoise.Remap(noiseValue, -1f, 1f, 0f, 1f);
 
 TileDefinition tileToPlace = null;
 foreach (var mapping in sortedMappings) {
 if (normalizedNoise <= mapping.noiseThreshold) {
 tileToPlace = mapping.tileToPlace;
-break; // Found the correct tile for this noise level
+break;
 }
 }
 
 if (tileToPlace != null) {
-tileManager.PlaceTile(tileToPlace, new Vector3Int(x, y, 0));
+var cellPos = new Vector3Int(x, y, 0);
+tileManager.PlaceTile(tileToPlace, cellPos);
+tileMap[new Vector2Int(x,y)] = tileToPlace; // Keep track for this session
 }
 }
 }
@@ -12221,17 +12245,26 @@ if (!ValidateConfiguration(checkMappings: false)) {
 return;
 }
 
-Debug.Log("Clearing existing map...");
+Debug.Log("Clearing existing map by checking every cell...");
 
 for (int x = 0; x < profile.mapSize.x; x++) {
 for (int y = 0; y < profile.mapSize.y; y++) {
 var cellPos = new Vector3Int(x, y, 0);
+
 TileDefinition currentTile = tileManager.FindWhichTileDefinitionAt(cellPos);
+
 if (currentTile != null) {
 tileManager.RemoveTile(currentTile, cellPos);
 }
 }
 }
+
+ClearCaches();
+Debug.Log("[ProceduralMapGenerator] Map clear complete.");
+}
+
+void ClearCaches() {
+tileMap.Clear();
 }
 
 bool ValidateConfiguration(bool checkMappings = true) {
@@ -12240,8 +12273,11 @@ Debug.LogError("[ProceduralMapGenerator] Map Generation Profile is not assigned!
 ret false;
 }
 if (tileManager == null) {
-Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigned!", this);
+tileManager = TileInteractionManager.Instance;
+if (tileManager == null) {
+Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigned and could not be found!", this);
 ret false;
+}
 }
 if (checkMappings && (tileMappings == null || tileMappings.Count == 0)) {
 Debug.LogError("[ProceduralMapGenerator] No Noise To Tile Mappings have been assigned!", this);
@@ -12250,11 +12286,12 @@ ret false;
 ret true;
 }
 }
-}*/
+}
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\ProceduralGeneration\SimplexNoise.cs
 
+﻿// FILE: Assets/Scripts/ProceduralGeneration/SimplexNoise.cs
 
 namespace WegoSystem.ProceduralGeneration {
 pub stat cls SimplexNoise {
@@ -12401,11 +12438,12 @@ SimplexNoise.Initialize(seed);
 ret SimplexNoise.GenerateOctaves(x, y, this);
 }
 }
-}*/
+}
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\ProceduralGeneration\Editor\ProceduralMapGeneratorEditor.cs
 
+﻿// FILE: Assets/Scripts/Editor/ProceduralMapGeneratorEditor.cs
 using UnityEditor;
 using WegoSystem.ProceduralGeneration;
 
@@ -12428,7 +12466,7 @@ generator.ClearMap();
 }
 }
 }
-}*/
+}
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Management\FaunaManager.cs

@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-using System.Collections.Generic;
-using System.Linq;
 using skner.DualGrid;
 using TMPro;
 using WegoSystem;
+using System.Collections.Generic;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -24,7 +24,6 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
         public int ticksRemaining;
     }
 
-    [Tooltip("Define tilemap layers here. For logic, overlays (keepBottomTile=false) are checked first, then base layers (keepBottomTile=true).")]
     public List<TileDefinitionMapping> tileDefinitionMappings;
     public TileInteractionLibrary interactionLibrary;
     public Grid interactionGrid;
@@ -41,17 +40,32 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
     public TextMeshProUGUI hoveredTileText;
     public TextMeshProUGUI currentToolText;
 
-    private Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
-    private Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
-    private Vector3Int? currentlyHoveredCell;
-    private TileDefinition hoveredTileDef;
-    private SpriteRenderer hoverSpriteRenderer;
-    private bool isWithinInteractionRange = false;
+    Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
+    Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
+    Vector3Int? currentlyHoveredCell;
+    TileDefinition hoveredTileDef;
+    SpriteRenderer hoverSpriteRenderer;
+    bool isWithinInteractionRange = false;
+    
+    // This flag is no longer strictly necessary with the new check, but is kept for clarity.
+    private bool isInitialized = false;
 
     protected override void OnAwake()
     {
-        SetupTilemaps();
+        EnsureInitialized();
         CacheHoverSpriteRenderer();
+    }
+    
+    // This is the key fix. It checks if initialization is needed and performs it.
+    private void EnsureInitialized()
+    {
+        // Only run setup if the dictionary hasn't been created yet.
+        if (moduleByDefinition == null)
+        {
+            if(debugLogs) Debug.Log("[TileInteractionManager] Dictionaries are null. Initializing now.");
+            SetupTilemaps();
+        }
+        isInitialized = true;
     }
 
     void Start()
@@ -83,7 +97,11 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
 
     public TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
     {
-        // First Pass: Search for an overlay tile (e.g., Wet Dirt, Tilled Dirt).
+        EnsureInitialized(); // Call at the beginning of the public method.
+        
+        // This mapping list check is important.
+        if (tileDefinitionMappings == null) return null;
+
         foreach (var mapping in tileDefinitionMappings)
         {
             if (mapping?.tileDef != null && !mapping.tileDef.keepBottomTile && mapping.tilemapModule != null)
@@ -95,7 +113,6 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
             }
         }
 
-        // Second Pass: If no overlay was found, search for a base tile (e.g., Dirt, Grass).
         foreach (var mapping in tileDefinitionMappings)
         {
             if (mapping?.tileDef != null && mapping.tileDef.keepBottomTile && mapping.tilemapModule != null)
@@ -106,14 +123,14 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
                 }
             }
         }
-        
+
         return null;
     }
 
-    private bool TileExistsInModule(DualGridTilemapModule module, Vector3Int cellPos)
+    bool TileExistsInModule(DualGridTilemapModule module, Vector3Int cellPos)
     {
         if (module.DataTilemap != null && module.DataTilemap.HasTile(cellPos)) return true;
-        
+
         Transform renderTransform = module.transform.Find("RenderTilemap");
         if (renderTransform?.GetComponent<Tilemap>() is Tilemap renderTilemap && renderTilemap.HasTile(cellPos))
         {
@@ -121,9 +138,10 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
         }
         return false;
     }
-    
+
     public void ApplyToolAction(ToolDefinition toolDef)
     {
+        EnsureInitialized();
         if (toolDef == null || !currentlyHoveredCell.HasValue) return;
         Vector3Int targetCell = currentlyHoveredCell.Value;
         TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
@@ -135,22 +153,15 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
         {
             if (debugLogs) Debug.Log($"[TileInteractionManager] Rule found! Transforming '{currentTileDef.displayName}' to '{(rule.toTile != null ? rule.toTile.displayName : "NULL")}'.");
 
-            // THIS IS THE DEFINITIVE FIX:
-            // An overlay (like Wet Dirt) has keepBottomTile = false.
-            // A base layer (like Dirt) has keepBottomTile = true.
-            // We ONLY remove the original tile IF the NEW tile is a base layer that should replace it.
-            // We DO NOT remove the original tile IF the NEW tile is an overlay.
             if (rule.toTile != null && rule.toTile.keepBottomTile)
             {
                 RemoveTile(currentTileDef, targetCell);
             }
-            else if (rule.toTile == null) // This is an explicit removal rule (e.g. shovel)
+            else if (rule.toTile == null)
             {
                 RemoveTile(currentTileDef, targetCell);
             }
-            
-            // Place the new tile regardless. If it's an overlay, it goes on top.
-            // If it's a base layer, the old one has already been removed.
+
             if (rule.toTile != null)
             {
                 PlaceTile(rule.toTile, targetCell);
@@ -162,7 +173,7 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
         }
     }
 
-    private void UpdateReversionTicks()
+    void UpdateReversionTicks()
     {
         if (timedCells.Count == 0) return;
         List<Vector3Int> cellsToProcess = timedCells.Keys.ToList();
@@ -200,6 +211,7 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
 
     public void PlaceTile(TileDefinition tileDef, Vector3Int cellPos)
     {
+        EnsureInitialized(); // Call at the beginning of the public method.
         if (tileDef == null) return;
         if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null)
         {
@@ -213,19 +225,20 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
 
     public void RemoveTile(TileDefinition tileDef, Vector3Int cellPos)
     {
+        EnsureInitialized(); // Call at the beginning of the public method.
         if (tileDef == null) return;
         if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null)
         {
             module.DataTilemap.SetTile(cellPos, null);
         }
-        
+
         if (timedCells.TryGetValue(cellPos, out TimedTileState timedState) && timedState.tileDef == tileDef)
         {
             timedCells.Remove(cellPos);
         }
     }
-    
-    private void CacheHoverSpriteRenderer()
+
+    void CacheHoverSpriteRenderer()
     {
         if (hoverHighlightObject != null)
         {
@@ -233,7 +246,7 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
         }
     }
 
-    private void SetupTilemaps()
+    void SetupTilemaps()
     {
         moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
         var definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
@@ -269,9 +282,9 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
                     if (renderTilemapTransform.GetComponent<TilemapRenderer>() is TilemapRenderer renderer)
                     {
                         renderer.sortingOrder = baseSortingOrder - i;
-                        #if UNITY_EDITOR
+#if UNITY_EDITOR
                         if (!Application.isPlaying) EditorUtility.SetDirty(renderer);
-                        #endif
+#endif
                     }
                 }
             }
@@ -291,16 +304,16 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
                     if (renderTilemapTransform.GetComponent<Tilemap>() is Tilemap renderTilemap)
                     {
                         renderTilemap.color = mapping.tileDef.tintColor;
-                        #if UNITY_EDITOR
+#if UNITY_EDITOR
                         if (!Application.isPlaying) EditorUtility.SetDirty(renderTilemap);
-                        #endif
+#endif
                     }
                 }
             }
         }
     }
-    
-    private void HandleTileHover()
+
+    void HandleTileHover()
     {
         if (mainCamera == null || player == null) return;
         Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
@@ -326,7 +339,7 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
         }
     }
 
-    private void UpdateHoverHighlightColor(bool withinRange)
+    void UpdateHoverHighlightColor(bool withinRange)
     {
         if (hoverSpriteRenderer != null && hoverColorManager != null)
         {
@@ -334,7 +347,7 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
         }
     }
 
-    private void UpdateDebugUI()
+    void UpdateDebugUI()
     {
         if (hoveredTileText != null)
         {
@@ -364,7 +377,7 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
         return interactionGrid != null ? interactionGrid.WorldToCell(worldPos) : Vector3Int.zero;
     }
 
-    private Vector3 CellCenterWorld(Vector3Int cellPos)
+    Vector3 CellCenterWorld(Vector3Int cellPos)
     {
         return interactionGrid != null ? interactionGrid.GetCellCenterWorld(cellPos) : Vector3.zero;
     }

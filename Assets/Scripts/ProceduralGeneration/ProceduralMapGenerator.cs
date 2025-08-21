@@ -1,7 +1,8 @@
-﻿// FILE: Assets/Scripts/ProceduralGeneration/ProceduralMapGenerator.cs
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.Events;
 using WegoSystem;
 
 namespace WegoSystem.ProceduralGeneration
@@ -20,6 +21,9 @@ namespace WegoSystem.ProceduralGeneration
         [SerializeField]
         private TileInteractionManager tileManager;
 
+        // Internal cache of what was last generated. Used only for generation, not for clearing.
+        private Dictionary<Vector2Int, TileDefinition> tileMap = new Dictionary<Vector2Int, TileDefinition>();
+
         #region Public Methods
         /// <summary>
         /// Generates the map based on the assigned profile and tile mappings.
@@ -31,22 +35,19 @@ namespace WegoSystem.ProceduralGeneration
                 return;
             }
 
+            profile.InitializeSeed();
             Debug.Log($"Starting map generation with seed: {profile.worldSeed}...");
 
             ClearMap();
-            profile.InitializeSeed();
 
-            // Sort mappings by threshold to ensure correct placement.
-            // We iterate from lowest to highest value.
             var sortedMappings = tileMappings.OrderBy(m => m.noiseThreshold).ToList();
 
             for (int x = 0; x < profile.mapSize.x; x++)
             {
                 for (int y = 0; y < profile.mapSize.y; y++)
                 {
-                    // Simplex noise returns [-1, 1], we remap to [0, 1] for our thresholds.
                     float noiseValue = profile.noiseParameters.Sample(x, y);
-                    float normalizedNoise = (noiseValue + 1f) / 2f;
+                    float normalizedNoise = SimplexNoise.Remap(noiseValue, -1f, 1f, 0f, 1f);
 
                     TileDefinition tileToPlace = null;
                     foreach (var mapping in sortedMappings)
@@ -54,15 +55,15 @@ namespace WegoSystem.ProceduralGeneration
                         if (normalizedNoise <= mapping.noiseThreshold)
                         {
                             tileToPlace = mapping.tileToPlace;
-                            break; // Found the correct tile for this noise level
+                            break;
                         }
                     }
 
                     if (tileToPlace != null)
                     {
-                        // IMPORTANT: We use the TileInteractionManager to place tiles.
-                        // This ensures full compatibility with the Dual Grid system.
-                        tileManager.PlaceTile(tileToPlace, new Vector3Int(x, y, 0));
+                        var cellPos = new Vector3Int(x, y, 0);
+                        tileManager.PlaceTile(tileToPlace, cellPos);
+                        tileMap[new Vector2Int(x,y)] = tileToPlace; // Keep track for this session
                     }
                 }
             }
@@ -71,7 +72,8 @@ namespace WegoSystem.ProceduralGeneration
         }
 
         /// <summary>
-        /// Clears all tiles within the map's defined size.
+        /// Clears all tiles within the map's defined size by iterating through every cell.
+        /// This is a robust method that doesn't rely on a cached map state.
         /// </summary>
         public void ClearMap()
         {
@@ -80,22 +82,39 @@ namespace WegoSystem.ProceduralGeneration
                 return;
             }
 
-            Debug.Log("Clearing existing map...");
+            Debug.Log("Clearing existing map by checking every cell...");
 
             for (int x = 0; x < profile.mapSize.x; x++)
             {
                 for (int y = 0; y < profile.mapSize.y; y++)
                 {
                     var cellPos = new Vector3Int(x, y, 0);
+                    
+                    // Ask the TileInteractionManager what tile is at this position.
+                    // This works because the manager knows about all tilemap layers.
                     TileDefinition currentTile = tileManager.FindWhichTileDefinitionAt(cellPos);
+
+                    // If a tile exists, tell the manager to remove it.
                     if (currentTile != null)
                     {
                         tileManager.RemoveTile(currentTile, cellPos);
                     }
                 }
             }
+            
+            // Clear internal caches as well
+            ClearCaches();
+            Debug.Log("[ProceduralMapGenerator] Map clear complete.");
         }
         #endregion
+
+        /// <summary>
+        /// Clears all internal cached data.
+        /// </summary>
+        private void ClearCaches()
+        {
+            tileMap.Clear();
+        }
 
         private bool ValidateConfiguration(bool checkMappings = true)
         {
@@ -106,8 +125,12 @@ namespace WegoSystem.ProceduralGeneration
             }
             if (tileManager == null)
             {
-                Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigned!", this);
-                return false;
+                tileManager = TileInteractionManager.Instance;
+                if (tileManager == null)
+                {
+                    Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigned and could not be found!", this);
+                    return false;
+                }
             }
             if (checkMappings && (tileMappings == null || tileMappings.Count == 0))
             {
