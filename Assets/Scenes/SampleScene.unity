@@ -725,6 +725,56 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 155998841}
   m_CullTransparentMesh: 1
+--- !u!1 &170155919
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 170155920}
+  - component: {fileID: 170155921}
+  m_Layer: 0
+  m_Name: Manager_MapGenerator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &170155920
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 170155919}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 697039534}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &170155921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 170155919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38fa3ad7c5b74208b9452eebbbe0fd65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  profile: {fileID: 11400000, guid: af1c1b12b05dbec46a82e511a5eb7607, type: 2}
+  tileMappings:
+  - {fileID: 11400000, guid: 8aca115f84e99234abdda2282f817640, type: 2}
+  - {fileID: 11400000, guid: fb744a8e631c06b4f80dce6252ebe21d, type: 2}
+  - {fileID: 11400000, guid: 0209963ae4e4f804a850454b11aabcc5, type: 2}
+  tileManager: {fileID: 1097838751}
 --- !u!1 &176308125
 GameObject:
   m_ObjectHideFlags: 0
@@ -8742,6 +8792,7 @@ Transform:
   - {fileID: 1486390868}
   - {fileID: 763889561}
   - {fileID: 128701655}
+  - {fileID: 170155920}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &706932636
@@ -15667,7 +15718,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1351473040}
-  - component: {fileID: 1351473041}
   - component: {fileID: 1351473042}
   m_Layer: 0
   m_Name: Manager_Inventory
@@ -15691,25 +15741,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 697039534}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1351473041
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1351473039}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 601e9f1eb0c64fce966a689e6cf74650, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  inventoryRows: 2
-  inventoryColumns: 10
-  cellSize: {x: 96, y: 96}
-  cellMargin: 16
-  itemSlotPrefab: {fileID: 2625715489423964964, guid: 0120ee7fcd5b4e94eb78b43ab8e07649, type: 3}
-  cellContainer: {fileID: 183649041}
-  startingInventory: {fileID: 0}
 --- !u!114 &1351473042
 MonoBehaviour:
   m_ObjectHideFlags: 0

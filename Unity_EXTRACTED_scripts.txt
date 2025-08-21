@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 521,302 → 352,136 chars (32.5% reduction)
-Estimated tokens saved: ~42,291
+Compression Stats: 533,738 → 358,317 chars (32.9% reduction)
+Estimated tokens saved: ~43,855
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -127,54 +127,63 @@ using System;
   InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7375
   InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7446
   InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7506
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7629
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7645
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7751
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7899
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7997
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L8098
-  GridSnapStartup (Assets\Scripts\Ticks/) L8337
-  TickDebugMonitor (Assets\Scripts\Ticks/) L8404
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8440
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8498
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8729
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8740
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8769
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8865
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8970
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9367
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9403
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9569
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9693
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9867
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9875
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L9904
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9951
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10118
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10180
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10220
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10244
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10264
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10561
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10573
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10608
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10783
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7638
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7654
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7760
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7908
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8006
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L8107
+  GridSnapStartup (Assets\Scripts\Ticks/) L8346
+  TickDebugMonitor (Assets\Scripts\Ticks/) L8413
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8449
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8507
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8738
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8749
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8778
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8874
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8979
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9376
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9412
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9578
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9702
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9876
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9884
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L9913
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9960
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10127
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10189
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10229
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10253
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10273
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10570
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10582
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10617
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10792
 
 [WegoSystem]
-  RunManager (Assets\Scripts\Core/) L10794
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L10930
-  GridEntity (Assets\Scripts\Ticks/) L10987
-  GridPosition (Assets\Scripts\Ticks/) L11144
-  GridPositionManager (Assets\Scripts\Ticks/) L11245
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11582
-  TickConfiguration (Assets\Scripts\Ticks/) L11726
-  ITickUpdateable (Assets\Scripts\Ticks/) L11809
+  RunManager (Assets\Scripts\Core/) L10803
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L10939
+  GridEntity (Assets\Scripts\Ticks/) L10996
+  GridPosition (Assets\Scripts\Ticks/) L11153
+  GridPositionManager (Assets\Scripts\Ticks/) L11254
+  GridRadiusUtility (Assets\Scripts\Ticks/) L11591
+  TickConfiguration (Assets\Scripts\Ticks/) L11735
+  ITickUpdateable (Assets\Scripts\Ticks/) L11818
+
+[WegoSystem.ProceduralGeneration]
+  MapGenerationProfile (Assets\Scripts\ProceduralGeneration/) L11970
+  NoiseToTileMapping (Assets\Scripts\ProceduralGeneration/) L11997
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12009
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12092
+
+[WegoSystem.ProceduralGeneration.Editor]
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12243
 
 [for]
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L11961
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L12270
 
 [namespace]
-  GeneEventBus (Assets\Scripts\Genes\Services/) L12186
+  GeneEventBus (Assets\Scripts\Genes\Services/) L12495
 
 ================================================================================
 SCRIPTS
@@ -7670,7 +7679,7 @@ using Abracodabra.UI.Genes;
 pub cls InventoryGridController : MonoBehaviour {
 pub stat InventoryGridController Instance { get; set; }
 
-[SerializeField][Min(1)] int inventoryRows = 4; // Increased default for more space
+[SerializeField][Min(1)] int inventoryRows = 4;
 [SerializeField][Min(1)] int inventoryColumns = 4;
 [SerializeField] Vector2 cellSize = new Vector2(64f, 64f);
 [SerializeField] float cellMargin = 10f;
@@ -7685,8 +7694,17 @@ List<GeneSlotUI> inventorySlots = new List<GeneSlotUI>();
 pub event System.Action OnInventoryChanged;
 
 void Awake() {
-if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+if (Instance != null && Instance != this) {
+Destroy(gameObject);
+return;
+}
 Instance = this;
+}
+
+void OnDestroy() {
+if (Instance == this) {
+Instance = null;
+}
 }
 
 void Start() {
@@ -12111,6 +12129,306 @@ ret tickUpdateables.Count;
 }
 }
 }
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\MapGenerationProfile.cs
+
+using WegoSystem.ProceduralGeneration;
+
+namespace WegoSystem.ProceduralGeneration {
+pub cls MapGenerationProfile : ScriptableObject {
+pub Vector2Int mapSize = new Vector2Int(100, 100);
+pub int worldSeed = 12345;
+pub bool useRandomSeed = true;
+
+pub NoiseParameters noiseParameters = new NoiseParameters {
+scale = 0.1f,
+octaves = 4,
+persistence = 0.5f,
+lacunarity = 2f
+};
+
+pub void InitializeSeed() {
+if (useRandomSeed) {
+worldSeed = Random.Range(0, int.MaxValue);
+}
+noiseParameters.seed = worldSeed;
+}
+}
+}*/
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\NoiseToTileMapping.cs
+
+
+namespace WegoSystem.ProceduralGeneration {
+pub cls NoiseToTileMapping : ScriptableObject {
+pub TileDefinition tileToPlace;
+
+pub float noiseThreshold = 0.5f;
+}
+}*/
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\ProceduralMapGenerator.cs
+
+using WegoSystem;
+
+namespace WegoSystem.ProceduralGeneration {
+pub cls ProceduralMapGenerator : MonoBehaviour {
+MapGenerationProfile profile;
+
+List<NoiseToTileMapping> tileMappings;
+
+TileInteractionManager tileManager;
+
+pub void GenerateMap() {
+if (!ValidateConfiguration()) {
+return;
+}
+
+Debug.Log($"Starting map generation with seed: {profile.worldSeed}...");
+
+ClearMap();
+profile.InitializeSeed();
+
+var sortedMappings = tileMappings.OrderBy(m => m.noiseThreshold).ToList();
+
+for (int x = 0; x < profile.mapSize.x; x++) {
+for (int y = 0; y < profile.mapSize.y; y++) {
+float noiseValue = profile.noiseParameters.Sample(x, y);
+float normalizedNoise = (noiseValue + 1f) / 2f;
+
+TileDefinition tileToPlace = null;
+foreach (var mapping in sortedMappings) {
+if (normalizedNoise <= mapping.noiseThreshold) {
+tileToPlace = mapping.tileToPlace;
+break; // Found the correct tile for this noise level
+}
+}
+
+if (tileToPlace != null) {
+tileManager.PlaceTile(tileToPlace, new Vector3Int(x, y, 0));
+}
+}
+}
+
+Debug.Log("Map generation complete.");
+}
+
+pub void ClearMap() {
+if (!ValidateConfiguration(checkMappings: false)) {
+return;
+}
+
+Debug.Log("Clearing existing map...");
+
+for (int x = 0; x < profile.mapSize.x; x++) {
+for (int y = 0; y < profile.mapSize.y; y++) {
+var cellPos = new Vector3Int(x, y, 0);
+TileDefinition currentTile = tileManager.FindWhichTileDefinitionAt(cellPos);
+if (currentTile != null) {
+tileManager.RemoveTile(currentTile, cellPos);
+}
+}
+}
+}
+
+bool ValidateConfiguration(bool checkMappings = true) {
+if (profile == null) {
+Debug.LogError("[ProceduralMapGenerator] Map Generation Profile is not assigned!", this);
+ret false;
+}
+if (tileManager == null) {
+Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigned!", this);
+ret false;
+}
+if (checkMappings && (tileMappings == null || tileMappings.Count == 0)) {
+Debug.LogError("[ProceduralMapGenerator] No Noise To Tile Mappings have been assigned!", this);
+ret false;
+}
+ret true;
+}
+}
+}*/
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\SimplexNoise.cs
+
+
+namespace WegoSystem.ProceduralGeneration {
+pub stat cls SimplexNoise {
+stat ro int[] perm = new int[512];
+stat ro float F2 = 0.5f * (Mathf.Sqrt(3f) - 1f);
+stat ro float G2 = (3f - Mathf.Sqrt(3f)) / 6f;
+
+stat ro Vector2[] grad2 = {
+new Vector2(1, 1), new Vector2(-1, 1), new Vector2(1, -1), new Vector2(-1, -1),
+new Vector2(1, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(0, -1)
+};
+
+pub stat void Initialize(int seed) {
+System.Random rand = new System.Random(seed);
+int[] p = new int[256];
+
+for (int i = 0; i < 256; i++) {
+p[i] = i;
+}
+
+for (int i = 255; i > 0; i--) {
+int j = rand.Next(i + 1);
+int temp = p[i];
+p[i] = p[j];
+p[j] = temp;
+}
+
+for (int i = 0; i < 512; i++) {
+perm[i] = p[i & 255];
+}
+}
+
+pub stat float Generate2D(float x, float y) {
+float s = (x + y) * F2;
+int i = Mathf.FloorToInt(x + s);
+int j = Mathf.FloorToInt(y + s);
+
+float t = (i + j) * G2;
+float X0 = i - t;
+float Y0 = j - t;
+float x0 = x - X0;
+float y0 = y - Y0;
+
+int i1, j1;
+if (x0 > y0) {
+i1 = 1; j1 = 0;
+}
+else {
+i1 = 0; j1 = 1;
+}
+
+float x1 = x0 - i1 + G2;
+float y1 = y0 - j1 + G2;
+float x2 = x0 - 1f + 2f * G2;
+float y2 = y0 - 1f + 2f * G2;
+
+int ii = i & 255;
+int jj = j & 255;
+int gi0 = perm[ii + perm[jj]] % 8;
+int gi1 = perm[ii + i1 + perm[jj + j1]] % 8;
+int gi2 = perm[ii + 1 + perm[jj + 1]] % 8;
+
+float n0 = 0f, n1 = 0f, n2 = 0f;
+
+float t0 = 0.5f - x0 * x0 - y0 * y0;
+if (t0 >= 0) {
+t0 *= t0;
+n0 = t0 * t0 * Dot(grad2[gi0], x0, y0);
+}
+
+float t1 = 0.5f - x1 * x1 - y1 * y1;
+if (t1 >= 0) {
+t1 *= t1;
+n1 = t1 * t1 * Dot(grad2[gi1], x1, y1);
+}
+
+float t2 = 0.5f - x2 * x2 - y2 * y2;
+if (t2 >= 0) {
+t2 *= t2;
+n2 = t2 * t2 * Dot(grad2[gi2], x2, y2);
+}
+
+ret 70f * (n0 + n1 + n2);
+}
+
+pub stat float GenerateOctaves(float x, float y, NoiseParameters parameters) {
+if (parameters.octaves <= 0) ret 0f;
+
+float amplitude = 1f;
+float frequency = 1f;
+float noiseValue = 0f;
+float maxValue = 0f;
+
+for (int i = 0; i < parameters.octaves; i++) {
+float sampleX = (x + parameters.offset.x) * parameters.scale * frequency;
+float sampleY = (y + parameters.offset.y) * parameters.scale * frequency;
+
+float octaveValue = Generate2D(sampleX, sampleY);
+noiseValue += octaveValue * amplitude;
+maxValue += amplitude;
+
+amplitude *= parameters.persistence;
+frequency *= parameters.lacunarity;
+}
+
+if (maxValue > 0) {
+ret noiseValue / maxValue;
+}
+ret 0f;
+}
+
+stat float Dot(Vector2 g, float x, float y) {
+ret g.x * x + g.y * y;
+}
+
+pub stat float Remap(float value, float from1, float to1, float from2, float to2) {
+ret from2 + (value - from1) * (to2 - from2) / (to1 - from1);
+}
+}
+
+pub cls NoiseParameters {
+pub float scale = 0.1f;
+
+pub int seed = 42;
+
+pub int octaves = 4;
+
+pub float persistence = 0.5f;
+
+pub float lacunarity = 2f;
+
+pub Vector2 offset = Vector2.zero;
+
+pub NoiseParameters() { }
+
+pub NoiseParameters(float scale, int octaves, int seed) {
+this.scale = scale;
+this.octaves = octaves;
+this.seed = seed;
+}
+
+pub float Sample(float x, float y) {
+SimplexNoise.Initialize(seed);
+ret SimplexNoise.GenerateOctaves(x, y, this);
+}
+}
+}*/
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\Editor\ProceduralMapGeneratorEditor.cs
+
+using UnityEditor;
+using WegoSystem.ProceduralGeneration;
+
+namespace WegoSystem.ProceduralGeneration.Editor {
+pub cls ProceduralMapGeneratorEditor : UnityEditor.Editor {
+pub ovr void OnInspectorGUI() {
+DrawDefaultInspector();
+
+ProceduralMapGenerator generator = (ProceduralMapGenerator)target;
+
+EditorGUILayout.Space(10);
+EditorGUILayout.LabelField("Controls", EditorStyles.boldLabel);
+
+if (GUILayout.Button("Generate Map")) {
+generator.GenerateMap();
+}
+
+if (GUILayout.Button("Clear Map")) {
+generator.ClearMap();
+}
+}
+}
+}*/
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Management\FaunaManager.cs

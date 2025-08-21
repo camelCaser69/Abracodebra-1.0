@@ -12,42 +12,45 @@ public class InventoryGridController : MonoBehaviour
 {
     public static InventoryGridController Instance { get; private set; }
 
-    [Header("Configuration")]
-    [SerializeField][Min(1)] private int inventoryRows = 4; // Increased default for more space
-    [SerializeField][Min(1)] private int inventoryColumns = 4;
-    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
-    [SerializeField] private float cellMargin = 10f;
+    [SerializeField][Min(1)] int inventoryRows = 4;
+    [SerializeField][Min(1)] int inventoryColumns = 4;
+    [SerializeField] Vector2 cellSize = new Vector2(64f, 64f);
+    [SerializeField] float cellMargin = 10f;
 
-    [Header("Scene References")]
-    [SerializeField] private GameObject itemSlotPrefab;
-    [SerializeField] private Transform cellContainer;
-    
-    // MODIFIED: We now only need a single reference to the StartingInventory asset.
-    [Header("Asset References")]
-    [Tooltip("Assign the ScriptableObject that defines all starting items for the player.")]
-    [SerializeField] private StartingInventory startingInventory;
-    
-    // The individual asset references below are no longer needed here.
-    // [SerializeField] private GeneLibrary geneLibrary;
-    // [SerializeField] private ToolSwitcher toolSwitcher;
-    // [SerializeField] private List<SeedTemplate> startingSeeds = new List<SeedTemplate>();
+    [SerializeField] GameObject itemSlotPrefab;
+    [SerializeField] Transform cellContainer;
 
-    private List<GeneSlotUI> inventorySlots = new List<GeneSlotUI>();
+    [SerializeField] StartingInventory startingInventory;
+
+    List<GeneSlotUI> inventorySlots = new List<GeneSlotUI>();
 
     public event System.Action OnInventoryChanged;
 
     void Awake()
     {
-        if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         Instance = this;
+    }
+
+    void OnDestroy()
+    {
+        // This is the crucial fix.
+        // If this instance is the current singleton instance, clear the static reference when it's destroyed.
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     void Start()
     {
         if (cellContainer == null) Debug.LogError("InventoryGridController: Cell Container not assigned!", this);
         if (itemSlotPrefab == null) Debug.LogError("InventoryGridController: Item Slot Prefab not assigned!", this);
-        
-        // NEW: Add a check for the starting inventory asset.
+
         if (startingInventory == null)
         {
             Debug.LogError("InventoryGridController: Starting Inventory asset is not assigned! The player will have no items.", this);
@@ -95,24 +98,20 @@ public class InventoryGridController : MonoBehaviour
         }
     }
 
-    // REWRITTEN: This method is now much cleaner and uses the StartingInventory asset.
     void PopulateInitialInventory()
     {
         if (startingInventory == null) return;
 
-        // Populate with starter genes
         foreach (var gene in startingInventory.startingGenes)
         {
             if (gene != null) AddItemToInventory(InventoryBarItem.FromGene(new RuntimeGeneInstance(gene)));
         }
-        
-        // Populate with starter seeds
+
         foreach (var seed in startingInventory.startingSeeds)
         {
             if (seed != null) AddItemToInventory(InventoryBarItem.FromSeed(seed));
         }
 
-        // Populate with starter tools
         foreach (var tool in startingInventory.startingTools)
         {
             if (tool != null) AddItemToInventory(InventoryBarItem.FromTool(tool));
