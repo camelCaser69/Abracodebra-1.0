@@ -25,33 +25,34 @@ public class BiomeLayer
     // --- NEW FIELDS END ---
 }
 
-[CreateAssetMenu(fileName = "NewMapProfile", menuName = "ProceduralGen/Map Generation Profile")]
-public class MapGenerationProfile : ScriptableObject
+namespace WegoSystem.ProceduralGeneration
 {
-    [Header("Map Settings")]
-    public Vector2Int mapSize = new Vector2Int(100, 100);
-    public int worldSeed = 12345;
-    public bool useRandomSeed = true;
-
-    [Header("Noise Settings")]
-    public NoiseParameters noiseParameters = new NoiseParameters
+    [CreateAssetMenu(fileName = "MapGenerationProfile", menuName = "Game/Map Generation Profile")]
+    public class MapGenerationProfile : ScriptableObject
     {
-        scale = 0.1f,
-        octaves = 4,
-        persistence = 0.5f,
-        lacunarity = 2f
-    };
+        // REMOVED: The mapSize is now sourced exclusively from MapConfiguration.
+        // public Vector2Int mapSize = new Vector2Int(100, 100); 
 
-    [Header("Biome Layers")]
-    [Tooltip("Define biome layers here, ordered from lowest altitude (e.g., Water) to highest (e.g., Grass).")]
-    public List<BiomeLayer> biomeLayers;
+        public int worldSeed = 12345;
+        public bool useRandomSeed = true;
 
-    public void InitializeSeed()
-    {
-        if (useRandomSeed)
+        public NoiseParameters noiseParameters = new NoiseParameters
         {
-            worldSeed = Random.Range(0, int.MaxValue);
+            scale = 0.1f,
+            octaves = 4,
+            persistence = 0.5f,
+            lacunarity = 2f
+        };
+
+        public List<BiomeLayer> biomeLayers;
+
+        public void InitializeSeed()
+        {
+            if (useRandomSeed)
+            {
+                worldSeed = Random.Range(0, int.MaxValue);
+            }
+            noiseParameters.seed = worldSeed;
         }
-        noiseParameters.seed = worldSeed;
     }
 }

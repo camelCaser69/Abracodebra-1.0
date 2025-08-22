@@ -34,9 +34,11 @@ namespace WegoSystem.ProceduralGeneration
 
             var sortedLayers = profile.biomeLayers.OrderBy(layer => layer.noiseThreshold).ToList();
 
+            // UPDATED: Use mapConfig for dimensions
             float halfWidth = mapConfig.mapSize.x / 2f;
             float halfHeight = mapConfig.mapSize.y / 2f;
 
+            // UPDATED: Use mapConfig for loop bounds
             for (int x = 0; x < mapConfig.mapSize.x; x++)
             {
                 for (int y = 0; y < mapConfig.mapSize.y; y++)
@@ -87,6 +89,7 @@ namespace WegoSystem.ProceduralGeneration
 
             Debug.Log("Clearing existing map by checking every cell...");
 
+            // UPDATED: Use mapConfig for loop bounds
             for (int x = 0; x < mapConfig.mapSize.x; x++)
             {
                 for (int y = 0; y < mapConfig.mapSize.y; y++)
@@ -122,20 +125,17 @@ namespace WegoSystem.ProceduralGeneration
                 Debug.LogError("[ProceduralMapGenerator] Map Generation Profile is not assigned!", this);
                 return false;
             }
-
-            // --- CORRECTED VALIDATION LOGIC ---
-            // Prioritize the Inspector field. Fall back to the singleton only if needed.
+            
             if (tileManager == null)
             {
-                tileManager = TileInteractionManager.Instance; // Attempt to find singleton as a fallback.
+                tileManager = TileInteractionManager.Instance; 
                 if (tileManager == null)
                 {
                     Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigned in the Inspector and could not be found in the scene! Please assign it.", this);
                     return false;
                 }
             }
-            // --- END OF CORRECTION ---
-
+            
             if (checkMappings && (profile.biomeLayers == null || profile.biomeLayers.Count == 0))
             {
                 Debug.LogError("[ProceduralMapGenerator] The assigned Profile has no Biome Layers defined!", this);

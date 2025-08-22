@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0939bd6d24b4315898f043ccecd6534, type: 3}
   m_Name: MapConfiguration
   m_EditorClassIdentifier: 
-  mapSize: {x: 50, y: 50}
+  mapSize: {x: 40, y: 30}
   gridOffset: {x: 0, y: 0}
-  gizmoDisplayRadius: 20
-  autoScaleGizmos: 1
+  gizmoDisplayRadius: 40
+  autoScaleGizmos: 0
   referenceResolution: {x: 320, y: 180}
   pixelsPerUnit: 12
