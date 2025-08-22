@@ -16,29 +16,45 @@ namespace WegoSystem.EditorTools
 
         private void OnDrawGizmos()
         {
-            if (mapConfig == null)
-            {
-                // Attempt to find it if not assigned
-                if (GridPositionManager.Instance != null)
-                {
-                    // A common pattern would be to have the config on the manager
-                    // This is just a guess to make it more user-friendly.
-                }
-                if (mapConfig == null) return;
-            }
+            if (mapConfig == null) return;
 
+            var gridManager = GridPositionManager.Instance;
+            if (gridManager == null)
+            {
+                // In Edit mode, the singleton might not be set. Try to find it in the scene.
+                // UPDATED: Replaced obsolete FindObjectOfType with FindFirstObjectByType.
+                gridManager = FindFirstObjectByType<GridPositionManager>();
+                if (gridManager == null) return; // If still not found, we cannot proceed.
+            }
+            
+            var grid = gridManager.GetTilemapGrid();
+            if (grid == null) return;
+
+            // 1. Get the world position of the CENTER of the first and last tiles.
+            Vector3 firstCellCenter = grid.GetCellCenterWorld(new Vector3Int(0, 0, 0));
+            Vector3 lastCellCenter = grid.GetCellCenterWorld(new Vector3Int(mapConfig.mapSize.x - 1, mapConfig.mapSize.y - 1, 0));
+
+            // 2. The center of the entire map is the midpoint between these two points.
+            Vector3 mapWorldCenter = (firstCellCenter + lastCellCenter) / 2f;
+
+            // 3. The total size of the map is the distance between the centers, PLUS one full cell size
+            //    to account for the outer halves of the edge tiles.
+            Vector3 mapWorldSize = (lastCellCenter - firstCellCenter) + grid.cellSize;
+            // Ensure size is always positive
+            mapWorldSize.x = Mathf.Abs(mapWorldSize.x);
+            mapWorldSize.y = Mathf.Abs(mapWorldSize.y);
+            
             // Draw map bounds
             Gizmos.color = boundsColor;
-            Vector3 center = mapConfig.GetMapBounds().center;
-            Vector3 size = mapConfig.GetMapBounds().size;
-            Gizmos.DrawWireCube(center, size);
+            Gizmos.DrawWireCube(mapWorldCenter, mapWorldSize);
 
-            // Draw safe area (using a 2-tile padding as an example)
+            // Draw safe area (with padding in world units)
             Gizmos.color = safeAreaColor;
-            Vector3 safeSize = size - new Vector3(4, 4, 0); // 2 tiles padding on each side
+            float padding = grid.cellSize.x * 2; // 2 tiles padding
+            Vector3 safeSize = mapWorldSize - new Vector3(padding * 2, padding * 2, 0);
             if (safeSize.x > 0 && safeSize.y > 0)
             {
-                Gizmos.DrawWireCube(center, safeSize);
+                Gizmos.DrawWireCube(mapWorldCenter, safeSize);
             }
 
             // Draw current camera view

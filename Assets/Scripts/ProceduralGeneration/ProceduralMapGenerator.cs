@@ -7,13 +7,16 @@ namespace WegoSystem.ProceduralGeneration
 {
     public class ProceduralMapGenerator : MonoBehaviour
     {
+        [Header("Core Configuration")]
         [Tooltip("The central configuration for map size. This is the primary source of truth for dimensions.")]
-        [SerializeField] MapConfiguration mapConfig;
+        [SerializeField] private MapConfiguration mapConfig;
         
         [Tooltip("Profile containing noise parameters and biome layer definitions.")]
-        [SerializeField] MapGenerationProfile profile;
+        [SerializeField] private MapGenerationProfile profile;
 
-        private TileInteractionManager tileManager;
+        [Header("Scene References")]
+        [Tooltip("Assign the scene's TileInteractionManager here. This is required for placing tiles.")]
+        [SerializeField] private TileInteractionManager tileManager;
 
         private readonly Dictionary<Vector2Int, TileDefinition> tileMap = new Dictionary<Vector2Int, TileDefinition>();
 
@@ -66,9 +69,8 @@ namespace WegoSystem.ProceduralGeneration
                         if (chosenLayer.tile != null)
                         {
                             tileManager.PlaceTile(chosenLayer.tile, cellPos);
-                            tileMap[new Vector2Int(x, y)] = chosenLayer.tile; // Track the top-most tile
+                            tileMap[new Vector2Int(x, y)] = chosenLayer.tile;
                         }
-
                     }
                 }
             }
@@ -120,15 +122,20 @@ namespace WegoSystem.ProceduralGeneration
                 Debug.LogError("[ProceduralMapGenerator] Map Generation Profile is not assigned!", this);
                 return false;
             }
+
+            // --- CORRECTED VALIDATION LOGIC ---
+            // Prioritize the Inspector field. Fall back to the singleton only if needed.
             if (tileManager == null)
             {
-                tileManager = TileInteractionManager.Instance;
+                tileManager = TileInteractionManager.Instance; // Attempt to find singleton as a fallback.
                 if (tileManager == null)
                 {
-                    Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigned and could not be found!", this);
+                    Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigned in the Inspector and could not be found in the scene! Please assign it.", this);
                     return false;
                 }
             }
+            // --- END OF CORRECTION ---
+
             if (checkMappings && (profile.biomeLayers == null || profile.biomeLayers.Count == 0))
             {
                 Debug.LogError("[ProceduralMapGenerator] The assigned Profile has no Biome Layers defined!", this);

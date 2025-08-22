@@ -8,34 +8,22 @@ namespace WegoSystem
     {
         [Header("Map Dimensions")]
         public Vector2Int mapSize = new Vector2Int(100, 100);
-        public Vector2Int gridOffset = Vector2Int.zero; // For future: offset from origin if needed
+        public Vector2Int gridOffset = Vector2Int.zero;
 
         [Header("Visual Settings")]
         public int gizmoDisplayRadius = 20;
         public bool autoScaleGizmos = true;
 
-        [Header("Camera Settings - Pulled from PixelPerfectSetup")]
+        [Header("Camera Settings")] // Renamed header for clarity
         public Vector2Int referenceResolution = new Vector2Int(320, 180);
         public int pixelsPerUnit = 6;
-
-        /// <summary>
-        /// Gets the center grid position of the map.
-        /// </summary>
+        
         public GridPosition GetMapCenter() => new GridPosition(mapSize.x / 2, mapSize.y / 2);
+        
+        // REMOVED: This method was misleading as it didn't account for Grid Cell Size.
+        // The calculation is now correctly handled in MapBoundsVisualizer.
+        // public Bounds GetMapBounds() { ... }
 
-        /// <summary>
-        /// Gets the world-space bounds of the map.
-        /// </summary>
-        public Bounds GetMapBounds()
-        {
-            Vector3 center = new Vector3(mapSize.x / 2f, mapSize.y / 2f, 0);
-            Vector3 size = new Vector3(mapSize.x, mapSize.y, 1);
-            return new Bounds(center + (Vector3Int)gridOffset, size);
-        }
-
-        /// <summary>
-        /// Gets a gizmo display size that adapts to the map size to prevent excessive drawing.
-        /// </summary>
         public int GetAdaptiveGizmoSize()
         {
             if (!autoScaleGizmos) return gizmoDisplayRadius;
