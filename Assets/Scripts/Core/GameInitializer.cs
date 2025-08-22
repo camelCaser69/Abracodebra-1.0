@@ -1,22 +1,40 @@
-﻿// REWORKED FILE: Assets/Scripts/Core/GameInitializer.cs
-using UnityEngine;
+﻿using UnityEngine;
 using Abracodabra.Genes.Services;
+using WegoSystem;
 
-public class GameInitializer : MonoBehaviour
+namespace WegoSystem
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    static void InitializeServices()
+    public class GameInitializer : MonoBehaviour
     {
-        // This now ONLY initializes the non-scene-dependent services.
-        GeneServices.Initialize();
-    }
+        [Header("Core Configuration")]
+        [Tooltip("Assign the project's MapConfiguration asset here. It's required for multiple systems.")]
+        [SerializeField] private MapConfiguration mapConfig;
 
-    void Awake()
-    {
-        // This ensures the MonoBehaviour singletons are created and ready.
-        if (GeneEffectPool.Instance == null)
+        private void Awake()
         {
-            Debug.LogError("GeneEffectPool instance could not be created.");
+            if (mapConfig == null)
+            {
+                Debug.LogError("[GameInitializer] CRITICAL: MapConfiguration is not assigned! Many systems will fail to initialize.", this);
+                return;
+            }
+
+            // Initialize static helpers that depend on configuration
+            PixelGridSnapper.Initialize(mapConfig);
+
+            // Initialize core services
+            InitializeServices();
+            
+            // Ensure the singleton effect pool is created
+            if (GeneEffectPool.Instance == null)
+            {
+                Debug.LogError("[GameInitializer] GeneEffectPool instance could not be created.");
+            }
+        }
+
+        private static void InitializeServices()
+        {
+            // This remains from your original script
+            GeneServices.Initialize();
         }
     }
 }

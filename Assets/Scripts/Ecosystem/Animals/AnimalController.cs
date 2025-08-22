@@ -104,6 +104,12 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     }
     #endregion
 
+    private void LateUpdate()
+    {
+        // Snap final visual position to the pixel grid after all movement calculations.
+        transform.position = PixelGridSnapper.SnapToGrid(transform.position);
+    }
+    
     public void OnTickUpdate(int currentTick)
     {
         if (!enabled || definition == null) return;
