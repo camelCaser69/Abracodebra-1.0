@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/WorldInteraction/Tiles/TileInteractionManager.cs
+using UnityEngine;
 using UnityEngine.Tilemaps;
 using skner.DualGrid;
 using TMPro;
@@ -47,8 +48,7 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
     SpriteRenderer hoverSpriteRenderer;
     bool isWithinInteractionRange = false;
     
-    // This flag is no longer strictly necessary with the new check, but is kept for clarity.
-    private bool isInitialized = false;
+    // UNUSED VARIABLE REMOVED: The 'isInitialized' boolean is gone.
 
     protected override void OnAwake()
     {
@@ -56,16 +56,13 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
         CacheHoverSpriteRenderer();
     }
     
-    // This is the key fix. It checks if initialization is needed and performs it.
     private void EnsureInitialized()
     {
-        // Only run setup if the dictionary hasn't been created yet.
         if (moduleByDefinition == null)
         {
             if(debugLogs) Debug.Log("[TileInteractionManager] Dictionaries are null. Initializing now.");
             SetupTilemaps();
         }
-        isInitialized = true;
     }
 
     void Start()
@@ -97,9 +94,8 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
 
     public TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
     {
-        EnsureInitialized(); // Call at the beginning of the public method.
+        EnsureInitialized();
         
-        // This mapping list check is important.
         if (tileDefinitionMappings == null) return null;
 
         foreach (var mapping in tileDefinitionMappings)
@@ -141,8 +137,8 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
 
     public void ApplyToolAction(ToolDefinition toolDef)
     {
-        EnsureInitialized();
         if (toolDef == null || !currentlyHoveredCell.HasValue) return;
+
         Vector3Int targetCell = currentlyHoveredCell.Value;
         TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
         if (currentTileDef == null) return;
@@ -151,21 +147,23 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
 
         if (rule != null)
         {
-            if (debugLogs) Debug.Log($"[TileInteractionManager] Rule found! Transforming '{currentTileDef.displayName}' to '{(rule.toTile != null ? rule.toTile.displayName : "NULL")}'.");
+            TileDefinition fromTile = currentTileDef;
+            TileDefinition toTile = rule.toTile;
 
-            if (rule.toTile != null && rule.toTile.keepBottomTile)
+            if (debugLogs) Debug.Log($"[TileInteractionManager] Rule found! From: '{fromTile.displayName}', To: '{(toTile != null ? toTile.displayName : "NULL")}'.");
+
+            if (toTile == null)
             {
-                RemoveTile(currentTileDef, targetCell);
-            }
-            else if (rule.toTile == null)
-            {
-                RemoveTile(currentTileDef, targetCell);
+                RemoveTile(fromTile, targetCell);
+                return;
             }
 
-            if (rule.toTile != null)
+            if (!toTile.keepBottomTile)
             {
-                PlaceTile(rule.toTile, targetCell);
+                RemoveTile(fromTile, targetCell);
             }
+            
+            PlaceTile(toTile, targetCell);
         }
         else if (debugLogs)
         {
@@ -211,7 +209,7 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
 
     public void PlaceTile(TileDefinition tileDef, Vector3Int cellPos)
     {
-        EnsureInitialized(); // Call at the beginning of the public method.
+        EnsureInitialized();
         if (tileDef == null) return;
         if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null)
         {
@@ -225,7 +223,7 @@ public class TileInteractionManager : SingletonMonoBehaviour<TileInteractionMana
 
     public void RemoveTile(TileDefinition tileDef, Vector3Int cellPos)
     {
-        EnsureInitialized(); // Call at the beginning of the public method.
+        EnsureInitialized();
         if (tileDef == null) return;
         if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null)
         {

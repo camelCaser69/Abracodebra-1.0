@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 534,336 → 359,449 chars (32.7% reduction)
-Estimated tokens saved: ~43,721
+Compression Stats: 519,514 → 344,703 chars (33.6% reduction)
+Estimated tokens saved: ~43,702
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -76,114 +76,112 @@ using System;
   PixelPerfectSetup (Assets\Scripts\Core/) L2533
   SortableEntity (Assets\Scripts\Core/) L2574
   UIManager (Assets\Scripts\Core/) L2641
-  WeatherManager (Assets\Scripts\Core/) L2834
-  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L3034
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L3087
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L3366
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L3452
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L3461
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L3849
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L3996
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L4009
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L4046
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L4356
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L4387
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L4651
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L4744
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L4759
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L4778
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L4862
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L4938
-  FoodType (Assets\Scripts\Ecosystem\Food/) L5004
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L5017
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L5039
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L5058
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L5363
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L5392
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L5530
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L5548
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L5586
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L5634
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L5652
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L5778
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L5889
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L5936
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L5949
-  TileDefinitionEditor (Assets\Scripts\Editor/) L6010
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L6030
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L6065
-  WaveManagerEditor (Assets\Scripts\Editor/) L6202
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6377
-  CompleteUISetup (Assets\Scripts\Helpers/) L6402
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6798
-  LeafData (Assets\Scripts\PlantSystem\Data/) L6806
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6821
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6860
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6881
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L7013
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L7071
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7157
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7226
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7375
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7446
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7506
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7638
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7654
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7760
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7908
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8006
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L8107
-  GridSnapStartup (Assets\Scripts\Ticks/) L8346
-  TickDebugMonitor (Assets\Scripts\Ticks/) L8413
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8449
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8507
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8738
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8749
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8778
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8874
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8979
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9376
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9412
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9578
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9702
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9876
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9884
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L9913
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9960
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10127
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10189
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10229
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10253
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10273
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10587
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10599
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10634
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10809
+  WeatherManager (Assets\Scripts\Core/) L2844
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L3044
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L3097
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L3376
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L3462
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L3471
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L3859
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L4006
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L4019
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L4056
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L4366
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L4397
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L4670
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L4763
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L4778
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L4797
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L4881
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L4957
+  FoodType (Assets\Scripts\Ecosystem\Food/) L5023
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L5036
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L5058
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L5301
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L5320
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L5625
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L5654
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L5792
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L5810
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L5848
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L5896
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L5914
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L6040
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L6151
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L6198
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L6211
+  TileDefinitionEditor (Assets\Scripts\Editor/) L6272
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L6292
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L6327
+  WaveManagerEditor (Assets\Scripts\Editor/) L6464
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6639
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6664
+  LeafData (Assets\Scripts\PlantSystem\Data/) L6672
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6687
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6726
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6747
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6879
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6937
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7023
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7092
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7241
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7312
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7372
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7504
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7520
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7626
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7774
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7872
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L7973
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L8012
+  GridSnapStartup (Assets\Scripts\Ticks/) L8251
+  TickDebugMonitor (Assets\Scripts\Ticks/) L8318
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8354
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8412
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8643
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8654
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8683
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8779
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8884
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9281
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9317
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9483
+  SceneSetupManagerEditor (Assets\Scripts\WorldInteraction\Player\Editor/) L9607
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9631
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9805
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9813
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L9842
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9889
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10056
+  SceneSetupManager (Assets\Scripts\WorldInteraction\Player/) L10118
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10188
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10228
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10252
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10272
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10586
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10598
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10633
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10808
 
 [WegoSystem]
-  RunManager (Assets\Scripts\Core/) L10820
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L10956
-  GridEntity (Assets\Scripts\Ticks/) L11013
-  GridPosition (Assets\Scripts\Ticks/) L11170
-  GridPositionManager (Assets\Scripts\Ticks/) L11271
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11608
-  TickConfiguration (Assets\Scripts\Ticks/) L11752
-  ITickUpdateable (Assets\Scripts\Ticks/) L11835
+  RunManager (Assets\Scripts\Core/) L10819
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L10955
+  GridEntity (Assets\Scripts\Ticks/) L11012
+  GridPosition (Assets\Scripts\Ticks/) L11169
+  GridPositionManager (Assets\Scripts\Ticks/) L11270
+  GridRadiusUtility (Assets\Scripts\Ticks/) L11635
+  TickConfiguration (Assets\Scripts\Ticks/) L11779
+  ITickUpdateable (Assets\Scripts\Ticks/) L11862
 
 [WegoSystem.ProceduralGeneration]
-  MapGenerationProfile (Assets\Scripts\ProceduralGeneration/) L11987
-  NoiseToTileMapping (Assets\Scripts\ProceduralGeneration/) L12015
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12028
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12128
-
-[WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12280
-
-[for]
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L12308
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12014
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12125
 
 [namespace]
-  GeneEventBus (Assets\Scripts\Genes\Services/) L12533
+  GeneEventBus (Assets\Scripts\Genes\Services/) L12277
+
+[needs]
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12329
 
 ================================================================================
 SCRIPTS
@@ -2811,6 +2809,8 @@ using WegoSystem;
 pub cls UIManager : MonoBehaviour {
 pub stat UIManager Instance { get; set; }
 
+[SerializeField] GameObject uiCanvasRoot;
+
 [SerializeField] GameObject planningPanel;
 [SerializeField] GameObject growthAndThreatPanel;
 [SerializeField] GameObject geneSequenceUIPanel;
@@ -2835,6 +2835,14 @@ Destroy(gameObject);
 return;
 }
 Instance = this;
+
+if (uiCanvasRoot != null) {
+uiCanvasRoot.SetActive(true);
+Debug.Log($"[UIManager] Activated main UI canvas '{uiCanvasRoot.name}'.");
+}
+else {
+Debug.LogWarning("[UIManager] UI Canvas Root is not assigned. UI may not appear.", this);
+}
 }
 
 pub void Initialize() {
@@ -4550,7 +4558,7 @@ pub float growingPlantAttraction = 1.0f;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Effects\FireflyManager.cs
 
-﻿using System.Collections.Generic;
+﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyManager.cs
 using WegoSystem;
 
 pub cls FireflyManager : MonoBehaviour, ITickUpdateable {
@@ -4558,14 +4566,15 @@ pub stat FireflyManager Instance { get; set; }
 
 [SerializeField] WeatherManager weatherManager;
 [SerializeField] GameObject fireflyPrefab;
-[SerializeField] pub FireflyDefinition defaultFireflyDefinition; // Made pub to fix access issue
+[SerializeField] pub FireflyDefinition defaultFireflyDefinition;
 [SerializeField] Transform fireflyParent;
 
 [SerializeField] int maxFireflies = 50;
 [SerializeField] int spawnIntervalTicks = 3;
 [SerializeField] [Range(0f, 1f)] float nightThreshold = 0.25f;
 
-[SerializeField] Vector2 spawnCenter = Vector2.zero;
+[SerializeField] bool useMapCenterAsSpawnArea = true;
+[SerializeField] Vector2 customSpawnCenter = Vector2.zero;
 [SerializeField] Vector2 spawnAreaSize = new Vector2(20f, 10f);
 
 pub float photosynthesisRadius = 3f;
@@ -4579,7 +4588,6 @@ pub float maxPhotosynthesisBonus = 0.5f;
 
 List<FireflyController> activeFireflies = new List<FireflyController>();
 Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
-
 int spawnTickCounter = 0;
 bool isNight = false;
 
@@ -4664,6 +4672,13 @@ void Update() {
 UpdateRuntimeLineVisualizers();
 }
 
+Vector2 GetEffectiveSpawnCenter() {
+if (useMapCenterAsSpawnArea && GridPositionManager.Instance != null) {
+ret GridPositionManager.Instance.GetMapCenterWorld();
+}
+ret customSpawnCenter;
+}
+
 void TrySpawnFirefly() {
 if (activeFireflies.Count >= maxFireflies) return;
 
@@ -4682,13 +4697,14 @@ activeFireflies.Add(controller);
 }
 
 GridPosition FindValidSpawnPosition() {
-Vector2 minBounds = spawnCenter - spawnAreaSize * 0.5f;
-Vector2 maxBounds = spawnCenter + spawnAreaSize * 0.5f;
+Vector2 center = GetEffectiveSpawnCenter();
+Vector2 minBounds = center - spawnAreaSize * 0.5f;
+Vector2 maxBounds = center + spawnAreaSize * 0.5f;
 
 GridPosition minGrid = GridPositionManager.Instance.WorldToGrid(minBounds);
 GridPosition maxGrid = GridPositionManager.Instance.WorldToGrid(maxBounds);
 
-for (int i = 0; i < 10; i++) // Try 10 times to find a spot {
+for (int i = 0; i < 10; i++) {
 int x = Random.Range(minGrid.x, maxGrid.x + 1);
 int y = Random.Range(minGrid.y, maxGrid.y + 1);
 GridPosition pos = new GridPosition(x, y);
@@ -4699,7 +4715,7 @@ ret pos;
 }
 }
 
-ret GridPosition.Zero; // Failed to find a spot
+ret GridPosition.Zero;
 }
 
 pub void ReportFireflyDespawned(FireflyController firefly) {
@@ -4797,8 +4813,9 @@ activeLineVisualizers.Clear();
 }
 
 void OnDrawGizmosSelected() {
+Vector2 center = GetEffectiveSpawnCenter();
 Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
-Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
+Gizmos.DrawWireCube(center, spawnAreaSize);
 
 if (Application.isPlaying) {
 Gizmos.color = new Color(0f, 1f, 0.5f, 0.2f);
@@ -5197,6 +5214,249 @@ if (scentLibrary == null) {
 Debug.LogWarning($"[{nameof(EcosystemManager)}] Scent Library not assigned! Scent effects will not work.", this);
 }
 }
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Ecosystem\Management\FaunaManager.cs
+
+﻿// FILE: Assets/Scripts/Ecosystem/Management/FaunaManager.cs
+using WegoSystem;
+
+pub cls FaunaManager : MonoBehaviour {
+[SerializeField] bool useMapCenterAsSpawnArea = true;
+[SerializeField] Vector2 customSpawnCenter = Vector2.zero;
+[SerializeField] Vector2 spawnAreaSize = new Vector2(20f, 10f);
+
+[SerializeField] Transform ecosystemParent;
+
+[SerializeField] [Min(0f)] float screenBoundsPadding = 0.5f;
+[SerializeField] [Min(0f)] float offscreenSpawnMargin = 2.0f;
+[SerializeField] [Range(-10f, 10f)] float boundsOffsetX = 0f;
+[SerializeField] [Range(-10f, 10f)] float boundsOffsetY = 0f;
+
+[SerializeField] bool showBoundsGizmos = false;
+
+List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
+Camera mainCamera;
+
+pub void Initialize() {
+InitializeManager();
+}
+
+void InitializeManager() {
+activeSpawnCoroutines.Clear();
+if (WaveManager.Instance != null) mainCamera = WaveManager.Instance.GetMainCamera();
+if (mainCamera == null) mainCamera = Camera.main;
+if (mainCamera == null) Debug.LogError("[FaunaManager] Cannot find Main Camera!", this);
+
+if (ecosystemParent == null) {
+if (EcosystemManager.Instance != null && EcosystemManager.Instance.animalParent != null) {
+ecosystemParent = EcosystemManager.Instance.animalParent;
+Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned from EcosystemManager.animalParent.", this);
+}
+else {
+ecosystemParent = transform;
+Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned to self as fallback.", this);
+}
+}
+}
+
+Vector2 GetEffectiveSpawnCenter() {
+if (useMapCenterAsSpawnArea && GridPositionManager.Instance != null) {
+ret GridPositionManager.Instance.GetMapCenterWorld();
+}
+ret customSpawnCenter;
+}
+
+pub void ExecuteSpawnWave(WaveDefinition waveDef) {
+if (waveDef == null) { Debug.LogError("[FaunaManager] ExecuteSpawnWave called with null WaveDefinition!", this); return; }
+if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; }
+
+Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'");
+StopAllSpawnCoroutines();
+
+foreach (WaveSpawnEntry entry in waveDef.spawnEntries) {
+if (entry.animalDefinition == null) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', null AnimalDefinition for wave '{waveDef.waveName}'."); continue; }
+if (entry.spawnCount <= 0) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', Spawn Count <= 0 for wave '{waveDef.waveName}'."); continue; }
+
+if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
+Debug.Log($"[FaunaManager] Halting further spawn entry processing for wave '{waveDef.waveName}', RunManager not in GrowthAndThreat state.");
+break;
+}
+
+WaveSpawnEntry currentEntry = entry;
+Coroutine spawnCoroutine = StartCoroutine(SpawnWaveEntryCoroutine(currentEntry, waveDef.waveName));
+activeSpawnCoroutines.Add(spawnCoroutine);
+}
+Debug.Log($"[FaunaManager] Started {activeSpawnCoroutines.Count} spawn entry coroutine(s) for '{waveDef.waveName}'.");
+}
+
+pub void StopAllSpawnCoroutines() {
+if (activeSpawnCoroutines.Count > 0) {
+Debug.Log($"[FaunaManager] Stopping all ({activeSpawnCoroutines.Count}) active spawn coroutines.");
+foreach (Coroutine co in activeSpawnCoroutines) {
+if (co != null) StopCoroutine(co);
+}
+activeSpawnCoroutines.Clear();
+}
+}
+
+IEnumerator SpawnWaveEntryCoroutine(WaveSpawnEntry entry, string waveNameForDebug) {
+if (entry.delayAfterSpawnTime > 0) {
+yield ret new WaitForSeconds(entry.delayAfterSpawnTime);
+}
+
+for (int i = 0; i < entry.spawnCount; i++) {
+if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
+Debug.Log($"[FaunaManager] Halting spawn for entry '{entry.description}' in wave '{waveNameForDebug}', RunManager no longer in GrowthAndThreat state.");
+break;
+}
+
+Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius);
+bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen;
+GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen);
+
+if (entry.spawnInterval > 0 && i < entry.spawnCount - 1) {
+yield ret new WaitForSeconds(entry.spawnInterval);
+}
+}
+}
+
+Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius) {
+if (mainCamera == null) {
+Debug.LogError("[FaunaManager] Missing Main Camera for CalculateSpawnPosition!");
+ret GetEffectiveSpawnCenter();
+}
+
+Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+
+Vector2 spawnPos;
+float camHeight = mainCamera.orthographicSize * 2f;
+float camWidth = camHeight * mainCamera.aspect;
+
+switch (locationType) {
+case WaveSpawnLocationType.Offscreen:
+float marginMinX = effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin;
+float marginMaxX = effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin;
+float marginMinY = effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin;
+float marginMaxY = effectiveCamPos.y + camHeight / 2f - offscreenSpawnMargin;
+float extraOffset = 0.1f;
+int edge = Random.Range(0, 4);
+if (edge == 0) { spawnPos.x = marginMinX - extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
+else if (edge == 1) { spawnPos.x = marginMaxX + extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
+else if (edge == 2) { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMinY - extraOffset; }
+else { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMaxY + extraOffset; }
+break;
+
+case WaveSpawnLocationType.RandomNearPlayer:
+Transform playerT = FindPlayerTransform();
+if (playerT != null) {
+spawnPos = (Vector2)playerT.position + Random.insideUnitCircle * radius;
+}
+else {
+Debug.LogWarning("[FaunaManager] Player not found for RandomNearPlayer. Falling back to Global.");
+goto case WaveSpawnLocationType.GlobalSpawnArea;
+}
+break;
+
+case WaveSpawnLocationType.GlobalSpawnArea:
+default:
+Vector2 center = GetEffectiveSpawnCenter();
+spawnPos.x = center.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
+spawnPos.y = center.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
+break;
+}
+ret spawnPos;
+}
+
+Transform FindPlayerTransform() {
+GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
+if (playerGO != null) ret playerGO.transform;
+
+PlayerTileInteractor pti = FindAnyObjectByType<PlayerTileInteractor>();
+if (pti != null) ret pti.transform;
+
+GardenerController gc = FindAnyObjectByType<GardenerController>();
+if (gc != null) ret gc.transform;
+
+ret null;
+}
+
+GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn) {
+if (definition == null || definition.prefab == null) {
+Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab.");
+ret null;
+}
+
+if (mainCamera == null) {
+Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!");
+ret null;
+}
+
+Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+
+Vector2 minPaddedBounds, maxPaddedBounds;
+float camHeight = mainCamera.orthographicSize * 2f;
+float camWidth = camHeight * mainCamera.aspect;
+
+minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
+maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
+minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
+maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
+
+GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
+
+if (ecosystemParent != null) {
+Transform speciesParent = ecosystemParent;
+if (EcosystemManager.Instance != null && EcosystemManager.Instance.sortAnimalsBySpecies && !string.IsNullOrEmpty(definition.animalName)) {
+speciesParent = ecosystemParent.Find(definition.animalName);
+if (speciesParent == null) {
+GameObject subParentGO = new GameObject(definition.animalName);
+subParentGO.transform.SetParent(ecosystemParent);
+speciesParent = subParentGO.transform;
+}
+}
+animalObj.transform.SetParent(speciesParent);
+}
+
+AnimalController controller = animalObj.GetComponent<AnimalController>();
+if (controller != null) {
+if (isOffscreenSpawn) {
+Vector2 screenCenter = (minPaddedBounds + maxPaddedBounds) / 2f;
+controller.SetSeekingScreenCenter(screenCenter, minPaddedBounds, maxPaddedBounds);
+}
+}
+else {
+Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj);
+}
+
+ret animalObj;
+}
+
+void OnDrawGizmos() {
+if (!showBoundsGizmos) return;
+
+Vector2 center = GetEffectiveSpawnCenter();
+Gizmos.color = new Color(0f, 0.5f, 1f, 0.5f); // Blue for spawn area
+Gizmos.DrawWireCube(center, spawnAreaSize);
+
+if (mainCamera == null) return;
+
+Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
+Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
+float camHeight = mainCamera.orthographicSize * 2f;
+float camWidth = camHeight * mainCamera.aspect;
+Vector2 paddedMin = new Vector2(effectiveCamPos.x - camWidth / 2f + screenBoundsPadding, effectiveCamPos.y - camHeight / 2f + screenBoundsPadding);
+Vector2 paddedMax = new Vector2(effectiveCamPos.x + camWidth / 2f - screenBoundsPadding, effectiveCamPos.y + camHeight / 2f - screenBoundsPadding);
+DrawWireRectangleGizmo(paddedMin, paddedMax, Color.green);
+Vector2 marginMin = new Vector2(effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin, effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin);
+Vector2 marginMax = new Vector2(effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin, effectiveCamPos.y + camHeight / 2f - offscreenSpawnMargin);
+DrawWireRectangleGizmo(marginMin, marginMax, Color.red);
+}
+
+void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { Gizmos.color = color; Gizmos.DrawLine(new Vector3(min.x, min.y, 0), new Vector3(max.x, min.y, 0)); Gizmos.DrawLine(new Vector3(max.x, min.y, 0), new Vector3(max.x, max.y, 0)); Gizmos.DrawLine(new Vector3(max.x, max.y, 0), new Vector3(min.x, max.y, 0)); Gizmos.DrawLine(new Vector3(min.x, max.y, 0), new Vector3(min.x, min.y, 0)); }
 }
 
 ////////////////////////////////////////////////////////////
@@ -6563,402 +6823,6 @@ Debug.Log("GeneLibrary instance was successfully set, initialized, and registere
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Helpers\CompleteUISetup.cs
-
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-using TMPro;
-using Abracodabra.Genes.Core;
-using Abracodabra.UI.Genes;
-using WegoSystem;
-using System.Reflection;
-
-pub cls CompleteUISetup : MonoBehaviour {
-[SerializeField] bool destroyAfterSetup = true;
-
-[SerializeField] Color panelBackgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
-[SerializeField] Color slotNormalColor = new Color(0.3f, 0.3f, 0.3f, 1f);
-[SerializeField] TMP_FontAsset defaultFontAsset;
-
-pub void GenerateCompleteUI() {
-Debug.Log("[CompleteUISetup] Starting complete UI setup...");
-
-CreateEventSystem();
-Canvas mainCanvas = CreateMainCanvas();
-GameObject prefabContainer = new GameObject("[Generated Prefabs]");
-prefabContainer.SetActive(false);
-
-GameObject planningPanel = CreatePanel("PlanningPanel", mainCanvas.transform);
-GameObject growthThreatPanel = CreatePanel("GrowthAndThreatPanel", mainCanvas.transform);
-planningPanel.SetActive(true);
-growthThreatPanel.SetActive(false);
-
-GameObject itemViewPrefab = CreateItemViewPrefab();
-itemViewPrefab.transform.SetParent(prefabContainer.transform);
-
-GameObject itemSlotPrefab = CreateItemSlotPrefab(itemViewPrefab);
-itemSlotPrefab.transform.SetParent(prefabContainer.transform);
-
-GameObject passiveSlotPrefab = CreateGeneSlot("PassiveSlotPrefab", GeneCategory.Passive, itemViewPrefab);
-passiveSlotPrefab.transform.SetParent(prefabContainer.transform);
-
-GameObject sequenceRowPrefab = CreateSequenceRowPrefab(itemViewPrefab);
-sequenceRowPrefab.transform.SetParent(prefabContainer.transform);
-
-InventoryGridController inventoryGrid = CreateInventoryGrid(planningPanel.transform, itemSlotPrefab);
-CreateInventoryBar(growthThreatPanel.transform, itemViewPrefab, inventoryGrid);
-GeneSequenceUI geneSequenceUI = CreateGeneSequenceUI(planningPanel.transform, passiveSlotPrefab, sequenceRowPrefab);
-
-CreateControlButtons(planningPanel.transform, growthThreatPanel.transform);
-GameObject wegoPanel = CreateDebugUI(mainCanvas.transform);
-
-LinkToUIManager(planningPanel, growthThreatPanel, geneSequenceUI, wegoPanel);
-
-Debug.Log("[CompleteUISetup] UI setup complete! Please create Prefab Assets from the GameObjects inside '[Generated Prefabs]'.");
-
-if (destroyAfterSetup) {
-if (Application.isPlaying) Destroy(gameObject);
-else DestroyImmediate(gameObject);
-}
-}
-
-void CreateEventSystem() {
-if (FindObjectOfType<EventSystem>() == null) {
-new GameObject("EventSystem", typeof(EventSystem), typeof(StandaloneInputModule));
-}
-}
-
-Canvas CreateMainCanvas() {
-GameObject existingRoot = GameObject.Find("Generated_UI_Root");
-if (existingRoot != null) DestroyImmediate(existingRoot);
-
-var canvasObj = new GameObject("Generated_UI_Root");
-canvasObj.layer = LayerMask.NameToLayer("UI");
-
-Canvas canvas = canvasObj.AddComponent<Canvas>();
-canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-
-var scaler = canvasObj.AddComponent<CanvasScaler>();
-scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-scaler.referenceResolution = new Vector2(1920, 1080);
-
-canvasObj.AddComponent<GraphicRaycaster>();
-ret canvas;
-}
-
-GameObject CreatePanel(string name, Transform parent) {
-var panel = new GameObject(name, typeof(RectTransform), typeof(Image));
-panel.transform.SetParent(parent, false);
-SetAnchorsAndOffsets(panel, Vector2.zero, Vector2.one);
-panel.GetComponent<Image>().color = panelBackgroundColor;
-ret panel;
-}
-
-GameObject CreateItemViewPrefab() {
-var prefab = new GameObject("ItemViewPrefab", typeof(RectTransform), typeof(Image), typeof(ItemView), typeof(TooltipTrigger));
-prefab.SetActive(false);
-prefab.GetComponent<RectTransform>().sizeDelta = new Vector2(60, 60);
-
-Image bgImage = prefab.GetComponent<Image>();
-bgImage.color = new Color(0.2f, 0.2f, 0.2f, 0.3f);
-
-var thumbnail = new GameObject("ThumbnailImage", typeof(RectTransform), typeof(Image));
-thumbnail.transform.SetParent(prefab.transform, false);
-SetAnchorsAndOffsets(thumbnail, Vector2.zero, Vector2.one, new Vector2(4, 4), new Vector2(-4, -4));
-thumbnail.GetComponent<Image>().preserveAspect = true;
-
-ItemView itemViewComponent = prefab.GetComponent<ItemView>();
-SetPrivateField(itemViewComponent, "thumbnailImage", thumbnail.GetComponent<Image>());
-SetPrivateField(itemViewComponent, "backgroundImage", bgImage);
-
-ret prefab;
-}
-
-GameObject CreateItemSlotPrefab(GameObject itemViewPrefab) {
-var prefab = CreateGeneSlot("ItemSlotPrefab", GeneCategory.Passive, itemViewPrefab); // Category is a placeholder
-prefab.GetComponent<GeneSlotUI>().acceptedCategory = 0;
-ret prefab;
-}
-
-GameObject CreateSequenceRowPrefab(GameObject itemViewPrefab) {
-var prefab = new GameObject("SequenceRowPrefab", typeof(RectTransform), typeof(HorizontalLayoutGroup), typeof(SequenceRowUI));
-prefab.SetActive(false);
-prefab.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 70);
-var layout = prefab.GetComponent<HorizontalLayoutGroup>();
-layout.spacing = 15;
-layout.childAlignment = TextAnchor.MiddleCenter;
-
-SequenceRowUI rowUI = prefab.GetComponent<SequenceRowUI>();
-
-rowUI.modifierSlot = CreateGeneSlot("ModifierSlot", GeneCategory.Modifier, itemViewPrefab, prefab.transform).GetComponent<GeneSlotUI>();
-rowUI.activeSlot = CreateGeneSlot("ActiveSlot", GeneCategory.Active, itemViewPrefab, prefab.transform).GetComponent<GeneSlotUI>();
-rowUI.payloadSlot = CreateGeneSlot("PayloadSlot", GeneCategory.Payload, itemViewPrefab, prefab.transform).GetComponent<GeneSlotUI>();
-
-ret prefab;
-}
-
-InventoryGridController CreateInventoryGrid(Transform parent, GameObject itemSlotPrefab) {
-var inventoryGridObj = new GameObject("InventoryGrid", typeof(Image), typeof(InventoryGridController));
-inventoryGridObj.transform.SetParent(parent, false);
-SetAnchorsAndOffsets(inventoryGridObj, new Vector2(0.05f, 0.1f), new Vector2(0.35f, 0.85f));
-inventoryGridObj.GetComponent<Image>().color = new Color(0.15f, 0.15f, 0.15f, 0.9f);
-var gridTitle = CreateText("Title", inventoryGridObj.transform, "INVENTORY", 20, TextAlignmentOptions.Center);
-SetAnchorsAndOffsets(gridTitle, new Vector2(0, 0.9f), new Vector2(1, 1f));
-
-InventoryGridController gridController = inventoryGridObj.GetComponent<InventoryGridController>();
-var cellContainer = new GameObject("CellContainer", typeof(RectTransform), typeof(GridLayoutGroup));
-cellContainer.transform.SetParent(inventoryGridObj.transform, false);
-SetAnchorsAndOffsets(cellContainer, new Vector2(0.05f, 0.05f), new Vector2(0.95f, 0.9f));
-
-var gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
-gridLayout.padding = new RectOffset(10, 10, 10, 10);
-gridLayout.cellSize = new Vector2(64, 64);
-gridLayout.spacing = new Vector2(10, 10);
-gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-gridLayout.constraintCount = 4;
-
-SetPrivateField(gridController, "cellContainer", cellContainer.transform);
-SetPrivateField(gridController, "itemSlotPrefab", itemSlotPrefab);
-ret gridController;
-}
-
-void CreateInventoryBar(Transform parent, GameObject itemViewPrefab, InventoryGridController gridController) {
-var inventoryBarObj = new GameObject("InventoryBar", typeof(Image), typeof(InventoryBarController));
-inventoryBarObj.transform.SetParent(parent, false);
-SetAnchorsAndOffsets(inventoryBarObj, new Vector2(0.3f, 0.02f), new Vector2(0.7f, 0.12f));
-inventoryBarObj.GetComponent<Image>().color = new Color(0.1f, 0.1f, 0.1f, 0.8f);
-
-InventoryBarController barController = inventoryBarObj.GetComponent<InventoryBarController>();
-var barCellContainer = new GameObject("CellContainer", typeof(RectTransform), typeof(GridLayoutGroup));
-barCellContainer.transform.SetParent(inventoryBarObj.transform, false);
-SetAnchorsAndOffsets(barCellContainer, new Vector2(0.05f, 0.1f), new Vector2(0.95f, 0.9f));
-
-var barGridLayout = barCellContainer.GetComponent<GridLayoutGroup>();
-barGridLayout.cellSize = new Vector2(60, 60);
-barGridLayout.spacing = new Vector2(5, 0);
-barGridLayout.constraint = GridLayoutGroup.Constraint.FixedRowCount;
-barGridLayout.constraintCount = 1;
-
-var selectionHighlight = CreateSelectionHighlight(inventoryBarObj.transform);
-SetPrivateField(barController, "cellContainer", barCellContainer.transform);
-SetPrivateField(barController, "selectionHighlight", selectionHighlight);
-SetPrivateField(barController, "inventoryItemViewPrefab", itemViewPrefab);
-SetPrivateField(barController, "inventoryGridController", gridController);
-}
-
-GeneSequenceUI CreateGeneSequenceUI(Transform parent, GameObject passiveSlotPrefab, GameObject sequenceRowPrefab) {
-var geneSequenceUIObj = new GameObject("GeneSequenceUI", typeof(Image), typeof(GeneSequenceUI));
-geneSequenceUIObj.transform.SetParent(parent, false);
-SetAnchorsAndOffsets(geneSequenceUIObj, new Vector2(0.4f, 0.1f), new Vector2(0.95f, 0.85f));
-geneSequenceUIObj.GetComponent<Image>().color = new Color(0.12f, 0.12f, 0.15f, 0.9f);
-var title = CreateText("Title", geneSequenceUIObj.transform, "SEED EDITOR", 20, TextAlignmentOptions.Center);
-SetAnchorsAndOffsets(title, new Vector2(0, 0.95f), new Vector2(1, 1f));
-
-GeneSequenceUI sequenceUI = geneSequenceUIObj.GetComponent<GeneSequenceUI>();
-
-var itemViewPrefab = CreateItemViewPrefab();
-itemViewPrefab.transform.SetParent(geneSequenceUIObj.transform, true);
-itemViewPrefab.hideFlags = HideFlags.HideInHierarchy;
-
-var seedEditSlot = CreateGeneSlot("SeedEditSlot", GeneCategory.Seed, itemViewPrefab, geneSequenceUIObj.transform);
-SetAnchorsAndOffsets(seedEditSlot, new Vector2(0.5f, 0.85f), new Vector2(0.5f, 0.85f), new Vector2(-32, -32), new Vector2(32, 32));
-seedEditSlot.GetComponent<GeneSlotUI>().isDraggable = true;
-
-var passiveContainer = new GameObject("PassiveGenesContainer", typeof(RectTransform), typeof(HorizontalLayoutGroup));
-passiveContainer.transform.SetParent(geneSequenceUIObj.transform, false);
-passiveContainer.GetComponent<HorizontalLayoutGroup>().spacing = 10;
-SetAnchorsAndOffsets(passiveContainer, new Vector2(0.05f, 0.7f), new Vector2(0.95f, 0.8f));
-
-var activeContainer = new GameObject("ActiveSequenceContainer", typeof(RectTransform), typeof(VerticalLayoutGroup));
-activeContainer.transform.SetParent(geneSequenceUIObj.transform, false);
-var activeLayout = activeContainer.GetComponent<VerticalLayoutGroup>();
-activeLayout.spacing = 10;
-activeLayout.childControlWidth = true;
-activeLayout.childForceExpandWidth = true;
-SetAnchorsAndOffsets(activeContainer, new Vector2(0.05f, 0.25f), new Vector2(0.95f, 0.65f));
-
-CreateSequenceInfoDisplay(geneSequenceUIObj.transform, sequenceUI);
-
-SetPrivateField(sequenceUI, "seedEditSlot", seedEditSlot.GetComponent<GeneSlotUI>());
-sequenceUI.passiveGenesContainer = passiveContainer.transform;
-sequenceUI.activeSequenceContainer = activeContainer.transform;
-sequenceUI.sequenceRowPrefab = sequenceRowPrefab;
-sequenceUI.passiveSlotPrefab = passiveSlotPrefab;
-
-DestroyImmediate(itemViewPrefab);
-ret sequenceUI;
-}
-
-void CreateSequenceInfoDisplay(Transform parent, GeneSequenceUI sequenceUI) {
-var infoPanel = new GameObject("InfoPanel", typeof(RectTransform));
-infoPanel.transform.SetParent(parent, false);
-SetAnchorsAndOffsets(infoPanel, new Vector2(0.05f, 0.05f), new Vector2(0.95f, 0.2f));
-
-var energyCostObj = CreateText("EnergyCostText", infoPanel.transform, "Cost: 0 E/cycle", 16, TextAlignmentOptions.Left);
-SetAnchorsAndOffsets(energyCostObj, new Vector2(0, 0.5f), new Vector2(0.4f, 1f));
-
-var rechargeObj = CreateText("RechargeTimeText", infoPanel.transform, "Recharge: 3 ticks", 16, TextAlignmentOptions.Right);
-SetAnchorsAndOffsets(rechargeObj, new Vector2(0.6f, 0.5f), new Vector2(1f, 1f));
-
-var currentEnergyObj = CreateText("CurrentEnergyText", infoPanel.transform, "Energy: --/100", 14, TextAlignmentOptions.Center);
-SetAnchorsAndOffsets(currentEnergyObj, new Vector2(0, 0f), new Vector2(1f, 0.5f));
-
-sequenceUI.energyCostText = energyCostObj.GetComponent<TextMeshProUGUI>();
-sequenceUI.currentEnergyText = currentEnergyObj.GetComponent<TextMeshProUGUI>();
-sequenceUI.rechargeTimeText = rechargeObj.GetComponent<TextMeshProUGUI>();
-sequenceUI.rechargeProgress = null;
-sequenceUI.validationMessage = null;
-}
-
-void CreateControlButtons(Transform planningParent, Transform growthParent) {
-CreateButton("EndPlanningButton", planningParent, "Start Growth", new Vector2(0.5f, 0.02f), new Vector2(0.8f, 0.08f));
-CreateButton("ReturnToPlanningButton", growthParent, "End Day", new Vector2(0.8f, 0.9f), new Vector2(0.95f, 0.95f));
-}
-
-GameObject CreateDebugUI(Transform parent) {
-GameObject wegoPanel = CreatePanel("WegoControlPanel", parent);
-wegoPanel.GetComponent<Image>().color = new Color(0, 0, 0, 0.5f);
-SetAnchorsAndOffsets(wegoPanel, new Vector2(0.01f, 0.01f), new Vector2(0.2f, 0.15f));
-
-var phaseText = CreateText("CurrentPhaseText", wegoPanel.transform, "Phase: Planning", 14, TextAlignmentOptions.Left);
-SetAnchorsAndOffsets(phaseText, new Vector2(0.1f, 0.6f), new Vector2(0.9f, 0.9f));
-
-var tickText = CreateText("TickCounterText", wegoPanel.transform, "Tick: 0", 14, TextAlignmentOptions.Left);
-SetAnchorsAndOffsets(tickText, new Vector2(0.1f, 0.3f), new Vector2(0.9f, 0.6f));
-
-var phaseProgressText = CreateText("PhaseProgressText", wegoPanel.transform, "Phase Ticks: 0", 12, TextAlignmentOptions.Left);
-SetAnchorsAndOffsets(phaseProgressText, new Vector2(0.1f, 0.0f), new Vector2(0.9f, 0.3f));
-
-ret wegoPanel;
-}
-
-void LinkToUIManager(GameObject planningPanel, GameObject growthThreatPanel, GeneSequenceUI geneSequenceUI, GameObject wegoPanel) {
-UIManager uiManager = FindObjectOfType<UIManager>();
-if (uiManager == null) {
-uiManager = new GameObject("UIManager").AddComponent<UIManager>();
-}
-
-SetPrivateField(uiManager, "planningPanel", planningPanel);
-SetPrivateField(uiManager, "growthAndThreatPanel", growthThreatPanel);
-SetPrivateField(uiManager, "geneSequenceUIPanel", geneSequenceUI.gameObject);
-
-var endPlanningBtn = planningPanel.transform.Find("EndPlanningButton")?.GetComponent<Button>();
-var newPlanningBtn = growthThreatPanel.transform.Find("ReturnToPlanningButton")?.GetComponent<Button>();
-
-SetPrivateField(uiManager, "endPlanningPhaseButton", endPlanningBtn);
-SetPrivateField(uiManager, "startNewPlanningPhaseButton", newPlanningBtn);
-
-var currentPhaseText = wegoPanel.transform.Find("CurrentPhaseText")?.GetComponent<TextMeshProUGUI>();
-var tickCounterText = wegoPanel.transform.Find("TickCounterText")?.GetComponent<TextMeshProUGUI>();
-var phaseProgressText = wegoPanel.transform.Find("PhaseProgressText")?.GetComponent<TextMeshProUGUI>();
-
-SetPrivateField(uiManager, "wegoControlPanel", wegoPanel);
-SetPrivateField(uiManager, "currentPhaseText", currentPhaseText);
-SetPrivateField(uiManager, "tickCounterText", tickCounterText);
-SetPrivateField(uiManager, "phaseProgressText", phaseProgressText);
-}
-
-GameObject CreateText(string name, Transform parent, string text, int fontSize, TextAlignmentOptions alignment) {
-var textObj = new GameObject(name, typeof(RectTransform), typeof(TextMeshProUGUI));
-textObj.transform.SetParent(parent, false);
-var tmp = textObj.GetComponent<TextMeshProUGUI>();
-tmp.text = text;
-tmp.fontSize = fontSize;
-tmp.alignment = alignment;
-tmp.color = Color.white;
-if (defaultFontAsset != null) tmp.font = defaultFontAsset;
-ret textObj;
-}
-
-GameObject CreateButton(string name, Transform parent, string text, Vector2 anchorMin, Vector2 anchorMax) {
-var buttonObj = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
-buttonObj.transform.SetParent(parent, false);
-SetAnchorsAndOffsets(buttonObj, anchorMin, anchorMax);
-Image bg = buttonObj.GetComponent<Image>();
-bg.color = new Color(0.2f, 0.3f, 0.4f, 1f);
-Button button = buttonObj.GetComponent<Button>();
-button.targetGraphic = bg;
-GameObject textObj = CreateText("Text", buttonObj.transform, text, 16, TextAlignmentOptions.Center);
-SetAnchorsAndOffsets(textObj, Vector2.zero, Vector2.one, new Vector2(10, 5), new Vector2(-10, -5));
-ret buttonObj;
-}
-
-GameObject CreateGeneSlot(string name, GeneCategory category, GameObject itemViewPrefab, Transform parent = null) {
-var slot = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(GeneSlotUI));
-if (parent != null) slot.transform.SetParent(parent, false);
-
-slot.GetComponent<RectTransform>().sizeDelta = new Vector2(64, 64);
-slot.GetComponent<Image>().color = GetSlotColorForCategory(category);
-
-GeneSlotUI slotUI = slot.GetComponent<GeneSlotUI>();
-slotUI.acceptedCategory = category;
-
-var emptyIndicator = CreateText("EmptyIndicator", slot.transform, GetEmptyTextForCategory(category), 12, TextAlignmentOptions.Center);
-SetAnchorsAndOffsets(emptyIndicator, Vector2.zero, Vector2.one);
-emptyIndicator.GetComponent<TextMeshProUGUI>().color = new Color(0.6f, 0.6f, 0.6f, 0.5f);
-
-var itemViewInstance = Instantiate(itemViewPrefab);
-itemViewInstance.transform.SetParent(slot.transform, false);
-itemViewInstance.name = "ItemView";
-itemViewInstance.SetActive(false);
-
-SetPrivateField(slotUI, "slotBackground", slot.GetComponent<Image>());
-SetPrivateField(slotUI, "emptyIndicator", emptyIndicator);
-SetPrivateField(slotUI, "itemView", itemViewInstance.GetComponent<ItemView>());
-
-ret slot;
-}
-
-GameObject CreateSelectionHighlight(Transform parent) {
-var highlight = new GameObject("SelectionHighlight", typeof(RectTransform), typeof(Image));
-highlight.transform.SetParent(parent, false);
-highlight.GetComponent<RectTransform>().sizeDelta = new Vector2(68, 68);
-Image highlightImage = highlight.GetComponent<Image>();
-highlightImage.color = new Color(1f, 0.9f, 0.3f, 0.5f);
-highlightImage.raycastTarget = false;
-highlight.SetActive(false);
-ret highlight;
-}
-
-void SetAnchorsAndOffsets(GameObject obj, Vector2 anchorMin, Vector2 anchorMax, Vector2 offsetMin = default, Vector2 offsetMax = default) {
-if (obj.GetComponent<RectTransform>() is RectTransform rect) {
-rect.anchorMin = anchorMin;
-rect.anchorMax = anchorMax;
-rect.offsetMin = offsetMin;
-rect.offsetMax = offsetMax;
-}
-}
-
-void SetPrivateField(object obj, string fieldName, object value) {
-var field = obj.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-if (field != null) field.SetValue(obj, value);
-else Debug.LogWarning($"[CompleteUISetup] Could not find field '{fieldName}' on object '{obj}'.");
-}
-
-Color GetSlotColorForCategory(GeneCategory category) {
-switch (category) {
-case GeneCategory.Active:   ret new Color(0.4f, 0.2f, 0.2f, 1f);
-case GeneCategory.Passive:  ret new Color(0.2f, 0.2f, 0.4f, 1f);
-case GeneCategory.Modifier: ret new Color(0.4f, 0.4f, 0.2f, 1f);
-case GeneCategory.Payload:  ret new Color(0.4f, 0.2f, 0.4f, 1f);
-case GeneCategory.Seed:     ret new Color(0.2f, 0.4f, 0.2f, 1f); // Added a color for the seed slot
-default:                    ret slotNormalColor;
-}
-}
-
-string GetEmptyTextForCategory(GeneCategory category) {
-switch (category) {
-case GeneCategory.Active:   ret "ACTIVE";
-case GeneCategory.Passive:  ret "PASSIVE";
-case GeneCategory.Modifier: ret "MOD";
-case GeneCategory.Payload:  ret "LOAD";
-case GeneCategory.Seed:     ret "SEED";
-default:                    ret "+";
-}
-}
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Data\ITriggerTarget.cs
 
 ﻿// Assets/Scripts/PlantSystem/Execution/ITriggerTarget.cs
@@ -8264,6 +8128,45 @@ else {
 DestroyImmediate(gameObject);
 }
 }
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\MapGenerationProfile.cs
+
+﻿// FILE: Assets/Scripts/ProceduralGeneration/MapGenerationProfile.cs
+using WegoSystem.ProceduralGeneration;
+
+pub cls BiomeLayer {
+pub TileDefinition tile;
+
+pub float noiseThreshold;
+
+pub bool placeUnderlayTile = false;
+
+pub TileDefinition underlayTile;
+
+}
+
+pub cls MapGenerationProfile : ScriptableObject {
+pub Vector2Int mapSize = new Vector2Int(100, 100);
+pub int worldSeed = 12345;
+pub bool useRandomSeed = true;
+
+pub NoiseParameters noiseParameters = new NoiseParameters {
+scale = 0.1f,
+octaves = 4,
+persistence = 0.5f,
+lacunarity = 2f
+};
+
+pub List<BiomeLayer> biomeLayers;
+
+pub void InitializeSeed() {
+if (useRandomSeed) {
+worldSeed = Random.Range(0, int.MaxValue);
+}
+noiseParameters.seed = worldSeed;
 }
 }
 
@@ -9863,6 +9766,30 @@ if (tileInteractionManager == null) tileInteractionManager = TileInteractionMana
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\WorldInteraction\Player\Editor\SceneSetupManagerEditor.cs
+
+﻿// FILE: Assets/Scripts/Editor/SceneSetupManagerEditor.cs
+using UnityEditor;
+
+pub cls SceneSetupManagerEditor : Editor {
+pub ovr void OnInspectorGUI() {
+DrawDefaultInspector();
+
+SceneSetupManager setupManager = (SceneSetupManager)target;
+
+EditorGUILayout.Space(10);
+
+GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+buttonStyle.padding = new RectOffset(10, 10, 10, 10);
+buttonStyle.fontSize = 13;
+
+if (GUILayout.Button("Setup Scene Now (Move Player & Camera)", buttonStyle)) {
+setupManager.SetupScene();
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\GardenerController.cs
 
 ﻿// Assets/Scripts/WorldInteraction/Player/GardenerController.cs
@@ -10350,6 +10277,76 @@ OnHungerChanged?.Invoke(CurrentHunger, maxHunger);
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\WorldInteraction\Player\SceneSetupManager.cs
+
+﻿// FILE: Assets/Scripts/Core/SceneSetupManager.cs
+using WegoSystem;
+
+pub cls SceneSetupManager : MonoBehaviour {
+bool setupOnStart = true;
+
+void Start() {
+if (setupOnStart) {
+SetupScene();
+}
+}
+
+pub void SetupScene() {
+Debug.Log("--- Starting Scene Setup ---");
+
+GridPositionManager gridManager = GridPositionManager.Instance;
+
+if (gridManager == null) {
+gridManager = FindFirstObjectByType<GridPositionManager>();
+if (gridManager != null) {
+Debug.LogWarning("[SceneSetupManager] GridPositionManager.Instance was null (expected in Edit Mode). Found manager manually.", this);
+}
+}
+
+if (gridManager == null) {
+Debug.LogError("[SceneSetupManager] GridPositionManager could not be found in the scene. Aborting setup.", this);
+return;
+}
+
+GardenerController player = FindFirstObjectByType<GardenerController>();
+if (player != null) {
+gridManager.SnapEntityToGrid(player.gameObject);
+
+GridPosition centerPosition = gridManager.GetMapCenter();
+player.GetComponent<GridEntity>().SetPosition(centerPosition, true);
+
+Debug.Log($"Player '{player.name}' snapped, registered, and moved to map center: {centerPosition}", player);
+
+CenterMainCameraOnTarget(player.transform);
+}
+else {
+Debug.LogWarning("[SceneSetupManager] No GardenerController found in the scene to position.", this);
+}
+
+Debug.Log("--- Scene Setup Complete ---");
+}
+
+void CenterMainCameraOnTarget(Transform target) {
+Camera mainCamera = Camera.main;
+if (mainCamera != null) {
+Vector3 targetWorldPosition = target.position;
+Transform cameraTransform = mainCamera.transform;
+
+cameraTransform.position = new Vector3(
+targetWorldPosition.x,
+targetWorldPosition.y,
+cameraTransform.position.z
+);
+
+Debug.Log($"Main Camera moved to focus on '{target.name}' at {targetWorldPosition}", mainCamera);
+}
+else {
+Debug.LogWarning("[SceneSetupManager] Could not find Main Camera to center. Ensure it has the 'MainCamera' tag.", this);
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Tiles\TileDefinition.cs
 
 ﻿using UnityEngine;
@@ -10436,7 +10433,7 @@ pub List<ToolRefillRule> refillRules; // <<< NEW LIST FOR REFILLS
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Tiles\TileInteractionManager.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/WorldInteraction/Tiles/TileInteractionManager.cs
 using UnityEngine.Tilemaps;
 using skner.DualGrid;
 using TMPro;
@@ -10479,8 +10476,6 @@ TileDefinition hoveredTileDef;
 SpriteRenderer hoverSpriteRenderer;
 bool isWithinInteractionRange = false;
 
-bool isInitialized = false;
-
 prot ovr void OnAwake() {
 EnsureInitialized();
 CacheHoverSpriteRenderer();
@@ -10491,7 +10486,6 @@ if (moduleByDefinition == null) {
 if(debugLogs) Debug.Log("[TileInteractionManager] Dictionaries are null. Initializing now.");
 SetupTilemaps();
 }
-isInitialized = true;
 }
 
 void Start() {
@@ -10516,7 +10510,7 @@ UpdateDebugUI();
 }
 
 pub TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos) {
-EnsureInitialized(); // Call at the beginning of the pub method.
+EnsureInitialized();
 
 if (tileDefinitionMappings == null) ret null;
 
@@ -10550,8 +10544,8 @@ ret false;
 }
 
 pub void ApplyToolAction(ToolDefinition toolDef) {
-EnsureInitialized();
 if (toolDef == null || !currentlyHoveredCell.HasValue) return;
+
 Vector3Int targetCell = currentlyHoveredCell.Value;
 TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
 if (currentTileDef == null) return;
@@ -10559,18 +10553,21 @@ if (currentTileDef == null) return;
 TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == currentTileDef);
 
 if (rule != null) {
-if (debugLogs) Debug.Log($"[TileInteractionManager] Rule found! Transforming '{currentTileDef.displayName}' to '{(rule.toTile != null ? rule.toTile.displayName : "NULL")}'.");
+TileDefinition fromTile = currentTileDef;
+TileDefinition toTile = rule.toTile;
 
-if (rule.toTile != null && rule.toTile.keepBottomTile) {
-RemoveTile(currentTileDef, targetCell);
-}
-else if (rule.toTile == null) {
-RemoveTile(currentTileDef, targetCell);
+if (debugLogs) Debug.Log($"[TileInteractionManager] Rule found! From: '{fromTile.displayName}', To: '{(toTile != null ? toTile.displayName : "NULL")}'.");
+
+if (toTile == null) {
+RemoveTile(fromTile, targetCell);
+return;
 }
 
-if (rule.toTile != null) {
-PlaceTile(rule.toTile, targetCell);
+if (!toTile.keepBottomTile) {
+RemoveTile(fromTile, targetCell);
 }
+
+PlaceTile(toTile, targetCell);
 }
 else if (debugLogs) {
 Debug.Log($"[TileInteractionManager] No transformation rule found for Tool='{toolDef.displayName}' on Tile='{currentTileDef.displayName}'.");
@@ -10606,7 +10603,7 @@ timedCells[cellPos] = state;
 }
 
 pub void PlaceTile(TileDefinition tileDef, Vector3Int cellPos) {
-EnsureInitialized(); // Call at the beginning of the pub method.
+EnsureInitialized();
 if (tileDef == null) return;
 if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null) {
 module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
@@ -10617,7 +10614,7 @@ timedCells[cellPos] = new TimedTileState { tileDef = tileDef, ticksRemaining = t
 }
 
 pub void RemoveTile(TileDefinition tileDef, Vector3Int cellPos) {
-EnsureInitialized(); // Call at the beginning of the pub method.
+EnsureInitialized();
 if (tileDef == null) return;
 if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null) {
 module.DataTilemap.SetTile(cellPos, null);
@@ -11434,8 +11431,9 @@ ret $"({x}, {y})";
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridPositionManager.cs
 
-﻿// Assets/Scripts/Ticks/GridPositionManager.cs
+﻿// FILE: Assets/Scripts/Ticks/GridPositionManager.cs
 using UnityEngine.Tilemaps;
+using WegoSystem;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -11445,11 +11443,10 @@ namespace WegoSystem {
 pub cls GridPositionManager : SingletonMonoBehaviour<GridPositionManager> {
 [SerializeField] TileInteractionManager tileInteractionManager;
 
+[SerializeField] pub Vector2Int gridBounds = new Vector2Int(100, 100);
+
 Grid _tilemapGrid;
-
 Grid TilemapGrid => _tilemapGrid;
-
-[SerializeField] Vector2Int gridBounds = new Vector2Int(100, 100);
 
 [SerializeField] bool showGridGizmos = true;
 [SerializeField] Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
@@ -11459,13 +11456,19 @@ Grid TilemapGrid => _tilemapGrid;
 ro Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
 ro HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
 
-void OnDestroy() {
-if (Instance == this) {
-}
+prot ovr void OnAwake() {
+EnsureInitialized();
 }
 
-pub void Initialize() {
+void EnsureInitialized() {
+if (_tilemapGrid != null) return;
+
+if(debugMode) Debug.Log("[GridPositionManager] Grid reference is null. Initializing now.");
 SyncWithTileGrid();
+}
+
+pub void Initialize() // This can still be called by other managers if needed. {
+EnsureInitialized();
 }
 
 pub void SyncWithTileGrid() {
@@ -11488,12 +11491,14 @@ Debug.LogError("[GridPositionManager] Could not find TileInteractionManager or i
 }
 
 pub GridPosition WorldToGrid(Vector3 worldPosition) {
+EnsureInitialized(); // Make sure _tilemapGrid is set before using it.
 if (TilemapGrid == null) ret GridPosition.Zero;
 Vector3Int cellPos = TilemapGrid.WorldToCell(worldPosition);
 ret new GridPosition(cellPos);
 }
 
 pub Vector3 GridToWorld(GridPosition gridPosition) {
+EnsureInitialized(); // Make sure _tilemapGrid is set before using it.
 if (TilemapGrid == null) ret Vector3.zero;
 ret TilemapGrid.GetCellCenterWorld(gridPosition.ToVector3Int());
 }
@@ -11503,8 +11508,16 @@ ret GridToWorld(gridPosition);
 }
 
 pub bool IsPositionValid(GridPosition position) {
-ret position.x >= -gridBounds.x / 2 && position.x < gridBounds.x / 2 &&
-position.y >= -gridBounds.y / 2 && position.y < gridBounds.y / 2;
+ret position.x >= 0 && position.x < gridBounds.x &&
+position.y >= 0 && position.y < gridBounds.y;
+}
+
+pub GridPosition GetMapCenter() {
+ret new GridPosition(gridBounds.x / 2, gridBounds.y / 2);
+}
+
+pub Vector3 GetMapCenterWorld() {
+ret GridToWorld(GetMapCenter());
 }
 
 pub bool IsPositionOccupied(GridPosition position) {
@@ -11572,7 +11585,8 @@ if (entitiesByPosition.ContainsKey(pos)) {
 result.AddRange(entitiesByPosition[pos]);
 }
 }
-} else {
+}
+else {
 for (int x = -radius; x <= radius; x++) {
 for (int y = -radius; y <= radius; y++) {
 var checkPos = new GridPosition(center.x + x, center.y + y);
@@ -11589,7 +11603,8 @@ ret result;
 pub bool IsPositionWithinRadius(GridPosition position, GridPosition center, int radius, bool useCircle = true) {
 if (useCircle) {
 ret GridRadiusUtility.IsWithinCircleRadius(position, center, radius);
-} else {
+}
+else {
 ret position.ManhattanDistance(center) <= radius;
 }
 }
@@ -11611,6 +11626,7 @@ ret nearest;
 }
 
 pub Grid GetTilemapGrid() {
+EnsureInitialized();
 ret TilemapGrid;
 }
 
@@ -11721,8 +11737,9 @@ var result = new List<GridPosition>();
 
 for (int x = -radius; x <= radius; x++) {
 for (int y = -radius; y <= radius; y++) {
-var offset = new GridPosition(x, y);
-var checkPos = center + offset;
+var checkPos = new GridPosition(center.x + x, center.y + y);
+
+if (Instance != null && !Instance.IsPositionValid(checkPos)) continue;
 
 int distance = useManhattan
 ? Mathf.Abs(x) + Mathf.Abs(y)
@@ -11738,30 +11755,38 @@ ret result;
 }
 
 void OnDrawGizmos() {
-if (!showGridGizmos || _tilemapGrid == null) return;
+if (!showGridGizmos) return;
+EnsureInitialized();
+if(_tilemapGrid == null) return;
 
 Gizmos.color = gridColor;
 
-int halfWidth = gizmoGridSize / 2;
-int halfHeight = gizmoGridSize / 2;
+int displayWidth = Mathf.Min(gizmoGridSize, gridBounds.x);
+int displayHeight = Mathf.Min(gizmoGridSize, gridBounds.y);
 
-for (int x = -halfWidth; x <= halfWidth; x++) {
-Vector3 start = GridToWorld(new GridPosition(x, -halfHeight));
-Vector3 end = GridToWorld(new GridPosition(x, halfHeight));
+for (int x = 0; x <= displayWidth; x++) {
+Vector3 start = GridToWorld(new GridPosition(x, 0));
+Vector3 end = GridToWorld(new GridPosition(x, displayHeight));
 Gizmos.DrawLine(start, end);
 }
 
-for (int y = -halfHeight; y <= halfHeight; y++) {
-Vector3 start = GridToWorld(new GridPosition(-halfWidth, y));
-Vector3 end = GridToWorld(new GridPosition(halfWidth, y));
+for (int y = 0; y <= displayHeight; y++) {
+Vector3 start = GridToWorld(new GridPosition(0, y));
+Vector3 end = GridToWorld(new GridPosition(displayWidth, y));
 Gizmos.DrawLine(start, end);
 }
+
+Gizmos.color = Color.green;
+Vector3 origin = GridToWorld(GridPosition.Zero);
+Gizmos.DrawWireSphere(origin, _tilemapGrid.cellSize.x * 0.2f);
 
 Gizmos.color = Color.red;
+if (entitiesByPosition != null) {
 foreach (var kvp in entitiesByPosition) {
 if (kvp.Value.Count > 0) {
 Vector3 cellCenter = GridToWorld(kvp.Key);
-Gizmos.DrawWireCube(cellCenter, Vector3.one * TilemapGrid.cellSize.x * 0.8f);
+Gizmos.DrawWireCube(cellCenter, Vector3.one * _tilemapGrid.cellSize.x * 0.8f);
+}
 }
 }
 }
@@ -12148,57 +12173,14 @@ ret tickUpdateables.Count;
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\ProceduralGeneration\MapGenerationProfile.cs
-
-﻿// FILE: Assets/Scripts/ProceduralGeneration/MapGenerationProfile.cs
-using WegoSystem.ProceduralGeneration;
-
-namespace WegoSystem.ProceduralGeneration {
-pub cls MapGenerationProfile : ScriptableObject {
-pub Vector2Int mapSize = new Vector2Int(100, 100);
-pub int worldSeed = 12345;
-pub bool useRandomSeed = true;
-
-pub NoiseParameters noiseParameters = new NoiseParameters {
-scale = 0.1f,
-octaves = 4,
-persistence = 0.5f,
-lacunarity = 2f
-};
-
-pub void InitializeSeed() {
-if (useRandomSeed) {
-worldSeed = Random.Range(0, int.MaxValue);
-}
-noiseParameters.seed = worldSeed;
-}
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\ProceduralGeneration\NoiseToTileMapping.cs
-
-﻿// FILE: Assets/Scripts/ProceduralGeneration/NoiseToTileMapping.cs
-
-namespace WegoSystem.ProceduralGeneration {
-pub cls NoiseToTileMapping : ScriptableObject {
-pub TileDefinition tileToPlace;
-
-pub float noiseThreshold = 0.5f;
-}
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\ProceduralGeneration\ProceduralMapGenerator.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/ProceduralGeneration/ProceduralMapGenerator.cs
 using WegoSystem;
 
 namespace WegoSystem.ProceduralGeneration {
 pub cls ProceduralMapGenerator : MonoBehaviour {
 MapGenerationProfile profile;
-
-List<NoiseToTileMapping> tileMappings;
 
 TileInteractionManager tileManager;
 
@@ -12214,25 +12196,39 @@ Debug.Log($"Starting map generation with seed: {profile.worldSeed}...");
 
 ClearMap();
 
-var sortedMappings = tileMappings.OrderBy(m => m.noiseThreshold).ToList();
+var sortedLayers = profile.biomeLayers.OrderBy(layer => layer.noiseThreshold).ToList();
+
+float halfWidth = profile.mapSize.x / 2f;
+float halfHeight = profile.mapSize.y / 2f;
 
 for (int x = 0; x < profile.mapSize.x; x++) {
 for (int y = 0; y < profile.mapSize.y; y++) {
-float noiseValue = profile.noiseParameters.Sample(x, y);
+float sampleX = x - halfWidth;
+float sampleY = y - halfHeight;
+float noiseValue = profile.noiseParameters.Sample(sampleX, sampleY);
+
 float normalizedNoise = SimplexNoise.Remap(noiseValue, -1f, 1f, 0f, 1f);
 
-TileDefinition tileToPlace = null;
-foreach (var mapping in sortedMappings) {
-if (normalizedNoise <= mapping.noiseThreshold) {
-tileToPlace = mapping.tileToPlace;
+BiomeLayer chosenLayer = null;
+foreach (var layer in sortedLayers) {
+if (normalizedNoise <= layer.noiseThreshold) {
+chosenLayer = layer;
 break;
 }
 }
 
-if (tileToPlace != null) {
+if (chosenLayer != null) {
 var cellPos = new Vector3Int(x, y, 0);
-tileManager.PlaceTile(tileToPlace, cellPos);
-tileMap[new Vector2Int(x,y)] = tileToPlace; // Keep track for this session
+
+if (chosenLayer.placeUnderlayTile && chosenLayer.underlayTile != null) {
+tileManager.PlaceTile(chosenLayer.underlayTile, cellPos);
+}
+
+if (chosenLayer.tile != null) {
+tileManager.PlaceTile(chosenLayer.tile, cellPos);
+tileMap[new Vector2Int(x, y)] = chosenLayer.tile; // Track the top-most tile
+}
+
 }
 }
 }
@@ -12251,10 +12247,9 @@ for (int x = 0; x < profile.mapSize.x; x++) {
 for (int y = 0; y < profile.mapSize.y; y++) {
 var cellPos = new Vector3Int(x, y, 0);
 
-TileDefinition currentTile = tileManager.FindWhichTileDefinitionAt(cellPos);
-
-if (currentTile != null) {
-tileManager.RemoveTile(currentTile, cellPos);
+TileDefinition tileOnTop;
+while ((tileOnTop = tileManager.FindWhichTileDefinitionAt(cellPos)) != null) {
+tileManager.RemoveTile(tileOnTop, cellPos);
 }
 }
 }
@@ -12279,8 +12274,8 @@ Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigne
 ret false;
 }
 }
-if (checkMappings && (tileMappings == null || tileMappings.Count == 0)) {
-Debug.LogError("[ProceduralMapGenerator] No Noise To Tile Mappings have been assigned!", this);
+if (checkMappings && (profile.biomeLayers == null || profile.biomeLayers.Count == 0)) {
+Debug.LogError("[ProceduralMapGenerator] The assigned Profile has no Biome Layers defined!", this);
 ret false;
 }
 ret true;
@@ -12441,259 +12436,6 @@ ret SimplexNoise.GenerateOctaves(x, y, this);
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\ProceduralGeneration\Editor\ProceduralMapGeneratorEditor.cs
-
-﻿// FILE: Assets/Scripts/Editor/ProceduralMapGeneratorEditor.cs
-using UnityEditor;
-using WegoSystem.ProceduralGeneration;
-
-namespace WegoSystem.ProceduralGeneration.Editor {
-pub cls ProceduralMapGeneratorEditor : UnityEditor.Editor {
-pub ovr void OnInspectorGUI() {
-DrawDefaultInspector();
-
-ProceduralMapGenerator generator = (ProceduralMapGenerator)target;
-
-EditorGUILayout.Space(10);
-EditorGUILayout.LabelField("Controls", EditorStyles.boldLabel);
-
-if (GUILayout.Button("Generate Map")) {
-generator.GenerateMap();
-}
-
-if (GUILayout.Button("Clear Map")) {
-generator.ClearMap();
-}
-}
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\Ecosystem\Management\FaunaManager.cs
-
-﻿// Assets/Scripts/Ecosystem/Management/FaunaManager.cs
-
-using WegoSystem; // Correctly referencing the ns for RunManager
-
-pub cls FaunaManager : MonoBehaviour {
-[SerializeField] Vector2 spawnCenter = Vector2.zero;
-[SerializeField] Vector2 spawnAreaSize = new Vector2(20f, 10f);
-
-[SerializeField] Transform ecosystemParent;
-[SerializeField] [Min(0f)] float screenBoundsPadding = 0.5f;
-[SerializeField] [Min(0f)] float offscreenSpawnMargin = 2.0f;
-
-[SerializeField] bool showBoundsGizmos = false;
-
-[SerializeField] [Range(-10f, 10f)] float boundsOffsetX = 0f;
-[SerializeField] [Range(-10f, 10f)] float boundsOffsetY = 0f;
-
-List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
-Camera mainCamera; // Ensure this is assigned or found
-
-pub void Initialize() {
-InitializeManager();
-}
-
-void InitializeManager() {
-activeSpawnCoroutines.Clear();
-if (WaveManager.Instance != null) mainCamera = WaveManager.Instance.GetMainCamera();
-if (mainCamera == null) mainCamera = Camera.main;
-if (mainCamera == null) Debug.LogError("[FaunaManager] Cannot find Main Camera!", this);
-
-if (ecosystemParent == null) {
-if (EcosystemManager.Instance != null && EcosystemManager.Instance.animalParent != null) {
-ecosystemParent = EcosystemManager.Instance.animalParent;
-Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned from EcosystemManager.animalParent.", this);
-}
-else {
-ecosystemParent = transform;
-Debug.LogWarning("[FaunaManager] Ecosystem Parent assigned to self as fallback.", this);
-}
-}
-}
-
-pub void ExecuteSpawnWave(WaveDefinition waveDef) {
-if (waveDef == null) { Debug.LogError("[FaunaManager] ExecuteSpawnWave called with null WaveDefinition!", this); return; }
-if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; }
-
-Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'");
-StopAllSpawnCoroutines(); // Ensures only one waveDef's entries are spawning at a time from this manager
-
-foreach (WaveSpawnEntry entry in waveDef.spawnEntries) {
-if (entry.animalDefinition == null) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', null AnimalDefinition for wave '{waveDef.waveName}'."); continue; }
-if (entry.spawnCount <= 0) { Debug.LogWarning($"[FaunaManager] Skipping entry '{entry.description}', Spawn Count <= 0 for wave '{waveDef.waveName}'."); continue; }
-
-if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
-Debug.Log($"[FaunaManager] Halting further spawn entry processing for wave '{waveDef.waveName}', RunManager not in GrowthAndThreat state.");
-break; // Don't start new coroutines if not in the correct game state
-}
-
-WaveSpawnEntry currentEntry = entry; // Closure capture
-Coroutine spawnCoroutine = StartCoroutine(SpawnWaveEntryCoroutine(currentEntry, waveDef.waveName));
-activeSpawnCoroutines.Add(spawnCoroutine);
-}
-Debug.Log($"[FaunaManager] Started {activeSpawnCoroutines.Count} spawn entry coroutine(s) for '{waveDef.waveName}'.");
-}
-
-pub void StopAllSpawnCoroutines() {
-if (activeSpawnCoroutines.Count > 0) {
-Debug.Log($"[FaunaManager] Stopping all ({activeSpawnCoroutines.Count}) active spawn coroutines.");
-foreach (Coroutine co in activeSpawnCoroutines) {
-if (co != null) StopCoroutine(co);
-}
-activeSpawnCoroutines.Clear();
-}
-}
-
-IEnumerator SpawnWaveEntryCoroutine(WaveSpawnEntry entry, string waveNameForDebug) {
-if (entry.delayAfterSpawnTime > 0) {
-yield ret new WaitForSeconds(entry.delayAfterSpawnTime);
-}
-
-for (int i = 0; i < entry.spawnCount; i++) {
-if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
-Debug.Log($"[FaunaManager] Halting spawn for entry '{entry.description}' in wave '{waveNameForDebug}', RunManager no longer in GrowthAndThreat state.");
-break; // Exit loop if game state changed
-}
-
-Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius);
-bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen;
-GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen);
-
-if (entry.spawnInterval > 0 && i < entry.spawnCount - 1) // Don't wait after the last one {
-yield ret new WaitForSeconds(entry.spawnInterval);
-}
-}
-}
-
-Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius) {
-if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera for CalculateSpawnPosition!"); ret spawnCenter; }
-
-Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-
-Vector2 spawnPos = Vector2.zero;
-float camHeight = mainCamera.orthographicSize * 2f;
-float camWidth = camHeight * mainCamera.aspect;
-
-switch (locationType) {
-case WaveSpawnLocationType.Offscreen:
-float marginMinX = effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin;
-float marginMaxX = effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin;
-float marginMinY = effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin;
-float marginMaxY = effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin;
-float extraOffset = 0.1f;
-int edge = Random.Range(0, 4);
-if (edge == 0) { spawnPos.x = marginMinX - extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
-else if (edge == 1) { spawnPos.x = marginMaxX + extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
-else if (edge == 2) { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMinY - extraOffset; }
-else { spawnPos.x = Random.Range(marginMinX, marginMaxX); spawnPos.y = marginMaxY + extraOffset; }
-break;
-
-case WaveSpawnLocationType.RandomNearPlayer:
-Transform playerT = FindPlayerTransform();
-if (playerT != null) {
-spawnPos = (Vector2)playerT.position + Random.insideUnitCircle * radius;
-}
-else {
-Debug.LogWarning("[FaunaManager] Player not found for RandomNearPlayer. Falling back to Global.");
-goto case WaveSpawnLocationType.GlobalSpawnArea;
-}
-break;
-
-case WaveSpawnLocationType.GlobalSpawnArea:
-default:
-spawnPos.x = effectiveCamPos.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
-spawnPos.y = effectiveCamPos.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
-break;
-}
-ret spawnPos;
-}
-
-Transform FindPlayerTransform() {
-GameObject playerGO = GameObject.FindGameObjectWithTag("Player");
-if (playerGO != null) ret playerGO.transform;
-
-PlayerTileInteractor pti = FindAnyObjectByType<PlayerTileInteractor>();
-if (pti != null) ret pti.transform;
-
-GardenerController gc = FindAnyObjectByType<GardenerController>();
-if (gc != null) ret gc.transform;
-
-ret null;
-}
-
-GameObject SpawnAnimal(AnimalDefinition definition, Vector2 position, bool isOffscreenSpawn) {
-if (definition == null || definition.prefab == null) {
-Debug.LogError("[FaunaManager] Cannot spawn animal: null definition or prefab.");
-ret null;
-}
-
-if (mainCamera == null) {
-Debug.LogError("[FaunaManager] Missing Main Camera for SpawnAnimal bounds calculation!");
-ret null;
-}
-
-Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-
-Vector2 minPaddedBounds, maxPaddedBounds;
-float camHeight = mainCamera.orthographicSize * 2f;
-float camWidth = camHeight * mainCamera.aspect;
-
-minPaddedBounds.x = effectiveCamPos.x - camWidth / 2f + screenBoundsPadding;
-maxPaddedBounds.x = effectiveCamPos.x + camWidth / 2f - screenBoundsPadding;
-minPaddedBounds.y = effectiveCamPos.y - camHeight / 2f + screenBoundsPadding;
-maxPaddedBounds.y = effectiveCamPos.y + camHeight / 2f - screenBoundsPadding;
-
-GameObject animalObj = Instantiate(definition.prefab, position, Quaternion.identity);
-
-if (ecosystemParent != null) {
-Transform speciesParent = ecosystemParent;
-if (EcosystemManager.Instance != null && EcosystemManager.Instance.sortAnimalsBySpecies && !string.IsNullOrEmpty(definition.animalName)) {
-speciesParent = ecosystemParent.Find(definition.animalName);
-if (speciesParent == null) {
-GameObject subParentGO = new GameObject(definition.animalName);
-subParentGO.transform.SetParent(ecosystemParent);
-speciesParent = subParentGO.transform;
-}
-}
-animalObj.transform.SetParent(speciesParent);
-}
-
-AnimalController controller = animalObj.GetComponent<AnimalController>();
-if (controller != null) {
-if (isOffscreenSpawn) {
-Vector2 screenCenter = (minPaddedBounds + maxPaddedBounds) / 2f;
-controller.SetSeekingScreenCenter(screenCenter, minPaddedBounds, maxPaddedBounds);
-}
-}
-else {
-Debug.LogError($"[FaunaManager] Spawned animal prefab '{definition.prefab.name}' missing AnimalController script!", animalObj);
-}
-
-ret animalObj;
-}
-
-void OnDrawGizmos() {
-if (!showBoundsGizmos || mainCamera == null) return;
-Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
-Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
-float camHeight = mainCamera.orthographicSize * 2f;
-float camWidth = camHeight * mainCamera.aspect;
-Vector2 paddedMin = new Vector2(effectiveCamPos.x - camWidth / 2f + screenBoundsPadding, effectiveCamPos.y - camHeight / 2f + screenBoundsPadding);
-Vector2 paddedMax = new Vector2(effectiveCamPos.x + camWidth / 2f - screenBoundsPadding, effectiveCamPos.y + camHeight / 2f - screenBoundsPadding);
-DrawWireRectangleGizmo(paddedMin, paddedMax, Color.green);
-Vector2 marginMin = new Vector2(effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin, effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin);
-Vector2 marginMax = new Vector2(effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin, effectiveCamPos.y + camHeight / 2f - offscreenSpawnMargin);
-DrawWireRectangleGizmo(marginMin, marginMax, Color.red);
-}
-
-void DrawWireRectangleGizmo(Vector2 min, Vector2 max, Color color) { Gizmos.color = color; Gizmos.DrawLine(new Vector3(min.x, min.y, 0), new Vector3(max.x, min.y, 0)); Gizmos.DrawLine(new Vector3(max.x, min.y, 0), new Vector3(max.x, max.y, 0)); Gizmos.DrawLine(new Vector3(max.x, max.y, 0), new Vector3(min.x, max.y, 0)); Gizmos.DrawLine(new Vector3(min.x, max.y, 0), new Vector3(min.x, min.y, 0)); }
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\Genes\Services\GeneEventBus.cs
 
 ﻿// File: Assets/Scripts/Genes/Services/GeneEventBus.cs
@@ -12743,4 +12485,32 @@ pub string GeneId { get; set; }
 pub string Reason { get; set; }
 }
 
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\Editor\ProceduralMapGeneratorEditor.cs
+
+﻿// FILE: Assets/Scripts/Editor/ProceduralMapGeneratorEditor.cs
+using UnityEditor;
+using WegoSystem.ProceduralGeneration;
+
+namespace WegoSystem.ProceduralGeneration.Editor {
+pub cls ProceduralMapGeneratorEditor : UnityEditor.Editor {
+pub ovr void OnInspectorGUI() {
+DrawDefaultInspector();
+
+ProceduralMapGenerator generator = (ProceduralMapGenerator)target;
+
+EditorGUILayout.Space(10);
+EditorGUILayout.LabelField("Controls", EditorStyles.boldLabel);
+
+if (GUILayout.Button("Generate Map")) {
+generator.GenerateMap();
+}
+
+if (GUILayout.Button("Clear Map")) {
+generator.ClearMap();
+}
+}
+}
 }

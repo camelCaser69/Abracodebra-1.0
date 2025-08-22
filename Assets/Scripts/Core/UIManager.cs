@@ -1,22 +1,29 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using TMPro;
 using WegoSystem;
+using System.Collections;
 
 public class UIManager : MonoBehaviour
 {
-    public static UIManager Instance { get; private set; }
+    public static UIManager Instance { get; set; }
 
+    [Header("UI Root References")]
+    [Tooltip("The main UI canvas object that should be enabled at runtime.")]
+    [SerializeField] private GameObject uiCanvasRoot;
+
+    [Header("Panel References")]
     [SerializeField] private GameObject planningPanel;
     [SerializeField] private GameObject growthAndThreatPanel;
     [SerializeField] private GameObject geneSequenceUIPanel;
 
+    [Header("Button References")]
     [SerializeField] private Button startGrowthPhaseButton;
     [SerializeField] private Button startNewPlanningPhaseButton;
     [SerializeField] private Button endPlanningPhaseButton;
     [SerializeField] private Button advanceTickButton;
 
+    [Header("Debug UI References")]
     [SerializeField] private GameObject wegoControlPanel;
     [SerializeField] private TextMeshProUGUI currentPhaseText;
     [SerializeField] private TextMeshProUGUI tickCounterText;
@@ -34,9 +41,19 @@ public class UIManager : MonoBehaviour
             return;
         }
         Instance = this;
+
+        // This is the core of the fix. It runs because UIManager is active.
+        if (uiCanvasRoot != null)
+        {
+            uiCanvasRoot.SetActive(true);
+            Debug.Log($"[UIManager] Activated main UI canvas '{uiCanvasRoot.name}'.");
+        }
+        else
+        {
+            Debug.LogWarning("[UIManager] UI Canvas Root is not assigned. UI may not appear.", this);
+        }
     }
 
-    // This method MUST be called by an InitializationManager to ensure correct order.
     public void Initialize()
     {
         runManager = RunManager.Instance;
@@ -44,15 +61,14 @@ public class UIManager : MonoBehaviour
 
         if (runManager == null)
         {
-            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not function correctly.");
+            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not fn correctly.");
             return;
         }
 
-        // Subscribe to events to get updates.
         runManager.OnRunStateChanged += HandleRunStateChanged;
         runManager.OnPhaseChanged += HandlePhaseChanged;
         runManager.OnRoundChanged += HandleRoundChanged;
-        
+
         if (tickManager != null)
         {
             tickManager.OnTickAdvanced += HandleTickAdvanced;
@@ -60,7 +76,6 @@ public class UIManager : MonoBehaviour
 
         SetupButtons();
 
-        // Perform initial setup based on the current state.
         HandleRunStateChanged(runManager.CurrentState);
         UpdatePhaseDisplay();
         UpdateTickDisplay();
@@ -68,7 +83,6 @@ public class UIManager : MonoBehaviour
 
     void OnDestroy()
     {
-        // Always unsubscribe from events when the object is destroyed.
         if (runManager != null)
         {
             runManager.OnRunStateChanged -= HandleRunStateChanged;
@@ -123,7 +137,6 @@ public class UIManager : MonoBehaviour
 
     void HandleRoundChanged(int newRound)
     {
-        // Placeholder for any logic needed when a new round starts
     }
 
     void HandleTickAdvanced(int currentTick)
@@ -157,7 +170,7 @@ public class UIManager : MonoBehaviour
         yield return null;
         InventoryBarController.Instance?.ShowBar();
     }
-    
+
     public void ShowNotification(string message, float duration = 3f)
     {
         StartCoroutine(ShowNotificationCoroutine(message, duration));

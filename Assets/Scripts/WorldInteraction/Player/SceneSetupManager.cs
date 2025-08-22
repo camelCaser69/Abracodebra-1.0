@@ -24,45 +24,38 @@ public class SceneSetupManager : MonoBehaviour
     public void SetupScene()
     {
         Debug.Log("--- Starting Scene Setup ---");
-
-        // --- START OF FIX ---
-
-        // Get a reference to the GridPositionManager.
+        
         GridPositionManager gridManager = GridPositionManager.Instance;
 
         // In Edit Mode, the static 'Instance' might be null. If so, find it manually.
         if (gridManager == null)
         {
-            gridManager = FindObjectOfType<GridPositionManager>();
+            // OBSOLETE CALL FIXED: Replaced FindObjectOfType with FindFirstObjectByType
+            gridManager = FindFirstObjectByType<GridPositionManager>();
             if (gridManager != null)
             {
                 Debug.LogWarning("[SceneSetupManager] GridPositionManager.Instance was null (expected in Edit Mode). Found manager manually.", this);
             }
         }
         
-        // Now, perform the null check on our local variable.
         if (gridManager == null)
         {
             Debug.LogError("[SceneSetupManager] GridPositionManager could not be found in the scene. Aborting setup.", this);
             return;
         }
 
-        // --- END OF FIX ---
-
         // --- Find and Position Player ---
-        GardenerController player = FindObjectOfType<GardenerController>();
+        // OBSOLETE CALL FIXED: Replaced FindObjectOfType with FindFirstObjectByType
+        GardenerController player = FindFirstObjectByType<GardenerController>();
         if (player != null)
         {
-            // This is the crucial step that registers the player with the grid system.
             gridManager.SnapEntityToGrid(player.gameObject);
             
-            // Now we can safely move it to the center.
             GridPosition centerPosition = gridManager.GetMapCenter();
             player.GetComponent<GridEntity>().SetPosition(centerPosition, true);
             
             Debug.Log($"Player '{player.name}' snapped, registered, and moved to map center: {centerPosition}", player);
-
-            // --- Find and Position Camera (after player is moved) ---
+            
             CenterMainCameraOnTarget(player.transform);
         }
         else
