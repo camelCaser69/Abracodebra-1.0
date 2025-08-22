@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using WegoSystem; // <-- ADDED THIS LINE to resolve the namespace issue.
 
 public class HungerUI : MonoBehaviour
 {
@@ -8,7 +9,7 @@ public class HungerUI : MonoBehaviour
     [SerializeField] private Slider hungerSlider;
     [SerializeField] private TextMeshProUGUI hungerText;
 
-    void Start()
+    private void Start()
     {
         if (playerHungerSystem == null)
         {
@@ -31,7 +32,7 @@ public class HungerUI : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         if (playerHungerSystem != null)
         {
