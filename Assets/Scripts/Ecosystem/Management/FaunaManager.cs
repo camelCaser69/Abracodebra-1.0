@@ -1,26 +1,32 @@
-﻿// Assets/Scripts/Ecosystem/Management/FaunaManager.cs
-
+﻿// FILE: Assets/Scripts/Ecosystem/Management/FaunaManager.cs
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using WegoSystem; // Correctly referencing the namespace for RunManager
+using WegoSystem;
 
 public class FaunaManager : MonoBehaviour
 {
-    [SerializeField] private Vector2 spawnCenter = Vector2.zero;
+    [Header("Spawning Area")]
+    [Tooltip("If true, the spawn area will be centered on the middle of the grid. If false, it will use the Custom Spawn Center.")]
+    [SerializeField] private bool useMapCenterAsSpawnArea = true;
+    [Tooltip("A custom world-space coordinate for the spawn area center. Only used if 'Use Map Center' is false.")]
+    [SerializeField] private Vector2 customSpawnCenter = Vector2.zero;
     [SerializeField] private Vector2 spawnAreaSize = new Vector2(20f, 10f);
 
+    [Header("System References")]
     [SerializeField] private Transform ecosystemParent;
+
+    [Header("Screen Spawning Settings")]
     [SerializeField] [Min(0f)] private float screenBoundsPadding = 0.5f;
     [SerializeField] [Min(0f)] private float offscreenSpawnMargin = 2.0f;
-
-    [SerializeField] private bool showBoundsGizmos = false;
-
     [SerializeField] [Range(-10f, 10f)] private float boundsOffsetX = 0f;
     [SerializeField] [Range(-10f, 10f)] private float boundsOffsetY = 0f;
+    
+    [Header("Debug")]
+    [SerializeField] private bool showBoundsGizmos = false;
 
     private List<Coroutine> activeSpawnCoroutines = new List<Coroutine>();
-    private Camera mainCamera; // Ensure this is assigned or found
+    private Camera mainCamera;
 
     public void Initialize()
     {
@@ -49,13 +55,22 @@ public class FaunaManager : MonoBehaviour
         }
     }
 
+    private Vector2 GetEffectiveSpawnCenter()
+    {
+        if (useMapCenterAsSpawnArea && GridPositionManager.Instance != null)
+        {
+            return GridPositionManager.Instance.GetMapCenterWorld();
+        }
+        return customSpawnCenter;
+    }
+
     public void ExecuteSpawnWave(WaveDefinition waveDef)
     {
         if (waveDef == null) { Debug.LogError("[FaunaManager] ExecuteSpawnWave called with null WaveDefinition!", this); return; }
         if (waveDef.spawnEntries == null || waveDef.spawnEntries.Count == 0) { Debug.LogWarning($"[FaunaManager] Wave '{waveDef.waveName}' has no spawn entries.", this); return; }
 
         Debug.Log($"[FaunaManager] Executing spawn for Wave: '{waveDef.waveName}'");
-        StopAllSpawnCoroutines(); // Ensures only one waveDef's entries are spawning at a time from this manager
+        StopAllSpawnCoroutines();
 
         foreach (WaveSpawnEntry entry in waveDef.spawnEntries)
         {
@@ -65,10 +80,10 @@ public class FaunaManager : MonoBehaviour
             if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
             {
                 Debug.Log($"[FaunaManager] Halting further spawn entry processing for wave '{waveDef.waveName}', RunManager not in GrowthAndThreat state.");
-                break; // Don't start new coroutines if not in the correct game state
+                break;
             }
 
-            WaveSpawnEntry currentEntry = entry; // Closure capture
+            WaveSpawnEntry currentEntry = entry;
             Coroutine spawnCoroutine = StartCoroutine(SpawnWaveEntryCoroutine(currentEntry, waveDef.waveName));
             activeSpawnCoroutines.Add(spawnCoroutine);
         }
@@ -100,14 +115,14 @@ public class FaunaManager : MonoBehaviour
             if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
             {
                 Debug.Log($"[FaunaManager] Halting spawn for entry '{entry.description}' in wave '{waveNameForDebug}', RunManager no longer in GrowthAndThreat state.");
-                break; // Exit loop if game state changed
+                break;
             }
 
             Vector2 spawnPos = CalculateSpawnPosition(entry.spawnLocationType, entry.spawnRadius);
             bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen;
             GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen);
 
-            if (entry.spawnInterval > 0 && i < entry.spawnCount - 1) // Don't wait after the last one
+            if (entry.spawnInterval > 0 && i < entry.spawnCount - 1)
             {
                 yield return new WaitForSeconds(entry.spawnInterval);
             }
@@ -116,12 +131,16 @@ public class FaunaManager : MonoBehaviour
 
     private Vector2 CalculateSpawnPosition(WaveSpawnLocationType locationType, float radius)
     {
-        if (mainCamera == null) { Debug.LogError("[FaunaManager] Missing Main Camera for CalculateSpawnPosition!"); return spawnCenter; }
+        if (mainCamera == null)
+        {
+            Debug.LogError("[FaunaManager] Missing Main Camera for CalculateSpawnPosition!");
+            return GetEffectiveSpawnCenter();
+        }
 
         Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
         Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
 
-        Vector2 spawnPos = Vector2.zero;
+        Vector2 spawnPos;
         float camHeight = mainCamera.orthographicSize * 2f;
         float camWidth = camHeight * mainCamera.aspect;
 
@@ -131,7 +150,7 @@ public class FaunaManager : MonoBehaviour
                 float marginMinX = effectiveCamPos.x - camWidth / 2f - offscreenSpawnMargin;
                 float marginMaxX = effectiveCamPos.x + camWidth / 2f + offscreenSpawnMargin;
                 float marginMinY = effectiveCamPos.y - camHeight / 2f - offscreenSpawnMargin;
-                float marginMaxY = effectiveCamPos.y + camHeight / 2f + offscreenSpawnMargin;
+                float marginMaxY = effectiveCamPos.y + camHeight / 2f - offscreenSpawnMargin;
                 float extraOffset = 0.1f;
                 int edge = Random.Range(0, 4);
                 if (edge == 0) { spawnPos.x = marginMinX - extraOffset; spawnPos.y = Random.Range(marginMinY, marginMaxY); }
@@ -155,8 +174,9 @@ public class FaunaManager : MonoBehaviour
 
             case WaveSpawnLocationType.GlobalSpawnArea:
             default:
-                spawnPos.x = effectiveCamPos.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
-                spawnPos.y = effectiveCamPos.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
+                Vector2 center = GetEffectiveSpawnCenter();
+                spawnPos.x = center.x + Random.Range(-spawnAreaSize.x / 2f, spawnAreaSize.x / 2f);
+                spawnPos.y = center.y + Random.Range(-spawnAreaSize.y / 2f, spawnAreaSize.y / 2f);
                 break;
         }
         return spawnPos;
@@ -239,7 +259,15 @@ public class FaunaManager : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        if (!showBoundsGizmos || mainCamera == null) return;
+        if (!showBoundsGizmos) return;
+
+        // Draw Global Spawn Area
+        Vector2 center = GetEffectiveSpawnCenter();
+        Gizmos.color = new Color(0f, 0.5f, 1f, 0.5f); // Blue for spawn area
+        Gizmos.DrawWireCube(center, spawnAreaSize);
+
+        if (mainCamera == null) return;
+
         Vector2 functionalOffset = new Vector2(boundsOffsetX, boundsOffsetY);
         Vector2 effectiveCamPos = (Vector2)mainCamera.transform.position + functionalOffset;
         float camHeight = mainCamera.orthographicSize * 2f;

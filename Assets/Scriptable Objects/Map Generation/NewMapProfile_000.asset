@@ -13,12 +13,25 @@ MonoBehaviour:
   m_Name: NewMapProfile_000
   m_EditorClassIdentifier: 
   mapSize: {x: 50, y: 50}
-  worldSeed: 12345
+  worldSeed: 1693561290
   useRandomSeed: 1
   noiseParameters:
     scale: 0.1
-    seed: 42
+    seed: 1693561290
     octaves: 4
     persistence: 0.5
     lacunarity: 2
     offset: {x: 0, y: 0}
+  biomeLayers:
+  - tile: {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}
+    noiseThreshold: 0.4
+    placeUnderlayTile: 1
+    underlayTile: {fileID: 11400000, guid: 4f94336bb2aca31489661a9f761144db, type: 2}
+  - tile: {fileID: 11400000, guid: b82b8add4da60854b89d053b81886617, type: 2}
+    noiseThreshold: 0.6
+    placeUnderlayTile: 1
+    underlayTile: {fileID: 11400000, guid: 4f94336bb2aca31489661a9f761144db, type: 2}
+  - tile: {fileID: 11400000, guid: 4f94336bb2aca31489661a9f761144db, type: 2}
+    noiseThreshold: 1
+    placeUnderlayTile: 0
+    underlayTile: {fileID: 0}

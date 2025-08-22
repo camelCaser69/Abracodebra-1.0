@@ -1,8 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿// FILE: Assets/Scripts/ProceduralGeneration/ProceduralMapGenerator.cs
+using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Events;
 using WegoSystem;
 
 namespace WegoSystem.ProceduralGeneration
@@ -13,21 +12,12 @@ namespace WegoSystem.ProceduralGeneration
         [SerializeField]
         private MapGenerationProfile profile;
 
-        [SerializeField]
-        [Tooltip("A list of tile mappings. Mappings should be ordered from lowest threshold (e.g., water) to highest (e.g., mountains).")]
-        private List<NoiseToTileMapping> tileMappings;
-
         [Header("System References")]
         [SerializeField]
         private TileInteractionManager tileManager;
 
-        // Internal cache of what was last generated. Used only for generation, not for clearing.
         private Dictionary<Vector2Int, TileDefinition> tileMap = new Dictionary<Vector2Int, TileDefinition>();
 
-        #region Public Methods
-        /// <summary>
-        /// Generates the map based on the assigned profile and tile mappings.
-        /// </summary>
         public void GenerateMap()
         {
             if (!ValidateConfiguration())
@@ -40,30 +30,51 @@ namespace WegoSystem.ProceduralGeneration
 
             ClearMap();
 
-            var sortedMappings = tileMappings.OrderBy(m => m.noiseThreshold).ToList();
+            var sortedLayers = profile.biomeLayers.OrderBy(layer => layer.noiseThreshold).ToList();
+
+            float halfWidth = profile.mapSize.x / 2f;
+            float halfHeight = profile.mapSize.y / 2f;
 
             for (int x = 0; x < profile.mapSize.x; x++)
             {
                 for (int y = 0; y < profile.mapSize.y; y++)
                 {
-                    float noiseValue = profile.noiseParameters.Sample(x, y);
+                    float sampleX = x - halfWidth;
+                    float sampleY = y - halfHeight;
+                    float noiseValue = profile.noiseParameters.Sample(sampleX, sampleY);
+                    
                     float normalizedNoise = SimplexNoise.Remap(noiseValue, -1f, 1f, 0f, 1f);
 
-                    TileDefinition tileToPlace = null;
-                    foreach (var mapping in sortedMappings)
+                    BiomeLayer chosenLayer = null;
+                    foreach (var layer in sortedLayers)
                     {
-                        if (normalizedNoise <= mapping.noiseThreshold)
+                        if (normalizedNoise <= layer.noiseThreshold)
                         {
-                            tileToPlace = mapping.tileToPlace;
-                            break;
+                            chosenLayer = layer;
+                            break; 
                         }
                     }
 
-                    if (tileToPlace != null)
+                    if (chosenLayer != null)
                     {
                         var cellPos = new Vector3Int(x, y, 0);
-                        tileManager.PlaceTile(tileToPlace, cellPos);
-                        tileMap[new Vector2Int(x,y)] = tileToPlace; // Keep track for this session
+                        
+                        // --- NEW LOGIC START ---
+
+                        // Step 1: Place the underlay tile if it's requested and valid.
+                        if (chosenLayer.placeUnderlayTile && chosenLayer.underlayTile != null)
+                        {
+                            tileManager.PlaceTile(chosenLayer.underlayTile, cellPos);
+                        }
+                        
+                        // Step 2: Place the primary tile.
+                        if (chosenLayer.tile != null)
+                        {
+                            tileManager.PlaceTile(chosenLayer.tile, cellPos);
+                            tileMap[new Vector2Int(x, y)] = chosenLayer.tile; // Track the top-most tile
+                        }
+
+                        // --- NEW LOGIC END ---
                     }
                 }
             }
@@ -71,10 +82,6 @@ namespace WegoSystem.ProceduralGeneration
             Debug.Log("Map generation complete.");
         }
 
-        /// <summary>
-        /// Clears all tiles within the map's defined size by iterating through every cell.
-        /// This is a robust method that doesn't rely on a cached map state.
-        /// </summary>
         public void ClearMap()
         {
             if (!ValidateConfiguration(checkMappings: false))
@@ -84,33 +91,31 @@ namespace WegoSystem.ProceduralGeneration
 
             Debug.Log("Clearing existing map by checking every cell...");
 
+            // This clear method is now even more important because it correctly
+            // queries the TileInteractionManager, which knows about all layers.
             for (int x = 0; x < profile.mapSize.x; x++)
             {
                 for (int y = 0; y < profile.mapSize.y; y++)
                 {
                     var cellPos = new Vector3Int(x, y, 0);
                     
-                    // Ask the TileInteractionManager what tile is at this position.
-                    // This works because the manager knows about all tilemap layers.
-                    TileDefinition currentTile = tileManager.FindWhichTileDefinitionAt(cellPos);
-
-                    // If a tile exists, tell the manager to remove it.
-                    if (currentTile != null)
+                    // The beauty of this is that FindWhichTileDefinitionAt finds the top-most
+                    // non-overlay tile, and the manager handles removing it correctly.
+                    // To clear all layers, we might need a loop.
+                    
+                    // We need to keep clearing until no tile is found at the position.
+                    TileDefinition tileOnTop;
+                    while ((tileOnTop = tileManager.FindWhichTileDefinitionAt(cellPos)) != null)
                     {
-                        tileManager.RemoveTile(currentTile, cellPos);
+                        tileManager.RemoveTile(tileOnTop, cellPos);
                     }
                 }
             }
             
-            // Clear internal caches as well
             ClearCaches();
             Debug.Log("[ProceduralMapGenerator] Map clear complete.");
         }
-        #endregion
 
-        /// <summary>
-        /// Clears all internal cached data.
-        /// </summary>
         private void ClearCaches()
         {
             tileMap.Clear();
@@ -132,9 +137,9 @@ namespace WegoSystem.ProceduralGeneration
                     return false;
                 }
             }
-            if (checkMappings && (tileMappings == null || tileMappings.Count == 0))
+            if (checkMappings && (profile.biomeLayers == null || profile.biomeLayers.Count == 0))
             {
-                Debug.LogError("[ProceduralMapGenerator] No Noise To Tile Mappings have been assigned!", this);
+                Debug.LogError("[ProceduralMapGenerator] The assigned Profile has no Biome Layers defined!", this);
                 return false;
             }
             return true;

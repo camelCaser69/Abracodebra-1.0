@@ -1,27 +1,36 @@
-﻿using System.Collections.Generic;
+﻿// FILE: Assets/Scripts/Ecosystem/Effects/FireflyManager.cs
 using UnityEngine;
+using System.Collections.Generic;
 using WegoSystem;
 
 public class FireflyManager : MonoBehaviour, ITickUpdateable
 {
-    public static FireflyManager Instance { get; private set; }
+    public static FireflyManager Instance { get; set; }
 
+    [Header("System References")]
     [SerializeField] private WeatherManager weatherManager;
     [SerializeField] private GameObject fireflyPrefab;
-    [SerializeField] public FireflyDefinition defaultFireflyDefinition; // Made public to fix access issue
+    [SerializeField] public FireflyDefinition defaultFireflyDefinition;
     [SerializeField] private Transform fireflyParent;
 
+    [Header("Spawning Logic")]
     [SerializeField] private int maxFireflies = 50;
     [SerializeField] private int spawnIntervalTicks = 3;
     [SerializeField] [Range(0f, 1f)] private float nightThreshold = 0.25f;
 
-    [SerializeField] private Vector2 spawnCenter = Vector2.zero;
+    [Header("Spawning Area")]
+    [Tooltip("If true, the spawn area will be centered on the middle of the grid. If false, it will use the Custom Spawn Center.")]
+    [SerializeField] private bool useMapCenterAsSpawnArea = true;
+    [Tooltip("A custom world-space coordinate for the spawn area center. Only used if 'Use Map Center' is false.")]
+    [SerializeField] private Vector2 customSpawnCenter = Vector2.zero;
     [SerializeField] private Vector2 spawnAreaSize = new Vector2(20f, 10f);
 
+    [Header("Gameplay Effects")]
     public float photosynthesisRadius = 3f;
     public float photosynthesisIntensityPerFly = 0.05f;
     public float maxPhotosynthesisBonus = 0.5f;
 
+    [Header("Debug")]
     [SerializeField] private bool showAttractionLinesRuntime = false;
     [SerializeField] private Color attractionLineColorRuntime = Color.magenta;
     [SerializeField] private GameObject lineVisualizerPrefab;
@@ -29,7 +38,6 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
 
     private List<FireflyController> activeFireflies = new List<FireflyController>();
     private Dictionary<FireflyController, LineRenderer> activeLineVisualizers = new Dictionary<FireflyController, LineRenderer>();
-
     private int spawnTickCounter = 0;
     private bool isNight = false;
 
@@ -59,7 +67,6 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
     {
         if (Instance == this) Instance = null;
 
-        // Safely get the instance once
         var tickManager = TickManager.Instance;
         if (tickManager != null)
         {
@@ -69,7 +76,7 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
         CleanupVisualizers();
     }
 
-    void ValidateReferences()
+    private void ValidateReferences()
     {
         if (weatherManager == null)
         {
@@ -132,7 +139,16 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
         UpdateRuntimeLineVisualizers();
     }
 
-    void TrySpawnFirefly()
+    private Vector2 GetEffectiveSpawnCenter()
+    {
+        if (useMapCenterAsSpawnArea && GridPositionManager.Instance != null)
+        {
+            return GridPositionManager.Instance.GetMapCenterWorld();
+        }
+        return customSpawnCenter;
+    }
+
+    private void TrySpawnFirefly()
     {
         if (activeFireflies.Count >= maxFireflies) return;
 
@@ -151,15 +167,16 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
         }
     }
 
-    GridPosition FindValidSpawnPosition()
+    private GridPosition FindValidSpawnPosition()
     {
-        Vector2 minBounds = spawnCenter - spawnAreaSize * 0.5f;
-        Vector2 maxBounds = spawnCenter + spawnAreaSize * 0.5f;
+        Vector2 center = GetEffectiveSpawnCenter();
+        Vector2 minBounds = center - spawnAreaSize * 0.5f;
+        Vector2 maxBounds = center + spawnAreaSize * 0.5f;
 
         GridPosition minGrid = GridPositionManager.Instance.WorldToGrid(minBounds);
         GridPosition maxGrid = GridPositionManager.Instance.WorldToGrid(maxBounds);
 
-        for (int i = 0; i < 10; i++) // Try 10 times to find a spot
+        for (int i = 0; i < 10; i++)
         {
             int x = Random.Range(minGrid.x, maxGrid.x + 1);
             int y = Random.Range(minGrid.y, maxGrid.y + 1);
@@ -172,7 +189,7 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
             }
         }
 
-        return GridPosition.Zero; // Failed to find a spot
+        return GridPosition.Zero;
     }
 
     public void ReportFireflyDespawned(FireflyController firefly)
@@ -208,7 +225,7 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
         return count;
     }
 
-    void UpdateRuntimeLineVisualizers()
+    private void UpdateRuntimeLineVisualizers()
     {
         if (!Application.isPlaying || !showAttractionLinesRuntime)
         {
@@ -279,7 +296,7 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void CleanupVisualizers()
+    private void CleanupVisualizers()
     {
         foreach (var kvp in activeLineVisualizers)
         {
@@ -293,11 +310,11 @@ public class FireflyManager : MonoBehaviour, ITickUpdateable
 
     void OnDrawGizmosSelected()
     {
-        // Draw spawn area
+        // Draw Global Spawn Area
+        Vector2 center = GetEffectiveSpawnCenter();
         Gizmos.color = new Color(1f, 1f, 0f, 0.3f);
-        Gizmos.DrawWireCube(spawnCenter, spawnAreaSize);
+        Gizmos.DrawWireCube(center, spawnAreaSize);
 
-        // Draw photosynthesis radius for each active firefly
         if (Application.isPlaying)
         {
             Gizmos.color = new Color(0f, 1f, 0.5f, 0.2f);

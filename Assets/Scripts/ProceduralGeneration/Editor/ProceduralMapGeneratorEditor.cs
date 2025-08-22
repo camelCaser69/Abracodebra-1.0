@@ -3,7 +3,8 @@ using UnityEngine;
 using UnityEditor;
 using WegoSystem.ProceduralGeneration;
 
-namespace WegoSystem.ProceduralGeneration.Editor
+// The namespace needs to match the generator's namespace + .Editor
+namespace WegoSystem.ProceduralGeneration.Editor 
 {
     [CustomEditor(typeof(ProceduralMapGenerator))]
     public class ProceduralMapGeneratorEditor : UnityEditor.Editor

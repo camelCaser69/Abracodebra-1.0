@@ -1,9 +1,9 @@
-﻿// Assets/Scripts/Ticks/GridPositionManager.cs
+﻿// FILE: Assets/Scripts/Ticks/GridPositionManager.cs
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 using System.Linq;
-using System;
+using WegoSystem;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -13,17 +13,17 @@ namespace WegoSystem
 {
     public class GridPositionManager : SingletonMonoBehaviour<GridPositionManager>
     {
+        [Header("System References")]
         [SerializeField] private TileInteractionManager tileInteractionManager;
 
-        private Grid _tilemapGrid;
+        [Header("Grid Configuration")]
+        [Tooltip("Defines the total size of the logical grid, starting from (0,0).")]
+        [SerializeField] public Vector2Int gridBounds = new Vector2Int(100, 100);
 
-        // The property is now simplified to just return the private field.
-        // Initialization is now the sole responsibility of the OnAwake method.
-        // This prevents OnDrawGizmos from causing a race condition.
+        private Grid _tilemapGrid;
         private Grid TilemapGrid => _tilemapGrid;
 
-        [SerializeField] private Vector2Int gridBounds = new Vector2Int(100, 100);
-
+        [Header("Debug Settings")]
         [SerializeField] private bool showGridGizmos = true;
         [SerializeField] private Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
         [SerializeField] private int gizmoGridSize = 20;
@@ -32,22 +32,37 @@ namespace WegoSystem
         private readonly Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
         private readonly HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
         
-        void OnDestroy()
+        // --- START OF FIX ---
+        
+        protected override void OnAwake()
         {
-            if (Instance == this)
-            {
-                // Clear static instance on destruction if this is the singleton
-            }
+            // This now handles initialization for Play Mode.
+            EnsureInitialized();
         }
         
-        public void Initialize()
+        /// <summary>
+        /// Ensures that the internal reference to the scene's Grid component is set.
+        /// Safe to call multiple times.
+        /// </summary>
+        private void EnsureInitialized()
         {
+            // If the grid reference is already set, do nothing.
+            if (_tilemapGrid != null) return;
+            
+            // If not, run the setup logic.
+            if(debugMode) Debug.Log("[GridPositionManager] Grid reference is null. Initializing now.");
             SyncWithTileGrid();
+        }
+        
+        // --- END OF FIX ---
+
+        public void Initialize() // This can still be called by other managers if needed.
+        {
+            EnsureInitialized();
         }
 
         public void SyncWithTileGrid()
         {
-            // Logic moved from OnAwake
             if (tileInteractionManager != null && tileInteractionManager.interactionGrid != null)
             {
                 this._tilemapGrid = tileInteractionManager.interactionGrid;
@@ -71,6 +86,7 @@ namespace WegoSystem
 
         public GridPosition WorldToGrid(Vector3 worldPosition)
         {
+            EnsureInitialized(); // Make sure _tilemapGrid is set before using it.
             if (TilemapGrid == null) return GridPosition.Zero;
             Vector3Int cellPos = TilemapGrid.WorldToCell(worldPosition);
             return new GridPosition(cellPos);
@@ -78,6 +94,7 @@ namespace WegoSystem
 
         public Vector3 GridToWorld(GridPosition gridPosition)
         {
+            EnsureInitialized(); // Make sure _tilemapGrid is set before using it.
             if (TilemapGrid == null) return Vector3.zero;
             return TilemapGrid.GetCellCenterWorld(gridPosition.ToVector3Int());
         }
@@ -89,10 +106,24 @@ namespace WegoSystem
 
         public bool IsPositionValid(GridPosition position)
         {
-            return position.x >= -gridBounds.x / 2 && position.x < gridBounds.x / 2 &&
-                   position.y >= -gridBounds.y / 2 && position.y < gridBounds.y / 2;
+            return position.x >= 0 && position.x < gridBounds.x &&
+                   position.y >= 0 && position.y < gridBounds.y;
         }
 
+        public GridPosition GetMapCenter()
+        {
+            return new GridPosition(gridBounds.x / 2, gridBounds.y / 2);
+        }
+
+        public Vector3 GetMapCenterWorld()
+        {
+            return GridToWorld(GetMapCenter());
+        }
+
+        // ... (The rest of the script is unchanged and can remain as it was)
+        // ...
+        
+        #region Unchanged Code
         public bool IsPositionOccupied(GridPosition position)
         {
             if (entitiesByPosition.TryGetValue(position, out var entities))
@@ -121,7 +152,7 @@ namespace WegoSystem
 
             entity.OnPositionChanged -= OnEntityPositionChanged;
         }
-        
+
         private void OnEntityPositionChanged(GridPosition oldPosition, GridPosition newPosition)
         {
             var entity = allEntities.FirstOrDefault(e => e.Position == newPosition && e.PreviousPosition == oldPosition);
@@ -159,7 +190,7 @@ namespace WegoSystem
                 ? new HashSet<GridEntity>(entitiesByPosition[position])
                 : new HashSet<GridEntity>();
         }
-        
+
         public List<GridEntity> GetEntitiesInRadius(GridPosition center, int radius, bool useCircle = true)
         {
             var result = new List<GridEntity>();
@@ -174,7 +205,8 @@ namespace WegoSystem
                         result.AddRange(entitiesByPosition[pos]);
                     }
                 }
-            } else
+            }
+            else
             {
                 for (int x = -radius; x <= radius; x++)
                 {
@@ -188,7 +220,7 @@ namespace WegoSystem
                     }
                 }
             }
-            
+
             return result;
         }
 
@@ -197,7 +229,8 @@ namespace WegoSystem
             if (useCircle)
             {
                 return GridRadiusUtility.IsWithinCircleRadius(position, center, radius);
-            } else
+            }
+            else
             {
                 return position.ManhattanDistance(center) <= radius;
             }
@@ -221,12 +254,13 @@ namespace WegoSystem
             }
             return nearest;
         }
-        
+
         public Grid GetTilemapGrid()
         {
+            EnsureInitialized();
             return TilemapGrid;
         }
-        
+
         public List<GridPosition> GetPath(GridPosition start, GridPosition end, bool allowDiagonal = false)
         {
             var path = new List<GridPosition>();
@@ -281,7 +315,7 @@ namespace WegoSystem
                     {
                         continue; // This path is not better
                     }
-                    
+
                     cameFrom[neighbor] = current;
                     gScore[neighbor] = tentativeGScore;
                     fScore[neighbor] = gScore[neighbor] + HeuristicCost(neighbor, end);
@@ -329,9 +363,9 @@ namespace WegoSystem
             }
 
             gridEntity.SnapToGrid();
-            
+
             RegisterEntity(gridEntity);
-            
+
             if (debugMode)
             {
                 Debug.Log($"[GridPositionManager] Snapped and Registered {entity.name} to grid {gridEntity.Position}");
@@ -347,17 +381,18 @@ namespace WegoSystem
             }
             Debug.Log($"[GridPositionManager] Snapped {entities.Length} entities of type {typeof(T).Name} to grid");
         }
-        
+
         public static List<GridPosition> GetTilesInRadius(GridPosition center, int radius, bool useManhattan = true)
         {
             var result = new List<GridPosition>();
-            
+
             for (int x = -radius; x <= radius; x++)
             {
                 for (int y = -radius; y <= radius; y++)
                 {
-                    var offset = new GridPosition(x, y);
-                    var checkPos = center + offset;
+                    var checkPos = new GridPosition(center.x + x, center.y + y);
+                    
+                    if (Instance != null && !Instance.IsPositionValid(checkPos)) continue;
 
                     int distance = useManhattan
                         ? Mathf.Abs(x) + Mathf.Abs(y)
@@ -372,41 +407,49 @@ namespace WegoSystem
 
             return result;
         }
-        
+
         void OnDrawGizmos()
         {
-            // This check is crucial. It prevents the method from running in the editor
-            // before the _tilemapGrid has been initialized in OnAwake.
-            if (!showGridGizmos || _tilemapGrid == null) return;
+            if (!showGridGizmos) return;
+            EnsureInitialized();
+            if(_tilemapGrid == null) return;
             
             Gizmos.color = gridColor;
+            
+            int displayWidth = Mathf.Min(gizmoGridSize, gridBounds.x);
+            int displayHeight = Mathf.Min(gizmoGridSize, gridBounds.y);
 
-            int halfWidth = gizmoGridSize / 2;
-            int halfHeight = gizmoGridSize / 2;
-
-            for (int x = -halfWidth; x <= halfWidth; x++)
+            for (int x = 0; x <= displayWidth; x++)
             {
-                Vector3 start = GridToWorld(new GridPosition(x, -halfHeight));
-                Vector3 end = GridToWorld(new GridPosition(x, halfHeight));
+                Vector3 start = GridToWorld(new GridPosition(x, 0));
+                Vector3 end = GridToWorld(new GridPosition(x, displayHeight));
                 Gizmos.DrawLine(start, end);
             }
 
-            for (int y = -halfHeight; y <= halfHeight; y++)
+            for (int y = 0; y <= displayHeight; y++)
             {
-                Vector3 start = GridToWorld(new GridPosition(-halfWidth, y));
-                Vector3 end = GridToWorld(new GridPosition(halfWidth, y));
+                Vector3 start = GridToWorld(new GridPosition(0, y));
+                Vector3 end = GridToWorld(new GridPosition(displayWidth, y));
                 Gizmos.DrawLine(start, end);
             }
 
+            Gizmos.color = Color.green;
+            Vector3 origin = GridToWorld(GridPosition.Zero);
+            Gizmos.DrawWireSphere(origin, _tilemapGrid.cellSize.x * 0.2f);
+            
             Gizmos.color = Color.red;
-            foreach (var kvp in entitiesByPosition)
+            if (entitiesByPosition != null)
             {
-                if (kvp.Value.Count > 0)
+                foreach (var kvp in entitiesByPosition)
                 {
-                    Vector3 cellCenter = GridToWorld(kvp.Key);
-                    Gizmos.DrawWireCube(cellCenter, Vector3.one * TilemapGrid.cellSize.x * 0.8f);
+                    if (kvp.Value.Count > 0)
+                    {
+                        Vector3 cellCenter = GridToWorld(kvp.Key);
+                        Gizmos.DrawWireCube(cellCenter, Vector3.one * _tilemapGrid.cellSize.x * 0.8f);
+                    }
                 }
             }
         }
+        #endregion
     }
 }
