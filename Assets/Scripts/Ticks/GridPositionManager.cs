@@ -1,8 +1,8 @@
-﻿// FILE: Assets/Scripts/Ticks/GridPositionManager.cs
-using UnityEngine;
-using UnityEngine.Tilemaps;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.Tilemaps;
 using WegoSystem;
 
 #if UNITY_EDITOR
@@ -13,48 +13,39 @@ namespace WegoSystem
 {
     public class GridPositionManager : SingletonMonoBehaviour<GridPositionManager>
     {
-        [Header("System References")]
-        [SerializeField] private TileInteractionManager tileInteractionManager;
-
-        [Header("Grid Configuration")]
-        [Tooltip("Defines the total size of the logical grid, starting from (0,0).")]
-        [SerializeField] public Vector2Int gridBounds = new Vector2Int(100, 100);
+        [Tooltip("The central configuration for map size and properties. This is the single source of truth.")]
+        [SerializeField] MapConfiguration mapConfig;
+        
+        [SerializeField] TileInteractionManager tileInteractionManager;
 
         private Grid _tilemapGrid;
         private Grid TilemapGrid => _tilemapGrid;
 
-        [Header("Debug Settings")]
-        [SerializeField] private bool showGridGizmos = true;
-        [SerializeField] private Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
-        [SerializeField] private int gizmoGridSize = 20;
-        [SerializeField] private bool debugMode = false;
+        [Header("Gizmos & Debugging")]
+        [SerializeField] bool showGridGizmos = true;
+        [SerializeField] Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
+        [SerializeField] bool debugMode = false;
 
         private readonly Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
         private readonly HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
-        
-        // --- START OF FIX ---
-        
+
         protected override void OnAwake()
         {
-            // This now handles initialization for Play Mode.
             EnsureInitialized();
         }
-        
-        /// <summary>
-        /// Ensures that the internal reference to the scene's Grid component is set.
-        /// Safe to call multiple times.
-        /// </summary>
+
         private void EnsureInitialized()
         {
-            // If the grid reference is already set, do nothing.
             if (_tilemapGrid != null) return;
+
+            if (mapConfig == null)
+            {
+                Debug.LogError("[GridPositionManager] CRITICAL: MapConfiguration is not assigned! Grid system will not function correctly.", this);
+            }
             
-            // If not, run the setup logic.
             if(debugMode) Debug.Log("[GridPositionManager] Grid reference is null. Initializing now.");
             SyncWithTileGrid();
         }
-        
-        // --- END OF FIX ---
 
         public void Initialize() // This can still be called by other managers if needed.
         {
@@ -106,13 +97,23 @@ namespace WegoSystem
 
         public bool IsPositionValid(GridPosition position)
         {
-            return position.x >= 0 && position.x < gridBounds.x &&
-                   position.y >= 0 && position.y < gridBounds.y;
+            if (mapConfig == null) 
+            {
+                Debug.LogError("[GridPositionManager] MapConfiguration not assigned!");
+                return false;
+            }
+            return position.x >= 0 && position.x < mapConfig.mapSize.x &&
+                   position.y >= 0 && position.y < mapConfig.mapSize.y;
         }
 
         public GridPosition GetMapCenter()
         {
-            return new GridPosition(gridBounds.x / 2, gridBounds.y / 2);
+            if (mapConfig == null)
+            {
+                Debug.LogError("[GridPositionManager] MapConfiguration not assigned! Returning fallback center.");
+                return new GridPosition(50, 50); // Fallback
+            }
+            return mapConfig.GetMapCenter();
         }
 
         public Vector3 GetMapCenterWorld()
@@ -120,10 +121,6 @@ namespace WegoSystem
             return GridToWorld(GetMapCenter());
         }
 
-        // ... (The rest of the script is unchanged and can remain as it was)
-        // ...
-        
-        #region Unchanged Code
         public bool IsPositionOccupied(GridPosition position)
         {
             if (entitiesByPosition.TryGetValue(position, out var entities))
@@ -391,7 +388,7 @@ namespace WegoSystem
                 for (int y = -radius; y <= radius; y++)
                 {
                     var checkPos = new GridPosition(center.x + x, center.y + y);
-                    
+
                     if (Instance != null && !Instance.IsPositionValid(checkPos)) continue;
 
                     int distance = useManhattan
@@ -408,16 +405,18 @@ namespace WegoSystem
             return result;
         }
 
-        void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
-            if (!showGridGizmos) return;
+            if (!showGridGizmos || mapConfig == null) return;
+            
             EnsureInitialized();
             if(_tilemapGrid == null) return;
-            
+
             Gizmos.color = gridColor;
             
-            int displayWidth = Mathf.Min(gizmoGridSize, gridBounds.x);
-            int displayHeight = Mathf.Min(gizmoGridSize, gridBounds.y);
+            int displaySize = mapConfig.GetAdaptiveGizmoSize();
+            int displayWidth = Mathf.Min(displaySize, mapConfig.mapSize.x);
+            int displayHeight = Mathf.Min(displaySize, mapConfig.mapSize.y);
 
             for (int x = 0; x <= displayWidth; x++)
             {
@@ -436,7 +435,7 @@ namespace WegoSystem
             Gizmos.color = Color.green;
             Vector3 origin = GridToWorld(GridPosition.Zero);
             Gizmos.DrawWireSphere(origin, _tilemapGrid.cellSize.x * 0.2f);
-            
+
             Gizmos.color = Color.red;
             if (entitiesByPosition != null)
             {
@@ -450,6 +449,5 @@ namespace WegoSystem
                 }
             }
         }
-        #endregion
     }
 }

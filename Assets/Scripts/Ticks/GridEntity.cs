@@ -126,6 +126,13 @@ namespace WegoSystem
 
         public void SetPosition(GridPosition newPosition, bool instant = false)
         {
+            // VALIDATION: Ensure the new position is within the map boundaries.
+            if (GridPositionManager.Instance != null && !GridPositionManager.Instance.IsPositionValid(newPosition))
+            {
+                Debug.LogWarning($"[GridEntity] Blocked attempt to move '{gameObject.name}' to invalid position {newPosition}. Movement cancelled.");
+                return;
+            }
+
             Position = newPosition; // This invokes OnGridPositionChanged which sets up the tween
 
             if (instant)
