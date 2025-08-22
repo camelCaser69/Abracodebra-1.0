@@ -8,91 +8,104 @@ using UnityEditor;
 
 namespace WegoSystem
 {
-    public class ResolutionManager : MonoBehaviour
+    public class ResolutionManager : SingletonMonoBehaviour<ResolutionManager>
     {
         [System.Serializable]
         public class ResolutionProfile
         {
             public string name;
             public Vector2Int resolution;
-            public bool upscaleRT;
-            [Tooltip("Allows for zooming in or out relative to the base pixel-perfect size.")]
+            public int pixelsPerUnit = 6;
             public float cameraZoomMultiplier = 1f;
         }
 
-        [Header("References")]
+        [Header("Core References")]
+        [Tooltip("Drag your Main Camera GameObject here. This is the most reliable way to link the camera.")]
+        [SerializeField] private Camera mainCamera; 
         [SerializeField] private MapConfiguration mapConfig;
 
         [Header("Profiles")]
         [SerializeField] private ResolutionProfile[] profiles = new[]
         {
-            new ResolutionProfile { name = "Pixel Perfect (Native)", resolution = new Vector2Int(320, 180), upscaleRT = true, cameraZoomMultiplier = 1f },
-            new ResolutionProfile { name = "HD Ready (2x)", resolution = new Vector2Int(640, 360), upscaleRT = true, cameraZoomMultiplier = 1f },
-            new ResolutionProfile { name = "Full HD (4x)", resolution = new Vector2Int(1280, 720), upscaleRT = true, cameraZoomMultiplier = 1f }
+            new ResolutionProfile { name = "Pixel Perfect (Native)", resolution = new Vector2Int(320, 180), pixelsPerUnit = 6, cameraZoomMultiplier = 1f },
+            new ResolutionProfile { name = "HD Ready (2x)", resolution = new Vector2Int(640, 360), pixelsPerUnit = 12, cameraZoomMultiplier = 1f },
+            new ResolutionProfile { name = "Full HD (4x)", resolution = new Vector2Int(1280, 720), pixelsPerUnit = 24, cameraZoomMultiplier = 1f }
         };
 
+        [Tooltip("The profile that will be applied on game start and by the editor button.")]
         [SerializeField] private int currentProfileIndex = 0;
+        
+        public int CurrentPPU { get; private set; } = 6;
 
         private URPPixelPerfectCamera pixelPerfectCam;
-        private Camera cam;
+        
+        protected override void OnAwake()
+        {
+            base.OnAwake();
+            if (mainCamera == null)
+            {
+                mainCamera = Camera.main;
+            }
+            if (mainCamera != null)
+            {
+                pixelPerfectCam = mainCamera.GetComponent<URPPixelPerfectCamera>();
+            }
+        }
 
         private void Start()
         {
-            // At runtime, we still want to apply the profile automatically.
             ApplyProfile(currentProfileIndex);
         }
 
-        // We can't call ApplyProfile directly because it uses private members not set in edit mode.
-        // So we create a dedicated method for the editor button.
         public void ApplyProfileInEditor()
         {
-            // In the editor, we need to find the references manually.
-            Camera mainCam = Camera.main;
-            if (mainCam == null)
+            Camera camToApply = mainCamera;
+            if (camToApply == null)
             {
-                Debug.LogError("[ResolutionManager] Could not find Main Camera. Ensure it has the 'MainCamera' tag.");
+                camToApply = Camera.main;
+            }
+
+            if (camToApply == null)
+            {
+                Debug.LogError("[ResolutionManager] Could not find Main Camera. Ensure it's tagged or assigned in the Inspector.");
                 return;
             }
 
-            URPPixelPerfectCamera ppCam = mainCam.GetComponent<URPPixelPerfectCamera>();
-            if (ppCam == null)
+            // --- FINAL, ROBUST FIX FOR EDITOR MODE ---
+            // We fetch the component using its full type name as a string.
+            // This bypasses the editor's issue with generic lookups on aliased types from packages.
+            var ppCamComponent = camToApply.GetComponent("UnityEngine.Rendering.Universal.PixelPerfectCamera");
+            
+            if (ppCamComponent == null)
             {
-                Debug.LogError("[ResolutionManager] Main Camera is missing the URP PixelPerfectCamera component.");
+                Debug.LogError($"[ResolutionManager] Failed to find URP PixelPerfectCamera component on '{camToApply.name}'. Please ensure the component exists.", camToApply.gameObject);
                 return;
             }
             
-            // Now, call the core logic with the found components.
-            ApplyProfileLogic(currentProfileIndex, mainCam, ppCam);
+            // Cast the found generic component to the specific type we need to work with.
+            URPPixelPerfectCamera ppCam = ppCamComponent as URPPixelPerfectCamera;
+            // --- END OF FIX ---
+            
+            ApplyProfileLogic(currentProfileIndex, camToApply, ppCam);
         }
 
         public void ApplyProfile(int index)
         {
-            // In Play mode, we can use the cached references.
-            if (cam == null || pixelPerfectCam == null)
+            if (mainCamera == null || pixelPerfectCam == null)
             {
-                cam = Camera.main;
-                if (cam != null)
-                {
-                    pixelPerfectCam = cam.GetComponent<URPPixelPerfectCamera>();
-                }
-            }
-            
-            if (cam == null || pixelPerfectCam == null)
-            {
-                Debug.LogError("[ResolutionManager] Could not find Main Camera or its URP PixelPerfectCamera component!", this);
-                enabled = false;
+                Debug.LogError("[ResolutionManager] The 'Main Camera' reference is not set in the Inspector or was not found at startup! Disabling ResolutionManager.", this);
+                this.enabled = false; 
                 return;
             }
             
-            ApplyProfileLogic(index, cam, pixelPerfectCam);
+            ApplyProfileLogic(index, mainCamera, pixelPerfectCam);
         }
 
-        // This new method contains the shared logic.
         private void ApplyProfileLogic(int index, Camera targetCam, URPPixelPerfectCamera targetPPCam)
         {
             if (mapConfig == null)
             {
-                Debug.LogError("[ResolutionManager] MapConfiguration is not assigned! Cannot calculate camera sizes.", this);
+                Debug.LogError("[ResolutionManager] MapConfiguration is not assigned! Cannot apply profile.", this);
                 return;
             }
             
@@ -104,25 +117,22 @@ namespace WegoSystem
 
             var profile = profiles[index];
             currentProfileIndex = index;
+            
+            CurrentPPU = profile.pixelsPerUnit;
+            targetPPCam.assetsPPU = profile.pixelsPerUnit;
+            targetPPCam.refResolutionX = profile.resolution.x;
+            targetPPCam.refResolutionY = profile.resolution.y;
 
-            if (targetPPCam != null)
+            float baseOrthoSize = (float)profile.resolution.y / (2f * profile.pixelsPerUnit);
+            targetCam.orthographicSize = baseOrthoSize * profile.cameraZoomMultiplier;
+
+            #if UNITY_EDITOR
+            if (!Application.isPlaying)
             {
-                targetPPCam.refResolutionX = profile.resolution.x;
-                targetPPCam.refResolutionY = profile.resolution.y;
-
-                float baseOrthoSize = (float)mapConfig.referenceResolution.y / (2f * mapConfig.pixelsPerUnit);
-                targetCam.orthographicSize = baseOrthoSize * profile.cameraZoomMultiplier;
-
-                #if UNITY_EDITOR
-                // When in the editor and not playing, we need to mark the objects as "dirty"
-                // so that Unity knows to save the changes.
-                if (!Application.isPlaying)
-                {
-                    EditorUtility.SetDirty(targetCam);
-                    EditorUtility.SetDirty(targetPPCam);
-                }
-                #endif
+                EditorUtility.SetDirty(targetCam);
+                EditorUtility.SetDirty(targetPPCam);
             }
+            #endif
 
             var cameraController = targetCam.GetComponent<CameraController>();
             if (cameraController != null)
@@ -130,7 +140,7 @@ namespace WegoSystem
                 cameraController.OnResolutionChanged();
             }
 
-            Debug.Log($"[ResolutionManager] Applied resolution profile: '{profile.name}'");
+            Debug.Log($"[ResolutionManager] Applied profile: '{profile.name}' (PPU: {CurrentPPU}, Res: {profile.resolution}, Zoom: {targetCam.orthographicSize})");
         }
 
         public void CycleResolution()
