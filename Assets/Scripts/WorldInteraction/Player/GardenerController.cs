@@ -65,6 +65,21 @@ namespace WegoSystem
             {
                 gridEntity.OnPositionChanged += OnGridPositionChanged;
             }
+
+            // --- FIX: Proactively check for status effects on the starting tile ---
+            // This ensures effects are applied immediately on game start, even before the first move.
+            StartCoroutine(InitialTileEffectCheck());
+            // --- END OF FIX ---
+        }
+        
+        private IEnumerator InitialTileEffectCheck()
+        {
+            // Wait one frame to ensure all other systems (like GridPositionManager) are fully initialized.
+            yield return null; 
+            if (EnvironmentalStatusEffectSystem.Instance != null)
+            {
+                EnvironmentalStatusEffectSystem.Instance.CheckAndApplyTileEffects(this);
+            }
         }
 
         private void OnDestroy()
@@ -102,7 +117,6 @@ namespace WegoSystem
 
         private void LateUpdate()
         {
-            // Snap final visual position to the pixel grid to prevent artifacts.
             transform.position = PixelGridSnapper.SnapToGrid(transform.position);
         }
 
@@ -119,7 +133,7 @@ namespace WegoSystem
         {
             if (hungerSystem != null)
             {
-                hungerSystem.Eat(-amount); // Negative amount to increase hunger (reduce satiation)
+                hungerSystem.Eat(-amount);
             }
         }
         #endregion

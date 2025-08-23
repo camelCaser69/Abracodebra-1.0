@@ -1,182 +1,168 @@
-﻿// Assets/Scripts/Ecosystem/StatusEffects/EnvironmentalStatusEffectSystem.cs
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using WegoSystem;
 
-public class EnvironmentalStatusEffectSystem : MonoBehaviour, ITickUpdateable
+namespace WegoSystem
 {
-    public static EnvironmentalStatusEffectSystem Instance { get; private set; }
-
-    [System.Serializable]
-    public class TileStatusRule
+    public class EnvironmentalStatusEffectSystem : MonoBehaviour, ITickUpdateable
     {
-        public TileDefinition tile;
-        public List<StatusEffect> statusEffectsToApply;
-    }
+        public static EnvironmentalStatusEffectSystem Instance { get; set; }
 
-    // <<< NEW: A rule structure for tools
-    [System.Serializable]
-    public class ToolStatusRule
-    {
-        public ToolDefinition tool;
-        public List<StatusEffect> statusEffectsToApply;
-    }
-
-    [Header("Environmental Rules")]
-    [Tooltip("Rules for applying status effects when an entity is on a specific tile.")]
-    public List<TileStatusRule> tileRules = new List<TileStatusRule>();
-
-    [Tooltip("Rules for applying status effects when a tool is used on an entity's tile.")]
-    public List<ToolStatusRule> toolRules = new List<ToolStatusRule>(); // <<< NEW
-
-    private Dictionary<TileDefinition, List<StatusEffect>> tileRuleLookup = new Dictionary<TileDefinition, List<StatusEffect>>();
-    private Dictionary<ToolDefinition, List<StatusEffect>> toolRuleLookup = new Dictionary<ToolDefinition, List<StatusEffect>>(); // <<< NEW
-    private List<IStatusEffectable> allEffectableEntities = new List<IStatusEffectable>();
-
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
+        [System.Serializable]
+        public class TileStatusRule
         {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        BuildLookups();
-    }
-
-    public void Initialize()
-    {
-        if (TickManager.Instance != null)
-        {
-            TickManager.Instance.RegisterTickUpdateable(this);
-        }
-        if (PlayerActionManager.Instance != null)
-        {
-            PlayerActionManager.Instance.OnActionExecuted += HandlePlayerAction;
-        }
-    }
-
-    // Assets/Scripts/Ecosystem/Status Effects/EnvironmentalStatusEffectSystem.cs
-
-    void OnDestroy()
-    {
-        if (Instance == this) Instance = null;
-
-        // Safely get the instance once for TickManager
-        var tickManager = TickManager.Instance;
-        if (tickManager != null)
-        {
-            tickManager.UnregisterTickUpdateable(this);
+            public TileDefinition tile;
+            public List<StatusEffect> statusEffectsToApply;
         }
 
-        // Safe check for PlayerActionManager, which uses a different singleton pattern
-        if (PlayerActionManager.Instance != null)
+        [System.Serializable]
+        public class ToolStatusRule
         {
-            PlayerActionManager.Instance.OnActionExecuted -= HandlePlayerAction;
+            public ToolDefinition tool;
+            public List<StatusEffect> statusEffectsToApply;
         }
-    }
-    
-    private void BuildLookups()
-    {
-        // Build tile lookup
-        tileRuleLookup.Clear();
-        foreach (var rule in tileRules)
+
+        public List<TileStatusRule> tileRules = new List<TileStatusRule>();
+        public List<ToolStatusRule> toolRules = new List<ToolStatusRule>();
+
+        private readonly Dictionary<TileDefinition, List<StatusEffect>> tileRuleLookup = new Dictionary<TileDefinition, List<StatusEffect>>();
+        private readonly Dictionary<ToolDefinition, List<StatusEffect>> toolRuleLookup = new Dictionary<ToolDefinition, List<StatusEffect>>();
+        private readonly List<IStatusEffectable> allEffectableEntities = new List<IStatusEffectable>();
+
+        private void Awake()
         {
-            if (rule.tile != null && rule.statusEffectsToApply != null && rule.statusEffectsToApply.Count > 0)
+            if (Instance != null && Instance != this)
             {
-                tileRuleLookup[rule.tile] = rule.statusEffectsToApply;
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+            BuildLookups();
+        }
+
+        public void Initialize()
+        {
+            if (TickManager.Instance != null)
+            {
+                TickManager.Instance.RegisterTickUpdateable(this);
+            }
+            if (PlayerActionManager.Instance != null)
+            {
+                PlayerActionManager.Instance.OnActionExecuted += HandlePlayerAction;
             }
         }
-        
-        // <<< NEW: Build tool lookup
-        toolRuleLookup.Clear();
-        foreach (var rule in toolRules)
+
+        private void OnDestroy()
         {
-            if (rule.tool != null && rule.statusEffectsToApply != null && rule.statusEffectsToApply.Count > 0)
+            if (Instance == this) Instance = null;
+
+            var tickManager = TickManager.Instance;
+            if (tickManager != null)
             {
-                toolRuleLookup[rule.tool] = rule.statusEffectsToApply;
+                tickManager.UnregisterTickUpdateable(this);
+            }
+
+            if (PlayerActionManager.Instance != null)
+            {
+                PlayerActionManager.Instance.OnActionExecuted -= HandlePlayerAction;
             }
         }
-    }
 
-    public void OnTickUpdate(int currentTick)
-    {
-        RefreshAllEntityTileEffects();
-    }
-    
-    // <<< NEW: This method listens for when the player uses a tool
-    private void HandlePlayerAction(PlayerActionType actionType, object actionData)
-    {
-        if (actionType != PlayerActionType.UseTool) return;
-        
-        var toolData = actionData as PlayerActionManager.ToolActionData;
-        if (toolData == null) return;
-        
-        // Check if there's a rule for the tool that was used
-        if (toolRuleLookup.TryGetValue(toolData.Tool, out List<StatusEffect> effectsToApply))
+        private void BuildLookups()
         {
-            // Find all entities on the tile that was targeted
-            if (GridPositionManager.Instance == null) return;
-            GridPosition gridPos = new GridPosition(toolData.GridPosition);
-            HashSet<GridEntity> entitiesOnTile = GridPositionManager.Instance.GetEntitiesAt(gridPos);
-
-            foreach(var entity in entitiesOnTile)
+            tileRuleLookup.Clear();
+            foreach (var rule in tileRules)
             {
-                IStatusEffectable effectable = entity.GetComponent<IStatusEffectable>();
-                if (effectable != null)
+                if (rule.tile != null && rule.statusEffectsToApply != null && rule.statusEffectsToApply.Count > 0)
                 {
-                    // Apply all effects associated with this tool's rule
-                    foreach(var effect in effectsToApply)
+                    tileRuleLookup[rule.tile] = rule.statusEffectsToApply;
+                }
+            }
+
+            toolRuleLookup.Clear();
+            foreach (var rule in toolRules)
+            {
+                if (rule.tool != null && rule.statusEffectsToApply != null && rule.statusEffectsToApply.Count > 0)
+                {
+                    toolRuleLookup[rule.tool] = rule.statusEffectsToApply;
+                }
+            }
+        }
+
+        public void OnTickUpdate(int currentTick)
+        {
+            RefreshAllEntityTileEffects();
+        }
+
+        private void HandlePlayerAction(PlayerActionType actionType, object actionData)
+        {
+            if (actionType != PlayerActionType.UseTool) return;
+
+            var toolData = actionData as PlayerActionManager.ToolActionData;
+            if (toolData == null) return;
+
+            if (toolRuleLookup.TryGetValue(toolData.Tool, out List<StatusEffect> effectsToApply))
+            {
+                if (GridPositionManager.Instance == null) return;
+                GridPosition gridPos = new GridPosition(toolData.GridPosition);
+                HashSet<GridEntity> entitiesOnTile = GridPositionManager.Instance.GetEntitiesAt(gridPos);
+
+                foreach(var entity in entitiesOnTile)
+                {
+                    IStatusEffectable effectable = entity.GetComponent<IStatusEffectable>();
+                    if (effectable != null)
                     {
-                        effectable.StatusManager.ApplyStatusEffect(effect);
+                        foreach(var effect in effectsToApply)
+                        {
+                            effectable.StatusManager.ApplyStatusEffect(effect);
+                        }
                     }
                 }
             }
         }
-    }
 
-    private void RefreshAllEntityTileEffects()
-    {
-        var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-        var players = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
-
-        allEffectableEntities.Clear();
-        foreach (var animal in animals) allEffectableEntities.Add(animal);
-        foreach (var player in players) allEffectableEntities.Add(player);
-
-        foreach(var entity in allEffectableEntities)
+        private void RefreshAllEntityTileEffects()
         {
-            CheckAndApplyTileEffects(entity);
-        }
-    }
+            var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+            var players = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
 
-    // Renamed for clarity
-    public void CheckAndApplyTileEffects(IStatusEffectable entity)
-    {
-        if (entity == null || TileInteractionManager.Instance == null) return;
+            allEffectableEntities.Clear();
+            foreach (var animal in animals) allEffectableEntities.Add(animal);
+            foreach (var player in players) allEffectableEntities.Add(player);
 
-        Component entityComponent = entity as Component;
-        if (entityComponent == null || !entityComponent.gameObject.activeInHierarchy) return;
-        
-        GridPosition currentPos = entity.GridEntity.Position;
-        TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(currentPos.ToVector3Int());
-
-        if (currentTile == null) return;
-
-        if (tileRuleLookup.TryGetValue(currentTile, out List<StatusEffect> effectsToApply))
-        {
-            foreach (var effect in effectsToApply)
+            foreach(var entity in allEffectableEntities)
             {
-                if (effect != null)
+                CheckAndApplyTileEffects(entity);
+            }
+        }
+
+        public void CheckAndApplyTileEffects(IStatusEffectable entity)
+        {
+            if (entity == null || entity.GridEntity == null || TileInteractionManager.Instance == null) return;
+
+            Component entityComponent = entity as Component;
+            if (entityComponent == null || !entityComponent.gameObject.activeInHierarchy) return;
+
+            // --- THE ELEGANT, FOOLPROOF FIX ---
+            // We directly use the entity's logical GridPosition, the same one used for movement.
+            // This completely eliminates any ambiguity or floating-point errors from world space conversion.
+            GridPosition currentPos = entity.GridEntity.Position;
+            // --- END OF FIX ---
+
+            TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(currentPos.ToVector3Int());
+
+            if (currentTile == null) return;
+            
+            if (tileRuleLookup.TryGetValue(currentTile, out List<StatusEffect> effectsToApply))
+            {
+                foreach (var effect in effectsToApply)
                 {
-                    entity.StatusManager.ApplyStatusEffect(effect);
+                    if (effect != null)
+                    {
+                        entity.StatusManager.ApplyStatusEffect(effect);
+                    }
                 }
             }
         }
-    }
-
-    void OnValidate()
-    {
-        BuildLookups();
     }
 }

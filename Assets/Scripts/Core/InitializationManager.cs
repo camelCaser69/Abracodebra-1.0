@@ -1,40 +1,54 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using UnityEngine;
 using WegoSystem;
 
-public class InitializationManager : SingletonMonoBehaviour<InitializationManager>
+namespace WegoSystem
 {
-    [SerializeField] private GameEvent onCoreSystemsInitialized;
-    [SerializeField] private GameEvent onGameManagersInitialized;
-    [SerializeField] private GameEvent onGameplaySystemsInitialized;
-
-    IEnumerator Start()
+    public class InitializationManager : SingletonMonoBehaviour<InitializationManager>
     {
-        Debug.Log("[InitializationManager] Starting initialization sequence...");
+        [SerializeField] private GameEvent onCoreSystemsInitialized;
+        [SerializeField] private GameEvent onGameManagersInitialized;
+        [SerializeField] private GameEvent onGameplaySystemsInitialized;
 
-        Debug.Log("[InitializationManager] Phase 1: Initializing Core Systems...");
-        onCoreSystemsInitialized.Raise();
-        yield return null;
-
-        Debug.Log("[InitializationManager] Phase 2: Initializing Game Managers...");
-        onGameManagersInitialized.Raise();
-        yield return null;
-
-        // FIX: Explicitly initialize the UIManager here to ensure it subscribes to events.
-        if (UIManager.Instance != null)
+        private IEnumerator Start()
         {
-            Debug.Log("[InitializationManager] Initializing UIManager...");
-            UIManager.Instance.Initialize();
-        }
-        else
-        {
-            Debug.LogError("[InitializationManager] UIManager instance not found! UI will not be initialized.");
-        }
+            Debug.Log("[InitializationManager] Starting initialization sequence...");
 
-        Debug.Log("[InitializationManager] Phase 3: Initializing Gameplay Systems & UI...");
-        onGameplaySystemsInitialized.Raise();
-        yield return null;
+            Debug.Log("[InitializationManager] Phase 1: Initializing Core Systems...");
+            onCoreSystemsInitialized.Raise();
+            yield return null;
 
-        Debug.Log("[InitializationManager] All systems initialized successfully.");
+            Debug.Log("[InitializationManager] Phase 2: Initializing Game Managers...");
+            onGameManagersInitialized.Raise();
+            yield return null;
+
+            if (UIManager.Instance != null)
+            {
+                Debug.Log("[InitializationManager] Initializing UIManager...");
+                UIManager.Instance.Initialize();
+            }
+            else
+            {
+                Debug.LogError("[InitializationManager] UIManager instance not found! UI will not be initialized.");
+            }
+
+            // --- FIX: Initialize the EnvironmentalStatusEffectSystem here ---
+            if (EnvironmentalStatusEffectSystem.Instance != null)
+            {
+                Debug.Log("[InitializationManager] Initializing EnvironmentalStatusEffectSystem...");
+                EnvironmentalStatusEffectSystem.Instance.Initialize();
+            }
+            else
+            {
+                Debug.LogWarning("[InitializationManager] EnvironmentalStatusEffectSystem instance not found. Tile-based status effects will not function.");
+            }
+            // --- END OF FIX ---
+
+            Debug.Log("[InitializationManager] Phase 3: Initializing Gameplay Systems & UI...");
+            onGameplaySystemsInitialized.Raise();
+            yield return null;
+
+            Debug.Log("[InitializationManager] All systems initialized successfully.");
+        }
     }
 }

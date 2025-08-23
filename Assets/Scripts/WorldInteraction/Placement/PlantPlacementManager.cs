@@ -1,14 +1,15 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Runtime;
+using WegoSystem; // <-- FIX: Added this line to resolve the namespace issue.
 
 namespace Abracodabra.UI.Genes
 {
     public class PlantPlacementManager : MonoBehaviour
     {
-        public static PlantPlacementManager Instance { get; private set; }
+        public static PlantPlacementManager Instance { get; set; }
 
         [SerializeField] private Transform plantParent;
         [SerializeField] private TileInteractionManager tileInteractionManager;
@@ -16,10 +17,10 @@ namespace Abracodabra.UI.Genes
         [SerializeField] private float spawnRadius = 0.25f;
         [SerializeField] private List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
 
-        private HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
-        private Dictionary<Vector3Int, GameObject> plantsByGridPosition = new Dictionary<Vector3Int, GameObject>();
+        private readonly HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
+        private readonly Dictionary<Vector3Int, GameObject> plantsByGridPosition = new Dictionary<Vector3Int, GameObject>();
 
-        void Awake()
+        private void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
@@ -35,7 +36,14 @@ namespace Abracodabra.UI.Genes
 
         private void RebuildInvalidTilesSet()
         {
-            invalidTilesSet = new HashSet<TileDefinition>(invalidPlantingTiles.Where(t => t != null));
+            invalidTilesSet.Clear();
+            foreach (var tile in invalidPlantingTiles)
+            {
+                if (tile != null)
+                {
+                    invalidTilesSet.Add(tile);
+                }
+            }
         }
 
         public bool IsPositionOccupied(Vector3Int gridPosition)
@@ -57,8 +65,7 @@ namespace Abracodabra.UI.Genes
                 plantsByGridPosition.Remove(key);
             }
         }
-        
-        // REWRITTEN WITH DETAILED LOGGING
+
         public bool TryPlantSeedFromInventory(PlantGeneRuntimeState runtimeState, Vector3Int gridPosition, Vector3 worldPosition)
         {
             if (runtimeState == null || runtimeState.template == null)
@@ -66,7 +73,7 @@ namespace Abracodabra.UI.Genes
                 Debug.LogError("[PlantPlacementManager] Failed: RuntimeState or its template was null.");
                 return false;
             }
-            
+
             if (!runtimeState.template.IsValid())
             {
                 Debug.LogError($"[PlantPlacementManager] Failed: Seed template '{runtimeState.template.templateName}' configuration is invalid.", runtimeState.template);
@@ -75,7 +82,6 @@ namespace Abracodabra.UI.Genes
 
             if (IsPositionOccupied(gridPosition))
             {
-                // THIS IS THE MOST LIKELY CULPRIT.
                 Debug.LogWarning($"[PlantPlacementManager] Failed: Position {gridPosition} is already occupied by another plant in the dictionary.", this);
                 return false;
             }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
+using WegoSystem;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
