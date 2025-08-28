@@ -3,27 +3,28 @@ using UnityEngine.UI;
 using TMPro;
 using WegoSystem;
 using System.Collections;
+using Abracodabra.UI.Genes; // FIX: Added missing using directive
 
 public class UIManager : MonoBehaviour
 {
+    #region Singleton
     public static UIManager Instance { get; set; }
+    #endregion
 
-    [Header("UI Root References")]
-    [Tooltip("The main UI canvas object that should be enabled at runtime.")]
+    #region Fields
+    [Header("UI Panels")]
     [SerializeField] private GameObject uiCanvasRoot;
-
-    [Header("Panel References")]
     [SerializeField] private GameObject planningPanel;
     [SerializeField] private GameObject growthAndThreatPanel;
     [SerializeField] private GameObject geneSequenceUIPanel;
 
-    [Header("Button References")]
+    [Header("Buttons")]
     [SerializeField] private Button startGrowthPhaseButton;
     [SerializeField] private Button startNewPlanningPhaseButton;
     [SerializeField] private Button endPlanningPhaseButton;
     [SerializeField] private Button advanceTickButton;
 
-    [Header("Debug UI References")]
+    [Header("Displays")]
     [SerializeField] private GameObject wegoControlPanel;
     [SerializeField] private TextMeshProUGUI currentPhaseText;
     [SerializeField] private TextMeshProUGUI tickCounterText;
@@ -32,8 +33,10 @@ public class UIManager : MonoBehaviour
 
     private RunManager runManager;
     private TickManager tickManager;
+    #endregion
 
-    void Awake()
+    #region Unity Methods
+    private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -42,7 +45,6 @@ public class UIManager : MonoBehaviour
         }
         Instance = this;
 
-        // This is the core of the fix. It runs because UIManager is active.
         if (uiCanvasRoot != null)
         {
             uiCanvasRoot.SetActive(true);
@@ -54,6 +56,38 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (runManager != null)
+        {
+            runManager.OnRunStateChanged -= HandleRunStateChanged;
+            runManager.OnPhaseChanged -= HandlePhaseChanged;
+            runManager.OnRoundChanged -= HandleRoundChanged;
+        }
+
+        if (tickManager != null)
+        {
+            tickManager.OnTickAdvanced -= HandleTickAdvanced;
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (runManager?.CurrentPhase == GamePhase.Planning)
+            {
+                OnEndPlanningPhaseClicked();
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.R) && (Application.isEditor || Debug.isDebugBuild))
+        {
+            runManager?.ForcePhase(GamePhase.Planning);
+        }
+    }
+    #endregion
+
+    #region Initialization
     public void Initialize()
     {
         runManager = RunManager.Instance;
@@ -76,38 +110,38 @@ public class UIManager : MonoBehaviour
 
         SetupButtons();
 
+        // Initial setup
         HandleRunStateChanged(runManager.CurrentState);
         UpdatePhaseDisplay();
         UpdateTickDisplay();
     }
 
-    void OnDestroy()
-    {
-        if (runManager != null)
-        {
-            runManager.OnRunStateChanged -= HandleRunStateChanged;
-            runManager.OnPhaseChanged -= HandlePhaseChanged;
-            runManager.OnRoundChanged -= HandleRoundChanged;
-        }
-
-        if (tickManager != null)
-        {
-            tickManager.OnTickAdvanced -= HandleTickAdvanced;
-        }
-    }
-
-    void SetupButtons()
+    private void SetupButtons()
     {
         startGrowthPhaseButton?.onClick.AddListener(OnStartGrowthPhaseClicked);
         startNewPlanningPhaseButton?.onClick.AddListener(OnStartNewPlanningPhaseClicked);
         endPlanningPhaseButton?.onClick.AddListener(OnEndPlanningPhaseClicked);
         advanceTickButton?.onClick.AddListener(OnAdvanceTickClicked);
     }
+    #endregion
 
-    void HandleRunStateChanged(RunState newState)
+    #region Event Handlers
+    private void HandleRunStateChanged(RunState newState)
     {
         if (planningPanel != null) planningPanel.SetActive(newState == RunState.Planning);
         if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
+
+        // FIX: When leaving planning phase, ensure the seed editor is cleaned up
+        // and any loaded seed is returned to the main inventory grid.
+        if (newState == RunState.GrowthAndThreat && geneSequenceUIPanel != null)
+        {
+            var geneSequenceUI = geneSequenceUIPanel.GetComponent<GeneSequenceUI>();
+            if (geneSequenceUI != null)
+            {
+                geneSequenceUI.CleanupOnPhaseEnd();
+            }
+        }
+        
         if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(newState == RunState.Planning);
 
         if (InventoryGridController.Instance != null)
@@ -129,27 +163,30 @@ public class UIManager : MonoBehaviour
         UpdateButtonStates(newState);
     }
 
-    void HandlePhaseChanged(GamePhase oldPhase, GamePhase newPhase)
+    private void HandlePhaseChanged(GamePhase oldPhase, GamePhase newPhase)
     {
         UpdatePhaseDisplay();
         UpdateButtonStates(runManager.CurrentState);
     }
 
-    void HandleRoundChanged(int newRound)
+    private void HandleRoundChanged(int newRound)
     {
+        // Placeholder for future UI updates related to round changes
     }
 
-    void HandleTickAdvanced(int currentTick)
+    private void HandleTickAdvanced(int currentTick)
     {
         UpdateTickDisplay();
         UpdatePhaseProgressDisplay();
     }
+    #endregion
 
-    void UpdatePhaseDisplay() { if (currentPhaseText != null && runManager != null) currentPhaseText.text = $"Phase: {runManager.CurrentPhase}"; }
-    void UpdateTickDisplay() { if (tickManager == null) return; string tickInfo = $"Tick: {tickManager.CurrentTick}"; if (tickCounterText != null) tickCounterText.text = tickInfo; if (persistentTickCounterText != null) persistentTickCounterText.text = tickInfo; }
-    void UpdatePhaseProgressDisplay() { if (phaseProgressText != null && runManager != null) phaseProgressText.text = $"Phase Ticks: {runManager.CurrentPhaseTicks}"; }
+    #region UI Updates
+    private void UpdatePhaseDisplay() { if (currentPhaseText != null && runManager != null) currentPhaseText.text = $"Phase: {runManager.CurrentPhase}"; }
+    private void UpdateTickDisplay() { if (tickManager == null) return; string tickInfo = $"Tick: {tickManager.CurrentTick}"; if (tickCounterText != null) tickCounterText.text = tickInfo; if (persistentTickCounterText != null) persistentTickCounterText.text = tickInfo; }
+    private void UpdatePhaseProgressDisplay() { if (phaseProgressText != null && runManager != null) phaseProgressText.text = $"Phase Ticks: {runManager.CurrentPhaseTicks}"; }
 
-    void UpdateButtonStates(RunState state)
+    private void UpdateButtonStates(RunState state)
     {
         bool isPlanning = (state == RunState.Planning);
         bool isPlanningPhase = (runManager?.CurrentPhase == GamePhase.Planning);
@@ -159,24 +196,29 @@ public class UIManager : MonoBehaviour
         if (endPlanningPhaseButton != null) endPlanningPhaseButton.interactable = isPlanning && isPlanningPhase;
         if (advanceTickButton != null) advanceTickButton.interactable = !isPlanningPhase;
     }
+    #endregion
 
-    void OnStartGrowthPhaseClicked() { runManager?.StartGrowthAndThreatPhase(); }
-    void OnStartNewPlanningPhaseClicked() { runManager?.StartNewPlanningPhase(); }
-    void OnEndPlanningPhaseClicked() { runManager?.EndPlanningPhase(); }
-    void OnAdvanceTickClicked() { tickManager?.DebugAdvanceTick(); }
+    #region Button Callbacks
+    private void OnStartGrowthPhaseClicked() { runManager?.StartGrowthAndThreatPhase(); }
+    private void OnStartNewPlanningPhaseClicked() { runManager?.StartNewPlanningPhase(); }
+    private void OnEndPlanningPhaseClicked() { runManager?.EndPlanningPhase(); }
+    private void OnAdvanceTickClicked() { tickManager?.DebugAdvanceTick(); }
+    #endregion
 
-    IEnumerator ShowInventoryBarDelayed()
+    #region Coroutines
+    private IEnumerator ShowInventoryBarDelayed()
     {
+        // Wait one frame to ensure UI layout has updated after panels are switched
         yield return null;
         InventoryBarController.Instance?.ShowBar();
     }
-
+    
     public void ShowNotification(string message, float duration = 3f)
     {
         StartCoroutine(ShowNotificationCoroutine(message, duration));
     }
 
-    IEnumerator ShowNotificationCoroutine(string message, float duration)
+    private IEnumerator ShowNotificationCoroutine(string message, float duration)
     {
         GameObject notification = new GameObject("Notification");
         notification.transform.SetParent(transform, false);
@@ -187,6 +229,7 @@ public class UIManager : MonoBehaviour
         var text = new GameObject("Text").AddComponent<TextMeshProUGUI>();
         text.transform.SetParent(notification.transform, false);
 
+        // Position and style the notification
         rectTransform.anchorMin = new Vector2(0.5f, 0.8f);
         rectTransform.anchorMax = new Vector2(0.5f, 0.8f);
         rectTransform.sizeDelta = new Vector2(300, 60);
@@ -198,6 +241,7 @@ public class UIManager : MonoBehaviour
         text.fontSize = 16;
         text.rectTransform.sizeDelta = rectTransform.sizeDelta;
 
+        // Fade In
         float elapsedTime = 0f;
         while (elapsedTime < 0.5f)
         {
@@ -207,8 +251,10 @@ public class UIManager : MonoBehaviour
         }
         canvasGroup.alpha = 1f;
 
+        // Wait
         yield return new WaitForSeconds(duration - 1f);
 
+        // Fade Out
         elapsedTime = 0f;
         while (elapsedTime < 0.5f)
         {
@@ -219,19 +265,5 @@ public class UIManager : MonoBehaviour
 
         Destroy(notification);
     }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (runManager?.CurrentPhase == GamePhase.Planning)
-            {
-                OnEndPlanningPhaseClicked();
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.R) && (Application.isEditor || Debug.isDebugBuild))
-        {
-            runManager?.ForcePhase(GamePhase.Planning);
-        }
-    }
+    #endregion
 }

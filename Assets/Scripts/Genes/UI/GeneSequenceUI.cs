@@ -76,6 +76,23 @@ namespace Abracodabra.UI.Genes
             SetEditorLocked(true);
             RefreshAllVisuals();
         }
+        
+        public void CleanupOnPhaseEnd()
+        {
+            if (seedEditSlot != null && seedEditSlot.CurrentItem != null)
+            {
+                var itemToReturn = seedEditSlot.CurrentItem;
+                if (InventoryGridController.Instance != null)
+                {
+                    bool success = InventoryGridController.Instance.AddItemToInventory(itemToReturn);
+                    if (!success)
+                    {
+                        Debug.LogWarning($"Could not return seed '{itemToReturn.GetDisplayName()}' to inventory on phase end, inventory may be full.");
+                    }
+                }
+            }
+            ClearEditor();
+        }
 
         private void GenerateSlotsFromState()
         {

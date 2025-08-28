@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 519,514 → 344,703 chars (33.6% reduction)
-Estimated tokens saved: ~43,702
+Compression Stats: 538,708 → 355,438 chars (34.0% reduction)
+Estimated tokens saved: ~45,817
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -64,124 +64,139 @@ using System;
   GeneSlotUI (Assets\Scripts\Genes\UI/) L1904
   SequenceRowUI (Assets\Scripts\Genes\UI/) L2127
   ItemView (Assets\Scripts\PlantSystem\UI/) L2198
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L2293
 
 [Unknown]
-  GameEvent (Assets\Scripts\Core\Events/) L2401
-  GameEventListener (Assets\Scripts\Core\Events/) L2428
-  IGameEventListener (Assets\Scripts\Core\Events/) L2455
-  GameInitializer (Assets\Scripts\Core/) L2463
-  GeneSystemInitializer (Assets\Scripts\Core/) L2481
-  InitializationManager (Assets\Scripts\Core/) L2495
-  PixelPerfectSetup (Assets\Scripts\Core/) L2533
-  SortableEntity (Assets\Scripts\Core/) L2574
-  UIManager (Assets\Scripts\Core/) L2641
-  WeatherManager (Assets\Scripts\Core/) L2844
-  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L3044
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L3097
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L3376
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L3462
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L3471
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L3859
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L4006
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L4019
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L4056
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L4366
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L4397
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L4670
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L4763
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L4778
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L4797
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L4881
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L4957
-  FoodType (Assets\Scripts\Ecosystem\Food/) L5023
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L5036
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L5058
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L5301
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L5320
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L5625
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L5654
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L5792
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L5810
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L5848
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L5896
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L5914
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L6040
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L6151
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L6198
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L6211
-  TileDefinitionEditor (Assets\Scripts\Editor/) L6272
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L6292
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L6327
-  WaveManagerEditor (Assets\Scripts\Editor/) L6464
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6639
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6664
-  LeafData (Assets\Scripts\PlantSystem\Data/) L6672
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6687
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6726
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6747
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6879
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6937
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7023
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L7092
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7241
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7312
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7372
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7504
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7520
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7626
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7774
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7872
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L7973
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L8012
-  GridSnapStartup (Assets\Scripts\Ticks/) L8251
-  TickDebugMonitor (Assets\Scripts\Ticks/) L8318
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8354
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8412
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8643
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8654
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8683
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8779
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8884
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9281
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9317
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9483
-  SceneSetupManagerEditor (Assets\Scripts\WorldInteraction\Player\Editor/) L9607
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L9631
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9805
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9813
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L9842
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9889
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10056
-  SceneSetupManager (Assets\Scripts\WorldInteraction\Player/) L10118
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L10188
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10228
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10252
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L10272
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10586
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10598
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10633
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10808
+  GameEvent (Assets\Scripts\Core\Events/) L2293
+  GameEventListener (Assets\Scripts\Core\Events/) L2320
+  IGameEventListener (Assets\Scripts\Core\Events/) L2347
+  GeneSystemInitializer (Assets\Scripts\Core/) L2355
+  SortableEntity (Assets\Scripts\Core/) L2369
+  UIManager (Assets\Scripts\Core/) L2436
+  WeatherManager (Assets\Scripts\Core/) L2639
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L2839
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L2892
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L3175
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L3261
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L3270
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L3658
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L3805
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L3818
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L3855
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L4165
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L4196
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L4469
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L4562
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L4577
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L4596
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L4680
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L4756
+  FoodType (Assets\Scripts\Ecosystem\Food/) L4822
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L4835
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L4857
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L5100
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L5119
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L5424
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L5453
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L5471
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L5509
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L5557
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L5575
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L5701
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L5812
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L5859
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L5872
+  TileDefinitionEditor (Assets\Scripts\Editor/) L5933
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L5953
+  WaveManagerEditor (Assets\Scripts\Editor/) L6090
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6265
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6290
+  LeafData (Assets\Scripts\PlantSystem\Data/) L6298
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6313
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6352
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6373
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6505
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6563
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L6649
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L6718
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6867
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L6938
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L6998
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7130
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7146
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7252
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7400
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7498
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L7599
+  GridSnapStartup (Assets\Scripts\Ticks/) L7838
+  TickDebugMonitor (Assets\Scripts\Ticks/) L7905
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L7941
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L7999
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8230
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8241
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8270
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8366
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8471
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8869
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L8905
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9071
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9195
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9203
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9232
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L9399
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L9461
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9485
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9505
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9517
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9552
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9727
 
 [WegoSystem]
-  RunManager (Assets\Scripts\Core/) L10819
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L10955
-  GridEntity (Assets\Scripts\Ticks/) L11012
-  GridPosition (Assets\Scripts\Ticks/) L11169
-  GridPositionManager (Assets\Scripts\Ticks/) L11270
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11635
-  TickConfiguration (Assets\Scripts\Ticks/) L11779
-  ITickUpdateable (Assets\Scripts\Ticks/) L11862
+  CameraController (Assets\Scripts\Core/) L9738
+  InitializationManager (Assets\Scripts\Core/) L9843
+  PixelGridSnapper (Assets\Scripts\Core/) L9891
+  RunManager (Assets\Scripts\Core/) L9924
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L10060
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L10117
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L10253
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L10280
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L10406
+  GridEntity (Assets\Scripts\Ticks/) L10478
+  GridPosition (Assets\Scripts\Ticks/) L10640
+  GridPositionManager (Assets\Scripts\Ticks/) L10741
+  GridRadiusUtility (Assets\Scripts\Ticks/) L11119
+  TickConfiguration (Assets\Scripts\Ticks/) L11263
+  ITickUpdateable (Assets\Scripts\Ticks/) L11346
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11498
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11686
+
+[WegoSystem.Editor]
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L11986
+
+[WegoSystem.Editor']
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L12018
+
+[WegoSystem.EditorTools]
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L12059
 
 [WegoSystem.ProceduralGeneration]
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12014
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12125
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L12115
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12156
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12274
+
+[is]
+  GameInitializer (Assets\Scripts\Core/) L12426
+
+[issue.]
+  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12449
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L12476
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L12590
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L12638
 
 [namespace]
-  GeneEventBus (Assets\Scripts\Genes\Services/) L12277
+  GeneEventBus (Assets\Scripts\Genes\Services/) L12679
 
 [needs]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12329
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12731
 
 ================================================================================
 SCRIPTS
@@ -2452,114 +2467,6 @@ pub SeedTemplate GetSeedTemplate() => _seedTemplate;
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\WorldInteraction\Placement\PlantPlacementManager.cs
-
-﻿using UnityEngine;
-using Abracodabra.Genes.Templates;
-using Abracodabra.Genes.Runtime;
-
-namespace Abracodabra.UI.Genes {
-pub cls PlantPlacementManager : MonoBehaviour {
-pub stat PlantPlacementManager Instance { get; set; }
-
-[SerializeField] Transform plantParent;
-[SerializeField] TileInteractionManager tileInteractionManager;
-[SerializeField] NodeExecutor nodeExecutor;
-[SerializeField] float spawnRadius = 0.25f;
-[SerializeField] List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
-
-HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
-Dictionary<Vector3Int, GameObject> plantsByGridPosition = new Dictionary<Vector3Int, GameObject>();
-
-void Awake() {
-if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-Instance = this;
-RebuildInvalidTilesSet();
-}
-
-pub void Initialize() {
-if (plantParent == null && EcosystemManager.Instance != null) plantParent = EcosystemManager.Instance.plantParent;
-if (tileInteractionManager == null) tileInteractionManager = TileInteractionManager.Instance;
-if (nodeExecutor == null) nodeExecutor = FindFirstObjectByType<NodeExecutor>();
-}
-
-void RebuildInvalidTilesSet() {
-invalidTilesSet = new HashSet<TileDefinition>(invalidPlantingTiles.Where(t => t != null));
-}
-
-pub bool IsPositionOccupied(Vector3Int gridPosition) {
-CleanupDestroyedPlants();
-ret plantsByGridPosition.ContainsKey(gridPosition);
-}
-
-pub bool IsTileValidForPlanting(TileDefinition tileDef) {
-ret tileDef != null && !invalidTilesSet.Contains(tileDef);
-}
-
-void CleanupDestroyedPlants() {
-var keysToRemove = plantsByGridPosition.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key).ToList();
-foreach (var key in keysToRemove) {
-plantsByGridPosition.Remove(key);
-}
-}
-
-pub bool TryPlantSeedFromInventory(PlantGeneRuntimeState runtimeState, Vector3Int gridPosition, Vector3 worldPosition) {
-if (runtimeState == null || runtimeState.template == null) {
-Debug.LogError("[PlantPlacementManager] Failed: RuntimeState or its template was null.");
-ret false;
-}
-
-if (!runtimeState.template.IsValid()) {
-Debug.LogError($"[PlantPlacementManager] Failed: Seed template '{runtimeState.template.templateName}' configuration is invalid.", runtimeState.template);
-ret false;
-}
-
-if (IsPositionOccupied(gridPosition)) {
-Debug.LogWarning($"[PlantPlacementManager] Failed: Position {gridPosition} is already occupied by another plant in the dictionary.", this);
-ret false;
-}
-
-TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
-if (!IsTileValidForPlanting(tileDef)) {
-string tileName = tileDef != null ? tileDef.displayName : "NULL";
-Debug.LogWarning($"[PlantPlacementManager] Failed: Tile '{tileName}' at {gridPosition} is not a valid planting tile.", this);
-ret false;
-}
-
-if (nodeExecutor == null) {
-nodeExecutor = FindFirstObjectByType<NodeExecutor>();
-if (nodeExecutor == null) {
-Debug.LogError("[PlantPlacementManager] Failed: NodeExecutor reference is missing and could not be found in the scene!");
-ret false;
-}
-}
-
-Vector3 finalPlantingPosition = GetRandomizedPlantingPosition(worldPosition);
-GameObject plantGO = nodeExecutor.SpawnPlantFromState(runtimeState, finalPlantingPosition, plantParent);
-
-if (plantGO == null) {
-Debug.LogError("[PlantPlacementManager] Failed: NodeExecutor returned a null plant GameObject. Check NodeExecutor's logs (is its Plant Prefab assigned?).", this);
-ret false;
-}
-
-WegoSystem.GridPositionManager.Instance.SnapEntityToGrid(plantGO);
-var finalGridEntity = plantGO.GetComponent<WegoSystem.GridEntity>();
-Vector3Int finalGridPosition = finalGridEntity.Position.ToVector3Int();
-
-plantsByGridPosition[finalGridPosition] = plantGO;
-Debug.Log($"[PlantPlacementManager] Successfully planted '{runtimeState.template.templateName}' and registered it at final grid position {finalGridPosition}.");
-ret true;
-}
-
-Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition) {
-if (spawnRadius <= 0f) ret centerPosition;
-Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
-ret centerPosition + new Vector3(randomOffset.x, randomOffset.y, 0);
-}
-}
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\Events\GameEvent.cs
 
 ﻿// Assets/Scripts/Core/Events/GameEvent.cs
@@ -2622,24 +2529,6 @@ void OnEventRaised();
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Core\GameInitializer.cs
-
-﻿// REWORKED FILE: Assets/Scripts/Core/GameInitializer.cs
-using Abracodabra.Genes.Services;
-
-pub cls GameInitializer : MonoBehaviour {
-stat void InitializeServices() {
-GeneServices.Initialize();
-}
-
-void Awake() {
-if (GeneEffectPool.Instance == null) {
-Debug.LogError("GeneEffectPool instance could not be created.");
-}
-}
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\GeneSystemInitializer.cs
 
 ﻿using UnityEngine;
@@ -2650,85 +2539,6 @@ void Awake() {
 if (!GeneServices.IsInitialized) {
 GeneServices.Initialize();
 }
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\Core\InitializationManager.cs
-
-﻿using UnityEngine;
-using WegoSystem;
-
-pub cls InitializationManager : SingletonMonoBehaviour<InitializationManager> {
-[SerializeField] GameEvent onCoreSystemsInitialized;
-[SerializeField] GameEvent onGameManagersInitialized;
-[SerializeField] GameEvent onGameplaySystemsInitialized;
-
-IEnumerator Start() {
-Debug.Log("[InitializationManager] Starting initialization sequence...");
-
-Debug.Log("[InitializationManager] Phase 1: Initializing Core Systems...");
-onCoreSystemsInitialized.Raise();
-yield ret null;
-
-Debug.Log("[InitializationManager] Phase 2: Initializing Game Managers...");
-onGameManagersInitialized.Raise();
-yield ret null;
-
-if (UIManager.Instance != null) {
-Debug.Log("[InitializationManager] Initializing UIManager...");
-UIManager.Instance.Initialize();
-}
-else {
-Debug.LogError("[InitializationManager] UIManager instance not found! UI will not be initialized.");
-}
-
-Debug.Log("[InitializationManager] Phase 3: Initializing Gameplay Systems & UI...");
-onGameplaySystemsInitialized.Raise();
-yield ret null;
-
-Debug.Log("[InitializationManager] All systems initialized successfully.");
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\Core\PixelPerfectSetup.cs
-
-﻿using UnityEngine;
-using UnityEngine.U2D;
-
-pub cls PixelPerfectSetup : MonoBehaviour {
-[SerializeField] int referenceResolutionX = 320; // Your base game width
-[SerializeField] int referenceResolutionY = 180; // Your base game height
-
-[SerializeField] int pixelsPerUnit = 6; // Since 1 game pixel = 6x6 real pixels
-
-PixelPerfectCamera pixelPerfectCamera;
-Camera cam;
-
-void Awake() {
-cam = GetComponent<Camera>();
-pixelPerfectCamera = GetComponent<PixelPerfectCamera>();
-
-SetupPixelPerfectCamera();
-}
-
-void SetupPixelPerfectCamera() {
-pixelPerfectCamera.assetsPPU = pixelsPerUnit;
-pixelPerfectCamera.refResolutionX = referenceResolutionX;
-pixelPerfectCamera.refResolutionY = referenceResolutionY;
-pixelPerfectCamera.upscaleRT = true;
-pixelPerfectCamera.pixelSnapping = true;
-pixelPerfectCamera.cropFrameX = false;
-pixelPerfectCamera.cropFrameY = false;
-pixelPerfectCamera.stretchFill = false;
-
-Debug.Log($"[PixelPerfectSetup] Configured for {referenceResolutionX}x{referenceResolutionY} at {pixelsPerUnit} PPU");
-}
-
-void Start() {
-float expectedCameraSize = (float)referenceResolutionY / (2f * pixelsPerUnit);
-Debug.Log($"[PixelPerfectSetup] Expected camera orthographic size: {expectedCameraSize}");
 }
 }
 
@@ -3340,6 +3150,10 @@ bool showStats = Input.GetKey(showStatsKey);
 SetStatsTextVisibility(showStats);
 UpdateSpriteFlipping();
 movement.UpdateVisuals();
+}
+
+void LateUpdate() {
+transform.position = PixelGridSnapper.SnapToGrid(transform.position);
 }
 
 pub void OnTickUpdate(int currentTick) {
@@ -5813,144 +5627,6 @@ pub List<WaveSpawnEntry> spawnEntries = new List<WaveSpawnEntry>();
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Ecosystem\Status Effects\EnvironmentalStatusEffectSystem.cs
-
-﻿// Assets/Scripts/Ecosystem/StatusEffects/EnvironmentalStatusEffectSystem.cs
-using WegoSystem;
-
-pub cls EnvironmentalStatusEffectSystem : MonoBehaviour, ITickUpdateable {
-pub stat EnvironmentalStatusEffectSystem Instance { get; set; }
-
-pub cls TileStatusRule {
-pub TileDefinition tile;
-pub List<StatusEffect> statusEffectsToApply;
-}
-
-pub cls ToolStatusRule {
-pub ToolDefinition tool;
-pub List<StatusEffect> statusEffectsToApply;
-}
-
-pub List<TileStatusRule> tileRules = new List<TileStatusRule>();
-
-pub List<ToolStatusRule> toolRules = new List<ToolStatusRule>(); // <<< NEW
-
-Dictionary<TileDefinition, List<StatusEffect>> tileRuleLookup = new Dictionary<TileDefinition, List<StatusEffect>>();
-Dictionary<ToolDefinition, List<StatusEffect>> toolRuleLookup = new Dictionary<ToolDefinition, List<StatusEffect>>(); // <<< NEW
-List<IStatusEffectable> allEffectableEntities = new List<IStatusEffectable>();
-
-void Awake() {
-if (Instance != null && Instance != this) {
-Destroy(gameObject);
-return;
-}
-Instance = this;
-BuildLookups();
-}
-
-pub void Initialize() {
-if (TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-}
-if (PlayerActionManager.Instance != null) {
-PlayerActionManager.Instance.OnActionExecuted += HandlePlayerAction;
-}
-}
-
-void OnDestroy() {
-if (Instance == this) Instance = null;
-
-var tickManager = TickManager.Instance;
-if (tickManager != null) {
-tickManager.UnregisterTickUpdateable(this);
-}
-
-if (PlayerActionManager.Instance != null) {
-PlayerActionManager.Instance.OnActionExecuted -= HandlePlayerAction;
-}
-}
-
-void BuildLookups() {
-tileRuleLookup.Clear();
-foreach (var rule in tileRules) {
-if (rule.tile != null && rule.statusEffectsToApply != null && rule.statusEffectsToApply.Count > 0) {
-tileRuleLookup[rule.tile] = rule.statusEffectsToApply;
-}
-}
-
-toolRuleLookup.Clear();
-foreach (var rule in toolRules) {
-if (rule.tool != null && rule.statusEffectsToApply != null && rule.statusEffectsToApply.Count > 0) {
-toolRuleLookup[rule.tool] = rule.statusEffectsToApply;
-}
-}
-}
-
-pub void OnTickUpdate(int currentTick) {
-RefreshAllEntityTileEffects();
-}
-
-void HandlePlayerAction(PlayerActionType actionType, object actionData) {
-if (actionType != PlayerActionType.UseTool) return;
-
-var toolData = actionData as PlayerActionManager.ToolActionData;
-if (toolData == null) return;
-
-if (toolRuleLookup.TryGetValue(toolData.Tool, out List<StatusEffect> effectsToApply)) {
-if (GridPositionManager.Instance == null) return;
-GridPosition gridPos = new GridPosition(toolData.GridPosition);
-HashSet<GridEntity> entitiesOnTile = GridPositionManager.Instance.GetEntitiesAt(gridPos);
-
-foreach(var entity in entitiesOnTile) {
-IStatusEffectable effectable = entity.GetComponent<IStatusEffectable>();
-if (effectable != null) {
-foreach(var effect in effectsToApply) {
-effectable.StatusManager.ApplyStatusEffect(effect);
-}
-}
-}
-}
-}
-
-void RefreshAllEntityTileEffects() {
-var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
-var players = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
-
-allEffectableEntities.Clear();
-foreach (var animal in animals) allEffectableEntities.Add(animal);
-foreach (var player in players) allEffectableEntities.Add(player);
-
-foreach(var entity in allEffectableEntities) {
-CheckAndApplyTileEffects(entity);
-}
-}
-
-pub void CheckAndApplyTileEffects(IStatusEffectable entity) {
-if (entity == null || TileInteractionManager.Instance == null) return;
-
-Component entityComponent = entity as Component;
-if (entityComponent == null || !entityComponent.gameObject.activeInHierarchy) return;
-
-GridPosition currentPos = entity.GridEntity.Position;
-TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(currentPos.ToVector3Int());
-
-if (currentTile == null) return;
-
-if (tileRuleLookup.TryGetValue(currentTile, out List<StatusEffect> effectsToApply)) {
-foreach (var effect in effectsToApply) {
-if (effect != null) {
-entity.StatusManager.ApplyStatusEffect(effect);
-}
-}
-}
-}
-
-void OnValidate() {
-BuildLookups();
-}
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\Ecosystem\Status Effects\IStatusEffectable.cs
 
 ﻿// Assets/Scripts/Ecosystem/StatusEffects/IStatusEffectable.cs
@@ -6446,41 +6122,6 @@ EditorGUILayout.Space();
 if (GUILayout.Button("UPDATE COLOR IN SCENE", GUILayout.Height(30))) {
 tileDefinition.UpdateColor();
 }
-}
-}
-#endif
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\Editor\TileInteractionManagerEditor.cs
-
-﻿#if UNITY_EDITOR
-using UnityEditor;
-
-pub cls TileInteractionManagerEditor : Editor {
-pub ovr void OnInspectorGUI() {
-DrawDefaultInspector();
-
-TileInteractionManager manager = (TileInteractionManager)target;
-
-EditorGUILayout.Space();
-EditorGUILayout.BeginHorizontal();
-
-if (GUILayout.Button("UPDATE SORTING ORDER", GUILayout.Height(30))) {
-manager.UpdateSortingOrder();
-EditorUtility.SetDirty(manager);
-}
-
-if (GUILayout.Button("UPDATE ALL COLORS", GUILayout.Height(30))) {
-manager.UpdateAllColors();
-EditorUtility.SetDirty(manager);
-}
-
-EditorGUILayout.EndHorizontal();
-
-EditorGUILayout.HelpBox("Order: First item in list gets highest sorting order value (" +
-manager.baseSortingOrder + "). Each subsequent item is " +
-(manager.baseSortingOrder - 1) + ", " +
-(manager.baseSortingOrder - 2) + ", etc.", MessageType.Info);
 }
 }
 #endif
@@ -8132,45 +7773,6 @@ DestroyImmediate(gameObject);
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\ProceduralGeneration\MapGenerationProfile.cs
-
-﻿// FILE: Assets/Scripts/ProceduralGeneration/MapGenerationProfile.cs
-using WegoSystem.ProceduralGeneration;
-
-pub cls BiomeLayer {
-pub TileDefinition tile;
-
-pub float noiseThreshold;
-
-pub bool placeUnderlayTile = false;
-
-pub TileDefinition underlayTile;
-
-}
-
-pub cls MapGenerationProfile : ScriptableObject {
-pub Vector2Int mapSize = new Vector2Int(100, 100);
-pub int worldSeed = 12345;
-pub bool useRandomSeed = true;
-
-pub NoiseParameters noiseParameters = new NoiseParameters {
-scale = 0.1f,
-octaves = 4,
-persistence = 0.5f,
-lacunarity = 2f
-};
-
-pub List<BiomeLayer> biomeLayers;
-
-pub void InitializeSeed() {
-if (useRandomSeed) {
-worldSeed = Random.Range(0, int.MaxValue);
-}
-noiseParameters.seed = worldSeed;
-}
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridDebugVisualizer.cs
 
 ﻿using System.Collections.Generic;
@@ -9047,6 +8649,7 @@ lineRenderer.SetPositions(points);
 
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
+using WegoSystem;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -9766,204 +9369,6 @@ if (tileInteractionManager == null) tileInteractionManager = TileInteractionMana
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\WorldInteraction\Player\Editor\SceneSetupManagerEditor.cs
-
-﻿// FILE: Assets/Scripts/Editor/SceneSetupManagerEditor.cs
-using UnityEditor;
-
-pub cls SceneSetupManagerEditor : Editor {
-pub ovr void OnInspectorGUI() {
-DrawDefaultInspector();
-
-SceneSetupManager setupManager = (SceneSetupManager)target;
-
-EditorGUILayout.Space(10);
-
-GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
-buttonStyle.padding = new RectOffset(10, 10, 10, 10);
-buttonStyle.fontSize = 13;
-
-if (GUILayout.Button("Setup Scene Now (Move Player & Camera)", buttonStyle)) {
-setupManager.SetupScene();
-}
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\WorldInteraction\Player\GardenerController.cs
-
-﻿// Assets/Scripts/WorldInteraction/Player/GardenerController.cs
-
-using WegoSystem;
-
-pub cls GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdateable {
-[SerializeField] float multiTickDelay = 0.5f;
-
-[SerializeField] bool useAnimations = true;
-[SerializeField] Animator animator;
-[SerializeField] string runningParameterName = "isRunning";
-[SerializeField] string plantingTriggerName = "plant";
-
-[SerializeField] SpriteRenderer spriteRenderer;
-[SerializeField] bool flipSpriteWhenMovingLeft = true;
-[SerializeField] bool flipHorizontalDirection = true;
-
-GridEntity gridEntity;
-StatusEffectManager statusManager;
-StatusEffectUIManager statusEffectUI;
-PlayerHungerSystem hungerSystem;
-
-GridPosition currentTargetPosition;
-bool isProcessingMovement = false;
-
-pub GridEntity GridEntity => gridEntity;
-pub StatusEffectManager StatusManager => statusManager;
-pub PlayerHungerSystem HungerSystem => hungerSystem;
-
-void Awake() {
-gridEntity = GetComponent<GridEntity>();
-if (gridEntity == null) gridEntity = gameObject.AddComponent<GridEntity>();
-statusManager = GetComponent<StatusEffectManager>();
-if (statusManager == null) statusManager = gameObject.AddComponent<StatusEffectManager>();
-hungerSystem = GetComponent<PlayerHungerSystem>();
-if (hungerSystem == null) hungerSystem = gameObject.AddComponent<PlayerHungerSystem>();
-
-statusEffectUI = GetComponentInChildren<StatusEffectUIManager>(true);
-if (statusEffectUI == null) Debug.LogWarning("[GardenerController] StatusEffectUIManager not found in children. Icons won't display.", this);
-if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-if (spriteRenderer == null) Debug.LogWarning("[GardenerController] SpriteRenderer not found.", gameObject);
-if (animator == null && useAnimations) Debug.LogWarning("[GardenerController] Animator not found.", gameObject);
-}
-
-void Start() {
-statusManager.Initialize(this);
-
-if (statusEffectUI != null) {
-statusEffectUI.Initialize(statusManager);
-}
-
-if (TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-}
-if (gridEntity != null) {
-gridEntity.OnPositionChanged += OnGridPositionChanged;
-}
-}
-
-void OnDestroy() {
-var tickManager = TickManager.Instance;
-if (tickManager != null) {
-tickManager.UnregisterTickUpdateable(this);
-}
-
-if (gridEntity != null) {
-gridEntity.OnPositionChanged -= OnGridPositionChanged;
-}
-}
-
-pub void OnTickUpdate(int currentTick) {
-statusManager?.OnTickUpdate(currentTick);
-}
-
-void Update() {
-if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat) {
-HandlePlayerInput();
-}
-if (gridEntity != null && statusManager != null) {
-gridEntity.SetSpeedMultiplier(statusManager.VisualSpeedMultiplier);
-}
-UpdateAnimations();
-UpdateSpriteDirection();
-}
-
-void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos) {
-EnvironmentalStatusEffectSystem.Instance?.CheckAndApplyTileEffects(this);
-}
-
-pub string GetDisplayName() { ret "Gardener"; }
-pub void TakeDamage(float amount) { Debug.Log($"Gardener took {amount} damage!"); }
-pub void Heal(float amount) { Debug.Log($"Gardener was healed for {amount}!"); }
-pub void ModifyHunger(float amount) {
-if (hungerSystem != null) {
-hungerSystem.Eat(-amount);
-}
-}
-
-void HandlePlayerInput() {
-if (gridEntity == null || gridEntity.IsMoving || isProcessingMovement) return;
-
-GridPosition moveDir = GridPosition.Zero;
-if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) moveDir = GridPosition.Up;
-else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) moveDir = GridPosition.Down;
-else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) moveDir = GridPosition.Left;
-else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) moveDir = GridPosition.Right;
-
-if (moveDir != GridPosition.Zero) {
-TryMove(moveDir);
-return;
-}
-}
-
-void TryMove(GridPosition direction) {
-if (gridEntity == null) return;
-GridPosition targetPos = gridEntity.Position + direction;
-if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
-GridPositionManager.Instance.IsPositionValid(targetPos) &&
-!GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
-Vector3 currentWorldPos = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
-int moveCost = PlayerActionManager.Instance.GetMovementTickCost(currentWorldPos, this);
-if (moveCost > 1) {
-StartCoroutine(ProcessMultiTickMovement(targetPos, moveCost));
-}
-else {
-gridEntity.SetPosition(targetPos);
-currentTargetPosition = targetPos;
-TickManager.Instance.AdvanceTick();
-}
-}
-}
-
-IEnumerator ProcessMultiTickMovement(GridPosition targetPos, int tickCost) {
-isProcessingMovement = true;
-for (int i = 0; i < tickCost - 1; i++) {
-TickManager.Instance.AdvanceTick();
-yield ret new WaitForSeconds(multiTickDelay);
-}
-gridEntity.SetPosition(targetPos);
-currentTargetPosition = targetPos;
-TickManager.Instance.AdvanceTick();
-isProcessingMovement = false;
-}
-
-void UpdateAnimations() {
-if (!useAnimations || animator == null) return;
-bool isMoving = gridEntity != null && gridEntity.IsMoving;
-animator.SetBool(runningParameterName, isMoving);
-}
-
-void UpdateSpriteDirection() {
-if (spriteRenderer == null || !flipSpriteWhenMovingLeft || gridEntity == null || !gridEntity.IsMoving) return;
-Vector3 worldTarget = GridPositionManager.Instance.GridToWorld(currentTargetPosition);
-Vector3 currentWorld = transform.position;
-Vector2 directionToCheck = (worldTarget - currentWorld).normalized;
-if (Mathf.Abs(directionToCheck.x) > 0.01f) {
-bool shouldFlip = directionToCheck.x < 0;
-spriteRenderer.flipX = flipHorizontalDirection ? shouldFlip : !shouldFlip;
-}
-}
-
-pub void Plant() {
-if (useAnimations && animator != null) {
-animator.SetTrigger(plantingTriggerName);
-}
-}
-
-pub GridPosition GetCurrentGridPosition() {
-ret gridEntity?.Position ?? GridPosition.Zero;
-}
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Player\HarvestableTag.cs
 
 ﻿using UnityEngine;
@@ -9997,53 +9402,6 @@ ret 0f; // Default if not a nutritious gene
 
 pub bool IsConsumable() {
 ret GetNutritionValue() > 0;
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\WorldInteraction\Player\HungerUI.cs
-
-﻿using UnityEngine;
-using TMPro;
-
-pub cls HungerUI : MonoBehaviour {
-[SerializeField] PlayerHungerSystem playerHungerSystem;
-[SerializeField] Slider hungerSlider;
-[SerializeField] TextMeshProUGUI hungerText;
-
-void Start() {
-if (playerHungerSystem == null) {
-GardenerController player = FindAnyObjectByType<GardenerController>();
-if (player != null) {
-playerHungerSystem = player.GetComponent<PlayerHungerSystem>();
-}
-}
-
-if (playerHungerSystem != null) {
-playerHungerSystem.OnHungerChanged += UpdateUI;
-UpdateUI(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
-}
-else {
-Debug.LogError("[HungerUI] PlayerHungerSystem reference not found! UI will not update.", this);
-gameObject.SetActive(false);
-}
-}
-
-void OnDestroy() {
-if (playerHungerSystem != null) {
-playerHungerSystem.OnHungerChanged -= UpdateUI;
-}
-}
-
-void UpdateUI(float currentHunger, float maxHunger) {
-if (hungerSlider != null) {
-hungerSlider.maxValue = maxHunger;
-hungerSlider.value = currentHunger;
-}
-
-if (hungerText != null) {
-hungerText.text = $"{Mathf.CeilToInt(currentHunger)} / {Mathf.CeilToInt(maxHunger)}";
-}
 }
 }
 
@@ -10277,116 +9635,6 @@ OnHungerChanged?.Invoke(CurrentHunger, maxHunger);
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\WorldInteraction\Player\SceneSetupManager.cs
-
-﻿// FILE: Assets/Scripts/Core/SceneSetupManager.cs
-using WegoSystem;
-
-pub cls SceneSetupManager : MonoBehaviour {
-bool setupOnStart = true;
-
-void Start() {
-if (setupOnStart) {
-SetupScene();
-}
-}
-
-pub void SetupScene() {
-Debug.Log("--- Starting Scene Setup ---");
-
-GridPositionManager gridManager = GridPositionManager.Instance;
-
-if (gridManager == null) {
-gridManager = FindFirstObjectByType<GridPositionManager>();
-if (gridManager != null) {
-Debug.LogWarning("[SceneSetupManager] GridPositionManager.Instance was null (expected in Edit Mode). Found manager manually.", this);
-}
-}
-
-if (gridManager == null) {
-Debug.LogError("[SceneSetupManager] GridPositionManager could not be found in the scene. Aborting setup.", this);
-return;
-}
-
-GardenerController player = FindFirstObjectByType<GardenerController>();
-if (player != null) {
-gridManager.SnapEntityToGrid(player.gameObject);
-
-GridPosition centerPosition = gridManager.GetMapCenter();
-player.GetComponent<GridEntity>().SetPosition(centerPosition, true);
-
-Debug.Log($"Player '{player.name}' snapped, registered, and moved to map center: {centerPosition}", player);
-
-CenterMainCameraOnTarget(player.transform);
-}
-else {
-Debug.LogWarning("[SceneSetupManager] No GardenerController found in the scene to position.", this);
-}
-
-Debug.Log("--- Scene Setup Complete ---");
-}
-
-void CenterMainCameraOnTarget(Transform target) {
-Camera mainCamera = Camera.main;
-if (mainCamera != null) {
-Vector3 targetWorldPosition = target.position;
-Transform cameraTransform = mainCamera.transform;
-
-cameraTransform.position = new Vector3(
-targetWorldPosition.x,
-targetWorldPosition.y,
-cameraTransform.position.z
-);
-
-Debug.Log($"Main Camera moved to focus on '{target.name}' at {targetWorldPosition}", mainCamera);
-}
-else {
-Debug.LogWarning("[SceneSetupManager] Could not find Main Camera to center. Ensure it has the 'MainCamera' tag.", this);
-}
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\WorldInteraction\Tiles\TileDefinition.cs
-
-﻿using UnityEngine;
-using UnityEngine.Tilemaps;
-
-pub cls TileDefinition : ScriptableObject {
-pub string displayName;    // e.g. "Grass", "Dirt", "Wet Dirt"
-
-pub Color tintColor = Color.white;
-
-pub int revertAfterTicks = 0;  // Changed from float revertAfterSeconds
-
-pub TileDefinition revertToTile;
-
-pub bool keepBottomTile = false;
-
-pub bool isWaterTile = false;
-
-#if UNITY_EDITOR
-pub void UpdateColor() {
-var manager = UnityEngine.Object.FindAnyObjectByType<TileInteractionManager>();
-if (manager == null) return;
-
-foreach (var mapping in manager.tileDefinitionMappings) {
-if (mapping.tileDef == this && mapping.tilemapModule != null) {
-Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-if (renderTilemapTransform != null) {
-Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
-if (renderTilemap != null) {
-renderTilemap.color = tintColor;
-UnityEditor.EditorUtility.SetDirty(renderTilemap);
-}
-}
-}
-}
-}
-#endif
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\WorldInteraction\Tiles\TileHoverColorManager.cs
 
 ﻿using UnityEngine;
@@ -10428,320 +9676,6 @@ pub List<TileInteractionRule> rules; // Existing transformation rules
 
 [Header("Tool Refill Rules")] // <<< NEW HEADER
 pub List<ToolRefillRule> refillRules; // <<< NEW LIST FOR REFILLS
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\WorldInteraction\Tiles\TileInteractionManager.cs
-
-﻿// FILE: Assets/Scripts/WorldInteraction/Tiles/TileInteractionManager.cs
-using UnityEngine.Tilemaps;
-using skner.DualGrid;
-using TMPro;
-using WegoSystem;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
-pub cls TileInteractionManager : SingletonMonoBehaviour<TileInteractionManager>, ITickUpdateable {
-pub cls TileDefinitionMapping {
-pub TileDefinition tileDef;
-pub DualGridTilemapModule tilemapModule;
-}
-
-pub struct TimedTileState {
-pub TileDefinition tileDef;
-pub int ticksRemaining;
-}
-
-pub List<TileDefinitionMapping> tileDefinitionMappings;
-pub TileInteractionLibrary interactionLibrary;
-pub Grid interactionGrid;
-pub Camera mainCamera;
-pub Transform player;
-
-pub float hoverRadius = 3f;
-
-pub GameObject hoverHighlightObject;
-pub TileHoverColorManager hoverColorManager;
-pub int baseSortingOrder = 0;
-
-pub bool debugLogs = false;
-pub TextMeshProUGUI hoveredTileText;
-pub TextMeshProUGUI currentToolText;
-
-Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
-Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
-Vector3Int? currentlyHoveredCell;
-TileDefinition hoveredTileDef;
-SpriteRenderer hoverSpriteRenderer;
-bool isWithinInteractionRange = false;
-
-prot ovr void OnAwake() {
-EnsureInitialized();
-CacheHoverSpriteRenderer();
-}
-
-void EnsureInitialized() {
-if (moduleByDefinition == null) {
-if(debugLogs) Debug.Log("[TileInteractionManager] Dictionaries are null. Initializing now.");
-SetupTilemaps();
-}
-}
-
-void Start() {
-if (TickManager.Instance != null) {
-TickManager.Instance.RegisterTickUpdateable(this);
-}
-}
-
-void OnDestroy() {
-if (TickManager.Instance != null) {
-TickManager.Instance.UnregisterTickUpdateable(this);
-}
-}
-
-pub void OnTickUpdate(int currentTick) {
-UpdateReversionTicks();
-}
-
-void Update() {
-HandleTileHover();
-UpdateDebugUI();
-}
-
-pub TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos) {
-EnsureInitialized();
-
-if (tileDefinitionMappings == null) ret null;
-
-foreach (var mapping in tileDefinitionMappings) {
-if (mapping?.tileDef != null && !mapping.tileDef.keepBottomTile && mapping.tilemapModule != null) {
-if (TileExistsInModule(mapping.tilemapModule, cellPos)) {
-ret mapping.tileDef;
-}
-}
-}
-
-foreach (var mapping in tileDefinitionMappings) {
-if (mapping?.tileDef != null && mapping.tileDef.keepBottomTile && mapping.tilemapModule != null) {
-if (TileExistsInModule(mapping.tilemapModule, cellPos)) {
-ret mapping.tileDef;
-}
-}
-}
-
-ret null;
-}
-
-bool TileExistsInModule(DualGridTilemapModule module, Vector3Int cellPos) {
-if (module.DataTilemap != null && module.DataTilemap.HasTile(cellPos)) ret true;
-
-Transform renderTransform = module.transform.Find("RenderTilemap");
-if (renderTransform?.GetComponent<Tilemap>() is Tilemap renderTilemap && renderTilemap.HasTile(cellPos)) {
-ret true;
-}
-ret false;
-}
-
-pub void ApplyToolAction(ToolDefinition toolDef) {
-if (toolDef == null || !currentlyHoveredCell.HasValue) return;
-
-Vector3Int targetCell = currentlyHoveredCell.Value;
-TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
-if (currentTileDef == null) return;
-
-TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == currentTileDef);
-
-if (rule != null) {
-TileDefinition fromTile = currentTileDef;
-TileDefinition toTile = rule.toTile;
-
-if (debugLogs) Debug.Log($"[TileInteractionManager] Rule found! From: '{fromTile.displayName}', To: '{(toTile != null ? toTile.displayName : "NULL")}'.");
-
-if (toTile == null) {
-RemoveTile(fromTile, targetCell);
-return;
-}
-
-if (!toTile.keepBottomTile) {
-RemoveTile(fromTile, targetCell);
-}
-
-PlaceTile(toTile, targetCell);
-}
-else if (debugLogs) {
-Debug.Log($"[TileInteractionManager] No transformation rule found for Tool='{toolDef.displayName}' on Tile='{currentTileDef.displayName}'.");
-}
-}
-
-void UpdateReversionTicks() {
-if (timedCells.Count == 0) return;
-List<Vector3Int> cellsToProcess = timedCells.Keys.ToList();
-
-foreach (Vector3Int cellPos in cellsToProcess) {
-if (timedCells.TryGetValue(cellPos, out TimedTileState state)) {
-state.ticksRemaining--;
-if (state.ticksRemaining <= 0) {
-TileDefinition actualTile = FindWhichTileDefinitionAt(cellPos);
-if (actualTile == state.tileDef) {
-if (debugLogs) Debug.Log($"[TileInteractionManager] Reverting tile '{state.tileDef.displayName}' at {cellPos}.");
-RemoveTile(state.tileDef, cellPos);
-if (state.tileDef.revertToTile != null) {
-PlaceTile(state.tileDef.revertToTile, cellPos);
-}
-}
-else {
-if (debugLogs) Debug.LogWarning($"[TileInteractionManager] State desync detected at {cellPos}. Expected '{state.tileDef.displayName}' for reversion, but found '{(actualTile != null ? actualTile.displayName : "NULL")}'. Removing stale timer.");
-timedCells.Remove(cellPos);
-}
-}
-else {
-timedCells[cellPos] = state;
-}
-}
-}
-}
-
-pub void PlaceTile(TileDefinition tileDef, Vector3Int cellPos) {
-EnsureInitialized();
-if (tileDef == null) return;
-if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null) {
-module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
-if (tileDef.revertAfterTicks > 0) {
-timedCells[cellPos] = new TimedTileState { tileDef = tileDef, ticksRemaining = tileDef.revertAfterTicks };
-}
-}
-}
-
-pub void RemoveTile(TileDefinition tileDef, Vector3Int cellPos) {
-EnsureInitialized();
-if (tileDef == null) return;
-if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null) {
-module.DataTilemap.SetTile(cellPos, null);
-}
-
-if (timedCells.TryGetValue(cellPos, out TimedTileState timedState) && timedState.tileDef == tileDef) {
-timedCells.Remove(cellPos);
-}
-}
-
-void CacheHoverSpriteRenderer() {
-if (hoverHighlightObject != null) {
-hoverSpriteRenderer = hoverHighlightObject.GetComponent<SpriteRenderer>();
-}
-}
-
-void SetupTilemaps() {
-moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
-var definitionByModule = new Dictionary<DualGridTilemapModule, TileDefinition>();
-if (tileDefinitionMappings == null) return;
-foreach (var mapping in tileDefinitionMappings) {
-if (mapping?.tileDef != null && mapping.tilemapModule != null) {
-if (!moduleByDefinition.ContainsKey(mapping.tileDef)) {
-moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
-definitionByModule[mapping.tilemapModule] = mapping.tileDef;
-}
-else {
-Debug.LogWarning($"[TileInteractionManager] Duplicate TileDefinition '{mapping.tileDef.displayName}' found in mappings.", mapping.tileDef);
-}
-}
-}
-}
-
-pub void UpdateSortingOrder() {
-if (tileDefinitionMappings == null) return;
-for (int i = 0; i < tileDefinitionMappings.Count; i++) {
-var mapping = tileDefinitionMappings[i];
-if (mapping?.tilemapModule != null) {
-Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-if (renderTilemapTransform != null) {
-if (renderTilemapTransform.GetComponent<TilemapRenderer>() is TilemapRenderer renderer) {
-renderer.sortingOrder = baseSortingOrder - i;
-#if UNITY_EDITOR
-if (!Application.isPlaying) EditorUtility.SetDirty(renderer);
-#endif
-}
-}
-}
-}
-}
-
-pub void UpdateAllColors() {
-if (tileDefinitionMappings == null) return;
-foreach (var mapping in tileDefinitionMappings) {
-if (mapping?.tileDef != null && mapping.tilemapModule != null) {
-Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
-if (renderTilemapTransform != null) {
-if (renderTilemapTransform.GetComponent<Tilemap>() is Tilemap renderTilemap) {
-renderTilemap.color = mapping.tileDef.tintColor;
-#if UNITY_EDITOR
-if (!Application.isPlaying) EditorUtility.SetDirty(renderTilemap);
-#endif
-}
-}
-}
-}
-}
-
-void HandleTileHover() {
-if (mainCamera == null || player == null) return;
-Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-mouseWorldPos.z = 0f;
-Vector3Int cellPos = WorldToCell(mouseWorldPos);
-
-if (player.GetComponent<GridEntity>() is GridEntity playerGrid) {
-int gridRadius = Mathf.CeilToInt(hoverRadius);
-GridPosition playerGridPos = playerGrid.Position;
-GridPosition hoveredGridPos = new GridPosition(cellPos);
-isWithinInteractionRange = GridRadiusUtility.IsWithinCircleRadius(hoveredGridPos, playerGridPos, gridRadius);
-}
-
-hoveredTileDef = FindWhichTileDefinitionAt(cellPos);
-currentlyHoveredCell = cellPos;
-
-if (hoverHighlightObject != null) {
-hoverHighlightObject.SetActive(true);
-hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
-UpdateHoverHighlightColor(isWithinInteractionRange);
-}
-}
-
-void UpdateHoverHighlightColor(bool withinRange) {
-if (hoverSpriteRenderer != null && hoverColorManager != null) {
-hoverSpriteRenderer.color = hoverColorManager.GetColorForRange(withinRange);
-}
-}
-
-void UpdateDebugUI() {
-if (hoveredTileText != null) {
-string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
-if (currentlyHoveredCell.HasValue && timedCells.TryGetValue(currentlyHoveredCell.Value, out TimedTileState timedState)) {
-tileName += $" [{timedState.ticksRemaining}t]";
-}
-string rangeIndicator = isWithinInteractionRange ? " [IN RANGE]" : " [OUT OF RANGE]";
-hoveredTileText.text = $"Hover: {tileName}{rangeIndicator}";
-}
-if (currentToolText != null) {
-if (InventoryBarController.Instance?.SelectedItem != null) {
-currentToolText.text = $"Selected: {InventoryBarController.Instance.SelectedItem.GetDisplayName()}";
-}
-else {
-currentToolText.text = "Nothing Selected";
-}
-}
-}
-
-pub Vector3Int WorldToCell(Vector3 worldPos) {
-ret interactionGrid != null ? interactionGrid.WorldToCell(worldPos) : Vector3Int.zero;
-}
-
-Vector3 CellCenterWorld(Vector3Int cellPos) {
-ret interactionGrid != null ? interactionGrid.GetCellCenterWorld(cellPos) : Vector3.zero;
-}
-
-pub bool IsWithinInteractionRange => isWithinInteractionRange;
-pub Vector3Int? CurrentlyHoveredCell => currentlyHoveredCell;
-pub TileDefinition HoveredTileDef => hoveredTileDef;
 }
 
 ////////////////////////////////////////////////////////////
@@ -10978,6 +9912,192 @@ HarvestPouch // <<< NEW
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\CameraController.cs
+
+﻿using UnityEngine;
+using UnityEngine.U2D;
+using WegoSystem;
+
+namespace WegoSystem {
+pub cls CameraController : MonoBehaviour {
+[SerializeField] MapConfiguration mapConfig;
+[SerializeField] pub Transform followTarget;
+[SerializeField] Camera cam;
+
+[SerializeField] bool enableFollow = false;
+[SerializeField] float smoothSpeed = 5f;
+[SerializeField] Vector2 offset = Vector2.zero;
+
+[SerializeField] bool constrainToMap = true;
+[SerializeField] float boundaryPadding = 2f; // Tiles from edge
+
+PixelPerfectCamera pixelPerfectCam;
+Vector2 minBounds, maxBounds;
+
+void Awake() {
+if (cam == null) cam = GetComponent<Camera>();
+pixelPerfectCam = GetComponent<PixelPerfectCamera>();
+
+if (mapConfig == null) {
+Debug.LogError("[CameraController] MapConfiguration is not assigned! Camera cannot calculate bounds.", this);
+enabled = false;
+}
+}
+
+void Start() {
+CalculateCameraBounds();
+
+if (followTarget == null) {
+var player = FindFirstObjectByType<GardenerController>();
+if (player != null) {
+followTarget = player.transform;
+Debug.Log("[CameraController] Follow target not set, automatically assigned to GardenerController.", this);
+}
+}
+}
+
+void LateUpdate() {
+if (!enableFollow || followTarget == null || mapConfig == null) return;
+
+Vector3 desiredPosition = followTarget.position + (Vector3)offset;
+desiredPosition.z = transform.position.z; // Keep Z unchanged
+
+if (constrainToMap) {
+desiredPosition.x = Mathf.Clamp(desiredPosition.x, minBounds.x, maxBounds.x);
+desiredPosition.y = Mathf.Clamp(desiredPosition.y, minBounds.y, maxBounds.y);
+}
+
+Vector3 smoothedPosition = Vector3.Lerp(
+transform.position,
+desiredPosition,
+smoothSpeed * Time.deltaTime
+);
+
+if (pixelPerfectCam != null && pixelPerfectCam.enabled) {
+float pixelSize = 1f / pixelPerfectCam.assetsPPU;
+smoothedPosition.x = Mathf.Round(smoothedPosition.x / pixelSize) * pixelSize;
+smoothedPosition.y = Mathf.Round(smoothedPosition.y / pixelSize) * pixelSize;
+}
+
+transform.position = smoothedPosition;
+}
+
+void CalculateCameraBounds() {
+if (mapConfig == null) return;
+
+float height = cam.orthographicSize * 2;
+float width = height * cam.aspect;
+
+minBounds.x = (width / 2f) + boundaryPadding;
+maxBounds.x = mapConfig.mapSize.x - (width / 2f) - boundaryPadding;
+minBounds.y = (height / 2f) + boundaryPadding;
+maxBounds.y = mapConfig.mapSize.y - (height / 2f) - boundaryPadding;
+
+if (maxBounds.x < minBounds.x) {
+float center = mapConfig.mapSize.x / 2f;
+minBounds.x = maxBounds.x = center;
+}
+if (maxBounds.y < minBounds.y) {
+float center = mapConfig.mapSize.y / 2f;
+minBounds.y = maxBounds.y = center;
+}
+}
+
+pub void SnapToTarget() {
+if (followTarget == null) return;
+Vector3 targetPos = followTarget.position + (Vector3)offset;
+targetPos.z = transform.position.z;
+transform.position = targetPos;
+}
+
+pub void OnResolutionChanged() {
+CalculateCameraBounds();
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\InitializationManager.cs
+
+﻿using System.Collections;
+using WegoSystem;
+
+namespace WegoSystem {
+pub cls InitializationManager : SingletonMonoBehaviour<InitializationManager> {
+[SerializeField] GameEvent onCoreSystemsInitialized;
+[SerializeField] GameEvent onGameManagersInitialized;
+[SerializeField] GameEvent onGameplaySystemsInitialized;
+
+IEnumerator Start() {
+Debug.Log("[InitializationManager] Starting initialization sequence...");
+
+Debug.Log("[InitializationManager] Phase 1: Initializing Core Systems...");
+onCoreSystemsInitialized.Raise();
+yield ret null;
+
+Debug.Log("[InitializationManager] Phase 2: Initializing Game Managers...");
+onGameManagersInitialized.Raise();
+yield ret null;
+
+if (UIManager.Instance != null) {
+Debug.Log("[InitializationManager] Initializing UIManager...");
+UIManager.Instance.Initialize();
+}
+else {
+Debug.LogError("[InitializationManager] UIManager instance not found! UI will not be initialized.");
+}
+
+if (EnvironmentalStatusEffectSystem.Instance != null) {
+Debug.Log("[InitializationManager] Initializing EnvironmentalStatusEffectSystem...");
+EnvironmentalStatusEffectSystem.Instance.Initialize();
+}
+else {
+Debug.LogWarning("[InitializationManager] EnvironmentalStatusEffectSystem instance not found. Tile-based status effects will not function.");
+}
+
+Debug.Log("[InitializationManager] Phase 3: Initializing Gameplay Systems & UI...");
+onGameplaySystemsInitialized.Raise();
+yield ret null;
+
+Debug.Log("[InitializationManager] All systems initialized successfully.");
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\PixelGridSnapper.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+namespace WegoSystem {
+pub stat cls PixelGridSnapper {
+stat float cachedPixelSize;
+stat bool pixelSizeIsCached = false;
+
+pub stat Vector3 SnapToGrid(Vector3 position) {
+if (ResolutionManager.HasInstance) {
+if (!pixelSizeIsCached) // Cache it once for performance {
+cachedPixelSize = 1f / ResolutionManager.Instance.CurrentPPU;
+pixelSizeIsCached = true;
+}
+
+position.x = Mathf.Round(position.x / cachedPixelSize) * cachedPixelSize;
+position.y = Mathf.Round(position.y / cachedPixelSize) * cachedPixelSize;
+ret position;
+}
+
+ret position;
+}
+
+pub stat Vector2 SnapToGrid(Vector2 position) {
+Vector3 snapped = SnapToGrid((Vector3)position);
+ret new Vector2(snapped.x, snapped.y);
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\RunManager.cs
 
 ﻿// Assets/Scripts/Core/RunManager.cs
@@ -11171,6 +10291,367 @@ _applicationIsQuitting = true;
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\Ecosystem\Status Effects\EnvironmentalStatusEffectSystem.cs
+
+﻿using System.Collections.Generic;
+using WegoSystem;
+
+namespace WegoSystem {
+pub cls EnvironmentalStatusEffectSystem : MonoBehaviour, ITickUpdateable {
+pub stat EnvironmentalStatusEffectSystem Instance { get; set; }
+
+pub cls TileStatusRule {
+pub TileDefinition tile;
+pub List<StatusEffect> statusEffectsToApply;
+}
+
+pub cls ToolStatusRule {
+pub ToolDefinition tool;
+pub List<StatusEffect> statusEffectsToApply;
+}
+
+pub List<TileStatusRule> tileRules = new List<TileStatusRule>();
+pub List<ToolStatusRule> toolRules = new List<ToolStatusRule>();
+
+ro Dictionary<TileDefinition, List<StatusEffect>> tileRuleLookup = new Dictionary<TileDefinition, List<StatusEffect>>();
+ro Dictionary<ToolDefinition, List<StatusEffect>> toolRuleLookup = new Dictionary<ToolDefinition, List<StatusEffect>>();
+ro List<IStatusEffectable> allEffectableEntities = new List<IStatusEffectable>();
+
+void Awake() {
+if (Instance != null && Instance != this) {
+Destroy(gameObject);
+return;
+}
+Instance = this;
+BuildLookups();
+}
+
+pub void Initialize() {
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
+}
+if (PlayerActionManager.Instance != null) {
+PlayerActionManager.Instance.OnActionExecuted += HandlePlayerAction;
+}
+}
+
+void OnDestroy() {
+if (Instance == this) Instance = null;
+
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.UnregisterTickUpdateable(this);
+}
+
+if (PlayerActionManager.Instance != null) {
+PlayerActionManager.Instance.OnActionExecuted -= HandlePlayerAction;
+}
+}
+
+void BuildLookups() {
+tileRuleLookup.Clear();
+foreach (var rule in tileRules) {
+if (rule.tile != null && rule.statusEffectsToApply != null && rule.statusEffectsToApply.Count > 0) {
+tileRuleLookup[rule.tile] = rule.statusEffectsToApply;
+}
+}
+
+toolRuleLookup.Clear();
+foreach (var rule in toolRules) {
+if (rule.tool != null && rule.statusEffectsToApply != null && rule.statusEffectsToApply.Count > 0) {
+toolRuleLookup[rule.tool] = rule.statusEffectsToApply;
+}
+}
+}
+
+pub void OnTickUpdate(int currentTick) {
+RefreshAllEntityTileEffects();
+}
+
+void HandlePlayerAction(PlayerActionType actionType, object actionData) {
+if (actionType != PlayerActionType.UseTool) return;
+
+var toolData = actionData as PlayerActionManager.ToolActionData;
+if (toolData == null) return;
+
+if (toolRuleLookup.TryGetValue(toolData.Tool, out List<StatusEffect> effectsToApply)) {
+if (GridPositionManager.Instance == null) return;
+GridPosition gridPos = new GridPosition(toolData.GridPosition);
+HashSet<GridEntity> entitiesOnTile = GridPositionManager.Instance.GetEntitiesAt(gridPos);
+
+foreach(var entity in entitiesOnTile) {
+IStatusEffectable effectable = entity.GetComponent<IStatusEffectable>();
+if (effectable != null) {
+foreach(var effect in effectsToApply) {
+effectable.StatusManager.ApplyStatusEffect(effect);
+}
+}
+}
+}
+}
+
+void RefreshAllEntityTileEffects() {
+var animals = FindObjectsByType<AnimalController>(FindObjectsSortMode.None);
+var players = FindObjectsByType<GardenerController>(FindObjectsSortMode.None);
+
+allEffectableEntities.Clear();
+foreach (var animal in animals) allEffectableEntities.Add(animal);
+foreach (var player in players) allEffectableEntities.Add(player);
+
+foreach(var entity in allEffectableEntities) {
+CheckAndApplyTileEffects(entity);
+}
+}
+
+pub void CheckAndApplyTileEffects(IStatusEffectable entity) {
+if (entity == null || entity.GridEntity == null || TileInteractionManager.Instance == null) return;
+
+Component entityComponent = entity as Component;
+if (entityComponent == null || !entityComponent.gameObject.activeInHierarchy) return;
+
+GridPosition currentPos = entity.GridEntity.Position;
+
+TileDefinition currentTile = TileInteractionManager.Instance.FindWhichTileDefinitionAt(currentPos.ToVector3Int());
+
+if (currentTile == null) return;
+
+if (tileRuleLookup.TryGetValue(currentTile, out List<StatusEffect> effectsToApply)) {
+foreach (var effect in effectsToApply) {
+if (effect != null) {
+entity.StatusManager.ApplyStatusEffect(effect);
+}
+}
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\MapConfiguration.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+namespace WegoSystem {
+pub cls MapConfiguration : ScriptableObject {
+pub Vector2Int mapSize = new Vector2Int(100, 100);
+pub Vector2Int gridOffset = Vector2Int.zero;
+
+pub int gizmoDisplayRadius = 20;
+pub bool autoScaleGizmos = true;
+
+[Header("Camera Settings")] // Renamed header for clarity
+pub Vector2Int referenceResolution = new Vector2Int(320, 180);
+pub int pixelsPerUnit = 6;
+
+pub GridPosition GetMapCenter() => new GridPosition(mapSize.x / 2, mapSize.y / 2);
+
+pub int GetAdaptiveGizmoSize() {
+if (!autoScaleGizmos) ret gizmoDisplayRadius;
+ret Mathf.Min(gizmoDisplayRadius, Mathf.Max(mapSize.x, mapSize.y) / 5);
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\ResolutionManager.cs
+
+﻿using UnityEngine;
+using URPPixelPerfectCamera = UnityEngine.Rendering.Universal.PixelPerfectCamera;
+using WegoSystem;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+namespace WegoSystem {
+pub cls ResolutionManager : SingletonMonoBehaviour<ResolutionManager> {
+pub cls ResolutionProfile {
+pub string name;
+pub Vector2Int resolution;
+pub int pixelsPerUnit = 6;
+pub float cameraZoomMultiplier = 1f;
+}
+
+[SerializeField] Camera mainCamera;
+[SerializeField] MapConfiguration mapConfig;
+
+{
+new ResolutionProfile { name = "Pixel Perfect (Native)", resolution = new Vector2Int(320, 180), pixelsPerUnit = 6, cameraZoomMultiplier = 1f },
+new ResolutionProfile { name = "HD Ready (2x)", resolution = new Vector2Int(640, 360), pixelsPerUnit = 12, cameraZoomMultiplier = 1f },
+new ResolutionProfile { name = "Full HD (4x)", resolution = new Vector2Int(1280, 720), pixelsPerUnit = 24, cameraZoomMultiplier = 1f }
+};
+
+[SerializeField] int currentProfileIndex = 0;
+
+pub int CurrentPPU { get; set; } = 6;
+
+URPPixelPerfectCamera pixelPerfectCam;
+
+prot ovr void OnAwake() {
+base.OnAwake();
+if (mainCamera == null) {
+mainCamera = Camera.main;
+}
+if (mainCamera != null) {
+pixelPerfectCam = mainCamera.GetComponent<URPPixelPerfectCamera>();
+}
+}
+
+void Start() {
+ApplyProfile(currentProfileIndex);
+}
+
+pub void ApplyProfileInEditor() {
+Camera camToApply = mainCamera;
+if (camToApply == null) {
+camToApply = Camera.main;
+}
+
+if (camToApply == null) {
+Debug.LogError("[ResolutionManager] Could not find Main Camera. Ensure it's tagged or assigned in the Inspector.");
+return;
+}
+
+var ppCamComponent = camToApply.GetComponent("UnityEngine.Rendering.Universal.PixelPerfectCamera");
+
+if (ppCamComponent == null) {
+Debug.LogError($"[ResolutionManager] Failed to find URP PixelPerfectCamera component on '{camToApply.name}'. Please ensure the component exists.", camToApply.gameObject);
+return;
+}
+
+URPPixelPerfectCamera ppCam = ppCamComponent as URPPixelPerfectCamera;
+
+ApplyProfileLogic(currentProfileIndex, camToApply, ppCam);
+}
+
+pub void ApplyProfile(int index) {
+if (mainCamera == null || pixelPerfectCam == null) {
+Debug.LogError("[ResolutionManager] The 'Main Camera' reference is not set in the Inspector or was not found at startup! Disabling ResolutionManager.", this);
+this.enabled = false;
+return;
+}
+
+ApplyProfileLogic(index, mainCamera, pixelPerfectCam);
+}
+
+void ApplyProfileLogic(int index, Camera targetCam, URPPixelPerfectCamera targetPPCam) {
+if (mapConfig == null) {
+Debug.LogError("[ResolutionManager] MapConfiguration is not assigned! Cannot apply profile.", this);
+return;
+}
+
+if (index < 0 || index >= profiles.Length) {
+Debug.LogWarning($"[ResolutionManager] Invalid profile index {index}. Aborting.", this);
+return;
+}
+
+var profile = profiles[index];
+currentProfileIndex = index;
+
+CurrentPPU = profile.pixelsPerUnit;
+targetPPCam.assetsPPU = profile.pixelsPerUnit;
+targetPPCam.refResolutionX = profile.resolution.x;
+targetPPCam.refResolutionY = profile.resolution.y;
+
+float baseOrthoSize = (float)profile.resolution.y / (2f * profile.pixelsPerUnit);
+targetCam.orthographicSize = baseOrthoSize * profile.cameraZoomMultiplier;
+
+#if UNITY_EDITOR
+if (!Application.isPlaying) {
+EditorUtility.SetDirty(targetCam);
+EditorUtility.SetDirty(targetPPCam);
+}
+#endif
+
+var cameraController = targetCam.GetComponent<CameraController>();
+if (cameraController != null) {
+cameraController.OnResolutionChanged();
+}
+
+Debug.Log($"[ResolutionManager] Applied profile: '{profile.name}' (PPU: {CurrentPPU}, Res: {profile.resolution}, Zoom: {targetCam.orthographicSize})");
+}
+
+pub void CycleResolution() {
+int nextIndex = (currentProfileIndex + 1) % profiles.Length;
+ApplyProfile(nextIndex);
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\SceneSetupManager.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+namespace WegoSystem {
+pub cls SceneSetupManager : MonoBehaviour {
+[SerializeField] bool setupOnStart = true;
+
+void Start() {
+if (setupOnStart) {
+SetupScene();
+}
+}
+
+pub void SetupScene() {
+Debug.Log("--- Starting Scene Setup ---");
+
+GridPositionManager gridManager = GridPositionManager.Instance;
+
+if (gridManager == null) {
+gridManager = FindFirstObjectByType<GridPositionManager>();
+if (gridManager != null) {
+Debug.LogWarning("[SceneSetupManager] GridPositionManager.Instance was null (expected in Edit Mode). Found manager manually.", this);
+}
+}
+
+if (gridManager == null) {
+Debug.LogError("[SceneSetupManager] GridPositionManager could not be found in the scene. Aborting setup.", this);
+return;
+}
+
+GardenerController player = FindFirstObjectByType<GardenerController>();
+if (player != null) {
+gridManager.SnapEntityToGrid(player.gameObject);
+
+GridPosition centerPosition = gridManager.GetMapCenter();
+player.GetComponent<GridEntity>().SetPosition(centerPosition, true);
+
+Debug.Log($"Player '{player.name}' snapped, registered, and moved to map center: {centerPosition}", player);
+
+SetupMainCamera(player.transform);
+}
+else {
+Debug.LogWarning("[SceneSetupManager] No GardenerController found in the scene to position.", this);
+}
+
+Debug.Log("--- Scene Setup Complete ---");
+}
+
+void SetupMainCamera(Transform target) {
+Camera mainCamera = Camera.main;
+if (mainCamera != null) {
+CameraController cameraController = mainCamera.GetComponent<CameraController>();
+if (cameraController == null) {
+Debug.LogWarning($"[SceneSetupManager] Main Camera does not have a CameraController. Adding one now.", mainCamera);
+cameraController = mainCamera.gameObject.AddComponent<CameraController>();
+}
+
+cameraController.followTarget = target;
+cameraController.SnapToTarget(); // Immediate snap on scene setup
+
+Debug.Log($"Main Camera's CameraController set to follow '{target.name}' and snapped to position.", mainCamera);
+}
+else {
+Debug.LogWarning("[SceneSetupManager] Could not find Main Camera to configure. Ensure it has the 'MainCamera' tag.", this);
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridEntity.cs
 
 ﻿// Assets/Scripts/Ticks/GridEntity.cs
@@ -11281,6 +10762,11 @@ OnPositionChanged?.Invoke(previousGridPosition, gridPosition);
 }
 
 pub void SetPosition(GridPosition newPosition, bool instant = false) {
+if (GridPositionManager.Instance != null && !GridPositionManager.Instance.IsPositionValid(newPosition)) {
+Debug.LogWarning($"[GridEntity] Blocked attempt to move '{gameObject.name}' to invalid position {newPosition}. Movement cancelled.");
+return;
+}
+
 Position = newPosition; // This invokes OnGridPositionChanged which sets up the tween
 
 if (instant) {
@@ -11431,7 +10917,7 @@ ret $"({x}, {y})";
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Ticks\GridPositionManager.cs
 
-﻿// FILE: Assets/Scripts/Ticks/GridPositionManager.cs
+﻿using System;
 using UnityEngine.Tilemaps;
 using WegoSystem;
 
@@ -11441,16 +10927,15 @@ using UnityEditor;
 
 namespace WegoSystem {
 pub cls GridPositionManager : SingletonMonoBehaviour<GridPositionManager> {
-[SerializeField] TileInteractionManager tileInteractionManager;
+[SerializeField] MapConfiguration mapConfig;
 
-[SerializeField] pub Vector2Int gridBounds = new Vector2Int(100, 100);
+[SerializeField] TileInteractionManager tileInteractionManager;
 
 Grid _tilemapGrid;
 Grid TilemapGrid => _tilemapGrid;
 
 [SerializeField] bool showGridGizmos = true;
 [SerializeField] Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
-[SerializeField] int gizmoGridSize = 20;
 [SerializeField] bool debugMode = false;
 
 ro Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
@@ -11462,6 +10947,10 @@ EnsureInitialized();
 
 void EnsureInitialized() {
 if (_tilemapGrid != null) return;
+
+if (mapConfig == null) {
+Debug.LogError("[GridPositionManager] CRITICAL: MapConfiguration is not assigned! Grid system will not fn correctly.", this);
+}
 
 if(debugMode) Debug.Log("[GridPositionManager] Grid reference is null. Initializing now.");
 SyncWithTileGrid();
@@ -11508,12 +10997,20 @@ ret GridToWorld(gridPosition);
 }
 
 pub bool IsPositionValid(GridPosition position) {
-ret position.x >= 0 && position.x < gridBounds.x &&
-position.y >= 0 && position.y < gridBounds.y;
+if (mapConfig == null) {
+Debug.LogError("[GridPositionManager] MapConfiguration not assigned!");
+ret false;
+}
+ret position.x >= 0 && position.x < mapConfig.mapSize.x &&
+position.y >= 0 && position.y < mapConfig.mapSize.y;
 }
 
 pub GridPosition GetMapCenter() {
-ret new GridPosition(gridBounds.x / 2, gridBounds.y / 2);
+if (mapConfig == null) {
+Debug.LogError("[GridPositionManager] MapConfiguration not assigned! Returning fallback center.");
+ret new GridPosition(50, 50); // Fallback
+}
+ret mapConfig.GetMapCenter();
 }
 
 pub Vector3 GetMapCenterWorld() {
@@ -11755,14 +11252,16 @@ ret result;
 }
 
 void OnDrawGizmos() {
-if (!showGridGizmos) return;
+if (!showGridGizmos || mapConfig == null) return;
+
 EnsureInitialized();
 if(_tilemapGrid == null) return;
 
 Gizmos.color = gridColor;
 
-int displayWidth = Mathf.Min(gizmoGridSize, gridBounds.x);
-int displayHeight = Mathf.Min(gizmoGridSize, gridBounds.y);
+int displaySize = mapConfig.GetAdaptiveGizmoSize();
+int displayWidth = Mathf.Min(displaySize, mapConfig.mapSize.x);
+int displayHeight = Mathf.Min(displaySize, mapConfig.mapSize.y);
 
 for (int x = 0; x <= displayWidth; x++) {
 Vector3 start = GridToWorld(new GridPosition(x, 0));
@@ -12173,18 +11672,678 @@ ret tickUpdateables.Count;
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\WorldInteraction\Player\GardenerController.cs
+
+﻿using System.Collections;
+using WegoSystem;
+
+namespace WegoSystem {
+pub cls GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdateable {
+[SerializeField] float multiTickDelay = 0.5f;
+
+[SerializeField] bool useAnimations = true;
+[SerializeField] Animator animator;
+[SerializeField] string runningParameterName = "isRunning";
+[SerializeField] string plantingTriggerName = "plant";
+
+[SerializeField] SpriteRenderer spriteRenderer;
+[SerializeField] bool flipSpriteWhenMovingLeft = true;
+[SerializeField] bool flipHorizontalDirection = true;
+
+GridEntity gridEntity;
+StatusEffectManager statusManager;
+StatusEffectUIManager statusEffectUI;
+PlayerHungerSystem hungerSystem;
+
+GridPosition currentTargetPosition;
+bool isProcessingMovement = false;
+
+pub GridEntity GridEntity => gridEntity;
+pub StatusEffectManager StatusManager => statusManager;
+pub PlayerHungerSystem HungerSystem => hungerSystem;
+
+void Awake() {
+gridEntity = GetComponent<GridEntity>();
+if (gridEntity == null) gridEntity = gameObject.AddComponent<GridEntity>();
+statusManager = GetComponent<StatusEffectManager>();
+if (statusManager == null) statusManager = gameObject.AddComponent<StatusEffectManager>();
+hungerSystem = GetComponent<PlayerHungerSystem>();
+if (hungerSystem == null) hungerSystem = gameObject.AddComponent<PlayerHungerSystem>();
+
+statusEffectUI = GetComponentInChildren<StatusEffectUIManager>(true);
+if (statusEffectUI == null) Debug.LogWarning("[GardenerController] StatusEffectUIManager not found in children. Icons won't display.", this);
+if (spriteRenderer == null) spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+if (spriteRenderer == null) Debug.LogWarning("[GardenerController] SpriteRenderer not found.", gameObject);
+if (animator == null && useAnimations) Debug.LogWarning("[GardenerController] Animator not found.", gameObject);
+}
+
+void Start() {
+statusManager.Initialize(this);
+
+if (statusEffectUI != null) {
+statusEffectUI.Initialize(statusManager);
+}
+
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
+}
+if (gridEntity != null) {
+gridEntity.OnPositionChanged += OnGridPositionChanged;
+}
+
+StartCoroutine(InitialTileEffectCheck());
+}
+
+IEnumerator InitialTileEffectCheck() {
+yield ret null;
+if (EnvironmentalStatusEffectSystem.Instance != null) {
+EnvironmentalStatusEffectSystem.Instance.CheckAndApplyTileEffects(this);
+}
+}
+
+void OnDestroy() {
+var tickManager = TickManager.Instance;
+if (tickManager != null) {
+tickManager.UnregisterTickUpdateable(this);
+}
+
+if (gridEntity != null) {
+gridEntity.OnPositionChanged -= OnGridPositionChanged;
+}
+}
+
+pub void OnTickUpdate(int currentTick) {
+statusManager?.OnTickUpdate(currentTick);
+}
+
+void Update() {
+if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat) {
+HandlePlayerInput();
+}
+if (gridEntity != null && statusManager != null) {
+gridEntity.SetSpeedMultiplier(statusManager.VisualSpeedMultiplier);
+}
+UpdateAnimations();
+UpdateSpriteDirection();
+}
+
+void LateUpdate() {
+transform.position = PixelGridSnapper.SnapToGrid(transform.position);
+}
+
+void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos) {
+EnvironmentalStatusEffectSystem.Instance?.CheckAndApplyTileEffects(this);
+}
+
+pub string GetDisplayName() { ret "Gardener"; }
+pub void TakeDamage(float amount) { Debug.Log($"Gardener took {amount} damage!"); }
+pub void Heal(float amount) { Debug.Log($"Gardener was healed for {amount}!"); }
+pub void ModifyHunger(float amount) {
+if (hungerSystem != null) {
+hungerSystem.Eat(-amount);
+}
+}
+
+void HandlePlayerInput() {
+if (gridEntity == null || gridEntity.IsMoving || isProcessingMovement) return;
+
+GridPosition moveDir = GridPosition.Zero;
+if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) moveDir = GridPosition.Up;
+else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) moveDir = GridPosition.Down;
+else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) moveDir = GridPosition.Left;
+else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) moveDir = GridPosition.Right;
+
+if (moveDir != GridPosition.Zero) {
+TryMove(moveDir);
+return;
+}
+}
+
+void TryMove(GridPosition direction) {
+if (gridEntity == null) return;
+GridPosition targetPos = gridEntity.Position + direction;
+if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
+GridPositionManager.Instance.IsPositionValid(targetPos) &&
+!GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
+Vector3 currentWorldPos = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
+int moveCost = PlayerActionManager.Instance.GetMovementTickCost(currentWorldPos, this);
+if (moveCost > 1) {
+StartCoroutine(ProcessMultiTickMovement(targetPos, moveCost));
+}
+else {
+gridEntity.SetPosition(targetPos);
+currentTargetPosition = targetPos;
+TickManager.Instance.AdvanceTick();
+}
+}
+}
+
+IEnumerator ProcessMultiTickMovement(GridPosition targetPos, int tickCost) {
+isProcessingMovement = true;
+for (int i = 0; i < tickCost - 1; i++) {
+TickManager.Instance.AdvanceTick();
+yield ret new WaitForSeconds(multiTickDelay);
+}
+gridEntity.SetPosition(targetPos);
+currentTargetPosition = targetPos;
+TickManager.Instance.AdvanceTick();
+isProcessingMovement = false;
+}
+
+void UpdateAnimations() {
+if (!useAnimations || animator == null) return;
+bool isMoving = gridEntity != null && gridEntity.IsMoving;
+animator.SetBool(runningParameterName, isMoving);
+}
+
+void UpdateSpriteDirection() {
+if (spriteRenderer == null || !flipSpriteWhenMovingLeft || gridEntity == null || !gridEntity.IsMoving) return;
+Vector3 worldTarget = GridPositionManager.Instance.GridToWorld(currentTargetPosition);
+Vector3 currentWorld = transform.position;
+Vector2 directionToCheck = (worldTarget - currentWorld).normalized;
+if (Mathf.Abs(directionToCheck.x) > 0.01f) {
+bool shouldFlip = directionToCheck.x < 0;
+spriteRenderer.flipX = flipHorizontalDirection ? shouldFlip : !shouldFlip;
+}
+}
+
+pub void Plant() {
+if (useAnimations && animator != null) {
+animator.SetTrigger(plantingTriggerName);
+}
+}
+
+pub GridPosition GetCurrentGridPosition() {
+ret gridEntity?.Position ?? GridPosition.Zero;
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\WorldInteraction\Tiles\TileInteractionManager.cs
+
+﻿using System.Collections.Generic;
+using UnityEngine.Tilemaps;
+using skner.DualGrid;
+using TMPro;
+using WegoSystem;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+namespace WegoSystem {
+pub cls TileInteractionManager : SingletonMonoBehaviour<TileInteractionManager>, ITickUpdateable {
+pub cls TileDefinitionMapping {
+pub TileDefinition tileDef;
+pub DualGridTilemapModule tilemapModule;
+}
+
+pub struct TimedTileState {
+pub TileDefinition tileDef;
+pub int ticksRemaining;
+}
+
+pub List<TileDefinitionMapping> tileDefinitionMappings;
+pub TileInteractionLibrary interactionLibrary;
+pub Grid interactionGrid;
+pub Camera mainCamera;
+pub Transform player;
+
+pub float hoverRadius = 3f;
+
+pub GameObject hoverHighlightObject;
+pub TileHoverColorManager hoverColorManager;
+pub int baseSortingOrder = 0;
+
+pub bool debugLogs = false;
+pub TextMeshProUGUI hoveredTileText;
+pub TextMeshProUGUI currentToolText;
+
+Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
+ro Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
+Vector3Int? currentlyHoveredCell;
+TileDefinition hoveredTileDef;
+SpriteRenderer hoverSpriteRenderer;
+bool isWithinInteractionRange = false;
+
+prot ovr void OnAwake() {
+EnsureInitialized();
+CacheHoverSpriteRenderer();
+}
+
+void EnsureInitialized() {
+if (moduleByDefinition == null) {
+if(debugLogs) Debug.Log("[TileInteractionManager] Dictionaries are null. Initializing now.");
+SetupTilemaps();
+}
+}
+
+void Start() {
+if (TickManager.Instance != null) {
+TickManager.Instance.RegisterTickUpdateable(this);
+}
+}
+
+void OnDestroy() {
+if (TickManager.Instance != null) {
+TickManager.Instance.UnregisterTickUpdateable(this);
+}
+}
+
+pub void OnTickUpdate(int currentTick) {
+UpdateReversionTicks();
+}
+
+void Update() {
+HandleTileHover();
+UpdateDebugUI();
+}
+
+pub TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos) {
+EnsureInitialized();
+if (tileDefinitionMappings == null) ret null;
+
+foreach (var mapping in tileDefinitionMappings) {
+if (mapping?.tileDef != null && mapping.tilemapModule != null) {
+if (TileExistsInModule(mapping.tilemapModule, cellPos)) {
+ret mapping.tileDef;
+}
+}
+}
+
+ret null;
+}
+
+bool TileExistsInModule(DualGridTilemapModule module, Vector3Int cellPos) {
+ret module.DataTilemap != null && module.DataTilemap.HasTile(cellPos);
+}
+
+pub void ApplyToolAction(ToolDefinition toolDef) {
+if (toolDef == null || !currentlyHoveredCell.HasValue) return;
+
+Vector3Int targetCell = currentlyHoveredCell.Value;
+TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
+if (currentTileDef == null) return;
+
+TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == currentTileDef);
+
+if (rule != null) {
+TileDefinition fromTile = currentTileDef;
+TileDefinition toTile = rule.toTile;
+
+if (debugLogs) Debug.Log($"[TileInteractionManager] Rule found! From: '{fromTile.displayName}', To: '{(toTile != null ? toTile.displayName : "NULL")}'.");
+
+if (toTile == null) {
+RemoveTile(fromTile, targetCell);
+return;
+}
+
+if (!toTile.keepBottomTile) {
+RemoveTile(fromTile, targetCell);
+}
+
+PlaceTile(toTile, targetCell);
+}
+else if (debugLogs) {
+Debug.Log($"[TileInteractionManager] No transformation rule found for Tool='{toolDef.displayName}' on Tile='{currentTileDef.displayName}'.");
+}
+}
+
+void UpdateReversionTicks() {
+if (timedCells.Count == 0) return;
+List<Vector3Int> cellsToProcess = timedCells.Keys.ToList();
+
+foreach (Vector3Int cellPos in cellsToProcess) {
+if (timedCells.TryGetValue(cellPos, out TimedTileState state)) {
+state.ticksRemaining--;
+if (state.ticksRemaining <= 0) {
+TileDefinition actualTile = FindWhichTileDefinitionAt(cellPos);
+if (actualTile == state.tileDef) {
+if (debugLogs) Debug.Log($"[TileInteractionManager] Reverting tile '{state.tileDef.displayName}' at {cellPos}.");
+RemoveTile(state.tileDef, cellPos);
+if (state.tileDef.revertToTile != null) {
+PlaceTile(state.tileDef.revertToTile, cellPos);
+}
+}
+else {
+if (debugLogs) Debug.LogWarning($"[TileInteractionManager] State desync detected at {cellPos}. Expected '{state.tileDef.displayName}' for reversion, but found '{(actualTile != null ? actualTile.displayName : "NULL")}'. Removing stale timer.");
+}
+timedCells.Remove(cellPos);
+}
+else {
+timedCells[cellPos] = state;
+}
+}
+}
+}
+
+pub void PlaceTile(TileDefinition tileDef, Vector3Int cellPos) {
+EnsureInitialized();
+if (tileDef == null) return;
+if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null) {
+module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
+if (tileDef.revertAfterTicks > 0) {
+timedCells[cellPos] = new TimedTileState { tileDef = tileDef, ticksRemaining = tileDef.revertAfterTicks };
+}
+}
+}
+
+pub void RemoveTile(TileDefinition tileDef, Vector3Int cellPos) {
+EnsureInitialized();
+if (tileDef == null) return;
+if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null) {
+module.DataTilemap.SetTile(cellPos, null);
+}
+
+if (timedCells.TryGetValue(cellPos, out TimedTileState timedState) && timedState.tileDef == tileDef) {
+timedCells.Remove(cellPos);
+}
+}
+
+void CacheHoverSpriteRenderer() {
+if (hoverHighlightObject != null) {
+hoverSpriteRenderer = hoverHighlightObject.GetComponent<SpriteRenderer>();
+}
+}
+
+void SetupTilemaps() {
+moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
+if (tileDefinitionMappings == null) return;
+foreach (var mapping in tileDefinitionMappings) {
+if (mapping?.tileDef != null && mapping.tilemapModule != null) {
+if (!moduleByDefinition.ContainsKey(mapping.tileDef)) {
+moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
+}
+else {
+Debug.LogWarning($"[TileInteractionManager] Duplicate TileDefinition '{mapping.tileDef.displayName}' found in mappings.", mapping.tileDef);
+}
+}
+}
+}
+
+pub void UpdateSortingOrder() {
+if (tileDefinitionMappings == null) return;
+for (int i = 0; i < tileDefinitionMappings.Count; i++) {
+var mapping = tileDefinitionMappings[i];
+if (mapping?.tilemapModule != null) {
+Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+if (renderTilemapTransform != null) {
+if (renderTilemapTransform.GetComponent<TilemapRenderer>() is TilemapRenderer renderer) {
+renderer.sortingOrder = baseSortingOrder - i;
+#if UNITY_EDITOR
+if (!Application.isPlaying) EditorUtility.SetDirty(renderer);
+#endif
+}
+}
+}
+}
+}
+
+pub void UpdateAllColors() {
+if (tileDefinitionMappings == null) return;
+foreach (var mapping in tileDefinitionMappings) {
+if (mapping?.tileDef != null && mapping.tilemapModule != null) {
+Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+if (renderTilemapTransform != null) {
+if (renderTilemapTransform.GetComponent<Tilemap>() is Tilemap renderTilemap) {
+renderTilemap.color = mapping.tileDef.tintColor;
+#if UNITY_EDITOR
+if (!Application.isPlaying) EditorUtility.SetDirty(renderTilemap);
+#endif
+}
+}
+}
+}
+}
+
+void HandleTileHover() {
+if (mainCamera == null || player == null) return;
+Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+mouseWorldPos.z = 0f;
+Vector3Int cellPos = WorldToCell(mouseWorldPos);
+
+if (player.GetComponent<GridEntity>() is GridEntity playerGrid) {
+int gridRadius = Mathf.CeilToInt(hoverRadius);
+GridPosition playerGridPos = playerGrid.Position;
+GridPosition hoveredGridPos = new GridPosition(cellPos);
+isWithinInteractionRange = GridRadiusUtility.IsWithinCircleRadius(hoveredGridPos, playerGridPos, gridRadius);
+}
+
+hoveredTileDef = FindWhichTileDefinitionAt(cellPos);
+currentlyHoveredCell = cellPos;
+
+if (hoverHighlightObject != null) {
+hoverHighlightObject.SetActive(true);
+hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
+UpdateHoverHighlightColor(isWithinInteractionRange);
+}
+}
+
+void UpdateHoverHighlightColor(bool withinRange) {
+if (hoverSpriteRenderer != null && hoverColorManager != null) {
+hoverSpriteRenderer.color = hoverColorManager.GetColorForRange(withinRange);
+}
+}
+
+void UpdateDebugUI() {
+if (hoveredTileText != null) {
+string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
+if (currentlyHoveredCell.HasValue && timedCells.TryGetValue(currentlyHoveredCell.Value, out TimedTileState timedState)) {
+tileName += $" [{timedState.ticksRemaining}t]";
+}
+string rangeIndicator = isWithinInteractionRange ? " [IN RANGE]" : " [OUT OF RANGE]";
+hoveredTileText.text = $"Hover: {tileName}{rangeIndicator}";
+}
+if (currentToolText != null) {
+if (InventoryBarController.Instance?.SelectedItem != null) {
+currentToolText.text = $"Selected: {InventoryBarController.Instance.SelectedItem.GetDisplayName()}";
+}
+else {
+currentToolText.text = "Nothing Selected";
+}
+}
+}
+
+pub Vector3Int WorldToCell(Vector3 worldPos) {
+ret interactionGrid != null ? interactionGrid.WorldToCell(worldPos) : Vector3Int.zero;
+}
+
+Vector3 CellCenterWorld(Vector3Int cellPos) {
+ret interactionGrid != null ? interactionGrid.GetCellCenterWorld(cellPos) : Vector3.zero;
+}
+
+pub bool IsWithinInteractionRange => isWithinInteractionRange;
+pub Vector3Int? CurrentlyHoveredCell => currentlyHoveredCell;
+pub TileDefinition HoveredTileDef => hoveredTileDef;
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\Editor\ResolutionManagerEditor.cs
+
+﻿using UnityEngine;
+using UnityEditor;
+using WegoSystem;
+
+namespace WegoSystem.Editor {
+pub cls ResolutionManagerEditor : UnityEditor.Editor {
+pub ovr void OnInspectorGUI() {
+DrawDefaultInspector();
+
+ResolutionManager manager = (ResolutionManager)target;
+
+EditorGUILayout.Space(10);
+
+GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+buttonStyle.padding = new RectOffset(10, 10, 8, 8);
+buttonStyle.fontSize = 12;
+
+if (GUILayout.Button("Apply Current Profile in Editor", buttonStyle)) {
+if (manager != null) {
+manager.ApplyProfileInEditor();
+Debug.Log("Applied resolution profile settings in the editor.");
+}
+}
+
+EditorGUILayout.HelpBox("Press this button to apply the 'Current Profile Index' settings to the Main Camera. This is useful for previewing changes without entering Play mode.", MessageType.Info);
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Editor\TileInteractionManagerEditor.cs
+
+﻿using UnityEngine;
+using UnityEditor;
+using WegoSystem;
+
+pub cls TileInteractionManagerEditor : Editor {
+pub ovr void OnInspectorGUI() {
+DrawDefaultInspector();
+
+TileInteractionManager manager = (TileInteractionManager)target;
+
+EditorGUILayout.Space();
+EditorGUILayout.BeginHorizontal();
+
+if (GUILayout.Button("UPDATE SORTING ORDER", GUILayout.Height(30))) {
+if (manager != null) {
+manager.UpdateSortingOrder();
+EditorUtility.SetDirty(manager);
+}
+}
+
+if (GUILayout.Button("UPDATE ALL COLORS", GUILayout.Height(30))) {
+if (manager != null) {
+manager.UpdateAllColors();
+EditorUtility.SetDirty(manager);
+}
+}
+
+EditorGUILayout.EndHorizontal();
+
+if (manager != null) {
+EditorGUILayout.HelpBox("Order: First item in list gets highest sorting order value (" +
+manager.baseSortingOrder + "). Each subsequent item is " +
+(manager.baseSortingOrder - 1) + ", " +
+(manager.baseSortingOrder - 2) + ", etc.", MessageType.Info);
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\MapBoundsVisualizer.cs
+
+﻿using UnityEngine;
+using WegoSystem;
+
+namespace WegoSystem.EditorTools {
+pub cls MapBoundsVisualizer : MonoBehaviour {
+[SerializeField] MapConfiguration mapConfig;
+
+[SerializeField] Color boundsColor = Color.green;
+[SerializeField] Color safeAreaColor = Color.yellow;
+[SerializeField] bool showCameraArea = true;
+
+void OnDrawGizmos() {
+if (mapConfig == null) return;
+
+var gridManager = GridPositionManager.Instance;
+if (gridManager == null) {
+gridManager = FindFirstObjectByType<GridPositionManager>();
+if (gridManager == null) return; // If still not found, we cannot proceed.
+}
+
+var grid = gridManager.GetTilemapGrid();
+if (grid == null) return;
+
+Vector3 firstCellCenter = grid.GetCellCenterWorld(new Vector3Int(0, 0, 0));
+Vector3 lastCellCenter = grid.GetCellCenterWorld(new Vector3Int(mapConfig.mapSize.x - 1, mapConfig.mapSize.y - 1, 0));
+
+Vector3 mapWorldCenter = (firstCellCenter + lastCellCenter) / 2f;
+
+Vector3 mapWorldSize = (lastCellCenter - firstCellCenter) + grid.cellSize;
+mapWorldSize.x = Mathf.Abs(mapWorldSize.x);
+mapWorldSize.y = Mathf.Abs(mapWorldSize.y);
+
+Gizmos.color = boundsColor;
+Gizmos.DrawWireCube(mapWorldCenter, mapWorldSize);
+
+Gizmos.color = safeAreaColor;
+float padding = grid.cellSize.x * 2; // 2 tiles padding
+Vector3 safeSize = mapWorldSize - new Vector3(padding * 2, padding * 2, 0);
+if (safeSize.x > 0 && safeSize.y > 0) {
+Gizmos.DrawWireCube(mapWorldCenter, safeSize);
+}
+
+if (showCameraArea && Camera.main != null) {
+Gizmos.color = Color.blue;
+Camera cam = Camera.main;
+float height = cam.orthographicSize * 2;
+float width = height * cam.aspect;
+Gizmos.DrawWireCube(cam.transform.position, new Vector3(width, height, 0));
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\MapGenerationProfile.cs
+
+﻿// FILE: Assets/Scripts/ProceduralGeneration/MapGenerationProfile.cs
+using WegoSystem.ProceduralGeneration;
+
+pub cls BiomeLayer {
+pub TileDefinition tile;
+
+pub float noiseThreshold;
+
+pub bool placeUnderlayTile = false;
+
+pub TileDefinition underlayTile;
+
+}
+
+namespace WegoSystem.ProceduralGeneration {
+pub cls MapGenerationProfile : ScriptableObject {
+
+pub int worldSeed = 12345;
+pub bool useRandomSeed = true;
+
+pub NoiseParameters noiseParameters = new NoiseParameters {
+scale = 0.1f,
+octaves = 4,
+persistence = 0.5f,
+lacunarity = 2f
+};
+
+pub List<BiomeLayer> biomeLayers;
+
+pub void InitializeSeed() {
+if (useRandomSeed) {
+worldSeed = Random.Range(0, int.MaxValue);
+}
+noiseParameters.seed = worldSeed;
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\ProceduralGeneration\ProceduralMapGenerator.cs
 
-﻿// FILE: Assets/Scripts/ProceduralGeneration/ProceduralMapGenerator.cs
+﻿using System.Collections.Generic;
 using WegoSystem;
 
 namespace WegoSystem.ProceduralGeneration {
 pub cls ProceduralMapGenerator : MonoBehaviour {
-MapGenerationProfile profile;
+[SerializeField] MapConfiguration mapConfig;
 
-TileInteractionManager tileManager;
+[SerializeField] MapGenerationProfile profile;
 
-Dictionary<Vector2Int, TileDefinition> tileMap = new Dictionary<Vector2Int, TileDefinition>();
+[SerializeField] TileInteractionManager tileManager;
+
+ro Dictionary<Vector2Int, TileDefinition> tileMap = new Dictionary<Vector2Int, TileDefinition>();
 
 pub void GenerateMap() {
 if (!ValidateConfiguration()) {
@@ -12198,11 +12357,11 @@ ClearMap();
 
 var sortedLayers = profile.biomeLayers.OrderBy(layer => layer.noiseThreshold).ToList();
 
-float halfWidth = profile.mapSize.x / 2f;
-float halfHeight = profile.mapSize.y / 2f;
+float halfWidth = mapConfig.mapSize.x / 2f;
+float halfHeight = mapConfig.mapSize.y / 2f;
 
-for (int x = 0; x < profile.mapSize.x; x++) {
-for (int y = 0; y < profile.mapSize.y; y++) {
+for (int x = 0; x < mapConfig.mapSize.x; x++) {
+for (int y = 0; y < mapConfig.mapSize.y; y++) {
 float sampleX = x - halfWidth;
 float sampleY = y - halfHeight;
 float noiseValue = profile.noiseParameters.Sample(sampleX, sampleY);
@@ -12226,9 +12385,8 @@ tileManager.PlaceTile(chosenLayer.underlayTile, cellPos);
 
 if (chosenLayer.tile != null) {
 tileManager.PlaceTile(chosenLayer.tile, cellPos);
-tileMap[new Vector2Int(x, y)] = chosenLayer.tile; // Track the top-most tile
+tileMap[new Vector2Int(x, y)] = chosenLayer.tile;
 }
-
 }
 }
 }
@@ -12243,8 +12401,8 @@ return;
 
 Debug.Log("Clearing existing map by checking every cell...");
 
-for (int x = 0; x < profile.mapSize.x; x++) {
-for (int y = 0; y < profile.mapSize.y; y++) {
+for (int x = 0; x < mapConfig.mapSize.x; x++) {
+for (int y = 0; y < mapConfig.mapSize.y; y++) {
 var cellPos = new Vector3Int(x, y, 0);
 
 TileDefinition tileOnTop;
@@ -12263,17 +12421,23 @@ tileMap.Clear();
 }
 
 bool ValidateConfiguration(bool checkMappings = true) {
+if (mapConfig == null) {
+Debug.LogError("[ProceduralMapGenerator] Map Configuration is not assigned!", this);
+ret false;
+}
 if (profile == null) {
 Debug.LogError("[ProceduralMapGenerator] Map Generation Profile is not assigned!", this);
 ret false;
 }
+
 if (tileManager == null) {
 tileManager = TileInteractionManager.Instance;
 if (tileManager == null) {
-Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigned and could not be found!", this);
+Debug.LogError("[ProceduralMapGenerator] Tile Interaction Manager is not assigned in the Inspector and could not be found in the scene! Please assign it.", this);
 ret false;
 }
 }
+
 if (checkMappings && (profile.biomeLayers == null || profile.biomeLayers.Count == 0)) {
 Debug.LogError("[ProceduralMapGenerator] The assigned Profile has no Biome Layers defined!", this);
 ret false;
@@ -12433,6 +12597,259 @@ SimplexNoise.Initialize(seed);
 ret SimplexNoise.GenerateOctaves(x, y, this);
 }
 }
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Core\GameInitializer.cs
+
+﻿using UnityEngine;
+using Abracodabra.Genes.Services;
+using WegoSystem;
+
+pub cls GameInitializer : MonoBehaviour {
+
+void Awake() {
+
+InitializeServices();
+
+if (GeneEffectPool.Instance == null) {
+Debug.LogError("[GameInitializer] GeneEffectPool instance could not be created.");
+}
+}
+
+stat void InitializeServices() {
+GeneServices.Initialize();
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\ProceduralGeneration\Editor\SceneSetupManagerEditor.cs
+
+﻿using UnityEngine;
+using UnityEditor;
+using WegoSystem; // <-- ADDED THIS LINE to resolve the ns issue.
+
+pub cls SceneSetupManagerEditor : Editor {
+pub ovr void OnInspectorGUI() {
+DrawDefaultInspector();
+
+SceneSetupManager setupManager = (SceneSetupManager)target;
+
+EditorGUILayout.Space(10);
+
+GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
+buttonStyle.padding = new RectOffset(10, 10, 10, 10);
+buttonStyle.fontSize = 13;
+
+if (GUILayout.Button("Setup Scene Now (Move Player & Camera)", buttonStyle)) {
+if (setupManager != null) {
+setupManager.SetupScene();
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\WorldInteraction\Placement\PlantPlacementManager.cs
+
+﻿using System.Collections.Generic;
+using Abracodabra.Genes.Templates;
+using Abracodabra.Genes.Runtime;
+using WegoSystem; // <-- FIX: Added this line to resolve the ns issue.
+
+namespace Abracodabra.UI.Genes {
+pub cls PlantPlacementManager : MonoBehaviour {
+pub stat PlantPlacementManager Instance { get; set; }
+
+[SerializeField] Transform plantParent;
+[SerializeField] TileInteractionManager tileInteractionManager;
+[SerializeField] NodeExecutor nodeExecutor;
+[SerializeField] float spawnRadius = 0.25f;
+[SerializeField] List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
+
+ro HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
+ro Dictionary<Vector3Int, GameObject> plantsByGridPosition = new Dictionary<Vector3Int, GameObject>();
+
+void Awake() {
+if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+Instance = this;
+RebuildInvalidTilesSet();
+}
+
+pub void Initialize() {
+if (plantParent == null && EcosystemManager.Instance != null) plantParent = EcosystemManager.Instance.plantParent;
+if (tileInteractionManager == null) tileInteractionManager = TileInteractionManager.Instance;
+if (nodeExecutor == null) nodeExecutor = FindFirstObjectByType<NodeExecutor>();
+}
+
+void RebuildInvalidTilesSet() {
+invalidTilesSet.Clear();
+foreach (var tile in invalidPlantingTiles) {
+if (tile != null) {
+invalidTilesSet.Add(tile);
+}
+}
+}
+
+pub bool IsPositionOccupied(Vector3Int gridPosition) {
+CleanupDestroyedPlants();
+ret plantsByGridPosition.ContainsKey(gridPosition);
+}
+
+pub bool IsTileValidForPlanting(TileDefinition tileDef) {
+ret tileDef != null && !invalidTilesSet.Contains(tileDef);
+}
+
+void CleanupDestroyedPlants() {
+var keysToRemove = plantsByGridPosition.Where(kvp => kvp.Value == null).Select(kvp => kvp.Key).ToList();
+foreach (var key in keysToRemove) {
+plantsByGridPosition.Remove(key);
+}
+}
+
+pub bool TryPlantSeedFromInventory(PlantGeneRuntimeState runtimeState, Vector3Int gridPosition, Vector3 worldPosition) {
+if (runtimeState == null || runtimeState.template == null) {
+Debug.LogError("[PlantPlacementManager] Failed: RuntimeState or its template was null.");
+ret false;
+}
+
+if (!runtimeState.template.IsValid()) {
+Debug.LogError($"[PlantPlacementManager] Failed: Seed template '{runtimeState.template.templateName}' configuration is invalid.", runtimeState.template);
+ret false;
+}
+
+if (IsPositionOccupied(gridPosition)) {
+Debug.LogWarning($"[PlantPlacementManager] Failed: Position {gridPosition} is already occupied by another plant in the dictionary.", this);
+ret false;
+}
+
+TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
+if (!IsTileValidForPlanting(tileDef)) {
+string tileName = tileDef != null ? tileDef.displayName : "NULL";
+Debug.LogWarning($"[PlantPlacementManager] Failed: Tile '{tileName}' at {gridPosition} is not a valid planting tile.", this);
+ret false;
+}
+
+if (nodeExecutor == null) {
+nodeExecutor = FindFirstObjectByType<NodeExecutor>();
+if (nodeExecutor == null) {
+Debug.LogError("[PlantPlacementManager] Failed: NodeExecutor reference is missing and could not be found in the scene!");
+ret false;
+}
+}
+
+Vector3 finalPlantingPosition = GetRandomizedPlantingPosition(worldPosition);
+GameObject plantGO = nodeExecutor.SpawnPlantFromState(runtimeState, finalPlantingPosition, plantParent);
+
+if (plantGO == null) {
+Debug.LogError("[PlantPlacementManager] Failed: NodeExecutor returned a null plant GameObject. Check NodeExecutor's logs (is its Plant Prefab assigned?).", this);
+ret false;
+}
+
+WegoSystem.GridPositionManager.Instance.SnapEntityToGrid(plantGO);
+var finalGridEntity = plantGO.GetComponent<WegoSystem.GridEntity>();
+Vector3Int finalGridPosition = finalGridEntity.Position.ToVector3Int();
+
+plantsByGridPosition[finalGridPosition] = plantGO;
+Debug.Log($"[PlantPlacementManager] Successfully planted '{runtimeState.template.templateName}' and registered it at final grid position {finalGridPosition}.");
+ret true;
+}
+
+Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition) {
+if (spawnRadius <= 0f) ret centerPosition;
+Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
+ret centerPosition + new Vector3(randomOffset.x, randomOffset.y, 0);
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\WorldInteraction\Player\HungerUI.cs
+
+﻿using UnityEngine;
+using TMPro;
+using WegoSystem; // <-- ADDED THIS LINE to resolve the ns issue.
+
+pub cls HungerUI : MonoBehaviour {
+[SerializeField] PlayerHungerSystem playerHungerSystem;
+[SerializeField] Slider hungerSlider;
+[SerializeField] TextMeshProUGUI hungerText;
+
+void Start() {
+if (playerHungerSystem == null) {
+GardenerController player = FindAnyObjectByType<GardenerController>();
+if (player != null) {
+playerHungerSystem = player.GetComponent<PlayerHungerSystem>();
+}
+}
+
+if (playerHungerSystem != null) {
+playerHungerSystem.OnHungerChanged += UpdateUI;
+UpdateUI(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+}
+else {
+Debug.LogError("[HungerUI] PlayerHungerSystem reference not found! UI will not update.", this);
+gameObject.SetActive(false);
+}
+}
+
+void OnDestroy() {
+if (playerHungerSystem != null) {
+playerHungerSystem.OnHungerChanged -= UpdateUI;
+}
+}
+
+void UpdateUI(float currentHunger, float maxHunger) {
+if (hungerSlider != null) {
+hungerSlider.maxValue = maxHunger;
+hungerSlider.value = currentHunger;
+}
+
+if (hungerText != null) {
+hungerText.text = $"{Mathf.CeilToInt(currentHunger)} / {Mathf.CeilToInt(maxHunger)}";
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\WorldInteraction\Tiles\TileDefinition.cs
+
+﻿using UnityEngine;
+using UnityEngine.Tilemaps;
+using WegoSystem; // <-- FIX: Added this line to resolve the ns issue.
+
+pub cls TileDefinition : ScriptableObject {
+pub string displayName;    // e.g. "Grass", "Dirt", "Wet Dirt"
+
+pub Color tintColor = Color.white;
+
+pub int revertAfterTicks = 0;  // Changed from float revertAfterSeconds
+
+pub TileDefinition revertToTile;
+
+pub bool keepBottomTile = false;
+
+pub bool isWaterTile = false;
+
+#if UNITY_EDITOR
+pub void UpdateColor() {
+var manager = UnityEngine.Object.FindAnyObjectByType<TileInteractionManager>();
+if (manager == null) return;
+
+foreach (var mapping in manager.tileDefinitionMappings) {
+if (mapping.tileDef == this && mapping.tilemapModule != null) {
+Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
+if (renderTilemapTransform != null) {
+Tilemap renderTilemap = renderTilemapTransform.GetComponent<Tilemap>();
+if (renderTilemap != null) {
+renderTilemap.color = tintColor;
+UnityEditor.EditorUtility.SetDirty(renderTilemap);
+}
+}
+}
+}
+}
+#endif
 }
 
 ////////////////////////////////////////////////////////////

@@ -53,6 +53,8 @@ namespace Abracodabra.Genes.Core
             float cost = baseEnergyCost;
             foreach (var modInstance in modifiers)
             {
+                if (modInstance == null) continue; // FIX: Prevent NRE on empty/null modifier slots
+
                 var modifier = modInstance.GetGene<ModifierGene>();
                 if (modifier != null)
                     cost = modifier.ModifyEnergyCost(cost, modInstance);

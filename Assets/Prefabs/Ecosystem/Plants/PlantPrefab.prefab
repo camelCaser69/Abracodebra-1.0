@@ -384,8 +384,7 @@ MonoBehaviour:
   energyGenerationMultiplier: 1
   energyStorageMultiplier: 1
   fruitYieldMultiplier: 1
-  poopAbsorptionRadius: 3
-  poopAbsorptionEfficiency: 1
+  baseGrowthChance: 0
   minHeight: 3
   maxHeight: 5
   leafDensity: 2
