@@ -37,12 +37,11 @@ public class OutlinePartController : MonoBehaviour
 
         cachedTransform.SetParent(controller.transform, true);
 
-        // Retrieve the correct world-unit spacing from the parent plant's dynamic property
-        float spacing = 0.08f; // Fallback in world units
         var plant = controller.GetComponentInParent<PlantGrowth>();
-        if (plant != null)
-        {
-            spacing = plant.cellSpacing; // Use the actual, up-to-date cell spacing from the plant
+        float spacing = 1f; // Default to 1 world unit per cell
+        if (plant != null) {
+            // Use consistent spacing calculation
+            spacing = plant.cellSpacingInPixels / 6f;
         }
         cachedTransform.localPosition = (Vector2)myCoord * spacing;
 

@@ -86,20 +86,20 @@ public class PlantCellManager
         GameObject prefab = GetPrefabForType(cellType);
         if (prefab == null) return null;
 
-        // Get the current, correct cellSpacing from the plant's property.
-        float currentCellSpacing = plant.cellSpacing;
-
-        Vector2 localOffset = (Vector2)coords * currentCellSpacing;
+        // Calculate the position in the plant's local grid
+// Each cell should be exactly 1 world unit (6 pixels at 6 PPU)
+        float worldUnitsPerCell = plant.cellSpacingInPixels / 6f; // Convert pixels to world units at base PPU
+        Vector2 localOffset = (Vector2)coords * worldUnitsPerCell;
         Vector2 worldPos = (Vector2)plant.transform.position + localOffset;
 
-        // Add pixel-perfect snapping
-        if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0)
-        {
+// Ensure pixel-perfect positioning
+        if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
             float pixelSize = 1f / ResolutionManager.Instance.CurrentPPU;
+            // Round to nearest pixel to ensure crisp rendering
             worldPos.x = Mathf.Round(worldPos.x / pixelSize) * pixelSize;
             worldPos.y = Mathf.Round(worldPos.y / pixelSize) * pixelSize;
         }
-
+        
         GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
         instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
 
