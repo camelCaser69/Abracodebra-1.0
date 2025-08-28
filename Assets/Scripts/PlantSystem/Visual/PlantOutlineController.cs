@@ -111,27 +111,31 @@ public class PlantOutlineController : MonoBehaviour
         }
     }
 
-    private void CreateOutlinePart(Vector2Int coord, SpriteRenderer sourceRenderer)
-    {
-        if (outlinePartMap.ContainsKey(coord) || sourceRenderer == null || outlinePartPrefab == null) return;
-
+    void CreateOutlinePart(Vector2Int coord, SpriteRenderer sourceRenderer) {
+        if (outlinePartMap.ContainsKey(coord) || sourceRenderer == null || outlinePartPrefab == null) {
+            return;
+        }
+    
         GameObject outlineInstance = Instantiate(outlinePartPrefab, transform);
-        
-        float spacing = parentPlantGrowth.cellSpacing;
+    
+        // Use the plant's spacing calculation
+        float spacing = 1f / 6f; // Default fallback
+        if (parentPlantGrowth != null) {
+            spacing = parentPlantGrowth.GetCellSpacingInWorldUnits();
+        }
+    
         outlineInstance.transform.localPosition = (Vector2)coord * spacing;
-
-        var outlineController = outlineInstance.GetComponent<OutlinePartController>();
-        if (outlineController != null)
-        {
+    
+        OutlinePartController outlineController = outlineInstance.GetComponent<OutlinePartController>();
+        if (outlineController != null) {
             outlineController.Initialize(sourceRenderer, coord, this);
             outlinePartMap.Add(coord, outlineController);
-            
-            // FIX: Using the debug flag
-            if (debugLogging)
-                Debug.Log($"[{gameObject.name}] Created outline part at {coord}");
+        
+            if (debugLogging) {
+                Debug.Log($"[{gameObject.name}] Created outline part at {coord} with spacing {spacing}");
+            }
         }
-        else
-        {
+        else {
             Debug.LogError("Outline Part Prefab is missing the OutlinePartController script!", outlinePartPrefab);
             Destroy(outlineInstance);
         }

@@ -75,72 +75,72 @@ public class PlantCellManager
         RootCellInstance = null;
     }
 
-    public GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords)
-    {
-        if (cells.ContainsKey(coords))
-        {
-            Debug.LogWarning($"[{plant.gameObject.name}] Trying to spawn {cellType} at already occupied coordinate {coords}.");
-            return GetCellGameObjectAt(coords);
-        }
-
-        GameObject prefab = GetPrefabForType(cellType);
-        if (prefab == null) return null;
-
-        // Calculate the position in the plant's local grid
-// Each cell should be exactly 1 world unit (6 pixels at 6 PPU)
-        float worldUnitsPerCell = plant.cellSpacingInPixels / 6f; // Convert pixels to world units at base PPU
-        Vector2 localOffset = (Vector2)coords * worldUnitsPerCell;
-        Vector2 worldPos = (Vector2)plant.transform.position + localOffset;
-
-// Ensure pixel-perfect positioning
-        if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
-            float pixelSize = 1f / ResolutionManager.Instance.CurrentPPU;
-            // Round to nearest pixel to ensure crisp rendering
-            worldPos.x = Mathf.Round(worldPos.x / pixelSize) * pixelSize;
-            worldPos.y = Mathf.Round(worldPos.y / pixelSize) * pixelSize;
-        }
-        
-        GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
-        instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
-
-        // Child parts of a plant should not have their own GridEntity
-        if (cellType != PlantCellType.Seed)
-        {
-            if (instance.TryGetComponent<GridEntity>(out var partGridEntity))
-            {
-                Object.Destroy(partGridEntity);
-            }
-        }
-
-        var cellComp = instance.GetComponent<PlantCell>() ?? instance.AddComponent<PlantCell>();
-        cellComp.ParentPlantGrowth = plant;
-        cellComp.GridCoord = coords;
-        cellComp.CellType = cellType;
-
-        cells[coords] = cellType;
-        activeCellGameObjects.Add(instance);
-
-        if (cellType == PlantCellType.Leaf)
-        {
-            LeafDataList.Add(new LeafData(coords, true));
-            instance.tag = "FruitSpawn";
-
-            if (_leafFoodType != null)
-            {
-                var foodItem = instance.AddComponent<FoodItem>();
-                foodItem.foodType = _leafFoodType;
-            }
-            else
-            {
-                Debug.LogWarning($"[{plant.gameObject.name}] Cannot add FoodItem to leaf. The 'Leaf Food Type' is not assigned in the PlantGrowth inspector.", plant);
-            }
-        }
-
-        plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
-        plant.VisualManager.RegisterOutlineForCell(instance, cellType.ToString());
-
-        return instance;
+    public GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords) {
+    if (cells.ContainsKey(coords)) {
+        Debug.LogWarning($"[{plant.gameObject.name}] Cell already exists at {coords}. Skipping spawn.");
+        return GetCellGameObjectAt(coords);
     }
+    
+    GameObject prefab = GetPrefabForType(cellType);
+    if (prefab == null) return null;
+    
+    // Calculate position using the plant's pixel-based spacing
+    float spacing = plant.GetCellSpacingInWorldUnits();
+    Vector2 localOffset = (Vector2)coords * spacing;
+    Vector3 worldPos = plant.transform.position + (Vector3)localOffset;
+    
+    // Ensure pixel-perfect positioning if needed
+    if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
+        float pixelSize = 1f / ResolutionManager.Instance.CurrentPPU;
+        worldPos.x = Mathf.Round(worldPos.x / pixelSize) * pixelSize;
+        worldPos.y = Mathf.Round(worldPos.y / pixelSize) * pixelSize;
+    }
+    
+    // Instantiate the cell
+    GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
+    instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
+    
+    // Remove GridEntity from plant parts (except seed)
+    if (cellType != PlantCellType.Seed) {
+        GridEntity partGridEntity = instance.GetComponent<GridEntity>();
+        if (partGridEntity != null) {
+            Object.Destroy(partGridEntity);
+        }
+    }
+    
+    // Set up PlantCell component
+    PlantCell cellComp = instance.GetComponent<PlantCell>();
+    if (cellComp == null) {
+        cellComp = instance.AddComponent<PlantCell>();
+    }
+    cellComp.ParentPlantGrowth = plant;
+    cellComp.GridCoord = coords;
+    cellComp.CellType = cellType;
+    
+    // Register the cell
+    cells[coords] = cellType;
+    activeCellGameObjects.Add(instance);
+    
+    // Special handling for leaves
+    if (cellType == PlantCellType.Leaf) {
+        LeafDataList.Add(new LeafData(coords, true));
+        instance.tag = "FruitSpawn";
+        
+        if (_leafFoodType != null) {
+            FoodItem foodItem = instance.AddComponent<FoodItem>();
+            foodItem.foodType = _leafFoodType;
+        }
+        else {
+            Debug.LogWarning($"[{plant.gameObject.name}] Leaf Food Type not assigned in PlantGrowth inspector.", plant);
+        }
+    }
+    
+    // Register visual effects
+    plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
+    plant.VisualManager.RegisterOutlineForCell(instance, cellType.ToString());
+    
+    return instance;
+}
 
     private GameObject GetPrefabForType(PlantCellType cellType)
     {

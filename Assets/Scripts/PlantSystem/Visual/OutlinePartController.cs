@@ -21,37 +21,39 @@ public class OutlinePartController : MonoBehaviour
         }
     }
 
-    public void Initialize(SpriteRenderer sourceRenderer, Vector2Int myCoord, PlantOutlineController controller)
-    {
-        if (sourceRenderer == null || controller == null) { Destroy(gameObject); return; }
-
+    public void Initialize(SpriteRenderer sourceRenderer, Vector2Int myCoord, PlantOutlineController controller) {
+        if (sourceRenderer == null || controller == null) {
+            Destroy(gameObject);
+            return;
+        }
+    
         sourcePlantPartRenderer = sourceRenderer;
         gridCoord = myCoord;
-
-        if (outlineRenderer != null)
-        {
+    
+        if (outlineRenderer != null) {
             outlineRenderer.sortingLayerID = controller.OutlineSortingLayer;
             outlineRenderer.sortingOrder = controller.OutlineSortingOrder;
             outlineRenderer.color = controller.OutlineColor;
         }
-
+    
         cachedTransform.SetParent(controller.transform, true);
-
-        var plant = controller.GetComponentInParent<PlantGrowth>();
-        float spacing = 1f; // Default to 1 world unit per cell
+    
+        // Get the plant component and use its spacing
+        PlantGrowth plant = controller.GetComponentInParent<PlantGrowth>();
+        float spacing = 1f / 6f; // Default fallback (1 world unit at 6 PPU)
+    
         if (plant != null) {
-            // Use consistent spacing calculation
-            spacing = plant.cellSpacingInPixels / 6f;
+            spacing = plant.GetCellSpacingInWorldUnits();
         }
+    
         cachedTransform.localPosition = (Vector2)myCoord * spacing;
-
-        if (outlineRenderer != null)
-        {
-            outlineRenderer.enabled = IsSourceRendererValid() &&
-                                  sourcePlantPartRenderer.enabled &&
-                                  sourcePlantPartRenderer.sprite != null;
+    
+        if (outlineRenderer != null) {
+            outlineRenderer.enabled = IsSourceRendererValid() && 
+                                      sourcePlantPartRenderer.enabled && 
+                                      sourcePlantPartRenderer.sprite != null;
         }
-
+    
         SyncSpriteAndTransform();
     }
 

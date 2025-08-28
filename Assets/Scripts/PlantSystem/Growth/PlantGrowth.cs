@@ -29,15 +29,32 @@ namespace Abracodabra.Genes
         public PlantEnergySystem EnergySystem { get; set; }
         public PlantVisualManager VisualManager { get; set; }
 
-        [Header("Visuals & Prefabs")]
-        [SerializeField] public float cellSpacingInPixels = 6f; // Exposed to inspector for easy tweaking
-
-        public float cellSpacing {
-            get {
-                // Always use a fixed world unit size that matches our pixel grid
-                // This ensures consistent spacing regardless of PPU changes
-                return cellSpacingInPixels / 6f; // 6 PPU is our base reference
+        // Add this at the top of the class, replacing the existing cellSpacingInPixels and cellSpacing
+        [Header("Plant Grid Settings")]
+        [SerializeField] public float cellSizeInPixels = 6f; // Size of each plant cell in pixels
+    
+        public float GetCellSpacingInWorldUnits() {
+            // Get the actual pixel-to-world conversion
+            float pixelsPerUnit = 6f; // Default fallback
+    
+            if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
+                pixelsPerUnit = ResolutionManager.Instance.CurrentPPU;
             }
+    
+            // Convert pixel size to world units
+            return cellSizeInPixels / pixelsPerUnit;
+        }
+
+// Keep this for backward compatibility but mark as obsolete
+        [System.Obsolete("Use GetCellSpacingInWorldUnits() instead")]
+        public float cellSpacing {
+            get { return GetCellSpacingInWorldUnits(); }
+        }
+
+// Add this property for convenience
+        public float cellSpacingInPixels {
+            get { return cellSizeInPixels; }
+            set { cellSizeInPixels = value; }
         }
 
         [SerializeField] private GameObject seedCellPrefab;
@@ -160,26 +177,28 @@ namespace Abracodabra.Genes
             }
         }
 
-        private void GrowSomething()
-        {
+        void GrowSomething() {
             int currentHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
-            if (currentHeight < maxHeight)
-            {
-                // Spawn stem at center column
+    
+            if (currentHeight < maxHeight) {
+                // Grow a new stem segment
                 Vector2Int stemPos = new Vector2Int(0, currentHeight + 1);
                 CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos);
-
+        
+                // Check if we should add leaves at this height
                 if (currentHeight > 0 && currentHeight % leafGap == 0) {
-                    // Calculate leaf positions to ensure no overlap
-                    // Leaves should be placed at the same height as the stem, but offset horizontally
-                    int leafY = currentHeight; // Same height as current stem, not +1
-    
+                    // Place leaves at the SAME height as the current stem segment
+                    int leafY = currentHeight; // Not currentHeight + 1
+            
                     for (int i = 0; i < leafDensity; i++) {
-                        // Alternate left and right, starting from position 1
-                        int xOffset = (i % 2 == 0) ? -(i/2 + 1) : (i/2 + 1);
+                        // Calculate leaf positions to avoid overlap
+                        // Alternating pattern: -1, +1, -2, +2, etc.
+                        int leafOffset = (i / 2) + 1;
+                        int xOffset = (i % 2 == 0) ? -leafOffset : leafOffset;
+                
                         var leafPos = new Vector2Int(xOffset, leafY);
-
-                        // Check if position is available (no overlap)
+                
+                        // Only place leaf if position is empty
                         if (!CellManager.HasCellAt(leafPos)) {
                             var leafObj = CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos);
                             if (leafObj != null) {
@@ -189,8 +208,7 @@ namespace Abracodabra.Genes
                     }
                 }
             }
-            else
-            {
+            else {
                 CurrentState = PlantState.Mature;
             }
         }
@@ -198,33 +216,53 @@ namespace Abracodabra.Genes
 #if UNITY_EDITOR
         void OnDrawGizmos() {
             if (!Application.isPlaying) return;
+            if (CellManager == null || CellManager.cells == null) return;
     
-            // Draw the plant's cell grid for debugging
-            Gizmos.color = Color.green;
-            float worldUnitsPerCell = cellSpacingInPixels / 6f;
+            float spacing = GetCellSpacingInWorldUnits();
     
             // Draw occupied cells
-            if (CellManager != null && CellManager.cells != null) {
-                foreach (var cell in CellManager.cells) {
-                    Vector2 cellWorldPos = (Vector2)transform.position + (Vector2)cell.Key * worldUnitsPerCell;
-            
-                    // Draw cell boundary
-                    Gizmos.color = cell.Value == PlantCellType.Stem ? Color.green : 
-                        cell.Value == PlantCellType.Leaf ? Color.yellow :
-                        cell.Value == PlantCellType.Seed ? Color.white : Color.red;
-            
-                    Gizmos.DrawWireCube(cellWorldPos, Vector3.one * worldUnitsPerCell * 0.9f);
+            foreach (var cell in CellManager.cells) {
+                Vector2 cellWorldPos = (Vector2)transform.position + (Vector2)cell.Key * spacing;
+        
+                // Color based on cell type
+                switch(cell.Value) {
+                    case PlantCellType.Stem:
+                        Gizmos.color = new Color(0, 1, 0, 0.5f); // Green
+                        break;
+                    case PlantCellType.Leaf:
+                        Gizmos.color = new Color(1, 1, 0, 0.5f); // Yellow
+                        break;
+                    case PlantCellType.Seed:
+                        Gizmos.color = new Color(1, 1, 1, 0.5f); // White
+                        break;
+                    case PlantCellType.Fruit:
+                        Gizmos.color = new Color(1, 0, 0, 0.5f); // Red
+                        break;
+                    default:
+                        Gizmos.color = new Color(0.5f, 0.5f, 0.5f, 0.5f); // Gray
+                        break;
+                }
+        
+                // Draw cell cube
+                Gizmos.DrawCube(cellWorldPos, Vector3.one * spacing * 0.9f);
+        
+                // Draw cell outline
+                Gizmos.color = new Color(Gizmos.color.r, Gizmos.color.g, Gizmos.color.b, 1f);
+                Gizmos.DrawWireCube(cellWorldPos, Vector3.one * spacing);
+            }
+    
+            // Draw grid reference lines
+            Gizmos.color = new Color(0, 1, 0, 0.1f);
+            for (int x = -5; x <= 5; x++) {
+                for (int y = 0; y <= maxHeight; y++) {
+                    Vector2 gridPos = (Vector2)transform.position + new Vector2(x, y) * spacing;
+                    Gizmos.DrawWireCube(gridPos, Vector3.one * spacing);
                 }
             }
     
-            // Draw grid lines for reference
-            Gizmos.color = new Color(0, 1, 0, 0.2f);
-            for (int x = -5; x <= 5; x++) {
-                for (int y = -1; y <= maxHeight + 1; y++) {
-                    Vector2 gridPos = (Vector2)transform.position + new Vector2(x, y) * worldUnitsPerCell;
-                    Gizmos.DrawWireCube(gridPos, Vector3.one * worldUnitsPerCell);
-                }
-            }
+            // Draw plant origin
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawWireSphere(transform.position, spacing * 0.25f);
         }
 #endif
 
