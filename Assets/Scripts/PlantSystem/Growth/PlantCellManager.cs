@@ -90,7 +90,18 @@ public class PlantCellManager
         GameObject prefab = GetPrefabForType(cellType);
         if (prefab == null) return null;
 
-        Vector2 worldPos = (Vector2)plant.transform.position + ((Vector2)coords * cellSpacing);
+        // Cell spacing is already in world units (converted in PlantGrowth.Awake)
+        // After calculating worldPos
+        Vector2 localOffset = (Vector2)coords * cellSpacing;
+        Vector2 worldPos = (Vector2)plant.transform.position + localOffset;
+
+// Add pixel-perfect snapping
+        if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
+            float pixelSize = 1f / ResolutionManager.Instance.CurrentPPU;
+            worldPos.x = Mathf.Round(worldPos.x / pixelSize) * pixelSize;
+            worldPos.y = Mathf.Round(worldPos.y / pixelSize) * pixelSize;
+        }
+
         GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
         instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
 

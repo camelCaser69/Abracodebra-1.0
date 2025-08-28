@@ -5958,10 +5958,10 @@ MonoBehaviour:
   profiles:
   - name: 1/2 Pixel Perfect (Native)
     resolution: {x: 320, y: 180}
-    pixelsPerUnit: 12
+    pixelsPerUnit: 18
     cameraZoomMultiplier: 1
   - name: Pixel Perfect (Native)
-    resolution: {x: 320, y: 180}
+    resolution: {x: 112, y: 63}
     pixelsPerUnit: 6
     cameraZoomMultiplier: 1
   - name: HD Ready (2x)
@@ -5972,7 +5972,7 @@ MonoBehaviour:
     resolution: {x: 1280, y: 720}
     pixelsPerUnit: 6
     cameraZoomMultiplier: 1
-  currentProfileIndex: 0
+  currentProfileIndex: 1
 --- !u!114 &171201765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19299,7 +19299,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 7.5
+  orthographic size: 5.2941175
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -19363,9 +19363,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ComponentVersion: 1
-  m_AssetsPPU: 12
-  m_RefResolutionX: 320
-  m_RefResolutionY: 180
+  m_AssetsPPU: 6
+  m_RefResolutionX: 112
+  m_RefResolutionY: 63
   m_CropFrame: 0
   m_GridSnapping: 1
   m_FilterMode: 0

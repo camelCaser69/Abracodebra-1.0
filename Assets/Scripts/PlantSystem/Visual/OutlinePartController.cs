@@ -1,7 +1,5 @@
-﻿// REWORKED FILE: Assets/Scripts/PlantSystem/Visual/OutlinePartController.cs
-
+﻿using UnityEngine;
 using Abracodabra.Genes;
-using UnityEngine;
 
 public class OutlinePartController : MonoBehaviour
 {
@@ -11,7 +9,7 @@ public class OutlinePartController : MonoBehaviour
 
     public Vector2Int gridCoord;
 
-    void Awake()
+    private void Awake()
     {
         outlineRenderer = GetComponent<SpriteRenderer>();
         cachedTransform = transform;
@@ -30,31 +28,35 @@ public class OutlinePartController : MonoBehaviour
         sourcePlantPartRenderer = sourceRenderer;
         gridCoord = myCoord;
 
-        outlineRenderer.sortingLayerID = controller.OutlineSortingLayer;
-        outlineRenderer.sortingOrder = controller.OutlineSortingOrder;
-        outlineRenderer.color = controller.OutlineColor;
-
+        if (outlineRenderer != null)
+        {
+            outlineRenderer.sortingLayerID = controller.OutlineSortingLayer;
+            outlineRenderer.sortingOrder = controller.OutlineSortingOrder;
+            outlineRenderer.color = controller.OutlineColor;
+        }
+        
         cachedTransform.SetParent(controller.transform, true);
 
-        // FIX: The old method GetCellSpacing() was removed. We can find the plant and get the value.
-        // This is not ideal for performance, but will work. A better solution is to pass spacing in.
-        float spacing = 0.08f; // Fallback
+        // Retrieve the correct world-unit spacing from the parent plant
+        float spacing = 0.08f; // Fallback in world units
         var plant = controller.GetComponentInParent<PlantGrowth>();
         if (plant != null)
         {
-            // A public field for cellSpacing should be added to PlantGrowth if this is needed often.
-            // For now, we assume a default value as the field was removed.
+            spacing = plant.cellSpacing; // Use the actual cell spacing from the plant
         }
         cachedTransform.localPosition = (Vector2)myCoord * spacing;
-
-        outlineRenderer.enabled = IsSourceRendererValid() &&
+        
+        if(outlineRenderer != null)
+        {
+            outlineRenderer.enabled = IsSourceRendererValid() &&
                                   sourcePlantPartRenderer.enabled &&
                                   sourcePlantPartRenderer.sprite != null;
+        }
 
         SyncSpriteAndTransform();
     }
 
-    void LateUpdate()
+    private void LateUpdate()
     {
         if (outlineRenderer == null || !outlineRenderer.enabled) return;
 
