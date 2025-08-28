@@ -75,73 +75,62 @@ public class PlantCellManager
         RootCellInstance = null;
     }
 
-    public GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords) {
-    if (cells.ContainsKey(coords)) {
-        Debug.LogWarning($"[{plant.gameObject.name}] Cell already exists at {coords}. Skipping spawn.");
-        return GetCellGameObjectAt(coords);
-    }
-    
-    GameObject prefab = GetPrefabForType(cellType);
-    if (prefab == null) return null;
-    
-    // Use the plant's corrected spacing calculation
-    float spacing = plant.GetCellWorldSpacing();
-    Vector2 localOffset = (Vector2)coords * spacing;
-    Vector3 worldPos = plant.transform.position + (Vector3)localOffset;
-    
-    // Apply pixel-perfect snapping if available
-    // Ensure pixel-perfect positioning at current PPU
-    if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
-        float pixelSize = 1f / ResolutionManager.Instance.CurrentPPU;
-        worldPos.x = Mathf.Round(worldPos.x / pixelSize) * pixelSize;
-        worldPos.y = Mathf.Round(worldPos.y / pixelSize) * pixelSize;
-    }
-    
-    // Create the cell GameObject
-    GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
-    instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
-    
-    // Remove GridEntity from plant parts (except seed)
-    if (cellType != PlantCellType.Seed) {
-        GridEntity partGridEntity = instance.GetComponent<GridEntity>();
-        if (partGridEntity != null) {
-            Object.Destroy(partGridEntity);
+    public GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords)
+    {
+        if (cells.ContainsKey(coords))
+        {
+            Debug.LogWarning($"[{plant.gameObject.name}] Cell already exists at {coords}. Skipping spawn.");
+            return GetCellGameObjectAt(coords);
         }
-    }
+
+        GameObject prefab = GetPrefabForType(cellType);
+        if (prefab == null) return null;
+
+        float spacing = plant.GetCellWorldSpacing();
+        Vector3 cellLocalPos = new Vector3(coords.x * spacing, coords.y * spacing, 0);
+        Vector3 cellWorldPos = plant.transform.position + cellLocalPos;
+
+        GameObject instance = UnityEngine.Object.Instantiate(prefab, cellWorldPos, Quaternion.identity, plant.transform);
     
-    // Setup PlantCell component
-    PlantCell cellComp = instance.GetComponent<PlantCell>();
-    if (cellComp == null) {
-        cellComp = instance.AddComponent<PlantCell>();
-    }
-    cellComp.ParentPlantGrowth = plant;
-    cellComp.GridCoord = coords;
-    cellComp.CellType = cellType;
+        PlantCell cellComponent = instance.GetComponent<PlantCell>();
+        if (cellComponent == null)
+        {
+            cellComponent = instance.AddComponent<PlantCell>();
+        }
     
-    // Register in collections
-    cells[coords] = cellType;
-    activeCellGameObjects.Add(instance);
-    
-    // Special handling for leaves
-    if (cellType == PlantCellType.Leaf) {
-        LeafDataList.Add(new LeafData(coords, true));
-        instance.tag = "FruitSpawn";
+        cellComponent.ParentPlantGrowth = plant;
+        cellComponent.GridCoord = coords;
+        cellComponent.CellType = cellType;
+
+        cells[coords] = cellType;
+        activeCellGameObjects.Add(instance);
+
+        if (cellType == PlantCellType.Seed)
+        {
+            RootCellInstance = instance;
+        }
+        else if (cellType == PlantCellType.Leaf)
+        {
+            LeafDataList.Add(new LeafData(coords, true));
         
-        if (_leafFoodType != null) {
-            FoodItem foodItem = instance.AddComponent<FoodItem>();
-            foodItem.foodType = _leafFoodType;
+            // Just ensure the FoodItem component exists with the right food type
+            var food = instance.GetComponent<FoodItem>();
+            if (food != null)
+            {
+                food.foodType = _leafFoodType;
+                // Nutrition value is handled by the FoodType ScriptableObject itself
+            }
+            else
+            {
+                Debug.LogWarning($"[{plant.gameObject.name}] Leaf prefab is missing FoodItem component.", plant);
+            }
         }
-        else {
-            Debug.LogWarning($"[{plant.gameObject.name}] Leaf Food Type not assigned in PlantGrowth inspector.", plant);
-        }
+
+        plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
+        plant.VisualManager.RegisterOutlineForCell(instance, cellType.ToString());
+
+        return instance;
     }
-    
-    // Register visual components
-    plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
-    plant.VisualManager.RegisterOutlineForCell(instance, cellType.ToString());
-    
-    return instance;
-}
 
     private GameObject GetPrefabForType(PlantCellType cellType)
     {

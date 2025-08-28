@@ -91,89 +91,118 @@ namespace Abracodabra.Genes {
             }
         }
 
-        public void InitializeWithState(PlantGeneRuntimeState state) {
-            if (state == null || state.template == null) {
-                Debug.LogError($"Cannot initialize plant on '{gameObject.name}': Provided state or its template is null.", this);
-                Destroy(gameObject);
-                return;
-            }
+        public void InitializeWithState(PlantGeneRuntimeState state)
+{
+    if (state == null || state.template == null)
+    {
+        Debug.LogError($"Cannot initialize plant on '{gameObject.name}': Provided state or its template is null.", this);
+        Destroy(gameObject);
+        return;
+    }
 
-            this.seedTemplate = state.template;
-            this.geneRuntimeState = state;
+    this.seedTemplate = state.template;
+    this.geneRuntimeState = state;
 
-            this.baseGrowthChance = seedTemplate.baseGrowthChance;
-            this.minHeight = seedTemplate.minHeight;
-            this.maxHeight = seedTemplate.maxHeight;
-            this.leafDensity = seedTemplate.leafDensity;
-            this.leafGap = seedTemplate.leafGap;
+    this.baseGrowthChance = seedTemplate.baseGrowthChance;
+    this.minHeight = seedTemplate.minHeight;
+    this.maxHeight = seedTemplate.maxHeight;
+    this.leafDensity = seedTemplate.leafDensity;
+    this.leafGap = seedTemplate.leafGap;
 
-            sequenceExecutor = GetComponent<PlantSequenceExecutor>();
-            if (sequenceExecutor == null) {
-                sequenceExecutor = gameObject.AddComponent<PlantSequenceExecutor>();
-            }
-            sequenceExecutor.plantGrowth = this;
+    sequenceExecutor = GetComponent<PlantSequenceExecutor>();
+    if (sequenceExecutor == null)
+    {
+        sequenceExecutor = gameObject.AddComponent<PlantSequenceExecutor>();
+    }
+    sequenceExecutor.plantGrowth = this;
 
-            GrowthLogic.CalculateAndApplyPassiveStats();
+    GrowthLogic.CalculateAndApplyPassiveStats();
 
-            EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
-            EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
-            EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
+    EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
+    EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
+    EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
 
-            sequenceExecutor.runtimeState = this.geneRuntimeState;
-            sequenceExecutor.StartExecution();
+    sequenceExecutor.runtimeState = this.geneRuntimeState;
+    sequenceExecutor.StartExecution();
 
-            CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
+    CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
+    
+    // Keep in Initializing state briefly to prevent immediate growth
+    CurrentState = PlantState.Initializing;
+    
+    // Start a coroutine to transition to Growing state after a short delay
+    StartCoroutine(DelayedGrowthStart());
+
+    if (TickManager.Instance != null)
+    {
+        TickManager.Instance.RegisterTickUpdateable(this);
+    }
+
+    Debug.Log($"Plant '{gameObject.name}' initialized from template '{seedTemplate.templateName}'. State: {CurrentState}");
+}
+
+        private System.Collections.IEnumerator DelayedGrowthStart()
+        {
+            yield return new WaitForSeconds(0.5f);
             CurrentState = PlantState.Growing;
-
-            if (TickManager.Instance != null) {
-                TickManager.Instance.RegisterTickUpdateable(this);
-            }
-
-            Debug.Log($"Plant '{gameObject.name}' initialized from template '{seedTemplate.templateName}'. State: {CurrentState}");
+            Debug.Log($"Plant '{gameObject.name}' transitioned to Growing state");
         }
 
-        public void OnTickUpdate(int currentTick) {
+        public void OnTickUpdate(int currentTick)
+        {
             EnergySystem.OnTickUpdate();
+    
+            // Update the visual display on each tick
+            if (VisualManager != null)
+            {
+                VisualManager.UpdateUI();
+            }
 
-            if (CurrentState == PlantState.Growing) {
-                float randomValue = (_deterministicRandom != null) ? _deterministicRandom.Range(0f, 1f) : Random.value;
-                if (randomValue < baseGrowthChance * growthSpeedMultiplier) {
+            if (CurrentState == PlantState.Growing)
+            {
+                float randomValue = (_deterministicRandom != null) ? 
+                    _deterministicRandom.Range(0f, 1f) : Random.value;
+                if (randomValue < baseGrowthChance * growthSpeedMultiplier)
+                {
                     GrowSomething();
                 }
             }
         }
 
-        void GrowSomething() {
+        private void GrowSomething()
+        {
             int currentHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
-            
-            if (currentHeight < maxHeight) {
-                // Grow a new stem segment one unit higher
+
+            if (currentHeight < maxHeight)
+            {
                 Vector2Int stemPos = new Vector2Int(0, currentHeight + 1);
                 CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos);
-                
-                // Add leaves at certain intervals
-                if (currentHeight > 0 && currentHeight % leafGap == 0) {
-                    // Place leaves at the CURRENT height, not above the new stem
+
+                if (currentHeight > 0 && currentHeight % leafGap == 0)
+                {
                     int leafY = currentHeight;
-                    
-                    for (int i = 0; i < leafDensity; i++) {
-                        // Proper alternating pattern for leaves
+
+                    for (int i = 0; i < leafDensity; i++)
+                    {
                         int leafOffset = (i / 2) + 1;
                         int xOffset = (i % 2 == 0) ? -leafOffset : leafOffset;
-                        
+
                         var leafPos = new Vector2Int(xOffset, leafY);
-                        
-                        // Only place if cell is empty
-                        if (!CellManager.HasCellAt(leafPos)) {
+
+                        if (!CellManager.HasCellAt(leafPos))
+                        {
                             var leafObj = CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos);
-                            if (leafObj != null) {
-                                leafObj.tag = "FruitSpawn";
+                            if (leafObj != null)
+                            {
+                                // Add a component to mark fruit spawn points instead of using tags
+                                leafObj.AddComponent<FruitSpawnPoint>();
                             }
                         }
                     }
                 }
             }
-            else {
+            else
+            {
                 CurrentState = PlantState.Mature;
             }
         }
@@ -190,10 +219,11 @@ namespace Abracodabra.Genes {
             return CellManager?.GetCellGameObjectAt(coord);
         }
 
-        public Transform[] GetFruitSpawnPoints() {
-            return GetComponentsInChildren<Transform>()
-                .Where(t => t.CompareTag("FruitSpawn"))
-                .ToArray();
+        public Transform[] GetFruitSpawnPoints()
+        {
+            // Look for FruitSpawnPoint components instead of tags
+            var spawnPoints = GetComponentsInChildren<FruitSpawnPoint>();
+            return spawnPoints.Select(sp => sp.transform).ToArray();
         }
 
 #if UNITY_EDITOR

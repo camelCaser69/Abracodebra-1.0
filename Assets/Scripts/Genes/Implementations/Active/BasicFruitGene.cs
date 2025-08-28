@@ -2,11 +2,12 @@
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Components;
-using System.Collections.Generic; // Required for List
+using System.Collections.Generic;
+using System.Linq;
+using System.Collections;
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "NewBasicFruitGene", menuName = "Abracodabra/Genes/Active/Basic Fruit Gene")]
     public class BasicFruitGene : ActiveGene
     {
         public GameObject fruitPrefab;
@@ -27,7 +28,7 @@ namespace Abracodabra.Genes.Implementations
 
             if (fruitPoints.Length == 0)
             {
-                Debug.LogWarning($"Plant '{context.plant.name}' has no spawn points tagged 'FruitSpawn'. Cannot spawn fruit.", context.plant);
+                Debug.LogWarning($"Plant '{context.plant.name}' has no fruit spawn points. Cannot spawn fruit.", context.plant);
                 return;
             }
 
@@ -77,11 +78,9 @@ namespace Abracodabra.Genes.Implementations
                 payloadInstance.GetGene<PayloadGene>()?.ConfigureFruit(fruit, payloadInstance);
             }
         }
-        
-        // FIX: Override the validation to allow this gene to be valid even without a payload.
+
         public override bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
         {
-            // A basic fruit is always a valid configuration. It doesn't require a payload to function.
             return true;
         }
 
