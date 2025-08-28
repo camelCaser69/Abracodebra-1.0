@@ -34,19 +34,19 @@ public class OutlinePartController : MonoBehaviour
             outlineRenderer.sortingOrder = controller.OutlineSortingOrder;
             outlineRenderer.color = controller.OutlineColor;
         }
-        
+
         cachedTransform.SetParent(controller.transform, true);
 
-        // Retrieve the correct world-unit spacing from the parent plant
+        // Retrieve the correct world-unit spacing from the parent plant's dynamic property
         float spacing = 0.08f; // Fallback in world units
         var plant = controller.GetComponentInParent<PlantGrowth>();
         if (plant != null)
         {
-            spacing = plant.cellSpacing; // Use the actual cell spacing from the plant
+            spacing = plant.cellSpacing; // Use the actual, up-to-date cell spacing from the plant
         }
         cachedTransform.localPosition = (Vector2)myCoord * spacing;
-        
-        if(outlineRenderer != null)
+
+        if (outlineRenderer != null)
         {
             outlineRenderer.enabled = IsSourceRendererValid() &&
                                   sourcePlantPartRenderer.enabled &&

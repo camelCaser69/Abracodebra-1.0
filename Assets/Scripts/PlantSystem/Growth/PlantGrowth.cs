@@ -30,10 +30,26 @@ namespace Abracodabra.Genes
         public PlantVisualManager VisualManager { get; set; }
 
         [Header("Visuals & Prefabs")]
-        [SerializeField] 
+        [SerializeField]
         [Tooltip("Size of each plant cell in pixels (e.g., 6 = 6x6 pixel cells)")]
-        [Range(1, 16)] // Reasonable range for pixel sizes
-        public float cellSpacing = 6f; // Changed from 0.08 to 6 (pixels)
+        [Range(1, 16)]
+        private float cellSpacingInPixels = 6f; // This is the source value, in pixels.
+
+        // DEFINITIVE FIX: cellSpacing is now a dynamic property that calculates the correct world-unit
+        // spacing every time it's accessed, based on the current PPU.
+        public float cellSpacing
+        {
+            get
+            {
+                if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0)
+                {
+                    return cellSpacingInPixels / ResolutionManager.Instance.CurrentPPU;
+                }
+                // Fallback if the manager isn't ready yet or is missing.
+                return cellSpacingInPixels / 6f;
+            }
+        }
+
         [SerializeField] private GameObject seedCellPrefab;
         [SerializeField] private GameObject stemCellPrefab;
         [SerializeField] private GameObject leafCellPrefab;
@@ -63,31 +79,19 @@ namespace Abracodabra.Genes
 
         private IDeterministicRandom _deterministicRandom;
 
-        void Awake() {
+        private void Awake()
+        {
             AllActivePlants.Add(this);
-    
-            // Cell spacing should be in pixels, then converted to world units when needed
-            // The inspector value (e.g., 6) represents the pixel size of each plant cell
-            float cellSpacingInPixels = cellSpacing; // This is now treated as pixels (e.g., 6 pixels)
-    
-            // Convert pixel spacing to world units for use in positioning
-            if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
-                cellSpacing = cellSpacingInPixels / ResolutionManager.Instance.CurrentPPU;
-                Debug.Log($"[{nameof(PlantGrowth)}] Cell spacing set to {cellSpacing} world units ({cellSpacingInPixels} pixels at {ResolutionManager.Instance.CurrentPPU} PPU)");
-            } else {
-                // Fallback: assume default PPU if ResolutionManager not available
-                float defaultPPU = 6f;
-                cellSpacing = cellSpacingInPixels / defaultPPU;
-                Debug.LogWarning($"[{nameof(PlantGrowth)}] ResolutionManager not available, using default PPU of {defaultPPU}. Cell spacing: {cellSpacing} world units");
-            }
-    
-            CellManager = new PlantCellManager(this, seedCellPrefab, stemCellPrefab, leafCellPrefab, berryCellPrefab, cellSpacing, leafFoodType);
+
+            // The calculation is now handled by the cellSpacing property, so Awake is simpler.
+            CellManager = new PlantCellManager(this, seedCellPrefab, stemCellPrefab, leafCellPrefab, berryCellPrefab, leafFoodType);
             GrowthLogic = new PlantGrowthLogic(this);
             EnergySystem = new PlantEnergySystem(this);
             VisualManager = new PlantVisualManager(this, shadowController, null, outlineController, outlinePartPrefab, enableOutline);
 
             _deterministicRandom = GeneServices.Get<IDeterministicRandom>();
-            if (_deterministicRandom == null) {
+            if (_deterministicRandom == null)
+            {
                 Debug.LogError($"[{nameof(PlantGrowth)}] could not retrieve IDeterministicRandom service! Growth will be non-deterministic.", this);
             }
         }
@@ -166,32 +170,40 @@ namespace Abracodabra.Genes
             }
         }
 
-        void GrowSomething() {
+        private void GrowSomething()
+        {
             int currentHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
-            if (currentHeight < maxHeight) {
+            if (currentHeight < maxHeight)
+            {
                 // Spawn stem at center column
                 Vector2Int stemPos = new Vector2Int(0, currentHeight + 1);
                 CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos);
 
                 // Check if we should spawn leaves at this height
-                if (currentHeight > 0 && currentHeight % leafGap == 0) {
+                if (currentHeight > 0 && currentHeight % leafGap == 0)
+                {
                     // Spawn leaves to the sides of the stem, not on top of it
-                    for (int i = 0; i < leafDensity; i++) {
+                    for (int i = 0; i < leafDensity; i++)
+                    {
                         // Alternate between left and right, with increasing distance
                         int leafIndex = i + 1;
                         int xOffset = (i % 2 == 0) ? -leafIndex : leafIndex;
                         var leafPos = new Vector2Int(xOffset, currentHeight + 1);
-                
+
                         // Only spawn if position is not occupied
-                        if (!CellManager.HasCellAt(leafPos)) {
+                        if (!CellManager.HasCellAt(leafPos))
+                        {
                             var leafObj = CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos);
-                            if (leafObj != null) {
+                            if (leafObj != null)
+                            {
                                 leafObj.tag = "FruitSpawn";
                             }
                         }
                     }
                 }
-            } else {
+            }
+            else
+            {
                 CurrentState = PlantState.Mature;
             }
         }

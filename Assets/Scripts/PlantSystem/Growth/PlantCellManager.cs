@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
 using Abracodabra.Genes;
 using WegoSystem;
-// Note: FoodType is in the global namespace, so no 'using' statement is required here.
+using System.Collections.Generic;
+using System.Linq;
 
 public class PlantCellManager
 {
@@ -12,8 +11,7 @@ public class PlantCellManager
     private readonly GameObject stemCellPrefab;
     private readonly GameObject leafCellPrefab;
     private readonly GameObject berryCellPrefab;
-    private readonly float cellSpacing;
-    private readonly FoodType _leafFoodType; // Added field to hold the reference
+    private readonly FoodType _leafFoodType;
 
     public readonly Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
     private readonly List<GameObject> activeCellGameObjects = new List<GameObject>();
@@ -21,16 +19,14 @@ public class PlantCellManager
     public List<LeafData> LeafDataList { get; } = new List<LeafData>();
     public GameObject RootCellInstance { get; set; }
 
-    // Updated constructor to accept the FoodType
-    public PlantCellManager(PlantGrowth plant, GameObject seedPrefab, GameObject stemPrefab, GameObject leafPrefab, GameObject berryPrefab, float spacing, FoodType leafFoodType)
+    public PlantCellManager(PlantGrowth plant, GameObject seedPrefab, GameObject stemPrefab, GameObject leafPrefab, GameObject berryPrefab, FoodType leafFoodType)
     {
         this.plant = plant;
         this.seedCellPrefab = seedPrefab;
         this.stemCellPrefab = stemPrefab;
         this.leafCellPrefab = leafPrefab;
         this.berryCellPrefab = berryPrefab;
-        this.cellSpacing = spacing;
-        this._leafFoodType = leafFoodType; // Store the reference
+        this._leafFoodType = leafFoodType;
     }
 
     public void ReportCellDestroyed(Vector2Int coord)
@@ -90,13 +86,15 @@ public class PlantCellManager
         GameObject prefab = GetPrefabForType(cellType);
         if (prefab == null) return null;
 
-        // Cell spacing is already in world units (converted in PlantGrowth.Awake)
-        // After calculating worldPos
-        Vector2 localOffset = (Vector2)coords * cellSpacing;
+        // Get the current, correct cellSpacing from the plant's property.
+        float currentCellSpacing = plant.cellSpacing;
+
+        Vector2 localOffset = (Vector2)coords * currentCellSpacing;
         Vector2 worldPos = (Vector2)plant.transform.position + localOffset;
 
-// Add pixel-perfect snapping
-        if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
+        // Add pixel-perfect snapping
+        if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0)
+        {
             float pixelSize = 1f / ResolutionManager.Instance.CurrentPPU;
             worldPos.x = Mathf.Round(worldPos.x / pixelSize) * pixelSize;
             worldPos.y = Mathf.Round(worldPos.y / pixelSize) * pixelSize;
@@ -105,6 +103,7 @@ public class PlantCellManager
         GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
         instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
 
+        // Child parts of a plant should not have their own GridEntity
         if (cellType != PlantCellType.Seed)
         {
             if (instance.TryGetComponent<GridEntity>(out var partGridEntity))
@@ -126,7 +125,6 @@ public class PlantCellManager
             LeafDataList.Add(new LeafData(coords, true));
             instance.tag = "FruitSpawn";
 
-            // Add FoodItem component to the leaf so it can be eaten
             if (_leafFoodType != null)
             {
                 var foodItem = instance.AddComponent<FoodItem>();
