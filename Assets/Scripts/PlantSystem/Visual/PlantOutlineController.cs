@@ -118,10 +118,10 @@ public class PlantOutlineController : MonoBehaviour
     
         GameObject outlineInstance = Instantiate(outlinePartPrefab, transform);
     
-        // Use the plant's spacing calculation
-        float spacing = 1f / 6f; // Default fallback
+        // Use the plant's corrected spacing
+        float spacing = 1f / 6f; // Default fallback (1 world unit at 6 PPU)
         if (parentPlantGrowth != null) {
-            spacing = parentPlantGrowth.GetCellSpacingInWorldUnits();
+            spacing = parentPlantGrowth.GetCellWorldSpacing();
         }
     
         outlineInstance.transform.localPosition = (Vector2)coord * spacing;
@@ -132,7 +132,7 @@ public class PlantOutlineController : MonoBehaviour
             outlinePartMap.Add(coord, outlineController);
         
             if (debugLogging) {
-                Debug.Log($"[{gameObject.name}] Created outline part at {coord} with spacing {spacing}");
+                Debug.Log($"[{gameObject.name}] Created outline at {coord}, spacing: {spacing:F4} world units");
             }
         }
         else {

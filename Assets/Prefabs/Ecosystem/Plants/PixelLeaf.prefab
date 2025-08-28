@@ -33,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 6, y: 6, z: 6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -146,7 +146,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.01, y: 0.01}
+    oldSize: {x: 0.0625, y: 0.0625}
     newSize: {x: 0.01, y: 0.01}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -168,7 +168,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   foodType: {fileID: 11400000, guid: a4b9d34a97cd8d543b757c7493c54451, type: 2}
   snapToGridOnStart: 0
-  registerAsGridEntity: 1
 --- !u!114 &5386156553378416530
 MonoBehaviour:
   m_ObjectHideFlags: 0

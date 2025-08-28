@@ -38,12 +38,12 @@ public class OutlinePartController : MonoBehaviour
     
         cachedTransform.SetParent(controller.transform, true);
     
-        // Get the plant component and use its spacing
+        // Get the plant's proper spacing
         PlantGrowth plant = controller.GetComponentInParent<PlantGrowth>();
-        float spacing = 1f / 6f; // Default fallback (1 world unit at 6 PPU)
+        float spacing = 1f; // Default fallback
     
         if (plant != null) {
-            spacing = plant.GetCellSpacingInWorldUnits();
+            spacing = plant.GetCellWorldSpacing();
         }
     
         cachedTransform.localPosition = (Vector2)myCoord * spacing;

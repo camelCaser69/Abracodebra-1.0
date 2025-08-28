@@ -84,19 +84,20 @@ public class PlantCellManager
     GameObject prefab = GetPrefabForType(cellType);
     if (prefab == null) return null;
     
-    // Calculate position using the plant's pixel-based spacing
-    float spacing = plant.GetCellSpacingInWorldUnits();
+    // Use the plant's corrected spacing calculation
+    float spacing = plant.GetCellWorldSpacing();
     Vector2 localOffset = (Vector2)coords * spacing;
     Vector3 worldPos = plant.transform.position + (Vector3)localOffset;
     
-    // Ensure pixel-perfect positioning if needed
+    // Apply pixel-perfect snapping if available
+    // Ensure pixel-perfect positioning at current PPU
     if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
         float pixelSize = 1f / ResolutionManager.Instance.CurrentPPU;
         worldPos.x = Mathf.Round(worldPos.x / pixelSize) * pixelSize;
         worldPos.y = Mathf.Round(worldPos.y / pixelSize) * pixelSize;
     }
     
-    // Instantiate the cell
+    // Create the cell GameObject
     GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
     instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
     
@@ -108,7 +109,7 @@ public class PlantCellManager
         }
     }
     
-    // Set up PlantCell component
+    // Setup PlantCell component
     PlantCell cellComp = instance.GetComponent<PlantCell>();
     if (cellComp == null) {
         cellComp = instance.AddComponent<PlantCell>();
@@ -117,7 +118,7 @@ public class PlantCellManager
     cellComp.GridCoord = coords;
     cellComp.CellType = cellType;
     
-    // Register the cell
+    // Register in collections
     cells[coords] = cellType;
     activeCellGameObjects.Add(instance);
     
@@ -135,7 +136,7 @@ public class PlantCellManager
         }
     }
     
-    // Register visual effects
+    // Register visual components
     plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
     plant.VisualManager.RegisterOutlineForCell(instance, cellType.ToString());
     

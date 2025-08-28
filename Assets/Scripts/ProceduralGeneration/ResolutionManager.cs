@@ -25,11 +25,31 @@ namespace WegoSystem
         [SerializeField] private MapConfiguration mapConfig;
 
         [Header("Profiles")]
-        [SerializeField] private ResolutionProfile[] profiles = new[]
-        {
-            new ResolutionProfile { name = "Pixel Perfect (Native)", resolution = new Vector2Int(320, 180), pixelsPerUnit = 6, cameraZoomMultiplier = 1f },
-            new ResolutionProfile { name = "HD Ready (2x)", resolution = new Vector2Int(640, 360), pixelsPerUnit = 12, cameraZoomMultiplier = 1f },
-            new ResolutionProfile { name = "Full HD (4x)", resolution = new Vector2Int(1280, 720), pixelsPerUnit = 24, cameraZoomMultiplier = 1f }
+        [SerializeField] ResolutionProfile[] profiles = {
+            new ResolutionProfile { 
+                name = "Pixel Perfect 320x180", 
+                resolution = new Vector2Int(320, 180), 
+                pixelsPerUnit = 16, 
+                cameraZoomMultiplier = 1f 
+            },
+            new ResolutionProfile { 
+                name = "HD 640x360", 
+                resolution = new Vector2Int(640, 360), 
+                pixelsPerUnit = 16, 
+                cameraZoomMultiplier = 1f 
+            },
+            new ResolutionProfile { 
+                name = "Full HD 1280x720", 
+                resolution = new Vector2Int(1280, 720), 
+                pixelsPerUnit = 16, 
+                cameraZoomMultiplier = 1f 
+            },
+            new ResolutionProfile { 
+                name = "4K 2560x1440", 
+                resolution = new Vector2Int(2560, 1440), 
+                pixelsPerUnit = 16, 
+                cameraZoomMultiplier = 1f 
+            }
         };
 
         [Tooltip("The profile that will be applied on game start and by the editor button.")]

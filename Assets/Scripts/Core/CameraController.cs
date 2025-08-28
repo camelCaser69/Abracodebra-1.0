@@ -129,6 +129,10 @@ namespace WegoSystem
         public void OnResolutionChanged()
         {
             CalculateCameraBounds();
+            var zoomController = GetComponent<CameraZoomController>();
+            if (zoomController != null) {
+                zoomController.StoreBaseSize();
+            }
         }
     }
 }
