@@ -12,14 +12,10 @@ namespace Abracodabra.Genes
         public PlantGrowth plantGrowth;
         public PlantGeneRuntimeState runtimeState;
 
-        public float tickInterval = 1f;
-        public bool isPaused = false;
+        private IGeneEventBus eventBus;
+        private IDeterministicRandom random;
 
-        Coroutine executionCoroutine;
-        IGeneEventBus eventBus;
-        IDeterministicRandom random;
-
-        void Awake()
+        private void Awake()
         {
             eventBus = GeneServices.Get<IGeneEventBus>();
             random = GeneServices.Get<IDeterministicRandom>();
@@ -31,86 +27,65 @@ namespace Abracodabra.Genes
             }
         }
 
-        void Start()
+        private void Start()
         {
             if (plantGrowth == null)
             {
                 plantGrowth = GetComponent<PlantGrowth>();
             }
         }
-        
+
         public void InitializeWithTemplate(SeedTemplate template)
         {
             runtimeState = template.CreateRuntimeState();
-            StartExecution();
         }
 
-        public void StartExecution()
+        public void InitializeWithTemplate(PlantGeneRuntimeState state)
         {
+            this.runtimeState = state;
             if (runtimeState == null || runtimeState.activeSequence == null || runtimeState.activeSequence.Count == 0)
             {
                 Debug.LogWarning($"Plant '{plantGrowth.name}' has no active gene sequence. Executor will remain idle.", this);
-                if (executionCoroutine != null)
-                {
-                    StopCoroutine(executionCoroutine);
-                    executionCoroutine = null;
-                }
+            }
+        }
+
+        public void OnTickUpdate(int currentTick)
+        {
+            if (runtimeState == null || runtimeState.template == null || plantGrowth == null)
+            {
                 return;
             }
 
-            if (executionCoroutine != null)
+            if (plantGrowth.CurrentState != PlantState.Mature)
             {
-                StopCoroutine(executionCoroutine);
+                return;
             }
 
-            executionCoroutine = StartCoroutine(ExecutionLoop());
-        }
-
-        IEnumerator ExecutionLoop()
-        {
-            yield return null;
-
-            while (true)
+            var energySystem = plantGrowth.EnergySystem;
+            if (energySystem == null)
             {
-                yield return new WaitForSeconds(tickInterval);
+                return;
+            }
 
-                if (isPaused || runtimeState == null || runtimeState.template == null || plantGrowth == null)
-                {
-                    continue;
-                }
-                
-                if (plantGrowth.CurrentState != PlantState.Mature)
-                {
-                    continue;
-                }
+            if (runtimeState.rechargeTicksRemaining > 0)
+            {
+                runtimeState.rechargeTicksRemaining--;
+                return;
+            }
+            
+            // This is the core execution logic, now running once per tick
+            if (TryExecuteCurrentSlot())
+            {
+                runtimeState.currentPosition++;
 
-                var energySystem = plantGrowth.EnergySystem;
-                if (energySystem == null)
+                if (runtimeState.currentPosition >= runtimeState.activeSequence.Count)
                 {
-                    continue;
-                }
-                
-                // REMOVED: runtimeState.currentEnergy = energySystem.CurrentEnergy;
-
-                if (runtimeState.rechargeTicksRemaining > 0)
-                {
-                    runtimeState.rechargeTicksRemaining--;
-                    continue;
-                }
-
-                if (TryExecuteCurrentSlot())
-                {
-                    runtimeState.currentPosition++;
-
-                    if (runtimeState.currentPosition >= runtimeState.activeSequence.Count)
-                    {
-                        OnSequenceComplete();
-                    }
+                    OnSequenceComplete();
                 }
             }
         }
 
-        bool TryExecuteCurrentSlot()
+        private bool TryExecuteCurrentSlot()
         {
             if (runtimeState.currentPosition >= runtimeState.activeSequence.Count)
             {
@@ -118,16 +93,25 @@ namespace Abracodabra.Genes
             }
 
             var slot = runtimeState.activeSequence[runtimeState.currentPosition];
+            
+            // Handle empty slots
             if (!slot.HasContent)
             {
-                return true;
+                return true; // Skip empty slot, advance sequence
             }
-
+            
+            // Handle execution delay
+            if (slot.delayTicksRemaining > 0)
+            {
+                slot.delayTicksRemaining--;
+                return false; // Still waiting, do not advance sequence
+            }
+            
             var activeGene = slot.activeInstance?.GetGene<ActiveGene>();
             if (activeGene == null)
             {
                 Debug.LogError($"Active gene instance at sequence position {runtimeState.currentPosition} has a null or invalid gene reference! Skipping slot.", this);
-                return true;
+                return true; // Skip invalid slot, advance sequence
             }
 
             float energyCost = slot.GetEnergyCost();
@@ -140,9 +124,13 @@ namespace Abracodabra.Genes
                     GeneId = activeGene.GUID,
                     Reason = $"Insufficient energy. Has {energySystem.CurrentEnergy}, needs {energyCost}."
                 });
-                return false; 
+                return false; // Not enough energy, do not advance sequence
             }
-
+            
+            // If we have reached this point, we will execute the gene.
+            energySystem.SpendEnergy(energyCost);
+            slot.isExecuting = true;
+            
             var context = new ActiveGeneContext
             {
                 plant = plantGrowth,
@@ -166,24 +154,23 @@ namespace Abracodabra.Genes
                     Debug.LogWarning($"A modifier gene in the slot at position {runtimeState.currentPosition} is missing or invalid.", this);
                 }
             }
-
-            energySystem.SpendEnergy(energyCost);
-            // REMOVED: runtimeState.currentEnergy = energySystem.CurrentEnergy;
-            slot.isExecuting = true;
-
-            if (activeGene.executionDelay > 0)
+            
+            // Check for delay and schedule it, otherwise execute immediately
+            if (activeGene.executionDelayTicks > 0)
             {
-                StartCoroutine(DelayedExecution(activeGene, context, slot, energyCost));
+                slot.delayTicksRemaining = activeGene.executionDelayTicks;
+                // We still return true here because the action has *started* and energy has been spent.
+                // The delay check at the top of the method will handle the waiting period.
             }
             else
             {
-                PerformExecutionLogic(activeGene, context, slot, energyCost);
+                PerformExecutionLogic(activeGene, context, slot);
             }
 
-            return true;
+            return true; // Execution successful, advance sequence
         }
 
-        void PerformExecutionLogic(ActiveGene activeGene, ActiveGeneContext context, RuntimeSequenceSlot slot, float energyCost)
+        private void PerformExecutionLogic(ActiveGene activeGene, ActiveGeneContext context, RuntimeSequenceSlot slot)
         {
             activeGene.Execute(context);
 
@@ -201,23 +188,14 @@ namespace Abracodabra.Genes
                 Gene = activeGene,
                 SequencePosition = context.sequencePosition,
                 Success = true,
-                EnergyCost = energyCost
+                EnergyCost = slot.GetEnergyCost()
             });
 
             StartCoroutine(ClearExecutionFlag(slot));
         }
 
-        IEnumerator DelayedExecution(ActiveGene activeGene, ActiveGeneContext context, RuntimeSequenceSlot slot, float energyCost)
-        {
-            yield return new WaitForSeconds(activeGene.executionDelay);
-
-            if (plantGrowth != null && plantGrowth.gameObject != null)
-            {
-                PerformExecutionLogic(activeGene, context, slot, energyCost);
-            }
-        }
-
-        IEnumerator ClearExecutionFlag(RuntimeSequenceSlot slot)
+        // This small coroutine can remain as it's for a minor visual effect and doesn't affect game logic timing.
+        private IEnumerator ClearExecutionFlag(RuntimeSequenceSlot slot)
         {
             yield return new WaitForSeconds(0.5f);
             if(slot != null)
@@ -226,7 +204,7 @@ namespace Abracodabra.Genes
             }
         }
 
-        void OnSequenceComplete()
+        private void OnSequenceComplete()
         {
             var energySystem = plantGrowth.EnergySystem;
 
@@ -240,15 +218,7 @@ namespace Abracodabra.Genes
             runtimeState.rechargeTicksRemaining = runtimeState.template.baseRechargeTime;
         }
 
-        public void PauseExecution() => isPaused = true;
-        public void ResumeExecution() => isPaused = false;
-
-        void OnDestroy()
-        {
-            if (executionCoroutine != null)
-            {
-                StopCoroutine(executionCoroutine);
-            }
-        }
+        public void PauseExecution() { /* Deprecated */ }
+        public void ResumeExecution() { /* Deprecated */ }
     }
 }

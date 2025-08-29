@@ -5,6 +5,7 @@ using Abracodabra.Genes.Templates;
 
 namespace Abracodabra.Genes.Runtime
 {
+    [Serializable]
     public class RuntimeSequenceSlot
     {
         public RuntimeGeneInstance activeInstance;
@@ -13,6 +14,7 @@ namespace Abracodabra.Genes.Runtime
 
         [NonSerialized] public bool isHighlighted;
         [NonSerialized] public bool isExecuting;
+        [NonSerialized] public int delayTicksRemaining = 0; // For tick-based delays
 
         public bool HasContent => activeInstance != null;
 
@@ -25,7 +27,6 @@ namespace Abracodabra.Genes.Runtime
             foreach (var modEntry in template.modifiers)
             {
                 if (modEntry?.gene == null) continue;
-                // Create instance and set the power multiplier from the template
                 var instance = new RuntimeGeneInstance(modEntry.gene);
                 instance.SetValue("power_multiplier", modEntry.powerMultiplier);
                 modifierInstances.Add(instance);
@@ -35,7 +36,6 @@ namespace Abracodabra.Genes.Runtime
             foreach (var payloadEntry in template.payloads)
             {
                 if (payloadEntry?.gene == null) continue;
-                // Create instance and set the power multiplier from the template
                 var instance = new RuntimeGeneInstance(payloadEntry.gene);
                 instance.SetValue("power_multiplier", payloadEntry.powerMultiplier);
                 payloadInstances.Add(instance);

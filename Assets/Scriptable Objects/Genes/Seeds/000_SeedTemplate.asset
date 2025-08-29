@@ -42,7 +42,7 @@ MonoBehaviour:
   leafDensity: 2
   leafGap: 2
   baseRechargeTime: 3
-  energyRegenRate: 10
+  energyRegenRate: 1
   maxEnergy: 40
   isUnlocked: 1
   unlockRequirements: []
