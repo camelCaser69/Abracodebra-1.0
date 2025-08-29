@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
+using System.Linq;
+using System.Collections.Generic;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Components;
-using System.Collections.Generic;
-using System.Linq;
-using System.Collections;
 
 namespace Abracodabra.Genes.Implementations
 {
+    [CreateAssetMenu(fileName = "NewBasicFruitGene", menuName = "Abracodabra/Genes/Active/Basic Fruit Gene")]
     public class BasicFruitGene : ActiveGene
     {
         public GameObject fruitPrefab;
@@ -28,7 +28,7 @@ namespace Abracodabra.Genes.Implementations
 
             if (fruitPoints.Length == 0)
             {
-                Debug.LogWarning($"Plant '{context.plant.name}' has no fruit spawn points. Cannot spawn fruit.", context.plant);
+                Debug.LogWarning($"Plant '{context.plant.name}' has no empty spaces for fruit spawning. Plant may be too crowded.", context.plant);
                 return;
             }
 
@@ -42,12 +42,17 @@ namespace Abracodabra.Genes.Implementations
                 }
             }
 
+            // Spawn fruits at available empty positions
             int count = Mathf.Min(fruitCount, fruitPoints.Length);
+
+            // Optional: Randomize spawn point selection for variety
+            List<Transform> shuffledPoints = fruitPoints.OrderBy(x => Random.value).ToList();
+
             for (int i = 0; i < count; i++)
             {
                 GameObject fruitObj = effectPool != null
-                    ? effectPool.GetEffect(fruitPrefab, fruitPoints[i].position, Quaternion.identity)
-                    : Instantiate(fruitPrefab, fruitPoints[i].position, Quaternion.identity);
+                    ? effectPool.GetEffect(fruitPrefab, shuffledPoints[i].position, Quaternion.identity)
+                    : Instantiate(fruitPrefab, shuffledPoints[i].position, Quaternion.identity);
 
                 Fruit fruit = fruitObj.GetComponent<Fruit>();
                 if (fruit != null)
@@ -81,7 +86,7 @@ namespace Abracodabra.Genes.Implementations
 
         public override bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
         {
-            return true;
+            return true; // BasicFruitGene can spawn empty fruit
         }
 
         public override string GetTooltip(GeneTooltipContext context)

@@ -1,20 +1,24 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using System.Collections;
 using WegoSystem;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
-using System.Linq;
 
-namespace Abracodabra.Genes {
-    public enum PlantState {
+namespace Abracodabra.Genes
+{
+    public enum PlantState
+    {
         Initializing,
         Growing,
         Mature
     }
 
-    public class PlantGrowth : MonoBehaviour, ITickUpdateable {
+    public class PlantGrowth : MonoBehaviour, ITickUpdateable
+    {
         public static readonly List<PlantGrowth> AllActivePlants = new List<PlantGrowth>();
 
         public SeedTemplate seedTemplate { get; set; }
@@ -26,39 +30,44 @@ namespace Abracodabra.Genes {
         public PlantEnergySystem EnergySystem { get; set; }
         public PlantVisualManager VisualManager { get; set; }
 
-        // ===== FIXED SPACING SYSTEM =====
-        [Header("Plant Grid Settings")]
+        [Header("Cell Configuration")]
         [SerializeField] public float desiredPixelsPerCell = 1f; // Each cell = 1 "fake pixel"
-        
-        // This property calculates the correct world spacing based on current PPU
-        public float GetCellWorldSpacing() {
-            if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
+
+        public float GetCellWorldSpacing()
+        {
+            if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0)
+            {
                 return desiredPixelsPerCell / ResolutionManager.Instance.CurrentPPU;
             }
             return desiredPixelsPerCell / 16f; // Fallback: 1/16 world unit per cell
         }
-        
-        // Backward compatibility properties
+
         public float cellSpacingInPixels => desiredPixelsPerCell;
         public float cellSpacing => GetCellWorldSpacing();
-        // ===== END SPACING SYSTEM =====
 
-        [SerializeField] GameObject seedCellPrefab;
-        [SerializeField] GameObject stemCellPrefab;
-        [SerializeField] GameObject leafCellPrefab;
-        [SerializeField] GameObject berryCellPrefab;
+        [SerializeField] private GameObject seedCellPrefab;
+        [SerializeField] private GameObject stemCellPrefab;
+        [SerializeField] private GameObject leafCellPrefab;
+        [SerializeField] private GameObject berryCellPrefab;
 
-        [SerializeField] PlantShadowController shadowController;
-        [SerializeField] PlantOutlineController outlineController;
-        [SerializeField] GameObject outlinePartPrefab;
-        [SerializeField] bool enableOutline = true;
-        [SerializeField] FoodType leafFoodType;
+        [Header("Visuals & Food")]
+        [SerializeField] private PlantShadowController shadowController;
+        [SerializeField] private PlantOutlineController outlineController;
+        [SerializeField] private GameObject outlinePartPrefab;
+        [SerializeField] private bool enableOutline = true;
+        [SerializeField] private FoodType leafFoodType;
 
+        [Header("Fruit Spawning")]
+        [SerializeField] private bool allowFruitsAroundLeaves = false;
+        [SerializeField] private int fruitSearchRadius = 2;
+
+        [Header("Passive Stat Multipliers")]
         public float growthSpeedMultiplier = 1f;
         public float energyGenerationMultiplier = 1f;
         public float energyStorageMultiplier = 1f;
         public float fruitYieldMultiplier = 1f;
 
+        [Header("Base Growth Parameters")]
         public float baseGrowthChance;
         public int minHeight;
         public int maxHeight;
@@ -67,9 +76,10 @@ namespace Abracodabra.Genes {
 
         public PlantState CurrentState { get; set; } = PlantState.Initializing;
 
-        IDeterministicRandom _deterministicRandom;
+        private IDeterministicRandom _deterministicRandom;
 
-        void Awake() {
+        void Awake()
+        {
             AllActivePlants.Add(this);
 
             CellManager = new PlantCellManager(this, seedCellPrefab, stemCellPrefab, leafCellPrefab, berryCellPrefab, leafFoodType);
@@ -78,70 +88,71 @@ namespace Abracodabra.Genes {
             VisualManager = new PlantVisualManager(this, shadowController, null, outlineController, outlinePartPrefab, enableOutline);
 
             _deterministicRandom = GeneServices.Get<IDeterministicRandom>();
-            if (_deterministicRandom == null) {
+            if (_deterministicRandom == null)
+            {
                 Debug.LogError($"[{nameof(PlantGrowth)}] could not retrieve IDeterministicRandom service! Growth will be non-deterministic.", this);
             }
         }
 
-        void OnDestroy() {
+        void OnDestroy()
+        {
             AllActivePlants.Remove(this);
             var tickManager = TickManager.Instance;
-            if (tickManager != null) {
+            if (tickManager != null)
+            {
                 tickManager.UnregisterTickUpdateable(this);
             }
         }
 
         public void InitializeWithState(PlantGeneRuntimeState state)
-{
-    if (state == null || state.template == null)
-    {
-        Debug.LogError($"Cannot initialize plant on '{gameObject.name}': Provided state or its template is null.", this);
-        Destroy(gameObject);
-        return;
-    }
+        {
+            if (state == null || state.template == null)
+            {
+                Debug.LogError($"Cannot initialize plant on '{gameObject.name}': Provided state or its template is null.", this);
+                Destroy(gameObject);
+                return;
+            }
 
-    this.seedTemplate = state.template;
-    this.geneRuntimeState = state;
+            this.seedTemplate = state.template;
+            this.geneRuntimeState = state;
 
-    this.baseGrowthChance = seedTemplate.baseGrowthChance;
-    this.minHeight = seedTemplate.minHeight;
-    this.maxHeight = seedTemplate.maxHeight;
-    this.leafDensity = seedTemplate.leafDensity;
-    this.leafGap = seedTemplate.leafGap;
+            this.baseGrowthChance = seedTemplate.baseGrowthChance;
+            this.minHeight = seedTemplate.minHeight;
+            this.maxHeight = seedTemplate.maxHeight;
+            this.leafDensity = seedTemplate.leafDensity;
+            this.leafGap = seedTemplate.leafGap;
 
-    sequenceExecutor = GetComponent<PlantSequenceExecutor>();
-    if (sequenceExecutor == null)
-    {
-        sequenceExecutor = gameObject.AddComponent<PlantSequenceExecutor>();
-    }
-    sequenceExecutor.plantGrowth = this;
+            sequenceExecutor = GetComponent<PlantSequenceExecutor>();
+            if (sequenceExecutor == null)
+            {
+                sequenceExecutor = gameObject.AddComponent<PlantSequenceExecutor>();
+            }
+            sequenceExecutor.plantGrowth = this;
 
-    GrowthLogic.CalculateAndApplyPassiveStats();
+            GrowthLogic.CalculateAndApplyPassiveStats();
 
-    EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
-    EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
-    EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
+            EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
+            EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
+            EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
 
-    sequenceExecutor.runtimeState = this.geneRuntimeState;
-    sequenceExecutor.StartExecution();
+            sequenceExecutor.runtimeState = this.geneRuntimeState;
+            sequenceExecutor.StartExecution();
 
-    CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
-    
-    // Keep in Initializing state briefly to prevent immediate growth
-    CurrentState = PlantState.Initializing;
-    
-    // Start a coroutine to transition to Growing state after a short delay
-    StartCoroutine(DelayedGrowthStart());
+            CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
 
-    if (TickManager.Instance != null)
-    {
-        TickManager.Instance.RegisterTickUpdateable(this);
-    }
+            CurrentState = PlantState.Initializing;
 
-    Debug.Log($"Plant '{gameObject.name}' initialized from template '{seedTemplate.templateName}'. State: {CurrentState}");
-}
+            StartCoroutine(DelayedGrowthStart());
 
-        private System.Collections.IEnumerator DelayedGrowthStart()
+            if (TickManager.Instance != null)
+            {
+                TickManager.Instance.RegisterTickUpdateable(this);
+            }
+
+            Debug.Log($"Plant '{gameObject.name}' initialized from template '{seedTemplate.templateName}'. State: {CurrentState}");
+        }
+
+        private IEnumerator DelayedGrowthStart()
         {
             yield return new WaitForSeconds(0.5f);
             CurrentState = PlantState.Growing;
@@ -151,8 +162,7 @@ namespace Abracodabra.Genes {
         public void OnTickUpdate(int currentTick)
         {
             EnergySystem.OnTickUpdate();
-    
-            // Update the visual display on each tick
+
             if (VisualManager != null)
             {
                 VisualManager.UpdateUI();
@@ -160,7 +170,7 @@ namespace Abracodabra.Genes {
 
             if (CurrentState == PlantState.Growing)
             {
-                float randomValue = (_deterministicRandom != null) ? 
+                float randomValue = (_deterministicRandom != null) ?
                     _deterministicRandom.Range(0f, 1f) : Random.value;
                 if (randomValue < baseGrowthChance * growthSpeedMultiplier)
                 {
@@ -192,11 +202,7 @@ namespace Abracodabra.Genes {
                         if (!CellManager.HasCellAt(leafPos))
                         {
                             var leafObj = CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos);
-                            if (leafObj != null)
-                            {
-                                // Add a component to mark fruit spawn points instead of using tags
-                                leafObj.AddComponent<FruitSpawnPoint>();
-                            }
+                            // REMOVED: No longer marking leaves as fruit spawn points
                         }
                     }
                 }
@@ -207,38 +213,153 @@ namespace Abracodabra.Genes {
             }
         }
 
-        public void HandleBeingEaten(AnimalController eater, PlantCell eatenCell) {
+        public void HandleBeingEaten(AnimalController eater, PlantCell eatenCell)
+        {
             Debug.Log($"{eater.SpeciesName} ate cell at {eatenCell.GridCoord} on plant {name}");
         }
 
-        public void ReportCellDestroyed(Vector2Int coord) {
+        public void ReportCellDestroyed(Vector2Int coord)
+        {
             CellManager?.ReportCellDestroyed(coord);
         }
 
-        public GameObject GetCellGameObjectAt(Vector2Int coord) {
+        public GameObject GetCellGameObjectAt(Vector2Int coord)
+        {
             return CellManager?.GetCellGameObjectAt(coord);
         }
 
         public Transform[] GetFruitSpawnPoints()
         {
-            // Look for FruitSpawnPoint components instead of tags
-            var spawnPoints = GetComponentsInChildren<FruitSpawnPoint>();
-            return spawnPoints.Select(sp => sp.transform).ToArray();
+            List<Transform> spawnPoints = new List<Transform>();
+
+            // Get all positions we want to spawn fruit around
+            List<Vector2Int> sourcePositions = GetFruitSourcePositions();
+
+            // Find empty positions around our source positions
+            HashSet<Vector2Int> emptyPositions = FindEmptyPositionsAround(sourcePositions);
+
+            // Create temporary spawn points at empty positions
+            foreach (Vector2Int emptyPos in emptyPositions)
+            {
+                GameObject tempSpawnPoint = CreateTemporarySpawnPoint(emptyPos);
+                if (tempSpawnPoint != null)
+                {
+                    spawnPoints.Add(tempSpawnPoint.transform);
+                }
+            }
+
+            // Clean up spawn points after a short delay
+            if (spawnPoints.Count > 0)
+            {
+                StartCoroutine(CleanupTemporarySpawnPoints(spawnPoints, 0.1f));
+            }
+
+            return spawnPoints.ToArray();
         }
 
-#if UNITY_EDITOR
-        void OnDrawGizmos() {
+        private List<Vector2Int> GetFruitSourcePositions()
+        {
+            List<Vector2Int> sourcePositions = new List<Vector2Int>();
+
+            // Always include stem positions
+            foreach (var kvp in CellManager.cells)
+            {
+                if (kvp.Value == PlantCellType.Stem)
+                {
+                    sourcePositions.Add(kvp.Key);
+                }
+            }
+
+            // Optionally include leaf positions (for future flexibility)
+            if (allowFruitsAroundLeaves)
+            {
+                foreach (var kvp in CellManager.cells)
+                {
+                    if (kvp.Value == PlantCellType.Leaf)
+                    {
+                        sourcePositions.Add(kvp.Key);
+                    }
+                }
+            }
+
+            return sourcePositions;
+        }
+
+        private HashSet<Vector2Int> FindEmptyPositionsAround(List<Vector2Int> sourcePositions)
+        {
+            HashSet<Vector2Int> emptyPositions = new HashSet<Vector2Int>();
+
+            foreach (Vector2Int sourcePos in sourcePositions)
+            {
+                // Check positions in a radius around each source
+                for (int x = -fruitSearchRadius; x <= fruitSearchRadius; x++)
+                {
+                    for (int y = -fruitSearchRadius; y <= fruitSearchRadius; y++)
+                    {
+                        // Skip the source position itself
+                        if (x == 0 && y == 0) continue;
+
+                        Vector2Int checkPos = sourcePos + new Vector2Int(x, y);
+
+                        // Add if this position is empty
+                        if (!CellManager.HasCellAt(checkPos))
+                        {
+                            // Optional: Add distance check to prefer closer positions
+                            float distance = Vector2Int.Distance(sourcePos, checkPos);
+                            if (distance <= fruitSearchRadius)
+                            {
+                                emptyPositions.Add(checkPos);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return emptyPositions;
+        }
+
+        private GameObject CreateTemporarySpawnPoint(Vector2Int gridPos)
+        {
+            float spacing = GetCellWorldSpacing();
+            Vector3 worldPos = transform.position + new Vector3(gridPos.x * spacing, gridPos.y * spacing, 0);
+
+            GameObject spawnPoint = new GameObject($"TempFruitSpawnPoint_{gridPos.x}_{gridPos.y}");
+            spawnPoint.transform.position = worldPos;
+            spawnPoint.transform.SetParent(transform);
+
+            // Add marker component for identification
+            spawnPoint.AddComponent<TemporaryFruitSpawnMarker>();
+
+            return spawnPoint;
+        }
+
+        private IEnumerator CleanupTemporarySpawnPoints(List<Transform> spawnPoints, float delay)
+        {
+            yield return new WaitForSeconds(delay);
+
+            foreach (Transform spawnPoint in spawnPoints)
+            {
+                if (spawnPoint != null && spawnPoint.GetComponent<TemporaryFruitSpawnMarker>() != null)
+                {
+                    Destroy(spawnPoint.gameObject);
+                }
+            }
+        }
+
+        #if UNITY_EDITOR
+        void OnDrawGizmos()
+        {
             if (!Application.isPlaying) return;
             if (CellManager == null || CellManager.cells == null) return;
 
             float spacing = GetCellWorldSpacing();
 
-            // Draw plant cells
-            foreach (var cell in CellManager.cells) {
+            foreach (var cell in CellManager.cells)
+            {
                 Vector2 cellWorldPos = (Vector2)transform.position + (Vector2)cell.Key * spacing;
 
-                // Color code by cell type
-                switch(cell.Value) {
+                switch (cell.Value)
+                {
                     case PlantCellType.Stem:
                         Gizmos.color = new Color(0, 1, 0, 0.5f);
                         break;
@@ -258,18 +379,43 @@ namespace Abracodabra.Genes {
                 Gizmos.DrawWireCube(cellWorldPos, Vector3.one * spacing);
             }
 
-            // Draw tile grid overlay for alignment checking
             Gizmos.color = new Color(0, 1, 1, 0.2f); // Cyan for tile grid
             Vector3Int tilePos = GridPositionManager.Instance?.WorldToGrid(transform.position).ToVector3Int() ?? Vector3Int.zero;
             Vector3 tileWorldPos = GridPositionManager.Instance?.GridToWorld(new GridPosition(tilePos)) ?? transform.position;
             Gizmos.DrawWireCube(tileWorldPos, Vector3.one * 1f); // 1 world unit = 1 tile
 
-            // Show debug info
             UnityEditor.Handles.Label(
                 transform.position + Vector3.up * (maxHeight + 1) * spacing,
                 $"Cell Spacing: {spacing:F4} wu\nPPU: {(ResolutionManager.HasInstance ? ResolutionManager.Instance.CurrentPPU.ToString() : "Unknown")}\nTile Aligned: {Mathf.Approximately(spacing, 1f)}"
             );
         }
-#endif
+
+        private void OnDrawGizmosSelected()
+        {
+            if (!Application.isPlaying || CellManager == null) return;
+
+            // Visualize potential fruit spawn points
+            List<Vector2Int> sourcePositions = GetFruitSourcePositions();
+            HashSet<Vector2Int> emptyPositions = FindEmptyPositionsAround(sourcePositions);
+
+            float spacing = GetCellWorldSpacing();
+
+            // Draw source positions in green
+            Gizmos.color = Color.green;
+            foreach (Vector2Int sourcePos in sourcePositions)
+            {
+                Vector3 worldPos = transform.position + new Vector3(sourcePos.x * spacing, sourcePos.y * spacing, 0);
+                Gizmos.DrawWireSphere(worldPos, spacing * 0.2f);
+            }
+
+            // Draw empty spawn positions in cyan
+            Gizmos.color = Color.cyan;
+            foreach (Vector2Int emptyPos in emptyPositions)
+            {
+                Vector3 worldPos = transform.position + new Vector3(emptyPos.x * spacing, emptyPos.y * spacing, 0);
+                Gizmos.DrawWireCube(worldPos, Vector3.one * spacing * 0.5f);
+            }
+        }
+        #endif
     }
 }

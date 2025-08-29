@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 545,678 → 360,096 chars (34.0% reduction)
-Estimated tokens saved: ~46,395
+Compression Stats: 546,537 → 360,805 chars (34.0% reduction)
+Estimated tokens saved: ~46,433
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -20,188 +20,199 @@ Common using statements (add these back when needed):
 using System;
 
 [Abracodabra.Genes]
-  GeneLibrary (Assets\Scripts\Genes/) L29
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L182
-  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L393
+  FruitSpawnPoint (Assets\Scripts\Genes\Components/) L29
+  GeneLibrary (Assets\Scripts\Genes/) L39
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L192
+  PlantGrowth (Assets\Scripts\PlantSystem\Growth/) L403
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L626
-  Fruit (Assets\Scripts\Genes\Components/) L651
-  NutritionComponent (Assets\Scripts\Genes\Components/) L680
+  Creature (Assets\Scripts\Genes\Components/) L649
+  Fruit (Assets\Scripts\Genes\Components/) L674
+  NutritionComponent (Assets\Scripts\Genes\Components/) L703
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L692
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L738
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L757
-  ModifierGene (Assets\Scripts\Genes\Core/) L769
-  PassiveGene (Assets\Scripts\Genes\Core/) L800
-  PayloadGene (Assets\Scripts\Genes\Core/) L832
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L877
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L898
-  GeneBase (Assets\Scripts\Genes/) L931
+  ActiveGene (Assets\Scripts\Genes\Core/) L715
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L761
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L780
+  ModifierGene (Assets\Scripts\Genes\Core/) L792
+  PassiveGene (Assets\Scripts\Genes\Core/) L823
+  PayloadGene (Assets\Scripts\Genes\Core/) L855
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L900
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L921
+  GeneBase (Assets\Scripts\Genes/) L954
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L1007
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L1090
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L1118
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L1161
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L1030
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L1112
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L1140
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L1183
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L1212
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L1268
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L1400
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L1234
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L1290
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L1422
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L1454
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L1487
-  GeneServices (Assets\Scripts\Genes\Services/) L1585
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L1476
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L1509
+  GeneServices (Assets\Scripts\Genes\Services/) L1607
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L1671
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L1693
 
 [Abracodabra.UI.Genes]
-  GeneSequenceUI (Assets\Scripts\Genes\UI/) L1749
-  GeneSlotUI (Assets\Scripts\Genes\UI/) L1981
-  SequenceRowUI (Assets\Scripts\Genes\UI/) L2204
-  ItemView (Assets\Scripts\PlantSystem\UI/) L2275
+  GeneSequenceUI (Assets\Scripts\Genes\UI/) L1771
+  GeneSlotUI (Assets\Scripts\Genes\UI/) L2003
+  SequenceRowUI (Assets\Scripts\Genes\UI/) L2226
+  ItemView (Assets\Scripts\PlantSystem\UI/) L2297
 
 [Unknown]
-  GameEvent (Assets\Scripts\Core\Events/) L2370
-  GameEventListener (Assets\Scripts\Core\Events/) L2397
-  IGameEventListener (Assets\Scripts\Core\Events/) L2424
-  GeneSystemInitializer (Assets\Scripts\Core/) L2432
-  SortableEntity (Assets\Scripts\Core/) L2446
-  UIManager (Assets\Scripts\Core/) L2513
-  WeatherManager (Assets\Scripts\Core/) L2724
-  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L2924
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L2977
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L3260
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L3346
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L3355
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L3743
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L3890
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L3903
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L3940
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L4250
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L4281
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L4554
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L4647
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L4662
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L4681
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L4765
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L4841
-  FoodType (Assets\Scripts\Ecosystem\Food/) L4907
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L4920
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L4942
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L5185
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L5204
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L5509
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L5538
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L5556
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L5594
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L5642
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L5660
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L5786
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L5897
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L5944
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L5957
-  TileDefinitionEditor (Assets\Scripts\Editor/) L6018
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L6038
-  WaveManagerEditor (Assets\Scripts\Editor/) L6175
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6350
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6375
-  LeafData (Assets\Scripts\PlantSystem\Data/) L6383
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6398
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6437
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6458
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6601
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6659
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L6745
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L6814
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L6963
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7034
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7094
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7226
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7242
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7357
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7512
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7610
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L7711
-  GridSnapStartup (Assets\Scripts\Ticks/) L7950
-  TickDebugMonitor (Assets\Scripts\Ticks/) L8017
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8053
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8111
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8342
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8353
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8382
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8478
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8583
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L8981
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9017
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9183
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9307
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9315
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9344
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L9511
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L9573
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9597
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9617
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9629
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9664
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9839
+  GameEvent (Assets\Scripts\Core\Events/) L2392
+  GameEventListener (Assets\Scripts\Core\Events/) L2419
+  IGameEventListener (Assets\Scripts\Core\Events/) L2446
+  GeneSystemInitializer (Assets\Scripts\Core/) L2454
+  SortableEntity (Assets\Scripts\Core/) L2468
+  UIManager (Assets\Scripts\Core/) L2535
+  WeatherManager (Assets\Scripts\Core/) L2746
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L2946
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L2999
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L3282
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L3368
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L3377
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L3765
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L3912
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L3925
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L3962
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L4272
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L4303
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L4576
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L4669
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L4684
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L4703
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L4787
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L4863
+  FoodType (Assets\Scripts\Ecosystem\Food/) L4929
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L4942
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L4964
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L5207
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L5226
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L5531
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L5560
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L5578
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L5616
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L5664
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L5682
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L5808
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L5919
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L5966
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L5979
+  TileDefinitionEditor (Assets\Scripts\Editor/) L6040
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L6060
+  WaveManagerEditor (Assets\Scripts\Editor/) L6197
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6372
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6397
+  LeafData (Assets\Scripts\PlantSystem\Data/) L6405
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6420
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6459
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6480
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6612
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6670
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L6756
+  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L6856
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7005
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7076
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7136
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7268
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7284
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7399
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7554
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7652
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L7753
+  GridSnapStartup (Assets\Scripts\Ticks/) L7992
+  TickDebugMonitor (Assets\Scripts\Ticks/) L8059
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8095
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8153
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8384
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8395
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8424
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8520
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8625
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9023
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9059
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9225
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9349
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9357
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9386
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L9553
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L9615
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9639
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9659
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9671
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9706
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9881
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L9850
-  CameraZoomController (Assets\Scripts\Core/) L9959
-  InitializationManager (Assets\Scripts\Core/) L10008
-  PixelGridSnapper (Assets\Scripts\Core/) L10056
-  RunManager (Assets\Scripts\Core/) L10089
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L10225
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L10282
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L10418
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L10445
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L10592
-  GridEntity (Assets\Scripts\Ticks/) L10664
-  GridPosition (Assets\Scripts\Ticks/) L10826
-  GridPositionManager (Assets\Scripts\Ticks/) L10927
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11305
-  TickConfiguration (Assets\Scripts\Ticks/) L11449
-  ITickUpdateable (Assets\Scripts\Ticks/) L11532
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11684
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11872
+  CameraController (Assets\Scripts\Core/) L9892
+  CameraZoomController (Assets\Scripts\Core/) L10001
+  InitializationManager (Assets\Scripts\Core/) L10050
+  PixelGridSnapper (Assets\Scripts\Core/) L10098
+  RunManager (Assets\Scripts\Core/) L10131
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L10267
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L10324
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L10460
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L10487
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L10634
+  GridEntity (Assets\Scripts\Ticks/) L10706
+  GridPosition (Assets\Scripts\Ticks/) L10868
+  GridPositionManager (Assets\Scripts\Ticks/) L10969
+  GridRadiusUtility (Assets\Scripts\Ticks/) L11347
+  TickConfiguration (Assets\Scripts\Ticks/) L11491
+  ITickUpdateable (Assets\Scripts\Ticks/) L11574
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11726
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L11914
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12172
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12214
 
 [WegoSystem.Editor']
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L12204
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L12246
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L12245
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L12287
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L12301
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12342
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12460
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L12343
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12384
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12502
 
 [is]
-  GameInitializer (Assets\Scripts\Core/) L12612
+  GameInitializer (Assets\Scripts\Core/) L12654
 
 [issue.]
-  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12635
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L12662
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L12776
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L12824
+  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12677
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L12704
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L12818
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L12866
 
 [namespace]
-  GeneEventBus (Assets\Scripts\Genes\Services/) L12865
+  GeneEventBus (Assets\Scripts\Genes\Services/) L12907
 
 [needs]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12917
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12959
 
 ================================================================================
 SCRIPTS
 ================================================================================
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\Genes\Components\FruitSpawnPoint.cs
+
+﻿using UnityEngine;
+
+namespace Abracodabra.Genes {
+pub cls FruitSpawnPoint : MonoBehaviour {
+}
+}
 
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Genes\GeneLibrary.cs
@@ -688,7 +699,10 @@ sequenceExecutor.runtimeState = this.geneRuntimeState;
 sequenceExecutor.StartExecution();
 
 CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
-CurrentState = PlantState.Growing;
+
+CurrentState = PlantState.Initializing;
+
+StartCoroutine(DelayedGrowthStart());
 
 if (TickManager.Instance != null) {
 TickManager.Instance.RegisterTickUpdateable(this);
@@ -697,11 +711,22 @@ TickManager.Instance.RegisterTickUpdateable(this);
 Debug.Log($"Plant '{gameObject.name}' initialized from template '{seedTemplate.templateName}'. State: {CurrentState}");
 }
 
+System.Collections.IEnumerator DelayedGrowthStart() {
+yield ret new WaitForSeconds(0.5f);
+CurrentState = PlantState.Growing;
+Debug.Log($"Plant '{gameObject.name}' transitioned to Growing state");
+}
+
 pub void OnTickUpdate(int currentTick) {
 EnergySystem.OnTickUpdate();
 
+if (VisualManager != null) {
+VisualManager.UpdateUI();
+}
+
 if (CurrentState == PlantState.Growing) {
-float randomValue = (_deterministicRandom != null) ? _deterministicRandom.Range(0f, 1f) : Random.value;
+float randomValue = (_deterministicRandom != null) ?
+_deterministicRandom.Range(0f, 1f) : Random.value;
 if (randomValue < baseGrowthChance * growthSpeedMultiplier) {
 GrowSomething();
 }
@@ -727,7 +752,7 @@ var leafPos = new Vector2Int(xOffset, leafY);
 if (!CellManager.HasCellAt(leafPos)) {
 var leafObj = CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos);
 if (leafObj != null) {
-leafObj.tag = "FruitSpawn";
+leafObj.AddComponent<FruitSpawnPoint>();
 }
 }
 }
@@ -751,9 +776,8 @@ ret CellManager?.GetCellGameObjectAt(coord);
 }
 
 pub Transform[] GetFruitSpawnPoints() {
-ret GetComponentsInChildren<Transform>()
-.Where(t => t.CompareTag("FruitSpawn"))
-.ToArray();
+var spawnPoints = GetComponentsInChildren<FruitSpawnPoint>();
+ret spawnPoints.Select(sp => sp.transform).ToArray();
 }
 
 #if UNITY_EDITOR
@@ -1188,7 +1212,6 @@ pub RuntimeGeneInstance instance; // The specific instance with its current valu
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Components;
-using System.Collections.Generic; // Required for List
 
 namespace Abracodabra.Genes.Implementations {
 pub cls BasicFruitGene : ActiveGene {
@@ -1207,7 +1230,7 @@ var effectPool = GeneServices.Get<IGeneEffectPool>();
 Transform[] fruitPoints = context.plant.GetFruitSpawnPoints();
 
 if (fruitPoints.Length == 0) {
-Debug.LogWarning($"Plant '{context.plant.name}' has no spawn points tagged 'FruitSpawn'. Cannot spawn fruit.", context.plant);
+Debug.LogWarning($"Plant '{context.plant.name}' has no fruit spawn points. Cannot spawn fruit.", context.plant);
 return;
 }
 
@@ -6709,46 +6732,35 @@ GameObject prefab = GetPrefabForType(cellType);
 if (prefab == null) ret null;
 
 float spacing = plant.GetCellWorldSpacing();
-Vector2 localOffset = (Vector2)coords * spacing;
-Vector3 worldPos = plant.transform.position + (Vector3)localOffset;
+Vector3 cellLocalPos = new Vector3(coords.x * spacing, coords.y * spacing, 0);
+Vector3 cellWorldPos = plant.transform.position + cellLocalPos;
 
-if (ResolutionManager.HasInstance && ResolutionManager.Instance.CurrentPPU > 0) {
-float pixelSize = 1f / ResolutionManager.Instance.CurrentPPU;
-worldPos.x = Mathf.Round(worldPos.x / pixelSize) * pixelSize;
-worldPos.y = Mathf.Round(worldPos.y / pixelSize) * pixelSize;
+GameObject instance = UnityEngine.Object.Instantiate(prefab, cellWorldPos, Quaternion.identity, plant.transform);
+
+PlantCell cellComponent = instance.GetComponent<PlantCell>();
+if (cellComponent == null) {
+cellComponent = instance.AddComponent<PlantCell>();
 }
 
-GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, plant.transform);
-instance.name = $"{plant.gameObject.name}_{cellType}_{coords.x}_{coords.y}";
-
-if (cellType != PlantCellType.Seed) {
-GridEntity partGridEntity = instance.GetComponent<GridEntity>();
-if (partGridEntity != null) {
-Object.Destroy(partGridEntity);
-}
-}
-
-PlantCell cellComp = instance.GetComponent<PlantCell>();
-if (cellComp == null) {
-cellComp = instance.AddComponent<PlantCell>();
-}
-cellComp.ParentPlantGrowth = plant;
-cellComp.GridCoord = coords;
-cellComp.CellType = cellType;
+cellComponent.ParentPlantGrowth = plant;
+cellComponent.GridCoord = coords;
+cellComponent.CellType = cellType;
 
 cells[coords] = cellType;
 activeCellGameObjects.Add(instance);
 
-if (cellType == PlantCellType.Leaf) {
+if (cellType == PlantCellType.Seed) {
+RootCellInstance = instance;
+}
+else if (cellType == PlantCellType.Leaf) {
 LeafDataList.Add(new LeafData(coords, true));
-instance.tag = "FruitSpawn";
 
-if (_leafFoodType != null) {
-FoodItem foodItem = instance.AddComponent<FoodItem>();
-foodItem.foodType = _leafFoodType;
+var food = instance.GetComponent<FoodItem>();
+if (food != null) {
+food.foodType = _leafFoodType;
 }
 else {
-Debug.LogWarning($"[{plant.gameObject.name}] Leaf Food Type not assigned in PlantGrowth inspector.", plant);
+Debug.LogWarning($"[{plant.gameObject.name}] Leaf prefab is missing FoodItem component.", plant);
 }
 }
 
@@ -6922,7 +6934,7 @@ break;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\Growth\PlantVisualManager.cs
 
-﻿// REWORKED FILE: Assets/Scripts/PlantSystem/Growth/PlantVisualManager.cs
+﻿using UnityEngine;
 using Abracodabra.Genes;
 using TMPro;
 
@@ -6933,7 +6945,7 @@ ro GameObject shadowPartPrefab;
 ro bool enableOutline;
 pub PlantOutlineController OutlineController { get; set; }
 ro GameObject outlinePartPrefab;
-ro TMP_Text energyText;
+TMP_Text energyText;
 
 pub PlantVisualManager(PlantGrowth plant, PlantShadowController shadowController, GameObject shadowPartPrefab, PlantOutlineController outlineController, GameObject outlinePartPrefab, bool enableOutline) {
 this.plant = plant;
@@ -6942,29 +6954,56 @@ this.shadowPartPrefab = shadowPartPrefab;
 this.OutlineController = outlineController;
 this.outlinePartPrefab = outlinePartPrefab;
 this.enableOutline = enableOutline;
-this.energyText = plant.GetComponentInChildren<TMP_Text>(true);
+
+FindEnergyTextComponent();
+}
+
+void FindEnergyTextComponent() {
+energyText = plant.GetComponentInChildren<TMP_Text>(true);
+
+if (energyText == null) {
+GameObject textObj = new GameObject("EnergyText");
+textObj.transform.SetParent(plant.transform);
+textObj.transform.localPosition = new Vector3(0, -0.5f, 0);
+
+energyText = textObj.AddComponent<TextMeshPro>();
+energyText.text = "0/0";
+energyText.fontSize = 2;
+energyText.alignment = TextAlignmentOptions.Center;
+
+MeshRenderer textRenderer = energyText.GetComponent<MeshRenderer>();
+if (textRenderer != null) {
+textRenderer.sortingOrder = 100; // Ensure it renders on top
+}
+}
 }
 
 pub void RegisterShadowForCell(GameObject cellInstance, string cellTypeName) {
-if (shadowController != null && shadowPartPrefab != null && cellInstance != null && cellInstance.TryGetComponent<SpriteRenderer>(out var partRenderer)) {
+if (shadowController != null && shadowPartPrefab != null && cellInstance != null &&
+cellInstance.TryGetComponent<SpriteRenderer>(out var partRenderer)) {
 shadowController.RegisterPlantPart(partRenderer, shadowPartPrefab);
 }
 }
 
 pub void UnregisterShadowForCell(GameObject cellInstance) {
-if (shadowController != null && cellInstance != null && cellInstance.TryGetComponent<SpriteRenderer>(out var partRenderer)) {
+if (shadowController != null && cellInstance != null &&
+cellInstance.TryGetComponent<SpriteRenderer>(out var partRenderer)) {
 shadowController.UnregisterPlantPart(partRenderer);
 }
 }
 
 pub void RegisterOutlineForCell(GameObject cellInstance, string cellTypeName) {
-if (enableOutline && OutlineController != null && cellInstance != null && cellInstance.TryGetComponent<SpriteRenderer>(out var partRenderer)) {
+if (enableOutline && OutlineController != null && cellInstance != null &&
+cellInstance.TryGetComponent<SpriteRenderer>(out var partRenderer)) {
 OutlineController.RegisterPlantPart(partRenderer, outlinePartPrefab);
 }
 }
 
 pub void UpdateUI() {
+if (energyText == null) {
+FindEnergyTextComponent();
 if (energyText == null) return;
+}
 
 if (plant.CurrentState == PlantState.Growing || plant.CurrentState == PlantState.Initializing) {
 UpdateGrowthPercentageUI();
@@ -6976,15 +7015,19 @@ UpdateEnergyUI();
 
 void UpdateGrowthPercentageUI() {
 if (energyText != null) {
-energyText.text = "Growing...";
+int currentHeight = plant.CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
+int maxHeight = plant.maxHeight;
+float percentage = (maxHeight > 0) ? (currentHeight / (float)maxHeight * 100f) : 0f;
+energyText.text = $"Growing {percentage:F0}%";
 }
 }
 
 void UpdateEnergyUI() {
 if (energyText == null || plant.EnergySystem == null) return;
+
 float currentEnergy = plant.EnergySystem.CurrentEnergy;
 float maxEnergy = plant.EnergySystem.MaxEnergy;
-energyText.text = $"{currentEnergy:F1}/{maxEnergy:F0}";
+energyText.text = $"{currentEnergy:F0}/{maxEnergy:F0}";
 }
 }
 

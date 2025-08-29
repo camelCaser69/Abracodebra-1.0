@@ -380,6 +380,8 @@ MonoBehaviour:
   outlinePartPrefab: {fileID: 4782029035367563709, guid: 743876fcc031111489cdd615ffaefa59, type: 3}
   enableOutline: 0
   leafFoodType: {fileID: 11400000, guid: a4b9d34a97cd8d543b757c7493c54451, type: 2}
+  allowFruitsAroundLeaves: 0
+  fruitSearchRadius: 1
   growthSpeedMultiplier: 1
   energyGenerationMultiplier: 1
   energyStorageMultiplier: 1
