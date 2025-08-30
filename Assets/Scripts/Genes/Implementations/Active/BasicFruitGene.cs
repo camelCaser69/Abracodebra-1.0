@@ -23,7 +23,6 @@ namespace Abracodabra.Genes.Implementations
                 return;
             }
 
-            var effectPool = GeneServices.Get<IGeneEffectPool>();
             Transform[] fruitPoints = context.plant.GetFruitSpawnPoints();
 
             if (fruitPoints.Length == 0)
@@ -41,18 +40,15 @@ namespace Abracodabra.Genes.Implementations
                     break;
                 }
             }
-
-            // Spawn fruits at available empty positions
+            
             int count = Mathf.Min(fruitCount, fruitPoints.Length);
-
-            // Optional: Randomize spawn point selection for variety
             List<Transform> shuffledPoints = fruitPoints.OrderBy(x => Random.value).ToList();
-
+            
             for (int i = 0; i < count; i++)
             {
-                GameObject fruitObj = effectPool != null
-                    ? effectPool.GetEffect(fruitPrefab, shuffledPoints[i].position, Quaternion.identity)
-                    : Instantiate(fruitPrefab, shuffledPoints[i].position, Quaternion.identity);
+                // --- THIS IS THE FIX ---
+                // We now use Instantiate directly, bypassing the effect pool which was causing the timed destruction.
+                GameObject fruitObj = Instantiate(fruitPrefab, shuffledPoints[i].position, Quaternion.identity);
 
                 Fruit fruit = fruitObj.GetComponent<Fruit>();
                 if (fruit != null)
@@ -86,7 +82,7 @@ namespace Abracodabra.Genes.Implementations
 
         public override bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
         {
-            return true; // BasicFruitGene can spawn empty fruit
+            return true;
         }
 
         public override string GetTooltip(GeneTooltipContext context)
