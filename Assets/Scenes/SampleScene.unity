@@ -13191,11 +13191,11 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: b02225d1ccd9f4d42b09de7941a00382, type: 2}
     - target: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 19.68
+      value: 19.493
       objectReference: {fileID: 0}
     - target: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 15.63
+      value: 16.253
       objectReference: {fileID: 0}
     - target: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_LocalPosition.z
@@ -16213,7 +16213,7 @@ Grid:
   m_GameObject: {fileID: 436520931}
   m_Enabled: 1
   m_CellSize: {x: 1, y: 1, z: 1}
-  m_CellGap: {x: -0.04, y: -0.04, z: -0.04}
+  m_CellGap: {x: 0, y: 0, z: 0}
   m_CellLayout: 0
   m_CellSwizzle: 0
 --- !u!4 &436520933

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using UnityEngine;
+using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Tilemaps;
 using skner.DualGrid;
 using TMPro;
@@ -21,13 +21,13 @@ namespace WegoSystem
             public DualGridTilemapModule tilemapModule;
         }
 
+        [System.Serializable]
         public struct TimedTileState
         {
             public TileDefinition tileDef;
             public int ticksRemaining;
         }
-        
-        [Tooltip("The definitive priority list for tiles. Order matters! The tile highest on this list will be detected first (e.g., Water should be above Dirt).")]
+
         public List<TileDefinitionMapping> tileDefinitionMappings;
         public TileInteractionLibrary interactionLibrary;
         public Grid interactionGrid;
@@ -61,7 +61,7 @@ namespace WegoSystem
         {
             if (moduleByDefinition == null)
             {
-                if(debugLogs) Debug.Log("[TileInteractionManager] Dictionaries are null. Initializing now.");
+                if (debugLogs) Debug.Log("[TileInteractionManager] Dictionaries are null. Initializing now.");
                 SetupTilemaps();
             }
         }
@@ -114,11 +114,7 @@ namespace WegoSystem
 
         private bool TileExistsInModule(DualGridTilemapModule module, Vector3Int cellPos)
         {
-            // --- THE DEFINITIVE FIX ---
-            // We ONLY check the DataTilemap. This is the logical source of truth.
-            // We completely ignore the RenderTilemap, which can contain visual spillover from Rule Tiles.
             return module.DataTilemap != null && module.DataTilemap.HasTile(cellPos);
-            // --- END OF FIX ---
         }
 
         public void ApplyToolAction(ToolDefinition toolDef)
@@ -156,7 +152,7 @@ namespace WegoSystem
                 Debug.Log($"[TileInteractionManager] No transformation rule found for Tool='{toolDef.displayName}' on Tile='{currentTileDef.displayName}'.");
             }
         }
-        
+
         private void UpdateReversionTicks()
         {
             if (timedCells.Count == 0) return;
@@ -301,7 +297,7 @@ namespace WegoSystem
             Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             mouseWorldPos.z = 0f;
             Vector3Int cellPos = WorldToCell(mouseWorldPos);
-            
+
             if (player.GetComponent<GridEntity>() is GridEntity playerGrid)
             {
                 int gridRadius = Mathf.CeilToInt(hoverRadius);
@@ -316,7 +312,14 @@ namespace WegoSystem
             if (hoverHighlightObject != null)
             {
                 hoverHighlightObject.SetActive(true);
+                
+                // Set the position to the mathematical center first
                 hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
+                
+                // --- THIS IS THE FIX ---
+                // Now, snap that final position to the pixel grid for perfect alignment.
+                hoverHighlightObject.transform.position = PixelGridSnapper.SnapToGrid(hoverHighlightObject.transform.position);
+
                 UpdateHoverHighlightColor(isWithinInteractionRange);
             }
         }
