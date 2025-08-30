@@ -60,6 +60,9 @@ namespace Abracodabra.Genes
         [Header("Fruit Spawning")]
         [SerializeField] private bool allowFruitsAroundLeaves = false;
         [SerializeField] private int fruitSearchRadius = 2;
+        
+        [Header("Energy System")]
+        [SerializeField] public bool rechargeEnergyDuringGrowth = false;
 
         [Header("Passive Stat Multipliers")]
         public float growthSpeedMultiplier = 1f;
@@ -132,7 +135,9 @@ namespace Abracodabra.Genes
             GrowthLogic.CalculateAndApplyPassiveStats();
 
             EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
-            EnergySystem.CurrentEnergy = EnergySystem.MaxEnergy;
+            // --- THIS IS THE FIX ---
+            // Use the startingEnergy from the template instead of starting at max.
+            EnergySystem.CurrentEnergy = geneRuntimeState.template.startingEnergy;
             EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
 
             sequenceExecutor.InitializeWithTemplate(this.geneRuntimeState);
@@ -160,10 +165,11 @@ namespace Abracodabra.Genes
 
         public void OnTickUpdate(int currentTick)
         {
-            // First, regenerate energy for this tick
-            EnergySystem.OnTickUpdate();
+            if (CurrentState == PlantState.Mature || rechargeEnergyDuringGrowth)
+            {
+                EnergySystem.OnTickUpdate();
+            }
             
-            // Then, potentially spend energy by executing a gene
             if (sequenceExecutor != null)
             {
                 sequenceExecutor.OnTickUpdate(currentTick);
@@ -173,7 +179,7 @@ namespace Abracodabra.Genes
             {
                 VisualManager.UpdateUI();
             }
-
+            
             if (CurrentState == PlantState.Growing)
             {
                 float randomValue = (_deterministicRandom != null) ?

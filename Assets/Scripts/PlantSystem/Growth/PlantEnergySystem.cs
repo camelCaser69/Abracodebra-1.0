@@ -1,6 +1,5 @@
-﻿// Reworked File: Assets/Scripts/PlantSystem/Growth/PlantEnergySystem.cs
+﻿using Abracodabra.Genes;
 using UnityEngine;
-using Abracodabra.Genes;
 using WegoSystem;
 
 public class PlantEnergySystem
@@ -11,29 +10,32 @@ public class PlantEnergySystem
     public float MaxEnergy { get; set; }
     public float BaseEnergyPerLeaf { get; set; } // Base rate from template
 
-    // Cache the FireflyManager instance to avoid repeated singleton lookups
     private readonly FireflyManager fireflyManagerInstance;
 
     public PlantEnergySystem(PlantGrowth plant)
     {
         this.plant = plant;
-        // Cache the reference once during construction. It's okay if it's null.
         this.fireflyManagerInstance = FireflyManager.Instance;
     }
 
     public void OnTickUpdate()
     {
+        // Redundant safety check: Don't do anything if the plant is still growing (unless overridden).
+        // The primary logic is in PlantGrowth, but this makes this class more robust.
+        if (plant.CurrentState == PlantState.Growing && 
+            plant.gameObject.GetComponent<PlantGrowth>()?.rechargeEnergyDuringGrowth == false)
+        {
+            return;
+        }
+
         if (plant.GrowthLogic == null || MaxEnergy <= 0) return;
 
         int leafCount = plant.CellManager.GetActiveLeafCount();
         if (leafCount <= 0) return;
 
-        // Ensure WeatherManager exists before using it
         float sunlight = (WeatherManager.Instance != null) ? WeatherManager.Instance.sunIntensity : 1f;
 
         float fireflyBonusRate = 0f;
-        // --- NULL-SAFETY CHECK ---
-        // Only attempt to calculate the firefly bonus if the manager was found and is active.
         if (fireflyManagerInstance != null && fireflyManagerInstance.isActiveAndEnabled)
         {
             int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(plant.transform.position, fireflyManagerInstance.photosynthesisRadius);
@@ -47,17 +49,17 @@ public class PlantEnergySystem
         float totalPhotosynthesisRatePerLeaf = (effectiveRate * sunlight) + fireflyBonusRate;
         float energyThisTick = totalPhotosynthesisRatePerLeaf * leafCount;
 
-        CurrentEnergy = Mathf.Clamp(CurrentEnergy + energyThisTick, 0f, MaxEnergy);
+        CurrentEnergy = UnityEngine.Mathf.Clamp(CurrentEnergy + energyThisTick, 0f, MaxEnergy);
     }
 
     public void SpendEnergy(float amount)
     {
-        CurrentEnergy = Mathf.Max(0f, CurrentEnergy - amount);
+        CurrentEnergy = UnityEngine.Mathf.Max(0f, CurrentEnergy - amount);
     }
 
     public void AddEnergy(float amount)
     {
-        CurrentEnergy = Mathf.Clamp(CurrentEnergy + amount, 0f, MaxEnergy);
+        CurrentEnergy = UnityEngine.Mathf.Clamp(CurrentEnergy + amount, 0f, MaxEnergy);
     }
 
     public bool HasEnergy(float amount)
