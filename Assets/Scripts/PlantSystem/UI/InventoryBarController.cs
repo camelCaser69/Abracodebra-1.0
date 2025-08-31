@@ -1,23 +1,28 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
 using System.Collections.Generic;
 using Abracodabra.UI.Genes;
 
-namespace Abracodabra.UI.Genes // Assuming this is the correct namespace based on context
+namespace Abracodabra.UI.Genes
 {
     public class InventoryBarController : MonoBehaviour
     {
         public static InventoryBarController Instance { get; private set; }
 
-        // This is now a maximum limit, not a fixed count.
+        [Header("Configuration")]
         [SerializeField] private int maxSlots = 10;
-        [SerializeField] private InventoryGridController inventoryGridController;
-        [SerializeField] private Transform cellContainer;
-        [SerializeField] private GameObject selectionHighlight;
         [SerializeField] private GameObject inventoryItemViewPrefab;
 
-        // We no longer need to store the slots, as they are created dynamically.
+        [Header("Component References")]
+        [SerializeField] private InventoryGridController inventoryGridController;
+        [SerializeField] private RectTransform inventoryBarPanelRect; // The parent RectTransform for rebuilding
+        [SerializeField] private Transform cellContainer; // <-- The CRUCIAL reference, now restored
+        [SerializeField] private GameObject selectionHighlight;
+
         private List<GameObject> activeItemSlots = new List<GameObject>();
         private int selectedSlot = 0;
+        private Coroutine updateHighlightCoroutine;
 
         public InventoryBarItem SelectedItem { get; private set; }
         public event System.Action<InventoryBarItem> OnSelectionChanged;
@@ -37,18 +42,17 @@ namespace Abracodabra.UI.Genes // Assuming this is the correct namespace based o
 
         private void Start()
         {
-            if (inventoryGridController != null)
-            {
-                inventoryGridController.OnInventoryChanged += HandleInventoryChanged;
-            }
-            else
-            {
-                Debug.LogError($"[{nameof(InventoryBarController)}] InventoryGridController not assigned!", this);
-            }
+            // --- VALIDATION ---
+            if (inventoryGridController == null) Debug.LogError($"[{nameof(InventoryBarController)}] InventoryGridController not assigned!", this);
+            if (inventoryItemViewPrefab == null) Debug.LogError($"[{nameof(InventoryBarController)}] InventoryItemViewPrefab not assigned!", this);
+            if (inventoryBarPanelRect == null) Debug.LogError($"[{nameof(InventoryBarController)}] Inventory Bar Panel Rect not assigned!", this);
+            if (cellContainer == null) Debug.LogError($"[{nameof(InventoryBarController)}] Cell Container not assigned!", this);
 
-            if (inventoryItemViewPrefab == null)
+            inventoryGridController.OnInventoryChanged += HandleInventoryChanged;
+            
+            if (selectionHighlight != null)
             {
-                Debug.LogError($"[{nameof(InventoryBarController)}] InventoryItemViewPrefab not assigned!", this);
+                selectionHighlight.SetActive(false);
             }
 
             gameObject.SetActive(false);
@@ -64,14 +68,13 @@ namespace Abracodabra.UI.Genes // Assuming this is the correct namespace based o
 
         private void UpdateBarDisplay()
         {
-            // Clear existing slots first
             foreach (var slot in activeItemSlots)
             {
                 Destroy(slot);
             }
             activeItemSlots.Clear();
 
-            if (inventoryGridController == null || inventoryItemViewPrefab == null) return;
+            if (inventoryGridController == null || inventoryItemViewPrefab == null || cellContainer == null) return;
             
             var allItems = inventoryGridController.GetAllItems();
             int itemsToDisplay = Mathf.Min(allItems.Count, maxSlots);
@@ -80,14 +83,15 @@ namespace Abracodabra.UI.Genes // Assuming this is the correct namespace based o
             {
                 var item = allItems[i];
                 if (item == null || !item.IsValid()) continue;
-
-                // Create a slot ONLY for valid items
+                
+                // --- THIS IS THE FIX ---
+                // Instantiate items as children of the correct 'cellContainer' transform.
                 GameObject itemViewGO = Instantiate(inventoryItemViewPrefab, cellContainer);
                 var itemView = itemViewGO.GetComponentInChildren<ItemView>();
                 
                 if (itemView == null)
                 {
-                    Debug.LogError($"The assigned InventoryItemViewPrefab is missing the ItemView component on itself or its children!", inventoryItemViewPrefab);
+                    Debug.LogError($"The assigned InventoryItemViewPrefab is missing the ItemView component!", itemViewGO);
                     Destroy(itemViewGO);
                     continue;
                 }
@@ -105,6 +109,11 @@ namespace Abracodabra.UI.Genes // Assuming this is the correct namespace based o
                 barItemComponent.item = item;
                 
                 activeItemSlots.Add(itemViewGO);
+            }
+            
+            if (inventoryBarPanelRect != null)
+            {
+                LayoutRebuilder.ForceRebuildLayoutImmediate(inventoryBarPanelRect);
             }
         }
 
@@ -126,6 +135,7 @@ namespace Abracodabra.UI.Genes // Assuming this is the correct namespace based o
         {
             gameObject.SetActive(true);
             RefreshBar();
+            SelectSlotByIndex(0);
         }
 
         public void HideBar()
@@ -140,7 +150,6 @@ namespace Abracodabra.UI.Genes // Assuming this is the correct namespace based o
         private void RefreshBar()
         {
             UpdateBarDisplay();
-            // Clamp selected slot to the number of actual items
             SelectSlot(Mathf.Clamp(selectedSlot, 0, activeItemSlots.Count - 1));
         }
 
@@ -155,10 +164,8 @@ namespace Abracodabra.UI.Genes // Assuming this is the correct namespace based o
 
         public void SelectSlot(int slotIndex)
         {
-            // Can't select a slot that doesn't exist
             if (slotIndex < 0 || slotIndex >= activeItemSlots.Count)
             {
-                // If trying to select an empty slot beyond the current items, deselect everything
                 SelectedItem = null;
                 UpdateSelection();
                 return;
@@ -167,20 +174,26 @@ namespace Abracodabra.UI.Genes // Assuming this is the correct namespace based o
             selectedSlot = slotIndex;
             var slot = activeItemSlots[slotIndex];
             var itemComponent = slot.GetComponentInChildren<InventoryBarItemComponent>();
-            if (itemComponent != null)
-            {
-                SelectedItem = itemComponent.item;
-            }
-            else
-            {
-                SelectedItem = null;
-            }
+            SelectedItem = itemComponent?.item;
             
             UpdateSelection();
         }
 
         private void UpdateSelection()
         {
+            if (updateHighlightCoroutine != null)
+            {
+                StopCoroutine(updateHighlightCoroutine);
+            }
+            updateHighlightCoroutine = StartCoroutine(UpdateSelectionVisualsAfterFrame());
+
+            OnSelectionChanged?.Invoke(SelectedItem);
+        }
+
+        private IEnumerator UpdateSelectionVisualsAfterFrame()
+        {
+            yield return null;
+
             if (selectionHighlight != null)
             {
                 bool itemIsValid = SelectedItem != null && SelectedItem.IsValid() && selectedSlot < activeItemSlots.Count;
@@ -191,7 +204,7 @@ namespace Abracodabra.UI.Genes // Assuming this is the correct namespace based o
                     selectionHighlight.transform.position = activeItemSlots[selectedSlot].transform.position;
                 }
             }
-            OnSelectionChanged?.Invoke(SelectedItem);
+            updateHighlightCoroutine = null;
         }
 
         public void SelectSlotByIndex(int slotIndex)
