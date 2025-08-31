@@ -18,24 +18,23 @@ namespace WegoSystem
                     return null;
                 }
 
-                lock (_lock)
+                if (_instance != null)
                 {
-                    if (_instance == null)
-                    {
-                        // Search for an existing instance in the scene.
-                        _instance = FindFirstObjectByType<T>();
-
-                        // FIX: REMOVED THE DANGEROUS AUTO-CREATION LOGIC.
-                        // If no instance is found, it's a setup error. We will now log a critical error
-                        // instead of creating a blank, broken instance silently.
-                        if (_instance == null)
-                        {
-                            Debug.LogError($"[Singleton] CRITICAL: An instance of '{typeof(T).Name}' is needed in the scene, but none was found. " +
-                                           "Ensure a GameObject with this component exists and is active in your scene.");
-                        }
-                    }
                     return _instance;
                 }
+
+                // Search for an existing instance in the scene.
+                _instance = FindFirstObjectByType<T>();
+
+                // FIX: REMOVED THE DANGEROUS AUTO-CREATION LOGIC.
+                // If no instance is found, it's a setup error. We will now log a critical error
+                // instead of creating a blank, broken instance silently.
+                if (_instance == null)
+                {
+                    Debug.LogError($"[Singleton] CRITICAL: An instance of '{typeof(T).Name}' is needed in the scene, but none was found. " +
+                                   "Ensure a GameObject with this component exists and is active in your scene.");
+                }
+                return _instance;
             }
         }
 
@@ -43,6 +42,8 @@ namespace WegoSystem
 
         protected virtual void Awake()
         {
+            _applicationIsQuitting = false;
+            
             if (_instance == null)
             {
                 // If this is the first instance, make it the singleton.
@@ -68,6 +69,7 @@ namespace WegoSystem
         protected virtual void OnApplicationQuit()
         {
             _applicationIsQuitting = true;
+            _instance = null;
         }
     }
 }
