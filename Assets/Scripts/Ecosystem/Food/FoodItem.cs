@@ -1,30 +1,28 @@
-﻿using Abracodabra.Genes;
-using UnityEngine;
+﻿using UnityEngine;
+using Abracodabra.Genes;
 using WegoSystem;
 
 public class FoodItem : MonoBehaviour
 {
     public FoodType foodType;
 
-    [SerializeField]
-    private bool snapToGridOnStart = true;
-
     private GridEntity gridEntity;
+    private bool isInitialized = false; // Prevents Start() from running if manually initialized
 
-    void Awake()
+    private void Awake()
     {
         gridEntity = GetComponent<GridEntity>();
         if (gridEntity == null)
         {
             gridEntity = gameObject.AddComponent<GridEntity>();
         }
-
-        // It's a part of something else, not a primary occupant of a tile.
-        gridEntity.isTileOccupant = false;
     }
 
-    void Start()
+    // This will now only run for STANDALONE food items
+    private void Start()
     {
+        if (isInitialized) return; // If initialized by PlantCellManager, do nothing.
+
         if (foodType == null)
         {
             Debug.LogWarning($"FoodItem on GameObject '{gameObject.name}' is missing its FoodType reference!", gameObject);
@@ -32,42 +30,40 @@ public class FoodItem : MonoBehaviour
             return;
         }
 
-        // --- FIX: Check if this food item is part of a plant ---
-        // If it is, it should NOT register its own grid position. The animal logic will
-        // find the root PlantGrowth entity to determine the correct tile.
-        PlantGrowth parentPlant = GetComponentInParent<PlantGrowth>();
-        if (parentPlant != null)
-        {
-            // This is a plant part (leaf, berry, etc.).
-            // Disable its personal GridEntity to avoid polluting the GridPositionManager
-            // with incorrect, offset positions.
-            if (gridEntity != null)
-            {
-                gridEntity.enabled = false;
-            }
-            // Ensure the independent snapping logic below is skipped.
-            snapToGridOnStart = false;
-        }
-        // --- END OF FIX ---
+        gridEntity.isTileOccupant = false;
+        gridEntity.enabled = true;
 
-
-        // This logic will now only run for standalone food items, not plant parts.
-        if (snapToGridOnStart && GridPositionManager.Instance != null)
+        if (GridPositionManager.Instance != null)
         {
             GridPositionManager.Instance.SnapEntityToGrid(gameObject);
-            Debug.Log($"[FoodItem] Standalone food '{foodType.foodName}' snapped to grid position {gridEntity.Position}");
+            Debug.Log($"[FoodItem] Registered STANDALONE food '{foodType.foodName}' at grid position {gridEntity.Position}");
         }
 
-        Collider2D col = GetComponent<Collider2D>();
-        if (col != null)
-        {
-            col.isTrigger = true;
-        }
+        isInitialized = true;
     }
 
-    void OnDestroy()
+    /// <summary>
+    /// A special initialization path for food items that are part of a plant.
+    /// This bypasses the default Start() logic to prevent the object from moving itself.
+    /// </summary>
+    public void InitializeAsPlantPart(FoodType type, GridPosition gridPosition)
     {
-        // No specific cleanup needed here anymore.
+        if (isInitialized) return;
+
+        this.foodType = type;
+        
+        gridEntity.isTileOccupant = false;
+        gridEntity.enabled = true;
+
+        if (GridPositionManager.Instance != null)
+        {
+            // We tell the GridEntity its position and register it WITHOUT moving the transform.
+            gridEntity.SetPosition(gridPosition, true); // Instantly set logical state
+            GridPositionManager.Instance.RegisterEntity(gridEntity); // Manually register
+            Debug.Log($"[FoodItem] Registered PLANT food '{foodType.name}' at grid position {gridPosition}");
+        }
+
+        isInitialized = true;
     }
 
     public bool CanBeEatenBy(AnimalController animal)

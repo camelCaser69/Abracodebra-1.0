@@ -1,6 +1,5 @@
-﻿// Assets/Scripts/Ticks/GridEntity.cs
+﻿using UnityEngine;
 using System;
-using UnityEngine;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,30 +11,33 @@ namespace WegoSystem
     {
         public bool isTileOccupant = true;
 
-        GridPosition gridPosition;
+        private GridPosition gridPosition;
 
-        [SerializeField] Vector3 groundPointOffset = Vector3.zero;
-        [SerializeField] Vector3 visualOffset = Vector3.zero;
-        [SerializeField] float visualInterpolationSpeed = 5f;
-        [SerializeField] AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+        [SerializeField] private Vector3 groundPointOffset = Vector3.zero;
+        [SerializeField] private Vector3 visualOffset = Vector3.zero;
+        [SerializeField] private float visualInterpolationSpeed = 5f;
+        [SerializeField] private AnimationCurve movementCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-        GridPosition previousGridPosition;
-        Vector3 visualStartPosition;
-        Vector3 visualTargetPosition;
-        float movementProgress = 1f;
-        bool isMoving = false;
-        float speedMultiplier = 1f;
+        private GridPosition previousGridPosition;
+        private Vector3 visualStartPosition;
+        private Vector3 visualTargetPosition;
+        private float movementProgress = 1f;
+        private bool isMoving = false;
+        private float speedMultiplier = 1f;
+
+        // --- THE FIX: A state to distinguish between being placed and actively moving ---
+        private bool isPositionLocked = false;
 
         public GridPosition Position
         {
             get => gridPosition;
-            set
+            private set
             {
                 if (gridPosition != value)
                 {
                     previousGridPosition = gridPosition;
                     gridPosition = value;
-                    OnGridPositionChanged();
+                    // Note: We no longer call OnGridPositionChanged here. It's called from SetPosition.
                 }
             }
         }
@@ -51,14 +53,16 @@ namespace WegoSystem
 
         protected virtual void Start()
         {
-            visualStartPosition = transform.position;
-            visualTargetPosition = transform.position;
-            previousGridPosition = gridPosition;
+            // If this entity hasn't been positioned by an external script by the first frame, snap it.
+            // This ensures standalone entities placed in the editor still get aligned.
+            if (gridPosition == GridPosition.Zero && movementProgress >= 1f)
+            {
+                SnapToGrid();
+            }
         }
 
         protected virtual void OnDestroy()
         {
-            // Safely get the instance once
             var gridManager = GridPositionManager.Instance;
             if (gridManager != null)
             {
@@ -68,20 +72,23 @@ namespace WegoSystem
 
         protected virtual void Update()
         {
-            if (movementProgress < 1f)
+            // If the position is locked (i.e., it's a static plant part), do not run movement logic.
+            if (isPositionLocked || movementProgress >= 1f)
             {
-                movementProgress += Time.deltaTime * visualInterpolationSpeed * speedMultiplier;
-                movementProgress = Mathf.Clamp01(movementProgress);
+                return;
+            }
 
-                float curvedProgress = movementCurve.Evaluate(movementProgress);
-                transform.position = Vector3.Lerp(visualStartPosition, visualTargetPosition, curvedProgress);
+            movementProgress += Time.deltaTime * visualInterpolationSpeed * speedMultiplier;
+            movementProgress = Mathf.Clamp01(movementProgress);
 
-                if (movementProgress >= 1f)
-                {
-                    transform.position = visualTargetPosition;
-                    isMoving = false;
-                    OnMovementComplete?.Invoke(gridPosition);
-                }
+            float curvedProgress = movementCurve.Evaluate(movementProgress);
+            transform.position = Vector3.Lerp(visualStartPosition, visualTargetPosition, curvedProgress);
+
+            if (movementProgress >= 1f)
+            {
+                transform.position = visualTargetPosition;
+                isMoving = false;
+                OnMovementComplete?.Invoke(gridPosition);
             }
         }
 
@@ -103,52 +110,62 @@ namespace WegoSystem
         }
 #endif
 
-        protected virtual void OnGridPositionChanged()
-        {
-            visualStartPosition = transform.position;
-
-            if (GridPositionManager.Instance != null)
-            {
-                Vector3 groundTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
-                visualTargetPosition = groundTargetPosition - groundPointOffset + visualOffset;
-            }
-
-            movementProgress = 0f;
-
-            if (!isMoving)
-            {
-                isMoving = true;
-                OnMovementStart?.Invoke();
-            }
-
-            OnPositionChanged?.Invoke(previousGridPosition, gridPosition);
-        }
-
+        /// <summary>
+        /// Sets the entity's logical grid position and handles the visual update.
+        /// </summary>
+        /// <param name="newPosition">The target grid position.</param>
+        /// <param name="instant">If true, the entity's state is updated without visual movement (for initial placement). 
+        /// If false, it tweens from its current position (for movement).</param>
         public void SetPosition(GridPosition newPosition, bool instant = false)
         {
-            // VALIDATION: Ensure the new position is within the map boundaries.
             if (GridPositionManager.Instance != null && !GridPositionManager.Instance.IsPositionValid(newPosition))
             {
                 Debug.LogWarning($"[GridEntity] Blocked attempt to move '{gameObject.name}' to invalid position {newPosition}. Movement cancelled.");
                 return;
             }
 
-            Position = newPosition; // This invokes OnGridPositionChanged which sets up the tween
-
             if (instant)
             {
-                if (GridPositionManager.Instance == null) return;
-
-                Vector3 groundTargetPosition = GridPositionManager.Instance.GridToWorld(Position);
-                transform.position = groundTargetPosition - groundPointOffset + visualOffset;
-
+                // --- FOR PLACING OBJECTS (like plant parts) ---
+                // We lock the position, set the state, and DO NOT move the transform.
+                // The caller (PlantCellManager) is the authority on the transform's position.
+                isPositionLocked = true;
+                Position = newPosition;
                 visualStartPosition = transform.position;
                 visualTargetPosition = transform.position;
                 movementProgress = 1f;
                 isMoving = false;
+                OnPositionChanged?.Invoke(previousGridPosition, newPosition);
+            }
+            else
+            {
+                // --- FOR MOVING OBJECTS (like animals) ---
+                // Unlock the position and initiate the tweening process.
+                isPositionLocked = false;
+                if (!isMoving)
+                {
+                    visualStartPosition = transform.position;
+                }
+
+                Position = newPosition; // This will update gridPosition and previousGridPosition
+
+                // Calculate where we need to move to
+                if (GridPositionManager.Instance != null)
+                {
+                    Vector3 groundTargetPosition = GridPositionManager.Instance.GridToWorld(gridPosition);
+                    visualTargetPosition = groundTargetPosition - groundPointOffset + visualOffset;
+                }
+
+                movementProgress = 0f;
+                if (!isMoving)
+                {
+                    isMoving = true;
+                    OnMovementStart?.Invoke();
+                }
+                OnPositionChanged?.Invoke(previousGridPosition, newPosition);
             }
         }
-        
+
         public void SetSpeedMultiplier(float multiplier)
         {
             this.speedMultiplier = multiplier;
@@ -160,7 +177,13 @@ namespace WegoSystem
 
             Vector3 groundWorldPos = transform.position + groundPointOffset;
             GridPosition currentGridPos = GridPositionManager.Instance.WorldToGrid(groundWorldPos);
-            SetPosition(currentGridPos, true);
+
+            // When snapping, we DO want to move the object.
+            isPositionLocked = false;
+            SetPosition(currentGridPos, true); // This will now use the instant path but we must move the transform.
+            transform.position = GridPositionManager.Instance.GridToWorld(currentGridPos) - groundPointOffset + visualOffset;
+            visualStartPosition = transform.position;
+            visualTargetPosition = transform.position;
         }
 
         public void MoveInDirection(GridPosition direction)
@@ -180,6 +203,7 @@ namespace WegoSystem
                 transform.position = visualTargetPosition;
                 movementProgress = 1f;
                 isMoving = false;
+                isPositionLocked = false;
                 OnMovementComplete?.Invoke(gridPosition);
             }
         }

@@ -18741,11 +18741,7 @@ MonoBehaviour:
   startNewPlanningPhaseButton: {fileID: 774509244}
   endPlanningPhaseButton: {fileID: 0}
   advanceTickButton: {fileID: 0}
-  wegoControlPanel: {fileID: 0}
-  currentPhaseText: {fileID: 0}
   tickCounterText: {fileID: 1709125727}
-  persistentTickCounterText: {fileID: 0}
-  phaseProgressText: {fileID: 0}
 --- !u!114 &513545530
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58429,9 +58425,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   barSlotCount: 8
-  inventorySlotPrefab: {fileID: 8484850646006857580, guid: 1618c32db2a32204498918a7b315b3e5, type: 3}
+  inventorySlotPrefab: {fileID: 2625715489423964964, guid: 0120ee7fcd5b4e94eb78b43ab8e07649, type: 3}
   inventoryGridController: {fileID: 1502243627}
-  inventoryBarPanelRect: {fileID: 864572959}
   cellContainer: {fileID: 314061415}
   selectionHighlight: {fileID: 1852126005}
 --- !u!222 &864572962

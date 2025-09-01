@@ -1,29 +1,30 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 using WegoSystem;
 
 public class AnimalMovement : MonoBehaviour
 {
-    [SerializeField] bool showPathfindingDebugLine = false;
+    [SerializeField] private bool showPathfindingDebugLine = false;
 
-    AnimalController controller;
-    AnimalDefinition definition;
-    GridEntity gridEntity;
-    LineRenderer pathDebugLine;
+    private AnimalController controller;
+    private AnimalDefinition definition;
+    private GridEntity gridEntity;
+    private LineRenderer pathDebugLine;
 
-    List<GridPosition> currentPath = new List<GridPosition>();
-    int currentPathIndex = 0;
-    GameObject currentTargetFood = null;
-    bool hasPlannedAction = false;
-    int wanderPauseTicks = 0;
-    int lastThinkTick = 0;
+    private List<GridPosition> currentPath = new List<GridPosition>();
+    private int currentPathIndex = 0;
+    private GameObject currentTargetFood = null;
+    private bool hasPlannedAction = false;
+    private int wanderPauseTicks = 0;
+    private int lastThinkTick = 0;
 
-    bool isSeekingScreenCenter = false;
-    Vector2 screenCenterTarget;
-    Vector2 minBounds;
-    Vector2 maxBounds;
+    private bool isSeekingScreenCenter = false;
+    private Vector2 screenCenterTarget;
+    private Vector2 minBounds;
+    private Vector2 maxBounds;
 
-    Vector2 lastMoveDirection;
+    private Vector2 lastMoveDirection;
 
     public bool HasTarget => currentTargetFood != null || hasPlannedAction;
     public GameObject CurrentTargetFood => currentTargetFood;
@@ -64,7 +65,7 @@ public class AnimalMovement : MonoBehaviour
         UpdatePathDebugLine();
     }
 
-    void MakeMovementDecision()
+    private void MakeMovementDecision()
     {
         if (gridEntity.IsMoving) return;
 
@@ -84,7 +85,7 @@ public class AnimalMovement : MonoBehaviour
         }
     }
 
-    void PlanFoodSeeking()
+    private void PlanFoodSeeking()
     {
         if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild)
         {
@@ -107,101 +108,62 @@ public class AnimalMovement : MonoBehaviour
         }
     }
 
-    GameObject FindNearestFood()
+    // --- TASK 2: UNIFIED FOOD SEARCH LOGIC ---
+    // This method now exclusively uses the grid, which is more performant and reliable.
+    private GameObject FindNearestFood()
     {
         if (definition.diet == null) return null;
 
-        GameObject foodFromGrid = FindFoodInGrid();
-        if (foodFromGrid != null) return foodFromGrid;
-
-        return FindFoodByCollider();
-    }
-
-    GameObject FindFoodInGrid()
-    {
         var entitiesInRadius = GridPositionManager.Instance.GetEntitiesInRadius(
             gridEntity.Position,
             definition.searchRadiusTiles,
-            true
+            true // Use circle radius
         );
 
         GameObject bestFood = null;
         float bestScore = -1f;
 
-        foreach (var entity in entitiesInRadius)
+        // Use LINQ to efficiently find all valid food items in the radius
+        var foodItems = entitiesInRadius
+            .Select(entity => entity.GetComponent<FoodItem>())
+            .Where(foodItem => foodItem != null && foodItem.foodType != null && definition.diet.CanEat(foodItem.foodType));
+
+        foreach (var foodItem in foodItems)
         {
-            if (entity == null || entity.gameObject == this.gameObject) continue;
+            var pref = definition.diet.GetPreference(foodItem.foodType);
+            if (pref == null) continue;
 
-            FoodItem foodItem = entity.GetComponent<FoodItem>();
-            if (foodItem != null && foodItem.foodType != null && definition.diet.CanEat(foodItem.foodType))
+            GridEntity foodEntity = foodItem.GetComponent<GridEntity>();
+            if (foodEntity == null) continue; // Should not happen with new FoodItem logic
+
+            float distance = gridEntity.Position.ManhattanDistance(foodEntity.Position);
+            float score = pref.preferencePriority / (1f + distance);
+
+            if (score > bestScore)
             {
-                var pref = definition.diet.GetPreference(foodItem.foodType);
-                if (pref == null) continue;
-
-                GridPosition foodGroundPos = GetFoodGroundPosition(entity.gameObject);
-                float distance = gridEntity.Position.ManhattanDistance(foodGroundPos);
-
-                float score = pref.preferencePriority / (1f + distance);
-
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    bestFood = entity.gameObject;
-                }
+                bestScore = score;
+                bestFood = foodItem.gameObject;
             }
         }
 
         return bestFood;
     }
 
-    GameObject FindFoodByCollider()
-    {
-        Vector3 worldPos = transform.position;
-        float tileSize = GridPositionManager.Instance.GetTilemapGrid()?.cellSize.x ?? 1f;
-        float searchRadius = definition.searchRadiusTiles * tileSize;
-
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(worldPos, searchRadius);
-
-        GameObject bestFood = null;
-        float bestScore = -1f;
-
-        foreach (var collider in colliders)
-        {
-            if (collider.gameObject == this.gameObject) continue;
-
-            FoodItem foodItem = collider.GetComponent<FoodItem>();
-            if (foodItem != null && foodItem.foodType != null && definition.diet.CanEat(foodItem.foodType))
-            {
-                var pref = definition.diet.GetPreference(foodItem.foodType);
-                if (pref == null) continue;
-
-                float distance = Vector3.Distance(worldPos, collider.transform.position);
-                float score = pref.preferencePriority / (1f + distance);
-
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    bestFood = collider.gameObject;
-                }
-            }
-        }
-
-        return bestFood;
-    }
-
-    GridPosition GetFoodGroundPosition(GameObject food)
+    private GridPosition GetFoodGroundPosition(GameObject food)
     {
         GridEntity foodEntity = food.GetComponent<GridEntity>();
-        if (foodEntity != null)
+        if (foodEntity != null && foodEntity.enabled)
         {
+            // This is now the primary, reliable way to get a food's position.
             return foodEntity.Position;
         }
-
-        Vector3 foodWorldPos = food.transform.position;
-        return GridPositionManager.Instance.WorldToGrid(foodWorldPos);
+        
+        // Fallback for safety, but should rarely be needed.
+        Debug.LogWarning($"[AnimalMovement] Food item '{food.name}' did not have an enabled GridEntity. Using world position as fallback.", food);
+        return GridPositionManager.Instance.WorldToGrid(food.transform.position);
     }
 
-    void SetTargetFood(GameObject food)
+    private void SetTargetFood(GameObject food)
     {
         currentTargetFood = food;
         GridPosition foodGroundPos = GetFoodGroundPosition(food);
@@ -219,7 +181,7 @@ public class AnimalMovement : MonoBehaviour
         }
     }
 
-    void PlanWandering()
+    private void PlanWandering()
     {
         if (GridDebugVisualizer.Instance != null)
         {
@@ -243,6 +205,7 @@ public class AnimalMovement : MonoBehaviour
             GridPosition.Left, GridPosition.Right
         };
 
+        // Shuffle directions to avoid bias
         for (int i = 0; i < directions.Length; i++)
         {
             int randomIndex = Random.Range(i, directions.Length);
@@ -267,7 +230,7 @@ public class AnimalMovement : MonoBehaviour
         hasPlannedAction = false;
     }
 
-    void ExecutePlannedMovement()
+    private void ExecutePlannedMovement()
     {
         if (!hasPlannedAction || gridEntity.IsMoving) return;
 
@@ -301,11 +264,11 @@ public class AnimalMovement : MonoBehaviour
             {
                 if (currentTargetFood != null)
                 {
-                    SetTargetFood(currentTargetFood); // Re-path to the same food
+                    SetTargetFood(currentTargetFood);
                 }
                 else
                 {
-                    ClearMovementPlan(); // Or just clear if it was a wander
+                    ClearMovementPlan();
                 }
             }
         }
@@ -315,7 +278,7 @@ public class AnimalMovement : MonoBehaviour
         }
     }
 
-    bool TryMoveTo(GridPosition targetPos)
+    private bool TryMoveTo(GridPosition targetPos)
     {
         if (!IsValidMove(targetPos))
             return false;
@@ -328,7 +291,7 @@ public class AnimalMovement : MonoBehaviour
         return true;
     }
 
-    bool IsValidMove(GridPosition pos)
+    private bool IsValidMove(GridPosition pos)
     {
         if (GridPositionManager.Instance == null) return false;
 
@@ -347,11 +310,11 @@ public class AnimalMovement : MonoBehaviour
         return true;
     }
 
-    void HandleScreenCenterSeeking()
+    private void HandleScreenCenterSeeking()
     {
         Vector2 currentPos = transform.position;
         bool centerWithinBounds = currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
-                                 currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
+                                  currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
 
         if (centerWithinBounds)
         {
@@ -401,7 +364,7 @@ public class AnimalMovement : MonoBehaviour
         return lastMoveDirection;
     }
 
-    void SetupDebugLineRenderer()
+    private void SetupDebugLineRenderer()
     {
         if (!showPathfindingDebugLine) return;
 
@@ -416,7 +379,7 @@ public class AnimalMovement : MonoBehaviour
         pathDebugLine.sortingOrder = 100;
     }
 
-    void UpdatePathDebugLine()
+    private void UpdatePathDebugLine()
     {
         if (!showPathfindingDebugLine || pathDebugLine == null || currentPath == null || currentPath.Count == 0)
         {
@@ -439,7 +402,7 @@ public class AnimalMovement : MonoBehaviour
         pathDebugLine.SetPositions(positions.ToArray());
     }
 
-    void ClearPathDebugLine()
+    private void ClearPathDebugLine()
     {
         if (pathDebugLine != null)
         {
