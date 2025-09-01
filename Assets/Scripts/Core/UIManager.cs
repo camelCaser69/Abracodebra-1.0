@@ -1,17 +1,14 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.UI; // For Button
+using System.Collections;
 using TMPro;
 using WegoSystem;
-using System.Collections;
-using Abracodabra.UI.Genes; // FIX: Added missing using directive
+using Abracodabra.UI.Genes;
 
 public class UIManager : MonoBehaviour
 {
-    #region Singleton
-    public static UIManager Instance { get; set; }
-    #endregion
+    public static UIManager Instance { get; private set; }
 
-    #region Fields
     [Header("UI Panels")]
     [SerializeField] private GameObject uiCanvasRoot;
     [SerializeField] private GameObject planningPanel;
@@ -23,19 +20,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Button startNewPlanningPhaseButton;
     [SerializeField] private Button endPlanningPhaseButton;
     [SerializeField] private Button advanceTickButton;
-
+    
     [Header("Displays")]
-    [SerializeField] private GameObject wegoControlPanel;
-    [SerializeField] private TextMeshProUGUI currentPhaseText;
     [SerializeField] private TextMeshProUGUI tickCounterText;
-    [SerializeField] private TextMeshProUGUI persistentTickCounterText;
-    [SerializeField] private TextMeshProUGUI phaseProgressText;
 
     private RunManager runManager;
     private TickManager tickManager;
-    #endregion
 
-    #region Unity Methods
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -85,9 +76,7 @@ public class UIManager : MonoBehaviour
             runManager?.ForcePhase(GamePhase.Planning);
         }
     }
-    #endregion
 
-    #region Initialization
     public void Initialize()
     {
         runManager = RunManager.Instance;
@@ -95,7 +84,7 @@ public class UIManager : MonoBehaviour
 
         if (runManager == null)
         {
-            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not fn correctly.");
+            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not function correctly.");
             return;
         }
 
@@ -110,9 +99,7 @@ public class UIManager : MonoBehaviour
 
         SetupButtons();
 
-        // Initial setup
         HandleRunStateChanged(runManager.CurrentState);
-        UpdatePhaseDisplay();
         UpdateTickDisplay();
     }
 
@@ -123,16 +110,12 @@ public class UIManager : MonoBehaviour
         endPlanningPhaseButton?.onClick.AddListener(OnEndPlanningPhaseClicked);
         advanceTickButton?.onClick.AddListener(OnAdvanceTickClicked);
     }
-    #endregion
 
-    #region Event Handlers
     private void HandleRunStateChanged(RunState newState)
     {
         if (planningPanel != null) planningPanel.SetActive(newState == RunState.Planning);
         if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
 
-        // FIX: When leaving planning phase, ensure the seed editor is cleaned up
-        // and any loaded seed is returned to the main inventory grid.
         if (newState == RunState.GrowthAndThreat && geneSequenceUIPanel != null)
         {
             var geneSequenceUI = geneSequenceUIPanel.GetComponent<GeneSequenceUI>();
@@ -141,7 +124,7 @@ public class UIManager : MonoBehaviour
                 geneSequenceUI.CleanupOnPhaseEnd();
             }
         }
-        
+
         if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(newState == RunState.Planning);
 
         if (InventoryGridController.Instance != null)
@@ -165,26 +148,26 @@ public class UIManager : MonoBehaviour
 
     private void HandlePhaseChanged(GamePhase oldPhase, GamePhase newPhase)
     {
-        UpdatePhaseDisplay();
         UpdateButtonStates(runManager.CurrentState);
     }
 
     private void HandleRoundChanged(int newRound)
     {
-        // Placeholder for future UI updates related to round changes
+        // Logic for round change can go here if needed in the future
     }
 
     private void HandleTickAdvanced(int currentTick)
     {
         UpdateTickDisplay();
-        UpdatePhaseProgressDisplay();
     }
-    #endregion
 
-    #region UI Updates
-    private void UpdatePhaseDisplay() { if (currentPhaseText != null && runManager != null) currentPhaseText.text = $"Phase: {runManager.CurrentPhase}"; }
-    private void UpdateTickDisplay() { if (tickManager == null) return; string tickInfo = $"Tick: {tickManager.CurrentTick}"; if (tickCounterText != null) tickCounterText.text = tickInfo; if (persistentTickCounterText != null) persistentTickCounterText.text = tickInfo; }
-    private void UpdatePhaseProgressDisplay() { if (phaseProgressText != null && runManager != null) phaseProgressText.text = $"Phase Ticks: {runManager.CurrentPhaseTicks}"; }
+    private void UpdateTickDisplay()
+    {
+        if (tickCounterText != null && tickManager != null)
+        {
+            tickCounterText.text = $"Tick: {tickManager.CurrentTick}";
+        }
+    }
 
     private void UpdateButtonStates(RunState state)
     {
@@ -196,23 +179,18 @@ public class UIManager : MonoBehaviour
         if (endPlanningPhaseButton != null) endPlanningPhaseButton.interactable = isPlanning && isPlanningPhase;
         if (advanceTickButton != null) advanceTickButton.interactable = !isPlanningPhase;
     }
-    #endregion
 
-    #region Button Callbacks
     private void OnStartGrowthPhaseClicked() { runManager?.StartGrowthAndThreatPhase(); }
     private void OnStartNewPlanningPhaseClicked() { runManager?.StartNewPlanningPhase(); }
     private void OnEndPlanningPhaseClicked() { runManager?.EndPlanningPhase(); }
     private void OnAdvanceTickClicked() { tickManager?.DebugAdvanceTick(); }
-    #endregion
 
-    #region Coroutines
     private IEnumerator ShowInventoryBarDelayed()
     {
-        // Wait one frame to ensure UI layout has updated after panels are switched
         yield return null;
         InventoryBarController.Instance?.ShowBar();
     }
-    
+
     public void ShowNotification(string message, float duration = 3f)
     {
         StartCoroutine(ShowNotificationCoroutine(message, duration));
@@ -229,7 +207,6 @@ public class UIManager : MonoBehaviour
         var text = new GameObject("Text").AddComponent<TextMeshProUGUI>();
         text.transform.SetParent(notification.transform, false);
 
-        // Position and style the notification
         rectTransform.anchorMin = new Vector2(0.5f, 0.8f);
         rectTransform.anchorMax = new Vector2(0.5f, 0.8f);
         rectTransform.sizeDelta = new Vector2(300, 60);
@@ -241,7 +218,6 @@ public class UIManager : MonoBehaviour
         text.fontSize = 16;
         text.rectTransform.sizeDelta = rectTransform.sizeDelta;
 
-        // Fade In
         float elapsedTime = 0f;
         while (elapsedTime < 0.5f)
         {
@@ -251,10 +227,8 @@ public class UIManager : MonoBehaviour
         }
         canvasGroup.alpha = 1f;
 
-        // Wait
         yield return new WaitForSeconds(duration - 1f);
 
-        // Fade Out
         elapsedTime = 0f;
         while (elapsedTime < 0.5f)
         {
@@ -265,5 +239,4 @@ public class UIManager : MonoBehaviour
 
         Destroy(notification);
     }
-    #endregion
 }
