@@ -1,32 +1,32 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
-using Abracodabra.Genes;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Templates;
 using Abracodabra.UI.Genes;
+using UnityEngine.UI;
 
 public class InventoryGridController : MonoBehaviour
 {
     public static InventoryGridController Instance { get; private set; }
 
-    [SerializeField][Min(1)] int inventoryRows = 4;
-    [SerializeField][Min(1)] int inventoryColumns = 4;
-    [SerializeField] Vector2 cellSize = new Vector2(64f, 64f);
-    [SerializeField] float cellMargin = 10f;
+    [Header("Grid Layout")]
+    [SerializeField][Min(1)] private int inventoryRows = 4;
+    [SerializeField][Min(1)] private int inventoryColumns = 4;
+    [SerializeField] private Vector2 cellSize = new Vector2(64f, 64f);
+    [SerializeField] private float cellMargin = 10f;
 
-    [SerializeField] GameObject itemSlotPrefab;
-    [SerializeField] Transform cellContainer;
+    [Header("Component References")]
+    [SerializeField] private GameObject itemSlotPrefab;
+    [SerializeField] private Transform cellContainer;
+    [SerializeField] private StartingInventory startingInventory;
 
-    [SerializeField] StartingInventory startingInventory;
-
-    List<GeneSlotUI> inventorySlots = new List<GeneSlotUI>();
+    private List<GeneSlotUI> inventorySlots = new List<GeneSlotUI>();
 
     public event System.Action OnInventoryChanged;
 
-    void Awake()
+    private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -36,17 +36,15 @@ public class InventoryGridController : MonoBehaviour
         Instance = this;
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
-        // This is the crucial fix.
-        // If this instance is the current singleton instance, clear the static reference when it's destroyed.
         if (Instance == this)
         {
             Instance = null;
         }
     }
 
-    void Start()
+    private void Start()
     {
         if (cellContainer == null) Debug.LogError("InventoryGridController: Cell Container not assigned!", this);
         if (itemSlotPrefab == null) Debug.LogError("InventoryGridController: Item Slot Prefab not assigned!", this);
@@ -60,7 +58,7 @@ public class InventoryGridController : MonoBehaviour
         PopulateInitialInventory();
     }
 
-    void CreateInventoryCells()
+    private void CreateInventoryCells()
     {
         if (itemSlotPrefab == null || cellContainer == null) return;
 
@@ -98,23 +96,29 @@ public class InventoryGridController : MonoBehaviour
         }
     }
 
-    void PopulateInitialInventory()
+    private void PopulateInitialInventory()
     {
         if (startingInventory == null) return;
 
-        foreach (var gene in startingInventory.startingGenes)
+        // --- THIS IS THE FIX ---
+        // The loops have been reordered to match your request.
+
+        // 1. Add Tools first
+        foreach (var tool in startingInventory.startingTools)
         {
-            if (gene != null) AddItemToInventory(InventoryBarItem.FromGene(new RuntimeGeneInstance(gene)));
+            if (tool != null) AddItemToInventory(InventoryBarItem.FromTool(tool));
         }
 
+        // 2. Add Seeds second
         foreach (var seed in startingInventory.startingSeeds)
         {
             if (seed != null) AddItemToInventory(InventoryBarItem.FromSeed(seed));
         }
 
-        foreach (var tool in startingInventory.startingTools)
+        // 3. Add Genes last
+        foreach (var gene in startingInventory.startingGenes)
         {
-            if (tool != null) AddItemToInventory(InventoryBarItem.FromTool(tool));
+            if (gene != null) AddItemToInventory(InventoryBarItem.FromGene(new RuntimeGeneInstance(gene)));
         }
     }
 
