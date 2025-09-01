@@ -100,22 +100,16 @@ public class InventoryGridController : MonoBehaviour
     {
         if (startingInventory == null) return;
 
-        // --- THIS IS THE FIX ---
-        // The loops have been reordered to match your request.
-
-        // 1. Add Tools first
         foreach (var tool in startingInventory.startingTools)
         {
             if (tool != null) AddItemToInventory(InventoryBarItem.FromTool(tool));
         }
 
-        // 2. Add Seeds second
         foreach (var seed in startingInventory.startingSeeds)
         {
             if (seed != null) AddItemToInventory(InventoryBarItem.FromSeed(seed));
         }
 
-        // 3. Add Genes last
         foreach (var gene in startingInventory.startingGenes)
         {
             if (gene != null) AddItemToInventory(InventoryBarItem.FromGene(new RuntimeGeneInstance(gene)));
@@ -155,5 +149,28 @@ public class InventoryGridController : MonoBehaviour
             .Where(s => s.CurrentItem != null && s.CurrentItem.IsValid())
             .Select(s => s.CurrentItem)
             .ToList();
+    }
+
+    /// <summary>
+    /// Gets the items from the first N slots of the inventory, including nulls for empty slots.
+    /// </summary>
+    /// <param name="count">The number of slots to get.</param>
+    /// <returns>A list of InventoryBarItems, which may contain null entries.</returns>
+    public List<InventoryBarItem> GetFirstNItems(int count)
+    {
+        var items = new List<InventoryBarItem>();
+        for (int i = 0; i < count; i++)
+        {
+            if (i < inventorySlots.Count)
+            {
+                items.Add(inventorySlots[i].CurrentItem);
+            }
+            else
+            {
+                // If the inventory grid itself is smaller than the bar, add nulls
+                items.Add(null);
+            }
+        }
+        return items;
     }
 }

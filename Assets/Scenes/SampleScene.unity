@@ -58428,8 +58428,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3cb91410948b47a2898df3f344af0016, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSlots: 10
-  inventoryItemViewPrefab: {fileID: 8484850646006857580, guid: 1618c32db2a32204498918a7b315b3e5, type: 3}
+  barSlotCount: 8
+  inventorySlotPrefab: {fileID: 8484850646006857580, guid: 1618c32db2a32204498918a7b315b3e5, type: 3}
   inventoryGridController: {fileID: 1502243627}
   inventoryBarPanelRect: {fileID: 864572959}
   cellContainer: {fileID: 314061415}
