@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Components;
+using WegoSystem; // <-- ADDED this using statement for GridPosition and GridPositionManager
 
 namespace Abracodabra.Genes.Implementations
 {
@@ -27,7 +28,7 @@ namespace Abracodabra.Genes.Implementations
 
             if (fruitPoints.Length == 0)
             {
-                Debug.LogWarning($"Plant '{context.plant.name}' has no empty spaces for fruit spawning. Plant may be too crowded.", context.plant);
+                Debug.LogWarning($"Plant '{context.plant.name}' has no empty spaces for fruit spawning.", context.plant);
                 return;
             }
 
@@ -46,9 +47,22 @@ namespace Abracodabra.Genes.Implementations
             
             for (int i = 0; i < count; i++)
             {
+                // Get the correct world position from the temporary spawn point
+                Vector3 spawnPosition = shuffledPoints[i].position;
+                
+                GameObject fruitObj = Instantiate(fruitPrefab, spawnPosition, Quaternion.identity);
+
                 // --- THIS IS THE FIX ---
-                // We now use Instantiate directly, bypassing the effect pool which was causing the timed destruction.
-                GameObject fruitObj = Instantiate(fruitPrefab, shuffledPoints[i].position, Quaternion.identity);
+                // We must manually initialize the fruit as a plant part to prevent it from snapping itself to the grid center.
+                FoodItem foodItem = fruitObj.GetComponent<FoodItem>();
+                if (foodItem != null)
+                {
+                    // Convert the spawn position to a grid position
+                    GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(spawnPosition);
+                    // Initialize it, which registers it correctly without moving it.
+                    foodItem.InitializeAsPlantPart(foodItem.foodType, gridPos);
+                }
+                // --- END OF FIX ---
 
                 Fruit fruit = fruitObj.GetComponent<Fruit>();
                 if (fruit != null)
