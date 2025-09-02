@@ -25,6 +25,7 @@ public class AnimalMovement : MonoBehaviour
     private Vector2 maxBounds;
 
     private Vector2 lastMoveDirection;
+    private float _speedAccumulator = 0f;
 
     public bool HasTarget => currentTargetFood != null || hasPlannedAction;
     public GameObject CurrentTargetFood => currentTargetFood;
@@ -40,13 +41,19 @@ public class AnimalMovement : MonoBehaviour
 
     public void OnTickUpdate(int currentTick)
     {
-        if (!enabled || controller.IsDying || controller.Behavior.IsEating || controller.Behavior.IsPooping) return;
+        if (!enabled || controller.IsDying || controller.Behavior.IsEating || controller.Behavior.IsPooping)
+        {
+            _speedAccumulator = 0f; // Reset speed if action is interrupted
+            return;
+        }
 
         if (wanderPauseTicks > 0)
         {
             wanderPauseTicks--;
             return;
         }
+
+        _speedAccumulator += definition.movementSpeed;
 
         if (currentTick - lastThinkTick >= definition.thinkingTickInterval)
         {
@@ -108,8 +115,6 @@ public class AnimalMovement : MonoBehaviour
         }
     }
 
-    // --- TASK 2: UNIFIED FOOD SEARCH LOGIC ---
-    // This method now exclusively uses the grid, which is more performant and reliable.
     private GameObject FindNearestFood()
     {
         if (definition.diet == null) return null;
@@ -123,7 +128,6 @@ public class AnimalMovement : MonoBehaviour
         GameObject bestFood = null;
         float bestScore = -1f;
 
-        // Use LINQ to efficiently find all valid food items in the radius
         var foodItems = entitiesInRadius
             .Select(entity => entity.GetComponent<FoodItem>())
             .Where(foodItem => foodItem != null && foodItem.foodType != null && definition.diet.CanEat(foodItem.foodType));
@@ -154,11 +158,9 @@ public class AnimalMovement : MonoBehaviour
         GridEntity foodEntity = food.GetComponent<GridEntity>();
         if (foodEntity != null && foodEntity.enabled)
         {
-            // This is now the primary, reliable way to get a food's position.
             return foodEntity.Position;
         }
-        
-        // Fallback for safety, but should rarely be needed.
+
         Debug.LogWarning($"[AnimalMovement] Food item '{food.name}' did not have an enabled GridEntity. Using world position as fallback.", food);
         return GridPositionManager.Instance.WorldToGrid(food.transform.position);
     }
@@ -205,7 +207,6 @@ public class AnimalMovement : MonoBehaviour
             GridPosition.Left, GridPosition.Right
         };
 
-        // Shuffle directions to avoid bias
         for (int i = 0; i < directions.Length; i++)
         {
             int randomIndex = Random.Range(i, directions.Length);
@@ -234,6 +235,7 @@ public class AnimalMovement : MonoBehaviour
     {
         if (!hasPlannedAction || gridEntity.IsMoving) return;
 
+        // Check if close enough to eat *before* moving this tick
         if (currentTargetFood != null)
         {
             GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
@@ -247,21 +249,27 @@ public class AnimalMovement : MonoBehaviour
             }
         }
 
-        if (currentPath != null && currentPath.Count > 0 && currentPathIndex < currentPath.Count)
-        {
-            GridPosition nextPosition = currentPath[currentPathIndex];
+        int tilesToMove = Mathf.FloorToInt(_speedAccumulator);
+        if (tilesToMove <= 0) return;
 
+        int tilesMovedSuccessfully = 0;
+        for (int i = 0; i < tilesToMove; i++)
+        {
+            if (currentPath == null || currentPathIndex >= currentPath.Count)
+            {
+                ClearMovementPlan(); // Path is complete
+                break;
+            }
+
+            GridPosition nextPosition = currentPath[currentPathIndex];
             if (TryMoveTo(nextPosition))
             {
                 currentPathIndex++;
-
-                if (currentPathIndex >= currentPath.Count)
-                {
-                    ClearMovementPlan();
-                }
+                tilesMovedSuccessfully++;
             }
             else
             {
+                // Path is blocked, recalculate
                 if (currentTargetFood != null)
                 {
                     SetTargetFood(currentTargetFood);
@@ -270,11 +278,16 @@ public class AnimalMovement : MonoBehaviour
                 {
                     ClearMovementPlan();
                 }
+                break; // Stop trying to move this tick
             }
         }
-        else
+
+        _speedAccumulator -= tilesMovedSuccessfully;
+
+        // If path completed, clear plan
+        if (currentPath != null && currentPathIndex >= currentPath.Count)
         {
-            hasPlannedAction = false;
+            ClearMovementPlan();
         }
     }
 
@@ -351,6 +364,7 @@ public class AnimalMovement : MonoBehaviour
         currentPathIndex = 0;
         currentTargetFood = null;
         hasPlannedAction = false;
+        _speedAccumulator = 0f; // Reset speed accumulator
         ClearPathDebugLine();
 
         if (GridDebugVisualizer.Instance != null)

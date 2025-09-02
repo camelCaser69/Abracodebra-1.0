@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 551,422 → 363,045 chars (34.2% reduction)
-Estimated tokens saved: ~47,094
+Compression Stats: 551,785 → 363,526 chars (34.1% reduction)
+Estimated tokens saved: ~47,064
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -81,122 +81,122 @@ using System;
   AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L3556
   AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L3642
   AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L3651
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L4001
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L4148
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L4161
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L4198
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L4508
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L4539
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L4812
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L4905
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L4920
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L4939
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L5023
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L5099
-  FoodType (Assets\Scripts\Ecosystem\Food/) L5171
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L5184
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L5206
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L5449
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L5468
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L5773
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L5802
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L5820
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L5858
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L5906
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L5924
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L6050
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L6161
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L6208
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L6221
-  TileDefinitionEditor (Assets\Scripts\Editor/) L6282
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L6302
-  WaveManagerEditor (Assets\Scripts\Editor/) L6439
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6614
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6639
-  LeafData (Assets\Scripts\PlantSystem\Data/) L6647
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6662
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6701
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6722
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6857
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6919
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7005
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7105
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7176
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7236
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7379
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7395
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7510
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7665
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7763
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L7864
-  GridSnapStartup (Assets\Scripts\Ticks/) L8103
-  TickDebugMonitor (Assets\Scripts\Ticks/) L8170
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8206
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8264
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L8495
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8506
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8535
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8631
-  WaterReflection (Assets\Scripts\Visual\Effects/) L8736
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9134
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9170
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9336
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9462
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9470
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9499
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L9666
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L9728
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9752
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9772
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9784
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9819
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L9994
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L4017
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L4164
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L4177
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L4214
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L4524
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L4555
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L4828
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L4921
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L4936
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L4955
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L5039
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L5115
+  FoodType (Assets\Scripts\Ecosystem\Food/) L5187
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L5200
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L5222
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L5465
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L5484
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L5789
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L5818
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L5836
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L5874
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L5922
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L5940
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L6066
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L6177
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L6224
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L6237
+  TileDefinitionEditor (Assets\Scripts\Editor/) L6298
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L6318
+  WaveManagerEditor (Assets\Scripts\Editor/) L6455
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L6630
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L6655
+  LeafData (Assets\Scripts\PlantSystem\Data/) L6663
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L6678
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L6717
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L6738
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L6873
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L6935
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7021
+  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L7121
+  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L7192
+  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L7252
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L7395
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L7411
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L7526
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L7681
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L7779
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L7880
+  GridSnapStartup (Assets\Scripts\Ticks/) L8119
+  TickDebugMonitor (Assets\Scripts\Ticks/) L8186
+  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L8222
+  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L8280
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L8511
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L8522
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L8551
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L8647
+  WaterReflection (Assets\Scripts\Visual\Effects/) L8752
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L9150
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L9186
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L9352
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L9478
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L9486
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L9515
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L9682
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L9744
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L9768
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L9788
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L9800
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L9835
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10010
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L10005
-  CameraZoomController (Assets\Scripts\Core/) L10114
-  InitializationManager (Assets\Scripts\Core/) L10163
-  PixelGridSnapper (Assets\Scripts\Core/) L10211
-  RunManager (Assets\Scripts\Core/) L10244
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L10380
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L10443
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L10579
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L10606
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L10753
-  GridEntity (Assets\Scripts\Ticks/) L10825
-  GridPosition (Assets\Scripts\Ticks/) L10994
-  GridPositionManager (Assets\Scripts\Ticks/) L11095
-  GridRadiusUtility (Assets\Scripts\Ticks/) L11473
-  TickConfiguration (Assets\Scripts\Ticks/) L11617
-  ITickUpdateable (Assets\Scripts\Ticks/) L11700
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11852
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12040
+  CameraController (Assets\Scripts\Core/) L10021
+  CameraZoomController (Assets\Scripts\Core/) L10130
+  InitializationManager (Assets\Scripts\Core/) L10179
+  PixelGridSnapper (Assets\Scripts\Core/) L10227
+  RunManager (Assets\Scripts\Core/) L10260
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L10396
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L10459
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L10595
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L10622
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L10769
+  GridEntity (Assets\Scripts\Ticks/) L10841
+  GridPosition (Assets\Scripts\Ticks/) L11010
+  GridPositionManager (Assets\Scripts\Ticks/) L11111
+  GridRadiusUtility (Assets\Scripts\Ticks/) L11489
+  TickConfiguration (Assets\Scripts\Ticks/) L11633
+  ITickUpdateable (Assets\Scripts\Ticks/) L11716
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L11868
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12056
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12345
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12361
 
 [WegoSystem.Editor']
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L12377
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L12393
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L12418
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L12434
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L12474
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12515
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12633
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L12490
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L12531
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L12649
 
 [issue.]
-  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12785
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L12812
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L12926
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L12974
+  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L12801
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L12828
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L12942
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L12990
 
 [namespace]
-  GeneEventBus (Assets\Scripts\Genes\Services/) L13015
+  GeneEventBus (Assets\Scripts\Genes\Services/) L13031
 
 [needs]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L13067
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L13083
 
 ================================================================================
 SCRIPTS
@@ -3851,6 +3851,7 @@ Vector2 minBounds;
 Vector2 maxBounds;
 
 Vector2 lastMoveDirection;
+float _speedAccumulator = 0f;
 
 pub bool HasTarget => currentTargetFood != null || hasPlannedAction;
 pub GameObject CurrentTargetFood => currentTargetFood;
@@ -3864,12 +3865,17 @@ SetupDebugLineRenderer();
 }
 
 pub void OnTickUpdate(int currentTick) {
-if (!enabled || controller.IsDying || controller.Behavior.IsEating || controller.Behavior.IsPooping) return;
+if (!enabled || controller.IsDying || controller.Behavior.IsEating || controller.Behavior.IsPooping) {
+_speedAccumulator = 0f; // Reset speed if action is interrupted
+return;
+}
 
 if (wanderPauseTicks > 0) {
 wanderPauseTicks--;
 return;
 }
+
+_speedAccumulator += definition.movementSpeed;
 
 if (currentTick - lastThinkTick >= definition.thinkingTickInterval) {
 MakeMovementDecision();
@@ -4035,15 +4041,20 @@ return;
 }
 }
 
-if (currentPath != null && currentPath.Count > 0 && currentPathIndex < currentPath.Count) {
-GridPosition nextPosition = currentPath[currentPathIndex];
+int tilesToMove = Mathf.FloorToInt(_speedAccumulator);
+if (tilesToMove <= 0) return;
 
+int tilesMovedSuccessfully = 0;
+for (int i = 0; i < tilesToMove; i++) {
+if (currentPath == null || currentPathIndex >= currentPath.Count) {
+ClearMovementPlan(); // Path is complete
+break;
+}
+
+GridPosition nextPosition = currentPath[currentPathIndex];
 if (TryMoveTo(nextPosition)) {
 currentPathIndex++;
-
-if (currentPathIndex >= currentPath.Count) {
-ClearMovementPlan();
-}
+tilesMovedSuccessfully++;
 }
 else {
 if (currentTargetFood != null) {
@@ -4052,10 +4063,14 @@ SetTargetFood(currentTargetFood);
 else {
 ClearMovementPlan();
 }
+break; // Stop trying to move this tick
 }
 }
-else {
-hasPlannedAction = false;
+
+_speedAccumulator -= tilesMovedSuccessfully;
+
+if (currentPath != null && currentPathIndex >= currentPath.Count) {
+ClearMovementPlan();
 }
 }
 
@@ -4122,6 +4137,7 @@ currentPath.Clear();
 currentPathIndex = 0;
 currentTargetFood = null;
 hasPlannedAction = false;
+_speedAccumulator = 0f; // Reset speed accumulator
 ClearPathDebugLine();
 
 if (GridDebugVisualizer.Instance != null) {
