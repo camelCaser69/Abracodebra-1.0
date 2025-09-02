@@ -37,12 +37,13 @@ MonoBehaviour:
     modifiers: []
     payloads: []
   baseGrowthChance: 1
-  minHeight: 4
+  minHeight: 6
   maxHeight: 6
   leafDensity: 2
   leafGap: 2
   baseRechargeTime: 3
   energyRegenRate: 1
   maxEnergy: 40
+  startingEnergy: 0
   isUnlocked: 1
   unlockRequirements: []

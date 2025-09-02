@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Collections;
 using WegoSystem;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Runtime;
@@ -30,7 +30,6 @@ namespace Abracodabra.Genes
         public PlantEnergySystem EnergySystem { get; set; }
         public PlantVisualManager VisualManager { get; set; }
 
-        [Header("Cell Configuration")]
         [SerializeField] public float desiredPixelsPerCell = 1f;
 
         public float GetCellWorldSpacing()
@@ -45,32 +44,27 @@ namespace Abracodabra.Genes
         public float cellSpacingInPixels => desiredPixelsPerCell;
         public float cellSpacing => GetCellWorldSpacing();
 
-        [SerializeField] private GameObject seedCellPrefab;
-        [SerializeField] private GameObject stemCellPrefab;
-        [SerializeField] private GameObject leafCellPrefab;
-        [SerializeField] private GameObject berryCellPrefab;
+        [SerializeField] GameObject seedCellPrefab;
+        [SerializeField] GameObject stemCellPrefab;
+        [SerializeField] GameObject leafCellPrefab;
+        [SerializeField] GameObject berryCellPrefab;
 
-        [Header("Visuals & Food")]
-        [SerializeField] private PlantShadowController shadowController;
-        [SerializeField] private PlantOutlineController outlineController;
-        [SerializeField] private GameObject outlinePartPrefab;
-        [SerializeField] private bool enableOutline = true;
-        [SerializeField] private FoodType leafFoodType;
+        [SerializeField] PlantShadowController shadowController;
+        [SerializeField] PlantOutlineController outlineController;
+        [SerializeField] GameObject outlinePartPrefab;
+        [SerializeField] bool enableOutline = true;
+        [SerializeField] FoodType leafFoodType;
 
-        [Header("Fruit Spawning")]
-        [SerializeField] private bool allowFruitsAroundLeaves = false;
-        [SerializeField] private int fruitSearchRadius = 2;
-        
-        [Header("Energy System")]
+        [SerializeField] bool allowFruitsAroundLeaves = false;
+        [SerializeField] int fruitSearchRadius = 2;
+
         [SerializeField] public bool rechargeEnergyDuringGrowth = false;
 
-        [Header("Passive Stat Multipliers")]
         public float growthSpeedMultiplier = 1f;
         public float energyGenerationMultiplier = 1f;
         public float energyStorageMultiplier = 1f;
         public float fruitYieldMultiplier = 1f;
 
-        [Header("Base Growth Parameters")]
         public float baseGrowthChance;
         public int minHeight;
         public int maxHeight;
@@ -79,6 +73,8 @@ namespace Abracodabra.Genes
 
         public PlantState CurrentState { get; set; } = PlantState.Initializing;
 
+        // NEW: Set to track occupied fruit positions
+        private HashSet<Vector2Int> activeFruitPositions = new HashSet<Vector2Int>();
         private IDeterministicRandom _deterministicRandom;
 
         void Awake()
@@ -135,8 +131,6 @@ namespace Abracodabra.Genes
             GrowthLogic.CalculateAndApplyPassiveStats();
 
             EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
-            // --- THIS IS THE FIX ---
-            // Use the startingEnergy from the template instead of starting at max.
             EnergySystem.CurrentEnergy = geneRuntimeState.template.startingEnergy;
             EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
 
@@ -156,7 +150,7 @@ namespace Abracodabra.Genes
             Debug.Log($"Plant '{gameObject.name}' initialized from template '{seedTemplate.templateName}'. State: {CurrentState}");
         }
 
-        private IEnumerator DelayedGrowthStart()
+        IEnumerator DelayedGrowthStart()
         {
             yield return new WaitForSeconds(0.5f);
             CurrentState = PlantState.Growing;
@@ -169,7 +163,7 @@ namespace Abracodabra.Genes
             {
                 EnergySystem.OnTickUpdate();
             }
-            
+
             if (sequenceExecutor != null)
             {
                 sequenceExecutor.OnTickUpdate(currentTick);
@@ -179,7 +173,7 @@ namespace Abracodabra.Genes
             {
                 VisualManager.UpdateUI();
             }
-            
+
             if (CurrentState == PlantState.Growing)
             {
                 float randomValue = (_deterministicRandom != null) ?
@@ -191,7 +185,7 @@ namespace Abracodabra.Genes
             }
         }
 
-        private void GrowSomething()
+        void GrowSomething()
         {
             int currentHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
 
@@ -227,10 +221,16 @@ namespace Abracodabra.Genes
         public void HandleBeingEaten(AnimalController eater, PlantCell eatenCell)
         {
             Debug.Log($"{eater.SpeciesName} ate cell at {eatenCell.GridCoord} on plant {name}");
+            CellManager?.ReportCellDestroyed(eatenCell.GridCoord);
         }
 
         public void ReportCellDestroyed(Vector2Int coord)
         {
+            // NEW: If the destroyed cell was a fruit, remove it from the tracking set.
+            if (CellManager.cells.TryGetValue(coord, out var cellType) && cellType == PlantCellType.Fruit)
+            {
+                activeFruitPositions.Remove(coord);
+            }
             CellManager?.ReportCellDestroyed(coord);
         }
 
@@ -244,16 +244,21 @@ namespace Abracodabra.Genes
             List<Transform> spawnPoints = new List<Transform>();
             List<Vector2Int> sourcePositions = GetFruitSourcePositions();
             HashSet<Vector2Int> emptyPositions = FindEmptyPositionsAround(sourcePositions);
-            
-            foreach (Vector2Int emptyPos in emptyPositions)
+
+            // NEW: Filter out positions that already have a fruit
+            var availablePositions = emptyPositions.Where(pos => !activeFruitPositions.Contains(pos)).ToList();
+
+            foreach (Vector2Int emptyPos in availablePositions)
             {
                 GameObject tempSpawnPoint = CreateTemporarySpawnPoint(emptyPos);
                 if (tempSpawnPoint != null)
                 {
                     spawnPoints.Add(tempSpawnPoint.transform);
+                    // NEW: Track this position as reserved for a new fruit
+                    activeFruitPositions.Add(emptyPos);
                 }
             }
-            
+
             if (spawnPoints.Count > 0)
             {
                 StartCoroutine(CleanupTemporarySpawnPoints(spawnPoints, 0.1f));
@@ -265,7 +270,7 @@ namespace Abracodabra.Genes
         private List<Vector2Int> GetFruitSourcePositions()
         {
             List<Vector2Int> sourcePositions = new List<Vector2Int>();
-            
+
             foreach (var kvp in CellManager.cells)
             {
                 if (kvp.Value == PlantCellType.Stem)
@@ -273,7 +278,7 @@ namespace Abracodabra.Genes
                     sourcePositions.Add(kvp.Key);
                 }
             }
-            
+
             if (allowFruitsAroundLeaves)
             {
                 foreach (var kvp in CellManager.cells)
@@ -284,7 +289,7 @@ namespace Abracodabra.Genes
                     }
                 }
             }
-            
+
             return sourcePositions;
         }
 
@@ -299,7 +304,7 @@ namespace Abracodabra.Genes
                     for (int y = -fruitSearchRadius; y <= fruitSearchRadius; y++)
                     {
                         if (x == 0 && y == 0) continue;
-                        
+
                         Vector2Int checkPos = sourcePos + new Vector2Int(x, y);
 
                         if (!CellManager.HasCellAt(checkPos))
@@ -321,20 +326,20 @@ namespace Abracodabra.Genes
         {
             float spacing = GetCellWorldSpacing();
             Vector3 worldPos = transform.position + new Vector3(gridPos.x * spacing, gridPos.y * spacing, 0);
-            
+
             GameObject spawnPoint = new GameObject($"TempFruitSpawnPoint_{gridPos.x}_{gridPos.y}");
             spawnPoint.transform.position = worldPos;
             spawnPoint.transform.SetParent(transform);
-            
+
             spawnPoint.AddComponent<TemporaryFruitSpawnMarker>();
-            
+
             return spawnPoint;
         }
-        
-        private IEnumerator CleanupTemporarySpawnPoints(List<Transform> spawnPoints, float delay)
+
+        IEnumerator CleanupTemporarySpawnPoints(List<Transform> spawnPoints, float delay)
         {
             yield return new WaitForSeconds(delay);
-            
+
             foreach (Transform spawnPoint in spawnPoints)
             {
                 if (spawnPoint != null && spawnPoint.GetComponent<TemporaryFruitSpawnMarker>() != null)
@@ -344,7 +349,7 @@ namespace Abracodabra.Genes
             }
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         void OnDrawGizmos()
         {
             if (!Application.isPlaying) return;
@@ -356,7 +361,7 @@ namespace Abracodabra.Genes
             {
                 Vector2 cellWorldPos = (Vector2)transform.position + (Vector2)cell.Key * spacing;
 
-                switch(cell.Value)
+                switch (cell.Value)
                 {
                     case PlantCellType.Stem: Gizmos.color = new Color(0, 1, 0, 0.5f); break;
                     case PlantCellType.Leaf: Gizmos.color = new Color(1, 1, 0, 0.5f); break;
@@ -380,22 +385,22 @@ namespace Abracodabra.Genes
             );
         }
 
-        private void OnDrawGizmosSelected()
+        void OnDrawGizmosSelected()
         {
             if (!Application.isPlaying || CellManager == null) return;
-            
+
             List<Vector2Int> sourcePositions = GetFruitSourcePositions();
             HashSet<Vector2Int> emptyPositions = FindEmptyPositionsAround(sourcePositions);
-            
+
             float spacing = GetCellWorldSpacing();
-            
+
             Gizmos.color = Color.green;
             foreach (Vector2Int sourcePos in sourcePositions)
             {
                 Vector3 worldPos = transform.position + new Vector3(sourcePos.x * spacing, sourcePos.y * spacing, 0);
                 Gizmos.DrawWireSphere(worldPos, spacing * 0.2f);
             }
-            
+
             Gizmos.color = Color.cyan;
             foreach (Vector2Int emptyPos in emptyPositions)
             {
@@ -403,6 +408,6 @@ namespace Abracodabra.Genes
                 Gizmos.DrawWireCube(worldPos, Vector3.one * spacing * 0.5f);
             }
         }
-        #endif
+#endif
     }
 }

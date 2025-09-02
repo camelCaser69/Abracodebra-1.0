@@ -1,28 +1,26 @@
-﻿// Assets/Scripts/Ecosystem/StatusEffects/StatusEffectManager.cs
+﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class StatusEffectManager : MonoBehaviour
 {
-    private IStatusEffectable owner; 
+    private IStatusEffectable owner;
     private List<StatusEffectInstance> activeEffects = new List<StatusEffectInstance>();
     private Dictionary<string, StatusEffectInstance> effectLookup = new Dictionary<string, StatusEffectInstance>();
 
-    // Cached values
-    private float cachedVisualSpeedMultiplier = 1f; // <<< RENAMED
+    private float cachedVisualInterpolationSpeedMultiplier = 1f;
     private float cachedDamageResistanceMultiplier = 1f;
     private int cachedAdditionalMoveTicks = 0;
     private Color originalColor;
     private SpriteRenderer spriteRenderer;
 
-    public float VisualSpeedMultiplier => cachedVisualSpeedMultiplier; // <<< RENAMED
+    public float VisualInterpolationSpeedMultiplier => cachedVisualInterpolationSpeedMultiplier;
     public float DamageResistanceMultiplier => cachedDamageResistanceMultiplier;
     public int AdditionalMoveTicks => cachedAdditionalMoveTicks;
 
     public void Initialize(IStatusEffectable owner)
     {
         this.owner = owner;
-        
+
         Component ownerComponent = owner as Component;
         if (ownerComponent != null)
         {
@@ -38,7 +36,7 @@ public class StatusEffectManager : MonoBehaviour
     {
         if (owner == null || (owner as Component) == null)
         {
-            Destroy(this); 
+            Destroy(this);
             return;
         }
 
@@ -81,10 +79,10 @@ public class StatusEffectManager : MonoBehaviour
             }
             Debug.Log($"[StatusEffect] Applied {effect.displayName} to {owner.GetDisplayName()}");
         }
-        
+
         UpdateCachedModifiers();
     }
-    
+
     public void RemoveStatusEffect(string effectID)
     {
         if (!effectLookup.ContainsKey(effectID)) return;
@@ -98,7 +96,7 @@ public class StatusEffectManager : MonoBehaviour
         Debug.Log($"[StatusEffect] Removed {instance.effect.displayName} from {owner.GetDisplayName()}");
         UpdateCachedModifiers();
     }
-    
+
     private void ProcessStatusEffects()
     {
         for (int i = activeEffects.Count - 1; i >= 0; i--)
@@ -109,7 +107,7 @@ public class StatusEffectManager : MonoBehaviour
             if (effect.damagePerTick) owner.TakeDamage(effect.damageAmount * instance.stackCount);
             if (effect.healPerTick) owner.Heal(effect.healAmount * instance.stackCount);
             if (effect.modifyHunger) owner.ModifyHunger(effect.hungerModifier * instance.stackCount);
-            
+
             if (!effect.isPermanent)
             {
                 instance.remainingTicks--;
@@ -120,27 +118,61 @@ public class StatusEffectManager : MonoBehaviour
             }
         }
     }
-    
+
     private void UpdateCachedModifiers()
     {
-        cachedVisualSpeedMultiplier = 1f; // <<< RENAMED
+        cachedVisualInterpolationSpeedMultiplier = 1f;
         cachedDamageResistanceMultiplier = 1f;
         cachedAdditionalMoveTicks = 0;
 
         foreach (var instance in activeEffects)
         {
             var effect = instance.effect;
-            cachedVisualSpeedMultiplier *= effect.visualSpeedMultiplier; // <<< RENAMED
+            cachedVisualInterpolationSpeedMultiplier *= effect.visualInterpolationSpeedMultiplier;
             cachedDamageResistanceMultiplier *= effect.damageResistanceMultiplier;
             cachedAdditionalMoveTicks += effect.additionalMoveTicks * instance.stackCount;
         }
     }
-    
-    // --- Unchanged Methods ---
-    public bool HasStatusEffect(string effectID) { return effectLookup.ContainsKey(effectID); }
-    private void UpdateVisualEffects() { if(spriteRenderer==null)return;Color targetColor=originalColor;bool hasColorEffect=false;foreach(var instance in activeEffects){if(instance.effect.modifyAnimalColor){targetColor=instance.effect.animalTintColor;hasColorEffect=true;break;}}
-    spriteRenderer.color=hasColorEffect?targetColor:originalColor;}
-    public List<StatusEffectInstance> GetActiveEffects() { return new List<StatusEffectInstance>(activeEffects); }
-    public void ClearAllEffects() { for(int i=activeEffects.Count-1;i>=0;i--){RemoveStatusEffect(activeEffects[i].effect.effectID);}}
-    private void OnDestroy() { foreach(var instance in activeEffects){if(instance.visualEffectInstance!=null){Destroy(instance.visualEffectInstance);}}}
+
+    public bool HasStatusEffect(string effectID)
+    {
+        return effectLookup.ContainsKey(effectID);
+    }
+    private void UpdateVisualEffects()
+    {
+        if (spriteRenderer == null) return;
+        Color targetColor = originalColor;
+        bool hasColorEffect = false;
+        foreach (var instance in activeEffects)
+        {
+            if (instance.effect.modifyAnimalColor)
+            {
+                targetColor = instance.effect.animalTintColor;
+                hasColorEffect = true;
+                break;
+            }
+        }
+        spriteRenderer.color = hasColorEffect ? targetColor : originalColor;
+    }
+    public List<StatusEffectInstance> GetActiveEffects()
+    {
+        return new List<StatusEffectInstance>(activeEffects);
+    }
+    public void ClearAllEffects()
+    {
+        for (int i = activeEffects.Count - 1; i >= 0; i--)
+        {
+            RemoveStatusEffect(activeEffects[i].effect.effectID);
+        }
+    }
+    void OnDestroy()
+    {
+        foreach (var instance in activeEffects)
+        {
+            if (instance.visualEffectInstance != null)
+            {
+                Destroy(instance.visualEffectInstance);
+            }
+        }
+    }
 }

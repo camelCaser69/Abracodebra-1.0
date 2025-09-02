@@ -1,24 +1,24 @@
-﻿// Assets/Scripts/Ecosystem/Animals/AnimalNeeds.cs
-using UnityEngine;
+﻿using UnityEngine;
 using WegoSystem;
+using Abracodabra.Genes.Components;
 
 public class AnimalNeeds : MonoBehaviour
 {
-    AnimalController controller;
-    AnimalDefinition definition;
-    AnimalDiet diet;
-    SpriteRenderer spriteRenderer;
+    private AnimalController controller;
+    private AnimalDefinition definition;
+    private AnimalDiet diet;
+    private SpriteRenderer spriteRenderer;
 
-    float currentHealth;
-    float currentHunger;
+    private float currentHealth;
+    private float currentHunger;
 
-    int hungerTick = 0;
-    int starvationTick = 0;
+    private int hungerTick = 0;
+    private int starvationTick = 0;
 
-    float flashRemainingTime = 0f;
-    float flashDurationSeconds = 0.2f;
-    bool isFlashing = false;
-    Color originalColor;
+    private float flashRemainingTime = 0f;
+    private float flashDurationSeconds = 0.2f;
+    private bool isFlashing = false;
+    private Color originalColor;
 
     public float CurrentHealth => currentHealth;
     public float CurrentHunger => currentHunger;
@@ -52,7 +52,7 @@ public class AnimalNeeds : MonoBehaviour
         UpdateStarvation();
     }
 
-    void UpdateHunger()
+    private void UpdateHunger()
     {
         if (TickManager.Instance?.Config == null || diet == null) return;
 
@@ -68,7 +68,7 @@ public class AnimalNeeds : MonoBehaviour
         }
     }
 
-    void UpdateStarvation()
+    private void UpdateStarvation()
     {
         if (!IsStarving)
         {
@@ -104,8 +104,6 @@ public class AnimalNeeds : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        // The damage calculation is now done in AnimalController before this is called.
-        // This method now simply applies the final calculated damage.
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, definition.maxHealth);
 
@@ -118,7 +116,7 @@ public class AnimalNeeds : MonoBehaviour
         }
     }
 
-    void ApplyStarvationDamage()
+    private void ApplyStarvationDamage()
     {
         currentHealth -= definition.damagePerStarvationTick;
         currentHealth = Mathf.Clamp(currentHealth, 0f, definition.maxHealth);
@@ -133,13 +131,26 @@ public class AnimalNeeds : MonoBehaviour
     {
         if (foodItem == null || foodItem.foodType == null || diet == null) return;
 
-        float satiationGain = diet.GetSatiationValue(foodItem.foodType);
+        float satiationGain = 0f;
+
+        // NEW: Prioritize NutritionComponent for gene-based foods
+        NutritionComponent nutrition = foodItem.GetComponent<NutritionComponent>();
+        if (nutrition != null)
+        {
+            satiationGain = nutrition.nutritionValue;
+        }
+        else
+        {
+            // Fallback for standard plant parts
+            satiationGain = diet.GetSatiationValue(foodItem.foodType);
+        }
+        
         currentHunger -= satiationGain;
         currentHunger = Mathf.Max(0f, currentHunger);
 
         controller.UpdateUI();
 
-        Debug.Log($"[AnimalNeeds] {controller.SpeciesName} ate {foodItem.foodType.foodName}. Hunger: {currentHunger}/{diet.maxHunger}");
+        Debug.Log($"[AnimalNeeds] {controller.SpeciesName} ate {foodItem.foodType.foodName} for {satiationGain} satiation. Hunger: {currentHunger}/{diet.maxHunger}");
     }
 
     public void Heal(float amount)
@@ -148,7 +159,7 @@ public class AnimalNeeds : MonoBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0f, definition.maxHealth);
         controller.UpdateUI();
     }
-    
+
     public void ModifyHunger(float amount)
     {
         currentHunger += amount;
@@ -156,7 +167,7 @@ public class AnimalNeeds : MonoBehaviour
         controller.UpdateUI();
     }
 
-    void StartDamageFlash()
+    private void StartDamageFlash()
     {
         if (spriteRenderer == null) return;
 

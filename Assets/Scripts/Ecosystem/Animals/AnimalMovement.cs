@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using WegoSystem;
+using Abracodabra.Genes; // Required for PlantCell
 
 public class AnimalMovement : MonoBehaviour
 {
@@ -138,7 +139,7 @@ public class AnimalMovement : MonoBehaviour
             if (pref == null) continue;
 
             GridEntity foodEntity = foodItem.GetComponent<GridEntity>();
-            if (foodEntity == null) continue; // Should not happen with new FoodItem logic
+            if (foodEntity == null) continue;
 
             float distance = gridEntity.Position.ManhattanDistance(foodEntity.Position);
             float score = pref.preferencePriority / (1f + distance);
@@ -170,17 +171,62 @@ public class AnimalMovement : MonoBehaviour
         currentTargetFood = food;
         GridPosition foodGroundPos = GetFoodGroundPosition(food);
 
-        List<GridPosition> path = GridPositionManager.Instance.GetPath(gridEntity.Position, foodGroundPos, false);
-        if (path != null && path.Count > 0)
+        // NEW LOGIC: Pathfind to a tile *next to* the food, not on it.
+        List<GridPosition> validEatingPositions = GetValidEatingPositions(foodGroundPos);
+
+        GridPosition bestTarget = GridPosition.Zero;
+        float shortestDistance = float.MaxValue;
+        List<GridPosition> shortestPath = null;
+
+        foreach (var pos in validEatingPositions)
         {
-            currentPath = path;
+            if (!IsValidMove(pos)) continue;
+
+            var path = GridPositionManager.Instance.GetPath(gridEntity.Position, pos, false);
+            if (path != null && path.Count > 0)
+            {
+                float distance = path.Count;
+                if (distance < shortestDistance)
+                {
+                    shortestDistance = distance;
+                    bestTarget = pos;
+                    shortestPath = path;
+                }
+            }
+        }
+        
+        if (shortestPath != null)
+        {
+            currentPath = shortestPath;
             currentPathIndex = 0;
             hasPlannedAction = true;
         }
         else
         {
+            // If no valid path to an eating spot is found, clear the target.
             currentTargetFood = null;
         }
+    }
+
+    private List<GridPosition> GetValidEatingPositions(GridPosition foodPos)
+    {
+        var positions = new List<GridPosition>();
+        // Get all positions at the exact eating distance
+        for (int x = -definition.eatDistanceTiles; x <= definition.eatDistanceTiles; x++)
+        {
+            for (int y = -definition.eatDistanceTiles; y <= definition.eatDistanceTiles; y++)
+            {
+                if (x == 0 && y == 0) continue; // Skip the food's own position
+
+                // Use Manhattan distance for grid-aligned movement
+                int distance = Mathf.Abs(x) + Mathf.Abs(y);
+                if (distance == definition.eatDistanceTiles)
+                {
+                    positions.Add(foodPos + new GridPosition(x, y));
+                }
+            }
+        }
+        return positions;
     }
 
     private void PlanWandering()
@@ -196,6 +242,7 @@ public class AnimalMovement : MonoBehaviour
 
         if (Random.Range(0, 100) < definition.wanderPauseTickChance)
         {
+            // The min/max wander MOVE ticks were removed, but pause ticks remain.
             wanderPauseTicks = Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
             hasPlannedAction = false;
             return;
@@ -235,13 +282,20 @@ public class AnimalMovement : MonoBehaviour
     {
         if (!hasPlannedAction || gridEntity.IsMoving) return;
 
-        // Check if close enough to eat *before* moving this tick
         if (currentTargetFood != null)
         {
+            // NEW: Check if food still exists before acting
+            if (currentTargetFood == null || !currentTargetFood.activeInHierarchy)
+            {
+                ClearMovementPlan();
+                return;
+            }
+
             GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
             int distance = gridEntity.Position.ManhattanDistance(foodPos);
 
-            if (distance <= definition.eatDistanceTiles)
+            // MODIFIED: Use exact distance check now that we pathfind to adjacent tiles.
+            if (distance == definition.eatDistanceTiles)
             {
                 controller.Behavior.StartEating(currentTargetFood);
                 ClearMovementPlan();
@@ -257,7 +311,7 @@ public class AnimalMovement : MonoBehaviour
         {
             if (currentPath == null || currentPathIndex >= currentPath.Count)
             {
-                ClearMovementPlan(); // Path is complete
+                ClearMovementPlan();
                 break;
             }
 
@@ -269,7 +323,6 @@ public class AnimalMovement : MonoBehaviour
             }
             else
             {
-                // Path is blocked, recalculate
                 if (currentTargetFood != null)
                 {
                     SetTargetFood(currentTargetFood);
@@ -278,13 +331,12 @@ public class AnimalMovement : MonoBehaviour
                 {
                     ClearMovementPlan();
                 }
-                break; // Stop trying to move this tick
+                break;
             }
         }
 
         _speedAccumulator -= tilesMovedSuccessfully;
 
-        // If path completed, clear plan
         if (currentPath != null && currentPathIndex >= currentPath.Count)
         {
             ClearMovementPlan();
@@ -310,12 +362,25 @@ public class AnimalMovement : MonoBehaviour
 
         if (!GridPositionManager.Instance.IsPositionValid(pos)) return false;
 
+        // NEW: Check for plant cells at this position and forbid movement.
+        var entitiesAtPos = GridPositionManager.Instance.GetEntitiesAt(pos);
+        foreach (var entity in entitiesAtPos)
+        {
+            if (entity.GetComponent<PlantCell>() != null)
+            {
+                return false;
+            }
+        }
+
         if (GridPositionManager.Instance.IsPositionOccupied(pos))
         {
+            // The original logic here was fine, but now it's redundant with the PlantCell check above.
+            // Kept for robustness in case other occupants exist.
             if (currentTargetFood != null)
             {
                 GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
-                if (pos == foodPos) return true;
+                // We shouldn't be pathing onto the food anymore, but as a safeguard:
+                if (pos == foodPos) return false;
             }
             return false;
         }
@@ -364,7 +429,7 @@ public class AnimalMovement : MonoBehaviour
         currentPathIndex = 0;
         currentTargetFood = null;
         hasPlannedAction = false;
-        _speedAccumulator = 0f; // Reset speed accumulator
+        _speedAccumulator = 0f;
         ClearPathDebugLine();
 
         if (GridDebugVisualizer.Instance != null)

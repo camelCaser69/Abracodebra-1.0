@@ -26,10 +26,22 @@ public class AnimalBehavior : MonoBehaviour
     public void OnTickUpdate(int currentTick) { if (isEating) { eatRemainingTicks--; if (eatRemainingTicks <= 0) { FinishEating(); } } if (poopDelayTick > 0) { poopDelayTick--; } if (currentPoopCooldownTick > 0) { currentPoopCooldownTick--; } if (!hasPooped && poopDelayTick <= 0 && currentPoopCooldownTick <= 0 && CanAct) { TryPoop(); } }
     public void StartEating(GameObject food) { if (food == null || !CanAct) return; FoodItem foodItem = food.GetComponent<FoodItem>(); if (foodItem == null || foodItem.foodType == null || !definition.diet.CanEat(foodItem.foodType)) { return; } controller.Movement.ClearMovementPlan(); isEating = true; currentEatingTarget = food; eatRemainingTicks = definition.eatDurationTicks; if (controller.CanShowThought()) { controller.ShowThought(ThoughtTrigger.Eating); } }
 
-    void FinishEating()
+    private void FinishEating()
     {
         isEating = false;
-        if (currentEatingTarget == null) return;
+    
+        // NEW: Null-safety check at the start
+        if (currentEatingTarget == null)
+        {
+            return;
+        }
+
+        // NEW: Check if target was destroyed by something else during the eating animation
+        if (!currentEatingTarget.activeInHierarchy)
+        {
+            currentEatingTarget = null;
+            return;
+        }
 
         FoodItem foodItem = currentEatingTarget.GetComponent<FoodItem>();
         if (foodItem != null)
@@ -39,11 +51,10 @@ public class AnimalBehavior : MonoBehaviour
             var plantCell = currentEatingTarget.GetComponent<PlantCell>();
             if (plantCell != null && plantCell.ParentPlantGrowth != null)
             {
-                // FIX: Instead of calling specific methods, we notify the plant it was eaten.
-                // The plant's internal gene system (executor) will handle any "On Eaten" triggers.
                 plantCell.ParentPlantGrowth.HandleBeingEaten(this.controller, plantCell);
             }
-
+        
+            // This will trigger the PlantCell's OnDestroy, which correctly notifies the plant.
             Destroy(currentEatingTarget);
 
             hasPooped = false;
@@ -53,7 +64,6 @@ public class AnimalBehavior : MonoBehaviour
         currentEatingTarget = null;
     }
 
-    // ... (Rest of the file is the same)
     private void TryPoop() { if (!CanAct) return; isPooping = true; currentPoopCooldownTick = definition.poopCooldownTicks; SpawnPoop(); hasPooped = true; isPooping = false; if (controller.CanShowThought()) { controller.ShowThought(ThoughtTrigger.Pooping); } }
     private void SpawnPoop() { if (poopPrefabs == null || poopPrefabs.Count == 0) return; int index = Random.Range(0, poopPrefabs.Count); GameObject prefab = poopPrefabs[index]; if (prefab == null) return; Transform spawnTransform = poopSpawnPoint != null ? poopSpawnPoint : transform; GameObject poopObj = Instantiate(prefab, spawnTransform.position, Quaternion.identity); if (GridPositionManager.Instance != null) { GridPositionManager.Instance.SnapEntityToGrid(poopObj); } }
     public void CancelCurrentAction() { isEating = false; eatRemainingTicks = 0; currentEatingTarget = null; isPooping = false; }

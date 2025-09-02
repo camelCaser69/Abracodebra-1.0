@@ -101,7 +101,7 @@ namespace WegoSystem
             statusManager?.OnTickUpdate(currentTick);
         }
 
-        private void Update()
+        void Update()
         {
             if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)
             {
@@ -109,7 +109,8 @@ namespace WegoSystem
             }
             if (gridEntity != null && statusManager != null)
             {
-                gridEntity.SetSpeedMultiplier(statusManager.VisualSpeedMultiplier);
+                // FIX: Use the new, correct property name
+                gridEntity.SetSpeedMultiplier(statusManager.VisualInterpolationSpeedMultiplier);
             }
             UpdateAnimations();
             UpdateSpriteDirection();
