@@ -72,8 +72,7 @@ namespace Abracodabra.Genes
         public int leafGap;
 
         public PlantState CurrentState { get; set; } = PlantState.Initializing;
-
-        // NEW: Set to track occupied fruit positions
+        
         private HashSet<Vector2Int> activeFruitPositions = new HashSet<Vector2Int>();
         private IDeterministicRandom _deterministicRandom;
 
@@ -187,16 +186,18 @@ namespace Abracodabra.Genes
 
         void GrowSomething()
         {
-            int currentHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
+            int oldHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
 
-            if (currentHeight < maxHeight)
+            if (oldHeight < maxHeight)
             {
-                Vector2Int stemPos = new Vector2Int(0, currentHeight + 1);
+                int newHeight = oldHeight + 1;
+                Vector2Int stemPos = new Vector2Int(0, newHeight);
                 CellManager.SpawnCellVisual(PlantCellType.Stem, stemPos);
 
-                if (currentHeight > 0 && currentHeight % leafGap == 0)
+                // Check for leaf growth using the new, correct height
+                if (newHeight > 0 && newHeight % leafGap == 0)
                 {
-                    int leafY = currentHeight;
+                    int leafY = newHeight;
 
                     for (int i = 0; i < leafDensity; i++)
                     {
@@ -226,7 +227,6 @@ namespace Abracodabra.Genes
 
         public void ReportCellDestroyed(Vector2Int coord)
         {
-            // NEW: If the destroyed cell was a fruit, remove it from the tracking set.
             if (CellManager.cells.TryGetValue(coord, out var cellType) && cellType == PlantCellType.Fruit)
             {
                 activeFruitPositions.Remove(coord);
@@ -244,8 +244,7 @@ namespace Abracodabra.Genes
             List<Transform> spawnPoints = new List<Transform>();
             List<Vector2Int> sourcePositions = GetFruitSourcePositions();
             HashSet<Vector2Int> emptyPositions = FindEmptyPositionsAround(sourcePositions);
-
-            // NEW: Filter out positions that already have a fruit
+            
             var availablePositions = emptyPositions.Where(pos => !activeFruitPositions.Contains(pos)).ToList();
 
             foreach (Vector2Int emptyPos in availablePositions)
@@ -254,7 +253,6 @@ namespace Abracodabra.Genes
                 if (tempSpawnPoint != null)
                 {
                     spawnPoints.Add(tempSpawnPoint.transform);
-                    // NEW: Track this position as reserved for a new fruit
                     activeFruitPositions.Add(emptyPos);
                 }
             }
