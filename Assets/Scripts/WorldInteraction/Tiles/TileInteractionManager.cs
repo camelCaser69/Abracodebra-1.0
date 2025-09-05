@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using Abracodabra.UI.Genes;
 using UnityEngine.Tilemaps;
 using skner.DualGrid;
@@ -67,7 +67,7 @@ namespace WegoSystem
             }
         }
 
-        private void Start()
+        void Start()
         {
             if (TickManager.Instance != null)
             {
@@ -75,7 +75,7 @@ namespace WegoSystem
             }
         }
 
-        private void OnDestroy()
+        void OnDestroy()
         {
             if (TickManager.Instance != null)
             {
@@ -88,9 +88,14 @@ namespace WegoSystem
             UpdateReversionTicks();
         }
 
-        private void Update()
+        void Update()
         {
             HandleTileHover();
+            // NEW: Check for tool refill action every frame
+            if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)
+            {
+                CheckAndRefillTool();
+            }
             UpdateDebugUI();
         }
 
@@ -119,38 +124,87 @@ namespace WegoSystem
         }
 
         public void ApplyToolAction(ToolDefinition toolDef)
+{
+    if (toolDef == null || !currentlyHoveredCell.HasValue) return;
+
+    Vector3Int targetCell = currentlyHoveredCell.Value;
+    TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
+
+    // NEW: Added more detailed debug logs as suggested
+    if (debugLogs)
+    {
+        Debug.Log($"[DEBUG] Applying Tool: '{toolDef?.displayName}' on Tile: '{currentTileDef?.displayName}' at {targetCell}");
+        if (interactionLibrary?.rules != null)
         {
-            if (toolDef == null || !currentlyHoveredCell.HasValue) return;
-
-            Vector3Int targetCell = currentlyHoveredCell.Value;
-            TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
-            if (currentTileDef == null) return;
-
-            TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == currentTileDef);
-
-            if (rule != null)
+            Debug.Log($"[DEBUG] Searching through {interactionLibrary.rules.Count} rules...");
+            var toolRules = interactionLibrary.rules.Where(r => r != null && r.tool == toolDef).ToList();
+            if (toolRules.Any())
             {
-                TileDefinition fromTile = currentTileDef;
-                TileDefinition toTile = rule.toTile;
-
-                if (debugLogs) Debug.Log($"[TileInteractionManager] Rule found! From: '{fromTile.displayName}', To: '{(toTile != null ? toTile.displayName : "NULL")}'.");
-
-                if (toTile == null)
+                foreach (var r in toolRules)
                 {
-                    RemoveTile(fromTile, targetCell);
-                    return;
+                    Debug.Log($"[DEBUG] Found rule for '{toolDef.displayName}': From '{r.fromTile?.displayName}' -> To '{r.toTile?.displayName}'");
                 }
-
-                if (!toTile.keepBottomTile)
-                {
-                    RemoveTile(fromTile, targetCell);
-                }
-
-                PlaceTile(toTile, targetCell);
             }
-            else if (debugLogs)
+            else
             {
-                Debug.Log($"[TileInteractionManager] No transformation rule found for Tool='{toolDef.displayName}' on Tile='{currentTileDef.displayName}'.");
+                Debug.Log($"[DEBUG] No rules found for tool '{toolDef.displayName}'.");
+            }
+        }
+    }
+
+    if (currentTileDef == null) return;
+
+    TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == currentTileDef);
+
+    if (rule != null)
+    {
+        TileDefinition fromTile = currentTileDef;
+        TileDefinition toTile = rule.toTile;
+
+        if (debugLogs) Debug.Log($"[TileInteractionManager] MATCH FOUND! From: '{fromTile.displayName}', To: '{(toTile != null ? toTile.displayName : "NULL")}'.");
+
+        if (toTile == null)
+        {
+            RemoveTile(fromTile, targetCell);
+            return;
+        }
+
+        if (!toTile.keepBottomTile)
+        {
+            RemoveTile(fromTile, targetCell);
+        }
+
+        PlaceTile(toTile, targetCell);
+    }
+    else if (debugLogs)
+    {
+        Debug.Log($"[TileInteractionManager] NO MATCH FOUND for Tool='{toolDef.displayName}' on Tile='{currentTileDef.displayName}'.");
+    }
+}
+
+        // NEW: Method to handle tool refilling
+        private void CheckAndRefillTool()
+        {
+            // Only allow refilling on right-click
+            if (!Input.GetMouseButtonDown(1)) return;
+
+            if (hoveredTileDef == null || ToolSwitcher.Instance == null) return;
+
+            var currentTool = ToolSwitcher.Instance.CurrentTool;
+            if (currentTool == null || !currentTool.limitedUses) return;
+
+            if (interactionLibrary?.refillRules != null)
+            {
+                var refillRule = interactionLibrary.refillRules.FirstOrDefault(
+                    r => r.toolToRefill == currentTool &&
+                         r.refillSourceTile == hoveredTileDef
+                );
+
+                if (refillRule != null && isWithinInteractionRange)
+                {
+                    ToolSwitcher.Instance.RefillCurrentTool();
+                    // Optionally: Add visual/audio feedback for refill here
+                }
             }
         }
 
@@ -261,9 +315,9 @@ namespace WegoSystem
                         if (renderTilemapTransform.GetComponent<TilemapRenderer>() is TilemapRenderer renderer)
                         {
                             renderer.sortingOrder = baseSortingOrder - i;
-                            #if UNITY_EDITOR
+#if UNITY_EDITOR
                             if (!Application.isPlaying) EditorUtility.SetDirty(renderer);
-                            #endif
+#endif
                         }
                     }
                 }
@@ -283,9 +337,9 @@ namespace WegoSystem
                         if (renderTilemapTransform.GetComponent<Tilemap>() is Tilemap renderTilemap)
                         {
                             renderTilemap.color = mapping.tileDef.tintColor;
-                            #if UNITY_EDITOR
+#if UNITY_EDITOR
                             if (!Application.isPlaying) EditorUtility.SetDirty(renderTilemap);
-                            #endif
+#endif
                         }
                     }
                 }
@@ -313,12 +367,9 @@ namespace WegoSystem
             if (hoverHighlightObject != null)
             {
                 hoverHighlightObject.SetActive(true);
-                
-                // Set the position to the mathematical center first
+
                 hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
-                
-                // --- THIS IS THE FIX ---
-                // Now, snap that final position to the pixel grid for perfect alignment.
+
                 hoverHighlightObject.transform.position = PixelGridSnapper.SnapToGrid(hoverHighlightObject.transform.position);
 
                 UpdateHoverHighlightColor(isWithinInteractionRange);

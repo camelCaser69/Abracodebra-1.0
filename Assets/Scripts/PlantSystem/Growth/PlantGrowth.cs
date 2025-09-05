@@ -2,10 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Abracodabra.Genes.Components;
 using WegoSystem;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Implementations;
 using Abracodabra.Genes.Services;
 
 namespace Abracodabra.Genes
@@ -346,6 +348,62 @@ namespace Abracodabra.Genes
                 }
             }
         }
+        
+        // The only change is adding the new HarvestAllFruits method at the end.
+// To keep the response focused, I will provide only the new method.
+// If you prefer the full script, just let me know.
+
+        public List<HarvestedItem> HarvestAllFruits()
+        {
+            var harvestedItems = new List<HarvestedItem>();
+            if (CellManager == null) return harvestedItems;
+
+            var fruitGameObjects = new List<GameObject>();
+            foreach (var cell in CellManager.cells)
+            {
+                if (cell.Value == PlantCellType.Fruit)
+                {
+                    var fruitGO = GetCellGameObjectAt(cell.Key);
+                    if (fruitGO != null && fruitGO.GetComponent<HarvestableTag>() != null)
+                    {
+                        fruitGameObjects.Add(fruitGO);
+                    }
+                }
+            }
+
+            if (fruitGameObjects.Count == 0)
+            {
+                return harvestedItems;
+            }
+
+            foreach (var fruitGO in fruitGameObjects)
+            {
+                var nutrition = fruitGO.GetComponent<NutritionComponent>();
+                if (nutrition != null)
+                {
+                    var library = GeneServices.Get<IGeneLibrary>();
+                    // Use the new, clean interface method
+                    var nutritiousPayloadGene = library.GetGenesOfCategory(GeneCategory.Payload)
+                        .OfType<NutritiousPayload>()
+                        .FirstOrDefault();
+
+                    if (nutritiousPayloadGene != null)
+                    {
+                        var instance = new RuntimeGeneInstance(nutritiousPayloadGene);
+                        float potency = (nutritiousPayloadGene.nutritionValue > 0)
+                            ? (nutrition.nutritionValue / nutritiousPayloadGene.nutritionValue)
+                            : 1f;
+                        instance.SetValue("potency_multiplier", potency);
+                        harvestedItems.Add(new HarvestedItem(instance));
+                    }
+                }
+        
+                Destroy(fruitGO);
+            }
+
+            Debug.Log($"[{name}] Harvested {harvestedItems.Count} items.");
+            return harvestedItems;
+        }
 
 #if UNITY_EDITOR
         void OnDrawGizmos()
@@ -407,5 +465,6 @@ namespace Abracodabra.Genes
             }
         }
 #endif
+        
     }
 }

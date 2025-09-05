@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using WegoSystem;
@@ -125,24 +126,49 @@ public class PlayerActionManager : MonoBehaviour
         return result;
     }
 
+    // This also only requires one method to be changed.
+
     private bool ExecuteHarvest(Vector3Int gridPosition)
     {
-        var plantEntity = GridPositionManager.Instance?.GetEntitiesAt(new GridPosition(gridPosition))
-            .FirstOrDefault(e => e.GetComponent<PlantGrowth>() != null);
+        var entities = GridPositionManager.Instance?.GetEntitiesAt(new GridPosition(gridPosition));
+        var plantEntity = entities?.FirstOrDefault(e => e.GetComponent<PlantGrowth>() != null);
 
         if (plantEntity == null)
         {
-            if (debugMode) Debug.Log($"Harvest failed: No plant found at {gridPosition}");
+            if (debugMode) Debug.Log($"[PlayerActionManager] Harvest failed: No plant found at {gridPosition}");
             return false;
         }
 
         var plant = plantEntity.GetComponent<PlantGrowth>();
         if (plant == null) return false;
 
-        Debug.LogWarning("PlayerActionManager.ExecuteHarvest needs to be updated to handle returned items from PlantGrowth.");
-        bool wasHarvested = true;
+        // The PlantGrowth component will now handle finding and removing its own fruits
+        List<HarvestedItem> harvestedItems = plant.HarvestAllFruits();
 
-        return wasHarvested;
+        if (harvestedItems == null || harvestedItems.Count == 0)
+        {
+            if (debugMode) Debug.Log($"[PlayerActionManager] Harvest action on plant '{plant.name}' yielded no items.");
+            return false; // Return false because nothing was actually harvested.
+        }
+
+        // Add all harvested items to the player's inventory
+        int itemsAdded = 0;
+        foreach (var item in harvestedItems)
+        {
+            if (item != null && item.HarvestedGeneInstance != null)
+            {
+                var inventoryItem = InventoryBarItem.FromGene(item.HarvestedGeneInstance);
+                if (InventoryGridController.Instance.AddItemToInventory(inventoryItem))
+                {
+                    itemsAdded++;
+                }
+            }
+        }
+
+        if (debugMode) Debug.Log($"[PlayerActionManager] Successfully added {itemsAdded}/{harvestedItems.Count} harvested items to inventory.");
+
+        // The action is successful if at least one item was harvested and added.
+        return itemsAdded > 0;
     }
 
     private bool ExecuteInteraction(Vector3Int gridPosition, object interactionData)

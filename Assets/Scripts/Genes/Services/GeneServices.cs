@@ -81,6 +81,8 @@ namespace Abracodabra.Genes.Services
         GeneBase GetGeneByGUID(string guid);
         GeneBase GetGeneByName(string name);
         GeneBase GetPlaceholderGene();
+        // NEW: Add this method to the interface
+        List<GeneBase> GetGenesOfCategory(GeneCategory category); 
     }
 
     public interface IGeneEventBus

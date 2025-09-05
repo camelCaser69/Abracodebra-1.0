@@ -93,62 +93,62 @@ public sealed class PlayerTileInteractor : MonoBehaviour
 
         // Only the HandleLeftClick method is changed.
 
-                void HandleLeftClick()
-        {
-            if (!EnsureManagers()) return;
+        private void HandleLeftClick()
+{
+    if (!EnsureManagers()) return;
 
-            InventoryBarItem selected = inventoryBar.SelectedItem;
-            if (selected == null || !selected.IsValid())
+    InventoryBarItem selected = inventoryBar.SelectedItem;
+    if (selected == null || !selected.IsValid())
+    {
+        if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: No valid item selected.");
+        return;
+    }
+
+    if (!tileInteractionManager.IsWithinInteractionRange)
+    {
+        if (showDebug) Debug.Log($"[PlayerTileInteractor] Left-click ignored: Target cell is out of range according to TileInteractionManager.");
+        return;
+    }
+
+    Vector3Int cellPos = tileInteractionManager.CurrentlyHoveredCell.Value;
+
+    if (showDebug) Debug.Log($"[PlayerTileInteractor] Attempting action '{selected.Type}' with item '{selected.GetDisplayName()}' at {cellPos}.");
+
+    switch (selected.Type)
+    {
+        case InventoryBarItem.ItemType.Tool:
+            var toolDef = selected.ToolDefinition;
+
+            if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool != toolDef)
             {
-                if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: No valid item selected.");
-                return;
+                ToolSwitcher.Instance.SelectToolByDefinition(toolDef);
             }
 
-            // FIX: The validation for range is now done by asking the TileInteractionManager directly.
-            // This ensures the action logic and the visual hover highlight are always in sync.
-            if (!tileInteractionManager.IsWithinInteractionRange)
+            // NEW: Check for and consume a tool use before executing the action.
+            if (ToolSwitcher.Instance != null)
             {
-                if (showDebug) Debug.Log($"[PlayerTileInteractor] Left-click ignored: Target cell is out of range according to TileInteractionManager.");
-                return;
+                if (!ToolSwitcher.Instance.TryConsumeUse())
+                {
+                    if (showDebug) Debug.Log($"[PlayerTileInteractor] Action blocked: Tool '{selected.GetDisplayName()}' is out of uses.");
+                    // Optionally, provide player feedback here (e.g., sound effect)
+                    return; // Abort the action
+                }
             }
 
-            Vector3Int cellPos = tileInteractionManager.CurrentlyHoveredCell.Value;
+            PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.UseTool, cellPos, toolDef);
+            break;
 
-            if (showDebug) Debug.Log($"[PlayerTileInteractor] Attempting action '{selected.Type}' with item '{selected.GetDisplayName()}' at {cellPos}.");
-
-            switch (selected.Type)
+        case InventoryBarItem.ItemType.Seed:
+            System.Action onSuccess = () =>
             {
-                case InventoryBarItem.ItemType.Tool:
-                    var toolDef = selected.ToolDefinition;
-
-                    if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool != toolDef)
-                    {
-                        ToolSwitcher.Instance.SelectToolByDefinition(toolDef);
-                    }
-
-                    if (ToolSwitcher.Instance != null)
-                    {
-                        if (!ToolSwitcher.Instance.TryConsumeUse())
-                        {
-                            if (showDebug) Debug.Log($"[PlayerTileInteractor] Action blocked: Tool '{selected.GetDisplayName()}' is out of uses.");
-                            return;
-                        }
-                    }
-
-                    PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.UseTool, cellPos, toolDef);
-                    break;
-
-                case InventoryBarItem.ItemType.Seed:
-                    System.Action onSuccess = () =>
-                    {
-                        if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
-                        InventoryGridController.Instance?.RemoveItemFromInventory(selected);
-                        inventoryBar.SelectSlotByIndex(0);
-                    };
-                    PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess);
-                    break;
-            }
-        }
+                if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
+                InventoryGridController.Instance?.RemoveItemFromInventory(selected);
+                inventoryBar.SelectSlotByIndex(0);
+            };
+            PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess);
+            break;
+    }
+}
 
     private bool EnsureManagers()
     {

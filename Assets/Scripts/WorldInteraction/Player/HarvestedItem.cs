@@ -1,15 +1,16 @@
-﻿// Reworked File: Assets/Scripts/WorldInteraction/Player/HarvestedItem.cs
-using System.Linq;
+﻿using UnityEngine;
 using Abracodabra.Genes.Runtime;
-using Abracodabra.Genes.Implementations; // For NutritionComponent
+using Abracodabra.Genes.Implementations;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Components;
 
-/// <summary>
-/// Represents an item harvested from a plant, now wrapping a RuntimeGeneInstance.
-/// </summary>
+// Reworked File: Assets/Scripts/WorldInteraction/Player/HarvestedItem.cs
 public class HarvestedItem
 {
     public RuntimeGeneInstance HarvestedGeneInstance { get; set; }
 
+    // This class is a wrapper for data from a harvested item,
+    // primarily gene-based fruits for now.
     public HarvestedItem(RuntimeGeneInstance instance)
     {
         HarvestedGeneInstance = instance;
@@ -19,15 +20,20 @@ public class HarvestedItem
     {
         if (HarvestedGeneInstance == null) return 0f;
 
-        // In the new system, nutrition value is a property of a payload.
-        // A proper implementation would check for a "NutritiousPayload" or similar.
-        // For now, let's assume a conventional value or look for a specific component.
+        // This logic assumes nutrition comes from a PAYLOAD gene.
+        // If the ActiveGene itself defined nutrition, you'd check that here.
+        // This is a placeholder for a more complex system where you might query
+        // all attached payloads for different effects.
+
         if (HarvestedGeneInstance.GetGene() is NutritiousPayload nutritiousGene)
         {
-            return nutritiousGene.nutritionValue;
+            return nutritiousGene.nutritionValue * HarvestedGeneInstance.GetValue("potency_multiplier", 1f);
         }
+        
+        // This could be expanded to check for other payload types
+        // that might have a nutrition value.
 
-        return 0f; // Default if not a nutritious gene
+        return 0f;
     }
 
     public bool IsConsumable()
