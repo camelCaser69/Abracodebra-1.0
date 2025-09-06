@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Components;
-using WegoSystem; // <-- ADDED this using statement for GridPosition and GridPositionManager
+using Abracodabra.Genes.Runtime;
+using WegoSystem;
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "NewBasicFruitGene", menuName = "Abracodabra/Genes/Active/Basic Fruit Gene")]
+    [CreateAssetMenu(fileName = "BasicFruitGene", menuName = "Abracodabra/Genes/Active/Basic Fruit Gene")]
     public class BasicFruitGene : ActiveGene
     {
         public GameObject fruitPrefab;
@@ -41,28 +42,22 @@ namespace Abracodabra.Genes.Implementations
                     break;
                 }
             }
-            
+
             int count = Mathf.Min(fruitCount, fruitPoints.Length);
             List<Transform> shuffledPoints = fruitPoints.OrderBy(x => Random.value).ToList();
-            
+
             for (int i = 0; i < count; i++)
             {
-                // Get the correct world position from the temporary spawn point
                 Vector3 spawnPosition = shuffledPoints[i].position;
-                
+
                 GameObject fruitObj = Instantiate(fruitPrefab, spawnPosition, Quaternion.identity);
 
-                // --- THIS IS THE FIX ---
-                // We must manually initialize the fruit as a plant part to prevent it from snapping itself to the grid center.
                 FoodItem foodItem = fruitObj.GetComponent<FoodItem>();
                 if (foodItem != null)
                 {
-                    // Convert the spawn position to a grid position
                     GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(spawnPosition);
-                    // Initialize it, which registers it correctly without moving it.
                     foodItem.InitializeAsPlantPart(foodItem.foodType, gridPos);
                 }
-                // --- END OF FIX ---
 
                 Fruit fruit = fruitObj.GetComponent<Fruit>();
                 if (fruit != null)
@@ -83,11 +78,19 @@ namespace Abracodabra.Genes.Implementations
             }
         }
 
-        private void ConfigureFruit(Fruit fruit, ActiveGeneContext context)
+        void ConfigureFruit(Fruit fruit, ActiveGeneContext context)
         {
             fruit.SourcePlant = context.plant;
             fruit.GrowthTime = growthTime;
 
+            // NEW: Directly assign the payload gene instances to the fruit.
+            // This is the crucial step for data persistence.
+            if (context.payloads != null)
+            {
+                fruit.PayloadGeneInstances = new List<RuntimeGeneInstance>(context.payloads);
+            }
+
+            // The original logic still runs to apply immediate effects like color.
             foreach (var payloadInstance in context.payloads)
             {
                 payloadInstance.GetGene<PayloadGene>()?.ConfigureFruit(fruit, payloadInstance);

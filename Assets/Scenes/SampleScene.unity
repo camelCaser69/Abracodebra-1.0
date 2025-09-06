@@ -17597,6 +17597,7 @@ GameObject:
   m_Component:
   - component: {fileID: 477121556}
   - component: {fileID: 477121557}
+  - component: {fileID: 477121558}
   m_Layer: 0
   m_Name: Manager_PlayerAction
   m_TagString: Untagged
@@ -17634,6 +17635,22 @@ MonoBehaviour:
   debugMode: 1
   tickCostPerAction: 1
   multiTickActionDelay: 0.5
+--- !u!114 &477121558
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477121555}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d39f717489704ed6b036bfc5081da772, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  toolDefinitions:
+  - {fileID: 11400000, guid: b02225d1ccd9f4d42b09de7941a00382, type: 2}
+  - {fileID: 11400000, guid: 864e5c2cfc433e249b02f2a97cced049, type: 2}
+  - {fileID: 11400000, guid: 7956b14e815a15c46bcb38c6d3019670, type: 2}
 --- !u!114 &478145294
 MonoBehaviour:
   m_ObjectHideFlags: 0

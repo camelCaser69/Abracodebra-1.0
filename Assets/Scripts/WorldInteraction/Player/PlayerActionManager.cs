@@ -1,8 +1,8 @@
-﻿using System;
+﻿using UnityEngine;
+using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using WegoSystem;
 using Abracodabra.Genes;
 using Abracodabra.UI.Genes;
@@ -18,7 +18,7 @@ public enum PlayerActionType
 
 public class PlayerActionManager : MonoBehaviour
 {
-    public static PlayerActionManager Instance { get; private set; }
+    public static PlayerActionManager Instance { get; set; }
 
     public class ToolActionData
     {
@@ -33,7 +33,7 @@ public class PlayerActionManager : MonoBehaviour
     public event Action<PlayerActionType, object> OnActionExecuted;
     public event Action<string> OnActionFailed;
 
-    void Awake()
+    private void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -51,11 +51,8 @@ public class PlayerActionManager : MonoBehaviour
         int tickCost = tickCostPerAction;
         object eventPayload = actionData;
 
-        var toolDefForCheck = actionData as ToolDefinition;
-        if (actionType == PlayerActionType.UseTool && toolDefForCheck != null && toolDefForCheck.toolType == ToolType.HarvestPouch)
-        {
-            actionType = PlayerActionType.Harvest;
-        }
+        // Note: The specific check for HarvestPouch is now handled in PlayerTileInteractor
+        // to allow for more nuanced action calls.
 
         switch (actionType)
         {
@@ -68,15 +65,14 @@ public class PlayerActionManager : MonoBehaviour
                 }
                 break;
 
-            // FIX: This case has been restructured to be synchronous, following the analysis document.
             case PlayerActionType.PlantSeed:
                 tickCost = 2; // Planting takes longer
                 var seedItem = actionData as InventoryBarItem;
                 success = ExecutePlantSeed(gridPosition, seedItem);
-                // We no longer start a coroutine or return early. The standard success handling below will now work correctly.
                 break;
 
             case PlayerActionType.Harvest:
+                // FIX: Use the new, functional harvest logic.
                 success = ExecuteHarvest(gridPosition);
                 break;
 
@@ -105,29 +101,27 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
-    // FIX: Added the recommended debug logs for better traceability.
     private bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem)
     {
         if (debugMode) Debug.Log($"[ExecutePlantSeed] Attempting to plant {seedItem?.GetDisplayName()} at {gridPosition}");
 
-        if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed) 
+        if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed)
         {
             Debug.LogError("[ExecutePlantSeed] Action failed: Provided item was not a valid seed.");
             return false;
         }
-    
+
         bool result = PlantPlacementManager.Instance?.TryPlantSeedFromInventory(
-            seedItem.SeedRuntimeState, 
-            gridPosition, 
+            seedItem.SeedRuntimeState,
+            gridPosition,
             TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)
         ) ?? false;
-    
+
         if (debugMode) Debug.Log($"[ExecutePlantSeed] PlantPlacementManager returned: {result}");
         return result;
     }
 
-    // This also only requires one method to be changed.
-
+    // Only providing the changed method block as requested.
     private bool ExecuteHarvest(Vector3Int gridPosition)
     {
         var entities = GridPositionManager.Instance?.GetEntitiesAt(new GridPosition(gridPosition));
@@ -142,22 +136,23 @@ public class PlayerActionManager : MonoBehaviour
         var plant = plantEntity.GetComponent<PlantGrowth>();
         if (plant == null) return false;
 
-        // The PlantGrowth component will now handle finding and removing its own fruits
         List<HarvestedItem> harvestedItems = plant.HarvestAllFruits();
 
         if (harvestedItems == null || harvestedItems.Count == 0)
         {
             if (debugMode) Debug.Log($"[PlayerActionManager] Harvest action on plant '{plant.name}' yielded no items.");
-            return false; // Return false because nothing was actually harvested.
+            return false; // Action failed because nothing was harvested.
         }
 
-        // Add all harvested items to the player's inventory
         int itemsAdded = 0;
         foreach (var item in harvestedItems)
         {
-            if (item != null && item.HarvestedGeneInstance != null)
+            // Get the primary gene instance for creating the inventory item.
+            var primaryInstance = item.GetPrimaryGeneInstance();
+            if (primaryInstance != null)
             {
-                var inventoryItem = InventoryBarItem.FromGene(item.HarvestedGeneInstance);
+                // This assumes a harvested fruit stack is represented by its primary payload gene in the inventory.
+                var inventoryItem = InventoryBarItem.FromGene(primaryInstance);
                 if (InventoryGridController.Instance.AddItemToInventory(inventoryItem))
                 {
                     itemsAdded++;
@@ -166,8 +161,7 @@ public class PlayerActionManager : MonoBehaviour
         }
 
         if (debugMode) Debug.Log($"[PlayerActionManager] Successfully added {itemsAdded}/{harvestedItems.Count} harvested items to inventory.");
-
-        // The action is successful if at least one item was harvested and added.
+    
         return itemsAdded > 0;
     }
 
@@ -177,11 +171,9 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
-    // This method is no longer used by the planting action, but is kept for other potential delayed actions.
-    IEnumerator ExecuteDelayedAction(Func<bool> action, int tickCost, Action onSuccessCallback, PlayerActionType actionType, object actionData)
+    private IEnumerator ExecuteDelayedAction(Func<bool> action, int tickCost, Action onSuccessCallback, PlayerActionType actionType, object actionData)
     {
-        // This simulates the action taking time before the result is known.
-        for (int i = 0; i < tickCost -1; i++)
+        for (int i = 0; i < tickCost - 1; i++)
         {
             yield return new WaitForSeconds(multiTickActionDelay);
             AdvanceGameTick(1);

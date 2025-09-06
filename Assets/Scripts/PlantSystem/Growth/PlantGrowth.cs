@@ -353,17 +353,20 @@ namespace Abracodabra.Genes
 // To keep the response focused, I will provide only the new method.
 // If you prefer the full script, just let me know.
 
+        // Only providing the changed method block as requested.
         public List<HarvestedItem> HarvestAllFruits()
         {
             var harvestedItems = new List<HarvestedItem>();
             if (CellManager == null) return harvestedItems;
 
+            // Find all fruit cell GameObjects to avoid modifying the collection while iterating
             var fruitGameObjects = new List<GameObject>();
             foreach (var cell in CellManager.cells)
             {
                 if (cell.Value == PlantCellType.Fruit)
                 {
                     var fruitGO = GetCellGameObjectAt(cell.Key);
+                    // Check for the HarvestableTag to ensure we only pick up designated items
                     if (fruitGO != null && fruitGO.GetComponent<HarvestableTag>() != null)
                     {
                         fruitGameObjects.Add(fruitGO);
@@ -373,31 +376,19 @@ namespace Abracodabra.Genes
 
             if (fruitGameObjects.Count == 0)
             {
-                return harvestedItems;
+                return harvestedItems; // Return empty list, PlayerActionManager will report it.
             }
 
             foreach (var fruitGO in fruitGameObjects)
             {
-                var nutrition = fruitGO.GetComponent<NutritionComponent>();
-                if (nutrition != null)
+                var fruitComponent = fruitGO.GetComponent<Fruit>();
+                if (fruitComponent != null && fruitComponent.PayloadGeneInstances != null && fruitComponent.PayloadGeneInstances.Count > 0)
                 {
-                    var library = GeneServices.Get<IGeneLibrary>();
-                    // Use the new, clean interface method
-                    var nutritiousPayloadGene = library.GetGenesOfCategory(GeneCategory.Payload)
-                        .OfType<NutritiousPayload>()
-                        .FirstOrDefault();
-
-                    if (nutritiousPayloadGene != null)
-                    {
-                        var instance = new RuntimeGeneInstance(nutritiousPayloadGene);
-                        float potency = (nutritiousPayloadGene.nutritionValue > 0)
-                            ? (nutrition.nutritionValue / nutritiousPayloadGene.nutritionValue)
-                            : 1f;
-                        instance.SetValue("potency_multiplier", potency);
-                        harvestedItems.Add(new HarvestedItem(instance));
-                    }
+                    // NEW: Create the HarvestedItem directly from the fruit's own gene data.
+                    harvestedItems.Add(new HarvestedItem(fruitComponent.PayloadGeneInstances));
                 }
-        
+
+                // Destroy the fruit, which will trigger ReportCellDestroyed via its PlantCell's OnDestroy method.
                 Destroy(fruitGO);
             }
 

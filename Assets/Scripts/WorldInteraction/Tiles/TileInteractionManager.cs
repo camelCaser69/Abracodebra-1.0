@@ -130,7 +130,7 @@ namespace WegoSystem
     Vector3Int targetCell = currentlyHoveredCell.Value;
     TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
 
-    // NEW: Added more detailed debug logs as suggested
+    // NEW: Enhanced debug logging
     if (debugLogs)
     {
         Debug.Log($"[DEBUG] Applying Tool: '{toolDef?.displayName}' on Tile: '{currentTileDef?.displayName}' at {targetCell}");
@@ -185,8 +185,8 @@ namespace WegoSystem
         // NEW: Method to handle tool refilling
         private void CheckAndRefillTool()
         {
-            // Only allow refilling on right-click
-            if (!Input.GetMouseButtonDown(1)) return;
+            // FIX: Changed from Right-Click (1) to Left-Click (0)
+            if (!Input.GetMouseButtonDown(0)) return;
 
             if (hoveredTileDef == null || ToolSwitcher.Instance == null) return;
 
@@ -203,7 +203,11 @@ namespace WegoSystem
                 if (refillRule != null && isWithinInteractionRange)
                 {
                     ToolSwitcher.Instance.RefillCurrentTool();
-                    // Optionally: Add visual/audio feedback for refill here
+                    // We consume a tick for the refill action.
+                    if (PlayerActionManager.Instance != null)
+                    {
+                        PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Interact, currentlyHoveredCell.Value, "Refill");
+                    }
                 }
             }
         }

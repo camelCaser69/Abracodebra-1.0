@@ -1,16 +1,17 @@
-﻿// File: Assets/Scripts/Genes/Components/Fruit.cs
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections.Generic; // Added for List
 using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Runtime; // Added for RuntimeGeneInstance
 
 namespace Abracodabra.Genes.Components
 {
-    /// <summary>
-    /// A component attached to fruit GameObjects, making them interactable and configurable by genes.
-    /// </summary>
     public class Fruit : MonoBehaviour
     {
         public PlantGrowth SourcePlant { get; set; }
         public float GrowthTime { get; set; }
+
+        // NEW: This list will store the gene data for this specific fruit.
+        public List<RuntimeGeneInstance> PayloadGeneInstances { get; set; } = new List<RuntimeGeneInstance>();
 
         public void LaunchImmediate(Vector2 force)
         {
@@ -20,7 +21,6 @@ namespace Abracodabra.Genes.Components
 
         public void StartGrowing()
         {
-            // Placeholder for a simple growth timer
             Debug.Log($"Fruit '{gameObject.name}' has started growing for {GrowthTime}s.", this);
         }
 
@@ -29,7 +29,6 @@ namespace Abracodabra.Genes.Components
             var renderer = GetComponent<SpriteRenderer>();
             if (renderer != null)
             {
-                // Tints the fruit to show a payload is active
                 renderer.color = Color.Lerp(renderer.color, color, 0.5f);
             }
         }

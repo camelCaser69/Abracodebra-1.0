@@ -1,43 +1,45 @@
 ﻿using UnityEngine;
+using System.Collections.Generic; // Added for List
+using System.Linq; // Added for Linq
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Implementations;
 using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Components;
 
-// Reworked File: Assets/Scripts/WorldInteraction/Player/HarvestedItem.cs
 public class HarvestedItem
 {
-    public RuntimeGeneInstance HarvestedGeneInstance { get; set; }
+    // MODIFIED: Now holds a list of gene instances.
+    public List<RuntimeGeneInstance> HarvestedGeneInstances { get; set; }
 
-    // This class is a wrapper for data from a harvested item,
-    // primarily gene-based fruits for now.
-    public HarvestedItem(RuntimeGeneInstance instance)
+    public HarvestedItem(List<RuntimeGeneInstance> instances)
     {
-        HarvestedGeneInstance = instance;
+        HarvestedGeneInstances = instances ?? new List<RuntimeGeneInstance>();
     }
 
     public float GetNutritionValue()
     {
-        if (HarvestedGeneInstance == null) return 0f;
+        if (HarvestedGeneInstances == null || HarvestedGeneInstances.Count == 0) return 0f;
 
-        // This logic assumes nutrition comes from a PAYLOAD gene.
-        // If the ActiveGene itself defined nutrition, you'd check that here.
-        // This is a placeholder for a more complex system where you might query
-        // all attached payloads for different effects.
+        float totalNutrition = 0f;
 
-        if (HarvestedGeneInstance.GetGene() is NutritiousPayload nutritiousGene)
+        foreach (var instance in HarvestedGeneInstances)
         {
-            return nutritiousGene.nutritionValue * HarvestedGeneInstance.GetValue("potency_multiplier", 1f);
+            if (instance.GetGene() is NutritiousPayload nutritiousGene)
+            {
+                totalNutrition += nutritiousGene.nutritionValue * instance.GetValue("potency_multiplier", 1f);
+            }
         }
         
-        // This could be expanded to check for other payload types
-        // that might have a nutrition value.
-
-        return 0f;
+        return totalNutrition;
     }
 
     public bool IsConsumable()
     {
         return GetNutritionValue() > 0;
+    }
+
+    // A helper to get the primary gene for UI purposes (e.g., icon, name)
+    public RuntimeGeneInstance GetPrimaryGeneInstance()
+    {
+        return HarvestedGeneInstances.FirstOrDefault();
     }
 }
