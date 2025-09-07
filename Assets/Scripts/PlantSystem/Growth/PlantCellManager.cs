@@ -44,11 +44,8 @@ public class PlantCellManager
         Vector3 cellLocalPos = new Vector3(coords.x * spacing, coords.y * spacing, 0);
         Vector3 cellWorldPos = plant.transform.position + cellLocalPos;
 
-        // --- THIS IS THE FIX ---
-        // Instantiate the object at its final, correct world position.
         GameObject instance = Object.Instantiate(prefab, cellWorldPos, Quaternion.identity, plant.transform);
-        
-        // ... (Code to set up PlantCell component remains the same) ...
+
         PlantCell cellComponent = instance.GetComponent<PlantCell>();
         if (cellComponent == null)
         {
@@ -57,7 +54,7 @@ public class PlantCellManager
         cellComponent.ParentPlantGrowth = plant;
         cellComponent.GridCoord = coords;
         cellComponent.CellType = cellType;
-        
+
         cells[coords] = cellType;
         activeCellGameObjects.Add(instance);
 
@@ -76,12 +73,9 @@ public class PlantCellManager
                 {
                     Debug.LogError($"[PlantCellManager] Cannot assign FoodType to new leaf on '{plant.name}' because the 'Leaf Food Type' field is not set!", plant);
                 }
-                
-                // Get the grid position that this world position corresponds to
+
                 GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(cellWorldPos);
-                
-                // Manually initialize the food item, telling it its type and grid position.
-                // This bypasses the problematic Start() method in FoodItem.
+
                 foodItem.InitializeAsPlantPart(_leafFoodType, gridPos);
             }
             else
@@ -89,14 +83,17 @@ public class PlantCellManager
                 Debug.LogWarning($"[{plant.gameObject.name}] Leaf prefab is missing FoodItem component.", plant);
             }
         }
+        else if (cellType == PlantCellType.Fruit)
+        {
+            // No special logic is needed here for now, but this ensures it's a recognized type.
+            // The key part `cells[coords] = cellType;` has already run.
+        }
 
         plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
         plant.VisualManager.RegisterOutlineForCell(instance, cellType.ToString());
 
         return instance;
     }
-
-    // --- Unchanged methods below ---
 
     public void ReportCellDestroyed(Vector2Int coord)
     {

@@ -49,13 +49,24 @@ namespace Abracodabra.Genes.Implementations
             for (int i = 0; i < count; i++)
             {
                 Vector3 spawnPosition = shuffledPoints[i].position;
+                Vector2Int fruitGridCoord = Vector2Int.RoundToInt(context.plant.transform.InverseTransformPoint(spawnPosition) / context.plant.GetCellWorldSpacing());
 
-                GameObject fruitObj = Instantiate(fruitPrefab, spawnPosition, Quaternion.identity);
+                // FIX: Use the plant's CellManager to spawn the fruit.
+                // This ensures it is correctly registered in the plant's data structures.
+                GameObject fruitObj = context.plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, fruitGridCoord);
+                if (fruitObj == null)
+                {
+                    continue; // Skip if spawn failed (e.g., position was somehow already taken).
+                }
 
+                // Ensure the visual object is exactly at the spawn point's world position.
+                fruitObj.transform.position = spawnPosition;
+                
                 FoodItem foodItem = fruitObj.GetComponent<FoodItem>();
                 if (foodItem != null)
                 {
                     GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(spawnPosition);
+                    // Ensure the FoodType from the prefab is used if one is assigned there.
                     foodItem.InitializeAsPlantPart(foodItem.foodType, gridPos);
                 }
 
@@ -82,15 +93,12 @@ namespace Abracodabra.Genes.Implementations
         {
             fruit.SourcePlant = context.plant;
             fruit.GrowthTime = growthTime;
-
-            // NEW: Directly assign the payload gene instances to the fruit.
-            // This is the crucial step for data persistence.
+            
             if (context.payloads != null)
             {
                 fruit.PayloadGeneInstances = new List<RuntimeGeneInstance>(context.payloads);
             }
-
-            // The original logic still runs to apply immediate effects like color.
+            
             foreach (var payloadInstance in context.payloads)
             {
                 payloadInstance.GetGene<PayloadGene>()?.ConfigureFruit(fruit, payloadInstance);

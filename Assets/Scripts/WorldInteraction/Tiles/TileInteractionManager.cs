@@ -91,7 +91,6 @@ namespace WegoSystem
         void Update()
         {
             HandleTileHover();
-            // NEW: Check for tool refill action every frame
             if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)
             {
                 CheckAndRefillTool();
@@ -104,6 +103,7 @@ namespace WegoSystem
             EnsureInitialized();
             if (tileDefinitionMappings == null) return null;
 
+            // This method now correctly finds the top-most visible tile, respecting the mapping order.
             foreach (var mapping in tileDefinitionMappings)
             {
                 if (mapping?.tileDef != null && mapping.tilemapModule != null)
@@ -122,70 +122,65 @@ namespace WegoSystem
         {
             return module.DataTilemap != null && module.DataTilemap.HasTile(cellPos);
         }
-
+        
+        // REWORKED METHOD: This logic is now much smarter and respects layer order for interactions.
         public void ApplyToolAction(ToolDefinition toolDef)
-{
-    if (toolDef == null || !currentlyHoveredCell.HasValue) return;
-
-    Vector3Int targetCell = currentlyHoveredCell.Value;
-    TileDefinition currentTileDef = FindWhichTileDefinitionAt(targetCell);
-
-    // NEW: Enhanced debug logging
-    if (debugLogs)
-    {
-        Debug.Log($"[DEBUG] Applying Tool: '{toolDef?.displayName}' on Tile: '{currentTileDef?.displayName}' at {targetCell}");
-        if (interactionLibrary?.rules != null)
         {
-            Debug.Log($"[DEBUG] Searching through {interactionLibrary.rules.Count} rules...");
-            var toolRules = interactionLibrary.rules.Where(r => r != null && r.tool == toolDef).ToList();
-            if (toolRules.Any())
+            if (toolDef == null || !currentlyHoveredCell.HasValue) return;
+
+            Vector3Int targetCell = currentlyHoveredCell.Value;
+            
+            if (debugLogs) Debug.Log($"[DEBUG] Applying Tool: '{toolDef.displayName}' at {targetCell}. Checking mappings in order...");
+
+            // Iterate through mappings to find the first valid interaction from top to bottom.
+            foreach (var mapping in tileDefinitionMappings)
             {
-                foreach (var r in toolRules)
+                if (mapping?.tileDef == null || mapping.tilemapModule == null) continue;
+
+                // Check if a tile exists on this layer at the target position.
+                if (TileExistsInModule(mapping.tilemapModule, targetCell))
                 {
-                    Debug.Log($"[DEBUG] Found rule for '{toolDef.displayName}': From '{r.fromTile?.displayName}' -> To '{r.toTile?.displayName}'");
+                    TileDefinition tileToTest = mapping.tileDef;
+                    if (debugLogs) Debug.Log($"[DEBUG] Found tile '{tileToTest.displayName}' on its layer. Searching for a matching rule...");
+
+                    // Now check if a rule exists for this specific tile and the current tool.
+                    TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(r => 
+                        r != null && r.tool == toolDef && r.fromTile == tileToTest);
+
+                    if (rule != null)
+                    {
+                        // SUCCESS! We found the highest-priority interactable tile.
+                        if (debugLogs) Debug.Log($"[TileInteractionManager] MATCH FOUND! Rule: From '{rule.fromTile.displayName}', To: '{(rule.toTile != null ? rule.toTile.displayName : "NULL")}'. Executing action.");
+
+                        if (rule.toTile == null) // Rule is to remove the tile
+                        {
+                            RemoveTile(rule.fromTile, targetCell);
+                        }
+                        else
+                        {
+                            if (!rule.toTile.keepBottomTile)
+                            {
+                                RemoveTile(rule.fromTile, targetCell);
+                            }
+                            PlaceTile(rule.toTile, targetCell);
+                        }
+                        
+                        // Action was found and executed, so we stop searching.
+                        return; 
+                    }
+                    else
+                    {
+                        if (debugLogs) Debug.Log($"[DEBUG] No rule found for tool '{toolDef.displayName}' on tile '{tileToTest.displayName}'. Checking next layer down.");
+                    }
                 }
             }
-            else
-            {
-                Debug.Log($"[DEBUG] No rules found for tool '{toolDef.displayName}'.");
-            }
-        }
-    }
 
-    if (currentTileDef == null) return;
-
-    TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == currentTileDef);
-
-    if (rule != null)
-    {
-        TileDefinition fromTile = currentTileDef;
-        TileDefinition toTile = rule.toTile;
-
-        if (debugLogs) Debug.Log($"[TileInteractionManager] MATCH FOUND! From: '{fromTile.displayName}', To: '{(toTile != null ? toTile.displayName : "NULL")}'.");
-
-        if (toTile == null)
-        {
-            RemoveTile(fromTile, targetCell);
-            return;
+            if (debugLogs) Debug.LogWarning($"[TileInteractionManager] NO MATCH FOUND for tool '{toolDef.displayName}' on any tile layer at {targetCell}.");
         }
 
-        if (!toTile.keepBottomTile)
-        {
-            RemoveTile(fromTile, targetCell);
-        }
 
-        PlaceTile(toTile, targetCell);
-    }
-    else if (debugLogs)
-    {
-        Debug.Log($"[TileInteractionManager] NO MATCH FOUND for Tool='{toolDef.displayName}' on Tile='{currentTileDef.displayName}'.");
-    }
-}
-
-        // NEW: Method to handle tool refilling
         private void CheckAndRefillTool()
         {
-            // FIX: Changed from Right-Click (1) to Left-Click (0)
             if (!Input.GetMouseButtonDown(0)) return;
 
             if (hoveredTileDef == null || ToolSwitcher.Instance == null) return;
@@ -203,7 +198,6 @@ namespace WegoSystem
                 if (refillRule != null && isWithinInteractionRange)
                 {
                     ToolSwitcher.Instance.RefillCurrentTool();
-                    // We consume a tick for the refill action.
                     if (PlayerActionManager.Instance != null)
                     {
                         PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Interact, currentlyHoveredCell.Value, "Refill");
@@ -371,11 +365,8 @@ namespace WegoSystem
             if (hoverHighlightObject != null)
             {
                 hoverHighlightObject.SetActive(true);
-
                 hoverHighlightObject.transform.position = CellCenterWorld(cellPos);
-
                 hoverHighlightObject.transform.position = PixelGridSnapper.SnapToGrid(hoverHighlightObject.transform.position);
-
                 UpdateHoverHighlightColor(isWithinInteractionRange);
             }
         }
