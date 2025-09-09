@@ -25,9 +25,10 @@ MonoBehaviour:
     modifierSlots: 1
     payloadSlots: 2
   canExecuteEmpty: 0
-  executionDelay: 0
+  executionDelayTicks: 0
   requiresTarget: 0
   fruitPrefab: {fileID: 3989903528299243114, guid: 0d04f86b0bfb77e4494b03c839ea7c5d, type: 3}
   growthTime: 2
   fruitCount: 1
   launchForce: 5
+  harvestedItemDefinition: {fileID: 11400000, guid: 68e0aafcf0e7aa540a10a15bc000e528, type: 2}

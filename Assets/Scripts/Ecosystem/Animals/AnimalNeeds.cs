@@ -132,25 +132,34 @@ public class AnimalNeeds : MonoBehaviour
         if (foodItem == null || foodItem.foodType == null || diet == null) return;
 
         float satiationGain = 0f;
+        string foodName = foodItem.foodType.foodName; // Get a default name
 
-        // NEW: Prioritize NutritionComponent for gene-based foods
-        NutritionComponent nutrition = foodItem.GetComponent<NutritionComponent>();
-        if (nutrition != null)
+        // NEW UNIFIED LOGIC:
+        // 1. Prioritize Fruit component with dynamic properties.
+        Fruit fruitComponent = foodItem.GetComponent<Fruit>();
+        if (fruitComponent != null && fruitComponent.RepresentingItemDefinition != null)
         {
-            satiationGain = nutrition.nutritionValue;
+            var itemDef = fruitComponent.RepresentingItemDefinition;
+            foodName = itemDef.itemName; // Get the more specific item name
+        
+            satiationGain = itemDef.baseNutrition; // Start with the base value
+            if (fruitComponent.DynamicProperties.TryGetValue("nutrition_multiplier", out float multiplier))
+            {
+                satiationGain *= multiplier; // Apply the gene-calculated multiplier
+            }
         }
+        // 2. Fallback for simple food items like leaves.
         else
         {
-            // Fallback for standard plant parts
             satiationGain = diet.GetSatiationValue(foodItem.foodType);
         }
-        
+    
         currentHunger -= satiationGain;
         currentHunger = Mathf.Max(0f, currentHunger);
 
         controller.UpdateUI();
 
-        Debug.Log($"[AnimalNeeds] {controller.SpeciesName} ate {foodItem.foodType.foodName} for {satiationGain} satiation. Hunger: {currentHunger}/{diet.maxHunger}");
+        Debug.Log($"[AnimalNeeds] {controller.SpeciesName} ate {foodName} for {satiationGain:F1} satiation. Hunger: {currentHunger:F1}/{diet.maxHunger}");
     }
 
     public void Heal(float amount)
