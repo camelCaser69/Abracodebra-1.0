@@ -51,22 +51,28 @@ public sealed class PlayerTileInteractor : MonoBehaviour
 
         InventoryBarItem selected = inventoryBar.SelectedItem;
         if (selected == null || !selected.IsValid()) return;
-
-        if (selected.Type == InventoryBarItem.ItemType.Gene)
+    
+        // MODIFIED: This logic now correctly handles the new ItemInstance type for consumption.
+        if (selected.Type == InventoryBarItem.ItemType.Resource)
         {
-            // FIX: Wrap the single GeneInstance in a new List to match the updated constructor.
-            var itemData = new HarvestedItem(new List<RuntimeGeneInstance> { selected.GeneInstance });
-
-            if (!itemData.IsConsumable()) return;
+            // Get the item's data from the inventory
+            ItemInstance itemToConsume = selected.ItemInstance;
+            if (itemToConsume == null || !itemToConsume.definition.isConsumable)
+            {
+                return; // Not a valid consumable item
+            }
 
             GardenerController player = playerTransform.GetComponent<GardenerController>();
             if (player == null || player.HungerSystem == null) return;
 
-            player.HungerSystem.Eat(itemData.GetNutritionValue());
+            // Use the ItemInstance to get the final nutrition value
+            player.HungerSystem.Eat(itemToConsume.GetNutrition());
 
             System.Action onSuccess = () => {
+                // This assumes eating consumes the whole stack.
+                // Future logic could decrement the stack count instead.
                 InventoryGridController.Instance.RemoveItemFromInventory(selected);
-                inventoryBar.ShowBar(); // Refresh the bar after removing an item
+                inventoryBar.ShowBar();
             };
 
             PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Interact,

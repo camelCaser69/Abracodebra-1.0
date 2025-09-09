@@ -1,45 +1,32 @@
 ﻿using UnityEngine;
-using System.Collections.Generic; // Added for List
-using System.Linq; // Added for Linq
+using System.Collections.Generic;
+using System.Linq;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Implementations;
 using Abracodabra.Genes.Core;
 
+// Note: Ensure your ItemInstance and ItemDefinition classes are accessible here,
+// either in the same namespace or with a 'using' statement.
+
 public class HarvestedItem
 {
-    // MODIFIED: Now holds a list of gene instances.
-    public List<RuntimeGeneInstance> HarvestedGeneInstances { get; set; }
+    // MODIFIED: This class now wraps a fully constructed ItemInstance.
+    public ItemInstance Item { get; private set; }
 
-    public HarvestedItem(List<RuntimeGeneInstance> instances)
+    public HarvestedItem(ItemDefinition definition, Dictionary<string, float> dynamicProps = null)
     {
-        HarvestedGeneInstances = instances ?? new List<RuntimeGeneInstance>();
+        Item = new ItemInstance(definition, dynamicProps);
     }
 
+    // This is now a convenience method that delegates to the ItemInstance.
     public float GetNutritionValue()
     {
-        if (HarvestedGeneInstances == null || HarvestedGeneInstances.Count == 0) return 0f;
-
-        float totalNutrition = 0f;
-
-        foreach (var instance in HarvestedGeneInstances)
-        {
-            if (instance.GetGene() is NutritiousPayload nutritiousGene)
-            {
-                totalNutrition += nutritiousGene.nutritionValue * instance.GetValue("potency_multiplier", 1f);
-            }
-        }
-        
-        return totalNutrition;
+        return Item.GetNutrition();
     }
 
+    // This is now a convenience method that delegates to the ItemDefinition.
     public bool IsConsumable()
     {
-        return GetNutritionValue() > 0;
-    }
-
-    // A helper to get the primary gene for UI purposes (e.g., icon, name)
-    public RuntimeGeneInstance GetPrimaryGeneInstance()
-    {
-        return HarvestedGeneInstances.FirstOrDefault();
+        return Item.definition != null && Item.definition.isConsumable;
     }
 }

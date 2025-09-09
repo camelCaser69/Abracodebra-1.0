@@ -2,12 +2,12 @@
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections;
-using System.Reflection;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Runtime;
-using Abracodabra.UI.Genes;
 using Abracodabra.Genes.Templates;
+
+// Note: Add 'using' statements for ItemInstance/ItemDefinition if they are in namespaces.
 
 namespace Abracodabra.UI.Genes
 {
@@ -18,27 +18,26 @@ namespace Abracodabra.UI.Genes
         public bool isLocked = false;
         public bool isDraggable = true;
 
-        [Header("Visual Components")]
         [SerializeField] private Image slotBackground;
         [SerializeField] private GameObject emptyIndicator;
         [SerializeField] private GameObject lockedOverlay;
         [SerializeField] private GameObject executingEffect;
         [SerializeField] private ItemView itemView;
 
-        [Header("Colors")]
-        [SerializeField] private Color normalColor = Color.white;
-        [SerializeField] private Color highlightColor = Color.yellow;
-        [SerializeField] private Color invalidColor = Color.red;
-        [SerializeField] private Color executingColor = Color.cyan;
-        
-        public InventoryBarItem CurrentItem { get; private set; }
+        [SerializeField] private Color normalColor = new Color(0.2f, 0.2f, 0.2f, 0.5f);
+        [SerializeField] private Color highlightColor = new Color(1f, 0.9f, 0.4f, 0.5f);
+        [SerializeField] private Color invalidColor = new Color(1f, 0.3f, 0.3f, 0.5f);
+        [SerializeField] private Color executingColor = new Color(0.4f, 0.8f, 1f, 0.5f);
+
+
+        public InventoryBarItem CurrentItem { get; set; }
         private GeneSequenceUI parentSequence;
         private IGeneEventBus eventBus;
         private GameObject draggedVisual;
         private Canvas canvas;
         private bool isPointerOver = false;
 
-        void Awake()
+        private void Awake()
         {
             parentSequence = GetComponentInParent<GeneSequenceUI>();
             canvas = GetComponentInParent<Canvas>();
@@ -46,18 +45,18 @@ namespace Abracodabra.UI.Genes
             if (itemView == null) Debug.LogError($"GeneSlotUI on {gameObject.name} is missing its ItemView child component.", this);
         }
 
-        void Start()
+        private void Start()
         {
             eventBus = GeneServices.Get<IGeneEventBus>();
             UpdateVisuals();
         }
 
-        void OnEnable()
+        private void OnEnable()
         {
             eventBus?.Subscribe<GeneExecutedEvent>(OnGeneExecuted);
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             eventBus?.Unsubscribe<GeneExecutedEvent>(OnGeneExecuted);
         }
@@ -86,17 +85,19 @@ namespace Abracodabra.UI.Genes
                 {
                     case InventoryBarItem.ItemType.Gene:
                         itemView.InitializeAsGene(CurrentItem.GeneInstance);
-                        slotBackground.color = CurrentItem.GeneInstance.GetGene().geneColor.WithAlpha(0.5f);
+                        slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(CurrentItem.GeneInstance.GetGene(), null, null, null);
                         break;
                     case InventoryBarItem.ItemType.Seed:
                         itemView.InitializeAsSeed(CurrentItem.SeedTemplate);
-                        if (InventoryColorManager.Instance != null)
-                            slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, CurrentItem.SeedTemplate, null);
+                        slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, CurrentItem.SeedTemplate, null, null);
                         break;
                     case InventoryBarItem.ItemType.Tool:
                         itemView.InitializeAsTool(CurrentItem.ToolDefinition);
-                        if (InventoryColorManager.Instance != null)
-                            slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, null, CurrentItem.ToolDefinition);
+                        slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, null, CurrentItem.ToolDefinition, null);
+                        break;
+                    case InventoryBarItem.ItemType.Resource: // NEW CASE
+                        itemView.InitializeAsItem(CurrentItem.ItemInstance);
+                        slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, null, null, CurrentItem.ItemInstance.definition);
                         break;
                 }
             }
@@ -111,41 +112,48 @@ namespace Abracodabra.UI.Genes
                 slotBackground.color = highlightColor;
             }
         }
-        
+
+
         public void OnDrop(PointerEventData eventData)
         {
             if (isLocked) return;
             GeneSlotUI sourceSlot = eventData.pointerDrag?.GetComponent<GeneSlotUI>();
             if (sourceSlot == null || sourceSlot == this) return;
-        
+
             if (!IsValidDrop(sourceSlot, this))
             {
                 ShowInvalidDropFeedback();
                 return;
             }
-        
+
             var itemFromSource = sourceSlot.CurrentItem;
             var itemFromDestination = this.CurrentItem;
-        
+
             UpdateSlotContents(sourceSlot, itemFromDestination);
             UpdateSlotContents(this, itemFromSource);
         }
-        
+
         private bool IsItemValidForSlot(InventoryBarItem item, GeneSlotUI slot)
         {
             if (item == null) return true;
-        
+
+            // Prevent dropping Resources into gene sequence slots
+            if (item.Type == InventoryBarItem.ItemType.Resource && slot.parentSequence != null)
+            {
+                return false;
+            }
+
             if (slot.acceptedCategory == GeneCategory.Seed)
             {
                 return item.Type == InventoryBarItem.ItemType.Seed;
             }
-        
+
             if (slot.parentSequence != null)
             {
                 if (item.Type != InventoryBarItem.ItemType.Gene) return false;
                 var gene = item.GeneInstance.GetGene();
                 if (gene.Category != slot.acceptedCategory) return false;
-        
+
                 if (slot.acceptedCategory == GeneCategory.Modifier || slot.acceptedCategory == GeneCategory.Payload)
                 {
                     var activeGene = slot.parentSequence.GetActiveGeneForRow(slot.slotIndex);
@@ -154,6 +162,7 @@ namespace Abracodabra.UI.Genes
             }
             return true;
         }
+
 
         private bool IsValidDrop(GeneSlotUI source, GeneSlotUI destination)
         {
@@ -177,7 +186,7 @@ namespace Abracodabra.UI.Genes
                 slot.SetItem(newItem);
             }
         }
-        
+
         public void OnPointerEnter(PointerEventData eventData)
         {
             isPointerOver = true;
@@ -225,7 +234,7 @@ namespace Abracodabra.UI.Genes
             StartCoroutine(FlashColor(invalidColor));
         }
 
-        IEnumerator FlashColor(Color flashColor)
+        private IEnumerator FlashColor(Color flashColor)
         {
             if (slotBackground == null) yield break;
             Color originalColor = slotBackground.color;

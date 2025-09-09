@@ -4,7 +4,7 @@ using System.Linq;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Components;
-using Abracodabra.Genes.Runtime;
+using Abracodabra.Genes.Implementations; // Added to reference NutritiousPayload
 using WegoSystem;
 
 namespace Abracodabra.Genes.Implementations
@@ -12,10 +12,15 @@ namespace Abracodabra.Genes.Implementations
     [CreateAssetMenu(fileName = "BasicFruitGene", menuName = "Abracodabra/Genes/Active/Basic Fruit Gene")]
     public class BasicFruitGene : ActiveGene
     {
+        [Header("Fruit Production")]
         public GameObject fruitPrefab;
         public float growthTime = 2f;
         public int fruitCount = 1;
         public float launchForce = 5f;
+
+        [Header("Harvest Item")]
+        [Tooltip("The Item Definition this gene produces when the fruit is harvested.")]
+        public ItemDefinition harvestedItemDefinition; // NEW: Link to the item asset.
 
         public override void Execute(ActiveGeneContext context)
         {
@@ -24,9 +29,14 @@ namespace Abracodabra.Genes.Implementations
                 Debug.LogError($"BasicFruitGene '{geneName}' is missing its fruitPrefab!", this);
                 return;
             }
+            // NEW: Check if the ItemDefinition is assigned.
+            if (harvestedItemDefinition == null)
+            {
+                Debug.LogError($"BasicFruitGene '{geneName}' is missing its Harvested Item Definition!", this);
+                return;
+            }
 
             Transform[] fruitPoints = context.plant.GetFruitSpawnPoints();
-
             if (fruitPoints.Length == 0)
             {
                 Debug.LogWarning($"Plant '{context.plant.name}' has no empty spaces for fruit spawning.", context.plant);
@@ -51,22 +61,15 @@ namespace Abracodabra.Genes.Implementations
                 Vector3 spawnPosition = shuffledPoints[i].position;
                 Vector2Int fruitGridCoord = Vector2Int.RoundToInt(context.plant.transform.InverseTransformPoint(spawnPosition) / context.plant.GetCellWorldSpacing());
 
-                // FIX: Use the plant's CellManager to spawn the fruit.
-                // This ensures it is correctly registered in the plant's data structures.
                 GameObject fruitObj = context.plant.CellManager.SpawnCellVisual(PlantCellType.Fruit, fruitGridCoord);
-                if (fruitObj == null)
-                {
-                    continue; // Skip if spawn failed (e.g., position was somehow already taken).
-                }
-
-                // Ensure the visual object is exactly at the spawn point's world position.
+                if (fruitObj == null) continue;
+                
                 fruitObj.transform.position = spawnPosition;
                 
                 FoodItem foodItem = fruitObj.GetComponent<FoodItem>();
                 if (foodItem != null)
                 {
                     GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(spawnPosition);
-                    // Ensure the FoodType from the prefab is used if one is assigned there.
                     foodItem.InitializeAsPlantPart(foodItem.foodType, gridPos);
                 }
 
@@ -94,11 +97,29 @@ namespace Abracodabra.Genes.Implementations
             fruit.SourcePlant = context.plant;
             fruit.GrowthTime = growthTime;
             
-            if (context.payloads != null)
-            {
-                fruit.PayloadGeneInstances = new List<RuntimeGeneInstance>(context.payloads);
-            }
+            // NEW: Assign the static item definition.
+            fruit.RepresentingItemDefinition = harvestedItemDefinition;
             
+            // NEW: Calculate dynamic properties from payloads and store them on the fruit.
+            var dynamicProps = new Dictionary<string, float>();
+            float totalPotencyMultiplier = 1f;
+
+            foreach (var payloadInstance in context.payloads)
+            {
+                var payloadGene = payloadInstance.GetGene<PayloadGene>();
+                if (payloadGene is NutritiousPayload)
+                {
+                    // This is just one example. You could add more properties here.
+                    totalPotencyMultiplier *= payloadGene.GetFinalPotency(payloadInstance);
+                }
+                // Future payloads could add other properties, like "poison_damage", etc.
+            }
+
+            // Store the calculated multiplier in the dictionary.
+            dynamicProps["nutrition_multiplier"] = totalPotencyMultiplier;
+            fruit.DynamicProperties = dynamicProps;
+            
+            // Apply immediate visual/config effects.
             foreach (var payloadInstance in context.payloads)
             {
                 payloadInstance.GetGene<PayloadGene>()?.ConfigureFruit(fruit, payloadInstance);
@@ -114,7 +135,7 @@ namespace Abracodabra.Genes.Implementations
         {
             return $"{description}\n\n" +
                    $"Grows <b>{fruitCount}</b> fruit(s).\n" +
-                   $"Growth Time: <b>{growthTime}s</b>\n" +
+                   $"Produces Item: <b>{(harvestedItemDefinition != null ? harvestedItemDefinition.itemName : "None")}</b>\n" +
                    $"Energy Cost: <b>{baseEnergyCost} E</b>\n" +
                    $"Slots: <b>{slotConfig.modifierSlots}</b> Modifiers, <b>{slotConfig.payloadSlots}</b> Payloads";
         }

@@ -76499,7 +76499,7 @@ MonoBehaviour:
   hoverHighlightObject: {fileID: 1547083800}
   hoverColorManager: {fileID: 11400000, guid: 13378dd3cbc1677489e27a96ad120303, type: 2}
   baseSortingOrder: 0
-  debugLogs: 0
+  debugLogs: 1
   hoveredTileText: {fileID: 0}
   currentToolText: {fileID: 0}
 --- !u!114 &1099771308
@@ -90821,6 +90821,7 @@ MonoBehaviour:
   activeGeneCellColor: {r: 0.94509804, g: 0.32549024, b: 0.5551241, a: 1}
   modifierGeneCellColor: {r: 1, g: 1, b: 0.7, a: 1}
   payloadGeneCellColor: {r: 1, g: 0.7, b: 1, a: 1}
+  resourceCellColor: {r: 0.9, g: 0.85, b: 0.7, a: 1}
   defaultCellColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &1352302867
 MonoBehaviour:

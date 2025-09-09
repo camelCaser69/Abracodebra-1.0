@@ -1,9 +1,10 @@
-﻿// Reworked File: Assets/Scripts/PlantSystem/UI/ItemView.cs
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Runtime;
+
+// Note: Ensure ItemDefinition is accessible via a 'using' statement if it's in a namespace.
 
 namespace Abracodabra.UI.Genes
 {
@@ -17,6 +18,7 @@ namespace Abracodabra.UI.Genes
         private RuntimeGeneInstance _runtimeInstance;
         private ToolDefinition _toolDefinition;
         private SeedTemplate _seedTemplate;
+        private ItemDefinition _itemDefinition; // NEW
 
         private Color _originalBackgroundColor;
 
@@ -26,6 +28,7 @@ namespace Abracodabra.UI.Genes
             _gene = instance.GetGene();
             _toolDefinition = null;
             _seedTemplate = null;
+            _itemDefinition = null;
             SetupVisuals();
             gameObject.SetActive(true);
         }
@@ -36,6 +39,7 @@ namespace Abracodabra.UI.Genes
             _gene = null;
             _toolDefinition = toolDef;
             _seedTemplate = null;
+            _itemDefinition = null;
             SetupVisuals();
             gameObject.SetActive(true);
         }
@@ -46,9 +50,23 @@ namespace Abracodabra.UI.Genes
             _gene = null;
             _toolDefinition = null;
             _seedTemplate = seed;
+            _itemDefinition = null;
             SetupVisuals();
             gameObject.SetActive(true);
         }
+        
+        // NEW METHOD for our new item type
+        public void InitializeAsItem(ItemInstance instance)
+        {
+            _runtimeInstance = null;
+            _gene = null;
+            _toolDefinition = null;
+            _seedTemplate = null;
+            _itemDefinition = instance.definition;
+            SetupVisuals();
+            gameObject.SetActive(true);
+        }
+
 
         private void SetupVisuals()
         {
@@ -66,14 +84,22 @@ namespace Abracodabra.UI.Genes
             {
                 spriteToShow = _toolDefinition.icon ?? fallbackThumbnail;
                 tintColor = _toolDefinition.iconTint;
-                _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(null, null, _toolDefinition);
+                _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(null, null, _toolDefinition, null);
             }
             else if (_seedTemplate != null)
             {
                 spriteToShow = _seedTemplate.icon ?? fallbackThumbnail;
                 tintColor = Color.white;
-                _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(null, _seedTemplate, null);
+                _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(null, _seedTemplate, null, null);
             }
+            // NEW CASE for ItemDefinition
+            else if (_itemDefinition != null)
+            {
+                spriteToShow = _itemDefinition.icon ?? fallbackThumbnail;
+                tintColor = Color.white; // Or add a tint to ItemDefinition if you want
+                _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(null, null, null, _itemDefinition);
+            }
+
 
             if (thumbnailImage != null)
             {
@@ -87,13 +113,14 @@ namespace Abracodabra.UI.Genes
                 backgroundImage.color = _originalBackgroundColor;
             }
         }
-        
+
         public void Clear()
         {
             _gene = null;
             _runtimeInstance = null;
             _toolDefinition = null;
             _seedTemplate = null;
+            _itemDefinition = null;
             gameObject.SetActive(false);
         }
 
@@ -101,5 +128,6 @@ namespace Abracodabra.UI.Genes
         public RuntimeGeneInstance GetRuntimeInstance() => _runtimeInstance;
         public ToolDefinition GetToolDefinition() => _toolDefinition;
         public SeedTemplate GetSeedTemplate() => _seedTemplate;
+        public ItemDefinition GetItemDefinition() => _itemDefinition; // NEW
     }
 }

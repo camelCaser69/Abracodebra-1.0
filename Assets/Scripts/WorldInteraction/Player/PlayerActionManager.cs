@@ -122,6 +122,7 @@ public class PlayerActionManager : MonoBehaviour
     }
 
     // Only providing the changed method block as requested.
+    // Only providing the changed method block as requested.
     private bool ExecuteHarvest(Vector3Int gridPosition)
     {
         var entities = GridPositionManager.Instance?.GetEntitiesAt(new GridPosition(gridPosition));
@@ -141,22 +142,21 @@ public class PlayerActionManager : MonoBehaviour
         if (harvestedItems == null || harvestedItems.Count == 0)
         {
             if (debugMode) Debug.Log($"[PlayerActionManager] Harvest action on plant '{plant.name}' yielded no items.");
-            return false; // Action failed because nothing was harvested.
+            return false;
         }
 
         int itemsAdded = 0;
-        foreach (var item in harvestedItems)
+        foreach (var harvestedItem in harvestedItems)
         {
-            // Get the primary gene instance for creating the inventory item.
-            var primaryInstance = item.GetPrimaryGeneInstance();
-            if (primaryInstance != null)
+            // NEW: Create the inventory item directly from the ItemInstance within the HarvestedItem.
+            var inventoryItem = InventoryBarItem.FromItem(harvestedItem.Item);
+            if (InventoryGridController.Instance.AddItemToInventory(inventoryItem))
             {
-                // This assumes a harvested fruit stack is represented by its primary payload gene in the inventory.
-                var inventoryItem = InventoryBarItem.FromGene(primaryInstance);
-                if (InventoryGridController.Instance.AddItemToInventory(inventoryItem))
-                {
-                    itemsAdded++;
-                }
+                itemsAdded++;
+            }
+            else
+            {
+                if (debugMode) Debug.LogWarning($"[PlayerActionManager] Failed to add harvested item '{harvestedItem.Item.definition.itemName}' to inventory. Inventory may be full.");
             }
         }
 
