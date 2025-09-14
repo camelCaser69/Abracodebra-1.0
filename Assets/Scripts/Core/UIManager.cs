@@ -1,27 +1,29 @@
 ﻿using UnityEngine;
-using UnityEngine.UI; // For Button
-using System.Collections;
+using UnityEngine.UI;
 using TMPro;
+using System.Collections;
 using WegoSystem;
 using Abracodabra.UI.Genes;
 
 public class UIManager : MonoBehaviour
 {
-    public static UIManager Instance { get; private set; }
+    public static UIManager Instance { get; set; }
 
-    [Header("UI Panels")]
+    [Header("Panels")]
     [SerializeField] private GameObject uiCanvasRoot;
     [SerializeField] private GameObject planningPanel;
     [SerializeField] private GameObject growthAndThreatPanel;
     [SerializeField] private GameObject geneSequenceUIPanel;
+    [SerializeField] private GameObject gameOverPanel; // NEW: Assign your Game Over UI panel here
 
     [Header("Buttons")]
     [SerializeField] private Button startGrowthPhaseButton;
     [SerializeField] private Button startNewPlanningPhaseButton;
     [SerializeField] private Button endPlanningPhaseButton;
     [SerializeField] private Button advanceTickButton;
-    
-    [Header("Displays")]
+    [SerializeField] private Button restartButton; // NEW: Assign your Restart button from the GameOver panel
+
+    [Header("Text Displays")]
     [SerializeField] private TextMeshProUGUI tickCounterText;
 
     private RunManager runManager;
@@ -84,7 +86,7 @@ public class UIManager : MonoBehaviour
 
         if (runManager == null)
         {
-            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not function correctly.");
+            Debug.LogError("[UIManager] RunManager.Instance not found! UI will not fn correctly.");
             return;
         }
 
@@ -99,6 +101,7 @@ public class UIManager : MonoBehaviour
 
         SetupButtons();
 
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
         HandleRunStateChanged(runManager.CurrentState);
         UpdateTickDisplay();
     }
@@ -109,40 +112,43 @@ public class UIManager : MonoBehaviour
         startNewPlanningPhaseButton?.onClick.AddListener(OnStartNewPlanningPhaseClicked);
         endPlanningPhaseButton?.onClick.AddListener(OnEndPlanningPhaseClicked);
         advanceTickButton?.onClick.AddListener(OnAdvanceTickClicked);
+        restartButton?.onClick.AddListener(OnRestartClicked); // NEW
     }
 
     private void HandleRunStateChanged(RunState newState)
     {
-        if (planningPanel != null) planningPanel.SetActive(newState == RunState.Planning);
-        if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(newState == RunState.GrowthAndThreat);
+        // Hide all major gameplay panels by default
+        if (planningPanel != null) planningPanel.SetActive(false);
+        if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(false);
+        if (gameOverPanel != null) gameOverPanel.SetActive(false);
+        if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(false);
+        if (InventoryGridController.Instance != null) InventoryGridController.Instance.gameObject.SetActive(false);
+        InventoryBarController.Instance?.HideBar();
 
-        if (newState == RunState.GrowthAndThreat && geneSequenceUIPanel != null)
+
+        // Now, show the correct panels for the current state
+        switch (newState)
         {
-            var geneSequenceUI = geneSequenceUIPanel.GetComponent<GeneSequenceUI>();
-            if (geneSequenceUI != null)
-            {
-                geneSequenceUI.CleanupOnPhaseEnd();
-            }
-        }
+            case RunState.Planning:
+                if (planningPanel != null) planningPanel.SetActive(true);
+                if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(true);
+                if (InventoryGridController.Instance != null) InventoryGridController.Instance.gameObject.SetActive(true);
+                break;
 
-        if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(newState == RunState.Planning);
-
-        if (InventoryGridController.Instance != null)
-        {
-            InventoryGridController.Instance.gameObject.SetActive(newState == RunState.Planning);
-        }
-
-        if (newState == RunState.GrowthAndThreat)
-        {
-            if (InventoryBarController.Instance != null)
-            {
+            case RunState.GrowthAndThreat:
+                if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(true);
+                if (geneSequenceUIPanel != null)
+                {
+                    geneSequenceUIPanel.GetComponent<GeneSequenceUI>()?.CleanupOnPhaseEnd();
+                }
                 StartCoroutine(ShowInventoryBarDelayed());
-            }
+                break;
+
+            case RunState.GameOver:
+                if (gameOverPanel != null) gameOverPanel.SetActive(true);
+                break;
         }
-        else
-        {
-            InventoryBarController.Instance?.HideBar();
-        }
+
         UpdateButtonStates(newState);
     }
 
@@ -153,7 +159,7 @@ public class UIManager : MonoBehaviour
 
     private void HandleRoundChanged(int newRound)
     {
-        // Logic for round change can go here if needed in the future
+        // Logic for round change if needed
     }
 
     private void HandleTickAdvanced(int currentTick)
@@ -184,10 +190,11 @@ public class UIManager : MonoBehaviour
     private void OnStartNewPlanningPhaseClicked() { runManager?.StartNewPlanningPhase(); }
     private void OnEndPlanningPhaseClicked() { runManager?.EndPlanningPhase(); }
     private void OnAdvanceTickClicked() { tickManager?.DebugAdvanceTick(); }
+    private void OnRestartClicked() { runManager?.RestartGame(); } // NEW
 
     private IEnumerator ShowInventoryBarDelayed()
     {
-        yield return null;
+        yield return null; // Wait one frame for layout to build
         InventoryBarController.Instance?.ShowBar();
     }
 

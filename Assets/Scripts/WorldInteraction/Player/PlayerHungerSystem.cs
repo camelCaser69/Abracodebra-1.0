@@ -1,24 +1,42 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using System;
 using WegoSystem;
 
 public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable
 {
-    [SerializeField] private float maxHunger = 100f;
-    [SerializeField] private float startingHunger = 100f;
-    [SerializeField] private float hungerDepletionPerTick = 0.1f; // Default: 1 hunger per 10 ticks
+    // MODIFIED: No longer serialized, will be set by RunManager
+    private float maxHunger; 
+    
+    // MODIFIED: Starting hunger is now a fraction of the max hunger
+    [Tooltip("What fraction of max hunger the player starts with (e.g., 1.0 for 100%).")]
+    [SerializeField] [Range(0f, 1f)] private float startingHungerFraction = 1.0f;
+    
+    [SerializeField] private float hungerDepletionPerTick = 0.1f;
 
     public float CurrentHunger { get; private set; }
     public float MaxHunger => maxHunger;
 
-    public event Action<float, float> OnHungerChanged; // current, max
+    public event Action<float, float> OnHungerChanged;
     public event Action OnStarvation;
 
     private bool hasStarved = false;
 
-    void Start()
+    private void Start()
     {
-        CurrentHunger = startingHunger;
+        // Get max hunger from the central RunManager.
+        if (RunManager.HasInstance)
+        {
+            maxHunger = RunManager.Instance.playerMaxHunger;
+        }
+        else
+        {
+            Debug.LogError("[PlayerHungerSystem] RunManager not found! Defaulting max hunger to 100.");
+            maxHunger = 100f;
+        }
+
+        CurrentHunger = maxHunger * startingHungerFraction;
+        OnHungerChanged?.Invoke(CurrentHunger, maxHunger);
+
         if (TickManager.Instance != null)
         {
             TickManager.Instance.RegisterTickUpdateable(this);
@@ -29,9 +47,8 @@ public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable
         }
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
-        // Safely get the instance once
         var tickManager = TickManager.Instance;
         if (tickManager != null)
         {
@@ -41,7 +58,10 @@ public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable
 
     public void OnTickUpdate(int currentTick)
     {
-        if (hasStarved) return;
+        if (hasStarved || (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat))
+        {
+            return;
+        }
 
         CurrentHunger -= hungerDepletionPerTick;
         CurrentHunger = Mathf.Max(0, CurrentHunger);
@@ -52,8 +72,7 @@ public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable
         {
             hasStarved = true;
             OnStarvation?.Invoke();
-            Debug.LogWarning("Player has starved to death!");
-            // Here you would typically trigger a game over state via the RunManager
+            Debug.LogWarning("Player has starved!");
         }
     }
 

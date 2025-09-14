@@ -18754,10 +18754,12 @@ MonoBehaviour:
   planningPanel: {fileID: 317089599}
   growthAndThreatPanel: {fileID: 683933347}
   geneSequenceUIPanel: {fileID: 1819199120}
+  gameOverPanel: {fileID: 0}
   startGrowthPhaseButton: {fileID: 882140024}
   startNewPlanningPhaseButton: {fileID: 774509244}
   endPlanningPhaseButton: {fileID: 0}
   advanceTickButton: {fileID: 0}
+  restartButton: {fileID: 0}
   tickCounterText: {fileID: 1709125727}
 --- !u!114 &513545530
 MonoBehaviour:
@@ -130549,6 +130551,7 @@ MonoBehaviour:
   currentPhase: 0
   currentRoundNumber: 1
   currentPhaseTicks: 0
+  playerMaxHunger: 60
 --- !u!114 &1970727777
 MonoBehaviour:
   m_ObjectHideFlags: 0
