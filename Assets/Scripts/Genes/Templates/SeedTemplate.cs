@@ -1,17 +1,24 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
+using Abracodabra.UI.Tooltips; // NEW: For new enums
 
 namespace Abracodabra.Genes.Templates
 {
-    [CreateAssetMenu(fileName = "NewSeedTemplate", menuName = "Abracodabra/Genes/Seed Template")]
     public class SeedTemplate : ScriptableObject
     {
         public string templateName;
         public string description;
         public Sprite icon;
+
+        // NEW FIELDS START
+        [Header("Tooltip Information")]
+        public SeedRarity rarity = SeedRarity.Common;
+        public PlantType plantType = PlantType.Flower;
+        public int generation = 1;
+        // NEW FIELDS END
 
         [Header("Slot Configuration")]
         [Range(1, 8)] public int passiveSlotCount = 3;
@@ -19,21 +26,21 @@ namespace Abracodabra.Genes.Templates
 
         public List<GeneTemplateEntry> passiveGenes = new List<GeneTemplateEntry>();
         public List<SequenceSlotTemplate> activeSequence = new List<SequenceSlotTemplate>();
-
+        
         [Header("Growth Parameters")]
         [Range(0f, 1f)] public float baseGrowthChance = 0.1f;
         public int minHeight = 3;
         public int maxHeight = 5;
         public int leafDensity = 2;
         public int leafGap = 1;
-
-        [Header("Energy & Sequence")]
+        
+        [Header("Energy System")]
         public int baseRechargeTime = 3;
         public float energyRegenRate = 10f;
         public float maxEnergy = 100f;
-        public float startingEnergy = 0f; // <-- NEW FIELD
-
-        [Header("Unlocking")]
+        public float startingEnergy = 0f;
+        
+        [Header("Unlock State")]
         public bool isUnlocked = true;
         public List<string> unlockRequirements = new List<string>();
 
@@ -83,7 +90,7 @@ namespace Abracodabra.Genes.Templates
 
         public bool Validate()
         {
-            if (activeGene == null) return true; // Empty slot is valid
+            if (activeGene == null) return true; // Empty slot is valid   
 
             if (modifiers.Count > activeGene.slotConfig.modifierSlots) return false;
             if (payloads.Count > activeGene.slotConfig.payloadSlots) return false;

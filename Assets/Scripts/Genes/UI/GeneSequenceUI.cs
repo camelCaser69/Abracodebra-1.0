@@ -1,32 +1,29 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
-using System.Collections.Generic;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes;
+using Abracodabra.UI.Tooltips; // NEW
 
 namespace Abracodabra.UI.Genes
 {
     public class GeneSequenceUI : MonoBehaviour
     {
-        [Header("Containers")]
+        #region Fields
         public Transform passiveGenesContainer;
         public Transform activeSequenceContainer;
-        [Tooltip("The dedicated slot where a seed is placed to be edited.")]
         [SerializeField] private GeneSlotUI seedEditSlot;
 
-        [Header("Prefabs")]
         public GameObject sequenceRowPrefab;
         public GameObject passiveSlotPrefab;
 
-        [Header("Display Elements")]
         public TMPro.TextMeshProUGUI energyCostText;
         public TMPro.TextMeshProUGUI currentEnergyText;
         public TMPro.TextMeshProUGUI rechargeTimeText;
         public TMPro.TextMeshProUGUI validationMessage;
-        public Slider rechargeProgress; // Restored this public field
+        public Slider rechargeProgress;
 
-        [Header("Configuration")]
         public int maxPassiveSlots = 6;
         public int maxSequenceLength = 5;
 
@@ -34,10 +31,10 @@ namespace Abracodabra.UI.Genes
         private List<GeneSlotUI> passiveSlots = new List<GeneSlotUI>();
         private List<SequenceRowUI> sequenceRows = new List<SequenceRowUI>();
         private PlantSequenceExecutor executor;
+        #endregion
 
         void Start()
         {
-            // InitializeUI was removed from here to support dynamic creation
             ClearEditor();
         }
 
@@ -68,15 +65,15 @@ namespace Abracodabra.UI.Genes
                 seedEditSlot.ClearSlot();
             }
 
-            foreach (var slot in passiveSlots) if(slot != null) Destroy(slot.gameObject);
-            foreach (var row in sequenceRows) if(row != null) Destroy(row.gameObject);
+            foreach (var slot in passiveSlots) if (slot != null) Destroy(slot.gameObject);
+            foreach (var row in sequenceRows) if (row != null) Destroy(row.gameObject);
             passiveSlots.Clear();
             sequenceRows.Clear();
 
             SetEditorLocked(true);
             RefreshAllVisuals();
         }
-        
+
         public void CleanupOnPhaseEnd()
         {
             if (seedEditSlot != null && seedEditSlot.CurrentItem != null)
@@ -96,14 +93,13 @@ namespace Abracodabra.UI.Genes
 
         private void GenerateSlotsFromState()
         {
-            foreach (var slot in passiveSlots) if(slot != null) Destroy(slot.gameObject);
-            foreach (var row in sequenceRows) if(row != null) Destroy(row.gameObject);
+            foreach (var slot in passiveSlots) if (slot != null) Destroy(slot.gameObject);
+            foreach (var row in sequenceRows) if (row != null) Destroy(row.gameObject);
             passiveSlots.Clear();
             sequenceRows.Clear();
 
             if (runtimeState == null) return;
-            
-            // This now uses the seed's specific template counts
+
             for (int i = 0; i < runtimeState.template.passiveSlotCount; i++)
             {
                 GameObject slotObj = Instantiate(passiveSlotPrefab, passiveGenesContainer);
@@ -148,7 +144,7 @@ namespace Abracodabra.UI.Genes
             {
                 if (slotIndex < 0 || slotIndex >= runtimeState.activeSequence.Count) return;
                 RuntimeSequenceSlot sequenceSlot = runtimeState.activeSequence[slotIndex];
-                
+
                 switch (slotCategory)
                 {
                     case GeneCategory.Active:
@@ -178,9 +174,15 @@ namespace Abracodabra.UI.Genes
 
         private void RefreshAllVisuals()
         {
+            // Existing logic to update the main editor UI...
             if (runtimeState == null)
             {
                 UpdateDisplay();
+                // NEW: Update tooltip panel
+                if (SeedEditorTooltipPanel.Instance != null)
+                {
+                    SeedEditorTooltipPanel.Instance.LoadSeedForAnalysis(null);
+                }
                 return;
             }
 
@@ -209,6 +211,12 @@ namespace Abracodabra.UI.Genes
                 }
             }
             UpdateDisplay();
+            
+            // NEW: Update tooltip panel
+            if (SeedEditorTooltipPanel.Instance != null)
+            {
+                SeedEditorTooltipPanel.Instance.LoadSeedForAnalysis(runtimeState);
+            }
         }
 
         private void UpdateDisplay()
@@ -254,14 +262,12 @@ namespace Abracodabra.UI.Genes
             }
             return true;
         }
-        
-        // Restored Method
+
         public void ConnectToExecutor(PlantSequenceExecutor exec)
         {
             executor = exec;
         }
 
-        // Restored Method
         void Update()
         {
             if (executor != null && executor.plantGrowth != null && executor.plantGrowth.EnergySystem != null && runtimeState != null)

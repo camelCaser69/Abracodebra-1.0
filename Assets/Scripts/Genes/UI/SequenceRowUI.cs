@@ -49,7 +49,7 @@ namespace Abracodabra.UI.Genes
             UpdateAttachmentSlots(GetActiveGene());
         }
 
-        public void ClearRow()
+        public void ClearRow() 
         {
             modifierSlot?.ClearSlot();
             activeSlot?.ClearSlot();
