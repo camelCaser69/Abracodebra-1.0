@@ -4,29 +4,45 @@ import os
 import datetime
 import json
 import glob
+import sys
 
-# Default settings for the UI extractor, adapted from your previous settings file.
+# =================================================================================
+# SCRIPT CONFIGURATION
+# =================================================================================
+
+# 1. Determines where the script is running to find the settings file correctly.
+#    This ensures it works even if you run it from a different working directory.
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SETTINGS_FILENAME = "ui_extractor_settings.json"
+SETTINGS_PATH = os.path.join(SCRIPT_DIR, SETTINGS_FILENAME)
+
+# 2. Default settings (used if json file is missing or corrupt).
 DEFAULT_SETTINGS = {
-    # Default folders to scan. **You may still need to adjust these to match your project.**
-    "ui_directories": ["Assets/UI", "Assets/UIToolkit"], 
+    # Default folders to scan.
+    "ui_directories": [
+        "Assets/Scripts/A_ToolkitUI"
+    ], 
     
-    # Naming convention matches your "Unity_EXTRACTED_scripts" file.
+    # File extensions to extract.
+    "extensions_to_include": [
+        ".uxml", 
+        ".uss", 
+        ".cs"
+    ],
+
+    # Naming convention for the output file.
     "output_filename": "Unity_EXTRACTED_ToolkitUI",
     
-    # Set to 'false' to match your preference.
+    # Settings preferences.
     "include_timestamp_in_filename": False,
-    
-    # Set to 'true' to match your preference.
     "clean_previous_output": True,
-    
-    # Set to 'true' to match your preference.
     "include_toc": True,
     
-    # A clear header for the UI file.
+    # Header text for the final document.
     "header_text": """=================================================
-UNITY UI TOOLKIT FILES (.uxml & .uss)
+UNITY UI TOOLKIT FILES
 =================================================
-This document contains all .uxml and .uss files
+This document contains selected source files (.uxml, .uss, .cs)
 extracted from the project for easy review.
 
 Project: {project_name}
@@ -34,67 +50,97 @@ Extracted on: {extraction_date}
 """
 }
 
+# =================================================================================
+# FUNCTIONS
+# =================================================================================
+
+def wait_for_any_key():
+    """Waits for any key press on Windows, or Enter on Mac/Linux."""
+    print("\nPress any key to exit...")
+    if os.name == 'nt':
+        # Windows-specific 'any key' logic
+        import msvcrt
+        msvcrt.getch()
+    else:
+        # Mac/Linux fallback (requires Enter)
+        input()
+
 def load_settings():
-    """Loads settings from ui_extractor_settings.json or creates it with defaults."""
-    settings_path = os.path.join(os.getcwd(), "ui_extractor_settings.json")
-    if os.path.exists(settings_path):
+    """Loads settings from json or creates it with defaults in the script's directory."""
+    if os.path.exists(SETTINGS_PATH):
         try:
-            with open(settings_path, 'r', encoding='utf-8') as f:
+            with open(SETTINGS_PATH, 'r', encoding='utf-8') as f:
                 user_settings = json.load(f)
+                # Merge defaults with user settings (ensures new keys exist)
                 settings = DEFAULT_SETTINGS.copy()
                 settings.update(user_settings)
+                print(f"Loaded settings from: {SETTINGS_FILENAME}")
                 return settings
-        except json.JSONDecodeError:
-            print("Warning: Error reading settings.json. File might be corrupt. Using defaults.")
+        except json.JSONDecodeError as e:
+            print(f"\n[!] Warning: Error reading {SETTINGS_FILENAME}.")
+            print(f"    Details: {e}")
+            print("    The file format is invalid. Using default settings for this run.")
             return DEFAULT_SETTINGS
     else:
-        with open(settings_path, 'w', encoding='utf-8') as f:
-            json.dump(DEFAULT_SETTINGS, f, indent=4)
-        print(f"Created default settings file: {settings_path}")
+        # Create the file if it doesn't exist
+        try:
+            with open(SETTINGS_PATH, 'w', encoding='utf-8') as f:
+                json.dump(DEFAULT_SETTINGS, f, indent=4)
+            print(f"Created default settings file: {SETTINGS_FILENAME}")
+        except IOError as e:
+            print(f"Warning: Could not create settings file. {e}")
+            
         return DEFAULT_SETTINGS
 
-def collect_ui_files(project_path, settings):
-    """Finds all .uxml and .uss files in the specified directories."""
-    ui_files = []
-    ui_directories = settings.get("ui_directories", [])
-    extensions_to_include = ['.uxml', '.uss']
+def collect_files(base_path, settings):
+    """Finds all files in the specified directories matching the extensions."""
+    found_files = []
+    target_directories = settings.get("ui_directories", [])
+    
+    # Normalize extensions to be lowercase
+    extensions = [ext.lower() for ext in settings.get("extensions_to_include", [])]
 
-    print(f"Scanning for {', '.join(extensions_to_include)} files in: {', '.join(ui_directories)}")
+    print(f"Scanning for {', '.join(extensions)} files...")
+    print(f"Looking in: {', '.join(target_directories)}")
 
-    for directory in ui_directories:
-        scan_path = os.path.join(project_path, directory)
+    for directory in target_directories:
+        scan_path = os.path.join(base_path, directory)
+        
         if not os.path.exists(scan_path):
             print(f"Warning: Directory not found, skipping: {scan_path}")
             continue
         
         for root, _, files in os.walk(scan_path):
             for file in files:
-                if any(file.lower().endswith(ext) for ext in extensions_to_include):
+                # Check if file ends with any of the allowed extensions
+                if any(file.lower().endswith(ext) for ext in extensions):
                     full_path = os.path.join(root, file)
-                    relative_path = os.path.relpath(full_path, project_path)
-                    ui_files.append({'path': relative_path, 'full_path': full_path})
+                    relative_path = os.path.relpath(full_path, base_path)
+                    found_files.append({'path': relative_path, 'full_path': full_path})
     
-    # Sort alphabetically for consistent output
-    return sorted(ui_files, key=lambda x: x['path'])
+    # Sort alphabetically by path for consistent output
+    return sorted(found_files, key=lambda x: x['path'])
 
-def create_table_of_contents(ui_files, file_locations):
+def create_table_of_contents(found_files, file_locations):
     """Creates a formatted Table of Contents."""
     toc = ["TABLE OF CONTENTS:", "------------------"]
-    if not ui_files:
-        toc.append("No UI files were found.")
+    if not found_files:
+        toc.append("No matching files were found.")
         return toc
 
-    for ui_file in ui_files:
-        line_num = file_locations.get(ui_file['path'], '?')
-        toc.append(f"- {ui_file['path']} (Line: {line_num})")
+    for file_info in found_files:
+        line_num = file_locations.get(file_info['path'], '?')
+        toc.append(f"- {file_info['path']} (Line: {line_num})")
     
     toc.append("\n")
     return toc
 
 def extract_ui():
     """Main function to perform the extraction."""
-    project_path = os.getcwd()
+    # Ensure we are operating relative to the script's location
+    project_path = SCRIPT_DIR
     project_name = os.path.basename(project_path)
+    
     settings = load_settings()
 
     # 1. Clean previous output file if enabled
@@ -103,17 +149,19 @@ def extract_ui():
         for file in glob.glob(filename_pattern):
             try:
                 os.remove(file)
-                print(f"Removed old file: {os.path.basename(file)}")
+                print(f"Removed old output file: {os.path.basename(file)}")
             except OSError as e:
                 print(f"Error removing old file {os.path.basename(file)}: {e}")
 
     # 2. Find all relevant files
-    ui_files = collect_ui_files(project_path, settings)
-    if not ui_files:
-        print("No .uxml or .uss files found in the specified directories. Nothing to extract.")
+    found_files = collect_files(project_path, settings)
+    if not found_files:
+        print("\n[!] No files found matching the criteria.")
+        print("    1. Check if the folders exist.")
+        print(f"    2. Check {SETTINGS_FILENAME} to ensure paths are correct.")
         return
 
-    print(f"Found {len(ui_files)} UI files to extract.")
+    print(f"Found {len(found_files)} files to extract.")
 
     # 3. Prepare the output content
     all_content = []
@@ -135,18 +183,18 @@ def extract_ui():
         current_line += 3
 
     # 4. Read each file and add its content
-    for ui_file in ui_files:
+    for file_info in found_files:
         file_header = f"""
 {'='*80}
-// FILE: {ui_file['path']}
+// FILE: {file_info['path']}
 {'='*80}
 """
         all_content.append(file_header)
-        file_locations[ui_file['path']] = current_line + 3 # Line where content starts
+        file_locations[file_info['path']] = current_line + 3 # Approximate line
         current_line += 4
 
         try:
-            with open(ui_file['full_path'], 'r', encoding='utf-8') as f:
+            with open(file_info['full_path'], 'r', encoding='utf-8') as f:
                 content_lines = f.read().split('\n')
                 all_content.extend(content_lines)
                 current_line += len(content_lines)
@@ -157,28 +205,28 @@ def extract_ui():
 
     # 5. Generate and insert the Table of Contents
     if settings.get("include_toc", True):
-        toc_content = create_table_of_contents(ui_files, file_locations)
+        toc_content = create_table_of_contents(found_files, file_locations)
         # Replace the placeholder with the actual TOC
         all_content[toc_placeholder_index] = '\n'.join(toc_content)
 
     # 6. Determine final filename
-    output_filename = settings.get("output_filename", "EXTRACTED_Unity_ToolkitUI")
+    base_filename = settings.get("output_filename", "EXTRACTED_Unity_ToolkitUI")
     if settings.get("include_timestamp_in_filename", False):
         timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-        output_filename = f"{output_filename}_{timestamp}.txt"
+        output_filename = f"{base_filename}_{timestamp}.txt"
     else:
-        output_filename = f"{output_filename}.txt"
+        output_filename = f"{base_filename}.txt"
 
     # 7. Write the final output file
     output_path = os.path.join(project_path, output_filename)
     try:
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write('\n'.join(all_content))
-        print(f"\nSuccess! All UI files extracted to: {output_path}")
+        print(f"\nSuccess! All files extracted to: {output_filename}")
     except IOError as e:
         print(f"\nError: Could not write to output file. {e}")
 
 
 if __name__ == "__main__":
     extract_ui()
-    input("\nExtraction complete. Press Enter to exit.")
+    wait_for_any_key()

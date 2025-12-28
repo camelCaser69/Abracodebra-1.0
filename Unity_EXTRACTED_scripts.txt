@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 594,007 → 392,109 chars (34.0% reduction)
-Estimated tokens saved: ~50,474
+Compression Stats: 610,945 → 405,005 chars (33.7% reduction)
+Estimated tokens saved: ~51,485
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -20,7 +20,7 @@ Common using statements (add these back when needed):
 using System;
 
 [//]
-  InventoryBarItem (Assets\Scripts\PlantSystem\UI/) L29
+  InventoryBarItem (Assets\Scripts\UI\_UGUI_Legacy/) L29
 
 [Abracodabra.Genes]
   TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L128
@@ -63,164 +63,165 @@ using System;
   SeedTemplate (Assets\Scripts\Genes\Templates/) L1914
 
 [Abracodabra.UI.Genes]
-  GeneSequenceUI (Assets\Scripts\Genes\UI/) L2002
-  GeneSlotUI (Assets\Scripts\Genes\UI/) L2242
-  SequenceRowUI (Assets\Scripts\Genes\UI/) L2469
-  InventoryBarController (Assets\Scripts\PlantSystem\UI/) L2540
-  ItemView (Assets\Scripts\PlantSystem\UI/) L2711
+  GeneSequenceUI (Assets\Scripts\UI\_UGUI_Legacy/) L2002
+  GeneSlotUI (Assets\Scripts\UI\_UGUI_Legacy/) L2242
+  InventoryBarController (Assets\Scripts\UI\_UGUI_Legacy/) L2469
+  ItemView (Assets\Scripts\UI\_UGUI_Legacy/) L2640
+  SequenceRowUI (Assets\Scripts\UI\_UGUI_Legacy/) L2756
 
 [Abracodabra.UI.Tooltips]
-  EnhancedTooltipTrigger (Assets\Scripts\Genes\UI/) L2827
-  InventoryTooltipPanel (Assets\Scripts\Genes\UI/) L2880
-  SeedEditorTooltipPanel (Assets\Scripts\Genes\UI/) L2981
-  SeedTooltipData (Assets\Scripts\Genes\UI/) L3118
-  TooltipEnums (Assets\Scripts\Genes\UI/) L3288
-  TooltipSystemManager (Assets\Scripts\Genes\UI/) L3310
-  TooltipUtilities (Assets\Scripts\Genes\UI/) L3334
+  EnhancedTooltipTrigger (Assets\Scripts\UI\_UGUI_Legacy/) L2827
+  InventoryTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L2880
+  SeedEditorTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L2981
+  SeedTooltipData (Assets\Scripts\UI\_UGUI_Legacy/) L3118
+  TooltipEnums (Assets\Scripts\UI\_UGUI_Legacy/) L3288
+  TooltipSystemManager (Assets\Scripts\UI\_UGUI_Legacy/) L3310
+  TooltipUtilities (Assets\Scripts\UI\_UGUI_Legacy/) L3334
 
 [Unknown]
-  GameEvent (Assets\Scripts\Core\Events/) L3427
-  GameEventListener (Assets\Scripts\Core\Events/) L3454
-  IGameEventListener (Assets\Scripts\Core\Events/) L3481
-  GameInitializer (Assets\Scripts\Core/) L3489
-  GeneSystemInitializer (Assets\Scripts\Core/) L3513
-  SortableEntity (Assets\Scripts\Core/) L3527
-  UIManager (Assets\Scripts\Core/) L3594
-  WeatherManager (Assets\Scripts\Core/) L3808
-  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L4008
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L4069
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L4352
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L4416
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L4425
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L4838
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L5002
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L5015
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L5052
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L5362
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L5393
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L5666
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L5759
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L5774
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L5793
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L5877
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L5953
-  FoodType (Assets\Scripts\Ecosystem\Food/) L6025
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L6040
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L6062
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L6305
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L6324
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L6629
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L6658
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L6676
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L6714
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L6762
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L6780
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L6931
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L7042
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L7089
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L7102
-  TileDefinitionEditor (Assets\Scripts\Editor/) L7163
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L7183
-  WaveManagerEditor (Assets\Scripts\Editor/) L7320
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L7495
-  ItemEffect (Assets\Scripts\Items/) L7520
-  ItemInstance (Assets\Scripts\Items/) L7548
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L7583
-  LeafData (Assets\Scripts\PlantSystem\Data/) L7591
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L7606
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L7645
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L7666
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L7803
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L7865
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L7951
-  InventoryColorManager (Assets\Scripts\PlantSystem\UI/) L8051
-  InventoryGridController (Assets\Scripts\PlantSystem\UI/) L8115
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L8258
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8274
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L8389
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8544
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8642
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L8743
-  GridSnapStartup (Assets\Scripts\Ticks/) L8982
-  TickDebugMonitor (Assets\Scripts\Ticks/) L9049
-  TooltipTrigger (Assets\Scripts\UI\Tooltips/) L9085
-  ITooltipDataProvider (Assets\Scripts\UI\Tooltips/) L9143
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L9374
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9385
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L9414
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L9510
-  WaterReflection (Assets\Scripts\Visual\Effects/) L9615
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10013
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10049
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10215
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L10346
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L10354
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10533
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L10609
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L10633
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L10653
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L10665
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L10700
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L10835
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L3427
+  GameEvent (Assets\Scripts\Core\Events/) L3838
+  GameEventListener (Assets\Scripts\Core\Events/) L3865
+  IGameEventListener (Assets\Scripts\Core\Events/) L3892
+  GameInitializer (Assets\Scripts\Core/) L3900
+  GeneSystemInitializer (Assets\Scripts\Core/) L3924
+  SortableEntity (Assets\Scripts\Core/) L3938
+  WeatherManager (Assets\Scripts\Core/) L4005
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L4205
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L4266
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L4549
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L4613
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L4622
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L5035
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L5199
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L5212
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L5249
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L5559
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L5590
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L5863
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L5956
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L5971
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L5990
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L6074
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L6150
+  FoodType (Assets\Scripts\Ecosystem\Food/) L6222
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L6237
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L6259
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L6502
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L6521
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L6826
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L6855
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L6873
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L6911
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L6959
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L6977
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L7128
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L7239
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L7286
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L7299
+  TileDefinitionEditor (Assets\Scripts\Editor/) L7360
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L7380
+  WaveManagerEditor (Assets\Scripts\Editor/) L7517
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L7692
+  ItemEffect (Assets\Scripts\Items/) L7717
+  ItemInstance (Assets\Scripts\Items/) L7745
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L7780
+  LeafData (Assets\Scripts\PlantSystem\Data/) L7788
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L7803
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L7842
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L7863
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L8000
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L8062
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L8148
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L8248
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8264
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L8379
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8534
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8632
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L8733
+  GridSnapStartup (Assets\Scripts\Ticks/) L8972
+  TickDebugMonitor (Assets\Scripts\Ticks/) L9039
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L9075
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9086
+  InventoryColorManager (Assets\Scripts\UI\_UGUI_Legacy/) L9115
+  InventoryGridController (Assets\Scripts\UI\_UGUI_Legacy/) L9179
+  TooltipTrigger (Assets\Scripts\UI\_UGUI_Legacy/) L9322
+  UIManager (Assets\Scripts\UI\_UGUI_Legacy/) L9380
+  ITooltipDataProvider (Assets\Scripts\UI\_UGUI_Legacy/) L9594
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L9825
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L9921
+  WaterReflection (Assets\Scripts\Visual\Effects/) L10026
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10424
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10460
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10626
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L10757
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L10765
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10944
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11020
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L11044
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L11064
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L11076
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L11111
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L11246
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L10846
-  CameraZoomController (Assets\Scripts\Core/) L10955
-  InitializationManager (Assets\Scripts\Core/) L11004
-  PixelGridSnapper (Assets\Scripts\Core/) L11052
-  RunManager (Assets\Scripts\Core/) L11085
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L11249
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L11312
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L11448
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L11475
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L11622
-  GridEntity (Assets\Scripts\Ticks/) L11694
-  GridPosition (Assets\Scripts\Ticks/) L11863
-  GridPositionManager (Assets\Scripts\Ticks/) L11964
-  GridRadiusUtility (Assets\Scripts\Ticks/) L12342
-  TickConfiguration (Assets\Scripts\Ticks/) L12486
-  ITickUpdateable (Assets\Scripts\Ticks/) L12569
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L12721
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L12909
+  CameraController (Assets\Scripts\Core/) L11257
+  CameraZoomController (Assets\Scripts\Core/) L11366
+  InitializationManager (Assets\Scripts\Core/) L11415
+  PixelGridSnapper (Assets\Scripts\Core/) L11455
+  RunManager (Assets\Scripts\Core/) L11488
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L11652
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L11715
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L11851
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L11878
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L12025
+  GridEntity (Assets\Scripts\Ticks/) L12097
+  GridPosition (Assets\Scripts\Ticks/) L12266
+  GridPositionManager (Assets\Scripts\Ticks/) L12367
+  GridRadiusUtility (Assets\Scripts\Ticks/) L12745
+  TickConfiguration (Assets\Scripts\Ticks/) L12889
+  ITickUpdateable (Assets\Scripts\Ticks/) L12972
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L13124
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L13312
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L13243
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L13646
 
 [WegoSystem.Editor']
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L13275
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L13678
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L13316
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L13719
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L13372
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L13413
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L13531
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L13775
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L13816
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L13934
 
 [if]
-  Fruit (Assets\Scripts\Genes\Components/) L13683
+  Fruit (Assets\Scripts\Genes\Components/) L14086
 
 [issue.]
-  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L13719
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L13746
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L13860
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L13908
+  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L14122
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L14149
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L14263
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L14311
 
 [namespace]
-  GeneEventBus (Assets\Scripts\Genes\Services/) L13949
+  GeneEventBus (Assets\Scripts\Genes\Services/) L14352
 
 [needs]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L14001
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L14404
 
 [or]
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L14029
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L14432
 
 ================================================================================
 SCRIPTS
 ================================================================================
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\UI\InventoryBarItem.cs
+// Assets\Scripts\UI\_UGUI_Legacy\InventoryBarItem.cs
 
 ﻿using UnityEngine;
 using Abracodabra.Genes.Core;
@@ -2193,7 +2194,7 @@ ret activeGene.IsValidConfiguration(modifierGenes, payloadGenes);
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Genes\UI\GeneSequenceUI.cs
+// Assets\Scripts\UI\_UGUI_Legacy\GeneSequenceUI.cs
 
 ﻿using System.Collections.Generic;
 using Abracodabra.Genes.Runtime;
@@ -2433,7 +2434,7 @@ currentEnergyText.text = $"Energy: {energySystem.CurrentEnergy:F0}/{energySystem
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Genes\UI\GeneSlotUI.cs
+// Assets\Scripts\UI\_UGUI_Legacy\GeneSlotUI.cs
 
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
@@ -2660,78 +2661,7 @@ UpdateVisuals();
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Genes\UI\SequenceRowUI.cs
-
-﻿// File: Assets/Scripts/UI/Genes/SequenceRowUI.cs
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Runtime;
-
-namespace Abracodabra.UI.Genes {
-pub cls SequenceRowUI : MonoBehaviour {
-pub GeneSlotUI modifierSlot;
-pub GeneSlotUI activeSlot;
-pub GeneSlotUI payloadSlot;
-
-int rowIndex;
-GeneSequenceUI parentSequence;
-
-pub void Initialize(int index, GeneSequenceUI parent) {
-rowIndex = index;
-parentSequence = parent;
-
-if (modifierSlot != null) {
-modifierSlot.acceptedCategory = GeneCategory.Modifier;
-modifierSlot.slotIndex = index;
-}
-if (activeSlot != null) {
-activeSlot.acceptedCategory = GeneCategory.Active;
-activeSlot.slotIndex = index;
-}
-if (payloadSlot != null) {
-payloadSlot.acceptedCategory = GeneCategory.Payload;
-payloadSlot.slotIndex = index;
-}
-}
-
-pub void LoadSlot(RuntimeSequenceSlot slotData) {
-activeSlot?.SetItem(slotData.activeInstance != null ? InventoryBarItem.FromGene(slotData.activeInstance) : null);
-
-var modInstance = slotData.modifierInstances.Count > 0 ? slotData.modifierInstances[0] : null;
-modifierSlot?.SetItem(modInstance != null ? InventoryBarItem.FromGene(modInstance) : null);
-
-var payloadInstance = slotData.payloadInstances.Count > 0 ? slotData.payloadInstances[0] : null;
-payloadSlot?.SetItem(payloadInstance != null ? InventoryBarItem.FromGene(payloadInstance) : null);
-
-UpdateAttachmentSlots(GetActiveGene());
-}
-
-pub void ClearRow() {
-modifierSlot?.ClearSlot();
-activeSlot?.ClearSlot();
-payloadSlot?.ClearSlot();
-UpdateAttachmentSlots(null);
-}
-
-pub ActiveGene GetActiveGene() {
-ret activeSlot?.CurrentItem?.GeneInstance?.GetGene<ActiveGene>();
-}
-
-pub void UpdateAttachmentSlots(ActiveGene activeGene) {
-bool hasActive = activeGene != null;
-if (modifierSlot != null) {
-modifierSlot.isLocked = !hasActive;
-modifierSlot.gameObject.SetActive(hasActive && activeGene.slotConfig.modifierSlots > 0);
-}
-if (payloadSlot != null) {
-payloadSlot.isLocked = !hasActive;
-payloadSlot.gameObject.SetActive(hasActive && activeGene.slotConfig.payloadSlots > 0);
-}
-}
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\UI\InventoryBarController.cs
+// Assets\Scripts\UI\_UGUI_Legacy\InventoryBarController.cs
 
 ﻿using UnityEngine;
 using Abracodabra.UI.Genes;
@@ -2902,7 +2832,7 @@ SelectSlot(targetSlot);
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\UI\ItemView.cs
+// Assets\Scripts\UI\_UGUI_Legacy\ItemView.cs
 
 ﻿using UnityEngine;
 using Abracodabra.Genes.Core;
@@ -3018,7 +2948,78 @@ pub ItemDefinition GetItemDefinition() => _itemDefinition; // NEW
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Genes\UI\EnhancedTooltipTrigger.cs
+// Assets\Scripts\UI\_UGUI_Legacy\SequenceRowUI.cs
+
+﻿// File: Assets/Scripts/UI/Genes/SequenceRowUI.cs
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Runtime;
+
+namespace Abracodabra.UI.Genes {
+pub cls SequenceRowUI : MonoBehaviour {
+pub GeneSlotUI modifierSlot;
+pub GeneSlotUI activeSlot;
+pub GeneSlotUI payloadSlot;
+
+int rowIndex;
+GeneSequenceUI parentSequence;
+
+pub void Initialize(int index, GeneSequenceUI parent) {
+rowIndex = index;
+parentSequence = parent;
+
+if (modifierSlot != null) {
+modifierSlot.acceptedCategory = GeneCategory.Modifier;
+modifierSlot.slotIndex = index;
+}
+if (activeSlot != null) {
+activeSlot.acceptedCategory = GeneCategory.Active;
+activeSlot.slotIndex = index;
+}
+if (payloadSlot != null) {
+payloadSlot.acceptedCategory = GeneCategory.Payload;
+payloadSlot.slotIndex = index;
+}
+}
+
+pub void LoadSlot(RuntimeSequenceSlot slotData) {
+activeSlot?.SetItem(slotData.activeInstance != null ? InventoryBarItem.FromGene(slotData.activeInstance) : null);
+
+var modInstance = slotData.modifierInstances.Count > 0 ? slotData.modifierInstances[0] : null;
+modifierSlot?.SetItem(modInstance != null ? InventoryBarItem.FromGene(modInstance) : null);
+
+var payloadInstance = slotData.payloadInstances.Count > 0 ? slotData.payloadInstances[0] : null;
+payloadSlot?.SetItem(payloadInstance != null ? InventoryBarItem.FromGene(payloadInstance) : null);
+
+UpdateAttachmentSlots(GetActiveGene());
+}
+
+pub void ClearRow() {
+modifierSlot?.ClearSlot();
+activeSlot?.ClearSlot();
+payloadSlot?.ClearSlot();
+UpdateAttachmentSlots(null);
+}
+
+pub ActiveGene GetActiveGene() {
+ret activeSlot?.CurrentItem?.GeneInstance?.GetGene<ActiveGene>();
+}
+
+pub void UpdateAttachmentSlots(ActiveGene activeGene) {
+bool hasActive = activeGene != null;
+if (modifierSlot != null) {
+modifierSlot.isLocked = !hasActive;
+modifierSlot.gameObject.SetActive(hasActive && activeGene.slotConfig.modifierSlots > 0);
+}
+if (payloadSlot != null) {
+payloadSlot.isLocked = !hasActive;
+payloadSlot.gameObject.SetActive(hasActive && activeGene.slotConfig.payloadSlots > 0);
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\UI\_UGUI_Legacy\EnhancedTooltipTrigger.cs
 
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
@@ -3071,7 +3072,7 @@ InventoryTooltipPanel.Instance?.HideTooltip();
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Genes\UI\InventoryTooltipPanel.cs
+// Assets\Scripts\UI\_UGUI_Legacy\InventoryTooltipPanel.cs
 
 ﻿using UnityEngine;
 using TMPro;
@@ -3172,7 +3173,7 @@ keyStat3Text.text = "";
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Genes\UI\SeedEditorTooltipPanel.cs
+// Assets\Scripts\UI\_UGUI_Legacy\SeedEditorTooltipPanel.cs
 
 ﻿using System.Collections.Generic;
 using TMPro;
@@ -3309,7 +3310,7 @@ pool[i].SetActive(false);
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Genes\UI\SeedTooltipData.cs
+// Assets\Scripts\UI\_UGUI_Legacy\SeedTooltipData.cs
 
 ﻿using System;
 using Abracodabra.Genes.Templates;
@@ -3479,7 +3480,7 @@ warnings.Add("Vulnerable: Low defense makes this plant an easy target for herbiv
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Genes\UI\TooltipEnums.cs
+// Assets\Scripts\UI\_UGUI_Legacy\TooltipEnums.cs
 
 ﻿ns Abracodabra.UI.Tooltips {
 pub enum SeedRarity {
@@ -3501,7 +3502,7 @@ Cactus
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Genes\UI\TooltipSystemManager.cs
+// Assets\Scripts\UI\_UGUI_Legacy\TooltipSystemManager.cs
 
 ﻿using UnityEngine;
 
@@ -3525,7 +3526,7 @@ Instantiate(seedEditorTooltipPanelPrefab, mainUICanvas);
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\Genes\UI\TooltipUtilities.cs
+// Assets\Scripts\UI\_UGUI_Legacy\TooltipUtilities.cs
 
 ﻿using UnityEngine;
 using Abracodabra.Genes.Core;
@@ -3614,6 +3615,417 @@ case QualityTier.Trash: ret new Color(0.4f, 0.2f, 0.2f);
 default: ret Color.grey;
 }
 }
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\A_ToolkitUI\GameUIManager.cs
+
+﻿using System.Collections.Generic;
+using UnityEngine.UIElements;
+using WegoSystem;
+using Abracodabra.Genes.Templates;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Runtime;
+using Abracodabra.UI.Genes;
+using Abracodabra.UI.Tooltips;
+
+pub cls UIInventoryItem {
+pub Sprite Icon { get; }
+pub int StackSize { get; set; } = 1;
+pub object OriginalData { get; }
+pub PlantGeneRuntimeState SeedRuntimeState { get; }
+
+pub UIInventoryItem(object data) {
+OriginalData = data;
+if (data is SeedTemplate seed) {
+Icon = seed.icon;
+SeedRuntimeState = seed.CreateRuntimeState();
+}
+else if (data is ToolDefinition tool) {
+Icon = tool.icon;
+}
+else if (data is GeneBase gene) {
+Icon = gene.icon;
+}
+}
+}
+
+pub cls GameUIManager : MonoBehaviour {
+[SerializeField] VisualTreeAsset inventorySlotTemplate;
+[SerializeField] VisualTreeAsset geneSlotTemplate;
+
+[SerializeField] StartingInventory startingInventory;
+
+List<UIInventoryItem> playerInventory = new List<UIInventoryItem>();
+List<VisualElement> inventorySlots = new List<VisualElement>();
+
+VisualElement planningPanel, hudPanel;
+VisualElement inventoryGrid;
+ListView hotbarList;
+VisualElement hotbarSelector;
+VisualElement seedEditorPanel, seedSpecSheetPanel;
+VisualElement seedDropSlotContainer, passiveGenesContainer, activeSequenceContainer;
+Image seedIcon;
+Label seedNameText, qualityText, descriptionText;
+Label maturityTimeText, energyBalanceText, yieldText;
+VisualElement attributeContainer, sequenceContainer, synergiesContainer, warningsContainer;
+Label cycleTimeText;
+
+int selectedHotbarIndex = 0;
+int selectedInventoryIndex = -1;
+UIInventoryItem currentlyEditingSeed;
+
+void Start() {
+if (inventorySlotTemplate == null || geneSlotTemplate == null) {
+Debug.LogError("CRITICAL: UI Template assets are not assigned in the GameUIManager Inspector! Please drag your 'InventorySlot.uxml' and 'GeneSlot.uxml' files into the corresponding fields on the '_UIDocument_GameUI' GameObject.", this);
+this.enabled = false;
+return;
+}
+
+var root = GetComponent<UIDocument>().rootVisualElement;
+
+planningPanel = root.Q<VisualElement>("PlanningPanel");
+hudPanel = root.Q<VisualElement>("HUDPanel");
+inventoryGrid = root.Q<VisualElement>("inventory-grid");
+hotbarList = root.Q<ListView>("hotbar-list");
+hotbarSelector = root.Q<VisualElement>("hotbar-selector");
+seedEditorPanel = root.Q<VisualElement>("SeedEditorPanel");
+seedDropSlotContainer = root.Q<VisualElement>("seed-drop-slot-container");
+passiveGenesContainer = root.Q<VisualElement>("passive-genes-container");
+activeSequenceContainer = root.Q<VisualElement>("active-sequence-container");
+seedSpecSheetPanel = root.Q<VisualElement>("SeedSpecSheetPanel");
+seedIcon = seedSpecSheetPanel.Q<Image>("seed-icon");
+seedNameText = seedSpecSheetPanel.Q<Label>("seed-name-text");
+qualityText = seedSpecSheetPanel.Q<Label>("quality-text");
+descriptionText = seedSpecSheetPanel.Q<Label>("description-text");
+maturityTimeText = seedSpecSheetPanel.Q<Label>("maturity-time-text");
+energyBalanceText = seedSpecSheetPanel.Q<Label>("energy-balance-text");
+yieldText = seedSpecSheetPanel.Q<Label>("yield-text");
+attributeContainer = seedSpecSheetPanel.Q<VisualElement>("attribute-breakdown-container");
+sequenceContainer = seedSpecSheetPanel.Q<VisualElement>("sequence-breakdown-container");
+synergiesContainer = seedSpecSheetPanel.Q<VisualElement>("synergies-container");
+warningsContainer = seedSpecSheetPanel.Q<VisualElement>("warnings-container");
+cycleTimeText = seedSpecSheetPanel.Q<Label>("cycle-time-text");
+
+SetupPlayerInventory();
+PopulateInventoryGrid();
+SetupHotbarListView(hotbarList, playerInventory.Take(8).ToList());
+
+if (RunManager.Instance != null) {
+RunManager.Instance.OnRunStateChanged += HandleRunStateChanged;
+HandleRunStateChanged(RunManager.Instance.CurrentState);
+}
+else {
+ShowPlanningUI();
+}
+
+ClearSeedEditor();
+ClearSpecSheet();
+root.schedule.Execute(() => SelectHotbarSlot(0)).StartingIn(10);
+}
+
+void Update() {
+HandleHotbarInput();
+}
+
+void PopulateInventoryGrid() {
+inventoryGrid.Clear();
+inventorySlots.Clear();
+
+for (int i = 0; i < playerInventory.Count; i++) {
+var newSlot = inventorySlotTemplate.Instantiate();
+newSlot.userData = i;
+
+newSlot.RegisterCallback<PointerDownEvent>(evt => { int index = (int)(evt.currentTarget as VisualElement).userData;
+SelectInventorySlot(index);
+});
+
+inventorySlots.Add(newSlot);
+inventoryGrid.Add(newSlot);
+}
+RefreshInventoryVisuals();
+}
+
+void RefreshInventoryVisuals() {
+for (int i = 0; i < inventorySlots.Count; i++) {
+var element = inventorySlots[i];
+var item = playerInventory[i];
+
+var icon = element.Q<Image>("icon");
+var stack = element.Q<Label>("stack-size");
+
+if (item != null) {
+icon.sprite = item.Icon;
+icon.style.display = DisplayStyle.Flex;
+stack.text = item.StackSize > 1 ? item.StackSize.ToString() : "";
+}
+else {
+icon.style.display = DisplayStyle.None;
+stack.text = "";
+}
+}
+}
+
+void SelectInventorySlot(int index) {
+if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count) {
+inventorySlots[selectedInventoryIndex].RemoveFromClassList("slot--selected");
+}
+
+selectedInventoryIndex = index;
+
+if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count) {
+inventorySlots[selectedInventoryIndex].AddToClassList("slot--selected");
+var selectedItem = playerInventory[selectedInventoryIndex];
+
+UpdateSpecSheet(selectedItem);
+
+if (selectedItem?.OriginalData is SeedTemplate) {
+SetEditingSeed(selectedItem);
+}
+else {
+ClearSeedEditor();
+}
+}
+else {
+UpdateSpecSheet(null);
+ClearSeedEditor();
+}
+}
+
+void SetEditingSeed(UIInventoryItem seedItem) {
+currentlyEditingSeed = seedItem;
+DisplaySeedInEditor(seedItem);
+}
+
+void ClearSeedEditor() {
+currentlyEditingSeed = null;
+seedDropSlotContainer.Clear();
+passiveGenesContainer.Clear();
+activeSequenceContainer.Clear();
+
+var emptySeedSlot = geneSlotTemplate.Instantiate();
+var label = emptySeedSlot.Q<Label>("tier-label");
+if(label != null) label.text = "SEED";
+emptySeedSlot.Q("icon").style.display = DisplayStyle.None;
+emptySeedSlot.AddToClassList("gene-slot--seed");
+emptySeedSlot.name = "seed-drop-slot";
+seedDropSlotContainer.Add(emptySeedSlot);
+}
+
+void DisplaySeedInEditor(UIInventoryItem seedItem) {
+if (seedItem == null || seedItem.OriginalData is not SeedTemplate template) {
+ClearSeedEditor();
+return;
+}
+
+seedDropSlotContainer.Clear();
+passiveGenesContainer.Clear();
+activeSequenceContainer.Clear();
+
+var seedSlot = geneSlotTemplate.Instantiate();
+BindGeneSlot(seedSlot, seedItem.OriginalData);
+seedDropSlotContainer.Add(seedSlot);
+
+var runtimeState = seedItem.SeedRuntimeState;
+
+for (int i = 0; i < template.passiveSlotCount; i++) {
+var passiveSlot = geneSlotTemplate.Instantiate();
+var geneInstance = (i < runtimeState.passiveInstances.Count) ? runtimeState.passiveInstances[i] : null;
+BindGeneSlot(passiveSlot, geneInstance?.GetGene());
+passiveGenesContainer.Add(passiveSlot);
+}
+
+for (int i = 0; i < template.activeSequenceLength; i++) {
+var sequenceRow = new VisualElement();
+sequenceRow.AddToClassList("sequence-row");
+activeSequenceContainer.Add(sequenceRow);
+
+var sequenceData = (i < runtimeState.activeSequence.Count) ? runtimeState.activeSequence[i] : null;
+
+var activeSlot = geneSlotTemplate.Instantiate();
+BindGeneSlot(activeSlot, sequenceData?.activeInstance?.GetGene());
+sequenceRow.Add(activeSlot);
+
+var modifierSlot = geneSlotTemplate.Instantiate();
+var payloadSlot = geneSlotTemplate.Instantiate();
+BindGeneSlot(modifierSlot, sequenceData?.modifierInstances.FirstOrDefault()?.GetGene());
+BindGeneSlot(payloadSlot, sequenceData?.payloadInstances.FirstOrDefault()?.GetGene());
+sequenceRow.Add(modifierSlot);
+sequenceRow.Add(payloadSlot);
+}
+}
+
+void BindGeneSlot(VisualElement slot, object data) {
+var background = slot.Q("background");
+var icon = slot.Q<Image>("icon");
+var tierLabel = slot.Q<Label>("tier-label");
+
+background.ClearClassList();
+background.AddToClassList("gene-slot__background");
+
+if (data == null) {
+icon.style.display = DisplayStyle.None;
+tierLabel.text = "";
+return;
+}
+
+icon.style.display = DisplayStyle.Flex;
+
+if (data is GeneBase gene) {
+icon.sprite = gene.icon;
+tierLabel.text = $"T{gene.tier}";
+background.AddToClassList($"gene-slot--{gene.Category.ToString().ToLower()}");
+}
+else if (data is SeedTemplate seed) {
+icon.sprite = seed.icon;
+tierLabel.text = "SEED";
+background.AddToClassList("gene-slot--seed");
+}
+}
+
+void UpdateSpecSheet(UIInventoryItem item) {
+if (item == null || item.OriginalData is not SeedTemplate seedTemplate) {
+ClearSpecSheet();
+return;
+}
+
+var data = SeedTooltipData.CreateFromSeed(seedTemplate, item.SeedRuntimeState);
+if (data == null) {
+ClearSpecSheet();
+return;
+}
+
+seedIcon.sprite = item.Icon;
+seedNameText.text = data.seedName;
+qualityText.text = SeedQualityCalculator.GetQualityDescription(data.qualityTier);
+qualityText.style.color = SeedQualityCalculator.GetQualityColor(data.qualityTier);
+descriptionText.text = seedTemplate.description;
+
+maturityTimeText.text = $"Maturity: {data.estimatedMaturityTicks:F0} ticks";
+energyBalanceText.text = $"Energy Balance: {data.energySurplusPerCycle:F1} E/cycle";
+yieldText.text = $"Primary Yield: {data.primaryYieldSummary}";
+
+attributeContainer.Clear();
+CreateAttributeDisplay("Growth", data.growthSpeedMultiplier);
+CreateAttributeDisplay("Storage", data.energyStorageMultiplier);
+CreateAttributeDisplay("Generation", data.energyGenerationMultiplier);
+CreateAttributeDisplay("Yield", data.fruitYieldMultiplier);
+CreateAttributeDisplay("Defense", data.defenseMultiplier);
+
+cycleTimeText.text = $"Cycle Time: {data.totalCycleTime} ticks";
+sequenceContainer.Clear();
+foreach (var slot in data.sequenceSlots) {
+var label = new Label($"A{slot.position}: {slot.actionName} ({slot.modifiedCost:F0}E)");
+sequenceContainer.Add(label);
+}
+
+synergiesContainer.Clear();
+warningsContainer.Clear();
+foreach(var synergy in data.synergies) {
+var label = new Label($"✓ {synergy}");
+label.style.color = new StyleColor(new Color(0.5f, 1f, 0.5f));
+synergiesContainer.Add(label);
+}
+foreach(var warning in data.warnings) {
+var label = new Label($"⚠ {warning}");
+label.style.color = new StyleColor(new Color(1f, 0.8f, 0.5f));
+warningsContainer.Add(label);
+}
+}
+
+void ClearSpecSheet() {
+seedNameText.text = "Select a Seed";
+qualityText.text = "Awaiting Analysis...";
+qualityText.style.color = Color.gray;
+descriptionText.text = "Select an item from the inventory to see its details.";
+seedIcon.sprite = null;
+maturityTimeText.text = "Maturity: --";
+energyBalanceText.text = "Energy Balance: --";
+yieldText.text = "Primary Yield: --";
+attributeContainer.Clear();
+sequenceContainer.Clear();
+synergiesContainer.Clear();
+warningsContainer.Clear();
+}
+
+void CreateAttributeDisplay(string label, float value) {
+var labelElement = new Label($"{label}: {value:F2}x");
+labelElement.style.fontSize = 13;
+attributeContainer.Add(labelElement);
+}
+
+void SetupPlayerInventory() {
+playerInventory.Clear();
+if (startingInventory == null) return;
+
+foreach (var tool in startingInventory.startingTools) if (tool != null) playerInventory.Add(new UIInventoryItem(tool));
+foreach (var seed in startingInventory.startingSeeds) if (seed != null) playerInventory.Add(new UIInventoryItem(seed));
+foreach (var gene in startingInventory.startingGenes) if (gene != null) playerInventory.Add(new UIInventoryItem(gene));
+
+while (playerInventory.Count < 24) {
+playerInventory.Add(null);
+}
+}
+
+void SetupHotbarListView(ListView listView, List<UIInventoryItem> itemList) {
+if (listView == null) return;
+listView.fixedItemHeight = 74;
+listView.selectionType = SelectionType.None;
+listView.itemsSource = itemList;
+listView.makeItem = () => inventorySlotTemplate.Instantiate();
+listView.bindItem = (element, index) => {
+var icon = element.Q<Image>("icon");
+var stack = element.Q<Label>("stack-size");
+
+if (itemList[index] != null) {
+icon.sprite = itemList[index].Icon;
+icon.style.display = DisplayStyle.Flex;
+stack.text = itemList[index].StackSize > 1 ? itemList[index].StackSize.ToString() : "";
+}
+else {
+icon.style.display = DisplayStyle.None;
+stack.text = "";
+}
+};
+}
+
+void HandleHotbarInput() {
+if (Input.GetKeyDown(KeyCode.Alpha1)) SelectHotbarSlot(0);
+if (Input.GetKeyDown(KeyCode.Alpha2)) SelectHotbarSlot(1);
+if (Input.GetKeyDown(KeyCode.Alpha3)) SelectHotbarSlot(2);
+if (Input.GetKeyDown(KeyCode.Alpha4)) SelectHotbarSlot(3);
+if (Input.GetKeyDown(KeyCode.Alpha5)) SelectHotbarSlot(4);
+if (Input.GetKeyDown(KeyCode.Alpha6)) SelectHotbarSlot(5);
+if (Input.GetKeyDown(KeyCode.Alpha7)) SelectHotbarSlot(6);
+if (Input.GetKeyDown(KeyCode.Alpha8)) SelectHotbarSlot(7);
+}
+
+void SelectHotbarSlot(int index) {
+if (index < 0 || hotbarList == null || index >= hotbarList.itemsSource.Count) return;
+
+selectedHotbarIndex = index;
+
+var selectedSlotElement = hotbarList.Query(className: "slot").AtIndex(selectedHotbarIndex);
+
+if (selectedSlotElement != null) {
+hotbarSelector.style.left = selectedSlotElement.layout.xMin;
+}
+}
+
+void HandleRunStateChanged(RunState newState) {
+if (newState == RunState.Planning) ShowPlanningUI();
+else ShowHUD();
+}
+
+void ShowPlanningUI() {
+planningPanel.style.display = DisplayStyle.Flex;
+hudPanel.style.display = DisplayStyle.None;
+}
+
+void ShowHUD() {
+planningPanel.style.display = DisplayStyle.None;
+hudPanel.style.display = DisplayStyle.Flex;
 }
 }
 
@@ -3781,220 +4193,6 @@ spriteRenderer.sortingOrder = order;
 
 pub void SetUseParentYCoordinate(bool value) {
 useParentYCoordinate = value;
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\Core\UIManager.cs
-
-﻿using UnityEngine;
-using TMPro;
-using WegoSystem;
-using Abracodabra.UI.Genes;
-
-pub cls UIManager : MonoBehaviour {
-pub stat UIManager Instance { get; set; }
-
-[SerializeField] GameObject uiCanvasRoot;
-[SerializeField] GameObject planningPanel;
-[SerializeField] GameObject growthAndThreatPanel;
-[SerializeField] GameObject geneSequenceUIPanel;
-[SerializeField] GameObject gameOverPanel; // NEW: Assign your Game Over UI panel here
-
-[SerializeField] Button startGrowthPhaseButton;
-[SerializeField] Button startNewPlanningPhaseButton;
-[SerializeField] Button endPlanningPhaseButton;
-[SerializeField] Button advanceTickButton;
-[SerializeField] Button restartButton; // NEW: Assign your Restart button from the GameOver panel
-
-[SerializeField] TextMeshProUGUI tickCounterText;
-
-RunManager runManager;
-TickManager tickManager;
-
-void Awake() {
-if (Instance != null && Instance != this) {
-Destroy(gameObject);
-return;
-}
-Instance = this;
-
-if (uiCanvasRoot != null) {
-uiCanvasRoot.SetActive(true);
-Debug.Log($"[UIManager] Activated main UI canvas '{uiCanvasRoot.name}'.");
-}
-else {
-Debug.LogWarning("[UIManager] UI Canvas Root is not assigned. UI may not appear.", this);
-}
-}
-
-void OnDestroy() {
-if (runManager != null) {
-runManager.OnRunStateChanged -= HandleRunStateChanged;
-runManager.OnPhaseChanged -= HandlePhaseChanged;
-runManager.OnRoundChanged -= HandleRoundChanged;
-}
-
-if (tickManager != null) {
-tickManager.OnTickAdvanced -= HandleTickAdvanced;
-}
-}
-
-void Update() {
-if (Input.GetKeyDown(KeyCode.Space)) {
-if (runManager?.CurrentPhase == GamePhase.Planning) {
-OnEndPlanningPhaseClicked();
-}
-}
-if (Input.GetKeyDown(KeyCode.R) && (Application.isEditor || Debug.isDebugBuild)) {
-runManager?.ForcePhase(GamePhase.Planning);
-}
-}
-
-pub void Initialize() {
-runManager = RunManager.Instance;
-tickManager = TickManager.Instance;
-
-if (runManager == null) {
-Debug.LogError("[UIManager] RunManager.Instance not found! UI will not fn correctly.");
-return;
-}
-
-runManager.OnRunStateChanged += HandleRunStateChanged;
-runManager.OnPhaseChanged += HandlePhaseChanged;
-runManager.OnRoundChanged += HandleRoundChanged;
-
-if (tickManager != null) {
-tickManager.OnTickAdvanced += HandleTickAdvanced;
-}
-
-SetupButtons();
-
-if (gameOverPanel != null) gameOverPanel.SetActive(false);
-HandleRunStateChanged(runManager.CurrentState);
-UpdateTickDisplay();
-}
-
-void SetupButtons() {
-startGrowthPhaseButton?.onClick.AddListener(OnStartGrowthPhaseClicked);
-startNewPlanningPhaseButton?.onClick.AddListener(OnStartNewPlanningPhaseClicked);
-endPlanningPhaseButton?.onClick.AddListener(OnEndPlanningPhaseClicked);
-advanceTickButton?.onClick.AddListener(OnAdvanceTickClicked);
-restartButton?.onClick.AddListener(OnRestartClicked); // NEW
-}
-
-void HandleRunStateChanged(RunState newState) {
-if (planningPanel != null) planningPanel.SetActive(false);
-if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(false);
-if (gameOverPanel != null) gameOverPanel.SetActive(false);
-if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(false);
-if (InventoryGridController.Instance != null) InventoryGridController.Instance.gameObject.SetActive(false);
-InventoryBarController.Instance?.HideBar();
-
-switch (newState) {
-case RunState.Planning:
-if (planningPanel != null) planningPanel.SetActive(true);
-if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(true);
-if (InventoryGridController.Instance != null) InventoryGridController.Instance.gameObject.SetActive(true);
-break;
-
-case RunState.GrowthAndThreat:
-if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(true);
-if (geneSequenceUIPanel != null) {
-geneSequenceUIPanel.GetComponent<GeneSequenceUI>()?.CleanupOnPhaseEnd();
-}
-StartCoroutine(ShowInventoryBarDelayed());
-break;
-
-case RunState.GameOver:
-if (gameOverPanel != null) gameOverPanel.SetActive(true);
-break;
-}
-
-UpdateButtonStates(newState);
-}
-
-void HandlePhaseChanged(GamePhase oldPhase, GamePhase newPhase) {
-UpdateButtonStates(runManager.CurrentState);
-}
-
-void HandleRoundChanged(int newRound) {
-}
-
-void HandleTickAdvanced(int currentTick) {
-UpdateTickDisplay();
-}
-
-void UpdateTickDisplay() {
-if (tickCounterText != null && tickManager != null) {
-tickCounterText.text = $"Tick: {tickManager.CurrentTick}";
-}
-}
-
-void UpdateButtonStates(RunState state) {
-bool isPlanning = (state == RunState.Planning);
-bool isPlanningPhase = (runManager?.CurrentPhase == GamePhase.Planning);
-
-if (startGrowthPhaseButton != null) startGrowthPhaseButton.interactable = isPlanning && isPlanningPhase;
-if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.interactable = !isPlanning;
-if (endPlanningPhaseButton != null) endPlanningPhaseButton.interactable = isPlanning && isPlanningPhase;
-if (advanceTickButton != null) advanceTickButton.interactable = !isPlanningPhase;
-}
-
-void OnStartGrowthPhaseClicked() { runManager?.StartGrowthAndThreatPhase(); }
-void OnStartNewPlanningPhaseClicked() { runManager?.StartNewPlanningPhase(); }
-void OnEndPlanningPhaseClicked() { runManager?.EndPlanningPhase(); }
-void OnAdvanceTickClicked() { tickManager?.DebugAdvanceTick(); }
-void OnRestartClicked() { runManager?.RestartGame(); } // NEW
-
-IEnumerator ShowInventoryBarDelayed() {
-yield ret null; // Wait one frame for layout to build
-InventoryBarController.Instance?.ShowBar();
-}
-
-pub void ShowNotification(string message, float duration = 3f) {
-StartCoroutine(ShowNotificationCoroutine(message, duration));
-}
-
-IEnumerator ShowNotificationCoroutine(string message, float duration) {
-GameObject notification = new GameObject("Notification");
-notification.transform.SetParent(transform, false);
-
-var canvasGroup = notification.AddComponent<CanvasGroup>();
-var rectTransform = notification.AddComponent<RectTransform>();
-var image = notification.AddComponent<Image>();
-var text = new GameObject("Text").AddComponent<TextMeshProUGUI>();
-text.transform.SetParent(notification.transform, false);
-
-rectTransform.anchorMin = new Vector2(0.5f, 0.8f);
-rectTransform.anchorMax = new Vector2(0.5f, 0.8f);
-rectTransform.sizeDelta = new Vector2(300, 60);
-
-image.color = new Color(0, 0, 0, 0.8f);
-text.text = message;
-text.color = Color.white;
-text.alignment = TextAlignmentOptions.Center;
-text.fontSize = 16;
-text.rectTransform.sizeDelta = rectTransform.sizeDelta;
-
-float elapsedTime = 0f;
-while (elapsedTime < 0.5f) {
-canvasGroup.alpha = elapsedTime / 0.5f;
-elapsedTime += Time.deltaTime;
-yield ret null;
-}
-canvasGroup.alpha = 1f;
-
-yield ret new WaitForSeconds(duration - 1f);
-
-elapsedTime = 0f;
-while (elapsedTime < 0.5f) {
-canvasGroup.alpha = 1f - (elapsedTime / 0.5f);
-elapsedTime += Time.deltaTime;
-yield ret null;
-}
-
-Destroy(notification);
 }
 }
 
@@ -8242,213 +8440,6 @@ energyText.text = $"{currentEnergy:F0}/{maxEnergy:F0}";
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\UI\InventoryColorManager.cs
-
-﻿using UnityEngine;
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Templates;
-
-pub cls InventoryColorManager : MonoBehaviour {
-pub stat InventoryColorManager Instance { get; set; }
-
-[SerializeField] Color toolCellColor = new Color(0.5f, 0.5f, 0.5f, 1f);
-[SerializeField] Color seedCellColor = new Color(0.8f, 1f, 0.8f, 1f);
-[SerializeField] Color passiveGeneCellColor = new Color(0.8f, 0.8f, 1f, 1f);
-[SerializeField] Color activeGeneCellColor = new Color(1f, 0.8f, 0.8f, 1f);
-[SerializeField] Color modifierGeneCellColor = new Color(1f, 1f, 0.7f, 1f);
-[SerializeField] Color payloadGeneCellColor = new Color(1f, 0.7f, 1f, 1f);
-[SerializeField] Color resourceCellColor = new Color(0.9f, 0.85f, 0.7f, 1f);
-[SerializeField] Color defaultCellColor = new Color(0.9f, 0.9f, 0.9f, 1f);
-
-void Awake() {
-if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-Instance = this;
-}
-
-pub Color GetCellColorForItem(GeneBase gene, SeedTemplate seed, ToolDefinition tool, ItemDefinition item) {
-switch (GetItemCategory(gene, seed, tool, item)) {
-case ItemUIType.Tool: ret toolCellColor;
-case ItemUIType.Seed: ret seedCellColor;
-case ItemUIType.PassiveGene: ret passiveGeneCellColor;
-case ItemUIType.ActiveGene: ret activeGeneCellColor;
-case ItemUIType.ModifierGene: ret modifierGeneCellColor;
-case ItemUIType.PayloadGene: ret payloadGeneCellColor;
-case ItemUIType.Resource: ret resourceCellColor; // NEW
-default: ret defaultCellColor;
-}
-}
-
-pub enum ItemUIType {
-Tool,
-Seed,
-PassiveGene,
-ActiveGene,
-ModifierGene,
-PayloadGene,
-Resource, // NEW
-Default
-}
-
-pub ItemUIType GetItemCategory(GeneBase gene, SeedTemplate seed, ToolDefinition tool, ItemDefinition item) {
-if (tool != null) ret ItemUIType.Tool;
-if (seed != null) ret ItemUIType.Seed;
-if (item != null) ret ItemUIType.Resource; // NEW
-if (gene != null) {
-switch (gene.Category) {
-case GeneCategory.Passive: ret ItemUIType.PassiveGene;
-case GeneCategory.Active: ret ItemUIType.ActiveGene;
-case GeneCategory.Modifier: ret ItemUIType.ModifierGene;
-case GeneCategory.Payload: ret ItemUIType.PayloadGene;
-}
-}
-ret ItemUIType.Default;
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\PlantSystem\UI\InventoryGridController.cs
-
-﻿using UnityEngine;
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Runtime;
-using Abracodabra.Genes.Templates;
-using Abracodabra.UI.Genes;
-
-pub cls InventoryGridController : MonoBehaviour {
-pub stat InventoryGridController Instance { get; set; }
-
-[SerializeField][Min(1)] int inventoryRows = 4;
-[SerializeField][Min(1)] int inventoryColumns = 4;
-[SerializeField] Vector2 cellSize = new Vector2(64f, 64f);
-[SerializeField] float cellMargin = 10f;
-
-[SerializeField] GameObject itemSlotPrefab;
-[SerializeField] Transform cellContainer;
-[SerializeField] StartingInventory startingInventory;
-
-List<GeneSlotUI> inventorySlots = new List<GeneSlotUI>();
-
-pub event System.Action OnInventoryChanged;
-
-void Awake() {
-if (Instance != null && Instance != this) {
-Destroy(gameObject);
-return;
-}
-Instance = this;
-}
-
-void OnDestroy() {
-if (Instance == this) {
-Instance = null;
-}
-}
-
-void Start() {
-if (cellContainer == null) Debug.LogError("InventoryGridController: Cell Container not assigned!", this);
-if (itemSlotPrefab == null) Debug.LogError("InventoryGridController: Item Slot Prefab not assigned!", this);
-
-if (startingInventory == null) {
-Debug.LogError("InventoryGridController: Starting Inventory asset is not assigned! The player will have no items.", this);
-}
-
-CreateInventoryCells();
-PopulateInitialInventory();
-}
-
-void CreateInventoryCells() {
-if (itemSlotPrefab == null || cellContainer == null) return;
-
-foreach (Transform child in cellContainer) {
-Destroy(child.gameObject);
-}
-inventorySlots.Clear();
-
-var gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
-if (gridLayout == null) {
-gridLayout = cellContainer.gameObject.AddComponent<GridLayoutGroup>();
-}
-gridLayout.cellSize = cellSize;
-gridLayout.spacing = new Vector2(cellMargin, cellMargin);
-gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-gridLayout.constraintCount = inventoryColumns;
-
-for (int i = 0; i < inventoryRows * inventoryColumns; i++) {
-GameObject slotObj = Instantiate(itemSlotPrefab, cellContainer);
-slotObj.name = $"ItemSlot_{i}";
-GeneSlotUI slot = slotObj.GetComponent<GeneSlotUI>();
-if (slot != null) {
-slot.slotIndex = i;
-inventorySlots.Add(slot);
-}
-else {
-Debug.LogError($"[InventoryGridController] The 'itemSlotPrefab' is missing the required GeneSlotUI component!", itemSlotPrefab);
-Destroy(slotObj);
-}
-}
-}
-
-void PopulateInitialInventory() {
-if (startingInventory == null) return;
-
-foreach (var tool in startingInventory.startingTools) {
-if (tool != null) AddItemToInventory(InventoryBarItem.FromTool(tool));
-}
-
-foreach (var seed in startingInventory.startingSeeds) {
-if (seed != null) AddItemToInventory(InventoryBarItem.FromSeed(seed));
-}
-
-foreach (var gene in startingInventory.startingGenes) {
-if (gene != null) AddItemToInventory(InventoryBarItem.FromGene(new RuntimeGeneInstance(gene)));
-}
-}
-
-pub bool AddItemToInventory(InventoryBarItem item) {
-if (item == null || !item.IsValid()) ret false;
-
-GeneSlotUI emptySlot = inventorySlots.FirstOrDefault(slot => slot.CurrentItem == null);
-if (emptySlot == null) {
-Debug.LogWarning($"Inventory is full! Cannot add item: {item.GetDisplayName()}", this);
-ret false;
-}
-
-emptySlot.SetItem(item);
-OnInventoryChanged?.Invoke();
-ret true;
-}
-
-pub void RemoveItemFromInventory(InventoryBarItem item) {
-if (item == null) return;
-GeneSlotUI slot = inventorySlots.FirstOrDefault(s => s.CurrentItem == item);
-if (slot != null) {
-slot.ClearSlot();
-OnInventoryChanged?.Invoke();
-}
-}
-
-pub List<InventoryBarItem> GetAllItems() {
-ret inventorySlots
-.Where(s => s.CurrentItem != null && s.CurrentItem.IsValid())
-.Select(s => s.CurrentItem)
-.ToList();
-}
-
-pub List<InventoryBarItem> GetFirstNItems(int count) {
-var items = new List<InventoryBarItem>();
-for (int i = 0; i < count; i++) {
-if (i < inventorySlots.Count) {
-items.Add(inventorySlots[i].CurrentItem);
-}
-else {
-items.Add(null);
-}
-}
-ret items;
-}
-}
-
-////////////////////////////////////////////////////////////
 // Assets\Scripts\PlantSystem\UI\StartingInventory.cs
 
 ﻿using UnityEngine;
@@ -9276,7 +9267,254 @@ plantCountText.text = $"Plants: {PlantGrowth.AllActivePlants.Count}";
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\UI\Tooltips\TooltipTrigger.cs
+// Assets\Scripts\UI\Utilities\ColorExtensions.cs
+
+﻿using UnityEngine;
+
+pub stat cls ColorExtensions {
+pub stat Color WithAlpha(this Color c, float alpha) {
+ret new Color(c.r, c.g, c.b, alpha);
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\UI\Utilities\PrefabOrigin.cs
+
+﻿// Assets/Scripts/Utility/PrefabOrigin.cs
+
+pub cls PrefabOrigin : MonoBehaviour {
+pub Transform originTransform;
+
+void Awake() {
+if (originTransform == null) {
+Debug.LogError($"[PrefabOrigin] The 'Origin Transform' is not assigned on '{gameObject.name}'. The script cannot function.", this);
+Destroy(this); // Destroy self if not configured
+return;
+}
+
+if (!originTransform.IsChildOf(transform)) {
+Debug.LogError($"[PrefabOrigin] The assigned 'Origin Transform' ('{originTransform.name}') is not a child of '{gameObject.name}'. The script cannot function.", this);
+Destroy(this); // Destroy self if configuration is invalid
+return;
+}
+
+Vector3 worldOffset = transform.TransformVector(originTransform.localPosition);
+
+transform.position -= worldOffset;
+
+Destroy(this);
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\UI\_UGUI_Legacy\InventoryColorManager.cs
+
+﻿using UnityEngine;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Templates;
+
+pub cls InventoryColorManager : MonoBehaviour {
+pub stat InventoryColorManager Instance { get; set; }
+
+[SerializeField] Color toolCellColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+[SerializeField] Color seedCellColor = new Color(0.8f, 1f, 0.8f, 1f);
+[SerializeField] Color passiveGeneCellColor = new Color(0.8f, 0.8f, 1f, 1f);
+[SerializeField] Color activeGeneCellColor = new Color(1f, 0.8f, 0.8f, 1f);
+[SerializeField] Color modifierGeneCellColor = new Color(1f, 1f, 0.7f, 1f);
+[SerializeField] Color payloadGeneCellColor = new Color(1f, 0.7f, 1f, 1f);
+[SerializeField] Color resourceCellColor = new Color(0.9f, 0.85f, 0.7f, 1f);
+[SerializeField] Color defaultCellColor = new Color(0.9f, 0.9f, 0.9f, 1f);
+
+void Awake() {
+if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+Instance = this;
+}
+
+pub Color GetCellColorForItem(GeneBase gene, SeedTemplate seed, ToolDefinition tool, ItemDefinition item) {
+switch (GetItemCategory(gene, seed, tool, item)) {
+case ItemUIType.Tool: ret toolCellColor;
+case ItemUIType.Seed: ret seedCellColor;
+case ItemUIType.PassiveGene: ret passiveGeneCellColor;
+case ItemUIType.ActiveGene: ret activeGeneCellColor;
+case ItemUIType.ModifierGene: ret modifierGeneCellColor;
+case ItemUIType.PayloadGene: ret payloadGeneCellColor;
+case ItemUIType.Resource: ret resourceCellColor; // NEW
+default: ret defaultCellColor;
+}
+}
+
+pub enum ItemUIType {
+Tool,
+Seed,
+PassiveGene,
+ActiveGene,
+ModifierGene,
+PayloadGene,
+Resource, // NEW
+Default
+}
+
+pub ItemUIType GetItemCategory(GeneBase gene, SeedTemplate seed, ToolDefinition tool, ItemDefinition item) {
+if (tool != null) ret ItemUIType.Tool;
+if (seed != null) ret ItemUIType.Seed;
+if (item != null) ret ItemUIType.Resource; // NEW
+if (gene != null) {
+switch (gene.Category) {
+case GeneCategory.Passive: ret ItemUIType.PassiveGene;
+case GeneCategory.Active: ret ItemUIType.ActiveGene;
+case GeneCategory.Modifier: ret ItemUIType.ModifierGene;
+case GeneCategory.Payload: ret ItemUIType.PayloadGene;
+}
+}
+ret ItemUIType.Default;
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\UI\_UGUI_Legacy\InventoryGridController.cs
+
+﻿using UnityEngine;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Runtime;
+using Abracodabra.Genes.Templates;
+using Abracodabra.UI.Genes;
+
+pub cls InventoryGridController : MonoBehaviour {
+pub stat InventoryGridController Instance { get; set; }
+
+[SerializeField][Min(1)] int inventoryRows = 4;
+[SerializeField][Min(1)] int inventoryColumns = 4;
+[SerializeField] Vector2 cellSize = new Vector2(64f, 64f);
+[SerializeField] float cellMargin = 10f;
+
+[SerializeField] GameObject itemSlotPrefab;
+[SerializeField] Transform cellContainer;
+[SerializeField] StartingInventory startingInventory;
+
+List<GeneSlotUI> inventorySlots = new List<GeneSlotUI>();
+
+pub event System.Action OnInventoryChanged;
+
+void Awake() {
+if (Instance != null && Instance != this) {
+Destroy(gameObject);
+return;
+}
+Instance = this;
+}
+
+void OnDestroy() {
+if (Instance == this) {
+Instance = null;
+}
+}
+
+void Start() {
+if (cellContainer == null) Debug.LogError("InventoryGridController: Cell Container not assigned!", this);
+if (itemSlotPrefab == null) Debug.LogError("InventoryGridController: Item Slot Prefab not assigned!", this);
+
+if (startingInventory == null) {
+Debug.LogError("InventoryGridController: Starting Inventory asset is not assigned! The player will have no items.", this);
+}
+
+CreateInventoryCells();
+PopulateInitialInventory();
+}
+
+void CreateInventoryCells() {
+if (itemSlotPrefab == null || cellContainer == null) return;
+
+foreach (Transform child in cellContainer) {
+Destroy(child.gameObject);
+}
+inventorySlots.Clear();
+
+var gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
+if (gridLayout == null) {
+gridLayout = cellContainer.gameObject.AddComponent<GridLayoutGroup>();
+}
+gridLayout.cellSize = cellSize;
+gridLayout.spacing = new Vector2(cellMargin, cellMargin);
+gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+gridLayout.constraintCount = inventoryColumns;
+
+for (int i = 0; i < inventoryRows * inventoryColumns; i++) {
+GameObject slotObj = Instantiate(itemSlotPrefab, cellContainer);
+slotObj.name = $"ItemSlot_{i}";
+GeneSlotUI slot = slotObj.GetComponent<GeneSlotUI>();
+if (slot != null) {
+slot.slotIndex = i;
+inventorySlots.Add(slot);
+}
+else {
+Debug.LogError($"[InventoryGridController] The 'itemSlotPrefab' is missing the required GeneSlotUI component!", itemSlotPrefab);
+Destroy(slotObj);
+}
+}
+}
+
+void PopulateInitialInventory() {
+if (startingInventory == null) return;
+
+foreach (var tool in startingInventory.startingTools) {
+if (tool != null) AddItemToInventory(InventoryBarItem.FromTool(tool));
+}
+
+foreach (var seed in startingInventory.startingSeeds) {
+if (seed != null) AddItemToInventory(InventoryBarItem.FromSeed(seed));
+}
+
+foreach (var gene in startingInventory.startingGenes) {
+if (gene != null) AddItemToInventory(InventoryBarItem.FromGene(new RuntimeGeneInstance(gene)));
+}
+}
+
+pub bool AddItemToInventory(InventoryBarItem item) {
+if (item == null || !item.IsValid()) ret false;
+
+GeneSlotUI emptySlot = inventorySlots.FirstOrDefault(slot => slot.CurrentItem == null);
+if (emptySlot == null) {
+Debug.LogWarning($"Inventory is full! Cannot add item: {item.GetDisplayName()}", this);
+ret false;
+}
+
+emptySlot.SetItem(item);
+OnInventoryChanged?.Invoke();
+ret true;
+}
+
+pub void RemoveItemFromInventory(InventoryBarItem item) {
+if (item == null) return;
+GeneSlotUI slot = inventorySlots.FirstOrDefault(s => s.CurrentItem == item);
+if (slot != null) {
+slot.ClearSlot();
+OnInventoryChanged?.Invoke();
+}
+}
+
+pub List<InventoryBarItem> GetAllItems() {
+ret inventorySlots
+.Where(s => s.CurrentItem != null && s.CurrentItem.IsValid())
+.Select(s => s.CurrentItem)
+.ToList();
+}
+
+pub List<InventoryBarItem> GetFirstNItems(int count) {
+var items = new List<InventoryBarItem>();
+for (int i = 0; i < count; i++) {
+if (i < inventorySlots.Count) {
+items.Add(inventorySlots[i].CurrentItem);
+}
+else {
+items.Add(null);
+}
+}
+ret items;
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\UI\_UGUI_Legacy\TooltipTrigger.cs
 
 ﻿// Reworked File: Assets/Scripts/UI/Tooltips/TooltipTrigger.cs
 using UnityEngine.EventSystems;
@@ -9334,7 +9572,221 @@ HideTooltip();
 }
 
 ////////////////////////////////////////////////////////////
-// Assets\Scripts\UI\Tooltips\UniversalTooltipManager.cs
+// Assets\Scripts\UI\_UGUI_Legacy\UIManager.cs
+
+﻿using UnityEngine;
+using TMPro;
+using WegoSystem;
+using Abracodabra.UI.Genes;
+
+pub cls UIManager : MonoBehaviour {
+pub stat UIManager Instance { get; set; }
+
+[SerializeField] GameObject uiCanvasRoot;
+[SerializeField] GameObject planningPanel;
+[SerializeField] GameObject growthAndThreatPanel;
+[SerializeField] GameObject geneSequenceUIPanel;
+[SerializeField] GameObject gameOverPanel; // NEW: Assign your Game Over UI panel here
+
+[SerializeField] Button startGrowthPhaseButton;
+[SerializeField] Button startNewPlanningPhaseButton;
+[SerializeField] Button endPlanningPhaseButton;
+[SerializeField] Button advanceTickButton;
+[SerializeField] Button restartButton; // NEW: Assign your Restart button from the GameOver panel
+
+[SerializeField] TextMeshProUGUI tickCounterText;
+
+RunManager runManager;
+TickManager tickManager;
+
+void Awake() {
+if (Instance != null && Instance != this) {
+Destroy(gameObject);
+return;
+}
+Instance = this;
+
+if (uiCanvasRoot != null) {
+uiCanvasRoot.SetActive(true);
+Debug.Log($"[UIManager] Activated main UI canvas '{uiCanvasRoot.name}'.");
+}
+else {
+Debug.LogWarning("[UIManager] UI Canvas Root is not assigned. UI may not appear.", this);
+}
+}
+
+void OnDestroy() {
+if (runManager != null) {
+runManager.OnRunStateChanged -= HandleRunStateChanged;
+runManager.OnPhaseChanged -= HandlePhaseChanged;
+runManager.OnRoundChanged -= HandleRoundChanged;
+}
+
+if (tickManager != null) {
+tickManager.OnTickAdvanced -= HandleTickAdvanced;
+}
+}
+
+void Update() {
+if (Input.GetKeyDown(KeyCode.Space)) {
+if (runManager?.CurrentPhase == GamePhase.Planning) {
+OnEndPlanningPhaseClicked();
+}
+}
+if (Input.GetKeyDown(KeyCode.R) && (Application.isEditor || Debug.isDebugBuild)) {
+runManager?.ForcePhase(GamePhase.Planning);
+}
+}
+
+pub void Initialize() {
+runManager = RunManager.Instance;
+tickManager = TickManager.Instance;
+
+if (runManager == null) {
+Debug.LogError("[UIManager] RunManager.Instance not found! UI will not fn correctly.");
+return;
+}
+
+runManager.OnRunStateChanged += HandleRunStateChanged;
+runManager.OnPhaseChanged += HandlePhaseChanged;
+runManager.OnRoundChanged += HandleRoundChanged;
+
+if (tickManager != null) {
+tickManager.OnTickAdvanced += HandleTickAdvanced;
+}
+
+SetupButtons();
+
+if (gameOverPanel != null) gameOverPanel.SetActive(false);
+HandleRunStateChanged(runManager.CurrentState);
+UpdateTickDisplay();
+}
+
+void SetupButtons() {
+startGrowthPhaseButton?.onClick.AddListener(OnStartGrowthPhaseClicked);
+startNewPlanningPhaseButton?.onClick.AddListener(OnStartNewPlanningPhaseClicked);
+endPlanningPhaseButton?.onClick.AddListener(OnEndPlanningPhaseClicked);
+advanceTickButton?.onClick.AddListener(OnAdvanceTickClicked);
+restartButton?.onClick.AddListener(OnRestartClicked); // NEW
+}
+
+void HandleRunStateChanged(RunState newState) {
+if (planningPanel != null) planningPanel.SetActive(false);
+if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(false);
+if (gameOverPanel != null) gameOverPanel.SetActive(false);
+if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(false);
+if (InventoryGridController.Instance != null) InventoryGridController.Instance.gameObject.SetActive(false);
+InventoryBarController.Instance?.HideBar();
+
+switch (newState) {
+case RunState.Planning:
+if (planningPanel != null) planningPanel.SetActive(true);
+if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(true);
+if (InventoryGridController.Instance != null) InventoryGridController.Instance.gameObject.SetActive(true);
+break;
+
+case RunState.GrowthAndThreat:
+if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(true);
+if (geneSequenceUIPanel != null) {
+geneSequenceUIPanel.GetComponent<GeneSequenceUI>()?.CleanupOnPhaseEnd();
+}
+StartCoroutine(ShowInventoryBarDelayed());
+break;
+
+case RunState.GameOver:
+if (gameOverPanel != null) gameOverPanel.SetActive(true);
+break;
+}
+
+UpdateButtonStates(newState);
+}
+
+void HandlePhaseChanged(GamePhase oldPhase, GamePhase newPhase) {
+UpdateButtonStates(runManager.CurrentState);
+}
+
+void HandleRoundChanged(int newRound) {
+}
+
+void HandleTickAdvanced(int currentTick) {
+UpdateTickDisplay();
+}
+
+void UpdateTickDisplay() {
+if (tickCounterText != null && tickManager != null) {
+tickCounterText.text = $"Tick: {tickManager.CurrentTick}";
+}
+}
+
+void UpdateButtonStates(RunState state) {
+bool isPlanning = (state == RunState.Planning);
+bool isPlanningPhase = (runManager?.CurrentPhase == GamePhase.Planning);
+
+if (startGrowthPhaseButton != null) startGrowthPhaseButton.interactable = isPlanning && isPlanningPhase;
+if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.interactable = !isPlanning;
+if (endPlanningPhaseButton != null) endPlanningPhaseButton.interactable = isPlanning && isPlanningPhase;
+if (advanceTickButton != null) advanceTickButton.interactable = !isPlanningPhase;
+}
+
+void OnStartGrowthPhaseClicked() { runManager?.StartGrowthAndThreatPhase(); }
+void OnStartNewPlanningPhaseClicked() { runManager?.StartNewPlanningPhase(); }
+void OnEndPlanningPhaseClicked() { runManager?.EndPlanningPhase(); }
+void OnAdvanceTickClicked() { tickManager?.DebugAdvanceTick(); }
+void OnRestartClicked() { runManager?.RestartGame(); } // NEW
+
+IEnumerator ShowInventoryBarDelayed() {
+yield ret null; // Wait one frame for layout to build
+InventoryBarController.Instance?.ShowBar();
+}
+
+pub void ShowNotification(string message, float duration = 3f) {
+StartCoroutine(ShowNotificationCoroutine(message, duration));
+}
+
+IEnumerator ShowNotificationCoroutine(string message, float duration) {
+GameObject notification = new GameObject("Notification");
+notification.transform.SetParent(transform, false);
+
+var canvasGroup = notification.AddComponent<CanvasGroup>();
+var rectTransform = notification.AddComponent<RectTransform>();
+var image = notification.AddComponent<Image>();
+var text = new GameObject("Text").AddComponent<TextMeshProUGUI>();
+text.transform.SetParent(notification.transform, false);
+
+rectTransform.anchorMin = new Vector2(0.5f, 0.8f);
+rectTransform.anchorMax = new Vector2(0.5f, 0.8f);
+rectTransform.sizeDelta = new Vector2(300, 60);
+
+image.color = new Color(0, 0, 0, 0.8f);
+text.text = message;
+text.color = Color.white;
+text.alignment = TextAlignmentOptions.Center;
+text.fontSize = 16;
+text.rectTransform.sizeDelta = rectTransform.sizeDelta;
+
+float elapsedTime = 0f;
+while (elapsedTime < 0.5f) {
+canvasGroup.alpha = elapsedTime / 0.5f;
+elapsedTime += Time.deltaTime;
+yield ret null;
+}
+canvasGroup.alpha = 1f;
+
+yield ret new WaitForSeconds(duration - 1f);
+
+elapsedTime = 0f;
+while (elapsedTime < 0.5f) {
+canvasGroup.alpha = 1f - (elapsedTime / 0.5f);
+elapsedTime += Time.deltaTime;
+yield ret null;
+}
+
+Destroy(notification);
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\UI\_UGUI_Legacy\UniversalTooltipManager.cs
 
 ﻿using UnityEngine;
 using TMPro;
@@ -9562,46 +10014,6 @@ ret text;
 ret null;
 }
 
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\UI\Utilities\ColorExtensions.cs
-
-﻿using UnityEngine;
-
-pub stat cls ColorExtensions {
-pub stat Color WithAlpha(this Color c, float alpha) {
-ret new Color(c.r, c.g, c.b, alpha);
-}
-}
-
-////////////////////////////////////////////////////////////
-// Assets\Scripts\UI\Utilities\PrefabOrigin.cs
-
-﻿// Assets/Scripts/Utility/PrefabOrigin.cs
-
-pub cls PrefabOrigin : MonoBehaviour {
-pub Transform originTransform;
-
-void Awake() {
-if (originTransform == null) {
-Debug.LogError($"[PrefabOrigin] The 'Origin Transform' is not assigned on '{gameObject.name}'. The script cannot function.", this);
-Destroy(this); // Destroy self if not configured
-return;
-}
-
-if (!originTransform.IsChildOf(transform)) {
-Debug.LogError($"[PrefabOrigin] The assigned 'Origin Transform' ('{originTransform.name}') is not a child of '{gameObject.name}'. The script cannot function.", this);
-Destroy(this); // Destroy self if configuration is invalid
-return;
-}
-
-Vector3 worldOffset = transform.TransformVector(originTransform.localPosition);
-
-transform.position -= worldOffset;
-
-Destroy(this);
-}
 }
 
 ////////////////////////////////////////////////////////////
@@ -11197,7 +11609,7 @@ targetCamera.orthographicSize = baseOrthographicSize;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\Core\InitializationManager.cs
 
-﻿using System.Collections;
+﻿using UnityEngine;
 using WegoSystem;
 
 namespace WegoSystem {
@@ -11216,14 +11628,6 @@ yield ret null;
 Debug.Log("[InitializationManager] Phase 2: Initializing Game Managers...");
 onGameManagersInitialized.Raise();
 yield ret null;
-
-if (UIManager.Instance != null) {
-Debug.Log("[InitializationManager] Initializing UIManager...");
-UIManager.Instance.Initialize();
-}
-else {
-Debug.LogError("[InitializationManager] UIManager instance not found! UI will not be initialized.");
-}
 
 if (EnvironmentalStatusEffectSystem.Instance != null) {
 Debug.Log("[InitializationManager] Initializing EnvironmentalStatusEffectSystem...");
