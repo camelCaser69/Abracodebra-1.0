@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- This is the root container for a single slot -->
+    <ui:VisualElement name="slot-container" class="slot">
+        
+        <!-- The icon for the item will go here -->
+        <ui:Image name="icon" class="slot-icon" />
+        
+        <!-- The stack size text, positioned at the bottom-right -->
+        <ui:Label name="stack-size" class="slot-stack-size" />
+
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,5 +1,5 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections;
 using WegoSystem;
 
 namespace WegoSystem
@@ -22,17 +22,11 @@ namespace WegoSystem
             onGameManagersInitialized.Raise();
             yield return null;
 
-            if (UIManager.Instance != null)
-            {
-                Debug.Log("[InitializationManager] Initializing UIManager...");
-                UIManager.Instance.Initialize();
-            }
-            else
-            {
-                Debug.LogError("[InitializationManager] UIManager instance not found! UI will not be initialized.");
-            }
-
-            // --- FIX: Initialize the EnvironmentalStatusEffectSystem here ---
+            // --- THIS BLOCK HAS BEEN REMOVED ---
+            // The new GameUIManager initializes itself via its own Awake/Start.
+            // We no longer need to manually initialize it from here.
+            // ------------------------------------
+            
             if (EnvironmentalStatusEffectSystem.Instance != null)
             {
                 Debug.Log("[InitializationManager] Initializing EnvironmentalStatusEffectSystem...");
@@ -42,7 +36,6 @@ namespace WegoSystem
             {
                 Debug.LogWarning("[InitializationManager] EnvironmentalStatusEffectSystem instance not found. Tile-based status effects will not function.");
             }
-            // --- END OF FIX ---
 
             Debug.Log("[InitializationManager] Phase 3: Initializing Gameplay Systems & UI...");
             onGameplaySystemsInitialized.Raise();

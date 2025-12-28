@@ -1,0 +1,58 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+
+    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/GameUI_Stylesheet.uss" />
+
+    <ui:VisualElement name="PlanningPanel" class="root-panel">
+        
+        <ui:VisualElement name="SeedEditorPanel" class="side-panel-left">
+            <ui:Label text="GENE EDITOR" class="h1" />
+            <ui:Label text="CURRENT SEED" class="section-header-small" />
+            <ui:VisualElement name="seed-drop-slot-container" class="seed-drop-slot-container" />
+            <ui:Label text="PASSIVE GENES" class="section-header-small" />
+            <ui:VisualElement name="passive-genes-container" class="genes-container" />
+            <ui:Label text="ACTIVE SEQUENCE" class="section-header-small" />
+            <ui:VisualElement name="active-sequence-container" class="genes-container" />
+        </ui:VisualElement>
+    
+        <ui:VisualElement name="InventoryPanel" class="main-panel">
+            <ui:Label text="INVENTORY" class="h1" />
+            <ui:VisualElement name="inventory-grid" class="inventory-grid" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="SeedSpecSheetPanel" class="side-panel-right">
+            <ui:VisualElement class="header">
+                <ui:Image name="seed-icon" class="seed-icon" />
+                <ui:VisualElement class="title-container">
+                    <ui:Label name="seed-name-text" class="h1" text="Select a Seed" />
+                    <ui:Label name="quality-text" class="h2" text="Awaiting Analysis..." />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="description-text" class="description-text" />
+            <ui:Label text="📊 PERFORMANCE" class="section-header" />
+            <ui:VisualElement class="section-content">
+                <ui:Label name="maturity-time-text" class="metric-text" />
+                <ui:Label name="energy-balance-text" class="metric-text" />
+                <ui:Label name="yield-text" class="metric-text" />
+            </ui:VisualElement>
+            <ui:Label text="🧬 ATTRIBUTES" class="section-header" />
+            <ui:VisualElement name="attribute-breakdown-container" class="section-content" />
+            <ui:Label text="⚙️ SEQUENCE ANALYSIS" class="section-header" />
+            <ui:VisualElement class="section-content">
+                <ui:Label name="cycle-time-text" />
+                <ui:VisualElement name="sequence-breakdown-container" class="list-container" />
+            </ui:VisualElement>
+            <ui:Label text="⭐ SYNERGIES &amp; ⚠ WARNINGS" class="section-header" />
+            <ui:VisualElement class="section-content">
+                <ui:VisualElement name="synergies-container" class="list-container" />
+                <ui:VisualElement name="warnings-container" class="list-container" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+    
+    <ui:VisualElement name="HUDPanel" class="root-panel">
+        <ui:VisualElement name="Hotbar" class="hotbar">
+            <ui:ListView name="hotbar-list" class="hotbar-list" />
+            <ui:VisualElement name="hotbar-selector" class="hotbar-selector" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

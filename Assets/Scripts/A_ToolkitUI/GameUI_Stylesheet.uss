@@ -1,0 +1,231 @@
+.root-panel {
+    width: 100%;
+    height: 100%;
+    flex-direction: row;
+    background-color: rgb(20, 20, 25);
+}
+
+.side-panel-left {
+    width: 400px;
+    flex-shrink: 0;
+    padding: 15px;
+    background-color: rgb(30, 30, 40);
+    border-right-width: 2px;
+    border-right-color: rgb(10, 10, 15);
+}
+
+.main-panel {
+    flex-grow: 1;
+    flex-shrink: 1;
+    padding: 15px;
+    background-color: rgb(40, 40, 50);
+}
+
+.side-panel-right {
+    width: 400px;
+    flex-shrink: 0;
+    padding: 15px;
+    background-color: rgb(30, 30, 40);
+    border-left-width: 2px;
+    border-left-color: rgb(10, 10, 15);
+}
+
+Label {
+    color: rgb(210, 210, 210);
+    white-space: normal;
+}
+
+.h1 {
+    font-size: 24px;
+    -unity-font-style: bold;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.metric-text {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: white;
+}
+
+.inventory-grid {
+    flex-grow: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+
+.hotbar {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    flex-direction: row;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.hotbar-list #unity-content-container {
+    flex-direction: row;
+}
+
+.hotbar-selector {
+    position: absolute;
+    width: 74px;
+    height: 74px;
+    border-width: 3px;
+    border-color: yellow;
+    border-radius: 5px;
+    transition: left 0.1s ease-in-out;
+}
+
+.slot {
+    width: 64px;
+    height: 64px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.2);
+    border-width: 1px;
+    margin: 5px;
+    border-radius: 5px;
+}
+
+.slot:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.slot--selected {
+    background-color: rgba(255, 220, 100, 0.3);
+    border-color: rgb(255, 220, 100);
+}
+
+.slot-icon {
+    width: 100%;
+    height: 100%;
+    scale: 0.9 0.9;
+}
+
+.slot-stack-size {
+    position: absolute;
+    bottom: 2px;
+    right: 5px;
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: white;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: black;
+}
+
+.header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.seed-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.title-container {
+    flex-grow: 1;
+}
+
+.description-text {
+    font-size: 13px;
+    -unity-font-style: italic;
+    color: rgb(180, 180, 180);
+    margin-bottom: 10px;
+}
+
+.section-header {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(150, 150, 180);
+    margin-top: 10px;
+    margin-bottom: 5px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(80, 80, 100);
+}
+
+.section-content {
+    padding-left: 10px;
+}
+
+.list-container {
+    padding-left: 10px;
+}
+
+.section-header-small {
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: rgb(150, 150, 180);
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.seed-drop-slot-container {
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.genes-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.sequence-row {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 5px;
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.gene-slot {
+    width: 50px;
+    height: 50px;
+    margin: 4px;
+    border-radius: 5px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.gene-slot__background {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+.gene-slot__icon {
+    width: 100%;
+    height: 100%;
+    scale: 0.8 0.8;
+}
+
+.gene-slot__tier-label {
+    position: absolute;
+    top: 2px;
+    left: 4px;
+    font-size: 10px;
+    -unity-font-style: bold;
+}
+
+#seed-drop-slot {
+    width: 80px;
+    height: 80px;
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, 0.5);
+    border-width: 2px;
+}
+
+.gene-slot--seed .gene-slot__background { background-color: rgb(50, 80, 50); }
+.gene-slot--passive .gene-slot__background { background-color: rgb(50, 50, 80); }
+.gene-slot--active .gene-slot__background { background-color: rgb(80, 50, 50); }
+.gene-slot--modifier .gene-slot__background { background-color: rgb(80, 80, 50); }
+.gene-slot--payload .gene-slot__background { background-color: rgb(80, 50, 80); }

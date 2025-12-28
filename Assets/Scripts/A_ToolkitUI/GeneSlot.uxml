@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <!-- This is a universal, reusable slot component -->
+    <ui:VisualElement name="slot-root" class="gene-slot">
+        <ui:VisualElement name="background" class="gene-slot__background" />
+        <ui:Image name="icon" class="gene-slot__icon" />
+        <ui:Label name="tier-label" class="gene-slot__tier-label" />
+    </ui:VisualElement>
+</ui:UXML>
