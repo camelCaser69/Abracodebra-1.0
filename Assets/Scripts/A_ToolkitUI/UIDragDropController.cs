@@ -15,6 +15,8 @@ namespace Abracodabra.UI.Toolkit
         // Events
         public event Action<int, int> OnInventorySwapRequested;
         public event Action<int, VisualElement, string> OnGeneDropRequested;
+        public event Action<GeneCategory?> OnDragStarted; // FIX #2: Notify what type is being dragged
+        public event Action OnDragEnded; // FIX #2: Notify when drag ends
         
         // State
         private bool isDragging = false;
@@ -106,11 +108,23 @@ namespace Abracodabra.UI.Toolkit
                 {
                     // Dragging from gene editor
                     CreateDragPreviewFromGene(draggedGene);
+                    // FIX #2: Notify with gene category
+                    OnDragStarted?.Invoke(draggedGene.Category);
                 }
                 else
                 {
                     // Dragging from inventory
                     CreateDragPreview(dragSourceIndex);
+                    // FIX #2: Check if it's a gene and notify category
+                    var item = inventory[dragSourceIndex];
+                    if (item?.OriginalData is GeneBase gene)
+                    {
+                        OnDragStarted?.Invoke(gene.Category);
+                    }
+                    else
+                    {
+                        OnDragStarted?.Invoke(null); // Not a gene
+                    }
                 }
             }
             
@@ -257,6 +271,12 @@ namespace Abracodabra.UI.Toolkit
             {
                 dragPreview.RemoveFromHierarchy();
                 dragPreview = null;
+            }
+            
+            // FIX #2: Notify that drag ended
+            if (isDragging)
+            {
+                OnDragEnded?.Invoke();
             }
             
             isDragging = false;

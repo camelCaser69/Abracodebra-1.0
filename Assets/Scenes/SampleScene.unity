@@ -46935,7 +46935,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inventorySlotTemplate: {fileID: 9197481963319205126, guid: 780713ff8274a264bb0cef87299adc99, type: 3}
+  geneSlotTemplate: {fileID: 9197481963319205126, guid: 743f93738243be049816b32aa02ca8ef, type: 3}
   startingInventory: {fileID: 11400000, guid: 82920e03e74deba47a7cb08ff8e2e293, type: 2}
+  inventoryRows: 4
+  inventoryColumns: 8
 --- !u!114 &752810916
 MonoBehaviour:
   m_ObjectHideFlags: 0

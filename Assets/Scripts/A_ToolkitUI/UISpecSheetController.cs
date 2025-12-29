@@ -120,9 +120,9 @@ namespace Abracodabra.UI.Toolkit
         }
 
         /// <summary>
-        /// Display gene details
+        /// Display gene details (public for hover tooltips)
         /// </summary>
-        private void DisplayGene(GeneBase gene)
+        public void DisplayGene(GeneBase gene)
         {
             seedIcon.sprite = gene.icon;
             seedNameText.text = gene.geneName;

@@ -12,6 +12,8 @@ namespace Abracodabra.UI.Toolkit
         // Events
         public event Action<int> OnSlotClicked;
         public event Action<int> OnSlotPointerDown;
+        public event Action<int> OnSlotHoverEnter; // FIX #4: Hover support
+        public event Action OnSlotHoverExit; // FIX #4: Clear on exit
         
         // State
         private List<UIInventoryItem> inventory;
@@ -57,6 +59,17 @@ namespace Abracodabra.UI.Toolkit
                 newSlot.RegisterCallback<PointerDownEvent>(evt =>
                 {
                     OnSlotPointerDown?.Invoke(slotIndex);
+                });
+                
+                // FIX #4: Hover events for tooltip
+                newSlot.RegisterCallback<PointerEnterEvent>(evt =>
+                {
+                    OnSlotHoverEnter?.Invoke(slotIndex);
+                });
+                
+                newSlot.RegisterCallback<PointerLeaveEvent>(evt =>
+                {
+                    OnSlotHoverExit?.Invoke();
                 });
                 
                 inventorySlots.Add(newSlot);
