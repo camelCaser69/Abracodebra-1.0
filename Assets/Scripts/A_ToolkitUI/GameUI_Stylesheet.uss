@@ -80,6 +80,7 @@ Label {
     transition: left 0.1s ease-in-out;
 }
 
+/* FIX #1: Use outline instead of border to prevent shifting */
 .slot {
     width: 64px;
     height: 64px;
@@ -88,32 +89,38 @@ Label {
     border-width: 1px;
     margin: 5px;
     border-radius: 5px;
-    cursor: arrow; /* Default cursor */
+    cursor: arrow;
 }
 
 .slot:hover {
     background-color: rgba(255, 255, 255, 0.2);
-    cursor: link; /* Hand cursor on hover */
+    cursor: link;
 }
 
 /* YELLOW HIGHLIGHT - For spec sheet selection (right panel) */
+/* Using outline instead of border to prevent size changes */
 .slot--selected {
     background-color: rgba(255, 220, 100, 0.3);
-    border-color: rgb(255, 220, 100);
-    border-width: 2px;
+    outline-width: 2px;
+    outline-color: rgb(255, 220, 100);
+    outline-offset: -2px;
 }
 
 /* GREEN HIGHLIGHT - For gene editor locked seed (left panel) */
+/* Using outline instead of border to prevent size changes */
 .slot--locked-for-editing {
     background-color: rgba(100, 255, 150, 0.3);
-    border-color: rgb(100, 255, 150);
-    border-width: 2px;
+    outline-width: 2px;
+    outline-color: rgb(100, 255, 150);
+    outline-offset: -2px;
 }
 
 /* If a slot is BOTH selected AND locked, prioritize the lock styling */
 .slot--locked-for-editing.slot--selected {
     background-color: rgba(100, 255, 150, 0.4);
-    border-color: rgb(100, 255, 150);
+    outline-width: 2px;
+    outline-color: rgb(100, 255, 150);
+    outline-offset: -2px;
     box-shadow: 0 0 10px rgba(100, 255, 150, 0.5);
 }
 
@@ -204,13 +211,15 @@ Label {
     border-radius: 5px;
 }
 
+/* FIX #3: Make gene slots same size as inventory slots (64x64) */
 .gene-slot {
-    width: 50px;
-    height: 50px;
+    width: 64px;
+    height: 64px;
     margin: 4px;
     border-radius: 5px;
     border-width: 1px;
     border-color: rgba(255, 255, 255, 0.1);
+    cursor: link; /* Show hand cursor for drag interaction */
 }
 
 .gene-slot__background {
