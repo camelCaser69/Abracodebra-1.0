@@ -48,6 +48,7 @@ public class GameUIManager : MonoBehaviour
     private List<VisualElement> inventorySlots = new List<VisualElement>();
 
     #region UI Element References
+    private VisualElement rootElement;
     private VisualElement planningPanel, hudPanel;
     private VisualElement inventoryGrid;
     private ListView hotbarList;
@@ -82,19 +83,19 @@ public class GameUIManager : MonoBehaviour
             return;
         }
 
-        var root = GetComponent<UIDocument>().rootVisualElement;
+        rootElement = GetComponent<UIDocument>().rootVisualElement;
 
         #region Queries
-        planningPanel = root.Q<VisualElement>("PlanningPanel");
-        hudPanel = root.Q<VisualElement>("HUDPanel");
-        inventoryGrid = root.Q<VisualElement>("inventory-grid");
-        hotbarList = root.Q<ListView>("hotbar-list");
-        hotbarSelector = root.Q<VisualElement>("hotbar-selector");
-        seedEditorPanel = root.Q<VisualElement>("SeedEditorPanel");
-        seedDropSlotContainer = root.Q<VisualElement>("seed-drop-slot-container");
-        passiveGenesContainer = root.Q<VisualElement>("passive-genes-container");
-        activeSequenceContainer = root.Q<VisualElement>("active-sequence-container");
-        seedSpecSheetPanel = root.Q<VisualElement>("SeedSpecSheetPanel");
+        planningPanel = rootElement.Q<VisualElement>("PlanningPanel");
+        hudPanel = rootElement.Q<VisualElement>("HUDPanel");
+        inventoryGrid = rootElement.Q<VisualElement>("inventory-grid");
+        hotbarList = rootElement.Q<ListView>("hotbar-list");
+        hotbarSelector = rootElement.Q<VisualElement>("hotbar-selector");
+        seedEditorPanel = rootElement.Q<VisualElement>("SeedEditorPanel");
+        seedDropSlotContainer = rootElement.Q<VisualElement>("seed-drop-slot-container");
+        passiveGenesContainer = rootElement.Q<VisualElement>("passive-genes-container");
+        activeSequenceContainer = rootElement.Q<VisualElement>("active-sequence-container");
+        seedSpecSheetPanel = rootElement.Q<VisualElement>("SeedSpecSheetPanel");
         seedIcon = seedSpecSheetPanel.Q<Image>("seed-icon");
         seedNameText = seedSpecSheetPanel.Q<Label>("seed-name-text");
         qualityText = seedSpecSheetPanel.Q<Label>("quality-text");
@@ -108,6 +109,10 @@ public class GameUIManager : MonoBehaviour
         warningsContainer = seedSpecSheetPanel.Q<VisualElement>("warnings-container");
         cycleTimeText = seedSpecSheetPanel.Q<Label>("cycle-time-text");
         #endregion
+
+        // Register GLOBAL mouse handlers on root element for drag & drop
+        rootElement.RegisterCallback<PointerMoveEvent>(OnGlobalPointerMove);
+        rootElement.RegisterCallback<PointerUpEvent>(OnGlobalPointerUp);
 
         SetupPlayerInventory();
         PopulateInventoryGrid(); 
@@ -125,7 +130,7 @@ public class GameUIManager : MonoBehaviour
         
         ClearSeedEditor();
         ClearSpecSheet();
-        root.schedule.Execute(() => SelectHotbarSlot(0)).StartingIn(10);
+        rootElement.schedule.Execute(() => SelectHotbarSlot(0)).StartingIn(10);
     }
 
     void Update()
@@ -152,10 +157,8 @@ public class GameUIManager : MonoBehaviour
                 SelectInventorySlot(index);
             });
             
-            // Drag & Drop handlers
+            // Only register PointerDown on slots (to start drag)
             newSlot.RegisterCallback<PointerDownEvent>(OnSlotPointerDown);
-            newSlot.RegisterCallback<PointerMoveEvent>(OnSlotPointerMove);
-            newSlot.RegisterCallback<PointerUpEvent>(OnSlotPointerUp);
             
             inventorySlots.Add(newSlot);
             inventoryGrid.Add(newSlot);
@@ -258,9 +261,11 @@ public class GameUIManager : MonoBehaviour
         
         dragSourceIndex = index;
         isDragging = false; // Not dragging yet, just pressed
+        
+        evt.StopPropagation(); // Prevent double-handling
     }
     
-    private void OnSlotPointerMove(PointerMoveEvent evt)
+    private void OnGlobalPointerMove(PointerMoveEvent evt)
     {
         if (dragSourceIndex == -1) return;
         
@@ -273,38 +278,142 @@ public class GameUIManager : MonoBehaviour
         
         if (dragPreview != null)
         {
+            // Use absolute screen position for smooth tracking
             dragPreview.style.left = evt.position.x - 32;
             dragPreview.style.top = evt.position.y - 32;
         }
     }
     
-    private void OnSlotPointerUp(PointerUpEvent evt)
+    private void OnGlobalPointerUp(PointerUpEvent evt)
     {
-        if (!isDragging)
+        if (!isDragging || dragSourceIndex == -1)
         {
             dragSourceIndex = -1;
             return;
         }
         
-        // Find drop target
-        int dropTargetIndex = -1;
-        for (int i = 0; i < inventorySlots.Count; i++)
+        bool dropHandled = false;
+        
+        // Check if dropped on inventory slot
+        int inventoryDropIndex = GetInventorySlotAtPosition(evt.position);
+        if (inventoryDropIndex >= 0 && inventoryDropIndex != dragSourceIndex)
         {
-            var slot = inventorySlots[i];
-            if (slot.worldBound.Contains(evt.position))
+            SwapInventorySlots(dragSourceIndex, inventoryDropIndex);
+            dropHandled = true;
+        }
+        
+        // Check if dropped on gene editor slot
+        if (!dropHandled)
+        {
+            var geneSlotDrop = GetGeneSlotAtPosition(evt.position);
+            if (geneSlotDrop.slot != null)
             {
-                dropTargetIndex = i;
-                break;
+                HandleGeneSlotDrop(geneSlotDrop.slot, geneSlotDrop.slotType);
+                dropHandled = true;
             }
         }
         
-        // Perform swap if valid drop
-        if (dropTargetIndex >= 0 && dropTargetIndex != dragSourceIndex)
+        // Always cleanup
+        CleanupDrag();
+    }
+
+    private int GetInventorySlotAtPosition(Vector2 screenPos)
+    {
+        for (int i = 0; i < inventorySlots.Count; i++)
         {
-            SwapInventorySlots(dragSourceIndex, dropTargetIndex);
+            var slot = inventorySlots[i];
+            if (slot.worldBound.Contains(screenPos))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private (VisualElement slot, string slotType) GetGeneSlotAtPosition(Vector2 screenPos)
+    {
+        // Check seed drop slot
+        if (seedDropSlotContainer.childCount > 0)
+        {
+            var seedSlot = seedDropSlotContainer.ElementAt(0);
+            if (seedSlot.worldBound.Contains(screenPos))
+            {
+                return (seedSlot, "seed");
+            }
         }
         
-        // Cleanup
+        // Check passive slots
+        foreach (var slot in passiveGenesContainer.Children())
+        {
+            if (slot.worldBound.Contains(screenPos))
+            {
+                return (slot, "passive");
+            }
+        }
+        
+        // Check active sequence slots
+        foreach (var row in activeSequenceContainer.Children())
+        {
+            int slotIndex = 0;
+            foreach (var slot in row.Children())
+            {
+                if (slot.worldBound.Contains(screenPos))
+                {
+                    string slotType = slotIndex switch
+                    {
+                        0 => "active",
+                        1 => "modifier",
+                        2 => "payload",
+                        _ => "unknown"
+                    };
+                    return (slot, slotType);
+                }
+                slotIndex++;
+            }
+        }
+        
+        return (null, null);
+    }
+
+    private void HandleGeneSlotDrop(VisualElement targetSlot, string slotType)
+    {
+        var draggedItem = playerInventory[dragSourceIndex];
+        if (draggedItem == null) return;
+        
+        bool validDrop = false;
+        
+        if (draggedItem.OriginalData is GeneBase gene)
+        {
+            // Validate gene category matches slot type
+            validDrop = slotType switch
+            {
+                "passive" => gene.Category == GeneCategory.Passive,
+                "active" => gene.Category == GeneCategory.Active,
+                "modifier" => gene.Category == GeneCategory.Modifier,
+                "payload" => gene.Category == GeneCategory.Payload,
+                _ => false
+            };
+            
+            if (validDrop)
+            {
+                Debug.Log($"Inserting {gene.geneName} into {slotType} slot");
+                BindGeneSlot(targetSlot, gene);
+                // TODO: Actually modify the seed's runtime state here
+            }
+            else
+            {
+                Debug.Log($"Invalid drop: {gene.Category} gene cannot go in {slotType} slot");
+            }
+        }
+        else if (draggedItem.OriginalData is SeedTemplate && slotType == "seed")
+        {
+            LockSeedForEditing(dragSourceIndex);
+            validDrop = true;
+        }
+    }
+
+    private void CleanupDrag()
+    {
         if (dragPreview != null)
         {
             dragPreview.RemoveFromHierarchy();
@@ -325,14 +434,15 @@ public class GameUIManager : MonoBehaviour
         dragPreview.style.position = Position.Absolute;
         dragPreview.style.width = 64;
         dragPreview.style.height = 64;
-        dragPreview.pickingMode = PickingMode.Ignore; // Don't interfere with drop detection
+        dragPreview.pickingMode = PickingMode.Ignore; // Don't interfere with hit detection
         
         var icon = new Image();
         icon.sprite = item.Icon;
         icon.AddToClassList("slot-icon");
         dragPreview.Add(icon);
         
-        inventoryGrid.parent.Add(dragPreview); // Add to parent so it's above grid
+        // Add to root element so it's above everything
+        rootElement.Add(dragPreview);
     }
     
     private void SwapInventorySlots(int fromIndex, int toIndex)
@@ -388,6 +498,7 @@ public class GameUIManager : MonoBehaviour
 
         var seedSlot = geneSlotTemplate.Instantiate();
         BindGeneSlot(seedSlot, seedItem.OriginalData);
+        seedSlot.name = "seed-drop-slot";
         seedDropSlotContainer.Add(seedSlot);
 
         var runtimeState = seedItem.SeedRuntimeState;
