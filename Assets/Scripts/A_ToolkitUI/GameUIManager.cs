@@ -25,10 +25,6 @@ public class GameUIManager : MonoBehaviour
     
     [Tooltip("Number of columns in the inventory grid")]
     [SerializeField] private int inventoryColumns = 6;
-    
-    [Header("Panel Sizing")]
-    [Tooltip("Enable dynamic panel resizing based on inventory columns. When disabled, panels split screen equally.")]
-    [SerializeField] private bool enableDynamicResizing = true;
 
     // Shared inventory data
     private List<UIInventoryItem> playerInventory = new List<UIInventoryItem>();
@@ -108,11 +104,6 @@ public class GameUIManager : MonoBehaviour
         
         Debug.Log($"[GameUIManager] === FIXING PANEL SIZING (prevent expansion) ===");
         
-        // CRITICAL FIX: The key to preventing gene editor expansion is:
-        // 1. Use flexBasis = 0 (NOT Auto, NOT explicit width)
-        // 2. Use flexGrow = 1 (fills remaining space)
-        // 3. Ensure overflow: hidden on all child containers
-        
         // Calculate slot dimensions
         int slotWidth = 64;
         int slotMarginLeft = 5;
@@ -153,14 +144,13 @@ public class GameUIManager : MonoBehaviour
         }
         
         // SET GENE EDITOR - FLEXIBLE BUT CONSTRAINED
-        // KEY FIX: flexBasis = 0 (NOT Auto!) prevents content-based sizing
         if (geneEditorPanel != null)
         {
-            geneEditorPanel.style.width = StyleKeyword.Null; // Clear explicit width
-            geneEditorPanel.style.minWidth = 300; // Minimum usable width
-            geneEditorPanel.style.maxWidth = StyleKeyword.Null; // No maximum
-            geneEditorPanel.style.flexGrow = 1; // Take remaining space
-            geneEditorPanel.style.flexShrink = 0; // Don't shrink
+            geneEditorPanel.style.width = StyleKeyword.Null;
+            geneEditorPanel.style.minWidth = 300;
+            geneEditorPanel.style.maxWidth = StyleKeyword.Null;
+            geneEditorPanel.style.flexGrow = 1;
+            geneEditorPanel.style.flexShrink = 0;
             geneEditorPanel.style.flexBasis = 0; // KEY: Start from 0, NOT Auto!
             Debug.Log($"[GameUIManager] ✓ Gene editor: flex-grow=1, flex-basis=0 (fills remaining, won't expand)");
         }
@@ -233,6 +223,7 @@ public class GameUIManager : MonoBehaviour
         seedEditorController.OnGeneSlotPointerDown += HandleGeneSlotPointerDown;
         seedEditorController.OnGeneSlotHoverEnter += HandleGeneHover;
         seedEditorController.OnGeneSlotHoverExit += HandleHoverExit;
+        seedEditorController.OnSeedColorChanged += HandleSeedColorChanged; // NEW: Color picker event
     }
 
     private void SetupPlayerInventory()
@@ -338,6 +329,20 @@ public class GameUIManager : MonoBehaviour
     private void HandleDragEnded()
     {
         seedEditorController.ClearSlotHighlighting();
+    }
+    
+    /// <summary>
+    /// NEW: Handle seed color change from color picker
+    /// </summary>
+    private void HandleSeedColorChanged(Color newColor)
+    {
+        // Refresh inventory grid to show updated colors
+        inventoryController.RefreshVisuals();
+        
+        // Refresh hotbar to show updated colors
+        hotbarController.RefreshHotbar();
+        
+        Debug.Log($"[GameUIManager] Seed color changed to: {newColor}");
     }
 
     private void HandleInventorySwap(int fromIndex, int toIndex)

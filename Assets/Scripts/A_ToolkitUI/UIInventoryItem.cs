@@ -14,6 +14,9 @@ namespace Abracodabra.UI.Toolkit
         public int StackSize { get; set; } = 1;
         public object OriginalData { get; }
         public PlantGeneRuntimeState SeedRuntimeState { get; }
+        
+        // Custom background color for seed identification (default: transparent)
+        public Color BackgroundColor { get; set; } = new Color(0, 0, 0, 0);
 
         public UIInventoryItem(object data)
         {
@@ -32,6 +35,14 @@ namespace Abracodabra.UI.Toolkit
             {
                 Icon = gene.icon;
             }
+        }
+        
+        /// <summary>
+        /// Check if this item has a custom background color set
+        /// </summary>
+        public bool HasCustomColor()
+        {
+            return BackgroundColor.a > 0.01f; // Has any alpha
         }
     }
 }

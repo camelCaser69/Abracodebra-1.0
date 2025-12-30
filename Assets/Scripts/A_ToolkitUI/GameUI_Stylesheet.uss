@@ -3,30 +3,25 @@
     height: 100%;
     flex-direction: row;
     background-color: rgb(20, 20, 25);
-    /* CRITICAL: Prevent children from overflowing container */
     overflow: hidden;
 }
 
 .side-panel-left {
-    /* Width is set programmatically - DO NOT set width here */
     flex-shrink: 0;
-    flex-grow: 0; /* CRITICAL: Prevent growth */
+    flex-grow: 0;
     padding: 15px;
     background-color: rgb(30, 30, 40);
     border-right-width: 2px;
     border-right-color: rgb(10, 10, 15);
-    /* CRITICAL: Strict overflow control - content cannot expand panel */
     overflow: hidden;
     box-sizing: border-box;
 }
 
 .main-panel {
-    /* Width is set programmatically - DO NOT set width here */
     flex-shrink: 0;
-    flex-grow: 0; /* CRITICAL: Prevent growth */
+    flex-grow: 0;
     padding: 15px;
     background-color: rgb(40, 40, 50);
-    /* CRITICAL: Strict overflow control - content cannot expand panel */
     overflow: hidden;
     box-sizing: border-box;
 }
@@ -41,7 +36,6 @@
     background-color: rgb(30, 30, 40);
     border-left-width: 2px;
     border-left-color: rgb(10, 10, 15);
-    /* Prevent content overflow */
     overflow: hidden;
     box-sizing: border-box;
 }
@@ -71,13 +65,11 @@ Label {
 }
 
 .inventory-grid {
-    /* Width set in code - precise sizing */
     flex-grow: 0;
     flex-shrink: 0;
     flex-direction: row;
     flex-wrap: wrap;
     align-content: flex-start;
-    /* Ensure absolutely no extra spacing */
     padding: 0;
     margin: 0;
     box-sizing: border-box;
@@ -108,7 +100,6 @@ Label {
     transition: left 0.1s ease-in-out;
 }
 
-/* Use outline instead of border to prevent shifting */
 .slot {
     width: 64px;
     height: 64px;
@@ -125,7 +116,6 @@ Label {
     cursor: link;
 }
 
-/* YELLOW HIGHLIGHT - For spec sheet selection (right panel) */
 .slot--selected {
     background-color: rgba(255, 220, 100, 0.3);
     outline-width: 2px;
@@ -133,7 +123,6 @@ Label {
     outline-offset: -2px;
 }
 
-/* GREEN HIGHLIGHT - For gene editor locked seed (left panel) */
 .slot--locked-for-editing {
     background-color: rgba(100, 255, 150, 0.3);
     outline-width: 2px;
@@ -141,7 +130,6 @@ Label {
     outline-offset: -2px;
 }
 
-/* If a slot is BOTH selected AND locked, prioritize the lock styling */
 .slot--locked-for-editing.slot--selected {
     background-color: rgba(100, 255, 150, 0.4);
     outline-width: 2px;
@@ -216,22 +204,21 @@ Label {
     margin-bottom: 5px;
 }
 
-/* CRITICAL: Strict width constraints for gene editor containers */
 .seed-drop-slot-container {
     align-items: center;
     margin-bottom: 10px;
     width: 100%;
-    max-width: 100%; /* Cannot exceed parent width */
+    max-width: 100%;
     box-sizing: border-box;
-    overflow: hidden; /* Clip any overflow */
+    overflow: hidden;
 }
 
 .genes-container {
     flex-direction: row;
     flex-wrap: wrap;
     width: 100%;
-    max-width: 100%; /* Cannot exceed parent width */
-    overflow: hidden; /* Clip overflow */
+    max-width: 100%;
+    overflow: hidden;
     box-sizing: border-box;
 }
 
@@ -239,16 +226,15 @@ Label {
     flex-direction: row;
     align-items: center;
     width: 100%;
-    max-width: 100%; /* Cannot exceed parent */
+    max-width: 100%;
     margin-bottom: 5px;
     padding: 5px;
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 5px;
-    overflow: hidden; /* Clip overflow */
+    overflow: hidden;
     box-sizing: border-box;
 }
 
-/* Gene slots - same size as inventory slots (64x64) */
 .gene-slot {
     width: 64px;
     height: 64px;
@@ -259,8 +245,8 @@ Label {
     cursor: link;
     position: relative;
     flex-direction: column;
-    flex-shrink: 0; /* Don't shrink */
-    flex-grow: 0; /* Don't grow */
+    flex-shrink: 0;
+    flex-grow: 0;
 }
 
 .gene-slot__background {
@@ -291,7 +277,6 @@ Label {
     z-index: 10;
 }
 
-/* Seed drop slot */
 #seed-drop-slot {
     width: 80px;
     height: 80px;
@@ -303,7 +288,6 @@ Label {
 .gene-slot--modifier .gene-slot__background { background-color: rgb(80, 80, 50); }
 .gene-slot--payload .gene-slot__background { background-color: rgb(80, 50, 80); }
 
-/* Gray out incompatible slots during drag */
 .gene-slot--incompatible {
     opacity: 0.3;
     cursor: not-allowed;
@@ -313,7 +297,6 @@ Label {
     background-color: rgb(40, 40, 40) !important;
 }
 
-/* Column headers for active sequence */
 .active-sequence-header {
     flex-direction: row;
     align-items: center;
@@ -334,13 +317,34 @@ Label {
     text-align: center;
 }
 
-/* CRITICAL: Absolutely strict constraint on internal gene containers */
 #passive-genes-container,
 #active-sequence-container {
     width: 100%;
     max-width: 100%;
-    overflow: hidden; /* Clip overflow */
+    overflow: hidden;
     box-sizing: border-box;
     flex-shrink: 0;
     flex-grow: 0;
+}
+
+/* NEW: Color picker styles */
+.color-picker-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.color-picker-button {
+    border-radius: 4px;
+    cursor: link;
+    transition-property: border-width, border-color;
+    transition-duration: 0.1s;
+}
+
+.color-picker-button:hover {
+    border-width: 3px;
+    border-color: rgba(255, 255, 255, 0.5);
 }

@@ -13,6 +13,7 @@ namespace Abracodabra.UI.Toolkit
         private ListView hotbarList;
         private VisualElement hotbarSelector;
         private VisualTreeAsset slotTemplate;
+        private List<UIInventoryItem> hotbarItems;
         
         // State
         private int selectedHotbarIndex = 0;
@@ -34,6 +35,8 @@ namespace Abracodabra.UI.Toolkit
         {
             if (hotbarList == null) return;
             
+            hotbarItems = items;
+            
             hotbarList.fixedItemHeight = 74;
             hotbarList.selectionType = SelectionType.None;
             hotbarList.itemsSource = items;
@@ -48,13 +51,35 @@ namespace Abracodabra.UI.Toolkit
                     icon.sprite = items[index].Icon;
                     icon.style.display = DisplayStyle.Flex;
                     stack.text = items[index].StackSize > 1 ? items[index].StackSize.ToString() : "";
+                    
+                    // Apply custom background color if set (for seeds)
+                    if (items[index].HasCustomColor())
+                    {
+                        element.style.backgroundColor = items[index].BackgroundColor;
+                    }
+                    else
+                    {
+                        element.style.backgroundColor = StyleKeyword.Null; // Clear background
+                    }
                 }
                 else
                 {
                     icon.style.display = DisplayStyle.None;
                     stack.text = "";
+                    element.style.backgroundColor = StyleKeyword.Null; // Clear background
                 }
             };
+        }
+        
+        /// <summary>
+        /// Refresh the hotbar to update visuals (e.g., after color change)
+        /// </summary>
+        public void RefreshHotbar()
+        {
+            if (hotbarList != null)
+            {
+                hotbarList.Rebuild();
+            }
         }
 
         /// <summary>

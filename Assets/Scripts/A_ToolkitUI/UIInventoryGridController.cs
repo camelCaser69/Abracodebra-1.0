@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Abracodabra.UI.Toolkit
@@ -12,8 +13,8 @@ namespace Abracodabra.UI.Toolkit
         // Events
         public event Action<int> OnSlotClicked;
         public event Action<int> OnSlotPointerDown;
-        public event Action<int> OnSlotHoverEnter; // FIX #4: Hover support
-        public event Action OnSlotHoverExit; // FIX #4: Clear on exit
+        public event Action<int> OnSlotHoverEnter;
+        public event Action OnSlotHoverExit;
         
         // State
         private List<UIInventoryItem> inventory;
@@ -48,20 +49,18 @@ namespace Abracodabra.UI.Toolkit
                 var newSlot = slotTemplate.Instantiate();
                 newSlot.userData = i;
                 
-                // Selection handler (don't trigger during drag - handled by GameUIManager)
-                int slotIndex = i; // Capture for lambda
+                int slotIndex = i;
+                
                 newSlot.RegisterCallback<PointerDownEvent>(evt => 
                 {
                     OnSlotClicked?.Invoke(slotIndex);
                 });
                 
-                // Notify about pointer down for drag system
                 newSlot.RegisterCallback<PointerDownEvent>(evt =>
                 {
                     OnSlotPointerDown?.Invoke(slotIndex);
                 });
                 
-                // FIX #4: Hover events for tooltip
                 newSlot.RegisterCallback<PointerEnterEvent>(evt =>
                 {
                     OnSlotHoverEnter?.Invoke(slotIndex);
@@ -97,11 +96,22 @@ namespace Abracodabra.UI.Toolkit
                     icon.sprite = item.Icon;
                     icon.style.display = DisplayStyle.Flex;
                     stack.text = item.StackSize > 1 ? item.StackSize.ToString() : "";
+                    
+                    // Apply custom background color if set (for seeds)
+                    if (item.HasCustomColor())
+                    {
+                        element.style.backgroundColor = item.BackgroundColor;
+                    }
+                    else
+                    {
+                        element.style.backgroundColor = StyleKeyword.Null; // Clear background
+                    }
                 }
                 else
                 {
                     icon.style.display = DisplayStyle.None;
                     stack.text = "";
+                    element.style.backgroundColor = StyleKeyword.Null; // Clear background
                 }
                 
                 // Update visual states
@@ -124,7 +134,6 @@ namespace Abracodabra.UI.Toolkit
         /// </summary>
         public void SetSelectedSlot(int index)
         {
-            // Clear previous selection highlight
             if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count)
             {
                 inventorySlots[selectedInventoryIndex].RemoveFromClassList("slot--selected");
@@ -143,7 +152,6 @@ namespace Abracodabra.UI.Toolkit
         /// </summary>
         public void SetLockedSeedSlot(int index)
         {
-            // Clear previous lock highlight
             if (lockedSeedIndex >= 0 && lockedSeedIndex < inventorySlots.Count)
             {
                 inventorySlots[lockedSeedIndex].RemoveFromClassList("slot--locked-for-editing");
@@ -162,7 +170,6 @@ namespace Abracodabra.UI.Toolkit
         /// </summary>
         public void UpdateIndicesAfterSwap(int fromIndex, int toIndex)
         {
-            // Update selection indices if they were swapped
             if (selectedInventoryIndex == fromIndex)
                 selectedInventoryIndex = toIndex;
             else if (selectedInventoryIndex == toIndex)

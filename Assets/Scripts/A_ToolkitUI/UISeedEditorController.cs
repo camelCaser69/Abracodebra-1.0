@@ -14,14 +14,19 @@ namespace Abracodabra.UI.Toolkit
     {
         // Events
         public event Action<GeneBase, VisualElement> OnGeneSlotPointerDown;
-        public event Action<GeneBase> OnGeneSlotHoverEnter; // FIX #4: Hover support
-        public event Action OnGeneSlotHoverExit; // FIX #4: Clear on exit
+        public event Action<GeneBase> OnGeneSlotHoverEnter;
+        public event Action OnGeneSlotHoverExit;
+        public event Action<Color> OnSeedColorChanged; // NEW: Color picker event
         
         // References
         private VisualElement seedDropSlotContainer;
         private VisualElement passiveGenesContainer;
         private VisualElement activeSequenceContainer;
         private VisualTreeAsset geneSlotTemplate;
+        
+        // Color picker
+        private VisualElement colorPickerContainer;
+        private UIInventoryItem currentSeedItem; // Track current seed for color updates
 
         /// <summary>
         /// Initialize the seed editor controller
@@ -36,6 +41,9 @@ namespace Abracodabra.UI.Toolkit
             passiveGenesContainer = passiveContainer;
             activeSequenceContainer = activeContainer;
             geneSlotTemplate = slotTemplate;
+            
+            // Create color picker container (will be added when seed is displayed)
+            CreateColorPicker();
         }
 
         /// <summary>
@@ -49,6 +57,8 @@ namespace Abracodabra.UI.Toolkit
                 return;
             }
 
+            currentSeedItem = seedItem; // Store reference for color updates
+            
             seedDropSlotContainer.Clear();
             passiveGenesContainer.Clear();
             activeSequenceContainer.Clear();
@@ -57,11 +67,29 @@ namespace Abracodabra.UI.Toolkit
             var seedSlot = geneSlotTemplate.Instantiate();
             BindGeneSlot(seedSlot, seedItem.OriginalData);
             seedSlot.name = "seed-drop-slot";
+            
+            // Apply current background color if set
+            if (seedItem.HasCustomColor())
+            {
+                var background = seedSlot.Q("background");
+                if (background != null)
+                {
+                    background.style.backgroundColor = seedItem.BackgroundColor;
+                }
+            }
+            
             seedDropSlotContainer.Add(seedSlot);
+            
+            // Add color picker below seed slot
+            if (colorPickerContainer != null)
+            {
+                seedDropSlotContainer.Add(colorPickerContainer);
+                UpdateColorPickerSelection(seedItem.BackgroundColor);
+            }
 
             var runtimeState = seedItem.SeedRuntimeState;
 
-            // FIX #2: Create passive gene slots with labels below
+            // Create passive gene slots with labels below
             for (int i = 0; i < template.passiveSlotCount; i++)
             {
                 var geneInstance = (i < runtimeState.passiveInstances.Count) ? runtimeState.passiveInstances[i] : null;
@@ -69,16 +97,14 @@ namespace Abracodabra.UI.Toolkit
                 
                 string labelText = gene != null ? $"T{gene.tier}" : $"P{i+1}";
                 var wrappedSlot = CreateGeneSlotWithLabel(gene, labelText);
-                wrappedSlot.userData = "passive"; // FIX #2: Mark slot type for drag feedback
+                wrappedSlot.userData = "passive";
                 passiveGenesContainer.Add(wrappedSlot);
             }
             
-            // FIX #3: Create column headers for active sequence
+            // Create column headers for active sequence
             var headerRow = new VisualElement();
             headerRow.AddToClassList("active-sequence-header");
             
-            // FIX #1: Each header needs to match wrapper structure exactly
-            // Wrapper is: 2px margin + 64px slot + 2px margin = 68px total
             var activeHeader = new Label("Active");
             activeHeader.style.width = 64;
             activeHeader.style.marginLeft = 2;
@@ -99,7 +125,7 @@ namespace Abracodabra.UI.Toolkit
             headerRow.Add(payloadHeader);
             activeSequenceContainer.Add(headerRow);
             
-            // FIX #2: Create active sequence slots with labels below
+            // Create active sequence slots with labels below
             for (int i = 0; i < template.activeSequenceLength; i++)
             {
                 var sequenceRow = new VisualElement();
@@ -112,21 +138,21 @@ namespace Abracodabra.UI.Toolkit
                 var activeGene = sequenceData?.activeInstance?.GetGene();
                 string activeLabel = activeGene != null ? $"T{activeGene.tier}" : $"A{i+1}";
                 var activeWrapped = CreateGeneSlotWithLabel(activeGene, activeLabel);
-                activeWrapped.userData = "active"; // FIX #2: Mark slot type
+                activeWrapped.userData = "active";
                 sequenceRow.Add(activeWrapped);
                 
                 // Modifier gene
                 var modifierGene = sequenceData?.modifierInstances.FirstOrDefault()?.GetGene();
                 string modifierLabel = modifierGene != null ? $"T{modifierGene.tier}" : $"M{i+1}";
                 var modifierWrapped = CreateGeneSlotWithLabel(modifierGene, modifierLabel);
-                modifierWrapped.userData = "modifier"; // FIX #2: Mark slot type
+                modifierWrapped.userData = "modifier";
                 sequenceRow.Add(modifierWrapped);
                 
                 // Payload gene
                 var payloadGene = sequenceData?.payloadInstances.FirstOrDefault()?.GetGene();
                 string payloadLabel = payloadGene != null ? $"T{payloadGene.tier}" : $"P{i+1}";
                 var payloadWrapped = CreateGeneSlotWithLabel(payloadGene, payloadLabel);
-                payloadWrapped.userData = "payload"; // FIX #2: Mark slot type
+                payloadWrapped.userData = "payload";
                 sequenceRow.Add(payloadWrapped);
             }
         }
@@ -136,6 +162,8 @@ namespace Abracodabra.UI.Toolkit
         /// </summary>
         public void Clear()
         {
+            currentSeedItem = null;
+            
             seedDropSlotContainer.Clear();
             passiveGenesContainer.Clear();
             activeSequenceContainer.Clear();
@@ -145,7 +173,7 @@ namespace Abracodabra.UI.Toolkit
             if(label != null)
             {
                 label.text = "SEED";
-                label.style.display = DisplayStyle.Flex; // Show for empty seed slot
+                label.style.display = DisplayStyle.Flex;
             }
             emptySeedSlot.Q("icon").style.display = DisplayStyle.None;
             emptySeedSlot.AddToClassList("gene-slot--seed");
@@ -158,7 +186,6 @@ namespace Abracodabra.UI.Toolkit
         /// </summary>
         public void UpdateGeneSlot(VisualElement slotOrWrapper, GeneBase gene)
         {
-            // The slot might be wrapped, so find the actual gene-slot element
             var slot = slotOrWrapper.ClassListContains("gene-slot") 
                 ? slotOrWrapper 
                 : slotOrWrapper.Q(className: "gene-slot");
@@ -167,7 +194,6 @@ namespace Abracodabra.UI.Toolkit
             {
                 BindGeneSlot(slot, gene);
                 
-                // Also update the label if this is a wrapped slot
                 if (slotOrWrapper != slot)
                 {
                     var label = slotOrWrapper.Q<Label>();
@@ -180,7 +206,157 @@ namespace Abracodabra.UI.Toolkit
         }
 
         /// <summary>
-        /// Bind data to a gene slot visual element - creates wrapper with label below
+        /// Create the color picker UI with preset pastel colors
+        /// </summary>
+        private void CreateColorPicker()
+        {
+            colorPickerContainer = new VisualElement();
+            colorPickerContainer.AddToClassList("color-picker-container");
+            colorPickerContainer.style.flexDirection = FlexDirection.Row;
+            colorPickerContainer.style.flexWrap = Wrap.Wrap;
+            colorPickerContainer.style.marginTop = 10;
+            colorPickerContainer.style.marginBottom = 10;
+            colorPickerContainer.style.justifyContent = Justify.Center;
+            colorPickerContainer.style.maxWidth = 200;
+            
+            // Define pastel colors for seed identification
+            var colors = new[]
+            {
+                new Color(0, 0, 0, 0),           // Transparent (default/none)
+                new Color(1.0f, 0.8f, 0.8f, 0.6f),   // Pastel Red
+                new Color(1.0f, 0.9f, 0.7f, 0.6f),   // Pastel Orange
+                new Color(1.0f, 1.0f, 0.8f, 0.6f),   // Pastel Yellow
+                new Color(0.8f, 1.0f, 0.8f, 0.6f),   // Pastel Green
+                new Color(0.8f, 0.9f, 1.0f, 0.6f),   // Pastel Blue
+                new Color(0.9f, 0.8f, 1.0f, 0.6f),   // Pastel Purple
+                new Color(1.0f, 0.8f, 0.9f, 0.6f),   // Pastel Pink
+            };
+            
+            foreach (var color in colors)
+            {
+                var colorButton = new Button();
+                colorButton.AddToClassList("color-picker-button");
+                colorButton.style.width = 24;
+                colorButton.style.height = 24;
+                colorButton.style.marginTop = 2;
+                colorButton.style.marginBottom = 2;
+                colorButton.style.marginLeft = 2;
+                colorButton.style.marginRight = 2;
+                colorButton.style.borderTopLeftRadius = 4;
+                colorButton.style.borderTopRightRadius = 4;
+                colorButton.style.borderBottomLeftRadius = 4;
+                colorButton.style.borderBottomRightRadius = 4;
+                colorButton.style.borderLeftWidth = 2;
+                colorButton.style.borderRightWidth = 2;
+                colorButton.style.borderTopWidth = 2;
+                colorButton.style.borderBottomWidth = 2;
+                colorButton.style.borderLeftColor = new Color(0.3f, 0.3f, 0.3f);
+                colorButton.style.borderRightColor = new Color(0.3f, 0.3f, 0.3f);
+                colorButton.style.borderTopColor = new Color(0.3f, 0.3f, 0.3f);
+                colorButton.style.borderBottomColor = new Color(0.3f, 0.3f, 0.3f);
+                
+                // Special styling for transparent option
+                if (color.a < 0.01f)
+                {
+                    // Checkerboard pattern simulation (diagonal lines)
+                    colorButton.style.backgroundColor = new Color(0.3f, 0.3f, 0.3f);
+                    colorButton.text = "✕"; // X mark for "none"
+                    colorButton.style.unityFontStyleAndWeight = FontStyle.Bold;
+                    colorButton.style.fontSize = 16;
+                }
+                else
+                {
+                    colorButton.style.backgroundColor = color;
+                }
+                
+                // Store color in userData for retrieval
+                colorButton.userData = color;
+                
+                // Click handler
+                colorButton.clicked += () =>
+                {
+                    var selectedColor = (Color)colorButton.userData;
+                    if (currentSeedItem != null)
+                    {
+                        currentSeedItem.BackgroundColor = selectedColor;
+                        
+                        // Update the seed slot background immediately
+                        var seedSlot = seedDropSlotContainer.Q("seed-drop-slot");
+                        if (seedSlot != null)
+                        {
+                            var background = seedSlot.Q("background");
+                            if (background != null)
+                            {
+                                background.style.backgroundColor = selectedColor;
+                            }
+                        }
+                        
+                        // Update selection highlighting
+                        UpdateColorPickerSelection(selectedColor);
+                        
+                        // Notify manager to update inventory/hotbar
+                        OnSeedColorChanged?.Invoke(selectedColor);
+                    }
+                };
+                
+                colorPickerContainer.Add(colorButton);
+            }
+            
+            // Add label
+            var label = new Label("Seed Color");
+            label.style.fontSize = 10;
+            label.style.color = new Color(0.6f, 0.6f, 0.6f);
+            label.style.unityTextAlign = TextAnchor.MiddleCenter;
+            label.style.width = Length.Percent(100);
+            label.style.marginBottom = 3;
+            colorPickerContainer.Insert(0, label);
+        }
+        
+        /// <summary>
+        /// Update which color button is shown as selected
+        /// </summary>
+        private void UpdateColorPickerSelection(Color currentColor)
+        {
+            if (colorPickerContainer == null) return;
+            
+            foreach (var child in colorPickerContainer.Children())
+            {
+                if (child is Button button && button.userData is Color buttonColor)
+                {
+                    // Check if this button's color matches current color
+                    bool isSelected = Mathf.Approximately(buttonColor.r, currentColor.r) &&
+                                    Mathf.Approximately(buttonColor.g, currentColor.g) &&
+                                    Mathf.Approximately(buttonColor.b, currentColor.b) &&
+                                    Mathf.Approximately(buttonColor.a, currentColor.a);
+                    
+                    if (isSelected)
+                    {
+                        button.style.borderLeftColor = new Color(1f, 1f, 0.3f); // Yellow border
+                        button.style.borderRightColor = new Color(1f, 1f, 0.3f);
+                        button.style.borderTopColor = new Color(1f, 1f, 0.3f);
+                        button.style.borderBottomColor = new Color(1f, 1f, 0.3f);
+                        button.style.borderLeftWidth = 3;
+                        button.style.borderRightWidth = 3;
+                        button.style.borderTopWidth = 3;
+                        button.style.borderBottomWidth = 3;
+                    }
+                    else
+                    {
+                        button.style.borderLeftColor = new Color(0.3f, 0.3f, 0.3f);
+                        button.style.borderRightColor = new Color(0.3f, 0.3f, 0.3f);
+                        button.style.borderTopColor = new Color(0.3f, 0.3f, 0.3f);
+                        button.style.borderBottomColor = new Color(0.3f, 0.3f, 0.3f);
+                        button.style.borderLeftWidth = 2;
+                        button.style.borderRightWidth = 2;
+                        button.style.borderTopWidth = 2;
+                        button.style.borderBottomWidth = 2;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Bind data to a gene slot visual element
         /// </summary>
         private void BindGeneSlot(VisualElement slot, object data)
         {
@@ -191,7 +367,6 @@ namespace Abracodabra.UI.Toolkit
             background.ClearClassList();
             background.AddToClassList("gene-slot__background");
 
-            // FIX #2: Hide the tier label inside the slot (we'll add it below instead)
             if (tierLabel != null)
             {
                 tierLabel.style.display = DisplayStyle.None;
@@ -203,27 +378,24 @@ namespace Abracodabra.UI.Toolkit
                 return;
             }
 
-            // FIX #1: Ensure icon fills entire slot properly
             icon.style.display = DisplayStyle.Flex;
             icon.style.width = Length.Percent(100);
             icon.style.height = Length.Percent(100);
             icon.style.position = Position.Absolute;
             icon.style.top = 0;
             icon.style.left = 0;
-            icon.scaleMode = ScaleMode.ScaleToFit; // Ensure proper scaling
+            icon.scaleMode = ScaleMode.ScaleToFit;
 
             if (data is GeneBase gene)
             {
                 icon.sprite = gene.icon;
                 background.AddToClassList($"gene-slot--{gene.Category.ToString().ToLower()}");
                 
-                // FIX #4: Register pointer down for dragging genes back to inventory
                 slot.RegisterCallback<PointerDownEvent>(evt =>
                 {
                     OnGeneSlotPointerDown?.Invoke(gene, slot);
                 });
                 
-                // FIX #4: Register hover events for tooltip
                 slot.RegisterCallback<PointerEnterEvent>(evt =>
                 {
                     OnGeneSlotHoverEnter?.Invoke(gene);
@@ -246,51 +418,46 @@ namespace Abracodabra.UI.Toolkit
         /// </summary>
         private VisualElement CreateGeneSlotWithLabel(object data, string labelText)
         {
-            // Create wrapper container
             var wrapper = new VisualElement();
             wrapper.style.flexDirection = FlexDirection.Column;
             wrapper.style.alignItems = Align.Center;
             wrapper.style.marginLeft = 2;
             wrapper.style.marginRight = 2;
             wrapper.style.marginBottom = 5;
-            // FIX: Constrain wrapper width to prevent expansion
-            wrapper.style.width = 68; // 64px slot + 2px margin on each side
+            wrapper.style.width = 68;
             wrapper.style.maxWidth = 68;
             wrapper.style.minWidth = 68;
-            wrapper.style.flexShrink = 0; // Don't shrink
-            wrapper.style.flexGrow = 0; // Don't grow
+            wrapper.style.flexShrink = 0;
+            wrapper.style.flexGrow = 0;
             
-            // Create the gene slot
             var slot = geneSlotTemplate.Instantiate();
             BindGeneSlot(slot, data);
             wrapper.Add(slot);
             
-            // FIX #2: Add label below the slot
             var label = new Label(labelText);
             label.style.fontSize = 9;
             label.style.color = new StyleColor(new Color(0.7f, 0.7f, 0.7f));
             label.style.unityTextAlign = TextAnchor.MiddleCenter;
             label.style.marginTop = 2;
-            label.style.maxWidth = 68; // FIX: Constrain label width too
-            label.style.overflow = Overflow.Hidden; // FIX: Clip long text
+            label.style.maxWidth = 68;
+            label.style.overflow = Overflow.Hidden;
             wrapper.Add(label);
             
             return wrapper;
         }
 
-        // Getters for drag-drop system
+        // Getters
         public VisualElement GetSeedContainer() => seedDropSlotContainer;
         public VisualElement GetPassiveContainer() => passiveGenesContainer;
         public VisualElement GetActiveContainer() => activeSequenceContainer;
         
         /// <summary>
-        /// FIX #2: Highlight only compatible slots when dragging a gene
+        /// Highlight only compatible slots when dragging a gene
         /// </summary>
         public void HighlightCompatibleSlots(GeneCategory? draggedCategory)
         {
-            if (draggedCategory == null) return; // Not dragging a gene
+            if (draggedCategory == null) return;
             
-            // Gray out incompatible passive slots
             foreach (var wrapper in passiveGenesContainer.Children())
             {
                 var slot = wrapper.Q(className: "gene-slot");
@@ -307,13 +474,10 @@ namespace Abracodabra.UI.Toolkit
                 }
             }
             
-            // Gray out incompatible active sequence slots
             foreach (var row in activeSequenceContainer.Children())
             {
-                // Skip header row
                 if (row.ClassListContains("active-sequence-header")) continue;
                 
-                int slotIndex = 0;
                 foreach (var wrapper in row.Children())
                 {
                     var slot = wrapper.Q(className: "gene-slot");
@@ -337,24 +501,21 @@ namespace Abracodabra.UI.Toolkit
                             slot.AddToClassList("gene-slot--incompatible");
                         }
                     }
-                    slotIndex++;
                 }
             }
         }
         
         /// <summary>
-        /// FIX #2: Clear all highlighting when drag ends
+        /// Clear all highlighting when drag ends
         /// </summary>
         public void ClearSlotHighlighting()
         {
-            // Clear passive slots
             foreach (var wrapper in passiveGenesContainer.Children())
             {
                 var slot = wrapper.Q(className: "gene-slot");
                 slot?.RemoveFromClassList("gene-slot--incompatible");
             }
             
-            // Clear active sequence slots
             foreach (var row in activeSequenceContainer.Children())
             {
                 if (row.ClassListContains("active-sequence-header")) continue;
