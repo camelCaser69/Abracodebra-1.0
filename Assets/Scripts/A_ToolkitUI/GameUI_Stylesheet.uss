@@ -3,35 +3,47 @@
     height: 100%;
     flex-direction: row;
     background-color: rgb(20, 20, 25);
+    /* CRITICAL: Prevent children from overflowing container */
+    overflow: hidden;
 }
 
 .side-panel-left {
-    /* Gene editor expands to fill remaining space */
-    flex-grow: 1;        /* Fill available space */
-    flex-shrink: 0;      /* Don't shrink below content */
-    min-width: 300px;    /* Minimum width to stay usable */
+    /* Width is set programmatically - DO NOT set width here */
+    flex-shrink: 0;
+    flex-grow: 0; /* CRITICAL: Prevent growth */
     padding: 15px;
     background-color: rgb(30, 30, 40);
     border-right-width: 2px;
     border-right-color: rgb(10, 10, 15);
+    /* CRITICAL: Strict overflow control - content cannot expand panel */
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .main-panel {
-    /* Width set dynamically in code based on inventory columns */
-    flex-grow: 0;    /* Don't grow - use exact width from code */
-    flex-shrink: 0;  /* Don't shrink - maintain width */
+    /* Width is set programmatically - DO NOT set width here */
+    flex-shrink: 0;
+    flex-grow: 0; /* CRITICAL: Prevent growth */
     padding: 15px;
     background-color: rgb(40, 40, 50);
+    /* CRITICAL: Strict overflow control - content cannot expand panel */
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .side-panel-right {
     width: 400px;
+    min-width: 400px;
+    max-width: 400px;
     flex-shrink: 0;
-    flex-grow: 0;        /* Don't grow */
+    flex-grow: 0;
     padding: 15px;
     background-color: rgb(30, 30, 40);
     border-left-width: 2px;
     border-left-color: rgb(10, 10, 15);
+    /* Prevent content overflow */
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 Label {
@@ -46,6 +58,12 @@ Label {
     margin-bottom: 10px;
 }
 
+.h2 {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(180, 180, 200);
+}
+
 .metric-text {
     font-size: 14px;
     -unity-font-style: bold;
@@ -53,15 +71,16 @@ Label {
 }
 
 .inventory-grid {
-    /* FIX #2: Precise sizing - width set in code, don't grow/shrink */
+    /* Width set in code - precise sizing */
     flex-grow: 0;
     flex-shrink: 0;
     flex-direction: row;
     flex-wrap: wrap;
     align-content: flex-start;
-    /* FIX #2: Ensure absolutely no extra spacing */
+    /* Ensure absolutely no extra spacing */
     padding: 0;
     margin: 0;
+    box-sizing: border-box;
 }
 
 .hotbar {
@@ -89,7 +108,7 @@ Label {
     transition: left 0.1s ease-in-out;
 }
 
-/* FIX #1: Use outline instead of border to prevent shifting */
+/* Use outline instead of border to prevent shifting */
 .slot {
     width: 64px;
     height: 64px;
@@ -107,7 +126,6 @@ Label {
 }
 
 /* YELLOW HIGHLIGHT - For spec sheet selection (right panel) */
-/* Using outline instead of border to prevent size changes */
 .slot--selected {
     background-color: rgba(255, 220, 100, 0.3);
     outline-width: 2px;
@@ -116,7 +134,6 @@ Label {
 }
 
 /* GREEN HIGHLIGHT - For gene editor locked seed (left panel) */
-/* Using outline instead of border to prevent size changes */
 .slot--locked-for-editing {
     background-color: rgba(100, 255, 150, 0.3);
     outline-width: 2px;
@@ -136,8 +153,6 @@ Label {
 .slot-icon {
     width: 100%;
     height: 100%;
-    /* FIX #1: Remove scale to match gene editor icons (both now 100%) */
-    /* OLD: scale: 0.9 0.9; */
 }
 
 .slot-stack-size {
@@ -201,27 +216,39 @@ Label {
     margin-bottom: 5px;
 }
 
+/* CRITICAL: Strict width constraints for gene editor containers */
 .seed-drop-slot-container {
     align-items: center;
     margin-bottom: 10px;
+    width: 100%;
+    max-width: 100%; /* Cannot exceed parent width */
+    box-sizing: border-box;
+    overflow: hidden; /* Clip any overflow */
 }
 
 .genes-container {
     flex-direction: row;
     flex-wrap: wrap;
+    width: 100%;
+    max-width: 100%; /* Cannot exceed parent width */
+    overflow: hidden; /* Clip overflow */
+    box-sizing: border-box;
 }
 
 .sequence-row {
     flex-direction: row;
     align-items: center;
     width: 100%;
+    max-width: 100%; /* Cannot exceed parent */
     margin-bottom: 5px;
     padding: 5px;
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 5px;
+    overflow: hidden; /* Clip overflow */
+    box-sizing: border-box;
 }
 
-/* FIX #3: Make gene slots same size as inventory slots (64x64) */
+/* Gene slots - same size as inventory slots (64x64) */
 .gene-slot {
     width: 64px;
     height: 64px;
@@ -230,9 +257,10 @@ Label {
     border-width: 1px;
     border-color: rgba(255, 255, 255, 0.1);
     cursor: link;
-    position: relative; /* Parent is relative for absolute children */
-    /* FIX #1: Prevent flexbox stacking - we want layered overlay */
-    flex-direction: column; 
+    position: relative;
+    flex-direction: column;
+    flex-shrink: 0; /* Don't shrink */
+    flex-grow: 0; /* Don't grow */
 }
 
 .gene-slot__background {
@@ -240,37 +268,33 @@ Label {
     height: 100%;
     border-radius: 5px;
     background-color: rgba(0, 0, 0, 0.3);
-    position: absolute; /* Absolute to parent */
+    position: absolute;
     top: 0;
     left: 0;
 }
 
 .gene-slot__icon {
-    /* FIX #1: Icon must fill entire 64x64 slot */
     width: 100%;
     height: 100%;
-    position: absolute; /* Absolute to parent - overlays background */
+    position: absolute;
     top: 0;
     left: 0;
-    /* Remove any scaling that makes it smaller */
     -unity-background-scale-mode: scale-to-fit;
 }
 
 .gene-slot__tier-label {
-    position: absolute; /* Absolute to parent - overlays everything */
+    position: absolute;
     top: 2px;
     left: 4px;
     font-size: 10px;
     -unity-font-style: bold;
-    z-index: 10; /* Ensure it's on top */
-    /* This will be hidden via code for gene slots with labels below */
+    z-index: 10;
 }
 
-/* Seed drop slot - removed special styling, now looks like regular gene slot */
+/* Seed drop slot */
 #seed-drop-slot {
     width: 80px;
     height: 80px;
-    /* FIX #1: Removed green border - now looks clean and consistent */
 }
 
 .gene-slot--seed .gene-slot__background { background-color: rgb(50, 80, 50); }
@@ -279,7 +303,7 @@ Label {
 .gene-slot--modifier .gene-slot__background { background-color: rgb(80, 80, 50); }
 .gene-slot--payload .gene-slot__background { background-color: rgb(80, 50, 80); }
 
-/* FIX #2: Gray out incompatible slots during drag */
+/* Gray out incompatible slots during drag */
 .gene-slot--incompatible {
     opacity: 0.3;
     cursor: not-allowed;
@@ -289,15 +313,18 @@ Label {
     background-color: rgb(40, 40, 40) !important;
 }
 
-/* FIX #3: Column headers for active sequence */
+/* Column headers for active sequence */
 .active-sequence-header {
     flex-direction: row;
     align-items: center;
     width: 100%;
+    max-width: 100%;
     margin-bottom: 8px;
     padding: 5px;
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 3px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 .active-sequence-header Label {
@@ -305,5 +332,15 @@ Label {
     -unity-font-style: bold;
     color: rgb(150, 150, 180);
     text-align: center;
-    /* FIX #1: Width and margins set in code to match wrapper structure */
+}
+
+/* CRITICAL: Absolutely strict constraint on internal gene containers */
+#passive-genes-container,
+#active-sequence-container {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden; /* Clip overflow */
+    box-sizing: border-box;
+    flex-shrink: 0;
+    flex-grow: 0;
 }

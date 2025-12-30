@@ -253,6 +253,12 @@ namespace Abracodabra.UI.Toolkit
             wrapper.style.marginLeft = 2;
             wrapper.style.marginRight = 2;
             wrapper.style.marginBottom = 5;
+            // FIX: Constrain wrapper width to prevent expansion
+            wrapper.style.width = 68; // 64px slot + 2px margin on each side
+            wrapper.style.maxWidth = 68;
+            wrapper.style.minWidth = 68;
+            wrapper.style.flexShrink = 0; // Don't shrink
+            wrapper.style.flexGrow = 0; // Don't grow
             
             // Create the gene slot
             var slot = geneSlotTemplate.Instantiate();
@@ -265,6 +271,8 @@ namespace Abracodabra.UI.Toolkit
             label.style.color = new StyleColor(new Color(0.7f, 0.7f, 0.7f));
             label.style.unityTextAlign = TextAnchor.MiddleCenter;
             label.style.marginTop = 2;
+            label.style.maxWidth = 68; // FIX: Constrain label width too
+            label.style.overflow = Overflow.Hidden; // FIX: Clip long text
             wrapper.Add(label);
             
             return wrapper;

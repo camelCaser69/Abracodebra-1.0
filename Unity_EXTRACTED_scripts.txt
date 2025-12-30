@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 610,945 → 405,005 chars (33.7% reduction)
-Estimated tokens saved: ~51,485
+Compression Stats: 658,614 → 429,324 chars (34.8% reduction)
+Estimated tokens saved: ~57,322
 
 This document contains extracted Unity 6 (version 6000.0.39f1) C# scripts from my Unity game project.
 
@@ -69,152 +69,160 @@ using System;
   ItemView (Assets\Scripts\UI\_UGUI_Legacy/) L2640
   SequenceRowUI (Assets\Scripts\UI\_UGUI_Legacy/) L2756
 
+[Abracodabra.UI.Toolkit]
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L2827
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L3069
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L3138
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L3264
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L3295
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L3568
+
 [Abracodabra.UI.Tooltips]
-  EnhancedTooltipTrigger (Assets\Scripts\UI\_UGUI_Legacy/) L2827
-  InventoryTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L2880
-  SeedEditorTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L2981
-  SeedTooltipData (Assets\Scripts\UI\_UGUI_Legacy/) L3118
-  TooltipEnums (Assets\Scripts\UI\_UGUI_Legacy/) L3288
-  TooltipSystemManager (Assets\Scripts\UI\_UGUI_Legacy/) L3310
-  TooltipUtilities (Assets\Scripts\UI\_UGUI_Legacy/) L3334
+  EnhancedTooltipTrigger (Assets\Scripts\UI\_UGUI_Legacy/) L3732
+  InventoryTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L3785
+  SeedEditorTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L3886
+  SeedTooltipData (Assets\Scripts\UI\_UGUI_Legacy/) L4023
+  TooltipEnums (Assets\Scripts\UI\_UGUI_Legacy/) L4193
+  TooltipSystemManager (Assets\Scripts\UI\_UGUI_Legacy/) L4215
+  TooltipUtilities (Assets\Scripts\UI\_UGUI_Legacy/) L4239
 
 [Unknown]
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L3427
-  GameEvent (Assets\Scripts\Core\Events/) L3838
-  GameEventListener (Assets\Scripts\Core\Events/) L3865
-  IGameEventListener (Assets\Scripts\Core\Events/) L3892
-  GameInitializer (Assets\Scripts\Core/) L3900
-  GeneSystemInitializer (Assets\Scripts\Core/) L3924
-  SortableEntity (Assets\Scripts\Core/) L3938
-  WeatherManager (Assets\Scripts\Core/) L4005
-  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L4205
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L4266
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L4549
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L4613
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L4622
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L5035
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L5199
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L5212
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L5249
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L5559
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L5590
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L5863
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L5956
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L5971
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L5990
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L6074
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L6150
-  FoodType (Assets\Scripts\Ecosystem\Food/) L6222
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L6237
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L6259
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L6502
-  WaveManager (Assets\Scripts\Ecosystem\Management/) L6521
-  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L6826
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L6855
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L6873
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L6911
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L6959
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L6977
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L7128
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L7239
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L7286
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L7299
-  TileDefinitionEditor (Assets\Scripts\Editor/) L7360
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L7380
-  WaveManagerEditor (Assets\Scripts\Editor/) L7517
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L7692
-  ItemEffect (Assets\Scripts\Items/) L7717
-  ItemInstance (Assets\Scripts\Items/) L7745
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L7780
-  LeafData (Assets\Scripts\PlantSystem\Data/) L7788
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L7803
-  PlantCell (Assets\Scripts\PlantSystem\Growth/) L7842
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L7863
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L8000
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L8062
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L8148
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L8248
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L8264
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L8379
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L8534
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L8632
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L8733
-  GridSnapStartup (Assets\Scripts\Ticks/) L8972
-  TickDebugMonitor (Assets\Scripts\Ticks/) L9039
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L9075
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9086
-  InventoryColorManager (Assets\Scripts\UI\_UGUI_Legacy/) L9115
-  InventoryGridController (Assets\Scripts\UI\_UGUI_Legacy/) L9179
-  TooltipTrigger (Assets\Scripts\UI\_UGUI_Legacy/) L9322
-  UIManager (Assets\Scripts\UI\_UGUI_Legacy/) L9380
-  ITooltipDataProvider (Assets\Scripts\UI\_UGUI_Legacy/) L9594
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L9825
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L9921
-  WaterReflection (Assets\Scripts\Visual\Effects/) L10026
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L10424
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L10460
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L10626
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L10757
-  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L10765
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L10944
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11020
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L11044
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L11064
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L11076
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L11111
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L11246
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L4332
+  GameEvent (Assets\Scripts\Core\Events/) L4696
+  GameEventListener (Assets\Scripts\Core\Events/) L4723
+  IGameEventListener (Assets\Scripts\Core\Events/) L4750
+  GameInitializer (Assets\Scripts\Core/) L4758
+  GeneSystemInitializer (Assets\Scripts\Core/) L4782
+  SortableEntity (Assets\Scripts\Core/) L4796
+  WeatherManager (Assets\Scripts\Core/) L4863
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L5063
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L5124
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L5407
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L5471
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L5480
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L5893
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L6057
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L6070
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L6107
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L6417
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L6448
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L6721
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L6814
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L6829
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L6848
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L6932
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L7008
+  FoodType (Assets\Scripts\Ecosystem\Food/) L7080
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L7095
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L7117
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L7360
+  WaveManager (Assets\Scripts\Ecosystem\Management/) L7379
+  WaveSpawnEntry (Assets\Scripts\Ecosystem\Spawning/) L7684
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L7713
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L7731
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L7769
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L7817
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L7835
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L7986
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L8097
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L8144
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L8157
+  TileDefinitionEditor (Assets\Scripts\Editor/) L8218
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L8238
+  WaveManagerEditor (Assets\Scripts\Editor/) L8375
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L8550
+  ItemEffect (Assets\Scripts\Items/) L8575
+  ItemInstance (Assets\Scripts\Items/) L8603
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L8638
+  LeafData (Assets\Scripts\PlantSystem\Data/) L8646
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L8661
+  PlantCell (Assets\Scripts\PlantSystem\Growth/) L8700
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L8721
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L8858
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L8920
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L9006
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L9106
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L9122
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L9237
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L9392
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L9490
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L9591
+  GridSnapStartup (Assets\Scripts\Ticks/) L9830
+  TickDebugMonitor (Assets\Scripts\Ticks/) L9897
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L9933
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L9944
+  InventoryColorManager (Assets\Scripts\UI\_UGUI_Legacy/) L9973
+  InventoryGridController (Assets\Scripts\UI\_UGUI_Legacy/) L10037
+  TooltipTrigger (Assets\Scripts\UI\_UGUI_Legacy/) L10180
+  UIManager (Assets\Scripts\UI\_UGUI_Legacy/) L10238
+  ITooltipDataProvider (Assets\Scripts\UI\_UGUI_Legacy/) L10452
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L10683
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L10779
+  WaterReflection (Assets\Scripts\Visual\Effects/) L10884
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L11282
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L11318
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L11484
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L11615
+  PlayerActionManager (Assets\Scripts\WorldInteraction\Player/) L11623
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L11802
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L11878
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L11902
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L11922
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L11934
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L11969
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L12104
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L11257
-  CameraZoomController (Assets\Scripts\Core/) L11366
-  InitializationManager (Assets\Scripts\Core/) L11415
-  PixelGridSnapper (Assets\Scripts\Core/) L11455
-  RunManager (Assets\Scripts\Core/) L11488
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L11652
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L11715
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L11851
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L11878
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L12025
-  GridEntity (Assets\Scripts\Ticks/) L12097
-  GridPosition (Assets\Scripts\Ticks/) L12266
-  GridPositionManager (Assets\Scripts\Ticks/) L12367
-  GridRadiusUtility (Assets\Scripts\Ticks/) L12745
-  TickConfiguration (Assets\Scripts\Ticks/) L12889
-  ITickUpdateable (Assets\Scripts\Ticks/) L12972
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L13124
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L13312
+  CameraController (Assets\Scripts\Core/) L12115
+  CameraZoomController (Assets\Scripts\Core/) L12224
+  InitializationManager (Assets\Scripts\Core/) L12273
+  PixelGridSnapper (Assets\Scripts\Core/) L12313
+  RunManager (Assets\Scripts\Core/) L12346
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L12510
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L12573
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L12709
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L12736
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L12883
+  GridEntity (Assets\Scripts\Ticks/) L12955
+  GridPosition (Assets\Scripts\Ticks/) L13124
+  GridPositionManager (Assets\Scripts\Ticks/) L13225
+  GridRadiusUtility (Assets\Scripts\Ticks/) L13603
+  TickConfiguration (Assets\Scripts\Ticks/) L13747
+  ITickUpdateable (Assets\Scripts\Ticks/) L13830
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L13982
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L14170
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L13646
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L14504
 
 [WegoSystem.Editor']
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L13678
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L14536
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L13719
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L14577
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L13775
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L13816
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L13934
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L14633
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L14674
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L14792
 
 [if]
-  Fruit (Assets\Scripts\Genes\Components/) L14086
+  Fruit (Assets\Scripts\Genes\Components/) L14944
 
 [issue.]
-  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L14122
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L14149
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L14263
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L14311
+  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L14980
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L15007
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L15121
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L15169
 
 [namespace]
-  GeneEventBus (Assets\Scripts\Genes\Services/) L14352
+  GeneEventBus (Assets\Scripts\Genes\Services/) L15210
 
 [needs]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L14404
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15262
 
 [or]
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L14432
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L15290
 
 ================================================================================
 SCRIPTS
@@ -3019,6 +3027,911 @@ payloadSlot.gameObject.SetActive(hasActive && activeGene.slotConfig.payloadSlots
 }
 
 ////////////////////////////////////////////////////////////
+// Assets\Scripts\A_ToolkitUI\UIDragDropController.cs
+
+using UnityEngine.UIElements;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Templates;
+
+namespace Abracodabra.UI.Toolkit {
+pub cls UIDragDropController {
+pub event Action<int, int> OnInventorySwapRequested;
+pub event Action<int, VisualElement, string> OnGeneDropRequested;
+pub event Action<GeneCategory?> OnDragStarted; // FIX #2: Notify what type is being dragged
+pub event Action OnDragEnded; // FIX #2: Notify when drag ends
+
+bool isDragging = false;
+int dragSourceIndex = -1;
+GeneBase draggedGene = null; // FIX #4: Track dragged gene from editor
+VisualElement draggedGeneSlot = null; // FIX #4: Track source slot
+VisualElement dragPreview;
+
+VisualElement rootElement;
+List<UIInventoryItem> inventory;
+List<VisualElement> inventorySlots;
+
+VisualElement seedDropSlotContainer;
+VisualElement passiveGenesContainer;
+VisualElement activeSequenceContainer;
+
+pub void Initialize(VisualElement root, List<UIInventoryItem> inventoryData) {
+rootElement = root;
+inventory = inventoryData;
+
+rootElement.RegisterCallback<PointerMoveEvent>(OnGlobalPointerMove);
+rootElement.RegisterCallback<PointerUpEvent>(OnGlobalPointerUp);
+}
+
+pub void SetInventorySlots(List<VisualElement> slots) {
+inventorySlots = slots;
+}
+
+pub void SetGeneEditorSlots(VisualElement seedContainer, VisualElement passiveContainer, VisualElement activeContainer) {
+seedDropSlotContainer = seedContainer;
+passiveGenesContainer = passiveContainer;
+activeSequenceContainer = activeContainer;
+}
+
+pub void StartDrag(int sourceIndex) {
+if (inventory[sourceIndex] == null) return; // Can't drag empty slots
+
+dragSourceIndex = sourceIndex;
+draggedGene = null; // Not dragging from gene editor
+draggedGeneSlot = null;
+isDragging = false; // Not dragging yet, just pressed
+}
+
+pub void StartDragFromGeneEditor(GeneBase gene, VisualElement sourceSlot) {
+draggedGene = gene;
+draggedGeneSlot = sourceSlot;
+dragSourceIndex = -1; // Not dragging from inventory
+isDragging = false; // Not dragging yet, just pressed
+}
+
+pub bool IsDragging() => isDragging;
+
+void OnGlobalPointerMove(PointerMoveEvent evt) {
+if (dragSourceIndex == -1 && draggedGene == null) return;
+
+if (!isDragging) {
+isDragging = true;
+
+if (draggedGene != null) {
+CreateDragPreviewFromGene(draggedGene);
+OnDragStarted?.Invoke(draggedGene.Category);
+}
+else {
+CreateDragPreview(dragSourceIndex);
+var item = inventory[dragSourceIndex];
+if (item?.OriginalData is GeneBase gene) {
+OnDragStarted?.Invoke(gene.Category);
+}
+else {
+OnDragStarted?.Invoke(null); // Not a gene
+}
+}
+}
+
+if (dragPreview != null) {
+dragPreview.style.left = evt.position.x - 32;
+dragPreview.style.top = evt.position.y - 32;
+}
+}
+
+void OnGlobalPointerUp(PointerUpEvent evt) {
+if (!isDragging || (dragSourceIndex == -1 && draggedGene == null)) {
+dragSourceIndex = -1;
+draggedGene = null;
+draggedGeneSlot = null;
+return;
+}
+
+bool dropHandled = false;
+
+int inventoryDropIndex = GetInventorySlotAtPosition(evt.position);
+if (inventoryDropIndex >= 0) {
+if (dragSourceIndex >= 0 && dragSourceIndex != inventoryDropIndex) {
+OnInventorySwapRequested?.Invoke(dragSourceIndex, inventoryDropIndex);
+dropHandled = true;
+}
+else if (draggedGene != null) {
+if (draggedGeneSlot != null) {
+var background = draggedGeneSlot.Q("background");
+var icon = draggedGeneSlot.Q<Image>("icon");
+var tierLabel = draggedGeneSlot.Q<Label>("tier-label");
+
+if (icon != null) icon.style.display = DisplayStyle.None;
+if (tierLabel != null) tierLabel.text = "";
+if (background != null) {
+background.ClearClassList();
+background.AddToClassList("gene-slot__background");
+}
+}
+
+Debug.Log($"Would add {draggedGene.geneName} to inventory slot {inventoryDropIndex}");
+dropHandled = true;
+}
+}
+
+if (!dropHandled && dragSourceIndex >= 0) {
+var geneSlotDrop = GetGeneSlotAtPosition(evt.position);
+if (geneSlotDrop.slot != null) {
+OnGeneDropRequested?.Invoke(dragSourceIndex, geneSlotDrop.slot, geneSlotDrop.slotType);
+dropHandled = true;
+}
+}
+
+CleanupDrag();
+}
+
+int GetInventorySlotAtPosition(Vector2 screenPos) {
+if (inventorySlots == null) ret -1;
+
+for (int i = 0; i < inventorySlots.Count; i++) {
+var slot = inventorySlots[i];
+if (slot.worldBound.Contains(screenPos)) {
+ret i;
+}
+}
+ret -1;
+}
+
+(VisualElement slot, string slotType) GetGeneSlotAtPosition(Vector2 screenPos) {
+if (seedDropSlotContainer != null && seedDropSlotContainer.childCount > 0) {
+var seedSlot = seedDropSlotContainer.ElementAt(0);
+if (seedSlot.worldBound.Contains(screenPos)) {
+ret (seedSlot, "seed");
+}
+}
+
+if (passiveGenesContainer != null) {
+foreach (var slot in passiveGenesContainer.Children()) {
+if (slot.worldBound.Contains(screenPos)) {
+ret (slot, "passive");
+}
+}
+}
+
+if (activeSequenceContainer != null) {
+foreach (var row in activeSequenceContainer.Children()) {
+int slotIndex = 0;
+foreach (var slot in row.Children()) {
+if (slot.worldBound.Contains(screenPos)) {
+string slotType = slotIndex switch {
+0 => "active",
+1 => "modifier",
+2 => "payload",
+_ => "unknown"
+};
+ret (slot, slotType);
+}
+slotIndex++;
+}
+}
+}
+
+ret (null, null);
+}
+
+void CleanupDrag() {
+if (dragPreview != null) {
+dragPreview.RemoveFromHierarchy();
+dragPreview = null;
+}
+
+if (isDragging) {
+OnDragEnded?.Invoke();
+}
+
+isDragging = false;
+dragSourceIndex = -1;
+draggedGene = null; // FIX #4: Clear gene editor drag state
+draggedGeneSlot = null;
+}
+
+void CreateDragPreview(int index) {
+var item = inventory[index];
+if (item == null) return;
+
+dragPreview = new VisualElement();
+dragPreview.AddToClassList("slot");
+dragPreview.style.position = Position.Absolute;
+dragPreview.style.width = 64;
+dragPreview.style.height = 64;
+dragPreview.pickingMode = PickingMode.Ignore; // Don't interfere with hit detection
+
+var icon = new Image();
+icon.sprite = item.Icon;
+icon.AddToClassList("slot-icon");
+dragPreview.Add(icon);
+
+rootElement.Add(dragPreview);
+}
+
+void CreateDragPreviewFromGene(GeneBase gene) {
+if (gene == null) return;
+
+dragPreview = new VisualElement();
+dragPreview.AddToClassList("slot");
+dragPreview.style.position = Position.Absolute;
+dragPreview.style.width = 64;
+dragPreview.style.height = 64;
+dragPreview.pickingMode = PickingMode.Ignore;
+
+var icon = new Image();
+icon.sprite = gene.icon;
+icon.AddToClassList("slot-icon");
+dragPreview.Add(icon);
+
+rootElement.Add(dragPreview);
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\A_ToolkitUI\UIHotbarController.cs
+
+using UnityEngine.UIElements;
+
+namespace Abracodabra.UI.Toolkit {
+pub cls UIHotbarController {
+ListView hotbarList;
+VisualElement hotbarSelector;
+VisualTreeAsset slotTemplate;
+
+int selectedHotbarIndex = 0;
+
+pub void Initialize(ListView listView, VisualElement selector, VisualTreeAsset template) {
+hotbarList = listView;
+hotbarSelector = selector;
+slotTemplate = template;
+}
+
+pub void SetupHotbar(List<UIInventoryItem> items) {
+if (hotbarList == null) return;
+
+hotbarList.fixedItemHeight = 74;
+hotbarList.selectionType = SelectionType.None;
+hotbarList.itemsSource = items;
+hotbarList.makeItem = () => slotTemplate.Instantiate();
+hotbarList.bindItem = (element, index) => {
+var icon = element.Q<Image>("icon");
+var stack = element.Q<Label>("stack-size");
+
+if (items[index] != null) {
+icon.sprite = items[index].Icon;
+icon.style.display = DisplayStyle.Flex;
+stack.text = items[index].StackSize > 1 ? items[index].StackSize.ToString() : "";
+}
+else {
+icon.style.display = DisplayStyle.None;
+stack.text = "";
+}
+};
+}
+
+pub void HandleInput() {
+if (Input.GetKeyDown(KeyCode.Alpha1)) SelectSlot(0);
+if (Input.GetKeyDown(KeyCode.Alpha2)) SelectSlot(1);
+if (Input.GetKeyDown(KeyCode.Alpha3)) SelectSlot(2);
+if (Input.GetKeyDown(KeyCode.Alpha4)) SelectSlot(3);
+if (Input.GetKeyDown(KeyCode.Alpha5)) SelectSlot(4);
+if (Input.GetKeyDown(KeyCode.Alpha6)) SelectSlot(5);
+if (Input.GetKeyDown(KeyCode.Alpha7)) SelectSlot(6);
+if (Input.GetKeyDown(KeyCode.Alpha8)) SelectSlot(7);
+}
+
+pub void SelectSlot(int index) {
+if (index < 0 || hotbarList == null || index >= hotbarList.itemsSource.Count) return;
+
+selectedHotbarIndex = index;
+
+var selectedSlotElement = hotbarList.Query(className: "slot").AtIndex(selectedHotbarIndex);
+
+if (selectedSlotElement != null) {
+hotbarSelector.style.left = selectedSlotElement.layout.xMin;
+}
+}
+
+pub int GetSelectedIndex() => selectedHotbarIndex;
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\A_ToolkitUI\UIInventoryGridController.cs
+
+using UnityEngine.UIElements;
+
+namespace Abracodabra.UI.Toolkit {
+pub cls UIInventoryGridController {
+pub event Action<int> OnSlotClicked;
+pub event Action<int> OnSlotPointerDown;
+pub event Action<int> OnSlotHoverEnter; // FIX #4: Hover support
+pub event Action OnSlotHoverExit; // FIX #4: Clear on exit
+
+List<UIInventoryItem> inventory;
+List<VisualElement> inventorySlots = new List<VisualElement>();
+int selectedInventoryIndex = -1;
+int lockedSeedIndex = -1;
+
+VisualElement inventoryGrid;
+VisualTreeAsset slotTemplate;
+
+pub void Initialize(VisualElement gridElement, VisualTreeAsset template, List<UIInventoryItem> inventoryData) {
+inventoryGrid = gridElement;
+slotTemplate = template;
+inventory = inventoryData;
+}
+
+pub void PopulateGrid() {
+inventoryGrid.Clear();
+inventorySlots.Clear();
+
+for (int i = 0; i < inventory.Count; i++) {
+var newSlot = slotTemplate.Instantiate();
+newSlot.userData = i;
+
+int slotIndex = i; // Capture for lambda
+newSlot.RegisterCallback<PointerDownEvent>(evt => { OnSlotClicked?.Invoke(slotIndex);
+});
+
+newSlot.RegisterCallback<PointerDownEvent>(evt => { OnSlotPointerDown?.Invoke(slotIndex);
+});
+
+newSlot.RegisterCallback<PointerEnterEvent>(evt => { OnSlotHoverEnter?.Invoke(slotIndex);
+});
+
+newSlot.RegisterCallback<PointerLeaveEvent>(evt => { OnSlotHoverExit?.Invoke();
+});
+
+inventorySlots.Add(newSlot);
+inventoryGrid.Add(newSlot);
+}
+
+RefreshVisuals();
+}
+
+pub void RefreshVisuals() {
+for (int i = 0; i < inventorySlots.Count; i++) {
+var element = inventorySlots[i];
+var item = inventory[i];
+
+var icon = element.Q<Image>("icon");
+var stack = element.Q<Label>("stack-size");
+
+if (item != null) {
+icon.sprite = item.Icon;
+icon.style.display = DisplayStyle.Flex;
+stack.text = item.StackSize > 1 ? item.StackSize.ToString() : "";
+}
+else {
+icon.style.display = DisplayStyle.None;
+stack.text = "";
+}
+
+element.RemoveFromClassList("slot--selected");
+element.RemoveFromClassList("slot--locked-for-editing");
+
+if (i == selectedInventoryIndex) {
+element.AddToClassList("slot--selected");
+}
+if (i == lockedSeedIndex) {
+element.AddToClassList("slot--locked-for-editing");
+}
+}
+}
+
+pub void SetSelectedSlot(int index) {
+if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count) {
+inventorySlots[selectedInventoryIndex].RemoveFromClassList("slot--selected");
+}
+
+selectedInventoryIndex = index;
+
+if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count) {
+inventorySlots[selectedInventoryIndex].AddToClassList("slot--selected");
+}
+}
+
+pub void SetLockedSeedSlot(int index) {
+if (lockedSeedIndex >= 0 && lockedSeedIndex < inventorySlots.Count) {
+inventorySlots[lockedSeedIndex].RemoveFromClassList("slot--locked-for-editing");
+}
+
+lockedSeedIndex = index;
+
+if (lockedSeedIndex >= 0 && lockedSeedIndex < inventorySlots.Count) {
+inventorySlots[lockedSeedIndex].AddToClassList("slot--locked-for-editing");
+}
+}
+
+pub void UpdateIndicesAfterSwap(int fromIndex, int toIndex) {
+if (selectedInventoryIndex == fromIndex)
+selectedInventoryIndex = toIndex;
+else if (selectedInventoryIndex == toIndex)
+selectedInventoryIndex = fromIndex;
+
+if (lockedSeedIndex == fromIndex)
+lockedSeedIndex = toIndex;
+else if (lockedSeedIndex == toIndex)
+lockedSeedIndex = fromIndex;
+}
+
+pub List<VisualElement> GetSlots() => inventorySlots;
+pub int GetSelectedIndex() => selectedInventoryIndex;
+pub int GetLockedSeedIndex() => lockedSeedIndex;
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\A_ToolkitUI\UIInventoryItem.cs
+
+using Abracodabra.Genes.Templates;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Runtime;
+
+namespace Abracodabra.UI.Toolkit {
+pub cls UIInventoryItem {
+pub Sprite Icon { get; }
+pub int StackSize { get; set; } = 1;
+pub object OriginalData { get; }
+pub PlantGeneRuntimeState SeedRuntimeState { get; }
+
+pub UIInventoryItem(object data) {
+OriginalData = data;
+
+if (data is SeedTemplate seed) {
+Icon = seed.icon;
+SeedRuntimeState = seed.CreateRuntimeState();
+}
+else if (data is ToolDefinition tool) {
+Icon = tool.icon;
+}
+else if (data is GeneBase gene) {
+Icon = gene.icon;
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\A_ToolkitUI\UISeedEditorController.cs
+
+using UnityEngine.UIElements;
+using Abracodabra.Genes.Templates;
+using Abracodabra.Genes.Core;
+
+namespace Abracodabra.UI.Toolkit {
+pub cls UISeedEditorController {
+pub event Action<GeneBase, VisualElement> OnGeneSlotPointerDown;
+pub event Action<GeneBase> OnGeneSlotHoverEnter; // FIX #4: Hover support
+pub event Action OnGeneSlotHoverExit; // FIX #4: Clear on exit
+
+VisualElement seedDropSlotContainer;
+VisualElement passiveGenesContainer;
+VisualElement activeSequenceContainer;
+VisualTreeAsset geneSlotTemplate;
+
+pub void Initialize( VisualElement seedContainer, VisualElement passiveContainer, VisualElement activeContainer, VisualTreeAsset slotTemplate) {
+seedDropSlotContainer = seedContainer;
+passiveGenesContainer = passiveContainer;
+activeSequenceContainer = activeContainer;
+geneSlotTemplate = slotTemplate;
+}
+
+pub void DisplaySeed(UIInventoryItem seedItem) {
+if (seedItem == null || seedItem.OriginalData is not SeedTemplate template) {
+Clear();
+return;
+}
+
+seedDropSlotContainer.Clear();
+passiveGenesContainer.Clear();
+activeSequenceContainer.Clear();
+
+var seedSlot = geneSlotTemplate.Instantiate();
+BindGeneSlot(seedSlot, seedItem.OriginalData);
+seedSlot.name = "seed-drop-slot";
+seedDropSlotContainer.Add(seedSlot);
+
+var runtimeState = seedItem.SeedRuntimeState;
+
+for (int i = 0; i < template.passiveSlotCount; i++) {
+var geneInstance = (i < runtimeState.passiveInstances.Count) ? runtimeState.passiveInstances[i] : null;
+var gene = geneInstance?.GetGene();
+
+string labelText = gene != null ? $"T{gene.tier}" : $"P{i+1}";
+var wrappedSlot = CreateGeneSlotWithLabel(gene, labelText);
+wrappedSlot.userData = "passive"; // FIX #2: Mark slot type for drag feedback
+passiveGenesContainer.Add(wrappedSlot);
+}
+
+var headerRow = new VisualElement();
+headerRow.AddToClassList("active-sequence-header");
+
+var activeHeader = new Label("Active");
+activeHeader.style.width = 64;
+activeHeader.style.marginLeft = 2;
+activeHeader.style.marginRight = 2;
+
+var modifierHeader = new Label("Modifier");
+modifierHeader.style.width = 64;
+modifierHeader.style.marginLeft = 2;
+modifierHeader.style.marginRight = 2;
+
+var payloadHeader = new Label("Payload");
+payloadHeader.style.width = 64;
+payloadHeader.style.marginLeft = 2;
+payloadHeader.style.marginRight = 2;
+
+headerRow.Add(activeHeader);
+headerRow.Add(modifierHeader);
+headerRow.Add(payloadHeader);
+activeSequenceContainer.Add(headerRow);
+
+for (int i = 0; i < template.activeSequenceLength; i++) {
+var sequenceRow = new VisualElement();
+sequenceRow.AddToClassList("sequence-row");
+activeSequenceContainer.Add(sequenceRow);
+
+var sequenceData = (i < runtimeState.activeSequence.Count) ? runtimeState.activeSequence[i] : null;
+
+var activeGene = sequenceData?.activeInstance?.GetGene();
+string activeLabel = activeGene != null ? $"T{activeGene.tier}" : $"A{i+1}";
+var activeWrapped = CreateGeneSlotWithLabel(activeGene, activeLabel);
+activeWrapped.userData = "active"; // FIX #2: Mark slot type
+sequenceRow.Add(activeWrapped);
+
+var modifierGene = sequenceData?.modifierInstances.FirstOrDefault()?.GetGene();
+string modifierLabel = modifierGene != null ? $"T{modifierGene.tier}" : $"M{i+1}";
+var modifierWrapped = CreateGeneSlotWithLabel(modifierGene, modifierLabel);
+modifierWrapped.userData = "modifier"; // FIX #2: Mark slot type
+sequenceRow.Add(modifierWrapped);
+
+var payloadGene = sequenceData?.payloadInstances.FirstOrDefault()?.GetGene();
+string payloadLabel = payloadGene != null ? $"T{payloadGene.tier}" : $"P{i+1}";
+var payloadWrapped = CreateGeneSlotWithLabel(payloadGene, payloadLabel);
+payloadWrapped.userData = "payload"; // FIX #2: Mark slot type
+sequenceRow.Add(payloadWrapped);
+}
+}
+
+pub void Clear() {
+seedDropSlotContainer.Clear();
+passiveGenesContainer.Clear();
+activeSequenceContainer.Clear();
+
+var emptySeedSlot = geneSlotTemplate.Instantiate();
+var label = emptySeedSlot.Q<Label>("tier-label");
+if(label != null) {
+label.text = "SEED";
+label.style.display = DisplayStyle.Flex; // Show for empty seed slot
+}
+emptySeedSlot.Q("icon").style.display = DisplayStyle.None;
+emptySeedSlot.AddToClassList("gene-slot--seed");
+emptySeedSlot.name = "seed-drop-slot";
+seedDropSlotContainer.Add(emptySeedSlot);
+}
+
+pub void UpdateGeneSlot(VisualElement slotOrWrapper, GeneBase gene) {
+var slot = slotOrWrapper.ClassListContains("gene-slot")
+? slotOrWrapper
+: slotOrWrapper.Q(className: "gene-slot");
+
+if (slot != null) {
+BindGeneSlot(slot, gene);
+
+if (slotOrWrapper != slot) {
+var label = slotOrWrapper.Q<Label>();
+if (label != null && gene != null) {
+label.text = $"T{gene.tier}";
+}
+}
+}
+}
+
+void BindGeneSlot(VisualElement slot, object data) {
+var background = slot.Q("background");
+var icon = slot.Q<Image>("icon");
+var tierLabel = slot.Q<Label>("tier-label");
+
+background.ClearClassList();
+background.AddToClassList("gene-slot__background");
+
+if (tierLabel != null) {
+tierLabel.style.display = DisplayStyle.None;
+}
+
+if (data == null) {
+icon.style.display = DisplayStyle.None;
+return;
+}
+
+icon.style.display = DisplayStyle.Flex;
+icon.style.width = Length.Percent(100);
+icon.style.height = Length.Percent(100);
+icon.style.position = Position.Absolute;
+icon.style.top = 0;
+icon.style.left = 0;
+icon.scaleMode = ScaleMode.ScaleToFit; // Ensure proper scaling
+
+if (data is GeneBase gene) {
+icon.sprite = gene.icon;
+background.AddToClassList($"gene-slot--{gene.Category.ToString().ToLower()}");
+
+slot.RegisterCallback<PointerDownEvent>(evt => { OnGeneSlotPointerDown?.Invoke(gene, slot);
+});
+
+slot.RegisterCallback<PointerEnterEvent>(evt => { OnGeneSlotHoverEnter?.Invoke(gene);
+});
+
+slot.RegisterCallback<PointerLeaveEvent>(evt => { OnGeneSlotHoverExit?.Invoke();
+});
+}
+else if (data is SeedTemplate seed) {
+icon.sprite = seed.icon;
+background.AddToClassList("gene-slot--seed");
+}
+}
+
+VisualElement CreateGeneSlotWithLabel(object data, string labelText) {
+var wrapper = new VisualElement();
+wrapper.style.flexDirection = FlexDirection.Column;
+wrapper.style.alignItems = Align.Center;
+wrapper.style.marginLeft = 2;
+wrapper.style.marginRight = 2;
+wrapper.style.marginBottom = 5;
+wrapper.style.width = 68; // 64px slot + 2px margin on each side
+wrapper.style.maxWidth = 68;
+wrapper.style.minWidth = 68;
+wrapper.style.flexShrink = 0; // Don't shrink
+wrapper.style.flexGrow = 0; // Don't grow
+
+var slot = geneSlotTemplate.Instantiate();
+BindGeneSlot(slot, data);
+wrapper.Add(slot);
+
+var label = new Label(labelText);
+label.style.fontSize = 9;
+label.style.color = new StyleColor(new Color(0.7f, 0.7f, 0.7f));
+label.style.unityTextAlign = TextAnchor.MiddleCenter;
+label.style.marginTop = 2;
+label.style.maxWidth = 68; // FIX: Constrain label width too
+label.style.overflow = Overflow.Hidden; // FIX: Clip long text
+wrapper.Add(label);
+
+ret wrapper;
+}
+
+pub VisualElement GetSeedContainer() => seedDropSlotContainer;
+pub VisualElement GetPassiveContainer() => passiveGenesContainer;
+pub VisualElement GetActiveContainer() => activeSequenceContainer;
+
+pub void HighlightCompatibleSlots(GeneCategory? draggedCategory) {
+if (draggedCategory == null) return; // Not dragging a gene
+
+foreach (var wrapper in passiveGenesContainer.Children()) {
+var slot = wrapper.Q(className: "gene-slot");
+if (slot != null) {
+if (draggedCategory == GeneCategory.Passive) {
+slot.RemoveFromClassList("gene-slot--incompatible");
+}
+else {
+slot.AddToClassList("gene-slot--incompatible");
+}
+}
+}
+
+foreach (var row in activeSequenceContainer.Children()) {
+if (row.ClassListContains("active-sequence-header")) continue;
+
+int slotIndex = 0;
+foreach (var wrapper in row.Children()) {
+var slot = wrapper.Q(className: "gene-slot");
+if (slot != null) {
+var slotType = wrapper.userData as string;
+bool compatible = slotType switch {
+"active" => draggedCategory == GeneCategory.Active,
+"modifier" => draggedCategory == GeneCategory.Modifier,
+"payload" => draggedCategory == GeneCategory.Payload,
+_ => false
+};
+
+if (compatible) {
+slot.RemoveFromClassList("gene-slot--incompatible");
+}
+else {
+slot.AddToClassList("gene-slot--incompatible");
+}
+}
+slotIndex++;
+}
+}
+}
+
+pub void ClearSlotHighlighting() {
+foreach (var wrapper in passiveGenesContainer.Children()) {
+var slot = wrapper.Q(className: "gene-slot");
+slot?.RemoveFromClassList("gene-slot--incompatible");
+}
+
+foreach (var row in activeSequenceContainer.Children()) {
+if (row.ClassListContains("active-sequence-header")) continue;
+
+foreach (var wrapper in row.Children()) {
+var slot = wrapper.Q(className: "gene-slot");
+slot?.RemoveFromClassList("gene-slot--incompatible");
+}
+}
+}
+}
+}
+
+////////////////////////////////////////////////////////////
+// Assets\Scripts\A_ToolkitUI\UISpecSheetController.cs
+
+using UnityEngine.UIElements;
+using Abracodabra.Genes.Templates;
+using Abracodabra.Genes.Core;
+using Abracodabra.UI.Tooltips;
+
+namespace Abracodabra.UI.Toolkit {
+pub cls UISpecSheetController {
+Image seedIcon;
+Label seedNameText, qualityText, descriptionText;
+Label maturityTimeText, energyBalanceText, yieldText, cycleTimeText;
+VisualElement attributeContainer, sequenceContainer, synergiesContainer, warningsContainer;
+
+pub void Initialize(VisualElement specSheetPanel) {
+seedIcon = specSheetPanel.Q<Image>("seed-icon");
+seedNameText = specSheetPanel.Q<Label>("seed-name-text");
+qualityText = specSheetPanel.Q<Label>("quality-text");
+descriptionText = specSheetPanel.Q<Label>("description-text");
+maturityTimeText = specSheetPanel.Q<Label>("maturity-time-text");
+energyBalanceText = specSheetPanel.Q<Label>("energy-balance-text");
+yieldText = specSheetPanel.Q<Label>("yield-text");
+cycleTimeText = specSheetPanel.Q<Label>("cycle-time-text");
+attributeContainer = specSheetPanel.Q<VisualElement>("attribute-breakdown-container");
+sequenceContainer = specSheetPanel.Q<VisualElement>("sequence-breakdown-container");
+synergiesContainer = specSheetPanel.Q<VisualElement>("synergies-container");
+warningsContainer = specSheetPanel.Q<VisualElement>("warnings-container");
+}
+
+pub void DisplayItem(UIInventoryItem item) {
+if (item == null) {
+Clear();
+return;
+}
+
+if (item.OriginalData is SeedTemplate seedTemplate) {
+DisplaySeed(item, seedTemplate);
+}
+else if (item.OriginalData is GeneBase gene) {
+DisplayGene(gene);
+}
+else if (item.OriginalData is ToolDefinition tool) {
+DisplayTool(tool);
+}
+else {
+Clear();
+}
+}
+
+void DisplaySeed(UIInventoryItem item, SeedTemplate seedTemplate) {
+var data = SeedTooltipData.CreateFromSeed(seedTemplate, item.SeedRuntimeState);
+if (data == null) {
+Clear();
+return;
+}
+
+seedIcon.sprite = item.Icon;
+seedNameText.text = data.seedName;
+qualityText.text = SeedQualityCalculator.GetQualityDescription(data.qualityTier);
+qualityText.style.color = SeedQualityCalculator.GetQualityColor(data.qualityTier);
+descriptionText.text = seedTemplate.description;
+
+maturityTimeText.text = $"Maturity: {data.estimatedMaturityTicks:F0} ticks";
+energyBalanceText.text = $"Energy Balance: {data.energySurplusPerCycle:F1} E/cycle";
+yieldText.text = $"Primary Yield: {data.primaryYieldSummary}";
+
+attributeContainer.Clear();
+CreateAttributeDisplay("Growth", data.growthSpeedMultiplier);
+CreateAttributeDisplay("Storage", data.energyStorageMultiplier);
+CreateAttributeDisplay("Generation", data.energyGenerationMultiplier);
+CreateAttributeDisplay("Yield", data.fruitYieldMultiplier);
+CreateAttributeDisplay("Defense", data.defenseMultiplier);
+
+cycleTimeText.text = $"Cycle Time: {data.totalCycleTime} ticks";
+sequenceContainer.Clear();
+foreach (var slot in data.sequenceSlots) {
+var label = new Label($"A{slot.position}: {slot.actionName} ({slot.modifiedCost:F0}E)");
+sequenceContainer.Add(label);
+}
+
+synergiesContainer.Clear();
+warningsContainer.Clear();
+foreach(var synergy in data.synergies) {
+var label = new Label($"✓ {synergy}");
+label.style.color = new StyleColor(new Color(0.5f, 1f, 0.5f));
+synergiesContainer.Add(label);
+}
+foreach(var warning in data.warnings) {
+var label = new Label($"⚠ {warning}");
+label.style.color = new StyleColor(new Color(1f, 0.8f, 0.5f));
+warningsContainer.Add(label);
+}
+}
+
+pub void DisplayGene(GeneBase gene) {
+seedIcon.sprite = gene.icon;
+seedNameText.text = gene.geneName;
+qualityText.text = $"Tier {gene.tier} {gene.Category}";
+qualityText.style.color = Color.cyan;
+descriptionText.text = gene.description;
+
+maturityTimeText.text = "";
+energyBalanceText.text = "";
+yieldText.text = "";
+cycleTimeText.text = "";
+
+attributeContainer.Clear();
+sequenceContainer.Clear();
+synergiesContainer.Clear();
+warningsContainer.Clear();
+
+var categoryLabel = new Label($"Category: {gene.Category}");
+attributeContainer.Add(categoryLabel);
+
+var tierLabel = new Label($"Tier: {gene.tier}");
+attributeContainer.Add(tierLabel);
+}
+
+void DisplayTool(ToolDefinition tool) {
+seedIcon.sprite = tool.icon;
+seedNameText.text = tool.displayName;
+qualityText.text = "Tool";
+qualityText.style.color = Color.white;
+descriptionText.text = tool.GetTooltipDescription();
+
+maturityTimeText.text = "";
+energyBalanceText.text = "";
+yieldText.text = "";
+cycleTimeText.text = "";
+
+attributeContainer.Clear();
+sequenceContainer.Clear();
+synergiesContainer.Clear();
+warningsContainer.Clear();
+
+var typeLabel = new Label($"Tool Type: {tool.toolType}");
+attributeContainer.Add(typeLabel);
+}
+
+pub void Clear() {
+seedNameText.text = "Select an Item";
+qualityText.text = "Awaiting Selection...";
+qualityText.style.color = Color.gray;
+descriptionText.text = "Select an item from the inventory to see its details.";
+seedIcon.sprite = null;
+maturityTimeText.text = "";
+energyBalanceText.text = "";
+yieldText.text = "";
+cycleTimeText.text = "";
+attributeContainer.Clear();
+sequenceContainer.Clear();
+synergiesContainer.Clear();
+warningsContainer.Clear();
+}
+
+void CreateAttributeDisplay(string label, float value) {
+var labelElement = new Label($"{label}: {value:F2}x");
+labelElement.style.fontSize = 13;
+attributeContainer.Add(labelElement);
+}
+}
+}
+
+////////////////////////////////////////////////////////////
 // Assets\Scripts\UI\_UGUI_Legacy\EnhancedTooltipTrigger.cs
 
 ﻿using UnityEngine;
@@ -3621,35 +4534,11 @@ default: ret Color.grey;
 ////////////////////////////////////////////////////////////
 // Assets\Scripts\A_ToolkitUI\GameUIManager.cs
 
-﻿using System.Collections.Generic;
 using UnityEngine.UIElements;
 using WegoSystem;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Runtime;
-using Abracodabra.UI.Genes;
-using Abracodabra.UI.Tooltips;
-
-pub cls UIInventoryItem {
-pub Sprite Icon { get; }
-pub int StackSize { get; set; } = 1;
-pub object OriginalData { get; }
-pub PlantGeneRuntimeState SeedRuntimeState { get; }
-
-pub UIInventoryItem(object data) {
-OriginalData = data;
-if (data is SeedTemplate seed) {
-Icon = seed.icon;
-SeedRuntimeState = seed.CreateRuntimeState();
-}
-else if (data is ToolDefinition tool) {
-Icon = tool.icon;
-}
-else if (data is GeneBase gene) {
-Icon = gene.icon;
-}
-}
-}
+using Abracodabra.UI.Toolkit;
 
 pub cls GameUIManager : MonoBehaviour {
 [SerializeField] VisualTreeAsset inventorySlotTemplate;
@@ -3657,24 +4546,25 @@ pub cls GameUIManager : MonoBehaviour {
 
 [SerializeField] StartingInventory startingInventory;
 
+[SerializeField] int inventoryRows = 4;
+
+[SerializeField] int inventoryColumns = 6;
+
+[SerializeField] bool enableDynamicResizing = true;
+
 List<UIInventoryItem> playerInventory = new List<UIInventoryItem>();
-List<VisualElement> inventorySlots = new List<VisualElement>();
+int selectedInventoryIndex = -1; // FIX #4: Track selected item for hover fallback
 
+UIInventoryGridController inventoryController;
+UIDragDropController dragDropController;
+UISeedEditorController seedEditorController;
+UISpecSheetController specSheetController;
+UIHotbarController hotbarController;
+
+VisualElement rootElement;
 VisualElement planningPanel, hudPanel;
-VisualElement inventoryGrid;
-ListView hotbarList;
-VisualElement hotbarSelector;
-VisualElement seedEditorPanel, seedSpecSheetPanel;
-VisualElement seedDropSlotContainer, passiveGenesContainer, activeSequenceContainer;
-Image seedIcon;
-Label seedNameText, qualityText, descriptionText;
-Label maturityTimeText, energyBalanceText, yieldText;
-VisualElement attributeContainer, sequenceContainer, synergiesContainer, warningsContainer;
-Label cycleTimeText;
 
-int selectedHotbarIndex = 0;
-int selectedInventoryIndex = -1;
-UIInventoryItem currentlyEditingSeed;
+int TotalInventorySlots => inventoryRows * inventoryColumns;
 
 void Start() {
 if (inventorySlotTemplate == null || geneSlotTemplate == null) {
@@ -3683,34 +4573,21 @@ this.enabled = false;
 return;
 }
 
-var root = GetComponent<UIDocument>().rootVisualElement;
+rootElement = GetComponent<UIDocument>().rootVisualElement;
 
-planningPanel = root.Q<VisualElement>("PlanningPanel");
-hudPanel = root.Q<VisualElement>("HUDPanel");
-inventoryGrid = root.Q<VisualElement>("inventory-grid");
-hotbarList = root.Q<ListView>("hotbar-list");
-hotbarSelector = root.Q<VisualElement>("hotbar-selector");
-seedEditorPanel = root.Q<VisualElement>("SeedEditorPanel");
-seedDropSlotContainer = root.Q<VisualElement>("seed-drop-slot-container");
-passiveGenesContainer = root.Q<VisualElement>("passive-genes-container");
-activeSequenceContainer = root.Q<VisualElement>("active-sequence-container");
-seedSpecSheetPanel = root.Q<VisualElement>("SeedSpecSheetPanel");
-seedIcon = seedSpecSheetPanel.Q<Image>("seed-icon");
-seedNameText = seedSpecSheetPanel.Q<Label>("seed-name-text");
-qualityText = seedSpecSheetPanel.Q<Label>("quality-text");
-descriptionText = seedSpecSheetPanel.Q<Label>("description-text");
-maturityTimeText = seedSpecSheetPanel.Q<Label>("maturity-time-text");
-energyBalanceText = seedSpecSheetPanel.Q<Label>("energy-balance-text");
-yieldText = seedSpecSheetPanel.Q<Label>("yield-text");
-attributeContainer = seedSpecSheetPanel.Q<VisualElement>("attribute-breakdown-container");
-sequenceContainer = seedSpecSheetPanel.Q<VisualElement>("sequence-breakdown-container");
-synergiesContainer = seedSpecSheetPanel.Q<VisualElement>("synergies-container");
-warningsContainer = seedSpecSheetPanel.Q<VisualElement>("warnings-container");
-cycleTimeText = seedSpecSheetPanel.Q<Label>("cycle-time-text");
+planningPanel = rootElement.Q<VisualElement>("PlanningPanel");
+hudPanel = rootElement.Q<VisualElement>("HUDPanel");
 
 SetupPlayerInventory();
-PopulateInventoryGrid();
-SetupHotbarListView(hotbarList, playerInventory.Take(8).ToList());
+
+InitializeControllers();
+
+SubscribeToEvents();
+
+inventoryController.PopulateGrid();
+hotbarController.SetupHotbar(playerInventory.Take(8).ToList());
+seedEditorController.Clear();
+specSheetController.Clear();
 
 if (RunManager.Instance != null) {
 RunManager.Instance.OnRunStateChanged += HandleRunStateChanged;
@@ -3720,296 +4597,285 @@ else {
 ShowPlanningUI();
 }
 
-ClearSeedEditor();
-ClearSpecSheet();
-root.schedule.Execute(() => SelectHotbarSlot(0)).StartingIn(10);
+rootElement.schedule.Execute(() => hotbarController.SelectSlot(0)).StartingIn(10);
 }
 
 void Update() {
-HandleHotbarInput();
+hotbarController.HandleInput();
 }
 
-void PopulateInventoryGrid() {
-inventoryGrid.Clear();
-inventorySlots.Clear();
+void InitializeControllers() {
+var inventoryPanel = rootElement.Q<VisualElement>("InventoryPanel");
+var geneEditorPanel = rootElement.Q<VisualElement>("SeedEditorPanel");
+var inventoryGridElement = rootElement.Q<VisualElement>("inventory-grid");
 
-for (int i = 0; i < playerInventory.Count; i++) {
-var newSlot = inventorySlotTemplate.Instantiate();
-newSlot.userData = i;
+Debug.Log($"[GameUIManager] === PANEL SIZING MODE: {(enableDynamicResizing ? "DYNAMIC" : "FIXED")} ===");
 
-newSlot.RegisterCallback<PointerDownEvent>(evt => { int index = (int)(evt.currentTarget as VisualElement).userData;
-SelectInventorySlot(index);
-});
+if (enableDynamicResizing) {
 
-inventorySlots.Add(newSlot);
-inventoryGrid.Add(newSlot);
-}
-RefreshInventoryVisuals();
-}
+int slotWidth = 64;
+int slotMarginLeft = 5;
+int slotMarginRight = 5;
+int totalSpacePerSlot = slotWidth + slotMarginLeft + slotMarginRight; // 74px
 
-void RefreshInventoryVisuals() {
-for (int i = 0; i < inventorySlots.Count; i++) {
-var element = inventorySlots[i];
-var item = playerInventory[i];
+int gridWidth = inventoryColumns * totalSpacePerSlot;
+int panelPaddingLeft = 15;
+int panelPaddingRight = 15;
+int totalPanelPadding = panelPaddingLeft + panelPaddingRight;
+int panelWidth = gridWidth + totalPanelPadding;
 
-var icon = element.Q<Image>("icon");
-var stack = element.Q<Label>("stack-size");
+Debug.Log($"[GameUIManager] Dynamic mode: {inventoryColumns} columns × {totalSpacePerSlot}px = {gridWidth}px grid + {totalPanelPadding}px padding = {panelWidth}px inventory panel");
 
-if (item != null) {
-icon.sprite = item.Icon;
-icon.style.display = DisplayStyle.Flex;
-stack.text = item.StackSize > 1 ? item.StackSize.ToString() : "";
-}
-else {
-icon.style.display = DisplayStyle.None;
-stack.text = "";
-}
-}
+if (inventoryPanel != null) {
+inventoryPanel.style.width = panelWidth;
+inventoryPanel.style.minWidth = panelWidth;
+inventoryPanel.style.maxWidth = panelWidth;
+inventoryPanel.style.flexGrow = 0;
+inventoryPanel.style.flexShrink = 0;
+Debug.Log($"[GameUIManager] ✓ Inventory panel: {panelWidth}px (fixed)");
 }
 
-void SelectInventorySlot(int index) {
-if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count) {
-inventorySlots[selectedInventoryIndex].RemoveFromClassList("slot--selected");
+if (geneEditorPanel != null) {
+geneEditorPanel.style.width = StyleKeyword.Null; // Clear any width
+geneEditorPanel.style.minWidth = StyleKeyword.Null; // Clear min
+geneEditorPanel.style.maxWidth = StyleKeyword.Null; // Clear max
+geneEditorPanel.style.flexGrow = 1; // Fill remaining space
+geneEditorPanel.style.flexShrink = 0; // Don't shrink
+geneEditorPanel.style.flexBasis = StyleKeyword.Auto; // Use content as basis
+Debug.Log($"[GameUIManager] ✓ Gene editor: flex-grow (fills remaining space)");
 }
 
-selectedInventoryIndex = index;
-
-if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count) {
-inventorySlots[selectedInventoryIndex].AddToClassList("slot--selected");
-var selectedItem = playerInventory[selectedInventoryIndex];
-
-UpdateSpecSheet(selectedItem);
-
-if (selectedItem?.OriginalData is SeedTemplate) {
-SetEditingSeed(selectedItem);
-}
-else {
-ClearSeedEditor();
+if (inventoryGridElement != null) {
+inventoryGridElement.style.width = gridWidth;
+inventoryGridElement.style.minWidth = gridWidth;
+inventoryGridElement.style.maxWidth = gridWidth;
+inventoryGridElement.style.flexShrink = 0;
+inventoryGridElement.style.flexGrow = 0;
+inventoryGridElement.style.marginLeft = StyleKeyword.Auto;
+inventoryGridElement.style.marginRight = StyleKeyword.Auto;
+inventoryGridElement.style.alignSelf = Align.Center;
+Debug.Log($"[GameUIManager] ✓ Grid width: {gridWidth}px (centered)");
 }
 }
 else {
-UpdateSpecSheet(null);
-ClearSeedEditor();
+
+Debug.Log($"[GameUIManager] Fixed mode: Panels split screen equally");
+
+if (inventoryPanel != null) {
+inventoryPanel.style.width = StyleKeyword.Null; // Clear any width
+inventoryPanel.style.minWidth = StyleKeyword.Null; // Clear min
+inventoryPanel.style.maxWidth = StyleKeyword.Null; // Clear max
+inventoryPanel.style.flexGrow = 1; // Fill available space
+inventoryPanel.style.flexShrink = 0; // Don't shrink
+inventoryPanel.style.flexBasis = StyleKeyword.Auto; // Use content as basis
+Debug.Log($"[GameUIManager] ✓ Inventory panel: flex-grow (fills space)");
+}
+
+if (geneEditorPanel != null) {
+geneEditorPanel.style.width = StyleKeyword.Null; // Clear any width
+geneEditorPanel.style.minWidth = StyleKeyword.Null; // Clear min
+geneEditorPanel.style.maxWidth = StyleKeyword.Null; // Clear max
+geneEditorPanel.style.flexGrow = 1; // Fill available space
+geneEditorPanel.style.flexShrink = 0; // Don't shrink
+geneEditorPanel.style.flexBasis = StyleKeyword.Auto; // Use content as basis
+Debug.Log($"[GameUIManager] ✓ Gene editor: flex-grow (fills space)");
+}
+
+if (inventoryGridElement != null) {
+int gridWidth = inventoryColumns * 74;
+inventoryGridElement.style.width = gridWidth;
+inventoryGridElement.style.flexShrink = 0;
+inventoryGridElement.style.flexGrow = 0;
+inventoryGridElement.style.marginLeft = 0;
+inventoryGridElement.style.marginRight = 0;
+inventoryGridElement.style.alignSelf = Align.FlexStart;
+Debug.Log($"[GameUIManager] ✓ Grid width: {gridWidth}px (left-aligned in auto panel)");
 }
 }
 
-void SetEditingSeed(UIInventoryItem seedItem) {
-currentlyEditingSeed = seedItem;
-DisplaySeedInEditor(seedItem);
+Debug.Log($"[GameUIManager] === PANEL SIZING COMPLETE ===");
+
+inventoryController = new UIInventoryGridController();
+inventoryController.Initialize(
+inventoryGridElement,
+inventorySlotTemplate,
+playerInventory
+);
+
+dragDropController = new UIDragDropController();
+dragDropController.Initialize(rootElement, playerInventory);
+
+seedEditorController = new UISeedEditorController();
+seedEditorController.Initialize(
+rootElement.Q<VisualElement>("seed-drop-slot-container"),
+rootElement.Q<VisualElement>("passive-genes-container"),
+rootElement.Q<VisualElement>("active-sequence-container"),
+geneSlotTemplate
+);
+
+specSheetController = new UISpecSheetController();
+specSheetController.Initialize(rootElement.Q<VisualElement>("SeedSpecSheetPanel"));
+
+hotbarController = new UIHotbarController();
+hotbarController.Initialize(
+rootElement.Q<ListView>("hotbar-list"),
+rootElement.Q<VisualElement>("hotbar-selector"),
+inventorySlotTemplate
+);
 }
 
-void ClearSeedEditor() {
-currentlyEditingSeed = null;
-seedDropSlotContainer.Clear();
-passiveGenesContainer.Clear();
-activeSequenceContainer.Clear();
+void SubscribeToEvents() {
+inventoryController.OnSlotClicked += HandleSlotClicked;
+inventoryController.OnSlotPointerDown += HandleSlotPointerDown;
+inventoryController.OnSlotHoverEnter += HandleInventoryHover; // FIX #4
+inventoryController.OnSlotHoverExit += HandleHoverExit; // FIX #4
 
-var emptySeedSlot = geneSlotTemplate.Instantiate();
-var label = emptySeedSlot.Q<Label>("tier-label");
-if(label != null) label.text = "SEED";
-emptySeedSlot.Q("icon").style.display = DisplayStyle.None;
-emptySeedSlot.AddToClassList("gene-slot--seed");
-emptySeedSlot.name = "seed-drop-slot";
-seedDropSlotContainer.Add(emptySeedSlot);
-}
+dragDropController.OnInventorySwapRequested += HandleInventorySwap;
+dragDropController.OnGeneDropRequested += HandleGeneDrop;
+dragDropController.OnDragStarted += HandleDragStarted; // FIX #2
+dragDropController.OnDragEnded += HandleDragEnded; // FIX #2
 
-void DisplaySeedInEditor(UIInventoryItem seedItem) {
-if (seedItem == null || seedItem.OriginalData is not SeedTemplate template) {
-ClearSeedEditor();
-return;
-}
-
-seedDropSlotContainer.Clear();
-passiveGenesContainer.Clear();
-activeSequenceContainer.Clear();
-
-var seedSlot = geneSlotTemplate.Instantiate();
-BindGeneSlot(seedSlot, seedItem.OriginalData);
-seedDropSlotContainer.Add(seedSlot);
-
-var runtimeState = seedItem.SeedRuntimeState;
-
-for (int i = 0; i < template.passiveSlotCount; i++) {
-var passiveSlot = geneSlotTemplate.Instantiate();
-var geneInstance = (i < runtimeState.passiveInstances.Count) ? runtimeState.passiveInstances[i] : null;
-BindGeneSlot(passiveSlot, geneInstance?.GetGene());
-passiveGenesContainer.Add(passiveSlot);
-}
-
-for (int i = 0; i < template.activeSequenceLength; i++) {
-var sequenceRow = new VisualElement();
-sequenceRow.AddToClassList("sequence-row");
-activeSequenceContainer.Add(sequenceRow);
-
-var sequenceData = (i < runtimeState.activeSequence.Count) ? runtimeState.activeSequence[i] : null;
-
-var activeSlot = geneSlotTemplate.Instantiate();
-BindGeneSlot(activeSlot, sequenceData?.activeInstance?.GetGene());
-sequenceRow.Add(activeSlot);
-
-var modifierSlot = geneSlotTemplate.Instantiate();
-var payloadSlot = geneSlotTemplate.Instantiate();
-BindGeneSlot(modifierSlot, sequenceData?.modifierInstances.FirstOrDefault()?.GetGene());
-BindGeneSlot(payloadSlot, sequenceData?.payloadInstances.FirstOrDefault()?.GetGene());
-sequenceRow.Add(modifierSlot);
-sequenceRow.Add(payloadSlot);
-}
-}
-
-void BindGeneSlot(VisualElement slot, object data) {
-var background = slot.Q("background");
-var icon = slot.Q<Image>("icon");
-var tierLabel = slot.Q<Label>("tier-label");
-
-background.ClearClassList();
-background.AddToClassList("gene-slot__background");
-
-if (data == null) {
-icon.style.display = DisplayStyle.None;
-tierLabel.text = "";
-return;
-}
-
-icon.style.display = DisplayStyle.Flex;
-
-if (data is GeneBase gene) {
-icon.sprite = gene.icon;
-tierLabel.text = $"T{gene.tier}";
-background.AddToClassList($"gene-slot--{gene.Category.ToString().ToLower()}");
-}
-else if (data is SeedTemplate seed) {
-icon.sprite = seed.icon;
-tierLabel.text = "SEED";
-background.AddToClassList("gene-slot--seed");
-}
-}
-
-void UpdateSpecSheet(UIInventoryItem item) {
-if (item == null || item.OriginalData is not SeedTemplate seedTemplate) {
-ClearSpecSheet();
-return;
-}
-
-var data = SeedTooltipData.CreateFromSeed(seedTemplate, item.SeedRuntimeState);
-if (data == null) {
-ClearSpecSheet();
-return;
-}
-
-seedIcon.sprite = item.Icon;
-seedNameText.text = data.seedName;
-qualityText.text = SeedQualityCalculator.GetQualityDescription(data.qualityTier);
-qualityText.style.color = SeedQualityCalculator.GetQualityColor(data.qualityTier);
-descriptionText.text = seedTemplate.description;
-
-maturityTimeText.text = $"Maturity: {data.estimatedMaturityTicks:F0} ticks";
-energyBalanceText.text = $"Energy Balance: {data.energySurplusPerCycle:F1} E/cycle";
-yieldText.text = $"Primary Yield: {data.primaryYieldSummary}";
-
-attributeContainer.Clear();
-CreateAttributeDisplay("Growth", data.growthSpeedMultiplier);
-CreateAttributeDisplay("Storage", data.energyStorageMultiplier);
-CreateAttributeDisplay("Generation", data.energyGenerationMultiplier);
-CreateAttributeDisplay("Yield", data.fruitYieldMultiplier);
-CreateAttributeDisplay("Defense", data.defenseMultiplier);
-
-cycleTimeText.text = $"Cycle Time: {data.totalCycleTime} ticks";
-sequenceContainer.Clear();
-foreach (var slot in data.sequenceSlots) {
-var label = new Label($"A{slot.position}: {slot.actionName} ({slot.modifiedCost:F0}E)");
-sequenceContainer.Add(label);
-}
-
-synergiesContainer.Clear();
-warningsContainer.Clear();
-foreach(var synergy in data.synergies) {
-var label = new Label($"✓ {synergy}");
-label.style.color = new StyleColor(new Color(0.5f, 1f, 0.5f));
-synergiesContainer.Add(label);
-}
-foreach(var warning in data.warnings) {
-var label = new Label($"⚠ {warning}");
-label.style.color = new StyleColor(new Color(1f, 0.8f, 0.5f));
-warningsContainer.Add(label);
-}
-}
-
-void ClearSpecSheet() {
-seedNameText.text = "Select a Seed";
-qualityText.text = "Awaiting Analysis...";
-qualityText.style.color = Color.gray;
-descriptionText.text = "Select an item from the inventory to see its details.";
-seedIcon.sprite = null;
-maturityTimeText.text = "Maturity: --";
-energyBalanceText.text = "Energy Balance: --";
-yieldText.text = "Primary Yield: --";
-attributeContainer.Clear();
-sequenceContainer.Clear();
-synergiesContainer.Clear();
-warningsContainer.Clear();
-}
-
-void CreateAttributeDisplay(string label, float value) {
-var labelElement = new Label($"{label}: {value:F2}x");
-labelElement.style.fontSize = 13;
-attributeContainer.Add(labelElement);
+seedEditorController.OnGeneSlotPointerDown += HandleGeneSlotPointerDown;
+seedEditorController.OnGeneSlotHoverEnter += HandleGeneHover; // FIX #4
+seedEditorController.OnGeneSlotHoverExit += HandleHoverExit; // FIX #4
 }
 
 void SetupPlayerInventory() {
 playerInventory.Clear();
 if (startingInventory == null) return;
 
-foreach (var tool in startingInventory.startingTools) if (tool != null) playerInventory.Add(new UIInventoryItem(tool));
-foreach (var seed in startingInventory.startingSeeds) if (seed != null) playerInventory.Add(new UIInventoryItem(seed));
-foreach (var gene in startingInventory.startingGenes) if (gene != null) playerInventory.Add(new UIInventoryItem(gene));
+foreach (var tool in startingInventory.startingTools)
+if (tool != null) playerInventory.Add(new UIInventoryItem(tool));
 
-while (playerInventory.Count < 24) {
+foreach (var seed in startingInventory.startingSeeds)
+if (seed != null) playerInventory.Add(new UIInventoryItem(seed));
+
+foreach (var gene in startingInventory.startingGenes)
+if (gene != null) playerInventory.Add(new UIInventoryItem(gene));
+
+while (playerInventory.Count < TotalInventorySlots) {
 playerInventory.Add(null);
 }
+
+if (playerInventory.Count > TotalInventorySlots) {
+Debug.LogWarning($"[GameUIManager] Starting inventory has {playerInventory.Count} items but only {TotalInventorySlots} slots configured ({inventoryRows}x{inventoryColumns}). Extra items will be truncated.");
+playerInventory = playerInventory.Take(TotalInventorySlots).ToList();
+}
 }
 
-void SetupHotbarListView(ListView listView, List<UIInventoryItem> itemList) {
-if (listView == null) return;
-listView.fixedItemHeight = 74;
-listView.selectionType = SelectionType.None;
-listView.itemsSource = itemList;
-listView.makeItem = () => inventorySlotTemplate.Instantiate();
-listView.bindItem = (element, index) => {
-var icon = element.Q<Image>("icon");
-var stack = element.Q<Label>("stack-size");
+void HandleSlotClicked(int index) {
+if (dragDropController.IsDragging()) return;
 
-if (itemList[index] != null) {
-icon.sprite = itemList[index].Icon;
-icon.style.display = DisplayStyle.Flex;
-stack.text = itemList[index].StackSize > 1 ? itemList[index].StackSize.ToString() : "";
+selectedInventoryIndex = index;
+
+inventoryController.SetSelectedSlot(index);
+
+var selectedItem = playerInventory[index];
+
+specSheetController.DisplayItem(selectedItem);
+
+if (selectedItem?.OriginalData is SeedTemplate) {
+inventoryController.SetLockedSeedSlot(index);
+seedEditorController.DisplaySeed(selectedItem);
+
+dragDropController.SetGeneEditorSlots(
+seedEditorController.GetSeedContainer(),
+seedEditorController.GetPassiveContainer(),
+seedEditorController.GetActiveContainer()
+);
+}
+}
+
+void HandleSlotPointerDown(int index) {
+dragDropController.StartDrag(index);
+
+dragDropController.SetInventorySlots(inventoryController.GetSlots());
+}
+
+void HandleGeneSlotPointerDown(GeneBase gene, VisualElement slot) {
+if (gene == null) return; // Can't drag empty slots
+
+dragDropController.StartDragFromGeneEditor(gene, slot);
+
+dragDropController.SetInventorySlots(inventoryController.GetSlots());
+}
+
+void HandleInventoryHover(int index) {
+if (dragDropController.IsDragging()) return; // Don't show tooltip while dragging
+
+var item = playerInventory[index];
+if (item != null) {
+specSheetController.DisplayItem(item);
+}
+}
+
+void HandleGeneHover(GeneBase gene) {
+if (dragDropController.IsDragging()) return; // Don't show tooltip while dragging
+
+if (gene != null) {
+specSheetController.DisplayGene(gene);
+}
+}
+
+void HandleHoverExit() {
+if (selectedInventoryIndex >= 0 && selectedInventoryIndex < playerInventory.Count) {
+var selectedItem = playerInventory[selectedInventoryIndex];
+specSheetController.DisplayItem(selectedItem);
+}
+}
+
+void HandleDragStarted(GeneCategory? category) {
+seedEditorController.HighlightCompatibleSlots(category);
+}
+
+void HandleDragEnded() {
+seedEditorController.ClearSlotHighlighting();
+}
+
+void HandleInventorySwap(int fromIndex, int toIndex) {
+var temp = playerInventory[fromIndex];
+playerInventory[fromIndex] = playerInventory[toIndex];
+playerInventory[toIndex] = temp;
+
+inventoryController.UpdateIndicesAfterSwap(fromIndex, toIndex);
+
+inventoryController.RefreshVisuals();
+}
+
+void HandleGeneDrop(int dragSourceIndex, VisualElement targetSlot, string slotType) {
+var draggedItem = playerInventory[dragSourceIndex];
+if (draggedItem == null) return;
+
+bool validDrop = false;
+
+if (draggedItem.OriginalData is GeneBase gene) {
+validDrop = slotType switch {
+"passive" => gene.Category == GeneCategory.Passive,
+"active" => gene.Category == GeneCategory.Active,
+"modifier" => gene.Category == GeneCategory.Modifier,
+"payload" => gene.Category == GeneCategory.Payload,
+_ => false
+};
+
+if (validDrop) {
+Debug.Log($"Inserting {gene.geneName} into {slotType} slot");
+seedEditorController.UpdateGeneSlot(targetSlot, gene);
 }
 else {
-icon.style.display = DisplayStyle.None;
-stack.text = "";
+Debug.Log($"Invalid drop: {gene.Category} gene cannot go in {slotType} slot");
 }
-};
 }
+else if (draggedItem.OriginalData is SeedTemplate && slotType == "seed") {
+inventoryController.SetLockedSeedSlot(dragSourceIndex);
+seedEditorController.DisplaySeed(draggedItem);
 
-void HandleHotbarInput() {
-if (Input.GetKeyDown(KeyCode.Alpha1)) SelectHotbarSlot(0);
-if (Input.GetKeyDown(KeyCode.Alpha2)) SelectHotbarSlot(1);
-if (Input.GetKeyDown(KeyCode.Alpha3)) SelectHotbarSlot(2);
-if (Input.GetKeyDown(KeyCode.Alpha4)) SelectHotbarSlot(3);
-if (Input.GetKeyDown(KeyCode.Alpha5)) SelectHotbarSlot(4);
-if (Input.GetKeyDown(KeyCode.Alpha6)) SelectHotbarSlot(5);
-if (Input.GetKeyDown(KeyCode.Alpha7)) SelectHotbarSlot(6);
-if (Input.GetKeyDown(KeyCode.Alpha8)) SelectHotbarSlot(7);
-}
+dragDropController.SetGeneEditorSlots(
+seedEditorController.GetSeedContainer(),
+seedEditorController.GetPassiveContainer(),
+seedEditorController.GetActiveContainer()
+);
 
-void SelectHotbarSlot(int index) {
-if (index < 0 || hotbarList == null || index >= hotbarList.itemsSource.Count) return;
-
-selectedHotbarIndex = index;
-
-var selectedSlotElement = hotbarList.Query(className: "slot").AtIndex(selectedHotbarIndex);
-
-if (selectedSlotElement != null) {
-hotbarSelector.style.left = selectedSlotElement.layout.xMin;
+validDrop = true;
 }
 }
 

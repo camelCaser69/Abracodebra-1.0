@@ -25,10 +25,14 @@ public class GameUIManager : MonoBehaviour
     
     [Tooltip("Number of columns in the inventory grid")]
     [SerializeField] private int inventoryColumns = 6;
+    
+    [Header("Panel Sizing")]
+    [Tooltip("Enable dynamic panel resizing based on inventory columns. When disabled, panels split screen equally.")]
+    [SerializeField] private bool enableDynamicResizing = true;
 
     // Shared inventory data
     private List<UIInventoryItem> playerInventory = new List<UIInventoryItem>();
-    private int selectedInventoryIndex = -1; // FIX #4: Track selected item for hover fallback
+    private int selectedInventoryIndex = -1;
 
     // UI Controllers
     private UIInventoryGridController inventoryController;
@@ -41,7 +45,6 @@ public class GameUIManager : MonoBehaviour
     private VisualElement rootElement;
     private VisualElement planningPanel, hudPanel;
 
-    // FIX #2: Calculate total inventory size from rows * columns
     private int TotalInventorySlots => inventoryRows * inventoryColumns;
 
     void Start()
@@ -97,94 +100,89 @@ public class GameUIManager : MonoBehaviour
     #region Initialization
     private void InitializeControllers()
     {
-        // DIAGNOSTIC: Show what we're searching for
-        Debug.Log($"[GameUIManager] === ELEMENT SEARCH DIAGNOSTICS ===");
-        
-        // CORRECT: We need to find the INVENTORY panel, not the gene editor!
-        // The inventory is in: <VisualElement name="InventoryPanel" class="main-panel">
+        // Find panel and grid elements once
         var inventoryPanel = rootElement.Q<VisualElement>("InventoryPanel");
+        var geneEditorPanel = rootElement.Q<VisualElement>("SeedEditorPanel");
+        var specSheetPanel = rootElement.Q<VisualElement>("SeedSpecSheetPanel");
+        var inventoryGridElement = rootElement.Q<VisualElement>("inventory-grid");
         
-        if (inventoryPanel != null)
-        {
-            Debug.Log($"[GameUIManager] ✓ Found INVENTORY panel by name: InventoryPanel");
-        }
-        else
-        {
-            // Fallback: try by class
-            inventoryPanel = rootElement.Q(className: "main-panel");
-            Debug.Log($"[GameUIManager] Found inventory panel by class: {(inventoryPanel != null ? "YES" : "NO")}");
-        }
+        Debug.Log($"[GameUIManager] === FIXING PANEL SIZING (prevent expansion) ===");
         
-        Debug.Log($"[GameUIManager] === STARTING WIDTH CALCULATION ===");
+        // CRITICAL FIX: The key to preventing gene editor expansion is:
+        // 1. Use flexBasis = 0 (NOT Auto, NOT explicit width)
+        // 2. Use flexGrow = 1 (fills remaining space)
+        // 3. Ensure overflow: hidden on all child containers
         
-        // STEP-BY-STEP CALCULATION:
-        // 1. Each slot is 64px wide with 5px margin on each side
+        // Calculate slot dimensions
         int slotWidth = 64;
         int slotMarginLeft = 5;
         int slotMarginRight = 5;
         int totalSpacePerSlot = slotWidth + slotMarginLeft + slotMarginRight; // 74px
         
-        Debug.Log($"[GameUIManager] Slot calculation: {slotWidth}px width + {slotMarginLeft}px + {slotMarginRight}px margin = {totalSpacePerSlot}px per slot");
-        
-        // 2. Grid width = number of columns × space per slot
+        // Calculate inventory panel width
         int gridWidth = inventoryColumns * totalSpacePerSlot;
-        Debug.Log($"[GameUIManager] Grid width: {inventoryColumns} columns × {totalSpacePerSlot}px = {gridWidth}px");
-        
-        // 3. Panel has 15px padding on left and right sides
         int panelPaddingLeft = 15;
         int panelPaddingRight = 15;
         int totalPanelPadding = panelPaddingLeft + panelPaddingRight;
+        int inventoryPanelWidth = gridWidth + totalPanelPadding;
         
-        // 4. Panel width = grid width + left padding + right padding
-        int panelWidth = gridWidth + totalPanelPadding;
-        Debug.Log($"[GameUIManager] Panel width: {gridWidth}px grid + {totalPanelPadding}px padding = {panelWidth}px TOTAL");
-        Debug.Log($"[GameUIManager] More columns = WIDER inventory panel | Less columns = NARROWER inventory panel");
+        Debug.Log($"[GameUIManager] Inventory panel width: {inventoryPanelWidth}px ({inventoryColumns} columns)");
         
+        // SET INVENTORY PANEL - FIXED WIDTH
         if (inventoryPanel != null)
         {
-            inventoryPanel.style.width = panelWidth;
-            inventoryPanel.style.minWidth = panelWidth;
-            inventoryPanel.style.maxWidth = panelWidth;
-            inventoryPanel.style.flexGrow = 0; // Don't grow
-            inventoryPanel.style.flexShrink = 0; // Don't shrink
-            
-            // DEBUG: Add visual red border to confirm which element we're sizing
-            inventoryPanel.style.borderLeftWidth = 5;
-            inventoryPanel.style.borderLeftColor = Color.red;
-            inventoryPanel.style.borderRightWidth = 5;
-            inventoryPanel.style.borderRightColor = Color.red;
-            
-            Debug.Log($"[GameUIManager] ✓ Set INVENTORY panel width to {panelWidth}px");
-            Debug.Log($"[GameUIManager] ✓ Added RED BORDERS to inventory panel");
+            inventoryPanel.style.width = inventoryPanelWidth;
+            inventoryPanel.style.minWidth = inventoryPanelWidth;
+            inventoryPanel.style.maxWidth = inventoryPanelWidth;
+            inventoryPanel.style.flexGrow = 0;
+            inventoryPanel.style.flexShrink = 0;
+            inventoryPanel.style.flexBasis = inventoryPanelWidth;
+            Debug.Log($"[GameUIManager] ✓ Inventory: {inventoryPanelWidth}px (FIXED)");
         }
-        else
+        
+        // SET SPEC SHEET PANEL - FIXED WIDTH (400px from CSS)
+        if (specSheetPanel != null)
         {
-            Debug.LogError("[GameUIManager] ✗ Could not find inventory panel element!");
+            specSheetPanel.style.width = 400;
+            specSheetPanel.style.minWidth = 400;
+            specSheetPanel.style.maxWidth = 400;
+            specSheetPanel.style.flexGrow = 0;
+            specSheetPanel.style.flexShrink = 0;
+            specSheetPanel.style.flexBasis = 400;
+            Debug.Log($"[GameUIManager] ✓ Spec sheet: 400px (FIXED)");
         }
         
-        // Inventory Grid Controller
-        inventoryController = new UIInventoryGridController();
-        var inventoryGridElement = rootElement.Q<VisualElement>("inventory-grid");
+        // SET GENE EDITOR - FLEXIBLE BUT CONSTRAINED
+        // KEY FIX: flexBasis = 0 (NOT Auto!) prevents content-based sizing
+        if (geneEditorPanel != null)
+        {
+            geneEditorPanel.style.width = StyleKeyword.Null; // Clear explicit width
+            geneEditorPanel.style.minWidth = 300; // Minimum usable width
+            geneEditorPanel.style.maxWidth = StyleKeyword.Null; // No maximum
+            geneEditorPanel.style.flexGrow = 1; // Take remaining space
+            geneEditorPanel.style.flexShrink = 0; // Don't shrink
+            geneEditorPanel.style.flexBasis = 0; // KEY: Start from 0, NOT Auto!
+            Debug.Log($"[GameUIManager] ✓ Gene editor: flex-grow=1, flex-basis=0 (fills remaining, won't expand)");
+        }
         
+        // SET GRID WIDTH
         if (inventoryGridElement != null)
         {
-            // Set exact grid width
             inventoryGridElement.style.width = gridWidth;
             inventoryGridElement.style.minWidth = gridWidth;
             inventoryGridElement.style.maxWidth = gridWidth;
             inventoryGridElement.style.flexShrink = 0;
             inventoryGridElement.style.flexGrow = 0;
-            inventoryGridElement.style.alignSelf = Align.FlexStart;
-            Debug.Log($"[GameUIManager] ✓ Set grid width to {gridWidth}px");
-        }
-        else
-        {
-            Debug.LogError("[GameUIManager] ✗ Could not find inventory-grid element!");
+            inventoryGridElement.style.marginLeft = StyleKeyword.Auto;
+            inventoryGridElement.style.marginRight = StyleKeyword.Auto;
+            inventoryGridElement.style.alignSelf = Align.Center;
+            Debug.Log($"[GameUIManager] ✓ Grid: {gridWidth}px (centered)");
         }
         
-        Debug.Log($"[GameUIManager] === COMPLETE ===");
-        Debug.Log($"[GameUIManager] RED borders mark the INVENTORY panel (should match column count)");
+        Debug.Log($"[GameUIManager] === PANEL SIZING COMPLETE ===");
         
+        // Continue with controller initialization
+        inventoryController = new UIInventoryGridController();
         inventoryController.Initialize(
             inventoryGridElement,
             inventorySlotTemplate,
@@ -222,19 +220,19 @@ public class GameUIManager : MonoBehaviour
         // Inventory events
         inventoryController.OnSlotClicked += HandleSlotClicked;
         inventoryController.OnSlotPointerDown += HandleSlotPointerDown;
-        inventoryController.OnSlotHoverEnter += HandleInventoryHover; // FIX #4
-        inventoryController.OnSlotHoverExit += HandleHoverExit; // FIX #4
+        inventoryController.OnSlotHoverEnter += HandleInventoryHover;
+        inventoryController.OnSlotHoverExit += HandleHoverExit;
 
         // Drag-drop events
         dragDropController.OnInventorySwapRequested += HandleInventorySwap;
         dragDropController.OnGeneDropRequested += HandleGeneDrop;
-        dragDropController.OnDragStarted += HandleDragStarted; // FIX #2
-        dragDropController.OnDragEnded += HandleDragEnded; // FIX #2
+        dragDropController.OnDragStarted += HandleDragStarted;
+        dragDropController.OnDragEnded += HandleDragEnded;
         
         // Gene editor events
         seedEditorController.OnGeneSlotPointerDown += HandleGeneSlotPointerDown;
-        seedEditorController.OnGeneSlotHoverEnter += HandleGeneHover; // FIX #4
-        seedEditorController.OnGeneSlotHoverExit += HandleHoverExit; // FIX #4
+        seedEditorController.OnGeneSlotHoverEnter += HandleGeneHover;
+        seedEditorController.OnGeneSlotHoverExit += HandleHoverExit;
     }
 
     private void SetupPlayerInventory()
@@ -251,13 +249,11 @@ public class GameUIManager : MonoBehaviour
         foreach (var gene in startingInventory.startingGenes) 
             if (gene != null) playerInventory.Add(new UIInventoryItem(gene));
 
-        // FIX #2: Fill remaining slots based on configured grid size
         while (playerInventory.Count < TotalInventorySlots)
         {
             playerInventory.Add(null);
         }
         
-        // Warn if we have more items than slots
         if (playerInventory.Count > TotalInventorySlots)
         {
             Debug.LogWarning($"[GameUIManager] Starting inventory has {playerInventory.Count} items but only {TotalInventorySlots} slots configured ({inventoryRows}x{inventoryColumns}). Extra items will be truncated.");
@@ -269,61 +265,44 @@ public class GameUIManager : MonoBehaviour
     #region Event Handlers
     private void HandleSlotClicked(int index)
     {
-        // Don't select while dragging
         if (dragDropController.IsDragging()) return;
 
-        // FIX #4: Track selected index
         selectedInventoryIndex = index;
-
-        // Update selection
         inventoryController.SetSelectedSlot(index);
         
         var selectedItem = playerInventory[index];
-
-        // Update spec sheet for any item type
         specSheetController.DisplayItem(selectedItem);
 
-        // If it's a seed, lock it for editing
         if (selectedItem?.OriginalData is SeedTemplate)
         {
             inventoryController.SetLockedSeedSlot(index);
             seedEditorController.DisplaySeed(selectedItem);
             
-            // Update drag-drop references to gene editor slots
             dragDropController.SetGeneEditorSlots(
                 seedEditorController.GetSeedContainer(),
                 seedEditorController.GetPassiveContainer(),
                 seedEditorController.GetActiveContainer()
             );
         }
-        // If not a seed, keep gene editor as-is (don't clear it)
     }
 
     private void HandleSlotPointerDown(int index)
     {
-        // Start drag operation
         dragDropController.StartDrag(index);
-        
-        // Update drag-drop controller with current inventory slots
         dragDropController.SetInventorySlots(inventoryController.GetSlots());
     }
     
-    // FIX #4: Handle dragging genes from gene editor
     private void HandleGeneSlotPointerDown(GeneBase gene, VisualElement slot)
     {
-        if (gene == null) return; // Can't drag empty slots
+        if (gene == null) return;
         
-        // Start drag from gene editor
         dragDropController.StartDragFromGeneEditor(gene, slot);
-        
-        // Update drag-drop controller with current inventory slots
         dragDropController.SetInventorySlots(inventoryController.GetSlots());
     }
     
-    // FIX #4: Handle hovering over inventory items
     private void HandleInventoryHover(int index)
     {
-        if (dragDropController.IsDragging()) return; // Don't show tooltip while dragging
+        if (dragDropController.IsDragging()) return;
         
         var item = playerInventory[index];
         if (item != null)
@@ -332,10 +311,9 @@ public class GameUIManager : MonoBehaviour
         }
     }
     
-    // FIX #4: Handle hovering over gene editor genes
     private void HandleGeneHover(GeneBase gene)
     {
-        if (dragDropController.IsDragging()) return; // Don't show tooltip while dragging
+        if (dragDropController.IsDragging()) return;
         
         if (gene != null)
         {
@@ -343,10 +321,8 @@ public class GameUIManager : MonoBehaviour
         }
     }
     
-    // FIX #4: Clear spec sheet when not hovering over anything
     private void HandleHoverExit()
     {
-        // Don't clear if we have a selected item
         if (selectedInventoryIndex >= 0 && selectedInventoryIndex < playerInventory.Count)
         {
             var selectedItem = playerInventory[selectedInventoryIndex];
@@ -354,13 +330,11 @@ public class GameUIManager : MonoBehaviour
         }
     }
     
-    // FIX #2: Handle drag started - highlight compatible slots
     private void HandleDragStarted(GeneCategory? category)
     {
         seedEditorController.HighlightCompatibleSlots(category);
     }
     
-    // FIX #2: Handle drag ended - clear highlighting
     private void HandleDragEnded()
     {
         seedEditorController.ClearSlotHighlighting();
@@ -368,15 +342,11 @@ public class GameUIManager : MonoBehaviour
 
     private void HandleInventorySwap(int fromIndex, int toIndex)
     {
-        // Swap items in data
         var temp = playerInventory[fromIndex];
         playerInventory[fromIndex] = playerInventory[toIndex];
         playerInventory[toIndex] = temp;
         
-        // Update indices
         inventoryController.UpdateIndicesAfterSwap(fromIndex, toIndex);
-        
-        // Refresh visuals
         inventoryController.RefreshVisuals();
     }
 
@@ -389,7 +359,6 @@ public class GameUIManager : MonoBehaviour
         
         if (draggedItem.OriginalData is GeneBase gene)
         {
-            // Validate gene category matches slot type
             validDrop = slotType switch
             {
                 "passive" => gene.Category == GeneCategory.Passive,
@@ -403,7 +372,6 @@ public class GameUIManager : MonoBehaviour
             {
                 Debug.Log($"Inserting {gene.geneName} into {slotType} slot");
                 seedEditorController.UpdateGeneSlot(targetSlot, gene);
-                // TODO: Actually modify the seed's runtime state here
             }
             else
             {
@@ -412,11 +380,9 @@ public class GameUIManager : MonoBehaviour
         }
         else if (draggedItem.OriginalData is SeedTemplate && slotType == "seed")
         {
-            // Dropping a seed into the seed slot - lock it for editing
             inventoryController.SetLockedSeedSlot(dragSourceIndex);
             seedEditorController.DisplaySeed(draggedItem);
             
-            // Update drag-drop references
             dragDropController.SetGeneEditorSlots(
                 seedEditorController.GetSeedContainer(),
                 seedEditorController.GetPassiveContainer(),
