@@ -4,11 +4,12 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.UI.Toolkit
 {
     /// <summary>
-    /// Manages the seed editor panel (gene slot display and editing)
+    /// Manages the seed editor panel with FULL gene modification support
     /// </summary>
     public class UISeedEditorController
     {
@@ -16,7 +17,8 @@ namespace Abracodabra.UI.Toolkit
         public event Action<GeneBase, VisualElement> OnGeneSlotPointerDown;
         public event Action<GeneBase> OnGeneSlotHoverEnter;
         public event Action OnGeneSlotHoverExit;
-        public event Action<Color> OnSeedColorChanged; // NEW: Color picker event
+        public event Action<Color> OnSeedColorChanged;
+        public event Action<GeneBase, int, string> OnGeneRemovedFromEditor; // NEW: Return gene to inventory
         
         // References
         private VisualElement seedDropSlotContainer;
@@ -26,11 +28,8 @@ namespace Abracodabra.UI.Toolkit
         
         // Color picker
         private VisualElement colorPickerContainer;
-        private UIInventoryItem currentSeedItem; // Track current seed for color updates
+        private UIInventoryItem currentSeedItem;
 
-        /// <summary>
-        /// Initialize the seed editor controller
-        /// </summary>
         public void Initialize(
             VisualElement seedContainer, 
             VisualElement passiveContainer, 
@@ -42,13 +41,9 @@ namespace Abracodabra.UI.Toolkit
             activeSequenceContainer = activeContainer;
             geneSlotTemplate = slotTemplate;
             
-            // Create color picker container (will be added when seed is displayed)
             CreateColorPicker();
         }
 
-        /// <summary>
-        /// Display a seed in the editor with all its genes
-        /// </summary>
         public void DisplaySeed(UIInventoryItem seedItem)
         {
             if (seedItem == null || seedItem.OriginalData is not SeedTemplate template)
@@ -57,18 +52,16 @@ namespace Abracodabra.UI.Toolkit
                 return;
             }
 
-            currentSeedItem = seedItem; // Store reference for color updates
+            currentSeedItem = seedItem;
             
             seedDropSlotContainer.Clear();
             passiveGenesContainer.Clear();
             activeSequenceContainer.Clear();
 
-            // Create seed slot (larger, special)
             var seedSlot = geneSlotTemplate.Instantiate();
             BindGeneSlot(seedSlot, seedItem.OriginalData);
             seedSlot.name = "seed-drop-slot";
             
-            // Apply current background color if set
             if (seedItem.HasCustomColor())
             {
                 var background = seedSlot.Q("background");
@@ -80,7 +73,6 @@ namespace Abracodabra.UI.Toolkit
             
             seedDropSlotContainer.Add(seedSlot);
             
-            // Add color picker below seed slot
             if (colorPickerContainer != null)
             {
                 seedDropSlotContainer.Add(colorPickerContainer);
@@ -89,19 +81,16 @@ namespace Abracodabra.UI.Toolkit
 
             var runtimeState = seedItem.SeedRuntimeState;
 
-            // Create passive gene slots with labels below
             for (int i = 0; i < template.passiveSlotCount; i++)
             {
                 var geneInstance = (i < runtimeState.passiveInstances.Count) ? runtimeState.passiveInstances[i] : null;
                 var gene = geneInstance?.GetGene();
                 
                 string labelText = gene != null ? $"T{gene.tier}" : $"P{i+1}";
-                var wrappedSlot = CreateGeneSlotWithLabel(gene, labelText);
-                wrappedSlot.userData = "passive";
+                var wrappedSlot = CreateGeneSlotWithLabel(gene, labelText, i, "passive");
                 passiveGenesContainer.Add(wrappedSlot);
             }
             
-            // Create column headers for active sequence
             var headerRow = new VisualElement();
             headerRow.AddToClassList("active-sequence-header");
             
@@ -125,7 +114,6 @@ namespace Abracodabra.UI.Toolkit
             headerRow.Add(payloadHeader);
             activeSequenceContainer.Add(headerRow);
             
-            // Create active sequence slots with labels below
             for (int i = 0; i < template.activeSequenceLength; i++)
             {
                 var sequenceRow = new VisualElement();
@@ -134,32 +122,137 @@ namespace Abracodabra.UI.Toolkit
 
                 var sequenceData = (i < runtimeState.activeSequence.Count) ? runtimeState.activeSequence[i] : null;
 
-                // Active gene
                 var activeGene = sequenceData?.activeInstance?.GetGene();
                 string activeLabel = activeGene != null ? $"T{activeGene.tier}" : $"A{i+1}";
-                var activeWrapped = CreateGeneSlotWithLabel(activeGene, activeLabel);
-                activeWrapped.userData = "active";
+                var activeWrapped = CreateGeneSlotWithLabel(activeGene, activeLabel, i, "active");
                 sequenceRow.Add(activeWrapped);
                 
-                // Modifier gene
                 var modifierGene = sequenceData?.modifierInstances.FirstOrDefault()?.GetGene();
                 string modifierLabel = modifierGene != null ? $"T{modifierGene.tier}" : $"M{i+1}";
-                var modifierWrapped = CreateGeneSlotWithLabel(modifierGene, modifierLabel);
-                modifierWrapped.userData = "modifier";
+                var modifierWrapped = CreateGeneSlotWithLabel(modifierGene, modifierLabel, i, "modifier");
                 sequenceRow.Add(modifierWrapped);
                 
-                // Payload gene
                 var payloadGene = sequenceData?.payloadInstances.FirstOrDefault()?.GetGene();
                 string payloadLabel = payloadGene != null ? $"T{payloadGene.tier}" : $"P{i+1}";
-                var payloadWrapped = CreateGeneSlotWithLabel(payloadGene, payloadLabel);
-                payloadWrapped.userData = "payload";
+                var payloadWrapped = CreateGeneSlotWithLabel(payloadGene, payloadLabel, i, "payload");
                 sequenceRow.Add(payloadWrapped);
             }
         }
 
-        /// <summary>
-        /// Clear the editor to empty state
-        /// </summary>
+        public bool AddGeneToSlot(GeneBase gene, int slotIndex, string slotType)
+        {
+            if (currentSeedItem == null || gene == null) return false;
+            
+            var runtimeState = currentSeedItem.SeedRuntimeState;
+            var template = currentSeedItem.OriginalData as SeedTemplate;
+            if (runtimeState == null || template == null) return false;
+
+            var instance = new RuntimeGeneInstance(gene);
+            instance.SetValue("power_multiplier", 1f);
+
+            bool success = false;
+
+            if (slotType == "passive")
+            {
+                if (slotIndex < template.passiveSlotCount)
+                {
+                    while (runtimeState.passiveInstances.Count <= slotIndex)
+                    {
+                        runtimeState.passiveInstances.Add(null);
+                    }
+                    
+                    runtimeState.passiveInstances[slotIndex] = instance;
+                    success = true;
+                }
+            }
+            else if (slotType == "active" || slotType == "modifier" || slotType == "payload")
+            {
+                while (runtimeState.activeSequence.Count <= slotIndex)
+                {
+                    runtimeState.activeSequence.Add(new RuntimeSequenceSlot());
+                }
+                
+                var slot = runtimeState.activeSequence[slotIndex];
+                
+                if (slotType == "active")
+                {
+                    slot.activeInstance = instance;
+                    success = true;
+                }
+                else if (slotType == "modifier")
+                {
+                    slot.modifierInstances.Clear();
+                    slot.modifierInstances.Add(instance);
+                    success = true;
+                }
+                else if (slotType == "payload")
+                {
+                    slot.payloadInstances.Clear();
+                    slot.payloadInstances.Add(instance);
+                    success = true;
+                }
+            }
+
+            if (success)
+            {
+                Debug.Log($"[SeedEditor] Added {gene.geneName} to {slotType} slot {slotIndex}");
+                DisplaySeed(currentSeedItem);
+            }
+
+            return success;
+        }
+
+        public GeneBase RemoveGeneFromSlot(int slotIndex, string slotType)
+        {
+            if (currentSeedItem == null) return null;
+            
+            var runtimeState = currentSeedItem.SeedRuntimeState;
+            if (runtimeState == null) return null;
+
+            GeneBase removedGene = null;
+
+            if (slotType == "passive")
+            {
+                if (slotIndex < runtimeState.passiveInstances.Count)
+                {
+                    var instance = runtimeState.passiveInstances[slotIndex];
+                    removedGene = instance?.GetGene();
+                    runtimeState.passiveInstances[slotIndex] = null;
+                }
+            }
+            else if (slotType == "active" || slotType == "modifier" || slotType == "payload")
+            {
+                if (slotIndex < runtimeState.activeSequence.Count)
+                {
+                    var slot = runtimeState.activeSequence[slotIndex];
+                    
+                    if (slotType == "active")
+                    {
+                        removedGene = slot.activeInstance?.GetGene();
+                        slot.activeInstance = null;
+                    }
+                    else if (slotType == "modifier" && slot.modifierInstances.Count > 0)
+                    {
+                        removedGene = slot.modifierInstances[0]?.GetGene();
+                        slot.modifierInstances.Clear();
+                    }
+                    else if (slotType == "payload" && slot.payloadInstances.Count > 0)
+                    {
+                        removedGene = slot.payloadInstances[0]?.GetGene();
+                        slot.payloadInstances.Clear();
+                    }
+                }
+            }
+
+            if (removedGene != null)
+            {
+                Debug.Log($"[SeedEditor] Removed {removedGene.geneName} from {slotType} slot {slotIndex}");
+                DisplaySeed(currentSeedItem);
+            }
+
+            return removedGene;
+        }
+
         public void Clear()
         {
             currentSeedItem = null;
@@ -181,33 +274,9 @@ namespace Abracodabra.UI.Toolkit
             seedDropSlotContainer.Add(emptySeedSlot);
         }
 
-        /// <summary>
-        /// Update a specific gene slot's visual
-        /// </summary>
-        public void UpdateGeneSlot(VisualElement slotOrWrapper, GeneBase gene)
-        {
-            var slot = slotOrWrapper.ClassListContains("gene-slot") 
-                ? slotOrWrapper 
-                : slotOrWrapper.Q(className: "gene-slot");
-                
-            if (slot != null)
-            {
-                BindGeneSlot(slot, gene);
-                
-                if (slotOrWrapper != slot)
-                {
-                    var label = slotOrWrapper.Q<Label>();
-                    if (label != null && gene != null)
-                    {
-                        label.text = $"T{gene.tier}";
-                    }
-                }
-            }
-        }
+        public bool HasSeedLoaded() => currentSeedItem != null;
 
-        /// <summary>
-        /// Create the color picker UI with preset pastel colors
-        /// </summary>
+        #region Color Picker
         private void CreateColorPicker()
         {
             colorPickerContainer = new VisualElement();
@@ -219,17 +288,16 @@ namespace Abracodabra.UI.Toolkit
             colorPickerContainer.style.justifyContent = Justify.Center;
             colorPickerContainer.style.maxWidth = 200;
             
-            // Define pastel colors for seed identification
             var colors = new[]
             {
-                new Color(0, 0, 0, 0),           // Transparent (default/none)
-                new Color(1.0f, 0.8f, 0.8f, 0.6f),   // Pastel Red
-                new Color(1.0f, 0.9f, 0.7f, 0.6f),   // Pastel Orange
-                new Color(1.0f, 1.0f, 0.8f, 0.6f),   // Pastel Yellow
-                new Color(0.8f, 1.0f, 0.8f, 0.6f),   // Pastel Green
-                new Color(0.8f, 0.9f, 1.0f, 0.6f),   // Pastel Blue
-                new Color(0.9f, 0.8f, 1.0f, 0.6f),   // Pastel Purple
-                new Color(1.0f, 0.8f, 0.9f, 0.6f),   // Pastel Pink
+                new Color(0, 0, 0, 0),
+                new Color(1.0f, 0.8f, 0.8f, 0.6f),
+                new Color(1.0f, 0.9f, 0.7f, 0.6f),
+                new Color(1.0f, 1.0f, 0.8f, 0.6f),
+                new Color(0.8f, 1.0f, 0.8f, 0.6f),
+                new Color(0.8f, 0.9f, 1.0f, 0.6f),
+                new Color(0.9f, 0.8f, 1.0f, 0.6f),
+                new Color(1.0f, 0.8f, 0.9f, 0.6f),
             };
             
             foreach (var color in colors)
@@ -255,12 +323,10 @@ namespace Abracodabra.UI.Toolkit
                 colorButton.style.borderTopColor = new Color(0.3f, 0.3f, 0.3f);
                 colorButton.style.borderBottomColor = new Color(0.3f, 0.3f, 0.3f);
                 
-                // Special styling for transparent option
                 if (color.a < 0.01f)
                 {
-                    // Checkerboard pattern simulation (diagonal lines)
                     colorButton.style.backgroundColor = new Color(0.3f, 0.3f, 0.3f);
-                    colorButton.text = "✕"; // X mark for "none"
+                    colorButton.text = "✕";
                     colorButton.style.unityFontStyleAndWeight = FontStyle.Bold;
                     colorButton.style.fontSize = 16;
                 }
@@ -269,10 +335,8 @@ namespace Abracodabra.UI.Toolkit
                     colorButton.style.backgroundColor = color;
                 }
                 
-                // Store color in userData for retrieval
                 colorButton.userData = color;
                 
-                // Click handler
                 colorButton.clicked += () =>
                 {
                     var selectedColor = (Color)colorButton.userData;
@@ -280,7 +344,6 @@ namespace Abracodabra.UI.Toolkit
                     {
                         currentSeedItem.BackgroundColor = selectedColor;
                         
-                        // Update the seed slot background immediately
                         var seedSlot = seedDropSlotContainer.Q("seed-drop-slot");
                         if (seedSlot != null)
                         {
@@ -291,10 +354,7 @@ namespace Abracodabra.UI.Toolkit
                             }
                         }
                         
-                        // Update selection highlighting
                         UpdateColorPickerSelection(selectedColor);
-                        
-                        // Notify manager to update inventory/hotbar
                         OnSeedColorChanged?.Invoke(selectedColor);
                     }
                 };
@@ -302,7 +362,6 @@ namespace Abracodabra.UI.Toolkit
                 colorPickerContainer.Add(colorButton);
             }
             
-            // Add label
             var label = new Label("Seed Color");
             label.style.fontSize = 10;
             label.style.color = new Color(0.6f, 0.6f, 0.6f);
@@ -312,9 +371,6 @@ namespace Abracodabra.UI.Toolkit
             colorPickerContainer.Insert(0, label);
         }
         
-        /// <summary>
-        /// Update which color button is shown as selected
-        /// </summary>
         private void UpdateColorPickerSelection(Color currentColor)
         {
             if (colorPickerContainer == null) return;
@@ -323,7 +379,6 @@ namespace Abracodabra.UI.Toolkit
             {
                 if (child is Button button && button.userData is Color buttonColor)
                 {
-                    // Check if this button's color matches current color
                     bool isSelected = Mathf.Approximately(buttonColor.r, currentColor.r) &&
                                     Mathf.Approximately(buttonColor.g, currentColor.g) &&
                                     Mathf.Approximately(buttonColor.b, currentColor.b) &&
@@ -331,7 +386,7 @@ namespace Abracodabra.UI.Toolkit
                     
                     if (isSelected)
                     {
-                        button.style.borderLeftColor = new Color(1f, 1f, 0.3f); // Yellow border
+                        button.style.borderLeftColor = new Color(1f, 1f, 0.3f);
                         button.style.borderRightColor = new Color(1f, 1f, 0.3f);
                         button.style.borderTopColor = new Color(1f, 1f, 0.3f);
                         button.style.borderBottomColor = new Color(1f, 1f, 0.3f);
@@ -354,10 +409,9 @@ namespace Abracodabra.UI.Toolkit
                 }
             }
         }
+        #endregion
 
-        /// <summary>
-        /// Bind data to a gene slot visual element
-        /// </summary>
+        #region Visual Binding
         private void BindGeneSlot(VisualElement slot, object data)
         {
             var background = slot.Q("background");
@@ -413,10 +467,7 @@ namespace Abracodabra.UI.Toolkit
             }
         }
         
-        /// <summary>
-        /// Create a wrapped gene slot with label below
-        /// </summary>
-        private VisualElement CreateGeneSlotWithLabel(object data, string labelText)
+        private VisualElement CreateGeneSlotWithLabel(object data, string labelText, int slotIndex, string slotType)
         {
             var wrapper = new VisualElement();
             wrapper.style.flexDirection = FlexDirection.Column;
@@ -430,8 +481,27 @@ namespace Abracodabra.UI.Toolkit
             wrapper.style.flexShrink = 0;
             wrapper.style.flexGrow = 0;
             
+            wrapper.userData = new SlotMetadata { index = slotIndex, type = slotType };
+            
             var slot = geneSlotTemplate.Instantiate();
             BindGeneSlot(slot, data);
+            
+            if (data is GeneBase gene)
+            {
+                slot.RegisterCallback<PointerDownEvent>(evt =>
+                {
+                    if (evt.button == 1)
+                    {
+                        var removedGene = RemoveGeneFromSlot(slotIndex, slotType);
+                        if (removedGene != null)
+                        {
+                            OnGeneRemovedFromEditor?.Invoke(removedGene, slotIndex, slotType);
+                        }
+                        evt.StopPropagation();
+                    }
+                });
+            }
+            
             wrapper.Add(slot);
             
             var label = new Label(labelText);
@@ -445,15 +515,12 @@ namespace Abracodabra.UI.Toolkit
             
             return wrapper;
         }
+        #endregion
 
-        // Getters
         public VisualElement GetSeedContainer() => seedDropSlotContainer;
         public VisualElement GetPassiveContainer() => passiveGenesContainer;
         public VisualElement GetActiveContainer() => activeSequenceContainer;
         
-        /// <summary>
-        /// Highlight only compatible slots when dragging a gene
-        /// </summary>
         public void HighlightCompatibleSlots(GeneCategory? draggedCategory)
         {
             if (draggedCategory == null) return;
@@ -483,8 +550,10 @@ namespace Abracodabra.UI.Toolkit
                     var slot = wrapper.Q(className: "gene-slot");
                     if (slot != null)
                     {
-                        var slotType = wrapper.userData as string;
-                        bool compatible = slotType switch
+                        var metadata = wrapper.userData as SlotMetadata;
+                        if (metadata == null) continue;
+                        
+                        bool compatible = metadata.type switch
                         {
                             "active" => draggedCategory == GeneCategory.Active,
                             "modifier" => draggedCategory == GeneCategory.Modifier,
@@ -505,9 +574,6 @@ namespace Abracodabra.UI.Toolkit
             }
         }
         
-        /// <summary>
-        /// Clear all highlighting when drag ends
-        /// </summary>
         public void ClearSlotHighlighting()
         {
             foreach (var wrapper in passiveGenesContainer.Children())
@@ -526,6 +592,12 @@ namespace Abracodabra.UI.Toolkit
                     slot?.RemoveFromClassList("gene-slot--incompatible");
                 }
             }
+        }
+        
+        private class SlotMetadata
+        {
+            public int index;
+            public string type;
         }
     }
 }

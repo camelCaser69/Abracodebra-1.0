@@ -8,7 +8,7 @@ using Abracodabra.Genes.Core;
 using Abracodabra.UI.Toolkit;
 
 /// <summary>
-/// Main UI Manager - Coordinates all UI controllers and manages shared state
+/// Main UI Manager - Fully functional gene editor with proper data persistence
 /// </summary>
 public class GameUIManager : MonoBehaviour
 {
@@ -40,6 +40,7 @@ public class GameUIManager : MonoBehaviour
     // UI Element References
     private VisualElement rootElement;
     private VisualElement planningPanel, hudPanel;
+    private Button startDayButton;
 
     private int TotalInventorySlots => inventoryRows * inventoryColumns;
 
@@ -47,7 +48,7 @@ public class GameUIManager : MonoBehaviour
     {
         if (inventorySlotTemplate == null || geneSlotTemplate == null)
         {
-            Debug.LogError("CRITICAL: UI Template assets are not assigned in the GameUIManager Inspector! Please drag your 'InventorySlot.uxml' and 'GeneSlot.uxml' files into the corresponding fields on the '_UIDocument_GameUI' GameObject.", this);
+            Debug.LogError("CRITICAL: UI Template assets are not assigned in the GameUIManager Inspector!");
             this.enabled = false;
             return;
         }
@@ -66,10 +67,13 @@ public class GameUIManager : MonoBehaviour
 
         // Subscribe to controller events
         SubscribeToEvents();
+        
+        // Create Start Day button
+        CreateStartDayButton();
 
         // Initial setup
         inventoryController.PopulateGrid();
-        hotbarController.SetupHotbar(playerInventory.Take(8).ToList());
+        hotbarController.SetupHotbar(playerInventory.Take(inventoryColumns).ToList());
         seedEditorController.Clear();
         specSheetController.Clear();
 
@@ -96,30 +100,27 @@ public class GameUIManager : MonoBehaviour
     #region Initialization
     private void InitializeControllers()
     {
-        // Find panel and grid elements once
+        // Find panel and grid elements
         var inventoryPanel = rootElement.Q<VisualElement>("InventoryPanel");
         var geneEditorPanel = rootElement.Q<VisualElement>("SeedEditorPanel");
         var specSheetPanel = rootElement.Q<VisualElement>("SeedSpecSheetPanel");
         var inventoryGridElement = rootElement.Q<VisualElement>("inventory-grid");
         
-        Debug.Log($"[GameUIManager] === FIXING PANEL SIZING (prevent expansion) ===");
+        Debug.Log($"[GameUIManager] === PANEL SIZING: FIXED MODE ===");
         
-        // Calculate slot dimensions
+        // Calculate dimensions
         int slotWidth = 64;
         int slotMarginLeft = 5;
         int slotMarginRight = 5;
-        int totalSpacePerSlot = slotWidth + slotMarginLeft + slotMarginRight; // 74px
+        int totalSpacePerSlot = slotWidth + slotMarginLeft + slotMarginRight;
         
-        // Calculate inventory panel width
         int gridWidth = inventoryColumns * totalSpacePerSlot;
         int panelPaddingLeft = 15;
         int panelPaddingRight = 15;
         int totalPanelPadding = panelPaddingLeft + panelPaddingRight;
         int inventoryPanelWidth = gridWidth + totalPanelPadding;
         
-        Debug.Log($"[GameUIManager] Inventory panel width: {inventoryPanelWidth}px ({inventoryColumns} columns)");
-        
-        // SET INVENTORY PANEL - FIXED WIDTH
+        // SET INVENTORY PANEL
         if (inventoryPanel != null)
         {
             inventoryPanel.style.width = inventoryPanelWidth;
@@ -128,10 +129,9 @@ public class GameUIManager : MonoBehaviour
             inventoryPanel.style.flexGrow = 0;
             inventoryPanel.style.flexShrink = 0;
             inventoryPanel.style.flexBasis = inventoryPanelWidth;
-            Debug.Log($"[GameUIManager] ✓ Inventory: {inventoryPanelWidth}px (FIXED)");
         }
         
-        // SET SPEC SHEET PANEL - FIXED WIDTH (400px from CSS)
+        // SET SPEC SHEET PANEL
         if (specSheetPanel != null)
         {
             specSheetPanel.style.width = 400;
@@ -140,7 +140,6 @@ public class GameUIManager : MonoBehaviour
             specSheetPanel.style.flexGrow = 0;
             specSheetPanel.style.flexShrink = 0;
             specSheetPanel.style.flexBasis = 400;
-            Debug.Log($"[GameUIManager] ✓ Spec sheet: 400px (FIXED)");
         }
         
         // SET GENE EDITOR - FLEXIBLE BUT CONSTRAINED
@@ -151,8 +150,7 @@ public class GameUIManager : MonoBehaviour
             geneEditorPanel.style.maxWidth = StyleKeyword.Null;
             geneEditorPanel.style.flexGrow = 1;
             geneEditorPanel.style.flexShrink = 0;
-            geneEditorPanel.style.flexBasis = 0; // KEY: Start from 0, NOT Auto!
-            Debug.Log($"[GameUIManager] ✓ Gene editor: flex-grow=1, flex-basis=0 (fills remaining, won't expand)");
+            geneEditorPanel.style.flexBasis = 0;
         }
         
         // SET GRID WIDTH
@@ -166,24 +164,15 @@ public class GameUIManager : MonoBehaviour
             inventoryGridElement.style.marginLeft = StyleKeyword.Auto;
             inventoryGridElement.style.marginRight = StyleKeyword.Auto;
             inventoryGridElement.style.alignSelf = Align.Center;
-            Debug.Log($"[GameUIManager] ✓ Grid: {gridWidth}px (centered)");
         }
         
-        Debug.Log($"[GameUIManager] === PANEL SIZING COMPLETE ===");
-        
-        // Continue with controller initialization
+        // Initialize controllers
         inventoryController = new UIInventoryGridController();
-        inventoryController.Initialize(
-            inventoryGridElement,
-            inventorySlotTemplate,
-            playerInventory
-        );
+        inventoryController.Initialize(inventoryGridElement, inventorySlotTemplate, playerInventory);
 
-        // Drag Drop Controller
         dragDropController = new UIDragDropController();
         dragDropController.Initialize(rootElement, playerInventory);
 
-        // Seed Editor Controller
         seedEditorController = new UISeedEditorController();
         seedEditorController.Initialize(
             rootElement.Q<VisualElement>("seed-drop-slot-container"),
@@ -192,17 +181,56 @@ public class GameUIManager : MonoBehaviour
             geneSlotTemplate
         );
 
-        // Spec Sheet Controller
         specSheetController = new UISpecSheetController();
         specSheetController.Initialize(rootElement.Q<VisualElement>("SeedSpecSheetPanel"));
 
-        // Hotbar Controller
         hotbarController = new UIHotbarController();
         hotbarController.Initialize(
             rootElement.Q<ListView>("hotbar-list"),
             rootElement.Q<VisualElement>("hotbar-selector"),
             inventorySlotTemplate
         );
+    }
+
+    private void CreateStartDayButton()
+    {
+        // Create button container at BOTTOM center (above hotbar area)
+        var buttonContainer = new VisualElement();
+        buttonContainer.style.position = Position.Absolute;
+        buttonContainer.style.bottom = 120; // Above the hotbar
+        buttonContainer.style.left = Length.Percent(50);
+        buttonContainer.style.translate = new Translate(Length.Percent(-50), 0);
+        buttonContainer.style.alignItems = Align.Center;
+        buttonContainer.style.justifyContent = Justify.Center;
+        
+        startDayButton = new Button();
+        startDayButton.text = "▶ START DAY";
+        startDayButton.AddToClassList("start-day-button");
+        
+        // Styling
+        startDayButton.style.fontSize = 24;
+        startDayButton.style.paddingTop = 15;
+        startDayButton.style.paddingBottom = 15;
+        startDayButton.style.paddingLeft = 40;
+        startDayButton.style.paddingRight = 40;
+        startDayButton.style.backgroundColor = new Color(0.2f, 0.7f, 0.3f);
+        startDayButton.style.color = Color.white;
+        startDayButton.style.borderTopLeftRadius = 10;
+        startDayButton.style.borderTopRightRadius = 10;
+        startDayButton.style.borderBottomLeftRadius = 10;
+        startDayButton.style.borderBottomRightRadius = 10;
+        startDayButton.style.borderLeftWidth = 0;
+        startDayButton.style.borderRightWidth = 0;
+        startDayButton.style.borderTopWidth = 0;
+        startDayButton.style.borderBottomWidth = 0;
+        startDayButton.style.unityFontStyleAndWeight = FontStyle.Bold;
+        
+        startDayButton.clicked += OnStartDayClicked;
+        
+        buttonContainer.Add(startDayButton);
+        planningPanel.Add(buttonContainer);
+        
+        Debug.Log("[GameUIManager] Start Day button created at bottom center");
     }
 
     private void SubscribeToEvents()
@@ -223,7 +251,8 @@ public class GameUIManager : MonoBehaviour
         seedEditorController.OnGeneSlotPointerDown += HandleGeneSlotPointerDown;
         seedEditorController.OnGeneSlotHoverEnter += HandleGeneHover;
         seedEditorController.OnGeneSlotHoverExit += HandleHoverExit;
-        seedEditorController.OnSeedColorChanged += HandleSeedColorChanged; // NEW: Color picker event
+        seedEditorController.OnSeedColorChanged += HandleSeedColorChanged;
+        seedEditorController.OnGeneRemovedFromEditor += HandleGeneRemovedFromEditor;
     }
 
     private void SetupPlayerInventory()
@@ -247,7 +276,7 @@ public class GameUIManager : MonoBehaviour
         
         if (playerInventory.Count > TotalInventorySlots)
         {
-            Debug.LogWarning($"[GameUIManager] Starting inventory has {playerInventory.Count} items but only {TotalInventorySlots} slots configured ({inventoryRows}x{inventoryColumns}). Extra items will be truncated.");
+            Debug.LogWarning($"[GameUIManager] Starting inventory has {playerInventory.Count} items but only {TotalInventorySlots} slots. Truncating.");
             playerInventory = playerInventory.Take(TotalInventorySlots).ToList();
         }
     }
@@ -331,18 +360,31 @@ public class GameUIManager : MonoBehaviour
         seedEditorController.ClearSlotHighlighting();
     }
     
-    /// <summary>
-    /// NEW: Handle seed color change from color picker
-    /// </summary>
     private void HandleSeedColorChanged(Color newColor)
     {
-        // Refresh inventory grid to show updated colors
         inventoryController.RefreshVisuals();
-        
-        // Refresh hotbar to show updated colors
         hotbarController.RefreshHotbar();
+    }
+    
+    /// <summary>
+    /// NEW: Handle gene removed from editor - return to inventory
+    /// </summary>
+    private void HandleGeneRemovedFromEditor(GeneBase gene, int slotIndex, string slotType)
+    {
+        // Find first empty slot
+        int emptySlot = playerInventory.FindIndex(item => item == null);
         
-        Debug.Log($"[GameUIManager] Seed color changed to: {newColor}");
+        if (emptySlot >= 0)
+        {
+            playerInventory[emptySlot] = new UIInventoryItem(gene);
+            inventoryController.RefreshVisuals();
+            hotbarController.SetupHotbar(playerInventory.Take(inventoryColumns).ToList());
+            Debug.Log($"[GameUIManager] Returned {gene.geneName} to inventory slot {emptySlot}");
+        }
+        else
+        {
+            Debug.LogWarning($"[GameUIManager] No empty inventory slot to return {gene.geneName}!");
+        }
     }
 
     private void HandleInventorySwap(int fromIndex, int toIndex)
@@ -364,6 +406,7 @@ public class GameUIManager : MonoBehaviour
         
         if (draggedItem.OriginalData is GeneBase gene)
         {
+            // Validate gene category matches slot type
             validDrop = slotType switch
             {
                 "passive" => gene.Category == GeneCategory.Passive,
@@ -375,12 +418,29 @@ public class GameUIManager : MonoBehaviour
             
             if (validDrop)
             {
-                Debug.Log($"Inserting {gene.geneName} into {slotType} slot");
-                seedEditorController.UpdateGeneSlot(targetSlot, gene);
+                // Extract slot index from visual hierarchy
+                int slotIndex = GetSlotIndexFromElement(targetSlot, slotType);
+                
+                Debug.Log($"[GameUIManager] Attempting to add {gene.geneName} to {slotType} slot {slotIndex}");
+                
+                bool added = seedEditorController.AddGeneToSlot(gene, slotIndex, slotType);
+                
+                if (added)
+                {
+                    // REMOVE from inventory
+                    playerInventory[dragSourceIndex] = null;
+                    inventoryController.RefreshVisuals();
+                    hotbarController.SetupHotbar(playerInventory.Take(inventoryColumns).ToList());
+                    Debug.Log($"[GameUIManager] ✓ Added {gene.geneName} to editor, removed from inventory");
+                }
+                else
+                {
+                    Debug.LogWarning($"[GameUIManager] ✗ Failed to add {gene.geneName} to slot");
+                }
             }
             else
             {
-                Debug.Log($"Invalid drop: {gene.Category} gene cannot go in {slotType} slot");
+                Debug.Log($"[GameUIManager] Invalid drop: {gene.Category} gene cannot go in {slotType} slot");
             }
         }
         else if (draggedItem.OriginalData is SeedTemplate && slotType == "seed")
@@ -397,6 +457,63 @@ public class GameUIManager : MonoBehaviour
             validDrop = true;
         }
     }
+    
+    /// <summary>
+    /// Helper to extract slot index from visual element hierarchy
+    /// </summary>
+    private int GetSlotIndexFromElement(VisualElement element, string slotType)
+    {
+        if (slotType == "passive")
+        {
+            var container = rootElement.Q<VisualElement>("passive-genes-container");
+            if (container != null)
+            {
+                int index = 0;
+                foreach (var child in container.Children())
+                {
+                    if (child.Contains(element)) return index;
+                    index++;
+                }
+            }
+        }
+        else if (slotType == "active" || slotType == "modifier" || slotType == "payload")
+        {
+            var container = rootElement.Q<VisualElement>("active-sequence-container");
+            if (container != null)
+            {
+                int rowIndex = 0;
+                foreach (var row in container.Children())
+                {
+                    if (row.ClassListContains("active-sequence-header")) continue;
+                    
+                    if (row.Contains(element))
+                    {
+                        return rowIndex;
+                    }
+                    rowIndex++;
+                }
+            }
+        }
+        
+        return 0;
+    }
+    
+    /// <summary>
+    /// NEW: Handle Start Day button click
+    /// </summary>
+    private void OnStartDayClicked()
+    {
+        Debug.Log("[GameUIManager] START DAY clicked - transitioning to Growth & Threat phase");
+        
+        if (RunManager.Instance != null)
+        {
+            RunManager.Instance.StartGrowthAndThreatPhase();
+        }
+        else
+        {
+            Debug.LogError("[GameUIManager] RunManager.Instance is null! Cannot start day.");
+        }
+    }
     #endregion
 
     #region Panel Switching
@@ -410,12 +527,36 @@ public class GameUIManager : MonoBehaviour
     {
         planningPanel.style.display = DisplayStyle.Flex;
         hudPanel.style.display = DisplayStyle.None;
+        
+        // Show solid background for planning mode
+        rootElement.style.backgroundColor = new Color(20f/255f, 20f/255f, 25f/255f);
+        
+        if (startDayButton != null)
+        {
+            startDayButton.style.display = DisplayStyle.Flex;
+        }
     }
 
     private void ShowHUD()
     {
         planningPanel.style.display = DisplayStyle.None;
         hudPanel.style.display = DisplayStyle.Flex;
+        
+        // CRITICAL: Make background transparent so game camera can render through
+        rootElement.style.backgroundColor = new Color(0, 0, 0, 0);
+        
+        // Also ensure HUD panel is transparent
+        if (hudPanel != null)
+        {
+            hudPanel.style.backgroundColor = new Color(0, 0, 0, 0);
+        }
+        
+        if (startDayButton != null)
+        {
+            startDayButton.style.display = DisplayStyle.None;
+        }
+        
+        Debug.Log("[GameUIManager] HUD shown - UI background set to transparent");
     }
     #endregion
 }
