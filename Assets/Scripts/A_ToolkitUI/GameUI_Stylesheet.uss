@@ -129,13 +129,17 @@ Label {
 
 .hotbar-selector {
     position: absolute;
-    width: 74px;
-    height: 74px;
+    width: 64px;
+    height: 64px;
     border-width: 3px;
     border-color: yellow;
     border-radius: 5px;
     transition: left 0.1s ease-in-out;
 }
+
+/* ============================================
+   SLOT STYLING - Inventory & Hotbar
+   ============================================ */
 
 .slot {
     width: 64px;
@@ -146,9 +150,7 @@ Label {
     margin: 5px;
     border-radius: 5px;
     cursor: arrow;
-    /* CRITICAL: Position relative for absolute children */
     position: relative;
-    overflow: hidden;
 }
 
 .slot:hover {
@@ -156,8 +158,11 @@ Label {
     cursor: link;
 }
 
+/* Selected slot - bright yellow border for visibility */
 .slot--selected {
     background-color: rgba(255, 255, 100, 0.3);
+    border-color: rgba(255, 255, 0, 0.9);
+    border-width: 3px;
 }
 
 .slot--locked {
@@ -166,15 +171,13 @@ Label {
     border-width: 2px;
 }
 
+/* Locked for editing - cyan border */
 .slot--locked-for-editing {
-    background-color: rgba(100, 100, 255, 0.2);
-    border-color: rgba(100, 100, 255, 0.7);
-    border-width: 2px;
+    border-color: rgba(0, 255, 255, 0.9);
+    border-width: 3px;
 }
 
-/* ========================================
-   SLOT ICON - CRITICAL FIX FOR TINY ICONS
-   ======================================== */
+/* Slot icon - properly sized */
 .slot-icon {
     width: 100%;
     height: 100%;
@@ -182,14 +185,9 @@ Label {
     top: 0;
     left: 0;
     -unity-background-scale-mode: scale-to-fit;
-    /* Ensure the icon fills the slot properly */
-    flex-shrink: 0;
-    flex-grow: 0;
 }
 
-/* ========================================
-   SLOT STACK SIZE - Positioned bottom-right
-   ======================================== */
+/* Stack size label */
 .slot-stack-size {
     position: absolute;
     bottom: 2px;
@@ -197,10 +195,12 @@ Label {
     font-size: 12px;
     -unity-font-style: bold;
     color: white;
-    /* Text shadow effect using border */
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+    text-shadow: 1px 1px 2px black;
 }
+
+/* ============================================
+   GENE SLOT STYLING - Gene Editor
+   ============================================ */
 
 .gene-slot {
     position: relative;
@@ -213,6 +213,7 @@ Label {
     width: 100%;
     height: 100%;
     border-radius: 5px;
+    border-width: 1px;
 }
 
 .gene-slot__icon {
@@ -231,33 +232,44 @@ Label {
     font-size: 10px;
     -unity-font-style: bold;
     color: white;
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+}
+
+/* EMPTY SLOT - visible placeholder for drag-drop targets */
+.gene-slot--empty {
+    background-color: rgba(80, 80, 100, 0.3);
+    border-color: rgba(120, 120, 150, 0.5);
+    border-width: 2px;
+    border-style: dashed;
 }
 
 .gene-slot--passive {
     background-color: rgba(100, 200, 100, 0.3);
     border-color: rgba(100, 255, 100, 0.5);
+    border-width: 1px;
 }
 
 .gene-slot--active {
     background-color: rgba(255, 150, 50, 0.3);
     border-color: rgba(255, 200, 100, 0.5);
+    border-width: 1px;
 }
 
 .gene-slot--modifier {
     background-color: rgba(100, 150, 255, 0.3);
     border-color: rgba(150, 200, 255, 0.5);
+    border-width: 1px;
 }
 
 .gene-slot--payload {
     background-color: rgba(200, 100, 255, 0.3);
     border-color: rgba(230, 150, 255, 0.5);
+    border-width: 1px;
 }
 
 .gene-slot--seed {
     background-color: rgba(150, 100, 50, 0.3);
     border-color: rgba(200, 150, 100, 0.5);
+    border-width: 1px;
 }
 
 .gene-slot--incompatible {
@@ -265,6 +277,10 @@ Label {
     border-color: rgba(255, 0, 0, 0.5);
     border-width: 2px;
 }
+
+/* ============================================
+   GENE EDITOR CONTAINERS
+   ============================================ */
 
 #seed-drop-slot-container {
     align-items: center;
@@ -297,6 +313,10 @@ Label {
     margin-bottom: 5px;
 }
 
+/* ============================================
+   SPEC SHEET (Item Details Panel)
+   ============================================ */
+
 .spec-sheet-container {
     padding: 10px;
     background-color: rgba(0, 0, 0, 0.2);
@@ -310,13 +330,19 @@ Label {
     margin-bottom: 10px;
 }
 
+/* FIXED: Spec sheet icon now matches other thumbnails (64px) */
 .spec-sheet-icon {
-    width: 48px;
-    height: 48px;
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    min-height: 64px;
+    max-width: 64px;
+    max-height: 64px;
     margin-right: 10px;
     border-radius: 5px;
     border-width: 1px;
     border-color: rgba(255, 255, 255, 0.3);
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 .spec-sheet-title {
@@ -344,18 +370,24 @@ Label {
     margin-left: 5px;
 }
 
+/* ============================================
+   COLOR PICKER
+   ============================================ */
+
 .color-picker-container {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: 10px;
+    align-items: center;
+    margin-top: 6px;
     margin-bottom: 10px;
-    max-width: 200px;
+    max-width: 400px;
+    width: 100%;
 }
 
 .color-picker-button {
-    width: 24px;
-    height: 24px;
+    width: 22px;
+    height: 22px;
     margin: 2px;
     border-radius: 4px;
     border-width: 2px;
@@ -369,4 +401,37 @@ Label {
 .color-picker-button--selected {
     border-color: rgb(255, 255, 75);
     border-width: 3px;
+}
+
+/* ============================================
+   NAME EDITOR
+   ============================================ */
+
+.seed-name-editor {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    width: 100%;
+}
+
+.seed-name-field {
+    width: 180px;
+    height: 24px;
+    font-size: 12px;
+    -unity-text-align: middle-center;
+}
+
+.seed-name-field > #unity-text-input {
+    background-color: rgba(40, 40, 55, 1);
+    border-radius: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+    border-width: 1px;
+    border-color: rgba(80, 80, 100, 0.8);
+}
+
+.seed-name-field > #unity-text-input:focus {
+    border-color: rgba(150, 150, 200, 0.9);
 }
