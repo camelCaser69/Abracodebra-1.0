@@ -1,31 +1,34 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Abracodabra.UI.Genes; // For InventoryBarController
-
-// NOTE: InventoryBarController is in Abracodabra.UI.Genes namespace
+using Abracodabra.UI.Genes;
 
 namespace Abracodabra.UI.Toolkit
 {
     /// <summary>
-    /// Manages the hotbar display with MANUAL container (no ListView) and integrates with InventoryBarController
+    /// Manages the hotbar display with MANUAL container (no ListView).
+    /// Uses HotbarSelectionService to communicate selection to game systems.
     /// </summary>
     public class UIHotbarController
     {
+        // Events
+        public event Action<int, UIInventoryItem> OnSlotSelected;
+
         // References
-        private VisualElement hotbarContainer; // The parent Hotbar element
-        private VisualElement slotsContainer; // Manual container for slots
+        private VisualElement hotbarContainer;
+        private VisualElement slotsContainer;
         private VisualElement hotbarSelector;
         private VisualTreeAsset slotTemplate;
         private List<UIInventoryItem> hotbarItems;
         private List<VisualElement> slotElements = new List<VisualElement>();
-        
+
         // State
         private int selectedHotbarIndex = 0;
         private int maxHotbarSlots = 8;
 
         /// <summary>
-        /// Initialize the hotbar controller - NOTE: We use the parent element, not ListView
+        /// Initialize the hotbar controller
         /// </summary>
         public void Initialize(ListView listView, VisualElement selector, VisualTreeAsset template)
         {
@@ -33,14 +36,14 @@ namespace Abracodabra.UI.Toolkit
             hotbarContainer = listView.parent;
             hotbarSelector = selector;
             slotTemplate = template;
-            
+
             // Remove the ListView entirely and create our own container
             if (listView != null)
             {
                 listView.RemoveFromHierarchy();
                 Debug.Log("[UIHotbarController] Removed ListView, creating manual container");
             }
-            
+
             // Create manual slots container
             slotsContainer = new VisualElement();
             slotsContainer.name = "hotbar-slots-container";
@@ -49,9 +52,9 @@ namespace Abracodabra.UI.Toolkit
             slotsContainer.style.flexWrap = Wrap.NoWrap;
             slotsContainer.style.overflow = Overflow.Hidden;
             slotsContainer.style.height = 74;
-            
+
             hotbarContainer.Add(slotsContainer);
-            
+
             Debug.Log("[UIHotbarController] Initialized with manual container");
         }
 
@@ -61,94 +64,137 @@ namespace Abracodabra.UI.Toolkit
         public void SetupHotbar(List<UIInventoryItem> items)
         {
             if (slotsContainer == null) return;
-            
+
             hotbarItems = items;
             maxHotbarSlots = items.Count;
-            
+
             // Clear existing slots
             slotsContainer.Clear();
             slotElements.Clear();
-            
+
             // Manually create each slot
             for (int i = 0; i < items.Count; i++)
             {
                 int slotIndex = i; // Capture for closure
-                
+
                 var slotElement = slotTemplate.Instantiate();
-                slotElement.AddToClassList("slot");
                 
-                // Bind the item data
-                BindSlot(slotElement, items[i]);
-                
+                // CRITICAL FIX: Get the actual slot container from the template
+                // The template instantiates a TemplateContainer, we need the slot inside
+                var actualSlot = slotElement.Q(className: "slot");
+                if (actualSlot == null)
+                {
+                    // If the template root is the slot itself
+                    actualSlot = slotElement;
+                    actualSlot.AddToClassList("slot");
+                }
+
+                // Bind the item data with PROPER icon sizing
+                BindSlot(actualSlot, items[i]);
+
                 // Add click handler for selection
-                slotElement.RegisterCallback<ClickEvent>(evt =>
+                actualSlot.RegisterCallback<ClickEvent>(evt =>
                 {
                     SelectSlot(slotIndex);
                 });
-                
-                slotElements.Add(slotElement);
+
+                slotElements.Add(actualSlot);
                 slotsContainer.Add(slotElement);
             }
-            
+
             // Calculate total width and set it
             int totalWidth = items.Count * 74; // 64px slot + 10px margin
             slotsContainer.style.width = totalWidth;
             slotsContainer.style.minWidth = totalWidth;
             slotsContainer.style.maxWidth = totalWidth;
-            
+
             // Set hotbar container width (with padding)
-            hotbarContainer.style.width = totalWidth + 10; // 5px padding on each side
+            hotbarContainer.style.width = totalWidth + 10;
             hotbarContainer.style.minWidth = totalWidth + 10;
             hotbarContainer.style.maxWidth = totalWidth + 10;
-            
+
             Debug.Log($"[UIHotbarController] Created {items.Count} manual slots, total width: {totalWidth}px");
-            
+
             // Initial selection
             SelectSlot(0);
         }
-        
+
         /// <summary>
-        /// Bind item data to a slot
+        /// Bind item data to a slot with PROPER icon sizing
         /// </summary>
         private void BindSlot(VisualElement slotElement, UIInventoryItem item)
         {
             var icon = slotElement.Q<Image>("icon");
             var stack = slotElement.Q<Label>("stack-size");
 
-            if (item != null)
+            if (icon != null)
             {
-                icon.sprite = item.Icon;
-                icon.style.display = DisplayStyle.Flex;
-                stack.text = item.StackSize > 1 ? item.StackSize.ToString() : "";
-                
-                // Apply custom background color if set (for seeds)
-                if (item.HasCustomColor())
+                // CRITICAL FIX: Ensure icon fills the slot properly
+                icon.style.width = Length.Percent(100);
+                icon.style.height = Length.Percent(100);
+                icon.style.position = Position.Absolute;
+                icon.style.top = 0;
+                icon.style.left = 0;
+                icon.scaleMode = ScaleMode.ScaleToFit;
+
+                if (item != null && item.Icon != null)
                 {
-                    slotElement.style.backgroundColor = item.BackgroundColor;
+                    icon.sprite = item.Icon;
+                    icon.style.display = DisplayStyle.Flex;
                 }
                 else
                 {
-                    slotElement.style.backgroundColor = new Color(0, 0, 0, 0); // Transparent
+                    icon.sprite = null;
+                    icon.style.display = DisplayStyle.None;
                 }
+            }
+
+            if (stack != null)
+            {
+                // Position stack size label
+                stack.style.position = Position.Absolute;
+                stack.style.bottom = 2;
+                stack.style.right = 4;
+
+                if (item != null && item.StackSize > 1)
+                {
+                    stack.text = item.StackSize.ToString();
+                    stack.style.display = DisplayStyle.Flex;
+                }
+                else
+                {
+                    stack.text = "";
+                    stack.style.display = DisplayStyle.None;
+                }
+            }
+
+            // Apply custom background color if set (for seeds)
+            if (item != null && item.HasCustomColor())
+            {
+                slotElement.style.backgroundColor = item.BackgroundColor;
             }
             else
             {
-                icon.style.display = DisplayStyle.None;
-                stack.text = "";
-                slotElement.style.backgroundColor = new Color(0, 0, 0, 0); // Transparent
+                slotElement.style.backgroundColor = new StyleColor(new Color(0, 0, 0, 0.4f));
             }
         }
-        
+
         /// <summary>
         /// Refresh the hotbar to update visuals (e.g., after color change)
         /// </summary>
         public void RefreshHotbar()
         {
             if (slotElements == null || hotbarItems == null) return;
-            
+
             for (int i = 0; i < slotElements.Count && i < hotbarItems.Count; i++)
             {
                 BindSlot(slotElements[i], hotbarItems[i]);
+            }
+
+            // Refresh the selection to update the service with current item
+            if (selectedHotbarIndex >= 0 && selectedHotbarIndex < hotbarItems.Count)
+            {
+                HotbarSelectionService.RefreshCurrentSelection(hotbarItems[selectedHotbarIndex]);
             }
         }
 
@@ -157,7 +203,6 @@ namespace Abracodabra.UI.Toolkit
         /// </summary>
         public void HandleInput()
         {
-            // Use Alpha keys (top number row) - works on all keyboard layouts
             if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1)) SelectSlot(0);
             if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2)) SelectSlot(1);
             if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3)) SelectSlot(2);
@@ -169,34 +214,46 @@ namespace Abracodabra.UI.Toolkit
         }
 
         /// <summary>
-        /// Select a hotbar slot by index - INTEGRATES WITH INVENTORYBARCONTROLLER
+        /// Select a hotbar slot by index
         /// </summary>
         public void SelectSlot(int index)
         {
             if (index < 0 || index >= maxHotbarSlots) return;
+            if (hotbarItems == null || index >= hotbarItems.Count) return;
 
             selectedHotbarIndex = index;
-            
+
             // Update visual selector position
             if (slotElements != null && index < slotElements.Count)
             {
                 var selectedSlot = slotElements[index];
                 if (selectedSlot != null && hotbarSelector != null)
                 {
-                    hotbarSelector.style.left = selectedSlot.layout.xMin;
-                    hotbarSelector.style.display = DisplayStyle.Flex;
+                    // Schedule the position update for after layout
+                    selectedSlot.schedule.Execute(() =>
+                    {
+                        if (hotbarSelector != null && selectedSlot != null)
+                        {
+                            hotbarSelector.style.left = selectedSlot.layout.xMin;
+                            hotbarSelector.style.display = DisplayStyle.Flex;
+                        }
+                    }).StartingIn(1);
                 }
             }
-            
-            // CRITICAL: Notify the old InventoryBarController system (from Abracodabra.UI.Genes namespace)
+
+            // Get the selected item
+            var selectedItem = hotbarItems[index];
+
+            // CRITICAL: Update the HotbarSelectionService (replaces old InventoryBarController integration)
+            HotbarSelectionService.SelectItem(index, selectedItem);
+
+            // Fire local event
+            OnSlotSelected?.Invoke(index, selectedItem);
+
+            // Also try to notify old InventoryBarController if it exists (backwards compatibility)
             if (InventoryBarController.Instance != null)
             {
                 InventoryBarController.Instance.SelectSlotByIndex(index);
-                Debug.Log($"[UIHotbarController] Selected slot {index + 1}, notified InventoryBarController");
-            }
-            else
-            {
-                Debug.LogWarning($"[UIHotbarController] Selected slot {index + 1} but InventoryBarController.Instance is null!");
             }
         }
 
@@ -204,5 +261,15 @@ namespace Abracodabra.UI.Toolkit
         /// Get the currently selected hotbar index
         /// </summary>
         public int GetSelectedIndex() => selectedHotbarIndex;
+
+        /// <summary>
+        /// Get the currently selected item
+        /// </summary>
+        public UIInventoryItem GetSelectedItem()
+        {
+            if (hotbarItems == null || selectedHotbarIndex < 0 || selectedHotbarIndex >= hotbarItems.Count)
+                return null;
+            return hotbarItems[selectedHotbarIndex];
+        }
     }
 }

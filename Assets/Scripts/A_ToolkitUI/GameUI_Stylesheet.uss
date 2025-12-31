@@ -146,6 +146,9 @@ Label {
     margin: 5px;
     border-radius: 5px;
     cursor: arrow;
+    /* CRITICAL: Position relative for absolute children */
+    position: relative;
+    overflow: hidden;
 }
 
 .slot:hover {
@@ -163,15 +166,73 @@ Label {
     border-width: 2px;
 }
 
+.slot--locked-for-editing {
+    background-color: rgba(100, 100, 255, 0.2);
+    border-color: rgba(100, 100, 255, 0.7);
+    border-width: 2px;
+}
+
+/* ========================================
+   SLOT ICON - CRITICAL FIX FOR TINY ICONS
+   ======================================== */
+.slot-icon {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    -unity-background-scale-mode: scale-to-fit;
+    /* Ensure the icon fills the slot properly */
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+/* ========================================
+   SLOT STACK SIZE - Positioned bottom-right
+   ======================================== */
+.slot-stack-size {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: white;
+    /* Text shadow effect using border */
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
+}
+
 .gene-slot {
     position: relative;
     flex-shrink: 0;
+    width: 64px;
+    height: 64px;
 }
 
 .gene-slot__background {
     width: 100%;
     height: 100%;
     border-radius: 5px;
+}
+
+.gene-slot__icon {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.gene-slot__tier-label {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 10px;
+    -unity-font-style: bold;
+    color: white;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(0, 0, 0, 0.8);
 }
 
 .gene-slot--passive {

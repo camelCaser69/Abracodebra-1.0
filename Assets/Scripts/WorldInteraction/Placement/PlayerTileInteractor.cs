@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
-using Abracodabra.Genes.Runtime;
 using UnityEngine;
+using Abracodabra.Genes.Runtime;
 using Abracodabra.UI.Genes;
 using WegoSystem;
 
+/// <summary>
+/// Handles player tile interactions - clicking to use tools, plant seeds, etc.
+/// Uses HotbarSelectionService to get the currently selected item.
+/// </summary>
 public sealed class PlayerTileInteractor : MonoBehaviour
 {
-    [SerializeField] private InventoryBarController inventoryBar;
     [SerializeField] private TileInteractionManager tileInteractionManager;
     [SerializeField] private Transform playerTransform;
     [SerializeField] private bool showDebug = false;
@@ -14,24 +17,29 @@ public sealed class PlayerTileInteractor : MonoBehaviour
     private bool pendingLeftClick;
     private bool pendingRightClick;
 
-    private void Awake()
+    void Awake()
     {
-        if (playerTransform == null) playerTransform = transform;
+        if (playerTransform == null)
+            playerTransform = transform;
     }
 
-    private void Start()
+    void Start()
     {
         FindSingletons();
     }
 
-    private void Update()
+    void Update()
     {
-        if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat) return;
-        if (Input.GetMouseButtonDown(0)) pendingLeftClick = true;
-        if (Input.GetMouseButtonDown(1)) pendingRightClick = true;
+        if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat)
+            return;
+
+        if (Input.GetMouseButtonDown(0))
+            pendingLeftClick = true;
+        if (Input.GetMouseButtonDown(1))
+            pendingRightClick = true;
     }
 
-    private void LateUpdate()
+    void LateUpdate()
     {
         if (pendingLeftClick)
         {
@@ -45,17 +53,16 @@ public sealed class PlayerTileInteractor : MonoBehaviour
         }
     }
 
-    private void HandleRightClick()
+    void HandleRightClick()
     {
         if (!EnsureManagers()) return;
 
-        InventoryBarItem selected = inventoryBar.SelectedItem;
+        // Use HotbarSelectionService instead of old InventoryBarController
+        InventoryBarItem selected = HotbarSelectionService.SelectedItem;
         if (selected == null || !selected.IsValid()) return;
-    
-        // MODIFIED: This logic now correctly handles the new ItemInstance type for consumption.
+
         if (selected.Type == InventoryBarItem.ItemType.Resource)
         {
-            // Get the item's data from the inventory
             ItemInstance itemToConsume = selected.ItemInstance;
             if (itemToConsume == null || !itemToConsume.definition.isConsumable)
             {
@@ -65,35 +72,45 @@ public sealed class PlayerTileInteractor : MonoBehaviour
             GardenerController player = playerTransform.GetComponent<GardenerController>();
             if (player == null || player.HungerSystem == null) return;
 
-            // Use the ItemInstance to get the final nutrition value
             player.HungerSystem.Eat(itemToConsume.GetNutrition());
 
-            System.Action onSuccess = () => {
-                // This assumes eating consumes the whole stack.
-                // Future logic could decrement the stack count instead.
-                InventoryGridController.Instance.RemoveItemFromInventory(selected);
-                inventoryBar.ShowBar();
+            System.Action onSuccess = () =>
+            {
+                InventoryGridController.Instance?.RemoveItemFromInventory(selected);
+                // Note: We don't need to call SelectSlotByIndex on the old controller anymore
             };
 
-            PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Interact,
-                tileInteractionManager.WorldToCell(playerTransform.position), "Eating", onSuccess);
+            PlayerActionManager.Instance.ExecutePlayerAction(
+                PlayerActionType.Interact,
+                tileInteractionManager.WorldToCell(playerTransform.position),
+                "Eating",
+                onSuccess
+            );
         }
     }
 
-    private void HandleLeftClick()
+    void HandleLeftClick()
     {
         if (!EnsureManagers()) return;
 
-        InventoryBarItem selected = inventoryBar.SelectedItem;
+        // CRITICAL FIX: Use HotbarSelectionService instead of old InventoryBarController
+        InventoryBarItem selected = HotbarSelectionService.SelectedItem;
+
         if (selected == null || !selected.IsValid())
         {
             if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: No valid item selected.");
             return;
         }
 
+        if (!tileInteractionManager.CurrentlyHoveredCell.HasValue)
+        {
+            if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: No hovered cell.");
+            return;
+        }
+
         if (!tileInteractionManager.IsWithinInteractionRange)
         {
-            if (showDebug) Debug.Log($"[PlayerTileInteractor] Left-click ignored: Target cell is out of range according to TileInteractionManager.");
+            if (showDebug) Debug.Log($"[PlayerTileInteractor] Left-click ignored: Target cell is out of range.");
             return;
         }
 
@@ -104,56 +121,73 @@ public sealed class PlayerTileInteractor : MonoBehaviour
         switch (selected.Type)
         {
             case InventoryBarItem.ItemType.Tool:
-                var toolDef = selected.ToolDefinition;
-
-                if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool != toolDef)
-                {
-                    ToolSwitcher.Instance.SelectToolByDefinition(toolDef);
-                }
-                
-                // NEW: Special case for Harvest Pouch to call the correct action type.
-                if (toolDef.toolType == ToolType.HarvestPouch)
-                {
-                    // We don't consume a use for harvesting until we know it was successful.
-                    // PlayerActionManager will handle tick cost.
-                    PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Harvest, cellPos, toolDef);
-                }
-                else
-                {
-                    // Standard tool usage
-                    if (ToolSwitcher.Instance != null)
-                    {
-                        if (!ToolSwitcher.Instance.TryConsumeUse())
-                        {
-                            if (showDebug) Debug.Log($"[PlayerTileInteractor] Action blocked: Tool '{selected.GetDisplayName()}' is out of uses.");
-                            return; 
-                        }
-                    }
-                    PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.UseTool, cellPos, toolDef);
-                }
+                HandleToolUse(selected, cellPos);
                 break;
 
             case InventoryBarItem.ItemType.Seed:
-                System.Action onSuccess = () =>
-                {
-                    if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
-                    InventoryGridController.Instance?.RemoveItemFromInventory(selected);
-                    inventoryBar.SelectSlotByIndex(0);
-                };
-                PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess);
+                HandleSeedPlant(selected, cellPos);
+                break;
+
+            case InventoryBarItem.ItemType.Gene:
+                if (showDebug) Debug.Log("[PlayerTileInteractor] Genes cannot be used directly on tiles.");
+                break;
+
+            case InventoryBarItem.ItemType.Resource:
+                if (showDebug) Debug.Log("[PlayerTileInteractor] Resources cannot be used on tiles. Right-click to consume.");
                 break;
         }
     }
 
-    private bool EnsureManagers()
+    private void HandleToolUse(InventoryBarItem selected, Vector3Int cellPos)
     {
-        if (tileInteractionManager == null || inventoryBar == null) FindSingletons();
-        return tileInteractionManager != null && inventoryBar != null;
+        var toolDef = selected.ToolDefinition;
+        if (toolDef == null) return;
+
+        if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool != toolDef)
+        {
+            ToolSwitcher.Instance.SelectToolByDefinition(toolDef);
+        }
+
+        if (toolDef.toolType == ToolType.HarvestPouch)
+        {
+            PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Harvest, cellPos, toolDef);
+        }
+        else
+        {
+            if (ToolSwitcher.Instance != null)
+            {
+                if (!ToolSwitcher.Instance.TryConsumeUse())
+                {
+                    if (showDebug) Debug.Log($"[PlayerTileInteractor] Action blocked: Tool '{selected.GetDisplayName()}' is out of uses.");
+                    return;
+                }
+            }
+            PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.UseTool, cellPos, toolDef);
+        }
     }
 
-    private void FindSingletons()
+    private void HandleSeedPlant(InventoryBarItem selected, Vector3Int cellPos)
     {
-        if (inventoryBar == null) inventoryBar = InventoryBarController.Instance;
-        if (tileInteractionManager == null) tileInteractionManager = TileInteractionManager.Instance;
+        System.Action onSuccess = () =>
+        {
+            if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
+            InventoryGridController.Instance?.RemoveItemFromInventory(selected);
+            // Note: Selection handling is now done through HotbarSelectionService
+        };
+
+        PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess);
+    }
+
+    bool EnsureManagers()
+    {
+        if (tileInteractionManager == null)
+            FindSingletons();
+        return tileInteractionManager != null;
+    }
+
+    void FindSingletons()
+    {
+        if (tileInteractionManager == null)
+            tileInteractionManager = TileInteractionManager.Instance;
     }
 }

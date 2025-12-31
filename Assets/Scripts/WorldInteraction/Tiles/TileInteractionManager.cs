@@ -379,7 +379,7 @@ namespace WegoSystem
             }
         }
 
-        private void UpdateDebugUI()
+        void UpdateDebugUI()
         {
             if (hoveredTileText != null)
             {
@@ -391,11 +391,14 @@ namespace WegoSystem
                 string rangeIndicator = isWithinInteractionRange ? " [IN RANGE]" : " [OUT OF RANGE]";
                 hoveredTileText.text = $"Hover: {tileName}{rangeIndicator}";
             }
+        
             if (currentToolText != null)
             {
-                if (InventoryBarController.Instance?.SelectedItem != null)
+                // FIXED: Use HotbarSelectionService instead of old InventoryBarController
+                var selectedItem = HotbarSelectionService.SelectedItem;
+                if (selectedItem != null && selectedItem.IsValid())
                 {
-                    currentToolText.text = $"Selected: {InventoryBarController.Instance.SelectedItem.GetDisplayName()}";
+                    currentToolText.text = $"Selected: {selectedItem.GetDisplayName()}";
                 }
                 else
                 {

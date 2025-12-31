@@ -15,21 +15,21 @@ namespace Abracodabra.UI.Toolkit
         // Events
         public event Action<int, int> OnInventorySwapRequested;
         public event Action<int, VisualElement, string> OnGeneDropRequested;
-        public event Action<GeneCategory?> OnDragStarted; // FIX #2: Notify what type is being dragged
-        public event Action OnDragEnded; // FIX #2: Notify when drag ends
-        
+        public event Action<GeneCategory?> OnDragStarted;
+        public event Action OnDragEnded;
+
         // State
         private bool isDragging = false;
         private int dragSourceIndex = -1;
-        private GeneBase draggedGene = null; // FIX #4: Track dragged gene from editor
-        private VisualElement draggedGeneSlot = null; // FIX #4: Track source slot
+        private GeneBase draggedGene = null;
+        private VisualElement draggedGeneSlot = null;
         private VisualElement dragPreview;
-        
+
         // References
         private VisualElement rootElement;
         private List<UIInventoryItem> inventory;
         private List<VisualElement> inventorySlots;
-        
+
         // Gene editor slot references
         private VisualElement seedDropSlotContainer;
         private VisualElement passiveGenesContainer;
@@ -42,7 +42,7 @@ namespace Abracodabra.UI.Toolkit
         {
             rootElement = root;
             inventory = inventoryData;
-            
+
             // Register GLOBAL mouse handlers for drag & drop
             rootElement.RegisterCallback<PointerMoveEvent>(OnGlobalPointerMove);
             rootElement.RegisterCallback<PointerUpEvent>(OnGlobalPointerUp);
@@ -72,13 +72,13 @@ namespace Abracodabra.UI.Toolkit
         public void StartDrag(int sourceIndex)
         {
             if (inventory[sourceIndex] == null) return; // Can't drag empty slots
-            
+
             dragSourceIndex = sourceIndex;
             draggedGene = null; // Not dragging from gene editor
             draggedGeneSlot = null;
             isDragging = false; // Not dragging yet, just pressed
         }
-        
+
         /// <summary>
         /// Start a drag operation from a gene editor slot
         /// </summary>
@@ -98,24 +98,22 @@ namespace Abracodabra.UI.Toolkit
         private void OnGlobalPointerMove(PointerMoveEvent evt)
         {
             if (dragSourceIndex == -1 && draggedGene == null) return;
-            
+
             // Start dragging if moved
             if (!isDragging)
             {
                 isDragging = true;
-                
+
                 if (draggedGene != null)
                 {
                     // Dragging from gene editor
                     CreateDragPreviewFromGene(draggedGene);
-                    // FIX #2: Notify with gene category
                     OnDragStarted?.Invoke(draggedGene.Category);
                 }
                 else
                 {
                     // Dragging from inventory
                     CreateDragPreview(dragSourceIndex);
-                    // FIX #2: Check if it's a gene and notify category
                     var item = inventory[dragSourceIndex];
                     if (item?.OriginalData is GeneBase gene)
                     {
@@ -127,7 +125,7 @@ namespace Abracodabra.UI.Toolkit
                     }
                 }
             }
-            
+
             if (dragPreview != null)
             {
                 // Use absolute screen position for smooth tracking
@@ -135,7 +133,7 @@ namespace Abracodabra.UI.Toolkit
                 dragPreview.style.top = evt.position.y - 32;
             }
         }
-        
+
         private void OnGlobalPointerUp(PointerUpEvent evt)
         {
             if (!isDragging || (dragSourceIndex == -1 && draggedGene == null))
@@ -145,9 +143,9 @@ namespace Abracodabra.UI.Toolkit
                 draggedGeneSlot = null;
                 return;
             }
-            
+
             bool dropHandled = false;
-            
+
             // Check if dropped on inventory slot
             int inventoryDropIndex = GetInventorySlotAtPosition(evt.position);
             if (inventoryDropIndex >= 0)
@@ -160,15 +158,14 @@ namespace Abracodabra.UI.Toolkit
                 }
                 else if (draggedGene != null)
                 {
-                    // FIX #4: Dragging from gene editor to inventory
-                    // Remove gene from editor slot
+                    // Dragging from gene editor to inventory
                     if (draggedGeneSlot != null)
                     {
                         // Clear the gene editor slot visually
                         var background = draggedGeneSlot.Q("background");
                         var icon = draggedGeneSlot.Q<Image>("icon");
                         var tierLabel = draggedGeneSlot.Q<Label>("tier-label");
-                        
+
                         if (icon != null) icon.style.display = DisplayStyle.None;
                         if (tierLabel != null) tierLabel.text = "";
                         if (background != null)
@@ -177,13 +174,12 @@ namespace Abracodabra.UI.Toolkit
                             background.AddToClassList("gene-slot__background");
                         }
                     }
-                    
-                    // TODO: Add gene to inventory at drop index
+
                     Debug.Log($"Would add {draggedGene.geneName} to inventory slot {inventoryDropIndex}");
                     dropHandled = true;
                 }
             }
-            
+
             // Check if dropped on gene editor slot (only from inventory)
             if (!dropHandled && dragSourceIndex >= 0)
             {
@@ -194,7 +190,7 @@ namespace Abracodabra.UI.Toolkit
                     dropHandled = true;
                 }
             }
-            
+
             // Always cleanup
             CleanupDrag();
         }
@@ -202,7 +198,7 @@ namespace Abracodabra.UI.Toolkit
         private int GetInventorySlotAtPosition(Vector2 screenPos)
         {
             if (inventorySlots == null) return -1;
-            
+
             for (int i = 0; i < inventorySlots.Count; i++)
             {
                 var slot = inventorySlots[i];
@@ -225,7 +221,7 @@ namespace Abracodabra.UI.Toolkit
                     return (seedSlot, "seed");
                 }
             }
-            
+
             // Check passive slots
             if (passiveGenesContainer != null)
             {
@@ -237,7 +233,7 @@ namespace Abracodabra.UI.Toolkit
                     }
                 }
             }
-            
+
             // Check active sequence slots
             if (activeSequenceContainer != null)
             {
@@ -261,7 +257,7 @@ namespace Abracodabra.UI.Toolkit
                     }
                 }
             }
-            
+
             return (null, null);
         }
 
@@ -272,56 +268,82 @@ namespace Abracodabra.UI.Toolkit
                 dragPreview.RemoveFromHierarchy();
                 dragPreview = null;
             }
-            
-            // FIX #2: Notify that drag ended
+
+            // Notify that drag ended
             if (isDragging)
             {
                 OnDragEnded?.Invoke();
             }
-            
+
             isDragging = false;
             dragSourceIndex = -1;
-            draggedGene = null; // FIX #4: Clear gene editor drag state
+            draggedGene = null;
             draggedGeneSlot = null;
         }
-        
+
+        /// <summary>
+        /// Create a drag preview for an inventory item - WITH PROPER ICON SIZING
+        /// </summary>
         private void CreateDragPreview(int index)
         {
             var item = inventory[index];
             if (item == null) return;
-            
+
             dragPreview = new VisualElement();
             dragPreview.AddToClassList("slot");
             dragPreview.style.position = Position.Absolute;
             dragPreview.style.width = 64;
             dragPreview.style.height = 64;
+            dragPreview.style.overflow = Overflow.Hidden;
             dragPreview.pickingMode = PickingMode.Ignore; // Don't interfere with hit detection
-            
+
             var icon = new Image();
             icon.sprite = item.Icon;
             icon.AddToClassList("slot-icon");
-            dragPreview.Add(icon);
             
+            // CRITICAL FIX: Ensure icon fills the preview properly (inline styling as backup)
+            icon.style.width = Length.Percent(100);
+            icon.style.height = Length.Percent(100);
+            icon.style.position = Position.Absolute;
+            icon.style.top = 0;
+            icon.style.left = 0;
+            icon.scaleMode = ScaleMode.ScaleToFit;
+            
+            dragPreview.Add(icon);
+
             // Add to root element so it's above everything
             rootElement.Add(dragPreview);
         }
-        
+
+        /// <summary>
+        /// Create a drag preview for a gene from the editor - WITH PROPER ICON SIZING
+        /// </summary>
         private void CreateDragPreviewFromGene(GeneBase gene)
         {
             if (gene == null) return;
-            
+
             dragPreview = new VisualElement();
             dragPreview.AddToClassList("slot");
             dragPreview.style.position = Position.Absolute;
             dragPreview.style.width = 64;
             dragPreview.style.height = 64;
+            dragPreview.style.overflow = Overflow.Hidden;
             dragPreview.pickingMode = PickingMode.Ignore;
-            
+
             var icon = new Image();
             icon.sprite = gene.icon;
             icon.AddToClassList("slot-icon");
-            dragPreview.Add(icon);
             
+            // CRITICAL FIX: Ensure icon fills the preview properly (inline styling as backup)
+            icon.style.width = Length.Percent(100);
+            icon.style.height = Length.Percent(100);
+            icon.style.position = Position.Absolute;
+            icon.style.top = 0;
+            icon.style.left = 0;
+            icon.scaleMode = ScaleMode.ScaleToFit;
+            
+            dragPreview.Add(icon);
+
             // Add to root element so it's above everything
             rootElement.Add(dragPreview);
         }
