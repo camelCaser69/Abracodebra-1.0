@@ -50,9 +50,39 @@
     </ui:VisualElement>
     
     <ui:VisualElement name="HUDPanel" class="root-panel">
+        
+        <!-- Top-left stats panel (Hunger + Tick) -->
+        <ui:VisualElement name="hud-stats-panel" class="hud-stats-panel">
+            <ui:VisualElement name="hunger-container" class="hud-stat-row">
+                <ui:Label text="🍖" class="hud-stat-icon" />
+                <ui:VisualElement name="hunger-bar-bg" class="hud-bar-background">
+                    <ui:VisualElement name="hunger-bar-fill" class="hud-bar-fill hud-bar-fill--hunger" />
+                </ui:VisualElement>
+                <ui:Label name="hunger-text" text="100/100" class="hud-stat-text" />
+            </ui:VisualElement>
+            <ui:VisualElement name="tick-container" class="hud-stat-row">
+                <ui:Label text="⏱️" class="hud-stat-icon" />
+                <ui:Label name="tick-text" text="Tick: 0" class="hud-stat-text-large" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        
+        <!-- Top-right tooltip panel for selected item -->
+        <ui:VisualElement name="hud-tooltip-panel" class="hud-tooltip-panel">
+            <ui:VisualElement class="hud-tooltip-header">
+                <ui:Image name="hud-tooltip-icon" class="hud-tooltip-icon" />
+                <ui:VisualElement class="hud-tooltip-title-container">
+                    <ui:Label name="hud-tooltip-name" text="" class="hud-tooltip-name" />
+                    <ui:Label name="hud-tooltip-type" text="" class="hud-tooltip-type" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:Label name="hud-tooltip-description" text="" class="hud-tooltip-description" />
+        </ui:VisualElement>
+        
+        <!-- Bottom hotbar -->
         <ui:VisualElement name="Hotbar" class="hotbar">
             <ui:ListView name="hotbar-list" class="hotbar-list" />
             <ui:VisualElement name="hotbar-selector" class="hotbar-selector" />
         </ui:VisualElement>
+        
     </ui:VisualElement>
 </ui:UXML>

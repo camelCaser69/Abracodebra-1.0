@@ -10,8 +10,8 @@
 #HUDPanel {
     background-color: rgba(0, 0, 0, 0);
     flex-direction: column;
-    justify-content: flex-end;
-    align-items: center; /* Centers children horizontally */
+    justify-content: space-between;
+    align-items: stretch;
     padding: 0;
     margin: 0;
 }
@@ -89,7 +89,133 @@ Label {
     box-sizing: border-box;
 }
 
-/* Hotbar container - centered by parent's align-items: center */
+/* ============================================
+   HUD STATS PANEL (Top-left)
+   ============================================ */
+
+.hud-stats-panel {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px 15px;
+    border-radius: 8px;
+    min-width: 180px;
+}
+
+.hud-stat-row {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.hud-stat-row:last-child {
+    margin-bottom: 0;
+}
+
+.hud-stat-icon {
+    font-size: 16px;
+    width: 24px;
+    margin-right: 8px;
+    -unity-text-align: middle-center;
+}
+
+.hud-bar-background {
+    width: 100px;
+    height: 14px;
+    background-color: rgba(50, 50, 50, 0.8);
+    border-radius: 7px;
+    overflow: hidden;
+    margin-right: 8px;
+}
+
+.hud-bar-fill {
+    height: 100%;
+    border-radius: 7px;
+    transition: width 0.2s ease-out;
+}
+
+.hud-bar-fill--hunger {
+    background-color: rgb(220, 120, 50);
+}
+
+.hud-bar-fill--low {
+    background-color: rgb(220, 60, 60);
+}
+
+.hud-stat-text {
+    font-size: 12px;
+    color: white;
+    min-width: 50px;
+}
+
+.hud-stat-text-large {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: white;
+}
+
+/* ============================================
+   HUD TOOLTIP PANEL (Top-right)
+   ============================================ */
+
+.hud-tooltip-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 12px 15px;
+    border-radius: 8px;
+    min-width: 200px;
+    max-width: 280px;
+    display: none;
+}
+
+.hud-tooltip-header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.hud-tooltip-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    margin-right: 10px;
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.3);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.hud-tooltip-title-container {
+    flex-grow: 1;
+}
+
+.hud-tooltip-name {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: white;
+    margin-bottom: 2px;
+}
+
+.hud-tooltip-type {
+    font-size: 12px;
+    color: rgb(150, 180, 220);
+}
+
+.hud-tooltip-description {
+    font-size: 11px;
+    color: rgb(180, 180, 180);
+    white-space: normal;
+}
+
+/* ============================================
+   HOTBAR
+   ============================================ */
+
+/* Hotbar container - centered at bottom */
 #Hotbar {
     height: 84px;
     max-height: 84px;
@@ -98,6 +224,7 @@ Label {
     align-items: center;
     justify-content: center;
     margin-bottom: 10px;
+    align-self: center;
 }
 
 /* Hotbar visual container */
@@ -135,6 +262,7 @@ Label {
     border-color: yellow;
     border-radius: 5px;
     transition: left 0.1s ease-in-out;
+    display: none;
 }
 
 /* ============================================
@@ -417,19 +545,23 @@ Label {
 }
 
 .seed-name-field {
-    width: 180px;
-    height: 24px;
-    font-size: 12px;
+    width: 280px;
+    height: 32px;
+    font-size: 16px;
     -unity-text-align: middle-center;
 }
 
 .seed-name-field > #unity-text-input {
-    background-color: rgba(40, 40, 55, 1);
-    border-radius: 4px;
-    padding-left: 6px;
-    padding-right: 6px;
+    background-color: rgba(20, 20, 30, 1);
+    border-radius: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
     border-width: 1px;
     border-color: rgba(80, 80, 100, 0.8);
+    color: white;
+    font-size: 16px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
 }
 
 .seed-name-field > #unity-text-input:focus {

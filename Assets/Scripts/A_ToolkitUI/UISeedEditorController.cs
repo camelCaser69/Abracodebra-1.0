@@ -313,45 +313,21 @@ namespace Abracodabra.UI.Toolkit
             nameEditorContainer.style.width = Length.Percent(100);
 
             seedNameField = new TextField();
-            seedNameField.style.width = 200;
-            seedNameField.style.height = 32;
-
-            // Style the text input element directly
-            seedNameField.RegisterCallback<GeometryChangedEvent>(evt =>
+            seedNameField.AddToClassList("seed-name-field");
+            
+            // Make it 2x wider (280px) with proper height
+            seedNameField.style.width = 280;
+            seedNameField.style.height = 36;
+            
+            // Ensure the text input is properly styled after layout
+            seedNameField.RegisterCallback<AttachToPanelEvent>(evt =>
             {
-                var textInput = seedNameField.Q("unity-text-input");
-                if (textInput != null)
-                {
-                    // Dark background for contrast
-                    textInput.style.backgroundColor = new Color(0.08f, 0.08f, 0.12f, 1f);
-                    
-                    // White text, large and bold
-                    textInput.style.color = Color.white;
-                    textInput.style.fontSize = 16;
-                    textInput.style.unityFontStyleAndWeight = FontStyle.Bold;
-                    textInput.style.unityTextAlign = TextAnchor.MiddleCenter;
-                    
-                    // Rounded corners and padding
-                    textInput.style.borderTopLeftRadius = 6;
-                    textInput.style.borderTopRightRadius = 6;
-                    textInput.style.borderBottomLeftRadius = 6;
-                    textInput.style.borderBottomRightRadius = 6;
-                    textInput.style.paddingLeft = 10;
-                    textInput.style.paddingRight = 10;
-                    textInput.style.paddingTop = 4;
-                    textInput.style.paddingBottom = 4;
-                    
-                    // Subtle border
-                    textInput.style.borderLeftWidth = 1;
-                    textInput.style.borderRightWidth = 1;
-                    textInput.style.borderTopWidth = 1;
-                    textInput.style.borderBottomWidth = 1;
-                    textInput.style.borderLeftColor = new Color(0.3f, 0.3f, 0.4f, 1f);
-                    textInput.style.borderRightColor = new Color(0.3f, 0.3f, 0.4f, 1f);
-                    textInput.style.borderTopColor = new Color(0.3f, 0.3f, 0.4f, 1f);
-                    textInput.style.borderBottomColor = new Color(0.3f, 0.3f, 0.4f, 1f);
-                }
+                // Schedule styling after the element is attached
+                seedNameField.schedule.Execute(() => StyleNameFieldInput()).StartingIn(10);
             });
+            
+            // Also apply on geometry change as backup
+            seedNameField.RegisterCallback<GeometryChangedEvent>(evt => StyleNameFieldInput());
 
             // Register value change callback
             seedNameField.RegisterValueChangedCallback(evt =>
@@ -364,6 +340,53 @@ namespace Abracodabra.UI.Toolkit
             });
 
             nameEditorContainer.Add(seedNameField);
+        }
+
+        private void StyleNameFieldInput()
+        {
+            if (seedNameField == null) return;
+            
+            var textInput = seedNameField.Q("unity-text-input");
+            if (textInput != null)
+            {
+                // Very dark background for maximum contrast
+                textInput.style.backgroundColor = new Color(0.05f, 0.05f, 0.08f, 1f);
+
+                // White bold text, large size
+                textInput.style.color = Color.white;
+                textInput.style.fontSize = 18;
+                textInput.style.unityFontStyleAndWeight = FontStyle.Bold;
+                textInput.style.unityTextAlign = TextAnchor.MiddleCenter;
+
+                // Rounded corners
+                textInput.style.borderTopLeftRadius = 6;
+                textInput.style.borderTopRightRadius = 6;
+                textInput.style.borderBottomLeftRadius = 6;
+                textInput.style.borderBottomRightRadius = 6;
+
+                // Padding
+                textInput.style.paddingLeft = 12;
+                textInput.style.paddingRight = 12;
+                textInput.style.paddingTop = 6;
+                textInput.style.paddingBottom = 6;
+
+                // Border
+                textInput.style.borderLeftWidth = 2;
+                textInput.style.borderRightWidth = 2;
+                textInput.style.borderTopWidth = 2;
+                textInput.style.borderBottomWidth = 2;
+                textInput.style.borderLeftColor = new Color(0.4f, 0.4f, 0.5f, 1f);
+                textInput.style.borderRightColor = new Color(0.4f, 0.4f, 0.5f, 1f);
+                textInput.style.borderTopColor = new Color(0.4f, 0.4f, 0.5f, 1f);
+                textInput.style.borderBottomColor = new Color(0.4f, 0.4f, 0.5f, 1f);
+            }
+
+            // Style the text element for cursor (caret) color
+            var textElement = seedNameField.Q<TextElement>();
+            if (textElement != null)
+            {
+                textElement.style.color = Color.white;
+            }
         }
 
         private void UpdateNameEditor(UIInventoryItem seedItem)
@@ -390,7 +413,7 @@ namespace Abracodabra.UI.Toolkit
             colorPickerContainer.style.marginBottom = 10;
             colorPickerContainer.style.justifyContent = Justify.Center;
             colorPickerContainer.style.alignItems = Align.Center;
-            colorPickerContainer.style.maxWidth = 400; // Wider for more colors
+            colorPickerContainer.style.maxWidth = 400;
             colorPickerContainer.style.width = Length.Percent(100);
 
             // Expanded color palette - 16 colors in 2 rows of 8
@@ -546,7 +569,7 @@ namespace Abracodabra.UI.Toolkit
 
             if (data == null)
             {
-                // FIXED: Show empty slot with visible styling
+                // Show empty slot with visible styling
                 icon.style.display = DisplayStyle.None;
                 background.AddToClassList("gene-slot--empty");
                 return;

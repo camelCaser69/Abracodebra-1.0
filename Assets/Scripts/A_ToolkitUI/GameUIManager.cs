@@ -6,9 +6,11 @@ using WegoSystem;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Core;
 using Abracodabra.UI.Toolkit;
+using Abracodabra.UI.Genes;
 
 /// <summary>
 /// Main UI Manager - Fully functional gene editor with proper data persistence
+/// Now includes HUD with hunger, tick counter, and selected item tooltip
 /// </summary>
 public class GameUIManager : MonoBehaviour
 {
@@ -22,7 +24,7 @@ public class GameUIManager : MonoBehaviour
     [Header("Inventory Configuration")]
     [Tooltip("Number of rows in the inventory grid")]
     [SerializeField] private int inventoryRows = 4;
-    
+
     [Tooltip("Number of columns in the inventory grid")]
     [SerializeField] private int inventoryColumns = 6;
 
@@ -41,6 +43,19 @@ public class GameUIManager : MonoBehaviour
     private VisualElement rootElement;
     private VisualElement planningPanel, hudPanel;
     private Button startDayButton;
+
+    // HUD Elements
+    private VisualElement hungerBarFill;
+    private Label hungerText;
+    private Label tickText;
+    private VisualElement hudTooltipPanel;
+    private Image hudTooltipIcon;
+    private Label hudTooltipName;
+    private Label hudTooltipType;
+    private Label hudTooltipDescription;
+
+    // System references
+    private PlayerHungerSystem playerHungerSystem;
 
     private int TotalInventorySlots => inventoryRows * inventoryColumns;
 
@@ -65,9 +80,12 @@ public class GameUIManager : MonoBehaviour
         // Initialize all controllers
         InitializeControllers();
 
+        // Initialize HUD elements
+        InitializeHUD();
+
         // Subscribe to controller events
         SubscribeToEvents();
-        
+
         // Create Start Day button
         CreateStartDayButton();
 
@@ -97,6 +115,27 @@ public class GameUIManager : MonoBehaviour
         hotbarController.HandleInput();
     }
 
+    void OnDestroy()
+    {
+        // Unsubscribe from events
+        if (RunManager.Instance != null)
+        {
+            RunManager.Instance.OnRunStateChanged -= HandleRunStateChanged;
+        }
+
+        if (playerHungerSystem != null)
+        {
+            playerHungerSystem.OnHungerChanged -= UpdateHungerDisplay;
+        }
+
+        if (TickManager.Instance != null)
+        {
+            TickManager.Instance.OnTickAdvanced -= UpdateTickDisplay;
+        }
+
+        HotbarSelectionService.OnSelectionChanged -= HandleHotbarSelectionChanged;
+    }
+
     #region Initialization
     private void InitializeControllers()
     {
@@ -105,21 +144,21 @@ public class GameUIManager : MonoBehaviour
         var geneEditorPanel = rootElement.Q<VisualElement>("SeedEditorPanel");
         var specSheetPanel = rootElement.Q<VisualElement>("SeedSpecSheetPanel");
         var inventoryGridElement = rootElement.Q<VisualElement>("inventory-grid");
-        
+
         Debug.Log($"[GameUIManager] === PANEL SIZING: FIXED MODE ===");
-        
+
         // Calculate dimensions
         int slotWidth = 64;
         int slotMarginLeft = 5;
         int slotMarginRight = 5;
         int totalSpacePerSlot = slotWidth + slotMarginLeft + slotMarginRight;
-        
+
         int gridWidth = inventoryColumns * totalSpacePerSlot;
         int panelPaddingLeft = 15;
         int panelPaddingRight = 15;
         int totalPanelPadding = panelPaddingLeft + panelPaddingRight;
         int inventoryPanelWidth = gridWidth + totalPanelPadding;
-        
+
         // SET INVENTORY PANEL
         if (inventoryPanel != null)
         {
@@ -130,7 +169,7 @@ public class GameUIManager : MonoBehaviour
             inventoryPanel.style.flexShrink = 0;
             inventoryPanel.style.flexBasis = inventoryPanelWidth;
         }
-        
+
         // SET SPEC SHEET PANEL
         if (specSheetPanel != null)
         {
@@ -141,7 +180,7 @@ public class GameUIManager : MonoBehaviour
             specSheetPanel.style.flexShrink = 0;
             specSheetPanel.style.flexBasis = 400;
         }
-        
+
         // SET GENE EDITOR - FLEXIBLE BUT CONSTRAINED
         if (geneEditorPanel != null)
         {
@@ -152,7 +191,7 @@ public class GameUIManager : MonoBehaviour
             geneEditorPanel.style.flexShrink = 0;
             geneEditorPanel.style.flexBasis = 0;
         }
-        
+
         // SET GRID WIDTH
         if (inventoryGridElement != null)
         {
@@ -165,7 +204,7 @@ public class GameUIManager : MonoBehaviour
             inventoryGridElement.style.marginRight = StyleKeyword.Auto;
             inventoryGridElement.style.alignSelf = Align.Center;
         }
-        
+
         // Initialize controllers
         inventoryController = new UIInventoryGridController();
         inventoryController.Initialize(inventoryGridElement, inventorySlotTemplate, playerInventory);
@@ -192,6 +231,46 @@ public class GameUIManager : MonoBehaviour
         );
     }
 
+    private void InitializeHUD()
+    {
+        // Get HUD elements
+        hungerBarFill = rootElement.Q<VisualElement>("hunger-bar-fill");
+        hungerText = rootElement.Q<Label>("hunger-text");
+        tickText = rootElement.Q<Label>("tick-text");
+
+        // Tooltip elements
+        hudTooltipPanel = rootElement.Q<VisualElement>("hud-tooltip-panel");
+        hudTooltipIcon = rootElement.Q<Image>("hud-tooltip-icon");
+        hudTooltipName = rootElement.Q<Label>("hud-tooltip-name");
+        hudTooltipType = rootElement.Q<Label>("hud-tooltip-type");
+        hudTooltipDescription = rootElement.Q<Label>("hud-tooltip-description");
+
+        // Find player hunger system
+        playerHungerSystem = FindFirstObjectByType<PlayerHungerSystem>();
+        if (playerHungerSystem != null)
+        {
+            playerHungerSystem.OnHungerChanged += UpdateHungerDisplay;
+            // Initial update
+            UpdateHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+        }
+        else
+        {
+            Debug.LogWarning("[GameUIManager] PlayerHungerSystem not found - hunger display won't update");
+        }
+
+        // Subscribe to tick manager
+        if (TickManager.Instance != null)
+        {
+            TickManager.Instance.OnTickAdvanced += UpdateTickDisplay;
+            UpdateTickDisplay(TickManager.Instance.CurrentTick);
+        }
+
+        // Subscribe to hotbar selection changes for tooltip
+        HotbarSelectionService.OnSelectionChanged += HandleHotbarSelectionChanged;
+
+        Debug.Log("[GameUIManager] HUD initialized");
+    }
+
     private void CreateStartDayButton()
     {
         // Create button container at BOTTOM center (above hotbar area)
@@ -202,11 +281,11 @@ public class GameUIManager : MonoBehaviour
         buttonContainer.style.translate = new Translate(Length.Percent(-50), 0);
         buttonContainer.style.alignItems = Align.Center;
         buttonContainer.style.justifyContent = Justify.Center;
-        
+
         startDayButton = new Button();
         startDayButton.text = "▶ START DAY";
         startDayButton.AddToClassList("start-day-button");
-        
+
         // Styling
         startDayButton.style.fontSize = 24;
         startDayButton.style.paddingTop = 15;
@@ -224,12 +303,12 @@ public class GameUIManager : MonoBehaviour
         startDayButton.style.borderTopWidth = 0;
         startDayButton.style.borderBottomWidth = 0;
         startDayButton.style.unityFontStyleAndWeight = FontStyle.Bold;
-        
+
         startDayButton.clicked += OnStartDayClicked;
-        
+
         buttonContainer.Add(startDayButton);
         planningPanel.Add(buttonContainer);
-        
+
         Debug.Log("[GameUIManager] Start Day button created at bottom center");
     }
 
@@ -246,7 +325,7 @@ public class GameUIManager : MonoBehaviour
         dragDropController.OnGeneDropRequested += HandleGeneDrop;
         dragDropController.OnDragStarted += HandleDragStarted;
         dragDropController.OnDragEnded += HandleDragEnded;
-        
+
         // Gene editor events
         seedEditorController.OnGeneSlotPointerDown += HandleGeneSlotPointerDown;
         seedEditorController.OnGeneSlotHoverEnter += HandleGeneHover;
@@ -259,25 +338,141 @@ public class GameUIManager : MonoBehaviour
     {
         playerInventory.Clear();
         if (startingInventory == null) return;
-        
-        foreach (var tool in startingInventory.startingTools) 
+
+        foreach (var tool in startingInventory.startingTools)
             if (tool != null) playerInventory.Add(new UIInventoryItem(tool));
-        
-        foreach (var seed in startingInventory.startingSeeds) 
+
+        foreach (var seed in startingInventory.startingSeeds)
             if (seed != null) playerInventory.Add(new UIInventoryItem(seed));
-        
-        foreach (var gene in startingInventory.startingGenes) 
+
+        foreach (var gene in startingInventory.startingGenes)
             if (gene != null) playerInventory.Add(new UIInventoryItem(gene));
 
         while (playerInventory.Count < TotalInventorySlots)
         {
             playerInventory.Add(null);
         }
-        
+
         if (playerInventory.Count > TotalInventorySlots)
         {
             Debug.LogWarning($"[GameUIManager] Starting inventory has {playerInventory.Count} items but only {TotalInventorySlots} slots. Truncating.");
             playerInventory = playerInventory.Take(TotalInventorySlots).ToList();
+        }
+    }
+    #endregion
+
+    #region HUD Updates
+    private void UpdateHungerDisplay(float currentHunger, float maxHunger)
+    {
+        if (hungerBarFill != null)
+        {
+            float percentage = maxHunger > 0 ? (currentHunger / maxHunger) * 100f : 0f;
+            hungerBarFill.style.width = Length.Percent(percentage);
+
+            // Change color when low
+            if (percentage <= 25f)
+            {
+                hungerBarFill.style.backgroundColor = new Color(0.85f, 0.25f, 0.25f); // Red
+            }
+            else if (percentage <= 50f)
+            {
+                hungerBarFill.style.backgroundColor = new Color(0.9f, 0.6f, 0.2f); // Orange
+            }
+            else
+            {
+                hungerBarFill.style.backgroundColor = new Color(0.86f, 0.47f, 0.2f); // Default orange
+            }
+        }
+
+        if (hungerText != null)
+        {
+            hungerText.text = $"{Mathf.CeilToInt(currentHunger)}/{Mathf.CeilToInt(maxHunger)}";
+        }
+    }
+
+    private void UpdateTickDisplay(int currentTick)
+    {
+        if (tickText != null)
+        {
+            tickText.text = $"Tick: {currentTick}";
+        }
+    }
+
+    /// <summary>
+    /// Handler for HotbarSelectionService.OnSelectionChanged event
+    /// </summary>
+    private void HandleHotbarSelectionChanged(InventoryBarItem selectedItem)
+    {
+        UpdateHUDTooltip(selectedItem);
+    }
+
+    /// <summary>
+    /// Update the HUD tooltip panel with the selected item info
+    /// </summary>
+    private void UpdateHUDTooltip(InventoryBarItem selectedItem)
+    {
+        if (selectedItem == null || hudTooltipPanel == null)
+        {
+            if (hudTooltipPanel != null)
+            {
+                hudTooltipPanel.style.display = DisplayStyle.None;
+            }
+            return;
+        }
+
+        // Show the panel
+        hudTooltipPanel.style.display = DisplayStyle.Flex;
+
+        // Get item info based on type
+        switch (selectedItem.Type)
+        {
+            case InventoryBarItem.ItemType.Seed:
+                var seed = selectedItem.SeedTemplate;
+                if (seed != null)
+                {
+                    if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
+                    if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
+                    if (hudTooltipType != null) hudTooltipType.text = "Seed";
+                    if (hudTooltipDescription != null) hudTooltipDescription.text = seed.description;
+                }
+                break;
+
+            case InventoryBarItem.ItemType.Tool:
+                var tool = selectedItem.ToolDefinition;
+                if (tool != null)
+                {
+                    if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
+                    if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
+                    if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
+                    if (hudTooltipDescription != null) hudTooltipDescription.text = tool.GetTooltipDescription();
+                }
+                break;
+
+            case InventoryBarItem.ItemType.Gene:
+                var gene = selectedItem.GeneInstance?.GetGene();
+                if (gene != null)
+                {
+                    if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
+                    if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
+                    if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
+                    if (hudTooltipDescription != null) hudTooltipDescription.text = gene.description;
+                }
+                break;
+
+            case InventoryBarItem.ItemType.Resource:
+                var resource = selectedItem.ItemInstance;
+                if (resource?.definition != null)
+                {
+                    if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
+                    if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
+                    if (hudTooltipType != null) hudTooltipType.text = "Resource";
+                    if (hudTooltipDescription != null) hudTooltipDescription.text = resource.definition.description;
+                }
+                break;
+
+            default:
+                hudTooltipPanel.style.display = DisplayStyle.None;
+                break;
         }
     }
     #endregion
@@ -289,7 +484,7 @@ public class GameUIManager : MonoBehaviour
 
         selectedInventoryIndex = index;
         inventoryController.SetSelectedSlot(index);
-        
+
         var selectedItem = playerInventory[index];
         specSheetController.DisplayItem(selectedItem);
 
@@ -297,7 +492,7 @@ public class GameUIManager : MonoBehaviour
         {
             inventoryController.SetLockedSeedSlot(index);
             seedEditorController.DisplaySeed(selectedItem);
-            
+
             dragDropController.SetGeneEditorSlots(
                 seedEditorController.GetSeedContainer(),
                 seedEditorController.GetPassiveContainer(),
@@ -311,36 +506,36 @@ public class GameUIManager : MonoBehaviour
         dragDropController.StartDrag(index);
         dragDropController.SetInventorySlots(inventoryController.GetSlots());
     }
-    
+
     private void HandleGeneSlotPointerDown(GeneBase gene, VisualElement slot)
     {
         if (gene == null) return;
-        
+
         dragDropController.StartDragFromGeneEditor(gene, slot);
         dragDropController.SetInventorySlots(inventoryController.GetSlots());
     }
-    
+
     private void HandleInventoryHover(int index)
     {
         if (dragDropController.IsDragging()) return;
-        
+
         var item = playerInventory[index];
         if (item != null)
         {
             specSheetController.DisplayItem(item);
         }
     }
-    
+
     private void HandleGeneHover(GeneBase gene)
     {
         if (dragDropController.IsDragging()) return;
-        
+
         if (gene != null)
         {
             specSheetController.DisplayGene(gene);
         }
     }
-    
+
     private void HandleHoverExit()
     {
         if (selectedInventoryIndex >= 0 && selectedInventoryIndex < playerInventory.Count)
@@ -349,31 +544,28 @@ public class GameUIManager : MonoBehaviour
             specSheetController.DisplayItem(selectedItem);
         }
     }
-    
+
     private void HandleDragStarted(GeneCategory? category)
     {
         seedEditorController.HighlightCompatibleSlots(category);
     }
-    
+
     private void HandleDragEnded()
     {
         seedEditorController.ClearSlotHighlighting();
     }
-    
+
     private void HandleSeedColorChanged(Color newColor)
     {
         inventoryController.RefreshVisuals();
         hotbarController.RefreshHotbar();
     }
-    
-    /// <summary>
-    /// NEW: Handle gene removed from editor - return to inventory
-    /// </summary>
+
     private void HandleGeneRemovedFromEditor(GeneBase gene, int slotIndex, string slotType)
     {
         // Find first empty slot
         int emptySlot = playerInventory.FindIndex(item => item == null);
-        
+
         if (emptySlot >= 0)
         {
             playerInventory[emptySlot] = new UIInventoryItem(gene);
@@ -392,7 +584,7 @@ public class GameUIManager : MonoBehaviour
         var temp = playerInventory[fromIndex];
         playerInventory[fromIndex] = playerInventory[toIndex];
         playerInventory[toIndex] = temp;
-        
+
         inventoryController.UpdateIndicesAfterSwap(fromIndex, toIndex);
         inventoryController.RefreshVisuals();
     }
@@ -401,12 +593,11 @@ public class GameUIManager : MonoBehaviour
     {
         var draggedItem = playerInventory[dragSourceIndex];
         if (draggedItem == null) return;
-        
+
         bool validDrop = false;
-        
+
         if (draggedItem.OriginalData is GeneBase gene)
         {
-            // Validate gene category matches slot type
             validDrop = slotType switch
             {
                 "passive" => gene.Category == GeneCategory.Passive,
@@ -415,19 +606,17 @@ public class GameUIManager : MonoBehaviour
                 "payload" => gene.Category == GeneCategory.Payload,
                 _ => false
             };
-            
+
             if (validDrop)
             {
-                // Extract slot index from visual hierarchy
                 int slotIndex = GetSlotIndexFromElement(targetSlot, slotType);
-                
+
                 Debug.Log($"[GameUIManager] Attempting to add {gene.geneName} to {slotType} slot {slotIndex}");
-                
+
                 bool added = seedEditorController.AddGeneToSlot(gene, slotIndex, slotType);
-                
+
                 if (added)
                 {
-                    // REMOVE from inventory
                     playerInventory[dragSourceIndex] = null;
                     inventoryController.RefreshVisuals();
                     hotbarController.SetupHotbar(playerInventory.Take(inventoryColumns).ToList());
@@ -447,20 +636,17 @@ public class GameUIManager : MonoBehaviour
         {
             inventoryController.SetLockedSeedSlot(dragSourceIndex);
             seedEditorController.DisplaySeed(draggedItem);
-            
+
             dragDropController.SetGeneEditorSlots(
                 seedEditorController.GetSeedContainer(),
                 seedEditorController.GetPassiveContainer(),
                 seedEditorController.GetActiveContainer()
             );
-            
+
             validDrop = true;
         }
     }
-    
-    /// <summary>
-    /// Helper to extract slot index from visual element hierarchy
-    /// </summary>
+
     private int GetSlotIndexFromElement(VisualElement element, string slotType)
     {
         if (slotType == "passive")
@@ -485,7 +671,7 @@ public class GameUIManager : MonoBehaviour
                 foreach (var row in container.Children())
                 {
                     if (row.ClassListContains("active-sequence-header")) continue;
-                    
+
                     if (row.Contains(element))
                     {
                         return rowIndex;
@@ -494,17 +680,14 @@ public class GameUIManager : MonoBehaviour
                 }
             }
         }
-        
+
         return 0;
     }
-    
-    /// <summary>
-    /// NEW: Handle Start Day button click
-    /// </summary>
+
     private void OnStartDayClicked()
     {
         Debug.Log("[GameUIManager] START DAY clicked - transitioning to Growth & Threat phase");
-        
+
         if (RunManager.Instance != null)
         {
             RunManager.Instance.StartGrowthAndThreatPhase();
@@ -527,10 +710,10 @@ public class GameUIManager : MonoBehaviour
     {
         planningPanel.style.display = DisplayStyle.Flex;
         hudPanel.style.display = DisplayStyle.None;
-        
+
         // Show solid background for planning mode
-        rootElement.style.backgroundColor = new Color(20f/255f, 20f/255f, 25f/255f);
-        
+        rootElement.style.backgroundColor = new Color(20f / 255f, 20f / 255f, 25f / 255f);
+
         if (startDayButton != null)
         {
             startDayButton.style.display = DisplayStyle.Flex;
@@ -541,21 +724,35 @@ public class GameUIManager : MonoBehaviour
     {
         planningPanel.style.display = DisplayStyle.None;
         hudPanel.style.display = DisplayStyle.Flex;
-        
+
         // CRITICAL: Make background transparent so game camera can render through
         rootElement.style.backgroundColor = new Color(0, 0, 0, 0);
-        
+
         // Also ensure HUD panel is transparent
         if (hudPanel != null)
         {
             hudPanel.style.backgroundColor = new Color(0, 0, 0, 0);
         }
-        
+
         if (startDayButton != null)
         {
             startDayButton.style.display = DisplayStyle.None;
         }
-        
+
+        // Update HUD displays
+        if (playerHungerSystem != null)
+        {
+            UpdateHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+        }
+
+        if (TickManager.Instance != null)
+        {
+            UpdateTickDisplay(TickManager.Instance.CurrentTick);
+        }
+
+        // Update tooltip for current selection
+        UpdateHUDTooltip(HotbarSelectionService.SelectedItem);
+
         Debug.Log("[GameUIManager] HUD shown - UI background set to transparent");
     }
     #endregion
