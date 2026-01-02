@@ -1,0 +1,160 @@
+{
+    "global": {
+        "clean_previous_files": true,
+        "backup_previous_files": false,
+        "backup_directory": "_extractor_backups",
+        "include_timestamp_in_filename": false,
+        "max_chars_per_file": 100000000,
+        "show_compression_stats": true
+    },
+    "profiles": {
+        "scripts": {
+            "enabled": true,
+            "description": "C# scripts with token-efficient compression",
+            "directories": [
+                "Assets/Scripts",
+                "Assets/Editor"
+            ],
+            "blacklist_directories": [],
+            "include_extensions": [".cs"],
+            "exclude_extensions": [".meta"],
+            "output_filename": "Unity_EXTRACTED_scripts",
+            "part_output_filename": "Unity_EXTRACTED_scripts_part",
+            "compression": {
+                "enabled": true,
+                "remove_empty_lines": true,
+                "remove_comments": true,
+                "remove_xml_docs": true,
+                "remove_using_statements": true,
+                "remove_regions": true,
+                "remove_attributes": true,
+                "trim_whitespace": true,
+                "compress_braces": true,
+                "compress_method_signatures": true,
+                "compress_namespaces": true,
+                "shorten_modifiers": true,
+                "reduce_indentation": true,
+                "indent_size": 1,
+                "extreme_compression": false,
+                "common_usings": [
+                    "using System;",
+                    "using System.Collections;",
+                    "using System.Collections.Generic;",
+                    "using UnityEngine;",
+                    "using UnityEngine.UI;",
+                    "using System.Linq;",
+                    "using UnityEngine.Events;"
+                ]
+            },
+            "include_toc": true,
+            "compact_toc": true,
+            "header_text": "UNITY PROJECT SCRIPTS - COMPRESSED FORMAT\nCompression Stats: {original_size:,} -> {compressed_size:,} chars ({saved_percent:.1f}% reduction)\nEstimated tokens saved: ~{tokens_saved:,}\n\nThis document contains extracted Unity 6 C# scripts optimized for AI/LLM context.\n\nWhen editing: return each changed method in full. If edits touch <=3 methods, list those blocks only; otherwise output the entire script. Always copy-paste ready.\n\nCOMPRESSION APPLIED:\n- Removed: empty lines, common usings, XML docs, most attributes, regions\n- Preserved: code structure, logic flow, important comments (TODO/FIXME/NOTE)\n\nWHEN CREATING/EDITING SCRIPTS:\n1. Re-add standard Unity using statements (listed below + any project-specific ones)\n2. Format with proper indentation and spacing\n3. Add [SerializeField] attributes where needed\n4. Ensure proper C# code style\n\nCOMMON USING STATEMENTS:\nusing System;\nusing System.Collections;\nusing System.Collections.Generic;\nusing UnityEngine;\nusing UnityEngine.UI;\nusing System.Linq;\nusing UnityEngine.Events;\n\nTABLE OF CONTENTS:"
+        },
+        "ui": {
+            "enabled": true,
+            "description": "UI Toolkit files (.uxml, .uss) - light compression",
+            "directories": [
+                "Assets/Scripts/A_ToolkitUI"
+            ],
+            "blacklist_directories": [],
+            "include_extensions": [".uxml", ".uss"],
+            "exclude_extensions": [".meta"],
+            "output_filename": "Unity_EXTRACTED_ToolkitUI",
+            "compression": {
+                "enabled": true,
+                "remove_comments": true,
+                "remove_empty_lines": true,
+                "compress_whitespace": false,
+                "remove_xml_docs": true,
+                "remove_using_statements": true,
+                "remove_regions": true,
+                "remove_attributes": false,
+                "trim_whitespace": true,
+                "compress_braces": true,
+                "compress_method_signatures": false,
+                "compress_namespaces": true,
+                "shorten_modifiers": false,
+                "extreme_compression": false,
+                "common_usings": [
+                    "using System;",
+                    "using System.Collections;",
+                    "using System.Collections.Generic;",
+                    "using UnityEngine;",
+                    "using UnityEngine.UIElements;",
+                    "using System.Linq;"
+                ]
+            },
+            "include_toc": true,
+            "compact_toc": false,
+            "header_text": "=================================================\nUNITY UI TOOLKIT FILES\n=================================================\nThis document contains UI Toolkit source files (.uxml, .uss)\nextracted from the project.\n\nProject: {project_name}\nExtracted on: {extraction_date}\n\nNote: Light compression applied - comments removed, empty lines consolidated.\nUSS and UXML structure preserved for accurate editing.\n"
+        },
+        "shaders": {
+            "enabled": false,
+            "description": "Shader files (.shader, .hlsl, .cginc) - no compression",
+            "directories": [
+                "Assets/Shaders"
+            ],
+            "blacklist_directories": [],
+            "include_extensions": [".shader", ".hlsl", ".cginc", ".compute"],
+            "exclude_extensions": [".meta"],
+            "output_filename": "Unity_EXTRACTED_shaders",
+            "compression": {
+                "enabled": false
+            },
+            "include_toc": true,
+            "compact_toc": false,
+            "header_text": "=================================================\nUNITY SHADER FILES\n=================================================\nThis document contains shader source files extracted from the project.\n\nProject: {project_name}\nExtracted on: {extraction_date}\n"
+        },
+        "scriptable_objects": {
+            "enabled": false,
+            "description": "ScriptableObject definitions - with compression",
+            "directories": [
+                "Assets/ScriptableObjects"
+            ],
+            "blacklist_directories": [],
+            "include_extensions": [".cs"],
+            "exclude_extensions": [".meta"],
+            "output_filename": "Unity_EXTRACTED_scriptable_objects",
+            "compression": {
+                "enabled": true,
+                "remove_empty_lines": true,
+                "remove_comments": true,
+                "remove_xml_docs": true,
+                "remove_using_statements": true,
+                "remove_regions": true,
+                "remove_attributes": false,
+                "trim_whitespace": true,
+                "compress_braces": true,
+                "compress_method_signatures": true,
+                "compress_namespaces": true,
+                "shorten_modifiers": true,
+                "extreme_compression": false,
+                "common_usings": [
+                    "using System;",
+                    "using System.Collections;",
+                    "using System.Collections.Generic;",
+                    "using UnityEngine;",
+                    "using System.Linq;"
+                ]
+            },
+            "include_toc": true,
+            "compact_toc": true,
+            "header_text": "UNITY SCRIPTABLE OBJECTS\nCompression Stats: {original_size:,} -> {compressed_size:,} chars ({saved_percent:.1f}% reduction)\n\nScriptableObject class definitions from the project.\nNote: [Header], [Tooltip] and other attributes are preserved for context.\n\nTABLE OF CONTENTS:"
+        },
+        "custom": {
+            "enabled": false,
+            "description": "Custom extraction profile - configure as needed",
+            "directories": [],
+            "blacklist_directories": [],
+            "include_extensions": [],
+            "exclude_extensions": [".meta"],
+            "output_filename": "Unity_EXTRACTED_custom",
+            "compression": {
+                "enabled": false
+            },
+            "include_toc": true,
+            "compact_toc": false,
+            "header_text": "Custom extraction output\nProject: {project_name}\nExtracted on: {extraction_date}\n"
+        }
+    }
+}
