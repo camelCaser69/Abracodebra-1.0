@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace Abracodabra.UI.Toolkit
-{
-    public class UIInventoryGridController
-    {
+namespace Abracodabra.UI.Toolkit {
+    public class UIInventoryGridController {
         public event Action<int> OnSlotClicked;
         public event Action<int> OnSlotPointerDown;
         public event Action<int> OnSlotHoverEnter;
@@ -20,28 +18,24 @@ namespace Abracodabra.UI.Toolkit
         VisualElement inventoryGrid;
         VisualTreeAsset slotTemplate;
 
-        public void Initialize(VisualElement gridElement, VisualTreeAsset template, List<UIInventoryItem> inventoryData)
-        {
+        public void Initialize(VisualElement gridElement, VisualTreeAsset template, List<UIInventoryItem> inventoryData) {
             inventoryGrid = gridElement;
             slotTemplate = template;
             inventory = inventoryData;
         }
 
-        public void PopulateGrid()
-        {
+        public void PopulateGrid() {
             inventoryGrid.Clear();
             inventorySlots.Clear();
 
-            for (int i = 0; i < inventory.Count; i++)
-            {
+            for (int i = 0; i < inventory.Count; i++) {
                 var newSlot = slotTemplate.Instantiate();
                 newSlot.userData = i;
 
                 int slotIndex = i;
 
                 var actualSlot = newSlot.Q(className: "slot");
-                if (actualSlot == null)
-                {
+                if (actualSlot == null) {
                     actualSlot = newSlot;
                     actualSlot.AddToClassList("slot");
                 }
@@ -49,19 +43,16 @@ namespace Abracodabra.UI.Toolkit
                 actualSlot.style.position = Position.Relative;
                 actualSlot.style.overflow = Overflow.Hidden;
 
-                actualSlot.RegisterCallback<PointerDownEvent>(evt =>
-                {
+                actualSlot.RegisterCallback<PointerDownEvent>(evt => {
                     OnSlotClicked?.Invoke(slotIndex);
                     OnSlotPointerDown?.Invoke(slotIndex);
                 });
 
-                actualSlot.RegisterCallback<PointerEnterEvent>(evt =>
-                {
+                actualSlot.RegisterCallback<PointerEnterEvent>(evt => {
                     OnSlotHoverEnter?.Invoke(slotIndex);
                 });
 
-                actualSlot.RegisterCallback<PointerLeaveEvent>(evt =>
-                {
+                actualSlot.RegisterCallback<PointerLeaveEvent>(evt => {
                     OnSlotHoverExit?.Invoke();
                 });
 
@@ -72,10 +63,8 @@ namespace Abracodabra.UI.Toolkit
             RefreshVisuals();
         }
 
-        public void RefreshVisuals()
-        {
-            for (int i = 0; i < inventorySlots.Count; i++)
-            {
+        public void RefreshVisuals() {
+            for (int i = 0; i < inventorySlots.Count; i++) {
                 var element = inventorySlots[i];
                 var item = inventory[i];
 
@@ -83,13 +72,11 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        void BindSlot(VisualElement element, UIInventoryItem item, int index)
-        {
+        void BindSlot(VisualElement element, UIInventoryItem item, int index) {
             var icon = element.Q<Image>("icon");
             var stack = element.Q<Label>("stack-size");
 
-            if (icon != null)
-            {
+            if (icon != null) {
                 icon.style.width = Length.Percent(100);
                 icon.style.height = Length.Percent(100);
                 icon.style.position = Position.Absolute;
@@ -97,106 +84,93 @@ namespace Abracodabra.UI.Toolkit
                 icon.style.left = 0;
                 icon.scaleMode = ScaleMode.ScaleToFit;
 
-                if (item != null && item.Icon != null)
-                {
+                if (item != null && item.Icon != null) {
                     icon.sprite = item.Icon;
                     icon.style.display = DisplayStyle.Flex;
                 }
-                else
-                {
+                else {
                     icon.sprite = null;
                     icon.style.display = DisplayStyle.None;
                 }
             }
 
-            if (stack != null)
-            {
+            if (stack != null) {
                 stack.style.position = Position.Absolute;
                 stack.style.bottom = 2;
                 stack.style.right = 4;
+                stack.style.fontSize = 12;
+                stack.style.unityFontStyleAndWeight = FontStyle.Bold;
+                stack.style.textShadow = new TextShadow {
+                    offset = new Vector2(1, 1),
+                    blurRadius = 0,
+                    color = Color.black
+                };
 
-                // Use the new ShouldShowCounter and GetDisplayCount methods
-                if (item != null && item.ShouldShowCounter())
-                {
-                    int displayCount = item.GetDisplayCount();
-                    stack.text = displayCount.ToString();
+                if (item != null && item.ShouldShowCounter()) {
+                    int count = item.GetDisplayCount();
+                    stack.text = count.ToString();
                     stack.style.display = DisplayStyle.Flex;
                     
-                    // Visual hint for low counts
-                    if (displayCount <= 1)
-                    {
-                        stack.style.color = new Color(1f, 0.6f, 0.6f); // Reddish for low
+                    // Color coding for low counts
+                    if (count <= 1) {
+                        stack.style.color = new Color(1f, 0.6f, 0.6f); // Red
                     }
-                    else if (displayCount <= 3)
-                    {
-                        stack.style.color = new Color(1f, 0.9f, 0.6f); // Yellowish for medium-low
+                    else if (count <= 3) {
+                        stack.style.color = new Color(1f, 0.9f, 0.6f); // Yellow
                     }
-                    else
-                    {
-                        stack.style.color = Color.white; // Normal
+                    else {
+                        stack.style.color = Color.white;
                     }
                 }
-                else
-                {
+                else {
                     stack.text = "";
                     stack.style.display = DisplayStyle.None;
                 }
             }
 
-            if (item != null && item.HasCustomColor())
-            {
+            if (item != null && item.HasCustomColor()) {
                 element.style.backgroundColor = item.BackgroundColor;
             }
-            else
-            {
-                element.style.backgroundColor = StyleKeyword.Null; // Clear to use CSS default
+            else {
+                element.style.backgroundColor = StyleKeyword.Null;
             }
 
             element.RemoveFromClassList("slot--selected");
             element.RemoveFromClassList("slot--locked-for-editing");
 
-            if (index == selectedInventoryIndex)
-            {
+            if (index == selectedInventoryIndex) {
                 element.AddToClassList("slot--selected");
             }
-            if (index == lockedSeedIndex)
-            {
+            if (index == lockedSeedIndex) {
                 element.AddToClassList("slot--locked-for-editing");
             }
         }
 
-        public void SetSelectedSlot(int index)
-        {
-            if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count)
-            {
+        public void SetSelectedSlot(int index) {
+            if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count) {
                 inventorySlots[selectedInventoryIndex].RemoveFromClassList("slot--selected");
             }
 
             selectedInventoryIndex = index;
 
-            if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count)
-            {
+            if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count) {
                 inventorySlots[selectedInventoryIndex].AddToClassList("slot--selected");
             }
         }
 
-        public void SetLockedSeedSlot(int index)
-        {
-            if (lockedSeedIndex >= 0 && lockedSeedIndex < inventorySlots.Count)
-            {
+        public void SetLockedSeedSlot(int index) {
+            if (lockedSeedIndex >= 0 && lockedSeedIndex < inventorySlots.Count) {
                 inventorySlots[lockedSeedIndex].RemoveFromClassList("slot--locked-for-editing");
             }
 
             lockedSeedIndex = index;
 
-            if (lockedSeedIndex >= 0 && lockedSeedIndex < inventorySlots.Count)
-            {
+            if (lockedSeedIndex >= 0 && lockedSeedIndex < inventorySlots.Count) {
                 inventorySlots[lockedSeedIndex].AddToClassList("slot--locked-for-editing");
             }
         }
 
-        public void UpdateIndicesAfterSwap(int fromIndex, int toIndex)
-        {
+        public void UpdateIndicesAfterSwap(int fromIndex, int toIndex) {
             if (selectedInventoryIndex == fromIndex)
                 selectedInventoryIndex = toIndex;
             else if (selectedInventoryIndex == toIndex)

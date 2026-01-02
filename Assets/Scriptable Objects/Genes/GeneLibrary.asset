@@ -14,16 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   passiveGenes:
   - {fileID: 11400000, guid: c62d2b1eed2428a4183638756d3c1ce7, type: 2}
+  - {fileID: 11400000, guid: 96a6da095e5bbd742835c0409890dccf, type: 2}
   activeGenes:
   - {fileID: 11400000, guid: 0fcc40c60bfe57149b2d4d2fe5dd94c3, type: 2}
   modifierGenes:
   - {fileID: 11400000, guid: a7d457a78ffdf9e4480e6ccac308ffa6, type: 2}
   payloadGenes:
   - {fileID: 11400000, guid: 6169d5ceddcbda04781cfc19c24f9100, type: 2}
-  starterGenes:
-  - {fileID: 11400000, guid: 0fcc40c60bfe57149b2d4d2fe5dd94c3, type: 2}
-  - {fileID: 11400000, guid: a7d457a78ffdf9e4480e6ccac308ffa6, type: 2}
-  - {fileID: 11400000, guid: c62d2b1eed2428a4183638756d3c1ce7, type: 2}
-  - {fileID: 11400000, guid: 6169d5ceddcbda04781cfc19c24f9100, type: 2}
-  - {fileID: 11400000, guid: 8ad6d36fa1642b64f92055e7329bddad, type: 2}
   placeholderGene: {fileID: 11400000, guid: 8ad6d36fa1642b64f92055e7329bddad, type: 2}

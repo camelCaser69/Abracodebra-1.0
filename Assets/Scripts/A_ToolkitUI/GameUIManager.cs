@@ -9,10 +9,8 @@ using Abracodabra.Genes.Core;
 using Abracodabra.UI.Toolkit;
 using Abracodabra.UI.Genes;
 
-namespace Abracodabra.UI.Toolkit
-{
-    public class GameUIManager : MonoBehaviour
-    {
+namespace Abracodabra.UI.Toolkit {
+    public class GameUIManager : MonoBehaviour {
         [Header("UI Templates")]
         [SerializeField] VisualTreeAsset inventorySlotTemplate;
         [SerializeField] VisualTreeAsset geneSlotTemplate;
@@ -53,10 +51,8 @@ namespace Abracodabra.UI.Toolkit
 
         int TotalInventorySlots => inventoryRows * inventoryColumns;
 
-        void Start()
-        {
-            if (inventorySlotTemplate == null || geneSlotTemplate == null)
-            {
+        void Start() {
+            if (inventorySlotTemplate == null || geneSlotTemplate == null) {
                 Debug.LogError("CRITICAL: UI Template assets are not assigned in the GameUIManager Inspector!");
                 this.enabled = false;
                 return;
@@ -79,6 +75,11 @@ namespace Abracodabra.UI.Toolkit
 
             InventoryService.OnInventoryChanged += HandleInventoryServiceChanged;
 
+            // Subscribe to ToolSwitcher for real-time tool uses updates
+            if (ToolSwitcher.Instance != null) {
+                ToolSwitcher.Instance.OnUsesChanged += HandleToolUsesChanged;
+            }
+
             CreateStartDayButton();
 
             inventoryController.PopulateGrid();
@@ -86,49 +87,45 @@ namespace Abracodabra.UI.Toolkit
             seedEditorController.Clear();
             specSheetController.Clear();
 
-            if (RunManager.Instance != null)
-            {
+            if (RunManager.Instance != null) {
                 RunManager.Instance.OnRunStateChanged += HandleRunStateChanged;
                 HandleRunStateChanged(RunManager.Instance.CurrentState);
             }
-            else
-            {
+            else {
                 ShowPlanningUI();
             }
 
             rootElement.schedule.Execute(() => hotbarController.SelectSlot(0)).StartingIn(10);
         }
 
-        void Update()
-        {
+        void Update() {
             hotbarController.HandleInput();
         }
 
-        void OnDestroy()
-        {
+        void OnDestroy() {
             InventoryService.OnInventoryChanged -= HandleInventoryServiceChanged;
             InventoryService.Unregister();
 
-            if (RunManager.Instance != null)
-            {
+            if (RunManager.Instance != null) {
                 RunManager.Instance.OnRunStateChanged -= HandleRunStateChanged;
             }
 
-            if (playerHungerSystem != null)
-            {
+            if (playerHungerSystem != null) {
                 playerHungerSystem.OnHungerChanged -= UpdateHungerDisplay;
             }
 
-            if (TickManager.Instance != null)
-            {
+            if (TickManager.Instance != null) {
                 TickManager.Instance.OnTickAdvanced -= UpdateTickDisplay;
+            }
+
+            if (ToolSwitcher.Instance != null) {
+                ToolSwitcher.Instance.OnUsesChanged -= HandleToolUsesChanged;
             }
 
             HotbarSelectionService.OnSelectionChanged -= HandleHotbarSelectionChanged;
         }
 
-        void InitializeControllers()
-        {
+        void InitializeControllers() {
             var inventoryPanel = rootElement.Q<VisualElement>("InventoryPanel");
             var geneEditorPanel = rootElement.Q<VisualElement>("SeedEditorPanel");
             var specSheetPanel = rootElement.Q<VisualElement>("SeedSpecSheetPanel");
@@ -147,8 +144,7 @@ namespace Abracodabra.UI.Toolkit
             int totalPanelPadding = panelPaddingLeft + panelPaddingRight;
             int inventoryPanelWidth = gridWidth + totalPanelPadding;
 
-            if (inventoryPanel != null)
-            {
+            if (inventoryPanel != null) {
                 inventoryPanel.style.width = inventoryPanelWidth;
                 inventoryPanel.style.minWidth = inventoryPanelWidth;
                 inventoryPanel.style.maxWidth = inventoryPanelWidth;
@@ -157,8 +153,7 @@ namespace Abracodabra.UI.Toolkit
                 inventoryPanel.style.flexBasis = inventoryPanelWidth;
             }
 
-            if (specSheetPanel != null)
-            {
+            if (specSheetPanel != null) {
                 specSheetPanel.style.width = 400;
                 specSheetPanel.style.minWidth = 400;
                 specSheetPanel.style.maxWidth = 400;
@@ -167,8 +162,7 @@ namespace Abracodabra.UI.Toolkit
                 specSheetPanel.style.flexBasis = 400;
             }
 
-            if (geneEditorPanel != null)
-            {
+            if (geneEditorPanel != null) {
                 geneEditorPanel.style.width = StyleKeyword.Null;
                 geneEditorPanel.style.minWidth = 300;
                 geneEditorPanel.style.maxWidth = StyleKeyword.Null;
@@ -177,8 +171,7 @@ namespace Abracodabra.UI.Toolkit
                 geneEditorPanel.style.flexBasis = 0;
             }
 
-            if (inventoryGridElement != null)
-            {
+            if (inventoryGridElement != null) {
                 inventoryGridElement.style.width = gridWidth;
                 inventoryGridElement.style.minWidth = gridWidth;
                 inventoryGridElement.style.maxWidth = gridWidth;
@@ -214,8 +207,7 @@ namespace Abracodabra.UI.Toolkit
             );
         }
 
-        void InitializeHUD()
-        {
+        void InitializeHUD() {
             hungerBarFill = rootElement.Q<VisualElement>("hunger-bar-fill");
             hungerText = rootElement.Q<Label>("hunger-text");
             tickText = rootElement.Q<Label>("tick-text");
@@ -227,18 +219,15 @@ namespace Abracodabra.UI.Toolkit
             hudTooltipDescription = rootElement.Q<Label>("hud-tooltip-description");
 
             playerHungerSystem = FindFirstObjectByType<PlayerHungerSystem>();
-            if (playerHungerSystem != null)
-            {
+            if (playerHungerSystem != null) {
                 playerHungerSystem.OnHungerChanged += UpdateHungerDisplay;
                 UpdateHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
             }
-            else
-            {
+            else {
                 Debug.LogWarning("[GameUIManager] PlayerHungerSystem not found - hunger display won't update");
             }
 
-            if (TickManager.Instance != null)
-            {
+            if (TickManager.Instance != null) {
                 TickManager.Instance.OnTickAdvanced += UpdateTickDisplay;
                 UpdateTickDisplay(TickManager.Instance.CurrentTick);
             }
@@ -248,8 +237,7 @@ namespace Abracodabra.UI.Toolkit
             Debug.Log("[GameUIManager] HUD initialized");
         }
 
-        void CreateStartDayButton()
-        {
+        void CreateStartDayButton() {
             var buttonContainer = new VisualElement();
             buttonContainer.style.position = Position.Absolute;
             buttonContainer.style.bottom = 120;
@@ -287,8 +275,7 @@ namespace Abracodabra.UI.Toolkit
             Debug.Log("[GameUIManager] Start Day button created");
         }
 
-        void SubscribeToEvents()
-        {
+        void SubscribeToEvents() {
             inventoryController.OnSlotClicked += HandleSlotClicked;
             inventoryController.OnSlotPointerDown += HandleSlotPointerDown;
             inventoryController.OnSlotHoverEnter += HandleInventoryHover;
@@ -298,7 +285,10 @@ namespace Abracodabra.UI.Toolkit
             dragDropController.OnGeneDropRequested += HandleGeneDrop;
             dragDropController.OnDragStarted += HandleDragStarted;
             dragDropController.OnDragEnded += HandleDragEnded;
+            
+            // New events for gene editor drag-drop
             dragDropController.OnGeneDroppedToInventory += HandleGeneDroppedToInventory;
+            dragDropController.OnGeneEditorInternalMove += HandleGeneEditorInternalMove;
 
             seedEditorController.OnGeneSlotPointerDown += HandleGeneSlotPointerDown;
             seedEditorController.OnGeneSlotHoverEnter += HandleGeneHover;
@@ -307,8 +297,7 @@ namespace Abracodabra.UI.Toolkit
             seedEditorController.OnGeneRemovedFromEditor += HandleGeneRemovedFromEditor;
         }
 
-        void SetupPlayerInventory()
-        {
+        void SetupPlayerInventory() {
             playerInventory.Clear();
             if (startingInventory == null) return;
 
@@ -321,88 +310,81 @@ namespace Abracodabra.UI.Toolkit
             foreach (var gene in startingInventory.startingGenes)
                 if (gene != null) playerInventory.Add(new UIInventoryItem(gene));
 
-            while (playerInventory.Count < TotalInventorySlots)
-            {
+            while (playerInventory.Count < TotalInventorySlots) {
                 playerInventory.Add(null);
             }
 
-            if (playerInventory.Count > TotalInventorySlots)
-            {
+            if (playerInventory.Count > TotalInventorySlots) {
                 Debug.LogWarning($"[GameUIManager] Starting inventory has {playerInventory.Count} items but only {TotalInventorySlots} slots. Truncating.");
                 playerInventory = playerInventory.Take(TotalInventorySlots).ToList();
             }
         }
 
-        void RefreshHotbar()
-        {
+        void RefreshHotbar() {
             var hotbarItems = new List<UIInventoryItem>();
-            for (int i = 0; i < inventoryColumns && i < playerInventory.Count; i++)
-            {
-                hotbarItems.Add(playerInventory[i]); // Add even if null!
+            for (int i = 0; i < inventoryColumns && i < playerInventory.Count; i++) {
+                hotbarItems.Add(playerInventory[i]);
             }
             hotbarController.SetupHotbar(hotbarItems);
         }
 
-        void HandleInventoryServiceChanged()
-        {
+        void HandleInventoryServiceChanged() {
             Debug.Log("[GameUIManager] Inventory changed via service - refreshing UI");
 
             inventoryController.RefreshVisuals();
 
             RefreshHotbar();
 
-            if (hotbarController != null)
-            {
+            if (hotbarController != null) {
                 hotbarController.SelectSlot(HotbarSelectionService.SelectedIndex);
             }
         }
+        
+        /// <summary>
+        /// Called when ToolSwitcher.OnUsesChanged fires - refreshes UI to show updated counts
+        /// </summary>
+        void HandleToolUsesChanged(int remainingUses) {
+            // Refresh the hotbar and inventory to update the counter display
+            inventoryController.RefreshVisuals();
+            RefreshHotbar();
+            
+            Debug.Log($"[GameUIManager] Tool uses changed: {remainingUses} remaining - UI refreshed");
+        }
 
-        void UpdateHungerDisplay(float currentHunger, float maxHunger)
-        {
-            if (hungerBarFill != null)
-            {
+        void UpdateHungerDisplay(float currentHunger, float maxHunger) {
+            if (hungerBarFill != null) {
                 float percentage = maxHunger > 0 ? (currentHunger / maxHunger) * 100f : 0f;
                 hungerBarFill.style.width = Length.Percent(percentage);
 
-                if (percentage <= 25f)
-                {
+                if (percentage <= 25f) {
                     hungerBarFill.style.backgroundColor = new Color(0.85f, 0.25f, 0.25f);
                 }
-                else if (percentage <= 50f)
-                {
+                else if (percentage <= 50f) {
                     hungerBarFill.style.backgroundColor = new Color(0.9f, 0.6f, 0.2f);
                 }
-                else
-                {
+                else {
                     hungerBarFill.style.backgroundColor = new Color(0.86f, 0.47f, 0.2f);
                 }
             }
 
-            if (hungerText != null)
-            {
+            if (hungerText != null) {
                 hungerText.text = $"{Mathf.CeilToInt(currentHunger)}/{Mathf.CeilToInt(maxHunger)}";
             }
         }
 
-        void UpdateTickDisplay(int currentTick)
-        {
-            if (tickText != null)
-            {
+        void UpdateTickDisplay(int currentTick) {
+            if (tickText != null) {
                 tickText.text = $"Tick: {currentTick}";
             }
         }
 
-        void HandleHotbarSelectionChanged(InventoryBarItem selectedItem)
-        {
+        void HandleHotbarSelectionChanged(InventoryBarItem selectedItem) {
             UpdateHUDTooltip(selectedItem);
         }
 
-        void UpdateHUDTooltip(InventoryBarItem selectedItem)
-        {
-            if (selectedItem == null || hudTooltipPanel == null)
-            {
-                if (hudTooltipPanel != null)
-                {
+        void UpdateHUDTooltip(InventoryBarItem selectedItem) {
+            if (selectedItem == null || hudTooltipPanel == null) {
+                if (hudTooltipPanel != null) {
                     hudTooltipPanel.style.display = DisplayStyle.None;
                 }
                 return;
@@ -410,12 +392,10 @@ namespace Abracodabra.UI.Toolkit
 
             hudTooltipPanel.style.display = DisplayStyle.Flex;
 
-            switch (selectedItem.Type)
-            {
+            switch (selectedItem.Type) {
                 case InventoryBarItem.ItemType.Seed:
                     var seed = selectedItem.SeedTemplate;
-                    if (seed != null)
-                    {
+                    if (seed != null) {
                         if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
                         if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
                         if (hudTooltipType != null) hudTooltipType.text = "Seed";
@@ -425,8 +405,7 @@ namespace Abracodabra.UI.Toolkit
 
                 case InventoryBarItem.ItemType.Tool:
                     var tool = selectedItem.ToolDefinition;
-                    if (tool != null)
-                    {
+                    if (tool != null) {
                         if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
                         if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
                         if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
@@ -436,8 +415,7 @@ namespace Abracodabra.UI.Toolkit
 
                 case InventoryBarItem.ItemType.Gene:
                     var gene = selectedItem.GeneInstance?.GetGene();
-                    if (gene != null)
-                    {
+                    if (gene != null) {
                         if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
                         if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
                         if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
@@ -447,8 +425,7 @@ namespace Abracodabra.UI.Toolkit
 
                 case InventoryBarItem.ItemType.Resource:
                     var resource = selectedItem.ItemInstance;
-                    if (resource?.definition != null)
-                    {
+                    if (resource?.definition != null) {
                         if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
                         if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
                         if (hudTooltipType != null) hudTooltipType.text = "Resource";
@@ -462,8 +439,7 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        void HandleSlotClicked(int index)
-        {
+        void HandleSlotClicked(int index) {
             if (dragDropController.IsDragging()) return;
 
             selectedInventoryIndex = index;
@@ -472,8 +448,7 @@ namespace Abracodabra.UI.Toolkit
             var selectedItem = playerInventory[index];
             specSheetController.DisplayItem(selectedItem);
 
-            if (selectedItem?.OriginalData is SeedTemplate)
-            {
+            if (selectedItem?.OriginalData is SeedTemplate) {
                 inventoryController.SetLockedSeedSlot(index);
                 seedEditorController.DisplaySeed(selectedItem);
 
@@ -485,156 +460,164 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        void HandleSlotPointerDown(int index)
-        {
+        void HandleSlotPointerDown(int index) {
             dragDropController.StartDrag(index);
             dragDropController.SetInventorySlots(inventoryController.GetSlots());
         }
 
-        // Updated to accept slot metadata
-        void HandleGeneSlotPointerDown(GeneBase gene, VisualElement slot, int slotIndex, string slotType)
-        {
+        void HandleGeneSlotPointerDown(GeneBase gene, VisualElement slot, int slotIndex, string slotType) {
             if (gene == null) return;
 
             dragDropController.StartDragFromGeneEditor(gene, slot, slotIndex, slotType);
             dragDropController.SetInventorySlots(inventoryController.GetSlots());
         }
 
-        void HandleInventoryHover(int index)
-        {
+        void HandleInventoryHover(int index) {
             if (dragDropController.IsDragging()) return;
 
             var item = playerInventory[index];
-            if (item != null)
-            {
+            if (item != null) {
                 specSheetController.DisplayItem(item);
             }
         }
 
-        void HandleGeneHover(GeneBase gene)
-        {
+        void HandleGeneHover(GeneBase gene) {
             if (dragDropController.IsDragging()) return;
 
-            if (gene != null)
-            {
+            if (gene != null) {
                 specSheetController.DisplayGene(gene);
             }
         }
 
-        void HandleHoverExit()
-        {
-            if (selectedInventoryIndex >= 0 && selectedInventoryIndex < playerInventory.Count)
-            {
+        void HandleHoverExit() {
+            if (selectedInventoryIndex >= 0 && selectedInventoryIndex < playerInventory.Count) {
                 var selectedItem = playerInventory[selectedInventoryIndex];
                 specSheetController.DisplayItem(selectedItem);
             }
         }
 
-        void HandleDragStarted(GeneCategory? category)
-        {
+        void HandleDragStarted(GeneCategory? category) {
             seedEditorController.HighlightCompatibleSlots(category);
         }
 
-        void HandleDragEnded()
-        {
+        void HandleDragEnded() {
             seedEditorController.ClearSlotHighlighting();
         }
 
-        void HandleSeedColorChanged(Color newColor)
-        {
+        void HandleSeedColorChanged(Color newColor) {
             inventoryController.RefreshVisuals();
             hotbarController.RefreshHotbar();
         }
 
-        void HandleGeneRemovedFromEditor(GeneBase gene, int slotIndex, string slotType)
-        {
+        void HandleGeneRemovedFromEditor(GeneBase gene, int slotIndex, string slotType) {
             int emptySlot = playerInventory.FindIndex(item => item == null);
 
-            if (emptySlot >= 0)
-            {
+            if (emptySlot >= 0) {
                 playerInventory[emptySlot] = new UIInventoryItem(gene);
                 inventoryController.RefreshVisuals();
                 RefreshHotbar();
                 Debug.Log($"[GameUIManager] Returned {gene.geneName} to inventory slot {emptySlot}");
             }
-            else
-            {
+            else {
                 Debug.LogWarning($"[GameUIManager] No empty inventory slot to return {gene.geneName}!");
             }
         }
-
-        // New handler for when a gene is dropped from editor to inventory
-        void HandleGeneDroppedToInventory(GeneBase gene, int inventoryIndex, int editorSlotIndex, string editorSlotType)
-        {
-            if (gene == null) return;
-
-            // First, remove the gene from the editor's runtime state
-            var removedGene = seedEditorController.RemoveGeneFromSlot(editorSlotIndex, editorSlotType);
+        
+        /// <summary>
+        /// Handle dropping a gene from editor to inventory
+        /// </summary>
+        void HandleGeneDroppedToInventory(GeneBase gene, int inventoryIndex, int editorSlotIndex, string editorSlotType) {
+            // First, remove the gene from the editor
+            seedEditorController.RemoveGeneFromSlot(editorSlotIndex, editorSlotType);
             
-            if (removedGene != null)
-            {
-                // Check if the inventory slot is empty or can be swapped
-                var existingItem = playerInventory[inventoryIndex];
-                
-                if (existingItem == null)
-                {
-                    // Empty slot - just add the gene
-                    playerInventory[inventoryIndex] = new UIInventoryItem(gene);
-                    Debug.Log($"[GameUIManager] ✓ Dropped {gene.geneName} from editor to inventory slot {inventoryIndex}");
+            // Check what's in the target inventory slot
+            var targetItem = playerInventory[inventoryIndex];
+            
+            if (targetItem == null) {
+                // Empty slot - just place the gene
+                playerInventory[inventoryIndex] = new UIInventoryItem(gene);
+                Debug.Log($"[GameUIManager] Dropped {gene.geneName} to empty inventory slot {inventoryIndex}");
+            }
+            else if (targetItem.OriginalData is GeneBase targetGene && CanGeneGoInSlot(targetGene, editorSlotType)) {
+                // Target has a compatible gene - swap!
+                playerInventory[inventoryIndex] = new UIInventoryItem(gene);
+                seedEditorController.AddGeneToSlot(targetGene, editorSlotIndex, editorSlotType);
+                Debug.Log($"[GameUIManager] Swapped {gene.geneName} with {targetGene.geneName}");
+            }
+            else {
+                // Target has incompatible item - find empty slot for the gene
+                int emptySlot = playerInventory.FindIndex(item => item == null);
+                if (emptySlot >= 0) {
+                    playerInventory[emptySlot] = new UIInventoryItem(gene);
+                    Debug.Log($"[GameUIManager] Target occupied - placed {gene.geneName} in empty slot {emptySlot}");
                 }
-                else if (existingItem.OriginalData is GeneBase existingGene)
-                {
-                    // Target slot has a gene - try to swap if compatible
-                    if (CanGeneGoInSlot(existingGene, editorSlotType))
-                    {
-                        // Swap: put existing gene in the editor slot
-                        seedEditorController.AddGeneToSlot(existingGene, editorSlotIndex, editorSlotType);
-                        playerInventory[inventoryIndex] = new UIInventoryItem(gene);
-                        Debug.Log($"[GameUIManager] ✓ Swapped {gene.geneName} with {existingGene.geneName}");
-                    }
-                    else
-                    {
-                        // Can't swap - find an empty slot instead
-                        int emptySlot = playerInventory.FindIndex(item => item == null);
-                        if (emptySlot >= 0)
-                        {
-                            playerInventory[emptySlot] = new UIInventoryItem(gene);
-                            Debug.Log($"[GameUIManager] ✓ Dropped {gene.geneName} to empty slot {emptySlot} (target was incompatible for swap)");
-                        }
-                        else
-                        {
-                            // No space - put it back in the editor
-                            seedEditorController.AddGeneToSlot(gene, editorSlotIndex, editorSlotType);
-                            Debug.LogWarning($"[GameUIManager] ✗ No space for {gene.geneName}, returned to editor");
-                        }
-                    }
+                else {
+                    // No space! Put it back in the editor
+                    seedEditorController.AddGeneToSlot(gene, editorSlotIndex, editorSlotType);
+                    Debug.LogWarning($"[GameUIManager] No space in inventory - returned {gene.geneName} to editor");
                 }
-                else
-                {
-                    // Target slot has a non-gene item - find an empty slot instead
+            }
+            
+            inventoryController.RefreshVisuals();
+            RefreshHotbar();
+        }
+        
+        /// <summary>
+        /// Handle moving a gene from one editor slot to another
+        /// </summary>
+        void HandleGeneEditorInternalMove(GeneBase gene, int fromIndex, string fromType, int toIndex, string toType) {
+            // Check if the gene category is compatible with the target slot type
+            if (!CanGeneGoInSlot(gene, toType)) {
+                Debug.Log($"[GameUIManager] Cannot move {gene.Category} gene to {toType} slot");
+                return;
+            }
+            
+            // Get the gene at the destination (if any)
+            var destinationGene = seedEditorController.GetGeneAtSlot(toIndex, toType);
+            
+            // Remove from source
+            seedEditorController.RemoveGeneFromSlot(fromIndex, fromType);
+            
+            // If there's a gene in the destination, check if we can swap
+            if (destinationGene != null) {
+                if (CanGeneGoInSlot(destinationGene, fromType)) {
+                    // Swap the genes
+                    seedEditorController.AddGeneToSlot(gene, toIndex, toType);
+                    seedEditorController.AddGeneToSlot(destinationGene, fromIndex, fromType);
+                    Debug.Log($"[GameUIManager] Swapped {gene.geneName} with {destinationGene.geneName}");
+                }
+                else {
+                    // Can't swap - put original gene in destination, send displaced gene to inventory
+                    seedEditorController.AddGeneToSlot(gene, toIndex, toType);
+                    
                     int emptySlot = playerInventory.FindIndex(item => item == null);
-                    if (emptySlot >= 0)
-                    {
-                        playerInventory[emptySlot] = new UIInventoryItem(gene);
-                        Debug.Log($"[GameUIManager] ✓ Dropped {gene.geneName} to empty slot {emptySlot} (target had non-gene item)");
+                    if (emptySlot >= 0) {
+                        playerInventory[emptySlot] = new UIInventoryItem(destinationGene);
+                        inventoryController.RefreshVisuals();
+                        RefreshHotbar();
+                        Debug.Log($"[GameUIManager] Moved {gene.geneName} to {toType} slot, {destinationGene.geneName} to inventory");
                     }
-                    else
-                    {
-                        // No space - put it back in the editor
-                        seedEditorController.AddGeneToSlot(gene, editorSlotIndex, editorSlotType);
-                        Debug.LogWarning($"[GameUIManager] ✗ No space for {gene.geneName}, returned to editor");
+                    else {
+                        // No space - revert
+                        seedEditorController.RemoveGeneFromSlot(toIndex, toType);
+                        seedEditorController.AddGeneToSlot(destinationGene, toIndex, toType);
+                        seedEditorController.AddGeneToSlot(gene, fromIndex, fromType);
+                        Debug.LogWarning($"[GameUIManager] No inventory space - reverted move");
                     }
                 }
-
-                inventoryController.RefreshVisuals();
-                RefreshHotbar();
+            }
+            else {
+                // Simple move - destination is empty
+                seedEditorController.AddGeneToSlot(gene, toIndex, toType);
+                Debug.Log($"[GameUIManager] Moved {gene.geneName} from {fromType}[{fromIndex}] to {toType}[{toIndex}]");
             }
         }
-
-        bool CanGeneGoInSlot(GeneBase gene, string slotType)
-        {
-            return slotType switch
-            {
+        
+        /// <summary>
+        /// Check if a gene's category is compatible with a slot type
+        /// </summary>
+        bool CanGeneGoInSlot(GeneBase gene, string slotType) {
+            return slotType switch {
                 "passive" => gene.Category == GeneCategory.Passive,
                 "active" => gene.Category == GeneCategory.Active,
                 "modifier" => gene.Category == GeneCategory.Modifier,
@@ -643,8 +626,7 @@ namespace Abracodabra.UI.Toolkit
             };
         }
 
-        void HandleInventorySwap(int fromIndex, int toIndex)
-        {
+        void HandleInventorySwap(int fromIndex, int toIndex) {
             var temp = playerInventory[fromIndex];
             playerInventory[fromIndex] = playerInventory[toIndex];
             playerInventory[toIndex] = temp;
@@ -652,23 +634,19 @@ namespace Abracodabra.UI.Toolkit
             inventoryController.UpdateIndicesAfterSwap(fromIndex, toIndex);
             inventoryController.RefreshVisuals();
 
-            if (fromIndex < inventoryColumns || toIndex < inventoryColumns)
-            {
+            if (fromIndex < inventoryColumns || toIndex < inventoryColumns) {
                 RefreshHotbar();
             }
         }
 
-        void HandleGeneDrop(int dragSourceIndex, VisualElement targetSlot, string slotType)
-        {
+        void HandleGeneDrop(int dragSourceIndex, VisualElement targetSlot, string slotType) {
             var draggedItem = playerInventory[dragSourceIndex];
             if (draggedItem == null) return;
 
             bool validDrop = false;
 
-            if (draggedItem.OriginalData is GeneBase gene)
-            {
-                validDrop = slotType switch
-                {
+            if (draggedItem.OriginalData is GeneBase gene) {
+                validDrop = slotType switch {
                     "passive" => gene.Category == GeneCategory.Passive,
                     "active" => gene.Category == GeneCategory.Active,
                     "modifier" => gene.Category == GeneCategory.Modifier,
@@ -676,33 +654,28 @@ namespace Abracodabra.UI.Toolkit
                     _ => false
                 };
 
-                if (validDrop)
-                {
+                if (validDrop) {
                     int slotIndex = GetSlotIndexFromElement(targetSlot, slotType);
 
                     Debug.Log($"[GameUIManager] Attempting to add {gene.geneName} to {slotType} slot {slotIndex}");
 
                     bool added = seedEditorController.AddGeneToSlot(gene, slotIndex, slotType);
 
-                    if (added)
-                    {
+                    if (added) {
                         playerInventory[dragSourceIndex] = null;
                         inventoryController.RefreshVisuals();
                         RefreshHotbar();
                         Debug.Log($"[GameUIManager] ✓ Added {gene.geneName} to editor, removed from inventory");
                     }
-                    else
-                    {
+                    else {
                         Debug.LogWarning($"[GameUIManager] ✗ Failed to add {gene.geneName} to slot");
                     }
                 }
-                else
-                {
+                else {
                     Debug.Log($"[GameUIManager] Invalid drop: {gene.Category} gene cannot go in {slotType} slot");
                 }
             }
-            else if (draggedItem.OriginalData is SeedTemplate && slotType == "seed")
-            {
+            else if (draggedItem.OriginalData is SeedTemplate && slotType == "seed") {
                 inventoryController.SetLockedSeedSlot(dragSourceIndex);
                 seedEditorController.DisplaySeed(draggedItem);
 
@@ -716,33 +689,25 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        int GetSlotIndexFromElement(VisualElement element, string slotType)
-        {
-            if (slotType == "passive")
-            {
+        int GetSlotIndexFromElement(VisualElement element, string slotType) {
+            if (slotType == "passive") {
                 var container = rootElement.Q<VisualElement>("passive-genes-container");
-                if (container != null)
-                {
+                if (container != null) {
                     int index = 0;
-                    foreach (var child in container.Children())
-                    {
+                    foreach (var child in container.Children()) {
                         if (child.Contains(element)) return index;
                         index++;
                     }
                 }
             }
-            else if (slotType == "active" || slotType == "modifier" || slotType == "payload")
-            {
+            else if (slotType == "active" || slotType == "modifier" || slotType == "payload") {
                 var container = rootElement.Q<VisualElement>("active-sequence-container");
-                if (container != null)
-                {
+                if (container != null) {
                     int rowIndex = 0;
-                    foreach (var row in container.Children())
-                    {
+                    foreach (var row in container.Children()) {
                         if (row.ClassListContains("active-sequence-header")) continue;
 
-                        if (row.Contains(element))
-                        {
+                        if (row.Contains(element)) {
                             return rowIndex;
                         }
                         rowIndex++;
@@ -753,63 +718,52 @@ namespace Abracodabra.UI.Toolkit
             return 0;
         }
 
-        void OnStartDayClicked()
-        {
+        void OnStartDayClicked() {
             Debug.Log("[GameUIManager] START DAY clicked - transitioning to Growth & Threat phase");
 
-            if (RunManager.Instance != null)
-            {
+            if (RunManager.Instance != null) {
                 RunManager.Instance.StartGrowthAndThreatPhase();
             }
-            else
-            {
+            else {
                 Debug.LogError("[GameUIManager] RunManager.Instance is null! Cannot start day.");
             }
         }
 
-        void HandleRunStateChanged(RunState newState)
-        {
+        void HandleRunStateChanged(RunState newState) {
             if (newState == RunState.Planning) ShowPlanningUI();
             else ShowHUD();
         }
 
-        void ShowPlanningUI()
-        {
+        void ShowPlanningUI() {
             planningPanel.style.display = DisplayStyle.Flex;
             hudPanel.style.display = DisplayStyle.None;
 
             rootElement.style.backgroundColor = new Color(20f / 255f, 20f / 255f, 25f / 255f);
 
-            if (startDayButton != null)
-            {
+            if (startDayButton != null) {
                 startDayButton.style.display = DisplayStyle.Flex;
             }
         }
 
-        void ShowHUD()
-        {
+        void ShowHUD() {
             planningPanel.style.display = DisplayStyle.None;
             hudPanel.style.display = DisplayStyle.Flex;
 
             rootElement.style.backgroundColor = new Color(0, 0, 0, 0);
 
-            if (hudPanel != null)
-            {
+            if (hudPanel != null) {
                 hudPanel.style.backgroundColor = new Color(0, 0, 0, 0);
             }
 
-            if (startDayButton != null)
-            {
+            if (startDayButton != null) {
                 startDayButton.style.display = DisplayStyle.None;
             }
 
-            if (playerHungerSystem != null)
-            {
+            if (playerHungerSystem != null) {
                 UpdateHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
             }
 
-            if (TickManager.Instance != null)
-            {
+            if (TickManager.Instance != null) {
                 UpdateTickDisplay(TickManager.Instance.CurrentTick);
             }
 

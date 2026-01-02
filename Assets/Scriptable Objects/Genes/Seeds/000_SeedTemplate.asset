@@ -15,11 +15,14 @@ MonoBehaviour:
   templateName: Starter Seed Template
   description: 
   icon: {fileID: 21300000, guid: 1db862c5c07e3d04f989efcb5a55e5b4, type: 3}
+  rarity: 0
+  plantType: 0
+  generation: 1
   passiveSlotCount: 4
   activeSequenceLength: 3
   passiveGenes:
-  - gene: {fileID: 0}
-    powerMultiplier: 0
+  - gene: {fileID: 11400000, guid: 96a6da095e5bbd742835c0409890dccf, type: 2}
+    powerMultiplier: 1
   - gene: {fileID: 0}
     powerMultiplier: 1
   - gene: {fileID: 0}

@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11874f9df7fffba4c85d8914f25d3130, type: 3}
+  m_Name: 001_TerrainAffinity_Dirt
+  m_EditorClassIdentifier: 
+  geneName: Terrain Affinity - Dirt
+  description: 
+  icon: {fileID: 21300000, guid: 0aac42833f760c64ab80dcdabdeb253f, type: 3}
+  tier: 1
+  geneColor: {r: 1, g: 1, b: 1, a: 1}
+  effectPrefab: {fileID: 0}
+  _persistentGUID: fd419318-445f-408f-a304-5ace6342cd3f
+  _version: 1
+  statToModify: 0
+  baseValue: 1
+  stacksAdditively: 1
+  maxStacks: -1
+  allowedTiles:
+  - {fileID: 11400000, guid: 4f94336bb2aca31489661a9f761144db, type: 2}
+  - {fileID: 11400000, guid: 2efc2db88b0caff4693943889a86ccac, type: 2}
+  additive: 0
+  preferredTerrainGrowthBonus: 1
+  preferredTiles: []
