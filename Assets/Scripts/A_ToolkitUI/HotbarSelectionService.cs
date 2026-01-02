@@ -17,7 +17,6 @@ namespace Abracodabra.UI.Genes
         // Current selection state
         private static InventoryBarItem _selectedItem;
         private static int _selectedIndex = 0;
-        private static UIInventoryItem _selectedUIItem;
 
         /// <summary>
         /// The currently selected item in the hotbar, as an InventoryBarItem for game system compatibility
@@ -30,27 +29,123 @@ namespace Abracodabra.UI.Genes
         public static int SelectedIndex => _selectedIndex;
 
         /// <summary>
-        /// The currently selected UI item (for UI Toolkit systems)
-        /// </summary>
-        public static UIInventoryItem SelectedUIItem => _selectedUIItem;
-
-        /// <summary>
-        /// Event fired when selection changes
+        /// Event fired when selection changes - provides the InventoryBarItem
         /// </summary>
         public static event Action<InventoryBarItem> OnSelectionChanged;
 
         /// <summary>
-        /// Select an item at the given index using a UIInventoryItem
-        /// Called by UIHotbarController when selection changes
+        /// PRIMARY METHOD: Select an item from UI Toolkit's UIInventoryItem
+        /// Converts to InventoryBarItem for game system compatibility
         /// </summary>
         public static void SelectItem(int index, UIInventoryItem uiItem)
         {
             _selectedIndex = index;
-            _selectedUIItem = uiItem;
-            _selectedItem = ConvertToInventoryBarItem(uiItem);
 
-            Debug.Log($"[HotbarSelectionService] Selected slot {index + 1}: {(_selectedItem?.GetDisplayName() ?? "Empty")}");
+            if (uiItem == null)
+            {
+                _selectedItem = null;
+                Debug.Log($"[HotbarSelectionService] Selected slot {index + 1}: Empty");
+                OnSelectionChanged?.Invoke(null);
+                return;
+            }
+
+            // Convert UIInventoryItem to InventoryBarItem based on type
+            if (uiItem.OriginalData is SeedTemplate seed)
+            {
+                _selectedItem = InventoryBarItem.FromSeed(seed);
+                if (_selectedItem != null && uiItem.SeedRuntimeState != null)
+                {
+                    _selectedItem.SeedRuntimeState = uiItem.SeedRuntimeState;
+                }
+            }
+            else if (uiItem.OriginalData is ToolDefinition tool)
+            {
+                _selectedItem = InventoryBarItem.FromTool(tool);
+            }
+            else if (uiItem.OriginalData is GeneBase gene)
+            {
+                var runtimeInstance = new RuntimeGeneInstance(gene);
+                _selectedItem = InventoryBarItem.FromGene(runtimeInstance);
+            }
+            else if (uiItem.ResourceInstance != null)
+            {
+                _selectedItem = InventoryBarItem.FromItem(uiItem.ResourceInstance);
+            }
+            else if (uiItem.OriginalData is ItemDefinition itemDef)
+            {
+                // Create an ItemInstance from the definition
+                var itemInstance = new ItemInstance(itemDef);
+                itemInstance.stackCount = uiItem.StackSize;
+                _selectedItem = InventoryBarItem.FromItem(itemInstance);
+            }
+            else
+            {
+                _selectedItem = null;
+            }
+
+            string itemName = _selectedItem?.GetDisplayName() ?? "Unknown";
+            Debug.Log($"[HotbarSelectionService] Selected slot {index + 1}: {itemName}");
             OnSelectionChanged?.Invoke(_selectedItem);
+        }
+
+        /// <summary>
+        /// Select a seed item (legacy method for compatibility)
+        /// </summary>
+        public static void SelectSeed(int index, SeedTemplate seedTemplate, PlantGeneRuntimeState runtimeState = null)
+        {
+            _selectedIndex = index;
+            _selectedItem = InventoryBarItem.FromSeed(seedTemplate);
+            if (runtimeState != null && _selectedItem != null)
+            {
+                _selectedItem.SeedRuntimeState = runtimeState;
+            }
+            LogSelection(index);
+            OnSelectionChanged?.Invoke(_selectedItem);
+        }
+
+        /// <summary>
+        /// Select a tool item (legacy method for compatibility)
+        /// </summary>
+        public static void SelectTool(int index, ToolDefinition toolDef)
+        {
+            _selectedIndex = index;
+            _selectedItem = InventoryBarItem.FromTool(toolDef);
+            LogSelection(index);
+            OnSelectionChanged?.Invoke(_selectedItem);
+        }
+
+        /// <summary>
+        /// Select a gene item (legacy method for compatibility)
+        /// </summary>
+        public static void SelectGene(int index, GeneBase gene)
+        {
+            _selectedIndex = index;
+            var runtimeInstance = new RuntimeGeneInstance(gene);
+            _selectedItem = InventoryBarItem.FromGene(runtimeInstance);
+            LogSelection(index);
+            OnSelectionChanged?.Invoke(_selectedItem);
+        }
+
+        /// <summary>
+        /// Select a resource/item (legacy method for compatibility)
+        /// </summary>
+        public static void SelectResource(int index, ItemInstance itemInstance)
+        {
+            _selectedIndex = index;
+            _selectedItem = InventoryBarItem.FromItem(itemInstance);
+            LogSelection(index);
+            OnSelectionChanged?.Invoke(_selectedItem);
+        }
+
+        /// <summary>
+        /// Select empty slot
+        /// </summary>
+        public static void SelectEmpty(int index)
+        {
+            _selectedIndex = index;
+            _selectedItem = null;
+            Debug.Log($"[HotbarSelectionService] Selected slot {index + 1}: Empty");
+            OnSelectionChanged?.Invoke(null);
         }
 
         /// <summary>
@@ -59,68 +154,14 @@ namespace Abracodabra.UI.Genes
         public static void ClearSelection()
         {
             _selectedIndex = -1;
-            _selectedUIItem = null;
             _selectedItem = null;
             OnSelectionChanged?.Invoke(null);
         }
 
-        /// <summary>
-        /// Convert a UIInventoryItem to an InventoryBarItem for game system compatibility
-        /// </summary>
-        private static InventoryBarItem ConvertToInventoryBarItem(UIInventoryItem uiItem)
+        private static void LogSelection(int index)
         {
-            if (uiItem == null) return null;
-
-            var originalData = uiItem.OriginalData;
-
-            // Handle SeedTemplate
-            if (originalData is SeedTemplate seedTemplate)
-            {
-                var item = InventoryBarItem.FromSeed(seedTemplate);
-                // If the UIInventoryItem has runtime state, use it
-                if (uiItem.SeedRuntimeState != null)
-                {
-                    item.SeedRuntimeState = uiItem.SeedRuntimeState;
-                }
-                return item;
-            }
-
-            // Handle ToolDefinition
-            if (originalData is ToolDefinition toolDef)
-            {
-                return InventoryBarItem.FromTool(toolDef);
-            }
-
-            // Handle GeneBase (wrapped in RuntimeGeneInstance for compatibility)
-            if (originalData is GeneBase gene)
-            {
-                var runtimeInstance = new RuntimeGeneInstance(gene);
-                return InventoryBarItem.FromGene(runtimeInstance);
-            }
-
-            // Handle RuntimeGeneInstance directly
-            if (originalData is RuntimeGeneInstance runtimeGene)
-            {
-                return InventoryBarItem.FromGene(runtimeGene);
-            }
-
-            // Handle ItemInstance (resources)
-            if (originalData is ItemInstance itemInstance)
-            {
-                return InventoryBarItem.FromItem(itemInstance);
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Force refresh the current selection (useful after inventory changes)
-        /// </summary>
-        public static void RefreshCurrentSelection(UIInventoryItem uiItem)
-        {
-            _selectedUIItem = uiItem;
-            _selectedItem = ConvertToInventoryBarItem(uiItem);
-            OnSelectionChanged?.Invoke(_selectedItem);
+            string itemName = _selectedItem?.GetDisplayName() ?? "Empty";
+            Debug.Log($"[HotbarSelectionService] Selected slot {index + 1}: {itemName}");
         }
     }
 }

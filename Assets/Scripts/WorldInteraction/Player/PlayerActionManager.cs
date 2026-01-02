@@ -1,11 +1,12 @@
-﻿using UnityEngine;
-using System;
-using System.Linq;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using WegoSystem;
 using Abracodabra.Genes;
 using Abracodabra.UI.Genes;
+using Abracodabra.UI.Toolkit;
 
 public enum PlayerActionType
 {
@@ -16,9 +17,15 @@ public enum PlayerActionType
     Interact
 }
 
+/// <summary>
+/// Manages player actions in the game world.
+/// 
+/// UPDATED: Now uses InventoryService for harvesting instead of old InventoryGridController.
+/// This integrates with the UI Toolkit inventory system.
+/// </summary>
 public class PlayerActionManager : MonoBehaviour
 {
-    public static PlayerActionManager Instance { get; set; }
+    public static PlayerActionManager Instance { get; private set; }
 
     public class ToolActionData
     {
@@ -33,7 +40,7 @@ public class PlayerActionManager : MonoBehaviour
     public event Action<PlayerActionType, object> OnActionExecuted;
     public event Action<string> OnActionFailed;
 
-    private void Awake()
+    void Awake()
     {
         if (Instance != null && Instance != this)
         {
@@ -43,6 +50,9 @@ public class PlayerActionManager : MonoBehaviour
         Instance = this;
     }
 
+    /// <summary>
+    /// Execute a player action at the specified grid position
+    /// </summary>
     public bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null, Action onSuccessCallback = null)
     {
         if (debugMode) Debug.Log($"[PlayerActionManager] Executing {actionType} at {gridPosition}");
@@ -50,9 +60,6 @@ public class PlayerActionManager : MonoBehaviour
         bool success = false;
         int tickCost = tickCostPerAction;
         object eventPayload = actionData;
-
-        // Note: The specific check for HarvestPouch is now handled in PlayerTileInteractor
-        // to allow for more nuanced action calls.
 
         switch (actionType)
         {
@@ -72,7 +79,6 @@ public class PlayerActionManager : MonoBehaviour
                 break;
 
             case PlayerActionType.Harvest:
-                // FIX: Use the new, functional harvest logic.
                 success = ExecuteHarvest(gridPosition);
                 break;
 
@@ -91,6 +97,7 @@ public class PlayerActionManager : MonoBehaviour
         {
             OnActionFailed?.Invoke($"{actionType} failed at {gridPosition}");
         }
+
         return success;
     }
 
@@ -121,8 +128,9 @@ public class PlayerActionManager : MonoBehaviour
         return result;
     }
 
-    // Only providing the changed method block as requested.
-    // Only providing the changed method block as requested.
+    /// <summary>
+    /// Execute harvest action - NOW uses InventoryService instead of old InventoryGridController
+    /// </summary>
     private bool ExecuteHarvest(Vector3Int gridPosition)
     {
         var entities = GridPositionManager.Instance?.GetEntitiesAt(new GridPosition(gridPosition));
@@ -146,28 +154,54 @@ public class PlayerActionManager : MonoBehaviour
         }
 
         int itemsAdded = 0;
-        foreach (var harvestedItem in harvestedItems)
+
+        // Use NEW InventoryService instead of old InventoryGridController
+        if (InventoryService.IsInitialized)
         {
-            // NEW: Create the inventory item directly from the ItemInstance within the HarvestedItem.
-            var inventoryItem = InventoryBarItem.FromItem(harvestedItem.Item);
-            if (InventoryGridController.Instance.AddItemToInventory(inventoryItem))
+            foreach (var harvestedItem in harvestedItems)
             {
-                itemsAdded++;
+                // Add harvested item using new service
+                if (InventoryService.AddHarvestedItem(harvestedItem.Item))
+                {
+                    itemsAdded++;
+                    if (debugMode) Debug.Log($"[PlayerActionManager] Added '{harvestedItem.Item.definition.itemName}' to inventory via InventoryService");
+                }
+                else
+                {
+                    if (debugMode) Debug.LogWarning($"[PlayerActionManager] Failed to add harvested item '{harvestedItem.Item.definition.itemName}' to inventory. Inventory may be full.");
+                }
+            }
+        }
+        else
+        {
+            // Fallback to legacy system if new system not initialized
+            Debug.LogWarning("[PlayerActionManager] InventoryService not initialized, trying legacy InventoryGridController");
+            
+            if (InventoryGridController.Instance != null)
+            {
+                foreach (var harvestedItem in harvestedItems)
+                {
+                    var inventoryItem = InventoryBarItem.FromItem(harvestedItem.Item);
+                    if (InventoryGridController.Instance.AddItemToInventory(inventoryItem))
+                    {
+                        itemsAdded++;
+                    }
+                }
             }
             else
             {
-                if (debugMode) Debug.LogWarning($"[PlayerActionManager] Failed to add harvested item '{harvestedItem.Item.definition.itemName}' to inventory. Inventory may be full.");
+                Debug.LogError("[PlayerActionManager] Neither InventoryService nor InventoryGridController available!");
             }
         }
 
         if (debugMode) Debug.Log($"[PlayerActionManager] Successfully added {itemsAdded}/{harvestedItems.Count} harvested items to inventory.");
-    
+
         return itemsAdded > 0;
     }
 
     private bool ExecuteInteraction(Vector3Int gridPosition, object interactionData)
     {
-        if (debugMode) Debug.Log($"[PlayerActionManager] Interaction at {gridPosition}");
+        if (debugMode) Debug.Log($"[PlayerActionManager] Interaction at {gridPosition}: {interactionData}");
         return true;
     }
 
@@ -183,7 +217,7 @@ public class PlayerActionManager : MonoBehaviour
 
         if (success)
         {
-            AdvanceGameTick(1); // Final tick
+            AdvanceGameTick(1);
             onSuccessCallback?.Invoke();
             OnActionExecuted?.Invoke(actionType, actionData);
         }

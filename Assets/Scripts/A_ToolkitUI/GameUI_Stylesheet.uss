@@ -10,7 +10,7 @@
 #HUDPanel {
     background-color: rgba(0, 0, 0, 0);
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: stretch;
     padding: 0;
     margin: 0;
@@ -109,7 +109,8 @@ Label {
     margin-bottom: 6px;
 }
 
-.hud-stat-row:last-child {
+/* Note: Unity UI Toolkit doesn't support :last-child, so we use explicit margin on tick container */
+#tick-container {
     margin-bottom: 0;
 }
 
@@ -212,19 +213,19 @@ Label {
 }
 
 /* ============================================
-   HOTBAR
+   HOTBAR - FIXED TO BOTTOM CENTER
    ============================================ */
 
-/* Hotbar container - centered at bottom */
+/* Hotbar container - ABSOLUTE positioned at bottom center */
 #Hotbar {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    translate: -50% 0;
     height: 84px;
-    max-height: 84px;
-    min-height: 84px;
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
-    align-self: center;
 }
 
 /* Hotbar visual container */
@@ -303,6 +304,14 @@ Label {
 .slot--locked-for-editing {
     border-color: rgba(0, 255, 255, 0.9);
     border-width: 3px;
+}
+
+/* Empty slot styling for hotbar */
+.slot--empty {
+    background-color: rgba(30, 30, 40, 0.5);
+    border-color: rgba(100, 100, 120, 0.3);
+    border-width: 1px;
+    border-style: dashed;
 }
 
 /* Slot icon - properly sized */

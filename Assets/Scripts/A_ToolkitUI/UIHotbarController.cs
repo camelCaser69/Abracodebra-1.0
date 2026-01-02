@@ -6,14 +6,15 @@ using Abracodabra.UI.Genes; // For HotbarSelectionService
 namespace Abracodabra.UI.Toolkit
 {
     /// <summary>
-    /// Manages the hotbar display with MANUAL container (no ListView) and integrates with HotbarSelectionService
+    /// Manages the hotbar display with MANUAL container (no ListView) and integrates with HotbarSelectionService.
+    /// IMPORTANT: This preserves empty slots - if inventory row 1 has nulls, hotbar shows empty slots.
     /// </summary>
     public class UIHotbarController
     {
         // References
         private VisualElement hotbarContainer; // The parent Hotbar element
         private VisualElement slotsContainer; // Manual container for slots
-        private VisualElement hotbarSelector; // Legacy selector element (we'll hide it)
+        private VisualElement hotbarSelector; // Legacy selector element (hidden, we use CSS)
         private VisualTreeAsset slotTemplate;
         private List<UIInventoryItem> hotbarItems;
         private List<VisualElement> slotElements = new List<VisualElement>();
@@ -66,12 +67,14 @@ namespace Abracodabra.UI.Toolkit
         }
 
         /// <summary>
-        /// Setup the hotbar with items (first row of inventory)
+        /// Setup the hotbar with items (first row of inventory).
+        /// IMPORTANT: This preserves NULL items as empty slots - does NOT filter them out.
         /// </summary>
         public void SetupHotbar(List<UIInventoryItem> items)
         {
             if (slotsContainer == null) return;
 
+            // Store reference to items - INCLUDING nulls
             hotbarItems = items;
             maxHotbarSlots = items.Count;
 
@@ -79,13 +82,14 @@ namespace Abracodabra.UI.Toolkit
             slotsContainer.Clear();
             slotElements.Clear();
 
-            // Manually create each slot
+            // Manually create each slot - INCLUDING empty slots for null items
             for (int i = 0; i < items.Count; i++)
             {
                 int slotIndex = i; // Capture for closure
+                var item = items[i]; // May be null!
 
                 var slotElement = slotTemplate.Instantiate();
-                
+
                 // Get the actual slot container from the template
                 var slotContainer = slotElement.Q<VisualElement>("slot-container");
                 if (slotContainer == null)
@@ -93,9 +97,9 @@ namespace Abracodabra.UI.Toolkit
                     // If no slot-container, use the first child or the element itself
                     slotContainer = slotElement.childCount > 0 ? slotElement[0] : slotElement;
                 }
-                
+
                 slotContainer.AddToClassList("slot");
-                
+
                 // Set explicit size and margins
                 slotContainer.style.width = SLOT_WIDTH;
                 slotContainer.style.height = SLOT_WIDTH;
@@ -104,8 +108,8 @@ namespace Abracodabra.UI.Toolkit
                 slotContainer.style.flexShrink = 0;
                 slotContainer.style.flexGrow = 0;
 
-                // Bind the item data
-                BindSlot(slotContainer, items[i]);
+                // Bind the item data (handles null for empty slots)
+                BindSlot(slotContainer, item);
 
                 // Add click handler for selection
                 slotContainer.RegisterCallback<ClickEvent>(evt =>
@@ -128,14 +132,14 @@ namespace Abracodabra.UI.Toolkit
             hotbarContainer.style.minWidth = totalWidth + 10;
             hotbarContainer.style.maxWidth = totalWidth + 10;
 
-            Debug.Log($"[UIHotbarController] Created {items.Count} manual slots, total width: {totalWidth}px");
+            Debug.Log($"[UIHotbarController] Created {items.Count} slots (including empty), total width: {totalWidth}px");
 
             // Initial selection
             SelectSlot(0);
         }
 
         /// <summary>
-        /// Bind item data to a slot
+        /// Bind item data to a slot. Handles NULL items as empty slots.
         /// </summary>
         private void BindSlot(VisualElement slotElement, UIInventoryItem item)
         {
@@ -153,8 +157,12 @@ namespace Abracodabra.UI.Toolkit
                 icon.scaleMode = ScaleMode.ScaleToFit;
             }
 
+            // Remove previous state classes
+            slotElement.RemoveFromClassList("slot--empty");
+
             if (item != null)
             {
+                // Has item - show icon
                 if (icon != null)
                 {
                     icon.sprite = item.Icon;
@@ -177,15 +185,20 @@ namespace Abracodabra.UI.Toolkit
             }
             else
             {
+                // NULL item - show as EMPTY slot
                 if (icon != null)
                 {
+                    icon.sprite = null;
                     icon.style.display = DisplayStyle.None;
                 }
                 if (stack != null)
                 {
                     stack.text = "";
                 }
-                slotElement.style.backgroundColor = new Color(0, 0, 0, 0.4f);
+
+                // Apply empty slot styling
+                slotElement.AddToClassList("slot--empty");
+                slotElement.style.backgroundColor = new Color(0.12f, 0.12f, 0.15f, 0.5f);
             }
         }
 
@@ -233,7 +246,7 @@ namespace Abracodabra.UI.Toolkit
             // Update visual selection (CSS class only - no selector element)
             UpdateSelectionVisual();
 
-            // Get the item at this index
+            // Get the item at this index (may be null for empty slot)
             UIInventoryItem selectedItem = null;
             if (hotbarItems != null && index < hotbarItems.Count)
             {
@@ -242,7 +255,9 @@ namespace Abracodabra.UI.Toolkit
 
             // CRITICAL: Notify the HotbarSelectionService (static bridge to game systems)
             HotbarSelectionService.SelectItem(index, selectedItem);
-            Debug.Log($"[UIHotbarController] Selected slot {index + 1}, notified HotbarSelectionService");
+            
+            string itemName = selectedItem != null ? selectedItem.GetDisplayName() : "Empty";
+            Debug.Log($"[UIHotbarController] Selected slot {index + 1}: {itemName}");
         }
 
         /// <summary>

@@ -8,9 +8,13 @@ using Abracodabra.Genes.Core;
 using Abracodabra.UI.Toolkit;
 using Abracodabra.UI.Genes;
 
+namespace Abracodabra.UI.Toolkit
+{
 /// <summary>
-/// Main UI Manager - Fully functional gene editor with proper data persistence
-/// Now includes HUD with hunger, tick counter, and selected item tooltip
+/// Main UI Manager - Fully functional gene editor with proper data persistence.
+/// Now integrates with InventoryService for game system compatibility.
+/// 
+/// HUD includes: hunger bar, tick counter, selected item tooltip
 /// </summary>
 public class GameUIManager : MonoBehaviour
 {
@@ -28,7 +32,7 @@ public class GameUIManager : MonoBehaviour
     [Tooltip("Number of columns in the inventory grid")]
     [SerializeField] private int inventoryColumns = 6;
 
-    // Shared inventory data
+    // Shared inventory data - this is THE authoritative inventory list
     private List<UIInventoryItem> playerInventory = new List<UIInventoryItem>();
     private int selectedInventoryIndex = -1;
 
@@ -77,6 +81,9 @@ public class GameUIManager : MonoBehaviour
         // Initialize inventory data
         SetupPlayerInventory();
 
+        // Register inventory with the service (BEFORE initializing controllers)
+        InventoryService.Register(playerInventory, inventoryColumns, inventoryRows);
+
         // Initialize all controllers
         InitializeControllers();
 
@@ -86,12 +93,15 @@ public class GameUIManager : MonoBehaviour
         // Subscribe to controller events
         SubscribeToEvents();
 
+        // Subscribe to inventory service changes
+        InventoryService.OnInventoryChanged += HandleInventoryServiceChanged;
+
         // Create Start Day button
         CreateStartDayButton();
 
         // Initial setup
         inventoryController.PopulateGrid();
-        hotbarController.SetupHotbar(playerInventory.Take(inventoryColumns).ToList());
+        RefreshHotbar();
         seedEditorController.Clear();
         specSheetController.Clear();
 
@@ -117,6 +127,10 @@ public class GameUIManager : MonoBehaviour
 
     void OnDestroy()
     {
+        // Unregister from inventory service
+        InventoryService.OnInventoryChanged -= HandleInventoryServiceChanged;
+        InventoryService.Unregister();
+
         // Unsubscribe from events
         if (RunManager.Instance != null)
         {
@@ -250,7 +264,6 @@ public class GameUIManager : MonoBehaviour
         if (playerHungerSystem != null)
         {
             playerHungerSystem.OnHungerChanged += UpdateHungerDisplay;
-            // Initial update
             UpdateHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
         }
         else
@@ -273,10 +286,9 @@ public class GameUIManager : MonoBehaviour
 
     private void CreateStartDayButton()
     {
-        // Create button container at BOTTOM center (above hotbar area)
         var buttonContainer = new VisualElement();
         buttonContainer.style.position = Position.Absolute;
-        buttonContainer.style.bottom = 120; // Above the hotbar
+        buttonContainer.style.bottom = 120;
         buttonContainer.style.left = Length.Percent(50);
         buttonContainer.style.translate = new Translate(Length.Percent(-50), 0);
         buttonContainer.style.alignItems = Align.Center;
@@ -286,7 +298,6 @@ public class GameUIManager : MonoBehaviour
         startDayButton.text = "▶ START DAY";
         startDayButton.AddToClassList("start-day-button");
 
-        // Styling
         startDayButton.style.fontSize = 24;
         startDayButton.style.paddingTop = 15;
         startDayButton.style.paddingBottom = 15;
@@ -309,7 +320,7 @@ public class GameUIManager : MonoBehaviour
         buttonContainer.Add(startDayButton);
         planningPanel.Add(buttonContainer);
 
-        Debug.Log("[GameUIManager] Start Day button created at bottom center");
+        Debug.Log("[GameUIManager] Start Day button created");
     }
 
     private void SubscribeToEvents()
@@ -359,6 +370,43 @@ public class GameUIManager : MonoBehaviour
             playerInventory = playerInventory.Take(TotalInventorySlots).ToList();
         }
     }
+
+    /// <summary>
+    /// Refresh the hotbar with current inventory first row.
+    /// Preserves empty slots (nulls) exactly as they appear in inventory.
+    /// </summary>
+    private void RefreshHotbar()
+    {
+        // Get exactly the first row, including nulls
+        var hotbarItems = new List<UIInventoryItem>();
+        for (int i = 0; i < inventoryColumns && i < playerInventory.Count; i++)
+        {
+            hotbarItems.Add(playerInventory[i]); // Add even if null!
+        }
+        hotbarController.SetupHotbar(hotbarItems);
+    }
+    #endregion
+
+    #region Inventory Service Handler
+    /// <summary>
+    /// Called when inventory is modified via InventoryService (e.g., planting, harvesting, eating)
+    /// </summary>
+    private void HandleInventoryServiceChanged()
+    {
+        Debug.Log("[GameUIManager] Inventory changed via service - refreshing UI");
+        
+        // Refresh inventory grid
+        inventoryController.RefreshVisuals();
+        
+        // Refresh hotbar (preserving empty slots)
+        RefreshHotbar();
+        
+        // Re-select current slot to update tooltip
+        if (hotbarController != null)
+        {
+            hotbarController.SelectSlot(HotbarSelectionService.SelectedIndex);
+        }
+    }
     #endregion
 
     #region HUD Updates
@@ -369,18 +417,17 @@ public class GameUIManager : MonoBehaviour
             float percentage = maxHunger > 0 ? (currentHunger / maxHunger) * 100f : 0f;
             hungerBarFill.style.width = Length.Percent(percentage);
 
-            // Change color when low
             if (percentage <= 25f)
             {
-                hungerBarFill.style.backgroundColor = new Color(0.85f, 0.25f, 0.25f); // Red
+                hungerBarFill.style.backgroundColor = new Color(0.85f, 0.25f, 0.25f);
             }
             else if (percentage <= 50f)
             {
-                hungerBarFill.style.backgroundColor = new Color(0.9f, 0.6f, 0.2f); // Orange
+                hungerBarFill.style.backgroundColor = new Color(0.9f, 0.6f, 0.2f);
             }
             else
             {
-                hungerBarFill.style.backgroundColor = new Color(0.86f, 0.47f, 0.2f); // Default orange
+                hungerBarFill.style.backgroundColor = new Color(0.86f, 0.47f, 0.2f);
             }
         }
 
@@ -398,17 +445,11 @@ public class GameUIManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Handler for HotbarSelectionService.OnSelectionChanged event
-    /// </summary>
     private void HandleHotbarSelectionChanged(InventoryBarItem selectedItem)
     {
         UpdateHUDTooltip(selectedItem);
     }
 
-    /// <summary>
-    /// Update the HUD tooltip panel with the selected item info
-    /// </summary>
     private void UpdateHUDTooltip(InventoryBarItem selectedItem)
     {
         if (selectedItem == null || hudTooltipPanel == null)
@@ -420,10 +461,8 @@ public class GameUIManager : MonoBehaviour
             return;
         }
 
-        // Show the panel
         hudTooltipPanel.style.display = DisplayStyle.Flex;
 
-        // Get item info based on type
         switch (selectedItem.Type)
         {
             case InventoryBarItem.ItemType.Seed:
@@ -563,14 +602,13 @@ public class GameUIManager : MonoBehaviour
 
     private void HandleGeneRemovedFromEditor(GeneBase gene, int slotIndex, string slotType)
     {
-        // Find first empty slot
         int emptySlot = playerInventory.FindIndex(item => item == null);
 
         if (emptySlot >= 0)
         {
             playerInventory[emptySlot] = new UIInventoryItem(gene);
             inventoryController.RefreshVisuals();
-            hotbarController.SetupHotbar(playerInventory.Take(inventoryColumns).ToList());
+            RefreshHotbar();
             Debug.Log($"[GameUIManager] Returned {gene.geneName} to inventory slot {emptySlot}");
         }
         else
@@ -587,6 +625,12 @@ public class GameUIManager : MonoBehaviour
 
         inventoryController.UpdateIndicesAfterSwap(fromIndex, toIndex);
         inventoryController.RefreshVisuals();
+        
+        // Refresh hotbar if either index is in first row
+        if (fromIndex < inventoryColumns || toIndex < inventoryColumns)
+        {
+            RefreshHotbar();
+        }
     }
 
     private void HandleGeneDrop(int dragSourceIndex, VisualElement targetSlot, string slotType)
@@ -619,7 +663,7 @@ public class GameUIManager : MonoBehaviour
                 {
                     playerInventory[dragSourceIndex] = null;
                     inventoryController.RefreshVisuals();
-                    hotbarController.SetupHotbar(playerInventory.Take(inventoryColumns).ToList());
+                    RefreshHotbar();
                     Debug.Log($"[GameUIManager] ✓ Added {gene.geneName} to editor, removed from inventory");
                 }
                 else
@@ -711,7 +755,6 @@ public class GameUIManager : MonoBehaviour
         planningPanel.style.display = DisplayStyle.Flex;
         hudPanel.style.display = DisplayStyle.None;
 
-        // Show solid background for planning mode
         rootElement.style.backgroundColor = new Color(20f / 255f, 20f / 255f, 25f / 255f);
 
         if (startDayButton != null)
@@ -725,10 +768,8 @@ public class GameUIManager : MonoBehaviour
         planningPanel.style.display = DisplayStyle.None;
         hudPanel.style.display = DisplayStyle.Flex;
 
-        // CRITICAL: Make background transparent so game camera can render through
         rootElement.style.backgroundColor = new Color(0, 0, 0, 0);
 
-        // Also ensure HUD panel is transparent
         if (hudPanel != null)
         {
             hudPanel.style.backgroundColor = new Color(0, 0, 0, 0);
@@ -757,3 +798,4 @@ public class GameUIManager : MonoBehaviour
     }
     #endregion
 }
+} // namespace Abracodabra.UI.Toolkit

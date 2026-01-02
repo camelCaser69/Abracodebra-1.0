@@ -78,7 +78,7 @@
             <ui:Label name="hud-tooltip-description" text="" class="hud-tooltip-description" />
         </ui:VisualElement>
         
-        <!-- Bottom hotbar -->
+        <!-- Bottom hotbar - positioned via CSS -->
         <ui:VisualElement name="Hotbar" class="hotbar">
             <ui:ListView name="hotbar-list" class="hotbar-list" />
             <ui:VisualElement name="hotbar-selector" class="hotbar-selector" />
