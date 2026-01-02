@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,32 +9,26 @@ using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.UI.Toolkit
 {
-    /// <summary>
-    /// Manages the seed editor panel with FULL gene modification support
-    /// </summary>
     public class UISeedEditorController
     {
-        // Events
-        public event Action<GeneBase, VisualElement> OnGeneSlotPointerDown;
+        // Updated event signature to include slot metadata
+        public event Action<GeneBase, VisualElement, int, string> OnGeneSlotPointerDown;
         public event Action<GeneBase> OnGeneSlotHoverEnter;
         public event Action OnGeneSlotHoverExit;
         public event Action<Color> OnSeedColorChanged;
         public event Action<string> OnSeedNameChanged;
         public event Action<GeneBase, int, string> OnGeneRemovedFromEditor;
 
-        // References
-        private VisualElement seedDropSlotContainer;
-        private VisualElement passiveGenesContainer;
-        private VisualElement activeSequenceContainer;
-        private VisualTreeAsset geneSlotTemplate;
+        VisualElement seedDropSlotContainer;
+        VisualElement passiveGenesContainer;
+        VisualElement activeSequenceContainer;
+        VisualTreeAsset geneSlotTemplate;
 
-        // Name editor
-        private TextField seedNameField;
-        private VisualElement nameEditorContainer;
+        TextField seedNameField;
+        VisualElement nameEditorContainer;
 
-        // Color picker
-        private VisualElement colorPickerContainer;
-        private UIInventoryItem currentSeedItem;
+        VisualElement colorPickerContainer;
+        UIInventoryItem currentSeedItem;
 
         public void Initialize(
             VisualElement seedContainer,
@@ -64,9 +59,8 @@ namespace Abracodabra.UI.Toolkit
             passiveGenesContainer.Clear();
             activeSequenceContainer.Clear();
 
-            // Create seed slot
             var seedSlot = geneSlotTemplate.Instantiate();
-            BindGeneSlot(seedSlot, seedItem.OriginalData);
+            BindGeneSlot(seedSlot, seedItem.OriginalData, -1, "seed");
             seedSlot.name = "seed-drop-slot";
 
             if (seedItem.HasCustomColor())
@@ -80,14 +74,12 @@ namespace Abracodabra.UI.Toolkit
 
             seedDropSlotContainer.Add(seedSlot);
 
-            // Add name editor
             if (nameEditorContainer != null)
             {
                 seedDropSlotContainer.Add(nameEditorContainer);
                 UpdateNameEditor(seedItem);
             }
 
-            // Add color picker
             if (colorPickerContainer != null)
             {
                 seedDropSlotContainer.Add(colorPickerContainer);
@@ -96,7 +88,6 @@ namespace Abracodabra.UI.Toolkit
 
             var runtimeState = seedItem.SeedRuntimeState;
 
-            // Create passive gene slots
             for (int i = 0; i < template.passiveSlotCount; i++)
             {
                 var geneInstance = (i < runtimeState.passiveInstances.Count) ? runtimeState.passiveInstances[i] : null;
@@ -107,7 +98,6 @@ namespace Abracodabra.UI.Toolkit
                 passiveGenesContainer.Add(wrappedSlot);
             }
 
-            // Create active sequence header
             var headerRow = new VisualElement();
             headerRow.AddToClassList("active-sequence-header");
 
@@ -131,7 +121,6 @@ namespace Abracodabra.UI.Toolkit
             headerRow.Add(payloadHeader);
             activeSequenceContainer.Add(headerRow);
 
-            // Create active sequence rows
             for (int i = 0; i < template.activeSequenceLength; i++)
             {
                 var sequenceRow = new VisualElement();
@@ -288,7 +277,6 @@ namespace Abracodabra.UI.Toolkit
             }
             emptySeedSlot.Q("icon").style.display = DisplayStyle.None;
 
-            // Apply empty slot styling
             var background = emptySeedSlot.Q("background");
             if (background != null)
             {
@@ -301,8 +289,7 @@ namespace Abracodabra.UI.Toolkit
 
         public bool HasSeedLoaded() => currentSeedItem != null;
 
-        #region Name Editor
-        private void CreateNameEditor()
+        void CreateNameEditor()
         {
             nameEditorContainer = new VisualElement();
             nameEditorContainer.style.flexDirection = FlexDirection.Row;
@@ -314,22 +301,17 @@ namespace Abracodabra.UI.Toolkit
 
             seedNameField = new TextField();
             seedNameField.AddToClassList("seed-name-field");
-            
-            // Make it 2x wider (280px) with proper height
+
             seedNameField.style.width = 280;
             seedNameField.style.height = 36;
-            
-            // Ensure the text input is properly styled after layout
+
             seedNameField.RegisterCallback<AttachToPanelEvent>(evt =>
             {
-                // Schedule styling after the element is attached
                 seedNameField.schedule.Execute(() => StyleNameFieldInput()).StartingIn(10);
             });
-            
-            // Also apply on geometry change as backup
+
             seedNameField.RegisterCallback<GeometryChangedEvent>(evt => StyleNameFieldInput());
 
-            // Register value change callback
             seedNameField.RegisterValueChangedCallback(evt =>
             {
                 if (currentSeedItem != null)
@@ -342,35 +324,30 @@ namespace Abracodabra.UI.Toolkit
             nameEditorContainer.Add(seedNameField);
         }
 
-        private void StyleNameFieldInput()
+        void StyleNameFieldInput()
         {
             if (seedNameField == null) return;
-            
+
             var textInput = seedNameField.Q("unity-text-input");
             if (textInput != null)
             {
-                // Very dark background for maximum contrast
                 textInput.style.backgroundColor = new Color(0.05f, 0.05f, 0.08f, 1f);
 
-                // White bold text, large size
                 textInput.style.color = Color.white;
                 textInput.style.fontSize = 18;
                 textInput.style.unityFontStyleAndWeight = FontStyle.Bold;
                 textInput.style.unityTextAlign = TextAnchor.MiddleCenter;
 
-                // Rounded corners
                 textInput.style.borderTopLeftRadius = 6;
                 textInput.style.borderTopRightRadius = 6;
                 textInput.style.borderBottomLeftRadius = 6;
                 textInput.style.borderBottomRightRadius = 6;
 
-                // Padding
                 textInput.style.paddingLeft = 12;
                 textInput.style.paddingRight = 12;
                 textInput.style.paddingTop = 6;
                 textInput.style.paddingBottom = 6;
 
-                // Border
                 textInput.style.borderLeftWidth = 2;
                 textInput.style.borderRightWidth = 2;
                 textInput.style.borderTopWidth = 2;
@@ -381,7 +358,6 @@ namespace Abracodabra.UI.Toolkit
                 textInput.style.borderBottomColor = new Color(0.4f, 0.4f, 0.5f, 1f);
             }
 
-            // Style the text element for cursor (caret) color
             var textElement = seedNameField.Q<TextElement>();
             if (textElement != null)
             {
@@ -389,21 +365,18 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        private void UpdateNameEditor(UIInventoryItem seedItem)
+        void UpdateNameEditor(UIInventoryItem seedItem)
         {
             if (seedNameField == null || seedItem == null) return;
 
-            // Use custom name if set, otherwise use template name
             string displayName = !string.IsNullOrEmpty(seedItem.CustomName)
                 ? seedItem.CustomName
                 : (seedItem.OriginalData as SeedTemplate)?.templateName ?? "Unnamed Seed";
 
             seedNameField.SetValueWithoutNotify(displayName);
         }
-        #endregion
 
-        #region Color Picker
-        private void CreateColorPicker()
+        void CreateColorPicker()
         {
             colorPickerContainer = new VisualElement();
             colorPickerContainer.AddToClassList("color-picker-container");
@@ -416,10 +389,8 @@ namespace Abracodabra.UI.Toolkit
             colorPickerContainer.style.maxWidth = 400;
             colorPickerContainer.style.width = Length.Percent(100);
 
-            // Expanded color palette - 16 colors in 2 rows of 8
             var colors = new[]
             {
-                // Row 1: Clear + warm colors
                 new Color(0, 0, 0, 0),                      // Clear/None
                 new Color(1.0f, 0.7f, 0.7f, 0.6f),          // Light Red
                 new Color(1.0f, 0.5f, 0.5f, 0.6f),          // Red
@@ -428,7 +399,6 @@ namespace Abracodabra.UI.Toolkit
                 new Color(1.0f, 0.95f, 0.7f, 0.6f),         // Light Yellow
                 new Color(1.0f, 1.0f, 0.5f, 0.6f),          // Yellow
                 new Color(0.85f, 1.0f, 0.7f, 0.6f),         // Lime
-                // Row 2: Cool colors + special
                 new Color(0.7f, 1.0f, 0.7f, 0.6f),          // Light Green
                 new Color(0.5f, 1.0f, 0.5f, 0.6f),          // Green
                 new Color(0.7f, 1.0f, 0.9f, 0.6f),          // Cyan
@@ -502,7 +472,6 @@ namespace Abracodabra.UI.Toolkit
                 colorPickerContainer.Add(colorButton);
             }
 
-            // Add label at the top
             var label = new Label("Seed Color");
             label.style.fontSize = 10;
             label.style.color = new Color(0.6f, 0.6f, 0.6f);
@@ -512,7 +481,7 @@ namespace Abracodabra.UI.Toolkit
             colorPickerContainer.Insert(0, label);
         }
 
-        private void UpdateColorPickerSelection(Color currentColor)
+        void UpdateColorPickerSelection(Color currentColor)
         {
             if (colorPickerContainer == null) return;
 
@@ -550,10 +519,8 @@ namespace Abracodabra.UI.Toolkit
                 }
             }
         }
-        #endregion
 
-        #region Visual Binding
-        private void BindGeneSlot(VisualElement slot, object data)
+        void BindGeneSlot(VisualElement slot, object data, int slotIndex, string slotType)
         {
             var background = slot.Q("background");
             var icon = slot.Q<Image>("icon");
@@ -569,7 +536,6 @@ namespace Abracodabra.UI.Toolkit
 
             if (data == null)
             {
-                // Show empty slot with visible styling
                 icon.style.display = DisplayStyle.None;
                 background.AddToClassList("gene-slot--empty");
                 return;
@@ -590,7 +556,10 @@ namespace Abracodabra.UI.Toolkit
 
                 slot.RegisterCallback<PointerDownEvent>(evt =>
                 {
-                    OnGeneSlotPointerDown?.Invoke(gene, slot);
+                    if (evt.button == 0) // Left click - start drag
+                    {
+                        OnGeneSlotPointerDown?.Invoke(gene, slot, slotIndex, slotType);
+                    }
                 });
 
                 slot.RegisterCallback<PointerEnterEvent>(evt =>
@@ -610,7 +579,7 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        private VisualElement CreateGeneSlotWithLabel(object data, string labelText, int slotIndex, string slotType)
+        VisualElement CreateGeneSlotWithLabel(object data, string labelText, int slotIndex, string slotType)
         {
             var wrapper = new VisualElement();
             wrapper.style.flexDirection = FlexDirection.Column;
@@ -627,13 +596,13 @@ namespace Abracodabra.UI.Toolkit
             wrapper.userData = new SlotMetadata { index = slotIndex, type = slotType };
 
             var slot = geneSlotTemplate.Instantiate();
-            BindGeneSlot(slot, data);
+            BindGeneSlot(slot, data, slotIndex, slotType);
 
             if (data is GeneBase gene)
             {
                 slot.RegisterCallback<PointerDownEvent>(evt =>
                 {
-                    if (evt.button == 1)
+                    if (evt.button == 1) // Right click - remove
                     {
                         var removedGene = RemoveGeneFromSlot(slotIndex, slotType);
                         if (removedGene != null)
@@ -658,7 +627,6 @@ namespace Abracodabra.UI.Toolkit
 
             return wrapper;
         }
-        #endregion
 
         public VisualElement GetSeedContainer() => seedDropSlotContainer;
         public VisualElement GetPassiveContainer() => passiveGenesContainer;
@@ -737,7 +705,7 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        private class SlotMetadata
+        class SlotMetadata
         {
             public int index;
             public string type;

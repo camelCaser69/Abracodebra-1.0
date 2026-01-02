@@ -5,30 +5,21 @@ using UnityEngine.UIElements;
 
 namespace Abracodabra.UI.Toolkit
 {
-    /// <summary>
-    /// Manages the inventory grid visual representation and selection state
-    /// </summary>
     public class UIInventoryGridController
     {
-        // Events
         public event Action<int> OnSlotClicked;
         public event Action<int> OnSlotPointerDown;
         public event Action<int> OnSlotHoverEnter;
         public event Action OnSlotHoverExit;
 
-        // State
-        private List<UIInventoryItem> inventory;
-        private List<VisualElement> inventorySlots = new List<VisualElement>();
-        private int selectedInventoryIndex = -1;
-        private int lockedSeedIndex = -1;
+        List<UIInventoryItem> inventory;
+        List<VisualElement> inventorySlots = new List<VisualElement>();
+        int selectedInventoryIndex = -1;
+        int lockedSeedIndex = -1;
 
-        // References
-        private VisualElement inventoryGrid;
-        private VisualTreeAsset slotTemplate;
+        VisualElement inventoryGrid;
+        VisualTreeAsset slotTemplate;
 
-        /// <summary>
-        /// Initialize the inventory grid controller
-        /// </summary>
         public void Initialize(VisualElement gridElement, VisualTreeAsset template, List<UIInventoryItem> inventoryData)
         {
             inventoryGrid = gridElement;
@@ -36,9 +27,6 @@ namespace Abracodabra.UI.Toolkit
             inventory = inventoryData;
         }
 
-        /// <summary>
-        /// Populate the grid with inventory slots
-        /// </summary>
         public void PopulateGrid()
         {
             inventoryGrid.Clear();
@@ -51,21 +39,16 @@ namespace Abracodabra.UI.Toolkit
 
                 int slotIndex = i;
 
-                // CRITICAL FIX: Get the actual slot element from the template
-                // The template instantiates a TemplateContainer, we need to work with the slot inside
                 var actualSlot = newSlot.Q(className: "slot");
                 if (actualSlot == null)
                 {
-                    // If the template root IS the slot, use it directly
                     actualSlot = newSlot;
                     actualSlot.AddToClassList("slot");
                 }
 
-                // Ensure the slot has proper relative positioning for absolute children
                 actualSlot.style.position = Position.Relative;
                 actualSlot.style.overflow = Overflow.Hidden;
 
-                // Register events on the actual slot element
                 actualSlot.RegisterCallback<PointerDownEvent>(evt =>
                 {
                     OnSlotClicked?.Invoke(slotIndex);
@@ -89,9 +72,6 @@ namespace Abracodabra.UI.Toolkit
             RefreshVisuals();
         }
 
-        /// <summary>
-        /// Refresh all slot visuals to match current state
-        /// </summary>
         public void RefreshVisuals()
         {
             for (int i = 0; i < inventorySlots.Count; i++)
@@ -103,17 +83,13 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        /// <summary>
-        /// Bind item data to a slot with PROPER icon sizing
-        /// </summary>
-        private void BindSlot(VisualElement element, UIInventoryItem item, int index)
+        void BindSlot(VisualElement element, UIInventoryItem item, int index)
         {
             var icon = element.Q<Image>("icon");
             var stack = element.Q<Label>("stack-size");
 
             if (icon != null)
             {
-                // CRITICAL FIX: Ensure icon fills the slot properly
                 icon.style.width = Length.Percent(100);
                 icon.style.height = Length.Percent(100);
                 icon.style.position = Position.Absolute;
@@ -135,15 +111,30 @@ namespace Abracodabra.UI.Toolkit
 
             if (stack != null)
             {
-                // Position stack size label
                 stack.style.position = Position.Absolute;
                 stack.style.bottom = 2;
                 stack.style.right = 4;
 
-                if (item != null && item.StackSize > 1)
+                // Use the new ShouldShowCounter and GetDisplayCount methods
+                if (item != null && item.ShouldShowCounter())
                 {
-                    stack.text = item.StackSize.ToString();
+                    int displayCount = item.GetDisplayCount();
+                    stack.text = displayCount.ToString();
                     stack.style.display = DisplayStyle.Flex;
+                    
+                    // Visual hint for low counts
+                    if (displayCount <= 1)
+                    {
+                        stack.style.color = new Color(1f, 0.6f, 0.6f); // Reddish for low
+                    }
+                    else if (displayCount <= 3)
+                    {
+                        stack.style.color = new Color(1f, 0.9f, 0.6f); // Yellowish for medium-low
+                    }
+                    else
+                    {
+                        stack.style.color = Color.white; // Normal
+                    }
                 }
                 else
                 {
@@ -152,7 +143,6 @@ namespace Abracodabra.UI.Toolkit
                 }
             }
 
-            // Apply custom background color if set (for seeds)
             if (item != null && item.HasCustomColor())
             {
                 element.style.backgroundColor = item.BackgroundColor;
@@ -162,7 +152,6 @@ namespace Abracodabra.UI.Toolkit
                 element.style.backgroundColor = StyleKeyword.Null; // Clear to use CSS default
             }
 
-            // Update visual states
             element.RemoveFromClassList("slot--selected");
             element.RemoveFromClassList("slot--locked-for-editing");
 
@@ -176,9 +165,6 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        /// <summary>
-        /// Select a slot (updates spec sheet display)
-        /// </summary>
         public void SetSelectedSlot(int index)
         {
             if (selectedInventoryIndex >= 0 && selectedInventoryIndex < inventorySlots.Count)
@@ -194,9 +180,6 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        /// <summary>
-        /// Lock a seed slot for editing (updates gene editor)
-        /// </summary>
         public void SetLockedSeedSlot(int index)
         {
             if (lockedSeedIndex >= 0 && lockedSeedIndex < inventorySlots.Count)
@@ -212,9 +195,6 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        /// <summary>
-        /// Update selection indices after a swap operation
-        /// </summary>
         public void UpdateIndicesAfterSwap(int fromIndex, int toIndex)
         {
             if (selectedInventoryIndex == fromIndex)
@@ -228,7 +208,6 @@ namespace Abracodabra.UI.Toolkit
                 lockedSeedIndex = fromIndex;
         }
 
-        // Getters
         public List<VisualElement> GetSlots() => inventorySlots;
         public int GetSelectedIndex() => selectedInventoryIndex;
         public int GetLockedSeedIndex() => lockedSeedIndex;

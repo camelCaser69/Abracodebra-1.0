@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Core;
@@ -5,59 +6,53 @@ using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.UI.Toolkit
 {
-    /// <summary>
-    /// Represents an item in the player's inventory with its visual and data properties.
-    /// Supports: SeedTemplate, ToolDefinition, GeneBase, ItemInstance (resources/consumables)
-    /// </summary>
     public class UIInventoryItem
     {
-        public Sprite Icon { get; private set; }
+        public Sprite Icon { get; set; }
         public int StackSize { get; set; } = 1;
         public object OriginalData { get; }
-        
-        // Seed-specific: runtime gene state (settable for when loading from save)
+
         public PlantGeneRuntimeState SeedRuntimeState { get; set; }
 
-        // Resource-specific: the item instance with dynamic properties
         public ItemInstance ResourceInstance { get; }
 
-        // Custom background color for seed identification (default: transparent)
         public Color BackgroundColor { get; set; } = new Color(0, 0, 0, 0);
 
-        // Custom name for seed (player-editable)
         public string CustomName { get; set; } = "";
 
-        /// <summary>
-        /// Create from SeedTemplate
-        /// </summary>
+        // Track remaining uses for tools with limited uses
+        public int RemainingUses { get; set; } = -1; // -1 means unlimited
+
         public UIInventoryItem(SeedTemplate seed)
         {
             OriginalData = seed;
             Icon = seed?.icon;
             SeedRuntimeState = seed?.CreateRuntimeState();
+            StackSize = 1; // Seeds start with 1 use
         }
 
-        /// <summary>
-        /// Create from ToolDefinition
-        /// </summary>
         public UIInventoryItem(ToolDefinition tool)
         {
             OriginalData = tool;
             Icon = tool?.icon;
+            
+            // Initialize uses based on tool definition
+            if (tool != null && tool.limitedUses)
+            {
+                RemainingUses = tool.initialUses;
+            }
+            else
+            {
+                RemainingUses = -1; // Unlimited
+            }
         }
 
-        /// <summary>
-        /// Create from GeneBase
-        /// </summary>
         public UIInventoryItem(GeneBase gene)
         {
             OriginalData = gene;
             Icon = gene?.icon;
         }
 
-        /// <summary>
-        /// Create from ItemInstance (harvested resources, consumables)
-        /// </summary>
         public UIInventoryItem(ItemInstance itemInstance)
         {
             OriginalData = itemInstance?.definition;
@@ -66,9 +61,6 @@ namespace Abracodabra.UI.Toolkit
             StackSize = itemInstance?.stackCount ?? 1;
         }
 
-        /// <summary>
-        /// Generic constructor for backwards compatibility
-        /// </summary>
         public UIInventoryItem(object data)
         {
             OriginalData = data;
@@ -77,10 +69,19 @@ namespace Abracodabra.UI.Toolkit
             {
                 Icon = seed.icon;
                 SeedRuntimeState = seed.CreateRuntimeState();
+                StackSize = 1;
             }
             else if (data is ToolDefinition tool)
             {
                 Icon = tool.icon;
+                if (tool.limitedUses)
+                {
+                    RemainingUses = tool.initialUses;
+                }
+                else
+                {
+                    RemainingUses = -1;
+                }
             }
             else if (data is GeneBase gene)
             {
@@ -97,17 +98,11 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        /// <summary>
-        /// Check if this item has a custom background color set
-        /// </summary>
         public bool HasCustomColor()
         {
             return BackgroundColor.a > 0.01f;
         }
 
-        /// <summary>
-        /// Check if this is a consumable item
-        /// </summary>
         public bool IsConsumable()
         {
             if (ResourceInstance != null)
@@ -117,9 +112,6 @@ namespace Abracodabra.UI.Toolkit
             return false;
         }
 
-        /// <summary>
-        /// Get nutrition value (for consumables)
-        /// </summary>
         public float GetNutrition()
         {
             if (ResourceInstance != null)
@@ -129,9 +121,6 @@ namespace Abracodabra.UI.Toolkit
             return 0f;
         }
 
-        /// <summary>
-        /// Get the display name for this item (custom name if set, otherwise default)
-        /// </summary>
         public string GetDisplayName()
         {
             if (!string.IsNullOrEmpty(CustomName))
@@ -150,9 +139,6 @@ namespace Abracodabra.UI.Toolkit
             };
         }
 
-        /// <summary>
-        /// Get a description for this item
-        /// </summary>
         public string GetDescription()
         {
             return OriginalData switch
@@ -163,6 +149,110 @@ namespace Abracodabra.UI.Toolkit
                 ItemDefinition itemDef => itemDef.description,
                 _ => ""
             };
+        }
+
+        /// <summary>
+        /// Returns whether this item should display a counter in the UI.
+        /// </summary>
+        public bool ShouldShowCounter()
+        {
+            // Seeds always show count (they're limited/consumable)
+            if (OriginalData is SeedTemplate)
+            {
+                return true;
+            }
+            
+            // Tools with limited uses show remaining uses
+            if (OriginalData is ToolDefinition tool && tool.limitedUses)
+            {
+                return true;
+            }
+            
+            // Resources/items show stack count if stackable (more than 1)
+            if (ResourceInstance != null && StackSize > 1)
+            {
+                return true;
+            }
+            
+            // Items with stack > 1
+            if (StackSize > 1)
+            {
+                return true;
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the count to display in the UI (stack size, uses remaining, etc.)
+        /// </summary>
+        public int GetDisplayCount()
+        {
+            // Tools with limited uses show remaining uses
+            if (OriginalData is ToolDefinition tool && tool.limitedUses)
+            {
+                return RemainingUses >= 0 ? RemainingUses : tool.initialUses;
+            }
+            
+            // Everything else shows stack size
+            return StackSize;
+        }
+
+        /// <summary>
+        /// Consumes one use of the item. Returns true if consumed successfully, false if depleted.
+        /// </summary>
+        public bool ConsumeUse()
+        {
+            // Tools with limited uses
+            if (OriginalData is ToolDefinition tool && tool.limitedUses)
+            {
+                if (RemainingUses > 0)
+                {
+                    RemainingUses--;
+                    return true;
+                }
+                return false; // No uses left
+            }
+            
+            // Seeds and stackable items decrease stack
+            if (StackSize > 0)
+            {
+                StackSize--;
+                return true;
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if this item is depleted (no uses/stacks remaining).
+        /// </summary>
+        public bool IsDepleted()
+        {
+            // Tools with limited uses
+            if (OriginalData is ToolDefinition tool && tool.limitedUses)
+            {
+                return RemainingUses <= 0;
+            }
+            
+            // Seeds and stackable items
+            if (OriginalData is SeedTemplate || ResourceInstance != null)
+            {
+                return StackSize <= 0;
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// Refills tool uses to full capacity.
+        /// </summary>
+        public void RefillUses()
+        {
+            if (OriginalData is ToolDefinition tool && tool.limitedUses)
+            {
+                RemainingUses = tool.initialUses;
+            }
         }
     }
 }

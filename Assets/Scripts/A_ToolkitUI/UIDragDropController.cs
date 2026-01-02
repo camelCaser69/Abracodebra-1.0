@@ -7,58 +7,48 @@ using Abracodabra.Genes.Templates;
 
 namespace Abracodabra.UI.Toolkit
 {
-    /// <summary>
-    /// Handles drag and drop operations for inventory and gene editor
-    /// </summary>
     public class UIDragDropController
     {
-        // Events
         public event Action<int, int> OnInventorySwapRequested;
         public event Action<int, VisualElement, string> OnGeneDropRequested;
         public event Action<GeneCategory?> OnDragStarted;
         public event Action OnDragEnded;
+        
+        // New event for when a gene is dropped from editor to inventory
+        public event Action<GeneBase, int, int, string> OnGeneDroppedToInventory;
 
-        // State
-        private bool isDragging = false;
-        private int dragSourceIndex = -1;
-        private GeneBase draggedGene = null;
-        private VisualElement draggedGeneSlot = null;
-        private VisualElement dragPreview;
+        bool isDragging = false;
+        int dragSourceIndex = -1;
+        GeneBase draggedGene = null;
+        VisualElement draggedGeneSlot = null;
+        VisualElement dragPreview;
+        
+        // Store source slot metadata when dragging from gene editor
+        int draggedGeneSlotIndex = -1;
+        string draggedGeneSlotType = null;
 
-        // References
-        private VisualElement rootElement;
-        private List<UIInventoryItem> inventory;
-        private List<VisualElement> inventorySlots;
+        VisualElement rootElement;
+        List<UIInventoryItem> inventory;
+        List<VisualElement> inventorySlots;
 
-        // Gene editor slot references
-        private VisualElement seedDropSlotContainer;
-        private VisualElement passiveGenesContainer;
-        private VisualElement activeSequenceContainer;
+        VisualElement seedDropSlotContainer;
+        VisualElement passiveGenesContainer;
+        VisualElement activeSequenceContainer;
 
-        /// <summary>
-        /// Initialize the drag-drop controller and register global mouse handlers
-        /// </summary>
         public void Initialize(VisualElement root, List<UIInventoryItem> inventoryData)
         {
             rootElement = root;
             inventory = inventoryData;
 
-            // Register GLOBAL mouse handlers for drag & drop
             rootElement.RegisterCallback<PointerMoveEvent>(OnGlobalPointerMove);
             rootElement.RegisterCallback<PointerUpEvent>(OnGlobalPointerUp);
         }
 
-        /// <summary>
-        /// Update references to inventory slots (call after grid population)
-        /// </summary>
         public void SetInventorySlots(List<VisualElement> slots)
         {
             inventorySlots = slots;
         }
 
-        /// <summary>
-        /// Update references to gene editor containers
-        /// </summary>
         public void SetGeneEditorSlots(VisualElement seedContainer, VisualElement passiveContainer, VisualElement activeContainer)
         {
             seedDropSlotContainer = seedContainer;
@@ -66,9 +56,6 @@ namespace Abracodabra.UI.Toolkit
             activeSequenceContainer = activeContainer;
         }
 
-        /// <summary>
-        /// Start a drag operation from an inventory slot
-        /// </summary>
         public void StartDrag(int sourceIndex)
         {
             if (inventory[sourceIndex] == null) return; // Can't drag empty slots
@@ -76,43 +63,38 @@ namespace Abracodabra.UI.Toolkit
             dragSourceIndex = sourceIndex;
             draggedGene = null; // Not dragging from gene editor
             draggedGeneSlot = null;
+            draggedGeneSlotIndex = -1;
+            draggedGeneSlotType = null;
             isDragging = false; // Not dragging yet, just pressed
         }
 
-        /// <summary>
-        /// Start a drag operation from a gene editor slot
-        /// </summary>
-        public void StartDragFromGeneEditor(GeneBase gene, VisualElement sourceSlot)
+        public void StartDragFromGeneEditor(GeneBase gene, VisualElement sourceSlot, int slotIndex, string slotType)
         {
             draggedGene = gene;
             draggedGeneSlot = sourceSlot;
+            draggedGeneSlotIndex = slotIndex;
+            draggedGeneSlotType = slotType;
             dragSourceIndex = -1; // Not dragging from inventory
             isDragging = false; // Not dragging yet, just pressed
         }
 
-        /// <summary>
-        /// Check if currently dragging
-        /// </summary>
         public bool IsDragging() => isDragging;
 
-        private void OnGlobalPointerMove(PointerMoveEvent evt)
+        void OnGlobalPointerMove(PointerMoveEvent evt)
         {
             if (dragSourceIndex == -1 && draggedGene == null) return;
 
-            // Start dragging if moved
             if (!isDragging)
             {
                 isDragging = true;
 
                 if (draggedGene != null)
                 {
-                    // Dragging from gene editor
                     CreateDragPreviewFromGene(draggedGene);
                     OnDragStarted?.Invoke(draggedGene.Category);
                 }
                 else
                 {
-                    // Dragging from inventory
                     CreateDragPreview(dragSourceIndex);
                     var item = inventory[dragSourceIndex];
                     if (item?.OriginalData is GeneBase gene)
@@ -128,59 +110,49 @@ namespace Abracodabra.UI.Toolkit
 
             if (dragPreview != null)
             {
-                // Use absolute screen position for smooth tracking
                 dragPreview.style.left = evt.position.x - 32;
                 dragPreview.style.top = evt.position.y - 32;
             }
         }
 
-        private void OnGlobalPointerUp(PointerUpEvent evt)
+        void OnGlobalPointerUp(PointerUpEvent evt)
         {
             if (!isDragging || (dragSourceIndex == -1 && draggedGene == null))
             {
                 dragSourceIndex = -1;
                 draggedGene = null;
                 draggedGeneSlot = null;
+                draggedGeneSlotIndex = -1;
+                draggedGeneSlotType = null;
                 return;
             }
 
             bool dropHandled = false;
 
-            // Check if dropped on inventory slot
             int inventoryDropIndex = GetInventorySlotAtPosition(evt.position);
             if (inventoryDropIndex >= 0)
             {
                 if (dragSourceIndex >= 0 && dragSourceIndex != inventoryDropIndex)
                 {
-                    // Dragging from inventory to inventory
+                    // Dragging from inventory to inventory - swap
                     OnInventorySwapRequested?.Invoke(dragSourceIndex, inventoryDropIndex);
                     dropHandled = true;
                 }
-                else if (draggedGene != null)
+                else if (draggedGene != null && draggedGeneSlotType != null)
                 {
                     // Dragging from gene editor to inventory
-                    if (draggedGeneSlot != null)
-                    {
-                        // Clear the gene editor slot visually
-                        var background = draggedGeneSlot.Q("background");
-                        var icon = draggedGeneSlot.Q<Image>("icon");
-                        var tierLabel = draggedGeneSlot.Q<Label>("tier-label");
-
-                        if (icon != null) icon.style.display = DisplayStyle.None;
-                        if (tierLabel != null) tierLabel.text = "";
-                        if (background != null)
-                        {
-                            background.ClearClassList();
-                            background.AddToClassList("gene-slot__background");
-                        }
-                    }
-
-                    Debug.Log($"Would add {draggedGene.geneName} to inventory slot {inventoryDropIndex}");
+                    // Fire event to handle the drop (remove from editor, add to inventory)
+                    OnGeneDroppedToInventory?.Invoke(
+                        draggedGene, 
+                        inventoryDropIndex, 
+                        draggedGeneSlotIndex, 
+                        draggedGeneSlotType
+                    );
                     dropHandled = true;
                 }
             }
 
-            // Check if dropped on gene editor slot (only from inventory)
+            // Check for gene editor slot drops (from inventory to gene editor)
             if (!dropHandled && dragSourceIndex >= 0)
             {
                 var geneSlotDrop = GetGeneSlotAtPosition(evt.position);
@@ -190,12 +162,23 @@ namespace Abracodabra.UI.Toolkit
                     dropHandled = true;
                 }
             }
+            
+            // Check for gene editor to gene editor slot drops
+            if (!dropHandled && draggedGene != null && draggedGeneSlotType != null)
+            {
+                var geneSlotDrop = GetGeneSlotAtPosition(evt.position);
+                if (geneSlotDrop.slot != null && geneSlotDrop.slotType == draggedGeneSlotType)
+                {
+                    // Same type slot - this could be a swap or move within the editor
+                    // For now, we'll let it fall through (no action)
+                    // Future enhancement: implement gene-to-gene slot swapping
+                }
+            }
 
-            // Always cleanup
             CleanupDrag();
         }
 
-        private int GetInventorySlotAtPosition(Vector2 screenPos)
+        int GetInventorySlotAtPosition(Vector2 screenPos)
         {
             if (inventorySlots == null) return -1;
 
@@ -210,9 +193,8 @@ namespace Abracodabra.UI.Toolkit
             return -1;
         }
 
-        private (VisualElement slot, string slotType) GetGeneSlotAtPosition(Vector2 screenPos)
+        (VisualElement slot, string slotType) GetGeneSlotAtPosition(Vector2 screenPos)
         {
-            // Check seed drop slot
             if (seedDropSlotContainer != null && seedDropSlotContainer.childCount > 0)
             {
                 var seedSlot = seedDropSlotContainer.ElementAt(0);
@@ -222,7 +204,6 @@ namespace Abracodabra.UI.Toolkit
                 }
             }
 
-            // Check passive slots
             if (passiveGenesContainer != null)
             {
                 foreach (var slot in passiveGenesContainer.Children())
@@ -234,11 +215,12 @@ namespace Abracodabra.UI.Toolkit
                 }
             }
 
-            // Check active sequence slots
             if (activeSequenceContainer != null)
             {
                 foreach (var row in activeSequenceContainer.Children())
                 {
+                    if (row.ClassListContains("active-sequence-header")) continue;
+                    
                     int slotIndex = 0;
                     foreach (var slot in row.Children())
                     {
@@ -261,7 +243,7 @@ namespace Abracodabra.UI.Toolkit
             return (null, null);
         }
 
-        private void CleanupDrag()
+        void CleanupDrag()
         {
             if (dragPreview != null)
             {
@@ -269,7 +251,6 @@ namespace Abracodabra.UI.Toolkit
                 dragPreview = null;
             }
 
-            // Notify that drag ended
             if (isDragging)
             {
                 OnDragEnded?.Invoke();
@@ -279,12 +260,11 @@ namespace Abracodabra.UI.Toolkit
             dragSourceIndex = -1;
             draggedGene = null;
             draggedGeneSlot = null;
+            draggedGeneSlotIndex = -1;
+            draggedGeneSlotType = null;
         }
 
-        /// <summary>
-        /// Create a drag preview for an inventory item - WITH PROPER ICON SIZING
-        /// </summary>
-        private void CreateDragPreview(int index)
+        void CreateDragPreview(int index)
         {
             var item = inventory[index];
             if (item == null) return;
@@ -300,25 +280,20 @@ namespace Abracodabra.UI.Toolkit
             var icon = new Image();
             icon.sprite = item.Icon;
             icon.AddToClassList("slot-icon");
-            
-            // CRITICAL FIX: Ensure icon fills the preview properly (inline styling as backup)
+
             icon.style.width = Length.Percent(100);
             icon.style.height = Length.Percent(100);
             icon.style.position = Position.Absolute;
             icon.style.top = 0;
             icon.style.left = 0;
             icon.scaleMode = ScaleMode.ScaleToFit;
-            
+
             dragPreview.Add(icon);
 
-            // Add to root element so it's above everything
             rootElement.Add(dragPreview);
         }
 
-        /// <summary>
-        /// Create a drag preview for a gene from the editor - WITH PROPER ICON SIZING
-        /// </summary>
-        private void CreateDragPreviewFromGene(GeneBase gene)
+        void CreateDragPreviewFromGene(GeneBase gene)
         {
             if (gene == null) return;
 
@@ -333,18 +308,16 @@ namespace Abracodabra.UI.Toolkit
             var icon = new Image();
             icon.sprite = gene.icon;
             icon.AddToClassList("slot-icon");
-            
-            // CRITICAL FIX: Ensure icon fills the preview properly (inline styling as backup)
+
             icon.style.width = Length.Percent(100);
             icon.style.height = Length.Percent(100);
             icon.style.position = Position.Absolute;
             icon.style.top = 0;
             icon.style.left = 0;
             icon.scaleMode = ScaleMode.ScaleToFit;
-            
+
             dragPreview.Add(icon);
 
-            // Add to root element so it's above everything
             rootElement.Add(dragPreview);
         }
     }
