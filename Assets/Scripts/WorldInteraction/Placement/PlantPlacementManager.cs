@@ -65,45 +65,56 @@ namespace Abracodabra.UI.Genes {
         /// Check if a tile is valid for planting a specific seed (checks TerrainAffinityGene)
         /// </summary>
         public bool IsTileValidForSeed(TileDefinition tileDef, PlantGeneRuntimeState runtimeState) {
-            // First check global rules
+            // First check global rules - if tile is globally invalid, reject it
             if (!IsTileValidForPlanting(tileDef)) {
+                Debug.Log($"[PlantPlacementManager] Tile '{tileDef?.displayName ?? "NULL"}' is globally invalid for planting.");
                 return false;
             }
             
             // Then check seed-specific terrain affinity
             var affinityGene = GetTerrainAffinityGene(runtimeState);
             if (affinityGene == null) {
-                // No terrain affinity gene means the seed can grow anywhere valid
+                // No terrain affinity gene means the seed can grow anywhere that's globally valid
+                Debug.Log($"[PlantPlacementManager] No TerrainAffinityGene found - allowing any valid tile.");
                 return true;
             }
             
-            // If the gene is additive, it ADDS to the allowed tiles
-            // If not additive (restrictive), the seed can ONLY grow on those tiles
-            if (affinityGene.IsAdditive) {
-                // Additive: allowed if globally valid OR in the allowed list
-                return affinityGene.IsTileAllowed(tileDef);
-            }
-            else {
-                // Restrictive: must be in the allowed list
-                return affinityGene.IsTileAllowed(tileDef);
-            }
+            // Gene exists - check if tile is in the allowed list
+            bool allowed = affinityGene.IsTileAllowed(tileDef);
+            Debug.Log($"[PlantPlacementManager] TerrainAffinityGene found. Tile '{tileDef?.displayName}' allowed: {allowed}");
+            
+            return allowed;
         }
         
         /// <summary>
         /// Get the TerrainAffinityGene from a seed's runtime state, if any
         /// </summary>
         TerrainAffinityGene GetTerrainAffinityGene(PlantGeneRuntimeState runtimeState) {
-            if (runtimeState == null || runtimeState.passiveInstances == null) {
+            if (runtimeState == null) {
+                Debug.Log("[PlantPlacementManager] GetTerrainAffinityGene: runtimeState is null");
                 return null;
             }
             
+            if (runtimeState.passiveInstances == null) {
+                Debug.Log("[PlantPlacementManager] GetTerrainAffinityGene: passiveInstances is null");
+                return null;
+            }
+            
+            Debug.Log($"[PlantPlacementManager] Searching {runtimeState.passiveInstances.Count} passive instances for TerrainAffinityGene...");
+            
             foreach (var instance in runtimeState.passiveInstances) {
-                var gene = instance?.GetGene();
+                if (instance == null) continue;
+                
+                var gene = instance.GetGene();
+                Debug.Log($"[PlantPlacementManager] Found passive gene: {gene?.geneName ?? "null"} (type: {gene?.GetType().Name ?? "null"})");
+                
                 if (gene is TerrainAffinityGene affinityGene) {
+                    Debug.Log($"[PlantPlacementManager] Found TerrainAffinityGene: {affinityGene.geneName} with {affinityGene.AllowedTiles?.Count ?? 0} allowed tiles");
                     return affinityGene;
                 }
             }
             
+            Debug.Log("[PlantPlacementManager] No TerrainAffinityGene found in passive instances.");
             return null;
         }
         
@@ -159,7 +170,7 @@ namespace Abracodabra.UI.Genes {
 
             TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
             
-            // Use the new seed-specific check
+            // *** CRITICAL: Use the seed-specific check that includes TerrainAffinityGene ***
             if (!IsTileValidForSeed(tileDef, runtimeState)) {
                 string reason = GetInvalidTileReason(tileDef, runtimeState);
                 Debug.LogWarning($"[PlantPlacementManager] Failed: {reason}", this);

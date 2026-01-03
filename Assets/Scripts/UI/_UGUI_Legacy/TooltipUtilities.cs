@@ -10,6 +10,7 @@ namespace Abracodabra.UI.Tooltips
         {
             switch (stat)
             {
+                case PassiveStatType.None: return "Special"; // Kept new change
                 case PassiveStatType.GrowthSpeed: return "Growth Speed";
                 case PassiveStatType.EnergyGeneration: return "Energy Generation";
                 case PassiveStatType.EnergyStorage: return "Energy Storage";
@@ -28,7 +29,8 @@ namespace Abracodabra.UI.Tooltips
             string sign = percentage >= 0 && showSign ? "+" : "";
             return $"{sign}{percentage:F0}%";
         }
-        
+
+        // Restored method required by SeedEditorTooltipPanel
         public static string ColorizeValue(float value, float baseline, string text, bool higherIsBetter = true)
         {
             Color goodColor = new Color(0.5f, 1f, 0.5f); // Light Green
@@ -36,20 +38,43 @@ namespace Abracodabra.UI.Tooltips
             
             bool isGood = higherIsBetter ? (value > baseline) : (value < baseline);
             
+            // If roughly equal, return white/default text
             if (Mathf.Approximately(value, baseline))
                 return text;
 
             Color finalColor = isGood ? goodColor : badColor;
             return $"<color=#{ColorUtility.ToHtmlStringRGB(finalColor)}>{text}</color>";
         }
+
+        // Kept new method from friend's update
+        public static string GetColorForValue(float value)
+        {
+            if (value > 1f) return "#90EE90"; // Light green for buffs
+            if (value < 1f) return "#FF6B6B"; // Light red for debuffs
+            return "#FFFFFF"; // White for neutral
+        }
+
+        // Kept new method from friend's update
+        public static string FormatStatChange(PassiveStatType stat, float value)
+        {
+            if (stat == PassiveStatType.None) return ""; // No stat change to display
+            
+            string color = GetColorForValue(value);
+            string statName = stat.GetDisplayName();
+            string change = FormatPercentage(value);
+            return $"<color={color}>{change} {statName}</color>";
+        }
     }
 
+    // Restored class required by UISpecSheetController, InventoryTooltipPanel, etc.
     public static class SeedQualityCalculator
     {
         public enum QualityTier { Trash, Poor, Common, Good, Excellent, Legendary }
 
         public static QualityTier CalculateQuality(SeedTooltipData data)
         {
+            if (data == null) return QualityTier.Common;
+
             float score = 0f;
 
             // Energy Surplus (0-30 points)
@@ -67,7 +92,10 @@ namespace Abracodabra.UI.Tooltips
             score += Mathf.Clamp01(data.defenseMultiplier) * 20f;
             
             // Penalize for warnings
-            score -= data.warnings.Count * 10f;
+            if (data.warnings != null)
+            {
+                score -= data.warnings.Count * 10f;
+            }
 
             // Determine tier
             if (score >= 90) return QualityTier.Legendary;

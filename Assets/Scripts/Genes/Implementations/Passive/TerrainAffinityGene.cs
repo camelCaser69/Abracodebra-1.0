@@ -29,6 +29,19 @@ namespace Abracodabra.Genes.Core {
         public bool IsAdditive => additive;
         public float PreferredTerrainGrowthBonus => preferredTerrainGrowthBonus;
 
+        void OnEnable() {
+            // Ensure this gene doesn't try to modify stats
+            statToModify = PassiveStatType.None;
+            baseValue = 1f;
+        }
+
+        void OnValidate() {
+            // Force stat type to None in editor
+            if (statToModify != PassiveStatType.None) {
+                statToModify = PassiveStatType.None;
+            }
+        }
+
         /// <summary>
         /// Check if a tile is valid for planting with this gene
         /// </summary>
