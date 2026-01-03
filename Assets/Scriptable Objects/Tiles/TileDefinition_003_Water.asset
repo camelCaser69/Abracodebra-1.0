@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: TileDefinition_003_Water
   m_EditorClassIdentifier: 
   displayName: Water
+  interactionPriority: 70
   tintColor: {r: 0.06407974, g: 0.8127963, b: 0.9056604, a: 1}
-  revertAfterSeconds: 0
+  revertAfterTicks: 0
   revertToTile: {fileID: 0}
   keepBottomTile: 1
   isWaterTile: 1

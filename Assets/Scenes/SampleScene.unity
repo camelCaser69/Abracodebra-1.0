@@ -74121,12 +74121,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tileDefinitionMappings:
-  - tileDef: {fileID: 11400000, guid: 2efc2db88b0caff4693943889a86ccac, type: 2}
-    tilemapModule: {fileID: 604569929}
   - tileDef: {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}
     tilemapModule: {fileID: 1219388324}
   - tileDef: {fileID: 11400000, guid: 4f94336bb2aca31489661a9f761144db, type: 2}
     tilemapModule: {fileID: 1673149537}
+  - tileDef: {fileID: 11400000, guid: 2efc2db88b0caff4693943889a86ccac, type: 2}
+    tilemapModule: {fileID: 604569929}
   - tileDef: {fileID: 11400000, guid: b82b8add4da60854b89d053b81886617, type: 2}
     tilemapModule: {fileID: 689674503}
   interactionLibrary: {fileID: 11400000, guid: f255a1f2fd3fbbb429940cb83c7d9809, type: 2}
@@ -77215,9 +77215,8 @@ MonoBehaviour:
   tileInteractionManager: {fileID: 1097838751}
   nodeExecutor: {fileID: 2010610567}
   spawnRadius: 0
-  invalidPlantingTiles:
-  - {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}
-  - {fileID: 11400000, guid: b82b8add4da60854b89d053b81886617, type: 2}
+  invalidPlantingTiles: []
+  verboseLogging: 1
 --- !u!114 &1190077648
 MonoBehaviour:
   m_ObjectHideFlags: 0
