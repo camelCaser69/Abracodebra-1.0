@@ -1,4 +1,4 @@
-// File: Assets/Scripts/A_ToolkitUI/UIInventoryItem.cs
+// Assets/Scripts/A_ToolkitUI/UIInventoryItem.cs
 using UnityEngine;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Core;
@@ -6,51 +6,39 @@ using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.UI.Toolkit
 {
-    /// <summary>
-    /// Unified inventory item wrapper for all item types.
-    /// Replaces legacy InventoryBarItem class.
-    /// </summary>
     public class UIInventoryItem
     {
         public enum ItemType { Gene, Seed, Tool, Resource }
 
-        // Core properties
         public Sprite Icon { get; set; }
         public int StackSize { get; set; } = 1;
         public object OriginalData { get; }
         public Color BackgroundColor { get; set; } = new Color(0, 0, 0, 0);
         public string CustomName { get; set; } = "";
 
-        // Type-specific data
         public PlantGeneRuntimeState SeedRuntimeState { get; set; }
         public ItemInstance ResourceInstance { get; }
         public RuntimeGeneInstance GeneInstance { get; }
 
-        /// <summary>
-        /// Returns the item type based on OriginalData.
-        /// </summary>
         public ItemType Type
         {
             get
             {
                 return OriginalData switch
                 {
-                    SeedTemplate => ItemType.Seed,
-                    ToolDefinition => ItemType.Tool,
-                    GeneBase => ItemType.Gene,
-                    ItemDefinition => ItemType.Resource,
+                    SeedTemplate _ => ItemType.Seed,
+                    ToolDefinition _ => ItemType.Tool,
+                    GeneBase _ => ItemType.Gene,
+                    ItemDefinition _ => ItemType.Resource,
                     _ => ResourceInstance != null ? ItemType.Resource : ItemType.Gene
                 };
             }
         }
 
-        // Direct accessors for type-specific data
         public SeedTemplate SeedTemplate => OriginalData as SeedTemplate;
         public ToolDefinition ToolDefinition => OriginalData as ToolDefinition;
         public GeneBase Gene => OriginalData as GeneBase;
         public ItemDefinition ItemDefinition => OriginalData as ItemDefinition ?? ResourceInstance?.definition;
-
-        #region Constructors
 
         public UIInventoryItem(SeedTemplate seed)
         {
@@ -115,10 +103,6 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        #endregion
-
-        #region Static Factory Methods
-
         public static UIInventoryItem FromSeed(SeedTemplate seed)
         {
             return seed != null ? new UIInventoryItem(seed) : null;
@@ -143,10 +127,6 @@ namespace Abracodabra.UI.Toolkit
         {
             return instance?.definition != null ? new UIInventoryItem(instance) : null;
         }
-
-        #endregion
-
-        #region Validation & Display
 
         public bool IsValid()
         {
@@ -244,7 +224,5 @@ namespace Abracodabra.UI.Toolkit
                 _ => "Unknown"
             };
         }
-
-        #endregion
     }
 }
