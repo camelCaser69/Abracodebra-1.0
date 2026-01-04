@@ -1,7 +1,15 @@
-﻿using UnityEngine;
+﻿// File: Assets/Scripts/Genes/Core/GeneLibraryLoader.cs
+using UnityEngine;
 using Abracodabra.Genes;
 using Abracodabra.Genes.Services;
 
+/// <summary>
+/// Loads and registers the GeneLibrary asset.
+/// Runs after GameBootstrap (-100) but before normal scripts.
+/// 
+/// Requires: GeneLibrary asset assigned in Inspector.
+/// </summary>
+[DefaultExecutionOrder(-90)]
 public class GeneLibraryLoader : MonoBehaviour
 {
     [SerializeField]
@@ -9,19 +17,25 @@ public class GeneLibraryLoader : MonoBehaviour
 
     void Awake()
     {
-        // The GeneServices.Initialize() call is no longer needed here,
-        // as it's handled by the new GeneSystemInitializer script.
-
         if (geneLibraryAsset == null)
         {
-            Debug.LogError("CRITICAL: The GeneLibrary Asset is not assigned in the GeneLibraryLoader component! The gene system will not work.", this);
+            Debug.LogError("[GeneLibraryLoader] CRITICAL: GeneLibrary asset not assigned! Gene system will not work.", this);
             return;
         }
 
+        // Ensure core services are ready (defensive, should already be done by GameBootstrap)
+        if (!GeneServices.IsInitialized)
+        {
+            Debug.LogWarning("[GeneLibraryLoader] GeneServices not initialized - initializing now. Check script execution order.");
+            GeneServices.Initialize();
+        }
+
+        // Set up the library singleton and build lookups
         geneLibraryAsset.SetActiveInstance();
 
+        // Register with service locator
         GeneServices.Register<IGeneLibrary>(geneLibraryAsset);
 
-        Debug.Log("GeneLibrary instance was successfully set, initialized, and registered by GeneLibraryLoader.");
+        Debug.Log($"[GeneLibraryLoader] GeneLibrary '{geneLibraryAsset.name}' registered successfully.");
     }
 }
