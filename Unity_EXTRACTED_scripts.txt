@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 725,394 -> 529,743 chars (27.0% reduction)
-Estimated tokens saved: ~48,912
+Compression Stats: 733,786 -> 533,942 chars (27.2% reduction)
+Estimated tokens saved: ~49,961
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -108,117 +108,117 @@ using System.Linq;
   PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L7513
   PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7712
   TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7789
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L7830
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7857
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7882
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7899
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7939
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L8074
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L7843
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7870
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7895
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7912
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7952
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L8087
 
 [Abracodabra.Genes]
-  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L8085
-  GeneLibrary (Assets\Scripts\Genes/) L8095
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L8250
-  PlantState (Assets\Scripts\PlantSystem\Growth/) L8430
+  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L8098
+  GeneLibrary (Assets\Scripts\Genes/) L8108
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L8263
+  PlantState (Assets\Scripts\PlantSystem\Growth/) L8443
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L8822
-  Fruit (Assets\Scripts\Genes\Components/) L8847
-  NutritionComponent (Assets\Scripts\Genes\Components/) L8885
+  Creature (Assets\Scripts\Genes\Components/) L8835
+  Fruit (Assets\Scripts\Genes\Components/) L8860
+  NutritionComponent (Assets\Scripts\Genes\Components/) L8898
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L8897
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L8943
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L8962
-  ModifierGene (Assets\Scripts\Genes\Core/) L8974
-  PassiveStatType (Assets\Scripts\Genes\Core/) L9006
-  PayloadGene (Assets\Scripts\Genes\Core/) L9048
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L9094
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L9115
-  GeneBase (Assets\Scripts\Genes/) L9148
-  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L9226
+  ActiveGene (Assets\Scripts\Genes\Core/) L8910
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L8956
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L8975
+  ModifierGene (Assets\Scripts\Genes\Core/) L8987
+  PassiveStatType (Assets\Scripts\Genes\Core/) L9019
+  PayloadGene (Assets\Scripts\Genes\Core/) L9061
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L9107
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L9128
+  GeneBase (Assets\Scripts\Genes/) L9161
+  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L9239
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L9329
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L9447
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L9477
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L9520
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L9342
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L9460
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L9490
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L9533
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L9571
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L9627
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9759
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L9584
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L9640
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9772
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L9814
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L9847
-  GeneEventBus (Assets\Scripts\Genes\Services/) L9945
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L9997
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L9827
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L9860
+  GeneEventBus (Assets\Scripts\Genes\Services/) L9958
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L10010
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L10084
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L10097
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L10177
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L10288
-  GeneSequenceUI (Assets\Scripts\UI\_UGUI_Legacy/) L10458
-  GeneSlotUI (Assets\Scripts\UI\_UGUI_Legacy/) L10698
-  InventoryBarController (Assets\Scripts\UI\_UGUI_Legacy/) L10927
-  ItemView (Assets\Scripts\UI\_UGUI_Legacy/) L11103
-  SequenceRowUI (Assets\Scripts\UI\_UGUI_Legacy/) L11221
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11292
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L10190
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L10301
+  GeneSequenceUI (Assets\Scripts\UI\_UGUI_Legacy/) L10471
+  GeneSlotUI (Assets\Scripts\UI\_UGUI_Legacy/) L10711
+  InventoryBarController (Assets\Scripts\UI\_UGUI_Legacy/) L10940
+  ItemView (Assets\Scripts\UI\_UGUI_Legacy/) L11116
+  SequenceRowUI (Assets\Scripts\UI\_UGUI_Legacy/) L11234
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11305
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L11487
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L12233
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L12522
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L12733
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L12919
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L13062
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L13706
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L11576
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L12322
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L12611
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L12822
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L13008
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L13151
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L13795
 
 [Abracodabra.UI.Tooltips]
-  EnhancedTooltipTrigger (Assets\Scripts\UI\_UGUI_Legacy/) L13900
-  InventoryTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L13953
-  SeedEditorTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L14055
-  SeedTooltipData (Assets\Scripts\UI\_UGUI_Legacy/) L14198
-  SeedRarity (Assets\Scripts\UI\_UGUI_Legacy/) L14368
-  TooltipSystemManager (Assets\Scripts\UI\_UGUI_Legacy/) L14390
-  QualityTier (Assets\Scripts\UI\_UGUI_Legacy/) L14416
+  EnhancedTooltipTrigger (Assets\Scripts\UI\_UGUI_Legacy/) L13989
+  InventoryTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L14042
+  SeedEditorTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L14144
+  SeedTooltipData (Assets\Scripts\UI\_UGUI_Legacy/) L14287
+  SeedRarity (Assets\Scripts\UI\_UGUI_Legacy/) L14457
+  TooltipSystemManager (Assets\Scripts\UI\_UGUI_Legacy/) L14479
+  QualityTier (Assets\Scripts\UI\_UGUI_Legacy/) L14505
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L14529
-  CameraZoomController (Assets\Scripts\Core/) L14642
-  InitializationManager (Assets\Scripts\Core/) L14691
-  PixelGridSnapper (Assets\Scripts\Core/) L14731
-  RunState (Assets\Scripts\Core/) L14764
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L14932
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L14995
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L15131
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L15160
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L15311
-  GridEntity (Assets\Scripts\Ticks/) L15383
-  GridPosition (Assets\Scripts\Ticks/) L15553
-  GridPositionManager (Assets\Scripts\Ticks/) L15654
-  GridRadiusUtility (Assets\Scripts\Ticks/) L16034
-  TickConfiguration (Assets\Scripts\Ticks/) L16178
-  ITickUpdateable (Assets\Scripts\Ticks/) L16264
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L16416
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L16607
+  CameraController (Assets\Scripts\Core/) L14618
+  CameraZoomController (Assets\Scripts\Core/) L14731
+  InitializationManager (Assets\Scripts\Core/) L14780
+  PixelGridSnapper (Assets\Scripts\Core/) L14820
+  RunState (Assets\Scripts\Core/) L14853
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L15021
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L15084
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L15220
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L15249
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L15400
+  GridEntity (Assets\Scripts\Ticks/) L15472
+  GridPosition (Assets\Scripts\Ticks/) L15642
+  GridPositionManager (Assets\Scripts\Ticks/) L15743
+  GridRadiusUtility (Assets\Scripts\Ticks/) L16123
+  TickConfiguration (Assets\Scripts\Ticks/) L16267
+  ITickUpdateable (Assets\Scripts\Ticks/) L16353
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L16505
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L16696
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16953
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17107
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L16985
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L17139
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L17043
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L17089
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L17212
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L17197
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L17243
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L17366
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17377
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17531
 
 
 ================================================================================
@@ -7985,19 +7985,32 @@ pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
 
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
-using WegoSystem; // <-- FIX: Added this line to resolve the namespace issue.
+using WegoSystem;
 
 pub class TileDefinition : ScriptableObject {
+ [Header("Display")]
  pub string displayName;    // e.g. "Grass", "Dirt", "Wet Dirt"
 
+ [Header("Interaction Priority")]
+ [Tooltip("Higher priority tiles are detected first when multiple tiles overlap. " +
+   "Use higher values for surface tiles (Grass=100, TilledSoil=90) and lower for underlay tiles (Dirt=10).")]
+ [Range(0, 200)]
+ pub int interactionPriority = 50;
+
+ [Header("Visuals")]
  pub Color tintColor = Color.white;
 
- pub int revertAfterTicks = 0;  // Changed from float revertAfterSeconds
+ [Header("Tile Behavior")]
+ [Tooltip("If > 0, this tile will revert after this many ticks")]
+ pub int revertAfterTicks = 0;
 
+ [Tooltip("The tile to revert to when revertAfterTicks expires")]
  pub TileDefinition revertToTile;
 
+ [Tooltip("If true, the tile below this one is kept when this tile is placed")]
  pub bool keepBottomTile = false;
 
+ [Tooltip("If true, this tile is treated as water for reflection masking")]
  pub bool isWaterTile = false;
 
 #if UNITY_EDITOR
@@ -11501,8 +11514,12 @@ namespace Abracodabra.UI.Genes {
   [SerializeField] float spawnRadius = 0.25f;
 
   [Header("Global Invalid Tiles")]
-  [Tooltip("Tiles that are NEVER valid for planting, regardless of seed terrain affinity")]
+  [Tooltip("Tiles that are NEVER valid for planting, regardless of seed terrain affinity. " +
+    "Note: This is a BLACKLIST. For restricting seeds to specific tiles, use TerrainAffinityGene instead.")]
   [SerializeField] List<TileDefinition> invalidPlantingTiles = new List<TileDefinition>();
+
+  [Header("Debug")]
+  [SerializeField] bool verboseLogging = true;
 
   ro HashSet<TileDefinition> invalidTilesSet = new HashSet<TileDefinition>();
   ro Dictionary<Vector3Int, GameObject> plantsByGridPosition = new Dictionary<Vector3Int, GameObject>();
@@ -11532,6 +11549,11 @@ namespace Abracodabra.UI.Genes {
      invalidTilesSet.Add(tile);
     }
    }
+
+   if (verboseLogging && invalidTilesSet.Count > 0) {
+    string invalidNames = string.Join(", ", invalidTilesSet.Select(t => t.displayName));
+    Debug.Log($"[PlantPlacementManager] Global invalid tiles: [{invalidNames}]");
+   }
   }
 
   pub bool IsPositionOccupied(Vector3Int gridPosition) {
@@ -11545,48 +11567,90 @@ namespace Abracodabra.UI.Genes {
 
   pub bool IsTileValidForSeed(TileDefinition tileDef, PlantGeneRuntimeState runtimeState) {
    if (!IsTileValidForPlanting(tileDef)) {
-    Debug.Log($"[PlantPlacementManager] Tile '{tileDef?.displayName ?? "NULL"}' is globally invalid for planting.");
+    if (verboseLogging)
+     Debug.Log($"[PlantPlacementManager] ❌ Tile '{tileDef?.displayName ?? "NULL"}' is in the global invalid tiles list.");
     return false;
    }
 
    var affinityGene = GetTerrainAffinityGene(runtimeState);
+
    if (affinityGene == null) {
-    Debug.Log($"[PlantPlacementManager] No TerrainAffinityGene found - allowing any valid tile.");
+    if (verboseLogging) {
+     Debug.LogWarning($"[PlantPlacementManager] ⚠️ Seed '{runtimeState?.template?.templateName ?? "Unknown"}' has NO TerrainAffinityGene. " +
+        $"It can be planted on ANY tile. Add a TerrainAffinityGene to restrict planting locations.");
+    }
+    return true;
+   }
+
+   if (affinityGene.AllowedTiles == null || affinityGene.AllowedTiles.Count == 0) {
+    if (verboseLogging) {
+     Debug.LogWarning($"[PlantPlacementManager] ⚠️ TerrainAffinityGene '{affinityGene.geneName}' has EMPTY allowedTiles. " +
+        $"Seed can be planted anywhere. Add TileDefinitions to restrict.");
+    }
     return true;
    }
 
    bool allowed = affinityGene.IsTileAllowed(tileDef);
-   Debug.Log($"[PlantPlacementManager] TerrainAffinityGene found. Tile '{tileDef?.displayName}' allowed: {allowed}");
+
+   if (verboseLogging) {
+string allowedTileNames = string.Join(", ", affinityGene.AllowedTiles .Where(t => t != null)
+     .Select(t => t.displayName));
+
+    string icon = allowed ? "✓" : "❌";
+    Debug.Log($"[PlantPlacementManager] {icon} Tile '{tileDef?.displayName}' (Priority: {tileDef?.interactionPriority}) " +
+      $"allowed: {allowed}. Seed requires: [{allowedTileNames}]");
+   }
 
    return allowed;
   }
 
   TerrainAffinityGene GetTerrainAffinityGene(PlantGeneRuntimeState runtimeState) {
    if (runtimeState == null) {
-    Debug.Log("[PlantPlacementManager] GetTerrainAffinityGene: runtimeState is null");
+    if (verboseLogging)
+     Debug.LogError("[PlantPlacementManager] GetTerrainAffinityGene: runtimeState is null!");
     return null;
    }
 
    if (runtimeState.passiveInstances == null) {
-    Debug.Log("[PlantPlacementManager] GetTerrainAffinityGene: passiveInstances is null");
+    if (verboseLogging)
+     Debug.LogError("[PlantPlacementManager] GetTerrainAffinityGene: passiveInstances list is null!");
     return null;
    }
 
-   Debug.Log($"[PlantPlacementManager] Searching {runtimeState.passiveInstances.Count} passive instances for TerrainAffinityGene...");
+   if (verboseLogging) {
+    Debug.Log($"[PlantPlacementManager] Searching {runtimeState.passiveInstances.Count} passive gene slots...");
+
+    for (int i = 0; i < runtimeState.passiveInstances.Count; i++) {
+     var instance = runtimeState.passiveInstances[i];
+     if (instance == null) {
+      Debug.Log($"  Slot [{i}]: Empty");
+     }
+     else {
+      var gene = instance.GetGene();
+      string isAffinity = (gene is TerrainAffinityGene) ? " ← TERRAIN AFFINITY" : "";
+      Debug.Log($"  Slot [{i}]: {gene?.geneName ?? "NULL"} ({gene?.GetType().Name ?? "null"}){isAffinity}");
+     }
+    }
+   }
 
    foreach (var instance in runtimeState.passiveInstances) {
     if (instance == null) continue;
 
     var gene = instance.GetGene();
-    Debug.Log($"[PlantPlacementManager] Found passive gene: {gene?.geneName ?? "null"} (type: {gene?.GetType().Name ?? "null"})");
-
     if (gene is TerrainAffinityGene affinityGene) {
-     Debug.Log($"[PlantPlacementManager] Found TerrainAffinityGene: {affinityGene.geneName} with {affinityGene.AllowedTiles?.Count ?? 0} allowed tiles");
+     if (verboseLogging) {
+string allowedNames = string.Join(", ", affinityGene.AllowedTiles? .Where(t => t != null)
+       .Select(t => t.displayName) ?? Array.Empty<string>());
+      Debug.Log($"[PlantPlacementManager] Found TerrainAffinityGene: '{affinityGene.geneName}' " +
+        $"with allowed tiles: [{allowedNames}]");
+     }
      return affinityGene;
     }
    }
 
-   Debug.Log("[PlantPlacementManager] No TerrainAffinityGene found in passive instances.");
+   if (verboseLogging) {
+    Debug.Log("[PlantPlacementManager] No TerrainAffinityGene found in passive gene slots.");
+   }
    return null;
   }
 
@@ -11596,16 +11660,22 @@ namespace Abracodabra.UI.Genes {
    }
 
    if (invalidTilesSet.Contains(tileDef)) {
-    return $"Cannot plant on {tileDef.displayName}";
+    return $"'{tileDef.displayName}' is globally blocked for planting";
    }
 
    var affinityGene = GetTerrainAffinityGene(runtimeState);
    if (affinityGene != null && !affinityGene.IsTileAllowed(tileDef)) {
-    var allowedNames = new List<string>();
-    foreach (var allowed in affinityGene.AllowedTiles) {
-     if (allowed != null) allowedNames.Add(allowed.displayName);
+    var allowedNames = affinityGene.AllowedTiles
+     .Where(t => t != null)
+     .Select(t => t.displayName)
+     .ToList();
+
+    if (allowedNames.Count > 0) {
+     return $"This seed requires: {string.Join(", ", allowedNames)}";
     }
-    return $"This seed requires: {string.Join(", ", allowedNames)}";
+    else {
+     return "TerrainAffinityGene has no allowed tiles configured";
+    }
    }
 
    return "Unknown reason";
@@ -11616,6 +11686,7 @@ namespace Abracodabra.UI.Genes {
     .Where(kvp => kvp.Value == null)
     .Select(kvp => kvp.Key)
     .ToList();
+
    foreach (var key in keysToRemove) {
     plantsByGridPosition.Remove(key);
    }
@@ -11633,22 +11704,36 @@ namespace Abracodabra.UI.Genes {
    }
 
    if (IsPositionOccupied(gridPosition)) {
-    Debug.LogWarning($"[PlantPlacementManager] Failed: Position {gridPosition} is already occupied by another plant in the dictionary.", this);
+    Debug.LogWarning($"[PlantPlacementManager] Failed: Position {gridPosition} is already occupied.", this);
     return false;
    }
 
    TileDefinition tileDef = tileInteractionManager?.FindWhichTileDefinitionAt(gridPosition);
 
+   if (verboseLogging) {
+    Debug.Log($"[PlantPlacementManager] === PLANTING ATTEMPT ===");
+    Debug.Log($"  Seed: '{runtimeState.template.templateName}'");
+    Debug.Log($"  Position: {gridPosition}");
+    Debug.Log($"  Detected Tile: '{tileDef?.displayName ?? "NULL"}' (Priority: {tileDef?.interactionPriority ?? 0})");
+
+    // Show all tiles at this position for debugging
+    var allTiles = tileInteractionManager?.GetAllTilesAt(gridPosition);
+    if (allTiles != null && allTiles.Count > 1) {
+     string allNames = string.Join(", ", allTiles.Select(t => $"{t.displayName}(P:{t.interactionPriority})"));
+     Debug.Log($"  All tiles at position: [{allNames}]");
+    }
+   }
+
    if (!IsTileValidForSeed(tileDef, runtimeState)) {
     string reason = GetInvalidTileReason(tileDef, runtimeState);
-    Debug.LogWarning($"[PlantPlacementManager] Failed: {reason}", this);
+    Debug.LogWarning($"[PlantPlacementManager] ❌ PLANTING BLOCKED: {reason}", this);
     return false;
    }
 
    if (nodeExecutor == null) {
     nodeExecutor = FindFirstObjectByType<NodeExecutor>();
     if (nodeExecutor == null) {
-     Debug.LogError("[PlantPlacementManager] Failed: NodeExecutor reference is missing and could not be found in the scene!");
+     Debug.LogError("[PlantPlacementManager] Failed: NodeExecutor not found!");
      return false;
     }
    }
@@ -11657,7 +11742,7 @@ namespace Abracodabra.UI.Genes {
    GameObject plantGO = nodeExecutor.SpawnPlantFromState(runtimeState, finalPlantingPosition, plantParent);
 
    if (plantGO == null) {
-    Debug.LogError("[PlantPlacementManager] Failed: NodeExecutor returned a null plant GameObject. Check NodeExecutor's logs (is its Plant Prefab assigned?).", this);
+    Debug.LogError("[PlantPlacementManager] Failed: NodeExecutor returned null. Check Plant Prefab assignment.", this);
     return false;
    }
 
@@ -11666,13 +11751,17 @@ namespace Abracodabra.UI.Genes {
    Vector3Int finalGridPosition = finalGridEntity.Position.ToVector3Int();
 
    plantsByGridPosition[finalGridPosition] = plantGO;
-   Debug.Log($"[PlantPlacementManager] Successfully planted '{runtimeState.template.templateName}' and registered it at final grid position {finalGridPosition}.");
+
+   if (verboseLogging) {
+    Debug.Log($"[PlantPlacementManager] ✓ Successfully planted '{runtimeState.template.templateName}' at {finalGridPosition}");
+   }
+
    return true;
   }
 
   Vector3 GetRandomizedPlantingPosition(Vector3 centerPosition) {
    if (spawnRadius <= 0f) return centerPosition;
-   Vector2 randomOffset = Random.insideUnitCircle * spawnRadius;
+   Vector2 randomOffset = UnityEngine.Random.insideUnitCircle * spawnRadius;
    return centerPosition + new Vector3(randomOffset.x, randomOffset.y, 0);
   }
  }
@@ -16801,9 +16890,9 @@ namespace WegoSystem {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\WorldInteraction\Tiles\TileInteractionManager.cs
 
-﻿using UnityEngine;
-using Abracodabra.UI.Genes;
+﻿using System;
 using UnityEngine.Tilemaps;
+using Abracodabra.UI.Genes;
 using skner.DualGrid;
 using TMPro;
 using WegoSystem;
@@ -16824,21 +16913,30 @@ namespace WegoSystem {
    pub int ticksRemaining;
   }
 
+  [Header("Tile Mappings")]
+  [Tooltip("Map TileDefinitions to their DualGridTilemapModules. Order affects sorting only, not detection priority.")]
   pub List<TileDefinitionMapping> tileDefinitionMappings;
+
+  [Header("Interaction")]
   pub TileInteractionLibrary interactionLibrary;
   pub Grid interactionGrid;
   pub Camera mainCamera;
   pub Transform player;
-
   pub float hoverRadius = 3f;
 
+  [Header("Hover Visuals")]
   pub GameObject hoverHighlightObject;
   pub TileHoverColorManager hoverColorManager;
   pub int baseSortingOrder = 0;
 
+  [Header("Debug")]
   pub bool debugLogs = false;
   pub TextMeshProUGUI hoveredTileText;
   pub TextMeshProUGUI currentToolText;
+
+  pub bool IsWithinInteractionRange => isWithinInteractionRange;
+  pub Vector3Int? CurrentlyHoveredCell => currentlyHoveredCell;
+  pub TileDefinition HoveredTileDef => hoveredTileDef;
 
   Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
   ro Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
@@ -16846,7 +16944,6 @@ namespace WegoSystem {
   TileDefinition hoveredTileDef;
   SpriteRenderer hoverSpriteRenderer;
   bool isWithinInteractionRange = false;
-
   bool refillHappenedThisFrame = false;
 
   prot ovr void OnAwake() {
@@ -16879,11 +16976,12 @@ namespace WegoSystem {
 
   void Update() {
    refillHappenedThisFrame = false;
-
    HandleTileHover();
+
    if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat) {
     CheckAndRefillTool();
    }
+
    UpdateDebugUI();
   }
 
@@ -16891,15 +16989,41 @@ namespace WegoSystem {
    EnsureInitialized();
    if (tileDefinitionMappings == null) return null;
 
+   TileDefinition highestPriorityTile = null;
+   int highestPriority = int.MinValue;
+
    foreach (var mapping in tileDefinitionMappings) {
-    if (mapping?.tileDef != null && mapping.tilemapModule != null) {
-     if (TileExistsInModule(mapping.tilemapModule, cellPos)) {
-      return mapping.tileDef;
+    if (mapping?.tileDef == null || mapping.tilemapModule == null) continue;
+
+    if (TileExistsInModule(mapping.tilemapModule, cellPos)) {
+     int priority = mapping.tileDef.interactionPriority;
+
+     if (priority > highestPriority) {
+      highestPriority = priority;
+      highestPriorityTile = mapping.tileDef;
      }
     }
    }
 
-   return null;
+   return highestPriorityTile;
+  }
+
+  pub List<TileDefinition> GetAllTilesAt(Vector3Int cellPos) {
+   EnsureInitialized();
+   var tiles = new List<TileDefinition>();
+
+   if (tileDefinitionMappings == null) return tiles;
+
+   foreach (var mapping in tileDefinitionMappings) {
+    if (mapping?.tileDef == null || mapping.tilemapModule == null) continue;
+
+    if (TileExistsInModule(mapping.tilemapModule, cellPos)) {
+     tiles.Add(mapping.tileDef);
+    }
+   }
+
+   tiles.Sort((a, b) => b.interactionPriority.CompareTo(a.interactionPriority));
+   return tiles;
   }
 
   bool TileExistsInModule(DualGridTilemapModule module, Vector3Int cellPos) {
@@ -16911,57 +17035,70 @@ namespace WegoSystem {
 
    Vector3Int targetCell = currentlyHoveredCell.Value;
 
-   if (debugLogs) Debug.Log($"[DEBUG] Applying Tool: '{toolDef.displayName}' at {targetCell}. Checking mappings in order...");
+   TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
 
-   foreach (var mapping in tileDefinitionMappings) {
-    if (mapping?.tileDef == null || mapping.tilemapModule == null) continue;
+   if (topTile == null) {
+    if (debugLogs)
+     Debug.Log($"[TileInteractionManager] No tile at {targetCell}");
+    return;
+   }
 
-    if (TileExistsInModule(mapping.tilemapModule, targetCell)) {
-     TileDefinition tileToTest = mapping.tileDef;
-     if (debugLogs) Debug.Log($"[DEBUG] Found tile '{tileToTest.displayName}' on its layer. Searching for a matching rule...");
+   if (debugLogs) {
+    Debug.Log($"[TileInteractionManager] Applying Tool: '{toolDef.displayName}' at {targetCell}");
+    Debug.Log($"[TileInteractionManager] Top tile: '{topTile.displayName}' (Priority: {topTile.interactionPriority})");
 
-     TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(r => r != null && r.tool == toolDef && r.fromTile == tileToTest);
-
-     if (rule != null) {
-      if (debugLogs) Debug.Log($"[TileInteractionManager] MATCH FOUND! Rule: From '{rule.fromTile.displayName}', To: '{(rule.toTile != null ? rule.toTile.displayName : "NULL")}'. Executing action.");
-
-      if (rule.toTile == null) {
-       RemoveTile(rule.fromTile, targetCell);
-      }
-      else {
-       if (!rule.toTile.keepBottomTile) {
-        RemoveTile(rule.fromTile, targetCell);
-       }
-       PlaceTile(rule.toTile, targetCell);
-      }
-
-      return;
-     }
-     else {
-      if (debugLogs) Debug.Log($"[DEBUG] No rule found for tool '{toolDef.displayName}' on tile '{tileToTest.displayName}'. Checking next layer down.");
-     }
+    // Show all tiles for debugging
+    var allTiles = GetAllTilesAt(targetCell);
+    if (allTiles.Count > 1) {
+     string tileList = string.Join(", ", allTiles.Select(t => $"{t.displayName}(P:{t.interactionPriority})"));
+     Debug.Log($"[TileInteractionManager] All tiles at position: [{tileList}]");
     }
    }
 
-   if (debugLogs) Debug.LogWarning($"[TileInteractionManager] NO MATCH FOUND for tool '{toolDef.displayName}' on any tile layer at {targetCell}.");
+TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault( r => r != null && r.tool == toolDef && r.fromTile == topTile );
+
+   if (rule != null) {
+    if (debugLogs)
+     Debug.Log($"[TileInteractionManager] ✓ MATCH! Rule: '{rule.fromTile.displayName}' -> '{(rule.toTile != null ? rule.toTile.displayName : "REMOVE")}'");
+
+    ExecuteTileTransformation(rule, targetCell);
+   }
+   else {
+    if (debugLogs)
+     Debug.Log($"[TileInteractionManager] ✗ No rule for '{toolDef.displayName}' on '{topTile.displayName}'. Action blocked by surface tile.");
+   }
+  }
+
+  void ExecuteTileTransformation(TileInteractionRule rule, Vector3Int targetCell) {
+   if (rule.toTile == null) {
+    RemoveTile(rule.fromTile, targetCell);
+   }
+   else {
+    if (!rule.toTile.keepBottomTile) {
+     RemoveTile(rule.fromTile, targetCell);
+    }
+    PlaceTile(rule.toTile, targetCell);
+   }
   }
 
   void CheckAndRefillTool() {
    if (!Input.GetMouseButtonDown(0)) return;
-
-   if (hoveredTileDef == null || ToolSwitcher.Instance == null) return;
+   if (ToolSwitcher.Instance == null) return;
 
    var currentTool = ToolSwitcher.Instance.CurrentTool;
    if (currentTool == null || !currentTool.limitedUses) return;
+
+   if (hoveredTileDef == null) return;
 
    if (interactionLibrary?.refillRules != null) {
 var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRefill == currentTool && r.refillSourceTile == hoveredTileDef );
 
     if (refillRule != null && isWithinInteractionRange) {
      ToolSwitcher.Instance.RefillCurrentTool();
-     refillHappenedThisFrame = true; // Set flag to prevent tool use
+     refillHappenedThisFrame = true;
 
-     if (debugLogs) Debug.Log($"[TileInteractionManager] Refilled {currentTool.displayName} on {hoveredTileDef.displayName}");
+     if (debugLogs)
+      Debug.Log($"[TileInteractionManager] Refilled {currentTool.displayName} from '{hoveredTileDef.displayName}'");
 
      if (PlayerActionManager.Instance != null) {
       PlayerActionManager.Instance.ExecutePlayerAction(PlayerActionType.Interact, currentlyHoveredCell.Value, "Refill");
@@ -16974,23 +17111,31 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
 
   void UpdateReversionTicks() {
    if (timedCells.Count == 0) return;
+
    List<Vector3Int> cellsToProcess = timedCells.Keys.ToList();
 
    foreach (Vector3Int cellPos in cellsToProcess) {
     if (timedCells.TryGetValue(cellPos, out TimedTileState state)) {
      state.ticksRemaining--;
+
      if (state.ticksRemaining <= 0) {
       TileDefinition actualTile = FindWhichTileDefinitionAt(cellPos);
+
       if (actualTile == state.tileDef) {
-       if (debugLogs) Debug.Log($"[TileInteractionManager] Reverting tile '{state.tileDef.displayName}' at {cellPos}.");
+       if (debugLogs)
+        Debug.Log($"[TileInteractionManager] Reverting tile '{state.tileDef.displayName}' at {cellPos}");
+
        RemoveTile(state.tileDef, cellPos);
+
        if (state.tileDef.revertToTile != null) {
         PlaceTile(state.tileDef.revertToTile, cellPos);
        }
       }
       else {
-       if (debugLogs) Debug.LogWarning($"[TileInteractionManager] State desync detected at {cellPos}. Expected '{state.tileDef.displayName}' for reversion, but found '{(actualTile != null ? actualTile.displayName : "NULL")}'. Removing stale timer.");
+       if (debugLogs)
+        Debug.LogWarning($"[TileInteractionManager] State desync at {cellPos}. Expected '{state.tileDef.displayName}', found '{actualTile?.displayName ?? "NULL"}'");
       }
+
       timedCells.Remove(cellPos);
      }
      else {
@@ -17003,10 +17148,15 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
   pub void PlaceTile(TileDefinition tileDef, Vector3Int cellPos) {
    EnsureInitialized();
    if (tileDef == null) return;
+
    if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null) {
     module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
+
     if (tileDef.revertAfterTicks > 0) {
-     timedCells[cellPos] = new TimedTileState { tileDef = tileDef, ticksRemaining = tileDef.revertAfterTicks };
+     timedCells[cellPos] = new TimedTileState {
+      tileDef = tileDef,
+      ticksRemaining = tileDef.revertAfterTicks
+     };
     }
    }
   }
@@ -17014,6 +17164,7 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
   pub void RemoveTile(TileDefinition tileDef, Vector3Int cellPos) {
    EnsureInitialized();
    if (tileDef == null) return;
+
    if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null) {
     module.DataTilemap.SetTile(cellPos, null);
    }
@@ -17032,13 +17183,14 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
   void SetupTilemaps() {
    moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
    if (tileDefinitionMappings == null) return;
+
    foreach (var mapping in tileDefinitionMappings) {
     if (mapping?.tileDef != null && mapping.tilemapModule != null) {
      if (!moduleByDefinition.ContainsKey(mapping.tileDef)) {
       moduleByDefinition[mapping.tileDef] = mapping.tilemapModule;
      }
      else {
-      Debug.LogWarning($"[TileInteractionManager] Duplicate TileDefinition '{mapping.tileDef.displayName}' found in mappings. Using first occurrence.", mapping.tileDef);
+      Debug.LogWarning($"[TileInteractionManager] Duplicate TileDefinition '{mapping.tileDef.displayName}' in mappings.", mapping.tileDef);
      }
     }
    }
@@ -17046,6 +17198,7 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
 
   pub void UpdateSortingOrder() {
    if (tileDefinitionMappings == null) return;
+
    for (int i = 0; i < tileDefinitionMappings.Count; i++) {
     var mapping = tileDefinitionMappings[i];
     if (mapping?.tilemapModule != null) {
@@ -17064,6 +17217,7 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
 
   pub void UpdateAllColors() {
    if (tileDefinitionMappings == null) return;
+
    foreach (var mapping in tileDefinitionMappings) {
     if (mapping?.tileDef != null && mapping.tilemapModule != null) {
      Transform renderTilemapTransform = mapping.tilemapModule.transform.Find("RenderTilemap");
@@ -17081,6 +17235,7 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
 
   void HandleTileHover() {
    if (mainCamera == null || player == null) return;
+
    Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
    mouseWorldPos.z = 0f;
    Vector3Int cellPos = WorldToCell(mouseWorldPos);
@@ -17112,35 +17267,34 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
   void UpdateDebugUI() {
    if (hoveredTileText != null) {
     string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
-    if (currentlyHoveredCell.HasValue && timedCells.TryGetValue(currentlyHoveredCell.Value, out TimedTileState timedState)) {
-     tileName += $" [{timedState.ticksRemaining}t]";
+
+    // Also show all tiles at this position for debugging
+    if (debugLogs && currentlyHoveredCell.HasValue) {
+     var allTiles = GetAllTilesAt(currentlyHoveredCell.Value);
+     if (allTiles.Count > 1) {
+      string allNames = string.Join(", ", allTiles.Select(t => $"{t.displayName}({t.interactionPriority})"));
+      tileName = $"{tileName} [All: {allNames}]";
+     }
     }
-    string rangeIndicator = isWithinInteractionRange ? " [IN RANGE]" : " [OUT OF RANGE]";
-    hoveredTileText.text = $"Hover: {tileName}{rangeIndicator}";
+
+    hoveredTileText.text = $"Tile: {tileName}";
    }
 
-   if (currentToolText != null) {
-    var selectedItem = HotbarSelectionService.SelectedItem;
-    if (selectedItem != null && selectedItem.IsValid()) {
-     currentToolText.text = $"Selected: {selectedItem.GetDisplayName()}";
-    }
-    else {
-     currentToolText.text = "Nothing Selected";
-    }
+   if (currentToolText != null && ToolSwitcher.Instance != null) {
+    var currentTool = ToolSwitcher.Instance.CurrentTool;
+    currentToolText.text = currentTool != null ? $"Tool: {currentTool.displayName}" : "Tool: None";
    }
   }
 
-  pub Vector3Int WorldToCell(Vector3 worldPos) {
-   return interactionGrid != null ? interactionGrid.WorldToCell(worldPos) : Vector3Int.zero;
+  pub Vector3Int WorldToCell(Vector3 worldPosition) {
+   if (interactionGrid == null) return Vector3Int.zero;
+   return interactionGrid.WorldToCell(worldPosition);
   }
 
-  Vector3 CellCenterWorld(Vector3Int cellPos) {
-   return interactionGrid != null ? interactionGrid.GetCellCenterWorld(cellPos) : Vector3.zero;
+  pub Vector3 CellCenterWorld(Vector3Int cellPos) {
+   if (interactionGrid == null) return Vector3.zero;
+   return interactionGrid.GetCellCenterWorld(cellPos);
   }
-
-  pub bool IsWithinInteractionRange => isWithinInteractionRange;
-  pub Vector3Int? CurrentlyHoveredCell => currentlyHoveredCell;
-  pub TileDefinition HoveredTileDef => hoveredTileDef;
  }
 }
 
