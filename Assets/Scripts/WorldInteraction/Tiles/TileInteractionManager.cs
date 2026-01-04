@@ -32,7 +32,7 @@ namespace WegoSystem
         [Header("Tile Mappings")]
         [Tooltip("Map TileDefinitions to their DualGridTilemapModules. Order affects sorting only, not detection priority.")]
         public List<TileDefinitionMapping> tileDefinitionMappings;
-        
+
         [Header("Interaction")]
         public TileInteractionLibrary interactionLibrary;
         public Grid interactionGrid;
@@ -42,7 +42,6 @@ namespace WegoSystem
 
         [Header("Hover Visuals")]
         public GameObject hoverHighlightObject;
-        public TileHoverColorManager hoverColorManager;
         public int baseSortingOrder = 0;
 
         [Header("Debug")]
@@ -50,12 +49,10 @@ namespace WegoSystem
         public TextMeshProUGUI hoveredTileText;
         public TextMeshProUGUI currentToolText;
 
-        // Public properties for external access
         public bool IsWithinInteractionRange => isWithinInteractionRange;
         public Vector3Int? CurrentlyHoveredCell => currentlyHoveredCell;
         public TileDefinition HoveredTileDef => hoveredTileDef;
 
-        // Internal state
         private Dictionary<TileDefinition, DualGridTilemapModule> moduleByDefinition;
         private readonly Dictionary<Vector3Int, TimedTileState> timedCells = new Dictionary<Vector3Int, TimedTileState>();
         private Vector3Int? currentlyHoveredCell;
@@ -104,19 +101,15 @@ namespace WegoSystem
         {
             refillHappenedThisFrame = false;
             HandleTileHover();
-            
+
             if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)
             {
                 CheckAndRefillTool();
             }
-            
+
             UpdateDebugUI();
         }
 
-        /// <summary>
-        /// Finds the tile with the HIGHEST interaction priority at the given position.
-        /// This properly handles overlapping tiles (e.g., grass over dirt).
-        /// </summary>
         public TileDefinition FindWhichTileDefinitionAt(Vector3Int cellPos)
         {
             EnsureInitialized();
@@ -132,7 +125,7 @@ namespace WegoSystem
                 if (TileExistsInModule(mapping.tilemapModule, cellPos))
                 {
                     int priority = mapping.tileDef.interactionPriority;
-                    
+
                     if (priority > highestPriority)
                     {
                         highestPriority = priority;
@@ -144,15 +137,11 @@ namespace WegoSystem
             return highestPriorityTile;
         }
 
-        /// <summary>
-        /// Gets ALL tiles present at the given position, sorted by priority (highest first).
-        /// Useful for debugging or special interactions that need to know about all layers.
-        /// </summary>
         public List<TileDefinition> GetAllTilesAt(Vector3Int cellPos)
         {
             EnsureInitialized();
             var tiles = new List<TileDefinition>();
-            
+
             if (tileDefinitionMappings == null) return tiles;
 
             foreach (var mapping in tileDefinitionMappings)
@@ -165,7 +154,6 @@ namespace WegoSystem
                 }
             }
 
-            // Sort by priority descending
             tiles.Sort((a, b) => b.interactionPriority.CompareTo(a.interactionPriority));
             return tiles;
         }
@@ -175,22 +163,17 @@ namespace WegoSystem
             return module.DataTilemap != null && module.DataTilemap.HasTile(cellPos);
         }
 
-        /// <summary>
-        /// Applies a tool action at the currently hovered cell.
-        /// Only interacts with the HIGHEST PRIORITY tile - does NOT cascade to lower tiles.
-        /// </summary>
         public void ApplyToolAction(ToolDefinition toolDef)
         {
             if (toolDef == null || !currentlyHoveredCell.HasValue) return;
 
             Vector3Int targetCell = currentlyHoveredCell.Value;
 
-            // Get the highest priority tile at this position
             TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
 
             if (topTile == null)
             {
-                if (debugLogs) 
+                if (debugLogs)
                     Debug.Log($"[TileInteractionManager] No tile at {targetCell}");
                 return;
             }
@@ -199,8 +182,7 @@ namespace WegoSystem
             {
                 Debug.Log($"[TileInteractionManager] Applying Tool: '{toolDef.displayName}' at {targetCell}");
                 Debug.Log($"[TileInteractionManager] Top tile: '{topTile.displayName}' (Priority: {topTile.interactionPriority})");
-                
-                // Show all tiles for debugging
+
                 var allTiles = GetAllTilesAt(targetCell);
                 if (allTiles.Count > 1)
                 {
@@ -209,21 +191,20 @@ namespace WegoSystem
                 }
             }
 
-            // Only check the TOP tile for a matching rule - no cascading!
             TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(
                 r => r != null && r.tool == toolDef && r.fromTile == topTile
             );
 
             if (rule != null)
             {
-                if (debugLogs) 
+                if (debugLogs)
                     Debug.Log($"[TileInteractionManager] ✓ MATCH! Rule: '{rule.fromTile.displayName}' -> '{(rule.toTile != null ? rule.toTile.displayName : "REMOVE")}'");
 
                 ExecuteTileTransformation(rule, targetCell);
             }
             else
             {
-                if (debugLogs) 
+                if (debugLogs)
                     Debug.Log($"[TileInteractionManager] ✗ No rule for '{toolDef.displayName}' on '{topTile.displayName}'. Action blocked by surface tile.");
             }
         }
@@ -232,12 +213,10 @@ namespace WegoSystem
         {
             if (rule.toTile == null)
             {
-                // Rule removes the tile
                 RemoveTile(rule.fromTile, targetCell);
             }
             else
             {
-                // Rule transforms the tile
                 if (!rule.toTile.keepBottomTile)
                 {
                     RemoveTile(rule.fromTile, targetCell);
@@ -254,7 +233,6 @@ namespace WegoSystem
             var currentTool = ToolSwitcher.Instance.CurrentTool;
             if (currentTool == null || !currentTool.limitedUses) return;
 
-            // Use the cached hoveredTileDef which is already the highest priority tile
             if (hoveredTileDef == null) return;
 
             if (interactionLibrary?.refillRules != null)
@@ -268,7 +246,7 @@ namespace WegoSystem
                     ToolSwitcher.Instance.RefillCurrentTool();
                     refillHappenedThisFrame = true;
 
-                    if (debugLogs) 
+                    if (debugLogs)
                         Debug.Log($"[TileInteractionManager] Refilled {currentTool.displayName} from '{hoveredTileDef.displayName}'");
 
                     if (PlayerActionManager.Instance != null)
@@ -284,7 +262,7 @@ namespace WegoSystem
         private void UpdateReversionTicks()
         {
             if (timedCells.Count == 0) return;
-            
+
             List<Vector3Int> cellsToProcess = timedCells.Keys.ToList();
 
             foreach (Vector3Int cellPos in cellsToProcess)
@@ -292,18 +270,18 @@ namespace WegoSystem
                 if (timedCells.TryGetValue(cellPos, out TimedTileState state))
                 {
                     state.ticksRemaining--;
-                    
+
                     if (state.ticksRemaining <= 0)
                     {
                         TileDefinition actualTile = FindWhichTileDefinitionAt(cellPos);
-                        
+
                         if (actualTile == state.tileDef)
                         {
-                            if (debugLogs) 
+                            if (debugLogs)
                                 Debug.Log($"[TileInteractionManager] Reverting tile '{state.tileDef.displayName}' at {cellPos}");
-                            
+
                             RemoveTile(state.tileDef, cellPos);
-                            
+
                             if (state.tileDef.revertToTile != null)
                             {
                                 PlaceTile(state.tileDef.revertToTile, cellPos);
@@ -311,10 +289,10 @@ namespace WegoSystem
                         }
                         else
                         {
-                            if (debugLogs) 
+                            if (debugLogs)
                                 Debug.LogWarning($"[TileInteractionManager] State desync at {cellPos}. Expected '{state.tileDef.displayName}', found '{actualTile?.displayName ?? "NULL"}'");
                         }
-                        
+
                         timedCells.Remove(cellPos);
                     }
                     else
@@ -329,17 +307,17 @@ namespace WegoSystem
         {
             EnsureInitialized();
             if (tileDef == null) return;
-            
+
             if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null)
             {
                 module.DataTilemap.SetTile(cellPos, ScriptableObject.CreateInstance<Tile>());
-                
+
                 if (tileDef.revertAfterTicks > 0)
                 {
-                    timedCells[cellPos] = new TimedTileState 
-                    { 
-                        tileDef = tileDef, 
-                        ticksRemaining = tileDef.revertAfterTicks 
+                    timedCells[cellPos] = new TimedTileState
+                    {
+                        tileDef = tileDef,
+                        ticksRemaining = tileDef.revertAfterTicks
                     };
                 }
             }
@@ -349,7 +327,7 @@ namespace WegoSystem
         {
             EnsureInitialized();
             if (tileDef == null) return;
-            
+
             if (moduleByDefinition.TryGetValue(tileDef, out DualGridTilemapModule module) && module?.DataTilemap != null)
             {
                 module.DataTilemap.SetTile(cellPos, null);
@@ -373,7 +351,7 @@ namespace WegoSystem
         {
             moduleByDefinition = new Dictionary<TileDefinition, DualGridTilemapModule>();
             if (tileDefinitionMappings == null) return;
-            
+
             foreach (var mapping in tileDefinitionMappings)
             {
                 if (mapping?.tileDef != null && mapping.tilemapModule != null)
@@ -393,7 +371,7 @@ namespace WegoSystem
         public void UpdateSortingOrder()
         {
             if (tileDefinitionMappings == null) return;
-            
+
             for (int i = 0; i < tileDefinitionMappings.Count; i++)
             {
                 var mapping = tileDefinitionMappings[i];
@@ -417,7 +395,7 @@ namespace WegoSystem
         public void UpdateAllColors()
         {
             if (tileDefinitionMappings == null) return;
-            
+
             foreach (var mapping in tileDefinitionMappings)
             {
                 if (mapping?.tileDef != null && mapping.tilemapModule != null)
@@ -440,7 +418,7 @@ namespace WegoSystem
         private void HandleTileHover()
         {
             if (mainCamera == null || player == null) return;
-            
+
             Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             mouseWorldPos.z = 0f;
             Vector3Int cellPos = WorldToCell(mouseWorldPos);
@@ -467,9 +445,9 @@ namespace WegoSystem
 
         private void UpdateHoverHighlightColor(bool withinRange)
         {
-            if (hoverSpriteRenderer != null && hoverColorManager != null)
+            if (hoverSpriteRenderer != null && interactionLibrary != null)
             {
-                hoverSpriteRenderer.color = hoverColorManager.GetColorForRange(withinRange);
+                hoverSpriteRenderer.color = interactionLibrary.GetHoverColorForRange(withinRange);
             }
         }
 
@@ -478,38 +456,33 @@ namespace WegoSystem
             if (hoveredTileText != null)
             {
                 string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
-                
-                // Also show all tiles at this position for debugging
-                if (debugLogs && currentlyHoveredCell.HasValue)
-                {
-                    var allTiles = GetAllTilesAt(currentlyHoveredCell.Value);
-                    if (allTiles.Count > 1)
-                    {
-                        string allNames = string.Join(", ", allTiles.Select(t => $"{t.displayName}({t.interactionPriority})"));
-                        tileName = $"{tileName} [All: {allNames}]";
-                    }
-                }
-                
-                hoveredTileText.text = $"Tile: {tileName}";
+                string rangeStatus = isWithinInteractionRange ? "[IN RANGE]" : "[OUT OF RANGE]";
+                hoveredTileText.text = $"Tile: {tileName} {rangeStatus}";
             }
 
             if (currentToolText != null && ToolSwitcher.Instance != null)
             {
-                var currentTool = ToolSwitcher.Instance.CurrentTool;
-                currentToolText.text = currentTool != null ? $"Tool: {currentTool.displayName}" : "Tool: None";
+                var tool = ToolSwitcher.Instance.CurrentTool;
+                currentToolText.text = tool != null ? $"Tool: {tool.displayName}" : "Tool: None";
             }
         }
 
-        public Vector3Int WorldToCell(Vector3 worldPosition)
+        public Vector3Int WorldToCell(Vector3 worldPos)
         {
-            if (interactionGrid == null) return Vector3Int.zero;
-            return interactionGrid.WorldToCell(worldPosition);
+            if (interactionGrid != null)
+            {
+                return interactionGrid.WorldToCell(worldPos);
+            }
+            return Vector3Int.FloorToInt(worldPos);
         }
 
         public Vector3 CellCenterWorld(Vector3Int cellPos)
         {
-            if (interactionGrid == null) return Vector3.zero;
-            return interactionGrid.GetCellCenterWorld(cellPos);
+            if (interactionGrid != null)
+            {
+                return interactionGrid.GetCellCenterWorld(cellPos);
+            }
+            return new Vector3(cellPos.x + 0.5f, cellPos.y + 0.5f, 0f);
         }
     }
 }

@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 650,670 -> 473,470 chars (27.2% reduction)
-Estimated tokens saved: ~44,300
+Compression Stats: 647,843 -> 472,909 chars (27.0% reduction)
+Estimated tokens saved: ~43,733
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -103,108 +103,107 @@ using System.Linq;
   PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6786
   PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L6973
   TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7050
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L7104
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7131
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7156
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7173
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7213
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7348
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7104
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7147
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7164
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7204
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7339
 
 [Abracodabra.Genes]
-  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L7359
-  GeneLibrary (Assets\Scripts\Genes/) L7369
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L7524
-  PlantState (Assets\Scripts\PlantSystem\Growth/) L7704
+  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L7350
+  GeneLibrary (Assets\Scripts\Genes/) L7360
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L7515
+  PlantState (Assets\Scripts\PlantSystem\Growth/) L7695
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L8096
-  Fruit (Assets\Scripts\Genes\Components/) L8121
-  NutritionComponent (Assets\Scripts\Genes\Components/) L8159
+  Creature (Assets\Scripts\Genes\Components/) L8087
+  Fruit (Assets\Scripts\Genes\Components/) L8112
+  NutritionComponent (Assets\Scripts\Genes\Components/) L8150
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L8171
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L8217
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L8236
-  ModifierGene (Assets\Scripts\Genes\Core/) L8248
-  PassiveStatType (Assets\Scripts\Genes\Core/) L8280
-  PayloadGene (Assets\Scripts\Genes\Core/) L8322
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L8368
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L8389
-  GeneBase (Assets\Scripts\Genes/) L8422
-  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L8500
+  ActiveGene (Assets\Scripts\Genes\Core/) L8162
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L8208
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L8227
+  ModifierGene (Assets\Scripts\Genes\Core/) L8239
+  PassiveStatType (Assets\Scripts\Genes\Core/) L8271
+  PayloadGene (Assets\Scripts\Genes\Core/) L8313
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L8359
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L8380
+  GeneBase (Assets\Scripts\Genes/) L8413
+  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L8491
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L8603
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L8721
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L8751
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L8794
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L8594
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L8712
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L8742
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L8785
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L8845
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L8901
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9033
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L8836
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L8892
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9024
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L9088
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L9121
-  GeneEventBus (Assets\Scripts\Genes\Services/) L9219
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L9271
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L9079
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L9112
+  GeneEventBus (Assets\Scripts\Genes\Services/) L9210
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L9262
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L9358
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L9349
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L9451
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L9536
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9676
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L9442
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L9527
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9667
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L9947
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L10693
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L10982
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L11193
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L11379
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L11579
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L12223
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L9938
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L10684
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L10973
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L11184
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L11370
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L11569
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L12213
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\UI\_UGUI_Legacy/) L12417
-  SeedRarity (Assets\Scripts\UI\_UGUI_Legacy/) L12587
-  QualityTier (Assets\Scripts\UI\_UGUI_Legacy/) L12609
+  SeedTooltipData (Assets\Scripts\UI\_UGUI_Legacy/) L12407
+  SeedRarity (Assets\Scripts\UI\_UGUI_Legacy/) L12577
+  QualityTier (Assets\Scripts\UI\_UGUI_Legacy/) L12599
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L12671
-  CameraZoomController (Assets\Scripts\Core/) L12784
-  InitializationManager (Assets\Scripts\Core/) L12833
-  PixelGridSnapper (Assets\Scripts\Core/) L12873
-  RunState (Assets\Scripts\Core/) L12906
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L13074
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L13137
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L13273
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L13302
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L13453
-  GridEntity (Assets\Scripts\Ticks/) L13525
-  GridPosition (Assets\Scripts\Ticks/) L13695
-  GridPositionManager (Assets\Scripts\Ticks/) L13796
-  GridRadiusUtility (Assets\Scripts\Ticks/) L14176
-  TickConfiguration (Assets\Scripts\Ticks/) L14320
-  ITickUpdateable (Assets\Scripts\Ticks/) L14406
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L14558
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L14749
+  CameraController (Assets\Scripts\Core/) L12661
+  CameraZoomController (Assets\Scripts\Core/) L12774
+  InitializationManager (Assets\Scripts\Core/) L12823
+  PixelGridSnapper (Assets\Scripts\Core/) L12863
+  RunState (Assets\Scripts\Core/) L12896
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L13064
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L13127
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L13263
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L13292
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L13443
+  GridEntity (Assets\Scripts\Ticks/) L13515
+  GridPosition (Assets\Scripts\Ticks/) L13685
+  GridPositionManager (Assets\Scripts\Ticks/) L13786
+  GridRadiusUtility (Assets\Scripts\Ticks/) L14166
+  TickConfiguration (Assets\Scripts\Ticks/) L14310
+  ITickUpdateable (Assets\Scripts\Ticks/) L14396
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L14548
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L14739
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15160
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15143
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L15192
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L15175
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L15250
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L15296
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L15419
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L15233
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L15279
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L15402
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15584
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15567
 
 
 ================================================================================
@@ -7282,39 +7281,10 @@ pub class TileDefinition : ScriptableObject {
 }
 
 ////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\WorldInteraction\Tiles\TileHoverColorManager.cs
+// FILE: Assets\Scripts\WorldInteraction\Tiles\TileInteractionLibrary.cs
 
 ﻿using UnityEngine;
 
-pub class TileHoverColorManager : ScriptableObject {
- [Header("Hover Tile Colors")]
- [SerializeField, Tooltip("Color when player is within range to interact")]
- Color withinRangeColor = new Color(1f, 1f, 1f, 0.8f);
-
- [SerializeField, Tooltip("Color when player is outside interaction range")]
- Color outsideRangeColor = new Color(1f, 1f, 1f, 0.3f);
-
- pub Color WithinRangeColor => withinRangeColor;
- pub Color OutsideRangeColor => outsideRangeColor;
-
- pub Color GetColorForRange(bool isWithinRange) {
-  return isWithinRange ? withinRangeColor : outsideRangeColor;
- }
-
- void OnValidate() {
-  if (withinRangeColor.a < outsideRangeColor.a) {
-   Debug.LogWarning("[TileHoverColorManager] Within range alpha should typically be higher than outside range alpha for better visibility.");
-  }
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\WorldInteraction\Tiles\TileInteractionLibrary.cs
-
-﻿using System.Collections.Generic;
-using System; // Needed for [Serializable]
-
-[Serializable] // Make it visible in the Inspector
 pub class ToolRefillRule {
  [Tooltip("The tool that can be refilled.")]
  pub ToolDefinition toolToRefill;
@@ -7326,11 +7296,31 @@ pub class ToolRefillRule {
 pub class TileInteractionLibrary : ScriptableObject {
  [Header("Standard Tile Transformations")]
  [Tooltip("List of rules: (Tool, fromTile) => toTile.")]
- pub List<TileInteractionRule> rules; // Existing transformation rules
+ pub List<TileInteractionRule> rules;
 
- [Header("Tool Refill Rules")] // <<< NEW HEADER
+ [Header("Tool Refill Rules")]
  [Tooltip("List of rules defining how tools are refilled.")]
- pub List<ToolRefillRule> refillRules; // <<< NEW LIST FOR REFILLS
+ pub List<ToolRefillRule> refillRules;
+
+ [Header("Hover Tile Colors")]
+ [SerializeField, Tooltip("Color when player is within range to interact")]
+ Color withinRangeColor = new Color(1f, 1f, 1f, 0.8f);
+
+ [SerializeField, Tooltip("Color when player is outside interaction range")]
+ Color outsideRangeColor = new Color(1f, 1f, 1f, 0.3f);
+
+ pub Color WithinRangeColor => withinRangeColor;
+ pub Color OutsideRangeColor => outsideRangeColor;
+
+ pub Color GetHoverColorForRange(bool isWithinRange) {
+  return isWithinRange ? withinRangeColor : outsideRangeColor;
+ }
+
+ void OnValidate() {
+  if (withinRangeColor.a < outsideRangeColor.a) {
+   Debug.LogWarning("[TileInteractionLibrary] Within range alpha should typically be higher than outside range alpha for better visibility.");
+  }
+ }
 }
 
 ////////////////////////////////////////////////////////////
@@ -11580,10 +11570,10 @@ namespace Abracodabra.UI.Toolkit {
   pub ItemType Type {
    get {
     return OriginalData switch {
-     SeedTemplate => ItemType.Seed,
-     ToolDefinition => ItemType.Tool,
-     GeneBase => ItemType.Gene,
-     ItemDefinition => ItemType.Resource,
+     SeedTemplate _ => ItemType.Seed,
+     ToolDefinition _ => ItemType.Tool,
+     GeneBase _ => ItemType.Gene,
+     ItemDefinition _ => ItemType.Resource,
      _ => ResourceInstance != null ? ItemType.Resource : ItemType.Gene
     };
    }
@@ -11752,7 +11742,6 @@ namespace Abracodabra.UI.Toolkit {
     _ => "Unknown"
    };
   }
-
  }
 }
 
@@ -14965,7 +14954,6 @@ namespace WegoSystem {
 
   [Header("Hover Visuals")]
   pub GameObject hoverHighlightObject;
-  pub TileHoverColorManager hoverColorManager;
   pub int baseSortingOrder = 0;
 
   [Header("Debug")]
@@ -15086,7 +15074,6 @@ namespace WegoSystem {
     Debug.Log($"[TileInteractionManager] Applying Tool: '{toolDef.displayName}' at {targetCell}");
     Debug.Log($"[TileInteractionManager] Top tile: '{topTile.displayName}' (Priority: {topTile.interactionPriority})");
 
-    // Show all tiles for debugging
     var allTiles = GetAllTilesAt(targetCell);
     if (allTiles.Count > 1) {
      string tileList = string.Join(", ", allTiles.Select(t => $"{t.displayName}(P:{t.interactionPriority})"));
@@ -15298,41 +15285,36 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
   }
 
   void UpdateHoverHighlightColor(bool withinRange) {
-   if (hoverSpriteRenderer != null && hoverColorManager != null) {
-    hoverSpriteRenderer.color = hoverColorManager.GetColorForRange(withinRange);
+   if (hoverSpriteRenderer != null && interactionLibrary != null) {
+    hoverSpriteRenderer.color = interactionLibrary.GetHoverColorForRange(withinRange);
    }
   }
 
   void UpdateDebugUI() {
    if (hoveredTileText != null) {
     string tileName = hoveredTileDef != null ? hoveredTileDef.displayName : "None";
-
-    // Also show all tiles at this position for debugging
-    if (debugLogs && currentlyHoveredCell.HasValue) {
-     var allTiles = GetAllTilesAt(currentlyHoveredCell.Value);
-     if (allTiles.Count > 1) {
-      string allNames = string.Join(", ", allTiles.Select(t => $"{t.displayName}({t.interactionPriority})"));
-      tileName = $"{tileName} [All: {allNames}]";
-     }
-    }
-
-    hoveredTileText.text = $"Tile: {tileName}";
+    string rangeStatus = isWithinInteractionRange ? "[IN RANGE]" : "[OUT OF RANGE]";
+    hoveredTileText.text = $"Tile: {tileName} {rangeStatus}";
    }
 
    if (currentToolText != null && ToolSwitcher.Instance != null) {
-    var currentTool = ToolSwitcher.Instance.CurrentTool;
-    currentToolText.text = currentTool != null ? $"Tool: {currentTool.displayName}" : "Tool: None";
+    var tool = ToolSwitcher.Instance.CurrentTool;
+    currentToolText.text = tool != null ? $"Tool: {tool.displayName}" : "Tool: None";
    }
   }
 
-  pub Vector3Int WorldToCell(Vector3 worldPosition) {
-   if (interactionGrid == null) return Vector3Int.zero;
-   return interactionGrid.WorldToCell(worldPosition);
+  pub Vector3Int WorldToCell(Vector3 worldPos) {
+   if (interactionGrid != null) {
+    return interactionGrid.WorldToCell(worldPos);
+   }
+   return Vector3Int.FloorToInt(worldPos);
   }
 
   pub Vector3 CellCenterWorld(Vector3Int cellPos) {
-   if (interactionGrid == null) return Vector3.zero;
-   return interactionGrid.GetCellCenterWorld(cellPos);
+   if (interactionGrid != null) {
+    return interactionGrid.GetCellCenterWorld(cellPos);
+   }
+   return new Vector3(cellPos.x + 0.5f, cellPos.y + 0.5f, 0f);
   }
  }
 }
