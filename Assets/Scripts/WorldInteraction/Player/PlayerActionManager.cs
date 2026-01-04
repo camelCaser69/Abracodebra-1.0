@@ -131,7 +131,7 @@ public class PlayerActionManager : MonoBehaviour
     /// <summary>
     /// Execute harvest action - NOW uses InventoryService instead of old InventoryGridController
     /// </summary>
-    private bool ExecuteHarvest(Vector3Int gridPosition)
+    bool ExecuteHarvest(Vector3Int gridPosition)
     {
         var entities = GridPositionManager.Instance?.GetEntitiesAt(new GridPosition(gridPosition));
         var plantEntity = entities?.FirstOrDefault(e => e.GetComponent<PlantGrowth>() != null);
@@ -155,12 +155,10 @@ public class PlayerActionManager : MonoBehaviour
 
         int itemsAdded = 0;
 
-        // Use NEW InventoryService instead of old InventoryGridController
         if (InventoryService.IsInitialized)
         {
             foreach (var harvestedItem in harvestedItems)
             {
-                // Add harvested item using new service
                 if (InventoryService.AddHarvestedItem(harvestedItem.Item))
                 {
                     itemsAdded++;
@@ -174,24 +172,7 @@ public class PlayerActionManager : MonoBehaviour
         }
         else
         {
-            // Fallback to legacy system if new system not initialized
-            Debug.LogWarning("[PlayerActionManager] InventoryService not initialized, trying legacy InventoryGridController");
-            
-            if (InventoryGridController.Instance != null)
-            {
-                foreach (var harvestedItem in harvestedItems)
-                {
-                    var inventoryItem = InventoryBarItem.FromItem(harvestedItem.Item);
-                    if (InventoryGridController.Instance.AddItemToInventory(inventoryItem))
-                    {
-                        itemsAdded++;
-                    }
-                }
-            }
-            else
-            {
-                Debug.LogError("[PlayerActionManager] Neither InventoryService nor InventoryGridController available!");
-            }
+            Debug.LogError("[PlayerActionManager] InventoryService not initialized! Cannot add harvested items.");
         }
 
         if (debugMode) Debug.Log($"[PlayerActionManager] Successfully added {itemsAdded}/{harvestedItems.Count} harvested items to inventory.");
