@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 733,786 -> 533,942 chars (27.2% reduction)
-Estimated tokens saved: ~49,961
+Compression Stats: 650,670 -> 473,470 chars (27.2% reduction)
+Estimated tokens saved: ~44,300
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -28,197 +28,183 @@ using System.Linq;
   GameEvent (Assets\Scripts\Core\Events/) L34
   GameEventListener (Assets\Scripts\Core\Events/) L61
   IGameEventListener (Assets\Scripts\Core\Events/) L90
-  GameInitializer (Assets\Scripts\Core/) L98
-  GeneSystemInitializer (Assets\Scripts\Core/) L122
-  SortableEntity (Assets\Scripts\Core/) L136
-  WeatherManager (Assets\Scripts\Core/) L207
-  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L409
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L470
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L756
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L827
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L836
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1249
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1413
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1429
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1467
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1777
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1813
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2093
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2186
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2208
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2227
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2311
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2392
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2464
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2480
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2502
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2751
-  WaveState (Assets\Scripts\Ecosystem\Management/) L2771
-  WaveSpawnLocationType (Assets\Scripts\Ecosystem\Spawning/) L3076
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3119
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3138
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3177
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3225
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3243
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3394
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3505
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3552
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3565
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3627
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3647
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L3688
-  WaveManagerEditor (Assets\Scripts\Editor/) L3825
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L4002
-  ItemEffect (Assets\Scripts\Items/) L4028
-  ItemInstance (Assets\Scripts\Items/) L4062
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4097
-  LeafData (Assets\Scripts\PlantSystem\Data/) L4105
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4120
-  PlantCellType (Assets\Scripts\PlantSystem\Growth/) L4159
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4180
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4317
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4379
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L4474
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L4574
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L4596
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L4711
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L4867
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L4977
-  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L5078
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L5105
-  GridSnapStartup (Assets\Scripts\Ticks/) L5347
-  TickDebugMonitor (Assets\Scripts\Ticks/) L5414
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L5450
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L5461
-  InventoryBarItem (Assets\Scripts\UI\_UGUI_Legacy/) L5491
-  InventoryColorManager (Assets\Scripts\UI\_UGUI_Legacy/) L5592
-  InventoryGridController (Assets\Scripts\UI\_UGUI_Legacy/) L5659
-  TooltipTrigger (Assets\Scripts\UI\_UGUI_Legacy/) L5804
-  UIManager (Assets\Scripts\UI\_UGUI_Legacy/) L5862
-  ITooltipDataProvider (Assets\Scripts\UI\_UGUI_Legacy/) L6079
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L6313
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L6421
-  WaterReflection (Assets\Scripts\Visual\Effects/) L6528
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L6953
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L6999
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L7170
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L7431
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L7439
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L7465
-  PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L7513
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7712
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7789
-  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L7843
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7870
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7895
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7912
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7952
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L8087
+  GameBootstrap (Assets\Scripts\Core/) L98
+  SortableEntity (Assets\Scripts\Core/) L149
+  WeatherManager (Assets\Scripts\Core/) L220
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L422
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L483
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L769
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L840
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L849
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1262
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1426
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1442
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1480
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1790
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1826
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2106
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2199
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2221
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2240
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2324
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2405
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2477
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2493
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2515
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2764
+  WaveState (Assets\Scripts\Ecosystem\Management/) L2784
+  WaveSpawnLocationType (Assets\Scripts\Ecosystem\Spawning/) L3089
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3132
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3151
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3190
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3238
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3256
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3407
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3518
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3565
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3578
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3640
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3660
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L3701
+  WaveManagerEditor (Assets\Scripts\Editor/) L3838
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L4015
+  ItemEffect (Assets\Scripts\Items/) L4045
+  ItemInstance (Assets\Scripts\Items/) L4079
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4114
+  LeafData (Assets\Scripts\PlantSystem\Data/) L4122
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4137
+  PlantCellType (Assets\Scripts\PlantSystem\Growth/) L4176
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4197
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4334
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4396
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L4491
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L4591
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L4613
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L4728
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L4884
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L4994
+  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L5095
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L5122
+  GridSnapStartup (Assets\Scripts\Ticks/) L5364
+  TickDebugMonitor (Assets\Scripts\Ticks/) L5431
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L5467
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L5478
+  ITooltipDataProvider (Assets\Scripts\UI\_UGUI_Legacy/) L5508
+  InventoryColorManager (Assets\Scripts\UI\_UGUI_Legacy/) L5519
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L5586
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L5694
+  WaterReflection (Assets\Scripts\Visual\Effects/) L5801
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L6226
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L6272
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L6443
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L6704
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L6712
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L6738
+  PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6786
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L6973
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7050
+  TileHoverColorManager (Assets\Scripts\WorldInteraction\Tiles/) L7104
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7131
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7156
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7173
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7213
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7348
 
 [Abracodabra.Genes]
-  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L8098
-  GeneLibrary (Assets\Scripts\Genes/) L8108
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L8263
-  PlantState (Assets\Scripts\PlantSystem\Growth/) L8443
+  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L7359
+  GeneLibrary (Assets\Scripts\Genes/) L7369
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L7524
+  PlantState (Assets\Scripts\PlantSystem\Growth/) L7704
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L8835
-  Fruit (Assets\Scripts\Genes\Components/) L8860
-  NutritionComponent (Assets\Scripts\Genes\Components/) L8898
+  Creature (Assets\Scripts\Genes\Components/) L8096
+  Fruit (Assets\Scripts\Genes\Components/) L8121
+  NutritionComponent (Assets\Scripts\Genes\Components/) L8159
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L8910
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L8956
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L8975
-  ModifierGene (Assets\Scripts\Genes\Core/) L8987
-  PassiveStatType (Assets\Scripts\Genes\Core/) L9019
-  PayloadGene (Assets\Scripts\Genes\Core/) L9061
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L9107
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L9128
-  GeneBase (Assets\Scripts\Genes/) L9161
-  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L9239
+  ActiveGene (Assets\Scripts\Genes\Core/) L8171
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L8217
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L8236
+  ModifierGene (Assets\Scripts\Genes\Core/) L8248
+  PassiveStatType (Assets\Scripts\Genes\Core/) L8280
+  PayloadGene (Assets\Scripts\Genes\Core/) L8322
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L8368
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L8389
+  GeneBase (Assets\Scripts\Genes/) L8422
+  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L8500
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L9342
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L9460
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L9490
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L9533
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L8603
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L8721
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L8751
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L8794
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L9584
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L9640
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9772
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L8845
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L8901
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9033
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L9827
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L9860
-  GeneEventBus (Assets\Scripts\Genes\Services/) L9958
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L10010
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L9088
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L9121
+  GeneEventBus (Assets\Scripts\Genes\Services/) L9219
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L9271
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L10097
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L9358
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L10190
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L10301
-  GeneSequenceUI (Assets\Scripts\UI\_UGUI_Legacy/) L10471
-  GeneSlotUI (Assets\Scripts\UI\_UGUI_Legacy/) L10711
-  InventoryBarController (Assets\Scripts\UI\_UGUI_Legacy/) L10940
-  ItemView (Assets\Scripts\UI\_UGUI_Legacy/) L11116
-  SequenceRowUI (Assets\Scripts\UI\_UGUI_Legacy/) L11234
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11305
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L9451
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L9536
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9676
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L11576
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L12322
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L12611
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L12822
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L13008
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L13151
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L13795
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L9947
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L10693
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L10982
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L11193
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L11379
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L11579
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L12223
 
 [Abracodabra.UI.Tooltips]
-  EnhancedTooltipTrigger (Assets\Scripts\UI\_UGUI_Legacy/) L13989
-  InventoryTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L14042
-  SeedEditorTooltipPanel (Assets\Scripts\UI\_UGUI_Legacy/) L14144
-  SeedTooltipData (Assets\Scripts\UI\_UGUI_Legacy/) L14287
-  SeedRarity (Assets\Scripts\UI\_UGUI_Legacy/) L14457
-  TooltipSystemManager (Assets\Scripts\UI\_UGUI_Legacy/) L14479
-  QualityTier (Assets\Scripts\UI\_UGUI_Legacy/) L14505
+  SeedTooltipData (Assets\Scripts\UI\_UGUI_Legacy/) L12417
+  SeedRarity (Assets\Scripts\UI\_UGUI_Legacy/) L12587
+  QualityTier (Assets\Scripts\UI\_UGUI_Legacy/) L12609
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L14618
-  CameraZoomController (Assets\Scripts\Core/) L14731
-  InitializationManager (Assets\Scripts\Core/) L14780
-  PixelGridSnapper (Assets\Scripts\Core/) L14820
-  RunState (Assets\Scripts\Core/) L14853
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L15021
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L15084
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L15220
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L15249
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L15400
-  GridEntity (Assets\Scripts\Ticks/) L15472
-  GridPosition (Assets\Scripts\Ticks/) L15642
-  GridPositionManager (Assets\Scripts\Ticks/) L15743
-  GridRadiusUtility (Assets\Scripts\Ticks/) L16123
-  TickConfiguration (Assets\Scripts\Ticks/) L16267
-  ITickUpdateable (Assets\Scripts\Ticks/) L16353
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L16505
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L16696
+  CameraController (Assets\Scripts\Core/) L12671
+  CameraZoomController (Assets\Scripts\Core/) L12784
+  InitializationManager (Assets\Scripts\Core/) L12833
+  PixelGridSnapper (Assets\Scripts\Core/) L12873
+  RunState (Assets\Scripts\Core/) L12906
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L13074
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L13137
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L13273
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L13302
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L13453
+  GridEntity (Assets\Scripts\Ticks/) L13525
+  GridPosition (Assets\Scripts\Ticks/) L13695
+  GridPositionManager (Assets\Scripts\Ticks/) L13796
+  GridRadiusUtility (Assets\Scripts\Ticks/) L14176
+  TickConfiguration (Assets\Scripts\Ticks/) L14320
+  ITickUpdateable (Assets\Scripts\Ticks/) L14406
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L14558
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L14749
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17107
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15160
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L17139
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L15192
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L17197
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L17243
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L17366
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L15250
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L15296
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L15419
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17531
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15584
 
 
 ================================================================================
@@ -290,40 +276,53 @@ pub interface IGameEventListener {
 }
 
 ////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Core\GameInitializer.cs
+// FILE: Assets\Scripts\Core\GameBootstrap.cs
 
-﻿using UnityEngine;
-using Abracodabra.Genes.Services;
-using WegoSystem;
-
-pub class GameInitializer : MonoBehaviour {
- void Awake() {
-  InitializeServices();
-
-  if (GeneEffectPool.Instance != null) {
-   GeneServices.Register<IGeneEffectPool>(GeneEffectPool.Instance);
-  }
-  else {
-   Debug.LogError("[GameInitializer] GeneEffectPool instance could not be created or found.");
-  }
- }
-
- stat void InitializeServices() {
-  GeneServices.Initialize();
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\Core\GeneSystemInitializer.cs
-
-﻿using UnityEngine;
+﻿// File: Assets/Scripts/Core/GameBootstrap.cs
 using Abracodabra.Genes.Services;
 
-pub class GeneSystemInitializer : MonoBehaviour {
+pub class GameBootstrap : MonoBehaviour {
+ stat bool hasInitialized = false;
+
  void Awake() {
+  if (hasInitialized) {
+   Debug.Log("[GameBootstrap] Already initialized, skipping.");
+   return;
+  }
+
+  Debug.Log("[GameBootstrap] === INITIALIZATION START ===");
+
+  InitializeCoreServices();
+
+  RegisterEffectPool();
+
+  hasInitialized = true;
+  Debug.Log("[GameBootstrap] === INITIALIZATION COMPLETE ===");
+ }
+
+ void InitializeCoreServices() {
   if (!GeneServices.IsInitialized) {
    GeneServices.Initialize();
+   Debug.Log("[GameBootstrap] Phase 1: GeneServices initialized (EventBus, Random)");
   }
+  else {
+   Debug.Log("[GameBootstrap] Phase 1: GeneServices already initialized");
+  }
+ }
+
+ void RegisterEffectPool() {
+  if (GeneEffectPool.Instance != null) {
+   GeneServices.Register<IGeneEffectPool>(GeneEffectPool.Instance);
+   Debug.Log("[GameBootstrap] Phase 2: GeneEffectPool registered");
+  }
+  else {
+   Debug.LogWarning("[GameBootstrap] Phase 2: GeneEffectPool not found - effects may not work");
+  }
+ }
+
+ stat void ResetStaticState() {
+  hasInitialized = false;
+  GeneServices.Reset();
  }
 }
 
@@ -4196,7 +4195,7 @@ pub class WaveManagerEditor : Editor {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Genes\Core\GeneLibraryLoader.cs
 
-﻿using UnityEngine;
+﻿// File: Assets/Scripts/Genes/Core/GeneLibraryLoader.cs
 using Abracodabra.Genes;
 using Abracodabra.Genes.Services;
 
@@ -4205,17 +4204,21 @@ pub class GeneLibraryLoader : MonoBehaviour {
  GeneLibrary geneLibraryAsset;
 
  void Awake() {
-
   if (geneLibraryAsset == null) {
-   Debug.LogError("CRITICAL: The GeneLibrary Asset is not assigned in the GeneLibraryLoader component! The gene system will not work.", this);
+   Debug.LogError("[GeneLibraryLoader] CRITICAL: GeneLibrary asset not assigned! Gene system will not work.", this);
    return;
+  }
+
+  if (!GeneServices.IsInitialized) {
+   Debug.LogWarning("[GeneLibraryLoader] GeneServices not initialized - initializing now. Check script execution order.");
+   GeneServices.Initialize();
   }
 
   geneLibraryAsset.SetActiveInstance();
 
   GeneServices.Register<IGeneLibrary>(geneLibraryAsset);
 
-  Debug.Log("GeneLibrary instance was successfully set, initialized, and registered by GeneLibraryLoader.");
+  Debug.Log($"[GeneLibraryLoader] GeneLibrary '{geneLibraryAsset.name}' registered successfully.");
  }
 }
 
@@ -5683,104 +5686,14 @@ pub class PrefabOrigin : MonoBehaviour {
 }
 
 ////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\InventoryBarItem.cs
+// FILE: Assets\Scripts\UI\_UGUI_Legacy\ITooltipDataProvider.cs
 
-﻿using UnityEngine;
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Runtime;
-using Abracodabra.Genes.Templates;
+﻿// File: Assets/Scripts/UI/ITooltipDataProvider.cs
 
-// Note: ItemInstance and ItemDefinition are assumed to be in the global namespace
-
-pub class InventoryBarItem {
- pub enum ItemType { Gene, Seed, Tool, Resource }
-
- pub ItemType Type { get; set; }
-
- pub RuntimeGeneInstance GeneInstance { get; set; }
- pub ToolDefinition ToolDefinition { get; set; }
- pub SeedTemplate SeedTemplate { get; set; }
- pub PlantGeneRuntimeState SeedRuntimeState { get; set; }
-
- pub ItemInstance ItemInstance { get; set; }
-
- pub stat InventoryBarItem FromGene(RuntimeGeneInstance instance) {
-  if (instance == null) return null;
-  return new InventoryBarItem {
-   Type = ItemType.Gene,
-   GeneInstance = instance
-  };
- }
-
- pub stat InventoryBarItem FromSeed(SeedTemplate seed) {
-  if (seed == null) return null;
-  return new InventoryBarItem {
-   Type = ItemType.Seed,
-   SeedTemplate = seed,
-   SeedRuntimeState = seed.CreateRuntimeState()
-  };
- }
-
- pub stat InventoryBarItem FromTool(ToolDefinition tool) {
-  if (tool == null) return null;
-  return new InventoryBarItem {
-   Type = ItemType.Tool,
-   ToolDefinition = tool
-  };
- }
-
- pub stat InventoryBarItem FromItem(ItemInstance instance) {
-  if (instance == null || instance.definition == null) return null;
-  return new InventoryBarItem {
-   Type = ItemType.Resource,
-   ItemInstance = instance
-  };
- }
-
- pub string GetDisplayName() {
-  switch (Type) {
-   case ItemType.Gene:
-    return GeneInstance?.GetGene()?.geneName ?? "Unknown Gene";
-   case ItemType.Seed:
-    return SeedTemplate?.templateName ?? "Unknown Seed";
-   case ItemType.Tool:
-    return ToolDefinition?.displayName ?? "Unknown Tool";
-   case ItemType.Resource: // NEW
-    return ItemInstance?.definition?.itemName ?? "Unknown Item";
-   default:
-    return "Invalid Item";
-  }
- }
-
- pub Sprite GetIcon() {
-  switch (Type) {
-   case ItemType.Gene:
-    return GeneInstance?.GetGene()?.icon;
-   case ItemType.Seed:
-    return SeedTemplate?.icon;
-   case ItemType.Tool:
-    return ToolDefinition?.icon;
-   case ItemType.Resource: // NEW
-    return ItemInstance?.definition?.icon;
-   default:
-    return null;
-  }
- }
-
- pub bool IsValid() {
-  switch (Type) {
-   case ItemType.Gene:
-    return GeneInstance?.GetGene() != null;
-   case ItemType.Seed:
-    return SeedTemplate != null && SeedRuntimeState != null;
-   case ItemType.Tool:
-    return ToolDefinition != null;
-   case ItemType.Resource: // NEW
-    return ItemInstance?.definition != null;
-   default:
-    return false;
-  }
- }
+pub interface ITooltipDataProvider {
+ string GetTooltipTitle();
+ string GetTooltipDescription();
+ string GetTooltipDetails(object source = null);
 }
 
 ////////////////////////////////////////////////////////////
@@ -5848,660 +5761,6 @@ pub class InventoryColorManager : MonoBehaviour {
   }
   return ItemUIType.Default;
  }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\InventoryGridController.cs
-
-﻿using UnityEngine;
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Runtime;
-using Abracodabra.Genes.Templates;
-using Abracodabra.UI.Genes;
-
-pub class InventoryGridController : MonoBehaviour {
- pub stat InventoryGridController Instance { get; set; }
-
- [Header("Grid Layout")]
- [SerializeField][Min(1)] int inventoryRows = 4;
- [SerializeField][Min(1)] int inventoryColumns = 4;
- [SerializeField] Vector2 cellSize = new Vector2(64f, 64f);
- [SerializeField] float cellMargin = 10f;
-
- [Header("Component References")]
- [SerializeField] GameObject itemSlotPrefab;
- [SerializeField] Transform cellContainer;
- [SerializeField] StartingInventory startingInventory;
-
- List<GeneSlotUI> inventorySlots = new List<GeneSlotUI>();
-
- pub event System.Action OnInventoryChanged;
-
- void Awake() {
-  if (Instance != null && Instance != this) {
-   Destroy(gameObject);
-   return;
-  }
-  Instance = this;
- }
-
- void OnDestroy() {
-  if (Instance == this) {
-   Instance = null;
-  }
- }
-
- void Start() {
-  if (cellContainer == null) Debug.LogError("InventoryGridController: Cell Container not assigned!", this);
-  if (itemSlotPrefab == null) Debug.LogError("InventoryGridController: Item Slot Prefab not assigned!", this);
-
-  if (startingInventory == null) {
-   Debug.LogError("InventoryGridController: Starting Inventory asset is not assigned! The player will have no items.", this);
-  }
-
-  CreateInventoryCells();
-  PopulateInitialInventory();
- }
-
- void CreateInventoryCells() {
-  if (itemSlotPrefab == null || cellContainer == null) return;
-
-  foreach (Transform child in cellContainer) {
-   Destroy(child.gameObject);
-  }
-  inventorySlots.Clear();
-
-  var gridLayout = cellContainer.GetComponent<GridLayoutGroup>();
-  if (gridLayout == null) {
-   gridLayout = cellContainer.gameObject.AddComponent<GridLayoutGroup>();
-  }
-  gridLayout.cellSize = cellSize;
-  gridLayout.spacing = new Vector2(cellMargin, cellMargin);
-  gridLayout.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-  gridLayout.constraintCount = inventoryColumns;
-
-  for (int i = 0; i < inventoryRows * inventoryColumns; i++) {
-   GameObject slotObj = Instantiate(itemSlotPrefab, cellContainer);
-   slotObj.name = $"ItemSlot_{i}";
-   GeneSlotUI slot = slotObj.GetComponent<GeneSlotUI>();
-   if (slot != null) {
-    slot.slotIndex = i;
-    inventorySlots.Add(slot);
-   }
-   else {
-    Debug.LogError($"[InventoryGridController] The 'itemSlotPrefab' is missing the required GeneSlotUI component!", itemSlotPrefab);
-    Destroy(slotObj);
-   }
-  }
- }
-
- void PopulateInitialInventory() {
-  if (startingInventory == null) return;
-
-  foreach (var tool in startingInventory.startingTools) {
-   if (tool != null) AddItemToInventory(InventoryBarItem.FromTool(tool));
-  }
-
-  foreach (var seed in startingInventory.startingSeeds) {
-   if (seed != null) AddItemToInventory(InventoryBarItem.FromSeed(seed));
-  }
-
-  foreach (var gene in startingInventory.startingGenes) {
-   if (gene != null) AddItemToInventory(InventoryBarItem.FromGene(new RuntimeGeneInstance(gene)));
-  }
- }
-
- pub bool AddItemToInventory(InventoryBarItem item) {
-  if (item == null || !item.IsValid()) return false;
-
-  GeneSlotUI emptySlot = inventorySlots.FirstOrDefault(slot => slot.CurrentItem == null);
-  if (emptySlot == null) {
-   Debug.LogWarning($"Inventory is full! Cannot add item: {item.GetDisplayName()}", this);
-   return false;
-  }
-
-  emptySlot.SetItem(item);
-  OnInventoryChanged?.Invoke();
-  return true;
- }
-
- pub void RemoveItemFromInventory(InventoryBarItem item) {
-  if (item == null) return;
-  GeneSlotUI slot = inventorySlots.FirstOrDefault(s => s.CurrentItem == item);
-  if (slot != null) {
-   slot.ClearSlot();
-   OnInventoryChanged?.Invoke();
-  }
- }
-
- pub List<InventoryBarItem> GetAllItems() {
-  return inventorySlots
-   .Where(s => s.CurrentItem != null && s.CurrentItem.IsValid())
-   .Select(s => s.CurrentItem)
-   .ToList();
- }
-
- pub List<InventoryBarItem> GetFirstNItems(int count) {
-  var items = new List<InventoryBarItem>();
-  for (int i = 0; i < count; i++) {
-   if (i < inventorySlots.Count) {
-    items.Add(inventorySlots[i].CurrentItem);
-   }
-   else {
-    items.Add(null);
-   }
-  }
-  return items;
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\TooltipTrigger.cs
-
-﻿// Reworked File: Assets/Scripts/UI/Tooltips/TooltipTrigger.cs
-using UnityEngine.EventSystems;
-using Abracodabra.UI.Genes; // For ItemView
-using Abracodabra.Genes.Core; // For GeneTooltipContext
-
-pub class TooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
- ItemView _itemView;
- bool _isShowingTooltip = false;
-
- void Awake() {
-  _itemView = GetComponent<ItemView>();
- }
-
- pub void OnPointerEnter(PointerEventData eventData) {
-  if (UniversalTooltipManager.Instance == null || _isShowingTooltip || _itemView == null) return;
-  ShowTooltip();
- }
-
- pub void OnPointerExit(PointerEventData eventData) {
-  if (UniversalTooltipManager.Instance == null || !_isShowingTooltip) return;
-  HideTooltip();
- }
-
- void ShowTooltip() {
-  ITooltipDataProvider provider = null;
-  GeneTooltipContext context = new GeneTooltipContext();
-
-  if (_itemView.GetGene() != null) {
-   provider = _itemView.GetGene();
-   context.instance = _itemView.GetRuntimeInstance();
-  }
-  else if (_itemView.GetToolDefinition() != null) {
-   provider = _itemView.GetToolDefinition();
-  }
-  else if (_itemView.GetSeedTemplate() != null) {
-  }
-
-  if (provider != null) {
-   UniversalTooltipManager.Instance.ShowTooltip(provider, transform, context);
-   _isShowingTooltip = true;
-  }
- }
-
- void HideTooltip() {
-  UniversalTooltipManager.Instance?.HideTooltip();
-  _isShowingTooltip = false;
- }
-
- void OnDisable() {
-  if (_isShowingTooltip) {
-   HideTooltip();
-  }
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\UIManager.cs
-
-﻿using UnityEngine;
-using TMPro;
-using WegoSystem;
-using Abracodabra.UI.Genes;
-
-pub class UIManager : MonoBehaviour {
- pub stat UIManager Instance { get; set; }
-
- [Header("Panels")]
- [SerializeField] GameObject uiCanvasRoot;
- [SerializeField] GameObject planningPanel;
- [SerializeField] GameObject growthAndThreatPanel;
- [SerializeField] GameObject geneSequenceUIPanel;
- [SerializeField] GameObject gameOverPanel; // NEW: Assign your Game Over UI panel here
-
- [Header("Buttons")]
- [SerializeField] Button startGrowthPhaseButton;
- [SerializeField] Button startNewPlanningPhaseButton;
- [SerializeField] Button endPlanningPhaseButton;
- [SerializeField] Button advanceTickButton;
- [SerializeField] Button restartButton; // NEW: Assign your Restart button from the GameOver panel
-
- [Header("Text Displays")]
- [SerializeField] TextMeshProUGUI tickCounterText;
-
- RunManager runManager;
- TickManager tickManager;
-
- void Awake() {
-  if (Instance != null && Instance != this) {
-   Destroy(gameObject);
-   return;
-  }
-  Instance = this;
-
-  if (uiCanvasRoot != null) {
-   uiCanvasRoot.SetActive(true);
-   Debug.Log($"[UIManager] Activated main UI canvas '{uiCanvasRoot.name}'.");
-  }
-  else {
-   Debug.LogWarning("[UIManager] UI Canvas Root is not assigned. UI may not appear.", this);
-  }
- }
-
- void OnDestroy() {
-  if (runManager != null) {
-   runManager.OnRunStateChanged -= HandleRunStateChanged;
-   runManager.OnPhaseChanged -= HandlePhaseChanged;
-   runManager.OnRoundChanged -= HandleRoundChanged;
-  }
-
-  if (tickManager != null) {
-   tickManager.OnTickAdvanced -= HandleTickAdvanced;
-  }
- }
-
- void Update() {
-  if (Input.GetKeyDown(KeyCode.Space)) {
-   if (runManager?.CurrentPhase == GamePhase.Planning) {
-    OnEndPlanningPhaseClicked();
-   }
-  }
-  if (Input.GetKeyDown(KeyCode.R) && (Application.isEditor || Debug.isDebugBuild)) {
-   runManager?.ForcePhase(GamePhase.Planning);
-  }
- }
-
- pub void Initialize() {
-  runManager = RunManager.Instance;
-  tickManager = TickManager.Instance;
-
-  if (runManager == null) {
-   Debug.LogError("[UIManager] RunManager.Instance not found! UI will not fn correctly.");
-   return;
-  }
-
-  runManager.OnRunStateChanged += HandleRunStateChanged;
-  runManager.OnPhaseChanged += HandlePhaseChanged;
-  runManager.OnRoundChanged += HandleRoundChanged;
-
-  if (tickManager != null) {
-   tickManager.OnTickAdvanced += HandleTickAdvanced;
-  }
-
-  SetupButtons();
-
-  if (gameOverPanel != null) gameOverPanel.SetActive(false);
-  HandleRunStateChanged(runManager.CurrentState);
-  UpdateTickDisplay();
- }
-
- void SetupButtons() {
-  startGrowthPhaseButton?.onClick.AddListener(OnStartGrowthPhaseClicked);
-  startNewPlanningPhaseButton?.onClick.AddListener(OnStartNewPlanningPhaseClicked);
-  endPlanningPhaseButton?.onClick.AddListener(OnEndPlanningPhaseClicked);
-  advanceTickButton?.onClick.AddListener(OnAdvanceTickClicked);
-  restartButton?.onClick.AddListener(OnRestartClicked); // NEW
- }
-
- void HandleRunStateChanged(RunState newState) {
-  if (planningPanel != null) planningPanel.SetActive(false);
-  if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(false);
-  if (gameOverPanel != null) gameOverPanel.SetActive(false);
-  if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(false);
-  if (InventoryGridController.Instance != null) InventoryGridController.Instance.gameObject.SetActive(false);
-  InventoryBarController.Instance?.HideBar();
-
-  switch (newState) {
-   case RunState.Planning:
-    if (planningPanel != null) planningPanel.SetActive(true);
-    if (geneSequenceUIPanel != null) geneSequenceUIPanel.SetActive(true);
-    if (InventoryGridController.Instance != null) InventoryGridController.Instance.gameObject.SetActive(true);
-    break;
-
-   case RunState.GrowthAndThreat:
-    if (growthAndThreatPanel != null) growthAndThreatPanel.SetActive(true);
-    if (geneSequenceUIPanel != null) {
-     geneSequenceUIPanel.GetComponent<GeneSequenceUI>()?.CleanupOnPhaseEnd();
-    }
-    StartCoroutine(ShowInventoryBarDelayed());
-    break;
-
-   case RunState.GameOver:
-    if (gameOverPanel != null) gameOverPanel.SetActive(true);
-    break;
-  }
-
-  UpdateButtonStates(newState);
- }
-
- void HandlePhaseChanged(GamePhase oldPhase, GamePhase newPhase) {
-  UpdateButtonStates(runManager.CurrentState);
- }
-
- void HandleRoundChanged(int newRound) {
- }
-
- void HandleTickAdvanced(int currentTick) {
-  UpdateTickDisplay();
- }
-
- void UpdateTickDisplay() {
-  if (tickCounterText != null && tickManager != null) {
-   tickCounterText.text = $"Tick: {tickManager.CurrentTick}";
-  }
- }
-
- void UpdateButtonStates(RunState state) {
-  bool isPlanning = (state == RunState.Planning);
-  bool isPlanningPhase = (runManager?.CurrentPhase == GamePhase.Planning);
-
-  if (startGrowthPhaseButton != null) startGrowthPhaseButton.interactable = isPlanning && isPlanningPhase;
-  if (startNewPlanningPhaseButton != null) startNewPlanningPhaseButton.interactable = !isPlanning;
-  if (endPlanningPhaseButton != null) endPlanningPhaseButton.interactable = isPlanning && isPlanningPhase;
-  if (advanceTickButton != null) advanceTickButton.interactable = !isPlanningPhase;
- }
-
- void OnStartGrowthPhaseClicked() { runManager?.StartGrowthAndThreatPhase(); }
- void OnStartNewPlanningPhaseClicked() { runManager?.StartNewPlanningPhase(); }
- void OnEndPlanningPhaseClicked() { runManager?.EndPlanningPhase(); }
- void OnAdvanceTickClicked() { tickManager?.DebugAdvanceTick(); }
- void OnRestartClicked() { runManager?.RestartGame(); } // NEW
-
- IEnumerator ShowInventoryBarDelayed() {
-  yield return null; // Wait one frame for layout to build
-  InventoryBarController.Instance?.ShowBar();
- }
-
- pub void ShowNotification(string message, float duration = 3f) {
-  StartCoroutine(ShowNotificationCoroutine(message, duration));
- }
-
- IEnumerator ShowNotificationCoroutine(string message, float duration) {
-  GameObject notification = new GameObject("Notification");
-  notification.transform.SetParent(transform, false);
-
-  var canvasGroup = notification.AddComponent<CanvasGroup>();
-  var rectTransform = notification.AddComponent<RectTransform>();
-  var image = notification.AddComponent<Image>();
-  var text = new GameObject("Text").AddComponent<TextMeshProUGUI>();
-  text.transform.SetParent(notification.transform, false);
-
-  rectTransform.anchorMin = new Vector2(0.5f, 0.8f);
-  rectTransform.anchorMax = new Vector2(0.5f, 0.8f);
-  rectTransform.sizeDelta = new Vector2(300, 60);
-
-  image.color = new Color(0, 0, 0, 0.8f);
-  text.text = message;
-  text.color = Color.white;
-  text.alignment = TextAlignmentOptions.Center;
-  text.fontSize = 16;
-  text.rectTransform.sizeDelta = rectTransform.sizeDelta;
-
-  float elapsedTime = 0f;
-  while (elapsedTime < 0.5f) {
-   canvasGroup.alpha = elapsedTime / 0.5f;
-   elapsedTime += Time.deltaTime;
-   yield return null;
-  }
-  canvasGroup.alpha = 1f;
-
-  yield return new WaitForSeconds(duration - 1f);
-
-  elapsedTime = 0f;
-  while (elapsedTime < 0.5f) {
-   canvasGroup.alpha = 1f - (elapsedTime / 0.5f);
-   elapsedTime += Time.deltaTime;
-   yield return null;
-  }
-
-  Destroy(notification);
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\UniversalTooltipManager.cs
-
-﻿using UnityEngine;
-using TMPro;
-
-pub interface ITooltipDataProvider {
- string GetTooltipTitle();
- string GetTooltipDescription();
- string GetTooltipDetails(object source = null);
-}
-
-pub class UniversalTooltipManager : MonoBehaviour {
- pub stat UniversalTooltipManager Instance { get; set; }
-
- [Header("UI References")]
- [SerializeField] GameObject tooltipPanel;
- [SerializeField] TextMeshProUGUI titleText;
- [SerializeField] TextMeshProUGUI descriptionText;
- [SerializeField] TextMeshProUGUI detailsText;
- [SerializeField] Image backgroundImage;
- [SerializeField] CanvasGroup canvasGroup;
- [SerializeField] VerticalLayoutGroup layoutGroup;
-
- [Header("Behavior")]
- [SerializeField] float fadeDuration = 0.15f;
- [SerializeField] bool moveTooltipWithMouse = true;
- [SerializeField] Vector2 mouseFollowOffset = new Vector2(15f, -15f);
-
- [Header("Styling")]
- [SerializeField] Color backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
- [SerializeField] Color titleColor = Color.white;
- [SerializeField] Color descriptionColor = new Color(0.8f, 0.8f, 0.8f, 1f);
- [SerializeField] Color detailsColor = new Color(0.7f, 0.7f, 0.7f, 1f);
- [SerializeField] int titleFontSize = 18;
- [SerializeField] int descriptionFontSize = 14;
- [SerializeField] int detailsFontSize = 12;
-
- Coroutine _fadeCoroutine;
- object _currentTarget;
- bool _isVisible = false;
-
- void Awake() {
-  if (Instance != null && Instance != this) {
-   Destroy(gameObject);
-   return;
-  }
-  Instance = this;
-
-  if (!ValidateReferences()) {
-   enabled = false;
-   return;
-  }
-
-  SetupTooltipPanel();
-  if (tooltipPanel != null) tooltipPanel.SetActive(false);
-  if (canvasGroup != null) canvasGroup.alpha = 0f;
-  _isVisible = false;
- }
-
- void Update() {
-  if (_isVisible && IsTargetNullOrDestroyed(_currentTarget)) {
-   HideTooltip();
-  }
- }
-
- pub void ShowTooltip(ITooltipDataProvider provider, Transform anchor = null, object source = null) {
-  if (provider == null) return;
-
-  if (_isVisible && ReferenceEquals(_currentTarget, provider)) return;
-
-  _currentTarget = provider;
-
-  string title = provider.GetTooltipTitle();
-  string description = provider.GetTooltipDescription();
-  string details = provider.GetTooltipDetails(source);
-
-  ShowTooltipInternal(title, description, details, anchor);
- }
-
- pub void HideTooltip() {
-  _currentTarget = null;
-  if (tooltipPanel == null || canvasGroup == null) return;
-
-  if (_fadeCoroutine != null) {
-   StopCoroutine(_fadeCoroutine);
-  }
-
-  if (fadeDuration > 0f && gameObject.activeInHierarchy) {
-   _fadeCoroutine = StartCoroutine(FadeTooltip(false));
-  }
-  else {
-   canvasGroup.alpha = 0f;
-   if (tooltipPanel != null) tooltipPanel.SetActive(false);
-   _isVisible = false;
-  }
- }
-
- void ShowTooltipInternal(string title, string description, string details, Transform itemAnchor) {
-  if (tooltipPanel == null || canvasGroup == null) return;
-
-  if (_fadeCoroutine != null) {
-   StopCoroutine(_fadeCoroutine);
-  }
-
-  if (titleText != null) {
-   titleText.text = title;
-   titleText.gameObject.SetActive(!string.IsNullOrEmpty(title));
-  }
-  if (descriptionText != null) {
-   descriptionText.text = description;
-   descriptionText.gameObject.SetActive(!string.IsNullOrEmpty(description));
-  }
-  if (detailsText != null) {
-   detailsText.text = details;
-   detailsText.gameObject.SetActive(!string.IsNullOrEmpty(details));
-  }
-
-  tooltipPanel.SetActive(true);
-  if (layoutGroup != null) {
-   LayoutRebuilder.ForceRebuildLayoutImmediate(layoutGroup.GetComponent<RectTransform>());
-  }
-
-  if (moveTooltipWithMouse) {
-   PositionTooltipWithMouse();
-  }
-
-  if (fadeDuration > 0f) {
-   _fadeCoroutine = StartCoroutine(FadeTooltip(true));
-  }
-  else {
-   canvasGroup.alpha = 1f;
-   _isVisible = true;
-  }
- }
-
- void PositionTooltipWithMouse() {
-  var tooltipRect = tooltipPanel.GetComponent<RectTransform>();
-  var rootCanvas = tooltipPanel.GetComponentInParent<Canvas>()?.rootCanvas;
-
-  if (tooltipRect == null || rootCanvas == null || !Input.mousePresent) return;
-
-  Vector2 targetScreenPos = Input.mousePosition;
-  targetScreenPos += mouseFollowOffset; // Apply user offset
-
-  var panelRect = tooltipRect.rect;
-  targetScreenPos.x = Mathf.Clamp(targetScreenPos.x, 0, Screen.width - panelRect.width);
-  targetScreenPos.y = Mathf.Clamp(targetScreenPos.y, 0, Screen.height - panelRect.height);
-
-  var parentRect = tooltipRect.parent as RectTransform;
-  if (parentRect == null) return;
-
-  Camera renderCamera = (rootCanvas.renderMode == RenderMode.ScreenSpaceOverlay) ? null : rootCanvas.worldCamera;
-  if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parentRect, targetScreenPos, renderCamera, out var localPos)) {
-   tooltipRect.localPosition = localPos;
-  }
- }
-
- IEnumerator FadeTooltip(bool fadeIn) {
-  if (canvasGroup == null) yield break;
-
-  float elapsed = 0f;
-  float startAlpha = canvasGroup.alpha;
-  float targetAlpha = fadeIn ? 1f : 0f;
-
-  if (fadeIn) _isVisible = true;
-
-  if (fadeIn && tooltipPanel != null && !tooltipPanel.activeSelf)
-   tooltipPanel.SetActive(true);
-
-  while (elapsed < fadeDuration) {
-   elapsed += Time.unscaledDeltaTime;
-   float t = (fadeDuration > 0) ? elapsed / fadeDuration : 1f;
-   canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
-   yield return null;
-  }
-
-  canvasGroup.alpha = targetAlpha;
-
-  if (!fadeIn) {
-   if (tooltipPanel != null) tooltipPanel.SetActive(false);
-   _isVisible = false;
-  }
- }
-
- bool IsTargetNullOrDestroyed(object target) {
-  if (target is UnityEngine.Object unityObject) {
-   return unityObject == null;
-  }
-  return System.Object.ReferenceEquals(target, null);
- }
-
- void SetupTooltipPanel() {
-  if (canvasGroup != null) {
-   canvasGroup.alpha = 0f;
-   canvasGroup.interactable = false;
-   canvasGroup.blocksRaycasts = false;
-  }
-  if (backgroundImage != null) backgroundImage.color = backgroundColor;
-  ApplyTextStyles();
- }
-
- void ApplyTextStyles() {
-  if (titleText != null) { titleText.color = titleColor; titleText.fontSize = titleFontSize; titleText.fontStyle = FontStyles.Bold; }
-  if (descriptionText != null) { descriptionText.color = descriptionColor; descriptionText.fontSize = descriptionFontSize; }
-  if (detailsText != null) { detailsText.color = detailsColor; detailsText.fontSize = detailsFontSize; }
- }
-
- bool ValidateReferences() {
-  if (tooltipPanel == null) { Debug.LogError("[UniversalTooltipManager] Tooltip Panel not assigned!"); return false; }
-
-  if (canvasGroup == null) canvasGroup = tooltipPanel.GetComponent<CanvasGroup>() ?? tooltipPanel.AddComponent<CanvasGroup>();
-  if (layoutGroup == null) layoutGroup = tooltipPanel.GetComponent<VerticalLayoutGroup>();
-  if (backgroundImage == null) backgroundImage = tooltipPanel.GetComponent<Image>();
-  if (titleText == null) titleText = FindTextComponent("Title");
-  if (descriptionText == null) descriptionText = FindTextComponent("Description");
-  if (detailsText == null) detailsText = FindTextComponent("Details");
-
-  if (titleText == null) { Debug.LogError("[UniversalTooltipManager] Missing required title text component!"); return false; }
-
-  return true;
- }
-
- TextMeshProUGUI FindTextComponent(string nameContains) {
-  if (tooltipPanel == null) return null;
-  foreach (var text in tooltipPanel.GetComponentsInChildren<TextMeshProUGUI>(true)) {
-   if (text.name.ToLower().Contains(nameContains.ToLower()))
-    return text;
-  }
-  return null;
- }
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -7369,6 +6628,7 @@ using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Components;
 using Abracodabra.UI.Genes;
 using WegoSystem;
+using Abracodabra.UI.Toolkit;
 
 pub seal class PlayerTileInteractor : MonoBehaviour {
  [Header("References")]
@@ -7477,18 +6737,18 @@ pub seal class PlayerTileInteractor : MonoBehaviour {
  }
 
  void TryEatFromInventory() {
-  InventoryBarItem selected = HotbarSelectionService.SelectedItem;
+  UIInventoryItem selected = HotbarSelectionService.SelectedItem;
   if (selected == null || !selected.IsValid()) {
    if (showDebug) Debug.Log("[PlayerTileInteractor] Right-click: No valid item selected");
    return;
   }
 
-  if (selected.Type != InventoryBarItem.ItemType.Resource) {
+  if (selected.Type != UIInventoryItem.ItemType.Resource) {
    if (showDebug) Debug.Log("[PlayerTileInteractor] Right-click: Selected item is not a resource");
    return;
   }
 
-  ItemInstance itemToConsume = selected.ItemInstance;
+  ItemInstance itemToConsume = selected.ResourceInstance;
   if (itemToConsume == null || !itemToConsume.definition.isConsumable) {
    if (showDebug) Debug.Log("[PlayerTileInteractor] Right-click: Item is not consumable");
    return;
@@ -7525,7 +6785,7 @@ pub seal class PlayerTileInteractor : MonoBehaviour {
    return;
   }
 
-  InventoryBarItem selected = HotbarSelectionService.SelectedItem;
+  UIInventoryItem selected = HotbarSelectionService.SelectedItem;
   if (selected == null || !selected.IsValid()) {
    if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: No valid item selected.");
    return;
@@ -7546,17 +6806,17 @@ pub seal class PlayerTileInteractor : MonoBehaviour {
   if (showDebug) Debug.Log($"[PlayerTileInteractor] Action '{selected.Type}' with '{selected.GetDisplayName()}' at {cellPos}");
 
   switch (selected.Type) {
-   case InventoryBarItem.ItemType.Tool:
+   case UIInventoryItem.ItemType.Tool:
     HandleToolUse(selected, cellPos);
     break;
 
-   case InventoryBarItem.ItemType.Seed:
+   case UIInventoryItem.ItemType.Seed:
     HandleSeedPlanting(selected, cellPos);
     break;
   }
  }
 
- void HandleToolUse(InventoryBarItem selected, Vector3Int cellPos) {
+ void HandleToolUse(UIInventoryItem selected, Vector3Int cellPos) {
   var toolDef = selected.ToolDefinition;
   if (toolDef == null) return;
 
@@ -7578,12 +6838,11 @@ pub seal class PlayerTileInteractor : MonoBehaviour {
   }
  }
 
- void HandleSeedPlanting(InventoryBarItem selected, Vector3Int cellPos) {
+ void HandleSeedPlanting(UIInventoryItem selected, Vector3Int cellPos) {
   int selectedIndex = HotbarSelectionService.SelectedIndex;
 
   System.Action onSuccess = () => {
    if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
-
    InventoryService.RemoveItemAtIndex(selectedIndex);
   };
 
@@ -7762,7 +7021,7 @@ pub class PlayerActionManager : MonoBehaviour {
 
    case PlayerActionType.PlantSeed:
     tickCost = 2; // Planting takes longer
-    var seedItem = actionData as InventoryBarItem;
+    var seedItem = actionData as UIInventoryItem;
     success = ExecutePlantSeed(gridPosition, seedItem);
     break;
 
@@ -7793,10 +7052,10 @@ pub class PlayerActionManager : MonoBehaviour {
   return true;
  }
 
- bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem) {
+ bool ExecutePlantSeed(Vector3Int gridPosition, UIInventoryItem seedItem) {
   if (debugMode) Debug.Log($"[ExecutePlantSeed] Attempting to plant {seedItem?.GetDisplayName()} at {gridPosition}");
 
-  if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed) {
+  if (seedItem == null || seedItem.Type != UIInventoryItem.ItemType.Seed) {
    Debug.LogError("[ExecutePlantSeed] Action failed: Provided item was not a valid seed.");
    return false;
   }
@@ -7841,19 +7100,7 @@ bool result = PlantPlacementManager.Instance?.TryPlantSeedFromInventory( seedIte
    }
   }
   else {
-   Debug.LogWarning("[PlayerActionManager] InventoryService not initialized, trying legacy InventoryGridController");
-
-   if (InventoryGridController.Instance != null) {
-    foreach (var harvestedItem in harvestedItems) {
-     var inventoryItem = InventoryBarItem.FromItem(harvestedItem.Item);
-     if (InventoryGridController.Instance.AddItemToInventory(inventoryItem)) {
-      itemsAdded++;
-     }
-    }
-   }
-   else {
-    Debug.LogError("[PlayerActionManager] Neither InventoryService nor InventoryGridController available!");
-   }
+   Debug.LogError("[PlayerActionManager] InventoryService not initialized! Cannot add harvested items.");
   }
 
   if (debugMode) Debug.Log($"[PlayerActionManager] Successfully added {itemsAdded}/{harvestedItems.Count} harvested items to inventory.");
@@ -10391,83 +9638,56 @@ using Abracodabra.UI.Toolkit;
 
 namespace Abracodabra.UI.Genes {
  pub stat class HotbarSelectionService {
-  stat InventoryBarItem _selectedItem;
+  stat UIInventoryItem _selectedItem;
   stat int _selectedIndex = 0;
 
-  pub stat InventoryBarItem SelectedItem => _selectedItem;
-
+  pub stat UIInventoryItem SelectedItem => _selectedItem;
   pub stat int SelectedIndex => _selectedIndex;
 
-  pub stat event Action<InventoryBarItem> OnSelectionChanged;
+  pub stat event Action<UIInventoryItem> OnSelectionChanged;
 
   pub stat void SelectItem(int index, UIInventoryItem uiItem) {
    _selectedIndex = index;
+   _selectedItem = uiItem;
 
-   if (uiItem == null) {
-    _selectedItem = null;
-    Debug.Log($"[HotbarSelectionService] Selected slot {index + 1}: Empty");
-    OnSelectionChanged?.Invoke(null);
-    return;
-   }
-
-   if (uiItem.OriginalData is SeedTemplate seed) {
-    _selectedItem = InventoryBarItem.FromSeed(seed);
-    if (_selectedItem != null && uiItem.SeedRuntimeState != null) {
-     _selectedItem.SeedRuntimeState = uiItem.SeedRuntimeState;
-    }
-   }
-   else if (uiItem.OriginalData is ToolDefinition tool) {
-    _selectedItem = InventoryBarItem.FromTool(tool);
-   }
-   else if (uiItem.OriginalData is GeneBase gene) {
-    var runtimeInstance = new RuntimeGeneInstance(gene);
-    _selectedItem = InventoryBarItem.FromGene(runtimeInstance);
-   }
-   else if (uiItem.ResourceInstance != null) {
-    _selectedItem = InventoryBarItem.FromItem(uiItem.ResourceInstance);
-   }
-   else if (uiItem.OriginalData is ItemDefinition itemDef) {
-    var itemInstance = new ItemInstance(itemDef);
-    itemInstance.stackCount = uiItem.StackSize;
-    _selectedItem = InventoryBarItem.FromItem(itemInstance);
-   }
-   else {
-    _selectedItem = null;
-   }
-
-   string itemName = _selectedItem?.GetDisplayName() ?? "Unknown";
+   string itemName = _selectedItem?.GetDisplayName() ?? "Empty";
    Debug.Log($"[HotbarSelectionService] Selected slot {index + 1}: {itemName}");
+
    OnSelectionChanged?.Invoke(_selectedItem);
   }
 
   pub stat void SelectSeed(int index, SeedTemplate seedTemplate, PlantGeneRuntimeState runtimeState = null) {
    _selectedIndex = index;
-   _selectedItem = InventoryBarItem.FromSeed(seedTemplate);
+   _selectedItem = UIInventoryItem.FromSeed(seedTemplate);
+
    if (runtimeState != null && _selectedItem != null) {
     _selectedItem.SeedRuntimeState = runtimeState;
    }
+
    LogSelection(index);
    OnSelectionChanged?.Invoke(_selectedItem);
   }
 
   pub stat void SelectTool(int index, ToolDefinition toolDef) {
    _selectedIndex = index;
-   _selectedItem = InventoryBarItem.FromTool(toolDef);
+   _selectedItem = UIInventoryItem.FromTool(toolDef);
+
    LogSelection(index);
    OnSelectionChanged?.Invoke(_selectedItem);
   }
 
   pub stat void SelectGene(int index, GeneBase gene) {
    _selectedIndex = index;
-   var runtimeInstance = new RuntimeGeneInstance(gene);
-   _selectedItem = InventoryBarItem.FromGene(runtimeInstance);
+   _selectedItem = UIInventoryItem.FromGene(gene);
+
    LogSelection(index);
    OnSelectionChanged?.Invoke(_selectedItem);
   }
 
   pub stat void SelectResource(int index, ItemInstance itemInstance) {
    _selectedIndex = index;
-   _selectedItem = InventoryBarItem.FromItem(itemInstance);
+   _selectedItem = UIInventoryItem.FromItem(itemInstance);
+
    LogSelection(index);
    OnSelectionChanged?.Invoke(_selectedItem);
   }
@@ -10475,6 +9695,7 @@ namespace Abracodabra.UI.Genes {
   pub stat void SelectEmpty(int index) {
    _selectedIndex = index;
    _selectedItem = null;
+
    Debug.Log($"[HotbarSelectionService] Selected slot {index + 1}: Empty");
    OnSelectionChanged?.Invoke(null);
   }
@@ -10622,876 +9843,12 @@ namespace Abracodabra.UI.Genes {
    return index >= 0 && index < _inventoryColumns;
   }
 
-  pub stat UIInventoryItem ConvertFromLegacy(InventoryBarItem legacyItem) {
-   if (legacyItem == null) return null;
-
-   switch (legacyItem.Type) {
-    case InventoryBarItem.ItemType.Seed:
-     var seedItem = new UIInventoryItem(legacyItem.SeedTemplate);
-     if (legacyItem.SeedRuntimeState != null) {
-      seedItem.SeedRuntimeState = legacyItem.SeedRuntimeState;
-     }
-     return seedItem;
-
-    case InventoryBarItem.ItemType.Tool:
-     return new UIInventoryItem(legacyItem.ToolDefinition);
-
-    case InventoryBarItem.ItemType.Gene:
-     var gene = legacyItem.GeneInstance?.GetGene();
-     if (gene != null)
-      return new UIInventoryItem(gene);
-     return null;
-
-    case InventoryBarItem.ItemType.Resource:
-     if (legacyItem.ItemInstance != null)
-      return new UIInventoryItem(legacyItem.ItemInstance);
-     return null;
-
-    default:
-     return null;
-   }
-  }
-
   pub stat bool AddHarvestedItem(ItemInstance itemInstance) {
    if (itemInstance == null || itemInstance.definition == null)
     return false;
 
    var uiItem = new UIInventoryItem(itemInstance);
    return AddItem(uiItem) >= 0;
-  }
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\GeneSequenceUI.cs
-
-﻿using System.Collections.Generic;
-using Abracodabra.Genes.Runtime;
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes;
-using Abracodabra.UI.Tooltips; // NEW
-
-namespace Abracodabra.UI.Genes {
- pub class GeneSequenceUI : MonoBehaviour {
-  pub Transform passiveGenesContainer;
-  pub Transform activeSequenceContainer;
-  [SerializeField] GeneSlotUI seedEditSlot;
-
-  pub GameObject sequenceRowPrefab;
-  pub GameObject passiveSlotPrefab;
-
-  pub TMPro.TextMeshProUGUI energyCostText;
-  pub TMPro.TextMeshProUGUI currentEnergyText;
-  pub TMPro.TextMeshProUGUI rechargeTimeText;
-  pub TMPro.TextMeshProUGUI validationMessage;
-  pub Slider rechargeProgress;
-
-  pub int maxPassiveSlots = 6;
-  pub int maxSequenceLength = 5;
-
-  PlantGeneRuntimeState runtimeState;
-  List<GeneSlotUI> passiveSlots = new List<GeneSlotUI>();
-  List<SequenceRowUI> sequenceRows = new List<SequenceRowUI>();
-  PlantSequenceExecutor executor;
-
-  void Start() {
-   ClearEditor();
-  }
-
-  pub void LoadSeedForEditing(InventoryBarItem seedItem) {
-   if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed) {
-    ClearEditor();
-    return;
-   }
-
-   this.runtimeState = seedItem.SeedRuntimeState;
-   if (seedEditSlot != null) {
-    seedEditSlot.SetItem(seedItem);
-   }
-
-   GenerateSlotsFromState();
-   SetEditorLocked(false);
-   RefreshAllVisuals();
-  }
-
-  void ClearEditor() {
-   this.runtimeState = null;
-   if (seedEditSlot != null) {
-    seedEditSlot.ClearSlot();
-   }
-
-   foreach (var slot in passiveSlots) if (slot != null) Destroy(slot.gameObject);
-   foreach (var row in sequenceRows) if (row != null) Destroy(row.gameObject);
-   passiveSlots.Clear();
-   sequenceRows.Clear();
-
-   SetEditorLocked(true);
-   RefreshAllVisuals();
-  }
-
-  pub void CleanupOnPhaseEnd() {
-   if (seedEditSlot != null && seedEditSlot.CurrentItem != null) {
-    var itemToReturn = seedEditSlot.CurrentItem;
-    if (InventoryGridController.Instance != null) {
-     bool success = InventoryGridController.Instance.AddItemToInventory(itemToReturn);
-     if (!success) {
-      Debug.LogWarning($"Could not return seed '{itemToReturn.GetDisplayName()}' to inventory on phase end, inventory may be full.");
-     }
-    }
-   }
-   ClearEditor();
-  }
-
-  void GenerateSlotsFromState() {
-   foreach (var slot in passiveSlots) if (slot != null) Destroy(slot.gameObject);
-   foreach (var row in sequenceRows) if (row != null) Destroy(row.gameObject);
-   passiveSlots.Clear();
-   sequenceRows.Clear();
-
-   if (runtimeState == null) return;
-
-   for (int i = 0; i < runtimeState.template.passiveSlotCount; i++) {
-    GameObject slotObj = Instantiate(passiveSlotPrefab, passiveGenesContainer);
-    slotObj.SetActive(true);
-    GeneSlotUI slot = slotObj.GetComponent<GeneSlotUI>();
-    slot.acceptedCategory = GeneCategory.Passive;
-    slot.slotIndex = i;
-    passiveSlots.Add(slot);
-   }
-
-   for (int i = 0; i < runtimeState.template.activeSequenceLength; i++) {
-    GameObject rowObj = Instantiate(sequenceRowPrefab, activeSequenceContainer);
-    rowObj.SetActive(true);
-    SequenceRowUI row = rowObj.GetComponent<SequenceRowUI>();
-    row.Initialize(i, this);
-    sequenceRows.Add(row);
-   }
-  }
-
-  void SetEditorLocked(bool isLocked) {
-   foreach (var slot in passiveSlots) slot.isLocked = isLocked;
-   foreach (var row in sequenceRows) {
-    if (row.activeSlot != null) row.activeSlot.isLocked = isLocked;
-   }
-  }
-
-  pub void UpdateDataForSlot(int slotIndex, GeneCategory slotCategory, InventoryBarItem newItem) {
-   if (runtimeState == null) return;
-   var newInstance = newItem?.GeneInstance;
-
-   if (slotCategory == GeneCategory.Passive) {
-    if (slotIndex < 0) return;
-    while (runtimeState.passiveInstances.Count <= slotIndex) runtimeState.passiveInstances.Add(null);
-    runtimeState.passiveInstances[slotIndex] = newInstance;
-   }
-   else {
-    if (slotIndex < 0 || slotIndex >= runtimeState.activeSequence.Count) return;
-    RuntimeSequenceSlot sequenceSlot = runtimeState.activeSequence[slotIndex];
-
-    switch (slotCategory) {
-     case GeneCategory.Active:
-      sequenceSlot.activeInstance = newInstance;
-      break;
-     case GeneCategory.Modifier:
-      if (sequenceSlot.modifierInstances.Count == 0) sequenceSlot.modifierInstances.Add(newInstance);
-      else sequenceSlot.modifierInstances[0] = newInstance;
-      break;
-     case GeneCategory.Payload:
-      if (sequenceSlot.payloadInstances.Count == 0) sequenceSlot.payloadInstances.Add(newInstance);
-      else sequenceSlot.payloadInstances[0] = newInstance;
-      break;
-    }
-   }
-   RefreshAllVisuals();
-  }
-
-  pub ActiveGene GetActiveGeneForRow(int rowIndex) {
-   if (runtimeState != null && rowIndex >= 0 && rowIndex < runtimeState.activeSequence.Count) {
-    return runtimeState.activeSequence[rowIndex]?.activeInstance?.GetGene<ActiveGene>();
-   }
-   return null;
-  }
-
-  void RefreshAllVisuals() {
-   if (runtimeState == null) {
-    UpdateDisplay();
-    if (SeedEditorTooltipPanel.Instance != null) {
-     SeedEditorTooltipPanel.Instance.LoadSeedForAnalysis(null);
-    }
-    return;
-   }
-
-   for (int i = 0; i < passiveSlots.Count; i++) {
-    if (i < runtimeState.passiveInstances.Count) {
-     var instance = runtimeState.passiveInstances[i];
-     passiveSlots[i].SetItem(instance != null && instance.GetGene() != null ? InventoryBarItem.FromGene(instance) : null);
-    }
-    else {
-     passiveSlots[i].ClearSlot();
-    }
-   }
-
-   for (int i = 0; i < sequenceRows.Count; i++) {
-    if (i < runtimeState.activeSequence.Count) {
-     sequenceRows[i].LoadSlot(runtimeState.activeSequence[i]);
-    }
-    else {
-     sequenceRows[i].ClearRow();
-    }
-   }
-   UpdateDisplay();
-
-   if (SeedEditorTooltipPanel.Instance != null) {
-    SeedEditorTooltipPanel.Instance.LoadSeedForAnalysis(runtimeState);
-   }
-  }
-
-  void UpdateDisplay() {
-   if (runtimeState == null) {
-    if (energyCostText != null) energyCostText.text = "Cost: --";
-    if (currentEnergyText != null) currentEnergyText.text = "Energy: --/--";
-    if (rechargeTimeText != null) rechargeTimeText.text = "Recharge: --";
-    if (validationMessage != null) {
-     validationMessage.gameObject.SetActive(true);
-     validationMessage.text = "Drop a seed into the slot above to begin editing.";
-    }
-    return;
-   }
-
-   float totalCost = runtimeState.CalculateTotalEnergyCost();
-   if (energyCostText != null) energyCostText.text = $"Cost: {totalCost:F0} E/cycle";
-   if (rechargeTimeText != null) rechargeTimeText.text = $"Recharge: {runtimeState.template.baseRechargeTime} ticks";
-   if (currentEnergyText != null) currentEnergyText.text = $"Energy: --/{runtimeState.template.maxEnergy:F0}";
-
-   bool isValid = ValidateConfiguration();
-   if (validationMessage != null) validationMessage.gameObject.SetActive(!isValid);
-  }
-
-  bool ValidateConfiguration() {
-   if (runtimeState == null) return false;
-   bool hasActiveGene = false;
-   foreach (var slot in runtimeState.activeSequence) {
-    if (slot.HasContent) {
-     hasActiveGene = true;
-     break;
-    }
-   }
-   if (!hasActiveGene) {
-    if (validationMessage != null) validationMessage.text = "Sequence requires at least one Active Gene.";
-    return false;
-   }
-   return true;
-  }
-
-  pub void ConnectToExecutor(PlantSequenceExecutor exec) {
-   executor = exec;
-  }
-
-  void Update() {
-   if (executor != null && executor.plantGrowth != null && executor.plantGrowth.EnergySystem != null && runtimeState != null) {
-    var energySystem = executor.plantGrowth.EnergySystem;
-    if (rechargeProgress != null && runtimeState.template.baseRechargeTime > 0) {
-     float progress = 1f - (runtimeState.rechargeTicksRemaining / (float)runtimeState.template.baseRechargeTime);
-     rechargeProgress.value = progress;
-    }
-    if (currentEnergyText != null) {
-     currentEnergyText.text = $"Energy: {energySystem.CurrentEnergy:F0}/{energySystem.MaxEnergy:F0}";
-    }
-   }
-  }
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\GeneSlotUI.cs
-
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Services;
-using Abracodabra.Genes.Runtime;
-using Abracodabra.Genes.Templates;
-
-// Note: Add 'using' statements for ItemInstance/ItemDefinition if they are in namespaces.
-
-namespace Abracodabra.UI.Genes {
- pub class GeneSlotUI : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler, IDragHandler, IEndDragHandler {
-  pub GeneCategory acceptedCategory;
-  pub int slotIndex;
-  pub bool isLocked = false;
-  pub bool isDraggable = true;
-
-  [SerializeField] Image slotBackground;
-  [SerializeField] GameObject emptyIndicator;
-  [SerializeField] GameObject lockedOverlay;
-  [SerializeField] GameObject executingEffect;
-  [SerializeField] ItemView itemView;
-
-  [SerializeField] Color normalColor = new Color(0.2f, 0.2f, 0.2f, 0.5f);
-  [SerializeField] Color highlightColor = new Color(1f, 0.9f, 0.4f, 0.5f);
-  [SerializeField] Color invalidColor = new Color(1f, 0.3f, 0.3f, 0.5f);
-  [SerializeField] Color executingColor = new Color(0.4f, 0.8f, 1f, 0.5f);
-
-  pub InventoryBarItem CurrentItem { get; set; }
-  GeneSequenceUI parentSequence;
-  IGeneEventBus eventBus;
-  GameObject draggedVisual;
-  Canvas canvas;
-  bool isPointerOver = false;
-
-  void Awake() {
-   parentSequence = GetComponentInParent<GeneSequenceUI>();
-   canvas = GetComponentInParent<Canvas>();
-   if (itemView == null) itemView = GetComponentInChildren<ItemView>(true);
-   if (itemView == null) Debug.LogError($"GeneSlotUI on {gameObject.name} is missing its ItemView child component.", this);
-  }
-
-  void Start() {
-   eventBus = GeneServices.Get<IGeneEventBus>();
-   UpdateVisuals();
-  }
-
-  void OnEnable() {
-   eventBus?.Subscribe<GeneExecutedEvent>(OnGeneExecuted);
-  }
-
-  void OnDisable() {
-   eventBus?.Unsubscribe<GeneExecutedEvent>(OnGeneExecuted);
-  }
-
-  pub void SetItem(InventoryBarItem item) {
-   CurrentItem = item;
-   UpdateVisuals();
-  }
-
-  pub void ClearSlot() {
-   SetItem(null);
-  }
-
-  void UpdateVisuals() {
-   if (itemView == null || slotBackground == null) return;
-   bool isEmpty = CurrentItem == null || !CurrentItem.IsValid();
-   if (emptyIndicator != null) emptyIndicator.SetActive(isEmpty);
-   itemView.gameObject.SetActive(!isEmpty);
-
-   if (!isEmpty) {
-    switch (CurrentItem.Type) {
-     case InventoryBarItem.ItemType.Gene:
-      itemView.InitializeAsGene(CurrentItem.GeneInstance);
-      slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(CurrentItem.GeneInstance.GetGene(), null, null, null);
-      break;
-     case InventoryBarItem.ItemType.Seed:
-      itemView.InitializeAsSeed(CurrentItem.SeedTemplate);
-      slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, CurrentItem.SeedTemplate, null, null);
-      break;
-     case InventoryBarItem.ItemType.Tool:
-      itemView.InitializeAsTool(CurrentItem.ToolDefinition);
-      slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, null, CurrentItem.ToolDefinition, null);
-      break;
-     case InventoryBarItem.ItemType.Resource: // NEW CASE
-      itemView.InitializeAsItem(CurrentItem.ItemInstance);
-      slotBackground.color = InventoryColorManager.Instance.GetCellColorForItem(null, null, null, CurrentItem.ItemInstance.definition);
-      break;
-    }
-   }
-   else {
-    slotBackground.color = normalColor;
-   }
-
-   if (lockedOverlay != null) lockedOverlay.SetActive(isLocked);
-   if (isPointerOver && !isLocked) {
-    slotBackground.color = highlightColor;
-   }
-  }
-
-  pub void OnDrop(PointerEventData eventData) {
-   if (isLocked) return;
-   GeneSlotUI sourceSlot = eventData.pointerDrag?.GetComponent<GeneSlotUI>();
-   if (sourceSlot == null || sourceSlot == this) return;
-
-   if (!IsValidDrop(sourceSlot, this)) {
-    ShowInvalidDropFeedback();
-    return;
-   }
-
-   var itemFromSource = sourceSlot.CurrentItem;
-   var itemFromDestination = this.CurrentItem;
-
-   UpdateSlotContents(sourceSlot, itemFromDestination);
-   UpdateSlotContents(this, itemFromSource);
-  }
-
-  bool IsItemValidForSlot(InventoryBarItem item, GeneSlotUI slot) {
-   if (item == null) return true;
-
-   if (item.Type == InventoryBarItem.ItemType.Resource && slot.parentSequence != null) {
-    return false;
-   }
-
-   if (slot.acceptedCategory == GeneCategory.Seed) {
-    return item.Type == InventoryBarItem.ItemType.Seed;
-   }
-
-   if (slot.parentSequence != null) {
-    if (item.Type != InventoryBarItem.ItemType.Gene) return false;
-    var gene = item.GeneInstance.GetGene();
-    if (gene.Category != slot.acceptedCategory) return false;
-
-    if (slot.acceptedCategory == GeneCategory.Modifier || slot.acceptedCategory == GeneCategory.Payload) {
-     var activeGene = slot.parentSequence.GetActiveGeneForRow(slot.slotIndex);
-     if (activeGene == null || !gene.CanAttachTo(activeGene)) return false;
-    }
-   }
-   return true;
-  }
-
-  bool IsValidDrop(GeneSlotUI source, GeneSlotUI destination) {
-   var sourceItem = source.CurrentItem;
-   var destinationItem = destination.CurrentItem;
-   return IsItemValidForSlot(sourceItem, destination) && IsItemValidForSlot(destinationItem, source);
-  }
-
-  void UpdateSlotContents(GeneSlotUI slot, InventoryBarItem newItem) {
-   if (slot.acceptedCategory == GeneCategory.Seed && slot.parentSequence != null) {
-    slot.parentSequence.LoadSeedForEditing(newItem);
-   }
-   else if (slot.parentSequence != null) {
-    slot.parentSequence.UpdateDataForSlot(slot.slotIndex, slot.acceptedCategory, newItem);
-   }
-   else {
-    slot.SetItem(newItem);
-   }
-  }
-
-  pub void OnPointerEnter(PointerEventData eventData) {
-   isPointerOver = true;
-   UpdateVisuals();
-  }
-
-  pub void OnPointerExit(PointerEventData eventData) {
-   isPointerOver = false;
-   UpdateVisuals();
-  }
-
-  pub void OnBeginDrag(PointerEventData eventData) {
-   if (!isDraggable || CurrentItem == null || isLocked) { eventData.pointerDrag = null; return; }
-   CreateDragVisual();
-  }
-
-  pub void OnDrag(PointerEventData eventData) {
-   if (draggedVisual != null) draggedVisual.transform.position = eventData.position;
-  }
-
-  pub void OnEndDrag(PointerEventData eventData) {
-   if (draggedVisual != null) Destroy(draggedVisual);
-  }
-
-  void CreateDragVisual() {
-   if (canvas == null || CurrentItem == null) return;
-   draggedVisual = new GameObject("DragVisual");
-   draggedVisual.transform.SetParent(canvas.transform, false);
-   draggedVisual.transform.SetAsLastSibling();
-   var image = draggedVisual.AddComponent<Image>();
-   image.sprite = CurrentItem.GetIcon();
-   image.color = new Color(1, 1, 1, 0.7f);
-   image.raycastTarget = false;
-   var rect = draggedVisual.GetComponent<RectTransform>();
-   rect.sizeDelta = new Vector2(64, 64);
-  }
-
-  void ShowInvalidDropFeedback() {
-   StartCoroutine(FlashColor(invalidColor));
-  }
-
-  IEnumerator FlashColor(Color flashColor) {
-   if (slotBackground == null) yield break;
-   Color originalColor = slotBackground.color;
-   slotBackground.color = flashColor;
-   yield return new WaitForSeconds(0.3f);
-   slotBackground.color = originalColor;
-   UpdateVisuals();
-  }
-
-  void OnGeneExecuted(GeneExecutedEvent evt) {
-   if (CurrentItem != null && CurrentItem.Type == InventoryBarItem.ItemType.Gene && CurrentItem.GeneInstance.GetGene()?.GUID == evt.Gene.GUID) {
-    ShowExecuting();
-   }
-  }
-
-  pub void ShowExecuting() {
-   if (executingEffect != null) executingEffect.SetActive(true);
-   if (slotBackground != null) slotBackground.color = executingColor;
-   Invoke(nameof(HideExecuting), 0.5f);
-  }
-
-  pub void HideExecuting() {
-   if (executingEffect != null) executingEffect.SetActive(false);
-   UpdateVisuals();
-  }
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\InventoryBarController.cs
-
-﻿using UnityEngine;
-using Abracodabra.UI.Genes;
-
-namespace Abracodabra.UI.Genes {
- pub class InventoryBarController : MonoBehaviour {
-  pub stat InventoryBarController Instance { get; set; }
-
-  [Header("Configuration")]
-  [Tooltip("The fixed number of slots to display in the bar.")]
-  [SerializeField] int barSlotCount = 8;
-  [Tooltip("The prefab for a single inventory slot (must have a GeneSlotUI component).")]
-  [SerializeField] GameObject inventorySlotPrefab;
-
-  [Header("Component References")]
-  [SerializeField] InventoryGridController inventoryGridController;
-  // NOTE: This should be the child object that has the Image, GridLayoutGroup, and ContentSizeFitter
-  [SerializeField] Transform cellContainer;
-  [SerializeField] GameObject selectionHighlight;
-
-  List<GeneSlotUI> barSlots = new List<GeneSlotUI>();
-  int selectedSlot = 0;
-  Coroutine updateHighlightCoroutine;
-  RectTransform cellContainerRect; // Store a reference to the RectTransform
-
-  pub InventoryBarItem SelectedItem { get; set; }
-  pub event System.Action<InventoryBarItem> OnSelectionChanged;
-
-  void Awake() {
-   if (Instance != null && Instance != this) {
-    Destroy(gameObject);
-    return;
-   }
-   Instance = this;
-   selectedSlot = 0;
-  }
-
-  void Start() {
-   if (inventoryGridController == null) Debug.LogError($"[{nameof(InventoryBarController)}] InventoryGridController not assigned!", this);
-   if (inventorySlotPrefab == null) Debug.LogError($"[{nameof(InventoryBarController)}] Inventory Slot Prefab not assigned!", this);
-   if (cellContainer == null) Debug.LogError($"[{nameof(InventoryBarController)}] Cell Container not assigned!", this);
-   else cellContainerRect = cellContainer.GetComponent<RectTransform>();
-
-   inventoryGridController.OnInventoryChanged += HandleInventoryChanged;
-
-   CreateBarSlots();
-
-   if (selectionHighlight != null) {
-    selectionHighlight.SetActive(false);
-   }
-
-   gameObject.SetActive(false);
-  }
-
-  void OnDestroy() {
-   if (inventoryGridController != null) {
-    inventoryGridController.OnInventoryChanged -= HandleInventoryChanged;
-   }
-  }
-
-  void CreateBarSlots() {
-   foreach (Transform child in cellContainer) {
-    Destroy(child.gameObject);
-   }
-   barSlots.Clear();
-
-   for (int i = 0; i < barSlotCount; i++) {
-    GameObject slotGO = Instantiate(inventorySlotPrefab, cellContainer);
-    GeneSlotUI slotUI = slotGO.GetComponent<GeneSlotUI>();
-    if (slotUI != null) {
-     slotUI.isDraggable = false;
-     barSlots.Add(slotUI);
-    }
-   }
-
-   if (cellContainerRect != null) {
-    LayoutRebuilder.ForceRebuildLayoutImmediate(cellContainerRect);
-   }
-  }
-
-  void UpdateBarDisplay() {
-   if (inventoryGridController == null) return;
-
-   List<InventoryBarItem> items = inventoryGridController.GetFirstNItems(barSlotCount);
-
-   for (int i = 0; i < barSlotCount; i++) {
-    if (i < barSlots.Count && i < items.Count) {
-     barSlots[i].SetItem(items[i]);
-    }
-   }
-  }
-
-  void HandleInventoryChanged() {
-   if (gameObject.activeInHierarchy) {
-    RefreshBar();
-   }
-  }
-
-  void Update() {
-   if (!gameObject.activeInHierarchy) return;
-   HandleNumberKeyInput();
-  }
-
-  pub void ShowBar() {
-   gameObject.SetActive(true);
-   RefreshBar();
-   SelectSlotByIndex(0);
-  }
-
-  pub void HideBar() {
-   gameObject.SetActive(false);
-   if (selectionHighlight != null) {
-    selectionHighlight.SetActive(false);
-   }
-  }
-
-  void RefreshBar() {
-   UpdateBarDisplay();
-   SelectSlot(selectedSlot);
-  }
-
-  void HandleNumberKeyInput() {
-   for (int i = 1; i <= 9; i++) {
-    if (i <= barSlotCount && Input.GetKeyDown(KeyCode.Alpha0 + i)) { SelectSlot(i - 1); return; }
-   }
-   if (barSlotCount >= 10 && Input.GetKeyDown(KeyCode.Alpha0)) { SelectSlot(9); }
-  }
-
-  pub void SelectSlot(int slotIndex) {
-   if (slotIndex < 0 || slotIndex >= barSlots.Count) {
-    return;
-   }
-
-   selectedSlot = slotIndex;
-   SelectedItem = barSlots[slotIndex].CurrentItem;
-
-   UpdateSelection();
-  }
-
-  void UpdateSelection() {
-   if (updateHighlightCoroutine != null) {
-    StopCoroutine(updateHighlightCoroutine);
-   }
-   updateHighlightCoroutine = StartCoroutine(UpdateSelectionVisualsAfterFrame());
-
-   OnSelectionChanged?.Invoke(SelectedItem);
-  }
-
-  IEnumerator UpdateSelectionVisualsAfterFrame() {
-   yield return null;
-
-   if (selectionHighlight != null) {
-    if (selectedSlot < 0 || selectedSlot >= barSlots.Count) {
-     selectionHighlight.SetActive(false);
-     yield break;
-    }
-
-    bool itemIsValid = SelectedItem != null && SelectedItem.IsValid();
-    selectionHighlight.SetActive(itemIsValid);
-
-    if (itemIsValid) {
-     selectionHighlight.transform.position = barSlots[selectedSlot].transform.position;
-    }
-   }
-   updateHighlightCoroutine = null;
-  }
-
-  pub void SelectSlotByIndex(int slotIndex) {
-   int targetSlot = Mathf.Clamp(slotIndex, 0, barSlotCount - 1);
-   SelectSlot(targetSlot);
-  }
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\ItemView.cs
-
-﻿using UnityEngine;
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Templates;
-using Abracodabra.Genes.Runtime;
-
-// Note: Ensure ItemDefinition is accessible via a 'using' statement if it's in a namespace.
-
-namespace Abracodabra.UI.Genes {
- pub class ItemView : MonoBehaviour {
-  [SerializeField] Image thumbnailImage;
-  [SerializeField] Image backgroundImage;
-  [SerializeField] Sprite fallbackThumbnail;
-
-  GeneBase _gene;
-  RuntimeGeneInstance _runtimeInstance;
-  ToolDefinition _toolDefinition;
-  SeedTemplate _seedTemplate;
-  ItemDefinition _itemDefinition; // NEW
-
-  Color _originalBackgroundColor;
-
-  pub void InitializeAsGene(RuntimeGeneInstance instance) {
-   _runtimeInstance = instance;
-   _gene = instance.GetGene();
-   _toolDefinition = null;
-   _seedTemplate = null;
-   _itemDefinition = null;
-   SetupVisuals();
-   gameObject.SetActive(true);
-  }
-
-  pub void InitializeAsTool(ToolDefinition toolDef) {
-   _runtimeInstance = null;
-   _gene = null;
-   _toolDefinition = toolDef;
-   _seedTemplate = null;
-   _itemDefinition = null;
-   SetupVisuals();
-   gameObject.SetActive(true);
-  }
-
-  pub void InitializeAsSeed(SeedTemplate seed) {
-   _runtimeInstance = null;
-   _gene = null;
-   _toolDefinition = null;
-   _seedTemplate = seed;
-   _itemDefinition = null;
-   SetupVisuals();
-   gameObject.SetActive(true);
-  }
-
-  pub void InitializeAsItem(ItemInstance instance) {
-   _runtimeInstance = null;
-   _gene = null;
-   _toolDefinition = null;
-   _seedTemplate = null;
-   _itemDefinition = instance.definition;
-   SetupVisuals();
-   gameObject.SetActive(true);
-  }
-
-  void SetupVisuals() {
-   Sprite spriteToShow = fallbackThumbnail;
-   Color tintColor = Color.white;
-   _originalBackgroundColor = Color.gray;
-
-   if (_gene != null) {
-    spriteToShow = _gene.icon ?? fallbackThumbnail;
-    tintColor = _gene.geneColor;
-    _originalBackgroundColor = _gene.geneColor.WithAlpha(0.5f);
-   }
-   else if (_toolDefinition != null) {
-    spriteToShow = _toolDefinition.icon ?? fallbackThumbnail;
-    tintColor = _toolDefinition.iconTint;
-    _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(null, null, _toolDefinition, null);
-   }
-   else if (_seedTemplate != null) {
-    spriteToShow = _seedTemplate.icon ?? fallbackThumbnail;
-    tintColor = Color.white;
-    _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(null, _seedTemplate, null, null);
-   }
-   else if (_itemDefinition != null) {
-    spriteToShow = _itemDefinition.icon ?? fallbackThumbnail;
-    tintColor = Color.white; // Or add a tint to ItemDefinition if you want
-    _originalBackgroundColor = InventoryColorManager.Instance.GetCellColorForItem(null, null, null, _itemDefinition);
-   }
-
-   if (thumbnailImage != null) {
-    thumbnailImage.sprite = spriteToShow;
-    thumbnailImage.color = tintColor;
-    thumbnailImage.enabled = (thumbnailImage.sprite != null);
-   }
-
-   if (backgroundImage != null) {
-    backgroundImage.color = _originalBackgroundColor;
-   }
-  }
-
-  pub void Clear() {
-   _gene = null;
-   _runtimeInstance = null;
-   _toolDefinition = null;
-   _seedTemplate = null;
-   _itemDefinition = null;
-   gameObject.SetActive(false);
-  }
-
-  pub GeneBase GetGene() => _gene;
-  pub RuntimeGeneInstance GetRuntimeInstance() => _runtimeInstance;
-  pub ToolDefinition GetToolDefinition() => _toolDefinition;
-  pub SeedTemplate GetSeedTemplate() => _seedTemplate;
-  pub ItemDefinition GetItemDefinition() => _itemDefinition; // NEW
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\SequenceRowUI.cs
-
-﻿// File: Assets/Scripts/UI/Genes/SequenceRowUI.cs
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Runtime;
-
-namespace Abracodabra.UI.Genes {
- pub class SequenceRowUI : MonoBehaviour {
-  pub GeneSlotUI modifierSlot;
-  pub GeneSlotUI activeSlot;
-  pub GeneSlotUI payloadSlot;
-
-  int rowIndex;
-  GeneSequenceUI parentSequence;
-
-  pub void Initialize(int index, GeneSequenceUI parent) {
-   rowIndex = index;
-   parentSequence = parent;
-
-   if (modifierSlot != null) {
-    modifierSlot.acceptedCategory = GeneCategory.Modifier;
-    modifierSlot.slotIndex = index;
-   }
-   if (activeSlot != null) {
-    activeSlot.acceptedCategory = GeneCategory.Active;
-    activeSlot.slotIndex = index;
-   }
-   if (payloadSlot != null) {
-    payloadSlot.acceptedCategory = GeneCategory.Payload;
-    payloadSlot.slotIndex = index;
-   }
-  }
-
-  pub void LoadSlot(RuntimeSequenceSlot slotData) {
-   activeSlot?.SetItem(slotData.activeInstance != null ? InventoryBarItem.FromGene(slotData.activeInstance) : null);
-
-   var modInstance = slotData.modifierInstances.Count > 0 ? slotData.modifierInstances[0] : null;
-   modifierSlot?.SetItem(modInstance != null ? InventoryBarItem.FromGene(modInstance) : null);
-
-   var payloadInstance = slotData.payloadInstances.Count > 0 ? slotData.payloadInstances[0] : null;
-   payloadSlot?.SetItem(payloadInstance != null ? InventoryBarItem.FromGene(payloadInstance) : null);
-
-   UpdateAttachmentSlots(GetActiveGene());
-  }
-
-  pub void ClearRow() {
-   modifierSlot?.ClearSlot();
-   activeSlot?.ClearSlot();
-   payloadSlot?.ClearSlot();
-   UpdateAttachmentSlots(null);
-  }
-
-  pub ActiveGene GetActiveGene() {
-   return activeSlot?.CurrentItem?.GeneInstance?.GetGene<ActiveGene>();
-  }
-
-  pub void UpdateAttachmentSlots(ActiveGene activeGene) {
-   bool hasActive = activeGene != null;
-   if (modifierSlot != null) {
-    modifierSlot.isLocked = !hasActive;
-    modifierSlot.gameObject.SetActive(hasActive && activeGene.slotConfig.modifierSlots > 0);
-   }
-   if (payloadSlot != null) {
-    payloadSlot.isLocked = !hasActive;
-    payloadSlot.gameObject.SetActive(hasActive && activeGene.slotConfig.payloadSlots > 0);
-   }
   }
  }
 }
@@ -12140,66 +10497,66 @@ namespace Abracodabra.UI.Toolkit {
    }
   }
 
-  void HandleHotbarSelectionChanged(InventoryBarItem selectedItem) {
+  void HandleHotbarSelectionChanged(UIInventoryItem selectedItem) {
    UpdateHUDTooltip(selectedItem);
   }
 
-  void UpdateHUDTooltip(InventoryBarItem selectedItem) {
-   if (selectedItem == null || hudTooltipPanel == null) {
-    if (hudTooltipPanel != null) {
-     hudTooltipPanel.style.display = DisplayStyle.None;
-    }
-    return;
-   }
-
-   hudTooltipPanel.style.display = DisplayStyle.Flex;
-
-   switch (selectedItem.Type) {
-    case InventoryBarItem.ItemType.Seed:
-     var seed = selectedItem.SeedTemplate;
-     if (seed != null) {
-      if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
-      if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
-      if (hudTooltipType != null) hudTooltipType.text = "Seed";
-      if (hudTooltipDescription != null) hudTooltipDescription.text = seed.description;
-     }
-     break;
-
-    case InventoryBarItem.ItemType.Tool:
-     var tool = selectedItem.ToolDefinition;
-     if (tool != null) {
-      if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
-      if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
-      if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
-      if (hudTooltipDescription != null) hudTooltipDescription.text = tool.GetTooltipDescription();
-     }
-     break;
-
-    case InventoryBarItem.ItemType.Gene:
-     var gene = selectedItem.GeneInstance?.GetGene();
-     if (gene != null) {
-      if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
-      if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
-      if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
-      if (hudTooltipDescription != null) hudTooltipDescription.text = gene.description;
-     }
-     break;
-
-    case InventoryBarItem.ItemType.Resource:
-     var resource = selectedItem.ItemInstance;
-     if (resource?.definition != null) {
-      if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
-      if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
-      if (hudTooltipType != null) hudTooltipType.text = "Resource";
-      if (hudTooltipDescription != null) hudTooltipDescription.text = resource.definition.description;
-     }
-     break;
-
-    default:
-     hudTooltipPanel.style.display = DisplayStyle.None;
-     break;
-   }
+  void UpdateHUDTooltip(UIInventoryItem selectedItem) {
+ if (selectedItem == null || hudTooltipPanel == null) {
+  if (hudTooltipPanel != null) {
+   hudTooltipPanel.style.display = DisplayStyle.None;
   }
+  return;
+ }
+
+ hudTooltipPanel.style.display = DisplayStyle.Flex;
+
+ switch (selectedItem.Type) {
+  case UIInventoryItem.ItemType.Seed:
+   var seed = selectedItem.SeedTemplate;
+   if (seed != null) {
+    if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
+    if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
+    if (hudTooltipType != null) hudTooltipType.text = "Seed";
+    if (hudTooltipDescription != null) hudTooltipDescription.text = seed.description;
+   }
+   break;
+
+  case UIInventoryItem.ItemType.Tool:
+   var tool = selectedItem.ToolDefinition;
+   if (tool != null) {
+    if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
+    if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
+    if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
+    if (hudTooltipDescription != null) hudTooltipDescription.text = tool.GetTooltipDescription();
+   }
+   break;
+
+  case UIInventoryItem.ItemType.Gene:
+   var gene = selectedItem.Gene ?? selectedItem.GeneInstance?.GetGene();
+   if (gene != null) {
+    if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
+    if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
+    if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
+    if (hudTooltipDescription != null) hudTooltipDescription.text = gene.description;
+   }
+   break;
+
+  case UIInventoryItem.ItemType.Resource:
+   var resource = selectedItem.ResourceInstance;
+   if (resource?.definition != null) {
+    if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
+    if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
+    if (hudTooltipType != null) hudTooltipType.text = "Resource";
+    if (hudTooltipDescription != null) hudTooltipDescription.text = resource.definition.description;
+   }
+   break;
+
+  default:
+   hudTooltipPanel.style.display = DisplayStyle.None;
+   break;
+ }
+}
 
   void HandleSlotClicked(int index) {
    if (dragDropController.IsDragging()) return;
@@ -13208,17 +11565,34 @@ using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.UI.Toolkit {
  pub class UIInventoryItem {
+  pub enum ItemType { Gene, Seed, Tool, Resource }
+
   pub Sprite Icon { get; set; }
   pub int StackSize { get; set; } = 1;
   pub object OriginalData { get; }
+  pub Color BackgroundColor { get; set; } = new Color(0, 0, 0, 0);
+  pub string CustomName { get; set; } = "";
 
   pub PlantGeneRuntimeState SeedRuntimeState { get; set; }
-
   pub ItemInstance ResourceInstance { get; }
+  pub RuntimeGeneInstance GeneInstance { get; }
 
-  pub Color BackgroundColor { get; set; } = new Color(0, 0, 0, 0);
+  pub ItemType Type {
+   get {
+    return OriginalData switch {
+     SeedTemplate => ItemType.Seed,
+     ToolDefinition => ItemType.Tool,
+     GeneBase => ItemType.Gene,
+     ItemDefinition => ItemType.Resource,
+     _ => ResourceInstance != null ? ItemType.Resource : ItemType.Gene
+    };
+   }
+  }
 
-  pub string CustomName { get; set; } = "";
+  pub SeedTemplate SeedTemplate => OriginalData as SeedTemplate;
+  pub ToolDefinition ToolDefinition => OriginalData as ToolDefinition;
+  pub GeneBase Gene => OriginalData as GeneBase;
+  pub ItemDefinition ItemDefinition => OriginalData as ItemDefinition ?? ResourceInstance?.definition;
 
   pub UIInventoryItem(SeedTemplate seed) {
    OriginalData = seed;
@@ -13234,6 +11608,14 @@ namespace Abracodabra.UI.Toolkit {
   pub UIInventoryItem(GeneBase gene) {
    OriginalData = gene;
    Icon = gene?.icon;
+   GeneInstance = gene != null ? new RuntimeGeneInstance(gene) : null;
+  }
+
+  pub UIInventoryItem(RuntimeGeneInstance geneInstance) {
+   GeneInstance = geneInstance;
+   var gene = geneInstance?.GetGene();
+   OriginalData = gene;
+   Icon = gene?.icon;
   }
 
   pub UIInventoryItem(ItemInstance itemInstance) {
@@ -13246,23 +11628,56 @@ namespace Abracodabra.UI.Toolkit {
   pub UIInventoryItem(object data) {
    OriginalData = data;
 
-   if (data is SeedTemplate seed) {
-    Icon = seed.icon;
-    SeedRuntimeState = seed.CreateRuntimeState();
+   switch (data) {
+    case SeedTemplate seed:
+     Icon = seed.icon;
+     SeedRuntimeState = seed.CreateRuntimeState();
+     break;
+    case ToolDefinition tool:
+     Icon = tool.icon;
+     break;
+    case GeneBase gene:
+     Icon = gene.icon;
+     GeneInstance = new RuntimeGeneInstance(gene);
+     break;
+    case ItemInstance item:
+     Icon = item.definition?.icon;
+     StackSize = item.stackCount;
+     break;
+    case ItemDefinition itemDef:
+     Icon = itemDef.icon;
+     break;
    }
-   else if (data is ToolDefinition tool) {
-    Icon = tool.icon;
-   }
-   else if (data is GeneBase gene) {
-    Icon = gene.icon;
-   }
-   else if (data is ItemInstance item) {
-    Icon = item.definition?.icon;
-    StackSize = item.stackCount;
-   }
-   else if (data is ItemDefinition itemDef) {
-    Icon = itemDef.icon;
-   }
+  }
+
+  pub stat UIInventoryItem FromSeed(SeedTemplate seed) {
+   return seed != null ? new UIInventoryItem(seed) : null;
+  }
+
+  pub stat UIInventoryItem FromTool(ToolDefinition tool) {
+   return tool != null ? new UIInventoryItem(tool) : null;
+  }
+
+  pub stat UIInventoryItem FromGene(GeneBase gene) {
+   return gene != null ? new UIInventoryItem(gene) : null;
+  }
+
+  pub stat UIInventoryItem FromGene(RuntimeGeneInstance instance) {
+   return instance != null ? new UIInventoryItem(instance) : null;
+  }
+
+  pub stat UIInventoryItem FromItem(ItemInstance instance) {
+   return instance?.definition != null ? new UIInventoryItem(instance) : null;
+  }
+
+  pub bool IsValid() {
+   return Type switch {
+    ItemType.Seed => SeedTemplate != null && SeedRuntimeState != null,
+    ItemType.Tool => ToolDefinition != null,
+    ItemType.Gene => Gene != null || GeneInstance?.GetGene() != null,
+    ItemType.Resource => ResourceInstance?.definition != null || ItemDefinition != null,
+    _ => false
+   };
   }
 
   pub bool HasCustomColor() {
@@ -13278,55 +11693,39 @@ namespace Abracodabra.UI.Toolkit {
   }
 
   pub bool ShouldShowCounter() {
-   if (OriginalData is SeedTemplate) {
+   if (OriginalData is SeedTemplate)
     return true;
-   }
 
-   if (OriginalData is ToolDefinition tool && tool.limitedUses) {
+   if (OriginalData is ToolDefinition tool && tool.limitedUses)
     return true;
-   }
 
-   if (StackSize > 1) {
+   if (StackSize > 1)
     return true;
-   }
 
    return false;
   }
 
   pub int GetDisplayCount() {
    if (OriginalData is ToolDefinition tool && tool.limitedUses) {
-    if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool == tool) {
+    if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool == tool)
      return ToolSwitcher.Instance.CurrentRemainingUses;
-    }
-    return GetToolUsesFromSwitcher(tool);
+
+    return tool.initialUses;
    }
 
    return StackSize;
   }
 
-  int GetToolUsesFromSwitcher(ToolDefinition tool) {
-   if (ToolSwitcher.Instance == null || tool == null) {
-    return tool?.initialUses ?? 0;
-   }
-
-   if (ToolSwitcher.Instance.CurrentTool == tool) {
-    return ToolSwitcher.Instance.CurrentRemainingUses;
-   }
-
-   return tool.initialUses;
-  }
-
   pub string GetDisplayName() {
-   if (!string.IsNullOrEmpty(CustomName)) {
+   if (!string.IsNullOrEmpty(CustomName))
     return CustomName;
-   }
 
    return OriginalData switch {
     SeedTemplate seed => seed.templateName,
     ToolDefinition tool => tool.displayName,
     GeneBase gene => gene.geneName,
     ItemDefinition itemDef => itemDef.itemName,
-    _ => "Unknown Item"
+    _ => GeneInstance?.GetGene()?.geneName ?? "Unknown Item"
    };
   }
 
@@ -13336,9 +11735,24 @@ namespace Abracodabra.UI.Toolkit {
     ToolDefinition tool => tool.GetTooltipDescription(),
     GeneBase gene => gene.description,
     ItemDefinition itemDef => itemDef.description,
-    _ => ""
+    _ => GeneInstance?.GetGene()?.description ?? ""
    };
   }
+
+  pub Sprite GetIcon() {
+   return Icon;
+  }
+
+  pub string GetTypeDisplayString() {
+   return Type switch {
+    ItemType.Seed => "Seed",
+    ItemType.Tool => ToolDefinition != null ? $"Tool - {ToolDefinition.toolType}" : "Tool",
+    ItemType.Gene => Gene != null ? $"Gene - {Gene.Category}" : "Gene",
+    ItemType.Resource => "Resource",
+    _ => "Unknown"
+   };
+  }
+
  }
 }
 
@@ -14181,304 +12595,6 @@ namespace Abracodabra.UI.Toolkit {
 }
 
 ////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\EnhancedTooltipTrigger.cs
-
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
-using Abracodabra.UI.Genes;
-
-namespace Abracodabra.UI.Tooltips {
- pub class EnhancedTooltipTrigger : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
-  GeneSlotUI slotUI;
-  Coroutine showTooltipCoroutine;
-  bool isPointerOver = false;
-
-  [SerializeField] float hoverDelay = 0.3f;
-
-  void Awake() {
-   slotUI = GetComponent<GeneSlotUI>();
-  }
-
-  pub void OnPointerEnter(PointerEventData eventData) {
-   isPointerOver = true;
-   if (slotUI.CurrentItem != null && slotUI.CurrentItem.IsValid()) {
-    showTooltipCoroutine = StartCoroutine(ShowTooltipAfterDelay());
-   }
-  }
-
-  pub void OnPointerExit(PointerEventData eventData) {
-   isPointerOver = false;
-   if (showTooltipCoroutine != null) {
-    StopCoroutine(showTooltipCoroutine);
-   }
-   InventoryTooltipPanel.Instance?.HideTooltip();
-  }
-
-  System.Collections.IEnumerator ShowTooltipAfterDelay() {
-   yield return new WaitForSeconds(hoverDelay);
-   if(isPointerOver) // Check if pointer is still over the slot {
-    InventoryTooltipPanel.Instance?.ShowTooltipForItem(slotUI.CurrentItem);
-   }
-  }
-
-  void OnDisable() {
-   if (isPointerOver) {
-    isPointerOver = false;
-    if (showTooltipCoroutine != null) {
-     StopCoroutine(showTooltipCoroutine);
-    }
-    InventoryTooltipPanel.Instance?.HideTooltip();
-   }
-  }
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\InventoryTooltipPanel.cs
-
-﻿using UnityEngine;
-using TMPro;
-using Abracodabra.UI.Genes;
-using Abracodabra.Genes.Templates;
-
-namespace Abracodabra.UI.Tooltips {
- pub class InventoryTooltipPanel : MonoBehaviour {
-  pub stat InventoryTooltipPanel Instance { get; set; }
-
-  [Header("UI References")]
-  [SerializeField] GameObject panelRoot;
-  [SerializeField] Image itemIcon;
-  [SerializeField] TextMeshProUGUI itemNameText;
-  [SerializeField] TextMeshProUGUI qualityText;
-  [SerializeField] TextMeshProUGUI descriptionText;
-  [SerializeField] TextMeshProUGUI keyStat1Text; // Max Energy
-  [SerializeField] TextMeshProUGUI keyStat2Text; // Growth Chance
-  [SerializeField] TextMeshProUGUI keyStat3Text; // Cycle Cost
-
-  void Awake() {
-   if (Instance != null && Instance != this) {
-    Destroy(gameObject);
-    return;
-   }
-   Instance = this;
-   if(panelRoot != null) panelRoot.SetActive(false);
-  }
-
-  pub void ShowTooltipForItem(InventoryBarItem item) {
-   if (item == null || !item.IsValid() || panelRoot == null) {
-    HideTooltip();
-    return;
-   }
-
-   switch (item.Type) {
-    case InventoryBarItem.ItemType.Seed:
-     DisplaySeedTooltip(item);
-     break;
-    case InventoryBarItem.ItemType.Gene:
-    case InventoryBarItem.ItemType.Tool:
-    case InventoryBarItem.ItemType.Resource:
-     DisplayGenericTooltip(item);
-     break;
-   }
-
-   panelRoot.SetActive(true);
-  }
-
-  pub void HideTooltip() {
-   if(panelRoot != null) panelRoot.SetActive(false);
-  }
-
-  void DisplaySeedTooltip(InventoryBarItem item) {
-   var data = SeedTooltipData.CreateFromSeed(item.SeedTemplate, item.SeedRuntimeState);
-   if (data == null) {
-    HideTooltip();
-    return;
-   }
-
-   itemIcon.sprite = item.GetIcon();
-   itemNameText.text = data.seedName;
-   descriptionText.text = $"<i>{item.SeedTemplate.description}</i>";
-
-   qualityText.text = SeedQualityCalculator.GetQualityDescription(data.qualityTier);
-   qualityText.color = SeedQualityCalculator.GetQualityColor(data.qualityTier);
-
-   keyStat1Text.text = $"<sprite=energy> {item.SeedTemplate.maxEnergy * data.energyStorageMultiplier:F0} E";
-   keyStat2Text.text = $"<sprite=growth> {item.SeedTemplate.baseGrowthChance * data.growthSpeedMultiplier:P0}/tick";
-   keyStat3Text.text = $"<sprite=cycle> {data.totalModifiedEnergyCost:F0} E/cycle";
-  }
-
-  void DisplayGenericTooltip(InventoryBarItem item) {
-   itemIcon.sprite = item.GetIcon();
-   itemNameText.text = item.GetDisplayName();
-
-   qualityText.text = item.Type.ToString();
-   qualityText.color = Color.grey;
-
-   string desc = "";
-   switch (item.Type) {
-    case InventoryBarItem.ItemType.Gene:
-     desc = item.GeneInstance?.GetGene()?.description ?? "";
-     break;
-    case InventoryBarItem.ItemType.Tool:
-     desc = item.ToolDefinition?.GetTooltipDetails() ?? "";
-     break;
-    case InventoryBarItem.ItemType.Resource:
-     desc = item.ItemInstance?.definition?.description ?? "";
-     break;
-   }
-   descriptionText.text = $"<i>{desc}</i>";
-
-   keyStat1Text.text = "";
-   keyStat2Text.text = "";
-   keyStat3Text.text = "";
-  }
- }
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\SeedEditorTooltipPanel.cs
-
-﻿using System.Collections.Generic;
-using TMPro;
-using Abracodabra.Genes.Templates;
-using Abracodabra.Genes.Runtime;
-
-namespace Abracodabra.UI.Tooltips {
- pub class SeedEditorTooltipPanel : MonoBehaviour {
-  pub stat SeedEditorTooltipPanel Instance { get; set; }
-
-  [Header("Main Panel")]
-  [SerializeField] GameObject panelRoot;
-
-  [Header("Header")]
-  [SerializeField] Image seedIcon;
-  [SerializeField] TextMeshProUGUI seedNameText;
-  [SerializeField] TextMeshProUGUI qualityText;
-  [SerializeField] TextMeshProUGUI descriptionText;
-
-  [Header("Performance Overview")]
-  [SerializeField] TextMeshProUGUI maturityTimeText;
-  [SerializeField] TextMeshProUGUI energyBalanceText;
-  [SerializeField] TextMeshProUGUI yieldText;
-
-  [Header("Attribute Breakdown")]
-  [SerializeField] StatBarUI growthSpeedBar;
-  [SerializeField] StatBarUI energyStorageBar;
-  [SerializeField] StatBarUI energyGenerationBar;
-  [SerializeField] StatBarUI fruitYieldBar;
-  [SerializeField] StatBarUI defenseBar;
-
-  [Header("Sequence Analysis")]
-  [SerializeField] TextMeshProUGUI cycleTimeText;
-  [SerializeField] Transform sequenceBreakdownContainer;
-  [SerializeField] GameObject sequenceBreakdownEntryPrefab;
-
-  [Header("Synergies & Warnings")]
-  [SerializeField] Transform synergiesContainer;
-  [SerializeField] Transform warningsContainer;
-  [SerializeField] GameObject synergyWarningEntryPrefab;
-
-  List<GameObject> pooledSequenceEntries = new List<GameObject>();
-  List<GameObject> pooledSynergyEntries = new List<GameObject>();
-  List<GameObject> pooledWarningEntries = new List<GameObject>();
-
-  pub class StatBarUI {
-   pub TextMeshProUGUI labelText;
-   pub Slider slider;
-   pub TextMeshProUGUI valueText;
-   pub Image fillImage;
-   pub Gradient colorGradient;
-
-   pub void UpdateBar(string label, float value, float baseline, float maxValue = 2f, bool higherIsBetter = true, string format = "P0") {
-    if (labelText != null) labelText.text = label;
-    if (slider != null) slider.value = Mathf.Clamp01((value - 0.5f) / (maxValue - 0.5f)); // Normalize from 0.5 to max
-    if (fillImage != null && colorGradient != null) fillImage.color = colorGradient.Evaluate(slider.value);
-
-    if (valueText != null) {
-     string formattedValue = (format == "P0") ? $"{value:P0}" : $"{value:F0}";
-     string baseFormatted = (format == "P0") ? $"{baseline:P0}" : $"{baseline:F0}";
-     valueText.text = $"{TooltipFormatting.ColorizeValue(value, baseline, formattedValue, higherIsBetter)} <size=70%>(Base: {baseFormatted})</size>";
-    }
-   }
-  }
-
-  void Awake() {
-   if (Instance != null && Instance != this) {
-    Destroy(gameObject);
-    return;
-   }
-   Instance = this;
-   if(panelRoot != null) panelRoot.SetActive(false);
-  }
-
-  pub void LoadSeedForAnalysis(PlantGeneRuntimeState runtimeState) {
-   if (runtimeState == null || runtimeState.template == null) {
-    if(panelRoot != null) panelRoot.SetActive(false);
-    return;
-   }
-
-   var data = SeedTooltipData.CreateFromSeed(runtimeState.template, runtimeState);
-   if (data == null) {
-    if(panelRoot != null) panelRoot.SetActive(false);
-    return;
-   }
-
-   DisplayAnalysis(data, runtimeState.template);
-   if(panelRoot != null) panelRoot.SetActive(true);
-  }
-
-  void DisplayAnalysis(SeedTooltipData data, SeedTemplate template) {
-   seedIcon.sprite = template.icon;
-   seedNameText.text = data.seedName;
-   qualityText.text = SeedQualityCalculator.GetQualityDescription(data.qualityTier);
-   qualityText.color = SeedQualityCalculator.GetQualityColor(data.qualityTier);
-   descriptionText.text = $"<i>{template.description}</i>";
-
-   maturityTimeText.text = TooltipFormatting.ColorizeValue(data.estimatedMaturityTicks, 40, $"{data.estimatedMaturityTicks:F0} ticks", false);
-   energyBalanceText.text = TooltipFormatting.ColorizeValue(data.energySurplusPerCycle, 0, $"{data.energySurplusPerCycle:F1} E/cycle");
-   yieldText.text = data.primaryYieldSummary;
-
-   growthSpeedBar.UpdateBar("Growth", data.growthSpeedMultiplier, 1f, 2.5f, true, "P0");
-   energyStorageBar.UpdateBar("Storage", data.energyStorageMultiplier, 1f, 2.5f, true, "P0");
-   energyGenerationBar.UpdateBar("Generation", data.energyGenerationMultiplier, 1f, 2.5f, true, "P0");
-   fruitYieldBar.UpdateBar("Yield", data.fruitYieldMultiplier, 1f, 2.5f, true, "P0");
-   defenseBar.UpdateBar("Defense", data.defenseMultiplier, 1f, 2.5f, true, "P0");
-
-   cycleTimeText.text = $"<b>{data.totalCycleTime} ticks</b> (Cycle Time)";
-   UpdateList(sequenceBreakdownContainer, pooledSequenceEntries, data.sequenceSlots.Count, (go, i) => {
-    var entryText = go.GetComponent<TextMeshProUGUI>();
-    var slotData = data.sequenceSlots[i];
-    entryText.text = $"{slotData.actionName}: {slotData.baseCost:F0}E → {TooltipFormatting.ColorizeValue(slotData.modifiedCost, slotData.baseCost, $"{slotData.modifiedCost:F0}E", false)}";
-   }, sequenceBreakdownEntryPrefab);
-
-   UpdateList(synergiesContainer, pooledSynergyEntries, data.synergies.Count, (go, i) => {
-    go.GetComponent<TextMeshProUGUI>().text = $"<color=#88FF88>✓</color> {data.synergies[i]}";
-   }, synergyWarningEntryPrefab);
-
-   UpdateList(warningsContainer, pooledWarningEntries, data.warnings.Count, (go, i) => {
-    go.GetComponent<TextMeshProUGUI>().text = $"<color=#FF8888>⚠</color> {data.warnings[i]}";
-   }, synergyWarningEntryPrefab);
-  }
-
-  void UpdateList(Transform container, List<GameObject> pool, int count, System.Action<GameObject, int> updateAction, GameObject prefab) {
-   while (pool.Count < count) {
-    var newEntry = Instantiate(prefab, container);
-    pool.Add(newEntry);
-   }
-
-   for (int i = 0; i < count; i++) {
-    pool[i].SetActive(true);
-    updateAction(pool[i], i);
-   }
-
-   for (int i = count; i < pool.Count; i++) {
-    pool[i].SetActive(false);
-   }
-  }
- }
-}
-
-////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\UI\_UGUI_Legacy\SeedTooltipData.cs
 
 ﻿using System;
@@ -14671,88 +12787,11 @@ namespace Abracodabra.UI.Tooltips {
 }
 
 ////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\TooltipSystemManager.cs
-
-﻿using UnityEngine;
-
-namespace Abracodabra.UI.Tooltips {
- pub class TooltipSystemManager : MonoBehaviour {
-  [Header("Tooltip Panel Prefabs")]
-  [SerializeField] GameObject inventoryTooltipPanelPrefab;
-  [SerializeField] GameObject seedEditorTooltipPanelPrefab;
-
-  [Header("Parent Canvases")]
-  [SerializeField] Transform mainUICanvas;
-
-  void Awake() {
-   if (InventoryTooltipPanel.Instance == null && inventoryTooltipPanelPrefab != null) {
-    Instantiate(inventoryTooltipPanelPrefab, mainUICanvas);
-   }
-
-   if (SeedEditorTooltipPanel.Instance == null && seedEditorTooltipPanelPrefab != null) {
-    Instantiate(seedEditorTooltipPanelPrefab, mainUICanvas);
-   }
-  }
- }
-}
-
-////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\UI\_UGUI_Legacy\TooltipUtilities.cs
 
-﻿using UnityEngine;
-using Abracodabra.Genes.Core;
+﻿// File: Assets/Scripts/UI/_UGUI_Legacy/TooltipUtilities.cs
 
 namespace Abracodabra.UI.Tooltips {
- pub stat class PassiveStatTypeExtensions {
-  pub stat string GetDisplayName(this PassiveStatType stat) {
-   switch (stat) {
-    case PassiveStatType.None: return "Special"; // Kept new change
-    case PassiveStatType.GrowthSpeed: return "Growth Speed";
-    case PassiveStatType.EnergyGeneration: return "Energy Generation";
-    case PassiveStatType.EnergyStorage: return "Energy Storage";
-    case PassiveStatType.FruitYield: return "Fruit Yield";
-    case PassiveStatType.Defense: return "Defense";
-    default: return stat.ToString();
-   }
-  }
- }
-
- pub stat class TooltipFormatting {
-  pub stat string FormatPercentage(float value, bool showSign = true) {
-   float percentage = (value - 1f) * 100f;
-   string sign = percentage >= 0 && showSign ? "+" : "";
-   return $"{sign}{percentage:F0}%";
-  }
-
-  pub stat string ColorizeValue(float value, float baseline, string text, bool higherIsBetter = true) {
-   Color goodColor = new Color(0.5f, 1f, 0.5f); // Light Green
-   Color badColor = new Color(1f, 0.5f, 0.5f);  // Light Red
-
-   bool isGood = higherIsBetter ? (value > baseline) : (value < baseline);
-
-   if (Mathf.Approximately(value, baseline))
-    return text;
-
-   Color finalColor = isGood ? goodColor : badColor;
-   return $"<color=#{ColorUtility.ToHtmlStringRGB(finalColor)}>{text}</color>";
-  }
-
-  pub stat string GetColorForValue(float value) {
-   if (value > 1f) return "#90EE90"; // Light green for buffs
-   if (value < 1f) return "#FF6B6B"; // Light red for debuffs
-   return "#FFFFFF"; // White for neutral
-  }
-
-  pub stat string FormatStatChange(PassiveStatType stat, float value) {
-   if (stat == PassiveStatType.None) return ""; // No stat change to display
-
-   string color = GetColorForValue(value);
-   string statName = stat.GetDisplayName();
-   string change = FormatPercentage(value);
-   return $"<color={color}>{change} {statName}</color>";
-  }
- }
-
  pub stat class SeedQualityCalculator {
   pub enum QualityTier { Trash, Poor, Common, Good, Excellent, Legendary }
 
@@ -14761,13 +12800,13 @@ namespace Abracodabra.UI.Tooltips {
 
    float score = 0f;
 
-   float efficiencyScore = Mathf.Clamp01((data.energySurplusPerCycle + 10) / 50f); // Normalize around a surplus of 40 being max
+   float efficiencyScore = Mathf.Clamp01((data.energySurplusPerCycle + 10) / 50f);
    score += efficiencyScore * 30f;
 
-   float maturityScore = 1f - Mathf.Clamp01(data.estimatedMaturityTicks / 100f); // 100 ticks is slow
+   float maturityScore = 1f - Mathf.Clamp01(data.estimatedMaturityTicks / 100f);
    score += maturityScore * 25f;
 
-   score += Mathf.Clamp01((data.fruitYieldMultiplier - 1f) / 1.5f) * 25f; // 150% bonus is max
+   score += Mathf.Clamp01((data.fruitYieldMultiplier - 1f) / 1.5f) * 25f;
 
    score += Mathf.Clamp01(data.defenseMultiplier) * 20f;
 
@@ -14797,12 +12836,12 @@ namespace Abracodabra.UI.Tooltips {
 
   pub stat Color GetQualityColor(QualityTier tier) {
    switch (tier) {
-    case QualityTier.Legendary: return new Color(1f, 0.6f, 0.1f);
-    case QualityTier.Excellent: return new Color(0.2f, 0.6f, 1f);
-    case QualityTier.Good: return new Color(0.2f, 0.8f, 0.2f);
+    case QualityTier.Legendary: return new Color(1f, 0.6f, 0.1f);   // Orange
+    case QualityTier.Excellent: return new Color(0.2f, 0.6f, 1f);   // Blue
+    case QualityTier.Good: return new Color(0.2f, 0.8f, 0.2f);      // Green
     case QualityTier.Common: return Color.white;
-    case QualityTier.Poor: return new Color(0.6f, 0.6f, 0.6f);
-    case QualityTier.Trash: return new Color(0.4f, 0.2f, 0.2f);
+    case QualityTier.Poor: return new Color(0.6f, 0.6f, 0.6f);      // Gray
+    case QualityTier.Trash: return new Color(0.4f, 0.2f, 0.2f);     // Dark red
     default: return Color.grey;
    }
   }

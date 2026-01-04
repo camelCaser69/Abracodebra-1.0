@@ -378,66 +378,75 @@ namespace Abracodabra.UI.Toolkit {
             }
         }
 
-        void HandleHotbarSelectionChanged(InventoryBarItem selectedItem) {
+        void HandleHotbarSelectionChanged(UIInventoryItem selectedItem)
+        {
             UpdateHUDTooltip(selectedItem);
         }
 
-        void UpdateHUDTooltip(InventoryBarItem selectedItem) {
-            if (selectedItem == null || hudTooltipPanel == null) {
-                if (hudTooltipPanel != null) {
-                    hudTooltipPanel.style.display = DisplayStyle.None;
-                }
-                return;
-            }
-
-            hudTooltipPanel.style.display = DisplayStyle.Flex;
-
-            switch (selectedItem.Type) {
-                case InventoryBarItem.ItemType.Seed:
-                    var seed = selectedItem.SeedTemplate;
-                    if (seed != null) {
-                        if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
-                        if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
-                        if (hudTooltipType != null) hudTooltipType.text = "Seed";
-                        if (hudTooltipDescription != null) hudTooltipDescription.text = seed.description;
-                    }
-                    break;
-
-                case InventoryBarItem.ItemType.Tool:
-                    var tool = selectedItem.ToolDefinition;
-                    if (tool != null) {
-                        if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
-                        if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
-                        if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
-                        if (hudTooltipDescription != null) hudTooltipDescription.text = tool.GetTooltipDescription();
-                    }
-                    break;
-
-                case InventoryBarItem.ItemType.Gene:
-                    var gene = selectedItem.GeneInstance?.GetGene();
-                    if (gene != null) {
-                        if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
-                        if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
-                        if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
-                        if (hudTooltipDescription != null) hudTooltipDescription.text = gene.description;
-                    }
-                    break;
-
-                case InventoryBarItem.ItemType.Resource:
-                    var resource = selectedItem.ItemInstance;
-                    if (resource?.definition != null) {
-                        if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
-                        if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
-                        if (hudTooltipType != null) hudTooltipType.text = "Resource";
-                        if (hudTooltipDescription != null) hudTooltipDescription.text = resource.definition.description;
-                    }
-                    break;
-
-                default:
-                    hudTooltipPanel.style.display = DisplayStyle.None;
-                    break;
-            }
+        void UpdateHUDTooltip(UIInventoryItem selectedItem)
+{
+    if (selectedItem == null || hudTooltipPanel == null)
+    {
+        if (hudTooltipPanel != null)
+        {
+            hudTooltipPanel.style.display = DisplayStyle.None;
         }
+        return;
+    }
+
+    hudTooltipPanel.style.display = DisplayStyle.Flex;
+
+    switch (selectedItem.Type)
+    {
+        case UIInventoryItem.ItemType.Seed:
+            var seed = selectedItem.SeedTemplate;
+            if (seed != null)
+            {
+                if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
+                if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
+                if (hudTooltipType != null) hudTooltipType.text = "Seed";
+                if (hudTooltipDescription != null) hudTooltipDescription.text = seed.description;
+            }
+            break;
+
+        case UIInventoryItem.ItemType.Tool:
+            var tool = selectedItem.ToolDefinition;
+            if (tool != null)
+            {
+                if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
+                if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
+                if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
+                if (hudTooltipDescription != null) hudTooltipDescription.text = tool.GetTooltipDescription();
+            }
+            break;
+
+        case UIInventoryItem.ItemType.Gene:
+            var gene = selectedItem.Gene ?? selectedItem.GeneInstance?.GetGene();
+            if (gene != null)
+            {
+                if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
+                if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
+                if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
+                if (hudTooltipDescription != null) hudTooltipDescription.text = gene.description;
+            }
+            break;
+
+        case UIInventoryItem.ItemType.Resource:
+            var resource = selectedItem.ResourceInstance;
+            if (resource?.definition != null)
+            {
+                if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
+                if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
+                if (hudTooltipType != null) hudTooltipType.text = "Resource";
+                if (hudTooltipDescription != null) hudTooltipDescription.text = resource.definition.description;
+            }
+            break;
+
+        default:
+            hudTooltipPanel.style.display = DisplayStyle.None;
+            break;
+    }
+}
 
         void HandleSlotClicked(int index) {
             if (dragDropController.IsDragging()) return;

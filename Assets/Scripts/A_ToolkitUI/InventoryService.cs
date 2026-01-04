@@ -204,43 +204,6 @@ namespace Abracodabra.UI.Genes
         }
 
         /// <summary>
-        /// Convert an InventoryBarItem to UIInventoryItem for adding to inventory
-        /// Used when harvesting returns InventoryBarItem
-        /// </summary>
-        public static UIInventoryItem ConvertFromLegacy(InventoryBarItem legacyItem)
-        {
-            if (legacyItem == null) return null;
-
-            switch (legacyItem.Type)
-            {
-                case InventoryBarItem.ItemType.Seed:
-                    var seedItem = new UIInventoryItem(legacyItem.SeedTemplate);
-                    if (legacyItem.SeedRuntimeState != null)
-                    {
-                        seedItem.SeedRuntimeState = legacyItem.SeedRuntimeState;
-                    }
-                    return seedItem;
-
-                case InventoryBarItem.ItemType.Tool:
-                    return new UIInventoryItem(legacyItem.ToolDefinition);
-
-                case InventoryBarItem.ItemType.Gene:
-                    var gene = legacyItem.GeneInstance?.GetGene();
-                    if (gene != null)
-                        return new UIInventoryItem(gene);
-                    return null;
-
-                case InventoryBarItem.ItemType.Resource:
-                    if (legacyItem.ItemInstance != null)
-                        return new UIInventoryItem(legacyItem.ItemInstance);
-                    return null;
-
-                default:
-                    return null;
-            }
-        }
-
-        /// <summary>
         /// Add a harvested item to inventory (convenience method)
         /// </summary>
         public static bool AddHarvestedItem(ItemInstance itemInstance)

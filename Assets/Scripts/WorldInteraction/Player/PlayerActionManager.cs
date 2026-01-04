@@ -74,7 +74,7 @@ public class PlayerActionManager : MonoBehaviour
 
             case PlayerActionType.PlantSeed:
                 tickCost = 2; // Planting takes longer
-                var seedItem = actionData as InventoryBarItem;
+                var seedItem = actionData as UIInventoryItem;
                 success = ExecutePlantSeed(gridPosition, seedItem);
                 break;
 
@@ -108,11 +108,11 @@ public class PlayerActionManager : MonoBehaviour
         return true;
     }
 
-    private bool ExecutePlantSeed(Vector3Int gridPosition, InventoryBarItem seedItem)
+    bool ExecutePlantSeed(Vector3Int gridPosition, UIInventoryItem seedItem)
     {
         if (debugMode) Debug.Log($"[ExecutePlantSeed] Attempting to plant {seedItem?.GetDisplayName()} at {gridPosition}");
 
-        if (seedItem == null || seedItem.Type != InventoryBarItem.ItemType.Seed)
+        if (seedItem == null || seedItem.Type != UIInventoryItem.ItemType.Seed)
         {
             Debug.LogError("[ExecutePlantSeed] Action failed: Provided item was not a valid seed.");
             return false;
