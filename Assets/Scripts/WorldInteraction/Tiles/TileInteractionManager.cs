@@ -177,7 +177,7 @@ namespace WegoSystem
 
         /// <summary>
         /// Applies a tool action at the currently hovered cell.
-        /// Checks tiles in PRIORITY ORDER (highest first) to find a matching rule.
+        /// Only interacts with the HIGHEST PRIORITY tile - does NOT cascade to lower tiles.
         /// </summary>
         public void ApplyToolAction(ToolDefinition toolDef)
         {
@@ -185,40 +185,47 @@ namespace WegoSystem
 
             Vector3Int targetCell = currentlyHoveredCell.Value;
 
-            if (debugLogs) 
-                Debug.Log($"[TileInteractionManager] Applying Tool: '{toolDef.displayName}' at {targetCell}");
+            // Get the highest priority tile at this position
+            TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
 
-            // Get all tiles at this position, sorted by priority
-            var tilesAtPosition = GetAllTilesAt(targetCell);
-
-            if (debugLogs && tilesAtPosition.Count > 0)
-            {
-                string tileList = string.Join(", ", tilesAtPosition.Select(t => $"{t.displayName}(P:{t.interactionPriority})"));
-                Debug.Log($"[TileInteractionManager] Tiles at position (by priority): [{tileList}]");
-            }
-
-            // Check each tile in priority order for a matching rule
-            foreach (var tileToTest in tilesAtPosition)
+            if (topTile == null)
             {
                 if (debugLogs) 
-                    Debug.Log($"[TileInteractionManager] Checking tile '{tileToTest.displayName}' (priority {tileToTest.interactionPriority}) for tool rule...");
+                    Debug.Log($"[TileInteractionManager] No tile at {targetCell}");
+                return;
+            }
 
-                TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(
-                    r => r != null && r.tool == toolDef && r.fromTile == tileToTest
-                );
-
-                if (rule != null)
+            if (debugLogs)
+            {
+                Debug.Log($"[TileInteractionManager] Applying Tool: '{toolDef.displayName}' at {targetCell}");
+                Debug.Log($"[TileInteractionManager] Top tile: '{topTile.displayName}' (Priority: {topTile.interactionPriority})");
+                
+                // Show all tiles for debugging
+                var allTiles = GetAllTilesAt(targetCell);
+                if (allTiles.Count > 1)
                 {
-                    if (debugLogs) 
-                        Debug.Log($"[TileInteractionManager] MATCH! Rule: '{rule.fromTile.displayName}' -> '{(rule.toTile != null ? rule.toTile.displayName : "REMOVE")}'");
-
-                    ExecuteTileTransformation(rule, targetCell);
-                    return;
+                    string tileList = string.Join(", ", allTiles.Select(t => $"{t.displayName}(P:{t.interactionPriority})"));
+                    Debug.Log($"[TileInteractionManager] All tiles at position: [{tileList}]");
                 }
             }
 
-            if (debugLogs) 
-                Debug.LogWarning($"[TileInteractionManager] No matching rule for tool '{toolDef.displayName}' on any tile at {targetCell}");
+            // Only check the TOP tile for a matching rule - no cascading!
+            TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(
+                r => r != null && r.tool == toolDef && r.fromTile == topTile
+            );
+
+            if (rule != null)
+            {
+                if (debugLogs) 
+                    Debug.Log($"[TileInteractionManager] ✓ MATCH! Rule: '{rule.fromTile.displayName}' -> '{(rule.toTile != null ? rule.toTile.displayName : "REMOVE")}'");
+
+                ExecuteTileTransformation(rule, targetCell);
+            }
+            else
+            {
+                if (debugLogs) 
+                    Debug.Log($"[TileInteractionManager] ✗ No rule for '{toolDef.displayName}' on '{topTile.displayName}'. Action blocked by surface tile.");
+            }
         }
 
         private void ExecuteTileTransformation(TileInteractionRule rule, Vector3Int targetCell)
@@ -242,10 +249,13 @@ namespace WegoSystem
         private void CheckAndRefillTool()
         {
             if (!Input.GetMouseButtonDown(0)) return;
-            if (hoveredTileDef == null || ToolSwitcher.Instance == null) return;
+            if (ToolSwitcher.Instance == null) return;
 
             var currentTool = ToolSwitcher.Instance.CurrentTool;
             if (currentTool == null || !currentTool.limitedUses) return;
+
+            // Use the cached hoveredTileDef which is already the highest priority tile
+            if (hoveredTileDef == null) return;
 
             if (interactionLibrary?.refillRules != null)
             {
@@ -259,7 +269,7 @@ namespace WegoSystem
                     refillHappenedThisFrame = true;
 
                     if (debugLogs) 
-                        Debug.Log($"[TileInteractionManager] Refilled {currentTool.displayName} on {hoveredTileDef.displayName}");
+                        Debug.Log($"[TileInteractionManager] Refilled {currentTool.displayName} from '{hoveredTileDef.displayName}'");
 
                     if (PlayerActionManager.Instance != null)
                     {
