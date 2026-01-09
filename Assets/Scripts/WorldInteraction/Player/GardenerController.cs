@@ -156,16 +156,21 @@ namespace WegoSystem
             }
         }
 
-        private void TryMove(GridPosition direction)
+        void TryMove(GridPosition direction)
         {
             if (gridEntity == null) return;
+    
             GridPosition targetPos = gridEntity.Position + direction;
-            if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
+    
+            if (GridPositionManager.Instance != null && 
+                PlayerActionManager.Instance != null && 
+                TickManager.Instance != null &&
                 GridPositionManager.Instance.IsPositionValid(targetPos) &&
-                !GridPositionManager.Instance.IsPositionOccupied(targetPos))
+                !GridPositionManager.Instance.IsMovementBlockedAt(targetPos))  // Use new granular check
             {
                 Vector3 currentWorldPos = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
                 int moveCost = PlayerActionManager.Instance.GetMovementTickCost(currentWorldPos, this);
+        
                 if (moveCost > 1)
                 {
                     StartCoroutine(ProcessMultiTickMovement(targetPos, moveCost));

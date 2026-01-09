@@ -356,13 +356,13 @@ public class AnimalMovement : MonoBehaviour
         return true;
     }
 
-    private bool IsValidMove(GridPosition pos)
+    bool IsValidMove(GridPosition pos)
     {
         if (GridPositionManager.Instance == null) return false;
 
         if (!GridPositionManager.Instance.IsPositionValid(pos)) return false;
 
-        // NEW: Check for plant cells at this position and forbid movement.
+        // Check for plant cells (animals can't walk through plants)
         var entitiesAtPos = GridPositionManager.Instance.GetEntitiesAt(pos);
         foreach (var entity in entitiesAtPos)
         {
@@ -372,14 +372,13 @@ public class AnimalMovement : MonoBehaviour
             }
         }
 
-        if (GridPositionManager.Instance.IsPositionOccupied(pos))
+        // Use the new granular movement blocking check
+        if (GridPositionManager.Instance.IsMovementBlockedAt(pos))
         {
-            // The original logic here was fine, but now it's redundant with the PlantCell check above.
-            // Kept for robustness in case other occupants exist.
+            // Allow movement to food position even if blocked (for eating)
             if (currentTargetFood != null)
             {
                 GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
-                // We shouldn't be pathing onto the food anymore, but as a safeguard:
                 if (pos == foodPos) return false;
             }
             return false;

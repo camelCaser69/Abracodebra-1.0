@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 681,070 -> 489,627 chars (28.1% reduction)
-Estimated tokens saved: ~47,860
+Compression Stats: 700,518 -> 502,521 chars (28.3% reduction)
+Estimated tokens saved: ~49,499
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -161,56 +161,57 @@ using System.Linq;
   PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9771
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L10048
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L10794
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L11083
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L11294
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L11480
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L11679
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L12323
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L10049
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L10795
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L11084
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L11295
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L11481
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L11680
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L12324
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L12517
-  SeedRarity (Assets\Scripts\A_ToolkitUI/) L12687
-  QualityTier (Assets\Scripts\A_ToolkitUI/) L12709
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L12518
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L12688
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L12710
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L12771
-  CameraZoomController (Assets\Scripts\Core/) L12884
-  InitializationManager (Assets\Scripts\Core/) L12933
-  PixelGridSnapper (Assets\Scripts\Core/) L12973
-  RunState (Assets\Scripts\Core/) L13006
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L13174
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L13237
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L13373
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L13402
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L13553
-  GridEntity (Assets\Scripts\Ticks/) L13625
-  GridPosition (Assets\Scripts\Ticks/) L13795
-  GridPositionManager (Assets\Scripts\Ticks/) L13896
-  GridRadiusUtility (Assets\Scripts\Ticks/) L14377
-  MultiTileEntity (Assets\Scripts\Ticks/) L14521
-  PivotMode (Assets\Scripts\Ticks/) L14767
-  TickConfiguration (Assets\Scripts\Ticks/) L14838
-  ITickUpdateable (Assets\Scripts\Ticks/) L14924
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L15076
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L15097
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L15288
-  for (Assets\Scripts\WorldInteraction/) L15699
+  CameraController (Assets\Scripts\Core/) L12772
+  CameraZoomController (Assets\Scripts\Core/) L12885
+  InitializationManager (Assets\Scripts\Core/) L12934
+  PixelGridSnapper (Assets\Scripts\Core/) L12974
+  RunState (Assets\Scripts\Core/) L13007
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L13175
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L13238
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L13374
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L13403
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L13554
+  GridEntity (Assets\Scripts\Ticks/) L13626
+  GridPosition (Assets\Scripts\Ticks/) L13796
+  GridPositionManager (Assets\Scripts\Ticks/) L13897
+  GridRadiusUtility (Assets\Scripts\Ticks/) L14511
+  MultiTileEntity (Assets\Scripts\Ticks/) L14655
+  PivotMode (Assets\Scripts\Ticks/) L14899
+  TickConfiguration (Assets\Scripts\Ticks/) L15013
+  ITickUpdateable (Assets\Scripts\Ticks/) L15099
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L15251
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L15272
+  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L15468
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L15484
+  for (Assets\Scripts\WorldInteraction/) L16103
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15771
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16175
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L15803
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L16207
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L15861
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L15907
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L16030
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L16265
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L16311
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L16434
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16195
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16599
 
 
 ================================================================================
@@ -1424,7 +1425,7 @@ pub class AnimalMovement : MonoBehaviour {
    }
   }
 
-  if (GridPositionManager.Instance.IsPositionOccupied(pos)) {
+  if (GridPositionManager.Instance.IsMovementBlockedAt(pos)) {
    if (currentTargetFood != null) {
     GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
     if (pos == foodPos) return false;
@@ -10016,10 +10017,11 @@ namespace Abracodabra.UI.Genes {
 
   pub bool IsPositionOccupied(Vector3Int gridPosition) {
    CleanupDestroyedPlants();
+
    if (plantsByGridPosition.ContainsKey(gridPosition)) return true;
 
    if (GridPositionManager.Instance != null) {
-    return GridPositionManager.Instance.IsPositionOccupied(new GridPosition(gridPosition));
+    return GridPositionManager.Instance.IsSeedPlantingBlockedAt(new GridPosition(gridPosition));
    }
 
    return false;
@@ -14107,6 +14109,8 @@ namespace WegoSystem {
   ro Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
   ro HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
 
+  ro Dictionary<GridPosition, HashSet<MultiTileEntity>> multiTileEntitiesByPosition = new Dictionary<GridPosition, HashSet<MultiTileEntity>>();
+
   ro Dictionary<GridPosition, HashSet<GridEntity>> multiTileOccupancy = new Dictionary<GridPosition, HashSet<GridEntity>>();
 
   pub bool DebugMode => debugMode;
@@ -14203,6 +14207,84 @@ namespace WegoSystem {
    return false;
   }
 
+  pub bool IsMovementBlockedAt(GridPosition position) {
+   if (entitiesByPosition.TryGetValue(position, out var entities)) {
+    if (entities.Any(entity => entity.isTileOccupant)) {
+     return true;
+    }
+   }
+
+   if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities)) {
+    foreach (var mte in multiTileEntities) {
+     if (mte != null && mte.BlocksMovement) {
+      return true;
+     }
+    }
+   }
+
+   return false;
+  }
+
+  pub bool IsSeedPlantingBlockedAt(GridPosition position) {
+   if (entitiesByPosition.TryGetValue(position, out var entities)) {
+    if (entities.Any(entity => entity.isTileOccupant)) {
+     return true;
+    }
+   }
+
+   if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities)) {
+    foreach (var mte in multiTileEntities) {
+     if (mte != null && mte.BlocksSeedPlanting) {
+      return true;
+     }
+    }
+   }
+
+   return false;
+  }
+
+  pub bool IsToolUsageBlockedAt(GridPosition position) {
+
+   if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities)) {
+    foreach (var mte in multiTileEntities) {
+     if (mte != null && mte.BlocksToolUsage) {
+      return true;
+     }
+    }
+   }
+
+   var multiTileEntity = GetMultiTileEntityAt(position);
+   if (multiTileEntity != null && multiTileEntity.BlocksToolUsage) {
+    return true;
+   }
+
+   return false;
+  }
+
+  pub TileBlockingSettings GetBlockingSettingsAt(GridPosition position) {
+   var combined = TileBlockingSettings.None;
+
+   if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities)) {
+    foreach (var mte in multiTileEntities) {
+     if (mte != null) {
+      var settings = mte.BlockingSettings;
+      combined.blocksMovement |= settings.blocksMovement;
+      combined.blocksSeedPlanting |= settings.blocksSeedPlanting;
+      combined.blocksToolUsage |= settings.blocksToolUsage;
+     }
+    }
+   }
+
+   if (entitiesByPosition.TryGetValue(position, out var entities)) {
+    if (entities.Any(entity => entity.isTileOccupant)) {
+     combined.blocksMovement = true;
+     combined.blocksSeedPlanting = true;
+    }
+   }
+
+   return combined;
+  }
+
   pub void RegisterEntity(GridEntity entity) {
    if (entity == null || allEntities.Contains(entity)) return;
 
@@ -14283,7 +14365,67 @@ namespace WegoSystem {
    }
   }
 
+  pub void RegisterMultiTileEntityAtPosition(MultiTileEntity multiTileEntity, GridPosition position) {
+   if (multiTileEntity == null) return;
+
+   if (!multiTileEntitiesByPosition.ContainsKey(position)) {
+    multiTileEntitiesByPosition[position] = new HashSet<MultiTileEntity>();
+   }
+   multiTileEntitiesByPosition[position].Add(multiTileEntity);
+
+   var gridEntity = multiTileEntity.GetComponent<GridEntity>();
+   if (gridEntity != null) {
+    if (!entitiesByPosition.ContainsKey(position)) {
+     entitiesByPosition[position] = new HashSet<GridEntity>();
+    }
+    entitiesByPosition[position].Add(gridEntity);
+
+    if (multiTileEntity.BlocksTiles) {
+     if (!multiTileOccupancy.ContainsKey(position)) {
+      multiTileOccupancy[position] = new HashSet<GridEntity>();
+     }
+     multiTileOccupancy[position].Add(gridEntity);
+    }
+
+    if (!allEntities.Contains(gridEntity)) {
+     allEntities.Add(gridEntity);
+    }
+   }
+  }
+
+  pub void UnregisterMultiTileEntityFromPosition(MultiTileEntity multiTileEntity, GridPosition position) {
+   if (multiTileEntity == null) return;
+
+   if (multiTileEntitiesByPosition.ContainsKey(position)) {
+    multiTileEntitiesByPosition[position].Remove(multiTileEntity);
+    if (multiTileEntitiesByPosition[position].Count == 0) {
+     multiTileEntitiesByPosition.Remove(position);
+    }
+   }
+
+   var gridEntity = multiTileEntity.GetComponent<GridEntity>();
+   if (gridEntity != null) {
+    if (entitiesByPosition.ContainsKey(position)) {
+     entitiesByPosition[position].Remove(gridEntity);
+     if (entitiesByPosition[position].Count == 0) {
+      entitiesByPosition.Remove(position);
+     }
+    }
+
+    if (multiTileOccupancy.ContainsKey(position)) {
+     multiTileOccupancy[position].Remove(gridEntity);
+     if (multiTileOccupancy[position].Count == 0) {
+      multiTileOccupancy.Remove(position);
+     }
+    }
+   }
+  }
+
   pub MultiTileEntity GetMultiTileEntityAt(GridPosition position) {
+   if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities)) {
+    return multiTileEntities.FirstOrDefault(mte => mte != null && mte.OccupiesPosition(position));
+   }
+
    if (!entitiesByPosition.TryGetValue(position, out var entities)) {
     return null;
    }
@@ -14301,15 +14443,8 @@ namespace WegoSystem {
   pub List<MultiTileEntity> GetAllMultiTileEntitiesAt(GridPosition position) {
    var result = new List<MultiTileEntity>();
 
-   if (!entitiesByPosition.TryGetValue(position, out var entities)) {
-    return result;
-   }
-
-   foreach (var entity in entities) {
-    var multiTile = entity.GetComponent<MultiTileEntity>();
-    if (multiTile != null && multiTile.OccupiesPosition(position)) {
-     result.Add(multiTile);
-    }
+   if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities)) {
+    result.AddRange(multiTileEntities.Where(mte => mte != null && mte.OccupiesPosition(position)));
    }
 
    return result;
@@ -14409,7 +14544,7 @@ namespace WegoSystem {
     closedSet.Add(current);
 
     foreach (var neighbor in current.GetNeighbors(allowDiagonal)) {
-     if (!IsPositionValid(neighbor) || closedSet.Contains(neighbor) || (neighbor != end && IsPositionOccupied(neighbor))) {
+     if (!IsPositionValid(neighbor) || closedSet.Contains(neighbor) || (neighbor != end && IsMovementBlockedAt(neighbor))) {
       continue;
      }
 
@@ -14735,18 +14870,19 @@ namespace WegoSystem {
   bool isRegistered = false;
 
   pub GridPosition AnchorPosition => gridEntity != null ? gridEntity.Position : GridPosition.Zero;
-
   pub IReadOnlyList<GridPosition> OccupiedPositions => occupiedPositions;
-
   pub MultiTileFootprint Footprint => footprint;
-
   pub int InteractionPriority => footprint != null ? footprint.InteractionPriority : 100;
 
   pub bool BlocksTiles => footprint != null && footprint.BlocksTiles;
 
+  pub bool BlocksMovement => footprint != null && footprint.BlocksMovement;
+  pub bool BlocksSeedPlanting => footprint != null && footprint.BlocksSeedPlanting;
+  pub bool BlocksToolUsage => footprint != null && footprint.BlocksToolUsage;
+  pub TileBlockingSettings BlockingSettings => footprint != null ? footprint.BlockingSettings : TileBlockingSettings.None;
+
   void Awake() {
    gridEntity = GetComponent<GridEntity>();
-
    gridEntity.isTileOccupant = false;
   }
 
@@ -14785,7 +14921,6 @@ namespace WegoSystem {
    }
 
    GridPosition anchorPos = GridPositionManager.Instance.WorldToGrid(transform.position);
-
    SetAnchorPosition(anchorPos, true);
   }
 
@@ -14861,7 +14996,7 @@ namespace WegoSystem {
    if (GridPositionManager.Instance == null || isRegistered) return;
 
    foreach (var pos in occupiedPositions) {
-    GridPositionManager.Instance.RegisterEntityAtPosition(gridEntity, pos, BlocksTiles);
+    GridPositionManager.Instance.RegisterMultiTileEntityAtPosition(this, pos);
    }
 
    isRegistered = true;
@@ -14875,7 +15010,7 @@ namespace WegoSystem {
    if (GridPositionManager.Instance == null || !isRegistered) return;
 
    foreach (var pos in occupiedPositions) {
-    GridPositionManager.Instance.UnregisterEntityFromPosition(gridEntity, pos);
+    GridPositionManager.Instance.UnregisterMultiTileEntityFromPosition(this, pos);
    }
 
    isRegistered = false;
@@ -14892,13 +15027,11 @@ namespace WegoSystem {
 #if UNITY_EDITOR
   void OnDrawGizmos() {
    if (!showDebugGizmos || footprint == null) return;
-
    DrawFootprintGizmos();
   }
 
   void OnDrawGizmosSelected() {
    if (footprint == null) return;
-
    DrawFootprintGizmos();
   }
 
@@ -14955,70 +15088,113 @@ namespace WegoSystem {
 
 
 namespace WegoSystem {
-pub enum PivotMode {
-None,
-Automatic,
-Manual
-}
-
-pub class MultiTileFootprint : ScriptableObject {
-[Tooltip("Size of the footprint in tiles. (2,2) = 2x2 grid.")]
-[SerializeField] Vector2Int size = new Vector2Int(2, 2);
-
-[Tooltip("Determines how the visual position is calculated relative to the anchor (bottom-left) tile.")]
-[SerializeField] PivotMode pivotMode = PivotMode.Automatic;
-
-[Tooltip("If Pivot Mode is Manual: The offset in tiles from the bottom-left anchor. (0.5, 0.5) is the center of the first tile.")]
-[SerializeField] Vector2 manualPivot = new Vector2(0.5f, 0.5f);
-
-[Tooltip("Interaction priority. Higher values take precedence over tiles and other entities.")]
-[SerializeField] int interactionPriority = 200;
-
-[Tooltip("If true, this entity blocks movement/pathfinding on all occupied tiles.")]
-[SerializeField] bool blocksTiles = true;
-
-pub Vector2Int Size => size;
-pub PivotMode CurrentPivotMode => pivotMode;
-pub int InteractionPriority => interactionPriority;
-pub bool BlocksTiles => blocksTiles;
-
-pub List<Vector2Int> GetLocalOffsets() {
-var offsets = new List<Vector2Int>();
-for (int x = 0; x < size.x; x++) {
- for (int y = 0; y < size.y; y++) {
- offsets.Add(new Vector2Int(x, y));
+ pub enum PivotMode {
+  None,
+  Automatic,
+  Manual
  }
-}
-return offsets;
-}
 
-pub Vector2 GetCenterOffset(float cellSize = 1f) {
-switch (pivotMode) {
- case PivotMode.Automatic:
- return new Vector2(
- (size.x - 1) * cellSize * 0.5f,
- (size.y - 1) * cellSize * 0.5f
- );
+ pub struct TileBlockingSettings {
+  [Tooltip("If true, blocks player/entity movement and pathfinding on all occupied tiles.")]
+  pub bool blocksMovement;
 
- case PivotMode.Manual:
- return manualPivot * cellSize;
+  [Tooltip("If true, prevents seed planting on all occupied tiles.")]
+  pub bool blocksSeedPlanting;
 
- case PivotMode.None:
- default:
- return Vector2.zero;
-}
-}
+  [Tooltip("If true, prevents tool usage (hoe, watering can, etc.) on all occupied tiles.")]
+  pub bool blocksToolUsage;
 
-pub Vector3 GetCenteredWorldPosition(Vector3 anchorWorldPosition, float cellSize = 1f) {
-Vector2 offset = GetCenterOffset(cellSize);
-return anchorWorldPosition + new Vector3(offset.x, offset.y, 0f);
-}
+  pub bool HasAnyBlocking => blocksMovement || blocksSeedPlanting || blocksToolUsage;
 
-void OnValidate() {
-size.x = Mathf.Max(1, size.x);
-size.y = Mathf.Max(1, size.y);
-}
-}
+  pub stat TileBlockingSettings AllBlocked => new TileBlockingSettings(true, true, true);
+
+  pub stat TileBlockingSettings MovementOnly => new TileBlockingSettings(true, false, false);
+
+  pub stat TileBlockingSettings None => new TileBlockingSettings(false, false, false);
+
+  pub TileBlockingSettings(bool movement, bool seedPlanting, bool toolUsage) {
+   blocksMovement = movement;
+   blocksSeedPlanting = seedPlanting;
+   blocksToolUsage = toolUsage;
+  }
+ }
+
+ pub class MultiTileFootprint : ScriptableObject {
+  [Header("Size")]
+  [Tooltip("Size of the footprint in tiles. (2,2) = 2x2 grid.")]
+  [SerializeField] Vector2Int size = new Vector2Int(2, 2);
+
+  [Header("Visual Positioning")]
+  [Tooltip("Determines how the visual position is calculated relative to the anchor (bottom-left) tile.")]
+  [SerializeField] PivotMode pivotMode = PivotMode.Automatic;
+
+  [Tooltip("If Pivot Mode is Manual: The offset in tiles from the bottom-left anchor. (0.5, 0.5) is the center of the first tile.")]
+  [SerializeField] Vector2 manualPivot = new Vector2(0.5f, 0.5f);
+
+  [Header("Interaction")]
+  [Tooltip("Interaction priority. Higher values take precedence over tiles and other entities.")]
+  [SerializeField] int interactionPriority = 200;
+
+  [Header("Tile Blocking")]
+  [Tooltip("Configure what actions are blocked on tiles occupied by this entity.")]
+  [SerializeField] TileBlockingSettings blockingSettings = new TileBlockingSettings(true, true, true);
+
+  pub Vector2Int Size => size;
+  pub PivotMode CurrentPivotMode => pivotMode;
+  pub int InteractionPriority => interactionPriority;
+  pub TileBlockingSettings BlockingSettings => blockingSettings;
+
+  pub bool BlocksMovement => blockingSettings.blocksMovement;
+  pub bool BlocksSeedPlanting => blockingSettings.blocksSeedPlanting;
+  pub bool BlocksToolUsage => blockingSettings.blocksToolUsage;
+
+  pub bool BlocksTiles => blockingSettings.HasAnyBlocking;
+
+  pub List<Vector2Int> GetLocalOffsets() {
+   var offsets = new List<Vector2Int>();
+   for (int x = 0; x < size.x; x++) {
+    for (int y = 0; y < size.y; y++) {
+     offsets.Add(new Vector2Int(x, y));
+    }
+   }
+   return offsets;
+  }
+
+  pub Vector2 GetCenterOffset(float cellSize = 1f) {
+   switch (pivotMode) {
+    case PivotMode.Automatic:
+     return new Vector2(
+      (size.x - 1) * cellSize * 0.5f,
+      (size.y - 1) * cellSize * 0.5f
+     );
+
+    case PivotMode.Manual:
+     return manualPivot * cellSize;
+
+    case PivotMode.None:
+    default:
+     return Vector2.zero;
+   }
+  }
+
+  pub Vector3 GetCenteredWorldPosition(Vector3 anchorWorldPosition, float cellSize = 1f) {
+   Vector2 offset = GetCenterOffset(cellSize);
+   return anchorWorldPosition + new Vector3(offset.x, offset.y, 0f);
+  }
+
+  void OnValidate() {
+   size.x = Mathf.Max(1, size.x);
+   size.y = Mathf.Max(1, size.y);
+  }
+
+  void Reset() {
+   size = new Vector2Int(2, 2);
+   pivotMode = PivotMode.Automatic;
+   manualPivot = new Vector2(0.5f, 0.5f);
+   interactionPriority = 200;
+   blockingSettings = new TileBlockingSettings(true, true, true);
+  }
+ }
 }
 
 ////////////////////////////////////////////////////////////
@@ -15413,12 +15589,17 @@ namespace WegoSystem {
 
   void TryMove(GridPosition direction) {
    if (gridEntity == null) return;
+
    GridPosition targetPos = gridEntity.Position + direction;
-   if (GridPositionManager.Instance != null && PlayerActionManager.Instance != null && TickManager.Instance != null &&
+
+   if (GridPositionManager.Instance != null &&
+    PlayerActionManager.Instance != null &&
+    TickManager.Instance != null &&
     GridPositionManager.Instance.IsPositionValid(targetPos) &&
-    !GridPositionManager.Instance.IsPositionOccupied(targetPos)) {
+    !GridPositionManager.Instance.IsMovementBlockedAt(targetPos))  // Use new granular check {
     Vector3 currentWorldPos = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
     int moveCost = PlayerActionManager.Instance.GetMovementTickCost(currentWorldPos, this);
+
     if (moveCost > 1) {
      StartCoroutine(ProcessMultiTickMovement(targetPos, moveCost));
     }
@@ -15472,6 +15653,22 @@ namespace WegoSystem {
 }
 
 ////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\WorldInteraction\Tiles\TileDefinitionMapping.cs
+
+﻿using System;
+using skner.DualGrid;
+
+namespace WegoSystem {
+ pub class TileDefinitionMapping {
+  [Tooltip("The tile definition that defines behavior and properties.")]
+  pub TileDefinition tileDef;
+
+  [Tooltip("The dual grid tilemap module that renders this tile type.")]
+  pub DualGridTilemapModule tilemapModule;
+ }
+}
+
+////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\WorldInteraction\Tiles\TileInteractionManager.cs
 
 ﻿using System;
@@ -15479,10 +15676,10 @@ using UnityEngine.Tilemaps;
 using Abracodabra.UI.Genes;
 using skner.DualGrid;
 using TMPro;
-using WegoSystem;
 
 #if UNITY_EDITOR
 using UnityEditor;
+using System.IO;
 #endif
 
 namespace WegoSystem {
@@ -15498,7 +15695,7 @@ namespace WegoSystem {
   }
 
   [Header("Tile Mappings")]
-  [Tooltip("Map TileDefinitions to their DualGridTilemapModules. Order affects sorting only, not detection priority.")]
+  [Tooltip("Map TileDefinitions to their DualGridTilemapModules. Auto-backed up on every change!")]
   pub List<TileDefinitionMapping> tileDefinitionMappings;
 
   [Header("Interaction")]
@@ -15617,12 +15814,15 @@ namespace WegoSystem {
    if (toolDef == null || !currentlyHoveredCell.HasValue) return;
 
    Vector3Int targetCell = currentlyHoveredCell.Value;
+   GridPosition gridPos = new GridPosition(targetCell);
 
-   if (GridPositionManager.Instance != null &&
-    GridPositionManager.Instance.IsPositionOccupied(new GridPosition(targetCell))) {
-    if (debugLogs)
-     Debug.Log($"[TileInteractionManager] Action blocked: Position {targetCell} is occupied by an entity.");
-    return;
+   if (GridPositionManager.Instance != null) {
+    var multiTileEntity = GridPositionManager.Instance.GetMultiTileEntityAt(gridPos);
+    if (multiTileEntity != null && multiTileEntity.BlocksToolUsage) {
+     if (debugLogs)
+      Debug.Log($"[TileInteractionManager] Tool action blocked: Position {targetCell} has tool usage blocked by '{multiTileEntity.gameObject.name}'.");
+     return;
+    }
    }
 
    TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
@@ -15879,6 +16079,211 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
    }
    return new Vector3(cellPos.x + 0.5f, cellPos.y + 0.5f, 0f);
   }
+
+#if UNITY_EDITOR
+
+  const string BACKUP_FOLDER = "Assets/Editor/TileMappingsBackup";
+  const string BACKUP_FILENAME = "TileMappingsBackup.json";
+
+  class MappingBackupData {
+   pub string tileDefGuid;
+   pub string tileDefPath;
+   pub string tilemapModulePath; // Hierarchy path in scene
+  }
+
+  class BackupFile {
+   pub string sceneName;
+   pub string gameObjectName;
+   pub List<MappingBackupData> mappings = new List<MappingBackupData>();
+   pub string backupTime;
+  }
+
+  string GetBackupFilePath() {
+   return Path.Combine(BACKUP_FOLDER, BACKUP_FILENAME);
+  }
+
+  pub void BackupMappingsToFile() {
+   if (tileDefinitionMappings == null || tileDefinitionMappings.Count == 0) {
+    Debug.LogWarning("[TileInteractionManager] No mappings to backup!");
+    return;
+   }
+
+   if (!Directory.Exists(BACKUP_FOLDER)) {
+    Directory.CreateDirectory(BACKUP_FOLDER);
+   }
+
+   var backup = new BackupFile {
+    sceneName = gameObject.scene.name,
+    gameObjectName = gameObject.name,
+    backupTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+   };
+
+   foreach (var mapping in tileDefinitionMappings) {
+    if (mapping == null) continue;
+
+    var data = new MappingBackupData();
+
+    if (mapping.tileDef != null) {
+     string assetPath = AssetDatabase.GetAssetPath(mapping.tileDef);
+     data.tileDefGuid = AssetDatabase.AssetPathToGUID(assetPath);
+     data.tileDefPath = assetPath;
+    }
+
+    if (mapping.tilemapModule != null) {
+     data.tilemapModulePath = GetGameObjectPath(mapping.tilemapModule.gameObject);
+    }
+
+    backup.mappings.Add(data);
+   }
+
+   string json = JsonUtility.ToJson(backup, true);
+   File.WriteAllText(GetBackupFilePath(), json);
+   AssetDatabase.Refresh();
+
+   Debug.Log($"[TileInteractionManager] ✅ Backed up {backup.mappings.Count} mappings to {GetBackupFilePath()}");
+  }
+
+  pub void RestoreMappingsFromFile() {
+   string filePath = GetBackupFilePath();
+
+   if (!File.Exists(filePath)) {
+    Debug.LogError($"[TileInteractionManager] No backup file found at {filePath}");
+    return;
+   }
+
+   string json = File.ReadAllText(filePath);
+   var backup = JsonUtility.FromJson<BackupFile>(json);
+
+   if (backup == null || backup.mappings == null) {
+    Debug.LogError("[TileInteractionManager] Failed to parse backup file!");
+    return;
+   }
+
+   if (tileDefinitionMappings == null) {
+    tileDefinitionMappings = new List<TileDefinitionMapping>();
+   }
+   tileDefinitionMappings.Clear();
+
+   int restoredCount = 0;
+   int failedCount = 0;
+
+   foreach (var data in backup.mappings) {
+    var mapping = new TileDefinitionMapping();
+
+    if (!string.IsNullOrEmpty(data.tileDefGuid)) {
+     string assetPath = AssetDatabase.GUIDToAssetPath(data.tileDefGuid);
+     if (!string.IsNullOrEmpty(assetPath)) {
+      mapping.tileDef = AssetDatabase.LoadAssetAtPath<TileDefinition>(assetPath);
+     }
+
+     if (mapping.tileDef == null && !string.IsNullOrEmpty(data.tileDefPath)) {
+      mapping.tileDef = AssetDatabase.LoadAssetAtPath<TileDefinition>(data.tileDefPath);
+     }
+    }
+
+    if (!string.IsNullOrEmpty(data.tilemapModulePath)) {
+     GameObject go = FindGameObjectByPath(data.tilemapModulePath);
+     if (go != null) {
+      mapping.tilemapModule = go.GetComponent<DualGridTilemapModule>();
+     }
+    }
+
+    tileDefinitionMappings.Add(mapping);
+
+    if (mapping.tileDef != null && mapping.tilemapModule != null) {
+     restoredCount++;
+    }
+    else {
+     failedCount++;
+     Debug.LogWarning($"[TileInteractionManager] Partial restore - TileDef: {(mapping.tileDef != null ? "✓" : "✗")}, Module: {(mapping.tilemapModule != null ? "✓" : "✗")} (Path: {data.tilemapModulePath})");
+    }
+   }
+
+   EditorUtility.SetDirty(this);
+
+   Debug.Log($"[TileInteractionManager] ✅ Restored {restoredCount} mappings successfully, {failedCount} had issues. Backup was from: {backup.backupTime}");
+  }
+
+  pub void CheckBackupStatus() {
+   string filePath = GetBackupFilePath();
+
+   if (!File.Exists(filePath)) {
+    Debug.Log("[TileInteractionManager] No backup file exists yet. Use 'Backup Mappings to File' to create one.");
+    return;
+   }
+
+   string json = File.ReadAllText(filePath);
+   var backup = JsonUtility.FromJson<BackupFile>(json);
+
+   int currentCount = tileDefinitionMappings?.Count ?? 0;
+   int backupCount = backup?.mappings?.Count ?? 0;
+
+   if (currentCount == 0 && backupCount > 0) {
+    Debug.LogWarning($"[TileInteractionManager] ⚠️ MAPPINGS LOST! Current: {currentCount}, Backup has: {backupCount}. Use 'Restore Mappings from File' to recover.");
+   }
+   else if (currentCount < backupCount) {
+    Debug.LogWarning($"[TileInteractionManager] ⚠️ Some mappings may be lost. Current: {currentCount}, Backup has: {backupCount}.");
+   }
+   else {
+    Debug.Log($"[TileInteractionManager] ✅ Mappings look fine. Current: {currentCount}, Backup: {backupCount}. Last backup: {backup.backupTime}");
+   }
+  }
+
+  string GetGameObjectPath(GameObject go) {
+   string path = go.name;
+   Transform parent = go.transform.parent;
+
+   while (parent != null) {
+    path = parent.name + "/" + path;
+    parent = parent.parent;
+   }
+
+   return path;
+  }
+
+  GameObject FindGameObjectByPath(string path) {
+   if (string.IsNullOrEmpty(path)) return null;
+
+   string[] parts = path.Split('/');
+
+   GameObject[] rootObjects = gameObject.scene.GetRootGameObjects();
+   GameObject current = null;
+
+   foreach (var root in rootObjects) {
+    if (root.name == parts[0]) {
+     current = root;
+     break;
+    }
+   }
+
+   if (current == null) return null;
+
+   for (int i = 1; i < parts.Length; i++) {
+    Transform child = current.transform.Find(parts[i]);
+    if (child == null) return null;
+    current = child.gameObject;
+   }
+
+   return current;
+  }
+
+  int lastMappingCount = -1;
+  void OnValidate() {
+   if (tileDefinitionMappings == null) return;
+
+   int validCount = tileDefinitionMappings.Count(m => m?.tileDef != null && m?.tilemapModule != null);
+
+   if (validCount > 0 && validCount != lastMappingCount) {
+    lastMappingCount = validCount;
+
+    EditorApplication.delayCall += () => {
+     if (this != null) {
+      BackupMappingsToFile();
+     }
+    };
+   }
+  }
+#endif
  }
 }
 

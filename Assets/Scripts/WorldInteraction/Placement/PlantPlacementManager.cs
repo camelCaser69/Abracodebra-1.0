@@ -70,14 +70,15 @@ namespace Abracodabra.UI.Genes
 
         public bool IsPositionOccupied(Vector3Int gridPosition)
         {
-            // Check internal plant registry first
             CleanupDestroyedPlants();
+    
+            // Check if there's already a plant at this position
             if (plantsByGridPosition.ContainsKey(gridPosition)) return true;
 
-            // NEW: Check global grid occupancy which handles MultiTileEntities
+            // Use the new granular blocking check for seed planting
             if (GridPositionManager.Instance != null)
             {
-                return GridPositionManager.Instance.IsPositionOccupied(new GridPosition(gridPosition));
+                return GridPositionManager.Instance.IsSeedPlantingBlockedAt(new GridPosition(gridPosition));
             }
 
             return false;

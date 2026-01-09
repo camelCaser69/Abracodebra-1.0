@@ -6,10 +6,10 @@ using UnityEngine.Tilemaps;
 using Abracodabra.UI.Genes;
 using skner.DualGrid;
 using TMPro;
-using WegoSystem;
 
 #if UNITY_EDITOR
 using UnityEditor;
+using System.IO;
 #endif
 
 namespace WegoSystem
@@ -30,7 +30,7 @@ namespace WegoSystem
         }
 
         [Header("Tile Mappings")]
-        [Tooltip("Map TileDefinitions to their DualGridTilemapModules. Order affects sorting only, not detection priority.")]
+        [Tooltip("Map TileDefinitions to their DualGridTilemapModules. Auto-backed up on every change!")]
         public List<TileDefinitionMapping> tileDefinitionMappings;
 
         [Header("Interaction")]
@@ -163,19 +163,28 @@ namespace WegoSystem
             return module.DataTilemap != null && module.DataTilemap.HasTile(cellPos);
         }
 
+        /// <summary>
+        /// Applies a tool action at the currently hovered cell.
+        /// Only blocks tool usage for multi-tile entities with BlocksToolUsage enabled.
+        /// Single-tile entities (plants, etc.) do NOT block tool usage.
+        /// </summary>
         public void ApplyToolAction(ToolDefinition toolDef)
         {
             if (toolDef == null || !currentlyHoveredCell.HasValue) return;
 
             Vector3Int targetCell = currentlyHoveredCell.Value;
-            
-            // NEW: Check if the tile is blocked by an entity (like a MultiTileEntity or Plant)
-            if (GridPositionManager.Instance != null && 
-                GridPositionManager.Instance.IsPositionOccupied(new GridPosition(targetCell)))
+            GridPosition gridPos = new GridPosition(targetCell);
+
+            // ONLY check multi-tile entities that explicitly block tool usage
+            if (GridPositionManager.Instance != null)
             {
-                if (debugLogs) 
-                    Debug.Log($"[TileInteractionManager] Action blocked: Position {targetCell} is occupied by an entity.");
-                return;
+                var multiTileEntity = GridPositionManager.Instance.GetMultiTileEntityAt(gridPos);
+                if (multiTileEntity != null && multiTileEntity.BlocksToolUsage)
+                {
+                    if (debugLogs)
+                        Debug.Log($"[TileInteractionManager] Tool action blocked: Position {targetCell} has tool usage blocked by '{multiTileEntity.gameObject.name}'.");
+                    return;
+                }
             }
 
             TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
@@ -493,5 +502,268 @@ namespace WegoSystem
             }
             return new Vector3(cellPos.x + 0.5f, cellPos.y + 0.5f, 0f);
         }
+
+#if UNITY_EDITOR
+        // ============================================================
+        // BACKUP/RESTORE SYSTEM - Prevents data loss on recompilation
+        // ============================================================
+
+        private const string BACKUP_FOLDER = "Assets/Editor/TileMappingsBackup";
+        private const string BACKUP_FILENAME = "TileMappingsBackup.json";
+
+        [Serializable]
+        private class MappingBackupData
+        {
+            public string tileDefGuid;
+            public string tileDefPath;
+            public string tilemapModulePath; // Hierarchy path in scene
+        }
+
+        [Serializable]
+        private class BackupFile
+        {
+            public string sceneName;
+            public string gameObjectName;
+            public List<MappingBackupData> mappings = new List<MappingBackupData>();
+            public string backupTime;
+        }
+
+        private string GetBackupFilePath()
+        {
+            return Path.Combine(BACKUP_FOLDER, BACKUP_FILENAME);
+        }
+
+        [ContextMenu("💾 Backup Mappings to File")]
+        public void BackupMappingsToFile()
+        {
+            if (tileDefinitionMappings == null || tileDefinitionMappings.Count == 0)
+            {
+                Debug.LogWarning("[TileInteractionManager] No mappings to backup!");
+                return;
+            }
+
+            // Ensure backup folder exists
+            if (!Directory.Exists(BACKUP_FOLDER))
+            {
+                Directory.CreateDirectory(BACKUP_FOLDER);
+            }
+
+            var backup = new BackupFile
+            {
+                sceneName = gameObject.scene.name,
+                gameObjectName = gameObject.name,
+                backupTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
+            };
+
+            foreach (var mapping in tileDefinitionMappings)
+            {
+                if (mapping == null) continue;
+
+                var data = new MappingBackupData();
+
+                // Store TileDefinition by GUID (asset reference)
+                if (mapping.tileDef != null)
+                {
+                    string assetPath = AssetDatabase.GetAssetPath(mapping.tileDef);
+                    data.tileDefGuid = AssetDatabase.AssetPathToGUID(assetPath);
+                    data.tileDefPath = assetPath;
+                }
+
+                // Store TilemapModule by hierarchy path (scene reference)
+                if (mapping.tilemapModule != null)
+                {
+                    data.tilemapModulePath = GetGameObjectPath(mapping.tilemapModule.gameObject);
+                }
+
+                backup.mappings.Add(data);
+            }
+
+            string json = JsonUtility.ToJson(backup, true);
+            File.WriteAllText(GetBackupFilePath(), json);
+            AssetDatabase.Refresh();
+
+            Debug.Log($"[TileInteractionManager] ✅ Backed up {backup.mappings.Count} mappings to {GetBackupFilePath()}");
+        }
+
+        [ContextMenu("📂 Restore Mappings from File")]
+        public void RestoreMappingsFromFile()
+        {
+            string filePath = GetBackupFilePath();
+
+            if (!File.Exists(filePath))
+            {
+                Debug.LogError($"[TileInteractionManager] No backup file found at {filePath}");
+                return;
+            }
+
+            string json = File.ReadAllText(filePath);
+            var backup = JsonUtility.FromJson<BackupFile>(json);
+
+            if (backup == null || backup.mappings == null)
+            {
+                Debug.LogError("[TileInteractionManager] Failed to parse backup file!");
+                return;
+            }
+
+            // Clear existing mappings
+            if (tileDefinitionMappings == null)
+            {
+                tileDefinitionMappings = new List<TileDefinitionMapping>();
+            }
+            tileDefinitionMappings.Clear();
+
+            int restoredCount = 0;
+            int failedCount = 0;
+
+            foreach (var data in backup.mappings)
+            {
+                var mapping = new TileDefinitionMapping();
+
+                // Restore TileDefinition from GUID
+                if (!string.IsNullOrEmpty(data.tileDefGuid))
+                {
+                    string assetPath = AssetDatabase.GUIDToAssetPath(data.tileDefGuid);
+                    if (!string.IsNullOrEmpty(assetPath))
+                    {
+                        mapping.tileDef = AssetDatabase.LoadAssetAtPath<TileDefinition>(assetPath);
+                    }
+                    
+                    // Fallback to path if GUID fails
+                    if (mapping.tileDef == null && !string.IsNullOrEmpty(data.tileDefPath))
+                    {
+                        mapping.tileDef = AssetDatabase.LoadAssetAtPath<TileDefinition>(data.tileDefPath);
+                    }
+                }
+
+                // Restore TilemapModule from hierarchy path
+                if (!string.IsNullOrEmpty(data.tilemapModulePath))
+                {
+                    GameObject go = FindGameObjectByPath(data.tilemapModulePath);
+                    if (go != null)
+                    {
+                        mapping.tilemapModule = go.GetComponent<DualGridTilemapModule>();
+                    }
+                }
+
+                tileDefinitionMappings.Add(mapping);
+
+                if (mapping.tileDef != null && mapping.tilemapModule != null)
+                {
+                    restoredCount++;
+                }
+                else
+                {
+                    failedCount++;
+                    Debug.LogWarning($"[TileInteractionManager] Partial restore - TileDef: {(mapping.tileDef != null ? "✓" : "✗")}, Module: {(mapping.tilemapModule != null ? "✓" : "✗")} (Path: {data.tilemapModulePath})");
+                }
+            }
+
+            EditorUtility.SetDirty(this);
+
+            Debug.Log($"[TileInteractionManager] ✅ Restored {restoredCount} mappings successfully, {failedCount} had issues. Backup was from: {backup.backupTime}");
+        }
+
+        [ContextMenu("🔍 Check Backup Status")]
+        public void CheckBackupStatus()
+        {
+            string filePath = GetBackupFilePath();
+
+            if (!File.Exists(filePath))
+            {
+                Debug.Log("[TileInteractionManager] No backup file exists yet. Use 'Backup Mappings to File' to create one.");
+                return;
+            }
+
+            string json = File.ReadAllText(filePath);
+            var backup = JsonUtility.FromJson<BackupFile>(json);
+
+            int currentCount = tileDefinitionMappings?.Count ?? 0;
+            int backupCount = backup?.mappings?.Count ?? 0;
+
+            if (currentCount == 0 && backupCount > 0)
+            {
+                Debug.LogWarning($"[TileInteractionManager] ⚠️ MAPPINGS LOST! Current: {currentCount}, Backup has: {backupCount}. Use 'Restore Mappings from File' to recover.");
+            }
+            else if (currentCount < backupCount)
+            {
+                Debug.LogWarning($"[TileInteractionManager] ⚠️ Some mappings may be lost. Current: {currentCount}, Backup has: {backupCount}.");
+            }
+            else
+            {
+                Debug.Log($"[TileInteractionManager] ✅ Mappings look fine. Current: {currentCount}, Backup: {backupCount}. Last backup: {backup.backupTime}");
+            }
+        }
+
+        private string GetGameObjectPath(GameObject go)
+        {
+            string path = go.name;
+            Transform parent = go.transform.parent;
+            
+            while (parent != null)
+            {
+                path = parent.name + "/" + path;
+                parent = parent.parent;
+            }
+            
+            return path;
+        }
+
+        private GameObject FindGameObjectByPath(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return null;
+
+            string[] parts = path.Split('/');
+            
+            // Find root objects in scene
+            GameObject[] rootObjects = gameObject.scene.GetRootGameObjects();
+            GameObject current = null;
+
+            foreach (var root in rootObjects)
+            {
+                if (root.name == parts[0])
+                {
+                    current = root;
+                    break;
+                }
+            }
+
+            if (current == null) return null;
+
+            // Navigate down the hierarchy
+            for (int i = 1; i < parts.Length; i++)
+            {
+                Transform child = current.transform.Find(parts[i]);
+                if (child == null) return null;
+                current = child.gameObject;
+            }
+
+            return current;
+        }
+
+        // Auto-backup when mappings change
+        private int lastMappingCount = -1;
+        private void OnValidate()
+        {
+            if (tileDefinitionMappings == null) return;
+            
+            // Check if any mapping has both references set
+            int validCount = tileDefinitionMappings.Count(m => m?.tileDef != null && m?.tilemapModule != null);
+            
+            // Only backup if we have valid mappings and the count changed
+            if (validCount > 0 && validCount != lastMappingCount)
+            {
+                lastMappingCount = validCount;
+                
+                // Delayed call to avoid issues during serialization
+                EditorApplication.delayCall += () =>
+                {
+                    if (this != null)
+                    {
+                        BackupMappingsToFile();
+                    }
+                };
+            }
+        }
+#endif
     }
 }

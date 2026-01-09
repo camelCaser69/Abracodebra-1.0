@@ -1,0 +1,27 @@
+{
+    "sceneName": "SampleScene",
+    "gameObjectName": "Manager_Tiles",
+    "mappings": [
+        {
+            "tileDefGuid": "bdaaa34d90e461942bac3c72135871fc",
+            "tileDefPath": "Assets/Scriptable Objects/Tiles/TileDefinition_003_Water.asset",
+            "tilemapModulePath": "Dual Grid/DataTilemap_Dirt_Water"
+        },
+        {
+            "tileDefGuid": "4f94336bb2aca31489661a9f761144db",
+            "tileDefPath": "Assets/Scriptable Objects/Tiles/TileDefinition_001_Dirt.asset",
+            "tilemapModulePath": "Dual Grid/DataTilemap_Dirt"
+        },
+        {
+            "tileDefGuid": "2efc2db88b0caff4693943889a86ccac",
+            "tileDefPath": "Assets/Scriptable Objects/Tiles/TileDefinition_002_DirtWet.asset",
+            "tilemapModulePath": "Dual Grid/DataTilemap_Dirt_Wet"
+        },
+        {
+            "tileDefGuid": "b82b8add4da60854b89d053b81886617",
+            "tileDefPath": "Assets/Scriptable Objects/Tiles/TileDefinition_000_Grass.asset",
+            "tilemapModulePath": "Dual Grid/DataTilemap_Grass"
+        }
+    ],
+    "backupTime": "2026-01-09 23:44:41"
+}

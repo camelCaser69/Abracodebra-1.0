@@ -33,32 +33,24 @@ namespace WegoSystem
         /// <summary>
         /// Create settings with all blocking enabled (default for most multi-tile entities).
         /// </summary>
-        public static TileBlockingSettings AllBlocked => new TileBlockingSettings
-        {
-            blocksMovement = true,
-            blocksSeedPlanting = true,
-            blocksToolUsage = true
-        };
+        public static TileBlockingSettings AllBlocked => new TileBlockingSettings(true, true, true);
 
         /// <summary>
         /// Create settings with only movement blocking (allows interactions on tiles).
         /// </summary>
-        public static TileBlockingSettings MovementOnly => new TileBlockingSettings
-        {
-            blocksMovement = true,
-            blocksSeedPlanting = false,
-            blocksToolUsage = false
-        };
+        public static TileBlockingSettings MovementOnly => new TileBlockingSettings(true, false, false);
 
         /// <summary>
         /// Create settings with no blocking at all.
         /// </summary>
-        public static TileBlockingSettings None => new TileBlockingSettings
+        public static TileBlockingSettings None => new TileBlockingSettings(false, false, false);
+
+        public TileBlockingSettings(bool movement, bool seedPlanting, bool toolUsage)
         {
-            blocksMovement = false,
-            blocksSeedPlanting = false,
-            blocksToolUsage = false
-        };
+            blocksMovement = movement;
+            blocksSeedPlanting = seedPlanting;
+            blocksToolUsage = toolUsage;
+        }
     }
 
     [CreateAssetMenu(fileName = "NewMultiTileFootprint", menuName = "WegoSystem/Multi-Tile Footprint")]
@@ -81,7 +73,7 @@ namespace WegoSystem
 
         [Header("Tile Blocking")]
         [Tooltip("Configure what actions are blocked on tiles occupied by this entity.")]
-        [SerializeField] private TileBlockingSettings blockingSettings = TileBlockingSettings.AllBlocked;
+        [SerializeField] private TileBlockingSettings blockingSettings = new TileBlockingSettings(true, true, true);
 
         // Public accessors
         public Vector2Int Size => size;
@@ -151,6 +143,17 @@ namespace WegoSystem
         {
             size.x = Mathf.Max(1, size.x);
             size.y = Mathf.Max(1, size.y);
+        }
+
+        private void Reset()
+        {
+            // Called when component is first added or Reset is used
+            // Set sensible defaults for new assets
+            size = new Vector2Int(2, 2);
+            pivotMode = PivotMode.Automatic;
+            manualPivot = new Vector2(0.5f, 0.5f);
+            interactionPriority = 200;
+            blockingSettings = new TileBlockingSettings(true, true, true);
         }
     }
 }

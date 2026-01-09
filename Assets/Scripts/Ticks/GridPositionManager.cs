@@ -222,10 +222,15 @@ namespace WegoSystem
 
         /// <summary>
         /// Returns true if tool usage (hoe, watering can, etc.) is blocked at this position.
+        /// IMPORTANT: Only multi-tile entities with BlocksToolUsage enabled block tool usage.
+        /// Single-tile entities (plants, food, poop, etc.) NEVER block tool usage.
         /// </summary>
         public bool IsToolUsageBlockedAt(GridPosition position)
         {
-            // Check multi-tile entities with tool usage blocking enabled
+            // ONLY check multi-tile entities with tool usage blocking enabled
+            // Single-tile entities should NEVER block tool usage (allows watering plants, etc.)
+            
+            // Check new multi-tile entity dictionary
             if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities))
             {
                 foreach (var mte in multiTileEntities)
@@ -237,9 +242,12 @@ namespace WegoSystem
                 }
             }
 
-            // Note: Single-tile entities (plants) typically don't block tool usage
-            // because you might want to water plants, etc.
-            // If you want plants to block tool usage, add that check here.
+            // Also check via GetMultiTileEntityAt for backwards compatibility
+            var multiTileEntity = GetMultiTileEntityAt(position);
+            if (multiTileEntity != null && multiTileEntity.BlocksToolUsage)
+            {
+                return true;
+            }
 
             return false;
         }
