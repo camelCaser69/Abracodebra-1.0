@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: add44ce22c09b714093e66ce3afd5c54, type: 3}
   m_Name: MultiTile_001_Doris
   m_EditorClassIdentifier: 
-  size: {x: 2, y: 2}
-  centerPivot: 1
+  size: {x: 2, y: 1}
+  pivotMode: 2
+  manualPivot: {x: 1, y: 1}
   interactionPriority: 200
   blocksTiles: 1

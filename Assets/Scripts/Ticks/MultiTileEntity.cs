@@ -1,6 +1,9 @@
-// Assets/Scripts/Ticks/MultiTileEntity.cs
 using System.Collections.Generic;
 using UnityEngine;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace WegoSystem
 {
@@ -103,7 +106,7 @@ namespace WegoSystem
 
         /// <summary>
         /// Snaps the anchor to the grid and registers at all footprint positions.
-        /// Also centers the visual if footprint.CenterPivot is true.
+        /// Also centers the visual based on the footprint's PivotMode.
         /// </summary>
         public void SnapToGridAndRegister()
         {
@@ -159,18 +162,13 @@ namespace WegoSystem
 
             Vector3 anchorWorld = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
             
-            if (footprint.CenterPivot)
-            {
-                // Get the grid's cell size (assuming uniform cells)
-                Grid grid = GridPositionManager.Instance.GetTilemapGrid();
-                float cellSize = grid != null ? grid.cellSize.x : 1f;
-                
-                transform.position = footprint.GetCenteredWorldPosition(anchorWorld, cellSize) + visualOffset;
-            }
-            else
-            {
-                transform.position = anchorWorld + visualOffset;
-            }
+            // Get the grid's cell size (assuming uniform cells)
+            Grid grid = GridPositionManager.Instance.GetTilemapGrid();
+            float cellSize = grid != null ? grid.cellSize.x : 1f;
+            
+            // Logic change: The Footprint class now handles PivotMode (None, Automatic, Manual) internally.
+            // If mode is 'None', it returns anchorWorld. If 'Automatic' or 'Manual', it calculates the offset.
+            transform.position = footprint.GetCenteredWorldPosition(anchorWorld, cellSize) + visualOffset;
         }
 
         /// <summary>
