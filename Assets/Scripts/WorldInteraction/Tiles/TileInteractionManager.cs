@@ -168,6 +168,15 @@ namespace WegoSystem
             if (toolDef == null || !currentlyHoveredCell.HasValue) return;
 
             Vector3Int targetCell = currentlyHoveredCell.Value;
+            
+            // NEW: Check if the tile is blocked by an entity (like a MultiTileEntity or Plant)
+            if (GridPositionManager.Instance != null && 
+                GridPositionManager.Instance.IsPositionOccupied(new GridPosition(targetCell)))
+            {
+                if (debugLogs) 
+                    Debug.Log($"[TileInteractionManager] Action blocked: Position {targetCell} is occupied by an entity.");
+                return;
+            }
 
             TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
 

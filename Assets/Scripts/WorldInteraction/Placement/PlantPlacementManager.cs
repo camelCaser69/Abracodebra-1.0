@@ -70,8 +70,17 @@ namespace Abracodabra.UI.Genes
 
         public bool IsPositionOccupied(Vector3Int gridPosition)
         {
+            // Check internal plant registry first
             CleanupDestroyedPlants();
-            return plantsByGridPosition.ContainsKey(gridPosition);
+            if (plantsByGridPosition.ContainsKey(gridPosition)) return true;
+
+            // NEW: Check global grid occupancy which handles MultiTileEntities
+            if (GridPositionManager.Instance != null)
+            {
+                return GridPositionManager.Instance.IsPositionOccupied(new GridPosition(gridPosition));
+            }
+
+            return false;
         }
 
         /// <summary>
