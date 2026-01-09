@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 680,853 -> 488,960 chars (28.2% reduction)
-Estimated tokens saved: ~47,973
+Compression Stats: 681,070 -> 489,627 chars (28.1% reduction)
+Estimated tokens saved: ~47,860
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -161,56 +161,56 @@ using System.Linq;
   PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9771
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L10042
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L10788
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L11077
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L11288
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L11474
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L11673
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L12317
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L10048
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L10794
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L11083
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L11294
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L11480
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L11679
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L12323
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L12511
-  SeedRarity (Assets\Scripts\A_ToolkitUI/) L12681
-  QualityTier (Assets\Scripts\A_ToolkitUI/) L12703
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L12517
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L12687
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L12709
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L12765
-  CameraZoomController (Assets\Scripts\Core/) L12878
-  InitializationManager (Assets\Scripts\Core/) L12927
-  PixelGridSnapper (Assets\Scripts\Core/) L12967
-  RunState (Assets\Scripts\Core/) L13000
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L13168
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L13231
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L13367
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L13396
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L13547
-  GridEntity (Assets\Scripts\Ticks/) L13619
-  GridPosition (Assets\Scripts\Ticks/) L13789
-  GridPositionManager (Assets\Scripts\Ticks/) L13890
-  GridRadiusUtility (Assets\Scripts\Ticks/) L14371
-  MultiTileEntity (Assets\Scripts\Ticks/) L14515
-  MultiTileFootprint (Assets\Scripts\Ticks/) L14762
-  TickConfiguration (Assets\Scripts\Ticks/) L14816
-  ITickUpdateable (Assets\Scripts\Ticks/) L14902
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L15054
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L15075
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L15266
-  for (Assets\Scripts\WorldInteraction/) L15670
+  CameraController (Assets\Scripts\Core/) L12771
+  CameraZoomController (Assets\Scripts\Core/) L12884
+  InitializationManager (Assets\Scripts\Core/) L12933
+  PixelGridSnapper (Assets\Scripts\Core/) L12973
+  RunState (Assets\Scripts\Core/) L13006
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L13174
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L13237
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L13373
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L13402
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L13553
+  GridEntity (Assets\Scripts\Ticks/) L13625
+  GridPosition (Assets\Scripts\Ticks/) L13795
+  GridPositionManager (Assets\Scripts\Ticks/) L13896
+  GridRadiusUtility (Assets\Scripts\Ticks/) L14377
+  MultiTileEntity (Assets\Scripts\Ticks/) L14521
+  PivotMode (Assets\Scripts\Ticks/) L14767
+  TickConfiguration (Assets\Scripts\Ticks/) L14838
+  ITickUpdateable (Assets\Scripts\Ticks/) L14924
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L15076
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L15097
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L15288
+  for (Assets\Scripts\WorldInteraction/) L15699
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15742
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15771
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L15774
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L15803
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L15832
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L15878
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L16001
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L15861
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L15907
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L16030
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16166
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16195
 
 
 ================================================================================
@@ -10016,7 +10016,13 @@ namespace Abracodabra.UI.Genes {
 
   pub bool IsPositionOccupied(Vector3Int gridPosition) {
    CleanupDestroyedPlants();
-   return plantsByGridPosition.ContainsKey(gridPosition);
+   if (plantsByGridPosition.ContainsKey(gridPosition)) return true;
+
+   if (GridPositionManager.Instance != null) {
+    return GridPositionManager.Instance.IsPositionOccupied(new GridPosition(gridPosition));
+   }
+
+   return false;
   }
 
   pub bool IsTileValidForPlanting(TileDefinition tileDef) {
@@ -14702,6 +14708,10 @@ namespace WegoSystem {
 // FILE: Assets\Scripts\Ticks\MultiTileEntity.cs
 
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace WegoSystem {
  pub class MultiTileEntity : MonoBehaviour {
   [Header("Footprint")]
@@ -14802,15 +14812,10 @@ namespace WegoSystem {
 
    Vector3 anchorWorld = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
 
-   if (footprint.CenterPivot) {
-    Grid grid = GridPositionManager.Instance.GetTilemapGrid();
-    float cellSize = grid != null ? grid.cellSize.x : 1f;
+   Grid grid = GridPositionManager.Instance.GetTilemapGrid();
+   float cellSize = grid != null ? grid.cellSize.x : 1f;
 
-    transform.position = footprint.GetCenteredWorldPosition(anchorWorld, cellSize) + visualOffset;
-   }
-   else {
-    transform.position = anchorWorld + visualOffset;
-   }
+   transform.position = footprint.GetCenteredWorldPosition(anchorWorld, cellSize) + visualOffset;
   }
 
   void CalculateOccupiedPositions(GridPosition anchor) {
@@ -14950,53 +14955,70 @@ namespace WegoSystem {
 
 
 namespace WegoSystem {
- pub class MultiTileFootprint : ScriptableObject {
-  [Tooltip("Size of the footprint in tiles. (2,2) = 2x2 grid.")]
-  [SerializeField] Vector2Int size = new Vector2Int(2, 2);
+pub enum PivotMode {
+None,
+Automatic,
+Manual
+}
 
-  [Tooltip("If true, the visual pivot will be centered on the footprint. If false, pivot stays at anchor (bottom-left).")]
-  [SerializeField] bool centerPivot = true;
+pub class MultiTileFootprint : ScriptableObject {
+[Tooltip("Size of the footprint in tiles. (2,2) = 2x2 grid.")]
+[SerializeField] Vector2Int size = new Vector2Int(2, 2);
 
-  [Tooltip("Interaction priority. Higher values take precedence over tiles and other entities.")]
-  [SerializeField] int interactionPriority = 200;
+[Tooltip("Determines how the visual position is calculated relative to the anchor (bottom-left) tile.")]
+[SerializeField] PivotMode pivotMode = PivotMode.Automatic;
 
-  [Tooltip("If true, this entity blocks movement/pathfinding on all occupied tiles.")]
-  [SerializeField] bool blocksTiles = true;
+[Tooltip("If Pivot Mode is Manual: The offset in tiles from the bottom-left anchor. (0.5, 0.5) is the center of the first tile.")]
+[SerializeField] Vector2 manualPivot = new Vector2(0.5f, 0.5f);
 
-  pub Vector2Int Size => size;
-  pub bool CenterPivot => centerPivot;
-  pub int InteractionPriority => interactionPriority;
-  pub bool BlocksTiles => blocksTiles;
+[Tooltip("Interaction priority. Higher values take precedence over tiles and other entities.")]
+[SerializeField] int interactionPriority = 200;
 
-  pub List<Vector2Int> GetLocalOffsets() {
-   var offsets = new List<Vector2Int>();
-   for (int x = 0; x < size.x; x++) {
-    for (int y = 0; y < size.y; y++) {
-     offsets.Add(new Vector2Int(x, y));
-    }
-   }
-   return offsets;
-  }
+[Tooltip("If true, this entity blocks movement/pathfinding on all occupied tiles.")]
+[SerializeField] bool blocksTiles = true;
 
-  pub Vector2 GetCenterOffset(float cellSize = 1f) {
-   return new Vector2(
-    (size.x - 1) * cellSize * 0.5f,
-    (size.y - 1) * cellSize * 0.5f
-   );
-  }
+pub Vector2Int Size => size;
+pub PivotMode CurrentPivotMode => pivotMode;
+pub int InteractionPriority => interactionPriority;
+pub bool BlocksTiles => blocksTiles;
 
-  pub Vector3 GetCenteredWorldPosition(Vector3 anchorWorldPosition, float cellSize = 1f) {
-   if (!centerPivot) return anchorWorldPosition;
-
-   Vector2 offset = GetCenterOffset(cellSize);
-   return anchorWorldPosition + new Vector3(offset.x, offset.y, 0f);
-  }
-
-  void OnValidate() {
-   size.x = Mathf.Max(1, size.x);
-   size.y = Mathf.Max(1, size.y);
-  }
+pub List<Vector2Int> GetLocalOffsets() {
+var offsets = new List<Vector2Int>();
+for (int x = 0; x < size.x; x++) {
+ for (int y = 0; y < size.y; y++) {
+ offsets.Add(new Vector2Int(x, y));
  }
+}
+return offsets;
+}
+
+pub Vector2 GetCenterOffset(float cellSize = 1f) {
+switch (pivotMode) {
+ case PivotMode.Automatic:
+ return new Vector2(
+ (size.x - 1) * cellSize * 0.5f,
+ (size.y - 1) * cellSize * 0.5f
+ );
+
+ case PivotMode.Manual:
+ return manualPivot * cellSize;
+
+ case PivotMode.None:
+ default:
+ return Vector2.zero;
+}
+}
+
+pub Vector3 GetCenteredWorldPosition(Vector3 anchorWorldPosition, float cellSize = 1f) {
+Vector2 offset = GetCenterOffset(cellSize);
+return anchorWorldPosition + new Vector3(offset.x, offset.y, 0f);
+}
+
+void OnValidate() {
+size.x = Mathf.Max(1, size.x);
+size.y = Mathf.Max(1, size.y);
+}
+}
 }
 
 ////////////////////////////////////////////////////////////
@@ -15595,6 +15617,13 @@ namespace WegoSystem {
    if (toolDef == null || !currentlyHoveredCell.HasValue) return;
 
    Vector3Int targetCell = currentlyHoveredCell.Value;
+
+   if (GridPositionManager.Instance != null &&
+    GridPositionManager.Instance.IsPositionOccupied(new GridPosition(targetCell))) {
+    if (debugLogs)
+     Debug.Log($"[TileInteractionManager] Action blocked: Position {targetCell} is occupied by an entity.");
+    return;
+   }
 
    TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
 
