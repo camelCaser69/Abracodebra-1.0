@@ -1,9 +1,9 @@
-﻿using System;
+﻿// Assets/Scripts/Ticks/GridPositionManager.cs
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using WegoSystem;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -14,20 +14,28 @@ namespace WegoSystem
     public class GridPositionManager : SingletonMonoBehaviour<GridPositionManager>
     {
         [Tooltip("The central configuration for map size and properties. This is the single source of truth.")]
-        [SerializeField] MapConfiguration mapConfig;
-        
-        [SerializeField] TileInteractionManager tileInteractionManager;
+        [SerializeField] private MapConfiguration mapConfig;
+
+        [SerializeField] private TileInteractionManager tileInteractionManager;
 
         private Grid _tilemapGrid;
         private Grid TilemapGrid => _tilemapGrid;
 
         [Header("Gizmos & Debugging")]
-        [SerializeField] bool showGridGizmos = true;
-        [SerializeField] Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
-        [SerializeField] bool debugMode = false;
+        [SerializeField] private bool showGridGizmos = true;
+        [SerializeField] private Color gridColor = new Color(0.5f, 0.5f, 0.5f, 0.3f);
+        [SerializeField] private bool debugMode = false;
 
         private readonly Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
         private readonly HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
+
+        // Multi-tile entity support: tracks which positions are occupied by multi-tile entities
+        private readonly Dictionary<GridPosition, HashSet<GridEntity>> multiTileOccupancy = new Dictionary<GridPosition, HashSet<GridEntity>>();
+
+        /// <summary>
+        /// Whether debug mode is enabled.
+        /// </summary>
+        public bool DebugMode => debugMode;
 
         protected override void OnAwake()
         {
@@ -42,12 +50,12 @@ namespace WegoSystem
             {
                 Debug.LogError("[GridPositionManager] CRITICAL: MapConfiguration is not assigned! Grid system will not function correctly.", this);
             }
-            
-            if(debugMode) Debug.Log("[GridPositionManager] Grid reference is null. Initializing now.");
+
+            if (debugMode) Debug.Log("[GridPositionManager] Grid reference is null. Initializing now.");
             SyncWithTileGrid();
         }
 
-        public void Initialize() // This can still be called by other managers if needed.
+        public void Initialize()
         {
             EnsureInitialized();
         }
@@ -77,7 +85,7 @@ namespace WegoSystem
 
         public GridPosition WorldToGrid(Vector3 worldPosition)
         {
-            EnsureInitialized(); // Make sure _tilemapGrid is set before using it.
+            EnsureInitialized();
             if (TilemapGrid == null) return GridPosition.Zero;
             Vector3Int cellPos = TilemapGrid.WorldToCell(worldPosition);
             return new GridPosition(cellPos);
@@ -85,7 +93,7 @@ namespace WegoSystem
 
         public Vector3 GridToWorld(GridPosition gridPosition)
         {
-            EnsureInitialized(); // Make sure _tilemapGrid is set before using it.
+            EnsureInitialized();
             if (TilemapGrid == null) return Vector3.zero;
             return TilemapGrid.GetCellCenterWorld(gridPosition.ToVector3Int());
         }
@@ -97,7 +105,7 @@ namespace WegoSystem
 
         public bool IsPositionValid(GridPosition position)
         {
-            if (mapConfig == null) 
+            if (mapConfig == null)
             {
                 Debug.LogError("[GridPositionManager] MapConfiguration not assigned!");
                 return false;
@@ -111,7 +119,7 @@ namespace WegoSystem
             if (mapConfig == null)
             {
                 Debug.LogError("[GridPositionManager] MapConfiguration not assigned! Returning fallback center.");
-                return new GridPosition(50, 50); // Fallback
+                return new GridPosition(50, 50);
             }
             return mapConfig.GetMapCenter();
         }
@@ -121,14 +129,33 @@ namespace WegoSystem
             return GridToWorld(GetMapCenter());
         }
 
+        /// <summary>
+        /// Checks if a position is occupied by any tile-occupying entity (single or multi-tile).
+        /// </summary>
         public bool IsPositionOccupied(GridPosition position)
         {
+            // Check single-tile entities
             if (entitiesByPosition.TryGetValue(position, out var entities))
             {
-                return entities.Any(entity => entity.isTileOccupant);
+                if (entities.Any(entity => entity.isTileOccupant))
+                {
+                    return true;
+                }
             }
+
+            // Check multi-tile entity occupancy
+            if (multiTileOccupancy.TryGetValue(position, out var multiEntities))
+            {
+                if (multiEntities.Count > 0)
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
+
+        #region Standard Entity Registration
 
         public void RegisterEntity(GridEntity entity)
         {
@@ -181,6 +208,124 @@ namespace WegoSystem
             }
         }
 
+        #endregion
+
+        #region Multi-Tile Entity Registration
+
+        /// <summary>
+        /// Registers an entity at a specific position. Used by MultiTileEntity to register at multiple positions.
+        /// </summary>
+        /// <param name="entity">The GridEntity to register.</param>
+        /// <param name="position">The grid position to register at.</param>
+        /// <param name="occupiesTile">If true, this position is marked as occupied for pathfinding.</param>
+        public void RegisterEntityAtPosition(GridEntity entity, GridPosition position, bool occupiesTile = false)
+        {
+            if (entity == null) return;
+
+            // Add to the general entity-by-position tracking
+            if (!entitiesByPosition.ContainsKey(position))
+            {
+                entitiesByPosition[position] = new HashSet<GridEntity>();
+            }
+            entitiesByPosition[position].Add(entity);
+
+            // If this blocks tiles, add to multi-tile occupancy
+            if (occupiesTile)
+            {
+                if (!multiTileOccupancy.ContainsKey(position))
+                {
+                    multiTileOccupancy[position] = new HashSet<GridEntity>();
+                }
+                multiTileOccupancy[position].Add(entity);
+            }
+
+            // Add to allEntities if not already there
+            if (!allEntities.Contains(entity))
+            {
+                allEntities.Add(entity);
+            }
+        }
+
+        /// <summary>
+        /// Unregisters an entity from a specific position. Used by MultiTileEntity for cleanup.
+        /// </summary>
+        /// <param name="entity">The GridEntity to unregister.</param>
+        /// <param name="position">The grid position to unregister from.</param>
+        public void UnregisterEntityFromPosition(GridEntity entity, GridPosition position)
+        {
+            if (entity == null) return;
+
+            // Remove from general entity tracking
+            if (entitiesByPosition.ContainsKey(position))
+            {
+                entitiesByPosition[position].Remove(entity);
+                if (entitiesByPosition[position].Count == 0)
+                {
+                    entitiesByPosition.Remove(position);
+                }
+            }
+
+            // Remove from multi-tile occupancy
+            if (multiTileOccupancy.ContainsKey(position))
+            {
+                multiTileOccupancy[position].Remove(entity);
+                if (multiTileOccupancy[position].Count == 0)
+                {
+                    multiTileOccupancy.Remove(position);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the MultiTileEntity at a given position, if any.
+        /// </summary>
+        public MultiTileEntity GetMultiTileEntityAt(GridPosition position)
+        {
+            if (!entitiesByPosition.TryGetValue(position, out var entities))
+            {
+                return null;
+            }
+
+            foreach (var entity in entities)
+            {
+                var multiTile = entity.GetComponent<MultiTileEntity>();
+                if (multiTile != null && multiTile.OccupiesPosition(position))
+                {
+                    return multiTile;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets all MultiTileEntities at a given position.
+        /// </summary>
+        public List<MultiTileEntity> GetAllMultiTileEntitiesAt(GridPosition position)
+        {
+            var result = new List<MultiTileEntity>();
+
+            if (!entitiesByPosition.TryGetValue(position, out var entities))
+            {
+                return result;
+            }
+
+            foreach (var entity in entities)
+            {
+                var multiTile = entity.GetComponent<MultiTileEntity>();
+                if (multiTile != null && multiTile.OccupiesPosition(position))
+                {
+                    result.Add(multiTile);
+                }
+            }
+
+            return result;
+        }
+
+        #endregion
+
+        #region Entity Queries
+
         public HashSet<GridEntity> GetEntitiesAt(GridPosition position)
         {
             return entitiesByPosition.ContainsKey(position)
@@ -218,7 +363,8 @@ namespace WegoSystem
                 }
             }
 
-            return result;
+            // Remove duplicates (same multi-tile entity might be at multiple positions)
+            return result.Distinct().ToList();
         }
 
         public bool IsPositionWithinRadius(GridPosition position, GridPosition center, int radius, bool useCircle = true)
@@ -233,7 +379,7 @@ namespace WegoSystem
             }
         }
 
-        public GridEntity GetNearestEntity(GridPosition position, System.Func<GridEntity, bool> predicate = null)
+        public GridEntity GetNearestEntity(GridPosition position, Func<GridEntity, bool> predicate = null)
         {
             GridEntity nearest = null;
             float nearestDistance = float.MaxValue;
@@ -251,6 +397,10 @@ namespace WegoSystem
             }
             return nearest;
         }
+
+        #endregion
+
+        #region Utility Methods
 
         public Grid GetTilemapGrid()
         {
@@ -302,7 +452,7 @@ namespace WegoSystem
                         continue;
                     }
 
-                    float tentativeGScore = gScore[current] + 1; // Assuming cost of 1 per tile
+                    float tentativeGScore = gScore[current] + 1;
 
                     if (!openSet.Contains(neighbor))
                     {
@@ -310,7 +460,7 @@ namespace WegoSystem
                     }
                     else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor])
                     {
-                        continue; // This path is not better
+                        continue;
                     }
 
                     cameFrom[neighbor] = current;
@@ -318,7 +468,7 @@ namespace WegoSystem
                     fScore[neighbor] = gScore[neighbor] + HeuristicCost(neighbor, end);
                 }
             }
-            return path; // No path found
+            return path;
         }
 
         private float HeuristicCost(GridPosition a, GridPosition b)
@@ -359,8 +509,19 @@ namespace WegoSystem
                 gridEntity = entity.AddComponent<GridEntity>();
             }
 
-            gridEntity.SnapToGrid();
+            // Check if this is a multi-tile entity - if so, use its own registration
+            var multiTileEntity = entity.GetComponent<MultiTileEntity>();
+            if (multiTileEntity != null)
+            {
+                multiTileEntity.SnapToGridAndRegister();
+                if (debugMode)
+                {
+                    Debug.Log($"[GridPositionManager] Snapped MultiTileEntity {entity.name} to grid at {multiTileEntity.AnchorPosition}");
+                }
+                return;
+            }
 
+            gridEntity.SnapToGrid();
             RegisterEntity(gridEntity);
 
             if (debugMode)
@@ -405,15 +566,19 @@ namespace WegoSystem
             return result;
         }
 
+        #endregion
+
+        #region Gizmos
+
         private void OnDrawGizmos()
         {
             if (!showGridGizmos || mapConfig == null) return;
-            
+
             EnsureInitialized();
-            if(_tilemapGrid == null) return;
+            if (_tilemapGrid == null) return;
 
             Gizmos.color = gridColor;
-            
+
             int displaySize = mapConfig.GetAdaptiveGizmoSize();
             int displayWidth = Mathf.Min(displaySize, mapConfig.mapSize.x);
             int displayHeight = Mathf.Min(displaySize, mapConfig.mapSize.y);
@@ -436,6 +601,7 @@ namespace WegoSystem
             Vector3 origin = GridToWorld(GridPosition.Zero);
             Gizmos.DrawWireSphere(origin, _tilemapGrid.cellSize.x * 0.2f);
 
+            // Draw occupied tiles
             Gizmos.color = Color.red;
             if (entitiesByPosition != null)
             {
@@ -448,6 +614,22 @@ namespace WegoSystem
                     }
                 }
             }
+
+            // Draw multi-tile occupancy with different color
+            Gizmos.color = new Color(1f, 0.5f, 0f, 0.8f); // Orange
+            if (multiTileOccupancy != null)
+            {
+                foreach (var kvp in multiTileOccupancy)
+                {
+                    if (kvp.Value.Count > 0)
+                    {
+                        Vector3 cellCenter = GridToWorld(kvp.Key);
+                        Gizmos.DrawCube(cellCenter, Vector3.one * _tilemapGrid.cellSize.x * 0.5f);
+                    }
+                }
+            }
         }
+
+        #endregion
     }
 }

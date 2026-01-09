@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 674,735 -> 486,269 chars (27.9% reduction)
-Estimated tokens saved: ~47,116
+Compression Stats: 680,853 -> 488,960 chars (28.2% reduction)
+Estimated tokens saved: ~47,973
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -188,29 +188,29 @@ using System.Linq;
   GridEntity (Assets\Scripts\Ticks/) L13619
   GridPosition (Assets\Scripts\Ticks/) L13789
   GridPositionManager (Assets\Scripts\Ticks/) L13890
-  GridRadiusUtility (Assets\Scripts\Ticks/) L14270
-  MultiTileEntity (Assets\Scripts\Ticks/) L14414
-  MultiTileFootprint (Assets\Scripts\Ticks/) L14661
-  TickConfiguration (Assets\Scripts\Ticks/) L14715
-  ITickUpdateable (Assets\Scripts\Ticks/) L14801
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L14953
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L14974
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L15165
-  for (Assets\Scripts\WorldInteraction/) L15569
+  GridRadiusUtility (Assets\Scripts\Ticks/) L14371
+  MultiTileEntity (Assets\Scripts\Ticks/) L14515
+  MultiTileFootprint (Assets\Scripts\Ticks/) L14762
+  TickConfiguration (Assets\Scripts\Ticks/) L14816
+  ITickUpdateable (Assets\Scripts\Ticks/) L14902
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L15054
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L15075
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L15266
+  for (Assets\Scripts\WorldInteraction/) L15670
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15641
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15742
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L15673
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L15774
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L15731
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L15777
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L15900
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L15832
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L15878
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L16001
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16065
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16166
 
 
 ================================================================================
@@ -14076,9 +14076,8 @@ namespace WegoSystem {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ticks\GridPositionManager.cs
 
-﻿using System;
+﻿// Assets/Scripts/Ticks/GridPositionManager.cs
 using UnityEngine.Tilemaps;
-using WegoSystem;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -14102,6 +14101,10 @@ namespace WegoSystem {
   ro Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
   ro HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
 
+  ro Dictionary<GridPosition, HashSet<GridEntity>> multiTileOccupancy = new Dictionary<GridPosition, HashSet<GridEntity>>();
+
+  pub bool DebugMode => debugMode;
+
   prot ovr void OnAwake() {
    EnsureInitialized();
   }
@@ -14113,11 +14116,11 @@ namespace WegoSystem {
     Debug.LogError("[GridPositionManager] CRITICAL: MapConfiguration is not assigned! Grid system will not function correctly.", this);
    }
 
-   if(debugMode) Debug.Log("[GridPositionManager] Grid reference is null. Initializing now.");
+   if (debugMode) Debug.Log("[GridPositionManager] Grid reference is null. Initializing now.");
    SyncWithTileGrid();
   }
 
-  pub void Initialize() // This can still be called by other managers if needed. {
+  pub void Initialize() {
    EnsureInitialized();
   }
 
@@ -14141,14 +14144,14 @@ namespace WegoSystem {
   }
 
   pub GridPosition WorldToGrid(Vector3 worldPosition) {
-   EnsureInitialized(); // Make sure _tilemapGrid is set before using it.
+   EnsureInitialized();
    if (TilemapGrid == null) return GridPosition.Zero;
    Vector3Int cellPos = TilemapGrid.WorldToCell(worldPosition);
    return new GridPosition(cellPos);
   }
 
   pub Vector3 GridToWorld(GridPosition gridPosition) {
-   EnsureInitialized(); // Make sure _tilemapGrid is set before using it.
+   EnsureInitialized();
    if (TilemapGrid == null) return Vector3.zero;
    return TilemapGrid.GetCellCenterWorld(gridPosition.ToVector3Int());
   }
@@ -14169,7 +14172,7 @@ namespace WegoSystem {
   pub GridPosition GetMapCenter() {
    if (mapConfig == null) {
     Debug.LogError("[GridPositionManager] MapConfiguration not assigned! Returning fallback center.");
-    return new GridPosition(50, 50); // Fallback
+    return new GridPosition(50, 50);
    }
    return mapConfig.GetMapCenter();
   }
@@ -14180,8 +14183,17 @@ namespace WegoSystem {
 
   pub bool IsPositionOccupied(GridPosition position) {
    if (entitiesByPosition.TryGetValue(position, out var entities)) {
-    return entities.Any(entity => entity.isTileOccupant);
+    if (entities.Any(entity => entity.isTileOccupant)) {
+     return true;
+    }
    }
+
+   if (multiTileOccupancy.TryGetValue(position, out var multiEntities)) {
+    if (multiEntities.Count > 0) {
+     return true;
+    }
+   }
+
    return false;
   }
 
@@ -14227,6 +14239,76 @@ namespace WegoSystem {
    }
   }
 
+  pub void RegisterEntityAtPosition(GridEntity entity, GridPosition position, bool occupiesTile = false) {
+   if (entity == null) return;
+
+   if (!entitiesByPosition.ContainsKey(position)) {
+    entitiesByPosition[position] = new HashSet<GridEntity>();
+   }
+   entitiesByPosition[position].Add(entity);
+
+   if (occupiesTile) {
+    if (!multiTileOccupancy.ContainsKey(position)) {
+     multiTileOccupancy[position] = new HashSet<GridEntity>();
+    }
+    multiTileOccupancy[position].Add(entity);
+   }
+
+   if (!allEntities.Contains(entity)) {
+    allEntities.Add(entity);
+   }
+  }
+
+  pub void UnregisterEntityFromPosition(GridEntity entity, GridPosition position) {
+   if (entity == null) return;
+
+   if (entitiesByPosition.ContainsKey(position)) {
+    entitiesByPosition[position].Remove(entity);
+    if (entitiesByPosition[position].Count == 0) {
+     entitiesByPosition.Remove(position);
+    }
+   }
+
+   if (multiTileOccupancy.ContainsKey(position)) {
+    multiTileOccupancy[position].Remove(entity);
+    if (multiTileOccupancy[position].Count == 0) {
+     multiTileOccupancy.Remove(position);
+    }
+   }
+  }
+
+  pub MultiTileEntity GetMultiTileEntityAt(GridPosition position) {
+   if (!entitiesByPosition.TryGetValue(position, out var entities)) {
+    return null;
+   }
+
+   foreach (var entity in entities) {
+    var multiTile = entity.GetComponent<MultiTileEntity>();
+    if (multiTile != null && multiTile.OccupiesPosition(position)) {
+     return multiTile;
+    }
+   }
+
+   return null;
+  }
+
+  pub List<MultiTileEntity> GetAllMultiTileEntitiesAt(GridPosition position) {
+   var result = new List<MultiTileEntity>();
+
+   if (!entitiesByPosition.TryGetValue(position, out var entities)) {
+    return result;
+   }
+
+   foreach (var entity in entities) {
+    var multiTile = entity.GetComponent<MultiTileEntity>();
+    if (multiTile != null && multiTile.OccupiesPosition(position)) {
+     result.Add(multiTile);
+    }
+   }
+
+   return result;
+  }
+
   pub HashSet<GridEntity> GetEntitiesAt(GridPosition position) {
    return entitiesByPosition.ContainsKey(position)
     ? new HashSet<GridEntity>(entitiesByPosition[position])
@@ -14255,7 +14337,7 @@ namespace WegoSystem {
     }
    }
 
-   return result;
+   return result.Distinct().ToList();
   }
 
   pub bool IsPositionWithinRadius(GridPosition position, GridPosition center, int radius, bool useCircle = true) {
@@ -14267,7 +14349,7 @@ namespace WegoSystem {
    }
   }
 
-  pub GridEntity GetNearestEntity(GridPosition position, System.Func<GridEntity, bool> predicate = null) {
+  pub GridEntity GetNearestEntity(GridPosition position, Func<GridEntity, bool> predicate = null) {
    GridEntity nearest = null;
    float nearestDistance = float.MaxValue;
 
@@ -14325,13 +14407,13 @@ namespace WegoSystem {
       continue;
      }
 
-     float tentativeGScore = gScore[current] + 1; // Assuming cost of 1 per tile
+     float tentativeGScore = gScore[current] + 1;
 
      if (!openSet.Contains(neighbor)) {
       openSet.Add(neighbor);
      }
      else if (gScore.ContainsKey(neighbor) && tentativeGScore >= gScore[neighbor]) {
-      continue; // This path is not better
+      continue;
      }
 
      cameFrom[neighbor] = current;
@@ -14339,7 +14421,7 @@ namespace WegoSystem {
      fScore[neighbor] = gScore[neighbor] + HeuristicCost(neighbor, end);
     }
    }
-   return path; // No path found
+   return path;
   }
 
   float HeuristicCost(GridPosition a, GridPosition b) {
@@ -14373,8 +14455,16 @@ namespace WegoSystem {
     gridEntity = entity.AddComponent<GridEntity>();
    }
 
-   gridEntity.SnapToGrid();
+   var multiTileEntity = entity.GetComponent<MultiTileEntity>();
+   if (multiTileEntity != null) {
+    multiTileEntity.SnapToGridAndRegister();
+    if (debugMode) {
+     Debug.Log($"[GridPositionManager] Snapped MultiTileEntity {entity.name} to grid at {multiTileEntity.AnchorPosition}");
+    }
+    return;
+   }
 
+   gridEntity.SnapToGrid();
    RegisterEntity(gridEntity);
 
    if (debugMode) {
@@ -14416,7 +14506,7 @@ namespace WegoSystem {
    if (!showGridGizmos || mapConfig == null) return;
 
    EnsureInitialized();
-   if(_tilemapGrid == null) return;
+   if (_tilemapGrid == null) return;
 
    Gizmos.color = gridColor;
 
@@ -14449,7 +14539,18 @@ namespace WegoSystem {
      }
     }
    }
+
+   Gizmos.color = new Color(1f, 0.5f, 0f, 0.8f); // Orange
+   if (multiTileOccupancy != null) {
+    foreach (var kvp in multiTileOccupancy) {
+     if (kvp.Value.Count > 0) {
+      Vector3 cellCenter = GridToWorld(kvp.Key);
+      Gizmos.DrawCube(cellCenter, Vector3.one * _tilemapGrid.cellSize.x * 0.5f);
+     }
+    }
+   }
   }
+
  }
 }
 
