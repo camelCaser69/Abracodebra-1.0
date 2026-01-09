@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   size: {x: 2, y: 1}
   pivotMode: 2
-  manualPivot: {x: 1, y: 1}
+  manualPivot: {x: 0.5, y: 0.5}
   interactionPriority: 200
-  blocksTiles: 1
+  blockingSettings:
+    blocksMovement: 1
+    blocksSeedPlanting: 1
+    blocksToolUsage: 1

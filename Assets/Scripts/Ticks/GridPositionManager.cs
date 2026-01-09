@@ -29,12 +29,12 @@ namespace WegoSystem
         private readonly Dictionary<GridPosition, HashSet<GridEntity>> entitiesByPosition = new Dictionary<GridPosition, HashSet<GridEntity>>();
         private readonly HashSet<GridEntity> allEntities = new HashSet<GridEntity>();
 
-        // Multi-tile entity support: tracks which positions are occupied by multi-tile entities
+        // NEW: Store MultiTileEntity references for granular blocking queries
+        private readonly Dictionary<GridPosition, HashSet<MultiTileEntity>> multiTileEntitiesByPosition = new Dictionary<GridPosition, HashSet<MultiTileEntity>>();
+
+        // Legacy: Keep for backwards compatibility with existing code
         private readonly Dictionary<GridPosition, HashSet<GridEntity>> multiTileOccupancy = new Dictionary<GridPosition, HashSet<GridEntity>>();
 
-        /// <summary>
-        /// Whether debug mode is enabled.
-        /// </summary>
         public bool DebugMode => debugMode;
 
         protected override void OnAwake()
@@ -129,12 +129,15 @@ namespace WegoSystem
             return GridToWorld(GetMapCenter());
         }
 
+        #region Generic Occupancy Checks (Legacy + Combined)
+
         /// <summary>
-        /// Checks if a position is occupied by any tile-occupying entity (single or multi-tile).
+        /// Returns true if ANY entity is occupying this position (legacy behavior).
+        /// For granular checks, use IsMovementBlockedAt, IsSeedPlantingBlockedAt, or IsToolUsageBlockedAt.
         /// </summary>
         public bool IsPositionOccupied(GridPosition position)
         {
-            // Check single-tile entities
+            // Check single-tile occupants
             if (entitiesByPosition.TryGetValue(position, out var entities))
             {
                 if (entities.Any(entity => entity.isTileOccupant))
@@ -143,7 +146,7 @@ namespace WegoSystem
                 }
             }
 
-            // Check multi-tile entity occupancy
+            // Check multi-tile occupants (legacy dictionary)
             if (multiTileOccupancy.TryGetValue(position, out var multiEntities))
             {
                 if (multiEntities.Count > 0)
@@ -155,7 +158,129 @@ namespace WegoSystem
             return false;
         }
 
-        #region Standard Entity Registration
+        #endregion
+
+        #region Granular Blocking Checks (NEW)
+
+        /// <summary>
+        /// Returns true if player/entity movement is blocked at this position.
+        /// </summary>
+        public bool IsMovementBlockedAt(GridPosition position)
+        {
+            // Check single-tile occupants (always block movement)
+            if (entitiesByPosition.TryGetValue(position, out var entities))
+            {
+                if (entities.Any(entity => entity.isTileOccupant))
+                {
+                    return true;
+                }
+            }
+
+            // Check multi-tile entities with movement blocking enabled
+            if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities))
+            {
+                foreach (var mte in multiTileEntities)
+                {
+                    if (mte != null && mte.BlocksMovement)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if seed planting is blocked at this position.
+        /// </summary>
+        public bool IsSeedPlantingBlockedAt(GridPosition position)
+        {
+            // Check single-tile occupants (plants always block planting on same tile)
+            if (entitiesByPosition.TryGetValue(position, out var entities))
+            {
+                if (entities.Any(entity => entity.isTileOccupant))
+                {
+                    return true;
+                }
+            }
+
+            // Check multi-tile entities with seed planting blocking enabled
+            if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities))
+            {
+                foreach (var mte in multiTileEntities)
+                {
+                    if (mte != null && mte.BlocksSeedPlanting)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if tool usage (hoe, watering can, etc.) is blocked at this position.
+        /// </summary>
+        public bool IsToolUsageBlockedAt(GridPosition position)
+        {
+            // Check multi-tile entities with tool usage blocking enabled
+            if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities))
+            {
+                foreach (var mte in multiTileEntities)
+                {
+                    if (mte != null && mte.BlocksToolUsage)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            // Note: Single-tile entities (plants) typically don't block tool usage
+            // because you might want to water plants, etc.
+            // If you want plants to block tool usage, add that check here.
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the combined blocking settings for a position from all multi-tile entities.
+        /// </summary>
+        public TileBlockingSettings GetBlockingSettingsAt(GridPosition position)
+        {
+            var combined = TileBlockingSettings.None;
+
+            if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities))
+            {
+                foreach (var mte in multiTileEntities)
+                {
+                    if (mte != null)
+                    {
+                        var settings = mte.BlockingSettings;
+                        combined.blocksMovement |= settings.blocksMovement;
+                        combined.blocksSeedPlanting |= settings.blocksSeedPlanting;
+                        combined.blocksToolUsage |= settings.blocksToolUsage;
+                    }
+                }
+            }
+
+            // Check single-tile occupants
+            if (entitiesByPosition.TryGetValue(position, out var entities))
+            {
+                if (entities.Any(entity => entity.isTileOccupant))
+                {
+                    combined.blocksMovement = true;
+                    combined.blocksSeedPlanting = true;
+                }
+            }
+
+            return combined;
+        }
+
+        #endregion
+
+        #region Entity Registration
 
         public void RegisterEntity(GridEntity entity)
         {
@@ -208,28 +333,20 @@ namespace WegoSystem
             }
         }
 
-        #endregion
-
-        #region Multi-Tile Entity Registration
-
         /// <summary>
-        /// Registers an entity at a specific position. Used by MultiTileEntity to register at multiple positions.
+        /// Legacy method - registers entity at position with optional occupancy flag.
+        /// Prefer RegisterMultiTileEntityAtPosition for multi-tile entities.
         /// </summary>
-        /// <param name="entity">The GridEntity to register.</param>
-        /// <param name="position">The grid position to register at.</param>
-        /// <param name="occupiesTile">If true, this position is marked as occupied for pathfinding.</param>
         public void RegisterEntityAtPosition(GridEntity entity, GridPosition position, bool occupiesTile = false)
         {
             if (entity == null) return;
 
-            // Add to the general entity-by-position tracking
             if (!entitiesByPosition.ContainsKey(position))
             {
                 entitiesByPosition[position] = new HashSet<GridEntity>();
             }
             entitiesByPosition[position].Add(entity);
 
-            // If this blocks tiles, add to multi-tile occupancy
             if (occupiesTile)
             {
                 if (!multiTileOccupancy.ContainsKey(position))
@@ -239,7 +356,6 @@ namespace WegoSystem
                 multiTileOccupancy[position].Add(entity);
             }
 
-            // Add to allEntities if not already there
             if (!allEntities.Contains(entity))
             {
                 allEntities.Add(entity);
@@ -247,15 +363,12 @@ namespace WegoSystem
         }
 
         /// <summary>
-        /// Unregisters an entity from a specific position. Used by MultiTileEntity for cleanup.
+        /// Legacy method - unregisters entity from position.
         /// </summary>
-        /// <param name="entity">The GridEntity to unregister.</param>
-        /// <param name="position">The grid position to unregister from.</param>
         public void UnregisterEntityFromPosition(GridEntity entity, GridPosition position)
         {
             if (entity == null) return;
 
-            // Remove from general entity tracking
             if (entitiesByPosition.ContainsKey(position))
             {
                 entitiesByPosition[position].Remove(entity);
@@ -265,7 +378,6 @@ namespace WegoSystem
                 }
             }
 
-            // Remove from multi-tile occupancy
             if (multiTileOccupancy.ContainsKey(position))
             {
                 multiTileOccupancy[position].Remove(entity);
@@ -277,10 +389,99 @@ namespace WegoSystem
         }
 
         /// <summary>
-        /// Gets the MultiTileEntity at a given position, if any.
+        /// Registers a multi-tile entity at a specific position with its blocking settings.
         /// </summary>
+        public void RegisterMultiTileEntityAtPosition(MultiTileEntity multiTileEntity, GridPosition position)
+        {
+            if (multiTileEntity == null) return;
+
+            // Register in the new multi-tile entity dictionary
+            if (!multiTileEntitiesByPosition.ContainsKey(position))
+            {
+                multiTileEntitiesByPosition[position] = new HashSet<MultiTileEntity>();
+            }
+            multiTileEntitiesByPosition[position].Add(multiTileEntity);
+
+            // Also register in legacy dictionaries for backwards compatibility
+            var gridEntity = multiTileEntity.GetComponent<GridEntity>();
+            if (gridEntity != null)
+            {
+                if (!entitiesByPosition.ContainsKey(position))
+                {
+                    entitiesByPosition[position] = new HashSet<GridEntity>();
+                }
+                entitiesByPosition[position].Add(gridEntity);
+
+                // Add to legacy multiTileOccupancy if any blocking is enabled
+                if (multiTileEntity.BlocksTiles)
+                {
+                    if (!multiTileOccupancy.ContainsKey(position))
+                    {
+                        multiTileOccupancy[position] = new HashSet<GridEntity>();
+                    }
+                    multiTileOccupancy[position].Add(gridEntity);
+                }
+
+                if (!allEntities.Contains(gridEntity))
+                {
+                    allEntities.Add(gridEntity);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Unregisters a multi-tile entity from a specific position.
+        /// </summary>
+        public void UnregisterMultiTileEntityFromPosition(MultiTileEntity multiTileEntity, GridPosition position)
+        {
+            if (multiTileEntity == null) return;
+
+            // Remove from new multi-tile entity dictionary
+            if (multiTileEntitiesByPosition.ContainsKey(position))
+            {
+                multiTileEntitiesByPosition[position].Remove(multiTileEntity);
+                if (multiTileEntitiesByPosition[position].Count == 0)
+                {
+                    multiTileEntitiesByPosition.Remove(position);
+                }
+            }
+
+            // Also remove from legacy dictionaries
+            var gridEntity = multiTileEntity.GetComponent<GridEntity>();
+            if (gridEntity != null)
+            {
+                if (entitiesByPosition.ContainsKey(position))
+                {
+                    entitiesByPosition[position].Remove(gridEntity);
+                    if (entitiesByPosition[position].Count == 0)
+                    {
+                        entitiesByPosition.Remove(position);
+                    }
+                }
+
+                if (multiTileOccupancy.ContainsKey(position))
+                {
+                    multiTileOccupancy[position].Remove(gridEntity);
+                    if (multiTileOccupancy[position].Count == 0)
+                    {
+                        multiTileOccupancy.Remove(position);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Entity Queries
+
         public MultiTileEntity GetMultiTileEntityAt(GridPosition position)
         {
+            if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities))
+            {
+                return multiTileEntities.FirstOrDefault(mte => mte != null && mte.OccupiesPosition(position));
+            }
+
+            // Fallback to legacy check
             if (!entitiesByPosition.TryGetValue(position, out var entities))
             {
                 return null;
@@ -298,33 +499,17 @@ namespace WegoSystem
             return null;
         }
 
-        /// <summary>
-        /// Gets all MultiTileEntities at a given position.
-        /// </summary>
         public List<MultiTileEntity> GetAllMultiTileEntitiesAt(GridPosition position)
         {
             var result = new List<MultiTileEntity>();
 
-            if (!entitiesByPosition.TryGetValue(position, out var entities))
+            if (multiTileEntitiesByPosition.TryGetValue(position, out var multiTileEntities))
             {
-                return result;
-            }
-
-            foreach (var entity in entities)
-            {
-                var multiTile = entity.GetComponent<MultiTileEntity>();
-                if (multiTile != null && multiTile.OccupiesPosition(position))
-                {
-                    result.Add(multiTile);
-                }
+                result.AddRange(multiTileEntities.Where(mte => mte != null && mte.OccupiesPosition(position)));
             }
 
             return result;
         }
-
-        #endregion
-
-        #region Entity Queries
 
         public HashSet<GridEntity> GetEntitiesAt(GridPosition position)
         {
@@ -363,7 +548,6 @@ namespace WegoSystem
                 }
             }
 
-            // Remove duplicates (same multi-tile entity might be at multiple positions)
             return result.Distinct().ToList();
         }
 
@@ -400,7 +584,7 @@ namespace WegoSystem
 
         #endregion
 
-        #region Utility Methods
+        #region Pathfinding
 
         public Grid GetTilemapGrid()
         {
@@ -447,7 +631,8 @@ namespace WegoSystem
 
                 foreach (var neighbor in current.GetNeighbors(allowDiagonal))
                 {
-                    if (!IsPositionValid(neighbor) || closedSet.Contains(neighbor) || (neighbor != end && IsPositionOccupied(neighbor)))
+                    // Use IsMovementBlockedAt for pathfinding instead of IsPositionOccupied
+                    if (!IsPositionValid(neighbor) || closedSet.Contains(neighbor) || (neighbor != end && IsMovementBlockedAt(neighbor)))
                     {
                         continue;
                     }
@@ -499,6 +684,10 @@ namespace WegoSystem
             return path.Count > 0;
         }
 
+        #endregion
+
+        #region Utility Methods
+
         public void SnapEntityToGrid(GameObject entity)
         {
             if (entity == null) return;
@@ -509,7 +698,6 @@ namespace WegoSystem
                 gridEntity = entity.AddComponent<GridEntity>();
             }
 
-            // Check if this is a multi-tile entity - if so, use its own registration
             var multiTileEntity = entity.GetComponent<MultiTileEntity>();
             if (multiTileEntity != null)
             {
@@ -601,7 +789,6 @@ namespace WegoSystem
             Vector3 origin = GridToWorld(GridPosition.Zero);
             Gizmos.DrawWireSphere(origin, _tilemapGrid.cellSize.x * 0.2f);
 
-            // Draw occupied tiles
             Gizmos.color = Color.red;
             if (entitiesByPosition != null)
             {
@@ -615,7 +802,6 @@ namespace WegoSystem
                 }
             }
 
-            // Draw multi-tile occupancy with different color
             Gizmos.color = new Color(1f, 0.5f, 0f, 0.8f); // Orange
             if (multiTileOccupancy != null)
             {

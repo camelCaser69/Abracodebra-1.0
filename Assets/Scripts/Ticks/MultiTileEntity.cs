@@ -7,11 +7,6 @@ using UnityEditor;
 
 namespace WegoSystem
 {
-    /// <summary>
-    /// Represents an entity that occupies multiple tiles on the grid.
-    /// Registers itself at all occupied positions so GetEntitiesAt() returns this entity
-    /// for any of its tiles.
-    /// </summary>
     [RequireComponent(typeof(GridEntity))]
     public class MultiTileEntity : MonoBehaviour
     {
@@ -35,36 +30,25 @@ namespace WegoSystem
         private readonly List<GridPosition> occupiedPositions = new List<GridPosition>();
         private bool isRegistered = false;
 
-        /// <summary>
-        /// The anchor position (bottom-left tile of the footprint).
-        /// </summary>
+        // Public accessors
         public GridPosition AnchorPosition => gridEntity != null ? gridEntity.Position : GridPosition.Zero;
-
-        /// <summary>
-        /// All grid positions this entity occupies.
-        /// </summary>
         public IReadOnlyList<GridPosition> OccupiedPositions => occupiedPositions;
-
-        /// <summary>
-        /// The footprint definition.
-        /// </summary>
         public MultiTileFootprint Footprint => footprint;
-
-        /// <summary>
-        /// Interaction priority from footprint.
-        /// </summary>
         public int InteractionPriority => footprint != null ? footprint.InteractionPriority : 100;
 
-        /// <summary>
-        /// Whether this entity blocks tiles for pathfinding.
-        /// </summary>
+        // Legacy accessor - returns true if ANY blocking is enabled
         public bool BlocksTiles => footprint != null && footprint.BlocksTiles;
+
+        // Granular blocking accessors
+        public bool BlocksMovement => footprint != null && footprint.BlocksMovement;
+        public bool BlocksSeedPlanting => footprint != null && footprint.BlocksSeedPlanting;
+        public bool BlocksToolUsage => footprint != null && footprint.BlocksToolUsage;
+        public TileBlockingSettings BlockingSettings => footprint != null ? footprint.BlockingSettings : TileBlockingSettings.None;
 
         private void Awake()
         {
             gridEntity = GetComponent<GridEntity>();
-            
-            // Multi-tile entities manage their own tile occupancy
+            // Multi-tile entities manage their own occupancy, don't use the default single-tile occupant system
             gridEntity.isTileOccupant = false;
         }
 
@@ -96,8 +80,7 @@ namespace WegoSystem
         private void OnEnable()
         {
             if (isRegistered || !Application.isPlaying) return;
-            
-            // Re-register if we were previously registered
+
             if (occupiedPositions.Count > 0)
             {
                 RegisterAtAllPositions();
@@ -105,8 +88,7 @@ namespace WegoSystem
         }
 
         /// <summary>
-        /// Snaps the anchor to the grid and registers at all footprint positions.
-        /// Also centers the visual based on the footprint's PivotMode.
+        /// Snaps the entity to the grid and registers at all occupied positions.
         /// </summary>
         public void SnapToGridAndRegister()
         {
@@ -116,68 +98,49 @@ namespace WegoSystem
                 return;
             }
 
-            // Snap anchor to grid
             GridPosition anchorPos = GridPositionManager.Instance.WorldToGrid(transform.position);
-            
-            // Set the position
             SetAnchorPosition(anchorPos, true);
         }
 
         /// <summary>
-        /// Sets the anchor position and updates all occupied tiles.
+        /// Sets the anchor position and re-registers at all occupied tiles.
         /// </summary>
-        /// <param name="newAnchor">The new anchor grid position (bottom-left).</param>
-        /// <param name="instant">If true, no interpolation.</param>
         public void SetAnchorPosition(GridPosition newAnchor, bool instant = false)
         {
             if (GridPositionManager.Instance == null) return;
 
-            // Validate all positions in the footprint
             if (!AreAllPositionsValid(newAnchor))
             {
                 Debug.LogWarning($"[MultiTileEntity] Cannot place {gameObject.name} at {newAnchor} - some tiles are out of bounds.");
                 return;
             }
 
-            // Unregister from old positions
             UnregisterFromAllPositions();
 
-            // Update anchor
             gridEntity.SetPosition(newAnchor, instant);
 
-            // Calculate world position (centered if needed)
             UpdateVisualPosition();
 
-            // Calculate and register at all positions
             CalculateOccupiedPositions(newAnchor);
             RegisterAtAllPositions();
         }
 
-        /// <summary>
-        /// Updates the visual position based on anchor and centering settings.
-        /// </summary>
         private void UpdateVisualPosition()
         {
             if (GridPositionManager.Instance == null || footprint == null) return;
 
             Vector3 anchorWorld = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
-            
-            // Get the grid's cell size (assuming uniform cells)
+
             Grid grid = GridPositionManager.Instance.GetTilemapGrid();
             float cellSize = grid != null ? grid.cellSize.x : 1f;
-            
-            // Logic change: The Footprint class now handles PivotMode (None, Automatic, Manual) internally.
-            // If mode is 'None', it returns anchorWorld. If 'Automatic' or 'Manual', it calculates the offset.
+
             transform.position = footprint.GetCenteredWorldPosition(anchorWorld, cellSize) + visualOffset;
         }
 
-        /// <summary>
-        /// Calculates all grid positions this entity occupies based on anchor and footprint.
-        /// </summary>
         private void CalculateOccupiedPositions(GridPosition anchor)
         {
             occupiedPositions.Clear();
-            
+
             if (footprint == null) return;
 
             foreach (var offset in footprint.GetLocalOffsets())
@@ -187,7 +150,7 @@ namespace WegoSystem
         }
 
         /// <summary>
-        /// Checks if all footprint positions would be valid at the given anchor.
+        /// Checks if all positions for the given anchor would be valid (within map bounds).
         /// </summary>
         public bool AreAllPositionsValid(GridPosition anchor)
         {
@@ -205,7 +168,7 @@ namespace WegoSystem
         }
 
         /// <summary>
-        /// Checks if placing at the given anchor would overlap with any occupied tiles.
+        /// Checks if placing at the given anchor would overlap with other occupied tiles.
         /// </summary>
         public bool WouldOverlapOccupiedTiles(GridPosition anchor, bool ignoreSelf = true)
         {
@@ -214,7 +177,7 @@ namespace WegoSystem
             foreach (var offset in footprint.GetLocalOffsets())
             {
                 var pos = new GridPosition(anchor.x + offset.x, anchor.y + offset.y);
-                
+
                 if (ignoreSelf && occupiedPositions.Contains(pos))
                 {
                     continue;
@@ -228,43 +191,37 @@ namespace WegoSystem
             return false;
         }
 
-        /// <summary>
-        /// Registers this entity at all occupied positions.
-        /// </summary>
         private void RegisterAtAllPositions()
         {
             if (GridPositionManager.Instance == null || isRegistered) return;
 
             foreach (var pos in occupiedPositions)
             {
-                GridPositionManager.Instance.RegisterEntityAtPosition(gridEntity, pos, BlocksTiles);
+                GridPositionManager.Instance.RegisterMultiTileEntityAtPosition(this, pos);
             }
-            
+
             isRegistered = true;
-            
+
             if (GridPositionManager.Instance.DebugMode)
             {
                 Debug.Log($"[MultiTileEntity] Registered {gameObject.name} at {occupiedPositions.Count} positions: {string.Join(", ", occupiedPositions)}");
             }
         }
 
-        /// <summary>
-        /// Unregisters this entity from all occupied positions.
-        /// </summary>
         private void UnregisterFromAllPositions()
         {
             if (GridPositionManager.Instance == null || !isRegistered) return;
 
             foreach (var pos in occupiedPositions)
             {
-                GridPositionManager.Instance.UnregisterEntityFromPosition(gridEntity, pos);
+                GridPositionManager.Instance.UnregisterMultiTileEntityFromPosition(this, pos);
             }
-            
+
             isRegistered = false;
         }
 
         /// <summary>
-        /// Checks if this entity occupies the given grid position.
+        /// Checks if this entity occupies the given position.
         /// </summary>
         public bool OccupiesPosition(GridPosition position)
         {
@@ -283,14 +240,12 @@ namespace WegoSystem
         private void OnDrawGizmos()
         {
             if (!showDebugGizmos || footprint == null) return;
-
             DrawFootprintGizmos();
         }
 
         private void OnDrawGizmosSelected()
         {
             if (footprint == null) return;
-            
             DrawFootprintGizmos();
         }
 
@@ -298,7 +253,7 @@ namespace WegoSystem
         {
             GridPosition anchor;
             Vector3 cellSize = Vector3.one;
-            
+
             if (Application.isPlaying && GridPositionManager.Instance != null)
             {
                 anchor = gridEntity != null ? gridEntity.Position : GridPosition.Zero;
@@ -307,18 +262,16 @@ namespace WegoSystem
             }
             else
             {
-                // In editor, estimate from transform position
                 anchor = new GridPosition(
                     Mathf.FloorToInt(transform.position.x),
                     Mathf.FloorToInt(transform.position.y)
                 );
             }
 
-            // Draw each tile in the footprint
             foreach (var offset in footprint.GetLocalOffsets())
             {
                 Vector3 tileCenter;
-                
+
                 if (Application.isPlaying && GridPositionManager.Instance != null)
                 {
                     var pos = new GridPosition(anchor.x + offset.x, anchor.y + offset.y);
@@ -333,11 +286,9 @@ namespace WegoSystem
                     );
                 }
 
-                // Footprint tile
                 Gizmos.color = footprintColor;
                 Gizmos.DrawCube(tileCenter, new Vector3(cellSize.x * 0.9f, cellSize.y * 0.9f, 0.1f));
 
-                // Anchor marker
                 if (offset == Vector2Int.zero)
                 {
                     Gizmos.color = anchorColor;
@@ -345,7 +296,6 @@ namespace WegoSystem
                 }
             }
 
-            // Draw center point
             Gizmos.color = Color.cyan;
             Vector3 centerPos = transform.position - visualOffset;
             Gizmos.DrawSphere(centerPos, 0.15f);
