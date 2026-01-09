@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 647,843 -> 472,909 chars (27.0% reduction)
-Estimated tokens saved: ~43,733
+Compression Stats: 674,735 -> 486,269 chars (27.9% reduction)
+Estimated tokens saved: ~47,116
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -25,72 +25,72 @@ using UnityEngine.UI;
 using System.Linq;
 
 [Global Scope]
-  GameEvent (Assets\Scripts\Core\Events/) L34
-  GameEventListener (Assets\Scripts\Core\Events/) L61
-  IGameEventListener (Assets\Scripts\Core\Events/) L90
-  GameBootstrap (Assets\Scripts\Core/) L98
-  SortableEntity (Assets\Scripts\Core/) L149
-  WeatherManager (Assets\Scripts\Core/) L220
-  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L422
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L483
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L769
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L840
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L849
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1262
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1426
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1442
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1480
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1790
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1826
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2106
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2199
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2221
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2240
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2324
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2405
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2477
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2493
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2515
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2764
-  WaveState (Assets\Scripts\Ecosystem\Management/) L2784
-  WaveSpawnLocationType (Assets\Scripts\Ecosystem\Spawning/) L3089
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3132
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3151
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3190
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3238
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3256
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3407
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3518
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3565
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3578
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3640
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3660
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L3701
-  WaveManagerEditor (Assets\Scripts\Editor/) L3838
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L4015
-  ItemEffect (Assets\Scripts\Items/) L4045
-  ItemInstance (Assets\Scripts\Items/) L4079
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4114
-  LeafData (Assets\Scripts\PlantSystem\Data/) L4122
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4137
-  PlantCellType (Assets\Scripts\PlantSystem\Growth/) L4176
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4197
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4334
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4396
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L4491
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L4591
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L4613
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L4728
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L4884
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L4994
-  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L5095
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L5122
-  GridSnapStartup (Assets\Scripts\Ticks/) L5364
-  TickDebugMonitor (Assets\Scripts\Ticks/) L5431
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L5467
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L5478
-  ITooltipDataProvider (Assets\Scripts\UI\_UGUI_Legacy/) L5508
-  InventoryColorManager (Assets\Scripts\UI\_UGUI_Legacy/) L5519
+  ITooltipDataProvider (Assets\Scripts\A_ToolkitUI/) L34
+  InventoryColorManager (Assets\Scripts\A_ToolkitUI/) L45
+  GameEvent (Assets\Scripts\Core\Events/) L112
+  GameEventListener (Assets\Scripts\Core\Events/) L139
+  IGameEventListener (Assets\Scripts\Core\Events/) L168
+  GameBootstrap (Assets\Scripts\Core/) L176
+  SortableEntity (Assets\Scripts\Core/) L227
+  WeatherManager (Assets\Scripts\Core/) L298
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L500
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L561
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L847
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L918
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L927
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1340
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1504
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1520
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1558
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1868
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1904
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2184
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2277
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2299
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2318
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2402
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2483
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2555
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2571
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2593
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2842
+  WaveState (Assets\Scripts\Ecosystem\Management/) L2862
+  WaveSpawnLocationType (Assets\Scripts\Ecosystem\Spawning/) L3167
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3210
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3229
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3268
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3316
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3334
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3485
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3596
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3643
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3656
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3718
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3738
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L3779
+  WaveManagerEditor (Assets\Scripts\Editor/) L3916
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L4093
+  ItemEffect (Assets\Scripts\Items/) L4123
+  ItemInstance (Assets\Scripts\Items/) L4157
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4192
+  LeafData (Assets\Scripts\PlantSystem\Data/) L4200
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4215
+  PlantCellType (Assets\Scripts\PlantSystem\Growth/) L4254
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4275
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4412
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4474
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L4569
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L4669
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L4691
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L4806
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L4962
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L5072
+  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L5173
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L5200
+  GridSnapStartup (Assets\Scripts\Ticks/) L5442
+  TickDebugMonitor (Assets\Scripts\Ticks/) L5509
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L5545
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L5556
   NightColorPostProcess (Assets\Scripts\Visual\Effects/) L5586
   RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L5694
   WaterReflection (Assets\Scripts\Visual\Effects/) L5801
@@ -109,106 +109,191 @@ using System.Linq;
   ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7204
   ToolType (Assets\Scripts\WorldInteraction\Tools/) L7339
 
+[Abracodabra.Ecosystem]
+  DorisController (Assets\Scripts\Ecosystem\Doris/) L7350
+
 [Abracodabra.Genes]
-  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L7350
-  GeneLibrary (Assets\Scripts\Genes/) L7360
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L7515
-  PlantState (Assets\Scripts\PlantSystem\Growth/) L7695
+  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L7454
+  GeneLibrary (Assets\Scripts\Genes/) L7464
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L7619
+  PlantState (Assets\Scripts\PlantSystem\Growth/) L7799
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L8087
-  Fruit (Assets\Scripts\Genes\Components/) L8112
-  NutritionComponent (Assets\Scripts\Genes\Components/) L8150
+  Creature (Assets\Scripts\Genes\Components/) L8191
+  Fruit (Assets\Scripts\Genes\Components/) L8216
+  NutritionComponent (Assets\Scripts\Genes\Components/) L8254
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L8162
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L8208
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L8227
-  ModifierGene (Assets\Scripts\Genes\Core/) L8239
-  PassiveStatType (Assets\Scripts\Genes\Core/) L8271
-  PayloadGene (Assets\Scripts\Genes\Core/) L8313
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L8359
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L8380
-  GeneBase (Assets\Scripts\Genes/) L8413
-  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L8491
+  ActiveGene (Assets\Scripts\Genes\Core/) L8266
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L8312
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L8331
+  ModifierGene (Assets\Scripts\Genes\Core/) L8343
+  PassiveStatType (Assets\Scripts\Genes\Core/) L8375
+  PayloadGene (Assets\Scripts\Genes\Core/) L8417
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L8463
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L8484
+  GeneBase (Assets\Scripts\Genes/) L8517
+  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L8595
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L8594
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L8712
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L8742
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L8785
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L8698
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L8816
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L8846
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L8889
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L8836
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L8892
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9024
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L8940
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L8996
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9128
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L9079
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L9112
-  GeneEventBus (Assets\Scripts\Genes\Services/) L9210
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L9262
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L9183
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L9216
+  GeneEventBus (Assets\Scripts\Genes\Services/) L9314
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L9366
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L9349
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L9453
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L9442
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L9527
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9667
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L9546
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L9631
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9771
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L9938
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L10684
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L10973
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L11184
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L11370
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L11569
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L12213
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L10042
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L10788
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L11077
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L11288
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L11474
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L11673
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L12317
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\UI\_UGUI_Legacy/) L12407
-  SeedRarity (Assets\Scripts\UI\_UGUI_Legacy/) L12577
-  QualityTier (Assets\Scripts\UI\_UGUI_Legacy/) L12599
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L12511
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L12681
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L12703
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L12661
-  CameraZoomController (Assets\Scripts\Core/) L12774
-  InitializationManager (Assets\Scripts\Core/) L12823
-  PixelGridSnapper (Assets\Scripts\Core/) L12863
-  RunState (Assets\Scripts\Core/) L12896
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L13064
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L13127
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L13263
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L13292
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L13443
-  GridEntity (Assets\Scripts\Ticks/) L13515
-  GridPosition (Assets\Scripts\Ticks/) L13685
-  GridPositionManager (Assets\Scripts\Ticks/) L13786
-  GridRadiusUtility (Assets\Scripts\Ticks/) L14166
-  TickConfiguration (Assets\Scripts\Ticks/) L14310
-  ITickUpdateable (Assets\Scripts\Ticks/) L14396
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L14548
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L14739
+  CameraController (Assets\Scripts\Core/) L12765
+  CameraZoomController (Assets\Scripts\Core/) L12878
+  InitializationManager (Assets\Scripts\Core/) L12927
+  PixelGridSnapper (Assets\Scripts\Core/) L12967
+  RunState (Assets\Scripts\Core/) L13000
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L13168
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L13231
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L13367
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L13396
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L13547
+  GridEntity (Assets\Scripts\Ticks/) L13619
+  GridPosition (Assets\Scripts\Ticks/) L13789
+  GridPositionManager (Assets\Scripts\Ticks/) L13890
+  GridRadiusUtility (Assets\Scripts\Ticks/) L14270
+  MultiTileEntity (Assets\Scripts\Ticks/) L14414
+  MultiTileFootprint (Assets\Scripts\Ticks/) L14661
+  TickConfiguration (Assets\Scripts\Ticks/) L14715
+  ITickUpdateable (Assets\Scripts\Ticks/) L14801
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L14953
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L14974
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L15165
+  for (Assets\Scripts\WorldInteraction/) L15569
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15143
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15641
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L15175
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L15673
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L15233
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L15279
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L15402
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L15731
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L15777
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L15900
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L15567
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16065
 
 
 ================================================================================
 FILES
 ================================================================================
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\A_ToolkitUI\ITooltipDataProvider.cs
+
+﻿// File: Assets/Scripts/UI/ITooltipDataProvider.cs
+
+pub interface ITooltipDataProvider {
+ string GetTooltipTitle();
+ string GetTooltipDescription();
+ string GetTooltipDetails(object source = null);
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\A_ToolkitUI\InventoryColorManager.cs
+
+﻿using UnityEngine;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Templates;
+
+// Note: Add 'using' for ItemDefinition if it's in a namespace.
+
+pub class InventoryColorManager : MonoBehaviour {
+ pub stat InventoryColorManager Instance { get; set; }
+
+ [Header("Cell Background Colors")]
+ [SerializeField] Color toolCellColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+ [SerializeField] Color seedCellColor = new Color(0.8f, 1f, 0.8f, 1f);
+ [SerializeField] Color passiveGeneCellColor = new Color(0.8f, 0.8f, 1f, 1f);
+ [SerializeField] Color activeGeneCellColor = new Color(1f, 0.8f, 0.8f, 1f);
+ [SerializeField] Color modifierGeneCellColor = new Color(1f, 1f, 0.7f, 1f);
+ [SerializeField] Color payloadGeneCellColor = new Color(1f, 0.7f, 1f, 1f);
+ [SerializeField] Color resourceCellColor = new Color(0.9f, 0.85f, 0.7f, 1f);
+ [SerializeField] Color defaultCellColor = new Color(0.9f, 0.9f, 0.9f, 1f);
+
+ void Awake() {
+  if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+  Instance = this;
+ }
+
+ pub Color GetCellColorForItem(GeneBase gene, SeedTemplate seed, ToolDefinition tool, ItemDefinition item) {
+  switch (GetItemCategory(gene, seed, tool, item)) {
+   case ItemUIType.Tool: return toolCellColor;
+   case ItemUIType.Seed: return seedCellColor;
+   case ItemUIType.PassiveGene: return passiveGeneCellColor;
+   case ItemUIType.ActiveGene: return activeGeneCellColor;
+   case ItemUIType.ModifierGene: return modifierGeneCellColor;
+   case ItemUIType.PayloadGene: return payloadGeneCellColor;
+   case ItemUIType.Resource: return resourceCellColor; // NEW
+   default: return defaultCellColor;
+  }
+ }
+
+ pub enum ItemUIType {
+  Tool,
+  Seed,
+  PassiveGene,
+  ActiveGene,
+  ModifierGene,
+  PayloadGene,
+  Resource, // NEW
+  Default
+ }
+
+ pub ItemUIType GetItemCategory(GeneBase gene, SeedTemplate seed, ToolDefinition tool, ItemDefinition item) {
+  if (tool != null) return ItemUIType.Tool;
+  if (seed != null) return ItemUIType.Seed;
+  if (item != null) return ItemUIType.Resource; // NEW
+  if (gene != null) {
+   switch (gene.Category) {
+    case GeneCategory.Passive: return ItemUIType.PassiveGene;
+    case GeneCategory.Active: return ItemUIType.ActiveGene;
+    case GeneCategory.Modifier: return ItemUIType.ModifierGene;
+    case GeneCategory.Payload: return ItemUIType.PayloadGene;
+   }
+  }
+  return ItemUIType.Default;
+ }
+}
 
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Core\Events\GameEvent.cs
@@ -5685,84 +5770,6 @@ pub class PrefabOrigin : MonoBehaviour {
 }
 
 ////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\ITooltipDataProvider.cs
-
-﻿// File: Assets/Scripts/UI/ITooltipDataProvider.cs
-
-pub interface ITooltipDataProvider {
- string GetTooltipTitle();
- string GetTooltipDescription();
- string GetTooltipDetails(object source = null);
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\InventoryColorManager.cs
-
-﻿using UnityEngine;
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Templates;
-
-// Note: Add 'using' for ItemDefinition if it's in a namespace.
-
-pub class InventoryColorManager : MonoBehaviour {
- pub stat InventoryColorManager Instance { get; set; }
-
- [Header("Cell Background Colors")]
- [SerializeField] Color toolCellColor = new Color(0.5f, 0.5f, 0.5f, 1f);
- [SerializeField] Color seedCellColor = new Color(0.8f, 1f, 0.8f, 1f);
- [SerializeField] Color passiveGeneCellColor = new Color(0.8f, 0.8f, 1f, 1f);
- [SerializeField] Color activeGeneCellColor = new Color(1f, 0.8f, 0.8f, 1f);
- [SerializeField] Color modifierGeneCellColor = new Color(1f, 1f, 0.7f, 1f);
- [SerializeField] Color payloadGeneCellColor = new Color(1f, 0.7f, 1f, 1f);
- [SerializeField] Color resourceCellColor = new Color(0.9f, 0.85f, 0.7f, 1f);
- [SerializeField] Color defaultCellColor = new Color(0.9f, 0.9f, 0.9f, 1f);
-
- void Awake() {
-  if (Instance != null && Instance != this) { Destroy(gameObject); return; }
-  Instance = this;
- }
-
- pub Color GetCellColorForItem(GeneBase gene, SeedTemplate seed, ToolDefinition tool, ItemDefinition item) {
-  switch (GetItemCategory(gene, seed, tool, item)) {
-   case ItemUIType.Tool: return toolCellColor;
-   case ItemUIType.Seed: return seedCellColor;
-   case ItemUIType.PassiveGene: return passiveGeneCellColor;
-   case ItemUIType.ActiveGene: return activeGeneCellColor;
-   case ItemUIType.ModifierGene: return modifierGeneCellColor;
-   case ItemUIType.PayloadGene: return payloadGeneCellColor;
-   case ItemUIType.Resource: return resourceCellColor; // NEW
-   default: return defaultCellColor;
-  }
- }
-
- pub enum ItemUIType {
-  Tool,
-  Seed,
-  PassiveGene,
-  ActiveGene,
-  ModifierGene,
-  PayloadGene,
-  Resource, // NEW
-  Default
- }
-
- pub ItemUIType GetItemCategory(GeneBase gene, SeedTemplate seed, ToolDefinition tool, ItemDefinition item) {
-  if (tool != null) return ItemUIType.Tool;
-  if (seed != null) return ItemUIType.Seed;
-  if (item != null) return ItemUIType.Resource; // NEW
-  if (gene != null) {
-   switch (gene.Category) {
-    case GeneCategory.Passive: return ItemUIType.PassiveGene;
-    case GeneCategory.Active: return ItemUIType.ActiveGene;
-    case GeneCategory.Modifier: return ItemUIType.ModifierGene;
-    case GeneCategory.Payload: return ItemUIType.PayloadGene;
-   }
-  }
-  return ItemUIType.Default;
- }
-}
-
-////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Visual\Effects\NightColorPostProcess.cs
 
 ﻿using UnityEngine;
@@ -7524,6 +7531,110 @@ pub class ToolSwitcher : MonoBehaviour {
  WateringCan,
  SeedPouch,
  HarvestPouch // <<< NEW
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Doris\DorisController.cs
+
+using WegoSystem;
+
+namespace Abracodabra.Ecosystem {
+ pub class DorisController : MonoBehaviour, IWorldInteractable {
+  [Header("References")]
+  [SerializeField] MultiTileEntity multiTileEntity;
+  [SerializeField] SpriteRenderer spriteRenderer;
+
+  [Header("Hover Feedback")]
+  [SerializeField] Color normalColor = Color.white;
+  [SerializeField] Color hoverColor = new Color(1f, 1f, 0.8f, 1f);
+
+  [Header("Debug")]
+  [SerializeField] bool debugLog = false;
+
+  bool isHovered = false;
+
+  pub int InteractionPriority => multiTileEntity != null ? multiTileEntity.InteractionPriority : 200;
+
+  pub bool CanInteract => enabled && gameObject.activeInHierarchy;
+
+  pub Vector3 InteractionWorldPosition => transform.position;
+
+  pub bool OnInteract(GameObject interactor, ToolDefinition tool) {
+   if (tool == null) {
+    OnClickedWithHands(interactor);
+    return true;
+   }
+
+   if (debugLog) {
+    Debug.Log($"[DorisController] Player used tool '{tool.displayName}' on Doris");
+   }
+
+   return HandleToolInteraction(interactor, tool);
+  }
+
+  pub void OnHoverEnter() {
+   isHovered = true;
+   if (spriteRenderer != null) {
+    spriteRenderer.color = hoverColor;
+   }
+
+   if (debugLog) {
+    Debug.Log("[DorisController] Hover entered");
+   }
+  }
+
+  pub void OnHoverExit() {
+   isHovered = false;
+   if (spriteRenderer != null) {
+    spriteRenderer.color = normalColor;
+   }
+
+   if (debugLog) {
+    Debug.Log("[DorisController] Hover exited");
+   }
+  }
+
+  void Awake() {
+   if (multiTileEntity == null) {
+    multiTileEntity = GetComponent<MultiTileEntity>();
+   }
+
+   if (spriteRenderer == null) {
+    spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+   }
+  }
+
+  void Start() {
+   if (spriteRenderer != null) {
+    normalColor = spriteRenderer.color;
+   }
+  }
+
+  void OnValidate() {
+   if (multiTileEntity == null) {
+    multiTileEntity = GetComponent<MultiTileEntity>();
+   }
+  }
+
+  void OnClickedWithHands(GameObject interactor) {
+   if (debugLog) {
+    Debug.Log($"[DorisController] Player clicked Doris with bare hands");
+   }
+
+   // TODO: Open Doris UI panel
+   // TODO: Show Doris info/status
+   // TODO: Trigger dialogue if any
+  }
+
+  bool HandleToolInteraction(GameObject interactor, ToolDefinition tool) {
+   // TODO: Check if this is a food item being given to Doris
+
+   return true;
+  }
+
+  // TODO: Implement these based on your design document
+
+ }
 }
 
 ////////////////////////////////////////////////////////////
@@ -12584,7 +12695,7 @@ namespace Abracodabra.UI.Toolkit {
 }
 
 ////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\SeedTooltipData.cs
+// FILE: Assets\Scripts\A_ToolkitUI\SeedTooltipData.cs
 
 ﻿using System;
 using Abracodabra.Genes.Templates;
@@ -12754,7 +12865,7 @@ namespace Abracodabra.UI.Tooltips {
 }
 
 ////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\TooltipEnums.cs
+// FILE: Assets\Scripts\A_ToolkitUI\TooltipEnums.cs
 
 ﻿namespace Abracodabra.UI.Tooltips {
  pub enum SeedRarity {
@@ -12776,7 +12887,7 @@ namespace Abracodabra.UI.Tooltips {
 }
 
 ////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\UI\_UGUI_Legacy\TooltipUtilities.cs
+// FILE: Assets\Scripts\A_ToolkitUI\TooltipUtilities.cs
 
 ﻿// File: Assets/Scripts/UI/_UGUI_Legacy/TooltipUtilities.cs
 
@@ -14487,6 +14598,307 @@ namespace WegoSystem {
 }
 
 ////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ticks\MultiTileEntity.cs
+
+
+namespace WegoSystem {
+ pub class MultiTileEntity : MonoBehaviour {
+  [Header("Footprint")]
+  [Tooltip("Defines the size and behavior of this multi-tile entity.")]
+  [SerializeField] MultiTileFootprint footprint;
+
+  [Header("Positioning")]
+  [Tooltip("If true, automatically snaps to grid and centers on Start.")]
+  [SerializeField] bool autoSnapOnStart = true;
+
+  [Tooltip("Visual offset applied after centering (for fine-tuning sprite position).")]
+  [SerializeField] Vector3 visualOffset = Vector3.zero;
+
+  [Header("Debug")]
+  [SerializeField] bool showDebugGizmos = true;
+  [SerializeField] Color footprintColor = new Color(1f, 0.5f, 0f, 0.3f);
+  [SerializeField] Color anchorColor = Color.red;
+
+  GridEntity gridEntity;
+  ro List<GridPosition> occupiedPositions = new List<GridPosition>();
+  bool isRegistered = false;
+
+  pub GridPosition AnchorPosition => gridEntity != null ? gridEntity.Position : GridPosition.Zero;
+
+  pub IReadOnlyList<GridPosition> OccupiedPositions => occupiedPositions;
+
+  pub MultiTileFootprint Footprint => footprint;
+
+  pub int InteractionPriority => footprint != null ? footprint.InteractionPriority : 100;
+
+  pub bool BlocksTiles => footprint != null && footprint.BlocksTiles;
+
+  void Awake() {
+   gridEntity = GetComponent<GridEntity>();
+
+   gridEntity.isTileOccupant = false;
+  }
+
+  void Start() {
+   if (footprint == null) {
+    Debug.LogError($"[MultiTileEntity] {gameObject.name} has no MultiTileFootprint assigned!", this);
+    enabled = false;
+    return;
+   }
+
+   if (autoSnapOnStart) {
+    SnapToGridAndRegister();
+   }
+  }
+
+  void OnDestroy() {
+   UnregisterFromAllPositions();
+  }
+
+  void OnDisable() {
+   UnregisterFromAllPositions();
+  }
+
+  void OnEnable() {
+   if (isRegistered || !Application.isPlaying) return;
+
+   if (occupiedPositions.Count > 0) {
+    RegisterAtAllPositions();
+   }
+  }
+
+  pub void SnapToGridAndRegister() {
+   if (GridPositionManager.Instance == null) {
+    Debug.LogError("[MultiTileEntity] GridPositionManager not found!", this);
+    return;
+   }
+
+   GridPosition anchorPos = GridPositionManager.Instance.WorldToGrid(transform.position);
+
+   SetAnchorPosition(anchorPos, true);
+  }
+
+  pub void SetAnchorPosition(GridPosition newAnchor, bool instant = false) {
+   if (GridPositionManager.Instance == null) return;
+
+   if (!AreAllPositionsValid(newAnchor)) {
+    Debug.LogWarning($"[MultiTileEntity] Cannot place {gameObject.name} at {newAnchor} - some tiles are out of bounds.");
+    return;
+   }
+
+   UnregisterFromAllPositions();
+
+   gridEntity.SetPosition(newAnchor, instant);
+
+   UpdateVisualPosition();
+
+   CalculateOccupiedPositions(newAnchor);
+   RegisterAtAllPositions();
+  }
+
+  void UpdateVisualPosition() {
+   if (GridPositionManager.Instance == null || footprint == null) return;
+
+   Vector3 anchorWorld = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
+
+   if (footprint.CenterPivot) {
+    Grid grid = GridPositionManager.Instance.GetTilemapGrid();
+    float cellSize = grid != null ? grid.cellSize.x : 1f;
+
+    transform.position = footprint.GetCenteredWorldPosition(anchorWorld, cellSize) + visualOffset;
+   }
+   else {
+    transform.position = anchorWorld + visualOffset;
+   }
+  }
+
+  void CalculateOccupiedPositions(GridPosition anchor) {
+   occupiedPositions.Clear();
+
+   if (footprint == null) return;
+
+   foreach (var offset in footprint.GetLocalOffsets()) {
+    occupiedPositions.Add(new GridPosition(anchor.x + offset.x, anchor.y + offset.y));
+   }
+  }
+
+  pub bool AreAllPositionsValid(GridPosition anchor) {
+   if (footprint == null || GridPositionManager.Instance == null) return false;
+
+   foreach (var offset in footprint.GetLocalOffsets()) {
+    var pos = new GridPosition(anchor.x + offset.x, anchor.y + offset.y);
+    if (!GridPositionManager.Instance.IsPositionValid(pos)) {
+     return false;
+    }
+   }
+   return true;
+  }
+
+  pub bool WouldOverlapOccupiedTiles(GridPosition anchor, bool ignoreSelf = true) {
+   if (footprint == null || GridPositionManager.Instance == null) return false;
+
+   foreach (var offset in footprint.GetLocalOffsets()) {
+    var pos = new GridPosition(anchor.x + offset.x, anchor.y + offset.y);
+
+    if (ignoreSelf && occupiedPositions.Contains(pos)) {
+     continue;
+    }
+
+    if (GridPositionManager.Instance.IsPositionOccupied(pos)) {
+     return true;
+    }
+   }
+   return false;
+  }
+
+  void RegisterAtAllPositions() {
+   if (GridPositionManager.Instance == null || isRegistered) return;
+
+   foreach (var pos in occupiedPositions) {
+    GridPositionManager.Instance.RegisterEntityAtPosition(gridEntity, pos, BlocksTiles);
+   }
+
+   isRegistered = true;
+
+   if (GridPositionManager.Instance.DebugMode) {
+    Debug.Log($"[MultiTileEntity] Registered {gameObject.name} at {occupiedPositions.Count} positions: {string.Join(", ", occupiedPositions)}");
+   }
+  }
+
+  void UnregisterFromAllPositions() {
+   if (GridPositionManager.Instance == null || !isRegistered) return;
+
+   foreach (var pos in occupiedPositions) {
+    GridPositionManager.Instance.UnregisterEntityFromPosition(gridEntity, pos);
+   }
+
+   isRegistered = false;
+  }
+
+  pub bool OccupiesPosition(GridPosition position) {
+   return occupiedPositions.Contains(position);
+  }
+
+  pub Vector3 GetCenterWorldPosition() {
+   return transform.position - visualOffset;
+  }
+
+#if UNITY_EDITOR
+  void OnDrawGizmos() {
+   if (!showDebugGizmos || footprint == null) return;
+
+   DrawFootprintGizmos();
+  }
+
+  void OnDrawGizmosSelected() {
+   if (footprint == null) return;
+
+   DrawFootprintGizmos();
+  }
+
+  void DrawFootprintGizmos() {
+   GridPosition anchor;
+   Vector3 cellSize = Vector3.one;
+
+   if (Application.isPlaying && GridPositionManager.Instance != null) {
+    anchor = gridEntity != null ? gridEntity.Position : GridPosition.Zero;
+    Grid grid = GridPositionManager.Instance.GetTilemapGrid();
+    if (grid != null) cellSize = grid.cellSize;
+   }
+   else {
+    anchor = new GridPosition(
+     Mathf.FloorToInt(transform.position.x),
+     Mathf.FloorToInt(transform.position.y)
+    );
+   }
+
+   foreach (var offset in footprint.GetLocalOffsets()) {
+    Vector3 tileCenter;
+
+    if (Application.isPlaying && GridPositionManager.Instance != null) {
+     var pos = new GridPosition(anchor.x + offset.x, anchor.y + offset.y);
+     tileCenter = GridPositionManager.Instance.GridToWorld(pos);
+    }
+    else {
+     tileCenter = new Vector3(
+      anchor.x + offset.x + 0.5f,
+      anchor.y + offset.y + 0.5f,
+      0f
+     );
+    }
+
+    Gizmos.color = footprintColor;
+    Gizmos.DrawCube(tileCenter, new Vector3(cellSize.x * 0.9f, cellSize.y * 0.9f, 0.1f));
+
+    if (offset == Vector2Int.zero) {
+     Gizmos.color = anchorColor;
+     Gizmos.DrawWireCube(tileCenter, new Vector3(cellSize.x, cellSize.y, 0.1f));
+    }
+   }
+
+   Gizmos.color = Color.cyan;
+   Vector3 centerPos = transform.position - visualOffset;
+   Gizmos.DrawSphere(centerPos, 0.15f);
+  }
+#endif
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ticks\MultiTileFootprint.cs
+
+
+namespace WegoSystem {
+ pub class MultiTileFootprint : ScriptableObject {
+  [Tooltip("Size of the footprint in tiles. (2,2) = 2x2 grid.")]
+  [SerializeField] Vector2Int size = new Vector2Int(2, 2);
+
+  [Tooltip("If true, the visual pivot will be centered on the footprint. If false, pivot stays at anchor (bottom-left).")]
+  [SerializeField] bool centerPivot = true;
+
+  [Tooltip("Interaction priority. Higher values take precedence over tiles and other entities.")]
+  [SerializeField] int interactionPriority = 200;
+
+  [Tooltip("If true, this entity blocks movement/pathfinding on all occupied tiles.")]
+  [SerializeField] bool blocksTiles = true;
+
+  pub Vector2Int Size => size;
+  pub bool CenterPivot => centerPivot;
+  pub int InteractionPriority => interactionPriority;
+  pub bool BlocksTiles => blocksTiles;
+
+  pub List<Vector2Int> GetLocalOffsets() {
+   var offsets = new List<Vector2Int>();
+   for (int x = 0; x < size.x; x++) {
+    for (int y = 0; y < size.y; y++) {
+     offsets.Add(new Vector2Int(x, y));
+    }
+   }
+   return offsets;
+  }
+
+  pub Vector2 GetCenterOffset(float cellSize = 1f) {
+   return new Vector2(
+    (size.x - 1) * cellSize * 0.5f,
+    (size.y - 1) * cellSize * 0.5f
+   );
+  }
+
+  pub Vector3 GetCenteredWorldPosition(Vector3 anchorWorldPosition, float cellSize = 1f) {
+   if (!centerPivot) return anchorWorldPosition;
+
+   Vector2 offset = GetCenterOffset(cellSize);
+   return anchorWorldPosition + new Vector3(offset.x, offset.y, 0f);
+  }
+
+  void OnValidate() {
+   size.x = Mathf.Max(1, size.x);
+   size.y = Mathf.Max(1, size.y);
+  }
+ }
+}
+
+////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ticks\TickConfiguration.cs
 
 ﻿using UnityEngine;
@@ -14721,6 +15133,27 @@ namespace WegoSystem {
   pub int GetRegisteredUpdateableCount() {
    return tickUpdateables.Count;
   }
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\WorldInteraction\IWorldInteractable.cs
+
+using WegoSystem;
+
+namespace WegoSystem {
+ pub interface IWorldInteractable {
+  int InteractionPriority { get; }
+
+  bool CanInteract { get; }
+
+  bool OnInteract(GameObject interactor, ToolDefinition tool);
+
+  void OnHoverEnter();
+
+  void OnHoverExit();
+
+  Vector3 InteractionWorldPosition { get; }
  }
 }
 
@@ -15315,6 +15748,78 @@ var refillRule = interactionLibrary.refillRules.FirstOrDefault( r => r.toolToRef
     return interactionGrid.GetCellCenterWorld(cellPos);
    }
    return new Vector3(cellPos.x + 0.5f, cellPos.y + 0.5f, 0f);
+  }
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\WorldInteraction\WorldInteractionHelper.cs
+
+using WegoSystem;
+
+namespace WegoSystem {
+ pub stat class WorldInteractionHelper {
+  pub stat IWorldInteractable GetInteractableAt(GridPosition position) {
+   if (GridPositionManager.Instance == null) return null;
+
+   var entities = GridPositionManager.Instance.GetEntitiesAt(position);
+   if (entities.Count == 0) return null;
+
+   IWorldInteractable best = null;
+   int bestPriority = int.MinValue;
+
+   foreach (var entity in entities) {
+    var interactable = entity.GetComponent<IWorldInteractable>();
+    if (interactable == null) {
+     interactable = entity.GetComponentInParent<IWorldInteractable>();
+    }
+
+    if (interactable != null && interactable.CanInteract) {
+     if (interactable.InteractionPriority > bestPriority) {
+      bestPriority = interactable.InteractionPriority;
+      best = interactable;
+     }
+    }
+   }
+
+   return best;
+  }
+
+  pub stat List<IWorldInteractable> GetAllInteractablesAt(GridPosition position) {
+   if (GridPositionManager.Instance == null) return new List<IWorldInteractable>();
+
+   var entities = GridPositionManager.Instance.GetEntitiesAt(position);
+   var interactables = new List<IWorldInteractable>();
+
+   foreach (var entity in entities) {
+    var interactable = entity.GetComponent<IWorldInteractable>();
+    if (interactable == null) {
+     interactable = entity.GetComponentInParent<IWorldInteractable>();
+    }
+
+    if (interactable != null && interactable.CanInteract && !interactables.Contains(interactable)) {
+     interactables.Add(interactable);
+    }
+   }
+
+   return interactables.OrderByDescending(i => i.InteractionPriority).ToList();
+  }
+
+  pub stat bool TryInteractAt(GridPosition position, GameObject interactor, ToolDefinition tool) {
+   var interactable = GetInteractableAt(position);
+   if (interactable != null) {
+    return interactable.OnInteract(interactor, tool);
+   }
+   return false;
+  }
+
+  pub stat MultiTileEntity GetMultiTileEntityAt(GridPosition position) {
+   return GridPositionManager.Instance?.GetMultiTileEntityAt(position);
+  }
+
+  pub stat bool HasBlockingInteractable(GridPosition position, int tileInteractionPriority = 100) {
+   var interactable = GetInteractableAt(position);
+   return interactable != null && interactable.InteractionPriority >= tileInteractionPriority;
   }
  }
 }
