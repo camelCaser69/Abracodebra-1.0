@@ -1,4 +1,5 @@
-﻿using System;
+﻿// FILE: Assets/Scripts/WorldInteraction/Player/PlayerActionManager.cs
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,7 @@ using Abracodabra.Genes;
 using Abracodabra.UI.Genes;
 using Abracodabra.UI.Toolkit;
 
-public enum PlayerActionType
-{
+public enum PlayerActionType {
     Move,
     UseTool,
     PlantSeed,
@@ -17,18 +17,10 @@ public enum PlayerActionType
     Interact
 }
 
-/// <summary>
-/// Manages player actions in the game world.
-/// 
-/// UPDATED: Now uses InventoryService for harvesting instead of old InventoryGridController.
-/// This integrates with the UI Toolkit inventory system.
-/// </summary>
-public class PlayerActionManager : MonoBehaviour
-{
+public class PlayerActionManager : MonoBehaviour {
     public static PlayerActionManager Instance { get; private set; }
 
-    public class ToolActionData
-    {
+    public class ToolActionData {
         public ToolDefinition Tool;
         public Vector3Int GridPosition;
     }
@@ -40,34 +32,26 @@ public class PlayerActionManager : MonoBehaviour
     public event Action<PlayerActionType, object> OnActionExecuted;
     public event Action<string> OnActionFailed;
 
-    void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
+    void Awake() {
+        if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
         }
         Instance = this;
     }
 
-    /// <summary>
-    /// Execute a player action at the specified grid position
-    /// </summary>
-    public bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null, Action onSuccessCallback = null)
-    {
+    public bool ExecutePlayerAction(PlayerActionType actionType, Vector3Int gridPosition, object actionData = null, Action onSuccessCallback = null) {
         if (debugMode) Debug.Log($"[PlayerActionManager] Executing {actionType} at {gridPosition}");
 
         bool success = false;
         int tickCost = tickCostPerAction;
         object eventPayload = actionData;
 
-        switch (actionType)
-        {
+        switch (actionType) {
             case PlayerActionType.UseTool:
                 var toolDef = actionData as ToolDefinition;
                 success = ExecuteToolUse(gridPosition, toolDef);
-                if (success)
-                {
+                if (success) {
                     eventPayload = new ToolActionData { Tool = toolDef, GridPosition = gridPosition };
                 }
                 break;
@@ -87,33 +71,43 @@ public class PlayerActionManager : MonoBehaviour
                 break;
         }
 
-        if (success)
-        {
+        if (success) {
             AdvanceGameTick(tickCost);
             onSuccessCallback?.Invoke();
             OnActionExecuted?.Invoke(actionType, eventPayload);
         }
-        else
-        {
+        else {
             OnActionFailed?.Invoke($"{actionType} failed at {gridPosition}");
         }
 
         return success;
     }
 
-    private bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool)
-    {
+    bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool) {
         if (tool == null) return false;
-        TileInteractionManager.Instance?.ApplyToolAction(tool);
-        return true;
+
+        // Get the actual result from TileInteractionManager
+        bool actionSucceeded = TileInteractionManager.Instance?.ApplyToolAction(tool) ?? false;
+
+        if (actionSucceeded) {
+            // Only consume tool use on SUCCESS
+            if (ToolSwitcher.Instance != null && tool.limitedUses) {
+                ToolSwitcher.Instance.TryConsumeUse();
+            }
+
+            if (debugMode) Debug.Log($"[PlayerActionManager] Tool '{tool.displayName}' action succeeded at {gridPosition}");
+        }
+        else {
+            if (debugMode) Debug.Log($"[PlayerActionManager] Tool '{tool.displayName}' action had no effect at {gridPosition} - no use consumed");
+        }
+
+        return actionSucceeded;
     }
 
-    bool ExecutePlantSeed(Vector3Int gridPosition, UIInventoryItem seedItem)
-    {
+    bool ExecutePlantSeed(Vector3Int gridPosition, UIInventoryItem seedItem) {
         if (debugMode) Debug.Log($"[ExecutePlantSeed] Attempting to plant {seedItem?.GetDisplayName()} at {gridPosition}");
 
-        if (seedItem == null || seedItem.Type != UIInventoryItem.ItemType.Seed)
-        {
+        if (seedItem == null || seedItem.Type != UIInventoryItem.ItemType.Seed) {
             Debug.LogError("[ExecutePlantSeed] Action failed: Provided item was not a valid seed.");
             return false;
         }
@@ -128,16 +122,11 @@ public class PlayerActionManager : MonoBehaviour
         return result;
     }
 
-    /// <summary>
-    /// Execute harvest action - NOW uses InventoryService instead of old InventoryGridController
-    /// </summary>
-    bool ExecuteHarvest(Vector3Int gridPosition)
-    {
+    bool ExecuteHarvest(Vector3Int gridPosition) {
         var entities = GridPositionManager.Instance?.GetEntitiesAt(new GridPosition(gridPosition));
         var plantEntity = entities?.FirstOrDefault(e => e.GetComponent<PlantGrowth>() != null);
 
-        if (plantEntity == null)
-        {
+        if (plantEntity == null) {
             if (debugMode) Debug.Log($"[PlayerActionManager] Harvest failed: No plant found at {gridPosition}");
             return false;
         }
@@ -147,31 +136,25 @@ public class PlayerActionManager : MonoBehaviour
 
         List<HarvestedItem> harvestedItems = plant.HarvestAllFruits();
 
-        if (harvestedItems == null || harvestedItems.Count == 0)
-        {
+        if (harvestedItems == null || harvestedItems.Count == 0) {
             if (debugMode) Debug.Log($"[PlayerActionManager] Harvest action on plant '{plant.name}' yielded no items.");
             return false;
         }
 
         int itemsAdded = 0;
 
-        if (InventoryService.IsInitialized)
-        {
-            foreach (var harvestedItem in harvestedItems)
-            {
-                if (InventoryService.AddHarvestedItem(harvestedItem.Item))
-                {
+        if (InventoryService.IsInitialized) {
+            foreach (var harvestedItem in harvestedItems) {
+                if (InventoryService.AddHarvestedItem(harvestedItem.Item)) {
                     itemsAdded++;
                     if (debugMode) Debug.Log($"[PlayerActionManager] Added '{harvestedItem.Item.definition.itemName}' to inventory via InventoryService");
                 }
-                else
-                {
+                else {
                     if (debugMode) Debug.LogWarning($"[PlayerActionManager] Failed to add harvested item '{harvestedItem.Item.definition.itemName}' to inventory. Inventory may be full.");
                 }
             }
         }
-        else
-        {
+        else {
             Debug.LogError("[PlayerActionManager] InventoryService not initialized! Cannot add harvested items.");
         }
 
@@ -180,53 +163,43 @@ public class PlayerActionManager : MonoBehaviour
         return itemsAdded > 0;
     }
 
-    private bool ExecuteInteraction(Vector3Int gridPosition, object interactionData)
-    {
+    bool ExecuteInteraction(Vector3Int gridPosition, object interactionData) {
         if (debugMode) Debug.Log($"[PlayerActionManager] Interaction at {gridPosition}: {interactionData}");
         return true;
     }
 
-    private IEnumerator ExecuteDelayedAction(Func<bool> action, int tickCost, Action onSuccessCallback, PlayerActionType actionType, object actionData)
-    {
-        for (int i = 0; i < tickCost - 1; i++)
-        {
+    IEnumerator ExecuteDelayedAction(Func<bool> action, int tickCost, Action onSuccessCallback, PlayerActionType actionType, object actionData) {
+        for (int i = 0; i < tickCost - 1; i++) {
             yield return new WaitForSeconds(multiTickActionDelay);
             AdvanceGameTick(1);
         }
 
         bool success = action.Invoke();
 
-        if (success)
-        {
+        if (success) {
             AdvanceGameTick(1);
             onSuccessCallback?.Invoke();
             OnActionExecuted?.Invoke(actionType, actionData);
         }
-        else
-        {
+        else {
             OnActionFailed?.Invoke($"{actionType} (delayed) failed");
         }
     }
 
-    public int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null)
-    {
+    public int GetMovementTickCost(Vector3 worldPosition, Component movingEntity = null) {
         int totalCost = tickCostPerAction;
-        if (movingEntity != null)
-        {
+        if (movingEntity != null) {
             IStatusEffectable effectable = movingEntity.GetComponent<IStatusEffectable>();
-            if (effectable != null)
-            {
+            if (effectable != null) {
                 totalCost += effectable.StatusManager.AdditionalMoveTicks;
             }
         }
         return totalCost;
     }
 
-    private void AdvanceGameTick(int tickCount = 1)
-    {
+    void AdvanceGameTick(int tickCount = 1) {
         if (TickManager.Instance == null) return;
-        for (int i = 0; i < tickCount; i++)
-        {
+        for (int i = 0; i < tickCount; i++) {
             TickManager.Instance.AdvanceTick();
         }
     }

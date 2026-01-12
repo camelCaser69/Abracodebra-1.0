@@ -1,84 +1,68 @@
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/WorldInteraction/Tools/ToolSwitcher.cs
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-public class ToolSwitcher : MonoBehaviour
-{
-    public static ToolSwitcher Instance { get; set; }
+public class ToolSwitcher : MonoBehaviour {
+    public static ToolSwitcher Instance { get; private set; }
 
     public ToolDefinition[] toolDefinitions;
 
-    // NEW: Dictionary to store uses for ALL tools.
     private Dictionary<ToolDefinition, int> toolUses = new Dictionary<ToolDefinition, int>();
 
     private int currentIndex = 0;
 
-    public ToolDefinition CurrentTool { get; set; } = null;
-    public int CurrentRemainingUses { get; private set; } = -1; // Setter is now private
+    public ToolDefinition CurrentTool { get; private set; } = null;
+    public int CurrentRemainingUses { get; private set; } = -1;
 
     public event Action<ToolDefinition> OnToolChanged;
     public event Action<int> OnUsesChanged;
 
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
+    void Awake() {
+        if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
         }
         Instance = this;
 
-        // NEW: Populate the uses dictionary at the start.
         InitializeAllToolUses();
     }
 
-    private void Start()
-    {
-        // Select the initial tool based on the array.
+    void Start() {
         SelectToolByIndex(0);
     }
 
-    private void OnDestroy()
-    {
-        if (Instance == this)
-        {
+    void OnDestroy() {
+        if (Instance == this) {
             Instance = null;
         }
     }
 
-    private void InitializeAllToolUses()
-    {
+    void InitializeAllToolUses() {
         toolUses.Clear();
         if (toolDefinitions == null) return;
 
-        foreach (var toolDef in toolDefinitions)
-        {
-            if (toolDef != null)
-            {
-                if (toolDef.limitedUses)
-                {
+        foreach (var toolDef in toolDefinitions) {
+            if (toolDef != null) {
+                if (toolDef.limitedUses) {
                     toolUses[toolDef] = toolDef.initialUses;
                 }
-                else
-                {
+                else {
                     toolUses[toolDef] = -1; // -1 indicates unlimited
                 }
             }
         }
     }
 
-    public void SelectToolByIndex(int index)
-    {
-        if (toolDefinitions == null || toolDefinitions.Length == 0 || index < 0 || index >= toolDefinitions.Length)
-        {
+    public void SelectToolByIndex(int index) {
+        if (toolDefinitions == null || toolDefinitions.Length == 0 || index < 0 || index >= toolDefinitions.Length) {
             return;
         }
 
         currentIndex = index;
         ToolDefinition newTool = toolDefinitions[currentIndex];
 
-        if (CurrentTool != newTool)
-        {
+        if (CurrentTool != newTool) {
             CurrentTool = newTool;
             CurrentRemainingUses = toolUses.ContainsKey(CurrentTool) ? toolUses[CurrentTool] : (CurrentTool.limitedUses ? CurrentTool.initialUses : -1);
 
@@ -88,15 +72,11 @@ public class ToolSwitcher : MonoBehaviour
         }
     }
 
-    public void SelectToolByDefinition(ToolDefinition toolDef)
-    {
+    public void SelectToolByDefinition(ToolDefinition toolDef) {
         if (toolDef == null || toolDefinitions == null) return;
 
-        for (int i = 0; i < toolDefinitions.Length; i++)
-        {
-            if (toolDefinitions[i] == toolDef)
-            {
-                // If we are already on this tool, no need to do anything.
+        for (int i = 0; i < toolDefinitions.Length; i++) {
+            if (toolDefinitions[i] == toolDef) {
                 if (currentIndex == i && CurrentTool == toolDef) return;
 
                 currentIndex = i;
@@ -112,50 +92,83 @@ public class ToolSwitcher : MonoBehaviour
         Debug.LogWarning($"[ToolSwitcher] Tool '{toolDef.displayName}' not found in definitions array");
     }
 
-    public void RefillCurrentTool()
-    {
+    public void RefillCurrentTool() {
         if (CurrentTool == null || !CurrentTool.limitedUses) return;
-        
+
         toolUses[CurrentTool] = CurrentTool.initialUses;
         CurrentRemainingUses = CurrentTool.initialUses;
-        
+
         Debug.Log($"[ToolSwitcher RefillCurrentTool] Refilled tool '{CurrentTool.displayName}' to {CurrentRemainingUses} uses.");
         OnUsesChanged?.Invoke(CurrentRemainingUses);
     }
 
-    public bool TryConsumeUse()
-    {
+    /// <summary>
+    /// Check if the current tool has uses remaining without consuming.
+    /// Returns true if tool has unlimited uses or has remaining uses > 0.
+    /// </summary>
+    public bool HasUsesRemaining() {
         if (CurrentTool == null) return false;
-        
-        if (!CurrentTool.limitedUses || CurrentRemainingUses == -1)
-        {
+
+        // Unlimited uses
+        if (!CurrentTool.limitedUses || CurrentRemainingUses == -1) {
             return true;
         }
-        
-        if (CurrentRemainingUses > 0)
-        {
+
+        return CurrentRemainingUses > 0;
+    }
+
+    /// <summary>
+    /// Check if a specific tool has uses remaining without consuming.
+    /// </summary>
+    public bool HasUsesRemaining(ToolDefinition toolDef) {
+        if (toolDef == null) return false;
+
+        // Unlimited uses
+        if (!toolDef.limitedUses) {
+            return true;
+        }
+
+        // Check stored uses
+        if (toolUses.TryGetValue(toolDef, out int uses)) {
+            return uses > 0 || uses == -1;
+        }
+
+        // Fall back to initial uses if not tracked yet
+        return toolDef.initialUses > 0;
+    }
+
+    /// <summary>
+    /// Attempts to consume one use of the current tool.
+    /// Returns true if successful (tool has uses or is unlimited).
+    /// Returns false if the tool is out of uses.
+    /// </summary>
+    public bool TryConsumeUse() {
+        if (CurrentTool == null) return false;
+
+        if (!CurrentTool.limitedUses || CurrentRemainingUses == -1) {
+            return true;
+        }
+
+        if (CurrentRemainingUses > 0) {
             CurrentRemainingUses--;
-            toolUses[CurrentTool] = CurrentRemainingUses; // Update the persistent dictionary
+            toolUses[CurrentTool] = CurrentRemainingUses;
             Debug.Log($"[ToolSwitcher TryConsumeUse] Consumed use for '{CurrentTool.displayName}'. Remaining: {CurrentRemainingUses}");
             OnUsesChanged?.Invoke(CurrentRemainingUses);
             return true;
         }
-        else
-        {
+        else {
             Debug.Log($"[ToolSwitcher TryConsumeUse] Tool '{CurrentTool.displayName}' is out of uses.");
             return false;
         }
     }
 
-    private void LogToolChange(string prefix = "[ToolSwitcher]")
-    {
+    void LogToolChange(string prefix = "[ToolSwitcher]") {
         string toolName = (CurrentTool != null) ? CurrentTool.displayName : "(none)";
         string usesSuffix = "";
-        if (CurrentTool != null && CurrentTool.limitedUses)
-        {
+        if (CurrentTool != null && CurrentTool.limitedUses) {
             usesSuffix = $" ({CurrentRemainingUses}/{CurrentTool.initialUses})";
         }
-        
+
         Debug.Log($"{prefix} Switched to: {toolName}{usesSuffix} (Index: {currentIndex})");
     }
 }

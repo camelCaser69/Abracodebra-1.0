@@ -164,68 +164,61 @@ namespace WegoSystem
         }
 
         /// <summary>
-        /// Applies a tool action at the currently hovered cell.
-        /// Only blocks tool usage for multi-tile entities with BlocksToolUsage enabled.
-        /// Single-tile entities (plants, etc.) do NOT block tool usage.
-        /// </summary>
-        public void ApplyToolAction(ToolDefinition toolDef)
-        {
-            if (toolDef == null || !currentlyHoveredCell.HasValue) return;
+/// Applies a tool action to the currently hovered cell.
+/// Returns true if the action succeeded (tile was transformed), false otherwise.
+/// </summary>
+public bool ApplyToolAction(ToolDefinition toolDef) {
+    if (toolDef == null || !currentlyHoveredCell.HasValue) return false;
 
-            Vector3Int targetCell = currentlyHoveredCell.Value;
-            GridPosition gridPos = new GridPosition(targetCell);
+    Vector3Int targetCell = currentlyHoveredCell.Value;
+    GridPosition gridPos = new GridPosition(targetCell);
 
-            // ONLY check multi-tile entities that explicitly block tool usage
-            if (GridPositionManager.Instance != null)
-            {
-                var multiTileEntity = GridPositionManager.Instance.GetMultiTileEntityAt(gridPos);
-                if (multiTileEntity != null && multiTileEntity.BlocksToolUsage)
-                {
-                    if (debugLogs)
-                        Debug.Log($"[TileInteractionManager] Tool action blocked: Position {targetCell} has tool usage blocked by '{multiTileEntity.gameObject.name}'.");
-                    return;
-                }
-            }
-
-            TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
-
-            if (topTile == null)
-            {
-                if (debugLogs)
-                    Debug.Log($"[TileInteractionManager] No tile at {targetCell}");
-                return;
-            }
-
+    // Check if blocked by multi-tile entity
+    if (GridPositionManager.Instance != null) {
+        var multiTileEntity = GridPositionManager.Instance.GetMultiTileEntityAt(gridPos);
+        if (multiTileEntity != null && multiTileEntity.BlocksToolUsage) {
             if (debugLogs)
-            {
-                Debug.Log($"[TileInteractionManager] Applying Tool: '{toolDef.displayName}' at {targetCell}");
-                Debug.Log($"[TileInteractionManager] Top tile: '{topTile.displayName}' (Priority: {topTile.interactionPriority})");
-
-                var allTiles = GetAllTilesAt(targetCell);
-                if (allTiles.Count > 1)
-                {
-                    string tileList = string.Join(", ", allTiles.Select(t => $"{t.displayName}(P:{t.interactionPriority})"));
-                    Debug.Log($"[TileInteractionManager] All tiles at position: [{tileList}]");
-                }
-            }
-
-            TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(
-                r => r != null && r.tool == toolDef && r.fromTile == topTile
-            );
-
-            if (rule != null)
-            {
-                if (debugLogs)
-                    Debug.Log($"[TileInteractionManager] ✓ MATCH! Rule: '{rule.fromTile.displayName}' -> '{(rule.toTile != null ? rule.toTile.displayName : "REMOVE")}'");
-
-                ExecuteTileTransformation(rule, targetCell);
-            }
-            else
-            {
-                if (debugLogs)
-                    Debug.Log($"[TileInteractionManager] ✗ No rule for '{toolDef.displayName}' on '{topTile.displayName}'. Action blocked by surface tile.");
-            }
+                Debug.Log($"[TileInteractionManager] Tool action blocked: Position {targetCell} has tool usage blocked by '{multiTileEntity.gameObject.name}'.");
+            return false;
         }
+    }
+
+    TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
+
+    if (topTile == null) {
+        if (debugLogs)
+            Debug.Log($"[TileInteractionManager] No tile at {targetCell}");
+        return false;
+    }
+
+    if (debugLogs) {
+        Debug.Log($"[TileInteractionManager] Applying Tool: '{toolDef.displayName}' at {targetCell}");
+        Debug.Log($"[TileInteractionManager] Top tile: '{topTile.displayName}' (Priority: {topTile.interactionPriority})");
+
+        var allTiles = GetAllTilesAt(targetCell);
+        if (allTiles.Count > 1) {
+            string tileList = string.Join(", ", allTiles.Select(t => $"{t.displayName}(P:{t.interactionPriority})"));
+            Debug.Log($"[TileInteractionManager] All tiles at position: [{tileList}]");
+        }
+    }
+
+    TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault(
+        r => r != null && r.tool == toolDef && r.fromTile == topTile
+    );
+
+    if (rule != null) {
+        if (debugLogs)
+            Debug.Log($"[TileInteractionManager] ✓ MATCH! Rule: '{rule.fromTile.displayName}' -> '{(rule.toTile != null ? rule.toTile.displayName : "REMOVE")}'");
+
+        ExecuteTileTransformation(rule, targetCell);
+        return true; // Action succeeded
+    }
+    else {
+        if (debugLogs)
+            Debug.Log($"[TileInteractionManager] ✗ No rule for '{toolDef.displayName}' on '{topTile.displayName}'. Action blocked by surface tile.");
+        return false; // No matching rule - action failed
+    }
+}
 
         private void ExecuteTileTransformation(TileInteractionRule rule, Vector3Int targetCell)
         {

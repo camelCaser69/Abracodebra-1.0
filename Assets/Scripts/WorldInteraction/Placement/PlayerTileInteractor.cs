@@ -1,21 +1,22 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿// FILE: Assets/Scripts/WorldInteraction/Placement/PlayerTileInteractor.cs
+using System.Collections.Generic;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Components;
 using Abracodabra.UI.Genes;
 using WegoSystem;
 using Abracodabra.UI.Toolkit;
+using UnityEngine;
 
 public sealed class PlayerTileInteractor : MonoBehaviour {
     [Header("References")]
-    [SerializeField] TileInteractionManager tileInteractionManager;
-    [SerializeField] Transform playerTransform;
+    [SerializeField] private TileInteractionManager tileInteractionManager;
+    [SerializeField] private Transform playerTransform;
 
     [Header("Debug")]
-    [SerializeField] bool showDebug = false;
+    [SerializeField] private bool showDebug = false;
 
-    bool pendingLeftClick;
-    bool pendingRightClick;
+    private bool pendingLeftClick;
+    private bool pendingRightClick;
 
     void Awake() {
         if (playerTransform == null)
@@ -112,31 +113,26 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
         return false;
     }
 
-    void TryEatFromInventory()
-    {
+    void TryEatFromInventory() {
         UIInventoryItem selected = HotbarSelectionService.SelectedItem;
-        if (selected == null || !selected.IsValid())
-        {
+        if (selected == null || !selected.IsValid()) {
             if (showDebug) Debug.Log("[PlayerTileInteractor] Right-click: No valid item selected");
             return;
         }
 
-        if (selected.Type != UIInventoryItem.ItemType.Resource)
-        {
+        if (selected.Type != UIInventoryItem.ItemType.Resource) {
             if (showDebug) Debug.Log("[PlayerTileInteractor] Right-click: Selected item is not a resource");
             return;
         }
 
         ItemInstance itemToConsume = selected.ResourceInstance;
-        if (itemToConsume == null || !itemToConsume.definition.isConsumable)
-        {
+        if (itemToConsume == null || !itemToConsume.definition.isConsumable) {
             if (showDebug) Debug.Log("[PlayerTileInteractor] Right-click: Item is not consumable");
             return;
         }
 
         GardenerController player = playerTransform.GetComponent<GardenerController>();
-        if (player == null || player.HungerSystem == null)
-        {
+        if (player == null || player.HungerSystem == null) {
             if (showDebug) Debug.LogWarning("[PlayerTileInteractor] Player has no HungerSystem");
             return;
         }
@@ -149,8 +145,7 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
         int selectedIndex = HotbarSelectionService.SelectedIndex;
         InventoryService.RemoveItemAtIndex(selectedIndex);
 
-        if (PlayerActionManager.Instance != null)
-        {
+        if (PlayerActionManager.Instance != null) {
             PlayerActionManager.Instance.ExecutePlayerAction(
                 PlayerActionType.Interact,
                 tileInteractionManager.WorldToCell(playerTransform.position),
@@ -159,31 +154,26 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
         }
     }
 
-    void HandleLeftClick()
-    {
+    void HandleLeftClick() {
         if (!EnsureReferences()) return;
 
-        if (tileInteractionManager.DidRefillThisFrame)
-        {
+        if (tileInteractionManager.DidRefillThisFrame) {
             if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: Refill happened this frame.");
             return;
         }
 
         UIInventoryItem selected = HotbarSelectionService.SelectedItem;
-        if (selected == null || !selected.IsValid())
-        {
+        if (selected == null || !selected.IsValid()) {
             if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: No valid item selected.");
             return;
         }
 
-        if (!tileInteractionManager.IsWithinInteractionRange)
-        {
+        if (!tileInteractionManager.IsWithinInteractionRange) {
             if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: Target cell out of range.");
             return;
         }
 
-        if (!tileInteractionManager.CurrentlyHoveredCell.HasValue)
-        {
+        if (!tileInteractionManager.CurrentlyHoveredCell.HasValue) {
             if (showDebug) Debug.Log("[PlayerTileInteractor] Left-click ignored: No hovered cell.");
             return;
         }
@@ -192,8 +182,7 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
 
         if (showDebug) Debug.Log($"[PlayerTileInteractor] Action '{selected.Type}' with '{selected.GetDisplayName()}' at {cellPos}");
 
-        switch (selected.Type)
-        {
+        switch (selected.Type) {
             case UIInventoryItem.ItemType.Tool:
                 HandleToolUse(selected, cellPos);
                 break;
@@ -204,59 +193,52 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
         }
     }
 
-    void HandleToolUse(UIInventoryItem selected, Vector3Int cellPos)
-    {
+    void HandleToolUse(UIInventoryItem selected, Vector3Int cellPos) {
         var toolDef = selected.ToolDefinition;
         if (toolDef == null) return;
 
-        if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool != toolDef)
-        {
+        if (ToolSwitcher.Instance != null && ToolSwitcher.Instance.CurrentTool != toolDef) {
             ToolSwitcher.Instance.SelectToolByDefinition(toolDef);
         }
 
-        if (toolDef.toolType == ToolType.HarvestPouch)
-        {
+        if (toolDef.toolType == ToolType.HarvestPouch) {
             HandleHarvest(cellPos);
         }
-        else
-        {
-            if (ToolSwitcher.Instance != null && toolDef.limitedUses)
-            {
-                if (!ToolSwitcher.Instance.TryConsumeUse())
-                {
+        else {
+            // Check if tool has uses remaining BEFORE attempting action (don't consume yet)
+            if (ToolSwitcher.Instance != null && toolDef.limitedUses) {
+                if (!ToolSwitcher.Instance.HasUsesRemaining()) {
                     if (showDebug) Debug.Log($"[PlayerTileInteractor] Tool '{toolDef.displayName}' is out of uses.");
                     return;
                 }
             }
-            PlayerActionManager.Instance?.ExecutePlayerAction(PlayerActionType.UseTool, cellPos, toolDef);
+
+            // Execute action - PlayerActionManager will handle consuming uses on SUCCESS only
+            bool success = PlayerActionManager.Instance?.ExecutePlayerAction(PlayerActionType.UseTool, cellPos, toolDef) ?? false;
+
+            if (!success && showDebug) {
+                Debug.Log($"[PlayerTileInteractor] Tool action failed at {cellPos} - no use consumed");
+            }
         }
     }
 
-    void HandleSeedPlanting(UIInventoryItem selected, Vector3Int cellPos)
-    {
+    void HandleSeedPlanting(UIInventoryItem selected, Vector3Int cellPos) {
         int selectedIndex = HotbarSelectionService.SelectedIndex;
 
-        System.Action onSuccess = () =>
-        {
+        System.Action onSuccess = () => {
             if (showDebug) Debug.Log($"[PlayerTileInteractor] Successfully planted '{selected.GetDisplayName()}'. Removing from inventory.");
             InventoryService.RemoveItemAtIndex(selectedIndex);
         };
 
-        bool success = PlayerActionManager.Instance?.ExecutePlayerAction(
-            PlayerActionType.PlantSeed, cellPos, selected, onSuccess
-        ) ?? false;
+        bool success = PlayerActionManager.Instance?.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess) ?? false;
 
-        if (!success && showDebug)
-        {
+        if (!success && showDebug) {
             Debug.Log($"[PlayerTileInteractor] Failed to plant '{selected.GetDisplayName()}' at {cellPos}");
         }
     }
 
     void HandleHarvest(Vector3Int cellPos) {
-        bool success = PlayerActionManager.Instance?.ExecutePlayerAction(
-            PlayerActionType.Harvest, 
-            cellPos
-        ) ?? false;
+        bool success = PlayerActionManager.Instance?.ExecutePlayerAction(PlayerActionType.Harvest, cellPos) ?? false;
 
         if (!success && showDebug) {
             Debug.Log($"[PlayerTileInteractor] Harvest failed at {cellPos}");
