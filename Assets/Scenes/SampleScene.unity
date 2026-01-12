@@ -12252,11 +12252,11 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: b02225d1ccd9f4d42b09de7941a00382, type: 2}
     - target: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 19.493
+      value: 19.5
       objectReference: {fileID: 0}
     - target: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 16.253
+      value: 16.15
       objectReference: {fileID: 0}
     - target: {fileID: 5575549963909954597, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: m_LocalPosition.z
@@ -76435,8 +76435,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1172029906}
   - component: {fileID: 1172029909}
+  - component: {fileID: 1172029911}
   - component: {fileID: 1172029908}
   - component: {fileID: 1172029907}
+  - component: {fileID: 1172029910}
   - component: {fileID: 1172029905}
   m_Layer: 0
   m_Name: Doris
@@ -76508,8 +76510,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1172029904}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 20.95, y: 15.97, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 20.94, y: 16.82, z: 0}
   m_LocalScale: {x: 6, y: 6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -76585,11 +76587,46 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b073bf275d3e445449a2c4940fa6ecef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  definition: {fileID: 11400000, guid: 8f91d6535bcc4f74184b6ba1aa23d219, type: 2}
   multiTileEntity: {fileID: 1172029907}
-  spriteRenderer: {fileID: 0}
+  spriteRenderer: {fileID: 1172029905}
+  hungerSystem: {fileID: 1172029911}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   hoverColor: {r: 1, g: 1, b: 0.8, a: 1}
+  ticksSinceLastPlantEat: 0
   debugLog: 0
+--- !u!114 &1172029910
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1172029904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dcb97044d7ed4dbbb8d3f852f45a3fc7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sortingLayerYOffset: 0.05
+  useParentYCoordinate: 0
+  useMultiTileAnchor: 1
+  sortingLayerName: 
+  debugSorting: 0
+--- !u!114 &1172029911
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1172029904}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22ea27f04c1a4df4a0d8726e3091228f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  definition: {fileID: 11400000, guid: 8f91d6535bcc4f74184b6ba1aa23d219, type: 2}
+  currentHunger: 0
+  currentState: 0
 --- !u!114 &1173229281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132642,10 +132679,10 @@ SceneRoots:
   - {fileID: 2010610566}
   - {fileID: 73518464}
   - {fileID: 372599651}
+  - {fileID: 1172029906}
   - {fileID: 436520933}
   - {fileID: 697039534}
   - {fileID: 553168402}
   - {fileID: 1079289979}
   - {fileID: 192826961}
   - {fileID: 752681537}
-  - {fileID: 1172029906}
