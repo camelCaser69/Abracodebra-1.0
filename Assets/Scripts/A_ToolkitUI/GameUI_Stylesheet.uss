@@ -6,7 +6,6 @@
     overflow: hidden;
 }
 
-/* HUD-specific styling - transparent background for game view */
 #HUDPanel {
     background-color: rgba(0, 0, 0, 0);
     flex-direction: column;
@@ -89,9 +88,40 @@ Label {
     box-sizing: border-box;
 }
 
-/* ============================================
-   HUD STATS PANEL (Top-left)
-   ============================================ */
+/* ==================== NEW: TOP BAR WITH TICK COUNTER ==================== */
+
+.hud-top-bar {
+    position: absolute;
+    top: 15px;
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.tick-panel {
+    flex-direction: row;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    padding: 10px 25px;
+    border-radius: 8px;
+}
+
+.tick-icon {
+    font-size: 24px;
+    margin-right: 10px;
+    color: white;
+}
+
+.tick-text-large {
+    font-size: 28px;
+    -unity-font-style: bold;
+    color: white;
+    letter-spacing: 1px;
+}
+
+/* ==================== LEGACY HUD STATS (kept for compatibility) ==================== */
 
 .hud-stats-panel {
     position: absolute;
@@ -109,7 +139,6 @@ Label {
     margin-bottom: 6px;
 }
 
-/* Note: Unity UI Toolkit doesn't support :last-child, so we use explicit margin on tick container */
 #tick-container {
     margin-bottom: 0;
 }
@@ -156,9 +185,7 @@ Label {
     color: white;
 }
 
-/* ============================================
-   HUD TOOLTIP PANEL (Top-right)
-   ============================================ */
+/* ==================== TOOLTIP ==================== */
 
 .hud-tooltip-panel {
     position: absolute;
@@ -212,23 +239,71 @@ Label {
     white-space: normal;
 }
 
-/* ============================================
-   HOTBAR - FIXED TO BOTTOM CENTER
-   ============================================ */
+/* ==================== NEW: BOTTOM SECTION ==================== */
 
-/* Hotbar container - ABSOLUTE positioned at bottom center */
-#Hotbar {
+.hud-bottom-section {
     position: absolute;
-    bottom: 10px;
-    left: 50%;
-    translate: -50% 0;
+    bottom: 50px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* ==================== NEW: PLAYER HUNGER BAR ==================== */
+
+.player-hunger-panel {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 8px 20px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.player-hunger-icon {
+    font-size: 20px;
+    margin-right: 10px;
+}
+
+.player-hunger-bar-bg {
+    width: 200px;
+    height: 18px;
+    background-color: rgba(40, 40, 40, 0.9);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-right: 10px;
+    border-width: 1px;
+    border-color: rgba(80, 80, 80, 0.8);
+}
+
+.player-hunger-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: rgb(80, 180, 80);
+    border-radius: 3px;
+    transition: width 0.3s ease-out, background-color 0.3s ease-out;
+}
+
+.player-hunger-text {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: white;
+    min-width: 60px;
+}
+
+/* ==================== HOTBAR ==================== */
+
+#Hotbar {
+    position: relative;
     height: 84px;
     flex-direction: row;
     align-items: center;
     justify-content: center;
 }
 
-/* Hotbar visual container */
 .hotbar {
     flex-direction: row;
     background-color: rgba(0, 0, 0, 0.7);
@@ -238,7 +313,6 @@ Label {
     justify-content: center;
 }
 
-/* Manual slots container (replaces ListView) */
 .hotbar-slots-container {
     flex-direction: row;
     flex-wrap: nowrap;
@@ -248,7 +322,6 @@ Label {
     padding: 0;
 }
 
-/* Individual slots in manual container */
 .hotbar-slots-container .slot {
     flex-shrink: 0;
     flex-grow: 0;
@@ -266,9 +339,80 @@ Label {
     display: none;
 }
 
-/* ============================================
-   SLOT STYLING - Inventory & Hotbar
-   ============================================ */
+/* ==================== NEW: DORIS HUNGER FOOTER ==================== */
+
+.doris-hunger-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 44px;
+    background-color: rgb(35, 25, 40);
+    border-top-width: 2px;
+    border-top-color: rgb(80, 50, 90);
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    display: none;
+}
+
+.doris-label {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: rgb(220, 180, 255);
+    margin-right: 15px;
+    min-width: 100px;
+}
+
+.doris-hunger-bar-bg {
+    flex-grow: 1;
+    height: 24px;
+    max-width: 800px;
+    background-color: rgba(20, 15, 25, 0.9);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-right: 15px;
+    border-width: 2px;
+    border-color: rgb(60, 40, 70);
+}
+
+.doris-hunger-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: rgb(100, 180, 100);
+    border-radius: 2px;
+    transition: width 0.3s ease-out, background-color 0.3s ease-out;
+}
+
+.doris-hunger-text {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: white;
+    min-width: 70px;
+    margin-right: 15px;
+}
+
+.doris-state-text {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(150, 220, 150);
+    min-width: 120px;
+}
+
+.doris-state-satisfied {
+    color: rgb(150, 220, 150);
+}
+
+.doris-state-hungry {
+    color: rgb(255, 200, 100);
+}
+
+.doris-state-starving {
+    color: rgb(255, 100, 100);
+}
+
+/* ==================== SLOTS ==================== */
 
 .slot {
     width: 64px;
@@ -287,7 +431,6 @@ Label {
     cursor: link;
 }
 
-/* Selected slot - bright yellow border for visibility */
 .slot--selected {
     background-color: rgba(255, 255, 100, 0.3);
     border-color: rgba(255, 255, 0, 0.9);
@@ -300,13 +443,11 @@ Label {
     border-width: 2px;
 }
 
-/* Locked for editing - cyan border */
 .slot--locked-for-editing {
     border-color: rgba(0, 255, 255, 0.9);
     border-width: 3px;
 }
 
-/* Empty slot styling for hotbar */
 .slot--empty {
     background-color: rgba(30, 30, 40, 0.5);
     border-color: rgba(100, 100, 120, 0.3);
@@ -314,7 +455,6 @@ Label {
     border-style: dashed;
 }
 
-/* Slot icon - properly sized */
 .slot-icon {
     width: 100%;
     height: 100%;
@@ -324,7 +464,6 @@ Label {
     -unity-background-scale-mode: scale-to-fit;
 }
 
-/* Stack size label */
 .slot-stack-size {
     position: absolute;
     bottom: 2px;
@@ -335,9 +474,7 @@ Label {
     text-shadow: 1px 1px 2px black;
 }
 
-/* ============================================
-   GENE SLOT STYLING - Gene Editor
-   ============================================ */
+/* ==================== GENE SLOTS ==================== */
 
 .gene-slot {
     position: relative;
@@ -371,7 +508,6 @@ Label {
     color: white;
 }
 
-/* EMPTY SLOT - visible placeholder for drag-drop targets */
 .gene-slot--empty {
     background-color: rgba(80, 80, 100, 0.3);
     border-color: rgba(120, 120, 150, 0.5);
@@ -415,9 +551,7 @@ Label {
     border-width: 2px;
 }
 
-/* ============================================
-   GENE EDITOR CONTAINERS
-   ============================================ */
+/* ==================== GENE EDITOR CONTAINERS ==================== */
 
 #seed-drop-slot-container {
     align-items: center;
@@ -450,9 +584,69 @@ Label {
     margin-bottom: 5px;
 }
 
-/* ============================================
-   SPEC SHEET (Item Details Panel)
-   ============================================ */
+.section-header-small {
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: rgb(150, 150, 170);
+    margin-top: 15px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.section-header {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(180, 180, 200);
+    margin-top: 15px;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(60, 60, 80);
+}
+
+.section-content {
+    margin-left: 5px;
+    margin-bottom: 10px;
+}
+
+.genes-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.list-container {
+    margin-top: 5px;
+}
+
+.description-text {
+    font-size: 13px;
+    color: rgb(170, 170, 180);
+    margin-bottom: 15px;
+    white-space: normal;
+}
+
+/* ==================== SPEC SHEET ==================== */
+
+.header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.seed-icon {
+    width: 64px;
+    height: 64px;
+    margin-right: 15px;
+    border-radius: 8px;
+    border-width: 2px;
+    border-color: rgb(80, 80, 100);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.title-container {
+    flex-grow: 1;
+}
 
 .spec-sheet-container {
     padding: 10px;
@@ -467,7 +661,6 @@ Label {
     margin-bottom: 10px;
 }
 
-/* FIXED: Spec sheet icon now matches other thumbnails (64px) */
 .spec-sheet-icon {
     width: 64px;
     height: 64px;
@@ -507,9 +700,7 @@ Label {
     margin-left: 5px;
 }
 
-/* ============================================
-   COLOR PICKER
-   ============================================ */
+/* ==================== COLOR PICKER ==================== */
 
 .color-picker-container {
     flex-direction: row;
@@ -540,9 +731,7 @@ Label {
     border-width: 3px;
 }
 
-/* ============================================
-   NAME EDITOR
-   ============================================ */
+/* ==================== SEED NAME EDITOR ==================== */
 
 .seed-name-editor {
     flex-direction: row;

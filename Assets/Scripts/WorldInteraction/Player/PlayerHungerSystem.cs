@@ -1,89 +1,181 @@
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/WorldInteraction/Player/PlayerHungerSystem.cs
 using System;
+using UnityEngine;
 using WegoSystem;
 
-public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable
-{
-    // MODIFIED: No longer serialized, will be set by RunManager
-    private float maxHunger; 
-    
-    // MODIFIED: Starting hunger is now a fraction of the max hunger
-    [Tooltip("What fraction of max hunger the player starts with (e.g., 1.0 for 100%).")]
-    [SerializeField] [Range(0f, 1f)] private float startingHungerFraction = 1.0f;
-    
-    [SerializeField] private float hungerDepletionPerTick = 0.1f;
+/// <summary>
+/// Player hunger system where hunger INCREASES over time.
+/// When hunger reaches max, bad things happen (starvation).
+/// Eating DECREASES hunger by the nutrition value.
+/// </summary>
+public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
+    [Header("Hunger Configuration")]
+    [Tooltip("Maximum hunger value. When reached, player starves.")]
+    [SerializeField] private float maxHunger = 100f;
 
-    public float CurrentHunger { get; private set; }
-    public float MaxHunger => maxHunger;
+    [Tooltip("Starting hunger as a fraction of max (0 = not hungry, 1 = starving).")]
+    [SerializeField] [Range(0f, 1f)] private float startingHungerFraction = 0f;
 
-    public event Action<float, float> OnHungerChanged;
-    public event Action OnStarvation;
+    [Tooltip("How much hunger increases per tick.")]
+    [SerializeField] private float hungerIncreasePerTick = 0.15f;
 
+    [Header("Hunger Thresholds")]
+    [Tooltip("Fraction of max hunger where 'hungry' state begins (yellow warning).")]
+    [SerializeField] [Range(0f, 1f)] private float hungryThreshold = 0.5f;
+
+    [Tooltip("Fraction of max hunger where 'starving' state begins (red warning).")]
+    [SerializeField] [Range(0f, 1f)] private float starvingThreshold = 0.8f;
+
+    // Runtime state
+    private float currentHunger;
     private bool hasStarved = false;
+    private HungerState currentState = HungerState.Satisfied;
 
-    private void Start()
-    {
-        // Get max hunger from the central RunManager.
-        if (RunManager.HasInstance)
-        {
+    // Properties
+    public float CurrentHunger => currentHunger;
+    public float MaxHunger => maxHunger;
+    public float HungerPercentage => maxHunger > 0 ? currentHunger / maxHunger : 0f;
+    public HungerState CurrentState => currentState;
+    public bool IsHungry => currentHunger >= maxHunger * hungryThreshold;
+    public bool IsStarving => currentHunger >= maxHunger * starvingThreshold;
+    public bool HasStarved => hasStarved;
+
+    // Events
+    public event Action<float, float> OnHungerChanged;
+    public event Action<HungerState> OnStateChanged;
+    public event Action OnStarvation;
+    public event Action OnBecameHungry;
+    public event Action OnBecameStarving;
+
+    public enum HungerState {
+        Satisfied,  // 0% to hungryThreshold
+        Hungry,     // hungryThreshold to starvingThreshold
+        Starving    // starvingThreshold to 100%
+    }
+
+    void Start() {
+        // Override from RunManager if available
+        if (RunManager.HasInstance) {
             maxHunger = RunManager.Instance.playerMaxHunger;
         }
-        else
-        {
-            Debug.LogError("[PlayerHungerSystem] RunManager not found! Defaulting max hunger to 100.");
-            maxHunger = 100f;
-        }
 
-        CurrentHunger = maxHunger * startingHungerFraction;
-        OnHungerChanged?.Invoke(CurrentHunger, maxHunger);
+        currentHunger = maxHunger * startingHungerFraction;
+        UpdateHungerState();
+        OnHungerChanged?.Invoke(currentHunger, maxHunger);
 
-        if (TickManager.Instance != null)
-        {
+        if (TickManager.Instance != null) {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
-        else
-        {
-            Debug.LogError("[PlayerHungerSystem] TickManager not found! Hunger will not deplete.");
+        else {
+            Debug.LogError("[PlayerHungerSystem] TickManager not found! Hunger will not increase.");
         }
     }
 
-    private void OnDestroy()
-    {
+    void OnDestroy() {
         var tickManager = TickManager.Instance;
-        if (tickManager != null)
-        {
+        if (tickManager != null) {
             tickManager.UnregisterTickUpdateable(this);
         }
     }
 
-    public void OnTickUpdate(int currentTick)
-    {
-        if (hasStarved || (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat))
-        {
+    public void OnTickUpdate(int currentTick) {
+        if (hasStarved) return;
+
+        // Only increase hunger during active gameplay
+        if (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
             return;
         }
 
-        CurrentHunger -= hungerDepletionPerTick;
-        CurrentHunger = Mathf.Max(0, CurrentHunger);
+        // Increase hunger over time
+        currentHunger += hungerIncreasePerTick;
+        currentHunger = Mathf.Min(currentHunger, maxHunger);
 
-        OnHungerChanged?.Invoke(CurrentHunger, maxHunger);
+        UpdateHungerState();
+        OnHungerChanged?.Invoke(currentHunger, maxHunger);
 
-        if (CurrentHunger <= 0)
-        {
+        // Check for starvation (reached max hunger)
+        if (currentHunger >= maxHunger) {
             hasStarved = true;
             OnStarvation?.Invoke();
-            Debug.LogWarning("Player has starved!");
+            Debug.LogWarning("[PlayerHungerSystem] Player has starved!");
         }
     }
 
-    public void Eat(float nutritionValue)
-    {
+    private void UpdateHungerState() {
+        HungerState newState;
+
+        if (currentHunger >= maxHunger * starvingThreshold) {
+            newState = HungerState.Starving;
+        }
+        else if (currentHunger >= maxHunger * hungryThreshold) {
+            newState = HungerState.Hungry;
+        }
+        else {
+            newState = HungerState.Satisfied;
+        }
+
+        if (newState != currentState) {
+            HungerState oldState = currentState;
+            currentState = newState;
+
+            OnStateChanged?.Invoke(newState);
+
+            // Fire specific events for state transitions
+            if (newState == HungerState.Hungry && oldState == HungerState.Satisfied) {
+                OnBecameHungry?.Invoke();
+            }
+            else if (newState == HungerState.Starving) {
+                OnBecameStarving?.Invoke();
+            }
+
+            Debug.Log($"[PlayerHungerSystem] State changed: {oldState} -> {newState}");
+        }
+    }
+
+    /// <summary>
+    /// Eat food to DECREASE hunger by the nutrition value.
+    /// </summary>
+    public void Eat(float nutritionValue) {
         if (hasStarved || nutritionValue <= 0) return;
 
-        CurrentHunger += nutritionValue;
-        CurrentHunger = Mathf.Clamp(CurrentHunger, 0, maxHunger);
+        float oldHunger = currentHunger;
+        currentHunger -= nutritionValue;
+        currentHunger = Mathf.Clamp(currentHunger, 0, maxHunger);
 
-        Debug.Log($"Player ate food. Restored {nutritionValue} hunger. Current hunger: {CurrentHunger}/{maxHunger}");
-        OnHungerChanged?.Invoke(CurrentHunger, maxHunger);
+        UpdateHungerState();
+
+        Debug.Log($"[PlayerHungerSystem] Player ate food. Reduced hunger by {nutritionValue}. " +
+                  $"Hunger: {oldHunger:F1} -> {currentHunger:F1}/{maxHunger}");
+
+        OnHungerChanged?.Invoke(currentHunger, maxHunger);
+    }
+
+    /// <summary>
+    /// Directly set hunger value (for debugging or special events).
+    /// </summary>
+    public void SetHunger(float value) {
+        currentHunger = Mathf.Clamp(value, 0, maxHunger);
+        UpdateHungerState();
+        OnHungerChanged?.Invoke(currentHunger, maxHunger);
+    }
+
+    /// <summary>
+    /// Reset hunger to starting value (for new rounds).
+    /// </summary>
+    public void ResetHunger() {
+        currentHunger = maxHunger * startingHungerFraction;
+        hasStarved = false;
+        UpdateHungerState();
+        OnHungerChanged?.Invoke(currentHunger, maxHunger);
+    }
+
+    /// <summary>
+    /// Modify hunger directly (positive = increase, negative = decrease).
+    /// </summary>
+    public void ModifyHunger(float amount) {
+        currentHunger += amount;
+        currentHunger = Mathf.Clamp(currentHunger, 0, maxHunger);
+        UpdateHungerState();
+        OnHungerChanged?.Invoke(currentHunger, maxHunger);
     }
 }

@@ -2,8 +2,9 @@
 
     <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/GameUI_Stylesheet.uss" />
 
+    <!-- PLANNING PANEL - UNCHANGED FROM ORIGINAL -->
     <ui:VisualElement name="PlanningPanel" class="root-panel">
-        
+
         <ui:VisualElement name="SeedEditorPanel" class="side-panel-left">
             <ui:Label text="GENE EDITOR" class="h1" />
             <ui:Label text="CURRENT SEED" class="section-header-small" />
@@ -13,7 +14,7 @@
             <ui:Label text="ACTIVE SEQUENCE" class="section-header-small" />
             <ui:VisualElement name="active-sequence-container" class="genes-container" />
         </ui:VisualElement>
-    
+
         <ui:VisualElement name="InventoryPanel" class="main-panel">
             <ui:Label text="INVENTORY" class="h1" />
             <ui:VisualElement name="inventory-grid" class="inventory-grid" />
@@ -47,26 +48,21 @@
                 <ui:VisualElement name="warnings-container" class="list-container" />
             </ui:VisualElement>
         </ui:VisualElement>
+
     </ui:VisualElement>
-    
+
+    <!-- HUD PANEL - UPDATED LAYOUT -->
     <ui:VisualElement name="HUDPanel" class="root-panel">
-        
-        <!-- Top-left stats panel (Hunger + Tick) -->
-        <ui:VisualElement name="hud-stats-panel" class="hud-stats-panel">
-            <ui:VisualElement name="hunger-container" class="hud-stat-row">
-                <ui:Label text="🍖" class="hud-stat-icon" />
-                <ui:VisualElement name="hunger-bar-bg" class="hud-bar-background">
-                    <ui:VisualElement name="hunger-bar-fill" class="hud-bar-fill hud-bar-fill--hunger" />
-                </ui:VisualElement>
-                <ui:Label name="hunger-text" text="100/100" class="hud-stat-text" />
-            </ui:VisualElement>
-            <ui:VisualElement name="tick-container" class="hud-stat-row">
-                <ui:Label text="⏱️" class="hud-stat-icon" />
-                <ui:Label name="tick-text" text="Tick: 0" class="hud-stat-text-large" />
+
+        <!-- TOP CENTER: Tick Counter (moved and enlarged) -->
+        <ui:VisualElement name="hud-top-bar" class="hud-top-bar">
+            <ui:VisualElement name="tick-panel" class="tick-panel">
+                <ui:Label text="⏱️" class="tick-icon" />
+                <ui:Label name="tick-text" text="Tick: 0" class="tick-text-large" />
             </ui:VisualElement>
         </ui:VisualElement>
-        
-        <!-- Top-right tooltip panel for selected item -->
+
+        <!-- RIGHT: Item Tooltip (unchanged) -->
         <ui:VisualElement name="hud-tooltip-panel" class="hud-tooltip-panel">
             <ui:VisualElement class="hud-tooltip-header">
                 <ui:Image name="hud-tooltip-icon" class="hud-tooltip-icon" />
@@ -77,12 +73,37 @@
             </ui:VisualElement>
             <ui:Label name="hud-tooltip-description" text="" class="hud-tooltip-description" />
         </ui:VisualElement>
-        
-        <!-- Bottom hotbar - positioned via CSS -->
-        <ui:VisualElement name="Hotbar" class="hotbar">
-            <ui:ListView name="hotbar-list" class="hotbar-list" />
-            <ui:VisualElement name="hotbar-selector" class="hotbar-selector" />
+
+        <!-- BOTTOM SECTION -->
+        <ui:VisualElement name="hud-bottom-section" class="hud-bottom-section">
+
+            <!-- Player Hunger Bar (above hotbar) -->
+            <ui:VisualElement name="player-hunger-panel" class="player-hunger-panel">
+                <ui:Label text="🍖" class="player-hunger-icon" />
+                <ui:VisualElement name="player-hunger-bar-bg" class="player-hunger-bar-bg">
+                    <ui:VisualElement name="player-hunger-bar-fill" class="player-hunger-bar-fill" />
+                </ui:VisualElement>
+                <ui:Label name="player-hunger-text" text="0/100" class="player-hunger-text" />
+            </ui:VisualElement>
+
+            <!-- Hotbar (original structure) -->
+            <ui:VisualElement name="Hotbar" class="hotbar">
+                <ui:ListView name="hotbar-list" class="hotbar-list" />
+                <ui:VisualElement name="hotbar-selector" class="hotbar-selector" />
+            </ui:VisualElement>
+
         </ui:VisualElement>
-        
+
+        <!-- DORIS HUNGER FOOTER (will be hidden if no Doris) -->
+        <ui:VisualElement name="doris-hunger-footer" class="doris-hunger-footer">
+            <ui:Label name="doris-label" text="🐛 DORIS" class="doris-label" />
+            <ui:VisualElement name="doris-hunger-bar-bg" class="doris-hunger-bar-bg">
+                <ui:VisualElement name="doris-hunger-bar-fill" class="doris-hunger-bar-fill" />
+            </ui:VisualElement>
+            <ui:Label name="doris-hunger-text" text="0/100" class="doris-hunger-text" />
+            <ui:Label name="doris-state-text" text="😊 Satisfied" class="doris-state-text" />
+        </ui:VisualElement>
+
     </ui:VisualElement>
+
 </ui:UXML>

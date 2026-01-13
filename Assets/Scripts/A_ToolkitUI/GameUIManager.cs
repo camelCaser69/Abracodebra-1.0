@@ -1,3 +1,4 @@
+// FILE: Assets/Scripts/A_ToolkitUI/GameUIManager.cs
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,44 +13,63 @@ using Abracodabra.UI.Genes;
 namespace Abracodabra.UI.Toolkit {
     public class GameUIManager : MonoBehaviour {
         [Header("UI Templates")]
-        [SerializeField] VisualTreeAsset inventorySlotTemplate;
-        [SerializeField] VisualTreeAsset geneSlotTemplate;
+        [SerializeField] private VisualTreeAsset inventorySlotTemplate;
+        [SerializeField] private VisualTreeAsset geneSlotTemplate;
 
         [Header("Starting Items")]
-        [SerializeField] StartingInventory startingInventory;
+        [SerializeField] private StartingInventory startingInventory;
 
         [Header("Inventory Configuration")]
         [Tooltip("Number of rows in the inventory grid")]
-        [SerializeField] int inventoryRows = 4;
+        [SerializeField] private int inventoryRows = 4;
 
         [Tooltip("Number of columns in the inventory grid")]
-        [SerializeField] int inventoryColumns = 6;
+        [SerializeField] private int inventoryColumns = 6;
 
-        List<UIInventoryItem> playerInventory = new List<UIInventoryItem>();
-        int selectedInventoryIndex = -1;
+        private List<UIInventoryItem> playerInventory = new List<UIInventoryItem>();
+        private int selectedInventoryIndex = -1;
 
-        UIInventoryGridController inventoryController;
-        UIDragDropController dragDropController;
-        UISeedEditorController seedEditorController;
-        UISpecSheetController specSheetController;
-        UIHotbarController hotbarController;
+        // Controllers
+        private UIInventoryGridController inventoryController;
+        private UIDragDropController dragDropController;
+        private UISeedEditorController seedEditorController;
+        private UISpecSheetController specSheetController;
+        private UIHotbarController hotbarController;
 
-        VisualElement rootElement;
-        VisualElement planningPanel, hudPanel;
-        Button startDayButton;
+        // Root elements
+        private VisualElement rootElement;
+        private VisualElement planningPanel, hudPanel;
+        private Button startDayButton;
 
-        VisualElement hungerBarFill;
-        Label hungerText;
-        Label tickText;
-        VisualElement hudTooltipPanel;
-        Image hudTooltipIcon;
-        Label hudTooltipName;
-        Label hudTooltipType;
-        Label hudTooltipDescription;
+        // HUD Elements - Tick Counter
+        private Label tickText;
 
-        PlayerHungerSystem playerHungerSystem;
+        // HUD Elements - Player Hunger
+        private VisualElement playerHungerBarFill;
+        private Label playerHungerText;
 
-        int TotalInventorySlots => inventoryRows * inventoryColumns;
+        // HUD Elements - Doris Hunger (optional - hidden if Doris not present)
+        private VisualElement dorisHungerFooter;
+        private VisualElement dorisHungerBarFill;
+        private Label dorisHungerText;
+        private Label dorisStateText;
+
+        // HUD Elements - Tooltip
+        private VisualElement hudTooltipPanel;
+        private Image hudTooltipIcon;
+        private Label hudTooltipName;
+        private Label hudTooltipType;
+        private Label hudTooltipDescription;
+
+        // System References
+        private PlayerHungerSystem playerHungerSystem;
+
+        // Doris reference (found at runtime, no compile-time dependency)
+        private MonoBehaviour dorisHungerSystemRef;
+        private System.Reflection.EventInfo dorisHungerChangedEvent;
+        private System.Reflection.EventInfo dorisStateChangedEvent;
+
+        private int TotalInventorySlots => inventoryRows * inventoryColumns;
 
         void Start() {
             if (inventorySlotTemplate == null || geneSlotTemplate == null) {
@@ -75,7 +95,6 @@ namespace Abracodabra.UI.Toolkit {
 
             InventoryService.OnInventoryChanged += HandleInventoryServiceChanged;
 
-            // Subscribe to ToolSwitcher for real-time tool uses updates
             if (ToolSwitcher.Instance != null) {
                 ToolSwitcher.Instance.OnUsesChanged += HandleToolUsesChanged;
             }
@@ -111,7 +130,7 @@ namespace Abracodabra.UI.Toolkit {
             }
 
             if (playerHungerSystem != null) {
-                playerHungerSystem.OnHungerChanged -= UpdateHungerDisplay;
+                playerHungerSystem.OnHungerChanged -= UpdatePlayerHungerDisplay;
             }
 
             if (TickManager.Instance != null) {
@@ -123,6 +142,9 @@ namespace Abracodabra.UI.Toolkit {
             }
 
             HotbarSelectionService.OnSelectionChanged -= HandleHotbarSelectionChanged;
+
+            // Unsubscribe from Doris if we were subscribed
+            UnsubscribeFromDoris();
         }
 
         void InitializeControllers() {
@@ -208,34 +230,154 @@ namespace Abracodabra.UI.Toolkit {
         }
 
         void InitializeHUD() {
-            hungerBarFill = rootElement.Q<VisualElement>("hunger-bar-fill");
-            hungerText = rootElement.Q<Label>("hunger-text");
+            // Tick counter
             tickText = rootElement.Q<Label>("tick-text");
 
+            // Player hunger elements
+            playerHungerBarFill = rootElement.Q<VisualElement>("player-hunger-bar-fill");
+            playerHungerText = rootElement.Q<Label>("player-hunger-text");
+
+            // Doris hunger elements (will be hidden if Doris not present)
+            dorisHungerFooter = rootElement.Q<VisualElement>("doris-hunger-footer");
+            dorisHungerBarFill = rootElement.Q<VisualElement>("doris-hunger-bar-fill");
+            dorisHungerText = rootElement.Q<Label>("doris-hunger-text");
+            dorisStateText = rootElement.Q<Label>("doris-state-text");
+
+            // Tooltip elements
             hudTooltipPanel = rootElement.Q<VisualElement>("hud-tooltip-panel");
             hudTooltipIcon = rootElement.Q<Image>("hud-tooltip-icon");
             hudTooltipName = rootElement.Q<Label>("hud-tooltip-name");
             hudTooltipType = rootElement.Q<Label>("hud-tooltip-type");
             hudTooltipDescription = rootElement.Q<Label>("hud-tooltip-description");
 
+            // Find and subscribe to Player Hunger System
             playerHungerSystem = FindFirstObjectByType<PlayerHungerSystem>();
             if (playerHungerSystem != null) {
-                playerHungerSystem.OnHungerChanged += UpdateHungerDisplay;
-                UpdateHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+                playerHungerSystem.OnHungerChanged += UpdatePlayerHungerDisplay;
+                UpdatePlayerHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+                Debug.Log("[GameUIManager] Subscribed to PlayerHungerSystem");
             }
             else {
-                Debug.LogWarning("[GameUIManager] PlayerHungerSystem not found - hunger display won't update");
+                Debug.LogWarning("[GameUIManager] PlayerHungerSystem not found - player hunger display won't update");
             }
 
+            // Try to find Doris at runtime (no compile-time dependency)
+            TryFindAndSubscribeToDoris();
+
+            // Subscribe to tick manager
             if (TickManager.Instance != null) {
                 TickManager.Instance.OnTickAdvanced += UpdateTickDisplay;
                 UpdateTickDisplay(TickManager.Instance.CurrentTick);
             }
 
+            // Subscribe to hotbar selection changes
             HotbarSelectionService.OnSelectionChanged += HandleHotbarSelectionChanged;
 
             Debug.Log("[GameUIManager] HUD initialized");
         }
+
+        #region Doris Integration (Runtime, No Compile-Time Dependency)
+
+        void TryFindAndSubscribeToDoris() {
+            // Hide Doris footer by default
+            if (dorisHungerFooter != null) {
+                dorisHungerFooter.style.display = DisplayStyle.None;
+            }
+
+            // Try to find DorisHungerSystem by type name (no compile-time dependency)
+            var dorisType = System.Type.GetType("Abracodabra.Ecosystem.DorisHungerSystem, Assembly-CSharp");
+            if (dorisType == null) {
+                Debug.Log("[GameUIManager] DorisHungerSystem type not found - Doris UI disabled");
+                return;
+            }
+
+            dorisHungerSystemRef = FindFirstObjectByType(dorisType) as MonoBehaviour;
+            if (dorisHungerSystemRef == null) {
+                Debug.Log("[GameUIManager] DorisHungerSystem instance not found in scene - Doris UI disabled");
+                return;
+            }
+
+            // Subscribe to events via reflection
+            try {
+                dorisHungerChangedEvent = dorisType.GetEvent("OnHungerChanged");
+                dorisStateChangedEvent = dorisType.GetEvent("OnStateChanged");
+
+                if (dorisHungerChangedEvent != null) {
+                    var handler = Delegate.CreateDelegate(
+                        dorisHungerChangedEvent.EventHandlerType,
+                        this,
+                        typeof(GameUIManager).GetMethod("OnDorisHungerChanged", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    );
+                    dorisHungerChangedEvent.AddEventHandler(dorisHungerSystemRef, handler);
+                }
+
+                // Show Doris footer
+                if (dorisHungerFooter != null) {
+                    dorisHungerFooter.style.display = DisplayStyle.Flex;
+                }
+
+                // Get initial values
+                var currentHungerProp = dorisType.GetProperty("CurrentHunger");
+                var maxHungerProp = dorisType.GetProperty("MaxHunger");
+                var currentStateProp = dorisType.GetProperty("CurrentState");
+
+                if (currentHungerProp != null && maxHungerProp != null) {
+                    float current = (float)currentHungerProp.GetValue(dorisHungerSystemRef);
+                    float max = (float)maxHungerProp.GetValue(dorisHungerSystemRef);
+                    UpdateDorisHungerDisplay(current, max);
+                }
+
+                if (currentStateProp != null) {
+                    int state = (int)currentStateProp.GetValue(dorisHungerSystemRef);
+                    UpdateDorisStateDisplayByInt(state);
+                }
+
+                Debug.Log("[GameUIManager] Successfully subscribed to DorisHungerSystem");
+            }
+            catch (System.Exception e) {
+                Debug.LogWarning($"[GameUIManager] Failed to subscribe to Doris events: {e.Message}");
+            }
+        }
+
+        void UnsubscribeFromDoris() {
+            // Unsubscribe via reflection if we were subscribed
+            if (dorisHungerSystemRef != null && dorisHungerChangedEvent != null) {
+                try {
+                    var handler = Delegate.CreateDelegate(
+                        dorisHungerChangedEvent.EventHandlerType,
+                        this,
+                        typeof(GameUIManager).GetMethod("OnDorisHungerChanged", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    );
+                    dorisHungerChangedEvent.RemoveEventHandler(dorisHungerSystemRef, handler);
+                }
+                catch { }
+            }
+        }
+
+        // Called via reflection from DorisHungerSystem.OnHungerChanged
+        private void OnDorisHungerChanged(float currentHunger, float maxHunger) {
+            UpdateDorisHungerDisplay(currentHunger, maxHunger);
+
+            // Also update state
+            if (dorisHungerSystemRef != null) {
+                var dorisType = dorisHungerSystemRef.GetType();
+                var currentStateProp = dorisType.GetProperty("CurrentState");
+                if (currentStateProp != null) {
+                    int state = (int)currentStateProp.GetValue(dorisHungerSystemRef);
+                    UpdateDorisStateDisplayByInt(state);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Call this to re-find Doris after she's spawned at runtime
+        /// </summary>
+        public void RefreshDorisReference() {
+            UnsubscribeFromDoris();
+            TryFindAndSubscribeToDoris();
+        }
+
+        #endregion
 
         void CreateStartDayButton() {
             var buttonContainer = new VisualElement();
@@ -285,8 +427,7 @@ namespace Abracodabra.UI.Toolkit {
             dragDropController.OnGeneDropRequested += HandleGeneDrop;
             dragDropController.OnDragStarted += HandleDragStarted;
             dragDropController.OnDragEnded += HandleDragEnded;
-            
-            // New events for gene editor drag-drop
+
             dragDropController.OnGeneDroppedToInventory += HandleGeneDroppedToInventory;
             dragDropController.OnGeneEditorInternalMove += HandleGeneEditorInternalMove;
 
@@ -339,38 +480,87 @@ namespace Abracodabra.UI.Toolkit {
                 hotbarController.SelectSlot(HotbarSelectionService.SelectedIndex);
             }
         }
-        
-        /// <summary>
-        /// Called when ToolSwitcher.OnUsesChanged fires - refreshes UI to show updated counts
-        /// </summary>
+
         void HandleToolUsesChanged(int remainingUses) {
-            // Refresh the hotbar and inventory to update the counter display
             inventoryController.RefreshVisuals();
             RefreshHotbar();
-            
+
             Debug.Log($"[GameUIManager] Tool uses changed: {remainingUses} remaining - UI refreshed");
         }
 
-        void UpdateHungerDisplay(float currentHunger, float maxHunger) {
-            if (hungerBarFill != null) {
-                float percentage = maxHunger > 0 ? (currentHunger / maxHunger) * 100f : 0f;
-                hungerBarFill.style.width = Length.Percent(percentage);
+        #region Hunger Display Updates
 
-                if (percentage <= 25f) {
-                    hungerBarFill.style.backgroundColor = new Color(0.85f, 0.25f, 0.25f);
+        /// <summary>
+        /// Updates the player hunger bar. Hunger INCREASING means getting hungrier (bad).
+        /// Bar fills up as hunger increases.
+        /// </summary>
+        void UpdatePlayerHungerDisplay(float currentHunger, float maxHunger) {
+            if (playerHungerBarFill != null) {
+                float percentage = maxHunger > 0 ? (currentHunger / maxHunger) * 100f : 0f;
+                playerHungerBarFill.style.width = Length.Percent(percentage);
+
+                // Color based on hunger level (high hunger = danger)
+                if (percentage >= 80f) {
+                    playerHungerBarFill.style.backgroundColor = new Color(0.9f, 0.25f, 0.25f);
                 }
-                else if (percentage <= 50f) {
-                    hungerBarFill.style.backgroundColor = new Color(0.9f, 0.6f, 0.2f);
+                else if (percentage >= 50f) {
+                    playerHungerBarFill.style.backgroundColor = new Color(0.95f, 0.7f, 0.2f);
                 }
                 else {
-                    hungerBarFill.style.backgroundColor = new Color(0.86f, 0.47f, 0.2f);
+                    playerHungerBarFill.style.backgroundColor = new Color(0.4f, 0.75f, 0.4f);
                 }
             }
 
-            if (hungerText != null) {
-                hungerText.text = $"{Mathf.CeilToInt(currentHunger)}/{Mathf.CeilToInt(maxHunger)}";
+            if (playerHungerText != null) {
+                playerHungerText.text = $"{Mathf.CeilToInt(currentHunger)}/{Mathf.CeilToInt(maxHunger)}";
             }
         }
+
+        void UpdateDorisHungerDisplay(float currentHunger, float maxHunger) {
+            if (dorisHungerBarFill != null) {
+                float percentage = maxHunger > 0 ? (currentHunger / maxHunger) * 100f : 0f;
+                dorisHungerBarFill.style.width = Length.Percent(percentage);
+
+                if (percentage >= 80f) {
+                    dorisHungerBarFill.style.backgroundColor = new Color(0.9f, 0.25f, 0.25f);
+                }
+                else if (percentage >= 50f) {
+                    dorisHungerBarFill.style.backgroundColor = new Color(0.95f, 0.6f, 0.2f);
+                }
+                else {
+                    dorisHungerBarFill.style.backgroundColor = new Color(0.4f, 0.75f, 0.4f);
+                }
+            }
+
+            if (dorisHungerText != null) {
+                dorisHungerText.text = $"{Mathf.CeilToInt(currentHunger)}/{Mathf.CeilToInt(maxHunger)}";
+            }
+        }
+
+        void UpdateDorisStateDisplayByInt(int stateValue) {
+            if (dorisStateText == null) return;
+
+            dorisStateText.RemoveFromClassList("doris-state-satisfied");
+            dorisStateText.RemoveFromClassList("doris-state-hungry");
+            dorisStateText.RemoveFromClassList("doris-state-starving");
+
+            switch (stateValue) {
+                case 0: // Satisfied
+                    dorisStateText.text = "😊 Satisfied";
+                    dorisStateText.AddToClassList("doris-state-satisfied");
+                    break;
+                case 1: // Hungry
+                    dorisStateText.text = "😐 Hungry";
+                    dorisStateText.AddToClassList("doris-state-hungry");
+                    break;
+                case 2: // Starving
+                    dorisStateText.text = "😡 STARVING!";
+                    dorisStateText.AddToClassList("doris-state-starving");
+                    break;
+            }
+        }
+
+        #endregion
 
         void UpdateTickDisplay(int currentTick) {
             if (tickText != null) {
@@ -378,75 +568,68 @@ namespace Abracodabra.UI.Toolkit {
             }
         }
 
-        void HandleHotbarSelectionChanged(UIInventoryItem selectedItem)
-        {
+        void HandleHotbarSelectionChanged(UIInventoryItem selectedItem) {
             UpdateHUDTooltip(selectedItem);
         }
 
-        void UpdateHUDTooltip(UIInventoryItem selectedItem)
-{
-    if (selectedItem == null || hudTooltipPanel == null)
-    {
-        if (hudTooltipPanel != null)
-        {
-            hudTooltipPanel.style.display = DisplayStyle.None;
+        void UpdateHUDTooltip(UIInventoryItem selectedItem) {
+            if (selectedItem == null || hudTooltipPanel == null) {
+                if (hudTooltipPanel != null) {
+                    hudTooltipPanel.style.display = DisplayStyle.None;
+                }
+                return;
+            }
+
+            hudTooltipPanel.style.display = DisplayStyle.Flex;
+
+            switch (selectedItem.Type) {
+                case UIInventoryItem.ItemType.Seed:
+                    var seed = selectedItem.SeedTemplate;
+                    if (seed != null) {
+                        if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
+                        if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
+                        if (hudTooltipType != null) hudTooltipType.text = "Seed";
+                        if (hudTooltipDescription != null) hudTooltipDescription.text = seed.description;
+                    }
+                    break;
+
+                case UIInventoryItem.ItemType.Tool:
+                    var tool = selectedItem.ToolDefinition;
+                    if (tool != null) {
+                        if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
+                        if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
+                        if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
+                        if (hudTooltipDescription != null) hudTooltipDescription.text = tool.GetTooltipDescription();
+                    }
+                    break;
+
+                case UIInventoryItem.ItemType.Gene:
+                    var gene = selectedItem.Gene ?? selectedItem.GeneInstance?.GetGene();
+                    if (gene != null) {
+                        if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
+                        if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
+                        if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
+                        if (hudTooltipDescription != null) hudTooltipDescription.text = gene.description;
+                    }
+                    break;
+
+                case UIInventoryItem.ItemType.Resource:
+                    var resource = selectedItem.ResourceInstance;
+                    if (resource?.definition != null) {
+                        if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
+                        if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
+                        if (hudTooltipType != null) hudTooltipType.text = "Resource";
+                        if (hudTooltipDescription != null) hudTooltipDescription.text = resource.definition.description;
+                    }
+                    break;
+
+                default:
+                    hudTooltipPanel.style.display = DisplayStyle.None;
+                    break;
+            }
         }
-        return;
-    }
 
-    hudTooltipPanel.style.display = DisplayStyle.Flex;
-
-    switch (selectedItem.Type)
-    {
-        case UIInventoryItem.ItemType.Seed:
-            var seed = selectedItem.SeedTemplate;
-            if (seed != null)
-            {
-                if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
-                if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
-                if (hudTooltipType != null) hudTooltipType.text = "Seed";
-                if (hudTooltipDescription != null) hudTooltipDescription.text = seed.description;
-            }
-            break;
-
-        case UIInventoryItem.ItemType.Tool:
-            var tool = selectedItem.ToolDefinition;
-            if (tool != null)
-            {
-                if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
-                if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
-                if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
-                if (hudTooltipDescription != null) hudTooltipDescription.text = tool.GetTooltipDescription();
-            }
-            break;
-
-        case UIInventoryItem.ItemType.Gene:
-            var gene = selectedItem.Gene ?? selectedItem.GeneInstance?.GetGene();
-            if (gene != null)
-            {
-                if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
-                if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
-                if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
-                if (hudTooltipDescription != null) hudTooltipDescription.text = gene.description;
-            }
-            break;
-
-        case UIInventoryItem.ItemType.Resource:
-            var resource = selectedItem.ResourceInstance;
-            if (resource?.definition != null)
-            {
-                if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
-                if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
-                if (hudTooltipType != null) hudTooltipType.text = "Resource";
-                if (hudTooltipDescription != null) hudTooltipDescription.text = resource.definition.description;
-            }
-            break;
-
-        default:
-            hudTooltipPanel.style.display = DisplayStyle.None;
-            break;
-    }
-}
+        #region Inventory Event Handlers
 
         void HandleSlotClicked(int index) {
             if (dragDropController.IsDragging()) return;
@@ -531,74 +714,56 @@ namespace Abracodabra.UI.Toolkit {
                 Debug.LogWarning($"[GameUIManager] No empty inventory slot to return {gene.geneName}!");
             }
         }
-        
-        /// <summary>
-        /// Handle dropping a gene from editor to inventory
-        /// </summary>
+
         void HandleGeneDroppedToInventory(GeneBase gene, int inventoryIndex, int editorSlotIndex, string editorSlotType) {
-            // First, remove the gene from the editor
             seedEditorController.RemoveGeneFromSlot(editorSlotIndex, editorSlotType);
-            
-            // Check what's in the target inventory slot
+
             var targetItem = playerInventory[inventoryIndex];
-            
+
             if (targetItem == null) {
-                // Empty slot - just place the gene
                 playerInventory[inventoryIndex] = new UIInventoryItem(gene);
                 Debug.Log($"[GameUIManager] Dropped {gene.geneName} to empty inventory slot {inventoryIndex}");
             }
             else if (targetItem.OriginalData is GeneBase targetGene && CanGeneGoInSlot(targetGene, editorSlotType)) {
-                // Target has a compatible gene - swap!
                 playerInventory[inventoryIndex] = new UIInventoryItem(gene);
                 seedEditorController.AddGeneToSlot(targetGene, editorSlotIndex, editorSlotType);
                 Debug.Log($"[GameUIManager] Swapped {gene.geneName} with {targetGene.geneName}");
             }
             else {
-                // Target has incompatible item - find empty slot for the gene
                 int emptySlot = playerInventory.FindIndex(item => item == null);
                 if (emptySlot >= 0) {
                     playerInventory[emptySlot] = new UIInventoryItem(gene);
                     Debug.Log($"[GameUIManager] Target occupied - placed {gene.geneName} in empty slot {emptySlot}");
                 }
                 else {
-                    // No space! Put it back in the editor
                     seedEditorController.AddGeneToSlot(gene, editorSlotIndex, editorSlotType);
                     Debug.LogWarning($"[GameUIManager] No space in inventory - returned {gene.geneName} to editor");
                 }
             }
-            
+
             inventoryController.RefreshVisuals();
             RefreshHotbar();
         }
-        
-        /// <summary>
-        /// Handle moving a gene from one editor slot to another
-        /// </summary>
+
         void HandleGeneEditorInternalMove(GeneBase gene, int fromIndex, string fromType, int toIndex, string toType) {
-            // Check if the gene category is compatible with the target slot type
             if (!CanGeneGoInSlot(gene, toType)) {
                 Debug.Log($"[GameUIManager] Cannot move {gene.Category} gene to {toType} slot");
                 return;
             }
-            
-            // Get the gene at the destination (if any)
+
             var destinationGene = seedEditorController.GetGeneAtSlot(toIndex, toType);
-            
-            // Remove from source
+
             seedEditorController.RemoveGeneFromSlot(fromIndex, fromType);
-            
-            // If there's a gene in the destination, check if we can swap
+
             if (destinationGene != null) {
                 if (CanGeneGoInSlot(destinationGene, fromType)) {
-                    // Swap the genes
                     seedEditorController.AddGeneToSlot(gene, toIndex, toType);
                     seedEditorController.AddGeneToSlot(destinationGene, fromIndex, fromType);
                     Debug.Log($"[GameUIManager] Swapped {gene.geneName} with {destinationGene.geneName}");
                 }
                 else {
-                    // Can't swap - put original gene in destination, send displaced gene to inventory
                     seedEditorController.AddGeneToSlot(gene, toIndex, toType);
-                    
+
                     int emptySlot = playerInventory.FindIndex(item => item == null);
                     if (emptySlot >= 0) {
                         playerInventory[emptySlot] = new UIInventoryItem(destinationGene);
@@ -607,7 +772,6 @@ namespace Abracodabra.UI.Toolkit {
                         Debug.Log($"[GameUIManager] Moved {gene.geneName} to {toType} slot, {destinationGene.geneName} to inventory");
                     }
                     else {
-                        // No space - revert
                         seedEditorController.RemoveGeneFromSlot(toIndex, toType);
                         seedEditorController.AddGeneToSlot(destinationGene, toIndex, toType);
                         seedEditorController.AddGeneToSlot(gene, fromIndex, fromType);
@@ -616,15 +780,11 @@ namespace Abracodabra.UI.Toolkit {
                 }
             }
             else {
-                // Simple move - destination is empty
                 seedEditorController.AddGeneToSlot(gene, toIndex, toType);
                 Debug.Log($"[GameUIManager] Moved {gene.geneName} from {fromType}[{fromIndex}] to {toType}[{toIndex}]");
             }
         }
-        
-        /// <summary>
-        /// Check if a gene's category is compatible with a slot type
-        /// </summary>
+
         bool CanGeneGoInSlot(GeneBase gene, string slotType) {
             return slotType switch {
                 "passive" => gene.Category == GeneCategory.Passive,
@@ -674,7 +834,7 @@ namespace Abracodabra.UI.Toolkit {
                         playerInventory[dragSourceIndex] = null;
                         inventoryController.RefreshVisuals();
                         RefreshHotbar();
-                        Debug.Log($"[GameUIManager] ✓ Added {gene.geneName} to editor, removed from inventory");
+                        Debug.Log($"[GameUIManager] ✔ Added {gene.geneName} to editor, removed from inventory");
                     }
                     else {
                         Debug.LogWarning($"[GameUIManager] ✗ Failed to add {gene.geneName} to slot");
@@ -727,6 +887,10 @@ namespace Abracodabra.UI.Toolkit {
             return 0;
         }
 
+        #endregion
+
+        #region State Management
+
         void OnStartDayClicked() {
             Debug.Log("[GameUIManager] START DAY clicked - transitioning to Growth & Threat phase");
 
@@ -768,8 +932,14 @@ namespace Abracodabra.UI.Toolkit {
                 startDayButton.style.display = DisplayStyle.None;
             }
 
+            // Refresh all HUD displays
             if (playerHungerSystem != null) {
-                UpdateHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+                UpdatePlayerHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+            }
+
+            // Try to find Doris again in case she was spawned during planning
+            if (dorisHungerSystemRef == null) {
+                TryFindAndSubscribeToDoris();
             }
 
             if (TickManager.Instance != null) {
@@ -780,5 +950,7 @@ namespace Abracodabra.UI.Toolkit {
 
             Debug.Log("[GameUIManager] HUD shown - UI background set to transparent");
         }
+
+        #endregion
     }
 }

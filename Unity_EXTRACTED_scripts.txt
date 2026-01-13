@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 700,518 -> 502,521 chars (28.3% reduction)
-Estimated tokens saved: ~49,499
+Compression Stats: 737,535 -> 529,675 chars (28.2% reduction)
+Estimated tokens saved: ~51,965
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -32,186 +32,188 @@ using System.Linq;
   IGameEventListener (Assets\Scripts\Core\Events/) L168
   GameBootstrap (Assets\Scripts\Core/) L176
   SortableEntity (Assets\Scripts\Core/) L227
-  WeatherManager (Assets\Scripts\Core/) L298
-  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L500
-  AnimalController (Assets\Scripts\Ecosystem\Animals/) L561
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L847
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L918
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L927
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1340
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1504
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1520
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1558
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1868
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1904
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2184
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2277
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2299
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2318
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2402
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2483
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2555
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2571
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2593
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2842
-  WaveState (Assets\Scripts\Ecosystem\Management/) L2862
-  WaveSpawnLocationType (Assets\Scripts\Ecosystem\Spawning/) L3167
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3210
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3229
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3268
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3316
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3334
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3485
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3596
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3643
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3656
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3718
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3738
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L3779
-  WaveManagerEditor (Assets\Scripts\Editor/) L3916
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L4093
-  ItemEffect (Assets\Scripts\Items/) L4123
-  ItemInstance (Assets\Scripts\Items/) L4157
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4192
-  LeafData (Assets\Scripts\PlantSystem\Data/) L4200
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4215
-  PlantCellType (Assets\Scripts\PlantSystem\Growth/) L4254
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4275
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4412
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4474
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L4569
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L4669
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L4691
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L4806
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L4962
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L5072
-  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L5173
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L5200
-  GridSnapStartup (Assets\Scripts\Ticks/) L5442
-  TickDebugMonitor (Assets\Scripts\Ticks/) L5509
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L5545
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L5556
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L5586
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L5694
-  WaterReflection (Assets\Scripts\Visual\Effects/) L5801
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L6226
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L6272
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L6443
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L6704
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L6712
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L6738
-  PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6786
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L6973
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7050
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7104
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7147
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7164
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7204
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7339
+  WeatherManager (Assets\Scripts\Core/) L376
+  AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L578
+  AnimalController (Assets\Scripts\Ecosystem\Animals/) L639
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L925
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L996
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L1005
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1418
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1582
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1598
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1636
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1946
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1982
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2262
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2355
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2377
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2396
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2480
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2561
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2633
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2649
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2671
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L2920
+  WaveState (Assets\Scripts\Ecosystem\Management/) L2940
+  WaveSpawnLocationType (Assets\Scripts\Ecosystem\Spawning/) L3245
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3288
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3307
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3346
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3394
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3412
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3563
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3674
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3721
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3734
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3796
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3816
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L3857
+  WaveManagerEditor (Assets\Scripts\Editor/) L3994
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L4171
+  ItemEffect (Assets\Scripts\Items/) L4201
+  ItemInstance (Assets\Scripts\Items/) L4235
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4270
+  LeafData (Assets\Scripts\PlantSystem\Data/) L4278
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4293
+  PlantCellType (Assets\Scripts\PlantSystem\Growth/) L4332
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4353
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4490
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4552
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L4647
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L4747
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L4769
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L4884
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L5040
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L5150
+  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L5251
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L5278
+  GridSnapStartup (Assets\Scripts\Ticks/) L5520
+  TickDebugMonitor (Assets\Scripts\Ticks/) L5587
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L5623
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L5634
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L5664
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L5772
+  WaterReflection (Assets\Scripts\Visual\Effects/) L5879
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L6304
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L6350
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L6521
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L6787
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L6795
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L6821
+  PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6869
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7069
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7227
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7281
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7324
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7341
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7381
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7540
 
 [Abracodabra.Ecosystem]
-  DorisController (Assets\Scripts\Ecosystem\Doris/) L7350
+  DorisController (Assets\Scripts\Ecosystem\Doris/) L7551
+  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L7909
+  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L7996
 
 [Abracodabra.Genes]
-  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L7454
-  GeneLibrary (Assets\Scripts\Genes/) L7464
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L7619
-  PlantState (Assets\Scripts\PlantSystem\Growth/) L7799
+  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L8197
+  GeneLibrary (Assets\Scripts\Genes/) L8207
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L8362
+  PlantState (Assets\Scripts\PlantSystem\Growth/) L8542
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L8191
-  Fruit (Assets\Scripts\Genes\Components/) L8216
-  NutritionComponent (Assets\Scripts\Genes\Components/) L8254
+  Creature (Assets\Scripts\Genes\Components/) L8934
+  Fruit (Assets\Scripts\Genes\Components/) L8959
+  NutritionComponent (Assets\Scripts\Genes\Components/) L8997
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L8266
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L8312
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L8331
-  ModifierGene (Assets\Scripts\Genes\Core/) L8343
-  PassiveStatType (Assets\Scripts\Genes\Core/) L8375
-  PayloadGene (Assets\Scripts\Genes\Core/) L8417
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L8463
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L8484
-  GeneBase (Assets\Scripts\Genes/) L8517
-  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L8595
+  ActiveGene (Assets\Scripts\Genes\Core/) L9009
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L9055
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L9074
+  ModifierGene (Assets\Scripts\Genes\Core/) L9086
+  PassiveStatType (Assets\Scripts\Genes\Core/) L9118
+  PayloadGene (Assets\Scripts\Genes\Core/) L9160
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L9206
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L9227
+  GeneBase (Assets\Scripts\Genes/) L9260
+  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L9338
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L8698
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L8816
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L8846
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L8889
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L9441
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L9559
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L9589
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L9632
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L8940
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L8996
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9128
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L9683
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L9739
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9871
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L9183
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L9216
-  GeneEventBus (Assets\Scripts\Genes\Services/) L9314
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L9366
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L9926
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L9959
+  GeneEventBus (Assets\Scripts\Genes\Services/) L10057
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L10109
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L9453
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L10196
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L9546
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L9631
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L9771
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L10289
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L10374
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L10514
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L10049
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L10795
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L11084
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L11295
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L11481
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L11680
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L12324
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L10792
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L11697
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L11986
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L12197
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L12383
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L12582
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L13226
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L12518
-  SeedRarity (Assets\Scripts\A_ToolkitUI/) L12688
-  QualityTier (Assets\Scripts\A_ToolkitUI/) L12710
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L13420
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L13590
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L13612
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L12772
-  CameraZoomController (Assets\Scripts\Core/) L12885
-  InitializationManager (Assets\Scripts\Core/) L12934
-  PixelGridSnapper (Assets\Scripts\Core/) L12974
-  RunState (Assets\Scripts\Core/) L13007
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L13175
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L13238
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L13374
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L13403
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L13554
-  GridEntity (Assets\Scripts\Ticks/) L13626
-  GridPosition (Assets\Scripts\Ticks/) L13796
-  GridPositionManager (Assets\Scripts\Ticks/) L13897
-  GridRadiusUtility (Assets\Scripts\Ticks/) L14511
-  MultiTileEntity (Assets\Scripts\Ticks/) L14655
-  PivotMode (Assets\Scripts\Ticks/) L14899
-  TickConfiguration (Assets\Scripts\Ticks/) L15013
-  ITickUpdateable (Assets\Scripts\Ticks/) L15099
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L15251
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L15272
-  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L15468
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L15484
-  for (Assets\Scripts\WorldInteraction/) L16103
+  CameraController (Assets\Scripts\Core/) L13674
+  CameraZoomController (Assets\Scripts\Core/) L13787
+  InitializationManager (Assets\Scripts\Core/) L13836
+  PixelGridSnapper (Assets\Scripts\Core/) L13876
+  RunState (Assets\Scripts\Core/) L13909
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L14077
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L14140
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L14276
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L14305
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L14456
+  GridEntity (Assets\Scripts\Ticks/) L14528
+  GridPosition (Assets\Scripts\Ticks/) L14698
+  GridPositionManager (Assets\Scripts\Ticks/) L14799
+  GridRadiusUtility (Assets\Scripts\Ticks/) L15413
+  MultiTileEntity (Assets\Scripts\Ticks/) L15557
+  PivotMode (Assets\Scripts\Ticks/) L15801
+  TickConfiguration (Assets\Scripts\Ticks/) L15915
+  ITickUpdateable (Assets\Scripts\Ticks/) L16001
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L16153
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L16174
+  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L16370
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L16386
+  for (Assets\Scripts\WorldInteraction/) L17007
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16175
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17079
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L16207
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L17111
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L16265
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L16311
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L16434
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L17169
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L17215
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L17338
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L16599
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17503
 
 
 ================================================================================
@@ -414,30 +416,34 @@ pub class GameBootstrap : MonoBehaviour {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Core\SortableEntity.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Core/SortableEntity.cs
+using WegoSystem;
 
 pub class SortableEntity : MonoBehaviour {
  [Header("Sorting Configuration")]
- [Tooltip("Offset added to Y position for sorting calculation")]
+ [Tooltip("Offset added to Y position for sorting calculation. Negative values make the entity sort as if it's lower on screen.")]
  [SerializeField] float sortingLayerYOffset = 0f;
 
- [Tooltip("Use parent's Y coordinate for sorting")]
+ [Tooltip("Use parent's Y coordinate for sorting instead of this object's Y.")]
  [SerializeField] bool useParentYCoordinate = false;
 
- [Tooltip("Debug logging for sorting")]
+ [Tooltip("If this object has a MultiTileEntity, use its anchor (bottom-left) position for sorting. " +
+   "This ensures multi-tile objects sort correctly based on their feet, not their center.")]
+ [SerializeField] bool useMultiTileAnchor = true;
+
+ [Header("Sorting Layer")]
+ [Tooltip("Optional: Override the sorting layer. Leave empty to keep the current layer.")]
+ [SerializeField] string sortingLayerName = "";
+
+ [Header("Debug")]
  pub bool debugSorting = false;
 
  SpriteRenderer spriteRenderer;
+ MultiTileEntity multiTileEntity;
+ bool hasCheckedMultiTile = false;
 
  void Awake() {
-  spriteRenderer = GetComponent<SpriteRenderer>();
-
-  if (spriteRenderer == null)
-   spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-
-  if (spriteRenderer == null) {
-   Debug.LogWarning($"[SortableEntity] No SpriteRenderer found on {gameObject.name}");
-  }
+  CacheReferences();
  }
 
  void Start() {
@@ -448,19 +454,73 @@ pub class SortableEntity : MonoBehaviour {
   UpdateSortingOrder();
  }
 
+ void CacheReferences() {
+  spriteRenderer = GetComponent<SpriteRenderer>();
+  if (spriteRenderer == null) {
+   spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+  }
+
+  if (spriteRenderer == null) {
+   Debug.LogWarning($"[SortableEntity] No SpriteRenderer found on {gameObject.name}");
+  }
+
+  CheckForMultiTileEntity();
+ }
+
+ void CheckForMultiTileEntity() {
+  if (hasCheckedMultiTile) return;
+
+  multiTileEntity = GetComponent<MultiTileEntity>();
+  if (multiTileEntity == null) {
+   multiTileEntity = GetComponentInParent<MultiTileEntity>();
+  }
+
+  hasCheckedMultiTile = true;
+
+  if (debugSorting && multiTileEntity != null) {
+   Debug.Log($"[SortableEntity] Found MultiTileEntity on {gameObject.name}");
+  }
+ }
+
  pub void UpdateSortingOrder() {
   if (spriteRenderer == null) return;
 
-  float yPositionForSorting = useParentYCoordinate && transform.parent != null
-   ? transform.parent.position.y
-   : transform.position.y;
-
+  float yPositionForSorting = GetYPositionForSorting();
   int sortOrder = CalculateSortOrder(yPositionForSorting);
+
   spriteRenderer.sortingOrder = sortOrder;
 
-  if (debugSorting) {
-   Debug.Log($"[SortableEntity] {gameObject.name} - Y: {yPositionForSorting}, Offset: {sortingLayerYOffset}, Sort Order: {sortOrder}");
+  if (!string.IsNullOrEmpty(sortingLayerName)) {
+   spriteRenderer.sortingLayerName = sortingLayerName;
   }
+
+  if (debugSorting) {
+   string source = GetSortingSourceDescription();
+   Debug.Log($"[SortableEntity] {gameObject.name} - Y: {yPositionForSorting:F2}, Offset: {sortingLayerYOffset}, Sort Order: {sortOrder} ({source})");
+  }
+ }
+
+ float GetYPositionForSorting() {
+  if (useMultiTileAnchor && multiTileEntity != null && GridPositionManager.Instance != null) {
+   Vector3 anchorWorld = GridPositionManager.Instance.GridToWorld(multiTileEntity.AnchorPosition);
+   return anchorWorld.y;
+  }
+
+  if (useParentYCoordinate && transform.parent != null) {
+   return transform.parent.position.y;
+  }
+
+  return transform.position.y;
+ }
+
+ string GetSortingSourceDescription() {
+  if (useMultiTileAnchor && multiTileEntity != null) {
+   return $"MultiTile Anchor at {multiTileEntity.AnchorPosition}";
+  }
+  if (useParentYCoordinate && transform.parent != null) {
+   return "Parent Y";
+  }
+  return "Self Y";
  }
 
  int CalculateSortOrder(float yPosition) {
@@ -473,12 +533,32 @@ pub class SortableEntity : MonoBehaviour {
  }
 
  pub void SetSortingOrder(int order) {
-  if (spriteRenderer != null)
+  if (spriteRenderer != null) {
    spriteRenderer.sortingOrder = order;
+  }
  }
 
  pub void SetUseParentYCoordinate(bool value) {
   useParentYCoordinate = value;
+ }
+
+ pub void SetUseMultiTileAnchor(bool value) {
+  useMultiTileAnchor = value;
+ }
+
+ pub void SetSortingYOffset(float offset) {
+  sortingLayerYOffset = offset;
+ }
+
+ pub void RefreshReferences() {
+  hasCheckedMultiTile = false;
+  CacheReferences();
+ }
+
+ void OnValidate() {
+  if (!Application.isPlaying) {
+   hasCheckedMultiTile = false;
+  }
  }
 }
 
@@ -6630,7 +6710,7 @@ pub class PlantGrowthModifierManager : MonoBehaviour, ITickUpdateable {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\WorldInteraction\Placement\PlayerTileInteractor.cs
 
-﻿using System.Collections.Generic;
+﻿// FILE: Assets/Scripts/WorldInteraction/Placement/PlayerTileInteractor.cs
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Components;
 using Abracodabra.UI.Genes;
@@ -6836,12 +6916,17 @@ pub seal class PlayerTileInteractor : MonoBehaviour {
   }
   else {
    if (ToolSwitcher.Instance != null && toolDef.limitedUses) {
-    if (!ToolSwitcher.Instance.TryConsumeUse()) {
+    if (!ToolSwitcher.Instance.HasUsesRemaining()) {
      if (showDebug) Debug.Log($"[PlayerTileInteractor] Tool '{toolDef.displayName}' is out of uses.");
      return;
     }
    }
-   PlayerActionManager.Instance?.ExecutePlayerAction(PlayerActionType.UseTool, cellPos, toolDef);
+
+   bool success = PlayerActionManager.Instance?.ExecutePlayerAction(PlayerActionType.UseTool, cellPos, toolDef) ?? false;
+
+   if (!success && showDebug) {
+    Debug.Log($"[PlayerTileInteractor] Tool action failed at {cellPos} - no use consumed");
+   }
   }
  }
 
@@ -6853,7 +6938,7 @@ pub seal class PlayerTileInteractor : MonoBehaviour {
    InventoryService.RemoveItemAtIndex(selectedIndex);
   };
 
-bool success = PlayerActionManager.Instance?.ExecutePlayerAction( PlayerActionType.PlantSeed, cellPos, selected, onSuccess ) ?? false;
+  bool success = PlayerActionManager.Instance?.ExecutePlayerAction(PlayerActionType.PlantSeed, cellPos, selected, onSuccess) ?? false;
 
   if (!success && showDebug) {
    Debug.Log($"[PlayerTileInteractor] Failed to plant '{selected.GetDisplayName()}' at {cellPos}");
@@ -6861,7 +6946,7 @@ bool success = PlayerActionManager.Instance?.ExecutePlayerAction( PlayerActionTy
  }
 
  void HandleHarvest(Vector3Int cellPos) {
-bool success = PlayerActionManager.Instance?.ExecutePlayerAction( PlayerActionType.Harvest, cellPos ) ?? false;
+  bool success = PlayerActionManager.Instance?.ExecutePlayerAction(PlayerActionType.Harvest, cellPos) ?? false;
 
   if (!success && showDebug) {
    Debug.Log($"[PlayerTileInteractor] Harvest failed at {cellPos}");
@@ -6973,7 +7058,7 @@ pub class HungerUI : MonoBehaviour {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\WorldInteraction\Player\PlayerActionManager.cs
 
-﻿using System;
+﻿// FILE: Assets/Scripts/WorldInteraction/Player/PlayerActionManager.cs
 using WegoSystem;
 using Abracodabra.Genes;
 using Abracodabra.UI.Genes;
@@ -7055,8 +7140,21 @@ pub class PlayerActionManager : MonoBehaviour {
 
  bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool) {
   if (tool == null) return false;
-  TileInteractionManager.Instance?.ApplyToolAction(tool);
-  return true;
+
+  bool actionSucceeded = TileInteractionManager.Instance?.ApplyToolAction(tool) ?? false;
+
+  if (actionSucceeded) {
+   if (ToolSwitcher.Instance != null && tool.limitedUses) {
+    ToolSwitcher.Instance.TryConsumeUse();
+   }
+
+   if (debugMode) Debug.Log($"[PlayerActionManager] Tool '{tool.displayName}' action succeeded at {gridPosition}");
+  }
+  else {
+   if (debugMode) Debug.Log($"[PlayerActionManager] Tool '{tool.displayName}' action had no effect at {gridPosition} - no use consumed");
+  }
+
+  return actionSucceeded;
  }
 
  bool ExecutePlantSeed(Vector3Int gridPosition, UIInventoryItem seedItem) {
@@ -7160,42 +7258,65 @@ bool result = PlantPlacementManager.Instance?.TryPlantSeedFromInventory( seedIte
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\WorldInteraction\Player\PlayerHungerSystem.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/WorldInteraction/Player/PlayerHungerSystem.cs
 using WegoSystem;
 
 pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
- float maxHunger;
+ [Header("Hunger Configuration")]
+ [Tooltip("Maximum hunger value. When reached, player starves.")]
+ [SerializeField] float maxHunger = 100f;
 
- [Tooltip("What fraction of max hunger the player starts with (e.g., 1.0 for 100%).")]
- [SerializeField] [Range(0f, 1f)] float startingHungerFraction = 1.0f;
+ [Tooltip("Starting hunger as a fraction of max (0 = not hungry, 1 = starving).")]
+ [SerializeField] [Range(0f, 1f)] float startingHungerFraction = 0f;
 
- [SerializeField] float hungerDepletionPerTick = 0.1f;
+ [Tooltip("How much hunger increases per tick.")]
+ [SerializeField] float hungerIncreasePerTick = 0.15f;
 
- pub float CurrentHunger { get; set; }
+ [Header("Hunger Thresholds")]
+ [Tooltip("Fraction of max hunger where 'hungry' state begins (yellow warning).")]
+ [SerializeField] [Range(0f, 1f)] float hungryThreshold = 0.5f;
+
+ [Tooltip("Fraction of max hunger where 'starving' state begins (red warning).")]
+ [SerializeField] [Range(0f, 1f)] float starvingThreshold = 0.8f;
+
+ float currentHunger;
+ bool hasStarved = false;
+ HungerState currentState = HungerState.Satisfied;
+
+ pub float CurrentHunger => currentHunger;
  pub float MaxHunger => maxHunger;
+ pub float HungerPercentage => maxHunger > 0 ? currentHunger / maxHunger : 0f;
+ pub HungerState CurrentState => currentState;
+ pub bool IsHungry => currentHunger >= maxHunger * hungryThreshold;
+ pub bool IsStarving => currentHunger >= maxHunger * starvingThreshold;
+ pub bool HasStarved => hasStarved;
 
  pub event Action<float, float> OnHungerChanged;
+ pub event Action<HungerState> OnStateChanged;
  pub event Action OnStarvation;
+ pub event Action OnBecameHungry;
+ pub event Action OnBecameStarving;
 
- bool hasStarved = false;
+ pub enum HungerState {
+  Satisfied,  // 0% to hungryThreshold
+  Hungry,     // hungryThreshold to starvingThreshold
+  Starving    // starvingThreshold to 100%
+ }
 
  void Start() {
   if (RunManager.HasInstance) {
    maxHunger = RunManager.Instance.playerMaxHunger;
   }
-  else {
-   Debug.LogError("[PlayerHungerSystem] RunManager not found! Defaulting max hunger to 100.");
-   maxHunger = 100f;
-  }
 
-  CurrentHunger = maxHunger * startingHungerFraction;
-  OnHungerChanged?.Invoke(CurrentHunger, maxHunger);
+  currentHunger = maxHunger * startingHungerFraction;
+  UpdateHungerState();
+  OnHungerChanged?.Invoke(currentHunger, maxHunger);
 
   if (TickManager.Instance != null) {
    TickManager.Instance.RegisterTickUpdateable(this);
   }
   else {
-   Debug.LogError("[PlayerHungerSystem] TickManager not found! Hunger will not deplete.");
+   Debug.LogError("[PlayerHungerSystem] TickManager not found! Hunger will not increase.");
   }
  }
 
@@ -7207,30 +7328,88 @@ pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
  }
 
  pub void OnTickUpdate(int currentTick) {
-  if (hasStarved || (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)) {
+  if (hasStarved) return;
+
+  if (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
    return;
   }
 
-  CurrentHunger -= hungerDepletionPerTick;
-  CurrentHunger = Mathf.Max(0, CurrentHunger);
+  currentHunger += hungerIncreasePerTick;
+  currentHunger = Mathf.Min(currentHunger, maxHunger);
 
-  OnHungerChanged?.Invoke(CurrentHunger, maxHunger);
+  UpdateHungerState();
+  OnHungerChanged?.Invoke(currentHunger, maxHunger);
 
-  if (CurrentHunger <= 0) {
+  if (currentHunger >= maxHunger) {
    hasStarved = true;
    OnStarvation?.Invoke();
-   Debug.LogWarning("Player has starved!");
+   Debug.LogWarning("[PlayerHungerSystem] Player has starved!");
+  }
+ }
+
+ void UpdateHungerState() {
+  HungerState newState;
+
+  if (currentHunger >= maxHunger * starvingThreshold) {
+   newState = HungerState.Starving;
+  }
+  else if (currentHunger >= maxHunger * hungryThreshold) {
+   newState = HungerState.Hungry;
+  }
+  else {
+   newState = HungerState.Satisfied;
+  }
+
+  if (newState != currentState) {
+   HungerState oldState = currentState;
+   currentState = newState;
+
+   OnStateChanged?.Invoke(newState);
+
+   if (newState == HungerState.Hungry && oldState == HungerState.Satisfied) {
+    OnBecameHungry?.Invoke();
+   }
+   else if (newState == HungerState.Starving) {
+    OnBecameStarving?.Invoke();
+   }
+
+   Debug.Log($"[PlayerHungerSystem] State changed: {oldState} -> {newState}");
   }
  }
 
  pub void Eat(float nutritionValue) {
   if (hasStarved || nutritionValue <= 0) return;
 
-  CurrentHunger += nutritionValue;
-  CurrentHunger = Mathf.Clamp(CurrentHunger, 0, maxHunger);
+  float oldHunger = currentHunger;
+  currentHunger -= nutritionValue;
+  currentHunger = Mathf.Clamp(currentHunger, 0, maxHunger);
 
-  Debug.Log($"Player ate food. Restored {nutritionValue} hunger. Current hunger: {CurrentHunger}/{maxHunger}");
-  OnHungerChanged?.Invoke(CurrentHunger, maxHunger);
+  UpdateHungerState();
+
+  Debug.Log($"[PlayerHungerSystem] Player ate food. Reduced hunger by {nutritionValue}. " +
+    $"Hunger: {oldHunger:F1} -> {currentHunger:F1}/{maxHunger}");
+
+  OnHungerChanged?.Invoke(currentHunger, maxHunger);
+ }
+
+ pub void SetHunger(float value) {
+  currentHunger = Mathf.Clamp(value, 0, maxHunger);
+  UpdateHungerState();
+  OnHungerChanged?.Invoke(currentHunger, maxHunger);
+ }
+
+ pub void ResetHunger() {
+  currentHunger = maxHunger * startingHungerFraction;
+  hasStarved = false;
+  UpdateHungerState();
+  OnHungerChanged?.Invoke(currentHunger, maxHunger);
+ }
+
+ pub void ModifyHunger(float amount) {
+  currentHunger += amount;
+  currentHunger = Mathf.Clamp(currentHunger, 0, maxHunger);
+  UpdateHungerState();
+  OnHungerChanged?.Invoke(currentHunger, maxHunger);
  }
 }
 
@@ -7391,7 +7570,7 @@ pub class ToolDefinition : ScriptableObject, ITooltipDataProvider {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\WorldInteraction\Tools\ToolSwitcher.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/WorldInteraction/Tools/ToolSwitcher.cs
 
 pub class ToolSwitcher : MonoBehaviour {
  pub stat ToolSwitcher Instance { get; set; }
@@ -7403,7 +7582,7 @@ pub class ToolSwitcher : MonoBehaviour {
  int currentIndex = 0;
 
  pub ToolDefinition CurrentTool { get; set; } = null;
- pub int CurrentRemainingUses { get; set; } = -1; // Setter is now private
+ pub int CurrentRemainingUses { get; set; } = -1;
 
  pub event Action<ToolDefinition> OnToolChanged;
  pub event Action<int> OnUsesChanged;
@@ -7492,6 +7671,30 @@ pub class ToolSwitcher : MonoBehaviour {
   OnUsesChanged?.Invoke(CurrentRemainingUses);
  }
 
+ pub bool HasUsesRemaining() {
+  if (CurrentTool == null) return false;
+
+  if (!CurrentTool.limitedUses || CurrentRemainingUses == -1) {
+   return true;
+  }
+
+  return CurrentRemainingUses > 0;
+ }
+
+ pub bool HasUsesRemaining(ToolDefinition toolDef) {
+  if (toolDef == null) return false;
+
+  if (!toolDef.limitedUses) {
+   return true;
+  }
+
+  if (toolUses.TryGetValue(toolDef, out int uses)) {
+   return uses > 0 || uses == -1;
+  }
+
+  return toolDef.initialUses > 0;
+ }
+
  pub bool TryConsumeUse() {
   if (CurrentTool == null) return false;
 
@@ -7501,7 +7704,7 @@ pub class ToolSwitcher : MonoBehaviour {
 
   if (CurrentRemainingUses > 0) {
    CurrentRemainingUses--;
-   toolUses[CurrentTool] = CurrentRemainingUses; // Update the persistent dictionary
+   toolUses[CurrentTool] = CurrentRemainingUses;
    Debug.Log($"[ToolSwitcher TryConsumeUse] Consumed use for '{CurrentTool.displayName}'. Remaining: {CurrentRemainingUses}");
    OnUsesChanged?.Invoke(CurrentRemainingUses);
    return true;
@@ -7538,27 +7741,135 @@ pub class ToolSwitcher : MonoBehaviour {
 // FILE: Assets\Scripts\Ecosystem\Doris\DorisController.cs
 
 using WegoSystem;
+using Abracodabra.Genes;
 
 namespace Abracodabra.Ecosystem {
  pub class DorisController : MonoBehaviour, IWorldInteractable {
+  [Header("Configuration")]
+  [SerializeField] DorisDefinition definition;
+
   [Header("References")]
   [SerializeField] MultiTileEntity multiTileEntity;
   [SerializeField] SpriteRenderer spriteRenderer;
+  [SerializeField] DorisHungerSystem hungerSystem;
 
   [Header("Hover Feedback")]
   [SerializeField] Color normalColor = Color.white;
   [SerializeField] Color hoverColor = new Color(1f, 1f, 0.8f, 1f);
 
+  [Header("Starvation Behavior")]
+  [SerializeField] int ticksSinceLastPlantEat = 0;
+
   [Header("Debug")]
   [SerializeField] bool debugLog = false;
 
   bool isHovered = false;
+  bool isInitialized = false;
 
-  pub int InteractionPriority => multiTileEntity != null ? multiTileEntity.InteractionPriority : 200;
+  pub event Action<PlantGrowth> OnDorisAtePlant;
+  pub event Action<float> OnDorisFed;
+
+  pub DorisDefinition Definition => definition;
+  pub DorisHungerSystem HungerSystem => hungerSystem;
+  pub MultiTileEntity MultiTileEntity => multiTileEntity;
+
+  pub int InteractionPriority => multiTileEntity != null
+   ? multiTileEntity.InteractionPriority
+   : (definition != null ? 200 : 200);
 
   pub bool CanInteract => enabled && gameObject.activeInHierarchy;
 
   pub Vector3 InteractionWorldPosition => transform.position;
+
+  void Awake() {
+   CacheComponents();
+   ValidateComponents();
+  }
+
+  void Start() {
+   Initialize();
+  }
+
+  void OnDestroy() {
+   UnsubscribeFromEvents();
+  }
+
+  void OnValidate() {
+   if (multiTileEntity == null) {
+    multiTileEntity = GetComponent<MultiTileEntity>();
+   }
+   if (hungerSystem == null) {
+    hungerSystem = GetComponent<DorisHungerSystem>();
+   }
+  }
+
+  void CacheComponents() {
+   if (multiTileEntity == null) {
+    multiTileEntity = GetComponent<MultiTileEntity>();
+   }
+   if (spriteRenderer == null) {
+    spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+   }
+   if (hungerSystem == null) {
+    hungerSystem = GetComponent<DorisHungerSystem>();
+    if (hungerSystem == null) {
+     hungerSystem = gameObject.AddComponent<DorisHungerSystem>();
+     Debug.Log("[DorisController] Added DorisHungerSystem component.");
+    }
+   }
+  }
+
+  void ValidateComponents() {
+   if (definition == null) {
+    Debug.LogError("[DorisController] Missing DorisDefinition! Doris will not function properly.", this);
+   }
+   if (multiTileEntity == null) {
+    Debug.LogWarning("[DorisController] Missing MultiTileEntity reference.", this);
+   }
+   if (spriteRenderer == null) {
+    Debug.LogWarning("[DorisController] Missing SpriteRenderer reference.", this);
+   }
+  }
+
+  void Initialize() {
+   if (isInitialized) return;
+
+   if (hungerSystem != null && definition != null) {
+    hungerSystem.Initialize(definition);
+   }
+
+   if (spriteRenderer != null) {
+    normalColor = spriteRenderer.color;
+   }
+
+   SubscribeToEvents();
+
+   UpdateVisualState();
+
+   isInitialized = true;
+
+   if (debugLog) {
+    Debug.Log("[DorisController] Initialized successfully.");
+   }
+  }
+
+  void SubscribeToEvents() {
+   if (hungerSystem != null) {
+    hungerSystem.OnStateChanged += HandleHungerStateChanged;
+    hungerSystem.OnStarvationTick += HandleStarvationTick;
+    hungerSystem.OnFed += HandleFed;
+    hungerSystem.OnHungerChanged += HandleHungerChanged;
+   }
+  }
+
+  void UnsubscribeFromEvents() {
+   if (hungerSystem != null) {
+    hungerSystem.OnStateChanged -= HandleHungerStateChanged;
+    hungerSystem.OnStarvationTick -= HandleStarvationTick;
+    hungerSystem.OnFed -= HandleFed;
+    hungerSystem.OnHungerChanged -= HandleHungerChanged;
+   }
+  }
 
   pub bool OnInteract(GameObject interactor, ToolDefinition tool) {
    if (tool == null) {
@@ -7595,46 +7906,480 @@ namespace Abracodabra.Ecosystem {
    }
   }
 
-  void Awake() {
-   if (multiTileEntity == null) {
-    multiTileEntity = GetComponent<MultiTileEntity>();
-   }
-
-   if (spriteRenderer == null) {
-    spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-   }
-  }
-
-  void Start() {
-   if (spriteRenderer != null) {
-    normalColor = spriteRenderer.color;
-   }
-  }
-
-  void OnValidate() {
-   if (multiTileEntity == null) {
-    multiTileEntity = GetComponent<MultiTileEntity>();
-   }
-  }
-
   void OnClickedWithHands(GameObject interactor) {
    if (debugLog) {
     Debug.Log($"[DorisController] Player clicked Doris with bare hands");
    }
 
-   // TODO: Open Doris UI panel
+   // TODO: Open Doris UI panel (Task 9 - DorisHungerUI)
    // TODO: Show Doris info/status
    // TODO: Trigger dialogue if any
   }
 
   bool HandleToolInteraction(GameObject interactor, ToolDefinition tool) {
-   // TODO: Check if this is a food item being given to Doris
+   // TODO: Task 2 - Feeding Mechanism
+
+   if (debugLog) {
+    Debug.Log($"[DorisController] Tool interaction with '{tool.displayName}' - not yet implemented");
+   }
 
    return true;
   }
 
-  // TODO: Implement these based on your design document
+  pub bool FeedDoris(float nutritionValue, object foodSource = null) {
+   if (hungerSystem == null || nutritionValue <= 0) {
+    return false;
+   }
 
+   float actualReduction = hungerSystem.Feed(nutritionValue);
+
+   if (actualReduction > 0) {
+    if (definition != null && definition.feedSound != null) {
+     AudioSource.PlayClipAtPoint(definition.feedSound, transform.position);
+    }
+
+    OnDorisFed?.Invoke(nutritionValue);
+
+    if (debugLog) {
+     Debug.Log($"[DorisController] Fed Doris with {nutritionValue:F1} nutrition. " +
+       $"Hunger reduced by {actualReduction:F1}");
+    }
+
+    return true;
+   }
+
+   return false;
+  }
+
+  void HandleHungerStateChanged(DorisHungerSystem.HungerState oldState, DorisHungerSystem.HungerState newState) {
+   if (debugLog) {
+    Debug.Log($"[DorisController] Hunger state changed: {oldState} -> {newState}");
+   }
+
+   UpdateVisualState();
+   PlayStateChangeAudio(newState);
+  }
+
+  void HandleHungerChanged(float currentHunger, float maxHunger) {
+  }
+
+  void HandleFed(float amount) {
+  }
+
+  void HandleStarvationTick() {
+   if (definition == null) return;
+
+   ticksSinceLastPlantEat++;
+
+   if (ticksSinceLastPlantEat >= definition.ticksBetweenPlantEating) {
+    ticksSinceLastPlantEat = 0;
+    TryEatNearbyPlant();
+   }
+  }
+
+  void TryEatNearbyPlant() {
+   if (definition == null || multiTileEntity == null) return;
+   if (GridPositionManager.Instance == null) return;
+
+   var entitiesInRadius = GridPositionManager.Instance.GetEntitiesInRadius(
+    multiTileEntity.AnchorPosition,
+    definition.plantEatingRadius,
+    true // Use circle radius
+   );
+
+   PlantGrowth nearestPlant = null;
+   float nearestDist = float.MaxValue;
+
+   foreach (var entity in entitiesInRadius) {
+    var plant = entity.GetComponent<PlantGrowth>();
+    if (plant != null && (plant.CurrentState == PlantState.Growing || plant.CurrentState == PlantState.Mature)) {
+     float dist = entity.Position.ManhattanDistance(multiTileEntity.AnchorPosition);
+     if (dist < nearestDist) {
+      nearestDist = dist;
+      nearestPlant = plant;
+     }
+    }
+   }
+
+   if (nearestPlant != null) {
+    EatPlant(nearestPlant);
+   }
+  }
+
+  void EatPlant(PlantGrowth plant) {
+   if (plant == null) return;
+
+   Debug.LogWarning($"[DorisController] Doris ate plant: {plant.gameObject.name}");
+
+   if (definition != null && definition.eatPlantSound != null) {
+    AudioSource.PlayClipAtPoint(definition.eatPlantSound, transform.position);
+   }
+
+   if (hungerSystem != null) {
+    hungerSystem.OnAtePlant();
+   }
+
+   OnDorisAtePlant?.Invoke(plant);
+
+   UnityEngine.Object.Destroy(plant.gameObject);
+  }
+
+  void UpdateVisualState() {
+   if (spriteRenderer == null || definition == null || hungerSystem == null) return;
+
+   Sprite targetSprite = null;
+
+   switch (hungerSystem.CurrentState) {
+    case DorisHungerSystem.HungerState.Satisfied:
+     targetSprite = definition.happySprite;
+     break;
+    case DorisHungerSystem.HungerState.Hungry:
+     targetSprite = definition.hungrySprite;
+     break;
+    case DorisHungerSystem.HungerState.Starving:
+     targetSprite = definition.starvingSprite;
+     break;
+   }
+
+   if (targetSprite != null) {
+    spriteRenderer.sprite = targetSprite;
+   }
+  }
+
+  void PlayStateChangeAudio(DorisHungerSystem.HungerState newState) {
+   if (definition == null) return;
+
+   AudioClip clip = null;
+
+   switch (newState) {
+    case DorisHungerSystem.HungerState.Hungry:
+     clip = definition.hungrySound;
+     break;
+    case DorisHungerSystem.HungerState.Starving:
+     clip = definition.hungrySound; // Could be a different "angry" sound
+     break;
+   }
+
+   if (clip != null) {
+    AudioSource.PlayClipAtPoint(clip, transform.position);
+   }
+  }
+
+  pub (float current, float max, float percent, DorisHungerSystem.HungerState state) GetHungerInfo() {
+   if (hungerSystem == null) {
+    return (0, 100, 0, DorisHungerSystem.HungerState.Satisfied);
+   }
+
+   return (
+    hungerSystem.CurrentHunger,
+    hungerSystem.MaxHunger,
+    hungerSystem.HungerPercent,
+    hungerSystem.CurrentState
+   );
+  }
+
+  pub void ResetForNewRound() {
+   ticksSinceLastPlantEat = 0;
+
+   if (hungerSystem != null) {
+    hungerSystem.ResetHunger();
+   }
+
+   UpdateVisualState();
+
+   if (debugLog) {
+    Debug.Log("[DorisController] Reset for new round.");
+   }
+  }
+
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Doris\DorisDefinition.cs
+
+﻿// FILE: Assets/Scripts/Ecosystem/Doris/DorisDefinition.cs
+
+namespace Abracodabra.Ecosystem {
+ pub class DorisDefinition : ScriptableObject {
+  [Header("Identity")]
+  [Tooltip("Display name for UI and logs.")]
+  pub string displayName = "Doris";
+
+  [Tooltip("Description shown in tooltips/UI.")]
+  pub string description = "A mysterious creature living in a stump. Always hungry.";
+
+  [Header("Hunger Configuration")]
+  [Tooltip("Maximum hunger value. When reached, Doris is fully starving.")]
+  [Min(1f)]
+  pub float maxHunger = 100f;
+
+  [Tooltip("How much hunger increases per tick during Growth & Threat phase.")]
+  [Min(0f)]
+  pub float hungerPerTick = 0.25f;
+
+  [Tooltip("Percentage of maxHunger where Doris becomes 'hungry' (visual/audio cues).")]
+  [Range(0f, 1f)]
+  pub float hungryThreshold = 0.4f;
+
+  [Tooltip("Percentage of maxHunger where Doris becomes 'starving' (will eat plants).")]
+  [Range(0f, 1f)]
+  pub float starvingThreshold = 0.8f;
+
+  [Header("Starvation Behavior")]
+  [Tooltip("How many ticks between each plant eating attempt when starving.")]
+  [Min(1)]
+  pub int ticksBetweenPlantEating = 5;
+
+  [Tooltip("How far (in tiles) Doris can reach to eat plants when starving.")]
+  [Min(1)]
+  pub int plantEatingRadius = 4;
+
+  [Tooltip("How much hunger is reduced when Doris eats a plant (less than player feeding).")]
+  [Min(0f)]
+  pub float hungerReductionFromPlant = 10f;
+
+  [Header("Feeding")]
+  [Tooltip("Base multiplier for nutrition when player feeds Doris.")]
+  [Min(0.1f)]
+  pub float feedingEfficiency = 1f;
+
+  [Header("Visual")]
+  [Tooltip("Sprite for happy state (low hunger).")]
+  pub Sprite happySprite;
+
+  [Tooltip("Sprite for hungry state (medium hunger).")]
+  pub Sprite hungrySprite;
+
+  [Tooltip("Sprite for starving/hangry state (high hunger).")]
+  pub Sprite starvingSprite;
+
+  [Header("Audio")]
+  [Tooltip("Sound when fed.")]
+  pub AudioClip feedSound;
+
+  [Tooltip("Sound when becoming hungry.")]
+  pub AudioClip hungrySound;
+
+  [Tooltip("Sound when eating a plant (starving behavior).")]
+  pub AudioClip eatPlantSound;
+
+  pub float HungryHungerValue => maxHunger * hungryThreshold;
+  pub float StarvingHungerValue => maxHunger * starvingThreshold;
+
+  void OnValidate() {
+   maxHunger = Mathf.Max(1f, maxHunger);
+   hungerPerTick = Mathf.Max(0f, hungerPerTick);
+   ticksBetweenPlantEating = Mathf.Max(1, ticksBetweenPlantEating);
+   plantEatingRadius = Mathf.Max(1, plantEatingRadius);
+   hungerReductionFromPlant = Mathf.Max(0f, hungerReductionFromPlant);
+   feedingEfficiency = Mathf.Max(0.1f, feedingEfficiency);
+
+   if (starvingThreshold < hungryThreshold) {
+    starvingThreshold = hungryThreshold;
+   }
+  }
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Doris\DorisHungerSystem.cs
+
+﻿// FILE: Assets/Scripts/Ecosystem/Doris/DorisHungerSystem.cs
+using WegoSystem;
+
+namespace Abracodabra.Ecosystem {
+ pub class DorisHungerSystem : MonoBehaviour, ITickUpdateable {
+  [Header("Configuration")]
+  [SerializeField] DorisDefinition definition;
+
+  [Header("Runtime State (Debug)")]
+  [SerializeField] float currentHunger = 0f;
+  [SerializeField] HungerState currentState = HungerState.Satisfied;
+
+  pub event Action<float, float> OnHungerChanged;           // (currentHunger, maxHunger)
+  pub event Action<HungerState, HungerState> OnStateChanged; // (oldState, newState)
+  pub event Action OnBecameHungry;                           // Crossed into hungry zone
+  pub event Action OnBecameStarving;                         // Crossed into starving zone
+  pub event Action OnBecameSatisfied;                        // Fed enough to exit hungry/starving
+  pub event Action OnStarvationTick;                         // Fires each tick while starving
+  pub event Action<float> OnFed;                             // (amountFed) when feeding occurs
+
+  pub float CurrentHunger => currentHunger;
+  pub float MaxHunger => definition != null ? definition.maxHunger : 100f;
+  pub float HungerPercent => definition != null ? currentHunger / definition.maxHunger : 0f;
+  pub HungerState CurrentState => currentState;
+  pub DorisDefinition Definition => definition;
+
+  pub bool IsSatisfied => currentState == HungerState.Satisfied;
+  pub bool IsHungry => currentState == HungerState.Hungry || currentState == HungerState.Starving;
+  pub bool IsStarving => currentState == HungerState.Starving;
+
+  bool isInitialized = false;
+
+  pub enum HungerState {
+   Satisfied,  // Low hunger - Doris is happy
+   Hungry,     // Medium hunger - visual/audio warnings
+   Starving    // High hunger - will eat plants
+  }
+
+  void Start() {
+   Initialize();
+  }
+
+  pub void Initialize() {
+   if (isInitialized) return;
+
+   if (definition == null) {
+    Debug.LogError("[DorisHungerSystem] No DorisDefinition assigned! Creating default values.");
+    return;
+   }
+
+   currentHunger = 0f;
+   currentState = HungerState.Satisfied;
+
+   if (TickManager.Instance != null) {
+    TickManager.Instance.RegisterTickUpdateable(this);
+    Debug.Log("[DorisHungerSystem] Registered with TickManager.");
+   } else {
+    Debug.LogError("[DorisHungerSystem] TickManager not found! Hunger will not increase.");
+   }
+
+   isInitialized = true;
+   OnHungerChanged?.Invoke(currentHunger, definition.maxHunger);
+  }
+
+  pub void Initialize(DorisDefinition newDefinition) {
+   definition = newDefinition;
+   isInitialized = false;
+   Initialize();
+  }
+
+  void OnDestroy() {
+   if (TickManager.Instance != null) {
+    TickManager.Instance.UnregisterTickUpdateable(this);
+   }
+  }
+
+  pub void OnTickUpdate(int currentTick) {
+   if (definition == null) return;
+
+   if (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
+    return;
+   }
+
+   float previousHunger = currentHunger;
+   currentHunger += definition.hungerPerTick;
+   currentHunger = Mathf.Clamp(currentHunger, 0f, definition.maxHunger);
+
+   UpdateHungerState();
+
+   if (!Mathf.Approximately(previousHunger, currentHunger)) {
+    OnHungerChanged?.Invoke(currentHunger, definition.maxHunger);
+   }
+
+   if (currentState == HungerState.Starving) {
+    OnStarvationTick?.Invoke();
+   }
+  }
+
+  void UpdateHungerState() {
+   HungerState newState = CalculateState();
+
+   if (newState != currentState) {
+    HungerState oldState = currentState;
+    currentState = newState;
+
+    OnStateChanged?.Invoke(oldState, newState);
+
+    switch (newState) {
+     case HungerState.Hungry when oldState == HungerState.Satisfied:
+      OnBecameHungry?.Invoke();
+      Debug.Log("[DorisHungerSystem] Doris is getting hungry!");
+      break;
+
+     case HungerState.Starving:
+      OnBecameStarving?.Invoke();
+      Debug.LogWarning("[DorisHungerSystem] Doris is STARVING! She will start eating plants!");
+      break;
+
+     case HungerState.Satisfied when oldState != HungerState.Satisfied:
+      OnBecameSatisfied?.Invoke();
+      Debug.Log("[DorisHungerSystem] Doris is satisfied!");
+      break;
+    }
+   }
+  }
+
+  HungerState CalculateState() {
+   if (definition == null) return HungerState.Satisfied;
+
+   float hungerPercent = currentHunger / definition.maxHunger;
+
+   if (hungerPercent >= definition.starvingThreshold) {
+    return HungerState.Starving;
+   }
+   if (hungerPercent >= definition.hungryThreshold) {
+    return HungerState.Hungry;
+   }
+   return HungerState.Satisfied;
+  }
+
+  pub float Feed(float nutritionValue) {
+   if (definition == null || nutritionValue <= 0) return 0f;
+
+   float effectiveNutrition = nutritionValue * definition.feedingEfficiency;
+   float previousHunger = currentHunger;
+
+   currentHunger -= effectiveNutrition;
+   currentHunger = Mathf.Clamp(currentHunger, 0f, definition.maxHunger);
+
+   float actualReduction = previousHunger - currentHunger;
+
+   Debug.Log($"[DorisHungerSystem] Fed {nutritionValue:F1} (effective: {effectiveNutrition:F1}). " +
+     $"Hunger: {currentHunger:F1}/{definition.maxHunger:F0}");
+
+   OnFed?.Invoke(actualReduction);
+   OnHungerChanged?.Invoke(currentHunger, definition.maxHunger);
+   UpdateHungerState();
+
+   return actualReduction;
+  }
+
+  pub void OnAtePlant() {
+   if (definition == null) return;
+
+   float previousHunger = currentHunger;
+   currentHunger -= definition.hungerReductionFromPlant;
+   currentHunger = Mathf.Clamp(currentHunger, 0f, definition.maxHunger);
+
+   Debug.Log($"[DorisHungerSystem] Doris ate a plant! Hunger reduced by {definition.hungerReductionFromPlant:F1}. " +
+     $"Hunger: {currentHunger:F1}/{definition.maxHunger:F0}");
+
+   OnHungerChanged?.Invoke(currentHunger, definition.maxHunger);
+   UpdateHungerState();
+  }
+
+  pub void ResetHunger() {
+   currentHunger = 0f;
+   UpdateHungerState();
+   OnHungerChanged?.Invoke(currentHunger, definition?.maxHunger ?? 100f);
+   Debug.Log("[DorisHungerSystem] Hunger reset to 0.");
+  }
+
+  pub void SetHunger(float value) {
+   if (definition == null) return;
+
+   currentHunger = Mathf.Clamp(value, 0f, definition.maxHunger);
+   UpdateHungerState();
+   OnHungerChanged?.Invoke(currentHunger, definition.maxHunger);
+  }
+
+  void OnValidate() {
+   if (definition != null) {
+    currentHunger = Mathf.Clamp(currentHunger, 0f, definition.maxHunger);
+   }
+  }
  }
 }
 
@@ -10272,9 +11017,16 @@ namespace Abracodabra.UI.Toolkit {
   VisualElement planningPanel, hudPanel;
   Button startDayButton;
 
-  VisualElement hungerBarFill;
-  Label hungerText;
   Label tickText;
+
+  VisualElement playerHungerBarFill;
+  Label playerHungerText;
+
+  VisualElement dorisHungerFooter;
+  VisualElement dorisHungerBarFill;
+  Label dorisHungerText;
+  Label dorisStateText;
+
   VisualElement hudTooltipPanel;
   Image hudTooltipIcon;
   Label hudTooltipName;
@@ -10282,6 +11034,10 @@ namespace Abracodabra.UI.Toolkit {
   Label hudTooltipDescription;
 
   PlayerHungerSystem playerHungerSystem;
+
+  MonoBehaviour dorisHungerSystemRef;
+  System.Reflection.EventInfo dorisHungerChangedEvent;
+  System.Reflection.EventInfo dorisStateChangedEvent;
 
   int TotalInventorySlots => inventoryRows * inventoryColumns;
 
@@ -10344,7 +11100,7 @@ namespace Abracodabra.UI.Toolkit {
    }
 
    if (playerHungerSystem != null) {
-    playerHungerSystem.OnHungerChanged -= UpdateHungerDisplay;
+    playerHungerSystem.OnHungerChanged -= UpdatePlayerHungerDisplay;
    }
 
    if (TickManager.Instance != null) {
@@ -10356,6 +11112,8 @@ namespace Abracodabra.UI.Toolkit {
    }
 
    HotbarSelectionService.OnSelectionChanged -= HandleHotbarSelectionChanged;
+
+   UnsubscribeFromDoris();
   }
 
   void InitializeControllers() {
@@ -10441,9 +11199,15 @@ namespace Abracodabra.UI.Toolkit {
   }
 
   void InitializeHUD() {
-   hungerBarFill = rootElement.Q<VisualElement>("hunger-bar-fill");
-   hungerText = rootElement.Q<Label>("hunger-text");
    tickText = rootElement.Q<Label>("tick-text");
+
+   playerHungerBarFill = rootElement.Q<VisualElement>("player-hunger-bar-fill");
+   playerHungerText = rootElement.Q<Label>("player-hunger-text");
+
+   dorisHungerFooter = rootElement.Q<VisualElement>("doris-hunger-footer");
+   dorisHungerBarFill = rootElement.Q<VisualElement>("doris-hunger-bar-fill");
+   dorisHungerText = rootElement.Q<Label>("doris-hunger-text");
+   dorisStateText = rootElement.Q<Label>("doris-state-text");
 
    hudTooltipPanel = rootElement.Q<VisualElement>("hud-tooltip-panel");
    hudTooltipIcon = rootElement.Q<Image>("hud-tooltip-icon");
@@ -10453,12 +11217,15 @@ namespace Abracodabra.UI.Toolkit {
 
    playerHungerSystem = FindFirstObjectByType<PlayerHungerSystem>();
    if (playerHungerSystem != null) {
-    playerHungerSystem.OnHungerChanged += UpdateHungerDisplay;
-    UpdateHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+    playerHungerSystem.OnHungerChanged += UpdatePlayerHungerDisplay;
+    UpdatePlayerHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+    Debug.Log("[GameUIManager] Subscribed to PlayerHungerSystem");
    }
    else {
-    Debug.LogWarning("[GameUIManager] PlayerHungerSystem not found - hunger display won't update");
+    Debug.LogWarning("[GameUIManager] PlayerHungerSystem not found - player hunger display won't update");
    }
+
+   TryFindAndSubscribeToDoris();
 
    if (TickManager.Instance != null) {
     TickManager.Instance.OnTickAdvanced += UpdateTickDisplay;
@@ -10468,6 +11235,94 @@ namespace Abracodabra.UI.Toolkit {
    HotbarSelectionService.OnSelectionChanged += HandleHotbarSelectionChanged;
 
    Debug.Log("[GameUIManager] HUD initialized");
+  }
+
+  void TryFindAndSubscribeToDoris() {
+   if (dorisHungerFooter != null) {
+    dorisHungerFooter.style.display = DisplayStyle.None;
+   }
+
+   var dorisType = System.Type.GetType("Abracodabra.Ecosystem.DorisHungerSystem, Assembly-CSharp");
+   if (dorisType == null) {
+    Debug.Log("[GameUIManager] DorisHungerSystem type not found - Doris UI disabled");
+    return;
+   }
+
+   dorisHungerSystemRef = FindFirstObjectByType(dorisType) as MonoBehaviour;
+   if (dorisHungerSystemRef == null) {
+    Debug.Log("[GameUIManager] DorisHungerSystem instance not found in scene - Doris UI disabled");
+    return;
+   }
+
+   try {
+    dorisHungerChangedEvent = dorisType.GetEvent("OnHungerChanged");
+    dorisStateChangedEvent = dorisType.GetEvent("OnStateChanged");
+
+    if (dorisHungerChangedEvent != null) {
+     var handler = Delegate.CreateDelegate(
+      dorisHungerChangedEvent.EventHandlerType,
+      this,
+      typeof(GameUIManager).GetMethod("OnDorisHungerChanged", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+     );
+     dorisHungerChangedEvent.AddEventHandler(dorisHungerSystemRef, handler);
+    }
+
+    if (dorisHungerFooter != null) {
+     dorisHungerFooter.style.display = DisplayStyle.Flex;
+    }
+
+    var currentHungerProp = dorisType.GetProperty("CurrentHunger");
+    var maxHungerProp = dorisType.GetProperty("MaxHunger");
+    var currentStateProp = dorisType.GetProperty("CurrentState");
+
+    if (currentHungerProp != null && maxHungerProp != null) {
+     float current = (float)currentHungerProp.GetValue(dorisHungerSystemRef);
+     float max = (float)maxHungerProp.GetValue(dorisHungerSystemRef);
+     UpdateDorisHungerDisplay(current, max);
+    }
+
+    if (currentStateProp != null) {
+     int state = (int)currentStateProp.GetValue(dorisHungerSystemRef);
+     UpdateDorisStateDisplayByInt(state);
+    }
+
+    Debug.Log("[GameUIManager] Successfully subscribed to DorisHungerSystem");
+   }
+   catch (System.Exception e) {
+    Debug.LogWarning($"[GameUIManager] Failed to subscribe to Doris events: {e.Message}");
+   }
+  }
+
+  void UnsubscribeFromDoris() {
+   if (dorisHungerSystemRef != null && dorisHungerChangedEvent != null) {
+    try {
+     var handler = Delegate.CreateDelegate(
+      dorisHungerChangedEvent.EventHandlerType,
+      this,
+      typeof(GameUIManager).GetMethod("OnDorisHungerChanged", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+     );
+     dorisHungerChangedEvent.RemoveEventHandler(dorisHungerSystemRef, handler);
+    }
+    catch { }
+   }
+  }
+
+  void OnDorisHungerChanged(float currentHunger, float maxHunger) {
+   UpdateDorisHungerDisplay(currentHunger, maxHunger);
+
+   if (dorisHungerSystemRef != null) {
+    var dorisType = dorisHungerSystemRef.GetType();
+    var currentStateProp = dorisType.GetProperty("CurrentState");
+    if (currentStateProp != null) {
+     int state = (int)currentStateProp.GetValue(dorisHungerSystemRef);
+     UpdateDorisStateDisplayByInt(state);
+    }
+   }
+  }
+
+  pub void RefreshDorisReference() {
+   UnsubscribeFromDoris();
+   TryFindAndSubscribeToDoris();
   }
 
   void CreateStartDayButton() {
@@ -10579,24 +11434,68 @@ namespace Abracodabra.UI.Toolkit {
    Debug.Log($"[GameUIManager] Tool uses changed: {remainingUses} remaining - UI refreshed");
   }
 
-  void UpdateHungerDisplay(float currentHunger, float maxHunger) {
-   if (hungerBarFill != null) {
+  void UpdatePlayerHungerDisplay(float currentHunger, float maxHunger) {
+   if (playerHungerBarFill != null) {
     float percentage = maxHunger > 0 ? (currentHunger / maxHunger) * 100f : 0f;
-    hungerBarFill.style.width = Length.Percent(percentage);
+    playerHungerBarFill.style.width = Length.Percent(percentage);
 
-    if (percentage <= 25f) {
-     hungerBarFill.style.backgroundColor = new Color(0.85f, 0.25f, 0.25f);
+    if (percentage >= 80f) {
+     playerHungerBarFill.style.backgroundColor = new Color(0.9f, 0.25f, 0.25f);
     }
-    else if (percentage <= 50f) {
-     hungerBarFill.style.backgroundColor = new Color(0.9f, 0.6f, 0.2f);
+    else if (percentage >= 50f) {
+     playerHungerBarFill.style.backgroundColor = new Color(0.95f, 0.7f, 0.2f);
     }
     else {
-     hungerBarFill.style.backgroundColor = new Color(0.86f, 0.47f, 0.2f);
+     playerHungerBarFill.style.backgroundColor = new Color(0.4f, 0.75f, 0.4f);
     }
    }
 
-   if (hungerText != null) {
-    hungerText.text = $"{Mathf.CeilToInt(currentHunger)}/{Mathf.CeilToInt(maxHunger)}";
+   if (playerHungerText != null) {
+    playerHungerText.text = $"{Mathf.CeilToInt(currentHunger)}/{Mathf.CeilToInt(maxHunger)}";
+   }
+  }
+
+  void UpdateDorisHungerDisplay(float currentHunger, float maxHunger) {
+   if (dorisHungerBarFill != null) {
+    float percentage = maxHunger > 0 ? (currentHunger / maxHunger) * 100f : 0f;
+    dorisHungerBarFill.style.width = Length.Percent(percentage);
+
+    if (percentage >= 80f) {
+     dorisHungerBarFill.style.backgroundColor = new Color(0.9f, 0.25f, 0.25f);
+    }
+    else if (percentage >= 50f) {
+     dorisHungerBarFill.style.backgroundColor = new Color(0.95f, 0.6f, 0.2f);
+    }
+    else {
+     dorisHungerBarFill.style.backgroundColor = new Color(0.4f, 0.75f, 0.4f);
+    }
+   }
+
+   if (dorisHungerText != null) {
+    dorisHungerText.text = $"{Mathf.CeilToInt(currentHunger)}/{Mathf.CeilToInt(maxHunger)}";
+   }
+  }
+
+  void UpdateDorisStateDisplayByInt(int stateValue) {
+   if (dorisStateText == null) return;
+
+   dorisStateText.RemoveFromClassList("doris-state-satisfied");
+   dorisStateText.RemoveFromClassList("doris-state-hungry");
+   dorisStateText.RemoveFromClassList("doris-state-starving");
+
+   switch (stateValue) {
+    case 0: // Satisfied
+     dorisStateText.text = "😊 Satisfied";
+     dorisStateText.AddToClassList("doris-state-satisfied");
+     break;
+    case 1: // Hungry
+     dorisStateText.text = "😐 Hungry";
+     dorisStateText.AddToClassList("doris-state-hungry");
+     break;
+    case 2: // Starving
+     dorisStateText.text = "😡 STARVING!";
+     dorisStateText.AddToClassList("doris-state-starving");
+     break;
    }
   }
 
@@ -10611,61 +11510,61 @@ namespace Abracodabra.UI.Toolkit {
   }
 
   void UpdateHUDTooltip(UIInventoryItem selectedItem) {
- if (selectedItem == null || hudTooltipPanel == null) {
-  if (hudTooltipPanel != null) {
-   hudTooltipPanel.style.display = DisplayStyle.None;
+   if (selectedItem == null || hudTooltipPanel == null) {
+    if (hudTooltipPanel != null) {
+     hudTooltipPanel.style.display = DisplayStyle.None;
+    }
+    return;
+   }
+
+   hudTooltipPanel.style.display = DisplayStyle.Flex;
+
+   switch (selectedItem.Type) {
+    case UIInventoryItem.ItemType.Seed:
+     var seed = selectedItem.SeedTemplate;
+     if (seed != null) {
+      if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
+      if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
+      if (hudTooltipType != null) hudTooltipType.text = "Seed";
+      if (hudTooltipDescription != null) hudTooltipDescription.text = seed.description;
+     }
+     break;
+
+    case UIInventoryItem.ItemType.Tool:
+     var tool = selectedItem.ToolDefinition;
+     if (tool != null) {
+      if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
+      if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
+      if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
+      if (hudTooltipDescription != null) hudTooltipDescription.text = tool.GetTooltipDescription();
+     }
+     break;
+
+    case UIInventoryItem.ItemType.Gene:
+     var gene = selectedItem.Gene ?? selectedItem.GeneInstance?.GetGene();
+     if (gene != null) {
+      if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
+      if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
+      if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
+      if (hudTooltipDescription != null) hudTooltipDescription.text = gene.description;
+     }
+     break;
+
+    case UIInventoryItem.ItemType.Resource:
+     var resource = selectedItem.ResourceInstance;
+     if (resource?.definition != null) {
+      if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
+      if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
+      if (hudTooltipType != null) hudTooltipType.text = "Resource";
+      if (hudTooltipDescription != null) hudTooltipDescription.text = resource.definition.description;
+     }
+     break;
+
+    default:
+     hudTooltipPanel.style.display = DisplayStyle.None;
+     break;
+   }
   }
-  return;
- }
-
- hudTooltipPanel.style.display = DisplayStyle.Flex;
-
- switch (selectedItem.Type) {
-  case UIInventoryItem.ItemType.Seed:
-   var seed = selectedItem.SeedTemplate;
-   if (seed != null) {
-    if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
-    if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
-    if (hudTooltipType != null) hudTooltipType.text = "Seed";
-    if (hudTooltipDescription != null) hudTooltipDescription.text = seed.description;
-   }
-   break;
-
-  case UIInventoryItem.ItemType.Tool:
-   var tool = selectedItem.ToolDefinition;
-   if (tool != null) {
-    if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
-    if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
-    if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
-    if (hudTooltipDescription != null) hudTooltipDescription.text = tool.GetTooltipDescription();
-   }
-   break;
-
-  case UIInventoryItem.ItemType.Gene:
-   var gene = selectedItem.Gene ?? selectedItem.GeneInstance?.GetGene();
-   if (gene != null) {
-    if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
-    if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
-    if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
-    if (hudTooltipDescription != null) hudTooltipDescription.text = gene.description;
-   }
-   break;
-
-  case UIInventoryItem.ItemType.Resource:
-   var resource = selectedItem.ResourceInstance;
-   if (resource?.definition != null) {
-    if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
-    if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
-    if (hudTooltipType != null) hudTooltipType.text = "Resource";
-    if (hudTooltipDescription != null) hudTooltipDescription.text = resource.definition.description;
-   }
-   break;
-
-  default:
-   hudTooltipPanel.style.display = DisplayStyle.None;
-   break;
- }
-}
 
   void HandleSlotClicked(int index) {
    if (dragDropController.IsDragging()) return;
@@ -10870,7 +11769,7 @@ namespace Abracodabra.UI.Toolkit {
       playerInventory[dragSourceIndex] = null;
       inventoryController.RefreshVisuals();
       RefreshHotbar();
-      Debug.Log($"[GameUIManager] ✓ Added {gene.geneName} to editor, removed from inventory");
+      Debug.Log($"[GameUIManager] ✔ Added {gene.geneName} to editor, removed from inventory");
      }
      else {
       Debug.LogWarning($"[GameUIManager] ✗ Failed to add {gene.geneName} to slot");
@@ -10965,7 +11864,11 @@ namespace Abracodabra.UI.Toolkit {
    }
 
    if (playerHungerSystem != null) {
-    UpdateHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+    UpdatePlayerHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
+   }
+
+   if (dorisHungerSystemRef == null) {
+    TryFindAndSubscribeToDoris();
    }
 
    if (TickManager.Instance != null) {
@@ -10976,6 +11879,7 @@ namespace Abracodabra.UI.Toolkit {
 
    Debug.Log("[GameUIManager] HUD shown - UI background set to transparent");
   }
+
  }
 }
 
@@ -15810,53 +16714,55 @@ namespace WegoSystem {
    return module.DataTilemap != null && module.DataTilemap.HasTile(cellPos);
   }
 
-  pub void ApplyToolAction(ToolDefinition toolDef) {
-   if (toolDef == null || !currentlyHoveredCell.HasValue) return;
+pub bool ApplyToolAction(ToolDefinition toolDef) {
+ if (toolDef == null || !currentlyHoveredCell.HasValue) return false;
 
-   Vector3Int targetCell = currentlyHoveredCell.Value;
-   GridPosition gridPos = new GridPosition(targetCell);
+ Vector3Int targetCell = currentlyHoveredCell.Value;
+ GridPosition gridPos = new GridPosition(targetCell);
 
-   if (GridPositionManager.Instance != null) {
-    var multiTileEntity = GridPositionManager.Instance.GetMultiTileEntityAt(gridPos);
-    if (multiTileEntity != null && multiTileEntity.BlocksToolUsage) {
-     if (debugLogs)
-      Debug.Log($"[TileInteractionManager] Tool action blocked: Position {targetCell} has tool usage blocked by '{multiTileEntity.gameObject.name}'.");
-     return;
-    }
-   }
+ if (GridPositionManager.Instance != null) {
+  var multiTileEntity = GridPositionManager.Instance.GetMultiTileEntityAt(gridPos);
+  if (multiTileEntity != null && multiTileEntity.BlocksToolUsage) {
+   if (debugLogs)
+    Debug.Log($"[TileInteractionManager] Tool action blocked: Position {targetCell} has tool usage blocked by '{multiTileEntity.gameObject.name}'.");
+   return false;
+  }
+ }
 
-   TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
+ TileDefinition topTile = FindWhichTileDefinitionAt(targetCell);
 
-   if (topTile == null) {
-    if (debugLogs)
-     Debug.Log($"[TileInteractionManager] No tile at {targetCell}");
-    return;
-   }
+ if (topTile == null) {
+  if (debugLogs)
+   Debug.Log($"[TileInteractionManager] No tile at {targetCell}");
+  return false;
+ }
 
-   if (debugLogs) {
-    Debug.Log($"[TileInteractionManager] Applying Tool: '{toolDef.displayName}' at {targetCell}");
-    Debug.Log($"[TileInteractionManager] Top tile: '{topTile.displayName}' (Priority: {topTile.interactionPriority})");
+ if (debugLogs) {
+  Debug.Log($"[TileInteractionManager] Applying Tool: '{toolDef.displayName}' at {targetCell}");
+  Debug.Log($"[TileInteractionManager] Top tile: '{topTile.displayName}' (Priority: {topTile.interactionPriority})");
 
-    var allTiles = GetAllTilesAt(targetCell);
-    if (allTiles.Count > 1) {
-     string tileList = string.Join(", ", allTiles.Select(t => $"{t.displayName}(P:{t.interactionPriority})"));
-     Debug.Log($"[TileInteractionManager] All tiles at position: [{tileList}]");
-    }
-   }
+  var allTiles = GetAllTilesAt(targetCell);
+  if (allTiles.Count > 1) {
+   string tileList = string.Join(", ", allTiles.Select(t => $"{t.displayName}(P:{t.interactionPriority})"));
+   Debug.Log($"[TileInteractionManager] All tiles at position: [{tileList}]");
+  }
+ }
 
 TileInteractionRule rule = interactionLibrary?.rules.FirstOrDefault( r => r != null && r.tool == toolDef && r.fromTile == topTile );
 
-   if (rule != null) {
-    if (debugLogs)
-     Debug.Log($"[TileInteractionManager] ✓ MATCH! Rule: '{rule.fromTile.displayName}' -> '{(rule.toTile != null ? rule.toTile.displayName : "REMOVE")}'");
+ if (rule != null) {
+  if (debugLogs)
+   Debug.Log($"[TileInteractionManager] ✓ MATCH! Rule: '{rule.fromTile.displayName}' -> '{(rule.toTile != null ? rule.toTile.displayName : "REMOVE")}'");
 
-    ExecuteTileTransformation(rule, targetCell);
-   }
-   else {
-    if (debugLogs)
-     Debug.Log($"[TileInteractionManager] ✗ No rule for '{toolDef.displayName}' on '{topTile.displayName}'. Action blocked by surface tile.");
-   }
-  }
+  ExecuteTileTransformation(rule, targetCell);
+  return true; // Action succeeded
+ }
+ else {
+  if (debugLogs)
+   Debug.Log($"[TileInteractionManager] ✗ No rule for '{toolDef.displayName}' on '{topTile.displayName}'. Action blocked by surface tile.");
+  return false; // No matching rule - action failed
+ }
+}
 
   void ExecuteTileTransformation(TileInteractionRule rule, Vector3Int targetCell) {
    if (rule.toTile == null) {
