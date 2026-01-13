@@ -15,7 +15,7 @@ MonoBehaviour:
   displayName: Doris
   description: A mysterious creature living in a stump. Always hungry.
   maxHunger: 100
-  hungerPerTick: 0.25
+  hungerPerTick: 2
   hungryThreshold: 0.4
   starvingThreshold: 0.8
   ticksBetweenPlantEating: 5

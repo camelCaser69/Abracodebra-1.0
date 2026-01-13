@@ -1,8 +1,10 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
 
-    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/GameUI_Stylesheet.uss" />
+    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/Styles/GameUI_Base.uss" />
+    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/Styles/GameUI_Planning.uss" />
+    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/Styles/GameUI_HUD.uss" />
+    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/Styles/GameUI_Slots.uss" />
 
-    <!-- PLANNING PANEL - UNCHANGED FROM ORIGINAL -->
     <ui:VisualElement name="PlanningPanel" class="root-panel">
 
         <ui:VisualElement name="SeedEditorPanel" class="side-panel-left">
@@ -29,20 +31,20 @@
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:Label name="description-text" class="description-text" />
-            <ui:Label text="📊 PERFORMANCE" class="section-header" />
+            <ui:Label text="PERFORMANCE" class="section-header" />
             <ui:VisualElement class="section-content">
                 <ui:Label name="maturity-time-text" class="metric-text" />
                 <ui:Label name="energy-balance-text" class="metric-text" />
                 <ui:Label name="yield-text" class="metric-text" />
             </ui:VisualElement>
-            <ui:Label text="🧬 ATTRIBUTES" class="section-header" />
+            <ui:Label text="ATTRIBUTES" class="section-header" />
             <ui:VisualElement name="attribute-breakdown-container" class="section-content" />
-            <ui:Label text="⚙️ SEQUENCE ANALYSIS" class="section-header" />
+            <ui:Label text="SEQUENCE ANALYSIS" class="section-header" />
             <ui:VisualElement class="section-content">
                 <ui:Label name="cycle-time-text" />
                 <ui:VisualElement name="sequence-breakdown-container" class="list-container" />
             </ui:VisualElement>
-            <ui:Label text="⭐ SYNERGIES &amp; ⚠ WARNINGS" class="section-header" />
+            <ui:Label text="SYNERGIES &amp; WARNINGS" class="section-header" />
             <ui:VisualElement class="section-content">
                 <ui:VisualElement name="synergies-container" class="list-container" />
                 <ui:VisualElement name="warnings-container" class="list-container" />
@@ -51,18 +53,14 @@
 
     </ui:VisualElement>
 
-    <!-- HUD PANEL - UPDATED LAYOUT -->
     <ui:VisualElement name="HUDPanel" class="root-panel">
 
-        <!-- TOP CENTER: Tick Counter (moved and enlarged) -->
         <ui:VisualElement name="hud-top-bar" class="hud-top-bar">
             <ui:VisualElement name="tick-panel" class="tick-panel">
-                <ui:Label text="⏱️" class="tick-icon" />
                 <ui:Label name="tick-text" text="Tick: 0" class="tick-text-large" />
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <!-- RIGHT: Item Tooltip (unchanged) -->
         <ui:VisualElement name="hud-tooltip-panel" class="hud-tooltip-panel">
             <ui:VisualElement class="hud-tooltip-header">
                 <ui:Image name="hud-tooltip-icon" class="hud-tooltip-icon" />
@@ -74,34 +72,31 @@
             <ui:Label name="hud-tooltip-description" text="" class="hud-tooltip-description" />
         </ui:VisualElement>
 
-        <!-- BOTTOM SECTION -->
-        <ui:VisualElement name="hud-bottom-section" class="hud-bottom-section">
+        <ui:VisualElement name="hud-bottom-monolith" class="hud-bottom-monolith">
 
-            <!-- Player Hunger Bar (above hotbar) -->
-            <ui:VisualElement name="player-hunger-panel" class="player-hunger-panel">
-                <ui:Label text="🍖" class="player-hunger-icon" />
-                <ui:VisualElement name="player-hunger-bar-bg" class="player-hunger-bar-bg">
+            <!-- LEFT: Player Hunger -->
+            <ui:VisualElement name="player-hunger-panel" class="hunger-panel hunger-panel--left">
+                <ui:VisualElement name="player-hunger-bar-bg" class="hunger-bar-bg">
                     <ui:VisualElement name="player-hunger-bar-fill" class="player-hunger-bar-fill" />
+                    <ui:Label name="player-hunger-text" text="0/100" class="hunger-text-centered" />
                 </ui:VisualElement>
-                <ui:Label name="player-hunger-text" text="0/100" class="player-hunger-text" />
             </ui:VisualElement>
 
-            <!-- Hotbar (original structure) -->
+            <!-- CENTER: Hotbar -->
             <ui:VisualElement name="Hotbar" class="hotbar">
                 <ui:ListView name="hotbar-list" class="hotbar-list" />
                 <ui:VisualElement name="hotbar-selector" class="hotbar-selector" />
             </ui:VisualElement>
 
-        </ui:VisualElement>
-
-        <!-- DORIS HUNGER FOOTER (will be hidden if no Doris) -->
-        <ui:VisualElement name="doris-hunger-footer" class="doris-hunger-footer">
-            <ui:Label name="doris-label" text="🐛 DORIS" class="doris-label" />
-            <ui:VisualElement name="doris-hunger-bar-bg" class="doris-hunger-bar-bg">
-                <ui:VisualElement name="doris-hunger-bar-fill" class="doris-hunger-bar-fill" />
+            <!-- RIGHT: Doris Hunger -->
+            <ui:VisualElement name="doris-hunger-footer" class="hunger-panel hunger-panel--right">
+                <ui:Label name="doris-label" text="DORIS" class="doris-label" />
+                <ui:VisualElement name="doris-hunger-bar-bg" class="hunger-bar-bg">
+                    <ui:VisualElement name="doris-hunger-bar-fill" class="doris-hunger-bar-fill" />
+                    <ui:Label name="doris-hunger-text" text="0/100" class="hunger-text-centered" />
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label name="doris-hunger-text" text="0/100" class="doris-hunger-text" />
-            <ui:Label name="doris-state-text" text="😊 Satisfied" class="doris-state-text" />
+
         </ui:VisualElement>
 
     </ui:VisualElement>

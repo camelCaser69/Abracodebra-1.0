@@ -12222,6 +12222,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4094730311420470352, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: hungerIncreasePerTick
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4094730311420470352, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
+      propertyPath: startingHungerFraction
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4423669967780435352, guid: 5c5dc51c6bf80564fbabc616a07c04aa, type: 3}
       propertyPath: sceneGrid
       value: 

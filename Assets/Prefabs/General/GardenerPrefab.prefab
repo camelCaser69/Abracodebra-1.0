@@ -246,6 +246,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sortingLayerYOffset: -0.8
   useParentYCoordinate: 0
+  useMultiTileAnchor: 1
+  sortingLayerName: 
   debugSorting: 0
 --- !u!212 &-6191398404550704219
 SpriteRenderer:
@@ -499,8 +501,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHunger: 100
-  startingHunger: 100
-  hungerDepletionPerTick: 1
+  startingHungerFraction: 0
+  hungerIncreasePerTick: 1
+  hungryThreshold: 0.5
+  starvingThreshold: 0.8
 --- !u!1 &4330577973963285420
 GameObject:
   m_ObjectHideFlags: 0
@@ -710,7 +714,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de6a2709b96d424e84cf46ac1940a547, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inventoryBar: {fileID: 0}
   tileInteractionManager: {fileID: 0}
   playerTransform: {fileID: 0}
   showDebug: 0

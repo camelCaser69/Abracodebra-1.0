@@ -228,29 +228,27 @@ namespace Abracodabra.UI.Toolkit {
                 inventorySlotTemplate
             );
         }
+        
 
         void InitializeHUD() {
-            // Tick counter
             tickText = rootElement.Q<Label>("tick-text");
 
-            // Player hunger elements
+            // Updated queries for new monolith structure
             playerHungerBarFill = rootElement.Q<VisualElement>("player-hunger-bar-fill");
             playerHungerText = rootElement.Q<Label>("player-hunger-text");
 
-            // Doris hunger elements (will be hidden if Doris not present)
+            // Doris is now inside the monolith, not a separate footer
             dorisHungerFooter = rootElement.Q<VisualElement>("doris-hunger-footer");
             dorisHungerBarFill = rootElement.Q<VisualElement>("doris-hunger-bar-fill");
             dorisHungerText = rootElement.Q<Label>("doris-hunger-text");
             dorisStateText = rootElement.Q<Label>("doris-state-text");
 
-            // Tooltip elements
             hudTooltipPanel = rootElement.Q<VisualElement>("hud-tooltip-panel");
             hudTooltipIcon = rootElement.Q<Image>("hud-tooltip-icon");
             hudTooltipName = rootElement.Q<Label>("hud-tooltip-name");
             hudTooltipType = rootElement.Q<Label>("hud-tooltip-type");
             hudTooltipDescription = rootElement.Q<Label>("hud-tooltip-description");
 
-            // Find and subscribe to Player Hunger System
             playerHungerSystem = FindFirstObjectByType<PlayerHungerSystem>();
             if (playerHungerSystem != null) {
                 playerHungerSystem.OnHungerChanged += UpdatePlayerHungerDisplay;
@@ -261,16 +259,13 @@ namespace Abracodabra.UI.Toolkit {
                 Debug.LogWarning("[GameUIManager] PlayerHungerSystem not found - player hunger display won't update");
             }
 
-            // Try to find Doris at runtime (no compile-time dependency)
             TryFindAndSubscribeToDoris();
 
-            // Subscribe to tick manager
             if (TickManager.Instance != null) {
                 TickManager.Instance.OnTickAdvanced += UpdateTickDisplay;
                 UpdateTickDisplay(TickManager.Instance.CurrentTick);
             }
 
-            // Subscribe to hotbar selection changes
             HotbarSelectionService.OnSelectionChanged += HandleHotbarSelectionChanged;
 
             Debug.Log("[GameUIManager] HUD initialized");
