@@ -43,6 +43,11 @@ namespace Abracodabra.UI.Toolkit {
 
         // HUD Elements - Tick Counter
         private Label tickText;
+        
+        // Wave progress UI
+        VisualElement waveProgressBarFill;
+        int waveStartTick = 0;
+        int waveEndTick = 0;
 
         // HUD Elements - Player Hunger
         private VisualElement playerHungerBarFill;
@@ -143,7 +148,6 @@ namespace Abracodabra.UI.Toolkit {
 
             HotbarSelectionService.OnSelectionChanged -= HandleHotbarSelectionChanged;
 
-            // Unsubscribe from Doris if we were subscribed
             UnsubscribeFromDoris();
         }
 
@@ -232,16 +236,16 @@ namespace Abracodabra.UI.Toolkit {
 
         void InitializeHUD() {
             tickText = rootElement.Q<Label>("tick-text");
+    
+            // Wave progress bar
+            waveProgressBarFill = rootElement.Q<VisualElement>("wave-progress-bar-fill");
 
-            // Updated queries for new monolith structure
             playerHungerBarFill = rootElement.Q<VisualElement>("player-hunger-bar-fill");
             playerHungerText = rootElement.Q<Label>("player-hunger-text");
 
-            // Doris is now inside the monolith, not a separate footer
             dorisHungerFooter = rootElement.Q<VisualElement>("doris-hunger-footer");
             dorisHungerBarFill = rootElement.Q<VisualElement>("doris-hunger-bar-fill");
             dorisHungerText = rootElement.Q<Label>("doris-hunger-text");
-            dorisStateText = rootElement.Q<Label>("doris-state-text");
 
             hudTooltipPanel = rootElement.Q<VisualElement>("hud-tooltip-panel");
             hudTooltipIcon = rootElement.Q<Image>("hud-tooltip-icon");
@@ -558,8 +562,38 @@ namespace Abracodabra.UI.Toolkit {
         #endregion
 
         void UpdateTickDisplay(int currentTick) {
+            // Get max ticks from wave or day configuration
+            int maxTicks = 100; // Default fallback
+            int effectiveCurrentTick = currentTick;
+    
+            if (WaveManager.Instance != null && WaveManager.Instance.IsWaveActive) {
+                // Use wave-relative ticks during active wave
+                var waveManagerType = WaveManager.Instance.GetType();
+                var startTickField = waveManagerType.GetField("waveStartTick", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var endTickField = waveManagerType.GetField("waveEndTick", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        
+                if (startTickField != null && endTickField != null) {
+                    waveStartTick = (int)startTickField.GetValue(WaveManager.Instance);
+                    waveEndTick = (int)endTickField.GetValue(WaveManager.Instance);
+                    maxTicks = waveEndTick - waveStartTick;
+                    effectiveCurrentTick = currentTick - waveStartTick;
+                }
+            }
+            else if (TickManager.Instance?.Config != null) {
+                // Use day duration when no wave is active
+                maxTicks = TickManager.Instance.Config.ticksPerDay;
+                effectiveCurrentTick = currentTick % maxTicks;
+            }
+    
+            // Update tick text with current/max format
             if (tickText != null) {
-                tickText.text = $"Tick: {currentTick}";
+                tickText.text = $"Tick: {effectiveCurrentTick}/{maxTicks}";
+            }
+    
+            // Update wave progress bar
+            if (waveProgressBarFill != null && maxTicks > 0) {
+                float progressPercent = (float)effectiveCurrentTick / maxTicks * 100f;
+                waveProgressBarFill.style.width = Length.Percent(Mathf.Clamp(progressPercent, 0f, 100f));
             }
         }
 

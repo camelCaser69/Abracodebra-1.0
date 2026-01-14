@@ -5,7 +5,7 @@ This document contains UI Toolkit source files (.uxml, .uss)
 extracted from the project.
 
 Project: Abracodebra 1.0
-Extracted on: 2026-01-13 15:03:24
+Extracted on: 2026-01-14 01:20:23
 
 Note: Light compression applied - comments removed, empty lines consolidated.
 USS and UXML structure preserved for accurate editing.
@@ -24,9 +24,12 @@ USS and UXML structure preserved for accurate editing.
 
 
 - Assets\Scripts\A_ToolkitUI\GameUI_Document.uxml (Line: L34)
-- Assets\Scripts\A_ToolkitUI\GameUI_Stylesheet.uss (Line: L139)
-- Assets\Scripts\A_ToolkitUI\GeneSlot.uxml (Line: L884)
-- Assets\Scripts\A_ToolkitUI\InventorySlot.uxml (Line: L896)
+- Assets\Scripts\A_ToolkitUI\GeneSlot.uxml (Line: L154)
+- Assets\Scripts\A_ToolkitUI\InventorySlot.uxml (Line: L166)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Base.uss (Line: L180)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_HUD.uss (Line: L311)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Planning.uss (Line: L653)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Slots.uss (Line: L829)
 
 
 ================================================================================
@@ -38,7 +41,10 @@ FILES
 
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
 
-    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/GameUI_Stylesheet.uss" />
+    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/Styles/GameUI_Base.uss" />
+    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/Styles/GameUI_Planning.uss" />
+    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/Styles/GameUI_HUD.uss" />
+    <ui:Style src="project:/Assets/Scripts/A_ToolkitUI/Styles/GameUI_Slots.uss" />
 
     <ui:VisualElement name="PlanningPanel" class="root-panel">
 
@@ -66,20 +72,20 @@ FILES
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:Label name="description-text" class="description-text" />
-            <ui:Label text="📊 PERFORMANCE" class="section-header" />
+            <ui:Label text="PERFORMANCE" class="section-header" />
             <ui:VisualElement class="section-content">
                 <ui:Label name="maturity-time-text" class="metric-text" />
                 <ui:Label name="energy-balance-text" class="metric-text" />
                 <ui:Label name="yield-text" class="metric-text" />
             </ui:VisualElement>
-            <ui:Label text="🧬 ATTRIBUTES" class="section-header" />
+            <ui:Label text="ATTRIBUTES" class="section-header" />
             <ui:VisualElement name="attribute-breakdown-container" class="section-content" />
-            <ui:Label text="⚙️ SEQUENCE ANALYSIS" class="section-header" />
+            <ui:Label text="SEQUENCE ANALYSIS" class="section-header" />
             <ui:VisualElement class="section-content">
                 <ui:Label name="cycle-time-text" />
                 <ui:VisualElement name="sequence-breakdown-container" class="list-container" />
             </ui:VisualElement>
-            <ui:Label text="⭐ SYNERGIES &amp; ⚠ WARNINGS" class="section-header" />
+            <ui:Label text="SYNERGIES &amp; WARNINGS" class="section-header" />
             <ui:VisualElement class="section-content">
                 <ui:VisualElement name="synergies-container" class="list-container" />
                 <ui:VisualElement name="warnings-container" class="list-container" />
@@ -92,8 +98,17 @@ FILES
 
         <ui:VisualElement name="hud-top-bar" class="hud-top-bar">
             <ui:VisualElement name="tick-panel" class="tick-panel">
-                <ui:Label text="⏱️" class="tick-icon" />
-                <ui:Label name="tick-text" text="Tick: 0" class="tick-text-large" />
+
+                <ui:VisualElement name="wave-progress-container" class="wave-progress-container">
+                    <ui:Label name="day-marker" text="DAY" class="wave-marker wave-marker--day" />
+                    <ui:VisualElement name="wave-progress-bar-bg" class="wave-progress-bar-bg">
+                        <ui:VisualElement name="wave-progress-bar-fill" class="wave-progress-bar-fill" />
+                        <ui:VisualElement name="night-marker-line" class="night-marker-line" />
+                    </ui:VisualElement>
+                    <ui:Label name="night-marker" text="NIGHT" class="wave-marker wave-marker--night" />
+                </ui:VisualElement>
+
+                <ui:Label name="tick-text" text="Tick: 0/100" class="tick-text-large" />
             </ui:VisualElement>
         </ui:VisualElement>
 
@@ -108,14 +123,16 @@ FILES
             <ui:Label name="hud-tooltip-description" text="" class="hud-tooltip-description" />
         </ui:VisualElement>
 
-        <ui:VisualElement name="hud-bottom-section" class="hud-bottom-section">
+        <ui:VisualElement name="hud-bottom-monolith" class="hud-bottom-monolith">
 
-            <ui:VisualElement name="player-hunger-panel" class="player-hunger-panel">
-                <ui:Label text="🍖" class="player-hunger-icon" />
-                <ui:VisualElement name="player-hunger-bar-bg" class="player-hunger-bar-bg">
-                    <ui:VisualElement name="player-hunger-bar-fill" class="player-hunger-bar-fill" />
+            <ui:VisualElement name="player-hunger-panel" class="hunger-panel hunger-panel--left">
+                <ui:VisualElement class="hunger-panel-inner">
+                    <ui:Label text="HUNGER" class="hunger-label" />
+                    <ui:VisualElement name="player-hunger-bar-bg" class="hunger-bar-bg">
+                        <ui:VisualElement name="player-hunger-bar-fill" class="player-hunger-bar-fill" />
+                        <ui:Label name="player-hunger-text" text="0/100" class="hunger-text-centered" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:Label name="player-hunger-text" text="0/100" class="player-hunger-text" />
             </ui:VisualElement>
 
             <ui:VisualElement name="Hotbar" class="hotbar">
@@ -123,15 +140,16 @@ FILES
                 <ui:VisualElement name="hotbar-selector" class="hotbar-selector" />
             </ui:VisualElement>
 
-        </ui:VisualElement>
-
-        <ui:VisualElement name="doris-hunger-footer" class="doris-hunger-footer">
-            <ui:Label name="doris-label" text="🐛 DORIS" class="doris-label" />
-            <ui:VisualElement name="doris-hunger-bar-bg" class="doris-hunger-bar-bg">
-                <ui:VisualElement name="doris-hunger-bar-fill" class="doris-hunger-bar-fill" />
+            <ui:VisualElement name="doris-hunger-footer" class="hunger-panel hunger-panel--right">
+                <ui:VisualElement class="hunger-panel-inner">
+                    <ui:Label name="doris-label" text="DORIS'S HUNGER" class="hunger-label" />
+                    <ui:VisualElement name="doris-hunger-bar-bg" class="hunger-bar-bg">
+                        <ui:VisualElement name="doris-hunger-bar-fill" class="doris-hunger-bar-fill" />
+                        <ui:Label name="doris-hunger-text" text="0/100" class="hunger-text-centered" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label name="doris-hunger-text" text="0/100" class="doris-hunger-text" />
-            <ui:Label name="doris-state-text" text="😊 Satisfied" class="doris-state-text" />
+
         </ui:VisualElement>
 
     </ui:VisualElement>
@@ -139,7 +157,35 @@ FILES
 </ui:UXML>
 
 ////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\A_ToolkitUI\GameUI_Stylesheet.uss
+// FILE: Assets\Scripts\A_ToolkitUI\GeneSlot.uxml
+
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+
+    <ui:VisualElement name="slot-root" class="gene-slot">
+        <ui:VisualElement name="background" class="gene-slot__background" />
+        <ui:Image name="icon" class="gene-slot__icon" />
+        <ui:Label name="tier-label" class="gene-slot__tier-label" />
+    </ui:VisualElement>
+</ui:UXML>
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\A_ToolkitUI\InventorySlot.uxml
+
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+
+    <ui:VisualElement name="slot-container" class="slot">
+
+        <ui:Image name="icon" class="slot-icon" />
+
+        <ui:Label name="stack-size" class="slot-stack-size" />
+
+    </ui:VisualElement>
+</ui:UXML>
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\A_ToolkitUI\Styles\GameUI_Base.uss
+
+﻿
 
 .root-panel {
     width: 100%;
@@ -220,16 +266,57 @@ Label {
     color: white;
 }
 
-.inventory-grid {
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-content: flex-start;
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
+.section-header-small {
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: rgb(150, 150, 170);
+    margin-top: 15px;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
+
+.section-header {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(180, 180, 200);
+    margin-top: 15px;
+    margin-bottom: 8px;
+    padding-bottom: 5px;
+    border-bottom-width: 1px;
+    border-bottom-color: rgb(60, 60, 80);
+}
+
+.section-content {
+    margin-left: 5px;
+    margin-bottom: 10px;
+}
+
+.header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.title-container {
+    flex-grow: 1;
+}
+
+.list-container {
+    margin-top: 5px;
+}
+
+.description-text {
+    font-size: 13px;
+    color: rgb(170, 170, 180);
+    margin-bottom: 15px;
+    white-space: normal;
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\A_ToolkitUI\Styles\GameUI_HUD.uss
+
+﻿
 
 .hud-top-bar {
     position: absolute;
@@ -242,24 +329,268 @@ Label {
 }
 
 .tick-panel {
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.75);
-    padding: 10px 25px;
-    border-radius: 8px;
-}
-
-.tick-icon {
-    font-size: 24px;
-    margin-right: 10px;
-    color: white;
+    padding: 8px 15px;
 }
 
 .tick-text-large {
-    font-size: 28px;
+    font-size: 20px;
     -unity-font-style: bold;
     color: white;
     letter-spacing: 1px;
+    margin-top: 6px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.wave-progress-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.wave-marker {
+    font-size: 10px;
+    -unity-font-style: bold;
+    color: white;
+    min-width: 40px;
+    -unity-text-align: middle-center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.wave-marker--day {
+    color: rgb(255, 220, 100);
+    margin-right: 8px;
+}
+
+.wave-marker--night {
+    color: rgb(150, 180, 255);
+    margin-left: 8px;
+}
+
+.wave-progress-bar-bg {
+    width: 200px;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: visible;
+    position: relative;
+}
+
+.wave-progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: rgb(255, 255, 255);
+    border-radius: 4px;
+    transition: width 0.2s ease-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.night-marker-line {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    left: 50%;
+    background-color: rgb(150, 180, 255);
+    border-radius: 1px;
+}
+
+.hud-tooltip-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 12px 15px;
+    border-radius: 8px;
+    min-width: 200px;
+    max-width: 280px;
+    display: none;
+}
+
+.hud-tooltip-header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.hud-tooltip-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    margin-right: 10px;
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.3);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.hud-tooltip-title-container {
+    flex-grow: 1;
+}
+
+.hud-tooltip-name {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: white;
+    margin-bottom: 2px;
+}
+
+.hud-tooltip-type {
+    font-size: 12px;
+    color: rgb(150, 180, 220);
+}
+
+.hud-tooltip-description {
+    font-size: 11px;
+    color: rgb(180, 180, 180);
+    white-space: normal;
+}
+
+.hud-bottom-monolith {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 84px;
+    background-color: rgb(25, 25, 30);
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+}
+
+.hunger-panel {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    background-color: rgb(25, 25, 30);
+    flex-grow: 1;
+    flex-shrink: 1;
+    height: 100%;
+}
+
+.hunger-panel--left {
+    justify-content: center;
+}
+
+.hunger-panel--right {
+    justify-content: center;
+    display: none;
+}
+
+.hunger-panel-inner {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    flex-grow: 1;
+    height: 74px;
+    padding: 5px 0;
+}
+
+.hunger-label {
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: rgb(180, 180, 190);
+    -unity-text-align: upper-left;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+}
+
+.hunger-bar-bg {
+    flex-grow: 1;
+    height: 44px;
+    background-color: rgba(15, 15, 20, 0.95);
+    border-radius: 6px;
+    overflow: hidden;
+    border-width: 2px;
+    border-color: rgb(50, 50, 60);
+    position: relative;
+}
+
+.player-hunger-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: rgb(80, 180, 80);
+    border-radius: 4px;
+    transition: width 0.3s ease-out, background-color 0.3s ease-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.doris-hunger-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: rgb(100, 180, 100);
+    border-radius: 4px;
+    transition: width 0.3s ease-out, background-color 0.3s ease-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.hunger-text-centered {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: white;
+    -unity-text-align: middle-center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#Hotbar {
+    position: relative;
+    height: 84px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    flex-grow: 0;
+}
+
+.hotbar {
+    flex-direction: row;
+    background-color: rgb(25, 25, 30);
+    padding: 5px 10px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0;
+}
+
+.hotbar-slots-container {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    height: 74px;
+    margin: 0;
+    padding: 0;
+}
+
+.hotbar-slots-container .slot {
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 5px;
+}
+
+.hotbar-selector {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    border-width: 3px;
+    border-color: yellow;
+    border-radius: 5px;
+    transition: left 0.1s ease-in-out;
+    display: none;
 }
 
 .hud-stats-panel {
@@ -324,222 +655,186 @@ Label {
     color: white;
 }
 
-.hud-tooltip-panel {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 12px 15px;
-    border-radius: 8px;
-    min-width: 200px;
-    max-width: 280px;
-    display: none;
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\A_ToolkitUI\Styles\GameUI_Planning.uss
+
+﻿
+
+.inventory-grid {
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
 }
 
-.hud-tooltip-header {
+#seed-drop-slot-container {
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#passive-genes-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#active-sequence-container {
+    flex-direction: column;
+}
+
+.genes-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.active-sequence-header {
+    flex-direction: row;
+    justify-content: space-around;
+    margin-bottom: 10px;
+    -unity-font-style: bold;
+    font-size: 12px;
+    color: rgb(180, 180, 200);
+}
+
+.sequence-row {
+    flex-direction: row;
+    justify-content: space-around;
+    margin-bottom: 5px;
+}
+
+.seed-icon {
+    width: 64px;
+    height: 64px;
+    margin-right: 15px;
+    border-radius: 8px;
+    border-width: 2px;
+    border-color: rgb(80, 80, 100);
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.spec-sheet-container {
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    margin: 5px 0;
+}
+
+.spec-sheet-header {
     flex-direction: row;
     align-items: center;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
-.hud-tooltip-icon {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    min-height: 48px;
+.spec-sheet-icon {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    min-height: 64px;
+    max-width: 64px;
+    max-height: 64px;
     margin-right: 10px;
-    border-radius: 4px;
+    border-radius: 5px;
     border-width: 1px;
     border-color: rgba(255, 255, 255, 0.3);
     -unity-background-scale-mode: scale-to-fit;
 }
 
-.hud-tooltip-title-container {
-    flex-grow: 1;
-}
-
-.hud-tooltip-name {
-    font-size: 16px;
+.spec-sheet-title {
+    font-size: 18px;
     -unity-font-style: bold;
     color: white;
-    margin-bottom: 2px;
 }
 
-.hud-tooltip-type {
-    font-size: 12px;
-    color: rgb(150, 180, 220);
-}
-
-.hud-tooltip-description {
-    font-size: 11px;
-    color: rgb(180, 180, 180);
-    white-space: normal;
-}
-
-.hud-bottom-section {
-    position: absolute;
-    bottom: 50px;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-}
-
-.player-hunger-panel {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 8px 20px;
-    border-radius: 8px;
+.spec-sheet-section {
     margin-bottom: 10px;
-}
-
-.player-hunger-icon {
-    font-size: 20px;
-    margin-right: 10px;
-}
-
-.player-hunger-bar-bg {
-    width: 200px;
-    height: 18px;
-    background-color: rgba(40, 40, 40, 0.9);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-right: 10px;
-    border-width: 1px;
-    border-color: rgba(80, 80, 80, 0.8);
-}
-
-.player-hunger-bar-fill {
-    height: 100%;
-    width: 0%;
-    background-color: rgb(80, 180, 80);
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
     border-radius: 3px;
-    transition: width 0.3s ease-out, background-color 0.3s ease-out;
 }
 
-.player-hunger-text {
+.spec-sheet-label {
+    font-size: 12px;
+    color: rgb(150, 150, 170);
+    margin-bottom: 3px;
+}
+
+.spec-sheet-value {
     font-size: 14px;
-    -unity-font-style: bold;
-    color: white;
-    min-width: 60px;
+    color: rgb(210, 210, 210);
+    margin-left: 5px;
 }
 
-#Hotbar {
-    position: relative;
-    height: 84px;
+.color-picker-container {
     flex-direction: row;
-    align-items: center;
+    flex-wrap: wrap;
     justify-content: center;
-}
-
-.hotbar {
-    flex-direction: row;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 5px;
-    border-radius: 10px;
     align-items: center;
-    justify-content: center;
+    margin-top: 6px;
+    margin-bottom: 10px;
+    max-width: 400px;
+    width: 100%;
 }
 
-.hotbar-slots-container {
-    flex-direction: row;
-    flex-wrap: nowrap;
-    overflow: hidden;
-    height: 74px;
-    margin: 0;
-    padding: 0;
+.color-picker-button {
+    width: 22px;
+    height: 22px;
+    margin: 2px;
+    border-radius: 4px;
+    border-width: 2px;
+    border-color: rgb(75, 75, 75);
 }
 
-.hotbar-slots-container .slot {
-    flex-shrink: 0;
-    flex-grow: 0;
-    margin: 5px;
+.color-picker-button:hover {
+    border-color: rgb(150, 150, 150);
 }
 
-.hotbar-selector {
-    position: absolute;
-    width: 64px;
-    height: 64px;
+.color-picker-button--selected {
+    border-color: rgb(255, 255, 75);
     border-width: 3px;
-    border-color: yellow;
-    border-radius: 5px;
-    transition: left 0.1s ease-in-out;
-    display: none;
 }
 
-.doris-hunger-footer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 44px;
-    background-color: rgb(35, 25, 40);
-    border-top-width: 2px;
-    border-top-color: rgb(80, 50, 90);
+.seed-name-editor {
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 0 20px;
-    display: none;
+    margin-top: 8px;
+    margin-bottom: 4px;
+    width: 100%;
 }
 
-.doris-label {
+.seed-name-field {
+    width: 280px;
+    height: 32px;
+    font-size: 16px;
+    -unity-text-align: middle-center;
+}
+
+.seed-name-field > #unity-text-input {
+    background-color: rgba(20, 20, 30, 1);
+    border-radius: 6px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-width: 1px;
+    border-color: rgba(80, 80, 100, 0.8);
+    color: white;
     font-size: 16px;
     -unity-font-style: bold;
-    color: rgb(220, 180, 255);
-    margin-right: 15px;
-    min-width: 100px;
+    -unity-text-align: middle-center;
 }
 
-.doris-hunger-bar-bg {
-    flex-grow: 1;
-    height: 24px;
-    max-width: 800px;
-    background-color: rgba(20, 15, 25, 0.9);
-    border-radius: 4px;
-    overflow: hidden;
-    margin-right: 15px;
-    border-width: 2px;
-    border-color: rgb(60, 40, 70);
+.seed-name-field > #unity-text-input:focus {
+    border-color: rgba(150, 150, 200, 0.9);
 }
 
-.doris-hunger-bar-fill {
-    height: 100%;
-    width: 0%;
-    background-color: rgb(100, 180, 100);
-    border-radius: 2px;
-    transition: width 0.3s ease-out, background-color 0.3s ease-out;
-}
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\A_ToolkitUI\Styles\GameUI_Slots.uss
 
-.doris-hunger-text {
-    font-size: 14px;
-    -unity-font-style: bold;
-    color: white;
-    min-width: 70px;
-    margin-right: 15px;
-}
-
-.doris-state-text {
-    font-size: 14px;
-    -unity-font-style: bold;
-    color: rgb(150, 220, 150);
-    min-width: 120px;
-}
-
-.doris-state-satisfied {
-    color: rgb(150, 220, 150);
-}
-
-.doris-state-hungry {
-    color: rgb(255, 200, 100);
-}
-
-.doris-state-starving {
-    color: rgb(255, 100, 100);
-}
+﻿
 
 .slot {
     width: 64px;
@@ -675,236 +970,3 @@ Label {
     border-color: rgba(255, 0, 0, 0.5);
     border-width: 2px;
 }
-
-#seed-drop-slot-container {
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-#passive-genes-container {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-#active-sequence-container {
-    flex-direction: column;
-}
-
-.active-sequence-header {
-    flex-direction: row;
-    justify-content: space-around;
-    margin-bottom: 10px;
-    -unity-font-style: bold;
-    font-size: 12px;
-    color: rgb(180, 180, 200);
-}
-
-.sequence-row {
-    flex-direction: row;
-    justify-content: space-around;
-    margin-bottom: 5px;
-}
-
-.section-header-small {
-    font-size: 12px;
-    -unity-font-style: bold;
-    color: rgb(150, 150, 170);
-    margin-top: 15px;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.section-header {
-    font-size: 14px;
-    -unity-font-style: bold;
-    color: rgb(180, 180, 200);
-    margin-top: 15px;
-    margin-bottom: 8px;
-    padding-bottom: 5px;
-    border-bottom-width: 1px;
-    border-bottom-color: rgb(60, 60, 80);
-}
-
-.section-content {
-    margin-left: 5px;
-    margin-bottom: 10px;
-}
-
-.genes-container {
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-.list-container {
-    margin-top: 5px;
-}
-
-.description-text {
-    font-size: 13px;
-    color: rgb(170, 170, 180);
-    margin-bottom: 15px;
-    white-space: normal;
-}
-
-.header {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-.seed-icon {
-    width: 64px;
-    height: 64px;
-    margin-right: 15px;
-    border-radius: 8px;
-    border-width: 2px;
-    border-color: rgb(80, 80, 100);
-    -unity-background-scale-mode: scale-to-fit;
-}
-
-.title-container {
-    flex-grow: 1;
-}
-
-.spec-sheet-container {
-    padding: 10px;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    margin: 5px 0;
-}
-
-.spec-sheet-header {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.spec-sheet-icon {
-    width: 64px;
-    height: 64px;
-    min-width: 64px;
-    min-height: 64px;
-    max-width: 64px;
-    max-height: 64px;
-    margin-right: 10px;
-    border-radius: 5px;
-    border-width: 1px;
-    border-color: rgba(255, 255, 255, 0.3);
-    -unity-background-scale-mode: scale-to-fit;
-}
-
-.spec-sheet-title {
-    font-size: 18px;
-    -unity-font-style: bold;
-    color: white;
-}
-
-.spec-sheet-section {
-    margin-bottom: 10px;
-    padding: 8px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border-radius: 3px;
-}
-
-.spec-sheet-label {
-    font-size: 12px;
-    color: rgb(150, 150, 170);
-    margin-bottom: 3px;
-}
-
-.spec-sheet-value {
-    font-size: 14px;
-    color: rgb(210, 210, 210);
-    margin-left: 5px;
-}
-
-.color-picker-container {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    margin-top: 6px;
-    margin-bottom: 10px;
-    max-width: 400px;
-    width: 100%;
-}
-
-.color-picker-button {
-    width: 22px;
-    height: 22px;
-    margin: 2px;
-    border-radius: 4px;
-    border-width: 2px;
-    border-color: rgb(75, 75, 75);
-}
-
-.color-picker-button:hover {
-    border-color: rgb(150, 150, 150);
-}
-
-.color-picker-button--selected {
-    border-color: rgb(255, 255, 75);
-    border-width: 3px;
-}
-
-.seed-name-editor {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    margin-top: 8px;
-    margin-bottom: 4px;
-    width: 100%;
-}
-
-.seed-name-field {
-    width: 280px;
-    height: 32px;
-    font-size: 16px;
-    -unity-text-align: middle-center;
-}
-
-.seed-name-field > #unity-text-input {
-    background-color: rgba(20, 20, 30, 1);
-    border-radius: 6px;
-    padding-left: 10px;
-    padding-right: 10px;
-    border-width: 1px;
-    border-color: rgba(80, 80, 100, 0.8);
-    color: white;
-    font-size: 16px;
-    -unity-font-style: bold;
-    -unity-text-align: middle-center;
-}
-
-.seed-name-field > #unity-text-input:focus {
-    border-color: rgba(150, 150, 200, 0.9);
-}
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\A_ToolkitUI\GeneSlot.uxml
-
-<ui:UXML xmlns:ui="UnityEngine.UIElements">
-
-    <ui:VisualElement name="slot-root" class="gene-slot">
-        <ui:VisualElement name="background" class="gene-slot__background" />
-        <ui:Image name="icon" class="gene-slot__icon" />
-        <ui:Label name="tier-label" class="gene-slot__tier-label" />
-    </ui:VisualElement>
-</ui:UXML>
-
-////////////////////////////////////////////////////////////
-// FILE: Assets\Scripts\A_ToolkitUI\InventorySlot.uxml
-
-<ui:UXML xmlns:ui="UnityEngine.UIElements">
-
-    <ui:VisualElement name="slot-container" class="slot">
-
-        <ui:Image name="icon" class="slot-icon" />
-
-        <ui:Label name="stack-size" class="slot-stack-size" />
-
-    </ui:VisualElement>
-</ui:UXML>

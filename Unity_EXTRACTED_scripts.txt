@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 737,535 -> 529,675 chars (28.2% reduction)
-Estimated tokens saved: ~51,965
+Compression Stats: 738,073 -> 530,819 chars (28.1% reduction)
+Estimated tokens saved: ~51,813
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -102,118 +102,118 @@ using System.Linq;
   HungerUI (Assets\Scripts\WorldInteraction\Player/) L6821
   PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6869
   PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7069
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7227
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7281
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7324
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7341
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7381
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7540
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7223
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7277
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7320
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7337
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7377
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7536
 
 [Abracodabra.Ecosystem]
-  DorisController (Assets\Scripts\Ecosystem\Doris/) L7551
-  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L7909
-  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L7996
+  DorisController (Assets\Scripts\Ecosystem\Doris/) L7547
+  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L7905
+  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L7992
 
 [Abracodabra.Genes]
-  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L8197
-  GeneLibrary (Assets\Scripts\Genes/) L8207
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L8362
-  PlantState (Assets\Scripts\PlantSystem\Growth/) L8542
+  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L8193
+  GeneLibrary (Assets\Scripts\Genes/) L8203
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L8358
+  PlantState (Assets\Scripts\PlantSystem\Growth/) L8538
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L8934
-  Fruit (Assets\Scripts\Genes\Components/) L8959
-  NutritionComponent (Assets\Scripts\Genes\Components/) L8997
+  Creature (Assets\Scripts\Genes\Components/) L8930
+  Fruit (Assets\Scripts\Genes\Components/) L8955
+  NutritionComponent (Assets\Scripts\Genes\Components/) L8993
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L9009
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L9055
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L9074
-  ModifierGene (Assets\Scripts\Genes\Core/) L9086
-  PassiveStatType (Assets\Scripts\Genes\Core/) L9118
-  PayloadGene (Assets\Scripts\Genes\Core/) L9160
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L9206
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L9227
-  GeneBase (Assets\Scripts\Genes/) L9260
-  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L9338
+  ActiveGene (Assets\Scripts\Genes\Core/) L9005
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L9051
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L9070
+  ModifierGene (Assets\Scripts\Genes\Core/) L9082
+  PassiveStatType (Assets\Scripts\Genes\Core/) L9114
+  PayloadGene (Assets\Scripts\Genes\Core/) L9156
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L9202
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L9223
+  GeneBase (Assets\Scripts\Genes/) L9256
+  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L9334
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L9441
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L9559
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L9589
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L9632
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L9437
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L9555
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L9585
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L9628
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L9683
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L9739
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9871
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L9679
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L9735
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9867
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L9926
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L9959
-  GeneEventBus (Assets\Scripts\Genes\Services/) L10057
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L10109
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L9922
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L9955
+  GeneEventBus (Assets\Scripts\Genes\Services/) L10053
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L10105
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L10196
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L10192
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L10289
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L10374
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L10514
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L10285
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L10370
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L10510
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L10792
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L11697
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L11986
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L12197
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L12383
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L12582
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L13226
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L10788
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L11723
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L12012
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L12223
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L12409
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L12608
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L13252
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L13420
-  SeedRarity (Assets\Scripts\A_ToolkitUI/) L13590
-  QualityTier (Assets\Scripts\A_ToolkitUI/) L13612
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L13446
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L13616
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L13638
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L13674
-  CameraZoomController (Assets\Scripts\Core/) L13787
-  InitializationManager (Assets\Scripts\Core/) L13836
-  PixelGridSnapper (Assets\Scripts\Core/) L13876
-  RunState (Assets\Scripts\Core/) L13909
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L14077
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L14140
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L14276
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L14305
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L14456
-  GridEntity (Assets\Scripts\Ticks/) L14528
-  GridPosition (Assets\Scripts\Ticks/) L14698
-  GridPositionManager (Assets\Scripts\Ticks/) L14799
-  GridRadiusUtility (Assets\Scripts\Ticks/) L15413
-  MultiTileEntity (Assets\Scripts\Ticks/) L15557
-  PivotMode (Assets\Scripts\Ticks/) L15801
-  TickConfiguration (Assets\Scripts\Ticks/) L15915
-  ITickUpdateable (Assets\Scripts\Ticks/) L16001
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L16153
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L16174
-  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L16370
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L16386
-  for (Assets\Scripts\WorldInteraction/) L17007
+  CameraController (Assets\Scripts\Core/) L13700
+  CameraZoomController (Assets\Scripts\Core/) L13813
+  InitializationManager (Assets\Scripts\Core/) L13862
+  PixelGridSnapper (Assets\Scripts\Core/) L13902
+  RunState (Assets\Scripts\Core/) L13935
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L14101
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L14164
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L14300
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L14329
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L14480
+  GridEntity (Assets\Scripts\Ticks/) L14552
+  GridPosition (Assets\Scripts\Ticks/) L14722
+  GridPositionManager (Assets\Scripts\Ticks/) L14823
+  GridRadiusUtility (Assets\Scripts\Ticks/) L15437
+  MultiTileEntity (Assets\Scripts\Ticks/) L15581
+  PivotMode (Assets\Scripts\Ticks/) L15825
+  TickConfiguration (Assets\Scripts\Ticks/) L15939
+  ITickUpdateable (Assets\Scripts\Ticks/) L16025
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L16177
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L16198
+  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L16394
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L16410
+  for (Assets\Scripts\WorldInteraction/) L17031
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17079
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17103
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L17111
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L17135
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L17169
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L17215
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L17338
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L17193
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L17239
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L17362
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17503
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17527
 
 
 ================================================================================
@@ -7304,10 +7304,6 @@ pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
  }
 
  void Start() {
-  if (RunManager.HasInstance) {
-   maxHunger = RunManager.Instance.playerMaxHunger;
-  }
-
   currentHunger = maxHunger * startingHungerFraction;
   UpdateHungerState();
   OnHungerChanged?.Invoke(currentHunger, maxHunger);
@@ -11019,6 +11015,10 @@ namespace Abracodabra.UI.Toolkit {
 
   Label tickText;
 
+  VisualElement waveProgressBarFill;
+  int waveStartTick = 0;
+  int waveEndTick = 0;
+
   VisualElement playerHungerBarFill;
   Label playerHungerText;
 
@@ -11201,13 +11201,14 @@ namespace Abracodabra.UI.Toolkit {
   void InitializeHUD() {
    tickText = rootElement.Q<Label>("tick-text");
 
+   waveProgressBarFill = rootElement.Q<VisualElement>("wave-progress-bar-fill");
+
    playerHungerBarFill = rootElement.Q<VisualElement>("player-hunger-bar-fill");
    playerHungerText = rootElement.Q<Label>("player-hunger-text");
 
    dorisHungerFooter = rootElement.Q<VisualElement>("doris-hunger-footer");
    dorisHungerBarFill = rootElement.Q<VisualElement>("doris-hunger-bar-fill");
    dorisHungerText = rootElement.Q<Label>("doris-hunger-text");
-   dorisStateText = rootElement.Q<Label>("doris-state-text");
 
    hudTooltipPanel = rootElement.Q<VisualElement>("hud-tooltip-panel");
    hudTooltipIcon = rootElement.Q<Image>("hud-tooltip-icon");
@@ -11500,8 +11501,33 @@ namespace Abracodabra.UI.Toolkit {
   }
 
   void UpdateTickDisplay(int currentTick) {
+   int maxTicks = 100; // Default fallback
+   int effectiveCurrentTick = currentTick;
+
+   if (WaveManager.Instance != null && WaveManager.Instance.IsWaveActive) {
+    var waveManagerType = WaveManager.Instance.GetType();
+    var startTickField = waveManagerType.GetField("waveStartTick", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+    var endTickField = waveManagerType.GetField("waveEndTick", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+    if (startTickField != null && endTickField != null) {
+     waveStartTick = (int)startTickField.GetValue(WaveManager.Instance);
+     waveEndTick = (int)endTickField.GetValue(WaveManager.Instance);
+     maxTicks = waveEndTick - waveStartTick;
+     effectiveCurrentTick = currentTick - waveStartTick;
+    }
+   }
+   else if (TickManager.Instance?.Config != null) {
+    maxTicks = TickManager.Instance.Config.ticksPerDay;
+    effectiveCurrentTick = currentTick % maxTicks;
+   }
+
    if (tickText != null) {
-    tickText.text = $"Tick: {currentTick}";
+    tickText.text = $"Tick: {effectiveCurrentTick}/{maxTicks}";
+   }
+
+   if (waveProgressBarFill != null && maxTicks > 0) {
+    float progressPercent = (float)effectiveCurrentTick / maxTicks * 100f;
+    waveProgressBarFill.style.width = Length.Percent(Mathf.Clamp(progressPercent, 0f, 100f));
    }
   }
 
@@ -14121,11 +14147,9 @@ namespace WegoSystem {
   [SerializeField] int currentRoundNumber = 1;
   [SerializeField] int currentPhaseTicks = 0;
 
-  [Header("Player Stats Configuration")]
-  [Tooltip("The maximum hunger the player starts with.")]
-  pub float playerMaxHunger = 100f;
-  [Tooltip("If checked, the game will end when the player's hunger reaches zero.")]
-  pub bool playerDeathEnabled = true; // NEW FIELD
+  [Header("Player Death")]
+  [Tooltip("If checked, the game will end when the player's hunger reaches max.")]
+  pub bool playerDeathEnabled = true;
 
   pub RunState CurrentState => currentState;
   pub GamePhase CurrentPhase => currentPhase;

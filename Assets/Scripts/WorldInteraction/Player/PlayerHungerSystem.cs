@@ -54,11 +54,7 @@ public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
     }
 
     void Start() {
-        // Override from RunManager if available
-        if (RunManager.HasInstance) {
-            maxHunger = RunManager.Instance.playerMaxHunger;
-        }
-
+        // maxHunger is now solely controlled by this component's inspector
         currentHunger = maxHunger * startingHungerFraction;
         UpdateHungerState();
         OnHungerChanged?.Invoke(currentHunger, maxHunger);

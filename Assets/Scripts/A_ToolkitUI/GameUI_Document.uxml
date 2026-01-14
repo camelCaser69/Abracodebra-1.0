@@ -55,9 +55,20 @@
 
     <ui:VisualElement name="HUDPanel" class="root-panel">
 
+        <!-- TOP: Tick Display with Progress Slider -->
         <ui:VisualElement name="hud-top-bar" class="hud-top-bar">
             <ui:VisualElement name="tick-panel" class="tick-panel">
-                <ui:Label name="tick-text" text="Tick: 0" class="tick-text-large" />
+                <!-- Progress slider with day/night markers -->
+                <ui:VisualElement name="wave-progress-container" class="wave-progress-container">
+                    <ui:Label name="day-marker" text="DAY" class="wave-marker wave-marker--day" />
+                    <ui:VisualElement name="wave-progress-bar-bg" class="wave-progress-bar-bg">
+                        <ui:VisualElement name="wave-progress-bar-fill" class="wave-progress-bar-fill" />
+                        <ui:VisualElement name="night-marker-line" class="night-marker-line" />
+                    </ui:VisualElement>
+                    <ui:Label name="night-marker" text="NIGHT" class="wave-marker wave-marker--night" />
+                </ui:VisualElement>
+                <!-- Tick counter -->
+                <ui:Label name="tick-text" text="Tick: 0/100" class="tick-text-large" />
             </ui:VisualElement>
         </ui:VisualElement>
 
@@ -72,13 +83,17 @@
             <ui:Label name="hud-tooltip-description" text="" class="hud-tooltip-description" />
         </ui:VisualElement>
 
+        <!-- BOTTOM: Unified Monolith Bar -->
         <ui:VisualElement name="hud-bottom-monolith" class="hud-bottom-monolith">
 
             <!-- LEFT: Player Hunger -->
             <ui:VisualElement name="player-hunger-panel" class="hunger-panel hunger-panel--left">
-                <ui:VisualElement name="player-hunger-bar-bg" class="hunger-bar-bg">
-                    <ui:VisualElement name="player-hunger-bar-fill" class="player-hunger-bar-fill" />
-                    <ui:Label name="player-hunger-text" text="0/100" class="hunger-text-centered" />
+                <ui:VisualElement class="hunger-panel-inner">
+                    <ui:Label text="HUNGER" class="hunger-label" />
+                    <ui:VisualElement name="player-hunger-bar-bg" class="hunger-bar-bg">
+                        <ui:VisualElement name="player-hunger-bar-fill" class="player-hunger-bar-fill" />
+                        <ui:Label name="player-hunger-text" text="0/100" class="hunger-text-centered" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
 
@@ -90,10 +105,12 @@
 
             <!-- RIGHT: Doris Hunger -->
             <ui:VisualElement name="doris-hunger-footer" class="hunger-panel hunger-panel--right">
-                <ui:Label name="doris-label" text="DORIS" class="doris-label" />
-                <ui:VisualElement name="doris-hunger-bar-bg" class="hunger-bar-bg">
-                    <ui:VisualElement name="doris-hunger-bar-fill" class="doris-hunger-bar-fill" />
-                    <ui:Label name="doris-hunger-text" text="0/100" class="hunger-text-centered" />
+                <ui:VisualElement class="hunger-panel-inner">
+                    <ui:Label name="doris-label" text="DORIS'S HUNGER" class="hunger-label" />
+                    <ui:VisualElement name="doris-hunger-bar-bg" class="hunger-bar-bg">
+                        <ui:VisualElement name="doris-hunger-bar-fill" class="doris-hunger-bar-fill" />
+                        <ui:Label name="doris-hunger-text" text="0/100" class="hunger-text-centered" />
+                    </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
 

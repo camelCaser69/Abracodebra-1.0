@@ -18,18 +18,77 @@
 }
 
 .tick-panel {
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.75);
-    padding: 10px 25px;
-    border-radius: 8px;
+    padding: 8px 15px;
 }
 
 .tick-text-large {
-    font-size: 28px;
+    font-size: 20px;
     -unity-font-style: bold;
     color: white;
     letter-spacing: 1px;
+    margin-top: 6px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+/* --------------------------------------------
+   WAVE PROGRESS SLIDER
+   -------------------------------------------- */
+
+.wave-progress-container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.wave-marker {
+    font-size: 10px;
+    -unity-font-style: bold;
+    color: white;
+    min-width: 40px;
+    -unity-text-align: middle-center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.wave-marker--day {
+    color: rgb(255, 220, 100);
+    margin-right: 8px;
+}
+
+.wave-marker--night {
+    color: rgb(150, 180, 255);
+    margin-left: 8px;
+}
+
+.wave-progress-bar-bg {
+    width: 200px;
+    height: 8px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    overflow: visible;
+    position: relative;
+}
+
+.wave-progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background-color: rgb(255, 255, 255);
+    border-radius: 4px;
+    transition: width 0.2s ease-out;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.night-marker-line {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 2px;
+    left: 50%;
+    background-color: rgb(150, 180, 255);
+    border-radius: 1px;
 }
 
 /* --------------------------------------------
@@ -100,7 +159,7 @@
     height: 84px;
     background-color: rgb(25, 25, 30);
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
     padding: 0;
     margin: 0;
@@ -114,7 +173,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    padding: 0 15px;
+    padding: 0 10px;
     background-color: rgb(25, 25, 30);
     flex-grow: 1;
     flex-shrink: 1;
@@ -122,23 +181,39 @@
 }
 
 .hunger-panel--left {
-    justify-content: flex-end;
-    padding-right: 15px;
+    justify-content: center;
 }
 
 .hunger-panel--right {
-    justify-content: flex-start;
-    padding-left: 15px;
+    justify-content: center;
     display: none;
 }
 
+.hunger-panel-inner {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    flex-grow: 1;
+    height: 74px;
+    padding: 5px 0;
+}
+
 /* --------------------------------------------
-   HUNGER BAR (fills available space)
+   HUNGER LABEL & BAR
    -------------------------------------------- */
+
+.hunger-label {
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: rgb(180, 180, 190);
+    -unity-text-align: upper-left;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+}
 
 .hunger-bar-bg {
     flex-grow: 1;
-    height: 54px;
+    height: 44px;
     background-color: rgba(15, 15, 20, 0.95);
     border-radius: 6px;
     overflow: hidden;
@@ -176,23 +251,11 @@
     left: 0;
     right: 0;
     bottom: 0;
-    font-size: 16px;
+    font-size: 14px;
     -unity-font-style: bold;
     color: white;
     -unity-text-align: middle-center;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-}
-
-/* --------------------------------------------
-   DORIS-SPECIFIC STYLES
-   -------------------------------------------- */
-
-.doris-label {
-    font-size: 14px;
-    -unity-font-style: bold;
-    color: rgb(220, 180, 255);
-    margin-right: 12px;
-    min-width: 50px;
 }
 
 /* --------------------------------------------

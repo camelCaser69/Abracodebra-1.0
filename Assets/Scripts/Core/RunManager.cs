@@ -21,17 +21,14 @@ namespace WegoSystem
     public class RunManager : SingletonMonoBehaviour<RunManager>
     {
         [Header("Game State")]
-        [SerializeField] private RunState currentState = RunState.Planning;
-        [SerializeField] private GamePhase currentPhase = GamePhase.Planning;
-        [SerializeField] private int currentRoundNumber = 1;
-        [SerializeField] private int currentPhaseTicks = 0;
+        [SerializeField] RunState currentState = RunState.Planning;
+        [SerializeField] GamePhase currentPhase = GamePhase.Planning;
+        [SerializeField] int currentRoundNumber = 1;
+        [SerializeField] int currentPhaseTicks = 0;
 
-        // Add this new field in the "Player Stats Configuration" header section
-        [Header("Player Stats Configuration")]
-        [Tooltip("The maximum hunger the player starts with.")]
-        public float playerMaxHunger = 100f;
-        [Tooltip("If checked, the game will end when the player's hunger reaches zero.")]
-        public bool playerDeathEnabled = true; // NEW FIELD
+        [Header("Player Death")]
+        [Tooltip("If checked, the game will end when the player's hunger reaches max.")]
+        public bool playerDeathEnabled = true;
 
         public RunState CurrentState => currentState;
         public GamePhase CurrentPhase => currentPhase;
@@ -42,51 +39,36 @@ namespace WegoSystem
         public event Action<GamePhase, GamePhase> OnPhaseChanged;
         public event Action<int> OnRoundChanged;
 
-        protected override void OnAwake()
-        {
+        protected override void OnAwake() {
             SetState(RunState.Planning, true);
         }
 
-        public void Initialize()
-        {
-            if (TickManager.Instance != null)
-            {
+        public void Initialize() {
+            if (TickManager.Instance != null) {
                 TickManager.Instance.RegisterTickUpdateable(new PhaseTickHandler(this));
             }
-            else
-            {
+            else {
                 Debug.LogError("[RunManager] Initialization failed: TickManager not found!");
             }
 
-            // Find the player's hunger system and subscribe to the starvation event
-            // FIX: Replaced obsolete FindObjectOfType with FindFirstObjectByType
             PlayerHungerSystem playerHunger = FindFirstObjectByType<PlayerHungerSystem>();
-            if (playerHunger != null)
-            {
+            if (playerHunger != null) {
                 playerHunger.OnStarvation += HandlePlayerStarvation;
             }
-            else
-            {
+            else {
                 Debug.LogError("[RunManager] Could not find PlayerHungerSystem to subscribe to OnStarvation event!");
             }
         }
 
-        private void OnDestroy()
-        {
-            // Unsubscribe from events to prevent memory leaks
-            // FIX: Replaced obsolete FindObjectOfType with FindFirstObjectByType
+        void OnDestroy() {
             PlayerHungerSystem playerHunger = FindFirstObjectByType<PlayerHungerSystem>();
-            if (playerHunger != null)
-            {
+            if (playerHunger != null) {
                 playerHunger.OnStarvation -= HandlePlayerStarvation;
             }
         }
 
-        private void HandlePlayerStarvation()
-        {
-            // NEW: Only trigger Game Over if the feature is enabled.
-            if (!playerDeathEnabled)
-            {
+        void HandlePlayerStarvation() {
+            if (!playerDeathEnabled) {
                 Debug.Log("[RunManager] Player has starved, but player death is disabled. No action taken.");
                 return;
             }
@@ -95,15 +77,13 @@ namespace WegoSystem
             SetState(RunState.GameOver);
         }
 
-        private void SetState(RunState newState, bool force = false)
-        {
+        void SetState(RunState newState, bool force = false) {
             if (currentState == newState && !force) return;
 
             currentState = newState;
             Debug.Log($"[RunManager] State changed to: {currentState}");
 
-            switch (currentState)
-            {
+            switch (currentState) {
                 case RunState.Planning:
                     WeatherManager.Instance?.PauseCycleAtDay();
                     SetPhase(GamePhase.Planning);
@@ -116,8 +96,6 @@ namespace WegoSystem
                     break;
 
                 case RunState.GameOver:
-                    // When the game is over, we pause systems.
-                    // The UIManager will show the game over screen.
                     break;
             }
 
