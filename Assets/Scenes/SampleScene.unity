@@ -57862,6 +57862,55 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
+--- !u!1 &906144531
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 906144533}
+  - component: {fileID: 906144532}
+  m_Layer: 0
+  m_Name: HoverTooltip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &906144532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906144531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1b994eff28543ad951d70157855047e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainCamera: {fileID: 519420031}
+  tileInteractionManager: {fileID: 1097838751}
+  uiDocument: {fileID: 752681536}
+  tooltipOffset: {x: 0, y: -0.6}
+  showDebug: 1
+--- !u!4 &906144533
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906144531}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &907151592
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126696,7 +126745,6 @@ MonoBehaviour:
   currentPhase: 0
   currentRoundNumber: 1
   currentPhaseTicks: 0
-  playerMaxHunger: 60
   playerDeathEnabled: 1
 --- !u!114 &1970727777
 MonoBehaviour:
@@ -132694,3 +132742,4 @@ SceneRoots:
   - {fileID: 1079289979}
   - {fileID: 192826961}
   - {fileID: 752681537}
+  - {fileID: 906144533}

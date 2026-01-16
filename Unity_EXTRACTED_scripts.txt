@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 738,073 -> 530,819 chars (28.1% reduction)
-Estimated tokens saved: ~51,813
+Compression Stats: 743,291 -> 534,401 chars (28.1% reduction)
+Estimated tokens saved: ~52,222
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -164,56 +164,57 @@ using System.Linq;
 
 [Abracodabra.UI.Toolkit]
   GameUIManager (Assets\Scripts\A_ToolkitUI/) L10788
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L11723
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L12012
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L12223
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L12409
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L12608
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L13252
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L11635
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L11924
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L12162
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L12348
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L12547
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L13191
+  WorldHoverTooltip (Assets\Scripts\A_ToolkitUI/) L13385
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L13446
-  SeedRarity (Assets\Scripts\A_ToolkitUI/) L13616
-  QualityTier (Assets\Scripts\A_ToolkitUI/) L13638
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L13595
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L13765
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L13787
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L13700
-  CameraZoomController (Assets\Scripts\Core/) L13813
-  InitializationManager (Assets\Scripts\Core/) L13862
-  PixelGridSnapper (Assets\Scripts\Core/) L13902
-  RunState (Assets\Scripts\Core/) L13935
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L14101
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L14164
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L14300
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L14329
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L14480
-  GridEntity (Assets\Scripts\Ticks/) L14552
-  GridPosition (Assets\Scripts\Ticks/) L14722
-  GridPositionManager (Assets\Scripts\Ticks/) L14823
-  GridRadiusUtility (Assets\Scripts\Ticks/) L15437
-  MultiTileEntity (Assets\Scripts\Ticks/) L15581
-  PivotMode (Assets\Scripts\Ticks/) L15825
-  TickConfiguration (Assets\Scripts\Ticks/) L15939
-  ITickUpdateable (Assets\Scripts\Ticks/) L16025
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L16177
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L16198
-  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L16394
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L16410
-  for (Assets\Scripts\WorldInteraction/) L17031
+  CameraController (Assets\Scripts\Core/) L13849
+  CameraZoomController (Assets\Scripts\Core/) L13962
+  InitializationManager (Assets\Scripts\Core/) L14011
+  PixelGridSnapper (Assets\Scripts\Core/) L14051
+  RunState (Assets\Scripts\Core/) L14084
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L14250
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L14313
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L14449
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L14478
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L14629
+  GridEntity (Assets\Scripts\Ticks/) L14701
+  GridPosition (Assets\Scripts\Ticks/) L14871
+  GridPositionManager (Assets\Scripts\Ticks/) L14972
+  GridRadiusUtility (Assets\Scripts\Ticks/) L15586
+  MultiTileEntity (Assets\Scripts\Ticks/) L15730
+  PivotMode (Assets\Scripts\Ticks/) L15974
+  TickConfiguration (Assets\Scripts\Ticks/) L16088
+  ITickUpdateable (Assets\Scripts\Ticks/) L16174
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L16326
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L16347
+  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L16543
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L16559
+  for (Assets\Scripts\WorldInteraction/) L17180
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17103
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17252
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L17135
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L17284
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L17193
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L17239
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L17362
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L17342
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L17388
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L17511
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17527
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17676
 
 
 ================================================================================
@@ -11027,11 +11028,7 @@ namespace Abracodabra.UI.Toolkit {
   Label dorisHungerText;
   Label dorisStateText;
 
-  VisualElement hudTooltipPanel;
-  Image hudTooltipIcon;
-  Label hudTooltipName;
-  Label hudTooltipType;
-  Label hudTooltipDescription;
+  Label hotbarTooltipLabel;
 
   PlayerHungerSystem playerHungerSystem;
 
@@ -11210,11 +11207,7 @@ namespace Abracodabra.UI.Toolkit {
    dorisHungerBarFill = rootElement.Q<VisualElement>("doris-hunger-bar-fill");
    dorisHungerText = rootElement.Q<Label>("doris-hunger-text");
 
-   hudTooltipPanel = rootElement.Q<VisualElement>("hud-tooltip-panel");
-   hudTooltipIcon = rootElement.Q<Image>("hud-tooltip-icon");
-   hudTooltipName = rootElement.Q<Label>("hud-tooltip-name");
-   hudTooltipType = rootElement.Q<Label>("hud-tooltip-type");
-   hudTooltipDescription = rootElement.Q<Label>("hud-tooltip-description");
+   hotbarTooltipLabel = rootElement.Q<Label>("hotbar-tooltip-label");
 
    playerHungerSystem = FindFirstObjectByType<PlayerHungerSystem>();
    if (playerHungerSystem != null) {
@@ -11532,64 +11525,25 @@ namespace Abracodabra.UI.Toolkit {
   }
 
   void HandleHotbarSelectionChanged(UIInventoryItem selectedItem) {
-   UpdateHUDTooltip(selectedItem);
+   UpdateHotbarTooltip(selectedItem);
   }
 
-  void UpdateHUDTooltip(UIInventoryItem selectedItem) {
-   if (selectedItem == null || hudTooltipPanel == null) {
-    if (hudTooltipPanel != null) {
-     hudTooltipPanel.style.display = DisplayStyle.None;
-    }
+  void UpdateHotbarTooltip(UIInventoryItem selectedItem) {
+   if (hotbarTooltipLabel == null) return;
+
+   if (selectedItem == null || !selectedItem.IsValid()) {
+    hotbarTooltipLabel.style.display = DisplayStyle.None;
     return;
    }
 
-   hudTooltipPanel.style.display = DisplayStyle.Flex;
-
-   switch (selectedItem.Type) {
-    case UIInventoryItem.ItemType.Seed:
-     var seed = selectedItem.SeedTemplate;
-     if (seed != null) {
-      if (hudTooltipIcon != null) hudTooltipIcon.sprite = seed.icon;
-      if (hudTooltipName != null) hudTooltipName.text = seed.templateName;
-      if (hudTooltipType != null) hudTooltipType.text = "Seed";
-      if (hudTooltipDescription != null) hudTooltipDescription.text = seed.description;
-     }
-     break;
-
-    case UIInventoryItem.ItemType.Tool:
-     var tool = selectedItem.ToolDefinition;
-     if (tool != null) {
-      if (hudTooltipIcon != null) hudTooltipIcon.sprite = tool.icon;
-      if (hudTooltipName != null) hudTooltipName.text = tool.displayName;
-      if (hudTooltipType != null) hudTooltipType.text = $"Tool - {tool.toolType}";
-      if (hudTooltipDescription != null) hudTooltipDescription.text = tool.GetTooltipDescription();
-     }
-     break;
-
-    case UIInventoryItem.ItemType.Gene:
-     var gene = selectedItem.Gene ?? selectedItem.GeneInstance?.GetGene();
-     if (gene != null) {
-      if (hudTooltipIcon != null) hudTooltipIcon.sprite = gene.icon;
-      if (hudTooltipName != null) hudTooltipName.text = gene.geneName;
-      if (hudTooltipType != null) hudTooltipType.text = $"Gene - {gene.Category}";
-      if (hudTooltipDescription != null) hudTooltipDescription.text = gene.description;
-     }
-     break;
-
-    case UIInventoryItem.ItemType.Resource:
-     var resource = selectedItem.ResourceInstance;
-     if (resource?.definition != null) {
-      if (hudTooltipIcon != null) hudTooltipIcon.sprite = resource.definition.icon;
-      if (hudTooltipName != null) hudTooltipName.text = resource.definition.itemName;
-      if (hudTooltipType != null) hudTooltipType.text = "Resource";
-      if (hudTooltipDescription != null) hudTooltipDescription.text = resource.definition.description;
-     }
-     break;
-
-    default:
-     hudTooltipPanel.style.display = DisplayStyle.None;
-     break;
+   string itemName = selectedItem.GetDisplayName();
+   if (string.IsNullOrEmpty(itemName)) {
+    hotbarTooltipLabel.style.display = DisplayStyle.None;
+    return;
    }
+
+   hotbarTooltipLabel.text = itemName;
+   hotbarTooltipLabel.style.display = DisplayStyle.Flex;
   }
 
   void HandleSlotClicked(int index) {
@@ -11752,71 +11706,50 @@ namespace Abracodabra.UI.Toolkit {
     "active" => gene.Category == GeneCategory.Active,
     "modifier" => gene.Category == GeneCategory.Modifier,
     "payload" => gene.Category == GeneCategory.Payload,
+    "seed" => false,
     _ => false
    };
   }
 
-  void HandleInventorySwap(int fromIndex, int toIndex) {
-   var temp = playerInventory[fromIndex];
-   playerInventory[fromIndex] = playerInventory[toIndex];
-   playerInventory[toIndex] = temp;
+  void HandleInventorySwap(int from, int to) {
+   if (from < 0 || from >= playerInventory.Count || to < 0 || to >= playerInventory.Count) return;
 
-   inventoryController.UpdateIndicesAfterSwap(fromIndex, toIndex);
+   (playerInventory[from], playerInventory[to]) = (playerInventory[to], playerInventory[from]);
+
    inventoryController.RefreshVisuals();
+   RefreshHotbar();
 
-   if (fromIndex < inventoryColumns || toIndex < inventoryColumns) {
-    RefreshHotbar();
-   }
+   Debug.Log($"[GameUIManager] Swapped inventory slots {from} and {to}");
   }
 
-  void HandleGeneDrop(int dragSourceIndex, VisualElement targetSlot, string slotType) {
-   var draggedItem = playerInventory[dragSourceIndex];
-   if (draggedItem == null) return;
+  void HandleGeneDrop(int inventoryIndex, VisualElement targetSlot, string slotType) {
+   var item = playerInventory[inventoryIndex];
+   if (item == null) return;
 
-   bool validDrop = false;
+   GeneBase gene = item.OriginalData as GeneBase;
+   if (gene == null) return;
 
-   if (draggedItem.OriginalData is GeneBase gene) {
-    validDrop = slotType switch {
-     "passive" => gene.Category == GeneCategory.Passive,
-     "active" => gene.Category == GeneCategory.Active,
-     "modifier" => gene.Category == GeneCategory.Modifier,
-     "payload" => gene.Category == GeneCategory.Payload,
-     _ => false
-    };
-
-    if (validDrop) {
-     int slotIndex = GetSlotIndexFromElement(targetSlot, slotType);
-
-     Debug.Log($"[GameUIManager] Attempting to add {gene.geneName} to {slotType} slot {slotIndex}");
-
-     bool added = seedEditorController.AddGeneToSlot(gene, slotIndex, slotType);
-
-     if (added) {
-      playerInventory[dragSourceIndex] = null;
-      inventoryController.RefreshVisuals();
-      RefreshHotbar();
-      Debug.Log($"[GameUIManager] ✔ Added {gene.geneName} to editor, removed from inventory");
-     }
-     else {
-      Debug.LogWarning($"[GameUIManager] ✗ Failed to add {gene.geneName} to slot");
-     }
-    }
-    else {
-     Debug.Log($"[GameUIManager] Invalid drop: {gene.Category} gene cannot go in {slotType} slot");
-    }
+   if (!CanGeneGoInSlot(gene, slotType)) {
+    Debug.Log($"[GameUIManager] Cannot place {gene.Category} gene in {slotType} slot");
+    return;
    }
-   else if (draggedItem.OriginalData is SeedTemplate && slotType == "seed") {
-    inventoryController.SetLockedSeedSlot(dragSourceIndex);
-    seedEditorController.DisplaySeed(draggedItem);
 
-    dragDropController.SetGeneEditorSlots(
-     seedEditorController.GetSeedContainer(),
-     seedEditorController.GetPassiveContainer(),
-     seedEditorController.GetActiveContainer()
-    );
+   int slotIndex = GetSlotIndexFromElement(targetSlot, slotType);
+   if (slotIndex < 0) return;
 
-    validDrop = true;
+   var existingGene = seedEditorController.GetGeneAtSlot(slotIndex, slotType);
+
+   seedEditorController.AddGeneToSlot(gene, slotIndex, slotType);
+
+   if (existingGene != null) {
+    playerInventory[inventoryIndex] = new UIInventoryItem(existingGene);
    }
+   else {
+    playerInventory[inventoryIndex] = null;
+   }
+
+   inventoryController.RefreshVisuals();
+   RefreshHotbar();
   }
 
   int GetSlotIndexFromElement(VisualElement element, string slotType) {
@@ -11860,52 +11793,32 @@ namespace Abracodabra.UI.Toolkit {
   }
 
   void HandleRunStateChanged(RunState newState) {
-   if (newState == RunState.Planning) ShowPlanningUI();
-   else ShowHUD();
+   Debug.Log($"[GameUIManager] Run state changed to: {newState}");
+
+   switch (newState) {
+    case RunState.Planning:
+     ShowPlanningUI();
+     break;
+
+    case RunState.GrowthAndThreat:
+     ShowHUDUI();
+     break;
+
+    case RunState.GameOver:
+     ShowHUDUI();
+     break;
+   }
   }
 
   void ShowPlanningUI() {
-   planningPanel.style.display = DisplayStyle.Flex;
-   hudPanel.style.display = DisplayStyle.None;
-
-   rootElement.style.backgroundColor = new Color(20f / 255f, 20f / 255f, 25f / 255f);
-
-   if (startDayButton != null) {
-    startDayButton.style.display = DisplayStyle.Flex;
-   }
+   if (planningPanel != null) planningPanel.style.display = DisplayStyle.Flex;
+   if (hudPanel != null) hudPanel.style.display = DisplayStyle.None;
   }
 
-  void ShowHUD() {
-   planningPanel.style.display = DisplayStyle.None;
-   hudPanel.style.display = DisplayStyle.Flex;
-
-   rootElement.style.backgroundColor = new Color(0, 0, 0, 0);
-
-   if (hudPanel != null) {
-    hudPanel.style.backgroundColor = new Color(0, 0, 0, 0);
-   }
-
-   if (startDayButton != null) {
-    startDayButton.style.display = DisplayStyle.None;
-   }
-
-   if (playerHungerSystem != null) {
-    UpdatePlayerHungerDisplay(playerHungerSystem.CurrentHunger, playerHungerSystem.MaxHunger);
-   }
-
-   if (dorisHungerSystemRef == null) {
-    TryFindAndSubscribeToDoris();
-   }
-
-   if (TickManager.Instance != null) {
-    UpdateTickDisplay(TickManager.Instance.CurrentTick);
-   }
-
-   UpdateHUDTooltip(HotbarSelectionService.SelectedItem);
-
-   Debug.Log("[GameUIManager] HUD shown - UI background set to transparent");
+  void ShowHUDUI() {
+   if (planningPanel != null) planningPanel.style.display = DisplayStyle.None;
+   if (hudPanel != null) hudPanel.style.display = DisplayStyle.Flex;
   }
-
  }
 }
 
@@ -12215,10 +12128,14 @@ namespace Abracodabra.UI.Toolkit {
 
   int selectedHotbarIndex = 0;
   int maxHotbarSlots = 8;
+  int hoveredSlotIndex = -1;
 
   const int SLOT_WIDTH = 64;
   const int SLOT_MARGIN = 5;
   const int SLOT_TOTAL_WIDTH = SLOT_WIDTH + SLOT_MARGIN * 2;
+
+  pub event Action<int, UIInventoryItem> OnSlotHoverEnter;
+  pub event Action OnSlotHoverExit;
 
   pub void Initialize(ListView hotbarList, VisualElement selector, VisualTreeAsset template) {
    if (hotbarList != null) {
@@ -12276,6 +12193,12 @@ namespace Abracodabra.UI.Toolkit {
 slotElement.RegisterCallback<PointerDownEvent>(evt => { SelectSlot(index);
     });
 
+slotElement.RegisterCallback<PointerEnterEvent>(evt => { HandleSlotHoverEnter(index);
+    });
+
+slotElement.RegisterCallback<PointerLeaveEvent>(evt => { HandleSlotHoverExit();
+    });
+
     slotElements.Add(slotElement);
     slotsContainer.Add(slotInstance);
 
@@ -12283,6 +12206,22 @@ slotElement.RegisterCallback<PointerDownEvent>(evt => { SelectSlot(index);
    }
 
    UpdateSelectionVisual();
+  }
+
+  void HandleSlotHoverEnter(int index) {
+   hoveredSlotIndex = index;
+
+   UIInventoryItem item = null;
+   if (hotbarItems != null && index >= 0 && index < hotbarItems.Count) {
+    item = hotbarItems[index];
+   }
+
+   OnSlotHoverEnter?.Invoke(index, item);
+  }
+
+  void HandleSlotHoverExit() {
+   hoveredSlotIndex = -1;
+   OnSlotHoverExit?.Invoke();
   }
 
   void BindSlot(VisualElement slotElement, UIInventoryItem item) {
@@ -12406,6 +12345,7 @@ slotElement.RegisterCallback<PointerDownEvent>(evt => { SelectSlot(index);
   }
 
   pub int GetSelectedIndex() => selectedHotbarIndex;
+  pub int GetHoveredIndex() => hoveredSlotIndex;
  }
 }
 
@@ -13628,6 +13568,216 @@ namespace Abracodabra.UI.Toolkit {
    var labelElement = new Label($"{label}: {value:F2}x");
    labelElement.style.fontSize = 13;
    attributeContainer.Add(labelElement);
+  }
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\A_ToolkitUI\WorldHoverTooltip.cs
+
+﻿using System.Collections.Generic;
+using TMPro;
+using WegoSystem;
+using Abracodabra.Genes;
+
+namespace Abracodabra.UI.Toolkit {
+ pub class WorldHoverTooltip : MonoBehaviour {
+  [Header("References")]
+  [SerializeField] Camera mainCamera;
+  [SerializeField] TileInteractionManager tileInteractionManager;
+
+  [Header("Tooltip Settings")]
+  [SerializeField] Vector2 tooltipOffset = new Vector2(0f, 1.5f); // Raised higher to be above objects
+  [SerializeField] float zOffset = -5f; // Pull closer to camera
+  [SerializeField] float fontSize = 4f; // Larger base size for visibility
+  [SerializeField] Color textColor = Color.white;
+
+  [Header("Sorting")]
+  [SerializeField] string sortingLayerName = "UI"; // Ensure this layer exists, or use "Default"
+  [SerializeField] int sortingOrder = 5000; // Very high number to force on top
+
+  [Header("Debug")]
+  [SerializeField] bool showDebug = false;
+  [SerializeField] bool forceShowTestText = false; // Check this to verify rendering works
+
+  TextMeshPro tooltipText;
+  Transform tooltipTransform;
+
+  void Start() {
+   if (mainCamera == null) {
+    mainCamera = Camera.main;
+   }
+
+   if (tileInteractionManager == null) {
+    tileInteractionManager = TileInteractionManager.Instance;
+   }
+
+   CreateTooltip();
+  }
+
+  void CreateTooltip() {
+   var existing = transform.Find("WorldHoverTooltip_Text");
+   if (existing != null) {
+    if (Application.isPlaying) Destroy(existing.gameObject);
+    else DestroyImmediate(existing.gameObject);
+   }
+
+   var tooltipGO = new GameObject("WorldHoverTooltip_Text");
+   tooltipGO.transform.SetParent(transform);
+   tooltipTransform = tooltipGO.transform;
+   tooltipTransform.localPosition = Vector3.zero;
+
+   tooltipText = tooltipGO.AddComponent<TextMeshPro>();
+
+   tooltipText.alignment = TextAlignmentOptions.Center;
+   tooltipText.fontSize = fontSize;
+   tooltipText.color = textColor;
+
+   RectTransform rect = tooltipText.rectTransform;
+   rect.sizeDelta = new Vector2(20f, 5f); // Give it plenty of space
+
+   tooltipText.enableWordWrapping = false;
+   tooltipText.overflowMode = TextOverflowModes.Overflow;
+
+   var meshRenderer = tooltipText.GetComponent<MeshRenderer>();
+   if (meshRenderer != null) {
+    meshRenderer.sortingLayerName = sortingLayerName;
+    meshRenderer.sortingOrder = sortingOrder;
+   }
+
+   tooltipText.outlineWidth = 0.2f;
+   tooltipText.outlineColor = Color.black;
+   // Note: Shader utilities require the material to support outlines.
+
+   tooltipGO.SetActive(false);
+
+   if (showDebug) Debug.Log("[WorldHoverTooltip] Created new Tooltip Object");
+  }
+
+  void Update() {
+   if (this == null || gameObject == null) return;
+   UpdateTooltip();
+  }
+
+  void UpdateTooltip() {
+   if (tooltipTransform == null || tooltipText == null) {
+    CreateTooltip();
+    return;
+   }
+
+   // --- DEBUG MODE FORCE SHOW ---
+   if (forceShowTestText) {
+    tooltipTransform.position = transform.position + new Vector3(0, 1, zOffset);
+    tooltipText.text = "DEBUG TOOLTIP VISIBLE";
+    tooltipTransform.gameObject.SetActive(true);
+    return;
+   }
+
+   if (mainCamera == null || tileInteractionManager == null) return;
+
+   Vector3Int? hoveredCell = tileInteractionManager.CurrentlyHoveredCell;
+
+   if (!hoveredCell.HasValue) {
+    if (tooltipTransform.gameObject.activeSelf) tooltipTransform.gameObject.SetActive(false);
+    return;
+   }
+
+   Vector3Int cellPos = hoveredCell.Value;
+   GridPosition gridPos = new GridPosition(cellPos);
+
+   string content = GetTooltipContent(gridPos);
+
+   if (string.IsNullOrEmpty(content)) {
+    if (tooltipTransform.gameObject.activeSelf) tooltipTransform.gameObject.SetActive(false);
+    return;
+   }
+
+   Vector3 cellCenter = tileInteractionManager.CellCenterWorld(cellPos);
+
+   Vector3 finalPos = cellCenter + new Vector3(tooltipOffset.x, tooltipOffset.y, zOffset);
+
+   tooltipTransform.position = finalPos;
+   tooltipText.text = content;
+
+   tooltipText.sortingOrder = sortingOrder;
+
+   if (!tooltipTransform.gameObject.activeSelf) {
+    tooltipTransform.gameObject.SetActive(true);
+   }
+  }
+
+  string GetTooltipContent(GridPosition gridPos) {
+   string entityName = GetEntityNameAtPosition(gridPos);
+   if (!string.IsNullOrEmpty(entityName)) {
+    return entityName;
+   }
+
+   TileDefinition tileDef = tileInteractionManager.HoveredTileDef;
+   if (tileDef != null && !string.IsNullOrEmpty(tileDef.displayName)) {
+    return tileDef.displayName;
+   }
+
+   return null;
+  }
+
+  string GetEntityNameAtPosition(GridPosition gridPos) {
+   if (GridPositionManager.Instance == null) return null;
+
+   MultiTileEntity multiTileEntity = GridPositionManager.Instance.GetMultiTileEntityAt(gridPos);
+   if (multiTileEntity != null) {
+    return GetDisplayNameFromGameObject(multiTileEntity.gameObject);
+   }
+
+   HashSet<GridEntity> entities = GridPositionManager.Instance.GetEntitiesAt(gridPos);
+   if (entities == null || entities.Count == 0) return null;
+
+   var nonPlayerEntities = entities
+    .Where(e => e != null && e.GetComponent<GardenerController>() == null)
+    .ToList();
+
+   if (nonPlayerEntities.Count > 0) {
+    return GetDisplayNameFromGameObject(nonPlayerEntities[0].gameObject);
+   }
+
+   return null;
+  }
+
+  string GetDisplayNameFromGameObject(GameObject go) {
+   if (go == null) return null;
+
+   var animal = go.GetComponent<AnimalController>();
+   if (animal != null) return animal.GetDisplayName();
+
+   var plant = go.GetComponent<PlantGrowth>();
+   if (plant != null) {
+    if (plant.geneRuntimeState?.template != null) return plant.geneRuntimeState.template.templateName;
+    if (plant.seedTemplate != null) return plant.seedTemplate.templateName;
+    return "Plant";
+   }
+
+   var dorisType = System.Type.GetType("Abracodabra.Ecosystem.DorisController, Assembly-CSharp");
+   if (dorisType != null) {
+    var doris = go.GetComponent(dorisType);
+    if (doris != null) return "Doris";
+   }
+
+   string name = go.name.Replace("(Clone)", "").Trim();
+   return name;
+  }
+
+  void OnDestroy() {
+   if (tooltipTransform != null) Destroy(tooltipTransform.gameObject);
+  }
+
+  // --- VISUAL DEBUGGING ---
+  void OnDrawGizmos() {
+   if (tooltipTransform != null && tooltipTransform.gameObject.activeSelf) {
+    Gizmos.color = Color.green;
+    Gizmos.DrawLine(tooltipTransform.position, tooltipTransform.position - new Vector3(tooltipOffset.x, tooltipOffset.y, zOffset));
+
+    Gizmos.color = Color.yellow;
+    Gizmos.DrawSphere(tooltipTransform.position, 0.2f);
+   }
   }
  }
 }

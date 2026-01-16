@@ -5,7 +5,7 @@ This document contains UI Toolkit source files (.uxml, .uss)
 extracted from the project.
 
 Project: Abracodebra 1.0
-Extracted on: 2026-01-14 01:20:23
+Extracted on: 2026-01-14 17:03:57
 
 Note: Light compression applied - comments removed, empty lines consolidated.
 USS and UXML structure preserved for accurate editing.
@@ -24,12 +24,12 @@ USS and UXML structure preserved for accurate editing.
 
 
 - Assets\Scripts\A_ToolkitUI\GameUI_Document.uxml (Line: L34)
-- Assets\Scripts\A_ToolkitUI\GeneSlot.uxml (Line: L154)
-- Assets\Scripts\A_ToolkitUI\InventorySlot.uxml (Line: L166)
-- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Base.uss (Line: L180)
-- Assets\Scripts\A_ToolkitUI\Styles\GameUI_HUD.uss (Line: L311)
-- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Planning.uss (Line: L653)
-- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Slots.uss (Line: L829)
+- Assets\Scripts\A_ToolkitUI\GeneSlot.uxml (Line: L145)
+- Assets\Scripts\A_ToolkitUI\InventorySlot.uxml (Line: L157)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Base.uss (Line: L171)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_HUD.uss (Line: L302)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Planning.uss (Line: L608)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Slots.uss (Line: L784)
 
 
 ================================================================================
@@ -112,22 +112,13 @@ FILES
             </ui:VisualElement>
         </ui:VisualElement>
 
-        <ui:VisualElement name="hud-tooltip-panel" class="hud-tooltip-panel">
-            <ui:VisualElement class="hud-tooltip-header">
-                <ui:Image name="hud-tooltip-icon" class="hud-tooltip-icon" />
-                <ui:VisualElement class="hud-tooltip-title-container">
-                    <ui:Label name="hud-tooltip-name" text="" class="hud-tooltip-name" />
-                    <ui:Label name="hud-tooltip-type" text="" class="hud-tooltip-type" />
-                </ui:VisualElement>
-            </ui:VisualElement>
-            <ui:Label name="hud-tooltip-description" text="" class="hud-tooltip-description" />
-        </ui:VisualElement>
+        <ui:Label name="hotbar-tooltip-label" text="" class="hotbar-tooltip-label" />
 
         <ui:VisualElement name="hud-bottom-monolith" class="hud-bottom-monolith">
 
             <ui:VisualElement name="player-hunger-panel" class="hunger-panel hunger-panel--left">
                 <ui:VisualElement class="hunger-panel-inner">
-                    <ui:Label text="HUNGER" class="hunger-label" />
+                    <ui:Label name="player-hunger-label" text="HUNGER" class="hunger-label hunger-label--centered" />
                     <ui:VisualElement name="player-hunger-bar-bg" class="hunger-bar-bg">
                         <ui:VisualElement name="player-hunger-bar-fill" class="player-hunger-bar-fill" />
                         <ui:Label name="player-hunger-text" text="0/100" class="hunger-text-centered" />
@@ -142,7 +133,7 @@ FILES
 
             <ui:VisualElement name="doris-hunger-footer" class="hunger-panel hunger-panel--right">
                 <ui:VisualElement class="hunger-panel-inner">
-                    <ui:Label name="doris-label" text="DORIS'S HUNGER" class="hunger-label" />
+                    <ui:Label name="doris-hunger-label" text="DORIS'S HUNGER" class="hunger-label hunger-label--centered" />
                     <ui:VisualElement name="doris-hunger-bar-bg" class="hunger-bar-bg">
                         <ui:VisualElement name="doris-hunger-bar-fill" class="doris-hunger-bar-fill" />
                         <ui:Label name="doris-hunger-text" text="0/100" class="hunger-text-centered" />
@@ -316,7 +307,6 @@ Label {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\A_ToolkitUI\Styles\GameUI_HUD.uss
 
-﻿
 
 .hud-top-bar {
     position: absolute;
@@ -398,56 +388,17 @@ Label {
     border-radius: 1px;
 }
 
-.hud-tooltip-panel {
+.hotbar-tooltip-label {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 12px 15px;
-    border-radius: 8px;
-    min-width: 200px;
-    max-width: 280px;
-    display: none;
-}
-
-.hud-tooltip-header {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.hud-tooltip-icon {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    min-height: 48px;
-    margin-right: 10px;
-    border-radius: 4px;
-    border-width: 1px;
-    border-color: rgba(255, 255, 255, 0.3);
-    -unity-background-scale-mode: scale-to-fit;
-}
-
-.hud-tooltip-title-container {
-    flex-grow: 1;
-}
-
-.hud-tooltip-name {
+    bottom: 94px;
+    left: 0;
+    right: 0;
     font-size: 16px;
     -unity-font-style: bold;
     color: white;
-    margin-bottom: 2px;
-}
-
-.hud-tooltip-type {
-    font-size: 12px;
-    color: rgb(150, 180, 220);
-}
-
-.hud-tooltip-description {
-    font-size: 11px;
-    color: rgb(180, 180, 180);
-    white-space: normal;
+    -unity-text-align: middle-center;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9), -1px -1px 3px rgba(0, 0, 0, 0.9);
+    display: none;
 }
 
 .hud-bottom-monolith {
@@ -500,6 +451,10 @@ Label {
     -unity-text-align: upper-left;
     margin-bottom: 4px;
     letter-spacing: 1px;
+}
+
+.hunger-label--centered {
+    -unity-text-align: upper-center;
 }
 
 .hunger-bar-bg {

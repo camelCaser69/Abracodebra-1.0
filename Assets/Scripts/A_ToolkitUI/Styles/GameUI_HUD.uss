@@ -1,12 +1,4 @@
-﻿/* ============================================
-   GameUI_HUD.uss
-   HUD: top bar, tooltip, bottom monolith, hunger bars, hotbar
-   ============================================ */
-
-/* --------------------------------------------
-   TOP BAR
-   -------------------------------------------- */
-
+/* HUD Top Bar */
 .hud-top-bar {
     position: absolute;
     top: 15px;
@@ -32,10 +24,7 @@
     text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
 }
 
-/* --------------------------------------------
-   WAVE PROGRESS SLIDER
-   -------------------------------------------- */
-
+/* Wave Progress */
 .wave-progress-container {
     flex-direction: row;
     align-items: center;
@@ -91,66 +80,21 @@
     border-radius: 1px;
 }
 
-/* --------------------------------------------
-   TOOLTIP PANEL
-   -------------------------------------------- */
-
-.hud-tooltip-panel {
+/* Simple Hotbar Tooltip - centered above monolith, no background */
+.hotbar-tooltip-label {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 12px 15px;
-    border-radius: 8px;
-    min-width: 200px;
-    max-width: 280px;
-    display: none;
-}
-
-.hud-tooltip-header {
-    flex-direction: row;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.hud-tooltip-icon {
-    width: 48px;
-    height: 48px;
-    min-width: 48px;
-    min-height: 48px;
-    margin-right: 10px;
-    border-radius: 4px;
-    border-width: 1px;
-    border-color: rgba(255, 255, 255, 0.3);
-    -unity-background-scale-mode: scale-to-fit;
-}
-
-.hud-tooltip-title-container {
-    flex-grow: 1;
-}
-
-.hud-tooltip-name {
+    bottom: 94px;
+    left: 0;
+    right: 0;
     font-size: 16px;
     -unity-font-style: bold;
     color: white;
-    margin-bottom: 2px;
+    -unity-text-align: middle-center;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9), -1px -1px 3px rgba(0, 0, 0, 0.9);
+    display: none;
 }
 
-.hud-tooltip-type {
-    font-size: 12px;
-    color: rgb(150, 180, 220);
-}
-
-.hud-tooltip-description {
-    font-size: 11px;
-    color: rgb(180, 180, 180);
-    white-space: normal;
-}
-
-/* --------------------------------------------
-   BOTTOM MONOLITH (Unified Bar)
-   -------------------------------------------- */
-
+/* HUD Bottom Monolith */
 .hud-bottom-monolith {
     position: absolute;
     bottom: 0;
@@ -165,10 +109,7 @@
     margin: 0;
 }
 
-/* --------------------------------------------
-   HUNGER PANELS (Left & Right)
-   -------------------------------------------- */
-
+/* Hunger Panels */
 .hunger-panel {
     flex-direction: row;
     align-items: center;
@@ -198,10 +139,7 @@
     padding: 5px 0;
 }
 
-/* --------------------------------------------
-   HUNGER LABEL & BAR
-   -------------------------------------------- */
-
+/* Hunger Labels - centered variant */
 .hunger-label {
     font-size: 11px;
     -unity-font-style: bold;
@@ -211,6 +149,11 @@
     letter-spacing: 1px;
 }
 
+.hunger-label--centered {
+    -unity-text-align: upper-center;
+}
+
+/* Hunger Bar */
 .hunger-bar-bg {
     flex-grow: 1;
     height: 44px;
@@ -244,7 +187,6 @@
     left: 0;
 }
 
-/* Text centered inside the bar */
 .hunger-text-centered {
     position: absolute;
     top: 0;
@@ -258,10 +200,7 @@
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
 }
 
-/* --------------------------------------------
-   HOTBAR (Center)
-   -------------------------------------------- */
-
+/* Hotbar */
 #Hotbar {
     position: relative;
     height: 84px;
@@ -307,10 +246,7 @@
     display: none;
 }
 
-/* --------------------------------------------
-   LEGACY HUD STATS (kept for compatibility)
-   -------------------------------------------- */
-
+/* Stats Panel */
 .hud-stats-panel {
     position: absolute;
     top: 10px;
@@ -371,4 +307,16 @@
     font-size: 14px;
     -unity-font-style: bold;
     color: white;
+}
+
+.world-hover-tooltip {
+    position: absolute;
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: white;
+    -unity-text-align: middle-center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9), -1px -1px 2px rgba(0, 0, 0, 0.9), 1px -1px 2px rgba(0, 0, 0, 0.9), -1px 1px 2px rgba(0, 0, 0, 0.9);
+    padding: 4px 8px;
+    display: none;
+    pointer-events: none;
 }
