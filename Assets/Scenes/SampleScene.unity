@@ -57893,9 +57893,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 519420031}
   tileInteractionManager: {fileID: 1097838751}
-  uiDocument: {fileID: 752681536}
+  followCursor: 0
+  cursorOffset: {x: 0, y: -0.8}
   tooltipOffset: {x: 0, y: -0.6}
-  showDebug: 1
+  zOffset: -5
+  fontSize: 2
+  textColor: {r: 1, g: 1, b: 1, a: 1}
+  useItalic: 1
+  useBold: 0
+  sortingLayerName: UI
+  sortingOrder: 5000
+  showDebug: 0
+  forceShowTestText: 0
+  trackDestruction: 0
 --- !u!4 &906144533
 Transform:
   m_ObjectHideFlags: 0
