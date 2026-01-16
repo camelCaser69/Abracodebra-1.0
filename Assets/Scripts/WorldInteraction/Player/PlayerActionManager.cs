@@ -8,6 +8,7 @@ using WegoSystem;
 using Abracodabra.Genes;
 using Abracodabra.UI.Genes;
 using Abracodabra.UI.Toolkit;
+using Abracodabra.Minigames;
 
 public enum PlayerActionType {
     Move,
@@ -25,9 +26,9 @@ public class PlayerActionManager : MonoBehaviour {
         public Vector3Int GridPosition;
     }
 
-    [SerializeField] private bool debugMode = true;
-    [SerializeField] private int tickCostPerAction = 1;
-    [SerializeField] private float multiTickActionDelay = 0.5f;
+    [SerializeField] bool debugMode = true;
+    [SerializeField] int tickCostPerAction = 1;
+    [SerializeField] float multiTickActionDelay = 0.5f;
 
     public event Action<PlayerActionType, object> OnActionExecuted;
     public event Action<string> OnActionFailed;
@@ -86,11 +87,9 @@ public class PlayerActionManager : MonoBehaviour {
     bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool) {
         if (tool == null) return false;
 
-        // Get the actual result from TileInteractionManager
         bool actionSucceeded = TileInteractionManager.Instance?.ApplyToolAction(tool) ?? false;
 
         if (actionSucceeded) {
-            // Only consume tool use on SUCCESS
             if (ToolSwitcher.Instance != null && tool.limitedUses) {
                 ToolSwitcher.Instance.TryConsumeUse();
             }
@@ -112,14 +111,63 @@ public class PlayerActionManager : MonoBehaviour {
             return false;
         }
 
+        Vector3 worldPosition = TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition);
+
         bool result = PlantPlacementManager.Instance?.TryPlantSeedFromInventory(
             seedItem.SeedRuntimeState,
             gridPosition,
-            TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)
+            worldPosition
         ) ?? false;
 
         if (debugMode) Debug.Log($"[ExecutePlantSeed] PlantPlacementManager returned: {result}");
+
+        // If planting succeeded, trigger the minigame for bonus opportunity
+        if (result) {
+            TriggerPlantingMinigame(gridPosition, worldPosition);
+        }
+
         return result;
+    }
+
+    /// <summary>
+    /// Trigger the planting minigame for a chance at bonus effects (e.g., auto-watering)
+    /// </summary>
+    void TriggerPlantingMinigame(Vector3Int gridPosition, Vector3 worldPosition) {
+        if (MinigameManager.Instance == null) {
+            if (debugMode) Debug.Log("[PlayerActionManager] MinigameManager not found - skipping minigame");
+            return;
+        }
+
+        // Check if planting minigames are enabled
+        if (!MinigameManager.Instance.IsTriggerEnabled(MinigameTrigger.Planting)) {
+            if (debugMode) Debug.Log("[PlayerActionManager] Planting minigame not enabled - skipping");
+            return;
+        }
+
+        // Trigger the minigame - rewards are handled by MinigameManager
+        bool triggered = MinigameManager.Instance.TryTriggerMinigame(
+            MinigameTrigger.Planting,
+            gridPosition,
+            worldPosition,
+            OnPlantingMinigameComplete
+        );
+
+        if (debugMode && triggered) {
+            Debug.Log($"[PlayerActionManager] Planting minigame triggered at {gridPosition}");
+        }
+    }
+
+    void OnPlantingMinigameComplete(MinigameResult result) {
+        if (debugMode) {
+            string resultText = result.Tier switch {
+                MinigameResultTier.Perfect => "PERFECT! Plant auto-watered!",
+                MinigameResultTier.Good => "Good! Plant auto-watered!",
+                MinigameResultTier.Miss => "Missed - no bonus",
+                MinigameResultTier.Skipped => "Skipped - no bonus",
+                _ => "Unknown result"
+            };
+            Debug.Log($"[PlayerActionManager] Planting minigame result: {resultText}");
+        }
     }
 
     bool ExecuteHarvest(Vector3Int gridPosition) {
@@ -197,10 +245,11 @@ public class PlayerActionManager : MonoBehaviour {
         return totalCost;
     }
 
-    void AdvanceGameTick(int tickCount = 1) {
-        if (TickManager.Instance == null) return;
-        for (int i = 0; i < tickCount; i++) {
-            TickManager.Instance.AdvanceTick();
+    void AdvanceGameTick(int tickCount) {
+        if (TickManager.Instance != null) {
+            for (int i = 0; i < tickCount; i++) {
+                TickManager.Instance.AdvanceTick();
+            }
         }
     }
 }
