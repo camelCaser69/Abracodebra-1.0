@@ -6,7 +6,8 @@ namespace Abracodabra.Minigames {
     
     /// <summary>
     /// Wartales-style timing circle minigame.
-    /// A circle shrinks toward a target zone - click when it's in the zone to succeed.
+    /// A circle shrinks toward target zones - click when it's in the zone to succeed.
+    /// Uses filled donut shapes for clear visual zones.
     /// </summary>
     public class TimingCircleMinigame : MonoBehaviour {
         
@@ -14,11 +15,9 @@ namespace Abracodabra.Minigames {
         MinigameCompletedCallback onComplete;
         
         // Visual components
+        SpriteRenderer goodZoneRenderer;
+        SpriteRenderer perfectZoneRenderer;
         LineRenderer shrinkingCircle;
-        LineRenderer targetOuterCircle;
-        LineRenderer targetInnerCircle;
-        LineRenderer perfectCircle;
-        SpriteRenderer centerPoint;
         SpriteRenderer flashOverlay;
         
         // State
@@ -29,6 +28,10 @@ namespace Abracodabra.Minigames {
         
         // Circle rendering settings
         const int CircleSegments = 64;
+        const int TextureResolution = 128;
+        
+        // Overlap to eliminate gap between zones
+        const float ZoneOverlap = 0.03f;
 
         public void Initialize(TimingCircleConfig config, MinigameCompletedCallback onComplete) {
             this.config = config;
@@ -38,34 +41,104 @@ namespace Abracodabra.Minigames {
         }
 
         void CreateVisuals() {
-            // Create target zones (static)
-            targetOuterCircle = CreateCircleRenderer("TargetOuter", config.targetOuterRadius, config.targetZoneColor, config.lineThickness);
-            targetInnerCircle = CreateCircleRenderer("TargetInner", config.targetInnerRadius, config.targetZoneColor, config.lineThickness);
-            perfectCircle = CreateCircleRenderer("Perfect", config.perfectRadius, config.perfectZoneColor, config.lineThickness * 0.8f);
+            // Create Good zone (outer ring) - render first (lower sorting order)
+            goodZoneRenderer = CreateDonutZone("GoodZone", 
+                config.goodZoneOuterRadius, 
+                config.goodZoneInnerRadius, 
+                config.goodZoneColor,
+                config.sortingOrder);
             
-            // Create shrinking circle
-            shrinkingCircle = CreateCircleRenderer("Shrinking", config.startRadius, config.shrinkingCircleColor, config.lineThickness * 1.5f);
+            // Create Perfect zone (inner area) - slightly overlaps good zone to eliminate gap
+            // Outer radius extends slightly into the good zone for seamless appearance
+            perfectZoneRenderer = CreateDonutZone("PerfectZone", 
+                config.goodZoneInnerRadius + ZoneOverlap, // Overlap into good zone
+                config.perfectZoneInnerRadius, 
+                config.perfectZoneColor,
+                config.sortingOrder + 1); // Renders on top
             
-            // Create center point
-            centerPoint = CreateCenterPoint();
+            // Create shrinking circle (animated)
+            shrinkingCircle = CreateCircleRenderer("Shrinking", config.startRadius, 
+                config.shrinkingCircleColor, config.shrinkingCircleThickness);
+            SetSorting(shrinkingCircle, config.sortingOrder + 2);
             
             // Create flash overlay (for feedback)
             flashOverlay = CreateFlashOverlay();
-            
-            // Set sorting
-            SetSorting(targetOuterCircle, config.sortingOrder);
-            SetSorting(targetInnerCircle, config.sortingOrder + 1);
-            SetSorting(perfectCircle, config.sortingOrder + 2);
-            SetSorting(shrinkingCircle, config.sortingOrder + 3);
-            if (centerPoint != null) {
-                centerPoint.sortingLayerName = config.sortingLayerName;
-                centerPoint.sortingOrder = config.sortingOrder + 4;
-            }
             if (flashOverlay != null) {
                 flashOverlay.sortingLayerName = config.sortingLayerName;
                 flashOverlay.sortingOrder = config.sortingOrder + 10;
                 flashOverlay.enabled = false;
             }
+        }
+
+        /// <summary>
+        /// Create a filled donut/ring zone using a procedural texture
+        /// </summary>
+        SpriteRenderer CreateDonutZone(string name, float outerRadius, float innerRadius, Color color, int sortOrder) {
+            GameObject go = new GameObject($"Zone_{name}");
+            go.transform.SetParent(transform);
+            go.transform.localPosition = Vector3.zero;
+            
+            SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = CreateDonutSprite(outerRadius, innerRadius);
+            sr.color = color;
+            sr.sortingLayerName = config.sortingLayerName;
+            sr.sortingOrder = sortOrder;
+            
+            // Scale to match world units (sprite is normalized, we scale to outer radius * 2)
+            float scale = outerRadius * 2f;
+            go.transform.localScale = new Vector3(scale, scale, 1f);
+            
+            return sr;
+        }
+
+        /// <summary>
+        /// Create a donut-shaped sprite (ring/annulus)
+        /// No soft inner edge - crisp boundary for seamless zone stacking
+        /// </summary>
+        Sprite CreateDonutSprite(float outerRadius, float innerRadius) {
+            Texture2D tex = new Texture2D(TextureResolution, TextureResolution, TextureFormat.RGBA32, false);
+            tex.filterMode = FilterMode.Bilinear;
+            
+            float center = TextureResolution / 2f;
+            
+            // Normalize inner radius relative to outer (0 to 0.5 range)
+            float normalizedOuter = 0.5f;
+            float normalizedInner = (outerRadius > 0) ? (innerRadius / outerRadius) * 0.5f : 0f;
+            
+            Color32[] pixels = new Color32[TextureResolution * TextureResolution];
+            
+            for (int y = 0; y < TextureResolution; y++) {
+                for (int x = 0; x < TextureResolution; x++) {
+                    float dx = (x - center) / TextureResolution;
+                    float dy = (y - center) / TextureResolution;
+                    float dist = Mathf.Sqrt(dx * dx + dy * dy);
+                    
+                    // Check if within donut
+                    if (dist <= normalizedOuter && dist >= normalizedInner) {
+                        float alpha = 1f;
+                        
+                        // Soft outer edge only (for nice anti-aliasing at outer boundary)
+                        float outerEdgeDist = normalizedOuter - dist;
+                        float edgeSoftness = 0.015f; // Reduced softness for crisper edges
+                        if (outerEdgeDist < edgeSoftness) {
+                            alpha *= outerEdgeDist / edgeSoftness;
+                        }
+                        
+                        // NO soft inner edge - this allows zones to stack seamlessly
+                        // The zone rendered on top will have a clean inner boundary
+                        
+                        pixels[y * TextureResolution + x] = new Color32(255, 255, 255, (byte)(alpha * 255));
+                    } else {
+                        pixels[y * TextureResolution + x] = new Color32(0, 0, 0, 0);
+                    }
+                }
+            }
+            
+            tex.SetPixels32(pixels);
+            tex.Apply();
+            
+            return Sprite.Create(tex, new Rect(0, 0, TextureResolution, TextureResolution), 
+                Vector2.one * 0.5f, TextureResolution);
         }
 
         LineRenderer CreateCircleRenderer(string name, float radius, Color color, float width) {
@@ -80,12 +153,10 @@ namespace Abracodabra.Minigames {
             lr.startWidth = width;
             lr.endWidth = width;
             
-            // Create a simple material
             lr.material = new Material(Shader.Find("Sprites/Default"));
             lr.startColor = color;
             lr.endColor = color;
             
-            // Generate circle points
             SetCirclePoints(lr, radius);
             
             return lr;
@@ -107,56 +178,43 @@ namespace Abracodabra.Minigames {
             lr.SetPositions(points);
         }
 
-        SpriteRenderer CreateCenterPoint() {
-            GameObject go = new GameObject("CenterPoint");
-            go.transform.SetParent(transform);
-            go.transform.localPosition = Vector3.zero;
-            
-            SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = CreateCircleSprite(32);
-            sr.color = config.centerPointColor;
-            go.transform.localScale = Vector3.one * 0.1f;
-            
-            return sr;
-        }
-
         SpriteRenderer CreateFlashOverlay() {
             GameObject go = new GameObject("FlashOverlay");
             go.transform.SetParent(transform);
             go.transform.localPosition = Vector3.zero;
             
             SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
-            sr.sprite = CreateCircleSprite(64);
+            sr.sprite = CreateFilledCircleSprite(64);
             sr.color = Color.white;
             go.transform.localScale = Vector3.one * config.startRadius * 2.5f;
             
             return sr;
         }
 
-        /// <summary>
-        /// Procedurally generate a filled circle sprite
-        /// </summary>
-        Sprite CreateCircleSprite(int resolution) {
-            Texture2D tex = new Texture2D(resolution, resolution);
+        Sprite CreateFilledCircleSprite(int resolution) {
+            Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
             tex.filterMode = FilterMode.Bilinear;
             
             float center = resolution / 2f;
             float radius = resolution / 2f - 1;
             
+            Color32[] pixels = new Color32[resolution * resolution];
+            
             for (int y = 0; y < resolution; y++) {
                 for (int x = 0; x < resolution; x++) {
                     float dist = Vector2.Distance(new Vector2(x, y), new Vector2(center, center));
                     if (dist <= radius) {
-                        // Soft edge
                         float alpha = Mathf.Clamp01((radius - dist) / 2f);
-                        tex.SetPixel(x, y, new Color(1, 1, 1, alpha));
+                        pixels[y * resolution + x] = new Color32(255, 255, 255, (byte)(alpha * 255));
                     } else {
-                        tex.SetPixel(x, y, Color.clear);
+                        pixels[y * resolution + x] = new Color32(0, 0, 0, 0);
                     }
                 }
             }
             
+            tex.SetPixels32(pixels);
             tex.Apply();
+            
             return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), Vector2.one * 0.5f, resolution);
         }
 
@@ -171,7 +229,6 @@ namespace Abracodabra.Minigames {
             isRunning = true;
             hasClicked = false;
             
-            // Play start sound
             if (config.startSound != null) {
                 AudioSource.PlayClipAtPoint(config.startSound, transform.position);
             }
@@ -190,7 +247,7 @@ namespace Abracodabra.Minigames {
             // Update visual
             SetCirclePoints(shrinkingCircle, currentRadius);
             
-            // Update color based on position (visual feedback)
+            // Update color based on current zone
             UpdateShrinkingCircleColor();
             
             // Check for click
@@ -207,15 +264,13 @@ namespace Abracodabra.Minigames {
         }
 
         void UpdateShrinkingCircleColor() {
-            // Change color when entering success zone
-            MinigameResultTier currentTier = config.EvaluateRadius(currentRadius);
+            MinigameResultTier currentZone = config.GetCurrentZone(currentRadius);
             
-            Color targetColor = config.shrinkingCircleColor;
-            if (currentTier == MinigameResultTier.Perfect) {
-                targetColor = config.perfectZoneColor;
-            } else if (currentTier == MinigameResultTier.Good) {
-                targetColor = config.targetZoneColor;
-            }
+            Color targetColor = currentZone switch {
+                MinigameResultTier.Perfect => config.shrinkingInPerfectZoneColor,
+                MinigameResultTier.Good => config.shrinkingInGoodZoneColor,
+                _ => config.shrinkingCircleColor
+            };
             
             shrinkingCircle.startColor = targetColor;
             shrinkingCircle.endColor = targetColor;
@@ -230,8 +285,6 @@ namespace Abracodabra.Minigames {
 
         void CompleteWithResult(MinigameResultTier tier, float accuracy) {
             isRunning = false;
-            
-            // Show feedback
             StartCoroutine(ShowFeedbackAndComplete(tier, accuracy));
         }
 
@@ -273,10 +326,8 @@ namespace Abracodabra.Minigames {
                 flashOverlay.enabled = false;
             }
             
-            // Brief pause to let player see result
             yield return new WaitForSeconds(0.1f);
             
-            // Complete
             MinigameResult result = new MinigameResult {
                 Tier = tier,
                 Accuracy = accuracy,
@@ -286,9 +337,6 @@ namespace Abracodabra.Minigames {
             onComplete?.Invoke(result);
         }
 
-        /// <summary>
-        /// Skip the minigame (player pressed escape or similar)
-        /// </summary>
         public void Skip() {
             if (!isRunning) return;
             
@@ -304,12 +352,14 @@ namespace Abracodabra.Minigames {
         }
 
         void OnDestroy() {
-            // Cleanup procedural textures
-            if (centerPoint != null && centerPoint.sprite != null && centerPoint.sprite.texture != null) {
-                Destroy(centerPoint.sprite.texture);
-            }
-            if (flashOverlay != null && flashOverlay.sprite != null && flashOverlay.sprite.texture != null) {
-                Destroy(flashOverlay.sprite.texture);
+            CleanupSpriteTexture(goodZoneRenderer);
+            CleanupSpriteTexture(perfectZoneRenderer);
+            CleanupSpriteTexture(flashOverlay);
+        }
+
+        void CleanupSpriteTexture(SpriteRenderer sr) {
+            if (sr != null && sr.sprite != null && sr.sprite.texture != null) {
+                Destroy(sr.sprite.texture);
             }
         }
     }

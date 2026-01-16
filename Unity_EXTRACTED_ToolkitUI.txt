@@ -5,7 +5,7 @@ This document contains UI Toolkit source files (.uxml, .uss)
 extracted from the project.
 
 Project: Abracodebra 1.0
-Extracted on: 2026-01-14 17:03:57
+Extracted on: 2026-01-16 12:40:44
 
 Note: Light compression applied - comments removed, empty lines consolidated.
 USS and UXML structure preserved for accurate editing.
@@ -24,12 +24,12 @@ USS and UXML structure preserved for accurate editing.
 
 
 - Assets\Scripts\A_ToolkitUI\GameUI_Document.uxml (Line: L34)
-- Assets\Scripts\A_ToolkitUI\GeneSlot.uxml (Line: L145)
-- Assets\Scripts\A_ToolkitUI\InventorySlot.uxml (Line: L157)
-- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Base.uss (Line: L171)
-- Assets\Scripts\A_ToolkitUI\Styles\GameUI_HUD.uss (Line: L302)
-- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Planning.uss (Line: L608)
-- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Slots.uss (Line: L784)
+- Assets\Scripts\A_ToolkitUI\GeneSlot.uxml (Line: L146)
+- Assets\Scripts\A_ToolkitUI\InventorySlot.uxml (Line: L158)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Base.uss (Line: L172)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_HUD.uss (Line: L303)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Planning.uss (Line: L621)
+- Assets\Scripts\A_ToolkitUI\Styles\GameUI_Slots.uss (Line: L797)
 
 
 ================================================================================
@@ -113,6 +113,7 @@ FILES
         </ui:VisualElement>
 
         <ui:Label name="hotbar-tooltip-label" text="" class="hotbar-tooltip-label" />
+        <ui:Label name="world-hover-tooltip" text="" class="world-hover-tooltip" />
 
         <ui:VisualElement name="hud-bottom-monolith" class="hud-bottom-monolith">
 
@@ -608,6 +609,18 @@ Label {
     font-size: 14px;
     -unity-font-style: bold;
     color: white;
+}
+
+.world-hover-tooltip {
+    position: absolute;
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: white;
+    -unity-text-align: middle-center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9), -1px -1px 2px rgba(0, 0, 0, 0.9), 1px -1px 2px rgba(0, 0, 0, 0.9), -1px 1px 2px rgba(0, 0, 0, 0.9);
+    padding: 4px 8px;
+    display: none;
+    pointer-events: none;
 }
 
 ////////////////////////////////////////////////////////////

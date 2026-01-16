@@ -14,16 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   duration: 1.5
   startRadius: 2
-  targetOuterRadius: 0.6
-  targetInnerRadius: 0.3
-  perfectRadius: 0.15
-  shrinkingCircleColor: {r: 1, g: 1, b: 1, a: 0.9}
-  targetZoneColor: {r: 0.015886446, g: 0.277397, b: 0.4811321, a: 0.6}
-  perfectZoneColor: {r: 0, g: 0.55049276, b: 1, a: 0.8}
-  centerPointColor: {r: 0, g: 0.3885045, b: 1, a: 0}
-  lineThickness: 0.05
-  successFlashColor: {r: 0.014684939, g: 0.336475, b: 0.6226415, a: 0.74509805}
-  perfectFlashColor: {r: 0, g: 0.55501795, b: 1, a: 1}
+  goodZoneOuterRadius: 0.7
+  goodZoneInnerRadius: 0.35
+  perfectZoneInnerRadius: 0.2
+  goodZoneColor: {r: 0, g: 0.5773263, b: 1, a: 1}
+  perfectZoneColor: {r: 0, g: 0.45429876, b: 0.7830189, a: 1}
+  shrinkingCircleColor: {r: 1, g: 1, b: 1, a: 0.95}
+  shrinkingCircleThickness: 0.06
+  shrinkingInGoodZoneColor: {r: 1, g: 1, b: 1, a: 1}
+  shrinkingInPerfectZoneColor: {r: 1, g: 1, b: 1, a: 1}
+  successFlashColor: {r: 0, g: 0.67209864, b: 1, a: 1}
+  perfectFlashColor: {r: 0, g: 0.45917082, b: 1, a: 1}
   missFlashColor: {r: 1, g: 0.2, b: 0.2, a: 1}
   flashDuration: 0.2
   startSound: {fileID: 0}

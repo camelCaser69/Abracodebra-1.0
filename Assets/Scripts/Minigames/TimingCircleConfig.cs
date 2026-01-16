@@ -19,34 +19,38 @@ namespace Abracodabra.Minigames {
         public float startRadius = 2f;
         
         [Header("Success Zones")]
-        [Tooltip("Radius of the outer target ring (success zone outer edge)")]
-        [Range(0.2f, 1f)]
-        public float targetOuterRadius = 0.6f;
+        [Tooltip("Outer edge of the Good zone (where success starts)")]
+        [Range(0.3f, 1.5f)]
+        public float goodZoneOuterRadius = 0.7f;
         
-        [Tooltip("Radius of the inner target ring (success zone inner edge / perfect zone outer edge)")]
-        [Range(0.1f, 0.8f)]
-        public float targetInnerRadius = 0.3f;
+        [Tooltip("Inner edge of the Good zone / Outer edge of the Perfect zone")]
+        [Range(0.15f, 1f)]
+        public float goodZoneInnerRadius = 0.35f;
         
-        [Tooltip("Radius for 'Perfect' tier (center of target)")]
-        [Range(0.05f, 0.5f)]
-        public float perfectRadius = 0.15f;
+        [Tooltip("Inner edge of the Perfect zone (can be 0 for solid center)")]
+        [Range(0f, 0.5f)]
+        public float perfectZoneInnerRadius = 0f;
         
-        [Header("Visuals")]
+        [Header("Zone Colors")]
+        [Tooltip("Color of the Good zone (outer ring)")]
+        public Color goodZoneColor = new Color(0.3f, 0.7f, 0.3f, 0.6f); // Semi-transparent green
+        
+        [Tooltip("Color of the Perfect zone (inner area)")]
+        public Color perfectZoneColor = new Color(0.2f, 1f, 0.2f, 0.8f); // Brighter green
+        
+        [Header("Shrinking Indicator")]
         [Tooltip("Color of the shrinking circle")]
-        public Color shrinkingCircleColor = new Color(1f, 0.8f, 0.2f, 0.9f); // Golden
+        public Color shrinkingCircleColor = new Color(1f, 0.8f, 0.2f, 0.95f); // Golden
         
-        [Tooltip("Color of the target zone (outer ring)")]
-        public Color targetZoneColor = new Color(0.2f, 0.8f, 0.2f, 0.6f); // Green
+        [Tooltip("Thickness of the shrinking circle line")]
+        [Range(0.03f, 0.15f)]
+        public float shrinkingCircleThickness = 0.06f;
         
-        [Tooltip("Color of the perfect zone (inner ring)")]
-        public Color perfectZoneColor = new Color(0.2f, 1f, 0.2f, 0.8f); // Bright green
+        [Tooltip("Color when shrinking circle enters Good zone")]
+        public Color shrinkingInGoodZoneColor = new Color(0.5f, 1f, 0.5f, 1f); // Light green
         
-        [Tooltip("Color of the center point")]
-        public Color centerPointColor = new Color(1f, 1f, 1f, 0.8f); // White
-        
-        [Tooltip("Thickness of circle lines (in world units)")]
-        [Range(0.02f, 0.2f)]
-        public float lineThickness = 0.05f;
+        [Tooltip("Color when shrinking circle enters Perfect zone")]
+        public Color shrinkingInPerfectZoneColor = new Color(1f, 1f, 0.5f, 1f); // Yellow-green
         
         [Header("Feedback")]
         [Tooltip("Flash color on successful hit")]
@@ -86,14 +90,12 @@ namespace Abracodabra.Minigames {
         /// Evaluate what tier a given radius falls into
         /// </summary>
         public MinigameResultTier EvaluateRadius(float currentRadius) {
-            if (currentRadius <= perfectRadius) {
+            // Perfect zone: between perfectZoneInnerRadius and goodZoneInnerRadius
+            if (currentRadius <= goodZoneInnerRadius && currentRadius >= perfectZoneInnerRadius) {
                 return MinigameResultTier.Perfect;
             }
-            if (currentRadius <= targetOuterRadius && currentRadius >= targetInnerRadius) {
-                return MinigameResultTier.Good;
-            }
-            if (currentRadius <= targetInnerRadius && currentRadius > perfectRadius) {
-                // Between perfect and inner target - still Good
+            // Good zone: between goodZoneOuterRadius and goodZoneInnerRadius
+            if (currentRadius <= goodZoneOuterRadius && currentRadius > goodZoneInnerRadius) {
                 return MinigameResultTier.Good;
             }
             return MinigameResultTier.Miss;
@@ -103,23 +105,39 @@ namespace Abracodabra.Minigames {
         /// Calculate accuracy (0-1) based on how close to perfect center
         /// </summary>
         public float CalculateAccuracy(float currentRadius) {
-            if (currentRadius <= perfectRadius) return 1f;
+            float perfectCenter = (goodZoneInnerRadius + perfectZoneInnerRadius) / 2f;
+            if (Mathf.Approximately(currentRadius, perfectCenter)) return 1f;
             if (currentRadius >= startRadius) return 0f;
             
-            // Linear interpolation from start to perfect
-            return 1f - (currentRadius - perfectRadius) / (startRadius - perfectRadius);
+            return 1f - Mathf.Abs(currentRadius - perfectCenter) / startRadius;
+        }
+
+        /// <summary>
+        /// Check which zone the current radius is in
+        /// </summary>
+        public MinigameResultTier GetCurrentZone(float currentRadius) {
+            if (currentRadius <= goodZoneInnerRadius) {
+                return MinigameResultTier.Perfect;
+            }
+            if (currentRadius <= goodZoneOuterRadius) {
+                return MinigameResultTier.Good;
+            }
+            return MinigameResultTier.Miss;
         }
 
         void OnValidate() {
             // Ensure radii are in correct order
-            if (targetInnerRadius >= targetOuterRadius) {
-                targetInnerRadius = targetOuterRadius - 0.1f;
+            if (goodZoneInnerRadius >= goodZoneOuterRadius) {
+                goodZoneInnerRadius = goodZoneOuterRadius - 0.1f;
             }
-            if (perfectRadius >= targetInnerRadius) {
-                perfectRadius = targetInnerRadius - 0.05f;
+            if (perfectZoneInnerRadius >= goodZoneInnerRadius) {
+                perfectZoneInnerRadius = goodZoneInnerRadius - 0.1f;
             }
-            if (targetOuterRadius >= startRadius) {
-                startRadius = targetOuterRadius + 0.5f;
+            if (goodZoneOuterRadius >= startRadius) {
+                startRadius = goodZoneOuterRadius + 0.5f;
+            }
+            if (perfectZoneInnerRadius < 0) {
+                perfectZoneInnerRadius = 0;
             }
         }
     }

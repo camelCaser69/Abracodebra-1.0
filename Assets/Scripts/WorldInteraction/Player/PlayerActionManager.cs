@@ -58,9 +58,19 @@ public class PlayerActionManager : MonoBehaviour {
                 break;
 
             case PlayerActionType.PlantSeed:
-                tickCost = 2; // Planting takes longer
                 var seedItem = actionData as UIInventoryItem;
-                success = ExecutePlantSeed(gridPosition, seedItem);
+                // Check if minigame will handle this
+                if (ShouldUseMinigameForPlanting()) {
+                    success = ExecutePlantSeedWithMinigame(gridPosition, seedItem, onSuccessCallback);
+                    if (success) {
+                        // Minigame started - it will handle tick advancement and seed consumption
+                        // Return true but DON'T execute the normal success flow
+                        return true;
+                    }
+                    // Minigame failed to start (validation failed) - fall through to normal flow
+                }
+                // No minigame or minigame failed - plant immediately
+                success = ExecutePlantSeedImmediate(gridPosition, seedItem);
                 break;
 
             case PlayerActionType.Harvest:
@@ -84,6 +94,11 @@ public class PlayerActionManager : MonoBehaviour {
         return success;
     }
 
+    bool ShouldUseMinigameForPlanting() {
+        return MinigameManager.Instance != null && 
+               MinigameManager.Instance.IsTriggerEnabled(MinigameTrigger.Planting);
+    }
+
     bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool) {
         if (tool == null) return false;
 
@@ -103,11 +118,93 @@ public class PlayerActionManager : MonoBehaviour {
         return actionSucceeded;
     }
 
-    bool ExecutePlantSeed(Vector3Int gridPosition, UIInventoryItem seedItem) {
-        if (debugMode) Debug.Log($"[ExecutePlantSeed] Attempting to plant {seedItem?.GetDisplayName()} at {gridPosition}");
+    /// <summary>
+    /// Execute planting with minigame - seed planted AFTER minigame completes
+    /// </summary>
+    bool ExecutePlantSeedWithMinigame(Vector3Int gridPosition, UIInventoryItem seedItem, Action onSuccessCallback) {
+        if (debugMode) Debug.Log($"[ExecutePlantSeedWithMinigame] Starting for {seedItem?.GetDisplayName()} at {gridPosition}");
 
         if (seedItem == null || seedItem.Type != UIInventoryItem.ItemType.Seed) {
-            Debug.LogError("[ExecutePlantSeed] Action failed: Provided item was not a valid seed.");
+            Debug.LogError("[ExecutePlantSeedWithMinigame] Invalid seed item");
+            return false;
+        }
+
+        // Validate that planting CAN happen
+        if (!CanPlantAtPosition(gridPosition, seedItem)) {
+            if (debugMode) Debug.Log("[ExecutePlantSeedWithMinigame] Planting validation failed");
+            return false;
+        }
+
+        Vector3 worldPosition = TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition);
+
+        // Capture everything needed for deferred execution
+        var capturedRuntimeState = seedItem.SeedRuntimeState;
+        var capturedSeedItem = seedItem;
+        var capturedGridPosition = gridPosition;
+        var capturedWorldPosition = worldPosition;
+        var capturedCallback = onSuccessCallback;
+        var capturedTickCost = tickCostPerAction;
+
+        // Define the deferred action that runs after minigame completes
+        Action deferredPlantAction = () => {
+            if (debugMode) Debug.Log($"[DeferredPlant] Executing deferred plant at {capturedGridPosition}");
+
+            bool planted = false;
+            try {
+                planted = PlantPlacementManager.Instance?.TryPlantSeedFromInventory(
+                    capturedRuntimeState,
+                    capturedGridPosition,
+                    capturedWorldPosition
+                ) ?? false;
+            }
+            catch (Exception e) {
+                Debug.LogError($"[DeferredPlant] Exception during planting: {e}");
+            }
+
+            if (debugMode) Debug.Log($"[DeferredPlant] TryPlantSeedFromInventory returned: {planted}");
+
+            if (planted) {
+                // Advance tick
+                if (debugMode) Debug.Log($"[DeferredPlant] Advancing {capturedTickCost} tick(s)");
+                AdvanceGameTickStatic(capturedTickCost);
+
+                // Consume seed (via callback)
+                if (debugMode) Debug.Log("[DeferredPlant] Invoking success callback to consume seed");
+                capturedCallback?.Invoke();
+
+                // Fire event
+                OnActionExecuted?.Invoke(PlayerActionType.PlantSeed, capturedSeedItem);
+
+                if (debugMode) Debug.Log("[DeferredPlant] Deferred planting completed successfully");
+            }
+            else {
+                Debug.LogWarning("[DeferredPlant] Planting failed in deferred action!");
+            }
+        };
+
+        // Start minigame with deferred action
+        bool minigameStarted = MinigameManager.Instance.TryTriggerMinigameWithDeferredAction(
+            MinigameTrigger.Planting,
+            gridPosition,
+            worldPosition,
+            deferredPlantAction,
+            null, // Use default reward handling
+            OnPlantingMinigameComplete
+        );
+
+        if (debugMode) Debug.Log($"[ExecutePlantSeedWithMinigame] Minigame started: {minigameStarted}");
+
+        return minigameStarted;
+    }
+
+    /// <summary>
+    /// Execute planting immediately (no minigame)
+    /// </summary>
+    bool ExecutePlantSeedImmediate(Vector3Int gridPosition, UIInventoryItem seedItem) {
+        if (debugMode) Debug.Log($"[ExecutePlantSeedImmediate] Planting {seedItem?.GetDisplayName()} at {gridPosition}");
+
+        if (seedItem == null || seedItem.Type != UIInventoryItem.ItemType.Seed) {
+            Debug.LogError("[ExecutePlantSeedImmediate] Invalid seed item");
             return false;
         }
 
@@ -119,42 +216,38 @@ public class PlayerActionManager : MonoBehaviour {
             worldPosition
         ) ?? false;
 
-        if (debugMode) Debug.Log($"[ExecutePlantSeed] PlantPlacementManager returned: {result}");
-
-        // If planting succeeded, trigger the minigame for bonus opportunity
-        if (result) {
-            TriggerPlantingMinigame(gridPosition, worldPosition);
-        }
-
+        if (debugMode) Debug.Log($"[ExecutePlantSeedImmediate] Result: {result}");
         return result;
     }
 
     /// <summary>
-    /// Trigger the planting minigame for a chance at bonus effects (e.g., auto-watering)
+    /// Static method to advance tick - can be called from lambda without closure issues
     /// </summary>
-    void TriggerPlantingMinigame(Vector3Int gridPosition, Vector3 worldPosition) {
-        if (MinigameManager.Instance == null) {
-            if (debugMode) Debug.Log("[PlayerActionManager] MinigameManager not found - skipping minigame");
+    static void AdvanceGameTickStatic(int tickCount) {
+        if (TickManager.Instance == null) {
+            Debug.LogError("[AdvanceGameTickStatic] TickManager.Instance is null!");
             return;
         }
+        for (int i = 0; i < tickCount; i++) {
+            TickManager.Instance.AdvanceTick();
+        }
+    }
 
-        // Check if planting minigames are enabled
-        if (!MinigameManager.Instance.IsTriggerEnabled(MinigameTrigger.Planting)) {
-            if (debugMode) Debug.Log("[PlayerActionManager] Planting minigame not enabled - skipping");
-            return;
+    bool CanPlantAtPosition(Vector3Int gridPosition, UIInventoryItem seedItem) {
+        if (PlantPlacementManager.Instance == null) return false;
+        
+        if (PlantPlacementManager.Instance.IsPositionOccupied(gridPosition)) {
+            if (debugMode) Debug.Log($"[CanPlantAtPosition] Position {gridPosition} is occupied");
+            return false;
         }
 
-        // Trigger the minigame - rewards are handled by MinigameManager
-        bool triggered = MinigameManager.Instance.TryTriggerMinigame(
-            MinigameTrigger.Planting,
-            gridPosition,
-            worldPosition,
-            OnPlantingMinigameComplete
-        );
-
-        if (debugMode && triggered) {
-            Debug.Log($"[PlayerActionManager] Planting minigame triggered at {gridPosition}");
+        var tileDef = TileInteractionManager.Instance?.FindWhichTileDefinitionAt(gridPosition);
+        if (!PlantPlacementManager.Instance.IsTileValidForSeed(tileDef, seedItem.SeedRuntimeState)) {
+            if (debugMode) Debug.Log($"[CanPlantAtPosition] Tile not valid for this seed at {gridPosition}");
+            return false;
         }
+
+        return true;
     }
 
     void OnPlantingMinigameComplete(MinigameResult result) {
@@ -245,11 +338,7 @@ public class PlayerActionManager : MonoBehaviour {
         return totalCost;
     }
 
-    void AdvanceGameTick(int tickCount) {
-        if (TickManager.Instance != null) {
-            for (int i = 0; i < tickCount; i++) {
-                TickManager.Instance.AdvanceTick();
-            }
-        }
+    void AdvanceGameTick(int tickCount = 1) {
+        AdvanceGameTickStatic(tickCount);
     }
 }

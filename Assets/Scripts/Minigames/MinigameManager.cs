@@ -8,6 +8,7 @@ namespace Abracodabra.Minigames {
     /// <summary>
     /// Central manager for the minigame system.
     /// Handles triggering minigames, processing results, and applying rewards.
+    /// Supports deferred actions (action happens after minigame completes).
     /// </summary>
     public class MinigameManager : MonoBehaviour {
         
@@ -36,6 +37,10 @@ namespace Abracodabra.Minigames {
         MinigameCompletedCallback pendingCallback;
         MinigameTrigger currentTrigger;
         Vector3Int currentGridPosition;
+        
+        // Deferred action data (for planting after minigame)
+        Action pendingAction;
+        Action<MinigameResult> pendingRewardAction;
 
         // Events for external systems to hook into
         public event Action<MinigameTrigger, Vector3Int> OnMinigameStarted;
@@ -59,7 +64,6 @@ namespace Abracodabra.Minigames {
         }
 
         void Update() {
-            // Handle skip input
             if (allowSkip && IsMinigameActive && Input.GetKeyDown(KeyCode.Escape)) {
                 SkipCurrentMinigame();
             }
@@ -67,7 +71,6 @@ namespace Abracodabra.Minigames {
 
         /// <summary>
         /// Enable minigames for a specific trigger type.
-        /// Call this from perk/upgrade systems to unlock minigames.
         /// </summary>
         public void EnableTrigger(MinigameTrigger trigger) {
             enabledTriggers.Add(trigger);
@@ -90,10 +93,19 @@ namespace Abracodabra.Minigames {
         }
 
         /// <summary>
-        /// Attempt to trigger a minigame for the given action.
-        /// Returns true if a minigame was started.
+        /// Trigger a minigame with a deferred action.
+        /// The deferredAction is executed AFTER the minigame completes (regardless of result).
+        /// The rewardAction is executed only on success, after deferredAction.
+        /// Returns true if minigame was started.
         /// </summary>
-        public bool TryTriggerMinigame(MinigameTrigger trigger, Vector3Int gridPosition, Vector3 worldPosition, MinigameCompletedCallback onComplete = null) {
+        public bool TryTriggerMinigameWithDeferredAction(
+            MinigameTrigger trigger, 
+            Vector3Int gridPosition, 
+            Vector3 worldPosition,
+            Action deferredAction,
+            Action<MinigameResult> rewardAction = null,
+            MinigameCompletedCallback onComplete = null) 
+        {
             if (!IsTriggerEnabled(trigger)) {
                 if (showDebug) Debug.Log($"[MinigameManager] Minigame not enabled for trigger: {trigger}");
                 return false;
@@ -114,29 +126,37 @@ namespace Abracodabra.Minigames {
             currentTrigger = trigger;
             currentGridPosition = gridPosition;
             pendingCallback = onComplete;
+            pendingAction = deferredAction;
+            pendingRewardAction = rewardAction;
 
             // Create and start the minigame
             StartTimingCircleMinigame(config, worldPosition);
 
             OnMinigameStarted?.Invoke(trigger, gridPosition);
             
-            if (showDebug) Debug.Log($"[MinigameManager] Started {trigger} minigame at {gridPosition}");
+            if (showDebug) Debug.Log($"[MinigameManager] Started {trigger} minigame at {gridPosition} (with deferred action)");
             
             return true;
+        }
+
+        /// <summary>
+        /// Attempt to trigger a minigame for the given action (legacy method without deferred action).
+        /// Returns true if a minigame was started.
+        /// </summary>
+        public bool TryTriggerMinigame(MinigameTrigger trigger, Vector3Int gridPosition, Vector3 worldPosition, MinigameCompletedCallback onComplete = null) {
+            return TryTriggerMinigameWithDeferredAction(trigger, gridPosition, worldPosition, null, null, onComplete);
         }
 
         TimingCircleConfig GetConfigForTrigger(MinigameTrigger trigger) {
             switch (trigger) {
                 case MinigameTrigger.Planting:
                     return plantingConfig;
-                // Add more cases as configs are added
                 default:
                     return null;
             }
         }
 
         void StartTimingCircleMinigame(TimingCircleConfig config, Vector3 worldPosition) {
-            // Create minigame GameObject
             GameObject minigameGO = new GameObject($"TimingCircleMinigame_{Time.frameCount}");
             minigameGO.transform.position = worldPosition;
 
@@ -154,8 +174,18 @@ namespace Abracodabra.Minigames {
                 Debug.Log($"[MinigameManager] Minigame finished: {result.Tier} (Accuracy: {result.Accuracy:P0})");
             }
 
-            // Apply rewards based on result
-            ApplyRewards(result);
+            // Execute deferred action first (e.g., plant the seed)
+            if (pendingAction != null) {
+                pendingAction.Invoke();
+                if (showDebug) Debug.Log("[MinigameManager] Executed deferred action");
+            }
+
+            // Apply rewards based on result (only if custom reward action not provided)
+            if (pendingRewardAction != null) {
+                pendingRewardAction.Invoke(result);
+            } else {
+                ApplyRewards(result);
+            }
 
             // Notify external listeners
             OnMinigameCompleted?.Invoke(result);
@@ -169,6 +199,8 @@ namespace Abracodabra.Minigames {
                 activeMinigame = null;
             }
             pendingCallback = null;
+            pendingAction = null;
+            pendingRewardAction = null;
             currentTrigger = MinigameTrigger.None;
         }
 
@@ -179,21 +211,16 @@ namespace Abracodabra.Minigames {
                 case MinigameTrigger.Planting:
                     ApplyPlantingReward(result);
                     break;
-                // Add more reward cases as needed
             }
         }
 
         void ApplyPlantingReward(MinigameResult result) {
-            // Success reward: Apply watering to the tile
             if (wateringCanTool == null) {
                 Debug.LogWarning("[MinigameManager] WateringCan tool not assigned - cannot apply planting bonus");
                 return;
             }
 
-            // Use TileInteractionManager to apply the watering effect
             if (TileInteractionManager.Instance != null) {
-                // We need to temporarily set the hovered cell to apply the tool
-                // This is a bit hacky but works with the existing system
                 bool applied = TileInteractionManager.Instance.ApplyToolAtPosition(wateringCanTool, result.GridPosition);
                 
                 if (showDebug) {
@@ -210,13 +237,15 @@ namespace Abracodabra.Minigames {
         }
 
         /// <summary>
-        /// Force cancel any active minigame (e.g., when game state changes)
+        /// Force cancel any active minigame
         /// </summary>
         public void CancelActiveMinigame() {
             if (activeMinigame != null) {
                 Destroy(activeMinigame.gameObject);
                 activeMinigame = null;
                 pendingCallback = null;
+                pendingAction = null;
+                pendingRewardAction = null;
                 currentTrigger = MinigameTrigger.None;
                 
                 if (showDebug) Debug.Log("[MinigameManager] Active minigame cancelled");

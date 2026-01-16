@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 743,291 -> 534,401 chars (28.1% reduction)
-Estimated tokens saved: ~52,222
+Compression Stats: 786,386 -> 563,531 chars (28.3% reduction)
+Estimated tokens saved: ~55,713
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -101,120 +101,127 @@ using System.Linq;
   HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L6795
   HungerUI (Assets\Scripts\WorldInteraction\Player/) L6821
   PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6869
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7069
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7223
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7277
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7320
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7337
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7377
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7536
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7180
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7334
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7388
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7431
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7448
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7488
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7647
 
 [Abracodabra.Ecosystem]
-  DorisController (Assets\Scripts\Ecosystem\Doris/) L7547
-  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L7905
-  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L7992
+  DorisController (Assets\Scripts\Ecosystem\Doris/) L7658
+  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L8016
+  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L8103
 
 [Abracodabra.Genes]
-  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L8193
-  GeneLibrary (Assets\Scripts\Genes/) L8203
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L8358
-  PlantState (Assets\Scripts\PlantSystem\Growth/) L8538
+  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L8304
+  GeneLibrary (Assets\Scripts\Genes/) L8314
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L8469
+  PlantState (Assets\Scripts\PlantSystem\Growth/) L8649
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L8930
-  Fruit (Assets\Scripts\Genes\Components/) L8955
-  NutritionComponent (Assets\Scripts\Genes\Components/) L8993
+  Creature (Assets\Scripts\Genes\Components/) L9041
+  Fruit (Assets\Scripts\Genes\Components/) L9066
+  NutritionComponent (Assets\Scripts\Genes\Components/) L9104
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L9005
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L9051
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L9070
-  ModifierGene (Assets\Scripts\Genes\Core/) L9082
-  PassiveStatType (Assets\Scripts\Genes\Core/) L9114
-  PayloadGene (Assets\Scripts\Genes\Core/) L9156
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L9202
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L9223
-  GeneBase (Assets\Scripts\Genes/) L9256
-  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L9334
+  ActiveGene (Assets\Scripts\Genes\Core/) L9116
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L9162
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L9181
+  ModifierGene (Assets\Scripts\Genes\Core/) L9193
+  PassiveStatType (Assets\Scripts\Genes\Core/) L9225
+  PayloadGene (Assets\Scripts\Genes\Core/) L9267
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L9313
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L9334
+  GeneBase (Assets\Scripts\Genes/) L9367
+  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L9445
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L9437
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L9555
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L9585
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L9628
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L9548
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L9666
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L9696
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L9739
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L9679
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L9735
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9867
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L9790
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L9846
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9978
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L9922
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L9955
-  GeneEventBus (Assets\Scripts\Genes\Services/) L10053
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L10105
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L10033
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L10066
+  GeneEventBus (Assets\Scripts\Genes\Services/) L10164
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L10216
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L10192
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L10303
+
+[Abracodabra.Minigames]
+  MinigameManager (Assets\Scripts\Minigames/) L10396
+  MinigameType (Assets\Scripts\Minigames/) L10612
+  TileInteractionManagerExtensions (Assets\Scripts\Minigames/) L10672
+  TimingCircleConfig (Assets\Scripts\Minigames/) L10734
+  TimingCircleMinigame (Assets\Scripts\Minigames/) L10865
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L10285
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L10370
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L10510
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L11194
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L11279
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11419
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L10788
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L11635
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L11924
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L12162
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L12348
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L12547
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L13191
-  WorldHoverTooltip (Assets\Scripts\A_ToolkitUI/) L13385
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L11697
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L12544
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L12833
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L13071
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L13257
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L13456
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L14100
+  DestroyTracker (Assets\Scripts\A_ToolkitUI/) L14294
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L13595
-  SeedRarity (Assets\Scripts\A_ToolkitUI/) L13765
-  QualityTier (Assets\Scripts\A_ToolkitUI/) L13787
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L14578
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L14748
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L14770
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L13849
-  CameraZoomController (Assets\Scripts\Core/) L13962
-  InitializationManager (Assets\Scripts\Core/) L14011
-  PixelGridSnapper (Assets\Scripts\Core/) L14051
-  RunState (Assets\Scripts\Core/) L14084
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L14250
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L14313
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L14449
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L14478
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L14629
-  GridEntity (Assets\Scripts\Ticks/) L14701
-  GridPosition (Assets\Scripts\Ticks/) L14871
-  GridPositionManager (Assets\Scripts\Ticks/) L14972
-  GridRadiusUtility (Assets\Scripts\Ticks/) L15586
-  MultiTileEntity (Assets\Scripts\Ticks/) L15730
-  PivotMode (Assets\Scripts\Ticks/) L15974
-  TickConfiguration (Assets\Scripts\Ticks/) L16088
-  ITickUpdateable (Assets\Scripts\Ticks/) L16174
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L16326
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L16347
-  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L16543
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L16559
-  for (Assets\Scripts\WorldInteraction/) L17180
+  CameraController (Assets\Scripts\Core/) L14832
+  CameraZoomController (Assets\Scripts\Core/) L14945
+  InitializationManager (Assets\Scripts\Core/) L14994
+  PixelGridSnapper (Assets\Scripts\Core/) L15034
+  RunState (Assets\Scripts\Core/) L15067
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L15233
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L15296
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L15432
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L15461
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L15612
+  GridEntity (Assets\Scripts\Ticks/) L15684
+  GridPosition (Assets\Scripts\Ticks/) L15854
+  GridPositionManager (Assets\Scripts\Ticks/) L15955
+  GridRadiusUtility (Assets\Scripts\Ticks/) L16569
+  MultiTileEntity (Assets\Scripts\Ticks/) L16713
+  PivotMode (Assets\Scripts\Ticks/) L16957
+  TickConfiguration (Assets\Scripts\Ticks/) L17071
+  ITickUpdateable (Assets\Scripts\Ticks/) L17157
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L17309
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L17330
+  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L17526
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L17542
+  for (Assets\Scripts\WorldInteraction/) L18163
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17252
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L18235
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L17284
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L18267
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L17342
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L17388
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L17511
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L18325
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L18371
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L18494
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L17676
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L18659
 
 
 ================================================================================
@@ -7064,6 +7071,7 @@ using WegoSystem;
 using Abracodabra.Genes;
 using Abracodabra.UI.Genes;
 using Abracodabra.UI.Toolkit;
+using Abracodabra.Minigames;
 
 pub enum PlayerActionType {
  Move,
@@ -7113,9 +7121,14 @@ pub class PlayerActionManager : MonoBehaviour {
     break;
 
    case PlayerActionType.PlantSeed:
-    tickCost = 2; // Planting takes longer
     var seedItem = actionData as UIInventoryItem;
-    success = ExecutePlantSeed(gridPosition, seedItem);
+    if (ShouldUseMinigameForPlanting()) {
+     success = ExecutePlantSeedWithMinigame(gridPosition, seedItem, onSuccessCallback);
+     if (success) {
+      return true;
+     }
+    }
+    success = ExecutePlantSeedImmediate(gridPosition, seedItem);
     break;
 
    case PlayerActionType.Harvest:
@@ -7139,6 +7152,11 @@ pub class PlayerActionManager : MonoBehaviour {
   return success;
  }
 
+ bool ShouldUseMinigameForPlanting() {
+  return MinigameManager.Instance != null &&
+   MinigameManager.Instance.IsTriggerEnabled(MinigameTrigger.Planting);
+ }
+
  bool ExecuteToolUse(Vector3Int gridPosition, ToolDefinition tool) {
   if (tool == null) return false;
 
@@ -7158,19 +7176,122 @@ pub class PlayerActionManager : MonoBehaviour {
   return actionSucceeded;
  }
 
- bool ExecutePlantSeed(Vector3Int gridPosition, UIInventoryItem seedItem) {
-  if (debugMode) Debug.Log($"[ExecutePlantSeed] Attempting to plant {seedItem?.GetDisplayName()} at {gridPosition}");
+ bool ExecutePlantSeedWithMinigame(Vector3Int gridPosition, UIInventoryItem seedItem, Action onSuccessCallback) {
+  if (debugMode) Debug.Log($"[ExecutePlantSeedWithMinigame] Starting for {seedItem?.GetDisplayName()} at {gridPosition}");
 
   if (seedItem == null || seedItem.Type != UIInventoryItem.ItemType.Seed) {
-   Debug.LogError("[ExecutePlantSeed] Action failed: Provided item was not a valid seed.");
+   Debug.LogError("[ExecutePlantSeedWithMinigame] Invalid seed item");
    return false;
   }
 
-bool result = PlantPlacementManager.Instance?.TryPlantSeedFromInventory( seedItem.SeedRuntimeState, gridPosition, TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition)
-  ) ?? false;
+  if (!CanPlantAtPosition(gridPosition, seedItem)) {
+   if (debugMode) Debug.Log("[ExecutePlantSeedWithMinigame] Planting validation failed");
+   return false;
+  }
 
-  if (debugMode) Debug.Log($"[ExecutePlantSeed] PlantPlacementManager returned: {result}");
+  Vector3 worldPosition = TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition);
+
+  var capturedRuntimeState = seedItem.SeedRuntimeState;
+  var capturedSeedItem = seedItem;
+  var capturedGridPosition = gridPosition;
+  var capturedWorldPosition = worldPosition;
+  var capturedCallback = onSuccessCallback;
+  var capturedTickCost = tickCostPerAction;
+
+  Action deferredPlantAction = () => {
+   if (debugMode) Debug.Log($"[DeferredPlant] Executing deferred plant at {capturedGridPosition}");
+
+   bool planted = false;
+   try {
+    planted = PlantPlacementManager.Instance?.TryPlantSeedFromInventory(
+     capturedRuntimeState,
+     capturedGridPosition,
+     capturedWorldPosition
+    ) ?? false;
+   }
+   catch (Exception e) {
+    Debug.LogError($"[DeferredPlant] Exception during planting: {e}");
+   }
+
+   if (debugMode) Debug.Log($"[DeferredPlant] TryPlantSeedFromInventory returned: {planted}");
+
+   if (planted) {
+    if (debugMode) Debug.Log($"[DeferredPlant] Advancing {capturedTickCost} tick(s)");
+    AdvanceGameTickStatic(capturedTickCost);
+
+    if (debugMode) Debug.Log("[DeferredPlant] Invoking success callback to consume seed");
+    capturedCallback?.Invoke();
+
+    OnActionExecuted?.Invoke(PlayerActionType.PlantSeed, capturedSeedItem);
+
+    if (debugMode) Debug.Log("[DeferredPlant] Deferred planting completed successfully");
+   }
+   else {
+    Debug.LogWarning("[DeferredPlant] Planting failed in deferred action!");
+   }
+  };
+
+bool minigameStarted = MinigameManager.Instance.TryTriggerMinigameWithDeferredAction( MinigameTrigger.Planting, gridPosition, worldPosition, deferredPlantAction, null, // Use default reward handling OnPlantingMinigameComplete );
+
+  if (debugMode) Debug.Log($"[ExecutePlantSeedWithMinigame] Minigame started: {minigameStarted}");
+
+  return minigameStarted;
+ }
+
+ bool ExecutePlantSeedImmediate(Vector3Int gridPosition, UIInventoryItem seedItem) {
+  if (debugMode) Debug.Log($"[ExecutePlantSeedImmediate] Planting {seedItem?.GetDisplayName()} at {gridPosition}");
+
+  if (seedItem == null || seedItem.Type != UIInventoryItem.ItemType.Seed) {
+   Debug.LogError("[ExecutePlantSeedImmediate] Invalid seed item");
+   return false;
+  }
+
+  Vector3 worldPosition = TileInteractionManager.Instance.interactionGrid.GetCellCenterWorld(gridPosition);
+
+bool result = PlantPlacementManager.Instance?.TryPlantSeedFromInventory( seedItem.SeedRuntimeState, gridPosition, worldPosition ) ?? false;
+
+  if (debugMode) Debug.Log($"[ExecutePlantSeedImmediate] Result: {result}");
   return result;
+ }
+
+ stat void AdvanceGameTickStatic(int tickCount) {
+  if (TickManager.Instance == null) {
+   Debug.LogError("[AdvanceGameTickStatic] TickManager.Instance is null!");
+   return;
+  }
+  for (int i = 0; i < tickCount; i++) {
+   TickManager.Instance.AdvanceTick();
+  }
+ }
+
+ bool CanPlantAtPosition(Vector3Int gridPosition, UIInventoryItem seedItem) {
+  if (PlantPlacementManager.Instance == null) return false;
+
+  if (PlantPlacementManager.Instance.IsPositionOccupied(gridPosition)) {
+   if (debugMode) Debug.Log($"[CanPlantAtPosition] Position {gridPosition} is occupied");
+   return false;
+  }
+
+  var tileDef = TileInteractionManager.Instance?.FindWhichTileDefinitionAt(gridPosition);
+  if (!PlantPlacementManager.Instance.IsTileValidForSeed(tileDef, seedItem.SeedRuntimeState)) {
+   if (debugMode) Debug.Log($"[CanPlantAtPosition] Tile not valid for this seed at {gridPosition}");
+   return false;
+  }
+
+  return true;
+ }
+
+ void OnPlantingMinigameComplete(MinigameResult result) {
+  if (debugMode) {
+   string resultText = result.Tier switch {
+    MinigameResultTier.Perfect => "PERFECT! Plant auto-watered!",
+    MinigameResultTier.Good => "Good! Plant auto-watered!",
+    MinigameResultTier.Miss => "Missed - no bonus",
+    MinigameResultTier.Skipped => "Skipped - no bonus",
+    _ => "Unknown result"
+   };
+   Debug.Log($"[PlayerActionManager] Planting minigame result: {resultText}");
+  }
  }
 
  bool ExecuteHarvest(Vector3Int gridPosition) {
@@ -7249,10 +7370,7 @@ bool result = PlantPlacementManager.Instance?.TryPlantSeedFromInventory( seedIte
  }
 
  void AdvanceGameTick(int tickCount = 1) {
-  if (TickManager.Instance == null) return;
-  for (int i = 0; i < tickCount; i++) {
-   TickManager.Instance.AdvanceTick();
-  }
+  AdvanceGameTickStatic(tickCount);
  }
 }
 
@@ -10473,6 +10591,804 @@ namespace Abracodabra.Genes.Templates {
 }
 
 ////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Minigames\MinigameManager.cs
+
+using WegoSystem;
+
+namespace Abracodabra.Minigames {
+
+ pub class MinigameManager : MonoBehaviour {
+
+  pub stat MinigameManager Instance { get; set; }
+
+  [Header("Minigame Configurations")]
+  [Tooltip("Configuration for planting minigame")]
+  [SerializeField] TimingCircleConfig plantingConfig;
+
+  [Header("Reward Configuration")]
+  [Tooltip("Tool definition for watering (used as planting bonus)")]
+  [SerializeField] ToolDefinition wateringCanTool;
+
+  [Header("Settings")]
+  [Tooltip("If true, minigames are enabled globally")]
+  [SerializeField] bool minigamesEnabled = true;
+
+  [Tooltip("If true, player can skip minigames by pressing Escape")]
+  [SerializeField] bool allowSkip = true;
+
+  [Header("Debug")]
+  [SerializeField] bool showDebug = false;
+
+  TimingCircleMinigame activeMinigame;
+  MinigameCompletedCallback pendingCallback;
+  MinigameTrigger currentTrigger;
+  Vector3Int currentGridPosition;
+
+  Action pendingAction;
+  Action<MinigameResult> pendingRewardAction;
+
+  pub event Action<MinigameTrigger, Vector3Int> OnMinigameStarted;
+  pub event Action<MinigameResult> OnMinigameCompleted;
+
+  ro HashSet<MinigameTrigger> enabledTriggers = new HashSet<MinigameTrigger>();
+
+  pub bool MinigamesEnabled => minigamesEnabled;
+  pub bool IsMinigameActive => activeMinigame != null;
+
+  void Awake() {
+   if (Instance != null && Instance != this) {
+    Destroy(gameObject);
+    return;
+   }
+   Instance = this;
+
+   EnableTrigger(MinigameTrigger.Planting);
+  }
+
+  void Update() {
+   if (allowSkip && IsMinigameActive && Input.GetKeyDown(KeyCode.Escape)) {
+    SkipCurrentMinigame();
+   }
+  }
+
+  pub void EnableTrigger(MinigameTrigger trigger) {
+   enabledTriggers.Add(trigger);
+   if (showDebug) Debug.Log($"[MinigameManager] Enabled minigame for trigger: {trigger}");
+  }
+
+  pub void DisableTrigger(MinigameTrigger trigger) {
+   enabledTriggers.Remove(trigger);
+   if (showDebug) Debug.Log($"[MinigameManager] Disabled minigame for trigger: {trigger}");
+  }
+
+  pub bool IsTriggerEnabled(MinigameTrigger trigger) {
+   return minigamesEnabled && enabledTriggers.Contains(trigger);
+  }
+
+pub bool TryTriggerMinigameWithDeferredAction( MinigameTrigger trigger, Vector3Int gridPosition, Vector3 worldPosition, Action deferredAction, Action<MinigameResult> rewardAction = null, MinigameCompletedCallback onComplete = null) {
+   if (!IsTriggerEnabled(trigger)) {
+    if (showDebug) Debug.Log($"[MinigameManager] Minigame not enabled for trigger: {trigger}");
+    return false;
+   }
+
+   if (IsMinigameActive) {
+    if (showDebug) Debug.LogWarning("[MinigameManager] Cannot start minigame - another is already active");
+    return false;
+   }
+
+   TimingCircleConfig config = GetConfigForTrigger(trigger);
+   if (config == null) {
+    if (showDebug) Debug.LogWarning($"[MinigameManager] No config found for trigger: {trigger}");
+    return false;
+   }
+
+   currentTrigger = trigger;
+   currentGridPosition = gridPosition;
+   pendingCallback = onComplete;
+   pendingAction = deferredAction;
+   pendingRewardAction = rewardAction;
+
+   StartTimingCircleMinigame(config, worldPosition);
+
+   OnMinigameStarted?.Invoke(trigger, gridPosition);
+
+   if (showDebug) Debug.Log($"[MinigameManager] Started {trigger} minigame at {gridPosition} (with deferred action)");
+
+   return true;
+  }
+
+  pub bool TryTriggerMinigame(MinigameTrigger trigger, Vector3Int gridPosition, Vector3 worldPosition, MinigameCompletedCallback onComplete = null) {
+   return TryTriggerMinigameWithDeferredAction(trigger, gridPosition, worldPosition, null, null, onComplete);
+  }
+
+  TimingCircleConfig GetConfigForTrigger(MinigameTrigger trigger) {
+   switch (trigger) {
+    case MinigameTrigger.Planting:
+     return plantingConfig;
+    default:
+     return null;
+   }
+  }
+
+  void StartTimingCircleMinigame(TimingCircleConfig config, Vector3 worldPosition) {
+   GameObject minigameGO = new GameObject($"TimingCircleMinigame_{Time.frameCount}");
+   minigameGO.transform.position = worldPosition;
+
+   activeMinigame = minigameGO.AddComponent<TimingCircleMinigame>();
+   activeMinigame.Initialize(config, OnMinigameFinished);
+   activeMinigame.StartMinigame();
+  }
+
+  void OnMinigameFinished(MinigameResult result) {
+   result.Trigger = currentTrigger;
+   result.GridPosition = currentGridPosition;
+
+   if (showDebug) {
+    Debug.Log($"[MinigameManager] Minigame finished: {result.Tier} (Accuracy: {result.Accuracy:P0})");
+   }
+
+   if (pendingAction != null) {
+    pendingAction.Invoke();
+    if (showDebug) Debug.Log("[MinigameManager] Executed deferred action");
+   }
+
+   if (pendingRewardAction != null) {
+    pendingRewardAction.Invoke(result);
+   } else {
+    ApplyRewards(result);
+   }
+
+   OnMinigameCompleted?.Invoke(result);
+
+   pendingCallback?.Invoke(result);
+
+   if (activeMinigame != null) {
+    Destroy(activeMinigame.gameObject);
+    activeMinigame = null;
+   }
+   pendingCallback = null;
+   pendingAction = null;
+   pendingRewardAction = null;
+   currentTrigger = MinigameTrigger.None;
+  }
+
+  void ApplyRewards(MinigameResult result) {
+   if (!result.IsSuccess) return;
+
+   switch (result.Trigger) {
+    case MinigameTrigger.Planting:
+     ApplyPlantingReward(result);
+     break;
+   }
+  }
+
+  void ApplyPlantingReward(MinigameResult result) {
+   if (wateringCanTool == null) {
+    Debug.LogWarning("[MinigameManager] WateringCan tool not assigned - cannot apply planting bonus");
+    return;
+   }
+
+   if (TileInteractionManager.Instance != null) {
+    bool applied = TileInteractionManager.Instance.ApplyToolAtPosition(wateringCanTool, result.GridPosition);
+
+    if (showDebug) {
+     string bonus = result.IsPerfect ? "PERFECT! " : "";
+     Debug.Log($"[MinigameManager] {bonus}Planting bonus applied: Watering at {result.GridPosition} = {applied}");
+    }
+   }
+  }
+
+  void SkipCurrentMinigame() {
+   if (activeMinigame != null) {
+    activeMinigame.Skip();
+   }
+  }
+
+  pub void CancelActiveMinigame() {
+   if (activeMinigame != null) {
+    Destroy(activeMinigame.gameObject);
+    activeMinigame = null;
+    pendingCallback = null;
+    pendingAction = null;
+    pendingRewardAction = null;
+    currentTrigger = MinigameTrigger.None;
+
+    if (showDebug) Debug.Log("[MinigameManager] Active minigame cancelled");
+   }
+  }
+
+  void OnDestroy() {
+   if (Instance == this) {
+    Instance = null;
+   }
+   CancelActiveMinigame();
+  }
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Minigames\MinigameTypes.cs
+
+
+namespace Abracodabra.Minigames {
+
+ pub enum MinigameType {
+  None,
+  TimingCircle,       // Wartales-style shrinking circle
+ }
+
+ pub enum MinigameTrigger {
+  None,
+  Planting,
+  Watering,
+  Harvesting,
+  Tilling,
+ }
+
+ pub enum MinigameResultTier {
+  Miss,       // Didn't click in time or clicked outside zone
+  Good,       // Clicked in outer success zone
+  Perfect,    // Clicked in inner "perfect" zone
+  Skipped,    // Player skipped/cancelled the minigame
+ }
+
+ pub struct MinigameResult {
+  pub MinigameResultTier Tier;
+  pub float Accuracy;          // 0-1, how close to perfect center
+  pub float TimeRemaining;     // How much time was left when clicked
+  pub MinigameTrigger Trigger; // What triggered this minigame
+  pub Vector3Int GridPosition; // Where the action occurred
+
+  pub bool IsSuccess => Tier == MinigameResultTier.Good || Tier == MinigameResultTier.Perfect;
+  pub bool IsPerfect => Tier == MinigameResultTier.Perfect;
+
+  pub stat MinigameResult Miss(MinigameTrigger trigger, Vector3Int gridPos) {
+   return new MinigameResult {
+    Tier = MinigameResultTier.Miss,
+    Accuracy = 0f,
+    TimeRemaining = 0f,
+    Trigger = trigger,
+    GridPosition = gridPos
+   };
+  }
+
+  pub stat MinigameResult Skipped(MinigameTrigger trigger, Vector3Int gridPos) {
+   return new MinigameResult {
+    Tier = MinigameResultTier.Skipped,
+    Accuracy = 0f,
+    TimeRemaining = 0f,
+    Trigger = trigger,
+    GridPosition = gridPos
+   };
+  }
+ }
+
+ pub delegate void MinigameCompletedCallback(MinigameResult result);
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Minigames\TileInteractionManagerExtensions.cs
+
+using WegoSystem;
+
+namespace Abracodabra.Minigames {
+
+ pub stat class TileInteractionManagerExtensions {
+
+  pub stat bool ApplyToolAtPosition(this TileInteractionManager manager, ToolDefinition toolDef, Vector3Int gridPosition) {
+   if (manager == null || toolDef == null) return false;
+
+   GridPosition gridPos = new GridPosition(gridPosition);
+   if (GridPositionManager.Instance != null) {
+    var multiTileEntity = GridPositionManager.Instance.GetMultiTileEntityAt(gridPos);
+    if (multiTileEntity != null && multiTileEntity.BlocksToolUsage) {
+     Debug.Log($"[TileInteractionManagerExt] Tool action blocked at {gridPosition} by '{multiTileEntity.gameObject.name}'");
+     return false;
+    }
+   }
+
+   TileDefinition topTile = manager.FindWhichTileDefinitionAt(gridPosition);
+   if (topTile == null) {
+    Debug.Log($"[TileInteractionManagerExt] No tile at {gridPosition}");
+    return false;
+   }
+
+   var library = manager.interactionLibrary;
+   if (library == null || library.rules == null) {
+    Debug.LogWarning("[TileInteractionManagerExt] No interaction library configured");
+    return false;
+   }
+
+   TileInteractionRule matchingRule = null;
+   foreach (var rule in library.rules) {
+    if (rule != null && rule.tool == toolDef && rule.fromTile == topTile) {
+     matchingRule = rule;
+     break;
+    }
+   }
+
+   if (matchingRule == null) {
+    Debug.Log($"[TileInteractionManagerExt] No rule for '{toolDef.displayName}' on '{topTile.displayName}'");
+    return false;
+   }
+
+   if (matchingRule.toTile == null) {
+    manager.RemoveTile(matchingRule.fromTile, gridPosition);
+   } else {
+    if (!matchingRule.toTile.keepBottomTile) {
+     manager.RemoveTile(matchingRule.fromTile, gridPosition);
+    }
+    manager.PlaceTile(matchingRule.toTile, gridPosition);
+   }
+
+   Debug.Log($"[TileInteractionManagerExt] Applied '{toolDef.displayName}' at {gridPosition}: '{matchingRule.fromTile.displayName}' -> '{matchingRule.toTile?.displayName ?? "REMOVE"}'");
+
+   return true;
+  }
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Minigames\TimingCircleConfig.cs
+
+
+namespace Abracodabra.Minigames {
+
+ [CreateAssetMenu(fileName = "TimingCircleConfig", menuName = "Abracodabra/Minigames/Timing Circle Config")]
+ pub class TimingCircleConfig : ScriptableObject {
+
+  [Header("Timing")]
+  [Tooltip("Total duration of the minigame in seconds")]
+  [Range(0.5f, 5f)]
+  pub float duration = 1.5f;
+
+  [Tooltip("Starting radius of the shrinking circle (in world units)")]
+  [Range(0.5f, 3f)]
+  pub float startRadius = 2f;
+
+  [Header("Success Zones")]
+  [Tooltip("Outer edge of the Good zone (where success starts)")]
+  [Range(0.3f, 1.5f)]
+  pub float goodZoneOuterRadius = 0.7f;
+
+  [Tooltip("Inner edge of the Good zone / Outer edge of the Perfect zone")]
+  [Range(0.15f, 1f)]
+  pub float goodZoneInnerRadius = 0.35f;
+
+  [Tooltip("Inner edge of the Perfect zone (can be 0 for solid center)")]
+  [Range(0f, 0.5f)]
+  pub float perfectZoneInnerRadius = 0f;
+
+  [Header("Zone Colors")]
+  [Tooltip("Color of the Good zone (outer ring)")]
+  pub Color goodZoneColor = new Color(0.3f, 0.7f, 0.3f, 0.6f); // Semi-transparent green
+
+  [Tooltip("Color of the Perfect zone (inner area)")]
+  pub Color perfectZoneColor = new Color(0.2f, 1f, 0.2f, 0.8f); // Brighter green
+
+  [Header("Shrinking Indicator")]
+  [Tooltip("Color of the shrinking circle")]
+  pub Color shrinkingCircleColor = new Color(1f, 0.8f, 0.2f, 0.95f); // Golden
+
+  [Tooltip("Thickness of the shrinking circle line")]
+  [Range(0.03f, 0.15f)]
+  pub float shrinkingCircleThickness = 0.06f;
+
+  [Tooltip("Color when shrinking circle enters Good zone")]
+  pub Color shrinkingInGoodZoneColor = new Color(0.5f, 1f, 0.5f, 1f); // Light green
+
+  [Tooltip("Color when shrinking circle enters Perfect zone")]
+  pub Color shrinkingInPerfectZoneColor = new Color(1f, 1f, 0.5f, 1f); // Yellow-green
+
+  [Header("Feedback")]
+  [Tooltip("Flash color on successful hit")]
+  pub Color successFlashColor = new Color(0.2f, 1f, 0.2f, 1f);
+
+  [Tooltip("Flash color on perfect hit")]
+  pub Color perfectFlashColor = new Color(1f, 1f, 0.2f, 1f);
+
+  [Tooltip("Flash color on miss")]
+  pub Color missFlashColor = new Color(1f, 0.2f, 0.2f, 1f);
+
+  [Tooltip("Duration of result flash effect")]
+  [Range(0.1f, 0.5f)]
+  pub float flashDuration = 0.2f;
+
+  [Header("Audio (Optional)")]
+  [Tooltip("Sound to play when minigame starts")]
+  pub AudioClip startSound;
+
+  [Tooltip("Sound to play on successful hit")]
+  pub AudioClip successSound;
+
+  [Tooltip("Sound to play on perfect hit")]
+  pub AudioClip perfectSound;
+
+  [Tooltip("Sound to play on miss")]
+  pub AudioClip missSound;
+
+  [Header("Sorting")]
+  [Tooltip("Sorting layer for minigame visuals")]
+  pub string sortingLayerName = "UI";
+
+  [Tooltip("Sorting order within the layer")]
+  pub int sortingOrder = 1000;
+
+  pub MinigameResultTier EvaluateRadius(float currentRadius) {
+   if (currentRadius <= goodZoneInnerRadius && currentRadius >= perfectZoneInnerRadius) {
+    return MinigameResultTier.Perfect;
+   }
+   if (currentRadius <= goodZoneOuterRadius && currentRadius > goodZoneInnerRadius) {
+    return MinigameResultTier.Good;
+   }
+   return MinigameResultTier.Miss;
+  }
+
+  pub float CalculateAccuracy(float currentRadius) {
+   float perfectCenter = (goodZoneInnerRadius + perfectZoneInnerRadius) / 2f;
+   if (Mathf.Approximately(currentRadius, perfectCenter)) return 1f;
+   if (currentRadius >= startRadius) return 0f;
+
+   return 1f - Mathf.Abs(currentRadius - perfectCenter) / startRadius;
+  }
+
+  pub MinigameResultTier GetCurrentZone(float currentRadius) {
+   if (currentRadius <= goodZoneInnerRadius) {
+    return MinigameResultTier.Perfect;
+   }
+   if (currentRadius <= goodZoneOuterRadius) {
+    return MinigameResultTier.Good;
+   }
+   return MinigameResultTier.Miss;
+  }
+
+  void OnValidate() {
+   if (goodZoneInnerRadius >= goodZoneOuterRadius) {
+    goodZoneInnerRadius = goodZoneOuterRadius - 0.1f;
+   }
+   if (perfectZoneInnerRadius >= goodZoneInnerRadius) {
+    perfectZoneInnerRadius = goodZoneInnerRadius - 0.1f;
+   }
+   if (goodZoneOuterRadius >= startRadius) {
+    startRadius = goodZoneOuterRadius + 0.5f;
+   }
+   if (perfectZoneInnerRadius < 0) {
+    perfectZoneInnerRadius = 0;
+   }
+  }
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Minigames\TimingCircleMinigame.cs
+
+
+namespace Abracodabra.Minigames {
+
+ pub class TimingCircleMinigame : MonoBehaviour {
+
+  TimingCircleConfig config;
+  MinigameCompletedCallback onComplete;
+
+  SpriteRenderer goodZoneRenderer;
+  SpriteRenderer perfectZoneRenderer;
+  LineRenderer shrinkingCircle;
+  SpriteRenderer flashOverlay;
+
+  float currentRadius;
+  float elapsedTime;
+  bool isRunning;
+  bool hasClicked;
+
+  const int CircleSegments = 64;
+  const int TextureResolution = 128;
+
+  const float ZoneOverlap = 0.03f;
+
+  pub void Initialize(TimingCircleConfig config, MinigameCompletedCallback onComplete) {
+   this.config = config;
+   this.onComplete = onComplete;
+
+   CreateVisuals();
+  }
+
+  void CreateVisuals() {
+   goodZoneRenderer = CreateDonutZone("GoodZone",
+    config.goodZoneOuterRadius,
+    config.goodZoneInnerRadius,
+    config.goodZoneColor,
+    config.sortingOrder);
+
+   perfectZoneRenderer = CreateDonutZone("PerfectZone",
+    config.goodZoneInnerRadius + ZoneOverlap, // Overlap into good zone
+    config.perfectZoneInnerRadius,
+    config.perfectZoneColor,
+    config.sortingOrder + 1); // Renders on top
+
+   shrinkingCircle = CreateCircleRenderer("Shrinking", config.startRadius,
+    config.shrinkingCircleColor, config.shrinkingCircleThickness);
+   SetSorting(shrinkingCircle, config.sortingOrder + 2);
+
+   flashOverlay = CreateFlashOverlay();
+   if (flashOverlay != null) {
+    flashOverlay.sortingLayerName = config.sortingLayerName;
+    flashOverlay.sortingOrder = config.sortingOrder + 10;
+    flashOverlay.enabled = false;
+   }
+  }
+
+  SpriteRenderer CreateDonutZone(string name, float outerRadius, float innerRadius, Color color, int sortOrder) {
+   GameObject go = new GameObject($"Zone_{name}");
+   go.transform.SetParent(transform);
+   go.transform.localPosition = Vector3.zero;
+
+   SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+   sr.sprite = CreateDonutSprite(outerRadius, innerRadius);
+   sr.color = color;
+   sr.sortingLayerName = config.sortingLayerName;
+   sr.sortingOrder = sortOrder;
+
+   float scale = outerRadius * 2f;
+   go.transform.localScale = new Vector3(scale, scale, 1f);
+
+   return sr;
+  }
+
+  Sprite CreateDonutSprite(float outerRadius, float innerRadius) {
+   Texture2D tex = new Texture2D(TextureResolution, TextureResolution, TextureFormat.RGBA32, false);
+   tex.filterMode = FilterMode.Bilinear;
+
+   float center = TextureResolution / 2f;
+
+   float normalizedOuter = 0.5f;
+   float normalizedInner = (outerRadius > 0) ? (innerRadius / outerRadius) * 0.5f : 0f;
+
+   Color32[] pixels = new Color32[TextureResolution * TextureResolution];
+
+   for (int y = 0; y < TextureResolution; y++) {
+    for (int x = 0; x < TextureResolution; x++) {
+     float dx = (x - center) / TextureResolution;
+     float dy = (y - center) / TextureResolution;
+     float dist = Mathf.Sqrt(dx * dx + dy * dy);
+
+     if (dist <= normalizedOuter && dist >= normalizedInner) {
+      float alpha = 1f;
+
+      float outerEdgeDist = normalizedOuter - dist;
+      float edgeSoftness = 0.015f; // Reduced softness for crisper edges
+      if (outerEdgeDist < edgeSoftness) {
+       alpha *= outerEdgeDist / edgeSoftness;
+      }
+
+      pixels[y * TextureResolution + x] = new Color32(255, 255, 255, (byte)(alpha * 255));
+     } else {
+      pixels[y * TextureResolution + x] = new Color32(0, 0, 0, 0);
+     }
+    }
+   }
+
+   tex.SetPixels32(pixels);
+   tex.Apply();
+
+   return Sprite.Create(tex, new Rect(0, 0, TextureResolution, TextureResolution),
+    Vector2.one * 0.5f, TextureResolution);
+  }
+
+  LineRenderer CreateCircleRenderer(string name, float radius, Color color, float width) {
+   GameObject go = new GameObject($"Circle_{name}");
+   go.transform.SetParent(transform);
+   go.transform.localPosition = Vector3.zero;
+
+   LineRenderer lr = go.AddComponent<LineRenderer>();
+   lr.useWorldSpace = false;
+   lr.loop = true;
+   lr.positionCount = CircleSegments;
+   lr.startWidth = width;
+   lr.endWidth = width;
+
+   lr.material = new Material(Shader.Find("Sprites/Default"));
+   lr.startColor = color;
+   lr.endColor = color;
+
+   SetCirclePoints(lr, radius);
+
+   return lr;
+  }
+
+  void SetCirclePoints(LineRenderer lr, float radius) {
+   Vector3[] points = new Vector3[CircleSegments];
+   float angleStep = 360f / CircleSegments;
+
+   for (int i = 0; i < CircleSegments; i++) {
+    float angle = i * angleStep * Mathf.Deg2Rad;
+points[i] = new Vector3( Mathf.Cos(angle) * radius,
+     Mathf.Sin(angle) * radius,
+     0f
+    );
+   }
+
+   lr.SetPositions(points);
+  }
+
+  SpriteRenderer CreateFlashOverlay() {
+   GameObject go = new GameObject("FlashOverlay");
+   go.transform.SetParent(transform);
+   go.transform.localPosition = Vector3.zero;
+
+   SpriteRenderer sr = go.AddComponent<SpriteRenderer>();
+   sr.sprite = CreateFilledCircleSprite(64);
+   sr.color = Color.white;
+   go.transform.localScale = Vector3.one * config.startRadius * 2.5f;
+
+   return sr;
+  }
+
+  Sprite CreateFilledCircleSprite(int resolution) {
+   Texture2D tex = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
+   tex.filterMode = FilterMode.Bilinear;
+
+   float center = resolution / 2f;
+   float radius = resolution / 2f - 1;
+
+   Color32[] pixels = new Color32[resolution * resolution];
+
+   for (int y = 0; y < resolution; y++) {
+    for (int x = 0; x < resolution; x++) {
+     float dist = Vector2.Distance(new Vector2(x, y), new Vector2(center, center));
+     if (dist <= radius) {
+      float alpha = Mathf.Clamp01((radius - dist) / 2f);
+      pixels[y * resolution + x] = new Color32(255, 255, 255, (byte)(alpha * 255));
+     } else {
+      pixels[y * resolution + x] = new Color32(0, 0, 0, 0);
+     }
+    }
+   }
+
+   tex.SetPixels32(pixels);
+   tex.Apply();
+
+   return Sprite.Create(tex, new Rect(0, 0, resolution, resolution), Vector2.one * 0.5f, resolution);
+  }
+
+  void SetSorting(LineRenderer lr, int order) {
+   lr.sortingLayerName = config.sortingLayerName;
+   lr.sortingOrder = order;
+  }
+
+  pub void StartMinigame() {
+   currentRadius = config.startRadius;
+   elapsedTime = 0f;
+   isRunning = true;
+   hasClicked = false;
+
+   if (config.startSound != null) {
+    AudioSource.PlayClipAtPoint(config.startSound, transform.position);
+   }
+  }
+
+  void Update() {
+   if (!isRunning) return;
+
+   elapsedTime += Time.deltaTime;
+   float progress = elapsedTime / config.duration;
+
+   currentRadius = Mathf.Lerp(config.startRadius, 0f, progress);
+
+   SetCirclePoints(shrinkingCircle, currentRadius);
+
+   UpdateShrinkingCircleColor();
+
+   if (Input.GetMouseButtonDown(0) && !hasClicked) {
+    hasClicked = true;
+    EvaluateClick();
+    return;
+   }
+
+   if (progress >= 1f) {
+    CompleteWithResult(MinigameResultTier.Miss, 0f);
+   }
+  }
+
+  void UpdateShrinkingCircleColor() {
+   MinigameResultTier currentZone = config.GetCurrentZone(currentRadius);
+
+   Color targetColor = currentZone switch {
+    MinigameResultTier.Perfect => config.shrinkingInPerfectZoneColor,
+    MinigameResultTier.Good => config.shrinkingInGoodZoneColor,
+    _ => config.shrinkingCircleColor
+   };
+
+   shrinkingCircle.startColor = targetColor;
+   shrinkingCircle.endColor = targetColor;
+  }
+
+  void EvaluateClick() {
+   MinigameResultTier tier = config.EvaluateRadius(currentRadius);
+   float accuracy = config.CalculateAccuracy(currentRadius);
+
+   CompleteWithResult(tier, accuracy);
+  }
+
+  void CompleteWithResult(MinigameResultTier tier, float accuracy) {
+   isRunning = false;
+   StartCoroutine(ShowFeedbackAndComplete(tier, accuracy));
+  }
+
+  IEnumerator ShowFeedbackAndComplete(MinigameResultTier tier, float accuracy) {
+   Color flashColor = tier switch {
+    MinigameResultTier.Perfect => config.perfectFlashColor,
+    MinigameResultTier.Good => config.successFlashColor,
+    _ => config.missFlashColor
+   };
+
+   AudioClip clip = tier switch {
+    MinigameResultTier.Perfect => config.perfectSound,
+    MinigameResultTier.Good => config.successSound,
+    _ => config.missSound
+   };
+
+   if (clip != null) {
+    AudioSource.PlayClipAtPoint(clip, transform.position);
+   }
+
+   if (flashOverlay != null) {
+    flashOverlay.enabled = true;
+    flashOverlay.color = flashColor;
+
+    float elapsed = 0f;
+    Color startColor = flashColor;
+    Color endColor = new Color(flashColor.r, flashColor.g, flashColor.b, 0f);
+
+    while (elapsed < config.flashDuration) {
+     elapsed += Time.deltaTime;
+     float t = elapsed / config.flashDuration;
+     flashOverlay.color = Color.Lerp(startColor, endColor, t);
+     yield return null;
+    }
+
+    flashOverlay.enabled = false;
+   }
+
+   yield return new WaitForSeconds(0.1f);
+
+   MinigameResult result = new MinigameResult {
+    Tier = tier,
+    Accuracy = accuracy,
+    TimeRemaining = config.duration - elapsedTime
+   };
+
+   onComplete?.Invoke(result);
+  }
+
+  pub void Skip() {
+   if (!isRunning) return;
+
+   isRunning = false;
+
+   MinigameResult result = new MinigameResult {
+    Tier = MinigameResultTier.Skipped,
+    Accuracy = 0f,
+    TimeRemaining = config.duration - elapsedTime
+   };
+
+   onComplete?.Invoke(result);
+  }
+
+  void OnDestroy() {
+   CleanupSpriteTexture(goodZoneRenderer);
+   CleanupSpriteTexture(perfectZoneRenderer);
+   CleanupSpriteTexture(flashOverlay);
+  }
+
+  void CleanupSpriteTexture(SpriteRenderer sr) {
+   if (sr != null && sr.sprite != null && sr.sprite.texture != null) {
+    Destroy(sr.sprite.texture);
+   }
+  }
+ }
+}
+
+////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\A_ToolkitUI\HotbarSelectionService.cs
 
 using Abracodabra.Genes.Core;
@@ -13581,27 +14497,55 @@ using WegoSystem;
 using Abracodabra.Genes;
 
 namespace Abracodabra.UI.Toolkit {
+
+ pub class DestroyTracker : MonoBehaviour {
+  void OnDestroy() {
+   Debug.LogError($"[DestroyTracker] '{gameObject.name}' is being DESTROYED! Stack trace:\n{System.Environment.StackTrace}");
+  }
+ }
+
  pub class WorldHoverTooltip : MonoBehaviour {
   [Header("References")]
   [SerializeField] Camera mainCamera;
   [SerializeField] TileInteractionManager tileInteractionManager;
 
+  [Header("Positioning Mode")]
+  [Tooltip("If enabled, tooltip follows the mouse cursor instead of being anchored to the tile center.")]
+  [SerializeField] bool followCursor = false;
+
+  [Tooltip("Offset from cursor position when followCursor is enabled.")]
+  [SerializeField] Vector2 cursorOffset = new Vector2(0.5f, 0.5f);
+
   [Header("Tooltip Settings")]
-  [SerializeField] Vector2 tooltipOffset = new Vector2(0f, 1.5f); // Raised higher to be above objects
-  [SerializeField] float zOffset = -5f; // Pull closer to camera
-  [SerializeField] float fontSize = 4f; // Larger base size for visibility
+  [SerializeField] Vector2 tooltipOffset = new Vector2(0f, 1.5f);
+  [SerializeField] float zOffset = -5f;
+  [SerializeField] float fontSize = 4f;
   [SerializeField] Color textColor = Color.white;
 
+  [Header("Text Style")]
+  [Tooltip("Enable italic/cursive text style.")]
+  [SerializeField] bool useItalic = false;
+
+  [Tooltip("Enable bold text style.")]
+  [SerializeField] bool useBold = false;
+
   [Header("Sorting")]
-  [SerializeField] string sortingLayerName = "UI"; // Ensure this layer exists, or use "Default"
-  [SerializeField] int sortingOrder = 5000; // Very high number to force on top
+  [SerializeField] string sortingLayerName = "UI";
+  [SerializeField] int sortingOrder = 5000;
 
   [Header("Debug")]
   [SerializeField] bool showDebug = false;
-  [SerializeField] bool forceShowTestText = false; // Check this to verify rendering works
+  [SerializeField] bool forceShowTestText = false;
+  [SerializeField] bool trackDestruction = false;
 
   TextMeshPro tooltipText;
   Transform tooltipTransform;
+
+  string tooltipChildName;
+
+  void Awake() {
+   tooltipChildName = $"WorldHoverTooltip_Text_{GetInstanceID()}";
+  }
 
   void Start() {
    if (mainCamera == null) {
@@ -13616,16 +14560,26 @@ namespace Abracodabra.UI.Toolkit {
   }
 
   void CreateTooltip() {
-   var existing = transform.Find("WorldHoverTooltip_Text");
+   var existing = transform.Find(tooltipChildName);
    if (existing != null) {
-    if (Application.isPlaying) Destroy(existing.gameObject);
-    else DestroyImmediate(existing.gameObject);
+    tooltipTransform = existing;
+    tooltipText = existing.GetComponent<TextMeshPro>();
+
+    if (tooltipText != null) {
+     if (showDebug) Debug.Log($"[WorldHoverTooltip] Reusing existing tooltip");
+     ApplyFontStyle();
+     return;
+    }
    }
 
-   var tooltipGO = new GameObject("WorldHoverTooltip_Text");
+   var tooltipGO = new GameObject(tooltipChildName);
    tooltipGO.transform.SetParent(transform);
    tooltipTransform = tooltipGO.transform;
    tooltipTransform.localPosition = Vector3.zero;
+
+   if (trackDestruction) {
+    tooltipGO.AddComponent<DestroyTracker>();
+   }
 
    tooltipText = tooltipGO.AddComponent<TextMeshPro>();
 
@@ -13634,9 +14588,9 @@ namespace Abracodabra.UI.Toolkit {
    tooltipText.color = textColor;
 
    RectTransform rect = tooltipText.rectTransform;
-   rect.sizeDelta = new Vector2(20f, 5f); // Give it plenty of space
+   rect.sizeDelta = new Vector2(20f, 5f);
 
-   tooltipText.enableWordWrapping = false;
+   tooltipText.textWrappingMode = TextWrappingModes.NoWrap;
    tooltipText.overflowMode = TextOverflowModes.Overflow;
 
    var meshRenderer = tooltipText.GetComponent<MeshRenderer>();
@@ -13647,11 +14601,23 @@ namespace Abracodabra.UI.Toolkit {
 
    tooltipText.outlineWidth = 0.2f;
    tooltipText.outlineColor = Color.black;
-   // Note: Shader utilities require the material to support outlines.
+
+   ApplyFontStyle();
 
    tooltipGO.SetActive(false);
 
-   if (showDebug) Debug.Log("[WorldHoverTooltip] Created new Tooltip Object");
+   if (showDebug) Debug.Log($"[WorldHoverTooltip] Created new tooltip: {tooltipChildName}");
+  }
+
+  void ApplyFontStyle() {
+   if (tooltipText == null) return;
+
+   FontStyles style = FontStyles.Normal;
+
+   if (useItalic) style |= FontStyles.Italic;
+   if (useBold) style |= FontStyles.Bold;
+
+   tooltipText.fontStyle = style;
   }
 
   void Update() {
@@ -13661,14 +14627,22 @@ namespace Abracodabra.UI.Toolkit {
 
   void UpdateTooltip() {
    if (tooltipTransform == null || tooltipText == null) {
-    CreateTooltip();
-    return;
+    var existing = transform.Find(tooltipChildName);
+    if (existing != null) {
+     tooltipTransform = existing;
+     tooltipText = existing.GetComponent<TextMeshPro>();
+    }
+
+    if (tooltipTransform == null || tooltipText == null) {
+     if (showDebug) Debug.LogWarning($"[WorldHoverTooltip] Tooltip missing, recreating...");
+     CreateTooltip();
+     return;
+    }
    }
 
-   // --- DEBUG MODE FORCE SHOW ---
    if (forceShowTestText) {
     tooltipTransform.position = transform.position + new Vector3(0, 1, zOffset);
-    tooltipText.text = "DEBUG TOOLTIP VISIBLE";
+    tooltipText.text = $"DEBUG TOOLTIP";
     tooltipTransform.gameObject.SetActive(true);
     return;
    }
@@ -13692,13 +14666,20 @@ namespace Abracodabra.UI.Toolkit {
     return;
    }
 
-   Vector3 cellCenter = tileInteractionManager.CellCenterWorld(cellPos);
+   Vector3 finalPos;
 
-   Vector3 finalPos = cellCenter + new Vector3(tooltipOffset.x, tooltipOffset.y, zOffset);
+   if (followCursor) {
+    Vector3 mousePos = Input.mousePosition;
+    mousePos.z = Mathf.Abs(mainCamera.transform.position.z);
+    Vector3 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
+    finalPos = new Vector3(worldPos.x + cursorOffset.x, worldPos.y + cursorOffset.y, zOffset);
+   } else {
+    Vector3 cellCenter = tileInteractionManager.CellCenterWorld(cellPos);
+    finalPos = cellCenter + new Vector3(tooltipOffset.x, tooltipOffset.y, zOffset);
+   }
 
    tooltipTransform.position = finalPos;
    tooltipText.text = content;
-
    tooltipText.sortingOrder = sortingOrder;
 
    if (!tooltipTransform.gameObject.activeSelf) {
@@ -13769,11 +14750,20 @@ namespace Abracodabra.UI.Toolkit {
    if (tooltipTransform != null) Destroy(tooltipTransform.gameObject);
   }
 
-  // --- VISUAL DEBUGGING ---
+  void OnValidate() {
+   ApplyFontStyle();
+  }
+
   void OnDrawGizmos() {
    if (tooltipTransform != null && tooltipTransform.gameObject.activeSelf) {
     Gizmos.color = Color.green;
-    Gizmos.DrawLine(tooltipTransform.position, tooltipTransform.position - new Vector3(tooltipOffset.x, tooltipOffset.y, zOffset));
+
+    if (followCursor) {
+     Vector3 cursorApprox = tooltipTransform.position - new Vector3(cursorOffset.x, cursorOffset.y, 0);
+     Gizmos.DrawLine(tooltipTransform.position, cursorApprox);
+    } else {
+     Gizmos.DrawLine(tooltipTransform.position, tooltipTransform.position - new Vector3(tooltipOffset.x, tooltipOffset.y, zOffset));
+    }
 
     Gizmos.color = Color.yellow;
     Gizmos.DrawSphere(tooltipTransform.position, 0.2f);
