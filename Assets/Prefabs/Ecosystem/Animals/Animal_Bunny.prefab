@@ -186,6 +186,7 @@ GameObject:
   - component: {fileID: 1678655499690775546}
   - component: {fileID: 8208813146050923784}
   - component: {fileID: 2553985273532714941}
+  - component: {fileID: 7768700393405104672}
   - component: {fileID: 272999362193415643}
   - component: {fileID: 5337159753638111056}
   - component: {fileID: 6958314175792756636}
@@ -231,8 +232,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   definition: {fileID: 11400000, guid: baa902ff700ab414b9200fe8e4ea6ab4, type: 2}
-  wetStatusEffect: {fileID: 11400000, guid: 820d4b4225e83484ba797b6078de1855, type: 2}
-  waterTileDefinition: {fileID: 11400000, guid: bdaaa34d90e461942bac3c72135871fc, type: 2}
   thoughtBubblePrefab: {fileID: 7019603340007582860, guid: e00dc2bef6e577f4788d3a0262749be1, type: 3}
   bubbleSpawnTransform: {fileID: 1385400547619210892}
   animator: {fileID: 0}
@@ -253,6 +252,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sortingLayerYOffset: -0.81
   useParentYCoordinate: 0
+  useMultiTileAnchor: 1
+  sortingLayerName: 
   debugSorting: 0
 --- !u!212 &7676723920541196182
 SpriteRenderer:
@@ -465,6 +466,20 @@ MonoBehaviour:
   localUseWaterMasking: 1
   localWaterTilemapTag: Water
   localShowDebugInfo: 0
+--- !u!114 &7768700393405104672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1618699628824306755}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1fe9446db869164f97e106043f48b64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  feedPopupOffset: {x: 0, y: 1, z: 0}
+  debugLog: 0
 --- !u!114 &272999362193415643
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -572,7 +587,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   effectIconContainer: {fileID: 8690851404544601141}
   effectIconPrefab: {fileID: 6027093001628851131, guid: 333d2abbda8c2c54da48bd0147f9fe14, type: 3}
-  iconSpacing: 10
 --- !u!1 &2461211831445650058
 GameObject:
   m_ObjectHideFlags: 0

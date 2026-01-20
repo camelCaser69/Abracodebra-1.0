@@ -12808,6 +12808,60 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
+--- !u!1 &383991853
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 383991855}
+  - component: {fileID: 383991854}
+  m_Layer: 0
+  m_Name: FoodSelectionPopup
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &383991854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383991853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78292f3633bd7f3408f6dfd930781072, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiDocument: {fileID: 752681536}
+  gridColumns: 3
+  gridRows: 3
+  slotSize: 64
+  slotSpacing: 4
+  normalSlotColor: {r: 0.15, g: 0.15, b: 0.2, a: 0.95}
+  hoverSlotColor: {r: 0.3, g: 0.3, b: 0.4, a: 0.95}
+  panelBackgroundColor: {r: 0.1, g: 0.1, b: 0.15, a: 0.98}
+  borderColor: {r: 0.4, g: 0.4, b: 0.5, a: 1}
+  debugLog: 0
+--- !u!4 &383991855
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383991853}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &384985897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45279,6 +45333,7 @@ Transform:
   - {fileID: 170155920}
   - {fileID: 237015054}
   - {fileID: 1660033955}
+  - {fileID: 1898939633}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &699026051
@@ -76661,6 +76716,7 @@ MonoBehaviour:
   hungerSystem: {fileID: 1172029911}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
   hoverColor: {r: 1, g: 1, b: 0.8, a: 1}
+  feedPopupOffset: {x: 0, y: 1.5, z: 0}
   ticksSinceLastPlantEat: 0
   debugLog: 0
 --- !u!114 &1172029910
@@ -124168,6 +124224,56 @@ MonoBehaviour:
   m_InstancedGameObject: {fileID: 0}
   m_Flags: 1
   m_ColliderType: 1
+--- !u!1 &1898939632
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1898939633}
+  - component: {fileID: 1898939634}
+  m_Layer: 0
+  m_Name: Manager_Feeding
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1898939633
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898939632}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 697039534}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1898939634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898939632}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93aad47d267d6ea4292de31510b2413d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxFeedingRange: 5
+  feedableLayerMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  player: {fileID: 1491144816}
+  debugLog: 0
 --- !u!114 &1899046522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132802,4 +132908,5 @@ SceneRoots:
   - {fileID: 1079289979}
   - {fileID: 192826961}
   - {fileID: 752681537}
+  - {fileID: 383991855}
   - {fileID: 906144533}

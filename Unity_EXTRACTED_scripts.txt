@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 786,386 -> 563,531 chars (28.3% reduction)
-Estimated tokens saved: ~55,713
+Compression Stats: 845,143 -> 601,189 chars (28.9% reduction)
+Estimated tokens saved: ~60,988
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -48,180 +48,187 @@ using System.Linq;
   ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2355
   ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2377
   ScentSource (Assets\Scripts\Ecosystem\Environment/) L2396
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2480
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2561
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2633
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2649
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2671
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L2920
-  WaveState (Assets\Scripts\Ecosystem\Management/) L2940
-  WaveSpawnLocationType (Assets\Scripts\Ecosystem\Spawning/) L3245
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3288
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3307
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3346
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3394
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3412
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3563
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3674
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3721
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3734
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3796
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3816
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L3857
-  WaveManagerEditor (Assets\Scripts\Editor/) L3994
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L4171
-  ItemEffect (Assets\Scripts\Items/) L4201
-  ItemInstance (Assets\Scripts\Items/) L4235
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4270
-  LeafData (Assets\Scripts\PlantSystem\Data/) L4278
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4293
-  PlantCellType (Assets\Scripts\PlantSystem\Growth/) L4332
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4353
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4490
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4552
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L4647
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L4747
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L4769
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L4884
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L5040
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L5150
-  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L5251
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L5278
-  GridSnapStartup (Assets\Scripts\Ticks/) L5520
-  TickDebugMonitor (Assets\Scripts\Ticks/) L5587
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L5623
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L5634
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L5664
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L5772
-  WaterReflection (Assets\Scripts\Visual\Effects/) L5879
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L6304
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L6350
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L6521
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L6787
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L6795
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L6821
-  PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6869
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7180
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7334
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7388
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7431
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7448
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7488
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7647
+  AnimalFeedableAdapter (Assets\Scripts\Ecosystem\Feeding/) L2480
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2590
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2671
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2743
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2759
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2781
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L3030
+  WaveState (Assets\Scripts\Ecosystem\Management/) L3050
+  WaveSpawnLocationType (Assets\Scripts\Ecosystem\Spawning/) L3355
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3398
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3417
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3456
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3504
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3522
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3673
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3784
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3831
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3844
+  TileDefinitionEditor (Assets\Scripts\Editor/) L3906
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3926
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L3967
+  WaveManagerEditor (Assets\Scripts\Editor/) L4104
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L4281
+  ItemEffect (Assets\Scripts\Items/) L4311
+  ItemInstance (Assets\Scripts\Items/) L4345
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4380
+  LeafData (Assets\Scripts\PlantSystem\Data/) L4388
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4403
+  PlantCellType (Assets\Scripts\PlantSystem\Growth/) L4442
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4463
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4600
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L4662
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L4757
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L4857
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L4879
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L4994
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L5150
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L5260
+  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L5361
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L5388
+  GridSnapStartup (Assets\Scripts\Ticks/) L5630
+  TickDebugMonitor (Assets\Scripts\Ticks/) L5697
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L5733
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L5744
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L5774
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L5882
+  WaterReflection (Assets\Scripts\Visual\Effects/) L5989
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L6414
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L6460
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L6631
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L6897
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L6905
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L6931
+  PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6979
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7290
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7516
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7570
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7613
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7630
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7670
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7829
 
 [Abracodabra.Ecosystem]
-  DorisController (Assets\Scripts\Ecosystem\Doris/) L7658
-  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L8016
-  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L8103
+  DorisController (Assets\Scripts\Ecosystem\Doris/) L7840
+  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L8248
+  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L8374
+
+[Abracodabra.Ecosystem.Feeding]
+  ConsumableData (Assets\Scripts\Ecosystem\Feeding/) L8575
+  FeedingSystem (Assets\Scripts\Ecosystem\Feeding/) L8695
+  FoodSelectionPopup (Assets\Scripts\Ecosystem\Feeding/) L9186
+  IFeedable (Assets\Scripts\Ecosystem\Feeding/) L9535
 
 [Abracodabra.Genes]
-  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L8304
-  GeneLibrary (Assets\Scripts\Genes/) L8314
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L8469
-  PlantState (Assets\Scripts\PlantSystem\Growth/) L8649
+  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L9553
+  GeneLibrary (Assets\Scripts\Genes/) L9563
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L9718
+  PlantState (Assets\Scripts\PlantSystem\Growth/) L9898
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L9041
-  Fruit (Assets\Scripts\Genes\Components/) L9066
-  NutritionComponent (Assets\Scripts\Genes\Components/) L9104
+  Creature (Assets\Scripts\Genes\Components/) L10290
+  Fruit (Assets\Scripts\Genes\Components/) L10315
+  NutritionComponent (Assets\Scripts\Genes\Components/) L10353
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L9116
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L9162
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L9181
-  ModifierGene (Assets\Scripts\Genes\Core/) L9193
-  PassiveStatType (Assets\Scripts\Genes\Core/) L9225
-  PayloadGene (Assets\Scripts\Genes\Core/) L9267
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L9313
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L9334
-  GeneBase (Assets\Scripts\Genes/) L9367
-  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L9445
+  ActiveGene (Assets\Scripts\Genes\Core/) L10365
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L10411
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L10430
+  ModifierGene (Assets\Scripts\Genes\Core/) L10442
+  PassiveStatType (Assets\Scripts\Genes\Core/) L10474
+  PayloadGene (Assets\Scripts\Genes\Core/) L10516
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L10562
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L10583
+  GeneBase (Assets\Scripts\Genes/) L10616
+  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L10694
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L9548
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L9666
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L9696
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L9739
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L10797
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L10915
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L10945
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L10988
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L9790
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L9846
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L9978
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L11039
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L11095
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L11227
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L10033
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L10066
-  GeneEventBus (Assets\Scripts\Genes\Services/) L10164
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L10216
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L11282
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L11315
+  GeneEventBus (Assets\Scripts\Genes\Services/) L11413
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L11465
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L10303
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L11552
 
 [Abracodabra.Minigames]
-  MinigameManager (Assets\Scripts\Minigames/) L10396
-  MinigameType (Assets\Scripts\Minigames/) L10612
-  TileInteractionManagerExtensions (Assets\Scripts\Minigames/) L10672
-  TimingCircleConfig (Assets\Scripts\Minigames/) L10734
-  TimingCircleMinigame (Assets\Scripts\Minigames/) L10865
+  MinigameManager (Assets\Scripts\Minigames/) L11645
+  MinigameType (Assets\Scripts\Minigames/) L11861
+  TileInteractionManagerExtensions (Assets\Scripts\Minigames/) L11921
+  TimingCircleConfig (Assets\Scripts\Minigames/) L11983
+  TimingCircleMinigame (Assets\Scripts\Minigames/) L12114
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L11194
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L11279
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L11419
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L12443
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L12528
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L12668
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L11697
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L12544
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L12833
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L13071
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L13257
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L13456
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L14100
-  DestroyTracker (Assets\Scripts\A_ToolkitUI/) L14294
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L12946
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L13793
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L14082
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L14320
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L14506
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L14705
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L15349
+  DestroyTracker (Assets\Scripts\A_ToolkitUI/) L15543
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L14578
-  SeedRarity (Assets\Scripts\A_ToolkitUI/) L14748
-  QualityTier (Assets\Scripts\A_ToolkitUI/) L14770
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L15854
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L16024
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L16046
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L14832
-  CameraZoomController (Assets\Scripts\Core/) L14945
-  InitializationManager (Assets\Scripts\Core/) L14994
-  PixelGridSnapper (Assets\Scripts\Core/) L15034
-  RunState (Assets\Scripts\Core/) L15067
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L15233
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L15296
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L15432
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L15461
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L15612
-  GridEntity (Assets\Scripts\Ticks/) L15684
-  GridPosition (Assets\Scripts\Ticks/) L15854
-  GridPositionManager (Assets\Scripts\Ticks/) L15955
-  GridRadiusUtility (Assets\Scripts\Ticks/) L16569
-  MultiTileEntity (Assets\Scripts\Ticks/) L16713
-  PivotMode (Assets\Scripts\Ticks/) L16957
-  TickConfiguration (Assets\Scripts\Ticks/) L17071
-  ITickUpdateable (Assets\Scripts\Ticks/) L17157
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L17309
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L17330
-  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L17526
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L17542
-  for (Assets\Scripts\WorldInteraction/) L18163
+  CameraController (Assets\Scripts\Core/) L16108
+  CameraZoomController (Assets\Scripts\Core/) L16221
+  InitializationManager (Assets\Scripts\Core/) L16270
+  PixelGridSnapper (Assets\Scripts\Core/) L16310
+  RunState (Assets\Scripts\Core/) L16343
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L16509
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L16572
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L16708
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L16737
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L16888
+  GridEntity (Assets\Scripts\Ticks/) L16960
+  GridPosition (Assets\Scripts\Ticks/) L17130
+  GridPositionManager (Assets\Scripts\Ticks/) L17231
+  GridRadiusUtility (Assets\Scripts\Ticks/) L17845
+  MultiTileEntity (Assets\Scripts\Ticks/) L17989
+  PivotMode (Assets\Scripts\Ticks/) L18233
+  TickConfiguration (Assets\Scripts\Ticks/) L18347
+  ITickUpdateable (Assets\Scripts\Ticks/) L18433
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L18585
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L18606
+  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L18802
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L18818
+  for (Assets\Scripts\WorldInteraction/) L19439
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L18235
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L19511
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L18267
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L19543
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L18325
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L18371
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L18494
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L19601
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L19647
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L19770
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L18659
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L19935
 
 
 ================================================================================
@@ -2672,6 +2679,116 @@ pub class ScentSource : MonoBehaviour {
  void OnEnable() {
   UpdateRadiusVisualization();
  }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Feeding\AnimalFeedableAdapter.cs
+
+using Abracodabra.Ecosystem.Feeding;
+
+pub class AnimalFeedableAdapter : MonoBehaviour, IFeedable {
+ [Header("Feeding Configuration")]
+ [SerializeField] Vector3 feedPopupOffset = new Vector3(0f, 1f, 0f);
+
+ [Header("Category Fallback")]
+ [Tooltip("If true, allows feeding based on category match when no FoodType reference exists")]
+ [SerializeField] bool allowCategoryFallback = true;
+
+ [Header("Debug")]
+ [SerializeField] bool debugLog = false;
+
+ AnimalController animalController;
+ AnimalNeeds animalNeeds;
+
+ pub event Action<ConsumableData, float> OnFed;
+
+ pub string FeedableName => animalController?.SpeciesName ?? "Animal";
+
+ pub Vector3 FeedPopupAnchor => transform.position + feedPopupOffset;
+
+ pub bool CanAcceptFood(ConsumableData consumable) {
+  if (consumable == null) return false;
+  if (animalController == null || animalController.Definition == null) return false;
+
+  var diet = animalController.Definition.diet;
+  if (diet == null) return false;
+
+  if (consumable.FoodType != null) {
+   return diet.CanEat(consumable.FoodType);
+  }
+
+  if (allowCategoryFallback) {
+   foreach (var pref in diet.acceptableFoods) {
+    if (pref.foodType != null && pref.foodType.category == consumable.Category) {
+     return true;
+    }
+   }
+  }
+
+  return false;
+ }
+
+ pub float ReceiveFood(ConsumableData consumable, GameObject feeder) {
+  if (consumable == null || animalNeeds == null) {
+   return 0f;
+  }
+
+  float satiation = consumable.NutritionValue;
+
+  if (consumable.FoodType != null && animalController?.Definition?.diet != null) {
+   satiation = animalController.Definition.diet.GetSatiationValue(consumable.FoodType);
+  }
+
+  float oldHunger = animalNeeds.CurrentHunger;
+  animalNeeds.ModifyHunger(-satiation);
+  float actualReduction = oldHunger - animalNeeds.CurrentHunger;
+
+  if (debugLog) {
+   Debug.Log($"[AnimalFeedableAdapter] Fed {consumable.Name} to {FeedableName}. " +
+     $"Satiation: {satiation:F1}, Actual reduction: {actualReduction:F1}");
+  }
+
+  OnFed?.Invoke(consumable, actualReduction);
+  return actualReduction;
+ }
+
+ void Awake() {
+  animalController = GetComponent<AnimalController>();
+  animalNeeds = GetComponent<AnimalNeeds>();
+ }
+
+ void Start() {
+  if (FeedingSystem.Instance != null) {
+   FeedingSystem.Instance.RegisterFeedable(this);
+
+   if (debugLog) {
+    Debug.Log($"[AnimalFeedableAdapter] Registered {FeedableName} with FeedingSystem");
+   }
+  }
+  else {
+   Invoke(nameof(DelayedFeedingRegistration), 0.3f);
+  }
+ }
+
+ void DelayedFeedingRegistration() {
+  if (FeedingSystem.Instance != null) {
+   FeedingSystem.Instance.RegisterFeedable(this);
+   if (debugLog) Debug.Log($"[AnimalFeedableAdapter] Registered {FeedableName} with FeedingSystem (delayed)");
+  }
+ }
+
+ void OnDestroy() {
+  if (FeedingSystem.Instance != null) {
+   FeedingSystem.Instance.UnregisterFeedable(this);
+  }
+ }
+
+ void OnValidate() {
+  if (animalController == null) {
+   animalController = GetComponent<AnimalController>();
+  }
+ }
+
 }
 
 ////////////////////////////////////////////////////////////
@@ -7377,10 +7494,10 @@ bool result = PlantPlacementManager.Instance?.TryPlantSeedFromInventory( seedIte
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\WorldInteraction\Player\PlayerHungerSystem.cs
 
-﻿// FILE: Assets/Scripts/WorldInteraction/Player/PlayerHungerSystem.cs
 using WegoSystem;
+using Abracodabra.Ecosystem.Feeding;
 
-pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
+pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable, IFeedable {
  [Header("Hunger Configuration")]
  [Tooltip("Maximum hunger value. When reached, player starves.")]
  [SerializeField] float maxHunger = 100f;
@@ -7397,6 +7514,17 @@ pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
 
  [Tooltip("Fraction of max hunger where 'starving' state begins (red warning).")]
  [SerializeField] [Range(0f, 1f)] float starvingThreshold = 0.8f;
+
+ [Header("Diet Configuration")]
+ [Tooltip("Food categories player accepts. Empty = accepts all.")]
+ [SerializeField] FoodType.FoodCategory[] acceptedFoodCategories;
+
+ [Header("Feeding")]
+ [Tooltip("Offset from player position for food selection popup")]
+ [SerializeField] Vector3 feedPopupOffset = new Vector3(0f, 1.5f, 0f);
+
+ [Header("Debug")]
+ [SerializeField] bool debugLog = false;
 
  float currentHunger;
  bool hasStarved = false;
@@ -7415,11 +7543,58 @@ pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
  pub event Action OnStarvation;
  pub event Action OnBecameHungry;
  pub event Action OnBecameStarving;
+ pub event Action<ConsumableData, float> OnFed;
 
  pub enum HungerState {
   Satisfied,  // 0% to hungryThreshold
   Hungry,     // hungryThreshold to starvingThreshold
   Starving    // starvingThreshold to 100%
+ }
+
+ pub string FeedableName => "Player";
+
+ pub Vector3 FeedPopupAnchor => transform.position + feedPopupOffset;
+
+ pub bool CanAcceptFood(ConsumableData consumable) {
+  if (consumable == null) return false;
+
+  if (hasStarved) return false;
+
+  if (acceptedFoodCategories != null && acceptedFoodCategories.Length > 0) {
+   foreach (var category in acceptedFoodCategories) {
+    if (consumable.Category == category)
+     return true;
+   }
+   return false;
+  }
+
+  return true;
+ }
+
+ pub float ReceiveFood(ConsumableData consumable, GameObject feeder) {
+  if (consumable == null || hasStarved) {
+   return 0f;
+  }
+
+  float nutritionValue = consumable.NutritionValue;
+
+  float oldHunger = currentHunger;
+  currentHunger -= nutritionValue;
+  currentHunger = Mathf.Clamp(currentHunger, 0, maxHunger);
+
+  float actualReduction = oldHunger - currentHunger;
+
+  UpdateHungerState();
+  OnHungerChanged?.Invoke(currentHunger, maxHunger);
+  OnFed?.Invoke(consumable, actualReduction);
+
+  if (debugLog) {
+   Debug.Log($"[PlayerHungerSystem] Player ate {consumable.Name}. " +
+     $"Reduced hunger by {actualReduction:F1}. " +
+     $"Hunger: {oldHunger:F1} -> {currentHunger:F1}/{maxHunger}");
+  }
+
+  return actualReduction;
  }
 
  void Start() {
@@ -7433,12 +7608,30 @@ pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
   else {
    Debug.LogError("[PlayerHungerSystem] TickManager not found! Hunger will not increase.");
   }
+
+  if (FeedingSystem.Instance != null) {
+   FeedingSystem.Instance.RegisterFeedable(this);
+  }
+  else {
+   Invoke(nameof(DelayedFeedingRegistration), 0.3f);
+  }
+ }
+
+ void DelayedFeedingRegistration() {
+  if (FeedingSystem.Instance != null) {
+   FeedingSystem.Instance.RegisterFeedable(this);
+   if (debugLog) Debug.Log("[PlayerHungerSystem] Registered with FeedingSystem (delayed)");
+  }
  }
 
  void OnDestroy() {
   var tickManager = TickManager.Instance;
   if (tickManager != null) {
    tickManager.UnregisterTickUpdateable(this);
+  }
+
+  if (FeedingSystem.Instance != null) {
+   FeedingSystem.Instance.UnregisterFeedable(this);
   }
  }
 
@@ -7488,7 +7681,9 @@ pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
     OnBecameStarving?.Invoke();
    }
 
-   Debug.Log($"[PlayerHungerSystem] State changed: {oldState} -> {newState}");
+   if (debugLog) {
+    Debug.Log($"[PlayerHungerSystem] State changed: {oldState} -> {newState}");
+   }
   }
  }
 
@@ -7502,7 +7697,7 @@ pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
   UpdateHungerState();
 
   Debug.Log($"[PlayerHungerSystem] Player ate food. Reduced hunger by {nutritionValue}. " +
-    $"Hunger: {oldHunger:F1} -> {currentHunger:F1}/{maxHunger}");
+   $"Hunger: {oldHunger:F1} -> {currentHunger:F1}/{maxHunger}");
 
   OnHungerChanged?.Invoke(currentHunger, maxHunger);
  }
@@ -7520,12 +7715,6 @@ pub class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
   OnHungerChanged?.Invoke(currentHunger, maxHunger);
  }
 
- pub void ModifyHunger(float amount) {
-  currentHunger += amount;
-  currentHunger = Mathf.Clamp(currentHunger, 0, maxHunger);
-  UpdateHungerState();
-  OnHungerChanged?.Invoke(currentHunger, maxHunger);
- }
 }
 
 ////////////////////////////////////////////////////////////
@@ -7857,9 +8046,10 @@ pub class ToolSwitcher : MonoBehaviour {
 
 using WegoSystem;
 using Abracodabra.Genes;
+using Abracodabra.Ecosystem.Feeding;
 
 namespace Abracodabra.Ecosystem {
- pub class DorisController : MonoBehaviour, IWorldInteractable {
+ pub class DorisController : MonoBehaviour, IWorldInteractable, IFeedable {
   [Header("Configuration")]
   [SerializeField] DorisDefinition definition;
 
@@ -7872,6 +8062,9 @@ namespace Abracodabra.Ecosystem {
   [SerializeField] Color normalColor = Color.white;
   [SerializeField] Color hoverColor = new Color(1f, 1f, 0.8f, 1f);
 
+  [Header("Feeding")]
+  [SerializeField] Vector3 feedPopupOffset = new Vector3(0f, 1.5f, 0f);
+
   [Header("Starvation Behavior")]
   [SerializeField] int ticksSinceLastPlantEat = 0;
 
@@ -7883,6 +8076,7 @@ namespace Abracodabra.Ecosystem {
 
   pub event Action<PlantGrowth> OnDorisAtePlant;
   pub event Action<float> OnDorisFed;
+  pub event Action<ConsumableData, float> OnFed;
 
   pub DorisDefinition Definition => definition;
   pub DorisHungerSystem HungerSystem => hungerSystem;
@@ -7896,6 +8090,51 @@ namespace Abracodabra.Ecosystem {
 
   pub Vector3 InteractionWorldPosition => transform.position;
 
+  pub string FeedableName => definition != null ? definition.displayName : "Doris";
+
+  pub Vector3 FeedPopupAnchor => transform.position + feedPopupOffset;
+
+  pub bool CanAcceptFood(ConsumableData consumable) {
+   if (consumable == null) return false;
+
+   if (definition != null && definition.acceptedFoodCategories != null
+    && definition.acceptedFoodCategories.Length > 0) {
+    return definition.CanEatCategory(consumable.Category);
+   }
+
+   return true;
+  }
+
+  pub float ReceiveFood(ConsumableData consumable, GameObject feeder) {
+   if (consumable == null || hungerSystem == null) {
+    return 0f;
+   }
+
+   float satiation = consumable.NutritionValue;
+
+   if (definition != null) {
+    satiation *= definition.GetFoodCategoryMultiplier(consumable.Category);
+   }
+
+   float actualReduction = hungerSystem.Feed(satiation);
+
+   if (actualReduction > 0 && definition != null && definition.feedSound != null) {
+    AudioSource.PlayClipAtPoint(definition.feedSound, transform.position);
+   }
+
+   OnDorisFed?.Invoke(actualReduction);
+   OnFed?.Invoke(consumable, actualReduction);
+
+   if (debugLog) {
+    Debug.Log($"[DorisController] Fed {consumable.Name} (nutrition={consumable.NutritionValue:F1}, " +
+      $"category={consumable.Category}). Actual reduction: {actualReduction:F1}");
+   }
+
+   ticksSinceLastPlantEat = 0;
+
+   return actualReduction;
+  }
+
   void Awake() {
    CacheComponents();
    ValidateComponents();
@@ -7903,10 +8142,18 @@ namespace Abracodabra.Ecosystem {
 
   void Start() {
    Initialize();
+
+   if (FeedingSystem.Instance != null) {
+    FeedingSystem.Instance.RegisterFeedable(this);
+   }
   }
 
   void OnDestroy() {
    UnsubscribeFromEvents();
+
+   if (FeedingSystem.Instance != null) {
+    FeedingSystem.Instance.UnregisterFeedable(this);
+   }
   }
 
   void OnValidate() {
@@ -7958,7 +8205,6 @@ namespace Abracodabra.Ecosystem {
    }
 
    SubscribeToEvents();
-
    UpdateVisualState();
 
    isInitialized = true;
@@ -7972,7 +8218,7 @@ namespace Abracodabra.Ecosystem {
    if (hungerSystem != null) {
     hungerSystem.OnStateChanged += HandleHungerStateChanged;
     hungerSystem.OnStarvationTick += HandleStarvationTick;
-    hungerSystem.OnFed += HandleFed;
+    hungerSystem.OnFed += HandleHungerSystemFed;
     hungerSystem.OnHungerChanged += HandleHungerChanged;
    }
   }
@@ -7981,7 +8227,7 @@ namespace Abracodabra.Ecosystem {
    if (hungerSystem != null) {
     hungerSystem.OnStateChanged -= HandleHungerStateChanged;
     hungerSystem.OnStarvationTick -= HandleStarvationTick;
-    hungerSystem.OnFed -= HandleFed;
+    hungerSystem.OnFed -= HandleHungerSystemFed;
     hungerSystem.OnHungerChanged -= HandleHungerChanged;
    }
   }
@@ -8012,9 +8258,7 @@ namespace Abracodabra.Ecosystem {
 
   pub void OnHoverExit() {
    isHovered = false;
-   if (spriteRenderer != null) {
-    spriteRenderer.color = normalColor;
-   }
+   UpdateVisualState();
 
    if (debugLog) {
     Debug.Log("[DorisController] Hover exited");
@@ -8027,13 +8271,9 @@ namespace Abracodabra.Ecosystem {
    }
 
    // TODO: Open Doris UI panel (Task 9 - DorisHungerUI)
-   // TODO: Show Doris info/status
-   // TODO: Trigger dialogue if any
   }
 
   bool HandleToolInteraction(GameObject interactor, ToolDefinition tool) {
-   // TODO: Task 2 - Feeding Mechanism
-
    if (debugLog) {
     Debug.Log($"[DorisController] Tool interaction with '{tool.displayName}' - not yet implemented");
    }
@@ -8057,7 +8297,7 @@ namespace Abracodabra.Ecosystem {
 
     if (debugLog) {
      Debug.Log($"[DorisController] Fed Doris with {nutritionValue:F1} nutrition. " +
-       $"Hunger reduced by {actualReduction:F1}");
+      $"Hunger reduced by {actualReduction:F1}");
     }
 
     return true;
@@ -8078,7 +8318,8 @@ namespace Abracodabra.Ecosystem {
   void HandleHungerChanged(float currentHunger, float maxHunger) {
   }
 
-  void HandleFed(float amount) {
+  void HandleHungerSystemFed(float amount) {
+   ticksSinceLastPlantEat = 0;
   }
 
   void HandleStarvationTick() {
@@ -8099,7 +8340,7 @@ namespace Abracodabra.Ecosystem {
    var entitiesInRadius = GridPositionManager.Instance.GetEntitiesInRadius(
     multiTileEntity.AnchorPosition,
     definition.plantEatingRadius,
-    true // Use circle radius
+    true
    );
 
    PlantGrowth nearestPlant = null;
@@ -8140,24 +8381,22 @@ namespace Abracodabra.Ecosystem {
   }
 
   void UpdateVisualState() {
-   if (spriteRenderer == null || definition == null || hungerSystem == null) return;
+   if (hungerSystem == null || spriteRenderer == null) return;
 
-   Sprite targetSprite = null;
+   if (!isHovered) {
+    switch (hungerSystem.CurrentState) {
+     case DorisHungerSystem.HungerState.Satisfied:
+      spriteRenderer.color = normalColor;
+      break;
 
-   switch (hungerSystem.CurrentState) {
-    case DorisHungerSystem.HungerState.Satisfied:
-     targetSprite = definition.happySprite;
-     break;
-    case DorisHungerSystem.HungerState.Hungry:
-     targetSprite = definition.hungrySprite;
-     break;
-    case DorisHungerSystem.HungerState.Starving:
-     targetSprite = definition.starvingSprite;
-     break;
-   }
+     case DorisHungerSystem.HungerState.Hungry:
+      spriteRenderer.color = Color.Lerp(normalColor, Color.yellow, 0.2f);
+      break;
 
-   if (targetSprite != null) {
-    spriteRenderer.sprite = targetSprite;
+     case DorisHungerSystem.HungerState.Starving:
+      spriteRenderer.color = Color.Lerp(normalColor, Color.red, 0.3f);
+      break;
+    }
    }
   }
 
@@ -8171,7 +8410,7 @@ namespace Abracodabra.Ecosystem {
      clip = definition.hungrySound;
      break;
     case DorisHungerSystem.HungerState.Starving:
-     clip = definition.hungrySound; // Could be a different "angry" sound
+     clip = definition.hungrySound;
      break;
    }
 
@@ -8213,7 +8452,6 @@ namespace Abracodabra.Ecosystem {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Doris\DorisDefinition.cs
 
-﻿// FILE: Assets/Scripts/Ecosystem/Doris/DorisDefinition.cs
 
 namespace Abracodabra.Ecosystem {
  pub class DorisDefinition : ScriptableObject {
@@ -8254,10 +8492,26 @@ namespace Abracodabra.Ecosystem {
   [Min(0f)]
   pub float hungerReductionFromPlant = 10f;
 
+  pub int starvationPlantEatInterval => ticksBetweenPlantEating;
+  pub int starvationPlantSearchRadius => plantEatingRadius;
+
   [Header("Feeding")]
   [Tooltip("Base multiplier for nutrition when player feeds Doris.")]
   [Min(0.1f)]
   pub float feedingEfficiency = 1f;
+
+  [Header("Diet Configuration")]
+  [Tooltip("Food categories Doris accepts. Empty = accepts all.")]
+  pub FoodType.FoodCategory[] acceptedFoodCategories;
+
+  [Tooltip("Multipliers for different food categories")]
+  pub FoodCategoryMultiplier[] foodCategoryMultipliers;
+
+  pub struct FoodCategoryMultiplier {
+   pub FoodType.FoodCategory category;
+   [Range(0.1f, 3f)]
+   pub float multiplier;
+  }
 
   [Header("Visual")]
   [Tooltip("Sprite for happy state (low hunger).")]
@@ -8281,6 +8535,30 @@ namespace Abracodabra.Ecosystem {
 
   pub float HungryHungerValue => maxHunger * hungryThreshold;
   pub float StarvingHungerValue => maxHunger * starvingThreshold;
+
+  pub float GetFoodCategoryMultiplier(FoodType.FoodCategory category) {
+   if (foodCategoryMultipliers == null || foodCategoryMultipliers.Length == 0)
+    return 1f;
+
+   foreach (var mult in foodCategoryMultipliers) {
+    if (mult.category == category)
+     return mult.multiplier;
+   }
+
+   return 1f;
+  }
+
+  pub bool CanEatCategory(FoodType.FoodCategory category) {
+   if (acceptedFoodCategories == null || acceptedFoodCategories.Length == 0)
+    return true; // Accept all if not specified
+
+   foreach (var accepted in acceptedFoodCategories) {
+    if (accepted == category)
+     return true;
+   }
+
+   return false;
+  }
 
   void OnValidate() {
    maxHunger = Mathf.Max(1f, maxHunger);
@@ -8495,6 +8773,984 @@ namespace Abracodabra.Ecosystem {
     currentHunger = Mathf.Clamp(currentHunger, 0f, definition.maxHunger);
    }
   }
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Feeding\ConsumableData.cs
+
+﻿// FILE: Assets/Scripts/Ecosystem/Feeding/ConsumableData.cs
+
+namespace Abracodabra.Ecosystem.Feeding {
+ pub class ConsumableData {
+  pub string Name { get; set; }
+  pub Sprite Icon { get; set; }
+  pub float NutritionValue { get; set; }
+  pub FoodType.FoodCategory Category { get; set; }
+
+  pub FoodType FoodType { get; set; }
+  pub ItemDefinition ItemDefinition { get; set; }
+
+  // Track source for debugging
+  pub bool IsFromFoodType => FoodType != null;
+  pub bool IsFromItemDefinition => ItemDefinition != null;
+
+  pub ConsumableData(FoodType foodType) {
+   if (foodType == null) {
+    Debug.LogError("[ConsumableData] Created with null FoodType");
+    return;
+   }
+
+   FoodType = foodType;
+   ItemDefinition = null;
+
+   Name = foodType.foodName;
+   Icon = foodType.icon;
+   NutritionValue = foodType.baseSatiationValue;
+   Category = foodType.category;
+  }
+
+  pub ConsumableData(ItemDefinition itemDef) {
+   if (itemDef == null) {
+    Debug.LogError("[ConsumableData] Created with null ItemDefinition");
+    return;
+   }
+
+   FoodType = null;
+   ItemDefinition = itemDef;
+
+   Name = itemDef.itemName;
+   Icon = itemDef.icon;
+   NutritionValue = itemDef.baseNutrition;
+
+   Category = InferCategoryFromItem(itemDef);
+  }
+
+  pub ConsumableData(ItemInstance itemInstance) {
+   if (itemInstance?.definition == null) {
+    Debug.LogError("[ConsumableData] Created with null ItemInstance or definition");
+    return;
+   }
+
+   var itemDef = itemInstance.definition;
+   FoodType = null;
+   ItemDefinition = itemDef;
+
+   Name = itemDef.itemName;
+   Icon = itemDef.icon;
+   NutritionValue = itemInstance.GetNutrition(); // Uses dynamic properties
+   Category = InferCategoryFromItem(itemDef);
+  }
+
+  FoodType.FoodCategory InferCategoryFromItem(ItemDefinition itemDef) {
+   if (itemDef == null) return FoodType.FoodCategory.Other;
+
+   string nameLower = itemDef.itemName?.ToLower() ?? "";
+
+   if (nameLower.Contains("fruit") || nameLower.Contains("berry") || nameLower.Contains("apple"))
+    return FoodType.FoodCategory.Plant_Fruit;
+
+   if (nameLower.Contains("leaf") || nameLower.Contains("lettuce") || nameLower.Contains("herb"))
+    return FoodType.FoodCategory.Plant_Leaf;
+
+   if (nameLower.Contains("seed"))
+    return FoodType.FoodCategory.Plant_Seed;
+
+   if (nameLower.Contains("stem") || nameLower.Contains("stalk"))
+    return FoodType.FoodCategory.Plant_Stem;
+
+   return FoodType.FoodCategory.Other;
+  }
+
+  pub bool MatchesCategory(FoodType.FoodCategory category) {
+   return Category == category;
+  }
+
+  pub stat ConsumableData TryCreate(object data) {
+   if (data == null) return null;
+
+   if (data is FoodType foodType) {
+    return new ConsumableData(foodType);
+   }
+
+   if (data is ItemDefinition itemDef) {
+    if (itemDef.isConsumable && itemDef.baseNutrition > 0) {
+     return new ConsumableData(itemDef);
+    }
+    return null;
+   }
+
+   if (data is ItemInstance itemInstance) {
+    if (itemInstance.definition?.isConsumable == true) {
+     return new ConsumableData(itemInstance);
+    }
+    return null;
+   }
+
+   return null;
+  }
+
+  pub ovr string ToString() {
+   return $"[ConsumableData: {Name}, Nutrition={NutritionValue}, Category={Category}, Source={(IsFromFoodType ? "FoodType" : "ItemDef")}]";
+  }
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Feeding\FeedingSystem.cs
+
+using WegoSystem;
+using Abracodabra.UI.Genes;
+using Abracodabra.UI.Toolkit;
+
+namespace Abracodabra.Ecosystem.Feeding {
+ pub class FeedingSystem : MonoBehaviour {
+  pub stat FeedingSystem Instance { get; set; }
+
+  [Header("Range Configuration")]
+  [Tooltip("If true, uses TileInteractionManager's hoverRadius. If false, uses manual range.")]
+  [SerializeField] bool useGameInteractionRange = true;
+
+  [Tooltip("Manual feeding range (only used if useGameInteractionRange is false)")]
+  [SerializeField] float manualFeedingRange = 3f;
+
+  [Header("State Restrictions")]
+  [Tooltip("If true, only allow feeding during GrowthAndThreat phase. If false, always allow.")]
+  [SerializeField] bool restrictToGrowthPhase = true;
+
+  [Header("Player Reference")]
+  [SerializeField] Transform player;
+  [SerializeField] GardenerController gardenerController;
+
+  [Header("Debug")]
+  [SerializeField] bool debugLog = true;
+  [SerializeField] bool verboseHoverLog = false;
+
+  pub event Action<IFeedable> OnFeedingStarted;
+  pub event Action<IFeedable, ConsumableData> OnFeedingCompleted;
+  pub event Action OnFeedingCancelled;
+
+  IFeedable currentTarget;
+  IFeedable hoveredFeedable;
+  Camera mainCamera;
+  bool isSelectingFood = false;
+
+  ro List<IFeedable> registeredFeedables = new List<IFeedable>();
+
+  pub float EffectiveFeedingRange {
+   get {
+    if (useGameInteractionRange && TileInteractionManager.Instance != null) {
+     return TileInteractionManager.Instance.hoverRadius;
+    }
+    return manualFeedingRange;
+   }
+  }
+
+  void Awake() {
+   if (Instance != null && Instance != this) {
+    if (debugLog) Debug.LogWarning("[FeedingSystem] Duplicate instance destroyed");
+    Destroy(gameObject);
+    return;
+   }
+   Instance = this;
+
+   if (debugLog) Debug.Log("[FeedingSystem] Awake - Instance set");
+  }
+
+  void Start() {
+   mainCamera = Camera.main;
+
+   if (player == null || gardenerController == null) {
+    gardenerController = FindFirstObjectByType<GardenerController>();
+    if (gardenerController != null) {
+     player = gardenerController.transform;
+    }
+   }
+
+   if (debugLog) {
+    Debug.Log($"[FeedingSystem] Start - Camera: {mainCamera != null}, Player: {player != null}, GardenerController: {gardenerController != null}");
+   }
+
+   Invoke(nameof(AutoRegisterFeedables), 0.2f);
+  }
+
+  void OnDestroy() {
+   if (Instance == this) {
+    Instance = null;
+   }
+  }
+
+  void Update() {
+   // Always detect right-click for debugging, but only process if allowed
+   bool rightClickThisFrame = Input.GetMouseButtonDown(1);
+
+   if (rightClickThisFrame && debugLog) {
+    Debug.Log($"[FeedingSystem] Right-click detected! isSelectingFood={isSelectingFood}, " +
+      $"registeredCount={registeredFeedables.Count}, hoveredFeedable={hoveredFeedable?.FeedableName ?? "null"}");
+   }
+
+   if (isSelectingFood) return;
+
+   if (restrictToGrowthPhase) {
+    if (RunManager.Instance == null) {
+     if (rightClickThisFrame && debugLog) Debug.Log("[FeedingSystem] RunManager.Instance is null");
+    }
+    else if (RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
+     if (rightClickThisFrame && debugLog)
+      Debug.Log($"[FeedingSystem] Wrong state: {RunManager.Instance.CurrentState} (need GrowthAndThreat)");
+     return;
+    }
+   }
+
+   UpdateHoveredFeedable();
+
+   if (rightClickThisFrame) {
+    HandleRightClickInput();
+   }
+
+   HandleKeyboardQuickFeed();
+  }
+
+  pub void RegisterFeedable(IFeedable feedable) {
+   if (feedable != null && !registeredFeedables.Contains(feedable)) {
+    registeredFeedables.Add(feedable);
+    if (debugLog) Debug.Log($"[FeedingSystem] Registered feedable: {feedable.FeedableName} (total: {registeredFeedables.Count})");
+   }
+  }
+
+  pub void UnregisterFeedable(IFeedable feedable) {
+   if (feedable != null) {
+    registeredFeedables.Remove(feedable);
+    if (debugLog) Debug.Log($"[FeedingSystem] Unregistered feedable: {feedable.FeedableName}");
+   }
+  }
+
+  void AutoRegisterFeedables() {
+   var allMonoBehaviours = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+   int count = 0;
+
+   foreach (var mb in allMonoBehaviours) {
+    if (mb is IFeedable feedable && !registeredFeedables.Contains(feedable)) {
+     registeredFeedables.Add(feedable);
+     count++;
+     if (debugLog) Debug.Log($"[FeedingSystem] Auto-registered: {feedable.FeedableName}");
+    }
+   }
+
+   if (debugLog) Debug.Log($"[FeedingSystem] Auto-registration complete: {count} new feedables (total: {registeredFeedables.Count})");
+  }
+
+  pub void RefreshFeedables() {
+   AutoRegisterFeedables();
+  }
+
+  void UpdateHoveredFeedable() {
+   if (mainCamera == null) {
+    mainCamera = Camera.main;
+    if (mainCamera == null) return;
+   }
+
+   Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+   mouseWorldPos.z = 0f;
+
+   GridPosition mouseGridPos = GridPosition.Zero;
+
+   if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null) {
+    Vector3Int cellPos = TileInteractionManager.Instance.interactionGrid.WorldToCell(mouseWorldPos);
+    mouseGridPos = new GridPosition(cellPos);
+   }
+
+   IFeedable closestFeedable = null;
+   float closestDistance = float.MaxValue;
+
+   registeredFeedables.RemoveAll(f => f == null || (f as MonoBehaviour) == null);
+
+   foreach (var feedable in registeredFeedables) {
+    var feedableMono = feedable as MonoBehaviour;
+    if (feedableMono == null || !feedableMono.gameObject.activeInHierarchy) continue;
+
+    GridPosition feedableGridPos = GetFeedableGridPosition(feedable);
+
+    int manhattanDist = mouseGridPos.ManhattanDistance(feedableGridPos);
+
+    float worldDist = Vector3.Distance(mouseWorldPos, feedable.FeedPopupAnchor);
+
+    if (verboseHoverLog && worldDist < 3f) {
+     Debug.Log($"[FeedingSystem] Checking {feedable.FeedableName}: gridDist={manhattanDist}, worldDist={worldDist:F2}");
+    }
+
+    if ((manhattanDist <= 1 || worldDist < 1.5f) && worldDist < closestDistance) {
+     closestDistance = worldDist;
+     closestFeedable = feedable;
+    }
+   }
+
+   if (hoveredFeedable != closestFeedable) {
+    hoveredFeedable = closestFeedable;
+
+    if (debugLog && hoveredFeedable != null) {
+     Debug.Log($"[FeedingSystem] Now hovering: {hoveredFeedable.FeedableName}");
+    }
+   }
+  }
+
+  GridPosition GetFeedableGridPosition(IFeedable feedable) {
+   var mono = feedable as MonoBehaviour;
+   if (mono == null) return GridPosition.Zero;
+
+   var gridEntity = mono.GetComponent<GridEntity>();
+   if (gridEntity != null) {
+    return gridEntity.Position;
+   }
+
+   var multiTile = mono.GetComponent<MultiTileEntity>();
+   if (multiTile != null) {
+    return multiTile.AnchorPosition;
+   }
+
+   if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null) {
+    Vector3Int cell = TileInteractionManager.Instance.interactionGrid.WorldToCell(mono.transform.position);
+    return new GridPosition(cell);
+   }
+
+   return GridPosition.Zero;
+  }
+
+  void HandleRightClickInput() {
+   if (debugLog) {
+    Debug.Log($"[FeedingSystem] HandleRightClickInput - hoveredFeedable: {hoveredFeedable?.FeedableName ?? "none"}");
+   }
+
+   if (hoveredFeedable == null) {
+    if (debugLog) Debug.Log("[FeedingSystem] No feedable under cursor - right-click ignored");
+    return;
+   }
+
+   if (player != null && gardenerController != null) {
+    GridPosition playerPos = gardenerController.GetCurrentGridPosition();
+    GridPosition feedablePos = GetFeedableGridPosition(hoveredFeedable);
+    int gridDistance = playerPos.ManhattanDistance(feedablePos);
+    int maxRange = Mathf.CeilToInt(EffectiveFeedingRange);
+
+    if (debugLog) {
+     Debug.Log($"[FeedingSystem] Distance check: player at {playerPos}, target at {feedablePos}, " +
+       $"distance={gridDistance}, maxRange={maxRange}");
+    }
+
+    if (gridDistance > maxRange) {
+     if (debugLog) Debug.Log($"[FeedingSystem] {hoveredFeedable.FeedableName} is too far to feed (dist {gridDistance} > max {maxRange})");
+     return;
+    }
+   }
+
+   if (debugLog) Debug.Log($"[FeedingSystem] Starting feeding interaction with {hoveredFeedable.FeedableName}");
+   StartFeedingInteraction(hoveredFeedable);
+  }
+
+  void HandleKeyboardQuickFeed() {
+   if (hoveredFeedable == null) return;
+
+   for (int i = 0; i < 9; i++) {
+    if (Input.GetKeyDown(KeyCode.Alpha1 + i)) {
+     TryQuickFeedFromHotbar(hoveredFeedable, i);
+     break;
+    }
+   }
+
+   if (Input.GetKeyDown(KeyCode.E)) {
+    var playerFeedable = GetPlayerFeedable();
+    if (playerFeedable != null) {
+     if (debugLog) Debug.Log("[FeedingSystem] E pressed - opening self-feed menu");
+     StartFeedingInteraction(playerFeedable);
+    }
+   }
+  }
+
+  void TryQuickFeedFromHotbar(IFeedable target, int hotbarIndex) {
+   if (!InventoryService.IsInitialized) return;
+
+   var hotbarItems = InventoryService.GetHotbarItems();
+   if (hotbarIndex >= hotbarItems.Count) return;
+
+   var item = hotbarItems[hotbarIndex];
+   if (item == null) return;
+
+   ConsumableData consumable = GetConsumableFromItem(item);
+   if (consumable == null) {
+    if (debugLog) Debug.Log($"[FeedingSystem] Slot {hotbarIndex + 1} is not a consumable");
+    return;
+   }
+
+   if (!target.CanAcceptFood(consumable)) {
+    if (debugLog) Debug.Log($"[FeedingSystem] {target.FeedableName} cannot eat {consumable.Name}");
+    return;
+   }
+
+   ExecuteFeeding(target, consumable, hotbarIndex);
+  }
+
+  pub void StartFeedingInteraction(IFeedable target) {
+   if (target == null) {
+    if (debugLog) Debug.LogWarning("[FeedingSystem] StartFeedingInteraction called with null target");
+    return;
+   }
+
+   currentTarget = target;
+   isSelectingFood = true;
+
+   if (debugLog) Debug.Log($"[FeedingSystem] Opening food selection for {target.FeedableName}");
+
+   OnFeedingStarted?.Invoke(target);
+
+   var availableFoods = GetAvailableFoodsForTarget(target);
+
+   if (availableFoods.Count == 0) {
+    if (debugLog) Debug.Log($"[FeedingSystem] No valid foods in inventory for {target.FeedableName}");
+    CancelFeedingInteraction();
+    return;
+   }
+
+   if (FoodSelectionPopup.Instance != null) {
+    if (debugLog) Debug.Log($"[FeedingSystem] Showing FoodSelectionPopup with {availableFoods.Count} foods");
+    FoodSelectionPopup.Instance.Show(target, availableFoods, OnFoodSelected, OnFoodSelectionCancelled);
+   }
+   else {
+    Debug.LogError("[FeedingSystem] FoodSelectionPopup.Instance is null! Make sure FoodSelectionPopup exists in the scene.");
+    CancelFeedingInteraction();
+   }
+  }
+
+  void OnFoodSelected(ConsumableData consumable, int inventoryIndex) {
+   if (currentTarget == null || consumable == null) {
+    CancelFeedingInteraction();
+    return;
+   }
+
+   ExecuteFeeding(currentTarget, consumable, inventoryIndex);
+
+   isSelectingFood = false;
+   currentTarget = null;
+  }
+
+  void OnFoodSelectionCancelled() {
+   CancelFeedingInteraction();
+  }
+
+  void CancelFeedingInteraction() {
+   isSelectingFood = false;
+   currentTarget = null;
+   OnFeedingCancelled?.Invoke();
+
+   if (debugLog) Debug.Log("[FeedingSystem] Feeding cancelled");
+  }
+
+  void ExecuteFeeding(IFeedable target, ConsumableData consumable, int inventoryIndex) {
+   if (target == null || consumable == null) return;
+
+   float satiationApplied = target.ReceiveFood(consumable, player?.gameObject);
+
+   if (inventoryIndex >= 0) {
+    InventoryService.RemoveItemAtIndex(inventoryIndex);
+   }
+
+   if (TickManager.Instance != null) {
+    TickManager.Instance.AdvanceTick();
+   }
+
+   if (debugLog) {
+    Debug.Log($"[FeedingSystem] Fed {consumable.Name} to {target.FeedableName}, " +
+      $"satiation: {satiationApplied:F1}");
+   }
+
+   OnFeedingCompleted?.Invoke(target, consumable);
+  }
+
+  List<FoodSelectionPopup.FoodSlotData> GetAvailableFoodsForTarget(IFeedable target) {
+   var result = new List<FoodSelectionPopup.FoodSlotData>();
+
+   if (!InventoryService.IsInitialized) {
+    if (debugLog) Debug.Log("[FeedingSystem] InventoryService not initialized");
+    return result;
+   }
+
+   if (debugLog) Debug.Log($"[FeedingSystem] Scanning {InventoryService.TotalSlots} inventory slots for consumables...");
+
+   for (int i = 0; i < InventoryService.TotalSlots; i++) {
+    var item = InventoryService.GetItemAt(i);
+    if (item == null) continue;
+
+    ConsumableData consumable = GetConsumableFromItem(item);
+    if (consumable == null) {
+     if (debugLog && verboseHoverLog) {
+      Debug.Log($"[FeedingSystem] Slot {i}: {item.ItemDefinition?.itemName ?? "unknown"} - not consumable");
+     }
+     continue;
+    }
+
+    if (!target.CanAcceptFood(consumable)) {
+     if (debugLog) Debug.Log($"[FeedingSystem] Slot {i}: {consumable.Name} - target cannot eat");
+     continue;
+    }
+
+    if (debugLog) Debug.Log($"[FeedingSystem] Slot {i}: {consumable.Name} - VALID (nutrition={consumable.NutritionValue})");
+
+    result.Add(new FoodSelectionPopup.FoodSlotData {
+     Consumable = consumable,
+     InventoryIndex = i,
+     Icon = consumable.Icon,
+     StackCount = item.StackSize
+    });
+   }
+
+   if (debugLog) Debug.Log($"[FeedingSystem] Found {result.Count} valid foods for {target.FeedableName}");
+   return result;
+  }
+
+  ConsumableData GetConsumableFromItem(UIInventoryItem item) {
+   if (item == null) return null;
+
+   if (item.OriginalData is FoodType foodType) {
+    return new ConsumableData(foodType);
+   }
+
+   var itemDef = item.ItemDefinition;
+   if (itemDef != null && itemDef.isConsumable) {
+    if (item.ResourceInstance != null) {
+     return new ConsumableData(item.ResourceInstance);
+    }
+
+    return new ConsumableData(itemDef);
+   }
+
+   if (item.OriginalData is ItemInstance itemInstance) {
+    if (itemInstance.definition?.isConsumable == true) {
+     return new ConsumableData(itemInstance);
+    }
+   }
+
+   return null;
+  }
+
+  IFeedable GetPlayerFeedable() {
+   if (player == null) return null;
+
+   return player.GetComponent<IFeedable>();
+  }
+
+  pub IFeedable GetHoveredFeedable() {
+   return hoveredFeedable;
+  }
+
+  pub bool IsSelectingFood => isSelectingFood;
+
+  pub int RegisteredFeedableCount => registeredFeedables.Count;
+
+  pub void LogRegisteredFeedables() {
+   Debug.Log($"[FeedingSystem] === Registered Feedables ({registeredFeedables.Count}) ===");
+   foreach (var feedable in registeredFeedables) {
+    var mono = feedable as MonoBehaviour;
+    string status = mono != null && mono.gameObject.activeInHierarchy ? "active" : "inactive/null";
+    Debug.Log($"  - {feedable?.FeedableName ?? "null"} ({status})");
+   }
+  }
+
+  pub void ForceRefreshFeedables() {
+   registeredFeedables.Clear();
+   AutoRegisterFeedables();
+  }
+
+  pub void LogInventoryConsumables() {
+   if (!InventoryService.IsInitialized) {
+    Debug.Log("[FeedingSystem] InventoryService not initialized");
+    return;
+   }
+
+   Debug.Log($"[FeedingSystem] === Inventory Consumables ({InventoryService.TotalSlots} slots) ===");
+
+   for (int i = 0; i < InventoryService.TotalSlots; i++) {
+    var item = InventoryService.GetItemAt(i);
+    if (item == null) continue;
+
+    var consumable = GetConsumableFromItem(item);
+    if (consumable != null) {
+     Debug.Log($"  Slot {i}: {consumable}");
+    }
+    else {
+     string itemName = item.ItemDefinition?.itemName ?? item.OriginalData?.GetType().Name ?? "unknown";
+     bool isConsumable = item.ItemDefinition?.isConsumable ?? false;
+     float nutrition = item.ItemDefinition?.baseNutrition ?? 0;
+     Debug.Log($"  Slot {i}: {itemName} (isConsumable={isConsumable}, nutrition={nutrition}) - NOT VALID");
+    }
+   }
+  }
+
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Feeding\FoodSelectionPopup.cs
+
+using UnityEngine.UIElements;
+
+namespace Abracodabra.Ecosystem.Feeding {
+ pub class FoodSelectionPopup : MonoBehaviour {
+  pub stat FoodSelectionPopup Instance { get; set; }
+
+  [Header("UI Document")]
+  [SerializeField] UIDocument uiDocument;
+
+  [Header("Grid Configuration")]
+  [SerializeField] int gridColumns = 3;
+  [SerializeField] int gridRows = 3;
+  [SerializeField] float slotSize = 64f;
+  [SerializeField] float slotSpacing = 4f;
+
+  [Header("Styling")]
+  [SerializeField] Color backgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.95f);
+  [SerializeField] Color slotBackgroundColor = new Color(0.25f, 0.25f, 0.25f, 1f);
+  [SerializeField] Color slotHoverColor = new Color(0.4f, 0.4f, 0.4f, 1f);
+  [SerializeField] Color slotBorderColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+  [SerializeField] int borderRadius = 8;
+
+  [Header("Debug")]
+  [SerializeField] bool debugLog = true;
+
+  VisualElement rootElement;
+  VisualElement popupContainer;
+  VisualElement gridContainer;
+  Label titleLabel;
+
+  bool isVisible = false;
+  IFeedable currentTarget;
+  List<FoodSlotData> currentFoods;
+  Action<ConsumableData, int> onFoodSelected;
+  Action onCancelled;
+
+  List<VisualElement> slotElements = new List<VisualElement>();
+
+  pub class FoodSlotData {
+   pub ConsumableData Consumable;
+   pub int InventoryIndex;
+   pub Sprite Icon;
+   pub int StackCount;
+  }
+
+  void Awake() {
+   if (Instance != null && Instance != this) {
+    Destroy(gameObject);
+    return;
+   }
+   Instance = this;
+  }
+
+  void Start() {
+   InitializeUI();
+  }
+
+  void InitializeUI() {
+   if (uiDocument == null) {
+    uiDocument = GetComponent<UIDocument>();
+   }
+
+   if (uiDocument == null) {
+    if (debugLog) Debug.LogWarning("[FoodSelectionPopup] No UIDocument found. FoodSelectionPopup will not function until one is added.");
+    return;
+   }
+
+   if (uiDocument.rootVisualElement == null) {
+    if (debugLog) Debug.LogWarning("[FoodSelectionPopup] UIDocument has no rootVisualElement yet.");
+    return;
+   }
+
+   CreateUI();
+   Hide();
+  }
+
+  void OnDestroy() {
+   if (Instance == this) {
+    Instance = null;
+   }
+  }
+
+  void Update() {
+   if (!isVisible) return;
+
+   if (Input.GetKeyDown(KeyCode.Escape)) {
+    Cancel();
+   }
+
+   if (Input.GetMouseButtonDown(1)) {
+    Cancel();
+   }
+
+   if (Input.GetMouseButtonDown(0) && !IsMouseOverPopup()) {
+    Cancel();
+   }
+  }
+
+  void CreateUI() {
+   rootElement = uiDocument.rootVisualElement;
+
+   rootElement.Clear();
+
+   var overlay = new VisualElement();
+   overlay.style.position = Position.Absolute;
+   overlay.style.left = 0;
+   overlay.style.top = 0;
+   overlay.style.right = 0;
+   overlay.style.bottom = 0;
+   overlay.pickingMode = PickingMode.Ignore;
+   rootElement.Add(overlay);
+
+   popupContainer = new VisualElement();
+   popupContainer.name = "food-selection-popup";
+   popupContainer.style.position = Position.Absolute;
+   popupContainer.style.backgroundColor = backgroundColor;
+   popupContainer.style.borderTopLeftRadius = borderRadius;
+   popupContainer.style.borderTopRightRadius = borderRadius;
+   popupContainer.style.borderBottomLeftRadius = borderRadius;
+   popupContainer.style.borderBottomRightRadius = borderRadius;
+   popupContainer.style.paddingTop = 8;
+   popupContainer.style.paddingBottom = 8;
+   popupContainer.style.paddingLeft = 8;
+   popupContainer.style.paddingRight = 8;
+   popupContainer.pickingMode = PickingMode.Position;
+   rootElement.Add(popupContainer);
+
+   titleLabel = new Label("Feed");
+   titleLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+   titleLabel.style.fontSize = 14;
+   titleLabel.style.color = Color.white;
+   titleLabel.style.marginBottom = 8;
+   titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+   popupContainer.Add(titleLabel);
+
+   gridContainer = new VisualElement();
+   gridContainer.name = "food-grid";
+   gridContainer.style.flexDirection = FlexDirection.Row;
+   gridContainer.style.flexWrap = Wrap.Wrap;
+   gridContainer.style.width = (slotSize + slotSpacing) * gridColumns;
+   popupContainer.Add(gridContainer);
+
+   if (debugLog) Debug.Log("[FoodSelectionPopup] UI created");
+  }
+
+  void PopulateGrid(List<FoodSlotData> foods) {
+   gridContainer.Clear();
+   slotElements.Clear();
+
+   int maxSlots = gridColumns * gridRows;
+   int slotsToShow = Mathf.Min(foods.Count, maxSlots);
+
+   for (int i = 0; i < slotsToShow; i++) {
+    var foodData = foods[i];
+    var slot = CreateFoodSlot(foodData, i);
+    gridContainer.Add(slot);
+    slotElements.Add(slot);
+   }
+
+   int actualColumns = Mathf.Min(slotsToShow, gridColumns);
+   gridContainer.style.width = (slotSize + slotSpacing) * actualColumns;
+
+   if (debugLog) Debug.Log($"[FoodSelectionPopup] Populated grid with {slotsToShow} slots");
+  }
+
+  VisualElement CreateFoodSlot(FoodSlotData foodData, int index) {
+   var slot = new VisualElement();
+   slot.name = $"food-slot-{index}";
+   slot.style.width = slotSize;
+   slot.style.height = slotSize;
+   slot.style.marginRight = slotSpacing;
+   slot.style.marginBottom = slotSpacing;
+   slot.style.backgroundColor = slotBackgroundColor;
+   slot.style.borderTopLeftRadius = 4;
+   slot.style.borderTopRightRadius = 4;
+   slot.style.borderBottomLeftRadius = 4;
+   slot.style.borderBottomRightRadius = 4;
+   slot.style.borderTopWidth = 1;
+   slot.style.borderBottomWidth = 1;
+   slot.style.borderLeftWidth = 1;
+   slot.style.borderRightWidth = 1;
+   slot.style.borderTopColor = slotBorderColor;
+   slot.style.borderBottomColor = slotBorderColor;
+   slot.style.borderLeftColor = slotBorderColor;
+   slot.style.borderRightColor = slotBorderColor;
+   slot.style.alignItems = Align.Center;
+   slot.style.justifyContent = Justify.Center;
+   slot.pickingMode = PickingMode.Position;
+
+   if (foodData.Icon != null) {
+    var icon = new VisualElement();
+    icon.style.width = slotSize - 16;
+    icon.style.height = slotSize - 16;
+    icon.style.backgroundImage = new StyleBackground(foodData.Icon);
+    icon.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+    icon.pickingMode = PickingMode.Ignore;
+    slot.Add(icon);
+   }
+   else {
+    var nameLabel = new Label(foodData.Consumable?.Name ?? "???");
+    nameLabel.style.fontSize = 10;
+    nameLabel.style.color = Color.white;
+    nameLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+    nameLabel.pickingMode = PickingMode.Ignore;
+    slot.Add(nameLabel);
+   }
+
+   if (foodData.StackCount > 1) {
+    var countBadge = new Label(foodData.StackCount.ToString());
+    countBadge.style.position = Position.Absolute;
+    countBadge.style.right = 2;
+    countBadge.style.bottom = 2;
+    countBadge.style.fontSize = 10;
+    countBadge.style.color = Color.white;
+    countBadge.style.backgroundColor = new Color(0, 0, 0, 0.7f);
+    countBadge.style.paddingLeft = 3;
+    countBadge.style.paddingRight = 3;
+    countBadge.style.paddingTop = 1;
+    countBadge.style.paddingBottom = 1;
+    countBadge.style.borderTopLeftRadius = 3;
+    countBadge.style.borderTopRightRadius = 3;
+    countBadge.style.borderBottomLeftRadius = 3;
+    countBadge.style.borderBottomRightRadius = 3;
+    countBadge.pickingMode = PickingMode.Ignore;
+    slot.Add(countBadge);
+   }
+
+   slot.RegisterCallback<MouseEnterEvent>(evt => {
+    slot.style.backgroundColor = slotHoverColor;
+   });
+
+   slot.RegisterCallback<MouseLeaveEvent>(evt => {
+    slot.style.backgroundColor = slotBackgroundColor;
+   });
+
+   slot.RegisterCallback<ClickEvent>(evt => {
+    if (debugLog) Debug.Log($"[FoodSelectionPopup] Selected: {foodData.Consumable?.Name} at inventory index {foodData.InventoryIndex}");
+    SelectFood(foodData);
+   });
+
+   slot.tooltip = $"{foodData.Consumable?.Name ?? "Unknown"}\nNutrition: {foodData.Consumable?.NutritionValue ?? 0:F0}";
+
+   return slot;
+  }
+
+pub void Show(IFeedable target, List<FoodSlotData> foods, Action<ConsumableData, int> onSelected, Action onCancel) {
+   if (target == null || foods == null || foods.Count == 0) {
+    if (debugLog) Debug.LogWarning("[FoodSelectionPopup] Show called with invalid params");
+    onCancel?.Invoke();
+    return;
+   }
+
+   if (popupContainer == null || gridContainer == null) {
+    InitializeUI();
+
+    if (popupContainer == null) {
+     Debug.LogError("[FoodSelectionPopup] UI not initialized! Make sure UIDocument is assigned.");
+     onCancel?.Invoke();
+     return;
+    }
+   }
+
+   currentTarget = target;
+   currentFoods = foods;
+   onFoodSelected = onSelected;
+   onCancelled = onCancel;
+
+   if (titleLabel != null) {
+    titleLabel.text = $"Feed {target.FeedableName}";
+   }
+
+   PopulateGrid(foods);
+
+   PositionNearTarget(target);
+
+   popupContainer.style.display = DisplayStyle.Flex;
+   isVisible = true;
+
+   if (debugLog) Debug.Log($"[FoodSelectionPopup] Showing for {target.FeedableName} with {foods.Count} foods");
+  }
+
+  pub void Hide() {
+   if (popupContainer != null) {
+    popupContainer.style.display = DisplayStyle.None;
+   }
+   isVisible = false;
+   currentTarget = null;
+   currentFoods = null;
+   onFoodSelected = null;
+   onCancelled = null;
+  }
+
+  pub void Cancel() {
+   if (debugLog) Debug.Log("[FoodSelectionPopup] Cancelled");
+
+   var callback = onCancelled;
+   Hide();
+   callback?.Invoke();
+  }
+
+  pub bool IsVisible => isVisible;
+
+  void PositionNearTarget(IFeedable target) {
+   if (Camera.main == null) return;
+
+   Vector3 worldPos = target.FeedPopupAnchor;
+   Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPos);
+
+   float uiX = screenPos.x;
+   float uiY = Screen.height - screenPos.y;
+
+   float popupWidth = (slotSize + slotSpacing) * gridColumns + 16; // padding
+   float popupHeight = (slotSize + slotSpacing) * Mathf.CeilToInt(currentFoods.Count / (float)gridColumns) + 40; // title + padding
+
+   float finalX = uiX - popupWidth / 2;
+   float finalY = uiY - popupHeight - 20; // 20px above target
+
+   finalX = Mathf.Clamp(finalX, 10, Screen.width - popupWidth - 10);
+   finalY = Mathf.Clamp(finalY, 10, Screen.height - popupHeight - 10);
+
+   popupContainer.style.left = finalX;
+   popupContainer.style.top = finalY;
+  }
+
+  void SelectFood(FoodSlotData foodData) {
+   var callback = onFoodSelected;
+   var consumable = foodData.Consumable;
+   int index = foodData.InventoryIndex;
+
+   Hide();
+   callback?.Invoke(consumable, index);
+  }
+
+  bool IsMouseOverPopup() {
+   if (popupContainer == null || !isVisible) return false;
+
+   Vector2 mousePos = Input.mousePosition;
+   float uiY = Screen.height - mousePos.y;
+
+   var rect = popupContainer.worldBound;
+   return rect.Contains(new Vector2(mousePos.x, uiY));
+  }
+
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Ecosystem\Feeding\IFeedable.cs
+
+
+namespace Abracodabra.Ecosystem.Feeding {
+ pub interface IFeedable {
+  string FeedableName { get; }
+
+  Vector3 FeedPopupAnchor { get; }
+
+  bool CanAcceptFood(ConsumableData consumable);
+
+  float ReceiveFood(ConsumableData consumable, GameObject feeder);
+
+  event Action<ConsumableData, float> OnFed;
  }
 }
 
@@ -14491,13 +15747,12 @@ namespace Abracodabra.UI.Toolkit {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\A_ToolkitUI\WorldHoverTooltip.cs
 
-﻿using System.Collections.Generic;
+﻿// FILE: Assets/Scripts/A_ToolkitUI/WorldHoverTooltip.cs
 using TMPro;
 using WegoSystem;
 using Abracodabra.Genes;
 
 namespace Abracodabra.UI.Toolkit {
-
  pub class DestroyTracker : MonoBehaviour {
   void OnDestroy() {
    Debug.LogError($"[DestroyTracker] '{gameObject.name}' is being DESTROYED! Stack trace:\n{System.Environment.StackTrace}");
@@ -14528,6 +15783,13 @@ namespace Abracodabra.UI.Toolkit {
 
   [Tooltip("Enable bold text style.")]
   [SerializeField] bool useBold = false;
+
+  [Header("Player Display")]
+  [Tooltip("Text to show when hovering over the player character.")]
+  [SerializeField] string playerDisplayName = "You";
+
+  [Tooltip("If true, show tooltip when hovering over player. If false, hide tooltip for player.")]
+  [SerializeField] bool showPlayerTooltip = true;
 
   [Header("Sorting")]
   [SerializeField] string sortingLayerName = "UI";
@@ -14673,7 +15935,8 @@ namespace Abracodabra.UI.Toolkit {
     mousePos.z = Mathf.Abs(mainCamera.transform.position.z);
     Vector3 worldPos = mainCamera.ScreenToWorldPoint(mousePos);
     finalPos = new Vector3(worldPos.x + cursorOffset.x, worldPos.y + cursorOffset.y, zOffset);
-   } else {
+   }
+   else {
     Vector3 cellCenter = tileInteractionManager.CellCenterWorld(cellPos);
     finalPos = cellCenter + new Vector3(tooltipOffset.x, tooltipOffset.y, zOffset);
    }
@@ -14712,12 +15975,26 @@ namespace Abracodabra.UI.Toolkit {
    HashSet<GridEntity> entities = GridPositionManager.Instance.GetEntitiesAt(gridPos);
    if (entities == null || entities.Count == 0) return null;
 
-   var nonPlayerEntities = entities
-    .Where(e => e != null && e.GetComponent<GardenerController>() == null)
-    .ToList();
+   var playerEntity = entities.FirstOrDefault(e => e != null && e.GetComponent<GardenerController>() != null);
+   if (playerEntity != null) {
+    if (showPlayerTooltip) {
+     return playerDisplayName;
+    }
 
-   if (nonPlayerEntities.Count > 0) {
-    return GetDisplayNameFromGameObject(nonPlayerEntities[0].gameObject);
+    var nonPlayerEntities = entities
+     .Where(e => e != null && e.GetComponent<GardenerController>() == null)
+     .ToList();
+
+    if (nonPlayerEntities.Count > 0) {
+     return GetDisplayNameFromGameObject(nonPlayerEntities[0].gameObject);
+    }
+
+    return null;
+   }
+
+   var firstEntity = entities.FirstOrDefault(e => e != null);
+   if (firstEntity != null) {
+    return GetDisplayNameFromGameObject(firstEntity.gameObject);
    }
 
    return null;
@@ -14725,6 +16002,11 @@ namespace Abracodabra.UI.Toolkit {
 
   string GetDisplayNameFromGameObject(GameObject go) {
    if (go == null) return null;
+
+   var gardener = go.GetComponent<GardenerController>();
+   if (gardener != null) {
+    return showPlayerTooltip ? playerDisplayName : null;
+   }
 
    var animal = go.GetComponent<AnimalController>();
    if (animal != null) return animal.GetDisplayName();
@@ -14761,7 +16043,8 @@ namespace Abracodabra.UI.Toolkit {
     if (followCursor) {
      Vector3 cursorApprox = tooltipTransform.position - new Vector3(cursorOffset.x, cursorOffset.y, 0);
      Gizmos.DrawLine(tooltipTransform.position, cursorApprox);
-    } else {
+    }
+    else {
      Gizmos.DrawLine(tooltipTransform.position, tooltipTransform.position - new Vector3(tooltipOffset.x, tooltipOffset.y, zOffset));
     }
 

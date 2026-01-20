@@ -1,14 +1,11 @@
-﻿// FILE: Assets/Scripts/WorldInteraction/Player/PlayerHungerSystem.cs
+// FILE: Assets/Scripts/WorldInteraction/Player/PlayerHungerSystem.cs
 using System;
 using UnityEngine;
 using WegoSystem;
+using Abracodabra.Ecosystem.Feeding;
 
-/// <summary>
-/// Player hunger system where hunger INCREASES over time.
-/// When hunger reaches max, bad things happen (starvation).
-/// Eating DECREASES hunger by the nutrition value.
-/// </summary>
-public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
+public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable, IFeedable
+{
     [Header("Hunger Configuration")]
     [Tooltip("Maximum hunger value. When reached, player starves.")]
     [SerializeField] private float maxHunger = 100f;
@@ -26,7 +23,17 @@ public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
     [Tooltip("Fraction of max hunger where 'starving' state begins (red warning).")]
     [SerializeField] [Range(0f, 1f)] private float starvingThreshold = 0.8f;
 
-    // Runtime state
+    [Header("Diet Configuration")]
+    [Tooltip("Food categories player accepts. Empty = accepts all.")]
+    [SerializeField] private FoodType.FoodCategory[] acceptedFoodCategories;
+
+    [Header("Feeding")]
+    [Tooltip("Offset from player position for food selection popup")]
+    [SerializeField] private Vector3 feedPopupOffset = new Vector3(0f, 1.5f, 0f);
+
+    [Header("Debug")]
+    [SerializeField] private bool debugLog = false;
+
     private float currentHunger;
     private bool hasStarved = false;
     private HungerState currentState = HungerState.Satisfied;
@@ -46,92 +53,207 @@ public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
     public event Action OnStarvation;
     public event Action OnBecameHungry;
     public event Action OnBecameStarving;
+    public event Action<ConsumableData, float> OnFed;
 
-    public enum HungerState {
+    public enum HungerState
+    {
         Satisfied,  // 0% to hungryThreshold
         Hungry,     // hungryThreshold to starvingThreshold
         Starving    // starvingThreshold to 100%
     }
 
-    void Start() {
-        // maxHunger is now solely controlled by this component's inspector
+    #region IFeedable Implementation
+
+    public string FeedableName => "Player";
+
+    public Vector3 FeedPopupAnchor => transform.position + feedPopupOffset;
+
+    public bool CanAcceptFood(ConsumableData consumable)
+    {
+        if (consumable == null) return false;
+
+        // Check if player has died
+        if (hasStarved) return false;
+
+        // Check diet restrictions
+        if (acceptedFoodCategories != null && acceptedFoodCategories.Length > 0)
+        {
+            foreach (var category in acceptedFoodCategories)
+            {
+                if (consumable.Category == category)
+                    return true;
+            }
+            return false;
+        }
+
+        // Default: accept all food
+        return true;
+    }
+
+    public float ReceiveFood(ConsumableData consumable, GameObject feeder)
+    {
+        if (consumable == null || hasStarved)
+        {
+            return 0f;
+        }
+
+        float nutritionValue = consumable.NutritionValue;
+        
+        float oldHunger = currentHunger;
+        currentHunger -= nutritionValue;
+        currentHunger = Mathf.Clamp(currentHunger, 0, maxHunger);
+
+        float actualReduction = oldHunger - currentHunger;
+
+        UpdateHungerState();
+        OnHungerChanged?.Invoke(currentHunger, maxHunger);
+        OnFed?.Invoke(consumable, actualReduction);
+
+        if (debugLog)
+        {
+            Debug.Log($"[PlayerHungerSystem] Player ate {consumable.Name}. " +
+                      $"Reduced hunger by {actualReduction:F1}. " +
+                      $"Hunger: {oldHunger:F1} -> {currentHunger:F1}/{maxHunger}");
+        }
+
+        return actualReduction;
+    }
+
+    #endregion
+
+    #region Unity Lifecycle
+
+    void Start()
+    {
         currentHunger = maxHunger * startingHungerFraction;
         UpdateHungerState();
         OnHungerChanged?.Invoke(currentHunger, maxHunger);
 
-        if (TickManager.Instance != null) {
+        if (TickManager.Instance != null)
+        {
             TickManager.Instance.RegisterTickUpdateable(this);
         }
-        else {
+        else
+        {
             Debug.LogError("[PlayerHungerSystem] TickManager not found! Hunger will not increase.");
         }
-    }
 
-    void OnDestroy() {
-        var tickManager = TickManager.Instance;
-        if (tickManager != null) {
-            tickManager.UnregisterTickUpdateable(this);
+        // Register with FeedingSystem
+        if (FeedingSystem.Instance != null)
+        {
+            FeedingSystem.Instance.RegisterFeedable(this);
+        }
+        else
+        {
+            // Delay registration in case FeedingSystem isn't initialized yet
+            Invoke(nameof(DelayedFeedingRegistration), 0.3f);
         }
     }
 
-    public void OnTickUpdate(int currentTick) {
+    void DelayedFeedingRegistration()
+    {
+        if (FeedingSystem.Instance != null)
+        {
+            FeedingSystem.Instance.RegisterFeedable(this);
+            if (debugLog) Debug.Log("[PlayerHungerSystem] Registered with FeedingSystem (delayed)");
+        }
+    }
+
+    void OnDestroy()
+    {
+        var tickManager = TickManager.Instance;
+        if (tickManager != null)
+        {
+            tickManager.UnregisterTickUpdateable(this);
+        }
+
+        // Unregister from FeedingSystem
+        if (FeedingSystem.Instance != null)
+        {
+            FeedingSystem.Instance.UnregisterFeedable(this);
+        }
+    }
+
+    #endregion
+
+    #region Tick System
+
+    public void OnTickUpdate(int currentTick)
+    {
         if (hasStarved) return;
 
-        // Only increase hunger during active gameplay
-        if (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
+        if (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
+        {
             return;
         }
 
-        // Increase hunger over time
         currentHunger += hungerIncreasePerTick;
         currentHunger = Mathf.Min(currentHunger, maxHunger);
 
         UpdateHungerState();
         OnHungerChanged?.Invoke(currentHunger, maxHunger);
 
-        // Check for starvation (reached max hunger)
-        if (currentHunger >= maxHunger) {
+        if (currentHunger >= maxHunger)
+        {
             hasStarved = true;
             OnStarvation?.Invoke();
             Debug.LogWarning("[PlayerHungerSystem] Player has starved!");
         }
     }
 
-    private void UpdateHungerState() {
+    #endregion
+
+    #region State Management
+
+    void UpdateHungerState()
+    {
         HungerState newState;
 
-        if (currentHunger >= maxHunger * starvingThreshold) {
+        if (currentHunger >= maxHunger * starvingThreshold)
+        {
             newState = HungerState.Starving;
         }
-        else if (currentHunger >= maxHunger * hungryThreshold) {
+        else if (currentHunger >= maxHunger * hungryThreshold)
+        {
             newState = HungerState.Hungry;
         }
-        else {
+        else
+        {
             newState = HungerState.Satisfied;
         }
 
-        if (newState != currentState) {
+        if (newState != currentState)
+        {
             HungerState oldState = currentState;
             currentState = newState;
 
             OnStateChanged?.Invoke(newState);
 
-            // Fire specific events for state transitions
-            if (newState == HungerState.Hungry && oldState == HungerState.Satisfied) {
+            if (newState == HungerState.Hungry && oldState == HungerState.Satisfied)
+            {
                 OnBecameHungry?.Invoke();
             }
-            else if (newState == HungerState.Starving) {
+            else if (newState == HungerState.Starving)
+            {
                 OnBecameStarving?.Invoke();
             }
 
-            Debug.Log($"[PlayerHungerSystem] State changed: {oldState} -> {newState}");
+            if (debugLog)
+            {
+                Debug.Log($"[PlayerHungerSystem] State changed: {oldState} -> {newState}");
+            }
         }
     }
 
+    #endregion
+
+    #region Public API
+
     /// <summary>
-    /// Eat food to DECREASE hunger by the nutrition value.
+    /// Legacy eat method - use IFeedable.ReceiveFood for new code
     /// </summary>
-    public void Eat(float nutritionValue) {
+    public void Eat(float nutritionValue)
+    {
         if (hasStarved || nutritionValue <= 0) return;
 
         float oldHunger = currentHunger;
@@ -141,37 +263,25 @@ public class PlayerHungerSystem : MonoBehaviour, ITickUpdateable {
         UpdateHungerState();
 
         Debug.Log($"[PlayerHungerSystem] Player ate food. Reduced hunger by {nutritionValue}. " +
-                  $"Hunger: {oldHunger:F1} -> {currentHunger:F1}/{maxHunger}");
+            $"Hunger: {oldHunger:F1} -> {currentHunger:F1}/{maxHunger}");
 
         OnHungerChanged?.Invoke(currentHunger, maxHunger);
     }
 
-    /// <summary>
-    /// Directly set hunger value (for debugging or special events).
-    /// </summary>
-    public void SetHunger(float value) {
+    public void SetHunger(float value)
+    {
         currentHunger = Mathf.Clamp(value, 0, maxHunger);
         UpdateHungerState();
         OnHungerChanged?.Invoke(currentHunger, maxHunger);
     }
 
-    /// <summary>
-    /// Reset hunger to starting value (for new rounds).
-    /// </summary>
-    public void ResetHunger() {
+    public void ResetHunger()
+    {
         currentHunger = maxHunger * startingHungerFraction;
         hasStarved = false;
         UpdateHungerState();
         OnHungerChanged?.Invoke(currentHunger, maxHunger);
     }
 
-    /// <summary>
-    /// Modify hunger directly (positive = increase, negative = decrease).
-    /// </summary>
-    public void ModifyHunger(float amount) {
-        currentHunger += amount;
-        currentHunger = Mathf.Clamp(currentHunger, 0, maxHunger);
-        UpdateHungerState();
-        OnHungerChanged?.Invoke(currentHunger, maxHunger);
-    }
+    #endregion
 }

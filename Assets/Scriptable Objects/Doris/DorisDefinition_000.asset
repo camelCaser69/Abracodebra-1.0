@@ -22,6 +22,8 @@ MonoBehaviour:
   plantEatingRadius: 4
   hungerReductionFromPlant: 10
   feedingEfficiency: 1
+  acceptedFoodCategories: 
+  foodCategoryMultipliers: []
   happySprite: {fileID: 0}
   hungrySprite: {fileID: 0}
   starvingSprite: {fileID: 0}
