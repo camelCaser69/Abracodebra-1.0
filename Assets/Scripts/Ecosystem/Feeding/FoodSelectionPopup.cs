@@ -21,6 +21,8 @@ namespace Abracodabra.Ecosystem.Feeding
         [SerializeField] Color slotBackgroundColor = new Color(0.25f, 0.25f, 0.25f, 1f);
         [SerializeField] Color slotHoverColor = new Color(0.4f, 0.4f, 0.4f, 1f);
         [SerializeField] Color slotBorderColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+        [SerializeField] Color emptySlotBackgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
+        [SerializeField] Color emptySlotBorderColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
         [SerializeField] int borderRadius = 8;
 
         [Header("Debug")]
@@ -31,6 +33,7 @@ namespace Abracodabra.Ecosystem.Feeding
         VisualElement popupContainer;
         VisualElement gridContainer;
         Label titleLabel;
+        Label emptyLabel;
 
         bool isVisible = false;
         bool isInitialized = false;
@@ -40,6 +43,10 @@ namespace Abracodabra.Ecosystem.Feeding
         Action onCancelled;
 
         List<VisualElement> slotElements = new List<VisualElement>();
+
+        public int GridColumns => gridColumns;
+        public int GridRows => gridRows;
+        public int TotalSlots => gridColumns * gridRows;
 
         public class FoodSlotData
         {
@@ -65,7 +72,6 @@ namespace Abracodabra.Ecosystem.Feeding
         {
             uiDocument = GetComponent<UIDocument>();
 
-            // Auto-find and assign PanelSettings if missing
             if (uiDocument.panelSettings == null)
             {
                 var existingPanelSettings = FindExistingPanelSettings();
@@ -81,7 +87,6 @@ namespace Abracodabra.Ecosystem.Feeding
                 }
             }
 
-            // Ensure we render on top of other UI
             uiDocument.sortingOrder = 100;
         }
 
@@ -105,7 +110,6 @@ namespace Abracodabra.Ecosystem.Feeding
 
         System.Collections.IEnumerator DelayedInit()
         {
-            // Wait for UIDocument to be ready
             yield return null;
             yield return new WaitForEndOfFrame();
 
@@ -155,7 +159,6 @@ namespace Abracodabra.Ecosystem.Feeding
             rootElement = uiDocument.rootVisualElement;
             rootElement.Clear();
 
-            // Root covers screen but doesn't block input
             rootElement.style.position = Position.Absolute;
             rootElement.style.left = 0;
             rootElement.style.top = 0;
@@ -163,7 +166,6 @@ namespace Abracodabra.Ecosystem.Feeding
             rootElement.style.bottom = 0;
             rootElement.pickingMode = PickingMode.Ignore;
 
-            // Popup container
             popupContainer = new VisualElement();
             popupContainer.name = "food-selection-popup";
             popupContainer.style.position = Position.Absolute;
@@ -188,7 +190,6 @@ namespace Abracodabra.Ecosystem.Feeding
             popupContainer.style.display = DisplayStyle.None;
             rootElement.Add(popupContainer);
 
-            // Title
             titleLabel = new Label("Feed");
             titleLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
             titleLabel.style.fontSize = 14;
@@ -197,13 +198,20 @@ namespace Abracodabra.Ecosystem.Feeding
             titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
             popupContainer.Add(titleLabel);
 
-            // Grid
             gridContainer = new VisualElement();
             gridContainer.name = "food-grid";
             gridContainer.style.flexDirection = FlexDirection.Row;
             gridContainer.style.flexWrap = Wrap.Wrap;
             gridContainer.style.width = (slotSize + slotSpacing) * gridColumns;
             popupContainer.Add(gridContainer);
+
+            emptyLabel = new Label("No food available");
+            emptyLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+            emptyLabel.style.fontSize = 11;
+            emptyLabel.style.color = new Color(0.6f, 0.6f, 0.6f, 1f);
+            emptyLabel.style.marginTop = 4;
+            emptyLabel.style.display = DisplayStyle.None;
+            popupContainer.Add(emptyLabel);
 
             if (debugLog) Debug.Log("[FoodSelectionPopup] UI created");
         }
@@ -215,20 +223,62 @@ namespace Abracodabra.Ecosystem.Feeding
             gridContainer.Clear();
             slotElements.Clear();
 
-            int maxSlots = gridColumns * gridRows;
-            int slotsToShow = Mathf.Min(foods.Count, maxSlots);
+            int totalSlots = gridColumns * gridRows;
+            int foodCount = foods?.Count ?? 0;
 
-            for (int i = 0; i < slotsToShow; i++)
+            for (int i = 0; i < totalSlots; i++)
             {
-                var slot = CreateFoodSlot(foods[i], i);
+                VisualElement slot;
+
+                if (i < foodCount && foods[i] != null)
+                {
+                    slot = CreateFoodSlot(foods[i], i);
+                }
+                else
+                {
+                    slot = CreateEmptySlot(i);
+                }
+
                 gridContainer.Add(slot);
                 slotElements.Add(slot);
             }
 
-            int actualColumns = Mathf.Min(slotsToShow, gridColumns);
-            gridContainer.style.width = (slotSize + slotSpacing) * actualColumns;
+            gridContainer.style.width = (slotSize + slotSpacing) * gridColumns;
 
-            if (debugLog) Debug.Log($"[FoodSelectionPopup] Populated {slotsToShow} slots");
+            if (emptyLabel != null)
+            {
+                emptyLabel.style.display = (foodCount == 0) ? DisplayStyle.Flex : DisplayStyle.None;
+            }
+
+            if (debugLog) Debug.Log($"[FoodSelectionPopup] Populated grid: {foodCount} foods, {totalSlots - foodCount} empty slots");
+        }
+
+        VisualElement CreateEmptySlot(int index)
+        {
+            var slot = new VisualElement();
+            slot.name = $"empty-slot-{index}";
+            slot.style.width = slotSize;
+            slot.style.height = slotSize;
+            slot.style.marginRight = slotSpacing;
+            slot.style.marginBottom = slotSpacing;
+            slot.style.backgroundColor = emptySlotBackgroundColor;
+            slot.style.borderTopLeftRadius = 4;
+            slot.style.borderTopRightRadius = 4;
+            slot.style.borderBottomLeftRadius = 4;
+            slot.style.borderBottomRightRadius = 4;
+            slot.style.borderTopWidth = 1;
+            slot.style.borderBottomWidth = 1;
+            slot.style.borderLeftWidth = 1;
+            slot.style.borderRightWidth = 1;
+            slot.style.borderTopColor = emptySlotBorderColor;
+            slot.style.borderBottomColor = emptySlotBorderColor;
+            slot.style.borderLeftColor = emptySlotBorderColor;
+            slot.style.borderRightColor = emptySlotBorderColor;
+            slot.style.alignItems = Align.Center;
+            slot.style.justifyContent = Justify.Center;
+            slot.pickingMode = PickingMode.Ignore;
+
+            return slot;
         }
 
         VisualElement CreateFoodSlot(FoodSlotData foodData, int index)
@@ -262,7 +312,8 @@ namespace Abracodabra.Ecosystem.Feeding
                 icon.style.width = slotSize - 16;
                 icon.style.height = slotSize - 16;
                 icon.style.backgroundImage = new StyleBackground(foodData.Icon);
-                icon.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+                // FIX: Use backgroundSize instead of deprecated unityBackgroundScaleMode
+                icon.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
                 icon.pickingMode = PickingMode.Ignore;
                 slot.Add(icon);
             }
@@ -312,9 +363,9 @@ namespace Abracodabra.Ecosystem.Feeding
 
         public void Show(IFeedable target, List<FoodSlotData> foods, Action<ConsumableData, int> onSelected, Action onCancel)
         {
-            if (target == null || foods == null || foods.Count == 0)
+            if (target == null)
             {
-                if (debugLog) Debug.LogWarning("[FoodSelectionPopup] Show called with invalid params");
+                if (debugLog) Debug.LogWarning("[FoodSelectionPopup] Show called with null target");
                 onCancel?.Invoke();
                 return;
             }
@@ -322,8 +373,7 @@ namespace Abracodabra.Ecosystem.Feeding
             if (!isInitialized || popupContainer == null)
             {
                 if (debugLog) Debug.LogWarning("[FoodSelectionPopup] Not initialized yet, retrying...");
-                
-                // Force init if needed
+
                 if (uiDocument != null && uiDocument.rootVisualElement != null)
                 {
                     CreateUI();
@@ -338,7 +388,7 @@ namespace Abracodabra.Ecosystem.Feeding
             }
 
             currentTarget = target;
-            currentFoods = foods;
+            currentFoods = foods ?? new List<FoodSlotData>();
             onFoodSelected = onSelected;
             onCancelled = onCancel;
 
@@ -347,13 +397,13 @@ namespace Abracodabra.Ecosystem.Feeding
                 titleLabel.text = $"Feed {target.FeedableName}";
             }
 
-            PopulateGrid(foods);
+            PopulateGrid(currentFoods);
             PositionNearTarget(target);
 
             popupContainer.style.display = DisplayStyle.Flex;
             isVisible = true;
 
-            if (debugLog) Debug.Log($"[FoodSelectionPopup] Showing for {target.FeedableName} with {foods.Count} foods");
+            if (debugLog) Debug.Log($"[FoodSelectionPopup] Showing for {target.FeedableName} with {currentFoods.Count} foods");
         }
 
         public void Hide()
@@ -381,7 +431,7 @@ namespace Abracodabra.Ecosystem.Feeding
 
         void PositionNearTarget(IFeedable target)
         {
-            if (Camera.main == null || currentFoods == null) return;
+            if (Camera.main == null) return;
 
             Vector3 worldPos = target.FeedPopupAnchor;
             Vector3 screenPos = Camera.main.WorldToScreenPoint(worldPos);
@@ -390,7 +440,7 @@ namespace Abracodabra.Ecosystem.Feeding
             float uiY = Screen.height - screenPos.y;
 
             float popupWidth = (slotSize + slotSpacing) * gridColumns + 16;
-            float popupHeight = (slotSize + slotSpacing) * Mathf.CeilToInt(currentFoods.Count / (float)gridColumns) + 40;
+            float popupHeight = (slotSize + slotSpacing) * gridRows + 40;
 
             float finalX = uiX - popupWidth / 2;
             float finalY = uiY - popupHeight - 20;
@@ -421,6 +471,22 @@ namespace Abracodabra.Ecosystem.Feeding
 
             var rect = popupContainer.worldBound;
             return rect.Contains(new Vector2(mousePos.x, uiY));
+        }
+
+        /// <summary>
+        /// Dynamically resize the grid (for perk scaling)
+        /// </summary>
+        public void SetGridSize(int columns, int rows)
+        {
+            gridColumns = Mathf.Max(1, columns);
+            gridRows = Mathf.Max(1, rows);
+
+            if (gridContainer != null)
+            {
+                gridContainer.style.width = (slotSize + slotSpacing) * gridColumns;
+            }
+
+            if (debugLog) Debug.Log($"[FoodSelectionPopup] Grid resized to {gridColumns}x{gridRows}");
         }
     }
 }

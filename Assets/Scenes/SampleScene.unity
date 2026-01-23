@@ -12818,6 +12818,7 @@ GameObject:
   m_Component:
   - component: {fileID: 383991855}
   - component: {fileID: 383991854}
+  - component: {fileID: 383991856}
   m_Layer: 0
   m_Name: FoodSelectionPopup
   m_TagString: Untagged
@@ -12837,15 +12838,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78292f3633bd7f3408f6dfd930781072, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiDocument: {fileID: 752681536}
   gridColumns: 3
   gridRows: 3
   slotSize: 64
   slotSpacing: 4
-  normalSlotColor: {r: 0.15, g: 0.15, b: 0.2, a: 0.95}
-  hoverSlotColor: {r: 0.3, g: 0.3, b: 0.4, a: 0.95}
-  panelBackgroundColor: {r: 0.1, g: 0.1, b: 0.15, a: 0.98}
-  borderColor: {r: 0.4, g: 0.4, b: 0.5, a: 1}
+  backgroundColor: {r: 0.15, g: 0.15, b: 0.15, a: 0.95}
+  slotBackgroundColor: {r: 0.25, g: 0.25, b: 0.25, a: 1}
+  slotHoverColor: {r: 0.4, g: 0.4, b: 0.4, a: 1}
+  slotBorderColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  emptySlotBackgroundColor: {r: 0.15, g: 0.15, b: 0.15, a: 0.5}
+  emptySlotBorderColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.5}
+  borderRadius: 8
   debugLog: 0
 --- !u!4 &383991855
 Transform:
@@ -12862,6 +12865,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &383991856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 383991853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: 15160131963ff3d419ca1961215d018f, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 0}
+  m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!114 &384985897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57957,6 +57979,8 @@ MonoBehaviour:
   textColor: {r: 1, g: 1, b: 1, a: 1}
   useItalic: 1
   useBold: 0
+  playerDisplayName: You
+  showPlayerTooltip: 1
   sortingLayerName: UI
   sortingOrder: 5000
   showDebug: 0
@@ -124268,12 +124292,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93aad47d267d6ea4292de31510b2413d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxFeedingRange: 5
-  feedableLayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
+  useGameInteractionRange: 1
+  manualFeedingRange: 3
+  restrictToGrowthPhase: 1
   player: {fileID: 1491144816}
+  gardenerController: {fileID: 0}
   debugLog: 0
+  verboseHoverLog: 0
 --- !u!114 &1899046522
 MonoBehaviour:
   m_ObjectHideFlags: 0

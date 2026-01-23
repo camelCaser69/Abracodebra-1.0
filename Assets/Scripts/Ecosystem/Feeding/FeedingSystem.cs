@@ -405,20 +405,19 @@ namespace Abracodabra.Ecosystem.Feeding
 
             OnFeedingStarted?.Invoke(target);
 
-            // Get available foods for this target
             var availableFoods = GetAvailableFoodsForTarget(target);
 
-            if (availableFoods.Count == 0)
+            // Show popup even with no food (popup will display empty slots)
+            if (debugLog)
             {
-                if (debugLog) Debug.Log($"[FeedingSystem] No valid foods in inventory for {target.FeedableName}");
-                CancelFeedingInteraction();
-                return;
+                if (availableFoods.Count == 0)
+                    Debug.Log($"[FeedingSystem] No valid foods in inventory for {target.FeedableName} - showing empty popup");
+                else
+                    Debug.Log($"[FeedingSystem] Showing FoodSelectionPopup with {availableFoods.Count} foods");
             }
 
-            // Show the food selection UI
             if (FoodSelectionPopup.Instance != null)
             {
-                if (debugLog) Debug.Log($"[FeedingSystem] Showing FoodSelectionPopup with {availableFoods.Count} foods");
                 FoodSelectionPopup.Instance.Show(target, availableFoods, OnFoodSelected, OnFoodSelectionCancelled);
             }
             else
