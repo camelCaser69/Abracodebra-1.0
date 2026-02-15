@@ -10,6 +10,12 @@ namespace Abracodabra.Ecosystem.Feeding
     {
         public static FoodSelectionPopup Instance { get; private set; }
 
+        /// <summary>
+        /// Static helper to check if popup is blocking input.
+        /// Use this in other systems to prevent actions while feeding.
+        /// </summary>
+        public static bool IsBlockingInput => Instance != null && Instance.IsVisible;
+
         [Header("Grid Configuration")]
         [SerializeField] int gridColumns = 3;
         [SerializeField] int gridRows = 3;
@@ -25,15 +31,26 @@ namespace Abracodabra.Ecosystem.Feeding
         [SerializeField] Color emptySlotBorderColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
         [SerializeField] int borderRadius = 8;
 
+        [Header("Tooltip Styling")]
+        [SerializeField] Color tooltipBackgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
+        [SerializeField] Color tooltipTextColor = Color.white;
+        [SerializeField] Color tooltipNutritionColor = new Color(0.5f, 1f, 0.5f, 1f);
+        [SerializeField] int tooltipFontSize = 12;
+        [SerializeField] Vector2 tooltipOffset = new Vector2(15f, 15f);
+
         [Header("Debug")]
         [SerializeField] bool debugLog = true;
 
         UIDocument uiDocument;
         VisualElement rootElement;
+        VisualElement blockingOverlay;
         VisualElement popupContainer;
         VisualElement gridContainer;
         Label titleLabel;
         Label emptyLabel;
+        VisualElement cursorTooltip;
+        Label tooltipNameLabel;
+        Label tooltipNutritionLabel;
 
         bool isVisible = false;
         bool isInitialized = false;
@@ -138,20 +155,50 @@ namespace Abracodabra.Ecosystem.Feeding
         {
             if (!isVisible) return;
 
+            // Update tooltip position to follow cursor
+            UpdateTooltipPosition();
+
+            // Handle keyboard/mouse cancel inputs
             if (Input.GetKeyDown(KeyCode.Escape))
             {
                 Cancel();
+                return;
             }
 
-            if (Input.GetMouseButtonDown(1))
+            // Movement keys also cancel (WASD, arrows)
+            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) ||
+                Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D) ||
+                Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) ||
+                Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow))
             {
                 Cancel();
+                return;
+            }
+        }
+
+        void UpdateTooltipPosition()
+        {
+            if (cursorTooltip == null || cursorTooltip.style.display == DisplayStyle.None) return;
+
+            Vector2 mousePos = Input.mousePosition;
+            float uiX = mousePos.x + tooltipOffset.x;
+            float uiY = Screen.height - mousePos.y + tooltipOffset.y;
+
+            // Keep tooltip on screen
+            float tooltipWidth = cursorTooltip.resolvedStyle.width;
+            float tooltipHeight = cursorTooltip.resolvedStyle.height;
+
+            if (tooltipWidth > 0 && uiX + tooltipWidth > Screen.width - 10)
+            {
+                uiX = mousePos.x - tooltipWidth - 5;
+            }
+            if (tooltipHeight > 0 && uiY + tooltipHeight > Screen.height - 10)
+            {
+                uiY = Screen.height - mousePos.y - tooltipHeight - 5;
             }
 
-            if (Input.GetMouseButtonDown(0) && !IsMouseOverPopup())
-            {
-                Cancel();
-            }
+            cursorTooltip.style.left = uiX;
+            cursorTooltip.style.top = uiY;
         }
 
         void CreateUI()
@@ -159,6 +206,7 @@ namespace Abracodabra.Ecosystem.Feeding
             rootElement = uiDocument.rootVisualElement;
             rootElement.Clear();
 
+            // Root element - no picking when hidden
             rootElement.style.position = Position.Absolute;
             rootElement.style.left = 0;
             rootElement.style.top = 0;
@@ -166,6 +214,22 @@ namespace Abracodabra.Ecosystem.Feeding
             rootElement.style.bottom = 0;
             rootElement.pickingMode = PickingMode.Ignore;
 
+            // Blocking overlay - covers entire screen, blocks all input when visible
+            // Clicking this overlay closes the popup
+            blockingOverlay = new VisualElement();
+            blockingOverlay.name = "blocking-overlay";
+            blockingOverlay.style.position = Position.Absolute;
+            blockingOverlay.style.left = 0;
+            blockingOverlay.style.top = 0;
+            blockingOverlay.style.right = 0;
+            blockingOverlay.style.bottom = 0;
+            blockingOverlay.style.backgroundColor = new Color(0, 0, 0, 0.3f); // Slight dim effect
+            blockingOverlay.pickingMode = PickingMode.Position; // Blocks all clicks
+            blockingOverlay.style.display = DisplayStyle.None;
+            blockingOverlay.RegisterCallback<ClickEvent>(OnOverlayClicked);
+            rootElement.Add(blockingOverlay);
+
+            // Popup container - clicking inside does NOT close (stops propagation)
             popupContainer = new VisualElement();
             popupContainer.name = "food-selection-popup";
             popupContainer.style.position = Position.Absolute;
@@ -188,8 +252,11 @@ namespace Abracodabra.Ecosystem.Feeding
             popupContainer.style.paddingRight = 8;
             popupContainer.pickingMode = PickingMode.Position;
             popupContainer.style.display = DisplayStyle.None;
-            rootElement.Add(popupContainer);
+            // Stop click propagation so clicking inside popup doesn't close it
+            popupContainer.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
+            blockingOverlay.Add(popupContainer);
 
+            // Title
             titleLabel = new Label("Feed");
             titleLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
             titleLabel.style.fontSize = 14;
@@ -198,6 +265,7 @@ namespace Abracodabra.Ecosystem.Feeding
             titleLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
             popupContainer.Add(titleLabel);
 
+            // Grid
             gridContainer = new VisualElement();
             gridContainer.name = "food-grid";
             gridContainer.style.flexDirection = FlexDirection.Row;
@@ -205,6 +273,7 @@ namespace Abracodabra.Ecosystem.Feeding
             gridContainer.style.width = (slotSize + slotSpacing) * gridColumns;
             popupContainer.Add(gridContainer);
 
+            // Empty state label
             emptyLabel = new Label("No food available");
             emptyLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
             emptyLabel.style.fontSize = 11;
@@ -213,7 +282,83 @@ namespace Abracodabra.Ecosystem.Feeding
             emptyLabel.style.display = DisplayStyle.None;
             popupContainer.Add(emptyLabel);
 
+            // Cursor-following tooltip (added to blocking overlay so it's always on top)
+            CreateCursorTooltip();
+
             if (debugLog) Debug.Log("[FoodSelectionPopup] UI created");
+        }
+
+        void CreateCursorTooltip()
+        {
+            cursorTooltip = new VisualElement();
+            cursorTooltip.name = "cursor-tooltip";
+            cursorTooltip.style.position = Position.Absolute;
+            cursorTooltip.style.backgroundColor = tooltipBackgroundColor;
+            cursorTooltip.style.borderTopLeftRadius = 4;
+            cursorTooltip.style.borderTopRightRadius = 4;
+            cursorTooltip.style.borderBottomLeftRadius = 4;
+            cursorTooltip.style.borderBottomRightRadius = 4;
+            cursorTooltip.style.borderTopWidth = 1;
+            cursorTooltip.style.borderBottomWidth = 1;
+            cursorTooltip.style.borderLeftWidth = 1;
+            cursorTooltip.style.borderRightWidth = 1;
+            cursorTooltip.style.borderTopColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+            cursorTooltip.style.borderBottomColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+            cursorTooltip.style.borderLeftColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+            cursorTooltip.style.borderRightColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+            cursorTooltip.style.paddingTop = 4;
+            cursorTooltip.style.paddingBottom = 4;
+            cursorTooltip.style.paddingLeft = 8;
+            cursorTooltip.style.paddingRight = 8;
+            cursorTooltip.style.display = DisplayStyle.None;
+            cursorTooltip.pickingMode = PickingMode.Ignore; // Don't block mouse
+
+            // Food name label
+            tooltipNameLabel = new Label("Food Name");
+            tooltipNameLabel.style.fontSize = tooltipFontSize;
+            tooltipNameLabel.style.color = tooltipTextColor;
+            tooltipNameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+            tooltipNameLabel.style.marginBottom = 2;
+            tooltipNameLabel.pickingMode = PickingMode.Ignore;
+            cursorTooltip.Add(tooltipNameLabel);
+
+            // Nutrition value label
+            tooltipNutritionLabel = new Label("(Nutrition: 0)");
+            tooltipNutritionLabel.style.fontSize = tooltipFontSize - 1;
+            tooltipNutritionLabel.style.color = tooltipNutritionColor;
+            tooltipNutritionLabel.pickingMode = PickingMode.Ignore;
+            cursorTooltip.Add(tooltipNutritionLabel);
+
+            blockingOverlay.Add(cursorTooltip);
+        }
+
+        void ShowCursorTooltip(FoodSlotData foodData)
+        {
+            if (cursorTooltip == null || foodData == null || foodData.Consumable == null) return;
+
+            tooltipNameLabel.text = foodData.Consumable.Name ?? "Unknown";
+            tooltipNutritionLabel.text = $"(Nutrition: {foodData.Consumable.NutritionValue:F0})";
+
+            cursorTooltip.style.display = DisplayStyle.Flex;
+            UpdateTooltipPosition();
+        }
+
+        void HideCursorTooltip()
+        {
+            if (cursorTooltip != null)
+            {
+                cursorTooltip.style.display = DisplayStyle.None;
+            }
+        }
+
+        void OnOverlayClicked(ClickEvent evt)
+        {
+            // Only close if clicking the overlay itself, not children
+            if (evt.target == blockingOverlay)
+            {
+                if (debugLog) Debug.Log("[FoodSelectionPopup] Clicked outside popup - closing");
+                Cancel();
+            }
         }
 
         void PopulateGrid(List<FoodSlotData> foods)
@@ -276,7 +421,9 @@ namespace Abracodabra.Ecosystem.Feeding
             slot.style.borderRightColor = emptySlotBorderColor;
             slot.style.alignItems = Align.Center;
             slot.style.justifyContent = Justify.Center;
-            slot.pickingMode = PickingMode.Ignore;
+            // Empty slots still block clicks (don't close popup)
+            slot.pickingMode = PickingMode.Position;
+            slot.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
 
             return slot;
         }
@@ -312,7 +459,6 @@ namespace Abracodabra.Ecosystem.Feeding
                 icon.style.width = slotSize - 16;
                 icon.style.height = slotSize - 16;
                 icon.style.backgroundImage = new StyleBackground(foodData.Icon);
-                // FIX: Use backgroundSize instead of deprecated unityBackgroundScaleMode
                 icon.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
                 icon.pickingMode = PickingMode.Ignore;
                 slot.Add(icon);
@@ -348,15 +494,26 @@ namespace Abracodabra.Ecosystem.Feeding
                 slot.Add(countBadge);
             }
 
-            slot.RegisterCallback<MouseEnterEvent>(evt => slot.style.backgroundColor = slotHoverColor);
-            slot.RegisterCallback<MouseLeaveEvent>(evt => slot.style.backgroundColor = slotBackgroundColor);
+            // Hover effects with cursor tooltip
+            slot.RegisterCallback<MouseEnterEvent>(evt =>
+            {
+                slot.style.backgroundColor = slotHoverColor;
+                ShowCursorTooltip(foodData);
+            });
+
+            slot.RegisterCallback<MouseLeaveEvent>(evt =>
+            {
+                slot.style.backgroundColor = slotBackgroundColor;
+                HideCursorTooltip();
+            });
+
+            // Click to select food (stops propagation so overlay doesn't close)
             slot.RegisterCallback<ClickEvent>(evt =>
             {
+                evt.StopPropagation();
                 if (debugLog) Debug.Log($"[FoodSelectionPopup] Selected: {foodData.Consumable?.Name}");
                 SelectFood(foodData);
             });
-
-            slot.tooltip = $"{foodData.Consumable?.Name ?? "Unknown"}\nNutrition: {foodData.Consumable?.NutritionValue ?? 0:F0}";
 
             return slot;
         }
@@ -400,18 +557,29 @@ namespace Abracodabra.Ecosystem.Feeding
             PopulateGrid(currentFoods);
             PositionNearTarget(target);
 
+            // Show blocking overlay and popup
+            blockingOverlay.style.display = DisplayStyle.Flex;
             popupContainer.style.display = DisplayStyle.Flex;
             isVisible = true;
+
+            // Hide tooltip initially
+            HideCursorTooltip();
 
             if (debugLog) Debug.Log($"[FoodSelectionPopup] Showing for {target.FeedableName} with {currentFoods.Count} foods");
         }
 
         public void Hide()
         {
+            if (blockingOverlay != null)
+            {
+                blockingOverlay.style.display = DisplayStyle.None;
+            }
             if (popupContainer != null)
             {
                 popupContainer.style.display = DisplayStyle.None;
             }
+            HideCursorTooltip();
+
             isVisible = false;
             currentTarget = null;
             currentFoods = null;
@@ -460,17 +628,6 @@ namespace Abracodabra.Ecosystem.Feeding
 
             Hide();
             callback?.Invoke(consumable, index);
-        }
-
-        bool IsMouseOverPopup()
-        {
-            if (popupContainer == null || !isVisible) return false;
-
-            Vector2 mousePos = Input.mousePosition;
-            float uiY = Screen.height - mousePos.y;
-
-            var rect = popupContainer.worldBound;
-            return rect.Contains(new Vector2(mousePos.x, uiY));
         }
 
         /// <summary>

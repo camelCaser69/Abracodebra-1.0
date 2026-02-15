@@ -6,6 +6,7 @@ using UnityEngine.Tilemaps;
 using Abracodabra.UI.Genes;
 using skner.DualGrid;
 using TMPro;
+using Abracodabra.Ecosystem.Feeding;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -97,9 +98,14 @@ namespace WegoSystem
             UpdateReversionTicks();
         }
 
-        private void Update()
+        void Update()
         {
             refillHappenedThisFrame = false;
+
+            // Block all tile interactions while feeding popup is open
+            if (FoodSelectionPopup.IsBlockingInput)
+                return;
+
             HandleTileHover();
 
             if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using WegoSystem;
+using Abracodabra.Ecosystem.Feeding;
 
 namespace WegoSystem
 {
@@ -103,15 +104,20 @@ namespace WegoSystem
 
         void Update()
         {
+            // Block all input while feeding popup is open
+            if (FoodSelectionPopup.IsBlockingInput)
+                return;
+
             if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat)
             {
                 HandlePlayerInput();
             }
+
             if (gridEntity != null && statusManager != null)
             {
-                // FIX: Use the new, correct property name
                 gridEntity.SetSpeedMultiplier(statusManager.VisualInterpolationSpeedMultiplier);
             }
+
             UpdateAnimations();
             UpdateSpriteDirection();
         }
@@ -139,15 +145,25 @@ namespace WegoSystem
         }
         #endregion
 
-        private void HandlePlayerInput()
+        void HandlePlayerInput()
         {
-            if (gridEntity == null || gridEntity.IsMoving || isProcessingMovement) return;
+            // Block input while feeding popup is open
+            if (FoodSelectionPopup.IsBlockingInput)
+                return;
+
+            if (gridEntity == null || gridEntity.IsMoving || isProcessingMovement)
+                return;
 
             GridPosition moveDir = GridPosition.Zero;
-            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) moveDir = GridPosition.Up;
-            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) moveDir = GridPosition.Down;
-            else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) moveDir = GridPosition.Left;
-            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) moveDir = GridPosition.Right;
+
+            if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+                moveDir = GridPosition.Up;
+            else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+                moveDir = GridPosition.Down;
+            else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+                moveDir = GridPosition.Left;
+            else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+                moveDir = GridPosition.Right;
 
             if (moveDir != GridPosition.Zero)
             {

@@ -6,6 +6,7 @@ using Abracodabra.UI.Genes;
 using WegoSystem;
 using Abracodabra.UI.Toolkit;
 using UnityEngine;
+using Abracodabra.Ecosystem.Feeding;
 
 public sealed class PlayerTileInteractor : MonoBehaviour {
     [Header("References")]
@@ -27,20 +28,37 @@ public sealed class PlayerTileInteractor : MonoBehaviour {
         FindReferences();
     }
 
-    void Update() {
+    void Update()
+    {
         if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat)
+            return;
+
+        // Block click detection while feeding popup is open
+        if (FoodSelectionPopup.IsBlockingInput)
             return;
 
         if (Input.GetMouseButtonDown(0)) pendingLeftClick = true;
         if (Input.GetMouseButtonDown(1)) pendingRightClick = true;
     }
 
-    void LateUpdate() {
-        if (pendingLeftClick) {
+    void LateUpdate()
+    {
+        // Block click processing while feeding popup is open
+        if (FoodSelectionPopup.IsBlockingInput)
+        {
+            pendingLeftClick = false;
+            pendingRightClick = false;
+            return;
+        }
+
+        if (pendingLeftClick)
+        {
             pendingLeftClick = false;
             HandleLeftClick();
         }
-        if (pendingRightClick) {
+
+        if (pendingRightClick)
+        {
             pendingRightClick = false;
             HandleRightClick();
         }

@@ -6,6 +6,7 @@ using UnityEngine;
 using WegoSystem;
 using Abracodabra.UI.Genes;
 using Abracodabra.UI.Toolkit;
+using Abracodabra.Ecosystem.Feeding;
 
 namespace Abracodabra.Ecosystem.Feeding
 {
@@ -113,37 +114,42 @@ namespace Abracodabra.Ecosystem.Feeding
         {
             // Always detect right-click for debugging, but only process if allowed
             bool rightClickThisFrame = Input.GetMouseButtonDown(1);
-            
+
             if (rightClickThisFrame && debugLog)
             {
                 Debug.Log($"[FeedingSystem] Right-click detected! isSelectingFood={isSelectingFood}, " +
                           $"registeredCount={registeredFeedables.Count}, hoveredFeedable={hoveredFeedable?.FeedableName ?? "null"}");
             }
 
-            if (isSelectingFood) return;
+            // If popup is open, don't process any feeding input (popup handles its own closing)
+            if (FoodSelectionPopup.IsBlockingInput)
+                return;
 
-            // Check state restriction
+            if (isSelectingFood)
+                return;
+
             if (restrictToGrowthPhase)
             {
                 if (RunManager.Instance == null)
                 {
-                    if (rightClickThisFrame && debugLog) Debug.Log("[FeedingSystem] RunManager.Instance is null");
+                    if (rightClickThisFrame && debugLog)
+                        Debug.Log("[FeedingSystem] RunManager.Instance is null");
                 }
                 else if (RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
                 {
-                    if (rightClickThisFrame && debugLog) 
+                    if (rightClickThisFrame && debugLog)
                         Debug.Log($"[FeedingSystem] Wrong state: {RunManager.Instance.CurrentState} (need GrowthAndThreat)");
                     return;
                 }
             }
 
             UpdateHoveredFeedable();
-            
+
             if (rightClickThisFrame)
             {
                 HandleRightClickInput();
             }
-            
+
             HandleKeyboardQuickFeed();
         }
 
@@ -198,7 +204,7 @@ namespace Abracodabra.Ecosystem.Feeding
 
         #region Input Handling
 
-        private void UpdateHoveredFeedable()
+        void UpdateHoveredFeedable()
         {
             if (mainCamera == null)
             {
@@ -209,7 +215,6 @@ namespace Abracodabra.Ecosystem.Feeding
             Vector3 mouseWorldPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             mouseWorldPos.z = 0f;
 
-            // Convert to grid position for accurate detection
             GridPosition mouseGridPos = GridPosition.Zero;
 
             if (TileInteractionManager.Instance != null && TileInteractionManager.Instance.interactionGrid != null)
@@ -221,7 +226,6 @@ namespace Abracodabra.Ecosystem.Feeding
             IFeedable closestFeedable = null;
             float closestDistance = float.MaxValue;
 
-            // Clean up destroyed feedables
             registeredFeedables.RemoveAll(f => f == null || (f as MonoBehaviour) == null);
 
             foreach (var feedable in registeredFeedables)
@@ -229,13 +233,8 @@ namespace Abracodabra.Ecosystem.Feeding
                 var feedableMono = feedable as MonoBehaviour;
                 if (feedableMono == null || !feedableMono.gameObject.activeInHierarchy) continue;
 
-                // Get feedable's grid position
                 GridPosition feedableGridPos = GetFeedableGridPosition(feedable);
-
-                // Check grid distance
                 int manhattanDist = mouseGridPos.ManhattanDistance(feedableGridPos);
-
-                // Also check world distance for precision
                 float worldDist = Vector3.Distance(mouseWorldPos, feedable.FeedPopupAnchor);
 
                 if (verboseHoverLog && worldDist < 3f)
@@ -243,15 +242,14 @@ namespace Abracodabra.Ecosystem.Feeding
                     Debug.Log($"[FeedingSystem] Checking {feedable.FeedableName}: gridDist={manhattanDist}, worldDist={worldDist:F2}");
                 }
 
-                // Consider "hovered" if within 1 tile Manhattan distance OR within 1.5 world units
-                if ((manhattanDist <= 1 || worldDist < 1.5f) && worldDist < closestDistance)
+                // Only detect feedable if cursor is on the EXACT same grid cell
+                if (manhattanDist == 0 && worldDist < closestDistance)
                 {
                     closestDistance = worldDist;
                     closestFeedable = feedable;
                 }
             }
 
-            // Update hovered state
             if (hoveredFeedable != closestFeedable)
             {
                 hoveredFeedable = closestFeedable;

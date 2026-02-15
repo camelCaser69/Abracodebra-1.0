@@ -8,6 +8,7 @@ using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Core;
 using Abracodabra.UI.Toolkit;
 using Abracodabra.UI.Genes;
+using Abracodabra.Ecosystem.Feeding;
 
 namespace Abracodabra.UI.Toolkit
 {
@@ -118,6 +119,10 @@ namespace Abracodabra.UI.Toolkit
 
         void Update()
         {
+            // Block hotbar input while feeding popup is open
+            if (FoodSelectionPopup.IsBlockingInput)
+                return;
+
             hotbarController.HandleInput();
         }
 

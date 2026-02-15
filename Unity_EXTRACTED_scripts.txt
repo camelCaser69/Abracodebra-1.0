@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 845,143 -> 601,189 chars (28.9% reduction)
-Estimated tokens saved: ~60,988
+Compression Stats: 855,397 -> 610,080 chars (28.7% reduction)
+Estimated tokens saved: ~61,329
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -98,137 +98,137 @@ using System.Linq;
   WaterReflectionManager (Assets\Scripts\Visual\Effects/) L6414
   PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L6460
   PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L6631
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L6897
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L6905
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L6931
-  PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6979
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7290
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7516
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7570
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7613
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7630
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7670
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7829
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L6908
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L6916
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L6942
+  PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6990
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7301
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7527
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7581
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7624
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7641
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7681
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7840
 
 [Abracodabra.Ecosystem]
-  DorisController (Assets\Scripts\Ecosystem\Doris/) L7840
-  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L8248
-  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L8374
+  DorisController (Assets\Scripts\Ecosystem\Doris/) L7851
+  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L8259
+  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L8385
 
 [Abracodabra.Ecosystem.Feeding]
-  ConsumableData (Assets\Scripts\Ecosystem\Feeding/) L8575
-  FeedingSystem (Assets\Scripts\Ecosystem\Feeding/) L8695
-  FoodSelectionPopup (Assets\Scripts\Ecosystem\Feeding/) L9186
-  IFeedable (Assets\Scripts\Ecosystem\Feeding/) L9535
+  ConsumableData (Assets\Scripts\Ecosystem\Feeding/) L8586
+  FeedingSystem (Assets\Scripts\Ecosystem\Feeding/) L8706
+  FoodSelectionPopup (Assets\Scripts\Ecosystem\Feeding/) L9201
+  IFeedable (Assets\Scripts\Ecosystem\Feeding/) L9765
 
 [Abracodabra.Genes]
-  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L9553
-  GeneLibrary (Assets\Scripts\Genes/) L9563
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L9718
-  PlantState (Assets\Scripts\PlantSystem\Growth/) L9898
+  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L9783
+  GeneLibrary (Assets\Scripts\Genes/) L9793
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L9948
+  PlantState (Assets\Scripts\PlantSystem\Growth/) L10128
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L10290
-  Fruit (Assets\Scripts\Genes\Components/) L10315
-  NutritionComponent (Assets\Scripts\Genes\Components/) L10353
+  Creature (Assets\Scripts\Genes\Components/) L10520
+  Fruit (Assets\Scripts\Genes\Components/) L10545
+  NutritionComponent (Assets\Scripts\Genes\Components/) L10583
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L10365
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L10411
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L10430
-  ModifierGene (Assets\Scripts\Genes\Core/) L10442
-  PassiveStatType (Assets\Scripts\Genes\Core/) L10474
-  PayloadGene (Assets\Scripts\Genes\Core/) L10516
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L10562
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L10583
-  GeneBase (Assets\Scripts\Genes/) L10616
-  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L10694
+  ActiveGene (Assets\Scripts\Genes\Core/) L10595
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L10641
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L10660
+  ModifierGene (Assets\Scripts\Genes\Core/) L10672
+  PassiveStatType (Assets\Scripts\Genes\Core/) L10704
+  PayloadGene (Assets\Scripts\Genes\Core/) L10746
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L10792
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L10813
+  GeneBase (Assets\Scripts\Genes/) L10846
+  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L10924
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L10797
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L10915
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L10945
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L10988
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L11027
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L11145
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L11175
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L11218
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L11039
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L11095
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L11227
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L11269
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L11325
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L11457
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L11282
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L11315
-  GeneEventBus (Assets\Scripts\Genes\Services/) L11413
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L11465
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L11512
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L11545
+  GeneEventBus (Assets\Scripts\Genes\Services/) L11643
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L11695
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L11552
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L11782
 
 [Abracodabra.Minigames]
-  MinigameManager (Assets\Scripts\Minigames/) L11645
-  MinigameType (Assets\Scripts\Minigames/) L11861
-  TileInteractionManagerExtensions (Assets\Scripts\Minigames/) L11921
-  TimingCircleConfig (Assets\Scripts\Minigames/) L11983
-  TimingCircleMinigame (Assets\Scripts\Minigames/) L12114
+  MinigameManager (Assets\Scripts\Minigames/) L11875
+  MinigameType (Assets\Scripts\Minigames/) L12091
+  TileInteractionManagerExtensions (Assets\Scripts\Minigames/) L12151
+  TimingCircleConfig (Assets\Scripts\Minigames/) L12213
+  TimingCircleMinigame (Assets\Scripts\Minigames/) L12344
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L12443
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L12528
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L12668
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L12673
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L12758
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L12898
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L12946
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L13793
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L14082
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L14320
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L14506
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L14705
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L15349
-  DestroyTracker (Assets\Scripts\A_ToolkitUI/) L15543
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L13176
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L14027
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L14316
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L14554
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L14740
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L14939
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L15583
+  DestroyTracker (Assets\Scripts\A_ToolkitUI/) L15777
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L15854
-  SeedRarity (Assets\Scripts\A_ToolkitUI/) L16024
-  QualityTier (Assets\Scripts\A_ToolkitUI/) L16046
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L16088
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L16258
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L16280
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L16108
-  CameraZoomController (Assets\Scripts\Core/) L16221
-  InitializationManager (Assets\Scripts\Core/) L16270
-  PixelGridSnapper (Assets\Scripts\Core/) L16310
-  RunState (Assets\Scripts\Core/) L16343
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L16509
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L16572
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L16708
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L16737
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L16888
-  GridEntity (Assets\Scripts\Ticks/) L16960
-  GridPosition (Assets\Scripts\Ticks/) L17130
-  GridPositionManager (Assets\Scripts\Ticks/) L17231
-  GridRadiusUtility (Assets\Scripts\Ticks/) L17845
-  MultiTileEntity (Assets\Scripts\Ticks/) L17989
-  PivotMode (Assets\Scripts\Ticks/) L18233
-  TickConfiguration (Assets\Scripts\Ticks/) L18347
-  ITickUpdateable (Assets\Scripts\Ticks/) L18433
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L18585
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L18606
-  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L18802
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L18818
-  for (Assets\Scripts\WorldInteraction/) L19439
+  CameraController (Assets\Scripts\Core/) L16342
+  CameraZoomController (Assets\Scripts\Core/) L16455
+  InitializationManager (Assets\Scripts\Core/) L16504
+  PixelGridSnapper (Assets\Scripts\Core/) L16544
+  RunState (Assets\Scripts\Core/) L16577
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L16743
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L16806
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L16942
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L16971
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L17122
+  GridEntity (Assets\Scripts\Ticks/) L17194
+  GridPosition (Assets\Scripts\Ticks/) L17364
+  GridPositionManager (Assets\Scripts\Ticks/) L17465
+  GridRadiusUtility (Assets\Scripts\Ticks/) L18079
+  MultiTileEntity (Assets\Scripts\Ticks/) L18223
+  PivotMode (Assets\Scripts\Ticks/) L18467
+  TickConfiguration (Assets\Scripts\Ticks/) L18581
+  ITickUpdateable (Assets\Scripts\Ticks/) L18667
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L18819
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L18840
+  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L19051
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L19067
+  for (Assets\Scripts\WorldInteraction/) L19693
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L19511
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L19765
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L19543
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L19797
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L19601
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L19647
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L19770
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L19855
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L19901
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L20024
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L19935
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L20189
 
 
 ================================================================================
@@ -6841,6 +6841,7 @@ using Abracodabra.Genes.Components;
 using Abracodabra.UI.Genes;
 using WegoSystem;
 using Abracodabra.UI.Toolkit;
+using Abracodabra.Ecosystem.Feeding;
 
 pub seal class PlayerTileInteractor : MonoBehaviour {
  [Header("References")]
@@ -6866,15 +6867,25 @@ pub seal class PlayerTileInteractor : MonoBehaviour {
   if (RunManager.Instance?.CurrentState != RunState.GrowthAndThreat)
    return;
 
+  if (FoodSelectionPopup.IsBlockingInput)
+   return;
+
   if (Input.GetMouseButtonDown(0)) pendingLeftClick = true;
   if (Input.GetMouseButtonDown(1)) pendingRightClick = true;
  }
 
  void LateUpdate() {
+  if (FoodSelectionPopup.IsBlockingInput) {
+   pendingLeftClick = false;
+   pendingRightClick = false;
+   return;
+  }
+
   if (pendingLeftClick) {
    pendingLeftClick = false;
    HandleLeftClick();
   }
+
   if (pendingRightClick) {
    pendingRightClick = false;
    HandleRightClick();
@@ -8902,6 +8913,7 @@ namespace Abracodabra.Ecosystem.Feeding {
 using WegoSystem;
 using Abracodabra.UI.Genes;
 using Abracodabra.UI.Toolkit;
+using Abracodabra.Ecosystem.Feeding;
 
 namespace Abracodabra.Ecosystem.Feeding {
  pub class FeedingSystem : MonoBehaviour {
@@ -8989,11 +9001,16 @@ namespace Abracodabra.Ecosystem.Feeding {
       $"registeredCount={registeredFeedables.Count}, hoveredFeedable={hoveredFeedable?.FeedableName ?? "null"}");
    }
 
-   if (isSelectingFood) return;
+   if (FoodSelectionPopup.IsBlockingInput)
+    return;
+
+   if (isSelectingFood)
+    return;
 
    if (restrictToGrowthPhase) {
     if (RunManager.Instance == null) {
-     if (rightClickThisFrame && debugLog) Debug.Log("[FeedingSystem] RunManager.Instance is null");
+     if (rightClickThisFrame && debugLog)
+      Debug.Log("[FeedingSystem] RunManager.Instance is null");
     }
     else if (RunManager.Instance.CurrentState != RunState.GrowthAndThreat) {
      if (rightClickThisFrame && debugLog)
@@ -9070,16 +9087,14 @@ namespace Abracodabra.Ecosystem.Feeding {
     if (feedableMono == null || !feedableMono.gameObject.activeInHierarchy) continue;
 
     GridPosition feedableGridPos = GetFeedableGridPosition(feedable);
-
     int manhattanDist = mouseGridPos.ManhattanDistance(feedableGridPos);
-
     float worldDist = Vector3.Distance(mouseWorldPos, feedable.FeedPopupAnchor);
 
     if (verboseHoverLog && worldDist < 3f) {
      Debug.Log($"[FeedingSystem] Checking {feedable.FeedableName}: gridDist={manhattanDist}, worldDist={worldDist:F2}");
     }
 
-    if ((manhattanDist <= 1 || worldDist < 1.5f) && worldDist < closestDistance) {
+    if (manhattanDist == 0 && worldDist < closestDistance) {
      closestDistance = worldDist;
      closestFeedable = feedable;
     }
@@ -9204,14 +9219,14 @@ namespace Abracodabra.Ecosystem.Feeding {
 
    var availableFoods = GetAvailableFoodsForTarget(target);
 
-   if (availableFoods.Count == 0) {
-    if (debugLog) Debug.Log($"[FeedingSystem] No valid foods in inventory for {target.FeedableName}");
-    CancelFeedingInteraction();
-    return;
+   if (debugLog) {
+    if (availableFoods.Count == 0)
+     Debug.Log($"[FeedingSystem] No valid foods in inventory for {target.FeedableName} - showing empty popup");
+    else
+     Debug.Log($"[FeedingSystem] Showing FoodSelectionPopup with {availableFoods.Count} foods");
    }
 
    if (FoodSelectionPopup.Instance != null) {
-    if (debugLog) Debug.Log($"[FeedingSystem] Showing FoodSelectionPopup with {availableFoods.Count} foods");
     FoodSelectionPopup.Instance.Show(target, availableFoods, OnFoodSelected, OnFoodSelectionCancelled);
    }
    else {
@@ -9396,8 +9411,7 @@ namespace Abracodabra.Ecosystem.Feeding {
  pub class FoodSelectionPopup : MonoBehaviour {
   pub stat FoodSelectionPopup Instance { get; set; }
 
-  [Header("UI Document")]
-  [SerializeField] UIDocument uiDocument;
+  pub stat bool IsBlockingInput => Instance != null && Instance.IsVisible;
 
   [Header("Grid Configuration")]
   [SerializeField] int gridColumns = 3;
@@ -9410,23 +9424,43 @@ namespace Abracodabra.Ecosystem.Feeding {
   [SerializeField] Color slotBackgroundColor = new Color(0.25f, 0.25f, 0.25f, 1f);
   [SerializeField] Color slotHoverColor = new Color(0.4f, 0.4f, 0.4f, 1f);
   [SerializeField] Color slotBorderColor = new Color(0.5f, 0.5f, 0.5f, 1f);
+  [SerializeField] Color emptySlotBackgroundColor = new Color(0.15f, 0.15f, 0.15f, 0.5f);
+  [SerializeField] Color emptySlotBorderColor = new Color(0.3f, 0.3f, 0.3f, 0.5f);
   [SerializeField] int borderRadius = 8;
+
+  [Header("Tooltip Styling")]
+  [SerializeField] Color tooltipBackgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
+  [SerializeField] Color tooltipTextColor = Color.white;
+  [SerializeField] Color tooltipNutritionColor = new Color(0.5f, 1f, 0.5f, 1f);
+  [SerializeField] int tooltipFontSize = 12;
+  [SerializeField] Vector2 tooltipOffset = new Vector2(15f, 15f);
 
   [Header("Debug")]
   [SerializeField] bool debugLog = true;
 
+  UIDocument uiDocument;
   VisualElement rootElement;
+  VisualElement blockingOverlay;
   VisualElement popupContainer;
   VisualElement gridContainer;
   Label titleLabel;
+  Label emptyLabel;
+  VisualElement cursorTooltip;
+  Label tooltipNameLabel;
+  Label tooltipNutritionLabel;
 
   bool isVisible = false;
+  bool isInitialized = false;
   IFeedable currentTarget;
   List<FoodSlotData> currentFoods;
   Action<ConsumableData, int> onFoodSelected;
   Action onCancelled;
 
   List<VisualElement> slotElements = new List<VisualElement>();
+
+  pub int GridColumns => gridColumns;
+  pub int GridRows => gridRows;
+  pub int TotalSlots => gridColumns * gridRows;
 
   pub class FoodSlotData {
    pub ConsumableData Consumable;
@@ -9441,29 +9475,56 @@ namespace Abracodabra.Ecosystem.Feeding {
     return;
    }
    Instance = this;
+
+   SetupUIDocument();
+  }
+
+  void SetupUIDocument() {
+   uiDocument = GetComponent<UIDocument>();
+
+   if (uiDocument.panelSettings == null) {
+    var existingPanelSettings = FindExistingPanelSettings();
+    if (existingPanelSettings != null) {
+     uiDocument.panelSettings = existingPanelSettings;
+     if (debugLog) Debug.Log($"[FoodSelectionPopup] Auto-assigned PanelSettings from scene");
+    }
+    else {
+     Debug.LogError("[FoodSelectionPopup] No PanelSettings found in scene! Please assign one to any UIDocument.");
+     return;
+    }
+   }
+
+   uiDocument.sortingOrder = 100;
+  }
+
+  PanelSettings FindExistingPanelSettings() {
+   var allDocs = FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
+   foreach (var doc in allDocs) {
+    if (doc != uiDocument && doc.panelSettings != null) {
+     return doc.panelSettings;
+    }
+   }
+   return null;
   }
 
   void Start() {
-   InitializeUI();
+   StartCoroutine(DelayedInit());
   }
 
-  void InitializeUI() {
-   if (uiDocument == null) {
-    uiDocument = GetComponent<UIDocument>();
-   }
+  System.Collections.IEnumerator DelayedInit() {
+   yield return null;
+   yield return new WaitForEndOfFrame();
 
-   if (uiDocument == null) {
-    if (debugLog) Debug.LogWarning("[FoodSelectionPopup] No UIDocument found. FoodSelectionPopup will not function until one is added.");
-    return;
-   }
-
-   if (uiDocument.rootVisualElement == null) {
-    if (debugLog) Debug.LogWarning("[FoodSelectionPopup] UIDocument has no rootVisualElement yet.");
-    return;
+   if (uiDocument == null || uiDocument.rootVisualElement == null) {
+    Debug.LogError("[FoodSelectionPopup] UIDocument not ready after delay!");
+    yield break;
    }
 
    CreateUI();
    Hide();
+   isInitialized = true;
+
+   if (debugLog) Debug.Log("[FoodSelectionPopup] Initialization complete");
   }
 
   void OnDestroy() {
@@ -9475,32 +9536,66 @@ namespace Abracodabra.Ecosystem.Feeding {
   void Update() {
    if (!isVisible) return;
 
+   UpdateTooltipPosition();
+
    if (Input.GetKeyDown(KeyCode.Escape)) {
     Cancel();
+    return;
    }
 
-   if (Input.GetMouseButtonDown(1)) {
+   if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.A) ||
+    Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.D) ||
+    Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.DownArrow) ||
+    Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.RightArrow)) {
     Cancel();
+    return;
+   }
+  }
+
+  void UpdateTooltipPosition() {
+   if (cursorTooltip == null || cursorTooltip.style.display == DisplayStyle.None) return;
+
+   Vector2 mousePos = Input.mousePosition;
+   float uiX = mousePos.x + tooltipOffset.x;
+   float uiY = Screen.height - mousePos.y + tooltipOffset.y;
+
+   float tooltipWidth = cursorTooltip.resolvedStyle.width;
+   float tooltipHeight = cursorTooltip.resolvedStyle.height;
+
+   if (tooltipWidth > 0 && uiX + tooltipWidth > Screen.width - 10) {
+    uiX = mousePos.x - tooltipWidth - 5;
+   }
+   if (tooltipHeight > 0 && uiY + tooltipHeight > Screen.height - 10) {
+    uiY = Screen.height - mousePos.y - tooltipHeight - 5;
    }
 
-   if (Input.GetMouseButtonDown(0) && !IsMouseOverPopup()) {
-    Cancel();
-   }
+   cursorTooltip.style.left = uiX;
+   cursorTooltip.style.top = uiY;
   }
 
   void CreateUI() {
    rootElement = uiDocument.rootVisualElement;
-
    rootElement.Clear();
 
-   var overlay = new VisualElement();
-   overlay.style.position = Position.Absolute;
-   overlay.style.left = 0;
-   overlay.style.top = 0;
-   overlay.style.right = 0;
-   overlay.style.bottom = 0;
-   overlay.pickingMode = PickingMode.Ignore;
-   rootElement.Add(overlay);
+   rootElement.style.position = Position.Absolute;
+   rootElement.style.left = 0;
+   rootElement.style.top = 0;
+   rootElement.style.right = 0;
+   rootElement.style.bottom = 0;
+   rootElement.pickingMode = PickingMode.Ignore;
+
+   blockingOverlay = new VisualElement();
+   blockingOverlay.name = "blocking-overlay";
+   blockingOverlay.style.position = Position.Absolute;
+   blockingOverlay.style.left = 0;
+   blockingOverlay.style.top = 0;
+   blockingOverlay.style.right = 0;
+   blockingOverlay.style.bottom = 0;
+   blockingOverlay.style.backgroundColor = new Color(0, 0, 0, 0.3f); // Slight dim effect
+   blockingOverlay.pickingMode = PickingMode.Position; // Blocks all clicks
+   blockingOverlay.style.display = DisplayStyle.None;
+   blockingOverlay.RegisterCallback<ClickEvent>(OnOverlayClicked);
+   rootElement.Add(blockingOverlay);
 
    popupContainer = new VisualElement();
    popupContainer.name = "food-selection-popup";
@@ -9510,12 +9605,22 @@ namespace Abracodabra.Ecosystem.Feeding {
    popupContainer.style.borderTopRightRadius = borderRadius;
    popupContainer.style.borderBottomLeftRadius = borderRadius;
    popupContainer.style.borderBottomRightRadius = borderRadius;
+   popupContainer.style.borderTopWidth = 2;
+   popupContainer.style.borderBottomWidth = 2;
+   popupContainer.style.borderLeftWidth = 2;
+   popupContainer.style.borderRightWidth = 2;
+   popupContainer.style.borderTopColor = new Color(0.4f, 0.4f, 0.5f, 1f);
+   popupContainer.style.borderBottomColor = new Color(0.4f, 0.4f, 0.5f, 1f);
+   popupContainer.style.borderLeftColor = new Color(0.4f, 0.4f, 0.5f, 1f);
+   popupContainer.style.borderRightColor = new Color(0.4f, 0.4f, 0.5f, 1f);
    popupContainer.style.paddingTop = 8;
    popupContainer.style.paddingBottom = 8;
    popupContainer.style.paddingLeft = 8;
    popupContainer.style.paddingRight = 8;
    popupContainer.pickingMode = PickingMode.Position;
-   rootElement.Add(popupContainer);
+   popupContainer.style.display = DisplayStyle.None;
+   popupContainer.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
+   blockingOverlay.Add(popupContainer);
 
    titleLabel = new Label("Feed");
    titleLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
@@ -9532,27 +9637,141 @@ namespace Abracodabra.Ecosystem.Feeding {
    gridContainer.style.width = (slotSize + slotSpacing) * gridColumns;
    popupContainer.Add(gridContainer);
 
+   emptyLabel = new Label("No food available");
+   emptyLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+   emptyLabel.style.fontSize = 11;
+   emptyLabel.style.color = new Color(0.6f, 0.6f, 0.6f, 1f);
+   emptyLabel.style.marginTop = 4;
+   emptyLabel.style.display = DisplayStyle.None;
+   popupContainer.Add(emptyLabel);
+
+   CreateCursorTooltip();
+
    if (debugLog) Debug.Log("[FoodSelectionPopup] UI created");
   }
 
+  void CreateCursorTooltip() {
+   cursorTooltip = new VisualElement();
+   cursorTooltip.name = "cursor-tooltip";
+   cursorTooltip.style.position = Position.Absolute;
+   cursorTooltip.style.backgroundColor = tooltipBackgroundColor;
+   cursorTooltip.style.borderTopLeftRadius = 4;
+   cursorTooltip.style.borderTopRightRadius = 4;
+   cursorTooltip.style.borderBottomLeftRadius = 4;
+   cursorTooltip.style.borderBottomRightRadius = 4;
+   cursorTooltip.style.borderTopWidth = 1;
+   cursorTooltip.style.borderBottomWidth = 1;
+   cursorTooltip.style.borderLeftWidth = 1;
+   cursorTooltip.style.borderRightWidth = 1;
+   cursorTooltip.style.borderTopColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+   cursorTooltip.style.borderBottomColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+   cursorTooltip.style.borderLeftColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+   cursorTooltip.style.borderRightColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+   cursorTooltip.style.paddingTop = 4;
+   cursorTooltip.style.paddingBottom = 4;
+   cursorTooltip.style.paddingLeft = 8;
+   cursorTooltip.style.paddingRight = 8;
+   cursorTooltip.style.display = DisplayStyle.None;
+   cursorTooltip.pickingMode = PickingMode.Ignore; // Don't block mouse
+
+   tooltipNameLabel = new Label("Food Name");
+   tooltipNameLabel.style.fontSize = tooltipFontSize;
+   tooltipNameLabel.style.color = tooltipTextColor;
+   tooltipNameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+   tooltipNameLabel.style.marginBottom = 2;
+   tooltipNameLabel.pickingMode = PickingMode.Ignore;
+   cursorTooltip.Add(tooltipNameLabel);
+
+   tooltipNutritionLabel = new Label("(Nutrition: 0)");
+   tooltipNutritionLabel.style.fontSize = tooltipFontSize - 1;
+   tooltipNutritionLabel.style.color = tooltipNutritionColor;
+   tooltipNutritionLabel.pickingMode = PickingMode.Ignore;
+   cursorTooltip.Add(tooltipNutritionLabel);
+
+   blockingOverlay.Add(cursorTooltip);
+  }
+
+  void ShowCursorTooltip(FoodSlotData foodData) {
+   if (cursorTooltip == null || foodData == null || foodData.Consumable == null) return;
+
+   tooltipNameLabel.text = foodData.Consumable.Name ?? "Unknown";
+   tooltipNutritionLabel.text = $"(Nutrition: {foodData.Consumable.NutritionValue:F0})";
+
+   cursorTooltip.style.display = DisplayStyle.Flex;
+   UpdateTooltipPosition();
+  }
+
+  void HideCursorTooltip() {
+   if (cursorTooltip != null) {
+    cursorTooltip.style.display = DisplayStyle.None;
+   }
+  }
+
+  void OnOverlayClicked(ClickEvent evt) {
+   if (evt.target == blockingOverlay) {
+    if (debugLog) Debug.Log("[FoodSelectionPopup] Clicked outside popup - closing");
+    Cancel();
+   }
+  }
+
   void PopulateGrid(List<FoodSlotData> foods) {
+   if (gridContainer == null) return;
+
    gridContainer.Clear();
    slotElements.Clear();
 
-   int maxSlots = gridColumns * gridRows;
-   int slotsToShow = Mathf.Min(foods.Count, maxSlots);
+   int totalSlots = gridColumns * gridRows;
+   int foodCount = foods?.Count ?? 0;
 
-   for (int i = 0; i < slotsToShow; i++) {
-    var foodData = foods[i];
-    var slot = CreateFoodSlot(foodData, i);
+   for (int i = 0; i < totalSlots; i++) {
+    VisualElement slot;
+
+    if (i < foodCount && foods[i] != null) {
+     slot = CreateFoodSlot(foods[i], i);
+    }
+    else {
+     slot = CreateEmptySlot(i);
+    }
+
     gridContainer.Add(slot);
     slotElements.Add(slot);
    }
 
-   int actualColumns = Mathf.Min(slotsToShow, gridColumns);
-   gridContainer.style.width = (slotSize + slotSpacing) * actualColumns;
+   gridContainer.style.width = (slotSize + slotSpacing) * gridColumns;
 
-   if (debugLog) Debug.Log($"[FoodSelectionPopup] Populated grid with {slotsToShow} slots");
+   if (emptyLabel != null) {
+    emptyLabel.style.display = (foodCount == 0) ? DisplayStyle.Flex : DisplayStyle.None;
+   }
+
+   if (debugLog) Debug.Log($"[FoodSelectionPopup] Populated grid: {foodCount} foods, {totalSlots - foodCount} empty slots");
+  }
+
+  VisualElement CreateEmptySlot(int index) {
+   var slot = new VisualElement();
+   slot.name = $"empty-slot-{index}";
+   slot.style.width = slotSize;
+   slot.style.height = slotSize;
+   slot.style.marginRight = slotSpacing;
+   slot.style.marginBottom = slotSpacing;
+   slot.style.backgroundColor = emptySlotBackgroundColor;
+   slot.style.borderTopLeftRadius = 4;
+   slot.style.borderTopRightRadius = 4;
+   slot.style.borderBottomLeftRadius = 4;
+   slot.style.borderBottomRightRadius = 4;
+   slot.style.borderTopWidth = 1;
+   slot.style.borderBottomWidth = 1;
+   slot.style.borderLeftWidth = 1;
+   slot.style.borderRightWidth = 1;
+   slot.style.borderTopColor = emptySlotBorderColor;
+   slot.style.borderBottomColor = emptySlotBorderColor;
+   slot.style.borderLeftColor = emptySlotBorderColor;
+   slot.style.borderRightColor = emptySlotBorderColor;
+   slot.style.alignItems = Align.Center;
+   slot.style.justifyContent = Justify.Center;
+   slot.pickingMode = PickingMode.Position;
+   slot.RegisterCallback<ClickEvent>(evt => evt.StopPropagation());
+
+   return slot;
   }
 
   VisualElement CreateFoodSlot(FoodSlotData foodData, int index) {
@@ -9584,7 +9803,7 @@ namespace Abracodabra.Ecosystem.Feeding {
     icon.style.width = slotSize - 16;
     icon.style.height = slotSize - 16;
     icon.style.backgroundImage = new StyleBackground(foodData.Icon);
-    icon.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
+    icon.style.backgroundSize = new BackgroundSize(BackgroundSizeType.Contain);
     icon.pickingMode = PickingMode.Ignore;
     slot.Add(icon);
    }
@@ -9619,41 +9838,46 @@ namespace Abracodabra.Ecosystem.Feeding {
 
    slot.RegisterCallback<MouseEnterEvent>(evt => {
     slot.style.backgroundColor = slotHoverColor;
+    ShowCursorTooltip(foodData);
    });
 
    slot.RegisterCallback<MouseLeaveEvent>(evt => {
     slot.style.backgroundColor = slotBackgroundColor;
+    HideCursorTooltip();
    });
 
    slot.RegisterCallback<ClickEvent>(evt => {
-    if (debugLog) Debug.Log($"[FoodSelectionPopup] Selected: {foodData.Consumable?.Name} at inventory index {foodData.InventoryIndex}");
+    evt.StopPropagation();
+    if (debugLog) Debug.Log($"[FoodSelectionPopup] Selected: {foodData.Consumable?.Name}");
     SelectFood(foodData);
    });
-
-   slot.tooltip = $"{foodData.Consumable?.Name ?? "Unknown"}\nNutrition: {foodData.Consumable?.NutritionValue ?? 0:F0}";
 
    return slot;
   }
 
-pub void Show(IFeedable target, List<FoodSlotData> foods, Action<ConsumableData, int> onSelected, Action onCancel) {
-   if (target == null || foods == null || foods.Count == 0) {
-    if (debugLog) Debug.LogWarning("[FoodSelectionPopup] Show called with invalid params");
+  pub void Show(IFeedable target, List<FoodSlotData> foods, Action<ConsumableData, int> onSelected, Action onCancel) {
+   if (target == null) {
+    if (debugLog) Debug.LogWarning("[FoodSelectionPopup] Show called with null target");
     onCancel?.Invoke();
     return;
    }
 
-   if (popupContainer == null || gridContainer == null) {
-    InitializeUI();
+   if (!isInitialized || popupContainer == null) {
+    if (debugLog) Debug.LogWarning("[FoodSelectionPopup] Not initialized yet, retrying...");
 
-    if (popupContainer == null) {
-     Debug.LogError("[FoodSelectionPopup] UI not initialized! Make sure UIDocument is assigned.");
+    if (uiDocument != null && uiDocument.rootVisualElement != null) {
+     CreateUI();
+     isInitialized = true;
+    }
+    else {
+     Debug.LogError("[FoodSelectionPopup] Cannot initialize - UIDocument not ready");
      onCancel?.Invoke();
      return;
     }
    }
 
    currentTarget = target;
-   currentFoods = foods;
+   currentFoods = foods ?? new List<FoodSlotData>();
    onFoodSelected = onSelected;
    onCancelled = onCancel;
 
@@ -9661,20 +9885,27 @@ pub void Show(IFeedable target, List<FoodSlotData> foods, Action<ConsumableData,
     titleLabel.text = $"Feed {target.FeedableName}";
    }
 
-   PopulateGrid(foods);
-
+   PopulateGrid(currentFoods);
    PositionNearTarget(target);
 
+   blockingOverlay.style.display = DisplayStyle.Flex;
    popupContainer.style.display = DisplayStyle.Flex;
    isVisible = true;
 
-   if (debugLog) Debug.Log($"[FoodSelectionPopup] Showing for {target.FeedableName} with {foods.Count} foods");
+   HideCursorTooltip();
+
+   if (debugLog) Debug.Log($"[FoodSelectionPopup] Showing for {target.FeedableName} with {currentFoods.Count} foods");
   }
 
   pub void Hide() {
+   if (blockingOverlay != null) {
+    blockingOverlay.style.display = DisplayStyle.None;
+   }
    if (popupContainer != null) {
     popupContainer.style.display = DisplayStyle.None;
    }
+   HideCursorTooltip();
+
    isVisible = false;
    currentTarget = null;
    currentFoods = null;
@@ -9684,7 +9915,6 @@ pub void Show(IFeedable target, List<FoodSlotData> foods, Action<ConsumableData,
 
   pub void Cancel() {
    if (debugLog) Debug.Log("[FoodSelectionPopup] Cancelled");
-
    var callback = onCancelled;
    Hide();
    callback?.Invoke();
@@ -9701,11 +9931,11 @@ pub void Show(IFeedable target, List<FoodSlotData> foods, Action<ConsumableData,
    float uiX = screenPos.x;
    float uiY = Screen.height - screenPos.y;
 
-   float popupWidth = (slotSize + slotSpacing) * gridColumns + 16; // padding
-   float popupHeight = (slotSize + slotSpacing) * Mathf.CeilToInt(currentFoods.Count / (float)gridColumns) + 40; // title + padding
+   float popupWidth = (slotSize + slotSpacing) * gridColumns + 16;
+   float popupHeight = (slotSize + slotSpacing) * gridRows + 40;
 
    float finalX = uiX - popupWidth / 2;
-   float finalY = uiY - popupHeight - 20; // 20px above target
+   float finalY = uiY - popupHeight - 20;
 
    finalX = Mathf.Clamp(finalX, 10, Screen.width - popupWidth - 10);
    finalY = Mathf.Clamp(finalY, 10, Screen.height - popupHeight - 10);
@@ -9723,16 +9953,16 @@ pub void Show(IFeedable target, List<FoodSlotData> foods, Action<ConsumableData,
    callback?.Invoke(consumable, index);
   }
 
-  bool IsMouseOverPopup() {
-   if (popupContainer == null || !isVisible) return false;
+  pub void SetGridSize(int columns, int rows) {
+   gridColumns = Mathf.Max(1, columns);
+   gridRows = Mathf.Max(1, rows);
 
-   Vector2 mousePos = Input.mousePosition;
-   float uiY = Screen.height - mousePos.y;
+   if (gridContainer != null) {
+    gridContainer.style.width = (slotSize + slotSpacing) * gridColumns;
+   }
 
-   var rect = popupContainer.worldBound;
-   return rect.Contains(new Vector2(mousePos.x, uiY));
+   if (debugLog) Debug.Log($"[FoodSelectionPopup] Grid resized to {gridColumns}x{gridRows}");
   }
-
  }
 }
 
@@ -13156,6 +13386,7 @@ using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Core;
 using Abracodabra.UI.Toolkit;
 using Abracodabra.UI.Genes;
+using Abracodabra.Ecosystem.Feeding;
 
 namespace Abracodabra.UI.Toolkit {
  pub class GameUIManager : MonoBehaviour {
@@ -13257,6 +13488,9 @@ namespace Abracodabra.UI.Toolkit {
   }
 
   void Update() {
+   if (FoodSelectionPopup.IsBlockingInput)
+    return;
+
    hotbarController.HandleInput();
   }
 
@@ -18812,6 +19046,7 @@ namespace WegoSystem {
 
 ﻿using System.Collections;
 using WegoSystem;
+using Abracodabra.Ecosystem.Feeding;
 
 namespace WegoSystem {
  pub class GardenerController : MonoBehaviour, IStatusEffectable, ITickUpdateable {
@@ -18896,12 +19131,17 @@ namespace WegoSystem {
   }
 
   void Update() {
+   if (FoodSelectionPopup.IsBlockingInput)
+    return;
+
    if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat) {
     HandlePlayerInput();
    }
+
    if (gridEntity != null && statusManager != null) {
     gridEntity.SetSpeedMultiplier(statusManager.VisualInterpolationSpeedMultiplier);
    }
+
    UpdateAnimations();
    UpdateSpriteDirection();
   }
@@ -18924,13 +19164,22 @@ namespace WegoSystem {
   }
 
   void HandlePlayerInput() {
-   if (gridEntity == null || gridEntity.IsMoving || isProcessingMovement) return;
+   if (FoodSelectionPopup.IsBlockingInput)
+    return;
+
+   if (gridEntity == null || gridEntity.IsMoving || isProcessingMovement)
+    return;
 
    GridPosition moveDir = GridPosition.Zero;
-   if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) moveDir = GridPosition.Up;
-   else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow)) moveDir = GridPosition.Down;
-   else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow)) moveDir = GridPosition.Left;
-   else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow)) moveDir = GridPosition.Right;
+
+   if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+    moveDir = GridPosition.Up;
+   else if (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+    moveDir = GridPosition.Down;
+   else if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
+    moveDir = GridPosition.Left;
+   else if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.RightArrow))
+    moveDir = GridPosition.Right;
 
    if (moveDir != GridPosition.Zero) {
     TryMove(moveDir);
@@ -19027,6 +19276,7 @@ using UnityEngine.Tilemaps;
 using Abracodabra.UI.Genes;
 using skner.DualGrid;
 using TMPro;
+using Abracodabra.Ecosystem.Feeding;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -19107,6 +19357,10 @@ namespace WegoSystem {
 
   void Update() {
    refillHappenedThisFrame = false;
+
+   if (FoodSelectionPopup.IsBlockingInput)
+    return;
+
    HandleTileHover();
 
    if (RunManager.Instance?.CurrentState == RunState.GrowthAndThreat) {
