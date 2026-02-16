@@ -1,26 +1,24 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
-using System.Linq;
 using Abracodabra.Genes;
 using WegoSystem;
+using System.Collections.Generic;
+using System.Linq;
 
-public class PlantCellManager
-{
-    private readonly PlantGrowth plant;
-    private readonly GameObject seedCellPrefab;
-    private readonly GameObject stemCellPrefab;
-    private readonly GameObject leafCellPrefab;
-    private readonly GameObject berryCellPrefab;
-    private readonly FoodType _leafFoodType;
+public class PlantCellManager {
+    readonly PlantGrowth plant;
+    readonly GameObject seedCellPrefab;
+    readonly GameObject stemCellPrefab;
+    readonly GameObject leafCellPrefab;
+    readonly GameObject berryCellPrefab;
+    readonly FoodType _leafFoodType;
 
     public readonly Dictionary<Vector2Int, PlantCellType> cells = new Dictionary<Vector2Int, PlantCellType>();
-    private readonly List<GameObject> activeCellGameObjects = new List<GameObject>();
+    readonly List<GameObject> activeCellGameObjects = new List<GameObject>();
 
     public List<LeafData> LeafDataList { get; } = new List<LeafData>();
     public GameObject RootCellInstance { get; set; }
 
-    public PlantCellManager(PlantGrowth plant, GameObject seedPrefab, GameObject stemPrefab, GameObject leafPrefab, GameObject berryPrefab, FoodType leafFoodType)
-    {
+    public PlantCellManager(PlantGrowth plant, GameObject seedPrefab, GameObject stemPrefab, GameObject leafPrefab, GameObject berryPrefab, FoodType leafFoodType) {
         this.plant = plant;
         this.seedCellPrefab = seedPrefab;
         this.stemCellPrefab = stemPrefab;
@@ -29,10 +27,8 @@ public class PlantCellManager
         this._leafFoodType = leafFoodType;
     }
 
-    public GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords)
-    {
-        if (cells.ContainsKey(coords))
-        {
+    public GameObject SpawnCellVisual(PlantCellType cellType, Vector2Int coords) {
+        if (cells.ContainsKey(coords)) {
             Debug.LogWarning($"[{plant.gameObject.name}] Cell already exists at {coords}. Skipping spawn.");
             return GetCellGameObjectAt(coords);
         }
@@ -47,8 +43,7 @@ public class PlantCellManager
         GameObject instance = Object.Instantiate(prefab, cellWorldPos, Quaternion.identity, plant.transform);
 
         PlantCell cellComponent = instance.GetComponent<PlantCell>();
-        if (cellComponent == null)
-        {
+        if (cellComponent == null) {
             cellComponent = instance.AddComponent<PlantCell>();
         }
         cellComponent.ParentPlantGrowth = plant;
@@ -58,35 +53,28 @@ public class PlantCellManager
         cells[coords] = cellType;
         activeCellGameObjects.Add(instance);
 
-        if (cellType == PlantCellType.Seed)
-        {
+        if (cellType == PlantCellType.Seed) {
             RootCellInstance = instance;
         }
-        else if (cellType == PlantCellType.Leaf)
-        {
+        else if (cellType == PlantCellType.Leaf) {
             LeafDataList.Add(new LeafData(coords, true));
 
             var foodItem = instance.GetComponent<FoodItem>();
-            if (foodItem != null)
-            {
-                if (_leafFoodType == null)
-                {
+            if (foodItem != null) {
+                if (_leafFoodType == null) {
                     Debug.LogError($"[PlantCellManager] Cannot assign FoodType to new leaf on '{plant.name}' because the 'Leaf Food Type' field is not set!", plant);
                 }
 
                 GridPosition gridPos = GridPositionManager.Instance.WorldToGrid(cellWorldPos);
-
                 foodItem.InitializeAsPlantPart(_leafFoodType, gridPos);
             }
-            else
-            {
+            else {
                 Debug.LogWarning($"[{plant.gameObject.name}] Leaf prefab is missing FoodItem component.", plant);
             }
         }
-        else if (cellType == PlantCellType.Fruit)
-        {
-            // No special logic is needed here for now, but this ensures it's a recognized type.
-            // The key part `cells[coords] = cellType;` has already run.
+        else if (cellType == PlantCellType.Fruit) {
+            // ✅ FIX: Explicitly register fruit position to keep PlantGrowth logic in sync
+            plant.RegisterFruitPosition(coords);
         }
 
         plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());
@@ -95,26 +83,20 @@ public class PlantCellManager
         return instance;
     }
 
-    public void ReportCellDestroyed(Vector2Int coord)
-    {
-        if (cells.TryGetValue(coord, out PlantCellType cellType))
-        {
+    public void ReportCellDestroyed(Vector2Int coord) {
+        if (cells.TryGetValue(coord, out PlantCellType cellType)) {
             GameObject cellObj = GetCellGameObjectAt(coord);
 
-            if (cellObj != null)
-            {
+            if (cellObj != null) {
                 plant.VisualManager.UnregisterShadowForCell(cellObj);
                 plant.VisualManager.OutlineController?.OnPlantCellRemoved(coord);
                 activeCellGameObjects.Remove(cellObj);
                 Object.Destroy(cellObj);
             }
 
-            if (cellType == PlantCellType.Leaf)
-            {
-                for (int i = 0; i < LeafDataList.Count; i++)
-                {
-                    if (LeafDataList[i].GridCoord == coord)
-                    {
+            if (cellType == PlantCellType.Leaf) {
+                for (int i = 0; i < LeafDataList.Count; i++) {
+                    if (LeafDataList[i].GridCoord == coord) {
                         LeafDataList[i] = new LeafData(coord, false);
                         break;
                     }
@@ -125,12 +107,9 @@ public class PlantCellManager
         }
     }
 
-    public void ClearAllVisuals()
-    {
-        foreach (GameObject cellGO in new List<GameObject>(activeCellGameObjects))
-        {
-            if (cellGO != null)
-            {
+    public void ClearAllVisuals() {
+        foreach (GameObject cellGO in new List<GameObject>(activeCellGameObjects)) {
+            if (cellGO != null) {
                 Object.Destroy(cellGO);
             }
         }
@@ -139,10 +118,8 @@ public class PlantCellManager
         RootCellInstance = null;
     }
 
-    private GameObject GetPrefabForType(PlantCellType cellType)
-    {
-        switch (cellType)
-        {
+    GameObject GetPrefabForType(PlantCellType cellType) {
+        switch (cellType) {
             case PlantCellType.Seed: return seedCellPrefab;
             case PlantCellType.Stem: return stemCellPrefab;
             case PlantCellType.Leaf: return leafCellPrefab;
