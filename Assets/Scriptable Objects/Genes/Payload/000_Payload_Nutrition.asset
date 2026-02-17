@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af21c972b1e145888e1a130c5979448f, type: 3}
-  m_Name: 000_NutritiousPayload
+  m_Name: 000_Payload_Nutrition
   m_EditorClassIdentifier: 
-  geneName: Nutritious Payload
+  geneName: Payload Nutrition
   description: 
   icon: {fileID: 21300000, guid: 0aac42833f760c64ab80dcdabdeb253f, type: 3}
   tier: 1
@@ -22,5 +22,5 @@ MonoBehaviour:
   _version: 1
   payloadType: 1
   basePotency: 1
-  nutritionValue: 10
   healAmount: 5
+  nutritionValue: 10

@@ -4,6 +4,8 @@ using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Components;
 
 namespace Abracodabra.Genes.Implementations {
+    
+    [CreateAssetMenu(fileName = "Gene_Payload_Nutrition", menuName = "Abracodabra/Genes/Payload/Nutrition")]
     public class NutritiousPayload : PayloadGene {
         // v5 Design Update: healAmount is deprecated for NutritiousPayload. 
         // It provides nutrition only. Healing is for a dedicated Healing Payload.
