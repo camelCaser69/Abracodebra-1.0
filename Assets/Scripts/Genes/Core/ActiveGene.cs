@@ -1,5 +1,6 @@
-﻿using UnityEngine;
+// File: Assets/Scripts/Genes/Core/ActiveGene.cs
 using System.Collections.Generic;
+using UnityEngine;
 using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Core
@@ -13,10 +14,14 @@ namespace Abracodabra.Genes.Core
 
         public bool canExecuteEmpty = false;
 
-        // Replaced real-time delay with a tick-based delay
         public int executionDelayTicks = 0;
 
+        [Header("Targeting")]
+        [Tooltip("If true, the executor checks for a target before spending energy. No target = skip slot.")]
         public bool requiresTarget = false;
+
+        [Tooltip("Range in tiles for target detection. Only used when requiresTarget is true.")]
+        public float targetRange = 3f;
 
         public virtual bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
         {

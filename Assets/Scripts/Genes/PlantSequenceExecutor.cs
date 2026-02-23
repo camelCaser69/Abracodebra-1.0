@@ -1,9 +1,12 @@
-﻿using UnityEngine;
+// File: Assets/Scripts/Genes/PlantSequenceExecutor.cs
 using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Templates;
+using Abracodabra.Genes.WorldEffects;
 
 namespace Abracodabra.Genes
 {
@@ -12,10 +15,10 @@ namespace Abracodabra.Genes
         public PlantGrowth plantGrowth;
         public PlantGeneRuntimeState runtimeState;
 
-        private IGeneEventBus eventBus;
-        private IDeterministicRandom random;
+        IGeneEventBus eventBus;
+        IDeterministicRandom random;
 
-        private void Awake()
+        void Awake()
         {
             eventBus = GeneServices.Get<IGeneEventBus>();
             random = GeneServices.Get<IDeterministicRandom>();
@@ -27,7 +30,7 @@ namespace Abracodabra.Genes
             }
         }
 
-        private void Start()
+        void Start()
         {
             if (plantGrowth == null)
             {
@@ -72,8 +75,7 @@ namespace Abracodabra.Genes
                 runtimeState.rechargeTicksRemaining--;
                 return;
             }
-            
-            // This is the core execution logic, now running once per tick
+
             if (TryExecuteCurrentSlot())
             {
                 runtimeState.currentPosition++;
@@ -85,7 +87,7 @@ namespace Abracodabra.Genes
             }
         }
 
-        private bool TryExecuteCurrentSlot()
+        bool TryExecuteCurrentSlot()
         {
             if (runtimeState.currentPosition >= runtimeState.activeSequence.Count)
             {
@@ -93,26 +95,64 @@ namespace Abracodabra.Genes
             }
 
             var slot = runtimeState.activeSequence[runtimeState.currentPosition];
-            
-            // Handle empty slots
+
             if (!slot.HasContent)
             {
                 return true; // Skip empty slot, advance sequence
             }
-            
-            // Handle execution delay
+
             if (slot.delayTicksRemaining > 0)
             {
                 slot.delayTicksRemaining--;
                 return false; // Still waiting, do not advance sequence
             }
-            
+
             var activeGene = slot.activeInstance?.GetGene<ActiveGene>();
             if (activeGene == null)
             {
                 Debug.LogError($"Active gene instance at sequence position {runtimeState.currentPosition} has a null or invalid gene reference! Skipping slot.", this);
                 return true; // Skip invalid slot, advance sequence
             }
+
+            // === TASK 4/6: Pre-energy checks ===
+
+            // Build context early so trigger modifiers can use it
+            var context = new ActiveGeneContext
+            {
+                plant = plantGrowth,
+                activeInstance = slot.activeInstance,
+                modifiers = slot.modifierInstances,
+                payloads = slot.payloadInstances,
+                sequencePosition = runtimeState.currentPosition,
+                executor = this,
+                random = random
+            };
+
+            // Check requiresTarget BEFORE spending energy (Task 4)
+            if (activeGene.requiresTarget)
+            {
+                if (!TargetFinder.HasCreatureInRange(plantGrowth.transform.position, activeGene.targetRange))
+                {
+                    // No target — skip slot, advance sequence, don't spend energy
+                    return true;
+                }
+            }
+
+            // Check trigger-type modifiers BEFORE spending energy (Task 6)
+            foreach (var modInstance in slot.modifierInstances)
+            {
+                var modifierGene = modInstance?.GetGene<ModifierGene>();
+                if (modifierGene != null && modifierGene.modifierType == ModifierType.Trigger)
+                {
+                    if (!modifierGene.CheckTriggerCondition(context))
+                    {
+                        // Trigger condition not met — skip, advance, save energy
+                        return true;
+                    }
+                }
+            }
+
+            // === Energy check (original logic) ===
 
             float energyCost = slot.GetEnergyCost();
             var energySystem = plantGrowth.EnergySystem;
@@ -126,22 +166,17 @@ namespace Abracodabra.Genes
                 });
                 return false; // Not enough energy, do not advance sequence
             }
-            
-            // If we have reached this point, we will execute the gene.
+
             energySystem.SpendEnergy(energyCost);
             slot.isExecuting = true;
-            
-            var context = new ActiveGeneContext
-            {
-                plant = plantGrowth,
-                activeInstance = slot.activeInstance,
-                modifiers = slot.modifierInstances,
-                payloads = slot.payloadInstances,
-                sequencePosition = runtimeState.currentPosition,
-                executor = this,
-                random = random
-            };
 
+            // Reset effect_multiplier before modifiers apply (Overcharge reads/writes this)
+            if (slot.activeInstance != null)
+            {
+                slot.activeInstance.SetValue("effect_multiplier", 1f);
+            }
+
+            // Run modifier PreExecution (Overcharge sets effect_multiplier here)
             foreach (var modInstance in slot.modifierInstances)
             {
                 var modifierGene = modInstance?.GetGene<ModifierGene>();
@@ -154,13 +189,10 @@ namespace Abracodabra.Genes
                     Debug.LogWarning($"A modifier gene in the slot at position {runtimeState.currentPosition} is missing or invalid.", this);
                 }
             }
-            
-            // Check for delay and schedule it, otherwise execute immediately
+
             if (activeGene.executionDelayTicks > 0)
             {
                 slot.delayTicksRemaining = activeGene.executionDelayTicks;
-                // We still return true here because the action has *started* and energy has been spent.
-                // The delay check at the top of the method will handle the waiting period.
             }
             else
             {
@@ -170,7 +202,7 @@ namespace Abracodabra.Genes
             return true; // Execution successful, advance sequence
         }
 
-        private void PerformExecutionLogic(ActiveGene activeGene, ActiveGeneContext context, RuntimeSequenceSlot slot)
+        void PerformExecutionLogic(ActiveGene activeGene, ActiveGeneContext context, RuntimeSequenceSlot slot)
         {
             activeGene.Execute(context);
 
@@ -194,31 +226,30 @@ namespace Abracodabra.Genes
             StartCoroutine(ClearExecutionFlag(slot));
         }
 
-        // This small coroutine can remain as it's for a minor visual effect and doesn't affect game logic timing.
-        private IEnumerator ClearExecutionFlag(RuntimeSequenceSlot slot)
+        IEnumerator ClearExecutionFlag(RuntimeSequenceSlot slot)
         {
             yield return new WaitForSeconds(0.5f);
-            if(slot != null)
+            if (slot != null)
             {
                 slot.isExecuting = false;
             }
         }
 
-        private void OnSequenceComplete()
-        {
+        void OnSequenceComplete() {
             var energySystem = plantGrowth.EnergySystem;
 
-            eventBus?.Publish(new SequenceCompletedEvent
-            {
+            eventBus?.Publish(new SequenceCompletedEvent {
                 TotalSlotsExecuted = runtimeState.activeSequence.Count,
-                TotalEnergyUsed = (energySystem != null) ? (energySystem.MaxEnergy - energySystem.CurrentEnergy) : 0f
+                TotalEnergyUsed = (energySystem != null) ? energySystem.EnergySpentThisCycle : 0f
             });
+
+            // Reset the cycle tracker for the next sequence iteration
+            if (energySystem != null) {
+                energySystem.EnergySpentThisCycle = 0f;
+            }
 
             runtimeState.currentPosition = 0;
             runtimeState.rechargeTicksRemaining = runtimeState.template.baseRechargeTime;
         }
-
-        public void PauseExecution() { /* Deprecated */ }
-        public void ResumeExecution() { /* Deprecated */ }
     }
 }

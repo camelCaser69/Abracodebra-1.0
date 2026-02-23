@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/PlantSystem/Growth/PlantGrowth.cs
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using Abracodabra.Genes.Components;
 using WegoSystem;
 using Abracodabra.Genes.Templates;
@@ -6,9 +10,6 @@ using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Implementations;
 using Abracodabra.Genes.Services;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -19,7 +20,7 @@ namespace Abracodabra.Genes {
         Initializing,
         Growing,
         Mature,
-        Dead // Added for future HP impl
+        Dead
     }
 
     public class PlantGrowth : MonoBehaviour, ITickUpdateable {
@@ -67,13 +68,16 @@ namespace Abracodabra.Genes {
         [Header("Energy Logic")]
         [SerializeField] public bool rechargeEnergyDuringGrowth = false;
 
-        // Runtime Stats (Modified by Passives)
         [HideInInspector] public float growthSpeedMultiplier = 1f;
         [HideInInspector] public float energyGenerationMultiplier = 1f;
         [HideInInspector] public float energyStorageMultiplier = 1f;
         [HideInInspector] public float fruitYieldMultiplier = 1f;
+        [HideInInspector] public float defenseMultiplier = 1f;
 
-        // Growth Parameters (From Template)
+        [Header("Plant HP")]
+        public float maxHP = 50f;
+        [HideInInspector] public float currentHP;
+
         [HideInInspector] public float baseGrowthChance;
         [HideInInspector] public int minHeight;
         [HideInInspector] public int maxHeight;
@@ -82,7 +86,6 @@ namespace Abracodabra.Genes {
 
         public PlantState CurrentState { get; set; } = PlantState.Initializing;
 
-        // Tracks actual fruits currently on the plant
         HashSet<Vector2Int> activeFruitPositions = new HashSet<Vector2Int>();
         IDeterministicRandom _deterministicRandom;
 
@@ -141,6 +144,7 @@ namespace Abracodabra.Genes {
             CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
 
             CurrentState = PlantState.Initializing;
+            currentHP = maxHP;
 
             StartCoroutine(DelayedGrowthStart());
 
@@ -212,10 +216,6 @@ namespace Abracodabra.Genes {
             CellManager?.ReportCellDestroyed(eatenCell.GridCoord);
         }
 
-        /// <summary>
-        /// Registers a position as occupied by a fruit. 
-        /// Called by CellManager or Fruit genes when a fruit is successfully created.
-        /// </summary>
         public void RegisterFruitPosition(Vector2Int coord) {
             if (!activeFruitPositions.Contains(coord)) {
                 activeFruitPositions.Add(coord);
@@ -238,19 +238,15 @@ namespace Abracodabra.Genes {
             List<Vector2Int> sourcePositions = GetFruitSourcePositions();
             HashSet<Vector2Int> emptyPositions = FindEmptyPositionsAround(sourcePositions);
 
-            // Filter out positions that already have fruit or were marked blocked
             var availablePositions = emptyPositions.Where(pos => !activeFruitPositions.Contains(pos)).ToList();
 
             foreach (Vector2Int emptyPos in availablePositions) {
                 GameObject tempSpawnPoint = CreateTemporarySpawnPoint(emptyPos);
                 if (tempSpawnPoint != null) {
                     spawnPoints.Add(tempSpawnPoint.transform);
-                    // FIXED: Do NOT add to activeFruitPositions here. 
-                    // Wait for the gene to actually spawn the fruit and call RegisterFruitPosition.
                 }
             }
 
-            // Cleanup markers after a short delay (enough time for the gene to use them)
             if (spawnPoints.Count > 0) {
                 StartCoroutine(CleanupTemporarySpawnPoints(spawnPoints, 0.1f));
             }
@@ -329,7 +325,6 @@ namespace Abracodabra.Genes {
             if (CellManager == null) return harvestedItems;
 
             var fruitGameObjects = new List<GameObject>();
-            // Find all fruit cells
             foreach (var cell in CellManager.cells) {
                 if (cell.Value == PlantCellType.Fruit) {
                     var fruitGO = GetCellGameObjectAt(cell.Key);
@@ -349,11 +344,10 @@ namespace Abracodabra.Genes {
                     harvestedItems.Add(new HarvestedItem(
                         fruitComponent.RepresentingItemDefinition,
                         fruitComponent.DynamicProperties,
-                        fruitComponent.PayloadGeneInstances // Preserving payloads
+                        fruitComponent.PayloadGeneInstances
                     ));
                 }
 
-                // Destroying the GameObject will trigger OnDestroy -> ReportCellDestroyed -> clears activeFruitPositions
                 Destroy(fruitGO);
             }
 
@@ -361,14 +355,98 @@ namespace Abracodabra.Genes {
             return harvestedItems;
         }
 
-#if UNITY_EDITOR
+        public void TakeDamage(float amount) {
+            if (CurrentState == PlantState.Dead) return;
+
+            // Apply defense reduction: defenseMultiplier 1.3 = 30% damage reduction
+            float reduction = Mathf.Clamp01(defenseMultiplier - 1f);
+            float finalDamage = amount * (1f - reduction);
+
+            currentHP -= finalDamage;
+            currentHP = Mathf.Max(0f, currentHP);
+
+            // Visual: brief red flash
+            StartCoroutine(DamageFlash());
+
+            if (currentHP <= 0f) {
+                Die();
+            }
+        }
+
+        private System.Collections.IEnumerator DamageFlash() {
+            var renderers = GetComponentsInChildren<SpriteRenderer>();
+            var originalColors = new Color[renderers.Length];
+
+            for (int i = 0; i < renderers.Length; i++) {
+                originalColors[i] = renderers[i].color;
+                renderers[i].color = Color.red;
+            }
+
+            yield return new WaitForSeconds(0.15f);
+
+            for (int i = 0; i < renderers.Length; i++) {
+                if (renderers[i] != null)
+                    renderers[i].color = originalColors[i];
+            }
+        }
+
+        public void Die() {
+            if (CurrentState == PlantState.Dead) return;
+
+            CurrentState = PlantState.Dead;
+            Debug.Log($"[PlantGrowth] Plant '{gameObject.name}' has died!");
+
+            // Unregister from tick system
+            if (TickManager.Instance != null) {
+                TickManager.Instance.UnregisterTickUpdateable(this);
+            }
+
+            AllActivePlants.Remove(this);
+
+            // Death visual: shrink and fade
+            StartCoroutine(DeathAnimation());
+        }
+
+        private System.Collections.IEnumerator DeathAnimation() {
+            float duration = 0.5f;
+            float elapsed = 0f;
+            Vector3 startScale = transform.localScale;
+
+            var renderers = GetComponentsInChildren<SpriteRenderer>();
+
+            while (elapsed < duration) {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+
+                // Shrink Y scale
+                transform.localScale = new Vector3(
+                    startScale.x,
+                    Mathf.Lerp(startScale.y, 0f, t),
+                    startScale.z
+                );
+
+                // Fade out
+                foreach (var r in renderers) {
+                    if (r != null) {
+                        Color c = r.color;
+                        c.a = Mathf.Lerp(1f, 0f, t);
+                        r.color = c;
+                    }
+                }
+
+                yield return null;
+            }
+
+            Destroy(gameObject);
+        }
+
+        #if UNITY_EDITOR
         void OnDrawGizmos() {
             if (!Application.isPlaying) return;
             if (CellManager == null || CellManager.cells == null) return;
 
             float spacing = GetCellWorldSpacing();
 
-            // Draw Cells
             foreach (var cell in CellManager.cells) {
                 Vector2 cellWorldPos = (Vector2)transform.position + (Vector2)cell.Key * spacing;
 
@@ -384,13 +462,11 @@ namespace Abracodabra.Genes {
                 Gizmos.DrawWireCube(cellWorldPos, Vector3.one * spacing);
             }
 
-            // Draw Tile Base
             Gizmos.color = new Color(0, 1, 1, 0.2f);
             Vector3Int tilePos = GridPositionManager.Instance?.WorldToGrid(transform.position).ToVector3Int() ?? Vector3Int.zero;
             Vector3 tileWorldPos = GridPositionManager.Instance?.GridToWorld(new GridPosition(tilePos)) ?? transform.position;
             Gizmos.DrawWireCube(tileWorldPos, Vector3.one * 1f);
 
-            // Draw Info Label
             Handles.Label(
                 transform.position + Vector3.up * (maxHeight + 1) * spacing,
                 $"Cell Spacing: {spacing:F4} wu\nPPU: {(ResolutionManager.HasInstance ? ResolutionManager.Instance.CurrentPPU.ToString() : "Unknown")}\nTile Aligned: {Mathf.Approximately(spacing, 1f)}\nEnergy: {(EnergySystem != null ? EnergySystem.CurrentEnergy : 0):F0}"
@@ -417,6 +493,6 @@ namespace Abracodabra.Genes {
                 Gizmos.DrawWireCube(worldPos, Vector3.one * spacing * 0.5f);
             }
         }
-#endif
+        #endif
     }
 }

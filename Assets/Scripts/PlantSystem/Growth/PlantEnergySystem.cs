@@ -1,30 +1,28 @@
-﻿using Abracodabra.Genes;
+﻿// FILE: Assets/Scripts/PlantSystem/Growth/PlantEnergySystem.cs
 using UnityEngine;
+using Abracodabra.Genes;
 using WegoSystem;
 
-public class PlantEnergySystem
-{
-    private readonly PlantGrowth plant;
+public class PlantEnergySystem {
+    readonly PlantGrowth plant;
 
     public float CurrentEnergy { get; set; }
     public float MaxEnergy { get; set; }
     public float BaseEnergyPerLeaf { get; set; } // Base rate from template
+    
+    // Tracks energy usage per cycle to inform metrics/events
+    public float EnergySpentThisCycle { get; set; }
 
-    private readonly FireflyManager fireflyManagerInstance;
+    readonly FireflyManager fireflyManagerInstance;
 
-    public PlantEnergySystem(PlantGrowth plant)
-    {
+    public PlantEnergySystem(PlantGrowth plant) {
         this.plant = plant;
         this.fireflyManagerInstance = FireflyManager.Instance;
     }
 
-    public void OnTickUpdate()
-    {
-        // Redundant safety check: Don't do anything if the plant is still growing (unless overridden).
-        // The primary logic is in PlantGrowth, but this makes this class more robust.
-        if (plant.CurrentState == PlantState.Growing && 
-            plant.gameObject.GetComponent<PlantGrowth>()?.rechargeEnergyDuringGrowth == false)
-        {
+    public void OnTickUpdate() {
+        if (plant.CurrentState == PlantState.Growing &&
+            plant.gameObject.GetComponent<PlantGrowth>()?.rechargeEnergyDuringGrowth == false) {
             return;
         }
 
@@ -36,8 +34,7 @@ public class PlantEnergySystem
         float sunlight = (WeatherManager.Instance != null) ? WeatherManager.Instance.sunIntensity : 1f;
 
         float fireflyBonusRate = 0f;
-        if (fireflyManagerInstance != null && fireflyManagerInstance.isActiveAndEnabled)
-        {
+        if (fireflyManagerInstance != null && fireflyManagerInstance.isActiveAndEnabled) {
             int nearbyFlyCount = fireflyManagerInstance.GetNearbyFireflyCount(plant.transform.position, fireflyManagerInstance.photosynthesisRadius);
             fireflyBonusRate = Mathf.Min(
                 nearbyFlyCount * fireflyManagerInstance.photosynthesisIntensityPerFly,
@@ -52,18 +49,16 @@ public class PlantEnergySystem
         CurrentEnergy = UnityEngine.Mathf.Clamp(CurrentEnergy + energyThisTick, 0f, MaxEnergy);
     }
 
-    public void SpendEnergy(float amount)
-    {
+    public void SpendEnergy(float amount) {
         CurrentEnergy = UnityEngine.Mathf.Max(0f, CurrentEnergy - amount);
+        EnergySpentThisCycle += amount;
     }
 
-    public void AddEnergy(float amount)
-    {
+    public void AddEnergy(float amount) {
         CurrentEnergy = UnityEngine.Mathf.Clamp(CurrentEnergy + amount, 0f, MaxEnergy);
     }
 
-    public bool HasEnergy(float amount)
-    {
+    public bool HasEnergy(float amount) {
         return CurrentEnergy >= amount;
     }
 }

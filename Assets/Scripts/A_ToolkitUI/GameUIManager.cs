@@ -789,10 +789,14 @@ namespace Abracodabra.UI.Toolkit
             RefreshHotbar();
         }
 
-        void HandleGeneEditorInternalMove(GeneBase gene, int fromIndex, string fromType, int toIndex, string toType)
-        {
-            if (!CanGeneGoInSlot(gene, toType))
-            {
+        void HandleGeneEditorInternalMove(GeneBase gene, int fromIndex, string fromType, int toIndex, string toType) {
+            // TASK 7.2: Block gene editing during Growth phase
+            if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.Planning) {
+                Debug.Log("[GameUIManager] Cannot edit genes outside Planning phase.");
+                return;
+            }
+
+            if (!CanGeneGoInSlot(gene, toType)) {
                 Debug.Log($"[GameUIManager] Cannot move {gene.Category} gene to {toType} slot");
                 return;
             }
@@ -801,28 +805,23 @@ namespace Abracodabra.UI.Toolkit
 
             seedEditorController.RemoveGeneFromSlot(fromIndex, fromType);
 
-            if (destinationGene != null)
-            {
-                if (CanGeneGoInSlot(destinationGene, fromType))
-                {
+            if (destinationGene != null) {
+                if (CanGeneGoInSlot(destinationGene, fromType)) {
                     seedEditorController.AddGeneToSlot(gene, toIndex, toType);
                     seedEditorController.AddGeneToSlot(destinationGene, fromIndex, fromType);
                     Debug.Log($"[GameUIManager] Swapped {gene.geneName} with {destinationGene.geneName}");
                 }
-                else
-                {
+                else {
                     seedEditorController.AddGeneToSlot(gene, toIndex, toType);
 
                     int emptySlot = playerInventory.FindIndex(item => item == null);
-                    if (emptySlot >= 0)
-                    {
+                    if (emptySlot >= 0) {
                         playerInventory[emptySlot] = new UIInventoryItem(destinationGene);
                         inventoryController.RefreshVisuals();
                         RefreshHotbar();
                         Debug.Log($"[GameUIManager] Moved {gene.geneName} to {toType} slot, {destinationGene.geneName} to inventory");
                     }
-                    else
-                    {
+                    else {
                         seedEditorController.RemoveGeneFromSlot(toIndex, toType);
                         seedEditorController.AddGeneToSlot(destinationGene, toIndex, toType);
                         seedEditorController.AddGeneToSlot(gene, fromIndex, fromType);
@@ -830,8 +829,7 @@ namespace Abracodabra.UI.Toolkit
                     }
                 }
             }
-            else
-            {
+            else {
                 seedEditorController.AddGeneToSlot(gene, toIndex, toType);
                 Debug.Log($"[GameUIManager] Moved {gene.geneName} from {fromType}[{fromIndex}] to {toType}[{toIndex}]");
             }
@@ -862,16 +860,20 @@ namespace Abracodabra.UI.Toolkit
             Debug.Log($"[GameUIManager] Swapped inventory slots {from} and {to}");
         }
 
-        void HandleGeneDrop(int inventoryIndex, VisualElement targetSlot, string slotType)
-        {
+        void HandleGeneDrop(int inventoryIndex, VisualElement targetSlot, string slotType) {
+            // TASK 7.2: Block gene editing during Growth phase
+            if (RunManager.Instance != null && RunManager.Instance.CurrentState != RunState.Planning) {
+                Debug.Log("[GameUIManager] Cannot edit genes outside Planning phase.");
+                return;
+            }
+
             var item = playerInventory[inventoryIndex];
             if (item == null) return;
 
             GeneBase gene = item.OriginalData as GeneBase;
             if (gene == null) return;
 
-            if (!CanGeneGoInSlot(gene, slotType))
-            {
+            if (!CanGeneGoInSlot(gene, slotType)) {
                 Debug.Log($"[GameUIManager] Cannot place {gene.Category} gene in {slotType} slot");
                 return;
             }
@@ -883,12 +885,10 @@ namespace Abracodabra.UI.Toolkit
 
             seedEditorController.AddGeneToSlot(gene, slotIndex, slotType);
 
-            if (existingGene != null)
-            {
+            if (existingGene != null) {
                 playerInventory[inventoryIndex] = new UIInventoryItem(existingGene);
             }
-            else
-            {
+            else {
                 playerInventory[inventoryIndex] = null;
             }
 
