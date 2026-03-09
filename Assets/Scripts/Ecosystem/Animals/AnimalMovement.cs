@@ -1,10 +1,12 @@
-﻿using UnityEngine;
-using WegoSystem;
-using Abracodabra.Genes; 
+﻿// REWORKED FILE: Assets/Scripts/Ecosystem/Animals/AnimalMovement.cs
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using WegoSystem;
+using Abracodabra.Genes;
 
-public class AnimalMovement : MonoBehaviour {
+public class AnimalMovement : MonoBehaviour
+{
     [SerializeField] bool showPathfindingDebugLine = false;
 
     AnimalController controller;
@@ -15,6 +17,7 @@ public class AnimalMovement : MonoBehaviour {
     List<GridPosition> currentPath = new List<GridPosition>();
     int currentPathIndex = 0;
     GameObject currentTargetFood = null;
+    PlantGrowth currentTargetPlant = null;   // TASK 8: pest plant target
     bool hasPlannedAction = false;
     int wanderPauseTicks = 0;
     int lastThinkTick = 0;
@@ -27,10 +30,11 @@ public class AnimalMovement : MonoBehaviour {
     Vector2 lastMoveDirection;
     float _speedAccumulator = 0f;
 
-    public bool HasTarget => currentTargetFood != null || hasPlannedAction;
+    public bool HasTarget => currentTargetFood != null || currentTargetPlant != null || hasPlannedAction;
     public GameObject CurrentTargetFood => currentTargetFood;
 
-    public void Initialize(AnimalController controller, AnimalDefinition definition) {
+    public void Initialize(AnimalController controller, AnimalDefinition definition)
+    {
         this.controller = controller;
         this.definition = definition;
         this.gridEntity = controller.GridEntity;
@@ -38,83 +42,214 @@ public class AnimalMovement : MonoBehaviour {
         SetupDebugLineRenderer();
     }
 
-    public void OnTickUpdate(int currentTick) {
-        if (!enabled || controller.IsDying || controller.Behavior.IsEating || controller.Behavior.IsPooping) {
-            _speedAccumulator = 0f; // Reset speed if action is interrupted
+    public void OnTickUpdate(int currentTick)
+    {
+        if (!enabled || controller.IsDying || controller.Behavior.IsEating || controller.Behavior.IsPooping)
+        {
+            _speedAccumulator = 0f;
             return;
         }
 
-        if (wanderPauseTicks > 0) {
+        if (wanderPauseTicks > 0)
+        {
             wanderPauseTicks--;
             return;
         }
 
-        // ✅ MODIFIED: Apply status effect slow logic
-        // If AdditionalMoveTicks > 0 (e.g. Slow effect), we divide speed.
-        // Example: Base MoveCost=1. Slow adds +2 ticks. Total cost = 3. Speed becomes 1/3rd.
         int slowPenalty = controller.StatusManager != null ? controller.StatusManager.AdditionalMoveTicks : 0;
-        
-        // Base movement cost is conceptually 1 tick per tile at speed 1.0.
-        // We simulate "increased tick cost" by reducing the speed accumulator.
         float effectiveSpeed = definition.movementSpeed / (1f + slowPenalty);
-
         _speedAccumulator += effectiveSpeed;
 
-        if (currentTick - lastThinkTick >= definition.thinkingTickInterval) {
+        if (currentTick - lastThinkTick >= definition.thinkingTickInterval)
+        {
             MakeMovementDecision();
             lastThinkTick = currentTick;
         }
 
-        if (hasPlannedAction && !gridEntity.IsMoving) {
+        if (hasPlannedAction && !gridEntity.IsMoving)
+        {
             ExecutePlannedMovement();
         }
     }
 
-    public void UpdateVisuals() {
+    public void UpdateVisuals()
+    {
         UpdatePathDebugLine();
     }
 
-    void MakeMovementDecision() {
+    void MakeMovementDecision()
+    {
         if (gridEntity.IsMoving) return;
 
-        if (isSeekingScreenCenter) {
+        if (isSeekingScreenCenter)
+        {
             HandleScreenCenterSeeking();
             return;
         }
 
-        if (controller.Needs.IsHungry) {
+        // ── TASK 8: Pests seek plants instead of food ──
+        if (definition.isPest)
+        {
+            PlanPlantTargeting();
+            return;
+        }
+
+        if (controller.Needs.IsHungry)
+        {
             PlanFoodSeeking();
         }
-        else {
+        else
+        {
             PlanWandering();
         }
     }
 
-    void PlanFoodSeeking() {
-        if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild) {
+    // ──────────────────────────────────────────────────────────
+    // TASK 8: Pest plant targeting
+    // ──────────────────────────────────────────────────────────
+
+    void PlanPlantTargeting()
+    {
+        // If our current target was destroyed, clear it
+        if (currentTargetPlant != null && (currentTargetPlant == null || currentTargetPlant.CurrentState == PlantState.Dead))
+        {
+            currentTargetPlant = null;
+            ClearMovementPlan();
+        }
+
+        // Find nearest mature plant if we don't have a target
+        if (currentTargetPlant == null)
+        {
+            currentTargetPlant = FindNearestMaturePlant();
+        }
+
+        if (currentTargetPlant == null)
+        {
+            // No plants — wander
+            PlanWandering();
+            return;
+        }
+
+        // Path toward a tile adjacent to the plant
+        GridPosition plantPos = GetPlantGridPosition(currentTargetPlant);
+        GridPosition bestTarget = GridPosition.Zero;
+        List<GridPosition> shortestPath = null;
+        float shortestDist = float.MaxValue;
+
+        // Try all 4 adjacent tiles
+        GridPosition[] neighbors = {
+            plantPos + GridPosition.Up,
+            plantPos + GridPosition.Down,
+            plantPos + GridPosition.Left,
+            plantPos + GridPosition.Right
+        };
+
+        foreach (var pos in neighbors)
+        {
+            if (!IsValidMoveForPest(pos)) continue;
+
+            // Already adjacent — stop moving
+            if (gridEntity.Position == pos)
+            {
+                hasPlannedAction = false;
+                currentPath.Clear();
+                return;
+            }
+
+            var path = GridPositionManager.Instance.GetPath(gridEntity.Position, pos, false);
+            if (path != null && path.Count > 0 && path.Count < shortestDist)
+            {
+                shortestDist = path.Count;
+                bestTarget = pos;
+                shortestPath = path;
+            }
+        }
+
+        if (shortestPath != null)
+        {
+            currentPath = shortestPath;
+            currentPathIndex = 0;
+            hasPlannedAction = true;
+        }
+        else
+        {
+            // Can't reach any adjacent tile, wander
+            PlanWandering();
+        }
+    }
+
+    PlantGrowth FindNearestMaturePlant()
+    {
+        PlantGrowth nearest = null;
+        float nearestDist = float.MaxValue;
+
+        foreach (var plant in PlantGrowth.AllActivePlants)
+        {
+            if (plant == null) continue;
+            if (plant.CurrentState != PlantState.Mature) continue;
+
+            float dist = Vector3.Distance(transform.position, plant.transform.position);
+            if (dist < nearestDist)
+            {
+                nearestDist = dist;
+                nearest = plant;
+            }
+        }
+
+        return nearest;
+    }
+
+    GridPosition GetPlantGridPosition(PlantGrowth plant)
+    {
+        var ge = plant.GetComponent<GridEntity>();
+        if (ge != null) return ge.Position;
+        return GridPositionManager.Instance.WorldToGrid(plant.transform.position);
+    }
+
+    // Pests can walk on most tiles but not through walls — allow moving beside plants
+    bool IsValidMoveForPest(GridPosition pos)
+    {
+        if (GridPositionManager.Instance == null) return false;
+        if (!GridPositionManager.Instance.IsPositionValid(pos)) return false;
+        if (GridPositionManager.Instance.IsMovementBlockedAt(pos)) return false;
+        return true;
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Normal animal food seeking (unchanged)
+    // ──────────────────────────────────────────────────────────
+
+    void PlanFoodSeeking()
+    {
+        if (GridDebugVisualizer.Instance != null && Debug.isDebugBuild)
+        {
             GridDebugVisualizer.Instance.VisualizeAnimalSearchRadius(controller, gridEntity.Position, definition.searchRadiusTiles);
         }
 
-        if (controller.CanShowThought()) {
+        if (controller.CanShowThought())
+        {
             controller.ShowThought(ThoughtTrigger.Hungry);
         }
 
         GameObject nearestFood = FindNearestFood();
-        if (nearestFood != null) {
+        if (nearestFood != null)
+        {
             SetTargetFood(nearestFood);
         }
-        else {
+        else
+        {
             PlanWandering();
         }
     }
 
-    GameObject FindNearestFood() {
+    GameObject FindNearestFood()
+    {
         if (definition.diet == null) return null;
 
         var entitiesInRadius = GridPositionManager.Instance.GetEntitiesInRadius(
             gridEntity.Position,
             definition.searchRadiusTiles,
-            true // Use circle radius
+            true
         );
 
         GameObject bestFood = null;
@@ -124,7 +259,8 @@ public class AnimalMovement : MonoBehaviour {
             .Select(entity => entity.GetComponent<FoodItem>())
             .Where(foodItem => foodItem != null && foodItem.foodType != null && definition.diet.CanEat(foodItem.foodType));
 
-        foreach (var foodItem in foodItems) {
+        foreach (var foodItem in foodItems)
+        {
             var pref = definition.diet.GetPreference(foodItem.foodType);
             if (pref == null) continue;
 
@@ -134,7 +270,8 @@ public class AnimalMovement : MonoBehaviour {
             float distance = gridEntity.Position.ManhattanDistance(foodEntity.Position);
             float score = pref.preferencePriority / (1f + distance);
 
-            if (score > bestScore) {
+            if (score > bestScore)
+            {
                 bestScore = score;
                 bestFood = foodItem.gameObject;
             }
@@ -143,9 +280,11 @@ public class AnimalMovement : MonoBehaviour {
         return bestFood;
     }
 
-    GridPosition GetFoodGroundPosition(GameObject food) {
+    GridPosition GetFoodGroundPosition(GameObject food)
+    {
         GridEntity foodEntity = food.GetComponent<GridEntity>();
-        if (foodEntity != null && foodEntity.enabled) {
+        if (foodEntity != null && foodEntity.enabled)
+        {
             return foodEntity.Position;
         }
 
@@ -153,7 +292,8 @@ public class AnimalMovement : MonoBehaviour {
         return GridPositionManager.Instance.WorldToGrid(food.transform.position);
     }
 
-    void SetTargetFood(GameObject food) {
+    void SetTargetFood(GameObject food)
+    {
         currentTargetFood = food;
         GridPosition foodGroundPos = GetFoodGroundPosition(food);
 
@@ -163,13 +303,16 @@ public class AnimalMovement : MonoBehaviour {
         float shortestDistance = float.MaxValue;
         List<GridPosition> shortestPath = null;
 
-        foreach (var pos in validEatingPositions) {
+        foreach (var pos in validEatingPositions)
+        {
             if (!IsValidMove(pos)) continue;
 
             var path = GridPositionManager.Instance.GetPath(gridEntity.Position, pos, false);
-            if (path != null && path.Count > 0) {
+            if (path != null && path.Count > 0)
+            {
                 float distance = path.Count;
-                if (distance < shortestDistance) {
+                if (distance < shortestDistance)
+                {
                     shortestDistance = distance;
                     bestTarget = pos;
                     shortestPath = path;
@@ -177,24 +320,30 @@ public class AnimalMovement : MonoBehaviour {
             }
         }
 
-        if (shortestPath != null) {
+        if (shortestPath != null)
+        {
             currentPath = shortestPath;
             currentPathIndex = 0;
             hasPlannedAction = true;
         }
-        else {
+        else
+        {
             currentTargetFood = null;
         }
     }
 
-    List<GridPosition> GetValidEatingPositions(GridPosition foodPos) {
+    List<GridPosition> GetValidEatingPositions(GridPosition foodPos)
+    {
         var positions = new List<GridPosition>();
-        for (int x = -definition.eatDistanceTiles; x <= definition.eatDistanceTiles; x++) {
-            for (int y = -definition.eatDistanceTiles; y <= definition.eatDistanceTiles; y++) {
-                if (x == 0 && y == 0) continue; // Skip the food's own position
+        for (int x = -definition.eatDistanceTiles; x <= definition.eatDistanceTiles; x++)
+        {
+            for (int y = -definition.eatDistanceTiles; y <= definition.eatDistanceTiles; y++)
+            {
+                if (x == 0 && y == 0) continue;
 
                 int distance = Mathf.Abs(x) + Mathf.Abs(y);
-                if (distance == definition.eatDistanceTiles) {
+                if (distance == definition.eatDistanceTiles)
+                {
                     positions.Add(foodPos + new GridPosition(x, y));
                 }
             }
@@ -202,16 +351,20 @@ public class AnimalMovement : MonoBehaviour {
         return positions;
     }
 
-    void PlanWandering() {
-        if (GridDebugVisualizer.Instance != null) {
+    void PlanWandering()
+    {
+        if (GridDebugVisualizer.Instance != null)
+        {
             GridDebugVisualizer.Instance.HideContinuousRadius(controller);
         }
         ClearPathDebugLine();
 
         currentPath.Clear();
         currentTargetFood = null;
+        currentTargetPlant = null;
 
-        if (Random.Range(0, 100) < definition.wanderPauseTickChance) {
+        if (Random.Range(0, 100) < definition.wanderPauseTickChance)
+        {
             wanderPauseTicks = Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
             hasPlannedAction = false;
             return;
@@ -223,16 +376,19 @@ public class AnimalMovement : MonoBehaviour {
             GridPosition.Left, GridPosition.Right
         };
 
-        for (int i = 0; i < directions.Length; i++) {
+        for (int i = 0; i < directions.Length; i++)
+        {
             int randomIndex = Random.Range(i, directions.Length);
             GridPosition temp = directions[i];
             directions[i] = directions[randomIndex];
             directions[randomIndex] = temp;
         }
 
-        foreach (var dir in directions) {
+        foreach (var dir in directions)
+        {
             GridPosition targetPos = currentPos + dir;
-            if (IsValidMove(targetPos)) {
+            if (IsValidMove(targetPos))
+            {
                 currentPath.Clear();
                 currentPath.Add(targetPos);
                 currentPathIndex = 0;
@@ -244,11 +400,14 @@ public class AnimalMovement : MonoBehaviour {
         hasPlannedAction = false;
     }
 
-    void ExecutePlannedMovement() {
+    void ExecutePlannedMovement()
+    {
         if (!hasPlannedAction || gridEntity.IsMoving) return;
 
-        if (currentTargetFood != null) {
-            if (currentTargetFood == null || !currentTargetFood.activeInHierarchy) {
+        if (currentTargetFood != null)
+        {
+            if (!currentTargetFood.activeInHierarchy)
+            {
                 ClearMovementPlan();
                 return;
             }
@@ -256,9 +415,23 @@ public class AnimalMovement : MonoBehaviour {
             GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
             int distance = gridEntity.Position.ManhattanDistance(foodPos);
 
-            if (distance == definition.eatDistanceTiles) {
+            if (distance == definition.eatDistanceTiles)
+            {
                 controller.Behavior.StartEating(currentTargetFood);
                 ClearMovementPlan();
+                return;
+            }
+        }
+
+        // If pest reached adjacent to plant, stop movement
+        if (definition.isPest && currentTargetPlant != null)
+        {
+            GridPosition plantPos = GetPlantGridPosition(currentTargetPlant);
+            int dist = gridEntity.Position.ManhattanDistance(plantPos);
+            if (dist <= 1)
+            {
+                hasPlannedAction = false;
+                currentPath.Clear();
                 return;
             }
         }
@@ -267,22 +440,28 @@ public class AnimalMovement : MonoBehaviour {
         if (tilesToMove <= 0) return;
 
         int tilesMovedSuccessfully = 0;
-        for (int i = 0; i < tilesToMove; i++) {
-            if (currentPath == null || currentPathIndex >= currentPath.Count) {
+        for (int i = 0; i < tilesToMove; i++)
+        {
+            if (currentPath == null || currentPathIndex >= currentPath.Count)
+            {
                 ClearMovementPlan();
                 break;
             }
 
             GridPosition nextPosition = currentPath[currentPathIndex];
-            if (TryMoveTo(nextPosition)) {
+            if (TryMoveTo(nextPosition))
+            {
                 currentPathIndex++;
                 tilesMovedSuccessfully++;
             }
-            else {
-                if (currentTargetFood != null) {
+            else
+            {
+                if (currentTargetFood != null)
+                {
                     SetTargetFood(currentTargetFood);
                 }
-                else {
+                else
+                {
                     ClearMovementPlan();
                 }
                 break;
@@ -291,14 +470,16 @@ public class AnimalMovement : MonoBehaviour {
 
         _speedAccumulator -= tilesMovedSuccessfully;
 
-        if (currentPath != null && currentPathIndex >= currentPath.Count) {
+        if (currentPath != null && currentPathIndex >= currentPath.Count)
+        {
             ClearMovementPlan();
         }
     }
 
-    bool TryMoveTo(GridPosition targetPos) {
-        if (!IsValidMove(targetPos))
-            return false;
+    bool TryMoveTo(GridPosition targetPos)
+    {
+        bool valid = definition.isPest ? IsValidMoveForPest(targetPos) : IsValidMove(targetPos);
+        if (!valid) return false;
 
         Vector3 currentWorld = transform.position;
         Vector3 targetWorld = GridPositionManager.Instance.GridToWorld(targetPos);
@@ -308,20 +489,24 @@ public class AnimalMovement : MonoBehaviour {
         return true;
     }
 
-    bool IsValidMove(GridPosition pos) {
+    bool IsValidMove(GridPosition pos)
+    {
         if (GridPositionManager.Instance == null) return false;
-
         if (!GridPositionManager.Instance.IsPositionValid(pos)) return false;
 
         var entitiesAtPos = GridPositionManager.Instance.GetEntitiesAt(pos);
-        foreach (var entity in entitiesAtPos) {
-            if (entity.GetComponent<PlantCell>() != null) {
+        foreach (var entity in entitiesAtPos)
+        {
+            if (entity.GetComponent<PlantCell>() != null)
+            {
                 return false;
             }
         }
 
-        if (GridPositionManager.Instance.IsMovementBlockedAt(pos)) {
-            if (currentTargetFood != null) {
+        if (GridPositionManager.Instance.IsMovementBlockedAt(pos))
+        {
+            if (currentTargetFood != null)
+            {
                 GridPosition foodPos = GetFoodGroundPosition(currentTargetFood);
                 if (pos == foodPos) return false;
             }
@@ -331,16 +516,19 @@ public class AnimalMovement : MonoBehaviour {
         return true;
     }
 
-    void HandleScreenCenterSeeking() {
+    void HandleScreenCenterSeeking()
+    {
         Vector2 currentPos = transform.position;
         bool centerWithinBounds = currentPos.x >= minBounds.x && currentPos.x <= maxBounds.x &&
                                   currentPos.y >= minBounds.y && currentPos.y <= maxBounds.y;
 
-        if (centerWithinBounds) {
+        if (centerWithinBounds)
+        {
             isSeekingScreenCenter = false;
             hasPlannedAction = false;
         }
-        else {
+        else
+        {
             GridPosition targetGridPos = GridPositionManager.Instance.WorldToGrid(screenCenterTarget);
             currentPath = GridPositionManager.Instance.GetPath(gridEntity.Position, targetGridPos, false);
             currentPathIndex = 0;
@@ -348,37 +536,44 @@ public class AnimalMovement : MonoBehaviour {
         }
     }
 
-    public void SetSeekingScreenCenter(Vector2 target, Vector2 minBounds, Vector2 maxBounds) {
+    public void SetSeekingScreenCenter(Vector2 target, Vector2 minBounds, Vector2 maxBounds)
+    {
         isSeekingScreenCenter = true;
         screenCenterTarget = target;
         this.minBounds = minBounds;
         this.maxBounds = maxBounds;
     }
 
-    public void StopAllMovement() {
+    public void StopAllMovement()
+    {
         ClearMovementPlan();
         wanderPauseTicks = 0;
         isSeekingScreenCenter = false;
     }
 
-    public void ClearMovementPlan() {
+    public void ClearMovementPlan()
+    {
         currentPath.Clear();
         currentPathIndex = 0;
         currentTargetFood = null;
+        currentTargetPlant = null;
         hasPlannedAction = false;
         _speedAccumulator = 0f;
         ClearPathDebugLine();
 
-        if (GridDebugVisualizer.Instance != null) {
+        if (GridDebugVisualizer.Instance != null)
+        {
             GridDebugVisualizer.Instance.HideContinuousRadius(controller);
         }
     }
 
-    public Vector2 GetLastMoveDirection() {
+    public Vector2 GetLastMoveDirection()
+    {
         return lastMoveDirection;
     }
 
-    void SetupDebugLineRenderer() {
+    void SetupDebugLineRenderer()
+    {
         if (!showPathfindingDebugLine) return;
 
         GameObject lineObj = new GameObject("PathDebugLine");
@@ -392,8 +587,10 @@ public class AnimalMovement : MonoBehaviour {
         pathDebugLine.sortingOrder = 100;
     }
 
-    void UpdatePathDebugLine() {
-        if (!showPathfindingDebugLine || pathDebugLine == null || currentPath == null || currentPath.Count == 0) {
+    void UpdatePathDebugLine()
+    {
+        if (!showPathfindingDebugLine || pathDebugLine == null || currentPath == null || currentPath.Count == 0)
+        {
             if (pathDebugLine != null) pathDebugLine.positionCount = 0;
             return;
         }
@@ -403,7 +600,8 @@ public class AnimalMovement : MonoBehaviour {
         Vector3 groundPosition = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
         positions.Add(groundPosition);
 
-        for (int i = currentPathIndex; i < currentPath.Count; i++) {
+        for (int i = currentPathIndex; i < currentPath.Count; i++)
+        {
             Vector3 worldPos = GridPositionManager.Instance.GridToWorld(currentPath[i]);
             positions.Add(worldPos);
         }
@@ -412,8 +610,10 @@ public class AnimalMovement : MonoBehaviour {
         pathDebugLine.SetPositions(positions.ToArray());
     }
 
-    void ClearPathDebugLine() {
-        if (pathDebugLine != null) {
+    void ClearPathDebugLine()
+    {
+        if (pathDebugLine != null)
+        {
             pathDebugLine.positionCount = 0;
         }
     }

@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿// Assets/Scripts/Ecosystem/Animals/AnimalDefinition.cs
 using System.Collections.Generic;
+using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewAnimalDefinition", menuName = "Ecosystem/Animal Definition")]
+[CreateAssetMenu(fileName = "AnimalDefinition", menuName = "Abracodabra/Animal Definition")]
 public class AnimalDefinition : ScriptableObject
 {
     public string animalName = "DefaultAnimal";
@@ -44,6 +45,23 @@ public class AnimalDefinition : ScriptableObject
     public List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
     public List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
+    // ──────────────────────────────────────────────────────────
+    // TASK 8: Pest combat fields
+    // ──────────────────────────────────────────────────────────
+
+    [Header("Pest / Combat")]
+    [Tooltip("If true, this animal will seek and attack plants during waves.")]
+    public bool isPest = false;
+
+    [Tooltip("Damage dealt to a plant each tick while adjacent to it.")]
+    public float attackDamage = 5f;
+
+    [Tooltip("Tiles within which a pest will start dealing damage to a plant.")]
+    public float attackRangeTiles = 1.5f;
+
+    [Tooltip("How many ticks between each attack. 1 = every tick.")]
+    public int attackCooldownTicks = 1;
+
     void OnValidate()
     {
         maxHealth = Mathf.Max(1f, maxHealth);
@@ -67,5 +85,9 @@ public class AnimalDefinition : ScriptableObject
         poopCooldownTicks = Mathf.Max(1, poopCooldownTicks);
 
         thoughtCooldownTicks = Mathf.Max(1, thoughtCooldownTicks);
+
+        attackDamage = Mathf.Max(0f, attackDamage);
+        attackRangeTiles = Mathf.Max(0.5f, attackRangeTiles);
+        attackCooldownTicks = Mathf.Max(1, attackCooldownTicks);
     }
 }

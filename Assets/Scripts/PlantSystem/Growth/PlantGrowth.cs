@@ -101,6 +101,13 @@ namespace Abracodabra.Genes {
             if (_deterministicRandom == null) {
                 Debug.LogError($"[{nameof(PlantGrowth)}] could not retrieve IDeterministicRandom service! Growth will be non-deterministic.", this);
             }
+
+            // Initialize the World UI for Health/Energy Bars
+            var worldUI = GetComponent<PlantWorldUI>();
+            if (worldUI == null) {
+                worldUI = gameObject.AddComponent<PlantWorldUI>();
+            }
+            worldUI.Initialize(this);
         }
 
         void OnDestroy() {
@@ -358,15 +365,18 @@ namespace Abracodabra.Genes {
         public void TakeDamage(float amount) {
             if (CurrentState == PlantState.Dead) return;
 
-            // Apply defense reduction: defenseMultiplier 1.3 = 30% damage reduction
             float reduction = Mathf.Clamp01(defenseMultiplier - 1f);
             float finalDamage = amount * (1f - reduction);
 
             currentHP -= finalDamage;
             currentHP = Mathf.Max(0f, currentHP);
 
-            // Visual: brief red flash
             StartCoroutine(DamageFlash());
+
+            // Spawn Floating Combat Text
+            if (finalDamage > 0) {
+                FloatingCombatText.Spawn(transform.position + Vector3.up * 0.5f, $"-{finalDamage:F0}", Color.red);
+            }
 
             if (currentHP <= 0f) {
                 Die();

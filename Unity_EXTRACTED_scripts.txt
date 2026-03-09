@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 901,654 -> 645,803 chars (28.4% reduction)
-Estimated tokens saved: ~63,962
+Compression Stats: 917,004 -> 656,151 chars (28.4% reduction)
+Estimated tokens saved: ~65,213
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -35,220 +35,222 @@ using System.Linq;
   WeatherManager (Assets\Scripts\Core/) L376
   AnimalBehavior (Assets\Scripts\Ecosystem\Animals/) L578
   AnimalController (Assets\Scripts\Ecosystem\Animals/) L639
-  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L925
-  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L996
-  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L1005
-  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1422
-  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1586
-  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1602
-  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1640
-  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L1950
-  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L1986
-  PoopController (Assets\Scripts\Ecosystem\Environment/) L2266
-  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2359
-  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2381
-  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2400
-  AnimalFeedableAdapter (Assets\Scripts\Ecosystem\Feeding/) L2484
-  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2594
-  FoodItem (Assets\Scripts\Ecosystem\Food/) L2675
-  FoodType (Assets\Scripts\Ecosystem\Food/) L2747
-  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2763
-  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2785
-  FloraManager (Assets\Scripts\Ecosystem\Management/) L3034
-  WaveState (Assets\Scripts\Ecosystem\Management/) L3054
-  WaveSpawnLocationType (Assets\Scripts\Ecosystem\Spawning/) L3359
-  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3402
-  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3421
-  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3460
-  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3508
-  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3526
-  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3677
-  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3788
-  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L3835
-  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L3848
-  TileDefinitionEditor (Assets\Scripts\Editor/) L3910
-  TileInteractionManagerEditor (Assets\Scripts\Editor/) L3930
-  WaveDefinitionEditor (Assets\Scripts\Editor/) L3971
-  WaveManagerEditor (Assets\Scripts\Editor/) L4108
-  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L4285
-  ItemEffect (Assets\Scripts\Items/) L4315
-  ItemInstance (Assets\Scripts\Items/) L4349
-  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4391
-  LeafData (Assets\Scripts\PlantSystem\Data/) L4399
-  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4414
-  PlantCellType (Assets\Scripts\PlantSystem\Growth/) L4453
-  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4474
-  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4611
-  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L4677
-  StartingInventory (Assets\Scripts\PlantSystem\UI/) L4777
-  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L4799
-  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L4914
-  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L5070
-  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L5180
-  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L5281
-  GridDebugVisualizer (Assets\Scripts\Ticks/) L5308
-  GridSnapStartup (Assets\Scripts\Ticks/) L5550
-  TickDebugMonitor (Assets\Scripts\Ticks/) L5617
-  ColorExtensions (Assets\Scripts\UI\Utilities/) L5653
-  PrefabOrigin (Assets\Scripts\UI\Utilities/) L5664
-  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L5694
-  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L5802
-  WaterReflection (Assets\Scripts\Visual\Effects/) L5909
-  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L6334
-  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L6380
-  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L6551
-  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L6828
-  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L6836
-  HungerUI (Assets\Scripts\WorldInteraction\Player/) L6860
-  PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L6908
-  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7219
-  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7445
-  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7499
-  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7542
-  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7559
-  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7599
-  ToolType (Assets\Scripts\WorldInteraction\Tools/) L7758
+  AnimalDefinition (Assets\Scripts\Ecosystem\Animals/) L980
+  AnimalLibrary (Assets\Scripts\Ecosystem\Animals/) L1068
+  AnimalMovement (Assets\Scripts\Ecosystem\Animals/) L1077
+  AnimalNeeds (Assets\Scripts\Ecosystem\Animals/) L1594
+  AnimalSpawnData (Assets\Scripts\Ecosystem\Animals/) L1758
+  AnimalThoughtLibrary (Assets\Scripts\Ecosystem\Animals/) L1774
+  FireflyController (Assets\Scripts\Ecosystem\Effects/) L1812
+  FireflyDefinition (Assets\Scripts\Ecosystem\Effects/) L2122
+  FireflyManager (Assets\Scripts\Ecosystem\Effects/) L2158
+  PoopController (Assets\Scripts\Ecosystem\Environment/) L2438
+  ScentDefinition (Assets\Scripts\Ecosystem\Environment/) L2531
+  ScentLibrary (Assets\Scripts\Ecosystem\Environment/) L2553
+  ScentSource (Assets\Scripts\Ecosystem\Environment/) L2572
+  AnimalFeedableAdapter (Assets\Scripts\Ecosystem\Feeding/) L2656
+  DietPreferenceSimplified (Assets\Scripts\Ecosystem\Food/) L2766
+  FoodItem (Assets\Scripts\Ecosystem\Food/) L2847
+  FoodType (Assets\Scripts\Ecosystem\Food/) L2919
+  EcosystemManager (Assets\Scripts\Ecosystem\Management/) L2935
+  FaunaManager (Assets\Scripts\Ecosystem\Management/) L2957
+  FloraManager (Assets\Scripts\Ecosystem\Management/) L3206
+  WaveState (Assets\Scripts\Ecosystem\Management/) L3226
+  WaveSpawnLocationType (Assets\Scripts\Ecosystem\Spawning/) L3531
+  IStatusEffectable (Assets\Scripts\Ecosystem\Status Effects/) L3574
+  StatusEffect (Assets\Scripts\Ecosystem\Status Effects/) L3593
+  StatusEffectIconUI (Assets\Scripts\Ecosystem\Status Effects/) L3632
+  StatusEffectInstance (Assets\Scripts\Ecosystem\Status Effects/) L3680
+  StatusEffectManager (Assets\Scripts\Ecosystem\Status Effects/) L3698
+  StatusEffectUIManager (Assets\Scripts\Ecosystem\Status Effects/) L3849
+  ThoughtBubbleController (Assets\Scripts\Ecosystem\UI/) L3960
+  ThoughtTrigger (Assets\Scripts\Ecosystem\UI/) L4007
+  RadiusPatternTesterEditor (Assets\Scripts\Editor/) L4020
+  TileDefinitionEditor (Assets\Scripts\Editor/) L4082
+  TileInteractionManagerEditor (Assets\Scripts\Editor/) L4102
+  WaveDefinitionEditor (Assets\Scripts\Editor/) L4143
+  WaveManagerEditor (Assets\Scripts\Editor/) L4280
+  GeneLibraryLoader (Assets\Scripts\Genes\Core/) L4457
+  ItemEffect (Assets\Scripts\Items/) L4487
+  ItemInstance (Assets\Scripts\Items/) L4521
+  ITriggerTarget (Assets\Scripts\PlantSystem\Data/) L4563
+  LeafData (Assets\Scripts\PlantSystem\Data/) L4571
+  NodeExecutor (Assets\Scripts\PlantSystem\Execution/) L4586
+  PlantCellType (Assets\Scripts\PlantSystem\Growth/) L4625
+  PlantCellManager (Assets\Scripts\PlantSystem\Growth/) L4646
+  PlantEnergySystem (Assets\Scripts\PlantSystem\Growth/) L4783
+  PlantVisualManager (Assets\Scripts\PlantSystem\Growth/) L4849
+  StartingInventory (Assets\Scripts\PlantSystem\UI/) L4949
+  OutlinePartController (Assets\Scripts\PlantSystem\Visual/) L4971
+  PlantOutlineController (Assets\Scripts\PlantSystem\Visual/) L5086
+  PlantShadowController (Assets\Scripts\PlantSystem\Visual/) L5242
+  PlantWorldUI (Assets\Scripts\PlantSystem\Visual/) L5352
+  ShadowPartController (Assets\Scripts\PlantSystem\Visual/) L5481
+  SceneSetupManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L5582
+  GridDebugVisualizer (Assets\Scripts\Ticks/) L5609
+  GridSnapStartup (Assets\Scripts\Ticks/) L5851
+  TickDebugMonitor (Assets\Scripts\Ticks/) L5918
+  ColorExtensions (Assets\Scripts\UI\Utilities/) L5954
+  PrefabOrigin (Assets\Scripts\UI\Utilities/) L5965
+  FloatingCombatText (Assets\Scripts\Visual\Effects/) L5995
+  NightColorPostProcess (Assets\Scripts\Visual\Effects/) L6053
+  RuntimeCircleDrawer (Assets\Scripts\Visual\Effects/) L6161
+  WaterReflection (Assets\Scripts\Visual\Effects/) L6268
+  WaterReflectionManager (Assets\Scripts\Visual\Effects/) L6693
+  PlantGrowthModifierManager (Assets\Scripts\WorldInteraction\Placement/) L6739
+  PlayerTileInteractor (Assets\Scripts\WorldInteraction\Placement/) L6910
+  HarvestableTag (Assets\Scripts\WorldInteraction\Player/) L7187
+  HarvestedItem (Assets\Scripts\WorldInteraction\Player/) L7195
+  HungerUI (Assets\Scripts\WorldInteraction\Player/) L7219
+  PlayerActionType (Assets\Scripts\WorldInteraction\Player/) L7267
+  PlayerHungerSystem (Assets\Scripts\WorldInteraction\Player/) L7578
+  TileDefinition (Assets\Scripts\WorldInteraction\Tiles/) L7804
+  ToolRefillRule (Assets\Scripts\WorldInteraction\Tiles/) L7858
+  TileInteractionRule (Assets\Scripts\WorldInteraction\Tiles/) L7901
+  ToolDefinition (Assets\Scripts\WorldInteraction\Tools/) L7918
+  ToolSwitcher (Assets\Scripts\WorldInteraction\Tools/) L7958
+  ToolType (Assets\Scripts\WorldInteraction\Tools/) L8117
 
 [Abracodabra.Ecosystem]
-  DorisController (Assets\Scripts\Ecosystem\Doris/) L7769
-  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L8177
-  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L8303
+  DorisController (Assets\Scripts\Ecosystem\Doris/) L8128
+  DorisDefinition (Assets\Scripts\Ecosystem\Doris/) L8536
+  DorisHungerSystem (Assets\Scripts\Ecosystem\Doris/) L8662
 
 [Abracodabra.Ecosystem.Feeding]
-  ConsumableData (Assets\Scripts\Ecosystem\Feeding/) L8504
-  FeedingSystem (Assets\Scripts\Ecosystem\Feeding/) L8631
-  FoodSelectionPopup (Assets\Scripts\Ecosystem\Feeding/) L9133
-  IFeedable (Assets\Scripts\Ecosystem\Feeding/) L9697
+  ConsumableData (Assets\Scripts\Ecosystem\Feeding/) L8863
+  FeedingSystem (Assets\Scripts\Ecosystem\Feeding/) L8990
+  FoodSelectionPopup (Assets\Scripts\Ecosystem\Feeding/) L9492
+  IFeedable (Assets\Scripts\Ecosystem\Feeding/) L10056
 
 [Abracodabra.Genes]
-  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L9715
-  GeneLibrary (Assets\Scripts\Genes/) L9725
-  PlantSequenceExecutor (Assets\Scripts\Genes/) L9880
-  PlantState (Assets\Scripts\PlantSystem\Growth/) L10082
-  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L10574
+  TemporaryFruitSpawnMarker (Assets\Scripts\Genes\Components/) L10074
+  GeneLibrary (Assets\Scripts\Genes/) L10084
+  PlantSequenceExecutor (Assets\Scripts\Genes/) L10239
+  PlantState (Assets\Scripts\PlantSystem\Growth/) L10441
+  PlantGrowthLogic (Assets\Scripts\PlantSystem\Growth/) L10943
 
 [Abracodabra.Genes.Components]
-  Creature (Assets\Scripts\Genes\Components/) L10673
-  Fruit (Assets\Scripts\Genes\Components/) L10698
-  FruitConsumptionHandler (Assets\Scripts\Genes\Components/) L10734
-  NutritionComponent (Assets\Scripts\Genes\Components/) L10782
+  Creature (Assets\Scripts\Genes\Components/) L11042
+  Fruit (Assets\Scripts\Genes\Components/) L11067
+  FruitConsumptionHandler (Assets\Scripts\Genes\Components/) L11103
+  NutritionComponent (Assets\Scripts\Genes\Components/) L11151
 
 [Abracodabra.Genes.Config]
-  GeneRewardSystem (Assets\Scripts\Genes\Config/) L10794
-  StartingLoadoutApplier (Assets\Scripts\Genes\Config/) L10910
-  StartingLoadoutConfig (Assets\Scripts\Genes\Config/) L10985
+  GeneRewardSystem (Assets\Scripts\Genes\Config/) L11163
+  StartingLoadoutApplier (Assets\Scripts\Genes\Config/) L11279
+  StartingLoadoutConfig (Assets\Scripts\Genes\Config/) L11354
 
 [Abracodabra.Genes.Core]
-  ActiveGene (Assets\Scripts\Genes\Core/) L11013
-  ActiveGeneContext (Assets\Scripts\Genes\Core/) L11063
-  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L11082
-  ModifierGene (Assets\Scripts\Genes\Core/) L11094
-  PassiveStatType (Assets\Scripts\Genes\Core/) L11129
-  PayloadGene (Assets\Scripts\Genes\Core/) L11171
-  PlaceholderGene (Assets\Scripts\Genes\Core/) L11217
-  SafeGeneLoader (Assets\Scripts\Genes\Core/) L11238
-  GeneBase (Assets\Scripts\Genes/) L11271
-  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L11349
+  ActiveGene (Assets\Scripts\Genes\Core/) L11382
+  ActiveGeneContext (Assets\Scripts\Genes\Core/) L11432
+  ActiveGeneSlotConfig (Assets\Scripts\Genes\Core/) L11451
+  ModifierGene (Assets\Scripts\Genes\Core/) L11463
+  PassiveStatType (Assets\Scripts\Genes\Core/) L11498
+  PayloadGene (Assets\Scripts\Genes\Core/) L11540
+  PlaceholderGene (Assets\Scripts\Genes\Core/) L11586
+  SafeGeneLoader (Assets\Scripts\Genes\Core/) L11607
+  GeneBase (Assets\Scripts\Genes/) L11640
+  TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L11718
 
 [Abracodabra.Genes.Implementations]
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L11452
-  CloudGene (Assets\Scripts\Genes\Implementations\Active/) L11575
-  ProjectileGene (Assets\Scripts\Genes\Implementations\Active/) L11642
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L11723
-  OverchargeGene (Assets\Scripts\Genes\Implementations\Modifier/) L11753
-  TriggerProximityGene (Assets\Scripts\Genes\Implementations\Modifier/) L11795
-  EnergyRootsGene (Assets\Scripts\Genes\Implementations\Passive/) L11827
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L11869
-  ThickBarkGene (Assets\Scripts\Genes\Implementations\Passive/) L11912
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L11954
-  PoisonPayload (Assets\Scripts\Genes\Implementations\Payload/) L12004
-  SlowPayload (Assets\Scripts\Genes\Implementations\Payload/) L12067
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L11821
+  CloudGene (Assets\Scripts\Genes\Implementations\Active/) L11944
+  ProjectileGene (Assets\Scripts\Genes\Implementations\Active/) L12011
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L12092
+  OverchargeGene (Assets\Scripts\Genes\Implementations\Modifier/) L12122
+  TriggerProximityGene (Assets\Scripts\Genes\Implementations\Modifier/) L12164
+  EnergyRootsGene (Assets\Scripts\Genes\Implementations\Passive/) L12196
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L12238
+  ThickBarkGene (Assets\Scripts\Genes\Implementations\Passive/) L12281
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L12323
+  PoisonPayload (Assets\Scripts\Genes\Implementations\Payload/) L12373
+  SlowPayload (Assets\Scripts\Genes\Implementations\Payload/) L12436
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L12129
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L12185
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L12317
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L12498
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L12554
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L12686
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L12372
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L12405
-  GeneEventBus (Assets\Scripts\Genes\Services/) L12503
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L12555
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L12741
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L12774
+  GeneEventBus (Assets\Scripts\Genes\Services/) L12872
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L12924
 
 [Abracodabra.Genes.Templates]
-  SeedTemplate (Assets\Scripts\Genes\Templates/) L12642
+  SeedTemplate (Assets\Scripts\Genes\Templates/) L13011
 
 [Abracodabra.Genes.WorldEffects]
-  CloudWorldEffect (Assets\Scripts\Genes\WorldEffects/) L12735
-  ProjectileWorldEffect (Assets\Scripts\Genes\WorldEffects/) L12781
-  TargetFinder (Assets\Scripts\Genes\WorldEffects/) L12893
-  WorldEffect (Assets\Scripts\Genes\WorldEffects/) L12973
+  CloudWorldEffect (Assets\Scripts\Genes\WorldEffects/) L13104
+  ProjectileWorldEffect (Assets\Scripts\Genes\WorldEffects/) L13150
+  TargetFinder (Assets\Scripts\Genes\WorldEffects/) L13262
+  WorldEffect (Assets\Scripts\Genes\WorldEffects/) L13342
 
 [Abracodabra.Minigames]
-  MinigameManager (Assets\Scripts\Minigames/) L13113
-  MinigameType (Assets\Scripts\Minigames/) L13329
-  TileInteractionManagerExtensions (Assets\Scripts\Minigames/) L13389
-  TimingCircleConfig (Assets\Scripts\Minigames/) L13451
-  TimingCircleMinigame (Assets\Scripts\Minigames/) L13582
+  MinigameManager (Assets\Scripts\Minigames/) L13482
+  MinigameType (Assets\Scripts\Minigames/) L13698
+  TileInteractionManagerExtensions (Assets\Scripts\Minigames/) L13758
+  TimingCircleConfig (Assets\Scripts\Minigames/) L13820
+  TimingCircleMinigame (Assets\Scripts\Minigames/) L13951
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L13911
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L13996
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L14136
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L14280
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L14365
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L14505
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L14414
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L15275
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L15564
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L15802
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L15988
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L16187
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L16831
-  DestroyTracker (Assets\Scripts\A_ToolkitUI/) L17025
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L14783
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L15644
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L15933
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L16171
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L16357
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L16556
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L17200
+  DestroyTracker (Assets\Scripts\A_ToolkitUI/) L17394
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L17336
-  SeedRarity (Assets\Scripts\A_ToolkitUI/) L17506
-  QualityTier (Assets\Scripts\A_ToolkitUI/) L17528
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L17705
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L17875
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L17897
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L17590
-  CameraZoomController (Assets\Scripts\Core/) L17703
-  InitializationManager (Assets\Scripts\Core/) L17752
-  PixelGridSnapper (Assets\Scripts\Core/) L17792
-  RunState (Assets\Scripts\Core/) L17825
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L17991
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L18054
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L18190
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L18219
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L18370
-  GridEntity (Assets\Scripts\Ticks/) L18442
-  GridPosition (Assets\Scripts\Ticks/) L18612
-  GridPositionManager (Assets\Scripts\Ticks/) L18713
-  GridRadiusUtility (Assets\Scripts\Ticks/) L19327
-  MultiTileEntity (Assets\Scripts\Ticks/) L19471
-  PivotMode (Assets\Scripts\Ticks/) L19715
-  TickConfiguration (Assets\Scripts\Ticks/) L19829
-  ITickUpdateable (Assets\Scripts\Ticks/) L19915
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L20067
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L20088
-  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L20299
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L20315
-  for (Assets\Scripts\WorldInteraction/) L20941
+  CameraController (Assets\Scripts\Core/) L17959
+  CameraZoomController (Assets\Scripts\Core/) L18072
+  InitializationManager (Assets\Scripts\Core/) L18121
+  PixelGridSnapper (Assets\Scripts\Core/) L18161
+  RunState (Assets\Scripts\Core/) L18194
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L18360
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L18423
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L18559
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L18588
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L18739
+  GridEntity (Assets\Scripts\Ticks/) L18811
+  GridPosition (Assets\Scripts\Ticks/) L18981
+  GridPositionManager (Assets\Scripts\Ticks/) L19082
+  GridRadiusUtility (Assets\Scripts\Ticks/) L19696
+  MultiTileEntity (Assets\Scripts\Ticks/) L19840
+  PivotMode (Assets\Scripts\Ticks/) L20084
+  TickConfiguration (Assets\Scripts\Ticks/) L20198
+  ITickUpdateable (Assets\Scripts\Ticks/) L20284
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L20436
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L20457
+  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L20668
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L20684
+  for (Assets\Scripts\WorldInteraction/) L21310
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L21013
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L21382
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L21045
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L21414
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L21103
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L21149
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L21272
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L21472
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L21518
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L21641
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L21437
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L21806
 
 
 ================================================================================
@@ -866,6 +868,7 @@ pub class AnimalBehavior : MonoBehaviour {
 ﻿// Assets/Scripts/Ecosystem/Animals/AnimalController.cs
 using TMPro;
 using WegoSystem;
+using Abracodabra.Genes;
 
 pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, ITriggerTarget {
  [Header("Configuration")]
@@ -893,6 +896,8 @@ pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, 
  float deathFadeTimer = 0f;
  float deathFadeDuration = 1f;
  int thoughtCooldownTick = 0;
+
+ int attackCooldownRemaining = 0;
 
  pub GridEntity GridEntity => gridEntity;
  pub StatusEffectManager StatusManager => statusManager;
@@ -928,9 +933,11 @@ pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, 
   if (TickManager.Instance != null) {
    TickManager.Instance.UnregisterTickUpdateable(this);
   }
+
   if (GridDebugVisualizer.Instance != null) {
    GridDebugVisualizer.Instance.HideContinuousRadius(this);
   }
+
   if (gridEntity != null) {
    gridEntity.OnPositionChanged -= OnGridPositionChanged;
   }
@@ -938,12 +945,14 @@ pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, 
 
  void Update() {
   if (!enabled) return;
+
   if (isDying && deathFadeTimer > 0) {
    deathFadeTimer -= Time.deltaTime;
    UpdateDeathFade();
    if (deathFadeTimer <= 0) Destroy(gameObject);
    return;
   }
+
   bool showStats = Input.GetKey(showStatsKey);
   SetStatsTextVisibility(showStats);
   UpdateSpriteFlipping();
@@ -956,10 +965,12 @@ pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, 
 
  pub void OnTickUpdate(int currentTick) {
   if (!enabled || definition == null) return;
+
   if (!isDying && needs != null && needs.CurrentHealth <= 0) {
    StartDying();
    return;
   }
+
   if (isDying) return;
 
   needs.OnTickUpdate(currentTick);
@@ -972,11 +983,46 @@ pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, 
   }
 
   if (thoughtCooldownTick > 0) thoughtCooldownTick--;
+
+  if (definition.isPest && !isDying) {
+   HandlePestAttack();
+  }
+
   UpdateAnimations();
  }
 
- void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos) {
+ void HandlePestAttack() {
+  if (attackCooldownRemaining > 0) {
+   attackCooldownRemaining--;
+   return;
+  }
+
+  PlantGrowth targetPlant = FindAttackablePlant();
+  if (targetPlant == null) return;
+
+  targetPlant.TakeDamage(definition.attackDamage);
+  attackCooldownRemaining = definition.attackCooldownTicks;
+
+  Debug.Log($"[AnimalController] Pest '{SpeciesName}' attacked plant '{targetPlant.name}' for {definition.attackDamage} damage. Plant HP: {targetPlant.currentHP:F0}");
  }
+
+ PlantGrowth FindAttackablePlant() {
+  float rangeSqr = definition.attackRangeTiles * definition.attackRangeTiles;
+
+  foreach (var plant in PlantGrowth.AllActivePlants) {
+   if (plant == null) continue;
+   if (plant.CurrentState == PlantState.Dead) continue;
+
+   float distSqr = (plant.transform.position - transform.position).sqrMagnitude;
+   if (distSqr <= rangeSqr) {
+    return plant;
+   }
+  }
+
+  return null;
+ }
+
+ void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos) { }
 
  pub string GetDisplayName() { return SpeciesName; }
  pub void Heal(float amount) { if (needs != null) needs.Heal(amount); }
@@ -994,17 +1040,24 @@ pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, 
  void CacheComponents() {
   gridEntity = GetComponent<GridEntity>();
   if (gridEntity == null) gridEntity = gameObject.AddComponent<GridEntity>();
+
   movement = GetComponent<AnimalMovement>();
   if (movement == null) movement = gameObject.AddComponent<AnimalMovement>();
+
   needs = GetComponent<AnimalNeeds>();
   if (needs == null) needs = gameObject.AddComponent<AnimalNeeds>();
+
   behavior = GetComponent<AnimalBehavior>();
   if (behavior == null) behavior = gameObject.AddComponent<AnimalBehavior>();
+
   spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
   statusManager = GetComponent<StatusEffectManager>();
   if (statusManager == null) statusManager = gameObject.AddComponent<StatusEffectManager>();
+
   statusEffectUI = GetComponentInChildren<StatusEffectUIManager>(true);
-  if (statusEffectUI == null) Debug.LogWarning($"StatusEffectUIManager not found on a child of {gameObject.name}. Icons will not display.", this);
+  if (statusEffectUI == null)
+   Debug.LogWarning($"StatusEffectUIManager not found on a child of {gameObject.name}. Icons will not display.", this);
  }
 
  void ValidateComponents() {
@@ -1045,6 +1098,7 @@ pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, 
   if (GridDebugVisualizer.Instance != null) {
    GridDebugVisualizer.Instance.HideContinuousRadius(this);
   }
+
   movement.StopAllMovement();
   behavior.CancelCurrentAction();
 
@@ -1071,28 +1125,33 @@ pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, 
   string message = "";
   switch (trigger) {
    case ThoughtTrigger.Hungry:
-    message = definition.thoughtLibrary?.hungryThoughts?.Length > 0 ? definition.thoughtLibrary.hungryThoughts[Random.Range(0, definition.thoughtLibrary.hungryThoughts.Length)] : "";
+    message = definition.thoughtLibrary?.hungryThoughts?.Length > 0
+     ? definition.thoughtLibrary.hungryThoughts[UnityEngine.Random.Range(0, definition.thoughtLibrary.hungryThoughts.Length)] : "";
     break;
    case ThoughtTrigger.Eating:
-    message = definition.thoughtLibrary?.eatingThoughts?.Length > 0 ? definition.thoughtLibrary.eatingThoughts[Random.Range(0, definition.thoughtLibrary.eatingThoughts.Length)] : "";
+    message = definition.thoughtLibrary?.eatingThoughts?.Length > 0
+     ? definition.thoughtLibrary.eatingThoughts[UnityEngine.Random.Range(0, definition.thoughtLibrary.eatingThoughts.Length)] : "";
     break;
    case ThoughtTrigger.HealthLow:
-    message = definition.thoughtLibrary?.healthLowThoughts?.Length > 0 ? definition.thoughtLibrary.healthLowThoughts[Random.Range(0, definition.thoughtLibrary.healthLowThoughts.Length)] : "";
+    message = definition.thoughtLibrary?.healthLowThoughts?.Length > 0
+     ? definition.thoughtLibrary.healthLowThoughts[UnityEngine.Random.Range(0, definition.thoughtLibrary.healthLowThoughts.Length)] : "";
     break;
    case ThoughtTrigger.Fleeing:
-    message = definition.thoughtLibrary?.fleeingThoughts?.Length > 0 ? definition.thoughtLibrary.fleeingThoughts[Random.Range(0, definition.thoughtLibrary.fleeingThoughts.Length)] : "";
+    message = definition.thoughtLibrary?.fleeingThoughts?.Length > 0
+     ? definition.thoughtLibrary.fleeingThoughts[UnityEngine.Random.Range(0, definition.thoughtLibrary.fleeingThoughts.Length)] : "";
     break;
    case ThoughtTrigger.Pooping:
-    message = definition.thoughtLibrary?.poopingThoughts?.Length > 0 ? definition.thoughtLibrary.poopingThoughts[Random.Range(0, definition.thoughtLibrary.poopingThoughts.Length)] : "";
+    message = definition.thoughtLibrary?.poopingThoughts?.Length > 0
+     ? definition.thoughtLibrary.poopingThoughts[UnityEngine.Random.Range(0, definition.thoughtLibrary.poopingThoughts.Length)] : "";
     break;
   }
 
   if (!string.IsNullOrEmpty(message)) {
    Transform spawnT = bubbleSpawnTransform != null ? bubbleSpawnTransform : transform;
    GameObject bubble = Instantiate(thoughtBubblePrefab, spawnT.position, Quaternion.identity);
-   ThoughtBubbleController controller = bubble.GetComponent<ThoughtBubbleController>();
-   if (controller != null) {
-    controller.Initialize(message, spawnT, 3f);
+   ThoughtBubbleController bubbleCtrl = bubble.GetComponent<ThoughtBubbleController>();
+   if (bubbleCtrl != null) {
+    bubbleCtrl.Initialize(message, spawnT, 3f);
    }
   }
  }
@@ -1125,9 +1184,7 @@ pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, 
   if (hpText != null) hpText.gameObject.SetActive(visible);
   if (hungerText != null) hungerText.gameObject.SetActive(visible);
 
-  if (visible) {
-   UpdateUI();
-  }
+  if (visible) UpdateUI();
  }
 
  pub void UpdateUI() {
@@ -1149,7 +1206,7 @@ pub class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, 
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Animals\AnimalDefinition.cs
 
-﻿using UnityEngine;
+﻿// Assets/Scripts/Ecosystem/Animals/AnimalDefinition.cs
 
 pub class AnimalDefinition : ScriptableObject {
  pub string animalName = "DefaultAnimal";
@@ -1192,6 +1249,19 @@ pub class AnimalDefinition : ScriptableObject {
  pub List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
  pub List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
+ [Header("Pest / Combat")]
+ [Tooltip("If true, this animal will seek and attack plants during waves.")]
+ pub bool isPest = false;
+
+ [Tooltip("Damage dealt to a plant each tick while adjacent to it.")]
+ pub float attackDamage = 5f;
+
+ [Tooltip("Tiles within which a pest will start dealing damage to a plant.")]
+ pub float attackRangeTiles = 1.5f;
+
+ [Tooltip("How many ticks between each attack. 1 = every tick.")]
+ pub int attackCooldownTicks = 1;
+
  void OnValidate() {
   maxHealth = Mathf.Max(1f, maxHealth);
   movementSpeed = Mathf.Max(0.1f, movementSpeed);
@@ -1214,6 +1284,10 @@ pub class AnimalDefinition : ScriptableObject {
   poopCooldownTicks = Mathf.Max(1, poopCooldownTicks);
 
   thoughtCooldownTicks = Mathf.Max(1, thoughtCooldownTicks);
+
+  attackDamage = Mathf.Max(0f, attackDamage);
+  attackRangeTiles = Mathf.Max(0.5f, attackRangeTiles);
+  attackCooldownTicks = Mathf.Max(1, attackCooldownTicks);
  }
 }
 
@@ -1229,7 +1303,7 @@ pub class AnimalLibrary : ScriptableObject {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Ecosystem\Animals\AnimalMovement.cs
 
-﻿using UnityEngine;
+﻿// REWORKED FILE: Assets/Scripts/Ecosystem/Animals/AnimalMovement.cs
 using WegoSystem;
 using Abracodabra.Genes;
 
@@ -1244,6 +1318,7 @@ pub class AnimalMovement : MonoBehaviour {
  List<GridPosition> currentPath = new List<GridPosition>();
  int currentPathIndex = 0;
  GameObject currentTargetFood = null;
+ PlantGrowth currentTargetPlant = null;   // TASK 8: pest plant target
  bool hasPlannedAction = false;
  int wanderPauseTicks = 0;
  int lastThinkTick = 0;
@@ -1256,7 +1331,7 @@ pub class AnimalMovement : MonoBehaviour {
  Vector2 lastMoveDirection;
  float _speedAccumulator = 0f;
 
- pub bool HasTarget => currentTargetFood != null || hasPlannedAction;
+ pub bool HasTarget => currentTargetFood != null || currentTargetPlant != null || hasPlannedAction;
  pub GameObject CurrentTargetFood => currentTargetFood;
 
  pub void Initialize(AnimalController controller, AnimalDefinition definition) {
@@ -1269,7 +1344,7 @@ pub class AnimalMovement : MonoBehaviour {
 
  pub void OnTickUpdate(int currentTick) {
   if (!enabled || controller.IsDying || controller.Behavior.IsEating || controller.Behavior.IsPooping) {
-   _speedAccumulator = 0f; // Reset speed if action is interrupted
+   _speedAccumulator = 0f;
    return;
   }
 
@@ -1279,9 +1354,7 @@ pub class AnimalMovement : MonoBehaviour {
   }
 
   int slowPenalty = controller.StatusManager != null ? controller.StatusManager.AdditionalMoveTicks : 0;
-
   float effectiveSpeed = definition.movementSpeed / (1f + slowPenalty);
-
   _speedAccumulator += effectiveSpeed;
 
   if (currentTick - lastThinkTick >= definition.thinkingTickInterval) {
@@ -1306,12 +1379,102 @@ pub class AnimalMovement : MonoBehaviour {
    return;
   }
 
+  if (definition.isPest) {
+   PlanPlantTargeting();
+   return;
+  }
+
   if (controller.Needs.IsHungry) {
    PlanFoodSeeking();
   }
   else {
    PlanWandering();
   }
+ }
+
+ void PlanPlantTargeting() {
+  if (currentTargetPlant != null && (currentTargetPlant == null || currentTargetPlant.CurrentState == PlantState.Dead)) {
+   currentTargetPlant = null;
+   ClearMovementPlan();
+  }
+
+  if (currentTargetPlant == null) {
+   currentTargetPlant = FindNearestMaturePlant();
+  }
+
+  if (currentTargetPlant == null) {
+   PlanWandering();
+   return;
+  }
+
+  GridPosition plantPos = GetPlantGridPosition(currentTargetPlant);
+  GridPosition bestTarget = GridPosition.Zero;
+  List<GridPosition> shortestPath = null;
+  float shortestDist = float.MaxValue;
+
+  GridPosition[] neighbors = {
+   plantPos + GridPosition.Up,
+   plantPos + GridPosition.Down,
+   plantPos + GridPosition.Left,
+   plantPos + GridPosition.Right
+  };
+
+  foreach (var pos in neighbors) {
+   if (!IsValidMoveForPest(pos)) continue;
+
+   if (gridEntity.Position == pos) {
+    hasPlannedAction = false;
+    currentPath.Clear();
+    return;
+   }
+
+   var path = GridPositionManager.Instance.GetPath(gridEntity.Position, pos, false);
+   if (path != null && path.Count > 0 && path.Count < shortestDist) {
+    shortestDist = path.Count;
+    bestTarget = pos;
+    shortestPath = path;
+   }
+  }
+
+  if (shortestPath != null) {
+   currentPath = shortestPath;
+   currentPathIndex = 0;
+   hasPlannedAction = true;
+  }
+  else {
+   PlanWandering();
+  }
+ }
+
+ PlantGrowth FindNearestMaturePlant() {
+  PlantGrowth nearest = null;
+  float nearestDist = float.MaxValue;
+
+  foreach (var plant in PlantGrowth.AllActivePlants) {
+   if (plant == null) continue;
+   if (plant.CurrentState != PlantState.Mature) continue;
+
+   float dist = Vector3.Distance(transform.position, plant.transform.position);
+   if (dist < nearestDist) {
+    nearestDist = dist;
+    nearest = plant;
+   }
+  }
+
+  return nearest;
+ }
+
+ GridPosition GetPlantGridPosition(PlantGrowth plant) {
+  var ge = plant.GetComponent<GridEntity>();
+  if (ge != null) return ge.Position;
+  return GridPositionManager.Instance.WorldToGrid(plant.transform.position);
+ }
+
+ bool IsValidMoveForPest(GridPosition pos) {
+  if (GridPositionManager.Instance == null) return false;
+  if (!GridPositionManager.Instance.IsPositionValid(pos)) return false;
+  if (GridPositionManager.Instance.IsMovementBlockedAt(pos)) return false;
+  return true;
  }
 
  void PlanFoodSeeking() {
@@ -1338,7 +1501,7 @@ pub class AnimalMovement : MonoBehaviour {
   var entitiesInRadius = GridPositionManager.Instance.GetEntitiesInRadius(
    gridEntity.Position,
    definition.searchRadiusTiles,
-   true // Use circle radius
+   true
   );
 
   GameObject bestFood = null;
@@ -1415,7 +1578,7 @@ pub class AnimalMovement : MonoBehaviour {
   var positions = new List<GridPosition>();
   for (int x = -definition.eatDistanceTiles; x <= definition.eatDistanceTiles; x++) {
    for (int y = -definition.eatDistanceTiles; y <= definition.eatDistanceTiles; y++) {
-    if (x == 0 && y == 0) continue; // Skip the food's own position
+    if (x == 0 && y == 0) continue;
 
     int distance = Mathf.Abs(x) + Mathf.Abs(y);
     if (distance == definition.eatDistanceTiles) {
@@ -1434,6 +1597,7 @@ pub class AnimalMovement : MonoBehaviour {
 
   currentPath.Clear();
   currentTargetFood = null;
+  currentTargetPlant = null;
 
   if (Random.Range(0, 100) < definition.wanderPauseTickChance) {
    wanderPauseTicks = Random.Range(definition.minWanderPauseTicks, definition.maxWanderPauseTicks);
@@ -1472,7 +1636,7 @@ pub class AnimalMovement : MonoBehaviour {
   if (!hasPlannedAction || gridEntity.IsMoving) return;
 
   if (currentTargetFood != null) {
-   if (currentTargetFood == null || !currentTargetFood.activeInHierarchy) {
+   if (!currentTargetFood.activeInHierarchy) {
     ClearMovementPlan();
     return;
    }
@@ -1483,6 +1647,16 @@ pub class AnimalMovement : MonoBehaviour {
    if (distance == definition.eatDistanceTiles) {
     controller.Behavior.StartEating(currentTargetFood);
     ClearMovementPlan();
+    return;
+   }
+  }
+
+  if (definition.isPest && currentTargetPlant != null) {
+   GridPosition plantPos = GetPlantGridPosition(currentTargetPlant);
+   int dist = gridEntity.Position.ManhattanDistance(plantPos);
+   if (dist <= 1) {
+    hasPlannedAction = false;
+    currentPath.Clear();
     return;
    }
   }
@@ -1521,8 +1695,8 @@ pub class AnimalMovement : MonoBehaviour {
  }
 
  bool TryMoveTo(GridPosition targetPos) {
-  if (!IsValidMove(targetPos))
-   return false;
+  bool valid = definition.isPest ? IsValidMoveForPest(targetPos) : IsValidMove(targetPos);
+  if (!valid) return false;
 
   Vector3 currentWorld = transform.position;
   Vector3 targetWorld = GridPositionManager.Instance.GridToWorld(targetPos);
@@ -1534,7 +1708,6 @@ pub class AnimalMovement : MonoBehaviour {
 
  bool IsValidMove(GridPosition pos) {
   if (GridPositionManager.Instance == null) return false;
-
   if (!GridPositionManager.Instance.IsPositionValid(pos)) return false;
 
   var entitiesAtPos = GridPositionManager.Instance.GetEntitiesAt(pos);
@@ -1589,6 +1762,7 @@ pub class AnimalMovement : MonoBehaviour {
   currentPath.Clear();
   currentPathIndex = 0;
   currentTargetFood = null;
+  currentTargetPlant = null;
   hasPlannedAction = false;
   _speedAccumulator = 0f;
   ClearPathDebugLine();
@@ -5402,6 +5576,135 @@ pub class PlantShadowController : MonoBehaviour {
 }
 
 ////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\PlantSystem\Visual\PlantWorldUI.cs
+
+﻿// FILE: Assets/Scripts/PlantSystem/Visual/PlantWorldUI.cs
+
+using Abracodabra.Genes;
+
+pub class PlantWorldUI : MonoBehaviour {
+ [Header("Bar Layout")]
+ [SerializeField] float barWidth = 0.6f;
+ [SerializeField] float barHeight = 0.06f;
+ [SerializeField] float energyBarYOffset = 0.3f;   // above plant base
+ [SerializeField] float hpBarYOffset = 0.22f;
+ [SerializeField] int sortingOrder = 50;
+
+ stat ro Color EnergyFillColor = new Color(1f, 0.85f, 0f);        // yellow
+ stat ro Color EnergyBgColor   = new Color(0.2f, 0.2f, 0.2f, 0.8f);
+ stat ro Color HpFillColor     = new Color(0.2f, 0.9f, 0.2f);     // green → red via lerp
+ stat ro Color HpBgColor       = new Color(0.15f, 0.15f, 0.15f, 0.8f);
+ stat ro Color HpLowColor      = new Color(1f, 0.15f, 0.15f);     // red when low HP
+
+ PlantGrowth plant;
+
+ Transform energyBarRoot;
+ Transform hpBarRoot;
+
+ Transform energyFill;
+ Transform hpFill;
+ SpriteRenderer hpFillRenderer;
+
+ stat Sprite _pixelSprite;
+
+ pub void Initialize(PlantGrowth target) {
+  plant = target;
+  EnsurePixelSprite();
+  BuildBars();
+ }
+
+ void LateUpdate() {
+  if (plant == null || plant.EnergySystem == null) return;
+  if (plant.CurrentState == PlantState.Dead) {
+   gameObject.SetActive(false);
+   return;
+  }
+
+  UpdateEnergyBar();
+  UpdateHPBar();
+ }
+
+ void BuildBars() {
+  energyBarRoot = BuildBar("EnergyBar", energyBarYOffset, EnergyBgColor, EnergyFillColor, out energyFill, out _);
+  hpBarRoot = BuildBar("HPBar", hpBarYOffset, HpBgColor, HpFillColor, out hpFill, out hpFillRenderer);
+ }
+
+Transform BuildBar(string barName, float yOffset, Color bgColor, Color fillColor, out Transform fill, out SpriteRenderer fillRenderer) {
+  GameObject root = new GameObject(barName);
+  root.transform.SetParent(transform);
+  root.transform.localPosition = new Vector3(-barWidth / 2f, yOffset, -0.1f);
+
+  GameObject bg = new GameObject("BG");
+  bg.transform.SetParent(root.transform, false);
+  bg.transform.localPosition = new Vector3(barWidth / 2f, 0f, 0f);
+  var bgSR = bg.AddComponent<SpriteRenderer>();
+  bgSR.sprite = _pixelSprite;
+  bgSR.color = bgColor;
+  bgSR.transform.localScale = new Vector3(barWidth, barHeight, 1f);
+  bgSR.sortingOrder = sortingOrder;
+
+  GameObject fillGO = new GameObject("Fill");
+  fillGO.transform.SetParent(root.transform, false);
+  fillGO.transform.localPosition = new Vector3(0f, 0f, -0.01f);
+  var fillSR = fillGO.AddComponent<SpriteRenderer>();
+  fillSR.sprite = _pixelSprite;
+  fillSR.color = fillColor;
+  fillGO.transform.localScale = new Vector3(barWidth, barHeight, 1f);
+  fillSR.sortingOrder = sortingOrder + 1;
+
+  GameObject pivot = new GameObject("Pivot");
+  pivot.transform.SetParent(root.transform, false);
+  pivot.transform.localPosition = Vector3.zero;
+  fillGO.transform.SetParent(pivot.transform, true);
+  fillGO.transform.localPosition = new Vector3(barWidth / 2f, 0f, -0.01f);
+
+  fill = pivot.transform;
+  fillRenderer = fillSR;
+  return root.transform;
+ }
+
+ void UpdateEnergyBar() {
+  if (energyFill == null) return;
+  float t = plant.EnergySystem.MaxEnergy > 0
+   ? Mathf.Clamp01(plant.EnergySystem.CurrentEnergy / plant.EnergySystem.MaxEnergy)
+   : 0f;
+  SetFillX(energyFill, t);
+ }
+
+ void UpdateHPBar() {
+  if (hpFill == null) return;
+  float t = plant.maxHP > 0 ? Mathf.Clamp01(plant.currentHP / plant.maxHP) : 0f;
+  SetFillX(hpFill, t);
+
+  if (hpFillRenderer != null) {
+   hpFillRenderer.color = Color.Lerp(HpLowColor, HpFillColor, t);
+  }
+ }
+
+ void SetFillX(Transform fillPivot, float t) {
+  var fillGO = fillPivot.GetChild(0);
+  if (fillGO != null) {
+   Vector3 s = fillGO.localScale;
+   s.x = barWidth * Mathf.Max(0.001f, t);
+   fillGO.localScale = s;
+   Vector3 pos = fillGO.localPosition;
+   pos.x = s.x / 2f;
+   fillGO.localPosition = pos;
+  }
+ }
+
+ stat void EnsurePixelSprite() {
+  if (_pixelSprite != null) return;
+
+  Texture2D tex = new Texture2D(1, 1, TextureFormat.RGBA32, false);
+  tex.SetPixel(0, 0, Color.white);
+  tex.Apply();
+  tex.filterMode = FilterMode.Point;
+  _pixelSprite = Sprite.Create(tex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+ }
+}
+
+////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\PlantSystem\Visual\ShadowPartController.cs
 
 ﻿using UnityEngine;
@@ -5912,6 +6215,64 @@ pub class PrefabOrigin : MonoBehaviour {
   transform.position -= worldOffset;
 
   Destroy(this);
+ }
+}
+
+////////////////////////////////////////////////////////////
+// FILE: Assets\Scripts\Visual\Effects\FloatingCombatText.cs
+
+﻿// FILE: Assets/Scripts/Visual/Effects/FloatingCombatText.cs
+
+using TMPro;
+
+pub class FloatingCombatText : MonoBehaviour {
+ [Header("Animation")]
+ [SerializeField] float riseSpeed = 0.4f;     // units/second
+ [SerializeField] float lifetime = 1.0f;       // seconds before destroyed
+ [SerializeField] float fontSize = 2f;
+
+ TextMeshPro tmp;
+ float elapsed;
+ Color startColor;
+
+ pub stat FloatingCombatText Spawn(Vector3 worldPosition, string text, Color color) {
+  GameObject go = new GameObject("FloatingCombatText");
+  go.transform.position = worldPosition;
+
+  var fct = go.AddComponent<FloatingCombatText>();
+  fct.Setup(text, color);
+  return fct;
+ }
+
+ void Setup(string text, Color color) {
+  startColor = color;
+
+  tmp = gameObject.AddComponent<TextMeshPro>();
+  tmp.text = text;
+  tmp.fontSize = fontSize;
+  tmp.color = color;
+  tmp.alignment = TextAlignmentOptions.Center;
+  tmp.fontStyle = FontStyles.Bold;
+
+  tmp.sortingOrder = 100;
+
+  float driftX = Random.Range(-0.15f, 0.15f);
+  transform.position += new Vector3(driftX, 0f, 0f);
+
+  Destroy(gameObject, lifetime + 0.05f);
+ }
+
+ void Update() {
+  if (tmp == null) return;
+
+  elapsed += Time.deltaTime;
+  float t = Mathf.Clamp01(elapsed / lifetime);
+
+  transform.position += Vector3.up * riseSpeed * Time.deltaTime;
+
+  float fadeStart = 0.6f;
+  float alpha = t < fadeStart ? 1f : Mathf.Lerp(1f, 0f, (t - fadeStart) / (1f - fadeStart));
+  tmp.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
  }
 }
 
@@ -10405,6 +10766,12 @@ namespace Abracodabra.Genes {
    if (_deterministicRandom == null) {
     Debug.LogError($"[{nameof(PlantGrowth)}] could not retrieve IDeterministicRandom service! Growth will be non-deterministic.", this);
    }
+
+   var worldUI = GetComponent<PlantWorldUI>();
+   if (worldUI == null) {
+    worldUI = gameObject.AddComponent<PlantWorldUI>();
+   }
+   worldUI.Initialize(this);
   }
 
   void OnDestroy() {
@@ -10669,6 +11036,10 @@ namespace Abracodabra.Genes {
    currentHP = Mathf.Max(0f, currentHP);
 
    StartCoroutine(DamageFlash());
+
+   if (finalDamage > 0) {
+    FloatingCombatText.Spawn(transform.position + Vector3.up * 0.5f, $"-{finalDamage:F0}", Color.red);
+   }
 
    if (currentHP <= 0f) {
     Die();
