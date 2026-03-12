@@ -1,13 +1,12 @@
 ﻿// Assets/Scripts/Ecosystem/Animals/AnimalController.cs
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using TMPro;
 using WegoSystem;
 using Abracodabra.Genes;
 
-public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, ITriggerTarget
-{
+public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectable, ITriggerTarget {
     [Header("Configuration")]
     [SerializeField] public AnimalDefinition definition;
 
@@ -34,8 +33,12 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     float deathFadeDuration = 1f;
     int thoughtCooldownTick = 0;
 
-    // TASK 8: attack cooldown tracker
-    int attackCooldownRemaining = 0;
+    // ─── Leaf Eating State (pest behavior, Task 2) ───────────────
+    private PlantGrowth currentEatingPlant;
+    private Vector2Int targetLeafCoord;
+    private int eatProgressTicks = 0;
+    private int eatRequiredTicks = 0;
+    // ─────────────────────────────────────────────────────────────
 
     public GridEntity GridEntity => gridEntity;
     public StatusEffectManager StatusManager => statusManager;
@@ -46,18 +49,15 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     public bool IsDying => isDying;
     public string SpeciesName => definition != null ? definition.animalName : "Uninitialized";
 
-    void Awake()
-    {
+    void Awake() {
         CacheComponents();
         ValidateComponents();
     }
 
-    void Start()
-    {
+    void Start() {
         InitializeAnimal();
 
-        if (TickManager.Instance == null)
-        {
+        if (TickManager.Instance == null) {
             Debug.LogError($"[{GetType().Name}] TickManager not found! Disabling component.", this);
             enabled = false;
             return;
@@ -65,36 +65,29 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
 
         TickManager.Instance.RegisterTickUpdateable(this);
 
-        if (gridEntity != null)
-        {
+        if (gridEntity != null) {
             gridEntity.OnPositionChanged += OnGridPositionChanged;
         }
     }
 
-    void OnDestroy()
-    {
-        if (TickManager.Instance != null)
-        {
+    void OnDestroy() {
+        if (TickManager.Instance != null) {
             TickManager.Instance.UnregisterTickUpdateable(this);
         }
 
-        if (GridDebugVisualizer.Instance != null)
-        {
+        if (GridDebugVisualizer.Instance != null) {
             GridDebugVisualizer.Instance.HideContinuousRadius(this);
         }
 
-        if (gridEntity != null)
-        {
+        if (gridEntity != null) {
             gridEntity.OnPositionChanged -= OnGridPositionChanged;
         }
     }
 
-    void Update()
-    {
+    void Update() {
         if (!enabled) return;
 
-        if (isDying && deathFadeTimer > 0)
-        {
+        if (isDying && deathFadeTimer > 0) {
             deathFadeTimer -= Time.deltaTime;
             UpdateDeathFade();
             if (deathFadeTimer <= 0) Destroy(gameObject);
@@ -107,17 +100,14 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         movement.UpdateVisuals();
     }
 
-    void LateUpdate()
-    {
+    void LateUpdate() {
         transform.position = PixelGridSnapper.SnapToGrid(transform.position);
     }
 
-    public void OnTickUpdate(int currentTick)
-    {
+    public void OnTickUpdate(int currentTick) {
         if (!enabled || definition == null) return;
 
-        if (!isDying && needs != null && needs.CurrentHealth <= 0)
-        {
+        if (!isDying && needs != null && needs.CurrentHealth <= 0) {
             StartDying();
             return;
         }
@@ -129,65 +119,113 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         movement.OnTickUpdate(currentTick);
         statusManager.OnTickUpdate(currentTick);
 
-        if (gridEntity != null && statusManager != null)
-        {
+        if (gridEntity != null && statusManager != null) {
             gridEntity.SetSpeedMultiplier(statusManager.VisualInterpolationSpeedMultiplier);
         }
 
         if (thoughtCooldownTick > 0) thoughtCooldownTick--;
 
-        // ── TASK 8: Pest deals damage to adjacent plants ──
-        if (definition.isPest && !isDying)
-        {
+        if (definition.isPest && !isDying) {
             HandlePestAttack();
         }
 
         UpdateAnimations();
     }
 
-    // ──────────────────────────────────────────────────────────
-    // TASK 8: Pest Attack Logic
-    // ──────────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════════
+    //  PEST ATTACK — Leaf Eating System (Task 2)
+    // ═══════════════════════════════════════════════════════════════
 
-    void HandlePestAttack()
-    {
-        if (attackCooldownRemaining > 0)
-        {
-            attackCooldownRemaining--;
-            return;
-        }
+    void HandlePestAttack() {
+        // ── Validate current target ──
+        // If we have a target, check it's still valid
+        if (currentEatingPlant != null) {
+            bool targetInvalid =
+                currentEatingPlant.CurrentState == PlantState.Dead ||
+                currentEatingPlant.CurrentState == PlantState.Withering ||
+                currentEatingPlant.ActiveLeafCount <= 0;
 
-        PlantGrowth targetPlant = FindAttackablePlant();
-        if (targetPlant == null) return;
+            // Also check if the specific leaf we're eating was destroyed by something else
+            if (!targetInvalid && !currentEatingPlant.CellManager.HasCellAt(targetLeafCoord)) {
+                targetInvalid = true;
+            }
 
-        targetPlant.TakeDamage(definition.attackDamage);
-        attackCooldownRemaining = definition.attackCooldownTicks;
-
-        Debug.Log($"[AnimalController] Pest '{SpeciesName}' attacked plant '{targetPlant.name}' for {definition.attackDamage} damage. Plant HP: {targetPlant.currentHP:F0}");
-    }
-
-    PlantGrowth FindAttackablePlant()
-    {
-        float rangeSqr = definition.attackRangeTiles * definition.attackRangeTiles;
-
-        foreach (var plant in PlantGrowth.AllActivePlants)
-        {
-            if (plant == null) continue;
-            if (plant.CurrentState == PlantState.Dead) continue;
-
-            float distSqr = (plant.transform.position - transform.position).sqrMagnitude;
-            if (distSqr <= rangeSqr)
-            {
-                return plant;
+            if (targetInvalid) {
+                ResetEatingState();
             }
         }
 
-        return null;
+        // ── Acquire new target if needed ──
+        if (currentEatingPlant == null) {
+            PlantGrowth plant = FindAttackablePlant();
+            if (plant == null) return; // No plant in range
+
+            // Pick a random active leaf on this plant
+            var activeLeaves = plant.CellManager.LeafDataList.Where(l => l.IsActive).ToList();
+            if (activeLeaves.Count == 0) return; // Plant has no leaves
+
+            var chosenLeaf = activeLeaves[Random.Range(0, activeLeaves.Count)];
+
+            currentEatingPlant = plant;
+            targetLeafCoord = chosenLeaf.GridCoord;
+            eatProgressTicks = 0;
+            eatRequiredTicks = Mathf.CeilToInt(definition.baseEatSpeedTicks * plant.leafDurabilityMultiplier);
+
+            Debug.Log($"[AnimalController] Pest '{SpeciesName}' targeting leaf at {targetLeafCoord} on '{plant.name}'. Eat time: {eatRequiredTicks} ticks.");
+        }
+
+        // ── Progress eating ──
+        eatProgressTicks++;
+
+        if (eatProgressTicks >= eatRequiredTicks) {
+            // Leaf consumed!
+            GameObject cellObj = currentEatingPlant.GetCellGameObjectAt(targetLeafCoord);
+            if (cellObj != null) {
+                PlantCell plantCell = cellObj.GetComponent<PlantCell>();
+                if (plantCell != null) {
+                    PlantGrowth eatenPlant = currentEatingPlant; // cache before reset
+                    currentEatingPlant.HandleBeingEaten(this, plantCell);
+                    Debug.Log($"[AnimalController] Pest '{SpeciesName}' ate a leaf from '{eatenPlant.name}'. Remaining: {eatenPlant.ActiveLeafCount}");
+                }
+            }
+
+            // Reset — will pick a new leaf next tick
+            ResetEatingState();
+        }
     }
 
-    // ──────────────────────────────────────────────────────────
-    // Existing methods (unchanged)
-    // ──────────────────────────────────────────────────────────
+    void ResetEatingState() {
+        currentEatingPlant = null;
+        targetLeafCoord = Vector2Int.zero;
+        eatProgressTicks = 0;
+        eatRequiredTicks = 0;
+    }
+
+    PlantGrowth FindAttackablePlant() {
+        float rangeSqr = definition.attackRangeTiles * definition.attackRangeTiles;
+
+        PlantGrowth closest = null;
+        float closestDistSqr = float.MaxValue;
+
+        foreach (var plant in PlantGrowth.AllActivePlants) {
+            if (plant == null) continue;
+            if (plant.CurrentState == PlantState.Dead) continue;
+            if (plant.CurrentState == PlantState.Withering) continue;
+            if (plant.ActiveLeafCount <= 0) continue;
+
+            float distSqr = (plant.transform.position - transform.position).sqrMagnitude;
+            if (distSqr <= rangeSqr && distSqr < closestDistSqr) {
+                closest = plant;
+                closestDistSqr = distSqr;
+            }
+        }
+
+        return closest;
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  EXISTING SYSTEMS
+    // ═══════════════════════════════════════════════════════════════
 
     void OnGridPositionChanged(GridPosition oldPos, GridPosition newPos) { }
 
@@ -195,19 +233,16 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     public void Heal(float amount) { if (needs != null) needs.Heal(amount); }
     public void ModifyHunger(float amount) { if (needs != null) needs.ModifyHunger(amount); }
 
-    public void TakeDamage(float amount)
-    {
+    public void TakeDamage(float amount) {
         if (isDying) return;
         float finalDamage = amount;
-        if (statusManager != null)
-        {
+        if (statusManager != null) {
             finalDamage *= statusManager.DamageResistanceMultiplier;
         }
         needs.TakeDamage(finalDamage);
     }
 
-    void CacheComponents()
-    {
+    void CacheComponents() {
         gridEntity = GetComponent<GridEntity>();
         if (gridEntity == null) gridEntity = gameObject.AddComponent<GridEntity>();
 
@@ -230,50 +265,42 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
             Debug.LogWarning($"StatusEffectUIManager not found on a child of {gameObject.name}. Icons will not display.", this);
     }
 
-    void ValidateComponents()
-    {
+    void ValidateComponents() {
         if (definition == null) { Debug.LogError($"[{gameObject.name}] Missing AnimalDefinition!", this); enabled = false; return; }
         if (definition.diet == null) { Debug.LogError($"[{gameObject.name}] AnimalDefinition missing diet!", this); enabled = false; return; }
     }
 
-    void InitializeAnimal()
-    {
+    void InitializeAnimal() {
         movement.Initialize(this, definition);
         needs.Initialize(this, definition);
         behavior.Initialize(this, definition);
         statusManager.Initialize(this);
 
-        if (statusEffectUI != null)
-        {
+        if (statusEffectUI != null) {
             statusEffectUI.Initialize(statusManager);
         }
 
-        if (GridPositionManager.Instance != null)
-        {
+        if (GridPositionManager.Instance != null) {
             GridPositionManager.Instance.SnapEntityToGrid(gameObject);
             Debug.Log($"[AnimalController] {gameObject.name} snapped to grid position {gridEntity.Position}");
         }
     }
 
-    void StartDying()
-    {
+    void StartDying() {
         if (isDying) return;
         isDying = true;
 
-        if (TickManager.Instance?.Config != null)
-        {
+        if (TickManager.Instance?.Config != null) {
             deathFadeDuration = definition.deathFadeTicks / TickManager.Instance.Config.ticksPerRealSecond;
         }
-        else
-        {
+        else {
             deathFadeDuration = definition.deathFadeTicks * 0.5f;
         }
         deathFadeTimer = deathFadeDuration;
 
         Debug.Log($"[AnimalController] {SpeciesName} is dying! Duration: {deathFadeDuration}s");
 
-        if (GridDebugVisualizer.Instance != null)
-        {
+        if (GridDebugVisualizer.Instance != null) {
             GridDebugVisualizer.Instance.HideContinuousRadius(this);
         }
 
@@ -285,8 +312,7 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         if (needs != null) needs.enabled = false;
     }
 
-    void UpdateDeathFade()
-    {
+    void UpdateDeathFade() {
         if (spriteRenderer == null) return;
 
         float fadeProgress = 1f - (deathFadeTimer / deathFadeDuration);
@@ -305,23 +331,23 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         switch (trigger) {
             case ThoughtTrigger.Hungry:
                 message = definition.thoughtLibrary?.hungryThoughts?.Length > 0
-                    ? definition.thoughtLibrary.hungryThoughts[UnityEngine.Random.Range(0, definition.thoughtLibrary.hungryThoughts.Length)] : "";
+                    ? definition.thoughtLibrary.hungryThoughts[Random.Range(0, definition.thoughtLibrary.hungryThoughts.Length)] : "";
                 break;
             case ThoughtTrigger.Eating:
                 message = definition.thoughtLibrary?.eatingThoughts?.Length > 0
-                    ? definition.thoughtLibrary.eatingThoughts[UnityEngine.Random.Range(0, definition.thoughtLibrary.eatingThoughts.Length)] : "";
+                    ? definition.thoughtLibrary.eatingThoughts[Random.Range(0, definition.thoughtLibrary.eatingThoughts.Length)] : "";
                 break;
             case ThoughtTrigger.HealthLow:
                 message = definition.thoughtLibrary?.healthLowThoughts?.Length > 0
-                    ? definition.thoughtLibrary.healthLowThoughts[UnityEngine.Random.Range(0, definition.thoughtLibrary.healthLowThoughts.Length)] : "";
+                    ? definition.thoughtLibrary.healthLowThoughts[Random.Range(0, definition.thoughtLibrary.healthLowThoughts.Length)] : "";
                 break;
             case ThoughtTrigger.Fleeing:
                 message = definition.thoughtLibrary?.fleeingThoughts?.Length > 0
-                    ? definition.thoughtLibrary.fleeingThoughts[UnityEngine.Random.Range(0, definition.thoughtLibrary.fleeingThoughts.Length)] : "";
+                    ? definition.thoughtLibrary.fleeingThoughts[Random.Range(0, definition.thoughtLibrary.fleeingThoughts.Length)] : "";
                 break;
             case ThoughtTrigger.Pooping:
                 message = definition.thoughtLibrary?.poopingThoughts?.Length > 0
-                    ? definition.thoughtLibrary.poopingThoughts[UnityEngine.Random.Range(0, definition.thoughtLibrary.poopingThoughts.Length)] : "";
+                    ? definition.thoughtLibrary.poopingThoughts[Random.Range(0, definition.thoughtLibrary.poopingThoughts.Length)] : "";
                 break;
         }
 
@@ -335,13 +361,11 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         }
     }
 
-    public bool CanShowThought()
-    {
+    public bool CanShowThought() {
         return thoughtCooldownTick <= 0 && !isDying;
     }
 
-    void UpdateAnimations()
-    {
+    void UpdateAnimations() {
         if (animator == null) return;
 
         bool isMoving = gridEntity != null && gridEntity.IsMoving;
@@ -352,41 +376,34 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         animator.SetBool("isDying", isDying);
     }
 
-    void UpdateSpriteFlipping()
-    {
+    void UpdateSpriteFlipping() {
         if (spriteRenderer == null || movement == null) return;
 
         Vector2 moveDirection = movement.GetLastMoveDirection();
-        if (Mathf.Abs(moveDirection.x) > 0.01f)
-        {
+        if (Mathf.Abs(moveDirection.x) > 0.01f) {
             spriteRenderer.flipX = moveDirection.x < 0;
         }
     }
 
-    void SetStatsTextVisibility(bool visible)
-    {
+    void SetStatsTextVisibility(bool visible) {
         if (hpText != null) hpText.gameObject.SetActive(visible);
         if (hungerText != null) hungerText.gameObject.SetActive(visible);
 
         if (visible) UpdateUI();
     }
 
-    public void UpdateUI()
-    {
+    public void UpdateUI() {
         if (needs == null) return;
 
-        if (hpText != null)
-        {
+        if (hpText != null) {
             hpText.text = $"{Mathf.CeilToInt(needs.CurrentHealth)}/{Mathf.CeilToInt(definition.maxHealth)}";
         }
-        if (hungerText != null)
-        {
+        if (hungerText != null) {
             hungerText.text = $"{Mathf.CeilToInt(needs.CurrentHunger)}/{Mathf.CeilToInt(definition.diet.maxHunger)}";
         }
     }
 
-    public void SetSeekingScreenCenter(Vector2 target, Vector2 minBounds, Vector2 maxBounds)
-    {
+    public void SetSeekingScreenCenter(Vector2 target, Vector2 minBounds, Vector2 maxBounds) {
         movement.SetSeekingScreenCenter(target, minBounds, maxBounds);
     }
 }

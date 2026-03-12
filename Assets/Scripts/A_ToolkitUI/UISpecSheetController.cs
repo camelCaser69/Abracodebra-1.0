@@ -1,30 +1,22 @@
+// FILE: Assets/Scripts/A_ToolkitUI/UISpecSheetController.cs
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.Core;
 using Abracodabra.UI.Tooltips;
 
-namespace Abracodabra.UI.Toolkit
-{
-    /// <summary>
-    /// Manages the spec sheet panel (item details display)
-    /// </summary>
-    public class UISpecSheetController
-    {
-        // References
-        private Image seedIcon;
-        private Label seedNameText, qualityText, descriptionText;
-        private Label maturityTimeText, energyBalanceText, yieldText, cycleTimeText;
-        private VisualElement attributeContainer, sequenceContainer, synergiesContainer, warningsContainer;
+namespace Abracodabra.UI.Toolkit {
+    public class UISpecSheetController {
+        Image seedIcon;
+        Label seedNameText, qualityText, descriptionText;
+        Label maturityTimeText, energyBalanceText, yieldText, cycleTimeText;
+        VisualElement attributeContainer, sequenceContainer, synergiesContainer, warningsContainer;
 
-        // Thumbnail size - matches other UI slot sizes
-        private const int THUMBNAIL_SIZE = 64;
+        const int THUMBNAIL_SIZE = 64;
 
-        /// <summary>
-        /// Initialize the spec sheet controller
-        /// </summary>
-        public void Initialize(VisualElement specSheetPanel)
-        {
+        public void Initialize(VisualElement specSheetPanel) {
             seedIcon = specSheetPanel.Q<Image>("seed-icon");
             seedNameText = specSheetPanel.Q<Label>("seed-name-text");
             qualityText = specSheetPanel.Q<Label>("quality-text");
@@ -38,9 +30,7 @@ namespace Abracodabra.UI.Toolkit
             synergiesContainer = specSheetPanel.Q<VisualElement>("synergies-container");
             warningsContainer = specSheetPanel.Q<VisualElement>("warnings-container");
 
-            // Apply proper sizing to the icon
-            if (seedIcon != null)
-            {
+            if (seedIcon != null) {
                 seedIcon.style.width = THUMBNAIL_SIZE;
                 seedIcon.style.height = THUMBNAIL_SIZE;
                 seedIcon.style.minWidth = THUMBNAIL_SIZE;
@@ -51,53 +41,36 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        /// <summary>
-        /// Display information for any item type
-        /// </summary>
-        public void DisplayItem(UIInventoryItem item)
-        {
-            if (item == null)
-            {
+        public void DisplayItem(UIInventoryItem item) {
+            if (item == null) {
                 Clear();
                 return;
             }
 
-            // Route to appropriate display method based on item type
-            if (item.OriginalData is SeedTemplate seedTemplate)
-            {
+            if (item.OriginalData is SeedTemplate seedTemplate) {
                 DisplaySeed(item, seedTemplate);
             }
-            else if (item.OriginalData is GeneBase gene)
-            {
+            else if (item.OriginalData is GeneBase gene) {
                 DisplayGene(gene);
             }
-            else if (item.OriginalData is ToolDefinition tool)
-            {
+            else if (item.OriginalData is ToolDefinition tool) {
                 DisplayTool(tool);
             }
-            else
-            {
+            else {
                 Clear();
             }
         }
 
-        /// <summary>
-        /// Display seed details with full stats
-        /// </summary>
-        private void DisplaySeed(UIInventoryItem item, SeedTemplate seedTemplate)
-        {
+        void DisplaySeed(UIInventoryItem item, SeedTemplate seedTemplate) {
             var data = SeedTooltipData.CreateFromSeed(seedTemplate, item.SeedRuntimeState);
-            if (data == null)
-            {
+            if (data == null) {
                 Clear();
                 return;
             }
 
-            // Set icon with proper sizing
             seedIcon.sprite = item.Icon;
             ApplyIconSizing();
 
-            // Use custom name if set
             seedNameText.text = item.GetDisplayName();
             qualityText.text = SeedQualityCalculator.GetQualityDescription(data.qualityTier);
             qualityText.style.color = SeedQualityCalculator.GetQualityColor(data.qualityTier);
@@ -112,37 +85,30 @@ namespace Abracodabra.UI.Toolkit
             CreateAttributeDisplay("Storage", data.energyStorageMultiplier);
             CreateAttributeDisplay("Generation", data.energyGenerationMultiplier);
             CreateAttributeDisplay("Yield", data.fruitYieldMultiplier);
-            CreateAttributeDisplay("Defense", data.defenseMultiplier);
+            CreateAttributeDisplay("Leaf Durability", data.leafDurabilityMultiplier);
 
             cycleTimeText.text = $"Cycle Time: {data.totalCycleTime} ticks";
             sequenceContainer.Clear();
-            foreach (var slot in data.sequenceSlots)
-            {
+            foreach (var slot in data.sequenceSlots) {
                 var label = new Label($"A{slot.position}: {slot.actionName} ({slot.modifiedCost:F0}E)");
                 sequenceContainer.Add(label);
             }
 
             synergiesContainer.Clear();
             warningsContainer.Clear();
-            foreach (var synergy in data.synergies)
-            {
+            foreach (var synergy in data.synergies) {
                 var label = new Label($"✓ {synergy}");
                 label.style.color = new StyleColor(new Color(0.5f, 1f, 0.5f));
                 synergiesContainer.Add(label);
             }
-            foreach (var warning in data.warnings)
-            {
+            foreach (var warning in data.warnings) {
                 var label = new Label($"⚠ {warning}");
                 label.style.color = new StyleColor(new Color(1f, 0.8f, 0.5f));
                 warningsContainer.Add(label);
             }
         }
 
-        /// <summary>
-        /// Display gene details (public for hover tooltips)
-        /// </summary>
-        public void DisplayGene(GeneBase gene)
-        {
+        public void DisplayGene(GeneBase gene) {
             seedIcon.sprite = gene.icon;
             ApplyIconSizing();
 
@@ -151,7 +117,6 @@ namespace Abracodabra.UI.Toolkit
             qualityText.style.color = Color.cyan;
             descriptionText.text = gene.description;
 
-            // Clear seed-specific metrics
             maturityTimeText.text = "";
             energyBalanceText.text = "";
             yieldText.text = "";
@@ -162,7 +127,6 @@ namespace Abracodabra.UI.Toolkit
             synergiesContainer.Clear();
             warningsContainer.Clear();
 
-            // Show gene-specific info
             var categoryLabel = new Label($"Category: {gene.Category}");
             attributeContainer.Add(categoryLabel);
 
@@ -170,11 +134,7 @@ namespace Abracodabra.UI.Toolkit
             attributeContainer.Add(tierLabel);
         }
 
-        /// <summary>
-        /// Display tool details
-        /// </summary>
-        private void DisplayTool(ToolDefinition tool)
-        {
+        void DisplayTool(ToolDefinition tool) {
             seedIcon.sprite = tool.icon;
             ApplyIconSizing();
 
@@ -183,7 +143,6 @@ namespace Abracodabra.UI.Toolkit
             qualityText.style.color = Color.white;
             descriptionText.text = tool.GetTooltipDescription();
 
-            // Clear all metrics
             maturityTimeText.text = "";
             energyBalanceText.text = "";
             yieldText.text = "";
@@ -194,16 +153,11 @@ namespace Abracodabra.UI.Toolkit
             synergiesContainer.Clear();
             warningsContainer.Clear();
 
-            // Show tool-specific info
             var typeLabel = new Label($"Tool Type: {tool.toolType}");
             attributeContainer.Add(typeLabel);
         }
 
-        /// <summary>
-        /// Clear the spec sheet to default state
-        /// </summary>
-        public void Clear()
-        {
+        public void Clear() {
             seedNameText.text = "Select an Item";
             qualityText.text = "Awaiting Selection...";
             qualityText.style.color = Color.gray;
@@ -219,13 +173,8 @@ namespace Abracodabra.UI.Toolkit
             warningsContainer.Clear();
         }
 
-        /// <summary>
-        /// Apply consistent icon sizing
-        /// </summary>
-        private void ApplyIconSizing()
-        {
-            if (seedIcon != null)
-            {
+        void ApplyIconSizing() {
+            if (seedIcon != null) {
                 seedIcon.style.width = THUMBNAIL_SIZE;
                 seedIcon.style.height = THUMBNAIL_SIZE;
                 seedIcon.style.minWidth = THUMBNAIL_SIZE;
@@ -236,9 +185,8 @@ namespace Abracodabra.UI.Toolkit
             }
         }
 
-        private void CreateAttributeDisplay(string label, float value)
-        {
-            var labelElement = new Label($"{label}: {value:F2}x");
+        void CreateAttributeDisplay(string label, float value) {
+            var labelElement = new Label($"{label}: ×{value:F1}");
             labelElement.style.fontSize = 13;
             attributeContainer.Add(labelElement);
         }

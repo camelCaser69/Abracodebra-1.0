@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "AnimalDefinition", menuName = "Abracodabra/Animal Definition")]
-public class AnimalDefinition : ScriptableObject
-{
+public class AnimalDefinition : ScriptableObject {
     public string animalName = "DefaultAnimal";
     public GameObject prefab;
 
@@ -45,25 +43,25 @@ public class AnimalDefinition : ScriptableObject
     public List<ScentDefinition> attractiveScentDefinitions = new List<ScentDefinition>();
     public List<ScentDefinition> repellentScentDefinitions = new List<ScentDefinition>();
 
-    // ──────────────────────────────────────────────────────────
-    // TASK 8: Pest combat fields
-    // ──────────────────────────────────────────────────────────
-
     [Header("Pest / Combat")]
     [Tooltip("If true, this animal will seek and attack plants during waves.")]
     public bool isPest = false;
 
-    [Tooltip("Damage dealt to a plant each tick while adjacent to it.")]
+    [System.Obsolete("Use baseEatSpeedTicks instead. HP damage is being replaced by leaf eating.")]
+    [Tooltip("DEPRECATED — Damage dealt to a plant each tick while adjacent to it.")]
     public float attackDamage = 5f;
+
+    [Tooltip("How many ticks this pest takes to eat one leaf (before leaf durability multiplier). Lower = faster eater.")]
+    public int baseEatSpeedTicks = 2;
 
     [Tooltip("Tiles within which a pest will start dealing damage to a plant.")]
     public float attackRangeTiles = 1.5f;
 
-    [Tooltip("How many ticks between each attack. 1 = every tick.")]
+    [System.Obsolete("Cooldown replaced by eat duration (baseEatSpeedTicks × leafDurabilityMultiplier).")]
+    [Tooltip("DEPRECATED — How many ticks between each attack.")]
     public int attackCooldownTicks = 1;
 
-    void OnValidate()
-    {
+    void OnValidate() {
         maxHealth = Mathf.Max(1f, maxHealth);
         movementSpeed = Mathf.Max(0.1f, movementSpeed);
 
@@ -86,8 +84,7 @@ public class AnimalDefinition : ScriptableObject
 
         thoughtCooldownTicks = Mathf.Max(1, thoughtCooldownTicks);
 
-        attackDamage = Mathf.Max(0f, attackDamage);
+        baseEatSpeedTicks = Mathf.Max(1, baseEatSpeedTicks);
         attackRangeTiles = Mathf.Max(0.5f, attackRangeTiles);
-        attackCooldownTicks = Mathf.Max(1, attackCooldownTicks);
     }
 }

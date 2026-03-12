@@ -1,14 +1,17 @@
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Genes/Core/PassiveGene.cs
+using UnityEngine;
 using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Core {
     public enum PassiveStatType {
-        None,           // For passive genes that don't modify stats (e.g., TerrainAffinityGene)
+        None,             // For passive genes that don't modify stats (e.g., TerrainAffinityGene)
         GrowthSpeed,
         EnergyGeneration,
         EnergyStorage,
         FruitYield,
-        Defense
+        Defense,          // v6: drives leafDurabilityMultiplier (Thick Bark)
+        LeafRegrowth,     // v6: ticks between automatic leaf regrowths (lower = faster)
+        ThornDamage       // v6: flat damage dealt to pests when they eat a leaf
     }
 
     public abstract class PassiveGene : GeneBase {
@@ -17,13 +20,13 @@ namespace Abracodabra.Genes.Core {
         [Header("Stat Modification")]
         [Tooltip("Which stat this gene modifies. Set to 'None' for genes that don't modify stats (like TerrainAffinity).")]
         public PassiveStatType statToModify = PassiveStatType.None;
-        
+
         [Tooltip("Base value of the modification (multiplier). 1.0 = no change.")]
         public float baseValue = 1f;
-        
+
         [Tooltip("If true, multiple copies stack additively. If false, they stack multiplicatively.")]
         public bool stacksAdditively = true;
-        
+
         [Tooltip("Maximum number of this gene that can be stacked. -1 for unlimited.")]
         public int maxStacks = -1;
 

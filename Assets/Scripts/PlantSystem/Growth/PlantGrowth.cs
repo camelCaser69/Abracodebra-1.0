@@ -20,6 +20,7 @@ namespace Abracodabra.Genes {
         Initializing,
         Growing,
         Mature,
+        Withering,
         Dead
     }
 
@@ -74,9 +75,43 @@ namespace Abracodabra.Genes {
         [HideInInspector] public float fruitYieldMultiplier = 1f;
         [HideInInspector] public float defenseMultiplier = 1f;
 
+        // ─── Leaf Vitality (v6) ───────────────────────────────────────
+        [HideInInspector] public float leafDurabilityMultiplier = 1f;
+        [HideInInspector] public float thornDamage = 0f;
+        [HideInInspector] public float leafRegrowthRate = 0f;
+
+        private int witheringTicksRemaining = 0;
+        private const int WITHERING_DURATION = 3;
+
+        private int regrowthTickCounter = 0;
+
+        private List<Vector2Int> destroyedLeafPositions = new List<Vector2Int>();
+
+        /// <summary>Public read access so healing effects can check if there's anything to regrow.</summary>
+        public int DestroyedLeafCount => destroyedLeafPositions.Count;
+
+        /// <summary>
+        /// Fires when any leaf is destroyed on this plant. Args: (plant, destroyed leaf coord).
+        /// Subscribe for: Reactive Burst trigger, Thorned Leaves, Spore Burst, etc.
+        /// Chain Reactor combo works automatically: explosion → DestroyRandomLeaf → OnLeafConsumed
+        /// → neighbor Reactive Burst → explosion → etc.
+        /// </summary>
+        public event System.Action<PlantGrowth, Vector2Int> OnLeafConsumed;
+
+        public int MaxLeafCount => CellManager != null ? CellManager.LeafDataList.Count : 0;
+        public int ActiveLeafCount => CellManager != null ? CellManager.GetActiveLeafCount() : 0;
+
+        // ─── Withering Visuals (Task 4.2) ────────────────────────────
+        private static readonly Color WitheringTint = new Color(0.6f, 0.4f, 0.2f);
+        private Dictionary<SpriteRenderer, Color> preWitheringColors;
+        // ──────────────────────────────────────────────────────────────
+
         [Header("Plant HP")]
+        [System.Obsolete("HP system replaced by leaf vitality. Use ActiveLeafCount instead.")]
         public float maxHP = 50f;
-        [HideInInspector] public float currentHP;
+        [HideInInspector]
+        [System.Obsolete("HP system replaced by leaf vitality. Use ActiveLeafCount instead.")]
+        public float currentHP;
 
         [HideInInspector] public float baseGrowthChance;
         [HideInInspector] public int minHeight;
@@ -102,7 +137,6 @@ namespace Abracodabra.Genes {
                 Debug.LogError($"[{nameof(PlantGrowth)}] could not retrieve IDeterministicRandom service! Growth will be non-deterministic.", this);
             }
 
-            // Initialize the World UI for Health/Energy Bars
             var worldUI = GetComponent<PlantWorldUI>();
             if (worldUI == null) {
                 worldUI = gameObject.AddComponent<PlantWorldUI>();
@@ -142,6 +176,8 @@ namespace Abracodabra.Genes {
 
             GrowthLogic.CalculateAndApplyPassiveStats();
 
+            leafDurabilityMultiplier = defenseMultiplier;
+
             EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
             EnergySystem.CurrentEnergy = geneRuntimeState.template.startingEnergy;
             EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
@@ -151,7 +187,14 @@ namespace Abracodabra.Genes {
             CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
 
             CurrentState = PlantState.Initializing;
+#pragma warning disable CS0618
             currentHP = maxHP;
+#pragma warning restore CS0618
+
+            destroyedLeafPositions.Clear();
+            witheringTicksRemaining = 0;
+            regrowthTickCounter = 0;
+            preWitheringColors = null;
 
             StartCoroutine(DelayedGrowthStart());
 
@@ -168,7 +211,38 @@ namespace Abracodabra.Genes {
             Debug.Log($"Plant '{gameObject.name}' transitioned to Growing state");
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        //  TICK UPDATE
+        // ═══════════════════════════════════════════════════════════════
         public void OnTickUpdate(int currentTick) {
+            // ── Regrowth passive ticks EVEN during withering (Task 6.3) ──
+            if (leafRegrowthRate > 0 && destroyedLeafPositions.Count > 0) {
+                regrowthTickCounter++;
+                if (regrowthTickCounter >= Mathf.CeilToInt(leafRegrowthRate)) {
+                    RegrowLeaf();
+                    regrowthTickCounter = 0;
+                }
+            }
+
+            // ── Withering countdown ──
+            if (CurrentState == PlantState.Withering) {
+                witheringTicksRemaining--;
+                Debug.Log($"[PlantGrowth] '{name}' withering… {witheringTicksRemaining} ticks remaining.");
+
+                if (witheringTicksRemaining <= 0) {
+                    if (ActiveLeafCount <= 0) {
+                        Die();
+                        return;
+                    }
+                    else {
+                        ExitWithering();
+                        Debug.Log($"[PlantGrowth] '{name}' survived withering! Leaves regrew in time.");
+                    }
+                }
+                return;
+            }
+
+            // ── Normal tick logic ──
             if (CurrentState == PlantState.Mature || rechargeEnergyDuringGrowth) {
                 EnergySystem.OnTickUpdate();
             }
@@ -190,6 +264,138 @@ namespace Abracodabra.Genes {
             }
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        //  WITHERING VISUALS (Task 4.2)
+        // ═══════════════════════════════════════════════════════════════
+
+        private void EnterWithering() {
+            CurrentState = PlantState.Withering;
+            witheringTicksRemaining = WITHERING_DURATION;
+
+            var renderers = GetComponentsInChildren<SpriteRenderer>();
+            preWitheringColors = new Dictionary<SpriteRenderer, Color>(renderers.Length);
+            foreach (var r in renderers) {
+                if (r != null) {
+                    preWitheringColors[r] = r.color;
+                    r.color = new Color(WitheringTint.r, WitheringTint.g, WitheringTint.b, r.color.a);
+                }
+            }
+
+            Debug.Log($"[PlantGrowth] '{name}' has 0 leaves — entering Withering ({WITHERING_DURATION} ticks until death).");
+        }
+
+        private void ExitWithering() {
+            CurrentState = PlantState.Mature;
+            witheringTicksRemaining = 0;
+
+            if (preWitheringColors != null) {
+                foreach (var kvp in preWitheringColors) {
+                    if (kvp.Key != null) {
+                        kvp.Key.color = kvp.Value;
+                    }
+                }
+                preWitheringColors = null;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  LEAF VITALITY — Core methods
+        // ═══════════════════════════════════════════════════════════════
+
+        public bool DestroyRandomLeaf(string source = "unknown") {
+            var activeLeaves = CellManager.LeafDataList.Where(l => l.IsActive).ToList();
+            if (activeLeaves.Count == 0) return false;
+
+            var target = activeLeaves[Random.Range(0, activeLeaves.Count)];
+            Vector2Int coord = target.GridCoord;
+
+            GameObject cellObj = CellManager.GetCellGameObjectAt(coord);
+            Vector3 vfxPos = cellObj != null
+                ? cellObj.transform.position
+                : transform.position + new Vector3(coord.x * cellSpacing, coord.y * cellSpacing, 0);
+
+            CellManager.ReportCellDestroyed(coord);
+
+            if (!destroyedLeafPositions.Contains(coord)) {
+                destroyedLeafPositions.Add(coord);
+            }
+
+            OnLeafConsumed?.Invoke(this, coord);
+
+            StartCoroutine(DamageFlash());
+            FloatingCombatText.Spawn(vfxPos, "-1 Leaf", new Color(0.4f, 0.8f, 0.2f));
+
+            Debug.Log($"[PlantGrowth] '{name}' lost a leaf from {source}. Remaining: {ActiveLeafCount}");
+
+            CheckLeafVitality();
+            return true;
+        }
+
+        public bool RegrowLeaf() {
+            if (destroyedLeafPositions.Count == 0) return false;
+
+            Vector2Int regrowCoord = destroyedLeafPositions[0];
+            destroyedLeafPositions.RemoveAt(0);
+
+            if (CellManager.HasCellAt(regrowCoord)) return false;
+
+            GameObject newLeaf = CellManager.SpawnCellVisual(PlantCellType.Leaf, regrowCoord);
+
+            Vector3 vfxPos = newLeaf != null
+                ? newLeaf.transform.position
+                : transform.position + (Vector3)(Vector2)regrowCoord * cellSpacing;
+            FloatingCombatText.Spawn(vfxPos + Vector3.up * 0.1f, "+1 Leaf", Color.green);
+
+            if (newLeaf != null) {
+                StartCoroutine(LeafRegrowAnimation(newLeaf.transform));
+            }
+
+            CheckLeafVitality();
+
+            Debug.Log($"[PlantGrowth] '{name}' regrew a leaf at {regrowCoord}. Active: {ActiveLeafCount}");
+            return true;
+        }
+
+        private void CheckLeafVitality() {
+            int activeLeaves = ActiveLeafCount;
+
+            if (activeLeaves > 0) {
+                if (CurrentState == PlantState.Withering) {
+                    ExitWithering();
+                    Debug.Log($"[PlantGrowth] '{name}' saved from withering! A leaf regrew.");
+                }
+            }
+            else if (activeLeaves <= 0 && CurrentState == PlantState.Mature) {
+                EnterWithering();
+            }
+        }
+
+        private IEnumerator LeafRegrowAnimation(Transform leafTransform) {
+            if (leafTransform == null) yield break;
+
+            Vector3 targetScale = leafTransform.localScale;
+            leafTransform.localScale = targetScale * 0.3f;
+
+            float elapsed = 0f;
+            float duration = 0.3f;
+
+            while (elapsed < duration) {
+                if (leafTransform == null) yield break;
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                leafTransform.localScale = Vector3.Lerp(targetScale * 0.3f, targetScale, t);
+                yield return null;
+            }
+
+            if (leafTransform != null) {
+                leafTransform.localScale = targetScale;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  GROWTH
+        // ═══════════════════════════════════════════════════════════════
+
         void GrowSomething() {
             int oldHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
 
@@ -200,13 +406,10 @@ namespace Abracodabra.Genes {
 
                 if (newHeight > 0 && newHeight % leafGap == 0) {
                     int leafY = newHeight;
-
                     for (int i = 0; i < leafDensity; i++) {
                         int leafOffset = (i / 2) + 1;
                         int xOffset = (i % 2 == 0) ? -leafOffset : leafOffset;
-
                         var leafPos = new Vector2Int(xOffset, leafY);
-
                         if (!CellManager.HasCellAt(leafPos)) {
                             CellManager.SpawnCellVisual(PlantCellType.Leaf, leafPos);
                         }
@@ -218,10 +421,38 @@ namespace Abracodabra.Genes {
             }
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        //  EATING — Leaf vitality + thorn damage
+        // ═══════════════════════════════════════════════════════════════
+
         public void HandleBeingEaten(AnimalController eater, PlantCell eatenCell) {
             Debug.Log($"{eater.SpeciesName} ate cell at {eatenCell.GridCoord} on plant {name}");
             CellManager?.ReportCellDestroyed(eatenCell.GridCoord);
+
+            if (eatenCell.CellType == PlantCellType.Leaf) {
+                if (!destroyedLeafPositions.Contains(eatenCell.GridCoord)) {
+                    destroyedLeafPositions.Add(eatenCell.GridCoord);
+                }
+                OnLeafConsumed?.Invoke(this, eatenCell.GridCoord);
+
+                // Thorn damage: pests take damage AFTER eating a leaf (Task 7.3)
+                if (thornDamage > 0 && eater != null) {
+                    eater.TakeDamage(thornDamage);
+                    FloatingCombatText.Spawn(
+                        eater.transform.position + Vector3.up * 0.3f,
+                        $"-{thornDamage:F0}",
+                        new Color(0.2f, 0.8f, 0.2f)
+                    );
+                    Debug.Log($"[Thorns] Pest '{eater.SpeciesName}' took {thornDamage} thorn damage from eating leaf on '{name}'");
+                }
+
+                CheckLeafVitality();
+            }
         }
+
+        // ═══════════════════════════════════════════════════════════════
+        //  FRUIT MANAGEMENT
+        // ═══════════════════════════════════════════════════════════════
 
         public void RegisterFruitPosition(Vector2Int coord) {
             if (!activeFruitPositions.Contains(coord)) {
@@ -244,7 +475,6 @@ namespace Abracodabra.Genes {
             List<Transform> spawnPoints = new List<Transform>();
             List<Vector2Int> sourcePositions = GetFruitSourcePositions();
             HashSet<Vector2Int> emptyPositions = FindEmptyPositionsAround(sourcePositions);
-
             var availablePositions = emptyPositions.Where(pos => !activeFruitPositions.Contains(pos)).ToList();
 
             foreach (Vector2Int emptyPos in availablePositions) {
@@ -263,34 +493,24 @@ namespace Abracodabra.Genes {
 
         List<Vector2Int> GetFruitSourcePositions() {
             List<Vector2Int> sourcePositions = new List<Vector2Int>();
-
             foreach (var kvp in CellManager.cells) {
-                if (kvp.Value == PlantCellType.Stem) {
-                    sourcePositions.Add(kvp.Key);
-                }
+                if (kvp.Value == PlantCellType.Stem) sourcePositions.Add(kvp.Key);
             }
-
             if (allowFruitsAroundLeaves) {
                 foreach (var kvp in CellManager.cells) {
-                    if (kvp.Value == PlantCellType.Leaf) {
-                        sourcePositions.Add(kvp.Key);
-                    }
+                    if (kvp.Value == PlantCellType.Leaf) sourcePositions.Add(kvp.Key);
                 }
             }
-
             return sourcePositions;
         }
 
         HashSet<Vector2Int> FindEmptyPositionsAround(List<Vector2Int> sourcePositions) {
             HashSet<Vector2Int> emptyPositions = new HashSet<Vector2Int>();
-
             foreach (Vector2Int sourcePos in sourcePositions) {
                 for (int x = -fruitSearchRadius; x <= fruitSearchRadius; x++) {
                     for (int y = -fruitSearchRadius; y <= fruitSearchRadius; y++) {
                         if (x == 0 && y == 0) continue;
-
                         Vector2Int checkPos = sourcePos + new Vector2Int(x, y);
-
                         if (!CellManager.HasCellAt(checkPos)) {
                             float distance = Vector2Int.Distance(sourcePos, checkPos);
                             if (distance <= fruitSearchRadius) {
@@ -300,26 +520,21 @@ namespace Abracodabra.Genes {
                     }
                 }
             }
-
             return emptyPositions;
         }
 
         GameObject CreateTemporarySpawnPoint(Vector2Int gridPos) {
             float spacing = GetCellWorldSpacing();
             Vector3 worldPos = transform.position + new Vector3(gridPos.x * spacing, gridPos.y * spacing, 0);
-
             GameObject spawnPoint = new GameObject($"TempFruitSpawnPoint_{gridPos.x}_{gridPos.y}");
             spawnPoint.transform.position = worldPos;
             spawnPoint.transform.SetParent(transform);
-
             spawnPoint.AddComponent<TemporaryFruitSpawnMarker>();
-
             return spawnPoint;
         }
 
         IEnumerator CleanupTemporarySpawnPoints(List<Transform> spawnPoints, float delay) {
             yield return new WaitForSeconds(delay);
-
             foreach (Transform spawnPoint in spawnPoints) {
                 if (spawnPoint != null && spawnPoint.GetComponent<TemporaryFruitSpawnMarker>() != null) {
                     Destroy(spawnPoint.gameObject);
@@ -341,9 +556,7 @@ namespace Abracodabra.Genes {
                 }
             }
 
-            if (fruitGameObjects.Count == 0) {
-                return harvestedItems;
-            }
+            if (fruitGameObjects.Count == 0) return harvestedItems;
 
             foreach (var fruitGO in fruitGameObjects) {
                 var fruitComponent = fruitGO.GetComponent<Fruit>();
@@ -354,7 +567,6 @@ namespace Abracodabra.Genes {
                         fruitComponent.PayloadGeneInstances
                     ));
                 }
-
                 Destroy(fruitGO);
             }
 
@@ -362,38 +574,24 @@ namespace Abracodabra.Genes {
             return harvestedItems;
         }
 
+        // ═══════════════════════════════════════════════════════════════
+        //  DAMAGE — Deprecated HP pathway (Task 5.4 wrapper)
+        // ═══════════════════════════════════════════════════════════════
+
+        [System.Obsolete("Use DestroyRandomLeaf() instead. HP damage is being replaced by leaf vitality.")]
         public void TakeDamage(float amount) {
             if (CurrentState == PlantState.Dead) return;
-
-            float reduction = Mathf.Clamp01(defenseMultiplier - 1f);
-            float finalDamage = amount * (1f - reduction);
-
-            currentHP -= finalDamage;
-            currentHP = Mathf.Max(0f, currentHP);
-
-            StartCoroutine(DamageFlash());
-
-            // Spawn Floating Combat Text
-            if (finalDamage > 0) {
-                FloatingCombatText.Spawn(transform.position + Vector3.up * 0.5f, $"-{finalDamage:F0}", Color.red);
-            }
-
-            if (currentHP <= 0f) {
-                Die();
-            }
+            DestroyRandomLeaf("legacy:TakeDamage");
         }
 
-        private System.Collections.IEnumerator DamageFlash() {
+        System.Collections.IEnumerator DamageFlash() {
             var renderers = GetComponentsInChildren<SpriteRenderer>();
             var originalColors = new Color[renderers.Length];
-
             for (int i = 0; i < renderers.Length; i++) {
                 originalColors[i] = renderers[i].color;
                 renderers[i].color = Color.red;
             }
-
             yield return new WaitForSeconds(0.15f);
-
             for (int i = 0; i < renderers.Length; i++) {
                 if (renderers[i] != null)
                     renderers[i].color = originalColors[i];
@@ -402,40 +600,27 @@ namespace Abracodabra.Genes {
 
         public void Die() {
             if (CurrentState == PlantState.Dead) return;
-
             CurrentState = PlantState.Dead;
+            preWitheringColors = null;
             Debug.Log($"[PlantGrowth] Plant '{gameObject.name}' has died!");
 
-            // Unregister from tick system
             if (TickManager.Instance != null) {
                 TickManager.Instance.UnregisterTickUpdateable(this);
             }
-
             AllActivePlants.Remove(this);
-
-            // Death visual: shrink and fade
             StartCoroutine(DeathAnimation());
         }
 
-        private System.Collections.IEnumerator DeathAnimation() {
+        System.Collections.IEnumerator DeathAnimation() {
             float duration = 0.5f;
             float elapsed = 0f;
             Vector3 startScale = transform.localScale;
-
             var renderers = GetComponentsInChildren<SpriteRenderer>();
 
             while (elapsed < duration) {
                 elapsed += Time.deltaTime;
                 float t = elapsed / duration;
-
-                // Shrink Y scale
-                transform.localScale = new Vector3(
-                    startScale.x,
-                    Mathf.Lerp(startScale.y, 0f, t),
-                    startScale.z
-                );
-
-                // Fade out
+                transform.localScale = new Vector3(startScale.x, Mathf.Lerp(startScale.y, 0f, t), startScale.z);
                 foreach (var r in renderers) {
                     if (r != null) {
                         Color c = r.color;
@@ -443,33 +628,34 @@ namespace Abracodabra.Genes {
                         r.color = c;
                     }
                 }
-
                 yield return null;
             }
-
             Destroy(gameObject);
         }
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         void OnDrawGizmos() {
             if (!Application.isPlaying) return;
             if (CellManager == null || CellManager.cells == null) return;
-
             float spacing = GetCellWorldSpacing();
 
             foreach (var cell in CellManager.cells) {
                 Vector2 cellWorldPos = (Vector2)transform.position + (Vector2)cell.Key * spacing;
-
                 switch (cell.Value) {
                     case PlantCellType.Stem: Gizmos.color = new Color(0, 1, 0, 0.5f); break;
                     case PlantCellType.Leaf: Gizmos.color = new Color(1, 1, 0, 0.5f); break;
                     case PlantCellType.Seed: Gizmos.color = new Color(1, 1, 1, 0.5f); break;
                     case PlantCellType.Fruit: Gizmos.color = new Color(1, 0, 0, 0.5f); break;
                 }
-
                 Gizmos.DrawCube(cellWorldPos, Vector3.one * spacing * 0.9f);
                 Gizmos.color = new Color(Gizmos.color.r, Gizmos.color.g, Gizmos.color.b, 1f);
                 Gizmos.DrawWireCube(cellWorldPos, Vector3.one * spacing);
+            }
+
+            Gizmos.color = new Color(1f, 0f, 1f, 0.4f);
+            foreach (var deadCoord in destroyedLeafPositions) {
+                Vector2 worldPos = (Vector2)transform.position + (Vector2)deadCoord * spacing;
+                Gizmos.DrawWireSphere(worldPos, spacing * 0.3f);
             }
 
             Gizmos.color = new Color(0, 1, 1, 0.2f);
@@ -479,16 +665,14 @@ namespace Abracodabra.Genes {
 
             Handles.Label(
                 transform.position + Vector3.up * (maxHeight + 1) * spacing,
-                $"Cell Spacing: {spacing:F4} wu\nPPU: {(ResolutionManager.HasInstance ? ResolutionManager.Instance.CurrentPPU.ToString() : "Unknown")}\nTile Aligned: {Mathf.Approximately(spacing, 1f)}\nEnergy: {(EnergySystem != null ? EnergySystem.CurrentEnergy : 0):F0}"
+                $"Spacing: {spacing:F4}\nEnergy: {(EnergySystem != null ? EnergySystem.CurrentEnergy : 0):F0}\nLeaves: {ActiveLeafCount}/{MaxLeafCount}\nState: {CurrentState}\nRegrowth: {(leafRegrowthRate > 0 ? $"every {leafRegrowthRate:F0}t" : "none")}"
             );
         }
 
         void OnDrawGizmosSelected() {
             if (!Application.isPlaying || CellManager == null) return;
-
             List<Vector2Int> sourcePositions = GetFruitSourcePositions();
             HashSet<Vector2Int> emptyPositions = FindEmptyPositionsAround(sourcePositions);
-
             float spacing = GetCellWorldSpacing();
 
             Gizmos.color = Color.green;
@@ -496,13 +680,12 @@ namespace Abracodabra.Genes {
                 Vector3 worldPos = transform.position + new Vector3(sourcePos.x * spacing, sourcePos.y * spacing, 0);
                 Gizmos.DrawWireSphere(worldPos, spacing * 0.2f);
             }
-
             Gizmos.color = Color.cyan;
             foreach (Vector2Int emptyPos in emptyPositions) {
                 Vector3 worldPos = transform.position + new Vector3(emptyPos.x * spacing, emptyPos.y * spacing, 0);
                 Gizmos.DrawWireCube(worldPos, Vector3.one * spacing * 0.5f);
             }
         }
-        #endif
+#endif
     }
 }

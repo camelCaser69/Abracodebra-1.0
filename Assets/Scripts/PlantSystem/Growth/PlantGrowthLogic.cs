@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes {
     public class PlantGrowthLogic {
@@ -21,14 +22,23 @@ namespace Abracodabra.Genes {
                 return;
             }
 
+            // Reset all stats
             plant.growthSpeedMultiplier = 1f;
             plant.energyGenerationMultiplier = 1f;
             plant.energyStorageMultiplier = 1f;
             plant.fruitYieldMultiplier = 1f;
+            plant.leafDurabilityMultiplier = 1f;
             plant.defenseMultiplier = 1f;
+            plant.leafRegrowthRate = 0f;
+            plant.thornDamage = 0f;
 
             var additiveBonuses = new Dictionary<PassiveStatType, float>();
             var multiplicativeBonuses = new Dictionary<PassiveStatType, float>();
+
+            // Flat-value accumulators for stats that don't use the multiplier pattern
+            float thornDamageAccumulator = 0f;
+            int regrowthStackCount = 0;
+            float regrowthBaseValue = 0f;
 
             foreach (var instance in plant.geneRuntimeState.passiveInstances) {
                 var passiveGene = instance.GetGene<PassiveGene>();
@@ -41,6 +51,20 @@ namespace Abracodabra.Genes {
 
                 float value = passiveGene.baseValue * instance.GetValue("power_multiplier", 1f);
 
+                // ThornDamage: flat additive (5 per stack, not multiplier-based)
+                if (passiveGene.statToModify == PassiveStatType.ThornDamage) {
+                    thornDamageAccumulator += value;
+                    continue;
+                }
+
+                // LeafRegrowth: first stack sets base rate, additional stacks reduce it
+                if (passiveGene.statToModify == PassiveStatType.LeafRegrowth) {
+                    regrowthStackCount++;
+                    regrowthBaseValue = value; // all stacks have same base
+                    continue;
+                }
+
+                // Standard multiplier stats
                 if (passiveGene.stacksAdditively) {
                     if (!additiveBonuses.ContainsKey(passiveGene.statToModify))
                         additiveBonuses[passiveGene.statToModify] = 0f;
@@ -53,11 +77,20 @@ namespace Abracodabra.Genes {
                 }
             }
 
+            // Apply standard multiplier stats
             foreach (var kvp in additiveBonuses) {
                 ApplyStat(kvp.Key, 1f + kvp.Value);
             }
             foreach (var kvp in multiplicativeBonuses) {
                 ApplyStat(kvp.Key, kvp.Value);
+            }
+
+            // Apply flat ThornDamage: N stacks × baseValue = total damage per leaf consumed
+            plant.thornDamage = thornDamageAccumulator;
+
+            // Apply LeafRegrowth: base rate reduced by 1 per extra stack, minimum 2
+            if (regrowthStackCount > 0) {
+                plant.leafRegrowthRate = Mathf.Max(2f, regrowthBaseValue - (regrowthStackCount - 1));
             }
 
             if (plant.EnergySystem != null) {
@@ -69,7 +102,9 @@ namespace Abracodabra.Genes {
                 $"EnergyGen={plant.energyGenerationMultiplier:F2}x, " +
                 $"EnergyStore={plant.energyStorageMultiplier:F2}x, " +
                 $"FruitYield={plant.fruitYieldMultiplier:F2}x, " +
-                $"Defense={plant.defenseMultiplier:F2}x");
+                $"LeafDurability={plant.leafDurabilityMultiplier:F2}x, " +
+                $"LeafRegrowth={plant.leafRegrowthRate:F1}t, " +
+                $"ThornDmg={plant.thornDamage:F1}");
         }
 
         void ApplyStat(PassiveStatType stat, float value) {
@@ -89,7 +124,12 @@ namespace Abracodabra.Genes {
                     plant.fruitYieldMultiplier *= value;
                     break;
                 case PassiveStatType.Defense:
+                    plant.leafDurabilityMultiplier *= value;
                     plant.defenseMultiplier *= value;
+                    break;
+                // LeafRegrowth and ThornDamage handled separately above
+                case PassiveStatType.LeafRegrowth:
+                case PassiveStatType.ThornDamage:
                     break;
             }
         }

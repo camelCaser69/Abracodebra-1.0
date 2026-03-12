@@ -1,39 +1,27 @@
-﻿// File: Assets/Scripts/UI/_UGUI_Legacy/TooltipUtilities.cs
+﻿// FILE: Assets/Scripts/A_ToolkitUI/TooltipUtilities.cs
 using UnityEngine;
 
-namespace Abracodabra.UI.Tooltips
-{
-    /// <summary>
-    /// Calculates quality tier for seeds based on their stats.
-    /// Used by UISpecSheetController to display quality ratings.
-    /// </summary>
-    public static class SeedQualityCalculator
-    {
+namespace Abracodabra.UI.Tooltips {
+    public static class SeedQualityCalculator {
         public enum QualityTier { Trash, Poor, Common, Good, Excellent, Legendary }
 
-        public static QualityTier CalculateQuality(SeedTooltipData data)
-        {
+        public static QualityTier CalculateQuality(SeedTooltipData data) {
             if (data == null) return QualityTier.Common;
 
             float score = 0f;
 
-            // Energy efficiency score
             float efficiencyScore = Mathf.Clamp01((data.energySurplusPerCycle + 10) / 50f);
             score += efficiencyScore * 30f;
 
-            // Maturity speed score
             float maturityScore = 1f - Mathf.Clamp01(data.estimatedMaturityTicks / 100f);
             score += maturityScore * 25f;
 
-            // Yield score
             score += Mathf.Clamp01((data.fruitYieldMultiplier - 1f) / 1.5f) * 25f;
 
-            // Defense score
-            score += Mathf.Clamp01(data.defenseMultiplier) * 20f;
+            // v6: use leafDurabilityMultiplier — higher durability = better quality
+            score += Mathf.Clamp01(data.leafDurabilityMultiplier / 3f) * 20f;
 
-            // Penalty for warnings
-            if (data.warnings != null)
-            {
+            if (data.warnings != null) {
                 score -= data.warnings.Count * 10f;
             }
 
@@ -45,10 +33,8 @@ namespace Abracodabra.UI.Tooltips
             return QualityTier.Trash;
         }
 
-        public static string GetQualityDescription(QualityTier tier)
-        {
-            switch (tier)
-            {
+        public static string GetQualityDescription(QualityTier tier) {
+            switch (tier) {
                 case QualityTier.Legendary: return "★★★★★ Legendary";
                 case QualityTier.Excellent: return "★★★★☆ Excellent";
                 case QualityTier.Good: return "★★★☆☆ Good";
@@ -59,10 +45,8 @@ namespace Abracodabra.UI.Tooltips
             }
         }
 
-        public static Color GetQualityColor(QualityTier tier)
-        {
-            switch (tier)
-            {
+        public static Color GetQualityColor(QualityTier tier) {
+            switch (tier) {
                 case QualityTier.Legendary: return new Color(1f, 0.6f, 0.1f);   // Orange
                 case QualityTier.Excellent: return new Color(0.2f, 0.6f, 1f);   // Blue
                 case QualityTier.Good: return new Color(0.2f, 0.8f, 0.2f);      // Green
