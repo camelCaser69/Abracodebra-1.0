@@ -1,4 +1,5 @@
 ﻿// FILE: Assets/Scripts/PlantSystem/Growth/PlantGrowth.cs
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,9 +74,7 @@ namespace Abracodabra.Genes {
         [HideInInspector] public float energyGenerationMultiplier = 1f;
         [HideInInspector] public float energyStorageMultiplier = 1f;
         [HideInInspector] public float fruitYieldMultiplier = 1f;
-        [HideInInspector] public float defenseMultiplier = 1f;
 
-        // ─── Leaf Vitality (v6) ───────────────────────────────────────
         [HideInInspector] public float leafDurabilityMultiplier = 1f;
         [HideInInspector] public float thornDamage = 0f;
         [HideInInspector] public float leafRegrowthRate = 0f;
@@ -87,31 +86,15 @@ namespace Abracodabra.Genes {
 
         private List<Vector2Int> destroyedLeafPositions = new List<Vector2Int>();
 
-        /// <summary>Public read access so healing effects can check if there's anything to regrow.</summary>
         public int DestroyedLeafCount => destroyedLeafPositions.Count;
 
-        /// <summary>
-        /// Fires when any leaf is destroyed on this plant. Args: (plant, destroyed leaf coord).
-        /// Subscribe for: Reactive Burst trigger, Thorned Leaves, Spore Burst, etc.
-        /// Chain Reactor combo works automatically: explosion → DestroyRandomLeaf → OnLeafConsumed
-        /// → neighbor Reactive Burst → explosion → etc.
-        /// </summary>
         public event System.Action<PlantGrowth, Vector2Int> OnLeafConsumed;
 
         public int MaxLeafCount => CellManager != null ? CellManager.LeafDataList.Count : 0;
         public int ActiveLeafCount => CellManager != null ? CellManager.GetActiveLeafCount() : 0;
 
-        // ─── Withering Visuals (Task 4.2) ────────────────────────────
         private static readonly Color WitheringTint = new Color(0.6f, 0.4f, 0.2f);
         private Dictionary<SpriteRenderer, Color> preWitheringColors;
-        // ──────────────────────────────────────────────────────────────
-
-        [Header("Plant HP")]
-        [System.Obsolete("HP system replaced by leaf vitality. Use ActiveLeafCount instead.")]
-        public float maxHP = 50f;
-        [HideInInspector]
-        [System.Obsolete("HP system replaced by leaf vitality. Use ActiveLeafCount instead.")]
-        public float currentHP;
 
         [HideInInspector] public float baseGrowthChance;
         [HideInInspector] public int minHeight;
@@ -121,8 +104,8 @@ namespace Abracodabra.Genes {
 
         public PlantState CurrentState { get; set; } = PlantState.Initializing;
 
-        HashSet<Vector2Int> activeFruitPositions = new HashSet<Vector2Int>();
-        IDeterministicRandom _deterministicRandom;
+        private HashSet<Vector2Int> activeFruitPositions = new HashSet<Vector2Int>();
+        private IDeterministicRandom _deterministicRandom;
 
         void Awake() {
             AllActivePlants.Add(this);
@@ -176,8 +159,6 @@ namespace Abracodabra.Genes {
 
             GrowthLogic.CalculateAndApplyPassiveStats();
 
-            leafDurabilityMultiplier = defenseMultiplier;
-
             EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
             EnergySystem.CurrentEnergy = geneRuntimeState.template.startingEnergy;
             EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
@@ -187,9 +168,6 @@ namespace Abracodabra.Genes {
             CellManager.SpawnCellVisual(PlantCellType.Seed, Vector2Int.zero);
 
             CurrentState = PlantState.Initializing;
-#pragma warning disable CS0618
-            currentHP = maxHP;
-#pragma warning restore CS0618
 
             destroyedLeafPositions.Clear();
             witheringTicksRemaining = 0;
@@ -211,11 +189,7 @@ namespace Abracodabra.Genes {
             Debug.Log($"Plant '{gameObject.name}' transitioned to Growing state");
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        //  TICK UPDATE
-        // ═══════════════════════════════════════════════════════════════
         public void OnTickUpdate(int currentTick) {
-            // ── Regrowth passive ticks EVEN during withering (Task 6.3) ──
             if (leafRegrowthRate > 0 && destroyedLeafPositions.Count > 0) {
                 regrowthTickCounter++;
                 if (regrowthTickCounter >= Mathf.CeilToInt(leafRegrowthRate)) {
@@ -224,7 +198,6 @@ namespace Abracodabra.Genes {
                 }
             }
 
-            // ── Withering countdown ──
             if (CurrentState == PlantState.Withering) {
                 witheringTicksRemaining--;
                 Debug.Log($"[PlantGrowth] '{name}' withering… {witheringTicksRemaining} ticks remaining.");
@@ -242,7 +215,6 @@ namespace Abracodabra.Genes {
                 return;
             }
 
-            // ── Normal tick logic ──
             if (CurrentState == PlantState.Mature || rechargeEnergyDuringGrowth) {
                 EnergySystem.OnTickUpdate();
             }
@@ -257,16 +229,12 @@ namespace Abracodabra.Genes {
 
             if (CurrentState == PlantState.Growing) {
                 float randomValue = (_deterministicRandom != null) ?
-                    _deterministicRandom.Range(0f, 1f) : Random.value;
+                    _deterministicRandom.Range(0f, 1f) : UnityEngine.Random.value;
                 if (randomValue < baseGrowthChance * growthSpeedMultiplier) {
                     GrowSomething();
                 }
             }
         }
-
-        // ═══════════════════════════════════════════════════════════════
-        //  WITHERING VISUALS (Task 4.2)
-        // ═══════════════════════════════════════════════════════════════
 
         private void EnterWithering() {
             CurrentState = PlantState.Withering;
@@ -298,15 +266,11 @@ namespace Abracodabra.Genes {
             }
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        //  LEAF VITALITY — Core methods
-        // ═══════════════════════════════════════════════════════════════
-
         public bool DestroyRandomLeaf(string source = "unknown") {
             var activeLeaves = CellManager.LeafDataList.Where(l => l.IsActive).ToList();
             if (activeLeaves.Count == 0) return false;
 
-            var target = activeLeaves[Random.Range(0, activeLeaves.Count)];
+            var target = activeLeaves[UnityEngine.Random.Range(0, activeLeaves.Count)];
             Vector2Int coord = target.GridCoord;
 
             GameObject cellObj = CellManager.GetCellGameObjectAt(coord);
@@ -370,7 +334,7 @@ namespace Abracodabra.Genes {
             }
         }
 
-        private IEnumerator LeafRegrowAnimation(Transform leafTransform) {
+        IEnumerator LeafRegrowAnimation(Transform leafTransform) {
             if (leafTransform == null) yield break;
 
             Vector3 targetScale = leafTransform.localScale;
@@ -392,11 +356,7 @@ namespace Abracodabra.Genes {
             }
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        //  GROWTH
-        // ═══════════════════════════════════════════════════════════════
-
-        void GrowSomething() {
+        private void GrowSomething() {
             int oldHeight = CellManager.cells.Count(c => c.Value == PlantCellType.Stem);
 
             if (oldHeight < maxHeight) {
@@ -421,10 +381,6 @@ namespace Abracodabra.Genes {
             }
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        //  EATING — Leaf vitality + thorn damage
-        // ═══════════════════════════════════════════════════════════════
-
         public void HandleBeingEaten(AnimalController eater, PlantCell eatenCell) {
             Debug.Log($"{eater.SpeciesName} ate cell at {eatenCell.GridCoord} on plant {name}");
             CellManager?.ReportCellDestroyed(eatenCell.GridCoord);
@@ -435,7 +391,6 @@ namespace Abracodabra.Genes {
                 }
                 OnLeafConsumed?.Invoke(this, eatenCell.GridCoord);
 
-                // Thorn damage: pests take damage AFTER eating a leaf (Task 7.3)
                 if (thornDamage > 0 && eater != null) {
                     eater.TakeDamage(thornDamage);
                     FloatingCombatText.Spawn(
@@ -449,10 +404,6 @@ namespace Abracodabra.Genes {
                 CheckLeafVitality();
             }
         }
-
-        // ═══════════════════════════════════════════════════════════════
-        //  FRUIT MANAGEMENT
-        // ═══════════════════════════════════════════════════════════════
 
         public void RegisterFruitPosition(Vector2Int coord) {
             if (!activeFruitPositions.Contains(coord)) {
@@ -491,7 +442,7 @@ namespace Abracodabra.Genes {
             return spawnPoints.ToArray();
         }
 
-        List<Vector2Int> GetFruitSourcePositions() {
+        private List<Vector2Int> GetFruitSourcePositions() {
             List<Vector2Int> sourcePositions = new List<Vector2Int>();
             foreach (var kvp in CellManager.cells) {
                 if (kvp.Value == PlantCellType.Stem) sourcePositions.Add(kvp.Key);
@@ -504,7 +455,7 @@ namespace Abracodabra.Genes {
             return sourcePositions;
         }
 
-        HashSet<Vector2Int> FindEmptyPositionsAround(List<Vector2Int> sourcePositions) {
+        private HashSet<Vector2Int> FindEmptyPositionsAround(List<Vector2Int> sourcePositions) {
             HashSet<Vector2Int> emptyPositions = new HashSet<Vector2Int>();
             foreach (Vector2Int sourcePos in sourcePositions) {
                 for (int x = -fruitSearchRadius; x <= fruitSearchRadius; x++) {
@@ -523,7 +474,7 @@ namespace Abracodabra.Genes {
             return emptyPositions;
         }
 
-        GameObject CreateTemporarySpawnPoint(Vector2Int gridPos) {
+        private GameObject CreateTemporarySpawnPoint(Vector2Int gridPos) {
             float spacing = GetCellWorldSpacing();
             Vector3 worldPos = transform.position + new Vector3(gridPos.x * spacing, gridPos.y * spacing, 0);
             GameObject spawnPoint = new GameObject($"TempFruitSpawnPoint_{gridPos.x}_{gridPos.y}");
@@ -574,11 +525,7 @@ namespace Abracodabra.Genes {
             return harvestedItems;
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        //  DAMAGE — Deprecated HP pathway (Task 5.4 wrapper)
-        // ═══════════════════════════════════════════════════════════════
-
-        [System.Obsolete("Use DestroyRandomLeaf() instead. HP damage is being replaced by leaf vitality.")]
+        [System.Obsolete("HP-based damage is removed. Use DestroyRandomLeaf() for leaf damage or HandleBeingEaten() for pest eating.")]
         public void TakeDamage(float amount) {
             if (CurrentState == PlantState.Dead) return;
             DestroyRandomLeaf("legacy:TakeDamage");

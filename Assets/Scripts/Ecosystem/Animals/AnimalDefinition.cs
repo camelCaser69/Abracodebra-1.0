@@ -1,4 +1,4 @@
-﻿// Assets/Scripts/Ecosystem/Animals/AnimalDefinition.cs
+﻿// FILE: Assets/Scripts/Ecosystem/Animals/AnimalDefinition.cs
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -47,21 +47,13 @@ public class AnimalDefinition : ScriptableObject {
     [Tooltip("If true, this animal will seek and attack plants during waves.")]
     public bool isPest = false;
 
-    [System.Obsolete("Use baseEatSpeedTicks instead. HP damage is being replaced by leaf eating.")]
-    [Tooltip("DEPRECATED — Damage dealt to a plant each tick while adjacent to it.")]
-    public float attackDamage = 5f;
-
     [Tooltip("How many ticks this pest takes to eat one leaf (before leaf durability multiplier). Lower = faster eater.")]
     public int baseEatSpeedTicks = 2;
 
     [Tooltip("Tiles within which a pest will start dealing damage to a plant.")]
     public float attackRangeTiles = 1.5f;
 
-    [System.Obsolete("Cooldown replaced by eat duration (baseEatSpeedTicks × leafDurabilityMultiplier).")]
-    [Tooltip("DEPRECATED — How many ticks between each attack.")]
-    public int attackCooldownTicks = 1;
-
-    void OnValidate() {
+    private void OnValidate() {
         maxHealth = Mathf.Max(1f, maxHealth);
         movementSpeed = Mathf.Max(0.1f, movementSpeed);
 

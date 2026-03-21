@@ -1,4 +1,10 @@
+// ============================================================
 // FILE: Assets/Scripts/A_ToolkitUI/UISpecSheetController.cs
+// ============================================================
+// Task 8.2: Added leaf vitality info display (thorn, regrowth, leaf balance)
+// ============================================================
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -9,12 +15,12 @@ using Abracodabra.UI.Tooltips;
 
 namespace Abracodabra.UI.Toolkit {
     public class UISpecSheetController {
-        Image seedIcon;
-        Label seedNameText, qualityText, descriptionText;
-        Label maturityTimeText, energyBalanceText, yieldText, cycleTimeText;
-        VisualElement attributeContainer, sequenceContainer, synergiesContainer, warningsContainer;
+        private Image seedIcon;
+        private Label seedNameText, qualityText, descriptionText;
+        private Label maturityTimeText, energyBalanceText, yieldText, cycleTimeText;
+        private VisualElement attributeContainer, sequenceContainer, synergiesContainer, warningsContainer;
 
-        const int THUMBNAIL_SIZE = 64;
+        private const int THUMBNAIL_SIZE = 64;
 
         public void Initialize(VisualElement specSheetPanel) {
             seedIcon = specSheetPanel.Q<Image>("seed-icon");
@@ -61,7 +67,7 @@ namespace Abracodabra.UI.Toolkit {
             }
         }
 
-        void DisplaySeed(UIInventoryItem item, SeedTemplate seedTemplate) {
+        private void DisplaySeed(UIInventoryItem item, SeedTemplate seedTemplate) {
             var data = SeedTooltipData.CreateFromSeed(seedTemplate, item.SeedRuntimeState);
             if (data == null) {
                 Clear();
@@ -87,6 +93,20 @@ namespace Abracodabra.UI.Toolkit {
             CreateAttributeDisplay("Yield", data.fruitYieldMultiplier);
             CreateAttributeDisplay("Leaf Durability", data.leafDurabilityMultiplier);
 
+            // v6 leaf vitality attributes
+            if (data.hasThornedLeaves) {
+                var thornLabel = new Label($"Thorn Damage: {data.thornDamageTotal:F0} per leaf eaten");
+                thornLabel.style.fontSize = 13;
+                thornLabel.style.color = new StyleColor(new Color(0.6f, 1f, 0.6f));
+                attributeContainer.Add(thornLabel);
+            }
+            if (data.hasRegrowth) {
+                var regrowthLabel = new Label($"Leaf Regrowth: 1 leaf every {data.leafRegrowthTickRate:F0} ticks");
+                regrowthLabel.style.fontSize = 13;
+                regrowthLabel.style.color = new StyleColor(new Color(0.5f, 1f, 0.8f));
+                attributeContainer.Add(regrowthLabel);
+            }
+
             cycleTimeText.text = $"Cycle Time: {data.totalCycleTime} ticks";
             sequenceContainer.Clear();
             foreach (var slot in data.sequenceSlots) {
@@ -97,14 +117,29 @@ namespace Abracodabra.UI.Toolkit {
             synergiesContainer.Clear();
             warningsContainer.Clear();
             foreach (var synergy in data.synergies) {
-                var label = new Label($"✓ {synergy}");
+                var label = new Label($"\u2713 {synergy}");
                 label.style.color = new StyleColor(new Color(0.5f, 1f, 0.5f));
                 synergiesContainer.Add(label);
             }
             foreach (var warning in data.warnings) {
-                var label = new Label($"⚠ {warning}");
+                var label = new Label($"\u26A0 {warning}");
                 label.style.color = new StyleColor(new Color(1f, 0.8f, 0.5f));
                 warningsContainer.Add(label);
+            }
+
+            // Leaf balance summary (only for self-damaging builds)
+            if (!string.IsNullOrEmpty(data.leafBalanceSummary)) {
+                bool isSustainable = data.leafBalanceSummary.Contains("Sustainable");
+                var balanceLabel = new Label(isSustainable
+                    ? $"\u2705 {data.leafBalanceSummary}"
+                    : $"\U0001F342 {data.leafBalanceSummary}");
+                balanceLabel.style.fontSize = 12;
+                balanceLabel.style.color = new StyleColor(isSustainable
+                    ? new Color(0.4f, 1f, 0.4f)
+                    : new Color(1f, 0.65f, 0.3f));
+                balanceLabel.style.whiteSpace = WhiteSpace.Normal;
+                balanceLabel.style.marginTop = 4;
+                warningsContainer.Add(balanceLabel);
             }
         }
 
@@ -134,7 +169,7 @@ namespace Abracodabra.UI.Toolkit {
             attributeContainer.Add(tierLabel);
         }
 
-        void DisplayTool(ToolDefinition tool) {
+        private void DisplayTool(ToolDefinition tool) {
             seedIcon.sprite = tool.icon;
             ApplyIconSizing();
 
@@ -173,7 +208,7 @@ namespace Abracodabra.UI.Toolkit {
             warningsContainer.Clear();
         }
 
-        void ApplyIconSizing() {
+        private void ApplyIconSizing() {
             if (seedIcon != null) {
                 seedIcon.style.width = THUMBNAIL_SIZE;
                 seedIcon.style.height = THUMBNAIL_SIZE;
@@ -185,8 +220,8 @@ namespace Abracodabra.UI.Toolkit {
             }
         }
 
-        void CreateAttributeDisplay(string label, float value) {
-            var labelElement = new Label($"{label}: ×{value:F1}");
+        private void CreateAttributeDisplay(string label, float value) {
+            var labelElement = new Label($"{label}: \u00D7{value:F1}");
             labelElement.style.fontSize = 13;
             attributeContainer.Add(labelElement);
         }

@@ -1,4 +1,6 @@
+// FILE: Assets/Scripts/A_ToolkitUI/UISeedEditorController.cs
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,7 +10,6 @@ using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.UI.Toolkit {
     public class UISeedEditorController {
-        // Updated event signature to include slot metadata
         public event Action<GeneBase, VisualElement, int, string> OnGeneSlotPointerDown;
         public event Action<GeneBase> OnGeneSlotHoverEnter;
         public event Action OnGeneSlotHoverExit;
@@ -16,16 +17,22 @@ namespace Abracodabra.UI.Toolkit {
         public event Action<string> OnSeedNameChanged;
         public event Action<GeneBase, int, string> OnGeneRemovedFromEditor;
 
-        VisualElement seedDropSlotContainer;
-        VisualElement passiveGenesContainer;
-        VisualElement activeSequenceContainer;
-        VisualTreeAsset geneSlotTemplate;
+        private VisualElement seedDropSlotContainer;
+        private VisualElement passiveGenesContainer;
+        private VisualElement activeSequenceContainer;
+        private VisualTreeAsset geneSlotTemplate;
 
-        TextField seedNameField;
-        VisualElement nameEditorContainer;
+        private TextField seedNameField;
+        private VisualElement nameEditorContainer;
 
-        VisualElement colorPickerContainer;
-        UIInventoryItem currentSeedItem;
+        private VisualElement colorPickerContainer;
+        private UIInventoryItem currentSeedItem;
+
+        // Task 8.1: Seed Editor Lock
+        private bool isInteractable = true;
+        private Label lockLabel;
+
+        public bool IsInteractable => isInteractable;
 
         public void Initialize(VisualElement seedContainer, VisualElement passiveContainer, VisualElement activeContainer, VisualTreeAsset slotTemplate) {
             seedDropSlotContainer = seedContainer;
@@ -35,6 +42,79 @@ namespace Abracodabra.UI.Toolkit {
 
             CreateNameEditor();
             CreateColorPicker();
+        }
+
+        public void SetInteractable(bool interactable) {
+            isInteractable = interactable;
+
+            float targetOpacity = interactable ? 1f : 0.45f;
+
+            if (passiveGenesContainer != null) {
+                passiveGenesContainer.style.opacity = targetOpacity;
+                SetPickingModeRecursive(passiveGenesContainer, interactable ? PickingMode.Position : PickingMode.Ignore);
+            }
+            if (activeSequenceContainer != null) {
+                activeSequenceContainer.style.opacity = targetOpacity;
+                SetPickingModeRecursive(activeSequenceContainer, interactable ? PickingMode.Position : PickingMode.Ignore);
+            }
+
+            if (seedNameField != null) {
+                seedNameField.SetEnabled(interactable);
+            }
+            if (colorPickerContainer != null) {
+                colorPickerContainer.style.opacity = targetOpacity;
+                SetPickingModeRecursive(colorPickerContainer, interactable ? PickingMode.Position : PickingMode.Ignore);
+            }
+
+            if (!interactable) {
+                if (lockLabel == null) {
+                    lockLabel = new Label("Locked during Growth");
+                    lockLabel.name = "seed-editor-lock-label";
+                    lockLabel.style.fontSize = 14;
+                    lockLabel.style.color = new Color(1f, 0.7f, 0.3f, 0.9f);
+                    lockLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
+                    lockLabel.style.unityTextAlign = TextAnchor.MiddleCenter;
+                    lockLabel.style.backgroundColor = new Color(0.15f, 0.1f, 0.05f, 0.85f);
+                    lockLabel.style.paddingTop = 6;
+                    lockLabel.style.paddingBottom = 6;
+                    lockLabel.style.paddingLeft = 12;
+                    lockLabel.style.paddingRight = 12;
+                    lockLabel.style.borderTopLeftRadius = 6;
+                    lockLabel.style.borderTopRightRadius = 6;
+                    lockLabel.style.borderBottomLeftRadius = 6;
+                    lockLabel.style.borderBottomRightRadius = 6;
+                    lockLabel.style.borderLeftWidth = 1;
+                    lockLabel.style.borderRightWidth = 1;
+                    lockLabel.style.borderTopWidth = 1;
+                    lockLabel.style.borderBottomWidth = 1;
+                    lockLabel.style.borderLeftColor = new Color(1f, 0.6f, 0.2f, 0.6f);
+                    lockLabel.style.borderRightColor = new Color(1f, 0.6f, 0.2f, 0.6f);
+                    lockLabel.style.borderTopColor = new Color(1f, 0.6f, 0.2f, 0.6f);
+                    lockLabel.style.borderBottomColor = new Color(1f, 0.6f, 0.2f, 0.6f);
+                    lockLabel.style.marginTop = 8;
+                    lockLabel.style.marginBottom = 8;
+                    lockLabel.style.alignSelf = Align.Center;
+                }
+
+                if (lockLabel.parent == null && seedDropSlotContainer != null) {
+                    seedDropSlotContainer.Insert(0, lockLabel);
+                }
+                lockLabel.style.display = DisplayStyle.Flex;
+            }
+            else {
+                if (lockLabel != null) {
+                    lockLabel.style.display = DisplayStyle.None;
+                }
+            }
+
+            Debug.Log($"[SeedEditor] Interactable set to: {interactable}");
+        }
+
+        private void SetPickingModeRecursive(VisualElement element, PickingMode mode) {
+            element.pickingMode = mode;
+            foreach (var child in element.Children()) {
+                SetPickingModeRecursive(child, mode);
+            }
         }
 
         public void DisplaySeed(UIInventoryItem seedItem) {
@@ -128,9 +208,19 @@ namespace Abracodabra.UI.Toolkit {
                 var payloadWrapped = CreateGeneSlotWithLabel(payloadGene, payloadLabel, i, "payload");
                 sequenceRow.Add(payloadWrapped);
             }
+
+            // Re-apply lock state after rebuilding UI
+            if (!isInteractable) {
+                SetInteractable(false);
+            }
         }
 
         public bool AddGeneToSlot(GeneBase gene, int slotIndex, string slotType) {
+            if (!isInteractable) {
+                Debug.Log("[SeedEditor] Cannot add genes — editor is locked.");
+                return false;
+            }
+
             if (currentSeedItem == null || gene == null) return false;
 
             var runtimeState = currentSeedItem.SeedRuntimeState;
@@ -184,6 +274,11 @@ namespace Abracodabra.UI.Toolkit {
         }
 
         public GeneBase RemoveGeneFromSlot(int slotIndex, string slotType) {
+            if (!isInteractable) {
+                Debug.Log("[SeedEditor] Cannot remove genes — editor is locked.");
+                return null;
+            }
+
             if (currentSeedItem == null) return null;
 
             var runtimeState = currentSeedItem.SeedRuntimeState;
@@ -224,16 +319,13 @@ namespace Abracodabra.UI.Toolkit {
 
             return removedGene;
         }
-        
-        /// <summary>
-        /// Gets the gene currently in a specific slot
-        /// </summary>
+
         public GeneBase GetGeneAtSlot(int slotIndex, string slotType) {
             if (currentSeedItem == null) return null;
-            
+
             var runtimeState = currentSeedItem.SeedRuntimeState;
             if (runtimeState == null) return null;
-            
+
             if (slotType == "passive") {
                 if (slotIndex < runtimeState.passiveInstances.Count) {
                     return runtimeState.passiveInstances[slotIndex]?.GetGene();
@@ -241,7 +333,7 @@ namespace Abracodabra.UI.Toolkit {
             }
             else if (slotIndex < runtimeState.activeSequence.Count) {
                 var slot = runtimeState.activeSequence[slotIndex];
-                
+
                 return slotType switch {
                     "active" => slot.activeInstance?.GetGene(),
                     "modifier" => slot.modifierInstances.FirstOrDefault()?.GetGene(),
@@ -249,7 +341,7 @@ namespace Abracodabra.UI.Toolkit {
                     _ => null
                 };
             }
-            
+
             return null;
         }
 
@@ -279,7 +371,7 @@ namespace Abracodabra.UI.Toolkit {
 
         public bool HasSeedLoaded() => currentSeedItem != null;
 
-        void CreateNameEditor() {
+        private void CreateNameEditor() {
             nameEditorContainer = new VisualElement();
             nameEditorContainer.style.flexDirection = FlexDirection.Row;
             nameEditorContainer.style.alignItems = Align.Center;
@@ -310,7 +402,7 @@ namespace Abracodabra.UI.Toolkit {
             nameEditorContainer.Add(seedNameField);
         }
 
-        void StyleNameFieldInput() {
+        private void StyleNameFieldInput() {
             if (seedNameField == null) return;
 
             var textInput = seedNameField.Q("unity-text-input");
@@ -347,7 +439,7 @@ namespace Abracodabra.UI.Toolkit {
             }
         }
 
-        void UpdateNameEditor(UIInventoryItem seedItem) {
+        private void UpdateNameEditor(UIInventoryItem seedItem) {
             if (seedNameField == null || seedItem == null) return;
 
             string displayName = !string.IsNullOrEmpty(seedItem.CustomName)
@@ -357,7 +449,7 @@ namespace Abracodabra.UI.Toolkit {
             seedNameField.SetValueWithoutNotify(displayName);
         }
 
-        void CreateColorPicker() {
+        private void CreateColorPicker() {
             colorPickerContainer = new VisualElement();
             colorPickerContainer.AddToClassList("color-picker-container");
             colorPickerContainer.style.flexDirection = FlexDirection.Row;
@@ -412,7 +504,7 @@ namespace Abracodabra.UI.Toolkit {
 
                 if (color.a < 0.01f) {
                     colorButton.style.backgroundColor = new Color(0.3f, 0.3f, 0.3f);
-                    colorButton.text = "✕";
+                    colorButton.text = "\u2715";
                     colorButton.style.unityFontStyleAndWeight = FontStyle.Bold;
                     colorButton.style.fontSize = 14;
                     colorButton.style.color = new Color(0.6f, 0.6f, 0.6f);
@@ -453,7 +545,7 @@ namespace Abracodabra.UI.Toolkit {
             colorPickerContainer.Insert(0, labelElement);
         }
 
-        void UpdateColorPickerSelection(Color currentColor) {
+        private void UpdateColorPickerSelection(Color currentColor) {
             if (colorPickerContainer == null) return;
 
             foreach (var child in colorPickerContainer.Children()) {
@@ -487,7 +579,7 @@ namespace Abracodabra.UI.Toolkit {
             }
         }
 
-        void BindGeneSlot(VisualElement slot, object data, int slotIndex, string slotType) {
+        private void BindGeneSlot(VisualElement slot, object data, int slotIndex, string slotType) {
             var background = slot.Q("background");
             var icon = slot.Q<Image>("icon");
             var tierLabel = slot.Q<Label>("tier-label");
@@ -517,7 +609,6 @@ namespace Abracodabra.UI.Toolkit {
                 icon.sprite = gene.icon;
                 background.AddToClassList($"gene-slot--{gene.Category.ToString().ToLower()}");
 
-                // Pass slot metadata with the event
                 slot.RegisterCallback<PointerDownEvent>(evt => {
                     if (evt.button == 0) {
                         OnGeneSlotPointerDown?.Invoke(gene, slot, slotIndex, slotType);
@@ -538,7 +629,7 @@ namespace Abracodabra.UI.Toolkit {
             }
         }
 
-        VisualElement CreateGeneSlotWithLabel(object data, string labelText, int slotIndex, string slotType) {
+        private VisualElement CreateGeneSlotWithLabel(object data, string labelText, int slotIndex, string slotType) {
             var wrapper = new VisualElement();
             wrapper.style.flexDirection = FlexDirection.Column;
             wrapper.style.alignItems = Align.Center;
@@ -644,7 +735,7 @@ namespace Abracodabra.UI.Toolkit {
             }
         }
 
-        class SlotMetadata {
+        private class SlotMetadata {
             public int index;
             public string type;
         }
