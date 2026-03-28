@@ -1,14 +1,10 @@
-﻿// File: Assets/Scripts/Genes/Core/PayloadGene.cs
+﻿// FILE: Assets/Scripts/Genes/Core/PayloadGene.cs
 using UnityEngine;
 using Abracodabra.Genes.Runtime;
-using Abracodabra.Genes.Components; // FIX: Added using statement for Fruit
+using Abracodabra.Genes.Components;
 
 namespace Abracodabra.Genes.Core
 {
-    /// <summary>
-    /// Base class for genes that attach to Active genes to add effects,
-    /// such as adding damage, nutrition, or status effects to a projectile.
-    /// </summary>
     public abstract class PayloadGene : GeneBase
     {
         public override GeneCategory Category => GeneCategory.Payload;
@@ -17,15 +13,10 @@ namespace Abracodabra.Genes.Core
         public PayloadType payloadType;
         public float basePotency = 1f;
 
-        // Applied when the active gene executes
         public abstract void ApplyPayload(PayloadContext context);
 
-        // For fruit-based actives
         public virtual void ConfigureFruit(Fruit fruit, RuntimeGeneInstance instance) { }
 
-        /// <summary>
-        /// A specific helper for direct-effect payloads (e.g., an aura).
-        /// </summary>
         public virtual void ApplyToTarget(GameObject target, RuntimeGeneInstance instance) { }
 
         public override bool CanAttachTo(GeneBase other)
@@ -38,18 +29,22 @@ namespace Abracodabra.Genes.Core
             if (instance == null) return basePotency;
             return basePotency * instance.GetValue("potency_multiplier", 1f);
         }
+
+        /// <summary>
+        /// Returns true if this payload has plant-healing behavior (leaf regrowth).
+        /// Used by Cloud/Aura effects to activate plant healing logic.
+        /// </summary>
+        public virtual bool IsPlantHealingPayload => payloadType == PayloadType.Healing;
     }
 
     public enum PayloadType
     {
-        Substance,  // Damage/status effects
-        Nutrition,  // Healing/hunger
-        Special     // Unique effects
+        Substance,  // Damage/status effects (Poison, Slow, Freeze, Fear)
+        Nutrition,  // Food/hunger (Nutritious)
+        Healing,    // HP restoration + leaf regrowth
+        Special     // Unique effects (Explosive, etc.)
     }
 
-    /// <summary>
-    /// A context object containing information for a PayloadGene's application.
-    /// </summary>
     public class PayloadContext
     {
         public GameObject target;

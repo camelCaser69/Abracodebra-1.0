@@ -1,4 +1,4 @@
-// File: Assets/Scripts/Genes/PlantSequenceExecutor.cs
+// FILE: Assets/Scripts/Genes/PlantSequenceExecutor.cs
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,6 +7,7 @@ using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Templates;
 using Abracodabra.Genes.WorldEffects;
+using Abracodabra.Genes.Implementations;
 
 namespace Abracodabra.Genes
 {
@@ -17,6 +18,9 @@ namespace Abracodabra.Genes
 
         IGeneEventBus eventBus;
         IDeterministicRandom random;
+
+        // Tracks whether trigger-type genes have been initialized for this plant
+        bool triggerGenesInitialized = false;
 
         void Awake()
         {
@@ -41,6 +45,7 @@ namespace Abracodabra.Genes
         public void InitializeWithTemplate(SeedTemplate template)
         {
             runtimeState = template.CreateRuntimeState();
+            InitializeTriggerGenes();
         }
 
         public void InitializeWithTemplate(PlantGeneRuntimeState state)
@@ -50,6 +55,49 @@ namespace Abracodabra.Genes
             {
                 Debug.LogWarning($"Plant '{plantGrowth.name}' has no active gene sequence. Executor will remain idle.", this);
             }
+            InitializeTriggerGenes();
+        }
+
+        /// <summary>
+        /// Scans the sequence for trigger-type active genes and sets up their event handlers.
+        /// Called once during initialization.
+        /// </summary>
+        void InitializeTriggerGenes()
+        {
+            if (triggerGenesInitialized) return;
+            if (runtimeState == null || runtimeState.activeSequence == null) return;
+
+            foreach (var slot in runtimeState.activeSequence)
+            {
+                if (!slot.HasContent) continue;
+
+                var activeGene = slot.activeInstance?.GetGene<ActiveGene>();
+                if (activeGene == null || !activeGene.isTriggerType) continue;
+
+                // Reactive Burst
+                if (activeGene is ReactiveBurstGene burstGene)
+                {
+                    var handler = gameObject.GetComponent<ReactiveBurstHandler>();
+                    if (handler == null)
+                    {
+                        handler = gameObject.AddComponent<ReactiveBurstHandler>();
+                    }
+
+                    handler.Initialize(
+                        plantGrowth,
+                        burstGene,
+                        slot.payloadInstances,
+                        slot.modifierInstances,
+                        slot.activeInstance
+                    );
+
+                    Debug.Log($"[PlantSequenceExecutor] Initialized ReactiveBurstHandler for '{burstGene.geneName}' on '{plantGrowth.name}'");
+                }
+
+                // Future trigger types can be added here
+            }
+
+            triggerGenesInitialized = true;
         }
 
         public void OnTickUpdate(int currentTick)
@@ -114,9 +162,12 @@ namespace Abracodabra.Genes
                 return true; // Skip invalid slot, advance sequence
             }
 
-            // === TASK 4/6: Pre-energy checks ===
+            // ── TRIGGER-TYPE: skip immediately without spending energy or a tick ──
+            if (activeGene.isTriggerType)
+            {
+                return true; // Cursor passes over trigger slots freely
+            }
 
-            // Build context early so trigger modifiers can use it
             var context = new ActiveGeneContext
             {
                 plant = plantGrowth,
@@ -128,17 +179,14 @@ namespace Abracodabra.Genes
                 random = random
             };
 
-            // Check requiresTarget BEFORE spending energy (Task 4)
             if (activeGene.requiresTarget)
             {
                 if (!TargetFinder.HasCreatureInRange(plantGrowth.transform.position, activeGene.targetRange))
                 {
-                    // No target — skip slot, advance sequence, don't spend energy
                     return true;
                 }
             }
 
-            // Check trigger-type modifiers BEFORE spending energy (Task 6)
             foreach (var modInstance in slot.modifierInstances)
             {
                 var modifierGene = modInstance?.GetGene<ModifierGene>();
@@ -146,37 +194,32 @@ namespace Abracodabra.Genes
                 {
                     if (!modifierGene.CheckTriggerCondition(context))
                     {
-                        // Trigger condition not met — skip, advance, save energy
                         return true;
                     }
                 }
             }
 
-            // === Energy check (original logic) ===
-
             float energyCost = slot.GetEnergyCost();
-            var energySystem = plantGrowth.EnergySystem;
+            var energySystemRef = plantGrowth.EnergySystem;
 
-            if (!energySystem.HasEnergy(energyCost))
+            if (!energySystemRef.HasEnergy(energyCost))
             {
                 eventBus?.Publish(new GeneValidationFailedEvent
                 {
                     GeneId = activeGene.GUID,
-                    Reason = $"Insufficient energy. Has {energySystem.CurrentEnergy}, needs {energyCost}."
+                    Reason = $"Insufficient energy. Has {energySystemRef.CurrentEnergy}, needs {energyCost}."
                 });
                 return false; // Not enough energy, do not advance sequence
             }
 
-            energySystem.SpendEnergy(energyCost);
+            energySystemRef.SpendEnergy(energyCost);
             slot.isExecuting = true;
 
-            // Reset effect_multiplier before modifiers apply (Overcharge reads/writes this)
             if (slot.activeInstance != null)
             {
                 slot.activeInstance.SetValue("effect_multiplier", 1f);
             }
 
-            // Run modifier PreExecution (Overcharge sets effect_multiplier here)
             foreach (var modInstance in slot.modifierInstances)
             {
                 var modifierGene = modInstance?.GetGene<ModifierGene>();
@@ -235,16 +278,18 @@ namespace Abracodabra.Genes
             }
         }
 
-        void OnSequenceComplete() {
+        void OnSequenceComplete()
+        {
             var energySystem = plantGrowth.EnergySystem;
 
-            eventBus?.Publish(new SequenceCompletedEvent {
+            eventBus?.Publish(new SequenceCompletedEvent
+            {
                 TotalSlotsExecuted = runtimeState.activeSequence.Count,
                 TotalEnergyUsed = (energySystem != null) ? energySystem.EnergySpentThisCycle : 0f
             });
 
-            // Reset the cycle tracker for the next sequence iteration
-            if (energySystem != null) {
+            if (energySystem != null)
+            {
                 energySystem.EnergySpentThisCycle = 0f;
             }
 

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AnimalDefinition : ScriptableObject {
+public class AnimalDefinition : ScriptableObject
+{
     public string animalName = "DefaultAnimal";
     public GameObject prefab;
 
@@ -53,7 +54,12 @@ public class AnimalDefinition : ScriptableObject {
     [Tooltip("Tiles within which a pest will start dealing damage to a plant.")]
     public float attackRangeTiles = 1.5f;
 
-    private void OnValidate() {
+    [Header("Status Effect Immunities")]
+    [Tooltip("If true, this creature is immune to the Fear payload. Use for large/boss creatures.")]
+    public bool immuneToFear = false;
+
+    void OnValidate()
+    {
         maxHealth = Mathf.Max(1f, maxHealth);
         movementSpeed = Mathf.Max(0.1f, movementSpeed);
 

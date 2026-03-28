@@ -1,85 +1,109 @@
 // FILE: Assets/Scripts/Genes/WorldEffects/CloudWorldEffect.cs
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
+using Abracodabra.Genes.Implementations;
 
-namespace Abracodabra.Genes.WorldEffects {
-    public class CloudWorldEffect : WorldEffect {
+namespace Abracodabra.Genes.WorldEffects
+{
+    public class CloudWorldEffect : WorldEffect
+    {
         float pulseTimer;
         float baseSpriteAlpha;
 
-        protected override void Awake() {
+        protected override void Awake()
+        {
             base.Awake();
         }
 
-        public override void Initialize(PlantGrowth source, List<RuntimeGeneInstance> payloads, float effectRadius, int duration, float multiplier = 1f) {
+        public override void Initialize(PlantGrowth source, List<RuntimeGeneInstance> payloads, float effectRadius, int duration, float multiplier = 1f)
+        {
             base.Initialize(source, payloads, effectRadius, duration, multiplier);
 
-            if (spriteRenderer != null) {
+            if (spriteRenderer != null)
+            {
                 baseSpriteAlpha = spriteRenderer.color.a;
             }
         }
 
-        protected override void OnEffectTick(int tick) {
-            // Apply payloads to creatures in radius (original behavior)
+        protected override void OnEffectTick(int tick)
+        {
+            // Apply payloads to creatures in radius
             var creatures = TargetFinder.FindCreaturesInRadius(transform.position, radius);
 
-            foreach (var creature in creatures) {
+            foreach (var creature in creatures)
+            {
                 if (creature == null || creature.IsDying) continue;
-
                 ApplyPayloadsToTarget(creature.gameObject);
             }
 
-            if (creatures.Count > 0) {
+            if (creatures.Count > 0)
+            {
                 Debug.Log($"[CloudWorldEffect] Tick {tick}: Applied payloads to {creatures.Count} creature(s) in radius {radius}");
             }
 
-            // Task 6.4: If any payload is Healing/Nutrition type, also regrow leaves on plants
-            if (HasHealingPayload()) {
+            // Apply healing to plants if we have a healing-type payload
+            float regrowChance = GetPlantRegrowChance();
+            if (regrowChance > 0f)
+            {
                 var plantsInRange = TargetFinder.FindPlantsInRadius(transform.position, radius);
 
                 int regrowCount = 0;
-                foreach (var plant in plantsInRange) {
+                foreach (var plant in plantsInRange)
+                {
                     if (plant == null) continue;
                     if (plant.DestroyedLeafCount <= 0) continue;
 
-                    // 50% chance per tick per plant — Healing Cloud regrows ~1 leaf per 2 cloud ticks
-                    if (Random.value < 0.5f) {
-                        if (plant.RegrowLeaf()) {
+                    if (Random.value < regrowChance)
+                    {
+                        if (plant.RegrowLeaf())
+                        {
                             regrowCount++;
                         }
                     }
                 }
 
-                if (regrowCount > 0) {
+                if (regrowCount > 0)
+                {
                     Debug.Log($"[CloudWorldEffect] Tick {tick}: Regrew {regrowCount} leaf/leaves on plants in healing radius");
                 }
             }
         }
 
         /// <summary>
-        /// Checks if any payload in this cloud's payload list is a Healing/Nutrition type.
+        /// Returns the plant regrow chance from the first healing payload, or 0 if none.
+        /// Checks both the new IsPlantHealingPayload property and legacy PayloadType.Nutrition.
         /// </summary>
-        bool HasHealingPayload() {
-            if (payloadInstances == null) return false;
+        float GetPlantRegrowChance()
+        {
+            if (payloadInstances == null) return 0f;
 
-            foreach (var instance in payloadInstances) {
+            foreach (var instance in payloadInstances)
+            {
                 if (instance == null) continue;
 
                 var payloadGene = instance.GetGene<PayloadGene>();
                 if (payloadGene == null) continue;
 
-                if (payloadGene.payloadType == PayloadType.Nutrition) {
-                    return true;
+                // Check for HealingPayload (Task 5) — uses configurable plantRegrowChance
+                if (payloadGene is HealingPayload healingPayload)
+                {
+                    return healingPayload.plantRegrowChance;
+                }
+
+                // Legacy check: NutritiousPayload also triggers plant healing at 50%
+                if (payloadGene.payloadType == PayloadType.Nutrition)
+                {
+                    return 0.5f;
                 }
             }
 
-            return false;
+            return 0f;
         }
 
-        void Update() {
+        void Update()
+        {
             if (spriteRenderer == null || !isActive) return;
 
             pulseTimer += Time.deltaTime * 2f;

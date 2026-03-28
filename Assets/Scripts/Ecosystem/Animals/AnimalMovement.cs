@@ -1,4 +1,4 @@
-﻿// REWORKED FILE: Assets/Scripts/Ecosystem/Animals/AnimalMovement.cs
+﻿// FILE: Assets/Scripts/Ecosystem/Animals/AnimalMovement.cs
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,7 +17,7 @@ public class AnimalMovement : MonoBehaviour
     List<GridPosition> currentPath = new List<GridPosition>();
     int currentPathIndex = 0;
     GameObject currentTargetFood = null;
-    PlantGrowth currentTargetPlant = null;   // TASK 8: pest plant target
+    PlantGrowth currentTargetPlant = null;
     bool hasPlannedAction = false;
     int wanderPauseTicks = 0;
     int lastThinkTick = 0;
@@ -29,6 +29,12 @@ public class AnimalMovement : MonoBehaviour
 
     Vector2 lastMoveDirection;
     float _speedAccumulator = 0f;
+
+    // ═══════════════════════════════════════════════════════
+    //  FEAR / FLEE STATE
+    // ═══════════════════════════════════════════════════════
+    bool isFleeing = false;
+    Vector3 fleeSourcePosition;
 
     public bool HasTarget => currentTargetFood != null || currentTargetPlant != null || hasPlannedAction;
     public GameObject CurrentTargetFood => currentTargetFood;
@@ -81,13 +87,19 @@ public class AnimalMovement : MonoBehaviour
     {
         if (gridEntity.IsMoving) return;
 
+        // Fear fleeing takes absolute priority
+        if (isFleeing)
+        {
+            PlanFleeing();
+            return;
+        }
+
         if (isSeekingScreenCenter)
         {
             HandleScreenCenterSeeking();
             return;
         }
 
-        // ── TASK 8: Pests seek plants instead of food ──
         if (definition.isPest)
         {
             PlanPlantTargeting();
@@ -104,20 +116,110 @@ public class AnimalMovement : MonoBehaviour
         }
     }
 
-    // ──────────────────────────────────────────────────────────
-    // TASK 8: Pest plant targeting
-    // ──────────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════
+    //  FEAR / FLEE — Public API
+    // ═══════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Start fleeing away from the given source position.
+    /// Called by AnimalController.ApplyFear().
+    /// </summary>
+    public void StartFleeing(Vector3 sourcePosition)
+    {
+        isFleeing = true;
+        fleeSourcePosition = sourcePosition;
+
+        // Immediately plan a flee path
+        ClearMovementPlan();
+        PlanFleeing();
+    }
+
+    /// <summary>
+    /// Update the fear source position (e.g., when fear is refreshed from a new source).
+    /// </summary>
+    public void UpdateFleeSource(Vector3 sourcePosition)
+    {
+        fleeSourcePosition = sourcePosition;
+    }
+
+    /// <summary>
+    /// Stop fleeing. Called when fear expires.
+    /// </summary>
+    public void StopFleeing()
+    {
+        isFleeing = false;
+        ClearMovementPlan();
+    }
+
+    /// <summary>
+    /// Plan movement directly away from the fear source.
+    /// Picks the best cardinal direction that moves away from the source.
+    /// </summary>
+    void PlanFleeing()
+    {
+        GridPosition currentPos = gridEntity.Position;
+        Vector3 currentWorld = GridPositionManager.Instance.GridToWorld(currentPos);
+
+        // Direction away from fear source
+        Vector2 fleeDir = ((Vector2)currentWorld - (Vector2)fleeSourcePosition).normalized;
+
+        // If we're right on top of the source, pick a random direction
+        if (fleeDir.sqrMagnitude < 0.01f)
+        {
+            fleeDir = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+        }
+
+        // Score each cardinal direction by how well it aligns with the flee direction
+        GridPosition[] directions = {
+            GridPosition.Up, GridPosition.Down,
+            GridPosition.Left, GridPosition.Right
+        };
+
+        float[] scores = new float[4];
+        Vector2[] dirVecs = {
+            Vector2.up, Vector2.down,
+            Vector2.left, Vector2.right
+        };
+
+        for (int i = 0; i < 4; i++)
+        {
+            scores[i] = Vector2.Dot(fleeDir, dirVecs[i]);
+        }
+
+        // Sort by score descending — prefer directions most aligned with flee vector
+        var ranked = Enumerable.Range(0, 4).OrderByDescending(i => scores[i]).ToArray();
+
+        foreach (int idx in ranked)
+        {
+            GridPosition targetPos = currentPos + directions[idx];
+
+            bool valid = definition.isPest ? IsValidMoveForPest(targetPos) : IsValidMove(targetPos);
+            if (valid)
+            {
+                currentPath.Clear();
+                currentPath.Add(targetPos);
+                currentPathIndex = 0;
+                hasPlannedAction = true;
+                return;
+            }
+        }
+
+        // Can't flee anywhere — stay put (cornered)
+        hasPlannedAction = false;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  PEST PLANT TARGETING
+    // ═══════════════════════════════════════════════════════
 
     void PlanPlantTargeting()
     {
-        // If our current target was destroyed, clear it
         if (currentTargetPlant != null && (currentTargetPlant == null || currentTargetPlant.CurrentState == PlantState.Dead))
         {
             currentTargetPlant = null;
             ClearMovementPlan();
         }
 
-        // Find nearest mature plant if we don't have a target
         if (currentTargetPlant == null)
         {
             currentTargetPlant = FindNearestMaturePlant();
@@ -125,18 +227,15 @@ public class AnimalMovement : MonoBehaviour
 
         if (currentTargetPlant == null)
         {
-            // No plants — wander
             PlanWandering();
             return;
         }
 
-        // Path toward a tile adjacent to the plant
         GridPosition plantPos = GetPlantGridPosition(currentTargetPlant);
         GridPosition bestTarget = GridPosition.Zero;
         List<GridPosition> shortestPath = null;
         float shortestDist = float.MaxValue;
 
-        // Try all 4 adjacent tiles
         GridPosition[] neighbors = {
             plantPos + GridPosition.Up,
             plantPos + GridPosition.Down,
@@ -148,7 +247,6 @@ public class AnimalMovement : MonoBehaviour
         {
             if (!IsValidMoveForPest(pos)) continue;
 
-            // Already adjacent — stop moving
             if (gridEntity.Position == pos)
             {
                 hasPlannedAction = false;
@@ -173,7 +271,6 @@ public class AnimalMovement : MonoBehaviour
         }
         else
         {
-            // Can't reach any adjacent tile, wander
             PlanWandering();
         }
     }
@@ -206,7 +303,6 @@ public class AnimalMovement : MonoBehaviour
         return GridPositionManager.Instance.WorldToGrid(plant.transform.position);
     }
 
-    // Pests can walk on most tiles but not through walls — allow moving beside plants
     bool IsValidMoveForPest(GridPosition pos)
     {
         if (GridPositionManager.Instance == null) return false;
@@ -215,9 +311,9 @@ public class AnimalMovement : MonoBehaviour
         return true;
     }
 
-    // ──────────────────────────────────────────────────────────
-    // Normal animal food seeking (unchanged)
-    // ──────────────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════
+    //  FOOD SEEKING
+    // ═══════════════════════════════════════════════════════
 
     void PlanFoodSeeking()
     {
@@ -351,6 +447,10 @@ public class AnimalMovement : MonoBehaviour
         return positions;
     }
 
+    // ═══════════════════════════════════════════════════════
+    //  WANDERING
+    // ═══════════════════════════════════════════════════════
+
     void PlanWandering()
     {
         if (GridDebugVisualizer.Instance != null)
@@ -400,6 +500,10 @@ public class AnimalMovement : MonoBehaviour
         hasPlannedAction = false;
     }
 
+    // ═══════════════════════════════════════════════════════
+    //  MOVEMENT EXECUTION
+    // ═══════════════════════════════════════════════════════
+
     void ExecutePlannedMovement()
     {
         if (!hasPlannedAction || gridEntity.IsMoving) return;
@@ -423,7 +527,6 @@ public class AnimalMovement : MonoBehaviour
             }
         }
 
-        // If pest reached adjacent to plant, stop movement
         if (definition.isPest && currentTargetPlant != null)
         {
             GridPosition plantPos = GetPlantGridPosition(currentTargetPlant);
@@ -516,6 +619,10 @@ public class AnimalMovement : MonoBehaviour
         return true;
     }
 
+    // ═══════════════════════════════════════════════════════
+    //  SCREEN CENTER SEEKING
+    // ═══════════════════════════════════════════════════════
+
     void HandleScreenCenterSeeking()
     {
         Vector2 currentPos = transform.position;
@@ -544,11 +651,16 @@ public class AnimalMovement : MonoBehaviour
         this.maxBounds = maxBounds;
     }
 
+    // ═══════════════════════════════════════════════════════
+    //  UTILITIES
+    // ═══════════════════════════════════════════════════════
+
     public void StopAllMovement()
     {
         ClearMovementPlan();
         wanderPauseTicks = 0;
         isSeekingScreenCenter = false;
+        isFleeing = false;
     }
 
     public void ClearMovementPlan()
@@ -572,42 +684,49 @@ public class AnimalMovement : MonoBehaviour
         return lastMoveDirection;
     }
 
+    // ═══════════════════════════════════════════════════════
+    //  DEBUG LINE RENDERER
+    // ═══════════════════════════════════════════════════════
+
     void SetupDebugLineRenderer()
     {
         if (!showPathfindingDebugLine) return;
 
-        GameObject lineObj = new GameObject("PathDebugLine");
-        lineObj.transform.SetParent(transform);
-        pathDebugLine = lineObj.AddComponent<LineRenderer>();
+        pathDebugLine = GetComponent<LineRenderer>();
+        if (pathDebugLine == null)
+        {
+            pathDebugLine = gameObject.AddComponent<LineRenderer>();
+        }
+
         pathDebugLine.startWidth = 0.05f;
         pathDebugLine.endWidth = 0.05f;
         pathDebugLine.material = new Material(Shader.Find("Sprites/Default"));
         pathDebugLine.startColor = Color.yellow;
         pathDebugLine.endColor = Color.red;
+        pathDebugLine.positionCount = 0;
         pathDebugLine.sortingOrder = 100;
     }
 
     void UpdatePathDebugLine()
     {
-        if (!showPathfindingDebugLine || pathDebugLine == null || currentPath == null || currentPath.Count == 0)
+        if (pathDebugLine == null || !showPathfindingDebugLine) return;
+
+        if (currentPath == null || currentPath.Count == 0 || currentPathIndex >= currentPath.Count)
         {
-            if (pathDebugLine != null) pathDebugLine.positionCount = 0;
+            pathDebugLine.positionCount = 0;
             return;
         }
 
-        List<Vector3> positions = new List<Vector3>();
+        int remainingPoints = currentPath.Count - currentPathIndex;
+        pathDebugLine.positionCount = remainingPoints + 1;
 
-        Vector3 groundPosition = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
-        positions.Add(groundPosition);
+        pathDebugLine.SetPosition(0, transform.position);
 
-        for (int i = currentPathIndex; i < currentPath.Count; i++)
+        for (int i = 0; i < remainingPoints; i++)
         {
-            Vector3 worldPos = GridPositionManager.Instance.GridToWorld(currentPath[i]);
-            positions.Add(worldPos);
+            Vector3 worldPos = GridPositionManager.Instance.GridToWorld(currentPath[currentPathIndex + i]);
+            pathDebugLine.SetPosition(i + 1, worldPos);
         }
-
-        pathDebugLine.positionCount = positions.Count;
-        pathDebugLine.SetPositions(positions.ToArray());
     }
 
     void ClearPathDebugLine()

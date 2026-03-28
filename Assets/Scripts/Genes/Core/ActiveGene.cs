@@ -1,4 +1,4 @@
-// File: Assets/Scripts/Genes/Core/ActiveGene.cs
+// FILE: Assets/Scripts/Genes/Core/ActiveGene.cs
 using System.Collections.Generic;
 using UnityEngine;
 using Abracodabra.Genes.Runtime;
@@ -22,6 +22,10 @@ namespace Abracodabra.Genes.Core
 
         [Tooltip("Range in tiles for target detection. Only used when requiresTarget is true.")]
         public float targetRange = 3f;
+
+        [Header("Trigger Type")]
+        [Tooltip("If true, this gene is event-driven (e.g., Reactive Burst). The cursor skips over it without spending a tick or energy. The gene subscribes to events instead.")]
+        public bool isTriggerType = false;
 
         public virtual bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
         {
