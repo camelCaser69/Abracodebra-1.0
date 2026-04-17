@@ -37,3 +37,7 @@ MonoBehaviour:
   thoughtCooldownTicks: 10
   attractiveScentDefinitions: []
   repellentScentDefinitions: []
+  isPest: 1
+  baseEatSpeedTicks: 1
+  attackRangeTiles: 1.5
+  immuneToFear: 0

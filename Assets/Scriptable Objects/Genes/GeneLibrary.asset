@@ -15,6 +15,9 @@ MonoBehaviour:
   passiveGenes:
   - {fileID: 11400000, guid: c62d2b1eed2428a4183638756d3c1ce7, type: 2}
   - {fileID: 11400000, guid: 96a6da095e5bbd742835c0409890dccf, type: 2}
+  - {fileID: 11400000, guid: 9254611caf46b2643aaaf292be077a06, type: 2}
+  - {fileID: 11400000, guid: ba40f8c34a70990468b21a1537f2c50f, type: 2}
+  - {fileID: 11400000, guid: 99579e662a27aa149926702f9d7372e6, type: 2}
   activeGenes:
   - {fileID: 11400000, guid: 0fcc40c60bfe57149b2d4d2fe5dd94c3, type: 2}
   modifierGenes:

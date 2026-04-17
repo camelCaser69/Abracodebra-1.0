@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67af1a02091245c785cccd6e19cca360, type: 3}
+  m_Name: 003_ThornedLeaves
+  m_EditorClassIdentifier: 
+  geneName: Thorned Leaves
+  description: Eating leaves does damage to creatures
+  icon: {fileID: 21300000, guid: 0aac42833f760c64ab80dcdabdeb253f, type: 3}
+  tier: 1
+  geneColor: {r: 1, g: 1, b: 1, a: 1}
+  effectPrefab: {fileID: 0}
+  _persistentGUID: 69dc74f1-f8ec-4737-85cb-0dbe64190d7c
+  _version: 1
+  statToModify: 7
+  baseValue: 5
+  stacksAdditively: 1
+  maxStacks: -1
