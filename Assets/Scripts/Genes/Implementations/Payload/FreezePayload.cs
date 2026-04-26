@@ -6,7 +6,7 @@ using Abracodabra.Genes.Components;
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "FreezePayload", menuName = "Abracodabra/Genes/Payload/Freeze")]
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Payload/Freeze", fileName = "Gene_Payload_Freeze")]
     public class FreezePayload : PayloadGene
     {
         [Header("Freeze Configuration")]
@@ -39,7 +39,6 @@ namespace Abracodabra.Genes.Implementations
 
             if (statusManager == null) return;
 
-            // Apply N stacks (each ApplyStatusEffect call adds 1 stack)
             float potency = GetFinalPotency(context.payloadInstance);
             int stacks = Mathf.CeilToInt(baseStacksPerHit * potency);
 
@@ -69,7 +68,6 @@ namespace Abracodabra.Genes.Implementations
 
         public override void ApplyToTarget(GameObject target, RuntimeGeneInstance instance)
         {
-            // Used when fruit is eaten — apply freeze stacks
             if (target == null || freezeStatusEffect == null) return;
 
             var statusManager = target.GetComponent<StatusEffectManager>();

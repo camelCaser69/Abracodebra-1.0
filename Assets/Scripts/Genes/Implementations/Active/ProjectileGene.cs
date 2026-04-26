@@ -1,4 +1,4 @@
-// File: Assets/Scripts/Genes/Implementations/Active/ProjectileGene.cs
+// FILE: Assets/Scripts/Genes/Implementations/Active/ProjectileGene.cs
 using System.Collections.Generic;
 using UnityEngine;
 using Abracodabra.Genes.Core;
@@ -7,11 +7,7 @@ using Abracodabra.Genes.WorldEffects;
 
 namespace Abracodabra.Genes.Implementations
 {
-    /// <summary>
-    /// Active gene that fires a targeted projectile at the nearest creature in range.
-    /// If no creature is nearby, the slot is skipped (no energy spent).
-    /// </summary>
-    [CreateAssetMenu(fileName = "ProjectileGene", menuName = "Abracodabra/Genes/Active/Projectile")]
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Active/Projectile", fileName = "Gene_Active_Projectile")]
     public class ProjectileGene : ActiveGene
     {
         [Header("Projectile Configuration")]
@@ -28,7 +24,7 @@ namespace Abracodabra.Genes.Implementations
         {
             baseEnergyCost = 6f;
             canExecuteEmpty = true;
-            requiresTarget = true; // Projectile needs a target — skips if none nearby
+            requiresTarget = true;
             targetRange = 3f;
         }
 
@@ -40,24 +36,19 @@ namespace Abracodabra.Genes.Implementations
                 return;
             }
 
-            // Find nearest creature in range
             AnimalController target = TargetFinder.FindNearestCreature(
                 context.plant.transform.position,
                 targetRange
             );
 
-            // This shouldn't happen because requiresTarget + TryExecuteCurrentSlot pre-check,
-            // but double-check for safety
             if (target == null)
             {
                 Debug.Log($"[ProjectileGene] '{geneName}' found no target in range {targetRange}. Skipping.");
                 return;
             }
 
-            // Calculate effect multiplier from modifiers
             float multiplier = context.activeInstance?.GetValue("effect_multiplier", 1f) ?? 1f;
 
-            // Spawn projectile
             Vector3 spawnPosition = context.plant.transform.position;
             GameObject projObj = Instantiate(projectilePrefab, spawnPosition, Quaternion.identity);
             projObj.name = $"Projectile_{geneName}_{Time.frameCount}";
@@ -84,7 +75,7 @@ namespace Abracodabra.Genes.Implementations
 
         public override bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
         {
-            return true; // Projectile works with any payload (base damage always applies)
+            return true;
         }
 
         public override string GetTooltip(GeneTooltipContext context)

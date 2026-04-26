@@ -1,24 +1,22 @@
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Genes/Implementations/Passive/GrowthSpeedGene.cs
+using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Implementations
 {
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Passive/Growth Speed", fileName = "Gene_Passive_GrowthSpeed")]
     public class GrowthSpeedGene : PassiveGene
     {
-        // The ApplyToPlant logic is now centralized in PlantGrowthLogic.
-        // This gene now just needs to provide its data correctly.
         public GrowthSpeedGene()
         {
             statToModify = PassiveStatType.GrowthSpeed;
             baseValue = 1.5f; // This now represents a 50% increase
             stacksAdditively = true;
         }
-        
+
         public override void ApplyToPlant(PlantGrowth plant, RuntimeGeneInstance instance)
         {
-            // This method is now handled by the centralized logic in PlantGrowthLogic.
-            // It can be left empty or used for unique, non-standard effects.
         }
 
         public override string GetStatModificationText()

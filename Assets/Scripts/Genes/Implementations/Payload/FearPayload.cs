@@ -6,7 +6,7 @@ using Abracodabra.Genes.Components;
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "FearPayload", menuName = "Abracodabra/Genes/Payload/Fear")]
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Payload/Fear", fileName = "Gene_Payload_Fear")]
     public class FearPayload : PayloadGene
     {
         [Header("Fear Configuration")]
@@ -29,25 +29,21 @@ namespace Abracodabra.Genes.Implementations
             var animalController = context.target.GetComponent<AnimalController>();
             if (animalController == null) return;
 
-            // Check fear immunity (large creatures configurable per AnimalDefinition)
             if (animalController.Definition != null && animalController.Definition.immuneToFear)
             {
                 Debug.Log($"[FearPayload] '{animalController.SpeciesName}' is immune to Fear.");
                 return;
             }
 
-            // Determine the source position for flee direction
             Vector3 fearSourcePos = context.source != null
                 ? context.source.transform.position
                 : context.target.transform.position;
 
-            // Apply fear to the animal controller
             float potency = GetFinalPotency(context.payloadInstance);
             int finalDuration = Mathf.CeilToInt(baseFearDurationTicks * potency);
 
             animalController.ApplyFear(fearSourcePos, finalDuration);
 
-            // Also apply the status effect SO for visual feedback (tint, icon)
             if (fearStatusEffect != null)
             {
                 var statusManager = animalController.StatusManager;
@@ -76,7 +72,6 @@ namespace Abracodabra.Genes.Implementations
 
         public override void ApplyToTarget(GameObject target, RuntimeGeneInstance instance)
         {
-            // Used when fruit is eaten — apply fear from the fruit's position
             var animalController = target.GetComponent<AnimalController>();
             if (animalController == null) return;
 

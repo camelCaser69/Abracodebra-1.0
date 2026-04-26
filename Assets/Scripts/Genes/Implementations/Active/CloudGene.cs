@@ -1,4 +1,4 @@
-// File: Assets/Scripts/Genes/Implementations/Active/CloudGene.cs
+// FILE: Assets/Scripts/Genes/Implementations/Active/CloudGene.cs
 using System.Collections.Generic;
 using UnityEngine;
 using Abracodabra.Genes.Core;
@@ -7,11 +7,7 @@ using Abracodabra.Genes.WorldEffects;
 
 namespace Abracodabra.Genes.Implementations
 {
-    /// <summary>
-    /// Active gene that spawns a persistent cloud area at the plant's position.
-    /// Cloud applies payloads to all creatures within radius each tick.
-    /// </summary>
-    [CreateAssetMenu(fileName = "CloudGene", menuName = "Abracodabra/Genes/Active/Cloud")]
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Active/Cloud", fileName = "Gene_Active_Cloud")]
     public class CloudGene : ActiveGene
     {
         [Header("Cloud Configuration")]
@@ -27,8 +23,8 @@ namespace Abracodabra.Genes.Implementations
         public CloudGene()
         {
             baseEnergyCost = 8f;
-            canExecuteEmpty = true; // Cloud can fire without payloads (does nothing useful, but allowed)
-            requiresTarget = false; // Clouds always fire regardless of enemies
+            canExecuteEmpty = true;
+            requiresTarget = false;
         }
 
         public override void Execute(ActiveGeneContext context)
@@ -41,14 +37,11 @@ namespace Abracodabra.Genes.Implementations
 
             Vector3 spawnPosition = context.plant.transform.position;
 
-            // Calculate effect multiplier from modifiers
             float multiplier = context.activeInstance?.GetValue("effect_multiplier", 1f) ?? 1f;
 
-            // Apply radius scaling from overcharge
-            float finalRadius = baseRadius * Mathf.Sqrt(multiplier); // sqrt so overcharge doesn't make clouds insanely large
+            float finalRadius = baseRadius * Mathf.Sqrt(multiplier);
             int finalDuration = baseDurationTicks;
 
-            // Spawn cloud
             GameObject cloudObj = Instantiate(cloudPrefab, spawnPosition, Quaternion.identity);
             cloudObj.name = $"Cloud_{geneName}_{Time.frameCount}";
 
@@ -58,7 +51,6 @@ namespace Abracodabra.Genes.Implementations
                 cloud = cloudObj.AddComponent<CloudWorldEffect>();
             }
 
-            // Copy payload instances for the cloud
             var payloadsCopy = new List<RuntimeGeneInstance>(context.payloads);
 
             cloud.Initialize(context.plant, payloadsCopy, finalRadius, finalDuration, multiplier);
@@ -68,7 +60,7 @@ namespace Abracodabra.Genes.Implementations
 
         public override bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
         {
-            return true; // Cloud works with any payload or even empty
+            return true;
         }
 
         public override string GetTooltip(GeneTooltipContext context)

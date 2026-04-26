@@ -8,7 +8,7 @@ using Abracodabra.Genes.WorldEffects;
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "ExplosivePayload", menuName = "Abracodabra/Genes/Payload/Explosive")]
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Payload/Explosive", fileName = "Gene_Payload_Explosive")]
     public class ExplosivePayload : PayloadGene
     {
         [Header("Explosive Configuration")]
@@ -30,8 +30,6 @@ namespace Abracodabra.Genes.Implementations
             geneColor = new Color(1f, 0.4f, 0.1f); // Orange-red — explosive
         }
 
-        // Track the last tick + source plant combo to prevent multiple self-damages
-        // from the same delivery event (e.g., Cloud hitting 5 creatures in one tick)
         static int _lastDetonationTick = -1;
         static int _lastDetonationPlantId = -1;
 
@@ -42,7 +40,7 @@ namespace Abracodabra.Genes.Implementations
             float potency = GetFinalPotency(context.payloadInstance);
             float finalDamage = baseAoeDamage * potency * context.effectMultiplier;
 
-            // ── Direct hit damage ──
+            // Direct hit — full damage to the primary target
             var directTarget = context.target.GetComponent<AnimalController>();
             if (directTarget != null && !directTarget.IsDying)
             {
@@ -50,7 +48,7 @@ namespace Abracodabra.Genes.Implementations
                 Debug.Log($"[ExplosivePayload] Direct hit on '{directTarget.SpeciesName}' for {finalDamage:F1} damage");
             }
 
-            // ── AoE splash to nearby creatures (excludes direct target) ──
+            // Splash — half damage to everything else in blast radius
             Vector3 detonationPos = context.target.transform.position;
             var creaturesInBlast = TargetFinder.FindCreaturesInRadius(detonationPos, blastRadius);
 
@@ -60,7 +58,6 @@ namespace Abracodabra.Genes.Implementations
                 if (creature == null || creature.IsDying) continue;
                 if (creature.gameObject == context.target) continue; // Skip direct target (already damaged)
 
-                // Splash deals 50% of full damage
                 creature.TakeDamage(finalDamage * 0.5f);
                 splashCount++;
             }
@@ -70,7 +67,7 @@ namespace Abracodabra.Genes.Implementations
                 Debug.Log($"[ExplosivePayload] Splash hit {splashCount} creature(s) in {blastRadius:F1} tile radius for {finalDamage * 0.5f:F1} each");
             }
 
-            // ── Spawn explosion VFX ──
+            // VFX
             if (explosionVfxPrefab != null)
             {
                 var vfx = Object.Instantiate(explosionVfxPrefab, detonationPos, Quaternion.identity);
@@ -78,8 +75,7 @@ namespace Abracodabra.Genes.Implementations
                 Object.Destroy(vfx, 1f); // Auto-cleanup after 1 second
             }
 
-            // ── Self-damage: destroy leaves on source plant ──
-            // Only once per tick per plant to prevent Cloud/Aura multi-hit cascading
+            // Self-damage — deduplicated per tick per plant
             if (context.source != null)
             {
                 int currentTick = Time.frameCount; // Use frameCount as tick proxy for dedup
@@ -104,7 +100,6 @@ namespace Abracodabra.Genes.Implementations
                 }
             }
 
-            // Floating combat text at detonation point
             FloatingCombatText.Spawn(
                 detonationPos + Vector3.up * 0.2f,
                 $"BOOM -{finalDamage:F0}",
@@ -126,14 +121,12 @@ namespace Abracodabra.Genes.Implementations
 
         public override void ApplyToTarget(GameObject target, RuntimeGeneInstance instance)
         {
-            // Used when explosive fruit is eaten — detonate at the eater's position
             if (target == null) return;
 
             Vector3 detonationPos = target.transform.position;
             float potency = GetFinalPotency(instance);
             float finalDamage = baseAoeDamage * potency;
 
-            // AoE at the eater's position
             var creaturesInBlast = TargetFinder.FindCreaturesInRadius(detonationPos, blastRadius);
             foreach (var creature in creaturesInBlast)
             {
@@ -141,7 +134,6 @@ namespace Abracodabra.Genes.Implementations
                 creature.TakeDamage(finalDamage);
             }
 
-            // VFX
             if (explosionVfxPrefab != null)
             {
                 var vfx = Object.Instantiate(explosionVfxPrefab, detonationPos, Quaternion.identity);

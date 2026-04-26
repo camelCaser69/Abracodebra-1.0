@@ -1,11 +1,11 @@
-﻿// File: Assets/Scripts/Genes/Implementations/Modifier/CostReductionGene.cs
+﻿// FILE: Assets/Scripts/Genes/Implementations/Modifier/CostReductionGene.cs
 using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "CostReductionGene", menuName = "Abracodabra/Genes/Modifier/Cost Reduction")]
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Modifier/Cost Reduction", fileName = "Gene_Modifier_CostReduction")]
     public class CostReductionGene : ModifierGene
     {
         [Header("Cost Settings")]

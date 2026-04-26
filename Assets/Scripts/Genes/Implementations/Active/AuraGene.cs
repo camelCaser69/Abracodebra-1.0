@@ -7,7 +7,7 @@ using Abracodabra.Genes.WorldEffects;
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "AuraGene", menuName = "Abracodabra/Genes/Active/Aura")]
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Active/Aura", fileName = "Gene_Active_Aura")]
     public class AuraGene : ActiveGene
     {
         [Header("Aura Configuration")]
@@ -22,11 +22,9 @@ namespace Abracodabra.Genes.Implementations
 
         public AuraGene()
         {
-            // Aura has no up-front energy cost from the sequence slot.
-            // It drains continuously from the pool instead.
             baseEnergyCost = 0f;
-            canExecuteEmpty = true;     // Aura can fire without payloads (does nothing useful, but allowed)
-            requiresTarget = false;      // Aura always activates regardless of enemies
+            canExecuteEmpty = true;
+            requiresTarget = false;
         }
 
         public override void Execute(ActiveGeneContext context)
@@ -37,11 +35,9 @@ namespace Abracodabra.Genes.Implementations
                 return;
             }
 
-            // Check if this plant already has an active aura from this gene — if so, just refresh it
             var existingAura = FindExistingAura(context.plant);
             if (existingAura != null && existingAura.IsActive)
             {
-                // Refresh: update payloads and multiplier in case the gene config changed
                 float multiplier = context.activeInstance?.GetValue("effect_multiplier", 1f) ?? 1f;
                 existingAura.Refresh(
                     new List<RuntimeGeneInstance>(context.payloads),
@@ -53,7 +49,6 @@ namespace Abracodabra.Genes.Implementations
                 return;
             }
 
-            // Spawn a new aura
             float spawnMultiplier = context.activeInstance?.GetValue("effect_multiplier", 1f) ?? 1f;
             float finalRadius = baseRadius * Mathf.Sqrt(spawnMultiplier);
 
@@ -61,8 +56,6 @@ namespace Abracodabra.Genes.Implementations
 
             GameObject auraObj = Object.Instantiate(auraPrefab, spawnPosition, Quaternion.identity);
             auraObj.name = $"Aura_{geneName}_{context.plant.name}";
-
-            // Parent to the plant so it moves with it (unlikely but defensive)
             auraObj.transform.SetParent(context.plant.transform);
 
             AuraWorldEffect aura = auraObj.GetComponent<AuraWorldEffect>();
@@ -84,9 +77,6 @@ namespace Abracodabra.Genes.Implementations
             Debug.Log($"[AuraGene] '{geneName}' spawned aura on '{context.plant.name}' | Radius: {finalRadius:F1} | Drain: {energyDrainPerTick:F1}/tick | Payloads: {payloadsCopy.Count}");
         }
 
-        /// <summary>
-        /// Finds an existing AuraWorldEffect parented to this plant (if any).
-        /// </summary>
         AuraWorldEffect FindExistingAura(PlantGrowth plant)
         {
             if (plant == null) return null;
@@ -95,7 +85,7 @@ namespace Abracodabra.Genes.Implementations
 
         public override bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
         {
-            return true; // Aura works with any payload or even empty
+            return true;
         }
 
         public override string GetTooltip(GeneTooltipContext context)

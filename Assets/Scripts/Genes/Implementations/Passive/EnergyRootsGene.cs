@@ -1,15 +1,11 @@
-// File: Assets/Scripts/Genes/Implementations/Passive/EnergyRootsGene.cs
+// FILE: Assets/Scripts/Genes/Implementations/Passive/EnergyRootsGene.cs
 using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Implementations
 {
-    /// <summary>
-    /// Passive gene that increases energy generation per leaf by 25%.
-    /// Works through the existing PassiveStatType.EnergyGeneration multiplier.
-    /// </summary>
-    [CreateAssetMenu(fileName = "EnergyRootsGene", menuName = "Abracodabra/Genes/Passive/EnergyRoots")]
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Passive/Energy Roots", fileName = "Gene_Passive_EnergyRoots")]
     public class EnergyRootsGene : PassiveGene
     {
         public EnergyRootsGene()
@@ -21,7 +17,6 @@ namespace Abracodabra.Genes.Implementations
 
         public override void ApplyToPlant(PlantGrowth plant, RuntimeGeneInstance instance)
         {
-            // Stat application handled generically by PlantGrowthLogic.CalculateAndApplyPassiveStats()
         }
 
         public override string GetStatModificationText()
@@ -46,8 +41,8 @@ namespace Abracodabra.Genes.Implementations
                 : $"{finalPercentage:F0}% Energy Generation";
 
             return $"{description}\n\n" +
-                $"<b>Effect:</b> {effectText}\n" +
-                "Increases the energy generated per leaf each tick.";
+                   $"<b>Effect:</b> {effectText}\n" +
+                   "Increases the energy generated per leaf each tick.";
         }
     }
 }

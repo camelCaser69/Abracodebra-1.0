@@ -1,17 +1,14 @@
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Genes/Core/PlaceholderGene.cs
+using UnityEngine;
 using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Core
 {
-    /// <summary>
-    /// A special gene that is used as a fallback when a gene cannot be loaded from its GUID.
-    /// This prevents null reference exceptions throughout the system.
-    /// </summary>
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/System/Placeholder", fileName = "Gene_System_Placeholder")]
     public class PlaceholderGene : PassiveGene
     {
         public override void ApplyToPlant(PlantGrowth plant, RuntimeGeneInstance instance)
         {
-            // A placeholder gene has no effect.
         }
 
         public override string GetStatModificationText()

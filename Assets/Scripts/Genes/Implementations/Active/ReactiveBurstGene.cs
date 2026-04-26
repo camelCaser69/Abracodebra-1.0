@@ -6,11 +6,11 @@ using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "ReactiveBurstGene", menuName = "Abracodabra/Genes/Active/Reactive Burst")]
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Active/Reactive Burst", fileName = "Gene_Active_ReactiveBurst")]
     public class ReactiveBurstGene : ActiveGene
     {
         [Header("Reactive Burst Configuration")]
-        [Tooltip("AoE damage dealt to all creatures in burst radius on trigger.")]
+        [Tooltip("Base AoE damage dealt per burst.")]
         public float baseAoeDamage = 15f;
 
         [Tooltip("Burst radius in tiles.")]
@@ -27,24 +27,20 @@ namespace Abracodabra.Genes.Implementations
 
         public ReactiveBurstGene()
         {
-            baseEnergyCost = 0f;        // No cost on cursor pass
-            canExecuteEmpty = true;      // Works without payloads (base AoE damage)
+            baseEnergyCost = 0f;
+            canExecuteEmpty = true;
             requiresTarget = false;
-            isTriggerType = true;        // Cursor passes over without spending a tick
+            isTriggerType = true;
         }
 
-        /// <summary>
-        /// Execute() does nothing for trigger-type genes.
-        /// The actual burst logic is in ReactiveBurstHandler.
-        /// </summary>
         public override void Execute(ActiveGeneContext context)
         {
-            // No-op — trigger genes don't fire on the normal strand cycle
+            // Trigger-type gene — execution handled by ReactiveBurstHandler
         }
 
         public override bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads)
         {
-            return true; // Works with or without payloads
+            return true;
         }
 
         public override string GetTooltip(GeneTooltipContext context)

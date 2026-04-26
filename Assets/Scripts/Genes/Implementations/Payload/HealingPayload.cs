@@ -6,7 +6,7 @@ using Abracodabra.Genes.Components;
 
 namespace Abracodabra.Genes.Implementations
 {
-    [CreateAssetMenu(fileName = "HealingPayload", menuName = "Abracodabra/Genes/Payload/Healing")]
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Payload/Healing", fileName = "Gene_Payload_Healing")]
     public class HealingPayload : PayloadGene
     {
         [Header("Healing Configuration")]
@@ -29,7 +29,6 @@ namespace Abracodabra.Genes.Implementations
         {
             if (context.target == null) return;
 
-            // Heal creatures
             var animalController = context.target.GetComponent<AnimalController>();
             if (animalController != null)
             {
@@ -44,7 +43,6 @@ namespace Abracodabra.Genes.Implementations
                 return;
             }
 
-            // Heal player (via IStatusEffectable)
             var effectable = context.target.GetComponent<IStatusEffectable>();
             if (effectable != null)
             {
@@ -56,14 +54,13 @@ namespace Abracodabra.Genes.Implementations
             }
 
             // NOTE: Plant leaf regrowth is NOT handled here — it's handled by
-            // CloudWorldEffect and AuraWorldEffect which detect IsPlantHealingPayload
-            // and call PlantGrowth.RegrowLeaf() with plantRegrowChance gating.
+            // CloudWorldEffect and AuraWorldEffect using plantRegrowChance
         }
 
         public override void ConfigureFruit(Fruit fruit, RuntimeGeneInstance instance)
         {
-            // Healing fruit: adds nutrition component with heal value
-            var nutrition = fruit.gameObject.GetComponent<NutritionComponent>() ?? fruit.gameObject.AddComponent<NutritionComponent>();
+            var nutrition = fruit.gameObject.GetComponent<NutritionComponent>() ??
+                fruit.gameObject.AddComponent<NutritionComponent>();
             float potency = GetFinalPotency(instance);
             nutrition.healAmount = baseHealAmount * potency;
 
@@ -78,7 +75,6 @@ namespace Abracodabra.Genes.Implementations
 
         public override void ApplyToTarget(GameObject target, RuntimeGeneInstance instance)
         {
-            // Used when fruit is eaten
             var effectable = target.GetComponent<IStatusEffectable>();
             if (effectable != null)
             {
