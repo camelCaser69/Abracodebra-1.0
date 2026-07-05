@@ -1,6 +1,6 @@
 UNITY PROJECT SCRIPTS - COMPRESSED FORMAT
-Compression Stats: 1,010,867 -> 724,566 chars (28.3% reduction)
-Estimated tokens saved: ~71,575
+Compression Stats: 1,002,902 -> 723,680 chars (27.8% reduction)
+Estimated tokens saved: ~69,805
 
 This document contains extracted Unity 6 C# scripts optimized for AI/LLM context.
 
@@ -153,117 +153,117 @@ using System.Linq;
   TerrainAffinityGene (Assets\Scripts\Genes\Implementations\Passive/) L12302
 
 [Abracodabra.Genes.Implementations]
-  AuraGene (Assets\Scripts\Genes\Implementations\Active/) L12405
-  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L12498
-  CloudGene (Assets\Scripts\Genes\Implementations\Active/) L12621
-  ProjectileGene (Assets\Scripts\Genes\Implementations\Active/) L12688
-  PruningGene (Assets\Scripts\Genes\Implementations\Active/) L12769
-  ReactiveBurstHandler (Assets\Scripts\Genes\Implementations\Active/) L12850
-  ReactiveBurstGene (Assets\Scripts\Genes\Implementations\Active/) L12981
-  TrapGene (Assets\Scripts\Genes\Implementations\Active/) L13031
-  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L13151
-  OverchargeGene (Assets\Scripts\Genes\Implementations\Modifier/) L13181
-  TriggerProximityGene (Assets\Scripts\Genes\Implementations\Modifier/) L13223
-  EnergyRootsGene (Assets\Scripts\Genes\Implementations\Passive/) L13255
-  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L13297
-  RegrowthGene (Assets\Scripts\Genes\Implementations\Passive/) L13340
-  ThickBarkGene (Assets\Scripts\Genes\Implementations\Passive/) L13376
-  ThornedLeavesGene (Assets\Scripts\Genes\Implementations\Passive/) L13410
-  ExplosivePayload (Assets\Scripts\Genes\Implementations\Payload/) L13445
-  FearPayload (Assets\Scripts\Genes\Implementations\Payload/) L13593
-  FreezePayload (Assets\Scripts\Genes\Implementations\Payload/) L13677
-  HealingPayload (Assets\Scripts\Genes\Implementations\Payload/) L13766
-  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L13855
-  PoisonPayload (Assets\Scripts\Genes\Implementations\Payload/) L13905
-  SlowPayload (Assets\Scripts\Genes\Implementations\Payload/) L13968
+  AuraGene (Assets\Scripts\Genes\Implementations\Active/) L12404
+  BasicFruitGene (Assets\Scripts\Genes\Implementations\Active/) L12496
+  CloudGene (Assets\Scripts\Genes\Implementations\Active/) L12617
+  ProjectileGene (Assets\Scripts\Genes\Implementations\Active/) L12684
+  PruningGene (Assets\Scripts\Genes\Implementations\Active/) L12765
+  ReactiveBurstHandler (Assets\Scripts\Genes\Implementations\Active/) L12846
+  ReactiveBurstGene (Assets\Scripts\Genes\Implementations\Active/) L12977
+  TrapGene (Assets\Scripts\Genes\Implementations\Active/) L13027
+  CostReductionGene (Assets\Scripts\Genes\Implementations\Modifier/) L13147
+  OverchargeGene (Assets\Scripts\Genes\Implementations\Modifier/) L13177
+  TriggerProximityGene (Assets\Scripts\Genes\Implementations\Modifier/) L13219
+  EnergyRootsGene (Assets\Scripts\Genes\Implementations\Passive/) L13251
+  GrowthSpeedGene (Assets\Scripts\Genes\Implementations\Passive/) L13293
+  RegrowthGene (Assets\Scripts\Genes\Implementations\Passive/) L13336
+  ThickBarkGene (Assets\Scripts\Genes\Implementations\Passive/) L13372
+  ThornedLeavesGene (Assets\Scripts\Genes\Implementations\Passive/) L13406
+  ExplosivePayload (Assets\Scripts\Genes\Implementations\Payload/) L13441
+  FearPayload (Assets\Scripts\Genes\Implementations\Payload/) L13589
+  FreezePayload (Assets\Scripts\Genes\Implementations\Payload/) L13673
+  HealingPayload (Assets\Scripts\Genes\Implementations\Payload/) L13762
+  NutritiousPayload (Assets\Scripts\Genes\Implementations\Payload/) L13852
+  PoisonPayload (Assets\Scripts\Genes\Implementations\Payload/) L13901
+  SlowPayload (Assets\Scripts\Genes\Implementations\Payload/) L13964
 
 [Abracodabra.Genes.Runtime]
-  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L14030
-  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L14086
-  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L14218
+  PlantGeneRuntimeState (Assets\Scripts\Genes\Runtime/) L14026
+  RuntimeGeneInstance (Assets\Scripts\Genes\Runtime/) L14082
+  RuntimeSequenceSlot (Assets\Scripts\Genes\Runtime/) L14214
 
 [Abracodabra.Genes.Services]
-  DeterministicRandom (Assets\Scripts\Genes\Services/) L14273
-  GeneEffectPool (Assets\Scripts\Genes\Services/) L14306
-  GeneEventBus (Assets\Scripts\Genes\Services/) L14404
-  IGeneLibrary (Assets\Scripts\Genes\Services/) L14456
+  DeterministicRandom (Assets\Scripts\Genes\Services/) L14269
+  GeneEffectPool (Assets\Scripts\Genes\Services/) L14302
+  GeneEventBus (Assets\Scripts\Genes\Services/) L14400
+  IGeneLibrary (Assets\Scripts\Genes\Services/) L14452
 
 [Abracodabra.Genes.Templates]
-  PlantArchetype (Assets\Scripts\Genes\Templates/) L14543
+  PlantArchetype (Assets\Scripts\Genes\Templates/) L14539
 
 [Abracodabra.Genes.WorldEffects]
-  AuraWorldEffect (Assets\Scripts\Genes\WorldEffects/) L14647
-  CloudWorldEffect (Assets\Scripts\Genes\WorldEffects/) L14866
-  ProjectileWorldEffect (Assets\Scripts\Genes\WorldEffects/) L14956
-  TargetFinder (Assets\Scripts\Genes\WorldEffects/) L15068
-  TrapWorldEffect (Assets\Scripts\Genes\WorldEffects/) L15169
-  WorldEffect (Assets\Scripts\Genes\WorldEffects/) L15282
+  AuraWorldEffect (Assets\Scripts\Genes\WorldEffects/) L14643
+  CloudWorldEffect (Assets\Scripts\Genes\WorldEffects/) L14862
+  ProjectileWorldEffect (Assets\Scripts\Genes\WorldEffects/) L14952
+  TargetFinder (Assets\Scripts\Genes\WorldEffects/) L15064
+  TrapWorldEffect (Assets\Scripts\Genes\WorldEffects/) L15165
+  WorldEffect (Assets\Scripts\Genes\WorldEffects/) L15278
 
 [Abracodabra.Minigames]
-  MinigameManager (Assets\Scripts\Minigames/) L15422
-  MinigameType (Assets\Scripts\Minigames/) L15638
-  TileInteractionManagerExtensions (Assets\Scripts\Minigames/) L15698
-  TimingCircleConfig (Assets\Scripts\Minigames/) L15760
-  TimingCircleMinigame (Assets\Scripts\Minigames/) L15891
+  MinigameManager (Assets\Scripts\Minigames/) L15418
+  MinigameType (Assets\Scripts\Minigames/) L15634
+  TileInteractionManagerExtensions (Assets\Scripts\Minigames/) L15694
+  TimingCircleConfig (Assets\Scripts\Minigames/) L15756
+  TimingCircleMinigame (Assets\Scripts\Minigames/) L15887
 
 [Abracodabra.UI.Genes]
-  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L16220
-  InventoryService (Assets\Scripts\A_ToolkitUI/) L16305
-  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L16445
+  HotbarSelectionService (Assets\Scripts\A_ToolkitUI/) L16216
+  InventoryService (Assets\Scripts\A_ToolkitUI/) L16301
+  PlantPlacementManager (Assets\Scripts\WorldInteraction\Placement/) L16441
 
 [Abracodabra.UI.Toolkit]
-  GameUIManager (Assets\Scripts\A_ToolkitUI/) L16723
-  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L17597
-  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L17886
-  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L18124
-  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L18310
-  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L18509
-  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L19245
-  DestroyTracker (Assets\Scripts\A_ToolkitUI/) L19467
+  GameUIManager (Assets\Scripts\A_ToolkitUI/) L16719
+  UIDragDropController (Assets\Scripts\A_ToolkitUI/) L17593
+  UIHotbarController (Assets\Scripts\A_ToolkitUI/) L17882
+  UIInventoryGridController (Assets\Scripts\A_ToolkitUI/) L18120
+  UIInventoryItem (Assets\Scripts\A_ToolkitUI/) L18306
+  UISeedEditorController (Assets\Scripts\A_ToolkitUI/) L18505
+  UISpecSheetController (Assets\Scripts\A_ToolkitUI/) L19241
+  DestroyTracker (Assets\Scripts\A_ToolkitUI/) L19463
 
 [Abracodabra.UI.Tooltips]
-  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L19778
-  SeedRarity (Assets\Scripts\A_ToolkitUI/) L20062
-  QualityTier (Assets\Scripts\A_ToolkitUI/) L20084
+  SeedTooltipData (Assets\Scripts\A_ToolkitUI/) L19774
+  SeedRarity (Assets\Scripts\A_ToolkitUI/) L20058
+  QualityTier (Assets\Scripts\A_ToolkitUI/) L20080
 
 [WegoSystem]
-  CameraController (Assets\Scripts\Core/) L20146
-  CameraZoomController (Assets\Scripts\Core/) L20259
-  InitializationManager (Assets\Scripts\Core/) L20308
-  PixelGridSnapper (Assets\Scripts\Core/) L20348
-  RunState (Assets\Scripts\Core/) L20381
-  SingletonMonoBehaviour (Assets\Scripts\Core/) L20547
-  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L20610
-  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L20746
-  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L20775
-  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L20926
-  GridEntity (Assets\Scripts\Ticks/) L20998
-  GridPosition (Assets\Scripts\Ticks/) L21168
-  GridPositionManager (Assets\Scripts\Ticks/) L21269
-  GridRadiusUtility (Assets\Scripts\Ticks/) L21883
-  MultiTileEntity (Assets\Scripts\Ticks/) L22027
-  PivotMode (Assets\Scripts\Ticks/) L22271
-  TickConfiguration (Assets\Scripts\Ticks/) L22385
-  ITickUpdateable (Assets\Scripts\Ticks/) L22471
-  IWorldInteractable (Assets\Scripts\WorldInteraction/) L22623
-  GardenerController (Assets\Scripts\WorldInteraction\Player/) L22644
-  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L22855
-  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L22871
-  for (Assets\Scripts\WorldInteraction/) L23497
+  CameraController (Assets\Scripts\Core/) L20142
+  CameraZoomController (Assets\Scripts\Core/) L20255
+  InitializationManager (Assets\Scripts\Core/) L20304
+  PixelGridSnapper (Assets\Scripts\Core/) L20344
+  RunState (Assets\Scripts\Core/) L20377
+  SingletonMonoBehaviour (Assets\Scripts\Core/) L20543
+  EnvironmentalStatusEffectSystem (Assets\Scripts\Ecosystem\Status Effects/) L20606
+  MapConfiguration (Assets\Scripts\ProceduralGeneration/) L20742
+  ResolutionManager (Assets\Scripts\ProceduralGeneration/) L20771
+  SceneSetupManager (Assets\Scripts\ProceduralGeneration/) L20922
+  GridEntity (Assets\Scripts\Ticks/) L20994
+  GridPosition (Assets\Scripts\Ticks/) L21164
+  GridPositionManager (Assets\Scripts\Ticks/) L21265
+  GridRadiusUtility (Assets\Scripts\Ticks/) L21879
+  MultiTileEntity (Assets\Scripts\Ticks/) L22023
+  PivotMode (Assets\Scripts\Ticks/) L22267
+  TickConfiguration (Assets\Scripts\Ticks/) L22381
+  ITickUpdateable (Assets\Scripts\Ticks/) L22467
+  IWorldInteractable (Assets\Scripts\WorldInteraction/) L22619
+  GardenerController (Assets\Scripts\WorldInteraction\Player/) L22640
+  TileDefinitionMapping (Assets\Scripts\WorldInteraction\Tiles/) L22851
+  TileInteractionManager (Assets\Scripts\WorldInteraction\Tiles/) L22867
+  for (Assets\Scripts\WorldInteraction/) L23493
 
 [WegoSystem.Editor]
-  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L23569
+  ResolutionManagerEditor (Assets\Scripts\ProceduralGeneration\Editor/) L23565
 
 [WegoSystem.EditorTools]
-  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L23601
+  MapBoundsVisualizer (Assets\Scripts\ProceduralGeneration/) L23597
 
 [WegoSystem.ProceduralGeneration]
-  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L23659
-  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L23705
-  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L23828
+  BiomeLayer (Assets\Scripts\ProceduralGeneration/) L23655
+  ProceduralMapGenerator (Assets\Scripts\ProceduralGeneration/) L23701
+  SimplexNoise (Assets\Scripts\ProceduralGeneration/) L23824
 
 [WegoSystem.ProceduralGeneration.Editor]
-  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L23993
+  ProceduralMapGeneratorEditor (Assets\Scripts\ProceduralGeneration\Editor/) L23989
 
 
 ================================================================================
@@ -12409,7 +12409,7 @@ namespace Abracodabra.Genes.Core {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Genes\Core\PlaceholderGene.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Genes/Core/PlaceholderGene.cs
 using Abracodabra.Genes.Runtime;
 
 namespace Abracodabra.Genes.Core {
@@ -12596,7 +12596,6 @@ namespace Abracodabra.Genes.Core {
 
   pub ovr void ApplyToPlant(PlantGrowth plant, RuntimeGeneInstance instance) {
    if (plant == null) return;
-
    Debug.Log($"[TerrainAffinityGene] Applied to plant {plant.name}");
   }
 
@@ -12663,8 +12662,8 @@ namespace Abracodabra.Genes.Implementations {
 
   pub AuraGene() {
    baseEnergyCost = 0f;
-   canExecuteEmpty = true;     // Aura can fire without payloads (does nothing useful, but allowed)
-   requiresTarget = false;      // Aura always activates regardless of enemies
+   canExecuteEmpty = true;
+   requiresTarget = false;
   }
 
   pub ovr void Execute(ActiveGeneContext context) {
@@ -12693,7 +12692,6 @@ namespace Abracodabra.Genes.Implementations {
 
    GameObject auraObj = Object.Instantiate(auraPrefab, spawnPosition, Quaternion.identity);
    auraObj.name = $"Aura_{geneName}_{context.plant.name}";
-
    auraObj.transform.SetParent(context.plant.transform);
 
    AuraWorldEffect aura = auraObj.GetComponent<AuraWorldEffect>();
@@ -12720,7 +12718,7 @@ namespace Abracodabra.Genes.Implementations {
   }
 
   pub ovr bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads) {
-   return true; // Aura works with any payload or even empty
+   return true;
   }
 
   pub ovr string GetTooltip(GeneTooltipContext context) {
@@ -12737,11 +12735,10 @@ namespace Abracodabra.Genes.Implementations {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Genes\Implementations\Active\BasicFruitGene.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Genes/Implementations/Active/BasicFruitGene.cs
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Services;
 using Abracodabra.Genes.Components;
-using Abracodabra.Genes.Implementations;
 using Abracodabra.Genes.Runtime;
 using WegoSystem;
 
@@ -12767,7 +12764,6 @@ namespace Abracodabra.Genes.Implementations {
     return;
    }
 
-   // NOTE: PlantGrowth.GetFruitSpawnPoints no longer auto-reserves these spots in the hashset.
    Transform[] fruitPoints = context.plant.GetFruitSpawnPoints();
 
    if (fruitPoints.Length == 0) {
@@ -12878,8 +12874,8 @@ namespace Abracodabra.Genes.Implementations {
 
   pub CloudGene() {
    baseEnergyCost = 8f;
-   canExecuteEmpty = true; // Cloud can fire without payloads (does nothing useful, but allowed)
-   requiresTarget = false; // Clouds always fire regardless of enemies
+   canExecuteEmpty = true;
+   requiresTarget = false;
   }
 
   pub ovr void Execute(ActiveGeneContext context) {
@@ -12892,7 +12888,7 @@ namespace Abracodabra.Genes.Implementations {
 
    float multiplier = context.activeInstance?.GetValue("effect_multiplier", 1f) ?? 1f;
 
-   float finalRadius = baseRadius * Mathf.Sqrt(multiplier); // sqrt so overcharge doesn't make clouds insanely large
+   float finalRadius = baseRadius * Mathf.Sqrt(multiplier);
    int finalDuration = baseDurationTicks;
 
    GameObject cloudObj = Instantiate(cloudPrefab, spawnPosition, Quaternion.identity);
@@ -12911,7 +12907,7 @@ namespace Abracodabra.Genes.Implementations {
   }
 
   pub ovr bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads) {
-   return true; // Cloud works with any payload or even empty
+   return true;
   }
 
   pub ovr string GetTooltip(GeneTooltipContext context) {
@@ -12946,7 +12942,7 @@ namespace Abracodabra.Genes.Implementations {
   pub ProjectileGene() {
    baseEnergyCost = 6f;
    canExecuteEmpty = true;
-   requiresTarget = true; // Projectile needs a target — skips if none nearby
+   requiresTarget = true;
    targetRange = 3f;
   }
 
@@ -12992,7 +12988,7 @@ namespace Abracodabra.Genes.Implementations {
   }
 
   pub ovr bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads) {
-   return true; // Projectile works with any payload (base damage always applies)
+   return true;
   }
 
   pub ovr string GetTooltip(GeneTooltipContext context) {
@@ -13022,9 +13018,9 @@ namespace Abracodabra.Genes.Implementations {
   pub GameObject pruneVfxPrefab;
 
   pub PruningGene() {
-   baseEnergyCost = 0f;        // The leaf IS the cost
-   canExecuteEmpty = true;      // No payloads needed
-   requiresTarget = false;      // Always fires
+   baseEnergyCost = 0f;
+   canExecuteEmpty = true;
+   requiresTarget = false;
   }
 
   pub ovr void Execute(ActiveGeneContext context) {
@@ -13067,7 +13063,7 @@ namespace Abracodabra.Genes.Implementations {
   }
 
   pub ovr bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads) {
-   return true; // Pruning works standalone — no payloads needed
+   return true;
   }
 
   pub ovr string GetTooltip(GeneTooltipContext context) {
@@ -13227,7 +13223,7 @@ using Abracodabra.Genes.Runtime;
 namespace Abracodabra.Genes.Implementations {
  pub class ReactiveBurstGene : ActiveGene {
   [Header("Reactive Burst Configuration")]
-  [Tooltip("AoE damage dealt to all creatures in burst radius on trigger.")]
+  [Tooltip("Base AoE damage dealt per burst.")]
   pub float baseAoeDamage = 15f;
 
   [Tooltip("Burst radius in tiles.")]
@@ -13243,17 +13239,17 @@ namespace Abracodabra.Genes.Implementations {
   pub GameObject burstVfxPrefab;
 
   pub ReactiveBurstGene() {
-   baseEnergyCost = 0f;        // No cost on cursor pass
-   canExecuteEmpty = true;      // Works without payloads (base AoE damage)
+   baseEnergyCost = 0f;
+   canExecuteEmpty = true;
    requiresTarget = false;
-   isTriggerType = true;        // Cursor passes over without spending a tick
+   isTriggerType = true;
   }
 
   pub ovr void Execute(ActiveGeneContext context) {
   }
 
   pub ovr bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads) {
-   return true; // Works with or without payloads
+   return true;
   }
 
   pub ovr string GetTooltip(GeneTooltipContext context) {
@@ -13295,9 +13291,9 @@ namespace Abracodabra.Genes.Implementations {
   pub GameObject triggerVfxPrefab;
 
   pub TrapGene() {
-   baseEnergyCost = 0f;        // Trap is free
-   canExecuteEmpty = false;     // Needs at least one payload to be useful
-   requiresTarget = false;      // Always arms regardless of enemies
+   baseEnergyCost = 0f;
+   canExecuteEmpty = false;
+   requiresTarget = false;
   }
 
   pub ovr void Execute(ActiveGeneContext context) {
@@ -13374,7 +13370,7 @@ namespace Abracodabra.Genes.Implementations {
   }
 
   pub ovr bool IsValidConfiguration(List<ModifierGene> modifiers, List<PayloadGene> payloads) {
-   return payloads.Count > 0; // Trap needs at least one payload
+   return payloads.Count > 0;
   }
 
   pub ovr string GetTooltip(GeneTooltipContext context) {
@@ -13390,7 +13386,7 @@ namespace Abracodabra.Genes.Implementations {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Genes\Implementations\Modifier\CostReductionGene.cs
 
-﻿// File: Assets/Scripts/Genes/Implementations/Modifier/CostReductionGene.cs
+﻿// FILE: Assets/Scripts/Genes/Implementations/Modifier/CostReductionGene.cs
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 
@@ -13536,7 +13532,7 @@ namespace Abracodabra.Genes.Implementations {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Genes\Implementations\Passive\GrowthSpeedGene.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Genes/Implementations/Passive/GrowthSpeedGene.cs
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 
@@ -14055,7 +14051,8 @@ namespace Abracodabra.Genes.Implementations {
   }
 
   pub ovr void ConfigureFruit(Fruit fruit, RuntimeGeneInstance instance) {
-   var nutrition = fruit.gameObject.GetComponent<NutritionComponent>() ?? fruit.gameObject.AddComponent<NutritionComponent>();
+   var nutrition = fruit.gameObject.GetComponent<NutritionComponent>() ??
+    fruit.gameObject.AddComponent<NutritionComponent>();
    float potency = GetFinalPotency(instance);
    nutrition.healAmount = baseHealAmount * potency;
 
@@ -14094,13 +14091,12 @@ namespace Abracodabra.Genes.Implementations {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Genes\Implementations\Payload\NutritiousPayload.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Genes/Implementations/Payload/NutritiousPayload.cs
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Components;
 
 namespace Abracodabra.Genes.Implementations {
-
  pub class NutritiousPayload : PayloadGene {
   [Tooltip("Healing is disabled for Nutritious payload in v5.")]
   pub float healAmount = 0f;
@@ -14112,14 +14108,14 @@ namespace Abracodabra.Genes.Implementations {
   }
 
   pub ovr void ApplyPayload(PayloadContext context) {
-
-   if(context.target != null) {
+   if (context.target != null) {
     Debug.Log($"[NutritiousPayload] Applied to {context.target.name} (Food Scent / Lure effect)");
    }
   }
 
   pub ovr void ConfigureFruit(Fruit fruit, RuntimeGeneInstance instance) {
-   var nutrition = fruit.gameObject.GetComponent<NutritionComponent>() ?? fruit.gameObject.AddComponent<NutritionComponent>();
+   var nutrition = fruit.gameObject.GetComponent<NutritionComponent>() ??
+       fruit.gameObject.AddComponent<NutritionComponent>();
    nutrition.nutritionValue = nutritionValue * GetFinalPotency(instance);
 
    fruit.AddVisualEffect(geneColor);
@@ -14144,14 +14140,13 @@ namespace Abracodabra.Genes.Implementations {
 ////////////////////////////////////////////////////////////
 // FILE: Assets\Scripts\Genes\Implementations\Payload\PoisonPayload.cs
 
-﻿using UnityEngine;
+﻿// FILE: Assets/Scripts/Genes/Implementations/Payload/PoisonPayload.cs
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Components;
-using WegoSystem; // For StatusEffect references
+using WegoSystem;
 
 namespace Abracodabra.Genes.Implementations {
-
  pub class PoisonPayload : PayloadGene {
   [Header("Poison Configuration")]
   [Tooltip("Assign the Poison StatusEffect asset here.")]
@@ -14186,7 +14181,8 @@ namespace Abracodabra.Genes.Implementations {
   pub ovr void ConfigureFruit(Fruit fruit, RuntimeGeneInstance instance) {
    fruit.AddVisualEffect(geneColor);
 
-   if (fruit.DynamicProperties == null) fruit.DynamicProperties = new System.Collections.Generic.Dictionary<string, float>();
+   if (fruit.DynamicProperties == null)
+    fruit.DynamicProperties = new System.Collections.Generic.Dictionary<string, float>();
    fruit.DynamicProperties["is_poisonous"] = 1f;
   }
 
