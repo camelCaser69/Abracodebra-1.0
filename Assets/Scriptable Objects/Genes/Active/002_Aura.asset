@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70d57d8641bd40bcbbba355fe0068275, type: 3}
+  m_Name: 002_Aura
+  m_EditorClassIdentifier: 
+  geneName: Aura
+  description: 
+  icon: {fileID: 21300000, guid: 0aac42833f760c64ab80dcdabdeb253f, type: 3}
+  tier: 1
+  geneColor: {r: 1, g: 1, b: 1, a: 1}
+  effectPrefab: {fileID: 0}
+  _persistentGUID: c3ef0836-9900-44aa-8281-2cb014188aa2
+  _version: 1
+  baseEnergyCost: 0
+  slotConfig:
+    modifierSlots: 1
+    payloadSlots: 1
+  canExecuteEmpty: 1
+  executionDelayTicks: 0
+  requiresTarget: 0
+  targetRange: 3
+  isTriggerType: 0
+  baseRadius: 2.5
+  energyDrainPerTick: 1.5
+  auraPrefab: {fileID: 6366326328904769615, guid: 6564561cc78702d439629b11f8f20df2, type: 3}

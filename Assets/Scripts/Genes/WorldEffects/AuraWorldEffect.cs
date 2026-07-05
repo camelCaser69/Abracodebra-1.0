@@ -1,35 +1,21 @@
-﻿// FILE: Assets/Scripts/Genes/WorldEffects/AuraWorldEffect.cs
+﻿// FILE: Assets\Scripts\Genes\WorldEffects\AuraWorldEffect.cs
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Implementations;
+using Abracodabra.Genes.Runtime;
+using UnityEngine;
 using WegoSystem;
 
 namespace Abracodabra.Genes.WorldEffects
 {
-    /// <summary>
-    /// Persistent area effect that drains energy every tick from its source plant.
-    /// Unlike CloudWorldEffect (periodic pulse that fades), Aura is always-on
-    /// until the plant dies or runs out of energy.
-    /// </summary>
     public class AuraWorldEffect : WorldEffect
     {
-        [Header("Aura Settings")]
-        [Tooltip("Energy drained from the source plant each tick.")]
         public float energyDrainPerTick = 1.5f;
 
-        float baseSpriteAlpha;
-        float pulseTimer;
         bool isEnergyStarved;
-
-        // Visual state
-        float targetVisualScale;
-        float currentVisualScale;
-        const float VISUAL_LERP_SPEED = 4f;
-        const float STARVED_SCALE_FACTOR = 0.4f;
-        const float STARVED_ALPHA_FACTOR = 0.3f;
+        Color activeOverlayColor;
+        Color starvedOverlayColor;
 
         protected override void Awake()
         {
@@ -48,9 +34,6 @@ namespace Abracodabra.Genes.WorldEffects
             isEnergyStarved = false;
         }
 
-        /// <summary>
-        /// Initialize the aura with its source plant, payloads, radius, and drain rate.
-        /// </summary>
         public void InitializeAura(
             PlantGrowth source,
             List<RuntimeGeneInstance> payloads,
@@ -65,40 +48,23 @@ namespace Abracodabra.Genes.WorldEffects
             effectMultiplier = multiplier;
             durationTicks = int.MaxValue;
 
-            targetVisualScale = radius * 2f;
-            currentVisualScale = targetVisualScale;
-            transform.localScale = Vector3.one * targetVisualScale;
+            // Compute overlay colors
+            activeOverlayColor = GetOverlayColor(0.25f);
+            starvedOverlayColor = activeOverlayColor;
+            starvedOverlayColor.a *= 0.3f; // Much dimmer when starved
 
+            // Show tile overlay
+            UpdateTileOverlay(activeOverlayColor);
+
+            // Hide the SpriteRenderer if present — we use tile overlays now
             if (spriteRenderer != null)
             {
-                if (payloadInstances.Count > 0)
-                {
-                    var primaryPayload = payloadInstances[0]?.GetGene<PayloadGene>();
-                    if (primaryPayload != null)
-                    {
-                        Color tint = primaryPayload.geneColor;
-                        tint.a = 0.35f;
-                        spriteRenderer.color = tint;
-                    }
-                    else
-                    {
-                        spriteRenderer.color = new Color(1f, 1f, 1f, 0.35f);
-                    }
-                }
-                else
-                {
-                    spriteRenderer.color = new Color(1f, 1f, 1f, 0.35f);
-                }
-
-                baseSpriteAlpha = spriteRenderer.color.a;
+                spriteRenderer.enabled = false;
             }
 
             Debug.Log($"[AuraWorldEffect] Initialized on '{source.name}' | Radius: {radius:F1} | Drain: {energyDrainPerTick:F1}/tick | Payloads: {payloadInstances.Count}");
         }
 
-        /// <summary>
-        /// Refresh an existing aura with potentially updated parameters.
-        /// </summary>
         public void Refresh(
             List<RuntimeGeneInstance> newPayloads,
             float newRadius,
@@ -109,18 +75,14 @@ namespace Abracodabra.Genes.WorldEffects
             radius = newRadius;
             energyDrainPerTick = newDrainPerTick;
             effectMultiplier = newMultiplier;
-            targetVisualScale = radius * 2f;
 
-            if (spriteRenderer != null && payloadInstances.Count > 0)
-            {
-                var primaryPayload = payloadInstances[0]?.GetGene<PayloadGene>();
-                if (primaryPayload != null)
-                {
-                    Color tint = primaryPayload.geneColor;
-                    tint.a = baseSpriteAlpha;
-                    spriteRenderer.color = tint;
-                }
-            }
+            // Recompute overlay colors from potentially new payloads
+            activeOverlayColor = GetOverlayColor(0.25f);
+            starvedOverlayColor = activeOverlayColor;
+            starvedOverlayColor.a *= 0.3f;
+
+            // Update tile overlay with new radius/color
+            UpdateTileOverlay(isEnergyStarved ? starvedOverlayColor : activeOverlayColor);
         }
 
         protected override void OnEffectTick(int tick)
@@ -142,9 +104,16 @@ namespace Abracodabra.Genes.WorldEffects
             if (energySystem.CurrentEnergy >= energyDrainPerTick)
             {
                 energySystem.CurrentEnergy -= energyDrainPerTick;
+
+                bool wasStarved = isEnergyStarved;
                 isEnergyStarved = false;
 
-                // Apply payloads to creatures
+                // Refresh overlay color if recovering from starvation
+                if (wasStarved)
+                {
+                    UpdateTileOverlay(activeOverlayColor);
+                }
+
                 var creatures = TargetFinder.FindCreaturesInRadius(transform.position, radius);
                 foreach (var creature in creatures)
                 {
@@ -157,7 +126,6 @@ namespace Abracodabra.Genes.WorldEffects
                     Debug.Log($"[AuraWorldEffect] Tick {tick}: Applied payloads to {creatures.Count} creature(s) in radius {radius:F1}");
                 }
 
-                // Apply healing to plants
                 float regrowChance = GetPlantRegrowChance();
                 if (regrowChance > 0f)
                 {
@@ -185,14 +153,17 @@ namespace Abracodabra.Genes.WorldEffects
             }
             else
             {
-                isEnergyStarved = true;
+                if (!isEnergyStarved)
+                {
+                    isEnergyStarved = true;
+                    // Dim the overlay when starved
+                    UpdateTileOverlay(starvedOverlayColor);
+                }
+
                 Debug.Log($"[AuraWorldEffect] Energy starved on '{sourcePlant.name}' — aura dimmed ({energySystem.CurrentEnergy:F1} < {energyDrainPerTick:F1})");
             }
         }
 
-        /// <summary>
-        /// Returns the plant regrow chance from the first healing payload, or 0 if none.
-        /// </summary>
         float GetPlantRegrowChance()
         {
             if (payloadInstances == null) return 0f;
@@ -219,65 +190,15 @@ namespace Abracodabra.Genes.WorldEffects
 
         protected override void OnEffectExpire()
         {
-            // Aura never expires via duration
-        }
-
-        void Update()
-        {
-            if (spriteRenderer == null) return;
-
-            pulseTimer += Time.deltaTime * 2f;
-
-            float targetAlpha;
-            float targetScale;
-
-            if (isEnergyStarved)
-            {
-                targetAlpha = baseSpriteAlpha * STARVED_ALPHA_FACTOR;
-                targetScale = targetVisualScale * STARVED_SCALE_FACTOR;
-            }
-            else
-            {
-                float pulse = Mathf.Sin(pulseTimer) * 0.08f;
-                targetAlpha = baseSpriteAlpha + pulse;
-                targetScale = targetVisualScale;
-            }
-
-            Color c = spriteRenderer.color;
-            c.a = Mathf.Lerp(c.a, targetAlpha, Time.deltaTime * VISUAL_LERP_SPEED);
-            spriteRenderer.color = c;
-
-            currentVisualScale = Mathf.Lerp(currentVisualScale, targetScale, Time.deltaTime * VISUAL_LERP_SPEED);
-            transform.localScale = Vector3.one * currentVisualScale;
+            // Auras don't normally expire (durationTicks = MaxValue),
+            // but if they do, clean up tile overlay
         }
 
         void DestroyAura()
         {
             isActive = false;
-            StartCoroutine(FadeAndDestroyAura());
-        }
-
-        IEnumerator FadeAndDestroyAura()
-        {
-            if (spriteRenderer != null)
-            {
-                float fadeDuration = 0.5f;
-                float elapsed = 0f;
-                Color startColor = spriteRenderer.color;
-                Vector3 startScale = transform.localScale;
-
-                while (elapsed < fadeDuration)
-                {
-                    elapsed += Time.deltaTime;
-                    float t = elapsed / fadeDuration;
-                    float alpha = Mathf.Lerp(startColor.a, 0f, t);
-                    spriteRenderer.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
-                    transform.localScale = Vector3.Lerp(startScale, startScale * 0.3f, t);
-                    yield return null;
-                }
-            }
-
-            Destroy(gameObject);
+            ClearTileOverlay();
+            Destroy(gameObject, 0.1f);
         }
     }
 }

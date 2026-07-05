@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿// FILE: Assets\Scripts\Ticks\GridDebugVisualizer.cs
+using System.Collections.Generic;
 using Abracodabra.Genes;
 using UnityEngine;
 using WegoSystem;
@@ -17,9 +18,9 @@ public class GridDebugVisualizer : MonoBehaviour
     }
 
     [Header("Master Control")]
-    [SerializeField] private bool showRadiusVisualizations = true;
-    [SerializeField] private float tileVisualizationAlpha = 0.3f;
-    [SerializeField] private GameObject tilePrefab;
+    [SerializeField] bool showRadiusVisualizations = true;
+    [SerializeField] float tileVisualizationAlpha = 0.3f;
+    [SerializeField] GameObject tilePrefab;
 
     [Header("Radius Colors (Centralized)")]
     [SerializeField] public Color animalSearchRadiusColor = new Color(1f, 0.5f, 0f, 0.3f);
@@ -29,22 +30,41 @@ public class GridDebugVisualizer : MonoBehaviour
     [SerializeField] public Color toolUseRadiusColor = new Color(0f, 0.5f, 1f, 0.3f);
 
     [Header("Individual Type Controls")]
-    [SerializeField] private bool enableAnimalSearchRadius = true;
-    [SerializeField] private bool enablePlantPoopRadius = true;
-    [SerializeField] private bool enableScentRadius = true;
-    [SerializeField] private bool enableFireflyPhotosynthesis = true;
-    [SerializeField] private bool enableToolUseRadius = true;
+    [SerializeField] bool enableAnimalSearchRadius = true;
+    [SerializeField] bool enablePlantPoopRadius = true;
+    [SerializeField] bool enableScentRadius = true;
+    [SerializeField] bool enableFireflyPhotosynthesis = true;
+    [SerializeField] bool enableToolUseRadius = true;
 
-    private class RadiusRequest
+    [Header("Gene Effect Overlays")]
+    [Tooltip("Master toggle for all gene-driven AOE tile overlays (Aura, Cloud, Reactive Burst, etc.)")]
+    [SerializeField] bool enableGeneEffectOverlays = true;
+
+    [Tooltip("Sorting order for gene effect overlay tiles. Higher = renders on top of debug radii.")]
+    [SerializeField] int geneEffectSortingOrder = -90;
+
+    // --- Existing typed requests ---
+    class RadiusRequest
     {
         public GridPosition Center;
         public int Radius;
         public RadiusType Type;
     }
 
-    private readonly Dictionary<object, List<GameObject>> oneShotVisualizations = new Dictionary<object, List<GameObject>>();
-    private readonly Dictionary<object, RadiusRequest> continuousRequests = new Dictionary<object, RadiusRequest>();
-    private readonly Dictionary<object, (GridPosition center, int radius)> lastDrawnState = new Dictionary<object, (GridPosition, int)>();
+    readonly Dictionary<object, List<GameObject>> oneShotVisualizations = new Dictionary<object, List<GameObject>>();
+    readonly Dictionary<object, RadiusRequest> continuousRequests = new Dictionary<object, RadiusRequest>();
+    readonly Dictionary<object, (GridPosition center, int radius)> lastDrawnState = new Dictionary<object, (GridPosition, int)>();
+
+    // --- Custom-colored continuous requests (for gene effects) ---
+    class ColoredRadiusRequest
+    {
+        public GridPosition Center;
+        public int Radius;
+        public Color Color;
+    }
+
+    readonly Dictionary<object, ColoredRadiusRequest> coloredContinuousRequests = new Dictionary<object, ColoredRadiusRequest>();
+    readonly Dictionary<object, (GridPosition center, int radius, Color color)> coloredLastDrawnState = new Dictionary<object, (GridPosition, int, Color)>();
 
     void Awake()
     {
@@ -65,7 +85,12 @@ public class GridDebugVisualizer : MonoBehaviour
     void Update()
     {
         ProcessContinuousRequests();
+        ProcessColoredContinuousRequests();
     }
+
+    // =========================================================================
+    // EXISTING API (unchanged)
+    // =========================================================================
 
     public void ShowContinuousRadius(object source, GridPosition center, int radius, RadiusType type)
     {
@@ -87,6 +112,13 @@ public class GridDebugVisualizer : MonoBehaviour
         if (continuousRequests.Remove(source))
         {
             ClearVisualization(source);
+        }
+
+        // Also check colored requests
+        if (coloredContinuousRequests.Remove(source))
+        {
+            ClearVisualization(source);
+            coloredLastDrawnState.Remove(source);
         }
     }
 
@@ -142,7 +174,66 @@ public class GridDebugVisualizer : MonoBehaviour
         }
     }
 
-    // Specific visualization methods - all use centralized settings
+    // =========================================================================
+    // NEW: Custom-colored continuous radius (for gene AOE effects)
+    // =========================================================================
+
+    /// <summary>
+    /// Shows a persistent tile overlay with a custom color. Use this for gene effects
+    /// (Aura, Cloud, Reactive Burst, Explosive blast, etc.) where each effect has
+    /// its own color derived from the payload gene.
+    ///
+    /// Multiple overlapping calls with different sources will layer semi-transparent
+    /// tiles on top of each other — overlaps naturally blend.
+    ///
+    /// Call HideContinuousRadius(source) to remove.
+    /// </summary>
+    public void ShowContinuousColoredRadius(object source, GridPosition center, int radius, Color color)
+    {
+        if (!showRadiusVisualizations || !enableGeneEffectOverlays || source == null) return;
+
+        if (!coloredContinuousRequests.ContainsKey(source))
+        {
+            coloredContinuousRequests.Add(source, new ColoredRadiusRequest());
+        }
+
+        coloredContinuousRequests[source].Center = center;
+        coloredContinuousRequests[source].Radius = radius;
+        coloredContinuousRequests[source].Color = color;
+    }
+
+    /// <summary>
+    /// One-shot colored radius that auto-destroys after duration seconds.
+    /// Good for explosions, reactive bursts, and other momentary AOE flashes.
+    /// </summary>
+    public void ShowColoredRadiusBurst(object source, GridPosition center, int radius, Color color, float duration)
+    {
+        if (!showRadiusVisualizations || !enableGeneEffectOverlays || tilePrefab == null) return;
+
+        var tiles = GridRadiusUtility.GetTilesInCircle(center, radius);
+
+        foreach (var tile in tiles)
+        {
+            Vector3 worldPos = GridPositionManager.Instance.GridToWorld(tile);
+            GameObject tileVis = Instantiate(tilePrefab, worldPos, Quaternion.identity, transform);
+
+            SpriteRenderer sr = tileVis.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                Color finalColor = color;
+                finalColor.a = tileVisualizationAlpha;
+                sr.color = finalColor;
+                sr.sortingOrder = geneEffectSortingOrder;
+            }
+
+            Destroy(tileVis, duration);
+        }
+    }
+
+    // =========================================================================
+    // Convenience methods for existing systems (unchanged)
+    // =========================================================================
+
     public void VisualizeAnimalSearchRadius(AnimalController animal, GridPosition center, int radius)
     {
         ShowContinuousRadius(animal, center, radius, RadiusType.AnimalSearch);
@@ -168,16 +259,32 @@ public class GridDebugVisualizer : MonoBehaviour
         ShowContinuousRadius(tool, center, radius, RadiusType.ToolUse);
     }
 
-    // Public methods for external control of individual types
+    // =========================================================================
+    // Toggle setters (unchanged + new)
+    // =========================================================================
+
     public void SetAnimalSearchRadiusEnabled(bool enabled) { enableAnimalSearchRadius = enabled; }
     public void SetPlantPoopRadiusEnabled(bool enabled) { enablePlantPoopRadius = enabled; }
     public void SetScentRadiusEnabled(bool enabled) { enableScentRadius = enabled; }
     public void SetFireflyPhotosynthesisEnabled(bool enabled) { enableFireflyPhotosynthesis = enabled; }
     public void SetToolUseRadiusEnabled(bool enabled) { enableToolUseRadius = enabled; }
+    public void SetGeneEffectOverlaysEnabled(bool enabled)
+    {
+        enableGeneEffectOverlays = enabled;
+        if (!enabled)
+        {
+            // Clear all colored overlays
+            foreach (var source in new List<object>(coloredContinuousRequests.Keys))
+            {
+                ClearVisualization(source);
+            }
+            coloredContinuousRequests.Clear();
+            coloredLastDrawnState.Clear();
+        }
+    }
 
-    // Master control
-    public void SetRadiusVisualizationsEnabled(bool enabled) 
-    { 
+    public void SetRadiusVisualizationsEnabled(bool enabled)
+    {
         showRadiusVisualizations = enabled;
         if (!enabled)
         {
@@ -185,7 +292,10 @@ public class GridDebugVisualizer : MonoBehaviour
         }
     }
 
-    // Color accessors for external components (like gizmos)
+    // =========================================================================
+    // Internals
+    // =========================================================================
+
     public Color GetColorForType(RadiusType type)
     {
         switch (type)
@@ -199,7 +309,7 @@ public class GridDebugVisualizer : MonoBehaviour
         }
     }
 
-    private bool IsTypeEnabled(RadiusType type)
+    bool IsTypeEnabled(RadiusType type)
     {
         switch (type)
         {
@@ -212,11 +322,10 @@ public class GridDebugVisualizer : MonoBehaviour
         }
     }
 
-    private void ProcessContinuousRequests()
+    void ProcessContinuousRequests()
     {
         if (!showRadiusVisualizations || tilePrefab == null) return;
 
-        // Remove visualizations that are no longer requested
         List<object> sourcesToRemove = new List<object>();
         foreach (var drawnSource in lastDrawnState.Keys)
         {
@@ -230,14 +339,12 @@ public class GridDebugVisualizer : MonoBehaviour
             ClearVisualization(source);
         }
 
-        // Update active visualizations
         foreach (var kvp in continuousRequests)
         {
             object source = kvp.Key;
             RadiusRequest request = kvp.Value;
 
-            // Check if this type is enabled
-            if (!IsTypeEnabled(request.Type)) 
+            if (!IsTypeEnabled(request.Type))
             {
                 if (lastDrawnState.ContainsKey(source))
                 {
@@ -268,7 +375,81 @@ public class GridDebugVisualizer : MonoBehaviour
         }
     }
 
-    private void ClearAllVisualizations()
+    void ProcessColoredContinuousRequests()
+    {
+        if (!showRadiusVisualizations || !enableGeneEffectOverlays || tilePrefab == null) return;
+
+        // Remove drawn entries whose source no longer has a request
+        List<object> sourcesToRemove = new List<object>();
+        foreach (var drawnSource in coloredLastDrawnState.Keys)
+        {
+            if (!coloredContinuousRequests.ContainsKey(drawnSource))
+            {
+                sourcesToRemove.Add(drawnSource);
+            }
+        }
+        foreach (var source in sourcesToRemove)
+        {
+            ClearVisualization(source);
+            coloredLastDrawnState.Remove(source);
+        }
+
+        // Draw or update colored requests
+        foreach (var kvp in coloredContinuousRequests)
+        {
+            object source = kvp.Key;
+            ColoredRadiusRequest request = kvp.Value;
+
+            bool needsRedraw = false;
+            if (coloredLastDrawnState.TryGetValue(source, out var lastState))
+            {
+                if (lastState.center != request.Center ||
+                    lastState.radius != request.Radius ||
+                    lastState.color != request.Color)
+                {
+                    needsRedraw = true;
+                }
+            }
+            else
+            {
+                needsRedraw = true;
+            }
+
+            if (needsRedraw)
+            {
+                DrawColoredRadius(source, request.Center, request.Radius, request.Color);
+                coloredLastDrawnState[source] = (request.Center, request.Radius, request.Color);
+            }
+        }
+    }
+
+    void DrawColoredRadius(object source, GridPosition center, int radius, Color color)
+    {
+        ClearVisualization(source);
+
+        var tiles = GridRadiusUtility.GetTilesInCircle(center, radius);
+        var tileObjects = new List<GameObject>();
+
+        foreach (var tile in tiles)
+        {
+            Vector3 worldPos = GridPositionManager.Instance.GridToWorld(tile);
+            GameObject tileVis = Instantiate(tilePrefab, worldPos, Quaternion.identity, transform);
+
+            SpriteRenderer sr = tileVis.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                Color finalColor = color;
+                finalColor.a = Mathf.Min(finalColor.a, tileVisualizationAlpha);
+                sr.color = finalColor;
+                sr.sortingOrder = geneEffectSortingOrder;
+            }
+            tileObjects.Add(tileVis);
+        }
+
+        oneShotVisualizations[source] = tileObjects;
+    }
+
+    void ClearAllVisualizations()
     {
         foreach (var kvp in oneShotVisualizations)
         {
@@ -280,13 +461,19 @@ public class GridDebugVisualizer : MonoBehaviour
         oneShotVisualizations.Clear();
         continuousRequests.Clear();
         lastDrawnState.Clear();
+        coloredContinuousRequests.Clear();
+        coloredLastDrawnState.Clear();
     }
 
-    // Public properties for read access
+    // =========================================================================
+    // Read-only state (unchanged)
+    // =========================================================================
+
     public bool IsRadiusVisualizationEnabled => showRadiusVisualizations;
     public bool IsAnimalSearchRadiusEnabled => enableAnimalSearchRadius;
     public bool IsPlantPoopRadiusEnabled => enablePlantPoopRadius;
     public bool IsScentRadiusEnabled => enableScentRadius;
     public bool IsFireflyPhotosynthesisEnabled => enableFireflyPhotosynthesis;
     public bool IsToolUseRadiusEnabled => enableToolUseRadius;
+    public bool IsGeneEffectOverlaysEnabled => enableGeneEffectOverlays;
 }
