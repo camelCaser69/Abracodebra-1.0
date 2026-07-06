@@ -42,7 +42,12 @@ public class WaveManager : MonoBehaviour
     private Coroutine activeSpawnCoroutine = null;
 
     public bool IsWaveActive => currentState != WaveState.Idle;
-    public bool IsCurrentWaveDefeated() => currentState == WaveState.Idle && currentWaveIndex >= 0;
+    // A3: rounds end on a survive-the-timer basis (the wave window elapsed), not on
+    // killing every pest. Named honestly to match behavior.
+    public bool IsWaveTimerComplete() => currentState == WaveState.Idle && currentWaveIndex >= 0;
+
+    [System.Obsolete("Use IsWaveTimerComplete(). Rounds are timer-based, not defeat-based.")]
+    public bool IsCurrentWaveDefeated() => IsWaveTimerComplete();
 
     void Awake()
     {

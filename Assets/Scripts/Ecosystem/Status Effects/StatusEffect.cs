@@ -1,7 +1,7 @@
 ﻿// FILE: Assets/Scripts/Ecosystem/Status Effects/StatusEffect.cs
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New StatusEffect", menuName = "Abracodabra/Status Effects/Status Effect")]
+[CreateAssetMenu(fileName = "NewStatusEffect", menuName = "Abracodabra/Status Effect")]
 public class StatusEffect : ScriptableObject
 {
     public string effectID = "status_effect";
@@ -35,6 +35,10 @@ public class StatusEffect : ScriptableObject
 
     public bool canStack = false;
     public int maxStacks = 1;
+
+    // ═══════════════════════════════════════════════════════
+    //  FREEZE-SPECIFIC FIELDS
+    // ═══════════════════════════════════════════════════════
 
     [Header("Freeze Behavior (Stack-Based CC)")]
     [Tooltip("If true, this effect uses freeze logic: full freeze at max stacks, stack decay, progressive tint.")]

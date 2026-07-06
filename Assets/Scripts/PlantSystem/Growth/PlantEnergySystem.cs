@@ -1,4 +1,4 @@
-﻿// FILE: Assets/Scripts/PlantSystem/Growth/PlantEnergySystem.cs
+// FILE: Assets/Scripts/PlantSystem/Growth/PlantEnergySystem.cs
 using UnityEngine;
 using Abracodabra.Genes;
 using WegoSystem;
@@ -9,8 +9,7 @@ public class PlantEnergySystem {
     public float CurrentEnergy { get; set; }
     public float MaxEnergy { get; set; }
     public float BaseEnergyPerLeaf { get; set; } // Base rate from template
-    
-    // Tracks energy usage per cycle to inform metrics/events
+
     public float EnergySpentThisCycle { get; set; }
 
     readonly FireflyManager fireflyManagerInstance;
@@ -21,8 +20,8 @@ public class PlantEnergySystem {
     }
 
     public void OnTickUpdate() {
-        if (plant.CurrentState == PlantState.Growing &&
-            plant.gameObject.GetComponent<PlantGrowth>()?.rechargeEnergyDuringGrowth == false) {
+        // A4 micro-fix: 'plant' is already a PlantGrowth reference; no per-tick GetComponent.
+        if (plant.CurrentState == PlantState.Growing && plant.rechargeEnergyDuringGrowth == false) {
             return;
         }
 
@@ -46,16 +45,16 @@ public class PlantEnergySystem {
         float totalPhotosynthesisRatePerLeaf = (effectiveRate * sunlight) + fireflyBonusRate;
         float energyThisTick = totalPhotosynthesisRatePerLeaf * leafCount;
 
-        CurrentEnergy = UnityEngine.Mathf.Clamp(CurrentEnergy + energyThisTick, 0f, MaxEnergy);
+        CurrentEnergy = Mathf.Clamp(CurrentEnergy + energyThisTick, 0f, MaxEnergy);
     }
 
     public void SpendEnergy(float amount) {
-        CurrentEnergy = UnityEngine.Mathf.Max(0f, CurrentEnergy - amount);
+        CurrentEnergy = Mathf.Max(0f, CurrentEnergy - amount);
         EnergySpentThisCycle += amount;
     }
 
     public void AddEnergy(float amount) {
-        CurrentEnergy = UnityEngine.Mathf.Clamp(CurrentEnergy + amount, 0f, MaxEnergy);
+        CurrentEnergy = Mathf.Clamp(CurrentEnergy + amount, 0f, MaxEnergy);
     }
 
     public bool HasEnergy(float amount) {

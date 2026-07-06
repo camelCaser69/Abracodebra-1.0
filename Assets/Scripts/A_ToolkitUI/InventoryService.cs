@@ -26,6 +26,10 @@ namespace Abracodabra.UI.Genes
         /// </summary>
         public static event Action OnInventoryChanged;
 
+        // A5: fired once the inventory model is registered, so loadout/reward systems
+        // can bind deterministically instead of waiting on a fixed time delay.
+        public static event Action OnInventoryReady;
+
         /// <summary>
         /// Event fired when a specific slot changes - provides the index
         /// </summary>
@@ -56,6 +60,8 @@ namespace Abracodabra.UI.Genes
             _inventoryColumns = columns;
             _inventoryRows = rows;
             Debug.Log($"[InventoryService] Registered inventory with {inventory.Count} slots ({columns}x{rows})");
+
+            OnInventoryReady?.Invoke();
         }
 
         /// <summary>

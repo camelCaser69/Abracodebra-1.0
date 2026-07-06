@@ -1,8 +1,9 @@
-﻿// FILE: Assets/Scripts/PlantSystem/Growth/PlantGrowthLogic.cs
+// FILE: Assets/Scripts/PlantSystem/Growth/PlantGrowthLogic.cs
 using System.Collections.Generic;
 using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
+using Abracodabra.Genes.Templates; // A4: access SeedTemplate.energyRegenRate
 
 namespace Abracodabra.Genes {
     public class PlantGrowthLogic {
@@ -21,6 +22,14 @@ namespace Abracodabra.Genes {
                 Debug.LogError($"[{plant.gameObject.name}] CalculateAndApplyStats called with null geneRuntimeState!");
                 return;
             }
+
+            // A4 FIX: derive the base photosynthesis rate from the template every time.
+            // Previously PhotosynthesisEfficiencyPerLeaf was never assigned (always 0), so any
+            // re-invocation of this method silently zeroed BaseEnergyPerLeaf. This makes the
+            // method idempotent and safe to call on any mid-run stat refresh.
+            PhotosynthesisEfficiencyPerLeaf = (plant.seedTemplate != null)
+                ? plant.seedTemplate.energyRegenRate
+                : PhotosynthesisEfficiencyPerLeaf;
 
             plant.growthSpeedMultiplier = 1f;
             plant.energyGenerationMultiplier = 1f;
@@ -98,7 +107,7 @@ namespace Abracodabra.Genes {
                 $"ThornDmg={plant.thornDamage:F1}");
         }
 
-        private void ApplyStat(PassiveStatType stat, float value) {
+        void ApplyStat(PassiveStatType stat, float value) {
             switch (stat) {
                 case PassiveStatType.None:
                     break;
@@ -119,7 +128,6 @@ namespace Abracodabra.Genes {
                     break;
                 case PassiveStatType.LeafRegrowth:
                 case PassiveStatType.ThornDamage:
-                    // Handled separately in CalculateAndApplyPassiveStats
                     break;
             }
         }

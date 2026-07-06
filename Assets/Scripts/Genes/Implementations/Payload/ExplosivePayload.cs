@@ -5,10 +5,10 @@ using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.Components;
 using Abracodabra.Genes.WorldEffects;
-using WegoSystem;
 
 namespace Abracodabra.Genes.Implementations
 {
+    [CreateAssetMenu(menuName = "Abracodabra/Genes/Payload/Explosive", fileName = "Gene_Payload_Explosive")]
     public class ExplosivePayload : PayloadGene
     {
         [Header("Explosive Configuration")]
@@ -40,6 +40,7 @@ namespace Abracodabra.Genes.Implementations
             float potency = GetFinalPotency(context.payloadInstance);
             float finalDamage = baseAoeDamage * potency * context.effectMultiplier;
 
+            // Direct hit — full damage to the primary target
             var directTarget = context.target.GetComponent<AnimalController>();
             if (directTarget != null && !directTarget.IsDying)
             {
@@ -47,6 +48,7 @@ namespace Abracodabra.Genes.Implementations
                 Debug.Log($"[ExplosivePayload] Direct hit on '{directTarget.SpeciesName}' for {finalDamage:F1} damage");
             }
 
+            // Splash — half damage to everything else in blast radius
             Vector3 detonationPos = context.target.transform.position;
             var creaturesInBlast = TargetFinder.FindCreaturesInRadius(detonationPos, blastRadius);
 
@@ -54,7 +56,7 @@ namespace Abracodabra.Genes.Implementations
             foreach (var creature in creaturesInBlast)
             {
                 if (creature == null || creature.IsDying) continue;
-                if (creature.gameObject == context.target) continue;
+                if (creature.gameObject == context.target) continue; // Skip direct target (already damaged)
 
                 creature.TakeDamage(finalDamage * 0.5f);
                 splashCount++;
@@ -65,27 +67,18 @@ namespace Abracodabra.Genes.Implementations
                 Debug.Log($"[ExplosivePayload] Splash hit {splashCount} creature(s) in {blastRadius:F1} tile radius for {finalDamage * 0.5f:F1} each");
             }
 
+            // VFX
             if (explosionVfxPrefab != null)
             {
                 var vfx = Object.Instantiate(explosionVfxPrefab, detonationPos, Quaternion.identity);
                 vfx.transform.localScale = Vector3.one * blastRadius * 2f;
-                Object.Destroy(vfx, 1f);
+                Object.Destroy(vfx, 1f); // Auto-cleanup after 1 second
             }
 
-            // Flash affected tiles
-            if (GridDebugVisualizer.Instance != null && GridPositionManager.Instance != null)
-            {
-                GridPosition blastCenter = GridPositionManager.Instance.WorldToGrid(detonationPos);
-                Color blastColor = geneColor;
-                blastColor.a = 0.4f;
-                GridDebugVisualizer.Instance.ShowColoredRadiusBurst(
-                    context.target, blastCenter, Mathf.RoundToInt(blastRadius),
-                    blastColor, 0.5f);
-            }
-
+            // Self-damage — deduplicated per tick per plant
             if (context.source != null)
             {
-                int currentTick = Time.frameCount;
+                int currentTick = Time.frameCount; // Use frameCount as tick proxy for dedup
                 int plantId = context.source.GetInstanceID();
 
                 if (_lastDetonationTick != currentTick || _lastDetonationPlantId != plantId)
@@ -119,7 +112,7 @@ namespace Abracodabra.Genes.Implementations
             fruit.AddVisualEffect(geneColor);
 
             if (fruit.DynamicProperties == null)
-                fruit.DynamicProperties = new Dictionary<string, float>();
+                fruit.DynamicProperties = new System.Collections.Generic.Dictionary<string, float>();
 
             fruit.DynamicProperties["is_explosive"] = 1f;
             fruit.DynamicProperties["explosion_damage"] = baseAoeDamage;
@@ -146,17 +139,6 @@ namespace Abracodabra.Genes.Implementations
                 var vfx = Object.Instantiate(explosionVfxPrefab, detonationPos, Quaternion.identity);
                 vfx.transform.localScale = Vector3.one * blastRadius * 2f;
                 Object.Destroy(vfx, 1f);
-            }
-
-            // Flash affected tiles
-            if (GridDebugVisualizer.Instance != null && GridPositionManager.Instance != null)
-            {
-                GridPosition blastCenter = GridPositionManager.Instance.WorldToGrid(detonationPos);
-                Color blastColor = geneColor;
-                blastColor.a = 0.4f;
-                GridDebugVisualizer.Instance.ShowColoredRadiusBurst(
-                    target, blastCenter, Mathf.RoundToInt(blastRadius),
-                    blastColor, 0.5f);
             }
 
             FloatingCombatText.Spawn(

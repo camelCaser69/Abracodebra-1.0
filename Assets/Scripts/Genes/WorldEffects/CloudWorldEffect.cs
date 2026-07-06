@@ -1,14 +1,17 @@
-// FILE: Assets\Scripts\Genes\WorldEffects\CloudWorldEffect.cs
+// FILE: Assets/Scripts/Genes/WorldEffects/CloudWorldEffect.cs
 using System.Collections.Generic;
-using Abracodabra.Genes.Core;
-using Abracodabra.Genes.Implementations;
-using Abracodabra.Genes.Runtime;
 using UnityEngine;
+using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Runtime;
+using Abracodabra.Genes.Implementations;
 
 namespace Abracodabra.Genes.WorldEffects
 {
     public class CloudWorldEffect : WorldEffect
     {
+        float pulseTimer;
+        float baseSpriteAlpha;
+
         protected override void Awake()
         {
             base.Awake();
@@ -18,18 +21,15 @@ namespace Abracodabra.Genes.WorldEffects
         {
             base.Initialize(source, payloads, effectRadius, duration, multiplier);
 
-            // Show tile overlay instead of scaling a circle sprite
-            UpdateTileOverlay();
-
-            // Hide the SpriteRenderer if present — we use tile overlays now
             if (spriteRenderer != null)
             {
-                spriteRenderer.enabled = false;
+                baseSpriteAlpha = spriteRenderer.color.a;
             }
         }
 
         protected override void OnEffectTick(int tick)
         {
+            // Apply payloads to creatures in radius
             var creatures = TargetFinder.FindCreaturesInRadius(transform.position, radius);
 
             foreach (var creature in creatures)
@@ -43,6 +43,7 @@ namespace Abracodabra.Genes.WorldEffects
                 Debug.Log($"[CloudWorldEffect] Tick {tick}: Applied payloads to {creatures.Count} creature(s) in radius {radius}");
             }
 
+            // Apply healing to plants if we have a healing-type payload
             float regrowChance = GetPlantRegrowChance();
             if (regrowChance > 0f)
             {
@@ -70,6 +71,10 @@ namespace Abracodabra.Genes.WorldEffects
             }
         }
 
+        /// <summary>
+        /// Returns the plant regrow chance from the first healing payload, or 0 if none.
+        /// Checks both the new IsPlantHealingPayload property and legacy PayloadType.Nutrition.
+        /// </summary>
         float GetPlantRegrowChance()
         {
             if (payloadInstances == null) return 0f;
@@ -77,14 +82,17 @@ namespace Abracodabra.Genes.WorldEffects
             foreach (var instance in payloadInstances)
             {
                 if (instance == null) continue;
+
                 var payloadGene = instance.GetGene<PayloadGene>();
                 if (payloadGene == null) continue;
 
+                // Check for HealingPayload (Task 5) — uses configurable plantRegrowChance
                 if (payloadGene is HealingPayload healingPayload)
                 {
                     return healingPayload.plantRegrowChance;
                 }
 
+                // Legacy check: NutritiousPayload also triggers plant healing at 50%
                 if (payloadGene.payloadType == PayloadType.Nutrition)
                 {
                     return 0.5f;
@@ -94,11 +102,14 @@ namespace Abracodabra.Genes.WorldEffects
             return 0f;
         }
 
-        protected override void OnEffectExpire()
+        void Update()
         {
-            // Clear tile overlay before the base fade-and-destroy
-            ClearTileOverlay();
-            base.OnEffectExpire();
+            if (spriteRenderer == null || !isActive) return;
+
+            pulseTimer += Time.deltaTime * 2f;
+            float pulseAlpha = baseSpriteAlpha + Mathf.Sin(pulseTimer) * 0.1f;
+            Color c = spriteRenderer.color;
+            spriteRenderer.color = new Color(c.r, c.g, c.b, pulseAlpha);
         }
     }
 }

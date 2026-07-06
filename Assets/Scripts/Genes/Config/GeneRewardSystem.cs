@@ -1,69 +1,46 @@
-// File: Assets/Scripts/Genes/Config/GeneRewardSystem.cs
+// FILE: Assets/Scripts/Genes/Config/GeneRewardSystem.cs
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Abracodabra.Genes.Core;
+using Abracodabra.Genes.Services; // A6: deterministic RNG
 using Abracodabra.UI.Genes;
 using Abracodabra.UI.Toolkit;
 using WegoSystem;
 
-namespace Abracodabra.Genes.Config
-{
-    /// <summary>
-    /// Gives random gene rewards to the player after each round.
-    /// Subscribes to RunManager.OnRoundChanged to trigger rewards.
-    /// Gene tier is gated by round number.
-    /// </summary>
-    public class GeneRewardSystem : MonoBehaviour
-    {
+namespace Abracodabra.Genes.Config {
+    public class GeneRewardSystem : MonoBehaviour {
         [Header("Reward Settings")]
         [Tooltip("Minimum number of genes awarded per round.")]
-        [SerializeField] private int minGenesPerRound = 2;
+        [SerializeField] int minGenesPerRound = 2;
 
         [Tooltip("Maximum number of genes awarded per round.")]
-        [SerializeField] private int maxGenesPerRound = 4;
+        [SerializeField] int maxGenesPerRound = 4;
 
         [Header("References")]
-        [SerializeField] private GeneLibrary geneLibrary;
+        [SerializeField] GeneLibrary geneLibrary;
 
-        private void Start()
-        {
-            if (geneLibrary == null)
-            {
+        void Start() {
+            if (geneLibrary == null) {
                 geneLibrary = GeneLibrary.Instance;
             }
 
-            if (RunManager.HasInstance)
-            {
+            // A5: RunManager is a SingletonMonoBehaviour; its Instance is set in Awake,
+            // so it is always available by Start. No timed late-binding needed.
+            if (RunManager.Instance != null) {
                 RunManager.Instance.OnRoundChanged += OnRoundChanged;
             }
-            else
-            {
-                Debug.LogWarning("[GeneRewardSystem] RunManager not found at Start. Will attempt late binding.");
-                Invoke(nameof(LateBindRunManager), 0.5f);
+            else {
+                Debug.LogError("[GeneRewardSystem] RunManager not found at Start. Round rewards will not fire.");
             }
         }
 
-        private void LateBindRunManager()
-        {
-            if (RunManager.HasInstance)
-            {
-                RunManager.Instance.OnRoundChanged += OnRoundChanged;
-                Debug.Log("[GeneRewardSystem] Late-bound to RunManager.");
-            }
-        }
-
-        private void OnDestroy()
-        {
-            if (RunManager.HasInstance)
-            {
+        void OnDestroy() {
+            if (RunManager.HasInstance) {
                 RunManager.Instance.OnRoundChanged -= OnRoundChanged;
             }
         }
 
-        private void OnRoundChanged(int newRoundNumber)
-        {
-            // Rewards are given at the START of a new round (meaning the previous round was completed)
+        void OnRoundChanged(int newRoundNumber) {
             int completedRound = newRoundNumber - 1;
             if (completedRound <= 0) return;
 
@@ -81,7 +58,13 @@ namespace Abracodabra.Genes.Config
                 return;
             }
 
-            int geneCount = Random.Range(minGenesPerRound, maxGenesPerRound + 1);
+            // A6: deterministic gameplay randomness.
+            var rng = GeneServices.Get<IDeterministicRandom>();
+
+            int geneCount = (rng != null)
+                ? rng.Range(minGenesPerRound, maxGenesPerRound + 1)
+                : Random.Range(minGenesPerRound, maxGenesPerRound + 1);
+
             int maxTier = GetMaxTierForRound(completedRoundNumber);
 
             var eligibleGenes = GetEligibleGenes(maxTier);
@@ -97,7 +80,11 @@ namespace Abracodabra.Genes.Config
                     break;
                 }
 
-                GeneBase randomGene = eligibleGenes[Random.Range(0, eligibleGenes.Count)];
+                int pick = (rng != null)
+                    ? rng.Range(0, eligibleGenes.Count)
+                    : Random.Range(0, eligibleGenes.Count);
+
+                GeneBase randomGene = eligibleGenes[pick];
                 var item = new UIInventoryItem(randomGene);
                 int slot = InventoryService.AddItem(item);
 
@@ -110,19 +97,16 @@ namespace Abracodabra.Genes.Config
             Debug.Log($"[GeneRewardSystem] Round {completedRoundNumber} complete! Awarded {added} gene(s). Max tier: T{maxTier}");
         }
 
-        private int GetMaxTierForRound(int roundNumber)
-        {
+        int GetMaxTierForRound(int roundNumber) {
             if (roundNumber <= 2) return 1;
             if (roundNumber <= 4) return 2;
             return 3;
         }
 
-        private List<GeneBase> GetEligibleGenes(int maxTier)
-        {
+        List<GeneBase> GetEligibleGenes(int maxTier) {
             var all = new List<GeneBase>();
 
-            foreach (var gene in geneLibrary.GetAllGenes())
-            {
+            foreach (var gene in geneLibrary.GetAllGenes()) {
                 if (gene == null) continue;
                 if (gene is PlaceholderGene) continue;
                 if (gene.tier > maxTier) continue;

@@ -75,6 +75,13 @@ namespace Abracodabra.Genes
         [Header("Energy Logic")]
         [SerializeField] public bool rechargeEnergyDuringGrowth = false;
 
+        [Header("Death (A2)")]
+        [SerializeField] float deathFadeDuration = 1f;
+        static readonly Color DeathTint = new Color(0.35f, 0.25f, 0.15f);
+
+        // A2: fired the moment a plant dies (UI, stats, Doris reactions can subscribe later).
+        public event Action<PlantGrowth> OnPlantDied;
+
         [HideInInspector] public float growthSpeedMultiplier = 1f;
         [HideInInspector] public float energyGenerationMultiplier = 1f;
         [HideInInspector] public float energyStorageMultiplier = 1f;
@@ -177,7 +184,8 @@ namespace Abracodabra.Genes
 
             EnergySystem.MaxEnergy = geneRuntimeState.template.maxEnergy * energyStorageMultiplier;
             EnergySystem.CurrentEnergy = geneRuntimeState.template.startingEnergy;
-            EnergySystem.BaseEnergyPerLeaf = seedTemplate.energyRegenRate;
+            // A4: BaseEnergyPerLeaf is now set (idempotently) inside CalculateAndApplyPassiveStats().
+            // The previous direct assignment here was a second source of truth and has been removed.
 
             sequenceExecutor.InitializeWithTemplate(this.geneRuntimeState);
 
@@ -307,8 +315,54 @@ namespace Abracodabra.Genes
 
         void Die()
         {
+            if (CurrentState == PlantState.Dead) return;
+
             CurrentState = PlantState.Dead;
             Debug.Log($"[PlantGrowth] '{name}' has died.");
+
+            OnPlantDied?.Invoke(this);
+
+            // A2: stop ticking immediately, then fade out and destroy so the tile frees up.
+            var tickManager = TickManager.Instance;
+            if (tickManager != null)
+            {
+                tickManager.UnregisterTickUpdateable(this);
+            }
+
+            StartCoroutine(DeathSequence());
+        }
+
+        IEnumerator DeathSequence()
+        {
+            var renderers = GetComponentsInChildren<SpriteRenderer>();
+            var startColors = new Color[renderers.Length];
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                startColors[i] = (renderers[i] != null) ? renderers[i].color : Color.white;
+            }
+
+            float elapsed = 0f;
+            float duration = Mathf.Max(0.01f, deathFadeDuration);
+
+            // Death fade is purely visual, so real time is fine here.
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.Clamp01(elapsed / duration);
+                for (int i = 0; i < renderers.Length; i++)
+                {
+                    if (renderers[i] == null) continue;
+                    Color c = Color.Lerp(startColors[i], DeathTint, t);
+                    c.a = Mathf.Lerp(startColors[i].a, 0f, t);
+                    renderers[i].color = c;
+                }
+                yield return null;
+            }
+
+            // OnDestroy() removes this from AllActivePlants and unregisters from TickManager.
+            // PlantPlacementManager.CleanupDestroyedPlants() then frees the grid tile because the
+            // dictionary entry becomes a destroyed (null) reference once this GameObject is gone.
+            Destroy(gameObject);
         }
 
         public bool DestroyRandomLeaf(string source = "unknown")
@@ -316,7 +370,12 @@ namespace Abracodabra.Genes
             var activeLeaves = CellManager.LeafDataList.Where(l => l.IsActive).ToList();
             if (activeLeaves.Count == 0) return false;
 
-            var target = activeLeaves[UnityEngine.Random.Range(0, activeLeaves.Count)];
+            // A6: deterministic leaf selection (falls back to Unity RNG only if the service is missing).
+            int idx = (_deterministicRandom != null)
+                ? _deterministicRandom.Range(0, activeLeaves.Count)
+                : UnityEngine.Random.Range(0, activeLeaves.Count);
+
+            var target = activeLeaves[idx];
             Vector2Int coord = target.GridCoord;
 
             GameObject cellObj = CellManager.GetCellGameObjectAt(coord);

@@ -1,25 +1,22 @@
-﻿using UnityEngine;
+// Assets/Scripts/Core/RunManager.cs
 using System;
-using WegoSystem;
+using UnityEngine;
 using UnityEngine.SceneManagement; // Required for restarting the scene
+using Abracodabra.Genes.Services;  // A6: deterministic gameplay RNG
 
-namespace WegoSystem
-{
-    public enum RunState
-    {
+namespace WegoSystem {
+    public enum RunState {
         Planning,
         GrowthAndThreat,
-        GameOver // NEW: State for when the game has ended
+        GameOver
     }
 
-    public enum GamePhase
-    {
+    public enum GamePhase {
         Planning,
         Execution
     }
 
-    public class RunManager : SingletonMonoBehaviour<RunManager>
-    {
+    public class RunManager : SingletonMonoBehaviour<RunManager> {
         [Header("Game State")]
         [SerializeField] RunState currentState = RunState.Planning;
         [SerializeField] GamePhase currentPhase = GamePhase.Planning;
@@ -30,10 +27,17 @@ namespace WegoSystem
         [Tooltip("If checked, the game will end when the player's hunger reaches max.")]
         public bool playerDeathEnabled = true;
 
+        [Header("Determinism (A6)")]
+        [Tooltip("If checked, a fresh random seed is generated each run. Uncheck and set 'Run Seed' to replay a specific run.")]
+        [SerializeField] bool randomizeSeedOnStart = true;
+        [Tooltip("The seed used for all gameplay randomness this run. Shown in logs; surface it on the game-over screen later.")]
+        [SerializeField] int runSeed = 0;
+
         public RunState CurrentState => currentState;
         public GamePhase CurrentPhase => currentPhase;
         public int CurrentRoundNumber => currentRoundNumber;
         public int CurrentPhaseTicks => currentPhaseTicks;
+        public int RunSeed => runSeed;
 
         public event Action<RunState> OnRunStateChanged;
         public event Action<GamePhase, GamePhase> OnPhaseChanged;
@@ -44,6 +48,9 @@ namespace WegoSystem
         }
 
         public void Initialize() {
+            // A6: seed the deterministic RNG once per run, before any gameplay randomness.
+            InitializeRunSeed();
+
             if (TickManager.Instance != null) {
                 TickManager.Instance.RegisterTickUpdateable(new PhaseTickHandler(this));
             }
@@ -57,6 +64,21 @@ namespace WegoSystem
             }
             else {
                 Debug.LogError("[RunManager] Could not find PlayerHungerSystem to subscribe to OnStarvation event!");
+            }
+        }
+
+        void InitializeRunSeed() {
+            if (randomizeSeedOnStart) {
+                runSeed = Environment.TickCount;
+            }
+
+            var rng = GeneServices.Get<IDeterministicRandom>();
+            if (rng != null) {
+                rng.SetSeed(runSeed);
+                Debug.Log($"[RunManager] Run seed = {runSeed} (deterministic gameplay RNG seeded).");
+            }
+            else {
+                Debug.LogWarning("[RunManager] IDeterministicRandom service unavailable; gameplay RNG not seeded.");
             }
         }
 
@@ -102,8 +124,7 @@ namespace WegoSystem
             OnRunStateChanged?.Invoke(currentState);
         }
 
-        private void SetPhase(GamePhase newPhase)
-        {
+        void SetPhase(GamePhase newPhase) {
             if (currentPhase == newPhase) return;
 
             GamePhase oldPhase = currentPhase;
@@ -114,41 +135,34 @@ namespace WegoSystem
             OnPhaseChanged?.Invoke(oldPhase, newPhase);
         }
 
-        public void StartGrowthAndThreatPhase()
-        {
-            if (currentState == RunState.Planning)
-            {
+        public void StartGrowthAndThreatPhase() {
+            if (currentState == RunState.Planning) {
                 Debug.Log($"[RunManager] Starting Growth & Threat for Round {currentRoundNumber}");
                 SetState(RunState.GrowthAndThreat);
             }
         }
 
-        public void EndPlanningPhase()
-        {
-            if (currentState == RunState.Planning && currentPhase == GamePhase.Planning)
-            {
+        public void EndPlanningPhase() {
+            if (currentState == RunState.Planning && currentPhase == GamePhase.Planning) {
                 SetPhase(GamePhase.Execution);
                 StartGrowthAndThreatPhase();
             }
         }
 
-        public void StartNewPlanningPhase()
-        {
-            if (currentState != RunState.Planning)
-            {
-                if (WaveManager.Instance != null && WaveManager.Instance.IsCurrentWaveDefeated())
-                {
+        public void StartNewPlanningPhase() {
+            if (currentState != RunState.Planning) {
+                // A3: rounds are survive-the-timer, not kill-based. When the wave timer
+                // has elapsed, advance to the next round; otherwise just return to Planning.
+                if (WaveManager.Instance != null && WaveManager.Instance.IsWaveTimerComplete()) {
                     StartNewRound();
                 }
-                else
-                {
+                else {
                     SetState(RunState.Planning);
                 }
             }
         }
 
-        private void StartNewRound()
-        {
+        void StartNewRound() {
             currentRoundNumber++;
             Debug.Log($"[RunManager] Starting new round: {currentRoundNumber}");
 
@@ -157,24 +171,19 @@ namespace WegoSystem
 
             OnRoundChanged?.Invoke(currentRoundNumber);
         }
-        
-        public void RestartGame()
-        {
-            // Simple restart logic: reload the current scene.
+
+        public void RestartGame() {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
-        private class PhaseTickHandler : ITickUpdateable
-        {
-            private RunManager manager;
+        class PhaseTickHandler : ITickUpdateable {
+            RunManager manager;
             public PhaseTickHandler(RunManager manager) { this.manager = manager; }
             public void OnTickUpdate(int currentTick) { manager.currentPhaseTicks++; }
         }
 
-        public void ForcePhase(GamePhase phase)
-        {
-            if (Application.isEditor || Debug.isDebugBuild)
-            {
+        public void ForcePhase(GamePhase phase) {
+            if (Application.isEditor || Debug.isDebugBuild) {
                 SetPhase(phase);
             }
         }

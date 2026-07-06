@@ -187,6 +187,15 @@ namespace WegoSystem
                 Vector3 currentWorldPos = GridPositionManager.Instance.GridToWorld(gridEntity.Position);
                 int moveCost = PlayerActionManager.Instance.GetMovementTickCost(currentWorldPos, this);
         
+                // A1: in the auto-driven Growth & Threat phase, movement is a free reaction —
+                // reposition the player and let ExecutionPhaseDriver advance time.
+                if (!TickManager.Instance.ActionsDriveTicks)
+                {
+                    gridEntity.SetPosition(targetPos);
+                    currentTargetPosition = targetPos;
+                    return;
+                }
+
                 if (moveCost > 1)
                 {
                     StartCoroutine(ProcessMultiTickMovement(targetPos, moveCost));
@@ -195,7 +204,7 @@ namespace WegoSystem
                 {
                     gridEntity.SetPosition(targetPos);
                     currentTargetPosition = targetPos;
-                    TickManager.Instance.AdvanceTick();
+                    TickManager.Instance.RequestActionTicks(1);
                 }
             }
         }
@@ -205,12 +214,12 @@ namespace WegoSystem
             isProcessingMovement = true;
             for (int i = 0; i < tickCost - 1; i++)
             {
-                TickManager.Instance.AdvanceTick();
+                TickManager.Instance.RequestActionTicks(1);
                 yield return new WaitForSeconds(multiTickDelay);
             }
             gridEntity.SetPosition(targetPos);
             currentTargetPosition = targetPos;
-            TickManager.Instance.AdvanceTick();
+            TickManager.Instance.RequestActionTicks(1);
             isProcessingMovement = false;
         }
 

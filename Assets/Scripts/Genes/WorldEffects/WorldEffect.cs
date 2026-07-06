@@ -1,13 +1,17 @@
-// FILE: Assets\Scripts\Genes\WorldEffects\WorldEffect.cs
-using System.Collections;
+// File: Assets/Scripts/Genes/WorldEffects/WorldEffect.cs
 using System.Collections.Generic;
+using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
-using UnityEngine;
 using WegoSystem;
 
 namespace Abracodabra.Genes.WorldEffects
 {
+    /// <summary>
+    /// Abstract base for any persistent world effect (clouds, auras, etc.).
+    /// Lives on a spawned GameObject. Registers with TickManager for tick updates.
+    /// Only ticks during GrowthAndThreat phase.
+    /// </summary>
     public abstract class WorldEffect : MonoBehaviour, ITickUpdateable
     {
         [Header("World Effect Settings")]
@@ -20,9 +24,6 @@ namespace Abracodabra.Genes.WorldEffects
         protected int currentTick;
         protected bool isActive;
         protected SpriteRenderer spriteRenderer;
-
-        // --- Tile overlay state ---
-        bool tileOverlayActive;
 
         public bool IsActive => isActive;
 
@@ -53,8 +54,6 @@ namespace Abracodabra.Genes.WorldEffects
             {
                 tickManager.UnregisterTickUpdateable(this);
             }
-
-            ClearTileOverlay();
         }
 
         protected virtual void OnDestroy()
@@ -64,12 +63,11 @@ namespace Abracodabra.Genes.WorldEffects
             {
                 tickManager.UnregisterTickUpdateable(this);
             }
-
-            ClearTileOverlay();
         }
 
         public void OnTickUpdate(int tick)
         {
+            // Only process during Growth & Threat phase
             if (RunManager.HasInstance && RunManager.Instance.CurrentState != RunState.GrowthAndThreat)
             {
                 return;
@@ -87,15 +85,20 @@ namespace Abracodabra.Genes.WorldEffects
             }
         }
 
+        /// <summary>
+        /// Called each tick while the effect is active. Implement per-effect behavior here.
+        /// </summary>
         protected abstract void OnEffectTick(int tick);
 
+        /// <summary>
+        /// Called when the effect's duration runs out. Default: destroy after fade.
+        /// </summary>
         protected virtual void OnEffectExpire()
         {
-            ClearTileOverlay();
             StartCoroutine(FadeAndDestroy());
         }
 
-        IEnumerator FadeAndDestroy()
+        private System.Collections.IEnumerator FadeAndDestroy()
         {
             if (spriteRenderer != null)
             {
@@ -115,6 +118,9 @@ namespace Abracodabra.Genes.WorldEffects
             Destroy(gameObject);
         }
 
+        /// <summary>
+        /// Applies all payload genes to the given target.
+        /// </summary>
         protected void ApplyPayloadsToTarget(GameObject target)
         {
             if (target == null || payloadInstances == null) return;
@@ -146,6 +152,9 @@ namespace Abracodabra.Genes.WorldEffects
             }
         }
 
+        /// <summary>
+        /// Initialize the world effect. Call after instantiation.
+        /// </summary>
         public virtual void Initialize(PlantGrowth source, List<RuntimeGeneInstance> payloads, float effectRadius, int duration, float multiplier = 1f)
         {
             sourcePlant = source;
@@ -154,98 +163,22 @@ namespace Abracodabra.Genes.WorldEffects
             durationTicks = duration;
             effectMultiplier = multiplier;
 
-            // Tint any sprite if present (used by projectile, trap marker, etc.)
+            // Set visual scale based on radius
+            transform.localScale = Vector3.one * radius * 2f;
+
+            // Tint based on primary payload color
             if (spriteRenderer != null && payloadInstances.Count > 0)
             {
                 var primaryPayload = payloadInstances[0]?.GetGene<PayloadGene>();
                 if (primaryPayload != null)
                 {
                     Color tint = primaryPayload.geneColor;
-                    tint.a = 0.5f;
+                    tint.a = 0.5f; // Semi-transparent
                     spriteRenderer.color = tint;
                 }
             }
 
             Debug.Log($"[WorldEffect] {GetType().Name} initialized at {transform.position} | Radius: {radius} | Duration: {durationTicks} ticks");
-        }
-
-        // =====================================================================
-        // TILE OVERLAY HELPERS
-        // Subclasses call these to show/update/clear tile-based AOE overlays
-        // via GridDebugVisualizer. Multiple effects naturally overlap because
-        // each gets its own semi-transparent tile set keyed by 'this'.
-        // =====================================================================
-
-        /// <summary>
-        /// Resolves the overlay color from payloads. Returns the primary payload's
-        /// geneColor with the specified alpha, or a white fallback.
-        /// </summary>
-        protected Color GetOverlayColor(float alpha = 0.3f)
-        {
-            if (payloadInstances != null && payloadInstances.Count > 0)
-            {
-                var primaryPayload = payloadInstances[0]?.GetGene<PayloadGene>();
-                if (primaryPayload != null)
-                {
-                    Color c = primaryPayload.geneColor;
-                    c.a = alpha;
-                    return c;
-                }
-            }
-
-            return new Color(1f, 1f, 1f, alpha);
-        }
-
-        /// <summary>
-        /// Shows or updates a persistent tile overlay at the effect's current position.
-        /// Call this after Initialize / InitializeAura / Refresh, and whenever
-        /// the radius or color changes.
-        /// </summary>
-        protected void UpdateTileOverlay()
-        {
-            UpdateTileOverlay(GetOverlayColor());
-        }
-
-        /// <summary>
-        /// Shows or updates a persistent tile overlay with an explicit color.
-        /// </summary>
-        protected void UpdateTileOverlay(Color color)
-        {
-            if (GridDebugVisualizer.Instance == null || GridPositionManager.Instance == null) return;
-
-            GridPosition center = GridPositionManager.Instance.WorldToGrid(transform.position);
-            int radiusTiles = Mathf.Max(0, Mathf.RoundToInt(radius));
-
-            GridDebugVisualizer.Instance.ShowContinuousColoredRadius(this, center, radiusTiles, color);
-            tileOverlayActive = true;
-        }
-
-        /// <summary>
-        /// Removes the tile overlay for this effect.
-        /// </summary>
-        protected void ClearTileOverlay()
-        {
-            if (!tileOverlayActive) return;
-
-            if (GridDebugVisualizer.Instance != null)
-            {
-                GridDebugVisualizer.Instance.HideContinuousRadius(this);
-            }
-            tileOverlayActive = false;
-        }
-
-        /// <summary>
-        /// Shows a momentary colored burst on tiles (for explosions, reactive bursts, etc.)
-        /// This is fire-and-forget — tiles auto-destroy after duration.
-        /// </summary>
-        protected void ShowTileBurst(float burstRadius, Color color, float duration = 0.4f)
-        {
-            if (GridDebugVisualizer.Instance == null || GridPositionManager.Instance == null) return;
-
-            GridPosition center = GridPositionManager.Instance.WorldToGrid(transform.position);
-            int radiusTiles = Mathf.Max(0, Mathf.RoundToInt(burstRadius));
-
-            GridDebugVisualizer.Instance.ShowColoredRadiusBurst(this, center, radiusTiles, color, duration);
         }
     }
 }

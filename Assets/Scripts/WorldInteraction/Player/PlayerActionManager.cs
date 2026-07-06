@@ -228,9 +228,10 @@ public class PlayerActionManager : MonoBehaviour {
             Debug.LogError("[AdvanceGameTickStatic] TickManager.Instance is null!");
             return;
         }
-        for (int i = 0; i < tickCount; i++) {
-            TickManager.Instance.AdvanceTick();
-        }
+
+        // A1: route through the central authority. During Growth & Threat the
+        // ExecutionPhaseDriver owns the clock, so player actions become free.
+        TickManager.Instance.RequestActionTicks(tickCount);
     }
 
     bool CanPlantAtPosition(Vector3Int gridPosition, UIInventoryItem seedItem) {

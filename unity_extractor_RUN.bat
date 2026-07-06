@@ -37,6 +37,7 @@ goto MENU
 cls
 echo Running ALL enabled profiles...
 python unity_extractor.py
+call :SYNC
 echo.
 pause
 goto MENU
@@ -45,6 +46,7 @@ goto MENU
 cls
 echo Extracting SCRIPTS profile...
 python unity_extractor.py --profile scripts
+call :SYNC
 echo.
 pause
 goto MENU
@@ -53,9 +55,16 @@ goto MENU
 cls
 echo Extracting UI profile...
 python unity_extractor.py --profile ui
+call :SYNC
 echo.
 pause
 goto MENU
+
+:SYNC
+if not exist "ClaudeProjectFiles\06_Index" mkdir "ClaudeProjectFiles\06_Index"
+copy /Y "Unity_EXTRACTED_*.txt" "ClaudeProjectFiles\06_Index\" >nul 2>&1
+echo [SYNC] Extracts copied to ClaudeProjectFiles\06_Index\
+goto :eof
 
 :LIST_PROFILES
 cls

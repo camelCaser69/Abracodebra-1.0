@@ -1,17 +1,19 @@
-﻿using UnityEngine;
+// Assets/Scripts/Core/InitializationManager.cs
 using System.Collections;
-using WegoSystem;
+using UnityEngine;
 
-namespace WegoSystem
-{
-    public class InitializationManager : SingletonMonoBehaviour<InitializationManager>
-    {
-        [SerializeField] private GameEvent onCoreSystemsInitialized;
-        [SerializeField] private GameEvent onGameManagersInitialized;
-        [SerializeField] private GameEvent onGameplaySystemsInitialized;
+namespace WegoSystem {
+    public class InitializationManager : SingletonMonoBehaviour<InitializationManager> {
+        [SerializeField] GameEvent onCoreSystemsInitialized;
+        [SerializeField] GameEvent onGameManagersInitialized;
+        [SerializeField] GameEvent onGameplaySystemsInitialized;
 
-        private IEnumerator Start()
-        {
+        // A5: deterministic "everything is up" signal for late-binding systems.
+        public static bool IsReady { get; private set; }
+        public static event System.Action OnReady;
+
+        IEnumerator Start() {
+            IsReady = false;
             Debug.Log("[InitializationManager] Starting initialization sequence...");
 
             Debug.Log("[InitializationManager] Phase 1: Initializing Core Systems...");
@@ -22,18 +24,11 @@ namespace WegoSystem
             onGameManagersInitialized.Raise();
             yield return null;
 
-            // --- THIS BLOCK HAS BEEN REMOVED ---
-            // The new GameUIManager initializes itself via its own Awake/Start.
-            // We no longer need to manually initialize it from here.
-            // ------------------------------------
-            
-            if (EnvironmentalStatusEffectSystem.Instance != null)
-            {
+            if (EnvironmentalStatusEffectSystem.Instance != null) {
                 Debug.Log("[InitializationManager] Initializing EnvironmentalStatusEffectSystem...");
                 EnvironmentalStatusEffectSystem.Instance.Initialize();
             }
-            else
-            {
+            else {
                 Debug.LogWarning("[InitializationManager] EnvironmentalStatusEffectSystem instance not found. Tile-based status effects will not function.");
             }
 
@@ -41,6 +36,8 @@ namespace WegoSystem
             onGameplaySystemsInitialized.Raise();
             yield return null;
 
+            IsReady = true;
+            OnReady?.Invoke();
             Debug.Log("[InitializationManager] All systems initialized successfully.");
         }
     }

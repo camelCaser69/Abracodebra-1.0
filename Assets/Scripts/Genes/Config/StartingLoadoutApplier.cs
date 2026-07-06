@@ -1,46 +1,55 @@
-// File: Assets/Scripts/Genes/Config/StartingLoadoutApplier.cs
+// FILE: Assets/Scripts/Genes/Config/StartingLoadoutApplier.cs
 using UnityEngine;
 using Abracodabra.Genes.Config;
 using Abracodabra.UI.Genes;
 using Abracodabra.UI.Toolkit;
 
-namespace Abracodabra.Genes.Config
-{
-    /// <summary>
-    /// Applies the starting gene/seed loadout to the player's inventory on game start.
-    /// Attach to a GameObject in the scene (e.g., GameManager or a dedicated initializer).
-    /// Runs after GameUIManager has set up the inventory.
-    /// </summary>
-    public class StartingLoadoutApplier : MonoBehaviour
-    {
+namespace Abracodabra.Genes.Config {
+    public class StartingLoadoutApplier : MonoBehaviour {
         [Header("Configuration")]
-        [SerializeField] private StartingLoadoutConfig loadoutConfig;
+        [SerializeField] StartingLoadoutConfig loadoutConfig;
 
-        [Header("Timing")]
-        [Tooltip("Delay before applying loadout to ensure inventory is initialized.")]
-        [SerializeField] private float applyDelay = 0.5f;
+        bool hasApplied;
+        bool subscribed;
 
-        private bool hasApplied;
-
-        private void Start()
-        {
-            if (loadoutConfig == null)
-            {
-                Debug.LogWarning("[StartingLoadoutApplier] No StartingLoadoutConfig assigned!");
-                return;
+        void Start() {
+            // A5: deterministic readiness instead of a fixed time delay.
+            if (InventoryService.IsInitialized) {
+                ApplyLoadout();
             }
+            else {
+                InventoryService.OnInventoryReady += HandleInventoryReady;
+                subscribed = true;
+            }
+        }
 
-            Invoke(nameof(ApplyLoadout), applyDelay);
+        void OnDestroy() {
+            if (subscribed) {
+                InventoryService.OnInventoryReady -= HandleInventoryReady;
+                subscribed = false;
+            }
+        }
+
+        void HandleInventoryReady() {
+            InventoryService.OnInventoryReady -= HandleInventoryReady;
+            subscribed = false;
+            ApplyLoadout();
         }
 
         void ApplyLoadout() {
             if (hasApplied) return;
-            hasApplied = true;
+
+            if (loadoutConfig == null) {
+                Debug.LogWarning("[StartingLoadoutApplier] No StartingLoadoutConfig assigned!");
+                return;
+            }
 
             if (!InventoryService.IsInitialized) {
                 Debug.LogError("[StartingLoadoutApplier] InventoryService not ready! Cannot apply loadout.");
                 return;
             }
+
+            hasApplied = true;
 
             int totalAdded = 0;
 

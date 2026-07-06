@@ -1,13 +1,18 @@
 ﻿// FILE: Assets/Scripts/Genes/Implementations/Active/ReactiveBurstHandler.cs
 using System.Collections.Generic;
+using UnityEngine;
 using Abracodabra.Genes.Core;
 using Abracodabra.Genes.Runtime;
 using Abracodabra.Genes.WorldEffects;
-using UnityEngine;
 using WegoSystem;
 
 namespace Abracodabra.Genes.Implementations
 {
+    /// <summary>
+    /// MonoBehaviour attached to a plant that handles Reactive Burst event subscriptions.
+    /// Subscribes to PlantGrowth.OnLeafConsumed and fires AoE + payloads when a leaf is consumed.
+    /// Added automatically by PlantSequenceExecutor when a ReactiveBurstGene is in the sequence.
+    /// </summary>
     public class ReactiveBurstHandler : MonoBehaviour, ITickUpdateable
     {
         PlantGrowth plant;
@@ -34,11 +39,13 @@ namespace Abracodabra.Genes.Implementations
             cooldownRemaining = 0;
             isInitialized = true;
 
+            // Subscribe to leaf consumed event
             if (plant != null)
             {
                 plant.OnLeafConsumed += OnLeafConsumed;
             }
 
+            // Register for tick updates (cooldown decrement)
             if (TickManager.Instance != null)
             {
                 TickManager.Instance.RegisterTickUpdateable(this);
@@ -47,6 +54,7 @@ namespace Abracodabra.Genes.Implementations
 
         void OnDestroy()
         {
+            // Unsubscribe
             if (plant != null)
             {
                 plant.OnLeafConsumed -= OnLeafConsumed;
@@ -58,6 +66,9 @@ namespace Abracodabra.Genes.Implementations
             }
         }
 
+        /// <summary>
+        /// Tick update: decrement cooldown.
+        /// </summary>
         public void OnTickUpdate(int currentTick)
         {
             if (cooldownRemaining > 0)
@@ -66,17 +77,22 @@ namespace Abracodabra.Genes.Implementations
             }
         }
 
+        /// <summary>
+        /// Event handler: called when any leaf is consumed on this plant.
+        /// </summary>
         void OnLeafConsumed(PlantGrowth sourcePlant, Vector2Int leafCoord)
         {
             if (!isInitialized || burstGene == null) return;
             if (plant == null || plant.CurrentState == PlantState.Dead) return;
 
+            // Cooldown check
             if (cooldownRemaining > 0)
             {
                 Debug.Log($"[ReactiveBurst] '{burstGene.geneName}' on cooldown ({cooldownRemaining} ticks remaining).");
                 return;
             }
 
+            // Energy check — burst costs energy when it fires
             var energySystem = plant.EnergySystem;
             if (energySystem != null && burstGene.burstEnergyCost > 0)
             {
@@ -88,12 +104,14 @@ namespace Abracodabra.Genes.Implementations
                 energySystem.SpendEnergy(burstGene.burstEnergyCost);
             }
 
+            // Fire the burst at the leaf's world position
             float spacing = plant.GetCellWorldSpacing();
             Vector3 burstPos = plant.transform.position + new Vector3(leafCoord.x * spacing, leafCoord.y * spacing, 0f);
 
             float multiplier = activeInstance?.GetValue("effect_multiplier", 1f) ?? 1f;
             float finalDamage = burstGene.baseAoeDamage * multiplier;
 
+            // AoE damage to all creatures in radius
             var creatures = TargetFinder.FindCreaturesInRadius(burstPos, burstGene.burstRadius);
             int hitCount = 0;
 
@@ -104,6 +122,7 @@ namespace Abracodabra.Genes.Implementations
                 creature.TakeDamage(finalDamage);
                 hitCount++;
 
+                // Apply payloads
                 if (payloadInstances != null)
                 {
                     foreach (var payloadInstance in payloadInstances)
@@ -134,6 +153,7 @@ namespace Abracodabra.Genes.Implementations
                 }
             }
 
+            // VFX
             if (burstGene.burstVfxPrefab != null)
             {
                 var vfx = Instantiate(burstGene.burstVfxPrefab, burstPos, Quaternion.identity);
@@ -141,31 +161,14 @@ namespace Abracodabra.Genes.Implementations
                 Destroy(vfx, 1f);
             }
 
-            // Flash affected tiles
-            if (GridDebugVisualizer.Instance != null && GridPositionManager.Instance != null)
-            {
-                GridPosition burstCenter = GridPositionManager.Instance.WorldToGrid(burstPos);
-                Color burstColor = new Color(1f, 0.6f, 0.2f, 0.3f); // Orange burst
-                if (payloadInstances != null && payloadInstances.Count > 0)
-                {
-                    var primaryPayload = payloadInstances[0]?.GetGene<PayloadGene>();
-                    if (primaryPayload != null)
-                    {
-                        burstColor = primaryPayload.geneColor;
-                        burstColor.a = 0.35f;
-                    }
-                }
-                GridDebugVisualizer.Instance.ShowColoredRadiusBurst(
-                    this, burstCenter, Mathf.RoundToInt(burstGene.burstRadius),
-                    burstColor, 0.4f);
-            }
-
+            // Floating combat text
             FloatingCombatText.Spawn(
                 burstPos + Vector3.up * 0.3f,
                 $"BURST -{finalDamage:F0}",
                 new Color(1f, 0.6f, 0.2f)
             );
 
+            // Set cooldown
             cooldownRemaining = burstGene.cooldownTicks;
 
             Debug.Log($"[ReactiveBurst] '{burstGene.geneName}' fired at {burstPos}! Hit {hitCount} creature(s) for {finalDamage:F1} damage. Cooldown: {burstGene.cooldownTicks} ticks.");

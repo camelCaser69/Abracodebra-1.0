@@ -367,8 +367,9 @@ namespace Abracodabra.Ecosystem.Feeding {
                 InventoryService.RemoveItemAtIndex(inventoryIndex);
             }
 
+            // A1: feeding during Growth & Threat is a real-time reaction; let the driver own time.
             if (TickManager.Instance != null) {
-                TickManager.Instance.AdvanceTick();
+                TickManager.Instance.RequestActionTicks(1);
             }
 
             if (debugLog) {
