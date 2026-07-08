@@ -46,13 +46,16 @@
 
 ## 4. Maintenance Rules (keeps memory flawless)
 
-- **projectmemory.md** — update at the end of any session that changes state, decisions, or roadmap. Claims about "implemented" systems must be disk-verified, not aspirational (this KB exists because memory once claimed A1–A6 were delivered when they weren't).
+*Full trigger table lives in `CLAUDE.md` → **Memory Protocol** (auto-loaded every session; mirrored in `01_Core/project_instructions.md`). Principle: **write-as-you-go** — memory updates happen at the moment of the triggering event, not batched to session end.*
+
+- **projectmemory.md** — update whenever state, decisions, or roadmap change (during the session, not just at the end). Claims about "implemented" systems must be disk-verified, not aspirational (this KB exists because memory once claimed A1–A6 were delivered when they weren't).
 - **Codebase map** — patch the affected section after any architecture-level change (new system, moved responsibility, new singleton/event). Full re-sweep only on request.
 - **Extractor** — run `unity_extractor_RUN.bat` after code changes; it now auto-copies both extracts into `06_Index/`.
 - **CLAUDE.md** — single copy in the Unity project root (since the 2026-07-06 machine move the Unity folder IS the workspace root; the old two-copy layout is gone). No other file may have copies.
 - **Task lifecycle** — Active → Done by moving the file; deferred/cut scope gets written into a Roadmaps doc, never left implicit.
 - **Versioned design bibles** — new version = new `_vN` file in place, previous version → `99_Archive/`.
 - **Nothing is deleted** without byte-identical-duplicate verification; superseded content is archived.
+- **KB doctor (weekly scheduled task, est. 2026-07-06)** — automated audit: truncated files (no trailing newline / mid-word EOF), `06_Index` freshness vs newest `.cs` mtime, root strays outside the allowed set, routing violations, stale `03_Tasks/Active/` entries. Fixes trivial issues (index re-sync), reports the rest. Backup: KB is git-tracked (GitHub `Abracodebra-1.0`); commit + push after significant KB changes.
 
 ---
 

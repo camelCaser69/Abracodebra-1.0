@@ -39,6 +39,35 @@ genetics. Solo indie project, 200 C# scripts. Engine: Unity 6, URP, **UI Toolkit
 
 ---
 
+## Memory Protocol (account memory is OFF — the KB is the ONLY memory)
+
+Session context does not persist; continuity exists only through `ClaudeProjectFiles/`.
+Execute these triggers proactively, without being asked:
+
+**Session start:** read `01_Core/projectmemory.md` (always) and
+`01_Core/Abracodebra_Codebase_Map.md` (any code task); check `03_Tasks/Active/` before
+proposing new work.
+
+**Write-as-you-go triggers (never batch memory writes to session end):**
+
+| Trigger | Automatic action |
+|---|---|
+| Concept / mechanic / research doc produced | Save to `02_Design/Concepts/Name.md` immediately — route, don't ask |
+| New task / implementation pack | `03_Tasks/Active/YYYY-MM_Name.md` |
+| Review / audit / retro | `04_Reviews/YYYY-MM_Name.md` |
+| Code applied to the repo | Update projectmemory **Current state** + re-run extractor (or flag `06_Index` stale) |
+| Architecture-level change | Patch the affected codebase-map section in the same session |
+| Decision / pivot / learning agreed in chat | Append to projectmemory |
+| Task finished & verified | Move its file `03_Tasks/Active/` → `Done/` |
+
+**Session end:** confirm projectmemory + map reflect disk reality; routing clean; no root strays.
+
+**Integrity:** "implemented" claims must be disk-verified; verify KB writes host-side
+(Read/Grep — bash view can serve stale/truncated content); `01_Core` filenames are fixed,
+edit in place; a weekly scheduled **KB doctor** independently audits KB health.
+
+---
+
 ## Core Principles
 
 - **Consistency** — Keep naming, patterns, and architecture aligned across all scripts.

@@ -154,9 +154,45 @@ inventory in its `00_START_HERE.md`. Create new docs THERE, never in the root:
 
 Only files outside the KB: this `CLAUDE.md` (auto-loaded router; single copy, lives in the
 Unity project root — the old two-copy workspace layout is gone since the 2026-07 machine
-move) and the extractor tooling + its live outputs in the Unity root. **Maintenance:** update `01_Core/projectmemory.md` after significant sessions; update
-the codebase map after architecture-level changes; re-run the extractor after code changes
-(it auto-syncs `06_Index`); keep this table in sync with `00_START_HERE.md`.
+move) and the extractor tooling + its live outputs in the Unity root. Maintenance is
+governed by the Memory Protocol below; keep the table above in sync with `00_START_HERE.md`.
+
+---
+
+## Memory Protocol (account memory is OFF — this KB is the ONLY memory)
+
+Claude's session context does not persist and account-level memory is disabled (shared
+account). Continuity exists **only** through `ClaudeProjectFiles/` + this auto-loaded
+router. Execute these triggers proactively, without being asked:
+
+**Session start**
+1. Read `01_Core/projectmemory.md` (always, before real work).
+2. Read `01_Core/Abracodebra_Codebase_Map.md` (any code task).
+3. Check `03_Tasks/Active/` before proposing new work — something may already be open.
+
+**During the session — write-as-you-go (never batch memory writes to session end):**
+
+| Trigger | Automatic action |
+|---|---|
+| Concept / mechanic / research doc produced | Save to `02_Design/Concepts/Name.md` immediately — route, don't ask |
+| New task / implementation pack | `03_Tasks/Active/YYYY-MM_Name.md` |
+| Review / audit / retro | `04_Reviews/YYYY-MM_Name.md` |
+| Code applied to the repo | Update projectmemory **Current state** + re-run extractor (or explicitly flag `06_Index` stale) |
+| Architecture-level change (new system / singleton / event, moved responsibility) | Patch the affected codebase-map section in the same session |
+| Decision, pivot, or learning agreed in chat | Append to projectmemory (active threads / learnings) |
+| Task finished & verified | Move its file `03_Tasks/Active/` → `Done/` |
+
+**Session end** (user wraps up, or a deliverable completes): confirm projectmemory +
+map reflect disk reality, routing is clean, no stray files in the Unity root.
+
+**Integrity rules**
+- Memory claims about "implemented/applied" must be **disk-verified**, never aspirational.
+- Verify every KB write host-side (Read/Grep) — the bash mounted view can serve stale or
+  truncated content; this has already corrupted `projectmemory.md` and
+  `project_instructions.md` once each.
+- `01_Core` filenames are fixed — edit in place, never fork (`_v2` etc.).
+- A weekly scheduled **KB doctor** task independently checks truncation, index freshness,
+  root strays, and routing violations.
 
 ---
 
