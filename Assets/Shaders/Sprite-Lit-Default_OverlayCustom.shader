@@ -73,7 +73,8 @@ Shader "Universal Render Pipeline/2D/Sprite-Lit-Overlay"
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/2D/Include/LightingUtility.hlsl"
+            // URP 17.3: CombinedShapeLightShared.hlsl (included below) pulls in LightingUtility.hlsl, which declares
+            // FragmentOutput and the _ShapeLightTexture{n} samplers. Do not include it or declare SHAPE_LIGHT(n) here.
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/DebugMipmapStreamingMacros.hlsl"
 
             TEXTURE2D(_MainTex);
@@ -100,22 +101,6 @@ Shader "Universal Render Pipeline/2D/Sprite-Lit-Overlay"
                 float _OverlayOffsetX;
                 float _OverlayOffsetY;
             CBUFFER_END
-
-            #if USE_SHAPE_LIGHT_TYPE_0
-            SHAPE_LIGHT(0)
-            #endif
-
-            #if USE_SHAPE_LIGHT_TYPE_1
-            SHAPE_LIGHT(1)
-            #endif
-
-            #if USE_SHAPE_LIGHT_TYPE_2
-            SHAPE_LIGHT(2)
-            #endif
-
-            #if USE_SHAPE_LIGHT_TYPE_3
-            SHAPE_LIGHT(3)
-            #endif
 
             Varyings CombinedShapeLightVertex(Attributes v)
             {
@@ -180,7 +165,9 @@ Shader "Universal Render Pipeline/2D/Sprite-Lit-Overlay"
                 InitializeSurfaceData(blended.rgb, main.a, mask, surfaceData);
                 InitializeInputData(i.uv, i.lightingUV, inputData);
 
+                #if defined(DEBUG_DISPLAY)
                 SETUP_DEBUG_TEXTURE_DATA_2D_NO_TS(inputData, i.positionWS, i.positionCS, _MainTex);
+                #endif
 
                 return CombinedShapeLightShared(surfaceData, inputData);
             }
