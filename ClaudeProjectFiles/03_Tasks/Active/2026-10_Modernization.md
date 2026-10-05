@@ -274,7 +274,7 @@ Did not fit the layout (decisions in §7.4 Q8–Q10): the seven undated files in
 
 ### 7.4 Needs Milan
 
-Answer "recs" to accept every recommendation.
+**Answered 2026-10-05: "recs" (every recommendation accepted, Q1–Q17).** Done since: Q2, local branch `charming-elgamal` deleted with `git branch -d`. Still Milan's: Q1 (push `main` and the tag), Q11, Q12 (and Q16, a Bitbloom-side commit). Everything else is executed by Phase B + C (§7.5).
 
 1. **Push (blocked).** The permission classifier refused `git push origin main` and the `pre-modernization` tag push. **Rec:** run them yourself in the terminal: `! git push origin main` then `! git push origin pre-modernization` (the tag stays on baseline commit `3a0abe0`, before this §7 commit). Check github.com → Tags afterwards.
 2. **`charming-elgamal`** is fully merged into main (§7.1). **Rec:** delete the local label (`git branch -d charming-elgamal`; safe, it refuses if anything were unmerged). No merge or cherry-pick is needed.
