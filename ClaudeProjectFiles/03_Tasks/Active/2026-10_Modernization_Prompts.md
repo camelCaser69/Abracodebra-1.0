@@ -115,8 +115,8 @@ At the end: tag kb-2026-10 and push. Report: what moved (counts), MB removed fro
 
 1. [ ] Open Abracodebra in Unity Hub (6000.0.39f1). Wait until it's idle.
 2. [ ] PowerShell, in the project folder:
-   - `& "$env:LOCALAPPDATA\Unity\bin\unity.exe" status`: shows this project.
-   - `& "$env:LOCALAPPDATA\Unity\bin\unity.exe" pipeline install`: wait for the recompile. If it fails, use Package Manager → + → Add package by name → `com.unity.pipeline` (version `0.7.0-exp.1`, as in Bitbloom).
+   - `& "$env:LOCALAPPDATA\Unity\bin\unity.exe" pipeline install`: wait for the Editor to recompile. (Running `status` before this says "No Unity Editor instances found with the Pipeline package installed"; that's expected.) If it asks you to log in, run `unity.exe auth login` first. If it still fails, use Package Manager → + → Add package by name → `com.unity.pipeline` (version `0.7.0-exp.1`, as in Bitbloom).
+   - `& "$env:LOCALAPPDATA\Unity\bin\unity.exe" status`: now shows this project.
    - `& "$env:LOCALAPPDATA\Unity\bin\unity.exe" command console --level error`: answers.
 3. [ ] Leave the Editor open and paste prompt 5 (Claude Code):
 
