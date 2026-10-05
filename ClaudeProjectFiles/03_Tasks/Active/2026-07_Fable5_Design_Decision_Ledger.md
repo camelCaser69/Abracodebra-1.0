@@ -34,6 +34,7 @@ least once per 15–20 s of Day phase?*
   Harvest Basket loses its main justification; Planning-tick hard invariant still applies.
 - **Anti-thrash rule:** run the A/B toggle in the same build, same seed (`RunSeed`),
   ≥2 runs per mode before judging. One bad run is noise.
+  **Revised 2026-07-20 (Phase Identity §4):** the experiment is sequential (A first, B-rev only if A fails), not a same-build toggle.
 
 ## D2 · Automation: Fixtures vs embodied gardener ✅
 
@@ -108,7 +109,7 @@ Reaffirming the Last Day Plan with model-strength routing now that Fable is gone
 | F4 hygiene sweep | weak is fine | G4 tables are mechanical |
 | §4.3 experiment build | Milan + any model | it's a toggle + playtesting, not model-bound |
 
-One pack per fresh session, extractor re-run between — unchanged.
+One pack per fresh session (2026-10: the extractor is retired; nothing to re-run) — unchanged.
 
 ---
 

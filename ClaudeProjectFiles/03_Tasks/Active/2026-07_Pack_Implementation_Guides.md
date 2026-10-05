@@ -6,15 +6,17 @@
 
 ## G0. Rules for whoever executes these packs (read first, non-negotiable)
 
+> **2026-10 note: tooling retired.** The code extractor and `06_Index/` no longer exist, and `Abracodebra_Codebase_Map.md` is now `01_Core/Codebase_Map.md`. Wherever G0 says "extractor" or "`06_Index`", read: grep the live files under `Assets/Scripts/` (and the Unity CLI `console --level error` once Phase D of `2026-10_Modernization.md` is done). Symbols below were verified 2026-07-07: re-verify before use.
+
 1. **Symbols are the contract; line numbers are hints.** Every line number below was valid 2026-07-07. Before editing a file, open it and re-locate the symbol. If a named symbol does not exist on disk, **STOP** — do not improvise. Re-grep, re-read this guide, or ask Milan.
-2. **Read before writing.** For each pack there is a "Read fully before starting" list. Read those live files first, entirely. Do not rely on `06_Index` extracts for editing.
+2. **Read before writing.** For each pack there is a "Read fully before starting" list. Read those live files first, entirely. Edit only after reading the live file (2026-10: there are no extracts any more).
 3. **Output rules (from CLAUDE.md, they bind you too):** complete methods signature-to-`}`, no `// ... rest of code` placeholders, full file rewrite if >3 methods change, never create `_v2`/`_new` filenames, re-state `using` directives, note line-count delta when rewriting a file.
 4. **No Inspector work.** Every new MonoBehaviour self-installs from code (pattern: `GameBootstrap.Awake` → `AddComponent<T>()`, or construction inside `GameUIManager`). If you catch yourself writing "then in the Inspector, drag…" — redesign.
 5. **Serialization safety:** never rename or delete a serialized field on a ScriptableObject class (`SeedTemplate`, `GeneBase` subclasses, definitions) — 51 `.asset` files depend on them. Additive fields are fine. `[FormerlySerializedAs]` if a rename is truly unavoidable (it never is in these packs).
 6. **Invariants:** gameplay RNG via `IDeterministicRandom` (hybrid fallback pattern, see G4-§1); tick-state changes on tick boundaries, wall-clock for visuals only; `GridPosition` Z stays 0; UI controllers named `UI[Name]Controller`; services static.
 7. **Compile triage protocol:** you cannot compile. At the end of the pack, output a short list titled "Compile-check focus" naming the files most likely to error. Milan opens Unity, pastes Console errors back, you fix. Expect 2–10 trivial errors on a big pack; that is normal, not failure.
 8. **Verification:** after writes, verify host-side with Read/Grep (the bash mount can serve stale content). Each pack ends with verification greps — run them and report results.
-9. **KB duties per pack:** update `01_Core/projectmemory.md` Current state, patch the affected `01_Core/Codebase_Map.md` section (F1→§5, F2→§8, F3→§8/§3, F4→§12), flag `06_Index` stale (or ask Milan to re-run `unity_extractor_RUN.bat`), and ask Milan to git-commit before starting the next pack.
+9. **KB duties per pack:** update `01_Core/projectmemory.md` Current state, patch the affected `01_Core/Codebase_Map.md` section (F1→§5, F2→§8, F3→§8/§3, F4→§12), and ask Milan to git-commit before starting the next pack.
 10. **Execution order if running multiple packs: F1 → F2 → F3 → F4**, one pack per session.
 
 ---
@@ -370,7 +372,7 @@ Template is `StartingLoadoutApplier.cs:17–34` (verified): if `InventoryService
 1. Report: what shipped, what didn't, compile-check focus list.
 2. Verify all written files host-side (Read the tail of each).
 3. Update `01_Core/projectmemory.md` Current state (+ codebase-map section per G0-§9) — claims must be disk-verified, never aspirational.
-4. Ask Milan to: open Unity (compile triage), run the Part-4-style play checks listed in the pack's Done-when, re-run `unity_extractor_RUN.bat`, git-commit.
+4. Ask Milan to: open Unity (compile triage), run the Part-4-style play checks listed in the pack's Done-when, git-commit (2026-10: no extractor re-run needed).
 5. When a pack's Done-when fully passes, record it in `01_Core/projectmemory.md`; when all four packs land, move this guide to `03_Tasks/Done/`. (2026-10: the Last-Day Plan itself is archived.)
 
 **Next action:** execute G1 Stage 1 (parser core + sandbox tests) — it validates the entire F1 design before any Unity file changes.
