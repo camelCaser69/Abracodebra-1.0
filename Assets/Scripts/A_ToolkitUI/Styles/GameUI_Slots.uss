@@ -45,7 +45,6 @@
     background-color: rgba(30, 30, 40, 0.5);
     border-color: rgba(100, 100, 120, 0.3);
     border-width: 1px;
-    border-style: dashed;
 }
 
 /* --------------------------------------------
@@ -115,7 +114,6 @@
     background-color: rgba(80, 80, 100, 0.3);
     border-color: rgba(120, 120, 150, 0.5);
     border-width: 2px;
-    border-style: dashed;
 }
 
 .gene-slot--passive {

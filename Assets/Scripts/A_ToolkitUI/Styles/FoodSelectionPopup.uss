@@ -73,7 +73,6 @@
 /* Food slot when empty/disabled */
 .food-slot--empty {
     background-color: rgba(30, 30, 40, 0.5);
-    border-style: dashed;
     border-color: rgba(60, 60, 80, 0.5);
 }
 
@@ -95,7 +94,6 @@
     font-size: 11px;
     -unity-font-style: bold;
     color: white;
-    text-shadow: 1px 1px 0 black, -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black;
 }
 
 /* Satiation value preview (shown on hover) */

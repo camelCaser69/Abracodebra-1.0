@@ -40,7 +40,6 @@
     border-right-width: 2px;
     border-right-color: rgb(10, 10, 15);
     overflow: hidden;
-    box-sizing: border-box;
 }
 
 .main-panel {
@@ -49,7 +48,6 @@
     padding: 15px;
     background-color: rgb(40, 40, 50);
     overflow: hidden;
-    box-sizing: border-box;
 }
 
 .side-panel-right {
@@ -63,7 +61,6 @@
     border-left-width: 2px;
     border-left-color: rgb(10, 10, 15);
     overflow: hidden;
-    box-sizing: border-box;
 }
 
 /* --------------------------------------------
@@ -104,7 +101,6 @@ Label {
     color: rgb(150, 150, 170);
     margin-top: 15px;
     margin-bottom: 8px;
-    text-transform: uppercase;
     letter-spacing: 1px;
 }
 
