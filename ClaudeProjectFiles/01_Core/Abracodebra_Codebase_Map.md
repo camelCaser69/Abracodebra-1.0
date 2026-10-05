@@ -7,7 +7,7 @@ How to use: this is the orientation layer. Trust it for *architecture and wiring
 
 ## 1. Verified Reality vs. Documented State (critical)
 
-The Foundation Review (`04_Reviews/Abracodabra_Foundation_Review_2026-06.md`) and A-Category pack (`03_Tasks/Active/Abracodabra_A_Category_Implementation.md`) describe fixes A1–A6 — **applied to the repo 2026-07-05** (code Parts 1–2 complete; Editor wiring + Part 4 tests pending). State after application:
+The Foundation Review (`04_Reviews/Abracodabra_Foundation_Review_2026-06.md`) and A-Category pack (`03_Tasks/Done/Abracodabra_A_Category_Implementation.md`) describe fixes A1–A6 — **applied to the repo 2026-07-05** (code Parts 1–2 complete; Editor wiring + Part 4 tests pending). State after application:
 
 | Item | Disk reality (2026-07-05, post-application) |
 |---|---|

@@ -1,6 +1,6 @@
 # Pack Implementation Guides — F1–F4 (written by Fable 5, 2026-07-07)
 
-**Purpose:** Step-by-step implementation guides for the four packs in `2026-07_Fable5_Last_Day_Plan.md`, written so a less advanced model — or a human — can execute each pack without architectural mistakes. All symbols, signatures, and call-site lists below were **verified against live disk on 2026-07-07**. The hard design decisions are made HERE; the executor's job is faithful mechanical application.
+**Purpose:** Step-by-step implementation guides for the four packs in `99_Archive/2026-07_Cowork_Era/2026-07_Fable5_Last_Day_Plan.md` (archived 2026-10; nothing in it is still actionable beyond this guide), written so a less advanced model — or a human — can execute each pack without architectural mistakes. All symbols, signatures, and call-site lists below were **verified against live disk on 2026-07-07**. The hard design decisions are made HERE; the executor's job is faithful mechanical application.
 
 ---
 
@@ -371,6 +371,6 @@ Template is `StartingLoadoutApplier.cs:17–34` (verified): if `InventoryService
 2. Verify all written files host-side (Read the tail of each).
 3. Update `01_Core/projectmemory.md` Current state (+ codebase-map section per G0-§9) — claims must be disk-verified, never aspirational.
 4. Ask Milan to: open Unity (compile triage), run the Part-4-style play checks listed in the pack's Done-when, re-run `unity_extractor_RUN.bat`, git-commit.
-5. When a pack's Done-when fully passes, move its section status in `2026-07_Fable5_Last_Day_Plan.md` and, when all four packs land, move both docs to `03_Tasks/Done/`.
+5. When a pack's Done-when fully passes, record it in `01_Core/projectmemory.md`; when all four packs land, move this guide to `03_Tasks/Done/`. (2026-10: the Last-Day Plan itself is archived.)
 
 **Next action:** execute G1 Stage 1 (parser core + sandbox tests) — it validates the entire F1 design before any Unity file changes.

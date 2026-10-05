@@ -1,5 +1,8 @@
 # Abracodabra — A-Category Implementation Pack
 
+> **CLOSED 2026-10-05 (moved to `Done/` by the 2026-10 modernization).** Code Parts 1–2 are applied and verified on disk (`ExecutionPhaseDriver.cs`, `TickManager.RequestActionTicks`, `RunManager.RunSeed`, `PlantGrowth.OnPlantDied`); the Editor wiring landed 2026-07-06 and Milan confirmed auto-tick, Space, Tab and the run seed in play.
+> **Part 4 was never fully run.** Still unticked: A1 no-double-advance, A1 Planning-unchanged, A2 tile frees, A2 no zombie ticks, A3 round ends on timer, A4 energy survives recalc, A5 clean cold start, A6 reproducibility (A1 auto-tick and speed/pause were informally confirmed). They are carried into `03_Tasks/Roadmap.md` as "verify" items.
+
 > **STATUS 2026-07-05: Parts 1 & 2 APPLIED to the repo (all 15 files, verified on disk — `ExecutionPhaseDriver.cs` created, every symbol cross-checked).**
 > **Remaining for Milan in the Unity Editor: Part 3 Step 2 (ExecutionPhaseDriver GameObject), Step 3 (RunManager seed fields), Step 4 (pick ONE starting-loadout source), then the Part 4 test checklist. When the checklist passes, move this file to `03_Tasks/Done/` and re-run the extractor.**
 

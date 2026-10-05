@@ -8,7 +8,7 @@ Overrule freely — but write the overrule here, don't leave it implicit.
 
 Sources reconciled: `Commit_And_Watch_Loop_Design.md` (Rev 2), `UI_Systems_Research.md`,
 `Minigames_And_Mechanics_Reevaluation.md`, `Gameplay_Engagement_Research.md`,
-`2026-07_Fable5_Last_Day_Plan.md`, `2026-07_Pack_Implementation_Guides.md`.
+`99_Archive/2026-07_Cowork_Era/2026-07_Fable5_Last_Day_Plan.md` (archived 2026-10), `2026-07_Pack_Implementation_Guides.md`.
 
 Status: ✅ decided here · 🧪 experiment decides, default recorded · ⏸️ genuinely Milan's call
 
