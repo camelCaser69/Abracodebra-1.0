@@ -91,14 +91,14 @@ Rules: never delete design content (archive it); generated files may be deleted;
 
 ### 3.2 Assets (GUID check first)
 
-- [ ] For every file in `Assets/TextMesh Pro/Fonts/Extracted Fonts/`, `Assets/TextMesh Pro/Examples & Extras/`, `NotoColorEmoji-Regular.ttf`, `SEGUIEMJ.TTF`: read its GUID from the `.meta` and grep all `*.unity`, `*.prefab`, `*.asset`, `*.mat`, `*.uss`, `*.uxml`, `*.cs` under `Assets/` and `ProjectSettings/`. Also follow font fallback chains (a used font asset can reference another as fallback).
-- [ ] Write the result table (file, size, referenced by) into §7 of this pack. **Stop for Milan's OK.**
-- [ ] After OK, with the **Editor closed**: move the unreferenced files and their `.meta` to `D:\Unity Projects\AbraCodebra\_Vault\Abracodebra_TMP_fonts\` (outside every repo). Commit `chore: move unused TMP font assets out of the project (−X MB)`.
-- [ ] `Assets/Editor/TileMappingsBackup/`: report what it is; archive only on Milan's OK.
+- [x] For every file in `Assets/TextMesh Pro/Fonts/Extracted Fonts/`, `Assets/TextMesh Pro/Examples & Extras/`, `NotoColorEmoji-Regular.ttf`, `SEGUIEMJ.TTF`: read its GUID from the `.meta` and grep all `*.unity`, `*.prefab`, `*.asset`, `*.mat`, `*.uss`, `*.uxml`, `*.cs` under `Assets/` and `ProjectSettings/`. Also follow font fallback chains (a used font asset can reference another as fallback).
+- [x] Write the result table (file, size, referenced by) into §7 of this pack. **Stop for Milan's OK.**
+- [x] After OK, with the **Editor closed**: move the unreferenced files and their `.meta` to `D:\Unity Projects\AbraCodebra\_Vault\Abracodebra_TMP_fonts\` (outside every repo). Commit `chore: move unused TMP font assets out of the project (−X MB)`.
+- [x] `Assets/Editor/TileMappingsBackup/`: report what it is; archive only on Milan's OK.
 
 ### 3.3 Packages
 
-- [ ] Remove `com.unity.visualscripting`, `com.unity.multiplayer.center`, `com.unity.collab-proxy` from `Packages/manifest.json` (grep first; no code uses Visual Scripting as of the audit). Milan opens the Editor once to let it resolve; console must stay clean.
+- [x] Remove `com.unity.visualscripting`, `com.unity.multiplayer.center`, `com.unity.collab-proxy` from `Packages/manifest.json` (grep first; no code uses Visual Scripting as of the audit). Milan opens the Editor once to let it resolve; console must stay clean.
 
 **Done when:** the repo root holds only Unity folders, `CLAUDE.md`, `ClaudeProjectFiles/`, git/IDE config and `Tools/` (if created); the project opens with 0 console errors. **How to check:** open the project in Unity Hub, Window → General → Console shows no red; `git status` clean.
 
@@ -137,11 +137,11 @@ ClaudeProjectFiles/
 
 ### 4.3 New and rewritten files
 
-- [ ] **`01_Core/projectmemory.md`** in Bitbloom's format: a header explaining the file; **Snapshot** (≤ 40 lines: what the game is, what's built, the design of record and where it lives, open for Milan, next action); **Recent entries**; **Decision log** table (date · decision · where); **Code facts**; **Learnings**. Everything older moves verbatim to `99_Archive/projectmemory_history.md`. Target ≤ 30 KB.
-- [ ] **`02_Design/Feedback_Log.md`**: start with Milan's cross-project rules from Bitbloom's Feedback_Log "Distilled rules" that are about him rather than about Bitbloom (red/green never alone, short playtest sheets in play order, terms explain themselves with a hover, one concept in one or two places, etc.), plus the Abracodabra feedback already in projectmemory and the Ledger (manual avatar piloting felt finicky and hectic → out of the design space; WeGo felt cortisol-heavy). Each rule keeps its source and date.
-- [ ] **`90_SideIdeas/README.md`**.
-- [ ] **CLAUDE.md** rewritten per §1.1.
-- [ ] **`.claude/settings.json`**: allow `git` read/commit, `unity command console*`, `recompile*`, `run_tests`, `list_tests`, `editor_play`, `editor_stop`, `capture_game_view`, `unity status`; **deny** `unity command eval*`, `eval_file*`, `run_script*` (they run arbitrary C# in the Editor; ask each time instead).
+- [x] **`01_Core/projectmemory.md`** in Bitbloom's format: a header explaining the file; **Snapshot** (≤ 40 lines: what the game is, what's built, the design of record and where it lives, open for Milan, next action); **Recent entries**; **Decision log** table (date · decision · where); **Code facts**; **Learnings**. Everything older moves verbatim to `99_Archive/projectmemory_history.md`. Target ≤ 30 KB.
+- [x] **`02_Design/Feedback_Log.md`**: start with Milan's cross-project rules from Bitbloom's Feedback_Log "Distilled rules" that are about him rather than about Bitbloom (red/green never alone, short playtest sheets in play order, terms explain themselves with a hover, one concept in one or two places, etc.), plus the Abracodabra feedback already in projectmemory and the Ledger (manual avatar piloting felt finicky and hectic → out of the design space; WeGo felt cortisol-heavy). Each rule keeps its source and date.
+- [x] **`90_SideIdeas/README.md`**.
+- [x] **CLAUDE.md** rewritten per §1.1.
+- [x] **`.claude/settings.json`**: allow `git` read/commit, `unity command console*`, `recompile*`, `run_tests`, `list_tests`, `editor_play`, `editor_stop`, `capture_game_view`, `unity status`; **deny** `unity command eval*`, `eval_file*`, `run_script*` (they run arbitrary C# in the Editor; ask each time instead).
 
 ### 4.4 Versioning rules (write these into CLAUDE.md §4)
 
@@ -274,7 +274,7 @@ Did not fit the layout (decisions in §7.4 Q8–Q10): the seven undated files in
 
 ### 7.4 Needs Milan
 
-**Answered 2026-10-05: "recs" (every recommendation accepted, Q1–Q17).** Done since: Q2, local branch `charming-elgamal` deleted with `git branch -d`. Still Milan's: Q1 (push `main` and the tag), Q11, Q12 (and Q16, a Bitbloom-side commit). Everything else is executed by Phase B + C (§7.5).
+**Answered 2026-10-05: "recs" (every recommendation accepted, Q1–Q17).** Done since: Q2, local branch `charming-elgamal` deleted with `git branch -d`. **Phase B + C executed 2026-10-05 (§7.6); new items N1–N7 in §7.4a.** Still Milan's: Q11, Q12, Q16 (a Bitbloom-side commit), N1, and the Unity Hub check (Console has no red errors).
 
 1. **Push (blocked).** The permission classifier refused `git push origin main` and the `pre-modernization` tag push. **Rec:** run them yourself in the terminal: `! git push origin main` then `! git push origin pre-modernization` (the tag stays on baseline commit `3a0abe0`, before this §7 commit). Check github.com → Tags afterwards.
 2. **`charming-elgamal`** is fully merged into main (§7.1). **Rec:** delete the local label (`git branch -d charming-elgamal`; safe, it refuses if anything were unmerged). No merge or cherry-pick is needed.
