@@ -329,6 +329,42 @@ Before step 1: Milan answers §7.4, pushes (Q1), closes the Unity Editor, runs `
 
 After C13, Milan's check (the Editor opens for the first time): Unity Hub → open the project (still 6000.0.39f1) → let it resolve the package removal → Console has no red → Play SampleScene 10 s → close. Then Claude commits whatever Unity changed (expect `Packages/packages-lock.json`, possibly new `.meta` files; review the diff first, no scene or prefab changes expected): `chore: packages-lock after package removal`. Test question after `/clear`: "What is this project, what's built, what's next?" must match the Snapshot.
 
+### 7.6 Execution results, Phase B + C (session 2, 2026-10-05, Sonnet · high)
+
+Every step is its own commit on `main` (22 commits from the baseline `3a0abe0` to the `kb-2026-10` tag; `git log --oneline pre-modernization..kb-2026-10`).
+
+| Step | Commit | Result |
+| --- | --- | --- |
+| B1 | `bce2e5a` | `.gitignore` (CRLF kept) gained IDE, `*.slnx`, ProfilerCaptures, Burst, `UIElementsSchema/`, `Unity_EXTRACTED_*.txt`, `.claude/settings.local.json`; `.gitattributes` = Bitbloom's |
+| B2 | `03310a4` | 36 files untracked or deleted: `.idea` 4, `.vscode` 3, `UIElementsSchema` **27** (the pack said 28), 2 root extracts (−32 831 lines). The first three stay on disk, ignored |
+| B3 / B4 | `7c756aa`, `d7d391f` | extractor trio + `.clinerules` file + 3 Bitbloom bootstrap drafts moved with `git mv`; the two empty folders removed |
+| B5 | `262026f` | Re-ran the GUID scan before moving: **identical to §7.2** (492 files, 0 references from outside the set, 9 kept files and their `.meta` intact). 997 entries moved (492 files + 492 `.meta` + 13 folder `.meta`) to `_Vault\Abracodebra_TMP_fonts\Assets\TextMesh Pro\`, sub-paths preserved. **1 088.8 MiB (= 1 141.5 MB) removed; `Assets/TextMesh Pro` 59 MB; `Assets/` 123 MB in total; tracked files 4 415 → 3 385; `.git` stays 145 MB** |
+| B6 | `829e2ac` | three packages removed from `manifest.json` (valid JSON, 40 dependencies left); `packages-lock.json` untouched, Unity rewrites it on first open |
+| C1 | `2db6703` | A-Category → `Done/` with the Part-4 closing note; Last-Day Plan → archive; 3 cross-references patched |
+| C2 | `4c39a55` | 10 `git mv` renames (map, deep dive + "v6, 2025" line, 7 Concepts files dated from their own header, Foundation Review); references fixed in 12 files outside the archive and the files rewritten later |
+| C3 | `bc8af59` | 6 WeGo files → `99_Archive/2025-06_WeGo_Rework/`; `WeGo/README.md` written (see §7.4 N2) |
+| C4 | `b13ee08` | `Roadmap.md` (8 candidates, the backlog's 13 items with a status each); old backlog archived; `Roadmaps/` removed |
+| C5 | `1fc8b2e` | `99_Archive/projectmemory_history.md` = old file byte-for-byte after a 4-line header (byte-compared) |
+| C6 | `28d4d92` | projectmemory rewritten: **25 971 B → 15 408 B**; Snapshot 16 lines; code claims re-checked by grep (see below) |
+| C7 / C8 | `0735c72`, `ca47792` | `Feedback_Log.md` (18 rules, 4 open shortcomings), `90_SideIdeas/README.md` |
+| C9 | `59bbcbe` | CLAUDE.md rewritten: **11 029 B → 12 430 B** (target ≤ ~12 KB: 0.4 KB over; the Unity CLI gotchas and D1–D10 account for it) |
+| C10 | `chore: .claude/settings.json permissions` | 26 allow rules (git read/add/mv/commit for Bash and PowerShell; `unity.exe status`, `command console`, `recompile*`, `run_tests`, `list_tests`, `editor_play`, `editor_stop`, `capture_game_view`) and 6 deny rules (`eval*`, `eval_file*`, `run_script*` for PowerShell and Bash). Syntax checked with the docs via a subagent (`Tool(pattern *)`, deny > ask > allow). **Tests:** `unity.exe command eval "1+1"` was **denied** (rule works); `unity.exe status` ran without a prompt, but this session's mode may allow it anyway, so the allow side is not independently proven. `git push` and `git tag` are deliberately not allowed |
+| C11 | `c74044f` | `00_START_HERE`, `project_instructions`, `Chat_History_Digest` → `99_Archive/2026-07_Cowork_Era/`; `06_Index/` removed (the extracts are generated) |
+| C12 | `8c6deba`, `8f544bc` | stale tooling lines patched in the Pack Guides (G0 rules 2, 9, closing duty 4, a dated note), the Ledger (extractor line, D1 "sequential, not a toggle" revision), and the Codebase Map (index, backlog path, next-action anchor) |
+| C13 | (this commit) | dead-reference grep over `ClaudeProjectFiles/` and `CLAUDE.md`: the remaining hits are history (this pack, the archive, point-in-time docs, projectmemory's own migration notes) |
+
+**Code claims checked on disk before they went into projectmemory** (all confirmed 2026-10-05): 200 `.cs` under `Assets/Scripts` (236 in `Assets/`); `ExecutionPhaseDriver`, `TickManager.RequestActionTicks` / `ActionsDriveTicks`, `RunManager.RunSeed` / `randomizeSeedOnStart` / `playerDeathEnabled` / `GameOver`, `PlantGrowth.OnPlantDied`, `WaveManager.IsWaveTimerComplete`, `InventoryService.OnInventoryReady`, `InitializationManager`, `GeneServices` default seed 0; `RuntimeSequenceSlot` live in 4 files; **no** `PlayerInventory`, `SequenceParser`, `DorisMoodSystem`, `ComboDiscoverySystem`, `GeneDraftSystem`, `DorisDigestionSystem`, `RoundStatsTracker`, `AnyPlantDied`; no `RunState` check in `PlantGrowth` / `PlantSequenceExecutor` (Planning-tick invariant not enforced); build has only `SampleScene`; 36 `Random.*` and 36 legacy `Input.*` call sites; Input System 1.13 installed, `activeInputHandler` = 2 (both).
+
+### 7.4a New items from session 2 (added to §7.4; the rest of the plan continued)
+
+- **N1. "WeGo felt cortisol-heavy" has no source on disk.** `grep -ri cortisol` finds it only in this pack. `Feedback_Log.md` rule 2 records it as "reported by Milan 2026-10-05" with the nearest written trace (Phase Identity §4: B-rev is the "calmer, more ADHD-friendly" game). **Milan: send the original wording and date if you remember them, or confirm the rule as written.**
+- **N2. WeGo reworks are not a design doc.** Rework 5 is a June-2025 code-foundation list (animal realtime cleanup, grid radius, SO migration, file splits…), and "5 - Copy" is a truncated draft of it (no Priorities 4, 5, 7). The 2026-07 Phase Identity doc does **not** supersede them (it settles Commit & Watch vs Tick Ledger). The README says so and marks the unchecked items "verify". Checked: `GetTilesInRadius` exists, no `HandleRealtimeUpdate` is left.
+- **N3. Pack figures corrected:** `UIElementsSchema/` held 27 tracked files, not 28; font bytes removed are 1 141.5 MB decimal (1 088.8 MiB), the same set as §7.2.
+- **N4. CLAUDE.md is 12 430 B**, slightly over the ~12 KB target. Cut D1–D10 further or move the CLI gotchas to a doc once Phase D lands them; your call.
+- **N5. Push.** `main` was pushed by Milan before this session (it showed no unpushed commits at the start); tags were not on GitHub. Pushes of this session's commits and tags: see the report at the end of the run.
+- **N6. Unity Editor state.** The only Unity process running during this session was **Bitbloom's** Editor (6000.3.24f1); Abracodabra's Editor was closed, so the font move and the manifest edit were safe.
+- **N7. Assumed, not verified:** the A-Category closing note repeats the pack's §7.3 claim that Milan confirmed auto-tick, Space, Tab and the run seed in play (from the old projectmemory, 2026-07-06). I did not re-run any play check (the Editor is closed).
+
 ---
 
 ## 8. Things to consider

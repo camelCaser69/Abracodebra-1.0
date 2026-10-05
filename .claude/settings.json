@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git branch *)",
+      "Bash(git ls-files *)",
+      "Bash(git add *)",
+      "Bash(git mv *)",
+      "Bash(git commit *)",
+      "PowerShell(git status *)",
+      "PowerShell(git diff *)",
+      "PowerShell(git log *)",
+      "PowerShell(git show *)",
+      "PowerShell(git branch *)",
+      "PowerShell(git ls-files *)",
+      "PowerShell(git add *)",
+      "PowerShell(git mv *)",
+      "PowerShell(git commit *)",
+      "PowerShell(unity.exe status*)",
+      "PowerShell(unity.exe command console*)",
+      "PowerShell(unity.exe command recompile*)",
+      "PowerShell(unity.exe command run_tests*)",
+      "PowerShell(unity.exe command list_tests*)",
+      "PowerShell(unity.exe command editor_play*)",
+      "PowerShell(unity.exe command editor_stop*)",
+      "PowerShell(unity.exe command capture_game_view*)"
+    ],
+    "deny": [
+      "PowerShell(unity.exe command eval*)",
+      "PowerShell(unity.exe command eval_file*)",
+      "PowerShell(unity.exe command run_script*)",
+      "Bash(*unity.exe command eval*)",
+      "Bash(*unity.exe command eval_file*)",
+      "Bash(*unity.exe command run_script*)"
+    ]
+  }
+}
