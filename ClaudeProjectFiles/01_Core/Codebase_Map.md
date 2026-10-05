@@ -20,7 +20,7 @@ The Foundation Review (`04_Reviews/2026-06_Foundation_Review.md`) and A-Category
 | `DorisMoodSystem` / `ComboDiscoverySystem` / `GeneDraftSystem` | **Still design-only.** Doris = `DorisController` + `DorisHungerSystem` + `DorisDefinition`. Gene acquisition = `GeneRewardSystem` (post-round drops). |
 | `PlantGrowth.cs` | Now **885 lines** (825 + A2/A6 additions; still the refactor-watch leader with GameUIManager 875). |
 
-Newest scripts on disk: 2026-07-05 (A-pack application; 200 .cs files total). Extract indexes in `06_Index/` were regenerated post-application and re-synced **2026-07-06** (extractor run in Cowork sandbox; `.bat` also patched to auto-sync `06_Index/` on every run). Unity compile still not verified (applied outside the Editor). Map spot-verified against live disk 2026-07-06: all A1–A6 symbols present (`ExecutionPhaseDriver.cs`, `RequestActionTicks`/`ActionsDriveTicks`, `OnPlantDied`, `RunSeed`/`randomizeSeedOnStart`, `IsWaveTimerComplete` + Obsolete shim, `OnInventoryReady`, `RactiveBurstHandler.cs` typo).
+Newest scripts on disk: 2026-07-05 (A-pack application; 200 .cs files total). (2026-10: the extractor and `06_Index/` are retired; grep the live files.) Editor wiring landed 2026-07-06. Map spot-verified against live disk 2026-07-06: all A1–A6 symbols present (`ExecutionPhaseDriver.cs`, `RequestActionTicks`/`ActionsDriveTicks`, `OnPlantDied`, `RunSeed`/`randomizeSeedOnStart`, `IsWaveTimerComplete` + Obsolete shim, `OnInventoryReady`, `RactiveBurstHandler.cs` typo).
 
 ---
 
@@ -172,10 +172,10 @@ Fruits: `BasicFruitGene` spawns `Fruit` components at spawn points; payloads con
 
 - `Assets/Scriptable Objects/` — 51 `.asset` files (recounted 2026-07-06): Animals, Animals Diet, Doris, Fireflies, Food, **Genes** (Active/Modifier/Passive/Payload + `GeneLibrary.asset`), Items, Life Thoughts, Map Generation, Minigames, MultiTiles, Scents, Settings, Status Effects, Tiles, Tools, Waves. `Assets/Prefabs/` — 41 (Ecosystem/General/Tiles). Scenes: `SampleScene.unity` (**primary — the sole scene in Build Settings**; ExecutionPhaseDriver wired here 2026-07-06), `MainScene.unity` (secondary, not in build). No custom Resources/ loading — all direct references (good).
 - Third-party: skner DualGrid, local package at `Packages/com.skner.dualgrid` (tilemap rendering; guides in `05_Reference/`).
-- Historical docs relocated 2026-07-05: GGS-era Documentation 00–06, `PROJECT_KNOWLEDGE_BASE.md`, `Memory.txt` → `99_Archive/`; WeGo rework docs 1–5 (+ divergent "5 - Copy") → `02_Design/WeGo/`; old `Todo.md` → `03_Tasks/Roadmaps/Code_Optimization_Backlog.md`; DualGrid guides (incl. old 07 package guide) → `05_Reference/`. Current canon: root `CLAUDE.md`, `01_Core/` (memory · instructions · this map), `02_Design/Gene_Systems_Deep_Dive.md`; routing rules in `00_START_HERE.md`.
+- Historical docs relocated 2026-07-05: GGS-era Documentation 00–06, `PROJECT_KNOWLEDGE_BASE.md`, `Memory.txt` → `99_Archive/`; WeGo rework docs 1–5 (+ divergent "5 - Copy") → `02_Design/WeGo/`; old `Todo.md` → the code-optimization backlog (merged into `03_Tasks/Roadmap.md` in 2026-10); DualGrid guides (incl. old 07 package guide) → `05_Reference/`. Current canon: root `CLAUDE.md`, `01_Core/` (memory · this map), `02_Design/Gene_Systems_Deep_Dive.md`; routing rules in `CLAUDE.md` §4.
 
 ---
 
 ## Next action anchor
 
-A-pack code is applied. Remaining, in the Unity Editor: (1) add an **ExecutionPhaseDriver** GameObject to the gameplay scene (pack Part 3 Step 2 — self-subscribes, nothing else to wire); (2) check RunManager's Determinism fields (Randomize Seed On Start ON for play, OFF+fixed seed for repro); (3) pick ONE starting-loadout source — keep `StartingInventory` and remove the `StartingLoadoutApplier` component, or the reverse (both = doubled items); (4) run the Part 4 test checklist. When green: move the pack to `03_Tasks/Done/` and re-run `unity_extractor_RUN.bat` (refreshes `06_Index/`).
+A-pack code is applied and wired (2026-07-06). The Part 4 play checks that were never run are listed in `03_Tasks/Roadmap.md` (#6). Next code block: `03_Tasks/Roadmap.md` §1 (asmdef split + golden-run harness, then the A proof of concept). Map last verified against live disk 2026-07-06; spot-check symbols before relying on them.
