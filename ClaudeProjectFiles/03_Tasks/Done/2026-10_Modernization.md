@@ -1,5 +1,7 @@
 # 2026-10 Modernization — Abracodabra
 
+> **Closed 2026-10-05; moved to `03_Tasks/Done/`.** Phases A–E ran; results in §7 (7.7 for Phases D and E). Paths below that say `03_Tasks/Active/` were true while the pack was open. Open follow-up: `03_Tasks/Roadmap.md` #9.
+
 **What this is:** the task pack that brings this project up to the Bitbloom workflow (Claude Code in the terminal, the Unity CLI bridge, a lean CLAUDE.md, a versioned knowledge base). It is written for Claude Code running in this repo and for Milan.
 
 **Where it lives:** `ClaudeProjectFiles/03_Tasks/Active/2026-10_Modernization.md`. Move it to `03_Tasks/Done/` when Phase E is verified.
@@ -193,12 +195,12 @@ Known 6.3 changes that touch this project:
 
 Steps:
 
-1. [ ] Milan: GitHub Desktop → Branch → New branch `upgrade/unity-6.3`. Claude: tag `pre-unity-6.3` on main.
-2. [ ] Milan: close the Editor. Unity Hub → Projects → the version cell of Abracodebra 1.0 → 6000.3.24f1 → Change version. Accept the API Updater if asked. Wait for the reimport (Phase B's font move makes this much faster).
-3. [ ] Claude: `unity command recompile` → `recompile_status` → `console --level error`; fix in batches; commit per fix group with the error it fixed.
-4. [ ] Claude: update package versions in `manifest.json` to match Bitbloom's where they overlap; recompile; console clean.
-5. [ ] Claude: the same `capture_game_view` as the Phase D baseline; put both PNGs side by side in `04_Reviews/2026-10_Unity63_Upgrade.md` with the error list and what changed.
-6. [ ] Milan's smoke test (≈5 min, in play order, SampleScene): planning phase shows → edit a seed's genes (drag-drop works, text renders) → Start Day → plants grow, genes fire → a wave arrives, pests eat leaves → Doris eats → Space pauses, Tab speeds → dual-grid tiles and post-processing look like the baseline.
+1. [x] Milan: GitHub Desktop → Branch → New branch `upgrade/unity-6.3`. Claude: tag `pre-unity-6.3` on main.
+2. [x] Milan: close the Editor. Unity Hub → Projects → the version cell of Abracodebra 1.0 → 6000.3.24f1 → Change version. Accept the API Updater if asked. Wait for the reimport (Phase B's font move makes this much faster).
+3. [x] Claude: `unity command recompile` → `recompile_status` → `console --level error`; fix in batches; commit per fix group with the error it fixed.
+4. [x] Claude: update package versions in `manifest.json` to match Bitbloom's where they overlap; recompile; console clean.
+5. [x] Claude: the same `capture_game_view` as the Phase D baseline; put both PNGs side by side in `04_Reviews/2026-10_Unity63_Upgrade.md` with the error list and what changed.
+6. [x] Milan's smoke test (≈5 min, in play order, SampleScene): planning phase shows → edit a seed's genes (drag-drop works, text renders) → Start Day → plants grow, genes fire → a wave arrives, pests eat leaves → Doris eats → Space pauses, Tab speeds → dual-grid tiles and post-processing look like the baseline.
 7. [ ] Green → merge `upgrade/unity-6.3` into main (GitHub Desktop), push, update projectmemory (Unity version, Decision log row).
 
 **Done when:** 0 console errors on 6000.3.24f1, the smoke test passes, main is on 6.3. **How to check:** `ProjectSettings/ProjectVersion.txt` says `6000.3.24f1`; the smoke test sheet is all yes.
@@ -369,6 +371,22 @@ Every step is its own commit on `main` (22 commits from the baseline `3a0abe0` t
 
 ---
 
+### 7.7 Phases D and E (session 3, 2026-10-05, Sonnet · high)
+
+Full record: `04_Reviews/2026-10_Baseline_6.0/` and `04_Reviews/2026-10_Unity63_Upgrade.md`.
+
+| Step | Result |
+| --- | --- |
+| D | `com.unity.pipeline` 0.8.0-exp.1 (Bitbloom 0.7.0-exp.1); 6.0 baseline (0 errors, 1 warning, camera + screen PNGs); the CLI gotchas are in CLAUDE.md §7 (now 12 750 B). Not verified: `AMBIGUOUS_EDITOR`, the 300 s wedge |
+| E1–E2 | Tag `pre-unity-6.3` (annotated, on `0f3c6f2`); Milan created `upgrade/unity-6.3` and switched the Hub version |
+| E3 | Reimport: 5 errors, 13 warnings. Fix commits: `bbad22d` (generic `[RuntimeInitializeOnLoad]`), `19029ee` (two custom 2D shaders vs URP 17.3), `0e21b68` (12 USS declarations). Unity's own migrations: `b853034`, `e2e83e4`, `6dcfab6` |
+| E4 | Nothing left to bump: Unity moved the overlapping packages to Bitbloom's versions itself; the lock matches Bitbloom's except `com.unity.pipeline` |
+| E5 | After captures in `04_Reviews/2026-10_Unity63_Upgrade/`; camera within 4/255, UI differs only in sub-pixel text anti-aliasing |
+| E6 | Smoke test: 7 of 9 yes. **Plant growth and Doris feeding unconfirmed** (no error; plant planted after START DAY, plant action fired twice, no fruit to feed). Milan accepted ("i think its fine"). Tracked as `Roadmap.md` #9 |
+| E7 | Merge into main and push: Milan's (GitHub Desktop). The CLI push from this session failed once on authentication before E1; see the closing report |
+
+---
+
 ## 8. Things to consider
 
 - **Decided 2026-10-05: Abracodabra stays a live game, developed alongside Bitbloom.** Bitbloom's lessons come in through a design pass (step 6 of the prompts file), not by porting code mid-block.
@@ -383,4 +401,4 @@ Every step is its own commit on `main` (22 commits from the baseline `3a0abe0` t
 
 ---
 
-**Next action:** Milan follows `2026-10_Modernization_Prompts.md` (the step-by-step restart guide) from step 1.
+**Next action:** none, the pack is closed. Follow-ups: `03_Tasks/Roadmap.md` #9 (plant growth and Doris feeding in play), and Milan merges `upgrade/unity-6.3` into main and pushes (GitHub Desktop).

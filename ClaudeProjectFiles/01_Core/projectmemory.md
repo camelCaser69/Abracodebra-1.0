@@ -11,9 +11,9 @@ Older history is in `99_Archive/projectmemory_history.md` (verbatim copy of the 
 
 **Trim rule** (CLAUDE.md §4): when a block closes, rewrite the Snapshot, move the previous block's entries and decision rows older than ~3 days of work to `99_Archive/projectmemory_history.md` (append, never delete). "Implemented" is written only after checking the code on disk.
 
-## Snapshot (2026-10-05, modernization pack in progress)
+## Snapshot (2026-10-05, modernization pack closed)
 
-- **Project:** Abracodabra — a cozy-dark, tick-based (WeGo) roguelite that mixes farming, tower defense and plant genetics. Solo, Milan (Prague). Unity **6000.0.39f1**, URP, UI Toolkit. Repo `camelCaser69/Abracodebra-1.0`, branch `main`. **It stays a live game, developed alongside Bitbloom** (Decision log 2026-10-05).
+- **Project:** Abracodabra — a cozy-dark, tick-based (WeGo) roguelite that mixes farming, tower defense and plant genetics. Solo, Milan (Prague). Unity **6000.3.24f1** (since 2026-10-05; same editor as Bitbloom), URP 17.3, UI Toolkit. Repo `camelCaser69/Abracodebra-1.0`, branch `main`. **It stays a live game, developed alongside Bitbloom** (Decision log 2026-10-05).
 - **Loop:** Planning (time frozen, player actions advance ticks: edit gene strands on seeds, plant) → Growth & Threat (the clock runs by itself, plants execute their genes, pest waves attack, Doris must be fed) → next round. The plant is the health bar (leaf loss, not HP).
 - **Built (disk-verified 2026-10-05):** 200 C# scripts under `Assets/Scripts` (236 under `Assets/`); tick core (`TickManager`, `ExecutionPhaseDriver` with Space = pause and Tab = speed, `RunManager`/`RunState`, per-run `RunSeed` into `IDeterministicRandom`); the gene system (`GeneBase` → Active/Modifier/Payload, `PlantSequenceExecutor`, slot-based sequences); plants (growth, energy, death pipeline with `OnPlantDied`); fauna waves, `AnimalController`, status effects, Doris (`DorisController`, `DorisHungerSystem`), feeding; a UI Toolkit stack (`GameUIManager` + seed editor, inventory grid, hotbar, drag-drop, spec sheet); `InventoryService` / `HotbarSelectionService`; a dual-grid tilemap (embedded package `Packages/com.skner.dualgrid`). Only `Assets/Scenes/SampleScene.unity` is in the build.
 - **Not built (design only):** the DNA-strand **buffer** model (`RuntimeSequenceSlot` is still live in 4 files; no `SequenceParser`, no `PlayerInventory`), run-loop screens (round summary, Game Over, Victory), `DorisMoodSystem`, `ComboDiscoverySystem`, `GeneDraftSystem`, `DorisDigestionSystem`, fixtures (Doris Bowl, Harvest Basket), ripeness windows, Mark & Go, a lose condition (only player starvation behind `RunManager.playerDeathEnabled` leads to `GameOver`), save/resume, audio. **The Planning-tick invariant is not enforced** (nothing in `PlantGrowth` / `PlantSequenceExecutor` checks `RunState`). Perfect ≡ Good is still the live minigame reward path.
@@ -23,16 +23,21 @@ Older history is in `99_Archive/projectmemory_history.md` (verbatim copy of the 
   - `02_Design/Concepts/Commit_And_Watch_Loop_Design_2026-07-06.md` (Rev 2): the detailed spec for A's systems (fixtures, timing asymmetry, four beats, budget);
   - taste: `02_Design/Feedback_Log.md`.
   - Concepts (not decided): gameplay engagement, UI systems, minigames, gene catalog + annex (all in `02_Design/Concepts/`, dated).
-- **Tasks:** `03_Tasks/Roadmap.md` (the candidates, in order); `03_Tasks/Active/`: this pack (2026-10_Modernization.md + its prompts guide), the Ledger, `2026-07_Pack_Implementation_Guides.md` (F1–F4 guides, all unapplied), `2026-07_Testing_Sandbox.md` (undecided).
+- **Tasks:** `03_Tasks/Roadmap.md` (the candidates, in order); `03_Tasks/Active/`: the Ledger, `2026-07_Pack_Implementation_Guides.md` (F1–F4 guides, all unapplied), `2026-07_Testing_Sandbox.md` (undecided).
 - **Tooling state:** Claude Code in the terminal is the code lane; the Unity CLI hookup is done (2026-10-05, `com.unity.pipeline` 0.8.0-exp.1; 6.0 baseline in `04_Reviews/2026-10_Baseline_6.0/`). The extractor, `06_Index` and the Cline rules are retired (archived/deleted). No asmdefs of our own and no tests.
 - **Lanes:** design in Cowork or chat (markdown into `ClaudeProjectFiles/`), code in Claude Code. Usage policy: CLAUDE.md §8.
 - **Other projects:** Bitbloom (sibling, `D:\Unity Projects\AbraCodebra\Bitbloom\Bitbloom 0.1a\Bitbloom`, same workflow; never edit it from here); Fistful of Mercs (a tabletop prototype in a separate folder with its own KB; state as of 2026-07-11 in the archived digest).
-- **Open for Milan:** (1) open the project in Unity Hub (still 6000.0.39f1), let it resolve the package removal, confirm the Console has no red errors; (2) Phase D: `unity pipeline install`; (3) decide the Testing Sandbox (keep or drop); (4) the sibling backup folder `Abracodebra 1.0 - Backup 08.07.2026`: zip to cold storage, delete; (5) turn off the old Cowork "KB doctor" task and stop using the old claude.ai Project; (6) fix Bitbloom's CLAUDE.md §8 ("Pro plan") in a Bitbloom session.
-- **Next action:** the Unity Hub check above, then Phase D (CLI baseline), then Phase E (Unity 6.3 on branch `upgrade/unity-6.3`). After that, Block 1 from `03_Tasks/Roadmap.md` (asmdef split + golden-run harness, then the A proof of concept).
+- **Open for Milan:** (1) merge `upgrade/unity-6.3` into `main` in GitHub Desktop and push (main and the tags were not on GitHub when last checked; the CLI push failed with an authentication error); (2) the 6.3 smoke test left **plant growth and Doris feeding unconfirmed** (Roadmap #9: replay it with planting done in Planning); (3) decide the Testing Sandbox (keep or drop); (4) the sibling backup folder `Abracodebra 1.0 - Backup 08.07.2026`: zip to cold storage, delete; (5) turn off the old Cowork "KB doctor" task and stop using the old claude.ai Project; (6) fix Bitbloom's CLAUDE.md §8 ("Pro plan") in a Bitbloom session.
+- **Next action:** the merge and push above, then Roadmap #9 (verify plant growth and Doris feeding in play, 5 min). After that, Block 1 from `03_Tasks/Roadmap.md` (asmdef split + golden-run harness, then the A proof of concept).
 
 ## Recent entries
 
-**2026-10-05 — modernization pack, Phases A–C** (`03_Tasks/Active/2026-10_Modernization.md`, results in its §7)
+**2026-10-05 — modernization pack, Phases D–E: Unity CLI and the 6.3 upgrade** (results: `04_Reviews/2026-10_Baseline_6.0/`, `04_Reviews/2026-10_Unity63_Upgrade.md`)
+- Phase D: `com.unity.pipeline` 0.8.0-exp.1 installed; 6.0 baseline recorded (0 errors, 1 known warning, camera + screen captures); CLI gotchas in CLAUDE.md §7.
+- Phase E: tag `pre-unity-6.3` on main, branch `upgrade/unity-6.3`, project on 6000.3.24f1. The reimport gave 5 errors and 13 warnings, all fixed in one commit per group: `[RuntimeInitializeOnLoad]` in the generic `SingletonMonoBehaviour<T>` (flag moved to `SingletonQuitState`), the two custom 2D sprite shaders vs URP 17.3 (duplicate `LightingUtility.hlsl` include and `SHAPE_LIGHT(n)`, unguarded debug macro), 12 unsupported USS declarations. Unity itself bumped the packages to Bitbloom's versions (URP 17.3.0, Input System 1.20.0, Test Framework 1.6.0). After: 0 errors, same 1 warning; world capture within 4/255 of the baseline.
+- Smoke test: Planning UI, gene editing, Space/Tab, waves/pests, water and tiles fine. **Plant growth and Doris feeding were not confirmed** (Roadmap #9); no console error, not shown to be a regression. Side finding: the plant action fires twice. The 6.3 "Input Manager is deprecated" warning stays until the 36 legacy `Input.*` sites move to the Input System.
+
+**2026-10-05 — modernization pack, Phases A–C** (`03_Tasks/Done/2026-10_Modernization.md`, results in its §7)
 - Phase A: baseline commit `3a0abe0`, tag `pre-modernization`; `charming-elgamal` was already merged into main and its local label deleted.
 - Phase B: `.gitignore` / `.gitattributes` aligned with Bitbloom; IDE config, `UIElementsSchema/` and the root code extracts untracked/deleted; extractor and Cline rules archived; 492 unused TMP font files (1.14 GB) moved to `D:\Unity Projects\AbraCodebra\_Vault\Abracodebra_TMP_fonts\` (`Assets/TextMesh Pro` 1.2 GB → 59 MB); `visualscripting`, `multiplayer.center`, `collab-proxy` removed from `manifest.json`.
 - Phase C: KB consolidated (fixed names for living docs, dated names for point-in-time docs, WeGo reworks archived, `Roadmap.md`, this file rewritten, `Feedback_Log.md`, new CLAUDE.md, `.claude/settings.json`).
@@ -49,7 +54,8 @@ Older history is in `99_Archive/projectmemory_history.md` (verbatim copy of the 
 
 | Date | Decision | Where |
 | --- | --- | --- |
-| 2026-10-05 | Abracodabra stays a live project, developed alongside Bitbloom; modernized to the Bitbloom workflow (this pack). | `03_Tasks/Active/2026-10_Modernization.md` |
+| 2026-10-05 | Abracodabra stays a live project, developed alongside Bitbloom; modernized to the Bitbloom workflow (this pack). | `03_Tasks/Done/2026-10_Modernization.md` |
+| 2026-10-05 | **Unity upgraded to 6000.3.24f1** (merged from `upgrade/unity-6.3`; tag `pre-unity-6.3` = the 6.0 state). Accepted by Milan with plant growth and Doris feeding still to verify (Roadmap #9). `com.unity.pipeline` stays at 0.8.0-exp.1 (Bitbloom 0.7.0). | `04_Reviews/2026-10_Unity63_Upgrade.md` |
 | 2026-10-05 | Tooling: Claude Code in the terminal + Unity CLI (`com.unity.pipeline`) replace the extractor, `06_Index` and any MCP bridge. Upgrade to Unity 6000.3.24f1 after the CLI hookup (Phase E). | Pack §5, §6 |
 | 2026-10-05 | KB layout = Bitbloom's; git is the version history (no `_vN` names; dated point-in-time docs; superseded → `99_Archive/<YYYY-MM_Era>/`; milestone tags). Pack answers Q1–Q17 all accepted ("recs"). | CLAUDE.md §4; pack §7.4 |
 | 2026-10-05 | `SEGUIEMJ.TTF` stays for now; swap to Noto (OFL) before any public build. `TileMappingsBackup/` stays. 492 unused font files left the project. | Roadmap #7; pack §7.2 |
@@ -82,7 +88,7 @@ All checked on disk 2026-10-05. Architecture map: `01_Core/Codebase_Map.md` (Jul
 - **Scenes:** the build has only `SampleScene` (`MainScene` exists but is not in the build). `ExecutionPhaseDriver` is wired into `SampleScene`.
 - **Known gaps (verified):** 36 `Random.*` call sites remain (the A6 follow-up: fauna and cosmetic systems; check which are gameplay before touching); 36 legacy `Input.*` sites (the Input System 1.13 package is installed, `activeInputHandler` = both); `PlantGrowth.cs` is 884 lines and `GameUIManager.cs` 875 (patch these surgically).
 - **Assets:** `Assets/TextMesh Pro` is 59 MB after the font move; fonts in use: Handjet Regular and Medium (game text), Liberation Sans, Noto Color Emoji (TMP emoji fallback), SEGUIEMJ (status-effect icons; not redistributable).
-- **Git:** `.git` ≈ 145 MB (the moved fonts remain in history). Tags: `pre-modernization`, `kb-2026-10`.
+- **Git:** `.git` ≈ 145 MB (the moved fonts remain in history). Tags: `pre-modernization`, `kb-2026-10`, `pre-unity-6.3`.
 
 ## Learnings
 

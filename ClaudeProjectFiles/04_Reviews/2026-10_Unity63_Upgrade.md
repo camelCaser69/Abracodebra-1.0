@@ -52,16 +52,20 @@
 
 ## Smoke test (Milan, ≈ 5 min, SampleScene, play order)
 
-- [ ] Open `SampleScene`, press Play. The Planning UI shows (Gene Editor, Inventory, **START DAY**) and the Console has no red.
-- [ ] Select the seed, edit its genes: drag-and-drop works, all text renders (Handjet, emoji icons).
-- [ ] Plant a seed on a tile, press **START DAY**.
-- [ ] Plants grow and their genes fire.
-- [ ] A wave arrives and pests eat leaves.
-- [ ] Doris eats.
-- [ ] **Space** pauses, **Tab** changes speed.
-- [ ] Water and sprites look like the baseline (the two custom overlay/reflection shaders were edited: check the water reflections and any overlay sprite); dual-grid edges and post-processing look like the baseline.
-- [ ] Console has no red errors at the end of the run.
+Run by Milan 2026-10-05 on 6000.3.24f1.
+
+- [x] Open `SampleScene`, press Play. The Planning UI shows (Gene Editor, Inventory, **START DAY**) and the Console has no red.
+- [x] Select the seed, edit its genes: drag-and-drop works, all text renders (Handjet, emoji icons).
+- [x] Plant a seed on a tile, press **START DAY** (done in the reverse order: START DAY first, then planted).
+- [ ] Plants grow and their genes fire. **Not confirmed:** Milan saw no growth. The log shows the plant reached `Growing` (seq 175) and nothing else; no console error.
+- [x] A wave arrives and pests eat leaves.
+- [ ] Doris eats. **Not confirmed:** the Doris popup opened, but there was no food to give (fruit needs a grown plant; the popup is click-to-select and lists only consumables).
+- [x] **Space** pauses, **Tab** changes speed.
+- [x] Water and sprites look like the baseline (the two custom overlay/reflection shaders were edited); dual-grid edges and post-processing look like the baseline.
+- [x] Console has no red errors at the end of the run (0 errors; 13 warnings in the session were the known `GeneLibraryLoader` one, "already occupied" from the double plant action, UI Toolkit cursor texture notices, and two `Import Error Code:(4)` that came from moving my capture PNGs out of `Assets/` during import).
+
+**Verdict:** Milan accepted the upgrade ("i think its fine") with the two open items above. They are not shown to be 6.3 regressions (no error, the failing steps depend on each other) and are tracked as `Roadmap.md` item 9. Side finding: the plant action fires twice (`PlayerActionManager` "Executing PlantSeed" at the same tile twice; the second logs "already occupied").
 
 ## Next action
 
-Milan runs the smoke test; on all yes: merge `upgrade/unity-6.3` into main (GitHub Desktop), push.
+Merge `upgrade/unity-6.3` into main (GitHub Desktop), push. Then Roadmap item 9 (plant growth and Doris feeding in play).

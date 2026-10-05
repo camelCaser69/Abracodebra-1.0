@@ -1,5 +1,7 @@
 # Abracodabra restart — step by step (with prompts)
 
+> **Closed 2026-10-05 with the pack (`2026-10_Modernization.md`, same folder).** Both moved to `03_Tasks/Done/`; the paths in the prompts below name the pack where it lived while open.
+
 **Goal:** get Abracodabra back to "I open it and know what to build next" in about a week, then return to building the game. It runs alongside Bitbloom; it doesn't replace it.
 **Hard cap:** modernization (steps 1–5) takes **one week at most**. If it spills into a second week, it has become a way to avoid the game: stop, and jump to step 6.
 **The pack all prompts point to:** `ClaudeProjectFiles/03_Tasks/Active/2026-10_Modernization.md`.
