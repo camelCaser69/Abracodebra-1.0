@@ -70,3 +70,22 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# IDE config and OS files (local only)
+.vscode/
+.idea/
+.DS_Store
+*.slnx
+
+# Profiler captures
+/[Pp]rofilerCaptures/
+
+# Burst debug output
+/Assets/*_BurstDebugInformation_DoNotShip*
+
+# Generated: UI Toolkit schema (regenerates) and the retired code extracts
+UIElementsSchema/
+Unity_EXTRACTED_*.txt
+
+# Claude Code local settings (personal)
+.claude/settings.local.json
