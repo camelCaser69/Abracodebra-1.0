@@ -160,16 +160,18 @@ ClaudeProjectFiles/
 
 Milan's steps (PowerShell, in the project folder, Editor open):
 
-1. [ ] `& "$env:LOCALAPPDATA\Unity\bin\unity.exe" status` — the CLI is already installed for Bitbloom.
-2. [ ] `& "$env:LOCALAPPDATA\Unity\bin\unity.exe" pipeline install` (or Package Manager → + → Add package by name → `com.unity.pipeline`, same version as Bitbloom: `0.7.0-exp.1`). Wait for the recompile.
-3. [ ] `unity status` reports this project; `unity command console --level error` returns.
+1. [x] `& "$env:LOCALAPPDATA\Unity\bin\unity.exe" status` — the CLI is already installed for Bitbloom.
+2. [x] `& "$env:LOCALAPPDATA\Unity\bin\unity.exe" pipeline install` (or Package Manager → + → Add package by name → `com.unity.pipeline`, same version as Bitbloom: `0.7.0-exp.1`). Wait for the recompile. (Installed 0.8.0-exp.1, the registry's current version; Bitbloom has 0.7.0-exp.1.)
+3. [x] `unity status` reports this project; `unity command console --level error` returns.
 4. [ ] Optional: `unity skill install claude --local` (adds Unity's own CLI skill under `.claude/skills/`; commit it).
 
 Claude's steps:
 
-- [ ] Record the **baseline**: the console errors and warnings (count + first 15), and a `capture_game_view` of SampleScene after 10 s of play, saved under `ClaudeProjectFiles/04_Reviews/2026-10_Baseline_6.0/` (move the PNG out of `Assets/` after capture). This is the "before" for Phase E.
-- [ ] Write the CLI gotchas into CLAUDE.md §7 (all learned in Bitbloom): not on PATH, use `"$env:LOCALAPPDATA\Unity\bin\unity.exe"` from PowerShell; editor commands are `unity command <name>`; a job past the 300 s default timeout wedges the pipeline until the Editor restarts, so long test runs use `--detach` and their own `--timeout`; `capture_game_view` must save inside the project (lands under `Assets/`, delete after) and captures the camera only, not IMGUI; **with two Editors open (Bitbloom + Abracodabra) the CLI targets the Editor whose project contains the current directory; pass `--project-path` when it reports `AMBIGUOUS_EDITOR`.**
+- [x] Record the **baseline**: the console errors and warnings (count + first 15), and a `capture_game_view` of SampleScene after 10 s of play, saved under `ClaudeProjectFiles/04_Reviews/2026-10_Baseline_6.0/` (move the PNG out of `Assets/` after capture). This is the "before" for Phase E.
+- [x] Write the CLI gotchas into CLAUDE.md §7 (all learned in Bitbloom): not on PATH, use `"$env:LOCALAPPDATA\Unity\bin\unity.exe"` from PowerShell; editor commands are `unity command <name>`; a job past the 300 s default timeout wedges the pipeline until the Editor restarts, so long test runs use `--detach` and their own `--timeout`; `capture_game_view` must save inside the project (lands under `Assets/`, delete after) and captures the camera only, not IMGUI; **with two Editors open (Bitbloom + Abracodabra) the CLI targets the Editor whose project contains the current directory; pass `--project-path` when it reports `AMBIGUOUS_EDITOR`.**
 - [ ] Optional, later: adapt Bitbloom's `Tools/UnityCompileCheck/compile_check.py` (for when the Editor stops answering) to this project's single `Assembly-CSharp.csproj`.
+
+**Phase D result (2026-10-05, session 3):** baseline in `04_Reviews/2026-10_Baseline_6.0/` (0 errors, 1 known warning, camera + screen captures); CLAUDE.md §7 carries the gotchas. Not verified here: the `AMBIGUOUS_EDITOR` case (Bitbloom's Editor was not open; `status` listed one instance) and the 300 s wedge. `unity skill install claude --local` skipped (optional).
 
 **Done when:** `unity command console --level error` answers for this project with Bitbloom's Editor open at the same time. **How to check:** both Editors open; run the command from this folder; it reports Abracodabra's console.
 
