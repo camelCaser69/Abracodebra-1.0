@@ -14,18 +14,18 @@
 
 | Area | Found | Verdict |
 | --- | --- | --- |
-| Unity | `6000.0.39f1`, URP 17.0.3, UI Toolkit (5 `.uss`, 3 `.uxml`), Input System 1.13, 236 `.cs`, **no asmdefs, no tests** | Upgrade to `6000.3.24f1` (Phase E) |
-| URP | `m_EnableRenderCompatibilityMode: 0`, no `ScriptableRendererFeature` / `ScriptableRenderPass` in code | The biggest 6.3 blocker (Compatibility Mode removed) does not apply |
-| Git | `main`, remote `camelCaser69/Abracodebra-1.0`, last commit 2026-07-10; uncommitted: `projectmemory.md` (+6 lines), 6 untracked July docs, `Claude outputs/` | Commit as baseline first (Phase A) |
-| Git | Local branch `charming-elgamal` (a Claude worktree branch): 1 commit not on main, "no idea what are the changes, but there were a lot" | Diff it, report, Milan decides |
-| Git | `.git/index.lock.stale_from_claude` (0 bytes; a lock left by Cowork on 2026-10-05, already renamed so it blocks nothing) | Delete |
-| Git | `.idea/`, `.vscode/`, both `Unity_EXTRACTED_*.txt` pairs (766 KB each, root + `06_Index/`) and the extractor are tracked | Untrack / archive (Phase B) |
+| Unity | `6000.0.39f1`, URP 17.0.3, UI Toolkit (5 `.uss`, 3 `.uxml`), Input System 1.13, 236 `.cs` under `Assets/` (259 with the embedded DualGrid package), **no asmdefs of its own (3 third-party: HueFolders, DualGrid ×2), no tests** (the Test Framework package is installed, nothing uses it) ✔ verified 2026-10-05 | Upgrade to `6000.3.24f1` (Phase E) |
+| URP | `m_EnableRenderCompatibilityMode: 0` (in `Assets/UniversalRenderPipelineGlobalSettings.asset`), no `ScriptableRendererFeature` / `ScriptableRenderPass` in code ✔ | The biggest 6.3 blocker (Compatibility Mode removed) does not apply |
+| Git | `main`, remote `camelCaser69/Abracodebra-1.0`, last commit 2026-07-10; uncommitted: `projectmemory.md` (+6 lines), 6 untracked July docs, `Claude outputs/` ✔ (the "6 July docs" were really 6 untracked files plus the pack and its guide: 9 untracked entries) | Committed as baseline `3a0abe0` in Phase A |
+| Git | **Corrected:** local branch `charming-elgamal` (tip `2f2260d`, 2025-12-28, "no idea what are the changes…") is **already an ancestor of `main`**: 0 commits not on main, main is 59 commits ahead, no remote branch, no worktree. The "lot of changes" (86 files, +10 449 / −7 038) are that commit itself, already in main's history since 2025 | Nothing to merge; deleting the local branch is safe (§7.1, §7.4) |
+| Git | `.git/index.lock.stale_from_claude` (0 bytes; a lock left by Cowork on 2026-10-05, already renamed so it blocks nothing) ✔ | **Deleted** in Phase A |
+| Git | Tracked: `.idea/` (4 files), `.vscode/` (3 files), root `Unity_EXTRACTED_*.txt` (2: 766 KB scripts + 25 KB UI) and `06_Index/` copies (2), the extractor (3 files), `.clinerules/` (1) ✔. **Corrected: `UIElementsSchema/` is also tracked (28 `.xsd` files)**, not only generated | Untrack / archive (Phase B); `UIElementsSchema/` needs `git rm -r --cached`, not just an ignore line |
 | Old workflow | `unity_extractor.py/.bat/.json`, `06_Index/`, `.clinerules/` (Cline, 2025), `01_Core/project_instructions.md` (claude.ai-Project copy of CLAUDE.md), `Chat_History_Digest.md` (written because account memory was off) | Retired: Claude Code reads the live files and the Unity CLI reads the Editor |
 | Strays | `Claude outputs/` holds Bitbloom's bootstrap files from 2026-09-20 (CLAUDE.md, Project_Bible.md, projectmemory.md) — not Abracodabra's | Archive |
-| Strays | `UIElementsSchema/` (generated), `HueFolders.Editor.csproj`, `skner.DualGrid*.csproj` (generated, already ignored) | Ignore |
-| Assets | `Assets/TextMesh Pro/` = **1.2 GB**: ~100 unused-looking SDF font assets in `Fonts/Extracted Fonts/` (Inter ×3 sizes ×18 weights, Exo2, SourceSans3, …, 5–13 MB each), `NotoColorEmoji-Regular.ttf` 24 MB, `SEGUIEMJ.TTF` 12 MB | GUID-check, move the unreferenced ones out of the project |
-| Packages | `com.unity.visualscripting` (no code uses it), `com.unity.multiplayer.center`, `com.unity.collab-proxy` (Unity Version Control; we use git) | Remove |
-| KB | `ClaudeProjectFiles/` already has a router (`00_START_HERE.md`), 01–06 + 99 folders, 41 files, 1.5 MB. `projectmemory.md` is 26 KB of dense prose without a Snapshot/Decision-log split. `02_Design/WeGo/` holds rework 1–5 + "5 - Copy". | Consolidate to the Bitbloom layout (Phase C) |
+| Strays | `UIElementsSchema/` (generated, **but tracked**, see above), `HueFolders.Editor.csproj`, `skner.DualGrid*.csproj` (generated, already ignored by `*.csproj`) ✔ | Ignore (and untrack the schema) |
+| Assets | `Assets/TextMesh Pro/` = **1.2 GB** (Fonts 1 129 MB, Examples & Extras 17 MB) ✔. **Corrected:** `Fonts/Extracted Fonts/` holds 178 font families as SDF `.asset` + `.ttf` pairs (356 files, 1 078 MB); only **Handjet-Regular and Handjet-Medium** are used. `NotoColorEmoji-Regular.ttf` (24 MB) and `SEGUIEMJ.TTF` (12 MB) are **both in use** (Noto: TMP Settings emoji fallback; SEGUIEMJ: `StatusEffect_Icon.prefab`), so neither is a removal candidate | GUID-checked (§7.2); move the unreferenced ones out of the project |
+| Packages | `com.unity.visualscripting` (no code uses it), `com.unity.multiplayer.center`, `com.unity.collab-proxy` (Unity Version Control; we use git) ✔ none has a dependent in `packages-lock.json`, none appears in code or ProjectSettings | Remove |
+| KB | `ClaudeProjectFiles/` already has a router (`00_START_HERE.md`), 01–06 + 99 folders, **43 files, 1.6 MB** (41 + the pack and its guide). `projectmemory.md` is 26 KB (25 971 B, 70 lines) of dense prose without a Snapshot/Decision-log split ✔. `02_Design/WeGo/` holds rework 1–5 + "5 - Copy" ✔ (they are in `02_Design/WeGo/`, not `99_Archive/`). Repo: 4 415 tracked files, `.git` 145 MB. | Consolidate to the Bitbloom layout (Phase C) |
 
 ---
 
@@ -62,11 +62,11 @@ Copy Bitbloom's CLAUDE.md structure and wording where it is about Milan or the w
 
 ## 2. Phase A — Safety baseline (git)
 
-- [ ] `git status`; commit everything currently on disk as `chore: baseline before 2026-10 modernization` (projectmemory edit, the 6 July docs, `Claude outputs/`, this pack). Push.
-- [ ] Tag `pre-modernization` and push the tag.
-- [ ] `charming-elgamal`: `git diff --stat main...charming-elgamal` and a one-paragraph summary of what it changes. **Stop and ask Milan** (merge, cherry-pick, or delete). Do not merge on your own.
-- [ ] Delete `.git/index.lock.stale_from_claude`.
-- [ ] Remote branches: list any `claude/*` branches on origin; report, don't delete.
+- [x] `git status`; commit everything currently on disk as `chore: baseline before 2026-10 modernization` (projectmemory edit, the 6 July docs, `Claude outputs/`, this pack). **Committed locally as `3a0abe0` (2026-10-05). ⏸ Push NOT done: the permission classifier denied it; Milan pushes (§7.4 Q1).**
+- [x] Tag `pre-modernization` created locally on `3a0abe0`. **⏸ Tag push NOT done (same reason).**
+- [x] `charming-elgamal`: already merged into main (§0, §7.1). **Waiting for Milan** (delete the local branch, or keep).
+- [x] Delete `.git/index.lock.stale_from_claude` (done).
+- [x] Remote branches: only `origin/main` exists (`git ls-remote --heads origin`); no `claude/*` branches, no remote tags yet.
 
 **Done when:** `git status` is clean, `main` = `origin/main`, the tag exists on GitHub. **How to check:** GitHub Desktop shows no changes and no unpushed commits; github.com → Abracodebra-1.0 → Tags shows `pre-modernization`.
 
@@ -205,17 +205,129 @@ Steps:
 
 ## 7. Results (Claude fills this in)
 
+_Written by Claude Code, session 1 (2026-10-05, opusplan · high). Nothing was moved, deleted or rewritten except what Phase A says, and the corrections to §0 and the Phase A boxes in §2._
+
 ### 7.1 Phase A
-_(charming-elgamal summary, remote branches)_
+
+| Item | Result |
+| --- | --- |
+| Baseline commit | `3a0abe0` "chore: baseline before 2026-10 modernization": 12 files (projectmemory edit, 6 untracked July docs, `Claude outputs/`, this pack and its guide). Local only. |
+| Tag | `pre-modernization` on `3a0abe0`, local only. |
+| Push | **Not done.** Both `git push origin main` and the tag push were refused by the permission classifier ("Out-of-Place Publication"). I did not try to get around it. `main` is ahead of `origin/main` by 1 commit (2 after the §7 commit); `git ls-remote --tags origin` is empty. Milan: §7.4 Q1. |
+| `.git/index.lock.stale_from_claude` | Deleted. |
+| Remote branches | `git ls-remote --heads origin`: only `refs/heads/main` (`fea4718`). No `claude/*` branches. |
+| `charming-elgamal` | **Already merged. Nothing to decide about its content.** Tip `2f2260d` ("no idea what are the changes, but there were a lot", camelCaser69, 2025-12-28); parent `d6ba21d` (2025-10-25, "submit before replacing UI with UI Toolkit"). `git merge-base --is-ancestor charming-elgamal main` is true; `git rev-list --count main..charming-elgamal` = **0**; main is 59 commits ahead. So it is not "1 commit not on main": it is main's own history up to 2025-12-28. The commit was a big housekeeping snapshot: 86 files, +10 449 / −7 038, mostly `UIElementsSchema/UnityEngine.UIElements.xsd` (+2 138), `Unity_EXTRACTED_scripts.txt` (±913), new `extract_ui.py` / `run_extract_ui.bat`, plus script edits. Local-only (no `origin/charming-elgamal`), not checked out in any worktree (`git worktree list` shows only main). Deleting the label (`git branch -d charming-elgamal`) loses nothing, and `-d` refuses if it were unmerged. |
 
 ### 7.2 Phase B
-_(font GUID table: file · MB · referenced by; TileMappingsBackup; package removal)_
 
-### 7.3 Phase C
-_(03_Tasks/Active triage verdicts; anything that didn't fit the layout)_
+**Method.** Candidates: every non-`.meta` file under `Assets/TextMesh Pro/Fonts/` (534 files incl. the pack's four named targets) and `Assets/TextMesh Pro/Examples & Extras/` (140 files). GUID read from each `.meta`; every file under `Assets/`, `ProjectSettings/`, `Packages/`, `UserSettings/` (793 text/serialized files; images, fonts and DLLs skipped) scanned for those 32-hex GUIDs (covers `.unity .prefab .asset .mat .uss .uxml .cs .json .tss`). References from candidate to candidate were followed as a closure (SDF asset → source `.ttf`, fallback tables). Cross-checks: `.cs` for `Resources.Load` / `TMP_FontAsset` / font names (none), `.uss`/`.uxml` for font definitions (none: the UI uses the default font), `TMPro.Examples` types in project code (none; the TMP example `CameraController` is namespaced, the game's own is global, no clash). Active scene list: only `Assets/Scenes/SampleScene.unity`. Re-run the same scan right before moving anything (Phase B step B5).
+
+**Referenced: 9 files, 40 MB. Keep.**
+
+| File | MB | Referenced by |
+| --- | ---: | --- |
+| `Fonts/Extracted Fonts/Handjet-Regular SDF.asset` | 1.52 | 11 prefabs: Animal_Bunny, Animal_Deer, ItemSlotPrefab, PassiveSlotPrefab, SeedEditSlot, SequenceRowPrefab, SequenceBreakdownEntry_Prefab, Statbar_Prefab, SynergyWarningEntry_Prefab, ThoughtBubble, GardenerPrefab |
+| `Fonts/Extracted Fonts/Handjet-Regular.ttf` | 0.22 | the SDF asset above (source font) |
+| `Fonts/Extracted Fonts/Handjet-Medium SDF.asset` | 1.52 | `PlantPrefab.prefab` |
+| `Fonts/Extracted Fonts/Handjet-Medium.ttf` | 0.22 | the SDF asset above |
+| `Fonts/LiberationSans.ttf` | 0.35 | `Resources/Fonts & Materials/LiberationSans SDF.asset` and `… - Fallback.asset` (TMP default font) |
+| `Fonts/NotoColorEmoji-Regular SDF emoji.asset` | 0.54 | `Resources/TMP Settings.asset` → `m_EmojiFallbackTextAssets` |
+| `Fonts/NotoColorEmoji-Regular.ttf` | **24.27** | the Noto SDF asset (source font) |
+| `Fonts/SEGUIEMJ SDF emoji.asset` | 0.70 | `Prefabs/Ecosystem/UI/StatusEffect_Icon.prefab` (the `UnicodeText` child) |
+| `Fonts/SEGUIEMJ.TTF` | **12.42** | the SEGUIEMJ SDF asset (source font) |
+
+No fallback chain pulls in anything else: no kept font asset lists another candidate as fallback; `TMP Settings.m_fallbackFontAssets` is empty.
+
+**Unreferenced: 525 files, 1 157 MB (+ their `.meta`).**
+
+| Group | Files | MB | Verdict |
+| --- | ---: | ---: | --- |
+| `Extracted Fonts/`, 176 families as SDF `.asset` + `.ttf` pairs (all except Handjet-Regular and Handjet-Medium) | 352 | 1 124.7 | **Move out** (breakdown below) |
+| `Examples & Extras/` (Fonts 16 files 10.9 MB, Resources 30, Scenes 32, Scripts 34, Textures 17, Materials 6, Prefabs 3, Sprites 2) | 140 | 16.8 | **Move out** (whole folder + its `.meta`; no project code uses its scripts) |
+| `Fonts/Kenney *.asset` ×12, `Kenney fonts/` (14 files), `m3x6` / `m5x7` / `m6x11` (`.ttf` + SDF), `LiberationSans - OFL.txt` | 33 | 15.9 | **Keep** (rec; small pixel fonts that fit the look and may be wanted for UI; the OFL text belongs with LiberationSans) |
+
+Extracted Fonts breakdown (unreferenced files, MB): Inter_18pt 221 · Inter_24pt 221 · Inter_28pt 221 · SourceSans3 133 · Exo2 106 · ChakraPetch 45 · SourceCodePro 36 · Ubuntu 35 · Comfortaa 28 · Handjet (the other 8 weights) 14 · AtkinsonHyperlegible 10 · SpaceMono 9 · Caveat 9 · Inter (variable) 6 · UbuntuCondensed 5 · OdibeeSans 5 · UbuntuMono 3 · and 13 single-weight families of 1–2 MB (Bungee, UnicaOne, VT323, Righteous, Handlee, ShareTech, ShareTechMono, PatrickHand, ReenieBeanie, ShortStack, GloriaHallelujah, ShadowsIntoLight, ArchitectsDaughter).
+
+**Result if the rec is followed:** 492 files + 492 `.meta` move (**1 141.5 MB ≈ 1.14 GB**); `Assets/TextMesh Pro/` drops from ~1.2 GB to ~60 MB. `.git` stays ~145 MB (the fonts remain in history). Both emoji fonts stay.
+
+**Findings to act on**
+- **`SEGUIEMJ.TTF` is in use** (status-effect icons). It is Windows' Segoe UI Emoji; Microsoft's licence does not let a shipped game redistribute it. Keep it for now; put "swap StatusEffect_Icon to the Noto emoji asset (OFL) before any public build" on the Roadmap (§7.4 Q5).
+- **`NotoColorEmoji-Regular.ttf` is in use** (TMP emoji fallback), contrary to the audit row's "unused-looking".
+- Only the `Assets/` + `ProjectSettings/` + `Packages/` text assets were scanned. Anything loaded from a path built at runtime would not show; there are no `Resources.Load` calls for fonts, and none of the moved files sits in a `Resources/` folder.
+
+**`Assets/Editor/TileMappingsBackup/`** (5 KB: `TileMappingsBackup.json` + `.meta`; the folder has its own `.meta`): a JSON of tile-definition GUID → tilemap-module mappings for `SampleScene` / `Manager_Tiles`. `TileInteractionManager.cs` (lines 510–511) hard-codes the path `Assets/Editor/TileMappingsBackup` / `TileMappingsBackup.json` as its backup/restore location. Last touched in git 2026-07-08. **Not an orphan: keep, don't archive** (moving it would break that routine's restore). §7.4 Q6.
+
+**Packages (§3.3).** `visualscripting 1.9.5`, `multiplayer.center 1.0.0`, `collab-proxy 2.7.1`: each is a direct dependency (depth 0) with **no dependents** in `packages-lock.json`; no hit in `Assets/**/*.cs`, `*.asmdef`, `*.asset` or `ProjectSettings/`; no `scriptingDefineSymbols`. Safe to remove from `Packages/manifest.json`.
+
+### 7.3 Phase C (03_Tasks/Active triage; no file moved)
+
+| File | Checked on disk | Verdict |
+| --- | --- | --- |
+| `2026-07_Fable5_Design_Decision_Ledger.md` (7 KB) | The decision record of D1–D10; D1 and D5 still wait for the Commit-&-Watch A/B experiment ("Next action"); no experiment toggle exists in code. Its warning "Planning-tick invariant not yet enforced in code" was not re-verified (`TickManager` treats Planning as action-driven, lines 29–35; nothing checks it). | **Stays in Active** (living; its D1–D10 go into CLAUDE.md §6 and projectmemory's Decision log). Becomes Done when D1/D5 are marked resolved. |
+| `2026-07_Fable5_Last_Day_Plan.md` (16 KB) | F1–F4 are all **unapplied**: `RuntimeSequenceSlot` is still live in 4 files (no DNA-strand buffer), no `PlayerInventory` / `SequenceParser`, no run-loop screens. Fable access is gone; the execution routing is restated in Ledger D10, the step-by-step detail lives in the Pack Guides. | **Archive** → `99_Archive/2026-07_Cowork_Era/` (rationale for the F1–F4 ranking is kept; nothing actionable is lost). Two cross-references to patch. |
+| `2026-07_Pack_Implementation_Guides.md` (53 KB) | Executable guides G1–G4 for the unapplied F1–F4; written 2026-07-07 against the live code, so symbols must be re-verified before use. Its G0 rules 2, 9 and the "re-run extractor" line (≈373) name `06_Index`, the extractor and `Abracodebra_Codebase_Map.md`, all of which this pack retires. | **Stays in Active.** Patch those stale lines in place with a dated note (§7.4 Q13). |
+| `2026-07_Testing_Sandbox.md` (11 KB) | A **proposal**; no sandbox/cheat code exists on disk. Part of its "already exists" table is stale (it says `ExecutionPhaseDriver` is not wired; it was wired into `SampleScene` on 2026-07-06). It overlaps with the audit's C3 (golden-run harness) and §8's asmdef split. | **Stays in Active** as an undecided proposal; its idea goes into `Roadmap.md` next to the asmdef split. Milan decides (§7.4 Q3). |
+| `Abracodabra_A_Category_Implementation.md` (61 KB) | Parts 1–2 are applied and were verified: `ExecutionPhaseDriver.cs` exists, `RequestActionTicks` is in `TickManager`, `RunSeed` in `RunManager`, `OnPlantDied` in `PlantGrowth`. Editor wiring landed 2026-07-06; projectmemory records that Milan confirmed auto-tick, Space, Tab and the run seed in play. Part 4's checklist still has **10 unticked boxes** (A1 ×4, A2 ×2, A3, A4, A5, A6); only the A1 auto-tick/speed/pause checks and the seed were informally confirmed. | **→ `Done/`**, with a closing note at the top naming the Part-4 checks that were never run; carry those into `Roadmap.md` as "verify" items. |
+| `2026-10_Modernization.md`, `2026-10_Modernization_Prompts.md` | This pack and its guide. | **Stay**; the pack goes to `Done/` after Phase E (the guide with it). |
+
+Did not fit the layout (decisions in §7.4 Q8–Q10): the seven undated files in `02_Design/Concepts/` (§4.1 wants `Name_YYYY-MM-DD.md`); `04_Reviews/Abracodabra_Foundation_Review_2026-06.md` (§4.1 wants `YYYY-MM_Name.md`); `05_Reference/07_Third_Party_Package_Guide_DualGrid.md` has a numbered prefix (harmless; leave); what goes in `90_SideIdeas/`.
 
 ### 7.4 Needs Milan
-_(every question, one line each, with a recommendation)_
+
+Answer "recs" to accept every recommendation.
+
+1. **Push (blocked).** The permission classifier refused `git push origin main` and the `pre-modernization` tag push. **Rec:** run them yourself in the terminal: `! git push origin main` then `! git push origin pre-modernization` (the tag stays on baseline commit `3a0abe0`, before this §7 commit). Check github.com → Tags afterwards.
+2. **`charming-elgamal`** is fully merged into main (§7.1). **Rec:** delete the local label (`git branch -d charming-elgamal`; safe, it refuses if anything were unmerged). No merge or cherry-pick is needed.
+3. **Task triage (§7.3).** Ledger, Pack Guides, Testing Sandbox stay Active; A-Category → `Done/` with a "Part 4 never fully run" note; Last-Day Plan → archive. **Rec:** accept all five. For the Sandbox, if you want it dropped instead, say so and it goes to the archive with the Roadmap note kept.
+4. **Font scope (§7.2).** **Rec:** move 492 files (176 unused Extracted-Font families + all of `Examples & Extras`, 1.14 GB); keep Handjet ×2, Liberation, Noto, SEGUIEMJ, and the 33 Kenney / m3x6 / m5x7 / m6x11 files (15.9 MB).
+5. **`SEGUIEMJ.TTF` is used** by `StatusEffect_Icon.prefab` and is not redistributable. **Rec:** keep now; add a Roadmap item "replace with Noto (OFL) before any public build / Steam page".
+6. **`TileMappingsBackup`:** code-referenced backup, not an orphan. **Rec:** keep where it is.
+7. **Vault path** `D:\Unity Projects\AbraCodebra\_Vault\Abracodebra_TMP_fonts\` (outside every repo, keeps the `Assets/TextMesh Pro/...` sub-paths so files can be restored). **Rec:** yes.
+8. **Dated names for point-in-time docs (§4.4 rule 2).** **Rec:** `git mv` the 7 Concepts files to `Name_YYYY-MM-DD.md` (date = the doc's own header date, else its first git commit) and `Abracodabra_Foundation_Review_2026-06.md` → `2026-06_Foundation_Review.md`; fix every reference in one commit.
+9. **`02_Design/WeGo/README.md`** must say which rework is current and what the 2026-07 Phase-Identity doc superseded. I have not read all six reworks. **Rec:** I read rework 5 and `Phase_Identity_Final_Refinement.md` in step C3 and write it; I list anything I'm unsure of in the README as "verify". (Assumption: rework 5 is current and "5 - Copy" is an older/diverged draft.)
+10. **`90_SideIdeas/`:** **Rec:** README only ("parking lot, not the design of record"), nothing moved in. `Gene_Catalog_Experimental_Annex.md` stays in `Concepts/`.
+11. **Sibling `Abracodebra 1.0 - Backup 08.07.2026`** (a full project copy incl. `Library/`, `Temp/`, the extractor files). **Rec:** after the push is on GitHub, zip it without `Library/`, `Temp/`, `obj/` to cold storage and delete the folder. Your call; I touch nothing outside this repo.
+12. **Old setup (yours to do):** turn off the weekly "KB doctor" scheduled task in the old Cowork desktop (it checks `06_Index`, which goes away), and stop using the old claude.ai Project after step 6 of the guide. **Rec:** yes.
+13. **Stale lines in `2026-07_Pack_Implementation_Guides.md`** (G0 rules 2 and 9, ≈ line 373: `06_Index`, extractor, old map name). **Rec:** patch just those lines in place with a dated "2026-10: tooling retired" note; it is an active pack, not a closed point-in-time doc.
+14. **Planning-tick invariant in CLAUDE.md §1.** The pack wants it as an invariant; the Ledger says it is not yet enforced in code. **Rec:** write it as "target invariant, **not yet enforced**; re-verify before touching `TickManager` / `PlantGrowth`".
+15. **`.vscode/` and `.idea/`** are untracked and ignored (Bitbloom does the same). **Rec:** yes; the files stay on your disk.
+16. **Bitbloom's `CLAUDE.md` §8 still says "Pro plan"** (confirmed). Not touched (read-only rule). **Rec:** fix in a Bitbloom code-lane session as its own commit.
+17. **`.claude/settings.json` rule syntax.** Permission-rule strings for Bash/PowerShell calls to `unity.exe` are easy to get wrong. **Rec:** I check the syntax against the current Claude Code docs in step C10 and test one allowed and one denied call before committing.
+
+### 7.5 Step plan for Phase B + C
+
+Before step 1: Milan answers §7.4, pushes (Q1), closes the Unity Editor, runs `/clear`, model opusplan · high. Commit trailer on every commit: `Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>`. Use `git mv` for tracked files; verify each write by reading it back. Anything unexpected goes to §7.4 and the plan continues.
+
+**Phase B (Editor closed)**
+
+| # | Files | Action | Commit message |
+| --- | --- | --- | --- |
+| B1 | `.gitignore`, `.gitattributes` | Merge Bitbloom's extras into `.gitignore`: `.vscode/`, `.idea/`, `.DS_Store`, `*.slnx`, `.claude/settings.local.json`, `/[Pp]rofilerCaptures/`, `UIElementsSchema/`, `Unity_EXTRACTED_*.txt`, the Burst debug line. `.gitattributes` = Bitbloom's (`* text=auto`, `*.sh text eol=lf`). Ignore rules first so nothing reappears as untracked. | `chore: align .gitignore and .gitattributes with Bitbloom` |
+| B2 | `.idea/`, `.vscode/`, `UIElementsSchema/` (28 `.xsd`), root `Unity_EXTRACTED_scripts.txt`, `Unity_EXTRACTED_ToolkitUI.txt` | `git rm -r --cached` the first three (files stay on disk); `git rm` the two root extracts (generated, deleted). `06_Index/` copies wait for C11. | `chore: untrack IDE config and generated schema, delete root code extracts` |
+| B3 | `unity_extractor.py`, `unity_extractor_RUN.bat`, `unity_extractor_settings.json`, `.clinerules/` | `git mv` the extractor trio → `ClaudeProjectFiles/99_Archive/2026-07_Cowork_Era/tools/`; `.clinerules/` → `99_Archive/2025_Cline/`. | `chore: archive the Unity extractor and Cline rules` |
+| B4 | `Claude outputs/` (3 files) | `git mv` → `ClaudeProjectFiles/99_Archive/2026-09_Bitbloom_Bootstrap/`. | `chore: archive Bitbloom bootstrap drafts` |
+| B5 | 492 font files + `.meta` under `Assets/TextMesh Pro/Fonts/Extracted Fonts/` and `Examples & Extras/` (list = §7.2) | Re-run the GUID scan; **abort and report if any row differs from §7.2**. Move (PowerShell `Move-Item`, sub-paths preserved) to `D:\Unity Projects\AbraCodebra\_Vault\Abracodebra_TMP_fonts\`; the `Extracted Fonts` folder and its `.meta` stay (Handjet is in it); `Examples & Extras` goes whole with its `.meta`. Then `git add -A`; confirm the 9 kept files and their `.meta` still exist and `du` of `Assets/TextMesh Pro` is ~60 MB. | `chore: move unused TMP font assets out of the project (−1.14 GB)` |
+| B6 | `Packages/manifest.json` | Remove `com.unity.visualscripting`, `com.unity.multiplayer.center`, `com.unity.collab-proxy`. Leave `packages-lock.json` to Unity. | `chore: remove unused packages (visualscripting, multiplayer.center, collab-proxy)` |
+
+**Phase C (docs only; Editor stays closed)**
+
+| # | Files | Action | Commit message |
+| --- | --- | --- | --- |
+| C1 | `03_Tasks/Active/Abracodabra_A_Category_Implementation.md`, `…/2026-07_Fable5_Last_Day_Plan.md` | A-Category → `03_Tasks/Done/` with a closing note listing the unrun Part-4 checks; Last-Day Plan → `99_Archive/2026-07_Cowork_Era/`; patch the two cross-references (Ledger, Guides). | `docs: close A-category pack, archive Last-Day plan` |
+| C2 | `01_Core/Abracodebra_Codebase_Map.md`, `02_Design/gene_systems_deep_dive_v6.md`, 7 files in `02_Design/Concepts/`, `04_Reviews/Abracodabra_Foundation_Review_2026-06.md` | `git mv` → `01_Core/Codebase_Map.md`, `02_Design/Gene_Systems_Deep_Dive.md` (first line: "v6, 2025"), dated Concepts names, `04_Reviews/2026-06_Foundation_Review.md`. `grep -r` every old name over `ClaudeProjectFiles/` and `CLAUDE.md` and fix the references (project memory and CLAUDE.md are rewritten later; they get the new names then). | `docs: fixed names for living docs, dated names for point-in-time docs` |
+| C3 | `02_Design/WeGo/wego-system-rework.md` … `rework5.md`, `rework5 - Copy.md`; new `02_Design/WeGo/README.md` | `git mv` the six → `99_Archive/2025-06_WeGo_Rework/` ("5 - Copy" kept). README (≤10 lines): which rework is current, what the 2026-07 Phase-Identity doc superseded (read both first; mark unsure points "verify"). | `docs: archive WeGo rework 1-5, add current-doc README` |
+| C4 | `03_Tasks/Roadmaps/Code_Optimization_Backlog.md` → new `03_Tasks/Roadmap.md` | Merge the backlog into `Roadmap.md`, stale items flagged "verify before acting". Put near the top: **asmdef split + golden-run harness** (audit C3; Block 1 or 2 candidate), then the Ledger A/B experiment, F1–F4 (Guides), Testing Sandbox, the A-pack Part-4 unrun checks, **SEGUIEMJ → Noto**, "Planning-tick invariant not enforced". Old file → `99_Archive/2026-07_Cowork_Era/`; remove the empty `Roadmaps/`. | `docs: Roadmap.md from the merged backlog, with the audit's candidates` |
+| C5 | `01_Core/projectmemory.md` → `99_Archive/projectmemory_history.md` | Create the archive file as a **verbatim** copy (byte-compare after) with a one-line header "projectmemory as of 2026-10-05 (pre-modernization)". `projectmemory.md` itself is not touched yet. | `docs: archive projectmemory verbatim before the rewrite` |
+| C6 | `01_Core/projectmemory.md` (reads `Chat_History_Digest.md`) | Rewrite in Bitbloom's format: header explaining the file; **Snapshot** ≤ 40 lines; Recent entries; **Decision log** (date · decision · where; includes the 2026-10-05 row "Abracodabra stays a live project, developed alongside Bitbloom; modernized to the Bitbloom workflow (this pack)", and one row per Ledger D1–D10); Code facts; Learnings. Carry the digest's still-true facts. Every "implemented" claim checked with grep/Read first. ≤ 30 KB. | `docs: projectmemory in Snapshot / Decision-log format` |
+| C7 | new `02_Design/Feedback_Log.md` | Seed with Milan's cross-project rules from Bitbloom's "Distilled rules" that are about him, not Bitbloom (rules 7, 9, 10, 21, 30, 36, 41, 42, 43, 44), each with source and date, plus Abracodabra's own: manual avatar piloting felt finicky and hectic (out of the design space), WeGo felt cortisol-heavy (find the wording and dates in projectmemory / Ledger / Concepts before writing). | `docs: Feedback_Log.md seeded with cross-project and Abracodabra rules` |
+| C8 | new `90_SideIdeas/README.md` | What's here, "parking lot, not the design of record" (§7.4 Q10). | `docs: 90_SideIdeas README` |
+| C9 | `CLAUDE.md` | Rewrite per §1.1 (Intro, §0–§8), the routing table from `00_START_HERE.md` as §4, the §4.4 versioning rules, the Planning-tick invariant as "target, not yet enforced" (Q14), §8 with Max 5x. §7 gets the Unity CLI loop and a "gotchas arrive in Phase D" line. Keep ≤ ~12 KB (`wc -c`; currently 11 053 B). | `docs: CLAUDE.md rewritten in the Bitbloom shape` |
+| C10 | new `.claude/settings.json` | Allow git read/commit, the `unity command` calls of §4.3, `unity status`; deny `eval*`, `eval_file*`, `run_script*`. Check rule syntax against the current docs and test one allowed + one denied call (Q17). | `chore: .claude/settings.json permissions` |
+| C11 | `00_START_HERE.md`, `01_Core/project_instructions.md`, `01_Core/Chat_History_Digest.md`, `06_Index/` | Last, once CLAUDE.md carries the routing table and projectmemory the digest's facts: `git mv` the three docs → `99_Archive/2026-07_Cowork_Era/`; `git rm -r ClaudeProjectFiles/06_Index`. | `docs: retire the old Cowork-era routing, instructions and index` |
+| C12 | `03_Tasks/Active/2026-07_Pack_Implementation_Guides.md`, `2026-07_Fable5_Design_Decision_Ledger.md` | Patch the stale tooling lines (Q13) with a dated note; ledger line 111 "extractor re-run between". | `docs: refresh retired-tooling references in the pack guides` |
+| C13 | whole `ClaudeProjectFiles/`, pack §7 | `grep -r` for dead references (`06_Index`, `extractor`, `00_START_HERE`, `Abracodebra_Codebase_Map`, `gene_systems_deep_dive_v6`, `project_instructions`, `Chat_History_Digest`) and fix; list the tree and check each file has a home per §4.1; `wc -c` CLAUDE.md (≤ ~12 KB) and projectmemory (≤ 30 KB); update this §7 with counts, MB removed and the sizes; tag `kb-2026-10`; push main + tag (Milan if still blocked). | `docs: kb-2026-10 consistency pass` |
+
+After C13, Milan's check (the Editor opens for the first time): Unity Hub → open the project (still 6000.0.39f1) → let it resolve the package removal → Console has no red → Play SampleScene 10 s → close. Then Claude commits whatever Unity changed (expect `Packages/packages-lock.json`, possibly new `.meta` files; review the diff first, no scene or prefab changes expected): `chore: packages-lock after package removal`. Test question after `/clear`: "What is this project, what's built, what's next?" must match the Snapshot.
 
 ---
 
