@@ -26,7 +26,7 @@ read *selectively*, never wholesale:
    current on-disk version, not the extract.
 5. **Don't slurp.** Never read the entire codebase "for context" on a routine task. Full
    sweeps are reserved for explicitly requested architecture reviews.
-6. **Architecture map first.** `ClaudeProjectFiles/01_Core/Abracodebra_Codebase_Map.md`
+6. **Architecture map first.** `ClaudeProjectFiles/01_Core/Codebase_Map.md`
    (July 2026 full sweep) holds boot flow, tick flow, gene execution, UI data flow,
    singleton/event catalogs, and verified gaps — orient there before grepping.
 
@@ -167,7 +167,7 @@ router. Execute these triggers proactively, without being asked:
 
 **Session start**
 1. Read `01_Core/projectmemory.md` (always, before real work).
-2. Read `01_Core/Abracodebra_Codebase_Map.md` (any code task).
+2. Read `01_Core/Codebase_Map.md` (any code task).
 3. Check `03_Tasks/Active/` before proposing new work — something may already be open.
 
 **During the session — write-as-you-go (never batch memory writes to session end):**

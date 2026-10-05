@@ -1,6 +1,6 @@
 # Gameplay Engagement Research — Shortcomings, Fixes, Minigames & Spice-Ups
 
-**Date:** 2026-07-05 · **Status:** CONCEPT RESEARCH ONLY — nothing in this document is implemented; no code or assets were changed. · **Home:** `02_Design/Concepts/` · **Builds on:** `01_Core/Abracodebra_Codebase_Map.md` (2026-07-05 sweep), `02_Design/gene_systems_deep_dive_v6.md`, `04_Reviews/Abracodabra_Foundation_Review_2026-06.md`.
+**Date:** 2026-07-05 · **Status:** CONCEPT RESEARCH ONLY — nothing in this document is implemented; no code or assets were changed. · **Home:** `02_Design/Concepts/` · **Builds on:** `01_Core/Codebase_Map.md` (2026-07-05 sweep), `02_Design/Gene_Systems_Deep_Dive.md`, `04_Reviews/2026-06_Foundation_Review.md`.
 
 ---
 

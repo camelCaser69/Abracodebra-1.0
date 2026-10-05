@@ -1,7 +1,7 @@
 # UI Systems Research — Smoothing Controls & Interface for a Complex Game
 
 *2026-07-08 · research/concept doc · nothing here is implemented unless marked ✅ (on disk)*
-*Companions: `Gameplay_Engagement_Research.md` (D1–D9), `Commit_And_Watch_Loop_Design.md` (Rev 2), codebase map §8.*
+*Companions: `Gameplay_Engagement_Research_2026-07-05.md` (D1–D9), `Commit_And_Watch_Loop_Design_2026-07-06.md` (Rev 2), codebase map §8.*
 
 ---
 
@@ -258,7 +258,7 @@ Stages 0–4 ≈ **3–4 weeks solo with buffer**; they overlap heavily with alr
 ## 9. Sources & verification
 
 - Disk: `GameUI_Document.uxml`, USS files, codebase map §8 (2026-07 sweep), grep results (input call sites; absent classes) — all verified 2026-07-08.
-- Project docs: `Gameplay_Engagement_Research.md` §§3–6, `Commit_And_Watch_Loop_Design.md` Rev 2 §§2–5, `2026-07_Fable5_Last_Day_Plan.md` (F2/F3), `2026-07_Pack_Implementation_Guides.md` (G2/G3).
+- Project docs: `Gameplay_Engagement_Research_2026-07-05.md` §§3–6, `Commit_And_Watch_Loop_Design_2026-07-06.md` Rev 2 §§2–5, `2026-07_Fable5_Last_Day_Plan.md` (F2/F3), `2026-07_Pack_Implementation_Guides.md` (G2/G3).
 - External: [Stoneshard: How to Tell Time (GameRant)](https://gamerant.com/stoneshard-how-to-tell-time/) · [Stoneshard controls/UI criticism (Steam)](https://steamcommunity.com/app/869760/discussions/0/1609400247626376911/) · [Against the Storm QoL Update 2 (Eremite)](https://eremitegames.com/ats-quality-of-life-update-2/) · [Against the Storm UI reference (Interface In Game)](https://interfaceingame.com/games/against-the-storm/) · [Unity 6 UI Toolkit data binding (Manual)](https://docs.unity3d.com/6000.4/Documentation/Manual/best-practice-guides/ui-toolkit-for-advanced-unity-developers/data-binding.html) · [UI Toolkit performance best practices (Manual)](https://docs.unity3d.com/6000.4/Documentation/Manual/best-practice-guides/ui-toolkit-for-advanced-unity-developers/optimizing-performance.html) · [Unity 6 UI Toolkit updates (Unity blog)](https://unity.com/blog/unity-6-ui-toolkit-updates).
 - Flagged **[verify]**: world-space UI Toolkit minor-version availability in the project's installed Unity 6.x; current wet-tile duration (Rev 2 carryover).
 

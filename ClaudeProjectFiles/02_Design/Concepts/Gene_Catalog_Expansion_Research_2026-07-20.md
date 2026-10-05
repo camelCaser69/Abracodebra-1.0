@@ -1,6 +1,6 @@
 # Gene Catalog Expansion Research
 ### Abracodabra — Future Genes, Refinements & Synergy Web
-*2026-07-20 · Concept only — nothing in this document is implemented. Companion to `02_Design/gene_systems_deep_dive_v6.md` (buffer model, payload×delivery matrix, tier system) — this doc EXTENDS it, does not repeat it.*
+*2026-07-20 · Concept only — nothing in this document is implemented. Companion to `02_Design/Gene_Systems_Deep_Dive.md` (buffer model, payload×delivery matrix, tier system) — this doc EXTENDS it, does not repeat it.*
 
 **Status legend used throughout:**
 - ✅ **In code** (verified on disk 2026-07-20)

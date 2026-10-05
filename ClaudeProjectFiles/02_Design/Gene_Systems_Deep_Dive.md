@@ -1,3 +1,5 @@
+*v6, 2025 — living design doc, edited in place (formerly `gene_systems_deep_dive_v6.md`; the version trail is `git log -p`).*
+
 # Gene Systems — Design Document v6
 ## Abracodabra — DNA Strand Sequencer (Final Architecture)
 

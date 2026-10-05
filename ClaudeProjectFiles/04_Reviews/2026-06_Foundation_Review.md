@@ -1,5 +1,5 @@
 # Abracodabra — Foundation Review (June 2026)
-**Scope:** Full pass over `Unity_EXTRACTED_scripts.txt` (~24,250 lines, 130+ scripts), `Unity_EXTRACTED_ToolkitUI.txt`, and `gene_systems_deep_dive_v6.md`.
+**Scope:** Full pass over `Unity_EXTRACTED_scripts.txt` (~24,250 lines, 130+ scripts), `Unity_EXTRACTED_ToolkitUI.txt`, and `Gene_Systems_Deep_Dive.md`.
 **Goal:** Identify what to rework *now*, before content fills in and systems interlock — plus the path to a testable beta/POC build.
 
 **Verdict up front:** The architecture is genuinely good. The gene runtime (GUID + fallback name + version migration), the leaf-vitality model, the service layer, the tick registration pattern, and the UI Toolkit controller split are all solid foundations. But there are **two gameplay-breaking structural gaps (A1, A2)**, **one masked bug that will detonate later (A4)**, and **one architectural inversion (B1)** that gets exponentially more expensive to fix with every system you add. Fix the A-list before writing any more content. Everything else can be scheduled.

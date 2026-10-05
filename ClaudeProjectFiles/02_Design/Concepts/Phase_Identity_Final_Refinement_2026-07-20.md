@@ -2,8 +2,8 @@
 
 **What this is.** Final Fable 5 pass on the §4.3 decision before the experiment build.
 Supersedes the *definitions* of both options wherever earlier docs conflict
-(`Commit_And_Watch_Loop_Design.md` Rev 2 remains the detailed spec for A's systems;
-`UI_Systems_Research.md` scenario layer [B] is partially obsoleted — see §3).
+(`Commit_And_Watch_Loop_Design_2026-07-06.md` Rev 2 remains the detailed spec for A's systems;
+`UI_Systems_Research_2026-07-08.md` scenario layer [B] is partially obsoleted — see §3).
 Companion to `03_Tasks/Active/2026-07_Fable5_Design_Decision_Ledger.md` (D1/D5/D8).
 
 **The new input that forced this pass:** Milan reports that in the simulation version,
@@ -112,7 +112,7 @@ legible; a marked order can be cancelled before arrival with no residue.
 
 **Old B (player-driven embodied WeGo — walk tile-to-tile, verbs on adjacency, Stoneshard
 travel) is dead.** Milan's finickiness verdict removes its core, and
-`UI_Systems_Research` scenario layer [B]'s multi-tick-travel/repeat-verb items die with
+`UI_Systems_Research_2026-07-08` scenario layer [B]'s multi-tick-travel/repeat-verb items die with
 it (wait/pass, danger interrupts, turn echo log survive — see below).
 
 **B-rev: the day is a tick budget.** The strongest honest steelman consistent with

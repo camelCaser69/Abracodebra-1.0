@@ -6,8 +6,8 @@ consequences** so Milan + weaker models can execute without re-deriving judgment
 Where a decision was previously "pending," this ledger is the tie-breaker of record.
 Overrule freely — but write the overrule here, don't leave it implicit.
 
-Sources reconciled: `Commit_And_Watch_Loop_Design.md` (Rev 2), `UI_Systems_Research.md`,
-`Minigames_And_Mechanics_Reevaluation.md`, `Gameplay_Engagement_Research.md`,
+Sources reconciled: `Commit_And_Watch_Loop_Design_2026-07-06.md` (Rev 2), `UI_Systems_Research_2026-07-08.md`,
+`Minigames_And_Mechanics_Reevaluation_2026-07-08.md`, `Gameplay_Engagement_Research_2026-07-05.md`,
 `99_Archive/2026-07_Cowork_Era/2026-07_Fable5_Last_Day_Plan.md` (archived 2026-10), `2026-07_Pack_Implementation_Guides.md`.
 
 Status: ✅ decided here · 🧪 experiment decides, default recorded · ⏸️ genuinely Milan's call
@@ -26,7 +26,7 @@ wave events + lean-in prompts active, does a meaningful decision or reaction lan
 least once per 15–20 s of Day phase?*
 
 - **Pass → A is final.** Proceed per D5–D8 A-branches. UI scenario layer [A] from
-  UI_Systems_Research (budget meter, Report cause-rows, fixture UI).
+  UI_Systems_Research_2026-07-08 (budget meter, Report cause-rows, fixture UI).
 - **Fail even after density levers (shorter day, denser waves, tighter windows) → B.**
   Consequences of B: UI scenario layer [B] (wait/pass verb, danger interrupts,
   multi-tick travel, turn echo — the Stoneshard-lessons set, more input-layer work);
@@ -118,7 +118,7 @@ One pack per fresh session, extractor re-run between — unchanged.
    player's action economy — never plant growth, energy, or gene execution. Any future
    pack touching `TickManager`/`PlantGrowth` must re-verify this; it is not yet enforced
    in code.
-2. **Minigames re-evaluation supersedes** Gameplay_Engagement_Research §7 ranking. If a
+2. **Minigames re-evaluation supersedes** Gameplay_Engagement_Research_2026-07-05 §7 ranking. If a
    future session cites §7, it's citing a stale ranking.
 3. **UI shared-core spine (stages 0–4) is scenario-neutral** — safe to start regardless
    of D1. The scenario layers are not.

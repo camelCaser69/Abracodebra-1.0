@@ -14,14 +14,14 @@
 6. **Invariants:** gameplay RNG via `IDeterministicRandom` (hybrid fallback pattern, see G4-§1); tick-state changes on tick boundaries, wall-clock for visuals only; `GridPosition` Z stays 0; UI controllers named `UI[Name]Controller`; services static.
 7. **Compile triage protocol:** you cannot compile. At the end of the pack, output a short list titled "Compile-check focus" naming the files most likely to error. Milan opens Unity, pastes Console errors back, you fix. Expect 2–10 trivial errors on a big pack; that is normal, not failure.
 8. **Verification:** after writes, verify host-side with Read/Grep (the bash mount can serve stale content). Each pack ends with verification greps — run them and report results.
-9. **KB duties per pack:** update `01_Core/projectmemory.md` Current state, patch the affected `01_Core/Abracodebra_Codebase_Map.md` section (F1→§5, F2→§8, F3→§8/§3, F4→§12), flag `06_Index` stale (or ask Milan to re-run `unity_extractor_RUN.bat`), and ask Milan to git-commit before starting the next pack.
+9. **KB duties per pack:** update `01_Core/projectmemory.md` Current state, patch the affected `01_Core/Codebase_Map.md` section (F1→§5, F2→§8, F3→§8/§3, F4→§12), flag `06_Index` stale (or ask Milan to re-run `unity_extractor_RUN.bat`), and ask Milan to git-commit before starting the next pack.
 10. **Execution order if running multiple packs: F1 → F2 → F3 → F4**, one pack per session.
 
 ---
 
 ## G1. Pack F1 — DNA Strand buffer migration (slot → Noita bus)
 
-**Design source:** `02_Design/gene_systems_deep_dive_v6.md` §3 (the three rules, wrap trick, trigger semantics, cycle time) and §1 "Implementation Path". Re-read both before starting.
+**Design source:** `02_Design/Gene_Systems_Deep_Dive.md` §3 (the three rules, wrap trick, trigger semantics, cycle time) and §1 "Implementation Path". Re-read both before starting.
 
 **Read fully before starting:**
 `Assets/Scripts/Genes/Runtime/PlantGeneRuntimeState.cs` · `Runtime/RuntimeSequenceSlot.cs` · `Runtime/RuntimeGeneInstance.cs` · `Genes/PlantSequenceExecutor.cs` · `Genes/Templates/SeedTemplate.cs` · `Genes/Core/ActiveGene.cs` + `GeneBase.cs` (GeneCategory) · `Assets/Scripts/A_ToolkitUI/UISeedEditorController.cs` · `UIDragDropController.cs` · `UISpecSheetController.cs` · `GameUIManager.cs` (the handler methods wired at its lines ~395–407).

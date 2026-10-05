@@ -1,6 +1,6 @@
 # Gene Catalog — Experimental Annex ("The Forbidden Greenhouse")
 ### Abracodabra — deliberately unhinged gene concepts
-*2026-07-20 · Concept only — nothing implemented. Companion to `Gene_Catalog_Expansion_Research.md` (the sane catalog). That doc is a quarry; this one is the cave system underneath it. Nothing here is scoped, costed, or promised. The point is to map the outer walls of the design space so the main catalog knows where the ceiling actually is.*
+*2026-07-20 · Concept only — nothing implemented. Companion to `Gene_Catalog_Expansion_Research_2026-07-20.md` (the sane catalog). That doc is a quarry; this one is the cave system underneath it. Nothing here is scoped, costed, or promised. The point is to map the outer walls of the design space so the main catalog knows where the ceiling actually is.*
 
 **Feasibility flags (honest, per project rules):**
 - 🟢 rides existing systems — could be tamed into the main catalog with modest work

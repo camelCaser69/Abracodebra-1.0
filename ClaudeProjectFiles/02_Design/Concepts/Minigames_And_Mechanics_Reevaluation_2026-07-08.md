@@ -1,8 +1,8 @@
 # Minigames & Mechanics — Full Weighted Re-evaluation
 
-**Date:** 2026-07-08 · **Status:** CONCEPT RESEARCH ONLY — nothing implemented; no code or assets changed. · **Home:** `02_Design/Concepts/` · **Builds on:** `Gameplay_Engagement_Research.md` (2026-07-05 — the D1–D9 diagnosis and §6.1 minigame policy remain canonical), `Commit_And_Watch_Loop_Design.md` (Rev 2), `UI_Systems_Research.md` (2026-07-08).
+**Date:** 2026-07-08 · **Status:** CONCEPT RESEARCH ONLY — nothing implemented; no code or assets changed. · **Home:** `02_Design/Concepts/` · **Builds on:** `Gameplay_Engagement_Research_2026-07-05.md` (2026-07-05 — the D1–D9 diagnosis and §6.1 minigame policy remain canonical), `Commit_And_Watch_Loop_Design_2026-07-06.md` (Rev 2), `UI_Systems_Research_2026-07-08.md` (2026-07-08).
 
-**This document SUPERSEDES the §7 priority table of `Gameplay_Engagement_Research.md`.** All old concepts are re-scored here alongside new ones, under a demo-first weighting and the working assumption that §4.3 resolves toward **Option A (Commit & Watch)** — Milan's stated gut pick, pending the experiment. Where a score would flip under Option B, it's flagged.
+**This document SUPERSEDES the §7 priority table of `Gameplay_Engagement_Research_2026-07-05.md`.** All old concepts are re-scored here alongside new ones, under a demo-first weighting and the working assumption that §4.3 resolves toward **Option A (Commit & Watch)** — Milan's stated gut pick, pending the experiment. Where a score would flip under Option B, it's flagged.
 
 ---
 
@@ -113,7 +113,7 @@ Surplus fruit → grind (RhythmTap) → one-shot consumables: repellent puff (1-
 
 ---
 
-## 5. MASTER RANKING (supersedes Gameplay_Engagement_Research.md §7)
+## 5. MASTER RANKING (supersedes Gameplay_Engagement_Research_2026-07-05.md §7)
 
 Assumption: §4.3 → Commit & Watch. Formula from §1. Flip-flags: 🅱 = score changes under Option B.
 
@@ -184,7 +184,7 @@ Realistic total: **5–7 focused weeks** with buffer — still inside the late-2
 
 ## 8. Sources & verification
 
-**Project (read 2026-07-08, live disk):** `Gameplay_Engagement_Research.md` (full), `projectmemory.md` (full), Commit & Watch Rev 2 + UI research via projectmemory summaries. No code read this session — all code claims inherit the 2026-07-05 verification and its *(survey)* / **[verify in Editor]** marks; nothing here modifies code or assets.
+**Project (read 2026-07-08, live disk):** `Gameplay_Engagement_Research_2026-07-05.md` (full), `projectmemory.md` (full), Commit & Watch Rev 2 + UI research via projectmemory summaries. No code read this session — all code claims inherit the 2026-07-05 verification and its *(survey)* / **[verify in Editor]** marks; nothing here modifies code or assets.
 **Web (2026-07-08):** Thronefall design — [Grokipedia](https://grokipedia.com/page/Thronefall), [GameLuster review](https://gameluster.com/thronefall-review-holding-on-for-one-last-night/); Against the Storm — [Game Developer interview](https://www.gamedeveloper.com/business/how-against-the-storm-managed-to-mix-city-building-and-roguelite-play), [Rogueliker review](https://rogueliker.com/against-the-storm-review/); Stardew fishing — [Stardew Valley Wiki: Fishing](https://stardewvalleywiki.com/Fishing), [Game Dev's Guide to Fishing Minigames](https://gamedevsjourney.substack.com/p/the-game-devs-guide-to-fishing-minigames); Cult of the Lamb critique — [Josh Bycer / Medium](https://medium.com/@GWBycer/cult-of-the-lamb-is-a-devilishly-cute-roguelite-a350de89dde1), [Inverse review](https://www.inverse.com/gaming/cult-of-the-lamb-review); Niche genetics — [niche-game.com](https://niche-game.com/), [Wikipedia](https://en.wikipedia.org/wiki/Niche_(video_game)); plant-care verbs — [GameSpew: games about plants](https://www.gamespew.com/2025/02/four-excellent-games-about-plants-and-horticulture/), [UnusualSeeds: gardening games](https://unusualseeds.net/the-best-video-games-about-gardening-and-plants/); Atomicrops — [Raw Fury](https://rawfury.com/games/atomicrops/).
 
 ---

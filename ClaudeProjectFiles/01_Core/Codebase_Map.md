@@ -7,7 +7,7 @@ How to use: this is the orientation layer. Trust it for *architecture and wiring
 
 ## 1. Verified Reality vs. Documented State (critical)
 
-The Foundation Review (`04_Reviews/Abracodabra_Foundation_Review_2026-06.md`) and A-Category pack (`03_Tasks/Done/Abracodabra_A_Category_Implementation.md`) describe fixes A1–A6 — **applied to the repo 2026-07-05** (code Parts 1–2 complete; Editor wiring + Part 4 tests pending). State after application:
+The Foundation Review (`04_Reviews/2026-06_Foundation_Review.md`) and A-Category pack (`03_Tasks/Done/Abracodabra_A_Category_Implementation.md`) describe fixes A1–A6 — **applied to the repo 2026-07-05** (code Parts 1–2 complete; Editor wiring + Part 4 tests pending). State after application:
 
 | Item | Disk reality (2026-07-05, post-application) |
 |---|---|
@@ -172,7 +172,7 @@ Fruits: `BasicFruitGene` spawns `Fruit` components at spawn points; payloads con
 
 - `Assets/Scriptable Objects/` — 51 `.asset` files (recounted 2026-07-06): Animals, Animals Diet, Doris, Fireflies, Food, **Genes** (Active/Modifier/Passive/Payload + `GeneLibrary.asset`), Items, Life Thoughts, Map Generation, Minigames, MultiTiles, Scents, Settings, Status Effects, Tiles, Tools, Waves. `Assets/Prefabs/` — 41 (Ecosystem/General/Tiles). Scenes: `SampleScene.unity` (**primary — the sole scene in Build Settings**; ExecutionPhaseDriver wired here 2026-07-06), `MainScene.unity` (secondary, not in build). No custom Resources/ loading — all direct references (good).
 - Third-party: skner DualGrid, local package at `Packages/com.skner.dualgrid` (tilemap rendering; guides in `05_Reference/`).
-- Historical docs relocated 2026-07-05: GGS-era Documentation 00–06, `PROJECT_KNOWLEDGE_BASE.md`, `Memory.txt` → `99_Archive/`; WeGo rework docs 1–5 (+ divergent "5 - Copy") → `02_Design/WeGo/`; old `Todo.md` → `03_Tasks/Roadmaps/Code_Optimization_Backlog.md`; DualGrid guides (incl. old 07 package guide) → `05_Reference/`. Current canon: root `CLAUDE.md`, `01_Core/` (memory · instructions · this map), `02_Design/gene_systems_deep_dive_v6.md`; routing rules in `00_START_HERE.md`.
+- Historical docs relocated 2026-07-05: GGS-era Documentation 00–06, `PROJECT_KNOWLEDGE_BASE.md`, `Memory.txt` → `99_Archive/`; WeGo rework docs 1–5 (+ divergent "5 - Copy") → `02_Design/WeGo/`; old `Todo.md` → `03_Tasks/Roadmaps/Code_Optimization_Backlog.md`; DualGrid guides (incl. old 07 package guide) → `05_Reference/`. Current canon: root `CLAUDE.md`, `01_Core/` (memory · instructions · this map), `02_Design/Gene_Systems_Deep_Dive.md`; routing rules in `00_START_HERE.md`.
 
 ---
 

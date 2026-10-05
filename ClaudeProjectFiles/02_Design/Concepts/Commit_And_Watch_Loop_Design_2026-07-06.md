@@ -1,6 +1,6 @@
 # Commit & Watch — Closing the Loop (Gardener & Doris Automation)
 
-**Date:** 2026-07-06 · **Rev 2** (same day, doctor pass) · **Status:** CONCEPT — nothing implemented; no code changed. · **Home:** `02_Design/Concepts/` · **Builds on:** `Gameplay_Engagement_Research.md` (§4.3 Option A, §6.1 rule 5), `04_Reviews/Abracodabra_Foundation_Review_2026-06.md`, code facts verified on live disk 2026-07-06.
+**Date:** 2026-07-06 · **Rev 2** (same day, doctor pass) · **Status:** CONCEPT — nothing implemented; no code changed. · **Home:** `02_Design/Concepts/` · **Builds on:** `Gameplay_Engagement_Research_2026-07-05.md` (§4.3 Option A, §6.1 rule 5), `04_Reviews/2026-06_Foundation_Review.md`, code facts verified on live disk 2026-07-06.
 
 **Prompted by:** Milan's gut pick of §4.3 **Option A ("Commit & Watch")** + the two worries it raises: *"how do I manage time and strategic decisions?"* and *"who moves the player and feeds Doris while I'm watching?"*
 
