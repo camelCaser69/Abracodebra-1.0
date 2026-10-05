@@ -1,18 +1,34 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace WegoSystem
 {
+    // Unity 6.3 rejects [RuntimeInitializeOnLoadMethod] inside a generic class, so the quit flag lives here.
+    // The flag is process-wide (every singleton shares the application quit), which matches how it was used.
+    internal static class SingletonQuitState
+    {
+        public static bool ApplicationIsQuitting;
+
+        // Runs when the game loads in the editor, before any scene object's Awake().
+        // Resets the flag even with Domain Reloading disabled.
+        #if UNITY_EDITOR
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void ResetStaticData()
+        {
+            ApplicationIsQuitting = false;
+        }
+        #endif
+    }
+
     public abstract class SingletonMonoBehaviour<T> : MonoBehaviour where T : MonoBehaviour
     {
         private static T _instance;
         private static readonly object _lock = new object();
-        private static bool _applicationIsQuitting = false;
 
         public static T Instance
         {
             get
             {
-                if (_applicationIsQuitting)
+                if (SingletonQuitState.ApplicationIsQuitting)
                 {
                     return null;
                 }
@@ -35,19 +51,6 @@ namespace WegoSystem
         }
 
         public static bool HasInstance => _instance != null;
-        
-        // --- THIS IS THE FIX ---
-        // This special attribute tells Unity to run this static method when the game loads in the editor,
-        // before any scene objects have their Awake() methods called.
-        // This ensures our flag is correctly reset, even with Domain Reloading disabled.
-        #if UNITY_EDITOR
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void ResetStaticData()
-        {
-            _applicationIsQuitting = false;
-        }
-        #endif
-
 
         protected virtual void Awake()
         {
@@ -56,7 +59,7 @@ namespace WegoSystem
                 _instance = this as T;
 
                 // Make this a root object to prevent DontDestroyOnLoad issues with parenting
-                transform.SetParent(null); 
+                transform.SetParent(null);
                 DontDestroyOnLoad(gameObject);
             }
             else if (_instance != this)
@@ -73,7 +76,7 @@ namespace WegoSystem
 
         protected virtual void OnApplicationQuit()
         {
-            _applicationIsQuitting = true;
+            SingletonQuitState.ApplicationIsQuitting = true;
         }
     }
 }
