@@ -184,6 +184,7 @@ namespace WegoSystem {
         public void StartGrowthAndThreatPhase() {
             if (currentState == RunState.Planning) {
                 Debug.Log($"[RunManager] Starting Growth & Threat for Round {currentRoundNumber}");
+                DayTally.BeginDay(currentRoundNumber); // B5: dawn resets the Day's counts (before the state event)
                 SetState(RunState.GrowthAndThreat);
             }
         }

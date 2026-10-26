@@ -44,6 +44,7 @@ namespace Abracodabra.Genes.Implementations
             var directTarget = context.target.GetComponent<AnimalController>();
             if (directTarget != null && !directTarget.IsDying)
             {
+                directTarget.NoteDamageSource(geneName);
                 directTarget.TakeDamage(finalDamage);
                 Debug.Log($"[ExplosivePayload] Direct hit on '{directTarget.SpeciesName}' for {finalDamage:F1} damage");
             }
@@ -58,6 +59,7 @@ namespace Abracodabra.Genes.Implementations
                 if (creature == null || creature.IsDying) continue;
                 if (creature.gameObject == context.target) continue; // Skip direct target (already damaged)
 
+                creature.NoteDamageSource(geneName);
                 creature.TakeDamage(finalDamage * 0.5f);
                 splashCount++;
             }
@@ -131,6 +133,7 @@ namespace Abracodabra.Genes.Implementations
             foreach (var creature in creaturesInBlast)
             {
                 if (creature == null || creature.IsDying) continue;
+                creature.NoteDamageSource(geneName);
                 creature.TakeDamage(finalDamage);
             }
 

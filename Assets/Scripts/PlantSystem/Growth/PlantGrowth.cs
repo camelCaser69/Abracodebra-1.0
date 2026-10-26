@@ -329,6 +329,7 @@ namespace Abracodabra.Genes
             Debug.Log($"[PlantGrowth] '{name}' has died.");
 
             OnPlantDied?.Invoke(this);
+            DayTally.NotePlantDied(this); // B5: counts the loss, auto-pauses the Day (D6)
 
             // A2: stop ticking immediately, then fade out and destroy so the tile frees up.
             var tickManager = TickManager.Instance;
@@ -692,6 +693,15 @@ namespace Abracodabra.Genes
 
             if (eatenCell.CellType == PlantCellType.Leaf)
             {
+                // B5: every bite says who did it, and is counted for the dusk ledger
+                string biter = eater != null ? eater.SpeciesName : "pest";
+                DayTally.NoteBite(biter, this);
+                FloatingCombatText.Spawn(
+                    eatenCell.transform.position + Vector3.up * 0.2f,
+                    $"-1 leaf · {biter.ToLowerInvariant()}",
+                    new Color(1f, 0.86f, 0.55f)
+                );
+
                 if (!destroyedLeafPositions.Contains(eatenCell.GridCoord))
                 {
                     destroyedLeafPositions.Add(eatenCell.GridCoord);
@@ -700,6 +710,7 @@ namespace Abracodabra.Genes
 
                 if (thornDamage > 0 && eater != null)
                 {
+                    eater.NoteDamageSource("Thorns");
                     eater.TakeDamage(thornDamage);
                     FloatingCombatText.Spawn(
                         eater.transform.position + Vector3.up * 0.3f,

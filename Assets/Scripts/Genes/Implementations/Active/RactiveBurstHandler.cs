@@ -125,6 +125,7 @@ namespace Abracodabra.Genes.Implementations
             {
                 if (creature == null || creature.IsDying) continue;
 
+                creature.NoteDamageSource(burstGene.geneName);
                 creature.TakeDamage(finalDamage);
                 hitCount++;
 

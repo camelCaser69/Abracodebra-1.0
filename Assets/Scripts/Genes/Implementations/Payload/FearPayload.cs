@@ -42,7 +42,20 @@ namespace Abracodabra.Genes.Implementations
             float potency = GetFinalPotency(context.payloadInstance);
             int finalDuration = Mathf.CeilToInt(baseFearDurationTicks * potency);
 
+            bool wasFeared = animalController.IsFeared;
             animalController.ApplyFear(fearSourcePos, finalDuration);
+
+            // B5: the first scare of a pest says which gene did it (refreshes stay quiet)
+            if (!wasFeared)
+            {
+                string fearName = geneName.StartsWith("Payload ") ? geneName.Substring("Payload ".Length) : geneName;
+                WegoSystem.DayTally.NoteRepel(animalController.SpeciesName);
+                FloatingCombatText.Spawn(
+                    animalController.transform.position + Vector3.up * 0.4f,
+                    $"{animalController.SpeciesName.ToLowerInvariant()} flees · {fearName}",
+                    new Color(0.80f, 0.90f, 0.95f)
+                );
+            }
 
             if (fearStatusEffect != null)
             {

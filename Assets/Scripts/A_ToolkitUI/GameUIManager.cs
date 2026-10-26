@@ -61,6 +61,8 @@ namespace Abracodabra.UI.Toolkit {
   public UIDorisBellyController DorisBelly => dorisBellyController;
   UIWaveMarkersController waveMarkers;         // B4: the coming wave's entry points, in Planning
   public UIWaveMarkersController WaveMarkers => waveMarkers;
+  UIAutoPauseBannerController autoPauseBanner;  // B5: why the Day paused itself
+  public UIAutoPauseBannerController AutoPauseBanner => autoPauseBanner;
   public UIRunEndOverlayController RunEndOverlay => runEndOverlay;
 
   // Garden view (Planning): the full-screen seed editor hides the world, so planting needs a way to see it.
@@ -142,11 +144,13 @@ namespace Abracodabra.UI.Toolkit {
    // B3: after the camera has moved this frame
    dorisBellyController?.Refresh();
    waveMarkers?.Refresh();
+   autoPauseBanner?.Refresh();
   }
 
   void OnDestroy() {
    dorisBellyController?.Dispose();
    waveMarkers?.Dispose();
+   autoPauseBanner?.Dispose();
    IsPlanningPanelOpen = false;
 
    InventoryService.OnInventoryChanged -= HandleInventoryServiceChanged;
@@ -294,6 +298,9 @@ namespace Abracodabra.UI.Toolkit {
    if (hudPanel != null) {
     waveMarkers = new UIWaveMarkersController();
     waveMarkers.Initialize(hudPanel);
+
+    autoPauseBanner = new UIAutoPauseBannerController();
+    autoPauseBanner.Initialize(hudPanel);
    }
 
    runEndOverlay = new UIRunEndOverlayController();

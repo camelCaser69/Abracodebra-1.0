@@ -75,6 +75,7 @@ public class PlantCellManager {
         else if (cellType == PlantCellType.Fruit) {
             // ✅ FIX: Explicitly register fruit position to keep PlantGrowth logic in sync
             plant.RegisterFruitPosition(coords);
+            DayTally.NoteFruitSet(); // B5: fruit set counts as a Day event
         }
 
         plant.VisualManager.RegisterShadowForCell(instance, cellType.ToString());

@@ -526,6 +526,7 @@ namespace Abracodabra.Ecosystem
 
             plantsEatenToday++;
             OnDorisAtePlant?.Invoke(plant);
+            DayTally.NoteDorisAtePlant(); // B5: counted, and the first one pauses the Day (D6)
 
             UnityEngine.Object.Destroy(plant.gameObject);
         }

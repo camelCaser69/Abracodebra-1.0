@@ -64,6 +64,16 @@ namespace WegoSystem {
         [Tooltip("Seconds to hold after the last fruit (and after an empty supper) before the dusk verdict.")]
         [Min(0f)] public float holdAfterSupper = 0.8f;
 
+        [Header("Auto-pause (D6, B5)")]
+        [Tooltip("Pause the Day (Space resumes) when the first pest group of the run walks in.")]
+        public bool autoPauseFirstWave = true;
+
+        [Tooltip("Pause the Day every time a plant dies.")]
+        public bool autoPausePlantDeath = true;
+
+        [Tooltip("Pause the Day the first time Doris eats a plant in a run.")]
+        public bool autoPauseDorisFirstEat = true;
+
         [Header("Player")]
         [Tooltip("D4: player starvation does not end the run in Block 1.")]
         public bool playerStarvationEndsRun = false;

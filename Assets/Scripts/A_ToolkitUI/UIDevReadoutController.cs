@@ -31,7 +31,7 @@ namespace Abracodabra.UI.Toolkit {
   const KeyCode ToggleKey = KeyCode.F9;
   const int DocumentSortingOrder = 900;
   const float PanelWidth = 250f;
-  const float PanelHeight = 74f;
+  const float PanelHeight = 90f;
   const float CornerMargin = 8f;
 
   static readonly Color BackgroundColor = new Color(0.09f, 0.11f, 0.09f, 0.88f);
@@ -45,6 +45,7 @@ namespace Abracodabra.UI.Toolkit {
   VisualElement panel;
   Label phaseLabel;
   Label checksumLabel;
+  Label eventsLabel;
   ExecutionPhaseDriver phaseDriver;
   bool isVisible = false;
 
@@ -165,6 +166,8 @@ namespace Abracodabra.UI.Toolkit {
    panel.Add(phaseLabel);
    checksumLabel = MakeLabel("Checksum –", 12, TextColor);
    panel.Add(checksumLabel);
+   eventsLabel = MakeLabel("Events this Day: –", 12, TextColor);
+   panel.Add(eventsLabel);
    panel.Add(MakeLabel("plants · cells · energy · fruit", 10, TitleColor));
 
    root.Add(panel);
@@ -186,6 +189,7 @@ namespace Abracodabra.UI.Toolkit {
    int tick = TickManager.Instance != null ? TickManager.Instance.CurrentTick : 0;
    phaseLabel.text = $"Tick {tick} · {DescribePhase()}";
    checksumLabel.text = $"Checksum  {ComputePlantChecksum()}";
+   eventsLabel.text = DayTally.EventsLine(); // B5: the density test's number
   }
 
   string DescribePhase() {

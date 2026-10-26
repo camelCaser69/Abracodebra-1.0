@@ -67,6 +67,10 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     public AnimalNeeds Needs => needs;
     public AnimalBehavior Behavior => behavior;
     public bool IsDying => isDying;
+
+    /// <summary>B5: the last source that hurt this animal, when the code knew it (a gene or "Thorns"); empty otherwise.</summary>
+    public string LastDamageSource => lastDamageSource;
+    string lastDamageSource = "";
     public string SpeciesName => definition != null ? definition.animalName : "Uninitialized";
 
     void Awake()
@@ -398,6 +402,14 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
     public void Heal(float amount) { if (needs != null) needs.Heal(amount); }
     public void ModifyHunger(float amount) { if (needs != null) needs.ModifyHunger(amount); }
 
+    /// <summary>B5: names what is about to hurt this animal, for the kill text and the Day tally. Unknown sources are simply not reported.</summary>
+    public void NoteDamageSource(string source)
+    {
+        if (string.IsNullOrEmpty(source)) return;
+        if (source.StartsWith("Payload ")) source = source.Substring("Payload ".Length);
+        lastDamageSource = source;
+    }
+
     public void TakeDamage(float amount)
     {
         if (isDying) return;
@@ -486,6 +498,14 @@ public class AnimalController : MonoBehaviour, ITickUpdateable, IStatusEffectabl
         deathFadeTimer = deathFadeDuration;
 
         Debug.Log($"[AnimalController] {SpeciesName} is dying! Duration: {deathFadeDuration}s");
+
+        // B5: say it on the map and count it (the gene's name when the code knew the source)
+        DayTally.NoteKill(SpeciesName, lastDamageSource);
+        FloatingCombatText.Spawn(
+            transform.position + Vector3.up * 0.4f,
+            string.IsNullOrEmpty(lastDamageSource) ? $"{SpeciesName.ToLowerInvariant()} down" : $"{SpeciesName.ToLowerInvariant()} down · {lastDamageSource}",
+            new Color(0.80f, 0.90f, 0.95f)
+        );
 
         if (GridDebugVisualizer.Instance != null)
         {

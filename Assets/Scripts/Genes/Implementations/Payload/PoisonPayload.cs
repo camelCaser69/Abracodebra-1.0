@@ -38,6 +38,7 @@ namespace Abracodabra.Genes.Implementations
             if (statusManager != null)
             {
                 statusManager.ApplyStatusEffect(poisonStatusEffect);
+                context.target.GetComponent<AnimalController>()?.NoteDamageSource(geneName); // B5: poison kills are named
 
                 if (context.source != null)
                 {

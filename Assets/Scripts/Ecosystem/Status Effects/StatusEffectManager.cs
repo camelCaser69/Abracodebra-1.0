@@ -168,7 +168,11 @@ public class StatusEffectManager : MonoBehaviour
             }
 
             // ── Standard per-tick effects ──
-            if (effect.damagePerTick) owner.TakeDamage(effect.damageAmount * instance.stackCount);
+            if (effect.damagePerTick)
+            {
+                (owner as AnimalController)?.NoteDamageSource(effect.displayName); // B5: a status effect's own name
+                owner.TakeDamage(effect.damageAmount * instance.stackCount);
+            }
             if (effect.healPerTick) owner.Heal(effect.healAmount * instance.stackCount);
             if (effect.modifyHunger) owner.ModifyHunger(effect.hungerModifier * instance.stackCount);
 

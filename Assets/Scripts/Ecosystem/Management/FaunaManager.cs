@@ -140,6 +140,7 @@ public class FaunaManager : MonoBehaviour
             bool isOffscreen = entry.spawnLocationType == WaveSpawnLocationType.Offscreen ||
                                entry.spawnLocationType == WaveSpawnLocationType.FixedEntry;
             GameObject spawnedAnimal = SpawnAnimal(entry.animalDefinition, spawnPos, isOffscreen);
+            if (i == 0 && spawnedAnimal != null) DayTally.NoteGroupArrived(entry); // B5: the first group of the run pauses the Day (D6)
 
             if (entry.spawnInterval > 0 && i < entry.spawnCount - 1)
             {

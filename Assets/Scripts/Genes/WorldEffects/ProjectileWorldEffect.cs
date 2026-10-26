@@ -103,6 +103,7 @@ namespace Abracodabra.Genes.WorldEffects
             {
                 // Apply base damage (goes through AnimalController which applies resistance)
                 float finalDamage = baseDamage * effectMultiplier;
+                target.NoteDamageSource("Projectile");
                 target.TakeDamage(finalDamage);
 
                 Debug.Log($"[Projectile] Hit {target.SpeciesName} for {finalDamage:F1} damage");
