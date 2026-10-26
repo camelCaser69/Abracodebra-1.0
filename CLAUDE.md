@@ -76,7 +76,9 @@ The knowledge base in `ClaudeProjectFiles/` is the memory; git is its version hi
 - Markdown, never .docx. Big docs are one markdown file: checklists, a separate "things to consider" section, and one **Next action** at the bottom.
 - Visual taste: moss-and-sage greens and grays; warm colors only where they mean something. Never encode state by red/green hue alone (Milan is partly red/green colour-blind).
 - UI must explain itself: phase banner, what to do now, labeled buttons; a new term gets a plain name and a hover.
-- Playtest sheets: ≤ ~8 items, in play order (`02_Design/Feedback_Log.md`).
+- Playtest sheets: ≤ ~8 items, in play order, Do / Look for / Answer, ★ on the answers that matter (`02_Design/Feedback_Log.md`).
+- **Milan's profile** (how he works, games he loves, design taste, hard constraints): `ClaudeProjectFiles/05_Reference/Milan_Preferences_Profile.md`. Hard constraints for every build: never red vs green alone; **Czech keyboard: no Y / Z and no Ctrl / Alt as game keys**.
+- Prompts handed to Milan: the header line **Model · Effort · Est. time · Est. usage**, then **Where** (repo, branch) and **When** (parallel or not, after what); a short name as a heading above each prompt block. Docs mentioned to him as clickable `file:///` links.
 - Chat stays short; code over explanation.
 
 ## 6. Design context

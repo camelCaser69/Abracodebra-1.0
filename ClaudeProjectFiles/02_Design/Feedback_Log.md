@@ -44,6 +44,10 @@ What Milan liked, disliked and asked for, in his words where possible, so genera
 25. **The Expedition's UI was the clearest** (Bitbloom, Milan, 2026-10-05): worded chips, a "reads as" sentence under the strand, a screen-space card, edits while paused. Never pictogram strings drawn in the world.
 26. **Chores should be automatic from the start** (Bitbloom, the Hollow toy, 2026-10-05): "produce should reach Doris automatically… not carried". The manual tier of "manual → automated" must be a decision, never a chore.
 27. **Density first** (Bitbloom rule 45, 2026-10-25): a small player in a big samey space reads as empty; keep the playable area tight and full. **Test panels never cover the game** (rule 47): dev readouts dock outside the play area, at a fixed size.
+28. **Czech keyboard: no Y / Z and no Ctrl / Alt as game keys** (Milan's profile, 2026-10-26, `05_Reference/Milan_Preferences_Profile.md` §2). Y and Z swap places on QWERTZ; Alt is AltGr on the right.
+29. **Cozy entry, mastery ceiling, about 30-minute runs** (profile §4, 2026-10-26). Games too hard or too long for adult life lose him (Rain World: "perfect but too hard and too time-consuming").
+30. **Risk should be voluntary and readable** (profile §3–4, Noita, 2026-10-26): there is always a safe line; the reward is visible before the risk; the risk is bounded per segment; one failure teaches its price. "Chill because chosen, tense because dangerous."
+31. **No copycats, no generic roguelike template, no complexity without depth** (profile §3, 2026-10-26: Magicraft "copy-pasted Noita's mechanics into the same but worse game"; Primordialis "too much stuff for too small an effect"; Grim Dawn's "elegant complexity" is the bar).
 
 ## Open shortcomings (design issues that came out of reviews)
 
@@ -51,6 +55,7 @@ What Milan liked, disliked and asked for, in his words where possible, so genera
 - [ ] ⚠️ **Perfect ≡ Good** is still the live minigame reward path (Ledger warning 4).
 - [ ] ⚠️ **The game cannot be lost** and has no victory arc (audit H1, H2). → Block 1 B3 (Doris by Dusk).
 - [ ] ⚠️ **The first ten minutes are undesigned** (audit H4).
+- [ ] ⚠️ **Animal stats are shown by holding Left Alt** (`AnimalController.showStatsKey`), against rule 28. Rebind (e.g. hold Shift, or hover only) in the next fix pass.
 
 ## Log
 
