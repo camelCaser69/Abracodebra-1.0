@@ -1,6 +1,8 @@
 # Abracodabra — Codebase Map
 **Full-codebase sweep, 2026-07-05. All 199 `.cs` files under `Assets/Scripts` read (live disk), plus UXML/USS, asset folders, and docs.**
 
+*Block 1 "Doris by Dusk" (B0-B7, 2026-10-26) is patched in: §3 (Dusk, ledger, invariant), §7 (waves, tally), §8 (belly, end overlay, banners, Reads as, dev readout), §10 (events), §11. B9 verified every class named there exists under `Assets/Scripts`.*
+
 How to use: this is the orientation layer. Trust it for *architecture and wiring*; before editing any file, still read its current on-disk version (live file wins). Line counts are as of sweep date and serve as regression signals.
 
 ---
@@ -112,10 +114,11 @@ Fruits: `BasicFruitGene` spawns `Fruit` components at spawn points; payloads con
 
 ## 8. UI Layer (UI Toolkit)
 
-- **`GameUIManager` (875L, biggest file)** — creates/wires all controllers from `GameUI_Document.uxml` (PlanningPanel: SeedEditor + Inventory + SpecSheet; HUDPanel: tick info, hotbar, hunger bars, Doris state). Owns `playerInventory` (list of `UIInventoryItem`) and registers it into `InventoryService` → **UI owns game data (review item B1)**. Panel switching driven by `RunManager.OnRunStateChanged`.
-- Controllers: `UIInventoryGridController` (grid + selection + locked seed slot), `UIHotbarController` (keys 1–8), `UIDragDropController` (all drag-drop incl. gene editor internal moves; 6 events), `UISeedEditorController` (742L; slots for passive/active/modifier/payload, name editor, color picker, Planning-only lock), `UISpecSheetController` (quality via `SeedQualityCalculator`, leaf-balance display from `SeedTooltipData`).
+- **`GameUIManager` (1043L after Block 1, was 875; biggest file)** — creates/wires all controllers from `GameUI_Document.uxml` (PlanningPanel: SeedEditor + Inventory + SpecSheet; HUDPanel: tick info, hotbar, hunger bars, Doris state). Owns `playerInventory` (list of `UIInventoryItem`) and registers it into `InventoryService` → **UI owns game data (review item B1)**. Panel switching driven by `RunManager.OnRunStateChanged`.
+- Controllers: `UIInventoryGridController` (grid + selection + locked seed slot), `UIHotbarController` (keys 1–8), `UIDragDropController` (all drag-drop incl. gene editor internal moves; 6 events), `UISeedEditorController` (784L; slots for passive/active/modifier/payload, name editor, color picker, Planning-only lock), `UISpecSheetController` (quality via `SeedQualityCalculator`, leaf-balance display from `SeedTooltipData`).
 - `UIInventoryItem` = unified wrapper (Seed | Tool | Gene | Resource) with `SeedRuntimeState`, `GeneInstance`, `ResourceInstance`.
 - **Block 1 B3 UI (2026-10-26):** `UIDorisBellyController` (plain class, GameUIManager-owned, lives in the HUD panel: 8 pips filled/hollow above Doris, repositioned in `GameUIManager.LateUpdate`, hover box from `DorisController.OnHoverChanged`); the HUD footer label is set to "DORIS'S BELLY" and shows "N / 8" in one sage colour; `UIRunEndOverlayController` (plain class on the root: kicker "DUSK n OF 5", title, reason, tonight's supper, seed, Restart (same seed) / New seed → `RunManager.RestartRun`), shown on `RunState.GameOver`; **garden view** (`GameUIManager.SetGardenView`, key G, VIEW GARDEN / EDIT SEEDS buttons, a second START DAY in the garden bar; static `GameUIManager.IsPlanningPanelOpen` makes `PlayerTileInteractor` and `FeedingSystem` ignore the mouse while the seed editor covers the world). Accessors `GameUIManager.DorisBelly` / `RunEndOverlay` for checks.
+- **Reads as (Block 1 B7, 2026-10-26):** `UISpecSheetController.BuildReadsAs(PlantGeneRuntimeState)` (static, pure) writes one sentence from the `RuntimeSequenceSlot` list (no buffer model / `SequenceParser` exists; when it does, only this method changes). Shown under a READS AS header in `UISeedEditorController` (rebuilt at the end of `DisplaySeed` and in `Clear`) and in the spec sheet under the description (seeds only). New genes need a branch in `DescribeStep` / `DescribeReaction` / `PayloadAdjectives` / `StepNoun`. `GameUIManager.SeedEditor` / `.SpecSheet` accessors.
 - **`UIDevReadoutController` (temporary dev readout, Block 1 B1, 2026-10-26):** not in any scene; a `[RuntimeInitializeOnLoadMethod(AfterSceneLoad)]` bootstrap makes one `DontDestroyOnLoad` object with its own `UIDocument` (borrows the scene UIDocument's PanelSettings, sortingOrder 900). F9 toggles (hidden by default). Bottom-left, fixed size: tick, phase (+ Day pause/speed), plant checksum (living plants · cells · energy · fruit). `UIDevReadoutController.ComputePlantChecksum()` is public static for CLI checks. Remove after the Block 1 playtest.
 - **Static services** (`Abracodabra.UI.Genes`): `InventoryService` (inventory list, `OnInventoryChanged`/`OnSlotChanged`, hotbar rows, `AddHarvestedItem`), `HotbarSelectionService` (`SelectedItem`/`SelectedIndex`, `OnSelectionChanged` → consumed by `PlayerTileInteractor` and `GameUIManager`).
 - World-space (TextMeshPro, outside UI Toolkit): `WorldHoverTooltip` (364L), `ThoughtBubbleController`, `PlantWorldUI`, `HungerUI` (legacy UGUI Slider — small second stack, review B3).
@@ -162,7 +165,7 @@ Fruits: `BasicFruitGene` spawns `Fruit` components at spawn points; payloads con
 
 ## 11. Big Files (refactor watch list)
 
-`GameUIManager` 1006 (post-B5, 2026-10-26; was 875) · `PlantGrowth` 907 · `GridPositionManager` 828 · `TileInteractionManager` 775 · `UISeedEditorController` 742 · `AnimalMovement` 738 · `FoodSelectionPopup` 648 · `DorisController` 620 · `AnimalController` 635 · `FeedingSystem` 510 · `WaterReflection` 506. (Review B4 targets PlantGrowth split before archetype content.)
+`GameUIManager` 1043 (post-B7, 2026-10-26; was 875) · `PlantGrowth` 913 · `GridPositionManager` 828 · `TileInteractionManager` 775 · `UISeedEditorController` 784 · `AnimalMovement` 738 · `FoodSelectionPopup` 648 · `DorisController` 620 · `AnimalController` 635 · `UISpecSheetController` 408 · `FeedingSystem` 510 · `WaterReflection` 506. (Review B4 targets PlantGrowth split before archetype content.)
 
 ---
 
